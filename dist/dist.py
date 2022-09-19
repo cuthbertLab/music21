@@ -47,7 +47,8 @@ the announcement while it's running.
 
 12b. If any new file extensions have been added, be sure to add them to MANIFEST.in
 
-13. And finally this file. (from the command line; not as python -m...)
+13. And finally this file. (from the command line; not as python -m...; cwd must
+    be music21[base]/dist/ )
     There are major problems in SetupTools -- v8 (or even a 7.3.1) needs to
     fix them -- creating a dir music21.egg-info in the main dir with a
     requires.txt file created as root.
@@ -59,14 +60,15 @@ the announcement while it's running.
 15. Tag the commit: git tag -a vX.Y.Z -m "music21 vX.Y.Z"
     Don't forget the "v" in the release tag.
     Sanity check that the correct commit was tagged: git log
-    Push tags: git push upstream --tags
 
-16. Create a new release on GitHub and upload the TWO files created here and docs.
+16. Push tags: git push upstream --tags
+
+17. Create a new release on GitHub and upload the TWO files created here and docs.
     Drag in this order: .tar.gz, documentation, no-corpus.tar.gz
 
     Finish this before doing the next step, even though it looks like it could be done in parallel.
 
-17. Upload the new file to PyPI with "twine upload music21-7.3.5a2.tar.gz" [*]
+18. Upload the new file to PyPI with "twine upload music21-7.3.5a2.tar.gz" [*]
 
     [*] Requires twine to be installed
 
@@ -80,14 +82,14 @@ the announcement while it's running.
         username:your_username
         password:your_password
 
-18. Delete the two .tar.gz files in dist...
+19. Delete the two .tar.gz files in dist...
 
-19. For starting a new major release create a GitHub branch for the old one.
+20. For starting a new major release create a GitHub branch for the old one.
 
-20. Immediately increment the number in _version.py and run tests on it here
+21. Immediately increment the number in _version.py and run tests on it here
     to prepare for next release.
 
-21. Announce on the blog, to the list, and twitter.
+22. Announce on the blog, to the list, and twitter.
 
 DO NOT RUN THIS ON A PC -- the Mac .tar.gz has an incorrect permission if you do.
 '''

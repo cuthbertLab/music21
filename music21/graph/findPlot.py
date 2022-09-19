@@ -235,7 +235,7 @@ def axisMatchesValue(axisClass: t.Union[t.Type[axis.Axis], axis.Axis], axisValue
     return False
 
 
-def getPlotsToMake(graphFormat=None,
+def getPlotsToMake(graphFormat: t.Optional[str] = None,
                    xValue=None,
                    yValue=None,
                    zValue=None):

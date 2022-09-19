@@ -27,6 +27,7 @@ class TieException(exceptions21.Music21Exception):
 
 # ------------------------------------------------------------------------------
 class Tie(prebase.ProtoM21Object, SlottedObjectMixin):
+    # pylint: disable-next=line-too-long
     '''
     An object added to Notes that are tied to other notes. The `type` value is one
     of start, stop, or continue.
@@ -41,10 +42,11 @@ class Tie(prebase.ProtoM21Object, SlottedObjectMixin):
     <music21.tie.Tie start>
 
     Generally Ties have a placement of None, but if they are defined
-    as 'above' or 'below' this will be retained.  (see:
-    https://forums.makemusic.com/viewtopic.php?f=12&t=2179&start=0
+    as 'above' or 'below' this will be retained.  (see: `this discussion`_
     for how orientation and placement in musicxml are essentially the same
     content).
+
+    .. _this discussion: https://web.archive.org/web/20210302051136/https://forums.makemusic.com/viewtopic.php?f=12&t=2179&start=0
 
     >>> note1.tie.placement is None
     True

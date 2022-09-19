@@ -107,6 +107,7 @@ class Specifier(enum.IntEnum):
 
     def __str__(self) -> str:
         # this should just be prefixSpecs[self.value] but pylint chokes
+        # noinspection PyTypeChecker
         return str(prefixSpecs[int(self.value)])
 
     def __repr__(self):
@@ -114,11 +115,12 @@ class Specifier(enum.IntEnum):
 
     @property
     def niceName(self):
+        # noinspection PyTypeChecker
         return niceSpecNames[int(self.value)]
 
     def inversion(self):
         '''
-        Return a new specifier that inverts this Specifier
+        Return a new specifier that inverts this Specifier.
 
         >>> interval.Specifier.MAJOR.inversion()
         <Specifier.MINOR>
@@ -127,6 +129,7 @@ class Specifier(enum.IntEnum):
         >>> interval.Specifier.PERFECT.inversion()
         <Specifier.PERFECT>
         '''
+        # noinspection PyTypeChecker
         v = int(self.value)
         inversions = [None, 1, 3, 2, 5, 4, 7, 6, 9, 8, 11, 10]
         return Specifier(inversions[v])
@@ -2946,10 +2949,14 @@ class Interval(IntervalBase):
     <music21.interval.Interval dddd9>
 
     Changed in v8:
+
     * Pitches are emphasized over notes.
+
     * It is not possible to create an interval with a name and a pitchStart/noteStart
-        and automatically get a pitchEnd/noteEnd in the process.  Set them later.
+      and automatically get a pitchEnd/noteEnd in the process.  Set them later.
+
     * Incompatible keywords raise ValueError not IntervalException.
+
     * An empty instantiation gives a P1 interval.
 
     OMIT_FROM_DOCS
