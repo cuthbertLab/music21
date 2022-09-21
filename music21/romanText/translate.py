@@ -216,7 +216,9 @@ def _copySingleMeasure(rtTagged, p, kCurrent):
                 else:
                     rnPast.key = kCurrent
                 if rnPast.secondaryRomanNumeral is not None:
-                    newRN = roman.RomanNumeral(rnPast.figure, kCurrent)
+                    newRN = roman.RomanNumeral(
+                        rnPast.figure, copy.deepcopy(kCurrent)
+                    )
                     newRN.duration = copy.deepcopy(rnPast.duration)
                     newRN.lyrics = copy.deepcopy(rnPast.lyrics)
                     m.replace(rnPast, newRN)
@@ -282,7 +284,9 @@ def _copyMultipleMeasures(rtMeasure: rtObjects.RTMeasure,
                 else:
                     rnPast.key = kCurrent
                 if rnPast.secondaryRomanNumeral is not None:
-                    newRN = roman.RomanNumeral(rnPast.figure, kCurrent)
+                    newRN = roman.RomanNumeral(
+                        rnPast.figure, copy.deepcopy(kCurrent)
+                    )
                     newRN.duration = copy.deepcopy(rnPast.duration)
                     newRN.lyrics = copy.deepcopy(rnPast.lyrics)
                     m.replace(rnPast, newRN)

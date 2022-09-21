@@ -3110,7 +3110,7 @@ class RomanNumeral(harmony.Harmony):
             post.key = self.key.transpose(value, inPlace=False)
             return post
         else:
-            self.key.transpose(value, inPlace=True)
+            self.key = self.key.transpose(value, inPlace=False)
             return None
 
 
