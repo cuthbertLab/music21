@@ -3107,6 +3107,7 @@ class MeasureExporter(XMLExporterBase):
             ('Dynamic', 'dynamicToXml'),
             ('Segno', 'segnoToXml'),
             ('Coda', 'codaToXml'),
+            ('TempoText', 'tempoIndicationToXml'),
             ('MetronomeMark', 'tempoIndicationToXml'),
             ('MetricModulation', 'tempoIndicationToXml'),
             ('TextExpression', 'textExpressionToXml'),
@@ -5828,6 +5829,18 @@ class MeasureExporter(XMLExporterBase):
           </direction-type>
           <sound tempo="60" />
         </direction>
+
+        This is the case of a TempoText.
+
+        >>> tt = tempo.TempoText('Andante')
+        >>> mxDirection = MEX.tempoIndicationToXml(tt)
+        >>> MEX.dump(mxDirection)
+        <direction>
+          <direction-type>
+            <words default-y="45" enclosure="none" font-weight="bold">Andante</words>
+          </direction-type>
+        </direction>
+
         '''
         # if writing just a sound tag, place an empty words tag in a
         # direction type and then follow with sound declaration
@@ -5838,6 +5851,13 @@ class MeasureExporter(XMLExporterBase):
         hideNumber = []  # hide the number after equal, e.g., quarter=120, hide 120
         # store the last value necessary as a sounding tag in bpm
         soundingQuarterBPM = False
+
+        # handle TempoText simply by exporting its textExpression.
+        if isinstance(ti, tempo.TempoText):
+            te = ti.getTextExpression()
+            te.offset = ti.offset
+            return self.textExpressionToXml(te)
+
         if isinstance(ti, tempo.MetronomeMark):
             # will not show a number of implicit
             if ti.numberImplicit or ti.number is None:
