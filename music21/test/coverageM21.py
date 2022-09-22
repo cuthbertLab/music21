@@ -6,22 +6,17 @@
 # Authors:      Christopher Ariza
 #               Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2014-15 Michael Scott Asato Cuthbert and the music21 Project
+# Copyright:    Copyright © 2014-15 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 import sys
 
 omit_modules = [
-    'music21/ext/*',
     'dist/dist.py',
-    'installer.py',
-    'music21/documentation/upload.py',
-    'music21/documentation/make.py',
     'music21/test/*',
-    'music21/demos/*',  # maybe remove someday...
     'music21/configure.py',
     'music21/figuredBass/examples.py',
-    'music21/alpha/*',  # trecento/tonality.py'
+    'music21/alpha/*',
 ]
 
 # THESE ARE NOT RELEVANT FOR coveralls.io -- edit .coveragerc to change that
@@ -51,7 +46,7 @@ def getCoverage(overrideVersion=False):
         try:
             # noinspection PyPackageRequirements
             import coverage  # type: ignore
-            cov = coverage.Coverage(omit=omit_modules)
+            cov = coverage.Coverage(omit=omit_modules)  # , debug='trace')
             for e in exclude_lines:
                 cov.exclude(e, which='exclude')
             cov.start()

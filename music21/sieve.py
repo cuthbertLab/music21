@@ -6,7 +6,7 @@
 # Authors:      Christopher Ariza
 #
 # Copyright:    Copyright © 2003, 2010 Christopher Ariza
-#               Copyright © 2010-2012, 19 Michael Scott Asato Cuthbert and the music21 Project
+#               Copyright © 2010-2012, 19 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
@@ -416,7 +416,6 @@ def _lcmRecurse(filterList):
     Given a list of values, find the LCM of all the values by iteratively
     looking doing an LCM comparison to the values in the list.
 
-    >>> from music21 import sieve
     >>> sieve._lcmRecurse([2, 3])
     6
     >>> sieve._lcmRecurse([2, 3, 12])

@@ -21,6 +21,7 @@ __pycache__/
 
 # OSX
 .DS_Store
+**/.DS_Store
 
 # C extensions
 *.so
@@ -40,6 +41,7 @@ develop-eggs
 lib
 lib64
 __pycache__
+**/__pycache__
 venv
 
 # Installer logs

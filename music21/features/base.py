@@ -6,7 +6,7 @@
 # Authors:      Christopher Ariza
 #               Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2011-2022 Michael Scott Asato Cuthbert and the music21 Project
+# Copyright:    Copyright © 2011-2022 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 from __future__ import annotations
@@ -260,7 +260,6 @@ class FeatureExtractor:
         '''
         Return a properly configured plain feature as a placeholder
 
-        >>> from music21 import features
         >>> fe = features.jSymbolic.InitialTimeSignatureFeature()
         >>> fe.name
         'Initial Time Signature'

@@ -2,6 +2,7 @@
 pylint
 flake8
 flake8-quotes
+hatchling
 mypy
 coveralls
 scipy

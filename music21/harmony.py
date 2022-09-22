@@ -8,7 +8,7 @@
 #               Jacob Tyler Walls
 #               Christopher Ariza
 #
-# Copyright:    Copyright © 2011-2022, Michael Scott Asato Cuthbert and the music21 Project
+# Copyright:    Copyright © 2011-2022, Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
@@ -2365,7 +2365,6 @@ class NoChord(ChordSymbol):
     encode absence of chords. This is especially useful to stop a chord
     without playing another.
 
-    >>> from music21 import stream, note, harmony
     >>> from music21.harmony import ChordSymbol, NoChord
     >>> s = stream.Score()
     >>> s.repeatAppend(note.Note('C'), 4)

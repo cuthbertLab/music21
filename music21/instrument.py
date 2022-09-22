@@ -10,7 +10,7 @@
 #               Ben Houge
 #               Mark Gotham
 #
-# Copyright:    Copyright © 2009-2022 Michael Scott Asato Cuthbert and the music21 Project
+# Copyright:    Copyright © 2009-2022 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
@@ -21,10 +21,8 @@ or instrument family, such as string pitches, etc.  Information about instrument
 ensembles is also included here though it may later be separated out into its own
 ensemble.py module.
 '''
-import copy
 import importlib
 import unittest
-import sys
 from collections import OrderedDict
 import typing as t
 
@@ -2324,7 +2322,6 @@ def fromString(instrumentString: str,
     for example), attempts to return an appropriate
     :class:`~music21.instrument.Instrument`.
 
-    >>> from music21 import instrument
     >>> t1 = instrument.fromString('Clarinet 2 in A')
     >>> t1
     <music21.instrument.Clarinet 'Clarinet 2 in A'>
@@ -2424,7 +2421,6 @@ def fromString(instrumentString: str,
     >>> t12
     <music21.instrument.Clarinet 'Klarinette'>
 
-
     This case works because the name 'Klarinette' is a recognised instrument name in German
     and appears in the German language list.
     If you search for a German name like 'Klarinette' on the French list (language='french'),
@@ -2434,7 +2430,6 @@ def fromString(instrumentString: str,
     'english', 'french', 'german', 'italian', 'russian', 'spanish', and 'abbreviation'.
 
     Note that the language string is not case-sensitive, so 'French' is also fine.
-
     '''
     from music21.languageExcerpts import instrumentLookup
 
@@ -2575,25 +2570,8 @@ class TestExternal(unittest.TestCase):
 class Test(unittest.TestCase):
 
     def testCopyAndDeepcopy(self):
-        '''Test copying all objects defined in this module
-        '''
-        import types
-        for part in sys.modules[self.__module__].__dict__.keys():
-            match = False
-            for skip in ['_', '__', 'Test', 'Exception']:
-                if part.startswith(skip) or part.endswith(skip):
-                    match = True
-            if match:
-                continue
-            name = getattr(sys.modules[self.__module__], part)
-            # noinspection PyTypeChecker
-            if callable(name) and not isinstance(name, types.FunctionType):
-                try:  # see if obj can be made w/ args
-                    obj = name()
-                except TypeError:  # pragma: no cover
-                    continue
-                i = copy.copy(obj)
-                j = copy.deepcopy(obj)
+        from music21.test.commonTest import testCopyAll
+        testCopyAll(self, globals())
 
     def testMusicXMLExport(self):
         from music21 import stream

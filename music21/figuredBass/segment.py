@@ -4,7 +4,7 @@
 # Purpose:      figured bass note and notational realization.
 # Authors:      Jose Cabal-Ugaz
 #
-# Copyright:    Copyright © 2011 Michael Scott Asato Cuthbert and the music21 Project
+# Copyright:    Copyright © 2011 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 import collections
@@ -323,7 +323,6 @@ class Segment:
 
         Dominant Seventh Segment:
 
-        >>> from music21 import note
         >>> segmentA = segment.Segment(bassNote=note.Note('B2'), notationString='6,5')
         >>> allSpecialResRules = segmentA.specialResolutionRules()
         >>> segment.printRules(allSpecialResRules, maxLength=3)
@@ -380,7 +379,6 @@ class Segment:
         as an ordinary Segment.
 
         >>> from music21.figuredBass import segment
-        >>> from music21 import note
         >>> segmentA = segment.Segment(bassNote=note.Note('G2'), notationString='7')
         >>> allDomPossib = segmentA.allCorrectSinglePossibilities()
         >>> allDomPossibList = list(allDomPossib)
@@ -480,7 +478,6 @@ class Segment:
         as an ordinary Segment.
 
         >>> from music21.figuredBass import segment
-        >>> from music21 import note
         >>> segmentA = segment.Segment(bassNote=note.Note('B2'), notationString='b7')
         >>> allDimPossib = segmentA.allCorrectSinglePossibilities()
         >>> allDimPossibList = list(allDimPossib)
@@ -558,7 +555,6 @@ class Segment:
 
 
         >>> from music21.figuredBass import segment
-        >>> from music21 import note
         >>> segmentA = segment.Segment(bassNote=note.Note('A-2'), notationString='#6,b5,3')
         >>> segmentA.pitchNamesInChord  # spell out a Gr+6 chord
         ['A-', 'C', 'E-', 'F#']
@@ -736,7 +732,6 @@ class Segment:
            to True.
 
         >>> from music21.figuredBass import segment
-        >>> from music21 import note
         >>> segmentA = segment.Segment(bassNote=note.Note('C3'), notationString='')
         >>> segmentB = segment.Segment(bassNote=note.Note('D3'), notationString='4,3')
 
@@ -874,8 +869,6 @@ def getPitches(pitchNames=('C', 'E', 'G'),
     pitches between the two limits (inclusive) which correspond to items in pitchNames.
 
     >>> from music21.figuredBass import segment
-    >>> from music21 import pitch
-
     >>> pitches = segment.getPitches()
     >>> print(', '.join([p.nameWithOctave for p in pitches]))
     C3, E3, G3, C4, E4, G4, C5, E5, G5, C6, E6, G6, C7, E7, G7, C8

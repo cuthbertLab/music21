@@ -6,7 +6,7 @@
 # Authors:      Michael Scott Asato Cuthbert
 #               Christopher Ariza
 #
-# Copyright:    Copyright © 2009-2012, 2020 Michael Scott Asato Cuthbert and the music21 Project
+# Copyright:    Copyright © 2009-2012, 2020 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
@@ -405,6 +405,8 @@ class Test(unittest.TestCase):
     def testFreezeThaw(self):
         from music21 import converter
         from music21 import stream
+        # pylint: disable=redefined-outer-name
+        from music21.bar import Barline  # avoid not same class error
 
         b = Barline()
         self.assertNotIn('StyleMixin', b.classes)

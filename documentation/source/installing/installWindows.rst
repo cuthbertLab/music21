@@ -13,7 +13,7 @@ is written in and in which you will write your own programs that
 use `music21`.
 
 Windows users should download and install Python version
-3.8 or higher.
+3.10 or higher.
 
 To get Python for Windows, go to https://www.python.org/downloads/
 and click on the "Windows installer" link.  It is probably the
@@ -37,7 +37,7 @@ typing in "IDLE" or (on Windows Vista and newer) typing
 in "IDLE" in the Search Programs list.
 
 The first lines of text displayed will include a version number.
-Make sure it begins with 3.7 or higher.
+Make sure it begins with 3.10 or higher.
 
 If your version is too old, download a newer version as above.
 
@@ -66,15 +66,15 @@ Python on your system.  Try uninstalling all of them along with `music21`
 and then restarting from scratch).
 
 You should then configure `music21` to find your helper programs
-such as MuseScore or Finale.  In IDLE
-type::
+such as MuseScore or Finale.  In the command prompt, type::
+
+    python3 -m music21.configure
+
+Or, in IDLE type::
 
     import music21
     music21.configure.run()
 
-or in the command prompt, type::
-
-    python3 -m music21.configure
 
 After Installation
 -------------------------------

@@ -5,7 +5,7 @@
 #
 # Authors:      Christopher Ariza
 #
-# Copyright:    Copyright © 2010, 16 Michael Scott Asato Cuthbert and the music21 Project
+# Copyright:    Copyright © 2010, 16 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 
@@ -15,7 +15,7 @@ This module defines classes for representing Scala scale data,
 including Scala pitch representations, storage, and files.
 
 The Scala format is defined at the following URL:
-http://www.huygens-fokker.org/scala/scl_format.html
+https://www.huygens-fokker.org/scala/scl_format.html
 
 We thank Manuel Op de Coul for allowing us to include
 the repository (as of May 11, 2011) with music21
@@ -128,7 +128,7 @@ class ScalaPitch:
      600.0883..., 699.9976..., 800.9095..., 900.0260...,
      1000.0201..., 1088.2687..., 1200.0]
     '''
-    # pitch values; if it has a period, it is cents.  Otherwise it is a ratio
+    # pitch values; if it has a period, it is cents.  Otherwise, it is a ratio
     # above the implied base ratio
     # integer values w/ no period or slash: 2 is 2/1
     def __init__(self, sourceString=None):

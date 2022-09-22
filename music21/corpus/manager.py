@@ -7,7 +7,7 @@
 #               Josiah Wolf Oberholtzer
 #               Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2009, 2013, 2015-17 Michael Scott Asato Cuthbert and the music21 Project
+# Copyright:    Copyright © 2009, 2013, 2015-17 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # -----------------------------------------------------------------------------
 '''
@@ -17,8 +17,11 @@ interface to searching corpora.
 New in v3 -- previously most were static methods on corpus.corpora.Corpus, but that
 seemed inappropriate since these work across corpora.
 '''
+from __future__ import annotations
+
 import pathlib
 import os
+import typing as t
 
 from music21 import common
 from music21 import converter
@@ -28,7 +31,7 @@ from music21 import metadata
 from music21.corpus import corpora
 from music21.exceptions21 import CorpusException
 
-_metadataBundles = {
+_metadataBundles: t.Dict[str, t.Optional['music21.metadata.bundles.MetadataBundle']] = {
     'core': None,
     'local': None,
     # 'virtual': None,
@@ -327,10 +330,7 @@ def cacheMetadataBundleFromDisk(corpusObject):
         metadataBundle = metadata.bundles.MetadataBundle(corpusName)
         metadataBundle.read()
         metadataBundle.validate()
-        # _metadataBundles needs TypedDict.
-        # noinspection PyTypeChecker
         _metadataBundles[corpusName] = metadataBundle
-
 
 def readAllMetadataBundlesFromDisk():
     '''

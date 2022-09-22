@@ -7,7 +7,7 @@
 #               Christopher Ariza
 #               Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2013-17 Michael Scott Asato Cuthbert and the music21 Project
+# Copyright:    Copyright © 2013-17 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # -----------------------------------------------------------------------------
 
@@ -393,6 +393,7 @@ class ClassDocumenter(ObjectDocumenter):
        - :attr:`~music21.base.Music21Object.classSortOrder`
        - :attr:`~music21.base.Music21Object.groups`
        - :attr:`~music21.base.Music21Object.isStream`
+       - :attr:`~music21.base.Music21Object.sites`
     '''
 
     # CLASS VARIABLES #
@@ -1056,6 +1057,7 @@ class ClassDocumenter(ObjectDocumenter):
         ''
         '   - :attr:`~music21.note.GeneralNote.lyric`'
         '   - :attr:`~music21.note.GeneralNote.pitches`'
+        '   - :attr:`~music21.note.GeneralNote.tie`'
         ''
         'Read/write properties inherited from :class:`~music21.base.Music21Object`:'
         ''

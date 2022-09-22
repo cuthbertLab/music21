@@ -7,7 +7,7 @@
 #               Michael Scott Asato Cuthbert
 #               Jose Cabal-Ugaz
 #
-# Copyright:    Copyright © 2009-2011 Michael Scott Asato Cuthbert and the music21 Project
+# Copyright:    Copyright © 2009-2011 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''

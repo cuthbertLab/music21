@@ -9,7 +9,6 @@
 #               Evan Lynch
 #
 # Copyright:    Copyright © 2008-2022 Michael Scott Asato Cuthbert
-#               and the music21 Project
 # License:      BSD, see license.txt
 # -----------------------------------------------------------------------------
 

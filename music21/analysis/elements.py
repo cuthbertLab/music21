@@ -5,7 +5,7 @@
 #
 # Authors:      Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2017-22 Michael Scott Asato Cuthbert and the music21 Project
+# Copyright:    Copyright © 2017-22 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 import collections
@@ -15,7 +15,6 @@ def attributeCount(streamOrStreamIter, attrName='quarterLength') -> collections.
     Return a collections.Counter of attribute usage for elements in a stream
     or StreamIterator
 
-    >>> from music21 import corpus
     >>> bach = corpus.parse('bach/bwv324.xml')
     >>> bachIter = bach.parts[0].recurse().getElementsByClass(note.Note)
     >>> qlCount = analysis.elements.attributeCount(bachIter, 'quarterLength')

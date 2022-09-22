@@ -4,7 +4,7 @@
 # Purpose:      representations of figured bass notation
 # Authors:      Jose Cabal-Ugaz
 #
-# Copyright:    Copyright © 2011 Michael Scott Asato Cuthbert and the music21 Project
+# Copyright:    Copyright © 2011 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 import copy
@@ -567,7 +567,6 @@ class Modifier(prebase.ProtoM21Object):
         Given a :class:`~music21.pitch.Pitch`, modify its :attr:`~music21.pitch.Pitch.accidental`
         given the Modifier's :attr:`~music21.figuredBass.notation.Modifier.accidental`.
 
-        >>> from music21 import pitch
         >>> from music21.figuredBass import notation
         >>> m1 = notation.Modifier('#')
         >>> m2 = notation.Modifier('-')

@@ -5,12 +5,12 @@
 #
 # Authors:      Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2012-15 Michael Scott Asato Cuthbert and the music21 Project
+# Copyright:    Copyright © 2012-15 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
 Multiprocess testing.  Tests all doctests and Test unittest objects in all
-modules that are imported when running "import music21".  Runs threads on
+modules that are imported when running "import music21".  Runs a thread on
 each core of a multicore system unless there are more than 2 cores, in which
 case it runs on n-1 cores.
 
@@ -73,7 +73,7 @@ def runOneModuleWithoutImp(args):
         return ModuleResponse(returnCode='NotInTree', fp=fp, success=success)
 
     try:
-        moduleName = modGath._getName(fp)
+        moduleName = modGath._getNamePeriod(fp, addM21=False)
 
         s1 = commonTest.defaultDoctestSuite()
 
@@ -132,7 +132,7 @@ def runOneModuleWithoutImp(args):
 
 def mainPoolRunner(testGroup=('test',), restoreEnvironmentDefaults=False, leaveOut=1):
     '''
-    Run all tests. Group can be test and/or external
+    Run all tests. Group can be "test" and/or "external"
     '''
     commonTest.testImports()
 
@@ -174,7 +174,6 @@ def mainPoolRunner(testGroup=('test',), restoreEnvironmentDefaults=False, leaveO
                     if newResult.moduleName is not None:
                         mn = newResult.moduleName
                         mn = mn.replace('___init__', '')
-                        mn = mn.replace('_', '.')
                     else:
                         mn = ''
                     rt = newResult.runTime

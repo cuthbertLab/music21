@@ -5,7 +5,7 @@
 #
 # Authors:      Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2011-2018 Michael Scott Asato Cuthbert and the music21 Project
+# Copyright:    Copyright © 2011-2018 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
@@ -61,7 +61,6 @@ def translateMonophonicPartToSegments(
     If algorithm is None then a default algorithm of music21.search.translateStreamToStringNoRhythm
     is used
 
-    >>> from music21 import *
     >>> luca = corpus.parse('luca/gloria')
     >>> lucaCantus = luca.parts[0]
     >>> segments, measureLists = search.segment.translateMonophonicPartToSegments(lucaCantus)

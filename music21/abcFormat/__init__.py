@@ -7,7 +7,7 @@
 #               Michael Scott Asato Cuthbert
 #               Dylan J. Nagler
 #
-# Copyright:    Copyright © 2010, 2013 Michael Scott Asato Cuthbert and the music21 Project
+# Copyright:    Copyright © 2010, 2013 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
@@ -24,7 +24,7 @@ the `converter` module:
 
 For users who will be editing ABC extensively or need a way to have music21 output ABC
 (which it doesn't do natively), we suggest using the open source EasyABC package:
-https://www.nilsliberg.se/ksp/easyabc/ .  You can set it up as a MusicXML reader through:
+http://easyabc.sourceforge.net .  You can set it up as a MusicXML reader through:
 
 >>> #_DOCS_SHOW us = environment.UserSettings()
 >>> #_DOCS_SHOW us['musicxmlPath'] = '/Applications/EasyABC.app'
@@ -416,8 +416,6 @@ class ABCMetadata(ABCToken):
         '''
         Extract key signature parameters,
         returning the number of sharps and the mode.
-
-        >>> from music21 import abcFormat
 
         >>> am = abcFormat.ABCMetadata('K:Eb Lydian')
         >>> am.preParse()

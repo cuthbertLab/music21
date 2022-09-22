@@ -1,8 +1,9 @@
 # music21 #
 
-music21 -- A Toolkit for Computational Musicology
+`music21` -- A Toolkit for Computer-Aided Musical Analysis and 
+Computational Musicology
 
-Copyright © 2006-2022, Michael Scott Asato Cuthbert and cuthbertLab
+Copyright © 2006-2022, [Michael Scott Asato Cuthbert](http://www.trecento.com)
 
 For more information, visit:
 https://web.mit.edu/music21
@@ -13,14 +14,13 @@ https://tinyurl.com/m21colab
 And to install, see:
 https://web.mit.edu/music21/doc/usersGuide/usersGuide_01_installing.html
 
-Music21 runs on Python 3.8+.  Use version 4 on Python 2 or Py3.4, version 5
+`Music21` runs on Python 3.8+.  Use version 4 on Python 2 or Py3.4, version 5
 on Py3.5, version 6 on Py3.6, version 7 on Py3.7.
 
-Released under the BSD (3-clause) license. Music21 may also be used
-under the LGPL license.  See LICENSE.
+Released under the BSD (3-clause) license. See LICENSE.
 Externally provided software (including the MIT licensed Lilypond/MusicXML test Suite) and
 music encoding in the corpus may have different licenses and/or copyrights. 
-A no-corpus version of music21 is available also on GitHub.
+A no-corpus version of `music21` is available also on GitHub.
 
 [![Build Status](https://github.com/cuthbertLab/music21/workflows/maincheck/badge.svg)](https://github.com/cuthbertLab/music21)
 [![Lint Status](https://github.com/cuthbertLab/music21/workflows/PyLint/badge.svg)](https://github.com/cuthbertLab/music21)
@@ -42,7 +42,7 @@ See: https://groups.google.com/forum/#!forum/music21list
 
 ## Community Code of Conduct ##
 
-Music21 encourages contributions, discussions, and usage from all people interested in
+`Music21` encourages contributions, discussions, and usage from all people interested in
 music and computers. This encouragement extends to all people regardless of (among other aspects)
 gender, race, sexual orientation, disability, religion, appearance, veteran status,
 gender identity, socioeconomic status, or nationality.
@@ -57,7 +57,15 @@ sometimes make mistakes and will, in general, accept sincere regrets for such ca
 Blatant or repeated violations of the code will result in the removal of the
 contributor’s participation in the community.
 
-The maintainers of music21 and associated sites will commit themselves to enforcing
+The maintainers of `music21` and associated sites will commit themselves to enforcing
 this code of conduct. Users who notice violations, including instances of abuse,
 harassment, or otherwise unacceptable behavior are requested to contact cuthbert@mit.edu.
 Maintainers will respect confidentiality with regard to reports.
+
+## Acknowledgements ##
+
+The development of `music21` has been supported by
+the generosity of the Seaver Institute and the
+National Endowment for the Humanities.  MIT's Music and Theater Arts Section
+and the School of Humanities, Arts, and Social Sciences encouraged Cuthbert
+in its development.

@@ -8,7 +8,7 @@
 #               Josiah Wolf Oberholtzer
 #               Evan Lynch
 #
-# Copyright:    Copyright © 2008-2022 Michael Scott Asato Cuthbert and the music21 Project
+# Copyright:    Copyright © 2008-2022 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # -----------------------------------------------------------------------------
 '''
@@ -28,7 +28,6 @@ import math
 import os
 import pathlib
 import unittest
-import sys
 import warnings
 
 from collections import namedtuple
@@ -65,6 +64,7 @@ from music21.stream import makeNotation
 from music21.stream import streamStatus
 from music21.stream import iterator
 from music21.stream import filters
+from music21.stream.enums import GivenElementsBehavior, RecursionType
 
 from music21.common.numberTools import opFrac
 from music21.common.enums import GatherSpanners, OffsetSpecial
@@ -219,16 +219,20 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         {0.0} <music21.stream.Measure 0 offset=0.0>
             {0.0} <music21.chord.Chord C2 A2>
 
-    This behavior can be modified by the `appendOrInsert` keyword to go against norms:
+    This behavior can be modified by the `givenElementsBehavior` keyword to go against the norm
+    of 'OFFSETS':
 
-    >>> s6 = stream.Stream([note.Note('C'), note.Note('D')], appendOrInsert='insert')
+    >>> from music21.stream.enums import GivenElementsBehavior
+    >>> s6 = stream.Stream([note.Note('C'), note.Note('D')],
+    ...                    givenElementsBehavior=GivenElementsBehavior.INSERT)
     >>> s6.show('text')  # all notes at offset 0.0
     {0.0} <music21.note.Note C>
     {0.0} <music21.note.Note D>
 
     >>> p1 = stream.Part(stream.Measure(note.Note('C')), id='p1')
     >>> p2 = stream.Part(stream.Measure(note.Note('D')), id='p2')
-    >>> s7 = stream.Score([p1, p2], appendOrInsert='append')
+    >>> s7 = stream.Score([p1, p2],
+    ...                   givenElementsBehavior=GivenElementsBehavior.APPEND)
     >>> s7.show('text')  # parts following each other (not recommended)
     {0.0} <music21.stream.Part p1>
         {0.0} <music21.stream.Measure 0 offset=0.0>
@@ -236,7 +240,6 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
     {1.0} <music21.stream.Part p2>
         {0.0} <music21.stream.Measure 0 offset=0.0>
             {0.0} <music21.note.Note D>
-
 
     For developers of subclasses, please note that because of how Streams
     are copied, there cannot be
@@ -249,14 +252,14 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
                 ...
 
     New in v.7 -- smart appending
-    New in v.8 -- appendOrInsert keyword configures the smart appending.
+    New in v.8 -- givenElementsBehavior keyword configures the smart appending.
     '''
     # this static attributes offer a performance boost over other
     # forms of checking class
     isStream = True
     isMeasure = False
     classSortOrder: t.Union[int, float] = -20
-    recursionType = 'elementsFirst'
+    recursionType: RecursionType = RecursionType.ELEMENTS_FIRST
 
     _styleClass = style.StreamStyle
 
@@ -271,7 +274,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         'recursionType': '''
             Class variable:
 
-            String of ('elementsFirst' (default), 'flatten', 'elementsOnly)
+            RecursionType Enum of (ELEMENTS_FIRST (default), FLATTEN, ELEMENTS_ONLY)
             that decides whether the stream likely holds relevant
             contexts for the elements in it.
 
@@ -313,7 +316,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
                                         base.Music21Object,
                                         t.Sequence[base.Music21Object]] = None,
                  *,
-                 appendOrInsert: t.Literal['append', 'insert', 'offsets'] = 'offsets',
+                 givenElementsBehavior: GivenElementsBehavior = GivenElementsBehavior.OFFSETS,
                  **keywords):
         # restrictClass: t.Type[M21ObjType] = base.Music21Object,
         super().__init__(**keywords)
@@ -347,7 +350,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         # (i.e. Part or Voice generally, but even Opus theoretically)
         # because these classes usually represent synchrony
         appendBool = True
-        if appendOrInsert == 'offsets':
+        if givenElementsBehavior == GivenElementsBehavior.OFFSETS:
             try:
                 appendBool = all(e.offset == 0.0 for e in givenElements)
             except AttributeError:
@@ -356,7 +359,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
                     (e.isStream and e.classSet.isdisjoint((Measure, Score)))
                     for e in givenElements):
                 appendBool = False
-        elif appendOrInsert == 'insert':
+        elif givenElementsBehavior == GivenElementsBehavior.INSERT:
             appendBool = False
         else:
             appendBool = True
@@ -3323,7 +3326,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
     # display methods; in the same manner as show() and write()
 
     def plot(self,
-             plotFormat: str,
+             plotFormat: t.Optional[str] = None,
              xValue: t.Optional[str] = None,
              yValue: t.Optional[str] = None,
              zValue: t.Optional[str] = None,
@@ -9909,7 +9912,6 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
 
         N.B., TODO: This may turn to an Iterator soon.
 
-        >>> from music21 import corpus
         >>> a = corpus.parse('bach/bwv324.xml')
         >>> partOnePitches = a.parts[0].pitches
         >>> len(partOnePitches)
@@ -12681,9 +12683,8 @@ class Voice(Stream):
 
     Voices have a sort order of 1 greater than time signatures
     '''
-    recursionType = 'elementsFirst'
+    recursionType = RecursionType.ELEMENTS_FIRST
     classSortOrder = 5
-
 
 # -----------------------------------------------------------------------------
 
@@ -12724,7 +12725,7 @@ class Measure(Stream):
     key or timeSignature than previous measures, allow for padding (and pickups),
     and can be found as a "measure slice" within a score and parts.
     '''
-    recursionType = 'elementsFirst'
+    recursionType = RecursionType.ELEMENTS_FIRST
     isMeasure = True
 
     # define order for presenting names in documentation; use strings
@@ -13354,7 +13355,7 @@ class Part(Stream):
     assumes that this part fits on one staff and shares it with no other
     part
     '''
-    recursionType = 'flatten'
+    recursionType = RecursionType.FLATTEN
 
     # _DOC_ATTR: t.Dict[str, str] = {
     # }
@@ -13589,7 +13590,7 @@ class Score(Stream):
     but we figure that many people will like calling the largest
     container a Score and that this will become a standard.
     '''
-    recursionType = 'elementsOnly'
+    recursionType = RecursionType.ELEMENTS_ONLY
 
     @property
     def parts(self) -> iterator.StreamIterator[Part]:
@@ -14083,7 +14084,7 @@ class Opus(Stream):
 
     Opus objects can contain multiple Score objects, or even other Opus objects!
     '''
-    recursionType = 'elementsOnly'
+    recursionType = RecursionType.ELEMENTS_ONLY
 
     # TODO: get by title, possibly w/ regex
 
@@ -14162,7 +14163,6 @@ class Opus(Stream):
         This method will treat each contained Score as a Part,
         merging and returning a single Score with merged Metadata.
 
-        >>> from music21 import corpus
         >>> o = corpus.parse('josquin/milleRegrets')
         >>> s = o.mergeScores()
         >>> s.metadata.title
@@ -14352,23 +14352,9 @@ class Test(unittest.TestCase):
     '''
     Note: most Stream tests are found in stream.tests
     '''
-
     def testCopyAndDeepcopy(self):
-        '''Test copying all objects defined in this module
-        '''
-        for part in sys.modules[self.__module__].__dict__:
-            if part.startswith('_') or part.startswith('__'):
-                continue
-            elif part in ['Test', 'TestExternal']:
-                continue
-            elif callable(part):  # pragma: no cover
-                # environLocal.printDebug(['testing copying on', part])
-                # noinspection PyTypeChecker
-                obj = getattr(self.__module__, part)()
-                a = copy.copy(obj)
-                b = copy.deepcopy(obj)
-                self.assertNotEqual(a, obj)
-                self.assertNotEqual(b, obj)
+        from music21.test.commonTest import testCopyAll
+        testCopyAll(self, globals())
 
 
 # -----------------------------------------------------------------------------

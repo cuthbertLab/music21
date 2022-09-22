@@ -5,7 +5,7 @@
 #
 # Authors:      Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2010-2012 Michael Scott Asato Cuthbert and the music21 Project
+# Copyright:    Copyright © 2010-2012 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
@@ -23,6 +23,8 @@ import typing as t
 from collections import namedtuple
 # noinspection PyPackageRequirements
 from docutils.core import publish_doctree  # pylint: disable=import-error
+# noinspection PyPackageRequirements
+import docutils.nodes  # pylint: disable=import-error
 
 import nbvalNotebook
 
@@ -69,7 +71,7 @@ skipModules = [
 
 def getDocumentationFromAutoGen(fullModulePath):
 
-    def is_code_or_literal_block(node):
+    def is_code_or_literal_block(node: docutils.nodes.Node) -> bool:
         if node.tagname != 'literal_block':
             return False
         classes = node.attributes['classes']
@@ -88,7 +90,7 @@ def getDocumentationFromAutoGen(fullModulePath):
     allCodeExpects = []
     lastCode = None
 
-    for child in doctree.traverse(is_code_or_literal_block):
+    for child in doctree.findall(condition=is_code_or_literal_block):
         childText = child.astext()
         if '#_DOCS_SHOW' in childText:
             continue
@@ -190,6 +192,9 @@ def getDocumentationFiles(runOne=False):
 def main(runOne: t.Union[str, bool] = False):
     if runOne is False:
         nbvalNotebook.runAll()
+    elif '.ipynb' in runOne:
+        nbvalNotebook.findAndRun(runOne)
+
     totalTests = 0
     totalFailures = 0
 

@@ -6,7 +6,7 @@
 # Authors:      Christopher Ariza
 #               Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2009-22 Michael Scott Asato Cuthbert and the music21 Project
+# Copyright:    Copyright © 2009-22 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
@@ -768,7 +768,6 @@ class MetronomeMark(TempoIndication):
         Return the duration in seconds for each quarter length
         (not necessarily the referent) of this MetronomeMark.
 
-        >>> from music21 import tempo
         >>> mm1 = tempo.MetronomeMark(referent=1.0, number=60.0)
         >>> mm1.secondsPerQuarter()
         1.0
@@ -790,7 +789,6 @@ class MetronomeMark(TempoIndication):
         quarter length, return the resultant time in seconds at the tempo specified by
         this MetronomeMark.
 
-        >>> from music21 import tempo
         >>> mm1 = tempo.MetronomeMark(referent=1.0, number=60.0)
         >>> mm1.durationToSeconds(60)
         60.0
@@ -809,7 +807,6 @@ class MetronomeMark(TempoIndication):
         Given a duration in seconds,
         return a :class:`~music21.duration.Duration` object equal to that time.
 
-        >>> from music21 import tempo
         >>> mm1 = tempo.MetronomeMark(referent=1.0, number=60.0)
         >>> mm1.secondsToDuration(0.25)
         <music21.duration.Duration 0.25>
@@ -1309,22 +1306,8 @@ class AccelerandoSpanner(TempoChangeSpanner):
 # ------------------------------------------------------------------------------
 class Test(unittest.TestCase):
     def testCopyAndDeepcopy(self):
-        '''Test copying all objects defined in this module
-        '''
-        import sys
-        import types
-        for part in sys.modules[self.__module__].__dict__:
-            match = False
-            for skip in ['_', '__', 'Test', 'Exception']:
-                if part.startswith(skip) or part.endswith(skip):
-                    match = True
-            if match:
-                continue
-            obj = getattr(sys.modules[self.__module__], part)
-            # noinspection PyTypeChecker
-            if callable(obj) and not isinstance(obj, types.FunctionType):
-                copy.copy(obj)
-                copy.deepcopy(obj)
+        from music21.test.commonTest import testCopyAll
+        testCopyAll(self, globals())
 
     def testSetup(self):
         mm1 = MetronomeMark(number=60, referent=note.Note(type='quarter'))

@@ -92,7 +92,6 @@ class MetadataCachingJob:
     '''
     Parses one corpus path, and attempts to extract metadata from it:
 
-    >>> from music21 import metadata
     >>> job = metadata.caching.MetadataCachingJob(
     ...     'bach/bwv66.6',
     ...     parseUsingCorpus=True,

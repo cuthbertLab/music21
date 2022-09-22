@@ -6,34 +6,82 @@
 # Authors:      Christopher Ariza
 #               Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2009-15 Michael Scott Asato Cuthbert and the music21 Project
+# Copyright:    Copyright © 2009-15 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
 Things that are common to testing...
 '''
-import importlib
-from unittest.signals import registerResult
-
+import copy
 import doctest
+import importlib
+import importlib.util
 import os
+import sys
+import typing
 import types
+import unittest
 import unittest.runner
+from unittest.signals import registerResult
 import warnings
 
 import music21
 from music21 import environment
 from music21 import common
 
-# import importlib
-with warnings.catch_warnings():
-    warnings.simplefilter('ignore', DeprecationWarning)
-    warnings.simplefilter('ignore', PendingDeprecationWarning)
-    import imp  # pylint: disable=deprecated-module
-
-
 environLocal = environment.Environment('test.commonTest')
 
+def testCopyAll(testInstance: unittest.TestCase, globals_: typing.Dict[str, typing.Any]):
+    my_module = testInstance.__class__.__module__
+    for part, obj in globals_.items():
+        match = False
+        for skip in ['_', 'Test', 'Exception']:
+            if part.startswith(skip) or part.endswith(skip):
+                match = True
+        if match:
+            continue
+        # noinspection PyTypeChecker
+        if not callable(obj) or isinstance(obj, types.FunctionType):
+            continue
+        if not hasattr(obj, '__module__') or obj.__module__ != my_module:
+            continue
+
+        try:  # see if obj can be made w/o args
+            instance = obj()
+        except TypeError:
+            continue
+
+        try:
+            copy.copy(instance)
+        except Exception as e:  # pylint: disable=broad-except
+            testInstance.fail(f'Could not copy obj {part}: {e}')
+        try:
+            copy.deepcopy(instance)
+        except Exception as e:  # pylint: disable=broad-except
+            testInstance.fail(f'Could not deepcopy obj {part}: {e}')
+
+
+def load_source(name: str, path: str) -> types.ModuleType:
+    '''
+    Replacement for deprecated imp.load_source()
+
+    Thanks to:
+    https://github.com/epfl-scitas/spack for pointing out the
+    important missing "spec.loader.exec_module(module)" line.
+    '''
+    spec = importlib.util.spec_from_file_location(name, path)
+    if spec is None or spec.loader is None:
+        raise FileNotFoundError(f'No such file or directory: {path!r}')
+    if name in sys.modules:
+        module = sys.modules[name]
+        spec.loader.exec_module(module)
+    else:
+        module = importlib.util.module_from_spec(spec)
+        if module is None:
+            raise FileNotFoundError(f'No such file or directory: {path!r}')
+        spec.loader.exec_module(module)
+
+    return module
 
 # noinspection PyPackageRequirements
 def testImports():
@@ -207,8 +255,8 @@ class ModuleGather:
             'abcFormat/testFiles.py',
         ]
         # run these first...
-        self.slowModules = ['metadata/caching',
-                            'metadata/bundles',
+        self.slowModules = ['metadata/bundles',
+                            'metadata/caching',
                             'features',
                             'graph',
                             'graph/plot',
@@ -224,11 +272,12 @@ class ModuleGather:
                             'analysis/windowed',
                             'converter/__init__',
 
-                            'musicxml/m21ToXml',
-                            'musicxml/xmlToM21',
+                            'musicxml/test_m21ToXml',
+                            'musicxml/test_xmlToM21',
 
                             'romanText/translate',
                             'corpus/testCorpus',
+                            'corpus/corpora',
                             'audioSearch/transcriber',
                             'audioSearch/__init__',
                             'alpha/theoryAnalysis/theoryAnalyzer',
@@ -367,17 +416,11 @@ class ModuleGather:
         if skip:
             return None
 
-        name = self._getName(fp)
-        # for importlib
-        # name = self._getNamePeriod(fp, addM21=True)
+        name = self._getNamePeriod(fp, addM21=False)
 
-        # print(name, os.path.dirname(fp))
         try:
             with warnings.catch_warnings():
-                # warnings.simplefilter('ignore', RuntimeWarning)
-                # importlib is messing with coverage...
-                mod = imp.load_source(name, fp)
-                # mod = importlib.import_module(name)
+                mod = load_source(name, fp)
         except Exception as excp:  # pylint: disable=broad-except
             environLocal.warn(['failed import:', fp, '\n',
                                '\tEXCEPTION:', str(excp).strip()])

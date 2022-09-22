@@ -6,7 +6,7 @@
 # Authors:      Michael Scott Asato Cuthbert
 #               Christopher Ariza
 #
-# Copyright:    Copyright © 2008-2019 Michael Scott Asato Cuthbert and the music21 Project
+# Copyright:    Copyright © 2008-2019 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
@@ -24,6 +24,7 @@ import itertools
 from collections import OrderedDict
 import typing as t
 from typing import overload
+import unittest
 
 from music21 import base
 from music21 import common
@@ -5270,12 +5271,18 @@ class Pitch(prebase.ProtoM21Object):
 
 
 # ------------------------------------------------------------------------------
-# tests moved to test_pitch.py
-#
+# nearly all tests moved to test_pitch.py
+
+class Test(unittest.TestCase):
+    def testCopyAndDeepcopy(self):
+        from music21.test.commonTest import testCopyAll
+        testCopyAll(self, globals())
+
+
 # define presented order in documentation
 _DOC_ORDER = [Pitch, Accidental, Microtone]
 
 
 if __name__ == '__main__':
     import music21
-    music21.mainTest()
+    music21.mainTest(Test)

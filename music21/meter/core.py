@@ -7,7 +7,6 @@
 #               Michael Scott Asato Cuthbert
 #
 # Copyright:    Copyright © 2009-2022 Michael Scott Asato Cuthbert
-#               and the music21 Project
 # License:      BSD, see license.txt
 # -----------------------------------------------------------------------------
 '''
@@ -112,7 +111,6 @@ class MeterTerminal(prebase.ProtoM21Object, SlottedObjectMixin):
         Compare the numerator and denominator of another object.
         Note that these have to be exact matches; 3/4 is not the same as 6/8
 
-        >>> from music21 import meter
         >>> a = meter.MeterTerminal('3/4')
         >>> b = meter.MeterTerminal('6/4')
         >>> c = meter.MeterTerminal('2/4')

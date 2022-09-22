@@ -7,7 +7,6 @@
 #               Michael Scott Asato Cuthbert
 #
 # Copyright:    Copyright © 2009-2022 Michael Scott Asato Cuthbert
-#               and the music21 Project
 # License:      BSD, see license.txt
 # -----------------------------------------------------------------------------
 import copy
@@ -73,28 +72,6 @@ class TestExternal(unittest.TestCase):
 
 
 class Test(unittest.TestCase):
-    def testCopyAndDeepcopy(self):
-        '''Test copying all objects defined in this module
-        '''
-        import sys
-        import types
-        for part in sys.modules[self.__module__].__dict__:
-            match = False
-            for skip in ['_', '__', 'Test', 'Exception']:
-                if part.startswith(skip) or part.endswith(skip):
-                    match = True
-            if match:
-                continue
-            name = getattr(sys.modules[self.__module__], part)
-            # noinspection PyTypeChecker
-            if callable(name) and not isinstance(name, types.FunctionType):
-                try:  # see if obj can be made w/ args
-                    obj = name()
-                except TypeError:
-                    continue
-                i = copy.copy(obj)
-                j = copy.deepcopy(obj)
-
     def testMeterSubdivision(self):
         a = MeterSequence()
         a.load('4/4', 4)

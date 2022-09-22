@@ -6,8 +6,7 @@
 # Authors:      Michael Scott Asato Cuthbert
 #               Christopher Ariza
 #
-# Copyright:    Copyright © 2006-2022 Michael Scott Asato Cuthbert and the music21
-#               Project
+# Copyright:    Copyright © 2006-2022 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # -----------------------------------------------------------------------------
 '''
@@ -28,7 +27,7 @@ available after importing `music21`.
 <class 'music21.base.Music21Object'>
 
 >>> music21.VERSION_STR
-'8.0.0a12'
+'8.1.0'
 
 Alternatively, after doing a complete import, these classes are available
 under the module "base":
@@ -40,16 +39,14 @@ from __future__ import annotations
 
 import builtins
 import copy
-import warnings
-import weakref
-
-from collections import namedtuple
-from importlib.util import find_spec
-
 # for type annotation only
 import fractions
+from importlib.util import find_spec
 import typing as t
 from typing import overload
+import unittest
+import warnings
+import weakref
 
 from music21 import common
 from music21.common.enums import ElementSearch, OffsetSpecial
@@ -128,7 +125,15 @@ class ElementException(exceptions21.Music21Exception):
 
 # -----------------------------------------------------------------------------
 # for contextSites searches...
-ContextTuple = namedtuple('ContextTuple', ['site', 'offset', 'recurseType'])
+class ContextTuple(t.NamedTuple):
+    site: 'music21.stream.Stream'
+    offset: OffsetQL
+    recurseType: 'music21.stream.enums.RecursionType'
+
+class ContextSortTuple(t.NamedTuple):
+    site: 'music21.stream.Stream'
+    offset: SortTuple
+    recurseType: 'music21.stream.enums.RecursionType'
 
 
 # pseudo class for returning splitAtX() type commands.
@@ -1706,35 +1711,67 @@ class Music21Object(prebase.ProtoM21Object):
         # nothing found...
         return None
 
+
+    @overload
+    def contextSites(
+        self,
+        *,
+        returnSortTuples: t.Literal[True],
+        callerFirst=None,
+        memo=None,
+        offsetAppend: OffsetQL = 0.0,
+        sortByCreationTime: t.Union[t.Literal['reverse'], bool] = False,
+        priorityTarget=None,
+        followDerivation=True,
+        priorityTargetOnly=False,
+    ) -> t.Generator[ContextSortTuple, None, None]:
+        pass
+
+    @overload
     def contextSites(
         self,
         *,
         callerFirst=None,
         memo=None,
-        offsetAppend=0.0,
-        sortByCreationTime: t.Union[str, bool] = False,
+        offsetAppend: OffsetQL = 0.0,
+        sortByCreationTime: t.Union[t.Literal['reverse'], bool] = False,
         priorityTarget=None,
-        returnSortTuples=False,
+        returnSortTuples: t.Literal[False] = False,
         followDerivation=True,
         priorityTargetOnly=False,
-    ):
+    ) -> t.Generator[ContextTuple, None, None]:
+        pass
+
+
+    def contextSites(
+        self,
+        *,
+        callerFirst=None,
+        memo=None,
+        offsetAppend: OffsetQL = 0.0,
+        sortByCreationTime: t.Union[t.Literal['reverse'], bool] = False,
+        priorityTarget=None,
+        returnSortTuples: bool = False,
+        followDerivation=True,
+        priorityTargetOnly=False,
+    ) -> t.Generator[t.Union[ContextTuple, ContextSortTuple], None, None]:
         '''
         A generator that returns a list of namedtuples of sites to search for a context...
 
         Each tuple contains three elements:
 
-        .site --  Stream object,
+        .site --  Stream object
         .offset -- the offset or position (sortTuple) of this element in that Stream
-        .recurseType -- the method of searching that should be applied to search for a context.
+        .recurseType -- the way of searching that should be applied to search for a context.
 
-        The recurseType methods are:
+        The recurseType values are all music21.stream.enums.RecurseType:
 
-            * 'flatten' -- flatten the stream and then look from this offset backwards.
+            * FLATTEN -- flatten the stream and then look from this offset backwards.
 
-            * 'elementsOnly' -- only search the stream's personal
+            * ELEMENTS_ONLY -- only search the stream's personal
                elements from this offset backwards
 
-            * 'elementsFirst' -- search this stream backwards,
+            * ELEMENTS_FIRST -- search this stream backwards,
                and then flatten and search backwards
 
         >>> c = corpus.parse('bwv66.6')
@@ -1749,9 +1786,9 @@ class Music21Object(prebase.ProtoM21Object):
         >>> for csTuple in n.contextSites(returnSortTuples=True):
         ...      yClearer = (csTuple.site, csTuple.offset.shortRepr(), csTuple.recurseType)
         ...      print(yClearer)
-        (<music21.stream.Measure 3 offset=9.0>, '0.5 <0.20...>', 'elementsFirst')
-        (<music21.stream.Part Alto>, '9.5 <0.20...>', 'flatten')
-        (<music21.stream.Score bach>, '9.5 <0.20...>', 'elementsOnly')
+        (<music21.stream.Measure 3 offset=9.0>, '0.5 <0.20...>', <RecursionType.ELEMENTS_FIRST>)
+        (<music21.stream.Part Alto>, '9.5 <0.20...>', <RecursionType.FLATTEN>)
+        (<music21.stream.Score bach>, '9.5 <0.20...>', <RecursionType.ELEMENTS_ONLY>)
 
         Streams have themselves as the first element in their context sites, at position
         zero and classSortOrder negative infinity.
@@ -1764,12 +1801,28 @@ class Music21Object(prebase.ProtoM21Object):
         >>> m = c[2][4]
         >>> m
         <music21.stream.Measure 3 offset=9.0>
+
+        If returnSortTuples is true then ContextSortTuples are returned, where the
+        second element is a SortTuple:
+
+        >>> for csTuple in m.contextSites(returnSortTuples=True):
+        ...     print(csTuple)
+        ContextSortTuple(site=<music21.stream.Measure 3 offset=9.0>,
+                         offset=SortTuple(atEnd=0, offset=0.0, priority=-inf, ...),
+                         recurseType=<RecursionType.ELEMENTS_FIRST>)
+        ContextSortTuple(...)
+        ContextSortTuple(...)
+
+        Because SortTuples are so detailed, we'll use their `shortRepr()` to see the
+        values, removing the insertIndex because it changes from run to run:
+
         >>> for csTuple in m.contextSites(returnSortTuples=True):
         ...      yClearer = (csTuple.site, csTuple.offset.shortRepr(), csTuple.recurseType)
         ...      print(yClearer)
-        (<music21.stream.Measure 3 offset=9.0>, '0.0 <-inf.-20...>', 'elementsFirst')
-        (<music21.stream.Part Alto>, '9.0 <0.-20...>', 'flatten')
-        (<music21.stream.Score bach>, '9.0 <0.-20...>', 'elementsOnly')
+        (<music21.stream.Measure 3 offset=9.0>, '0.0 <-inf.-20...>', <RecursionType.ELEMENTS_FIRST>)
+        (<music21.stream.Part Alto>, '9.0 <0.-20...>', <RecursionType.FLATTEN>)
+        (<music21.stream.Score bach>, '9.0 <0.-20...>', <RecursionType.ELEMENTS_ONLY>)
+
 
         Here we make a copy of the earlier measure, and we see that its contextSites
         follow the derivationChain from the original measure and still find the Part
@@ -1783,13 +1836,13 @@ class Music21Object(prebase.ProtoM21Object):
         ...      print(csTuple, mCopy in csTuple.site)
         ContextTuple(site=<music21.stream.Measure 3333 offset=0.0>,
                      offset=0.0,
-                     recurseType='elementsFirst') False
+                     recurseType=<RecursionType.ELEMENTS_FIRST>) False
         ContextTuple(site=<music21.stream.Part Alto>,
                      offset=9.0,
-                     recurseType='flatten') False
+                     recurseType=<RecursionType.FLATTEN>) False
         ContextTuple(site=<music21.stream.Score bach>,
                      offset=9.0,
-                     recurseType='elementsOnly') False
+                     recurseType=<RecursionType.ELEMENTS_ONLY>) False
 
         If followDerivation were False, then the Part and Score would not be found.
 
@@ -1797,7 +1850,7 @@ class Music21Object(prebase.ProtoM21Object):
         ...     print(csTuple)
         ContextTuple(site=<music21.stream.Measure 3333 offset=0.0>,
                      offset=0.0,
-                     recurseType='elementsFirst')
+                     recurseType=<RecursionType.ELEMENTS_FIRST>)
 
         >>> partIterator = c.parts
         >>> m3 = partIterator[1].measure(3)
@@ -1805,13 +1858,13 @@ class Music21Object(prebase.ProtoM21Object):
         ...      print(csTuple)
         ContextTuple(site=<music21.stream.Measure 3 offset=9.0>,
                      offset=0.0,
-                     recurseType='elementsFirst')
+                     recurseType=<RecursionType.ELEMENTS_FIRST>)
         ContextTuple(site=<music21.stream.Part Alto>,
                      offset=9.0,
-                     recurseType='flatten')
+                     recurseType=<RecursionType.FLATTEN>)
         ContextTuple(site=<music21.stream.Score bach>,
                      offset=9.0,
-                     recurseType='elementsOnly')
+                     recurseType=<RecursionType.ELEMENTS_ONLY>)
 
         Sorting order:
 
@@ -1891,6 +1944,7 @@ class Music21Object(prebase.ProtoM21Object):
         *  changed in v5.5: all arguments are keyword only.
         *  changed in v6: added `priorityTargetOnly=False` to only search in the
             context of the priorityTarget.
+        *  changed in v8: returnSortTuple=True returns a new ContextSortTuple
         '''
         from music21 import stream
 
@@ -1909,7 +1963,7 @@ class Music21Object(prebase.ProtoM21Object):
                         offset=0.0,
                         priority=float('-inf')
                     )
-                    yield ContextTuple(streamSelf, selfSortTuple, recursionType)
+                    yield ContextSortTuple(streamSelf, selfSortTuple, recursionType)
                 else:
                     yield ContextTuple(streamSelf, 0.0, recursionType)
                 memo.append(streamSelf)
@@ -1945,7 +1999,7 @@ class Music21Object(prebase.ProtoM21Object):
 
             recursionType = siteObj.recursionType
             if returnSortTuples:
-                yield ContextTuple(siteObj, positionInStream, recursionType)
+                yield ContextSortTuple(siteObj, positionInStream, recursionType)
             else:
                 yield ContextTuple(siteObj, positionInStream.offset, recursionType)
 
@@ -1974,7 +2028,7 @@ class Music21Object(prebase.ProtoM21Object):
                     #                                                inStreamPos.shortRepr(),
                     #                                                recurType))
                     if returnSortTuples:
-                        yield ContextTuple(topLevel, hypotheticalPosition, recurType)
+                        yield ContextSortTuple(topLevel, hypotheticalPosition, recurType)
                     else:
                         yield ContextTuple(topLevel, inStreamOffset, recurType)
                     memo.append(topLevel)
@@ -1999,7 +2053,7 @@ class Music21Object(prebase.ProtoM21Object):
                     environLocal.printDebug(
                         f'Yielding {derivedCsTuple} from derivedObject contextSites'
                     )
-                    offsetAdjustedCsTuple = ContextTuple(
+                    offsetAdjustedCsTuple = ContextSortTuple(
                         derivedCsTuple.site,
                         derivedCsTuple.offset.modify(offset=derivedCsTuple[1].offset
                                                             + offsetAppend),
@@ -2469,7 +2523,14 @@ class Music21Object(prebase.ProtoM21Object):
         else:
             self._naiveOffset = offset
 
-    def sortTuple(self, useSite=False, raiseExceptionOnMiss=False):
+    def sortTuple(self,
+                  useSite: t.Union[
+                      t.Literal[False],
+                      None,
+                      'music21.stream.Stream',
+                  ] = False,
+                  raiseExceptionOnMiss: bool = False
+                  ) -> SortTuple:
         '''
         Returns a collections.namedtuple called SortTuple(atEnd, offset, priority, classSortOrder,
         isNotGrace, insertIndex)
@@ -2498,6 +2559,8 @@ class Music21Object(prebase.ProtoM21Object):
 
         6) The last tie-breaker is the creation time (insertIndex) of the site object
         represented by the activeSite.
+
+        By default, the site used will be the activeSite:
 
         >>> n = note.Note()
         >>> n.offset = 4.0
@@ -2571,14 +2634,18 @@ class Music21Object(prebase.ProtoM21Object):
         music21.sites.SitesException: an entry for this object 0x... is not stored in
             stream <music21.stream.Stream aloneStream>
         '''
+        useSiteNoFalse: t.Optional['music21.stream.Stream']
         if useSite is False:  # False or a Site; since None is a valid site, default is False
-            useSite = self.activeSite
+            useSiteNoFalse = self.activeSite
+        else:
+            useSiteNoFalse = useSite
 
-        if useSite is None:
+        foundOffset: t.Union[OffsetQL, OffsetSpecial]
+        if useSiteNoFalse is None:
             foundOffset = self.offset
         else:
             try:
-                foundOffset = useSite.elementOffset(self, returnSpecial=True)
+                foundOffset = useSiteNoFalse.elementOffset(self, returnSpecial=True)
             except SitesException:
                 if raiseExceptionOnMiss:
                     raise
@@ -2586,11 +2653,12 @@ class Music21Object(prebase.ProtoM21Object):
                     # activeSite may have vanished! or does not have the element
                 foundOffset = self._naiveOffset
 
+        offset: OffsetQL
         if foundOffset == OffsetSpecial.AT_END:
             offset = 0.0
             atEnd = 1
-        else:
-            offset = foundOffset
+        else:  # no other OffsetSpecials currently exist.
+            offset = t.cast(OffsetQL, foundOffset)
             atEnd = 0
 
         if self.duration.isGrace:
@@ -2598,12 +2666,11 @@ class Music21Object(prebase.ProtoM21Object):
         else:
             isNotGrace = 1
 
-        if (useSite is not False
-                and self.sites.hasSiteId(id(useSite))):
+        if self.sites.hasSiteId(id(useSite)):
             insertIndex = self.sites.siteDict[id(useSite)].globalSiteIndex
         elif self.activeSite is not None:
             insertIndex = self.sites.siteDict[id(self.activeSite)].globalSiteIndex
-        else:
+        else:  # for None, use this instead of default of -2.
             insertIndex = 0
 
         return SortTuple(atEnd, offset, self.priority,
@@ -3415,7 +3482,8 @@ class Music21Object(prebase.ProtoM21Object):
             for cs in self.contextSites():
                 m = cs[0]
                 if m.isMeasure:
-                    mNumber = m.number
+                    # mypy does not know that isMeasure is a typeGuard.
+                    mNumber = m.number  # type: ignore
         return mNumber
 
     def _getMeasureOffset(self, includeMeasurePadding=True) -> t.Union[float, fractions.Fraction]:
@@ -4049,6 +4117,15 @@ class ElementWrapper(Music21Object):
         if storedObj is None:
             raise AttributeError(f'Could not get attribute {name!r} in an object-less element')
         return object.__getattribute__(storedObj, name)
+
+
+class Test(unittest.TestCase):
+    '''
+    All other tests moved to test/test_base.py
+    '''
+    def testCopyAndDeepcopy(self):
+        from music21.test.commonTest import testCopyAll
+        testCopyAll(self, globals())
 
 
 # ------------------------------------------------------------------------------

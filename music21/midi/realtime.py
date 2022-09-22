@@ -6,7 +6,7 @@
 # Authors:      Michael Scott Asato Cuthbert
 #               (from an idea by Joe "Codeswell")
 #
-# Copyright:    Copyright © 2012 Michael Scott Asato Cuthbert and the music21 Project
+# Copyright:    Copyright © 2012 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''

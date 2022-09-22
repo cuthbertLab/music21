@@ -1,13 +1,9 @@
 # -*- coding: utf-8 -*-
 '''
-The music21 Framework is Copyright © 2006-2022 Michael Scott Asato Cuthbert
-and the music21 Project
-
-(Michael Scott Asato Cuthbert, principal investigator; cuthbert@mit.edu)
+The music21 Framework is Copyright © 2006-2022 Michael Scott Asato Cuthbert.
 
 Some Rights Reserved
-Released under the BSD (3-clause) license.  For historical reasons, music21
-can also be used under an LGPL license.
+Released under the BSD (3-clause) license.  See license.txt.
 
 See license.txt file for the full license which represents your legal
 obligations in using, modifying, or distributing music21.

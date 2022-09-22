@@ -8,7 +8,6 @@
 #               Evan Lynch
 #
 # Copyright:    Copyright © 2009-2022 Michael Scott Asato Cuthbert,
-#               and the music21 Project
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
@@ -17,7 +16,7 @@ Object definitions for graphing and plotting :class:`~music21.stream.Stream` obj
 The :class:`~music21.graph.primitives.Graph` object subclasses primitive,
 abstract fundamental graphing archetypes using the matplotlib library.
 
-From highest level to lowest level usage, ways of graphing are as follows:
+From the highest level to the lowest level of usage, ways of graphing are as follows:
 
     1. streamObj.plot('graphName')
     2. graph.plot.Class(streamObj).run()
@@ -78,7 +77,7 @@ class Graph(prebase.ProtoM21Object):
     unlikely that users will call this class directly.
 
     The `doneAction` argument determines what happens after the graph
-    has been processed. Currently there are three options, 'write' creates
+    has been processed. Currently, there are three options, 'write' creates
     a file on disk (this is the default), while 'show' opens an
     interactive GUI browser.  The
     third option, None, does the processing but does not write any output.
@@ -852,7 +851,7 @@ class GraphColorGridLegend(Graph):
         >>> fig = matplotlib.pyplot.figure()
         >>> subplot = colorLegend.makeOneRowOfGraph(fig, 0, 'Scriabin Mapping', rowData)
         >>> subplot
-        <AxesSubplot:>
+        <AxesSubplot: >
         '''
         # environLocal.printDebug(['rowLabel', rowLabel, i])
 
@@ -1647,29 +1646,8 @@ class Graph3DBars(Graph):
 class Test(unittest.TestCase):
 
     def testCopyAndDeepcopy(self):
-        '''
-        Test copying all objects defined in this module
-        '''
-        import copy
-        import sys
-        import types
-        for part in sys.modules[self.__module__].__dict__:
-            match = False
-            for skip in ['_', '__', 'Test', 'Exception']:
-                if part.startswith(skip) or part.endswith(skip):
-                    match = True
-            if match:
-                continue
-            name = getattr(sys.modules[self.__module__], part)
-            # noinspection PyTypeChecker
-            if callable(name) and not isinstance(name, types.FunctionType):
-                try:  # see if obj can be made w/ args
-                    obj = name()
-                except TypeError:
-                    continue
-                unused_a = copy.copy(obj)
-                unused_b = copy.deepcopy(obj)
-
+        from music21.test.commonTest import testCopyAll
+        testCopyAll(self, globals())
 
 # ------------------------------------------------------------------------------
 class TestExternal(unittest.TestCase):

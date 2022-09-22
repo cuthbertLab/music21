@@ -7,7 +7,7 @@
 # Authors:      Beth Hadley
 #               Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2011-12, 2015 Michael Scott Asato Cuthbert and the music21 Project
+# Copyright:    Copyright © 2011-12, 2015 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''

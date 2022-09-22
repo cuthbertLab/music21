@@ -6,7 +6,7 @@
 # Authors:      Christopher Ariza
 #               Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2009-2012 Michael Scott Asato Cuthbert and the music21 Project
+# Copyright:    Copyright © 2009-2012 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
@@ -38,7 +38,7 @@ cov = coverageM21.getCoverage()
 
 def main(testGroup: t.Sequence[str] = ('test',),
          restoreEnvironmentDefaults=False,
-         limit=None,
+         limit: t.Optional[bool] = None,
          verbosity=2,
          show: bool = True,
          ):

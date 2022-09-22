@@ -6,8 +6,10 @@ Created on May 24, 2017
 
 @author: cuthbert
 '''
+import pathlib  # for typing
 import sys
 import subprocess
+import typing as t
 # noinspection PyPackageRequirements
 import pytest  # pylint: disable=unused-import,import-error
 # noinspection PyPackageRequirements
@@ -19,8 +21,7 @@ from music21 import common
 # pytest --nbval usersGuide_15_key.ipynb --sanitize-with ../../nbval-sanitize.cfg -q
 skip = ['installJupyter.ipynb']
 
-
-def runAll():
+def getAllFiles() -> t.List[pathlib.Path]:
     sourcePath = common.getRootFilePath() / 'documentation' / 'source'
     goodFiles = []
     for innerDir in ('about', 'developerReference', 'installing', 'usersGuide'):
@@ -32,9 +33,10 @@ def runAll():
                 continue
 
             goodFiles.append(f)
+    return goodFiles
 
-
-    for f in goodFiles:
+def runAll():
+    for f in getAllFiles():
         print('Running: ', str(f))
         try:
             retVal = runOne(f)
@@ -44,6 +46,11 @@ def runAll():
         if retVal == 512:
             return None
 
+def findAndRun(filename: str):
+    allFiles = getAllFiles()
+    for f in allFiles:
+        if filename in str(f):
+            runOne(f)
 
 def runOne(nbFile):
     us = environment.UserSettings()
