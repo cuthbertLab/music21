@@ -130,7 +130,6 @@ import unittest
 from music21 import bar
 from music21 import base
 from music21 import common
-from music21 import duration
 from music21 import exceptions21
 from music21 import harmony
 from music21 import key
@@ -575,10 +574,8 @@ class PartTranslator:
 
         else:
             m = self.translateSingleMeasure(measureLineToken)
-            if self.tsCurrent is not None and m.duration.quarterLength == 0:
-                m.duration = duration.Duration(
-                    self.tsCurrent.barDuration.quarterLength
-                )
+            if m.duration.quarterLength == 0:
+                self.fillMeasureFromPreviousRn(m)
             p.coreAppend(m)
 
     def fillToMeasureToken(self, measureToken: rtObjects.RTMeasure):
@@ -590,25 +587,28 @@ class PartTranslator:
         for i in range(self.lastMeasureNumber + 1, measureToken.number[0]):
             mFill = stream.Measure()
             mFill.number = i
-            if self.previousRn is not None:
-                newRn = copy.deepcopy(self.previousRn)
-                newRn.lyric = ''
-                # set to entire bar duration and tie
-                newRn.duration = copy.deepcopy(self.tsAtTimeOfLastChord.barDuration)
-                if self.previousRn.tie is None:
-                    self.previousRn.tie = tie.Tie('start')
-                else:
-                    self.previousRn.tie.type = 'continue'
-                # set to stop for now; may extend on next iteration
-                newRn.tie = tie.Tie('stop')
-                self.previousRn = newRn
-                mFill.append(newRn)
+            self.fillMeasureFromPreviousRn(mFill)
             appendMeasureToRepeatEndingsDict(self.lastMeasureToken,
                                              mFill,
                                              self.repeatEndings, i)
             p.coreAppend(mFill)
         self.lastMeasureNumber = measureToken.number[0] - 1
         self.lastMeasureToken = measureToken
+
+    def fillMeasureFromPreviousRn(self, mFill: stream.Measure) -> None:
+        if self.previousRn is not None:
+            newRn = copy.deepcopy(self.previousRn)
+            newRn.lyric = ''
+            # set to entire bar duration and tie
+            newRn.duration = copy.deepcopy(self.tsAtTimeOfLastChord.barDuration)
+            if self.previousRn.tie is None:
+                self.previousRn.tie = tie.Tie('start')
+            else:
+                self.previousRn.tie.type = 'continue'
+            # set to stop for now; may extend on next iteration
+            newRn.tie = tie.Tie('stop')
+            self.previousRn = newRn
+            mFill.append(newRn)
 
     def parseKeySignatureTag(self, rtTagged: rtObjects.RTTagged):
         '''
@@ -1695,6 +1695,14 @@ m1 C: I'''
         _repeat_tester(end_repeat1, 'end', 2.0, 3)
         _repeat_tester(start_repeat2, 'start', 0.0, 4)
         _repeat_tester(end_repeat2, 'end', 2.0, 4)
+        for measure in s[stream.Measure]:
+            rn_iter = measure[roman.RomanNumeral]
+            self.assertEqual(len(rn_iter), 1)
+            # mypy complains about the next line because
+            #   RecursiveIterator.first() has t.Optional type, but we know
+            #   it will not be None because we have just asserted that rn_iter
+            #   has length 1
+            self.assertEqual(rn_iter.first().figure, 'I')  # type: ignore
 
         _test_expanded(s, 14.0)
 
