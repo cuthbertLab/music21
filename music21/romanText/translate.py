@@ -575,7 +575,7 @@ class PartTranslator:
 
         else:
             m = self.translateSingleMeasure(measureLineToken)
-            if m.barDuration.quarterLength == 0:
+            if self.tsCurrent is not None and m.barDuration.quarterLength == 0:
                 m.duration = duration.Duration(
                     self.tsCurrent.barDuration.quarterLength
                 )
