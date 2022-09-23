@@ -16,7 +16,7 @@ jobs:
             matrix:
                 python-version: [3.8, 3.9, "3.10"]  # "3.10" must be in quotes to not have it eval to 3.1
         steps:
-        - uses: actions/setup-python@v2
+        - uses: actions/setup-python@v4
           with:
               python-version: ${{ matrix.python-version }}
         - uses: actions/checkout@v2
