@@ -45,6 +45,7 @@ When changing, update the single test case in base.py.
 
 Changing this number invalidates old pickles -- do it if the old pickles create a problem.
 '''
+__version__ = '8.2.0'
 
 def get_version_tuple(vv):
     v = vv.split('.')
@@ -61,9 +62,6 @@ def get_version_tuple(vv):
     if beta:
         v.append(beta)
     return tuple(v)
-
-
-__version__ = '8.1.0'
 
 __version_info__ = get_version_tuple(__version__)
 
