@@ -65,7 +65,8 @@ the announcement while it's running.
 
     Finish this before doing the next step, even though it looks like it could be done in parallel.
 
-19. Upload the new file to PyPI with "twine upload music21-7.3.5a2.tar.gz" [*]
+19. Upload the new file to PyPI with "twine upload music21-7.3.5a2.tar.gz", and same for the
+    whl file (but NOT no corpus) [*]
 
     [*] Requires twine to be installed
 
@@ -79,7 +80,7 @@ the announcement while it's running.
         username:your_username
         password:your_password
 
-20. Delete the two .tar.gz files in dist...
+20. Delete the two .tar.gz files and .whl file in dist...
 
 21. For starting a new major release create a GitHub branch for the old one.
 

@@ -574,6 +574,8 @@ class PartTranslator:
 
         else:
             m = self.translateSingleMeasure(measureLineToken)
+            if m.duration.quarterLength == 0:
+                self.fillMeasureFromPreviousRn(m)
             p.coreAppend(m)
 
     def fillToMeasureToken(self, measureToken: rtObjects.RTMeasure):
@@ -585,25 +587,28 @@ class PartTranslator:
         for i in range(self.lastMeasureNumber + 1, measureToken.number[0]):
             mFill = stream.Measure()
             mFill.number = i
-            if self.previousRn is not None:
-                newRn = copy.deepcopy(self.previousRn)
-                newRn.lyric = ''
-                # set to entire bar duration and tie
-                newRn.duration = copy.deepcopy(self.tsAtTimeOfLastChord.barDuration)
-                if self.previousRn.tie is None:
-                    self.previousRn.tie = tie.Tie('start')
-                else:
-                    self.previousRn.tie.type = 'continue'
-                # set to stop for now; may extend on next iteration
-                newRn.tie = tie.Tie('stop')
-                self.previousRn = newRn
-                mFill.append(newRn)
+            self.fillMeasureFromPreviousRn(mFill)
             appendMeasureToRepeatEndingsDict(self.lastMeasureToken,
                                              mFill,
                                              self.repeatEndings, i)
             p.coreAppend(mFill)
         self.lastMeasureNumber = measureToken.number[0] - 1
         self.lastMeasureToken = measureToken
+
+    def fillMeasureFromPreviousRn(self, mFill: stream.Measure) -> None:
+        if self.previousRn is not None:
+            newRn = copy.deepcopy(self.previousRn)
+            newRn.lyric = ''
+            # set to entire bar duration and tie
+            newRn.duration = copy.deepcopy(self.tsAtTimeOfLastChord.barDuration)
+            if self.previousRn.tie is None:
+                self.previousRn.tie = tie.Tie('start')
+            else:
+                self.previousRn.tie.type = 'continue'
+            # set to stop for now; may extend on next iteration
+            newRn.tie = tie.Tie('stop')
+            self.previousRn = newRn
+            mFill.append(newRn)
 
     def parseKeySignatureTag(self, rtTagged: rtObjects.RTTagged):
         '''
@@ -791,6 +796,10 @@ class PartTranslator:
                 # Is it ok, however, that this condition will match if self.tsCurrent
                 #   is None? Previously, that case was excluded below.
                 m.rightBarline = bar.Repeat(direction='end')
+                if self.tsCurrent is not None:
+                    m.setElementOffset(
+                        m.rightBarline, self.tsCurrent.barDuration.quarterLength
+                    )
             elif self.currentOffsetInMeasure == 0:
                 if isinstance(a, rtObjects.RTRepeatStart):
                     m.leftBarline = bar.Repeat(direction='start')
@@ -1608,6 +1617,18 @@ m1 C: I'''
         self.assertEqual(n2.offset, common.opFrac(11 / 6))
         self.assertEqual(n2.duration.quarterLength, common.opFrac(13 / 6))
 
+    def testCopyEmptyMeasures(self) -> None:
+        from music21 import converter
+        empty_measures_with_copy = textwrap.dedent(''''
+            Time Signature: 2/4
+            m1 I
+            m2 V
+            m3 = m1
+            m4-5 = m1-2
+        ''')
+        s = converter.parse(empty_measures_with_copy, format='romanText')
+        assert s.duration.quarterLength == 10
+
     def testRepeats(self) -> None:
         from music21 import converter
 
@@ -1636,8 +1657,8 @@ m1 C: I'''
         # Test simple repeats
         simple_repeats = textwrap.dedent('''
             Time Signature: 3/4
-            m1: ||: V
-            m2: I :||
+            m1 ||: V
+            m2 I :||
         ''')
         s = converter.parse(simple_repeats, format='romanText')
         br_iter = s[bar.Repeat]
@@ -1649,7 +1670,7 @@ m1 C: I'''
 
         single_bar_repeats = textwrap.dedent('''
             Time Signature: 2/4
-            m1: ||: I :||
+            m1 ||: I :||
         ''')
         s = converter.parse(single_bar_repeats, format='romanText')
         br_iter = s[bar.Repeat]
@@ -1661,10 +1682,10 @@ m1 C: I'''
 
         empty_bars_with_repeats = textwrap.dedent('''
             Time Signature: 2/4
-            m1: I
-            m2: ||:
-            m3: :||
-            m4: ||: :||
+            m1 I
+            m2 ||:
+            m3 :||
+            m4 ||: :||
         ''')
         s = converter.parse(empty_bars_with_repeats, format='romanText')
         br_iter = s[bar.Repeat]
@@ -1674,14 +1695,23 @@ m1 C: I'''
         _repeat_tester(end_repeat1, 'end', 2.0, 3)
         _repeat_tester(start_repeat2, 'start', 0.0, 4)
         _repeat_tester(end_repeat2, 'end', 2.0, 4)
+        for measure in s[stream.Measure]:
+            rn_iter = measure[roman.RomanNumeral]
+            self.assertEqual(len(rn_iter), 1)
+            # mypy complains about the next line because
+            #   RecursiveIterator.first() has t.Optional type, but we know
+            #   it will not be None because we have just asserted that rn_iter
+            #   has length 1
+            self.assertEqual(rn_iter.first().figure, 'I')  # type: ignore
+
         _test_expanded(s, 14.0)
 
         three_endings = textwrap.dedent('''
             Time Signature: 3/4
-            m1: ||: I
-            m2a: IV :||
-            m2b: V :||
-            m2c: I
+            m1 ||: I
+            m2a IV :||
+            m2b V :||
+            m2c I
         ''')
         s = converter.parse(three_endings, format='romanText')
         br_iter = s[bar.Repeat]
@@ -1700,13 +1730,13 @@ m1 C: I'''
 
         more_complex_example = textwrap.dedent('''
             TimeSignature: 3/4
-            m1: ||: I
-            m2a: IV
-            m3a: V :||
-            m2b: V :||
-            m2c: IV
-            m3c: V
-            m4: I
+            m1 ||: I
+            m2a IV
+            m3a V :||
+            m2b V :||
+            m2c IV
+            m3c V
+            m4 I
         ''')
         s = converter.parse(more_complex_example, format='romanText')
         br_iter = s[bar.Repeat]
