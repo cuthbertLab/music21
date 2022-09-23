@@ -331,7 +331,7 @@ class RnWriter(prebase.ProtoM21Object):
 
 # ------------------------------------------------------------------------------
 
-def rnString(measureNumber: int,
+def rnString(measureNumber: t.Union[int, str],
              beat: t.Union[str, int, float, fractions.Fraction],
              chordString: str,
              inString: t.Optional[str] = ''):
