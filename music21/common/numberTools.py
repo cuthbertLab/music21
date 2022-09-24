@@ -13,7 +13,7 @@ from __future__ import annotations
 
 from collections.abc import Iterable, Sequence
 from fractions import Fraction
-from functools import lru_cache
+from functools import cache
 import math
 from math import isclose, gcd
 import numbers
@@ -148,7 +148,7 @@ def numToIntOrFloat(value: t.Union[int, float]) -> t.Union[int, float]:
 
 DENOM_LIMIT = defaults.limitOffsetDenominator
 
-@lru_cache(None)
+@cache
 def _preFracLimitDenominator(n: int, d: int) -> tuple[int, int]:
     # noinspection PyShadowingNames
     '''
@@ -199,8 +199,6 @@ def _preFracLimitDenominator(n: int, d: int) -> tuple[int, int]:
 
     (n.b. -- nothing printed)
     '''
-    # TODO: when Python 3.9 is the minimum version, replace lru_cache with simply cache,
-    #     which is the same speed as lru_cache(None) (it simply calls it)
     if d <= DENOM_LIMIT:  # faster than hard-coding 65535
         return (n, d)
     nOrg = n
@@ -853,26 +851,27 @@ def approximateGCD(values: list[t.Union[int, float]], grain: float = 1e-4) -> fl
     return max(commonUniqueDivisions)
 
 
+@deprecated('v9', 'v10', 'Use math.lcm instead')
 def lcm(filterList: Iterable[int]) -> int:
     '''
     Find the least common multiple of a list of values
 
-    >>> common.lcm([3, 4, 5])
+    common.lcm([3, 4, 5])
     60
-    >>> common.lcm([3, 4])
+    common.lcm([3, 4])
     12
-    >>> common.lcm([1, 2])
+    common.lcm([1, 2])
     2
-    >>> common.lcm([3, 6])
+    common.lcm([3, 6])
     6
 
     Works with any iterable, like this set
 
-    >>> common.lcm({3, 5, 6})
+    common.lcm({3, 5, 6})
     30
 
-    To be deprecated in v.8 once Python 3.9 is the minimum version
-    since math.lcm works in C and is faster
+    Deprecated in v.9 since Python 3.9 is the minimum version
+    and math.lcm works in C and is faster
     '''
     def _lcm(a, b):
         '''find the least common multiple of a, b'''

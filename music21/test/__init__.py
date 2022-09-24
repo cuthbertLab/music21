@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from music21.test import test_base as base
+from music21.test import test_chord as chord
 from music21.test import test_clef as clef
 from music21.test import test_expressions as expressions
 from music21.test import test_interval as interval
