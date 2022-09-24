@@ -6,7 +6,7 @@
 # Authors:      Michael Scott Asato Cuthbert
 #               Christopher Ariza
 #
-# Copyright:    Copyright © 2009-2020 Michael Scott Asato Cuthbert
+# Copyright:    Copyright © 2009-2022 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
@@ -15,7 +15,7 @@ as well as other methods, functions, and objects related to chords.
 '''
 from __future__ import annotations
 
-__all__ = ['tables', 'Chord', 'ChordException', 'fromIntervalVector', 'fromForteClass']
+__all__ = ['tools', 'tables', 'Chord', 'ChordException', 'fromIntervalVector', 'fromForteClass']
 
 import copy
 import unittest
@@ -35,6 +35,7 @@ from music21 import volume
 
 from music21 import environment
 from music21.chord import tables
+from music21.chord import tools
 from music21.common.decorators import cacheMethod
 
 environLocal = environment.Environment('chord')
@@ -1844,6 +1845,17 @@ class Chord(ChordBase):
         >>> cmaj.getChordStep(6) is None
         True
 
+        Ninths can be specified with either 9 or 2.  Similarly for elevenths
+        and thirteenths.
+
+        >>> c9 = chord.Chord('C4 E4 G4 B4 D5')
+        >>> c9.getChordStep(9)
+        <music21.pitch.Pitch D5>
+        >>> c9.getChordStep(2)
+        <music21.pitch.Pitch D5>
+
+        * Changed in v8.3 --
+
         OMIT_FROM_DOCS
 
         If `root` has been explicitly overridden as `None`, calling this raises `ChordException`:
@@ -1852,7 +1864,12 @@ class Chord(ChordBase):
         >>> cmaj.getChordStep(6)
         Traceback (most recent call last):
         music21.chord.ChordException: Cannot run getChordStep without a root
+
+        (This is in OMIT...)
         '''
+        if chordStep >= 8:
+            chordStep -= 7
+
         testRootPitch: pitch.Pitch
         if testRoot is None:
             testRootPitch = self.root()  # raises ChordException if no pitches
