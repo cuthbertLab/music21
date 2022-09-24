@@ -2180,9 +2180,9 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         offsets and items; the method then, obviously, inserts the items
         at the specified offsets.
 
-        Note: This functionality will be deprecated in v.8 and replaced
+        Note: This functionality will be deprecated in v.9 and replaced
         with a list of tuples of [(offset, element), (offset, element)]
-        and removed in v.9
+        and removed in v.10
 
         >>> n1 = note.Note('G')
         >>> n2 = note.Note('F#')

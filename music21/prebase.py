@@ -82,7 +82,7 @@ class ProtoM21Object:
 
     __slots__: tuple[str, ...] = ()
 
-    @deprecated('v7', 'v8', 'use `someClass in .classSet`'
+    @deprecated('v7', 'v10', 'use `someClass in .classSet`'
         'or for intersection: `not classSet.isdisjoint(classList)`')
     def isClassOrSubclass(self, classFilterList: Sequence) -> bool:
         '''

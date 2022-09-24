@@ -27,8 +27,6 @@ from music21.common.types import OffsetQLIn, OffsetQL
 
 __all__ = [
     'ordinals', 'musicOrdinals', 'ordinalsToNumbers',
-
-    'cleanupFloat',
     'numToIntOrFloat',
 
     'opFrac', 'mixedNumeral',
@@ -39,7 +37,6 @@ __all__ = [
     'dotMultiplier', 'decimalToTuplet',
     'unitNormalizeProportion', 'unitBoundaryProportion',
     'weightedSelection',
-    'lcm',
     'approximateGCD',
 
     'contiguousList',
@@ -64,34 +61,6 @@ musicOrdinals[8] = 'Octave'
 musicOrdinals[15] = 'Double-octave'
 musicOrdinals[22] = 'Triple-octave'
 
-
-@deprecated('v7.3', 'v9', 'Use common.opFrac(num) instead')
-def cleanupFloat(floatNum, maxDenominator=defaults.limitOffsetDenominator):  # pragma: no cover
-    '''
-    Cleans up a floating point number by converting
-    it to a fractions.Fraction object limited to
-    a denominator of maxDenominator
-
-    common.cleanupFloat(0.33333327824)
-    0.333333333333...
-
-    common.cleanupFloat(0.142857)
-    0.1428571428571...
-
-    common.cleanupFloat(1.5)
-    1.5
-
-    Fractions are passed through silently...
-
-    import fractions
-    common.cleanupFloat(fractions.Fraction(4, 3))
-    Fraction(4, 3)
-    '''
-    if isinstance(floatNum, Fraction):
-        return floatNum  # do nothing to fractions
-    else:
-        f = Fraction(floatNum).limit_denominator(maxDenominator)
-        return float(f)
 
 # -----------------------------------------------------------------------------
 # Number methods...
@@ -764,26 +733,6 @@ def weightedSelection(values: list[int],
     return values[index]
 
 
-@deprecated('v8', 'v9', 'use math.gcd(a, b) instead.')
-def euclidGCD(a: int, b: int) -> int:  # pragma: no cover
-    '''
-    Deprecated: use math.gcd(a, b) instead
-
-    use Euclid's algorithm to find the GCD of a and b::
-
-        common.euclidGCD(2, 4)
-        2
-        common.euclidGCD(20, 8)
-        4
-        common.euclidGCD(20, 16)
-        4
-    '''
-    if b == 0:
-        return a
-    else:
-        return euclidGCD(b, a % b)
-
-
 def approximateGCD(values: list[t.Union[int, float]], grain: float = 1e-4) -> float:
     '''Given a list of values, find the lowest common divisor of floating point values.
 
@@ -870,7 +819,7 @@ def lcm(filterList: Iterable[int]) -> int:
     common.lcm({3, 5, 6})
     30
 
-    Deprecated in v.9 since Python 3.9 is the minimum version
+    Deprecated in v9 since Python 3.9 is the minimum version
     and math.lcm works in C and is faster
     '''
     def _lcm(a, b):

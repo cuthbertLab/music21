@@ -68,6 +68,7 @@ from music21.scale import scala
 # -------------------------
 from music21 import base
 from music21 import common
+from music21.common.decorators import deprecated
 from music21 import defaults
 from music21 import environment
 from music21 import exceptions21
@@ -2047,6 +2048,7 @@ class ConcreteScale(Scale):
 
     # no type checking as a deprecated call that shadows superclass.
     @t.no_type_check
+    @deprecated('v9', 'v10', 'use nextPitch instead')
     def next(
         self,
         pitchOrigin=None,
@@ -2062,7 +2064,7 @@ class ConcreteScale(Scale):
         full subclass substitution.  Thus, is shadows the `.next()` function of
         Music21Object without performing similar functionality.
 
-        The routine will be formally deprecated in v9 and removed in v10.
+        The routine is formally deprecated in v9 and will be removed in v10.
         '''
         return self.nextPitch(
             pitchOrigin=pitchOrigin,

@@ -12,7 +12,7 @@ from __future__ import annotations
 
 import collections
 
-def attributeCount(streamOrStreamIter, attrName='quarterLength') -> collections.Counter:
+def attributeCount(streamOrStreamIter, attrName='quarterLength') -> collections.Counter[t.Any]:
     '''
     Return a collections.Counter of attribute usage for elements in a stream
     or StreamIterator
@@ -25,11 +25,7 @@ def attributeCount(streamOrStreamIter, attrName='quarterLength') -> collections.
 
     Changed in v4: Returns a collections.Counter object.
     '''
-    # TODO: when 3.9 is the minimum version, set return code to collections.Counter[t.Any]
-    # above, and replace next line with this:
-    # post: collections.Counter[t.Any] = collections.Counter()
-
-    post: collections.Counter = collections.Counter()
+    post: collections.Counter[t.Any] = collections.Counter()
     for e in streamOrStreamIter:
         if hasattr(e, attrName):
             k = getattr(e, attrName)

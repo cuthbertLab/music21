@@ -1188,42 +1188,29 @@ class Metadata(base.Music21Object):
         return False, None
 
 
-    # When deprecated setWorkId is removed, this dictionary can be removed as well.
-    workIdAbbreviationDict = {
-        'gaw': 'associatedWork',
-        'gco': 'collectionDesignation',
-        'gtl': 'groupTitle',
-        'oac': 'actNumber',
-        'oco': 'commission',
-        'ocy': 'countryOfComposition',
-        'ode': 'dedication',
-        'omd': 'movementName',
-        'omv': 'movementNumber',
-        'onm': 'number',
-        'opc': 'localeOfComposition',  # origin in abc
-        'opr': 'parentTitle',
-        'ops': 'opusNumber',
-        'osc': 'sceneNumber',
-        'ota': 'alternativeTitle',
-        'otl': 'title',
-        'otp': 'popularTitle',
-        'ovm': 'volume',
-        'txl': 'textLanguage',
-        'txo': 'textOriginalLanguage',
-    }
-
-    @deprecated('v8', 'v9', "use `md.uniqueName = value` or `md['uniqueName'] = [value]`")
-    def setWorkId(self, idStr, value):
-        idStr = idStr.lower()
-        match = False
-        for abbreviation, workId in self.workIdAbbreviationDict.items():
-            if workId.lower() == idStr or abbreviation == idStr:
-                setattr(self, workId, value)
-                match = True
-                break
-        if not match:
-            raise exceptions21.MetadataException(
-                f'no work id available with id: {idStr}')
+    # # No longer used.
+    # workIdAbbreviationDict = {
+    #     'gaw': 'associatedWork',
+    #     'gco': 'collectionDesignation',
+    #     'gtl': 'groupTitle',
+    #     'oac': 'actNumber',
+    #     'oco': 'commission',
+    #     'ocy': 'countryOfComposition',
+    #     'ode': 'dedication',
+    #     'omd': 'movementName',
+    #     'omv': 'movementNumber',
+    #     'onm': 'number',
+    #     'opc': 'localeOfComposition',  # origin in abc
+    #     'opr': 'parentTitle',
+    #     'ops': 'opusNumber',
+    #     'osc': 'sceneNumber',
+    #     'ota': 'alternativeTitle',
+    #     'otl': 'title',
+    #     'otp': 'popularTitle',
+    #     'ovm': 'volume',
+    #     'txl': 'textLanguage',
+    #     'txo': 'textOriginalLanguage',
+    # }
 
     @property
     def alternativeTitle(self):

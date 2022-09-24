@@ -2129,21 +2129,6 @@ class ThreeNoteLinearSegment(NNoteLinearSegment):
     def _reprInternal(self):
         return f'n1={self.n1} n2={self.n2} n3={self.n3}'
 
-    @common.deprecated('v7', 'v8', 'assign colors to n1.style.color (etc.) directly')
-    def color(self, color='red', noteList=(2,)):  # pragma: no cover
-        '''
-        color all the notes in noteList (1, 2, 3). Default is to color
-        only the second note red
-
-        DEPRECATED.
-        '''
-        if 1 in noteList:
-            self.n1.style.color = color
-        if 2 in noteList:
-            self.n2.style.color = color
-        if 3 in noteList:
-            self.n3.style.color = color
-
     def _isComplete(self) -> bool:
         return (self.n1 is not None) and (self.n2 is not None) and (self.n3 is not None)
         # if any of these are None, it isn't complete
