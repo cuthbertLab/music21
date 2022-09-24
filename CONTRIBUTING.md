@@ -105,9 +105,8 @@ Conventions:
   - line continuation characters (`\`) are not allowed; use open parentheses.
   - prefer f-strings to `.format()`.  The `%` interpolation is no longer allowed.
   - annotating types is required in new code, and encouraged to be added to older code.
-    - e.g. `self.counter: int = 0` or `def makeNoises() -> t.List['noise.Noise']:`
+    - e.g. `self.counter: int = 0` or `def makeNoises() -> list['noise.Noise']:`
     - The typing library should always be imported as `t`.
-    - Until `music21` no longer supports Python 3.8, use `t.List[]` rather than `list[]`.
     - Until `music21` no longer supports Python 3.9, use `t.Optional[x]` rather than `x|None`.
   - prefer enums to string configurations
     - in music21.common.enums, there is a StrEnum class for nearly-backwards compatible
@@ -136,7 +135,7 @@ Conventions:
     - Exceptions may be granted if the class structures follow names that are in common musical use
       but whose real world objects do not follow this principle.  For instance, a `Manx` is a subclass
       of `Cat` without `self.tail`.  Sometimes, however, rewriting the superclass might be possible
-      (perhaps `self.tail: Optional[Tail]`).
+      (perhaps `self.tail: t.Optional[Tail]`).
     - `Music21` was originally designed without this principle in mind, so you will find
       parts of the system that do not follow LSP and for backwards compatibility never will.
       I (Myke) have personally apologized to Barbara Liskov for my past ignorance. 

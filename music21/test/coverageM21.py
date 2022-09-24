@@ -37,7 +37,7 @@ def getCoverage(overrideVersion=False):
     # the newest and oldest are passing)
     #
     # Note the .minor == 9 -- that makes it only run on 3.9
-    # run on Py 3.9 -- to get Py 3.8/3.10 timing...
+    # run on Py 3.9 -- to get Py3.10 timing...
     #
     # When changing the version, be sure also to change
     # .github/maincheck.yml's line:

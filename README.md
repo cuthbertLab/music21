@@ -14,8 +14,8 @@ https://tinyurl.com/m21colab
 And to install, see:
 https://web.mit.edu/music21/doc/usersGuide/usersGuide_01_installing.html
 
-`Music21` runs on Python 3.8+.  Use version 4 on Python 2 or Py3.4, version 5
-on Py3.5, version 6 on Py3.6, version 7 on Py3.7.
+`Music21` runs on Python 3.9+.  Use version 4 on Python 2 or Py3.4, version 5
+on Py3.5, version 6 on Py3.6, version 7 on Py3.7, version 8 on Py3.8.
 
 Released under the BSD (3-clause) license. See LICENSE.
 Externally provided software (including the MIT licensed Lilypond/MusicXML test Suite) and
