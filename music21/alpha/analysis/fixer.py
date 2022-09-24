@@ -24,7 +24,6 @@ from music21 import stream
 from music21.alpha.analysis import aligner
 from music21.alpha.analysis import ornamentRecognizer
 
-
 class OMRMidiFixer:
     '''
     Base class for future fixers
@@ -370,8 +369,8 @@ class OrnamentFixer(OMRMidiFixer):
         return None
 
     def addOrnament(self,
-                    selectedNote: 'music21.note.Note',
-                    ornament: 'music21.expressions.Ornament',
+                    selectedNote: note.Note,
+                    ornament: expressions.Ornament,
                     *,
                     show=False) -> bool:
         '''

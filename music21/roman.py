@@ -3376,7 +3376,7 @@ class RomanNumeral(harmony.Harmony):
 
     def bassScaleDegreeFromNotation(
         self,
-        notationObject: t.Optional['music21.figuredBass.notation.Notation'] = None
+        notationObject: t.Optional[fbNotation] = None
     ):
         '''
         Given a notationObject from

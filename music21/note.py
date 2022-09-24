@@ -43,6 +43,7 @@ if TYPE_CHECKING:
     from music21 import articulations
     from music21 import chord
     from music21 import instrument
+    from music21 import percussion
 
 environLocal = environment.Environment('note')
 

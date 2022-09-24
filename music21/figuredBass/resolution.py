@@ -32,6 +32,7 @@ import typing as t
 from music21 import exceptions21
 from music21 import chord
 from music21 import note
+from music21 import pitch
 from music21 import stream
 
 
@@ -745,8 +746,8 @@ def _resolvePitches(possibToResolve, howToResolve):
 
 
 def _unpackSeventhChord(
-    seventhChord: 'music21.chord.Chord'
-) -> list[t.Optional['music21.pitch.Pitch']]:
+    seventhChord: chord.Chord
+) -> list[t.Optional[pitch.Pitch]]:
     '''
     Takes in a Chord and returns a list of Pitches (or Nones) corresponding
     to the bass, root, fifth, seventh.

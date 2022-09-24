@@ -383,7 +383,7 @@ def safePitch(
 def makeDuration(
     base: t.Union[float, int, Fraction] = 0.0,
     dots: int = 0
-) -> 'music21.duration.Duration':
+) -> duration.Duration:
     '''
     Given a ``base`` duration and a number of ``dots``, create a :class:`~music21.duration.Duration`
     instance with the

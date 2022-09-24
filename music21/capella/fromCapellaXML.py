@@ -193,7 +193,7 @@ class CapellaImporter:
                 newPart.coreElementsChanged()
         newScore = stream.Score()
         # ORDERED DICT
-        parts: list[t.Optional['music21.stream.Part']] = [None for i in range(len(partDictById))]
+        parts: list[t.Optional[stream.Part]] = [None for i in range(len(partDictById))]
         for partId in partDictById:
             partDict = partDictById[partId]
             parts[partDict['number']] = partDict['part']

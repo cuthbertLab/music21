@@ -37,9 +37,8 @@ The list of objects included here are:
 from __future__ import annotations
 
 import enum
-import unittest
-import typing as t
 from typing import TYPE_CHECKING  # pylint bug; does not arise here though.
+import unittest
 
 from music21 import base
 from music21 import chord

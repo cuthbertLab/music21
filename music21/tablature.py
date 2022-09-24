@@ -18,6 +18,7 @@ Chord from FretBoard Object with tuning.
 from __future__ import annotations
 
 import typing as t
+from typing import TYPE_CHECKING
 import unittest
 
 from music21 import common
@@ -25,6 +26,10 @@ from music21 import exceptions21
 from music21 import harmony
 from music21 import pitch
 from music21 import prebase
+
+
+if TYPE_CHECKING:
+    from music21 import duration
 
 
 class TablatureException(exceptions21.Music21Exception):
@@ -229,7 +234,7 @@ class FretBoard(prebase.ProtoM21Object):
                     self.numStrings
                 ))
 
-        pitchList: list[t.Optional['music21.pitch.Pitch']] = [None] * self.numStrings
+        pitchList: list[t.Optional[pitch.Pitch]] = [None] * self.numStrings
 
         if not self.fretNotes:
             return pitchList

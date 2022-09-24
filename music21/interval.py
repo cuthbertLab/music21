@@ -721,7 +721,7 @@ class IntervalBase(base.Music21Object):
     '''
     General base class for inheritance.
     '''
-    def transposeNote(self, note1: 'music21.note.Note') -> 'music21.note.Note':
+    def transposeNote(self, note1: note.Note) -> note.Note:
         '''
         Uses self.transposePitch to do the same to a note.
 
@@ -742,7 +742,7 @@ class IntervalBase(base.Music21Object):
 
     @abc.abstractmethod
     def transposePitch(self,
-                       pitch1: 'music21.pitch.Pitch',
+                       pitch1: pitch.Pitch,
                        *,
                        inPlace: bool = False):
         '''
@@ -1367,7 +1367,7 @@ class GenericInterval(IntervalBase):
         else:
             return GenericInterval(self.undirected * (-1 * self.direction))
 
-    def transposePitch(self, p: 'music21.pitch.Pitch', *, inPlace=False):
+    def transposePitch(self, p: pitch.Pitch, *, inPlace=False):
         '''
         transpose a pitch, retaining the accidental if any.
 
@@ -2131,7 +2131,7 @@ class DiatonicInterval(IntervalBase):
 
         return ChromaticInterval(semitones)
 
-    def transposePitch(self, p: 'music21.pitch.Pitch', *, inPlace=False):
+    def transposePitch(self, p: pitch.Pitch, *, inPlace=False):
         # noinspection PyShadowingNames
         '''
         Calls transposePitch from a full interval object.
@@ -2437,7 +2437,7 @@ class ChromaticInterval(IntervalBase):
         specifier, generic = convertSemitoneToSpecifierGeneric(self.semitones)
         return DiatonicInterval(specifier, generic)
 
-    def transposePitch(self, p: 'music21.pitch.Pitch', *, inPlace=False):
+    def transposePitch(self, p: pitch.Pitch, *, inPlace=False):
         # noinspection PyShadowingNames
         '''
         Given a :class:`~music21.pitch.Pitch` object, return a new,
@@ -3330,7 +3330,7 @@ class Interval(IntervalBase):
         return cCents - dCents
 
     def transposePitch(self,
-                       p: 'music21.pitch.Pitch',
+                       p: pitch.Pitch,
                        *,
                        reverse=False,
                        maxAccidental: t.Optional[int] = 4,
@@ -3431,7 +3431,7 @@ class Interval(IntervalBase):
             return pOut
 
     def _diatonicTransposePitch(self,
-                                p: 'music21.pitch.Pitch',
+                                p: pitch.Pitch,
                                 *,
                                 maxAccidental: int,
                                 inPlace: bool = False):
@@ -3577,7 +3577,7 @@ class Interval(IntervalBase):
         return self._pitchStart
 
     @pitchStart.setter
-    def pitchStart(self, p: 'music21.pitch.Pitch'):
+    def pitchStart(self, p: pitch.Pitch):
         '''
         Assuming that this interval is defined,
         we can set a new start Pitch (_pitchStart) and
@@ -3795,11 +3795,11 @@ def getAbsoluteLowerNote(note1: t.Union[note.Note, pitch.Pitch],
 
 
 def transposePitch(
-    pitch1: 'music21.pitch.Pitch',
+    pitch1: pitch.Pitch,
     interval1: t.Union[str, Interval],
     *,
     inPlace=False
-) -> 'music21.pitch.Pitch':
+) -> pitch.Pitch:
     '''
     DEPRECATED: call `p.transpose(interval1)` directly
 
@@ -3848,8 +3848,8 @@ def transposePitch(
 
 
 def transposeNote(
-        note1: 'music21.note.Note',
-        intervalString: t.Union[str, Interval]) -> 'music21.note.Note':
+        note1: note.Note,
+        intervalString: t.Union[str, Interval]) -> note.Note:
     '''
     To be deprecated: call `n.transpose(intervalString)` directly.
 

@@ -1909,7 +1909,7 @@ def splitElementsToCompleteTuplets(
 
     for container in iterator:
         general_notes = list(container.notesAndRests)
-        last_tuplet: t.Optional['music21.duration.Tuplet'] = None
+        last_tuplet: t.Optional[duration.Tuplet] = None
         partial_tuplet_sum = 0.0
         for gn in general_notes:
             if (

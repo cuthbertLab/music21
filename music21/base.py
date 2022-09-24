@@ -68,6 +68,7 @@ from music21.sorting import SortTuple, ZeroSortTupleLow, ZeroSortTupleHigh
 from music21 import tie
 
 if TYPE_CHECKING:
+    from music21 import meter
     from music21 import stream
     from music21 import spanner
 
@@ -658,7 +659,7 @@ class Music21Object(prebase.ProtoM21Object):
         return not (self._editorial is None)
 
     @property
-    def editorial(self) -> 'music21.editorial.Editorial':
+    def editorial(self) -> Editorial:
         '''
         a :class:`~music21.editorial.Editorial` object that stores editorial information
         (comments, footnotes, harmonic information, ficta).
@@ -683,7 +684,7 @@ class Music21Object(prebase.ProtoM21Object):
         return self._editorial
 
     @editorial.setter
-    def editorial(self, ed: 'music21.editorial.Editorial'):
+    def editorial(self, ed: Editorial):
         # Dev note: because the property "editorial" shadows module editorial,
         # typing has to be in quotes.
         self._editorial = ed
@@ -3552,7 +3553,7 @@ class Music21Object(prebase.ProtoM21Object):
         #     ['_getMeasureOffset(): found local offset as:', offsetLocal, self])
         return offsetLocal
 
-    def _getTimeSignatureForBeat(self) -> 'music21.meter.TimeSignature':
+    def _getTimeSignatureForBeat(self) -> meter.TimeSignature:
         '''
         used by all the _getBeat, _getBeatDuration, _getBeatStrength functions.
 

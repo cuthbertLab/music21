@@ -20,6 +20,7 @@ from __future__ import annotations
 from collections.abc import Generator, Iterable
 import itertools
 import random
+from typing import TYPE_CHECKING
 import unittest
 
 import more_itertools
@@ -30,6 +31,11 @@ from music21 import exceptions21
 
 from music21.tree import spans
 from music21.tree import trees
+
+
+if TYPE_CHECKING:
+    from music21.tree.verticality import VerticalitySequence
+
 
 environLocal = environment.Environment('tree.timespanTree')
 
@@ -505,7 +511,7 @@ class TimespanTree(trees.OffsetTree):
 
     def iterateVerticalitiesNwise(
             self, n: int = 3, *, reverse: bool = False, padEnd: bool = False
-    ) -> Generator['music21.tree.verticality.VerticalitySequence', None, None]:
+    ) -> Generator[VerticalitySequence, None, None]:
         r'''
         Iterates :class:`~music21.tree.verticality.Verticality` objects in groups of length `n`.
 

@@ -470,7 +470,7 @@ class ChordBase(note.NotRest):
 
 
     @volume.setter
-    def volume(self, expr: t.Union[None, 'music21.volume.Volume', int, float]):
+    def volume(self, expr: t.Union[None, volume.Volume, int, float]):
         if isinstance(expr, volume.Volume):
             expr.client = self
             # remove any component volumes
