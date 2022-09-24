@@ -1121,11 +1121,11 @@ class QuarterLengthAxis(PositionAxis):
 
     labelDefault = 'Quarter Length'
     quantities: tuple[str, ...] = ('quarterLength',
-                                     'ql',
-                                     'quarterlengths',
-                                     'durations',
-                                     'duration',
-                                     )
+                                   'ql',
+                                   'quarterlengths',
+                                   'durations',
+                                   'duration',
+                                   )
 
     def __init__(self, client=None, axisName='x'):
         super().__init__(client, axisName)

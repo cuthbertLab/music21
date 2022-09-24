@@ -10,12 +10,12 @@
 # Copyright:    Copyright © 2013-17 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # -----------------------------------------------------------------------------
+from __future__ import annotations
 
 import builtins
 import inspect
 import re
 import types
-import typing as t
 import unittest
 
 from music21 import common

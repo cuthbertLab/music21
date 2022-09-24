@@ -17,7 +17,7 @@ from __future__ import annotations
 from collections import namedtuple
 import typing as t
 import unittest
-import webcolors
+import webcolors  # type: ignore  # no typing in module
 
 # TODO: Move _missingImport to environment or common so this is unnecessary.
 from music21.base import _missingImport

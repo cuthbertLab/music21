@@ -49,6 +49,8 @@ if you get a 'ssh_askpass' not found error, create this file in
 
 Otherwise just contact MSC...
 '''
+from __future__ import annotations
+
 import getpass
 import os
 

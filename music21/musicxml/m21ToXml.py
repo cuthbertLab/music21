@@ -28,10 +28,9 @@ from xml.etree.ElementTree import (
 )
 
 # external dependencies
-import webcolors
+import webcolors  # type: ignore  # no typing in module
 
-# modules that import this include converter.py.
-# thus, cannot import these here
+# Imported in music21.converter. Thus, cannot import it here
 from music21 import articulations
 from music21 import base
 from music21 import bar
@@ -2932,6 +2931,8 @@ class PartExporter(XMLExporterBase):
             try:
                 part.makeBeams(inPlace=True)
             except exceptions21.StreamException as se:  # no measures or no time sig?
+                # incorrectly flagging MusicXMLWarning as not a Warning
+                # noinspection PyTypeChecker
                 warnings.warn(MusicXMLWarning, str(se))
         if not part.streamStatus.tuplets:
             for m in measures:

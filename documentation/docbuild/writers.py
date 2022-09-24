@@ -10,6 +10,8 @@
 # Copyright:    Copyright © 2013-22 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
+from __future__ import annotations
+
 import logging
 import os
 import pathlib

@@ -6,10 +6,12 @@ Created on May 24, 2017
 
 @author: cuthbert
 '''
+from __future__ import annotations
+
 import pathlib  # for typing
 import sys
 import subprocess
-import typing as t
+
 # noinspection PyPackageRequirements
 import pytest  # pylint: disable=unused-import,import-error
 # noinspection PyPackageRequirements

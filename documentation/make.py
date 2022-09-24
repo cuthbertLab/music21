@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
+from __future__ import annotations
 
 import sys
+
 from docbuild.make import DocBuilder
 
 if __name__ == '__main__':
