@@ -3376,8 +3376,8 @@ class RomanNumeral(harmony.Harmony):
 
     def bassScaleDegreeFromNotation(
         self,
-        notationObject: t.Optional[fbNotation] = None
-    ):
+        notationObject: t.Optional[fbNotation.Notation] = None
+    ) -> int:
         '''
         Given a notationObject from
         :class:`music21.figuredBass.notation.Notation`
@@ -3435,7 +3435,7 @@ class RomanNumeral(harmony.Harmony):
         bassSD = ((self.scaleDegree - staffDistanceFromBassToRoot) %
                   self.scaleCardinality)
         if bassSD == 0:
-            bassSD = 7
+            bassSD = self.scaleCardinality
         return bassSD
 
     @property

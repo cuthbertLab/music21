@@ -418,7 +418,7 @@ class ChordBase(note.NotRest):
             # d['tie'] = value
 
     @property
-    def volume(self) -> 'music21.volume.Volume':
+    def volume(self) -> 'music21.volume.Volume':  # do NOT change to volume.Volume
         '''
         Get or set the :class:`~music21.volume.Volume` object for this
         Chord.
@@ -470,7 +470,9 @@ class ChordBase(note.NotRest):
 
 
     @volume.setter
-    def volume(self, expr: t.Union[None, volume.Volume, int, float]):
+    def volume(self, expr: t.Union[None, 'music21.volume.Volume', int, float]):
+        # Do NOT change typing to volume.Volume because it will take the property as
+        # its name
         if isinstance(expr, volume.Volume):
             expr.client = self
             # remove any component volumes
@@ -537,7 +539,8 @@ class ChordBase(note.NotRest):
     # --------------------------------------------------------------------------
     # volume per pitch ??
     # --------------------------------------------------------------------------
-    def setVolumes(self, volumes: Sequence[t.Union[volume.Volume, int, float]]):
+    def setVolumes(self, volumes: Sequence[t.Union['music21.volume.Volume', int, float]]):
+        # do not change typing to volume.Volume -- will get the property of same name.
         # noinspection PyShadowingNames
         '''
         Set as many individual volumes as appear in volumes.  If there are not
@@ -4028,7 +4031,8 @@ class Chord(ChordBase):
             c2 = self
 
         if TYPE_CHECKING:
-            assert isinstance(c2, stream.Stream)
+            from music21.stream import Stream
+            assert isinstance(c2, Stream)
         # startOctave = c2.bass().octave
         remainingPitches = copy.copy(c2.pitches)  # no deepcopy needed
 
