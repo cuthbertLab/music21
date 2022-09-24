@@ -1298,22 +1298,28 @@ class MeterSequence(MeterTerminal):
     @property
     def flat(self):
         '''
+        deprecated.  Call .flatten() instead.  To be removed in v11.
+        '''
+        return self.flatten()
+
+    def flatten(self) -> MeterSequence:
+        '''
         Return a new MeterSequence composed of the flattened representation.
 
         >>> ms = meter.MeterSequence('3/4', 3)
-        >>> b = ms.flat
+        >>> b = ms.flatten()
         >>> len(b)
         3
 
         >>> ms[1] = ms[1].subdivide(4)
-        >>> b = ms.flat
+        >>> b = ms.flatten()
         >>> len(b)
         6
 
         >>> ms[1][2] = ms[1][2].subdivide(4)
         >>> ms
         <music21.meter.core.MeterSequence {1/4+{1/16+1/16+{1/64+1/64+1/64+1/64}+1/16}+1/4}>
-        >>> b = ms.flat
+        >>> b = ms.flatten()
         >>> len(b)
         9
         '''

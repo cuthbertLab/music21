@@ -7796,16 +7796,8 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
 
         This property will be deprecated in v8 and removed in v9.
         '''
+        print('.flat will be removed in the next version of music21.  Use .flatten() instead.')
         return self.flatten(retainContainers=False)
-
-    @property
-    def semiFlat(self):
-        '''
-        The same as `.flatten(retainContainers=True)`.  This
-        property should be rarely used, in favor of `.recurse()`, and will
-        be removed as a property in version 8.
-        '''
-        return self.flatten(retainContainers=True)
 
     @overload
     def recurse(self,

@@ -1219,8 +1219,8 @@ class TimeSignature(TimeSignatureBase):
             ms.subdivideNestedHierarchy(depth,
                                         firstPartitionForm=firstPartitionForm)
 
-            # provide a partition for each flat division
-            accentCount = len(ms.flat)
+            # provide a partition for each flattened division
+            accentCount = len(ms.flatten())
             # environLocal.printDebug(['got accentCount', accentCount, 'ms: ', ms])
             divStep = self.barDuration.quarterLength / accentCount
             weightInts = [0] * accentCount  # weights as integer/depth counts
