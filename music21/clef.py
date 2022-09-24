@@ -884,7 +884,7 @@ def clefFromString(clefString, octaveShift=0) -> Clef:
             clefObj.line = lineNum
         else:
             ClefType = line_list[lineNum]
-            if t.TYPE_CHECKING:
+            if TYPE_CHECKING:
                 assert ClefType is not None
                 assert issubclass(ClefType, PitchClef)
             clefObj = ClefType()
@@ -1010,13 +1010,13 @@ def bestClef(streamObj: stream.Stream,
 
 
 # ------------------------------------------------------------------------------
+# all other tests in test/test_clef
 class Test(unittest.TestCase):
 
     def testCopyAndDeepcopy(self):
         from music21.test.commonTest import testCopyAll
         testCopyAll(self, globals())
 
-    # all other tests in test/test_clef
 
 # ------------------------------------------------------------------------------
 # define presented order in documentation

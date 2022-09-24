@@ -547,9 +547,8 @@ class StreamCore(Music21Object):
         >>> scoreTree
         <ElementTree {20} (0.0 <0.-25...> to 8.0) <music21.stream.Score exampleScore>>
         '''
-        if t.TYPE_CHECKING:
-            from music21 import stream
-            assert isinstance(self, stream.Stream)
+        if TYPE_CHECKING:
+            assert isinstance(self, Stream)
         hashedAttributes = hash((tuple(classList or ()),
                                   flatten,
                                   useTimespans,

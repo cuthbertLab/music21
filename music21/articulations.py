@@ -78,6 +78,7 @@ A longer test showing the utility of the module:
 from __future__ import annotations
 
 import typing as t
+from typing import TYPE_CHECKING  # Pylint bug
 import unittest
 
 from music21 import base
@@ -87,10 +88,11 @@ from music21 import environment
 from music21 import exceptions21
 from music21 import style
 
-environLocal = environment.Environment('articulations')
-
-if t.TYPE_CHECKING:
+if TYPE_CHECKING:
     from music21 import interval
+
+
+environLocal = environment.Environment('articulations')
 
 
 class ArticulationException(exceptions21.Music21Exception):

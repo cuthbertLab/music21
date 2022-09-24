@@ -760,7 +760,7 @@ class StreamIterator(prebase.ProtoM21Object, Sequence[M21ObjType]):
                     if f(e, self) is False:
                         return False
                 except TypeError:  # one element filters are acceptable.
-                    if t.TYPE_CHECKING:
+                    if TYPE_CHECKING:
                         assert isinstance(f, filters.StreamFilter)
                     if f(e) is False:
                         return False
@@ -1845,8 +1845,7 @@ class RecursiveIterator(StreamIterator, Sequence[M21ObjType]):
             # in a recursive filter, the stream does not need to match the filter,
             # only the internal elements.
             if e.isStream:
-                if t.TYPE_CHECKING:
-                    from music21 import stream
+                if TYPE_CHECKING:
                     assert isinstance(e, stream.Stream)
 
                 childRecursiveIterator: RecursiveIterator[M21ObjType] = RecursiveIterator(

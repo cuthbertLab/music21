@@ -22,6 +22,7 @@ from __future__ import annotations
 import pathlib
 import os
 import typing as t
+from typing import TYPE_CHECKING
 
 from music21 import common
 from music21 import converter
@@ -31,7 +32,12 @@ from music21 import metadata
 
 from music21.corpus import corpora
 
-_metadataBundles: dict[str, t.Optional['music21.metadata.bundles.MetadataBundle']] = {
+
+if TYPE_CHECKING:
+    from music21.metadata import bundles
+
+
+_metadataBundles: dict[str, t.Optional[bundles.MetadataBundle]] = {
     'core': None,
     'local': None,
     # 'virtual': None,

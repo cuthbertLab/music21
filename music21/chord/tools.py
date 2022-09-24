@@ -14,9 +14,10 @@ enough to go in the music21 core library.
 '''
 from __future__ import annotations
 
-import typing as t
+from typing import TYPE_CHECKING
 
-if t.TYPE_CHECKING:
+
+if TYPE_CHECKING:
     from music21 import chord
     from music21 import pitch
 

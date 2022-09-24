@@ -31,7 +31,8 @@ from math import isclose
 import os
 import pathlib
 import typing as t
-from typing import overload
+from typing import overload  # pycharm bug disallows alias
+from typing import TYPE_CHECKING  # pylint bug
 import unittest
 import warnings
 
@@ -67,6 +68,11 @@ from music21.stream import streamStatus
 from music21.stream import iterator
 from music21.stream import filters
 from music21.stream.enums import GivenElementsBehavior, RecursionType
+
+
+if TYPE_CHECKING:
+    from music21 import spanner
+
 
 environLocal = environment.Environment('stream')
 
@@ -1046,7 +1052,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
 
     # ------------------------------
     @property
-    def clef(self) -> t.Optional['music21.clef.Clef']:
+    def clef(self) -> t.Optional[clef.Clef]:
         '''
         Finds or sets a :class:`~music21.clef.Clef` at offset 0.0 in the Stream
         (generally a Measure):
@@ -1087,7 +1093,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         return clefList.first()
 
     @clef.setter
-    def clef(self, clefObj: t.Optional['music21.clef.Clef']):
+    def clef(self, clefObj: t.Optional[clef.Clef]):
         # if clef is None; remove object?
         oldClef = self.clef
         if oldClef is not None:
@@ -1100,7 +1106,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         self.insert(0.0, clefObj)
 
     @property
-    def timeSignature(self) -> t.Optional['music21.meter.TimeSignature']:
+    def timeSignature(self) -> t.Optional[meter.TimeSignature]:
         '''
         Gets or sets the timeSignature at offset 0.0 of the Stream (generally a Measure)
 
@@ -1152,7 +1158,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         return tsList.first()
 
     @timeSignature.setter
-    def timeSignature(self, tsObj: t.Optional['music21.meter.TimeSignature']):
+    def timeSignature(self, tsObj: t.Optional[meter.TimeSignature]):
         oldTimeSignature = self.timeSignature
         if oldTimeSignature is not None:
             # environLocal.printDebug(['removing ts', oldTimeSignature])
@@ -5066,7 +5072,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         return self.getElementsByClass('Voice')
 
     @property
-    def spanners(self) -> iterator.StreamIterator['music21.spanner.Spanner']:
+    def spanners(self) -> iterator.StreamIterator[spanner.Spanner]:
         '''
         Return all :class:`~music21.spanner.Spanner` objects
         (things such as Slurs, long trills, or anything that
@@ -5584,7 +5590,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
                       *,
                       searchActiveSite=True,
                       returnDefault=True,
-                      recurse=False) -> t.Optional['music21.instrument.Instrument']:
+                      recurse=False) -> t.Optional[instrument.Instrument]:
         '''
         Return the first Instrument found in this Stream, or None.
 
@@ -14285,7 +14291,7 @@ class SpannerStorage(Stream):
     Changed in v8: spannerParent is renamed client.
     '''
 
-    def __init__(self, givenElements=None, *, client: 'music21.spanner.Spanner', **keywords):
+    def __init__(self, givenElements=None, *, client: spanner.Spanner, **keywords):
         # No longer need store as weakref since Py2.3 and better references
         self.client = client
         super().__init__(givenElements, **keywords)

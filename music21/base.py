@@ -133,12 +133,12 @@ class ElementException(exceptions21.Music21Exception):
 class ContextTuple(t.NamedTuple):
     site: stream.Stream
     offset: OffsetQL
-    recurseType: 'music21.stream.enums.RecursionType'
+    recurseType: stream.enums.RecursionType
 
 class ContextSortTuple(t.NamedTuple):
     site: stream.Stream
     offset: SortTuple
-    recurseType: 'music21.stream.enums.RecursionType'
+    recurseType: stream.enums.RecursionType
 
 
 # pseudo class for returning splitAtX() type commands.
@@ -2692,7 +2692,7 @@ class Music21Object(prebase.ProtoM21Object):
             self._duration = Duration(0)
 
         d_out = self._duration
-        if t.TYPE_CHECKING:
+        if TYPE_CHECKING:
             assert d_out is not None
 
         return d_out

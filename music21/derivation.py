@@ -21,11 +21,17 @@ from __future__ import annotations
 from collections.abc import Generator
 import functools
 import typing as t
+from typing import TYPE_CHECKING  # Pylint bug
 import unittest
 
 from music21 import common
 from music21.common.objects import SlottedObjectMixin
 from music21 import environment
+
+
+if TYPE_CHECKING:
+    from music21 import base
+
 
 environLocal = environment.Environment('derivation')
 

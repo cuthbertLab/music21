@@ -76,6 +76,7 @@ from __future__ import annotations
 
 from collections.abc import Iterable
 import typing as t
+from typing import TYPE_CHECKING  # pylint bug
 import unittest
 
 from music21 import exceptions21
@@ -84,6 +85,11 @@ from music21 import environment
 from music21 import prebase
 from music21 import style
 from music21.common.objects import EqualSlottedObjectMixin
+
+
+if TYPE_CHECKING:
+    from music21 import base
+
 
 environLocal = environment.Environment('beam')
 
@@ -243,7 +249,7 @@ class Beams(prebase.ProtoM21Object, EqualSlottedObjectMixin):
     # STATIC METHODS #
 
     @staticmethod
-    def naiveBeams(srcList: Iterable['music21.base.Music21Object']):
+    def naiveBeams(srcList: Iterable[base.Music21Object]):
         # noinspection PyShadowingNames
         '''
         Given a list or iterator of elements, return a list of None or Beams for

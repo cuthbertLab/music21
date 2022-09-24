@@ -20,7 +20,8 @@ from __future__ import annotations
 from collections.abc import Iterable, Sequence
 import copy
 import typing as t
-from typing import overload
+from typing import overload  # PyCharm bug
+from typing import TYPE_CHECKING  # PyLint bug
 import unittest
 
 from music21 import base
@@ -38,8 +39,10 @@ from music21 import style
 from music21 import tie
 from music21 import volume
 
-if t.TYPE_CHECKING:
+if TYPE_CHECKING:
     from music21 import articulations
+    from music21 import chord
+    from music21 import instrument
 
 environLocal = environment.Environment('note')
 
@@ -987,8 +990,8 @@ class NotRest(GeneralNote):
             self.beams = beams
         else:
             self.beams = beam.Beams()
-        self._storedInstrument: t.Optional['music21.instrument.Instrument'] = None
-        self._chordAttached: t.Optional['music21.chord.ChordBase'] = None
+        self._storedInstrument: t.Optional[instrument.Instrument] = None
+        self._chordAttached: t.Optional[chord.ChordBase] = None
 
     # ==============================================================================================
     # Special functions
@@ -1230,7 +1233,7 @@ class NotRest(GeneralNote):
                 self._volume = volume.Volume(client=forceClient)
 
         volume_out = self._volume
-        if t.TYPE_CHECKING:
+        if TYPE_CHECKING:
             assert volume_out is not None
 
         return volume_out
@@ -1259,7 +1262,7 @@ class NotRest(GeneralNote):
             raise Exception(f'this must be a Volume object, not {value}')
 
     @property
-    def volume(self) -> 'music21.volume.Volume':
+    def volume(self) -> volume.Volume:
         '''
         Get and set the :class:`~music21.volume.Volume` object of this object.
         Volume objects are created on demand.
@@ -1276,7 +1279,7 @@ class NotRest(GeneralNote):
         return self._getVolume()
 
     @volume.setter
-    def volume(self, value: t.Union[None, 'music21.volume.Volume', int, float]):
+    def volume(self, value: t.Union[None, volume.Volume, int, float]):
         self._setVolume(value)
 
     def _getStoredInstrument(self):
@@ -1302,7 +1305,7 @@ class NotRest(GeneralNote):
     def getInstrument(self,
                       *,
                       returnDefault: t.Literal[True] = True
-                      ) -> 'music21.instrument.Instrument':
+                      ) -> instrument.Instrument:
         from music21 import instrument
         return instrument.Instrument()  # astroid #1015
 
@@ -1310,13 +1313,13 @@ class NotRest(GeneralNote):
     def getInstrument(self,
                       *,
                       returnDefault: t.Literal[False]
-                      ) -> t.Optional['music21.instrument.Instrument']:
+                      ) -> t.Optional[instrument.Instrument]:
         return None  # astroid #1015
 
     def getInstrument(self,
                       *,
                       returnDefault: bool = True
-                      ) -> t.Optional['music21.instrument.Instrument']:
+                      ) -> t.Optional[instrument.Instrument]:
         '''
         Retrieves the `.storedInstrument` on this `NotRest` instance, if any.
         If one is not found, executes a context search (without following
@@ -1466,7 +1469,7 @@ class Note(NotRest):
                  nameWithOctave: t.Optional[str] = None,
                  **keywords):
         super().__init__(**keywords)
-        self._chordAttached: t.Optional['music21.chord.Chord']
+        self._chordAttached: t.Optional[chord.Chord]
 
         if pitch is not None:
             if isinstance(pitch, Pitch):
@@ -1833,7 +1836,7 @@ class Unpitched(NotRest):
                  displayName=None,
                  **keywords):
         super().__init__(**keywords)
-        self._chordAttached: t.Optional['music21.percussion.PercussionChord'] = None
+        self._chordAttached: t.Optional[percussion.PercussionChord] = None
 
         self.displayStep: StepName = 'B'
         self.displayOctave: int = 4

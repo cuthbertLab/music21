@@ -55,10 +55,8 @@ from functools import lru_cache
 import io
 from math import inf, isnan
 import typing as t
+from typing import TYPE_CHECKING  # pylint bug
 import unittest
-
-
-from music21 import prebase
 
 from music21 import common
 from music21.common.objects import SlottedObjectMixin
@@ -67,6 +65,11 @@ from music21.common.types import OffsetQL, OffsetQLIn, DocOrder
 from music21 import defaults
 from music21 import environment
 from music21 import exceptions21
+from music21 import prebase
+
+
+if TYPE_CHECKING:
+    from music21 import base
 
 environLocal = environment.Environment('duration')
 
@@ -1615,7 +1618,7 @@ class Duration(prebase.ProtoM21Object, SlottedObjectMixin):
                  quarterLength: t.Optional[OffsetQLIn] = None,
                  durationTuple: t.Optional[DurationTuple] = None,
                  components: t.Optional[Iterable[DurationTuple]] = None,
-                 client: t.Optional['music21.base.Music21Object'] = None,
+                 client: t.Optional[base.Music21Object] = None,
                  **keywords):
         # First positional argument is assumed to be type string or a quarterLength.
         # no need for super() on ProtoM21 or SlottedObjectMixin

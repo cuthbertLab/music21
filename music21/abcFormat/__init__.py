@@ -1602,7 +1602,7 @@ class ABCNote(ABCToken):
         # assume we have a complete fraction
         elif '/' in numStr:
             nStr, dStr = numStr.split('/')
-            if t.TYPE_CHECKING:
+            if TYPE_CHECKING:
                 assert nStr is not None
                 assert dStr is not None
             n = int(nStr.strip())

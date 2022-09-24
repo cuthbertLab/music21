@@ -20,7 +20,8 @@ __all__ = ['tools', 'tables', 'Chord', 'ChordException', 'fromIntervalVector', '
 from collections.abc import Iterable, Sequence
 import copy
 import typing as t
-from typing import overload
+from typing import overload  # pycharm bug
+from typing import TYPE_CHECKING  # pylint bug
 import unittest
 
 from music21 import beam
@@ -38,6 +39,11 @@ from music21 import volume
 
 from music21.chord import tables
 from music21.chord import tools
+
+
+if TYPE_CHECKING:
+    from music21 import stream
+
 
 environLocal = environment.Environment('chord')
 
@@ -458,7 +464,7 @@ class ChordBase(note.NotRest):
         if velocities:  # avoid division by zero error
             self._volume.velocity = int(round(sum(velocities) / len(velocities)))
 
-        if t.TYPE_CHECKING:
+        if TYPE_CHECKING:
             assert self._volume is not None
         return self._volume
 
@@ -473,7 +479,7 @@ class ChordBase(note.NotRest):
             note.NotRest._setVolume(self, expr, setClient=False)
         elif common.isNum(expr):
             vol = self._getVolume()
-            if t.TYPE_CHECKING:
+            if TYPE_CHECKING:
                 assert isinstance(expr, (int, float))
 
             if expr < 1:  # assume a scalar
@@ -531,7 +537,7 @@ class ChordBase(note.NotRest):
     # --------------------------------------------------------------------------
     # volume per pitch ??
     # --------------------------------------------------------------------------
-    def setVolumes(self, volumes: Sequence[t.Union['music21.volume.Volume', int, float]]):
+    def setVolumes(self, volumes: Sequence[t.Union[volume.Volume, int, float]]):
         # noinspection PyShadowingNames
         '''
         Set as many individual volumes as appear in volumes.  If there are not
@@ -4021,8 +4027,7 @@ class Chord(ChordBase):
         if inPlace is True:
             c2 = self
 
-        if t.TYPE_CHECKING:
-            from music21 import stream
+        if TYPE_CHECKING:
             assert isinstance(c2, stream.Stream)
         # startOctave = c2.bass().octave
         remainingPitches = copy.copy(c2.pitches)  # no deepcopy needed
@@ -4486,7 +4491,7 @@ class Chord(ChordBase):
                 f'the given pitch is not in the Chord: {pitchTarget}')
 
     def setVolume(self,
-                  vol: 'music21.volume.Volume',
+                  vol: volume.Volume,
                   target: t.Union[str, note.Note, pitch.Pitch]):
         '''
         Set the :class:`~music21.volume.Volume` object of a specific Pitch.
@@ -4984,7 +4989,7 @@ class Chord(ChordBase):
             self._duration = pitchZeroDuration
 
         d_out = self._duration
-        if t.TYPE_CHECKING:
+        if TYPE_CHECKING:
             assert isinstance(d_out, Duration)
         return d_out
 

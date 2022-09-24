@@ -3068,7 +3068,7 @@ class Interval(IntervalBase):
 
         # both self.diatonic and self.chromatic can still both be None if an
         # empty Interval class is being created, such as in deepcopy
-        if t.TYPE_CHECKING:
+        if TYPE_CHECKING:
             assert diatonic is not None
             assert chromatic is not None
 

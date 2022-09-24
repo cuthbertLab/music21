@@ -466,11 +466,11 @@ class MidiEvent(prebase.ProtoM21Object):
     '''
     # pylint: disable=redefined-builtin
     def __init__(self,
-                 track: t.Optional['music21.midi.MidiTrack'] = None,
+                 track: t.Optional[MidiTrack] = None,
                  type=None,
                  time: int = 0,
                  channel: t.Optional[int] = None):
-        self.track: t.Optional['music21.midi.MidiTrack'] = track  # a MidiTrack object
+        self.track: t.Optional[MidiTrack] = track  # a MidiTrack object
         self.type = type
         self.time: int = time
         self.channel: t.Optional[int] = channel
