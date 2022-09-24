@@ -73,11 +73,11 @@ class SubConverter:
     '''
     readBinary = False
     canBePickled = True
-    registerFormats: t.Tuple[str, ...] = ()
-    registerShowFormats: t.Tuple[str, ...] = ()
-    registerInputExtensions: t.Tuple[str, ...] = ()  # if converter supports input
-    registerOutputExtensions: t.Tuple[str, ...] = ()  # if converter supports output
-    registerOutputSubformatExtensions: t.Dict[str, str] = {}
+    registerFormats: tuple[str, ...] = ()
+    registerShowFormats: tuple[str, ...] = ()
+    registerInputExtensions: tuple[str, ...] = ()  # if converter supports input
+    registerOutputExtensions: tuple[str, ...] = ()  # if converter supports output
+    registerOutputSubformatExtensions: dict[str, str] = {}
     launchKey: t.Union[str, pathlib.Path, None] = None
 
     codecWrite = False

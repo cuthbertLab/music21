@@ -79,7 +79,7 @@ environLocal = environment.Environment('scale')
 Direction = intervalNetwork.Direction
 Terminus = intervalNetwork.Terminus
 
-_PitchDegreeCacheKey = t.Tuple[
+_PitchDegreeCacheKey = tuple[
     t.Type,  # scale class
     str,  # scale type
     str,  # tonic name with octave
@@ -90,7 +90,7 @@ _PitchDegreeCacheKey = t.Tuple[
 
 # a dictionary mapping an abstract scale class, tonic.nameWithOctave,
 # and degree to a pitchNameWithOctave.
-_pitchDegreeCache: t.Dict[_PitchDegreeCacheKey, str] = {}
+_pitchDegreeCache: dict[_PitchDegreeCacheKey, str] = {}
 
 
 # ------------------------------------------------------------------------------
@@ -1256,7 +1256,7 @@ class ConcreteScale(Scale):
 
     def __init__(self,
                  tonic: t.Optional[t.Union[str, pitch.Pitch, note.Note]] = None,
-                 pitches: t.Optional[t.List[t.Union[pitch.Pitch, str]]] = None):
+                 pitches: t.Optional[list[t.Union[pitch.Pitch, str]]] = None):
         super().__init__()
 
         self.type = 'Concrete'
@@ -1498,7 +1498,7 @@ class ConcreteScale(Scale):
                                     )
         pitchCollNames = [p.name for p in pitchColl]
 
-        def tuneOnePitch(p, dst: t.List[pitch.Pitch]):
+        def tuneOnePitch(p, dst: list[pitch.Pitch]):
             # some pitches might be quarter / 3/4 tones; need to convert
             # these to microtonal representations so that we can directly
             # compare pitch names
@@ -1536,7 +1536,7 @@ class ConcreteScale(Scale):
                 elementPitches = [e.pitch]
 
             # store a list of reset chord pitches
-            outerDestination: t.List[pitch.Pitch] = []
+            outerDestination: list[pitch.Pitch] = []
 
             for p in elementPitches:
                 tuneOnePitch(p, outerDestination)
@@ -1571,7 +1571,7 @@ class ConcreteScale(Scale):
         minPitch: t.Union[str, pitch.Pitch, None] = None,
         maxPitch: t.Union[str, pitch.Pitch, None] = None,
         direction: t.Optional[Direction] = None
-    ) -> t.List[pitch.Pitch]:
+    ) -> list[pitch.Pitch]:
         '''
         Return a list of Pitch objects, using a
         deepcopy of a cached version if available.
@@ -3014,7 +3014,7 @@ class OctaveRepeatingScale(ConcreteScale):
     [<music21.pitch.Pitch C4>, <music21.pitch.Pitch D-4>, <music21.pitch.Pitch C5>]
     '''
 
-    def __init__(self, tonic=None, intervalList: t.Optional[t.List] = None):
+    def __init__(self, tonic=None, intervalList: t.Optional[list] = None):
         super().__init__(tonic=tonic)
         mode = intervalList if intervalList else ['m2']
         self._abstract = AbstractOctaveRepeatingScale(mode=mode)
@@ -3044,7 +3044,7 @@ class CyclicalScale(ConcreteScale):
 
     def __init__(self,
                  tonic: t.Union[str, pitch.Pitch, note.Note, None] = None,
-                 intervalList: t.Optional[t.List] = None):
+                 intervalList: t.Optional[list] = None):
         super().__init__(tonic=tonic)
         mode = intervalList if intervalList else ['m2']
         self._abstract = AbstractCyclicalScale(mode=mode)

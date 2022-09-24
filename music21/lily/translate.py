@@ -52,7 +52,7 @@ del find_spec
 # TODO: speed up tests everywhere! move these to music21 base...
 
 class _sharedCorpusTestObject:
-    sharedCache: t.Dict[str, stream.Stream] = {}
+    sharedCache: dict[str, stream.Stream] = {}
 
 
 sharedCacheObject = _sharedCorpusTestObject()

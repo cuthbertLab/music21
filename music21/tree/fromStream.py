@@ -29,11 +29,11 @@ def listOfTreesByClass(
     inputStream: StreamType,
     *,
     classLists: t.Sequence[t.Sequence[t.Type[M21ObjType]]] = (),
-    currentParentage: t.Optional[t.Tuple['music21.stream.Stream', ...]] = None,
+    currentParentage: t.Optional[tuple['music21.stream.Stream', ...]] = None,
     initialOffset: float = 0.0,
     flatten: t.Union[bool, str] = False,
     useTimespans: bool = False
-) -> t.List[t.Union[trees.OffsetTree, timespanTree.TimespanTree]]:
+) -> list[t.Union[trees.OffsetTree, timespanTree.TimespanTree]]:
     # noinspection PyShadowingNames
     r'''
     To be DEPRECATED in v8: this is no faster than calling streamToTimespanTree
@@ -360,7 +360,7 @@ def asTimespans(
     >>> tenorElements.source is score[3]
     True
     '''
-    classLists: t.List[t.Sequence[t.Type[Music21Object]]]
+    classLists: list[t.Sequence[t.Type[Music21Object]]]
     if classList is None:
         classLists = [[Music21Object]]
     else:

@@ -88,7 +88,7 @@ class Tie(prebase.ProtoM21Object, SlottedObjectMixin):
         'type',
     )
 
-    _DOC_ATTR: t.Dict[str, str] = {
+    _DOC_ATTR: dict[str, str] = {
         'type': '''
             The tie type, can be 'start', 'stop', 'continue', 'let-ring', or 'continue-let-ring'.
             ''',

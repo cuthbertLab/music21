@@ -22,7 +22,7 @@ from music21.graph import plot
 from music21.graph import primitives
 
 # shortcuts that get a PlotClass directly
-PLOTCLASS_SHORTCUTS: t.Dict[str, t.Type[plot.PlotStreamMixin]] = {
+PLOTCLASS_SHORTCUTS: dict[str, t.Type[plot.PlotStreamMixin]] = {
     'ambitus': plot.WindowedAmbitus,
     'dolan': plot.Dolan,
     'instruments': plot.Dolan,
@@ -32,7 +32,7 @@ PLOTCLASS_SHORTCUTS: t.Dict[str, t.Type[plot.PlotStreamMixin]] = {
 
 
 # all formats need to be here, and first for each row must match a graphType.
-FORMAT_SYNONYMS: t.List[t.Tuple[str, ...]] = [
+FORMAT_SYNONYMS: list[tuple[str, ...]] = [
     ('horizontalbar', 'bar', 'horizontal', 'pianoroll', 'piano'),
     ('histogram', 'histo', 'count'),
     ('scatter', 'point'),
@@ -46,7 +46,7 @@ FORMAT_SYNONYMS: t.List[t.Tuple[str, ...]] = [
 FORMATS = [syn[0] for syn in FORMAT_SYNONYMS]
 
 
-def getPlotClasses() -> t.List[t.Type[plot.PlotStreamMixin]]:
+def getPlotClasses() -> list[t.Type[plot.PlotStreamMixin]]:
     '''
     return a list of all PlotStreamMixin subclasses...  returns sorted list by name
 
@@ -58,7 +58,7 @@ def getPlotClasses() -> t.List[t.Type[plot.PlotStreamMixin]]:
      <class 'music21.graph.plot.HistogramPitchSpace'>,
      ...]
     '''
-    allPlot: t.List[t.Type[plot.PlotStreamMixin]] = []
+    allPlot: list[t.Type[plot.PlotStreamMixin]] = []
     for i in sorted(plot.__dict__):
         name = getattr(plot, i)
         # noinspection PyTypeChecker
@@ -71,7 +71,7 @@ def getPlotClasses() -> t.List[t.Type[plot.PlotStreamMixin]]:
     return allPlot
 
 
-def getAxisClasses() -> t.List[t.Type[axis.Axis]]:
+def getAxisClasses() -> list[t.Type[axis.Axis]]:
     '''
     return a list of all Axis subclasses...  returns sorted list by name
 
@@ -82,7 +82,7 @@ def getAxisClasses() -> t.List[t.Type[axis.Axis]]:
      <class 'music21.graph.axis.OffsetAxis'>,
      ...]
     '''
-    allAxis: t.List[t.Type[axis.Axis]] = []
+    allAxis: list[t.Type[axis.Axis]] = []
     for i in sorted(axis.__dict__):
         name = getattr(axis, i)
         if (callable(name)
@@ -331,7 +331,7 @@ def getPlotsToMake(graphFormat: t.Optional[str] = None,
     if [graphFormat, xValue, yValue, zValue] == [None] * 4:
         graphFormat = 'pianoroll'
 
-    graphClasses: t.List[t.Type[plot.PlotStreamMixin]]
+    graphClasses: list[t.Type[plot.PlotStreamMixin]]
     if graphFormat in PLOTCLASS_SHORTCUTS:
         graphClasses = [PLOTCLASS_SHORTCUTS[graphFormat]]
     else:

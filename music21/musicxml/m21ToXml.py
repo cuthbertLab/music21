@@ -1469,17 +1469,17 @@ class ScoreExporter(XMLExporterBase, PartStaffExporterMixin):
 
         self.refStreamOrTimeRange = [0.0, self.highestTime]
 
-        self.partExporterList: t.List['PartExporter'] = []
+        self.partExporterList: list['PartExporter'] = []
 
-        self.groupsToJoin: t.List[layout.StaffGroup] = []
+        self.groupsToJoin: list[layout.StaffGroup] = []
         # key = id(stream) (NB: not stream.id); value = .instrumentStream
-        self.instrumentsByStream: t.Dict[int, stream.Stream] = {}
+        self.instrumentsByStream: dict[int, stream.Stream] = {}
 
-        self.instrumentList: t.List[instrument.Instrument] = []
-        self.instrumentIdList: t.List[t.Optional[str]] = []
-        self.midiChannelList: t.List[t.Optional[int]] = []
+        self.instrumentList: list[instrument.Instrument] = []
+        self.instrumentIdList: list[t.Optional[str]] = []
+        self.midiChannelList: list[t.Optional[int]] = []
 
-        self.parts: t.List[stream.Part] = []
+        self.parts: list[stream.Part] = []
 
         self.makeNotation: bool = makeNotation
 
@@ -1752,7 +1752,7 @@ class ScoreExporter(XMLExporterBase, PartStaffExporterMixin):
 
         Called automatically by .parse()
         '''
-        staffGroupsProcessed: t.List = []
+        staffGroupsProcessed: list = []
         for partExp in self.partExporterList:
             if partExp.staffGroup is None:
                 # no staffGroup to process
@@ -2354,7 +2354,7 @@ class ScoreExporter(XMLExporterBase, PartStaffExporterMixin):
             mxCreator.text = defaults.author
 
         if self.scoreMetadata is not None:
-            copyrights: t.Tuple[metadata.Copyright, ...] = self.scoreMetadata['copyright']
+            copyrights: tuple[metadata.Copyright, ...] = self.scoreMetadata['copyright']
             for c in copyrights:
                 mxRights = SubElement(mxId, 'rights')
                 if c.role is not None:
@@ -2397,7 +2397,7 @@ class ScoreExporter(XMLExporterBase, PartStaffExporterMixin):
         mxMiscellaneous = Element('miscellaneous')
 
         foundOne = False
-        allItems: t.List[t.Tuple[str, t.Any]] = []
+        allItems: list[tuple[str, t.Any]] = []
 
         allItems = md.all(
             skipContributors=True,  # we don't want the contributors (already handled them)
@@ -2561,7 +2561,7 @@ class ScoreExporter(XMLExporterBase, PartStaffExporterMixin):
         mxWork = Element('work')
         # TODO: work-number
         firstTitleFound: t.Optional[metadata.Text] = None
-        titles: t.Tuple[metadata.Text, ...] = mdObj['title']
+        titles: tuple[metadata.Text, ...] = mdObj['title']
         if titles:
             if firstTitleFound is None:
                 firstTitleFound = titles[0]
@@ -2570,7 +2570,7 @@ class ScoreExporter(XMLExporterBase, PartStaffExporterMixin):
         if mxWork:
             mxScoreHeader.append(mxWork)
 
-        movementNumbers: t.Tuple[metadata.Text, ...] = mdObj['movementNumber']
+        movementNumbers: tuple[metadata.Text, ...] = mdObj['movementNumber']
         if movementNumbers:
             mxMovementNumber = SubElement(mxScoreHeader, 'movement-number')
             mxMovementNumber.text = str(movementNumbers[0])
@@ -2582,7 +2582,7 @@ class ScoreExporter(XMLExporterBase, PartStaffExporterMixin):
 
         movement_title: str = ''
 
-        movementNames: t.Tuple[metadata.Text, ...] = mdObj['movementName']
+        movementNames: tuple[metadata.Text, ...] = mdObj['movementName']
         if movementNames:
             movement_title = str(movementNames[0])
         else:  # there are no movementNames
@@ -3145,9 +3145,9 @@ class MeasureExporter(XMLExporterBase):
         self.currentVoiceId: t.Optional[int] = None
         self.nextFreeVoiceNumber: int = 1
         self.nextArpeggioNumber: int = 1
-        self.arpeggioNumbers: t.Dict[expressions.ArpeggioMarkSpanner, int] = {}
+        self.arpeggioNumbers: dict[expressions.ArpeggioMarkSpanner, int] = {}
 
-        self.rbSpanners: t.List[spanner.RepeatBracket] = []  # repeatBracket spanners
+        self.rbSpanners: list[spanner.RepeatBracket] = []  # repeatBracket spanners
 
         if parent is None:
             self.spannerBundle = spanner.SpannerBundle()
@@ -3507,7 +3507,7 @@ class MeasureExporter(XMLExporterBase):
         obj: base.Music21Object,
         noteIndexInChord: int = 0,
         objectSpannerBundle: t.Optional[spanner.SpannerBundle] = None
-    ) -> t.List[Element]:
+    ) -> list[Element]:
         '''
         return a list of <notations> from spanners related to the object that should appear
         in the notations tag (slurs, slides, etc.)
@@ -3534,7 +3534,7 @@ class MeasureExporter(XMLExporterBase):
           <tremolo type="stop">3</tremolo>
         </ornaments>
         '''
-        notations: t.List[Element] = []
+        notations: list[Element] = []
         if objectSpannerBundle is not None:
             sb = objectSpannerBundle
         else:
@@ -3660,7 +3660,7 @@ class MeasureExporter(XMLExporterBase):
         self,
         obj: base.Music21Object,
         noteIndexInChord: int,
-        notations: t.List[Element],
+        notations: list[Element],
         sb: spanner.SpannerBundle,
     ) -> None:
         for ams in sb.getByClass(expressions.ArpeggioMarkSpanner):

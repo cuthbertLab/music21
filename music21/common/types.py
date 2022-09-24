@@ -16,7 +16,7 @@ from music21.common.enums import OffsetSpecial
 if t.TYPE_CHECKING:
     import music21  # pylint: disable=unused-import
 
-DocOrder = t.List[t.Union[str, t.Callable]]
+DocOrder = list[t.Union[str, t.Callable]]
 OffsetQL = t.Union[float, Fraction]
 OffsetQLSpecial = t.Union[float, Fraction, OffsetSpecial]
 OffsetQLIn = t.Union[int, float, Fraction]

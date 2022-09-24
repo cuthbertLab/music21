@@ -52,10 +52,10 @@ class ChordTablesException(exceptions21.Music21Exception):
 # For index 2 (python [1]), a value of 1 or higher
 # is symmetrical under inversion.
 
-TNIStructure = t.Tuple[
-    t.Tuple[int, ...],
-    t.Tuple[int, int, int, int, int, int],
-    t.Tuple[int, int, int, int, int, int, int, int],
+TNIStructure = tuple[
+    tuple[int, ...],
+    tuple[int, int, int, int, int, int],
+    tuple[int, int, int, int, int, int, int, int],
     int,
 ]
 

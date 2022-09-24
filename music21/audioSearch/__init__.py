@@ -525,11 +525,11 @@ def detectPitchFrequencies(freqFromAQList, useScale=None):
 
 
 def smoothFrequencies(
-    frequencyList: t.List[t.Union[int, float]],
+    frequencyList: list[t.Union[int, float]],
     *,
     smoothLevels=7,
     inPlace=False
-) -> t.List[int]:
+) -> list[int]:
     '''
     Smooths the shape of the signal in order to avoid false detections in the fundamental
     frequency.  Takes in a list of ints or floats.
@@ -605,7 +605,7 @@ def smoothFrequencies(
         )
 
     dpf = frequencyList
-    detectedPitchesFreq: t.List[float]
+    detectedPitchesFreq: list[float]
     if inPlace:
         detectedPitchesFreq = [float(f) for f in dpf]
     else:
@@ -633,7 +633,7 @@ def smoothFrequencies(
                 change += detectedPitchesFreq[i + j - int(math.floor(smoothLevels / 2.0))]
             detectedPitchesFreq[i] = change / smoothLevels
 
-    out: t.List[int] = [int(round(f)) for f in detectedPitchesFreq]
+    out: list[int] = [int(round(f)) for f in detectedPitchesFreq]
     if not inPlace:
         return out
     else:
@@ -1003,7 +1003,7 @@ class Test(unittest.TestCase):
 
 # ------------------------------------------------------------------------------
 # define presented order in documentation
-_DOC_ORDER: t.List[type] = []
+_DOC_ORDER: list[type] = []
 
 
 if __name__ == '__main__':

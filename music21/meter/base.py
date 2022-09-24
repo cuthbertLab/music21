@@ -48,7 +48,7 @@ MIN_DENOMINATOR_TYPE = '128th'
 
 # store a module-level dictionary of partitioned meter sequences used
 # for setting default accent weights; store as needed
-_meterSequenceAccentArchetypes: t.Dict[t.Tuple[str, t.Any, int], MeterSequence] = {}
+_meterSequenceAccentArchetypes: dict[tuple[str, t.Any, int], MeterSequence] = {}
 _meterSequenceAccentArchetypesNoneCache = ('', -1, -1)  # a cache key representing None
 
 def bestTimeSignature(meas: 'music21.stream.Stream') -> 'music21.meter.TimeSignature':
@@ -446,7 +446,7 @@ class TimeSignature(TimeSignatureBase):
     _styleClass = style.TextStyle
     classSortOrder = 4
 
-    _DOC_ATTR: t.Dict[str, str] = {
+    _DOC_ATTR: dict[str, str] = {
         'beatSequence': 'A :class:`~music21.meter.MeterSequence` governing beat partitioning.',
         'beamSequence': 'A :class:`~music21.meter.MeterSequence` governing automatic beaming.',
         'accentSequence': 'A :class:`~music21.meter.MeterSequence` governing accent partitioning.',
@@ -971,7 +971,7 @@ class TimeSignature(TimeSignatureBase):
             return 'Other'
 
     @property
-    def beatDivisionDurations(self) -> t.List[duration.Duration]:
+    def beatDivisionDurations(self) -> list[duration.Duration]:
         '''
         Return the beat division, or the durations that make up one beat,
         as a list of :class:`~music21.duration.Duration` objects, if and only if
@@ -1007,7 +1007,7 @@ class TimeSignature(TimeSignatureBase):
             raise TimeSignatureException(f'non uniform beat division: {post}')
 
     @property
-    def beatSubDivisionDurations(self) -> t.List[duration.Duration]:
+    def beatSubDivisionDurations(self) -> list[duration.Duration]:
         '''
         Return a subdivision of the beat division, or a list
         of :class:`~music21.duration.Duration` objects representing each beat division
@@ -1242,7 +1242,7 @@ class TimeSignature(TimeSignatureBase):
 
     # --------------------------------------------------------------------------
     # access data for other processing
-    def getBeams(self, srcList, measureStartOffset=0.0) -> t.List[t.Optional[beam.Beams]]:
+    def getBeams(self, srcList, measureStartOffset=0.0) -> list[t.Optional[beam.Beams]]:
         '''
         Given a qLen position and an iterable of Music21Objects, return a list of Beams objects.
 

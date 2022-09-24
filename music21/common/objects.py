@@ -184,7 +184,7 @@ class SlottedObjectMixin:
 
     # CLASS VARIABLES #
 
-    __slots__: t.Tuple[str, ...] = ()
+    __slots__: tuple[str, ...] = ()
 
     # SPECIAL METHODS #
 

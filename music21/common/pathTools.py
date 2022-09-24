@@ -70,7 +70,7 @@ def getCorpusFilePath() -> pathlib.Path:
     return pathlib.Path(coreCorpus.manualCoreCorpusPath)
 
 
-def getCorpusContentDirs() -> t.List[str]:
+def getCorpusContentDirs() -> list[str]:
     '''
     Get all dirs that are found in the CoreCorpus that contain content;
     that is, exclude dirs that have code or other resources.

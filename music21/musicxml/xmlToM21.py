@@ -65,14 +65,14 @@ from music21 import environment
 environLocal = environment.Environment('musicxml.xmlToM21')
 
 # what goes in a `.staffReference`
-StaffReferenceType = t.Dict[int, t.List[base.Music21Object]]
+StaffReferenceType = dict[int, list[base.Music21Object]]
 
 # const
 NO_STAFF_ASSIGNED = 0
 
 # see docstring for isRecognizableMetadataKey for information on
 # this list.
-_recognizableKeys: t.List[str] = list(
+_recognizableKeys: list[str] = list(
     metadata.properties.ALL_NAMESPACE_NAMES
     + metadata.properties.ALL_UNIQUE_NAMES
     + metadata.properties.ALL_MUSIC21_WORK_IDS
@@ -1544,15 +1544,15 @@ class PartParser(XMLParserBase):
 
         self.atSoundingPitch = True
 
-        self.staffReferenceList: t.List[StaffReferenceType] = []
+        self.staffReferenceList: list[StaffReferenceType] = []
 
         self.lastTimeSignature = None
         self.lastMeasureWasShort = False
         self.lastMeasureOffset = 0.0
 
         # a dict of clefs per staff number
-        self.lastClefs: t.Dict[int, t.Optional[clef.Clef]] = {NO_STAFF_ASSIGNED: clef.TrebleClef()}
-        self.activeTuplets: t.List[t.Optional[duration.Tuplet]] = [None] * 7
+        self.lastClefs: dict[int, t.Optional[clef.Clef]] = {NO_STAFF_ASSIGNED: clef.TrebleClef()}
+        self.activeTuplets: list[t.Optional[duration.Tuplet]] = [None] * 7
 
         self.maxStaves = 1  # will be changed in measure parsing...
 
@@ -1839,9 +1839,9 @@ class PartParser(XMLParserBase):
             'TimeSignature',
         ]
 
-        uniqueStaffKeys: t.List[int] = self._getUniqueStaffKeys()
-        partStaffs: t.List[stream.PartStaff] = []
-        appendedElementIds: t.Set[int] = set()  # id is id(el) not el.id
+        uniqueStaffKeys: list[int] = self._getUniqueStaffKeys()
+        partStaffs: list[stream.PartStaff] = []
+        appendedElementIds: set[int] = set()  # id is id(el) not el.id
 
         def copy_into_partStaff(source, target, omitTheseElementIds):
             for sourceElem in source.getElementsByClass(STAFF_SPECIFIC_CLASSES):
@@ -1872,7 +1872,7 @@ class PartParser(XMLParserBase):
             newPartStaff.groups.append(partStaffId)
             partStaffs.append(newPartStaff)
             self.parent.m21PartObjectsById[partStaffId] = newPartStaff
-            elementsIdsNotToGoInThisStaff: t.Set[int] = set()
+            elementsIdsNotToGoInThisStaff: set[int] = set()
             for staffReference in self.staffReferenceList:
                 excludeOneMeasure = self._getStaffExclude(
                     staffReference,
@@ -1908,7 +1908,7 @@ class PartParser(XMLParserBase):
         self,
         staffReference: StaffReferenceType,
         targetKey: int
-    ) -> t.List[base.Music21Object]:
+    ) -> list[base.Music21Object]:
         '''
         Given a staff reference dictionary, remove and combine in a list all elements that
         are NOT part of the given key. Thus, return a list of all entries to remove.
@@ -1929,7 +1929,7 @@ class PartParser(XMLParserBase):
             post += staffReference[k]
         return post
 
-    def _getUniqueStaffKeys(self) -> t.List[int]:
+    def _getUniqueStaffKeys(self) -> list[int]:
         '''
         Given a list of staffReference dictionaries,
         collect and return a list of all unique keys except NO_STAFF_ASSIGNED (0)
@@ -2357,9 +2357,9 @@ class MeasureParser(XMLParserBase):
         self.staffReference: StaffReferenceType = {}
         if parent is not None:
             # list of current tuplets or Nones
-            self.activeTuplets: t.List[t.Optional[duration.Tuplet]] = parent.activeTuplets
+            self.activeTuplets: list[t.Optional[duration.Tuplet]] = parent.activeTuplets
         else:
-            self.activeTuplets: t.List[t.Optional[duration.Tuplet]] = [None] * 7
+            self.activeTuplets: list[t.Optional[duration.Tuplet]] = [None] * 7
 
         self.useVoices = False
         self.voicesById = {}
@@ -2380,7 +2380,7 @@ class MeasureParser(XMLParserBase):
         # key is a tuple of the
         #     staff number (or None) and offsetMeasureNote, and the value is a
         #     StaffLayout object.
-        self.staffLayoutObjects: t.Dict[t.Tuple[t.Optional[int], float], layout.StaffLayout] = {}
+        self.staffLayoutObjects: dict[tuple[t.Optional[int], float], layout.StaffLayout] = {}
         self.stream = stream.Measure()
 
         self.mxNoteList = []  # for accumulating notes in chords
@@ -2400,11 +2400,11 @@ class MeasureParser(XMLParserBase):
         self.restAndNoteCount = {'rest': 0, 'note': 0}
         if parent is not None:
             # share dict
-            self.lastClefs: t.Dict[int, t.Optional[clef.Clef]] = self.parent.lastClefs
+            self.lastClefs: dict[int, t.Optional[clef.Clef]] = self.parent.lastClefs
 
         else:
             # a dict of clefs for staffIndexes:
-            self.lastClefs: t.Dict[int, t.Optional[clef.Clef]] = {NO_STAFF_ASSIGNED: None}
+            self.lastClefs: dict[int, t.Optional[clef.Clef]] = {NO_STAFF_ASSIGNED: None}
         self.parseIndex = 0
 
         # what is the offset in the measure of the current note position?
@@ -2812,7 +2812,7 @@ class MeasureParser(XMLParserBase):
         self.offsetMeasureNote += offsetIncrement
         self.endedWithForwardTag = None
 
-    def xmlToChord(self, mxNoteList: t.List[ET.Element]) -> chord.ChordBase:
+    def xmlToChord(self, mxNoteList: list[ET.Element]) -> chord.ChordBase:
         # noinspection PyShadowingNames
         '''
         Given an a list of mxNotes, fill the necessary parameters
@@ -4370,7 +4370,7 @@ class MeasureParser(XMLParserBase):
         remainingTupletAmountToAccountFor = tup.tupletMultiplier()
         timeModTup = tup
 
-        returnTuplets: t.List[t.Optional[duration.Tuplet]] = [None] * 8
+        returnTuplets: list[t.Optional[duration.Tuplet]] = [None] * 8
         removeFromActiveTuplets = set()
 
         # a set of tuplets to set to stop...

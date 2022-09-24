@@ -147,7 +147,7 @@ def numToIntOrFloat(value: t.Union[int, float]) -> t.Union[int, float]:
 DENOM_LIMIT = defaults.limitOffsetDenominator
 
 @lru_cache(None)
-def _preFracLimitDenominator(n: int, d: int) -> t.Tuple[int, int]:
+def _preFracLimitDenominator(n: int, d: int) -> tuple[int, int]:
     # noinspection PyShadowingNames
     '''
     Used in opFrac
@@ -515,7 +515,7 @@ def strTrimFloat(floatNum: float, maxNum: int = 4) -> str:
     return off
 
 
-def nearestMultiple(n: float, unit: float) -> t.Tuple[float, float, float]:
+def nearestMultiple(n: float, unit: float) -> tuple[float, float, float]:
     '''
     Given a positive value `n`, return the nearest multiple of the supplied `unit` as well as
     the absolute difference (error) to seven significant digits and the signed difference.
@@ -613,7 +613,7 @@ def dotMultiplier(dots: int) -> float:
     return ((2 ** (dots + 1.0)) - 1.0) / (2 ** dots)
 
 
-def decimalToTuplet(decNum: float) -> t.Tuple[int, int]:
+def decimalToTuplet(decNum: float) -> tuple[int, int]:
     '''
     For simple decimals (usually > 1), a quick way to figure out the
     fraction in lowest terms that gives a valid tuplet.
@@ -673,7 +673,7 @@ def decimalToTuplet(decNum: float) -> t.Tuple[int, int]:
         return (int(iy), int(jy))
 
 
-def unitNormalizeProportion(values: t.Sequence[t.Union[int, float]]) -> t.List[float]:
+def unitNormalizeProportion(values: t.Sequence[t.Union[int, float]]) -> list[float]:
     '''
     Normalize values within the unit interval, where max is determined by the sum of the series.
 
@@ -713,7 +713,7 @@ def unitNormalizeProportion(values: t.Sequence[t.Union[int, float]]) -> t.List[f
 
 def unitBoundaryProportion(
     series: t.Sequence[t.Union[int, float]]
-) -> t.List[t.Tuple[t.Union[int, float], float]]:
+) -> list[tuple[t.Union[int, float], float]]:
     '''
     Take a series of parts with an implied sum, and create
     unit-interval boundaries proportional to the series components.
@@ -735,8 +735,8 @@ def unitBoundaryProportion(
     return bounds
 
 
-def weightedSelection(values: t.List[int],
-                      weights: t.List[t.Union[int, float]],
+def weightedSelection(values: list[int],
+                      weights: list[t.Union[int, float]],
                       randomGenerator=None) -> int:
     '''
     Given a list of values and an equal-sized list of weights,
@@ -784,7 +784,7 @@ def euclidGCD(a: int, b: int) -> int:  # pragma: no cover
         return euclidGCD(b, a % b)
 
 
-def approximateGCD(values: t.List[t.Union[int, float]], grain: float = 1e-4) -> float:
+def approximateGCD(values: list[t.Union[int, float]], grain: float = 1e-4) -> float:
     '''Given a list of values, find the lowest common divisor of floating point values.
 
     >>> common.approximateGCD([2.5, 10, 0.25])
@@ -917,7 +917,7 @@ def contiguousList(inputListOrTuple) -> bool:
     return True
 
 
-def groupContiguousIntegers(src: t.List[int]) -> t.List[t.List[int]]:
+def groupContiguousIntegers(src: list[int]) -> list[list[int]]:
     '''
     Given a list of integers, group contiguous values into sub lists
 

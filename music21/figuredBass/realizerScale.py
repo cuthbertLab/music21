@@ -51,7 +51,7 @@ class FiguredBassScale:
     >>> fbScale.keySig
     <music21.key.KeySignature of 1 flat>
     '''
-    _DOC_ATTR: t.Dict[str, str] = {
+    _DOC_ATTR: dict[str, str] = {
         'realizerScale': '''
             A :class:`~music21.scale.Scale` based on the
             desired value and mode.

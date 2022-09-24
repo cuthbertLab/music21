@@ -410,7 +410,7 @@ def makeDuration(
     return returnDuration
 
 
-def allPartsPresent(scoreElem) -> t.Tuple[str, ...]:
+def allPartsPresent(scoreElem) -> tuple[str, ...]:
     # noinspection PyShadowingNames
     '''
     Find the @n values for all <staffDef> elements in a <score> element. This assumes that every
@@ -945,7 +945,7 @@ def _ppConclude(theConverter):
 # Helper Functions
 # -----------------------------------------------------------------------------
 def _processEmbeddedElements(
-    elements: t.List[Element],
+    elements: list[Element],
     mapping,
     callerTag=None,
     slurBundle=None

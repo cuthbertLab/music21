@@ -43,9 +43,9 @@ class Corpus(prebase.ProtoM21Object):
     _allExtensions = tuple(common.flattenList([common.findInputExtension(x)
                                                for x in _acceptableExtensions]))
 
-    _pathsCache: t.Dict[t.Tuple[str, t.Tuple[str]], pathlib.Path] = {}
+    _pathsCache: dict[tuple[str, tuple[str]], pathlib.Path] = {}
 
-    _directoryInformation: t.Union[t.Tuple[()], t.Sequence[t.Tuple[str, str, bool]]] = ()
+    _directoryInformation: t.Union[tuple[()], t.Sequence[tuple[str, str, bool]]] = ()
 
     parseUsingCorpus = True
 
@@ -67,7 +67,7 @@ class Corpus(prebase.ProtoM21Object):
     def _findPaths(
         self,
         rootDirectoryPath: pathlib.Path,
-        fileExtensions: t.List[str]
+        fileExtensions: list[str]
     ):
         '''
         Given a root filePath file path, recursively search all contained paths
@@ -681,7 +681,7 @@ class LocalCorpus(Corpus):
 
     # CLASS VARIABLES #
 
-    _temporaryLocalPaths: t.Dict[str, set] = {}
+    _temporaryLocalPaths: dict[str, set] = {}
 
     parseUsingCorpus = False
     # INITIALIZER #

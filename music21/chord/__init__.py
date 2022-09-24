@@ -60,7 +60,7 @@ class ChordBase(note.NotRest):
     isNote = False
     isRest = False
 
-    _DOC_ATTR: t.Dict[str, str] = {
+    _DOC_ATTR: dict[str, str] = {
         'isNote': '''
             Boolean read-only value describing if this
             GeneralNote object is a Note. Is False''',
@@ -99,9 +99,9 @@ class ChordBase(note.NotRest):
         # the list of pitch objects is managed by a property; this permits
         # only updating the _chordTablesAddress when ".pitches" has changed
 
-        self._overrides: t.Dict[str, t.Any] = {}
+        self._overrides: dict[str, t.Any] = {}
 
-        self._notes: t.List[note.NotRest] = []
+        self._notes: list[note.NotRest] = []
         # here, pitch and duration data is extracted from notes
         # if provided.
 
@@ -376,7 +376,7 @@ class ChordBase(note.NotRest):
             raise ValueError('Chord.remove(x), x not in chord')
 
     @property
-    def notes(self) -> t.Tuple[note.NotRest, ...]:
+    def notes(self) -> tuple[note.NotRest, ...]:
         return ()
 
     @property
@@ -702,7 +702,7 @@ class Chord(ChordBase):
     # define order of presenting names in documentation; use strings
     _DOC_ORDER = ['pitches']
     # documentation for all attributes (not properties or methods)
-    _DOC_ATTR: t.Dict[str, str] = {
+    _DOC_ATTR: dict[str, str] = {
         'isChord': '''
             Boolean read-only value describing if this
             GeneralNote object is a Chord. Is True''',
@@ -727,7 +727,7 @@ class Chord(ChordBase):
         super().__init__(notes=notes, **keywords)
 
         # if there were a covariant list, we would use that instead.
-        self._notes: t.List[note.Note]  # type: ignore
+        self._notes: list[note.Note]  # type: ignore
 
         if notes is not None and all(isinstance(n, int) for n in notes):
             self.simplifyEnharmonics(inPlace=True)
@@ -816,7 +816,7 @@ class Chord(ChordBase):
         KeyError: 'Cannot access component with: None'
         '''
         foundNote: note.Note
-        attributes: t.Tuple[str, ...]
+        attributes: tuple[str, ...]
 
         keyErrorStr = f'Cannot access component with: {key!r}'
         if isinstance(key, str):
@@ -1005,7 +1005,7 @@ class Chord(ChordBase):
         attribute: str,
         *,
         inPlace=False
-    ) -> t.Union[_ChordType, t.List[pitch.Pitch]]:
+    ) -> t.Union[_ChordType, list[pitch.Pitch]]:
         '''
         Common method for stripping pitches based on redundancy of one pitch
         attribute. The `attribute` is provided by a string.
@@ -1715,7 +1715,7 @@ class Chord(ChordBase):
         elif lenPitches == 7:  # 13th chord
             return self.bass()
 
-        stepNumsToPitches: t.Dict[int, pitch.Pitch] = {pitch.STEP_TO_DNN_OFFSET[p.step]: p
+        stepNumsToPitches: dict[int, pitch.Pitch] = {pitch.STEP_TO_DNN_OFFSET[p.step]: p
                                                      for p in nonDuplicatingPitches}
         stepNums = sorted(stepNumsToPitches)
         for startIndex in range(lenPitches):
@@ -1755,7 +1755,7 @@ class Chord(ChordBase):
         mostRootyIndex = rootnessFunctionScores.index(max(rootnessFunctionScores))
         return nonDuplicatingPitches[mostRootyIndex]
 
-    def geometricNormalForm(self) -> t.List[int]:
+    def geometricNormalForm(self) -> list[int]:
         '''
         Geometric Normal Form, as first defined by Dmitri Tymoczko, orders pitch classes
         such that the spacing is prioritized with the smallest spacing between the first and
@@ -3193,10 +3193,10 @@ class Chord(ChordBase):
 
     def _isAugmentedSixthHelper(
         self,
-        chordTableAddress: t.Tuple[int, int, int],
+        chordTableAddress: tuple[int, int, int],
         requiredInversion: int,
         permitAnyInversion: bool,
-        intervalsCheck: t.List[t.Tuple[str, str]],
+        intervalsCheck: list[tuple[str, str]],
     ) -> bool:
         '''
         Helper method for simplifying checking Italian, German, etc. Augmented
@@ -5238,7 +5238,7 @@ class Chord(ChordBase):
         return len(self.pitchClasses)
 
     @property
-    def notes(self) -> t.Tuple[note.Note, ...]:
+    def notes(self) -> tuple[note.Note, ...]:
         '''
         Return a tuple (immutable) of the notes contained in the chord.
 
@@ -5399,7 +5399,7 @@ class Chord(ChordBase):
         '''
         return Chord.formatVectorString(self.normalOrder)
 
-    def _unorderedPitchClasses(self) -> t.Set[int]:
+    def _unorderedPitchClasses(self) -> set[int]:
         '''
         helper function for orderedPitchClasses but also routines
         like pitchClassCardinality which do not need sorting.
@@ -5412,7 +5412,7 @@ class Chord(ChordBase):
         return pcGroup
 
     @property
-    def orderedPitchClasses(self) -> t.List[int]:
+    def orderedPitchClasses(self) -> list[int]:
         '''
         Return a list of pitch class integers, ordered form lowest to highest.
 
@@ -5452,7 +5452,7 @@ class Chord(ChordBase):
         return len(self._unorderedPitchClasses())
 
     @property
-    def pitchClasses(self) -> t.List[int]:
+    def pitchClasses(self) -> list[int]:
         '''
         Return a list of all pitch classes in the chord as integers. Not sorted
 
@@ -5466,7 +5466,7 @@ class Chord(ChordBase):
         return pcGroup
 
     @property
-    def pitchNames(self) -> t.List[str]:
+    def pitchNames(self) -> list[str]:
         '''
         Return a list of Pitch names from each
         :class:`~music21.pitch.Pitch` object's
@@ -5614,7 +5614,7 @@ class Chord(ChordBase):
             return f'{rootName}-{nameStr}'
 
     @property
-    def pitches(self) -> t.Tuple[pitch.Pitch, ...]:
+    def pitches(self) -> tuple[pitch.Pitch, ...]:
         '''
         Get or set a list or tuple of all Pitch objects in this Chord.
 
@@ -5653,7 +5653,7 @@ class Chord(ChordBase):
         <music21.pitch.Pitch A#4>
         '''
         # noinspection PyTypeChecker
-        pitches: t.Tuple[pitch.Pitch, ...] = tuple(component.pitch for component in self._notes)
+        pitches: tuple[pitch.Pitch, ...] = tuple(component.pitch for component in self._notes)
         return pitches
 
     @pitches.setter
@@ -5666,7 +5666,7 @@ class Chord(ChordBase):
             self._notes.append(note.Note(p))
 
     @property
-    def primeForm(self) -> t.List[int]:
+    def primeForm(self) -> list[int]:
         '''
         Return a representation of the Chord as a prime-form list of pitch
         class integers:

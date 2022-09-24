@@ -227,7 +227,7 @@ class FretBoard(prebase.ProtoM21Object):
                     self.numStrings
                 ))
 
-        pitchList: t.List[t.Optional['music21.pitch.Pitch']] = [None] * self.numStrings
+        pitchList: list[t.Optional['music21.pitch.Pitch']] = [None] * self.numStrings
 
         if not self.fretNotes:
             return pitchList

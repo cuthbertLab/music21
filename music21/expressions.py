@@ -326,7 +326,7 @@ class TextExpression(Expression):
     classSortOrder = -30
     _styleClass = style.TextStyle
 
-    _DOC_ATTR: t.Dict[str, str] = {
+    _DOC_ATTR: dict[str, str] = {
         'placement': '''
             Staff placement: 'above', 'below', or None.
 
@@ -459,9 +459,9 @@ class Ornament(Expression):
                 srcObj: 'music21.note.Note',
                 *,
                 inPlace: bool = False
-                ) -> t.Tuple[t.List['music21.note.Note'],
+                ) -> tuple[list['music21.note.Note'],
                              t.Optional['music21.note.Note'],
-                             t.List['music21.note.Note']]:
+                             list['music21.note.Note']]:
         '''
         subclassable method call that takes a sourceObject
         and returns a three-element tuple of a list of notes before the
@@ -481,7 +481,7 @@ class Ornament(Expression):
     def fillListOfRealizedNotes(
         self,
         srcObj: 'music21.note.Note',
-        fillObjects: t.List['music21.note.Note'],
+        fillObjects: list['music21.note.Note'],
         transposeInterval: interval.IntervalBase,
         *,
         useQL: t.Optional[OffsetQL] = None
@@ -567,7 +567,7 @@ class GeneralMordent(Ornament):
             transposeInterval = self.size.reverse()
         else:
             transposeInterval = self.size
-        mordNotes: t.List['music21.note.Note'] = []
+        mordNotes: list['music21.note.Note'] = []
         self.fillListOfRealizedNotes(srcObj, mordNotes, transposeInterval, useQL=use_ql)
 
         currentKeySig = srcObj.getContextByClass(key.KeySignature)
@@ -773,7 +773,7 @@ class Trill(Ornament):
         srcObj: 'music21.note.Note',
         *,
         inPlace=False
-    ) -> t.Tuple[t.List['music21.note.Note'], None, t.List['music21.note.Note']]:
+    ) -> tuple[list['music21.note.Note'], None, list['music21.note.Note']]:
         '''
         realize a trill.
 
@@ -891,7 +891,7 @@ class Trill(Ornament):
         if self.nachschlag:
             numberOfTrillNotes -= 2
 
-        trillNotes: t.List['music21.note.Note'] = []
+        trillNotes: list['music21.note.Note'] = []
         for unused_counter in range(int(numberOfTrillNotes / 2)):
             self.fillListOfRealizedNotes(srcObj, trillNotes, transposeInterval, useQL=useQL)
 
@@ -1122,7 +1122,7 @@ class Turn(Ornament):
         transposeIntervalUp = self.size
         transposeIntervalDown = self.size.reverse()
 
-        turnNotes: t.List['music21.note.Note'] = []
+        turnNotes: list['music21.note.Note'] = []
 
         firstNote = copy.deepcopy(srcObj)
         firstNote.expressions = []
@@ -1575,7 +1575,7 @@ class ArpeggioMarkSpanner(spanner.Spanner):
             )
         self.type = arpeggioType
 
-    def noteExtremes(self) -> t.Tuple[t.Optional['music21.note.Note'],
+    def noteExtremes(self) -> tuple[t.Optional['music21.note.Note'],
                                       t.Optional['music21.note.Note']]:
         '''
         Return the lowest and highest note spanned by the element,

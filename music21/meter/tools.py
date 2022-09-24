@@ -24,9 +24,9 @@ environLocal = environment.Environment('meter.tools')
 
 MeterTerminalTuple = collections.namedtuple('MeterTerminalTuple',
                                             ['numerator', 'denominator', 'division'])
-NumDenom = t.Tuple[int, int]
-NumDenomTuple = t.Tuple[NumDenom, ...]
-MeterOptions = t.Tuple[t.Tuple[str, ...], ...]
+NumDenom = tuple[int, int]
+NumDenomTuple = tuple[NumDenom, ...]
+MeterOptions = tuple[tuple[str, ...], ...]
 
 validDenominators = [1, 2, 4, 8, 16, 32, 64, 128]  # in order
 validDenominatorsSet = set(validDenominators)
@@ -80,7 +80,7 @@ def slashCompoundToFraction(value: str) -> NumDenomTuple:
 
     Changed in v7 -- new location and returns a tuple.
     '''
-    post: t.List[NumDenom] = []
+    post: list[NumDenom] = []
     value = value.strip()  # rem whitespace
     valueList = value.split('+')
     for part in valueList:
@@ -93,7 +93,7 @@ def slashCompoundToFraction(value: str) -> NumDenomTuple:
 
 
 @lru_cache(512)
-def slashMixedToFraction(valueSrc: str) -> t.Tuple[NumDenomTuple, bool]:
+def slashMixedToFraction(valueSrc: str) -> tuple[NumDenomTuple, bool]:
     '''
     Given a mixture if possible meter fraction representations, return a tuple
     of two elements: The first element is a tuple of pairs of numerator, denominators
@@ -130,8 +130,8 @@ def slashMixedToFraction(valueSrc: str) -> t.Tuple[NumDenomTuple, bool]:
 
     Changed in v7 -- new location and returns a tuple as first value.
     '''
-    pre: t.List[t.Union[NumDenom, t.Tuple[int, None]]] = []
-    post: t.List[NumDenom] = []
+    pre: list[t.Union[NumDenom, tuple[int, None]]] = []
+    post: list[NumDenom] = []
     summedNumerator = False
     value = valueSrc.strip()  # rem whitespace
     value = value.split('+')
@@ -180,7 +180,7 @@ def slashMixedToFraction(valueSrc: str) -> t.Tuple[NumDenomTuple, bool]:
 
 
 @lru_cache(512)
-def fractionToSlashMixed(fList: NumDenomTuple) -> t.Tuple[t.Tuple[str, int], ...]:
+def fractionToSlashMixed(fList: NumDenomTuple) -> tuple[tuple[str, int], ...]:
     '''
     Given a tuple of fraction values, compact numerators by sum if denominators
     are the same
@@ -191,7 +191,7 @@ def fractionToSlashMixed(fList: NumDenomTuple) -> t.Tuple[t.Tuple[str, int], ...
 
     Changed in v7 -- new location and returns a tuple.
     '''
-    pre: t.List[t.Tuple[t.List[int], int]] = []
+    pre: list[tuple[list[int], int]] = []
     for i in range(len(fList)):
         n: int
         d: int
@@ -214,7 +214,7 @@ def fractionToSlashMixed(fList: NumDenomTuple) -> t.Tuple[t.Tuple[str, int], ...
             pre[match][0].append(n)
 
     # create string representation
-    post: t.List[t.Tuple[str, int]] = []
+    post: list[tuple[str, int]] = []
     for part in pre:
         nStrList = [str(x) for x in part[0]]
         nStr = '+'.join(nStrList)
@@ -309,7 +309,7 @@ def proportionToFraction(value: float) -> NumDenom:
 # load common meter templates into this sequence
 # no need to cache these -- getPartitionOptions is cached
 
-def divisionOptionsFractionsUpward(n, d) -> t.Tuple[str, ...]:
+def divisionOptionsFractionsUpward(n, d) -> tuple[str, ...]:
     '''
     This simply gets restatements of the same fraction in smaller units,
     up to the largest valid denominator.
@@ -335,7 +335,7 @@ def divisionOptionsFractionsUpward(n, d) -> t.Tuple[str, ...]:
     return tuple(opts)
 
 
-def divisionOptionsFractionsDownward(n, d) -> t.Tuple[str, ...]:
+def divisionOptionsFractionsDownward(n, d) -> tuple[str, ...]:
     '''
     Get restatements of the same fraction in larger units
 
@@ -579,7 +579,7 @@ def divisionOptionsAlgo(n, d) -> MeterOptions:
     (('1/128', '1/128', '1/128'), ('3/128',))
     '''
     opts = []
-    group: t.Tuple[int, ...]
+    group: tuple[int, ...]
 
     # compound meters; 6, 9, 12, 15, 18
     # 9/4, 9/2, 6/2 are all considered compound without d>4

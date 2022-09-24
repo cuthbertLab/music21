@@ -2236,7 +2236,7 @@ def partitionByInstrument(streamObj: 'music21.stream.Stream') -> 'music21.stream
     if not instrumentIterator:
         return s  # no partition is available
 
-    names: t.OrderedDict[str, t.Dict[str, t.Any]] = OrderedDict()  # store unique names
+    names: t.OrderedDict[str, dict[str, t.Any]] = OrderedDict()  # store unique names
     for instrumentObj in instrumentIterator:
         # matching here by instrument name
         if instrumentObj.instrumentName not in names:

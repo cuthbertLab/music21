@@ -64,7 +64,7 @@ class PercussionChord(chord.ChordBase):
         return new
 
     @property
-    def notes(self) -> t.Tuple[note.NotRest, ...]:
+    def notes(self) -> tuple[note.NotRest, ...]:
         return tuple(self._notes)
 
     @notes.setter

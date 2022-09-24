@@ -46,8 +46,8 @@ class OrnamentRecognizer:
 
     def calculateOrnamentTotalQl(
         self,
-        busyNotes: t.List[note.GeneralNote],
-        simpleNotes: t.Optional[t.List[note.GeneralNote]] = None
+        busyNotes: list[note.GeneralNote],
+        simpleNotes: t.Optional[list[note.GeneralNote]] = None
     ) -> OffsetQL:
         '''
         Returns total length of trill assuming busy notes are all an expanded trill.

@@ -62,9 +62,9 @@ class TranspositionChecker:
         # if not isinstance(p0, pitch.Pitch):
         #     raise TranspositionException('List must have pitch objects')
         self.pitches: t.Iterable[pitch.Pitch] = pitches
-        self.allTranspositions: t.List = []
-        self.allNormalOrders: t.List = []
-        self.distinctNormalOrders: t.List = []
+        self.allTranspositions: list = []
+        self.allNormalOrders: list = []
+        self.distinctNormalOrders: list = []
 
     def getTranspositions(self):
         # noinspection PyShadowingNames

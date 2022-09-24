@@ -297,7 +297,7 @@ class ElementTimespan(Timespan):
     '''
 
     # CLASS VARIABLES #
-    _DOC_ATTR: t.Dict[str, str] = {
+    _DOC_ATTR: dict[str, str] = {
         'parentage': r'''
             The Stream hierarchy above the element in a ElementTimespan.
 

@@ -31,7 +31,7 @@ from music21 import metadata
 from music21.corpus import corpora
 from music21.exceptions21 import CorpusException
 
-_metadataBundles: t.Dict[str, t.Optional['music21.metadata.bundles.MetadataBundle']] = {
+_metadataBundles: dict[str, t.Optional['music21.metadata.bundles.MetadataBundle']] = {
     'core': None,
     'local': None,
     # 'virtual': None,

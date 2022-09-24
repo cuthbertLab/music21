@@ -40,9 +40,9 @@ class LyObject(prebase.ProtoM21Object):
     ''
 
     '''
-    supportedClasses: t.List[object] = []  # ordered list of classes to support
-    m21toLy: t.Dict[str, dict] = {}
-    defaultAttributes: t.Dict[str, t.Any] = {}
+    supportedClasses: list[object] = []  # ordered list of classes to support
+    m21toLy: dict[str, dict] = {}
+    defaultAttributes: dict[str, t.Any] = {}
     backslash = '\\'
 
     def __init__(self):

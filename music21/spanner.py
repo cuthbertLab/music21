@@ -222,7 +222,7 @@ class Spanner(base.Music21Object):
         self.spannerStorage.autoSort = False
 
         # add arguments as a list or single item
-        proc: t.List[base.Music21Object] = []
+        proc: list[base.Music21Object] = []
         for spannedElement in spannedElements:
             if isinstance(spannedElement, base.Music21Object):
                 proc.append(spannedElement)
@@ -628,10 +628,10 @@ class SpannerBundle(prebase.ProtoM21Object):
     Changed in v7: only argument must be a List of spanners.
     Creators of SpannerBundles are required to check that this constraint is True
     '''
-    def __init__(self, spanners: t.Optional[t.List[Spanner]] = None):
-        self._cache: t.Dict[str, t.Any] = {}  # cache is defined on Music21Object not ProtoM21Object
+    def __init__(self, spanners: t.Optional[list[Spanner]] = None):
+        self._cache: dict[str, t.Any] = {}  # cache is defined on Music21Object not ProtoM21Object
 
-        self._storage: t.List[Spanner]
+        self._storage: list[Spanner]
         if spanners:
             self._storage = spanners[:]  # a simple List, not a Stream
         else:
@@ -641,7 +641,7 @@ class SpannerBundle(prebase.ProtoM21Object):
         # SpannerBundle as missing a spannedElement; the next obj that meets
         # the class expectation will then be assigned and the spannedElement
         # cleared
-        self._pendingSpannedElementAssignment: t.List[_SpannerRef] = []
+        self._pendingSpannedElementAssignment: list[_SpannerRef] = []
 
     def append(self, other):
         '''
@@ -801,7 +801,7 @@ class SpannerBundle(prebase.ProtoM21Object):
         self,
         old: base.Music21Object,
         new: base.Music21Object
-    ) -> t.List[Spanner]:
+    ) -> list[Spanner]:
         # noinspection PyShadowingNames
         '''
         Given a spanner spannedElement (an object), replace all old spannedElements
@@ -1141,7 +1141,7 @@ class MultiMeasureRest(Spanner):
     '''
     _styleClass = style.TextStyle
 
-    _DOC_ATTR: t.Dict[str, str] = {
+    _DOC_ATTR: dict[str, str] = {
         'useSymbols': '''
             Boolean to indicate whether rest symbols
             (breve, longa, etc.) should be used when
@@ -1282,7 +1282,7 @@ class RepeatBracket(Spanner):
 
         self._number: t.Optional[int] = None
         # store a range, inclusive of the single number assignment
-        self._numberRange: t.List[int] = []
+        self._numberRange: list[int] = []
         # are there exactly two numbers that should be written as  3, 4 not 3-4.
         self._numberSpanIsAdjacent: bool = False
         # can we write as '3, 4' or '5-10' and not as '1, 5, 6, 11'
@@ -2745,7 +2745,7 @@ class Test(unittest.TestCase):
 
 # ------------------------------------------------------------------------------
 # define presented order in documentation
-_DOC_ORDER: t.List[type] = [Spanner]
+_DOC_ORDER: list[type] = [Spanner]
 
 
 if __name__ == '__main__':

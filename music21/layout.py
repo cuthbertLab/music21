@@ -160,7 +160,7 @@ class ScoreLayout(LayoutBase):
                  wordFont: t.Optional[str] = None,
                  pageLayout: t.Optional[PageLayout] = None,
                  systemLayout: t.Optional[SystemLayout] = None,
-                 staffLayoutList: t.Optional[t.List[StaffLayout]] = None,
+                 staffLayoutList: t.Optional[list[StaffLayout]] = None,
                  **keywords):
         super().__init__(**keywords)
 
@@ -168,7 +168,7 @@ class ScoreLayout(LayoutBase):
         self.scalingTenths = scalingTenths
         self.pageLayout: t.Optional[PageLayout] = pageLayout
         self.systemLayout: t.Optional[SystemLayout] = systemLayout
-        self.staffLayoutList: t.List[StaffLayout] = []
+        self.staffLayoutList: list[StaffLayout] = []
         self.musicFont = musicFont
         self.wordFont = wordFont
 
@@ -345,7 +345,7 @@ class StaffLayout(LayoutBase):
 
     Note: (TODO: .hidden None is not working; always gives False)
     '''
-    _DOC_ATTR: t.Dict[str, str] = {
+    _DOC_ATTR: dict[str, str] = {
         'staffType': '''
             What kind of staff is this as a stream.enums.StaffType.
 
@@ -668,7 +668,7 @@ def divideByPages(scoreIn, printUpdates=False, fastMeasures=False):
 
                 staffObject.elements = p
                 thisSystem.replace(p, staffObject)
-                allStaffLayouts: t.List[StaffLayout] = list(p[StaffLayout])
+                allStaffLayouts: list[StaffLayout] = list(p[StaffLayout])
                 if not allStaffLayouts:
                     continue
                 # else:
@@ -1288,7 +1288,7 @@ class LayoutScore(stream.Opus):
         self,
         pageId: int,
         systemId: int
-    ) -> t.Tuple[t.Optional[int], int]:
+    ) -> tuple[t.Optional[int], int]:
         # noinspection PyShadowingNames
         '''
         given a pageId and systemId, get the (pageId, systemId) for the previous system.

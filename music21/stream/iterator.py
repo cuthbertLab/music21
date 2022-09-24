@@ -38,7 +38,7 @@ T = t.TypeVar('T')
 S = t.TypeVar('S')
 ChangedM21ObjType = t.TypeVar('ChangedM21ObjType', bound=base.Music21Object)
 StreamIteratorType = t.TypeVar('StreamIteratorType', bound='StreamIterator')
-FilterType = t.Union[t.Callable, filters.StreamFilter]
+FilterType = t.Union[set, filters.StreamFilter]
 
 # -----------------------------------------------------------------------------
 
@@ -131,7 +131,7 @@ class StreamIterator(prebase.ProtoM21Object, t.Sequence[M21ObjType]):
                  srcStream: StreamType,
                  *,
                  # restrictClass: t.Type[M21ObjType] = base.Music21Object,
-                 filterList: t.Optional[t.List[FilterType]] = None,
+                 filterList: t.Optional[list[FilterType]] = None,
                  restoreActiveSites: bool = True,
                  activeInformation: t.Optional[ActiveInformation] = None,
                  ignoreSorting: bool = False):
@@ -141,7 +141,7 @@ class StreamIterator(prebase.ProtoM21Object, t.Sequence[M21ObjType]):
         self.elementIndex: int = 0
 
         # use .elements instead of ._elements/etc. so that it is sorted...
-        self.srcStreamElements = t.cast(t.Tuple[M21ObjType, ...], srcStream.elements)
+        self.srcStreamElements = t.cast(tuple[M21ObjType, ...], srcStream.elements)
         self.streamLength: int = len(self.srcStreamElements)
 
         # this information can help in speed later
@@ -165,9 +165,9 @@ class StreamIterator(prebase.ProtoM21Object, t.Sequence[M21ObjType]):
         # self.filters is a list of expressions that
         # return True or False for an element for
         # whether it should be yielded.
-        self.filters: t.List[FilterType] = filterList
+        self.filters: list[FilterType] = filterList
         self._len: t.Optional[int] = None
-        self._matchingElements: t.Optional[t.List[M21ObjType]] = None
+        self._matchingElements: t.Optional[list[M21ObjType]] = None
         # keep track of where we are in the parse.
         # esp important for recursive streams...
         if activeInformation is not None:
@@ -327,7 +327,7 @@ class StreamIterator(prebase.ProtoM21Object, t.Sequence[M21ObjType]):
         return self.matchingElements()[k]
 
     @overload
-    def __getitem__(self, k: slice) -> t.List[M21ObjType]:
+    def __getitem__(self, k: slice) -> list[M21ObjType]:
         return self.matchingElements()
 
     @overload
@@ -335,7 +335,7 @@ class StreamIterator(prebase.ProtoM21Object, t.Sequence[M21ObjType]):
         return None
 
     def __getitem__(self, k: t.Union[int, slice, str]) -> t.Union[M21ObjType,
-                                                                  t.List[M21ObjType],
+                                                                  list[M21ObjType],
                                                                   None]:
         '''
         Iterators can request other items by index or slice.
@@ -677,7 +677,7 @@ class StreamIterator(prebase.ProtoM21Object, t.Sequence[M21ObjType]):
         self,
         *,
         restoreActiveSites: bool = True
-    ) -> t.List[M21ObjType]:
+    ) -> list[M21ObjType]:
         '''
         Returns a list of elements that match the filter.
 
@@ -1528,7 +1528,7 @@ class StreamIterator(prebase.ProtoM21Object, t.Sequence[M21ObjType]):
 
 
 # -----------------------------------------------------------------------------
-class OffsetIterator(StreamIterator, t.Sequence[t.List[M21ObjType]]):
+class OffsetIterator(StreamIterator, t.Sequence[list[M21ObjType]]):
     '''
     An iterator that with each iteration returns a list of elements
     that are at the same offset (or all at end)
@@ -1587,10 +1587,10 @@ class OffsetIterator(StreamIterator, t.Sequence[t.List[M21ObjType]]):
                          ignoreSorting=ignoreSorting,
                          )
         self.raiseStopIterationNext = False
-        self.nextToYield: t.List[M21ObjType] = []
+        self.nextToYield: list[M21ObjType] = []
         self.nextOffsetToYield = None
 
-    def __next__(self) -> t.List[M21ObjType]:  # type: ignore
+    def __next__(self) -> list[M21ObjType]:  # type: ignore
         if self.raiseStopIterationNext:
             raise StopIteration
 
@@ -1895,7 +1895,7 @@ class RecursiveIterator(StreamIterator, t.Sequence[M21ObjType]):
             fe = super().matchingElements(restoreActiveSites=restoreActiveSites)
         return fe
 
-    def iteratorStack(self) -> t.List[RecursiveIterator]:
+    def iteratorStack(self) -> list[RecursiveIterator]:
         '''
         Returns a stack of RecursiveIterators at this point in the iteration.  Last is most recent.
 

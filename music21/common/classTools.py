@@ -231,7 +231,7 @@ def saveAttributes(obj, *attributeList):
 
     New in v7.
     '''
-    tempStorage: t.Dict[str, t.Any] = {}
+    tempStorage: dict[str, t.Any] = {}
     for attribute in attributeList:
         tempStorage[attribute] = getattr(obj, attribute)
     try:

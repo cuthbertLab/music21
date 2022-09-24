@@ -250,7 +250,7 @@ class Metadata(base.Music21Object):
                 m21BaseKeywords[attr] = value
 
         super().__init__(**m21BaseKeywords)
-        self._contents: t.Dict[str, t.List[ValueType]] = {}
+        self._contents: dict[str, list[ValueType]] = {}
 
         for attr, value in myKeywords.items():
             setattr(self, attr, value)
@@ -301,12 +301,12 @@ class Metadata(base.Music21Object):
         '''
         self._add(name, value, isCustom=False)
 
-    def getCustom(self, name: str) -> t.Tuple[ValueType, ...]:
+    def getCustom(self, name: str) -> tuple[ValueType, ...]:
         '''
         Gets any custom-named metadata items. The name can be free-form,
         or it can be a custom 'namespace:name'.
 
-        getCustom always returns t.Tuple[Text, ...], which may be empty.
+        getCustom always returns tuple[Text, ...], which may be empty.
 
         >>> md = metadata.Metadata()
         >>> md.setCustom('measure with 2nd ending', 'measure 128')
@@ -512,7 +512,7 @@ class Metadata(base.Music21Object):
 #   Public APIs
 
     @property
-    def software(self) -> t.Tuple[str, ...]:
+    def software(self) -> tuple[str, ...]:
         '''
         Returns a tuple of software names/versions.
 
@@ -538,7 +538,7 @@ class Metadata(base.Music21Object):
         return self._getPluralAttribute('software')
 
     @property
-    def contributors(self) -> t.Tuple[Contributor, ...]:
+    def contributors(self) -> tuple[Contributor, ...]:
         '''
         Returns a tuple of all the Contributors found in the metadata.
         Returns an empty tuple if no Contributors exist.
@@ -561,7 +561,7 @@ class Metadata(base.Music21Object):
         Note that `.contributors` cannot be set.  Add them separately via
         specific setters or the `.addContributor()` method.
         '''
-        output: t.List[Contributor] = []
+        output: list[Contributor] = []
         for _, contrib in self.all(
                 skipNonContributors=True,  # we only want the contributors
                 returnPrimitives=True,     # we want Contributor values
@@ -635,7 +635,7 @@ class Metadata(base.Music21Object):
             skipNonContributors: bool = False,
             returnPrimitives: bool = False,
             returnSorted: bool = True
-    ) -> t.Tuple[t.Tuple[str, t.Any], ...]:
+    ) -> tuple[tuple[str, t.Any], ...]:
         # noinspection SpellCheckingInspection,PyShadowingNames
         '''
         Returns the values stored in this metadata as a Tuple of (uniqueName, value) pairs.
@@ -693,9 +693,9 @@ class Metadata(base.Music21Object):
         (('arranger', <music21.metadata.primitives.Contributor arranger:Michael Scott Cuthbert>),
          ('composer', <music21.metadata.primitives.Contributor composer:Arcangelo Corelli>))
         '''
-        allOut: t.List[t.Tuple[str, t.Any]] = []
+        allOut: list[tuple[str, t.Any]] = []
 
-        valueList: t.List[ValueType]
+        valueList: list[ValueType]
         for uniqueName, valueList in self._contents.items():
             isContributor: bool = self._isContributorUniqueName(uniqueName)
             if skipContributors and isContributor:
@@ -851,12 +851,12 @@ class Metadata(base.Music21Object):
         # bare attributes (including the ones in base classes).
         super().__setattr__(name, value)
 
-    def __getitem__(self, key: str) -> t.Tuple[ValueType, ...]:
+    def __getitem__(self, key: str) -> tuple[ValueType, ...]:
         '''
         "Dictionary key" access for all standard uniqueNames and
         standard keys of the form 'namespace:name'.
 
-        These always return t.Tuple[ValueType, ...], which may be empty.
+        These always return tuple[ValueType, ...], which may be empty.
 
         If key is not a standard uniqueName or standard 'namespace:name',
         then KeyError is raised.
@@ -969,7 +969,7 @@ class Metadata(base.Music21Object):
         uniqueName: str = self._contributorRoleToUniqueName(c.role)
         self._add(uniqueName, c, isCustom=False)
 
-    def getContributorsByRole(self, role: t.Optional[str]) -> t.Tuple[Contributor, ...]:
+    def getContributorsByRole(self, role: t.Optional[str]) -> tuple[Contributor, ...]:
         r'''
         Return a :class:`~music21.metadata.Contributor` if defined for a
         provided role.
@@ -1005,7 +1005,7 @@ class Metadata(base.Music21Object):
         >>> noRoleTuple[0].name
         'Baron van Swieten'
         '''
-        result: t.List[Contributor] = []  # there may be more than one per role
+        result: list[Contributor] = []  # there may be more than one per role
         for _, contrib in self.all(
                 skipNonContributors=True,  # we only want the contributors
                 returnPrimitives=True,     # we want Contributor values
@@ -1693,7 +1693,7 @@ class Metadata(base.Music21Object):
         if namespaceName not in properties.ALL_NAMESPACE_NAMES:
             return None
 
-        values: t.Tuple[ValueType, ...] = self._get(namespaceName, isCustom=False)
+        values: tuple[ValueType, ...] = self._get(namespaceName, isCustom=False)
         if not values:
             return None
 
@@ -1715,7 +1715,7 @@ class Metadata(base.Music21Object):
 
         return ', '.join(str(value) for value in values)
 
-    def _getStringValuesByNamespaceName(self, namespaceName: str) -> t.Tuple[str, ...]:
+    def _getStringValuesByNamespaceName(self, namespaceName: str) -> tuple[str, ...]:
         '''
         Gets a tuple of str values for a supported 'namespace:name'.
 
@@ -1747,12 +1747,12 @@ class Metadata(base.Music21Object):
         if namespaceName not in properties.ALL_NAMESPACE_NAMES:
             return tuple()
 
-        values: t.Tuple[ValueType, ...] = self._get(namespaceName, isCustom=False)
+        values: tuple[ValueType, ...] = self._get(namespaceName, isCustom=False)
         if not values:
             return tuple()
 
         if self._namespaceNameNeedsArticleNormalization(namespaceName):
-            output: t.List[str] = []
+            output: list[str] = []
             for value in values:
                 assert isinstance(value, Text)
                 output.append(value.getNormalizedArticle())
@@ -1760,7 +1760,7 @@ class Metadata(base.Music21Object):
 
         return tuple(str(value) for value in values)
 
-    def _getPluralAttribute(self, attributeName: str) -> t.Tuple[str, ...]:
+    def _getPluralAttribute(self, attributeName: str) -> tuple[str, ...]:
         '''
         This does what __getattr__ would do if we supported plural attributeNames
         (but it takes singular attributeNames, of course).  It returns a tuple
@@ -2122,7 +2122,7 @@ class Metadata(base.Music21Object):
 
         return role
 
-    def _get(self, name: str, isCustom: bool) -> t.Tuple[ValueType, ...]:
+    def _get(self, name: str, isCustom: bool) -> tuple[ValueType, ...]:
         '''
         Returns all the items stored in metadata with this name.
         The returned value is always a Tuple. If there are no items, an empty
@@ -2143,7 +2143,7 @@ class Metadata(base.Music21Object):
                     ' Call addCustom/setCustom/getCustom for custom names.')
             name = uniqueName
 
-        valueList: t.Optional[t.List[ValueType]] = self._contents.get(name, None)
+        valueList: t.Optional[list[ValueType]] = self._contents.get(name, None)
 
         if not valueList:
             # return empty tuple
@@ -2179,11 +2179,11 @@ class Metadata(base.Music21Object):
             # special case: str is iterable, but we don't want to iterate over it.
             value = [value]
 
-        convertedValues: t.List[ValueType] = []
+        convertedValues: list[ValueType] = []
         for v in value:
             convertedValues.append(self._convertValue(name, v))
 
-        prevValues: t.Optional[t.List[ValueType]] = self._contents.get(name, None)
+        prevValues: t.Optional[list[ValueType]] = self._contents.get(name, None)
         if not prevValues:  # None or []
             # set the convertedValues list in there
             # it's always a list, even if there's only one value
@@ -2424,7 +2424,7 @@ class RichMetadata(Metadata):
         self.timeSignatureFirst = None
         self.timeSignatures = []
 
-    def _getPluralAttribute(self, attributeName) -> t.Tuple[str, ...]:
+    def _getPluralAttribute(self, attributeName) -> tuple[str, ...]:
         # we have to implement this to add the RichMetadata attributes, since
         # Metadata.search calls it.
         if attributeName in self.additionalRichMetadataAttributes:
@@ -2609,7 +2609,7 @@ class RichMetadata(Metadata):
             skipNonContributors: bool = False,
             returnPrimitives: bool = False,
             returnSorted: bool = True
-    ) -> t.Tuple[t.Tuple[str, t.Any], ...]:
+    ) -> tuple[tuple[str, t.Any], ...]:
         '''
         Returns all values stored in this RichMetadata as a Tuple of Tuples.
         Each individual Metadata Tuple is (uniqueName, value) and each additional
@@ -2658,7 +2658,7 @@ class RichMetadata(Metadata):
         (('arranger', <music21.metadata.primitives.Contributor arranger:Michael Scott Cuthbert>),
          ('composer', <music21.metadata.primitives.Contributor composer:Arcangelo Corelli>))
         '''
-        allOut: t.List[t.Tuple[str, t.Any]] = list(super().all(
+        allOut: list[tuple[str, t.Any]] = list(super().all(
             skipContributors=skipContributors,
             skipNonContributors=skipNonContributors,
             returnPrimitives=returnPrimitives,
@@ -2719,7 +2719,7 @@ class RichMetadata(Metadata):
 
 # -----------------------------------------------------------------------------
 # tests are in test/test_metadata
-_DOC_ORDER: t.List[type] = []
+_DOC_ORDER: list[type] = []
 
 
 if __name__ == '__main__':

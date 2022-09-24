@@ -300,10 +300,10 @@ class Music21Object(prebase.ProtoM21Object):
     _styleClass: t.Type[Style] = Style
 
     # define order for presenting names in documentation; use strings
-    _DOC_ORDER: t.List[str] = []
+    _DOC_ORDER: list[str] = []
 
     # documentation for all attributes (not properties or methods)
-    _DOC_ATTR: t.Dict[str, str] = {
+    _DOC_ATTR: dict[str, str] = {
         'groups': '''An instance of a :class:`~music21.base.Groups`
             object which describes
             arbitrary `Groups` that this object belongs to.''',
@@ -380,7 +380,7 @@ class Music21Object(prebase.ProtoM21Object):
         self._priority = 0  # default is zero
 
         # store cached values here:
-        self._cache: t.Dict[str, t.Any] = {}
+        self._cache: dict[str, t.Any] = {}
 
         self.groups = groups or Groups()
         self.sites = sites or Sites()
@@ -551,7 +551,7 @@ class Music21Object(prebase.ProtoM21Object):
 
         return new
 
-    def __deepcopy__(self: _M21T, memo: t.Optional[t.Dict[int, t.Any]] = None) -> _M21T:
+    def __deepcopy__(self: _M21T, memo: t.Optional[dict[int, t.Any]] = None) -> _M21T:
         '''
         Helper method to copy.py's deepcopy function.  Call it from there.
 
@@ -597,13 +597,13 @@ class Music21Object(prebase.ProtoM21Object):
         # environLocal.printDebug([self, 'end deepcopy', 'self._activeSite', self._activeSite])
         return new
 
-    def __getstate__(self) -> t.Dict[str, t.Any]:
+    def __getstate__(self) -> dict[str, t.Any]:
         state = self.__dict__.copy()
         state['_derivation'] = None
         state['_activeSite'] = None
         return state
 
-    def __setstate__(self, state: t.Dict[str, t.Any]):
+    def __setstate__(self, state: dict[str, t.Any]):
         # defining self.__dict__ upon initialization currently breaks everything
         self.__dict__ = state  # pylint: disable=attribute-defined-outside-init
 
@@ -818,7 +818,7 @@ class Music21Object(prebase.ProtoM21Object):
         '''
         # do not replace with self._cache.clear() -- leaves terrible
         # state for shallow copies.
-        self._cache: t.Dict[str, t.Any] = {}
+        self._cache: dict[str, t.Any] = {}
 
     @overload
     def getOffsetBySite(
@@ -1086,7 +1086,7 @@ class Music21Object(prebase.ProtoM21Object):
 
     def getSpannerSites(self,
                         spannerClassList: t.Optional[t.Iterable] = None
-                        ) -> t.List['music21.spanner.Spanner']:
+                        ) -> list['music21.spanner.Spanner']:
         '''
         Return a list of all :class:`~music21.spanner.Spanner` objects
         (or Spanner subclasses) that contain
@@ -3119,7 +3119,7 @@ class Music21Object(prebase.ProtoM21Object):
 
         # clear lyrics from remaining parts
         if isinstance(eRemain, note.GeneralNote):
-            emptyLyrics: t.List['music21.note.Lyric'] = []
+            emptyLyrics: list['music21.note.Lyric'] = []
             # not sure why isinstance check is not picking this up.
             eRemain.lyrics = emptyLyrics  # pylint: disable=attribute-defined-outside-init
 
@@ -3245,7 +3245,7 @@ class Music21Object(prebase.ProtoM21Object):
 
     def splitByQuarterLengths(
         self,
-        quarterLengthList: t.List[t.Union[int, float]],
+        quarterLengthList: list[t.Union[int, float]],
         addTies=True,
         displayTiedAccidentals=False
     ) -> _SplitTuple:
@@ -4029,7 +4029,7 @@ class ElementWrapper(Music21Object):
     obj: t.Any = None
 
     _DOC_ORDER = ['obj']
-    _DOC_ATTR: t.Dict[str, str] = {
+    _DOC_ATTR: dict[str, str] = {
         'obj': '''
         The object this wrapper wraps. It should not be a Music21Object, since
         if so, you might as well put that directly into the Stream itself.''',

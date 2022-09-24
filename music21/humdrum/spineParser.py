@@ -1055,8 +1055,8 @@ class HumdrumSpine(prebase.ProtoM21Object):
         self.parentSpine = None
         self.newSpine = None
         self.isLastSpine = False
-        self.childSpines: t.List[HumdrumSpine] = []
-        self.childSpineInsertPoints: t.Dict[int, t.Tuple[HumdrumSpine, ...]] = {}
+        self.childSpines: list[HumdrumSpine] = []
+        self.childSpineInsertPoints: dict[int, tuple[HumdrumSpine, ...]] = {}
 
         self.parsed = False
         self.measuresMoved = False
@@ -2006,7 +2006,7 @@ class SpineCollection(prebase.ProtoM21Object):
                 if not hasVoices:
                     continue
 
-                voices: t.List[t.Optional[stream.Voice]] = [None for i in range(10)]
+                voices: list[t.Optional[stream.Voice]] = [None for i in range(10)]
                 measureElements = el.elements
                 for mEl in measureElements:
                     mElGroups = mEl.groups

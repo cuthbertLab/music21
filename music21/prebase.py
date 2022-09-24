@@ -75,10 +75,10 @@ class ProtoM21Object:
     # this dictionary stores as a tuple of strings for each Class so that
     # it only needs to be made once (11 microseconds per call, can be
     # a big part of iteration; from cache just 1 microsecond)
-    _classTupleCacheDict: t.Dict[type, t.Tuple[str, ...]] = {}
-    _classSetCacheDict: t.Dict[type, t.FrozenSet[t.Union[str, type]]] = {}
+    _classTupleCacheDict: dict[type, tuple[str, ...]] = {}
+    _classSetCacheDict: dict[type, t.FrozenSet[t.Union[str, type]]] = {}
 
-    __slots__: t.Tuple[str, ...] = ()
+    __slots__: tuple[str, ...] = ()
 
     @deprecated('v7', 'v8', 'use `someClass in .classSet`'
         'or for intersection: `not classSet.isdisjoint(classList)`')
@@ -111,7 +111,7 @@ class ProtoM21Object:
         return not self.classSet.isdisjoint(classFilterList)
 
     @property
-    def classes(self) -> t.Tuple[str, ...]:
+    def classes(self) -> tuple[str, ...]:
         '''
         Returns a tuple containing the names (strings, not objects) of classes that this
         object belongs to -- starting with the object's class name and going up the mro()
@@ -221,7 +221,7 @@ class ProtoM21Object:
         try:
             return self._classSetCacheDict[self.__class__]
         except KeyError:
-            classList: t.List[t.Union[str, type]] = list(self.classes)
+            classList: list[t.Union[str, type]] = list(self.classes)
             classList.extend(self.__class__.mro())
             fullyQualifiedStrings = [x.__module__ + '.' + x.__name__ for x in self.__class__.mro()]
             classList.extend(fullyQualifiedStrings)

@@ -179,7 +179,7 @@ def getColor(color):
             if len(color) == 1:
                 color = [color[0], color[0], color[0]]
             # convert to 0 100% values as strings with % symbol
-            colorStrList = t.cast(t.Tuple[str, str, str], tuple(str(x * 100) + '%' for x in color))
+            colorStrList = t.cast(tuple[str, str, str], tuple(str(x * 100) + '%' for x in color))
             return webcolors.rgb_percent_to_hex(colorStrList)
         else:  # assume integers
             return webcolors.rgb_to_hex(tuple(color))

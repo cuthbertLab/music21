@@ -21,7 +21,7 @@ from music21 import common
 # pytest --nbval usersGuide_15_key.ipynb --sanitize-with ../../nbval-sanitize.cfg -q
 skip = ['installJupyter.ipynb']
 
-def getAllFiles() -> t.List[pathlib.Path]:
+def getAllFiles() -> list[pathlib.Path]:
     sourcePath = common.getRootFilePath() / 'documentation' / 'source'
     goodFiles = []
     for innerDir in ('about', 'developerReference', 'installing', 'usersGuide'):

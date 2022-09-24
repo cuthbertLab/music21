@@ -280,7 +280,7 @@ class ToneRow(stream.Stream):
     >>> len(rcsRow)
     10
     '''
-    _DOC_ATTR: t.Dict[str, str] = {
+    _DOC_ATTR: dict[str, str] = {
         'row': 'A list representing the pitch class values of the row.',
     }
 
@@ -554,7 +554,7 @@ class ToneRow(stream.Stream):
 
         return self.zeroCenteredTransformation(transformationType, newIndex)
 
-    def findZeroCenteredTransformations(self, otherRow) -> t.Union[bool, t.List[t.Any]]:
+    def findZeroCenteredTransformations(self, otherRow) -> t.Union[bool, list[t.Any]]:
         '''
         Gives the list of zero-centered serial transformations
         taking one :class:`~music21.serial.ToneRow`
@@ -1081,7 +1081,7 @@ class HistoricalTwelveToneRow(TwelveToneRow):
     Subclass of :class:`~music21.serial.TwelveToneRow` storing additional attributes of a
     twelve-tone row used in the historical literature.
     '''
-    _DOC_ATTR: t.Dict[str, str] = {
+    _DOC_ATTR: dict[str, str] = {
         'composer': 'The name of the composer, or None.  (String)',
         'opus': 'The opus of the work, or None.  (String)',
         'title': 'The title of the work, or None.  (String)',
@@ -1299,7 +1299,7 @@ def pcToToneRow(pcSet):
     return a
 
 
-def rowToMatrix(p: t.List[int]) -> str:
+def rowToMatrix(p: list[int]) -> str:
     # noinspection PyShadowingNames
     '''
     Takes a list of numbers of converts it to a string representation of a

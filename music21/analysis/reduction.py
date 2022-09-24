@@ -465,7 +465,7 @@ class PartReduction:
     def __init__(self,
                  srcScore=None,
                  *,
-                 partGroups: t.Optional[t.List[t.Dict[str, t.Any]]] = None,
+                 partGroups: t.Optional[list[dict[str, t.Any]]] = None,
                  fillByMeasure: bool = True,
                  segmentByTarget: bool = True,
                  normalize: bool = True,
@@ -479,9 +479,9 @@ class PartReduction:
         # an ordered list of dictionaries for
         # part id, part color, and a list of Part objs
         # TODO: typed dict
-        self._partBundles: t.List[t.Dict[str, t.Any]] = []
+        self._partBundles: list[dict[str, t.Any]] = []
         # a dictionary of part id to a list of events
-        self._eventSpans: t.Dict[t.Union[str, int], t.List[t.Any]] = {}
+        self._eventSpans: dict[t.Union[str, int], list[t.Any]] = {}
 
         # define how parts are grouped
         # a list of dictionaries, with keys for name, color, and a match list

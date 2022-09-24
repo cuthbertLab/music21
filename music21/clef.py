@@ -59,7 +59,7 @@ class Clef(base.Music21Object):
     >>> tc.lowestLine
     31
     '''
-    _DOC_ATTR: t.Dict[str, str] = {
+    _DOC_ATTR: dict[str, str] = {
         'sign': '''
             The sign of the clef, generally, 'C', 'G', 'F', 'percussion', 'none' or None.
 
@@ -272,7 +272,7 @@ class PitchClef(Clef):
     '''
     superclass for all other clef subclasses that use pitches...
     '''
-    _DOC_ATTR: t.Dict[str, str] = {
+    _DOC_ATTR: dict[str, str] = {
         'lowestLine': '''
             The diatonicNoteNumber of the lowest line of the clef.
             (Can be none...)
@@ -338,7 +338,7 @@ class PercussionClef(Clef):
 
     Changed in v7.3 -- setting octaveChange no longer affects lowestLine
     '''
-    _DOC_ATTR: t.Dict[str, str] = {}
+    _DOC_ATTR: dict[str, str] = {}
 
     def __init__(self):
         super().__init__()
@@ -359,7 +359,7 @@ class NoClef(Clef):
     >>> nc.sign is None
     False
     '''
-    _DOC_ATTR: t.Dict[str, str] = {}
+    _DOC_ATTR: dict[str, str] = {}
 
     def __init__(self):
         super().__init__()
@@ -728,7 +728,7 @@ class SubBassClef(FClef):
 
 
 # ------------------------------------------------------------------------------
-CLASS_FROM_TYPE: t.Dict[str, t.List[t.Optional[t.Type[Clef]]]] = {
+CLASS_FROM_TYPE: dict[str, list[t.Optional[t.Type[Clef]]]] = {
     'G': [None, FrenchViolinClef, TrebleClef, GSopranoClef, None, None],
     'C': [None, SopranoClef, MezzoSopranoClef, AltoClef, TenorClef, CBaritoneClef],
     'F': [None, None, None, FBaritoneClef, BassClef, SubBassClef],

@@ -204,7 +204,7 @@ class Beams(prebase.ProtoM21Object, EqualSlottedObjectMixin):
         'id',
     )
 
-    _DOC_ATTR: t.Dict[str, str] = {
+    _DOC_ATTR: dict[str, str] = {
         'feathered': '''
             Boolean determining if this is a feathered beam or not
             (does nothing for now).''',
@@ -261,7 +261,7 @@ class Beams(prebase.ProtoM21Object, EqualSlottedObjectMixin):
                      2/None>/<music21.beam.Beam 3/None>>,
          None]
         '''
-        beamsList: t.List[t.Optional[Beams]] = []
+        beamsList: list[t.Optional[Beams]] = []
         for el in srcList:
             # if a dur cannot be beamable under any circumstance, replace
             # it with None; this includes Rests
@@ -280,7 +280,7 @@ class Beams(prebase.ProtoM21Object, EqualSlottedObjectMixin):
         return beamsList
 
     @staticmethod
-    def removeSandwichedUnbeamables(beamsList: t.List[t.Union['Beams', None]]):
+    def removeSandwichedUnbeamables(beamsList: list[t.Union['Beams', None]]):
         # noinspection PyShadowingNames
         '''
         Go through the naiveBeamsList and remove beams from objects surrounded

@@ -226,8 +226,8 @@ class Harmony(chord.Chord):
         # called <function> which might conflict with the Harmony...
         self._roman = None
         # specify an array of degree alteration objects
-        self.chordStepModifications: t.List[ChordStepModification] = []
-        self._degreesList: t.List[str] = []
+        self.chordStepModifications: list[ChordStepModification] = []
+        self._degreesList: list[str] = []
         self._key = None
         # senseless to parse inversion until chord members are populated
         self._updateFromParameters(root=root, bass=bass)
@@ -1384,7 +1384,7 @@ def removeChordSymbols(chordType):
 
 
 # --------------------------------------------------------------------------
-realizerScaleCache: t.Dict[t.Tuple[str, str], realizerScale.FiguredBassScale] = {}
+realizerScaleCache: dict[tuple[str, str], realizerScale.FiguredBassScale] = {}
 
 # --------------------------------------------------------------------------
 

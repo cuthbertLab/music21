@@ -380,7 +380,7 @@ class MetronomeMark(TempoIndication):
     >>> tm2.number
     144
     '''
-    _DOC_ATTR: t.Dict[str, str] = {
+    _DOC_ATTR: dict[str, str] = {
         'placement': '''
             Staff placement: 'above', 'below', or None.
 

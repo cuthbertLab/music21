@@ -57,7 +57,7 @@ from music21 import scale
 
 # create a module level shared cache for intervals of P1, P5, P8
 # to be populated the first time a VLQ object is created
-intervalCache: t.List[interval.Interval] = []
+intervalCache: list[interval.Interval] = []
 
 
 class MotionType(str, enum.Enum):
@@ -84,7 +84,7 @@ class VoiceLeadingQuartet(base.Music21Object):
     to make sense.  Most routines will work the other way still though.
     '''
 
-    _DOC_ATTR: t.Dict[str, str] = {
+    _DOC_ATTR: dict[str, str] = {
         'vIntervals': '''
             A two-element list of the two harmonic intervals present,
             vn1n1 to v2n1 and v1n2 to v2n2.
@@ -118,8 +118,8 @@ class VoiceLeadingQuartet(base.Music21Object):
         self.v2n1 = v2n1
         self.v2n2 = v2n2
 
-        self.vIntervals: t.List[interval.Interval] = []  # vertical intervals (harmonic)
-        self.hIntervals: t.List[interval.Interval] = []  # horizontal intervals (melodic)
+        self.vIntervals: list[interval.Interval] = []  # vertical intervals (harmonic)
+        self.hIntervals: list[interval.Interval] = []  # horizontal intervals (melodic)
 
         self._key = None
         if analyticKey is not None:
@@ -1415,7 +1415,7 @@ class Verticality(base.Music21Object):
     #  obsolete:     To create Verticalities out of a score, call
     #                by :meth:`~music21.theoryAnalyzer.getVerticalities`
 
-    _DOC_ATTR: t.Dict[str, str] = {
+    _DOC_ATTR: dict[str, str] = {
         'contentDict': '''Dictionary representing contents of Verticalities.
             the keys of the dictionary
             are the part numbers and the element at each key is a list of

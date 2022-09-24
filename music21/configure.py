@@ -1052,7 +1052,7 @@ class SelectFilePath(SelectFromList):
     def __init__(self, default=None, tryAgain=True, promptHeader=None):
         super().__init__(default=default, tryAgain=tryAgain, promptHeader=promptHeader)
 
-    def _getAppOSIndependent(self, comparisonFunction, path0: str, post: t.List[str],
+    def _getAppOSIndependent(self, comparisonFunction, path0: str, post: list[str],
                              *,
                              glob: str = '**/*'):
         '''
@@ -1070,23 +1070,23 @@ class SelectFilePath(SelectFromList):
             if comparisonFunction(str(path1)):
                 post.append(str(path1))
 
-    def _getDarwinApp(self, comparisonFunction) -> t.List[str]:
+    def _getDarwinApp(self, comparisonFunction) -> list[str]:
         '''
         Provide a comparison function that returns True or False based on the file name.
         This looks at everything in Applications, as well as every directory in Applications
         '''
-        post: t.List[str] = []
+        post: list[str] = []
         for path0 in ('/Applications', common.cleanpath('~/Applications', returnPathlib=False)):
             assert isinstance(path0, str)
             self._getAppOSIndependent(comparisonFunction, path0, post, glob='*')
         return post
 
-    def _getWinApp(self, comparisonFunction) -> t.List[str]:
+    def _getWinApp(self, comparisonFunction) -> list[str]:
         '''
         Provide a comparison function that returns True or False based on the file name.
         '''
         # provide a similar method to _getDarwinApp
-        post: t.List[str] = []
+        post: list[str] = []
         environKeys = ('ProgramFiles', 'ProgramFiles(x86)', 'ProgramW6432')
         for possibleEnvironKey in environKeys:
             if possibleEnvironKey not in os.environ:
@@ -1443,7 +1443,7 @@ class ConfigurationAssistant:
 #         print('got: %s' % post)
 # ------------------------------------------------------------------------------
 # define presented order in documentation
-_DOC_ORDER: t.List[type] = []
+_DOC_ORDER: list[type] = []
 
 
 class TestUserInput(unittest.TestCase):  # pragma: no cover

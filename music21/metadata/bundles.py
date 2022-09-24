@@ -587,7 +587,7 @@ class MetadataBundle(prebase.ProtoM21Object):
             raise MetadataBundleException('metadataBundle must be a MetadataBundle')
         selfKeys = set(self._metadataEntries.keys())
         otherKeys = set(metadataBundle._metadataEntries.keys())
-        resultKeys: t.List[str] = getattr(selfKeys, operator)(otherKeys)
+        resultKeys: list[str] = getattr(selfKeys, operator)(otherKeys)
         resultBundle: MetadataBundle = type(self)()
         for key in resultKeys:
             metadataEntry: MetadataEntry
@@ -598,7 +598,7 @@ class MetadataBundle(prebase.ProtoM21Object):
             resultBundle._metadataEntries[key] = metadataEntry
 
         # noinspection PyTypeChecker
-        mdbItems: t.List[t.Tuple[str, MetadataEntry]] = list(resultBundle._metadataEntries.items())
+        mdbItems: list[tuple[str, MetadataEntry]] = list(resultBundle._metadataEntries.items())
         resultBundle._metadataEntries = OrderedDict(sorted(mdbItems,
                                                            key=lambda mde: mde[1].sourcePath))
         return resultBundle

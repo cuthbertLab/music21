@@ -30,7 +30,7 @@ from music21.musicxml.xmlObjects import MusicXMLExportException, MusicXMLWarning
 def addStaffTags(
     measure: Element,
     staffNumber: int,
-    tagList: t.List[str]
+    tagList: list[str]
 ):
     '''
     For a <measure> tag `measure`, add a <staff> grandchild to any instance of
@@ -149,7 +149,7 @@ class PartStaffExporterMixin:
             self.setEarliestAttributesAndClefsPartStaff(group)
             self.cleanUpSubsequentPartStaffs(group)
 
-    def joinableGroups(self) -> t.List[StaffGroup]:
+    def joinableGroups(self) -> list[StaffGroup]:
         # noinspection PyShadowingNames
         '''
         Returns a list of :class:`~music21.layout.StaffGroup` objects that
@@ -234,7 +234,7 @@ class PartStaffExporterMixin:
             from music21.musicxml.m21ToXml import XMLExporterBase
             assert isinstance(self, XMLExporterBase)
         staffGroups = list(s.getElementsByClass(StaffGroup)) if (s := self.stream) else []
-        joinableGroups: t.List[StaffGroup] = []
+        joinableGroups: list[StaffGroup] = []
         # Joinable groups must consist of only PartStaffs with Measures
         # and exist in self.stream
         for sg in staffGroups:
@@ -253,7 +253,7 @@ class PartStaffExporterMixin:
 
         # Deduplicate joinable groups (ex: bracket and brace enclose same PartStaffs)
         permutations = set()
-        deduplicatedGroups: t.List[StaffGroup] = []
+        deduplicatedGroups: list[StaffGroup] = []
         for jg in joinableGroups:
             containedParts = tuple(jg)
             if containedParts not in permutations:
@@ -372,7 +372,7 @@ class PartStaffExporterMixin:
                                    target: Element,
                                    source: Element,
                                    staffNum: int
-                                   ) -> t.Dict[int, t.List[Element]]:
+                                   ) -> dict[int, list[Element]]:
         '''
         Move elements from subsequent PartStaff's measures into `target`: the <part>
         element representing the initial PartStaff that will soon represent the merged whole.
@@ -390,7 +390,7 @@ class PartStaffExporterMixin:
 
         sourceMeasures = iter(source.findall('measure'))
         sourceMeasure = None  # Set back to None when disposed of
-        insertions: t.Dict[int, t.List[Element]] = {}
+        insertions: dict[int, list[Element]] = {}
 
         # Walk through <measures> of the target <part>, compare measure numbers
         for i, targetMeasure in enumerate(target):
@@ -670,7 +670,7 @@ class PartStaffExporterMixin:
             partStaffRoot: Element = self.getRootForPartStaff(ps)
             # Remove PartStaff from export list
             # noinspection PyAttributeOutsideInit
-            self.partExporterList: t.List[music21.musicxml.m21ToXml.PartExporter] = [
+            self.partExporterList: list[music21.musicxml.m21ToXml.PartExporter] = [
                 pex for pex in self.partExporterList if pex.xmlRoot != partStaffRoot
             ]
 

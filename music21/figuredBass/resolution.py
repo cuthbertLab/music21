@@ -744,7 +744,7 @@ def _resolvePitches(possibToResolve, howToResolve):
 
 def _unpackSeventhChord(
     seventhChord: 'music21.chord.Chord'
-) -> t.List[t.Optional['music21.pitch.Pitch']]:
+) -> list[t.Optional['music21.pitch.Pitch']]:
     '''
     Takes in a Chord and returns a list of Pitches (or Nones) corresponding
     to the bass, root, fifth, seventh.

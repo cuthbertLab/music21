@@ -127,7 +127,7 @@ def makeBeams(
         returnObj = s
 
     # if s.isClass(Measure):
-    mColl: t.List[stream.Measure]
+    mColl: list[stream.Measure]
     if isinstance(returnObj, stream.Measure):
         mColl = [returnObj]  # store a list of measures for processing
     else:
@@ -907,7 +907,7 @@ def makeRests(
             oLowTarget = min(refStreamOrTimeRange)
             oHighTarget = max(refStreamOrTimeRange)
 
-    bundle: t.List[StreamType]
+    bundle: list[StreamType]
     if returnObj.hasVoices():
         bundle = list(returnObj.voices)
     elif returnObj.hasMeasures():
@@ -1356,7 +1356,7 @@ def makeTupletBrackets(s: StreamType, *, inPlace=False) -> t.Optional[StreamType
     Changed in v1.8: `inPlace` is False by default
     Changed in v7: Legacy behavior of taking in a list of durations removed.
     '''
-    durationList: t.List[duration.Duration] = []
+    durationList: list[duration.Duration] = []
 
     # Stream, as it should be...
     if not inPlace:  # make a copy
@@ -1371,7 +1371,7 @@ def makeTupletBrackets(s: StreamType, *, inPlace=False) -> t.Optional[StreamType
         durationList.append(n.duration)
 
     # a list of (tuplet obj, Duration) pairs
-    tupletMap: t.List[t.Tuple[t.Optional[duration.Tuplet], duration.Duration]] = []
+    tupletMap: list[tuple[t.Optional[duration.Tuplet], duration.Duration]] = []
 
     for dur in durationList:  # all Duration objects
         tupletList = dur.tuplets
@@ -1550,7 +1550,7 @@ def moveNotesToVoices(source: StreamType,
     source.insert(0, dst)
 
 
-def getTiePitchSet(prior: 'music21.note.NotRest') -> t.Optional[t.Set[str]]:
+def getTiePitchSet(prior: 'music21.note.NotRest') -> t.Optional[set[str]]:
     # noinspection PyShadowingNames
     '''
     helper method for makeAccidentals to get the tie pitch set (or None)
@@ -1610,15 +1610,15 @@ def getTiePitchSet(prior: 'music21.note.NotRest') -> t.Optional[t.Set[str]]:
 def makeAccidentalsInMeasureStream(
     s: t.Union[StreamType, StreamIterator],
     *,
-    pitchPast: t.Optional[t.List[pitch.Pitch]] = None,
-    pitchPastMeasure: t.Optional[t.List[pitch.Pitch]] = None,
+    pitchPast: t.Optional[list[pitch.Pitch]] = None,
+    pitchPastMeasure: t.Optional[list[pitch.Pitch]] = None,
     useKeySignature: t.Union[bool, key.KeySignature] = True,
-    alteredPitches: t.Optional[t.List[pitch.Pitch]] = None,
+    alteredPitches: t.Optional[list[pitch.Pitch]] = None,
     cautionaryPitchClass: bool = True,
     cautionaryAll: bool = False,
     overrideStatus: bool = False,
     cautionaryNotImmediateRepeat: bool = True,
-    tiePitchSet: t.Optional[t.Set[str]] = None
+    tiePitchSet: t.Optional[set[str]] = None
 ) -> None:
     '''
     Makes accidentals in place on a stream that contains Measures.
@@ -1646,13 +1646,13 @@ def makeAccidentalsInMeasureStream(
     # only key.KeySignature values are interesting
     # but method arg is typed this way for backwards compatibility
     ksLast: t.Union[bool, key.KeySignature] = False
-    ksLastDiatonic: t.List[str] = []
+    ksLastDiatonic: list[str] = []
 
     if isinstance(useKeySignature, key.KeySignature):
         ksLast = useKeySignature
         ksLastDiatonic = [p.name for p in ksLast.getScale().pitches]
 
-    measuresOnly: t.List[Measure] = list(s.getElementsByClass(Measure))
+    measuresOnly: list[Measure] = list(s.getElementsByClass(Measure))
     for i, m in enumerate(measuresOnly):
         # if beyond the first measure, use the pitches from the last
         # measure for context (cautionary accidentals)
@@ -1704,7 +1704,7 @@ def iterateBeamGroups(
     s: StreamType,
     skipNoBeams=True,
     recurse=True
-) -> t.Generator[t.List[note.NotRest], None, None]:
+) -> t.Generator[list[note.NotRest], None, None]:
     '''
     Generator that yields a List of NotRest objects that fall within a beam group.
 
@@ -1749,7 +1749,7 @@ def iterateBeamGroups(
     New in v6.7.
     '''
     iterator: 'music21.stream.iterator.StreamIterator' = s.recurse() if recurse else s.iter()
-    current_beam_group: t.List[note.NotRest] = []
+    current_beam_group: list[note.NotRest] = []
     in_beam_group: bool = False
     for el in iterator.notes:
         first_el_type: t.Optional[str] = None
@@ -1797,7 +1797,7 @@ def setStemDirectionForBeamGroups(
 
     New in v6.7.
     '''
-    beamGroup: t.List[note.NotRest]
+    beamGroup: list[note.NotRest]
     for beamGroup in iterateBeamGroups(s, skipNoBeams=True, recurse=True):
         setStemDirectionOneGroup(
             beamGroup,
@@ -1807,7 +1807,7 @@ def setStemDirectionForBeamGroups(
 
 
 def setStemDirectionOneGroup(
-    group: t.List[note.NotRest],
+    group: list[note.NotRest],
     *,
     setNewStems=True,
     overrideConsistentStemDirections=False,
@@ -1837,7 +1837,7 @@ def setStemDirectionOneGroup(
         return
     clef_context: clef.Clef = optional_clef_context
 
-    pitchList: t.List[pitch.Pitch] = []
+    pitchList: list[pitch.Pitch] = []
     for n in group:
         pitchList.extend(n.pitches)
     if not pitchList:
@@ -2007,7 +2007,7 @@ def consolidateCompletedTuplets(
         iterator = [s]
     for container in iterator:
         reexpressible = [gn for gn in container.notesAndRests if is_reexpressible(gn)]
-        to_consolidate: t.List['music21.note.GeneralNote'] = []
+        to_consolidate: list['music21.note.GeneralNote'] = []
         partial_tuplet_sum: OffsetQL = 0.0
         last_tuplet: t.Optional['music21.duration.Tuplet'] = None
         completion_target: t.Optional[OffsetQL] = None

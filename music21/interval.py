@@ -43,7 +43,7 @@ environLocal = environment.Environment('interval')
 # ------------------------------------------------------------------------------
 # constants
 
-STEPNAMES: t.Tuple[StepName, ...] = ('C', 'D', 'E', 'F', 'G', 'A', 'B')
+STEPNAMES: tuple[StepName, ...] = ('C', 'D', 'E', 'F', 'G', 'A', 'B')
 
 class Direction(enum.IntEnum):
     DESCENDING = -1
@@ -355,7 +355,7 @@ def convertStaffDistanceToInterval(staffDist):
         return staffDist - 1
 
 
-def convertDiatonicNumberToStep(dn: int) -> t.Tuple[StepName, int]:
+def convertDiatonicNumberToStep(dn: int) -> tuple[StepName, int]:
     '''
     Convert a diatonic number to a step name (without accidental) and an octave integer.
     The lowest C on a Bösendorfer Imperial Grand is assigned 1 the D above it is 2,
@@ -547,7 +547,7 @@ def convertGeneric(value: t.Union[int, str]) -> int:
 
 def convertSemitoneToSpecifierGenericMicrotone(
     count: t.Union[int, float]
-) -> t.Tuple[Specifier, int, float]:
+) -> tuple[Specifier, int, float]:
     '''
     Given a number of semitones (positive or negative),
     return a default diatonic specifier and cent offset.
@@ -598,7 +598,7 @@ def convertSemitoneToSpecifierGenericMicrotone(
     return (spec, (generic + (octave * 7)) * dirScale, cents)
 
 
-def convertSemitoneToSpecifierGeneric(count: t.Union[int, float]) -> t.Tuple[Specifier, int]:
+def convertSemitoneToSpecifierGeneric(count: t.Union[int, float]) -> tuple[Specifier, int]:
     '''
     Given a number of semitones, return a default diatonic specifier, and
     a number that can be used as a GenericInterval
@@ -638,7 +638,7 @@ def convertSemitoneToSpecifierGeneric(count: t.Union[int, float]) -> t.Tuple[Spe
     return convertSemitoneToSpecifierGenericMicrotone(count)[:2]
 
 
-_pythagorean_cache: t.Dict[str, t.Tuple['music21.pitch.Pitch', Fraction]] = {}
+_pythagorean_cache: dict[str, tuple['music21.pitch.Pitch', Fraction]] = {}
 
 
 def intervalToPythagoreanRatio(intervalObj: Interval) -> Fraction:
@@ -1047,7 +1047,7 @@ class GenericInterval(IntervalBase):
         return self.undirected == 1
 
     @property
-    def _simpleStepsAndOctaves(self) -> t.Tuple[int, int]:
+    def _simpleStepsAndOctaves(self) -> tuple[int, int]:
         '''
         Returns simpleUndirectedSteps and undirectedOctaves.
         '''
@@ -1653,7 +1653,7 @@ class DiatonicInterval(IntervalBase):
     Traceback (most recent call last):
     music21.interval.IntervalException: There is no such thing as a descending Perfect Unison
     '''
-    _DOC_ATTR: t.Dict[str, str] = {
+    _DOC_ATTR: dict[str, str] = {
         'specifier': 'A :class:`~music21.interval.Specifier` enum representing '
                      + 'the Quality of the interval.',
         'generic': 'A :class:`~music21.interval.GenericInterval` enum representing '
@@ -2508,7 +2508,7 @@ class ChromaticInterval(IntervalBase):
 # ------------------------------------------------------------------------------
 def _stringToDiatonicChromatic(
     value: str
-) -> t.Tuple[DiatonicInterval, ChromaticInterval, bool]:
+) -> tuple[DiatonicInterval, ChromaticInterval, bool]:
     '''
     A function for processing interval strings and returning
     diatonic and chromatic interval objects. Used by the Interval class, below.

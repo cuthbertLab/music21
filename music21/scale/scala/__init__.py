@@ -62,7 +62,7 @@ environLocal = environment.Environment('scale.scala')
 
 # ------------------------------------------------------------------------------
 # global variable to cache the paths returned from getPaths()
-SCALA_PATHS: t.Dict[str, t.Optional[t.Dict[str, t.List[str]]]] = {'allPaths': None}
+SCALA_PATHS: dict[str, t.Optional[dict[str, list[str]]]] = {'allPaths': None}
 
 def getPaths():
     '''
@@ -721,7 +721,7 @@ Aristoxenos' Chromatic/Enharmonic, 3 + 9 + 18 parts
 
 # ------------------------------------------------------------------------------
 # define presented order in documentation
-_DOC_ORDER: t.List[t.Callable] = []
+_DOC_ORDER: list[t.Callable] = []
 
 
 if __name__ == '__main__':

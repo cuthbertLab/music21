@@ -51,8 +51,8 @@ ENDWITHFLAT_RE = re.compile(r'[b\-]$')
 
 # cache all Key/Scale objects created or passed in; re-use
 # permits using internally scored pitch segments
-_scaleCache: t.Dict[str, scale.ConcreteScale] = {}
-_keyCache: t.Dict[str, key.Key] = {}
+_scaleCache: dict[str, scale.ConcreteScale] = {}
+_keyCache: dict[str, key.Key] = {}
 
 # create a single notation object for RN initialization, for type-checking,
 # but it will always be replaced.
@@ -60,7 +60,7 @@ _NOTATION_SINGLETON = fbNotation.Notation()
 
 
 # only some figures imply a root other than the bass (e.g. "54" does not)
-FIGURES_IMPLYING_ROOT: t.Tuple[t.Tuple[int, ...], ...] = (
+FIGURES_IMPLYING_ROOT: tuple[tuple[int, ...], ...] = (
     # triads
     (6,), (6, 3), (6, 4),
     # seventh chords
@@ -114,7 +114,7 @@ figureShorthands = {
     'b7b53': 'ø7',
 }
 
-figureShorthandsMode: t.Dict[str, t.Dict] = {
+figureShorthandsMode: dict[str, dict] = {
     'major': {
     },
     'minor': {
@@ -123,7 +123,7 @@ figureShorthandsMode: t.Dict[str, t.Dict] = {
 
 
 # this is sort of a crock...  :-)  but it's very helpful.
-functionalityScores: t.Dict[str, int] = {
+functionalityScores: dict[str, int] = {
     'I': 100,
     'i': 90,
     'V7': 80,
@@ -395,7 +395,7 @@ def postFigureFromChordAndKey(chordObj, keyObj=None):
     return allFigureString
 
 
-def figureTuples(chordObject: chord.Chord, keyObject: key.Key) -> t.List[ChordFigureTuple]:
+def figureTuples(chordObject: chord.Chord, keyObject: key.Key) -> list[ChordFigureTuple]:
     '''
     (This will become a private function in v.10)
 
@@ -1869,7 +1869,7 @@ class RomanNumeral(harmony.Harmony):
     _aug6defaultInversions = {'It': '6', 'Fr': '43', 'Ger': '65', 'Sw': '43'}
     _slashedAug6Inv = re.compile(r'(\d)/(\d)')
 
-    _DOC_ATTR: t.Dict[str, str] = {
+    _DOC_ATTR: dict[str, str] = {
         'addedSteps': '''
             Returns a list of the added steps, each as a tuple of
             modifier as a string (which might be empty) and a chord factor as an int.
@@ -2290,9 +2290,9 @@ class RomanNumeral(harmony.Harmony):
 
         self.impliedScale: t.Optional[scale.ConcreteScale] = None
         self.useImpliedScale: bool = False
-        self.bracketedAlterations: t.List[t.Tuple[str, int]] = []
-        self.omittedSteps: t.List[int] = []
-        self.addedSteps: t.List[t.Tuple[str, int]] = []
+        self.bracketedAlterations: list[tuple[str, int]] = []
+        self.omittedSteps: list[int] = []
+        self.addedSteps: list[tuple[str, int]] = []
         # do not update pitches.
         self._parsingComplete = False
         self.key = keyOrScale
@@ -2426,7 +2426,7 @@ class RomanNumeral(harmony.Harmony):
                 else:
                     alterPitch.accidental.set(alterPitch.accidental.alter + newAccidental.alter)
 
-    def _findSemitoneSizeForQuality(self, impliedQuality: str) -> t.Tuple[int, ...]:
+    def _findSemitoneSizeForQuality(self, impliedQuality: str) -> tuple[int, ...]:
         '''
         Given an implied quality, return the number of semitones that should be included.
 
@@ -2463,7 +2463,7 @@ class RomanNumeral(harmony.Harmony):
 
         (This is in OMIT...)
         '''
-        correctSemitones: t.Tuple[int, ...]
+        correctSemitones: tuple[int, ...]
         if impliedQuality == 'major':
             correctSemitones = (4, 7)
         elif impliedQuality == 'minor':
@@ -2581,7 +2581,7 @@ class RomanNumeral(harmony.Harmony):
         self,
         useScale: t.Union[key.Key, scale.ConcreteScale],
         figure: t.Optional[str] = None
-    ) -> t.Tuple[str, t.Union[key.Key, scale.ConcreteScale]]:
+    ) -> tuple[str, t.Union[key.Key, scale.ConcreteScale]]:
         '''
         Creates .secondaryRomanNumeral object and .secondaryRomanNumeralKey Key object
         inside the RomanNumeral object (recursively in case of V/V/V/V etc.) and returns
@@ -2794,7 +2794,7 @@ class RomanNumeral(harmony.Harmony):
         self,
         workingFigure: str,
         useScale: t.Union[key.Key, scale.ConcreteScale],
-    ) -> t.Tuple[str, t.Union[key.Key, scale.ConcreteScale]]:
+    ) -> tuple[str, t.Union[key.Key, scale.ConcreteScale]]:
         # noinspection PyShadowingNames
         '''
         Sets and removes from workingFigure the roman numeral alone, possibly
@@ -3062,7 +3062,7 @@ class RomanNumeral(harmony.Harmony):
 
         bassScaleDegree = self.bassScaleDegreeFromNotation(self.figuresNotationObj)
         bassPitch = useScale.pitchFromDegree(bassScaleDegree, direction=scale.Direction.ASCENDING)
-        pitches: t.List[pitch.Pitch] = [bassPitch]
+        pitches: list[pitch.Pitch] = [bassPitch]
         lastPitch = bassPitch
         numberNotes = len(self.figuresNotationObj.numbers)
 
@@ -3352,7 +3352,7 @@ class RomanNumeral(harmony.Harmony):
             #     ])
 
     @property
-    def scaleDegreeWithAlteration(self) -> t.Tuple[int, t.Optional[pitch.Accidental]]:
+    def scaleDegreeWithAlteration(self) -> tuple[int, t.Optional[pitch.Accidental]]:
         '''
         Returns a two element tuple of the scale degree and the
         accidental that alters the scale degree for things such as #ii or

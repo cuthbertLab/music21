@@ -487,7 +487,7 @@ class StreamFreezer(StreamFreezeThawBase):
         hierarchyObject=None,
         getSpanners=True,
         getVariants=True
-    ) -> t.List[int]:
+    ) -> list[int]:
         '''
         Return a list of all Stream ids anywhere in the hierarchy.  By id,
         we mean `id(s)` not `s.id` -- so they are memory locations and unique.

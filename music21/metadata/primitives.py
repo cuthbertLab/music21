@@ -181,7 +181,7 @@ class Date(prebase.ProtoM21Object):
     # PRIVATE METHODS #
     def _stripError(self,
                     value: t.Union[int, float, str],
-                    ) -> t.Tuple[int, t.Optional[str]]:
+                    ) -> tuple[int, t.Optional[str]]:
         r'''
         Strip error symbols from a numerical value. Return cleaned source and
         sym. Only one error symbol is expected per string.
@@ -360,8 +360,8 @@ class Date(prebase.ProtoM21Object):
         >>> d.minute, d.second
         (50, 32)
         '''
-        post: t.List[t.Optional[int]] = []
-        postError: t.List[t.Optional[str]] = []
+        post: list[t.Optional[int]] = []
+        postError: list[t.Optional[str]] = []
         dateStr = dateStr.replace(':', '/')
         dateStr = dateStr.replace(' ', '')
         for chunk in dateStr.split('/'):
@@ -477,13 +477,13 @@ class DatePrimitive(prebase.ProtoM21Object):
     # INITIALIZER #
 
     def __init__(self, relevance='certain'):
-        self._data: t.List[Date] = []
+        self._data: list[Date] = []
         self._relevance = None  # managed by property
         # not yet implemented
         # store an array of values marking if date data itself
         # is certain, approximate, or uncertain
         # here, dataError is relevance
-        self._dataUncertainty: t.List[t.Union[str, None]] = []
+        self._dataUncertainty: list[t.Union[str, None]] = []
         self.relevance = relevance  # will use property
 
     # SPECIAL METHODS #
@@ -1099,7 +1099,7 @@ class Contributor(prebase.ProtoM21Object):
             self.role = None
         # a list of Text objects to support various spellings or
         # language translations
-        self._names: t.List[Text] = []
+        self._names: list[Text] = []
         if name:  # a single
             if isinstance(name, Text):
                 self._names.append(name)
@@ -1112,7 +1112,7 @@ class Contributor(prebase.ProtoM21Object):
                 else:
                     self._names.append(Text(n))
         # store the nationality, if known (not currently used)
-        self._nationality: t.List[Text] = []
+        self._nationality: list[Text] = []
 
         self.birth: t.Optional[DateSingle] = None
         self.death: t.Optional[DateSingle] = None

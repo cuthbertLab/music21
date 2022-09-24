@@ -102,7 +102,7 @@ class NotRestException(exceptions21.Music21Exception):
 # ------------------------------------------------------------------------------
 SyllabicChoices = t.Literal[None, 'begin', 'single', 'end', 'middle', 'composite']
 
-SYLLABIC_CHOICES: t.List[SyllabicChoices] = [
+SYLLABIC_CHOICES: list[SyllabicChoices] = [
     None, 'begin', 'single', 'end', 'middle', 'composite',
 ]
 
@@ -205,7 +205,7 @@ class Lyric(prebase.ProtoM21Object, style.StyleMixin):
         self._number: int = 1
         self._text: str = ''
         self._syllabic: SyllabicChoices = None
-        self.components: t.Optional[t.List['music21.note.Lyric']] = None
+        self.components: t.Optional[list['music21.note.Lyric']] = None
         self.elisionBefore = ' '
 
         # these are set by setTextAndSyllabic
@@ -553,7 +553,7 @@ class GeneralNote(base.Music21Object):
     # define order for presenting names in documentation; use strings
     _DOC_ORDER = ['duration', 'quarterLength']
     # documentation for all attributes (not properties or methods)
-    _DOC_ATTR: t.Dict[str, str] = {
+    _DOC_ATTR: dict[str, str] = {
         'isChord': 'Boolean read-only value describing if this object is a Chord.',
         'lyrics': 'A list of :class:`~music21.note.Lyric` objects.',
         'expressions': '''a list of expressions (such
@@ -586,9 +586,9 @@ class GeneralNote(base.Music21Object):
         # this sets the stored duration defined in Music21Object
         super().__init__(duration=tempDuration)
 
-        self.lyrics: t.List[Lyric] = []  # a list of lyric objects
-        self.expressions: t.List[expressions.Expression] = []
-        self.articulations: t.List['music21.articulations.Articulation'] = []
+        self.lyrics: list[Lyric] = []  # a list of lyric objects
+        self.expressions: list[expressions.Expression] = []
+        self.articulations: list['music21.articulations.Articulation'] = []
 
         if lyric is not None:
             self.addLyric(lyric)
@@ -833,7 +833,7 @@ class GeneralNote(base.Music21Object):
         return self.classes[0]  # override in subclasses
 
     @property
-    def pitches(self) -> t.Tuple[Pitch, ...]:
+    def pitches(self) -> tuple[Pitch, ...]:
         '''
         Returns an empty tuple.  (Useful for iterating over NotRests since they
         include Notes and Chords.)
@@ -964,7 +964,7 @@ class NotRest(GeneralNote):
     # unspecified means that there may be a stem, but its orientation
     # has not been declared.
 
-    _DOC_ATTR: t.Dict[str, str] = {
+    _DOC_ATTR: dict[str, str] = {
         'beams': '''
             A :class:`~music21.beam.Beams` object that contains
             information about the beaming of this note.''',
@@ -1446,7 +1446,7 @@ class Note(NotRest):
     # Defines the order of presenting names in the documentation; use strings
     _DOC_ORDER = ['duration', 'quarterLength', 'nameWithOctave']
     # documentation for all attributes (not properties or methods)
-    _DOC_ATTR: t.Dict[str, str] = {
+    _DOC_ATTR: dict[str, str] = {
         'isNote': 'Boolean read-only value describing if this Note is a Note (True).',
         'isRest': 'Boolean read-only value describing if this Note is a Rest (False).',
         'pitch': '''A :class:`~music21.pitch.Pitch` object containing all the
@@ -1640,7 +1640,7 @@ class Note(NotRest):
         ''')
 
     @property
-    def pitches(self) -> t.Tuple[Pitch, ...]:
+    def pitches(self) -> tuple[Pitch, ...]:
         '''
         Return the single :class:`~music21.pitch.Pitch` object in a tuple.
         This property is designed to provide an interface analogous to
@@ -1932,7 +1932,7 @@ class Rest(GeneralNote):
     isRest = True
     name = 'rest'
 
-    _DOC_ATTR: t.Dict[str, str] = {
+    _DOC_ATTR: dict[str, str] = {
         'isNote': 'Boolean read-only value describing if this Rest is a Note (False).',
         'isRest': 'Boolean read-only value describing if this Rest is a Rest (True, obviously).',
         'name': '''returns "rest" always.  It is here so that you can get

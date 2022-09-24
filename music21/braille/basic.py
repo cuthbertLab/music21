@@ -35,7 +35,7 @@ symbols = lookup.symbols
 
 environRules = environment.Environment('basic.py')
 
-beamStatus: t.Dict[str, bool] = {}
+beamStatus: dict[str, bool] = {}
 
 # Attributes that the translator currently sets on Music21Objects
 # that should be cleaned up after transcription
@@ -689,7 +689,7 @@ def noteToBraille(
         except AttributeError:
             beamStatus[keyword] = False
 
-    noteTrans: t.List[str] = []
+    noteTrans: list[str] = []
     # opening double slur (before second note, after first note)
     # opening bracket slur
     # closing bracket slur (if also beginning of next long slur)
@@ -847,7 +847,7 @@ def handlePitchWithAccidental(music21Pitch, pitchTrans, brailleEnglish):
             brailleEnglish.append(f'Parenthesis {ps}')
 
 
-def handleArticulations(music21Note, noteTrans: t.List[str], upperFirstInFingering=True):
+def handleArticulations(music21Note, noteTrans: list[str], upperFirstInFingering=True):
     # finger mark
     # -----------
     try:
@@ -863,7 +863,7 @@ def handleArticulations(music21Note, noteTrans: t.List[str], upperFirstInFingeri
             + 'cannot be transcribed to braille.')
 
 
-def handleExpressions(music21Note: note.GeneralNote, noteTrans: t.List[str]):
+def handleExpressions(music21Note: note.GeneralNote, noteTrans: list[str]):
     '''
     Transcribe the expressions for a note.GeneralNote.
     '''
@@ -959,13 +959,13 @@ def tempoTextToBraille(
     ⠛⠗⠁⠵⠊⠕⠎⠕⠀⠍⠁⠀
     ⠉⠁⠝⠞⠁⠃⠊⠇⠑⠲
     '''
-    newBrailleEnglish: t.List[str] = []
+    newBrailleEnglish: list[str] = []
     music21TempoText.editorial.brailleEnglish = newBrailleEnglish
     allPhrases = music21TempoText.text.split(',')
     braillePhrases = []
     for samplePhrase in allPhrases:
         allWords = samplePhrase.split()
-        phraseTrans: t.List[str] = []
+        phraseTrans: list[str] = []
         for sampleWord in allWords:
             try:
                 brailleWord = wordToBraille(sampleWord)

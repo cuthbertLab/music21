@@ -89,7 +89,7 @@ class TupletException(exceptions21.Music21Exception):
 
 
 # N.B.: MusicXML uses long instead of longa
-typeToDuration: t.Dict[str, float] = {
+typeToDuration: dict[str, float] = {
     'duplex-maxima': 64.0,
     'maxima': 32.0,
     'longa': 16.0,
@@ -109,7 +109,7 @@ typeToDuration: t.Dict[str, float] = {
     'zero': 0.0,
 }
 
-typeFromNumDict: t.Dict[float, str] = {
+typeFromNumDict: dict[float, str] = {
     1.0: 'whole',
     2.0: 'half',
     4.0: 'quarter',
@@ -128,9 +128,9 @@ typeFromNumDict: t.Dict[float, str] = {
     0.125: 'maxima',
     0.0625: 'duplex-maxima',
 }
-typeFromNumDictKeys: t.List[float] = sorted(list(typeFromNumDict.keys()))
+typeFromNumDictKeys: list[float] = sorted(list(typeFromNumDict.keys()))
 
-ordinalTypeFromNum: t.List[str] = [
+ordinalTypeFromNum: list[str] = [
     'duplex-maxima',
     'maxima',
     'longa',
@@ -150,9 +150,9 @@ ordinalTypeFromNum: t.List[str] = [
 ]
 
 
-defaultTupletNumerators: t.Tuple[int, ...] = (3, 5, 7, 11, 13)
+defaultTupletNumerators: tuple[int, ...] = (3, 5, 7, 11, 13)
 
-extendedTupletNumerators: t.Tuple[int, ...] = (
+extendedTupletNumerators: tuple[int, ...] = (
     3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53, 59, 61, 67,
     71, 73, 79, 83, 89, 97, 101, 103, 107, 109, 113, 127, 131, 137, 139,
     149, 151, 157, 163, 167, 173, 179, 181, 191, 193, 197, 199,
@@ -160,7 +160,7 @@ extendedTupletNumerators: t.Tuple[int, ...] = (
 
 
 class QuarterLengthConversion(t.NamedTuple):
-    components: t.Tuple[DurationTuple]
+    components: tuple[DurationTuple]
     tuplet: t.Optional[Tuplet]
 
 
@@ -342,7 +342,7 @@ def convertQuarterLengthToType(qLen: OffsetQLIn) -> str:
 
 def dottedMatch(qLen: OffsetQLIn,
                 maxDots=4
-                ) -> t.Union[t.Tuple[int, str], t.Tuple[t.Literal[False], t.Literal[False]]]:
+                ) -> t.Union[tuple[int, str], tuple[t.Literal[False], t.Literal[False]]]:
     '''
     Given a quarterLength, determine if there is a dotted
     (or non-dotted) type that exactly matches. Returns a pair of
@@ -385,7 +385,7 @@ def dottedMatch(qLen: OffsetQLIn,
 
 def quarterLengthToNonPowerOf2Tuplet(
     qLen: OffsetQLIn
-) -> t.Tuple[Tuplet, DurationTuple]:
+) -> tuple[Tuplet, DurationTuple]:
     '''
     Slow, last chance function that returns a tuple of a single tuplet, probably with a non
     power of 2 denominator (such as 7:6) that represents the quarterLength and the
@@ -435,7 +435,7 @@ def quarterLengthToTuplet(
     qLen: OffsetQLIn,
     maxToReturn=4,
     tupletNumerators=defaultTupletNumerators
-) -> t.List['music21.duration.Tuplet']:
+) -> list['music21.duration.Tuplet']:
     '''
     Returns a list of possible Tuplet objects for a
     given `qLen` (quarterLength). As there may be more than one
@@ -721,7 +721,7 @@ def quarterConversion(qLen: OffsetQLIn) -> QuarterLengthConversion:
 def convertTypeToQuarterLength(
     dType: str,
     dots=0,
-    tuplets: t.Optional[t.List['music21.duration.Tuplet']] = None,
+    tuplets: t.Optional[list['music21.duration.Tuplet']] = None,
     dotGroups=None
 ) -> OffsetQL:
     # noinspection PyShadowingNames
@@ -855,8 +855,8 @@ class DurationTuple(t.NamedTuple):
         return ordinalFound
 
 
-_durationTupleCacheTypeDots: t.Dict[t.Tuple[str, int], DurationTuple] = {}
-_durationTupleCacheQuarterLength: t.Dict[OffsetQL, DurationTuple] = {}
+_durationTupleCacheTypeDots: dict[tuple[str, int], DurationTuple] = {}
+_durationTupleCacheQuarterLength: dict[OffsetQL, DurationTuple] = {}
 
 
 def durationTupleFromQuarterLength(ql=1.0) -> DurationTuple:
@@ -1050,9 +1050,9 @@ class Tuplet(prebase.ProtoM21Object):
                  numberNotesActual: int = 3,
                  numberNotesNormal: int = 2,
                  durationActual: t.Union[DurationTuple, Duration,
-                                         str, t.Tuple[str, int], None] = None,
+                                         str, tuple[str, int], None] = None,
                  durationNormal: t.Union[DurationTuple, Duration,
-                                         str, t.Tuple[str, int], None] = None,
+                                         str, tuple[str, int], None] = None,
                  *,
                  tupletId: int = 0,
                  nestedLevel: int = 1,
@@ -1628,12 +1628,12 @@ class Duration(prebase.ProtoM21Object, SlottedObjectMixin):
         self._typeNeedsUpdating = False
 
         self._unlinkedType: t.Optional[str] = None
-        self._dotGroups: t.Tuple[int, ...] = (0,)
-        self._tuplets: t.Tuple['Tuplet', ...] = ()  # an empty tuple
+        self._dotGroups: tuple[int, ...] = (0,)
+        self._tuplets: tuple['Tuplet', ...] = ()  # an empty tuple
         self._qtrLength: OffsetQL = 0.0
 
         # DurationTuples go here
-        self._components: t.List[DurationTuple] = []
+        self._components: list[DurationTuple] = []
 
         # defer updating until necessary
         self._quarterLengthNeedsUpdating = False
@@ -1662,7 +1662,7 @@ class Duration(prebase.ProtoM21Object, SlottedObjectMixin):
             storeDots = 0
 
         if components is not None:
-            self.components = t.cast(t.Tuple[DurationTuple, ...], components)
+            self.components = t.cast(tuple[DurationTuple, ...], components)
             # this is set in _setComponents
             # self._quarterLengthNeedsUpdating = True
 
@@ -2475,7 +2475,7 @@ class Duration(prebase.ProtoM21Object, SlottedObjectMixin):
 
     # PUBLIC PROPERTIES #
     @property
-    def components(self) -> t.Tuple[DurationTuple, ...]:
+    def components(self) -> tuple[DurationTuple, ...]:
         '''
         Returns or sets a tuple of the component DurationTuples of this
         Duration object
@@ -2537,7 +2537,7 @@ class Duration(prebase.ProtoM21Object, SlottedObjectMixin):
             # must be cleared
 
     @property
-    def dotGroups(self) -> t.Tuple[int, ...]:
+    def dotGroups(self) -> tuple[int, ...]:
         '''
         Dot groups are medieval dotted-dotted notes (written one above another).
         For instance a half note with dotGroups = (1, 1) represents a dotted half note that
@@ -2563,7 +2563,7 @@ class Duration(prebase.ProtoM21Object, SlottedObjectMixin):
             return self._dotGroups
 
     @dotGroups.setter
-    def dotGroups(self, value: t.Tuple[int, ...]):
+    def dotGroups(self, value: tuple[int, ...]):
         if not isinstance(value, tuple):
             raise TypeError('only tuple dotGroups values can be used with this method.')
         # removes dots from all components...
@@ -2929,7 +2929,7 @@ class Duration(prebase.ProtoM21Object, SlottedObjectMixin):
         ''')
 
     @property
-    def tuplets(self) -> t.Tuple[Tuplet, ...]:
+    def tuplets(self) -> tuple[Tuplet, ...]:
         '''
         Return a tuple of Tuplet objects.
         Setting tuplets will inform the client (Note) that the duration has changed.
@@ -3069,7 +3069,7 @@ class GraceDuration(Duration):
     # CLASS VARIABLES #
 
     # TODO: What does 'amount of time' mean here?
-    _DOC_ATTR: t.Dict[str, str] = {
+    _DOC_ATTR: dict[str, str] = {
         'stealTimePrevious': '''
                 Float number from 0.0 to 1.0, or None (default) for the proportion
                 of the previous duration to steal from the previous note.''',
@@ -3860,7 +3860,7 @@ class Test(unittest.TestCase):
 
 # -------------------------------------------------------------------------------
 # define presented order in documentation
-_DOC_ORDER: t.List[t.Union[t.Type, t.Callable]] = [
+_DOC_ORDER: list[t.Union[t.Type, t.Callable]] = [
     Duration, Tuplet, GraceDuration, convertQuarterLengthToType, TupletFixer,
 ]
 

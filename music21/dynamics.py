@@ -194,7 +194,7 @@ class Dynamic(base.Music21Object):
     _styleClass = style.TextStyle
 
     _DOC_ORDER = ['longName', 'englishName']
-    _DOC_ATTR: t.Dict[str, str] = {
+    _DOC_ATTR: dict[str, str] = {
         'longName': r'''
             the name of this dynamic in Italian.
 
