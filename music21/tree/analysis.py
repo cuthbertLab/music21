@@ -12,13 +12,13 @@
 '''
 Tools for performing voice-leading analysis with trees.
 '''
+from __future__ import annotations
+
 import collections.abc
 import unittest
-# from music21 import base
-# from music21 import common
+
 from music21 import environment
 from music21 import exceptions21
-# from music21 import key
 
 environLocal = environment.Environment('tree.analysis')
 

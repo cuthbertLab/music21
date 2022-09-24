@@ -12,12 +12,14 @@
 '''
 sites.py -- Objects for keeping track of relationships among Music21Objects
 '''
+from __future__ import annotations
+
 import collections
 from collections.abc import Generator, MutableMapping
-import unittest
-import weakref
 import typing as t
 from typing import overload  # for some reason does not work in PyCharm if not directly imported
+import unittest
+import weakref
 
 from music21 import common
 from music21 import exceptions21

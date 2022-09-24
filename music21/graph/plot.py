@@ -21,19 +21,23 @@ reusable approaches to graphing data and structures in
 from __future__ import annotations
 
 import collections
+import numbers
 import os
 import pathlib
-import unittest
-import numbers
 import typing as t
+import unittest
 
+from music21.analysis import correlate
+from music21.analysis import discrete
+from music21.analysis import reduction
+from music21.analysis import windowed
 from music21 import base
-# from music21 import common
 from music21 import chord
 from music21 import common
 from music21 import corpus
 from music21 import converter
 from music21 import dynamics
+from music21 import environment
 from music21 import features
 from music21 import note
 from music21 import prebase
@@ -43,12 +47,7 @@ from music21.graph import axis
 from music21.graph import primitives
 from music21.graph.utilities import (GraphException, PlotStreamException)
 
-from music21.analysis import correlate
-from music21.analysis import discrete
-from music21.analysis import reduction
-from music21.analysis import windowed
 
-from music21 import environment
 environLocal = environment.Environment('graph.plot')
 
 # Graph uses setattr, which PyLint can't infer from currently

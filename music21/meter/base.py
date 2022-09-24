@@ -26,14 +26,14 @@ import unittest
 from music21 import base
 from music21 import beam
 from music21 import common
+from music21.common.enums import MeterDivision
+from music21.common.numberTools import opFrac
 from music21 import defaults
 from music21 import duration
 from music21 import environment
-from music21 import style
 from music21.exceptions21 import MeterException, TimeSignatureException
+from music21 import style
 
-from music21.common.enums import MeterDivision
-from music21.common.numberTools import opFrac
 from music21.meter.tools import slashToTuple, proportionToFraction
 from music21.meter.core import MeterSequence
 

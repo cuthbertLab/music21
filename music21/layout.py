@@ -95,13 +95,13 @@ from collections import namedtuple
 import typing as t
 
 from music21 import base
+from music21.common.enums import GatherSpanners
+from music21 import environment
 from music21 import exceptions21
 from music21 import spanner
 from music21 import stream
-from music21.common.enums import GatherSpanners
 from music21.stream.enums import StaffType
 
-from music21 import environment
 environLocal = environment.Environment('layout')
 
 

@@ -41,6 +41,8 @@ next pitch. In all cases :class:`~music21.pitch.Pitch` objects are returned.
 >>> [str(p) for p in sc2.getPitches('g2', 'g4', direction=scale.Direction.ASCENDING)]
 ['G#2', 'A2', 'B2', 'C3', 'D3', 'E3', 'F#3', 'G#3', 'A3', 'B3', 'C4', 'D4', 'E4', 'F#4']
 '''
+from __future__ import annotations
+
 __all__ = [
     'intervalNetwork', 'scala',
     'Direction', 'Terminus',

@@ -25,11 +25,11 @@ import typing as t
 
 from music21 import common
 from music21 import converter
+from music21.exceptions21 import CorpusException
 from music21 import environment
 from music21 import metadata
 
 from music21.corpus import corpora
-from music21.exceptions21 import CorpusException
 
 _metadataBundles: dict[str, t.Optional['music21.metadata.bundles.MetadataBundle']] = {
     'core': None,

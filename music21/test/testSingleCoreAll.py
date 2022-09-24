@@ -14,6 +14,8 @@ Controller to run all module tests in the music21 folders.
 
 Runs great, but slowly on multiprocessor systems.
 '''
+from __future__ import annotations
+
 from collections.abc import Sequence
 import doctest
 import sys

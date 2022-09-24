@@ -11,6 +11,7 @@
 # ------------------------------------------------------------------------------
 # https://stackoverflow.com/questions/12611337/
 #     recursively-dir-a-python-object-to-find-values-of-a-certain-type-or-with-a-cer
+from __future__ import annotations
 
 import weakref
 

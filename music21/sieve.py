@@ -16,7 +16,6 @@ in various representation. Additional functionality is available through associa
 
 The :class:`music21.sieve.Sieve` class permits generation segments in four formats.
 
-
 >>> a = sieve.Sieve('3@2|7@1')
 >>> a.segment()
 [1, 2, 5, 8, 11, 14, 15, 17, 20, 22, 23, 26, 29, 32, 35, 36, 38, 41, 43, 44,
@@ -55,21 +54,23 @@ The :class:`music21.sieve.PitchSieve` class provides a quick generation of
  F7, C8, E-8, F#8, C#9, E9, G9'
 
 '''
+from __future__ import annotations
+
 from ast import literal_eval
 import copy
 from math import gcd
 import random
 import string
-import unittest
 import typing as t
+import unittest
 
-from music21 import exceptions21
-from music21 import pitch
 from music21 import common
-from music21 import interval
 from music21.common.numberTools import lcm
-
 from music21 import environment
+from music21 import exceptions21
+from music21 import interval
+from music21 import pitch
+
 environLocal = environment.Environment('sieve')
 
 

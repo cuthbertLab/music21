@@ -17,12 +17,13 @@ Slurs, Dynamics, Ornamentation, etc.
 Does not handle pickup notes, which are defined simply with an early barline
 (same as incomplete bars at the end).
 '''
-import xml.etree.ElementTree
-import unittest
-import zipfile
+from __future__ import annotations
 
 from io import StringIO
 import typing as t
+import unittest
+import xml.etree.ElementTree
+import zipfile
 
 from music21 import bar
 from music21 import chord

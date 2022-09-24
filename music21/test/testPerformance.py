@@ -15,7 +15,7 @@ This module defines a number of performance test.
 
 This file is not run with the standard test battery presently.
 '''
-
+from __future__ import annotations
 
 import unittest
 

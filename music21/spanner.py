@@ -25,14 +25,14 @@ import copy
 import typing as t
 import unittest
 
-from music21 import exceptions21
 from music21 import base
 from music21 import common
 from music21 import defaults
+from music21 import environment
+from music21 import exceptions21
 from music21 import prebase
 from music21 import style
 
-from music21 import environment
 environLocal = environment.Environment('spanner')
 
 

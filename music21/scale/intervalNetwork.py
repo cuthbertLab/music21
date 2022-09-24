@@ -41,13 +41,13 @@ import enum
 import typing as t
 
 from music21 import common
+from music21 import environment
 from music21 import exceptions21
 from music21 import interval
 from music21 import note
 from music21 import pitch
 from music21 import prebase
 
-from music21 import environment
 environLocal = environment.Environment('scale.intervalNetwork')
 
 class Terminus(enum.Enum):

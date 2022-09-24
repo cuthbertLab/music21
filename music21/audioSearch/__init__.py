@@ -16,6 +16,8 @@ Base routines used throughout audioSearching and score-following.
 Requires numpy and matplotlib.  Installing scipy makes the process faster
 and more accurate using FFT convolve.
 '''
+from __future__ import annotations
+
 __all__ = [
     'transcriber', 'recording', 'scoreFollower',
     'histogram', 'autocorrelationFunction',
@@ -47,6 +49,7 @@ import typing as t
 # imports * from base, it overwrites audioSearch!
 from music21 import base
 from music21 import common
+from music21 import environment
 from music21 import exceptions21
 from music21 import features
 from music21 import metadata
@@ -58,7 +61,6 @@ from music21 import stream
 from music21.audioSearch import recording
 from music21.audioSearch import transcriber
 
-from music21 import environment
 environLocal = environment.Environment('audioSearch')
 
 audioChunkLength = 1024

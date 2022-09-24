@@ -23,6 +23,7 @@ from music21 import common
 from music21.common.types import StreamType
 from music21 import converter
 from music21 import corpus
+from music21 import environment
 from music21 import exceptions21
 from music21 import note
 from music21 import stream
@@ -30,7 +31,6 @@ from music21 import text
 
 from music21.metadata.bundles import MetadataEntry
 
-from music21 import environment
 environLocal = environment.Environment('features.base')
 # ------------------------------------------------------------------------------
 

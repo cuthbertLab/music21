@@ -12,10 +12,12 @@
 Implementation of Walter Hewlett's base40 system for musical intervals.
 (See Hewlett and Ann K. Blombach 1989 article)
 '''
+from __future__ import annotations
+
 import unittest
-from music21 import exceptions21
 
 from music21 import common
+from music21 import exceptions21
 from music21 import interval
 from music21 import note
 from music21 import pitch

@@ -10,13 +10,12 @@
 # Copyright:    Copyright © 2009-2022 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
+from __future__ import annotations
+
 import copy
 import fractions
 import io
-# import pprint
 import re
-# import sys
-# import traceback
 import warnings
 
 from math import isclose

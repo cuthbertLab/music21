@@ -13,6 +13,10 @@ music21 translates to Lilypond format and if Lilypond is installed on the
 local computer, can automatically generate .pdf, .png, and .svg versions
 of musical files using Lilypond.
 '''
+from __future__ import annotations
+
+from collections import OrderedDict
+from importlib.util import find_spec
 import os
 import pathlib
 import re
@@ -20,9 +24,6 @@ import subprocess
 import sys
 import typing as t
 import unittest
-
-from collections import OrderedDict
-from importlib.util import find_spec
 
 from music21 import clef
 from music21 import common
@@ -35,6 +36,7 @@ from music21 import key
 from music21 import note
 from music21 import stream
 from music21 import variant
+
 from music21.lily import lilyObjects as lyo
 
 environLocal = environment.Environment('lily.translate')

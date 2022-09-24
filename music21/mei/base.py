@@ -172,13 +172,15 @@ tool.
 * <sb>: a system break
 
 '''
-import typing as t
-from xml.etree.ElementTree import Element, ParseError, fromstring, ElementTree
+from __future__ import annotations
 
 from collections import defaultdict
 from copy import deepcopy
 from fractions import Fraction  # for typing
+import typing as t
 from uuid import uuid4
+from xml.etree.ElementTree import Element, ParseError, fromstring, ElementTree
+
 
 # music21
 from music21 import articulations

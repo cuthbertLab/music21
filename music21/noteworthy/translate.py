@@ -57,9 +57,11 @@ Module to translate Noteworthy Composer's NWCTXT format to music21.
 #
 # Pos2? Dur2?
 # |Chord|Dur:8th|Pos:-4,n-3,b-2,#-1,x0,v1,2x|Opts:Stem=Down,Crescendo|Dur2:8th,DblDotted|Pos2:3x
+from __future__ import annotations
 
 import unittest
 import warnings
+
 from music21 import bar
 from music21 import chord
 from music21 import clef

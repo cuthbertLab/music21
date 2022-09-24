@@ -13,6 +13,8 @@
 A mixin to ScoreExporter that includes the capabilities for producing a single
 MusicXML `<part>` from multiple music21 `PartStaff` objects.
 '''
+from __future__ import annotations
+
 import typing as t
 import unittest
 import warnings

@@ -8,6 +8,8 @@
 # Copyright:    Copyright © 2012 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
+from __future__ import annotations
+
 __all__ = ['fromCapellaXML']
 
 from music21.capella import fromCapellaXML

@@ -45,6 +45,8 @@ When changing, update the single test case in base.py.
 
 Changing this number invalidates old pickles -- do it if the old pickles create a problem.
 '''
+from __future__ import annotations
+
 __version__ = '9.0.0a1'
 
 

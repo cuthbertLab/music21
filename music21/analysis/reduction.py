@@ -15,6 +15,8 @@ and one or more reductive representation lines.
 
 Used by graph.PlotHorizontalBarWeighted()
 '''
+from __future__ import annotations
+
 import copy
 import re
 import typing as t
@@ -24,15 +26,15 @@ from music21 import exceptions21
 
 from music21 import chord
 from music21 import common
+from music21.common.types import DocOrder
+from music21 import environment
 from music21 import expressions
 from music21 import instrument
 from music21 import note
 from music21 import pitch
 from music21 import prebase
 from music21 import stream
-from music21.common.types import DocOrder
 
-from music21 import environment
 environLocal = environment.Environment('analysis.reduction')
 
 

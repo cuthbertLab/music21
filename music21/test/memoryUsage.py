@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+from __future__ import annotations
+
 from music21 import exceptions21
 from music21 import corpus
 

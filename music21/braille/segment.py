@@ -30,8 +30,8 @@ from music21 import base
 from music21 import chord
 from music21 import clef
 from music21 import dynamics
-from music21 import exceptions21
 from music21 import environment
+from music21 import exceptions21
 from music21 import expressions
 from music21 import key
 from music21 import layout

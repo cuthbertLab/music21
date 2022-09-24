@@ -21,27 +21,27 @@ import datetime
 import fractions
 import io
 import math
+import typing as t
 import warnings
 from xml.etree.ElementTree import (
     Element, SubElement, Comment
 )
-import typing as t
 
 # external dependencies
-import webcolors  # type: ignore
+import webcolors
 
 # modules that import this include converter.py.
 # thus, cannot import these here
-from music21 import base
-from music21 import common
-from music21 import defaults
-from music21 import exceptions21
-
 from music21 import articulations
+from music21 import base
 from music21 import bar
 from music21 import clef
 from music21 import chord
+from music21 import common
+from music21 import defaults
 from music21 import duration
+from music21 import environment
+from music21 import exceptions21
 from music21 import expressions
 from music21 import harmony
 from music21 import instrument
@@ -54,10 +54,10 @@ from music21 import pitch
 from music21 import prebase
 from music21 import spanner
 from music21 import stream
+from music21.stream.iterator import OffsetIterator
 from music21 import style
 from music21 import tempo
 from music21 import tie
-from music21.stream.iterator import OffsetIterator
 
 from music21.musicxml import helpers
 from music21.musicxml.partStaffExporter import PartStaffExporterMixin
@@ -65,7 +65,6 @@ from music21.musicxml import xmlObjects
 from music21.musicxml.xmlObjects import MusicXMLExportException
 from music21.musicxml.xmlObjects import MusicXMLWarning
 
-from music21 import environment
 environLocal = environment.Environment('musicxml.m21ToXml')
 
 # ------------------------------------------------------------------------------

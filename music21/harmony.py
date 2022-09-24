@@ -15,6 +15,8 @@
 An object representation of harmony, a subclass of chord, as encountered as chord symbols or
 roman numerals, or other chord representations with a defined root.
 '''
+from __future__ import annotations
+
 import collections
 import copy
 import re
@@ -26,16 +28,15 @@ from music21 import base
 from music21 import chord
 from music21 import common
 from music21 import duration
+from music21 import environment
 from music21 import exceptions21
+from music21.figuredBass import realizerScale
 from music21 import interval
 from music21 import key
 from music21 import pitch
 from music21 import prebase
 from music21 import style
 
-from music21.figuredBass import realizerScale
-
-from music21 import environment
 environLocal = environment.Environment('harmony')
 
 T = t.TypeVar('T', bound='ChordSymbol')

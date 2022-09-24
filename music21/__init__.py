@@ -31,6 +31,8 @@ standard, Copyright © 2004-2022 the Contributors to the MusicXML Specification.
 The corpus files have copyrights retained by their
 owners who have allowed them to be included with music21.
 '''
+from __future__ import annotations
+
 import sys
 
 minPythonVersion = (3, 8)

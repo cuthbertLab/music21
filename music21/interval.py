@@ -31,13 +31,12 @@ import typing as t
 
 from music21 import base
 from music21 import common
-from music21 import exceptions21
-
-# from music21 import pitch  # SHOULD NOT, b/c of enharmonics
 from music21.common.decorators import cacheMethod
 from music21.common.types import StepName
-
 from music21 import environment
+from music21 import exceptions21
+# from music21 import pitch  # SHOULD NOT, b/c of enharmonics
+
 environLocal = environment.Environment('interval')
 
 # ------------------------------------------------------------------------------

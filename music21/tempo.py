@@ -12,9 +12,11 @@
 '''
 This module defines objects for describing tempo and changes in tempo.
 '''
+from __future__ import annotations
+
 import copy
-import unittest
 import typing as t
+import unittest
 
 from music21 import base
 from music21 import common

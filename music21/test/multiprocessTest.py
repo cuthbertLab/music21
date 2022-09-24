@@ -21,6 +21,8 @@ building a new release.
 
 Run test/testDocumentation after this.
 '''
+from __future__ import annotations
+
 import dataclasses
 import multiprocessing
 import os

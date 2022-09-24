@@ -8,6 +8,8 @@
 # Copyright:    Copyright © 2017 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
+from __future__ import annotations
+
 import collections
 
 def pitchAttributeCount(s, pitchAttr='name'):

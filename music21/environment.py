@@ -22,6 +22,8 @@ Additional documentation for and examples of using this module are found in
 
 # TODO: Update to user's guide -- showing each function
 '''
+from __future__ import annotations
+
 import io
 import os
 import pathlib

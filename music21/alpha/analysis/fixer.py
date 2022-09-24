@@ -8,12 +8,11 @@
 # Copyright:    Copyright © 2016 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
-import unittest
+from __future__ import annotations
+
 from copy import deepcopy
 import typing as t
-
-from music21.alpha.analysis import aligner
-from music21.alpha.analysis import ornamentRecognizer
+import unittest
 
 from music21 import duration
 from music21 import expressions
@@ -21,6 +20,9 @@ from music21 import interval
 from music21 import note
 from music21 import pitch
 from music21 import stream
+
+from music21.alpha.analysis import aligner
+from music21.alpha.analysis import ornamentRecognizer
 
 
 class OMRMidiFixer:

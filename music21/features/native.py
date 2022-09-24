@@ -11,12 +11,15 @@
 '''
 Original music21 feature extractors.
 '''
-import unittest
-import typing as t
+from __future__ import annotations
 
+import typing as t
+import unittest
+
+from music21 import environment
 from music21.features import base as featuresModule
 from music21 import text
-from music21 import environment
+
 environLocal = environment.Environment('features.native')
 
 # ------------------------------------------------------------------------------

@@ -33,6 +33,8 @@ the temp folder on the disk.
 >>> s
 <music21.stream.Score ...>
 '''
+from __future__ import annotations
+
 import collections.abc
 import copy
 from http.client import responses

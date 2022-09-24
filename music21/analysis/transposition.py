@@ -13,12 +13,12 @@ from __future__ import annotations
 from collections.abc import Iterable
 import unittest
 
+from music21 import chord
 from music21 import common
+from music21 import environment
 from music21 import exceptions21
 from music21 import pitch
-from music21 import chord
 
-from music21 import environment
 environLocal = environment.Environment('analysis.transposition')
 
 

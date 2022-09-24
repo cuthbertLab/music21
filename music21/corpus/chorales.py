@@ -20,9 +20,10 @@ import copy
 import typing as t
 import unittest
 
-from music21 import exceptions21
 from music21 import environment
+from music21 import exceptions21
 from music21 import metadata
+
 environLocal = environment.Environment('corpus.chorales')
 
 

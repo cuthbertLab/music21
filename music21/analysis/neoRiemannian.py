@@ -15,14 +15,16 @@ This module defines the L, P, and R objects and their
 related transformations as called on a :class:`~music21.chord.Chord`,
 according to Neo-Riemannian theory.
 '''
+from __future__ import annotations
+
 import copy
 import unittest
 
 from music21 import exceptions21
 from music21 import chord
 from music21.analysis import enharmonics
-
 from music21 import environment
+
 environLocal = environment.Environment('analysis.neoRiemannian')
 
 # TODO: change doctests from passing on exceptions to raising them and trapping them.

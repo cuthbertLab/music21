@@ -38,11 +38,15 @@ import warnings
 from music21 import base
 from music21 import bar
 from music21 import common
+from music21.common.enums import GatherSpanners, OffsetSpecial
+from music21.common.numberTools import opFrac
+from music21.common.types import StreamType, M21ObjType, OffsetQL, OffsetQLSpecial
 from music21 import clef
 from music21 import chord
 from music21 import defaults
 from music21 import derivation
 from music21 import duration
+from music21 import environment
 from music21 import exceptions21
 from music21 import interval
 from music21 import instrument
@@ -63,12 +67,6 @@ from music21.stream import streamStatus
 from music21.stream import iterator
 from music21.stream import filters
 from music21.stream.enums import GivenElementsBehavior, RecursionType
-
-from music21.common.numberTools import opFrac
-from music21.common.enums import GatherSpanners, OffsetSpecial
-from music21.common.types import StreamType, M21ObjType, OffsetQL, OffsetQLSpecial
-
-from music21 import environment
 
 environLocal = environment.Environment('stream')
 

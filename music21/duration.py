@@ -61,13 +61,12 @@ import unittest
 from music21 import prebase
 
 from music21 import common
-from music21 import defaults
-from music21 import exceptions21
-from music21 import environment
-
 from music21.common.objects import SlottedObjectMixin
 from music21.common.numberTools import opFrac
 from music21.common.types import OffsetQL, OffsetQLIn, DocOrder
+from music21 import defaults
+from music21 import environment
+from music21 import exceptions21
 
 environLocal = environment.Environment('duration')
 

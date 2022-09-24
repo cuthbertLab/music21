@@ -15,6 +15,8 @@ should inherit from are given below.
 
 Concept borrowed from m21j.
 '''
+from __future__ import annotations
+
 from collections.abc import Sequence
 import typing as t
 import unittest

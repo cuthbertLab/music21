@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# import music21.ipython21.objects
+from __future__ import annotations
 
 _DOC_IGNORE_MODULE_OR_PACKAGE = True
 

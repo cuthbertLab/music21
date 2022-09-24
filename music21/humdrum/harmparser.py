@@ -13,9 +13,11 @@ Harmonic annotations from humdrum to `music21`.
 
 The `**harm` representation is described here: https://www.humdrum.org/rep/harm/
 '''
+from __future__ import annotations
+
 import re
-import unittest
 import typing as t
+import unittest
 
 def convertHarmToRoman(harmStr):
     # noinspection PyShadowingNames

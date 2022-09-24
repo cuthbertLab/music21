@@ -11,6 +11,8 @@
 '''
 Tests for :mod:`music21.mei.base`.
 '''
+from __future__ import annotations
+
 # part of the whole point is to test protect things too
 # pylint: disable=protected-access
 

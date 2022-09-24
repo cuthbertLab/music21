@@ -13,6 +13,8 @@
 '''
 Tools for creating timespans (fast, manipulable objects) from Streams
 '''
+from __future__ import annotations
+
 from collections.abc import Sequence
 import typing as t
 import unittest

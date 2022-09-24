@@ -29,6 +29,7 @@ from collections.abc import Iterable, Sequence
 import typing as t
 import unittest
 
+from music21 import environment
 from music21 import exceptions21
 from music21 import harmony
 from music21 import interval
@@ -36,8 +37,6 @@ from music21 import note
 from music21 import key
 from music21 import pitch
 
-
-from music21 import environment
 environLocal = environment.Environment('analysis.discrete')
 
 

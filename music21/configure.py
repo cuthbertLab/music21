@@ -8,14 +8,16 @@
 # Copyright:    Copyright © 2011-2019 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
+from __future__ import annotations
+
 import os
 import pathlib
 import re
 import time
 import sys
 import sysconfig
-import unittest
 import textwrap
+import unittest
 import webbrowser
 
 from importlib import reload

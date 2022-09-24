@@ -16,6 +16,8 @@ These are the lowest level tools for working with self-balancing AVL trees.
 There's an overhead to creating an AVL tree, but for a large score it is
 absolutely balanced by having O(log n) search times.
 '''
+from __future__ import annotations
+
 import typing as t
 
 from music21 import prebase

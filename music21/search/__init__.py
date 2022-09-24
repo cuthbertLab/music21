@@ -14,6 +14,8 @@ Methods and Classes useful in searching within scores.
 For searching a group of scores, see the search functions within
 :ref:`moduleCorpus` .
 '''
+from __future__ import annotations
+
 __all__ = [
     'base', 'lyrics', 'segment', 'serial',
 

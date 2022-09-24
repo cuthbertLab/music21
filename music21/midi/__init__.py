@@ -23,6 +23,8 @@ This module originally used routines from Will Ware's public domain midi.py
 library from 2001 which was once posted at (http link)
 groups.google.com/g/alt.sources/msg/0c5fc523e050c35e
 '''
+from __future__ import annotations
+
 __all__ = [
     'realtime', 'percussion',
     'MidiEvent', 'MidiFile', 'MidiTrack', 'MidiException',

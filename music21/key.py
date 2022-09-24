@@ -21,12 +21,15 @@ from __future__ import annotations
 
 import copy
 import re
-import unittest
 import typing as t
 from typing import overload
+import unittest
 import warnings
 
 from music21 import base
+from music21.common.decorators import cacheMethod
+from music21.common.types import StepName
+from music21 import environment
 from music21 import exceptions21
 from music21 import interval
 from music21 import note
@@ -34,9 +37,6 @@ from music21 import pitch
 from music21 import scale
 from music21 import style
 
-from music21.common.decorators import cacheMethod
-from music21.common.types import StepName
-from music21 import environment
 environLocal = environment.Environment('key')
 
 KeySignatureType = t.TypeVar('KeySignatureType', bound='KeySignature')

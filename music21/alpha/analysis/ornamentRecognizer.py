@@ -8,9 +8,11 @@
 # Copyright:    Copyright © 2016 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
-import unittest
+from __future__ import annotations
+
 from copy import deepcopy
 import typing as t
+import unittest
 
 from music21.common.numberTools import opFrac
 from music21.common.types import OffsetQL

@@ -17,6 +17,8 @@ from any music21 Stream.
 
 This module will move to a medren package hopefully by v.7
 '''
+from __future__ import annotations
+
 import enum
 import unittest
 

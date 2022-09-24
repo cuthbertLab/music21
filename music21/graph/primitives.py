@@ -27,21 +27,20 @@ from __future__ import annotations
 
 import math
 import random
-import unittest
 import typing as t
+import unittest
 
 from music21 import common
+from music21.converter.subConverters import SubConverter
+from music21 import environment
 from music21.graph.utilities import (getExtendedModules,
                                      GraphException,
                                      getColor,
                                      accidentalLabelToUnicode,
                                      )
 from music21 import prebase
-from music21.converter.subConverters import SubConverter
 
-from music21 import environment
 environLocal = environment.Environment('graph.primitives')
-
 
 # ------------------------------------------------------------------------------
 class Graph(prebase.ProtoM21Object):

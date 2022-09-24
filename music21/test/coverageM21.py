@@ -9,6 +9,8 @@
 # Copyright:    Copyright © 2014-15 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
+from __future__ import annotations
+
 import sys
 
 omit_modules = [

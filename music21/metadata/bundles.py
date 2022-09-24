@@ -13,6 +13,13 @@
 # -----------------------------------------------------------------------------
 from __future__ import annotations
 
+__all__ = [
+    'MetadataEntry',
+    'MetadataBundle',
+    'MetadataBundleException',
+]
+
+from collections import OrderedDict
 import gzip
 import os
 import pathlib
@@ -20,22 +27,13 @@ import pickle
 import time
 import unittest
 
-from collections import OrderedDict
-
 from music21 import common
 from music21.common.fileTools import readPickleGzip
+from music21 import environment
 from music21 import exceptions21
 from music21 import prebase
 
 # -----------------------------------------------------------------------------
-__all__ = [
-    'MetadataEntry',
-    'MetadataBundle',
-    'MetadataBundleException',
-]
-
-
-from music21 import environment
 environLocal = environment.Environment(os.path.basename(__file__))
 
 

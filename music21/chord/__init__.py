@@ -25,8 +25,10 @@ import unittest
 
 from music21 import beam
 from music21 import common
+from music21.common.decorators import cacheMethod
 from music21 import derivation
 from music21.duration import Duration
+from music21 import environment
 from music21 import exceptions21
 from music21 import interval
 from music21 import note
@@ -34,10 +36,8 @@ from music21 import pitch
 from music21 import tie
 from music21 import volume
 
-from music21 import environment
 from music21.chord import tables
 from music21.chord import tools
-from music21.common.decorators import cacheMethod
 
 environLocal = environment.Environment('chord')
 

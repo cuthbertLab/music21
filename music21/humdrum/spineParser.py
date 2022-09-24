@@ -48,9 +48,8 @@ from __future__ import annotations
 import copy
 import math
 import re
-import unittest
-
 import typing as t
+import unittest
 
 from music21 import articulations
 from music21 import bar
@@ -60,6 +59,7 @@ from music21 import clef
 from music21 import common
 from music21 import dynamics
 from music21 import duration
+from music21 import environment
 from music21 import exceptions21
 from music21 import expressions
 from music21 import instrument
@@ -77,7 +77,6 @@ from music21.humdrum import testFiles
 from music21.humdrum import harmparser
 from music21.humdrum import instruments
 
-from music21 import environment
 environLocal = environment.Environment('humdrum.spineParser')
 
 flavors = {'JRP': False}

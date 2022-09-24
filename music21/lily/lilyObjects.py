@@ -20,8 +20,11 @@ this replaces (April 2012) the old LilyString() conversion methods.
 The Grammar for Lilypond comes from
 http://lilypond.org/doc/v2.14/Documentation/notation/lilypond-grammar
 '''
+from __future__ import annotations
+
 import typing as t
 import unittest
+
 from music21 import common
 from music21 import exceptions21
 from music21 import prebase

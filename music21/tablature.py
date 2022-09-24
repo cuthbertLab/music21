@@ -15,8 +15,10 @@ TODO:
 Chord from Figure
 Chord from FretBoard Object with tuning.
 '''
-import unittest
+from __future__ import annotations
+
 import typing as t
+import unittest
 
 from music21 import common
 from music21 import exceptions21

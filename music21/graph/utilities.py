@@ -17,17 +17,15 @@ from __future__ import annotations
 from collections import namedtuple
 import typing as t
 import unittest
-
-import webcolors  # type: ignore
+import webcolors
 
 # TODO: Move _missingImport to environment or common so this is unnecessary.
 from music21.base import _missingImport
-
 from music21 import common
+from music21 import environment
 from music21 import exceptions21
 from music21 import pitch
 
-from music21 import environment
 environLocal = environment.Environment('graph.utilities')
 
 

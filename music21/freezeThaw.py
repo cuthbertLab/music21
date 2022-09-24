@@ -66,27 +66,27 @@ like the idea of thawing something that's frozen; "unpickling" just doesn't
 seem possible.  In any event, I needed a name that wouldn't already
 exist in the Python namespace.
 '''
+from __future__ import annotations
+
 import copy
 import io
 import os
 import pathlib
 import pickle
 import time
+import typing as t
 import unittest
 import weakref
 import zlib
 
-import typing as t
-
 from music21 import base
 from music21 import common
 from music21 import derivation
+from music21 import environment
 from music21 import exceptions21
 from music21 import spanner
 from music21 import variant
-# from music21.tree.trees import ElementTree
 
-from music21 import environment
 environLocal = environment.Environment('freezeThaw')
 
 # -----------------------------------------------------------------------------

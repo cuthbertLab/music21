@@ -13,6 +13,8 @@
 Module to translate MIDI data to music21 Streams and vice versa.  Note that quantization of
 notes takes place in the :meth:`~music21.stream.Stream.quantize` method not here.
 '''
+from __future__ import annotations
+
 from collections.abc import Sequence
 import copy
 import math
@@ -28,6 +30,7 @@ from music21 import dynamics
 from music21 import exceptions21
 from music21 import environment
 from music21 import instrument
+from music21.instrument import Conductor, UnpitchedPercussion, deduplicate
 from music21 import key
 from music21 import meter
 from music21 import note
@@ -36,7 +39,6 @@ from music21 import pitch
 from music21 import stream
 from music21 import tempo
 
-from music21.instrument import Conductor, UnpitchedPercussion, deduplicate
 from music21.midi.percussion import MIDIPercussionException, PercussionMapper
 
 environLocal = environment.Environment('midi.translate')

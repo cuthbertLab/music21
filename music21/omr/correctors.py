@@ -9,6 +9,8 @@
 # Copyright:    Copyright © 2014 Maura Church, Michael Scott Asato Cuthbert,
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
+from __future__ import annotations
+
 import copy
 import collections
 import difflib

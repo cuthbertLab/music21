@@ -25,16 +25,15 @@ import base64
 import os
 import pathlib
 import subprocess
-import unittest
-
 import typing as t
+import unittest
 
 from music21 import common
 from music21 import defaults
-from music21 import stream
-from music21 import exceptions21
-
 from music21 import environment
+from music21 import exceptions21
+from music21 import stream
+
 environLocal = environment.Environment('converter.subConverters')
 
 # pylint complains when abstract methods are not overwritten, but that's okay.

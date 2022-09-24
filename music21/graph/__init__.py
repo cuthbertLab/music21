@@ -49,6 +49,7 @@ import typing as t
 import unittest
 
 from music21 import common
+from music21 import environment
 
 from music21.graph import axis
 from music21.graph import findPlot
@@ -56,7 +57,6 @@ from music21.graph import plot
 from music21.graph import primitives
 from music21.graph import utilities
 
-from music21 import environment
 environLocal = environment.Environment('graph')
 
 

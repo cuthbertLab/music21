@@ -9,6 +9,8 @@
 # Copyright:    Copyright © 2009-2022 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # -----------------------------------------------------------------------------
+from __future__ import annotations
+
 import collections
 import fractions
 from functools import lru_cache
@@ -16,8 +18,8 @@ import re
 import typing as t
 
 from music21 import common
-from music21 import environment
 from music21.common.enums import MeterDivision
+from music21 import environment
 from music21.exceptions21 import MeterException, Music21Exception, TimeSignatureException
 
 environLocal = environment.Environment('meter.tools')

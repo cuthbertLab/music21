@@ -14,6 +14,7 @@ objects that this tag might represent.
 
 Pulled out because xmlToM21 is getting way too big.
 '''
+from __future__ import annotations
 
 class SoundTagMixin:
     pass

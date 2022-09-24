@@ -11,8 +11,10 @@
 '''
 Classes for searching for Lyric objects.
 '''
-import re
+from __future__ import annotations
+
 from collections import namedtuple, OrderedDict
+import re
 import typing as t
 import unittest
 

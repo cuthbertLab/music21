@@ -52,11 +52,11 @@ from music21 import common
 from music21.common.enums import ElementSearch, OffsetSpecial
 from music21.common.numberTools import opFrac
 from music21.common.types import OffsetQL, OffsetQLIn
-from music21 import environment
-from music21.editorial import Editorial
 from music21 import defaults
 from music21.derivation import Derivation
 from music21.duration import Duration, DurationException
+from music21.editorial import Editorial
+from music21 import environment
 from music21 import prebase
 from music21.sites import Sites, SitesException, WEAKREF_ACTIVE
 from music21.style import Style  # pylint: disable=unused-import

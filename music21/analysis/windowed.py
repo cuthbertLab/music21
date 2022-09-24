@@ -19,20 +19,21 @@ Modular analysis procedures inherit from :class:`music21.analysis.discrete.Discr
 The :class:`music21.analysis.discrete.KrumhanslSchmuckler` (for algorithmic key detection)
 and :class:`music21.analysis.discrete.Ambitus` (for pitch range analysis) classes provide examples.
 '''
+from __future__ import annotations
+
+import typing as t
 import unittest
 import warnings
-import typing as t
 
 from music21 import exceptions21
 
 from music21 import common
+from music21 import environment
 from music21 import meter
 from music21 import stream
 
 from music21.analysis.discrete import DiscreteAnalysisException
 
-
-from music21 import environment
 environLocal = environment.Environment('analysis.windowed')
 
 

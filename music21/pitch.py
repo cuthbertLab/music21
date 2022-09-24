@@ -28,15 +28,14 @@ import unittest
 
 from music21 import base
 from music21 import common
+from music21.common.objects import SlottedObjectMixin
+from music21.common.types import StepName
 from music21 import defaults
+from music21 import environment
 from music21 import exceptions21
 from music21 import interval
 from music21 import style
 from music21 import prebase
-
-from music21.common.objects import SlottedObjectMixin
-from music21.common.types import StepName
-from music21 import environment
 
 PitchType = t.TypeVar('PitchType', bound='Pitch')
 

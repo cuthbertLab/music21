@@ -12,21 +12,6 @@
 # -----------------------------------------------------------------------------
 from __future__ import annotations
 
-from collections.abc import Iterable
-import datetime
-import os
-import unittest
-import typing as t
-
-from music21 import common
-from music21 import exceptions21
-from music21 import prebase
-
-# -----------------------------------------------------------------------------
-
-
-from music21 import environment
-
 __all__ = [
     'Contributor',
     'Copyright',
@@ -40,6 +25,18 @@ __all__ = [
     'Text',
 ]
 
+from collections.abc import Iterable
+import datetime
+import os
+import typing as t
+import unittest
+
+from music21 import common
+from music21 import environment
+from music21 import exceptions21
+from music21 import prebase
+
+# -----------------------------------------------------------------------------
 
 environLocal = environment.Environment(os.path.basename(__file__))
 

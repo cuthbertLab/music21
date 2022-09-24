@@ -17,12 +17,11 @@ import pathlib
 import typing as t
 
 from music21 import common
-# from music21.corpus import virtual
 from music21.corpus import work
-from music21 import prebase
-from music21.exceptions21 import CorpusException
-
 from music21 import environment
+from music21.exceptions21 import CorpusException
+from music21 import prebase
+
 environLocal = environment.Environment(__file__)
 
 

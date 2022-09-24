@@ -12,6 +12,8 @@
 '''
 Things that are common to testing...
 '''
+from __future__ import annotations
+
 import copy
 import doctest
 import importlib

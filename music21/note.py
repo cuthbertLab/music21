@@ -19,15 +19,16 @@ from __future__ import annotations
 
 from collections.abc import Iterable, Sequence
 import copy
-import unittest
-
 import typing as t
 from typing import overload
+import unittest
 
 from music21 import base
 from music21 import beam
 from music21 import common
+from music21.common.types import StepName, OffsetQLIn
 from music21.duration import Duration
+from music21 import environment
 from music21 import exceptions21
 from music21 import expressions
 from music21 import interval
@@ -36,8 +37,7 @@ from music21 import prebase
 from music21 import style
 from music21 import tie
 from music21 import volume
-from music21.common.types import StepName, OffsetQLIn
-from music21 import environment
+
 environLocal = environment.Environment('note')
 
 noteheadTypeNames = (

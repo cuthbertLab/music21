@@ -12,17 +12,6 @@
 # -----------------------------------------------------------------------------
 from __future__ import annotations
 
-import multiprocessing
-import os
-import pathlib
-import pickle
-import traceback
-import unittest
-
-from music21 import common
-from music21 import exceptions21
-
-# -----------------------------------------------------------------------------
 __all__ = [
     'JobProcessor',
     'MetadataCachingJob',
@@ -31,8 +20,18 @@ __all__ = [
     'WorkerProcess',
 ]
 
+import multiprocessing
+import os
+import pathlib
+import pickle
+import traceback
+import unittest
 
+from music21 import common
 from music21 import environment
+from music21 import exceptions21
+
+# -----------------------------------------------------------------------------
 environLocal = environment.Environment(os.path.basename(__file__))
 # -----------------------------------------------------------------------------
 

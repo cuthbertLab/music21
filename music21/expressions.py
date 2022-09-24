@@ -22,6 +22,7 @@ For instance, TextExpressions.
 '''
 # TODO: replace .size with a string representing interval and then
 #     create interval.Interval objects only when necessary.
+from __future__ import annotations
 
 import copy
 import string

@@ -25,6 +25,7 @@ import unittest
 
 from music21 import common
 from music21 import environment
+
 environLocal = environment.Environment('corpus.virtual')
 
 

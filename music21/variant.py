@@ -20,6 +20,8 @@ and showing different variant streams. These functions and the variant class sho
 used when variants of a score are the same length and contain the same measure structure at
 this time.
 '''
+from __future__ import annotations
+
 from collections.abc import Sequence
 import copy
 import difflib

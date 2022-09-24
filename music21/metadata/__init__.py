@@ -131,6 +131,12 @@ the string.  See metadata/primitives.py for more information.
 '''
 from __future__ import annotations
 
+__all__ = [
+    'Metadata',
+    'RichMetadata',
+    'AmbitusShort',
+]
+
 from collections import namedtuple
 from collections.abc import Iterable
 import copy
@@ -144,10 +150,10 @@ import unittest
 
 from music21 import base
 from music21 import common
-from music21 import defaults
-from music21 import exceptions21
 from music21.common import deprecated
-
+from music21 import defaults
+from music21 import environment
+from music21 import exceptions21
 
 from music21.metadata import properties
 from music21.metadata.properties import PropertyDescription
@@ -159,14 +165,6 @@ from music21.metadata.primitives import (Date, DatePrimitive,
                                          DateSelection, Text, Contributor, Creator,
                                          Imprint, Copyright, ValueType)
 # -----------------------------------------------------------------------------
-
-__all__ = [
-    'Metadata',
-    'RichMetadata',
-    'AmbitusShort',
-]
-
-from music21 import environment
 environLocal = environment.Environment(os.path.basename(__file__))
 
 AmbitusShort = namedtuple('AmbitusShort',

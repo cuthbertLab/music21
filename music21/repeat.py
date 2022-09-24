@@ -16,17 +16,19 @@ This module provides the base class for all RepeatMark objects: entities that de
 Some RepeatMark objects are Expression objects; others are Bar objects. See for instance,
 the :class:`~music21.bar.Repeat` which represents a normal barline repeat.
 '''
+from __future__ import annotations
+
 import copy
 import string
 import typing as t
 
+from music21 import environment
 from music21 import exceptions21
 from music21 import expressions
 from music21 import prebase
 from music21 import spanner
 from music21 import style
 
-from music21 import environment
 environLocal = environment.Environment('repeat')
 
 

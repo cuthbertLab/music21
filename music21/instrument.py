@@ -21,6 +21,8 @@ or instrument family, such as string pitches, etc.  Information about instrument
 ensembles is also included here though it may later be separated out into its own
 ensemble.py module.
 '''
+from __future__ import annotations
+
 from collections import OrderedDict
 from collections.abc import Iterable
 import importlib
@@ -29,14 +31,13 @@ import typing as t
 
 from music21 import base
 from music21 import common
+from music21 import environment
+from music21.exceptions21 import InstrumentException
 from music21 import interval
 from music21 import note
 from music21 import pitch
 from music21.tree.trees import OffsetTree
 
-from music21.exceptions21 import InstrumentException
-
-from music21 import environment
 environLocal = environment.Environment('instrument')
 
 

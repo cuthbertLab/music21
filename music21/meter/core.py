@@ -13,6 +13,8 @@
 This module defines two component objects for defining nested metrical structures:
 :class:`~music21.meter.core.MeterTerminal` and :class:`~music21.meter.core.MeterSequence`.
 '''
+from __future__ import annotations
+
 import copy
 import typing as t
 

@@ -9,8 +9,11 @@
 # Copyright:    Copyright © 2013-2020 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
+from __future__ import annotations
+
 import copy
 from xml.etree.ElementTree import tostring as et_tostring
+
 from music21 import meter
 
 def dumpString(obj, *, noCopy=False) -> str:

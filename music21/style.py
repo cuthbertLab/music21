@@ -13,6 +13,8 @@
 The style module represents information about the style of a Note, Accidental,
 etc. such that precise positioning information, layout, size, etc. can be specified.
 '''
+from __future__ import annotations
+
 import typing as t
 import unittest
 
