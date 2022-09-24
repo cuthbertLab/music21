@@ -18,6 +18,7 @@ import collections
 from collections.abc import Generator, MutableMapping
 import typing as t
 from typing import overload  # for some reason does not work in PyCharm if not directly imported
+from typing import TYPE_CHECKING  # pylint needs no alias
 import unittest
 import weakref
 
@@ -26,7 +27,7 @@ from music21 import exceptions21
 from music21 import prebase
 
 
-if t.TYPE_CHECKING:
+if TYPE_CHECKING:
     from music21 import stream
 
 

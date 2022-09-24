@@ -43,7 +43,8 @@ import copy
 import fractions  # for type annotation only
 from importlib.util import find_spec
 import typing as t
-from typing import overload
+from typing import overload  # Pycharm can't do alias
+from typing import TYPE_CHECKING  # pylint needs no alias
 import unittest
 import warnings
 import weakref
@@ -66,7 +67,7 @@ from music21.sorting import SortTuple, ZeroSortTupleLow, ZeroSortTupleHigh
 # needed for temporal manipulations; not music21 objects
 from music21 import tie
 
-if t.TYPE_CHECKING:
+if TYPE_CHECKING:
     from music21 import stream
     from music21 import spanner
 

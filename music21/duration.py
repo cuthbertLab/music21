@@ -1297,7 +1297,7 @@ class Tuplet(prebase.ProtoM21Object):
         self.numberNotesActual = actual
         self.numberNotesNormal = normal
 
-    def totalTupletLength(self):
+    def totalTupletLength(self) -> OffsetQL:
         '''
         The total duration in quarter length of the tuplet as defined,
         assuming that enough notes existed to fill all entire tuplet as defined.

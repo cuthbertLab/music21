@@ -26,6 +26,7 @@ from __future__ import annotations
 import copy
 from fractions import Fraction
 import typing as t
+from typing import TYPE_CHECKING  # pylint needs no alias
 import unittest
 
 from music21.base import Music21Object
@@ -38,7 +39,7 @@ from music21.exceptions21 import StreamException, ImmutableStreamException
 from music21.stream.iterator import StreamIterator, RecursiveIterator
 
 
-if t.TYPE_CHECKING:
+if TYPE_CHECKING:
     from music21.stream import Stream
 
 

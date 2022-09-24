@@ -27,6 +27,7 @@ import enum
 import math
 import re
 import typing as t
+from typing import TYPE_CHECKING  # pylint needs no alias
 
 from music21 import base
 from music21 import common
@@ -36,7 +37,7 @@ from music21 import environment
 from music21 import exceptions21
 
 
-if t.TYPE_CHECKING:
+if TYPE_CHECKING:
     from music21 import key
     from music21 import note
     from music21 import pitch
@@ -1493,7 +1494,7 @@ class GenericInterval(IntervalBase):
 
         Does not take into account harmonic or melodic minor.
         '''
-        from music21 import pitch  # pylint: disable=redefined-outer-name  # only in TYPE_CHECKING
+        from music21 import pitch
 
         if k is None:
             return self.transposePitch(p, inPlace=inPlace)
@@ -3081,7 +3082,7 @@ class Interval(IntervalBase):
         self.intervalType: t.Literal['harmonic', 'melodic', ''] = ''
 
     def _reprInternal(self):
-        from music21 import pitch  # pylint: disable=redefined-outer-name  # only in TYPE_CHECKING
+        from music21 import pitch
         try:
             shift = self._diatonicIntervalCentShift()
         except AttributeError:
@@ -3919,7 +3920,7 @@ def add(intervalList):
     >>> interval.add([P5, 'P-4'])
     <music21.interval.Interval M2>
     '''
-    from music21 import pitch  # pylint: disable=redefined-outer-name  # only in TYPE_CHECKING
+    from music21 import pitch
     if not intervalList:
         raise IntervalException('Cannot add an empty set of intervals')
 
@@ -3967,7 +3968,7 @@ def subtract(intervalList):
     -1
 
     '''
-    from music21 import pitch  # pylint: disable=redefined-outer-name  # only in TYPE_CHECKING
+    from music21 import pitch
     if not intervalList:
         raise IntervalException('Cannot add an empty set of intervals')
 

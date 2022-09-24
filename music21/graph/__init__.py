@@ -46,6 +46,7 @@ __all__ = [
 ]
 
 import typing as t
+from typing import TYPE_CHECKING  # pylint needs no alias
 import unittest
 
 from music21 import common
@@ -58,7 +59,7 @@ from music21.graph import primitives
 from music21.graph import utilities
 
 
-if t.TYPE_CHECKING:
+if TYPE_CHECKING:
     from music21 import stream
 
 
@@ -184,7 +185,7 @@ class Test(unittest.TestCase):
     def testPlotChordsC(self):
         from music21 import dynamics
         from music21 import note
-        from music21 import stream  # pylint: disable=redefined-outer-name  # only in TYPE_CHECKING
+        from music21 import stream
         from music21 import scale
 
         sc = scale.MajorScale('c4')
@@ -219,7 +220,7 @@ class Test(unittest.TestCase):
     def testHorizontalInstrumentationB(self):
         from music21 import corpus
         from music21 import dynamics
-        from music21 import stream  # pylint: disable=redefined-outer-name  # only in TYPE_CHECKING
+        from music21 import stream
         s = corpus.parse('bwv66.6')
         dyn = ['p', 'mf', 'f', 'ff', 'mp', 'fff', 'ppp']
         i = 0

@@ -19,7 +19,8 @@ from __future__ import annotations
 from collections.abc import Callable, Iterable, Sequence
 import copy
 import typing as t
-from typing import overload
+from typing import overload  # PyCharm can't use alias
+from typing import TYPE_CHECKING  # pylint needs no alias
 import unittest
 import warnings
 
@@ -35,7 +36,7 @@ from music21 import base   # just for typing.
 
 from music21.sites import SitesException
 
-if t.TYPE_CHECKING:
+if TYPE_CHECKING:
     from music21 import stream
 
 T = t.TypeVar('T')

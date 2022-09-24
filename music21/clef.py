@@ -20,6 +20,7 @@ from __future__ import annotations
 
 from collections.abc import Iterable, Sequence
 import typing as t
+from typing import TYPE_CHECKING  # pylint needs no alias
 import unittest
 
 from music21 import base
@@ -29,7 +30,7 @@ from music21 import pitch  # for typing only
 from music21 import style
 
 
-if t.TYPE_CHECKING:
+if TYPE_CHECKING:
     from music21 import stream
 
 

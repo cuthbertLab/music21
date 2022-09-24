@@ -27,6 +27,7 @@ from __future__ import annotations
 import copy
 import string
 import typing as t
+from typing import TYPE_CHECKING  # pylint needs no alias
 
 from music21 import base
 from music21 import common
@@ -37,7 +38,7 @@ from music21 import spanner
 from music21 import style
 
 
-if t.TYPE_CHECKING:
+if TYPE_CHECKING:
     from music21 import note
 
 
@@ -1593,7 +1594,7 @@ class ArpeggioMarkSpanner(spanner.Spanner):
         (<music21.note.Note C#>, <music21.note.Note G>)
         '''
         from music21 import chord
-        from music21 import note  # pylint: disable=redefined-outer-name
+        from music21 import note
         notes = []
         for n_or_ch in self:
             if isinstance(n_or_ch, note.Note):

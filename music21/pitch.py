@@ -23,7 +23,8 @@ import copy
 import itertools
 import math
 import typing as t
-from typing import overload
+from typing import TYPE_CHECKING  # pylint needs no alias
+from typing import overload  # Pycharm can't use an alias
 import unittest
 
 from music21 import base
@@ -37,7 +38,7 @@ from music21 import interval
 from music21 import prebase
 from music21 import style
 
-if t.TYPE_CHECKING:
+if TYPE_CHECKING:
     from music21 import note
 
 PitchType = t.TypeVar('PitchType', bound='Pitch')
@@ -5224,7 +5225,7 @@ class Pitch(prebase.ProtoM21Object):
 
         '''
         # Takes in a chord, finds the interval between the notes
-        from music21 import note  # pylint: disable=redefined-outer-name  # only in TYPE_CHECKING
+        from music21 import note
         from music21 import chord
 
         pitchList = chordIn.pitches

@@ -15,8 +15,8 @@ from __future__ import annotations
 
 from collections.abc import Iterable, Generator
 import copy
-from fractions import Fraction  # typing only
 import typing as t
+from typing import TYPE_CHECKING  # pylint needs no alias
 import unittest
 
 from music21 import beam
@@ -36,7 +36,7 @@ from music21.common.types import StreamType, OffsetQL
 from music21.exceptions21 import StreamException
 
 
-if t.TYPE_CHECKING:
+if TYPE_CHECKING:
     from music21 import stream
     from music21.stream.iterator import StreamIterator
 
@@ -865,12 +865,12 @@ def makeRests(
     def oHighTargetForMeasure(
         m: t.Optional[stream.Measure] = None,
         ts: t.Optional[meter.TimeSignature] = None
-    ) -> t.Union[float, Fraction]:
+    ) -> OffsetQL:
         '''
         Needed for timeRangeFromBarDuration.
         Returns 0.0 if no meter can be found.
         '''
-        post: t.Union[float, Fraction] = 0.0
+        post: OffsetQL = 0.0
         if ts is not None:
             post = ts.barDuration.quarterLength
         elif m is not None:
@@ -1394,8 +1394,8 @@ def makeTupletBrackets(s: StreamType, *, inPlace=False) -> t.Optional[StreamType
             tupletMap.append((tupletList[0], dur))
 
     # have a list of tuplet, Duration pairs
-    completionCount: t.Union[float, int, Fraction] = 0  # qLen currently filled
-    completionTarget: t.Union[float, int, Fraction, None] = None  # qLen necessary to fill tuplet
+    completionCount: OffsetQL = 0.0  # qLen currently filled
+    completionTarget: t.Optional[OffsetQL] = None  # qLen necessary to fill tuplet
     for i in range(len(tupletMap)):
         tupletObj, dur = tupletMap[i]
 
@@ -1426,7 +1426,7 @@ def makeTupletBrackets(s: StreamType, *, inPlace=False) -> t.Optional[StreamType
                 if tupletNext is None:  # single tuplet w/o tuplets either side
                     tupletObj.type = 'startStop'
                     tupletObj.bracket = False
-                    completionCount = 0  # reset
+                    completionCount = 0.0  # reset
                 else:
                     tupletObj.type = 'start'
                     # get total quarter length of this tuplet
@@ -1444,7 +1444,7 @@ def makeTupletBrackets(s: StreamType, *, inPlace=False) -> t.Optional[StreamType
             elif tupletNext is None or completionCount >= completionTarget:
                 tupletObj.type = 'stop'  # should be impossible once frozen...
                 completionTarget = None  # reset
-                completionCount = 0  # reset
+                completionCount = 0.0  # reset
                 # environLocal.printDebug(['stopping tuplet type, value:',
                 #                          tuplet, tuplet.type])
                 # environLocal.printDebug(['completion count, target:',
@@ -1557,7 +1557,7 @@ def moveNotesToVoices(source: StreamType,
 
 
 def getTiePitchSet(prior: 'music21.note.NotRest') -> t.Optional[set[str]]:
-    # noinspection PyShadowingNames
+    # noinspection PyShadowingNames,PyTypeChecker
     '''
     helper method for makeAccidentals to get the tie pitch set (or None)
     from the prior

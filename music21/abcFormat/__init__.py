@@ -60,6 +60,7 @@ from collections.abc import Sequence
 import io
 import re
 import typing as t
+from typing import TYPE_CHECKING  # pylint needs no alias
 import unittest
 
 from music21 import common
@@ -69,7 +70,7 @@ from music21 import prebase
 
 from music21.abcFormat import translate
 
-if t.TYPE_CHECKING:
+if TYPE_CHECKING:
     from music21 import bar
     from music21 import clef
     from music21 import duration
