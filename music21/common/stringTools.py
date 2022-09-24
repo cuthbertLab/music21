@@ -12,6 +12,8 @@
 '''
 Tools for working with strings
 '''
+from __future__ import annotations
+
 __all__ = [
     'whitespaceEqual',
     'getNumFromStr',
@@ -31,8 +33,6 @@ import re
 import time
 import string
 import unicodedata
-
-import typing as t
 
 # ------------------------------------------------------------------------------
 WHITESPACE = re.compile(r'\s+')

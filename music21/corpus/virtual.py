@@ -19,8 +19,8 @@ TURNED OFF in 2017 -- to be recreated with a bigger test set.
 
 TODO: Demonstrate with JRP.
 '''
+from __future__ import annotations
 
-import typing as t
 import unittest
 
 from music21 import common

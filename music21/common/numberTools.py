@@ -9,15 +9,17 @@
 # Copyright:    Copyright © 2009-2022 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
+from __future__ import annotations
+
+from collections.abc import Iterable, Sequence
+from fractions import Fraction
 from functools import lru_cache
 import math
+from math import isclose, gcd
 import numbers
 import random
-import unittest
 import typing as t
-
-from fractions import Fraction
-from math import isclose, gcd
+import unittest
 
 from music21 import defaults
 from music21.common import deprecated
@@ -673,7 +675,7 @@ def decimalToTuplet(decNum: float) -> tuple[int, int]:
         return (int(iy), int(jy))
 
 
-def unitNormalizeProportion(values: t.Sequence[t.Union[int, float]]) -> list[float]:
+def unitNormalizeProportion(values: Sequence[t.Union[int, float]]) -> list[float]:
     '''
     Normalize values within the unit interval, where max is determined by the sum of the series.
 
@@ -712,7 +714,7 @@ def unitNormalizeProportion(values: t.Sequence[t.Union[int, float]]) -> list[flo
 
 
 def unitBoundaryProportion(
-    series: t.Sequence[t.Union[int, float]]
+    series: Sequence[t.Union[int, float]]
 ) -> list[tuple[t.Union[int, float], float]]:
     '''
     Take a series of parts with an implied sum, and create
@@ -851,7 +853,7 @@ def approximateGCD(values: list[t.Union[int, float]], grain: float = 1e-4) -> fl
     return max(commonUniqueDivisions)
 
 
-def lcm(filterList: t.Iterable[int]) -> int:
+def lcm(filterList: Iterable[int]) -> int:
     '''
     Find the least common multiple of a list of values
 

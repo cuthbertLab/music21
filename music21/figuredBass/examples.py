@@ -19,6 +19,7 @@ object which can generate realizations as instances of
 in external software such as MuseScore or Finale by
 calling :meth:`~music21.base.Music21Object.show`.
 '''
+from __future__ import annotations
 
 import copy
 import unittest

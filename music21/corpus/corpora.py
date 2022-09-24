@@ -9,8 +9,10 @@
 #               Project
 # License:      BSD, see license.txt
 # -----------------------------------------------------------------------------
+from __future__ import annotations
 
 import abc
+from collections.abc import Sequence
 import pathlib
 import typing as t
 
@@ -45,7 +47,7 @@ class Corpus(prebase.ProtoM21Object):
 
     _pathsCache: dict[tuple[str, tuple[str]], pathlib.Path] = {}
 
-    _directoryInformation: t.Union[tuple[()], t.Sequence[tuple[str, str, bool]]] = ()
+    _directoryInformation: t.Union[tuple[()], Sequence[tuple[str, str, bool]]] = ()
 
     parseUsingCorpus = True
 

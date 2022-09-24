@@ -16,7 +16,7 @@ StreamIterators are explicitly allowed to access private methods on streams.
 '''
 from __future__ import annotations
 
-from collections.abc import Callable
+from collections.abc import Callable, Iterable, Sequence
 import copy
 import typing as t
 from typing import overload
@@ -39,7 +39,7 @@ T = t.TypeVar('T')
 S = t.TypeVar('S')
 ChangedM21ObjType = t.TypeVar('ChangedM21ObjType', bound=base.Music21Object)
 StreamIteratorType = t.TypeVar('StreamIteratorType', bound='StreamIterator')
-FilterType = t.Union[set, filters.StreamFilter]
+FilterType = t.Union[Callable[[t.Any, t.Optional[t.Any]], t.Any], filters.StreamFilter]
 
 # -----------------------------------------------------------------------------
 
@@ -62,7 +62,7 @@ class ActiveInformation(t.TypedDict, total=False):
 
 
 # -----------------------------------------------------------------------------
-class StreamIterator(prebase.ProtoM21Object, t.Sequence[M21ObjType]):
+class StreamIterator(prebase.ProtoM21Object, Sequence[M21ObjType]):
     '''
     An Iterator object used to handle getting items from Streams.
     The :meth:`~music21.stream.Stream.__iter__` method
@@ -749,7 +749,7 @@ class StreamIterator(prebase.ProtoM21Object, t.Sequence[M21ObjType]):
         '''
         returns False if any filter returns False, True otherwise.
         '''
-        f: t.Union[Callable[[t.Any, t.Optional[t.Any]], t.Any], filters.StreamFilter]
+        f: FilterType
         for f in self.filters:
             try:
                 try:
@@ -1002,7 +1002,7 @@ class StreamIterator(prebase.ProtoM21Object, t.Sequence[M21ObjType]):
 
     @overload
     def getElementsByClass(self,
-                           classFilterList: t.Iterable[str],
+                           classFilterList: Iterable[str],
                            *,
                            returnClone: bool = True) -> StreamIterator[M21ObjType]:
         x: StreamIterator[M21ObjType] = self.__class__(self.streamObj)
@@ -1027,7 +1027,7 @@ class StreamIterator(prebase.ProtoM21Object, t.Sequence[M21ObjType]):
 
     @overload
     def getElementsByClass(self,
-                           classFilterList: t.Iterable[type],
+                           classFilterList: Iterable[type],
                            *,
                            returnClone: bool = True) -> StreamIterator[M21ObjType]:
         # putting multiple types into classFilterList, defaults to the previous type
@@ -1040,8 +1040,8 @@ class StreamIterator(prebase.ProtoM21Object, t.Sequence[M21ObjType]):
         classFilterList: t.Union[
             str,
             type[ChangedM21ObjType],
-            t.Iterable[str],
-            t.Iterable[type],
+            Iterable[str],
+            Iterable[type],
         ],
         *,
         returnClone: bool = True
@@ -1529,7 +1529,7 @@ class StreamIterator(prebase.ProtoM21Object, t.Sequence[M21ObjType]):
 
 
 # -----------------------------------------------------------------------------
-class OffsetIterator(StreamIterator, t.Sequence[list[M21ObjType]]):
+class OffsetIterator(StreamIterator, Sequence[list[M21ObjType]]):
     '''
     An iterator that with each iteration returns a list of elements
     that are at the same offset (or all at end)
@@ -1649,7 +1649,7 @@ class OffsetIterator(StreamIterator, t.Sequence[list[M21ObjType]]):
 
     @overload
     def getElementsByClass(self,
-                           classFilterList: t.Iterable[str],
+                           classFilterList: Iterable[str],
                            *,
                            returnClone: bool = True) -> OffsetIterator[M21ObjType]:
         x: OffsetIterator[M21ObjType] = self.__class__(self.streamObj)
@@ -1674,7 +1674,7 @@ class OffsetIterator(StreamIterator, t.Sequence[list[M21ObjType]]):
 
     @overload
     def getElementsByClass(self,
-                           classFilterList: t.Iterable[type],
+                           classFilterList: Iterable[type],
                            *,
                            returnClone: bool = True) -> OffsetIterator[M21ObjType]:
         x: OffsetIterator[M21ObjType] = self.__class__(self.streamObj)
@@ -1685,8 +1685,8 @@ class OffsetIterator(StreamIterator, t.Sequence[list[M21ObjType]]):
                            classFilterList: t.Union[
                                str,
                                type[ChangedM21ObjType],
-                               t.Iterable[str],
-                               t.Iterable[type],
+                               Iterable[str],
+                               Iterable[type],
                            ],
                            *,
                            returnClone: bool = True
@@ -1701,7 +1701,7 @@ class OffsetIterator(StreamIterator, t.Sequence[list[M21ObjType]]):
 
 
 # -----------------------------------------------------------------------------
-class RecursiveIterator(StreamIterator, t.Sequence[M21ObjType]):
+class RecursiveIterator(StreamIterator, Sequence[M21ObjType]):
     '''
     One of the most powerful iterators in music21.  Generally not called
     directly, but created by being invoked on a stream with `Stream.recurse()`
@@ -2060,7 +2060,7 @@ class RecursiveIterator(StreamIterator, t.Sequence[M21ObjType]):
 
     @overload
     def getElementsByClass(self,
-                           classFilterList: t.Iterable[str],
+                           classFilterList: Iterable[str],
                            *,
                            returnClone: bool = True) -> RecursiveIterator[M21ObjType]:
         x: RecursiveIterator[M21ObjType] = self.__class__(self.streamObj)
@@ -2084,7 +2084,7 @@ class RecursiveIterator(StreamIterator, t.Sequence[M21ObjType]):
 
     @overload
     def getElementsByClass(self,
-                           classFilterList: t.Iterable[type],
+                           classFilterList: Iterable[type],
                            *,
                            returnClone: bool = True) -> RecursiveIterator[M21ObjType]:
         x: RecursiveIterator[M21ObjType] = self.__class__(self.streamObj)
@@ -2095,8 +2095,8 @@ class RecursiveIterator(StreamIterator, t.Sequence[M21ObjType]):
                            classFilterList: t.Union[
                                str,
                                type[ChangedM21ObjType],
-                               t.Iterable[str],
-                               t.Iterable[type[ChangedM21ObjType]],
+                               Iterable[str],
+                               Iterable[type[ChangedM21ObjType]],
                            ],
                            *,
                            returnClone: bool = True

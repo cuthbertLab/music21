@@ -264,7 +264,7 @@ class PickleFilter:
                  forceSource: bool = False,
                  number: t.Optional[int] = None,
                  # quantizePost: bool = False,
-                 # quarterLengthDivisors: t.Optional[t.Iterable[int]] = None,
+                 # quarterLengthDivisors: t.Optional[Iterable[int]] = None,
                  **keywords):
         self.fp: pathlib.Path = common.cleanpath(fp, returnPathlib=True)
         self.forceSource: bool = forceSource

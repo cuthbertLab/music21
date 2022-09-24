@@ -12,7 +12,6 @@
 Chord utilities too obscure to go on the Chord object, yet still helpful
 enough to go in the music21 core library.
 '''
-
 from __future__ import annotations
 
 import typing as t

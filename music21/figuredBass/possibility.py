@@ -66,7 +66,8 @@ The application of these methods is controlled by corresponding instance variabl
 .. note:: The number of parts and maxPitch are universal for a
     :class:`~music21.figuredBass.realizer.FiguredBassLine`.
 '''
-import typing as t
+from __future__ import annotations
+
 import unittest
 
 from music21 import chord

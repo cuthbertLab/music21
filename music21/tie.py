@@ -9,13 +9,14 @@
 # Copyright:    Copyright © 2009-2022 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
-
 '''
 The `tie` module contains a single class, `Tie` that represents the visual and
 conceptual idea of tied notes.  They can be start or stop ties.
 '''
-import typing as t
+from __future__ import annotations
+
 import unittest
+
 from music21 import exceptions21
 from music21.common.objects import SlottedObjectMixin
 from music21 import prebase

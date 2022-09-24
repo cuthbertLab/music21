@@ -14,10 +14,13 @@
 '''
 Object for dealing with vertical simultaneities in a fast way w/o Chord's overhead.
 '''
+from __future__ import annotations
+
+from collections.abc import Iterable, Sequence
 import copy
 import itertools
-import unittest
 import typing as t
+import unittest
 
 from music21 import chord
 from music21 import common
@@ -1113,14 +1116,14 @@ class Verticality(prebase.ProtoM21Object):
 # -----------------------------------------------------------------------------
 
 
-class VerticalitySequence(prebase.ProtoM21Object, t.Sequence[Verticality]):
+class VerticalitySequence(prebase.ProtoM21Object, Sequence[Verticality]):
     r'''
     A segment of verticalities.
     '''
 
     # INITIALIZER #
 
-    def __init__(self, verticalities: t.Iterable[Verticality]):
+    def __init__(self, verticalities: Iterable[Verticality]):
         self._verticalities = tuple(verticalities)
 
     # SPECIAL METHODS #

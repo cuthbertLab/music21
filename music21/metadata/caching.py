@@ -10,12 +10,13 @@
 #               Project
 # License:      BSD, see license.txt
 # -----------------------------------------------------------------------------
+from __future__ import annotations
+
 import multiprocessing
 import os
 import pathlib
 import pickle
 import traceback
-import typing as t
 import unittest
 
 from music21 import common

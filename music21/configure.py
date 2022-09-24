@@ -18,9 +18,7 @@ import unittest
 import textwrap
 import webbrowser
 
-import typing as t
-
-from importlib import reload  # Python 3.4
+from importlib import reload
 
 # assume that we will manually add this dir to sys.path top get access to
 # all modules before installation

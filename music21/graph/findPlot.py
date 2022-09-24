@@ -12,6 +12,8 @@
 '''
 Functions that find appropriate plots for graph.plot.
 '''
+from __future__ import annotations
+
 import collections
 import types
 import unittest

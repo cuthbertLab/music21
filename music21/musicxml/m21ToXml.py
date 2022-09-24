@@ -2625,7 +2625,7 @@ class PartExporter(XMLExporterBase):
     '''
     Object to convert one Part stream to a <part> tag on .parse()
     '''
-    _DOC_ATTR: t.Mapping[str, str] = {
+    _DOC_ATTR: dict[str, str] = {
         'previousPartStaffInGroup': '''
             If the part being exported is a :class:`~music21.stream.base.PartStaff`,
             this attribute will be used to store the immediately previous `PartStaff`

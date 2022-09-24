@@ -24,6 +24,8 @@ possibilities formed around the same chord. If provided with additional
 arguments, the methods only :meth:`~music21.pitch.Pitch.transpose` each
 :class:`~music21.pitch.Pitch` in a possibility by the appropriate interval.
 '''
+from __future__ import annotations
+
 import unittest
 import typing as t
 

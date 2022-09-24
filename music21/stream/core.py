@@ -24,8 +24,8 @@ All functions here will eventually begin with `.core`.
 from __future__ import annotations
 
 import copy
-import typing as t
 from fractions import Fraction
+import typing as t
 import unittest
 
 from music21.base import Music21Object

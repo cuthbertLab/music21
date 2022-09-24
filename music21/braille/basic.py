@@ -9,9 +9,9 @@
 # Copyright:    Copyright © 2011-22 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
+from __future__ import annotations
 
 import unittest
-import typing as t
 
 # from music21 import articulations
 from music21 import articulations

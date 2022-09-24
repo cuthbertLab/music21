@@ -18,6 +18,8 @@ object subclasses combine a Graph object with the PlotStreamMixin to give
 reusable approaches to graphing data and structures in
 :class:`~music21.stream.Stream` objects.
 '''
+from __future__ import annotations
+
 import collections
 import os
 import pathlib

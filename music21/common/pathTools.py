@@ -9,6 +9,8 @@
 # Copyright:    Copyright © 2009-2015 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
+from __future__ import annotations
+
 __all__ = [
     'getRootFilePath',
     'getSourceFilePath',

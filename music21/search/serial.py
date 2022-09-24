@@ -9,10 +9,11 @@
 # Copyright:    Copyright © 2009-2012, 2016 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # -------------------------------------------------
+from __future__ import annotations
+
 from collections import Counter
 import copy
 from operator import attrgetter
-import typing as t
 import unittest
 
 from music21 import base

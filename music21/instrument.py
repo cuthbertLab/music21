@@ -21,9 +21,10 @@ or instrument family, such as string pitches, etc.  Information about instrument
 ensembles is also included here though it may later be separated out into its own
 ensemble.py module.
 '''
+from collections import OrderedDict
+from collections.abc import Iterable
 import importlib
 import unittest
-from collections import OrderedDict
 import typing as t
 
 from music21 import base
@@ -1869,7 +1870,7 @@ def deduplicate(s: 'music21.stream.Stream', inPlace: bool = False) -> 'music21.s
         returnObj = s.coreCopyAsDerivation('instrument.deduplicate')
 
     if not returnObj.hasPartLikeStreams():
-        substreams: t.Iterable[stream.Stream] = [returnObj]
+        substreams: Iterable[stream.Stream] = [returnObj]
     else:
         substreams = returnObj.getElementsByClass(stream.Stream)
 
@@ -2236,7 +2237,7 @@ def partitionByInstrument(streamObj: 'music21.stream.Stream') -> 'music21.stream
     if not instrumentIterator:
         return s  # no partition is available
 
-    names: t.OrderedDict[str, dict[str, t.Any]] = OrderedDict()  # store unique names
+    names: OrderedDict[str, dict[str, t.Any]] = OrderedDict()  # store unique names
     for instrumentObj in instrumentIterator:
         # matching here by instrument name
         if instrumentObj.instrumentName not in names:

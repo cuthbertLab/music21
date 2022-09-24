@@ -16,8 +16,9 @@ This module stores numerous data lists used in deriving set-class values and oth
 chord representations. All features of this module are made available through
 :class:`~music21.chord.Chord` objects. Use of this module directly is thus not necessary.
 '''
+from __future__ import annotations
+
 from collections import namedtuple
-import typing as t
 import unittest
 
 from music21 import environment

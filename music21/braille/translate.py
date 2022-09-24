@@ -89,10 +89,11 @@ memorization" (BMTM, 71). Some of these keywords are changed automatically in co
     there is a choice fingering (i.e. 5|4), the upper
     number is transcribed before the lower number. If False, the reverse is the case.
 '''
-import re
-import unittest
+from __future__ import annotations
 
+import re
 import typing as t
+import unittest
 
 from music21 import base
 from music21 import exceptions21

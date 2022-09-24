@@ -11,6 +11,7 @@
 '''
 Writer for the 'RomanText' format (Tymoczko, Gotham, Cuthbert, & Ariza ISMIR 2019)
 '''
+from __future__ import annotations
 
 import fractions
 import textwrap

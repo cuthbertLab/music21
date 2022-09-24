@@ -18,7 +18,6 @@ import os
 import pathlib
 import pickle
 import time
-import typing as t
 import unittest
 
 from collections import OrderedDict
@@ -267,7 +266,7 @@ class MetadataBundle(prebase.ProtoM21Object):
 
     def __init__(self, expr=None):
         from music21 import corpus
-        self._metadataEntries: t.OrderedDict[str, MetadataEntry] = OrderedDict()
+        self._metadataEntries: OrderedDict[str, MetadataEntry] = OrderedDict()
         if not isinstance(expr, (str, corpus.corpora.Corpus, type(None))):
             raise MetadataBundleException('Need to take a string, corpus, or None as expression')
 

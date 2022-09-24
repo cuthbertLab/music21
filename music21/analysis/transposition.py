@@ -8,7 +8,9 @@
 # Copyright:    Copyright © 2017 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
-import typing as t
+from __future__ import annotations
+
+from collections.abc import Iterable
 import unittest
 
 from music21 import common
@@ -51,7 +53,7 @@ class TranspositionChecker:
      <music21.chord.Chord C# E G A#>,
      <music21.chord.Chord D F G# B>]
     '''
-    def __init__(self, pitches: t.Iterable[pitch.Pitch] = ()):
+    def __init__(self, pitches: Iterable[pitch.Pitch] = ()):
         if not pitches:
             raise TranspositionException(
                 'Must have at least one element in list'
@@ -61,7 +63,7 @@ class TranspositionChecker:
         # p0 = pitches[0]
         # if not isinstance(p0, pitch.Pitch):
         #     raise TranspositionException('List must have pitch objects')
-        self.pitches: t.Iterable[pitch.Pitch] = pitches
+        self.pitches: Iterable[pitch.Pitch] = pitches
         self.allTranspositions: list = []
         self.allNormalOrders: list = []
         self.distinctNormalOrders: list = []

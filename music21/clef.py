@@ -5,12 +5,10 @@
 #
 # Authors:      Michael Scott Asato Cuthbert
 #               Christopher Ariza
+#               Michael Bodenbach
 #
-# Copyright:    Copyright © 2009-2012 Michael Scott Asato Cuthbert
+# Copyright:    Copyright © 2009-2022 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
-#
-# Changes:      04 March 2014 by Michael Bodenbach
-#               - TabClef added
 # ------------------------------------------------------------------------------
 '''
 This module defines numerous subclasses of
@@ -18,8 +16,11 @@ This module defines numerous subclasses of
 commonly used clefs. Clef objects are often found
 within :class:`~music21.stream.Measure` objects.
 '''
-import unittest
+from __future__ import annotations
+
+from collections.abc import Iterable, Sequence
 import typing as t
+import unittest
 
 from music21 import base
 from music21 import exceptions21
@@ -184,7 +185,7 @@ class Clef(base.Music21Object):
 
     def getStemDirectionForPitches(
         self,
-        pitches: t.Union[pitch.Pitch, t.Sequence[pitch.Pitch]],
+        pitches: t.Union[pitch.Pitch, Sequence[pitch.Pitch]],
         *,
         firstLastOnly: bool = True,
         extremePitchOnly: bool = False,
@@ -227,12 +228,12 @@ class Clef(base.Music21Object):
         >>> bc.getStemDirectionForPitches(pitchList, extremePitchOnly=True)
         'up'
         '''
-        pitchList: t.Sequence[pitch.Pitch]
+        pitchList: Sequence[pitch.Pitch]
         if isinstance(pitches, pitch.Pitch):
             pitchList = [pitches]
         else:
             pitchList = pitches
-        relevantPitches: t.Sequence[pitch.Pitch]
+        relevantPitches: Sequence[pitch.Pitch]
 
         if not pitchList:
             raise ValueError('getStemDirectionForPitches cannot operate on an empty list')
@@ -397,7 +398,7 @@ class TabClef(PitchClef):
 
     def getStemDirectionForPitches(
         self,
-        pitchList: t.Union[pitch.Pitch, t.Iterable[pitch.Pitch]],
+        pitchList: t.Union[pitch.Pitch, Iterable[pitch.Pitch]],
         *,
         firstLastOnly: bool = True,
         extremePitchOnly: bool = False,

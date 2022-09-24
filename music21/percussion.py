@@ -10,7 +10,9 @@
 # Copyright:    Copyright © 2006-2019 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
+from __future__ import annotations
 
+from collections.abc import Iterable
 import typing as t
 import unittest
 
@@ -68,7 +70,7 @@ class PercussionChord(chord.ChordBase):
         return tuple(self._notes)
 
     @notes.setter
-    def notes(self, newNotes: t.Iterable[t.Union[note.Unpitched, note.Note]]) -> None:
+    def notes(self, newNotes: Iterable[t.Union[note.Unpitched, note.Note]]) -> None:
         '''
         Sets notes to an iterable of Note or Unpitched objects
         '''

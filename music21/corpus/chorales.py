@@ -14,6 +14,8 @@ This file makes it easier to access Bach's chorales through various
 numbering schemes and filters and includes the corpus.chorales.Iterator()
 class for easily iterating through the chorale collection.
 '''
+from __future__ import annotations
+
 import copy
 import typing as t
 import unittest

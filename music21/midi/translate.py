@@ -13,10 +13,11 @@
 Module to translate MIDI data to music21 Streams and vice versa.  Note that quantization of
 notes takes place in the :meth:`~music21.stream.Stream.quantize` method not here.
 '''
-import unittest
-import math
+from collections.abc import Sequence
 import copy
+import math
 import typing as t
+import unittest
 import warnings
 
 from music21 import chord
@@ -520,7 +521,7 @@ def noteToMidiEvents(
 # ------------------------------------------------------------------------------
 # Chords
 def midiEventsToChord(
-    eventList: t.Sequence[tuple[tuple[int, 'music21.midi.MidiEvent'],
+    eventList: Sequence[tuple[tuple[int, 'music21.midi.MidiEvent'],
                                   tuple[int, 'music21.midi.MidiEvent']]],
     ticksPerQuarter: int = defaults.ticksPerQuarter,
 ) -> chord.ChordBase:
@@ -1872,7 +1873,7 @@ def midiTrackToStream(
     inputM21=None,
     conductorPart: t.Optional[stream.Part] = None,
     isFirst: bool = False,
-    quarterLengthDivisors: t.Sequence[int] = (),
+    quarterLengthDivisors: Sequence[int] = (),
     **keywords
 ) -> stream.Part:
     # noinspection PyShadowingNames

@@ -17,6 +17,7 @@ and used to configure, :class:`~music21.note.Note` objects.
 '''
 from __future__ import annotations
 
+from collections.abc import Iterable, Sequence
 import copy
 import unittest
 
@@ -273,7 +274,7 @@ class Lyric(prebase.ProtoM21Object, style.StyleMixin):
         if not self.isComposite:
             return self._text
         else:
-            assert isinstance(self.components, t.Sequence), \
+            assert isinstance(self.components, Sequence), \
                 'Programming error: isComposite implies that components exists'  # mypy
             text_out = self.components[0].text
             if text_out is None:
@@ -406,7 +407,7 @@ class Lyric(prebase.ProtoM21Object, style.StyleMixin):
             else:
                 return text
         else:
-            assert isinstance(self.components, t.Sequence), \
+            assert isinstance(self.components, Sequence), \
                 'Programming error: isComposite should assert components exists'  # for mypy
             firstSyllabic = self.components[0].syllabic
             lastSyllabic = self.components[-1].syllabic
@@ -841,7 +842,7 @@ class GeneralNote(base.Music21Object):
         return ()
 
     @pitches.setter
-    def pitches(self, _value: t.Iterable[Pitch]):
+    def pitches(self, _value: Iterable[Pitch]):
         pass
 
 
@@ -1682,7 +1683,7 @@ class Note(NotRest):
         return (self.pitch,)
 
     @pitches.setter
-    def pitches(self, value: t.Sequence[Pitch]):
+    def pitches(self, value: Sequence[Pitch]):
         if common.isListLike(value) and value:
             self.pitch = value[0]
         else:

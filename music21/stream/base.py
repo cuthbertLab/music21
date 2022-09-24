@@ -21,23 +21,21 @@ and :class:`~music21.stream.Score` objects, are also in this module.
 '''
 from __future__ import annotations
 
-import collections
+from collections import namedtuple, OrderedDict
+from collections.abc import Collection, Iterable, Sequence
 import copy
+from fractions import Fraction
 import itertools
 import math
+from math import isclose
 import os
 import pathlib
+import typing as t
+from typing import overload
 import unittest
 import warnings
 
-from collections import namedtuple
-from fractions import Fraction
-from math import isclose
-import typing as t
-from typing import overload
-
 from music21 import base
-
 from music21 import bar
 from music21 import common
 from music21 import clef
@@ -94,7 +92,7 @@ class StreamDeprecationWarning(UserWarning):
 
 # -----------------------------------------------------------------------------
 # Metaclass
-OffsetMap = collections.namedtuple('OffsetMap', ['element', 'offset', 'endTime', 'voiceIndex'])
+OffsetMap = namedtuple('OffsetMap', ['element', 'offset', 'endTime', 'voiceIndex'])
 
 
 # -----------------------------------------------------------------------------
@@ -314,7 +312,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
     def __init__(self,
                  givenElements: t.Union[None,
                                         base.Music21Object,
-                                        t.Sequence[base.Music21Object]] = None,
+                                        Sequence[base.Music21Object]] = None,
                  *,
                  givenElementsBehavior: GivenElementsBehavior = GivenElementsBehavior.OFFSETS,
                  **keywords):
@@ -486,7 +484,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
     @overload
     def __getitem__(
         self,
-        k: t.Collection[type]
+        k: Collection[type]
     ) -> iterator.RecursiveIterator[M21ObjType]:
         # Remove this code and replace with ... once Astroid #1015 is fixed.
         x: iterator.RecursiveIterator[M21ObjType] = self.recurse()
@@ -498,7 +496,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
                                int,
                                slice,
                                type[ChangedM21ObjType],
-                               t.Collection[type]]
+                               Collection[type]]
                     ) -> t.Union[iterator.RecursiveIterator[M21ObjType],
                                  iterator.RecursiveIterator[ChangedM21ObjType],
                                  M21ObjType,
@@ -848,7 +846,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         return tuple(self._cache['elements'])
 
     @elements.setter
-    def elements(self, value: t.Union[Stream, t.Iterable[base.Music21Object]]):
+    def elements(self, value: t.Union[Stream, Iterable[base.Music21Object]]):
         '''
         Sets this stream's elements to the elements in another stream (just give
         the stream, not the stream's .elements), or to a list of elements.
@@ -1545,7 +1543,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         raise StreamException(f'cannot find object ({el}) in Stream')
 
     def remove(self,
-               targetOrList: t.Union[base.Music21Object, t.Sequence[base.Music21Object]],
+               targetOrList: t.Union[base.Music21Object, Sequence[base.Music21Object]],
                *,
                shiftOffsets=False,
                recurse=False):
@@ -1692,7 +1690,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
             if t.TYPE_CHECKING:
                 assert isinstance(targetOrList, base.Music21Object)
             targetList = [targetOrList]
-        elif isinstance(targetOrList, t.Sequence) and len(targetOrList) > 1:
+        elif isinstance(targetOrList, Sequence) and len(targetOrList) > 1:
             if t.TYPE_CHECKING:
                 assert not isinstance(targetOrList, base.Music21Object)
             try:
@@ -3486,7 +3484,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
 
     @overload
     def getElementsByClass(self,
-                           classFilterList: t.Union[str, t.Iterable[str]]
+                           classFilterList: t.Union[str, Iterable[str]]
                            ) -> iterator.StreamIterator[M21ObjType]:
         # Remove all dummy code once Astroid #1015 is fixed
         x: iterator.StreamIterator[M21ObjType] = self.iter()
@@ -3503,7 +3501,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
 
     @overload
     def getElementsByClass(self,
-                           classFilterList: t.Iterable[type[ChangedM21ObjType]]
+                           classFilterList: Iterable[type[ChangedM21ObjType]]
                            ) -> iterator.StreamIterator[M21ObjType]:
         x: iterator.StreamIterator[M21ObjType] = self.iter()
         return x  # dummy code
@@ -3511,9 +3509,9 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
     def getElementsByClass(self,
                            classFilterList: t.Union[
                                str,
-                               t.Iterable[str],
+                               Iterable[str],
                                type[ChangedM21ObjType],
-                               t.Iterable[type[ChangedM21ObjType]],
+                               Iterable[type[ChangedM21ObjType]],
                            ],
                            ) -> t.Union[iterator.StreamIterator[M21ObjType],
                                         iterator.StreamIterator[ChangedM21ObjType]]:
@@ -4956,7 +4954,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
                 if m not in offsetMap[offset]:
                     offsetMap[offset].append(m)
 
-        orderedOffsetMap = collections.OrderedDict(sorted(offsetMap.items(), key=lambda o: o[0]))
+        orderedOffsetMap = OrderedDict(sorted(offsetMap.items(), key=lambda o: o[0]))
         return orderedOffsetMap
 
     def _getFinalBarline(self):
@@ -9060,7 +9058,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
 
     def quantize(
         self,
-        quarterLengthDivisors: t.Iterable[int] = (),
+        quarterLengthDivisors: Iterable[int] = (),
         processOffsets: bool = True,
         processDurations: bool = True,
         inPlace: bool = False,
@@ -13824,7 +13822,7 @@ class Score(Stream):
                 for m in mapPartial[k]:  # get measures from partial
                     if m not in offsetMap[k]:
                         offsetMap[k].append(m)
-        orderedOffsetMap = collections.OrderedDict(sorted(offsetMap.items(), key=lambda o: o[0]))
+        orderedOffsetMap = OrderedDict(sorted(offsetMap.items(), key=lambda o: o[0]))
         return orderedOffsetMap
 
     def sliceByGreatestDivisor(self, *, addTies=True, inPlace=False):

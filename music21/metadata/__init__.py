@@ -129,16 +129,18 @@ whether the text has been translated,
 as well as an encoding scheme, that specifies which standard should be used to parse
 the string.  See metadata/primitives.py for more information.
 '''
+from __future__ import annotations
 
 from collections import namedtuple
-from dataclasses import dataclass
-import os
-import pathlib
-import re
+from collections.abc import Iterable
 import copy
+from dataclasses import dataclass
 import datetime
-import unittest
+import pathlib
+import os
+import re
 import typing as t
+import unittest
 
 from music21 import base
 from music21 import common
@@ -263,7 +265,7 @@ class Metadata(base.Music21Object):
 
     def add(self,
             name: str,
-            value: t.Union[t.Any, t.Iterable[t.Any]]):
+            value: t.Union[t.Any, Iterable[t.Any]]):
         '''
         Adds a single item or multiple items with this name, leaving any existing
         items with this name in place.
@@ -328,7 +330,7 @@ class Metadata(base.Music21Object):
         '''
         return self._get(name, isCustom=True)
 
-    def addCustom(self, name: str, value: t.Union[t.Any, t.Iterable[t.Any]]):
+    def addCustom(self, name: str, value: t.Union[t.Any, Iterable[t.Any]]):
         '''
         Adds any custom-named metadata items. The name can be free-form,
         or it can be a custom 'namespace:name'.
@@ -357,7 +359,7 @@ class Metadata(base.Music21Object):
         '''
         self._add(name, value, isCustom=True)
 
-    def setCustom(self, name: str, value: t.Union[t.Any, t.Iterable[t.Any]]):
+    def setCustom(self, name: str, value: t.Union[t.Any, Iterable[t.Any]]):
         '''
         Sets any custom-named metadata items (deleting any existing such items).
         The name can be free-form, or it can be a custom 'namespace:name'.
@@ -802,13 +804,13 @@ class Metadata(base.Music21Object):
 
         if name in properties.ALL_SINGLE_ATTRIBUTE_NAMES:
             if (value is not None
-                    and isinstance(value, t.Iterable)
+                    and isinstance(value, Iterable)
                     and not isinstance(value, str)):
                 raise ValueError(f'md.{name} can only be set to a single value; '
                                  f'set md[{name}] to multiple values instead.')
 
         if name in properties.ALL_PLURAL_ATTRIBUTE_NAMES:
-            if not isinstance(value, t.Iterable) or isinstance(value, str):
+            if not isinstance(value, Iterable) or isinstance(value, str):
                 raise ValueError(
                     f'md.{name} can only be set to an iterable (e.g. a list, tuple, etc).'
                 )
@@ -898,7 +900,7 @@ class Metadata(base.Music21Object):
 
         return self._get(key, isCustom=False)
 
-    def __setitem__(self, key: str, value: t.Union[t.Any, t.Iterable[t.Any]]):
+    def __setitem__(self, key: str, value: t.Union[t.Any, Iterable[t.Any]]):
         '''
         "Dictionary key" access for all standard uniqueNames and
         standard keys of the form 'namespace:name'.
@@ -1304,7 +1306,7 @@ class Metadata(base.Music21Object):
         return self._getPluralAttribute('composer')
 
     @composers.setter
-    def composers(self, value: t.Iterable[str]) -> None:
+    def composers(self, value: Iterable[str]) -> None:
         '''For type checking only. Does not run.'''
         setattr(self, 'composers', value)
 
@@ -1441,7 +1443,7 @@ class Metadata(base.Music21Object):
         return self._getPluralAttribute('librettist')
 
     @librettists.setter
-    def librettists(self, value: t.Iterable[str]) -> None:
+    def librettists(self, value: Iterable[str]) -> None:
         '''For type checking only. Does not run.'''
         setattr(self, 'librettists', value)
 
@@ -1484,7 +1486,7 @@ class Metadata(base.Music21Object):
         return self._getPluralAttribute('lyricist')
 
     @lyricists.setter
-    def lyricists(self, value: t.Iterable[str]) -> None:
+    def lyricists(self, value: Iterable[str]) -> None:
         '''For type checking only. Does not run.'''
         setattr(self, 'lyricists', value)
 
@@ -2152,7 +2154,7 @@ class Metadata(base.Music21Object):
         # return a tuple containing contents of list
         return tuple(valueList)
 
-    def _add(self, name: str, value: t.Union[t.Any, t.Iterable[t.Any]], isCustom: bool):
+    def _add(self, name: str, value: t.Union[t.Any, Iterable[t.Any]], isCustom: bool):
         '''
         Adds a single item or multiple items with this name, leaving any existing
         items with this name in place.
@@ -2172,7 +2174,7 @@ class Metadata(base.Music21Object):
                     ' Call addCustom/setCustom/getCustom for custom names.')
             name = uniqueName
 
-        if not isinstance(value, t.Iterable):
+        if not isinstance(value, Iterable):
             value = [value]
 
         if isinstance(value, str):
@@ -2192,7 +2194,7 @@ class Metadata(base.Music21Object):
             # add the convertedValues list to the existing list
             self._contents[name] = prevValues + convertedValues
 
-    def _set(self, name: str, value: t.Union[t.Any, t.Iterable[t.Any]], isCustom: bool):
+    def _set(self, name: str, value: t.Union[t.Any, Iterable[t.Any]], isCustom: bool):
         '''
         Sets a single item or multiple items with this name, replacing any
         existing items with this name.  If isCustom is False, the name must

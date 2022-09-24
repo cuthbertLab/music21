@@ -13,13 +13,15 @@ base classes for searching scores.
 
 See User's Guide, Chapter 43: Searching in and Among Scores for details.
 '''
+from __future__ import annotations
+
+from collections import namedtuple
 from collections.abc import Callable
 import copy
 import difflib
 import math
 import typing as t
 import unittest
-from collections import namedtuple
 
 from more_itertools import windowed
 

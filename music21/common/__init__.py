@@ -21,6 +21,7 @@ folder are available by importing common.
 
 split according to function -- September 2015
 '''
+from __future__ import annotations
 
 __all__ = [
     'classTools',

@@ -16,6 +16,9 @@
 This module defines objects for tracking the derivation of one
 :class:`~music21.stream.Stream` from another.
 '''
+from __future__ import annotations
+
+from collections.abc import Generator
 import functools
 import typing as t
 import unittest
@@ -207,7 +210,7 @@ class Derivation(SlottedObjectMixin):
             self._clientId = id(client)
             self._client = common.wrapWeakref(client)
 
-    def chain(self) -> t.Generator['music21.base.Music21Object', None, None]:
+    def chain(self) -> Generator['music21.base.Music21Object', None, None]:
         '''
         Iterator/Generator
 

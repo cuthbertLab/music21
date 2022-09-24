@@ -8,6 +8,8 @@
 # Copyright:    Copyright © 2015-16 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
+from __future__ import annotations
+
 __all__ = [
     'runParallel',
     'runNonParallel',

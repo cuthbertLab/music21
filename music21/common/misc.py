@@ -12,7 +12,9 @@
 '''
 If it doesn't fit anywhere else in the common directory, you'll find it here...
 '''
-from collections.abc import Callable
+from __future__ import annotations
+
+from collections.abc import Callable, Iterable
 import platform
 import re
 import typing as t
@@ -52,7 +54,7 @@ def flattenList(originalList: list) -> list:
     return [item for sublist in originalList for item in sublist]
 
 
-def unique(originalList: t.Iterable, *, key: t.Optional[Callable] = None) -> list:
+def unique(originalList: Iterable, *, key: t.Optional[Callable] = None) -> list:
     '''
     Return a List of unique items from an iterable, preserving order.
     (unlike casting to a set and back)
@@ -166,7 +168,7 @@ def macOSVersion() -> tuple[int, int, int]:  # pragma: no cover
     return (major, minor, maintenance)
 
 
-def sortModules(moduleList: t.Iterable[t.Any]) -> list[object]:
+def sortModules(moduleList: Iterable[t.Any]) -> list[object]:
     '''
     Sort a list of imported module names such that most recently modified is
     first.  In ties, last access time is used then module name

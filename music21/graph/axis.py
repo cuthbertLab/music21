@@ -14,10 +14,11 @@
 Definitions for extracting data from a Stream to place on one axis of a
 :class:`~music21.graph.plot.PlotStream` or similar object.
 '''
+from __future__ import annotations
+
 import collections
 import math
 import re
-import typing as t
 import unittest
 
 from music21.graph.utilities import accidentalLabelToUnicode, GraphException

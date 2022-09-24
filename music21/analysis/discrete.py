@@ -24,13 +24,11 @@ The :class:`music21.analysis.discrete.KrumhanslSchmuckler`
 '''
 from __future__ import annotations
 
-# TODO: make an analysis.base for the Discrete and analyzeStream aspects, then create
-#     range and key modules in analysis
-
-import unittest
-import typing as t
-
 from collections import OrderedDict
+from collections.abc import Iterable, Sequence
+import typing as t
+import unittest
+
 from music21 import exceptions21
 from music21 import harmony
 from music21 import interval
@@ -42,6 +40,9 @@ from music21 import pitch
 from music21 import environment
 environLocal = environment.Environment('analysis.discrete')
 
+
+# TODO: make an analysis.base for the Discrete and analyzeStream aspects, then create
+#     range and key modules in analysis
 
 # -----------------------------------------------------------------------------
 class DiscreteAnalysisException(exceptions21.Music21Exception):
@@ -75,7 +76,7 @@ class DiscreteAnalysis:
         # store alternative solutions, which may be sorted or not
         self.alternativeSolutions = []
 
-    def _rgbToHex(self, rgb: t.Sequence[t.Union[float, int]]) -> str:
+    def _rgbToHex(self, rgb: Sequence[t.Union[float, int]]) -> str:
         '''
         Utility conversion method
 
@@ -1047,7 +1048,7 @@ class Ambitus(DiscreteAnalysis):
         pitchesFound: list[pitch.Pitch] = []
         for n in justNotes:
             # environLocal.printDebug([n])
-            pitches: t.Iterable[pitch.Pitch] = ()
+            pitches: Iterable[pitch.Pitch] = ()
             if isinstance(n, note.GeneralNote) and not isinstance(n, harmony.ChordSymbol):
                 pitches = n.pitches
             psFound += [p.ps for p in pitches]

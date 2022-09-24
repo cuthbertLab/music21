@@ -72,6 +72,9 @@ To get rid of beams on a note do:
 
 >>> n2.beams.beamsList = []
 '''
+from __future__ import annotations
+
+from collections.abc import Iterable
 import typing as t
 import unittest
 
@@ -240,7 +243,7 @@ class Beams(prebase.ProtoM21Object, EqualSlottedObjectMixin):
     # STATIC METHODS #
 
     @staticmethod
-    def naiveBeams(srcList: t.Iterable['music21.base.Music21Object']):
+    def naiveBeams(srcList: Iterable['music21.base.Music21Object']):
         # noinspection PyShadowingNames
         '''
         Given a list or iterator of elements, return a list of None or Beams for

@@ -56,10 +56,11 @@ __all__ = [
     'ABCFile',
 ]
 
+from collections.abc import Sequence
 import io
 import re
-import unittest
 import typing as t
+import unittest
 
 from music21 import common
 from music21 import environment
@@ -1774,7 +1775,7 @@ class ABCHandler:
         self.currentCollectStr = ''
 
     @staticmethod
-    def _getLinearContext(source: t.Sequence[_T],
+    def _getLinearContext(source: Sequence[_T],
                           i: int) -> tuple[t.Optional[_T], _T, t.Optional[_T], t.Optional[_T]]:
         '''
         Find the local context of a string or iterable of objects

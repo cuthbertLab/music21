@@ -34,11 +34,11 @@ Changed in v8 -- nodeId and nodeName standardized.  TERMINUS and DIRECTION
 '''
 from __future__ import annotations
 
+from collections import OrderedDict
+from collections.abc import Sequence
 import copy
 import enum
 import typing as t
-
-from collections import OrderedDict
 
 from music21 import common
 from music21 import exceptions21
@@ -416,7 +416,7 @@ class IntervalNetwork:
     '''
 
     def __init__(self,
-                 edgeList: t.Sequence[t.Union[interval.Interval, str]] = (),
+                 edgeList: Sequence[t.Union[interval.Interval, str]] = (),
                  octaveDuplicating=False,
                  deterministic=True,
                  pitchSimplification='maxAccidental'):
@@ -427,10 +427,10 @@ class IntervalNetwork:
 
         # a dictionary of Edge object, where keys are edgeId values
         # Edges store directed connections between Node ids
-        self.edges: t.OrderedDict[t.Union[Terminus, int], Edge] = OrderedDict()
+        self.edges: OrderedDict[t.Union[Terminus, int], Edge] = OrderedDict()
 
         # nodes suggest Pitches, but Pitches are not stored
-        self.nodes: t.OrderedDict[t.Union[Terminus, int], Node] = OrderedDict()
+        self.nodes: OrderedDict[t.Union[Terminus, int], Node] = OrderedDict()
 
         if edgeList:  # auto initialize
             self.fillBiDirectedEdges(edgeList)
@@ -443,11 +443,11 @@ class IntervalNetwork:
         self.pitchSimplification = pitchSimplification
 
         # store segments
-        self._ascendingCache: t.OrderedDict[
+        self._ascendingCache: OrderedDict[
             CacheKey,
             tuple[list[pitch.Pitch], list[t.Union[Terminus, int]]]
         ] = OrderedDict()
-        self._descendingCache: t.OrderedDict[
+        self._descendingCache: OrderedDict[
             CacheKey,
             tuple[list[pitch.Pitch], list[t.Union[Terminus, int]]]
         ] = OrderedDict()
@@ -488,7 +488,7 @@ class IntervalNetwork:
         return (isinstance(other, self.__class__)
                 and self.__dict__ == other.__dict__)
 
-    def fillBiDirectedEdges(self, edgeList: t.Sequence[t.Union[interval.Interval, str]]):
+    def fillBiDirectedEdges(self, edgeList: Sequence[t.Union[interval.Interval, str]]):
         # noinspection PyShadowingNames
         '''
         Given an ordered list of bi-directed edges given as :class:`~music21.interval.Interval`

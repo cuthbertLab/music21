@@ -12,9 +12,11 @@
 '''
 Functions for finding external modules, converting colors to Matplotlib colors, etc.
 '''
-import unittest
+from __future__ import annotations
+
 from collections import namedtuple
 import typing as t
+import unittest
 
 import webcolors  # type: ignore
 

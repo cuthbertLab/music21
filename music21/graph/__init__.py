@@ -38,6 +38,8 @@ From highest level to lowest level usage, ways of graphing are as follows:
     4. Use `matplotlib` directly to create any graph, musical or non-musical.
 
 '''
+from __future__ import annotations
+
 __all__ = [
     'axis', 'findPlot', 'plot', 'primitives', 'utilities',
     'plotStream',

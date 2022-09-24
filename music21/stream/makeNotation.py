@@ -11,11 +11,13 @@
 # Copyright:    Copyright © 2008-2022 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # -----------------------------------------------------------------------------
+from __future__ import annotations
 
+from collections.abc import Iterable, Generator
 import copy
-import unittest
-import typing as t
 from fractions import Fraction  # typing only
+import typing as t
+import unittest
 
 from music21 import beam
 from music21 import clef
@@ -1704,7 +1706,7 @@ def iterateBeamGroups(
     s: StreamType,
     skipNoBeams=True,
     recurse=True
-) -> t.Generator[list[note.NotRest], None, None]:
+) -> Generator[list[note.NotRest], None, None]:
     '''
     Generator that yields a List of NotRest objects that fall within a beam group.
 
@@ -1895,7 +1897,7 @@ def splitElementsToCompleteTuplets(
     >>> [el.quarterLength for el in p.recurse().notesAndRests]
     [Fraction(1, 6), Fraction(1, 3), Fraction(1, 3), Fraction(1, 6)]
     '''
-    iterator: t.Iterable['music21.stream.Stream']
+    iterator: Iterable['music21.stream.Stream']
     if recurse:
         iterator = s.recurse(streamsOnly=True, includeSelf=True)
     else:
@@ -2000,7 +2002,7 @@ def consolidateCompletedTuplets(
             and (gn.isRest or gn.tie is not None or not onlyIfTied)
         )
 
-    iterator: t.Iterable['music21.stream.Stream']
+    iterator: Iterable['music21.stream.Stream']
     if recurse:
         iterator = s.recurse(streamsOnly=True, includeSelf=True)
     else:

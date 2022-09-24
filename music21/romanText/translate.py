@@ -121,6 +121,8 @@ OMIT_FROM_DOCS
 ...                  )[roman.RomanNumeral].first().pitches]
 ['F#5', 'A5', 'C6']
 '''
+from __future__ import annotations
+
 import copy
 import textwrap
 import traceback

@@ -15,6 +15,9 @@
 This module defines the object model of Volume, covering all representation of
 amplitude, volume, velocity, and related parameters.
 '''
+from __future__ import annotations
+
+from collections.abc import Iterable
 import typing as t
 import unittest
 
@@ -137,7 +140,7 @@ class Volume(prebase.ProtoM21Object, SlottedObjectMixin):
                        useVelocity=True,
                        useArticulations: t.Union[bool,
                                                  articulations.Articulation,
-                                                 t.Iterable[articulations.Articulation]
+                                                 Iterable[articulations.Articulation]
                                                  ] = True,
                        baseLevel=0.5,
                        clip=True):
@@ -160,7 +163,7 @@ class Volume(prebase.ProtoM21Object, SlottedObjectMixin):
         useDynamicContext: t.Union[bool, dynamics.Dynamic] = True,
         useVelocity=True,
         useArticulations: t.Union[
-            bool, articulations.Articulation, t.Iterable[articulations.Articulation]
+            bool, articulations.Articulation, Iterable[articulations.Articulation]
         ] = True,
         baseLevel=0.5,
         clip=True,
@@ -262,7 +265,7 @@ class Volume(prebase.ProtoM21Object, SlottedObjectMixin):
             # useArticulations can be a list of 1 or more articulation objects
             # as well as True/False
             if useArticulations is not False:
-                am: t.Iterable[articulations.Articulation]
+                am: Iterable[articulations.Articulation]
                 if isinstance(useArticulations, articulations.Articulation):
                     am = [useArticulations]  # place in a list
                 elif common.isIterable(useArticulations):

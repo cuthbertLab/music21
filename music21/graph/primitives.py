@@ -23,6 +23,8 @@ From the highest level to the lowest level of usage, ways of graphing are as fol
     3. plotter = graph.primitives.Class(); plotter.data = ...; plotter.process()
     4. Use matplotlib directly to create your graph.
 '''
+from __future__ import annotations
+
 import math
 import random
 import unittest

@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
+from __future__ import annotations
+
 import re
 import unittest
-import typing as t
 
 from music21 import converter
 from music21 import corpus

@@ -6,15 +6,16 @@
 # Authors:      Josiah Wolf Oberholtzer
 #               Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2013-16 Michael Scott Asato Cuthbert and the music21
+# Copyright:    Copyright © 2013-22 Michael Scott Asato Cuthbert and the music21
 #               Project
 # License:      BSD, see license.txt
 # -----------------------------------------------------------------------------
 '''
 Tools for creating timespans (fast, manipulable objects) from Streams
 '''
-import unittest
+from collections.abc import Sequence
 import typing as t
+import unittest
 
 from music21.base import Music21Object
 from music21.common.types import M21ObjType, StreamType
@@ -28,7 +29,7 @@ from music21.tree import trees
 def listOfTreesByClass(
     inputStream: StreamType,
     *,
-    classLists: t.Sequence[t.Sequence[type[M21ObjType]]] = (),
+    classLists: Sequence[Sequence[type[M21ObjType]]] = (),
     currentParentage: t.Optional[tuple['music21.stream.Stream', ...]] = None,
     initialOffset: float = 0.0,
     flatten: t.Union[bool, str] = False,
@@ -154,7 +155,7 @@ def asTree(
     inputStream: StreamType,
     *,
     flatten: t.Union[t.Literal['semiFlat'], bool] = False,
-    classList: t.Optional[t.Sequence[type]] = None,
+    classList: t.Optional[Sequence[type]] = None,
     useTimespans: bool = False,
     groupOffsets: bool = False
 ) -> t.Union[trees.OffsetTree, trees.ElementTree, timespanTree.TimespanTree]:
@@ -288,7 +289,7 @@ def makeFastShallowTreeFromSortedStream(
     inputStream: 'music21.stream.Stream',
     *,
     outputTree: t.Union[trees.OffsetTree, trees.ElementTree],
-    classList: t.Optional[t.Sequence[type]] = None,
+    classList: t.Optional[Sequence[type]] = None,
 ) -> t.Union[trees.OffsetTree, trees.ElementTree]:
     '''
     Use populateFromSortedList to quickly make a tree from a stream.
@@ -315,7 +316,7 @@ def asTimespans(
     inputStream,
     *,
     flatten: t.Union[str, bool] = False,
-    classList: t.Optional[t.Sequence[type[Music21Object]]] = None
+    classList: t.Optional[Sequence[type[Music21Object]]] = None
 ) -> timespanTree.TimespanTree:
     r'''
     Recurses through a score and constructs a
@@ -360,7 +361,7 @@ def asTimespans(
     >>> tenorElements.source is score[3]
     True
     '''
-    classLists: list[t.Sequence[type[Music21Object]]]
+    classLists: list[Sequence[type[Music21Object]]]
     if classList is None:
         classLists = [[Music21Object]]
     else:

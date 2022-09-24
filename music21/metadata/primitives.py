@@ -12,6 +12,7 @@
 # -----------------------------------------------------------------------------
 from __future__ import annotations
 
+from collections.abc import Iterable
 import datetime
 import os
 import unittest
@@ -694,7 +695,7 @@ class DateBetween(DatePrimitive):
     '''
     # INITIALIZER #
 
-    def __init__(self, data: t.Iterable[DateParseType] = (), relevance='between'):
+    def __init__(self, data: Iterable[DateParseType] = (), relevance='between'):
         super().__init__(relevance)
         self._prepareData(data)
 
@@ -708,7 +709,7 @@ class DateBetween(DatePrimitive):
 
     # PRIVATE METHODS #
 
-    def _prepareData(self, data: t.Iterable[DateParseType]):
+    def _prepareData(self, data: Iterable[DateParseType]):
         r'''
         Assume a list of dates as strings is supplied as argument
         '''
@@ -778,7 +779,7 @@ class DateSelection(DatePrimitive):
     # INITIALIZER #
 
     def __init__(self,
-                 data: t.Iterable[DateParseType] = (),
+                 data: Iterable[DateParseType] = (),
                  relevance='or'):
         super().__init__(relevance)
         self._prepareData(data)
@@ -793,7 +794,7 @@ class DateSelection(DatePrimitive):
 
     # PRIVATE METHODS #
 
-    def _prepareData(self, data: t.Iterable[DateParseType]):
+    def _prepareData(self, data: Iterable[DateParseType]):
         r'''
         Assume a list of dates as strings is supplied as argument.
         '''
@@ -1086,7 +1087,7 @@ class Contributor(prebase.ProtoM21Object):
     def __init__(self,
                  *,
                  name: t.Union[str, Text, None] = None,
-                 names: t.Iterable[t.Union[str, Text]] = (),
+                 names: Iterable[t.Union[str, Text]] = (),
                  role: t.Union[str, Text, None] = None,
                  birth: t.Union[None, DateSingle, str] = None,
                  death: t.Union[None, DateSingle, str] = None,

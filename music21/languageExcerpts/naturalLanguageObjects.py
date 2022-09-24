@@ -11,9 +11,10 @@
 '''
 Multilingual conversion of pitch, etc. objects
 '''
+from __future__ import annotations
 
-import typing as t
 import unittest
+
 from music21 import pitch
 
 SUPPORTED_LANGUAGES = ['de', 'fr', 'it', 'es']

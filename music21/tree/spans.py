@@ -15,9 +15,10 @@
 Tools for grouping notes and chords into a searchable tree
 organized by start and stop offsets.
 '''
+from __future__ import annotations
+
 import copy
 from math import inf
-import typing as t
 import unittest
 
 from music21 import environment

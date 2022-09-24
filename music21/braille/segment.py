@@ -17,11 +17,13 @@ available from the Library of Congress
 `here <https://www.loc.gov/nls/braille-audio-reading-materials/music-materials/>`_,
 and will henceforth be referred to as BMTM.
 '''
+from __future__ import annotations
+
 import collections
 import copy
 import enum
-import unittest
 import typing as t
+import unittest
 
 from music21 import bar
 from music21 import base

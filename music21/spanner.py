@@ -18,9 +18,12 @@ connect notes in different Measure objects or even between different parts.
 This package defines some of the most common spanners.  Other spanners
 can be found in modules such as :ref:`moduleDynamics` (for things such as crescendos).
 '''
-import unittest
+from __future__ import annotations
+
+from collections.abc import Sequence
 import copy
 import typing as t
+import unittest
 
 from music21 import exceptions21
 from music21 import base
@@ -202,7 +205,7 @@ class Spanner(base.Music21Object):
 
     def __init__(self,
                  *spannedElements: t.Union[base.Music21Object,
-                                           t.Sequence[base.Music21Object]],
+                                           Sequence[base.Music21Object]],
                  **keywords):
         super().__init__(**keywords)
 
@@ -404,7 +407,7 @@ class Spanner(base.Music21Object):
 
     def addSpannedElements(
         self,
-        spannedElements: t.Union[t.Sequence[base.Music21Object],
+        spannedElements: t.Union[Sequence[base.Music21Object],
                                  base.Music21Object],
         *otherElements: base.Music21Object,
     ):

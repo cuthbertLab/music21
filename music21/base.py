@@ -38,9 +38,9 @@ under the module "base":
 from __future__ import annotations
 
 import builtins
+from collections.abc import Generator, Iterable
 import copy
-# for type annotation only
-import fractions
+import fractions  # for type annotation only
 from importlib.util import find_spec
 import typing as t
 from typing import overload
@@ -1085,7 +1085,7 @@ class Music21Object(prebase.ProtoM21Object):
         raise SitesException(f'Element {self} is not in hierarchy of {site}')
 
     def getSpannerSites(self,
-                        spannerClassList: t.Optional[t.Iterable] = None
+                        spannerClassList: t.Optional[Iterable] = None
                         ) -> list['music21.spanner.Spanner']:
         '''
         Return a list of all :class:`~music21.spanner.Spanner` objects
@@ -1724,7 +1724,7 @@ class Music21Object(prebase.ProtoM21Object):
         priorityTarget=None,
         followDerivation=True,
         priorityTargetOnly=False,
-    ) -> t.Generator[ContextSortTuple, None, None]:
+    ) -> Generator[ContextSortTuple, None, None]:
         pass
 
     @overload
@@ -1739,7 +1739,7 @@ class Music21Object(prebase.ProtoM21Object):
         returnSortTuples: t.Literal[False] = False,
         followDerivation=True,
         priorityTargetOnly=False,
-    ) -> t.Generator[ContextTuple, None, None]:
+    ) -> Generator[ContextTuple, None, None]:
         pass
 
 
@@ -1754,7 +1754,7 @@ class Music21Object(prebase.ProtoM21Object):
         returnSortTuples: bool = False,
         followDerivation=True,
         priorityTargetOnly=False,
-    ) -> t.Generator[t.Union[ContextTuple, ContextSortTuple], None, None]:
+    ) -> Generator[t.Union[ContextTuple, ContextSortTuple], None, None]:
         '''
         A generator that returns a list of namedtuples of sites to search for a context...
 

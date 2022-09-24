@@ -14,6 +14,8 @@ Translation routines for roman numeral analysis text files, as defined
 and demonstrated by Dmitri Tymoczko, Mark Gotham, Michael Scott Cuthbert,
 and Christopher Ariza in ISMIR 2019.
 '''
+from __future__ import annotations
+
 import fractions
 import io
 import re

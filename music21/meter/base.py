@@ -14,9 +14,12 @@ This module defines the :class:`~music21.meter.TimeSignature` object,
 as well as component objects for defining nested metrical structures,
 :class:`~music21.meter.MeterTerminal` and :class:`~music21.meter.MeterSequence` objects.
 '''
+from __future__ import annotations
+
+from collections.abc import Sequence
 import copy
-from math import gcd
 import fractions
+from math import gcd
 import typing as t
 import unittest
 
@@ -1557,7 +1560,7 @@ class TimeSignature(TimeSignatureBase):
             pos += self.accentSequence[i].duration.quarterLength
         return False
 
-    def setAccentWeight(self, weights: t.Union[t.Sequence[float], float], level: int = 0) -> None:
+    def setAccentWeight(self, weights: t.Union[Sequence[float], float], level: int = 0) -> None:
         '''
         Set accent weight, or floating point scalars, for the accent MeterSequence.
         Provide a list of float values; if this list is shorter than the length
@@ -1582,8 +1585,8 @@ class TimeSignature(TimeSignatureBase):
         >>> a.getAccentWeight(3.5)
         0.2...
         '''
-        weightList: t.Sequence[float]
-        if not isinstance(weights, t.Sequence):
+        weightList: Sequence[float]
+        if not isinstance(weights, Sequence):
             weightList = [weights]
         else:
             weightList = weights

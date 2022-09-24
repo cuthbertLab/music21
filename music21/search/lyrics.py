@@ -195,9 +195,9 @@ class LyricSearcher:
         else:
             self.stream = s
 
-        indexByIdentifier: t.OrderedDict[t.Union[str, int], list[IndexedLyric]] = OrderedDict()
-        iTextByIdentifier: t.OrderedDict[t.Union[str, int], str] = OrderedDict()
-        lastSyllabicByIdentifier: t.OrderedDict[t.Union[str, int],
+        indexByIdentifier: OrderedDict[t.Union[str, int], list[IndexedLyric]] = OrderedDict()
+        iTextByIdentifier: OrderedDict[t.Union[str, int], str] = OrderedDict()
+        lastSyllabicByIdentifier: OrderedDict[t.Union[str, int],
                                                 t.Union[str, None]] = OrderedDict()
 
         for n in s.recurse().notes:

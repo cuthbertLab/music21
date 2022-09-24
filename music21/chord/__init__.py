@@ -17,10 +17,11 @@ from __future__ import annotations
 
 __all__ = ['tools', 'tables', 'Chord', 'ChordException', 'fromIntervalVector', 'fromForteClass']
 
+from collections.abc import Iterable, Sequence
 import copy
-import unittest
 import typing as t
 from typing import overload
+import unittest
 
 from music21 import beam
 from music21 import common
@@ -81,10 +82,10 @@ class ChordBase(note.NotRest):
     def __init__(self,
                  notes: t.Union[None,
                                 str,
-                                t.Sequence[str],
-                                t.Sequence[pitch.Pitch],
-                                t.Sequence[note.NotRest],
-                                t.Sequence[int]] = None,
+                                Sequence[str],
+                                Sequence[pitch.Pitch],
+                                Sequence[note.NotRest],
+                                Sequence[int]] = None,
                  **keywords):
 
         if notes is None:
@@ -530,7 +531,7 @@ class ChordBase(note.NotRest):
     # --------------------------------------------------------------------------
     # volume per pitch ??
     # --------------------------------------------------------------------------
-    def setVolumes(self, volumes: t.Sequence[t.Union['music21.volume.Volume', int, float]]):
+    def setVolumes(self, volumes: Sequence[t.Union['music21.volume.Volume', int, float]]):
         # noinspection PyShadowingNames
         '''
         Set as many individual volumes as appear in volumes.  If there are not
@@ -714,11 +715,11 @@ class Chord(ChordBase):
     # INITIALIZER #
     def __init__(self,
                  notes: t.Union[None,
-                                t.Sequence[pitch.Pitch],
-                                t.Sequence[note.Note],
-                                t.Sequence[str],
+                                Sequence[pitch.Pitch],
+                                Sequence[note.Note],
+                                Sequence[str],
                                 str,
-                                t.Sequence[int]] = None,
+                                Sequence[int]] = None,
                  **keywords):
         if notes is not None and any(isinstance(n, note.GeneralNote)
                                      and not isinstance(n, (note.Note, Chord))
@@ -5300,7 +5301,7 @@ class Chord(ChordBase):
         return tuple(self._notes)
 
     @notes.setter
-    def notes(self, newNotes: t.Iterable[note.Note]) -> None:
+    def notes(self, newNotes: Iterable[note.Note]) -> None:
         '''
         sets notes to an iterable of Note objects
         '''
@@ -5657,7 +5658,7 @@ class Chord(ChordBase):
         return pitches
 
     @pitches.setter
-    def pitches(self, value: t.Sequence[t.Union[str, pitch.Pitch, int]]):
+    def pitches(self, value: Sequence[t.Union[str, pitch.Pitch, int]]):
         self._notes = []
         self.clearCache()
         # TODO: individual ties are not being retained here
@@ -5945,7 +5946,7 @@ class Chord(ChordBase):
 
 
 
-def fromForteClass(notation: t.Union[str, t.Sequence[int]]) -> Chord:
+def fromForteClass(notation: t.Union[str, Sequence[int]]) -> Chord:
     '''
     Return a Chord given a Forte-class notation. The Forte class can be
     specified as string (e.g., 3-11) or as a list of cardinality and number

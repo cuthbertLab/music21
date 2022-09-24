@@ -20,11 +20,11 @@ and showing different variant streams. These functions and the variant class sho
 used when variants of a score are the same length and contain the same measure structure at
 this time.
 '''
-import typing as t
-import unittest
-
+from collections.abc import Sequence
 import copy
 import difflib
+import typing as t
+import unittest
 
 from music21 import base
 from music21 import clef
@@ -94,7 +94,7 @@ class Variant(base.Music21Object):
         self,
         givenElements: t.Union[None,
                                base.Music21Object,
-                               t.Sequence[base.Music21Object]] = None,
+                               Sequence[base.Music21Object]] = None,
         name: t.Optional[str] = None,
         givenElementsBehavior: GivenElementsBehavior = GivenElementsBehavior.OFFSETS,
         **music21ObjectKeywords,

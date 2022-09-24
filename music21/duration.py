@@ -47,6 +47,7 @@ Example usage:
 '''
 from __future__ import annotations
 
+from collections.abc import Iterable
 import contextlib
 import copy
 import fractions
@@ -1614,7 +1615,7 @@ class Duration(prebase.ProtoM21Object, SlottedObjectMixin):
                  dots: t.Optional[int] = None,
                  quarterLength: t.Optional[OffsetQLIn] = None,
                  durationTuple: t.Optional[DurationTuple] = None,
-                 components: t.Optional[t.Iterable[DurationTuple]] = None,
+                 components: t.Optional[Iterable[DurationTuple]] = None,
                  client: t.Optional['music21.base.Music21Object'] = None,
                  **keywords):
         # First positional argument is assumed to be type string or a quarterLength.
@@ -2523,7 +2524,7 @@ class Duration(prebase.ProtoM21Object, SlottedObjectMixin):
         return tuple(self._components)
 
     @components.setter
-    def components(self, value: t.Iterable[DurationTuple]):
+    def components(self, value: Iterable[DurationTuple]):
         # previously, self._componentsNeedUpdating was not set here
         # this needs to be set because if _componentsNeedUpdating is True
         # new components will be derived from quarterLength
@@ -2939,7 +2940,7 @@ class Duration(prebase.ProtoM21Object, SlottedObjectMixin):
         return self._tuplets
 
     @tuplets.setter
-    def tuplets(self, tupletTuple: t.Iterable[Tuplet]):
+    def tuplets(self, tupletTuple: Iterable[Tuplet]):
         # environLocal.printDebug(['assigning tuplets in Duration', tupletTuple])
         self._tuplets = tuple(tupletTuple)
         self._quarterLengthNeedsUpdating = True

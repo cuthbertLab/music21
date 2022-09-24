@@ -24,15 +24,15 @@ Speed notes:
    (But then PyPy probably won't work.)
 
 '''
+from __future__ import annotations
+
+from collections import OrderedDict
 import difflib
+from functools import partial
 import json
 import math
 import pathlib
 import random
-
-from collections import OrderedDict
-from functools import partial
-import typing as t
 
 from music21 import common
 from music21 import converter

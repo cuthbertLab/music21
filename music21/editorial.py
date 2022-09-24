@@ -37,8 +37,10 @@ False
 >>> n.hasEditorialInformation
 True
 '''
-import typing as t
+from __future__ import annotations
+
 import unittest
+
 from music21 import exceptions21
 from music21 import prebase
 from music21 import style

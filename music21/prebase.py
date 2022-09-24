@@ -15,9 +15,9 @@ should inherit from are given below.
 
 Concept borrowed from m21j.
 '''
-import unittest
-
+from collections.abc import Sequence
 import typing as t
+import unittest
 
 from music21.common import deprecated
 
@@ -70,19 +70,19 @@ class ProtoM21Object:
     ]
 
     # documentation for all attributes (not properties or methods)
-    _DOC_ATTR: t.Mapping[str, str] = {}
+    _DOC_ATTR: dict[str, str] = {}
 
     # this dictionary stores as a tuple of strings for each Class so that
     # it only needs to be made once (11 microseconds per call, can be
     # a big part of iteration; from cache just 1 microsecond)
     _classTupleCacheDict: dict[type, tuple[str, ...]] = {}
-    _classSetCacheDict: dict[type, t.FrozenSet[t.Union[str, type]]] = {}
+    _classSetCacheDict: dict[type, frozenset[t.Union[str, type]]] = {}
 
     __slots__: tuple[str, ...] = ()
 
     @deprecated('v7', 'v8', 'use `someClass in .classSet`'
         'or for intersection: `not classSet.isdisjoint(classList)`')
-    def isClassOrSubclass(self, classFilterList: t.Sequence) -> bool:
+    def isClassOrSubclass(self, classFilterList: Sequence) -> bool:
         '''
         Given a class filter list (a list or tuple must be submitted),
         which may have strings or class objects, determine
@@ -158,7 +158,7 @@ class ProtoM21Object:
             return classTuple
 
     @property
-    def classSet(self) -> t.FrozenSet[t.Union[str, type]]:
+    def classSet(self) -> frozenset[t.Union[str, type]]:
         '''
         Returns a set (that is, unordered, but indexed) of all classes that
         this class belongs to, including

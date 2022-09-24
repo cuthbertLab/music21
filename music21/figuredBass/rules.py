@@ -7,7 +7,8 @@
 # Copyright:    Copyright © 2010 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
-import typing as t
+from __future__ import annotations
+
 import unittest
 from music21 import exceptions21
 from music21 import prebase

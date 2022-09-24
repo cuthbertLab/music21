@@ -10,6 +10,7 @@
 #               Project
 # License:      BSD, see license.txt
 # -----------------------------------------------------------------------------
+from __future__ import annotations
 
 import typing as t
 from dataclasses import dataclass
