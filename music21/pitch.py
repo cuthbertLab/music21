@@ -18,10 +18,10 @@ made available directly in the `Note` object, so they will seem familiar.
 '''
 from __future__ import annotations
 
-import copy
-import math
-import itertools
 from collections import OrderedDict
+import copy
+import itertools
+import math
 import typing as t
 from typing import overload
 import unittest
@@ -34,8 +34,11 @@ from music21 import defaults
 from music21 import environment
 from music21 import exceptions21
 from music21 import interval
-from music21 import style
 from music21 import prebase
+from music21 import style
+
+if t.TYPE_CHECKING:
+    from music21 import note
 
 PitchType = t.TypeVar('PitchType', bound='Pitch')
 
@@ -897,7 +900,7 @@ class Accidental(prebase.ProtoM21Object, style.StyleMixin):
         self.displayLocation = 'normal'
 
         # store a reference to the Pitch that has this Accidental object as a property
-        self._client: t.Optional['Pitch'] = None
+        self._client: t.Optional[Pitch] = None
         self._name = ''
         self._modifier = ''
         self._alter = 0.0     # semitones to alter step
@@ -1836,10 +1839,10 @@ class Pitch(prebase.ProtoM21Object):
         self.spellingIsInferred = False
         # the fundamental attribute stores an optional pitch
         # that defines the fundamental used to create this Pitch
-        self.fundamental: t.Optional['Pitch'] = None
+        self.fundamental: t.Optional[Pitch] = None
 
         # so that we can tell clients about changes in pitches.
-        self._client: t.Optional['music21.note.Note'] = None
+        self._client: t.Optional[note.Note] = None
 
         # name combines step, octave, and accidental
         if name is not None:
@@ -4352,7 +4355,7 @@ class Pitch(prebase.ProtoM21Object):
     @overload
     def transpose(
         self: PitchType,
-        value: t.Union['music21.interval.IntervalBase', str, int],
+        value: t.Union[interval.IntervalBase, str, int],
         *,
         inPlace: t.Literal[True]
     ) -> None:
@@ -4361,7 +4364,7 @@ class Pitch(prebase.ProtoM21Object):
     @overload
     def transpose(
         self: PitchType,
-        value: t.Union['music21.interval.IntervalBase', str, int],
+        value: t.Union[interval.IntervalBase, str, int],
         *,
         inPlace: t.Literal[False] = False
     ) -> PitchType:
@@ -4369,7 +4372,7 @@ class Pitch(prebase.ProtoM21Object):
 
     def transpose(
         self: PitchType,
-        value: t.Union['music21.interval.IntervalBase', str, int],
+        value: t.Union[interval.IntervalBase, str, int],
         *,
         inPlace: bool = False
     ) -> t.Optional[PitchType]:
@@ -4744,10 +4747,10 @@ class Pitch(prebase.ProtoM21Object):
     def updateAccidentalDisplay(
         self,
         *,
-        pitchPast: t.Optional[list['Pitch']] = None,
-        pitchPastMeasure: t.Optional[list['Pitch']] = None,
-        otherSimultaneousPitches: t.Optional[list['Pitch']] = None,
-        alteredPitches: t.Optional[list['Pitch']] = None,
+        pitchPast: t.Optional[list[Pitch]] = None,
+        pitchPastMeasure: t.Optional[list[Pitch]] = None,
+        otherSimultaneousPitches: t.Optional[list[Pitch]] = None,
+        alteredPitches: t.Optional[list[Pitch]] = None,
         cautionaryPitchClass: bool = True,
         cautionaryAll: bool = False,
         overrideStatus: bool = False,

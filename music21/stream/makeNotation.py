@@ -35,7 +35,11 @@ from music21.common.numberTools import opFrac
 from music21.common.types import StreamType, OffsetQL
 from music21.exceptions21 import StreamException
 
-from music21.stream.iterator import StreamIterator  # type-checking only
+
+if t.TYPE_CHECKING:
+    from music21 import stream
+    from music21.stream.iterator import StreamIterator
+
 
 environLocal = environment.Environment(__file__)
 
@@ -1860,7 +1864,7 @@ def setStemDirectionOneGroup(
 
 
 def splitElementsToCompleteTuplets(
-    s: 'music21.stream.Stream',
+    s: stream.Stream,
     *,
     recurse: bool = False,
     addTies: bool = True
@@ -1897,7 +1901,7 @@ def splitElementsToCompleteTuplets(
     >>> [el.quarterLength for el in p.recurse().notesAndRests]
     [Fraction(1, 6), Fraction(1, 3), Fraction(1, 3), Fraction(1, 6)]
     '''
-    iterator: Iterable['music21.stream.Stream']
+    iterator: Iterable[stream.Stream]
     if recurse:
         iterator = s.recurse(streamsOnly=True, includeSelf=True)
     else:
@@ -1936,7 +1940,7 @@ def splitElementsToCompleteTuplets(
 
 
 def consolidateCompletedTuplets(
-    s: 'music21.stream.Stream',
+    s: stream.Stream,
     *,
     recurse: bool = False,
     onlyIfTied: bool = True,
@@ -2002,16 +2006,16 @@ def consolidateCompletedTuplets(
             and (gn.isRest or gn.tie is not None or not onlyIfTied)
         )
 
-    iterator: Iterable['music21.stream.Stream']
+    iterator: Iterable[stream.Stream]
     if recurse:
         iterator = s.recurse(streamsOnly=True, includeSelf=True)
     else:
         iterator = [s]
     for container in iterator:
         reexpressible = [gn for gn in container.notesAndRests if is_reexpressible(gn)]
-        to_consolidate: list['music21.note.GeneralNote'] = []
+        to_consolidate: list[note.GeneralNote] = []
         partial_tuplet_sum: OffsetQL = 0.0
-        last_tuplet: t.Optional['music21.duration.Tuplet'] = None
+        last_tuplet: t.Optional[duration.Tuplet] = None
         completion_target: t.Optional[OffsetQL] = None
         for gn in reexpressible:
             prev_gn = gn.previous(note.GeneralNote, activeSiteOnly=True)

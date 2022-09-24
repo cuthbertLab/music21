@@ -37,6 +37,11 @@ from music21 import note
 from music21 import key
 from music21 import pitch
 
+
+if t.TYPE_CHECKING:
+    from music21 import stream
+
+
 environLocal = environment.Environment('analysis.discrete')
 
 
@@ -1287,7 +1292,7 @@ class MelodicIntervalDiversity(DiscreteAnalysis):
 # public access function
 
 def analyzeStream(
-    streamObj: 'music21.stream.Stream',
+    streamObj: stream.Stream,
     method: str,
     **keywords
 ):

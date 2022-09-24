@@ -27,12 +27,15 @@ from music21.tree import spans
 from music21.tree import timespanTree
 from music21.tree import trees
 
+if t.TYPE_CHECKING:
+    from music21 import stream
+
 
 def listOfTreesByClass(
     inputStream: StreamType,
     *,
     classLists: Sequence[Sequence[type[M21ObjType]]] = (),
-    currentParentage: t.Optional[tuple['music21.stream.Stream', ...]] = None,
+    currentParentage: t.Optional[tuple[stream.Stream, ...]] = None,
     initialOffset: float = 0.0,
     flatten: t.Union[bool, str] = False,
     useTimespans: bool = False
@@ -288,7 +291,7 @@ def asTree(
                                      initialOffset=0.0)
 
 def makeFastShallowTreeFromSortedStream(
-    inputStream: 'music21.stream.Stream',
+    inputStream: stream.Stream,
     *,
     outputTree: t.Union[trees.OffsetTree, trees.ElementTree],
     classList: t.Optional[Sequence[type]] = None,

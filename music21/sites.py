@@ -25,6 +25,11 @@ from music21 import common
 from music21 import exceptions21
 from music21 import prebase
 
+
+if t.TYPE_CHECKING:
+    from music21 import stream
+
+
 # define whether weakrefs are used for storage of object locations
 WEAKREF_ACTIVE = True
 
@@ -389,7 +394,7 @@ class Sites(common.SlottedObjectMixin):
                    excludeNone: t.Literal[True],
                    sortByCreationTime: t.Union[bool, t.Literal['reverse']] = False,
                    priorityTarget=None,
-                   ) -> Generator['music21.stream.Stream', None, None]:
+                   ) -> Generator[stream.Stream, None, None]:
         from music21 import stream
         yield stream.Stream()
 
@@ -399,7 +404,7 @@ class Sites(common.SlottedObjectMixin):
                    excludeNone: bool = False,
                    sortByCreationTime: t.Union[bool, t.Literal['reverse']] = False,
                    priorityTarget=None,
-                   ) -> Generator[t.Union['music21.stream.Stream', None], None, None]:
+                   ) -> Generator[t.Union[stream.Stream, None], None, None]:
         yield None
 
     def yieldSites(self,
@@ -407,7 +412,7 @@ class Sites(common.SlottedObjectMixin):
                    excludeNone: bool = False,
                    sortByCreationTime: t.Union[bool, t.Literal['reverse']] = False,
                    priorityTarget=None,
-                   ) -> Generator[t.Union['music21.stream.Stream', None], None, None]:
+                   ) -> Generator[t.Union[stream.Stream, None], None, None]:
         # noinspection PyDunderSlots
         '''
         Yield references; order, based on dictionary keys, is from least

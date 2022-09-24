@@ -1469,7 +1469,7 @@ class ConverterMEI(SubConverter):
     # registerShowFormats = ('mei',)
     # registerOutputExtensions = ('mei',)
 
-    def parseData(self, dataString: str, number=None) -> 'music21.stream.Stream':
+    def parseData(self, dataString: str, number=None) -> stream.Stream:
         '''
         Convert a string with an MEI document into its corresponding music21 elements.
 
@@ -1492,7 +1492,7 @@ class ConverterMEI(SubConverter):
         filePath: t.Union[str, pathlib.Path],
         number: t.Optional[int] = None,
         **keywords,
-    ) -> 'music21.stream.Stream':
+    ) -> stream.Stream:
         '''
         Convert a file with an MEI document into its corresponding music21 elements.
 

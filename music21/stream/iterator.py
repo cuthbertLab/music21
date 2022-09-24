@@ -35,6 +35,9 @@ from music21 import base   # just for typing.
 
 from music21.sites import SitesException
 
+if t.TYPE_CHECKING:
+    from music21 import stream
+
 T = t.TypeVar('T')
 S = t.TypeVar('S')
 ChangedM21ObjType = t.TypeVar('ChangedM21ObjType', bound=base.Music21Object)
@@ -53,7 +56,7 @@ class StreamIteratorInefficientWarning(UserWarning):
 
 
 class ActiveInformation(t.TypedDict, total=False):
-    stream: t.Optional['music21.stream.Stream']
+    stream: t.Optional[stream.Stream]
     elementIndex: int
     iterSection: t.Literal['_elements', '_endElements']
     sectionIndex: int
@@ -764,7 +767,7 @@ class StreamIterator(prebase.ProtoM21Object, Sequence[M21ObjType]):
                 raise  # clearer this way to see that this can happen...
         return True
 
-    def _newBaseStream(self) -> 'music21.stream.Stream':
+    def _newBaseStream(self) -> stream.Stream:
         '''
         Returns a new stream.Stream.  The same thing as calling:
 
@@ -783,9 +786,9 @@ class StreamIterator(prebase.ProtoM21Object, Sequence[M21ObjType]):
         return stream.Stream()
 
     @overload
-    def stream(self, returnStreamSubClass: t.Literal[False]) -> 'music21.stream.Stream':
+    def stream(self, returnStreamSubClass: t.Literal[False]) -> stream.Stream:
         # ignore this code -- just here until Astroid bug #1015 is fixed
-        x: 'music21.stream.Stream' = self.streamObj
+        x: stream.Stream = self.streamObj
         return x
 
     @overload
@@ -793,7 +796,7 @@ class StreamIterator(prebase.ProtoM21Object, Sequence[M21ObjType]):
         x: StreamType = self.streamObj
         return x
 
-    def stream(self, returnStreamSubClass=True) -> t.Union['music21.stream.Stream', StreamType]:
+    def stream(self, returnStreamSubClass=True) -> t.Union[stream.Stream, StreamType]:
         '''
         return a new stream from this iterator.
 
@@ -862,7 +865,7 @@ class StreamIterator(prebase.ProtoM21Object, Sequence[M21ObjType]):
 
         # if this stream was sorted, the resultant stream is sorted
         clearIsSorted = False
-        found: t.Union['music21.stream.Stream', StreamType]
+        found: t.Union[stream.Stream, StreamType]
         if returnStreamSubClass is True:
             try:
                 found = ss.__class__()

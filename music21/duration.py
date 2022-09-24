@@ -435,7 +435,7 @@ def quarterLengthToTuplet(
     qLen: OffsetQLIn,
     maxToReturn=4,
     tupletNumerators=defaultTupletNumerators
-) -> list['music21.duration.Tuplet']:
+) -> list[Tuplet]:
     '''
     Returns a list of possible Tuplet objects for a
     given `qLen` (quarterLength). As there may be more than one
@@ -721,7 +721,7 @@ def quarterConversion(qLen: OffsetQLIn) -> QuarterLengthConversion:
 def convertTypeToQuarterLength(
     dType: str,
     dots=0,
-    tuplets: t.Optional[list['music21.duration.Tuplet']] = None,
+    tuplets: t.Optional[list[Tuplet]] = None,
     dotGroups=None
 ) -> OffsetQL:
     # noinspection PyShadowingNames

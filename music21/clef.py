@@ -28,6 +28,11 @@ from music21 import environment
 from music21 import pitch  # for typing only
 from music21 import style
 
+
+if t.TYPE_CHECKING:
+    from music21 import stream
+
+
 environLocal = environment.Environment('clef')
 
 
@@ -893,7 +898,7 @@ def clefFromString(clefString, octaveShift=0) -> Clef:
     return clefObj
 
 
-def bestClef(streamObj: 'music21.stream.Stream',
+def bestClef(streamObj: stream.Stream,
              allowTreble8vb=False,
              recurse=False) -> PitchClef:
     # noinspection PyShadowingNames

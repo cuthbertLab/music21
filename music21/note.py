@@ -38,6 +38,9 @@ from music21 import style
 from music21 import tie
 from music21 import volume
 
+if t.TYPE_CHECKING:
+    from music21 import articulations
+
 environLocal = environment.Environment('note')
 
 noteheadTypeNames = (
@@ -206,7 +209,7 @@ class Lyric(prebase.ProtoM21Object, style.StyleMixin):
         self._number: int = 1
         self._text: str = ''
         self._syllabic: SyllabicChoices = None
-        self.components: t.Optional[list['music21.note.Lyric']] = None
+        self.components: t.Optional[list[Lyric]] = None
         self.elisionBefore = ' '
 
         # these are set by setTextAndSyllabic
@@ -589,7 +592,7 @@ class GeneralNote(base.Music21Object):
 
         self.lyrics: list[Lyric] = []  # a list of lyric objects
         self.expressions: list[expressions.Expression] = []
-        self.articulations: list['music21.articulations.Articulation'] = []
+        self.articulations: list[articulations.Articulation] = []
 
         if lyric is not None:
             self.addLyric(lyric)

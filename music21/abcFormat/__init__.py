@@ -69,6 +69,16 @@ from music21 import prebase
 
 from music21.abcFormat import translate
 
+if t.TYPE_CHECKING:
+    from music21 import bar
+    from music21 import clef
+    from music21 import duration
+    from music21 import dynamics
+    from music21 import key
+    from music21 import meter
+    from music21 import tempo
+    from music21 import spanner
+
 _T = t.TypeVar('_T')
 environLocal = environment.Environment('abcFormat')
 
@@ -378,7 +388,7 @@ class ABCMetadata(ABCToken):
             symbol = 'normal'  # m21 compat
         return n, d, symbol
 
-    def getTimeSignatureObject(self) -> t.Optional['music21.meter.TimeSignature']:
+    def getTimeSignatureObject(self) -> t.Optional[meter.TimeSignature]:
         '''
         Return a music21 :class:`~music21.meter.TimeSignature`
         object for this metadata tag, if isMeter is True, otherwise raise exception.
@@ -531,8 +541,8 @@ class ABCMetadata(ABCToken):
         # (key of D) but then mark every  c  as  natural
         return key.pitchToSharps(standardKeyStr, mode), mode
 
-    def getKeySignatureObject(self) -> t.Union['music21.key.Key',
-                                               'music21.key.KeySignature',
+    def getKeySignatureObject(self) -> t.Union[key.Key,
+                                               key.KeySignature,
                                                None]:
         # noinspection SpellCheckingInspection,PyShadowingNames
         '''
@@ -576,7 +586,7 @@ class ABCMetadata(ABCToken):
         else:
             return ks.asKey(mode)
 
-    def getClefObject(self) -> tuple[t.Optional['music21.clef.Clef'], t.Optional[int]]:
+    def getClefObject(self) -> tuple[t.Optional[clef.Clef], t.Optional[int]]:
         '''
         Extract any clef parameters stored in the key metadata token.
         Assume that a clef definition suggests a transposition.
@@ -608,7 +618,7 @@ class ABCMetadata(ABCToken):
         # if not defined, returns None, None
         return clefObj, transposeSemitones
 
-    def getMetronomeMarkObject(self) -> t.Optional['music21.tempo.MetronomeMark']:
+    def getMetronomeMarkObject(self) -> t.Optional[tempo.MetronomeMark]:
         '''
         Extract any tempo parameters stored in a tempo metadata token.
 
@@ -880,7 +890,7 @@ class ABCBar(ABCToken):
         else:
             return False
 
-    def getBarObject(self) -> t.Optional['music21.bar.Barline']:
+    def getBarObject(self) -> t.Optional[bar.Barline]:
         '''
         Return a music21 bar object
 
@@ -932,11 +942,11 @@ class ABCTuplet(ABCToken):
         self.numberNotesNormal: int = 1
 
         # store an m21 tuplet object
-        self.tupletObj: t.Optional['music21.duration.Tuplet'] = None
+        self.tupletObj: t.Optional[duration.Tuplet] = None
 
     def updateRatio(
         self,
-        timeSignatureObj: t.Optional['music21.meter.TimeSignature'] = None
+        timeSignatureObj: t.Optional[meter.TimeSignature] = None
     ) -> None:
         # noinspection PyShadowingNames
         '''
@@ -1119,7 +1129,7 @@ class ABCSlurStart(ABCToken):
     '''
     def __init__(self, src=''):
         super().__init__(src)
-        self.slurObj: t.Optional['music21.spanner.Slur'] = None
+        self.slurObj: t.Optional[spanner.Slur] = None
 
     def fillSlur(self):
         '''
@@ -1146,7 +1156,7 @@ class ABCCrescStart(ABCToken):
 
     def __init__(self, src=''):
         super().__init__(src)
-        self.crescObj: t.Optional['music21.dynamics.Crescendo'] = None
+        self.crescObj: t.Optional[dynamics.Crescendo] = None
 
     def fillCresc(self):
         from music21 import dynamics
@@ -1160,7 +1170,7 @@ class ABCDimStart(ABCToken):
     '''
     def __init__(self, src=''):
         super().__init__(src)
-        self.dimObj: t.Optional['music21.dynamics.Diminuendo'] = None
+        self.dimObj: t.Optional[dynamics.Diminuendo] = None
 
     def fillDim(self):
         from music21 import dynamics
@@ -1286,7 +1296,7 @@ class ABCNote(ABCToken):
         self.activeTuplet = None
 
         # store a spanner if active
-        self.applicableSpanners: list['music21.spanner.Spanner'] = []
+        self.applicableSpanners: list[spanner.Spanner] = []
 
         # store a tie if active
         self.tie = None
@@ -1629,7 +1639,7 @@ class ABCNote(ABCToken):
     def parse(
         self,
         forceDefaultQuarterLength: t.Optional[float] = None,
-        forceKeySignature: t.Optional['music21.key.KeySignature'] = None
+        forceKeySignature: t.Optional[key.KeySignature] = None
     ) -> None:
         # environLocal.printDebug(['parse', self.src])
         self.chordSymbols, nonChordSymStr = self._splitChordSymbols(self.src)
@@ -1765,7 +1775,7 @@ class ABCHandler:
         self.abcDirectives: dict[str, str] = {}
         self.tokens: list[ABCToken] = []
         self.activeParens: list[str] = []  # e.g. ['Crescendo', 'Slur']
-        self.activeSpanners: list['music21.spanner.Spanner'] = []
+        self.activeSpanners: list[spanner.Spanner] = []
         self.lineBreaksDefinePhrases: bool = lineBreaksDefinePhrases
         self.pos = -1
         self.skipAhead = 0
@@ -2156,7 +2166,7 @@ class ABCHandler:
                         self.tokens.append(tokenSub)
                     # environLocal.printDebug(['got bars:', repr(self.currentCollectStr)])
                     # if self.currentCollectStr == '::':
-                    #     # create a start and and an end
+                    #     # create a start and an end
                     #     self.tokens.append(ABCBar(':|'))
                     #     self.tokens.append(ABCBar('|:'))
                     # else:
@@ -2845,7 +2855,7 @@ class ABCHandler:
                         return True
         return False
 
-    def splitByVoice(self) -> list['ABCHandler']:
+    def splitByVoice(self) -> list[ABCHandler]:
         # noinspection PyShadowingNames
         '''
         Given a processed token list, look for voices. If voices exist,
@@ -2992,7 +3002,7 @@ class ABCHandler:
         # environLocal.printDebug(['splitByMeasure(); pairs pre filter', pairs])
         return pairs
 
-    def splitByMeasure(self) -> list['ABCHandlerBar']:
+    def splitByMeasure(self) -> list[ABCHandlerBar]:
         '''
         Divide a token list by Measures, also
         defining start and end bars of each Measure.

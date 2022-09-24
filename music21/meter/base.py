@@ -39,6 +39,8 @@ from music21.meter.core import MeterSequence
 
 environLocal = environment.Environment('meter')
 
+if t.TYPE_CHECKING:
+    from music21 import stream
 
 # this is just a placeholder so that .beamSequence, etc. do not need to
 # be typed as Optional.  It should never be touched or queried
@@ -54,7 +56,7 @@ MIN_DENOMINATOR_TYPE = '128th'
 _meterSequenceAccentArchetypes: dict[tuple[str, t.Any, int], MeterSequence] = {}
 _meterSequenceAccentArchetypesNoneCache = ('', -1, -1)  # a cache key representing None
 
-def bestTimeSignature(meas: 'music21.stream.Stream') -> 'music21.meter.TimeSignature':
+def bestTimeSignature(meas: stream.Stream) -> 'music21.meter.TimeSignature':
     # noinspection PyShadowingNames
     '''
     Given a Measure (or any Stream) with elements in it, get a TimeSignature that contains all

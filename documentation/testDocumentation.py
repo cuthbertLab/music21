@@ -28,10 +28,12 @@ from docutils.core import publish_doctree  # pylint: disable=import-error
 # noinspection PyPackageRequirements
 import docutils.nodes  # pylint: disable=import-error
 
+
+import nbvalNotebook  # TODO: make into a package and import with .nbvalNotebook
+
+
 from music21.exceptions21 import Music21Exception
 from music21.test import testRunner
-
-import nbvalNotebook
 
 ModTuple = namedtuple('ModTuple',
                       ['module', 'fullModulePath', 'moduleNoExtension', 'autoGen'])

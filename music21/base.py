@@ -48,6 +48,7 @@ import unittest
 import warnings
 import weakref
 
+from music21._version import __version__, __version_info__
 from music21 import common
 from music21.common.enums import ElementSearch, OffsetSpecial
 from music21.common.numberTools import opFrac
@@ -57,14 +58,17 @@ from music21.derivation import Derivation
 from music21.duration import Duration, DurationException
 from music21.editorial import Editorial
 from music21 import environment
+from music21 import exceptions21
 from music21 import prebase
 from music21.sites import Sites, SitesException, WEAKREF_ACTIVE
 from music21.style import Style  # pylint: disable=unused-import
 from music21.sorting import SortTuple, ZeroSortTupleLow, ZeroSortTupleHigh
 # needed for temporal manipulations; not music21 objects
 from music21 import tie
-from music21 import exceptions21
-from music21._version import __version__, __version_info__
+
+if t.TYPE_CHECKING:
+    from music21 import stream
+    from music21 import spanner
 
 _M21T = t.TypeVar('_M21T', bound='music21.base.Music21Object')
 
@@ -126,12 +130,12 @@ class ElementException(exceptions21.Music21Exception):
 # -----------------------------------------------------------------------------
 # for contextSites searches...
 class ContextTuple(t.NamedTuple):
-    site: 'music21.stream.Stream'
+    site: stream.Stream
     offset: OffsetQL
     recurseType: 'music21.stream.enums.RecursionType'
 
 class ContextSortTuple(t.NamedTuple):
-    site: 'music21.stream.Stream'
+    site: stream.Stream
     offset: SortTuple
     recurseType: 'music21.stream.enums.RecursionType'
 
@@ -350,7 +354,7 @@ class Music21Object(prebase.ProtoM21Object):
                  groups: t.Optional[Groups] = None,
                  sites: t.Optional[Sites] = None,
                  duration: t.Optional[Duration] = None,
-                 activeSite: t.Optional['music21.stream.Stream'] = None,
+                 activeSite: t.Optional[stream.Stream] = None,
                  style: t.Optional[Style] = None,
                  editorial: t.Optional[Editorial] = None,
                  offset: OffsetQL = 0.0,
@@ -359,7 +363,7 @@ class Music21Object(prebase.ProtoM21Object):
         # do not call super().__init__() since it just wastes time
         self._id: t.Union[str, int, None] = id
         # None is stored as the internal location of an obj w/o any sites
-        self._activeSite: t.Union['music21.stream.Stream', weakref.ReferenceType, None] = None
+        self._activeSite: t.Union[stream.Stream, weakref.ReferenceType, None] = None
         # offset when no activeSite is available
         self._naiveOffset: OffsetQL = offset
 
@@ -823,28 +827,28 @@ class Music21Object(prebase.ProtoM21Object):
     @overload
     def getOffsetBySite(
         self,
-        site: t.Union['music21.stream.Stream', None],
+        site: t.Union[stream.Stream, None],
         *,
         returnSpecial: t.Literal[False] = False,
-    ) -> t.Union[float, fractions.Fraction]:
+    ) -> OffsetQL:
         return 0.0  # dummy until Astroid #1015 is fixed.  Replace with ...
 
     @overload
     def getOffsetBySite(
         self,
-        site: t.Union['music21.stream.Stream', None],
+        site: t.Union[stream.Stream, None],
         *,
         returnSpecial: bool = False,
-    ) -> t.Union[float, fractions.Fraction, str]:
+    ) -> t.Union[OffsetQL, OffsetSpecial]:
         return 0.0  # dummy until Astroid #1015 is fixed.  Replace with ...
         # using bool instead of t.Literal[True] because of
 
     def getOffsetBySite(
         self,
-        site: t.Union['music21.stream.Stream', None],
+        site: t.Union[stream.Stream, None],
         *,
         returnSpecial: bool = False,
-    ) -> t.Union[float, fractions.Fraction, str]:
+    ) -> t.Union[OffsetQL, OffsetSpecial]:
         '''
         If this class has been registered in a container such as a Stream,
         that container can be provided here, and the offset in that object
@@ -959,7 +963,7 @@ class Music21Object(prebase.ProtoM21Object):
             ) from se
 
     def setOffsetBySite(self,
-                        site: t.Optional['music21.stream.Stream'],
+                        site: t.Optional[stream.Stream],
                         value: OffsetQLIn):
         '''
         Change the offset for a site.  These are equivalent:
@@ -1013,8 +1017,8 @@ class Music21Object(prebase.ProtoM21Object):
 
     def getOffsetInHierarchy(
         self,
-        site: t.Optional['music21.stream.Stream']
-    ) -> t.Union[float, fractions.Fraction]:
+        site: t.Optional[stream.Stream]
+    ) -> OffsetQL:
         '''
         For an element which may not be in site, but might be in a Stream in site (or further
         in streams), find the cumulative offset of the element in that site.
@@ -1086,7 +1090,7 @@ class Music21Object(prebase.ProtoM21Object):
 
     def getSpannerSites(self,
                         spannerClassList: t.Optional[Iterable] = None
-                        ) -> list['music21.spanner.Spanner']:
+                        ) -> list[spanner.Spanner]:
         '''
         Return a list of all :class:`~music21.spanner.Spanner` objects
         (or Spanner subclasses) that contain
@@ -2325,7 +2329,7 @@ class Music21Object(prebase.ProtoM21Object):
         else:  # pragma: no cover
             return self._activeSite
 
-    def _setActiveSite(self, site: t.Union['music21.stream.Stream', None]):
+    def _setActiveSite(self, site: t.Union[stream.Stream, None]):
         # environLocal.printDebug(['_setActiveSite() called:', 'self', self, 'site', site])
 
         # NOTE: this is a performance intensive call
@@ -2527,7 +2531,7 @@ class Music21Object(prebase.ProtoM21Object):
                   useSite: t.Union[
                       t.Literal[False],
                       None,
-                      'music21.stream.Stream',
+                      stream.Stream,
                   ] = False,
                   raiseExceptionOnMiss: bool = False
                   ) -> SortTuple:
@@ -2634,7 +2638,7 @@ class Music21Object(prebase.ProtoM21Object):
         music21.sites.SitesException: an entry for this object 0x... is not stored in
             stream <music21.stream.Stream aloneStream>
         '''
-        useSiteNoFalse: t.Optional['music21.stream.Stream']
+        useSiteNoFalse: t.Optional[stream.Stream]
         if useSite is False:  # False or a Site; since None is a valid site, default is False
             useSiteNoFalse = self.activeSite
         else:
@@ -3119,7 +3123,7 @@ class Music21Object(prebase.ProtoM21Object):
 
         # clear lyrics from remaining parts
         if isinstance(eRemain, note.GeneralNote):
-            emptyLyrics: list['music21.note.Lyric'] = []
+            emptyLyrics: list[note.Lyric] = []
             # not sure why isinstance check is not picking this up.
             eRemain.lyrics = emptyLyrics  # pylint: disable=attribute-defined-outside-init
 

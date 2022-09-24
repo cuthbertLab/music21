@@ -57,11 +57,16 @@ from music21.graph import plot
 from music21.graph import primitives
 from music21.graph import utilities
 
+
+if t.TYPE_CHECKING:
+    from music21 import stream
+
+
 environLocal = environment.Environment('graph')
 
 
 def plotStream(
-    streamObj: 'music21.stream.Stream',
+    streamObj: stream.Stream,
     graphFormat: t.Optional[str] = None,
     xValue=None,
     yValue=None,

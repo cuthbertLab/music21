@@ -29,6 +29,11 @@ from music21 import prebase
 from music21 import spanner
 from music21 import style
 
+
+if t.TYPE_CHECKING:
+    from music21 import stream
+
+
 environLocal = environment.Environment('repeat')
 
 
@@ -879,7 +884,7 @@ class Expander:
         if rb is not None and 'music21.bar.Repeat' in rb.classSet:
             m.rightBarline = bar.Barline(newType)
 
-    def _stripRepeatExpressions(self, streamObj: 'music21.stream.Stream'):
+    def _stripRepeatExpressions(self, streamObj: stream.Stream):
         '''
         Given a Stream of measures or a Measure, strip all RepeatExpression
         objects in place.

@@ -1467,7 +1467,7 @@ class ScoreExporter(XMLExporterBase, PartStaffExporterMixin):
 
         self.refStreamOrTimeRange = [0.0, self.highestTime]
 
-        self.partExporterList: list['PartExporter'] = []
+        self.partExporterList: list[PartExporter] = []
 
         self.groupsToJoin: list[layout.StaffGroup] = []
         # key = id(stream) (NB: not stream.id); value = .instrumentStream

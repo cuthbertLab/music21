@@ -31,7 +31,7 @@ import unittest
 from music21.base import Music21Object
 from music21.common.enums import OffsetSpecial
 from music21.common.numberTools import opFrac
-from music21.common.types import OffsetQLSpecial, M21ObjType
+from music21.common.types import OffsetQL, OffsetQLSpecial, M21ObjType
 from music21 import spanner
 from music21 import tree
 from music21.exceptions21 import StreamException, ImmutableStreamException
@@ -67,7 +67,7 @@ class StreamCore(Music21Object):
 
     def coreInsert(
         self,
-        offset: t.Union[float, Fraction],
+        offset: OffsetQL,
         element: Music21Object,
         *,
         ignoreSort=False,
@@ -259,7 +259,7 @@ class StreamCore(Music21Object):
         if self._derivation is not None:
             sdm = self._derivation.method
             if sdm in ('flat', 'semiflat'):
-                origin: 'music21.stream.Stream' = self._derivation.origin
+                origin: stream.Stream = self._derivation.origin
                 origin.clearCache()
 
         # may not always need to clear cache of all living sites, but may

@@ -41,6 +41,12 @@ from music21 import tempo
 
 from music21.midi.percussion import MIDIPercussionException, PercussionMapper
 
+
+if t.TYPE_CHECKING:
+    from music21 import midi
+    from music21 import base
+
+
 environLocal = environment.Environment('midi.translate')
 PERCUSSION_MAPPER = PercussionMapper()
 
@@ -470,7 +476,7 @@ def noteToMidiEvents(
     n = inputM21
 
     mt = None  # use a midi track set to None
-    eventList: list[t.Union[midiModule.DeltaTime, midiModule.MidiEvent]] = []
+    eventList: list[t.Union[midi.DeltaTime, midi.MidiEvent]] = []
 
     if includeDeltaTime:
         dt = midiModule.DeltaTime(mt, channel=channel)
@@ -690,12 +696,12 @@ def chordToMidiEvents(
     '''
     from music21 import midi as midiModule
     mt = None  # midi track
-    eventList: list[t.Union[midiModule.DeltaTime, midiModule.MidiEvent]] = []
+    eventList: list[t.Union[midi.DeltaTime, midi.MidiEvent]] = []
     c = inputM21
 
     # temporary storage for setting correspondence
-    noteOn: list[midiModule.MidiEvent] = []
-    noteOff: list[midiModule.MidiEvent] = []
+    noteOn: list[midi.MidiEvent] = []
+    noteOff: list[midi.MidiEvent] = []
 
     chordVolume = c.volume  # use if component volume are not defined
     hasComponentVolumes = c.hasComponentVolumes()
@@ -1079,7 +1085,7 @@ def keySignatureToMidiEvents(
     '''
     from music21 import midi as midiModule
     mt = None  # use a midi track set to None
-    eventList: list[t.Union[midiModule.DeltaTime, midiModule.MidiEvent]] = []
+    eventList: list[t.Union[midi.DeltaTime, midi.MidiEvent]] = []
     if includeDeltaTime:
         dt = midiModule.DeltaTime(track=mt)
         # leave dt.time set to zero; will be shifted later as necessary
@@ -1255,8 +1261,8 @@ def getPacketFromMidiEvent(
 
 
 def elementToMidiEventList(
-    el: 'music21.base.Music21Object'
-) -> t.Optional[list['music21.midi.MidiEvent']]:
+    el: base.Music21Object
+) -> t.Optional[list[midi.MidiEvent]]:
     '''
     Return a list of MidiEvents (or None) from a Music21Object,
     assuming that dynamics have already been applied, etc.
@@ -1273,7 +1279,7 @@ def elementToMidiEventList(
     '''
     # TODO: this is the best use of the switch statement when minimum Python
     #    version is 3.10
-    sub: t.Optional[list[t.Union['music21.midi.DeltaTime', 'music21.midi.MidiEvent']]]
+    sub: t.Optional[list[t.Union[midi.DeltaTime, midi.MidiEvent]]]
     if isinstance(el, note.Rest):
         return None
     elif isinstance(el, note.Note):
@@ -1655,8 +1661,8 @@ def filterPacketsByTrackId(
 
 def packetsToDeltaSeparatedEvents(
         packets: list[dict[str, t.Any]],
-        midiTrack: 'music21.midi.MidiTrack'
-) -> list[t.Union['music21.midi.MidiEvent', 'music21.midi.DeltaTime']]:
+        midiTrack: midi.MidiTrack,
+) -> list[t.Union[midi.MidiEvent, midi.DeltaTime]]:
     '''
     Given a list of packets (which already contain MidiEvent objects)
     return a list of those Events with proper delta times between them.
@@ -1669,7 +1675,7 @@ def packetsToDeltaSeparatedEvents(
     '''
     from music21.midi import DeltaTime
 
-    events: list[t.Union['music21.midi.MidiEvent', DeltaTime]] = []
+    events: list[t.Union[midi.MidiEvent, DeltaTime]] = []
     lastOffset = 0
     for packet in packets:
         midiEvent = packet['midiEvent']
@@ -2580,7 +2586,7 @@ def streamHierarchyToMidiTracks(
 
 
 def midiTracksToStreams(
-    midiTracks: list['music21.midi.MidiTrack'],
+    midiTracks: list[midi.MidiTrack],
     ticksPerQuarter: int = defaults.ticksPerQuarter,
     quantizePost=True,
     inputM21: t.Optional[stream.Score] = None,

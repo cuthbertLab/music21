@@ -38,12 +38,15 @@ from music21 import note
 from music21 import pitch
 from music21.tree.trees import OffsetTree
 
+if t.TYPE_CHECKING:
+    from music21 import stream
+
 environLocal = environment.Environment('instrument')
 
 
-def unbundleInstruments(streamIn: 'music21.stream.Stream',
+def unbundleInstruments(streamIn: stream.Stream,
                         *,
-                        inPlace=False) -> t.Optional['music21.stream.Stream']:
+                        inPlace=False) -> t.Optional[stream.Stream]:
     # noinspection PyShadowingNames
     '''
     takes a :class:`~music21.stream.Stream` that has :class:`~music21.note.NotRest` objects
@@ -80,9 +83,9 @@ def unbundleInstruments(streamIn: 'music21.stream.Stream',
         return s
 
 
-def bundleInstruments(streamIn: 'music21.stream.Stream',
+def bundleInstruments(streamIn: stream.Stream,
                       *,
-                      inPlace=False) -> t.Optional['music21.stream.Stream']:
+                      inPlace=False) -> t.Optional[stream.Stream]:
     # noinspection PyShadowingNames
     '''
     >>> up1 = note.Unpitched()
@@ -517,8 +520,6 @@ class StringInstrument(Instrument):
             stringPitches is a property that stores a list of Pitches (or pitch names,
             such as "C4") that represent the pitch of the open strings from lowest to
             highest.[*]
-
-
 
             >>> vln1 = instrument.Violin()
             >>> [str(p) for p in vln1.stringPitches]
@@ -1814,7 +1815,7 @@ def ensembleNameBySize(number):
         return ensembleNamesBySize[int(number)]
 
 
-def deduplicate(s: 'music21.stream.Stream', inPlace: bool = False) -> 'music21.stream.Stream':
+def deduplicate(s: stream.Stream, inPlace: bool = False) -> stream.Stream:
     '''
     Check every offset in `s` for multiple instrument instances.
     If the `.partName` can be standardized across instances,
@@ -2089,7 +2090,7 @@ def instrumentFromMidiProgram(number: int) -> Instrument:
     return inst
 
 
-def partitionByInstrument(streamObj: 'music21.stream.Stream') -> 'music21.stream.Stream':
+def partitionByInstrument(streamObj: stream.Stream) -> stream.Stream:
     # noinspection PyShadowingNames
     '''
     Given a single Stream, or a Score or similar multi-part structure,
