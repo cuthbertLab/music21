@@ -1276,7 +1276,9 @@ class ConcreteScale(Scale):
         # here, tonic is a pitch
         # the abstract scale defines what step the tonic is expected to be
         # found on
-        # no default tonic is defined; as such, it is mostly an abstract scale
+        # no default tonic is defined; as such, it is mostly an abstract scale, and
+        # can't be used concretely until it is created.
+        self.tonic: t.Optional[pitch.Pitch]
         if tonic is None:
             self.tonic = None  # pitch.Pitch()
         elif isinstance(tonic, str):

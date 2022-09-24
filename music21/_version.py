@@ -47,6 +47,7 @@ Changing this number invalidates old pickles -- do it if the old pickles create 
 '''
 __version__ = '8.2.0'
 
+
 def get_version_tuple(vv):
     v = vv.split('.')
     last_v = v[-1]
@@ -63,6 +64,8 @@ def get_version_tuple(vv):
         v.append(beta)
     return tuple(v)
 
+
 __version_info__ = get_version_tuple(__version__)
+
 
 del get_version_tuple
