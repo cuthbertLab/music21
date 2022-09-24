@@ -28,6 +28,8 @@ exclude_lines = [
     r'.*#\s*pragma:\s*no cover.*',
     r'class TestExternal.*',
     r'class TestSlow.*',
+    r'\s*if TYPE_CHECKING:\s*',
+    r'\s*if t.TYPE_CHECKING:\s*',
 ]
 
 
