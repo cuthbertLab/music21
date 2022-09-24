@@ -8,6 +8,7 @@ from music21.abcFormat import testFiles
 from music21 import bar
 from music21 import converter
 from music21 import corpus
+from music21 import environment
 from music21 import expressions
 from music21 import features
 from music21 import instrument
@@ -20,7 +21,6 @@ from music21 import repeat
 from music21 import spanner
 from music21 import stream
 
-from music21 import environment
 environLocal = environment.Environment('test.test_repeat')
 
 

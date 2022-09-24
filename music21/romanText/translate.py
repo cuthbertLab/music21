@@ -132,6 +132,7 @@ import unittest
 from music21 import bar
 from music21 import base
 from music21 import common
+from music21 import environment
 from music21 import exceptions21
 from music21 import harmony
 from music21 import key
@@ -140,12 +141,11 @@ from music21 import meter
 from music21 import note
 from music21 import repeat
 from music21 import roman
+from music21.romanText import rtObjects
 from music21 import spanner
 from music21 import stream
 from music21 import tie
-from music21.romanText import rtObjects
 
-from music21 import environment
 environLocal = environment.Environment('romanText.translate')
 
 ROMANTEXT_VERSION = 1.0

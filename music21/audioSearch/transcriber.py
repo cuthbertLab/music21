@@ -14,8 +14,9 @@ from __future__ import annotations
 
 import unittest
 
-from music21 import scale
 from music21 import environment
+from music21 import scale
+
 environLocal = environment.Environment('audioSearch.transcriber')
 
 

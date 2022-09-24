@@ -238,6 +238,7 @@ import unittest
 from music21.base import Music21Object  # for typing only.
 from music21 import note
 from music21 import duration
+from music21 import environment
 from music21 import exceptions21
 from music21 import stream
 from music21 import tie
@@ -245,7 +246,6 @@ from music21 import expressions
 from music21 import meter
 from music21 import pitch
 
-from music21 import environment
 environLocal = environment.Environment('tinyNotation')
 
 

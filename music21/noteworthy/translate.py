@@ -68,6 +68,8 @@ from music21 import clef
 from music21 import common
 from music21 import duration
 from music21 import dynamics
+from music21 import environment
+from music21.exceptions21 import Music21Exception
 from music21 import key
 from music21 import meter
 from music21 import note
@@ -76,9 +78,7 @@ from music21 import repeat
 from music21 import spanner
 from music21 import stream
 from music21 import tie
-from music21.exceptions21 import Music21Exception
 
-from music21 import environment
 environLocal = environment.Environment('noteworthy.translate')
 
 

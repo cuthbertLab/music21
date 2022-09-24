@@ -26,10 +26,10 @@ from importlib.util import find_spec
 import unittest
 import wave
 
-from music21 import exceptions21
 from music21.common.types import DocOrder
-
 from music21 import environment
+from music21 import exceptions21
+
 environLocal = environment.Environment('audioSearch.recording')
 
 

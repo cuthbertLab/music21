@@ -16,11 +16,11 @@ import math
 from time import time
 import unittest
 
+from music21 import environment
 from music21 import scale
 from music21 import search
 from music21 import stream
 
-from music21 import environment
 environLocal = environment.Environment('audioSearch.scoreFollower')
 
 

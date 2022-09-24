@@ -25,11 +25,12 @@ import unittest
 import more_itertools
 
 from music21 import common
+from music21 import environment
 from music21 import exceptions21
 
-from music21.tree import spans, trees
+from music21.tree import spans
+from music21.tree import trees
 
-from music21 import environment
 environLocal = environment.Environment('tree.timespanTree')
 
 

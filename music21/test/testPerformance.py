@@ -20,10 +20,11 @@ from __future__ import annotations
 import unittest
 
 import music21
-from music21 import common, corpus
+from music21 import common
+from music21 import corpus
+from music21 import environment
 from music21.musicxml.m21ToXml import GeneralObjectExporter as GEX
 
-from music21 import environment
 environLocal = environment.Environment('test.testPerformance')
 
 # ------------------------------------------------------------------------------
