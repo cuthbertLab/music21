@@ -11,6 +11,7 @@
 '''
 Run from command line to toggle debug status.
 '''
+from __future__ import annotations
 
 import music21.environment
 

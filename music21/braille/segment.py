@@ -17,19 +17,21 @@ available from the Library of Congress
 `here <https://www.loc.gov/nls/braille-audio-reading-materials/music-materials/>`_,
 and will henceforth be referred to as BMTM.
 '''
+from __future__ import annotations
+
 import collections
 import copy
 import enum
-import unittest
 import typing as t
+import unittest
 
 from music21 import bar
 from music21 import base
 from music21 import chord
 from music21 import clef
 from music21 import dynamics
-from music21 import exceptions21
 from music21 import environment
+from music21 import exceptions21
 from music21 import expressions
 from music21 import key
 from music21 import layout
@@ -85,7 +87,7 @@ CSO_MMARK = 4
 CSO_VOICE = 10
 
 # (music21Object, affinity code, Braille classSortOrder)
-affinityCodes: t.List[t.Tuple[t.Type[base.Music21Object], Affinity, int]] = [
+affinityCodes: list[tuple[type[base.Music21Object], Affinity, int]] = [
     (note.Note, Affinity.NOTEGROUP, CSO_NOTE),
     (note.Rest, Affinity.NOTEGROUP, CSO_REST),
     (chord.Chord, Affinity.NOTEGROUP, CSO_CHORD),
@@ -99,7 +101,7 @@ affinityCodes: t.List[t.Tuple[t.Type[base.Music21Object], Affinity, int]] = [
     (stream.Voice, Affinity.INACCORD, CSO_VOICE),
 ]
 
-affinityNames: t.Dict[Affinity, str] = {
+affinityNames: dict[Affinity, str] = {
     Affinity.SIGNATURE: 'Signature Grouping',
     Affinity.TTEXT: 'Tempo Text Grouping',
     Affinity.MMARK: 'Metronome Mark Grouping',
@@ -110,7 +112,7 @@ affinityNames: t.Dict[Affinity, str] = {
     Affinity.SPLIT2_NOTEGROUP: 'Split Note Grouping B',
 }
 
-excludeFromBrailleElements: t.List[t.Type[base.Music21Object]] = [
+excludeFromBrailleElements: list[type[base.Music21Object]] = [
     spanner.Slur,
     layout.SystemLayout,
     layout.PageLayout,
@@ -153,7 +155,7 @@ SegmentKey.__new__.__defaults__ = (0, 0, None, None)
 # ------------------------------------------------------------------------------
 
 class BrailleElementGrouping(ProtoM21Object):
-    _DOC_ATTR: t.Dict[str, str] = {
+    _DOC_ATTR: dict[str, str] = {
         'keySignature': 'The last :class:`~music21.key.KeySignature` preceding the grouping.',
         'timeSignature': 'The last :class:`~music21.meter.TimeSignature` preceding the grouping.',
         'descendingChords': '''True if a :class:`~music21.chord.Chord` should be spelled
@@ -269,7 +271,7 @@ class BrailleElementGrouping(ProtoM21Object):
 
 
 class BrailleSegment(text.BrailleText):
-    _DOC_ATTR: t.Dict[str, str] = {
+    _DOC_ATTR: dict[str, str] = {
         'cancelOutgoingKeySig': '''If True, the previous key signature should be
                  cancelled immediately before a new key signature is encountered.''',
         'dummyRestLength': '''For a given positive integer n, adds n "dummy rests"
@@ -354,9 +356,9 @@ class BrailleSegment(text.BrailleText):
         ---end segment---
         '''
         super().__init__(lineLength=lineLength)
-        self._groupingDict: t.Dict[SegmentKey, BrailleElementGrouping] = {}
+        self._groupingDict: dict[SegmentKey, BrailleElementGrouping] = {}
 
-        self.groupingKeysToProcess: t.List[SegmentKey] = []
+        self.groupingKeysToProcess: list[SegmentKey] = []
         self.currentGroupingKey: t.Optional[SegmentKey] = None
         self.previousGroupingKey: t.Optional[SegmentKey] = None
         self.lastNote = None
@@ -1090,7 +1092,7 @@ class BrailleGrandSegment(BrailleSegment, text.BrailleKeyboard):
     def __init__(self, lineLength: int = 40):
         BrailleSegment.__init__(self, lineLength=lineLength)
         text.BrailleKeyboard.__init__(self, lineLength=lineLength)
-        self.allKeyPairs: t.List[t.Tuple[t.Optional[SegmentKey],
+        self.allKeyPairs: list[tuple[t.Optional[SegmentKey],
                                      t.Optional[SegmentKey]]] = []
         self.previousGroupingPair = None
         self.currentGroupingPair = None

@@ -34,9 +34,11 @@ The list of objects included here are:
 * :class:`~music21.voiceLeading.TwoChordLinearSegment` : 2 chord objects
 
 '''
+from __future__ import annotations
+
 import enum
+from typing import TYPE_CHECKING  # pylint bug; does not arise here though.
 import unittest
-import typing as t
 
 from music21 import base
 from music21 import chord
@@ -57,7 +59,7 @@ from music21 import scale
 
 # create a module level shared cache for intervals of P1, P5, P8
 # to be populated the first time a VLQ object is created
-intervalCache: t.List[interval.Interval] = []
+intervalCache: list[interval.Interval] = []
 
 
 class MotionType(str, enum.Enum):
@@ -84,7 +86,7 @@ class VoiceLeadingQuartet(base.Music21Object):
     to make sense.  Most routines will work the other way still though.
     '''
 
-    _DOC_ATTR: t.Dict[str, str] = {
+    _DOC_ATTR: dict[str, str] = {
         'vIntervals': '''
             A two-element list of the two harmonic intervals present,
             vn1n1 to v2n1 and v1n2 to v2n2.
@@ -118,8 +120,8 @@ class VoiceLeadingQuartet(base.Music21Object):
         self.v2n1 = v2n1
         self.v2n2 = v2n2
 
-        self.vIntervals: t.List[interval.Interval] = []  # vertical intervals (harmonic)
-        self.hIntervals: t.List[interval.Interval] = []  # horizontal intervals (melodic)
+        self.vIntervals: list[interval.Interval] = []  # vertical intervals (harmonic)
+        self.hIntervals: list[interval.Interval] = []  # horizontal intervals (melodic)
 
         self._key = None
         if analyticKey is not None:
@@ -534,7 +536,7 @@ class VoiceLeadingQuartet(base.Music21Object):
         vInt1 = self.vIntervals[1]
         vInt1_generic = vInt1.generic
 
-        if t.TYPE_CHECKING:
+        if TYPE_CHECKING:
             assert vInt0_generic is not None
             assert vInt1_generic is not None
 
@@ -1132,7 +1134,7 @@ class VoiceLeadingQuartet(base.Music21Object):
 
         firstHarmony = self.vIntervals[0].simpleName
         secondGeneric = self.vIntervals[1].generic
-        if t.TYPE_CHECKING:
+        if TYPE_CHECKING:
             assert secondGeneric is not None
         secondHarmony = secondGeneric.simpleUndirected
 
@@ -1200,7 +1202,7 @@ class VoiceLeadingQuartet(base.Music21Object):
 
         hInt0_generic = self.hIntervals[0].generic
         hInt1_generic = self.hIntervals[1].generic
-        if t.TYPE_CHECKING:
+        if TYPE_CHECKING:
             assert hInt0_generic is not None
             assert hInt1_generic is not None
 
@@ -1261,7 +1263,7 @@ class VoiceLeadingQuartet(base.Music21Object):
         v1ns = v1.noteStart
         v1ne = v1.noteEnd
 
-        if t.TYPE_CHECKING:
+        if TYPE_CHECKING:
             assert v0ns is not None and v0ne is not None
             assert v1ns is not None and v1ne is not None
 
@@ -1316,7 +1318,7 @@ class VoiceLeadingQuartet(base.Music21Object):
 
         vInt0_generic = self.vIntervals[0].generic
         vInt1_generic = self.vIntervals[1].generic
-        if t.TYPE_CHECKING:
+        if TYPE_CHECKING:
             assert vInt0_generic is not None
             assert vInt1_generic is not None
 
@@ -1415,7 +1417,7 @@ class Verticality(base.Music21Object):
     #  obsolete:     To create Verticalities out of a score, call
     #                by :meth:`~music21.theoryAnalyzer.getVerticalities`
 
-    _DOC_ATTR: t.Dict[str, str] = {
+    _DOC_ATTR: dict[str, str] = {
         'contentDict': '''Dictionary representing contents of Verticalities.
             the keys of the dictionary
             are the part numbers and the element at each key is a list of
@@ -2126,21 +2128,6 @@ class ThreeNoteLinearSegment(NNoteLinearSegment):
 
     def _reprInternal(self):
         return f'n1={self.n1} n2={self.n2} n3={self.n3}'
-
-    @common.deprecated('v7', 'v8', 'assign colors to n1.style.color (etc.) directly')
-    def color(self, color='red', noteList=(2,)):  # pragma: no cover
-        '''
-        color all the notes in noteList (1, 2, 3). Default is to color
-        only the second note red
-
-        DEPRECATED.
-        '''
-        if 1 in noteList:
-            self.n1.style.color = color
-        if 2 in noteList:
-            self.n2.style.color = color
-        if 3 in noteList:
-            self.n3.style.color = color
 
     def _isComplete(self) -> bool:
         return (self.n1 is not None) and (self.n2 is not None) and (self.n3 is not None)

@@ -13,30 +13,27 @@
 # -----------------------------------------------------------------------------
 from __future__ import annotations
 
-import gzip
-import os
-import pathlib
-import pickle
-import time
-import typing as t
-import unittest
-
-from collections import OrderedDict
-
-from music21 import common
-from music21.common.fileTools import readPickleGzip
-from music21 import exceptions21
-from music21 import prebase
-
-# -----------------------------------------------------------------------------
 __all__ = [
     'MetadataEntry',
     'MetadataBundle',
     'MetadataBundleException',
 ]
 
+from collections import OrderedDict
+import gzip
+import os
+import pathlib
+import pickle
+import time
+import unittest
 
+from music21 import common
+from music21.common.fileTools import readPickleGzip
 from music21 import environment
+from music21 import exceptions21
+from music21 import prebase
+
+# -----------------------------------------------------------------------------
 environLocal = environment.Environment(os.path.basename(__file__))
 
 
@@ -267,7 +264,7 @@ class MetadataBundle(prebase.ProtoM21Object):
 
     def __init__(self, expr=None):
         from music21 import corpus
-        self._metadataEntries: t.OrderedDict[str, MetadataEntry] = OrderedDict()
+        self._metadataEntries: OrderedDict[str, MetadataEntry] = OrderedDict()
         if not isinstance(expr, (str, corpus.corpora.Corpus, type(None))):
             raise MetadataBundleException('Need to take a string, corpus, or None as expression')
 
@@ -587,7 +584,7 @@ class MetadataBundle(prebase.ProtoM21Object):
             raise MetadataBundleException('metadataBundle must be a MetadataBundle')
         selfKeys = set(self._metadataEntries.keys())
         otherKeys = set(metadataBundle._metadataEntries.keys())
-        resultKeys: t.List[str] = getattr(selfKeys, operator)(otherKeys)
+        resultKeys: list[str] = getattr(selfKeys, operator)(otherKeys)
         resultBundle: MetadataBundle = type(self)()
         for key in resultKeys:
             metadataEntry: MetadataEntry
@@ -598,7 +595,7 @@ class MetadataBundle(prebase.ProtoM21Object):
             resultBundle._metadataEntries[key] = metadataEntry
 
         # noinspection PyTypeChecker
-        mdbItems: t.List[t.Tuple[str, MetadataEntry]] = list(resultBundle._metadataEntries.items())
+        mdbItems: list[tuple[str, MetadataEntry]] = list(resultBundle._metadataEntries.items())
         resultBundle._metadataEntries = OrderedDict(sorted(mdbItems,
                                                            key=lambda mde: mde[1].sourcePath))
         return resultBundle
@@ -1068,11 +1065,12 @@ class MetadataBundle(prebase.ProtoM21Object):
         'title'
         ...
         '''
-        from music21 import metadata
+        from music21.metadata import properties
+        from music21.metadata import RichMetadata
         return tuple(sorted(
-            metadata.properties.ALL_UNIQUE_NAMES
-            + metadata.properties.ALL_MUSIC21_WORK_IDS
-            + list(metadata.RichMetadata.additionalRichMetadataAttributes)
+            properties.ALL_UNIQUE_NAMES
+            + properties.ALL_MUSIC21_WORK_IDS
+            + list(RichMetadata.additionalRichMetadataAttributes)
         ))
 
     def read(self, filePath=None):

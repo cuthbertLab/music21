@@ -41,6 +41,8 @@ next pitch. In all cases :class:`~music21.pitch.Pitch` objects are returned.
 >>> [str(p) for p in sc2.getPitches('g2', 'g4', direction=scale.Direction.ASCENDING)]
 ['G#2', 'A2', 'B2', 'C3', 'D3', 'E3', 'F#3', 'G#3', 'A3', 'B3', 'C4', 'D4', 'E4', 'F#4']
 '''
+from __future__ import annotations
+
 __all__ = [
     'intervalNetwork', 'scala',
     'Direction', 'Terminus',
@@ -66,6 +68,7 @@ from music21.scale import scala
 # -------------------------
 from music21 import base
 from music21 import common
+from music21.common.decorators import deprecated
 from music21 import defaults
 from music21 import environment
 from music21 import exceptions21
@@ -79,8 +82,8 @@ environLocal = environment.Environment('scale')
 Direction = intervalNetwork.Direction
 Terminus = intervalNetwork.Terminus
 
-_PitchDegreeCacheKey = t.Tuple[
-    t.Type,  # scale class
+_PitchDegreeCacheKey = tuple[
+    type,  # scale class
     str,  # scale type
     str,  # tonic name with octave
     int,  # degree
@@ -90,7 +93,7 @@ _PitchDegreeCacheKey = t.Tuple[
 
 # a dictionary mapping an abstract scale class, tonic.nameWithOctave,
 # and degree to a pitchNameWithOctave.
-_pitchDegreeCache: t.Dict[_PitchDegreeCacheKey, str] = {}
+_pitchDegreeCache: dict[_PitchDegreeCacheKey, str] = {}
 
 
 # ------------------------------------------------------------------------------
@@ -1256,7 +1259,7 @@ class ConcreteScale(Scale):
 
     def __init__(self,
                  tonic: t.Optional[t.Union[str, pitch.Pitch, note.Note]] = None,
-                 pitches: t.Optional[t.List[t.Union[pitch.Pitch, str]]] = None):
+                 pitches: t.Optional[list[t.Union[pitch.Pitch, str]]] = None):
         super().__init__()
 
         self.type = 'Concrete'
@@ -1498,7 +1501,7 @@ class ConcreteScale(Scale):
                                     )
         pitchCollNames = [p.name for p in pitchColl]
 
-        def tuneOnePitch(p, dst: t.List[pitch.Pitch]):
+        def tuneOnePitch(p, dst: list[pitch.Pitch]):
             # some pitches might be quarter / 3/4 tones; need to convert
             # these to microtonal representations so that we can directly
             # compare pitch names
@@ -1536,7 +1539,7 @@ class ConcreteScale(Scale):
                 elementPitches = [e.pitch]
 
             # store a list of reset chord pitches
-            outerDestination: t.List[pitch.Pitch] = []
+            outerDestination: list[pitch.Pitch] = []
 
             for p in elementPitches:
                 tuneOnePitch(p, outerDestination)
@@ -1571,7 +1574,7 @@ class ConcreteScale(Scale):
         minPitch: t.Union[str, pitch.Pitch, None] = None,
         maxPitch: t.Union[str, pitch.Pitch, None] = None,
         direction: t.Optional[Direction] = None
-    ) -> t.List[pitch.Pitch]:
+    ) -> list[pitch.Pitch]:
         '''
         Return a list of Pitch objects, using a
         deepcopy of a cached version if available.
@@ -2045,6 +2048,7 @@ class ConcreteScale(Scale):
 
     # no type checking as a deprecated call that shadows superclass.
     @t.no_type_check
+    @deprecated('v9', 'v10', 'use nextPitch instead')
     def next(
         self,
         pitchOrigin=None,
@@ -2060,7 +2064,7 @@ class ConcreteScale(Scale):
         full subclass substitution.  Thus, is shadows the `.next()` function of
         Music21Object without performing similar functionality.
 
-        The routine will be formally deprecated in v9 and removed in v10.
+        The routine is formally deprecated in v9 and will be removed in v10.
         '''
         return self.nextPitch(
             pitchOrigin=pitchOrigin,
@@ -3014,7 +3018,7 @@ class OctaveRepeatingScale(ConcreteScale):
     [<music21.pitch.Pitch C4>, <music21.pitch.Pitch D-4>, <music21.pitch.Pitch C5>]
     '''
 
-    def __init__(self, tonic=None, intervalList: t.Optional[t.List] = None):
+    def __init__(self, tonic=None, intervalList: t.Optional[list] = None):
         super().__init__(tonic=tonic)
         mode = intervalList if intervalList else ['m2']
         self._abstract = AbstractOctaveRepeatingScale(mode=mode)
@@ -3044,7 +3048,7 @@ class CyclicalScale(ConcreteScale):
 
     def __init__(self,
                  tonic: t.Union[str, pitch.Pitch, note.Note, None] = None,
-                 intervalList: t.Optional[t.List] = None):
+                 intervalList: t.Optional[list] = None):
         super().__init__(tonic=tonic)
         mode = intervalList if intervalList else ['m2']
         self._abstract = AbstractCyclicalScale(mode=mode)

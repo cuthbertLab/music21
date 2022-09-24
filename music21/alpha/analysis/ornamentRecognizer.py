@@ -8,9 +8,11 @@
 # Copyright:    Copyright © 2016 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
-import unittest
+from __future__ import annotations
+
 from copy import deepcopy
 import typing as t
+import unittest
 
 from music21.common.numberTools import opFrac
 from music21.common.types import OffsetQL
@@ -46,8 +48,8 @@ class OrnamentRecognizer:
 
     def calculateOrnamentTotalQl(
         self,
-        busyNotes: t.List[note.GeneralNote],
-        simpleNotes: t.Optional[t.List[note.GeneralNote]] = None
+        busyNotes: list[note.GeneralNote],
+        simpleNotes: t.Optional[list[note.GeneralNote]] = None
     ) -> OffsetQL:
         '''
         Returns total length of trill assuming busy notes are all an expanded trill.

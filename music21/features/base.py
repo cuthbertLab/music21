@@ -23,6 +23,7 @@ from music21 import common
 from music21.common.types import StreamType
 from music21 import converter
 from music21 import corpus
+from music21 import environment
 from music21 import exceptions21
 from music21 import note
 from music21 import stream
@@ -30,7 +31,6 @@ from music21 import text
 
 from music21.metadata.bundles import MetadataEntry
 
-from music21 import environment
 environLocal = environment.Environment('features.base')
 # ------------------------------------------------------------------------------
 
@@ -307,7 +307,7 @@ class StreamForms:
             self.prepared = None
 
         # basic data storage is a dictionary
-        self.forms: t.Dict[str, stream.Stream] = {}
+        self.forms: dict[str, stream.Stream] = {}
 
     def keys(self) -> KeysView[str]:
         # will only return forms that are established
@@ -356,11 +356,11 @@ class StreamForms:
 
         return prepared
 
-    def _getIntervalHistogram(self, algorithm='midi') -> t.List[int]:
+    def _getIntervalHistogram(self, algorithm='midi') -> list[int]:
         # note that this does not optimize and cache part presentations
         histo = [0] * 128
         # if we have parts, must add one at a time
-        parts: t.List[stream.Stream]
+        parts: list[stream.Stream]
         if isinstance(self.prepared, stream.Score):
             parts = list(self.prepared.parts)
         else:

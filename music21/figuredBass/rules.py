@@ -7,7 +7,8 @@
 # Copyright:    Copyright © 2010 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
-import typing as t
+from __future__ import annotations
+
 import unittest
 from music21 import exceptions21
 from music21 import prebase
@@ -143,7 +144,7 @@ class Rules(prebase.ProtoM21Object):
     _DOC_ORDER = ([_x[0] for _x in singlePossibilityDoc]
                   + [_y[0] for _y in consecutivePossibilityDoc]
                   + [_z[0] for _z in specialResDoc])
-    _DOC_ATTR: t.Dict[str, str] = dict(
+    _DOC_ATTR: dict[str, str] = dict(
         singlePossibilityDoc
         + consecutivePossibilityDoc
         + specialResDoc

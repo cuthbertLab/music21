@@ -121,6 +121,8 @@ OMIT_FROM_DOCS
 ...                  )[roman.RomanNumeral].first().pitches]
 ['F#5', 'A5', 'C6']
 '''
+from __future__ import annotations
+
 import copy
 import textwrap
 import traceback
@@ -130,6 +132,7 @@ import unittest
 from music21 import bar
 from music21 import base
 from music21 import common
+from music21 import environment
 from music21 import exceptions21
 from music21 import harmony
 from music21 import key
@@ -138,12 +141,11 @@ from music21 import meter
 from music21 import note
 from music21 import repeat
 from music21 import roman
+from music21.romanText import rtObjects
 from music21 import spanner
 from music21 import stream
 from music21 import tie
-from music21.romanText import rtObjects
 
-from music21 import environment
 environLocal = environment.Environment('romanText.translate')
 
 ROMANTEXT_VERSION = 1.0
@@ -323,7 +325,7 @@ def _getKeyAndPrefix(rtKeyOrString):
 
 
 # Cache each of the created keys so that we don't recreate them.
-_rnKeyCache: t.Dict[t.Tuple[str, str], roman.RomanNumeral] = {}
+_rnKeyCache: dict[tuple[str, str], roman.RomanNumeral] = {}
 
 
 class PartTranslator:
@@ -954,7 +956,7 @@ letterToNumDict = {'a': 1, 'b': 2, 'c': 3, 'd': 4, 'e': 5, 'f': 6, 'g': 7, 'h': 
 
 def appendMeasureToRepeatEndingsDict(rtMeasureObj: rtObjects.RTMeasure,
                                      m: stream.Measure,
-                                     repeatEndings: t.Dict,
+                                     repeatEndings: dict,
                                      measureNumber=None):
     # noinspection PyShadowingNames
     '''
@@ -1649,7 +1651,7 @@ m1 C: I'''
             self.assertEqual(p2.quarterLength, quarterLength)
 
         def _test_ending_contents(
-            rb: spanner.RepeatBracket, expectedMeasures: t.List[str]
+            rb: spanner.RepeatBracket, expectedMeasures: list[str]
         ) -> None:
             measure_nos = [m.measureNumberWithSuffix() for m in rb[stream.Measure]]
             self.assertEqual(measure_nos, expectedMeasures)
@@ -1757,7 +1759,7 @@ m1 C: I'''
 # ------------------------------------------------------------------------------
 
 # define presented order in documentation
-_DOC_ORDER: t.List[type] = []
+_DOC_ORDER: list[type] = []
 
 
 if __name__ == '__main__':

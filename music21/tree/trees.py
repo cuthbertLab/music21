@@ -15,20 +15,20 @@ Tools for grouping elements, timespans, and especially
 pitched elements into kinds of searchable tree organized by start and stop offsets
 and other positions.
 '''
-import unittest
-import weakref
+from __future__ import annotations
+
 from math import inf
 import typing as t
+import unittest
+import weakref
 
 from music21 import common
+from music21 import environment
 from music21 import exceptions21
-
 from music21.sorting import SortTuple
 
 from music21.tree import core
 from music21.tree import node as nodeModule
-
-from music21 import environment
 
 environLocal = environment.Environment('tree.trees')
 

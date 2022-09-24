@@ -12,9 +12,12 @@
 '''
 If it doesn't fit anywhere else in the common directory, you'll find it here...
 '''
-import typing as t
+from __future__ import annotations
+
+from collections.abc import Callable, Iterable
 import platform
 import re
+import typing as t
 
 __all__ = [
     'flattenList',
@@ -38,7 +41,7 @@ import time
 # -----------------------------------------------------------------------------
 
 
-def flattenList(originalList: t.List) -> t.List:
+def flattenList(originalList: list) -> list:
     '''
     Flatten a list of lists into a flat list
 
@@ -51,7 +54,7 @@ def flattenList(originalList: t.List) -> t.List:
     return [item for sublist in originalList for item in sublist]
 
 
-def unique(originalList: t.Iterable, *, key: t.Optional[t.Callable] = None) -> t.List:
+def unique(originalList: Iterable, *, key: t.Optional[Callable] = None) -> list:
     '''
     Return a List of unique items from an iterable, preserving order.
     (unlike casting to a set and back)
@@ -145,7 +148,7 @@ def getPlatform() -> str:
     else:
         return os.name
 
-def macOSVersion() -> t.Tuple[int, int, int]:  # pragma: no cover
+def macOSVersion() -> tuple[int, int, int]:  # pragma: no cover
     '''
     On a Mac returns the current version as a tuple of (currently 3) ints,
     such as: (10, 5, 6) for 10.5.6.
@@ -165,7 +168,7 @@ def macOSVersion() -> t.Tuple[int, int, int]:  # pragma: no cover
     return (major, minor, maintenance)
 
 
-def sortModules(moduleList: t.Iterable[t.Any]) -> t.List[object]:
+def sortModules(moduleList: Iterable[t.Any]) -> list[object]:
     '''
     Sort a list of imported module names such that most recently modified is
     first.  In ties, last access time is used then module name

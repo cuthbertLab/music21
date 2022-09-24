@@ -7,9 +7,10 @@
 # Copyright:    Copyright © 2011 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
+from __future__ import annotations
+
 import copy
 import re
-import typing as t
 import unittest
 
 from music21 import exceptions21
@@ -141,7 +142,7 @@ class Notation(prebase.ProtoM21Object):
     '''
     _DOC_ORDER = ['notationColumn', 'figureStrings', 'numbers', 'modifiers',
                   'figures', 'origNumbers', 'origModStrings', 'modifierStrings']
-    _DOC_ATTR: t.Dict[str, str] = {
+    _DOC_ATTR: dict[str, str] = {
         'modifiers': '''
             A list of :class:`~music21.figuredBass.notation.Modifier`
             objects associated with the expanded
@@ -395,7 +396,7 @@ class Figure(prebase.ProtoM21Object):
     >>> f1.modifier
     <music21.figuredBass.notation.Modifier + sharp>
     '''
-    _DOC_ATTR: t.Dict[str, str] = {
+    _DOC_ATTR: dict[str, str] = {
         'number': '''
             A number associated with an expanded
             :attr:`~music21.figuredBass.notation.Notation.notationColumn`.
@@ -483,7 +484,7 @@ class Modifier(prebase.ProtoM21Object):
     >>> m3b.accidental is None
     True
     '''
-    _DOC_ATTR: t.Dict[str, str] = {
+    _DOC_ATTR: dict[str, str] = {
         'modifierString': '''
             A modifier string associated with an
             expanded :attr:`~music21.figuredBass.notation.Notation.notationColumn`.

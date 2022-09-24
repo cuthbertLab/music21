@@ -12,16 +12,16 @@
 '''
 Object models of barlines, including repeat barlines.
 '''
-import unittest
+from __future__ import annotations
+
 import typing as t
+import unittest
 
 from music21 import base
+from music21 import environment
 from music21 import exceptions21
-
 from music21 import expressions
 from music21 import repeat
-
-from music21 import environment
 
 environLocal = environment.Environment('bar')
 

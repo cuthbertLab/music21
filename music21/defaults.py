@@ -12,6 +12,8 @@
 '''
 Simple storage for data defaults used throughout music21.
 '''
+from __future__ import annotations
+
 import unittest
 import typing as t
 from music21 import _version

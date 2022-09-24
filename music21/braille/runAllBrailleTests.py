@@ -18,6 +18,8 @@ to people who are programming music21 on a screen reader.
 
 For Bo-Cheng Jhan with my thanks.
 '''
+from __future__ import annotations
+
 import re
 import subprocess
 import sys

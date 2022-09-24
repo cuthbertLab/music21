@@ -8,6 +8,8 @@
 # Copyright:    Copyright © 2022 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
+from __future__ import annotations
+
 import typing as t
 import unittest
 

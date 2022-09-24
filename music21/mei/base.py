@@ -172,13 +172,15 @@ tool.
 * <sb>: a system break
 
 '''
-import typing as t
-from xml.etree.ElementTree import Element, ParseError, fromstring, ElementTree
+from __future__ import annotations
 
 from collections import defaultdict
 from copy import deepcopy
 from fractions import Fraction  # for typing
+import typing as t
 from uuid import uuid4
+from xml.etree.ElementTree import Element, ParseError, fromstring, ElementTree
+
 
 # music21
 from music21 import articulations
@@ -381,7 +383,7 @@ def safePitch(
 def makeDuration(
     base: t.Union[float, int, Fraction] = 0.0,
     dots: int = 0
-) -> 'music21.duration.Duration':
+) -> duration.Duration:
     '''
     Given a ``base`` duration and a number of ``dots``, create a :class:`~music21.duration.Duration`
     instance with the
@@ -410,7 +412,7 @@ def makeDuration(
     return returnDuration
 
 
-def allPartsPresent(scoreElem) -> t.Tuple[str, ...]:
+def allPartsPresent(scoreElem) -> tuple[str, ...]:
     # noinspection PyShadowingNames
     '''
     Find the @n values for all <staffDef> elements in a <score> element. This assumes that every
@@ -945,7 +947,7 @@ def _ppConclude(theConverter):
 # Helper Functions
 # -----------------------------------------------------------------------------
 def _processEmbeddedElements(
-    elements: t.List[Element],
+    elements: list[Element],
     mapping,
     callerTag=None,
     slurBundle=None

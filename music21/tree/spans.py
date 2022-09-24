@@ -15,9 +15,10 @@
 Tools for grouping notes and chords into a searchable tree
 organized by start and stop offsets.
 '''
+from __future__ import annotations
+
 import copy
 from math import inf
-import typing as t
 import unittest
 
 from music21 import environment
@@ -297,7 +298,7 @@ class ElementTimespan(Timespan):
     '''
 
     # CLASS VARIABLES #
-    _DOC_ATTR: t.Dict[str, str] = {
+    _DOC_ATTR: dict[str, str] = {
         'parentage': r'''
             The Stream hierarchy above the element in a ElementTimespan.
 

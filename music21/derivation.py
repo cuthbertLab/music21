@@ -16,15 +16,23 @@
 This module defines objects for tracking the derivation of one
 :class:`~music21.stream.Stream` from another.
 '''
+from __future__ import annotations
+
+from collections.abc import Generator
 import functools
 import typing as t
+from typing import TYPE_CHECKING  # Pylint bug
 import unittest
 
 from music21 import common
 from music21.common.objects import SlottedObjectMixin
-# imported by stream
-
 from music21 import environment
+
+
+if TYPE_CHECKING:
+    from music21 import base
+
+
 environLocal = environment.Environment('derivation')
 
 
@@ -188,7 +196,7 @@ class Derivation(SlottedObjectMixin):
     # PUBLIC PROPERTIES #
 
     @property
-    def client(self) -> t.Optional['music21.base.Music21Object']:
+    def client(self) -> t.Optional[base.Music21Object]:
         c = common.unwrapWeakref(self._client)
         if c is None and self._clientId is not None:
             self._clientId = None
@@ -198,7 +206,7 @@ class Derivation(SlottedObjectMixin):
         return c
 
     @client.setter
-    def client(self, client: t.Optional['music21.base.Music21Object']):
+    def client(self, client: t.Optional[base.Music21Object]):
         # client is the Stream that this derivation lives on
         if client is None:
             self._clientId = None
@@ -207,7 +215,7 @@ class Derivation(SlottedObjectMixin):
             self._clientId = id(client)
             self._client = common.wrapWeakref(client)
 
-    def chain(self) -> t.Generator['music21.base.Music21Object', None, None]:
+    def chain(self) -> Generator[base.Music21Object, None, None]:
         '''
         Iterator/Generator
 
@@ -283,11 +291,11 @@ class Derivation(SlottedObjectMixin):
         self._method = method
 
     @property
-    def origin(self) -> t.Optional['music21.base.Music21Object']:
+    def origin(self) -> t.Optional[base.Music21Object]:
         return self._origin
 
     @origin.setter
-    def origin(self, origin: t.Optional['music21.base.Music21Object']):
+    def origin(self, origin: t.Optional[base.Music21Object]):
         # for now, origin is not a weak ref
         if origin is None:
             self._originId = None
@@ -298,7 +306,7 @@ class Derivation(SlottedObjectMixin):
             # self._origin = common.wrapWeakref(origin)
 
     @property
-    def rootDerivation(self) -> t.Optional['music21.base.Music21Object']:
+    def rootDerivation(self) -> t.Optional[base.Music21Object]:
         r'''
         Return a reference to the oldest source of this Stream; that is, chain
         calls to :attr:`~music21.stream.Stream.derivesFrom` until we get to a

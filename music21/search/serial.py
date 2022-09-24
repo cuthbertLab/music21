@@ -9,18 +9,19 @@
 # Copyright:    Copyright © 2009-2012, 2016 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # -------------------------------------------------
+from __future__ import annotations
+
 from collections import Counter
 import copy
 from operator import attrgetter
-import typing as t
 import unittest
 
 from music21 import base
 from music21 import common
 from music21 import environment
+from music21.serial import pcToToneRow, ToneRow
 from music21 import spanner
 from music21 import stream
-from music21.serial import pcToToneRow, ToneRow
 
 environLocal = environment.Environment()
 
@@ -47,7 +48,7 @@ class ContiguousSegmentOfNotes(base.Music21Object):
     <music21.search.serial.ContiguousSegmentOfNotes ['C4', 'D4']>
 
     '''
-    _DOC_ATTR: t.Dict[str, str] = {
+    _DOC_ATTR: dict[str, str] = {
         'segment': 'The list of notes and chords in the contiguous segment.',
         'containerStream': '''
             The stream containing the contiguous segment -

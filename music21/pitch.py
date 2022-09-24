@@ -18,25 +18,28 @@ made available directly in the `Note` object, so they will seem familiar.
 '''
 from __future__ import annotations
 
-import copy
-import math
-import itertools
 from collections import OrderedDict
+import copy
+import itertools
+import math
 import typing as t
-from typing import overload
+from typing import TYPE_CHECKING  # pylint needs no alias
+from typing import overload  # Pycharm can't use an alias
 import unittest
 
 from music21 import base
 from music21 import common
-from music21 import defaults
-from music21 import exceptions21
-from music21 import interval
-from music21 import style
-from music21 import prebase
-
 from music21.common.objects import SlottedObjectMixin
 from music21.common.types import StepName
+from music21 import defaults
 from music21 import environment
+from music21 import exceptions21
+from music21 import interval
+from music21 import prebase
+from music21 import style
+
+if TYPE_CHECKING:
+    from music21 import note
 
 PitchType = t.TypeVar('PitchType', bound='Pitch')
 
@@ -44,7 +47,7 @@ environLocal = environment.Environment('pitch')
 
 PitchClassString = t.Literal['a', 'A', 't', 'T', 'b', 'B', 'e', 'E']
 
-STEPREF: t.Dict[StepName, int] = {
+STEPREF: dict[StepName, int] = {
     'C': 0,
     'D': 2,
     'E': 4,
@@ -54,7 +57,7 @@ STEPREF: t.Dict[StepName, int] = {
     'B': 11,
 }
 NATURAL_PCS = (0, 2, 4, 5, 7, 9, 11)
-STEPREF_REVERSED: t.Dict[int, StepName] = {
+STEPREF_REVERSED: dict[int, StepName] = {
     0: 'C',
     2: 'D',
     4: 'E',
@@ -63,8 +66,8 @@ STEPREF_REVERSED: t.Dict[int, StepName] = {
     9: 'A',
     11: 'B',
 }
-STEPNAMES: t.Set[StepName] = {'C', 'D', 'E', 'F', 'G', 'A', 'B'}  # set
-STEP_TO_DNN_OFFSET: t.Dict[StepName, int] = {
+STEPNAMES: set[StepName] = {'C', 'D', 'E', 'F', 'G', 'A', 'B'}  # set
+STEP_TO_DNN_OFFSET: dict[StepName, int] = {
     'C': 0,
     'D': 1,
     'E': 2,
@@ -210,7 +213,7 @@ def _convertPsToOct(ps: t.Union[int, float]) -> int:
 
 def _convertPsToStep(
     ps: t.Union[int, float]
-) -> t.Tuple[StepName,
+) -> tuple[StepName,
              Accidental,
              Microtone,
              int]:
@@ -363,7 +366,7 @@ def _convertPsToStep(
     return name, acc, microObj, octShift
 
 
-def _convertCentsToAlterAndCents(shift) -> t.Tuple[float, float]:
+def _convertCentsToAlterAndCents(shift) -> tuple[float, float]:
     '''
     Given any floating point value, split into accidental and microtone components.
 
@@ -874,7 +877,7 @@ class Accidental(prebase.ProtoM21Object, style.StyleMixin):
     _DOC_ORDER = ['name', 'modifier', 'alter', 'set']
 
     # documentation for all attributes (not properties or methods)
-    _DOC_ATTR: t.Dict[str, str] = {
+    _DOC_ATTR: dict[str, str] = {
         'displaySize': 'Size in display: "cue", "large", or a percentage.',
         'displayStyle': 'Style of display: "parentheses", "bracket", "both".',
         'displayLocation': 'Location of accidental: "normal", "above", "below".',
@@ -898,7 +901,7 @@ class Accidental(prebase.ProtoM21Object, style.StyleMixin):
         self.displayLocation = 'normal'
 
         # store a reference to the Pitch that has this Accidental object as a property
-        self._client: t.Optional['Pitch'] = None
+        self._client: t.Optional[Pitch] = None
         self._name = ''
         self._modifier = ''
         self._alter = 0.0     # semitones to alter step
@@ -1737,13 +1740,13 @@ class Pitch(prebase.ProtoM21Object):
     _DOC_ORDER = ['name', 'nameWithOctave', 'step', 'pitchClass', 'octave', 'midi', 'german',
                   'french', 'spanish', 'italian', 'dutch']
     # documentation for all attributes (not properties or methods)
-    # _DOC_ATTR: t.Dict[str, str] = {
+    # _DOC_ATTR: dict[str, str] = {
     # }
 
     # constants shared by all classes
     _twelfth_root_of_two = TWELFTH_ROOT_OF_TWO
 
-    _DOC_ATTR: t.Dict[str, str] = {
+    _DOC_ATTR: dict[str, str] = {
         'spellingIsInferred': '''
             Returns True or False about whether enharmonic spelling
             Has been inferred on pitch creation or whether it has
@@ -1837,10 +1840,10 @@ class Pitch(prebase.ProtoM21Object):
         self.spellingIsInferred = False
         # the fundamental attribute stores an optional pitch
         # that defines the fundamental used to create this Pitch
-        self.fundamental: t.Optional['Pitch'] = None
+        self.fundamental: t.Optional[Pitch] = None
 
         # so that we can tell clients about changes in pitches.
-        self._client: t.Optional['music21.note.Note'] = None
+        self._client: t.Optional[note.Note] = None
 
         # name combines step, octave, and accidental
         if name is not None:
@@ -2660,8 +2663,8 @@ class Pitch(prebase.ProtoM21Object):
         '''
         usrStr = usrStr.strip()
         # extract any numbers that may be octave designations
-        octFound: t.List[str] = []
-        octNot: t.List[str] = []
+        octFound: list[str] = []
+        octNot: list[str] = []
 
         for char in usrStr:
             if char in '0123456789':
@@ -3214,7 +3217,7 @@ class Pitch(prebase.ProtoM21Object):
                 return ' cuádruple'
             return ''
 
-    _SPANISH_DICT: t.Dict[StepName, str] = {
+    _SPANISH_DICT: dict[StepName, str] = {
         'A': 'la',
         'B': 'si',
         'C': 'do',
@@ -3270,7 +3273,7 @@ class Pitch(prebase.ProtoM21Object):
         else:
             raise PitchException('Unsupported accidental type.')
 
-    _FRENCH_DICT: t.Dict[StepName, str] = {
+    _FRENCH_DICT: dict[StepName, str] = {
         'A': 'la',
         'B': 'si',
         'C': 'do',
@@ -3515,7 +3518,7 @@ class Pitch(prebase.ProtoM21Object):
 
     def harmonicFromFundamental(self,
                                 fundamental: t.Union[str, 'Pitch']
-                                ) -> t.Tuple[int, float]:
+                                ) -> tuple[int, float]:
         # noinspection PyShadowingNames
         '''
         Given another Pitch as a fundamental, find the harmonic
@@ -3695,7 +3698,7 @@ class Pitch(prebase.ProtoM21Object):
     def harmonicAndFundamentalFromPitch(
             self,
             target: t.Union[str, 'Pitch']
-    ) -> t.Tuple[int, 'Pitch']:
+    ) -> tuple[int, 'Pitch']:
         '''
         Given a Pitch that is a plausible target for a fundamental,
         return the harmonic number and a potentially shifted fundamental
@@ -3852,7 +3855,7 @@ class Pitch(prebase.ProtoM21Object):
             return False
 
     # a cache so that interval objects can be reused...
-    _transpositionIntervals: t.Dict[t.Literal['d2', '-d2'], interval.Interval] = {}
+    _transpositionIntervals: dict[t.Literal['d2', '-d2'], interval.Interval] = {}
 
     @overload
     def _getEnharmonicHelper(self: PitchType,
@@ -4192,7 +4195,7 @@ class Pitch(prebase.ProtoM21Object):
             self._client.pitchChanged()  # pylint: disable=no-member
 
 
-    def getAllCommonEnharmonics(self: PitchType, alterLimit: int = 2) -> t.List[PitchType]:
+    def getAllCommonEnharmonics(self: PitchType, alterLimit: int = 2) -> list[PitchType]:
         '''
         Return all common unique enharmonics for a pitch,
         or those that do not involve more than two accidentals.
@@ -4225,7 +4228,7 @@ class Pitch(prebase.ProtoM21Object):
         Music21 does not support accidentals beyond quadruple sharp/flat, so
         `alterLimit` = 4 is the most you can use. (Thank goodness!)
         '''
-        post: t.List[PitchType] = []
+        post: list[PitchType] = []
         c = self.simplifyEnharmonic(inPlace=False)
         if c is None:  # pragma: no follow
             return post  # not going to happen...
@@ -4345,7 +4348,7 @@ class Pitch(prebase.ProtoM21Object):
     def diatonicNoteNum(self, newNum: int):
         octave = int((newNum - 1) / 7)
         noteNameNum = newNum - 1 - (7 * octave)
-        pitchList: t.Tuple[StepName, ...] = ('C', 'D', 'E', 'F', 'G', 'A', 'B')
+        pitchList: tuple[StepName, ...] = ('C', 'D', 'E', 'F', 'G', 'A', 'B')
         noteName: StepName = pitchList[noteNameNum]
         self.octave = octave
         self.step = noteName
@@ -4353,7 +4356,7 @@ class Pitch(prebase.ProtoM21Object):
     @overload
     def transpose(
         self: PitchType,
-        value: t.Union['music21.interval.IntervalBase', str, int],
+        value: t.Union[interval.IntervalBase, str, int],
         *,
         inPlace: t.Literal[True]
     ) -> None:
@@ -4362,7 +4365,7 @@ class Pitch(prebase.ProtoM21Object):
     @overload
     def transpose(
         self: PitchType,
-        value: t.Union['music21.interval.IntervalBase', str, int],
+        value: t.Union[interval.IntervalBase, str, int],
         *,
         inPlace: t.Literal[False] = False
     ) -> PitchType:
@@ -4370,7 +4373,7 @@ class Pitch(prebase.ProtoM21Object):
 
     def transpose(
         self: PitchType,
-        value: t.Union['music21.interval.IntervalBase', str, int],
+        value: t.Union[interval.IntervalBase, str, int],
         *,
         inPlace: bool = False
     ) -> t.Optional[PitchType]:
@@ -4745,10 +4748,10 @@ class Pitch(prebase.ProtoM21Object):
     def updateAccidentalDisplay(
         self,
         *,
-        pitchPast: t.Optional[t.List['Pitch']] = None,
-        pitchPastMeasure: t.Optional[t.List['Pitch']] = None,
-        otherSimultaneousPitches: t.Optional[t.List['Pitch']] = None,
-        alteredPitches: t.Optional[t.List['Pitch']] = None,
+        pitchPast: t.Optional[list[Pitch]] = None,
+        pitchPastMeasure: t.Optional[list[Pitch]] = None,
+        otherSimultaneousPitches: t.Optional[list[Pitch]] = None,
+        alteredPitches: t.Optional[list[Pitch]] = None,
         cautionaryPitchClass: bool = True,
         cautionaryAll: bool = False,
         overrideStatus: bool = False,

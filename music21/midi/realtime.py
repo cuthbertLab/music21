@@ -20,16 +20,17 @@ https://stackoverflow.com/questions/10983462/how-can-i-produce-real-time-audio-o
 
 Requires pygame: http://www.pygame.org/download.shtml
 '''
+from __future__ import annotations
+
 from importlib.util import find_spec
-import unittest
 from io import BytesIO
+import unittest
 
 from music21 import defaults
-
 from music21.exceptions21 import Music21Exception
-from music21.midi import translate as midiTranslate
 from music21 import stream
 
+from music21.midi import translate as midiTranslate
 
 class StreamPlayerException(Music21Exception):
     pass

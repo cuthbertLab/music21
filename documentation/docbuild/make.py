@@ -10,6 +10,7 @@
 # Copyright:    Copyright © 2013-17 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
+from __future__ import annotations
 
 import os
 import shutil

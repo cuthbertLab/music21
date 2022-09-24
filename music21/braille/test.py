@@ -7,6 +7,8 @@
 # Copyright:    Copyright © 2012, 2016 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
+from __future__ import annotations
+
 import re
 import textwrap
 import unittest

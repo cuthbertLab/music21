@@ -8,6 +8,8 @@
 # Copyright:    Copyright © 2011, 2016 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
+from __future__ import annotations
+
 import unittest
 
 from music21 import exceptions21

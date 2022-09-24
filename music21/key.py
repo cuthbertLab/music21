@@ -21,12 +21,15 @@ from __future__ import annotations
 
 import copy
 import re
-import unittest
 import typing as t
 from typing import overload
+import unittest
 import warnings
 
 from music21 import base
+from music21.common.decorators import cacheMethod
+from music21.common.types import StepName
+from music21 import environment
 from music21 import exceptions21
 from music21 import interval
 from music21 import note
@@ -34,9 +37,6 @@ from music21 import pitch
 from music21 import scale
 from music21 import style
 
-from music21.common.decorators import cacheMethod
-from music21.common.types import StepName
-from music21 import environment
 environLocal = environment.Environment('key')
 
 KeySignatureType = t.TypeVar('KeySignatureType', bound='KeySignature')
@@ -46,7 +46,7 @@ TransposeTypes = t.Union[int, str, interval.Interval, interval.GenericInterval]
 
 # ------------------------------------------------------------------------------
 # store a cache of already-found values
-_sharpsToPitchCache: t.Dict[int, pitch.Pitch] = {}
+_sharpsToPitchCache: dict[int, pitch.Pitch] = {}
 
 
 def convertKeyStringToMusic21KeyString(textString):
@@ -360,7 +360,7 @@ class KeySignature(base.Music21Object):
         self._sharps = sharps
         # need to store a list of pitch objects, used for creating a
         # non-traditional key
-        self._alteredPitches: t.Optional[t.List[pitch.Pitch]] = None
+        self._alteredPitches: t.Optional[list[pitch.Pitch]] = None
         self.accidentalsApplyOnlyToOctave = False
 
     def __hash__(self):
@@ -459,7 +459,7 @@ class KeySignature(base.Music21Object):
 
     @property  # type: ignore
     @cacheMethod
-    def alteredPitches(self) -> t.List[pitch.Pitch]:
+    def alteredPitches(self) -> list[pitch.Pitch]:
         # unfortunately, mypy cannot deal with @property on decorated methods.
         # noinspection PyShadowingNames
         '''
@@ -517,7 +517,7 @@ class KeySignature(base.Music21Object):
         if self._alteredPitches is not None:
             return self._alteredPitches
 
-        post: t.List[pitch.Pitch] = []
+        post: list[pitch.Pitch] = []
         if self.sharps is None:
             return post
 
@@ -542,10 +542,10 @@ class KeySignature(base.Music21Object):
         return post
 
     @alteredPitches.setter
-    def alteredPitches(self, newAlteredPitches: t.List[t.Union[str, pitch.Pitch, note.Note]]
+    def alteredPitches(self, newAlteredPitches: list[t.Union[str, pitch.Pitch, note.Note]]
                        ) -> None:
         self.clearCache()
-        newList: t.List[pitch.Pitch] = []
+        newList: list[pitch.Pitch] = []
         for p in newAlteredPitches:
             if isinstance(p, str):
                 newList.append(pitch.Pitch(p))
@@ -990,7 +990,7 @@ class Key(KeySignature, scale.DiatonicScale):
         self.correlationCoefficient = None
 
         # store an ordered list of alternative Key objects
-        self.alternateInterpretations: t.List[Key] = []
+        self.alternateInterpretations: list[Key] = []
 
     def __hash__(self):
         hashTuple = (self.tonic, self.mode)

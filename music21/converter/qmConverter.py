@@ -23,9 +23,15 @@ Consult the code to see how it works.  To use, call
 then `myStream = converter.parse('quarterMusic: C E G D F')`
 
 '''
-from music21 import converter, note, stream, meter, environment
+from __future__ import annotations
 
-environLocal = environment.Environment()
+from music21 import converter
+from music21 import environment
+from music21 import meter
+from music21 import note
+from music21 import stream
+
+environLocal = environment.Environment('converter.qmConverter')
 
 
 class QMConverter(converter.subConverters.SubConverter):

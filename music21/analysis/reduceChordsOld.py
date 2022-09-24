@@ -11,8 +11,10 @@
 '''
 Automatically reduce a MeasureStack to a single chord or group of chords.
 '''
-import unittest
+from __future__ import annotations
+
 import copy
+import unittest
 
 from music21 import chord
 from music21.common.types import DocOrder

@@ -14,19 +14,21 @@ defined in Cory McKay's MA Thesis, "Automatic Genre Classification of MIDI Recor
 
 The LGPL jSymbolic system can be found here: http://jmir.sourceforge.net/jSymbolic.html
 '''
+from __future__ import annotations
+
+from collections import OrderedDict
 import copy
 import math
+from math import isclose
 import statistics
 import unittest
-from collections import OrderedDict
-from math import isclose
 
 from music21 import base
+from music21 import environment
 from music21 import exceptions21
 from music21.features import base as featuresModule
 from music21.instrument import Instrument
 
-from music21 import environment
 environLocal = environment.Environment('features.jSymbolic')
 
 

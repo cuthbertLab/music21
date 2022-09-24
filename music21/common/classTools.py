@@ -9,6 +9,8 @@
 # Copyright:    Copyright © 2009-2015 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
+from __future__ import annotations
+
 import contextlib
 import typing as t
 
@@ -124,7 +126,7 @@ def isIterable(usrData: t.Any) -> bool:
     return False
 
 
-def classToClassStr(classObj: t.Type) -> str:
+def classToClassStr(classObj: type) -> str:
     '''Convert a class object to a class string.
 
     >>> common.classToClassStr(note.Note)
@@ -231,7 +233,7 @@ def saveAttributes(obj, *attributeList):
 
     New in v7.
     '''
-    tempStorage: t.Dict[str, t.Any] = {}
+    tempStorage: dict[str, t.Any] = {}
     for attribute in attributeList:
         tempStorage[attribute] = getattr(obj, attribute)
     try:

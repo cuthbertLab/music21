@@ -12,6 +12,7 @@
 '''
 Tools for working with files
 '''
+from __future__ import annotations
 
 import codecs
 import contextlib  # for with statements

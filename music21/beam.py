@@ -72,7 +72,11 @@ To get rid of beams on a note do:
 
 >>> n2.beams.beamsList = []
 '''
+from __future__ import annotations
+
+from collections.abc import Iterable
 import typing as t
+from typing import TYPE_CHECKING  # pylint bug
 import unittest
 
 from music21 import exceptions21
@@ -81,6 +85,11 @@ from music21 import environment
 from music21 import prebase
 from music21 import style
 from music21.common.objects import EqualSlottedObjectMixin
+
+
+if TYPE_CHECKING:
+    from music21 import base
+
 
 environLocal = environment.Environment('beam')
 
@@ -204,7 +213,7 @@ class Beams(prebase.ProtoM21Object, EqualSlottedObjectMixin):
         'id',
     )
 
-    _DOC_ATTR: t.Dict[str, str] = {
+    _DOC_ATTR: dict[str, str] = {
         'feathered': '''
             Boolean determining if this is a feathered beam or not
             (does nothing for now).''',
@@ -240,7 +249,7 @@ class Beams(prebase.ProtoM21Object, EqualSlottedObjectMixin):
     # STATIC METHODS #
 
     @staticmethod
-    def naiveBeams(srcList: t.Iterable['music21.base.Music21Object']):
+    def naiveBeams(srcList: Iterable[base.Music21Object]):
         # noinspection PyShadowingNames
         '''
         Given a list or iterator of elements, return a list of None or Beams for
@@ -261,7 +270,7 @@ class Beams(prebase.ProtoM21Object, EqualSlottedObjectMixin):
                      2/None>/<music21.beam.Beam 3/None>>,
          None]
         '''
-        beamsList: t.List[t.Optional[Beams]] = []
+        beamsList: list[t.Optional[Beams]] = []
         for el in srcList:
             # if a dur cannot be beamable under any circumstance, replace
             # it with None; this includes Rests
@@ -280,7 +289,7 @@ class Beams(prebase.ProtoM21Object, EqualSlottedObjectMixin):
         return beamsList
 
     @staticmethod
-    def removeSandwichedUnbeamables(beamsList: t.List[t.Union['Beams', None]]):
+    def removeSandwichedUnbeamables(beamsList: list[t.Union['Beams', None]]):
         # noinspection PyShadowingNames
         '''
         Go through the naiveBeamsList and remove beams from objects surrounded

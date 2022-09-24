@@ -11,16 +11,18 @@
 '''
 Various tools and utilities to find correlations between disparate objects in a Stream.
 '''
-import unittest
+from __future__ import annotations
+
 from collections import OrderedDict
+import unittest
 
 from music21 import exceptions21
 
 from music21 import note
 from music21 import chord
 from music21 import dynamics
-
 from music21 import environment
+
 environLocal = environment.Environment('analysis.correlate')
 
 

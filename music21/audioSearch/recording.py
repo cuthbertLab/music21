@@ -20,14 +20,16 @@ users of 64-bit windows but 32-bit python should download the win32 port
 
 users of 64-bit windows and 64-bit python should download the amd64 port
 '''
+from __future__ import annotations
+
 from importlib.util import find_spec
 import unittest
 import wave
 
-from music21 import exceptions21
 from music21.common.types import DocOrder
-
 from music21 import environment
+from music21 import exceptions21
+
 environLocal = environment.Environment('audioSearch.recording')
 
 
@@ -90,7 +92,7 @@ def samplesFromRecording(seconds=10.0, storeFile=True,
         # write recording to disk
         data = b''.join(storedWaveSampleList)
         try:
-            # wave.open does not take a path-like object as of 3.9
+            # wave.open does not take a path-like object as of 3.10
             wf = wave.open(waveFilename, 'wb')
             wf.setnchannels(recordChannels)
             wf.setsampwidth(p_audio.get_sample_size(recordFormat))

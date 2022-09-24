@@ -9,6 +9,7 @@
 # Copyright:    Copyright © 2009-2022 Michael Scott Asato Cuthbert,
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
+from __future__ import annotations
 
 # this requires pylint to be installed and available from the command line
 import argparse

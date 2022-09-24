@@ -40,12 +40,12 @@ See :meth:`~music21.figuredBass.realizer.figuredBassFromStream` for more details
 >>> allSols2.getNumSolutions()
 30
 '''
+from __future__ import annotations
+
 import collections
 import copy
 import random
-import typing as t
 import unittest
-
 
 from music21 import chord
 from music21 import clef
@@ -213,7 +213,7 @@ class FiguredBassLine:
     <music21.meter.TimeSignature 3/4>
     '''
     _DOC_ORDER = ['addElement', 'generateBassLine', 'realize']
-    _DOC_ATTR: t.Dict[str, str] = {
+    _DOC_ATTR: dict[str, str] = {
         'inKey': '''
             A :class:`~music21.key.Key` which implies a scale value,
             scale mode, and key signature for a
@@ -561,7 +561,7 @@ class Realization:
                   'generateRandomRealizations', 'generateAllRealizations',
                   'getAllPossibilityProgressions', 'getRandomPossibilityProgression',
                   'generateRealizationFromPossibilityProgression']
-    _DOC_ATTR: t.Dict[str, str] = {
+    _DOC_ATTR: dict[str, str] = {
         'keyboardStyleOutput': '''
             True by default. If True, generated realizations
             are represented in keyboard style, with two staves. If False,

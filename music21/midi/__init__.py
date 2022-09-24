@@ -23,6 +23,8 @@ This module originally used routines from Will Ware's public domain midi.py
 library from 2001 which was once posted at (http link)
 groups.google.com/g/alt.sources/msg/0c5fc523e050c35e
 '''
+from __future__ import annotations
+
 __all__ = [
     'realtime', 'percussion',
     'MidiEvent', 'MidiFile', 'MidiTrack', 'MidiException',
@@ -464,11 +466,11 @@ class MidiEvent(prebase.ProtoM21Object):
     '''
     # pylint: disable=redefined-builtin
     def __init__(self,
-                 track: t.Optional['music21.midi.MidiTrack'] = None,
+                 track: t.Optional[MidiTrack] = None,
                  type=None,
                  time: int = 0,
                  channel: t.Optional[int] = None):
-        self.track: t.Optional['music21.midi.MidiTrack'] = track  # a MidiTrack object
+        self.track: t.Optional[MidiTrack] = track  # a MidiTrack object
         self.type = type
         self.time: int = time
         self.channel: t.Optional[int] = channel
@@ -1152,7 +1154,7 @@ class DeltaTime(MidiEvent):
             rep = '(empty) ' + rep
         return rep
 
-    def read(self, oldBytes: bytes) -> t.Tuple[int, bytes]:
+    def read(self, oldBytes: bytes) -> tuple[int, bytes]:
         r'''
         Read a byte-string until hitting a character below 0x80
         and return the converted number and the rest of the bytes
@@ -1986,7 +1988,7 @@ class Test(unittest.TestCase):
 
 # ------------------------------------------------------------------------------
 # define presented order in documentation
-_DOC_ORDER: t.List[type] = []
+_DOC_ORDER: list[type] = []
 
 if __name__ == '__main__':
     import music21

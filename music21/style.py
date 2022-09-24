@@ -13,12 +13,19 @@
 The style module represents information about the style of a Note, Accidental,
 etc. such that precise positioning information, layout, size, etc. can be specified.
 '''
+from __future__ import annotations
+
 import typing as t
+from typing import TYPE_CHECKING
 import unittest
 
 from music21 import common
 from music21 import exceptions21
 from music21.prebase import ProtoM21Object
+
+
+if TYPE_CHECKING:
+    from music21 import editorial
 
 
 class TextFormatException(exceptions21.Music21Exception):
@@ -59,7 +66,7 @@ class Style(ProtoM21Object):
     20.4
 
     '''
-    _DOC_ATTR: t.Dict[str, str] = {
+    _DOC_ATTR: dict[str, str] = {
         'hideObjectOnPrint': '''
             If set to `True`, the Music21Object will not print upon output
             (only used in MusicXML output at this point and
@@ -221,7 +228,7 @@ class NoteStyle(Style):
     Beam style is stored on the Beams object.  Lyric style is stored on the Lyric
     object.
     '''
-    _DOC_ATTR: t.Dict[str, str] = {
+    _DOC_ATTR: dict[str, str] = {
         'stemStyle': '''
             An optional style.Style object describing what the stem looks like.
 
@@ -620,7 +627,7 @@ class StyleMixin(common.SlottedObjectMixin):
         # no need to call super().__init__() on SlottedObjectMixin
         # This might be dangerous though
         self._style: t.Optional[Style] = None
-        self._editorial: t.Optional['music21.editorial.Editorial'] = None
+        self._editorial: t.Optional[editorial.Editorial] = None
 
     @property
     def hasStyleInformation(self) -> bool:
@@ -703,7 +710,7 @@ class StyleMixin(common.SlottedObjectMixin):
         return not (self._editorial is None)
 
     @property
-    def editorial(self) -> 'music21.editorial.Editorial':
+    def editorial(self) -> editorial.Editorial:
         '''
         a :class:`~music21.editorial.Editorial` object that stores editorial information
         (comments, footnotes, harmonic information, ficta).
@@ -726,7 +733,7 @@ class StyleMixin(common.SlottedObjectMixin):
         return self._editorial
 
     @editorial.setter
-    def editorial(self, ed: 'music21.editorial.Editorial'):
+    def editorial(self, ed: editorial.Editorial):
         self._editorial = ed
 
 

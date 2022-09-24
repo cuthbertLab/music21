@@ -15,6 +15,8 @@
 An object representation of harmony, a subclass of chord, as encountered as chord symbols or
 roman numerals, or other chord representations with a defined root.
 '''
+from __future__ import annotations
+
 import collections
 import copy
 import re
@@ -26,16 +28,15 @@ from music21 import base
 from music21 import chord
 from music21 import common
 from music21 import duration
+from music21 import environment
 from music21 import exceptions21
+from music21.figuredBass import realizerScale
 from music21 import interval
 from music21 import key
 from music21 import pitch
 from music21 import prebase
 from music21 import style
 
-from music21.figuredBass import realizerScale
-
-from music21 import environment
 environLocal = environment.Environment('harmony')
 
 T = t.TypeVar('T', bound='ChordSymbol')
@@ -226,8 +227,8 @@ class Harmony(chord.Chord):
         # called <function> which might conflict with the Harmony...
         self._roman = None
         # specify an array of degree alteration objects
-        self.chordStepModifications: t.List[ChordStepModification] = []
-        self._degreesList: t.List[str] = []
+        self.chordStepModifications: list[ChordStepModification] = []
+        self._degreesList: list[str] = []
         self._key = None
         # senseless to parse inversion until chord members are populated
         self._updateFromParameters(root=root, bass=bass)
@@ -1384,7 +1385,7 @@ def removeChordSymbols(chordType):
 
 
 # --------------------------------------------------------------------------
-realizerScaleCache: t.Dict[t.Tuple[str, str], realizerScale.FiguredBassScale] = {}
+realizerScaleCache: dict[tuple[str, str], realizerScale.FiguredBassScale] = {}
 
 # --------------------------------------------------------------------------
 

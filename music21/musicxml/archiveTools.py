@@ -12,13 +12,16 @@
 '''
 Tools for compressing and decompressing musicxml files.
 '''
+from __future__ import annotations
+
 import os
 import pathlib
-import zipfile
 import typing as t
+import zipfile
 
 from music21 import common
 from music21 import environment
+
 environLocal = environment.Environment('musicxml.archiveTools')
 
 

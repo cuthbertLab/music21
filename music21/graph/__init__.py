@@ -38,15 +38,19 @@ From highest level to lowest level usage, ways of graphing are as follows:
     4. Use `matplotlib` directly to create any graph, musical or non-musical.
 
 '''
+from __future__ import annotations
+
 __all__ = [
     'axis', 'findPlot', 'plot', 'primitives', 'utilities',
     'plotStream',
 ]
 
 import typing as t
+from typing import TYPE_CHECKING  # pylint needs no alias
 import unittest
 
 from music21 import common
+from music21 import environment
 
 from music21.graph import axis
 from music21.graph import findPlot
@@ -54,12 +58,16 @@ from music21.graph import plot
 from music21.graph import primitives
 from music21.graph import utilities
 
-from music21 import environment
+
+if TYPE_CHECKING:
+    from music21 import stream
+
+
 environLocal = environment.Environment('graph')
 
 
 def plotStream(
-    streamObj: 'music21.stream.Stream',
+    streamObj: stream.Stream,
     graphFormat: t.Optional[str] = None,
     xValue=None,
     yValue=None,

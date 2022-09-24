@@ -14,7 +14,9 @@ Controller to run all module tests in the music21 folders.
 
 Runs great, but slowly on multiprocessor systems.
 '''
+from __future__ import annotations
 
+from collections.abc import Sequence
 import doctest
 import sys
 import typing as t
@@ -36,7 +38,7 @@ environLocal = environment.Environment('test.testSingleCoreAll')
 cov = coverageM21.getCoverage()
 
 
-def main(testGroup: t.Sequence[str] = ('test',),
+def main(testGroup: Sequence[str] = ('test',),
          restoreEnvironmentDefaults=False,
          limit: t.Optional[bool] = None,
          verbosity=2,

@@ -7,7 +7,10 @@
 #
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
+from __future__ import annotations
+
 import unittest
+
 _DOC_IGNORE_MODULE_OR_PACKAGE = True
 
 

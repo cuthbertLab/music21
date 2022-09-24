@@ -14,28 +14,34 @@ This module defines the :class:`~music21.meter.TimeSignature` object,
 as well as component objects for defining nested metrical structures,
 :class:`~music21.meter.MeterTerminal` and :class:`~music21.meter.MeterSequence` objects.
 '''
+from __future__ import annotations
+
+from collections.abc import Sequence
 import copy
-from math import gcd
 import fractions
+from math import gcd
 import typing as t
+from typing import TYPE_CHECKING  # pylint needs no alias
 import unittest
 
 from music21 import base
 from music21 import beam
 from music21 import common
+from music21.common.enums import MeterDivision
+from music21.common.numberTools import opFrac
 from music21 import defaults
 from music21 import duration
 from music21 import environment
-from music21 import style
 from music21.exceptions21 import MeterException, TimeSignatureException
+from music21 import style
 
-from music21.common.enums import MeterDivision
-from music21.common.numberTools import opFrac
 from music21.meter.tools import slashToTuple, proportionToFraction
 from music21.meter.core import MeterSequence
 
 environLocal = environment.Environment('meter')
 
+if TYPE_CHECKING:
+    from music21 import stream
 
 # this is just a placeholder so that .beamSequence, etc. do not need to
 # be typed as Optional.  It should never be touched or queried
@@ -48,10 +54,10 @@ MIN_DENOMINATOR_TYPE = '128th'
 
 # store a module-level dictionary of partitioned meter sequences used
 # for setting default accent weights; store as needed
-_meterSequenceAccentArchetypes: t.Dict[t.Tuple[str, t.Any, int], MeterSequence] = {}
+_meterSequenceAccentArchetypes: dict[tuple[str, t.Any, int], MeterSequence] = {}
 _meterSequenceAccentArchetypesNoneCache = ('', -1, -1)  # a cache key representing None
 
-def bestTimeSignature(meas: 'music21.stream.Stream') -> 'music21.meter.TimeSignature':
+def bestTimeSignature(meas: stream.Stream) -> 'music21.meter.TimeSignature':
     # noinspection PyShadowingNames
     '''
     Given a Measure (or any Stream) with elements in it, get a TimeSignature that contains all
@@ -446,7 +452,7 @@ class TimeSignature(TimeSignatureBase):
     _styleClass = style.TextStyle
     classSortOrder = 4
 
-    _DOC_ATTR: t.Dict[str, str] = {
+    _DOC_ATTR: dict[str, str] = {
         'beatSequence': 'A :class:`~music21.meter.MeterSequence` governing beat partitioning.',
         'beamSequence': 'A :class:`~music21.meter.MeterSequence` governing automatic beaming.',
         'accentSequence': 'A :class:`~music21.meter.MeterSequence` governing accent partitioning.',
@@ -971,7 +977,7 @@ class TimeSignature(TimeSignatureBase):
             return 'Other'
 
     @property
-    def beatDivisionDurations(self) -> t.List[duration.Duration]:
+    def beatDivisionDurations(self) -> list[duration.Duration]:
         '''
         Return the beat division, or the durations that make up one beat,
         as a list of :class:`~music21.duration.Duration` objects, if and only if
@@ -1007,7 +1013,7 @@ class TimeSignature(TimeSignatureBase):
             raise TimeSignatureException(f'non uniform beat division: {post}')
 
     @property
-    def beatSubDivisionDurations(self) -> t.List[duration.Duration]:
+    def beatSubDivisionDurations(self) -> list[duration.Duration]:
         '''
         Return a subdivision of the beat division, or a list
         of :class:`~music21.duration.Duration` objects representing each beat division
@@ -1213,8 +1219,8 @@ class TimeSignature(TimeSignatureBase):
             ms.subdivideNestedHierarchy(depth,
                                         firstPartitionForm=firstPartitionForm)
 
-            # provide a partition for each flat division
-            accentCount = len(ms.flat)
+            # provide a partition for each flattened division
+            accentCount = len(ms.flatten())
             # environLocal.printDebug(['got accentCount', accentCount, 'ms: ', ms])
             divStep = self.barDuration.quarterLength / accentCount
             weightInts = [0] * accentCount  # weights as integer/depth counts
@@ -1242,7 +1248,7 @@ class TimeSignature(TimeSignatureBase):
 
     # --------------------------------------------------------------------------
     # access data for other processing
-    def getBeams(self, srcList, measureStartOffset=0.0) -> t.List[t.Optional[beam.Beams]]:
+    def getBeams(self, srcList, measureStartOffset=0.0) -> list[t.Optional[beam.Beams]]:
         '''
         Given a qLen position and an iterable of Music21Objects, return a list of Beams objects.
 
@@ -1557,7 +1563,7 @@ class TimeSignature(TimeSignatureBase):
             pos += self.accentSequence[i].duration.quarterLength
         return False
 
-    def setAccentWeight(self, weights: t.Union[t.Sequence[float], float], level: int = 0) -> None:
+    def setAccentWeight(self, weights: t.Union[Sequence[float], float], level: int = 0) -> None:
         '''
         Set accent weight, or floating point scalars, for the accent MeterSequence.
         Provide a list of float values; if this list is shorter than the length
@@ -1582,8 +1588,8 @@ class TimeSignature(TimeSignatureBase):
         >>> a.getAccentWeight(3.5)
         0.2...
         '''
-        weightList: t.Sequence[float]
-        if not isinstance(weights, t.Sequence):
+        weightList: Sequence[float]
+        if not isinstance(weights, Sequence):
             weightList = [weights]
         else:
             weightList = weights

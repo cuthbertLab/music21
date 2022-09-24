@@ -5,10 +5,9 @@
 #
 # Authors:      Christopher Ariza
 #
-# Copyright:    Copyright © 2010, 16 Michael Scott Asato Cuthbert
+# Copyright:    Copyright © 2010-22 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
-
 # noinspection SpellCheckingInspection
 '''
 This module defines classes for representing Scala scale data,
@@ -42,27 +41,29 @@ For most people you'll want to do something like this:
 ['A4', 'B4(-15c)', 'C#5(-11c)', 'E-5(-7c)', 'E~5(+6c)', 'F#5(+14c)', 'G~5(+1c)', 'B-5(+2c)']
 
 '''
-import typing as t
+from __future__ import annotations
 
 import io
 import math
 import os
 import pathlib
+import typing as t
 import unittest
 
 
 from music21 import common
+from music21 import environment
 from music21 import interval
+
 # scl is the library of scala files
 from music21.scale.scala import scl
 
-from music21 import environment
 environLocal = environment.Environment('scale.scala')
 
 
 # ------------------------------------------------------------------------------
 # global variable to cache the paths returned from getPaths()
-SCALA_PATHS: t.Dict[str, t.Optional[t.Dict[str, t.List[str]]]] = {'allPaths': None}
+SCALA_PATHS: dict[str, t.Optional[dict[str, list[str]]]] = {'allPaths': None}
 
 def getPaths():
     '''
@@ -721,7 +722,7 @@ Aristoxenos' Chromatic/Enharmonic, 3 + 9 + 18 parts
 
 # ------------------------------------------------------------------------------
 # define presented order in documentation
-_DOC_ORDER: t.List[t.Callable] = []
+_DOC_ORDER: list[type] = []
 
 
 if __name__ == '__main__':

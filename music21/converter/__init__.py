@@ -33,6 +33,8 @@ the temp folder on the disk.
 >>> s
 <music21.stream.Score ...>
 '''
+from __future__ import annotations
+
 import collections.abc
 import copy
 from http.client import responses
@@ -146,11 +148,11 @@ class ArchiveManager:
             raise ArchiveManagerException(f'no support for archiveType: {self.archiveType}')
         return False
 
-    def getNames(self) -> t.List[str]:
+    def getNames(self) -> list[str]:
         '''
         Return a list of all names contained in this archive.
         '''
-        post: t.List[str] = []
+        post: list[str] = []
         if self.archiveType == 'zip':
             with zipfile.ZipFile(self.fp, 'r') as f:
                 for subFp in f.namelist():
@@ -264,12 +266,12 @@ class PickleFilter:
                  forceSource: bool = False,
                  number: t.Optional[int] = None,
                  # quantizePost: bool = False,
-                 # quarterLengthDivisors: t.Optional[t.Iterable[int]] = None,
+                 # quarterLengthDivisors: t.Optional[Iterable[int]] = None,
                  **keywords):
         self.fp: pathlib.Path = common.cleanpath(fp, returnPathlib=True)
         self.forceSource: bool = forceSource
         self.number: t.Optional[int] = number
-        self.keywords: t.Dict[str, t.Any] = keywords
+        self.keywords: dict[str, t.Any] = keywords
         # environLocal.printDebug(['creating pickle filter'])
 
     def getPickleFp(self,
@@ -297,7 +299,7 @@ class PickleFilter:
 
         pathNameToParse = str(self.fp)
 
-        quantization: t.List[str] = []
+        quantization: list[str] = []
         if 'quantizePost' in self.keywords and self.keywords['quantizePost'] is False:
             quantization.append('noQtz')
         elif 'quarterLengthDivisors' in self.keywords:
@@ -324,7 +326,7 @@ class PickleFilter:
         if pickleFp.exists():
             os.remove(pickleFp)
 
-    def status(self) -> t.Tuple[pathlib.Path, bool, t.Optional[pathlib.Path]]:
+    def status(self) -> tuple[pathlib.Path, bool, t.Optional[pathlib.Path]]:
         '''
         Given a file path specified with __init__, look for an up-to-date pickled
         version of this file path. If it exists, return its fp, otherwise return the
@@ -372,10 +374,10 @@ class PickleFilter:
 
 
 # ------------------------------------------------------------------------------
-_registeredSubconverters: t.List[t.Type[subConverters.SubConverter]] = []
+_registeredSubconverters: list[type[subConverters.SubConverter]] = []
 # default subconverters to skip
-_deregisteredSubconverters: t.List[
-    t.Union[t.Type[subConverters.SubConverter], t.Literal['all']]
+_deregisteredSubconverters: list[
+    t.Union[type[subConverters.SubConverter], t.Literal['all']]
 ] = []
 
 
@@ -417,7 +419,7 @@ def registerSubconverter(newSubConverter) -> None:
 
 
 def unregisterSubconverter(
-    removeSubconverter: t.Union[t.Literal['all'], t.Type[subConverters.SubConverter]]
+    removeSubconverter: t.Union[t.Literal['all'], type[subConverters.SubConverter]]
 ) -> None:
     # noinspection PyShadowingNames
     '''
@@ -479,7 +481,7 @@ class Converter:
 
     Not a subclass, but a wrapper for different converter objects based on format.
     '''
-    _DOC_ATTR: t.Dict[str, str] = {
+    _DOC_ATTR: dict[str, str] = {
         'subConverter':
             '''
             a :class:`~music21.converter.subConverters.SubConverter` object
@@ -785,7 +787,7 @@ class Converter:
     def subconvertersList(
         self,
         converterType: t.Literal['any', 'input', 'output'] = 'any'
-    ) -> t.List[t.Type[subConverters.SubConverter]]:
+    ) -> list[type[subConverters.SubConverter]]:
         '''
         Gives a list of all the subconverter classes that are registered.
 
@@ -870,7 +872,7 @@ class Converter:
 
         return filteredSubConvertersList
 
-    def defaultSubconverters(self) -> t.List[t.Type[subConverters.SubConverter]]:
+    def defaultSubconverters(self) -> list[type[subConverters.SubConverter]]:
         '''
         return an alphabetical list of the default subconverters: those in converter.subConverters
         with the class Subconverter.
@@ -902,7 +904,7 @@ class Converter:
         <class 'music21.converter.subConverters.ConverterVolpiano'>
         <class 'music21.converter.subConverters.SubConverter'>
         '''
-        defaultSubconverters: t.List[t.Type[subConverters.SubConverter]] = []
+        defaultSubconverters: list[type[subConverters.SubConverter]] = []
         for i in sorted(subConverters.__dict__):
             possibleSubConverter = getattr(subConverters, i)
             # noinspection PyTypeChecker
@@ -978,7 +980,7 @@ class Converter:
     def formatFromHeader(
         self,
         dataStr: _StrOrBytes
-    ) -> t.Tuple[t.Optional[str], _StrOrBytes]:
+    ) -> tuple[t.Optional[str], _StrOrBytes]:
         '''
         if dataStr begins with a text header such as  "tinyNotation:" then
         return that format plus the dataStr with the head removed.

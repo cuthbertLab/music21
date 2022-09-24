@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import copy
 import difflib
 import fractions
@@ -548,7 +550,7 @@ class Test(unittest.TestCase):
         '''
         alto = corpus.parse('bach/bwv57.8').parts['#Alto']
         alto.measure(7).timeSignature = meter.TimeSignature('6/8')
-        newAlto = alto.flat.getElementsNotOfClass(meter.TimeSignature).stream()
+        newAlto = alto.flatten().getElementsNotOfClass(meter.TimeSignature).stream()
         newAlto.insert(0, meter.TimeSignature('2/4'))
         newAlto.makeMeasures(inPlace=True)
         newAltoFixed = newAlto.makeNotation()

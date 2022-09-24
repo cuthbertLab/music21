@@ -12,10 +12,10 @@
 '''
 Utility routines for processing text in scores and other musical objects.
 '''
-import unittest
-import random
+from __future__ import annotations
 
-# import music21  # needed to properly do isinstance checking
+import random
+import unittest
 
 from music21 import base
 from music21 import common

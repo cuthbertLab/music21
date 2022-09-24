@@ -12,20 +12,22 @@
 '''
 This module defines objects for describing tempo and changes in tempo.
 '''
+from __future__ import annotations
+
 import copy
-import unittest
 import typing as t
+import unittest
 
 from music21 import base
 from music21 import common
 from music21 import duration
+from music21 import environment
 from music21 import exceptions21
 from music21 import expressions
 from music21 import note
 from music21 import spanner
 from music21 import style
 
-from music21 import environment
 environLocal = environment.Environment('tempo')
 
 
@@ -380,7 +382,7 @@ class MetronomeMark(TempoIndication):
     >>> tm2.number
     144
     '''
-    _DOC_ATTR: t.Dict[str, str] = {
+    _DOC_ATTR: dict[str, str] = {
         'placement': '''
             Staff placement: 'above', 'below', or None.
 

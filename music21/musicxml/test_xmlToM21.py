@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import fractions
 import unittest
 import xml.etree.ElementTree as ET

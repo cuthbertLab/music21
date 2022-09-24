@@ -22,6 +22,8 @@ Additional documentation for and examples of using this module are found in
 
 # TODO: Update to user's guide -- showing each function
 '''
+from __future__ import annotations
+
 import io
 import os
 import pathlib
@@ -834,7 +836,7 @@ class Environment:
     _DOC_ORDER = ['read', 'write', 'getSettingsPath']
 
     # documentation for all attributes (not properties or methods)
-    _DOC_ATTR: t.Dict[str, str] = {
+    _DOC_ATTR: dict[str, str] = {
         'modNameParent': '''
             A string representation of the module that contains this
             Environment instance.

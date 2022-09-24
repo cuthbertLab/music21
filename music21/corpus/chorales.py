@@ -14,13 +14,16 @@ This file makes it easier to access Bach's chorales through various
 numbering schemes and filters and includes the corpus.chorales.Iterator()
 class for easily iterating through the chorale collection.
 '''
+from __future__ import annotations
+
 import copy
 import typing as t
 import unittest
 
-from music21 import exceptions21
 from music21 import environment
+from music21 import exceptions21
 from music21 import metadata
+
 environLocal = environment.Environment('corpus.chorales')
 
 
@@ -1072,8 +1075,8 @@ class Iterator:
                  returnType: str = 'stream',
                  iterationType: str = 'number',
                  analysis: bool = False,
-                 numberList: t.Optional[t.List[int]] = None,
-                 titleList: t.Optional[t.List[str]] = None,
+                 numberList: t.Optional[list[int]] = None,
+                 titleList: t.Optional[list[str]] = None,
                  ):
         '''
         By default: numberingSystem = 'riemenschneider', currentNumber = 1,

@@ -7,10 +7,10 @@
 # Copyright:    Copyright © 2012 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
+from __future__ import annotations
 
 import collections
 import copy
-import typing as t
 import unittest
 
 from music21 import pitch
@@ -391,8 +391,8 @@ def voiceCrossing(possibA):
 # Consecutive Possibility Rule-Checking Methods
 
 
-PITCH_QUARTET_TO_BOOL_TYPE = t.Dict[
-    t.Tuple[pitch.Pitch, pitch.Pitch, pitch.Pitch, pitch.Pitch],
+PITCH_QUARTET_TO_BOOL_TYPE = dict[
+    tuple[pitch.Pitch, pitch.Pitch, pitch.Pitch, pitch.Pitch],
     bool
 ]
 parallelFifthsTable: PITCH_QUARTET_TO_BOOL_TYPE = {}

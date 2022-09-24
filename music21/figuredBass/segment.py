@@ -7,6 +7,8 @@
 # Copyright:    Copyright © 2011 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
+from __future__ import annotations
+
 import collections
 import copy
 import itertools
@@ -28,7 +30,7 @@ from music21.figuredBass import rules
 # used below
 _MOD = 'figuredBass.segment'
 
-_defaultRealizerScale: t.Dict[str, t.Optional[realizerScale.FiguredBassScale]] = {
+_defaultRealizerScale: dict[str, t.Optional[realizerScale.FiguredBassScale]] = {
     'scale': None,  # singleton
 }
 
@@ -43,7 +45,7 @@ class Segment:
                   'resolveDominantSeventhSegment',
                   'resolveDiminishedSeventhSegment',
                   'resolveAugmentedSixthSegment']
-    _DOC_ATTR: t.Dict[str, str] = {
+    _DOC_ATTR: dict[str, str] = {
         'bassNote': '''A :class:`~music21.note.Note` whose pitch
              forms the bass of each possibility.''',
         'numParts': '''The number of parts (including the bass) that possibilities

@@ -21,27 +21,33 @@ or instrument family, such as string pitches, etc.  Information about instrument
 ensembles is also included here though it may later be separated out into its own
 ensemble.py module.
 '''
+from __future__ import annotations
+
+from collections import OrderedDict
+from collections.abc import Iterable
 import importlib
 import unittest
-from collections import OrderedDict
 import typing as t
+from typing import TYPE_CHECKING  # must be imported separately
 
 from music21 import base
 from music21 import common
+from music21 import environment
+from music21.exceptions21 import InstrumentException
 from music21 import interval
 from music21 import note
 from music21 import pitch
 from music21.tree.trees import OffsetTree
 
-from music21.exceptions21 import InstrumentException
+if TYPE_CHECKING:
+    from music21 import stream
 
-from music21 import environment
 environLocal = environment.Environment('instrument')
 
 
-def unbundleInstruments(streamIn: 'music21.stream.Stream',
+def unbundleInstruments(streamIn: stream.Stream,
                         *,
-                        inPlace=False) -> t.Optional['music21.stream.Stream']:
+                        inPlace=False) -> t.Optional[stream.Stream]:
     # noinspection PyShadowingNames
     '''
     takes a :class:`~music21.stream.Stream` that has :class:`~music21.note.NotRest` objects
@@ -78,9 +84,9 @@ def unbundleInstruments(streamIn: 'music21.stream.Stream',
         return s
 
 
-def bundleInstruments(streamIn: 'music21.stream.Stream',
+def bundleInstruments(streamIn: stream.Stream,
                       *,
-                      inPlace=False) -> t.Optional['music21.stream.Stream']:
+                      inPlace=False) -> t.Optional[stream.Stream]:
     # noinspection PyShadowingNames
     '''
     >>> up1 = note.Unpitched()
@@ -515,8 +521,6 @@ class StringInstrument(Instrument):
             stringPitches is a property that stores a list of Pitches (or pitch names,
             such as "C4") that represent the pitch of the open strings from lowest to
             highest.[*]
-
-
 
             >>> vln1 = instrument.Violin()
             >>> [str(p) for p in vln1.stringPitches]
@@ -1812,7 +1816,7 @@ def ensembleNameBySize(number):
         return ensembleNamesBySize[int(number)]
 
 
-def deduplicate(s: 'music21.stream.Stream', inPlace: bool = False) -> 'music21.stream.Stream':
+def deduplicate(s: stream.Stream, inPlace: bool = False) -> stream.Stream:
     '''
     Check every offset in `s` for multiple instrument instances.
     If the `.partName` can be standardized across instances,
@@ -1869,7 +1873,7 @@ def deduplicate(s: 'music21.stream.Stream', inPlace: bool = False) -> 'music21.s
         returnObj = s.coreCopyAsDerivation('instrument.deduplicate')
 
     if not returnObj.hasPartLikeStreams():
-        substreams: t.Iterable[stream.Stream] = [returnObj]
+        substreams: Iterable[stream.Stream] = [returnObj]
     else:
         substreams = returnObj.getElementsByClass(stream.Stream)
 
@@ -2087,7 +2091,7 @@ def instrumentFromMidiProgram(number: int) -> Instrument:
     return inst
 
 
-def partitionByInstrument(streamObj: 'music21.stream.Stream') -> 'music21.stream.Stream':
+def partitionByInstrument(streamObj: stream.Stream) -> stream.Stream:
     # noinspection PyShadowingNames
     '''
     Given a single Stream, or a Score or similar multi-part structure,
@@ -2236,7 +2240,7 @@ def partitionByInstrument(streamObj: 'music21.stream.Stream') -> 'music21.stream
     if not instrumentIterator:
         return s  # no partition is available
 
-    names: t.OrderedDict[str, t.Dict[str, t.Any]] = OrderedDict()  # store unique names
+    names: OrderedDict[str, dict[str, t.Any]] = OrderedDict()  # store unique names
     for instrumentObj in instrumentIterator:
         # matching here by instrument name
         if instrumentObj.instrumentName not in names:

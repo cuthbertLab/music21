@@ -13,6 +13,8 @@
 This module defines two component objects for defining nested metrical structures:
 :class:`~music21.meter.core.MeterTerminal` and :class:`~music21.meter.core.MeterSequence`.
 '''
+from __future__ import annotations
+
 import copy
 import typing as t
 
@@ -1161,7 +1163,7 @@ class MeterSequence(MeterTerminal):
             #    'created MeterSequence from MeterTerminal; old weight, new weight',
             #    value.weight, self.weight])
 
-        elif common.isIterable(value):  # a list of Terminals or t.Sequence es
+        elif common.isIterable(value):  # a list of Terminals or Sequence es
             for obj in value:
                 # environLocal.printDebug('creating MeterSequence with %s' % obj)
                 self._addTerminal(obj)
@@ -1296,22 +1298,28 @@ class MeterSequence(MeterTerminal):
     @property
     def flat(self):
         '''
+        deprecated.  Call .flatten() instead.  To be removed in v11.
+        '''
+        return self.flatten()
+
+    def flatten(self) -> MeterSequence:
+        '''
         Return a new MeterSequence composed of the flattened representation.
 
         >>> ms = meter.MeterSequence('3/4', 3)
-        >>> b = ms.flat
+        >>> b = ms.flatten()
         >>> len(b)
         3
 
         >>> ms[1] = ms[1].subdivide(4)
-        >>> b = ms.flat
+        >>> b = ms.flatten()
         >>> len(b)
         6
 
         >>> ms[1][2] = ms[1][2].subdivide(4)
         >>> ms
         <music21.meter.core.MeterSequence {1/4+{1/16+1/16+{1/64+1/64+1/64+1/64}+1/16}+1/4}>
-        >>> b = ms.flat
+        >>> b = ms.flatten()
         >>> len(b)
         9
         '''

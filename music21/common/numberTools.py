@@ -9,15 +9,17 @@
 # Copyright:    Copyright © 2009-2022 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
-from functools import lru_cache
+from __future__ import annotations
+
+from collections.abc import Iterable, Sequence
+from fractions import Fraction
+from functools import cache
 import math
+from math import isclose, gcd
 import numbers
 import random
-import unittest
 import typing as t
-
-from fractions import Fraction
-from math import isclose, gcd
+import unittest
 
 from music21 import defaults
 from music21.common import deprecated
@@ -25,8 +27,6 @@ from music21.common.types import OffsetQLIn, OffsetQL
 
 __all__ = [
     'ordinals', 'musicOrdinals', 'ordinalsToNumbers',
-
-    'cleanupFloat',
     'numToIntOrFloat',
 
     'opFrac', 'mixedNumeral',
@@ -37,7 +37,6 @@ __all__ = [
     'dotMultiplier', 'decimalToTuplet',
     'unitNormalizeProportion', 'unitBoundaryProportion',
     'weightedSelection',
-    'lcm',
     'approximateGCD',
 
     'contiguousList',
@@ -62,34 +61,6 @@ musicOrdinals[8] = 'Octave'
 musicOrdinals[15] = 'Double-octave'
 musicOrdinals[22] = 'Triple-octave'
 
-
-@deprecated('v7.3', 'v9', 'Use common.opFrac(num) instead')
-def cleanupFloat(floatNum, maxDenominator=defaults.limitOffsetDenominator):  # pragma: no cover
-    '''
-    Cleans up a floating point number by converting
-    it to a fractions.Fraction object limited to
-    a denominator of maxDenominator
-
-    common.cleanupFloat(0.33333327824)
-    0.333333333333...
-
-    common.cleanupFloat(0.142857)
-    0.1428571428571...
-
-    common.cleanupFloat(1.5)
-    1.5
-
-    Fractions are passed through silently...
-
-    import fractions
-    common.cleanupFloat(fractions.Fraction(4, 3))
-    Fraction(4, 3)
-    '''
-    if isinstance(floatNum, Fraction):
-        return floatNum  # do nothing to fractions
-    else:
-        f = Fraction(floatNum).limit_denominator(maxDenominator)
-        return float(f)
 
 # -----------------------------------------------------------------------------
 # Number methods...
@@ -146,8 +117,8 @@ def numToIntOrFloat(value: t.Union[int, float]) -> t.Union[int, float]:
 
 DENOM_LIMIT = defaults.limitOffsetDenominator
 
-@lru_cache(None)
-def _preFracLimitDenominator(n: int, d: int) -> t.Tuple[int, int]:
+@cache
+def _preFracLimitDenominator(n: int, d: int) -> tuple[int, int]:
     # noinspection PyShadowingNames
     '''
     Used in opFrac
@@ -197,8 +168,6 @@ def _preFracLimitDenominator(n: int, d: int) -> t.Tuple[int, int]:
 
     (n.b. -- nothing printed)
     '''
-    # TODO: when Python 3.9 is the minimum version, replace lru_cache with simply cache,
-    #     which is the same speed as lru_cache(None) (it simply calls it)
     if d <= DENOM_LIMIT:  # faster than hard-coding 65535
         return (n, d)
     nOrg = n
@@ -515,7 +484,7 @@ def strTrimFloat(floatNum: float, maxNum: int = 4) -> str:
     return off
 
 
-def nearestMultiple(n: float, unit: float) -> t.Tuple[float, float, float]:
+def nearestMultiple(n: float, unit: float) -> tuple[float, float, float]:
     '''
     Given a positive value `n`, return the nearest multiple of the supplied `unit` as well as
     the absolute difference (error) to seven significant digits and the signed difference.
@@ -613,7 +582,7 @@ def dotMultiplier(dots: int) -> float:
     return ((2 ** (dots + 1.0)) - 1.0) / (2 ** dots)
 
 
-def decimalToTuplet(decNum: float) -> t.Tuple[int, int]:
+def decimalToTuplet(decNum: float) -> tuple[int, int]:
     '''
     For simple decimals (usually > 1), a quick way to figure out the
     fraction in lowest terms that gives a valid tuplet.
@@ -673,7 +642,7 @@ def decimalToTuplet(decNum: float) -> t.Tuple[int, int]:
         return (int(iy), int(jy))
 
 
-def unitNormalizeProportion(values: t.Sequence[t.Union[int, float]]) -> t.List[float]:
+def unitNormalizeProportion(values: Sequence[t.Union[int, float]]) -> list[float]:
     '''
     Normalize values within the unit interval, where max is determined by the sum of the series.
 
@@ -712,8 +681,8 @@ def unitNormalizeProportion(values: t.Sequence[t.Union[int, float]]) -> t.List[f
 
 
 def unitBoundaryProportion(
-    series: t.Sequence[t.Union[int, float]]
-) -> t.List[t.Tuple[t.Union[int, float], float]]:
+    series: Sequence[t.Union[int, float]]
+) -> list[tuple[t.Union[int, float], float]]:
     '''
     Take a series of parts with an implied sum, and create
     unit-interval boundaries proportional to the series components.
@@ -735,8 +704,8 @@ def unitBoundaryProportion(
     return bounds
 
 
-def weightedSelection(values: t.List[int],
-                      weights: t.List[t.Union[int, float]],
+def weightedSelection(values: list[int],
+                      weights: list[t.Union[int, float]],
                       randomGenerator=None) -> int:
     '''
     Given a list of values and an equal-sized list of weights,
@@ -764,27 +733,7 @@ def weightedSelection(values: t.List[int],
     return values[index]
 
 
-@deprecated('v8', 'v9', 'use math.gcd(a, b) instead.')
-def euclidGCD(a: int, b: int) -> int:  # pragma: no cover
-    '''
-    Deprecated: use math.gcd(a, b) instead
-
-    use Euclid's algorithm to find the GCD of a and b::
-
-        common.euclidGCD(2, 4)
-        2
-        common.euclidGCD(20, 8)
-        4
-        common.euclidGCD(20, 16)
-        4
-    '''
-    if b == 0:
-        return a
-    else:
-        return euclidGCD(b, a % b)
-
-
-def approximateGCD(values: t.List[t.Union[int, float]], grain: float = 1e-4) -> float:
+def approximateGCD(values: list[t.Union[int, float]], grain: float = 1e-4) -> float:
     '''Given a list of values, find the lowest common divisor of floating point values.
 
     >>> common.approximateGCD([2.5, 10, 0.25])
@@ -851,26 +800,27 @@ def approximateGCD(values: t.List[t.Union[int, float]], grain: float = 1e-4) -> 
     return max(commonUniqueDivisions)
 
 
-def lcm(filterList: t.Iterable[int]) -> int:
+@deprecated('v9', 'v10', 'Use math.lcm instead')
+def lcm(filterList: Iterable[int]) -> int:
     '''
     Find the least common multiple of a list of values
 
-    >>> common.lcm([3, 4, 5])
+    common.lcm([3, 4, 5])
     60
-    >>> common.lcm([3, 4])
+    common.lcm([3, 4])
     12
-    >>> common.lcm([1, 2])
+    common.lcm([1, 2])
     2
-    >>> common.lcm([3, 6])
+    common.lcm([3, 6])
     6
 
     Works with any iterable, like this set
 
-    >>> common.lcm({3, 5, 6})
+    common.lcm({3, 5, 6})
     30
 
-    To be deprecated in v.8 once Python 3.9 is the minimum version
-    since math.lcm works in C and is faster
+    Deprecated in v9 since Python 3.9 is the minimum version
+    and math.lcm works in C and is faster
     '''
     def _lcm(a, b):
         '''find the least common multiple of a, b'''
@@ -917,7 +867,7 @@ def contiguousList(inputListOrTuple) -> bool:
     return True
 
 
-def groupContiguousIntegers(src: t.List[int]) -> t.List[t.List[int]]:
+def groupContiguousIntegers(src: list[int]) -> list[list[int]]:
     '''
     Given a list of integers, group contiguous values into sub lists
 

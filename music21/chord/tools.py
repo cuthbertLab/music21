@@ -12,16 +12,16 @@
 Chord utilities too obscure to go on the Chord object, yet still helpful
 enough to go in the music21 core library.
 '''
-
 from __future__ import annotations
 
-import typing as t
+from typing import TYPE_CHECKING
 
-if t.TYPE_CHECKING:
+
+if TYPE_CHECKING:
     from music21 import chord
     from music21 import pitch
 
-def allChordSteps(c: chord.Chord) -> t.Dict[int, pitch.Pitch]:
+def allChordSteps(c: chord.Chord) -> dict[int, pitch.Pitch]:
     '''
     Return a dictionary of all chordSteps in the chord.
     If more than one pitch shares the same chordStep such as the third
@@ -43,7 +43,7 @@ def allChordSteps(c: chord.Chord) -> t.Dict[int, pitch.Pitch]:
      2: <music21.pitch.Pitch D5>}
     '''
     root_dnn = c.root().diatonicNoteNum
-    out_map: t.Dict[int, pitch.Pitch] = {}
+    out_map: dict[int, pitch.Pitch] = {}
     for thisPitch in c.pitches:
         diatonicDistance = ((thisPitch.diatonicNoteNum - root_dnn) % 7) + 1
         if diatonicDistance not in out_map:

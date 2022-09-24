@@ -9,21 +9,21 @@
 # Copyright:    Copyright © 2009-2022 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
-
 '''
 Classes and functions for creating and manipulating dynamic symbols. Rather than
 subclasses, the :class:`~music21.dynamics.Dynamic` object is often specialized by parameters.
 '''
-import typing as t
+from __future__ import annotations
+
 import unittest
 
 from music21 import base
-from music21 import exceptions21
 from music21 import common
+from music21 import environment
+from music21 import exceptions21
 from music21 import spanner
 from music21 import style
 
-from music21 import environment
 environLocal = environment.Environment('dynamics')
 
 
@@ -194,7 +194,7 @@ class Dynamic(base.Music21Object):
     _styleClass = style.TextStyle
 
     _DOC_ORDER = ['longName', 'englishName']
-    _DOC_ATTR: t.Dict[str, str] = {
+    _DOC_ATTR: dict[str, str] = {
         'longName': r'''
             the name of this dynamic in Italian.
 

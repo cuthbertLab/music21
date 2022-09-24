@@ -25,16 +25,15 @@ import base64
 import os
 import pathlib
 import subprocess
-import unittest
-
 import typing as t
+import unittest
 
 from music21 import common
 from music21 import defaults
-from music21 import stream
-from music21 import exceptions21
-
 from music21 import environment
+from music21 import exceptions21
+from music21 import stream
+
 environLocal = environment.Environment('converter.subConverters')
 
 # pylint complains when abstract methods are not overwritten, but that's okay.
@@ -73,11 +72,11 @@ class SubConverter:
     '''
     readBinary = False
     canBePickled = True
-    registerFormats: t.Tuple[str, ...] = ()
-    registerShowFormats: t.Tuple[str, ...] = ()
-    registerInputExtensions: t.Tuple[str, ...] = ()  # if converter supports input
-    registerOutputExtensions: t.Tuple[str, ...] = ()  # if converter supports output
-    registerOutputSubformatExtensions: t.Dict[str, str] = {}
+    registerFormats: tuple[str, ...] = ()
+    registerShowFormats: tuple[str, ...] = ()
+    registerInputExtensions: tuple[str, ...] = ()  # if converter supports input
+    registerOutputExtensions: tuple[str, ...] = ()  # if converter supports output
+    registerOutputSubformatExtensions: dict[str, str] = {}
     launchKey: t.Union[str, pathlib.Path, None] = None
 
     codecWrite = False
@@ -1470,7 +1469,7 @@ class ConverterMEI(SubConverter):
     # registerShowFormats = ('mei',)
     # registerOutputExtensions = ('mei',)
 
-    def parseData(self, dataString: str, number=None) -> 'music21.stream.Stream':
+    def parseData(self, dataString: str, number=None) -> stream.Stream:
         '''
         Convert a string with an MEI document into its corresponding music21 elements.
 
@@ -1493,7 +1492,7 @@ class ConverterMEI(SubConverter):
         filePath: t.Union[str, pathlib.Path],
         number: t.Optional[int] = None,
         **keywords,
-    ) -> 'music21.stream.Stream':
+    ) -> stream.Stream:
         '''
         Convert a file with an MEI document into its corresponding music21 elements.
 

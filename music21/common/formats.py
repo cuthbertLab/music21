@@ -14,6 +14,8 @@ Utilities for working with file formats.
 
 almost everything here is deprecated.
 '''
+from __future__ import annotations
+
 __all__ = [
     'findSubConverterForFormat',
     'findFormat',

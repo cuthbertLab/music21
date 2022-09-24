@@ -11,6 +11,7 @@
 '''
 Writer for the 'RomanText' format (Tymoczko, Gotham, Cuthbert, & Ariza ISMIR 2019)
 '''
+from __future__ import annotations
 
 import fractions
 import textwrap
@@ -127,7 +128,7 @@ class RnWriter(prebase.ProtoM21Object):
         self.title = 'Title unknown'
         self.analyst = ''
         self.proofreader = ''
-        self.combinedList: t.List[str] = []
+        self.combinedList: list[str] = []
         self.container: t.Union[stream.Part, stream.Score]
 
         if isinstance(obj, stream.Stream):
@@ -181,7 +182,7 @@ class RnWriter(prebase.ProtoM21Object):
         self.prepSequentialListOfLines()
 
     def _makeContainer(self,
-                       obj: t.Union[stream.Stream, t.List]):
+                       obj: t.Union[stream.Stream, list]):
         '''
         Makes a placeholder container for the unusual cases where this class is called on
         generic- or non-stream object as opposed to

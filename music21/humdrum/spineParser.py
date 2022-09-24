@@ -48,9 +48,8 @@ from __future__ import annotations
 import copy
 import math
 import re
-import unittest
-
 import typing as t
+import unittest
 
 from music21 import articulations
 from music21 import bar
@@ -60,6 +59,7 @@ from music21 import clef
 from music21 import common
 from music21 import dynamics
 from music21 import duration
+from music21 import environment
 from music21 import exceptions21
 from music21 import expressions
 from music21 import instrument
@@ -77,7 +77,6 @@ from music21.humdrum import testFiles
 from music21.humdrum import harmparser
 from music21.humdrum import instruments
 
-from music21 import environment
 environLocal = environment.Environment('humdrum.spineParser')
 
 flavors = {'JRP': False}
@@ -1055,8 +1054,8 @@ class HumdrumSpine(prebase.ProtoM21Object):
         self.parentSpine = None
         self.newSpine = None
         self.isLastSpine = False
-        self.childSpines: t.List[HumdrumSpine] = []
-        self.childSpineInsertPoints: t.Dict[int, t.Tuple[HumdrumSpine, ...]] = {}
+        self.childSpines: list[HumdrumSpine] = []
+        self.childSpineInsertPoints: dict[int, tuple[HumdrumSpine, ...]] = {}
 
         self.parsed = False
         self.measuresMoved = False
@@ -1633,7 +1632,7 @@ class SpineCollection(prebase.ProtoM21Object):
         self.iterIndex -= 1
         return thisSpine
 
-    def addSpine(self, streamClass: t.Type[stream.Stream] = stream.Part):
+    def addSpine(self, streamClass: type[stream.Stream] = stream.Part):
         '''
         creates a new spine in the collection and returns it.
 
@@ -2006,7 +2005,7 @@ class SpineCollection(prebase.ProtoM21Object):
                 if not hasVoices:
                     continue
 
-                voices: t.List[t.Optional[stream.Voice]] = [None for i in range(10)]
+                voices: list[t.Optional[stream.Voice]] = [None for i in range(10)]
                 measureElements = el.elements
                 for mEl in measureElements:
                     mElGroups = mEl.groups

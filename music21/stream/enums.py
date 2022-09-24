@@ -8,7 +8,10 @@
 # Copyright:    Copyright © 2020 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # -----------------------------------------------------------------------------
+from __future__ import annotations
+
 import enum
+
 from music21.common.enums import StrEnum
 
 class StaffType(enum.Enum):

@@ -9,6 +9,8 @@
 # Copyright:    Copyright © 2013, 17 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
+from __future__ import annotations
+
 import abc  # for @abc.abstractmethod decorator: requires a function to be defined in subclasses
 import os
 import types

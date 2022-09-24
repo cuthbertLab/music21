@@ -16,10 +16,11 @@ decide whether a given element matches the list of elements that are being
 filtered.  Filters are used by methods on streams such as
 :meth:`~music21.stream.Stream.getElementsByClass` to filter elements by classes.
 '''
-# import inspect
-import unittest
+from __future__ import annotations
+
 from math import inf
 import typing as t
+import unittest
 
 from music21 import common
 from music21.common.numberTools import opFrac

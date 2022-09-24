@@ -8,6 +8,8 @@
 # Copyright:    Copyright © 2011 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
+from __future__ import annotations
+
 __all__ = ['base', 'outputFormats', 'jSymbolic', 'native']
 
 # __init__ can wildcard import base; it's how it is designed.

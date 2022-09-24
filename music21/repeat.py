@@ -16,17 +16,25 @@ This module provides the base class for all RepeatMark objects: entities that de
 Some RepeatMark objects are Expression objects; others are Bar objects. See for instance,
 the :class:`~music21.bar.Repeat` which represents a normal barline repeat.
 '''
+from __future__ import annotations
+
 import copy
 import string
 import typing as t
+from typing import TYPE_CHECKING  # pylint needs no alias
 
+from music21 import environment
 from music21 import exceptions21
 from music21 import expressions
 from music21 import prebase
 from music21 import spanner
 from music21 import style
 
-from music21 import environment
+
+if TYPE_CHECKING:
+    from music21 import stream
+
+
 environLocal = environment.Environment('repeat')
 
 
@@ -877,7 +885,7 @@ class Expander:
         if rb is not None and 'music21.bar.Repeat' in rb.classSet:
             m.rightBarline = bar.Barline(newType)
 
-    def _stripRepeatExpressions(self, streamObj: 'music21.stream.Stream'):
+    def _stripRepeatExpressions(self, streamObj: stream.Stream):
         '''
         Given a Stream of measures or a Measure, strip all RepeatExpression
         objects in place.
@@ -1949,7 +1957,7 @@ class RepeatFinder:
                   'getQuarterLengthOfPickupMeasure',
                   'hasPickup']
 
-    _DOC_ATTR: t.Dict[str, str] = {
+    _DOC_ATTR: dict[str, str] = {
         'defaultHash': r'''A function that takes a stream of notes and rests and
                                 returns a string or an
                                 integer such that two measures are equal if their

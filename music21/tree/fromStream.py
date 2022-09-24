@@ -6,15 +6,19 @@
 # Authors:      Josiah Wolf Oberholtzer
 #               Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2013-16 Michael Scott Asato Cuthbert and the music21
+# Copyright:    Copyright © 2013-22 Michael Scott Asato Cuthbert and the music21
 #               Project
 # License:      BSD, see license.txt
 # -----------------------------------------------------------------------------
 '''
 Tools for creating timespans (fast, manipulable objects) from Streams
 '''
-import unittest
+from __future__ import annotations
+
+from collections.abc import Sequence
 import typing as t
+from typing import TYPE_CHECKING  # pylint needs no alias
+import unittest
 
 from music21.base import Music21Object
 from music21.common.types import M21ObjType, StreamType
@@ -24,16 +28,19 @@ from music21.tree import spans
 from music21.tree import timespanTree
 from music21.tree import trees
 
+if TYPE_CHECKING:
+    from music21 import stream
+
 
 def listOfTreesByClass(
     inputStream: StreamType,
     *,
-    classLists: t.Sequence[t.Sequence[t.Type[M21ObjType]]] = (),
-    currentParentage: t.Optional[t.Tuple['music21.stream.Stream', ...]] = None,
+    classLists: Sequence[Sequence[type[M21ObjType]]] = (),
+    currentParentage: t.Optional[tuple[stream.Stream, ...]] = None,
     initialOffset: float = 0.0,
     flatten: t.Union[bool, str] = False,
     useTimespans: bool = False
-) -> t.List[t.Union[trees.OffsetTree, timespanTree.TimespanTree]]:
+) -> list[t.Union[trees.OffsetTree, timespanTree.TimespanTree]]:
     # noinspection PyShadowingNames
     r'''
     To be DEPRECATED in v8: this is no faster than calling streamToTimespanTree
@@ -91,7 +98,7 @@ def listOfTreesByClass(
 
     lastParentage = currentParentage[-1]
 
-    treeClass: t.Type[trees.OffsetTree]
+    treeClass: type[trees.OffsetTree]
     if useTimespans:
         treeClass = timespanTree.TimespanTree
     else:
@@ -132,7 +139,7 @@ def listOfTreesByClass(
                 if classList and element.classSet.isdisjoint(classList):
                     continue
                 if useTimespans:
-                    spanClass: t.Type[spans.ElementTimespan]
+                    spanClass: type[spans.ElementTimespan]
                     if isinstance(element, (note.NotRest, stream.Stream)):
                         spanClass = spans.PitchedTimespan
                     else:
@@ -154,7 +161,7 @@ def asTree(
     inputStream: StreamType,
     *,
     flatten: t.Union[t.Literal['semiFlat'], bool] = False,
-    classList: t.Optional[t.Sequence[t.Type]] = None,
+    classList: t.Optional[Sequence[type]] = None,
     useTimespans: bool = False,
     groupOffsets: bool = False
 ) -> t.Union[trees.OffsetTree, trees.ElementTree, timespanTree.TimespanTree]:
@@ -257,7 +264,7 @@ def asTree(
         return inner_outputTree
 
     # first time through...
-    treeClass: t.Type[trees.ElementTree]
+    treeClass: type[trees.ElementTree]
 
     if useTimespans:
         treeClass = timespanTree.TimespanTree
@@ -285,10 +292,10 @@ def asTree(
                                      initialOffset=0.0)
 
 def makeFastShallowTreeFromSortedStream(
-    inputStream: 'music21.stream.Stream',
+    inputStream: stream.Stream,
     *,
     outputTree: t.Union[trees.OffsetTree, trees.ElementTree],
-    classList: t.Optional[t.Sequence[t.Type]] = None,
+    classList: t.Optional[Sequence[type]] = None,
 ) -> t.Union[trees.OffsetTree, trees.ElementTree]:
     '''
     Use populateFromSortedList to quickly make a tree from a stream.
@@ -315,7 +322,7 @@ def asTimespans(
     inputStream,
     *,
     flatten: t.Union[str, bool] = False,
-    classList: t.Optional[t.Sequence[t.Type[Music21Object]]] = None
+    classList: t.Optional[Sequence[type[Music21Object]]] = None
 ) -> timespanTree.TimespanTree:
     r'''
     Recurses through a score and constructs a
@@ -360,7 +367,7 @@ def asTimespans(
     >>> tenorElements.source is score[3]
     True
     '''
-    classLists: t.List[t.Sequence[t.Type[Music21Object]]]
+    classLists: list[Sequence[type[Music21Object]]]
     if classList is None:
         classLists = [[Music21Object]]
     else:
