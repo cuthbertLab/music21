@@ -184,7 +184,7 @@ class Test(unittest.TestCase):
     def testPlotChordsC(self):
         from music21 import dynamics
         from music21 import note
-        from music21 import stream
+        from music21 import stream  # pylint: disable=redefined-outer-name  # only in TYPE_CHECKING
         from music21 import scale
 
         sc = scale.MajorScale('c4')
@@ -219,7 +219,7 @@ class Test(unittest.TestCase):
     def testHorizontalInstrumentationB(self):
         from music21 import corpus
         from music21 import dynamics
-        from music21 import stream
+        from music21 import stream  # pylint: disable=redefined-outer-name  # only in TYPE_CHECKING
         s = corpus.parse('bwv66.6')
         dyn = ['p', 'mf', 'f', 'ff', 'mp', 'fff', 'ppp']
         i = 0

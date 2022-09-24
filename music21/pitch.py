@@ -5224,7 +5224,7 @@ class Pitch(prebase.ProtoM21Object):
 
         '''
         # Takes in a chord, finds the interval between the notes
-        from music21 import note
+        from music21 import note  # pylint: disable=redefined-outer-name  # only in TYPE_CHECKING
         from music21 import chord
 
         pitchList = chordIn.pitches

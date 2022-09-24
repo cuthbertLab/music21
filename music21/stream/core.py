@@ -38,6 +38,10 @@ from music21.exceptions21 import StreamException, ImmutableStreamException
 from music21.stream.iterator import StreamIterator, RecursiveIterator
 
 
+if t.TYPE_CHECKING:
+    from music21.stream import Stream
+
+
 class StreamCore(Music21Object):
     '''
     Core aspects of a Stream's behavior.  Any of these can change at any time.
@@ -259,7 +263,7 @@ class StreamCore(Music21Object):
         if self._derivation is not None:
             sdm = self._derivation.method
             if sdm in ('flat', 'semiflat'):
-                origin: stream.Stream = self._derivation.origin
+                origin: Stream = self._derivation.origin
                 origin.clearCache()
 
         # may not always need to clear cache of all living sites, but may

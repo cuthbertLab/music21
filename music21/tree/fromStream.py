@@ -90,7 +90,7 @@ def listOfTreesByClass(
     Changed in v8: it is now a stickler that classLists must be sequences of sequences,
         such as tuples of tuples.
     '''
-    from music21 import stream
+    from music21 import stream  # pylint: disable=redefined-outer-name  # only in TYPE_CHECKING
 
     if currentParentage is None:
         currentParentage = (inputStream,)
