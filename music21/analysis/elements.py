@@ -11,6 +11,7 @@
 from __future__ import annotations
 
 import collections
+import typing as t
 
 def attributeCount(streamOrStreamIter, attrName='quarterLength') -> collections.Counter[t.Any]:
     '''
