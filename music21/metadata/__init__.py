@@ -2285,7 +2285,7 @@ class Metadata(base.Music21Object):
         ...     metadata.DateBetween(['1938','1939']))
         <music21.metadata.primitives.DateBetween 1938/--/-- to 1939/--/-->
         '''
-        valueType: t.Optional[t.Type[ValueType]] = properties.UNIQUE_NAME_TO_VALUE_TYPE.get(
+        valueType: t.Optional[type[ValueType]] = properties.UNIQUE_NAME_TO_VALUE_TYPE.get(
             uniqueName, None
         )
         originalValue: t.Any = value

@@ -16,6 +16,7 @@ StreamIterators are explicitly allowed to access private methods on streams.
 '''
 from __future__ import annotations
 
+from collections.abc import Callable
 import copy
 import typing as t
 from typing import overload
@@ -130,7 +131,7 @@ class StreamIterator(prebase.ProtoM21Object, t.Sequence[M21ObjType]):
     def __init__(self,
                  srcStream: StreamType,
                  *,
-                 # restrictClass: t.Type[M21ObjType] = base.Music21Object,
+                 # restrictClass: type[M21ObjType] = base.Music21Object,
                  filterList: t.Optional[list[FilterType]] = None,
                  restoreActiveSites: bool = True,
                  activeInformation: t.Optional[ActiveInformation] = None,
@@ -748,7 +749,7 @@ class StreamIterator(prebase.ProtoM21Object, t.Sequence[M21ObjType]):
         '''
         returns False if any filter returns False, True otherwise.
         '''
-        f: t.Union[t.Callable[[t.Any, t.Optional[t.Any]], t.Any], filters.StreamFilter]
+        f: t.Union[Callable[[t.Any, t.Optional[t.Any]], t.Any], filters.StreamFilter]
         for f in self.filters:
             try:
                 try:
@@ -1009,7 +1010,7 @@ class StreamIterator(prebase.ProtoM21Object, t.Sequence[M21ObjType]):
 
     # @overload
     # def getElementsByClass(self,
-    #                        classFilterList: t.Type,
+    #                        classFilterList: type,
     #                        *,
     #                        returnClone: bool = True) -> StreamIterator[M21ObjType]:
     #     # putting a non-music21 type into classFilterList, defaults to the previous type
@@ -1018,7 +1019,7 @@ class StreamIterator(prebase.ProtoM21Object, t.Sequence[M21ObjType]):
 
     @overload
     def getElementsByClass(self,
-                           classFilterList: t.Type[ChangedM21ObjType],
+                           classFilterList: type[ChangedM21ObjType],
                            *,
                            returnClone: bool = True) -> StreamIterator[ChangedM21ObjType]:
         x = t.cast(StreamIterator[ChangedM21ObjType], self.__class__(self.streamObj))
@@ -1026,7 +1027,7 @@ class StreamIterator(prebase.ProtoM21Object, t.Sequence[M21ObjType]):
 
     @overload
     def getElementsByClass(self,
-                           classFilterList: t.Iterable[t.Type],
+                           classFilterList: t.Iterable[type],
                            *,
                            returnClone: bool = True) -> StreamIterator[M21ObjType]:
         # putting multiple types into classFilterList, defaults to the previous type
@@ -1038,9 +1039,9 @@ class StreamIterator(prebase.ProtoM21Object, t.Sequence[M21ObjType]):
         self,
         classFilterList: t.Union[
             str,
-            t.Type[ChangedM21ObjType],
+            type[ChangedM21ObjType],
             t.Iterable[str],
-            t.Iterable[t.Type],
+            t.Iterable[type],
         ],
         *,
         returnClone: bool = True
@@ -1573,7 +1574,7 @@ class OffsetIterator(StreamIterator, t.Sequence[list[M21ObjType]]):
     def __init__(self,
                  srcStream,
                  *,
-                 # restrictClass: t.Type[M21ObjType] = base.Music21Object,
+                 # restrictClass: type[M21ObjType] = base.Music21Object,
                  filterList=None,
                  restoreActiveSites=True,
                  activeInformation=None,
@@ -1656,7 +1657,7 @@ class OffsetIterator(StreamIterator, t.Sequence[list[M21ObjType]]):
 
     @overload
     def getElementsByClass(self,
-                           classFilterList: t.Type[ChangedM21ObjType],
+                           classFilterList: type[ChangedM21ObjType],
                            *,
                            returnClone: bool = True) -> OffsetIterator[ChangedM21ObjType]:
         x = t.cast(OffsetIterator[ChangedM21ObjType], self.__class__(self.streamObj))
@@ -1664,7 +1665,7 @@ class OffsetIterator(StreamIterator, t.Sequence[list[M21ObjType]]):
 
     # @overload
     # def getElementsByClass(self,
-    #                        classFilterList: t.Type,
+    #                        classFilterList: type,
     #                        *,
     #                        returnClone: bool = True) -> OffsetIterator[M21ObjType]:
     #     x: OffsetIterator[M21ObjType] = self.__class__(self.streamObj)
@@ -1673,7 +1674,7 @@ class OffsetIterator(StreamIterator, t.Sequence[list[M21ObjType]]):
 
     @overload
     def getElementsByClass(self,
-                           classFilterList: t.Iterable[t.Type],
+                           classFilterList: t.Iterable[type],
                            *,
                            returnClone: bool = True) -> OffsetIterator[M21ObjType]:
         x: OffsetIterator[M21ObjType] = self.__class__(self.streamObj)
@@ -1683,9 +1684,9 @@ class OffsetIterator(StreamIterator, t.Sequence[list[M21ObjType]]):
     def getElementsByClass(self,
                            classFilterList: t.Union[
                                str,
-                               t.Type[ChangedM21ObjType],
+                               type[ChangedM21ObjType],
                                t.Iterable[str],
-                               t.Iterable[t.Type],
+                               t.Iterable[type],
                            ],
                            *,
                            returnClone: bool = True
@@ -1765,7 +1766,7 @@ class RecursiveIterator(StreamIterator, t.Sequence[M21ObjType]):
     def __init__(self,
                  srcStream,
                  *,
-                 # restrictClass: t.Type[M21ObjType] = base.Music21Object,
+                 # restrictClass: type[M21ObjType] = base.Music21Object,
                  filterList=None,
                  restoreActiveSites=True,
                  activeInformation=None,
@@ -2067,7 +2068,7 @@ class RecursiveIterator(StreamIterator, t.Sequence[M21ObjType]):
 
     @overload
     def getElementsByClass(self,
-                           classFilterList: t.Type[ChangedM21ObjType],
+                           classFilterList: type[ChangedM21ObjType],
                            *,
                            returnClone: bool = True) -> RecursiveIterator[ChangedM21ObjType]:
         x = t.cast(RecursiveIterator[ChangedM21ObjType], self.__class__(self.streamObj))
@@ -2075,7 +2076,7 @@ class RecursiveIterator(StreamIterator, t.Sequence[M21ObjType]):
 
     # @overload
     # def getElementsByClass(self,
-    #                        classFilterList: t.Type,
+    #                        classFilterList: type,
     #                        *,
     #                        returnClone: bool = True) -> RecursiveIterator[M21ObjType]:
     #     x: RecursiveIterator[M21ObjType] = self.__class__(self.streamObj)
@@ -2083,7 +2084,7 @@ class RecursiveIterator(StreamIterator, t.Sequence[M21ObjType]):
 
     @overload
     def getElementsByClass(self,
-                           classFilterList: t.Iterable[t.Type],
+                           classFilterList: t.Iterable[type],
                            *,
                            returnClone: bool = True) -> RecursiveIterator[M21ObjType]:
         x: RecursiveIterator[M21ObjType] = self.__class__(self.streamObj)
@@ -2093,9 +2094,9 @@ class RecursiveIterator(StreamIterator, t.Sequence[M21ObjType]):
     def getElementsByClass(self,
                            classFilterList: t.Union[
                                str,
-                               t.Type[ChangedM21ObjType],
+                               type[ChangedM21ObjType],
                                t.Iterable[str],
-                               t.Iterable[t.Type[ChangedM21ObjType]],
+                               t.Iterable[type[ChangedM21ObjType]],
                            ],
                            *,
                            returnClone: bool = True

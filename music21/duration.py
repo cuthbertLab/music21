@@ -66,7 +66,7 @@ from music21 import environment
 
 from music21.common.objects import SlottedObjectMixin
 from music21.common.numberTools import opFrac
-from music21.common.types import OffsetQL, OffsetQLIn
+from music21.common.types import OffsetQL, OffsetQLIn, DocOrder
 
 environLocal = environment.Environment('duration')
 
@@ -3860,7 +3860,7 @@ class Test(unittest.TestCase):
 
 # -------------------------------------------------------------------------------
 # define presented order in documentation
-_DOC_ORDER: list[t.Union[t.Type, t.Callable]] = [
+_DOC_ORDER: DocOrder = [
     Duration, Tuplet, GraceDuration, convertQuarterLengthToType, TupletFixer,
 ]
 

@@ -28,7 +28,7 @@ from music21.tree import trees
 def listOfTreesByClass(
     inputStream: StreamType,
     *,
-    classLists: t.Sequence[t.Sequence[t.Type[M21ObjType]]] = (),
+    classLists: t.Sequence[t.Sequence[type[M21ObjType]]] = (),
     currentParentage: t.Optional[tuple['music21.stream.Stream', ...]] = None,
     initialOffset: float = 0.0,
     flatten: t.Union[bool, str] = False,
@@ -91,7 +91,7 @@ def listOfTreesByClass(
 
     lastParentage = currentParentage[-1]
 
-    treeClass: t.Type[trees.OffsetTree]
+    treeClass: type[trees.OffsetTree]
     if useTimespans:
         treeClass = timespanTree.TimespanTree
     else:
@@ -132,7 +132,7 @@ def listOfTreesByClass(
                 if classList and element.classSet.isdisjoint(classList):
                     continue
                 if useTimespans:
-                    spanClass: t.Type[spans.ElementTimespan]
+                    spanClass: type[spans.ElementTimespan]
                     if isinstance(element, (note.NotRest, stream.Stream)):
                         spanClass = spans.PitchedTimespan
                     else:
@@ -154,7 +154,7 @@ def asTree(
     inputStream: StreamType,
     *,
     flatten: t.Union[t.Literal['semiFlat'], bool] = False,
-    classList: t.Optional[t.Sequence[t.Type]] = None,
+    classList: t.Optional[t.Sequence[type]] = None,
     useTimespans: bool = False,
     groupOffsets: bool = False
 ) -> t.Union[trees.OffsetTree, trees.ElementTree, timespanTree.TimespanTree]:
@@ -257,7 +257,7 @@ def asTree(
         return inner_outputTree
 
     # first time through...
-    treeClass: t.Type[trees.ElementTree]
+    treeClass: type[trees.ElementTree]
 
     if useTimespans:
         treeClass = timespanTree.TimespanTree
@@ -288,7 +288,7 @@ def makeFastShallowTreeFromSortedStream(
     inputStream: 'music21.stream.Stream',
     *,
     outputTree: t.Union[trees.OffsetTree, trees.ElementTree],
-    classList: t.Optional[t.Sequence[t.Type]] = None,
+    classList: t.Optional[t.Sequence[type]] = None,
 ) -> t.Union[trees.OffsetTree, trees.ElementTree]:
     '''
     Use populateFromSortedList to quickly make a tree from a stream.
@@ -315,7 +315,7 @@ def asTimespans(
     inputStream,
     *,
     flatten: t.Union[str, bool] = False,
-    classList: t.Optional[t.Sequence[t.Type[Music21Object]]] = None
+    classList: t.Optional[t.Sequence[type[Music21Object]]] = None
 ) -> timespanTree.TimespanTree:
     r'''
     Recurses through a score and constructs a
@@ -360,7 +360,7 @@ def asTimespans(
     >>> tenorElements.source is score[3]
     True
     '''
-    classLists: list[t.Sequence[t.Type[Music21Object]]]
+    classLists: list[t.Sequence[type[Music21Object]]]
     if classList is None:
         classLists = [[Music21Object]]
     else:

@@ -1328,7 +1328,7 @@ def analyzeStream(
         # this synonym is being added for compatibility
         method = 'span'
 
-    analysisClassName: t.Optional[t.Type[DiscreteAnalysis]] = analysisClassFromMethodName(method)
+    analysisClassName: t.Optional[type[DiscreteAnalysis]] = analysisClassFromMethodName(method)
 
     if analysisClassName is not None:
         obj = analysisClassName()
@@ -1340,7 +1340,7 @@ def analyzeStream(
 
 
 # noinspection SpellCheckingInspection
-def analysisClassFromMethodName(method: str) -> t.Optional[t.Type[DiscreteAnalysis]]:
+def analysisClassFromMethodName(method: str) -> t.Optional[type[DiscreteAnalysis]]:
     '''
     Returns an analysis class given a method name, or None if none can be found
 
@@ -1361,7 +1361,7 @@ def analysisClassFromMethodName(method: str) -> t.Optional[t.Type[DiscreteAnalys
     >>> print(repr(acfmn('unknown-format')))
     None
     '''
-    analysisClasses: list[t.Type[DiscreteAnalysis]] = [
+    analysisClasses: list[type[DiscreteAnalysis]] = [
         Ambitus,
         KrumhanslSchmuckler,
         AardenEssen,
@@ -1369,7 +1369,7 @@ def analysisClassFromMethodName(method: str) -> t.Optional[t.Type[DiscreteAnalys
         BellmanBudge,
         TemperleyKostkaPayne,
     ]
-    match: t.Optional[t.Type[DiscreteAnalysis]] = None
+    match: t.Optional[type[DiscreteAnalysis]] = None
     for analysisClass in analysisClasses:
         # this is a very loose matching, as there are few classes now
         if (method.lower() in analysisClass.__name__.lower()

@@ -728,7 +728,7 @@ class SubBassClef(FClef):
 
 
 # ------------------------------------------------------------------------------
-CLASS_FROM_TYPE: dict[str, list[t.Optional[t.Type[Clef]]]] = {
+CLASS_FROM_TYPE: dict[str, list[t.Optional[type[Clef]]]] = {
     'G': [None, FrenchViolinClef, TrebleClef, GSopranoClef, None, None],
     'C': [None, SopranoClef, MezzoSopranoClef, AltoClef, TenorClef, CBaritoneClef],
     'F': [None, None, None, FBaritoneClef, BassClef, SubBassClef],

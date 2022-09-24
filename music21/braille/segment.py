@@ -85,7 +85,7 @@ CSO_MMARK = 4
 CSO_VOICE = 10
 
 # (music21Object, affinity code, Braille classSortOrder)
-affinityCodes: list[tuple[t.Type[base.Music21Object], Affinity, int]] = [
+affinityCodes: list[tuple[type[base.Music21Object], Affinity, int]] = [
     (note.Note, Affinity.NOTEGROUP, CSO_NOTE),
     (note.Rest, Affinity.NOTEGROUP, CSO_REST),
     (chord.Chord, Affinity.NOTEGROUP, CSO_CHORD),
@@ -110,7 +110,7 @@ affinityNames: dict[Affinity, str] = {
     Affinity.SPLIT2_NOTEGROUP: 'Split Note Grouping B',
 }
 
-excludeFromBrailleElements: list[t.Type[base.Music21Object]] = [
+excludeFromBrailleElements: list[type[base.Music21Object]] = [
     spanner.Slur,
     layout.SystemLayout,
     layout.PageLayout,

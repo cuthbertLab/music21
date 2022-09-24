@@ -198,7 +198,7 @@ class Test(unittest.TestCase):
             uniqueName: str,
             namespaceName: str,
             contributorRole: str = None,
-            valueType: t.Type = metadata.Text):
+            valueType: type = metadata.Text):
 
         if ':' not in namespaceName:
             # It's just the namespace because name == uniqueName,

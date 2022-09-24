@@ -80,7 +80,7 @@ Direction = intervalNetwork.Direction
 Terminus = intervalNetwork.Terminus
 
 _PitchDegreeCacheKey = tuple[
-    t.Type,  # scale class
+    type,  # scale class
     str,  # scale type
     str,  # tonic name with octave
     int,  # degree

@@ -13,6 +13,7 @@ base classes for searching scores.
 
 See User's Guide, Chapter 43: Searching in and Among Scores for details.
 '''
+from collections.abc import Callable
 import copy
 import difflib
 import math
@@ -202,8 +203,8 @@ class StreamSearcher:
         self.filterNotesAndRests = False
 
         self.algorithms: list[
-            t.Callable[[Stream, m21Base.Music21Object],
-                       t.Union[bool, None]]
+            Callable[[Stream, m21Base.Music21Object],
+                     t.Union[bool, None]]
         ] = [StreamSearcher.wildcardAlgorithm]
 
         self.activeIterator = None

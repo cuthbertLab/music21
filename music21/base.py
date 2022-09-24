@@ -297,7 +297,7 @@ class Music21Object(prebase.ProtoM21Object):
     # these values permit fast class comparisons for performance critical cases
     isStream = False
 
-    _styleClass: t.Type[Style] = Style
+    _styleClass: type[Style] = Style
 
     # define order for presenting names in documentation; use strings
     _DOC_ORDER: list[str] = []
@@ -1221,7 +1221,7 @@ class Music21Object(prebase.ProtoM21Object):
     @overload
     def getContextByClass(
         self,
-        className: t.Type[_M21T],
+        className: type[_M21T],
         *,
         getElementMethod=ElementSearch.AT_OR_BEFORE,
         sortByCreationTime=False,
@@ -1245,7 +1245,7 @@ class Music21Object(prebase.ProtoM21Object):
 
     def getContextByClass(
         self,
-        className: t.Union[t.Type[_M21T], str, None],
+        className: t.Union[type[_M21T], str, None],
         *,
         getElementMethod: ElementSearch = ElementSearch.AT_OR_BEFORE,
         sortByCreationTime=False,
@@ -2098,7 +2098,7 @@ class Music21Object(prebase.ProtoM21Object):
     # -------------------------------------------------------------------------
 
     def next(self,
-             className: t.Union[t.Type[Music21Object], str, None] = None,
+             className: t.Union[type[Music21Object], str, None] = None,
              *,
              activeSiteOnly=False):
         '''
@@ -2218,7 +2218,7 @@ class Music21Object(prebase.ProtoM21Object):
             raise Music21Exception('Maximum recursion!')
 
     def previous(self,
-                 className: t.Union[t.Type[Music21Object], str, None] = None,
+                 className: t.Union[type[Music21Object], str, None] = None,
                  *,
                  activeSiteOnly=False):
         '''

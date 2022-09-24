@@ -377,7 +377,7 @@ class TabChordBase(abc.ABC):
     def populateFromRow(
         self,
         row: list[str],
-        headIndices: dict[str, tuple[int, t.Type]],
+        headIndices: dict[str, tuple[int, type]],
         extraIndices: dict[int, str]
     ) -> None:
         # To implement without calling setattr we would need to repeat lines
@@ -526,7 +526,7 @@ class TsvHandler:
     def __init__(self, tsvFile: str, dcml_version: int = 1):
         if dcml_version == 1:
             self.heading_names = HEADERS[1]
-            self._tab_chord_cls: t.Type[TabChordBase] = TabChord
+            self._tab_chord_cls: type[TabChordBase] = TabChord
         elif dcml_version == 2:
             self.heading_names = HEADERS[2]
             self._tab_chord_cls = TabChordV2
@@ -535,7 +535,7 @@ class TsvHandler:
         self.tsvFileName = tsvFile
         self.chordList: list[TabChordBase] = []
         self.m21stream: t.Optional[stream.Score] = None
-        self._head_indices: dict[str, tuple[int, t.Union[t.Type, t.Any]]] = {}
+        self._head_indices: dict[str, tuple[int, t.Union[type, t.Any]]] = {}
         self._extra_indices: dict[int, str] = {}
         self.dcml_version = dcml_version
         self.tsvData = self._importTsv()  # converted to private

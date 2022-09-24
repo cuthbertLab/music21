@@ -110,7 +110,7 @@ class Articulation(base.Music21Object):
     >>> x.displayText = '>'
 
     '''
-    _styleClass: t.Type[style.Style] = style.TextStyle
+    _styleClass: type[style.Style] = style.TextStyle
 
     def __init__(self):
         super().__init__()

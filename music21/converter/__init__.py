@@ -372,10 +372,10 @@ class PickleFilter:
 
 
 # ------------------------------------------------------------------------------
-_registeredSubconverters: list[t.Type[subConverters.SubConverter]] = []
+_registeredSubconverters: list[type[subConverters.SubConverter]] = []
 # default subconverters to skip
 _deregisteredSubconverters: list[
-    t.Union[t.Type[subConverters.SubConverter], t.Literal['all']]
+    t.Union[type[subConverters.SubConverter], t.Literal['all']]
 ] = []
 
 
@@ -417,7 +417,7 @@ def registerSubconverter(newSubConverter) -> None:
 
 
 def unregisterSubconverter(
-    removeSubconverter: t.Union[t.Literal['all'], t.Type[subConverters.SubConverter]]
+    removeSubconverter: t.Union[t.Literal['all'], type[subConverters.SubConverter]]
 ) -> None:
     # noinspection PyShadowingNames
     '''
@@ -785,7 +785,7 @@ class Converter:
     def subconvertersList(
         self,
         converterType: t.Literal['any', 'input', 'output'] = 'any'
-    ) -> list[t.Type[subConverters.SubConverter]]:
+    ) -> list[type[subConverters.SubConverter]]:
         '''
         Gives a list of all the subconverter classes that are registered.
 
@@ -870,7 +870,7 @@ class Converter:
 
         return filteredSubConvertersList
 
-    def defaultSubconverters(self) -> list[t.Type[subConverters.SubConverter]]:
+    def defaultSubconverters(self) -> list[type[subConverters.SubConverter]]:
         '''
         return an alphabetical list of the default subconverters: those in converter.subConverters
         with the class Subconverter.
@@ -902,7 +902,7 @@ class Converter:
         <class 'music21.converter.subConverters.ConverterVolpiano'>
         <class 'music21.converter.subConverters.SubConverter'>
         '''
-        defaultSubconverters: list[t.Type[subConverters.SubConverter]] = []
+        defaultSubconverters: list[type[subConverters.SubConverter]] = []
         for i in sorted(subConverters.__dict__):
             possibleSubConverter = getattr(subConverters, i)
             # noinspection PyTypeChecker

@@ -1025,7 +1025,7 @@ class TestExternal(unittest.TestCase):
 
 # --------------------------------------------------------------------------
 # define presented class order in documentation
-_DOC_ORDER: list[t.Type] = [CTSong, CTRule]
+_DOC_ORDER: list[type] = [CTSong, CTRule]
 
 if __name__ == '__main__':
     import music21

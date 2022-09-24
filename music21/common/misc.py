@@ -12,9 +12,10 @@
 '''
 If it doesn't fit anywhere else in the common directory, you'll find it here...
 '''
-import typing as t
+from collections.abc import Callable
 import platform
 import re
+import typing as t
 
 __all__ = [
     'flattenList',
@@ -51,7 +52,7 @@ def flattenList(originalList: list) -> list:
     return [item for sublist in originalList for item in sublist]
 
 
-def unique(originalList: t.Iterable, *, key: t.Optional[t.Callable] = None) -> list:
+def unique(originalList: t.Iterable, *, key: t.Optional[Callable] = None) -> list:
     '''
     Return a List of unique items from an iterable, preserving order.
     (unlike casting to a set and back)

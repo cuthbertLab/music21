@@ -538,7 +538,7 @@ class PartStaffExporterMixin:
         </measure>
         '''
 
-        def isMultiAttribute(m21Class: t.Type[M21ObjType],
+        def isMultiAttribute(m21Class: type[M21ObjType],
                              comparison: str = '__eq__') -> bool:
             '''
             Return True if any first instance of m21Class in any subsequent staff

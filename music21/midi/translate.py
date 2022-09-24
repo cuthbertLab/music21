@@ -281,7 +281,7 @@ def _constructOrUpdateNotRestSubclass(
     tOff: int,
     ticksPerQuarter: int,
     *,
-    returnClass: t.Type[NotRestType],
+    returnClass: type[NotRestType],
 ) -> NotRestType:
     '''
     Construct (or edit the duration of) a NotRest subclass, usually
@@ -383,7 +383,7 @@ def midiEventsToNote(
     tOn, eOn = eventTuple[0]
     tOff, unused_eOff = eventTuple[1]
 
-    returnClass: t.Union[t.Type[note.Unpitched], t.Type[note.Note]]
+    returnClass: t.Union[type[note.Unpitched], type[note.Note]]
     if eOn.channel == 10:
         returnClass = note.Unpitched
     else:
@@ -621,7 +621,7 @@ def midiEventsToChord(
         v.velocityIsRelative = False  # velocity is absolute coming from
         volumes.append(v)
 
-    returnClass: t.Union[t.Type[percussion.PercussionChord], t.Type[chord.Chord]]
+    returnClass: t.Union[type[percussion.PercussionChord], type[chord.Chord]]
     if any_channel_10:
         returnClass = percussion.PercussionChord
     else:

@@ -52,7 +52,7 @@ class PropertyDescription:
     namespace: str = ''
     oldMusic21Abbrev: t.Optional[str] = None
     oldMusic21WorkId: t.Optional[str] = None
-    valueType: t.Type[ValueType] = Text
+    valueType: type[ValueType] = Text
     needsArticleNormalization: bool = False
     isContributor: bool = False
 
@@ -1183,7 +1183,7 @@ for _x in STANDARD_PROPERTY_DESCRIPTIONS:
     UNIQUE_NAME_TO_PROPERTY_DESCRIPTION[_uniqueName(_x)] = _x
 
 
-UNIQUE_NAME_TO_VALUE_TYPE: dict[str, t.Type] = {}
+UNIQUE_NAME_TO_VALUE_TYPE: dict[str, type] = {}
 for _x in STANDARD_PROPERTY_DESCRIPTIONS:
     UNIQUE_NAME_TO_VALUE_TYPE[_uniqueName(_x)] = _x.valueType
 

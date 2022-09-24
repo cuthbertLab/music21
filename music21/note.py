@@ -548,7 +548,7 @@ class GeneralNote(base.Music21Object):
     isNote = False
     isRest = False
     isChord = False
-    _styleClass: t.Type[style.Style] = style.NoteStyle
+    _styleClass: type[style.Style] = style.NoteStyle
 
     # define order for presenting names in documentation; use strings
     _DOC_ORDER = ['duration', 'quarterLength']

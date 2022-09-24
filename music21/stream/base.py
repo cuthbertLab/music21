@@ -318,7 +318,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
                  *,
                  givenElementsBehavior: GivenElementsBehavior = GivenElementsBehavior.OFFSETS,
                  **keywords):
-        # restrictClass: t.Type[M21ObjType] = base.Music21Object,
+        # restrictClass: type[M21ObjType] = base.Music21Object,
         super().__init__(**keywords)
 
         self.streamStatus = streamStatus.StreamStatus(self)
@@ -469,7 +469,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
     @overload
     def __getitem__(
         self,
-        k: t.Type[ChangedM21ObjType]
+        k: type[ChangedM21ObjType]
     ) -> iterator.RecursiveIterator[ChangedM21ObjType]:
         x = t.cast(iterator.RecursiveIterator[ChangedM21ObjType], self.recurse())
         return x  # dummy code
@@ -477,7 +477,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
     @overload
     def __getitem__(
         self,
-        k: t.Type  # getting something that is a subclass of something that is not a m21 object
+        k: type  # getting something that is a subclass of something that is not a m21 object
     ) -> iterator.RecursiveIterator[M21ObjType]:
         x = t.cast(iterator.RecursiveIterator[M21ObjType], self.recurse())
         return x  # dummy code
@@ -486,7 +486,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
     @overload
     def __getitem__(
         self,
-        k: t.Collection[t.Type]
+        k: t.Collection[type]
     ) -> iterator.RecursiveIterator[M21ObjType]:
         # Remove this code and replace with ... once Astroid #1015 is fixed.
         x: iterator.RecursiveIterator[M21ObjType] = self.recurse()
@@ -497,8 +497,8 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
                     k: t.Union[str,
                                int,
                                slice,
-                               t.Type[ChangedM21ObjType],
-                               t.Collection[t.Type]]
+                               type[ChangedM21ObjType],
+                               t.Collection[type]]
                     ) -> t.Union[iterator.RecursiveIterator[M21ObjType],
                                  iterator.RecursiveIterator[ChangedM21ObjType],
                                  M21ObjType,
@@ -691,7 +691,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
                 # this is explicitly NOT true, but we're pretending
                 # it is a Music21Object for now, because the only things returnable
                 # from getElementsByClass are Music21Objects that also inherit from k.
-                m21Type = t.cast(t.Type[M21ObjType], k)  # type: ignore
+                m21Type = t.cast(type[M21ObjType], k)  # type: ignore
                 return self.recurse().getElementsByClass(m21Type)
 
         elif common.isIterable(k) and all(isinstance(maybe_type, type) for maybe_type in k):
@@ -3494,7 +3494,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
 
     @overload
     def getElementsByClass(self,
-                           classFilterList: t.Type[ChangedM21ObjType]
+                           classFilterList: type[ChangedM21ObjType]
                            ) -> iterator.StreamIterator[ChangedM21ObjType]:
         x: iterator.StreamIterator[ChangedM21ObjType] = (
             self.iter().getElementsByClass(classFilterList)
@@ -3503,7 +3503,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
 
     @overload
     def getElementsByClass(self,
-                           classFilterList: t.Iterable[t.Type[ChangedM21ObjType]]
+                           classFilterList: t.Iterable[type[ChangedM21ObjType]]
                            ) -> iterator.StreamIterator[M21ObjType]:
         x: iterator.StreamIterator[M21ObjType] = self.iter()
         return x  # dummy code
@@ -3512,8 +3512,8 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
                            classFilterList: t.Union[
                                str,
                                t.Iterable[str],
-                               t.Type[ChangedM21ObjType],
-                               t.Iterable[t.Type[ChangedM21ObjType]],
+                               type[ChangedM21ObjType],
+                               t.Iterable[type[ChangedM21ObjType]],
                            ],
                            ) -> t.Union[iterator.StreamIterator[M21ObjType],
                                         iterator.StreamIterator[ChangedM21ObjType]]:

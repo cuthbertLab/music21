@@ -721,7 +721,7 @@ Aristoxenos' Chromatic/Enharmonic, 3 + 9 + 18 parts
 
 # ------------------------------------------------------------------------------
 # define presented order in documentation
-_DOC_ORDER: list[t.Callable] = []
+_DOC_ORDER: list[type] = []
 
 
 if __name__ == '__main__':

@@ -124,7 +124,7 @@ def isIterable(usrData: t.Any) -> bool:
     return False
 
 
-def classToClassStr(classObj: t.Type) -> str:
+def classToClassStr(classObj: type) -> str:
     '''Convert a class object to a class string.
 
     >>> common.classToClassStr(note.Note)

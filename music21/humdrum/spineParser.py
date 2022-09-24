@@ -1633,7 +1633,7 @@ class SpineCollection(prebase.ProtoM21Object):
         self.iterIndex -= 1
         return thisSpine
 
-    def addSpine(self, streamClass: t.Type[stream.Stream] = stream.Part):
+    def addSpine(self, streamClass: type[stream.Stream] = stream.Part):
         '''
         creates a new spine in the collection and returns it.
 
