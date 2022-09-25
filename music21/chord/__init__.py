@@ -1835,7 +1835,7 @@ class Chord(ChordBase):
         self,
         chordStep: int,
         *,
-        testRoot: t.Optional[t.Union[note.Note, pitch.Pitch]] = None
+        testRoot: t.Optional[note.Note|pitch.Pitch] = None
     ) -> t.Optional[pitch.Pitch]:
         '''
         Returns the (first) pitch at the provided scaleDegree (Thus, it's
@@ -2282,7 +2282,7 @@ class Chord(ChordBase):
         find: bool = True,
         testRoot: pitch.Pitch|None = None,
         transposeOnSet: bool = True
-    ) -> t.Union[int, None]:
+    ) -> int|None:
         '''
         Find the chord's inversion or (if called with a number) set the chord to
         the new inversion.

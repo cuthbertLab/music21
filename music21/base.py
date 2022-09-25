@@ -401,7 +401,7 @@ class Music21Object(prebase.ProtoM21Object):
             self.duration = duration
 
     @property
-    def id(self) -> t.Union[int, str]:
+    def id(self) -> int|str:
         '''
         A unique identification string or int; not to be confused with Python's
         built-in `id()` method. However, if not set, will return
@@ -417,7 +417,7 @@ class Music21Object(prebase.ProtoM21Object):
         return builtins.id(self)
 
     @id.setter
-    def id(self, new_id: t.Union[int, str]):
+    def id(self, new_id: int|str):
         if isinstance(new_id, int) and new_id > defaults.minIdNumberToConsiderMemoryLocation:
             msg = 'Setting an ID that could be mistaken for a memory location '
             msg += f'is discouraged: got {new_id}'
@@ -829,7 +829,7 @@ class Music21Object(prebase.ProtoM21Object):
     @overload
     def getOffsetBySite(
         self,
-        site: t.Union[stream.Stream, None],
+        site: stream.Stream|None,
         *,
         returnSpecial: t.Literal[False] = False,
     ) -> OffsetQL:
@@ -838,19 +838,19 @@ class Music21Object(prebase.ProtoM21Object):
     @overload
     def getOffsetBySite(
         self,
-        site: t.Union[stream.Stream, None],
+        site: stream.Stream|None,
         *,
         returnSpecial: bool = False,
-    ) -> t.Union[OffsetQL, OffsetSpecial]:
+    ) -> OffsetQL|OffsetSpecial:
         return 0.0  # dummy until Astroid #1015 is fixed.  Replace with ...
         # using bool instead of t.Literal[True] because of
 
     def getOffsetBySite(
         self,
-        site: t.Union[stream.Stream, None],
+        site: stream.Stream|None,
         *,
         returnSpecial: bool = False,
-    ) -> t.Union[OffsetQL, OffsetSpecial]:
+    ) -> OffsetQL|OffsetSpecial:
         '''
         If this class has been registered in a container such as a Stream,
         that container can be provided here, and the offset in that object
@@ -1239,7 +1239,7 @@ class Music21Object(prebase.ProtoM21Object):
     @overload
     def getContextByClass(
         self,
-        className: t.Union[str, None],
+        className: str|None,
         *,
         getElementMethod=ElementSearch.AT_OR_BEFORE,
         sortByCreationTime=False,
@@ -1760,7 +1760,7 @@ class Music21Object(prebase.ProtoM21Object):
         returnSortTuples: bool = False,
         followDerivation=True,
         priorityTargetOnly=False,
-    ) -> Generator[t.Union[ContextTuple, ContextSortTuple], None, None]:
+    ) -> Generator[ContextTuple|ContextSortTuple, None, None]:
         '''
         A generator that returns a list of namedtuples of sites to search for a context...
 
@@ -2331,7 +2331,7 @@ class Music21Object(prebase.ProtoM21Object):
         else:  # pragma: no cover
             return self._activeSite
 
-    def _setActiveSite(self, site: t.Union[stream.Stream, None]):
+    def _setActiveSite(self, site: stream.Stream|None):
         # environLocal.printDebug(['_setActiveSite() called:', 'self', self, 'site', site])
 
         # NOTE: this is a performance intensive call
@@ -2646,7 +2646,7 @@ class Music21Object(prebase.ProtoM21Object):
         else:
             useSiteNoFalse = useSite
 
-        foundOffset: t.Union[OffsetQL, OffsetSpecial]
+        foundOffset: OffsetQL|OffsetSpecial
         if useSiteNoFalse is None:
             foundOffset = self.offset
         else:
@@ -3251,7 +3251,7 @@ class Music21Object(prebase.ProtoM21Object):
 
     def splitByQuarterLengths(
         self,
-        quarterLengthList: list[t.Union[int, float]],
+        quarterLengthList: list[int|float],
         addTies=True,
         displayTiedAccidentals=False
     ) -> _SplitTuple:
@@ -3492,7 +3492,7 @@ class Music21Object(prebase.ProtoM21Object):
                     mNumber = m.number  # type: ignore
         return mNumber
 
-    def _getMeasureOffset(self, includeMeasurePadding=True) -> t.Union[float, fractions.Fraction]:
+    def _getMeasureOffset(self, includeMeasurePadding=True) -> float|fractions.Fraction:
         # noinspection PyShadowingNames
         '''
         Try to obtain the nearest Measure that contains this object,
@@ -3569,7 +3569,7 @@ class Music21Object(prebase.ProtoM21Object):
         return ts
 
     @property
-    def beat(self) -> t.Union[fractions.Fraction, float]:
+    def beat(self) -> fractions.Fraction|float:
         # noinspection PyShadowingNames
         '''
         Return the beat of this object as found in the most
@@ -3872,7 +3872,7 @@ class Music21Object(prebase.ProtoM21Object):
         # once we have mm, simply pass in this duration
         return mm.durationToSeconds(self.duration)
 
-    def _setSeconds(self, value: t.Union[int, float]) -> None:
+    def _setSeconds(self, value: int|float) -> None:
         from music21 import tempo
         ti = self.getContextByClass(tempo.TempoIndication)
         if ti is None:

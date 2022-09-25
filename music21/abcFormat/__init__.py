@@ -108,7 +108,7 @@ ABC_BARS = [
 # store a mapping of ABC representation to pitch values
 # key is (srcStr, carriedAccidental, str(keySignature)
 # value is (pitchName (m21), accidentalDisplayStatus)
-_pitchTranslationCache: dict[tuple[str, str, str], tuple[str, t.Union[bool, None]]] = {}
+_pitchTranslationCache: dict[tuple[str, str, str], tuple[str, bool|None]] = {}
 
 
 # ------------------------------------------------------------------------------
