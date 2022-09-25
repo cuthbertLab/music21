@@ -260,7 +260,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
     # forms of checking class
     isStream = True
     isMeasure = False
-    classSortOrder: t.Union[int, float] = -20
+    classSortOrder: int|float = -20
     recursionType: RecursionType = RecursionType.ELEMENTS_FIRST
 
     _styleClass = style.StreamStyle
@@ -6530,7 +6530,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         pitchPast: t.Optional[list[pitch.Pitch]] = None,
         pitchPastMeasure: t.Optional[list[pitch.Pitch]] = None,
         otherSimultaneousPitches: t.Optional[list[pitch.Pitch]] = None,
-        useKeySignature: t.Union[bool, key.KeySignature] = True,
+        useKeySignature: bool|key.KeySignature = True,
         alteredPitches: t.Optional[list[pitch.Pitch]] = None,
         searchKeySignatureByContext: bool = False,
         cautionaryPitchClass: bool = True,
@@ -6732,7 +6732,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
                      bestClef=False,
                      pitchPast: t.Optional[list[pitch.Pitch]] = None,
                      pitchPastMeasure: t.Optional[list[pitch.Pitch]] = None,
-                     useKeySignature: t.Union[bool, key.KeySignature] = True,
+                     useKeySignature: bool|key.KeySignature = True,
                      alteredPitches: t.Optional[list[pitch.Pitch]] = None,
                      cautionaryPitchClass: bool = True,
                      cautionaryAll: bool = False,
@@ -12763,7 +12763,7 @@ class Measure(Stream):
             for the amount of padding on the right side of a region.)''',
     }
 
-    def __init__(self, *args, number: t.Union[int, str] = 0, **keywords):
+    def __init__(self, *args, number: int|str = 0, **keywords):
         if len(args) == 1 and isinstance(args[0], int) and number == 0:
             number = args[0]
             args = ()

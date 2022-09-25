@@ -1611,7 +1611,7 @@ class Duration(prebase.ProtoM21Object, SlottedObjectMixin):
     # INITIALIZER #
 
     def __init__(self,
-                 typeOrDuration: t.Union[str, OffsetQLIn, DurationTuple, None] = None,
+                 typeOrDuration: str|OffsetQLIn|DurationTuple|None = None,
                  *,
                  type: str|None = None,  # pylint: disable=redefined-builtin
                  dots: int|None = None,
@@ -3092,7 +3092,7 @@ class GraceDuration(Duration):
     # INITIALIZER #
 
     def __init__(self,
-                 typeOrDuration: t.Union[str, OffsetQLIn, DurationTuple, None] = None,
+                 typeOrDuration: str|OffsetQLIn|DurationTuple|None = None,
                  **keywords):
         super().__init__(typeOrDuration, **keywords)
         # update components to derive types; this sets ql, but this
@@ -3112,8 +3112,8 @@ class GraceDuration(Duration):
         self._slash = None
         self.slash = True  # can be True, False, or None; make None go to True?
         # values are unit interval percentages
-        self.stealTimePrevious: t.Union[float, None] = None
-        self.stealTimeFollowing: t.Union[float, None] = None
+        self.stealTimePrevious: float|None = None
+        self.stealTimeFollowing: float|None = None
 
 
     # PUBLIC PROPERTIES #
@@ -3159,7 +3159,7 @@ class AppoggiaturaDuration(GraceDuration):
     # INITIALIZER #
 
     def __init__(self,
-                 typeOrDuration: t.Union[str, OffsetQLIn, DurationTuple, None] = None,
+                 typeOrDuration: str|OffsetQLIn|DurationTuple|None = None,
                  **keywords):
         super().__init__(typeOrDuration, **keywords)
         self.slash = False  # can be True, False, or None; make None go to True?

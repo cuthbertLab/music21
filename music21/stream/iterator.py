@@ -43,7 +43,7 @@ T = t.TypeVar('T')
 S = t.TypeVar('S')
 ChangedM21ObjType = t.TypeVar('ChangedM21ObjType', bound=base.Music21Object)
 StreamIteratorType = t.TypeVar('StreamIteratorType', bound='StreamIterator')
-FilterType = t.Union[Callable[[t.Any, t.Any|None], t.Any], filters.StreamFilter]
+FilterType = $1|$2|$3|$4 =[Callable[[t.Any, t.Any|None], t.Any], filters.StreamFilter]
 
 # -----------------------------------------------------------------------------
 

@@ -77,13 +77,13 @@ class SubConverter:
     registerInputExtensions: tuple[str, ...] = ()  # if converter supports input
     registerOutputExtensions: tuple[str, ...] = ()  # if converter supports output
     registerOutputSubformatExtensions: dict[str, str] = {}
-    launchKey: t.Union[str, pathlib.Path, None] = None
+    launchKey: str|pathlib.Path|None = None
 
     codecWrite = False
     stringEncoding = 'utf-8'
 
     def __init__(self, **keywords):
-        self._stream: t.Union[stream.Score, stream.Part, stream.Opus] = stream.Score()
+        self._stream: stream.Score|stream.Part|stream.Opus = stream.Score()
         self.keywords = keywords
 
     def parseData(self, dataString, number=None):

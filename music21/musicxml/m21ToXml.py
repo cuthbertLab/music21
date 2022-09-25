@@ -2632,7 +2632,7 @@ class PartExporter(XMLExporterBase):
     }
 
     def __init__(self,
-                 partObj: t.Union[stream.Part, stream.Score, None] = None,
+                 partObj: stream.Part|stream.Score|None = None,
                  parent: ScoreExporter|None = None):
         super().__init__()
         # partObj can be a Score IF it has no parts within it.  But better to
@@ -2640,7 +2640,7 @@ class PartExporter(XMLExporterBase):
 
         if partObj is None:
             partObj = stream.Part()
-        self.stream: t.Union[stream.Part, stream.Score] = partObj
+        self.stream: stream.Part|stream.Score = partObj
         self.parent = parent  # ScoreExporter
         self.xmlRoot = Element('part')
 
@@ -4002,7 +4002,7 @@ class MeasureExporter(XMLExporterBase):
         if n.isRest:
             return
 
-        searchingObject: t.Union[note.NotRest, chord.Chord] = chordParent if chordParent else n
+        searchingObject: note.NotRest|chord.Chord = chordParent if chordParent else n
         closest_inst = searchingObject.getInstrument(returnDefault=True)
 
         instance_to_use = None

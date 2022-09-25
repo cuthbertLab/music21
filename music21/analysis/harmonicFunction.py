@@ -103,7 +103,7 @@ functionFigureTuplesMinor = {
 
 
 def functionToRoman(thisHarmonicFunction: HarmonicFunction,
-                    keyOrScale: t.Union[key.Key, scale.ConcreteScale, str] = 'C'
+                    keyOrScale: key.Key|scale.ConcreteScale|str = 'C'
                     ) -> t.Optional[roman.RomanNumeral]:
     '''
     Takes harmonic function labels (such as 'T' for major tonic)

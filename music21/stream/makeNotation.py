@@ -1618,7 +1618,7 @@ def makeAccidentalsInMeasureStream(
     *,
     pitchPast: t.Optional[list[pitch.Pitch]] = None,
     pitchPastMeasure: t.Optional[list[pitch.Pitch]] = None,
-    useKeySignature: t.Union[bool, key.KeySignature] = True,
+    useKeySignature: bool|key.KeySignature = True,
     alteredPitches: t.Optional[list[pitch.Pitch]] = None,
     cautionaryPitchClass: bool = True,
     cautionaryAll: bool = False,
@@ -1651,7 +1651,7 @@ def makeAccidentalsInMeasureStream(
     # because we are definitely searching key signature contexts
     # only key.KeySignature values are interesting
     # but method arg is typed this way for backwards compatibility
-    ksLast: t.Union[bool, key.KeySignature] = False
+    ksLast: bool|key.KeySignature = False
     ksLastDiatonic: list[str] = []
 
     if isinstance(useKeySignature, key.KeySignature):

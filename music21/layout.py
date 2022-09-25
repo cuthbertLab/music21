@@ -154,8 +154,8 @@ class ScoreLayout(LayoutBase):
 
     def __init__(self,
                  *,
-                 scalingMillimeters: t.Union[int, float, None] = None,
-                 scalingTenths: t.Union[int, float, None] = None,
+                 scalingMillimeters: int|float|None = None,
+                 scalingTenths: int|float|None = None,
                  musicFont: str|None = None,
                  wordFont: str|None = None,
                  pageLayout: PageLayout|None = None,
@@ -226,13 +226,13 @@ class PageLayout(LayoutBase):
     def __init__(self,
                  *,
                  pageNumber: int|None = None,
-                 leftMargin: t.Union[int, float, None] = None,
-                 rightMargin: t.Union[int, float, None] = None,
-                 topMargin: t.Union[int, float, None] = None,
-                 bottomMargin: t.Union[int, float, None] = None,
-                 pageHeight: t.Union[int, float, None] = None,
-                 pageWidth: t.Union[int, float, None] = None,
-                 isNew: t.Union[bool, None] = None,
+                 leftMargin: int|float|None = None,
+                 rightMargin: int|float|None = None,
+                 topMargin: int|float|None = None,
+                 bottomMargin: int|float|None = None,
+                 pageHeight: int|float|None = None,
+                 pageWidth: int|float|None = None,
+                 isNew: bool|None = None,
                  **keywords):
         super().__init__(**keywords)
 
@@ -274,11 +274,11 @@ class SystemLayout(LayoutBase):
     '''
     def __init__(self,
                  *,
-                 leftMargin: t.Union[int, float, None] = None,
-                 rightMargin: t.Union[int, float, None] = None,
-                 distance: t.Union[int, float, None] = None,
-                 topDistance: t.Union[int, float, None] = None,
-                 isNew: t.Union[bool, None] = None,
+                 leftMargin: int|float|None = None,
+                 rightMargin: int|float|None = None,
+                 distance: int|float|None = None,
+                 topDistance: int|float|None = None,
+                 isNew: bool|None = None,
                  **keywords):
         super().__init__(**keywords)
 
@@ -359,11 +359,11 @@ class StaffLayout(LayoutBase):
     }
     def __init__(self,
                  *,
-                 distance: t.Union[int, float, None] = None,
-                 staffNumber: t.Union[int, float, None] = None,
-                 staffSize: t.Union[int, float, None] = None,
+                 distance: int|float|None = None,
+                 staffNumber: int|float|None = None,
+                 staffSize: int|float|None = None,
                  staffLines: int|None = None,
-                 hidden: t.Union[bool, None] = None,
+                 hidden: bool|None = None,
                  staffType: StaffType = StaffType.REGULAR,
                  **keywords):
         super().__init__(**keywords)

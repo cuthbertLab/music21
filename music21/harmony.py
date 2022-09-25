@@ -209,8 +209,8 @@ class Harmony(chord.Chord):
 
     def __init__(self,
                  figure: str|None = None,
-                 root: t.Union[str, pitch.Pitch, None] = None,
-                 bass: t.Union[str, pitch.Pitch, None] = None,
+                 root: str|pitch.Pitch|None = None,
+                 bass: str|pitch.Pitch|None = None,
                  inversion: int|None = None,
                  updatePitches: bool = True,
                  **keywords
@@ -1577,8 +1577,8 @@ class ChordSymbol(Harmony):
 
     def __init__(self,
                  figure=None,
-                 root: t.Union[pitch.Pitch, str, None] = None,
-                 bass: t.Union[pitch.Pitch, str, None] = None,
+                 root: pitch.Pitch|str|None = None,
+                 bass: pitch.Pitch|str|None = None,
                  inversion: int|None = None,
                  kind='',
                  kindStr='',

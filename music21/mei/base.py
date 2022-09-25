@@ -343,7 +343,7 @@ class MeiToM21Converter:
 def safePitch(
     name: str,
     accidental: str|None = None,
-    octave: t.Union[str, int] = ''
+    octave: str|int = ''
 ) -> pitch.Pitch:
     '''
     Safely build a :class:`~music21.pitch.Pitch` from a string.
@@ -381,7 +381,7 @@ def safePitch(
 
 
 def makeDuration(
-    base: t.Union[float, int, Fraction] = 0.0,
+    base: float|int|Fraction = 0.0,
     dots: int = 0
 ) -> duration.Duration:
     '''

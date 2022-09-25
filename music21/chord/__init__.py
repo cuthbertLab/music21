@@ -1246,7 +1246,7 @@ class Chord(ChordBase):
     def bass(self,
              newbass: None = None,
              *,
-             find: t.Union[bool, None] = None,
+             find: bool|None = None,
              allow_add: bool = False,
              ) -> pitch.Pitch:
         return self.pitches[0]  # dummy until Astroid 1015 is fixed.
@@ -1255,15 +1255,15 @@ class Chord(ChordBase):
     def bass(self,
              newbass: t.Union[str, pitch.Pitch, note.Note],
              *,
-             find: t.Union[bool, None] = None,
+             find: bool|None = None,
              allow_add: bool = False,
              ) -> None:
         return None
 
     def bass(self,
-             newbass: t.Union[None, str, pitch.Pitch, note.Note] = None,
+             newbass: None|str|pitch.Pitch|note.Note = None,
              *,
-             find: t.Union[bool, None] = None,
+             find: bool|None = None,
              allow_add: bool = False,
              ) -> t.Optional[pitch.Pitch]:
         '''
@@ -3760,7 +3760,7 @@ class Chord(ChordBase):
     def root(self,
              newroot: None = None,
              *,
-             find: t.Union[bool, None] = None
+             find: bool|None = None
              ) -> pitch.Pitch:
         return self.pitches[0]  # dummy until Astroid 1015 is fixed.
 
@@ -3768,14 +3768,14 @@ class Chord(ChordBase):
     def root(self,
              newroot: t.Union[str, pitch.Pitch, note.Note],
              *,
-             find: t.Union[bool, None] = None
+             find: bool|None = None
              ) -> None:
         return None  # dummy until Astroid 1015 is fixed.
 
     def root(self,
-             newroot: t.Union[None, str, pitch.Pitch, note.Note] = None,
+             newroot: None|str|pitch.Pitch|note.Note = None,
              *,
-             find: t.Union[bool, None] = None
+             find: bool|None = None
              ) -> t.Optional[pitch.Pitch]:
         # noinspection PyShadowingNames
         '''

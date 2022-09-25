@@ -682,7 +682,7 @@ class TsvHandler:
 
         currentMeasureLength = ts.barDuration.quarterLength
 
-        currentOffset: t.Union[float, fractions.Fraction] = 0.0
+        currentOffset: float|fractions.Fraction = 0.0
 
         previousMeasure: int = self.chordList[0].measure - 1  # Covers pickups
         for entry in self.chordList:

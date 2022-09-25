@@ -685,9 +685,9 @@ class Microtone(prebase.ProtoM21Object, SlottedObjectMixin):
     # INITIALIZER #
 
     def __init__(self,
-                 centsOrString: t.Union[str, int, float] = 0,
+                 centsOrString: str|int|float = 0,
                  harmonicShift=1):
-        self._centShift: t.Union[int, float] = 0
+        self._centShift: int|float = 0
         self._harmonicShift: int = harmonicShift  # the first harmonic is the start
 
         if isinstance(centsOrString, (int, float)):
@@ -885,7 +885,7 @@ class Accidental(prebase.ProtoM21Object, style.StyleMixin):
 
     # INITIALIZER #
 
-    def __init__(self, specifier: t.Union[int, str, float] = 'natural'):
+    def __init__(self, specifier: int|str|float = 'natural'):
         super().__init__()
         # managed by properties
         self._displayType = 'normal'
@@ -1804,7 +1804,7 @@ class Pitch(prebase.ProtoM21Object):
                  step: StepName|None = None,
                  octave: int|None = None,
                  accidental: t.Union[Accidental, str, int, float, None] = None,
-                 microtone: t.Union[Microtone, int, float, None] = None,
+                 microtone: Microtone|int|float|None = None,
                  pitchClass: t.Optional[t.Union[int, PitchClassString]] = None,
                  midi: int|None = None,
                  ps: float|None = None,
@@ -2987,7 +2987,7 @@ class Pitch(prebase.ProtoM21Object):
     @pitchClass.setter
     def pitchClass(self, value: t.Union[int, PitchClassString]):
         # permit the submission of strings, like "A" and "B"
-        valueOut: t.Union[int, float] = _convertPitchClassToNumber(value)
+        valueOut: int|float = _convertPitchClassToNumber(value)
         # get step and accidental w/o octave
         self.step, self._accidental = _convertPsToStep(valueOut)[0:2]
 

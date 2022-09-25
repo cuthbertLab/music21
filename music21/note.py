@@ -574,7 +574,7 @@ class GeneralNote(base.Music21Object):
     def __init__(self,
                  *,
                  duration: Duration|None = None,
-                 lyric: t.Union[None, str, Lyric] = None,
+                 lyric: None|str|Lyric = None,
                  **keywords
                  ):
         if duration is None:
@@ -1464,7 +1464,7 @@ class Note(NotRest):
 
     # Accepts an argument for pitch
     def __init__(self,
-                 pitch: t.Union[str, int, Pitch, None] = None,
+                 pitch: str|int|Pitch|None = None,
                  *,
                  name: str|None = None,
                  nameWithOctave: str|None = None,
@@ -1966,7 +1966,7 @@ class Rest(GeneralNote):
     }
 
     def __init__(self,
-                 length: t.Union[str, OffsetQLIn, None] = None,
+                 length: str|OffsetQLIn|None = None,
                  *,
                  stepShift: int = 0,
                  fullMeasure: t.Literal[True, False, 'auto', 'always'] = 'auto',

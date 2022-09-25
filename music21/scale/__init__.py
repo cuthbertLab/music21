@@ -560,7 +560,7 @@ class AbstractScale(Scale):
                   pitchOrigin,
                   direction: Direction = Direction.ASCENDING,
                   stepSize=1,
-                  getNeighbor: t.Union[Direction, bool] = True):
+                  getNeighbor: Direction|bool = True):
         '''
         Expose functionality from :class:`~music21.intervalNetwork.IntervalNetwork`,
         passing on the stored alteredDegrees dictionary.
@@ -1571,8 +1571,8 @@ class ConcreteScale(Scale):
 
     def getPitches(
         self,
-        minPitch: t.Union[str, pitch.Pitch, None] = None,
-        maxPitch: t.Union[str, pitch.Pitch, None] = None,
+        minPitch: str|pitch.Pitch|None = None,
+        maxPitch: str|pitch.Pitch|None = None,
         direction: Direction|None = None
     ) -> list[pitch.Pitch]:
         '''
@@ -2052,9 +2052,9 @@ class ConcreteScale(Scale):
     def next(
         self,
         pitchOrigin=None,
-        direction: t.Union[Direction, int] = Direction.ASCENDING,
+        direction: Direction|int = Direction.ASCENDING,
         stepSize=1,
-        getNeighbor: t.Union[Direction, bool] = True,
+        getNeighbor: Direction|bool = True,
     ):  # pragma: no cover
         '''
         See :meth:`~music21.scale.ConcreteScale.nextPitch`.  This function
@@ -2076,9 +2076,9 @@ class ConcreteScale(Scale):
     def nextPitch(
         self,
         pitchOrigin=None,
-        direction: t.Union[Direction, int] = Direction.ASCENDING,
+        direction: Direction|int = Direction.ASCENDING,
         stepSize=1,
-        getNeighbor: t.Union[Direction, bool] = True,
+        getNeighbor: Direction|bool = True,
     ):
         '''
         Get the next pitch above (or below if direction is Direction.DESCENDING)
@@ -2170,7 +2170,7 @@ class ConcreteScale(Scale):
                pitchOrigin,
                direction: Direction = Direction.ASCENDING,
                stepSize=1,
-               getNeighbor: t.Union[Direction, bool] = True,
+               getNeighbor: Direction|bool = True,
                comparisonAttribute='name'):
         '''
         Given another pitch, as well as an origin and a direction,
@@ -3047,7 +3047,7 @@ class CyclicalScale(ConcreteScale):
     '''
 
     def __init__(self,
-                 tonic: t.Union[str, pitch.Pitch, note.Note, None] = None,
+                 tonic: str|pitch.Pitch|note.Note|None = None,
                  intervalList: list|None = None):
         super().__init__(tonic=tonic)
         mode = intervalList if intervalList else ['m2']
@@ -3152,7 +3152,7 @@ class SieveScale(ConcreteScale):
     def __init__(self,
                  tonic=None,
                  sieveString='2@0',
-                 eld: t.Union[int, float] = 1):
+                 eld: int|float = 1):
         super().__init__(tonic=tonic)
 
         # self.tonic is a Pitch

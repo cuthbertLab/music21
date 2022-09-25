@@ -1307,7 +1307,7 @@ class ABCNote(ABCToken):
 
         # set to True if a modification of key signature
         # set to False if an altered tone part of a Key
-        self.accidentalDisplayStatus: t.Union[bool, None] = None
+        self.accidentalDisplayStatus: bool|None = None
 
         # determined during parse() based on if pitch chars are present
         self.isRest: bool = False

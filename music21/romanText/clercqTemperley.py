@@ -296,7 +296,7 @@ class CTSong(prebase.ProtoM21Object):
             ''',
     }
 
-    def __init__(self, textFile: t.Union[str, pathlib.Path] = '', **keywords):
+    def __init__(self, textFile: str|pathlib.Path = '', **keywords):
         self._title = None
         self.text = ''
         self.lines: list[str] = []

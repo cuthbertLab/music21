@@ -1064,7 +1064,7 @@ class HumdrumSpine(prebase.ProtoM21Object):
         self._spineCollection = None
         self._spineType = None
 
-        self.isFirstVoice: t.Union[bool, None] = None
+        self.isFirstVoice: bool|None = None
         self.iterIndex = None
 
     def _reprInternal(self):

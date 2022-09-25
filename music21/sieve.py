@@ -1845,7 +1845,7 @@ class PitchSieve:
                  pitchLower: str|None = None,
                  pitchUpper: str|None = None,
                  pitchOrigin: str|None = None,
-                 eld: t.Union[int, float] = 1):
+                 eld: int|float = 1):
         self.sieveString = sieveString  # logical sieve string
 
         # should be in a try block

@@ -475,8 +475,8 @@ class MidiEvent(prebase.ProtoM21Object):
         self.time: int = time
         self.channel: int|None = channel
 
-        self.parameter1: t.Union[int, bytes, None] = None  # pitch or first data value
-        self.parameter2: t.Union[int, bytes, None] = None  # velocity or second data value
+        self.parameter1: int|bytes|None = None  # pitch or first data value
+        self.parameter2: int|bytes|None = None  # velocity or second data value
 
         # data is a property...
 

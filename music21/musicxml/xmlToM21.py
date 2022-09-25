@@ -2741,7 +2741,7 @@ class MeasureParser(XMLParserBase):
         isRest = False
         # TODO: Unpitched
 
-        offsetIncrement: t.Union[float, fractions.Fraction] = 0.0
+        offsetIncrement: float|fractions.Fraction = 0.0
 
         if mxNote.find('rest') is not None:  # it is a Rest
             isRest = True
@@ -2754,7 +2754,7 @@ class MeasureParser(XMLParserBase):
             isChord = True  # first note of chord is not identified.
             voiceOfChord = mxNote.find('voice')
             if voiceOfChord is not None:
-                vIndex: t.Union[str, int, None] = voiceOfChord.text
+                vIndex: str|int|None = voiceOfChord.text
                 if isinstance(vIndex, str):
                     try:
                         vIndex = int(vIndex)

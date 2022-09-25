@@ -89,18 +89,18 @@ class Date(prebase.ProtoM21Object):
 
     def __init__(self,
                  *,
-                 year: t.Union[int, str, None] = None,
-                 month: t.Union[int, str, None] = None,
-                 day: t.Union[int, str, None] = None,
-                 hour: t.Union[int, str, None] = None,
-                 minute: t.Union[int, str, None] = None,
-                 second: t.Union[int, float, str, None] = None,
-                 yearError: t.Union[str, None] = None,
-                 monthError: t.Union[str, None] = None,
-                 dayError: t.Union[str, None] = None,
-                 hourError: t.Union[str, None] = None,
-                 minuteError: t.Union[str, None] = None,
-                 secondError: t.Union[str, None] = None):
+                 year: int|str|None = None,
+                 month: int|str|None = None,
+                 day: int|str|None = None,
+                 hour: int|str|None = None,
+                 minute: int|str|None = None,
+                 second: int|float|str|None = None,
+                 yearError: str|None = None,
+                 monthError: str|None = None,
+                 dayError: str|None = None,
+                 hourError: str|None = None,
+                 minuteError: str|None = None,
+                 secondError: str|None = None):
         if year is not None and yearError is None:
             year, yearError = self._stripError(year)
         if month is not None and monthError is None:
@@ -849,7 +849,7 @@ class Text(prebase.ProtoM21Object):
                  encodingScheme: str|None = None):
         if isinstance(data, Text):
             # accessing private attributes here; not desirable
-            self._data: t.Union[str, Text] = data._data
+            self._data: str|Text = data._data
             self._language: str|None = data._language
             self.isTranslated: bool|None = data.isTranslated
             self.encodingScheme: str|None = data.encodingScheme
@@ -1083,11 +1083,11 @@ class Contributor(prebase.ProtoM21Object):
 
     def __init__(self,
                  *,
-                 name: t.Union[str, Text, None] = None,
+                 name: str|Text|None = None,
                  names: Iterable[t.Union[str, Text]] = (),
-                 role: t.Union[str, Text, None] = None,
-                 birth: t.Union[None, DateSingle, str] = None,
-                 death: t.Union[None, DateSingle, str] = None,
+                 role: str|Text|None = None,
+                 birth: None|DateSingle|str = None,
+                 death: None|DateSingle|str = None,
                  **keywords):
         self._role = None
         if role:

@@ -275,7 +275,7 @@ class PickleFilter:
         # environLocal.printDebug(['creating pickle filter'])
 
     def getPickleFp(self,
-                    directory: t.Union[pathlib.Path, str, None] = None,
+                    directory: pathlib.Path|str|None = None,
                     zipType: str|None = None) -> pathlib.Path:
         '''
         Returns the file path of the pickle file for this file.
@@ -492,7 +492,7 @@ class Converter:
     def __init__(self):
         self.subConverter: subConverters.SubConverter|None = None
         # a stream object unthawed
-        self._thawedStream: t.Union[stream.Score, stream.Part, stream.Opus, None] = None
+        self._thawedStream: stream.Score|stream.Part|stream.Opus|None = None
 
     def _getDownloadFp(
         self,

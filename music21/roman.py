@@ -737,7 +737,7 @@ def correctRNAlterationForMinor(
 
 def romanNumeralFromChord(
     chordObj: chord.Chord,
-    keyObj: t.Union[key.Key, str] = None,
+    keyObj: key.Key|str = None,
     preferSecondaryDominants: bool = False,
 ) -> RomanNumeral:
     # noinspection PyShadowingNames
@@ -2237,7 +2237,7 @@ class RomanNumeral(harmony.Harmony):
 
     def __init__(
         self,
-        figure: t.Union[str, int] = '',
+        figure: str|int = '',
         keyOrScale: t.Optional[t.Union[key.Key, scale.ConcreteScale, str]] = None,
         *,
         caseMatters=True,

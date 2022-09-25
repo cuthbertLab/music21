@@ -886,7 +886,7 @@ class GenericInterval(IntervalBase):
     Changed in v.6 -- large intervals get abbreviations
     '''
     def __init__(self,
-                 value: t.Union[int, str] = 'Unison',
+                 value: int|str = 'Unison',
                  **keywords):
         super().__init__(**keywords)
         self._value: int = 1
@@ -1666,8 +1666,8 @@ class DiatonicInterval(IntervalBase):
     }
 
     def __init__(self,
-                 specifier: t.Union[str, int] = 'P',
-                 generic: t.Union[int, GenericInterval, str] = 1,
+                 specifier: str|int = 'P',
+                 generic: int|GenericInterval|str = 1,
                  **keywords):
         super().__init__(**keywords)
 
@@ -2219,13 +2219,13 @@ class ChromaticInterval(IntervalBase):
     True
     '''
 
-    def __init__(self, semitones: t.Union[int, float] = 0, **keywords):
+    def __init__(self, semitones: int|float = 0, **keywords):
         super().__init__(**keywords)
 
         if semitones == int(semitones):
             semitones = int(semitones)
 
-        self.semitones: t.Union[int, float] = semitones
+        self.semitones: int|float = semitones
 
     def _reprInternal(self) -> str:
         return str(self.directed)
@@ -2991,15 +2991,15 @@ class Interval(IntervalBase):
                                pitch.Pitch,
                                note.Note,
                                None] = None,
-                 arg1: t.Union[pitch.Pitch, note.Note, None] = None,
+                 arg1: pitch.Pitch|note.Note|None = None,
                  /,
                  *,
                  diatonic: DiatonicInterval|None = None,
                  chromatic: ChromaticInterval|None = None,
                  pitchStart: pitch.Pitch|None = None,
                  pitchEnd: pitch.Pitch|None = None,
-                 noteStart: t.Union[note.Note, pitch.Pitch, None] = None,
-                 noteEnd: t.Union[note.Note, pitch.Pitch, None] = None,
+                 noteStart: note.Note|pitch.Pitch|None = None,
+                 noteEnd: note.Note|pitch.Pitch|None = None,
                  name: str|None = None,
                  **keywords):
         super().__init__(**keywords)

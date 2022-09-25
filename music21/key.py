@@ -942,7 +942,7 @@ class Key(KeySignature, scale.DiatonicScale):
     tonic: pitch.Pitch
 
     def __init__(self,
-                 tonic: t.Union[str, pitch.Pitch, note.Note] = 'C',
+                 tonic: str|pitch.Pitch|note.Note = 'C',
                  mode=None):
         if isinstance(tonic, (note.Note, pitch.Pitch)):
             tonicStr = tonic.name

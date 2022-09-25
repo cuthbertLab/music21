@@ -1147,7 +1147,7 @@ class MetricModulation(TempoIndication):
     def setOtherByReferent(
         self,
         side: str|None = None,
-        referent: t.Union[str, int, float] = 1.0
+        referent: str|int|float = 1.0
     ):
         '''
         Set the other side of the metric modulation not based on equality,

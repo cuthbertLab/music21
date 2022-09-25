@@ -299,7 +299,7 @@ class Music21Object(prebase.ProtoM21Object):
     within Note)
     '''
 
-    classSortOrder: t.Union[int, float] = 20  # default classSortOrder
+    classSortOrder: int|float = 20  # default classSortOrder
     # these values permit fast class comparisons for performance critical cases
     isStream = False
 
@@ -352,7 +352,7 @@ class Music21Object(prebase.ProtoM21Object):
     }
 
     def __init__(self,
-                 id: t.Union[str, int, None] = None,  # pylint: disable=redefined-builtin
+                 id: str|int|None = None,  # pylint: disable=redefined-builtin
                  groups: Groups|None = None,
                  sites: Sites|None = None,
                  duration: Duration|None = None,
@@ -363,16 +363,16 @@ class Music21Object(prebase.ProtoM21Object):
                  quarterLength: OffsetQLIn|None = None,
                  **keywords):
         # do not call super().__init__() since it just wastes time
-        self._id: t.Union[str, int, None] = id
+        self._id: str|int|None = id
         # None is stored as the internal location of an obj w/o any sites
-        self._activeSite: t.Union[stream.Stream, weakref.ReferenceType, None] = None
+        self._activeSite: stream.Stream|weakref.ReferenceType|None = None
         # offset when no activeSite is available
         self._naiveOffset: OffsetQL = offset
 
         # offset when activeSite is already garbage collected/dead,
         # as in short-lived sites
         # like .getElementsByClass().stream()
-        self._activeSiteStoredOffset: t.Union[float, fractions.Fraction, None] = None
+        self._activeSiteStoredOffset: float|fractions.Fraction|None = None
 
         # store a derivation object to track derivations from other Streams
         # pass a reference to this object

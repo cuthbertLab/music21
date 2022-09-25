@@ -38,7 +38,7 @@ def listOfTreesByClass(
     classLists: Sequence[Sequence[type[M21ObjType]]] = (),
     currentParentage: t.Optional[tuple[stream.Stream, ...]] = None,
     initialOffset: float = 0.0,
-    flatten: t.Union[bool, str] = False,
+    flatten: bool|str = False,
     useTimespans: bool = False
 ) -> list[t.Union[trees.OffsetTree, timespanTree.TimespanTree]]:
     # noinspection PyShadowingNames
@@ -282,7 +282,7 @@ def asTree(
     if (inputStream.isSorted
             and groupOffsets is False  # currently we can't populate for an OffsetTree*
             and (inputStream.isFlat or flatten is False)):
-        outputTree: t.Union[trees.OffsetTree, trees.ElementTree] = treeClass(source=inputStream)
+        outputTree: trees.OffsetTree|trees.ElementTree = treeClass(source=inputStream)
         return makeFastShallowTreeFromSortedStream(inputStream,
                                                    outputTree=outputTree,
                                                    classList=classList)
@@ -321,7 +321,7 @@ def makeFastShallowTreeFromSortedStream(
 def asTimespans(
     inputStream,
     *,
-    flatten: t.Union[str, bool] = False,
+    flatten: str|bool = False,
     classList: t.Optional[Sequence[type[Music21Object]]] = None
 ) -> timespanTree.TimespanTree:
     r'''

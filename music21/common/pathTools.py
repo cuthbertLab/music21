@@ -169,7 +169,7 @@ def cleanpath(path: t.Union[str, pathlib.Path], *,
     return '/'  # dummy until Astroid #1015 is fixed.
 
 def cleanpath(path: t.Union[str, pathlib.Path], *,
-              returnPathlib: t.Union[bool, None] = None) -> t.Union[str, pathlib.Path]:
+              returnPathlib: bool|None = None) -> t.Union[str, pathlib.Path]:
     '''
     Normalizes the path by expanding ~user on Unix, ${var} environmental vars
     (is this a good idea?), expanding %name% on Windows, normalizing path names

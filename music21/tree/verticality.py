@@ -555,7 +555,7 @@ class Verticality(prebase.ProtoM21Object):
 
     def makeElement(
         self,
-        quarterLength: t.Union[OffsetQLIn, None] = None,
+        quarterLength: OffsetQLIn|None = None,
         *,
         addTies=True,
         addPartIdAsGroup=False,

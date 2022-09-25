@@ -67,12 +67,12 @@ class Segment:
     }
 
     def __init__(self,
-                 bassNote: t.Union[str, note.Note] = 'C3',
+                 bassNote: str|note.Note = 'C3',
                  notationString: str|None = None,
                  fbScale: realizerScale.FiguredBassScale|None = None,
                  fbRules: rules.Rules|None = None,
                  numParts=4,
-                 maxPitch: t.Union[str, pitch.Pitch] = 'B5',
+                 maxPitch: str|pitch.Pitch = 'B5',
                  listOfPitches=None):
         '''
         A Segment corresponds to a 1:1 realization of a bassNote and notationString
@@ -864,8 +864,8 @@ class OverlaidSegment(Segment):
 # HELPER METHODS
 # --------------
 def getPitches(pitchNames=('C', 'E', 'G'),
-               bassPitch: t.Union[str, pitch.Pitch] = 'C3',
-               maxPitch: t.Union[str, pitch.Pitch] = 'C8'):
+               bassPitch: str|pitch.Pitch = 'C3',
+               maxPitch: str|pitch.Pitch = 'C8'):
     '''
     Given a list of pitchNames, a bassPitch, and a maxPitch, returns a sorted list of
     pitches between the two limits (inclusive) which correspond to items in pitchNames.
