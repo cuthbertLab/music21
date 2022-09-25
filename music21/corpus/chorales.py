@@ -17,7 +17,6 @@ class for easily iterating through the chorale collection.
 from __future__ import annotations
 
 import copy
-import typing as t
 import unittest
 
 from music21 import environment

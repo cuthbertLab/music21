@@ -19,7 +19,6 @@ from __future__ import annotations
 from collections.abc import Iterable, Sequence
 import copy
 import itertools
-import typing as t
 import unittest
 
 from music21 import chord

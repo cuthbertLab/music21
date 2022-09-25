@@ -17,7 +17,6 @@ Chord from FretBoard Object with tuning.
 '''
 from __future__ import annotations
 
-import typing as t
 from typing import TYPE_CHECKING
 import unittest
 

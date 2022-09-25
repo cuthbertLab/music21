@@ -27,7 +27,6 @@ from __future__ import annotations
 
 import math
 import random
-import typing as t
 import unittest
 
 from music21 import common

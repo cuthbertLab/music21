@@ -737,7 +737,7 @@ def correctRNAlterationForMinor(
 
 def romanNumeralFromChord(
     chordObj: chord.Chord,
-    keyObj: key.Key | str = None,
+    keyObj: key.Key | str | None = None,
     preferSecondaryDominants: bool = False,
 ) -> RomanNumeral:
     # noinspection PyShadowingNames

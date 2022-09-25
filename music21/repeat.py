@@ -20,7 +20,6 @@ from __future__ import annotations
 
 import copy
 import string
-import typing as t
 from typing import TYPE_CHECKING  # pylint needs no alias
 
 from music21 import environment

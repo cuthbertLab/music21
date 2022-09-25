@@ -3991,7 +3991,7 @@ class Chord(ChordBase):
         forceOctave: int | None = None,
         inPlace: t.Literal[True] | t.Literal[False] = False,
         leaveRedundantPitches: bool = False
-    ) -> None|_ChordType:
+    ) -> None | _ChordType:
         # noinspection PyShadowingNames
         '''
         Similar to :meth:`~music21.chord.Chord.ClosedPosition` in that it

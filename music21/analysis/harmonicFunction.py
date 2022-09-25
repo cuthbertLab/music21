@@ -10,7 +10,6 @@
 # ------------------------------------------------------------------------------
 from __future__ import annotations
 
-import typing as t
 import unittest
 
 from music21 import common

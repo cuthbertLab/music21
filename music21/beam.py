@@ -75,7 +75,6 @@ To get rid of beams on a note do:
 from __future__ import annotations
 
 from collections.abc import Iterable
-import typing as t
 from typing import TYPE_CHECKING  # pylint bug
 import unittest
 

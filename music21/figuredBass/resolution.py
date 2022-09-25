@@ -27,7 +27,6 @@ arguments, the methods only :meth:`~music21.pitch.Pitch.transpose` each
 from __future__ import annotations
 
 import unittest
-import typing as t
 
 from music21 import exceptions21
 from music21 import chord

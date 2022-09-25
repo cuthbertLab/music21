@@ -20,7 +20,6 @@ from __future__ import annotations
 
 from collections.abc import Generator
 import functools
-import typing as t
 from typing import TYPE_CHECKING  # Pylint bug
 import unittest
 

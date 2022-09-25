@@ -25,7 +25,6 @@ import base64
 import os
 import pathlib
 import subprocess
-import typing as t
 import unittest
 
 from music21 import common

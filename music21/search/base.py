@@ -20,7 +20,6 @@ from collections.abc import Callable
 import copy
 import difflib
 import math
-import typing as t
 import unittest
 
 from more_itertools import windowed

@@ -13,7 +13,6 @@
 from __future__ import annotations
 
 from collections.abc import Iterable
-import typing as t
 import unittest
 
 from music21 import common
@@ -70,7 +69,7 @@ class PercussionChord(chord.ChordBase):
         return tuple(self._notes)
 
     @notes.setter
-    def notes(self, newNotes: Iterable[note.Unpitched|note.Note]) -> None:
+    def notes(self, newNotes: Iterable[note.Unpitched | note.Note]) -> None:
         '''
         Sets notes to an iterable of Note or Unpitched objects
         '''

@@ -8800,7 +8800,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
 
     def transpose(
         self,
-        value: str | int|'music21.interval.IntervalBase',
+        value: str | int | 'music21.interval.IntervalBase',
         /,
         *,
         inPlace=False,

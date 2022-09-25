@@ -43,7 +43,9 @@ T = t.TypeVar('T')
 S = t.TypeVar('S')
 ChangedM21ObjType = t.TypeVar('ChangedM21ObjType', bound=base.Music21Object)
 StreamIteratorType = t.TypeVar('StreamIteratorType', bound='StreamIterator')
-FilterType = Callable[[t.Any, t.Any | None], t.Any] | filters.StreamFilter
+
+# pipe | version not passing mypy.
+FilterType = t.Union[Callable[[t.Any, t.Optional[t.Any]], t.Any], filters.StreamFilter]
 
 # -----------------------------------------------------------------------------
 

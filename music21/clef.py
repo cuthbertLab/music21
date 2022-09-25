@@ -19,7 +19,6 @@ within :class:`~music21.stream.Measure` objects.
 from __future__ import annotations
 
 from collections.abc import Iterable, Sequence
-import typing as t
 from typing import TYPE_CHECKING  # pylint needs no alias
 import unittest
 

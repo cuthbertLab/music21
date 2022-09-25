@@ -18,8 +18,6 @@ absolutely balanced by having O(log n) search times.
 '''
 from __future__ import annotations
 
-import typing as t
-
 from music21 import prebase
 from music21.exceptions21 import TreeException
 from music21 import common

@@ -20,7 +20,7 @@ _T = t.TypeVar('_T')
 # ------------------------------------------------------------------------------
 
 
-def wrapWeakref(referent: _T) -> weakref.ReferenceType|_T:
+def wrapWeakref(referent: _T) -> weakref.ReferenceType | _T:
     '''
     utility function that wraps objects as weakrefs but does not wrap
     already wrapped objects; also prevents wrapping the unwrappable "None" type, etc.

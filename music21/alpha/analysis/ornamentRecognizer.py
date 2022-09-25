@@ -11,7 +11,6 @@
 from __future__ import annotations
 
 from copy import deepcopy
-import typing as t
 import unittest
 
 from music21.common.numberTools import opFrac

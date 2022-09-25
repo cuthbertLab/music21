@@ -213,7 +213,7 @@ class Lyric(prebase.ProtoM21Object, style.StyleMixin):
         self._number: int = 1
         self._text: str = ''
         self._syllabic: SyllabicChoices = None
-        self.components: list[Lyric | None] = None
+        self.components: list[Lyric] | None = None
         self.elisionBefore = ' '
 
         # these are set by setTextAndSyllabic

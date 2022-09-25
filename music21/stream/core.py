@@ -25,7 +25,6 @@ from __future__ import annotations
 
 import copy
 from fractions import Fraction
-import typing as t
 from typing import TYPE_CHECKING  # pylint needs no alias
 import unittest
 

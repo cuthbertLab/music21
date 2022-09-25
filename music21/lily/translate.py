@@ -22,7 +22,6 @@ import pathlib
 import re
 import subprocess
 import sys
-import typing as t
 import unittest
 
 from music21 import clef

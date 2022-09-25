@@ -20,7 +20,6 @@ Does not handle pickup notes, which are defined simply with an early barline
 from __future__ import annotations
 
 from io import StringIO
-import typing as t
 import unittest
 import xml.etree.ElementTree
 import zipfile

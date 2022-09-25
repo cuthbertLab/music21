@@ -17,8 +17,6 @@ import fractions
 import textwrap
 import unittest
 
-import typing as t
-
 from music21 import bar
 from music21 import base
 from music21 import metadata

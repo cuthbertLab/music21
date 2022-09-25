@@ -14,8 +14,6 @@ import copy
 import itertools
 import unittest
 
-import typing as t
-
 from music21 import chord
 from music21 import environment
 from music21 import exceptions21
@@ -30,7 +28,7 @@ from music21.figuredBass import rules
 # used below
 _MOD = 'figuredBass.segment'
 
-_defaultRealizerScale: dict[str, realizerScale.FiguredBassScale|None] = {
+_defaultRealizerScale: dict[str, realizerScale.FiguredBassScale | None] = {
     'scale': None,  # singleton
 }
 
@@ -69,7 +67,7 @@ class Segment:
     def __init__(self,
                  bassNote: str | note.Note = 'C3',
                  notationString: str | None = None,
-                 fbScale: realizerScale.FiguredBassScale|None = None,
+                 fbScale: realizerScale.FiguredBassScale | None = None,
                  fbRules: rules.Rules | None = None,
                  numParts=4,
                  maxPitch: str | pitch.Pitch = 'B5',

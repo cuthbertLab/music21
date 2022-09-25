@@ -92,7 +92,6 @@ memorization" (BMTM, 71). Some of these keywords are changed automatically in co
 from __future__ import annotations
 
 import re
-import typing as t
 import unittest
 
 from music21 import base

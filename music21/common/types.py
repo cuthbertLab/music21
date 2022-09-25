@@ -30,5 +30,6 @@ StreamType2 = t.TypeVar('StreamType2', bound='music21.stream.Stream')
 M21ObjType = t.TypeVar('M21ObjType', bound='music21.base.Music21Object')
 M21ObjType2 = t.TypeVar('M21ObjType2', bound='music21.base.Music21Object')  # when you need another
 
-ClassListType = str | Iterable[str] | type[M21ObjType] | Iterable[type[M21ObjType]]
+# does not seem to like the | way of spelling
+ClassListType = t.Union[str, Iterable[str], type[M21ObjType], Iterable[type[M21ObjType]]]
 StepName = t.Literal['C', 'D', 'E', 'F', 'G', 'A', 'B']

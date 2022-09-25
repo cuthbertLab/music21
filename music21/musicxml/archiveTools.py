@@ -16,7 +16,6 @@ from __future__ import annotations
 
 import os
 import pathlib
-import typing as t
 import zipfile
 
 from music21 import common
