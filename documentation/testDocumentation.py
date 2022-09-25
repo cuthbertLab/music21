@@ -21,7 +21,6 @@ import os.path
 import re
 import sys
 import time
-import typing as t
 
 # noinspection PyPackageRequirements
 from docutils.core import publish_doctree  # pylint: disable=import-error
