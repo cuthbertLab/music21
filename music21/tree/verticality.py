@@ -337,7 +337,7 @@ class Verticality(prebase.ProtoM21Object):
         return self.startTimespans[0].measureNumber
 
     @property
-    def nextStartOffset(self) -> float|None:
+    def nextStartOffset(self) -> float | None:
         r'''
         Gets the next start-offset in the verticality's offset-tree.
 
@@ -536,7 +536,7 @@ class Verticality(prebase.ProtoM21Object):
         return tuple(self.startTimespans[:] + self.overlapTimespans[:])
 
     @property
-    def timeToNextEvent(self) -> OffsetQL|None:
+    def timeToNextEvent(self) -> OffsetQL | None:
         '''
         Returns a float or Fraction of the quarterLength to the next
         event (usually the next Verticality, but also to the end of the piece).
@@ -555,7 +555,7 @@ class Verticality(prebase.ProtoM21Object):
 
     def makeElement(
         self,
-        quarterLength: OffsetQLIn|None = None,
+        quarterLength: OffsetQLIn | None = None,
         *,
         addTies=True,
         addPartIdAsGroup=False,
@@ -563,7 +563,7 @@ class Verticality(prebase.ProtoM21Object):
         gatherArticulations='single',
         gatherExpressions='single',
         copyPitches=True,
-    ) -> note.Rest|chord.Chord:
+    ) -> note.Rest | chord.Chord:
         # noinspection PyDunderSlots, PyShadowingNames
         r'''
         Makes a Chord or Rest from this verticality and quarterLength.

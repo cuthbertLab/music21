@@ -1842,10 +1842,10 @@ class PitchSieve:
 
     def __init__(self,
                  sieveString,
-                 pitchLower: str|None = None,
-                 pitchUpper: str|None = None,
-                 pitchOrigin: str|None = None,
-                 eld: int|float = 1):
+                 pitchLower: str | None = None,
+                 pitchUpper: str | None = None,
+                 pitchOrigin: str | None = None,
+                 eld: int | float = 1):
         self.sieveString = sieveString  # logical sieve string
 
         # should be in a try block
@@ -1978,7 +1978,7 @@ class PitchSieve:
         #            self.sieveObject.period())
         p = self.sieveObject.period()
 
-        z: list[int]|None
+        z: list[int] | None
         if p < 999999999:
             z = list(range(p + 1))
         else:  # too big to get z as list of values

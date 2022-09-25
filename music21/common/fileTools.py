@@ -53,7 +53,7 @@ def cd(targetDir):
         os.chdir(cwd)
 
 
-def readPickleGzip(filePath: str|pathlib.Path) -> t.Any:
+def readPickleGzip(filePath: str | pathlib.Path) -> t.Any:
     '''
     Read a gzip-compressed pickle file, uncompress it, unpickle it, and
     return the contents.

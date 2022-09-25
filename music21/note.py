@@ -206,14 +206,14 @@ class Lyric(prebase.ProtoM21Object, style.StyleMixin):
                  *,
                  applyRaw: bool = False,
                  syllabic: SyllabicChoices = None,
-                 identifier: str|None = None,
+                 identifier: str | None = None,
                  **keywords):
         super().__init__()
-        self._identifier: str|None = None
+        self._identifier: str | None = None
         self._number: int = 1
         self._text: str = ''
         self._syllabic: SyllabicChoices = None
-        self.components: list[Lyric|None] = None
+        self.components: list[Lyric | None] = None
         self.elisionBefore = ' '
 
         # these are set by setTextAndSyllabic
@@ -335,7 +335,7 @@ class Lyric(prebase.ProtoM21Object, style.StyleMixin):
         self._syllabic = newSyllabic
 
     @property
-    def identifier(self) -> str|int:
+    def identifier(self) -> str | int:
         '''
         By default, this is the same as self.number. However, if there is a
         descriptive identifier like 'part2verse1', it is stored here and
@@ -363,7 +363,7 @@ class Lyric(prebase.ProtoM21Object, style.StyleMixin):
             return self._identifier
 
     @identifier.setter
-    def identifier(self, value: str|None):
+    def identifier(self, value: str | None):
         self._identifier = value
 
     @property
@@ -573,8 +573,8 @@ class GeneralNote(base.Music21Object):
 
     def __init__(self,
                  *,
-                 duration: Duration|None = None,
-                 lyric: None|str|Lyric = None,
+                 duration: Duration | None = None,
+                 lyric: None | str | Lyric = None,
                  **keywords
                  ):
         if duration is None:
@@ -602,7 +602,7 @@ class GeneralNote(base.Music21Object):
             self.addLyric(lyric)
 
         # note: Chords handle ties differently
-        self._tie: tie.Tie|None = None  # store a Tie object
+        self._tie: tie.Tie | None = None  # store a Tie object
 
     def __eq__(self, other):
         '''
@@ -634,7 +634,7 @@ class GeneralNote(base.Music21Object):
 
     # --------------------------------------------------------------------------
     @property
-    def tie(self) -> tie.Tie|None:
+    def tie(self) -> tie.Tie | None:
         '''
         Return and set a :class:`~music21.note.Tie` object, or None.
 
@@ -646,17 +646,17 @@ class GeneralNote(base.Music21Object):
         return self._tie
 
     @tie.setter
-    def tie(self, value: tie.Tie|None):
+    def tie(self, value: tie.Tie | None):
         self._tie = value
 
-    def _getLyric(self) -> str|None:
+    def _getLyric(self) -> str | None:
         if not self.lyrics:
             return None
 
         allText = [ly.text for ly in self.lyrics]
         return '\n'.join([textStr for textStr in allText if textStr is not None])
 
-    def _setLyric(self, value: str|Lyric|None) -> None:
+    def _setLyric(self, value: str | Lyric | None) -> None:
         self.lyrics = []
         if value is None:
             return
@@ -979,20 +979,20 @@ class NotRest(GeneralNote):
     }
 
     def __init__(self,
-                 beams: beam.Beams|None = None,
+                 beams: beam.Beams | None = None,
                  **keywords):
         super().__init__(**keywords)
         self._notehead: str = 'normal'
-        self._noteheadFill: bool|None = None
+        self._noteheadFill: bool | None = None
         self._noteheadParenthesis: bool = False
         self._stemDirection: str = 'unspecified'
-        self._volume: volume.Volume|None = None  # created on demand
+        self._volume: volume.Volume | None = None  # created on demand
         if beams is not None:
             self.beams = beams
         else:
             self.beams = beam.Beams()
-        self._storedInstrument: instrument.Instrument|None = None
-        self._chordAttached: chord.ChordBase|None = None
+        self._storedInstrument: instrument.Instrument | None = None
+        self._chordAttached: chord.ChordBase | None = None
 
     # ==============================================================================================
     # Special functions
@@ -1131,7 +1131,7 @@ class NotRest(GeneralNote):
         self._notehead = value
 
     @property
-    def noteheadFill(self) -> bool|None:
+    def noteheadFill(self) -> bool | None:
         '''
         Get or set the note head fill status of this NotRest. Valid note head fill values are
         True, False, or None (meaning default).  "yes" and "no" are converted to True
@@ -1152,8 +1152,8 @@ class NotRest(GeneralNote):
         return self._noteheadFill
 
     @noteheadFill.setter
-    def noteheadFill(self, value: bool|None|str):
-        boolValue: bool|None
+    def noteheadFill(self, value: bool | None | str):
+        boolValue: bool | None
         if value in ('none', None, 'default'):
             boolValue = None  # allow setting to none or None
         elif value in (True, 'filled', 'yes'):
@@ -1191,7 +1191,7 @@ class NotRest(GeneralNote):
         return self._noteheadParenthesis
 
     @noteheadParenthesis.setter
-    def noteheadParenthesis(self, value: bool|str|int):
+    def noteheadParenthesis(self, value: bool | str | int):
         boolValue: bool
         if value in (True, 'yes', 1):
             boolValue = True
@@ -1222,7 +1222,7 @@ class NotRest(GeneralNote):
             return True
 
     def _getVolume(self,
-                   forceClient: base.Music21Object|None = None
+                   forceClient: base.Music21Object | None = None
                    ) -> volume.Volume:
         # DO NOT CHANGE TO @property because of optional attributes
         # lazy volume creation.  property is set below.
@@ -1239,7 +1239,7 @@ class NotRest(GeneralNote):
 
         return volume_out
 
-    def _setVolume(self, value: None|volume.Volume|int|float, setClient=True):
+    def _setVolume(self, value: None | volume.Volume | int | float, setClient=True):
         # DO NOT CHANGE TO @property because of optional attributes
         # setClient is only False when Chords are bundling Notes.
         if value is None:
@@ -1280,7 +1280,7 @@ class NotRest(GeneralNote):
         return self._getVolume()
 
     @volume.setter
-    def volume(self, value: None|volume.Volume|int|float):
+    def volume(self, value: None | volume.Volume | int | float):
         self._setVolume(value)
 
     def _getStoredInstrument(self):
@@ -1314,13 +1314,13 @@ class NotRest(GeneralNote):
     def getInstrument(self,
                       *,
                       returnDefault: t.Literal[False]
-                      ) -> instrument.Instrument|None:
+                      ) -> instrument.Instrument | None:
         return None  # astroid #1015
 
     def getInstrument(self,
                       *,
                       returnDefault: bool = True
-                      ) -> instrument.Instrument|None:
+                      ) -> instrument.Instrument | None:
         '''
         Retrieves the `.storedInstrument` on this `NotRest` instance, if any.
         If one is not found, executes a context search (without following
@@ -1464,13 +1464,13 @@ class Note(NotRest):
 
     # Accepts an argument for pitch
     def __init__(self,
-                 pitch: str|int|Pitch|None = None,
+                 pitch: str | int | Pitch | None = None,
                  *,
-                 name: str|None = None,
-                 nameWithOctave: str|None = None,
+                 name: str | None = None,
+                 nameWithOctave: str | None = None,
                  **keywords):
         super().__init__(**keywords)
-        self._chordAttached: chord.Chord|None
+        self._chordAttached: chord.Chord | None
 
         if pitch is not None:
             if isinstance(pitch, Pitch):
@@ -1634,10 +1634,10 @@ class Note(NotRest):
     def step(self, value: StepName):
         self.pitch.step = value
 
-    def _getOctave(self) -> int|None:
+    def _getOctave(self) -> int | None:
         return self.pitch.octave
 
-    def _setOctave(self, value: int|None):
+    def _setOctave(self, value: int | None):
         self.pitch.octave = value
 
     octave = property(_getOctave,
@@ -1837,7 +1837,7 @@ class Unpitched(NotRest):
                  displayName=None,
                  **keywords):
         super().__init__(**keywords)
-        self._chordAttached: percussion.PercussionChord|None = None
+        self._chordAttached: percussion.PercussionChord | None = None
 
         self.displayStep: StepName = 'B'
         self.displayOctave: int = 4
@@ -1966,7 +1966,7 @@ class Rest(GeneralNote):
     }
 
     def __init__(self,
-                 length: str|OffsetQLIn|None = None,
+                 length: str | OffsetQLIn | None = None,
                  *,
                  stepShift: int = 0,
                  fullMeasure: t.Literal[True, False, 'auto', 'always'] = 'auto',

@@ -560,7 +560,7 @@ class AbstractScale(Scale):
                   pitchOrigin,
                   direction: Direction = Direction.ASCENDING,
                   stepSize=1,
-                  getNeighbor: Direction|bool = True):
+                  getNeighbor: Direction | bool = True):
         '''
         Expose functionality from :class:`~music21.intervalNetwork.IntervalNetwork`,
         passing on the stored alteredDegrees dictionary.
@@ -659,7 +659,7 @@ class AbstractDiatonicScale(AbstractScale):
     True
 
     '''
-    def __init__(self, mode: str|None = None):
+    def __init__(self, mode: str | None = None):
         super().__init__()
         self.mode = mode
         self.type = 'Abstract diatonic'
@@ -1258,14 +1258,14 @@ class ConcreteScale(Scale):
     usePitchDegreeCache = False
 
     def __init__(self,
-                 tonic: str|pitch.Pitch|note.Note|None = None,
-                 pitches: list[pitch.Pitch|str]|None = None):
+                 tonic: str | pitch.Pitch | note.Note | None = None,
+                 pitches: list[pitch.Pitch | str] | None = None):
         super().__init__()
 
         self.type = 'Concrete'
         # store an instance of an abstract scale
         # subclasses might use multiple abstract scales?
-        self._abstract: AbstractScale|None = None
+        self._abstract: AbstractScale | None = None
 
         # determine whether this is a limited range
         self.boundRange = False
@@ -1281,7 +1281,7 @@ class ConcreteScale(Scale):
         # found on
         # no default tonic is defined; as such, it is mostly an abstract scale, and
         # can't be used concretely until it is created.
-        self.tonic: pitch.Pitch|None
+        self.tonic: pitch.Pitch | None
         if tonic is None:
             self.tonic = None  # pitch.Pitch()
         elif isinstance(tonic, str):
@@ -1521,7 +1521,7 @@ class ConcreteScale(Scale):
                 pDstNew.octave = pEnh.octave  # copy octave
                 # need to adjust enharmonic
                 pDstNewEnh = pDstNew.getAllCommonEnharmonics(alterLimit=2)
-                match: pitch.Pitch|None = None
+                match: pitch.Pitch | None = None
                 for x in pDstNewEnh:
                     # try to match enharmonic with original alt
                     if x.name == pAlt.name:
@@ -1571,9 +1571,9 @@ class ConcreteScale(Scale):
 
     def getPitches(
         self,
-        minPitch: str|pitch.Pitch|None = None,
-        maxPitch: str|pitch.Pitch|None = None,
-        direction: Direction|None = None
+        minPitch: str | pitch.Pitch | None = None,
+        maxPitch: str | pitch.Pitch | None = None,
+        direction: Direction | None = None
     ) -> list[pitch.Pitch]:
         '''
         Return a list of Pitch objects, using a
@@ -1594,13 +1594,13 @@ class ConcreteScale(Scale):
             pitchObj = self.tonic
         stepOfPitch = self._abstract.tonicDegree
 
-        minPitchObj: pitch.Pitch|None
+        minPitchObj: pitch.Pitch | None
         if isinstance(minPitch, str):
             minPitchObj = pitch.Pitch(minPitch)
         else:
             minPitchObj = minPitch
 
-        maxPitchObj: pitch.Pitch|None
+        maxPitchObj: pitch.Pitch | None
         if isinstance(maxPitch, str):
             maxPitchObj = pitch.Pitch(maxPitch)
         else:
@@ -1697,7 +1697,7 @@ class ConcreteScale(Scale):
         if self._abstract is None:  # pragma: no cover
             raise ScaleException('Abstract scale underpinning this scale is not defined.')
 
-        cacheKey: _PitchDegreeCacheKey|None = None
+        cacheKey: _PitchDegreeCacheKey | None = None
         if (self.usePitchDegreeCache and self.tonic
                 and not minPitch and not maxPitch and getattr(self, 'type', None)):
             tonicCacheKey = self.tonic.nameWithOctave
@@ -2052,9 +2052,9 @@ class ConcreteScale(Scale):
     def next(
         self,
         pitchOrigin=None,
-        direction: Direction|int = Direction.ASCENDING,
+        direction: Direction | int = Direction.ASCENDING,
         stepSize=1,
-        getNeighbor: Direction|bool = True,
+        getNeighbor: Direction | bool = True,
     ):  # pragma: no cover
         '''
         See :meth:`~music21.scale.ConcreteScale.nextPitch`.  This function
@@ -2076,9 +2076,9 @@ class ConcreteScale(Scale):
     def nextPitch(
         self,
         pitchOrigin=None,
-        direction: Direction|int = Direction.ASCENDING,
+        direction: Direction | int = Direction.ASCENDING,
         stepSize=1,
-        getNeighbor: Direction|bool = True,
+        getNeighbor: Direction | bool = True,
     ):
         '''
         Get the next pitch above (or below if direction is Direction.DESCENDING)
@@ -2170,7 +2170,7 @@ class ConcreteScale(Scale):
                pitchOrigin,
                direction: Direction = Direction.ASCENDING,
                stepSize=1,
-               getNeighbor: Direction|bool = True,
+               getNeighbor: Direction | bool = True,
                comparisonAttribute='name'):
         '''
         Given another pitch, as well as an origin and a direction,
@@ -3018,7 +3018,7 @@ class OctaveRepeatingScale(ConcreteScale):
     [<music21.pitch.Pitch C4>, <music21.pitch.Pitch D-4>, <music21.pitch.Pitch C5>]
     '''
 
-    def __init__(self, tonic=None, intervalList: list|None = None):
+    def __init__(self, tonic=None, intervalList: list | None = None):
         super().__init__(tonic=tonic)
         mode = intervalList if intervalList else ['m2']
         self._abstract = AbstractOctaveRepeatingScale(mode=mode)
@@ -3047,8 +3047,8 @@ class CyclicalScale(ConcreteScale):
     '''
 
     def __init__(self,
-                 tonic: str|pitch.Pitch|note.Note|None = None,
-                 intervalList: list|None = None):
+                 tonic: str | pitch.Pitch | note.Note | None = None,
+                 intervalList: list | None = None):
         super().__init__(tonic=tonic)
         mode = intervalList if intervalList else ['m2']
         self._abstract = AbstractCyclicalScale(mode=mode)
@@ -3152,7 +3152,7 @@ class SieveScale(ConcreteScale):
     def __init__(self,
                  tonic=None,
                  sieveString='2@0',
-                 eld: int|float = 1):
+                 eld: int | float = 1):
         super().__init__(tonic=tonic)
 
         # self.tonic is a Pitch

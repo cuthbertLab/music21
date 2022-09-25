@@ -82,28 +82,28 @@ class Style(ProtoM21Object):
     def __init__(self):
         self.size = None
 
-        self.relativeX: float|int|None = None
-        self.relativeY: float|int|None = None
-        self.absoluteX: float|int|None = None
+        self.relativeX: float | int | None = None
+        self.relativeY: float | int | None = None
+        self.absoluteX: float | int | None = None
 
         # managed by property below.
-        self._absoluteY: float|int|None = None
+        self._absoluteY: float | int | None = None
 
-        self._enclosure: Enclosure|None = None
+        self._enclosure: Enclosure | None = None
 
         # how should this symbol be represented in the font?
         # SMuFL characters are allowed.
         self.fontRepresentation = None
 
-        self.color: str|None = None
+        self.color: str | None = None
 
         self.units: str = 'tenths'
         self.hideObjectOnPrint: bool = False
 
-    def _getEnclosure(self) -> Enclosure|None:
+    def _getEnclosure(self) -> Enclosure | None:
         return self._enclosure
 
-    def _setEnclosure(self, value: Enclosure|None):
+    def _setEnclosure(self, value: Enclosure | None):
         if value is None:
             self._enclosure = value
         elif value == Enclosure.NONE:
@@ -270,9 +270,9 @@ class NoteStyle(Style):
 
     def __init__(self):
         super().__init__()
-        self.stemStyle: Style|None = None
-        self.accidentalStyle: Style|None = None
-        self.noteSize: str|None = None  # can be 'cue' etc.
+        self.stemStyle: Style | None = None
+        self.accidentalStyle: Style | None = None
+        self.noteSize: str | None = None  # can be 'cue' etc.
 
 
 class TextStyle(Style):
@@ -626,8 +626,8 @@ class StyleMixin(common.SlottedObjectMixin):
     def __init__(self):
         # no need to call super().__init__() on SlottedObjectMixin
         # This might be dangerous though
-        self._style: Style|None = None
-        self._editorial: editorial.Editorial|None = None
+        self._style: Style | None = None
+        self._editorial: editorial.Editorial | None = None
 
     @property
     def hasStyleInformation(self) -> bool:

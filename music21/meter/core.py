@@ -56,7 +56,7 @@ class MeterTerminal(prebase.ProtoM21Object, SlottedObjectMixin):
     )
 
     # INITIALIZER #
-    def __init__(self, slashNotation: str|None = None, weight=1):
+    def __init__(self, slashNotation: str | None = None, weight=1):
         # because of how they are copied, MeterTerminals must not have any
         # initialization parameters without defaults
         self._duration = None
@@ -1775,7 +1775,7 @@ class MeterSequence(MeterTerminal):
         iMatch = self.offsetToIndex(qLenPos)
         return opFrac(self[iMatch].weight)
 
-    def offsetToDepth(self, qLenPos, align='quantize', index: int|None = None):
+    def offsetToDepth(self, qLenPos, align='quantize', index: int | None = None):
         '''
         Given a qLenPos, return the maximum available depth at this position.
 

@@ -527,7 +527,7 @@ def detectPitchFrequencies(freqFromAQList, useScale=None):
 
 
 def smoothFrequencies(
-    frequencyList: list[int|float],
+    frequencyList: list[int | float],
     *,
     smoothLevels=7,
     inPlace=False

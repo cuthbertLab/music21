@@ -168,7 +168,7 @@ def slashMixedToFraction(valueSrc: str) -> tuple[NumDenomTuple, bool]:
             post.append((intNum, intDenom))
         else:  # search ahead for next defined denominator
             summedNumerator = True
-            match: int|None = None
+            match: int | None = None
             for j in range(i, len(pre)):  # this O(n^2) operation is easily simplified to O(n)
                 if pre[j][1] is not None:
                     match = pre[j][1]

@@ -99,7 +99,7 @@ class Graph(prebase.ProtoM21Object):
     '''
     graphType = 'genericGraph'
     axisKeys: tuple[str, ...] = ('x', 'y')
-    figureSizeDefault: tuple[int|float, ...] = (6, 6)
+    figureSizeDefault: tuple[int | float, ...] = (6, 6)
 
     keywordConfigurables: tuple[str, ...] = (
         'alpha',

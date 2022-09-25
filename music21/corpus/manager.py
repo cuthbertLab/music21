@@ -37,7 +37,7 @@ if TYPE_CHECKING:
     from music21.metadata import bundles
 
 
-_metadataBundles: dict[str, bundles.MetadataBundle|None] = {
+_metadataBundles: dict[str, bundles.MetadataBundle | None] = {
     'core': None,
     'local': None,
     # 'virtual': None,

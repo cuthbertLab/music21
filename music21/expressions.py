@@ -173,7 +173,7 @@ class RehearsalMark(Expression):
         return repr(self.content)
 
     @staticmethod
-    def _getNumberingFromContent(c) -> str|None:
+    def _getNumberingFromContent(c) -> str | None:
         '''
         if numbering was not set, get it from the content
 
@@ -368,7 +368,7 @@ class TextExpression(Expression):
             return ''
 
     @property
-    def enclosure(self) -> style.Enclosure|None:
+    def enclosure(self) -> style.Enclosure | None:
         '''
         Returns or sets the enclosure on the Style object
         stored on .style.
@@ -394,7 +394,7 @@ class TextExpression(Expression):
         return self.style.enclosure
 
     @enclosure.setter
-    def enclosure(self, value: style.Enclosure|None):
+    def enclosure(self, value: style.Enclosure | None):
         if not self.hasStyleInformation and value is None:
             return
         self.style.enclosure = value
@@ -466,7 +466,7 @@ class Ornament(Expression):
                 *,
                 inPlace: bool = False
                 ) -> tuple[list[note.Note],
-                           note.Note|None,
+                           note.Note | None,
                            list[note.Note]]:
         '''
         subclassable method call that takes a sourceObject
@@ -490,7 +490,7 @@ class Ornament(Expression):
         fillObjects: list[note.Note],
         transposeInterval: interval.IntervalBase,
         *,
-        useQL: OffsetQL|None = None
+        useQL: OffsetQL | None = None
     ) -> None:
         '''
         Used by trills and mordents to fill out their realization.
@@ -1534,7 +1534,7 @@ class ArpeggioMark(Expression):
     >>> am.type
     'down'
     '''
-    def __init__(self, arpeggioType: str|None = None):
+    def __init__(self, arpeggioType: str | None = None):
         super().__init__()
         if arpeggioType is None:
             arpeggioType = 'normal'
@@ -1581,8 +1581,8 @@ class ArpeggioMarkSpanner(spanner.Spanner):
             )
         self.type = arpeggioType
 
-    def noteExtremes(self) -> tuple[note.Note|None,
-                                    note.Note|None]:
+    def noteExtremes(self) -> tuple[note.Note | None,
+                                    note.Note | None]:
         '''
         Return the lowest and highest note spanned by the element,
         extracting them from Chords if need be.

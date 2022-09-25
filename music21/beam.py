@@ -270,7 +270,7 @@ class Beams(prebase.ProtoM21Object, EqualSlottedObjectMixin):
                      2/None>/<music21.beam.Beam 3/None>>,
          None]
         '''
-        beamsList: list[Beams|None] = []
+        beamsList: list[Beams | None] = []
         for el in srcList:
             # if a dur cannot be beamable under any circumstance, replace
             # it with None; this includes Rests
@@ -289,7 +289,7 @@ class Beams(prebase.ProtoM21Object, EqualSlottedObjectMixin):
         return beamsList
 
     @staticmethod
-    def removeSandwichedUnbeamables(beamsList: list[Beams|None]):
+    def removeSandwichedUnbeamables(beamsList: list[Beams | None]):
         # noinspection PyShadowingNames
         '''
         Go through the naiveBeamsList and remove beams from objects surrounded

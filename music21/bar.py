@@ -272,8 +272,8 @@ class Repeat(repeat.RepeatMark, Barline):
             barType = 'final'
         Barline.__init__(self, type=barType)
 
-        self._direction: str|None = None  # either start or end
-        self._times: int|None = None  # if an end, how many repeats
+        self._direction: str | None = None  # either start or end
+        self._times: int | None = None  # if an end, how many repeats
 
         # start is forward, end is backward in musicxml
         self.direction = direction  # start, end
@@ -309,7 +309,7 @@ class Repeat(repeat.RepeatMark, Barline):
             raise BarException(f'cannot set repeat direction to: {value}')
 
     @property
-    def times(self) -> int|None:
+    def times(self) -> int | None:
         '''
         Get or set the "times" property of this barline. This
         defines how many times the repeat happens. A standard repeat

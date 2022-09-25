@@ -192,7 +192,7 @@ def getDocumentationFiles(runOne=False):
     return allModules
 
 
-def main(runOne: str|bool = False):
+def main(runOne: str | bool = False):
     if runOne is False:
         nbvalNotebook.runAll()
     elif '.ipynb' in runOne:

@@ -138,7 +138,7 @@ class NWCConverter:
         self.staffHeight = 0
 
     # noinspection SpellCheckingInspection
-    def parseFile(self, fp: pathlib.Path|str):
+    def parseFile(self, fp: pathlib.Path | str):
         # noinspection PyShadowingNames
         r'''
         Parse a file (calls .toStream)

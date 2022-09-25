@@ -75,7 +75,7 @@ __all__ = [
 
 environLocal = environment.Environment('converter')
 
-_StrOrBytes = t.TypeVar('_StrOrBytes', bound=str|bytes)
+_StrOrBytes = t.TypeVar('_StrOrBytes', bound=str | bytes)
 
 # ------------------------------------------------------------------------------
 class ArchiveManagerException(exceptions21.Music21Exception):
@@ -123,7 +123,7 @@ class ArchiveManager:
     # for info on mxl files, see
     # http://www.recordare.com/xml/compressed-mxl.html
 
-    def __init__(self, fp: str|pathlib.Path, archiveType='zip'):
+    def __init__(self, fp: str | pathlib.Path, archiveType='zip'):
         self.fp: pathlib.Path = common.cleanpath(fp, returnPathlib=True)
         self.archiveType: str = archiveType
 
@@ -262,21 +262,21 @@ class PickleFilter:
     '''
 
     def __init__(self,
-                 fp: str|pathlib.Path,
+                 fp: str | pathlib.Path,
                  forceSource: bool = False,
-                 number: int|None = None,
+                 number: int | None = None,
                  # quantizePost: bool = False,
-                 # quarterLengthDivisors: Iterable[int]|None = None,
+                 # quarterLengthDivisors: Iterable[int] | None = None,
                  **keywords):
         self.fp: pathlib.Path = common.cleanpath(fp, returnPathlib=True)
         self.forceSource: bool = forceSource
-        self.number: int|None = number
+        self.number: int | None = number
         self.keywords: dict[str, t.Any] = keywords
         # environLocal.printDebug(['creating pickle filter'])
 
     def getPickleFp(self,
-                    directory: pathlib.Path|str|None = None,
-                    zipType: str|None = None) -> pathlib.Path:
+                    directory: pathlib.Path | str | None = None,
+                    zipType: str | None = None) -> pathlib.Path:
         '''
         Returns the file path of the pickle file for this file.
 
@@ -326,7 +326,7 @@ class PickleFilter:
         if pickleFp.exists():
             os.remove(pickleFp)
 
-    def status(self) -> tuple[pathlib.Path, bool, pathlib.Path|None]:
+    def status(self) -> tuple[pathlib.Path, bool, pathlib.Path | None]:
         '''
         Given a file path specified with __init__, look for an up-to-date pickled
         version of this file path. If it exists, return its fp, otherwise return the
@@ -490,13 +490,13 @@ class Converter:
     }
 
     def __init__(self):
-        self.subConverter: subConverters.SubConverter|None = None
+        self.subConverter: subConverters.SubConverter | None = None
         # a stream object unthawed
-        self._thawedStream: stream.Score|stream.Part|stream.Opus|None = None
+        self._thawedStream: stream.Score | stream.Part | stream.Opus | None = None
 
     def _getDownloadFp(
         self,
-        directory: pathlib.Path|str,
+        directory: pathlib.Path | str,
         ext: str,
         url: str,
     ):
@@ -513,9 +513,9 @@ class Converter:
     # noinspection PyShadowingBuiltins
     def parseFileNoPickle(
         self,
-        fp: pathlib.Path|str,
-        number: int|None = None,
-        format: str|None = None,
+        fp: pathlib.Path | str,
+        number: int | None = None,
+        format: str | None = None,
         forceSource: bool = False,
         **keywords
     ):
@@ -640,7 +640,7 @@ class Converter:
 
     def parseData(
         self,
-        dataStr: str|bytes,
+        dataStr: str | bytes,
         number=None,
         format=None,
         forceSource=False,
@@ -703,8 +703,8 @@ class Converter:
         self,
         url: str,
         *,
-        format: str|None = None,
-        number: int|None = None,
+        format: str | None = None,
+        number: int | None = None,
         forceSource: bool = False,
         **keywords,
     ) -> None:
@@ -980,7 +980,7 @@ class Converter:
     def formatFromHeader(
         self,
         dataStr: _StrOrBytes
-    ) -> tuple[str|None, _StrOrBytes]:
+    ) -> tuple[str | None, _StrOrBytes]:
         '''
         if dataStr begins with a text header such as  "tinyNotation:" then
         return that format plus the dataStr with the head removed.
@@ -1049,7 +1049,7 @@ class Converter:
                     break
         return (foundFormat, dataStr)
 
-    def regularizeFormat(self, fmt: str) -> str|None:
+    def regularizeFormat(self, fmt: str) -> str | None:
         '''
         Take in a string representing a format, a file extension (w/ or without leading dot)
         etc. and find the format string that best represents the format that should be used.
@@ -1121,7 +1121,7 @@ class Converter:
     # --------------------------------------------------------------------------
     # properties
     @property
-    def stream(self) -> stream.Score|stream.Part|stream.Opus|None:
+    def stream(self) -> stream.Score | stream.Part | stream.Opus | None:
         '''
         Returns the .subConverter.stream object.
         '''
@@ -1144,7 +1144,7 @@ def parseFile(fp,
               number=None,
               format=None,
               forceSource=False,
-              **keywords) -> stream.Score|stream.Part|stream.Opus:
+              **keywords) -> stream.Score | stream.Part | stream.Opus:
     '''
     Given a file path, attempt to parse the file into a Stream.
     '''
@@ -1160,7 +1160,7 @@ def parseFile(fp,
 def parseData(dataStr,
               number=None,
               format=None,
-              **keywords) -> stream.Score|stream.Part|stream.Opus:
+              **keywords) -> stream.Score | stream.Part | stream.Opus:
     '''
     Given musical data represented within a Python string, attempt to parse the
     data into a Stream.
@@ -1178,7 +1178,7 @@ def parseURL(url,
              format=None,
              number=None,
              forceSource=False,
-             **keywords) -> stream.Score|stream.Part|stream.Opus:
+             **keywords) -> stream.Score | stream.Part | stream.Opus:
     '''
     Given a URL, attempt to download and parse the file into a Stream. Note:
     URL downloading will not happen automatically unless the user has set their
@@ -1193,12 +1193,12 @@ def parseURL(url,
     return v.stream
 
 
-def parse(value: bundles.MetadataEntry|bytes|str|pathlib.Path,
+def parse(value: bundles.MetadataEntry | bytes | str | pathlib.Path,
           *,
           forceSource: bool = False,
-          number: int|None = None,
-          format: str|None = None,  # pylint: disable=redefined-builtin
-          **keywords) -> stream.Score|stream.Part|stream.Opus:
+          number: int | None = None,
+          format: str | None = None,  # pylint: disable=redefined-builtin
+          **keywords) -> stream.Score | stream.Part | stream.Opus:
     r'''
     Given a file path, encoded data in a Python string, or a URL, attempt to
     parse the item into a Stream.  Note: URL downloading will not happen

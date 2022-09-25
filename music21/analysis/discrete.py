@@ -81,7 +81,7 @@ class DiscreteAnalysis:
         # store alternative solutions, which may be sorted or not
         self.alternativeSolutions = []
 
-    def _rgbToHex(self, rgb: Sequence[float|int]) -> str:
+    def _rgbToHex(self, rgb: Sequence[float | int]) -> str:
         '''
         Utility conversion method
 
@@ -418,7 +418,7 @@ class KeyWeightKeyAnalysis(DiscreteAnalysis):
         if keyResults is None:
             return None
 
-        solution: list[int|float] = [0.0] * 12
+        solution: list[int | float] = [0.0] * 12
         top = [0.0] * 12
         bottomRight = [0.0] * 12
         bottomLeft = [0.0] * 12
@@ -956,8 +956,8 @@ class Ambitus(DiscreteAnalysis):
         super().__init__(referenceStream=referenceStream)
         # Store the min and max Pitch instances for referenceStream
         # set by getPitchSpan(), which is called by _generateColors()
-        self.minPitchObj: pitch.Pitch|None = None
-        self.maxPitchObj: pitch.Pitch|None = None
+        self.minPitchObj: pitch.Pitch | None = None
+        self.maxPitchObj: pitch.Pitch | None = None
 
         self._pitchSpanColors = OrderedDict()
         self._generateColors()
@@ -1002,7 +1002,7 @@ class Ambitus(DiscreteAnalysis):
 
         # environLocal.printDebug([self._pitchSpanColors])
 
-    def getPitchSpan(self, subStream) -> tuple[pitch.Pitch, pitch.Pitch]|None:
+    def getPitchSpan(self, subStream) -> tuple[pitch.Pitch, pitch.Pitch] | None:
         '''
         For a given subStream, return a tuple consisting of the two pitches
         with the minimum and maximum pitch space value.
@@ -1334,7 +1334,7 @@ def analyzeStream(
         # this synonym is being added for compatibility
         method = 'span'
 
-    analysisClassName: type[DiscreteAnalysis]|None = analysisClassFromMethodName(method)
+    analysisClassName: type[DiscreteAnalysis] | None = analysisClassFromMethodName(method)
 
     if analysisClassName is not None:
         obj = analysisClassName()

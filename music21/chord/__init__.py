@@ -197,7 +197,7 @@ class ChordBase(note.NotRest):
     def _add_core_or_init(self,
                           notes,
                           *,
-                          useDuration: None|t.Literal[False]|Duration = None):
+                          useDuration: None | t.Literal[False] | Duration = None):
         '''
         This is the private append method called by .add and called by __init__.
 
@@ -387,7 +387,7 @@ class ChordBase(note.NotRest):
         return ()
 
     @property
-    def tie(self) -> tie.Tie|None:
+    def tie(self) -> tie.Tie | None:
         '''
         Get or set a single tie based on all the ties in this Chord.
 
@@ -411,7 +411,7 @@ class ChordBase(note.NotRest):
         return None
 
     @tie.setter
-    def tie(self, value: tie.Tie|None):
+    def tie(self, value: tie.Tie | None):
         for d in self._notes:
             d.tie = value
             # set the same instance for each pitch
@@ -470,7 +470,7 @@ class ChordBase(note.NotRest):
 
 
     @volume.setter
-    def volume(self, expr: None|'music21.volume.Volume'|int|float):
+    def volume(self, expr: None | 'music21.volume.Volume' | int | float):
         # Do NOT change typing to volume.Volume because it will take the property as
         # its name
         if isinstance(expr, volume.Volume):
@@ -539,7 +539,7 @@ class ChordBase(note.NotRest):
     # --------------------------------------------------------------------------
     # volume per pitch ??
     # --------------------------------------------------------------------------
-    def setVolumes(self, volumes: Sequence['music21.volume.Volume'|int|float]):
+    def setVolumes(self, volumes: Sequence['music21.volume.Volume' | int | float]):
         # do not change typing to volume.Volume -- will get the property of same name.
         # noinspection PyShadowingNames
         '''
@@ -775,7 +775,7 @@ class Chord(ChordBase):
             return False
         return True
 
-    def __getitem__(self, key: int|str|note.Note|pitch.Pitch):
+    def __getitem__(self, key: int | str | note.Note | pitch.Pitch):
         '''
         Get item makes accessing pitch components for the Chord easier
 
@@ -989,7 +989,7 @@ class Chord(ChordBase):
         return ''.join(msg)
 
     # PRIVATE METHODS #
-    def _findBass(self) -> pitch.Pitch|None:
+    def _findBass(self) -> pitch.Pitch | None:
         '''
         Returns the lowest Pitch in the chord.
 
@@ -1015,7 +1015,7 @@ class Chord(ChordBase):
         attribute: str,
         *,
         inPlace=False
-    ) -> _ChordType|list[pitch.Pitch]:
+    ) -> _ChordType | list[pitch.Pitch]:
         '''
         Common method for stripping pitches based on redundancy of one pitch
         attribute. The `attribute` is provided by a string.
@@ -1246,26 +1246,26 @@ class Chord(ChordBase):
     def bass(self,
              newbass: None = None,
              *,
-             find: bool|None = None,
+             find: bool | None = None,
              allow_add: bool = False,
              ) -> pitch.Pitch:
         return self.pitches[0]  # dummy until Astroid 1015 is fixed.
 
     @overload
     def bass(self,
-             newbass: str|pitch.Pitch|note.Note,
+             newbass: str | pitch.Pitch | note.Note,
              *,
-             find: bool|None = None,
+             find: bool | None = None,
              allow_add: bool = False,
              ) -> None:
         return None
 
     def bass(self,
-             newbass: None|str|pitch.Pitch|note.Note = None,
+             newbass: None | str | pitch.Pitch | note.Note = None,
              *,
-             find: bool|None = None,
+             find: bool | None = None,
              allow_add: bool = False,
-             ) -> pitch.Pitch|None:
+             ) -> pitch.Pitch | None:
         '''
         Generally used to find and return the bass Pitch:
 
@@ -1453,7 +1453,7 @@ class Chord(ChordBase):
     def closedPosition(
         self: _ChordType,
         *,
-        forceOctave: int|None,
+        forceOctave: int | None,
         inPlace: t.Literal[True],
         leaveRedundantPitches=False
     ) -> None:
@@ -1464,7 +1464,7 @@ class Chord(ChordBase):
     def closedPosition(
         self: _ChordType,
         *,
-        forceOctave: int|None = None,
+        forceOctave: int | None = None,
         inPlace: t.Literal[False] = False,
         leaveRedundantPitches: bool = False
     ) -> _ChordType:
@@ -1474,10 +1474,10 @@ class Chord(ChordBase):
     def closedPosition(
         self: _ChordType,
         *,
-        forceOctave: int|None = None,
-        inPlace: t.Literal[True]|t.Literal[False] = False,
+        forceOctave: int | None = None,
+        inPlace: t.Literal[True] | t.Literal[False] = False,
         leaveRedundantPitches: bool = False
-    ) -> _ChordType|None:
+    ) -> _ChordType | None:
         '''
         Returns a new Chord object with the same pitch classes,
         but now in closed position.
@@ -1835,8 +1835,8 @@ class Chord(ChordBase):
         self,
         chordStep: int,
         *,
-        testRoot: note.Note|pitch.Pitch|None = None
-    ) -> pitch.Pitch|None:
+        testRoot: note.Note | pitch.Pitch | None = None
+    ) -> pitch.Pitch | None:
         '''
         Returns the (first) pitch at the provided scaleDegree (Thus, it's
         exactly like semitonesFromChordStep, except it instead of the number of
@@ -2112,7 +2112,7 @@ class Chord(ChordBase):
         except KeyError:
             raise ChordException(f'the given pitch is not in the Chord: {p}')
 
-    def getZRelation(self) -> Chord|None:
+    def getZRelation(self) -> Chord | None:
         '''
         Return a Z relation if it exists, otherwise return None.
 
@@ -2259,7 +2259,7 @@ class Chord(ChordBase):
         newInversion: int,
         *,
         find: bool = True,
-        testRoot: pitch.Pitch|None = None,
+        testRoot: pitch.Pitch | None = None,
         transposeOnSet: bool = True
     ) -> None:
         return None  # dummy until Astroid 1015 is fixed
@@ -2270,19 +2270,19 @@ class Chord(ChordBase):
         newInversion: None = None,
         *,
         find: bool = True,
-        testRoot: pitch.Pitch|None = None,
+        testRoot: pitch.Pitch | None = None,
         transposeOnSet: bool = True
     ) -> int:
         return -1  # dummy until Astroid 1015 is fixed
 
     def inversion(
         self,
-        newInversion: int|None = None,
+        newInversion: int | None = None,
         *,
         find: bool = True,
-        testRoot: pitch.Pitch|None = None,
+        testRoot: pitch.Pitch | None = None,
         transposeOnSet: bool = True
-    ) -> int|None:
+    ) -> int | None:
         '''
         Find the chord's inversion or (if called with a number) set the chord to
         the new inversion.
@@ -3760,23 +3760,23 @@ class Chord(ChordBase):
     def root(self,
              newroot: None = None,
              *,
-             find: bool|None = None
+             find: bool | None = None
              ) -> pitch.Pitch:
         return self.pitches[0]  # dummy until Astroid 1015 is fixed.
 
     @overload
     def root(self,
-             newroot: str|pitch.Pitch|note.Note,
+             newroot: str | pitch.Pitch | note.Note,
              *,
-             find: bool|None = None
+             find: bool | None = None
              ) -> None:
         return None  # dummy until Astroid 1015 is fixed.
 
     def root(self,
-             newroot: None|str|pitch.Pitch|note.Note = None,
+             newroot: None | str | pitch.Pitch | note.Note = None,
              *,
-             find: bool|None = None
-             ) -> pitch.Pitch|None:
+             find: bool | None = None
+             ) -> pitch.Pitch | None:
         # noinspection PyShadowingNames
         '''
         Returns the root of the chord.  Or if given a Pitch as the
@@ -3988,8 +3988,8 @@ class Chord(ChordBase):
     def semiClosedPosition(
         self: _ChordType,
         *,
-        forceOctave: int|None = None,
-        inPlace: t.Literal[True]|t.Literal[False] = False,
+        forceOctave: int | None = None,
+        inPlace: t.Literal[True] | t.Literal[False] = False,
         leaveRedundantPitches: bool = False
     ) -> None|_ChordType:
         # noinspection PyShadowingNames
@@ -4425,7 +4425,7 @@ class Chord(ChordBase):
             raise ChordException(
                 f'the given pitch is not in the Chord: {pitchTarget}')
 
-    def setTie(self, tieObjOrStr: tie.Tie|str, pitchTarget):
+    def setTie(self, tieObjOrStr: tie.Tie | str, pitchTarget):
         '''
         Given a tie object (or a tie type string) and a pitch or Note in this Chord,
         set the pitch's tie attribute in this chord to that tie type.
@@ -4496,7 +4496,7 @@ class Chord(ChordBase):
 
     def setVolume(self,
                   vol: volume.Volume,
-                  target: str|note.Note|pitch.Pitch):
+                  target: str | note.Note | pitch.Pitch):
         '''
         Set the :class:`~music21.volume.Volume` object of a specific Pitch.
 
@@ -4986,7 +4986,7 @@ class Chord(ChordBase):
         >>> c.duration is d
         True
         '''
-        d = t.cast(Duration|None, self._duration)  # type: ignore
+        d = t.cast(Duration | None, self._duration)  # type: ignore
         if d is None and self._notes:
             # pitchZeroDuration = self._notes[0]['pitch'].duration
             pitchZeroDuration = self._notes[0].duration
@@ -5010,7 +5010,7 @@ class Chord(ChordBase):
 
     @property  # type: ignore
     @cacheMethod
-    def fifth(self) -> pitch.Pitch|None:
+    def fifth(self) -> pitch.Pitch | None:
         '''
         Shortcut for getChordStep(5), but caches it and does not raise exceptions
 
@@ -5667,7 +5667,7 @@ class Chord(ChordBase):
         return pitches
 
     @pitches.setter
-    def pitches(self, value: Sequence[str|pitch.Pitch|int]):
+    def pitches(self, value: Sequence[str | pitch.Pitch | int]):
         self._notes = []
         self.clearCache()
         # TODO: individual ties are not being retained here
@@ -5930,7 +5930,7 @@ class Chord(ChordBase):
 
     @property  # type: ignore
     @cacheMethod
-    def third(self) -> pitch.Pitch|None:
+    def third(self) -> pitch.Pitch | None:
         '''
         Shortcut for getChordStep(3), but caches the value, and returns
         None on errors.
@@ -5955,7 +5955,7 @@ class Chord(ChordBase):
 
 
 
-def fromForteClass(notation: str|Sequence[int]) -> Chord:
+def fromForteClass(notation: str | Sequence[int]) -> Chord:
     '''
     Return a Chord given a Forte-class notation. The Forte class can be
     specified as string (e.g., 3-11) or as a list of cardinality and number

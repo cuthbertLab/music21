@@ -41,7 +41,7 @@ environLocal = environment.Environment('key')
 
 KeySignatureType = t.TypeVar('KeySignatureType', bound='KeySignature')
 KeyType = t.TypeVar('KeyType', bound='Key')
-TransposeTypes = int|str|interval.Interval|interval.GenericInterval
+TransposeTypes = int | str | interval.Interval | interval.GenericInterval
 
 
 # ------------------------------------------------------------------------------
@@ -167,7 +167,7 @@ modeSharpsAlter = {'major': 0,
                    }
 
 
-def pitchToSharps(value: str|pitch.Pitch|note.Note,
+def pitchToSharps(value: str | pitch.Pitch | note.Note,
                   mode: str = None) -> int:
     '''
     Given a pitch string or :class:`music21.pitch.Pitch` or
@@ -342,7 +342,7 @@ class KeySignature(base.Music21Object):
 
     classSortOrder = 2
 
-    def __init__(self, sharps: int|None = 0):
+    def __init__(self, sharps: int | None = 0):
         super().__init__()
         # position on the circle of fifths, where 1 is one sharp, -1 is one flat
 
@@ -360,7 +360,7 @@ class KeySignature(base.Music21Object):
         self._sharps = sharps
         # need to store a list of pitch objects, used for creating a
         # non-traditional key
-        self._alteredPitches: list[pitch.Pitch]|None = None
+        self._alteredPitches: list[pitch.Pitch] | None = None
         self.accidentalsApplyOnlyToOctave = False
 
     def __hash__(self):
@@ -401,7 +401,7 @@ class KeySignature(base.Music21Object):
     def _reprInternal(self):
         return 'of ' + self._strDescription()
 
-    def asKey(self, mode: str|None = None, tonic: str|None = None):
+    def asKey(self, mode: str | None = None, tonic: str | None = None):
         '''
         Return a `key.Key` object representing this KeySignature object as a key in the
         given mode or in the given tonic. If `mode` is None, and `tonic` is not provided,
@@ -542,7 +542,7 @@ class KeySignature(base.Music21Object):
         return post
 
     @alteredPitches.setter
-    def alteredPitches(self, newAlteredPitches: list[str|pitch.Pitch|note.Note]
+    def alteredPitches(self, newAlteredPitches: list[str | pitch.Pitch | note.Note]
                        ) -> None:
         self.clearCache()
         newList: list[pitch.Pitch] = []
@@ -580,7 +580,7 @@ class KeySignature(base.Music21Object):
         else:
             return False
 
-    def accidentalByStep(self, step: StepName) -> pitch.Accidental|None:
+    def accidentalByStep(self, step: StepName) -> pitch.Accidental | None:
         '''
         Given a step (C, D, E, F, etc.) return the accidental
         for that note in this key (using the natural minor for minor)
@@ -679,7 +679,7 @@ class KeySignature(base.Music21Object):
     def transpose(self: KeySignatureType,
                   value: TransposeTypes,
                   *,
-                  inPlace: bool = False) -> KeySignatureType|None:
+                  inPlace: bool = False) -> KeySignatureType | None:
         '''
         Transpose the KeySignature by the user-provided value.
         If the value is an integer, the transposition is treated
@@ -726,7 +726,7 @@ class KeySignature(base.Music21Object):
         >>> eFlat
         <music21.key.KeySignature of 3 flats>
         '''
-        intervalObj: interval.Interval|interval.GenericInterval
+        intervalObj: interval.Interval | interval.GenericInterval
         if isinstance(value, interval.Interval):  # it is an Interval class
             intervalObj = value
         elif isinstance(value, interval.GenericInterval):
@@ -754,7 +754,7 @@ class KeySignature(base.Music21Object):
         else:
             return None
 
-    def transposePitchFromC(self, p: pitch.Pitch, *, inPlace=False) -> pitch.Pitch|None:
+    def transposePitchFromC(self, p: pitch.Pitch, *, inPlace=False) -> pitch.Pitch | None:
         '''
         Takes a pitch in C major and transposes it so that it has
         the same step position in the current key signature.
@@ -850,10 +850,10 @@ class KeySignature(base.Music21Object):
     # --------------------------------------------------------------------------
     # properties
 
-    def _getSharps(self) -> int|None:
+    def _getSharps(self) -> int | None:
         return self._sharps
 
-    def _setSharps(self, value: int|None):
+    def _setSharps(self, value: int | None):
         if value != self._sharps:
             self._sharps = value
             self.clearCache()
@@ -938,11 +938,11 @@ class Key(KeySignature, scale.DiatonicScale):
     <music21.key.Key of f# minor>
     '''
     _sharps = 0
-    _mode: str|None = None
+    _mode: str | None = None
     tonic: pitch.Pitch
 
     def __init__(self,
-                 tonic: str|pitch.Pitch|note.Note = 'C',
+                 tonic: str | pitch.Pitch | note.Note = 'C',
                  mode=None):
         if isinstance(tonic, (note.Note, pitch.Pitch)):
             tonicStr = tonic.name
@@ -1247,7 +1247,7 @@ class Key(KeySignature, scale.DiatonicScale):
                   value: TransposeTypes,
                   *,
                   inPlace: bool = False
-                  ) -> KeyType|None:
+                  ) -> KeyType | None:
         '''
         Transpose the Key by the user-provided value.
         If the value is an integer, the transposition is treated

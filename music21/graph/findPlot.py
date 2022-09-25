@@ -237,7 +237,7 @@ def axisMatchesValue(axisClass: type[axis.Axis] | axis.Axis,
     return False
 
 
-def getPlotsToMake(graphFormat: str|None = None,
+def getPlotsToMake(graphFormat: str | None = None,
                    xValue=None,
                    yValue=None,
                    zValue=None):
