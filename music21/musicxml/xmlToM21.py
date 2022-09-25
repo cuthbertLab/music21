@@ -1319,7 +1319,7 @@ class MusicXMLImporter(XMLParserBase):
 
     def identificationToMetadata(self,
                                  identification: ET.Element,
-                                 inputM21: t.Optional[metadata.Metadata] = None):
+                                 inputM21: metadata.Metadata|None = None):
         '''
         Convert an <identification> tag, containing <creator> tags, <rights> tags, and
         <miscellaneous> tag.
@@ -1435,7 +1435,7 @@ class MusicXMLImporter(XMLParserBase):
 
     def creatorToContributor(self,
                              creator: ET.Element,
-                             inputM21: t.Optional[metadata.primitives.Contributor] = None):
+                             inputM21: metadata.primitives.Contributor|None = None):
         # noinspection PyShadowingNames
         '''
         Given a <creator> tag, fill the necessary parameters of a Contributor.
@@ -1716,7 +1716,7 @@ class PartParser(XMLParserBase):
         # TODO: elevation
         # TODO: store id attribute somewhere
         mxMIDIInstrument = mxScorePart.find('midi-instrument')
-        i: t.Optional[instrument.Instrument] = None
+        i: instrument.Instrument|None = None
         if mxMIDIInstrument is not None:
             mxMidiProgram = mxMIDIInstrument.find('midi-program')
             mxMidiUnpitched = mxMIDIInstrument.find('midi-unpitched')
@@ -2414,7 +2414,7 @@ class MeasureParser(XMLParserBase):
         # older versions of Finale put a forward tag at the end, but this
         # disguises the incomplete last measure.  The PartParser will
         # pick this up from the last measure.
-        self.endedWithForwardTag: t.Optional[note.Rest] = None
+        self.endedWithForwardTag: note.Rest|None = None
 
     @staticmethod
     def getStaffNumber(mxObjectOrNumber) -> int:
@@ -3722,7 +3722,7 @@ class MeasureParser(XMLParserBase):
                     arpeggioType = 'non-arpeggio'
                 else:
                     arpeggioType = mxObj.get('direction')
-                idFound: t.Optional[str] = mxObj.get('number')
+                idFound: str|None = mxObj.get('number')
                 if idFound is None:
                     arpeggio = expressions.ArpeggioMark(arpeggioType)
                     n.expressions.append(arpeggio)
@@ -4952,9 +4952,9 @@ class MeasureParser(XMLParserBase):
         # TODO: musicxml 4: attr: arrangement -- C/E or C over E etc.
         # TODO: offset
         # Element staff is covered by insertCoreAndReference in xmlHarmony()
-        b: t.Optional[pitch.Pitch] = None
-        r: t.Optional[pitch.Pitch] = None
-        inversion: t.Optional[int] = None
+        b: pitch.Pitch|None = None
+        r: pitch.Pitch|None = None
+        inversion: int|None = None
         chordKind: str = ''
         chordKindStr: str = ''
 
@@ -5883,7 +5883,7 @@ class MeasureParser(XMLParserBase):
     def xmlStaffLayoutFromStaffDetails(
         self,
         mxDetails,
-        m21staffLayout: t.Optional[layout.StaffLayout] = None
+        m21staffLayout: layout.StaffLayout|None = None
     ) -> t.Optional[layout.StaffLayout]:
         # noinspection PyShadowingNames
         '''

@@ -1068,8 +1068,8 @@ class Tuplet(prebase.ProtoM21Object):
         self.frozen = False
         # environLocal.printDebug(['creating Tuplet instance'])
 
-        self._durationNormal: t.Optional[DurationTuple] = None
-        self._durationActual: t.Optional[DurationTuple] = None
+        self._durationNormal: DurationTuple|None = None
+        self._durationActual: DurationTuple|None = None
 
         # necessary for some complex tuplets, interrupted, for instance
         self.tupletId = tupletId
@@ -1613,12 +1613,12 @@ class Duration(prebase.ProtoM21Object, SlottedObjectMixin):
     def __init__(self,
                  typeOrDuration: t.Union[str, OffsetQLIn, DurationTuple, None] = None,
                  *,
-                 type: t.Optional[str] = None,  # pylint: disable=redefined-builtin
-                 dots: t.Optional[int] = None,
-                 quarterLength: t.Optional[OffsetQLIn] = None,
-                 durationTuple: t.Optional[DurationTuple] = None,
+                 type: str|None = None,  # pylint: disable=redefined-builtin
+                 dots: int|None = None,
+                 quarterLength: OffsetQLIn|None = None,
+                 durationTuple: DurationTuple|None = None,
                  components: t.Optional[Iterable[DurationTuple]] = None,
-                 client: t.Optional[base.Music21Object] = None,
+                 client: base.Music21Object|None = None,
                  **keywords):
         # First positional argument is assumed to be type string or a quarterLength.
         # no need for super() on ProtoM21 or SlottedObjectMixin
@@ -1630,7 +1630,7 @@ class Duration(prebase.ProtoM21Object, SlottedObjectMixin):
         self._quarterLengthNeedsUpdating = False
         self._typeNeedsUpdating = False
 
-        self._unlinkedType: t.Optional[str] = None
+        self._unlinkedType: str|None = None
         self._dotGroups: tuple[int, ...] = (0,)
         self._tuplets: tuple['Tuplet', ...] = ()  # an empty tuple
         self._qtrLength: OffsetQL = 0.0

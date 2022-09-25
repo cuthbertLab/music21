@@ -153,11 +153,11 @@ class Derivation(SlottedObjectMixin):
     def __init__(self, client=None):
         # store a reference to the Music21Object that has this Derivation object as a property
         self._client = None
-        self._clientId: t.Optional[int] = None  # store python-id to optimize w/o unwrapping
-        self._method: t.Optional[str] = None
+        self._clientId: int|None = None  # store python-id to optimize w/o unwrapping
+        self._method: str|None = None
         # origin should be stored as a weak ref -- the place where the client was derived from.
         self._origin = None
-        self._originId: t.Optional[int] = None  # store id to optimize w/o unwrapping
+        self._originId: int|None = None  # store id to optimize w/o unwrapping
 
         # set client; can handle None
         self.client = client

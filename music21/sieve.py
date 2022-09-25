@@ -1842,9 +1842,9 @@ class PitchSieve:
 
     def __init__(self,
                  sieveString,
-                 pitchLower: t.Optional[str] = None,
-                 pitchUpper: t.Optional[str] = None,
-                 pitchOrigin: t.Optional[str] = None,
+                 pitchLower: str|None = None,
+                 pitchUpper: str|None = None,
+                 pitchOrigin: str|None = None,
                  eld: t.Union[int, float] = 1):
         self.sieveString = sieveString  # logical sieve string
 

@@ -476,7 +476,7 @@ class TimeSignature(TimeSignatureBase):
         if value is None:
             value = f'{defaults.meterNumerator}/{defaults.meterDenominatorBeatType}'
 
-        self._overriddenBarDuration: t.Optional[duration.Duration] = None
+        self._overriddenBarDuration: duration.Duration|None = None
         self.symbol: str = ''
         self.displaySequence: MeterSequence = _SENTINEL_METER_SEQUENCE
         self.beatSequence: MeterSequence = _SENTINEL_METER_SEQUENCE

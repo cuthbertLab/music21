@@ -863,8 +863,8 @@ def makeRests(
             return returnObj
 
     def oHighTargetForMeasure(
-        m: t.Optional[stream.Measure] = None,
-        ts: t.Optional[meter.TimeSignature] = None
+        m: stream.Measure|None = None,
+        ts: meter.TimeSignature|None = None
     ) -> OffsetQL:
         '''
         Needed for timeRangeFromBarDuration.
@@ -890,7 +890,7 @@ def makeRests(
             if isinstance(refStreamOrTimeRange, stream.Measure):
                 oHighTarget = oHighTargetForMeasure(m=refStreamOrTimeRange)
             elif isinstance(refStreamOrTimeRange, meter.TimeSignature):
-                maybe_measure: t.Optional[stream.Measure] = None
+                maybe_measure: stream.Measure|None = None
                 if isinstance(returnObj.activeSite, stream.Measure):
                     maybe_measure = returnObj.activeSite
                 oHighTarget = oHighTargetForMeasure(m=maybe_measure, ts=refStreamOrTimeRange)
@@ -921,7 +921,7 @@ def makeRests(
     else:
         bundle = [returnObj]
 
-    lastTimeSignature: t.Optional[meter.TimeSignature] = None
+    lastTimeSignature: meter.TimeSignature|None = None
     # bundle components may be voices, measures, or a flat Stream
     for component in bundle:
         oLow = component.lowestOffset
@@ -1395,7 +1395,7 @@ def makeTupletBrackets(s: StreamType, *, inPlace=False) -> t.Optional[StreamType
 
     # have a list of tuplet, Duration pairs
     completionCount: OffsetQL = 0.0  # qLen currently filled
-    completionTarget: t.Optional[OffsetQL] = None  # qLen necessary to fill tuplet
+    completionTarget: OffsetQL|None = None  # qLen necessary to fill tuplet
     for i in range(len(tupletMap)):
         tupletObj, dur = tupletMap[i]
 
@@ -1758,7 +1758,7 @@ def iterateBeamGroups(
     current_beam_group: list[note.NotRest] = []
     in_beam_group: bool = False
     for el in iterator.notes:
-        first_el_type: t.Optional[str] = None
+        first_el_type: str|None = None
         if el.beams and el.beams.getByNumber(1):
             first_el_type = el.beams.getTypeByNumber(1)
 
@@ -1838,7 +1838,7 @@ def setStemDirectionOneGroup(
         has_consistent_stem_directions = False
 
     # noinspection PyTypeChecker
-    optional_clef_context: t.Optional[clef.Clef] = group[0].getContextByClass(clef.Clef)
+    optional_clef_context: clef.Clef|None = group[0].getContextByClass(clef.Clef)
     if optional_clef_context is None:
         return
     clef_context: clef.Clef = optional_clef_context
@@ -1909,7 +1909,7 @@ def splitElementsToCompleteTuplets(
 
     for container in iterator:
         general_notes = list(container.notesAndRests)
-        last_tuplet: t.Optional[duration.Tuplet] = None
+        last_tuplet: duration.Tuplet|None = None
         partial_tuplet_sum = 0.0
         for gn in general_notes:
             if (
@@ -2015,8 +2015,8 @@ def consolidateCompletedTuplets(
         reexpressible = [gn for gn in container.notesAndRests if is_reexpressible(gn)]
         to_consolidate: list[note.GeneralNote] = []
         partial_tuplet_sum: OffsetQL = 0.0
-        last_tuplet: t.Optional[duration.Tuplet] = None
-        completion_target: t.Optional[OffsetQL] = None
+        last_tuplet: duration.Tuplet|None = None
+        completion_target: OffsetQL|None = None
         for gn in reexpressible:
             prev_gn = gn.previous(note.GeneralNote, activeSiteOnly=True)
             if (

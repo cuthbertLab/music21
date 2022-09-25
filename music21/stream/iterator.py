@@ -43,7 +43,7 @@ T = t.TypeVar('T')
 S = t.TypeVar('S')
 ChangedM21ObjType = t.TypeVar('ChangedM21ObjType', bound=base.Music21Object)
 StreamIteratorType = t.TypeVar('StreamIteratorType', bound='StreamIterator')
-FilterType = t.Union[Callable[[t.Any, t.Optional[t.Any]], t.Any], filters.StreamFilter]
+FilterType = t.Union[Callable[[t.Any, t.Any|None], t.Any], filters.StreamFilter]
 
 # -----------------------------------------------------------------------------
 
@@ -57,11 +57,11 @@ class StreamIteratorInefficientWarning(UserWarning):
 
 
 class ActiveInformation(t.TypedDict, total=False):
-    stream: t.Optional[stream.Stream]
+    stream: stream.Stream|None
     elementIndex: int
     iterSection: t.Literal['_elements', '_endElements']
     sectionIndex: int
-    lastYielded: t.Optional[base.Music21Object]
+    lastYielded: base.Music21Object|None
 
 
 
@@ -138,7 +138,7 @@ class StreamIterator(prebase.ProtoM21Object, Sequence[M21ObjType]):
                  # restrictClass: type[M21ObjType] = base.Music21Object,
                  filterList: t.Optional[list[FilterType]] = None,
                  restoreActiveSites: bool = True,
-                 activeInformation: t.Optional[ActiveInformation] = None,
+                 activeInformation: ActiveInformation|None = None,
                  ignoreSorting: bool = False):
         if not ignoreSorting and srcStream.isSorted is False and srcStream.autoSort:
             srcStream.sort()
@@ -159,7 +159,7 @@ class StreamIterator(prebase.ProtoM21Object, Sequence[M21ObjType]):
         self.cleanupOnStop: bool = False
         self.restoreActiveSites: bool = restoreActiveSites
 
-        self.overrideDerivation: t.Optional[str] = None
+        self.overrideDerivation: str|None = None
 
         if filterList is None:
             filterList = []
@@ -171,7 +171,7 @@ class StreamIterator(prebase.ProtoM21Object, Sequence[M21ObjType]):
         # return True or False for an element for
         # whether it should be yielded.
         self.filters: list[FilterType] = filterList
-        self._len: t.Optional[int] = None
+        self._len: int|None = None
         self._matchingElements: t.Optional[list[M21ObjType]] = None
         # keep track of where we are in the parse.
         # esp important for recursive streams...

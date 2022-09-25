@@ -335,7 +335,7 @@ class RnWriter(prebase.ProtoM21Object):
 def rnString(measureNumber: t.Union[int, str],
              beat: t.Union[str, int, float, fractions.Fraction],
              chordString: str,
-             inString: t.Optional[str] = ''):
+             inString: str|None = ''):
     '''
     Creates or extends a string of RomanText such that the output corresponds to a single
     measure line.

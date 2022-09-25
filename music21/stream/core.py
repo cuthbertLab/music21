@@ -569,7 +569,7 @@ class StreamCore(Music21Object):
         recurse=True,
         requireAllPresent=True,
         insert=True,
-        constrainingSpannerBundle: t.Optional[spanner.SpannerBundle] = None
+        constrainingSpannerBundle: spanner.SpannerBundle|None = None
     ) -> t.Optional[list[spanner.Spanner]]:
         '''
         find all spanners that are referenced by elements in the

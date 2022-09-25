@@ -342,7 +342,7 @@ class KeySignature(base.Music21Object):
 
     classSortOrder = 2
 
-    def __init__(self, sharps: t.Optional[int] = 0):
+    def __init__(self, sharps: int|None = 0):
         super().__init__()
         # position on the circle of fifths, where 1 is one sharp, -1 is one flat
 
@@ -401,7 +401,7 @@ class KeySignature(base.Music21Object):
     def _reprInternal(self):
         return 'of ' + self._strDescription()
 
-    def asKey(self, mode: t.Optional[str] = None, tonic: t.Optional[str] = None):
+    def asKey(self, mode: str|None = None, tonic: str|None = None):
         '''
         Return a `key.Key` object representing this KeySignature object as a key in the
         given mode or in the given tonic. If `mode` is None, and `tonic` is not provided,
@@ -938,7 +938,7 @@ class Key(KeySignature, scale.DiatonicScale):
     <music21.key.Key of f# minor>
     '''
     _sharps = 0
-    _mode: t.Optional[str] = None
+    _mode: str|None = None
     tonic: pitch.Pitch
 
     def __init__(self,

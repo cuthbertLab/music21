@@ -206,14 +206,14 @@ class Lyric(prebase.ProtoM21Object, style.StyleMixin):
                  *,
                  applyRaw: bool = False,
                  syllabic: SyllabicChoices = None,
-                 identifier: t.Optional[str] = None,
+                 identifier: str|None = None,
                  **keywords):
         super().__init__()
-        self._identifier: t.Optional[str] = None
+        self._identifier: str|None = None
         self._number: int = 1
         self._text: str = ''
         self._syllabic: SyllabicChoices = None
-        self.components: t.Optional[list[Lyric]] = None
+        self.components: list[Lyric|None] = None
         self.elisionBefore = ' '
 
         # these are set by setTextAndSyllabic
@@ -573,7 +573,7 @@ class GeneralNote(base.Music21Object):
 
     def __init__(self,
                  *,
-                 duration: t.Optional[Duration] = None,
+                 duration: Duration|None = None,
                  lyric: t.Union[None, str, Lyric] = None,
                  **keywords
                  ):
@@ -602,7 +602,7 @@ class GeneralNote(base.Music21Object):
             self.addLyric(lyric)
 
         # note: Chords handle ties differently
-        self._tie: t.Optional[tie.Tie] = None  # store a Tie object
+        self._tie: tie.Tie|None = None  # store a Tie object
 
     def __eq__(self, other):
         '''
@@ -634,7 +634,7 @@ class GeneralNote(base.Music21Object):
 
     # --------------------------------------------------------------------------
     @property
-    def tie(self) -> t.Optional[tie.Tie]:
+    def tie(self) -> tie.Tie|None:
         '''
         Return and set a :class:`~music21.note.Tie` object, or None.
 
@@ -646,10 +646,10 @@ class GeneralNote(base.Music21Object):
         return self._tie
 
     @tie.setter
-    def tie(self, value: t.Optional[tie.Tie]):
+    def tie(self, value: tie.Tie|None):
         self._tie = value
 
-    def _getLyric(self) -> t.Optional[str]:
+    def _getLyric(self) -> str|None:
         if not self.lyrics:
             return None
 
@@ -979,20 +979,20 @@ class NotRest(GeneralNote):
     }
 
     def __init__(self,
-                 beams: t.Optional[beam.Beams] = None,
+                 beams: beam.Beams|None = None,
                  **keywords):
         super().__init__(**keywords)
         self._notehead: str = 'normal'
-        self._noteheadFill: t.Optional[bool] = None
+        self._noteheadFill: bool|None = None
         self._noteheadParenthesis: bool = False
         self._stemDirection: str = 'unspecified'
-        self._volume: t.Optional[volume.Volume] = None  # created on demand
+        self._volume: volume.Volume|None = None  # created on demand
         if beams is not None:
             self.beams = beams
         else:
             self.beams = beam.Beams()
-        self._storedInstrument: t.Optional[instrument.Instrument] = None
-        self._chordAttached: t.Optional[chord.ChordBase] = None
+        self._storedInstrument: instrument.Instrument|None = None
+        self._chordAttached: chord.ChordBase|None = None
 
     # ==============================================================================================
     # Special functions
@@ -1153,7 +1153,7 @@ class NotRest(GeneralNote):
 
     @noteheadFill.setter
     def noteheadFill(self, value: t.Union[bool, None, str]):
-        boolValue: t.Optional[bool]
+        boolValue: bool|None
         if value in ('none', None, 'default'):
             boolValue = None  # allow setting to none or None
         elif value in (True, 'filled', 'yes'):
@@ -1222,7 +1222,7 @@ class NotRest(GeneralNote):
             return True
 
     def _getVolume(self,
-                   forceClient: t.Optional[base.Music21Object] = None
+                   forceClient: base.Music21Object|None = None
                    ) -> volume.Volume:
         # DO NOT CHANGE TO @property because of optional attributes
         # lazy volume creation.  property is set below.
@@ -1314,13 +1314,13 @@ class NotRest(GeneralNote):
     def getInstrument(self,
                       *,
                       returnDefault: t.Literal[False]
-                      ) -> t.Optional[instrument.Instrument]:
+                      ) -> instrument.Instrument|None:
         return None  # astroid #1015
 
     def getInstrument(self,
                       *,
                       returnDefault: bool = True
-                      ) -> t.Optional[instrument.Instrument]:
+                      ) -> instrument.Instrument|None:
         '''
         Retrieves the `.storedInstrument` on this `NotRest` instance, if any.
         If one is not found, executes a context search (without following
@@ -1466,11 +1466,11 @@ class Note(NotRest):
     def __init__(self,
                  pitch: t.Union[str, int, Pitch, None] = None,
                  *,
-                 name: t.Optional[str] = None,
-                 nameWithOctave: t.Optional[str] = None,
+                 name: str|None = None,
+                 nameWithOctave: str|None = None,
                  **keywords):
         super().__init__(**keywords)
-        self._chordAttached: t.Optional[chord.Chord]
+        self._chordAttached: chord.Chord|None
 
         if pitch is not None:
             if isinstance(pitch, Pitch):
@@ -1634,10 +1634,10 @@ class Note(NotRest):
     def step(self, value: StepName):
         self.pitch.step = value
 
-    def _getOctave(self) -> t.Optional[int]:
+    def _getOctave(self) -> int|None:
         return self.pitch.octave
 
-    def _setOctave(self, value: t.Optional[int]):
+    def _setOctave(self, value: int|None):
         self.pitch.octave = value
 
     octave = property(_getOctave,
@@ -1837,7 +1837,7 @@ class Unpitched(NotRest):
                  displayName=None,
                  **keywords):
         super().__init__(**keywords)
-        self._chordAttached: t.Optional[percussion.PercussionChord] = None
+        self._chordAttached: percussion.PercussionChord|None = None
 
         self.displayStep: StepName = 'B'
         self.displayOctave: int = 4

@@ -68,9 +68,9 @@ class Segment:
 
     def __init__(self,
                  bassNote: t.Union[str, note.Note] = 'C3',
-                 notationString: t.Optional[str] = None,
-                 fbScale: t.Optional[realizerScale.FiguredBassScale] = None,
-                 fbRules: t.Optional[rules.Rules] = None,
+                 notationString: str|None = None,
+                 fbScale: realizerScale.FiguredBassScale|None = None,
+                 fbRules: rules.Rules|None = None,
                  numParts=4,
                  maxPitch: t.Union[str, pitch.Pitch] = 'B5',
                  listOfPitches=None):

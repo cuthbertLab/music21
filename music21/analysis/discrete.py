@@ -956,8 +956,8 @@ class Ambitus(DiscreteAnalysis):
         super().__init__(referenceStream=referenceStream)
         # Store the min and max Pitch instances for referenceStream
         # set by getPitchSpan(), which is called by _generateColors()
-        self.minPitchObj: t.Optional[pitch.Pitch] = None
-        self.maxPitchObj: t.Optional[pitch.Pitch] = None
+        self.minPitchObj: pitch.Pitch|None = None
+        self.maxPitchObj: pitch.Pitch|None = None
 
         self._pitchSpanColors = OrderedDict()
         self._generateColors()

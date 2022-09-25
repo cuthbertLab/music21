@@ -398,7 +398,7 @@ class OrnamentFixer(OMRMidiFixer):
         return a new OrnamentFixer with changes
         '''
         changes = self.changes
-        sa: t.Optional[aligner.StreamAligner] = None
+        sa: aligner.StreamAligner|None = None
         omrNotesLabeledOrnament = []
         midiNotesAlreadyFixedForOrnament = []
 

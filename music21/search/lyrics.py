@@ -137,7 +137,7 @@ class LyricSearcher:
         self.includeIntermediateElements = False  # currently does nothing
         self.includeTrailingMelisma = False  # currently does nothing
 
-        self._indexText: t.Optional[str] = None
+        self._indexText: str|None = None
         self._indexTuples: list[IndexedLyric] = []
 
     @property

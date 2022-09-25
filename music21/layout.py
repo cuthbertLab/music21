@@ -156,18 +156,18 @@ class ScoreLayout(LayoutBase):
                  *,
                  scalingMillimeters: t.Union[int, float, None] = None,
                  scalingTenths: t.Union[int, float, None] = None,
-                 musicFont: t.Optional[str] = None,
-                 wordFont: t.Optional[str] = None,
-                 pageLayout: t.Optional[PageLayout] = None,
-                 systemLayout: t.Optional[SystemLayout] = None,
+                 musicFont: str|None = None,
+                 wordFont: str|None = None,
+                 pageLayout: PageLayout|None = None,
+                 systemLayout: SystemLayout|None = None,
                  staffLayoutList: t.Optional[list[StaffLayout]] = None,
                  **keywords):
         super().__init__(**keywords)
 
         self.scalingMillimeters = scalingMillimeters
         self.scalingTenths = scalingTenths
-        self.pageLayout: t.Optional[PageLayout] = pageLayout
-        self.systemLayout: t.Optional[SystemLayout] = systemLayout
+        self.pageLayout: PageLayout|None = pageLayout
+        self.systemLayout: SystemLayout|None = systemLayout
         self.staffLayoutList: list[StaffLayout] = []
         self.musicFont = musicFont
         self.wordFont = wordFont
@@ -225,7 +225,7 @@ class PageLayout(LayoutBase):
 
     def __init__(self,
                  *,
-                 pageNumber: t.Optional[int] = None,
+                 pageNumber: int|None = None,
                  leftMargin: t.Union[int, float, None] = None,
                  rightMargin: t.Union[int, float, None] = None,
                  topMargin: t.Union[int, float, None] = None,
@@ -362,7 +362,7 @@ class StaffLayout(LayoutBase):
                  distance: t.Union[int, float, None] = None,
                  staffNumber: t.Union[int, float, None] = None,
                  staffSize: t.Union[int, float, None] = None,
-                 staffLines: t.Optional[int] = None,
+                 staffLines: int|None = None,
                  hidden: t.Union[bool, None] = None,
                  staffType: StaffType = StaffType.REGULAR,
                  **keywords):
@@ -371,7 +371,7 @@ class StaffLayout(LayoutBase):
         # this is the distance between adjacent staves
         self.distance = distance
         self.staffNumber = staffNumber
-        self.staffSize: t.Optional[float] = None if staffSize is None else float(staffSize)
+        self.staffSize: float|None = None if staffSize is None else float(staffSize)
         self.staffLines = staffLines
         self.hidden = hidden  # True = hidden; False = shown; None = inherit
         self.staffType: StaffType = staffType
@@ -426,9 +426,9 @@ class StaffGroup(spanner.Spanner):
     '''
     def __init__(self,
                  *spannedElements,
-                 name: t.Optional[str] = None,
+                 name: str|None = None,
                  barTogether: t.Literal[True, False, None, 'Mensurstrich'] = True,
-                 abbreviation: t.Optional[str] = None,
+                 abbreviation: str|None = None,
                  symbol: t.Literal['bracket', 'line', 'grace', 'square'] = None,
                  **keywords):
         super().__init__(*spannedElements, **keywords)

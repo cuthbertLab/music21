@@ -1278,12 +1278,12 @@ class RepeatBracket(Spanner):
     '''
     def __init__(self,
                  *spannedElements,
-                 number: t.Optional[int] = None,
-                 overrideDisplay: t.Optional[str] = None,
+                 number: int|None = None,
+                 overrideDisplay: str|None = None,
                  **keywords):
         super().__init__(*spannedElements, **keywords)
 
-        self._number: t.Optional[int] = None
+        self._number: int|None = None
         # store a range, inclusive of the single number assignment
         self._numberRange: list[int] = []
         # are there exactly two numbers that should be written as  3, 4 not 3-4.
@@ -1838,7 +1838,7 @@ class Glissando(Spanner):
     def __init__(self,
                  *spannedElements,
                  lineType: str = 'wavy',
-                 label: t.Optional[str] = None,
+                 label: str|None = None,
                  **keywords):
         super().__init__(*spannedElements, **keywords)
 

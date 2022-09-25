@@ -1068,8 +1068,8 @@ class Iterator:
                   'titleList', 'numberList', 'returnType', 'iterationType']
 
     def __init__(self,
-                 currentNumber: t.Optional[int] = None,
-                 highestNumber: t.Optional[int] = None,
+                 currentNumber: int|None = None,
+                 highestNumber: int|None = None,
                  *,
                  numberingSystem: str = 'riemenschneider',
                  returnType: str = 'stream',

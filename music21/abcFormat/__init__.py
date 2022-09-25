@@ -606,7 +606,7 @@ class ABCMetadata(ABCToken):
 
         # placing this import in method for now; clef.py may import this module UNLIKELY
         from music21 import clef
-        clefObj: t.Optional[clef.Clef] = None
+        clefObj: clef.Clef|None = None
         transposeSemitones = None
 
         if '-8va' in self.data.lower():
@@ -676,7 +676,7 @@ class ABCMetadata(ABCToken):
 
         # get a symbolic and numerical value if available
         number: float = -1  # sentinel = None
-        referent: t.Optional[float] = None
+        referent: float|None = None
         if nonText:
             if '=' in nonText:
                 durs, numberStr = nonText.split('=')
@@ -943,11 +943,11 @@ class ABCTuplet(ABCToken):
         self.numberNotesNormal: int = 1
 
         # store an m21 tuplet object
-        self.tupletObj: t.Optional[duration.Tuplet] = None
+        self.tupletObj: duration.Tuplet|None = None
 
     def updateRatio(
         self,
-        timeSignatureObj: t.Optional[meter.TimeSignature] = None
+        timeSignatureObj: meter.TimeSignature|None = None
     ) -> None:
         # noinspection PyShadowingNames
         '''
@@ -1031,7 +1031,7 @@ class ABCTuplet(ABCToken):
         splitTuplet = self.src.strip().split(':')
 
         tupletNumber = splitTuplet[0]
-        normalNotes: t.Optional[int] = None
+        normalNotes: int|None = None
 
         if len(splitTuplet) >= 2 and splitTuplet[1] != '':
             normalNotes = int(splitTuplet[1])
@@ -1130,7 +1130,7 @@ class ABCSlurStart(ABCToken):
     '''
     def __init__(self, src=''):
         super().__init__(src)
-        self.slurObj: t.Optional[spanner.Slur] = None
+        self.slurObj: spanner.Slur|None = None
 
     def fillSlur(self):
         '''
@@ -1157,7 +1157,7 @@ class ABCCrescStart(ABCToken):
 
     def __init__(self, src=''):
         super().__init__(src)
-        self.crescObj: t.Optional[dynamics.Crescendo] = None
+        self.crescObj: dynamics.Crescendo|None = None
 
     def fillCresc(self):
         from music21 import dynamics
@@ -1171,7 +1171,7 @@ class ABCDimStart(ABCToken):
     '''
     def __init__(self, src=''):
         super().__init__(src)
-        self.dimObj: t.Optional[dynamics.Diminuendo] = None
+        self.dimObj: dynamics.Diminuendo|None = None
 
     def fillDim(self):
         from music21 import dynamics
@@ -1240,7 +1240,7 @@ class ABCBrokenRhythmMarker(ABCToken):
     '''
     def __init__(self, src=''):
         super().__init__(src)
-        self.data: t.Optional[str] = None
+        self.data: str|None = None
 
     def preParse(self):
         '''Called before context adjustments: need to have access to data
@@ -1286,7 +1286,7 @@ class ABCNote(ABCToken):
         self.inGrace = None
 
         # provide default duration from handler; may change during piece
-        self.activeDefaultQuarterLength: t.Optional[float] = None
+        self.activeDefaultQuarterLength: float|None = None
         # store if a broken symbol applies; a pair of symbols, position (left, right)
         self.brokenRhythmMarker = None
 
@@ -1314,7 +1314,7 @@ class ABCNote(ABCToken):
 
         # Pitch and duration attributes for m21 conversion
         # they are set via parse() based on other contextual information.
-        self.pitchName: t.Optional[str] = None  # if None, a rest or chord
+        self.pitchName: str|None = None  # if None, a rest or chord
         self.quarterLength: float = 0.0
 
     @staticmethod
@@ -1509,7 +1509,7 @@ class ABCNote(ABCToken):
 
     def getQuarterLength(self,
                          strSrc: str,
-                         forceDefaultQuarterLength: t.Optional[float] = None) -> float:
+                         forceDefaultQuarterLength: float|None = None) -> float:
         '''
         Called with parse(), after context processing, to calculate duration
 
@@ -1639,8 +1639,8 @@ class ABCNote(ABCToken):
 
     def parse(
         self,
-        forceDefaultQuarterLength: t.Optional[float] = None,
-        forceKeySignature: t.Optional[key.KeySignature] = None
+        forceDefaultQuarterLength: float|None = None,
+        forceKeySignature: key.KeySignature|None = None
     ) -> None:
         # environLocal.printDebug(['parse', self.src])
         self.chordSymbols, nonChordSymStr = self._splitChordSymbols(self.src)
@@ -2468,8 +2468,8 @@ class ABCHandler:
         lastDefaultQL = None
         lastKeySignature = None
         lastTimeSignatureObj = None  # an m21 object
-        lastTupletToken: t.Optional[ABCTuplet] = None  # a token obj; keeps count of usage
-        lastTieToken: t.Optional[ABCTie] = None
+        lastTupletToken: ABCTuplet|None = None  # a token obj; keeps count of usage
+        lastTieToken: ABCTie|None = None
         lastStaccToken = None
         lastUpToken = None
         lastDownToken = None
@@ -3199,8 +3199,8 @@ class ABCHandlerBar(ABCHandler):
         # tokens are ABC objects in a linear stream
         super().__init__()
 
-        self.leftBarToken: t.Optional[ABCBar] = None
-        self.rightBarToken: t.Optional[ABCBar] = None
+        self.leftBarToken: ABCBar|None = None
+        self.rightBarToken: ABCBar|None = None
 
     def __add__(self, other):
         ah = self.__class__()  # will get the same class type
@@ -3390,7 +3390,7 @@ class ABCFile(prebase.ProtoM21Object):
         referenceNumbers = '\n'.join(collect)
         return referenceNumbers
 
-    def readstr(self, strSrc: str, number: t.Optional[int] = None) -> ABCHandler:
+    def readstr(self, strSrc: str, number: int|None = None) -> ABCHandler:
         '''
         Read a string and process all Tokens.
         Returns a ABCHandler instance.

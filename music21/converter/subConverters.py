@@ -99,7 +99,7 @@ class SubConverter:
 
     def parseFile(self,
                   filePath: t.Union[str, pathlib.Path],
-                  number: t.Optional[int] = None,
+                  number: int|None = None,
                   **keywords):
         '''
         Called when a file is encountered. If all that needs to be done is
@@ -714,7 +714,7 @@ class ConverterHumdrum(SubConverter):
 
     def parseFile(self,
                   filePath: t.Union[pathlib.Path, str],
-                  number: t.Optional[int] = None,
+                  number: int|None = None,
                   **keywords):
         '''
         Open Humdrum data from a file path.
@@ -827,7 +827,7 @@ class ConverterNoteworthy(SubConverter):
 
     def parseFile(self,
                   filePath: t.Union[pathlib.Path, str],
-                  number: t.Optional[int] = None,
+                  number: int|None = None,
                   **keywords):
         # noinspection SpellCheckingInspection,PyShadowingNames
         '''
@@ -864,7 +864,7 @@ class ConverterNoteworthyBinary(SubConverter):
 
     def parseFile(self,
                   filePath: t.Union[pathlib.Path, str],
-                  number: t.Optional[int] = None,
+                  number: int|None = None,
                   **keywords):
         from music21.noteworthy import binaryTranslate as noteworthyBinary
         self.stream = noteworthyBinary.NWCConverter().parseFile(filePath)
@@ -921,7 +921,7 @@ class ConverterMusicXML(SubConverter):
 
     def parseFile(self,
                   filePath: t.Union[str, pathlib.Path],
-                  number: t.Optional[int] = None,
+                  number: int|None = None,
                   **keywords):
         '''
         Open from a file path; check to see if there is a pickled
@@ -956,7 +956,7 @@ class ConverterMusicXML(SubConverter):
                             fp,
                             subformats=None,
                             *,
-                            dpi: t.Optional[int] = None,
+                            dpi: int|None = None,
                             **keywords) -> pathlib.Path:  # pragma: no cover
         '''
         Take the output of the conversion process and run it through musescore to convert it
@@ -1080,7 +1080,7 @@ class ConverterMusicXML(SubConverter):
               subformats=None,
               *,
               makeNotation=True,
-              compress: t.Optional[bool] = None,
+              compress: bool|None = None,
               **keywords):
         '''
         Write to a .musicxml file.
@@ -1186,7 +1186,7 @@ class ConverterMidi(SubConverter):
 
     def parseFile(self,
                   filePath: t.Union[pathlib.Path, str],
-                  number: t.Optional[int] = None,
+                  number: int|None = None,
                   **keywords):
         '''
         Get MIDI data from a file path.
@@ -1251,7 +1251,7 @@ class ConverterABC(SubConverter):
 
     def parseFile(self,
                   filePath: t.Union[pathlib.Path, str],
-                  number: t.Optional[int] = None,
+                  number: int|None = None,
                   **keywords):
         '''
         Get ABC data from a file path. If more than one work is defined in the ABC
@@ -1302,7 +1302,7 @@ class ConverterRomanText(SubConverter):
 
     def parseFile(self,
                   filePath: t.Union[pathlib.Path, str],
-                  number: t.Optional[int] = None,
+                  number: int|None = None,
                   **keywords):
         from music21.romanText import rtObjects
         from music21.romanText import translate as romanTextTranslate
@@ -1376,7 +1376,7 @@ class ConverterCapella(SubConverter):
 
     def parseFile(self,
                   filePath: t.Union[str, pathlib.Path],
-                  number: t.Optional[int] = None,
+                  number: int|None = None,
                   **keywords):
         '''
         Parse a Capella file
@@ -1414,7 +1414,7 @@ class ConverterMuseData(SubConverter):
 
     def parseFile(self,
                   filePath: t.Union[str, pathlib.Path],
-                  number: t.Optional[int] = None,
+                  number: int|None = None,
                   **keywords):
         '''
         parse fp (a pathlib.Path()) and number
@@ -1490,7 +1490,7 @@ class ConverterMEI(SubConverter):
     def parseFile(
         self,
         filePath: t.Union[str, pathlib.Path],
-        number: t.Optional[int] = None,
+        number: int|None = None,
         **keywords,
     ) -> stream.Stream:
         '''

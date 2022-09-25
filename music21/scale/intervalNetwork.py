@@ -1363,7 +1363,7 @@ class IntervalNetwork:
         maxPitch: t.Optional[pitch.Pitch],
         *,
         includeFirst: bool,
-        reverse: t.Optional[bool] = None,  # only meaningful for descending
+        reverse: bool|None = None,  # only meaningful for descending
     ) -> CacheKey:
         '''
         Return key for caching based on critical components.

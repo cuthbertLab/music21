@@ -490,7 +490,7 @@ class Ornament(Expression):
         fillObjects: list[note.Note],
         transposeInterval: interval.IntervalBase,
         *,
-        useQL: t.Optional[OffsetQL] = None
+        useQL: OffsetQL|None = None
     ) -> None:
         '''
         Used by trills and mordents to fill out their realization.
@@ -1534,7 +1534,7 @@ class ArpeggioMark(Expression):
     >>> am.type
     'down'
     '''
-    def __init__(self, arpeggioType: t.Optional[str] = None):
+    def __init__(self, arpeggioType: str|None = None):
         super().__init__()
         if arpeggioType is None:
             arpeggioType = 'normal'

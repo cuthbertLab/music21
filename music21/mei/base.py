@@ -342,7 +342,7 @@ class MeiToM21Converter:
 # -----------------------------------------------------------------------------
 def safePitch(
     name: str,
-    accidental: t.Optional[str] = None,
+    accidental: str|None = None,
     octave: t.Union[str, int] = ''
 ) -> pitch.Pitch:
     '''

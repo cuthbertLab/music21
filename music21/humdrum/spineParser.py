@@ -1571,7 +1571,7 @@ class SpineEvent(prebase.ProtoM21Object):
         self.contents = contents
         self.position = position
         self.protoSpineId: int = 0
-        self.spineId: t.Optional[int] = None
+        self.spineId: int|None = None
 
     def _reprInternal(self):
         return str(self.contents)

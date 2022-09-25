@@ -901,7 +901,7 @@ class Accidental(prebase.ProtoM21Object, style.StyleMixin):
         self.displayLocation = 'normal'
 
         # store a reference to the Pitch that has this Accidental object as a property
-        self._client: t.Optional[Pitch] = None
+        self._client: Pitch|None = None
         self._name = ''
         self._modifier = ''
         self._alter = 0.0     # semitones to alter step
@@ -1801,17 +1801,17 @@ class Pitch(prebase.ProtoM21Object):
     def __init__(self,
                  name: t.Optional[t.Union[str, int, float]] = None,
                  *,
-                 step: t.Optional[StepName] = None,
-                 octave: t.Optional[int] = None,
+                 step: StepName|None = None,
+                 octave: int|None = None,
                  accidental: t.Union[Accidental, str, int, float, None] = None,
                  microtone: t.Union[Microtone, int, float, None] = None,
                  pitchClass: t.Optional[t.Union[int, PitchClassString]] = None,
-                 midi: t.Optional[int] = None,
-                 ps: t.Optional[float] = None,
-                 fundamental: t.Optional[Pitch] = None,
+                 midi: int|None = None,
+                 ps: float|None = None,
+                 fundamental: Pitch|None = None,
                  **keywords):
         # No need for super().__init__() on protoM21Object
-        self._groups: t.Optional[base.Groups] = None
+        self._groups: base.Groups|None = None
 
         if isinstance(name, type(self)):
             name = name.nameWithOctave
@@ -1819,31 +1819,31 @@ class Pitch(prebase.ProtoM21Object):
         # this should not be set, as will be updated when needed
         self._step: StepName = defaults.pitchStep  # this is only the pitch step
 
-        self._overridden_freq440: t.Optional[float] = None
+        self._overridden_freq440: float|None = None
 
         # store an Accidental and Microtone objects
         # note that creating an Accidental object is much more time-consuming
         # than a microtone
-        self._accidental: t.Optional[Accidental] = None
+        self._accidental: Accidental|None = None
         # 5% of pitch creation time; it'll be created in a sec anyhow
-        self._microtone: t.Optional[Microtone] = None
+        self._microtone: Microtone|None = None
 
         # CA, Q: should this remain an attribute or only refer to value in defaults?
         # MSC A: no, it's a useful attribute for cases such as scales where if there are
         #        no octaves we give a defaultOctave higher than the previous
         #        (MSC 12 years later: maybe Chris was right...)
         self.defaultOctave: int = defaults.pitchOctave
-        self._octave: t.Optional[int] = None
+        self._octave: int|None = None
 
         # if True, accidental is not known; is determined algorithmically
         # likely due to pitch data from midi or pitch space/class numbers
         self.spellingIsInferred = False
         # the fundamental attribute stores an optional pitch
         # that defines the fundamental used to create this Pitch
-        self.fundamental: t.Optional[Pitch] = None
+        self.fundamental: Pitch|None = None
 
         # so that we can tell clients about changes in pitches.
-        self._client: t.Optional[note.Note] = None
+        self._client: note.Note|None = None
 
         # name combines step, octave, and accidental
         if name is not None:

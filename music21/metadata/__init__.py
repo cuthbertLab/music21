@@ -469,7 +469,7 @@ class Metadata(base.Music21Object):
         '''
         if not uniqueName:
             return False
-        prop: t.Optional[PropertyDescription] = (
+        prop: PropertyDescription|None = (
             properties.UNIQUE_NAME_TO_PROPERTY_DESCRIPTION.get(uniqueName, None)
         )
         if prop is None:
@@ -1113,7 +1113,7 @@ class Metadata(base.Music21Object):
 
                     # see if there is an associated grandfathered workId, and if so,
                     # search for that, too.
-                    workId: t.Optional[str] = properties.UNIQUE_NAME_TO_MUSIC21_WORK_ID.get(
+                    workId: str|None = properties.UNIQUE_NAME_TO_MUSIC21_WORK_ID.get(
                         uniqueName, None
                     )
 
@@ -1636,7 +1636,7 @@ class Metadata(base.Music21Object):
             'movementName',
         )
         for uniqueName in searchId:
-            titleSummary: t.Optional[str] = self._getStringValueByNamespaceName(
+            titleSummary: str|None = self._getStringValueByNamespaceName(
                 properties.UNIQUE_NAME_TO_NAMESPACE_NAME[uniqueName]
             )
             if titleSummary:
@@ -1886,7 +1886,7 @@ class Metadata(base.Music21Object):
         False
 
         '''
-        prop: t.Optional[PropertyDescription] = (
+        prop: PropertyDescription|None = (
             properties.UNIQUE_NAME_TO_PROPERTY_DESCRIPTION.get(uniqueName, None)
         )
         if prop is None:
@@ -1928,7 +1928,7 @@ class Metadata(base.Music21Object):
         >>> metadata.Metadata._isStandardNamespaceName('average duration')
         False
         '''
-        prop: t.Optional[PropertyDescription] = (
+        prop: PropertyDescription|None = (
             properties.NAMESPACE_NAME_TO_PROPERTY_DESCRIPTION.get(namespaceName, None)
         )
         if prop is None:
@@ -1967,7 +1967,7 @@ class Metadata(base.Music21Object):
         >>> metadata.Metadata._isContributorUniqueName('average duration')
         False
         '''
-        prop: t.Optional[PropertyDescription] = (
+        prop: PropertyDescription|None = (
             properties.UNIQUE_NAME_TO_PROPERTY_DESCRIPTION.get(uniqueName, None)
         )
         if prop is None:
@@ -2017,7 +2017,7 @@ class Metadata(base.Music21Object):
         >>> metadata.Metadata._isContributorNamespaceName('average duration')
         False
         '''
-        prop: t.Optional[PropertyDescription] = (
+        prop: PropertyDescription|None = (
             properties.NAMESPACE_NAME_TO_PROPERTY_DESCRIPTION.get(namespaceName, None)
         )
         if prop is None:
@@ -2055,7 +2055,7 @@ class Metadata(base.Music21Object):
         >>> metadata.Metadata._namespaceNameNeedsArticleNormalization('average duration')
         False
         '''
-        prop: t.Optional[PropertyDescription] = (
+        prop: PropertyDescription|None = (
             properties.NAMESPACE_NAME_TO_PROPERTY_DESCRIPTION.get(namespaceName, None)
         )
         if prop is None:
@@ -2095,7 +2095,7 @@ class Metadata(base.Music21Object):
         if role is None:
             return 'otherContributor'
 
-        prop: t.Optional[PropertyDescription] = (
+        prop: PropertyDescription|None = (
             properties.UNIQUE_NAME_TO_PROPERTY_DESCRIPTION.get(role, None)
         )
 

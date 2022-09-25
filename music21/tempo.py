@@ -1146,7 +1146,7 @@ class MetricModulation(TempoIndication):
 
     def setOtherByReferent(
         self,
-        side: t.Optional[str] = None,
+        side: str|None = None,
         referent: t.Union[str, int, float] = 1.0
     ):
         '''

@@ -1464,7 +1464,7 @@ class Chord(ChordBase):
     def closedPosition(
         self: _ChordType,
         *,
-        forceOctave: t.Optional[int] = None,
+        forceOctave: int|None = None,
         inPlace: t.Literal[False] = False,
         leaveRedundantPitches: bool = False
     ) -> _ChordType:
@@ -1474,7 +1474,7 @@ class Chord(ChordBase):
     def closedPosition(
         self: _ChordType,
         *,
-        forceOctave: t.Optional[int] = None,
+        forceOctave: int|None = None,
         inPlace: t.Union[t.Literal[True], t.Literal[False]] = False,
         leaveRedundantPitches: bool = False
     ) -> t.Optional[_ChordType]:
@@ -2259,7 +2259,7 @@ class Chord(ChordBase):
         newInversion: int,
         *,
         find: bool = True,
-        testRoot: t.Optional[pitch.Pitch] = None,
+        testRoot: pitch.Pitch|None = None,
         transposeOnSet: bool = True
     ) -> None:
         return None  # dummy until Astroid 1015 is fixed
@@ -2270,17 +2270,17 @@ class Chord(ChordBase):
         newInversion: None = None,
         *,
         find: bool = True,
-        testRoot: t.Optional[pitch.Pitch] = None,
+        testRoot: pitch.Pitch|None = None,
         transposeOnSet: bool = True
     ) -> int:
         return -1  # dummy until Astroid 1015 is fixed
 
     def inversion(
         self,
-        newInversion: t.Optional[int] = None,
+        newInversion: int|None = None,
         *,
         find: bool = True,
-        testRoot: t.Optional[pitch.Pitch] = None,
+        testRoot: pitch.Pitch|None = None,
         transposeOnSet: bool = True
     ) -> t.Union[int, None]:
         '''
@@ -3988,7 +3988,7 @@ class Chord(ChordBase):
     def semiClosedPosition(
         self: _ChordType,
         *,
-        forceOctave: t.Optional[int] = None,
+        forceOctave: int|None = None,
         inPlace: t.Union[t.Literal[True], t.Literal[False]] = False,
         leaveRedundantPitches: bool = False
     ) -> t.Union[None, _ChordType]:

@@ -1314,7 +1314,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         '''
         self.elements = ()
 
-    def cloneEmpty(self: StreamType, derivationMethod: t.Optional[str] = None) -> StreamType:
+    def cloneEmpty(self: StreamType, derivationMethod: str|None = None) -> StreamType:
         '''
         Create a Stream that is identical to this one except that the elements are empty
         and set derivation.
@@ -3328,10 +3328,10 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
     # display methods; in the same manner as show() and write()
 
     def plot(self,
-             plotFormat: t.Optional[str] = None,
-             xValue: t.Optional[str] = None,
-             yValue: t.Optional[str] = None,
-             zValue: t.Optional[str] = None,
+             plotFormat: str|None = None,
+             xValue: str|None = None,
+             yValue: str|None = None,
+             zValue: str|None = None,
              **keywords):
         '''
         Given a method and keyword configuration arguments, create and display a plot.
@@ -6640,7 +6640,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         if tiePitchSet is None:
             tiePitchSet = set()
 
-        last_measure: t.Optional[Measure] = None
+        last_measure: Measure|None = None
 
         for e in noteIterator:
             if e.activeSite is not None and e.activeSite.isMeasure:

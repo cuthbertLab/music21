@@ -208,10 +208,10 @@ class Harmony(chord.Chord):
     # INITIALIZER #
 
     def __init__(self,
-                 figure: t.Optional[str] = None,
+                 figure: str|None = None,
                  root: t.Union[str, pitch.Pitch, None] = None,
                  bass: t.Union[str, pitch.Pitch, None] = None,
-                 inversion: t.Optional[int] = None,
+                 inversion: int|None = None,
                  updatePitches: bool = True,
                  **keywords
                  ):
@@ -273,7 +273,7 @@ class Harmony(chord.Chord):
         '''
         return
 
-    def _updateFromParameters(self, root, bass, inversion: t.Optional[int] = None):
+    def _updateFromParameters(self, root, bass, inversion: int|None = None):
         '''
         This method must be called twice, once before the pitches
         are rendered, and once after. This is because after the pitches
@@ -1579,7 +1579,7 @@ class ChordSymbol(Harmony):
                  figure=None,
                  root: t.Union[pitch.Pitch, str, None] = None,
                  bass: t.Union[pitch.Pitch, str, None] = None,
-                 inversion: t.Optional[int] = None,
+                 inversion: int|None = None,
                  kind='',
                  kindStr='',
                  **keywords

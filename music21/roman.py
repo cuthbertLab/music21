@@ -606,7 +606,7 @@ def identifyAsTonicOrDominant(
     return rootScaleDeg + romanInversionName(inChord)
 
 
-def romanInversionName(inChord: chord.Chord, inv: t.Optional[int] = None) -> str:
+def romanInversionName(inChord: chord.Chord, inv: int|None = None) -> str:
     '''
     Extremely similar to Chord's inversionName() method, but returns string
     values and allows incomplete triads.
@@ -2246,10 +2246,10 @@ class RomanNumeral(harmony.Harmony):
         seventhMinor=Minor67Default.QUALITY,
     ):
         self.primaryFigure: str = ''
-        self.secondaryRomanNumeral: t.Optional[RomanNumeral] = None
-        self.secondaryRomanNumeralKey: t.Optional['key.Key'] = None
+        self.secondaryRomanNumeral: RomanNumeral|None = None
+        self.secondaryRomanNumeralKey: 'key.Key'|None = None
 
-        self.pivotChord: t.Optional[RomanNumeral] = None
+        self.pivotChord: RomanNumeral|None = None
         self.caseMatters: bool = caseMatters
         self.scaleCardinality: int = 7
 
@@ -2278,8 +2278,8 @@ class RomanNumeral(harmony.Harmony):
         self._scale = None
         self.scaleDegree: int = 0
         self.frontAlterationString: str = ''
-        self.frontAlterationTransposeInterval: t.Optional[interval.Interval] = None
-        self.frontAlterationAccidental: t.Optional[pitch.Accidental] = None
+        self.frontAlterationTransposeInterval: interval.Interval|None = None
+        self.frontAlterationAccidental: pitch.Accidental|None = None
         self.romanNumeralAlone: str = ''
         self.figuresWritten: str = ''
         self.figuresNotationObj: fbNotation.Notation = _NOTATION_SINGLETON
@@ -2288,7 +2288,7 @@ class RomanNumeral(harmony.Harmony):
 
         self.impliedQuality: str = ''
 
-        self.impliedScale: t.Optional[scale.ConcreteScale] = None
+        self.impliedScale: scale.ConcreteScale|None = None
         self.useImpliedScale: bool = False
         self.bracketedAlterations: list[tuple[str, int]] = []
         self.omittedSteps: list[int] = []
@@ -2301,7 +2301,7 @@ class RomanNumeral(harmony.Harmony):
 
         super().__init__(figure, updatePitches=updatePitches)
         self._parsingComplete = True
-        self._functionalityScore: t.Optional[int] = None
+        self._functionalityScore: int|None = None
         self.editorial.followsKeyChange = False
 
     # SPECIAL METHODS #
@@ -2580,7 +2580,7 @@ class RomanNumeral(harmony.Harmony):
     def _correctForSecondaryRomanNumeral(
         self,
         useScale: t.Union[key.Key, scale.ConcreteScale],
-        figure: t.Optional[str] = None
+        figure: str|None = None
     ) -> tuple[str, t.Union[key.Key, scale.ConcreteScale]]:
         '''
         Creates .secondaryRomanNumeral object and .secondaryRomanNumeralKey Key object
@@ -3376,7 +3376,7 @@ class RomanNumeral(harmony.Harmony):
 
     def bassScaleDegreeFromNotation(
         self,
-        notationObject: t.Optional[fbNotation.Notation] = None
+        notationObject: fbNotation.Notation|None = None
     ) -> int:
         '''
         Given a notationObject from

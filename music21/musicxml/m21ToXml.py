@@ -164,7 +164,7 @@ def _setTagTextFromAttribute(
     m21El,
     xmlEl: Element,
     tag: str,
-    attributeName: t.Optional[str] = None,
+    attributeName: str|None = None,
     *,
     transform=None,
     forceEmpty=False
@@ -803,7 +803,7 @@ class XMLExporterBase:
     '''
     def __init__(self):
         self.xmlRoot = None
-        self.stream: t.Optional[stream.Stream] = None
+        self.stream: stream.Stream|None = None
 
     def asBytes(self, noCopy=True) -> bytes:
         '''
@@ -1445,7 +1445,7 @@ class ScoreExporter(XMLExporterBase, PartStaffExporterMixin):
     a musicxml Element.
     '''
 
-    def __init__(self, score: t.Optional[stream.Score] = None, makeNotation: bool = True):
+    def __init__(self, score: stream.Score|None = None, makeNotation: bool = True):
         super().__init__()
         if score is None:
             # should not be done this way.
@@ -1458,7 +1458,7 @@ class ScoreExporter(XMLExporterBase, PartStaffExporterMixin):
 
         self.scoreMetadata = None
 
-        self.spannerBundle: t.Optional[spanner.SpannerBundle] = None
+        self.spannerBundle: spanner.SpannerBundle|None = None
         self.meterStream: t.Optional[stream.Stream[meter.TimeSignatureBase]] = None
         self.scoreLayouts = None
         self.firstScoreLayout = None
@@ -2436,7 +2436,7 @@ class ScoreExporter(XMLExporterBase, PartStaffExporterMixin):
                 # We have already emitted all the copyrights.
                 continue
 
-            namespaceName: t.Optional[str] = md.uniqueNameToNamespaceName(uniqueName)
+            namespaceName: str|None = md.uniqueNameToNamespaceName(uniqueName)
             if namespaceName is None:
                 namespaceName = uniqueName
 
@@ -2558,7 +2558,7 @@ class ScoreExporter(XMLExporterBase, PartStaffExporterMixin):
         mxScoreHeader = self.xmlRoot
         mxWork = Element('work')
         # TODO: work-number
-        firstTitleFound: t.Optional[metadata.Text] = None
+        firstTitleFound: metadata.Text|None = None
         titles: tuple[metadata.Text, ...] = mdObj['title']
         if titles:
             if firstTitleFound is None:
@@ -2633,7 +2633,7 @@ class PartExporter(XMLExporterBase):
 
     def __init__(self,
                  partObj: t.Union[stream.Part, stream.Score, None] = None,
-                 parent: t.Optional[ScoreExporter] = None):
+                 parent: ScoreExporter|None = None):
         super().__init__()
         # partObj can be a Score IF it has no parts within it.  But better to
         # always have it be a Part
@@ -2657,7 +2657,7 @@ class PartExporter(XMLExporterBase):
             self.midiChannelList = parent.midiChannelList  # shared list
             self.makeNotation = parent.makeNotation
 
-        self.previousPartStaffInGroup: t.Optional[stream.PartStaff] = None
+        self.previousPartStaffInGroup: stream.PartStaff|None = None
 
         self.instrumentStream: t.Optional[stream.Stream[instrument.Instrument]] = None
         self.firstInstrumentObject = None
@@ -2667,7 +2667,7 @@ class PartExporter(XMLExporterBase):
         self.lastDivisions = None
 
         # The staffGroup to which this part belongs (if it belongs to one)
-        self.staffGroup: t.Optional[layout.StaffGroup] = None
+        self.staffGroup: layout.StaffGroup|None = None
 
         self.spannerBundle = partObj.spannerBundle
 
@@ -3125,8 +3125,8 @@ class MeasureExporter(XMLExporterBase):
     ignoreOnParseClasses = {'LayoutBase', 'Barline'}
 
     def __init__(self,
-                 measureObj: t.Optional[stream.Measure] = None,
-                 parent: t.Optional[PartExporter] = None):
+                 measureObj: stream.Measure|None = None,
+                 parent: PartExporter|None = None):
         super().__init__()
         if measureObj is None:  # no point, but...
             self.stream = stream.Measure()
@@ -3142,7 +3142,7 @@ class MeasureExporter(XMLExporterBase):
         self.mxTranspose = None
         self.measureOffsetStart = 0.0
         self.offsetInMeasure = 0.0
-        self.currentVoiceId: t.Optional[int] = None
+        self.currentVoiceId: int|None = None
         self.nextFreeVoiceNumber: int = 1
         self.nextArpeggioNumber: int = 1
         self.arpeggioNumbers: dict[expressions.ArpeggioMarkSpanner, int] = {}
@@ -3506,7 +3506,7 @@ class MeasureExporter(XMLExporterBase):
         self,
         obj: base.Music21Object,
         noteIndexInChord: int = 0,
-        objectSpannerBundle: t.Optional[spanner.SpannerBundle] = None
+        objectSpannerBundle: spanner.SpannerBundle|None = None
     ) -> list[Element]:
         '''
         return a list of <notations> from spanners related to the object that should appear
@@ -3673,7 +3673,7 @@ class MeasureExporter(XMLExporterBase):
             if isinstance(obj, chord.Chord):
                 sub_obj = obj[noteIndexInChord]
 
-            mxArpeggio: t.Optional[Element] = None
+            mxArpeggio: Element|None = None
             if ams.type == 'non-arpeggio':
                 min_note, max_note = ams.noteExtremes()
                 # <non-arpeggiate> goes only on top and bottom note in chord
@@ -4126,7 +4126,7 @@ class MeasureExporter(XMLExporterBase):
         if r.stepShift != 0:
             mxDisplayStep = SubElement(mxRestTag, 'display-step')
             mxDisplayOctave = SubElement(mxRestTag, 'display-octave')
-            currentClef: t.Optional[clef.PitchClef] = r.getContextByClass(clef.PitchClef)
+            currentClef: clef.PitchClef|None = r.getContextByClass(clef.PitchClef)
             if currentClef is None or not hasattr(currentClef, 'lowestLine'):
                 currentClef = clef.TrebleClef()
                 # this should not be common enough to
@@ -4519,7 +4519,7 @@ class MeasureExporter(XMLExporterBase):
         self,
         mxNote: Element,
         n: note.GeneralNote,
-        chordParent: t.Optional[chord.Chord] = None
+        chordParent: chord.Chord|None = None
     ) -> None:
         '''
         Determine if an <notehead> element needs to be added to this <note>

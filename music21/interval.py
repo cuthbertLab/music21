@@ -1423,7 +1423,7 @@ class GenericInterval(IntervalBase):
     def transposePitchKeyAware(
         self,
         p: pitch.Pitch,
-        k: t.Optional[key.KeySignature] = None,
+        k: key.KeySignature|None = None,
         *,
         inPlace: bool = False
     ):
@@ -2994,13 +2994,13 @@ class Interval(IntervalBase):
                  arg1: t.Union[pitch.Pitch, note.Note, None] = None,
                  /,
                  *,
-                 diatonic: t.Optional[DiatonicInterval] = None,
-                 chromatic: t.Optional[ChromaticInterval] = None,
-                 pitchStart: t.Optional[pitch.Pitch] = None,
-                 pitchEnd: t.Optional[pitch.Pitch] = None,
+                 diatonic: DiatonicInterval|None = None,
+                 chromatic: ChromaticInterval|None = None,
+                 pitchStart: pitch.Pitch|None = None,
+                 pitchEnd: pitch.Pitch|None = None,
                  noteStart: t.Union[note.Note, pitch.Pitch, None] = None,
                  noteEnd: t.Union[note.Note, pitch.Pitch, None] = None,
-                 name: t.Optional[str] = None,
+                 name: str|None = None,
                  **keywords):
         super().__init__(**keywords)
 
@@ -3076,8 +3076,8 @@ class Interval(IntervalBase):
         self.chromatic: ChromaticInterval = chromatic
 
         # these can be accessed through pitchStart and pitchEnd properties
-        self._pitchStart: t.Optional[pitch.Pitch] = pitchStart
-        self._pitchEnd: t.Optional[pitch.Pitch] = pitchEnd
+        self._pitchStart: pitch.Pitch|None = pitchStart
+        self._pitchEnd: pitch.Pitch|None = pitchEnd
 
         self.intervalType: t.Literal['harmonic', 'melodic', ''] = ''
 
@@ -3333,7 +3333,7 @@ class Interval(IntervalBase):
                        p: pitch.Pitch,
                        *,
                        reverse=False,
-                       maxAccidental: t.Optional[int] = 4,
+                       maxAccidental: int|None = 4,
                        inPlace=False):
         '''
         Given a :class:`~music21.pitch.Pitch` object, return a new,

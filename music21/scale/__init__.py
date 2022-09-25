@@ -659,7 +659,7 @@ class AbstractDiatonicScale(AbstractScale):
     True
 
     '''
-    def __init__(self, mode: t.Optional[str] = None):
+    def __init__(self, mode: str|None = None):
         super().__init__()
         self.mode = mode
         self.type = 'Abstract diatonic'
@@ -1265,7 +1265,7 @@ class ConcreteScale(Scale):
         self.type = 'Concrete'
         # store an instance of an abstract scale
         # subclasses might use multiple abstract scales?
-        self._abstract: t.Optional[AbstractScale] = None
+        self._abstract: AbstractScale|None = None
 
         # determine whether this is a limited range
         self.boundRange = False
@@ -1521,7 +1521,7 @@ class ConcreteScale(Scale):
                 pDstNew.octave = pEnh.octave  # copy octave
                 # need to adjust enharmonic
                 pDstNewEnh = pDstNew.getAllCommonEnharmonics(alterLimit=2)
-                match: t.Optional[pitch.Pitch] = None
+                match: pitch.Pitch|None = None
                 for x in pDstNewEnh:
                     # try to match enharmonic with original alt
                     if x.name == pAlt.name:
@@ -1573,7 +1573,7 @@ class ConcreteScale(Scale):
         self,
         minPitch: t.Union[str, pitch.Pitch, None] = None,
         maxPitch: t.Union[str, pitch.Pitch, None] = None,
-        direction: t.Optional[Direction] = None
+        direction: Direction|None = None
     ) -> list[pitch.Pitch]:
         '''
         Return a list of Pitch objects, using a
@@ -1697,7 +1697,7 @@ class ConcreteScale(Scale):
         if self._abstract is None:  # pragma: no cover
             raise ScaleException('Abstract scale underpinning this scale is not defined.')
 
-        cacheKey: t.Optional[_PitchDegreeCacheKey] = None
+        cacheKey: _PitchDegreeCacheKey|None = None
         if (self.usePitchDegreeCache and self.tonic
                 and not minPitch and not maxPitch and getattr(self, 'type', None)):
             tonicCacheKey = self.tonic.nameWithOctave
@@ -3018,7 +3018,7 @@ class OctaveRepeatingScale(ConcreteScale):
     [<music21.pitch.Pitch C4>, <music21.pitch.Pitch D-4>, <music21.pitch.Pitch C5>]
     '''
 
-    def __init__(self, tonic=None, intervalList: t.Optional[list] = None):
+    def __init__(self, tonic=None, intervalList: list|None = None):
         super().__init__(tonic=tonic)
         mode = intervalList if intervalList else ['m2']
         self._abstract = AbstractOctaveRepeatingScale(mode=mode)
@@ -3048,7 +3048,7 @@ class CyclicalScale(ConcreteScale):
 
     def __init__(self,
                  tonic: t.Union[str, pitch.Pitch, note.Note, None] = None,
-                 intervalList: t.Optional[list] = None):
+                 intervalList: list|None = None):
         super().__init__(tonic=tonic)
         mode = intervalList if intervalList else ['m2']
         self._abstract = AbstractCyclicalScale(mode=mode)

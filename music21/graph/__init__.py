@@ -68,7 +68,7 @@ environLocal = environment.Environment('graph')
 
 def plotStream(
     streamObj: stream.Stream,
-    graphFormat: t.Optional[str] = None,
+    graphFormat: str|None = None,
     xValue=None,
     yValue=None,
     zValue=None,

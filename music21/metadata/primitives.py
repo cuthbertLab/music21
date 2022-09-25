@@ -125,12 +125,12 @@ class Date(prebase.ProtoM21Object):
 
         # error: can be 'approximate', 'uncertain' or None.
         # None is assumed to be certain
-        self.yearError: t.Optional[str] = yearError
-        self.monthError: t.Optional[str] = monthError
-        self.dayError: t.Optional[str] = dayError
-        self.hourError: t.Optional[str] = hourError
-        self.minuteError: t.Optional[str] = minuteError
-        self.secondError: t.Optional[str] = secondError
+        self.yearError: str|None = yearError
+        self.monthError: str|None = monthError
+        self.dayError: str|None = dayError
+        self.hourError: str|None = hourError
+        self.minuteError: str|None = minuteError
+        self.secondError: str|None = secondError
         self.attrNames = ('year', 'month', 'day', 'hour', 'minute', 'second')
 
     # SPECIAL METHODS #
@@ -196,7 +196,7 @@ class Date(prebase.ProtoM21Object):
         >>> d._stripError('4.43')
         (4, None)
         '''
-        uncertainty: t.Optional[str] = None
+        uncertainty: str|None = None
         if isinstance(value, str):  # if a number, let pass
             sym = self.approximateSymbols + self.uncertainSymbols + self.priorTimeSymbols
             found = None
@@ -844,15 +844,15 @@ class Text(prebase.ProtoM21Object):
 
     def __init__(self,
                  data: t.Union[str, 'Text'] = '',
-                 language: t.Optional[str] = None,
-                 isTranslated: t.Optional[bool] = None,   # True, False, or None (unknown)
-                 encodingScheme: t.Optional[str] = None):
+                 language: str|None = None,
+                 isTranslated: bool|None = None,   # True, False, or None (unknown)
+                 encodingScheme: str|None = None):
         if isinstance(data, Text):
             # accessing private attributes here; not desirable
             self._data: t.Union[str, Text] = data._data
-            self._language: t.Optional[str] = data._language
-            self.isTranslated: t.Optional[bool] = data.isTranslated
-            self.encodingScheme: t.Optional[str] = data.encodingScheme
+            self._language: str|None = data._language
+            self.isTranslated: bool|None = data.isTranslated
+            self.encodingScheme: str|None = data.encodingScheme
         else:
             self._data = data
             self._language = language
@@ -1003,8 +1003,8 @@ class Copyright(Text):
 
     def __init__(self,
                  data: t.Union[str, 'Text'] = '',
-                 language: t.Optional[str] = None,
-                 isTranslated: t.Optional[bool] = None,   # True, False, or None (unknown)
+                 language: str|None = None,
+                 isTranslated: bool|None = None,   # True, False, or None (unknown)
                  *, role=None):
         super().__init__(data, language, isTranslated)
         self.role = role
@@ -1112,8 +1112,8 @@ class Contributor(prebase.ProtoM21Object):
         # store the nationality, if known (not currently used)
         self._nationality: list[Text] = []
 
-        self.birth: t.Optional[DateSingle] = None
-        self.death: t.Optional[DateSingle] = None
+        self.birth: DateSingle|None = None
+        self.death: DateSingle|None = None
 
         if birth is not None:
             if not isinstance(birth, DateSingle):

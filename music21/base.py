@@ -353,14 +353,14 @@ class Music21Object(prebase.ProtoM21Object):
 
     def __init__(self,
                  id: t.Union[str, int, None] = None,  # pylint: disable=redefined-builtin
-                 groups: t.Optional[Groups] = None,
-                 sites: t.Optional[Sites] = None,
-                 duration: t.Optional[Duration] = None,
-                 activeSite: t.Optional[stream.Stream] = None,
-                 style: t.Optional[Style] = None,
-                 editorial: t.Optional[Editorial] = None,
+                 groups: Groups|None = None,
+                 sites: Sites|None = None,
+                 duration: Duration|None = None,
+                 activeSite: stream.Stream|None = None,
+                 style: Style|None = None,
+                 editorial: Editorial|None = None,
                  offset: OffsetQL = 0.0,
-                 quarterLength: t.Optional[OffsetQLIn] = None,
+                 quarterLength: OffsetQLIn|None = None,
                  **keywords):
         # do not call super().__init__() since it just wastes time
         self._id: t.Union[str, int, None] = id
@@ -376,13 +376,13 @@ class Music21Object(prebase.ProtoM21Object):
 
         # store a derivation object to track derivations from other Streams
         # pass a reference to this object
-        self._derivation: t.Optional[Derivation] = None
+        self._derivation: Derivation|None = None
 
-        self._style: t.Optional[Style] = style
-        self._editorial: t.Optional[Editorial] = None
+        self._style: Style|None = style
+        self._editorial: Editorial|None = None
 
         # private duration storage; managed by property
-        self._duration: t.Optional[Duration] = None
+        self._duration: Duration|None = None
         self._priority = 0  # default is zero
 
         # store cached values here:
@@ -557,7 +557,7 @@ class Music21Object(prebase.ProtoM21Object):
 
         return new
 
-    def __deepcopy__(self: _M21T, memo: t.Optional[dict[int, t.Any]] = None) -> _M21T:
+    def __deepcopy__(self: _M21T, memo: dict[int, t.Any]|None = None) -> _M21T:
         '''
         Helper method to copy.py's deepcopy function.  Call it from there.
 
@@ -1091,7 +1091,7 @@ class Music21Object(prebase.ProtoM21Object):
         raise SitesException(f'Element {self} is not in hierarchy of {site}')
 
     def getSpannerSites(self,
-                        spannerClassList: t.Optional[Iterable] = None
+                        spannerClassList: Iterable|None = None
                         ) -> list[spanner.Spanner]:
         '''
         Return a list of all :class:`~music21.spanner.Spanner` objects
@@ -3560,7 +3560,7 @@ class Music21Object(prebase.ProtoM21Object):
         extracted to make sure that all three of the routines use the same one.
         '''
         from music21 import meter
-        ts: t.Optional[meter.TimeSignature] = self.getContextByClass(
+        ts: meter.TimeSignature|None = self.getContextByClass(
             meter.TimeSignature,
             getElementMethod=ElementSearch.AT_OR_BEFORE_OFFSET
         )

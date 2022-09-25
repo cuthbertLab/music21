@@ -359,8 +359,8 @@ class BrailleSegment(text.BrailleText):
         self._groupingDict: dict[SegmentKey, BrailleElementGrouping] = {}
 
         self.groupingKeysToProcess: list[SegmentKey] = []
-        self.currentGroupingKey: t.Optional[SegmentKey] = None
-        self.previousGroupingKey: t.Optional[SegmentKey] = None
+        self.currentGroupingKey: SegmentKey|None = None
+        self.previousGroupingKey: SegmentKey|None = None
         self.lastNote = None
 
         self.showClefSigns: bool = False
@@ -593,7 +593,7 @@ class BrailleSegment(text.BrailleText):
 
     def extractInaccordGrouping(self):
         inaccords = self._groupingDict.get(self.currentGroupingKey)
-        last_clef: t.Optional[clef.Clef] = None
+        last_clef: clef.Clef|None = None
         seen_voice: bool = False
         for music21VoiceOrClef in inaccords:
             if isinstance(music21VoiceOrClef, clef.Clef):
@@ -1403,7 +1403,7 @@ def findSegments(music21Part,
                  showFirstMeasureNumber=True,
                  showHand=None,
                  showHeading=True,
-                 showLongSlursAndTiesTogether: t.Optional[bool] = None,
+                 showLongSlursAndTiesTogether: bool|None = None,
                  showShortSlursAndTiesTogether=False,
                  slurLongPhraseWithBrackets=True,
                  suppressOctaveMarks=False,
@@ -1579,7 +1579,7 @@ def prepareSlurredNotes(music21Part,
                         *,
                         slurLongPhraseWithBrackets=True,
                         showShortSlursAndTiesTogether=False,
-                        showLongSlursAndTiesTogether: t.Optional[bool] = None,
+                        showLongSlursAndTiesTogether: bool|None = None,
                         ):
     '''
     Takes in a :class:`~music21.stream.Part` and three keywords:
@@ -2024,7 +2024,7 @@ def extractBrailleElements(music21MeasureOrVoice: t.Union[stream.Measure, stream
     <music21.bar.Barline type=final>
     '''
     allElements = BrailleElementGrouping()
-    last_clef: t.Optional[clef.Clef] = None
+    last_clef: clef.Clef|None = None
     for music21Object in music21MeasureOrVoice:
         # Hold the clef in memory in case the next object is a voice
         if isinstance(music21Object, clef.Clef):

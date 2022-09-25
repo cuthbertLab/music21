@@ -1206,8 +1206,8 @@ def getPacketFromMidiEvent(
         trackId: int,
         offset: int,
         midiEvent: midi.MidiEvent,
-        obj: t.Optional[base.Music21Object] = None,
-        lastInstrument: t.Optional[instrument.Instrument] = None
+        obj: base.Music21Object|None = None,
+        lastInstrument: instrument.Instrument|None = None
 ) -> dict[str, t.Any]:
     '''
     Pack a dictionary of parameters for each event.
@@ -1628,7 +1628,7 @@ def assignPacketsToChannels(
 
 def filterPacketsByTrackId(
     packetsSrc: list[dict[str, t.Any]],
-    trackIdFilter: t.Optional[int] = None,
+    trackIdFilter: int|None = None,
 ) -> list[dict[str, t.Any]]:
     '''
     Given a list of Packet dictionaries, return a list of
@@ -1880,7 +1880,7 @@ def midiTrackToStream(
     ticksPerQuarter: int = defaults.ticksPerQuarter,
     quantizePost=True,
     inputM21=None,
-    conductorPart: t.Optional[stream.Part] = None,
+    conductorPart: stream.Part|None = None,
     isFirst: bool = False,
     quarterLengthDivisors: Sequence[int] = (),
     **keywords
@@ -2080,7 +2080,7 @@ def midiTrackToStream(
     if conductorPart is not None:
         insertConductorEvents(conductorPart, s, isFirst=isFirst)
 
-    meterStream: t.Optional[stream.Stream] = None
+    meterStream: stream.Stream|None = None
     if conductorPart is not None:
         ts_iter = conductorPart['TimeSignature']
         if ts_iter:
@@ -2590,7 +2590,7 @@ def midiTracksToStreams(
     midiTracks: list[midi.MidiTrack],
     ticksPerQuarter: int = defaults.ticksPerQuarter,
     quantizePost=True,
-    inputM21: t.Optional[stream.Score] = None,
+    inputM21: stream.Score|None = None,
     **keywords
 ) -> stream.Score:
     '''

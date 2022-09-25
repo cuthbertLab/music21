@@ -97,7 +97,7 @@ class Variant(base.Music21Object):
         givenElements: t.Union[None,
                                base.Music21Object,
                                Sequence[base.Music21Object]] = None,
-        name: t.Optional[str] = None,
+        name: str|None = None,
         givenElementsBehavior: GivenElementsBehavior = GivenElementsBehavior.OFFSETS,
         **music21ObjectKeywords,
     ):

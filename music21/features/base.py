@@ -142,7 +142,7 @@ class FeatureExtractor:
     '''
     def __init__(self, dataOrStream=None, **keywords):
         self.stream = None  # the original Stream, or None
-        self.data: t.Optional[DataInstance] = None  # a DataInstance object: use to get data
+        self.data: DataInstance|None = None  # a DataInstance object: use to get data
         self.setData(dataOrStream)
 
         self.feature = None  # Feature object that results from processing

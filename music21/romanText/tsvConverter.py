@@ -534,7 +534,7 @@ class TsvHandler:
             raise ValueError(f'dcml_version {dcml_version} is not in (1, 2)')
         self.tsvFileName = tsvFile
         self.chordList: list[TabChordBase] = []
-        self.m21stream: t.Optional[stream.Score] = None
+        self.m21stream: stream.Score|None = None
         self._head_indices: dict[str, tuple[int, t.Union[type, t.Any]]] = {}
         self._extra_indices: dict[int, str] = {}
         self.dcml_version = dcml_version

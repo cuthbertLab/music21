@@ -264,19 +264,19 @@ class PickleFilter:
     def __init__(self,
                  fp: t.Union[str, pathlib.Path],
                  forceSource: bool = False,
-                 number: t.Optional[int] = None,
+                 number: int|None = None,
                  # quantizePost: bool = False,
                  # quarterLengthDivisors: t.Optional[Iterable[int]] = None,
                  **keywords):
         self.fp: pathlib.Path = common.cleanpath(fp, returnPathlib=True)
         self.forceSource: bool = forceSource
-        self.number: t.Optional[int] = number
+        self.number: int|None = number
         self.keywords: dict[str, t.Any] = keywords
         # environLocal.printDebug(['creating pickle filter'])
 
     def getPickleFp(self,
                     directory: t.Union[pathlib.Path, str, None] = None,
-                    zipType: t.Optional[str] = None) -> pathlib.Path:
+                    zipType: str|None = None) -> pathlib.Path:
         '''
         Returns the file path of the pickle file for this file.
 
@@ -490,7 +490,7 @@ class Converter:
     }
 
     def __init__(self):
-        self.subConverter: t.Optional[subConverters.SubConverter] = None
+        self.subConverter: subConverters.SubConverter|None = None
         # a stream object unthawed
         self._thawedStream: t.Union[stream.Score, stream.Part, stream.Opus, None] = None
 
@@ -514,8 +514,8 @@ class Converter:
     def parseFileNoPickle(
         self,
         fp: t.Union[pathlib.Path, str],
-        number: t.Optional[int] = None,
-        format: t.Optional[str] = None,
+        number: int|None = None,
+        format: str|None = None,
         forceSource: bool = False,
         **keywords
     ):
@@ -703,8 +703,8 @@ class Converter:
         self,
         url: str,
         *,
-        format: t.Optional[str] = None,
-        number: t.Optional[int] = None,
+        format: str|None = None,
+        number: int|None = None,
         forceSource: bool = False,
         **keywords,
     ) -> None:
@@ -1196,8 +1196,8 @@ def parseURL(url,
 def parse(value: t.Union[bundles.MetadataEntry, bytes, str, pathlib.Path],
           *,
           forceSource: bool = False,
-          number: t.Optional[int] = None,
-          format: t.Optional[str] = None,  # pylint: disable=redefined-builtin
+          number: int|None = None,
+          format: str|None = None,  # pylint: disable=redefined-builtin
           **keywords) -> t.Union[stream.Score, stream.Part, stream.Opus]:
     r'''
     Given a file path, encoded data in a Python string, or a URL, attempt to
