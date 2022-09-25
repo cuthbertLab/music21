@@ -98,7 +98,7 @@ class SubConverter:
         # return self.stream
 
     def parseFile(self,
-                  filePath: t.Union[str, pathlib.Path],
+                  filePath: str|pathlib.Path,
                   number: int|None = None,
                   **keywords):
         '''
@@ -273,7 +273,7 @@ class SubConverter:
 
     def writeDataStream(self,
                         fp,
-                        dataStr: t.Union[str, bytes],
+                        dataStr: str|bytes,
                         **keywords) -> pathlib.Path:  # pragma: no cover
         '''
         Writes the data stream to `fp` or to a temporary file and returns the
@@ -713,7 +713,7 @@ class ConverterHumdrum(SubConverter):
         return self.data
 
     def parseFile(self,
-                  filePath: t.Union[pathlib.Path, str],
+                  filePath: pathlib.Path|str,
                   number: int|None = None,
                   **keywords):
         '''
@@ -826,7 +826,7 @@ class ConverterNoteworthy(SubConverter):
         self.stream = noteworthyTranslate.NoteworthyTranslator().parseString(nwcData)
 
     def parseFile(self,
-                  filePath: t.Union[pathlib.Path, str],
+                  filePath: pathlib.Path|str,
                   number: int|None = None,
                   **keywords):
         # noinspection SpellCheckingInspection,PyShadowingNames
@@ -863,7 +863,7 @@ class ConverterNoteworthyBinary(SubConverter):
         self.stream = noteworthyBinary.NWCConverter().parseString(nwcData)
 
     def parseFile(self,
-                  filePath: t.Union[pathlib.Path, str],
+                  filePath: pathlib.Path|str,
                   number: int|None = None,
                   **keywords):
         from music21.noteworthy import binaryTranslate as noteworthyBinary
@@ -885,7 +885,7 @@ class ConverterMusicXML(SubConverter):
                                          }
 
     @staticmethod
-    def findNumberedPNGPath(inputFp: t.Union[str, pathlib.Path]) -> pathlib.Path:
+    def findNumberedPNGPath(inputFp: str|pathlib.Path) -> pathlib.Path:
         '''
         Find the first numbered file path corresponding to the provided unnumbered file path
         ending in ".png". Raises an exception if no file can be found.
@@ -920,7 +920,7 @@ class ConverterMusicXML(SubConverter):
         self.stream = c.stream
 
     def parseFile(self,
-                  filePath: t.Union[str, pathlib.Path],
+                  filePath: str|pathlib.Path,
                   number: int|None = None,
                   **keywords):
         '''
@@ -1027,7 +1027,7 @@ class ConverterMusicXML(SubConverter):
 
     def writeDataStream(self,
                         fp,
-                        dataStr: t.Union[str, bytes],
+                        dataStr: str|bytes,
                         **keywords) -> pathlib.Path:  # pragma: no cover
         # noinspection PyShadowingNames
         '''
@@ -1185,7 +1185,7 @@ class ConverterMidi(SubConverter):
         self.stream = midiTranslate.midiStringToStream(strData, **self.keywords)
 
     def parseFile(self,
-                  filePath: t.Union[pathlib.Path, str],
+                  filePath: pathlib.Path|str,
                   number: int|None = None,
                   **keywords):
         '''
@@ -1250,7 +1250,7 @@ class ConverterABC(SubConverter):
             abcFormat.translate.abcToStreamScore(abcHandler, self.stream)
 
     def parseFile(self,
-                  filePath: t.Union[pathlib.Path, str],
+                  filePath: pathlib.Path|str,
                   number: int|None = None,
                   **keywords):
         '''
@@ -1301,7 +1301,7 @@ class ConverterRomanText(SubConverter):
             romanTextTranslate.romanTextToStreamScore(rtHandler, self.stream)
 
     def parseFile(self,
-                  filePath: t.Union[pathlib.Path, str],
+                  filePath: pathlib.Path|str,
                   number: int|None = None,
                   **keywords):
         from music21.romanText import rtObjects
@@ -1348,7 +1348,7 @@ class ConverterClercqTemperley(SubConverter):
         self.stream = ctSong.toScore()
 
     def parseFile(self,
-                  filePath: t.Union[pathlib.Path, str],
+                  filePath: pathlib.Path|str,
                   number=None,
                   **keywords):
         self.parseData(filePath)
@@ -1375,7 +1375,7 @@ class ConverterCapella(SubConverter):
         self.stream = partScore
 
     def parseFile(self,
-                  filePath: t.Union[str, pathlib.Path],
+                  filePath: str|pathlib.Path,
                   number: int|None = None,
                   **keywords):
         '''
@@ -1413,7 +1413,7 @@ class ConverterMuseData(SubConverter):
         musedataTranslate.museDataWorkToStreamScore(mdw, self.stream)
 
     def parseFile(self,
-                  filePath: t.Union[str, pathlib.Path],
+                  filePath: str|pathlib.Path,
                   number: int|None = None,
                   **keywords):
         '''
@@ -1489,7 +1489,7 @@ class ConverterMEI(SubConverter):
 
     def parseFile(
         self,
-        filePath: t.Union[str, pathlib.Path],
+        filePath: str|pathlib.Path,
         number: int|None = None,
         **keywords,
     ) -> stream.Stream:

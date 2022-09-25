@@ -120,8 +120,8 @@ excludeFromBrailleElements: list[type[base.Music21Object]] = [
 ]
 
 class GroupingGlobals(t.TypedDict):
-    keySignature: t.Optional[key.KeySignature]
-    timeSignature: t.Optional[meter.TimeSignature]
+    keySignature: key.KeySignature|None
+    timeSignature: meter.TimeSignature|None
 
 
 GROUPING_GLOBALS: GroupingGlobals = {
@@ -1092,8 +1092,8 @@ class BrailleGrandSegment(BrailleSegment, text.BrailleKeyboard):
     def __init__(self, lineLength: int = 40):
         BrailleSegment.__init__(self, lineLength=lineLength)
         text.BrailleKeyboard.__init__(self, lineLength=lineLength)
-        self.allKeyPairs: list[tuple[t.Optional[SegmentKey],
-                                     t.Optional[SegmentKey]]] = []
+        self.allKeyPairs: list[tuple[SegmentKey|None,
+                                     SegmentKey|None]] = []
         self.previousGroupingPair = None
         self.currentGroupingPair = None
 
@@ -1980,7 +1980,7 @@ def getRawSegments(music21Part,
     return allSegments
 
 
-def extractBrailleElements(music21MeasureOrVoice: t.Union[stream.Measure, stream.Voice]):
+def extractBrailleElements(music21MeasureOrVoice: stream.Measure|stream.Voice):
     '''
     Takes in a :class:`~music21.stream.Measure` or :class:`~music21.stream.Voice`
     and returns a :class:`~music21.braille.segment.BrailleElementGrouping` of correctly ordered

@@ -335,7 +335,7 @@ class Lyric(prebase.ProtoM21Object, style.StyleMixin):
         self._syllabic = newSyllabic
 
     @property
-    def identifier(self) -> t.Union[str, int]:
+    def identifier(self) -> str|int:
         '''
         By default, this is the same as self.number. However, if there is a
         descriptive identifier like 'part2verse1', it is stored here and
@@ -363,7 +363,7 @@ class Lyric(prebase.ProtoM21Object, style.StyleMixin):
             return self._identifier
 
     @identifier.setter
-    def identifier(self, value: t.Union[str, None]):
+    def identifier(self, value: str|None):
         self._identifier = value
 
     @property
@@ -656,7 +656,7 @@ class GeneralNote(base.Music21Object):
         allText = [ly.text for ly in self.lyrics]
         return '\n'.join([textStr for textStr in allText if textStr is not None])
 
-    def _setLyric(self, value: t.Union[str, Lyric, None]) -> None:
+    def _setLyric(self, value: str|Lyric|None) -> None:
         self.lyrics = []
         if value is None:
             return
@@ -1131,7 +1131,7 @@ class NotRest(GeneralNote):
         self._notehead = value
 
     @property
-    def noteheadFill(self) -> t.Union[bool, None]:
+    def noteheadFill(self) -> bool|None:
         '''
         Get or set the note head fill status of this NotRest. Valid note head fill values are
         True, False, or None (meaning default).  "yes" and "no" are converted to True
@@ -1152,7 +1152,7 @@ class NotRest(GeneralNote):
         return self._noteheadFill
 
     @noteheadFill.setter
-    def noteheadFill(self, value: t.Union[bool, None, str]):
+    def noteheadFill(self, value: bool|None|str):
         boolValue: bool|None
         if value in ('none', None, 'default'):
             boolValue = None  # allow setting to none or None
@@ -1191,7 +1191,7 @@ class NotRest(GeneralNote):
         return self._noteheadParenthesis
 
     @noteheadParenthesis.setter
-    def noteheadParenthesis(self, value: t.Union[bool, str, int]):
+    def noteheadParenthesis(self, value: bool|str|int):
         boolValue: bool
         if value in (True, 'yes', 1):
             boolValue = True
@@ -1239,7 +1239,7 @@ class NotRest(GeneralNote):
 
         return volume_out
 
-    def _setVolume(self, value: t.Union[None, volume.Volume, int, float], setClient=True):
+    def _setVolume(self, value: None|volume.Volume|int|float, setClient=True):
         # DO NOT CHANGE TO @property because of optional attributes
         # setClient is only False when Chords are bundling Notes.
         if value is None:
@@ -1280,7 +1280,7 @@ class NotRest(GeneralNote):
         return self._getVolume()
 
     @volume.setter
-    def volume(self, value: t.Union[None, volume.Volume, int, float]):
+    def volume(self, value: None|volume.Volume|int|float):
         self._setVolume(value)
 
     def _getStoredInstrument(self):

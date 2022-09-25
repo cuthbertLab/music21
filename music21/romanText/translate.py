@@ -228,7 +228,7 @@ def _copySingleMeasure(rtTagged, p, kCurrent):
 
 def _copyMultipleMeasures(rtMeasure: rtObjects.RTMeasure,
                           p: stream.Part,
-                          kCurrent: t.Optional[key.Key]):
+                          kCurrent: key.Key|None):
     '''
     Given a RomanText token for a RTMeasure, a
     Part used as the current container, and the current Key,
@@ -1701,7 +1701,7 @@ m1 C: I'''
             rn_iter = measure[roman.RomanNumeral]
             self.assertEqual(len(rn_iter), 1)
             # mypy complains about the next line because
-            #   RecursiveIterator.first() has t.Optional type, but we know
+            #   RecursiveIterator.first() has X|None type, but we know
             #   it will not be None because we have just asserted that rn_iter
             #   has length 1
             self.assertEqual(rn_iter.first().figure, 'I')  # type: ignore

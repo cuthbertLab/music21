@@ -53,7 +53,7 @@ def makeBeams(
     inPlace=False,
     setStemDirections=True,
     failOnNoTimeSignature=False,
-) -> t.Optional[StreamType]:
+) -> StreamType|None:
     # noinspection PyShadowingNames
     '''
     Return a new Measure, or Stream of Measures, with beams applied to all
@@ -237,7 +237,7 @@ def makeMeasures(
     finalBarline='final',
     bestClef=False,
     inPlace=False,
-) -> t.Optional[StreamType]:
+) -> StreamType|None:
     '''
     Takes a stream and places all of its elements into
     measures (:class:`~music21.stream.Measure` objects)
@@ -716,7 +716,7 @@ def makeRests(
     timeRangeFromBarDuration=False,
     inPlace=False,
     hideRests=False,
-) -> t.Optional[StreamType]:
+) -> StreamType|None:
     '''
     Given a Stream with an offset not equal to zero,
     fill with one Rest preceding this offset.
@@ -993,7 +993,7 @@ def makeTies(
     inPlace=False,
     displayTiedAccidentals=False,
     classFilterList=(note.GeneralNote,),
-) -> t.Optional[StreamType]:
+) -> StreamType|None:
     # noinspection PyShadowingNames
     '''
     Given a stream containing measures, examine each element in the
@@ -1338,7 +1338,7 @@ def makeTies(
         return None
 
 
-def makeTupletBrackets(s: StreamType, *, inPlace=False) -> t.Optional[StreamType]:
+def makeTupletBrackets(s: StreamType, *, inPlace=False) -> StreamType|None:
     # noinspection PyShadowingNames
     '''
     Given a flat Stream of mixed durations, designates the first and last tuplet of any group
@@ -1377,7 +1377,7 @@ def makeTupletBrackets(s: StreamType, *, inPlace=False) -> t.Optional[StreamType
         durationList.append(n.duration)
 
     # a list of (tuplet obj, Duration) pairs
-    tupletMap: list[tuple[t.Optional[duration.Tuplet], duration.Duration]] = []
+    tupletMap: list[tuple[duration.Tuplet|None, duration.Duration]] = []
 
     for dur in durationList:  # all Duration objects
         tupletList = dur.tuplets
@@ -1556,7 +1556,7 @@ def moveNotesToVoices(source: StreamType,
     source.insert(0, dst)
 
 
-def getTiePitchSet(prior: 'music21.note.NotRest') -> t.Optional[set[str]]:
+def getTiePitchSet(prior: 'music21.note.NotRest') -> set[str]|None:
     # noinspection PyShadowingNames,PyTypeChecker
     '''
     helper method for makeAccidentals to get the tie pitch set (or None)
@@ -1614,17 +1614,17 @@ def getTiePitchSet(prior: 'music21.note.NotRest') -> t.Optional[set[str]]:
     return tiePitchSet
 
 def makeAccidentalsInMeasureStream(
-    s: t.Union[StreamType, StreamIterator],
+    s: StreamType|StreamIterator,
     *,
-    pitchPast: t.Optional[list[pitch.Pitch]] = None,
-    pitchPastMeasure: t.Optional[list[pitch.Pitch]] = None,
+    pitchPast: list[pitch.Pitch]|None = None,
+    pitchPastMeasure: list[pitch.Pitch]|None = None,
     useKeySignature: bool|key.KeySignature = True,
-    alteredPitches: t.Optional[list[pitch.Pitch]] = None,
+    alteredPitches: list[pitch.Pitch]|None = None,
     cautionaryPitchClass: bool = True,
     cautionaryAll: bool = False,
     overrideStatus: bool = False,
     cautionaryNotImmediateRepeat: bool = True,
-    tiePitchSet: t.Optional[set[str]] = None
+    tiePitchSet: set[str]|None = None
 ) -> None:
     '''
     Makes accidentals in place on a stream that contains Measures.

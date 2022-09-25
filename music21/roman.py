@@ -525,7 +525,7 @@ def figureTupleSolo(
 
 
 def identifyAsTonicOrDominant(
-    inChord: t.Union[list, tuple, chord.Chord],
+    inChord: list|tuple|chord.Chord,
     inKey: key.Key
 ) -> t.Union[str, t.Literal[False]]:
     '''
@@ -2238,7 +2238,7 @@ class RomanNumeral(harmony.Harmony):
     def __init__(
         self,
         figure: str|int = '',
-        keyOrScale: t.Optional[t.Union[key.Key, scale.ConcreteScale, str]] = None,
+        keyOrScale: key.Key|scale.ConcreteScale|str|None = None,
         *,
         caseMatters=True,
         updatePitches=True,
@@ -2247,7 +2247,7 @@ class RomanNumeral(harmony.Harmony):
     ):
         self.primaryFigure: str = ''
         self.secondaryRomanNumeral: RomanNumeral|None = None
-        self.secondaryRomanNumeralKey: 'key.Key'|None = None
+        self.secondaryRomanNumeralKey: key.Key|None = None
 
         self.pivotChord: RomanNumeral|None = None
         self.caseMatters: bool = caseMatters
@@ -2579,9 +2579,9 @@ class RomanNumeral(harmony.Harmony):
 
     def _correctForSecondaryRomanNumeral(
         self,
-        useScale: t.Union[key.Key, scale.ConcreteScale],
+        useScale: key.Key|scale.ConcreteScale,
         figure: str|None = None
-    ) -> tuple[str, t.Union[key.Key, scale.ConcreteScale]]:
+    ) -> tuple[str, key.Key|scale.ConcreteScale]:
         '''
         Creates .secondaryRomanNumeral object and .secondaryRomanNumeralKey Key object
         inside the RomanNumeral object (recursively in case of V/V/V/V etc.) and returns
@@ -2793,8 +2793,8 @@ class RomanNumeral(harmony.Harmony):
     def _parseRNAloneAmidstAug6(
         self,
         workingFigure: str,
-        useScale: t.Union[key.Key, scale.ConcreteScale],
-    ) -> tuple[str, t.Union[key.Key, scale.ConcreteScale]]:
+        useScale: key.Key|scale.ConcreteScale,
+    ) -> tuple[str, key.Key|scale.ConcreteScale]:
         # noinspection PyShadowingNames
         '''
         Sets and removes from workingFigure the roman numeral alone, possibly
@@ -2901,7 +2901,7 @@ class RomanNumeral(harmony.Harmony):
 
     def adjustMinorVIandVIIByQuality(
         self,
-        useScale: t.Union[key.Key, scale.ConcreteScale]
+        useScale: key.Key|scale.ConcreteScale
     ) -> None:
         '''
         Fix minor vi and vii to always be #vi and #vii if `.caseMatters`.
@@ -2933,7 +2933,7 @@ class RomanNumeral(harmony.Harmony):
     def _adjustMinorVIandVIIByQuality(
         self,
         workingFigure: str,
-        useScale: t.Union[key.Key, scale.ConcreteScale]
+        useScale: key.Key|scale.ConcreteScale
     ) -> str:
         '''
         Fix minor vi and vii to always be #vi and #vii if `.caseMatters`.
@@ -3045,7 +3045,7 @@ class RomanNumeral(harmony.Harmony):
         '''
         Utility function to update the pitches to the new figure etc.
         '''
-        useScale: t.Union[key.Key, scale.ConcreteScale]
+        useScale: key.Key|scale.ConcreteScale
         if self.secondaryRomanNumeralKey is not None:
             useScale = self.secondaryRomanNumeralKey
         elif self.useImpliedScale and self.impliedScale is not None:
@@ -3352,7 +3352,7 @@ class RomanNumeral(harmony.Harmony):
             #     ])
 
     @property
-    def scaleDegreeWithAlteration(self) -> tuple[int, t.Optional[pitch.Accidental]]:
+    def scaleDegreeWithAlteration(self) -> tuple[int, pitch.Accidental|None]:
         '''
         Returns a two element tuple of the scale degree and the
         accidental that alters the scale degree for things such as #ii or

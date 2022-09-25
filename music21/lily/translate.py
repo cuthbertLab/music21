@@ -1528,7 +1528,7 @@ class LilypondConverter:
 
     def lyMultipliedDurationFromDuration(
         self,
-        durationObj: t.Union[duration.Duration, duration.DurationTuple],
+        durationObj: duration.Duration|duration.DurationTuple,
     ):
         r'''
         take a simple Duration (that is, one with one DurationTuple)
@@ -1568,7 +1568,7 @@ class LilypondConverter:
         >>> [str(lpc.lyMultipliedDurationFromDuration(c)) for c in components]
         ['1 ', '4 ']
         '''
-        number_type: t.Union[float, int, str]
+        number_type: float|int|str
         try:
             number_type = duration.convertTypeToNumber(durationObj.type)  # module call
         except duration.DurationException as de:

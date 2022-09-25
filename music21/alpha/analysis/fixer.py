@@ -351,7 +351,7 @@ class OrnamentFixer(OMRMidiFixer):
             self.recognizers = recognizers
         self.markChangeColor = markChangeColor
 
-    def findOrnament(self, busyNotes, simpleNotes) -> t.Optional[expressions.Ornament]:
+    def findOrnament(self, busyNotes, simpleNotes) -> expressions.Ornament|None:
         '''
         Finds an ornament in busyNotes based from simpleNote
         using provided recognizers.
@@ -390,7 +390,7 @@ class OrnamentFixer(OMRMidiFixer):
             return True
         return False
 
-    def fix(self, *, show=False, inPlace=True) -> t.Optional[OMRMidiFixer]:
+    def fix(self, *, show=False, inPlace=True) -> OMRMidiFixer|None:
         '''
         Corrects missed ornaments in omrStream according to midiStream
         :param show: Whether to show results

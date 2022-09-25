@@ -2335,7 +2335,7 @@ class ChordSymbol(Harmony):
         else:
             return False
 
-    def transpose(self: T, value, *, inPlace=False) -> t.Optional[T]:
+    def transpose(self: T, value, *, inPlace=False) -> T|None:
         '''
         Overrides :meth:`~music21.chord.Chord.transpose` so that this ChordSymbol's
         `figure` is appropriately cleared afterward.
@@ -2441,7 +2441,7 @@ class NoChord(ChordSymbol):
         # do nothing, everything is already set.
         return
 
-    def transpose(self: NCT, _value, *, inPlace=False) -> t.Optional[NCT]:
+    def transpose(self: NCT, _value, *, inPlace=False) -> NCT|None:
         '''
         Overrides :meth:`~music21.chord.Chord.transpose` to do nothing.
 

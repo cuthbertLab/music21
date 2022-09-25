@@ -36,11 +36,11 @@ def listOfTreesByClass(
     inputStream: StreamType,
     *,
     classLists: Sequence[Sequence[type[M21ObjType]]] = (),
-    currentParentage: t.Optional[tuple[stream.Stream, ...]] = None,
+    currentParentage: tuple[stream.Stream, ...]|None = None,
     initialOffset: float = 0.0,
     flatten: bool|str = False,
     useTimespans: bool = False
-) -> list[t.Union[trees.OffsetTree, timespanTree.TimespanTree]]:
+) -> list[trees.OffsetTree|timespanTree.TimespanTree]:
     # noinspection PyShadowingNames
     r'''
     To be DEPRECATED in v8: this is no faster than calling streamToTimespanTree
@@ -160,11 +160,11 @@ def listOfTreesByClass(
 def asTree(
     inputStream: StreamType,
     *,
-    flatten: t.Union[t.Literal['semiFlat'], bool] = False,
-    classList: t.Optional[Sequence[type]] = None,
+    flatten: t.Literal['semiFlat']|bool = False,
+    classList: Sequence[type]|None = None,
     useTimespans: bool = False,
     groupOffsets: bool = False
-) -> t.Union[trees.OffsetTree, trees.ElementTree, timespanTree.TimespanTree]:
+) -> trees.OffsetTree|trees.ElementTree|timespanTree.TimespanTree:
     '''
     Converts a Stream and constructs an :class:`~music21.tree.trees.ElementTree` based on this.
 
@@ -294,9 +294,9 @@ def asTree(
 def makeFastShallowTreeFromSortedStream(
     inputStream: stream.Stream,
     *,
-    outputTree: t.Union[trees.OffsetTree, trees.ElementTree],
-    classList: t.Optional[Sequence[type]] = None,
-) -> t.Union[trees.OffsetTree, trees.ElementTree]:
+    outputTree: trees.OffsetTree|trees.ElementTree,
+    classList: Sequence[type]|None = None,
+) -> trees.OffsetTree|trees.ElementTree:
     '''
     Use populateFromSortedList to quickly make a tree from a stream.
 
@@ -322,7 +322,7 @@ def asTimespans(
     inputStream,
     *,
     flatten: str|bool = False,
-    classList: t.Optional[Sequence[type[Music21Object]]] = None
+    classList: Sequence[type[Music21Object]]|None = None
 ) -> timespanTree.TimespanTree:
     r'''
     Recurses through a score and constructs a

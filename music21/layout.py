@@ -160,7 +160,7 @@ class ScoreLayout(LayoutBase):
                  wordFont: str|None = None,
                  pageLayout: PageLayout|None = None,
                  systemLayout: SystemLayout|None = None,
-                 staffLayoutList: t.Optional[list[StaffLayout]] = None,
+                 staffLayoutList: list[StaffLayout]|None = None,
                  **keywords):
         super().__init__(**keywords)
 
@@ -1288,7 +1288,7 @@ class LayoutScore(stream.Opus):
         self,
         pageId: int,
         systemId: int
-    ) -> tuple[t.Optional[int], int]:
+    ) -> tuple[int|None, int]:
         # noinspection PyShadowingNames
         '''
         given a pageId and systemId, get the (pageId, systemId) for the previous system.

@@ -206,7 +206,7 @@ class StreamSearcher:
 
         self.algorithms: list[
             Callable[[Stream, m21Base.Music21Object],
-                     t.Union[bool, None]]
+                     bool|None]
         ] = [StreamSearcher.wildcardAlgorithm]
 
         self.activeIterator = None

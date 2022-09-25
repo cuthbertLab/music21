@@ -535,7 +535,7 @@ class TsvHandler:
         self.tsvFileName = tsvFile
         self.chordList: list[TabChordBase] = []
         self.m21stream: stream.Score|None = None
-        self._head_indices: dict[str, tuple[int, t.Union[type, t.Any]]] = {}
+        self._head_indices: dict[str, tuple[int, type|t.Any]] = {}
         self._extra_indices: dict[int, str] = {}
         self.dcml_version = dcml_version
         self.tsvData = self._importTsv()  # converted to private

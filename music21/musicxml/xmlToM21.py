@@ -80,7 +80,7 @@ _recognizableKeys: list[str] = list(
 
 # ------------------------------------------------------------------------------
 # Helpers...
-def _clean(badStr: t.Optional[str]) -> t.Optional[str]:
+def _clean(badStr: str|None) -> str|None:
     # need to remove badly-formed strings
     if badStr is None:
         return None
@@ -1550,8 +1550,8 @@ class PartParser(XMLParserBase):
         self.lastMeasureOffset = 0.0
 
         # a dict of clefs per staff number
-        self.lastClefs: dict[int, t.Optional[clef.Clef]] = {NO_STAFF_ASSIGNED: clef.TrebleClef()}
-        self.activeTuplets: list[t.Optional[duration.Tuplet]] = [None] * 7
+        self.lastClefs: dict[int, clef.Clef|None] = {NO_STAFF_ASSIGNED: clef.TrebleClef()}
+        self.activeTuplets: list[duration.Tuplet|None] = [None] * 7
 
         self.maxStaves = 1  # will be changed in measure parsing...
 
@@ -2356,9 +2356,9 @@ class MeasureParser(XMLParserBase):
         self.staffReference: StaffReferenceType = {}
         if parent is not None:
             # list of current tuplets or Nones
-            self.activeTuplets: list[t.Optional[duration.Tuplet]] = parent.activeTuplets
+            self.activeTuplets: list[duration.Tuplet|None] = parent.activeTuplets
         else:
-            self.activeTuplets: list[t.Optional[duration.Tuplet]] = [None] * 7
+            self.activeTuplets: list[duration.Tuplet|None] = [None] * 7
 
         self.useVoices = False
         self.voicesById = {}
@@ -2379,7 +2379,7 @@ class MeasureParser(XMLParserBase):
         # key is a tuple of the
         #     staff number (or None) and offsetMeasureNote, and the value is a
         #     StaffLayout object.
-        self.staffLayoutObjects: dict[tuple[t.Optional[int], float], layout.StaffLayout] = {}
+        self.staffLayoutObjects: dict[tuple[int|None, float], layout.StaffLayout] = {}
         self.stream = stream.Measure()
 
         self.mxNoteList = []  # for accumulating notes in chords
@@ -2399,11 +2399,11 @@ class MeasureParser(XMLParserBase):
         self.restAndNoteCount = {'rest': 0, 'note': 0}
         if parent is not None:
             # share dict
-            self.lastClefs: dict[int, t.Optional[clef.Clef]] = self.parent.lastClefs
+            self.lastClefs: dict[int, clef.Clef|None] = self.parent.lastClefs
 
         else:
             # a dict of clefs for staffIndexes:
-            self.lastClefs: dict[int, t.Optional[clef.Clef]] = {NO_STAFF_ASSIGNED: None}
+            self.lastClefs: dict[int, clef.Clef|None] = {NO_STAFF_ASSIGNED: None}
         self.parseIndex = 0
 
         # what is the offset in the measure of the current note position?
@@ -2898,7 +2898,7 @@ class MeasureParser(XMLParserBase):
         self.spannerBundle.freePendingSpannedElementAssignment(c)
         return c
 
-    def xmlToSimpleNote(self, mxNote, freeSpanners=True) -> t.Union[note.Note, note.Unpitched]:
+    def xmlToSimpleNote(self, mxNote, freeSpanners=True) -> note.Note|note.Unpitched:
         # noinspection PyShadowingNames
         '''
         Translate a MusicXML <note> (without <chord/>)
@@ -2946,7 +2946,7 @@ class MeasureParser(XMLParserBase):
         '''
         d = self.xmlToDuration(mxNote)
 
-        n: t.Union[note.Note, note.Unpitched]
+        n: note.Note|note.Unpitched
 
         mxUnpitched = mxNote.find('unpitched')
         if mxUnpitched is None:
@@ -4369,7 +4369,7 @@ class MeasureParser(XMLParserBase):
         remainingTupletAmountToAccountFor = tup.tupletMultiplier()
         timeModTup = tup
 
-        returnTuplets: list[t.Optional[duration.Tuplet]] = [None] * 8
+        returnTuplets: list[duration.Tuplet|None] = [None] * 8
         removeFromActiveTuplets = set()
 
         # a set of tuplets to set to stop...
@@ -4510,7 +4510,7 @@ class MeasureParser(XMLParserBase):
             n.lyrics.append(lyricObj)
             currentLyricNumber += 1
 
-    def xmlToLyric(self, mxLyric, inputM21=None) -> t.Optional[note.Lyric]:
+    def xmlToLyric(self, mxLyric, inputM21=None) -> note.Lyric|None:
         # noinspection PyShadowingNames
         '''
         Translate a MusicXML <lyric> tag to a
@@ -5884,7 +5884,7 @@ class MeasureParser(XMLParserBase):
         self,
         mxDetails,
         m21staffLayout: layout.StaffLayout|None = None
-    ) -> t.Optional[layout.StaffLayout]:
+    ) -> layout.StaffLayout|None:
         # noinspection PyShadowingNames
         '''
         Returns a new StaffLayout object from staff-details or sets attributes on an existing one

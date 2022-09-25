@@ -574,7 +574,7 @@ class AVLTree(prebase.ProtoM21Object):
         <AVLNode: Start:1 Height:1 L:0 R:0> '1'
         <AVLNode: Start:0 Height:0 L:None R:None> '0'
         '''
-        def recurse(subListOfTuples) -> t.Optional[AVLNode]:
+        def recurse(subListOfTuples) -> AVLNode|None:
             '''
             Divide and conquer.
             '''

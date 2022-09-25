@@ -30,7 +30,7 @@ from music21.figuredBass import rules
 # used below
 _MOD = 'figuredBass.segment'
 
-_defaultRealizerScale: dict[str, t.Optional[realizerScale.FiguredBassScale]] = {
+_defaultRealizerScale: dict[str, realizerScale.FiguredBassScale|None] = {
     'scale': None,  # singleton
 }
 

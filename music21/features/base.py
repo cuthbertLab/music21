@@ -16,7 +16,6 @@ from collections.abc import KeysView
 import os
 import pathlib
 import pickle
-import typing as t
 import unittest
 
 from music21 import common

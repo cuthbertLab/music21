@@ -387,7 +387,7 @@ class PartStaffExporterMixin:
         DIVIDER_COMMENT = '========================= Measure [NNN] =========================='
         PLACEHOLDER = '[NNN]'
 
-        def makeDivider(inner_sourceNumber: t.Union[int, str]) -> Element:
+        def makeDivider(inner_sourceNumber: int|str) -> Element:
             return Comment(DIVIDER_COMMENT.replace(PLACEHOLDER, str(inner_sourceNumber)))
 
         sourceMeasures = iter(source.findall('measure'))

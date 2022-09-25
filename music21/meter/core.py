@@ -16,7 +16,6 @@ This module defines two component objects for defining nested metrical structure
 from __future__ import annotations
 
 import copy
-import typing as t
 
 from music21 import prebase
 from music21.common.numberTools import opFrac

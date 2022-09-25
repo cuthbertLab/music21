@@ -12,7 +12,6 @@
 # -----------------------------------------------------------------------------
 from __future__ import annotations
 
-import typing as t
 from dataclasses import dataclass
 
 from music21.metadata.primitives import (DatePrimitive, Text, Contributor, Copyright, ValueType)

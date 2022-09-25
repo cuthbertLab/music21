@@ -196,7 +196,7 @@ class Derivation(SlottedObjectMixin):
     # PUBLIC PROPERTIES #
 
     @property
-    def client(self) -> t.Optional[base.Music21Object]:
+    def client(self) -> base.Music21Object|None:
         c = common.unwrapWeakref(self._client)
         if c is None and self._clientId is not None:
             self._clientId = None
@@ -206,7 +206,7 @@ class Derivation(SlottedObjectMixin):
         return c
 
     @client.setter
-    def client(self, client: t.Optional[base.Music21Object]):
+    def client(self, client: base.Music21Object|None):
         # client is the Stream that this derivation lives on
         if client is None:
             self._clientId = None
@@ -247,7 +247,7 @@ class Derivation(SlottedObjectMixin):
             origin = origin.derivation.origin
 
     @property
-    def method(self) -> t.Optional[str]:
+    def method(self) -> str|None:
         '''
         Returns or sets the string of the method that was used to generate this
         Stream.
@@ -287,15 +287,15 @@ class Derivation(SlottedObjectMixin):
         return self._method
 
     @method.setter
-    def method(self, method: t.Optional[str]):
+    def method(self, method: str|None):
         self._method = method
 
     @property
-    def origin(self) -> t.Optional[base.Music21Object]:
+    def origin(self) -> base.Music21Object|None:
         return self._origin
 
     @origin.setter
-    def origin(self, origin: t.Optional[base.Music21Object]):
+    def origin(self, origin: base.Music21Object|None):
         # for now, origin is not a weak ref
         if origin is None:
             self._originId = None
@@ -306,7 +306,7 @@ class Derivation(SlottedObjectMixin):
             # self._origin = common.wrapWeakref(origin)
 
     @property
-    def rootDerivation(self) -> t.Optional[base.Music21Object]:
+    def rootDerivation(self) -> base.Music21Object|None:
         r'''
         Return a reference to the oldest source of this Stream; that is, chain
         calls to :attr:`~music21.stream.Stream.derivesFrom` until we get to a

@@ -1075,8 +1075,8 @@ class Iterator:
                  returnType: str = 'stream',
                  iterationType: str = 'number',
                  analysis: bool = False,
-                 numberList: t.Optional[list[int]] = None,
-                 titleList: t.Optional[list[str]] = None,
+                 numberList: list[int]|None = None,
+                 titleList: list[str]|None = None,
                  ):
         '''
         By default: numberingSystem = 'riemenschneider', currentNumber = 1,

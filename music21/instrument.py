@@ -47,7 +47,7 @@ environLocal = environment.Environment('instrument')
 
 def unbundleInstruments(streamIn: stream.Stream,
                         *,
-                        inPlace=False) -> t.Optional[stream.Stream]:
+                        inPlace=False) -> stream.Stream|None:
     # noinspection PyShadowingNames
     '''
     takes a :class:`~music21.stream.Stream` that has :class:`~music21.note.NotRest` objects
@@ -86,7 +86,7 @@ def unbundleInstruments(streamIn: stream.Stream,
 
 def bundleInstruments(streamIn: stream.Stream,
                       *,
-                      inPlace=False) -> t.Optional[stream.Stream]:
+                      inPlace=False) -> stream.Stream|None:
     # noinspection PyShadowingNames
     '''
     >>> up1 = note.Unpitched()

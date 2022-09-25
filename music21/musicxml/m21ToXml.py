@@ -279,7 +279,7 @@ def _setAttributeFromAttribute(m21El, xmlEl, xmlAttributeName, attributeName=Non
 
 
 def _synchronizeIds(element: Element,
-                    m21Object: t.Optional[prebase.ProtoM21Object]) -> None:
+                    m21Object: prebase.ProtoM21Object|None) -> None:
     # noinspection PyTypeChecker
     '''
     MusicXML 3.1 defines the id attribute (entity: %optional-unique-id)
@@ -1459,7 +1459,7 @@ class ScoreExporter(XMLExporterBase, PartStaffExporterMixin):
         self.scoreMetadata = None
 
         self.spannerBundle: spanner.SpannerBundle|None = None
-        self.meterStream: t.Optional[stream.Stream[meter.TimeSignatureBase]] = None
+        self.meterStream: stream.Stream[meter.TimeSignatureBase]|None = None
         self.scoreLayouts = None
         self.firstScoreLayout = None
         self.textBoxes = None
@@ -1474,8 +1474,8 @@ class ScoreExporter(XMLExporterBase, PartStaffExporterMixin):
         self.instrumentsByStream: dict[int, stream.Stream] = {}
 
         self.instrumentList: list[instrument.Instrument] = []
-        self.instrumentIdList: list[t.Optional[str]] = []
-        self.midiChannelList: list[t.Optional[int]] = []
+        self.instrumentIdList: list[str|None] = []
+        self.midiChannelList: list[int|None] = []
 
         self.parts: list[stream.Part] = []
 
@@ -2659,7 +2659,7 @@ class PartExporter(XMLExporterBase):
 
         self.previousPartStaffInGroup: stream.PartStaff|None = None
 
-        self.instrumentStream: t.Optional[stream.Stream[instrument.Instrument]] = None
+        self.instrumentStream: stream.Stream[instrument.Instrument] | None = None
         self.firstInstrumentObject = None
 
         # keep track of this so that we only put out new attributes when something
@@ -3988,7 +3988,7 @@ class MeasureExporter(XMLExporterBase):
     def setNoteInstrument(self,
                           n: note.NotRest,
                           mxNote: Element,
-                          chordParent: t.Optional[chord.Chord]):
+                          chordParent: chord.Chord|None):
         '''
         Insert <instrument> tags if necessary, that is, when there is more than one
         instrument anywhere in the same musicxml <part>.
@@ -4414,7 +4414,7 @@ class MeasureExporter(XMLExporterBase):
 
         return mxFrameNote
 
-    def fretBoardToXml(self, fretBoard) -> t.Optional[Element]:
+    def fretBoardToXml(self, fretBoard) -> Element|None:
         '''
         The ChordWithFretBoard Object combines chord symbols with FretNote objects.
 
@@ -6468,7 +6468,7 @@ class MeasureExporter(XMLExporterBase):
         # TODO: staff-size
         return mxStaffDetails
 
-    def timeSignatureToXml(self, ts: t.Union[meter.TimeSignature, meter.SenzaMisuraTimeSignature]):
+    def timeSignatureToXml(self, ts: meter.TimeSignature|meter.SenzaMisuraTimeSignature):
         '''
         Returns a single <time> tag from a meter.TimeSignature object.
 

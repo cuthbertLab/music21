@@ -222,7 +222,7 @@ def objectToBraille(music21Obj: base.Music21Object,
                                 upperFirstInNoteFingering=upperFirstInNoteFingering,
                                 )
 
-def streamToBraille(music21Stream: t.Union[stream.Measure, stream.Part, stream.Score, stream.Opus],
+def streamToBraille(music21Stream: stream.Measure|stream.Part|stream.Score|stream.Opus,
                     *,
                     inPlace=False,
                     debug=False,

@@ -21,7 +21,6 @@ and :class:`music21.analysis.discrete.Ambitus` (for pitch range analysis) classe
 '''
 from __future__ import annotations
 
-import typing as t
 import unittest
 import warnings
 

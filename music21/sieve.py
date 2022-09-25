@@ -1978,7 +1978,7 @@ class PitchSieve:
         #            self.sieveObject.period())
         p = self.sieveObject.period()
 
-        z: t.Optional[list[int]]
+        z: list[int]|None
         if p < 999999999:
             z = list(range(p + 1))
         else:  # too big to get z as list of values

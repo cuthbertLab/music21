@@ -742,7 +742,7 @@ class Music21Object(prebase.ProtoM21Object):
         return self._style
 
     @style.setter
-    def style(self, newStyle: t.Optional[Style]):
+    def style(self, newStyle: Style|None):
         # Dev note: because property style shadows module style,
         # typing has to be in quotes.
         self._style = newStyle
@@ -801,7 +801,7 @@ class Music21Object(prebase.ProtoM21Object):
         return self._derivation
 
     @derivation.setter
-    def derivation(self, newDerivation: t.Optional[Derivation]) -> None:
+    def derivation(self, newDerivation: Derivation|None) -> None:
         self._derivation = newDerivation
 
     def clearCache(self, **keywords):
@@ -965,7 +965,7 @@ class Music21Object(prebase.ProtoM21Object):
             ) from se
 
     def setOffsetBySite(self,
-                        site: t.Optional[stream.Stream],
+                        site: stream.Stream|None,
                         value: OffsetQLIn):
         '''
         Change the offset for a site.  These are equivalent:
@@ -1019,7 +1019,7 @@ class Music21Object(prebase.ProtoM21Object):
 
     def getOffsetInHierarchy(
         self,
-        site: t.Optional[stream.Stream]
+        site: stream.Stream|None
     ) -> OffsetQL:
         '''
         For an element which may not be in site, but might be in a Stream in site (or further
@@ -1233,7 +1233,7 @@ class Music21Object(prebase.ProtoM21Object):
         sortByCreationTime=False,
         followDerivation=True,
         priorityTargetOnly=False,
-    ) -> t.Union[_M21T, None]:
+    ) -> _M21T|None:
         return None  # until Astroid #1015
 
     @overload
@@ -1245,19 +1245,19 @@ class Music21Object(prebase.ProtoM21Object):
         sortByCreationTime=False,
         followDerivation=True,
         priorityTargetOnly=False,
-    ) -> t.Union[Music21Object, None]:
+    ) -> Music21Object|None:
         return None  # until Astroid #1015
 
 
     def getContextByClass(
         self,
-        className: t.Union[type[_M21T], str, None],
+        className: type[_M21T] | str | None,
         *,
         getElementMethod: ElementSearch = ElementSearch.AT_OR_BEFORE,
         sortByCreationTime=False,
         followDerivation=True,
         priorityTargetOnly=False,
-    ) -> t.Union[_M21T, Music21Object, None]:
+    ) -> _M21T|Music21Object|None:
         # noinspection PyShadowingNames
         '''
         A very powerful method in music21 of fundamental importance: Returns
@@ -1726,7 +1726,7 @@ class Music21Object(prebase.ProtoM21Object):
         callerFirst=None,
         memo=None,
         offsetAppend: OffsetQL = 0.0,
-        sortByCreationTime: t.Union[t.Literal['reverse'], bool] = False,
+        sortByCreationTime: t.Literal['reverse']|bool = False,
         priorityTarget=None,
         followDerivation=True,
         priorityTargetOnly=False,
@@ -1740,7 +1740,7 @@ class Music21Object(prebase.ProtoM21Object):
         callerFirst=None,
         memo=None,
         offsetAppend: OffsetQL = 0.0,
-        sortByCreationTime: t.Union[t.Literal['reverse'], bool] = False,
+        sortByCreationTime: t.Literal['reverse']|bool = False,
         priorityTarget=None,
         returnSortTuples: t.Literal[False] = False,
         followDerivation=True,
@@ -1755,7 +1755,7 @@ class Music21Object(prebase.ProtoM21Object):
         callerFirst=None,
         memo=None,
         offsetAppend: OffsetQL = 0.0,
-        sortByCreationTime: t.Union[t.Literal['reverse'], bool] = False,
+        sortByCreationTime: t.Literal['reverse']|bool = False,
         priorityTarget=None,
         returnSortTuples: bool = False,
         followDerivation=True,
@@ -2104,7 +2104,7 @@ class Music21Object(prebase.ProtoM21Object):
     # -------------------------------------------------------------------------
 
     def next(self,
-             className: t.Union[type[Music21Object], str, None] = None,
+             className: type[Music21Object]|str|None = None,
              *,
              activeSiteOnly=False):
         '''
@@ -2224,7 +2224,7 @@ class Music21Object(prebase.ProtoM21Object):
             raise Music21Exception('Maximum recursion!')
 
     def previous(self,
-                 className: t.Union[type[Music21Object], str, None] = None,
+                 className: type[Music21Object]|str|None = None,
                  *,
                  activeSiteOnly=False):
         '''
@@ -2530,11 +2530,7 @@ class Music21Object(prebase.ProtoM21Object):
             self._naiveOffset = offset
 
     def sortTuple(self,
-                  useSite: t.Union[
-                      t.Literal[False],
-                      None,
-                      stream.Stream,
-                  ] = False,
+                  useSite: t.Literal[False]|stream.Stream|None = False,
                   raiseExceptionOnMiss: bool = False
                   ) -> SortTuple:
         '''
@@ -2640,7 +2636,7 @@ class Music21Object(prebase.ProtoM21Object):
         music21.sites.SitesException: an entry for this object 0x... is not stored in
             stream <music21.stream.Stream aloneStream>
         '''
-        useSiteNoFalse: t.Optional[stream.Stream]
+        useSiteNoFalse: stream.Stream|None
         if useSite is False:  # False or a Site; since None is a valid site, default is False
             useSiteNoFalse = self.activeSite
         else:
@@ -3419,7 +3415,7 @@ class Music21Object(prebase.ProtoM21Object):
     # temporal and beat based positioning
 
     @property
-    def measureNumber(self) -> t.Optional[int]:
+    def measureNumber(self) -> int|None:
         # noinspection PyShadowingNames
         '''
         Return the measure number of a :class:`~music21.stream.Measure` that contains this

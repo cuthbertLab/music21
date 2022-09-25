@@ -182,7 +182,7 @@ def getPlotClassesFromFormat(graphFormat, checkPlotClasses=None):
     return filteredPlots
 
 
-def getAxisClassFromValue(axisValue: str) -> t.Optional[type[axis.Axis]]:
+def getAxisClassFromValue(axisValue: str) -> type[axis.Axis] | None:
     '''
     given an axis value return the single best axis for the value, or None
 
@@ -205,7 +205,8 @@ def getAxisClassFromValue(axisValue: str) -> t.Optional[type[axis.Axis]]:
     return None
 
 
-def axisMatchesValue(axisClass: t.Union[type[axis.Axis], axis.Axis], axisValue: str) -> bool:
+def axisMatchesValue(axisClass: type[axis.Axis] | axis.Axis,
+                     axisValue: str) -> bool:
     '''
     Returns Bool about whether axisValue.lower() is anywhere in axisClass.quantities
 

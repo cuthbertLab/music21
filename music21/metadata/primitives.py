@@ -116,12 +116,12 @@ class Date(prebase.ProtoM21Object):
 
         self._sanityCheck(year=year, month=month, day=day, hour=hour, minute=minute, second=second)
 
-        self.year = t.cast(t.Optional[int], year)
-        self.month = t.cast(t.Optional[int], month)
-        self.day = t.cast(t.Optional[int], day)
-        self.hour = t.cast(t.Optional[int], hour)
-        self.minute = t.cast(t.Optional[int], minute)
-        self.second = t.cast(t.Optional[int], second)
+        self.year = t.cast(int|None, year)
+        self.month = t.cast(int|None, month)
+        self.day = t.cast(int|None, day)
+        self.hour = t.cast(int|None, hour)
+        self.minute = t.cast(int|None, minute)
+        self.second = t.cast(int|None, second)
 
         # error: can be 'approximate', 'uncertain' or None.
         # None is assumed to be certain
@@ -178,8 +178,8 @@ class Date(prebase.ProtoM21Object):
 
     # PRIVATE METHODS #
     def _stripError(self,
-                    value: t.Union[int, float, str],
-                    ) -> tuple[int, t.Optional[str]]:
+                    value: int|float|str,
+                    ) -> tuple[int, str|None]:
         r'''
         Strip error symbols from a numerical value. Return cleaned source and
         sym. Only one error symbol is expected per string.
@@ -358,8 +358,8 @@ class Date(prebase.ProtoM21Object):
         >>> d.minute, d.second
         (50, 32)
         '''
-        post: list[t.Optional[int]] = []
-        postError: list[t.Optional[str]] = []
+        post: list[int|None] = []
+        postError: list[str|None] = []
         dateStr = dateStr.replace(':', '/')
         dateStr = dateStr.replace(' ', '')
         for chunk in dateStr.split('/'):
@@ -481,7 +481,7 @@ class DatePrimitive(prebase.ProtoM21Object):
         # store an array of values marking if date data itself
         # is certain, approximate, or uncertain
         # here, dataError is relevance
-        self._dataUncertainty: list[t.Union[str, None]] = []
+        self._dataUncertainty: list[str|None] = []
         self.relevance = relevance  # will use property
 
     # SPECIAL METHODS #
@@ -843,7 +843,7 @@ class Text(prebase.ProtoM21Object):
     # INITIALIZER #
 
     def __init__(self,
-                 data: t.Union[str, 'Text'] = '',
+                 data: str|Text = '',
                  language: str|None = None,
                  isTranslated: bool|None = None,   # True, False, or None (unknown)
                  encodingScheme: str|None = None):
@@ -1002,7 +1002,7 @@ class Copyright(Text):
     '''
 
     def __init__(self,
-                 data: t.Union[str, 'Text'] = '',
+                 data: str|Text = '',
                  language: str|None = None,
                  isTranslated: bool|None = None,   # True, False, or None (unknown)
                  *, role=None):
@@ -1084,7 +1084,7 @@ class Contributor(prebase.ProtoM21Object):
     def __init__(self,
                  *,
                  name: str|Text|None = None,
-                 names: Iterable[t.Union[str, Text]] = (),
+                 names: Iterable[str|Text] = (),
                  role: str|Text|None = None,
                  birth: None|DateSingle|str = None,
                  death: None|DateSingle|str = None,
@@ -1213,7 +1213,7 @@ class Contributor(prebase.ProtoM21Object):
 
     # PUBLIC METHODS #
 
-    def age(self) -> t.Optional[datetime.timedelta]:
+    def age(self) -> datetime.timedelta|None:
         r'''
         Calculate the age at death of the Contributor, returning a
         datetime.timedelta object.
@@ -1608,8 +1608,8 @@ _DOC_ORDER = (
     Copyright,
 )
 
-DateParseType = t.Union[Date, datetime.datetime, str]
-ValueType = t.Union[DatePrimitive, Text, Contributor, Copyright, int]
+DateParseType = Date|datetime.datetime|str
+ValueType = DatePrimitive|Text|Contributor|Copyright|int
 
 
 if __name__ == '__main__':

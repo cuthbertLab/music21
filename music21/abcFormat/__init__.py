@@ -337,7 +337,7 @@ class ABCMetadata(ABCToken):
             return True
         return False
 
-    def getTimeSignatureParameters(self) -> t.Optional[tuple[int, int, str]]:
+    def getTimeSignatureParameters(self) -> tuple[int, int, str]|None:
         '''
         If there is a time signature representation available,
         get a numerator, denominator and an abbreviation symbol.
@@ -389,7 +389,7 @@ class ABCMetadata(ABCToken):
             symbol = 'normal'  # m21 compat
         return n, d, symbol
 
-    def getTimeSignatureObject(self) -> t.Optional[meter.TimeSignature]:
+    def getTimeSignatureObject(self) -> meter.TimeSignature|None:
         '''
         Return a music21 :class:`~music21.meter.TimeSignature`
         object for this metadata tag, if isMeter is True, otherwise raise exception.
@@ -423,7 +423,7 @@ class ABCMetadata(ABCToken):
             numerator, denominator, unused_symbol = parameters
             return meter.TimeSignature(f'{numerator}/{denominator}')
 
-    def getKeySignatureParameters(self) -> tuple[int, t.Optional[str]]:
+    def getKeySignatureParameters(self) -> tuple[int, str|None]:
         # noinspection SpellCheckingInspection
         '''
         Extract key signature parameters,
@@ -587,7 +587,7 @@ class ABCMetadata(ABCToken):
         else:
             return ks.asKey(mode)
 
-    def getClefObject(self) -> tuple[t.Optional[clef.Clef], t.Optional[int]]:
+    def getClefObject(self) -> tuple[clef.Clef|None, int|None]:
         '''
         Extract any clef parameters stored in the key metadata token.
         Assume that a clef definition suggests a transposition.
@@ -619,7 +619,7 @@ class ABCMetadata(ABCToken):
         # if not defined, returns None, None
         return clefObj, transposeSemitones
 
-    def getMetronomeMarkObject(self) -> t.Optional[tempo.MetronomeMark]:
+    def getMetronomeMarkObject(self) -> tempo.MetronomeMark|None:
         '''
         Extract any tempo parameters stored in a tempo metadata token.
 
@@ -872,7 +872,7 @@ class ABCBar(ABCToken):
         else:
             return False
 
-    def isRepeatBracket(self) -> t.Union[int, t.Literal[False]]:
+    def isRepeatBracket(self) -> int|t.Literal[False]:
         '''
         Return a number if this defines a repeat bracket for an alternate ending
         otherwise returns False.
@@ -891,7 +891,7 @@ class ABCBar(ABCToken):
         else:
             return False
 
-    def getBarObject(self) -> t.Optional[bar.Barline]:
+    def getBarObject(self) -> bar.Barline|None:
         '''
         Return a music21 bar object
 
@@ -902,7 +902,7 @@ class ABCBar(ABCToken):
          <music21.bar.Repeat direction=start>
         '''
         from music21 import bar
-        m21bar: t.Optional[bar.Barline]
+        m21bar: bar.Barline|None
         if self.isRepeat():
             if self.repeatForm in ('end', 'start'):
                 m21bar = bar.Repeat(direction=self.repeatForm)
@@ -1348,7 +1348,7 @@ class ABCNote(ABCToken):
         self,
         strSrc: str,
         forceKeySignature=None
-    ) -> tuple[t.Optional[str], t.Union[bool, None]]:
+    ) -> tuple[str|None, bool|None]:
         '''
         Given a note or rest string without a chord symbol,
         return a music21 pitch string or None (if a rest),
@@ -1464,7 +1464,7 @@ class ABCNote(ABCToken):
             raise ABCHandlerException('Carried accidentals not rendered moot.')
         # if there is an explicit accidental, regardless of key, it should
         # be shown: this will work for naturals well
-        accidentalDisplayStatus: t.Union[bool, None]
+        accidentalDisplayStatus: bool|None
         if carriedAccString:
             # An accidental carrying through the measure is supposed to be applied.
             # This will be set iff no explicit accidental is attached to the note.
@@ -1557,7 +1557,7 @@ class ABCNote(ABCToken):
         >>> an.getQuarterLength('A', forceDefaultQuarterLength=1.0)
         1.875
         '''
-        activeDefaultQuarterLength: t.Optional[float]
+        activeDefaultQuarterLength: float|None
         if forceDefaultQuarterLength is not None:
             activeDefaultQuarterLength = forceDefaultQuarterLength
         else:  # may be None
@@ -1647,8 +1647,8 @@ class ABCNote(ABCToken):
         # get pitch name form remaining string
         # rests will have a pitch name of None
 
-        pn: t.Optional[str]
-        accDisp: t.Union[bool, None]
+        pn: str|None
+        accDisp: bool|None
         try:
             pn, accDisp = self.getPitchName(nonChordSymStr,
                                             forceKeySignature=forceKeySignature)
@@ -1769,10 +1769,10 @@ class ABCHandler:
     New in v6.3 -- lineBreaksDefinePhrases -- does not yet do anything
     '''
     def __init__(self,
-                 abcVersion: t.Optional[tuple[int, ...]] = None,
+                 abcVersion: tuple[int, ...]|None = None,
                  lineBreaksDefinePhrases=False):
         # tokens are ABC objects import n a linear stream
-        self.abcVersion: t.Optional[tuple[int, ...]] = abcVersion
+        self.abcVersion: tuple[int, ...]|None = abcVersion
         self.abcDirectives: dict[str, str] = {}
         self.tokens: list[ABCToken] = []
         self.activeParens: list[str] = []  # e.g. ['Crescendo', 'Slur']
@@ -1787,7 +1787,7 @@ class ABCHandler:
 
     @staticmethod
     def _getLinearContext(source: Sequence[_T],
-                          i: int) -> tuple[t.Optional[_T], _T, t.Optional[_T], t.Optional[_T]]:
+                          i: int) -> tuple[_T|None, _T, _T|None, _T|None]:
         '''
         Find the local context of a string or iterable of objects
         beginning at a particular index.
@@ -2010,8 +2010,8 @@ class ABCHandler:
 
     @staticmethod
     def startsMetadata(c: str,
-                       cNext: t.Optional[str],
-                       cNextNext: t.Optional[str]) -> bool:
+                       cNext: str|None,
+                       cNextNext: str|None) -> bool:
         '''
         Returns True if this context describes the start of a metadata section, like
 
@@ -3172,7 +3172,7 @@ class ABCHandler:
         else:
             return False
 
-    def getTitle(self) -> t.Optional[str]:
+    def getTitle(self) -> str|None:
         '''
         Get the first title tag. Used for testing.
 

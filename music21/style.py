@@ -82,12 +82,12 @@ class Style(ProtoM21Object):
     def __init__(self):
         self.size = None
 
-        self.relativeX: t.Optional[t.Union[float, int]] = None
-        self.relativeY: t.Optional[t.Union[float, int]] = None
-        self.absoluteX: t.Optional[t.Union[float, int]] = None
+        self.relativeX: float|int|None = None
+        self.relativeY: float|int|None = None
+        self.absoluteX: float|int|None = None
 
         # managed by property below.
-        self._absoluteY: t.Optional[t.Union[float, int]] = None
+        self._absoluteY: float|int|None = None
 
         self._enclosure: Enclosure|None = None
 
@@ -100,10 +100,10 @@ class Style(ProtoM21Object):
         self.units: str = 'tenths'
         self.hideObjectOnPrint: bool = False
 
-    def _getEnclosure(self) -> t.Optional[Enclosure]:
+    def _getEnclosure(self) -> Enclosure|None:
         return self._enclosure
 
-    def _setEnclosure(self, value: t.Optional[Enclosure]):
+    def _setEnclosure(self, value: Enclosure|None):
         if value is None:
             self._enclosure = value
         elif value == Enclosure.NONE:

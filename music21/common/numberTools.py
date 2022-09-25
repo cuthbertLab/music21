@@ -66,7 +66,7 @@ musicOrdinals[22] = 'Triple-octave'
 # Number methods...
 
 
-def numToIntOrFloat(value: t.Union[int, float]) -> t.Union[int, float]:
+def numToIntOrFloat(value: int|float) -> int|float:
     '''
     Given a number, return an integer if it is very close to an integer,
     otherwise, return a float.
@@ -210,7 +210,7 @@ _KNOWN_PASSES = frozenset([
 
 # no type checking due to accessing protected attributes (for speed)
 @t.no_type_check
-def opFrac(num: t.Union[OffsetQLIn, None]) -> t.Union[OffsetQL, None]:
+def opFrac(num: OffsetQLIn|None) -> OffsetQL|None:
     '''
     opFrac -> optionally convert a number to a fraction or back.
 
@@ -376,7 +376,7 @@ def mixedNumeral(expr: numbers.Real,
     return str(0)
 
 
-def roundToHalfInteger(num: t.Union[float, int]) -> t.Union[float, int]:
+def roundToHalfInteger(num: float|int) -> float|int:
     '''
     Given a floating-point number, round to the nearest half-integer. Returns int or float
 
@@ -424,7 +424,7 @@ def roundToHalfInteger(num: t.Union[float, int]) -> t.Union[float, int]:
     return intVal + floatVal
 
 
-def addFloatPrecision(x, grain=1e-2) -> t.Union[float, Fraction]:
+def addFloatPrecision(x, grain=1e-2) -> float|Fraction:
     '''
     Given a value that suggests a floating point fraction, like 0.33,
     return a Fraction or float that provides greater specification, such as Fraction(1, 3)
@@ -642,7 +642,7 @@ def decimalToTuplet(decNum: float) -> tuple[int, int]:
         return (int(iy), int(jy))
 
 
-def unitNormalizeProportion(values: Sequence[t.Union[int, float]]) -> list[float]:
+def unitNormalizeProportion(values: Sequence[int|float]) -> list[float]:
     '''
     Normalize values within the unit interval, where max is determined by the sum of the series.
 
@@ -681,8 +681,8 @@ def unitNormalizeProportion(values: Sequence[t.Union[int, float]]) -> list[float
 
 
 def unitBoundaryProportion(
-    series: Sequence[t.Union[int, float]]
-) -> list[tuple[t.Union[int, float], float]]:
+    series: Sequence[int|float]
+) -> list[tuple[int|float, float]]:
     '''
     Take a series of parts with an implied sum, and create
     unit-interval boundaries proportional to the series components.
@@ -705,7 +705,7 @@ def unitBoundaryProportion(
 
 
 def weightedSelection(values: list[int],
-                      weights: list[t.Union[int, float]],
+                      weights: list[int|float],
                       randomGenerator=None) -> int:
     '''
     Given a list of values and an equal-sized list of weights,
@@ -733,7 +733,7 @@ def weightedSelection(values: list[int],
     return values[index]
 
 
-def approximateGCD(values: list[t.Union[int, float]], grain: float = 1e-4) -> float:
+def approximateGCD(values: list[int|float], grain: float = 1e-4) -> float:
     '''Given a list of values, find the lowest common divisor of floating point values.
 
     >>> common.approximateGCD([2.5, 10, 0.25])

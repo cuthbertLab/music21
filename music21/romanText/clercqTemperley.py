@@ -328,7 +328,7 @@ class CTSong(prebase.ProtoM21Object):
         return f'title={self.title!r} year={self.year}'
 
     # --------------------------------------------------------------------------
-    def parse(self, textFile: t.Union[str, pathlib.Path]):
+    def parse(self, textFile: str|pathlib.Path):
         '''
         Called when a CTSong is created by passing a string or filename;
         in the second case, it opens the file

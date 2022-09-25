@@ -197,7 +197,7 @@ class ChordBase(note.NotRest):
     def _add_core_or_init(self,
                           notes,
                           *,
-                          useDuration: t.Union[None, t.Literal[False], Duration] = None):
+                          useDuration: None|t.Literal[False]|Duration = None):
         '''
         This is the private append method called by .add and called by __init__.
 
@@ -387,7 +387,7 @@ class ChordBase(note.NotRest):
         return ()
 
     @property
-    def tie(self) -> t.Optional[tie.Tie]:
+    def tie(self) -> tie.Tie|None:
         '''
         Get or set a single tie based on all the ties in this Chord.
 
@@ -411,7 +411,7 @@ class ChordBase(note.NotRest):
         return None
 
     @tie.setter
-    def tie(self, value: t.Optional[tie.Tie]):
+    def tie(self, value: tie.Tie|None):
         for d in self._notes:
             d.tie = value
             # set the same instance for each pitch
@@ -470,7 +470,7 @@ class ChordBase(note.NotRest):
 
 
     @volume.setter
-    def volume(self, expr: t.Union[None, 'music21.volume.Volume', int, float]):
+    def volume(self, expr: None|'music21.volume.Volume'|int|float):
         # Do NOT change typing to volume.Volume because it will take the property as
         # its name
         if isinstance(expr, volume.Volume):
@@ -539,7 +539,7 @@ class ChordBase(note.NotRest):
     # --------------------------------------------------------------------------
     # volume per pitch ??
     # --------------------------------------------------------------------------
-    def setVolumes(self, volumes: Sequence[t.Union['music21.volume.Volume', int, float]]):
+    def setVolumes(self, volumes: Sequence['music21.volume.Volume'|int|float]):
         # do not change typing to volume.Volume -- will get the property of same name.
         # noinspection PyShadowingNames
         '''
@@ -775,7 +775,7 @@ class Chord(ChordBase):
             return False
         return True
 
-    def __getitem__(self, key: t.Union[int, str, note.Note, pitch.Pitch]):
+    def __getitem__(self, key: int|str|note.Note|pitch.Pitch):
         '''
         Get item makes accessing pitch components for the Chord easier
 
@@ -989,7 +989,7 @@ class Chord(ChordBase):
         return ''.join(msg)
 
     # PRIVATE METHODS #
-    def _findBass(self) -> t.Optional[pitch.Pitch]:
+    def _findBass(self) -> pitch.Pitch|None:
         '''
         Returns the lowest Pitch in the chord.
 
@@ -1015,7 +1015,7 @@ class Chord(ChordBase):
         attribute: str,
         *,
         inPlace=False
-    ) -> t.Union[_ChordType, list[pitch.Pitch]]:
+    ) -> _ChordType|list[pitch.Pitch]:
         '''
         Common method for stripping pitches based on redundancy of one pitch
         attribute. The `attribute` is provided by a string.
@@ -1253,7 +1253,7 @@ class Chord(ChordBase):
 
     @overload
     def bass(self,
-             newbass: t.Union[str, pitch.Pitch, note.Note],
+             newbass: str|pitch.Pitch|note.Note,
              *,
              find: bool|None = None,
              allow_add: bool = False,
@@ -1265,7 +1265,7 @@ class Chord(ChordBase):
              *,
              find: bool|None = None,
              allow_add: bool = False,
-             ) -> t.Optional[pitch.Pitch]:
+             ) -> pitch.Pitch|None:
         '''
         Generally used to find and return the bass Pitch:
 
@@ -1453,7 +1453,7 @@ class Chord(ChordBase):
     def closedPosition(
         self: _ChordType,
         *,
-        forceOctave: t.Optional[int],
+        forceOctave: int|None,
         inPlace: t.Literal[True],
         leaveRedundantPitches=False
     ) -> None:
@@ -1475,9 +1475,9 @@ class Chord(ChordBase):
         self: _ChordType,
         *,
         forceOctave: int|None = None,
-        inPlace: t.Union[t.Literal[True], t.Literal[False]] = False,
+        inPlace: t.Literal[True]|t.Literal[False] = False,
         leaveRedundantPitches: bool = False
-    ) -> t.Optional[_ChordType]:
+    ) -> _ChordType|None:
         '''
         Returns a new Chord object with the same pitch classes,
         but now in closed position.
@@ -1835,8 +1835,8 @@ class Chord(ChordBase):
         self,
         chordStep: int,
         *,
-        testRoot: t.Optional[note.Note|pitch.Pitch] = None
-    ) -> t.Optional[pitch.Pitch]:
+        testRoot: note.Note|pitch.Pitch|None = None
+    ) -> pitch.Pitch|None:
         '''
         Returns the (first) pitch at the provided scaleDegree (Thus, it's
         exactly like semitonesFromChordStep, except it instead of the number of
@@ -2112,7 +2112,7 @@ class Chord(ChordBase):
         except KeyError:
             raise ChordException(f'the given pitch is not in the Chord: {p}')
 
-    def getZRelation(self) -> t.Optional[Chord]:
+    def getZRelation(self) -> Chord|None:
         '''
         Return a Z relation if it exists, otherwise return None.
 
@@ -3766,7 +3766,7 @@ class Chord(ChordBase):
 
     @overload
     def root(self,
-             newroot: t.Union[str, pitch.Pitch, note.Note],
+             newroot: str|pitch.Pitch|note.Note,
              *,
              find: bool|None = None
              ) -> None:
@@ -3776,7 +3776,7 @@ class Chord(ChordBase):
              newroot: None|str|pitch.Pitch|note.Note = None,
              *,
              find: bool|None = None
-             ) -> t.Optional[pitch.Pitch]:
+             ) -> pitch.Pitch|None:
         # noinspection PyShadowingNames
         '''
         Returns the root of the chord.  Or if given a Pitch as the
@@ -3989,9 +3989,9 @@ class Chord(ChordBase):
         self: _ChordType,
         *,
         forceOctave: int|None = None,
-        inPlace: t.Union[t.Literal[True], t.Literal[False]] = False,
+        inPlace: t.Literal[True]|t.Literal[False] = False,
         leaveRedundantPitches: bool = False
-    ) -> t.Union[None, _ChordType]:
+    ) -> None|_ChordType:
         # noinspection PyShadowingNames
         '''
         Similar to :meth:`~music21.chord.Chord.ClosedPosition` in that it
@@ -4425,7 +4425,7 @@ class Chord(ChordBase):
             raise ChordException(
                 f'the given pitch is not in the Chord: {pitchTarget}')
 
-    def setTie(self, tieObjOrStr: t.Union[tie.Tie, str], pitchTarget):
+    def setTie(self, tieObjOrStr: tie.Tie|str, pitchTarget):
         '''
         Given a tie object (or a tie type string) and a pitch or Note in this Chord,
         set the pitch's tie attribute in this chord to that tie type.
@@ -4496,7 +4496,7 @@ class Chord(ChordBase):
 
     def setVolume(self,
                   vol: volume.Volume,
-                  target: t.Union[str, note.Note, pitch.Pitch]):
+                  target: str|note.Note|pitch.Pitch):
         '''
         Set the :class:`~music21.volume.Volume` object of a specific Pitch.
 
@@ -4986,7 +4986,7 @@ class Chord(ChordBase):
         >>> c.duration is d
         True
         '''
-        d = t.cast(t.Union[Duration, None], self._duration)  # type: ignore
+        d = t.cast(Duration|None, self._duration)  # type: ignore
         if d is None and self._notes:
             # pitchZeroDuration = self._notes[0]['pitch'].duration
             pitchZeroDuration = self._notes[0].duration
@@ -5010,7 +5010,7 @@ class Chord(ChordBase):
 
     @property  # type: ignore
     @cacheMethod
-    def fifth(self) -> t.Optional[pitch.Pitch]:
+    def fifth(self) -> pitch.Pitch|None:
         '''
         Shortcut for getChordStep(5), but caches it and does not raise exceptions
 
@@ -5667,7 +5667,7 @@ class Chord(ChordBase):
         return pitches
 
     @pitches.setter
-    def pitches(self, value: Sequence[t.Union[str, pitch.Pitch, int]]):
+    def pitches(self, value: Sequence[str|pitch.Pitch|int]):
         self._notes = []
         self.clearCache()
         # TODO: individual ties are not being retained here
@@ -5930,7 +5930,7 @@ class Chord(ChordBase):
 
     @property  # type: ignore
     @cacheMethod
-    def third(self) -> t.Optional[pitch.Pitch]:
+    def third(self) -> pitch.Pitch|None:
         '''
         Shortcut for getChordStep(3), but caches the value, and returns
         None on errors.
@@ -5955,7 +5955,7 @@ class Chord(ChordBase):
 
 
 
-def fromForteClass(notation: t.Union[str, Sequence[int]]) -> Chord:
+def fromForteClass(notation: str|Sequence[int]) -> Chord:
     '''
     Return a Chord given a Forte-class notation. The Forte class can be
     specified as string (e.g., 3-11) or as a list of cardinality and number

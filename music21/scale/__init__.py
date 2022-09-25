@@ -1258,8 +1258,8 @@ class ConcreteScale(Scale):
     usePitchDegreeCache = False
 
     def __init__(self,
-                 tonic: t.Optional[t.Union[str, pitch.Pitch, note.Note]] = None,
-                 pitches: t.Optional[list[t.Union[pitch.Pitch, str]]] = None):
+                 tonic: str|pitch.Pitch|note.Note|None = None,
+                 pitches: list[pitch.Pitch|str]|None = None):
         super().__init__()
 
         self.type = 'Concrete'
@@ -1281,7 +1281,7 @@ class ConcreteScale(Scale):
         # found on
         # no default tonic is defined; as such, it is mostly an abstract scale, and
         # can't be used concretely until it is created.
-        self.tonic: t.Optional[pitch.Pitch]
+        self.tonic: pitch.Pitch|None
         if tonic is None:
             self.tonic = None  # pitch.Pitch()
         elif isinstance(tonic, str):
@@ -1594,13 +1594,13 @@ class ConcreteScale(Scale):
             pitchObj = self.tonic
         stepOfPitch = self._abstract.tonicDegree
 
-        minPitchObj: t.Optional[pitch.Pitch]
+        minPitchObj: pitch.Pitch|None
         if isinstance(minPitch, str):
             minPitchObj = pitch.Pitch(minPitch)
         else:
             minPitchObj = minPitch
 
-        maxPitchObj: t.Optional[pitch.Pitch]
+        maxPitchObj: pitch.Pitch|None
         if isinstance(maxPitch, str):
             maxPitchObj = pitch.Pitch(maxPitch)
         else:

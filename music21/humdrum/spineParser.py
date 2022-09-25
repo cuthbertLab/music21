@@ -2005,7 +2005,7 @@ class SpineCollection(prebase.ProtoM21Object):
                 if not hasVoices:
                     continue
 
-                voices: list[t.Optional[stream.Voice]] = [None for i in range(10)]
+                voices: list[stream.Voice|None] = [None for i in range(10)]
                 measureElements = el.elements
                 for mEl in measureElements:
                     mElGroups = mEl.groups

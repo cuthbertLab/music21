@@ -70,7 +70,7 @@ class PercussionChord(chord.ChordBase):
         return tuple(self._notes)
 
     @notes.setter
-    def notes(self, newNotes: Iterable[t.Union[note.Unpitched, note.Note]]) -> None:
+    def notes(self, newNotes: Iterable[note.Unpitched|note.Note]) -> None:
         '''
         Sets notes to an iterable of Note or Unpitched objects
         '''
