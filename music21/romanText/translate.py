@@ -217,7 +217,8 @@ def _copySingleMeasure(rtTagged, p, kCurrent):
                 else:
                     rnPast.key = kCurrent
                 if rnPast.secondaryRomanNumeral is not None:
-                    newRN = roman.RomanNumeral(rnPast.figure, kCurrent)
+                    newRN = roman.RomanNumeral(rnPast.figure, copy.deepcopy(kCurrent))
+                    newRN.writeAsChord = True
                     newRN.duration = copy.deepcopy(rnPast.duration)
                     newRN.lyrics = copy.deepcopy(rnPast.lyrics)
                     m.replace(rnPast, newRN)
@@ -283,7 +284,8 @@ def _copyMultipleMeasures(rtMeasure: rtObjects.RTMeasure,
                 else:
                     rnPast.key = kCurrent
                 if rnPast.secondaryRomanNumeral is not None:
-                    newRN = roman.RomanNumeral(rnPast.figure, kCurrent)
+                    newRN = roman.RomanNumeral(rnPast.figure, copy.deepcopy(kCurrent))
+                    newRN.writeAsChord = True
                     newRN.duration = copy.deepcopy(rnPast.duration)
                     newRN.lyrics = copy.deepcopy(rnPast.lyrics)
                     m.replace(rnPast, newRN)
@@ -849,6 +851,7 @@ class PartTranslator:
                                         sixthMinor=self.sixthMinor,
                                         seventhMinor=self.seventhMinor,
                                         )
+                rn.writeAsChord = True
                 _rnKeyCache[cacheTuple] = rn
             # surprisingly, not faster... and more dangerous
             # rn = roman.RomanNumeral(aSrc, kCurrent)

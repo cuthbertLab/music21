@@ -3252,9 +3252,12 @@ class MeasureExporter(XMLExporterBase):
 
             notesForLater = []
             for obj in objGroup:
-                # we do all non-note elements (including ChordSymbols)
+                # we do all non-note elements (including ChordSymbols not written as chord)
                 # first before note elements, in musicxml
-                if isinstance(obj, note.GeneralNote) and not isinstance(obj, harmony.Harmony):
+                if isinstance(obj, note.GeneralNote) and (
+                    not (isHarm := isinstance(obj, harmony.Harmony))
+                    or (isHarm and obj.writeAsChord)
+                ):
                     notesForLater.append(obj)
                 else:
                     self.parseOneElement(obj)
