@@ -12,7 +12,7 @@
 from __future__ import annotations
 
 import abc
-from collections.abc import Sequence
+from collections.abc import Sequence, Iterable
 import pathlib
 import typing as t
 
@@ -41,10 +41,11 @@ class Corpus(prebase.ProtoM21Object):
     _acceptableExtensions = ['abc', 'capella', 'midi', 'musicxml', 'musedata',
                              'humdrum', 'romantext', 'noteworthytext', 'noteworthy']
 
+    # TODO: this should be wiped if a SubConverter is registered or deregistered.
     _allExtensions = tuple(common.flattenList([common.findInputExtension(x)
                                                for x in _acceptableExtensions]))
 
-    _pathsCache: dict[tuple[str, tuple[str]], pathlib.Path] = {}
+    _pathsCache: dict[tuple[str, tuple[str]], list[pathlib.Path]] = {}
 
     _directoryInformation: t.Union[tuple[()], Sequence[tuple[str, str, bool]]] = ()
 
@@ -68,8 +69,8 @@ class Corpus(prebase.ProtoM21Object):
     def _findPaths(
         self,
         rootDirectoryPath: pathlib.Path,
-        fileExtensions: list[str]
-    ):
+        fileExtensions: tuple[str]
+    ) -> list[pathlib.Path]:
         '''
         Given a root filePath file path, recursively search all contained paths
         for files in `rootFilePath` matching any of the file extensions in
@@ -101,11 +102,11 @@ class Corpus(prebase.ProtoM21Object):
         #           ... etc ...
         return matched
 
+    @staticmethod
     def _translateExtensions(
-        self,
-        fileExtensions=None,
+        fileExtensions: t.Union[Iterable[str], str] = (),
         expandExtensions=True,
-    ):
+    ) -> tuple[str]:
         # noinspection PyShadowingNames
         '''
         Utility to get default extensions, or, optionally, expand extensions to
@@ -134,33 +135,50 @@ class Corpus(prebase.ProtoM21Object):
         '.nwc'
 
         >>> coreCorpus._translateExtensions('.mid', False)
-        ['.mid']
+        ('.mid',)
+        >>> coreCorpus._translateExtensions(('.mid',), False)
+        ('.mid',)
 
-        >>> coreCorpus._translateExtensions('.mid', True)
-        ['.mid', '.midi']
+        >>> coreCorpus._translateExtensions(('.mid',), True)
+        ('.mid', '.midi')
 
         It does not matter if you choose a canonical name or not, the output is the same:
 
-        >>> coreCorpus._translateExtensions('.musicxml', True)
-        ['.xml', '.mxl', '.musicxml']
+        >>> coreCorpus._translateExtensions(('.musicxml',), True)
+        ('.xml', '.mxl', '.musicxml')
 
-        >>> coreCorpus._translateExtensions('.xml', True)
-        ['.xml', '.mxl', '.musicxml']
+        >>> coreCorpus._translateExtensions(('.xml',), True)
+        ('.xml', '.mxl', '.musicxml')
+
+
+        # With multiple extensions:
+
+        >>> coreCorpus._translateExtensions(('.mid', '.musicxml'), False)
+        ('.mid', '.musicxml')
+        >>> coreCorpus._translateExtensions(('.mid', '.musicxml'), True)
+        ('.mid', '.midi', '.xml', '.mxl', '.musicxml')
+
+        Changed in v9: returns a tuple, not a list.  first element should be a tuple of strings
         '''
-        if not common.isListLike(fileExtensions):
-            fileExtensions = [fileExtensions]
-        if len(fileExtensions) == 1 and fileExtensions[0] is None:
-            fileExtensions = Corpus._allExtensions
+        fileExtensionsTuple: tuple[str]
+        if isinstance(fileExtensions, str):
+            fileExtensionsTuple = (fileExtensions,)
+        elif not isinstance(fileExtensions, tuple):
+            fileExtensionsTuple = tuple(fileExtensions)
+        else:
+            fileExtensionsTuple = t.cast(tuple[str], fileExtensions)
+
+        if not fileExtensionsTuple:
+            fileExtensionsTuple = Corpus._allExtensions
         elif expandExtensions:
-            expandedExtensions = []
-            for extension in fileExtensions:
+            expandedExtensions: list[str] = []
+            for extension in fileExtensionsTuple:
                 allInputExtensions = common.findInputExtension(extension)
-                if allInputExtensions is None:
-                    pass
-                else:
+                if allInputExtensions:
+                    # inefficient, but very few loops.
                     expandedExtensions += allInputExtensions
-            return expandedExtensions
-        return fileExtensions
+            return tuple(expandedExtensions)
+        return fileExtensionsTuple
 
     # PRIVATE PROPERTIES #
 
@@ -226,7 +244,10 @@ class Corpus(prebase.ProtoM21Object):
         return failingFilePaths
 
     @abc.abstractmethod
-    def getPaths(self, fileExtensions=None, expandExtensions=True):
+    def getPaths(self,
+                 fileExtensions: t.Union[Iterable[str], str] = (),
+                 expandExtensions: bool = True
+                 ) -> list[pathlib.Path]:
         r'''
         The paths of the files in a given corpus.
         '''
@@ -236,7 +257,7 @@ class Corpus(prebase.ProtoM21Object):
         self,
         workName,
         movementNumber=None,
-        fileExtensions=None,
+        fileExtensions=(),
     ):
         r'''
         Search the corpus and return a list of filenames of works, always in a
@@ -374,7 +395,7 @@ class Corpus(prebase.ProtoM21Object):
     # PUBLIC PROPERTIES #
 
     @property
-    def directoryInformation(self):
+    def directoryInformation(self) -> tuple[work.DirectoryInformation]:
         '''
         Returns a tuple of DirectoryInformation objects for
         each directory in self._directoryInformation.
@@ -435,7 +456,7 @@ class Corpus(prebase.ProtoM21Object):
     def getComposer(
         self,
         composerName,
-        fileExtensions=None,
+        fileExtensions=(),
     ):
         '''
         Return all filenames in the corpus that match a composer's or a
@@ -525,7 +546,7 @@ class CoreCorpus(Corpus):
         ('joplin', 'Scott Joplin', True),
         ('josquin', 'Josquin des Prez', True),
         ('leadSheet', 'Leadsheet demos', False),
-        ('luca', 'D. Luca', False),
+        ('luca', 'D. Luca', True),
         ('miscFolk', 'Miscellaneous Folk', False),
         ('monteverdi', 'Claudio Monteverdi', True),
         ('mozart', 'Wolfgang Amadeus Mozart', True),
@@ -535,7 +556,7 @@ class CoreCorpus(Corpus):
         ('ryansMammoth', "Ryan's Mammoth Collection", False),
         ('schoenberg', 'Arnold Schoenberg', True),
         ('schubert', 'Franz Schubert', True),
-        ('schumann', 'Robert Schumann', True),
+        ('schumann_robert', 'Robert Schumann', True),
         ('schumann_clara', 'Clara Schumann', True),
         ('theoryExercises', 'Theory Exercises', False),
         ('trecento', 'Fourteenth-Century Italian Music', False),
@@ -558,9 +579,9 @@ class CoreCorpus(Corpus):
 
     def getPaths(
         self,
-        fileExtensions=None,
+        fileExtensions: t.Union[Iterable[str], str] = (),
         expandExtensions=True,
-    ):
+    ) -> list[pathlib.Path]:
         '''
         Get all paths in the core corpus that match a known extension, or an
         extension provided by an argument.
@@ -649,13 +670,19 @@ class CoreCorpus(Corpus):
         >>> corpus.corpora.CoreCorpus().noCorpus
         False
         '''
-        if CoreCorpus._noCorpus is None:
-            # assume that there will always be a 'bach' dir
-            for unused in common.getCorpusFilePath().iterdir():
-                CoreCorpus._noCorpus = False
-                return False
+        if CoreCorpus._noCorpus is not None:
+            return CoreCorpus._noCorpus
 
-        CoreCorpus._noCorpus = False
+        # assume that there will always be at least one dir
+        for the_dir in common.getCorpusFilePath().iterdir():
+            if not the_dir.is_dir():
+                continue
+            if the_dir.name in ('_metadataCache', '__pycache__'):
+                continue
+            CoreCorpus._noCorpus = False
+            return False
+
+        CoreCorpus._noCorpus = True
         return CoreCorpus._noCorpus
 
 
@@ -800,9 +827,9 @@ class LocalCorpus(Corpus):
 
     def getPaths(
         self,
-        fileExtensions=None,
+        fileExtensions: t.Union[Iterable[str], str] = (),
         expandExtensions=True,
-    ):
+    ) -> list[pathlib.Path]:
         '''
         Access files in additional directories supplied by the user and defined
         in environment settings in the 'localCorpusSettings' list.
@@ -811,11 +838,11 @@ class LocalCorpus(Corpus):
         :func:`~music21.corpus.addPath` function, these paths are also returned
         with this method.
         '''
-        fileExtensions = self._translateExtensions(
+        fileExtensions: tuple[str] = self._translateExtensions(
             fileExtensions=fileExtensions,
             expandExtensions=expandExtensions,
         )
-        cacheKey = (self.name, tuple(fileExtensions))
+        cacheKey = (self.name, fileExtensions)
         # not cached, fetch and reset
         # if cacheKey not in Corpus._pathsCache:
         # check paths before trying to search
@@ -829,7 +856,7 @@ class LocalCorpus(Corpus):
         # append successive matches into one list
         matches = []
         for directoryPath in validPaths:
-            matches += self._findPaths(directoryPath, fileExtensions)
+            matches.extend(self._findPaths(directoryPath, fileExtensions))
         Corpus._pathsCache[cacheKey] = matches
 
         return Corpus._pathsCache[cacheKey]

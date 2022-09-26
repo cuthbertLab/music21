@@ -256,29 +256,36 @@ def noCorpus():
 # -----------------------------------------------------------------------------
 
 
-def getWork(workName, movementNumber=None, fileExtensions=None):
+def getWork(workName: str,
+            movementNumber: t.Union[int, None] = None,
+            fileExtensions=None) -> t.Union[pathlib.Path, list[pathlib.Path]]:
     '''
-    Search all Corpora for a work, and return a file
-    path or URL.  N.B. does not parse the work: but it's suitable for passing
+    Search all Corpora for a work, and return a file path.
+    N.B. does not parse the work: but it's suitable for passing
     to converter.parse.
 
     This method will return either a list of file paths or, if there is a
     single match, a single file path. If no matches are found an Exception is
     raised.
 
-    returns a pathlib.Path object
-
-    >>> import os
-    >>> a = corpus.getWork('luca/gloria')
-    >>> a.name
+    >>> import os, pathlib
+    >>> luca = corpus.getWork('luca/gloria')
+    >>> type(luca)
+    <class 'pathlib....Path'>
+    >>> luca.name
     'gloria.xml'
-
-    >>> a.parent.name
+    >>> luca.parent.name
     'luca'
 
     >>> trecentoFiles = corpus.getWork('trecento')
+    >>> isinstance(trecentoFiles, list)
+    True
+    >>> isinstance(trecentoFiles[0], pathlib.Path)
+    True
     >>> 100 < len(trecentoFiles) < 200
     True
+
+    Note: if the Virtual corpus is ever brought back, it may return a URL.
     '''
     return manager.getWork(workName, movementNumber, fileExtensions)
 

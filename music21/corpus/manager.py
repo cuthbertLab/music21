@@ -124,7 +124,7 @@ def iterateCorpora(returnObjects=True):
 def getWork(workName,
             movementNumber=None,
             fileExtensions=None,
-            ):
+            ) -> t.Union[pathlib.Path, list[pathlib.Path]]:
     '''
     this parse function is called from `corpus.parse()` and does nothing differently from it.
 
@@ -134,9 +134,8 @@ def getWork(workName,
     workNameJoined = str(workName)
     mxlWorkName = workNameJoined
 
-    if workName in (None, ''):
-        raise CorpusException(
-            'a work name must be provided as an argument')
+    if not workName:
+        raise CorpusException('a work name must be provided as an argument')
     if not common.isListLike(fileExtensions):
         fileExtensions = [fileExtensions]
 
@@ -159,7 +158,7 @@ def getWork(workName,
     if filePaths is None:
         warningMessage = 'Could not find a'
         if addXMLWarning:
-            warningMessage += 'n xml or mxl'
+            warningMessage += 'n xml, musicxml, or mxl'
         warningMessage += f' work that met this criterion: {workName};'
         warningMessage += ' if you are searching for a file on disk, '
         warningMessage += 'use "converter" instead of "corpus".'
@@ -179,13 +178,15 @@ def parse(workName,
             fileExtensions=None,
             forceSource=False,
             format=None
-          ):
-    filePath = getWork(workName=workName,
+          ) -> t.Union[stream.Score, stream.Part, stream.Opus]:
+    filePaths = getWork(workName=workName,
                         movementNumber=movementNumber,
                         fileExtensions=fileExtensions,
                        )
-    if isinstance(filePath, list):
-        filePath = filePath[0]
+    if isinstance(filePaths, list):
+        filePath = filePaths[0]
+    else:
+        filePath = filePaths
 
     streamObject = converter.parse(
         filePath,
