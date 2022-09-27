@@ -408,7 +408,7 @@ def convertDiatonicNumberToStep(dn: int) -> tuple[StepName, int]:
         octave = int((dn - 1) / 7.0)
         stepNumber = (dn - 1) - (octave * 7)
         return STEPNAMES[stepNumber], octave
-    else:  #  dn < 0:
+    else:  # dn < 0:
         octave = int(dn / 7)
         stepNumber = (dn - 1) - (octave * 7)
         return STEPNAMES[stepNumber], (octave - 1)
