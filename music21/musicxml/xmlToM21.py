@@ -853,7 +853,7 @@ class MusicXMLImporter(XMLParserBase):
         self.partGroupList = []
         self.parts = []
 
-        self.musicXmlVersion = '3.1'
+        self.musicXmlVersion = defaults.musicxmlVersion
 
     def scoreFromFile(self, filename):
         '''

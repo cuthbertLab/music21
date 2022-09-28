@@ -531,7 +531,7 @@ def smoothFrequencies(
     *,
     smoothLevels=7,
     inPlace=False
-) -> list[int]:
+) -> t.Union[list[int], None]:
     '''
     Smooths the shape of the signal in order to avoid false detections in the fundamental
     frequency.  Takes in a list of ints or floats.
