@@ -43,8 +43,6 @@ import wave
 import warnings
 import unittest
 
-import typing as t
-
 # cannot call this base, because when audioSearch.__init__.py
 # imports * from base, it overwrites audioSearch!
 from music21 import base
@@ -527,11 +525,11 @@ def detectPitchFrequencies(freqFromAQList, useScale=None):
 
 
 def smoothFrequencies(
-    frequencyList: list[t.Union[int, float]],
+    frequencyList: list[int | float],
     *,
     smoothLevels=7,
     inPlace=False
-) -> t.Union[list[int], None]:
+) -> list[int] | None:
     '''
     Smooths the shape of the signal in order to avoid false detections in the fundamental
     frequency.  Takes in a list of ints or floats.

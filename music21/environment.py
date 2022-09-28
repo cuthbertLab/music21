@@ -437,7 +437,7 @@ class _EnvironmentCore:
             ]:
                 self[name] = value  # use for key checking
 
-    def _checkAccessibility(self, path: t.Optional[t.Union[str, pathlib.Path]]) -> bool:
+    def _checkAccessibility(self, path: str | pathlib.Path | None) -> bool:
         '''
         Return True if the path exists, is readable and writable.
         '''
@@ -650,7 +650,7 @@ class _EnvironmentCore:
         # darwin specific option
         # os.path.join(os.environ['HOME'], 'Library',)
 
-    def getTempFile(self, suffix='', returnPathlib=True) -> t.Union[str, pathlib.Path]:
+    def getTempFile(self, suffix='', returnPathlib=True) -> str | pathlib.Path:
         '''
         Gets a temporary file with a suffix that will work for a bit.
 
@@ -1010,7 +1010,7 @@ class Environment:
     def getTempFile(self, suffix: str = '', returnPathlib: t.Literal[True] = True) -> pathlib.Path:
         return pathlib.Path('/')  # astroid #1015
 
-    def getTempFile(self, suffix: str = '', returnPathlib=True) -> t.Union[str, pathlib.Path]:
+    def getTempFile(self, suffix: str = '', returnPathlib=True) -> str | pathlib.Path:
         '''
         Return a file path to a temporary file with the specified suffix (file
         extension).

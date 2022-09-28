@@ -1087,14 +1087,14 @@ class HistoricalTwelveToneRow(TwelveToneRow):
         'title': 'The title of the work, or None.  (String)',
     }
 
-    composer: t.Union[None, str] = None
-    opus: t.Union[None, str] = None
-    title: t.Union[None, str] = None
+    composer: None | str = None
+    opus: None | str = None
+    title: None | str = None
 
     def __init__(self,
-                 composer: t.Union[None, str] = None,
-                 opus: t.Union[None, str] = None,
-                 title: t.Union[None, str] = None,
+                 composer: None | str = None,
+                 opus: None | str = None,
+                 title: None | str = None,
                  row=None,
                  **keywords):
         super().__init__(row, **keywords)

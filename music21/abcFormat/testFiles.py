@@ -549,7 +549,7 @@ X:2
 T:Kitchen Girl
 C:Trad.
 K:D
-[c4a4] [B4g4]|efed c2cd|e2f2 gaba|g2e2 e2fg|
+[c4a4] [B4g4] | efed c2cd|e2f2 gaba|g2e2 e2fg|
 a4 g4|efed cdef|g2d2 efed|c2A2 A4:|
 K:G
 ABcA BAGB|ABAG EDEG|A2AB c2d2|e3f edcB|ABcA BAGB|

@@ -15,7 +15,6 @@ etc. such that precise positioning information, layout, size, etc. can be specif
 '''
 from __future__ import annotations
 
-import typing as t
 from typing import TYPE_CHECKING
 import unittest
 
@@ -82,28 +81,28 @@ class Style(ProtoM21Object):
     def __init__(self):
         self.size = None
 
-        self.relativeX: t.Optional[t.Union[float, int]] = None
-        self.relativeY: t.Optional[t.Union[float, int]] = None
-        self.absoluteX: t.Optional[t.Union[float, int]] = None
+        self.relativeX: float | int | None = None
+        self.relativeY: float | int | None = None
+        self.absoluteX: float | int | None = None
 
         # managed by property below.
-        self._absoluteY: t.Optional[t.Union[float, int]] = None
+        self._absoluteY: float | int | None = None
 
-        self._enclosure: t.Optional[Enclosure] = None
+        self._enclosure: Enclosure | None = None
 
         # how should this symbol be represented in the font?
         # SMuFL characters are allowed.
         self.fontRepresentation = None
 
-        self.color: t.Optional[str] = None
+        self.color: str | None = None
 
         self.units: str = 'tenths'
         self.hideObjectOnPrint: bool = False
 
-    def _getEnclosure(self) -> t.Optional[Enclosure]:
+    def _getEnclosure(self) -> Enclosure | None:
         return self._enclosure
 
-    def _setEnclosure(self, value: t.Optional[Enclosure]):
+    def _setEnclosure(self, value: Enclosure | None):
         if value is None:
             self._enclosure = value
         elif value == Enclosure.NONE:
@@ -270,9 +269,9 @@ class NoteStyle(Style):
 
     def __init__(self):
         super().__init__()
-        self.stemStyle: t.Optional[Style] = None
-        self.accidentalStyle: t.Optional[Style] = None
-        self.noteSize: t.Optional[str] = None  # can be 'cue' etc.
+        self.stemStyle: Style | None = None
+        self.accidentalStyle: Style | None = None
+        self.noteSize: str | None = None  # can be 'cue' etc.
 
 
 class TextStyle(Style):
@@ -626,8 +625,8 @@ class StyleMixin(common.SlottedObjectMixin):
     def __init__(self):
         # no need to call super().__init__() on SlottedObjectMixin
         # This might be dangerous though
-        self._style: t.Optional[Style] = None
-        self._editorial: t.Optional[editorial.Editorial] = None
+        self._style: Style | None = None
+        self._editorial: editorial.Editorial | None = None
 
     @property
     def hasStyleInformation(self) -> bool:

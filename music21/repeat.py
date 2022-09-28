@@ -20,7 +20,6 @@ from __future__ import annotations
 
 import copy
 import string
-import typing as t
 from typing import TYPE_CHECKING  # pylint needs no alias
 
 from music21 import environment
@@ -1738,7 +1737,7 @@ class Expander:
             return post
         return None
 
-    def isExpandable(self) -> t.Union[bool, None]:
+    def isExpandable(self) -> bool | None:
         '''
         Return True or False if this Stream is expandable, that is,
         if it has balanced repeats or sensible Da Capo or Dal Segno

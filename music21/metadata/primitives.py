@@ -89,18 +89,18 @@ class Date(prebase.ProtoM21Object):
 
     def __init__(self,
                  *,
-                 year: t.Union[int, str, None] = None,
-                 month: t.Union[int, str, None] = None,
-                 day: t.Union[int, str, None] = None,
-                 hour: t.Union[int, str, None] = None,
-                 minute: t.Union[int, str, None] = None,
-                 second: t.Union[int, float, str, None] = None,
-                 yearError: t.Union[str, None] = None,
-                 monthError: t.Union[str, None] = None,
-                 dayError: t.Union[str, None] = None,
-                 hourError: t.Union[str, None] = None,
-                 minuteError: t.Union[str, None] = None,
-                 secondError: t.Union[str, None] = None):
+                 year: int | str | None = None,
+                 month: int | str | None = None,
+                 day: int | str | None = None,
+                 hour: int | str | None = None,
+                 minute: int | str | None = None,
+                 second: int | float | str | None = None,
+                 yearError: str | None = None,
+                 monthError: str | None = None,
+                 dayError: str | None = None,
+                 hourError: str | None = None,
+                 minuteError: str | None = None,
+                 secondError: str | None = None):
         if year is not None and yearError is None:
             year, yearError = self._stripError(year)
         if month is not None and monthError is None:
@@ -116,21 +116,21 @@ class Date(prebase.ProtoM21Object):
 
         self._sanityCheck(year=year, month=month, day=day, hour=hour, minute=minute, second=second)
 
-        self.year = t.cast(t.Optional[int], year)
-        self.month = t.cast(t.Optional[int], month)
-        self.day = t.cast(t.Optional[int], day)
-        self.hour = t.cast(t.Optional[int], hour)
-        self.minute = t.cast(t.Optional[int], minute)
-        self.second = t.cast(t.Optional[int], second)
+        self.year = t.cast(int | None, year)
+        self.month = t.cast(int | None, month)
+        self.day = t.cast(int | None, day)
+        self.hour = t.cast(int | None, hour)
+        self.minute = t.cast(int | None, minute)
+        self.second = t.cast(int | None, second)
 
         # error: can be 'approximate', 'uncertain' or None.
         # None is assumed to be certain
-        self.yearError: t.Optional[str] = yearError
-        self.monthError: t.Optional[str] = monthError
-        self.dayError: t.Optional[str] = dayError
-        self.hourError: t.Optional[str] = hourError
-        self.minuteError: t.Optional[str] = minuteError
-        self.secondError: t.Optional[str] = secondError
+        self.yearError: str | None = yearError
+        self.monthError: str | None = monthError
+        self.dayError: str | None = dayError
+        self.hourError: str | None = hourError
+        self.minuteError: str | None = minuteError
+        self.secondError: str | None = secondError
         self.attrNames = ('year', 'month', 'day', 'hour', 'minute', 'second')
 
     # SPECIAL METHODS #
@@ -178,8 +178,8 @@ class Date(prebase.ProtoM21Object):
 
     # PRIVATE METHODS #
     def _stripError(self,
-                    value: t.Union[int, float, str],
-                    ) -> tuple[int, t.Optional[str]]:
+                    value: int | float | str,
+                    ) -> tuple[int, str | None]:
         r'''
         Strip error symbols from a numerical value. Return cleaned source and
         sym. Only one error symbol is expected per string.
@@ -196,7 +196,7 @@ class Date(prebase.ProtoM21Object):
         >>> d._stripError('4.43')
         (4, None)
         '''
-        uncertainty: t.Optional[str] = None
+        uncertainty: str | None = None
         if isinstance(value, str):  # if a number, let pass
             sym = self.approximateSymbols + self.uncertainSymbols + self.priorTimeSymbols
             found = None
@@ -358,8 +358,8 @@ class Date(prebase.ProtoM21Object):
         >>> d.minute, d.second
         (50, 32)
         '''
-        post: list[t.Optional[int]] = []
-        postError: list[t.Optional[str]] = []
+        post: list[int | None] = []
+        postError: list[str | None] = []
         dateStr = dateStr.replace(':', '/')
         dateStr = dateStr.replace(' ', '')
         for chunk in dateStr.split('/'):
@@ -481,7 +481,7 @@ class DatePrimitive(prebase.ProtoM21Object):
         # store an array of values marking if date data itself
         # is certain, approximate, or uncertain
         # here, dataError is relevance
-        self._dataUncertainty: list[t.Union[str, None]] = []
+        self._dataUncertainty: list[str | None] = []
         self.relevance = relevance  # will use property
 
     # SPECIAL METHODS #
@@ -843,16 +843,16 @@ class Text(prebase.ProtoM21Object):
     # INITIALIZER #
 
     def __init__(self,
-                 data: t.Union[str, 'Text'] = '',
-                 language: t.Optional[str] = None,
-                 isTranslated: t.Optional[bool] = None,   # True, False, or None (unknown)
-                 encodingScheme: t.Optional[str] = None):
+                 data: str | Text = '',
+                 language: str | None = None,
+                 isTranslated: bool | None = None,   # True, False, or None (unknown)
+                 encodingScheme: str | None = None):
         if isinstance(data, Text):
             # accessing private attributes here; not desirable
-            self._data: t.Union[str, Text] = data._data
-            self._language: t.Optional[str] = data._language
-            self.isTranslated: t.Optional[bool] = data.isTranslated
-            self.encodingScheme: t.Optional[str] = data.encodingScheme
+            self._data: str | Text = data._data
+            self._language: str | None = data._language
+            self.isTranslated: bool | None = data.isTranslated
+            self.encodingScheme: str | None = data.encodingScheme
         else:
             self._data = data
             self._language = language
@@ -1002,9 +1002,9 @@ class Copyright(Text):
     '''
 
     def __init__(self,
-                 data: t.Union[str, 'Text'] = '',
-                 language: t.Optional[str] = None,
-                 isTranslated: t.Optional[bool] = None,   # True, False, or None (unknown)
+                 data: str | Text = '',
+                 language: str | None = None,
+                 isTranslated: bool | None = None,   # True, False, or None (unknown)
                  *, role=None):
         super().__init__(data, language, isTranslated)
         self.role = role
@@ -1083,11 +1083,11 @@ class Contributor(prebase.ProtoM21Object):
 
     def __init__(self,
                  *,
-                 name: t.Union[str, Text, None] = None,
-                 names: Iterable[t.Union[str, Text]] = (),
-                 role: t.Union[str, Text, None] = None,
-                 birth: t.Union[None, DateSingle, str] = None,
-                 death: t.Union[None, DateSingle, str] = None,
+                 name: str | Text | None = None,
+                 names: Iterable[str | Text] = (),
+                 role: str | Text | None = None,
+                 birth: None | DateSingle | str = None,
+                 death: None | DateSingle | str = None,
                  **keywords):
         self._role = None
         if role:
@@ -1112,8 +1112,8 @@ class Contributor(prebase.ProtoM21Object):
         # store the nationality, if known (not currently used)
         self._nationality: list[Text] = []
 
-        self.birth: t.Optional[DateSingle] = None
-        self.death: t.Optional[DateSingle] = None
+        self.birth: DateSingle | None = None
+        self.death: DateSingle | None = None
 
         if birth is not None:
             if not isinstance(birth, DateSingle):
@@ -1213,7 +1213,7 @@ class Contributor(prebase.ProtoM21Object):
 
     # PUBLIC METHODS #
 
-    def age(self) -> t.Optional[datetime.timedelta]:
+    def age(self) -> datetime.timedelta | None:
         r'''
         Calculate the age at death of the Contributor, returning a
         datetime.timedelta object.
@@ -1608,8 +1608,8 @@ _DOC_ORDER = (
     Copyright,
 )
 
-DateParseType = t.Union[Date, datetime.datetime, str]
-ValueType = t.Union[DatePrimitive, Text, Contributor, Copyright, int]
+DateParseType = Date | datetime.datetime | str
+ValueType = DatePrimitive | Text | Contributor | Copyright | int
 
 
 if __name__ == '__main__':

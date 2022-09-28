@@ -47,7 +47,7 @@ environLocal = environment.Environment('instrument')
 
 def unbundleInstruments(streamIn: stream.Stream,
                         *,
-                        inPlace=False) -> t.Optional[stream.Stream]:
+                        inPlace=False) -> stream.Stream | None:
     # noinspection PyShadowingNames
     '''
     takes a :class:`~music21.stream.Stream` that has :class:`~music21.note.NotRest` objects
@@ -86,7 +86,7 @@ def unbundleInstruments(streamIn: stream.Stream,
 
 def bundleInstruments(streamIn: stream.Stream,
                       *,
-                      inPlace=False) -> t.Optional[stream.Stream]:
+                      inPlace=False) -> stream.Stream | None:
     # noinspection PyShadowingNames
     '''
     >>> up1 = note.Unpitched()
@@ -163,20 +163,20 @@ class Instrument(base.Music21Object):
         self.printPartName = None  # True = yes, False = no, None = let others decide
         self.printPartAbbreviation = None
 
-        self.instrumentId: t.Optional[str] = None  # apply to midi and instrument
+        self.instrumentId: str | None = None  # apply to midi and instrument
         self._instrumentIdIsRandom = False
 
         self.instrumentName: str = instrumentName
-        self.instrumentAbbreviation: t.Optional[str] = None
-        self.midiProgram: t.Optional[int] = None  # 0-indexed
-        self.midiChannel: t.Optional[int] = None  # 0-indexed
-        self.instrumentSound: t.Optional[str] = None
+        self.instrumentAbbreviation: str | None = None
+        self.midiProgram: int | None = None  # 0-indexed
+        self.midiChannel: int | None = None  # 0-indexed
+        self.instrumentSound: str | None = None
 
         self.lowestNote = None
         self.highestNote = None
 
         # define interval to go from written to sounding
-        self.transposition: t.Optional[interval.Interval] = None
+        self.transposition: interval.Interval | None = None
 
         self.inGMPercMap = False
         self.soundfontFn = None  # if defined...

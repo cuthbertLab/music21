@@ -81,7 +81,7 @@ class DiscreteAnalysis:
         # store alternative solutions, which may be sorted or not
         self.alternativeSolutions = []
 
-    def _rgbToHex(self, rgb: Sequence[t.Union[float, int]]) -> str:
+    def _rgbToHex(self, rgb: Sequence[float | int]) -> str:
         '''
         Utility conversion method
 
@@ -418,7 +418,7 @@ class KeyWeightKeyAnalysis(DiscreteAnalysis):
         if keyResults is None:
             return None
 
-        solution: list[t.Union[int, float]] = [0.0] * 12
+        solution: list[int | float] = [0.0] * 12
         top = [0.0] * 12
         bottomRight = [0.0] * 12
         bottomLeft = [0.0] * 12
@@ -956,8 +956,8 @@ class Ambitus(DiscreteAnalysis):
         super().__init__(referenceStream=referenceStream)
         # Store the min and max Pitch instances for referenceStream
         # set by getPitchSpan(), which is called by _generateColors()
-        self.minPitchObj: t.Optional[pitch.Pitch] = None
-        self.maxPitchObj: t.Optional[pitch.Pitch] = None
+        self.minPitchObj: pitch.Pitch | None = None
+        self.maxPitchObj: pitch.Pitch | None = None
 
         self._pitchSpanColors = OrderedDict()
         self._generateColors()
@@ -1002,7 +1002,7 @@ class Ambitus(DiscreteAnalysis):
 
         # environLocal.printDebug([self._pitchSpanColors])
 
-    def getPitchSpan(self, subStream) -> t.Optional[tuple[pitch.Pitch, pitch.Pitch]]:
+    def getPitchSpan(self, subStream) -> tuple[pitch.Pitch, pitch.Pitch] | None:
         '''
         For a given subStream, return a tuple consisting of the two pitches
         with the minimum and maximum pitch space value.
@@ -1334,7 +1334,7 @@ def analyzeStream(
         # this synonym is being added for compatibility
         method = 'span'
 
-    analysisClassName: t.Optional[type[DiscreteAnalysis]] = analysisClassFromMethodName(method)
+    analysisClassName: type[DiscreteAnalysis] | None = analysisClassFromMethodName(method)
 
     if analysisClassName is not None:
         obj = analysisClassName()
@@ -1346,7 +1346,7 @@ def analyzeStream(
 
 
 # noinspection SpellCheckingInspection
-def analysisClassFromMethodName(method: str) -> t.Optional[type[DiscreteAnalysis]]:
+def analysisClassFromMethodName(method: str) -> type[DiscreteAnalysis] | None:
     '''
     Returns an analysis class given a method name, or None if none can be found
 
@@ -1375,7 +1375,7 @@ def analysisClassFromMethodName(method: str) -> t.Optional[type[DiscreteAnalysis
         BellmanBudge,
         TemperleyKostkaPayne,
     ]
-    match: t.Optional[type[DiscreteAnalysis]] = None
+    match: type[DiscreteAnalysis] | None = None
     for analysisClass in analysisClasses:
         # this is a very loose matching, as there are few classes now
         if (method.lower() in analysisClass.__name__.lower()

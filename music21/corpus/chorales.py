@@ -17,7 +17,6 @@ class for easily iterating through the chorale collection.
 from __future__ import annotations
 
 import copy
-import typing as t
 import unittest
 
 from music21 import environment
@@ -1068,15 +1067,15 @@ class Iterator:
                   'titleList', 'numberList', 'returnType', 'iterationType']
 
     def __init__(self,
-                 currentNumber: t.Optional[int] = None,
-                 highestNumber: t.Optional[int] = None,
+                 currentNumber: int | None = None,
+                 highestNumber: int | None = None,
                  *,
                  numberingSystem: str = 'riemenschneider',
                  returnType: str = 'stream',
                  iterationType: str = 'number',
                  analysis: bool = False,
-                 numberList: t.Optional[list[int]] = None,
-                 titleList: t.Optional[list[str]] = None,
+                 numberList: list[int] | None = None,
+                 titleList: list[str] | None = None,
                  ):
         '''
         By default: numberingSystem = 'riemenschneider', currentNumber = 1,

@@ -12,7 +12,6 @@
 # -----------------------------------------------------------------------------
 from __future__ import annotations
 
-import typing as t
 from dataclasses import dataclass
 
 from music21.metadata.primitives import (DatePrimitive, Text, Contributor, Copyright, ValueType)
@@ -48,11 +47,11 @@ class PropertyDescription:
         metadata, and is the tuple element type clients will always receive from
         md['uniqueName'] or md['namespace:name'].
     '''
-    uniqueName: t.Optional[str] = None
+    uniqueName: str | None = None
     name: str = ''
     namespace: str = ''
-    oldMusic21Abbrev: t.Optional[str] = None
-    oldMusic21WorkId: t.Optional[str] = None
+    oldMusic21Abbrev: str | None = None
+    oldMusic21WorkId: str | None = None
     valueType: type[ValueType] = Text
     needsArticleNormalization: bool = False
     isContributor: bool = False

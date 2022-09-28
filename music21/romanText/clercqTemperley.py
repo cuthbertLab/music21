@@ -21,7 +21,6 @@ import copy
 import io
 import pathlib
 import re
-import typing as t
 import unittest
 
 from collections import OrderedDict
@@ -296,7 +295,7 @@ class CTSong(prebase.ProtoM21Object):
             ''',
     }
 
-    def __init__(self, textFile: t.Union[str, pathlib.Path] = '', **keywords):
+    def __init__(self, textFile: str | pathlib.Path = '', **keywords):
         self._title = None
         self.text = ''
         self.lines: list[str] = []
@@ -328,7 +327,7 @@ class CTSong(prebase.ProtoM21Object):
         return f'title={self.title!r} year={self.year}'
 
     # --------------------------------------------------------------------------
-    def parse(self, textFile: t.Union[str, pathlib.Path]):
+    def parse(self, textFile: str | pathlib.Path):
         '''
         Called when a CTSong is created by passing a string or filename;
         in the second case, it opens the file

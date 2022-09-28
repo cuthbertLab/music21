@@ -63,7 +63,7 @@ environLocal = environment.Environment('scale.scala')
 
 # ------------------------------------------------------------------------------
 # global variable to cache the paths returned from getPaths()
-SCALA_PATHS: dict[str, t.Optional[dict[str, list[str]]]] = {'allPaths': None}
+SCALA_PATHS: dict[str, dict[str, list[str]] | None] = {'allPaths': None}
 
 def getPaths():
     '''

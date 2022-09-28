@@ -96,7 +96,7 @@ class ElementTree(core.AVLTree):
     6.0
     '''
     # TYPING #
-    rootNode: t.Optional[nodeModule.ElementNode]
+    rootNode: nodeModule.ElementNode | None
 
     # CLASS VARIABLES #
     nodeClass = nodeModule.ElementNode
@@ -553,7 +553,7 @@ class ElementTree(core.AVLTree):
         <ElementNode: Start:36.0 <0.-5...> Indices:(l:193 *194* r:195)
             Payload:<music21.bar.Barline type=final>>
         '''
-        def recurse(subListOfTuples, globalStartOffset) -> t.Optional[core.AVLNode]:
+        def recurse(subListOfTuples, globalStartOffset) -> core.AVLNode | None:
             '''
             Divide and conquer.
             '''
@@ -898,7 +898,7 @@ class OffsetTree(ElementTree):
     __slots__ = ()
 
     # TYPING #
-    rootNode: t.Optional[nodeModule.OffsetNode]
+    rootNode: nodeModule.OffsetNode | None
 
     nodeClass = nodeModule.OffsetNode
 

@@ -15,7 +15,6 @@ This module defines objects for describing tempo and changes in tempo.
 from __future__ import annotations
 
 import copy
-import typing as t
 import unittest
 
 from music21 import base
@@ -1146,8 +1145,8 @@ class MetricModulation(TempoIndication):
 
     def setOtherByReferent(
         self,
-        side: t.Optional[str] = None,
-        referent: t.Union[str, int, float] = 1.0
+        side: str | None = None,
+        referent: str | int | float = 1.0
     ):
         '''
         Set the other side of the metric modulation not based on equality,

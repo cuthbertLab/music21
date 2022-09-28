@@ -48,7 +48,6 @@ from __future__ import annotations
 import copy
 import math
 import re
-import typing as t
 import unittest
 
 from music21 import articulations
@@ -1064,7 +1063,7 @@ class HumdrumSpine(prebase.ProtoM21Object):
         self._spineCollection = None
         self._spineType = None
 
-        self.isFirstVoice: t.Union[bool, None] = None
+        self.isFirstVoice: bool | None = None
         self.iterIndex = None
 
     def _reprInternal(self):
@@ -1571,7 +1570,7 @@ class SpineEvent(prebase.ProtoM21Object):
         self.contents = contents
         self.position = position
         self.protoSpineId: int = 0
-        self.spineId: t.Optional[int] = None
+        self.spineId: int | None = None
 
     def _reprInternal(self):
         return str(self.contents)
@@ -2005,7 +2004,7 @@ class SpineCollection(prebase.ProtoM21Object):
                 if not hasVoices:
                     continue
 
-                voices: list[t.Optional[stream.Voice]] = [None for i in range(10)]
+                voices: list[stream.Voice | None] = [None for i in range(10)]
                 measureElements = el.elements
                 for mEl in measureElements:
                     mElGroups = mEl.groups

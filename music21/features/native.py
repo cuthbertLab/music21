@@ -13,7 +13,6 @@ Original music21 feature extractors.
 '''
 from __future__ import annotations
 
-import typing as t
 import unittest
 
 from music21 import environment
@@ -112,7 +111,7 @@ class QualityFeature(featuresModule.FeatureExtractor):
         Do processing necessary, storing result in feature.
         '''
         allKeys = self.data['flat.getElementsByClass(Key)']
-        keyFeature: t.Optional[int] = None
+        keyFeature: int | None = None
         if len(allKeys) == 1:
             k0 = allKeys[0]
             if k0.mode == 'major':

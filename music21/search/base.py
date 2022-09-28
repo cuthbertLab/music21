@@ -20,7 +20,6 @@ from collections.abc import Callable
 import copy
 import difflib
 import math
-import typing as t
 import unittest
 
 from more_itertools import windowed
@@ -206,7 +205,7 @@ class StreamSearcher:
 
         self.algorithms: list[
             Callable[[Stream, m21Base.Music21Object],
-                     t.Union[bool, None]]
+                     bool | None]
         ] = [StreamSearcher.wildcardAlgorithm]
 
         self.activeIterator = None
