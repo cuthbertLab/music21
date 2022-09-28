@@ -4383,31 +4383,6 @@ class Test(unittest.TestCase):
         rn = RomanNumeral('bVII7', 'C', seventhMinor=Minor67Default.CAUTIONARY)
         self.assertEqual(rn.seventh.name, 'A')
 
-    def test_musicxml_two_kinds(self):
-        from music21.musicxml.m21ToXml import GeneralObjectExporter
-        from music21 import stream
-
-        # normal roman numerals take up no time in xml output.
-        rn1 = RomanNumeral('I', 'C')
-        rn2 = RomanNumeral('V', 'C')
-
-        m = stream.Measure()
-        m.insert(0.0, rn1)
-        m.insert(2.0, rn2)
-
-        # with writeAsChord=True, they get their own Chord objects and durations.
-        self.assertTrue(rn1.writeAsChord)
-        xmlOut = GeneralObjectExporter().parse(m).decode('utf-8')
-        self.assertNotIn('<forward>', xmlOut)
-        self.assertIn('<chord', xmlOut)
-
-        rn1.writeAsChord = True
-        rn2.writeAsChord = True
-        rn1.duration.type = 'half'
-        xmlOut = GeneralObjectExporter().parse(m).decode('utf-8')
-        self.assertIn('<forward>', xmlOut)
-        self.assertNotIn('<chord', xmlOut)
-
 
 class TestExternal(unittest.TestCase):
     show = True

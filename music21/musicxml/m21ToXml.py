@@ -5398,6 +5398,41 @@ class MeasureExporter(XMLExporterBase):
           <kind>diminished-seventh</kind>
           <inversion>1</inversion>
         </harmony>
+
+        >>> maj6 = roman.RomanNumeral('VI7', 'd')
+        >>> maj6.writeAsChord = False
+        >>> mxHarmonyFromRN = MEX.romanNumeralToXml(maj6)
+        >>> MEX.dump(mxHarmonyFromRN)
+        <harmony>
+          <numeral>
+            <numeral-root text="VI7">6</numeral-root>
+            <numeral-key print-object="no">
+              <numeral-fifths>-1</numeral-fifths>
+              <numeral-mode>natural minor</numeral-mode>
+            </numeral-key>
+          </numeral>
+          <kind>major-seventh</kind>
+        </harmony>
+
+        >>> min6 = roman.RomanNumeral('vi', 'd')
+        >>> min6.writeAsChord = False
+        >>> mxHarmonyFromRN = MEX.romanNumeralToXml(min6)
+        >>> mxHarmonyFromRN.find('.//numeral-mode').text
+        'melodic minor'
+
+        >>> dim7 = roman.RomanNumeral('viiø65', 'd')
+        >>> dim7.writeAsChord = False
+        >>> mxHarmonyFromRN = MEX.romanNumeralToXml(dim7)
+        >>> mxHarmonyFromRN.find('.//numeral-mode').text
+        'harmonic minor'
+        >>> mxHarmonyFromRN.find('kind').text
+        'half-diminished'
+
+        >>> maj7 = roman.RomanNumeral('VII64', 'd')
+        >>> maj7.writeAsChord = False
+        >>> mxHarmonyFromRN = MEX.romanNumeralToXml(maj7)
+        >>> mxHarmonyFromRN.find('.//numeral-mode').text
+        'natural minor'
         '''
         if rn.writeAsChord is True:
             return self.chordToXml(rn)
@@ -5406,6 +5441,7 @@ class MeasureExporter(XMLExporterBase):
         # create a new chordSymbol in order to get the musicxml "kind"
         # a little slower than needs to be.
         cs = harmony.chordSymbolFromChord(rn)
+        cs.offset = rn.offset  # needed for not getting an extra offset tag w/ forward.
         mxHarmony = self.chordSymbolToXml(cs, append=False)
         mxRoot = mxHarmony.find('root')
         mxHarmony.remove(mxRoot)
@@ -5437,12 +5473,12 @@ class MeasureExporter(XMLExporterBase):
                 modeText = 'minor'
             elif rn.scaleDegree == 6:
                 # simplest way to figure this out.
-                if (rnRoot.pitchClass - rn.key.tonic.pitchClass) % 12 == 8:
+                if (rn.root().pitchClass - rn.key.tonic.pitchClass) % 12 == 8:
                     modeText = 'natural minor'
                 else:
                     modeText = 'melodic minor'
             else:
-                if (rnRoot.pitchClass - rn.key.tonic.pitchClass) % 12 == 10:
+                if (rn.root().pitchClass - rn.key.tonic.pitchClass) % 12 == 10:
                     modeText = 'natural minor'
                 else:
                     modeText = 'harmonic minor'

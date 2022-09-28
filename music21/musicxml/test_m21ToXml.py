@@ -778,6 +778,41 @@ class Test(unittest.TestCase):
         # No <forward> tag is necessary to finish the incomplete measure (3.9979 -> 4.0)
         self.assertEqual(len(tree.findall('.//forward')), 1)
 
+    def test_roman_musicxml_two_kinds(self):
+        from music21.roman import RomanNumeral
+        
+        # normal roman numerals take up no time in xml output.
+        rn1 = RomanNumeral('I', 'C')
+        rn1.duration.type = 'half'
+        rn2 = RomanNumeral('V', 'C')
+        rn2.duration.type = 'half'
+
+        m = stream.Measure()
+        m.insert(0.0, rn1)
+        m.insert(2.0, rn2)
+
+        # with writeAsChord=True, they get their own Chord objects and durations.
+        self.assertTrue(rn1.writeAsChord)
+        xmlOut = GeneralObjectExporter().parse(m).decode('utf-8')
+        self.assertNotIn('<forward>', xmlOut)
+        self.assertIn('<chord', xmlOut)
+
+        rn1.writeAsChord = False
+        rn2.writeAsChord = False
+        xmlOut = GeneralObjectExporter().parse(m).decode('utf-8')
+        self.assertIn('<numeral', xmlOut)
+        self.assertIn('<forward>', xmlOut)
+        self.assertNotIn('<chord', xmlOut)
+        self.assertNotIn('<offset', xmlOut)
+        self.assertNotIn('<rest', xmlOut)
+
+        rn1.duration.quarterLength = 0.0
+        rn2.duration.quarterLength = 0.0
+        xmlOut = GeneralObjectExporter().parse(m).decode('utf-8')
+        self.assertIn('<rest', xmlOut)
+        self.assertNotIn('<forward>', xmlOut)
+
+
 
 class TestExternal(unittest.TestCase):
     show = True
