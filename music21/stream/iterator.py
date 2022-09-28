@@ -793,7 +793,9 @@ class StreamIterator(prebase.ProtoM21Object, Sequence[M21ObjType]):
         return x
 
     @overload
-    def stream(self, returnStreamSubClass: t.Literal[True] = True) -> StreamType:
+    def stream(self, returnStreamSubClass: t.Literal[True] = True) -> StreamType:  # type: ignore
+        # Astroid bug + new mypy 0.981 problem -- if type-var is a problem here, then
+        # it should be in the non-overloaded function below.
         x: StreamType = self.streamObj
         return x
 
