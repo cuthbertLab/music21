@@ -780,7 +780,7 @@ class Test(unittest.TestCase):
 
     def test_roman_musicxml_two_kinds(self):
         from music21.roman import RomanNumeral
-        
+
         # normal roman numerals take up no time in xml output.
         rn1 = RomanNumeral('I', 'C')
         rn1.duration.type = 'half'
