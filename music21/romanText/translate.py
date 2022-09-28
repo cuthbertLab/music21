@@ -210,7 +210,7 @@ def _copySingleMeasure(rtTagged, p, kCurrent):
                     # should not happen
                     raise RomanTextTranslateException(
                         'attempting to copy a measure but no past key definitions are found')
-                if rnPast.editorial.get('followsKeyChange'):
+                if rnPast.followsKeyChange:
                     kCurrent = rnPast.key
                 elif rnPast.pivotChord is not None:
                     kCurrent = rnPast.pivotChord.key
@@ -220,6 +220,7 @@ def _copySingleMeasure(rtTagged, p, kCurrent):
                     newRN = roman.RomanNumeral(
                         rnPast.figure, copy.deepcopy(kCurrent)
                     )
+                    newRN.writeAsChord = True
                     newRN.duration = copy.deepcopy(rnPast.duration)
                     newRN.lyrics = copy.deepcopy(rnPast.lyrics)
                     m.replace(rnPast, newRN)
@@ -278,7 +279,7 @@ def _copyMultipleMeasures(rtMeasure: rtObjects.RTMeasure,
                     # should not happen
                     raise RomanTextTranslateException(
                         'attempting to copy a measure but no past key definitions are found')
-                if rnPast.editorial.get('followsKeyChange'):
+                if rnPast.followsKeyChange:
                     kCurrent = rnPast.key
                 elif rnPast.pivotChord is not None:
                     kCurrent = rnPast.pivotChord.key
@@ -288,6 +289,7 @@ def _copyMultipleMeasures(rtMeasure: rtObjects.RTMeasure,
                     newRN = roman.RomanNumeral(
                         rnPast.figure, copy.deepcopy(kCurrent)
                     )
+                    newRN.writeAsChord = True
                     newRN.duration = copy.deepcopy(rnPast.duration)
                     newRN.lyrics = copy.deepcopy(rnPast.lyrics)
                     m.replace(rnPast, newRN)
@@ -853,6 +855,7 @@ class PartTranslator:
                                         sixthMinor=self.sixthMinor,
                                         seventhMinor=self.seventhMinor,
                                         )
+                rn.writeAsChord = True
                 _rnKeyCache[cacheTuple] = rn
             # surprisingly, not faster... and more dangerous
             # rn = roman.RomanNumeral(aSrc, kCurrent)
@@ -877,10 +880,10 @@ class PartTranslator:
             # 19.01
 
             if self.setKeyChangeToken is True:
-                rn.editorial.followsKeyChange = True
+                rn.followsKeyChange = True
                 self.setKeyChangeToken = False
             else:
-                rn.editorial.followsKeyChange = False
+                rn.followsKeyChange = False
         except (roman.RomanNumeralException,
                 exceptions21.Music21CommonException):  # pragma: no cover
             # environLocal.printDebug(f' cannot create RN from: {a.src}')
@@ -1085,7 +1088,8 @@ def fixPickupMeasure(partObject):
     Fix a pickup measure if any.
 
     We determine a pickup measure by being measure 0 and not having an RN
-    object at the beginning.
+    object at the beginning.  Will also pad the last measure right and
+    cut the duration of the final chord to match.
 
     Demonstration: an otherwise incorrect part
 
@@ -1095,11 +1099,13 @@ def fixPickupMeasure(partObject):
     >>> k0 = key.Key('G')
     >>> m0.insert(0, k0)
     >>> m0.insert(0, meter.TimeSignature('4/4'))
-    >>> m0.insert(2, roman.RomanNumeral('V', k0))
+    >>> m0.insert(3, roman.RomanNumeral('I', k0, quarterLength=1.0))
     >>> m1 = stream.Measure()
     >>> m1.number = 1
+    >>> m1.append(roman.RomanNumeral('V', k0, quarterLength=4.0))
     >>> m2 = stream.Measure()
     >>> m2.number = 2
+    >>> m2.append(roman.RomanNumeral('I', k0, quarterLength=4.0))
     >>> p.insert(0, m0)
     >>> p.insert(4, m1)
     >>> p.insert(8, m2)
@@ -1111,32 +1117,51 @@ def fixPickupMeasure(partObject):
     {0.0} <music21.stream.Measure 0 offset=0.0>
         {0.0} <music21.key.Key of G major>
         {0.0} <music21.meter.TimeSignature 4/4>
+        {0.0} <music21.roman.RomanNumeral I in G major>
+    {1.0} <music21.stream.Measure 1 offset=1.0>
         {0.0} <music21.roman.RomanNumeral V in G major>
-    {2.0} <music21.stream.Measure 1 offset=2.0>
-    <BLANKLINE>
-    {6.0} <music21.stream.Measure 2 offset=6.0>
-    <BLANKLINE>
+    {5.0} <music21.stream.Measure 2 offset=5.0>
+        {0.0} <music21.roman.RomanNumeral I in G major>
+
     >>> m0.paddingLeft
-    2.0
+    3.0
+    >>> m2.paddingRight
+    1.0
+    >>> m2[roman.RomanNumeral].last().duration
+    <music21.duration.Duration 3.0>
     '''
     m0 = partObject.measure(0)
     if m0 is None:
         return
-    rnObjects = m0.getElementsByClass(roman.RomanNumeral)
+    rnObjects = m0.getElementsByClass([roman.RomanNumeral, harmony.NoChord])
     if not rnObjects:
         return
     if rnObjects[0].offset == 0:
         return
-    newPadding = rnObjects[0].offset
+    leftPadding = rnObjects[0].offset
     for el in m0:
-        if el.offset < newPadding:  # should be zero for Clefs, etc.
+        if el.offset < leftPadding:  # should be zero for Clefs, etc.
             pass
         else:
-            el.offset = el.offset - newPadding
-    m0.paddingLeft = newPadding
-    for el in partObject:  # adjust all other measures backwards
+            el.offset = el.offset - leftPadding
+    m0.paddingLeft = leftPadding
+    for el in partObject:  # adjust all other measures etc. backwards
         if el.offset > 0:
-            el.offset -= newPadding
+            el.offset -= leftPadding
+    mLast = partObject.getElementsByClass(stream.Measure).last()
+    if mLast is m0:
+        return
+
+    lastRN = mLast.getElementsByClass([roman.RomanNumeral, harmony.NoChord]).last()
+    if lastRN and lastRN.duration.quarterLength > leftPadding:
+        curLastLength = mLast.duration.quarterLength
+        lastRN.duration.quarterLength -= curLastLength - leftPadding
+        mLast.paddingRight = curLastLength - leftPadding
+        i = -1
+        while partObject[i] is not mLast:
+            # unprocessed metadata after last object
+            partObject[i].setOffsetBySite(partObject, partObject[i].offset - mLast.paddingRight)
+            i -= 1
 
 
 def romanTextToStreamOpus(rtHandler, inputM21=None):
@@ -1769,4 +1794,3 @@ _DOC_ORDER: list[type] = []
 if __name__ == '__main__':
     import music21
     music21.mainTest(Test)  # , TestSlow)
-

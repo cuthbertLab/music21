@@ -2246,6 +2246,7 @@ class RomanNumeral(harmony.Harmony):
         updatePitches=True,
         sixthMinor=Minor67Default.QUALITY,
         seventhMinor=Minor67Default.QUALITY,
+        **keywords,
     ):
         self.primaryFigure: str = ''
         self.secondaryRomanNumeral: t.Optional[RomanNumeral] = None
@@ -2301,10 +2302,11 @@ class RomanNumeral(harmony.Harmony):
         self.sixthMinor = sixthMinor
         self.seventhMinor = seventhMinor
 
-        super().__init__(figure, updatePitches=updatePitches)
+        super().__init__(figure, updatePitches=updatePitches, **keywords)
+        self.writeAsChord = True  # override from Harmony/ChordSymbol
         self._parsingComplete = True
         self._functionalityScore: t.Optional[int] = None
-        self.editorial.followsKeyChange = False
+        self.followsKeyChange = False
 
     # SPECIAL METHODS #
 
