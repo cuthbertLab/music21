@@ -393,7 +393,7 @@ def midiEventsToNote(
     tOn, eOn = eventTuple[0]
     tOff, unused_eOff = eventTuple[1]
 
-    returnClass: t.Union[type[note.Unpitched], type[note.Note]]
+    returnClass: type[note.Unpitched] | type[note.Note]
     if eOn.channel == 10:
         returnClass = note.Unpitched
     else:
@@ -631,7 +631,7 @@ def midiEventsToChord(
         v.velocityIsRelative = False  # velocity is absolute coming from
         volumes.append(v)
 
-    returnClass: t.Union[type[percussion.PercussionChord], type[chord.Chord]]
+    returnClass: type[percussion.PercussionChord] | type[chord.Chord]
     if any_channel_10:
         returnClass = percussion.PercussionChord
     else:

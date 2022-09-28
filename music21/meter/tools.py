@@ -133,7 +133,7 @@ def slashMixedToFraction(valueSrc: str) -> tuple[NumDenomTuple, bool]:
 
     Changed in v7 -- new location and returns a tuple as first value.
     '''
-    pre: list[t.Union[NumDenom, tuple[int, None]]] = []
+    pre: list[NumDenom | tuple[int, None]] = []
     post: list[NumDenom] = []
     summedNumerator = False
     value = valueSrc.strip()  # rem whitespace
@@ -641,7 +641,7 @@ def divisionOptionsPreset(n, d) -> MeterOptions:
     Provide fixed set of meter divisions that will not be easily
     obtained algorithmically.
 
-    Currently does nothing except to allow partitioning 5/8 as 2/8, 2/8, 1/8 as a possibility
+    Currently, does nothing except to allow partitioning 5/8 as 2/8, 2/8, 1/8 as a possibility
     (sim for 5/16, etc.)
 
     >>> meter.tools.divisionOptionsPreset(5, 8)

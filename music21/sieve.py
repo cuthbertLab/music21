@@ -1630,7 +1630,7 @@ class Sieve:
 
     def segment(
         self,
-        state: t.Union[t.Literal['cmp'], t.Literal['exp'], None] = None,
+        state: t.Literal['cmp'] | t.Literal['exp'] | None = None,
         n=0,
         z=None,
         segmentFormat=None

@@ -529,7 +529,7 @@ def figureTupleSolo(
 def identifyAsTonicOrDominant(
     inChord: list | tuple | chord.Chord,
     inKey: key.Key
-) -> t.Union[str, t.Literal[False]]:
+) -> str | t.Literal[False]:
     '''
     Returns the roman numeral string expression (either tonic or dominant) that
     best matches the inChord. Useful when you know inChord is either tonic or
@@ -3159,7 +3159,7 @@ class RomanNumeral(harmony.Harmony):
                 f'_updatePitches() was unable to derive pitches from the figure: {self.figure!r}'
             )  # pragma: no cover
 
-    def transpose(self: T, value, *, inPlace=False) -> t.Optional[T]:
+    def transpose(self: T, value, *, inPlace=False) -> T | None:
         '''
         Overrides :meth:`~music21.harmony.Harmony.transpose` so that `key`
         attribute is transposed as well.

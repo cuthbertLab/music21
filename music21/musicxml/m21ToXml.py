@@ -5340,7 +5340,7 @@ class MeasureExporter(XMLExporterBase):
         self.xmlRoot.append(mxHarmony)
         return mxHarmony
 
-    def romanNumeralToXml(self, rn: roman.RomanNumeral) -> t.Union[Element, list[Element]]:
+    def romanNumeralToXml(self, rn: roman.RomanNumeral) -> Element | list[Element]:
         '''
         Convert a RomanNumeral object to either a chord (if .writeAsChord is True)
         or a Harmony XML Element.
