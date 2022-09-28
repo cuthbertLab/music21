@@ -74,7 +74,7 @@ class StreamFilter(prebase.ProtoM21Object):
     def reset(self):
         pass
 
-    def __call__(self, item, iterator: t.Optional[StreamIteratorType] = None):
+    def __call__(self, item, iterator: StreamIteratorType | None = None):
         return True
 
 class IsFilter(StreamFilter):

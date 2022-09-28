@@ -342,8 +342,8 @@ class MeiToM21Converter:
 # -----------------------------------------------------------------------------
 def safePitch(
     name: str,
-    accidental: t.Optional[str] = None,
-    octave: t.Union[str, int] = ''
+    accidental: str | None = None,
+    octave: str | int = ''
 ) -> pitch.Pitch:
     '''
     Safely build a :class:`~music21.pitch.Pitch` from a string.
@@ -381,7 +381,7 @@ def safePitch(
 
 
 def makeDuration(
-    base: t.Union[float, int, Fraction] = 0.0,
+    base: float | int | Fraction = 0.0,
     dots: int = 0
 ) -> duration.Duration:
     '''
@@ -617,7 +617,8 @@ def _makeArticList(attr):
     return articList
 
 
-def _getOctaveShift(dis: t.Union[t.Literal['8', '15', '22'], None], disPlace: str) -> int:
+def _getOctaveShift(dis: t.Literal['8', '15', '22'] | None,
+                    disPlace: str) -> int:
     '''
     Use :func:`_getOctaveShift` to calculate the :attr:`octaveShift` attribute for a
     :class:`~music21.clef.Clef` subclass. Any of the arguments may be ``None``.
@@ -1026,7 +1027,7 @@ def _timeSigFromAttrs(elem):
     return meter.TimeSignature(f"{elem.get('meter.count')!s}/{elem.get('meter.unit')!s}")
 
 
-def _keySigFromAttrs(elem: Element) -> t.Union[key.Key, key.KeySignature]:
+def _keySigFromAttrs(elem: Element) -> key.Key | key.KeySignature:
     '''
     From any tag with (at minimum) either @key.pname or @key.sig attributes, make a
     :class:`KeySignature` or :class:`Key`, as possible.

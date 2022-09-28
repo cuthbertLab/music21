@@ -20,7 +20,6 @@ Does not handle pickup notes, which are defined simply with an early barline
 from __future__ import annotations
 
 from io import StringIO
-import typing as t
 import unittest
 import xml.etree.ElementTree
 import zipfile
@@ -193,7 +192,7 @@ class CapellaImporter:
                 newPart.coreElementsChanged()
         newScore = stream.Score()
         # ORDERED DICT
-        parts: list[t.Optional[stream.Part]] = [None for i in range(len(partDictById))]
+        parts: list[stream.Part | None] = [None for i in range(len(partDictById))]
         for partId in partDictById:
             partDict = partDictById[partId]
             parts[partDict['number']] = partDict['part']

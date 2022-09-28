@@ -27,7 +27,6 @@ arguments, the methods only :meth:`~music21.pitch.Pitch.transpose` each
 from __future__ import annotations
 
 import unittest
-import typing as t
 
 from music21 import exceptions21
 from music21 import chord
@@ -747,7 +746,7 @@ def _resolvePitches(possibToResolve, howToResolve):
 
 def _unpackSeventhChord(
     seventhChord: chord.Chord
-) -> list[t.Optional[pitch.Pitch]]:
+) -> list[pitch.Pitch | None]:
     '''
     Takes in a Chord and returns a list of Pitches (or Nones) corresponding
     to the bass, root, fifth, seventh.

@@ -534,8 +534,8 @@ class TsvHandler:
             raise ValueError(f'dcml_version {dcml_version} is not in (1, 2)')
         self.tsvFileName = tsvFile
         self.chordList: list[TabChordBase] = []
-        self.m21stream: t.Optional[stream.Score] = None
-        self._head_indices: dict[str, tuple[int, t.Union[type, t.Any]]] = {}
+        self.m21stream: stream.Score | None = None
+        self._head_indices: dict[str, tuple[int, type | t.Any]] = {}
         self._extra_indices: dict[int, str] = {}
         self.dcml_version = dcml_version
         self.tsvData = self._importTsv()  # converted to private
@@ -682,7 +682,7 @@ class TsvHandler:
 
         currentMeasureLength = ts.barDuration.quarterLength
 
-        currentOffset: t.Union[float, fractions.Fraction] = 0.0
+        currentOffset: float | fractions.Fraction = 0.0
 
         previousMeasure: int = self.chordList[0].measure - 1  # Covers pickups
         for entry in self.chordList:

@@ -208,10 +208,10 @@ class Harmony(chord.Chord):
     # INITIALIZER #
 
     def __init__(self,
-                 figure: t.Optional[str] = None,
-                 root: t.Union[str, pitch.Pitch, None] = None,
-                 bass: t.Union[str, pitch.Pitch, None] = None,
-                 inversion: t.Optional[int] = None,
+                 figure: str | None = None,
+                 root: str | pitch.Pitch | None = None,
+                 bass: str | pitch.Pitch | None = None,
+                 inversion: int | None = None,
                  updatePitches: bool = True,
                  **keywords
                  ):
@@ -273,7 +273,7 @@ class Harmony(chord.Chord):
         '''
         return
 
-    def _updateFromParameters(self, root, bass, inversion: t.Optional[int] = None):
+    def _updateFromParameters(self, root, bass, inversion: int | None = None):
         '''
         This method must be called twice, once before the pitches
         are rendered, and once after. This is because after the pitches
@@ -429,7 +429,7 @@ class Harmony(chord.Chord):
             if not self.pitches:
                 return roman.RomanNumeral()
 
-
+            # what is manipulating this so that write as chord matters?
             storedWriteAsChord = self._writeAsChord
             self.writeAsChord = True
             if self.key is None:
@@ -760,7 +760,7 @@ def changeAbbreviationFor(chordType, changeTo):
     CHORD_TYPES[chordType][1].insert(0, changeTo)
 
 
-def chordSymbolFigureFromChord(inChord, includeChordType=False):
+def chordSymbolFigureFromChord(inChord: chord.Chord, includeChordType=False):
     # noinspection SpellCheckingInspection
     '''
     Analyze the given chord, and attempt to describe its pitches using a
@@ -1323,7 +1323,7 @@ def chordSymbolFigureFromChord(inChord, includeChordType=False):
         return cs
 
 
-def chordSymbolFromChord(inChord):
+def chordSymbolFromChord(inChord: chord.Chord) -> ChordSymbol:
     '''
     Get the :class:`~music21.harmony.chordSymbol` object from the chord, using
     :meth:`music21.harmony.Harmony.chordSymbolFigureFromChord`
@@ -1577,9 +1577,9 @@ class ChordSymbol(Harmony):
 
     def __init__(self,
                  figure=None,
-                 root: t.Union[pitch.Pitch, str, None] = None,
-                 bass: t.Union[pitch.Pitch, str, None] = None,
-                 inversion: t.Optional[int] = None,
+                 root: pitch.Pitch | str | None = None,
+                 bass: pitch.Pitch | str | None = None,
+                 inversion: int | None = None,
                  kind='',
                  kindStr='',
                  **keywords
@@ -2335,7 +2335,7 @@ class ChordSymbol(Harmony):
         else:
             return False
 
-    def transpose(self: T, value, *, inPlace=False) -> t.Optional[T]:
+    def transpose(self: T, value, *, inPlace=False) -> T | None:
         '''
         Overrides :meth:`~music21.chord.Chord.transpose` so that this ChordSymbol's
         `figure` is appropriately cleared afterward.
@@ -2441,7 +2441,7 @@ class NoChord(ChordSymbol):
         # do nothing, everything is already set.
         return
 
-    def transpose(self: NCT, _value, *, inPlace=False) -> t.Optional[NCT]:
+    def transpose(self: NCT, _value, *, inPlace=False) -> NCT | None:
         '''
         Overrides :meth:`~music21.chord.Chord.transpose` to do nothing.
 

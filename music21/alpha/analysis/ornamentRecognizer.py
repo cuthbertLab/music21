@@ -11,7 +11,6 @@
 from __future__ import annotations
 
 from copy import deepcopy
-import typing as t
 import unittest
 
 from music21.common.numberTools import opFrac
@@ -49,7 +48,7 @@ class OrnamentRecognizer:
     def calculateOrnamentTotalQl(
         self,
         busyNotes: list[note.GeneralNote],
-        simpleNotes: t.Optional[list[note.GeneralNote]] = None
+        simpleNotes: list[note.GeneralNote] | None = None
     ) -> OffsetQL:
         '''
         Returns total length of trill assuming busy notes are all an expanded trill.
@@ -78,7 +77,7 @@ class TrillRecognizer(OrnamentRecognizer):
         self.acceptableInterval = 3
         self.minimumLengthForNachschlag = 5
 
-    def recognize(self, busyNotes, simpleNotes=None) -> t.Union[bool, expressions.Trill]:
+    def recognize(self, busyNotes, simpleNotes=None) -> bool | expressions.Trill:
         '''
         Tries to identify the busy notes as a trill.
 
@@ -178,7 +177,7 @@ class TurnRecognizer(OrnamentRecognizer):
         self,
         busyNotes,
         simpleNotes=None,
-    ) -> t.Union[bool, expressions.Turn, expressions.InvertedTurn]:
+    ) -> bool | expressions.Turn | expressions.InvertedTurn:
         '''
         Tries to identify the busy notes as a turn or inverted turn.
 

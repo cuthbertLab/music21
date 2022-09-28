@@ -25,7 +25,6 @@ from __future__ import annotations
 
 import copy
 from fractions import Fraction
-import typing as t
 from typing import TYPE_CHECKING  # pylint needs no alias
 import unittest
 
@@ -167,7 +166,7 @@ class StreamCore(Music21Object):
     def coreSetElementOffset(
         self,
         element: Music21Object,
-        offset: t.Union[int, float, Fraction, OffsetSpecial],
+        offset: int | float | Fraction | OffsetSpecial,
         *,
         addElement=False,
         setActiveSite=True
@@ -569,8 +568,8 @@ class StreamCore(Music21Object):
         recurse=True,
         requireAllPresent=True,
         insert=True,
-        constrainingSpannerBundle: t.Optional[spanner.SpannerBundle] = None
-    ) -> t.Optional[list[spanner.Spanner]]:
+        constrainingSpannerBundle: spanner.SpannerBundle | None = None
+    ) -> list[spanner.Spanner] | None:
         '''
         find all spanners that are referenced by elements in the
         (recursed if recurse=True) stream and either inserts them in the Stream
@@ -715,7 +714,7 @@ class StreamCore(Music21Object):
         {1.0} <music21.note.Note D>
         '''
         sb = self.spannerBundle
-        sIter: t.Union[StreamIterator, RecursiveIterator]
+        sIter: StreamIterator | RecursiveIterator
         if recurse is True:
             sIter = self.recurse()  # type: ignore
         else:

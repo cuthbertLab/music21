@@ -18,8 +18,6 @@ absolutely balanced by having O(log n) search times.
 '''
 from __future__ import annotations
 
-import typing as t
-
 from music21 import prebase
 from music21.exceptions21 import TreeException
 from music21 import common
@@ -574,7 +572,7 @@ class AVLTree(prebase.ProtoM21Object):
         <AVLNode: Start:1 Height:1 L:0 R:0> '1'
         <AVLNode: Start:0 Height:0 L:None R:None> '0'
         '''
-        def recurse(subListOfTuples) -> t.Optional[AVLNode]:
+        def recurse(subListOfTuples) -> AVLNode | None:
             '''
             Divide and conquer.
             '''

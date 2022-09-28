@@ -21,7 +21,6 @@ import os.path
 import re
 import sys
 import time
-import typing as t
 
 # noinspection PyPackageRequirements
 from docutils.core import publish_doctree  # pylint: disable=import-error
@@ -192,7 +191,7 @@ def getDocumentationFiles(runOne=False):
     return allModules
 
 
-def main(runOne: t.Union[str, bool] = False):
+def main(runOne: str | bool = False):
     if runOne is False:
         nbvalNotebook.runAll()
     elif '.ipynb' in runOne:

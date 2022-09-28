@@ -12,7 +12,7 @@ dynamic = [
 description = "A Toolkit for Computer-Aided Musical Analysis and Computational Musicology."
 readme = "README.md"
 license = "BSD-3-Clause"
-requires-python = ">=3.9"
+requires-python = ">=3.10"
 classifiers = [
     "Development Status :: 5 - Production/Stable",
     "Environment :: Console",
@@ -29,7 +29,6 @@ classifiers = [
     "Operating System :: POSIX",
     "Programming Language :: Python",
     "Programming Language :: Python :: 3 :: Only",
-    "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Topic :: Artistic Software",

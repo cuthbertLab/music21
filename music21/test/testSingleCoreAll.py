@@ -19,7 +19,6 @@ from __future__ import annotations
 from collections.abc import Sequence
 import doctest
 import sys
-import typing as t
 import unittest
 import warnings
 
@@ -40,7 +39,7 @@ cov = coverageM21.getCoverage()
 
 def main(testGroup: Sequence[str] = ('test',),
          restoreEnvironmentDefaults=False,
-         limit: t.Optional[bool] = None,
+         limit: bool | None = None,
          verbosity=2,
          show: bool = True,
          ):

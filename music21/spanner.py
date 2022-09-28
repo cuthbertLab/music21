@@ -631,7 +631,7 @@ class SpannerBundle(prebase.ProtoM21Object):
     Changed in v7: only argument must be a List of spanners.
     Creators of SpannerBundles are required to check that this constraint is True
     '''
-    def __init__(self, spanners: t.Optional[list[Spanner]] = None):
+    def __init__(self, spanners: list[Spanner] | None = None):
         self._cache: dict[str, t.Any] = {}  # cache is defined on Music21Object not ProtoM21Object
 
         self._storage: list[Spanner]
@@ -871,7 +871,7 @@ class SpannerBundle(prebase.ProtoM21Object):
 
         return replacedSpanners
 
-    def getByClass(self, className: t.Union[str, type]) -> 'SpannerBundle':
+    def getByClass(self, className: str | type) -> 'SpannerBundle':
         '''
         Given a spanner class, return a new SpannerBundle of all Spanners of the desired class.
 
@@ -1278,12 +1278,12 @@ class RepeatBracket(Spanner):
     '''
     def __init__(self,
                  *spannedElements,
-                 number: t.Optional[int] = None,
-                 overrideDisplay: t.Optional[str] = None,
+                 number: int | None = None,
+                 overrideDisplay: str | None = None,
                  **keywords):
         super().__init__(*spannedElements, **keywords)
 
-        self._number: t.Optional[int] = None
+        self._number: int | None = None
         # store a range, inclusive of the single number assignment
         self._numberRange: list[int] = []
         # are there exactly two numbers that should be written as  3, 4 not 3-4.
@@ -1677,8 +1677,8 @@ class Line(Spanner):
         tick: str = 'down',
         startTick: str = 'down',
         endTick: str = 'down',
-        startHeight: t.Optional[t.Union[int, float]] = None,
-        endHeight: t.Optional[t.Union[int, float]] = None,
+        startHeight: int | float | None = None,
+        endHeight: int | float | None = None,
         **keywords
     ):
         super().__init__(*spannedElements, **keywords)
@@ -1838,7 +1838,7 @@ class Glissando(Spanner):
     def __init__(self,
                  *spannedElements,
                  lineType: str = 'wavy',
-                 label: t.Optional[str] = None,
+                 label: str | None = None,
                  **keywords):
         super().__init__(*spannedElements, **keywords)
 
