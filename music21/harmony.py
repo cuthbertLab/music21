@@ -429,7 +429,7 @@ class Harmony(chord.Chord):
             if not self.pitches:
                 return roman.RomanNumeral()
 
-
+            # what is manipulating this so that write as chord matters?
             storedWriteAsChord = self._writeAsChord
             self.writeAsChord = True
             if self.key is None:
@@ -760,7 +760,7 @@ def changeAbbreviationFor(chordType, changeTo):
     CHORD_TYPES[chordType][1].insert(0, changeTo)
 
 
-def chordSymbolFigureFromChord(inChord, includeChordType=False):
+def chordSymbolFigureFromChord(inChord: chord.Chord, includeChordType=False):
     # noinspection SpellCheckingInspection
     '''
     Analyze the given chord, and attempt to describe its pitches using a
@@ -1323,7 +1323,7 @@ def chordSymbolFigureFromChord(inChord, includeChordType=False):
         return cs
 
 
-def chordSymbolFromChord(inChord):
+def chordSymbolFromChord(inChord: chord.Chord) -> ChordSymbol:
     '''
     Get the :class:`~music21.harmony.chordSymbol` object from the chord, using
     :meth:`music21.harmony.Harmony.chordSymbolFigureFromChord`
