@@ -6,10 +6,9 @@
 # Authors:      Michael Scott Asato Cuthbert
 #               Christopher Ariza
 #
-# Copyright:    Copyright © 2009-2013 Michael Scott Asato Cuthbert and the music21 Project
+# Copyright:    Copyright © 2009-2013 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
-
 '''
 Classes for representing and processing articulations.
 Specific articulations are modeled as :class:`~music21.articulations.Articulation` subclasses.
@@ -23,8 +22,6 @@ MusicXML is "StrongAccent" here.
 
 Fingering and other playing marks are found here.  Fermatas, trills, etc.
 are found in music21.expressions.
-
-
 
 >>> n1 = note.Note('D#4')
 >>> n1.articulations.append(articulations.Tenuto())
@@ -81,19 +78,21 @@ A longer test showing the utility of the module:
 from __future__ import annotations
 
 import typing as t
+from typing import TYPE_CHECKING  # Pylint bug
 import unittest
 
 from music21 import base
 from music21 import common
 from music21.common.classTools import tempAttribute
-from music21 import exceptions21
 from music21 import environment
+from music21 import exceptions21
 from music21 import style
 
-environLocal = environment.Environment('articulations')
-
-if t.TYPE_CHECKING:
+if TYPE_CHECKING:
     from music21 import interval
+
+
+environLocal = environment.Environment('articulations')
 
 
 class ArticulationException(exceptions21.Music21Exception):
@@ -110,7 +109,7 @@ class Articulation(base.Music21Object):
     >>> x.displayText = '>'
 
     '''
-    _styleClass: t.Type[style.Style] = style.TextStyle
+    _styleClass: type[style.Style] = style.TextStyle
 
     def __init__(self):
         super().__init__()
@@ -119,7 +118,7 @@ class Articulation(base.Music21Object):
         self._volumeShift: float = 0.0
         self.lengthShift: float = 1.0
         self.tieAttach: str = 'first'  # attach to first or last or all notes after split
-        self.displayText: t.Optional[str] = None
+        self.displayText: str | None = None
 
     def _reprInternal(self):
         return ''
@@ -593,7 +592,7 @@ class PullOff(FretIndication):
     pass
 
 class FretBend(FretIndication):
-    bendAlter: t.Optional[interval.IntervalBase] = None
+    bendAlter: interval.IntervalBase | None = None
     preBend: t.Any = None
     release: t.Any = None
     withBar: t.Any = None

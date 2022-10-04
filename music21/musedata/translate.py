@@ -6,7 +6,7 @@
 # Authors:      Christopher Ariza
 #               Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2010-2012 Michael Scott Asato Cuthbert and the music21 Project
+# Copyright:    Copyright © 2010-2012 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
@@ -21,12 +21,14 @@ these functions are for advanced, low level usage. For basic importing of MuseDa
 files from a file or URL to a :class:`~music21.stream.Stream`, use the music21
 converter module's :func:`~music21.converter.parse` function.
 '''
+from __future__ import annotations
 
 import unittest
 
 from music21 import clef
 from music21 import environment
 from music21 import exceptions21
+
 environLocal = environment.Environment('musedata.translate')
 
 

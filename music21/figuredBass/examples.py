@@ -4,7 +4,7 @@
 # Purpose:      Figured bass test cases
 # Authors:      Jose Cabal-Ugaz
 #
-# Copyright:    Copyright © 2010-2011 Michael Scott Asato Cuthbert and the music21 Project
+# Copyright:    Copyright © 2010-2011 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
@@ -19,6 +19,7 @@ object which can generate realizations as instances of
 in external software such as MuseScore or Finale by
 calling :meth:`~music21.base.Music21Object.show`.
 '''
+from __future__ import annotations
 
 import copy
 import unittest

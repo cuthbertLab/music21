@@ -5,18 +5,20 @@
 #
 # Authors:      Christopher Ariza
 #
-# Copyright:    Copyright © 2011 Michael Scott Asato Cuthbert and the music21 Project
+# Copyright:    Copyright © 2011 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
 Original music21 feature extractors.
 '''
-import unittest
-import typing as t
+from __future__ import annotations
 
+import unittest
+
+from music21 import environment
 from music21.features import base as featuresModule
 from music21 import text
-from music21 import environment
+
 environLocal = environment.Environment('features.native')
 
 # ------------------------------------------------------------------------------
@@ -109,7 +111,7 @@ class QualityFeature(featuresModule.FeatureExtractor):
         Do processing necessary, storing result in feature.
         '''
         allKeys = self.data['flat.getElementsByClass(Key)']
-        keyFeature: t.Optional[int] = None
+        keyFeature: int | None = None
         if len(allKeys) == 1:
             k0 = allKeys[0]
             if k0.mode == 'major':

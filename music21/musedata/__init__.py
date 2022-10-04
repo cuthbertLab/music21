@@ -6,7 +6,7 @@
 # Authors:      Christopher Ariza
 #               Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2010, 2014 Michael Scott Asato Cuthbert and the music21 Project
+# Copyright:    Copyright © 2010, 2014 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
@@ -25,10 +25,12 @@ the music21 converter module's :func:`~music21.converter.parse` function.
 Low level MuseData conversion is facilitated by the objects in this module and
 :func:`music21.musedata.translate.museDataToStreamScore`.
 '''
+from __future__ import annotations
 
-import unittest
 import os
+import unittest
 
+from music21 import environment
 from music21 import exceptions21
 from music21.musedata import base12_26
 from music21.musedata import base40
@@ -37,7 +39,6 @@ from music21.musedata import translate
 from music21 import common
 from music21 import prebase
 
-from music21 import environment
 environLocal = environment.Environment('musedata')
 
 # for implementation

@@ -5,12 +5,14 @@
 #
 # Authors:      Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2015 Michael Scott Asato Cuthbert and the music21 Project
+# Copyright:    Copyright © 2015 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # -----------------------------------------------------------------------------
 '''
 This is a lightweight module that stores information about individual corpus works.
 '''
+from __future__ import annotations
+
 from collections import namedtuple, OrderedDict
 import os
 

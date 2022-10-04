@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+from __future__ import annotations
+
 __all__ = [
     'correlate', 'discrete', 'elements', 'enharmonics',
     'floatingKey', 'harmonicFunction', 'metrical', 'neoRiemannian',

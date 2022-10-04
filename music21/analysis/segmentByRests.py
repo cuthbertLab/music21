@@ -6,20 +6,20 @@
 # Authors:      Mark Gotham
 #               Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2018 Michael Scott Asato Cuthbert and the music21 Project
+# Copyright:    Copyright © 2018 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
+from __future__ import annotations
 
 import unittest
 
 from music21 import clef
 from music21 import converter
+from music21 import environment
 from music21 import exceptions21
 from music21 import note
 from music21 import interval
 
-
-from music21 import environment
 environLocal = environment.Environment('analysis.segmentByRests')
 
 # ------------------------------------------------------------------------------

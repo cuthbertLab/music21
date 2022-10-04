@@ -5,7 +5,7 @@
 #
 # Authors:      Luke Poeppel
 #
-# Copyright:    Copyright © 2006-2016 Michael Scott Asato Cuthbert and the music21 Project
+# Copyright:    Copyright © 2006-2016 Michael Scott Asato Cuthbert
 # Licence:      BSD, see licence.txt
 # ------------------------------------------------------------------------------
 '''
@@ -15,14 +15,20 @@ TODO:
 Chord from Figure
 Chord from FretBoard Object with tuning.
 '''
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
 import unittest
-import typing as t
 
 from music21 import common
 from music21 import exceptions21
 from music21 import harmony
 from music21 import pitch
 from music21 import prebase
+
+
+if TYPE_CHECKING:
+    from music21 import duration
 
 
 class TablatureException(exceptions21.Music21Exception):
@@ -227,7 +233,7 @@ class FretBoard(prebase.ProtoM21Object):
                     self.numStrings
                 ))
 
-        pitchList: t.List[t.Optional['music21.pitch.Pitch']] = [None] * self.numStrings
+        pitchList: list[pitch.Pitch | None] = [None] * self.numStrings
 
         if not self.fretNotes:
             return pitchList

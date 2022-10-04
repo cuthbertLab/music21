@@ -6,10 +6,12 @@
 # Authors:       Michael Scott Asato Cuthbert
 #                Christopher Ariza
 #
-# Copyright:    Copyright © 2009-2020 Michael Scott Asato Cuthbert and the music21 Project
+# Copyright:    Copyright © 2009-2020 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 # pragma: no cover
+from __future__ import annotations
+
 import cProfile
 import pstats
 # import time

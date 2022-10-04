@@ -6,9 +6,11 @@
 # Authors:      Michael Scott Asato Cuthbert
 #               Christopher Ariza
 #
-# Copyright:    Copyright © 2009-2015 Michael Scott Asato Cuthbert and the music21 Project
+# Copyright:    Copyright © 2009-2015 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
+from __future__ import annotations
+
 __all__ = [
     'defaultlist',
     'SingletonCounter',
@@ -20,7 +22,6 @@ __all__ = [
 
 import collections
 import time
-import typing as t
 import weakref
 
 
@@ -184,7 +185,7 @@ class SlottedObjectMixin:
 
     # CLASS VARIABLES #
 
-    __slots__: t.Tuple[str, ...] = ()
+    __slots__: tuple[str, ...] = ()
 
     # SPECIAL METHODS #
 

@@ -8,9 +8,11 @@
 #               Josiah Wolf Oberholtzer
 #               Evan Lynch
 #
-# Copyright:    Copyright © 2008-2020 Michael Scott Asato Cuthbert and the music21 Project
+# Copyright:    Copyright © 2008-2020 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # -----------------------------------------------------------------------------
+from __future__ import annotations
+
 from music21.exceptions21 import StreamException, ImmutableStreamException
 from music21.stream.base import (
     Stream, Opus, Score, Part, PartStaff, Measure, Voice,

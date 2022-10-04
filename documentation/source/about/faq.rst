@@ -32,13 +32,17 @@ Why is it called `music21`?
     
     I figured that since no one had actually released a piece of software
     in over 35 years that actually followed the "Music N" naming structure,
-    it was fair game to think of it not as the paradigmatic name for a
+    it was fair game to think of it not as the paradigmatic name just for a
     software synthesis package, but for any new or original usage of software
     and music.  
     
-    I'm pretty tickled that the new naming convention is getting an hommage
+    I'm pretty tickled that the new naming convention is getting an homage
     in Anas Ghrab's music22 package: https://pypi.org/project/music22
-    
+
+    When I was giving a talk in Germany, everyone referred to it as
+    Musikeinundzwanzig, and that made me happy, so feel free to localize
+    the name however you like when speaking in your language.
+    Musique vignt-et-un, 音楽二十一, whatever.
     
 What is the native `music21` data format?
 
@@ -70,7 +74,8 @@ What is the native `music21` data format?
       (This is the reverse of the problem Finale has, 
       where you can only read older versions of files), so it 
       should not be used for long term storage and sharing.  
-      Run :meth:`~music21.stream.Stream.setupSerializationScaffold` and
+      Run `s.freeze()` and then `s.thaw()` later.  Or for more deeply configurable
+      needs, :meth:`~music21.stream.Stream.setupSerializationScaffold` and
       :meth:`~music21.stream.Stream.teardownSerializationScaffold` 
       before running `pickle.dump(yourStream)` and
       after running `pickle.load(yourStream)` 
@@ -79,7 +84,7 @@ What is the native `music21` data format?
     * For data that cannot easily be recreated but needs long-term storage and sharing, 
       try saving the relevant 
       parts of the data in an XML, json, or even CSV(!) format. 
-      See plistlib https://docs.python.org/dev/library/plistlib.html 
+      See plistlib at https://docs.python.org/dev/library/plistlib.html
       or https://code.activestate.com:443/recipes/440595. You cannot store every 
       element of python's object structure, 
       but you should easily be able to store the parts that are difficult to recreate. 
@@ -91,24 +96,6 @@ What is the native `music21` data format?
       Please consider contributing 
       your solution to improve the package.
 
-Can I synthesize new sounds with `music21`?
-
-    Yes, and no.  `Music21` is primarily built for manipulating symbolic 
-    musical data not sound waves.  There are lots of great programs for
-    doing that.  But the symbolic data, however, can be used as data within 
-    a large variety of synthesis packages. So you could create new
-    `music21` objects that control the synthesis package of your choosing.   
-    
-Can `music21` read in music directly from an image or a .pdf?
-
-    Sorry, that's beyond `music21`'s capabilities. This technology
-    is called OMR (Optical Music Recognition) and it's a whole separate
-    field of research in itself.  Audiveris is an open-source OMR
-    software toolkit.  The development team here has had good experience
-    with the commercial SmartScore application.  `Music21` does have a
-    good set of modules for improving the output of OMR after it's done.
-    See :ref:`moduleOmrCorrectors`.
- 
 I'm ready to give it a try, but how do I install `music21`?
 
     Please see the complete install instructions: 
@@ -121,6 +108,46 @@ you help?
     operating systems, the development team can only give free help to
     Mac and Windows installation. (but see paid support, below).
 
+Uses
+---------
+Can I synthesize new sounds with `music21`?
+
+    Yes, and no.  `Music21` is primarily built for manipulating symbolic
+    musical data not sound waves.  There are lots of great programs for
+    doing that.  But the symbolic data, however, can be used as data within
+    a large variety of synthesis packages. So you could create new
+    `music21` objects that control the synthesis package of your choosing.
+
+Can `music21` read in music directly from an image or a .pdf?
+
+    Sorry, that's beyond `music21`'s capabilities. This technology
+    is called OMR (Optical Music Recognition) and it's a whole separate
+    field of research in itself.  Audiveris is an open-source OMR
+    software toolkit.  The development team here has had good experience
+    with the commercial SmartScore application.  `Music21` does have a
+    good set of modules for improving the output of OMR after it's done.
+    See :ref:`moduleOmrCorrectors`.
+
+I'm having trouble reading in MIDI.  The docs for `music21.midi.translate`
+and `music21.converter.subConverters.ConverterMIDI` are rather hard
+to understand.  (Same for `musicxml`, `mei`, etc.)
+
+    You shouldn't need to be going into subConverters or the various format
+    modules, like `music21.midi` or `music21.musicxml` in everyday use.
+    Just load the file into the system with `music21.converter.parse(filename)`
+    and it will figure out the right format and everything else, and give you
+    a `Stream` object.  To load
+    from the internet, you can pass in a URL instead.  If
+    `filename` does not give enough information to determine the file type,
+    add `format='midi'` and it will do the right thing.
+
+    To save a `Stream` (stored as variable `s`) afterwards, just call:
+    `s.write('midi', fp='filename.mid')`.  Or to hear it immediately,
+    `s.show('midi')`.
+
+
+Feature requests and Consulting
+-------------------------------
 `Music21` doesn't have some feature that I need, how do I get it added?
 
     It won't hurt to email the list (or us directly) and we'll consider it.
@@ -132,8 +159,6 @@ you help?
     employ.  (Or side-step us and offer a cash bounty on the music21list
     itself).
 
-Consulting
-----------    
 No, you don't understand, I **really** need this feature!
 
     If you really need something done in `music21`, we offer paid support

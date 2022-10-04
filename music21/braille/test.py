@@ -4,9 +4,11 @@
 # Purpose:      Examples from "Introduction to Braille Music Transcription"
 # Authors:      Jose Cabal-Ugaz
 #
-# Copyright:    Copyright © 2012, 2016 Michael Scott Asato Cuthbert and the music21 Project
+# Copyright:    Copyright © 2012, 2016 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
+from __future__ import annotations
+
 import re
 import textwrap
 import unittest

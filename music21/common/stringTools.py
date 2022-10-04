@@ -6,12 +6,14 @@
 # Authors:      Michael Scott Asato Cuthbert
 #               Christopher Ariza
 #
-# Copyright:    Copyright © 2009-2015 Michael Scott Asato Cuthbert and the music21 Project
+# Copyright:    Copyright © 2009-2015 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
 Tools for working with strings
 '''
+from __future__ import annotations
+
 __all__ = [
     'whitespaceEqual',
     'getNumFromStr',
@@ -31,8 +33,6 @@ import re
 import time
 import string
 import unicodedata
-
-import typing as t
 
 # ------------------------------------------------------------------------------
 WHITESPACE = re.compile(r'\s+')
@@ -62,7 +62,7 @@ def whitespaceEqual(a: str, b: str) -> bool:
         return False
 
 
-def getNumFromStr(usrStr: str, numbers: str = '0123456789') -> t.Tuple[str, str]:
+def getNumFromStr(usrStr: str, numbers: str = '0123456789') -> tuple[str, str]:
     '''
     Given a string, extract any numbers.
     Return two strings, the numbers (as strings) and the remaining characters.
@@ -195,7 +195,7 @@ def spaceCamelCase(usrStr: str, replaceUnderscore=True, fixMeList=None) -> str:
     firstChar = False
     isNumber = False
     lastIsNum = False
-    post: t.List[str] = []
+    post: list[str] = []
 
     # do not split these...
     if fixMeList is None:

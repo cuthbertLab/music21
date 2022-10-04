@@ -31,6 +31,8 @@ point, along with chant and trecento.
 
 When adding files here, update documentation.library.iterators
 '''
+from __future__ import annotations
+
 __all__ = [
     # dirs
     'analysis',

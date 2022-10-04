@@ -7,7 +7,7 @@
 #               Michael Scott Asato Cuthbert
 #               (Will Ware -- see docs)
 #
-# Copyright:    Copyright © 2011-2013, 2019 Michael Scott Asato Cuthbert and the music21 Project
+# Copyright:    Copyright © 2011-2013, 2019 Michael Scott Asato Cuthbert
 #               Some parts of this module are in the Public Domain, see details.
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
@@ -23,6 +23,8 @@ This module originally used routines from Will Ware's public domain midi.py
 library from 2001 which was once posted at (http link)
 groups.google.com/g/alt.sources/msg/0c5fc523e050c35e
 '''
+from __future__ import annotations
+
 __all__ = [
     'realtime', 'percussion',
     'MidiEvent', 'MidiFile', 'MidiTrack', 'MidiException',
@@ -464,31 +466,31 @@ class MidiEvent(prebase.ProtoM21Object):
     '''
     # pylint: disable=redefined-builtin
     def __init__(self,
-                 track: t.Optional['music21.midi.MidiTrack'] = None,
+                 track: MidiTrack | None = None,
                  type=None,
                  time: int = 0,
-                 channel: t.Optional[int] = None):
-        self.track: t.Optional['music21.midi.MidiTrack'] = track  # a MidiTrack object
+                 channel: int | None = None):
+        self.track: MidiTrack | None = track  # a MidiTrack object
         self.type = type
         self.time: int = time
-        self.channel: t.Optional[int] = channel
+        self.channel: int | None = channel
 
-        self.parameter1: t.Union[int, bytes, None] = None  # pitch or first data value
-        self.parameter2: t.Union[int, bytes, None] = None  # velocity or second data value
+        self.parameter1: int | bytes | None = None  # pitch or first data value
+        self.parameter2: int | bytes | None = None  # velocity or second data value
 
         # data is a property...
 
         # if this is a Note on/off, need to store original
         # pitch space value in order to determine if this has a microtone
-        self.centShift: t.Optional[int] = None
+        self.centShift: int | None = None
 
         # store a reference to a corresponding event
         # if a noteOn, store the note off, and vice versa
         # circular ref -- but modern Python will garbage collect it.
-        self.correspondingEvent: t.Optional[MidiEvent] = None
+        self.correspondingEvent: MidiEvent | None = None
 
         # store and pass on a running status if found
-        self.lastStatusByte: t.Optional[int] = None
+        self.lastStatusByte: int | None = None
 
     @property
     def sortOrder(self) -> int:
@@ -1152,7 +1154,7 @@ class DeltaTime(MidiEvent):
             rep = '(empty) ' + rep
         return rep
 
-    def read(self, oldBytes: bytes) -> t.Tuple[int, bytes]:
+    def read(self, oldBytes: bytes) -> tuple[int, bytes]:
         r'''
         Read a byte-string until hitting a character below 0x80
         and return the converted number and the rest of the bytes
@@ -1986,7 +1988,7 @@ class Test(unittest.TestCase):
 
 # ------------------------------------------------------------------------------
 # define presented order in documentation
-_DOC_ORDER: t.List[type] = []
+_DOC_ORDER: list[type] = []
 
 if __name__ == '__main__':
     import music21

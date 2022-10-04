@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
-from music21 import exceptions21
+from __future__ import annotations
+
 from music21 import environment
+from music21 import exceptions21
 
 environLocal = environment.Environment('features.outputFormats')
 

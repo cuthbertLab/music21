@@ -6,9 +6,11 @@
 # Authors:      Michael Scott Asato Cuthbert
 #               Christopher Ariza
 #
-# Copyright:    Copyright © 2009-2015 Michael Scott Asato Cuthbert and the music21 Project
+# Copyright:    Copyright © 2009-2015 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
+from __future__ import annotations
+
 __all__ = [
     'getRootFilePath',
     'getSourceFilePath',
@@ -26,7 +28,7 @@ import os
 import pathlib
 import unittest
 
-StrOrPath = t.TypeVar('StrOrPath', bound=t.Union[str, pathlib.Path])
+StrOrPath = t.TypeVar('StrOrPath', bound=str | pathlib.Path)
 
 # ------------------------------------------------------------------------------
 def getSourceFilePath() -> pathlib.Path:
@@ -70,7 +72,7 @@ def getCorpusFilePath() -> pathlib.Path:
     return pathlib.Path(coreCorpus.manualCoreCorpusPath)
 
 
-def getCorpusContentDirs() -> t.List[str]:
+def getCorpusContentDirs() -> list[str]:
     '''
     Get all dirs that are found in the CoreCorpus that contain content;
     that is, exclude dirs that have code or other resources.
@@ -132,7 +134,7 @@ def getRootFilePath() -> pathlib.Path:
     return fpParent
 
 
-def relativepath(path: StrOrPath, start: t.Optional[str] = None) -> t.Union[StrOrPath, str]:
+def relativepath(path: StrOrPath, start: str | None = None) -> StrOrPath | str:
     '''
     A cross-platform wrapper for `os.path.relpath()`, which returns `path` if
     under Windows, otherwise returns the relative path of `path`.
@@ -157,17 +159,17 @@ def cleanpath(path: str, *,
     return '/'  # dummy until Astroid #1015 is fixed.
 
 @overload
-def cleanpath(path: t.Union[str, pathlib.Path], *,
+def cleanpath(path: str | pathlib.Path, *,
               returnPathlib: t.Literal[True]) -> pathlib.Path:
     return pathlib.Path('/')  # dummy until Astroid #1015 is fixed.
 
 @overload
-def cleanpath(path: t.Union[str, pathlib.Path], *,
+def cleanpath(path: str | pathlib.Path, *,
               returnPathlib: t.Literal[False]) -> str:
     return '/'  # dummy until Astroid #1015 is fixed.
 
-def cleanpath(path: t.Union[str, pathlib.Path], *,
-              returnPathlib: t.Union[bool, None] = None) -> t.Union[str, pathlib.Path]:
+def cleanpath(path: str | pathlib.Path, *,
+              returnPathlib: bool | None = None) -> str | pathlib.Path:
     '''
     Normalizes the path by expanding ~user on Unix, ${var} environmental vars
     (is this a good idea?), expanding %name% on Windows, normalizing path names

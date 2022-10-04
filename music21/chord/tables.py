@@ -7,7 +7,7 @@
 #               Michael Scott Asato Cuthbert
 #
 # Copyright:    Copyright © 2001-11 Christopher Ariza
-# Copyright:    Copyright © 2011-22 Michael Scott Asato Cuthbert and the music21 Project
+# Copyright:    Copyright © 2011-22 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 
@@ -16,8 +16,9 @@ This module stores numerous data lists used in deriving set-class values and oth
 chord representations. All features of this module are made available through
 :class:`~music21.chord.Chord` objects. Use of this module directly is thus not necessary.
 '''
+from __future__ import annotations
+
 from collections import namedtuple
-import typing as t
 import unittest
 
 from music21 import environment
@@ -52,10 +53,10 @@ class ChordTablesException(exceptions21.Music21Exception):
 # For index 2 (python [1]), a value of 1 or higher
 # is symmetrical under inversion.
 
-TNIStructure = t.Tuple[
-    t.Tuple[int, ...],
-    t.Tuple[int, int, int, int, int, int],
-    t.Tuple[int, int, int, int, int, int, int, int],
+TNIStructure = tuple[
+    tuple[int, ...],
+    tuple[int, int, int, int, int, int],
+    tuple[int, int, int, int, int, int, int, int],
     int,
 ]
 

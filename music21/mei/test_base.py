@@ -5,12 +5,14 @@
 #
 # Authors:      Christopher Antila
 #
-# Copyright:    Copyright © 2014 Michael Scott Asato Cuthbert and the music21 Project
+# Copyright:    Copyright © 2014 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # -----------------------------------------------------------------------------
 '''
 Tests for :mod:`music21.mei.base`.
 '''
+from __future__ import annotations
+
 # part of the whole point is to test protect things too
 # pylint: disable=protected-access
 

@@ -5,7 +5,7 @@
 #
 # Authors:      Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2016-22 Michael Scott Asato Cuthbert and the music21 Project
+# Copyright:    Copyright © 2016-22 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
@@ -14,6 +14,7 @@ objects that this tag might represent.
 
 Pulled out because xmlToM21 is getting way too big.
 '''
+from __future__ import annotations
 
 class SoundTagMixin:
     pass

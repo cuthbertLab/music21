@@ -6,22 +6,21 @@
 # Authors:      Michael Scott Asato Cuthbert
 #               Christopher Ariza
 #
-# Copyright:    Copyright © 2009-2012, 2020 Michael Scott Asato Cuthbert and the music21 Project
+# Copyright:    Copyright © 2009-2012, 2020 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
 Object models of barlines, including repeat barlines.
 '''
+from __future__ import annotations
+
 import unittest
-import typing as t
 
 from music21 import base
+from music21 import environment
 from music21 import exceptions21
-
 from music21 import expressions
 from music21 import repeat
-
-from music21 import environment
 
 environLocal = environment.Environment('bar')
 
@@ -273,8 +272,8 @@ class Repeat(repeat.RepeatMark, Barline):
             barType = 'final'
         Barline.__init__(self, type=barType)
 
-        self._direction: t.Optional[str] = None  # either start or end
-        self._times: t.Optional[int] = None  # if an end, how many repeats
+        self._direction: str | None = None  # either start or end
+        self._times: int | None = None  # if an end, how many repeats
 
         # start is forward, end is backward in musicxml
         self.direction = direction  # start, end
@@ -310,7 +309,7 @@ class Repeat(repeat.RepeatMark, Barline):
             raise BarException(f'cannot set repeat direction to: {value}')
 
     @property
-    def times(self) -> t.Optional[int]:
+    def times(self) -> int | None:
         '''
         Get or set the "times" property of this barline. This
         defines how many times the repeat happens. A standard repeat
@@ -405,6 +404,8 @@ class Test(unittest.TestCase):
     def testFreezeThaw(self):
         from music21 import converter
         from music21 import stream
+        # pylint: disable=redefined-outer-name
+        from music21.bar import Barline  # avoid not same class error
 
         b = Barline()
         self.assertNotIn('StyleMixin', b.classes)

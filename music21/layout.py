@@ -6,7 +6,7 @@
 # Authors:      Christopher Ariza
 #               Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2010, 2012 Michael Scott Asato Cuthbert and the music21 Project
+# Copyright:    Copyright © 2010, 2012 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
@@ -95,13 +95,13 @@ from collections import namedtuple
 import typing as t
 
 from music21 import base
+from music21.common.enums import GatherSpanners
+from music21 import environment
 from music21 import exceptions21
 from music21 import spanner
 from music21 import stream
-from music21.common.enums import GatherSpanners
 from music21.stream.enums import StaffType
 
-from music21 import environment
 environLocal = environment.Environment('layout')
 
 
@@ -154,21 +154,21 @@ class ScoreLayout(LayoutBase):
 
     def __init__(self,
                  *,
-                 scalingMillimeters: t.Union[int, float, None] = None,
-                 scalingTenths: t.Union[int, float, None] = None,
-                 musicFont: t.Optional[str] = None,
-                 wordFont: t.Optional[str] = None,
-                 pageLayout: t.Optional[PageLayout] = None,
-                 systemLayout: t.Optional[SystemLayout] = None,
-                 staffLayoutList: t.Optional[t.List[StaffLayout]] = None,
+                 scalingMillimeters: int | float | None = None,
+                 scalingTenths: int | float | None = None,
+                 musicFont: str | None = None,
+                 wordFont: str | None = None,
+                 pageLayout: PageLayout | None = None,
+                 systemLayout: SystemLayout | None = None,
+                 staffLayoutList: list[StaffLayout] | None = None,
                  **keywords):
         super().__init__(**keywords)
 
         self.scalingMillimeters = scalingMillimeters
         self.scalingTenths = scalingTenths
-        self.pageLayout: t.Optional[PageLayout] = pageLayout
-        self.systemLayout: t.Optional[SystemLayout] = systemLayout
-        self.staffLayoutList: t.List[StaffLayout] = []
+        self.pageLayout: PageLayout | None = pageLayout
+        self.systemLayout: SystemLayout | None = systemLayout
+        self.staffLayoutList: list[StaffLayout] = []
         self.musicFont = musicFont
         self.wordFont = wordFont
 
@@ -225,14 +225,14 @@ class PageLayout(LayoutBase):
 
     def __init__(self,
                  *,
-                 pageNumber: t.Optional[int] = None,
-                 leftMargin: t.Union[int, float, None] = None,
-                 rightMargin: t.Union[int, float, None] = None,
-                 topMargin: t.Union[int, float, None] = None,
-                 bottomMargin: t.Union[int, float, None] = None,
-                 pageHeight: t.Union[int, float, None] = None,
-                 pageWidth: t.Union[int, float, None] = None,
-                 isNew: t.Union[bool, None] = None,
+                 pageNumber: int | None = None,
+                 leftMargin: int | float | None = None,
+                 rightMargin: int | float | None = None,
+                 topMargin: int | float | None = None,
+                 bottomMargin: int | float | None = None,
+                 pageHeight: int | float | None = None,
+                 pageWidth: int | float | None = None,
+                 isNew: bool | None = None,
                  **keywords):
         super().__init__(**keywords)
 
@@ -274,11 +274,11 @@ class SystemLayout(LayoutBase):
     '''
     def __init__(self,
                  *,
-                 leftMargin: t.Union[int, float, None] = None,
-                 rightMargin: t.Union[int, float, None] = None,
-                 distance: t.Union[int, float, None] = None,
-                 topDistance: t.Union[int, float, None] = None,
-                 isNew: t.Union[bool, None] = None,
+                 leftMargin: int | float | None = None,
+                 rightMargin: int | float | None = None,
+                 distance: int | float | None = None,
+                 topDistance: int | float | None = None,
+                 isNew: bool | None = None,
                  **keywords):
         super().__init__(**keywords)
 
@@ -345,7 +345,7 @@ class StaffLayout(LayoutBase):
 
     Note: (TODO: .hidden None is not working; always gives False)
     '''
-    _DOC_ATTR: t.Dict[str, str] = {
+    _DOC_ATTR: dict[str, str] = {
         'staffType': '''
             What kind of staff is this as a stream.enums.StaffType.
 
@@ -359,11 +359,11 @@ class StaffLayout(LayoutBase):
     }
     def __init__(self,
                  *,
-                 distance: t.Union[int, float, None] = None,
-                 staffNumber: t.Union[int, float, None] = None,
-                 staffSize: t.Union[int, float, None] = None,
-                 staffLines: t.Optional[int] = None,
-                 hidden: t.Union[bool, None] = None,
+                 distance: int | float | None = None,
+                 staffNumber: int | float | None = None,
+                 staffSize: int | float | None = None,
+                 staffLines: int | None = None,
+                 hidden: bool | None = None,
                  staffType: StaffType = StaffType.REGULAR,
                  **keywords):
         super().__init__(**keywords)
@@ -371,7 +371,7 @@ class StaffLayout(LayoutBase):
         # this is the distance between adjacent staves
         self.distance = distance
         self.staffNumber = staffNumber
-        self.staffSize: t.Optional[float] = None if staffSize is None else float(staffSize)
+        self.staffSize: float | None = None if staffSize is None else float(staffSize)
         self.staffLines = staffLines
         self.hidden = hidden  # True = hidden; False = shown; None = inherit
         self.staffType: StaffType = staffType
@@ -426,9 +426,9 @@ class StaffGroup(spanner.Spanner):
     '''
     def __init__(self,
                  *spannedElements,
-                 name: t.Optional[str] = None,
+                 name: str | None = None,
                  barTogether: t.Literal[True, False, None, 'Mensurstrich'] = True,
-                 abbreviation: t.Optional[str] = None,
+                 abbreviation: str | None = None,
                  symbol: t.Literal['bracket', 'line', 'grace', 'square'] = None,
                  **keywords):
         super().__init__(*spannedElements, **keywords)
@@ -668,7 +668,7 @@ def divideByPages(scoreIn, printUpdates=False, fastMeasures=False):
 
                 staffObject.elements = p
                 thisSystem.replace(p, staffObject)
-                allStaffLayouts: t.List[StaffLayout] = list(p[StaffLayout])
+                allStaffLayouts: list[StaffLayout] = list(p[StaffLayout])
                 if not allStaffLayouts:
                     continue
                 # else:
@@ -1288,7 +1288,7 @@ class LayoutScore(stream.Opus):
         self,
         pageId: int,
         systemId: int
-    ) -> t.Tuple[t.Optional[int], int]:
+    ) -> tuple[int | None, int]:
         # noinspection PyShadowingNames
         '''
         given a pageId and systemId, get the (pageId, systemId) for the previous system.

@@ -6,15 +6,18 @@
 # Authors:      Josiah Wolf Oberholtzer
 #               Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2013 Michael Scott Asato Cuthbert and the music21 Project
+# Copyright:    Copyright © 2013 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # -----------------------------------------------------------------------------
 '''
 Automatically reduce a MeasureStack to a single chord or group of chords.
 '''
+from __future__ import annotations
+
 import collections
 import itertools
 import unittest
+
 from music21 import chord
 from music21.common.types import DocOrder
 from music21 import exceptions21

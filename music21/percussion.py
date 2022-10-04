@@ -7,11 +7,12 @@
 #               Michael Scott Asato Cuthbert
 #               Christopher Ariza
 #
-# Copyright:    Copyright © 2006-2019 Michael Scott Asato Cuthbert and the music21 Project
+# Copyright:    Copyright © 2006-2019 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
+from __future__ import annotations
 
-import typing as t
+from collections.abc import Iterable
 import unittest
 
 from music21 import common
@@ -64,11 +65,11 @@ class PercussionChord(chord.ChordBase):
         return new
 
     @property
-    def notes(self) -> t.Tuple[note.NotRest, ...]:
+    def notes(self) -> tuple[note.NotRest, ...]:
         return tuple(self._notes)
 
     @notes.setter
-    def notes(self, newNotes: t.Iterable[t.Union[note.Unpitched, note.Note]]) -> None:
+    def notes(self, newNotes: Iterable[note.Unpitched | note.Note]) -> None:
         '''
         Sets notes to an iterable of Note or Unpitched objects
         '''

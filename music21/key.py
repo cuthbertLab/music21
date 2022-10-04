@@ -6,7 +6,7 @@
 # Authors:      Michael Scott Asato Cuthbert
 #               Christopher Ariza
 #
-# Copyright:    Copyright © 2009-22 Michael Scott Asato Cuthbert and the music21 Project
+# Copyright:    Copyright © 2009-22 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
@@ -21,12 +21,15 @@ from __future__ import annotations
 
 import copy
 import re
-import unittest
 import typing as t
 from typing import overload
+import unittest
 import warnings
 
 from music21 import base
+from music21.common.decorators import cacheMethod
+from music21.common.types import StepName
+from music21 import environment
 from music21 import exceptions21
 from music21 import interval
 from music21 import note
@@ -34,19 +37,16 @@ from music21 import pitch
 from music21 import scale
 from music21 import style
 
-from music21.common.decorators import cacheMethod
-from music21.common.types import StepName
-from music21 import environment
 environLocal = environment.Environment('key')
 
 KeySignatureType = t.TypeVar('KeySignatureType', bound='KeySignature')
 KeyType = t.TypeVar('KeyType', bound='Key')
-TransposeTypes = t.Union[int, str, interval.Interval, interval.GenericInterval]
+TransposeTypes = int | str | interval.Interval | interval.GenericInterval
 
 
 # ------------------------------------------------------------------------------
 # store a cache of already-found values
-_sharpsToPitchCache: t.Dict[int, pitch.Pitch] = {}
+_sharpsToPitchCache: dict[int, pitch.Pitch] = {}
 
 
 def convertKeyStringToMusic21KeyString(textString):
@@ -167,7 +167,7 @@ modeSharpsAlter = {'major': 0,
                    }
 
 
-def pitchToSharps(value: t.Union[str, pitch.Pitch, note.Note],
+def pitchToSharps(value: str | pitch.Pitch | note.Note,
                   mode: str = None) -> int:
     '''
     Given a pitch string or :class:`music21.pitch.Pitch` or
@@ -342,7 +342,7 @@ class KeySignature(base.Music21Object):
 
     classSortOrder = 2
 
-    def __init__(self, sharps: t.Optional[int] = 0):
+    def __init__(self, sharps: int | None = 0):
         super().__init__()
         # position on the circle of fifths, where 1 is one sharp, -1 is one flat
 
@@ -360,7 +360,7 @@ class KeySignature(base.Music21Object):
         self._sharps = sharps
         # need to store a list of pitch objects, used for creating a
         # non-traditional key
-        self._alteredPitches: t.Optional[t.List[pitch.Pitch]] = None
+        self._alteredPitches: list[pitch.Pitch] | None = None
         self.accidentalsApplyOnlyToOctave = False
 
     def __hash__(self):
@@ -401,7 +401,7 @@ class KeySignature(base.Music21Object):
     def _reprInternal(self):
         return 'of ' + self._strDescription()
 
-    def asKey(self, mode: t.Optional[str] = None, tonic: t.Optional[str] = None):
+    def asKey(self, mode: str | None = None, tonic: str | None = None):
         '''
         Return a `key.Key` object representing this KeySignature object as a key in the
         given mode or in the given tonic. If `mode` is None, and `tonic` is not provided,
@@ -459,7 +459,7 @@ class KeySignature(base.Music21Object):
 
     @property  # type: ignore
     @cacheMethod
-    def alteredPitches(self) -> t.List[pitch.Pitch]:
+    def alteredPitches(self) -> list[pitch.Pitch]:
         # unfortunately, mypy cannot deal with @property on decorated methods.
         # noinspection PyShadowingNames
         '''
@@ -517,7 +517,7 @@ class KeySignature(base.Music21Object):
         if self._alteredPitches is not None:
             return self._alteredPitches
 
-        post: t.List[pitch.Pitch] = []
+        post: list[pitch.Pitch] = []
         if self.sharps is None:
             return post
 
@@ -542,10 +542,10 @@ class KeySignature(base.Music21Object):
         return post
 
     @alteredPitches.setter
-    def alteredPitches(self, newAlteredPitches: t.List[t.Union[str, pitch.Pitch, note.Note]]
+    def alteredPitches(self, newAlteredPitches: list[str | pitch.Pitch | note.Note]
                        ) -> None:
         self.clearCache()
-        newList: t.List[pitch.Pitch] = []
+        newList: list[pitch.Pitch] = []
         for p in newAlteredPitches:
             if isinstance(p, str):
                 newList.append(pitch.Pitch(p))
@@ -580,7 +580,7 @@ class KeySignature(base.Music21Object):
         else:
             return False
 
-    def accidentalByStep(self, step: StepName) -> t.Optional[pitch.Accidental]:
+    def accidentalByStep(self, step: StepName) -> pitch.Accidental | None:
         '''
         Given a step (C, D, E, F, etc.) return the accidental
         for that note in this key (using the natural minor for minor)
@@ -679,7 +679,7 @@ class KeySignature(base.Music21Object):
     def transpose(self: KeySignatureType,
                   value: TransposeTypes,
                   *,
-                  inPlace: bool = False) -> t.Optional[KeySignatureType]:
+                  inPlace: bool = False) -> KeySignatureType | None:
         '''
         Transpose the KeySignature by the user-provided value.
         If the value is an integer, the transposition is treated
@@ -726,7 +726,7 @@ class KeySignature(base.Music21Object):
         >>> eFlat
         <music21.key.KeySignature of 3 flats>
         '''
-        intervalObj: t.Union[interval.Interval, interval.GenericInterval]
+        intervalObj: interval.Interval | interval.GenericInterval
         if isinstance(value, interval.Interval):  # it is an Interval class
             intervalObj = value
         elif isinstance(value, interval.GenericInterval):
@@ -754,7 +754,7 @@ class KeySignature(base.Music21Object):
         else:
             return None
 
-    def transposePitchFromC(self, p: pitch.Pitch, *, inPlace=False) -> t.Optional[pitch.Pitch]:
+    def transposePitchFromC(self, p: pitch.Pitch, *, inPlace=False) -> pitch.Pitch | None:
         '''
         Takes a pitch in C major and transposes it so that it has
         the same step position in the current key signature.
@@ -850,10 +850,10 @@ class KeySignature(base.Music21Object):
     # --------------------------------------------------------------------------
     # properties
 
-    def _getSharps(self) -> t.Optional[int]:
+    def _getSharps(self) -> int | None:
         return self._sharps
 
-    def _setSharps(self, value: t.Optional[int]):
+    def _setSharps(self, value: int | None):
         if value != self._sharps:
             self._sharps = value
             self.clearCache()
@@ -938,11 +938,11 @@ class Key(KeySignature, scale.DiatonicScale):
     <music21.key.Key of f# minor>
     '''
     _sharps = 0
-    _mode: t.Optional[str] = None
+    _mode: str | None = None
     tonic: pitch.Pitch
 
     def __init__(self,
-                 tonic: t.Union[str, pitch.Pitch, note.Note] = 'C',
+                 tonic: str | pitch.Pitch | note.Note = 'C',
                  mode=None):
         if isinstance(tonic, (note.Note, pitch.Pitch)):
             tonicStr = tonic.name
@@ -990,7 +990,7 @@ class Key(KeySignature, scale.DiatonicScale):
         self.correlationCoefficient = None
 
         # store an ordered list of alternative Key objects
-        self.alternateInterpretations: t.List[Key] = []
+        self.alternateInterpretations: list[Key] = []
 
     def __hash__(self):
         hashTuple = (self.tonic, self.mode)
@@ -1247,7 +1247,7 @@ class Key(KeySignature, scale.DiatonicScale):
                   value: TransposeTypes,
                   *,
                   inPlace: bool = False
-                  ) -> t.Optional[KeyType]:
+                  ) -> KeyType | None:
         '''
         Transpose the Key by the user-provided value.
         If the value is an integer, the transposition is treated
@@ -1317,27 +1317,8 @@ class Key(KeySignature, scale.DiatonicScale):
 class Test(unittest.TestCase):
 
     def testCopyAndDeepcopy(self):
-        '''
-        Test copying all objects defined in this module
-        '''
-        import sys
-        import types
-        for part in sys.modules[self.__module__].__dict__:
-            match = False
-            for skip in ['_', '__', 'Test', 'Exception']:
-                if part.startswith(skip) or part.endswith(skip):
-                    match = True
-            if match:
-                continue
-            name = getattr(sys.modules[self.__module__], part)
-            # noinspection PyTypeChecker
-            if callable(name) and not isinstance(name, types.FunctionType):
-                try:  # see if obj can be made w/ args
-                    obj = name()
-                except TypeError:
-                    continue
-                i = copy.copy(obj)
-                j = copy.deepcopy(obj)
+        from music21.test.commonTest import testCopyAll
+        testCopyAll(self, globals())
 
     def testBasic(self):
         a = KeySignature()

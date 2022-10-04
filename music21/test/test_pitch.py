@@ -6,12 +6,12 @@
 # Authors:      Michael Scott Asato Cuthbert
 #               Christopher Ariza
 #
-# Copyright:    Copyright © 2008-2022 Michael Scott Asato Cuthbert and the music21 Project
+# Copyright:    Copyright © 2008-2022 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
+from __future__ import annotations
+
 import copy
-import sys
-import types
 import unittest
 
 from music21 import common
@@ -28,27 +28,7 @@ from music21.pitch import Pitch, Accidental
 
 class Test(unittest.TestCase):
 
-    def testCopyAndDeepcopy(self):
-        '''
-        Test copying all objects defined in this module
-        '''
-        for part in sys.modules[self.__module__].__dict__:
-            match = False
-            for skip in ['_', '__', 'Test', 'Exception']:
-                if part.startswith(skip) or part.endswith(skip):
-                    match = True
-            if match:
-                continue
-            name = getattr(sys.modules[self.__module__], part)
-            # noinspection PyTypeChecker
-            if callable(name) and not isinstance(name, types.FunctionType):
-                try:  # see if obj can be made w/ args
-                    obj = name()
-                except TypeError:
-                    continue
-                copy.copy(obj)
-                copy.deepcopy(obj)
-
+    def testCopyManually(self):
         p1 = Pitch('C#3')
         p2 = copy.deepcopy(p1)
         self.assertIsNot(p1, p2)

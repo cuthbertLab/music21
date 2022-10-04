@@ -9,18 +9,19 @@
 #               Project
 # License:      BSD, see license.txt
 # -----------------------------------------------------------------------------
+from __future__ import annotations
 
 import abc
+from collections.abc import Sequence
 import pathlib
 import typing as t
 
 from music21 import common
-# from music21.corpus import virtual
 from music21.corpus import work
-from music21 import prebase
-from music21.exceptions21 import CorpusException
-
 from music21 import environment
+from music21.exceptions21 import CorpusException
+from music21 import prebase
+
 environLocal = environment.Environment(__file__)
 
 
@@ -43,9 +44,9 @@ class Corpus(prebase.ProtoM21Object):
     _allExtensions = tuple(common.flattenList([common.findInputExtension(x)
                                                for x in _acceptableExtensions]))
 
-    _pathsCache: t.Dict[t.Tuple[str, t.Tuple[str]], pathlib.Path] = {}
+    _pathsCache: dict[tuple[str, tuple[str]], pathlib.Path] = {}
 
-    _directoryInformation: t.Union[t.Tuple[()], t.Sequence[t.Tuple[str, str, bool]]] = ()
+    _directoryInformation: t.Union[tuple[()], Sequence[tuple[str, str, bool]]] = ()
 
     parseUsingCorpus = True
 
@@ -67,7 +68,7 @@ class Corpus(prebase.ProtoM21Object):
     def _findPaths(
         self,
         rootDirectoryPath: pathlib.Path,
-        fileExtensions: t.List[str]
+        fileExtensions: list[str]
     ):
         '''
         Given a root filePath file path, recursively search all contained paths
@@ -243,7 +244,6 @@ class Corpus(prebase.ProtoM21Object):
 
         If no matches are found, an empty list is returned.
 
-        >>> from music21 import corpus
         >>> coreCorpus = corpus.corpora.CoreCorpus()
 
         # returns 1 even though there is a '.mus' file, which cannot be read...
@@ -408,7 +408,6 @@ class Corpus(prebase.ProtoM21Object):
         r'''
         The metadata bundle for a corpus:
 
-        >>> from music21 import corpus
         >>> corpus.corpora.CoreCorpus().metadataBundle
         <music21.metadata.bundles.MetadataBundle 'core': {151... entries}>
 
@@ -428,7 +427,6 @@ class Corpus(prebase.ProtoM21Object):
         This is a synonym for the metadataBundle property, but easier to understand
         what it does.
 
-        >>> from music21 import corpus
         >>> corpus.corpora.CoreCorpus().all()
         <music21.metadata.bundles.MetadataBundle 'core': {151... entries}>
         '''
@@ -447,7 +445,6 @@ class Corpus(prebase.ProtoM21Object):
 
         Note that xml and mxl are treated equivalently.
 
-        >>> from music21 import corpus
         >>> coreCorpus = corpus.corpora.CoreCorpus()
         >>> a = coreCorpus.getComposer('bach')
         >>> len(a) > 100
@@ -574,7 +571,6 @@ class CoreCorpus(Corpus):
         This is convenient when an input format might match for multiple
         extensions.
 
-        >>> from music21 import corpus
         >>> coreCorpus = corpus.corpora.CoreCorpus()
         >>> corpusFilePaths = coreCorpus.getPaths()
         >>> 3000 < len(corpusFilePaths) < 4000
@@ -650,10 +646,8 @@ class CoreCorpus(Corpus):
         '''
         Return True or False if this is a `corpus` or `noCorpus` distribution.
 
-        >>> from music21 import corpus
         >>> corpus.corpora.CoreCorpus().noCorpus
         False
-
         '''
         if CoreCorpus._noCorpus is None:
             # assume that there will always be a 'bach' dir
@@ -688,7 +682,7 @@ class LocalCorpus(Corpus):
 
     # CLASS VARIABLES #
 
-    _temporaryLocalPaths: t.Dict[str, set] = {}
+    _temporaryLocalPaths: dict[str, set] = {}
 
     parseUsingCorpus = False
     # INITIALIZER #
@@ -924,7 +918,6 @@ class LocalCorpus(Corpus):
         The name of a given local corpus.  Either 'local' for the unnamed corpus
         or a name for a named corpus
 
-        >>> from music21 import corpus
         >>> corpus.corpora.LocalCorpus().name
         'local'
 

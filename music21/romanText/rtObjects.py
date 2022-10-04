@@ -6,7 +6,7 @@
 # Authors:      Christopher Ariza
 #               Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2011-2012, 2019 Michael Scott Asato Cuthbert and the music21 Project
+# Copyright:    Copyright © 2011-2012, 2019 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
@@ -14,6 +14,8 @@ Translation routines for roman numeral analysis text files, as defined
 and demonstrated by Dmitri Tymoczko, Mark Gotham, Michael Scott Cuthbert,
 and Christopher Ariza in ISMIR 2019.
 '''
+from __future__ import annotations
+
 import fractions
 import io
 import re

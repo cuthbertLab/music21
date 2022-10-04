@@ -5,7 +5,7 @@
 #
 # Authors:      Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2009-2012, 2020 Michael Scott Asato Cuthbert and the music21 Project
+# Copyright:    Copyright © 2009-2012, 2020 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
@@ -50,8 +50,6 @@ import math
 import re
 import unittest
 
-import typing as t
-
 from music21 import articulations
 from music21 import bar
 from music21 import base
@@ -60,6 +58,7 @@ from music21 import clef
 from music21 import common
 from music21 import dynamics
 from music21 import duration
+from music21 import environment
 from music21 import exceptions21
 from music21 import expressions
 from music21 import instrument
@@ -77,7 +76,6 @@ from music21.humdrum import testFiles
 from music21.humdrum import harmparser
 from music21.humdrum import instruments
 
-from music21 import environment
 environLocal = environment.Environment('humdrum.spineParser')
 
 flavors = {'JRP': False}
@@ -1055,8 +1053,8 @@ class HumdrumSpine(prebase.ProtoM21Object):
         self.parentSpine = None
         self.newSpine = None
         self.isLastSpine = False
-        self.childSpines: t.List[HumdrumSpine] = []
-        self.childSpineInsertPoints: t.Dict[int, t.Tuple[HumdrumSpine, ...]] = {}
+        self.childSpines: list[HumdrumSpine] = []
+        self.childSpineInsertPoints: dict[int, tuple[HumdrumSpine, ...]] = {}
 
         self.parsed = False
         self.measuresMoved = False
@@ -1065,7 +1063,7 @@ class HumdrumSpine(prebase.ProtoM21Object):
         self._spineCollection = None
         self._spineType = None
 
-        self.isFirstVoice: t.Union[bool, None] = None
+        self.isFirstVoice: bool | None = None
         self.iterIndex = None
 
     def _reprInternal(self):
@@ -1572,7 +1570,7 @@ class SpineEvent(prebase.ProtoM21Object):
         self.contents = contents
         self.position = position
         self.protoSpineId: int = 0
-        self.spineId: t.Optional[int] = None
+        self.spineId: int | None = None
 
     def _reprInternal(self):
         return str(self.contents)
@@ -1633,7 +1631,7 @@ class SpineCollection(prebase.ProtoM21Object):
         self.iterIndex -= 1
         return thisSpine
 
-    def addSpine(self, streamClass: t.Type[stream.Stream] = stream.Part):
+    def addSpine(self, streamClass: type[stream.Stream] = stream.Part):
         '''
         creates a new spine in the collection and returns it.
 
@@ -2006,7 +2004,7 @@ class SpineCollection(prebase.ProtoM21Object):
                 if not hasVoices:
                     continue
 
-                voices: t.List[t.Optional[stream.Voice]] = [None for i in range(10)]
+                voices: list[stream.Voice | None] = [None for i in range(10)]
                 measureElements = el.elements
                 for mEl in measureElements:
                     mElGroups = mEl.groups

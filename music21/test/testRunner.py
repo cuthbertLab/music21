@@ -15,6 +15,8 @@ The testRunner module contains the all important "mainTest" function that runs t
 in a given module.  Except for the one instance of "defaultImports", everything here
 can run on any system, not just music21.
 '''
+from __future__ import annotations
+
 import doctest
 import inspect
 import platform

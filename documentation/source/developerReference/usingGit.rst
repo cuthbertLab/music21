@@ -17,7 +17,7 @@ Installing Git
 --------------
 
 First, make sure you have Git installed. You can find binaries for Windows, OSX
-and Unix at `http://git-scm.com/ <http://git-scm.com/>`_.
+and Unix at `https://git-scm.com/ <https://git-scm.com/>`_.
 
 But the best way to do almost everything with Git and `music21` today is with the
 GitHub Desktop app, at `https://desktop.github.com <https://desktop.github.com>`.

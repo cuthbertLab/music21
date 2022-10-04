@@ -4,12 +4,13 @@
 # Purpose:      a figured bass scale
 # Authors:      Jose Cabal-Ugaz
 #
-# Copyright:    Copyright © 2010-2011 Michael Scott Asato Cuthbert and the music21 Project
+# Copyright:    Copyright © 2010-2011 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
+from __future__ import annotations
+
 import copy
 import itertools
-import typing as t
 import unittest
 
 from music21 import exceptions21
@@ -51,7 +52,7 @@ class FiguredBassScale:
     >>> fbScale.keySig
     <music21.key.KeySignature of 1 flat>
     '''
-    _DOC_ATTR: t.Dict[str, str] = {
+    _DOC_ATTR: dict[str, str] = {
         'realizerScale': '''
             A :class:`~music21.scale.Scale` based on the
             desired value and mode.

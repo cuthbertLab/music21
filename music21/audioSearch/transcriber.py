@@ -7,16 +7,16 @@
 # Authors:      Jordi Bartolome
 #               Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2011 Michael Scott Asato Cuthbert and the music21 Project
+# Copyright:    Copyright © 2011 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
+from __future__ import annotations
 
 import unittest
 
-# from time import time
-
-from music21 import scale
 from music21 import environment
+from music21 import scale
+
 environLocal = environment.Environment('audioSearch.transcriber')
 
 
