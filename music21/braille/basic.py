@@ -11,9 +11,9 @@
 # ------------------------------------------------------------------------------
 from __future__ import annotations
 
+import typing as t
 import unittest
 
-# from music21 import articulations
 from music21 import articulations
 from music21 import clef
 from music21 import duration
@@ -22,12 +22,14 @@ from music21 import exceptions21
 from music21 import expressions
 from music21 import interval
 from music21 import note
-from music21 import tempo  # for typing
 
 from music21.braille import lookup
 from music21.common import stringTools
 
-# Add aliases to lookup tables ONLY if it will be used in many different contexts
+if t.TYPE_CHECKING:
+    from music21 import tempo
+
+# Add aliases to lookup tables ONLY if it will be used in many contexts
 # if it is used in only one function, make the alias there.
 alphabet = lookup.alphabet
 ascii_chars = lookup.ascii_chars
@@ -680,7 +682,7 @@ def noteToBraille(
     # Note: beamStatus is a helper that we hope to remove
     # when moving all the translation features to an object class.
     #
-    # Currently does not allow parallelization of parsing.
+    # Currently, does not allow parallelization of parsing.
     music21Note.editorial.brailleEnglish = []
 
     for keyword in TEMPORARY_ATTRIBUTES:

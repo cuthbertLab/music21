@@ -25,9 +25,13 @@ from music21.common.types import M21ObjType
 from music21.key import KeySignature
 from music21.layout import StaffGroup
 from music21.meter import TimeSignature
-from music21 import stream  # for typing
 from music21.musicxml import helpers
 from music21.musicxml.xmlObjects import MusicXMLExportException, MusicXMLWarning
+
+
+if t.TYPE_CHECKING:
+    from music21 import stream
+
 
 def addStaffTags(
     measure: Element,

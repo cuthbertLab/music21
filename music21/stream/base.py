@@ -55,7 +55,6 @@ from music21 import key
 from music21 import metadata
 from music21 import meter
 from music21 import note
-from music21 import pitch  # for typing
 from music21 import tie
 from music21 import repeat
 from music21 import sites
@@ -71,6 +70,7 @@ from music21.stream.enums import GivenElementsBehavior, RecursionType
 
 
 if TYPE_CHECKING:
+    from music21 import pitch
     from music21 import spanner
 
 
@@ -4823,10 +4823,10 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
 
         # Replace old measures in spanners with new measures
         # Example: out is a Part, out.spannerBundle has RepeatBrackets spanning measures
-        # TODO: when dropping support for Py3.9 (min=3.10) add strict=True
         for oldM, newM in zip(
             self.getElementsByClass(Measure),
-            out.getElementsByClass(Measure)
+            out.getElementsByClass(Measure),
+            strict=True
         ):
             out.spannerBundle.replaceSpannedElement(oldM, newM)
 

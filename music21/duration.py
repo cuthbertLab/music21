@@ -1084,27 +1084,29 @@ class Tuplet(prebase.ProtoM21Object):
         elif durationActual is None and durationNormal is not None:
             durationActual = durationNormal
 
-        # this stores a durationTuple
-        if durationActual is not None:
-            if isinstance(durationActual, str):
-                self.durationActual = durationTupleFromTypeDots(durationActual, 0)
-            elif isinstance(durationActual, tuple):
-                self.durationActual = durationTupleFromTypeDots(durationActual[0],
-                                                                durationActual[1])
-            else:
+        match durationActual:
+            case None:
+                pass
+            case str(durAct):
+                self.durationActual = durationTupleFromTypeDots(durAct, 0)
+            case (str(durActType), int(dots)):
+                self.durationActual = durationTupleFromTypeDots(durActType, dots)
+            case _:
                 # type ignore until https://github.com/python/mypy/issues/3004 resolved
                 self.durationActual = durationActual  # type: ignore
+
 
         # normal is the space that would normally be occupied by the tuplet span
         self.numberNotesNormal: int = numberNotesNormal
 
-        if durationNormal is not None:
-            if isinstance(durationNormal, str):
-                self.durationNormal = durationTupleFromTypeDots(durationNormal, 0)
-            elif isinstance(durationNormal, tuple):
-                self.durationNormal = durationTupleFromTypeDots(durationNormal[0],
-                                                                durationNormal[1])
-            else:
+        match durationNormal:
+            case None:
+                pass
+            case str(durNor):
+                self.durationNormal = durationTupleFromTypeDots(durNor, 0)
+            case(str(durNorType), int(dots)):
+                self.durationNormal = durationTupleFromTypeDots(durNorType, dots)
+            case _:
                 # type ignore until https://github.com/python/mypy/issues/3004 resolved
                 self.durationNormal = durationNormal  # type: ignore
 
@@ -1160,10 +1162,10 @@ class Tuplet(prebase.ProtoM21Object):
     # PRIVATE METHODS #
 
     def _reprInternal(self):
-        base = f'{self.numberNotesActual!r}/{self.numberNotesNormal!r}'
+        base_rep = f'{self.numberNotesActual!r}/{self.numberNotesNormal!r}'
         if self.durationNormal is not None:
-            base += f'/{self.durationNormal.type}'
-        return base
+            base_rep += f'/{self.durationNormal.type}'
+        return base_rep
 
     def _checkFrozen(self):
         if self.frozen is True:
