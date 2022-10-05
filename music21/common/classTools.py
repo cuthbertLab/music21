@@ -40,7 +40,7 @@ def isInt(usrData: t.Any) -> t.TypeGuard[int]:
     return isinstance(usrData, int) and usrData is not True and usrData is not False
 
 
-def isNum(usrData: t.Any) -> t.TypeGuard[Number]:
+def isNum(usrData: t.Any) -> t.TypeGuard[numbers.Number]:
     '''
     check if usrData is a number (float, int, long, Decimal),
     return boolean
@@ -85,7 +85,7 @@ def isNum(usrData: t.Any) -> t.TypeGuard[Number]:
         return False
 
 
-def isListLike(usrData: t.Any) -> bool:
+def isListLike(usrData: t.Any) -> t.TypeGuard[list | tuple]:
     '''
     Returns True if is a List or Tuple or their subclasses.
 
@@ -145,7 +145,7 @@ def isIterable(usrData: t.Any) -> t.TypeGuard[Iterable]:
     return False
 
 
-def holdsType(usrData: t.Any, checkType: type[_T]) -> TypeGuard[Collection[_T]]:
+def holdsType(usrData: t.Any, checkType: type[_T]) -> t.TypeGuard[Collection[_T]]:
     '''
     Returns True if usrData is a Collection of type checkType.
 

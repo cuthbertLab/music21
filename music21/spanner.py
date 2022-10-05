@@ -1348,7 +1348,6 @@ class RepeatBracket(Spanner):
             # undefined.
             self.numberRange = [0]
         elif common.holdsType(value, int):
-            value = t.cast(Collection[int], value)  # unnecessary, but not working in mypy 0.982
             self.numberRange = []  # clear
             for x in value:
                 self.numberRange.append(x)
@@ -1364,7 +1363,7 @@ class RepeatBracket(Spanner):
                     one_number = int(one_letter_value.strip())
                     self.numberRange.append(one_number)
             elif value.isdigit():
-                self.numberRange.append(int(value))
+                self.numberRange = [int(value)]
             else:
                 raise SpannerException(f'number for RepeatBracket must be a number, not {value!r}')
         elif common.isInt(value):

@@ -4732,7 +4732,7 @@ class MeasureParser(XMLParserBase):
             # not complete
 
             # TODO: this should also filter by number (in theory.)
-            rbSpanners = self.spannerBundle.getByClass('RepeatBracket').getByCompleteStatus(False)
+            rbSpanners = self.spannerBundle.getByClass(spanner.RepeatBracket).getByCompleteStatus(False)
             # if we have no complete bracket objects, must start a new one
             if not rbSpanners:
                 # create with this measure as the object

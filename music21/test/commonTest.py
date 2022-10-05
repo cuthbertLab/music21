@@ -76,12 +76,12 @@ def load_source(name: str, path: str) -> types.ModuleType:
         raise FileNotFoundError(f'No such file or directory: {path!r}')
     if name in sys.modules:
         module = sys.modules[name]
-        spec.loader.exec_module(module)
     else:
         module = importlib.util.module_from_spec(spec)
         if module is None:
             raise FileNotFoundError(f'No such file or directory: {path!r}')
-        spec.loader.exec_module(module)
+        sys.modules[name] = module
+    spec.loader.exec_module(module)
 
     return module
 
@@ -424,7 +424,7 @@ class ModuleGather:
             with warnings.catch_warnings():
                 mod = load_source(name, fp)
         except Exception as excp:  # pylint: disable=broad-except
-            environLocal.warn(['failed import:', fp, '\n',
+            environLocal.warn(['failed import:', name, '\t', fp, '\n',
                                '\tEXCEPTION:', str(excp).strip()])
             return None
 
