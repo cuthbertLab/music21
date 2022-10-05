@@ -1278,7 +1278,7 @@ class RepeatBracket(Spanner):
     '''
     def __init__(self,
                  *spannedElements,
-                 number: int | None = None,
+                 number: int | str | list[int | str] | None = None,
                  overrideDisplay: str | None = None,
                  **keywords):
         super().__init__(*spannedElements, **keywords)
@@ -1296,7 +1296,7 @@ class RepeatBracket(Spanner):
             self.number = number
 
     # property to enforce numerical numbers
-    def _getNumber(self):
+    def _getNumber(self) -> str:
         '''
         This must return a string, as we may have single numbers or lists.
         For a raw numerical list, use getNumberList() below.
@@ -1313,7 +1313,7 @@ class RepeatBracket(Spanner):
             else:  # range of values
                 return f'{self._numberRange[0]}-{self._numberRange[-1]}'
 
-    def _setNumber(self, value):
+    def _setNumber(self, value: int | str | list[int | str] | None):
         '''
         Set the bracket number. There may be range of values provided
         '''

@@ -1933,19 +1933,17 @@ class Test(unittest.TestCase):
         sInnerFlat = sInner.flatten()
         sInnerFlat.id = 'sInnerFlat'
 
-#         # but it has sOuter has a context
-#         self.assertIn(sOuter, sInnerFlat.sites)
-#         # environLocal.printDebug(['sites.get() of sInnerFlat', sInnerFlat.sites.get()])
-#         # environLocal.printDebug(['sites.siteDict of sInnerFlat', sInnerFlat.sites.siteDict])
-#
-#
-#         self.assertIn(sOuter, sInnerFlat.sites)
-#
-#         # this returns the proper dictionary entry
-#         # environLocal.printDebug(
-#         #    ['sInnerFlat.sites.siteDict[id(sInner)', sInnerFlat.sites.siteDict[id(sOuter)]])
-#         # we can extract out the same reference
-#         unused_sOuterOut = sInnerFlat.sites.getById(id(sOuter))
+        # # but it has sOuter has a context
+        # self.assertIn(sOuter, sInnerFlat.sites)
+        # # environLocal.printDebug(['sites.get() of sInnerFlat', sInnerFlat.sites.get()])
+        # # environLocal.printDebug(['sites.siteDict of sInnerFlat', sInnerFlat.sites.siteDict])
+        # self.assertIn(sOuter, sInnerFlat.sites)
+
+        # # this returns the proper dictionary entry
+        # # environLocal.printDebug(
+        # #    ['sInnerFlat.sites.siteDict[id(sInner)', sInnerFlat.sites.siteDict[id(sOuter)]])
+        # # we can extract out the same reference
+        # unused_sOuterOut = sInnerFlat.sites.getById(id(sOuter))
 
         # this works
         post = sInnerFlat.getContextByClass(clef.Clef)
@@ -3359,13 +3357,13 @@ class Test(unittest.TestCase):
         self.assertEqual(m.barDurationProportion(), Fraction(1, 3), 4)
         self.assertEqual(m.barDuration.quarterLength, 3, 4)
 
-# temporarily commented out
-#         m.shiftElementsAsAnacrusis()
-#         self.assertTrue(m in m.notesAndRests[0].sites)
-#         self.assertEqual(m.notesAndRests[0].offset, 2.0)
-#         # now the duration is full
-#         self.assertAlmostEqual(m.barDurationProportion(), 1.0, 4)
-#         self.assertAlmostEqual(m.highestOffset, 2.0, 4)
+        # temporarily commented out
+        # m.shiftElementsAsAnacrusis()
+        # self.assertTrue(m in m.notesAndRests[0].sites)
+        # self.assertEqual(m.notesAndRests[0].offset, 2.0)
+        # # now the duration is full
+        # self.assertAlmostEqual(m.barDurationProportion(), 1.0, 4)
+        # self.assertAlmostEqual(m.highestOffset, 2.0, 4)
 
         m = Measure()
         m.timeSignature = meter.TimeSignature('5/4')
@@ -3379,11 +3377,11 @@ class Test(unittest.TestCase):
         self.assertEqual(m.barDurationProportion(), Fraction(2, 5), 4)
         self.assertEqual(m.barDuration.quarterLength, 5.0)
 
-#         m.shiftElementsAsAnacrusis()
-#         self.assertEqual(m.notesAndRests[0].offset, 3.0)
-#         self.assertEqual(n1.offset, 3.0)
-#         self.assertEqual(n2.offset, 3.5)
-#         self.assertAlmostEqual(m.barDurationProportion(), 1.0, 4)
+        # m.shiftElementsAsAnacrusis()
+        # self.assertEqual(m.notesAndRests[0].offset, 3.0)
+        # self.assertEqual(n1.offset, 3.0)
+        # self.assertEqual(n2.offset, 3.5)
+        # self.assertAlmostEqual(m.barDurationProportion(), 1.0, 4)
 
     def testInsertAndShiftBasic(self):
         offsets = [0, 2, 4, 6, 8, 10, 12]
@@ -5907,52 +5905,49 @@ class Test(unittest.TestCase):
 
         # s1.show()
 
-#         s0 = corpus.parse('hwv56', '1-05')
-#         # can use index values
-#         s2 = s0.partsToVoices(([0, 1], [2, 4], 3), permitOneVoicePerPart=True)
-#         self.assertEqual(len(s2.parts), 3)
-#         self.assertEqual(len(s2.parts[0].getElementsByClass(
-#             'Measure')[0].voices), 2)
-#         self.assertEqual(len(s2.parts[1].getElementsByClass(
-#             'Measure')[0].voices), 2)
-#         self.assertEqual(len(s2.parts[2].getElementsByClass(
-#             'Measure')[0].voices), 1)
-#
-#         s2 = s0.partsToVoices((['Violino I', 'Violino II'], ['Viola', 'Bassi'], ['Basso']),
-#                permitOneVoicePerPart=True)
-#         self.assertEqual(len(s2.parts), 3)
-#         self.assertEqual(len(s2.parts[0].getElementsByClass(
-#             'Measure')[0].voices), 2)
-#         self.assertEqual(len(s2.parts[1].getElementsByClass(
-#             'Measure')[0].voices), 2)
-#         self.assertEqual(len(s2.parts[2].getElementsByClass(
-#             'Measure')[0].voices), 1)
-#
-#
-#         # this will keep the voice part unaltered
-#         s2 = s0.partsToVoices((['Violino I', 'Violino II'], ['Viola', 'Bassi'], 'Basso'),
-#                permitOneVoicePerPart=False)
-#         self.assertEqual(len(s2.parts), 3)
-#         self.assertEqual(len(s2.parts[0].getElementsByClass(
-#             'Measure')[0].voices), 2)
-#         self.assertEqual(len(s2.parts[1].getElementsByClass(
-#             'Measure')[0].voices), 2)
-#         self.assertEqual(s2.parts[2].getElementsByClass(
-#             'Measure')[0].hasVoices(), False)
-#
-#
-#         # mm 16-19 are a good examples
-#         s1 = corpus.parse('hwv56', '1-05').measures(16, 19)
-#         s2 = s1.partsToVoices((['Violino I', 'Violino II'], ['Viola', 'Bassi'], 'Basso'))
-#         # s.show()
-#
-#         self.assertEqual(len(s2.parts), 3)
-#         self.assertEqual(len(s2.parts[0].getElementsByClass(
-#             'Measure')[0].voices), 2)
-#         self.assertEqual(len(s2.parts[1].getElementsByClass(
-#             'Measure')[0].voices), 2)
-#         self.assertEqual(s2.parts[2].getElementsByClass(
-#             'Measure')[0].hasVoices(), False)
+        # s0 = corpus.parse('hwv56', '1-05')
+        # # can use index values
+        # s2 = s0.partsToVoices(([0, 1], [2, 4], 3), permitOneVoicePerPart=True)
+        # self.assertEqual(len(s2.parts), 3)
+        # self.assertEqual(len(s2.parts[0].getElementsByClass(
+        #     'Measure')[0].voices), 2)
+        # self.assertEqual(len(s2.parts[1].getElementsByClass(
+        #     'Measure')[0].voices), 2)
+        # self.assertEqual(len(s2.parts[2].getElementsByClass(
+        #     'Measure')[0].voices), 1)
+
+        # s2 = s0.partsToVoices((['Violino I', 'Violino II'], ['Viola', 'Bassi'], ['Basso']),
+        #        permitOneVoicePerPart=True)
+        # self.assertEqual(len(s2.parts), 3)
+        # self.assertEqual(len(s2.parts[0].getElementsByClass(
+        #     'Measure')[0].voices), 2)
+        # self.assertEqual(len(s2.parts[1].getElementsByClass(
+        #     'Measure')[0].voices), 2)
+        # self.assertEqual(len(s2.parts[2].getElementsByClass(
+        #     'Measure')[0].voices), 1)
+        # # this will keep the voice part unaltered
+        # s2 = s0.partsToVoices((['Violino I', 'Violino II'], ['Viola', 'Bassi'], 'Basso'),
+        #        permitOneVoicePerPart=False)
+        # self.assertEqual(len(s2.parts), 3)
+        # self.assertEqual(len(s2.parts[0].getElementsByClass(
+        #     'Measure')[0].voices), 2)
+        # self.assertEqual(len(s2.parts[1].getElementsByClass(
+        #     'Measure')[0].voices), 2)
+        # self.assertEqual(s2.parts[2].getElementsByClass(
+        #     'Measure')[0].hasVoices(), False)
+
+        # # mm 16-19 are a good examples
+        # s1 = corpus.parse('hwv56', '1-05').measures(16, 19)
+        # s2 = s1.partsToVoices((['Violino I', 'Violino II'], ['Viola', 'Bassi'], 'Basso'))
+        # # s.show()
+
+        # self.assertEqual(len(s2.parts), 3)
+        # self.assertEqual(len(s2.parts[0].getElementsByClass(
+        #     'Measure')[0].voices), 2)
+        # self.assertEqual(len(s2.parts[1].getElementsByClass(
+        #     'Measure')[0].voices), 2)
+        # self.assertEqual(s2.parts[2].getElementsByClass(
+        #     'Measure')[0].hasVoices(), False)
 
     def testVoicesToPartsA(self):
 
@@ -7013,11 +7008,11 @@ class Test(unittest.TestCase):
         self.assertEqual([m.seconds for m in s.getElementsByClass(Measure)], [6.0, 10.0, 4.0])
 
     # TODO: New piece with Metronome Mark Boundaries
-#     def testMetronomeMarkBoundaries(self):
-# #         s = corpus.parse('hwv56/movement2-09.md')
-#         mmBoundaries = s.metronomeMarkBoundaries()
-#         self.assertEqual(str(mmBoundaries),
-#                '[(0.0, 20.0, <music21.tempo.MetronomeMark Largo e piano Quarter=46>)]')
+    # def testMetronomeMarkBoundaries(self):
+    #     s = corpus.parse('hwv56/movement2-09.md')
+    #     mmBoundaries = s.metronomeMarkBoundaries()
+    #     self.assertEqual(str(mmBoundaries),
+    #            '[(0.0, 20.0, <music21.tempo.MetronomeMark Largo e piano Quarter=46>)]')
 
     def testAccumulatedTimeA(self):
         s = Stream()

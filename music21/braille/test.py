@@ -2763,8 +2763,8 @@ Barline final ⠣⠅
         ml[1].append(spanner.Slur(ml[1].notes[0], ml[1].notes[1]))
         ml[3].insert(0.0, expressions.TextExpression('rit.'))
         self.s = bm
-#         self.b = '''
-#         '''
+        # self.b = '''
+        # '''
 
     def test_example13_14(self):
         bm = converter.parse("tinynotation: 3/4 e'4 e' f'# g'2. f'#8 d' a d' e' c'# d'2.").flatten()
@@ -2895,8 +2895,8 @@ Barline final ⠣⠅
         ml[0].insert(0.0, expressions.TextExpression('very sweetly'))
         ml[-1].rightBarline = None
         self.s = bm
-#         self.b = '''
-#         '''
+        # self.b = '''
+        # '''
 
     def test_example13_26(self):
         bm = converter.parse('''
@@ -3287,8 +3287,8 @@ Barline final ⠣⠅
         bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
         bm.getElementsByClass(stream.Measure)[-1].rightBarline = None
         self.s = bm
-#         self.b = '''
-#         '''
+        # self.b = '''
+        # '''
 
     def test_example15_11(self):
         bm = converter.parse('''
@@ -3370,8 +3370,8 @@ Barline final ⠣⠅
         bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
         bm.getElementsByClass(stream.Measure)[-1].rightBarline = None
         self.s = bm
-#         self.b = '''
-#         '''
+        # self.b = '''
+        # '''
 
     def test_example16_15(self):
         bm = converter.parse('''

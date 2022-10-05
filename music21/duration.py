@@ -3204,7 +3204,6 @@ class TupletFixer:
     reflect proper beaming, etc.  It does not alter the quarterLength
     of any notes.
     '''
-
     def __init__(self, streamIn=None):
         self.streamIn = streamIn
 
@@ -3384,51 +3383,48 @@ class TupletFixer:
 
         if currentTupletDuration == totalTupletDuration:
             return
-        else:
-            excessRatio = opFrac(currentTupletDuration / totalTupletDuration)
-            inverseExcessRatio = opFrac(1 / excessRatio)
 
-            if excessRatio == int(excessRatio):  # divide tuplets into smaller
-                largestTupletType = ordinalTypeFromNum[largestTupletTypeOrdinal]
+        excessRatio = opFrac(currentTupletDuration / totalTupletDuration)
+        inverseExcessRatio = opFrac(1 / excessRatio)
 
-                for n in tupletGroup:
-                    normalDots = 0
-                    n.duration.tuplets[0].frozen = False  # bad
-                    if n.duration.tuplets[0].durationNormal is not None:
-                        normalDots = n.duration.tuplets[0].durationNormal.dots
-                    n.duration.tuplets[0].durationNormal = durationTupleFromTypeDots(
-                        largestTupletType, normalDots)
-                    actualDots = 0
-                    if n.duration.tuplets[0].durationActual is not None:
-                        actualDots = n.duration.tuplets[0].durationActual.dots
-                    n.duration.tuplets[0].durationActual = durationTupleFromTypeDots(
-                        largestTupletType, actualDots)
-                    n.duration.tuplets[0].frozen = True
-                    n.duration.informClient()
+        if excessRatio == int(excessRatio):  # divide tuplets into smaller
+            largestTupletType = ordinalTypeFromNum[largestTupletTypeOrdinal]
 
-            elif inverseExcessRatio == int(inverseExcessRatio):  # redefine tuplets by GCD
-                smallestTupletType = ordinalTypeFromNum[smallestTupletTypeOrdinal]
-                for n in tupletGroup:
-                    normalDots = 0
-                    n.duration.tuplets[0].frozen = False  # bad
-                    if n.duration.tuplets[0].durationNormal is not None:
-                        normalDots = n.duration.tuplets[0].durationNormal.dots
-                    # TODO: this should be frozen!
-                    durTuple = durationTupleFromTypeDots(smallestTupletType, normalDots)
-                    n.duration.tuplets[0].durationNormal = durTuple
+            for n in tupletGroup:
+                normalDots = 0
+                n.duration.tuplets[0].frozen = False  # bad
+                if n.duration.tuplets[0].durationNormal is not None:
+                    normalDots = n.duration.tuplets[0].durationNormal.dots
+                n.duration.tuplets[0].durationNormal = durationTupleFromTypeDots(
+                    largestTupletType, normalDots)
+                actualDots = 0
+                if n.duration.tuplets[0].durationActual is not None:
+                    actualDots = n.duration.tuplets[0].durationActual.dots
+                n.duration.tuplets[0].durationActual = durationTupleFromTypeDots(
+                    largestTupletType, actualDots)
+                n.duration.tuplets[0].frozen = True
+                n.duration.informClient()
 
-                    actualDots = 0
-                    if n.duration.tuplets[0].durationActual is not None:
-                        actualDots = n.duration.tuplets[0].durationActual.dots
-                    durTuple = durationTupleFromTypeDots(smallestTupletType,
-                                                         actualDots)
-                    n.duration.tuplets[0].durationActual = durTuple
-                    n.duration.tuplets[0].frozen = True
-                    n.duration.informClient()
+        elif inverseExcessRatio == int(inverseExcessRatio):  # redefine tuplets by GCD
+            smallestTupletType = ordinalTypeFromNum[smallestTupletTypeOrdinal]
+            for n in tupletGroup:
+                normalDots = 0
+                n.duration.tuplets[0].frozen = False  # bad
+                if n.duration.tuplets[0].durationNormal is not None:
+                    normalDots = n.duration.tuplets[0].durationNormal.dots
+                # TODO: this should be frozen!
+                durTuple = durationTupleFromTypeDots(smallestTupletType, normalDots)
+                n.duration.tuplets[0].durationNormal = durTuple
 
-            else:
-                pass
-                # print('Crazy!', currentTupletDuration, totalTupletDuration, excess)
+                actualDots = 0
+                if n.duration.tuplets[0].durationActual is not None:
+                    actualDots = n.duration.tuplets[0].durationActual.dots
+                durTuple = durationTupleFromTypeDots(smallestTupletType,
+                                                     actualDots)
+                n.duration.tuplets[0].durationActual = durTuple
+                n.duration.tuplets[0].frozen = True
+                n.duration.informClient()
+        # else: pass
 
 # -------------------------------------------------------------------------------
 
@@ -3724,16 +3720,15 @@ class Test(unittest.TestCase):
         self.assertEqual(d.type, '16th')
         self.assertFalse(d.linked)  # note set
 
-
-#         d = duration.Duration()
-#         d.setTypeUnlinked('quarter')
-#         self.assertEqual(d.type, 'quarter')
-#         self.assertEqual(d.quarterLength, 0.0)  # note set
-#         self.assertFalse(d.linked)  # note set
-#
-#         d.setQuarterLengthUnlinked(20)
-#         self.assertEqual(d.quarterLength, 20.0)
-#         self.assertFalse(d.linked)  # note set
+        # d = duration.Duration()
+        # d.setTypeUnlinked('quarter')
+        # self.assertEqual(d.type, 'quarter')
+        # self.assertEqual(d.quarterLength, 0.0)  # note set
+        # self.assertFalse(d.linked)  # note set
+        #
+        # d.setQuarterLengthUnlinked(20)
+        # self.assertEqual(d.quarterLength, 20.0)
+        # self.assertFalse(d.linked)  # note set
 
 
     def x_testStrangeMeasure(self):
