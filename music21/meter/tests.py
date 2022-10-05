@@ -4,12 +4,13 @@
 # Purpose:      Tests of meter
 #
 # Authors:      Christopher Ariza
-#               Michael Scott Cuthbert
+#               Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2009-2012, 2015, 2021 Michael Scott Cuthbert
-#               and the music21 Project
+# Copyright:    Copyright © 2009-2022 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # -----------------------------------------------------------------------------
+from __future__ import annotations
+
 import copy
 import random
 import unittest
@@ -73,28 +74,6 @@ class TestExternal(unittest.TestCase):
 
 
 class Test(unittest.TestCase):
-    def testCopyAndDeepcopy(self):
-        '''Test copying all objects defined in this module
-        '''
-        import sys
-        import types
-        for part in sys.modules[self.__module__].__dict__:
-            match = False
-            for skip in ['_', '__', 'Test', 'Exception']:
-                if part.startswith(skip) or part.endswith(skip):
-                    match = True
-            if match:
-                continue
-            name = getattr(sys.modules[self.__module__], part)
-            # noinspection PyTypeChecker
-            if callable(name) and not isinstance(name, types.FunctionType):
-                try:  # see if obj can be made w/ args
-                    obj = name()
-                except TypeError:
-                    continue
-                i = copy.copy(obj)
-                j = copy.deepcopy(obj)
-
     def testMeterSubdivision(self):
         a = MeterSequence()
         a.load('4/4', 4)
@@ -546,11 +525,11 @@ class Test(unittest.TestCase):
         '''
         from music21 import corpus
         faulty = corpus.parse('demos/incorrect_time_signature_pv')
-        for m in faulty.recurse().getElementsByClass('Measure'):
+        for m in faulty.recurse().getElementsByClass(stream.Measure):
             m.timeSignature = m.bestTimeSignature()
         p1 = faulty.parts[1]
         tsReps = []
-        for m in p1.getElementsByClass('Measure'):
+        for m in p1.getElementsByClass(stream.Measure):
             tsReps.append(repr(m.timeSignature))
         self.assertEqual(tsReps, ['<music21.meter.TimeSignature 12/4>',
                                   '<music21.meter.TimeSignature 23/8>',
@@ -629,7 +608,6 @@ class Test(unittest.TestCase):
         ts328 = TimeSignature('3+2/8')
         beatSeq = ts328.beamSequence
         self.assertEqual(str(beatSeq), '{3/8+2/8}')
-
 
 
 if __name__ == '__main__':

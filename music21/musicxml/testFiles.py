@@ -6,12 +6,13 @@
 # Authors:      Christopher Ariza
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
+from __future__ import annotations
 
 import unittest
 
 _DOC_IGNORE_MODULE_OR_PACKAGE = True
 
-chantQuemQueritis = """<?xml version="1.0" standalone="no"?>
+chantQuemQueritis = '''<?xml version="1.0" standalone="no"?>
 <!DOCTYPE score-partwise PUBLIC "-//Recordare//DTD MusicXML 1.0 Partwise//EN" "http://www.musicxml.org/dtds/partwise.dtd">
 <score-partwise>
     <movement-title>Quem queritis</movement-title>
@@ -426,10 +427,10 @@ chantQuemQueritis = """<?xml version="1.0" standalone="no"?>
     </part>
 </score-partwise>
 
-"""
+'''
 
 
-schumannOp48No1 = """<?xml version="1.0" encoding="UTF-8"?>
+schumannOp48No1 = '''<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE score-partwise PUBLIC "-//Recordare//DTD MusicXML 2.0 Partwise//EN"
                                 "http://www.musicxml.org/dtds/partwise.dtd">
 <score-partwise version="2.0">
@@ -8016,10 +8017,10 @@ schumannOp48No1 = """<?xml version="1.0" encoding="UTF-8"?>
   <!--=========================================================-->
 </score-partwise>
 
-"""
+'''
 
 
-mozartTrioK581Excerpt = """<?xml version="1.0" standalone="no"?>
+mozartTrioK581Excerpt = '''<?xml version="1.0" standalone="no"?>
 <!DOCTYPE score-partwise PUBLIC "-//Recordare//DTD MusicXML 1.0 Partwise//EN" "http://www.musicxml.org/dtds/partwise.dtd">
 <score-partwise>
     <work>
@@ -11119,10 +11120,10 @@ mozartTrioK581Excerpt = """<?xml version="1.0" standalone="no"?>
     </part>
 </score-partwise>
 
-"""
+'''
 
 
-binchoisMagnificat = """<?xml version="1.0" encoding="utf-8"?>
+binchoisMagnificat = '''<?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE score-partwise
   PUBLIC '-//Recordare//DTD MusicXML 2.0 Partwise//EN'
   'http://www.musicxml.org/dtds/partwise.dtd'>
@@ -13300,10 +13301,10 @@ binchoisMagnificat = """<?xml version="1.0" encoding="utf-8"?>
   </part>
 </score-partwise>
 
-"""
+'''
 
 
-moussorgskyPromenade = """<?xml version="1.0" encoding="UTF-8"?>
+moussorgskyPromenade = '''<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE score-partwise PUBLIC "-//Recordare//DTD MusicXML 2.0 Partwise//EN"
                                 "http://www.musicxml.org/dtds/partwise.dtd">
 <score-partwise version="2.0">
@@ -14316,10 +14317,10 @@ moussorgskyPromenade = """<?xml version="1.0" encoding="UTF-8"?>
   </part>
   <!--=========================================================-->
 </score-partwise>
-"""
+'''
 
 
-edgefield82b = """<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+edgefield82b = '''<?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!DOCTYPE score-partwise PUBLIC "-//Recordare//DTD MusicXML 1.1 Partwise//EN" "http://www.musicxml.org/dtds/partwise.dtd">
 <score-partwise>
     <work>
@@ -15947,9 +15948,9 @@ edgefield82b = """<?xml version="1.0" encoding="UTF-8" standalone="no"?>
         </measure>
     </part>
 </score-partwise>
-"""
+'''
 
-tabTest = """<?xml version="1.0" encoding="UTF-8" ?>
+tabTest = '''<?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE score-partwise PUBLIC '-//Recordare//DTD MusicXML 2.0 Partwise//EN' 'http://www.musicxml.org/dtds/2.0/partwise.dtd'>
 <score-partwise version="2.0">
  <movement-title>test</movement-title>
@@ -16067,7 +16068,7 @@ tabTest = """<?xml version="1.0" encoding="UTF-8" ?>
   </measure>
  </part>
 </score-partwise>
-"""
+'''
 
 
 # ------------------------------------------------------------------------------

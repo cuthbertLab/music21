@@ -4,14 +4,17 @@
 # Purpose:      Classes for meters
 #
 # Authors:      Christopher Ariza
-#               Michael Scott Cuthbert
+#               Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2009-2012, 2015, 2021 Michael Scott Cuthbert
-#               and the music21 Project
+# Copyright:    Copyright © 2009-2022 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # -----------------------------------------------------------------------------
+from __future__ import annotations
+
 from music21.exceptions21 import TimeSignatureException, MeterException
-from music21.meter.base import TimeSignature, bestTimeSignature, SenzaMisuraTimeSignature
+from music21.meter.base import (
+    TimeSignature, bestTimeSignature, SenzaMisuraTimeSignature, TimeSignatureBase,
+)
 from music21.meter import core
 from music21.meter import tests
 from music21.meter import tools

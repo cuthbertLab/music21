@@ -5,9 +5,10 @@
 #
 # Authors:      Josiah Wolf Oberholtzer
 #
-# Copyright:    Copyright © 2013 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2013 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # -----------------------------------------------------------------------------
+from __future__ import annotations
 
 # loaded by source/conf.py
 

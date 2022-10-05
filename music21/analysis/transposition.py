@@ -5,20 +5,21 @@
 #
 # Authors:      Mark Gotham
 #
-# Copyright:    Copyright © 2017 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2017 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
+from __future__ import annotations
 
+from collections.abc import Iterable
 import unittest
 
+from music21 import chord
 from music21 import common
+from music21 import environment
 from music21 import exceptions21
 from music21 import pitch
-from music21 import chord
 
-from music21 import environment
-_MOD = 'analysis.transposition'
-environLocal = environment.Environment(_MOD)
+environLocal = environment.Environment('analysis.transposition')
 
 
 class TranspositionException(exceptions21.Music21Exception):
@@ -52,26 +53,25 @@ class TranspositionChecker:
      <music21.chord.Chord C# E G A#>,
      <music21.chord.Chord D F G# B>]
     '''
-    def __init__(self, pitches=None):
-        if pitches is None:
-            raise TranspositionException('Must have some input')
-        if not common.isIterable(pitches):
-            raise TranspositionException('Must be a list or tuple')
+    def __init__(self, pitches: Iterable[pitch.Pitch] = ()):
         if not pitches:
             raise TranspositionException(
                 'Must have at least one element in list'
             )
+        if not common.isIterable(pitches):
+            raise TranspositionException('Must be a list or tuple')
         # p0 = pitches[0]
         # if not isinstance(p0, pitch.Pitch):
         #     raise TranspositionException('List must have pitch objects')
-        self.pitches = pitches
-        self.allTranspositions = None
-        self.allNormalOrders = None
-        self.distinctNormalOrders = None
+        self.pitches: Iterable[pitch.Pitch] = pitches
+        self.allTranspositions: list = []
+        self.allNormalOrders: list = []
+        self.distinctNormalOrders: list = []
 
     def getTranspositions(self):
+        # noinspection PyShadowingNames
         '''
-        Gets all 12 transpositions (distinct or otherwise)
+        Gets all 12 transpositions (distinct or otherwise).
 
         >>> p = [pitch.Pitch('D#')]
         >>> tc = analysis.transposition.TranspositionChecker(p)
@@ -109,7 +109,7 @@ class TranspositionChecker:
          [0, 4, 8], [1, 5, 9], [2, 6, 10], [3, 7, 11],
          [0, 4, 8], [1, 5, 9], [2, 6, 10], [3, 7, 11]]
         '''
-        if self.allTranspositions is None:
+        if not self.allTranspositions:
             self.getTranspositions()
         allTranspositions = self.allTranspositions
         allNormalOrders = []
@@ -130,7 +130,7 @@ class TranspositionChecker:
         >>> tc.listDistinctNormalOrders()
         [[0, 4, 8], [1, 5, 9], [2, 6, 10], [3, 7, 11]]
         '''
-        if self.allNormalOrders is None:
+        if not self.allNormalOrders:
             self.listNormalOrders()
         allNormalOrders = self.allNormalOrders
         seen = set()
@@ -148,7 +148,7 @@ class TranspositionChecker:
         >>> tc.numDistinctTranspositions()
         4
         '''
-        if self.distinctNormalOrders is None:
+        if not self.distinctNormalOrders:
             self.listDistinctNormalOrders()
         return len(self.distinctNormalOrders)
 
@@ -164,7 +164,7 @@ class TranspositionChecker:
          <music21.chord.Chord D F# A#>,
          <music21.chord.Chord E- G B>]
         '''
-        if self.distinctNormalOrders is None:
+        if not self.distinctNormalOrders:
             self.listDistinctNormalOrders()
         distinctNormalOrders = self.distinctNormalOrders
         allNormalOrderChords = []

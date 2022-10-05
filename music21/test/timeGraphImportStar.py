@@ -3,13 +3,15 @@
 # Name:          timeGraphsImportStar.py
 # Purpose:       time how long it takes to import music21, and report biggest offenders
 #
-# Authors:       Michael Scott Cuthbert
+# Authors:       Michael Scott Asato Cuthbert
 #                Christopher Ariza
 #
-# Copyright:    Copyright © 2009-2020 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2009-2020 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 # pragma: no cover
+from __future__ import annotations
+
 import cProfile
 import pstats
 

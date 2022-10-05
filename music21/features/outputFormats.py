@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
-from music21 import exceptions21
+from __future__ import annotations
+
 from music21 import environment
+from music21 import exceptions21
 
 environLocal = environment.Environment('features.outputFormats')
 
@@ -23,6 +25,9 @@ class OutputFormat:
     def getHeaderLines(self):
         '''Get the header as a list of lines.
         '''
+        pass  # define in subclass
+
+    def getString(self, includeClassLabel=True, includeId=True, lineBreak=None):
         pass  # define in subclass
 
     def write(self, fp=None, includeClassLabel=True, includeId=True):
@@ -53,8 +58,9 @@ class OutputTabOrange(OutputFormat):
         self.ext = '.tab'
 
     def getHeaderLines(self, includeClassLabel=True, includeId=True):
-        '''Get the header as a list of lines.
-
+        # noinspection PyShadowingNames
+        '''
+        Get the header as a list of lines.
 
         >>> f = [features.jSymbolic.ChangesOfMeterFeature]
         >>> ds = features.DataSet()
@@ -78,7 +84,7 @@ class OutputTabOrange(OutputFormat):
         post.append(self._dataSet.getAttributeLabels(
             includeClassLabel=includeClassLabel, includeId=includeId))
 
-        # second row meta data
+        # second row metadata
         row = []
         for x in self._dataSet.getDiscreteLabels(
                 includeClassLabel=includeClassLabel, includeId=includeId):

@@ -5,22 +5,23 @@
 #
 # Authors:      Josiah Wolf Oberholtzer
 #
-# Copyright:    Copyright © 2009-2012, 2014 Michael Scott Cuthbert and the music21
+# Copyright:    Copyright © 2009-2012, 2014 Michael Scott Asato Cuthbert and the music21
 #               Project
 # License:      BSD, see license.txt
 # -----------------------------------------------------------------------------
+from __future__ import annotations
 
 import abc
+from collections.abc import Sequence
 import pathlib
-from typing import Dict, List, Sequence, Tuple, Union, cast
+import typing as t
 
 from music21 import common
-# from music21.corpus import virtual
 from music21.corpus import work
-from music21 import prebase
-from music21.exceptions21 import CorpusException
-
 from music21 import environment
+from music21.exceptions21 import CorpusException
+from music21 import prebase
+
 environLocal = environment.Environment(__file__)
 
 
@@ -43,9 +44,9 @@ class Corpus(prebase.ProtoM21Object):
     _allExtensions = tuple(common.flattenList([common.findInputExtension(x)
                                                for x in _acceptableExtensions]))
 
-    _pathsCache: Dict[Tuple[str, Tuple[str]], pathlib.Path] = {}
+    _pathsCache: dict[tuple[str, tuple[str]], pathlib.Path] = {}
 
-    _directoryInformation: Union[Tuple[()], Sequence[Tuple[str, str, bool]]] = ()
+    _directoryInformation: t.Union[tuple[()], Sequence[tuple[str, str, bool]]] = ()
 
     parseUsingCorpus = True
 
@@ -62,12 +63,12 @@ class Corpus(prebase.ProtoM21Object):
                 keysToRemove.append(key)
 
         for key in keysToRemove:
-            del(Corpus._pathsCache[key])
+            del Corpus._pathsCache[key]
 
     def _findPaths(
         self,
         rootDirectoryPath: pathlib.Path,
-        fileExtensions: List[str]
+        fileExtensions: list[str]
     ):
         '''
         Given a root filePath file path, recursively search all contained paths
@@ -81,7 +82,7 @@ class Corpus(prebase.ProtoM21Object):
 
         Generally cached.
         '''
-        rdp = cast(pathlib.Path, common.cleanpath(rootDirectoryPath, returnPathlib=True))
+        rdp = t.cast(pathlib.Path, common.cleanpath(rootDirectoryPath, returnPathlib=True))
         matched = []
 
         for filename in sorted(rdp.rglob('*')):
@@ -243,7 +244,6 @@ class Corpus(prebase.ProtoM21Object):
 
         If no matches are found, an empty list is returned.
 
-        >>> from music21 import corpus
         >>> coreCorpus = corpus.corpora.CoreCorpus()
 
         # returns 1 even though there is a '.mus' file, which cannot be read...
@@ -343,7 +343,7 @@ class Corpus(prebase.ProtoM21Object):
                query,
                field=None,
                fileExtensions=None,
-               **kwargs):
+               **keywords):
         r'''
         Search this corpus for metadata entries, returning a metadataBundle
 
@@ -368,7 +368,7 @@ class Corpus(prebase.ProtoM21Object):
             query,
             field=field,
             fileExtensions=fileExtensions,
-            **kwargs
+            **keywords
         )
 
     # PUBLIC PROPERTIES #
@@ -408,7 +408,6 @@ class Corpus(prebase.ProtoM21Object):
         r'''
         The metadata bundle for a corpus:
 
-        >>> from music21 import corpus
         >>> corpus.corpora.CoreCorpus().metadataBundle
         <music21.metadata.bundles.MetadataBundle 'core': {151... entries}>
 
@@ -428,7 +427,6 @@ class Corpus(prebase.ProtoM21Object):
         This is a synonym for the metadataBundle property, but easier to understand
         what it does.
 
-        >>> from music21 import corpus
         >>> corpus.corpora.CoreCorpus().all()
         <music21.metadata.bundles.MetadataBundle 'core': {151... entries}>
         '''
@@ -447,7 +445,6 @@ class Corpus(prebase.ProtoM21Object):
 
         Note that xml and mxl are treated equivalently.
 
-        >>> from music21 import corpus
         >>> coreCorpus = corpus.corpora.CoreCorpus()
         >>> a = coreCorpus.getComposer('bach')
         >>> len(a) > 100
@@ -513,7 +510,7 @@ class CoreCorpus(Corpus):
 
     # noinspection SpellCheckingInspection
     _directoryInformation = (  # filepath, composer/collection name, isComposer
-        ('airdsAirs', 'Aird\'s Airs', False),
+        ('airdsAirs', "Aird's Airs", False),
         ('bach', 'Johann Sebastian Bach', True),
         ('beach', 'Amy Beach', True),
         ('beethoven', 'Ludwig van Beethoven', True),
@@ -533,9 +530,9 @@ class CoreCorpus(Corpus):
         ('monteverdi', 'Claudio Monteverdi', True),
         ('mozart', 'Wolfgang Amadeus Mozart', True),
         ('nottingham-dataset', 'Nottingham Music Database (partial)', False),
-        ('oneills1850', 'Oneill\'s 1850 Collection', False),
+        ('oneills1850', "Oneill's 1850 Collection", False),
         ('palestrina', 'Giovanni Palestrina', True),
-        ('ryansMammoth', 'Ryan\'s Mammoth Collection', False),
+        ('ryansMammoth', "Ryan's Mammoth Collection", False),
         ('schoenberg', 'Arnold Schoenberg', True),
         ('schubert', 'Franz Schubert', True),
         ('schumann', 'Robert Schumann', True),
@@ -574,7 +571,6 @@ class CoreCorpus(Corpus):
         This is convenient when an input format might match for multiple
         extensions.
 
-        >>> from music21 import corpus
         >>> coreCorpus = corpus.corpora.CoreCorpus()
         >>> corpusFilePaths = coreCorpus.getPaths()
         >>> 3000 < len(corpusFilePaths) < 4000
@@ -650,10 +646,8 @@ class CoreCorpus(Corpus):
         '''
         Return True or False if this is a `corpus` or `noCorpus` distribution.
 
-        >>> from music21 import corpus
         >>> corpus.corpora.CoreCorpus().noCorpus
         False
-
         '''
         if CoreCorpus._noCorpus is None:
             # assume that there will always be a 'bach' dir
@@ -688,7 +682,7 @@ class LocalCorpus(Corpus):
 
     # CLASS VARIABLES #
 
-    _temporaryLocalPaths: Dict[str, set] = {}
+    _temporaryLocalPaths: dict[str, set] = {}
 
     parseUsingCorpus = False
     # INITIALIZER #
@@ -924,7 +918,6 @@ class LocalCorpus(Corpus):
         The name of a given local corpus.  Either 'local' for the unnamed corpus
         or a name for a named corpus
 
-        >>> from music21 import corpus
         >>> corpus.corpora.LocalCorpus().name
         'local'
 

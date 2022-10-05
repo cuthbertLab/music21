@@ -4,24 +4,14 @@
 # Purpose:      music21 classes for representing score and work metadata
 #
 # Authors:      Christopher Ariza
-#               Michael Scott Cuthbert
+#               Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2010, 2012 Michael Scott Cuthbert and the music21
+# Copyright:    Copyright © 2010, 2012 Michael Scott Asato Cuthbert and the music21
 #               Project
 # License:      BSD, see license.txt
 # -----------------------------------------------------------------------------
-import multiprocessing
-import os
-import pathlib
-import pickle
-import traceback
-from typing import List
-import unittest
+from __future__ import annotations
 
-from music21 import common
-from music21 import exceptions21
-
-# -----------------------------------------------------------------------------
 __all__ = [
     'JobProcessor',
     'MetadataCachingJob',
@@ -30,8 +20,18 @@ __all__ = [
     'WorkerProcess',
 ]
 
+import multiprocessing
+import os
+import pathlib
+import pickle
+import traceback
+import unittest
 
+from music21 import common
 from music21 import environment
+from music21 import exceptions21
+
+# -----------------------------------------------------------------------------
 environLocal = environment.Environment(os.path.basename(__file__))
 # -----------------------------------------------------------------------------
 
@@ -92,7 +92,6 @@ class MetadataCachingJob:
     '''
     Parses one corpus path, and attempts to extract metadata from it:
 
-    >>> from music21 import metadata
     >>> job = metadata.caching.MetadataCachingJob(
     ...     'bach/bwv66.6',
     ...     parseUsingCorpus=True,
@@ -171,7 +170,7 @@ class MetadataCachingJob:
                 environLocal.printDebug(
                     'addFromPaths: got stream without metadata, '
                     'creating stub: {0}'.format(
-                        common.relativepath(self.cleanFilePath)))
+                        common.relativepath(str(self.cleanFilePath))))
                 metadataEntry = metadata.bundles.MetadataEntry(
                     sourcePath=self.cleanFilePath,
                     metadataPayload=None,
@@ -388,9 +387,9 @@ class JobProcessor:
 # -----------------------------------------------------------------------------
 
 
-class WorkerProcess(multiprocessing.Process):  # @UndefinedVariable pylint: disable=inherit-non-class
+class WorkerProcess(multiprocessing.Process):  # pylint: disable=inherit-non-class
     '''
-    A worker process for use by the multi-threaded metadata-caching job
+    A worker process for use by the multithreaded metadata-caching job
     processor.
     '''
 
@@ -424,7 +423,7 @@ class Test(unittest.TestCase):
 
 
 # -----------------------------------------------------------------------------
-_DOC_ORDER: List[type] = []
+_DOC_ORDER: list[type] = []
 
 if __name__ == '__main__':
     import music21

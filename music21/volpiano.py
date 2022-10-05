@@ -3,9 +3,9 @@
 # Name:         volpiano.py
 # Purpose:      music21 classes for converting to and from volpiano
 #
-# Authors:      Michael Scott Cuthbert
+# Authors:      Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2017 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2017 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
@@ -17,6 +17,8 @@ from any music21 Stream.
 
 This module will move to a medren package hopefully by v.7
 '''
+from __future__ import annotations
+
 import enum
 import unittest
 
@@ -90,6 +92,7 @@ accidentalTokens = flatTokens + naturalTokens
 
 
 def toPart(volpianoText, *, breaksToLayout=False):
+    # noinspection PyShadowingNames
     '''
     Returns a music21 Part from volpiano text.
 

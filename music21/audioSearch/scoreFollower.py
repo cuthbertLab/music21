@@ -5,27 +5,26 @@
 #
 #
 # Authors:      Jordi Bartolome
-#               Michael Scott Cuthbert
+#               Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2011 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2011 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # -----------------------------------------------------------------------------
+from __future__ import annotations
+
 import math
+from time import time
 import unittest
 
-from time import time
-
+from music21 import environment
 from music21 import scale
 from music21 import search
 from music21 import stream
 
-from music21 import environment
-_MOD = 'audioSearch.scoreFollower'
-environLocal = environment.Environment(_MOD)
+environLocal = environment.Environment('audioSearch.scoreFollower')
 
 
 class ScoreFollower:
-
     def __init__(self, scoreStream=None):
         self.scoreStream = scoreStream
         if scoreStream is not None:

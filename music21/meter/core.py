@@ -4,18 +4,18 @@
 # Purpose:      Component objects for meters
 #
 # Authors:      Christopher Ariza
-#               Michael Scott Cuthbert
+#               Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2009-2012, 2015, 2021 Michael Scott Cuthbert
-#               and the music21 Project
+# Copyright:    Copyright © 2009-2022 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # -----------------------------------------------------------------------------
 '''
 This module defines two component objects for defining nested metrical structures:
 :class:`~music21.meter.core.MeterTerminal` and :class:`~music21.meter.core.MeterSequence`.
 '''
+from __future__ import annotations
+
 import copy
-from typing import Optional
 
 from music21 import prebase
 from music21.common.numberTools import opFrac
@@ -56,8 +56,9 @@ class MeterTerminal(prebase.ProtoM21Object, SlottedObjectMixin):
     )
 
     # INITIALIZER #
-
-    def __init__(self, slashNotation=None, weight=1):
+    def __init__(self, slashNotation: str | None = None, weight=1):
+        # because of how they are copied, MeterTerminals must not have any
+        # initialization parameters without defaults
         self._duration = None
         self._numerator = 0
         self._denominator = 1
@@ -67,10 +68,10 @@ class MeterTerminal(prebase.ProtoM21Object, SlottedObjectMixin):
         if slashNotation is not None:
             # assign directly to values, not properties, to avoid
             # calling _ratioChanged more than necessary
-            values = tools.slashToTuple(slashNotation)
-            if values is not None:  # if failed to parse
-                self._numerator = values.numerator
-                self._denominator = values.denominator
+            values = tools.slashToTuple(slashNotation)  # raise MeterException early if problem.
+            self._numerator = values.numerator
+            self._denominator = values.denominator
+
         self._ratioChanged()  # sets self._duration
 
         # this will set the underlying weight attribute directly for data checking
@@ -82,7 +83,9 @@ class MeterTerminal(prebase.ProtoM21Object, SlottedObjectMixin):
 
     def __deepcopy__(self, memo=None):
         '''
-        Helper method to copy.py's deepcopy function. Call it from there.
+        Helper method to for the deepcopy function in copy.py.
+
+        Do not call this directly.
 
         Defining a custom __deepcopy__ here is a performance boost,
         particularly in not copying _duration, directly assigning _weight, and
@@ -109,7 +112,6 @@ class MeterTerminal(prebase.ProtoM21Object, SlottedObjectMixin):
         Compare the numerator and denominator of another object.
         Note that these have to be exact matches; 3/4 is not the same as 6/8
 
-        >>> from music21 import meter
         >>> a = meter.MeterTerminal('3/4')
         >>> b = meter.MeterTerminal('6/4')
         >>> c = meter.MeterTerminal('2/4')
@@ -241,10 +243,10 @@ class MeterTerminal(prebase.ProtoM21Object, SlottedObjectMixin):
         Subdivision takes a MeterTerminal and, making it into a collection of MeterTerminals,
         Returns a MeterSequence.
 
-        This is different than a partitioning a MeterSequence in that this does not happen
+        This is different from partitioning a MeterSequence. `subdivide` does not happen
         in place and instead returns a new object.
 
-        If an integer is provided, assume it is a partition count
+        If an integer is provided, assume it is a partition count.
         '''
         if common.isListLike(value):
             return self.subdivideByList(value)
@@ -399,15 +401,15 @@ class MeterSequence(MeterTerminal):
         self._levelListCache = {}
 
         # this attribute is only used in MeterTerminals, and note
-        # in MeterSequences; a MeterSequences weight is based solely
-        # on the sum of its components
+        # in MeterSequences; a MeterSequence's weight is based solely
+        # on the sum of its component parts.
         # del self._weight -- no -- screws up pickling -- cannot del a slotted object
 
-        #: Bool stores whether this meter was provided as a summed numerator
+        # Bool stores whether this meter was provided as a summed numerator
         self.summedNumerator = False
 
-        #: an optional parameter used only in meter display sequences.
-        #: needed in cases where a meter component is parenthetical
+        # An optional parameter used only in meter display sequences.
+        # Needed in cases where a meter component is parenthetical
         self.parenthesis = False
 
         if value is not None:
@@ -555,7 +557,7 @@ class MeterSequence(MeterTerminal):
 
     def _addTerminal(self, value):
         '''
-        Add a an object to the partition list. This does not update numerator and denominator.
+        Add an object to the partition list. This does not update numerator and denominator.
 
         ???: (targetWeight is the expected total Weight for this MeterSequence. This
         would be self.weight, but often partitions are cleared before _addTerminal is called.)
@@ -581,8 +583,8 @@ class MeterSequence(MeterTerminal):
         '''
         Return either a cached or a new set of division/partition options.
 
-        Calls tools.divisionOptionsAlgo and tools.divisionOptionsPreset (which will be empty
-        except if the numerator is 5).
+        Calls `tools.divisionOptionsAlgo` and `tools.divisionOptionsPreset`
+        (which will be empty except if the numerator is 5).
 
         Works on anything that has a .numerator and .denominator.
 
@@ -767,10 +769,11 @@ class MeterSequence(MeterTerminal):
                     break
 
         if optMatch is None:
-            raise MeterException('Cannot set partition by %s (%s/%s)' % (
-                numeratorList, self.numerator, self.denominator))
+            raise MeterException(
+                f'Cannot set partition by {numeratorList} ({self.numerator}/{self.denominator})'
+            )
 
-        # if a n/d match, now set this MeterSequence
+        # Since we have a numerator/denominator match, set this MeterSequence
         targetWeight = self.weight
         self._clearPartition()  # clears self.weight
         for mStr in optMatch:
@@ -978,8 +981,8 @@ class MeterSequence(MeterTerminal):
         # by looking at the number of top-level beat partitions
         # thus, 6/8 will have 2, 18/4 should have 5
         if isinstance(firstPartitionForm, MeterSequence):
-            # change self in place, as we cannot re-assign to self
-            # self = self.subdivideByOther(firstPartitionForm.getLevel(0))
+            # change self in place, as we cannot re-assign to self:
+            #     self = self.subdivideByOther(firstPartitionForm.getLevel(0))
             self.load(firstPartitionForm.getLevel(0))
             depthCount += 1
         else:  # can be just a number
@@ -1294,22 +1297,28 @@ class MeterSequence(MeterTerminal):
     @property
     def flat(self):
         '''
+        deprecated.  Call .flatten() instead.  To be removed in v11.
+        '''
+        return self.flatten()
+
+    def flatten(self) -> MeterSequence:
+        '''
         Return a new MeterSequence composed of the flattened representation.
 
         >>> ms = meter.MeterSequence('3/4', 3)
-        >>> b = ms.flat
+        >>> b = ms.flatten()
         >>> len(b)
         3
 
         >>> ms[1] = ms[1].subdivide(4)
-        >>> b = ms.flat
+        >>> b = ms.flatten()
         >>> len(b)
         6
 
         >>> ms[1][2] = ms[1][2].subdivide(4)
         >>> ms
         <music21.meter.core.MeterSequence {1/4+{1/16+1/16+{1/64+1/64+1/64+1/64}+1/16}+1/4}>
-        >>> b = ms.flat
+        >>> b = ms.flatten()
         >>> len(b)
         9
         '''
@@ -1614,7 +1623,7 @@ class MeterSequence(MeterTerminal):
             )
 
         qPos = 0
-        match = None
+        match = -1  # no match -- will not happen.
         for i in range(len(self)):
             start = qPos
             end = opFrac(qPos + self[i].duration.quarterLength)
@@ -1624,8 +1633,8 @@ class MeterSequence(MeterTerminal):
                     match = i
                     break
             else:
-                # note that this is >=, meaning that the first boundary
-                # is coincident
+                # note that this is <=, meaning that the first boundary
+                # is coincident.
                 if start <= qLenPos < end:
                     match = i
                     break
@@ -1766,7 +1775,7 @@ class MeterSequence(MeterTerminal):
         iMatch = self.offsetToIndex(qLenPos)
         return opFrac(self[iMatch].weight)
 
-    def offsetToDepth(self, qLenPos, align='quantize', index: Optional[int] = None):
+    def offsetToDepth(self, qLenPos, align='quantize', index: int | None = None):
         '''
         Given a qLenPos, return the maximum available depth at this position.
 

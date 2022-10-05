@@ -5,13 +5,19 @@
 #
 # Authors:      Emily Zhang
 #
-# Copyright:    Copyright © 2015 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2015 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
-import os
-import inspect
+from __future__ import annotations
 
-pathName = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
+import inspect
+import os
+
+def _dummy():
+    pass  # something for getting our path name
+
+
+pathName = os.path.dirname(os.path.abspath(inspect.getfile(_dummy)))
 
 K525_short_dir = pathName + os.sep + 'testfiles' + os.sep + 'K525'
 K525_short_midi_path = K525_short_dir + os.sep + 'k525short_midi_ms_parsed.xml'

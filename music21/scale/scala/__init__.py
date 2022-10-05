@@ -5,17 +5,16 @@
 #
 # Authors:      Christopher Ariza
 #
-# Copyright:    Copyright © 2010, 16 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2010-22 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
-
 # noinspection SpellCheckingInspection
 '''
 This module defines classes for representing Scala scale data,
 including Scala pitch representations, storage, and files.
 
 The Scala format is defined at the following URL:
-http://www.huygens-fokker.org/scala/scl_format.html
+https://www.huygens-fokker.org/scala/scl_format.html
 
 We thank Manuel Op de Coul for allowing us to include
 the repository (as of May 11, 2011) with music21
@@ -42,28 +41,29 @@ For most people you'll want to do something like this:
 ['A4', 'B4(-15c)', 'C#5(-11c)', 'E-5(-7c)', 'E~5(+6c)', 'F#5(+14c)', 'G~5(+1c)', 'B-5(+2c)']
 
 '''
-from typing import Dict, Optional, List
+from __future__ import annotations
 
 import io
 import math
 import os
 import pathlib
+import typing as t
 import unittest
 
 
 from music21 import common
+from music21 import environment
 from music21 import interval
+
 # scl is the library of scala files
 from music21.scale.scala import scl
 
-from music21 import environment
-_MOD = "scale.scala"
-environLocal = environment.Environment(_MOD)
+environLocal = environment.Environment('scale.scala')
 
 
 # ------------------------------------------------------------------------------
 # global variable to cache the paths returned from getPaths()
-SCALA_PATHS: Dict[str, Optional[Dict[str, List[str]]]] = {'allPaths': None}
+SCALA_PATHS: dict[str, dict[str, list[str]] | None] = {'allPaths': None}
 
 def getPaths():
     '''
@@ -81,7 +81,7 @@ def getPaths():
         # when importing a package name (a directory) the moduleName
         # may be a list of all paths contained within the package
         # this seems to be dependent on the context of the call:
-        # from the command line is different than from the interpreter
+        # from the command line is different from calling from the interpreter
         dirListing = moduleName
     else:
         # returns a list with one or more paths
@@ -129,7 +129,7 @@ class ScalaPitch:
      600.0883..., 699.9976..., 800.9095..., 900.0260...,
      1000.0201..., 1088.2687..., 1200.0]
     '''
-    # pitch values; if has a period, is cents, otherwise a ratio
+    # pitch values; if it has a period, it is cents.  Otherwise, it is a ratio
     # above the implied base ratio
     # integer values w/ no period or slash: 2 is 2/1
     def __init__(self, sourceString=None):
@@ -156,7 +156,7 @@ class ScalaPitch:
 
         if '.' in self.src:  # cents
             self.cents = float(self.src)
-        else:  # its a ratio
+        else:  # it is a ratio
             if '/' in self.src:
                 n, d = self.src.split('/')
                 n, d = float(n), float(d)
@@ -173,7 +173,7 @@ class ScalaPitch:
 class ScalaData:
     # noinspection SpellCheckingInspection
     '''
-    Object representation of data stored in a Scale scale file. This object is used to
+    Object representation of data stored in a Scala scale file. This object is used to
     access Scala information stored in a file. To create a music21 scale with a Scala file,
     use :class:`~music21.scale.ScalaScale`.
 
@@ -413,7 +413,7 @@ class ScalaFile:
         self.file = fileLike  # already 'open'
 
     def __repr__(self):
-        r = "<ScalaFile>"
+        r = '<ScalaFile>'
         return r
 
     def close(self):
@@ -447,7 +447,7 @@ class ScalaFile:
 
 # ------------------------------------------------------------------------------
 def parse(target):
-    # noinspection SpellCheckingInspection
+    # noinspection SpellCheckingInspection, PyShadowingNames
     '''
     Get a :class:`~music21.scala.ScalaData` object from
     the bundled SCL archive or a file path.
@@ -722,7 +722,7 @@ Aristoxenos' Chromatic/Enharmonic, 3 + 9 + 18 parts
 
 # ------------------------------------------------------------------------------
 # define presented order in documentation
-_DOC_ORDER = []
+_DOC_ORDER: list[type] = []
 
 
 if __name__ == '__main__':

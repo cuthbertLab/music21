@@ -1,19 +1,20 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 # Name:         naturalLanguageObjects.py
-# Purpose:      Multi-lingual conversion of pitch, etc. objects
+# Purpose:      Multilingual conversion of pitch, etc. objects
 # Authors:      David Perez
-#               Michael Scott Cuthbert
+#               Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2014, 2016 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2014-2016 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
-Multi-lingual conversion of pitch, etc. objects
+Multilingual conversion of pitch, etc. objects
 '''
+from __future__ import annotations
 
-from typing import List
 import unittest
+
 from music21 import pitch
 
 SUPPORTED_LANGUAGES = ['de', 'fr', 'it', 'es']
@@ -268,7 +269,7 @@ class Test(unittest.TestCase):
 # define presented order in documentation
 
 
-_DOC_ORDER: List[type] = []
+_DOC_ORDER: list[type] = []
 
 
 if __name__ == '__main__':

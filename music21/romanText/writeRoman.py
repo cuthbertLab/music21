@@ -5,18 +5,19 @@
 #
 # Authors:      Mark Gotham
 #
-# Copyright:    Copyright © 2020 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2020 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
 Writer for the 'RomanText' format (Tymoczko, Gotham, Cuthbert, & Ariza ISMIR 2019)
 '''
+from __future__ import annotations
 
 import fractions
+import textwrap
 import unittest
 
-from typing import List, Optional, Union
-
+from music21 import bar
 from music21 import base
 from music21 import metadata
 from music21 import meter
@@ -123,7 +124,10 @@ class RnWriter(prebase.ProtoM21Object):
 
         self.composer = 'Composer unknown'
         self.title = 'Title unknown'
-        self.combinedList: List[str] = []
+        self.analyst = ''
+        self.proofreader = ''
+        self.combinedList: list[str] = []
+        self.container: stream.Part | stream.Score
 
         if isinstance(obj, stream.Stream):
             if isinstance(obj, stream.Opus):
@@ -135,8 +139,9 @@ class RnWriter(prebase.ProtoM21Object):
                 return
 
             elif isinstance(obj, stream.Score):
-                if obj.parts:
-                    self.container = obj.parts.first()
+                p = obj.parts.first()
+                if p is not None:
+                    self.container = p
                 else:  # score with no parts
                     self.container = obj
 
@@ -148,31 +153,34 @@ class RnWriter(prebase.ProtoM21Object):
                 self.container.insert(0, obj)
 
             else:  # A stream, but not a measure, part, or score
-                self._makeContainer(obj)
+                self.container = self._makeContainer(obj)
 
             if obj.metadata:  # Check the obj (not container) for metadata if obj is a stream
                 self.prepTitle(obj.metadata)
                 if obj.metadata.composer:
                     self.composer = obj.metadata.composer
+                if obj.metadata.analyst:
+                    self.analyst = obj.metadata.analyst
+                if obj.metadata.proofreader:
+                    self.proofreader = obj.metadata.proofreader
 
         else:  # Not a stream
-            self._makeContainer([obj])
+            self.container = self._makeContainer([obj])
 
         self.combinedList = [f'Composer: {self.composer}',
                              f'Title: {self.title}',
-                             'Analyst: ',
-                             'Proofreader: ',
+                             f'Analyst: {self.analyst}',
+                             f'Proofreader: {self.proofreader}',
                              '']  # One blank line between metadata and analysis
-        # Note: blank analyst and proof reader entries until supported within music21 metadata
 
-        if not self.container.recurse().getElementsByClass('TimeSignature'):
+        if not self.container[meter.TimeSignature]:
             self.container.insert(0, meter.TimeSignature('4/4'))  # Placeholder
 
         self.currentKeyString: str = ''
         self.prepSequentialListOfLines()
 
     def _makeContainer(self,
-                       obj: Union[stream.Stream, List]):
+                       obj: stream.Stream | list):
         '''
         Makes a placeholder container for the unusual cases where this class is called on
         generic- or non-stream object as opposed to
@@ -182,8 +190,9 @@ class RnWriter(prebase.ProtoM21Object):
         m = stream.Measure()
         for x in obj:
             m.append(x)
-        self.container = stream.Part()
-        self.container.insert(0, m)
+        container = stream.Part()
+        container.insert(0, m)
+        return container
 
     def prepTitle(self,
                   md: metadata.Metadata):
@@ -208,8 +217,8 @@ class RnWriter(prebase.ProtoM21Object):
 
         workingTitle = []
 
-        if md.title:
-            workingTitle.append(md.title)
+        if md.bestTitle:
+            workingTitle.append(md.bestTitle)
         if md.movementNumber:
             workingTitle.append(f'- No.{md.movementNumber}:')  # Spaces later
         if md.movementName:
@@ -236,9 +245,9 @@ class RnWriter(prebase.ProtoM21Object):
         'm0 G: V'
         '''
 
-        for thisMeasure in self.container.getElementsByClass('Measure'):
+        for thisMeasure in self.container.getElementsByClass(stream.Measure):
             # TimeSignatures  # TODO KeySignatures
-            tsThisMeasure = thisMeasure.getElementsByClass('TimeSignature')
+            tsThisMeasure = thisMeasure.getElementsByClass(meter.TimeSignature)
             if tsThisMeasure:
                 firstTS = tsThisMeasure[0]
                 self.combinedList.append(f'Time Signature: {firstTS.ratioString}')
@@ -247,19 +256,45 @@ class RnWriter(prebase.ProtoM21Object):
                     msg = f'further time signature change(s) unprocessed: {unprocessedTSs}'
                     self.combinedList.append(f'Note: {msg}')
 
+            measureNumberString = str(thisMeasure.measureNumber)
+            if thisMeasure.numberSuffix is not None:
+                measureNumberString += thisMeasure.numberSuffix
+
             # RomanNumerals
             measureString = ''  # Clear for each measure
 
-            rnsThisMeasure = thisMeasure.getElementsByClass('RomanNumeral')
+            rnsThisMeasure = thisMeasure.getElementsByClass(roman.RomanNumeral)
+            if (isinstance(thisMeasure.leftBarline, bar.Repeat)
+                    and thisMeasure.leftBarline.direction == 'start'):
+                measureString = rnString(measureNumber=measureNumberString,
+                                         beat=1.0,
+                                         chordString='||:',
+                                         inString=measureString,
+                                         )
 
             for rn in rnsThisMeasure:
                 if rn.tie is None or rn.tie.type == 'start':  # Ignore tied to Roman numerals
                     chordString = self.getChordString(rn)
-                    measureString = rnString(measureNumber=thisMeasure.measureNumber,  # Suffix?
+                    measureString = rnString(measureNumber=measureNumberString,
                                              beat=rn.beat,
                                              chordString=chordString,
                                              inString=measureString,  # Creating update
                                              )
+            if (isinstance(thisMeasure.rightBarline, bar.Repeat)
+                    and thisMeasure.rightBarline.direction == 'end'):
+                # we want to put the repeat at the beat of the last roman
+                #   numeral to avoid printing an unnecessary indication like
+                #   'b3' prior to the repeat
+                last_rn = thisMeasure[roman.RomanNumeral].last()
+                if last_rn is None:
+                    beat = 1.0
+                else:
+                    beat = last_rn.beat
+                measureString = rnString(measureNumber=measureNumberString,
+                                         beat=beat,
+                                         chordString=':||',
+                                         inString=measureString,
+                                         )
 
             if measureString:
                 self.combinedList.append(measureString)
@@ -295,10 +330,10 @@ class RnWriter(prebase.ProtoM21Object):
 
 # ------------------------------------------------------------------------------
 
-def rnString(measureNumber: int,
-             beat: Union[str, int, float, fractions.Fraction],
+def rnString(measureNumber: int | str,
+             beat: str | int | float | fractions.Fraction,
              chordString: str,
-             inString: Optional[str] = ''):
+             inString: str | None = ''):
     '''
     Creates or extends a string of RomanText such that the output corresponds to a single
     measure line.
@@ -324,11 +359,14 @@ def rnString(measureNumber: int,
     '''
 
     if inString:
-        inStringMeasureNumber = int(inString.split(' ')[0][1:])
-        if inStringMeasureNumber != measureNumber:
+        inStringMeasureNumber = inString.split(' ')[0][1:]
+        # inStringMeasureNumber was previously cast to int, but this fails on
+        #   measures with suffixes ("m1a"). However, now we need to cast
+        #   measureNumber to string in the following comparison.
+        if inStringMeasureNumber != str(measureNumber):
             msg = f'The current measureNumber is given as {measureNumber}, but '
             msg += f'the contextual inString ({inString}) refers to '
-            msg += 'measure number {measureNumber}. They should match.'
+            msg += f'measure number {measureNumber}. They should match.'
             raise ValueError(msg)
     else:  # inString and therefore start new line
         inString = f'm{measureNumber}'
@@ -342,7 +380,7 @@ def rnString(measureNumber: int,
     return newString
 
 
-def intBeat(beat: Union[str, int, float, fractions.Fraction],
+def intBeat(beat: str | int | float | fractions.Fraction,
             roundValue: int = 2):
     '''
     Converts beats to integers if possible, and otherwise to rounded decimals.
@@ -404,7 +442,7 @@ class Test(unittest.TestCase):
     Tests for two analysis cases (the smallest rntxt files in the music21 corpus)
     along with two test by modifying those scores.
 
-    Additional tests for the stand alone functions rnString and intBeat and
+    Additional tests for the standalone functions rnString and intBeat and
     for handling the special case of opus objects.
     '''
 
@@ -425,7 +463,7 @@ class Test(unittest.TestCase):
 
         from music21 import converter
 
-        testOpusString = """Composer: Fake composer
+        testOpusString = '''Composer: Fake composer
         Piece: Fake piece
         Movement: 1
         m1 C: I b3 IV b4 V
@@ -441,7 +479,7 @@ class Test(unittest.TestCase):
         m1 C: I
         m2 V
         m3 I
-        """
+        '''
 
         testOpus = converter.parse('romantext: ' + testOpusString)
         self.assertIsInstance(testOpus, stream.Opus)
@@ -489,6 +527,7 @@ class Test(unittest.TestCase):
         rnMonte = RnWriter(scoreMonte)
 
         self.assertEqual(rnMonte.composer, 'Monteverdi')
+        # noinspection SpellCheckingInspection
         self.assertEqual(rnMonte.title, "La piaga c'ho nel core")
         self.assertEqual(rnMonte.combinedList[-1], 'm57 I')
 
@@ -533,6 +572,22 @@ class Test(unittest.TestCase):
         rn = roman.RomanNumeral('viio6', 'G')
         RnWriter(rn)  # and even (perhaps dubiously) directly on other music21 objects
 
+    def testRepeats(self):
+        from music21 import converter
+        rntxt = textwrap.dedent('''
+            Time Signature: 2/4
+            m1 ||: C: I
+            m2 V :||
+            m3 ||: I :||
+            m4 ||: I
+            m5a V :||
+            m5b I
+        ''')
+        s = converter.parse(rntxt, format='romanText')
+        writer = RnWriter(s)
+        assert '\n'.join(writer.combinedList).strip().endswith(rntxt.strip())
+
+
 # ------------------------------------------------------------------------------
 
     def testRnString(self):
@@ -541,7 +596,7 @@ class Test(unittest.TestCase):
         self.assertEqual(test, 'm1 G: I')  # no beat number given for b1
 
         test = rnString(0, 4, 'b: V')
-        self.assertEqual(test, 'm0 b4 b: V')  # beat number given for all other cases
+        self.assertEqual(test, 'm0 b4 b: V')  # beat number is given for all other cases
 
         with self.assertRaises(ValueError):  # error when the measure numbers don't match
             rnString(15, 1, 'viio6', 'm14 G: I')
@@ -549,7 +604,6 @@ class Test(unittest.TestCase):
 # ------------------------------------------------------------------------------
 
     def testIntBeat(self):
-
         testInt = intBeat(1, roundValue=2)
         self.assertEqual(testInt, 1)
 
@@ -572,7 +626,7 @@ class Test(unittest.TestCase):
         self.assertEqual(testStr, 0.67)
 
         with self.assertRaises(TypeError):  # TypeError when called on an unsupported object
-            intBeat([0, 1, 2])
+            intBeat([0, 1, 2])  # type: ignore
 
         with self.assertRaises(ValueError):  # ValueError when called on a negative number
             intBeat(-1.5)

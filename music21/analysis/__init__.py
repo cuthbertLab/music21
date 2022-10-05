@@ -1,7 +1,9 @@
 # -*- coding: utf-8 -*-
+from __future__ import annotations
+
 __all__ = [
     'correlate', 'discrete', 'elements', 'enharmonics',
-    'floatingKey', 'metrical', 'neoRiemannian',
+    'floatingKey', 'harmonicFunction', 'metrical', 'neoRiemannian',
     'patel', 'pitchAnalysis',
     'reduceChords', 'reduceChordsOld', 'reduction', 'segmentByRests',
     'transposition', 'windowed',
@@ -15,6 +17,7 @@ from music21.analysis import discrete
 from music21.analysis import elements
 from music21.analysis import enharmonics
 from music21.analysis import floatingKey
+from music21.analysis import harmonicFunction
 from music21.analysis import metrical
 from music21.analysis import neoRiemannian
 from music21.analysis import patel

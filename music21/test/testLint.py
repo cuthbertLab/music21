@@ -4,11 +4,12 @@
 # Purpose:      Controller for all lint based testing.
 #
 # Authors:      Christopher Ariza
-#               Michael Scott Cuthbert
+#               Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2009-2010, 2015 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2009-2022 Michael Scott Asato Cuthbert,
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
+from __future__ import annotations
 
 # this requires pylint to be installed and available from the command line
 import argparse
@@ -35,7 +36,7 @@ except ImportError:
 #           use its bound instance, and so could be written as a function.
 # R0904:	Too many public methods (%s/%s) Used when class has too many public methods,
 #            try to reduce this to get a more simple (and so easier to use) class.
-# E1101:	%s %r has no %r member Used when a variable is accessed for an non-existent member.
+# E1101:	%s %r has no %r member Used when a variable is accessed for a non-existent member.
 # R0914:	Too many local variables (%s/%s) Used when a function or method has
 #           too many local variables.
 # many of our test use many local variables
@@ -103,7 +104,6 @@ def main(fnAccept=None, strict=False):
         'too-many-ancestors',  # -- 8 is okay.
         'fixme',  # known...
         'superfluous-parens',  # nope -- if they make things clearer...
-        'no-member',  # important, but too many false positives
         'too-many-locals',   # no
         'bad-whitespace',  # maybe later, but "bad" isn't something I necessarily agree with
         'bad-continuation',  # never remove -- this is a good thing many times.
@@ -120,7 +120,7 @@ def main(fnAccept=None, strict=False):
         'consider-using-dict-items',  # readability improvement depends on excellent variable names
 
         'invalid-name',      # these are good music21 names; fix the regexp instead...
-        'no-self-use',       # maybe later
+        # 'no-self-use',       # no-self-use was moved to an optional extension
         'too-few-public-methods',  # never remove or set to 1
 
         'trailing-whitespace',  # should ignore blank lines with tabs
@@ -136,7 +136,7 @@ def main(fnAccept=None, strict=False):
         'simplifiable-if-statement',  # NO! NO! NO!
         #  if (x or y and z and q): return True, else: return False,
         #      is a GREAT paradigm -- over "return (x or y and z and q)" and
-        #      assuming that it returns a bool...  it's no slower than
+        #      assuming that it returns a bool...  it is not any slower than
         #      the simplification and it's so much clearer.
         'consider-using-enumerate',  # good when i used only once, but
         # x[i] = y[i] is a nice paradigm, even if one can be simplified out.

@@ -5,11 +5,13 @@
 #
 # Authors:      Josiah Wolf Oberholtzer
 #               Christopher Ariza
-#               Michael Scott Cuthbert
+#               Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2013-15 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2013-22 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
+from __future__ import annotations
+
 import logging
 import os
 import pathlib
@@ -263,7 +265,7 @@ class IPythonNotebookReSTWriter(ReSTWriter):
         ipFilePaths = [x for x in self.ipythonNotebookFilePaths if 'usersGuide' in x.name]
         if not ipFilePaths:
             raise DocumentationWritersException(
-                'No iPythonNotebook files were converted; '
+                'No Jupyter Notebook files were converted; '
                 + 'you probably have a problem with pandoc or nbconvert not being installed.'
             )
         usersGuideDir = self.notebookFilePathToRstFilePath(ipFilePaths[0]).parent
@@ -325,7 +327,7 @@ class IPythonNotebookReSTWriter(ReSTWriter):
     def notebookFilePathToRstFilePath(self, ipythonNotebookFilePath):
         if not ipythonNotebookFilePath.exists():
             raise DocumentationWritersException(
-                f'No iPythonNotebook with filePath {ipythonNotebookFilePath}')
+                f'No Jupyter Notebook with filePath {ipythonNotebookFilePath}')
         notebookFileNameWithoutExtension = ipythonNotebookFilePath.stem
         notebookParentDirectoryPath = ipythonNotebookFilePath.parent
         rstFileName = notebookFileNameWithoutExtension + '.rst'

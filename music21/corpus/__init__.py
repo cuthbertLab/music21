@@ -4,9 +4,9 @@
 # Purpose:      Shortcuts to the corpus collection
 #
 # Authors:      Christopher Ariza
-#               Michael Scott Cuthbert
+#               Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2009, 2015 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2009, 2015 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # -----------------------------------------------------------------------------
 '''
@@ -36,6 +36,8 @@ And use `corpus.search` if you do not:
 >>> cb[0].parse()
 <music21.stream.Score 0x1050ce940>
 '''
+from __future__ import annotations
+
 __all__ = [
     'chorales', 'corpora', 'manager',
     # virtual
@@ -64,11 +66,10 @@ from music21.corpus import virtual
 from music21.corpus import work
 
 from music21.corpus.manager import search
+from music21 import environment
 from music21.exceptions21 import CorpusException
 
-from music21 import environment
-_MOD = 'corpus'
-environLocal = environment.Environment(_MOD)
+environLocal = environment.Environment('corpus')
 
 
 # -----------------------------------------------------------------------------
@@ -289,7 +290,7 @@ def parse(workName,
             number=None,
             fileExtensions=None,
             forceSource=False,
-            format=None  # @ReservedAssignment
+            format=None
           ):
     '''
     The most important method call for corpus.
@@ -332,7 +333,7 @@ def parse(workName,
         number=number,
         fileExtensions=fileExtensions,
         forceSource=forceSource,
-        format=format  # @ReservedAssignment
+        format=format
     )
 
 

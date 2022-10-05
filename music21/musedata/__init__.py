@@ -4,9 +4,9 @@
 # Purpose:      parses Walter Hewlett's MuseData format
 #
 # Authors:      Christopher Ariza
-#               Michael Scott Cuthbert
+#               Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2010, 2014 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2010, 2014 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
@@ -25,10 +25,12 @@ the music21 converter module's :func:`~music21.converter.parse` function.
 Low level MuseData conversion is facilitated by the objects in this module and
 :func:`music21.musedata.translate.museDataToStreamScore`.
 '''
+from __future__ import annotations
 
-import unittest
 import os
+import unittest
 
+from music21 import environment
 from music21 import exceptions21
 from music21.musedata import base12_26
 from music21.musedata import base40
@@ -37,9 +39,7 @@ from music21.musedata import translate
 from music21 import common
 from music21 import prebase
 
-from music21 import environment
-_MOD = 'musedata'
-environLocal = environment.Environment(_MOD)
+environLocal = environment.Environment('musedata')
 
 # for implementation
 # see http://www.ccarh.org/publications/books/beyondmidi/online/musedata/
@@ -227,6 +227,7 @@ class MuseDataRecord(prebase.ProtoM21Object):
         return acc
 
     def getPitchObject(self):
+        # noinspection PyShadowingNames
         '''
         Get the Pitch object defined by this record. This may be a note, chord, or grace pitch.
 
@@ -248,7 +249,6 @@ class MuseDataRecord(prebase.ProtoM21Object):
         >>> p = mdr.getPitchObject()
         >>> p.nameWithOctave
         'F##5'
-
         '''
         from music21 import pitch
         pp = self._getPitchParameters()
@@ -545,6 +545,7 @@ class MuseDataRecord(prebase.ProtoM21Object):
         return post
 
     def hasCautionaryAccidental(self):
+        # noinspection GrazieInspection
         '''
         Return a boolean if this note has a cautionary accidental.
 
@@ -1246,7 +1247,7 @@ class MuseDataPart(prebase.ProtoM21Object):
                 return clef.AltoClef()
             elif charPair == '14':
                 return clef.MezzoSopranoClef()
-            elif charPair == '15':  # 5 is lowest line
+            elif charPair == '15':  # 5 is the lowest line
                 return clef.SopranoClef()
 
             elif charPair == '22':
@@ -1584,7 +1585,7 @@ class MuseDataWork(prebase.ProtoM21Object):
 class MuseDataDirectory(prebase.ProtoM21Object):
     '''
     This class manages finding musedata files stored in a directory,
-    comparing file names and examining sub directories to determine which files are parts.
+    comparing file names and examining subdirectories to determine which files are parts.
 
     Once found, a MuseDataWork, or a list of paths, can be returned
 
@@ -1861,7 +1862,7 @@ class Test(unittest.TestCase):
     #     s = corpus.parse('symphony94/02')
     #     for p in s.parts:
     #         match = []
-    #         for m in p.getElementsByClass('Measure'):
+    #         for m in p.getElementsByClass(stream.Measure):
     #             match.append(m.number)
     #         self.assertEqual(len(match), 156)
     #         # make sure there are no empty strings

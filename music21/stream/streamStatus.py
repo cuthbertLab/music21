@@ -1,14 +1,15 @@
 # -*- coding: utf-8 -*-
 # -----------------------------------------------------------------------------
 # Name:         streamStatus.py
-# Purpose:      functionality for reporting on the notational status of streams
+# Purpose:      Functionality for reporting on the notational status of streams
 #
 # Authors:      Josiah Wolf Oberholtzer
 #
-# Copyright:    Copyright © 2013 Michael Scott Cuthbert and the music21
+# Copyright:    Copyright © 2013 Michael Scott Asato Cuthbert and the music21
 #               Project
 # License:      BSD, see license.txt
 # -----------------------------------------------------------------------------
+from __future__ import annotations
 
 import unittest
 
@@ -141,7 +142,7 @@ class StreamStatus(SlottedObjectMixin):
         '''
         If any GeneralNote in this Stream is a tuplet, then check to
         see if any of them have a first Tuplet with type besides None
-        return True. Otherwise return False if there is a tuplet. Return None if
+        return True. Otherwise, return False if there is a tuplet. Return None if
         no Tuplets.
 
         >>> s = stream.Stream()
@@ -150,11 +151,11 @@ class StreamStatus(SlottedObjectMixin):
         >>> s.append(note.Note())
         >>> s.streamStatus.haveTupletBracketsBeenMade() is None
         True
-        >>> n = note.Note(quarterLength=1/3)
-        >>> s.append(n)
+        >>> nTuplet = note.Note(quarterLength=1/3)
+        >>> s.append(nTuplet)
         >>> s.streamStatus.haveTupletBracketsBeenMade()
         False
-        >>> n.duration.tuplets[0].type = 'start'
+        >>> nTuplet.duration.tuplets[0].type = 'start'
         >>> s.streamStatus.haveTupletBracketsBeenMade()
         True
 

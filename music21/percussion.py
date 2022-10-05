@@ -4,13 +4,15 @@
 # Purpose:      music21 classes for representing unpitched events
 #
 # Authors:      Jacob Tyler Walls
-#               Michael Scott Cuthbert
+#               Michael Scott Asato Cuthbert
 #               Christopher Ariza
 #
-# Copyright:    Copyright © 2006-2019 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2006-2019 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
+from __future__ import annotations
 
+from collections.abc import Iterable
 import unittest
 
 from music21 import common
@@ -56,13 +58,18 @@ class PercussionChord(chord.ChordBase):
 
     isChord = False
 
+    def __deepcopy__(self, memo=None):
+        new = super().__deepcopy__(memo=memo)
+        for n in new._notes:
+            n._chordAttached = new
+        return new
 
     @property
-    def notes(self) -> tuple:
+    def notes(self) -> tuple[note.NotRest, ...]:
         return tuple(self._notes)
 
     @notes.setter
-    def notes(self, newNotes):
+    def notes(self, newNotes: Iterable[note.Unpitched | note.Note]) -> None:
         '''
         Sets notes to an iterable of Note or Unpitched objects
         '''
@@ -79,12 +86,13 @@ class PercussionChord(chord.ChordBase):
 
         allNotes = []
         for thisNote in self.notes:
-            if hasattr(thisNote, 'nameWithOctave'):
+            if isinstance(thisNote, note.Note):
                 allNotes.append(thisNote.nameWithOctave)
-            elif thisNote.storedInstrument:
-                allNotes.append(str(thisNote.storedInstrument.instrumentName))
-            else:
-                allNotes.append(f'unpitched[{thisNote.displayName}]')
+            elif isinstance(thisNote, note.Unpitched):
+                if thisNote.storedInstrument:
+                    allNotes.append(str(thisNote.storedInstrument.instrumentName))
+                else:
+                    allNotes.append(f'unpitched[{thisNote.displayName}]')
 
         return '[' + ' '.join(allNotes) + ']'
 

@@ -3,23 +3,33 @@
 # Name:         sites.py
 # Purpose:      Objects for keeping track of relationships among Music21Objects
 #
-# Authors:      Michael Scott Cuthbert
+# Authors:      Michael Scott Asato Cuthbert
 #               Christopher Ariza
 #
-# Copyright:    Copyright © 2007-2015 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2007-2015 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
 sites.py -- Objects for keeping track of relationships among Music21Objects
 '''
+from __future__ import annotations
+
 import collections
+from collections.abc import Generator, MutableMapping
+import typing as t
+from typing import overload  # for some reason does not work in PyCharm if not directly imported
+from typing import TYPE_CHECKING  # pylint needs no alias
 import unittest
 import weakref
-from typing import Any, MutableMapping, Optional, Union
 
 from music21 import common
 from music21 import exceptions21
 from music21 import prebase
+
+
+if TYPE_CHECKING:
+    from music21 import stream
+
 
 # define whether weakrefs are used for storage of object locations
 WEAKREF_ACTIVE = True
@@ -34,7 +44,7 @@ WEAKREF_ACTIVE = True
 # that still exists, then restore it from the dictionary; otherwise, do not
 # sweat it.  Should make pickle deepcopies of music21 objects in Streams still
 # possible without needing to recreate the whole stream.
-GLOBAL_SITE_STATE_DICT: MutableMapping[str, Optional[Any]] = weakref.WeakValueDictionary()
+GLOBAL_SITE_STATE_DICT: MutableMapping[str, t.Any | None] = weakref.WeakValueDictionary()
 
 
 class SitesException(exceptions21.Music21Exception):
@@ -225,8 +235,8 @@ class Sites(common.SlottedObjectMixin):
         True
         '''
         # TODO: it may be a problem that sites are being transferred to deep
-        # copies; this functionality is used at times in context searches, but
-        # may be a performance hog.
+        #     copies; this functionality is used at times in context searches, but
+        #     may be a performance hog.
         new = self.__class__()
         # environLocal.printDebug(['Sites.__deepcopy__',
         #    'self.siteDict.keys()', self.siteDict.keys()])
@@ -254,7 +264,7 @@ class Sites(common.SlottedObjectMixin):
             #    print(idKey, id(originalObj))
             new.siteDict[newIdKey] = newSite
 
-        new._siteIndex = self._siteIndex  # keep to stay coherent
+        new._siteIndex = self._siteIndex  # keep the _siteIndex to stay coherent
         return new
 
     def __len__(self):
@@ -379,10 +389,31 @@ class Sites(common.SlottedObjectMixin):
         self.siteDict = collections.OrderedDict([(None, _NoneSiteRef), ])
         self._lastID = -1  # cannot be None
 
+    @overload
     def yieldSites(self,
-                   sortByCreationTime: Union[str, bool] = False,
+                   *,
+                   excludeNone: t.Literal[True],
+                   sortByCreationTime: t.Union[bool, t.Literal['reverse']] = False,
                    priorityTarget=None,
-                   excludeNone=False):
+                   ) -> Generator[stream.Stream, None, None]:
+        from music21 import stream
+        yield stream.Stream()
+
+    @overload
+    def yieldSites(self,
+                   *,
+                   excludeNone: bool = False,
+                   sortByCreationTime: t.Union[bool, t.Literal['reverse']] = False,
+                   priorityTarget=None,
+                   ) -> Generator[stream.Stream | None, None, None]:
+        yield None
+
+    def yieldSites(self,
+                   *,
+                   excludeNone: bool = False,
+                   sortByCreationTime: t.Union[bool, t.Literal['reverse']] = False,
+                   priorityTarget=None,
+                   ) -> Generator[stream.Stream | None, None, None]:
         # noinspection PyDunderSlots
         '''
         Yield references; order, based on dictionary keys, is from least
@@ -392,8 +423,8 @@ class Sites(common.SlottedObjectMixin):
         where most-recently assigned objects are returned first.
 
         Note that priorityTarget is searched only on id -- this could be dangerous if the
-        target has been garbage collected and the id is reused. Unlikely since you gotta
-        pass in the priorityTarget itself so therefore it still exists...
+        target has been garbage collected and the id is reused. Unlikely since you have to
+        pass in the priorityTarget itself, so therefore it still exists...
 
         This can be much faster than .get in the case where the sought-for site
         is earlier in the list.
@@ -409,13 +440,11 @@ class Sites(common.SlottedObjectMixin):
         >>> aSites.add(aObj)
         >>> aSites.add(bObj)
 
-        Returns a generator (The ellipsis in the repr here is
-        because Python 3.5+ gives a fully qualified name to a generator object):
-
+        Returns a generator:
 
         >>> ys = aSites.yieldSites()
         >>> ys
-        <generator object ...yieldSites at 0x1058085e8>
+        <generator object Sites.yieldSites at 0x1058085e8>
 
         That's no help, so iterate over it instead:
 
@@ -434,11 +463,10 @@ class Sites(common.SlottedObjectMixin):
         b
         a
 
-        *Changes:*
-
-        # v.3: changed dramatically from previously unused version
-        # `sortByCreationTime='reverse'` is removed, since the ordered dict takes
-        care of it and was not working
+        * Changed in v.3: changed dramatically from previously unused version
+          `sortByCreationTime='reverse'` is removed, since the ordered dict takes
+          care of it and was not working.
+        * Changed in v.8: arguments are keyword only
         '''
         keyRepository = list(self.siteDict.keys())
         if sortByCreationTime is True:
@@ -509,9 +537,11 @@ class Sites(common.SlottedObjectMixin):
 
         * Changed in v5.5: keyword only.
         '''
-        post = list(self.yieldSites(sortByCreationTime, priorityTarget, excludeNone))
+        post = list(self.yieldSites(sortByCreationTime=sortByCreationTime,
+                                    priorityTarget=priorityTarget,
+                                    excludeNone=excludeNone))
 
-        # we do this resorting again, because the priority target might not match id and we
+        # we do this resorting again, because the priority target might not match id, and we
         # want to be extra safe.  If you want fast, use .yieldSites
         if priorityTarget is not None:
             if priorityTarget in post:

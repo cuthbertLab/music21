@@ -5,11 +5,12 @@
 #
 # Authors:      Josiah Wolf Oberholtzer
 #               Christopher Ariza
-#               Michael Scott Cuthbert
+#               Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2013-17 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2013-17 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
+from __future__ import annotations
 
 import os
 import shutil
@@ -30,7 +31,8 @@ class DocBuilder:
         self.cpus_to_use = common.cpus()
         if self.cpus_to_use == 1:
             self.useMultiprocessing = False
-        self.useMultiprocessing = False  # too unstable still
+        else:
+            self.useMultiprocessing = True  # now stable enough
         self.documentationDirectoryPath = None
         self.autogenDirectoryPath = None
         self.buildDirectoryPath = None
@@ -92,7 +94,7 @@ class DocBuilder:
             import sphinx
         except ImportError:
             message = 'Sphinx is required to build documentation; '
-            message += 'download from http://sphinx-doc.org'
+            message += 'run pip install Sphinx'
             raise ImportError(message)
 
         target = self.command
@@ -102,6 +104,8 @@ class DocBuilder:
 
         # sphinx changed their main processing in v. 1.7; see
         # https://github.com/sphinx-doc/sphinx/pull/3668
+        # before 1.7 it ignored the first option thinking it was
+        # always 'sphinx'.
         sphinx_version = tuple(sphinx.__version__.split('.'))
         sphinx_new = False
         if tuple(int(x) for x in sphinx_version[0:2]) < (1, 7):

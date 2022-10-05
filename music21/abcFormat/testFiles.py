@@ -4,9 +4,8 @@
 # Purpose:      ABC test files
 #
 # Authors:      Christopher Ariza
-#
-# License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
+from __future__ import annotations
 
 import unittest
 
@@ -16,8 +15,8 @@ import unittest
 
 # abc standard
 # http://abcnotation.com/abc2mtex/abc.txt
-
 from music21 import environment
+
 environLocal = environment.Environment('abcFormat.testFiles')
 
 _DOC_IGNORE_MODULE_OR_PACKAGE = True
@@ -550,7 +549,7 @@ X:2
 T:Kitchen Girl
 C:Trad.
 K:D
-[c4a4] [B4g4]|efed c2cd|e2f2 gaba|g2e2 e2fg|
+[c4a4] [B4g4] | efed c2cd|e2f2 gaba|g2e2 e2fg|
 a4 g4|efed cdef|g2d2 efed|c2A2 A4:|
 K:G
 ABcA BAGB|ABAG EDEG|A2AB c2d2|e3f edcB|ABcA BAGB|
@@ -911,11 +910,11 @@ class Test(unittest.TestCase):
             ('c<<g', 0.25, 1.75),
             ('c>>>g', 1.875, 0.125),
             ('c<<<_g', 0.125, 1.875),
-            ("[ceg]>^f", 1.5, 0.5),
+            ('[ceg]>^f', 1.5, 0.5),
             ('[ce^g]>>f', 1.75, 0.25),
-            ("[ceg]<<f", 0.25, 1.75),
+            ('[ceg]<<f', 0.25, 1.75),
             ('[ceg]>>>f', 1.875, 0.125),
-            ("[ceg]<<<f", 0.125, 1.875),
+            ('[ceg]<<<f', 0.125, 1.875),
             ('f>[ceg]', 1.5, 0.5),
             ('f>>[_ceg]', 1.75, 0.25),
             ("f'<<[ceg]", 0.25, 1.75),

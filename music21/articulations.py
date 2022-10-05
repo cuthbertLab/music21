@@ -3,13 +3,12 @@
 # Name:         articulations.py
 # Purpose:      music21 classes for representing articulations
 #
-# Authors:      Michael Scott Cuthbert
+# Authors:      Michael Scott Asato Cuthbert
 #               Christopher Ariza
 #
-# Copyright:    Copyright © 2009-2013 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2009-2013 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
-
 '''
 Classes for representing and processing articulations.
 Specific articulations are modeled as :class:`~music21.articulations.Articulation` subclasses.
@@ -23,8 +22,6 @@ MusicXML is "StrongAccent" here.
 
 Fingering and other playing marks are found here.  Fermatas, trills, etc.
 are found in music21.expressions.
-
-
 
 >>> n1 = note.Note('D#4')
 >>> n1.articulations.append(articulations.Tenuto())
@@ -78,19 +75,24 @@ A longer test showing the utility of the module:
     :width: 628
 
 '''
-from typing import Optional, Type
+from __future__ import annotations
+
+import typing as t
+from typing import TYPE_CHECKING  # Pylint bug
 import unittest
 
 from music21 import base
 from music21 import common
 from music21.common.classTools import tempAttribute
-from music21 import exceptions21
 from music21 import environment
+from music21 import exceptions21
 from music21 import style
 
-_MOD = 'articulations'
-environLocal = environment.Environment(_MOD)
+if TYPE_CHECKING:
+    from music21 import interval
 
+
+environLocal = environment.Environment('articulations')
 
 
 class ArticulationException(exceptions21.Music21Exception):
@@ -107,7 +109,7 @@ class Articulation(base.Music21Object):
     >>> x.displayText = '>'
 
     '''
-    _styleClass: Type[style.Style] = style.TextStyle
+    _styleClass: type[style.Style] = style.TextStyle
 
     def __init__(self):
         super().__init__()
@@ -116,7 +118,7 @@ class Articulation(base.Music21Object):
         self._volumeShift: float = 0.0
         self.lengthShift: float = 1.0
         self.tieAttach: str = 'first'  # attach to first or last or all notes after split
-        self.displayText: Optional[str] = None
+        self.displayText: str | None = None
 
     def _reprInternal(self):
         return ''
@@ -143,7 +145,7 @@ class Articulation(base.Music21Object):
     # def __eq__(self, other):
     #     '''
     #     Equality. Based only on the class name,
-    #     as other other attributes are independent of context and deployment.
+    #     as other attributes are independent of context and deployment.
     #
     #
     #     >>> at1 = articulations.StrongAccent()
@@ -590,10 +592,10 @@ class PullOff(FretIndication):
     pass
 
 class FretBend(FretIndication):
-    bendAlter = None  # music21.interval.Interval object
-    preBend = None
-    release = None
-    withBar = None
+    bendAlter: interval.IntervalBase | None = None
+    preBend: t.Any = None
+    release: t.Any = None
+    withBar: t.Any = None
 
 class FretTap(FretIndication):
     pass

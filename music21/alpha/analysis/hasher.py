@@ -5,17 +5,19 @@
 #
 # Authors:      Emily Zhang
 #
-# Copyright:    Copyright © 2015 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2015 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
-
-import unittest
+from __future__ import annotations
 
 import collections
 import difflib
+import unittest
 
-from music21 import note, chord, key
+from music21 import chord
+from music21 import key
 from music21 import interval
+from music21 import note
 from music21 import stream
 
 
@@ -31,7 +33,7 @@ class Hasher:
         a) self.validTypes should be some combination of notes, chords, rests
 
         b) general hashing settings include self.includeReference. if
-           self.includeReference is True, a reference to to original note/rest/chord is created
+           self.includeReference is True, a reference to the original note/rest/chord is created
            and kept track of during the hashing process.
 
         c) note properties are things like pitch, duration, offset, and some slightly fancier
@@ -97,7 +99,7 @@ class Hasher:
         # --- end note properties to hash ---
 
         # --- begin chord properties to hash ---  #
-        # chords can hashed as chords or by their note constituents
+        # chords can be hashed as chords or by their note constituents
         self.hashChordsAsNotes = True
         self.hashChordsAsChords = False
         self.hashNormalOrderString = False
@@ -273,9 +275,9 @@ class Hasher:
 
     def _hashRoundedOffset(self, e, thisChord=None):
         '''
-        returns offset rounded to the nearest subdivided beat
-        subdivided beat is indicated with self.granularity
-        by default, the granularity is set to 32, or 32nd notes
+        Returns offset rounded to the nearest subdivided beat.
+        The subdivided beat is indicated with self.granularity.
+        By default, the granularity is set to 32, or 32nd notes
         '''
         if thisChord:
             return self._getApproxDurOrOffset(thisChord.offset)
@@ -284,7 +286,7 @@ class Hasher:
 
     def _hashOffset(self, e, thisChord=None):
         '''
-        returns unrounded floating point representation of a note's offset
+        returns an unrounded floating point representation of a note's offset
         '''
         if thisChord:
             return thisChord.offset
@@ -438,6 +440,7 @@ class Hasher:
             self.addNoteHashToFinalHash(finalHash, tupleHash)
 
     def addNoteHashWithReferenceToFinalHash(self, finalHash, tupleHash, reference):
+        # noinspection PyShadowingNames
         '''
         creates a NoteHashWithReference object from tupleHash and with the reference pass in
         and adds the NoteHashWithReference object to the end of finalHash
@@ -460,6 +463,7 @@ class Hasher:
         finalHash.append(nhwr)
 
     def addNoteHashToFinalHash(self, finalHash, tupleHash):
+        # noinspection PyShadowingNames
         '''
         creates a NoteHash object from tupleHash and adds the NoteHash
         object to the end of finalHash
@@ -508,6 +512,7 @@ class Hasher:
 
 
 class NoteHashWithReference:
+    # noinspection PyShadowingNames
     '''
     returns tuple with reference to original note or chord or rest
 
@@ -545,7 +550,7 @@ class NoteHashWithReference:
 
     def __iter__(self):
         for keyName in self.hashItemsKeys:
-            yield(getattr(self, keyName))
+            yield getattr(self, keyName)
 
     def __repr__(self):
         nhStrAll = 'NoteHashWithReference('
@@ -586,7 +591,7 @@ class Test(unittest.TestCase):
         use to look at whether beat lengths are close, within a certain range
         probably can use for other things that are approx. equal
         '''
-        return (a == b or int(a * 10 ** sig_fig) == int(b * 10 ** sig_fig))
+        return a == b or int(a * 10 ** sig_fig) == int(b * 10 ** sig_fig)
 
     def testBasicHash(self):
         '''
@@ -777,14 +782,13 @@ class TestExternal(unittest.TestCase):
     #     # h.hashChordsAsNotes = False
     #     # h.hashChordsAsChords = True
     #     # h.hashOctave = True
-    #     # h.hashPrimeiFormString = True
+    #     # h.hashPrimeFormString = True
     #     h.hashIntervalFromLastNote = True
     #     # pp(h.hashStream(s1.recurse()))
     #     # hashes1 = h.hashStream(s1.recurse())
     #     s2 = corpus.parse('schoenberg', 2).parts[0]
     #     # hashes2 = h.hashStream(s2.recurse())
     #     s3 = corpus.parse('bwv66.6').parts[0]
-    #     # print(type(s3.recurse()))
     #     hashes3 = h.hashStream(s3)
     #     # s4 = corpus.parse('bwv66.6').parts[0].transpose('M2')
     #     # s4 = s5.parts[0].transpose('M2')
@@ -800,7 +804,8 @@ class TestExternal(unittest.TestCase):
     #     pp(difflib.SequenceMatcher(a=hashes1, b=hashes3).ratio())
     #     pp(difflib.SequenceMatcher(a=hashes2, b=hashes3).ratio())
     #     # pp(difflib.SequenceMatcher(a=hashes3, b=hashes4).ratio())
-    # def testfolk(self):
+
+    # def testFolk(self):
     #     from music21 import corpus
     #     h = Hasher()
 

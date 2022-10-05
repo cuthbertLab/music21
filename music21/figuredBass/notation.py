@@ -1,16 +1,17 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 # Name:         notation.py
-# Purpose:      music21 class for conveniently representing figured bass notation
+# Purpose:      representations of figured bass notation
 # Authors:      Jose Cabal-Ugaz
 #
-# Copyright:    Copyright © 2011 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2011 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
+from __future__ import annotations
 
-import unittest
 import copy
 import re
+import unittest
 
 from music21 import exceptions21
 from music21 import pitch
@@ -141,24 +142,42 @@ class Notation(prebase.ProtoM21Object):
     '''
     _DOC_ORDER = ['notationColumn', 'figureStrings', 'numbers', 'modifiers',
                   'figures', 'origNumbers', 'origModStrings', 'modifierStrings']
-    _DOC_ATTR = {'modifiers': 'A list of :class:`~music21.figuredBass.notation.Modifier` '
-                    'objects associated with the expanded '
-                    ':attr:`~music21.figuredBass.notation.Notation.notationColumn`.',
-                 'notationColumn': 'A string of figures delimited by commas, '
-                    'each associated with a number and an optional modifier.',
-                 'modifierStrings': 'The modifiers associated with the expanded '
-                    ':attr:`~music21.figuredBass.notation.Notation.notationColumn`, as strings.',
-                 'figureStrings': 'A list of figures derived from the original '
-                    ':attr:`~music21.figuredBass.notation.Notation.notationColumn`.',
-                 'origNumbers': 'The numbers associated with the original '
-                    ':attr:`~music21.figuredBass.notation.Notation.notationColumn`.',
-                 'numbers': 'The numbers associated with the expanded '
-                    ':attr:`~music21.figuredBass.notation.Notation.notationColumn`.',
-                 'origModStrings': 'The modifiers associated with the original '
-                    ':attr:`~music21.figuredBass.notation.Notation.notationColumn`, as strings.',
-                 'figures': 'A list of :class:`~music21.figuredBass.notation.Figure` objects '
-                    'associated with figures in the expanded '
-                    ':attr:`~music21.figuredBass.notation.Notation.notationColumn`.'}
+    _DOC_ATTR: dict[str, str] = {
+        'modifiers': '''
+            A list of :class:`~music21.figuredBass.notation.Modifier`
+            objects associated with the expanded
+            :attr:`~music21.figuredBass.notation.Notation.notationColumn`.
+            ''',
+        'notationColumn': '''
+            A string of figures delimited by commas,
+            each associated with a number and an optional modifier.
+            ''',
+        'modifierStrings': '''
+            The modifiers associated with the expanded
+            :attr:`~music21.figuredBass.notation.Notation.notationColumn`, as strings.
+            ''',
+        'figureStrings': '''
+            A list of figures derived from the original
+            :attr:`~music21.figuredBass.notation.Notation.notationColumn`.
+            ''',
+        'origNumbers': '''
+            The numbers associated with the original
+            :attr:`~music21.figuredBass.notation.Notation.notationColumn`.
+            ''',
+        'numbers': '''
+            The numbers associated with the expanded
+            :attr:`~music21.figuredBass.notation.Notation.notationColumn`.
+            ''',
+        'origModStrings': '''
+            The modifiers associated with the original
+            :attr:`~music21.figuredBass.notation.Notation.notationColumn`, as strings.
+            ''',
+        'figures': '''
+            A list of :class:`~music21.figuredBass.notation.Figure` objects
+            associated with figures in the expanded
+            :attr:`~music21.figuredBass.notation.Notation.notationColumn`.
+            ''',
+    }
 
     def __init__(self, notationColumn=None):
         # Parse notation string
@@ -377,13 +396,21 @@ class Figure(prebase.ProtoM21Object):
     >>> f1.modifier
     <music21.figuredBass.notation.Modifier + sharp>
     '''
-    _DOC_ATTR = {'number': 'A number associated with an expanded '
-                    ':attr:`~music21.figuredBass.notation.Notation.notationColumn`.',
-                 'modifierString': 'A modifier string associated with an '
-                    'expanded :attr:`~music21.figuredBass.notation.Notation.notationColumn`.',
-                 'modifier': 'A :class:`~music21.figuredBass.notation.Modifier` '
-                    'associated with an expanded '
-                    ':attr:`~music21.figuredBass.notation.Notation.notationColumn`.'}
+    _DOC_ATTR: dict[str, str] = {
+        'number': '''
+            A number associated with an expanded
+            :attr:`~music21.figuredBass.notation.Notation.notationColumn`.
+            ''',
+        'modifierString': '''
+            A modifier string associated with an
+            expanded :attr:`~music21.figuredBass.notation.Notation.notationColumn`.
+            ''',
+        'modifier': '''
+            A :class:`~music21.figuredBass.notation.Modifier`
+            associated with an expanded
+            :attr:`~music21.figuredBass.notation.Notation.notationColumn`.
+            ''',
+    }
 
     def __init__(self, number=1, modifierString=None):
         self.number = number
@@ -457,10 +484,16 @@ class Modifier(prebase.ProtoM21Object):
     >>> m3b.accidental is None
     True
     '''
-    _DOC_ATTR = {'modifierString': 'A modifier string associated with an '
-                    'expanded :attr:`~music21.figuredBass.notation.Notation.notationColumn`.',
-                 'accidental': ' A :class:`~music21.pitch.Accidental` corresponding to '
-                    ':attr:`~music21.figuredBass.notation.Modifier.modifierString`.'}
+    _DOC_ATTR: dict[str, str] = {
+        'modifierString': '''
+            A modifier string associated with an
+            expanded :attr:`~music21.figuredBass.notation.Notation.notationColumn`.
+            ''',
+        'accidental': '''
+            A :class:`~music21.pitch.Accidental` corresponding to
+            :attr:`~music21.figuredBass.notation.Modifier.modifierString`.
+            ''',
+    }
 
     def __init__(self, modifierString=None):
         self.modifierString = modifierString
@@ -535,7 +568,6 @@ class Modifier(prebase.ProtoM21Object):
         Given a :class:`~music21.pitch.Pitch`, modify its :attr:`~music21.pitch.Pitch.accidental`
         given the Modifier's :attr:`~music21.figuredBass.notation.Modifier.accidental`.
 
-        >>> from music21 import pitch
         >>> from music21.figuredBass import notation
         >>> m1 = notation.Modifier('#')
         >>> m2 = notation.Modifier('-')
@@ -590,8 +622,8 @@ def convertToPitch(pitchString):
     Converts a pitchString to a :class:`~music21.pitch.Pitch`, only if necessary.
 
     >>> from music21.figuredBass import notation
-    >>> pitchString = 'C5'
-    >>> notation.convertToPitch(pitchString)
+    >>> pitchStr = 'C5'
+    >>> notation.convertToPitch(pitchStr)
     <music21.pitch.Pitch C5>
     >>> notation.convertToPitch(pitch.Pitch('E4'))  # does nothing
     <music21.pitch.Pitch E4>

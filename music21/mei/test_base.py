@@ -5,20 +5,19 @@
 #
 # Authors:      Christopher Antila
 #
-# Copyright:    Copyright © 2014 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2014 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # -----------------------------------------------------------------------------
 '''
 Tests for :mod:`music21.mei.base`.
 '''
+from __future__ import annotations
+
 # part of the whole point is to test protect things too
 # pylint: disable=protected-access
 
 # this often happens on TestCase subclasses
 # pylint: disable=too-many-public-methods
-
-# a test that uses only assertions on the Mocks will have no-self-use
-# pylint: disable=no-self-use
 
 # if we mock many things, this may be triggered
 # pylint: disable=too-many-arguments
@@ -162,7 +161,7 @@ class Test(unittest.TestCase):
         self.assertEqual(expected.octave, actual.octave)
 
     def testSafePitch3(self):
-        '''safePitch(): when ``name`` is not given, but there are various kwargs'''
+        '''safePitch(): when ``name`` is not given, but there are various **keywords'''
         expected = pitch.Pitch('D#6')
         actual = base.safePitch(name='D', accidental='#', octave='6')
         self.assertEqual(expected.name, actual.name)
@@ -395,12 +394,12 @@ class Test(unittest.TestCase):
         '''
         metaSetTitle() with a title and tempo but no subtitle
         '''
-        work = """<work xmlns="http://www.music-encoding.org/ns/mei">
+        work = '''<work xmlns="http://www.music-encoding.org/ns/mei">
             <titleStmt>
                 <title>Symphony No. 7</title>
             </titleStmt>
             <tempo>Adagio</tempo>
-        </work>"""
+        </work>'''
         work = ETree.fromstring(work)
         expTitle = 'Symphony No. 7'
         expMovementName = 'Adagio'
@@ -417,12 +416,12 @@ class Test(unittest.TestCase):
         '''
         metaSetTitle() with a title, subtitle, but no tempo
         '''
-        work = """<work xmlns="http://www.music-encoding.org/ns/mei">
+        work = '''<work xmlns="http://www.music-encoding.org/ns/mei">
             <titleStmt>
                 <title>Symphony No. 7</title>
                 <title type="subtitle">in one movement</title>
             </titleStmt>
-        </work>"""
+        </work>'''
         work = ETree.fromstring(work)
         expTitle = 'Symphony No. 7 (in one movement)'
         meta = metadata.Metadata()
@@ -438,7 +437,7 @@ class Test(unittest.TestCase):
         '''
         metaSetComposer() with no composers
         '''
-        work = """<work xmlns="http://www.music-encoding.org/ns/mei"/>"""
+        work = '''<work xmlns="http://www.music-encoding.org/ns/mei"/>'''
         work = ETree.fromstring(work)
         meta = metadata.Metadata()
 
@@ -451,13 +450,13 @@ class Test(unittest.TestCase):
         '''
         metaSetComposer() with one composer in <respStmt>
         '''
-        work = """<work xmlns="http://www.music-encoding.org/ns/mei">
+        work = '''<work xmlns="http://www.music-encoding.org/ns/mei">
             <titleStmt>
                 <respStmt>
                     <persName role="composer">Jean Sibelius</persName>
                 </respStmt>
             </titleStmt>
-        </work>"""
+        </work>'''
         work = ETree.fromstring(work)
         expComposer = 'Jean Sibelius'
         meta = metadata.Metadata()
@@ -471,11 +470,11 @@ class Test(unittest.TestCase):
         '''
         metaSetComposer() with one composer in <composer>
         '''
-        work = """<work xmlns="http://www.music-encoding.org/ns/mei">
+        work = '''<work xmlns="http://www.music-encoding.org/ns/mei">
             <titleStmt>
                 <composer>Jean Sibelius</composer>
             </titleStmt>
-        </work>"""
+        </work>'''
         work = ETree.fromstring(work)
         expComposer = 'Jean Sibelius'
         meta = metadata.Metadata()
@@ -489,50 +488,50 @@ class Test(unittest.TestCase):
         '''
         metaSetComposer() with two composers, one specified each way
         '''
-        work = """<work xmlns="http://www.music-encoding.org/ns/mei">
+        work = '''<work xmlns="http://www.music-encoding.org/ns/mei">
             <titleStmt>
                 <respStmt>
                     <persName role="composer">Jean Sibelius</persName>
                 </respStmt>
                 <composer>Sibelius, Jean</composer>
             </titleStmt>
-        </work>"""
+        </work>'''
         work = ETree.fromstring(work)
-        expComposer1 = "['Jean Sibelius', 'Sibelius, Jean']"
-        expComposer2 = "['Sibelius, Jean', 'Jean Sibelius']"
+        expComposers1 = ('Jean Sibelius', 'Sibelius, Jean')
+        expComposers2 = ('Sibelius, Jean', 'Jean Sibelius')
         meta = metadata.Metadata()
 
         actual = base.metaSetComposer(work, meta)
 
         self.assertIs(meta, actual)
-        if actual.composer not in (expComposer1, expComposer2):
+        if actual.composers not in (expComposers1, expComposers2):
             self.fail('composer names do not match in either order')
 
     def testMetaDate1(self):
         '''
         metaSetDate() with no dates
         '''
-        work = """<work xmlns="http://www.music-encoding.org/ns/mei"/>"""
+        work = '''<work xmlns="http://www.music-encoding.org/ns/mei"/>'''
         work = ETree.fromstring(work)
-        expDate = 'None'  # I don't know why, but that's what it does
+        expDate = None
         meta = metadata.Metadata()
 
         actual = base.metaSetDate(work, meta)
 
         self.assertIs(meta, actual)
-        self.assertEqual(expDate, actual.date)
+        self.assertEqual(expDate, actual.dateCreated)
 
     def testMetaDate2(self):
         '''
         metaSetDate() with @isodate
         '''
-        work = """<work xmlns="http://www.music-encoding.org/ns/mei">
+        work = '''<work xmlns="http://www.music-encoding.org/ns/mei">
             <history>
                 <creation>
                     <date isodate="1924-03-02"/>
                 </creation>
             </history>
-        </work>"""
+        </work>'''
         work = ETree.fromstring(work)
         expDate = '1924/03/02'
         meta = metadata.Metadata()
@@ -540,19 +539,19 @@ class Test(unittest.TestCase):
         actual = base.metaSetDate(work, meta)
 
         self.assertIs(meta, actual)
-        self.assertEqual(expDate, actual.date)
+        self.assertEqual(expDate, actual.dateCreated)
 
     def testMetaDate3(self):
         '''
         metaSetDate() with text
         '''
-        work = """<work xmlns="http://www.music-encoding.org/ns/mei">
+        work = '''<work xmlns="http://www.music-encoding.org/ns/mei">
             <history>
                 <creation>
                     <date>1924-03-02</date>
                 </creation>
             </history>
-        </work>"""
+        </work>'''
         work = ETree.fromstring(work)
         expDate = '1924/03/02'
         meta = metadata.Metadata()
@@ -560,42 +559,42 @@ class Test(unittest.TestCase):
         actual = base.metaSetDate(work, meta)
 
         self.assertIs(meta, actual)
-        self.assertEqual(expDate, actual.date)
+        self.assertEqual(expDate, actual.dateCreated)
 
     @mock.patch('music21.mei.base.environLocal')
     def testMetaDate4(self, mockEnviron):
         '''
         metaSetDate() with text that fails
         '''
-        work = """<work xmlns="http://www.music-encoding.org/ns/mei">
+        work = '''<work xmlns="http://www.music-encoding.org/ns/mei">
             <history>
                 <creation>
                     <date>2 March 1924</date>
                 </creation>
             </history>
-        </work>"""
+        </work>'''
         work = ETree.fromstring(work)
-        expDate = 'None'
+        expDate = None
         expWarn = base._MISSED_DATE.format('2 March 1924')
         meta = metadata.Metadata()
 
         actual = base.metaSetDate(work, meta)
 
         self.assertIs(meta, actual)
-        self.assertEqual(expDate, actual.date)
+        self.assertEqual(expDate, actual.dateCreated)
         mockEnviron.warn.assert_called_once_with(expWarn)
 
     def testMetaDate5(self):
         '''
         metaSetDate() with @notbefore and @notafter
         '''
-        work = """<work xmlns="http://www.music-encoding.org/ns/mei">
+        work = '''<work xmlns="http://www.music-encoding.org/ns/mei">
             <history>
                 <creation>
                     <date notbefore="1915" notafter="1924"/>
                 </creation>
             </history>
-        </work>"""
+        </work>'''
         work = ETree.fromstring(work)
         expDate = '1915/--/-- to 1924/--/--'
         meta = metadata.Metadata()
@@ -603,19 +602,19 @@ class Test(unittest.TestCase):
         actual = base.metaSetDate(work, meta)
 
         self.assertIs(meta, actual)
-        self.assertEqual(expDate, actual.date)
+        self.assertEqual(expDate, actual.dateCreated)
 
     def testMetaDate6(self):
         '''
         metaSetDate() with @startdate and @enddate
         '''
-        work = """<work xmlns="http://www.music-encoding.org/ns/mei">
+        work = '''<work xmlns="http://www.music-encoding.org/ns/mei">
             <history>
                 <creation>
                     <date startdate="1915" enddate="1924"/>
                 </creation>
             </history>
-        </work>"""
+        </work>'''
         work = ETree.fromstring(work)
         expDate = '1915/--/-- to 1924/--/--'
         meta = metadata.Metadata()
@@ -623,7 +622,7 @@ class Test(unittest.TestCase):
         actual = base.metaSetDate(work, meta)
 
         self.assertIs(meta, actual)
-        self.assertEqual(expDate, actual.date)
+        self.assertEqual(expDate, actual.dateCreated)
 
     # -----------------------------------------------------------------------------
     # class TestAttrTranslators(unittest.TestCase):
@@ -1294,7 +1293,7 @@ class Test(unittest.TestCase):
 
         (mostly-unit test)
         '''
-        elem = """<note pname="D" oct="2" dur="16" xmlns="http://www.music-encoding.org/ns/mei">
+        elem = '''<note pname="D" oct="2" dur="16" xmlns="http://www.music-encoding.org/ns/mei">
             <verse>
                 <syl>au</syl>
                 <syl>luong</syl>
@@ -1303,7 +1302,7 @@ class Test(unittest.TestCase):
                 <syl>sun</syl>
             </verse>
         </note>
-        """
+        '''
         elem = ETree.fromstring(elem)
         mockSafePitch.return_value = 'safePitch() return'
         mockNewNote = mock.MagicMock()
@@ -1315,9 +1314,9 @@ class Test(unittest.TestCase):
         vfeReturns = [[mock.MagicMock(name='au'), mock.MagicMock(name='luong')],
                       [mock.MagicMock(name='sun')]]
 
-        def mockVerseFESideEffect(elem, backupN):
-            "this way we can check it gets called with the right elements"
-            assert f'{MEI_NS}verse' == elem.tag
+        def mockVerseFESideEffect(inner_elem, backupN):
+            '''Check that it gets called with the right elements'''
+            assert f'{MEI_NS}verse' == inner_elem.tag
             return vfeReturns.pop(0)
         mockVerseFE.side_effect = mockVerseFESideEffect
         expLyrics = [vfeReturns[0][0], vfeReturns[0][1], vfeReturns[1][0]]
@@ -1335,7 +1334,7 @@ class Test(unittest.TestCase):
         noteFromElement(): test contained <verse>
         (corresponds to testUnit6() with no mocks)
         '''
-        elem = """<note pname="D" oct="2" dur="16" xmlns="http://www.music-encoding.org/ns/mei">
+        elem = '''<note pname="D" oct="2" dur="16" xmlns="http://www.music-encoding.org/ns/mei">
             <verse>
                 <syl>au</syl>
                 <syl>luong</syl>
@@ -1344,7 +1343,7 @@ class Test(unittest.TestCase):
                 <syl>sun</syl>
             </verse>
         </note>
-        """
+        '''
         elem = ETree.fromstring(elem)
         slurBundle = spanner.SpannerBundle()
 
@@ -4268,7 +4267,7 @@ class Test(unittest.TestCase):
 
         It's two parts, each with two things in them.
         '''
-        elem = """<score xmlns="http://www.music-encoding.org/ns/mei">
+        elem = '''<score xmlns="http://www.music-encoding.org/ns/mei">
             <scoreDef meter.count="8" meter.unit="8">
                 <staffGrp>
                     <staffDef n="1" clef.shape="G" clef.line="2"/>
@@ -4290,7 +4289,7 @@ class Test(unittest.TestCase):
                     </staff>
                 </measure>
             </section>
-        </score>"""
+        </score>'''
         elem = ETree.fromstring(elem)
         slurBundle = spanner.SpannerBundle()
 
@@ -4338,7 +4337,7 @@ class Test(unittest.TestCase):
     def testCoreUnit1(self, mockStaffDFE, mockScoreDFE, mockSectionFE, mockMeasureFE):
         '''
         sectionScoreCore(): everything basic, as called by scoreFromElement()
-            - no kwargs
+            - no keywords
                 - and the <measure> has no @n; it would be set to "1" automatically
             - one of everything (<section>, <scoreDef>, and <staffDef>)
             - that the <measure> in here won't be processed (<measure> must be in a <section>)
@@ -4352,7 +4351,7 @@ class Test(unittest.TestCase):
         '''
         # setup the arguments
         # NB: there's more MEI here than we need, but it's shared between unit & integration tests
-        elem = """<score xmlns="http://www.music-encoding.org/ns/mei">
+        elem = '''<score xmlns="http://www.music-encoding.org/ns/mei">
             <scoreDef meter.count="8" meter.unit="8"/>
             <staffDef n="1" clef.shape="G" clef.line="2"/>
             <measure/>
@@ -4365,7 +4364,7 @@ class Test(unittest.TestCase):
                     </staff>
                 </measure>
             </section>
-        </score>"""
+        </score>'''
         elem = ETree.fromstring(elem)
         slurBundle = mock.MagicMock()
         allPartNs = ['1']
@@ -4415,14 +4414,14 @@ class Test(unittest.TestCase):
     def testCoreIntegration1(self):
         '''
         sectionScoreCore(): everything basic, as called by scoreFromElement()
-            - no kwargs
+            - no keywords
                 - and the <measure> has no @n; it would be set to "1" automatically
             - one of everything (<section>, <scoreDef>, and <staffDef>)
             - that the <measure> in here won't be processed (<measure> must be in a <section>)
             - things in a <section> are appended properly (different for <score> and <section>)
         '''
         # setup the arguments
-        elem = """<score xmlns="http://www.music-encoding.org/ns/mei">
+        elem = '''<score xmlns="http://www.music-encoding.org/ns/mei">
             <scoreDef meter.count="8" meter.unit="8"/>
             <staffDef n="1" clef.shape="G" clef.line="2"/>
             <measure/>
@@ -4435,7 +4434,7 @@ class Test(unittest.TestCase):
                     </staff>
                 </measure>
             </section>
-        </score>"""
+        </score>'''
         elem = ETree.fromstring(elem)
         slurBundle = spanner.SpannerBundle()
         allPartNs = ['1']
@@ -4474,7 +4473,7 @@ class Test(unittest.TestCase):
     def testCoreUnit2(self, mockStaffDFE, mockScoreDFE, mockSectionFE, mockMeasureFE):
         '''
         sectionScoreCore(): everything basic, as called by sectionFromElement()
-            - no kwargs
+            - no keywords
                 - but the <measure> elements do have @n so those values should be used
             - one of most things (<section>, <scoreDef>, and <staffDef>)
             - two of <measure> (one in a <section>)
@@ -4493,7 +4492,7 @@ class Test(unittest.TestCase):
         '''
         # setup the arguments
         # NB: there's more MEI here than we need, but it's shared between unit & integration tests
-        elem = """<section xmlns="http://www.music-encoding.org/ns/mei">
+        elem = '''<section xmlns="http://www.music-encoding.org/ns/mei">
             <scoreDef meter.count="8" meter.unit="8"/>
             <staffDef n="1" clef.shape="G" clef.line="2"/>
             <measure n="400">
@@ -4512,7 +4511,7 @@ class Test(unittest.TestCase):
                     </staff>
                 </measure>
             </section>
-        </section>"""
+        </section>'''
         elem = ETree.fromstring(elem)
         slurBundle = mock.MagicMock()
         allPartNs = ['1']
@@ -4572,14 +4571,14 @@ class Test(unittest.TestCase):
     def testCoreIntegration2(self):
         '''
         sectionScoreCore(): everything basic, as called by sectionFromElement()
-            - no kwargs
+            - no keywords
                 - but the <measure> elements do have @n so those values should be used
             - one of most things (<section>, <scoreDef>, and <staffDef>)
             - two of <measure> (one in a <section>)
             - things in a <section> are appended properly (different for <score> and <section>)
         '''
         # setup the arguments
-        elem = """<section xmlns="http://www.music-encoding.org/ns/mei">
+        elem = '''<section xmlns="http://www.music-encoding.org/ns/mei">
             <scoreDef meter.count="8" meter.unit="8"/>
             <staffDef n="1" clef.shape="G" clef.line="2"/>
             <measure n="400">
@@ -4598,7 +4597,7 @@ class Test(unittest.TestCase):
                     </staff>
                 </measure>
             </section>
-        </section>"""
+        </section>'''
         elem = ETree.fromstring(elem)
         slurBundle = spanner.SpannerBundle()
         allPartNs = ['1']
@@ -4652,7 +4651,7 @@ class Test(unittest.TestCase):
     def testCoreUnit3(self, mockStaffDFE, mockScoreDFE, mockSectionFE, mockMeasureFE):
         '''
         sectionScoreCore(): everything basic, as called by sectionFromElement()
-            - all kwargs
+            - all keywords
                 - and the <measure> has no @n; it should use the backupNum
                 - activeMeter = a MagicMock (we expect this returned)
                 - nextMeasureLeft = 'next left measure' (expected in the Measure)
@@ -4666,7 +4665,7 @@ class Test(unittest.TestCase):
         '''
         # setup the arguments
         # NB: there's more MEI here than we need, but it's shared between unit & integration tests
-        elem = """<section xmlns="http://www.music-encoding.org/ns/mei">
+        elem = '''<section xmlns="http://www.music-encoding.org/ns/mei">
             <measure>
                 <staff n="1">
                     <layer n="1">
@@ -4674,7 +4673,7 @@ class Test(unittest.TestCase):
                     </layer>
                 </staff>
             </measure>
-        </section>"""
+        </section>'''
         elem = ETree.fromstring(elem)
         slurBundle = mock.MagicMock()
         allPartNs = ['1']
@@ -4715,14 +4714,14 @@ class Test(unittest.TestCase):
     def testCoreIntegration3(self):
         '''
         sectionScoreCore(): everything basic, as called by sectionFromElement()
-            - all kwargs
+            - all keywords
                 - and the <measure> has no @n; it should use the backupNum
                 - activeMeter = a MagicMock (we expect this returned)
                 - nextMeasureLeft = 'next left measure' (expected in the Measure)
                 - backupMeasureNum = 900 (expected in the Measure)
         '''
         # setup the arguments
-        elem = """<section xmlns="http://www.music-encoding.org/ns/mei">
+        elem = '''<section xmlns="http://www.music-encoding.org/ns/mei">
             <measure>
                 <staff n="1">
                     <layer n="1">
@@ -4730,7 +4729,7 @@ class Test(unittest.TestCase):
                     </layer>
                 </staff>
             </measure>
-        </section>"""
+        </section>'''
         elem = ETree.fromstring(elem)
         slurBundle = spanner.SpannerBundle()
         allPartNs = ['1']
@@ -4792,14 +4791,14 @@ class Test(unittest.TestCase):
         '''
         # setup the arguments
         # NB: there's more MEI here than we need, but it's shared between unit & integration tests
-        elem = """<section xmlns="http://www.music-encoding.org/ns/mei">
+        elem = '''<section xmlns="http://www.music-encoding.org/ns/mei">
             <bogus>5</bogus>  <!-- this will be ignored -->
             <staffDef n="1" meter.count="6" meter.unit="8"/>
             <staffDef key.accid="3s" key.mode="minor"/>  <!-- this will be ignored -->
             <measure n="42" right="rptboth">
                 <staff n="1"><layer n="1"><note pname="G" oct="4" dur="1"/></layer></staff>
             </measure>
-        </section>"""
+        </section>'''
         elem = ETree.fromstring(elem)
         slurBundle = mock.MagicMock()
         allPartNs = ['1']
@@ -4852,14 +4851,14 @@ class Test(unittest.TestCase):
             - there's an unknown element, so we have to debug-warn the user
         '''
         # setup the arguments
-        elem = """<section xmlns="http://www.music-encoding.org/ns/mei">
+        elem = '''<section xmlns="http://www.music-encoding.org/ns/mei">
             <bogus>5</bogus>  <!-- this will be ignored -->
             <staffDef n="1" meter.count="6" meter.unit="8"/>
             <staffDef key.accid="3s" key.mode="minor"/>  <!-- this will be ignored -->
             <measure n="42" right="rptboth">
                 <staff n="1"><layer n="1"><note pname="G" oct="4" dur="1"/></layer></staff>
             </measure>
-        </section>"""
+        </section>'''
         elem = ETree.fromstring(elem)
         slurBundle = spanner.SpannerBundle()
         allPartNs = ['1']
@@ -4909,7 +4908,7 @@ class Test(unittest.TestCase):
             is really all about the cumulative effect
         '''
         # setup the arguments
-        elem = """<score xmlns="http://www.music-encoding.org/ns/mei">
+        elem = '''<score xmlns="http://www.music-encoding.org/ns/mei">
             <scoreDef key.sig="1f" key.mode="minor">
                 <staffGrp>
                     <staffDef n="1" clef.line="4" clef.shape="F"/>
@@ -4929,7 +4928,7 @@ class Test(unittest.TestCase):
                     <staff n="1"><layer n="1"><note pname="C" oct="2" dur="1"/></layer></staff>
                 </measure>
             </section>
-        </score>"""
+        </score>'''
         elem = ETree.fromstring(elem)
         slurBundle = spanner.SpannerBundle()
         allPartNs = ['1']
@@ -5047,6 +5046,18 @@ class Test(unittest.TestCase):
         self.assertIsInstance(instr, instrument.Instrument)
         self.assertEqual(instr.partName, 'Clarinet')
         self.assertEqual(instr.transposition.directedName, 'm-3')
+
+    def testUniqueInstances(self):
+        from music21 import common
+        from music21 import converter
+
+        fp = common.getSourceFilePath() / 'mei' / 'test' / 'test_file.mei'
+        s = converter.parse(fp)
+
+        seen_ids = set()
+        for el in s.recurse():
+            self.assertNotIn(id(el), seen_ids, el)
+            seen_ids.add(id(el))
 
 
 if __name__ == '__main__':

@@ -5,9 +5,9 @@
 #
 # Authors:      Christopher Ariza
 #               Josiah Wolf Oberholtzer
-#               Michael Scott Cuthbert
+#               Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2009, 2013, 2015-17 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2009, 2013, 2015-17 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # -----------------------------------------------------------------------------
 '''
@@ -17,18 +17,26 @@ interface to searching corpora.
 New in v3 -- previously most were static methods on corpus.corpora.Corpus, but that
 seemed inappropriate since these work across corpora.
 '''
+from __future__ import annotations
+
 import pathlib
 import os
+from typing import TYPE_CHECKING
 
 from music21 import common
 from music21 import converter
+from music21.exceptions21 import CorpusException
 from music21 import environment
 from music21 import metadata
 
 from music21.corpus import corpora
-from music21.exceptions21 import CorpusException
 
-_metadataBundles = {
+
+if TYPE_CHECKING:
+    from music21.metadata import bundles
+
+
+_metadataBundles: dict[str, bundles.MetadataBundle | None] = {
     'core': None,
     'local': None,
     # 'virtual': None,
@@ -169,7 +177,7 @@ def parse(workName,
             number=None,
             fileExtensions=None,
             forceSource=False,
-            format=None  # @ReservedAssignment
+            format=None
           ):
     filePath = getWork(workName=workName,
                         movementNumber=movementNumber,
@@ -214,7 +222,7 @@ def _addCorpusFilepathToStreamObject(streamObj, filePath):
         streamObj.corpusFilepath = filePath
 
 
-def search(query=None, field=None, corpusNames=None, fileExtensions=None, **kwargs):
+def search(query=None, field=None, corpusNames=None, fileExtensions=None, **keywords):
     '''
     Search all stored metadata bundles and return a list of file paths.
 
@@ -278,7 +286,7 @@ def search(query=None, field=None, corpusNames=None, fileExtensions=None, **kwar
     for corpusName in corpusNames:
         c = fromName(corpusName)
         searchResults = c.metadataBundle.search(
-            query, field, fileExtensions=fileExtensions, **kwargs)
+            query, field, fileExtensions=fileExtensions, **keywords)
         allSearchResults = allSearchResults.union(searchResults)
 
     return allSearchResults
@@ -327,10 +335,7 @@ def cacheMetadataBundleFromDisk(corpusObject):
         metadataBundle = metadata.bundles.MetadataBundle(corpusName)
         metadataBundle.read()
         metadataBundle.validate()
-        # _metadataBundles needs TypedDict.
-        # noinspection PyTypeChecker
         _metadataBundles[corpusName] = metadataBundle
-
 
 def readAllMetadataBundlesFromDisk():
     '''
@@ -362,17 +367,33 @@ def listSearchFields():
     >>> for field in corpus.manager.listSearchFields():
     ...     field
     ...
-    'actNumber'
-    'alternativeTitle'
-    'ambitus'
-    'associatedWork'
-    'collectionDesignation'
-    'commission'
+    'abstract'
+    'accessRights'
+    'accompanyingMaterialWriter'
+    ...
     'composer'
-    'copyright'
+    'composerAlias'
+    'composerCorporate'
+    'conceptor'
+    'conductor'
+    ...
+    'dateCreated'
+    'dateFirstPublished'
+    'dateIssued'
+    'dateModified'
+    'dateSubmitted'
+    'dateValid'
+    ...
+    'tempoFirst'
+    'tempos'
+    'textLanguage'
+    'textOriginalLanguage'
+    'timeSignatureFirst'
+    'timeSignatures'
+    'title'
     ...
     '''
-    return tuple(sorted(metadata.RichMetadata.searchAttributes))
+    return metadata.bundles.MetadataBundle.listSearchFields()
 
 # -----------------------------------------------------------------------------
 

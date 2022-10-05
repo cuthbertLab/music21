@@ -3,40 +3,41 @@
 # Name:         common/numberTools.py
 # Purpose:      Utilities for working with numbers or number-like objects
 #
-# Authors:      Michael Scott Cuthbert
+# Authors:      Michael Scott Asato Cuthbert
 #               Christopher Ariza
 #
-# Copyright:    Copyright © 2009-2015 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2009-2022 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
-import math
-import random
-import unittest
-from typing import List, Tuple, Union, Sequence, Iterable
+from __future__ import annotations
 
+from collections.abc import Iterable, Sequence
 from fractions import Fraction
-from math import isclose
+from functools import cache
+import math
+from math import isclose, gcd
+import numbers
+import random
+import typing as t
+import unittest
 
 from music21 import defaults
 from music21.common import deprecated
+from music21.common.types import OffsetQLIn, OffsetQL
 
 __all__ = [
     'ordinals', 'musicOrdinals', 'ordinalsToNumbers',
-
-    'cleanupFloat',
     'numToIntOrFloat',
 
     'opFrac', 'mixedNumeral',
     'roundToHalfInteger',
-    'almostEquals',
     'addFloatPrecision', 'strTrimFloat',
     'nearestMultiple',
 
     'dotMultiplier', 'decimalToTuplet',
     'unitNormalizeProportion', 'unitBoundaryProportion',
     'weightedSelection',
-    'euclidGCD', 'approximateGCD',
-    'lcm',
+    'approximateGCD',
 
     'contiguousList',
 
@@ -61,39 +62,11 @@ musicOrdinals[15] = 'Double-octave'
 musicOrdinals[22] = 'Triple-octave'
 
 
-def cleanupFloat(floatNum, maxDenominator=defaults.limitOffsetDenominator):
-    '''
-    Cleans up a floating point number by converting
-    it to a fractions.Fraction object limited to
-    a denominator of maxDenominator
-
-    >>> common.cleanupFloat(0.33333327824)
-    0.333333333333...
-
-    >>> common.cleanupFloat(0.142857)
-    0.1428571428571...
-
-    >>> common.cleanupFloat(1.5)
-    1.5
-
-    Fractions are passed through silently...
-
-    >>> import fractions
-    >>> common.cleanupFloat(fractions.Fraction(4, 3))
-    Fraction(4, 3)
-
-    '''
-    if isinstance(floatNum, Fraction):
-        return floatNum  # do nothing to fractions
-    else:
-        f = Fraction(floatNum).limit_denominator(maxDenominator)
-        return float(f)
-
 # -----------------------------------------------------------------------------
 # Number methods...
 
 
-def numToIntOrFloat(value: Union[int, float]) -> Union[int, float]:
+def numToIntOrFloat(value: int | float) -> int | float:
     '''
     Given a number, return an integer if it is very close to an integer,
     otherwise, return a float.
@@ -144,13 +117,15 @@ def numToIntOrFloat(value: Union[int, float]) -> Union[int, float]:
 
 DENOM_LIMIT = defaults.limitOffsetDenominator
 
-
-def _preFracLimitDenominator(n, d):
+@cache
+def _preFracLimitDenominator(n: int, d: int) -> tuple[int, int]:
     # noinspection PyShadowingNames
     '''
+    Used in opFrac
+
     Copied from fractions.limit_denominator.  Their method
-    requires creating three new Fraction instances to get one back. this doesn't create any
-    call before Fraction...
+    requires creating three new Fraction instances to get one back.
+    This doesn't create any call before Fraction...
 
     DENOM_LIMIT is hardcoded to defaults.limitOffsetDenominator for speed...
 
@@ -193,10 +168,10 @@ def _preFracLimitDenominator(n, d):
 
     (n.b. -- nothing printed)
     '''
-    nOrg = n
-    dOrg = d
     if d <= DENOM_LIMIT:  # faster than hard-coding 65535
         return (n, d)
+    nOrg = n
+    dOrg = d
     p0, q0, p1, q1 = 0, 1, 1, 0
     while True:
         a = n // d
@@ -212,17 +187,30 @@ def _preFracLimitDenominator(n, d):
     bound2n = p1
     bound2d = q1
     # s = (0.0 + n)/d
-    bound1minusS = (abs((bound1n * dOrg) - (nOrg * bound1d)), (dOrg * bound1d))
-    bound2minusS = (abs((bound2n * dOrg) - (nOrg * bound2d)), (dOrg * bound2d))
-    difference = (bound1minusS[0] * bound2minusS[1]) - (bound2minusS[0] * bound1minusS[1])
-    if difference > 0:
+    bound1minusS_n = abs((bound1n * dOrg) - (nOrg * bound1d))
+    bound1minusS_d = dOrg * bound1d
+    bound2minusS_n = abs((bound2n * dOrg) - (nOrg * bound2d))
+    bound2minusS_d = dOrg * bound2d
+    difference = (bound1minusS_n * bound2minusS_d) - (bound2minusS_n * bound1minusS_d)
+    if difference >= 0:
         # bound1 is farther from zero than bound2; return bound2
-        return (p1, q1)
+        return (bound2n, bound2d)
     else:
-        return (p0 + k * p1, q0 + k * q1)
+        return (bound1n, bound1d)
 
 
-def opFrac(num):
+# _KNOWN_PASSES is all values from whole to 64th notes with 0 or 1 dot
+# the length of this set does determine the time to search.  A set with all values from maxima to
+# 2048th notes + 1-2 dots was half the speed
+
+_KNOWN_PASSES = frozenset([
+    0.0625, 0.09375, 0.125, 0.1875,
+    0.25, 0.375, 0.5, 0.75, 1.0, 1.5, 2.0, 3.0, 4.0, 6.0
+])
+
+# no type checking due to accessing protected attributes (for speed)
+@t.no_type_check
+def opFrac(num: OffsetQLIn | None) -> OffsetQL | None:
     '''
     opFrac -> optionally convert a number to a fraction or back.
 
@@ -261,14 +249,21 @@ def opFrac(num):
     Fraction(10, 81)
     >>> common.opFrac(None) is None
     True
-
-    :type num: float
     '''
     # This is a performance critical operation, tuned to go as fast as possible.
     # hence redundancy -- first we check for type (no inheritance) and then we
-    # repeat exact same test with inheritance. Note that the later examples are more verbose
-    t = type(num)
-    if t is float:
+    # repeat exact same test with inheritance.
+    #
+    # Cannot use functools's Caching mechanisms on this because then it will
+    # return the same Fraction object for all calls, which is a problem in case
+    # anyone sets ._numeration or ._denominator directly on that object.
+    #
+    if num in _KNOWN_PASSES:
+        return num + 0.0   # need the add, because ints and Fractions satisfy the "in"
+
+    # Note that the later examples are more verbose
+    numType = type(num)
+    if numType is float:
         # quick test of power of whether denominator is a power
         # of two, and thus representable exactly as a float: can it be
         # represented w/ a denominator less than DENOM_LIMIT?
@@ -278,14 +273,15 @@ def opFrac(num):
         # unused_numerator, denominator = num.as_integer_ratio()  # too slow
         ir = num.as_integer_ratio()
         if ir[1] > DENOM_LIMIT:  # slightly faster[SIC!] than hard coding 65535!
+            # _preFracLimitDenominator uses a cache
             return Fraction(*_preFracLimitDenominator(*ir))  # way faster!
             # return Fraction(*ir).limit_denominator(DENOM_LIMIT) # *ir instead of float--can happen
             # internally in Fraction constructor, but is twice as fast...
         else:
             return num
-    elif t is int:  # if vs. elif is negligible time difference.
+    elif numType is int:  # if vs. elif is negligible time difference.
         return num + 0.0  # 8x faster than float(num)
-    elif t is Fraction:
+    elif numType is Fraction:
         d = num._denominator  # private access instead of property: 6x faster; may break later...
         if (d & (d - 1)) == 0:  # power of two...
             return num._numerator / (d + 0.0)  # 50% faster than float(num)
@@ -294,7 +290,7 @@ def opFrac(num):
     elif num is None:
         return None
 
-    # class inheritance only check AFTER ifs... this is redundant but highly optimized.
+    # class inheritance only check AFTER "type is" checks... this is redundant but highly optimized.
     elif isinstance(num, int):
         return num + 0.0
     elif isinstance(num, float):
@@ -305,16 +301,17 @@ def opFrac(num):
             return num
 
     elif isinstance(num, Fraction):
-        d = num._denominator  # private access instead of property: 6x faster; may break later...
+        d = num.denominator  # Use properties since it is a subclass
         if (d & (d - 1)) == 0:  # power of two...
-            return num._numerator / (d + 0.0)  # 50% faster than float(num)
+            return num.numerator / (d + 0.0)  # 50% faster than float(num)
         else:
             return num  # leave fraction alone
     else:
         raise TypeError(f'Cannot convert num: {num}')
 
 
-def mixedNumeral(expr, limitDenominator=defaults.limitOffsetDenominator):
+def mixedNumeral(expr: numbers.Real,
+                 limitDenominator=defaults.limitOffsetDenominator):
     '''
     Returns a string representing a mixedNumeral form of a number
 
@@ -363,8 +360,7 @@ def mixedNumeral(expr, limitDenominator=defaults.limitOffsetDenominator):
             quotient = 0.0
             remainderFrac = remainderFrac - 1
     else:
-        # noinspection PyTypeChecker
-        quotient = int(expr)  # int seems completely supported for Fractions
+        quotient = int(float(expr))
         remainderFrac = expr - quotient
         if quotient < 0:
             remainderFrac *= -1
@@ -380,7 +376,7 @@ def mixedNumeral(expr, limitDenominator=defaults.limitOffsetDenominator):
     return str(0)
 
 
-def roundToHalfInteger(num: Union[float, int]) -> Union[float, int]:
+def roundToHalfInteger(num: float | int) -> float | int:
     '''
     Given a floating-point number, round to the nearest half-integer. Returns int or float
 
@@ -427,29 +423,8 @@ def roundToHalfInteger(num: Union[float, int]) -> Union[float, int]:
         floatVal = 1
     return intVal + floatVal
 
-@deprecated('v.7', 'any time', 'just call math.isclose(x, y, abs_tol=1e-7)')
-def almostEquals(x, y=0.0, grain=1e-7) -> bool:
-    # noinspection PyShadowingNames
-    '''
-    almostEquals(x, y) -- returns True if x and y are
-    within grain (default  0.0000001) of each other
 
-    Allows comparisons between floats that are normally inconsistent.
-
-    DEPRECATED in v.7 -- just call `isclose` with `abs_tol`:
-
-    >>> from math import isclose
-    >>> isclose(1.000000001, 1, abs_tol=1e-7)
-    True
-    >>> isclose(1.001, 1, abs_tol=1e-7)
-    False
-    >>> isclose(1.001, 1, abs_tol=0.1)
-    True
-    '''
-    return isclose(x, y, abs_tol=grain)
-
-
-def addFloatPrecision(x, grain=1e-2) -> Union[float, Fraction]:
+def addFloatPrecision(x, grain=1e-2) -> float | Fraction:
     '''
     Given a value that suggests a floating point fraction, like 0.33,
     return a Fraction or float that provides greater specification, such as Fraction(1, 3)
@@ -509,7 +484,7 @@ def strTrimFloat(floatNum: float, maxNum: int = 4) -> str:
     return off
 
 
-def nearestMultiple(n: float, unit: float) -> Tuple[float, float, float]:
+def nearestMultiple(n: float, unit: float) -> tuple[float, float, float]:
     '''
     Given a positive value `n`, return the nearest multiple of the supplied `unit` as well as
     the absolute difference (error) to seven significant digits and the signed difference.
@@ -521,7 +496,8 @@ def nearestMultiple(n: float, unit: float) -> Tuple[float, float, float]:
     >>> print(common.nearestMultiple(0.20, 0.25))
     (0.25, 0.05..., -0.05...)
 
-    Note that this one also has an error of 0.1 but it's a positive error off of 0.5
+    Note that this one also has an error of 0.1, but it's a positive error off of 0.5
+
     >>> print(common.nearestMultiple(0.4, 0.25))
     (0.5, 0.1..., -0.1...)
 
@@ -552,12 +528,12 @@ def nearestMultiple(n: float, unit: float) -> Tuple[float, float, float]:
 
     >>> common.nearestMultiple(-0.5, 0.125)
     Traceback (most recent call last):
-    ValueError: n (-0.5) is less than zero. Thus cannot find nearest
+    ValueError: n (-0.5) is less than zero. Thus, cannot find the nearest
         multiple for a value less than the unit, 0.125
     '''
     if n < 0:
         raise ValueError(f'n ({n}) is less than zero. '
-                         + 'Thus cannot find nearest multiple for a value '
+                         + 'Thus, cannot find the nearest multiple for a value '
                          + f'less than the unit, {unit}')
 
     mult = math.floor(n / unit)  # can start with the floor
@@ -578,6 +554,9 @@ def nearestMultiple(n: float, unit: float) -> Tuple[float, float, float]:
         return matchHigh, round(matchHigh - n, 7), round(n - matchHigh, 7)
 
 
+_DOT_LOOKUP = (1.0, 1.5, 1.75, 1.875, 1.9375,
+               1.96875, 1.984375, 1.9921875, 1.99609375)
+
 def dotMultiplier(dots: int) -> float:
     '''
     dotMultiplier(dots) returns how long to multiply the note
@@ -597,10 +576,13 @@ def dotMultiplier(dots: int) -> float:
     >>> common.dotMultiplier(0)
     1.0
     '''
+    if dots < 9:
+        return _DOT_LOOKUP[dots]
+
     return ((2 ** (dots + 1.0)) - 1.0) / (2 ** dots)
 
 
-def decimalToTuplet(decNum: float) -> Tuple[int, int]:
+def decimalToTuplet(decNum: float) -> tuple[int, int]:
     '''
     For simple decimals (usually > 1), a quick way to figure out the
     fraction in lowest terms that gives a valid tuplet.
@@ -625,12 +607,9 @@ def decimalToTuplet(decNum: float) -> Tuple[int, int]:
     >>> common.decimalToTuplet(-.02)
     Traceback (most recent call last):
     ZeroDivisionError: number must be greater than zero
-
-    TODO: replace with fractions...
     '''
-
     def findSimpleFraction(inner_working):
-        'Utility function.'
+        '''Utility function.'''
         for index in range(1, 1000):
             for j in range(index, index * 2):
                 if isclose(inner_working, j / index, abs_tol=1e-7):
@@ -653,9 +632,9 @@ def decimalToTuplet(decNum: float) -> Tuple[int, int]:
         raise Exception('No such luck')
 
     jy *= multiplier
-    gcd = euclidGCD(int(jy), int(iy))
-    jy = jy / gcd
-    iy = iy / gcd
+    my_gcd = gcd(int(jy), int(iy))
+    jy = jy / my_gcd
+    iy = iy / my_gcd
 
     if flipNumerator is False:
         return (int(jy), int(iy))
@@ -663,7 +642,7 @@ def decimalToTuplet(decNum: float) -> Tuple[int, int]:
         return (int(iy), int(jy))
 
 
-def unitNormalizeProportion(values: Sequence[int]) -> List[float]:
+def unitNormalizeProportion(values: Sequence[int | float]) -> list[float]:
     '''
     Normalize values within the unit interval, where max is determined by the sum of the series.
 
@@ -672,13 +651,17 @@ def unitNormalizeProportion(values: Sequence[int]) -> List[float]:
     >>> common.unitNormalizeProportion([1, 1, 1])
     [0.3333333..., 0.333333..., 0.333333...]
 
+    Works fine with a mix of ints and floats:
 
-    On 32-bit computers this number is inexact.  On 64-bit it works fine.
+    >>> common.unitNormalizeProportion([1.0, 1, 1.0])
+    [0.3333333..., 0.333333..., 0.333333...]
 
-    # >>> common.unitNormalizeProportion([0.2, 0.6, 0.2])
 
-    # [0.20000000000000001, 0.59999999999999998, 0.20000000000000001]
+    On 32-bit computers this number may be inexact even for small floats.
+    On 64-bit it works fine.  This is the 32-bit output for this result.
 
+        common.unitNormalizeProportion([0.2, 0.6, 0.2])
+        [0.20000000000000001, 0.59999999999999998, 0.20000000000000001]
 
     Negative values should be shifted to positive region first:
 
@@ -686,9 +669,9 @@ def unitNormalizeProportion(values: Sequence[int]) -> List[float]:
     Traceback (most recent call last):
     ValueError: value members must be positive
     '''
-    summation = 0
+    summation = 0.0
     for x in values:
-        if x < 0:
+        if x < 0.0:
             raise ValueError('value members must be positive')
         summation += x
     unit = []  # weights on the unit interval; sum == 1
@@ -697,7 +680,9 @@ def unitNormalizeProportion(values: Sequence[int]) -> List[float]:
     return unit
 
 
-def unitBoundaryProportion(series: Sequence[int]) -> List[Tuple[Union[int, float], float]]:
+def unitBoundaryProportion(
+    series: Sequence[int | float]
+) -> list[tuple[int | float, float]]:
     '''
     Take a series of parts with an implied sum, and create
     unit-interval boundaries proportional to the series components.
@@ -719,7 +704,9 @@ def unitBoundaryProportion(series: Sequence[int]) -> List[Tuple[Union[int, float
     return bounds
 
 
-def weightedSelection(values: List[int], weights: List[int], randomGenerator=None) -> int:
+def weightedSelection(values: list[int],
+                      weights: list[int | float],
+                      randomGenerator=None) -> int:
     '''
     Given a list of values and an equal-sized list of weights,
     return a randomly selected value using the weight.
@@ -746,24 +733,7 @@ def weightedSelection(values: List[int], weights: List[int], randomGenerator=Non
     return values[index]
 
 
-def euclidGCD(a: int, b: int) -> int:
-    '''
-    use Euclid's algorithm to find the GCD of a and b
-
-    >>> common.euclidGCD(2, 4)
-    2
-    >>> common.euclidGCD(20, 8)
-    4
-    >>> common.euclidGCD(20, 16)
-    4
-    '''
-    if b == 0:
-        return a
-    else:
-        return euclidGCD(b, a % b)
-
-
-def approximateGCD(values: List[Union[int, float]], grain: float = 1e-4) -> float:
+def approximateGCD(values: list[int | float], grain: float = 1e-4) -> float:
     '''Given a list of values, find the lowest common divisor of floating point values.
 
     >>> common.approximateGCD([2.5, 10, 0.25])
@@ -830,29 +800,32 @@ def approximateGCD(values: List[Union[int, float]], grain: float = 1e-4) -> floa
     return max(commonUniqueDivisions)
 
 
+@deprecated('v9', 'v10', 'Use math.lcm instead')
 def lcm(filterList: Iterable[int]) -> int:
     '''
     Find the least common multiple of a list of values
 
-    >>> common.lcm([3, 4, 5])
+    common.lcm([3, 4, 5])
     60
-    >>> common.lcm([3, 4])
+    common.lcm([3, 4])
     12
-    >>> common.lcm([1, 2])
+    common.lcm([1, 2])
     2
-    >>> common.lcm([3, 6])
+    common.lcm([3, 6])
     6
 
     Works with any iterable, like this set
 
-    >>> common.lcm({3, 5, 6})
+    common.lcm({3, 5, 6})
     30
 
+    Deprecated in v9 since Python 3.9 is the minimum version
+    and math.lcm works in C and is faster
     '''
     def _lcm(a, b):
-        '''find lowest common multiple of a, b'''
+        '''find the least common multiple of a, b'''
         # // forces integer style division (no remainder)
-        return abs(a * b) // euclidGCD(a, b)
+        return abs(a * b) // gcd(a, b)
 
     # derived from
     # http://www.oreillynet.com/cs/user/view/cs_msg/41022
@@ -894,7 +867,7 @@ def contiguousList(inputListOrTuple) -> bool:
     return True
 
 
-def groupContiguousIntegers(src: List[int]) -> List[List[int]]:
+def groupContiguousIntegers(src: list[int]) -> list[list[int]]:
     '''
     Given a list of integers, group contiguous values into sub lists
 
@@ -1165,4 +1138,3 @@ _DOC_ORDER = [fromRoman, toRoman]
 if __name__ == '__main__':
     import music21
     music21.mainTest(Test)
-

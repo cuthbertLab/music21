@@ -1,36 +1,36 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 # Name:         graph/utilities.py
-# Purpose:      Methods for finding external modules, manipulating colors, etc.
+# Purpose:      Functions for finding external modules, manipulating colors, etc.
 #
 # Authors:      Christopher Ariza
-#               Michael Scott Cuthbert
+#               Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2009-2012, 2017 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2009-2022 Michael Scott Asato Cuthbert,
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
-Methods for finding external modules, converting colors to Matplotlib colors, etc.
+Functions for finding external modules, converting colors to Matplotlib colors, etc.
 '''
-import unittest
-from collections import namedtuple
+from __future__ import annotations
 
-import webcolors
+from collections import namedtuple
+import typing as t
+import unittest
+import webcolors  # type: ignore  # no typing in module
 
 # TODO: Move _missingImport to environment or common so this is unnecessary.
 from music21.base import _missingImport
-
 from music21 import common
+from music21 import environment
 from music21 import exceptions21
 from music21 import pitch
 
-from music21 import environment
-_MOD = 'graph.utilities'
-environLocal = environment.Environment(_MOD)
+environLocal = environment.Environment('graph.utilities')
 
 
 ExtendedModules = namedtuple('ExtendedModules',
-                             'matplotlib Axes3D collections patches plt networkx')
+                             ['matplotlib', 'Axes3D', 'collections', 'patches', 'plt', 'networkx'])
 
 
 def getExtendedModules():
@@ -43,12 +43,12 @@ def getExtendedModules():
     if 'matplotlib' in _missingImport:
         raise GraphException(
             'could not find matplotlib, graphing is not allowed')  # pragma: no cover
-    import matplotlib
+    import matplotlib  # type: ignore  # eventually: https://pypi.org/project/data-science-types/
     # backend can be configured from config file, matplotlibrc,
     # but an early test broke all processing
     # matplotlib.use('WXAgg')
     try:
-        from mpl_toolkits.mplot3d import Axes3D
+        from mpl_toolkits.mplot3d import Axes3D  # type: ignore
     except ImportError:  # pragma: no cover
         Axes3D = None
         environLocal.warn(
@@ -60,11 +60,11 @@ def getExtendedModules():
     from matplotlib import patches
 
     # from matplotlib.colors import colorConverter
-    import matplotlib.pyplot as plt
+    import matplotlib.pyplot as plt  # type: ignore
 
     try:
         # noinspection PyPackageRequirements
-        import networkx
+        import networkx  # type: ignore
     except ImportError:  # pragma: no cover
         networkx = None  # use for testing
 
@@ -179,7 +179,7 @@ def getColor(color):
             if len(color) == 1:
                 color = [color[0], color[0], color[0]]
             # convert to 0 100% values as strings with % symbol
-            colorStrList = [str(x * 100) + '%' for x in color]
+            colorStrList = t.cast(tuple[str, str, str], tuple(str(x * 100) + '%' for x in color))
             return webcolors.rgb_percent_to_hex(colorStrList)
         else:  # assume integers
             return webcolors.rgb_to_hex(tuple(color))

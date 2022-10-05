@@ -3,14 +3,15 @@
 # Name:         noteGrouping.py
 # Purpose:      Transcribes note groupings into Braille
 # Authors:      Jose Cabal-Ugaz
-#               Michael Scott Cuthbert
+#               Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2012, 2016 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2012, 2016 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
-import unittest
+from __future__ import annotations
 
 from collections import OrderedDict
+import unittest
 
 from music21 import clef
 from music21 import dynamics
@@ -271,7 +272,7 @@ def transcribeNoteGrouping(brailleElementGrouping, showLeadingOctave=True):
     '''
     transcribe a group of notes, possibly excluding certain attributes.
 
-    To be DEPRECATED -- called only be BrailleGrandSegment now.
+    To be DEPRECATED -- called only by BrailleGrandSegment now.
     '''
     ngt = NoteGroupingTranscriber()
     ngt.showLeadingOctave = showLeadingOctave

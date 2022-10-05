@@ -4,10 +4,10 @@
 # Purpose:      Access to MIDI library / music21 classes for dealing with midi data
 #
 # Authors:      Christopher Ariza
-#               Michael Scott Cuthbert
+#               Michael Scott Asato Cuthbert
 #               (Will Ware -- see docs)
 #
-# Copyright:    Copyright © 2011-2013, 2019 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2011-2013, 2019 Michael Scott Asato Cuthbert
 #               Some parts of this module are in the Public Domain, see details.
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
@@ -23,6 +23,8 @@ This module originally used routines from Will Ware's public domain midi.py
 library from 2001 which was once posted at (http link)
 groups.google.com/g/alt.sources/msg/0c5fc523e050c35e
 '''
+from __future__ import annotations
+
 __all__ = [
     'realtime', 'percussion',
     'MidiEvent', 'MidiFile', 'MidiTrack', 'MidiException',
@@ -37,7 +39,7 @@ import struct
 import sys
 import unicodedata
 import unittest
-from typing import List, Optional, Union, Tuple
+import typing as t
 
 from enum import IntEnum
 
@@ -49,8 +51,7 @@ from music21 import prebase
 from music21.midi import realtime
 from music21.midi import percussion
 
-_MOD = 'midi'
-environLocal = environment.Environment(_MOD)
+environLocal = environment.Environment('midi')
 
 
 # good midi reference:
@@ -148,7 +149,7 @@ def getNumber(midiStr, length):
 def getVariableLengthNumber(midiBytes):
     r'''
     Given a string or bytes of data, strip off the first character, or all high-byte characters
-    terminating with one whose ord() function is < 0x80.  Thus a variable number of bytes
+    terminating with one whose ord() function is < 0x80.  Thus, a variable number of bytes
     might be read.
 
     After finding the appropriate termination,
@@ -350,7 +351,8 @@ class _ContainsEnum(IntEnum):
 
     @classmethod
     def hasValue(cls, val):
-        return val in cls._value2member_map_
+        # https://github.com/PyCQA/pylint/issues/3941
+        return val in cls._value2member_map_  # pylint: disable=no-member
 
 
 class ChannelVoiceMessages(_ContainsEnum):
@@ -463,33 +465,32 @@ class MidiEvent(prebase.ProtoM21Object):
     <music21.midi.MidiEvent SEQUENCE_TRACK_NAME, track=1, channel=None, data=b'guitar'>
     '''
     # pylint: disable=redefined-builtin
-
     def __init__(self,
-                 track: Optional['music21.midi.MidiTrack'] = None,
-                 type=None,  # @ReservedAssignment
+                 track: MidiTrack | None = None,
+                 type=None,
                  time: int = 0,
-                 channel: Optional[int] = None):
-        self.track: Optional['music21.midi.MidiTrack'] = track  # a MidiTrack object
+                 channel: int | None = None):
+        self.track: MidiTrack | None = track  # a MidiTrack object
         self.type = type
         self.time: int = time
-        self.channel: Optional[int] = channel
+        self.channel: int | None = channel
 
-        self.parameter1: Union[int, bytes, None] = None  # pitch or first data value
-        self.parameter2: Union[int, bytes, None] = None  # velocity or second data value
+        self.parameter1: int | bytes | None = None  # pitch or first data value
+        self.parameter2: int | bytes | None = None  # velocity or second data value
 
         # data is a property...
 
         # if this is a Note on/off, need to store original
-        # pitch space value in order to determine if this is has a microtone
-        self.centShift: Optional[int] = None
+        # pitch space value in order to determine if this has a microtone
+        self.centShift: int | None = None
 
         # store a reference to a corresponding event
         # if a noteOn, store the note off, and vice versa
         # circular ref -- but modern Python will garbage collect it.
-        self.correspondingEvent = None
+        self.correspondingEvent: MidiEvent | None = None
 
         # store and pass on a running status if found
-        self.lastStatusByte: Optional[int] = None
+        self.lastStatusByte: int | None = None
 
     @property
     def sortOrder(self) -> int:
@@ -616,8 +617,7 @@ class MidiEvent(prebase.ProtoM21Object):
         >>> me1.parameter1, me1.parameter2
         (0, 64)
 
-
-        Parameter 2 is most significant digit, not
+        Parameter 2 is the most significant digit, not
         parameter 1.
 
         >>> me1.setPitchBend(101)
@@ -713,7 +713,7 @@ class MidiEvent(prebase.ProtoM21Object):
         # 'd1', d1, 'd2', d2,])
 
         self.parameter1 = d2
-        self.parameter2 = d1  # d1 is most significant byte here
+        self.parameter2 = d1  # d1 is the most significant byte here
 
     def parseChannelVoiceMessage(self, midiBytes: bytes) -> bytes:
         r'''
@@ -762,7 +762,7 @@ class MidiEvent(prebase.ProtoM21Object):
         1
 
 
-        Here we send the message for a note on on another channel (0x91 = channel 2):
+        Here we send the message for a note on another channel (0x91 = channel 2):
 
         >>> rem = me1.parseChannelVoiceMessage(to_bytes([0x91, 60, 120]))
         >>> me1
@@ -877,7 +877,7 @@ class MidiEvent(prebase.ProtoM21Object):
         # contains the midi channel number on which the command will be executed.
         byte0: int = midiBytes[0]  # extracting a single val from a byte makes it an int
 
-        # detect running status: if the status byte is less than 0x80, its
+        # detect running status: if the status byte is less than 0x80, it is
         # not a status byte, but a data byte
         if byte0 < 0x80:
             # environLocal.printDebug(['MidiEvent.read(): found running status even data',
@@ -965,7 +965,7 @@ class MidiEvent(prebase.ProtoM21Object):
                 data = param1data + param2data
             elif self.type == ChannelVoiceMessages.PROGRAM_CHANGE:
                 data = bytes([self.data])
-            else:  # all other messages
+            else:  # all the other messages
                 try:
                     if isinstance(self.data, int):
                         data = bytes([self.data])
@@ -1000,8 +1000,13 @@ class MidiEvent(prebase.ProtoM21Object):
                 return s + self.data
             except (UnicodeDecodeError, TypeError):
                 # environLocal.printDebug(['cannot decode data', self.data])
-                return s + unicodedata.normalize('NFKD',
-                                                 self.data).encode('ascii', 'ignore')
+
+                # normalize can take bytes.
+                # noinspection PyTypeChecker
+                return s + unicodedata.normalize(
+                    'NFKD',
+                    self.data
+                ).encode('ascii', 'ignore')
         else:
             raise MidiException(f'unknown midi event type: {self.type!r}')
 
@@ -1025,7 +1030,7 @@ class MidiEvent(prebase.ProtoM21Object):
 
     def isNoteOff(self):
         '''
-        Return a boolean if this is should be interpreted as a note-off message,
+        Return a boolean if this should be interpreted as a note-off message,
         either as a real note-off or as a note-on with zero velocity.
 
 
@@ -1149,7 +1154,7 @@ class DeltaTime(MidiEvent):
             rep = '(empty) ' + rep
         return rep
 
-    def read(self, oldBytes: bytes) -> Tuple[int, bytes]:
+    def read(self, oldBytes: bytes) -> tuple[int, bytes]:
         r'''
         Read a byte-string until hitting a character below 0x80
         and return the converted number and the rest of the bytes
@@ -1577,7 +1582,7 @@ class MidiFile(prebase.ProtoM21Object):
         The name readstr is a carryover from Python 2.  It works on bytes objects, not strings
         '''
         if not midiBytes[:4] == b'MThd':
-            raise MidiException(f'badly formatted midi bytes, got: {midiBytes[:20]}')
+            raise MidiException(f'badly formatted midi bytes, got: {midiBytes[:20]!r}')
 
         # we step through the str src, chopping off characters as we go
         # and reassigning to str
@@ -1801,11 +1806,11 @@ class Test(unittest.TestCase):
                 [1024, 50, 70],
                 [1024, 51, 120],
                 [1024, 62, 80]]
-        t = 0
+        timeNow = 0
         tLast = 0
         for d, p, v in data:
             dt = midi.DeltaTime(mt)
-            dt.time = t - tLast
+            dt.time = timeNow - tLast
             # add to track events
             mt.events.append(dt)
 
@@ -1829,8 +1834,8 @@ class Test(unittest.TestCase):
             me.velocity = 0
             mt.events.append(me)
 
-            tLast = t + d  # have delta to note off
-            t += d  # next time
+            tLast = timeNow + d  # have delta to note off
+            timeNow += d  # next time
 
         # add end of track
         dt = midi.DeltaTime(mt)
@@ -1875,13 +1880,13 @@ class Test(unittest.TestCase):
 
         # duration, pitch, velocity
         data = [[1024, 60, 90]] * 20
-        t = 0
+        timeNow = 0
         tLast = 0
         for i, e in enumerate(data):
             d, p, v = e
 
             dt = midi.DeltaTime(mt)
-            dt.time = t - tLast
+            dt.time = timeNow - tLast
             # add to track events
             mt.events.append(dt)
 
@@ -1891,7 +1896,7 @@ class Test(unittest.TestCase):
             mt.events.append(me)
 
             dt = midi.DeltaTime(mt)
-            dt.time = t - tLast
+            dt.time = timeNow - tLast
             # add to track events
             mt.events.append(dt)
 
@@ -1911,8 +1916,8 @@ class Test(unittest.TestCase):
             me.velocity = 0
             mt.events.append(me)
 
-            tLast = t + d  # have delta to note off
-            t += d  # next time
+            tLast = timeNow + d  # have delta to note off
+            timeNow += d  # next time
 
         # add end of track
         dt = midi.DeltaTime(mt)
@@ -1983,7 +1988,7 @@ class Test(unittest.TestCase):
 
 # ------------------------------------------------------------------------------
 # define presented order in documentation
-_DOC_ORDER: List[type] = []
+_DOC_ORDER: list[type] = []
 
 if __name__ == '__main__':
     import music21
