@@ -588,7 +588,7 @@ class Test(unittest.TestCase):
         p = stream.Part()
         romanText.writeRoman.RnWriter(p)  # or on a part
 
-        s.insert(p)
+        s.insert(0, p)
         romanText.writeRoman.RnWriter(s)  # or on a score with part
 
         m = stream.Measure()
