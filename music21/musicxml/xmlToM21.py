@@ -59,11 +59,10 @@ from music21.musicxml.xmlObjects import MusicXMLImportException, MusicXMLWarning
 
 if t.TYPE_CHECKING:
     from music21 import base
+    # what goes in a `.staffReference`
+    StaffReferenceType = dict[int, list[base.Music21Object]]
 
 environLocal = environment.Environment('musicxml.xmlToM21')
-
-# what goes in a `.staffReference`
-StaffReferenceType = dict[int, list[base.Music21Object]]
 
 # const
 NO_STAFF_ASSIGNED = 0
@@ -878,6 +877,8 @@ class MusicXMLImporter(XMLParserBase):
             self.xmlText = self.xmlText.decode('utf-8')
         sio = io.StringIO(self.xmlText)
         try:
+            # StringIO is a SupportsRead[str] type.
+            # noinspection PyTypeChecker
             etree = ET.parse(sio)
             self.xmlRoot = etree.getroot()
         except ET.ParseError:

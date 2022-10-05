@@ -1084,31 +1084,54 @@ class Tuplet(prebase.ProtoM21Object):
         elif durationActual is None and durationNormal is not None:
             durationActual = durationNormal
 
-        match durationActual:
-            case None:
-                pass
-            case str(durAct):
-                self.durationActual = durationTupleFromTypeDots(durAct, 0)
-            case (str(durActType), int(dots)):
-                self.durationActual = durationTupleFromTypeDots(durActType, dots)
-            case _:
+        # this stores a durationTuple
+        if durationActual is not None:
+            if isinstance(durationActual, str):
+                self.durationActual = durationTupleFromTypeDots(durationActual, 0)
+            elif isinstance(durationActual, tuple):
+                self.durationActual = durationTupleFromTypeDots(durationActual[0],
+                                                                durationActual[1])
+            else:
                 # type ignore until https://github.com/python/mypy/issues/3004 resolved
                 self.durationActual = durationActual  # type: ignore
+
+        # # crashes mypy-0.982 -- fixed in 0.999 dev.
+        # match durationActual:
+        #     case None:
+        #         pass
+        #     case str(durAct):
+        #         self.durationActual = durationTupleFromTypeDots(durAct, 0)
+        #     case (str(durActType), int(dots)):
+        #         self.durationActual = durationTupleFromTypeDots(durActType, dots)
+        #     case _:
+        #         # type ignore until https://github.com/python/mypy/issues/3004 resolved
+        #         self.durationActual = durationActual  # type: ignore
 
 
         # normal is the space that would normally be occupied by the tuplet span
         self.numberNotesNormal: int = numberNotesNormal
 
-        match durationNormal:
-            case None:
-                pass
-            case str(durNor):
-                self.durationNormal = durationTupleFromTypeDots(durNor, 0)
-            case(str(durNorType), int(dots)):
-                self.durationNormal = durationTupleFromTypeDots(durNorType, dots)
-            case _:
+        if durationNormal is not None:
+            if isinstance(durationNormal, str):
+                self.durationNormal = durationTupleFromTypeDots(durationNormal, 0)
+            elif isinstance(durationNormal, tuple):
+                self.durationNormal = durationTupleFromTypeDots(durationNormal[0],
+                                                                durationNormal[1])
+            else:
                 # type ignore until https://github.com/python/mypy/issues/3004 resolved
                 self.durationNormal = durationNormal  # type: ignore
+
+        # # crashes mypy-0.982 -- fixed in 0.999 dev.
+        # match durationNormal:
+        #     case None:
+        #         pass
+        #     case str(durNor):
+        #         self.durationNormal = durationTupleFromTypeDots(durNor, 0)
+        #     case(str(durNorType), int(dots)):
+        #         self.durationNormal = durationTupleFromTypeDots(durNorType, dots)
+        #     case _:
+        #         # type ignore until https://github.com/python/mypy/issues/3004 resolved
+        #         self.durationNormal = durationNormal  # type: ignore
 
         # Type is 'start', 'stop', 'startStop', False or None: determines whether to start or stop
         # the bracket/group drawing
