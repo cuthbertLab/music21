@@ -6,7 +6,7 @@
 # Authors:      Christopher Ariza
 #               Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2010-2022 Michael Scott Asato Cuthbert and the music21 Project
+# Copyright:    Copyright © 2010-2022 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
@@ -34,20 +34,20 @@ Changed in v8 -- nodeId and nodeName standardized.  TERMINUS and DIRECTION
 '''
 from __future__ import annotations
 
+from collections import OrderedDict
+from collections.abc import Sequence
 import copy
 import enum
 import typing as t
 
-from collections import OrderedDict
-
 from music21 import common
+from music21 import environment
 from music21 import exceptions21
 from music21 import interval
 from music21 import note
 from music21 import pitch
 from music21 import prebase
 
-from music21 import environment
 environLocal = environment.Environment('scale.intervalNetwork')
 
 class Terminus(enum.Enum):
@@ -72,8 +72,8 @@ class Direction(enum.Enum):
         return 'Direction.' + self.name
 
 
-CacheKey = t.Tuple[
-    t.Union[int, Terminus], str, t.Union[str, None], t.Union[str, None], bool, t.Optional[bool]]
+CacheKey = tuple[
+    int | Terminus, str, str | None, str | None, bool, bool | None]
 
 
 def _gte(a, b):
@@ -145,7 +145,7 @@ class Edge(prebase.ProtoM21Object):
     # noinspection PyShadowingBuiltins
     # pylint: disable=redefined-builtin
     def __init__(self,
-                 intervalData: t.Union[interval.Interval, str],
+                 intervalData: interval.Interval | str,
                  id=None,  # id is okay: @ReservedAssignment
                  direction=Direction.BI):
         if isinstance(intervalData, str):
@@ -161,7 +161,7 @@ class Edge(prebase.ProtoM21Object):
 
         # one or two pairs of Node ids that this Edge connects
         # if there are two, it is a bidirectional, w/ first ascending
-        self._connections: t.List[t.Tuple[t.Union[int, Terminus], t.Union[int, Terminus]]] = []
+        self._connections: list[tuple[int | Terminus, int | Terminus]] = []
 
     def __eq__(self, other):
         '''
@@ -184,8 +184,8 @@ class Edge(prebase.ProtoM21Object):
 
     def addDirectedConnection(
         self,
-        node1: t.Union[Node, int, Terminus],
-        node2: t.Union[Node, int, Terminus],
+        node1: Node | int | Terminus,
+        node2: Node | int | Terminus,
         direction=None
     ) -> None:
         '''
@@ -251,8 +251,8 @@ class Edge(prebase.ProtoM21Object):
 
     def getConnections(
         self,
-        direction: t.Union[None, Direction] = None
-    ) -> t.List[t.Tuple[t.Union[int, Terminus], t.Union[int, Terminus]]]:
+        direction: None | Direction = None
+    ) -> list[tuple[int | Terminus, int | Terminus]]:
         '''
         Callable as a property (.connections) or as a method
         (.getConnections(direction)):
@@ -303,7 +303,7 @@ class Edge(prebase.ProtoM21Object):
 
     # keep separate property, since getConnections takes a direction argument.
     @property
-    def connections(self) -> t.List[t.Tuple[t.Union[int, Terminus], t.Union[int, Terminus]]]:
+    def connections(self) -> list[tuple[int | Terminus, int | Terminus]]:
         return self.getConnections()
 
 
@@ -328,10 +328,10 @@ class Node(prebase.ProtoM21Object, common.SlottedObjectMixin):
 
     # noinspection PyShadowingBuiltins
     # pylint: disable=redefined-builtin
-    def __init__(self, id: t.Union[Terminus, int], degree: int, weight: float = 1.0):
+    def __init__(self, id: Terminus | int, degree: int, weight: float = 1.0):
         # store id, either as string, such as terminusLow, or a number.
         # ids are unique to any node in the network
-        self.id: t.Union[Terminus, int] = id
+        self.id: Terminus | int = id
         # the degree is used to define ordered node counts from the bottom
         # the degree is analogous to scale degree or degree
         # more than one node may have the same degree
@@ -416,7 +416,7 @@ class IntervalNetwork:
     '''
 
     def __init__(self,
-                 edgeList: t.Sequence[t.Union[interval.Interval, str]] = (),
+                 edgeList: Sequence[interval.Interval | str] = (),
                  octaveDuplicating=False,
                  deterministic=True,
                  pitchSimplification='maxAccidental'):
@@ -427,10 +427,10 @@ class IntervalNetwork:
 
         # a dictionary of Edge object, where keys are edgeId values
         # Edges store directed connections between Node ids
-        self.edges: t.OrderedDict[t.Union[Terminus, int], Edge] = OrderedDict()
+        self.edges: OrderedDict[Terminus | int, Edge] = OrderedDict()
 
         # nodes suggest Pitches, but Pitches are not stored
-        self.nodes: t.OrderedDict[t.Union[Terminus, int], Node] = OrderedDict()
+        self.nodes: OrderedDict[Terminus | int, Node] = OrderedDict()
 
         if edgeList:  # auto initialize
             self.fillBiDirectedEdges(edgeList)
@@ -443,13 +443,13 @@ class IntervalNetwork:
         self.pitchSimplification = pitchSimplification
 
         # store segments
-        self._ascendingCache: t.OrderedDict[
+        self._ascendingCache: OrderedDict[
             CacheKey,
-            t.Tuple[t.List[pitch.Pitch], t.List[t.Union[Terminus, int]]]
+            tuple[list[pitch.Pitch], list[Terminus | int]]
         ] = OrderedDict()
-        self._descendingCache: t.OrderedDict[
+        self._descendingCache: OrderedDict[
             CacheKey,
-            t.Tuple[t.List[pitch.Pitch], t.List[t.Union[Terminus, int]]]
+            tuple[list[pitch.Pitch], list[Terminus | int]]
         ] = OrderedDict()
 
     def clear(self):
@@ -488,7 +488,7 @@ class IntervalNetwork:
         return (isinstance(other, self.__class__)
                 and self.__dict__ == other.__dict__)
 
-    def fillBiDirectedEdges(self, edgeList: t.Sequence[t.Union[interval.Interval, str]]):
+    def fillBiDirectedEdges(self, edgeList: Sequence[interval.Interval | str]):
         # noinspection PyShadowingNames
         '''
         Given an ordered list of bi-directed edges given as :class:`~music21.interval.Interval`
@@ -862,7 +862,7 @@ class IntervalNetwork:
         return x
 
     @property
-    def terminusLowNodes(self) -> t.List[Node]:
+    def terminusLowNodes(self) -> list[Node]:
         '''
         Return a list of first Nodes, or Nodes that contain Terminus.LOW.
 
@@ -975,7 +975,7 @@ class IntervalNetwork:
             raise IntervalNetworkException('failed to match any edges', nObj)
         return collection
 
-    def degreeModulus(self, degree):
+    def degreeModulus(self, degree: int) -> int:
         '''
         Return the degree modulus degreeMax - degreeMin.
 
@@ -1008,7 +1008,8 @@ class IntervalNetwork:
         return ((degree - 1) % spanCount) + sMin
 
     def nodeNameToNodes(self,
-                        nodeId: t.Union[Node, int, Terminus, None],
+                        nodeId: Node | int | Terminus | None,
+                        *,
                         equateTermini=True,
                         permitDegreeModuli=True):
         '''
@@ -1131,7 +1132,12 @@ class IntervalNetwork:
         postNode = [self.nodes[nId] for nId in postNodeId]
         return postEdge, postNode
 
-    def processAlteredNodes(self, alteredDegrees, n, p, direction):
+    def processAlteredNodes(self,
+                            alteredDegrees,
+                            n,
+                            p,
+                            *,
+                            direction):
         '''
         Return an altered pitch for given node, if an alteration is specified
         in the alteredDegrees dictionary
@@ -1173,6 +1179,7 @@ class IntervalNetwork:
         self,
         pitchObj,
         nodeObj,
+        *,
         direction=Direction.BI,
         alteredDegrees=None
     ) -> pitch.Pitch:
@@ -1193,13 +1200,14 @@ class IntervalNetwork:
 
     def nextPitch(
         self,
-        pitchReference: t.Union[pitch.Pitch, str],
-        nodeName: t.Union[Node, int, Terminus, None],
-        pitchOrigin: t.Union[pitch.Pitch, str],
+        pitchReference: pitch.Pitch | str,
+        nodeName: Node | int | Terminus | None,
+        pitchOrigin: pitch.Pitch | str,
+        *,
         direction: Direction = Direction.ASCENDING,
         stepSize=1,
         alteredDegrees=None,
-        getNeighbor: t.Union[bool, Direction] = True
+        getNeighbor: bool | Direction = True
     ):
         # noinspection PyShadowingNames
         '''
@@ -1208,23 +1216,35 @@ class IntervalNetwork:
         The `nodeName` parameter may be a :class:`~music21.scale.intervalNetwork.Node` object,
         a node degree, a Terminus Enum, or a None (indicating Terminus.LOW).
 
-        The `stepSize` parameter can be configured to permit different sized steps
-        in the specified direction.
 
         >>> edgeList = ['M2', 'M2', 'm2', 'M2', 'M2', 'M2', 'm2']
         >>> net = scale.intervalNetwork.IntervalNetwork()
         >>> net.fillBiDirectedEdges(edgeList)
-        >>> net.nextPitch('g', 1, 'f#5', scale.Direction.ASCENDING)
+        >>> net.nextPitch('g', 1, 'f#5', direction=scale.Direction.ASCENDING)
         <music21.pitch.Pitch G5>
-        >>> net.nextPitch('g', 1, 'f#5', scale.Direction.DESCENDING)
+        >>> net.nextPitch('g', 1, 'f#5', direction=scale.Direction.DESCENDING)
         <music21.pitch.Pitch E5>
-        >>> net.nextPitch('g', 1, 'f#5', scale.Direction.ASCENDING, 2)  # two steps
+
+        The `stepSize` parameter can be configured to permit different sized steps
+        in the specified direction.
+
+        >>> net.nextPitch('g', 1, 'f#5',
+        ...               direction=scale.Direction.ASCENDING,
+        ...               stepSize=2)
         <music21.pitch.Pitch A5>
+
+        Altered degrees can be given to temporarily change the pitches returned
+        without affecting the network as a whole.
+
         >>> alteredDegrees = {2: {'direction': scale.Direction.BI,
         ...                       'interval': interval.Interval('-a1')}}
-        >>> net.nextPitch('g', 1, 'g2', scale.Direction.ASCENDING, alteredDegrees=alteredDegrees)
+        >>> net.nextPitch('g', 1, 'g2',
+        ...               direction=scale.Direction.ASCENDING,
+        ...               alteredDegrees=alteredDegrees)
         <music21.pitch.Pitch A-2>
-        >>> net.nextPitch('g', 1, 'a-2', scale.Direction.ASCENDING, alteredDegrees=alteredDegrees)
+        >>> net.nextPitch('g', 1, 'a-2',
+        ...               direction=scale.Direction.ASCENDING,
+        ...               alteredDegrees=alteredDegrees)
         <music21.pitch.Pitch B2>
         '''
         if pitchOrigin is None:
@@ -1339,10 +1359,11 @@ class IntervalNetwork:
         self,
         nodeObj: Node,
         pitchReference: pitch.Pitch,
-        minPitch: t.Optional[pitch.Pitch],
-        maxPitch: t.Optional[pitch.Pitch],
+        minPitch: pitch.Pitch | None,
+        maxPitch: pitch.Pitch | None,
+        *,
         includeFirst: bool,
-        reverse: t.Optional[bool] = None,  # only meaningful for descending
+        reverse: bool | None = None,  # only meaningful for descending
     ) -> CacheKey:
         '''
         Return key for caching based on critical components.
@@ -1366,13 +1387,14 @@ class IntervalNetwork:
 
     def realizeAscending(
         self,
-        pitchReference: t.Union[pitch.Pitch, str],
-        nodeId: t.Union[Node, int, Terminus, None] = None,
-        minPitch: t.Union[pitch.Pitch, str, None] = None,
-        maxPitch: t.Union[pitch.Pitch, str, None] = None,
+        pitchReference: pitch.Pitch | str,
+        nodeId: Node | int | Terminus | None = None,
+        minPitch: pitch.Pitch | str | None = None,
+        maxPitch: pitch.Pitch | str | None = None,
+        *,
         alteredDegrees=None,
         fillMinMaxIfNone=False
-    ) -> t.Tuple[t.List[pitch.Pitch], t.List[t.Union[Terminus, int]]]:
+    ) -> tuple[list[pitch.Pitch], list[Terminus | int]]:
         # noinspection PyShadowingNames
         '''
         Given a reference pitch, realize upwards to a maximum pitch.
@@ -1530,10 +1552,11 @@ class IntervalNetwork:
 
     def realizeDescending(
         self,
-        pitchReference: t.Union[pitch.Pitch, str],
-        nodeId: t.Union[Node, int, Terminus, None] = None,
-        minPitch: t.Union[pitch.Pitch, str, None] = None,
-        maxPitch: t.Union[pitch.Pitch, str, None] = None,
+        pitchReference: pitch.Pitch | str,
+        nodeId: Node | int | Terminus | None = None,
+        minPitch: pitch.Pitch | str | None = None,
+        maxPitch: pitch.Pitch | str | None = None,
+        *,
         alteredDegrees=None,
         includeFirst=False,
         fillMinMaxIfNone=False,
@@ -1608,13 +1631,13 @@ class IntervalNetwork:
         else:
             nodeObj = self.nodeNameToNodes(nodeId)[0]
 
-        minPitchObj: t.Optional[pitch.Pitch]
+        minPitchObj: pitch.Pitch | None
         if isinstance(minPitch, str):
             minPitchObj = pitch.Pitch(minPitch)
         else:
             minPitchObj = minPitch
 
-        maxPitchObj: t.Optional[pitch.Pitch]
+        maxPitchObj: pitch.Pitch | None
         if isinstance(maxPitch, str):
             maxPitchObj = pitch.Pitch(maxPitch)
         else:
@@ -1637,10 +1660,10 @@ class IntervalNetwork:
         if self.deterministic:
             ck = self._getCacheKey(nodeObj,
                                    pitchRef,
-                                   minPitchObj,
-                                   maxPitchObj,
-                                   includeFirst,
-                                   reverse,
+                                   minPitch=minPitchObj,
+                                   maxPitch=maxPitchObj,
+                                   includeFirst=includeFirst,
+                                   reverse=reverse,
                                    )
             if ck in self._descendingCache:
                 return self._descendingCache[ck]
@@ -1728,10 +1751,10 @@ class IntervalNetwork:
         return pre, preNodeId
 
     def realize(self,
-                pitchReference: t.Union[str, pitch.Pitch],
-                nodeId: t.Union[Node, int, Terminus, None] = None,
-                minPitch: t.Union[pitch.Pitch, str, None] = None,
-                maxPitch: t.Union[pitch.Pitch, str, None] = None,
+                pitchReference: str | pitch.Pitch,
+                nodeId: Node | int | Terminus | None = None,
+                minPitch: pitch.Pitch | str | None = None,
+                maxPitch: pitch.Pitch | str | None = None,
                 direction: Direction = Direction.ASCENDING,
                 alteredDegrees=None,
                 reverse=False):
@@ -1784,13 +1807,13 @@ class IntervalNetwork:
         if pitchRef.octave is None:
             pitchRef.octave = pitchRef.implicitOctave
 
-        minPitchObj: t.Optional[pitch.Pitch]
+        minPitchObj: pitch.Pitch | None
         if isinstance(minPitch, str):
             minPitchObj = pitch.Pitch(minPitch)
         else:
             minPitchObj = minPitch
 
-        maxPitchObj: t.Optional[pitch.Pitch]
+        maxPitchObj: pitch.Pitch | None
         if isinstance(maxPitch, str):
             maxPitchObj = pitch.Pitch(maxPitch)
         else:
@@ -1928,14 +1951,14 @@ class IntervalNetwork:
 
     def realizePitch(
         self,
-        pitchReference: t.Union[str, pitch.Pitch],
-        nodeId: t.Union[Node, int, Terminus, None] = None,
-        minPitch: t.Union[pitch.Pitch, str, None] = None,
-        maxPitch: t.Union[pitch.Pitch, str, None] = None,
+        pitchReference: str | pitch.Pitch,
+        nodeId: Node | int | Terminus | None = None,
+        minPitch: pitch.Pitch | str | None = None,
+        maxPitch: pitch.Pitch | str | None = None,
         direction: Direction = Direction.ASCENDING,
         alteredDegrees=None,
         reverse=False,
-    ) -> t.List[pitch.Pitch]:
+    ) -> list[pitch.Pitch]:
         '''
         Realize the native nodes of this network based on a pitch
         assigned to a valid `nodeId`, where `nodeId` can be specified by integer
@@ -1992,13 +2015,13 @@ class IntervalNetwork:
 
     def realizeIntervals(
         self,
-        nodeId: t.Union[Node, int, Terminus, None] = None,
-        minPitch: t.Union[pitch.Pitch, str, None] = None,
-        maxPitch: t.Union[pitch.Pitch, str, None] = None,
+        nodeId: Node | int | Terminus | None = None,
+        minPitch: pitch.Pitch | str | None = None,
+        maxPitch: pitch.Pitch | str | None = None,
         direction: Direction = Direction.ASCENDING,
         alteredDegrees=None,
         reverse=False,
-    ) -> t.List[interval.Interval]:
+    ) -> list[interval.Interval]:
         '''Realize the sequence of intervals between the specified pitches, or the termini.
 
 
@@ -2034,10 +2057,10 @@ class IntervalNetwork:
 
     def realizeTermini(
         self,
-        pitchReference: t.Union[str, pitch.Pitch],
-        nodeId: t.Union[Node, int, Terminus, None] = None,
+        pitchReference: str | pitch.Pitch,
+        nodeId: Node | int | Terminus | None = None,
         alteredDegrees=None,
-    ) -> t.Tuple[pitch.Pitch, pitch.Pitch]:
+    ) -> tuple[pitch.Pitch, pitch.Pitch]:
         '''
         Realize the pitches of the 'natural' terminus of a network. This (presently)
         must be done by ascending, and assumes only one valid terminus for both extremes.
@@ -2077,10 +2100,10 @@ class IntervalNetwork:
 
     def realizeMinMax(
         self,
-        pitchReference: t.Union[str, pitch.Pitch],
-        nodeId: t.Union[Node, int, Terminus, None] = None,
+        pitchReference: str | pitch.Pitch,
+        nodeId: Node | int | Terminus | None = None,
         alteredDegrees=None,
-    ) -> t.Tuple[pitch.Pitch, pitch.Pitch]:
+    ) -> tuple[pitch.Pitch, pitch.Pitch]:
         '''
         Realize the min and max pitches of the scale, or the min and max values
         found between two termini.
@@ -2176,11 +2199,11 @@ class IntervalNetwork:
 
     def realizePitchByDegree(
         self,
-        pitchReference: t.Union[pitch.Pitch, str],
-        nodeId: t.Union[Node, int, Terminus, None] = None,
+        pitchReference: pitch.Pitch | str,
+        nodeId: Node | int | Terminus | None = None,
         nodeDegreeTargets=(1,),
-        minPitch: t.Union[pitch.Pitch, str, None] = None,
-        maxPitch: t.Union[pitch.Pitch, str, None] = None,
+        minPitch: pitch.Pitch | str | None = None,
+        maxPitch: pitch.Pitch | str | None = None,
         direction: Direction = Direction.ASCENDING,
         alteredDegrees=None,
     ):
@@ -2307,7 +2330,6 @@ class IntervalNetwork:
         return g
 
     def plot(self,
-             *args,
              **keywords):
         '''
         Given a method and keyword configuration arguments, create and display a plot.
@@ -2333,9 +2355,10 @@ class IntervalNetwork:
 
     def getRelativeNodeId(
         self,
-        pitchReference: t.Union[pitch.Pitch, str],
-        nodeId: t.Union[Node, int, Terminus, None],
-        pitchTarget: t.Union[pitch.Pitch, note.Note, str],
+        pitchReference: pitch.Pitch | str,
+        nodeId: Node | int | Terminus | None,
+        pitchTarget: pitch.Pitch | note.Note | str,
+        *,
         comparisonAttribute: str = 'ps',
         direction: Direction = Direction.ASCENDING,
         alteredDegrees=None
@@ -2364,9 +2387,9 @@ class IntervalNetwork:
         0
         >>> net.getRelativeNodeId('a', 1, 'c#4')
         1
-        >>> net.getRelativeNodeId('a', 1, 'c4', comparisonAttribute = 'step')
+        >>> net.getRelativeNodeId('a', 1, 'c4', comparisonAttribute='step')
         1
-        >>> net.getRelativeNodeId('a', 1, 'c', comparisonAttribute = 'step')
+        >>> net.getRelativeNodeId('a', 1, 'c', comparisonAttribute='step')
         1
         >>> net.getRelativeNodeId('a', 1, 'b-4') is None
         True
@@ -2437,9 +2460,9 @@ class IntervalNetwork:
 
     def getNeighborNodeIds(
         self,
-        pitchReference: t.Union[pitch.Pitch, str],
-        nodeName: t.Union[Node, int, Terminus, None],
-        pitchTarget: t.Union[pitch.Pitch, str],
+        pitchReference: pitch.Pitch | str,
+        nodeName: Node | int | Terminus | None,
+        pitchTarget: pitch.Pitch | str,
         direction: Direction = Direction.ASCENDING,
         alteredDegrees=None,
     ):
@@ -2498,9 +2521,9 @@ class IntervalNetwork:
 
     def getRelativeNodeDegree(
         self,
-        pitchReference: t.Union[pitch.Pitch, str],
+        pitchReference: pitch.Pitch | str,
         nodeId,
-        pitchTarget: t.Union[pitch.Pitch, str],
+        pitchTarget: pitch.Pitch | str,
         comparisonAttribute='ps',
         direction: Direction = Direction.ASCENDING,
         alteredDegrees=None,
@@ -2605,8 +2628,8 @@ class IntervalNetwork:
 
     def getPitchFromNodeDegree(
         self,
-        pitchReference: t.Union[pitch.Pitch, str],
-        nodeName: t.Union[Node, int, Terminus, None],
+        pitchReference: pitch.Pitch | str,
+        nodeName: Node | int | Terminus | None,
         nodeDegreeTarget,
         direction: Direction = Direction.ASCENDING,
         minPitch=None,
@@ -2730,8 +2753,8 @@ class IntervalNetwork:
 
     @staticmethod
     def filterPitchList(
-        pitchTarget: t.Union[t.List[str], t.List[pitch.Pitch], str, pitch.Pitch]
-    ) -> t.Tuple[t.List[pitch.Pitch], pitch.Pitch, pitch.Pitch]:
+        pitchTarget: t.Union[list[str], list[pitch.Pitch], str, pitch.Pitch]
+    ) -> tuple[list[pitch.Pitch], pitch.Pitch, pitch.Pitch]:
         '''
         Given a list or one pitch, check if all are pitch objects; convert if necessary.
         Return a 3-tuple: a list of all pitches, the min value and the max value.
@@ -2757,7 +2780,7 @@ class IntervalNetwork:
 
         Changed in v8 -- staticmethod.  Raise value error on empty
         '''
-        pitchList: t.List[pitch.Pitch]
+        pitchList: list[pitch.Pitch]
         if not isinstance(pitchTarget, (list, tuple)):
             pitchObj: pitch.Pitch
             if isinstance(pitchTarget, str):
@@ -2786,7 +2809,7 @@ class IntervalNetwork:
         return pitchList, minPitch, maxPitch
 
     def match(self,
-              pitchReference: t.Union[pitch.Pitch, str],
+              pitchReference: pitch.Pitch | str,
               nodeId,
               pitchTarget,
               comparisonAttribute='pitchClass',
@@ -2862,7 +2885,7 @@ class IntervalNetwork:
         return matched, noMatch
 
     def findMissing(self,
-                    pitchReference: t.Union[pitch.Pitch, str],
+                    pitchReference: pitch.Pitch | str,
                     nodeId,
                     pitchTarget,
                     comparisonAttribute='pitchClass',
@@ -2913,7 +2936,7 @@ class IntervalNetwork:
         return post
 
 
-    _SCALE_STARTS: t.Tuple[str, ...] = (
+    _SCALE_STARTS: tuple[str, ...] = (
         'C', 'C#', 'D-',
         'D', 'D#', 'E-',
         'E', 'F',

@@ -6,7 +6,7 @@
 # Authors:      Christopher Ariza
 #
 # Copyright:    Copyright © 2003, 2010 Christopher Ariza
-#               Copyright © 2010-2012, 19 Michael Scott Asato Cuthbert and the music21 Project
+#               Copyright © 2010-2012, 19 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
@@ -15,7 +15,6 @@ objects can be created from high-level string notations, and used to generate li
 in various representation. Additional functionality is available through associated objects.
 
 The :class:`music21.sieve.Sieve` class permits generation segments in four formats.
-
 
 >>> a = sieve.Sieve('3@2|7@1')
 >>> a.segment()
@@ -55,21 +54,23 @@ The :class:`music21.sieve.PitchSieve` class provides a quick generation of
  F7, C8, E-8, F#8, C#9, E9, G9'
 
 '''
+from __future__ import annotations
+
 from ast import literal_eval
+from collections.abc import Iterable
 import copy
-from math import gcd
+from math import gcd, lcm
 import random
 import string
-import unittest
 import typing as t
+import unittest
 
-from music21 import exceptions21
-from music21 import pitch
 from music21 import common
-from music21 import interval
-from music21.common.numberTools import lcm
-
 from music21 import environment
+from music21 import exceptions21
+from music21 import interval
+from music21 import pitch
+
 environLocal = environment.Environment('sieve')
 
 
@@ -247,7 +248,7 @@ def rabinMiller(n):
 # list processing and unit interval routines
 # possible move to common.py if used elsewhere
 
-def discreteBinaryPad(series, fixRange=None):
+def discreteBinaryPad(series: Iterable[int], fixRange=None) -> list[int]:
     '''
     Treat a sequence of integers as defining contiguous binary integers,
     where provided values are 1's and excluded values are zero.
@@ -410,33 +411,6 @@ def unitNormStep(step, a=0, b=1, normalized=True):
 # ------------------------------------------------------------------------------
 # note: some of these methods are in common, though they are slightly different algorithms;
 # need to test for compatibility
-
-def _lcmRecurse(filterList):
-    '''
-    Given a list of values, find the LCM of all the values by iteratively
-    looking doing an LCM comparison to the values in the list.
-
-    >>> from music21 import sieve
-    >>> sieve._lcmRecurse([2, 3])
-    6
-    >>> sieve._lcmRecurse([2, 3, 12])
-    12
-    >>> sieve._lcmRecurse([8, 10, 3])
-    120
-    '''
-    # from
-    # http://www.oreillynet.com/cs/user/view/cs_msg/41022
-    lcmVal = 1
-    # note: timing may not be necessary
-    timer = common.Timer()
-    timer.start()
-    for i in range(len(filterList)):
-        if timer() >= 60:
-            environLocal.printDebug(['lcm timed out'])
-            lcmVal = None
-            break
-        lcmVal = lcm([lcmVal, filterList[i]])
-    return lcmVal
 
 
 def _meziriac(c1, c2):
@@ -655,7 +629,7 @@ class Residual:
         else:
             raise ResidualException(f'{segmentFormat} not a valid sieve segmentFormat string.')
 
-    def period(self):
+    def period(self) -> int:
         '''
         period is M; obvious, but nice for completeness
 
@@ -1045,7 +1019,7 @@ class Sieve:
             pass
         self._z = z  # may be none; will be handled in self._load
 
-        self._state = 'exp'  # default start state
+        self._state: t.Literal['exp', 'cmp'] = 'exp'  # default start state
         self._expType = None  # either 'simple' or 'complex'; set w/ load
         self._segmentFormat = 'int'
         self._segmentFormatOptions = ['int', 'bin', 'unit', 'wid']
@@ -1057,9 +1031,9 @@ class Sieve:
 
         # expanded, compressed form
         self._expTree = ''  # string that stores representation
-        self._expPeriod = None  # only set if called
+        self._expPeriod = -1  # only set if called
         self._cmpTree = ''  # string that stores representation
-        self._cmpPeriod = None  # only set if called; may not be same as exp
+        self._cmpPeriod = -1  # only set if called; may not be same as exp
         self._usrStr = usrStr  # store user string, may be None
         if self._usrStr is not None:
             self._load()
@@ -1114,13 +1088,13 @@ class Sieve:
         mListExp = self._resPeriodList('exp')
         mListCmp = self._resPeriodList('cmp')
         # get lcm of expanded sieves
-        lcmExp = _lcmRecurse(mListExp)
+        lcmExp = lcm(*mListExp)
         if mListExp == mListCmp:
             self._expPeriod = lcmExp
             self._cmpPeriod = lcmExp
         else:  # calculate separately
             self._expPeriod = lcmExp
-            self._cmpPeriod = _lcmRecurse(mListCmp)
+            self._cmpPeriod = lcm(*mListCmp)
 
     # --------------------------------------------------------------------------
     def expand(self):
@@ -1137,7 +1111,8 @@ class Sieve:
             self._z = z
             self._resClear('cmp')  # clear compressed residuals
             self._initCompression()  # may update self._nonCompressible
-        if self._nonCompressible:  # do not changes set
+
+        if self._nonCompressible:  # do not change state
             pass  # no compression available at this z
         else:
             self._state = 'cmp'
@@ -1410,12 +1385,12 @@ class Sieve:
                     libKeys.append(key)
             return libKeys
 
-    def _resPeriodList(self, state):
+    def _resPeriodList(self, state) -> list[int]:
         '''
         For all residual classes, get the period, or the value of M,
         and return these in a list. Remove any redundant values and sort.
         '''
-        mList = []
+        mList: list[int] = []
         for key in self._resKeys(state):
             p = self._resLib[key].period()
             if p not in mList:
@@ -1653,7 +1628,13 @@ class Sieve:
 
     # --------------------------------------------------------------------------
 
-    def segment(self, state=None, n=0, z=None, segmentFormat=None):
+    def segment(
+        self,
+        state: t.Literal['cmp'] | t.Literal['exp'] | None = None,
+        n=0,
+        z=None,
+        segmentFormat=None
+    ) -> list[int]:
         '''
         Return a sieve segment in various formats.
 
@@ -1724,7 +1705,7 @@ class Sieve:
         else:  # int, integer
             return seg
 
-    def period(self, state=None):
+    def period(self) -> int:
         '''
         Return the period of the sieve.
 
@@ -1737,25 +1718,35 @@ class Sieve:
         >>> c = sieve.Sieve('(5|2)&4&8')
         >>> c.period()
         40
+
+        Changed in v9: state is taken from the object.
         '''
         # two periods are possible; if residuals are the same
         # for both exp and cmd, only one is calculated
         # period only calculated the first time this method is called
-
-        if state is None:
-            state = self._state
         # check and see if exp has been set yet
-        if self._expPeriod is None:
+        state = self._state
+
+        if self._expPeriod == -1:
             self._initPeriod()
         if state == 'exp':
             return self._expPeriod
         elif state == 'cmp':
             return self._cmpPeriod
+        else:
+            raise ValueError('State must be exp or cmp')
 
     def __call__(self, n=0, z=None, segmentFormat=None):
         return self.segment(self._state, n, z, segmentFormat)
 
-    def collect(self, n, zMinimum, length, segmentFormat, zStep=100):
+    def collect(
+        self,
+        n: int,
+        zMinimum: int,
+        length: int,
+        segmentFormat: str,
+        zStep: int = 100
+    ) -> list[int]:
         '''
         Collect sieve segment points for the provided length and format.
 
@@ -1769,7 +1760,7 @@ class Sieve:
         #  zStep is the size of each z used to cycle through all z
         #  this seems to only work properly for float and integer sieves
 
-        found = []
+        found: list[int] = []
         p = zMinimum  # starting value
         zExtendCount = 0
         while zExtendCount < 10000:  # default max to break loops
@@ -1851,17 +1842,14 @@ class PitchSieve:
 
     def __init__(self,
                  sieveString,
-                 pitchLower=None,
-                 pitchUpper=None,
-                 pitchOrigin=None,
-                 eld: t.Union[int, float] = 1):
-        self.pitchLower = None  # 'c3'
-        self.pitchUpper = None  # 'c5' -- default ps Range
-        self.pitchOrigin = None  # pitchLower -- default
+                 pitchLower: str | None = None,
+                 pitchUpper: str | None = None,
+                 pitchOrigin: str | None = None,
+                 eld: int | float = 1):
         self.sieveString = sieveString  # logical sieve string
 
         # should be in a try block
-        self.sieveObject = Sieve(self.sieveString)
+        self.sieveObject: Sieve = Sieve(self.sieveString)
 
         if pitchLower is not None:
             self.pitchLower = pitch.Pitch(pitchLower)
@@ -1948,7 +1936,7 @@ class PitchSieve:
                     sieveSeg.append(p)
         return sieveSeg
 
-    def getIntervalSequence(self):
+    def getIntervalSequence(self) -> list[interval.Interval]:
         '''
         Return a list of Interval objects that defines the complete structure
         of this :class:`music21.sieve.Sieve`.
@@ -1983,12 +1971,14 @@ class PitchSieve:
          <music21.interval.Interval m2>]
         '''
         # get a z for the complete period
-#         try:
-#             z = range(self.sieveObject.period() + 1)
-#         except (OverflowError, MemoryError):
-#             environLocal.printDebug('failed to generates a z with period:',
-#                    self.sieveObject.period())
+        # try:
+        #     z = range(self.sieveObject.period() + 1)
+        # except (OverflowError, MemoryError):
+        #     environLocal.printDebug('failed to generate a z with period:',
+        #            self.sieveObject.period())
         p = self.sieveObject.period()
+
+        z: list[int] | None
         if p < 999999999:
             z = list(range(p + 1))
         else:  # too big to get z as list of values
@@ -1998,7 +1988,7 @@ class PitchSieve:
         # note that the shift here might not always be zero
         widthSegments = self.sieveObject(0, z, segmentFormat='wid')
 
-        post = []
+        post: list[interval.Interval] = []
         # value = 0
         for i, width in enumerate(widthSegments):
             # environLocal.printDebug(['stepStart', stepStart, 'stepEnd', stepEnd])
@@ -2010,22 +2000,22 @@ class PitchSieve:
         return post
 
         # integer steps have no eld
-#         integerSteps = self.sieveObject(0, z, format='int')
-#
-#         post = []
-#         for i, step in enumerate(integerSteps):
-#             stepStart = step
-#             if i < len(integerSteps) - 1:
-#                 stepEnd = integerSteps[i + 1]
-#             else:
-#                 break
-#             # environLocal.printDebug(['stepStart', stepStart, 'stepEnd', stepEnd])
-#             intervalObj = interval.Interval(stepEnd-stepStart)
-#             post.append(intervalObj)
-#
-#         if len(post) == 0:
-#             raise PitchSieveException('interval segment has no values')
-#         return post
+        # integerSteps = self.sieveObject(0, z, format='int')
+        #
+        # post = []
+        # for i, step in enumerate(integerSteps):
+        #     stepStart = step
+        #     if i < len(integerSteps) - 1:
+        #         stepEnd = integerSteps[i + 1]
+        #     else:
+        #         break
+        #     # environLocal.printDebug(['stepStart', stepStart, 'stepEnd', stepEnd])
+        #     intervalObj = interval.Interval(stepEnd-stepStart)
+        #     post.append(intervalObj)
+        #
+        # if len(post) == 0:
+        #     raise PitchSieveException('interval segment has no values')
+        # return post
 
 
 # ------------------------------------------------------------------------------
@@ -2155,7 +2145,7 @@ class Test(unittest.TestCase):
 
 # ------------------------------------------------------------------------------
 # define presented order in documentation
-_DOC_ORDER: t.List[type] = []
+_DOC_ORDER: list[type] = []
 
 if __name__ == '__main__':
     import music21

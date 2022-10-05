@@ -8,7 +8,6 @@
 #               Evan Lynch
 #
 # Copyright:    Copyright © 2009-2022 Michael Scott Asato Cuthbert,
-#               and the music21 Project
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
@@ -17,30 +16,30 @@ Object definitions for graphing and plotting :class:`~music21.stream.Stream` obj
 The :class:`~music21.graph.primitives.Graph` object subclasses primitive,
 abstract fundamental graphing archetypes using the matplotlib library.
 
-From highest level to lowest level usage, ways of graphing are as follows:
+From the highest level to the lowest level of usage, ways of graphing are as follows:
 
     1. streamObj.plot('graphName')
     2. graph.plot.Class(streamObj).run()
     3. plotter = graph.primitives.Class(); plotter.data = ...; plotter.process()
     4. Use matplotlib directly to create your graph.
 '''
+from __future__ import annotations
+
 import math
 import random
 import unittest
-import typing as t
 
 from music21 import common
+from music21.converter.subConverters import SubConverter
+from music21 import environment
 from music21.graph.utilities import (getExtendedModules,
                                      GraphException,
                                      getColor,
                                      accidentalLabelToUnicode,
                                      )
 from music21 import prebase
-from music21.converter.subConverters import SubConverter
 
-from music21 import environment
 environLocal = environment.Environment('graph.primitives')
-
 
 # ------------------------------------------------------------------------------
 class Graph(prebase.ProtoM21Object):
@@ -78,7 +77,7 @@ class Graph(prebase.ProtoM21Object):
     unlikely that users will call this class directly.
 
     The `doneAction` argument determines what happens after the graph
-    has been processed. Currently there are three options, 'write' creates
+    has been processed. Currently, there are three options, 'write' creates
     a file on disk (this is the default), while 'show' opens an
     interactive GUI browser.  The
     third option, None, does the processing but does not write any output.
@@ -98,10 +97,10 @@ class Graph(prebase.ProtoM21Object):
     'genericGraph'
     '''
     graphType = 'genericGraph'
-    axisKeys: t.Tuple[str, ...] = ('x', 'y')
-    figureSizeDefault: t.Tuple[t.Union[int, float], ...] = (6, 6)
+    axisKeys: tuple[str, ...] = ('x', 'y')
+    figureSizeDefault: tuple[int | float, ...] = (6, 6)
 
-    keywordConfigurables: t.Tuple[str, ...] = (
+    keywordConfigurables: tuple[str, ...] = (
         'alpha',
         'colorBackgroundData',
         'colorBackgroundFigure',
@@ -125,7 +124,7 @@ class Graph(prebase.ProtoM21Object):
         'xTickLabelVerticalAlignment',
     )
 
-    def __init__(self, *args, **keywords):
+    def __init__(self, **keywords):
         extm = getExtendedModules()
         self.plt = extm.plt  # wrapper to matplotlib.pyplot
 
@@ -590,7 +589,7 @@ class GraphNetworkxGraph(Graph):
     #
     # .. image:: images/GraphNetworkxGraph.*
     #     :width: 600
-    _DOC_ATTR: t.Dict[str, str] = {
+    _DOC_ATTR: dict[str, str] = {
         'networkxGraph': '''An instance of a networkx graph object.''',
         'hideLeftBottomSpines': 'bool to hide the left and bottom axis spines; default True',
     }
@@ -600,11 +599,11 @@ class GraphNetworkxGraph(Graph):
         'networkxGraph', 'hideLeftBottomSpines',
     )
 
-    def __init__(self, *args, **keywords):
+    def __init__(self, **keywords):
         self.networkxGraph = None
         self.hideLeftBottomSpines = True
 
-        super().__init__(*args, **keywords)
+        super().__init__(**keywords)
 
         extm = getExtendedModules()
 
@@ -687,7 +686,7 @@ class GraphColorGrid(Graph):
     .. image:: images/GraphColorGrid.*
         :width: 600
     '''
-    _DOC_ATTR: t.Dict[str, str] = {
+    _DOC_ATTR: dict[str, str] = {
         'hideLeftBottomSpines': 'bool to hide the left and bottom axis spines; default True',
     }
 
@@ -695,9 +694,9 @@ class GraphColorGrid(Graph):
     figureSizeDefault = (9, 6)
     keywordConfigurables = Graph.keywordConfigurables + ('hideLeftBottomSpines',)
 
-    def __init__(self, *args, **keywords):
+    def __init__(self, **keywords):
         self.hideLeftBottomSpines = True
-        super().__init__(*args, **keywords)
+        super().__init__(**keywords)
 
     def renderSubplot(self, subplot):  # do not need a grid for the outer container
 
@@ -794,7 +793,7 @@ class GraphColorGridLegend(Graph):
         :width: 600
 
     '''
-    _DOC_ATTR: t.Dict[str, str] = {
+    _DOC_ATTR: dict[str, str] = {
         'hideLeftBottomSpines': 'bool to hide the left and bottom axis spines; default True',
     }
 
@@ -802,10 +801,10 @@ class GraphColorGridLegend(Graph):
     figureSizeDefault = (5, 1.5)
     keywordConfigurables = Graph.keywordConfigurables + ('hideLeftBottomSpines',)
 
-    def __init__(self, *args, **keywords):
+    def __init__(self, **keywords):
         self.hideLeftBottomSpines = True
 
-        super().__init__(*args, **keywords)
+        super().__init__(**keywords)
 
         if 'title' not in keywords:
             self.title = 'Legend'
@@ -852,7 +851,7 @@ class GraphColorGridLegend(Graph):
         >>> fig = matplotlib.pyplot.figure()
         >>> subplot = colorLegend.makeOneRowOfGraph(fig, 0, 'Scriabin Mapping', rowData)
         >>> subplot
-        <AxesSubplot:>
+        <AxesSubplot: >
         '''
         # environLocal.printDebug(['rowLabel', rowLabel, i])
 
@@ -954,7 +953,7 @@ class GraphHorizontalBar(Graph):
         `('', [], {})`
 
     '''
-    _DOC_ATTR: t.Dict[str, str] = {
+    _DOC_ATTR: dict[str, str] = {
         'barSpace': 'Amount of vertical space each bar takes; default 8',
         'margin': '''
             Vertical space above and below the bars, default 2 (= total4 space between bars)
@@ -968,11 +967,11 @@ class GraphHorizontalBar(Graph):
         'margin',
     )
 
-    def __init__(self, *args, **keywords):
+    def __init__(self, **keywords):
         self.barSpace = 8
         self.margin = 2
 
-        super().__init__(*args, **keywords)
+        super().__init__(**keywords)
 
         if 'alpha' not in keywords:
             self.alpha = 0.6
@@ -1005,7 +1004,7 @@ class GraphHorizontalBar(Graph):
 
             if points:
                 uniformFormatPerRow = (len(points[0]) == 2)
-                rowFaceColors: t.Union[str, t.List[str]]
+                rowFaceColors: str | list[str]
                 if uniformFormatPerRow:
                     rowFaceColors = faceColor
                     positionPoints = points
@@ -1064,7 +1063,7 @@ class GraphHorizontalBarWeighted(Graph):
     can have different heights and colors within their
     respective channel.
     '''
-    _DOC_ATTR: t.Dict[str, str] = {
+    _DOC_ATTR: dict[str, str] = {
         'barSpace': 'Amount of vertical space each bar takes; default 8',
         'margin': 'Space around the bars, default 2',
     }
@@ -1077,11 +1076,11 @@ class GraphHorizontalBarWeighted(Graph):
         'margin',
     )
 
-    def __init__(self, *args, **keywords):
+    def __init__(self, **keywords):
         self.barSpace = 8
         self.margin = 0.25  # was 8; determines space between channels
 
-        super().__init__(*args, **keywords)
+        super().__init__(**keywords)
 
         # this default alpha is used if not specified per bar
         if 'alpha' not in keywords:
@@ -1210,7 +1209,7 @@ class GraphScatterWeighted(Graph):
         :width: 600
 
     '''
-    _DOC_ATTR: t.Dict[str, str] = {
+    _DOC_ATTR: dict[str, str] = {
         'maxDiameter': 'the maximum diameter of any ellipse, default 1.25',
         'minDiameter': 'the minimum diameter of any ellipse, default 0.25',
     }
@@ -1220,11 +1219,11 @@ class GraphScatterWeighted(Graph):
 
     keywordConfigurables = Graph.keywordConfigurables + ('maxDiameter', 'minDiameter')
 
-    def __init__(self, *args, **keywords):
+    def __init__(self, **keywords):
         self.maxDiameter = 1.25
         self.minDiameter = 0.25
 
-        super().__init__(*args, **keywords)
+        super().__init__(**keywords)
 
         if 'alpha' not in keywords:
             self.alpha = 0.6
@@ -1411,7 +1410,7 @@ class GraphHistogram(Graph):
     .. image:: images/GraphHistogram.*
         :width: 600
     '''
-    _DOC_ATTR: t.Dict[str, str] = {
+    _DOC_ATTR: dict[str, str] = {
         'binWidth': '''
             Size of each bin; if the bins are equally spaced at intervals of 1,
             then 0.8 is a good default to allow a little space. 1.0 will give no
@@ -1422,12 +1421,9 @@ class GraphHistogram(Graph):
     graphType = 'histogram'
     keywordConfigurables = Graph.keywordConfigurables + ('binWidth',)
 
-    def __init__(self, *args, **keywords):
-        self.binWidth = 0.8
-        super().__init__(*args, **keywords)
-
-        if 'alpha' not in keywords:
-            self.alpha = 0.8
+    def __init__(self, *, binWidth: float = 0.8, alpha: float = 0.8, **keywords):
+        self.binWidth = binWidth
+        super().__init__(alpha=alpha, **keywords)
 
     def renderSubplot(self, subplot):
         self.figure.subplots_adjust(left=0.15)
@@ -1472,12 +1468,12 @@ class GraphGroupedVerticalBar(Graph):
     keywordConfigurables = Graph.keywordConfigurables + (
         'binWidth', 'roundDigits', 'groupLabelHeight',)
 
-    def __init__(self, *args, **keywords):
+    def __init__(self, **keywords):
         self.binWidth = 1
         self.roundDigits = 1
         self.groupLabelHeight = 0.0
 
-        super().__init__(*args, **keywords)
+        super().__init__(**keywords)
 
     def labelBars(self, subplot, rects):
         # attach some text labels
@@ -1570,10 +1566,8 @@ class Graph3DBars(Graph):
     graphType = '3DBars'
     axisKeys = ('x', 'y', 'z')
 
-    def __init__(self, *args, **keywords):
-        super().__init__(*args, **keywords)
-        if 'alpha' not in keywords:
-            self.alpha = 0.8
+    def __init__(self, *, alpha: float = 0.8, **keywords):
+        super().__init__(alpha=alpha, **keywords)
         if 'colors' not in keywords:
             self.colors = ['#ff0000', '#00ff00', '#6666ff']
 
@@ -1652,29 +1646,8 @@ class Graph3DBars(Graph):
 class Test(unittest.TestCase):
 
     def testCopyAndDeepcopy(self):
-        '''
-        Test copying all objects defined in this module
-        '''
-        import copy
-        import sys
-        import types
-        for part in sys.modules[self.__module__].__dict__:
-            match = False
-            for skip in ['_', '__', 'Test', 'Exception']:
-                if part.startswith(skip) or part.endswith(skip):
-                    match = True
-            if match:
-                continue
-            name = getattr(sys.modules[self.__module__], part)
-            # noinspection PyTypeChecker
-            if callable(name) and not isinstance(name, types.FunctionType):
-                try:  # see if obj can be made w/ args
-                    obj = name()
-                except TypeError:
-                    continue
-                unused_a = copy.copy(obj)
-                unused_b = copy.deepcopy(obj)
-
+        from music21.test.commonTest import testCopyAll
+        testCopyAll(self, globals())
 
 # ------------------------------------------------------------------------------
 class TestExternal(unittest.TestCase):
@@ -1884,4 +1857,3 @@ class TestExternal(unittest.TestCase):
 if __name__ == '__main__':
     import music21
     music21.mainTest(Test)  # , runTest='testPlot3DPitchSpaceQuarterLengthCount')
-

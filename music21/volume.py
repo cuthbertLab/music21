@@ -8,26 +8,28 @@
 #               Michael Scott Asato Cuthbert
 #
 # Copyright:    Copyright © 2011-2012, 2015, 2017
-#               Michael Scott Asato Cuthbert and the music21 Project
+#               Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
 This module defines the object model of Volume, covering all representation of
 amplitude, volume, velocity, and related parameters.
 '''
+from __future__ import annotations
+
+from collections.abc import Iterable
 import typing as t
 import unittest
-
 
 from music21 import articulations
 from music21 import exceptions21
 from music21 import common
 from music21.common.objects import SlottedObjectMixin
 from music21 import dynamics
+from music21 import environment
 from music21 import prebase
 from music21 import note  # circular but acceptable, because not used at highest level.
 
-from music21 import environment
 environLocal = environment.Environment('volume')
 
 
@@ -133,11 +135,11 @@ class Volume(prebase.ProtoM21Object, SlottedObjectMixin):
             self.velocityIsRelative = other.velocityIsRelative
 
     def getRealizedStr(self,
-                       useDynamicContext: t.Union[dynamics.Dynamic, bool] = True,
+                       useDynamicContext: dynamics.Dynamic | bool = True,
                        useVelocity=True,
                        useArticulations: t.Union[bool,
                                                  articulations.Articulation,
-                                                 t.Iterable[articulations.Articulation]
+                                                 Iterable[articulations.Articulation]
                                                  ] = True,
                        baseLevel=0.5,
                        clip=True):
@@ -157,10 +159,10 @@ class Volume(prebase.ProtoM21Object, SlottedObjectMixin):
 
     def getRealized(
         self,
-        useDynamicContext: t.Union[bool, dynamics.Dynamic] = True,
+        useDynamicContext: bool | dynamics.Dynamic = True,
         useVelocity=True,
         useArticulations: t.Union[
-            bool, articulations.Articulation, t.Iterable[articulations.Articulation]
+            bool, articulations.Articulation, Iterable[articulations.Articulation]
         ] = True,
         baseLevel=0.5,
         clip=True,
@@ -262,7 +264,7 @@ class Volume(prebase.ProtoM21Object, SlottedObjectMixin):
             # useArticulations can be a list of 1 or more articulation objects
             # as well as True/False
             if useArticulations is not False:
-                am: t.Iterable[articulations.Articulation]
+                am: Iterable[articulations.Articulation]
                 if isinstance(useArticulations, articulations.Articulation):
                     am = [useArticulations]  # place in a list
                 elif common.isIterable(useArticulations):
@@ -752,7 +754,7 @@ class Test(unittest.TestCase):
 
 # ------------------------------------------------------------------------------
 # define presented order in documentation
-_DOC_ORDER: t.List[type] = []
+_DOC_ORDER: list[type] = []
 
 
 if __name__ == '__main__':

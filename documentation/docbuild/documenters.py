@@ -7,15 +7,15 @@
 #               Christopher Ariza
 #               Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2013-17 Michael Scott Asato Cuthbert and the music21 Project
+# Copyright:    Copyright © 2013-17 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # -----------------------------------------------------------------------------
+from __future__ import annotations
 
 import builtins
 import inspect
 import re
 import types
-import typing as t
 import unittest
 
 from music21 import common
@@ -83,7 +83,7 @@ class ObjectDocumenter(Documenter):
     Base class for object documenting sub-classes. such as ClassDocumenter
     '''
 
-    _DOC_ATTR: t.Dict[str, str] = {
+    _DOC_ATTR: dict[str, str] = {
         'referent':
             ''''
             The object being documented.
@@ -103,7 +103,7 @@ class ObjectDocumenter(Documenter):
         return ''
 
     @property
-    def rstAutodocDirectiveFormat(self) -> t.List[str]:
+    def rstAutodocDirectiveFormat(self) -> list[str]:
         return []
 
     @property
@@ -174,7 +174,7 @@ class FunctionDocumenter(ObjectDocumenter):
         return path.replace('.__init__', '')
 
     @property
-    def rstAutodocDirectiveFormat(self) -> t.List[str]:
+    def rstAutodocDirectiveFormat(self) -> list[str]:
         '''
         >>> function = common.opFrac
         >>> documenter = FunctionDocumenter(function)
@@ -193,7 +193,7 @@ class MemberDocumenter(ObjectDocumenter):
     '''
     Abstract base class for documenting class members such as Methods and Attributes and Properties
     '''
-    _DOC_ATTR: t.Dict[str, str] = {
+    _DOC_ATTR: dict[str, str] = {
         'memberName': 'the short name of the member, for instance "mode"',
         'referent': '''the attribute or method itself, such as (no quotes)
                        key.KeySignature.mode''',
@@ -393,6 +393,7 @@ class ClassDocumenter(ObjectDocumenter):
        - :attr:`~music21.base.Music21Object.classSortOrder`
        - :attr:`~music21.base.Music21Object.groups`
        - :attr:`~music21.base.Music21Object.isStream`
+       - :attr:`~music21.base.Music21Object.sites`
     '''
 
     # CLASS VARIABLES #
@@ -438,7 +439,7 @@ class ClassDocumenter(ObjectDocumenter):
         find all attributes in self.referent and set classes appropriately.
         '''
 
-        attrs: t.List[inspect.Attribute] = inspect.classify_class_attrs(self.referent)
+        attrs: list[inspect.Attribute] = inspect.classify_class_attrs(self.referent)
         for attr in attrs:
             self.findOneAttribute(attr)
 
@@ -1056,6 +1057,7 @@ class ClassDocumenter(ObjectDocumenter):
         ''
         '   - :attr:`~music21.note.GeneralNote.lyric`'
         '   - :attr:`~music21.note.GeneralNote.pitches`'
+        '   - :attr:`~music21.note.GeneralNote.tie`'
         ''
         'Read/write properties inherited from :class:`~music21.base.Music21Object`:'
         ''

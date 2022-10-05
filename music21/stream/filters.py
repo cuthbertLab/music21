@@ -6,7 +6,7 @@
 # Authors:      Michael Scott Asato Cuthbert
 #               Christopher Ariza
 #
-# Copyright:    Copyright © 2008-2017 Michael Scott Asato Cuthbert and the music21 Project
+# Copyright:    Copyright © 2008-2017 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # -----------------------------------------------------------------------------
 '''
@@ -16,10 +16,11 @@ decide whether a given element matches the list of elements that are being
 filtered.  Filters are used by methods on streams such as
 :meth:`~music21.stream.Stream.getElementsByClass` to filter elements by classes.
 '''
-# import inspect
-import unittest
+from __future__ import annotations
+
 from math import inf
 import typing as t
+import unittest
 
 from music21 import common
 from music21.common.numberTools import opFrac
@@ -73,7 +74,7 @@ class StreamFilter(prebase.ProtoM21Object):
     def reset(self):
         pass
 
-    def __call__(self, item, iterator: t.Optional[StreamIteratorType] = None):
+    def __call__(self, item, iterator: StreamIteratorType | None = None):
         return True
 
 class IsFilter(StreamFilter):

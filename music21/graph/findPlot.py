@@ -7,12 +7,13 @@
 #               Christopher Ariza
 #
 # Copyright:    Copyright © 2017-22 Michael Scott Asato Cuthbert
-#               and the music21 Project
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
 Functions that find appropriate plots for graph.plot.
 '''
+from __future__ import annotations
+
 import collections
 import types
 import unittest
@@ -23,7 +24,7 @@ from music21.graph import plot
 from music21.graph import primitives
 
 # shortcuts that get a PlotClass directly
-PLOTCLASS_SHORTCUTS = {
+PLOTCLASS_SHORTCUTS: dict[str, type[plot.PlotStreamMixin]] = {
     'ambitus': plot.WindowedAmbitus,
     'dolan': plot.Dolan,
     'instruments': plot.Dolan,
@@ -33,7 +34,7 @@ PLOTCLASS_SHORTCUTS = {
 
 
 # all formats need to be here, and first for each row must match a graphType.
-FORMAT_SYNONYMS: t.List[t.Tuple[str, ...]] = [
+FORMAT_SYNONYMS: list[tuple[str, ...]] = [
     ('horizontalbar', 'bar', 'horizontal', 'pianoroll', 'piano'),
     ('histogram', 'histo', 'count'),
     ('scatter', 'point'),
@@ -47,7 +48,7 @@ FORMAT_SYNONYMS: t.List[t.Tuple[str, ...]] = [
 FORMATS = [syn[0] for syn in FORMAT_SYNONYMS]
 
 
-def getPlotClasses():
+def getPlotClasses() -> list[type[plot.PlotStreamMixin]]:
     '''
     return a list of all PlotStreamMixin subclasses...  returns sorted list by name
 
@@ -59,7 +60,7 @@ def getPlotClasses():
      <class 'music21.graph.plot.HistogramPitchSpace'>,
      ...]
     '''
-    allPlot = []
+    allPlot: list[type[plot.PlotStreamMixin]] = []
     for i in sorted(plot.__dict__):
         name = getattr(plot, i)
         # noinspection PyTypeChecker
@@ -68,11 +69,11 @@ def getPlotClasses():
                 and hasattr(name, '__mro__')
                 and plot.PlotStreamMixin in name.__mro__
                 and primitives.Graph in name.__mro__):
-            allPlot.append(name)
+            allPlot.append(t.cast(type[plot.PlotStreamMixin], name))
     return allPlot
 
 
-def getAxisClasses() -> t.List[t.Type[axis.Axis]]:
+def getAxisClasses() -> list[type[axis.Axis]]:
     '''
     return a list of all Axis subclasses...  returns sorted list by name
 
@@ -83,7 +84,7 @@ def getAxisClasses() -> t.List[t.Type[axis.Axis]]:
      <class 'music21.graph.axis.OffsetAxis'>,
      ...]
     '''
-    allAxis: t.List[t.Type[axis.Axis]] = []
+    allAxis: list[type[axis.Axis]] = []
     for i in sorted(axis.__dict__):
         name = getattr(axis, i)
         if (callable(name)
@@ -181,7 +182,7 @@ def getPlotClassesFromFormat(graphFormat, checkPlotClasses=None):
     return filteredPlots
 
 
-def getAxisClassFromValue(axisValue: str) -> t.Optional[t.Type[axis.Axis]]:
+def getAxisClassFromValue(axisValue: str) -> type[axis.Axis] | None:
     '''
     given an axis value return the single best axis for the value, or None
 
@@ -204,7 +205,8 @@ def getAxisClassFromValue(axisValue: str) -> t.Optional[t.Type[axis.Axis]]:
     return None
 
 
-def axisMatchesValue(axisClass: t.Union[t.Type[axis.Axis], axis.Axis], axisValue: str) -> bool:
+def axisMatchesValue(axisClass: type[axis.Axis] | axis.Axis,
+                     axisValue: str) -> bool:
     '''
     Returns Bool about whether axisValue.lower() is anywhere in axisClass.quantities
 
@@ -235,7 +237,7 @@ def axisMatchesValue(axisClass: t.Union[t.Type[axis.Axis], axis.Axis], axisValue
     return False
 
 
-def getPlotsToMake(graphFormat=None,
+def getPlotsToMake(graphFormat: str | None = None,
                    xValue=None,
                    yValue=None,
                    zValue=None):
@@ -332,6 +334,7 @@ def getPlotsToMake(graphFormat=None,
     if [graphFormat, xValue, yValue, zValue] == [None] * 4:
         graphFormat = 'pianoroll'
 
+    graphClasses: list[type[plot.PlotStreamMixin]]
     if graphFormat in PLOTCLASS_SHORTCUTS:
         graphClasses = [PLOTCLASS_SHORTCUTS[graphFormat]]
     else:

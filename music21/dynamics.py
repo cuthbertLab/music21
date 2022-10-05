@@ -6,24 +6,24 @@
 # Authors:      Michael Scott Asato Cuthbert
 #               Christopher Ariza
 #
-# Copyright:    Copyright © 2009-2022 Michael Scott Asato Cuthbert and the music21 Project
+# Copyright:    Copyright © 2009-2022 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
-
 '''
 Classes and functions for creating and manipulating dynamic symbols. Rather than
 subclasses, the :class:`~music21.dynamics.Dynamic` object is often specialized by parameters.
 '''
-import typing as t
+from __future__ import annotations
+
 import unittest
 
 from music21 import base
-from music21 import exceptions21
 from music21 import common
+from music21 import environment
+from music21 import exceptions21
 from music21 import spanner
 from music21 import style
 
-from music21 import environment
 environLocal = environment.Environment('dynamics')
 
 
@@ -194,7 +194,7 @@ class Dynamic(base.Music21Object):
     _styleClass = style.TextStyle
 
     _DOC_ORDER = ['longName', 'englishName']
-    _DOC_ATTR: t.Dict[str, str] = {
+    _DOC_ATTR: dict[str, str] = {
         'longName': r'''
             the name of this dynamic in Italian.
 
@@ -355,11 +355,12 @@ class Dynamic(base.Music21Object):
 
 # ------------------------------------------------------------------------------
 class DynamicWedge(spanner.Spanner):
-    '''Common base-class for Crescendo and Diminuendo.
+    '''
+    Common base-class for Crescendo and Diminuendo.
     '''
 
-    def __init__(self, *arguments, **keywords):
-        super().__init__(*arguments, **keywords)
+    def __init__(self, *spannedElements, **keywords):
+        super().__init__(*spannedElements, **keywords)
 
         self.type = None  # crescendo or diminuendo
         self.placement = 'below'  # can above or below, after musicxml
@@ -368,9 +369,9 @@ class DynamicWedge(spanner.Spanner):
 
 
 class Crescendo(DynamicWedge):
-    '''A spanner crescendo wedge.
+    '''
+    A spanner crescendo wedge.
 
-    >>> from music21 import dynamics
     >>> d = dynamics.Crescendo()
     >>> d.spread
     15
@@ -381,23 +382,23 @@ class Crescendo(DynamicWedge):
     'crescendo'
     '''
 
-    def __init__(self, *arguments, **keywords):
-        super().__init__(*arguments, **keywords)
+    def __init__(self, *spannedElements, **keywords):
+        super().__init__(*spannedElements, **keywords)
         self.type = 'crescendo'
 
 
 class Diminuendo(DynamicWedge):
-    '''A spanner diminuendo wedge.
+    '''
+    A spanner diminuendo wedge.
 
-    >>> from music21 import dynamics
     >>> d = dynamics.Diminuendo()
     >>> d.spread = 20
     >>> d.spread
     20
     '''
 
-    def __init__(self, *arguments, **keywords):
-        super().__init__(*arguments, **keywords)
+    def __init__(self, *spannedElements, **keywords):
+        super().__init__(*spannedElements, **keywords)
         self.type = 'diminuendo'
 
 # ------------------------------------------------------------------------------
@@ -412,7 +413,8 @@ class TestExternal(unittest.TestCase):
             a.show()
 
     def testBasic(self):
-        '''present each dynamic in a single measure
+        '''
+        present each dynamic in a single measure
         '''
         from music21 import stream
         a = stream.Stream()
@@ -429,27 +431,8 @@ class TestExternal(unittest.TestCase):
 class Test(unittest.TestCase):
 
     def testCopyAndDeepcopy(self):
-        '''Test copying all objects defined in this module
-        '''
-        import copy
-        import sys
-        import types
-        for part in sys.modules[self.__module__].__dict__:
-            match = False
-            for skip in ['_', '__', 'Test', 'Exception']:
-                if part.startswith(skip) or part.endswith(skip):
-                    match = True
-            if match:
-                continue
-            name = getattr(sys.modules[self.__module__], part)
-            # noinspection PyTypeChecker
-            if callable(name) and not isinstance(name, types.FunctionType):
-                try:  # see if obj can be made w/ args
-                    obj = name()
-                except TypeError:
-                    continue
-                unused_a = copy.copy(obj)
-                unused_b = copy.deepcopy(obj)
+        from music21.test.commonTest import testCopyAll
+        testCopyAll(self, globals())
 
     def testBasic(self):
         noDyn = Dynamic()
@@ -511,7 +494,6 @@ class Test(unittest.TestCase):
                 d = Dynamic('mf')
                 d.style.absoluteY = 20
                 m.insert(o, d)
-
         # s.show()
 
 
@@ -522,4 +504,3 @@ _DOC_ORDER = [Dynamic, dynamicStrFromDecimal]
 if __name__ == '__main__':
     import music21
     music21.mainTest(Test)
-

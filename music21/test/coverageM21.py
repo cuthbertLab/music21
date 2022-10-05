@@ -6,22 +6,19 @@
 # Authors:      Christopher Ariza
 #               Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2014-15 Michael Scott Asato Cuthbert and the music21 Project
+# Copyright:    Copyright © 2014-15 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
+from __future__ import annotations
+
 import sys
 
 omit_modules = [
-    'music21/ext/*',
     'dist/dist.py',
-    'installer.py',
-    'music21/documentation/upload.py',
-    'music21/documentation/make.py',
     'music21/test/*',
-    'music21/demos/*',  # maybe remove someday...
     'music21/configure.py',
     'music21/figuredBass/examples.py',
-    'music21/alpha/*',  # trecento/tonality.py'
+    'music21/alpha/*',
 ]
 
 # THESE ARE NOT RELEVANT FOR coveralls.io -- edit .coveragerc to change that
@@ -31,6 +28,8 @@ exclude_lines = [
     r'.*#\s*pragma:\s*no cover.*',
     r'class TestExternal.*',
     r'class TestSlow.*',
+    r'\s*if TYPE_CHECKING:\s*',
+    r'\s*if t.TYPE_CHECKING:\s*',
 ]
 
 
@@ -41,17 +40,16 @@ def getCoverage(overrideVersion=False):
     # (The odds of a failure on the middle version are low if
     # the newest and oldest are passing)
     #
-    # Note the .minor == 9 -- that makes it only run on 3.9
-    # run on Py 3.9 -- to get Py 3.8/3.10 timing...
+    # Note the .minor == 10 -- that makes it only run on 3.10.6
     #
     # When changing the version, be sure also to change
     # .github/maincheck.yml's line:
-    #           if: ${{ matrix.python-version == '3.9' }}
-    if overrideVersion or sys.version_info.minor == 9:
+    #           if: ${{ matrix.python-version == '3.10' }}
+    if overrideVersion or (sys.version_info.minor == 10 and sys.version_info.micro == 6):
         try:
             # noinspection PyPackageRequirements
             import coverage  # type: ignore
-            cov = coverage.Coverage(omit=omit_modules)
+            cov = coverage.Coverage(omit=omit_modules)  # , debug='trace')
             for e in exclude_lines:
                 cov.exclude(e, which='exclude')
             cov.start()

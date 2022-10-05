@@ -5,22 +5,24 @@
 #
 # Authors:      Christopher Ariza
 #
-# Copyright:    Copyright © 2009-2010 Michael Scott Asato Cuthbert and the music21 Project
+# Copyright:    Copyright © 2009-2010 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
 Various tools and utilities to find correlations between disparate objects in a Stream.
 '''
-import unittest
+from __future__ import annotations
+
 from collections import OrderedDict
+import unittest
 
 from music21 import exceptions21
 
 from music21 import note
 from music21 import chord
 from music21 import dynamics
-
 from music21 import environment
+
 environLocal = environment.Environment('analysis.correlate')
 
 
@@ -182,32 +184,8 @@ class ActivityMatch:
 class Test(unittest.TestCase):
 
     def testCopyAndDeepcopy(self):
-        '''
-        Test copying all objects defined in this module
-        '''
-        import copy
-        import sys
-        import types
-
-        for part in sys.modules[self.__module__].__dict__:
-            match = False
-            for skip in ['_', '__', 'Test', 'Exception']:
-                if part.startswith(skip) or part.endswith(skip):
-                    match = True
-            if match:
-                continue
-            name = getattr(sys.modules[self.__module__], part)
-
-            # noinspection PyTypeChecker
-            if callable(name) and not isinstance(name, types.FunctionType):
-                try:  # see if obj can be made w/ args
-                    obj = name()
-                except TypeError:
-                    continue
-                dummy_a = copy.copy(obj)
-                dummy_b = copy.deepcopy(obj)
-
-
+        from music21.test.commonTest import testCopyAll
+        testCopyAll(self, globals())
 
     def testActivityMatchPitchToDynamic(self):
         from music21 import corpus

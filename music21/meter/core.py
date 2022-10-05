@@ -7,15 +7,15 @@
 #               Michael Scott Asato Cuthbert
 #
 # Copyright:    Copyright © 2009-2022 Michael Scott Asato Cuthbert
-#               and the music21 Project
 # License:      BSD, see license.txt
 # -----------------------------------------------------------------------------
 '''
 This module defines two component objects for defining nested metrical structures:
 :class:`~music21.meter.core.MeterTerminal` and :class:`~music21.meter.core.MeterSequence`.
 '''
+from __future__ import annotations
+
 import copy
-import typing as t
 
 from music21 import prebase
 from music21.common.numberTools import opFrac
@@ -56,7 +56,7 @@ class MeterTerminal(prebase.ProtoM21Object, SlottedObjectMixin):
     )
 
     # INITIALIZER #
-    def __init__(self, slashNotation: t.Optional[str] = None, weight=1):
+    def __init__(self, slashNotation: str | None = None, weight=1):
         # because of how they are copied, MeterTerminals must not have any
         # initialization parameters without defaults
         self._duration = None
@@ -112,7 +112,6 @@ class MeterTerminal(prebase.ProtoM21Object, SlottedObjectMixin):
         Compare the numerator and denominator of another object.
         Note that these have to be exact matches; 3/4 is not the same as 6/8
 
-        >>> from music21 import meter
         >>> a = meter.MeterTerminal('3/4')
         >>> b = meter.MeterTerminal('6/4')
         >>> c = meter.MeterTerminal('2/4')
@@ -1163,7 +1162,7 @@ class MeterSequence(MeterTerminal):
             #    'created MeterSequence from MeterTerminal; old weight, new weight',
             #    value.weight, self.weight])
 
-        elif common.isIterable(value):  # a list of Terminals or t.Sequence es
+        elif common.isIterable(value):  # a list of Terminals or Sequence es
             for obj in value:
                 # environLocal.printDebug('creating MeterSequence with %s' % obj)
                 self._addTerminal(obj)
@@ -1298,22 +1297,28 @@ class MeterSequence(MeterTerminal):
     @property
     def flat(self):
         '''
+        deprecated.  Call .flatten() instead.  To be removed in v11.
+        '''
+        return self.flatten()
+
+    def flatten(self) -> MeterSequence:
+        '''
         Return a new MeterSequence composed of the flattened representation.
 
         >>> ms = meter.MeterSequence('3/4', 3)
-        >>> b = ms.flat
+        >>> b = ms.flatten()
         >>> len(b)
         3
 
         >>> ms[1] = ms[1].subdivide(4)
-        >>> b = ms.flat
+        >>> b = ms.flatten()
         >>> len(b)
         6
 
         >>> ms[1][2] = ms[1][2].subdivide(4)
         >>> ms
         <music21.meter.core.MeterSequence {1/4+{1/16+1/16+{1/64+1/64+1/64+1/64}+1/16}+1/4}>
-        >>> b = ms.flat
+        >>> b = ms.flatten()
         >>> len(b)
         9
         '''
@@ -1770,7 +1775,7 @@ class MeterSequence(MeterTerminal):
         iMatch = self.offsetToIndex(qLenPos)
         return opFrac(self[iMatch].weight)
 
-    def offsetToDepth(self, qLenPos, align='quantize', index: t.Optional[int] = None):
+    def offsetToDepth(self, qLenPos, align='quantize', index: int | None = None):
         '''
         Given a qLenPos, return the maximum available depth at this position.
 

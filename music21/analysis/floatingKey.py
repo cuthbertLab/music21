@@ -5,7 +5,7 @@
 #
 # Authors:      Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2015 Michael Scott Asato Cuthbert and the music21 Project
+# Copyright:    Copyright © 2015 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
@@ -13,7 +13,10 @@ The floatingKey analyzer will give an approximation of the key at any point in
 a score down to the measure level using a fixed window.  It helps smooth out
 measures emphasizing non-chord tones, etc.
 '''
+from __future__ import annotations
+
 import copy
+
 from music21 import key
 from music21 import stream
 from music21.exceptions21 import AnalysisException

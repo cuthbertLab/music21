@@ -5,9 +5,10 @@
 # Authors:      Jose Cabal-Ugaz
 #               Mark Gotham
 #
-# Copyright:    Copyright © 2012, 20 Michael Scott Asato Cuthbert and the music21 Project
+# Copyright:    Copyright © 2012-2020 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
+from __future__ import annotations
 
 import unittest
 

@@ -6,6 +6,7 @@
 # Authors:      Christopher Ariza
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
+from __future__ import annotations
 
 import unittest
 

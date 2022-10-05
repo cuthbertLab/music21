@@ -19,6 +19,7 @@ For basic importing of ABC files from a file or URL to a
 :class:`~music21.stream.Stream`, use the music21 converter
 module's :func:`~music21.converter.parse` function.
 '''
+from __future__ import annotations
 
 import copy
 import unittest

@@ -5,7 +5,7 @@
 #
 # Authors:      Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2013-22 Michael Scott Asato Cuthbert and the music21 Project
+# Copyright:    Copyright © 2013-22 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
@@ -15,13 +15,15 @@ IPython extension to music21.  In Jupyter Notebook call:
 
 and show will take place inside the browser.  But currently not needed.
 '''
+from __future__ import annotations
+
 __all__ = ['ipExtension', 'objects', 'loadNoMagic', 'load_ipython_extension']
+
+from music21 import common
 
 from music21.ipython21 import ipExtension
 from music21.ipython21 import objects
 from music21.ipython21.ipExtension import load_ipython_extension
-
-from music21 import common
 
 def loadNoMagic():
     '''

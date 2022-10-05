@@ -5,7 +5,7 @@
 #
 # Authors:      Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2011-2013, 2017 Michael Scott Asato Cuthbert and the music21 Project
+# Copyright:    Copyright © 2011-2013, 2017 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
@@ -13,12 +13,14 @@ base classes for searching scores.
 
 See User's Guide, Chapter 43: Searching in and Among Scores for details.
 '''
+from __future__ import annotations
+
+from collections import namedtuple
+from collections.abc import Callable
 import copy
 import difflib
 import math
-import typing as t
 import unittest
-from collections import namedtuple
 
 from more_itertools import windowed
 
@@ -81,7 +83,7 @@ class SearchMatch(namedtuple('SearchMatch', ['elStart', 'els', 'index', 'iterato
     A lightweight object representing the match (if any) for a search.  Derived from namedtuple
     '''
     __slots__ = ()
-    _DOC_ATTR: t.Dict[str, str] = {
+    _DOC_ATTR: dict[str, str] = {
         'elStart': '''The first element that matches the list.''',
         'els': '''A tuple of all the matching elements.''',
         'index': '''The index in the iterator at which the first element can be found''',
@@ -201,9 +203,9 @@ class StreamSearcher:
         self.filterNotes = False
         self.filterNotesAndRests = False
 
-        self.algorithms: t.List[
-            t.Callable[[Stream, m21Base.Music21Object],
-                       t.Union[bool, None]]
+        self.algorithms: list[
+            Callable[[Stream, m21Base.Music21Object],
+                     bool | None]
         ] = [StreamSearcher.wildcardAlgorithm]
 
         self.activeIterator = None
@@ -1117,23 +1119,8 @@ class SearchException(exceptions21.Music21Exception):
 class Test(unittest.TestCase):
 
     def testCopyAndDeepcopy(self):
-        '''
-        Test copying all objects defined in this module
-        '''
-        import sys
-        import types
-        for part in sys.modules[self.__module__].__dict__:
-            match = False
-            for skip in ['_', '__', 'Test', 'Exception']:
-                if part.startswith(skip) or part.endswith(skip):
-                    match = True
-            if match:
-                continue
-            obj = getattr(sys.modules[self.__module__], part)
-            # noinspection PyTypeChecker
-            if callable(obj) and not isinstance(obj, types.FunctionType):
-                i = copy.copy(obj)
-                j = copy.deepcopy(obj)
+        from music21.test.commonTest import testCopyAll
+        testCopyAll(self, globals())
 
 
 # ------------------------------------------------------------------------------

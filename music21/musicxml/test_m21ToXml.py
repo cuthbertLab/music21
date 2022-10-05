@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import copy
 import difflib
 import fractions
@@ -146,10 +148,48 @@ class Test(unittest.TestCase):
         v1.id = 234
         xmlOut = self.getXml(m)
         self.assertIn('<voice>234</voice>', xmlOut)
-        self.assertIn('<voice>1</voice>', xmlOut)  # is v2 now!
+        self.assertIn('<voice>235</voice>', xmlOut)
         v2.id = 'hello'
         xmlOut = self.getXml(m)
         self.assertIn('<voice>hello</voice>', xmlOut)
+
+    def testVoiceNumberOffsetsThreeStaffsInGroup(self):
+        n1_1 = note.Note()
+        v1_1 = stream.Voice([n1_1])
+        m1_1 = stream.Measure([v1_1])
+        n1_2 = note.Note()
+        v1_2 = stream.Voice([n1_2])
+        m1_2 = stream.Measure([v1_2])
+        ps1 = stream.PartStaff([m1_1, m1_2])
+
+        n2_1 = note.Note()
+        v2_1 = stream.Voice([n2_1])
+        m2_1 = stream.Measure([v2_1])
+        n2_2 = note.Note()
+        v2_2 = stream.Voice([n2_2])
+        m2_2 = stream.Measure([v2_2])
+        ps2 = stream.PartStaff([m2_1, m2_2])
+
+        n3_1 = note.Note()
+        v3_1 = stream.Voice([n3_1])
+        m3_1 = stream.Measure([v3_1])
+        n3_2 = note.Note()
+        v3_2 = stream.Voice([n3_2])
+        m3_2 = stream.Measure([v3_2])
+        ps3 = stream.PartStaff([m3_1, m3_2])
+
+        s = stream.Score([ps1, ps2, ps3])
+        staffGroup = layout.StaffGroup([ps1, ps2, ps3])
+        s.insert(0, staffGroup)
+
+        tree = self.getET(s, makeNotation=False)
+        # helpers.dump(tree)
+        mxNotes = tree.findall('part/measure/note')
+        for mxNote in mxNotes:
+            voice = mxNote.find('voice')
+            staff = mxNote.find('staff')
+            # Because there is one voice per staff/measure, voicenum == staffnum
+            self.assertEqual(voice.text, staff.text)
 
     def testCompositeLyrics(self):
         xmlDir = common.getSourceFilePath() / 'musicxml' / 'lilypondTestSuite'
@@ -375,6 +415,72 @@ class Test(unittest.TestCase):
         endings = x.findall('.//ending')
         self.assertEqual([e.get('number') for e in endings], ['', '', '3', '3'])
 
+    def testMultiMeasureEndingsWrite(self):
+        # Relevant barlines:
+        # Measure 1, left barline: no ending
+        # Measure 1, right barline: no ending
+        # Measure 2, left barline: <ending number="1" type="start"/>
+        # Measure 2, right barline: no ending
+        # Measure 3, left barline: no ending
+        # Measure 3, right barline: no ending
+        # Measure 4, left barline: no ending
+        # Measure 4, right barline: <ending number="1" type="stop"/>
+        # Measure 5, left barline: <ending number="2" type="start"/>
+        # Measure 5, right barline: no ending
+        # Measure 6, left barline: no ending
+        # Measure 6, right barline: no ending
+        # Measure 7, left barline: no ending
+        # Measure 7, right barline: <ending number="2" type="stop"/>
+        # Measure 8, left barline: no ending
+        # Measure 8, right barline: no ending
+        s = converter.parse(testPrimitive.multiMeasureEnding)
+        x = self.getET(s)
+        endings = x.findall('.//ending')
+        self.assertEqual([e.get('number') for e in endings], ['1', '1', '2', '2'])
+
+        expectedEndings = {
+            # key = measure number, value = list(leftEndingType, rightEndingType)
+            '1': [None, None],     # measure before the endings
+            '2': ['start', None],  # first measure of ending 1
+            '3': [None, None],     # second measure of ending 1
+            '4': [None, 'stop'],   # last measure of ending 1
+            '5': ['start', None],  # first measure of ending 2
+            '6': [None, None],     # second measure of ending 2
+            '7': [None, 'stop'],   # last measure of ending 2
+            '8': [None, None]      # measure after the endings
+        }
+        measures = x.findall('.//measure')
+        self.assertEqual(len(measures), 8)
+        for measure in measures:
+            measNumber = measure.get('number')
+            with self.subTest(measureNumber=measNumber):
+                expectLeftBarline = bool(expectedEndings[measNumber][0] is not None)
+                expectRightBarline = bool(expectedEndings[measNumber][1] is not None)
+
+                gotLeftBarline = False
+                gotRightBarline = False
+                barlines = measure.findall('.//barline')
+                for i, barline in enumerate(barlines):
+                    if barline.get('location') == 'left':
+                        gotLeftBarline = True
+                        leftEndingType = None
+                        leftEnding = barline.find('ending')
+                        if leftEnding is not None:
+                            leftEndingType = leftEnding.get('type')
+                        self.assertEqual(leftEndingType, expectedEndings[measNumber][0])
+                    elif barline.get('location') == 'right':
+                        gotRightBarline = True
+                        rightEndingType = None
+                        rightEnding = barline.find('ending')
+                        if rightEnding is not None:
+                            rightEndingType = rightEnding.get('type')
+                        self.assertEqual(rightEndingType, expectedEndings[measNumber][1])
+
+                if expectLeftBarline:
+                    self.assertTrue(gotLeftBarline)
+                if expectRightBarline:
+                    self.assertTrue(gotRightBarline)
+
     def testTextExpressionOffset(self):
         '''Transfer element offset after calling getTextExpression().'''
         # https://github.com/cuthbertLab/music21/issues/624
@@ -444,7 +550,7 @@ class Test(unittest.TestCase):
         '''
         alto = corpus.parse('bach/bwv57.8').parts['#Alto']
         alto.measure(7).timeSignature = meter.TimeSignature('6/8')
-        newAlto = alto.flat.getElementsNotOfClass(meter.TimeSignature).stream()
+        newAlto = alto.flatten().getElementsNotOfClass(meter.TimeSignature).stream()
         newAlto.insert(0, meter.TimeSignature('2/4'))
         newAlto.makeMeasures(inPlace=True)
         newAltoFixed = newAlto.makeNotation()
@@ -671,6 +777,41 @@ class Test(unittest.TestCase):
         # Only one <forward> tag to get from 1.9979 -> 2.0
         # No <forward> tag is necessary to finish the incomplete measure (3.9979 -> 4.0)
         self.assertEqual(len(tree.findall('.//forward')), 1)
+
+    def test_roman_musicxml_two_kinds(self):
+        from music21.roman import RomanNumeral
+
+        # normal roman numerals take up no time in xml output.
+        rn1 = RomanNumeral('I', 'C')
+        rn1.duration.type = 'half'
+        rn2 = RomanNumeral('V', 'C')
+        rn2.duration.type = 'half'
+
+        m = stream.Measure()
+        m.insert(0.0, rn1)
+        m.insert(2.0, rn2)
+
+        # with writeAsChord=True, they get their own Chord objects and durations.
+        self.assertTrue(rn1.writeAsChord)
+        xmlOut = GeneralObjectExporter().parse(m).decode('utf-8')
+        self.assertNotIn('<forward>', xmlOut)
+        self.assertIn('<chord', xmlOut)
+
+        rn1.writeAsChord = False
+        rn2.writeAsChord = False
+        xmlOut = GeneralObjectExporter().parse(m).decode('utf-8')
+        self.assertIn('<numeral', xmlOut)
+        self.assertIn('<forward>', xmlOut)
+        self.assertNotIn('<chord', xmlOut)
+        self.assertNotIn('<offset', xmlOut)
+        self.assertNotIn('<rest', xmlOut)
+
+        rn1.duration.quarterLength = 0.0
+        rn2.duration.quarterLength = 0.0
+        xmlOut = GeneralObjectExporter().parse(m).decode('utf-8')
+        self.assertIn('<rest', xmlOut)
+        self.assertNotIn('<forward>', xmlOut)
+
 
 
 class TestExternal(unittest.TestCase):

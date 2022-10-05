@@ -6,7 +6,7 @@
 # Authors:      Michael Scott Asato Cuthbert
 #               Evan Lynch
 #
-# Copyright:    Copyright © 2012 Michael Scott Asato Cuthbert and the music21 Project
+# Copyright:    Copyright © 2012 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
@@ -14,13 +14,15 @@ This file makes it easier to access Bach's chorales through various
 numbering schemes and filters and includes the corpus.chorales.Iterator()
 class for easily iterating through the chorale collection.
 '''
+from __future__ import annotations
+
 import copy
-import typing as t
 import unittest
 
-from music21 import exceptions21
 from music21 import environment
+from music21 import exceptions21
 from music21 import metadata
+
 environLocal = environment.Environment('corpus.chorales')
 
 
@@ -37,7 +39,6 @@ class ChoraleList:
     which does not have all chorales in the Bärenreitter-Kirnberger or Riemenschneider
     numberings since it only includes BWV 250-438.
 
-    >>> from music21 import corpus
     >>> bcl = corpus.chorales.ChoraleList()
     >>> info358 = bcl.byBudapest[358]
     >>> for key in sorted(list(info358)):
@@ -500,8 +501,6 @@ class ChoraleListRKBWV:
     all chorales in the corpus, but only had numbers for the `kalmus`,
     `riemenschneider`, and `bwv` numbering systems.
 
-
-    >>> from music21 import corpus
     >>> bcl = corpus.chorales.ChoraleListRKBWV()
     >>> info155 = bcl.byRiemenschneider[155]
     >>> for key in sorted(list(info155)):
@@ -966,7 +965,6 @@ class Iterator:
     * `titleList` = [list, of, titles]
     * `numberList` = [list, of, numbers]
 
-    >>> from music21 import corpus
     >>> for chorale in corpus.chorales.Iterator(1, 4, returnType='filename'):
     ...    print(chorale)
     bach/bwv269
@@ -1069,15 +1067,15 @@ class Iterator:
                   'titleList', 'numberList', 'returnType', 'iterationType']
 
     def __init__(self,
-                 currentNumber: t.Optional[int] = None,
-                 highestNumber: t.Optional[int] = None,
+                 currentNumber: int | None = None,
+                 highestNumber: int | None = None,
                  *,
                  numberingSystem: str = 'riemenschneider',
                  returnType: str = 'stream',
                  iterationType: str = 'number',
                  analysis: bool = False,
-                 numberList: t.Optional[t.List[int]] = None,
-                 titleList: t.Optional[t.List[str]] = None,
+                 numberList: list[int] | None = None,
+                 titleList: list[str] | None = None,
                  ):
         '''
         By default: numberingSystem = 'riemenschneider', currentNumber = 1,
@@ -1188,7 +1186,6 @@ class Iterator:
         the chorale is instead queried by Title
         from the titleList and the numberList is ignored.
 
-        >>> from music21 import corpus
         >>> BCI = corpus.chorales.Iterator()
         >>> riemenschneider1 = BCI._returnChorale()
         >>> riemenschneider1.metadata.title
@@ -1330,7 +1327,6 @@ class Iterator:
         is set to None, and the currentNumber and highestNumber are set
         to the lowest and highest indices in the titleList.
 
-        >>> from music21 import corpus
         >>> BCI = corpus.chorales.Iterator()
         >>> BCI.numberingSystem = 'riemenschneider'
         >>> (BCI._numberList[0], BCI._numberList[40], BCI._numberList[-1])

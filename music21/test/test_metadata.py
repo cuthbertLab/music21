@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
+from __future__ import annotations
+
 import re
 import unittest
-import typing as t
 
 from music21 import converter
 from music21 import corpus
@@ -198,7 +199,7 @@ class Test(unittest.TestCase):
             uniqueName: str,
             namespaceName: str,
             contributorRole: str = None,
-            valueType: t.Type = metadata.Text):
+            valueType: type = metadata.Text):
 
         if ':' not in namespaceName:
             # It's just the namespace because name == uniqueName,
@@ -229,26 +230,26 @@ class Test(unittest.TestCase):
             self.assertEqual(itemTuple, tuple())
 
         if valueType is metadata.DatePrimitive:
-            md[namespaceName] = ['1978/6/11']
+            md[namespaceName] = ['1987/6/11']
             self.assertEqual(
                 getattr(md, uniqueName),
-                '1978/06/11'
+                '1987/06/11'
             )
-            md[uniqueName] = ('1979/6/11',)
+            md[uniqueName] = ('1989/6/11',)
             self.assertEqual(
                 getattr(md, uniqueName),
-                '1979/06/11'
+                '1989/06/11'
             )
         elif valueType is metadata.Copyright:
-            md[namespaceName] = [f'Copyright © 1979 {namespaceName}']
+            md[namespaceName] = [f'Copyright ©1987 {namespaceName}']
             self.assertEqual(
                 getattr(md, uniqueName),
-                f'Copyright © 1979 {namespaceName}'
+                f'Copyright ©1987 {namespaceName}'
             )
-            md[uniqueName] = (f'Copyright © 1979 {uniqueName}',)
+            md[uniqueName] = (f'Copyright ©1987 {uniqueName}',)
             self.assertEqual(
                 getattr(md, uniqueName),
-                f'Copyright © 1979 {uniqueName}'
+                f'Copyright ©1987 {uniqueName}'
             )
         elif valueType is metadata.Contributor:
             md[namespaceName] = [f'The {namespaceName}']
@@ -303,55 +304,55 @@ class Test(unittest.TestCase):
 
         if valueType is metadata.DatePrimitive:
             md.add(namespaceName,
-                   [metadata.DateBetween(['1978', '1980']),
-                    metadata.DateSingle('1979/6/11/4:50:32')])
+                   [metadata.DateBetween(['1987', '1989']),
+                    metadata.DateSingle('1989/6/11/4:50:32')])
             self.assertEqual(
                 getattr(md, uniqueName),
-                '1979/06/11, 1978/--/-- to 1980/--/--, 1979/06/11/04/50/032.00'
+                '1989/06/11, 1987/--/-- to 1989/--/--, 1989/06/11/04:50:32'
             )
             self.assertEqual(
                 md[uniqueName],
                 (
-                    metadata.DateSingle('1979/06/11'),
-                    metadata.DateBetween(['1978', '1980']),
-                    metadata.DateSingle('1979/6/11/4:50:32')
+                    metadata.DateSingle('1989/06/11'),
+                    metadata.DateBetween(['1987', '1989']),
+                    metadata.DateSingle('1989/6/11/4:50:32')
                 )
             )
         elif valueType is metadata.Copyright:
             md.add(
                 namespaceName,
-                metadata.Text('Lyrics copyright © 1979 John Jones')
+                metadata.Text('Lyrics copyright ©1987 Kat Bjelland')
             )
             md.add(
                 uniqueName,
                 (
                     metadata.Copyright(
-                        'Other content copyright © 1979 Jenni Johnson',
+                        'Other content copyright ©1987 Lori Barbero',
                         role='other'),
                     metadata.Copyright(
-                        metadata.Text('Even more content copyright © 1979 Sarah Michaels'),
-                        role='even more')
+                        metadata.Text('Music contributions copyright ©1987 Michelle Leon'),
+                        role='music contributions')
                 )
             )
             self.assertEqual(
                 getattr(md, uniqueName),
-                f'Copyright © 1979 {uniqueName}'
-                + ', Lyrics copyright © 1979 John Jones'
-                + ', Other content copyright © 1979 Jenni Johnson'
-                + ', Even more content copyright © 1979 Sarah Michaels'
+                f'Copyright ©1987 {uniqueName}'
+                + ', Lyrics copyright ©1987 Kat Bjelland'
+                + ', Other content copyright ©1987 Lori Barbero'
+                + ', Music contributions copyright ©1987 Michelle Leon'
             )
             self.assertEqual(
                 md[uniqueName],
                 (
-                    metadata.Copyright(f'Copyright © 1979 {uniqueName}'),
-                    metadata.Copyright('Lyrics copyright © 1979 John Jones'),
+                    metadata.Copyright(f'Copyright ©1987 {uniqueName}'),
+                    metadata.Copyright('Lyrics copyright ©1987 Kat Bjelland'),
                     metadata.Copyright(
-                        'Other content copyright © 1979 Jenni Johnson',
+                        'Other content copyright ©1987 Lori Barbero',
                         role='other'
                     ),
                     metadata.Copyright(
-                        metadata.Text('Even more content copyright © 1979 Sarah Michaels'),
-                        role='even more'
+                        metadata.Text('Music contributions copyright ©1987 Michelle Leon'),
+                        role='music contributions'
                     )
                 )
             )

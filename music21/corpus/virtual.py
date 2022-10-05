@@ -5,7 +5,7 @@
 #
 # Authors:      Christopher Ariza
 #
-# Copyright:    Copyright © 2010, 2012 Michael Scott Asato Cuthbert and the music21 Project
+# Copyright:    Copyright © 2010, 2012 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
@@ -19,12 +19,13 @@ TURNED OFF in 2017 -- to be recreated with a bigger test set.
 
 TODO: Demonstrate with JRP.
 '''
+from __future__ import annotations
 
-import typing as t
 import unittest
 
 from music21 import common
 from music21 import environment
+
 environLocal = environment.Environment('corpus.virtual')
 
 
@@ -208,7 +209,7 @@ class Test(unittest.TestCase):
 
 # ------------------------------------------------------------------------------
 # define presented order in documentation
-_DOC_ORDER: t.List[type] = []
+_DOC_ORDER: list[type] = []
 
 if __name__ == '__main__':
     import music21

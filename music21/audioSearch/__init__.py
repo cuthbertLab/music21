@@ -7,7 +7,7 @@
 # Authors:      Jordi Bartolome
 #               Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2011-2020 Michael Scott Asato Cuthbert and the music21 Project
+# Copyright:    Copyright © 2011-2020 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # -----------------------------------------------------------------------------
 '''
@@ -16,6 +16,8 @@ Base routines used throughout audioSearching and score-following.
 Requires numpy and matplotlib.  Installing scipy makes the process faster
 and more accurate using FFT convolve.
 '''
+from __future__ import annotations
+
 __all__ = [
     'transcriber', 'recording', 'scoreFollower',
     'histogram', 'autocorrelationFunction',
@@ -41,12 +43,11 @@ import wave
 import warnings
 import unittest
 
-import typing as t
-
 # cannot call this base, because when audioSearch.__init__.py
 # imports * from base, it overwrites audioSearch!
 from music21 import base
 from music21 import common
+from music21 import environment
 from music21 import exceptions21
 from music21 import features
 from music21 import metadata
@@ -58,7 +59,6 @@ from music21 import stream
 from music21.audioSearch import recording
 from music21.audioSearch import transcriber
 
-from music21 import environment
 environLocal = environment.Environment('audioSearch')
 
 audioChunkLength = 1024
@@ -525,11 +525,11 @@ def detectPitchFrequencies(freqFromAQList, useScale=None):
 
 
 def smoothFrequencies(
-    frequencyList: t.List[t.Union[int, float]],
+    frequencyList: list[int | float],
     *,
     smoothLevels=7,
     inPlace=False
-) -> t.List[int]:
+) -> list[int] | None:
     '''
     Smooths the shape of the signal in order to avoid false detections in the fundamental
     frequency.  Takes in a list of ints or floats.
@@ -605,7 +605,7 @@ def smoothFrequencies(
         )
 
     dpf = frequencyList
-    detectedPitchesFreq: t.List[float]
+    detectedPitchesFreq: list[float]
     if inPlace:
         detectedPitchesFreq = [float(f) for f in dpf]
     else:
@@ -633,7 +633,7 @@ def smoothFrequencies(
                 change += detectedPitchesFreq[i + j - int(math.floor(smoothLevels / 2.0))]
             detectedPitchesFreq[i] = change / smoothLevels
 
-    out: t.List[int] = [int(round(f)) for f in detectedPitchesFreq]
+    out: list[int] = [int(round(f)) for f in detectedPitchesFreq]
     if not inPlace:
         return out
     else:
@@ -1003,7 +1003,7 @@ class Test(unittest.TestCase):
 
 # ------------------------------------------------------------------------------
 # define presented order in documentation
-_DOC_ORDER: t.List[type] = []
+_DOC_ORDER: list[type] = []
 
 
 if __name__ == '__main__':

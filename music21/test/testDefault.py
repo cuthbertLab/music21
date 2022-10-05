@@ -6,9 +6,10 @@
 # Authors:      Christopher Ariza
 #               Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2010 Michael Scott Asato Cuthbert and the music21 Project
+# Copyright:    Copyright © 2010 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
+from __future__ import annotations
 
 import sys
 from music21.test import testSingleCoreAll as test

@@ -1,6 +1,6 @@
 #-------------------------------------------------------------------------------
 # Name:         scala/scl/license.txt
-# Purpose:      The music21 Project assumes no copyright or change in licensing
+# Purpose:      The muisc21 authors assume no copyright or change in licensing
 #               for content distributed in the scala/scl collection.
 #
 #-------------------------------------------------------------------------------

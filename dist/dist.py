@@ -6,7 +6,7 @@
 # Authors:      Christopher Ariza
 #               Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2010-2022 Michael Scott Asato Cuthbert and the music21 Project
+# Copyright:    Copyright © 2010-2022 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
@@ -45,28 +45,28 @@ the announcement while it's running.
 12. zip up documentation/build/html and get ready to upload/delete it.
     Rename to music21.v.7.1.0-docs.zip (skip for Alpha/Beta)
 
-12b. If any new file extensions have been added, be sure to add them to MANIFEST.in
+13. Run "hatch build" -- requires hatch to be installed "brew install hatch"
 
-13. And finally this file. (from the command line; not as python -m...)
-    There are major problems in SetupTools -- v8 (or even a 7.3.1) needs to
-    fix them -- creating a dir music21.egg-info in the main dir with a
-    requires.txt file created as root.
+14. Run this file -- it builds the no-corpus version of music21.
+    DO NOT RUN THIS ON A PC -- the Mac .tar.gz might have an incorrect permission if you do.
 
-14. COMMIT to GitHub at this point w/ commit comment of the new version,
+15. COMMIT to GitHub at this point w/ commit comment of the new version,
     then don't change anything until the next step is done.
     (.gitignore will avoid uploading the large files created here...)
 
-15. Tag the commit: git tag -a vX.Y.Z -m "music21 vX.Y.Z"
+16. Tag the commit: git tag -a vX.Y.Z -m "music21 vX.Y.Z"
     Don't forget the "v" in the release tag.
     Sanity check that the correct commit was tagged: git log
-    Push tags: git push upstream --tags
 
-16. Create a new release on GitHub and upload the TWO files created here and docs.
+17. Push tags: git push --tags  (or git push upstream --tags if not on main branch)
+
+18. Create a new release on GitHub and upload the TWO non-wheel files created here and docs.
     Drag in this order: .tar.gz, documentation, no-corpus.tar.gz
 
     Finish this before doing the next step, even though it looks like it could be done in parallel.
 
-17. Upload the new file to PyPI with "twine upload music21-7.3.5a2.tar.gz" [*]
+19. Upload the new file to PyPI with "twine upload music21-7.3.5a2.tar.gz", and same for the
+    whl file (but NOT no corpus) [*]
 
     [*] Requires twine to be installed
 
@@ -80,251 +80,68 @@ the announcement while it's running.
         username:your_username
         password:your_password
 
-18. Delete the two .tar.gz files in dist...
+20. Delete the two .tar.gz files and .whl file in dist...
 
-19. For starting a new major release create a GitHub branch for the old one.
+21. For starting a new major release create a GitHub branch for the old one.
 
-20. Immediately increment the number in _version.py and run tests on it here
+22. Immediately increment the number in _version.py and run tests on it here
     to prepare for next release.
 
-21. Announce on the blog, to the list, and twitter.
-
-DO NOT RUN THIS ON A PC -- the Mac .tar.gz has an incorrect permission if you do.
+23. Announce on the blog, to the list, and twitter.
 '''
-import hashlib
 import os
-import sys
 import shutil
 import tarfile
 
-from music21 import base
-from music21 import common
+from music21._version import __version__ as version
+from music21.common.pathTools import getRootFilePath, getCorpusContentDirs
 
-from music21 import environment
-environLocal = environment.Environment('..dist.dist')
+def removeCorpus():
+    '''
+    Remove the corpus from a compressed file (.tar.gz) and
+    create a new music21-noCorpus version.
 
-PY = sys.executable
-environLocal.warn(f'using python executable at {PY}')
+    Return the completed file path of the newly created edition.
 
-class Distributor:
-    def __init__(self):
-        # self.fpEgg = None
-        # self.fpWin = None
-        self.fpTar = None
+    NOTE: this function works only with Posix systems.
+    '''
+    fp = getRootFilePath() / 'dist' / ('music21-' + version + '.tar.gz')
+    fpDir, fn = os.path.split(str(fp))
 
-        self.buildNoCorpus = True
-        # self.fpEggNoCorpus = None
-        self.fpTarNoCorpus = None
+    # this has .tar.gz extension; this is the final completed package
+    fnDst = fn.replace('music21', 'music21-noCorpus')
+    fpDst = os.path.join(fpDir, fnDst)
+    # remove file extensions
+    fnDstDir = fnDst.replace('.tar.gz', '')
+    fpDstDir = os.path.join(fpDir, fnDstDir)
 
-        self.version = base.VERSION_STR
+    file = tarfile.open(fp)
+    file.extractall(fpDir)
+    file.close()
 
-        self._initPaths()
+    os.rename(fpDstDir.replace('-noCorpus', ''), fpDstDir)
 
-    def _initPaths(self):
-
-        # must be in the dist dir
-        directory = os.getcwd()
-        parentDir = os.path.dirname(directory)
-        parentContents = sorted(os.listdir(parentDir))
-        # make sure we are in the proper directory
-        if (not directory.endswith('dist')
-                or 'music21' not in parentContents):
-            raise Exception(f'not in the music21{os.sep}dist directory: {directory}')
-
-        self.fpDistDir = directory
-        self.fpPackageDir = parentDir  # dir with setup.py
-        self.fpBuildDir = os.path.join(self.fpPackageDir, 'build')
-        # self.fpEggInfo = os.path.join(self.fpPackageDir, 'music21.egg-info')
-
-        sys.path.insert(0, parentDir)  # to get setup in as a possibility.
-
-        for fp in [self.fpDistDir, self.fpPackageDir, self.fpBuildDir]:
-            environLocal.warn(fp)
-
-
-    def updatePaths(self):
-        '''
-        Process output of build scripts. Get most recently produced distributions.
-        '''
-        contents = sorted(os.listdir(self.fpDistDir))
-        for fn in contents:
-            fp = os.path.join(self.fpDistDir, fn)
-            # if self.version in fn and fn.endswith('.egg'):
-            #    self.fpEgg = fp
-            # if self.version in fn and fn.endswith('.exe'):
-            #     fpNew = fp.replace('.macosx-10.8-intel.exe', '.win32.exe')
-            #     fpNew = fpNew.replace('.macosx-10.8-x86_64.exe', '.win32.exe')
-            #     fpNew = fpNew.replace('.macosx-10.9-intel.exe', '.win32.exe')
-            #     fpNew = fpNew.replace('.macosx-10.9-x86_64.exe', '.win32.exe')
-            #     fpNew = fpNew.replace('.macosx-10.10-intel.exe', '.win32.exe')
-            #     fpNew = fpNew.replace('.macosx-10.10-x86_64.exe', '.win32.exe')
-            #     fpNew = fpNew.replace('.macosx-10.11-intel.exe', '.win32.exe')
-            #     fpNew = fpNew.replace('.macosx-10.11-x86_64.exe', '.win32.exe')
-            #     fpNew = fpNew.replace('.macosx-10.12-intel.exe', '.win32.exe')
-            #     fpNew = fpNew.replace('.macosx-10.12-x86_64.exe', '.win32.exe')
-            #     if fpNew != fp:
-            #         os.rename(fp, fpNew)
-            #     self.fpWin = fpNew
-
-            print(fn)
-            if self.version in fn and fn.endswith('.tar.gz'):
-                self.fpTar = fp
-            else:
-                environLocal.warn(fn + ' does not end with .tar.gz')
-
-        environLocal.warn('giving path for tar.gz')
-        for fn in [self.fpTar]:
-            if fn is None:
-                environLocal.warn('missing fn path')
-            else:
-                environLocal.warn(fn)
-
-    def removeCorpus(self, fp):
-        '''
-        Remove the corpus from a compressed file (.tar.gz) and
-        create a new music21-noCorpus version.
-
-        Return the completed file path of the newly created edition.
-
-        NOTE: this function works only with Posix systems.
-        '''
-        TAR = 'TAR'
-        # EGG = 'EGG'
-        if fp and fp.endswith('.tar.gz'):
-            mode = TAR
-            modeExt = '.tar.gz'
-        else:
-            raise Exception('incorrect source file path')
-
-        fpDir, fn = os.path.split(fp)
-
-        # this has .tar.gz extension; this is the final completed package
-        fnDst = fn.replace('music21', 'music21-noCorpus')
-        fpDst = os.path.join(fpDir, fnDst)
-        # remove file extensions
-        fnDstDir = fnDst.replace(modeExt, '')
-        fpDstDir = os.path.join(fpDir, fnDstDir)
-
-        # get the name of the dir after decompression
-        fpSrcDir = os.path.join(fpDir, fn.replace(modeExt, ''))
-
-        # remove old dirs if it exists
-        if os.path.exists(fpDst):
-            shutil.rmtree(fpDst)
-
-        if os.path.exists(fpDstDir):
-            shutil.rmtree(fpDstDir)
-
-        if mode == TAR:
-            tf = tarfile.open(fp, 'r:gz')
-            # the path here is the dir into which to expand,
-            # not the name of that dir
-            tf.extractall(path=fpDir)
-            os.system(f'mv {fpSrcDir} {fpDstDir}')
-            tf.close()  # done after extraction
-
-        # elif mode == EGG:
-        #    os.system(f'mkdir {fpDstDir}')
-        #    # need to create dst dir to unzip into
-        #    tf = zipfile.ZipFile(fp, 'r')
-        #    tf.extractall(path=fpDstDir)
-
-
-        # remove files, updates manifest
-        for fn in common.getCorpusContentDirs():
-            fp = os.path.join(fpDstDir, 'music21', 'corpus', fn)
-            shutil.rmtree(fp)
-
-        fp = os.path.join(fpDstDir, 'music21', 'corpus', '_metadataCache')
+    # remove files, updates manifest
+    for fn in getCorpusContentDirs():
+        fp = os.path.join(fpDstDir, 'music21', 'corpus', fn)
         shutil.rmtree(fp)
 
-        # adjust the sources Txt file
-        # if mode == TAR:
-        sourcesTxt = os.path.join(fpDstDir, 'music21.egg-info', 'SOURCES.txt')
-        # else:
-        #    raise Exception('invalid mode')
+    fp = os.path.join(fpDstDir, 'music21', 'corpus', '_metadataCache')
+    shutil.rmtree(fp)
 
-        # elif mode == EGG:
-        #    sourcesTxt = os.path.join(fpDstDir, 'EGG-INFO', 'SOURCES.txt')
+    # compress dst dir to dst file path name
+    # need the -C flag to set relative dir
+    # just name of dir
+    cmd = f'tar -C {fpDir} -czf {fpDst} {fnDstDir}/'
+    os.system(cmd)
 
-        # files will look like 'music21/corpus/haydn' in SOURCES.txt
-        post = []
-        f = open(sourcesTxt, 'r')
-        corpusContentDirs = common.getCorpusContentDirs()
-        for line in f:
-            match = False
-            if 'corpus' in line:
-                for fn in corpusContentDirs:
-                    # these are relative paths
-                    fp = os.path.join('music21', 'corpus', fn)
-                    if line.startswith(fp):
-                        match = True
-                        break
-            if not match:
-                post.append(line)
-        f.close()
-        f = open(sourcesTxt, 'w')
-        f.writelines(post)
-        f.close()
+    # # remove directory that was compressed
+    if os.path.exists(fpDstDir):
+        shutil.rmtree(fpDstDir)
 
-        if mode == TAR:
-            # compress dst dir to dst file path name
-            # need the -C flag to set relative dir
-            # just name of dir
-            cmd = f'tar -C {fpDir} -czf {fpDst} {fnDstDir}/'
-            os.system(cmd)
-
-        # remove directory that was compressed
-        if os.path.exists(fpDstDir):
-            shutil.rmtree(fpDstDir)
-
-        return fpDst  # full path with extension
-
-
-
-    def build(self):
-        '''
-        Build all distributions. Update and rename file paths if necessary;
-        remove extract build products.
-        '''
-        # call setup.py
-        # import setup  # -- for some reason does not work unless called from command line
-        for buildType in ['sdist --formats=gztar', 'bdist_wheel']:
-            environLocal.warn(f'making {buildType}')
-
-            savePath = os.getcwd()
-            os.chdir(self.fpPackageDir)
-            os.system(f'{PY} setup.py {buildType}')
-            os.chdir(savePath)
-
-        self.updatePaths()
-
-        environLocal.warn(f'removing {self.fpBuildDir} (except on windows...there do it yourself)')
-        try:
-            shutil.rmtree(self.fpBuildDir)
-        except FileNotFoundError:
-            environLocal.warn(
-                'Directory was already cleaned up'
-            )
-
-        if self.buildNoCorpus is True:
-            # create no corpus versions
-            self.fpTarNoCorpus = self.removeCorpus(fp=self.fpTar)
-            # self.fpEggNoCorpus = self.removeCorpus(fp=self.fpEgg)
-
-
-    def md5ForFile(self, path, hexReturn=True):
-        if hexReturn:
-            return hashlib.md5(open(path, 'rb').read()).hexdigest()
-        else:
-            return hashlib.md5(open(path, 'rb').read()).digest()
+    return fpDst  # full path with extension
 
 
 # ------------------------------------------------------------------------------
 if __name__ == '__main__':
-    d = Distributor()
-    d.buildNoCorpus = True
-    d.build()
-    d.updatePaths()
-    # d.getMD5Path()
-    # d.uploadPyPi()
+    removeCorpus()

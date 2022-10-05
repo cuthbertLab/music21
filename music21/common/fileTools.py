@@ -6,12 +6,13 @@
 # Authors:      Michael Scott Asato Cuthbert
 #               Christopher Ariza
 #
-# Copyright:    Copyright © 2009-2015 Michael Scott Asato Cuthbert and the music21 Project
+# Copyright:    Copyright © 2009-2015 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
 Tools for working with files
 '''
+from __future__ import annotations
 
 import codecs
 import contextlib  # for with statements
@@ -52,7 +53,7 @@ def cd(targetDir):
         os.chdir(cwd)
 
 
-def readPickleGzip(filePath: t.Union[str, pathlib.Path]) -> t.Any:
+def readPickleGzip(filePath: str | pathlib.Path) -> t.Any:
     '''
     Read a gzip-compressed pickle file, uncompress it, unpickle it, and
     return the contents.

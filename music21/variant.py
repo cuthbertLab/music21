@@ -7,7 +7,7 @@
 #               Evan Lynch
 #               Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2012 Michael Scott Asato Cuthbert and the music21 Project
+# Copyright:    Copyright © 2012 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 # currently the tinyNotation demos use alignment to show variation, making this necessary.
@@ -20,11 +20,13 @@ and showing different variant streams. These functions and the variant class sho
 used when variants of a score are the same length and contain the same measure structure at
 this time.
 '''
-import typing as t
-import unittest
+from __future__ import annotations
 
+from collections.abc import Sequence
 import copy
 import difflib
+import typing as t
+import unittest
 
 from music21 import base
 from music21 import clef
@@ -35,6 +37,7 @@ from music21 import meter
 from music21 import note
 from music21 import search
 from music21 import stream
+from music21.stream.enums import GivenElementsBehavior
 
 environLocal = environment.Environment('variant')
 
@@ -93,15 +96,15 @@ class Variant(base.Music21Object):
         self,
         givenElements: t.Union[None,
                                base.Music21Object,
-                               t.Sequence[base.Music21Object]] = None,
-        name: t.Optional[str] = None,
-        appendOrInsert: t.Literal['append', 'insert', 'offsets'] = 'offsets',
+                               Sequence[base.Music21Object]] = None,
+        name: str | None = None,
+        givenElementsBehavior: GivenElementsBehavior = GivenElementsBehavior.OFFSETS,
         **music21ObjectKeywords,
     ):
         super().__init__(**music21ObjectKeywords)
         self.exposeTime = False
         self._stream = stream.VariantStorage(givenElements=givenElements,
-                                             appendOrInsert=appendOrInsert)
+                                             givenElementsBehavior=givenElementsBehavior)
 
         self._replacementDuration = None
 
@@ -1384,8 +1387,8 @@ def mergePartAsOssia(mainPart, ossiaPart, ossiaName,
 
 def addVariant(
     s: stream.Stream,
-    startOffset: t.Union[int, float],
-    sVariant: t.Union[stream.Stream, Variant],
+    startOffset: int | float,
+    sVariant: stream.Stream | Variant,
     variantName=None,
     variantGroups=None,
     replacementDuration=None

@@ -5,6 +5,7 @@
 #
 # Authors:      Christopher Ariza
 # ------------------------------------------------------------------------------
+from __future__ import annotations
 
 import unittest
 
@@ -14,8 +15,8 @@ import unittest
 
 # abc standard
 # http://abcnotation.com/abc2mtex/abc.txt
-
 from music21 import environment
+
 environLocal = environment.Environment('abcFormat.testFiles')
 
 _DOC_IGNORE_MODULE_OR_PACKAGE = True
@@ -548,7 +549,7 @@ X:2
 T:Kitchen Girl
 C:Trad.
 K:D
-[c4a4] [B4g4]|efed c2cd|e2f2 gaba|g2e2 e2fg|
+[c4a4] [B4g4] | efed c2cd|e2f2 gaba|g2e2 e2fg|
 a4 g4|efed cdef|g2d2 efed|c2A2 A4:|
 K:G
 ABcA BAGB|ABAG EDEG|A2AB c2d2|e3f edcB|ABcA BAGB|

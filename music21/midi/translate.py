@@ -6,17 +6,21 @@
 # Authors:      Christopher Ariza
 #               Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2010-2022 Michael Scott Asato Cuthbert and the music21 Project
+# Copyright:    Copyright © 2010-2022 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
 Module to translate MIDI data to music21 Streams and vice versa.  Note that quantization of
 notes takes place in the :meth:`~music21.stream.Stream.quantize` method not here.
 '''
-import unittest
-import math
+from __future__ import annotations
+
+from collections.abc import Sequence
 import copy
+import math
 import typing as t
+from typing import TYPE_CHECKING
+import unittest
 import warnings
 
 from music21 import chord
@@ -27,6 +31,7 @@ from music21 import dynamics
 from music21 import exceptions21
 from music21 import environment
 from music21 import instrument
+from music21.instrument import Conductor, UnpitchedPercussion, deduplicate
 from music21 import key
 from music21 import meter
 from music21 import note
@@ -35,8 +40,13 @@ from music21 import pitch
 from music21 import stream
 from music21 import tempo
 
-from music21.instrument import Conductor, UnpitchedPercussion, deduplicate
 from music21.midi.percussion import MIDIPercussionException, PercussionMapper
+
+
+if TYPE_CHECKING:
+    from music21 import base
+    from music21 import midi
+
 
 environLocal = environment.Environment('midi.translate')
 PERCUSSION_MAPPER = PercussionMapper()
@@ -252,7 +262,7 @@ def music21ObjectToMidiFile(
     music21Object,
     *,
     addStartDelay=False,
-) -> 'music21.midi.MidiFile':
+) -> midi.MidiFile:
     '''
     Either calls streamToMidiFile on the music21Object or
     puts a copy of that object into a Stream (so as
@@ -276,12 +286,12 @@ def music21ObjectToMidiFile(
 # Notes
 
 def _constructOrUpdateNotRestSubclass(
-    eOn: 'music21.midi.MidiEvent',
+    eOn: midi.MidiEvent,
     tOn: int,
     tOff: int,
     ticksPerQuarter: int,
     *,
-    returnClass: t.Type[NotRestType],
+    returnClass: type[NotRestType],
 ) -> NotRestType:
     '''
     Construct (or edit the duration of) a NotRest subclass, usually
@@ -309,10 +319,10 @@ def _constructOrUpdateNotRestSubclass(
     return nr
 
 def midiEventsToNote(
-    eventTuple: t.Tuple[t.Tuple[int, 'music21.midi.MidiEvent'],
-                        t.Tuple[int, 'music21.midi.MidiEvent']],
+    eventTuple: tuple[tuple[int, midi.MidiEvent],
+                      tuple[int, midi.MidiEvent]],
     ticksPerQuarter: int = defaults.ticksPerQuarter,
-) -> t.Union[note.Note, note.Unpitched]:
+) -> note.Note | note.Unpitched:
     # noinspection PyShadowingNames
     '''
     Convert from a tuple of two tuples of an int and a midi.MidiEvent objects
@@ -383,7 +393,7 @@ def midiEventsToNote(
     tOn, eOn = eventTuple[0]
     tOff, unused_eOff = eventTuple[1]
 
-    returnClass: t.Union[t.Type[note.Unpitched], t.Type[note.Note]]
+    returnClass: type[note.Unpitched] | type[note.Note]
     if eOn.channel == 10:
         returnClass = note.Unpitched
     else:
@@ -416,12 +426,12 @@ def midiEventsToNote(
     nr.volume.velocityIsRelative = False  # not relative coming from MIDI
     # n._midiVelocity = eOn.velocity
 
-    return t.cast(t.Union[note.Note, note.Unpitched], nr)
+    return t.cast(note.Note | note.Unpitched, nr)
 
 
 def noteToMidiEvents(
-    inputM21: t.Union[note.Note, note.Unpitched], *, includeDeltaTime=True, channel=1
-) -> t.List[t.Union['music21.midi.DeltaTime', 'music21.midi.MidiEvent']]:
+    inputM21: note.Note | note.Unpitched, *, includeDeltaTime=True, channel=1
+) -> list[midi.DeltaTime | midi.MidiEvent]:
     # noinspection PyShadowingNames
     '''
     Translate a music21 Note to a list of four MIDI events --
@@ -467,7 +477,7 @@ def noteToMidiEvents(
     n = inputM21
 
     mt = None  # use a midi track set to None
-    eventList: t.List[t.Union[midiModule.DeltaTime, midiModule.MidiEvent]] = []
+    eventList: list[midi.DeltaTime | midi.MidiEvent] = []
 
     if includeDeltaTime:
         dt = midiModule.DeltaTime(mt, channel=channel)
@@ -520,8 +530,8 @@ def noteToMidiEvents(
 # ------------------------------------------------------------------------------
 # Chords
 def midiEventsToChord(
-    eventList: t.Sequence[t.Tuple[t.Tuple[int, 'music21.midi.MidiEvent'],
-                                  t.Tuple[int, 'music21.midi.MidiEvent']]],
+    eventList: Sequence[tuple[tuple[int, midi.MidiEvent],
+                                  tuple[int, midi.MidiEvent]]],
     ticksPerQuarter: int = defaults.ticksPerQuarter,
 ) -> chord.ChordBase:
     # noinspection PyShadowingNames
@@ -601,10 +611,10 @@ def midiEventsToChord(
     tOff: int = 0  # ticks
 
     from music21 import volume
-    pitches: t.List[pitch.Pitch] = []
+    pitches: list[pitch.Pitch] = []
     volumes = []
 
-    firstOn: 'music21.midi.MidiEvent' = eventList[0][0][1]
+    firstOn: midi.MidiEvent = eventList[0][0][1]
     any_channel_10 = False
     # this is a format provided by the Stream conversion of
     # midi events; it pre-groups events for a chord together in nested pairs
@@ -621,7 +631,7 @@ def midiEventsToChord(
         v.velocityIsRelative = False  # velocity is absolute coming from
         volumes.append(v)
 
-    returnClass: t.Union[t.Type[percussion.PercussionChord], t.Type[chord.Chord]]
+    returnClass: type[percussion.PercussionChord] | type[chord.Chord]
     if any_channel_10:
         returnClass = percussion.PercussionChord
     else:
@@ -654,7 +664,7 @@ def midiEventsToChord(
 
 def chordToMidiEvents(
     inputM21: chord.ChordBase, *, includeDeltaTime=True, channel=1
-) -> t.List[t.Union['music21.midi.DeltaTime', 'music21.midi.MidiEvent']]:
+) -> list[midi.DeltaTime | midi.MidiEvent]:
     # noinspection PyShadowingNames
     '''
     Translates a :class:`~music21.chord.Chord` object to a
@@ -687,12 +697,12 @@ def chordToMidiEvents(
     '''
     from music21 import midi as midiModule
     mt = None  # midi track
-    eventList: t.List[t.Union[midiModule.DeltaTime, midiModule.MidiEvent]] = []
+    eventList: list[midi.DeltaTime | midi.MidiEvent] = []
     c = inputM21
 
     # temporary storage for setting correspondence
-    noteOn: t.List[midiModule.MidiEvent] = []
-    noteOff: t.List[midiModule.MidiEvent] = []
+    noteOn: list[midi.MidiEvent] = []
+    noteOff: list[midi.MidiEvent] = []
 
     chordVolume = c.volume  # use if component volume are not defined
     hasComponentVolumes = c.hasComponentVolumes()
@@ -986,7 +996,7 @@ def timeSignatureToMidiEvents(ts, includeDeltaTime=True):
     return eventList
 
 
-def midiEventsToKey(eventList) -> 'music21.key.Key':
+def midiEventsToKey(eventList) -> key.Key:
     # noinspection PyShadowingNames
     r'''
     Convert a single MIDI event into a :class:`~music21.key.KeySignature` object.
@@ -1048,9 +1058,9 @@ def midiEventsToKey(eventList) -> 'music21.key.Key':
 
 
 def keySignatureToMidiEvents(
-    ks: 'music21.key.KeySignature',
+    ks: key.KeySignature,
     includeDeltaTime=True
-) -> t.List[t.Union['music21.midi.DeltaTime', 'music21.midi.MidiEvent']]:
+) -> list[midi.DeltaTime | midi.MidiEvent]:
     # noinspection PyShadowingNames
     r'''
     Convert a single :class:`~music21.key.Key` or
@@ -1076,7 +1086,7 @@ def keySignatureToMidiEvents(
     '''
     from music21 import midi as midiModule
     mt = None  # use a midi track set to None
-    eventList: t.List[t.Union[midiModule.DeltaTime, midiModule.MidiEvent]] = []
+    eventList: list[midi.DeltaTime | midi.MidiEvent] = []
     if includeDeltaTime:
         dt = midiModule.DeltaTime(track=mt)
         # leave dt.time set to zero; will be shifted later as necessary
@@ -1119,7 +1129,7 @@ def midiEventsToTempo(eventList):
 def tempoToMidiEvents(
     tempoIndication: tempo.MetronomeMark,
     includeDeltaTime=True,
-) -> t.Optional[t.List[t.Union['music21.midi.DeltaTime', 'music21.midi.MidiEvent']]]:
+) -> list[midi.DeltaTime | midi.MidiEvent] | None:
     # noinspection PyShadowingNames
     r'''
     Given any TempoIndication, convert it to list of :class:`~music21.midi.MidiEvent`
@@ -1169,7 +1179,7 @@ def tempoToMidiEvents(
     if not hasattr(tempoIndication, 'number') or tempoIndication.number is None:
         return None
     mt = None  # use a midi track set to None
-    eventList: t.List[t.Union['music21.midi.DeltaTime', 'music21.midi.MidiEvent']] = []
+    eventList: list[midi.DeltaTime | midi.MidiEvent] = []
     if includeDeltaTime:
         dt = midiModule.DeltaTime(track=mt)
         eventList.append(dt)
@@ -1195,10 +1205,10 @@ def tempoToMidiEvents(
 def getPacketFromMidiEvent(
         trackId: int,
         offset: int,
-        midiEvent: 'music21.midi.MidiEvent',
-        obj: t.Optional['music21.base.Music21Object'] = None,
-        lastInstrument: t.Optional['music21.instrument.Instrument'] = None
-) -> t.Dict[str, t.Any]:
+        midiEvent: midi.MidiEvent,
+        obj: base.Music21Object | None = None,
+        lastInstrument: instrument.Instrument | None = None
+) -> dict[str, t.Any]:
     '''
     Pack a dictionary of parameters for each event.
     Packets are used for sorting and configuring all note events.
@@ -1252,8 +1262,8 @@ def getPacketFromMidiEvent(
 
 
 def elementToMidiEventList(
-    el: 'music21.base.Music21Object'
-) -> t.Optional[t.List['music21.midi.MidiEvent']]:
+    el: base.Music21Object
+) -> list[midi.MidiEvent] | None:
     '''
     Return a list of MidiEvents (or None) from a Music21Object,
     assuming that dynamics have already been applied, etc.
@@ -1270,7 +1280,7 @@ def elementToMidiEventList(
     '''
     # TODO: this is the best use of the switch statement when minimum Python
     #    version is 3.10
-    sub: t.Optional[t.List[t.Union['music21.midi.DeltaTime', 'music21.midi.MidiEvent']]]
+    sub: list[midi.DeltaTime | midi.MidiEvent] | None
     if isinstance(el, note.Rest):
         return None
     elif isinstance(el, note.Note):
@@ -1310,7 +1320,7 @@ def streamToPackets(
     s: stream.Stream,
     trackId: int = 1,
     addStartDelay: bool = False,
-) -> t.List[t.Dict[str, t.Any]]:
+) -> list[dict[str, t.Any]]:
     '''
     Convert a (flattened, sorted) Stream to packets.
 
@@ -1617,9 +1627,9 @@ def assignPacketsToChannels(
 
 
 def filterPacketsByTrackId(
-    packetsSrc: t.List[t.Dict[str, t.Any]],
-    trackIdFilter: t.Optional[int] = None,
-) -> t.List[t.Dict[str, t.Any]]:
+    packetsSrc: list[dict[str, t.Any]],
+    trackIdFilter: int | None = None,
+) -> list[dict[str, t.Any]]:
     '''
     Given a list of Packet dictionaries, return a list of
     only those whose trackId matches the filter.
@@ -1651,9 +1661,9 @@ def filterPacketsByTrackId(
 
 
 def packetsToDeltaSeparatedEvents(
-        packets: t.List[t.Dict[str, t.Any]],
-        midiTrack: 'music21.midi.MidiTrack'
-) -> t.List[t.Union['music21.midi.MidiEvent', 'music21.midi.DeltaTime']]:
+        packets: list[dict[str, t.Any]],
+        midiTrack: midi.MidiTrack,
+) -> list[midi.MidiEvent | midi.DeltaTime]:
     '''
     Given a list of packets (which already contain MidiEvent objects)
     return a list of those Events with proper delta times between them.
@@ -1666,7 +1676,7 @@ def packetsToDeltaSeparatedEvents(
     '''
     from music21.midi import DeltaTime
 
-    events: t.List[t.Union['music21.midi.MidiEvent', DeltaTime]] = []
+    events: list[midi.MidiEvent | DeltaTime] = []
     lastOffset = 0
     for packet in packets:
         midiEvent = packet['midiEvent']
@@ -1716,8 +1726,8 @@ def packetsToMidiTrack(packets, trackId=1, channel=1, instrumentObj=None):
 
 
 def getTimeForEvents(
-    mt: 'music21.midi.MidiTrack'
-) -> t.List[t.Tuple[int, 'music21.midi.MidiEvent']]:
+    mt: midi.MidiTrack
+) -> list[tuple[int, midi.MidiEvent]]:
     '''
     Get a list of tuples of (tickTime, MidiEvent) from the events with time deltas.
     '''
@@ -1769,9 +1779,9 @@ def getTimeForEvents(
 
 
 def getNotesFromEvents(
-    events: t.List[t.Tuple[int, 'music21.midi.MidiEvent']]
-) -> t.List[t.Tuple[t.Tuple[int, 'music21.midi.MidiEvent'],
-                    t.Tuple[int, 'music21.midi.MidiEvent']]]:
+    events: list[tuple[int, midi.MidiEvent]]
+) -> list[tuple[tuple[int, midi.MidiEvent],
+                tuple[int, midi.MidiEvent]]]:
     '''
     Returns a list of Tuples of MIDI events that are pairs of note-on and
     note-off events.
@@ -1870,9 +1880,9 @@ def midiTrackToStream(
     ticksPerQuarter: int = defaults.ticksPerQuarter,
     quantizePost=True,
     inputM21=None,
-    conductorPart: t.Optional[stream.Part] = None,
+    conductorPart: stream.Part | None = None,
     isFirst: bool = False,
-    quarterLengthDivisors: t.Sequence[int] = (),
+    quarterLengthDivisors: Sequence[int] = (),
     **keywords
 ) -> stream.Part:
     # noinspection PyShadowingNames
@@ -1963,8 +1973,8 @@ def midiTrackToStream(
     # collect notes with similar start times into chords
     # create a composite list of both notes and chords
     # composite = []
-    chordSub: t.List[t.Tuple[t.Tuple[int, 'music21.midi.MidiEvent'],
-                             t.Tuple[int, 'music21.midi.MidiEvent']]] = []
+    chordSub: list[tuple[tuple[int, midi.MidiEvent],
+                         tuple[int, midi.MidiEvent]]] = []
     i = 0
     iGathered = []  # store a list of indexes of gathered values put into chords
     voicesRequired = False
@@ -2070,12 +2080,12 @@ def midiTrackToStream(
     if conductorPart is not None:
         insertConductorEvents(conductorPart, s, isFirst=isFirst)
 
-    meterStream: t.Optional[stream.Stream] = None
+    meterStream: stream.Stream | None = None
     if conductorPart is not None:
         ts_iter = conductorPart['TimeSignature']
         if ts_iter:
             meterStream = ts_iter.stream()
-            if t.TYPE_CHECKING:
+            if TYPE_CHECKING:
                 assert meterStream is not None
 
             # Supply any missing time signature at the start
@@ -2228,8 +2238,8 @@ def conductorStream(s: stream.Stream) -> stream.Part:
 
 def channelInstrumentData(
     s: stream.Stream,
-    acceptableChannelList: t.Optional[t.List[int]] = None,
-) -> t.Tuple[t.Dict[t.Union[int, None], int], t.List[int]]:
+    acceptableChannelList: list[int] | None = None,
+) -> tuple[dict[int | None, int], list[int]]:
     '''
     Read through Stream `s` and finding instruments in it, return a 2-tuple,
     the first a dictionary mapping MIDI program numbers to channel numbers,
@@ -2349,10 +2359,10 @@ def channelInstrumentData(
 
 
 def packetStorageFromSubstreamList(
-    substreamList: t.List[stream.Part],
+    substreamList: list[stream.Part],
     *,
     addStartDelay=False,
-) -> t.Dict[int, t.Dict[str, t.Any]]:
+) -> dict[int, dict[str, t.Any]]:
     # noinspection PyShadowingNames
     r'''
     Make a dictionary of raw packets and the initial instrument for each
@@ -2457,8 +2467,8 @@ def packetStorageFromSubstreamList(
 
 
 def updatePacketStorageWithChannelInfo(
-        packetStorage: t.Dict[int, t.Dict[str, t.Any]],
-        channelByInstrument: t.Dict[t.Union[int, None], t.Union[int, None]],
+        packetStorage: dict[int, dict[str, t.Any]],
+        channelByInstrument: dict[int | None, int | None],
 ) -> None:
     '''
     Take the packetStorage dictionary and using information
@@ -2577,10 +2587,10 @@ def streamHierarchyToMidiTracks(
 
 
 def midiTracksToStreams(
-    midiTracks: t.List['music21.midi.MidiTrack'],
+    midiTracks: list[midi.MidiTrack],
     ticksPerQuarter: int = defaults.ticksPerQuarter,
     quantizePost=True,
-    inputM21: t.Optional[stream.Score] = None,
+    inputM21: stream.Score | None = None,
     **keywords
 ) -> stream.Score:
     '''
@@ -2625,8 +2635,8 @@ def streamToMidiFile(
     inputM21: stream.Stream,
     *,
     addStartDelay: bool = False,
-    acceptableChannelList: t.Optional[t.List[int]] = None,
-) -> 'music21.midi.MidiFile':
+    acceptableChannelList: list[int] | None = None,
+) -> midi.MidiFile:
     # noinspection PyShadowingNames
     '''
     Converts a Stream hierarchy into a :class:`~music21.midi.MidiFile` object.
@@ -2824,7 +2834,7 @@ def midiStringToStream(strData, **keywords):
 
 
 def midiFileToStream(
-    mf: 'music21.midi.MidiFile',
+    mf: midi.MidiFile,
     *,
     inputM21=None,
     quantizePost=True,
@@ -3764,7 +3774,7 @@ class Test(unittest.TestCase):
                 c = note.Rest()
             else:
                 c = chord.Chord(['c3', 'd-4', 'g5'])
-                vChord: t.List[volume.Volume] = []
+                vChord: list[volume.Volume] = []
                 for i, unused_cSub in enumerate(c):
                     v = volume.Volume()
                     v.velocityScalar = amps[(j + shift[i]) % len(amps)]

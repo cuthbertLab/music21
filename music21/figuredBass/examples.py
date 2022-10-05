@@ -4,7 +4,7 @@
 # Purpose:      Figured bass test cases
 # Authors:      Jose Cabal-Ugaz
 #
-# Copyright:    Copyright © 2010-2011 Michael Scott Asato Cuthbert and the music21 Project
+# Copyright:    Copyright © 2010-2011 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
@@ -19,6 +19,7 @@ object which can generate realizations as instances of
 in external software such as MuseScore or Finale by
 calling :meth:`~music21.base.Music21Object.show`.
 '''
+from __future__ import annotations
 
 import copy
 import unittest
@@ -437,7 +438,7 @@ def generateBoogieVamp(blRealization=None, numRepeats=5):
     newBassLine.append(sampleScore[1][1])  # Key signature
 
     for n in sampleScore[1].notes:
-        i = interval.notesToInterval(boogieBassLine[0], n)
+        i = interval.Interval(boogieBassLine[0], n)
         tp = boogieBassLine.transpose(i)
         for lyr in n.lyrics:
             tp.notes.first().addLyric(lyr.text)
@@ -483,7 +484,7 @@ def generateTripletBlues(blRealization=None, numRepeats=5):  # 12/8
 
     newBassLine = stream.Part()
     for n in sampleScore[1].notes:
-        i = interval.notesToInterval(tripletBassLine[0], n)
+        i = interval.Interval(tripletBassLine[0], n)
         tp = tripletBassLine.transpose(i)
         for lyr in n.lyrics:
             tp.notes.first().addLyric(lyr.text)

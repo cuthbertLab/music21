@@ -6,12 +6,14 @@
 # Authors:      Christopher Ariza
 #               Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2009-2010 Michael Scott Asato Cuthbert and the music21 Project
+# Copyright:    Copyright © 2009-2010 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
 Simple storage for data defaults used throughout music21.
 '''
+from __future__ import annotations
+
 import unittest
 import typing as t
 from music21 import _version
@@ -32,7 +34,7 @@ class DefaultsException(Exception):
 title = 'Music21 Fragment'
 author = 'Music21'
 software = 'music21 v.' + _version.__version__  # used in xml encoding source software
-musicxmlVersion = '3.1'
+musicxmlVersion = '4.0'
 
 meterNumerator = 4
 meterDenominator = 'quarter'

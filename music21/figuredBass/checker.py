@@ -4,13 +4,13 @@
 # Purpose:      checks figured basses for following voice-leading rules
 # Authors:      Jose Cabal-Ugaz
 #
-# Copyright:    Copyright © 2012 Michael Scott Asato Cuthbert and the music21 Project
+# Copyright:    Copyright © 2012 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
+from __future__ import annotations
 
 import collections
 import copy
-import typing as t
 import unittest
 
 from music21 import pitch
@@ -76,7 +76,6 @@ def extractHarmonies(music21Stream):
     moments are spelled out from the first or highest :class:`~music21.stream.Part`
     to the lowest one.
 
-    >>> from music21 import corpus
     >>> score = corpus.parse('corelli/opus3no1/1grave').measures(1, 3)
     >>> #_DOCS_SHOW score.show()
 
@@ -120,7 +119,6 @@ def createOffsetMapping(music21Part):
     '''
     Creates an initial offset mapping of a :class:`~music21.stream.Part`.
 
-    >>> from music21 import corpus
     >>> from music21.figuredBass import checker
     >>> score = corpus.parse('corelli/opus3no1/1grave').measures(1, 3)
     >>> v0 = score[0]
@@ -153,7 +151,6 @@ def correlateHarmonies(currentMapping, music21Part):
     '''
     Adds a new :class:`~music21.stream.Part` to an existing offset mapping.
 
-    >>> from music21 import corpus
     >>> from music21.figuredBass import checker
     >>> score = corpus.parse('corelli/opus3no1/1grave').measures(1, 3)
     >>> v0 = score[0]
@@ -216,7 +213,6 @@ def checkSinglePossibilities(music21Stream, functionToApply, color='#FF0000', de
 
     .. note:: Colored notes are NOT supported in Finale.
 
-    >>> from music21 import corpus
     >>> music21Stream = corpus.parse('corelli/opus3no1/1grave').measures(1, 6)
     >>> #_DOCS_SHOW music21Stream.show()
 
@@ -281,7 +277,6 @@ def checkConsecutivePossibilities(music21Stream, functionToApply, color='#FF0000
 
     .. note:: Colored notes are NOT supported in Finale.
 
-    >>> from music21 import corpus
     >>> music21Stream = corpus.parse('theoryExercises/checker_demo.xml')
     >>> #_DOCS_SHOW music21Stream.show()
 
@@ -361,7 +356,6 @@ def voiceCrossing(possibA):
     pitches are done using pitch comparison methods, which are based on pitch
     space values (see :class:`~music21.pitch.Pitch`).
 
-    >>> from music21 import pitch
     >>> from music21.figuredBass import checker
     >>> C4 = pitch.Pitch('C4')
     >>> E4 = pitch.Pitch('E4')
@@ -397,8 +391,8 @@ def voiceCrossing(possibA):
 # Consecutive Possibility Rule-Checking Methods
 
 
-PITCH_QUARTET_TO_BOOL_TYPE = t.Dict[
-    t.Tuple[pitch.Pitch, pitch.Pitch, pitch.Pitch, pitch.Pitch],
+PITCH_QUARTET_TO_BOOL_TYPE = dict[
+    tuple[pitch.Pitch, pitch.Pitch, pitch.Pitch, pitch.Pitch],
     bool
 ]
 parallelFifthsTable: PITCH_QUARTET_TO_BOOL_TYPE = {}
@@ -419,7 +413,6 @@ def parallelFifths(possibA, possibB):
     by the simple interval of a perfect fifth, then this
     constitutes parallel fifths between these two parts.
 
-    >>> from music21 import pitch
     >>> from music21.figuredBass import checker
     >>> C3 = pitch.Pitch('C3')
     >>> D3 = pitch.Pitch('D3')
@@ -497,7 +490,6 @@ def hiddenFifth(possibA, possibB):
     between sopranoPitchB and bassPitchB is that of a perfect fifth,
     then this constitutes a hidden octave between the two possibilities.
 
-    >>> from music21 import pitch
     >>> from music21.figuredBass import checker
     >>> C3 = pitch.Pitch('C3')
     >>> D3 = pitch.Pitch('D3')
@@ -579,7 +571,6 @@ def parallelOctaves(possibA, possibB):
     by the simple interval of a perfect octave, then this
     constitutes parallel octaves between these two parts.
 
-    >>> from music21 import pitch
     >>> from music21.figuredBass import checker
     >>> C3 = pitch.Pitch('C3')
     >>> D3 = pitch.Pitch('D3')
@@ -657,7 +648,6 @@ def hiddenOctave(possibA, possibB):
     between sopranoPitchB and bassPitchB is that of a perfect octave,
     then this constitutes a hidden octave between the two possibilities.
 
-    >>> from music21 import pitch
     >>> from music21.figuredBass import checker
     >>> C3 = pitch.Pitch('C3')
     >>> D3 = pitch.Pitch('D3')

@@ -5,7 +5,7 @@
 #
 # Authors:      Christopher Ariza
 #
-# Copyright:    Copyright © 2009-2011 Michael Scott Asato Cuthbert and the music21 Project
+# Copyright:    Copyright © 2009-2011 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
@@ -15,15 +15,16 @@ This module defines a number of performance test.
 
 This file is not run with the standard test battery presently.
 '''
-
+from __future__ import annotations
 
 import unittest
 
 import music21
-from music21 import common, corpus
+from music21 import common
+from music21 import corpus
+from music21 import environment
 from music21.musicxml.m21ToXml import GeneralObjectExporter as GEX
 
-from music21 import environment
 environLocal = environment.Environment('test.testPerformance')
 
 # ------------------------------------------------------------------------------

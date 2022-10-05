@@ -27,6 +27,8 @@ SortTuple(atEnd=0, offset=0.0, priority=-inf, classSortOrder=0, isNotGrace=1, in
 >>> sorting.ZeroSortTupleHigh
 SortTuple(atEnd=0, offset=0.0, priority=inf, classSortOrder=0, isNotGrace=1, insertIndex=0)
 '''
+from __future__ import annotations
+
 from collections import namedtuple
 from math import inf as INFINITY
 from music21 import exceptions21

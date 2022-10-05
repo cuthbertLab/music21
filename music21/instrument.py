@@ -10,7 +10,7 @@
 #               Ben Houge
 #               Mark Gotham
 #
-# Copyright:    Copyright © 2009-2022 Michael Scott Asato Cuthbert and the music21 Project
+# Copyright:    Copyright © 2009-2022 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
@@ -21,29 +21,33 @@ or instrument family, such as string pitches, etc.  Information about instrument
 ensembles is also included here though it may later be separated out into its own
 ensemble.py module.
 '''
-import copy
+from __future__ import annotations
+
+from collections import OrderedDict
+from collections.abc import Iterable
 import importlib
 import unittest
-import sys
-from collections import OrderedDict
 import typing as t
+from typing import TYPE_CHECKING  # must be imported separately
 
 from music21 import base
 from music21 import common
+from music21 import environment
+from music21.exceptions21 import InstrumentException
 from music21 import interval
 from music21 import note
 from music21 import pitch
 from music21.tree.trees import OffsetTree
 
-from music21.exceptions21 import InstrumentException
+if TYPE_CHECKING:
+    from music21 import stream
 
-from music21 import environment
 environLocal = environment.Environment('instrument')
 
 
-def unbundleInstruments(streamIn: 'music21.stream.Stream',
+def unbundleInstruments(streamIn: stream.Stream,
                         *,
-                        inPlace=False) -> t.Optional['music21.stream.Stream']:
+                        inPlace=False) -> stream.Stream | None:
     # noinspection PyShadowingNames
     '''
     takes a :class:`~music21.stream.Stream` that has :class:`~music21.note.NotRest` objects
@@ -80,9 +84,9 @@ def unbundleInstruments(streamIn: 'music21.stream.Stream',
         return s
 
 
-def bundleInstruments(streamIn: 'music21.stream.Stream',
+def bundleInstruments(streamIn: stream.Stream,
                       *,
-                      inPlace=False) -> t.Optional['music21.stream.Stream']:
+                      inPlace=False) -> stream.Stream | None:
     # noinspection PyShadowingNames
     '''
     >>> up1 = note.Unpitched()
@@ -159,20 +163,20 @@ class Instrument(base.Music21Object):
         self.printPartName = None  # True = yes, False = no, None = let others decide
         self.printPartAbbreviation = None
 
-        self.instrumentId: t.Optional[str] = None  # apply to midi and instrument
+        self.instrumentId: str | None = None  # apply to midi and instrument
         self._instrumentIdIsRandom = False
 
         self.instrumentName: str = instrumentName
-        self.instrumentAbbreviation: t.Optional[str] = None
-        self.midiProgram: t.Optional[int] = None  # 0-indexed
-        self.midiChannel: t.Optional[int] = None  # 0-indexed
-        self.instrumentSound: t.Optional[str] = None
+        self.instrumentAbbreviation: str | None = None
+        self.midiProgram: int | None = None  # 0-indexed
+        self.midiChannel: int | None = None  # 0-indexed
+        self.instrumentSound: str | None = None
 
         self.lowestNote = None
         self.highestNote = None
 
         # define interval to go from written to sounding
-        self.transposition: t.Optional[interval.Interval] = None
+        self.transposition: interval.Interval | None = None
 
         self.inGMPercMap = False
         self.soundfontFn = None  # if defined...
@@ -517,8 +521,6 @@ class StringInstrument(Instrument):
             stringPitches is a property that stores a list of Pitches (or pitch names,
             such as "C4") that represent the pitch of the open strings from lowest to
             highest.[*]
-
-
 
             >>> vln1 = instrument.Violin()
             >>> [str(p) for p in vln1.stringPitches]
@@ -1814,7 +1816,7 @@ def ensembleNameBySize(number):
         return ensembleNamesBySize[int(number)]
 
 
-def deduplicate(s: 'music21.stream.Stream', inPlace: bool = False) -> 'music21.stream.Stream':
+def deduplicate(s: stream.Stream, inPlace: bool = False) -> stream.Stream:
     '''
     Check every offset in `s` for multiple instrument instances.
     If the `.partName` can be standardized across instances,
@@ -1871,7 +1873,7 @@ def deduplicate(s: 'music21.stream.Stream', inPlace: bool = False) -> 'music21.s
         returnObj = s.coreCopyAsDerivation('instrument.deduplicate')
 
     if not returnObj.hasPartLikeStreams():
-        substreams: t.Iterable[stream.Stream] = [returnObj]
+        substreams: Iterable[stream.Stream] = [returnObj]
     else:
         substreams = returnObj.getElementsByClass(stream.Stream)
 
@@ -2089,7 +2091,7 @@ def instrumentFromMidiProgram(number: int) -> Instrument:
     return inst
 
 
-def partitionByInstrument(streamObj):
+def partitionByInstrument(streamObj: stream.Stream) -> stream.Stream:
     # noinspection PyShadowingNames
     '''
     Given a single Stream, or a Score or similar multi-part structure,
@@ -2212,6 +2214,8 @@ def partitionByInstrument(streamObj):
             {0.0} <music21.note.Note C#>
             {4.0} <music21.bar.Barline type=final>
 
+    Changes in v8: returns the original stream if there are no instruments.
+
     TODO: parts should be in Score Order. Coincidence that this almost works.
     TODO: use proper recursion to make a copy of the stream.
     TODO: final barlines should be aligned.
@@ -2232,12 +2236,11 @@ def partitionByInstrument(streamObj):
         sub.extendDuration('Instrument', inPlace=True)
 
     # first, find all unique instruments
-    instrumentIterator = s.recurse().getElementsByClass(Instrument)
+    instrumentIterator = s[Instrument]
     if not instrumentIterator:
-        # TODO(msc): v7 return s.
-        return None  # no partition is available
+        return s  # no partition is available
 
-    names = OrderedDict()  # store unique names
+    names: OrderedDict[str, dict[str, t.Any]] = OrderedDict()  # store unique names
     for instrumentObj in instrumentIterator:
         # matching here by instrument name
         if instrumentObj.instrumentName not in names:
@@ -2323,7 +2326,6 @@ def fromString(instrumentString: str,
     for example), attempts to return an appropriate
     :class:`~music21.instrument.Instrument`.
 
-    >>> from music21 import instrument
     >>> t1 = instrument.fromString('Clarinet 2 in A')
     >>> t1
     <music21.instrument.Clarinet 'Clarinet 2 in A'>
@@ -2423,7 +2425,6 @@ def fromString(instrumentString: str,
     >>> t12
     <music21.instrument.Clarinet 'Klarinette'>
 
-
     This case works because the name 'Klarinette' is a recognised instrument name in German
     and appears in the German language list.
     If you search for a German name like 'Klarinette' on the French list (language='french'),
@@ -2433,7 +2434,6 @@ def fromString(instrumentString: str,
     'english', 'french', 'german', 'italian', 'russian', 'spanish', and 'abbreviation'.
 
     Note that the language string is not case-sensitive, so 'French' is also fine.
-
     '''
     from music21.languageExcerpts import instrumentLookup
 
@@ -2574,25 +2574,8 @@ class TestExternal(unittest.TestCase):
 class Test(unittest.TestCase):
 
     def testCopyAndDeepcopy(self):
-        '''Test copying all objects defined in this module
-        '''
-        import types
-        for part in sys.modules[self.__module__].__dict__.keys():
-            match = False
-            for skip in ['_', '__', 'Test', 'Exception']:
-                if part.startswith(skip) or part.endswith(skip):
-                    match = True
-            if match:
-                continue
-            name = getattr(sys.modules[self.__module__], part)
-            # noinspection PyTypeChecker
-            if callable(name) and not isinstance(name, types.FunctionType):
-                try:  # see if obj can be made w/ args
-                    obj = name()
-                except TypeError:  # pragma: no cover
-                    continue
-                i = copy.copy(obj)
-                j = copy.deepcopy(obj)
+        from music21.test.commonTest import testCopyAll
+        testCopyAll(self, globals())
 
     def testMusicXMLExport(self):
         from music21 import stream

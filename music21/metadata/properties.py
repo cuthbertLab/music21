@@ -10,8 +10,8 @@
 #               Project
 # License:      BSD, see license.txt
 # -----------------------------------------------------------------------------
+from __future__ import annotations
 
-import typing as t
 from dataclasses import dataclass
 
 from music21.metadata.primitives import (DatePrimitive, Text, Contributor, Copyright, ValueType)
@@ -25,11 +25,11 @@ class PropertyDescription:
     * name: str is the namespace's name of the property (the tail of the property term URI).
     * namespace: str is a shortened form of the URI for the set of terms.
         * 'dcterms' means the property term is from the Dublin Core terms,
-            defined at <http://purl.org/dc/terms/>
+            defined at <https://www.dublincore.org/specifications/dublin-core/dcmi-terms/>
         * 'marcrel' means the property term is from the MARC Relator terms,
-            defined at <http://www.loc.gov/loc.terms/relators/>
+            defined at <https://id.loc.gov/vocabulary/relators.html>
         * 'humdrum' means the property term is from the Humdrum reference record terms,
-            defined at <https://www.humdrum.org/reference-records/#>
+            defined at <https://www.humdrum.org/reference-records/>
     * isContributor: bool is whether the property describes a contributor.
     * needsArticleNormalization: bool is whether the property values might
         benefit from article normalization when getting as a string (this is
@@ -47,17 +47,17 @@ class PropertyDescription:
         metadata, and is the tuple element type clients will always receive from
         md['uniqueName'] or md['namespace:name'].
     '''
-    uniqueName: t.Optional[str] = None
+    uniqueName: str | None = None
     name: str = ''
     namespace: str = ''
-    oldMusic21Abbrev: t.Optional[str] = None
-    oldMusic21WorkId: t.Optional[str] = None
-    valueType: t.Type[ValueType] = Text
+    oldMusic21Abbrev: str | None = None
+    oldMusic21WorkId: str | None = None
+    valueType: type[ValueType] = Text
     needsArticleNormalization: bool = False
     isContributor: bool = False
 
 
-STANDARD_PROPERTY_DESCRIPTIONS: t.Tuple[PropertyDescription, ...] = (
+STANDARD_PROPERTY_DESCRIPTIONS: tuple[PropertyDescription, ...] = (
     # The following 'dcterms' properties are standard Dublin Core property
     # terms, found at http://purl.org/dc/terms/
 
@@ -1163,76 +1163,76 @@ def _namespaceName(prop: PropertyDescription) -> str:
 
 
 # The dictionaries:
-NAMESPACE_NAME_TO_PROPERTY_DESCRIPTION: t.Dict[str, PropertyDescription] = {}
+NAMESPACE_NAME_TO_PROPERTY_DESCRIPTION: dict[str, PropertyDescription] = {}
 for _x in STANDARD_PROPERTY_DESCRIPTIONS:
     NAMESPACE_NAME_TO_PROPERTY_DESCRIPTION[_namespaceName(_x)] = _x
 
 
-NAMESPACE_NAME_TO_UNIQUE_NAME: t.Dict[str, str] = {}
+NAMESPACE_NAME_TO_UNIQUE_NAME: dict[str, str] = {}
 for _x in STANDARD_PROPERTY_DESCRIPTIONS:
     NAMESPACE_NAME_TO_UNIQUE_NAME[_namespaceName(_x)] = _uniqueName(_x)
 
 
-UNIQUE_NAME_TO_NAMESPACE_NAME: t.Dict[str, str] = {}
+UNIQUE_NAME_TO_NAMESPACE_NAME: dict[str, str] = {}
 for _x in STANDARD_PROPERTY_DESCRIPTIONS:
     UNIQUE_NAME_TO_NAMESPACE_NAME[_uniqueName(_x)] = _namespaceName(_x)
 
 
-UNIQUE_NAME_TO_PROPERTY_DESCRIPTION: t.Dict[str, PropertyDescription] = {}
+UNIQUE_NAME_TO_PROPERTY_DESCRIPTION: dict[str, PropertyDescription] = {}
 for _x in STANDARD_PROPERTY_DESCRIPTIONS:
     UNIQUE_NAME_TO_PROPERTY_DESCRIPTION[_uniqueName(_x)] = _x
 
 
-UNIQUE_NAME_TO_VALUE_TYPE: t.Dict[str, t.Type] = {}
+UNIQUE_NAME_TO_VALUE_TYPE: dict[str, type] = {}
 for _x in STANDARD_PROPERTY_DESCRIPTIONS:
     UNIQUE_NAME_TO_VALUE_TYPE[_uniqueName(_x)] = _x.valueType
 
 
-MUSIC21_ABBREVIATION_TO_NAMESPACE_NAME: t.Dict[str, str] = {}
+MUSIC21_ABBREVIATION_TO_NAMESPACE_NAME: dict[str, str] = {}
 for _x in STANDARD_PROPERTY_DESCRIPTIONS:
     if _x.oldMusic21Abbrev:
         MUSIC21_ABBREVIATION_TO_NAMESPACE_NAME[_x.oldMusic21Abbrev] = _namespaceName(_x)
 
 
-MUSIC21_WORK_ID_TO_NAMESPACE_NAME: t.Dict[str, str] = {}
+MUSIC21_WORK_ID_TO_NAMESPACE_NAME: dict[str, str] = {}
 for _x in STANDARD_PROPERTY_DESCRIPTIONS:
     if _x.oldMusic21WorkId:
         MUSIC21_WORK_ID_TO_NAMESPACE_NAME[_x.oldMusic21WorkId] = _namespaceName(_x)
 
 
-MUSIC21_WORK_ID_TO_UNIQUE_NAME: t.Dict[str, str] = {}
+MUSIC21_WORK_ID_TO_UNIQUE_NAME: dict[str, str] = {}
 for _x in STANDARD_PROPERTY_DESCRIPTIONS:
     if _x.oldMusic21WorkId:
         MUSIC21_WORK_ID_TO_UNIQUE_NAME[_x.oldMusic21WorkId] = _uniqueName(_x)
 
 
-UNIQUE_NAME_TO_MUSIC21_WORK_ID: t.Dict[str, str] = {}
+UNIQUE_NAME_TO_MUSIC21_WORK_ID: dict[str, str] = {}
 for _x in STANDARD_PROPERTY_DESCRIPTIONS:
     if _x.oldMusic21WorkId:
         UNIQUE_NAME_TO_MUSIC21_WORK_ID[_uniqueName(_x)] = _x.oldMusic21WorkId
 
-ALL_UNIQUE_NAMES: t.List[str] = list(UNIQUE_NAME_TO_NAMESPACE_NAME.keys())
-ALL_MUSIC21_WORK_IDS: t.List[str] = list(MUSIC21_WORK_ID_TO_NAMESPACE_NAME.keys())
-ALL_MUSIC21_ABBREVIATIONS: t.List[str] = list(MUSIC21_ABBREVIATION_TO_NAMESPACE_NAME.keys())
-ALL_NAMESPACE_NAMES: t.List[str] = list(NAMESPACE_NAME_TO_PROPERTY_DESCRIPTION.keys())
+ALL_UNIQUE_NAMES: list[str] = list(UNIQUE_NAME_TO_NAMESPACE_NAME.keys())
+ALL_MUSIC21_WORK_IDS: list[str] = list(MUSIC21_WORK_ID_TO_NAMESPACE_NAME.keys())
+ALL_MUSIC21_ABBREVIATIONS: list[str] = list(MUSIC21_ABBREVIATION_TO_NAMESPACE_NAME.keys())
+ALL_NAMESPACE_NAMES: list[str] = list(NAMESPACE_NAME_TO_PROPERTY_DESCRIPTION.keys())
 
 # 'software' is a plural attribute name (never singular) so we have
 # to carefully leave it out of ALL_SINGLE_ATTRIBUTE_NAMES.
-_ALL_UNIQUE_NAMES_EXCEPT_SOFTWARE: t.List[str] = list(
+_ALL_UNIQUE_NAMES_EXCEPT_SOFTWARE: list[str] = list(
     name for name in ALL_UNIQUE_NAMES if name != 'software')
 
-ALL_SINGLE_ATTRIBUTE_NAMES: t.List[str] = list(
+ALL_SINGLE_ATTRIBUTE_NAMES: list[str] = list(
     _ALL_UNIQUE_NAMES_EXCEPT_SOFTWARE
     + ALL_MUSIC21_WORK_IDS
     + ALL_MUSIC21_ABBREVIATIONS
     + ['fileFormat' + 'filePath' + 'fileNumber']
 )
 
-ALL_PLURAL_ATTRIBUTE_NAMES: t.List[str] = [
+ALL_PLURAL_ATTRIBUTE_NAMES: list[str] = [
     'composers', 'librettists', 'lyricists', 'software'
 ]
 
-ALL_LEGAL_ATTRIBUTES: t.List[str] = list(
+ALL_LEGAL_ATTRIBUTES: list[str] = list(
     ALL_SINGLE_ATTRIBUTE_NAMES
     + ALL_PLURAL_ATTRIBUTE_NAMES
 )

@@ -6,9 +6,10 @@
 # Authors:      Michael Scott Asato Cuthbert
 #               Christopher Ariza
 #
-# Copyright:    Copyright © 2009-2015 Michael Scott Asato Cuthbert and the music21 Project
+# Copyright:    Copyright © 2009-2015 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
+from __future__ import annotations
 
 __all__ = ['wrapWeakref', 'unwrapWeakref']
 
@@ -19,7 +20,7 @@ _T = t.TypeVar('_T')
 # ------------------------------------------------------------------------------
 
 
-def wrapWeakref(referent: _T) -> t.Union[weakref.ReferenceType, _T]:
+def wrapWeakref(referent: _T) -> weakref.ReferenceType | _T:
     '''
     utility function that wraps objects as weakrefs but does not wrap
     already wrapped objects; also prevents wrapping the unwrappable "None" type, etc.

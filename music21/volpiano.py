@@ -5,7 +5,7 @@
 #
 # Authors:      Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2017 Michael Scott Asato Cuthbert and the music21 Project
+# Copyright:    Copyright © 2017 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
@@ -17,6 +17,8 @@ from any music21 Stream.
 
 This module will move to a medren package hopefully by v.7
 '''
+from __future__ import annotations
+
 import enum
 import unittest
 

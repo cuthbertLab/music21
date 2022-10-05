@@ -5,7 +5,7 @@
 #
 # Authors:      Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2011-2018 Michael Scott Asato Cuthbert and the music21 Project
+# Copyright:    Copyright © 2011-2018 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
@@ -24,15 +24,15 @@ Speed notes:
    (But then PyPy probably won't work.)
 
 '''
+from __future__ import annotations
+
+from collections import OrderedDict
 import difflib
+from functools import partial
 import json
 import math
 import pathlib
 import random
-
-from collections import OrderedDict
-from functools import partial
-import typing as t
 
 from music21 import common
 from music21 import converter
@@ -45,6 +45,7 @@ environLocal = environment.Environment('search.segment')
 # noinspection SpellCheckingInspection
 def translateMonophonicPartToSegments(
     inputStream,
+    *,
     segmentLengths=30,
     overlap=12,
     algorithm=None,
@@ -60,7 +61,6 @@ def translateMonophonicPartToSegments(
     If algorithm is None then a default algorithm of music21.search.translateStreamToStringNoRhythm
     is used
 
-    >>> from music21 import *
     >>> luca = corpus.parse('luca/gloria')
     >>> lucaCantus = luca.parts[0]
     >>> segments, measureLists = search.segment.translateMonophonicPartToSegments(lucaCantus)
@@ -113,7 +113,7 @@ def translateMonophonicPartToSegments(
 
 
 # noinspection SpellCheckingInspection
-def indexScoreParts(scoreFile, *args, **keywords):
+def indexScoreParts(scoreFile, **keywords):
     r'''
     Creates segment and measure lists for each part of a score
     Returns list of dictionaries of segment and measure lists
@@ -129,7 +129,7 @@ def indexScoreParts(scoreFile, *args, **keywords):
     indexedList = []
     for part in scoreFileParts:
         segmentList, measureList = translateMonophonicPartToSegments(
-            part, *args, **keywords)
+            part, **keywords)
         indexedList.append({
             'segmentList': segmentList,
             'measureList': measureList,
@@ -137,7 +137,7 @@ def indexScoreParts(scoreFile, *args, **keywords):
     return indexedList
 
 
-def _indexSingleMulticore(filePath, *args, failFast=False, **keywords):
+def _indexSingleMulticore(filePath, failFast=False, **keywords):
     '''
     Index one path in the context of multicore.
     '''
@@ -147,7 +147,7 @@ def _indexSingleMulticore(filePath, *args, failFast=False, **keywords):
     shortFp = filePath.name
 
     try:
-        indexOutput = indexOnePath(filePath, *args, **keywords)
+        indexOutput = indexOnePath(filePath, **keywords)
     except Exception as e:  # pylint: disable=broad-except
         if not failFast:
             print(f'Failed on parse/index for, {filePath}: {e}')
@@ -163,8 +163,8 @@ def _giveUpdatesMulticore(numRun, totalRun, latestOutput):
 
 # noinspection SpellCheckingInspection
 def indexScoreFilePaths(scoreFilePaths,
+                        *,
                         giveUpdates=False,
-                        *args,
                         runMulticore=True,
                         **keywords):
     # noinspection PyShadowingNames
@@ -193,7 +193,7 @@ def indexScoreFilePaths(scoreFilePaths,
     else:
         updateFunction = None
 
-    indexFunc = partial(_indexSingleMulticore, *args, **keywords)
+    indexFunc = partial(_indexSingleMulticore, **keywords)
 
     for i in range(len(scoreFilePaths)):
         if not isinstance(scoreFilePaths[i], pathlib.Path):
@@ -224,7 +224,7 @@ def indexScoreFilePaths(scoreFilePaths,
     return scoreDict
 
 
-def indexOnePath(filePath, *args, **keywords):
+def indexOnePath(filePath, **keywords):
     '''
     Index a single path.  Returns a scoreDictEntry
     '''
@@ -236,7 +236,7 @@ def indexOnePath(filePath, *args, **keywords):
     else:
         scoreObj = converter.parse(filePath)
 
-    scoreDictEntry = indexScoreParts(scoreObj, *args, **keywords)
+    scoreDictEntry = indexScoreParts(scoreObj, **keywords)
     return scoreDictEntry
 
 
@@ -398,10 +398,9 @@ def scoreSimilarity(
 
 # ------------------------------------------------------------------------------
 # define presented order in documentation
-_DOC_ORDER: t.List[type] = []
+_DOC_ORDER: list[type] = []
 
 
 if __name__ == '__main__':
     import music21
     music21.mainTest()
-

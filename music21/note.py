@@ -7,7 +7,6 @@
 #               Christopher Ariza
 #
 # Copyright:    Copyright © 2006-2022 Michael Scott Asato Cuthbert
-#               and the music21 Project
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
@@ -18,16 +17,19 @@ and used to configure, :class:`~music21.note.Note` objects.
 '''
 from __future__ import annotations
 
+from collections.abc import Iterable, Sequence
 import copy
-import unittest
-
 import typing as t
-from typing import overload
+from typing import overload  # PyCharm bug
+from typing import TYPE_CHECKING  # PyLint bug
+import unittest
 
 from music21 import base
 from music21 import beam
 from music21 import common
+from music21.common.types import StepName, OffsetQLIn
 from music21.duration import Duration
+from music21 import environment
 from music21 import exceptions21
 from music21 import expressions
 from music21 import interval
@@ -36,8 +38,13 @@ from music21 import prebase
 from music21 import style
 from music21 import tie
 from music21 import volume
-from music21.common.types import StepName
-from music21 import environment
+
+if TYPE_CHECKING:
+    from music21 import articulations
+    from music21 import chord
+    from music21 import instrument
+    from music21 import percussion
+
 environLocal = environment.Environment('note')
 
 noteheadTypeNames = (
@@ -103,7 +110,7 @@ class NotRestException(exceptions21.Music21Exception):
 # ------------------------------------------------------------------------------
 SyllabicChoices = t.Literal[None, 'begin', 'single', 'end', 'middle', 'composite']
 
-SYLLABIC_CHOICES: t.List[SyllabicChoices] = [
+SYLLABIC_CHOICES: list[SyllabicChoices] = [
     None, 'begin', 'single', 'end', 'middle', 'composite',
 ]
 
@@ -199,14 +206,14 @@ class Lyric(prebase.ProtoM21Object, style.StyleMixin):
                  *,
                  applyRaw: bool = False,
                  syllabic: SyllabicChoices = None,
-                 identifier: t.Optional[str] = None,
+                 identifier: str | None = None,
                  **keywords):
         super().__init__()
-        self._identifier: t.Optional[str] = None
+        self._identifier: str | None = None
         self._number: int = 1
         self._text: str = ''
         self._syllabic: SyllabicChoices = None
-        self.components: t.Optional[t.List['music21.note.Lyric']] = None
+        self.components: list[Lyric] | None = None
         self.elisionBefore = ' '
 
         # these are set by setTextAndSyllabic
@@ -274,7 +281,7 @@ class Lyric(prebase.ProtoM21Object, style.StyleMixin):
         if not self.isComposite:
             return self._text
         else:
-            assert isinstance(self.components, t.Sequence), \
+            assert isinstance(self.components, Sequence), \
                 'Programming error: isComposite implies that components exists'  # mypy
             text_out = self.components[0].text
             if text_out is None:
@@ -328,7 +335,7 @@ class Lyric(prebase.ProtoM21Object, style.StyleMixin):
         self._syllabic = newSyllabic
 
     @property
-    def identifier(self) -> t.Union[str, int]:
+    def identifier(self) -> str | int:
         '''
         By default, this is the same as self.number. However, if there is a
         descriptive identifier like 'part2verse1', it is stored here and
@@ -356,7 +363,7 @@ class Lyric(prebase.ProtoM21Object, style.StyleMixin):
             return self._identifier
 
     @identifier.setter
-    def identifier(self, value: t.Union[str, None]):
+    def identifier(self, value: str | None):
         self._identifier = value
 
     @property
@@ -407,7 +414,7 @@ class Lyric(prebase.ProtoM21Object, style.StyleMixin):
             else:
                 return text
         else:
-            assert isinstance(self.components, t.Sequence), \
+            assert isinstance(self.components, Sequence), \
                 'Programming error: isComposite should assert components exists'  # for mypy
             firstSyllabic = self.components[0].syllabic
             lastSyllabic = self.components[-1].syllabic
@@ -542,7 +549,6 @@ class GeneralNote(base.Music21Object):
     objects directly, and not use this underlying
     structure.
 
-
     >>> gn = note.GeneralNote(type='16th', dots=2)
     >>> gn.quarterLength
     0.4375
@@ -550,12 +556,12 @@ class GeneralNote(base.Music21Object):
     isNote = False
     isRest = False
     isChord = False
-    _styleClass: t.Type[style.Style] = style.NoteStyle
+    _styleClass: type[style.Style] = style.NoteStyle
 
     # define order for presenting names in documentation; use strings
     _DOC_ORDER = ['duration', 'quarterLength']
     # documentation for all attributes (not properties or methods)
-    _DOC_ATTR: t.Dict[str, str] = {
+    _DOC_ATTR: dict[str, str] = {
         'isChord': 'Boolean read-only value describing if this object is a Chord.',
         'lyrics': 'A list of :class:`~music21.note.Lyric` objects.',
         'expressions': '''a list of expressions (such
@@ -566,13 +572,13 @@ class GeneralNote(base.Music21Object):
     }
 
     def __init__(self,
-                 *arguments,
-                 duration: t.Optional[Duration] = None,
-                 lyric: t.Union[None, str, Lyric] = None,
+                 *,
+                 duration: Duration | None = None,
+                 lyric: None | str | Lyric = None,
                  **keywords
                  ):
         if duration is None:
-            # ensure music21base not automatically create a duration.
+            # ensure music21base not automatically create a zero duration before we can.
             if not keywords or ('type' not in keywords and 'quarterLength' not in keywords):
                 tempDuration = Duration(1.0)
             else:
@@ -588,15 +594,15 @@ class GeneralNote(base.Music21Object):
         # this sets the stored duration defined in Music21Object
         super().__init__(duration=tempDuration)
 
-        self.lyrics: t.List[Lyric] = []  # a list of lyric objects
-        self.expressions: t.List[expressions.Expression] = []
-        self.articulations: t.List['music21.articulations.Articulation'] = []
+        self.lyrics: list[Lyric] = []  # a list of lyric objects
+        self.expressions: list[expressions.Expression] = []
+        self.articulations: list[articulations.Articulation] = []
 
         if lyric is not None:
             self.addLyric(lyric)
 
         # note: Chords handle ties differently
-        self._tie: t.Optional[tie.Tie] = None  # store a Tie object
+        self._tie: tie.Tie | None = None  # store a Tie object
 
     def __eq__(self, other):
         '''
@@ -628,7 +634,7 @@ class GeneralNote(base.Music21Object):
 
     # --------------------------------------------------------------------------
     @property
-    def tie(self) -> t.Optional[tie.Tie]:
+    def tie(self) -> tie.Tie | None:
         '''
         Return and set a :class:`~music21.note.Tie` object, or None.
 
@@ -640,17 +646,17 @@ class GeneralNote(base.Music21Object):
         return self._tie
 
     @tie.setter
-    def tie(self, value: t.Optional[tie.Tie]):
+    def tie(self, value: tie.Tie | None):
         self._tie = value
 
-    def _getLyric(self) -> t.Optional[str]:
+    def _getLyric(self) -> str | None:
         if not self.lyrics:
             return None
 
         allText = [ly.text for ly in self.lyrics]
         return '\n'.join([textStr for textStr in allText if textStr is not None])
 
-    def _setLyric(self, value: t.Union[str, Lyric, None]) -> None:
+    def _setLyric(self, value: str | Lyric | None) -> None:
         self.lyrics = []
         if value is None:
             return
@@ -835,7 +841,7 @@ class GeneralNote(base.Music21Object):
         return self.classes[0]  # override in subclasses
 
     @property
-    def pitches(self) -> t.Tuple[Pitch, ...]:
+    def pitches(self) -> tuple[Pitch, ...]:
         '''
         Returns an empty tuple.  (Useful for iterating over NotRests since they
         include Notes and Chords.)
@@ -843,7 +849,7 @@ class GeneralNote(base.Music21Object):
         return ()
 
     @pitches.setter
-    def pitches(self, _value: t.Iterable[Pitch]):
+    def pitches(self, _value: Iterable[Pitch]):
         pass
 
 
@@ -966,28 +972,27 @@ class NotRest(GeneralNote):
     # unspecified means that there may be a stem, but its orientation
     # has not been declared.
 
-    _DOC_ATTR: t.Dict[str, str] = {
+    _DOC_ATTR: dict[str, str] = {
         'beams': '''
             A :class:`~music21.beam.Beams` object that contains
             information about the beaming of this note.''',
     }
 
     def __init__(self,
-                 *arguments,
-                 beams: t.Optional[beam.Beams] = None,
+                 beams: beam.Beams | None = None,
                  **keywords):
         super().__init__(**keywords)
         self._notehead: str = 'normal'
-        self._noteheadFill: t.Optional[bool] = None
+        self._noteheadFill: bool | None = None
         self._noteheadParenthesis: bool = False
         self._stemDirection: str = 'unspecified'
-        self._volume: t.Optional[volume.Volume] = None  # created on demand
+        self._volume: volume.Volume | None = None  # created on demand
         if beams is not None:
             self.beams = beams
         else:
             self.beams = beam.Beams()
-        self._storedInstrument: t.Optional['music21.instrument.Instrument'] = None
-        self._chordAttached: t.Optional['music21.chord.ChordBase'] = None
+        self._storedInstrument: instrument.Instrument | None = None
+        self._chordAttached: chord.ChordBase | None = None
 
     # ==============================================================================================
     # Special functions
@@ -1126,7 +1131,7 @@ class NotRest(GeneralNote):
         self._notehead = value
 
     @property
-    def noteheadFill(self) -> t.Union[bool, None]:
+    def noteheadFill(self) -> bool | None:
         '''
         Get or set the note head fill status of this NotRest. Valid note head fill values are
         True, False, or None (meaning default).  "yes" and "no" are converted to True
@@ -1147,8 +1152,8 @@ class NotRest(GeneralNote):
         return self._noteheadFill
 
     @noteheadFill.setter
-    def noteheadFill(self, value: t.Union[bool, None, str]):
-        boolValue: t.Optional[bool]
+    def noteheadFill(self, value: bool | None | str):
+        boolValue: bool | None
         if value in ('none', None, 'default'):
             boolValue = None  # allow setting to none or None
         elif value in (True, 'filled', 'yes'):
@@ -1186,7 +1191,7 @@ class NotRest(GeneralNote):
         return self._noteheadParenthesis
 
     @noteheadParenthesis.setter
-    def noteheadParenthesis(self, value: t.Union[bool, str, int]):
+    def noteheadParenthesis(self, value: bool | str | int):
         boolValue: bool
         if value in (True, 'yes', 1):
             boolValue = True
@@ -1217,7 +1222,7 @@ class NotRest(GeneralNote):
             return True
 
     def _getVolume(self,
-                   forceClient: t.Optional[base.Music21Object] = None
+                   forceClient: base.Music21Object | None = None
                    ) -> volume.Volume:
         # DO NOT CHANGE TO @property because of optional attributes
         # lazy volume creation.  property is set below.
@@ -1229,12 +1234,12 @@ class NotRest(GeneralNote):
                 self._volume = volume.Volume(client=forceClient)
 
         volume_out = self._volume
-        if t.TYPE_CHECKING:
+        if TYPE_CHECKING:
             assert volume_out is not None
 
         return volume_out
 
-    def _setVolume(self, value: t.Union[None, volume.Volume, int, float], setClient=True):
+    def _setVolume(self, value: None | volume.Volume | int | float, setClient=True):
         # DO NOT CHANGE TO @property because of optional attributes
         # setClient is only False when Chords are bundling Notes.
         if value is None:
@@ -1258,7 +1263,7 @@ class NotRest(GeneralNote):
             raise Exception(f'this must be a Volume object, not {value}')
 
     @property
-    def volume(self) -> 'music21.volume.Volume':
+    def volume(self) -> volume.Volume:
         '''
         Get and set the :class:`~music21.volume.Volume` object of this object.
         Volume objects are created on demand.
@@ -1275,7 +1280,7 @@ class NotRest(GeneralNote):
         return self._getVolume()
 
     @volume.setter
-    def volume(self, value: t.Union[None, 'music21.volume.Volume', int, float]):
+    def volume(self, value: None | volume.Volume | int | float):
         self._setVolume(value)
 
     def _getStoredInstrument(self):
@@ -1301,7 +1306,7 @@ class NotRest(GeneralNote):
     def getInstrument(self,
                       *,
                       returnDefault: t.Literal[True] = True
-                      ) -> 'music21.instrument.Instrument':
+                      ) -> instrument.Instrument:
         from music21 import instrument
         return instrument.Instrument()  # astroid #1015
 
@@ -1309,13 +1314,13 @@ class NotRest(GeneralNote):
     def getInstrument(self,
                       *,
                       returnDefault: t.Literal[False]
-                      ) -> t.Optional['music21.instrument.Instrument']:
+                      ) -> instrument.Instrument | None:
         return None  # astroid #1015
 
     def getInstrument(self,
                       *,
                       returnDefault: bool = True
-                      ) -> t.Optional['music21.instrument.Instrument']:
+                      ) -> instrument.Instrument | None:
         '''
         Retrieves the `.storedInstrument` on this `NotRest` instance, if any.
         If one is not found, executes a context search (without following
@@ -1449,7 +1454,7 @@ class Note(NotRest):
     # Defines the order of presenting names in the documentation; use strings
     _DOC_ORDER = ['duration', 'quarterLength', 'nameWithOctave']
     # documentation for all attributes (not properties or methods)
-    _DOC_ATTR: t.Dict[str, str] = {
+    _DOC_ATTR: dict[str, str] = {
         'isNote': 'Boolean read-only value describing if this Note is a Note (True).',
         'isRest': 'Boolean read-only value describing if this Note is a Rest (False).',
         'pitch': '''A :class:`~music21.pitch.Pitch` object containing all the
@@ -1459,13 +1464,13 @@ class Note(NotRest):
 
     # Accepts an argument for pitch
     def __init__(self,
-                 pitch: t.Union[str, int, Pitch, None] = None,
+                 pitch: str | int | Pitch | None = None,
                  *,
-                 name: t.Optional[str] = None,
-                 nameWithOctave: t.Optional[str] = None,
+                 name: str | None = None,
+                 nameWithOctave: str | None = None,
                  **keywords):
         super().__init__(**keywords)
-        self._chordAttached: t.Optional['music21.chord.Chord']
+        self._chordAttached: chord.Chord | None
 
         if pitch is not None:
             if isinstance(pitch, Pitch):
@@ -1629,10 +1634,10 @@ class Note(NotRest):
     def step(self, value: StepName):
         self.pitch.step = value
 
-    def _getOctave(self) -> t.Optional[int]:
+    def _getOctave(self) -> int | None:
         return self.pitch.octave
 
-    def _setOctave(self, value: t.Optional[int]):
+    def _setOctave(self, value: int | None):
         self.pitch.octave = value
 
     octave = property(_getOctave,
@@ -1643,7 +1648,7 @@ class Note(NotRest):
         ''')
 
     @property
-    def pitches(self) -> t.Tuple[Pitch, ...]:
+    def pitches(self) -> tuple[Pitch, ...]:
         '''
         Return the single :class:`~music21.pitch.Pitch` object in a tuple.
         This property is designed to provide an interface analogous to
@@ -1685,7 +1690,7 @@ class Note(NotRest):
         return (self.pitch,)
 
     @pitches.setter
-    def pitches(self, value: t.Sequence[Pitch]):
+    def pitches(self, value: Sequence[Pitch]):
         if common.isListLike(value) and value:
             self.pitch = value[0]
         else:
@@ -1832,7 +1837,7 @@ class Unpitched(NotRest):
                  displayName=None,
                  **keywords):
         super().__init__(**keywords)
-        self._chordAttached: t.Optional['music21.percussion.PercussionChord'] = None
+        self._chordAttached: percussion.PercussionChord | None = None
 
         self.displayStep: StepName = 'B'
         self.displayOctave: int = 4
@@ -1898,7 +1903,6 @@ class Rest(GeneralNote):
     However, the property :attr:`~music21.stream.Stream.notesAndRests` of Streams
     gets rests as well.
 
-
     >>> r = note.Rest()
     >>> r.isRest
     True
@@ -1924,11 +1928,19 @@ class Rest(GeneralNote):
     >>> r2 = note.Rest(type='whole')
     >>> r2.duration.quarterLength
     4.0
+
+    Or they can just be specified in without a type, and they'll be evaluated automatically
+
+    >>> r3, r4 = note.Rest('half'), note.Rest(2.0)
+    >>> r3 == r4
+    True
+    >>> r3.duration.quarterLength
+    2.0
     '''
     isRest = True
     name = 'rest'
 
-    _DOC_ATTR: t.Dict[str, str] = {
+    _DOC_ATTR: dict[str, str] = {
         'isNote': 'Boolean read-only value describing if this Rest is a Note (False).',
         'isRest': 'Boolean read-only value describing if this Rest is a Rest (True, obviously).',
         'name': '''returns "rest" always.  It is here so that you can get
@@ -1945,8 +1957,6 @@ class Rest(GeneralNote):
                 update automatically to match the time signature context; and is True.
                 Does not work yet -- functions as True.
 
-                # TODO: get it to work.
-
                 "auto" is the default, where if the rest value happens to match the current
                 time signature context, then display it as a whole rest, centered, etc.
                 otherwise will display normally.
@@ -1955,10 +1965,21 @@ class Rest(GeneralNote):
                 ''',
     }
 
-    def __init__(self, *arguments, **keywords):
+    def __init__(self,
+                 length: str | OffsetQLIn | None = None,
+                 *,
+                 stepShift: int = 0,
+                 fullMeasure: t.Literal[True, False, 'auto', 'always'] = 'auto',
+                 **keywords):
+        if length is not None:
+            if isinstance(length, str) and 'type' not in keywords:
+                keywords['type'] = length
+            elif 'quarterLength' not in keywords:
+                keywords['quarterLength'] = length
         super().__init__(**keywords)
-        self.stepShift = 0  # display line
-        self.fullMeasure = 'auto'  # see docs; True, False, 'always',
+        self.stepShift = stepShift  # display line
+        # TODO: fullMeasure=='always' does not work properly
+        self.fullMeasure = fullMeasure  # see docs; True, False, 'always',
 
     def _reprInternal(self):
         duration_name = self.duration.fullName.lower()
@@ -1976,7 +1997,6 @@ class Rest(GeneralNote):
         A Music21 rest is equal to another object if that object is also a rest which
         has the same duration.
 
-
         >>> r1 = note.Rest()
         >>> r2 = note.Rest()
         >>> r1 == r2
@@ -1984,7 +2004,7 @@ class Rest(GeneralNote):
         >>> r1 != r2
         False
 
-        >>> r2.duration.quarterLength = 4.0/3
+        >>> r2.duration.quarterLength = 4/3
         >>> r1 == r2
         False
         >>> r1 == note.Note()
@@ -2051,369 +2071,9 @@ class TestExternal(unittest.TestCase):
 
 # ------------------------------------------------------------------------------
 class Test(unittest.TestCase):
-
     def testCopyAndDeepcopy(self):
-        '''
-        Test copying all objects defined in this module
-        '''
-        import sys
-        import types
-        for part in sys.modules[self.__module__].__dict__:
-            match = False
-            for skip in ['_', '__', 'Test', 'Exception']:
-                if part.startswith(skip) or part.endswith(skip):
-                    match = True
-            if match:
-                continue
-            name = getattr(sys.modules[self.__module__], part)
-            # noinspection PyTypeChecker
-            if callable(name) and not isinstance(name, types.FunctionType):
-                try:  # see if obj can be made w/ args
-                    obj = name()
-                except TypeError:  # pragma: no cover
-                    continue
-                a = copy.copy(obj)
-                b = copy.deepcopy(obj)
-                self.assertNotEqual(id(a), id(b))
-
-    def testLyricRepr(self):
-        from music21 import note
-        ly = note.Lyric()
-        self.assertEqual(repr(ly), '<music21.note.Lyric number=1>')
-        ly.text = 'hi'
-        self.assertEqual(repr(ly), "<music21.note.Lyric number=1 text='hi'>")
-        ly.identifier = 'verse'
-        self.assertEqual(repr(ly), "<music21.note.Lyric number=1 identifier='verse' text='hi'>")
-        ly.text = None
-        self.assertEqual(repr(ly), "<music21.note.Lyric number=1 identifier='verse'>")
-
-    def testComplex(self):
-        from music21 import note
-        from music21.duration import DurationTuple
-        note1 = note.Note()
-        note1.duration.clear()
-        d1 = DurationTuple('whole', 0, 4.0)
-        d2 = DurationTuple('quarter', 0, 1.0)
-        note1.duration.addDurationTuple(d1)
-        note1.duration.addDurationTuple(d2)
-        self.assertEqual(note1.duration.quarterLength, 5.0)
-        self.assertEqual(note1.duration.componentIndexAtQtrPosition(2), 0)
-        self.assertEqual(note1.duration.componentIndexAtQtrPosition(4), 1)
-        self.assertEqual(note1.duration.componentIndexAtQtrPosition(4.5), 1)
-        note1.duration.sliceComponentAtPosition(1.0)
-
-        matchStr = "c'4~\nc'2.~\nc'4"
-        from music21.lily.translate import LilypondConverter
-        conv = LilypondConverter()
-        conv.appendM21ObjectToContext(note1)
-        outStr = str(conv.context).replace(' ', '').strip()
-        # print(outStr)
-        self.assertEqual(matchStr, outStr)
-        i = 0
-        for thisNote in note1.splitAtDurations():
-            matchSub = matchStr.split('\n')[i]  # pylint: disable=use-maxsplit-arg
-            conv = LilypondConverter()
-            conv.appendM21ObjectToContext(thisNote)
-            outStr = str(conv.context).replace(' ', '').strip()
-            self.assertEqual(matchSub, outStr)
-            i += 1
-
-    def testNote(self):
-        from music21 import note
-        note2 = note.Rest()
-        self.assertTrue(note2.isRest)
-        note3 = note.Note()
-        note3.pitch.name = 'B-'
-        # not sure how to test not None
-        # self.assertFalse (note3.pitch.accidental, None)
-        self.assertEqual(note3.pitch.accidental.name, 'flat')
-        self.assertEqual(note3.pitch.pitchClass, 10)
-
-        a5 = note.Note()
-        a5.name = 'A'
-        a5.octave = 5
-        self.assertAlmostEqual(a5.pitch.frequency, 880.0)
-        self.assertEqual(a5.pitch.pitchClass, 9)
-
-    def testCopyNote(self):
-        from music21 import note
-        a = note.Note()
-        a.quarterLength = 3.5
-        a.name = 'D'
-        b = copy.deepcopy(a)
-        self.assertEqual(b.name, a.name)
-
-    def testMusicXMLFermata(self):
-        from music21 import corpus
-        a = corpus.parse('bach/bwv5.7')
-        found = []
-        for n in a.flatten().notesAndRests:
-            for obj in n.expressions:
-                if isinstance(obj, expressions.Fermata):
-                    found.append(obj)
-        self.assertEqual(len(found), 24)
-
-    def testNoteBeatProperty(self):
-        from music21 import meter
-        from music21 import note
-        from music21 import stream
-
-        data = [
-            ['3/4', 0.5, 6, [1.0, 1.5, 2.0, 2.5, 3.0, 3.5],
-             [1.0] * 6, ],
-            ['3/4', 0.25, 8, [1.0, 1.25, 1.5, 1.75, 2.0, 2.25, 2.5, 2.75],
-             [1.0] * 8],
-            ['3/2', 0.5, 8, [1.0, 1.25, 1.5, 1.75, 2.0, 2.25, 2.5, 2.75],
-             [2.0] * 8],
-
-            ['6/8', 0.5, 6, [1.0, 1.3333, 1.66666, 2.0, 2.3333, 2.666666],
-             [1.5] * 6],
-            ['9/8', 0.5, 6, [1.0, 1.3333, 1.66666, 2.0, 2.3333, 2.666666],
-             [1.5] * 6],
-            ['12/8', 0.5, 6, [1.0, 1.3333, 1.66666, 2.0, 2.3333, 2.666666],
-             [1.5] * 6],
-
-            ['6/16', 0.25, 6, [1.0, 1.3333, 1.66666, 2.0, 2.3333, 2.666666],
-             [0.75] * 6],
-
-            ['5/4', 1, 5, [1.0, 2.0, 3.0, 4.0, 5.0],
-             [1.] * 5],
-
-            ['2/8+3/8+2/8', 0.5, 6, [1.0, 1.5, 2.0, 2.33333, 2.66666, 3.0],
-             [1., 1., 1.5, 1.5, 1.5, 1.]],
-
-        ]
-
-        # one measure case
-        for tsStr, nQL, nCount, matchBeat, matchBeatDur in data:
-            n = note.Note()  # need fully qualified name
-            n.quarterLength = nQL
-            m = stream.Measure()
-            m.timeSignature = meter.TimeSignature(tsStr)
-            m.repeatAppend(n, nCount)
-
-            self.assertEqual(len(m), nCount + 1)
-
-            # test matching beat proportion value
-            post = [m.notesAndRests[i].beat for i in range(nCount)]
-            for i in range(len(matchBeat)):
-                self.assertAlmostEqual(post[i], matchBeat[i], 4)
-
-            # test getting beat duration
-            post = [m.notesAndRests[i].beatDuration.quarterLength for i in range(nCount)]
-
-            for i in range(len(matchBeat)):
-                self.assertAlmostEqual(post[i], matchBeatDur[i], 4)
-
-        # two measure case
-        for tsStr, nQL, nCount, matchBeat, matchBeatDur in data:
-            p = stream.Part()
-            n = note.Note()
-            n.quarterLength = nQL
-
-            # m1 has time signature
-            m1 = stream.Measure()
-            m1.timeSignature = meter.TimeSignature(tsStr)
-            p.append(m1)
-
-            # m2 does not have time signature
-            m2 = stream.Measure()
-            m2.repeatAppend(n, nCount)
-            self.assertEqual(len(m2), nCount)
-            self.assertEqual(len(m2.notesAndRests), nCount)
-
-            p.append(m2)
-
-            # test matching beat proportion value
-            post = [m2.notesAndRests[i].beat for i in range(nCount)]
-            for i in range(len(matchBeat)):
-                self.assertAlmostEqual(post[i], matchBeat[i], 4)
-            # test getting beat duration
-            post = [m2.notesAndRests[i].beatDuration.quarterLength for i in range(nCount)]
-            for i in range(len(matchBeat)):
-                self.assertAlmostEqual(post[i], matchBeatDur[i], 4)
-
-    def testNoteBeatPropertyCorpus(self):
-        data = [['bach/bwv255', [4.0, 1.0, 2.5, 3.0, 4.0, 4.5, 1.0, 1.5]],
-                ['bach/bwv153.9', [1.0, 2.0, 3.0, 1.0, 2.0, 3.0, 1.0, 3.0, 1.0]]
-                ]
-
-        for work, match in data:
-            from music21 import corpus
-            s = corpus.parse(work)
-            # always use tenor line
-            found = []
-            for n in s.parts[2].flatten().notesAndRests:
-                n.lyric = n.beatStr
-                found.append(n.beat)
-
-            for i in range(len(match)):
-                self.assertEqual(match[i], found[i])
-
-            # s.show()
-
-    def testNoteEquality(self):
-        from music21 import articulations
-        from music21 import note
-
-        n1 = note.Note('A#')
-        n2 = note.Note('G')
-        n3 = note.Note('A-')
-        n4 = note.Note('A#')
-
-        self.assertNotEqual(n1, n2)
-        self.assertNotEqual(n1, n3)
-        self.assertEqual(n1, n4)
-
-        # test durations with the same pitch
-        for x, y, match in [
-            (1, 1, True),
-            (1, 0.5, False),
-            (1, 2, False),
-            (1, 1.5, False)
-        ]:
-            n1.quarterLength = x
-            n4.quarterLength = y
-            self.assertEqual(n1 == n4, match)  # sub1
-
-        # test durations with different pitch
-        for x, y, match in [(1, 1, False), (1, 0.5, False),
-                            (1, 2, False), (1, 1.5, False)]:
-            n1.quarterLength = x
-            n2.quarterLength = y
-            self.assertEqual(n1 == n2, match)  # sub2
-
-        # same pitches different octaves
-        n1.quarterLength = 1.0
-        n4.quarterLength = 1.0
-        for x, y, match in [(4, 4, True), (3, 4, False), (2, 4, False)]:
-            n1.pitch.octave = x
-            n4.pitch.octave = y
-            self.assertEqual(n1 == n4, match)  # sub4
-
-        # with and without ties
-        n1.pitch.octave = 4
-        n4.pitch.octave = 4
-        t1 = tie.Tie()
-        t2 = tie.Tie()
-        for x, y, match in [(t1, None, False), (t1, t2, True)]:
-            n1.tie = x
-            n4.tie = y
-            self.assertEqual(n1 == n4, match)  # sub4
-
-        # with ties but different pitches
-        for n in [n1, n2, n3, n4]:
-            n.quarterLength = 1.0
-        t1 = tie.Tie()
-        t2 = tie.Tie()
-        for a, b, match in [(n1, n2, False), (n1, n3, False),
-                            (n2, n3, False), (n1, n4, True)]:
-            a.tie = t1
-            b.tie = t2
-            self.assertEqual(a == b, match)  # sub5
-
-        # articulation groups
-        a1 = [articulations.Accent()]
-        a2 = [articulations.Accent(), articulations.StrongAccent()]
-        a3 = [articulations.StrongAccent(), articulations.Accent()]
-        a4 = [articulations.StrongAccent(), articulations.Accent(),
-              articulations.Tenuto()]
-        a5 = [articulations.Accent(), articulations.Tenuto(),
-              articulations.StrongAccent()]
-
-        for a, b, c, d, match in [(n1, n4, a1, a1, True),
-                                      (n1, n2, a1, a1, False), (n1, n3, a1, a1, False),
-                                  # same pitch different orderings
-                                  (n1, n4, a2, a3, True), (n1, n4, a4, a5, True),
-                                  # different pitch same orderings
-                                  (n1, n2, a2, a3, False), (n1, n3, a4, a5, False),
-                                  ]:
-            a.articulations = c
-            b.articulations = d
-            self.assertEqual(a == b, match)  # sub6
-
-    def testMetricalAccent(self):
-        from music21 import meter
-        from music21 import note
-        from music21 import stream
-        data = [
-            ('4/4', 8, 0.5, [1.0, 0.125, 0.25, 0.125, 0.5, 0.125, 0.25, 0.125]),
-            ('3/4', 6, 0.5, [1.0, 0.25, 0.5, 0.25, 0.5, 0.25]),
-            ('6/8', 6, 0.5, [1.0, 0.25, 0.25, 0.5, 0.25, 0.25]),
-
-            ('12/32', 12, 0.125, [1.0, 0.125, 0.125, 0.25, 0.125, 0.125,
-                                  0.5, 0.125, 0.125, 0.25, 0.125, 0.125]),
-
-            ('5/8', 10, 0.25, [1.0, 0.25, 0.5, 0.25, 0.5, 0.25, 0.5, 0.25, 0.5, 0.25]),
-
-            # test notes that do not have defined accents
-            ('4/4', 16, 0.25, [1.0, 0.0625, 0.125, 0.0625, 0.25, 0.0625, 0.125, 0.0625,
-                               0.5, 0.0625, 0.125, 0.0625, 0.25, 0.0625, 0.125, 0.0625]),
-            ('4/4', 32, 0.125, [1.0, 0.0625, 0.0625, 0.0625, 0.125, 0.0625, 0.0625, 0.0625,
-                                0.25, 0.0625, 0.0625, 0.0625, 0.125, 0.0625, 0.0625, 0.0625,
-                                0.5, 0.0625, 0.0625, 0.0625, 0.125, 0.0625, 0.0625, 0.0625,
-                                0.25, 0.0625, 0.0625, 0.0625, 0.125, 0.0625, 0.0625, 0.0625]),
-        ]
-
-        for tsStr, nCount, dur, match in data:
-            m = stream.Measure()
-            m.timeSignature = meter.TimeSignature(tsStr)
-            n = note.Note()
-            n.quarterLength = dur
-            m.repeatAppend(n, nCount)
-
-            self.assertEqual([n.beatStrength for n in m.notesAndRests], match)
-
-    def testTieContinue(self):
-        from music21 import note
-        from music21 import stream
-
-        n1 = note.Note()
-        n1.tie = tie.Tie()
-        n1.tie.type = 'start'
-
-        n2 = note.Note()
-        n2.tie = tie.Tie()
-        n2.tie.type = 'continue'
-
-        n3 = note.Note()
-        n3.tie = tie.Tie()
-        n3.tie.type = 'stop'
-
-        s = stream.Stream()
-        s.append([n1, n2, n3])
-
-        # need to test that this gets us a "continue" tie, but hard to test
-        # post musicxml processing
-        # s.show()
-
-    def testVolumeA(self):
-        from music21 import note
-        v1 = volume.Volume()
-
-        n1 = note.Note()
-        n2 = note.Note()
-
-        n1.volume = v1  # can set as v1 has no client
-        self.assertEqual(n1.volume, v1)
-        self.assertEqual(n1.volume.client, n1)
-
-        # object is created on demand
-        self.assertIsNot(n2.volume, v1)
-        self.assertIsNotNone(n2.volume)
-
-    def testVolumeB(self):
-        from music21 import note
-        # manage deepcopying properly
-        n1 = note.Note()
-
-        n1.volume.velocity = 100
-        self.assertEqual(n1.volume.velocity, 100)
-        self.assertEqual(n1.volume.client, n1)
-
-        n1Copy = copy.deepcopy(n1)
-        self.assertEqual(n1Copy.volume.velocity, 100)
-        self.assertEqual(n1Copy.volume.client, n1Copy)
+        from music21.test.commonTest import testCopyAll
+        testCopyAll(self, globals())
 
 
 # ------------------------------------------------------------------------------
@@ -2424,4 +2084,3 @@ if __name__ == '__main__':
     # sys.arg test options will be used in mainTest()
     import music21
     music21.mainTest(Test)
-

@@ -5,17 +5,19 @@
 #
 # Authors:      Jose Cabal-Ugaz
 #
-# Copyright:    Copyright © 2009-2010 Michael Scott Asato Cuthbert and the music21 Project
+# Copyright:    Copyright © 2009-2010 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
 Implementation of Walter Hewlett's base40 system for musical intervals.
 (See Hewlett and Ann K. Blombach 1989 article)
 '''
+from __future__ import annotations
+
 import unittest
-from music21 import exceptions21
 
 from music21 import common
+from music21 import exceptions21
 from music21 import interval
 from music21 import note
 from music21 import pitch
@@ -362,7 +364,7 @@ def base40ActualInterval(base40NumA, base40NumB):
     noteB.pitch = pitchB
 
     try:
-        return interval.notesToInterval(noteA, noteB)
+        return interval.Interval(noteA, noteB)
     except IndexError:
         raise Base40Exception('Unusual interval- Limitation of music21.interval')
 

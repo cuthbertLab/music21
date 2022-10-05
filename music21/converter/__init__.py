@@ -7,7 +7,7 @@
 # Authors:      Michael Scott Asato Cuthbert
 #               Christopher Ariza
 #
-# Copyright:    Copyright © 2009-2015 Michael Scott Asato Cuthbert and the music21 Project
+# Copyright:    Copyright © 2009-2015 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
@@ -33,6 +33,8 @@ the temp folder on the disk.
 >>> s
 <music21.stream.Score ...>
 '''
+from __future__ import annotations
+
 import collections.abc
 import copy
 from http.client import responses
@@ -73,7 +75,7 @@ __all__ = [
 
 environLocal = environment.Environment('converter')
 
-_StrOrBytes = t.TypeVar('_StrOrBytes', bound=t.Union[str, bytes])
+_StrOrBytes = t.TypeVar('_StrOrBytes', bound=str | bytes)
 
 # ------------------------------------------------------------------------------
 class ArchiveManagerException(exceptions21.Music21Exception):
@@ -121,7 +123,7 @@ class ArchiveManager:
     # for info on mxl files, see
     # http://www.recordare.com/xml/compressed-mxl.html
 
-    def __init__(self, fp: t.Union[str, pathlib.Path], archiveType='zip'):
+    def __init__(self, fp: str | pathlib.Path, archiveType='zip'):
         self.fp: pathlib.Path = common.cleanpath(fp, returnPathlib=True)
         self.archiveType: str = archiveType
 
@@ -146,11 +148,11 @@ class ArchiveManager:
             raise ArchiveManagerException(f'no support for archiveType: {self.archiveType}')
         return False
 
-    def getNames(self) -> t.List[str]:
+    def getNames(self) -> list[str]:
         '''
         Return a list of all names contained in this archive.
         '''
-        post: t.List[str] = []
+        post: list[str] = []
         if self.archiveType == 'zip':
             with zipfile.ZipFile(self.fp, 'r') as f:
                 for subFp in f.namelist():
@@ -260,21 +262,21 @@ class PickleFilter:
     '''
 
     def __init__(self,
-                 fp: t.Union[str, pathlib.Path],
+                 fp: str | pathlib.Path,
                  forceSource: bool = False,
-                 number: t.Optional[int] = None,
+                 number: int | None = None,
                  # quantizePost: bool = False,
-                 # quarterLengthDivisors: t.Optional[t.Iterable[int]] = None,
+                 # quarterLengthDivisors: Iterable[int] | None = None,
                  **keywords):
         self.fp: pathlib.Path = common.cleanpath(fp, returnPathlib=True)
         self.forceSource: bool = forceSource
-        self.number: t.Optional[int] = number
-        self.keywords: t.Dict[str, t.Any] = keywords
+        self.number: int | None = number
+        self.keywords: dict[str, t.Any] = keywords
         # environLocal.printDebug(['creating pickle filter'])
 
     def getPickleFp(self,
-                    directory: t.Union[pathlib.Path, str, None] = None,
-                    zipType: t.Optional[str] = None) -> pathlib.Path:
+                    directory: pathlib.Path | str | None = None,
+                    zipType: str | None = None) -> pathlib.Path:
         '''
         Returns the file path of the pickle file for this file.
 
@@ -297,7 +299,7 @@ class PickleFilter:
 
         pathNameToParse = str(self.fp)
 
-        quantization: t.List[str] = []
+        quantization: list[str] = []
         if 'quantizePost' in self.keywords and self.keywords['quantizePost'] is False:
             quantization.append('noQtz')
         elif 'quarterLengthDivisors' in self.keywords:
@@ -324,7 +326,7 @@ class PickleFilter:
         if pickleFp.exists():
             os.remove(pickleFp)
 
-    def status(self) -> t.Tuple[pathlib.Path, bool, t.Optional[pathlib.Path]]:
+    def status(self) -> tuple[pathlib.Path, bool, pathlib.Path | None]:
         '''
         Given a file path specified with __init__, look for an up-to-date pickled
         version of this file path. If it exists, return its fp, otherwise return the
@@ -372,10 +374,10 @@ class PickleFilter:
 
 
 # ------------------------------------------------------------------------------
-_registeredSubconverters: t.List[t.Type[subConverters.SubConverter]] = []
+_registeredSubconverters: list[type[subConverters.SubConverter]] = []
 # default subconverters to skip
-_deregisteredSubconverters: t.List[
-    t.Union[t.Type[subConverters.SubConverter], t.Literal['all']]
+_deregisteredSubconverters: list[
+    type[subConverters.SubConverter] | t.Literal['all']
 ] = []
 
 
@@ -417,7 +419,7 @@ def registerSubconverter(newSubConverter) -> None:
 
 
 def unregisterSubconverter(
-    removeSubconverter: t.Union[t.Literal['all'], t.Type[subConverters.SubConverter]]
+    removeSubconverter: t.Literal['all'] | type[subConverters.SubConverter]
 ) -> None:
     # noinspection PyShadowingNames
     '''
@@ -479,7 +481,7 @@ class Converter:
 
     Not a subclass, but a wrapper for different converter objects based on format.
     '''
-    _DOC_ATTR: t.Dict[str, str] = {
+    _DOC_ATTR: dict[str, str] = {
         'subConverter':
             '''
             a :class:`~music21.converter.subConverters.SubConverter` object
@@ -488,13 +490,13 @@ class Converter:
     }
 
     def __init__(self):
-        self.subConverter: t.Optional[subConverters.SubConverter] = None
+        self.subConverter: subConverters.SubConverter | None = None
         # a stream object unthawed
-        self._thawedStream: t.Union[stream.Score, stream.Part, stream.Opus, None] = None
+        self._thawedStream: stream.Score | stream.Part | stream.Opus | None = None
 
     def _getDownloadFp(
         self,
-        directory: t.Union[pathlib.Path, str],
+        directory: pathlib.Path | str,
         ext: str,
         url: str,
     ):
@@ -511,9 +513,9 @@ class Converter:
     # noinspection PyShadowingBuiltins
     def parseFileNoPickle(
         self,
-        fp: t.Union[pathlib.Path, str],
-        number: t.Optional[int] = None,
-        format: t.Optional[str] = None,
+        fp: pathlib.Path | str,
+        number: int | None = None,
+        format: str | None = None,
         forceSource: bool = False,
         **keywords
     ):
@@ -638,7 +640,7 @@ class Converter:
 
     def parseData(
         self,
-        dataStr: t.Union[str, bytes],
+        dataStr: str | bytes,
         number=None,
         format=None,
         forceSource=False,
@@ -701,8 +703,8 @@ class Converter:
         self,
         url: str,
         *,
-        format: t.Optional[str] = None,
-        number: t.Optional[int] = None,
+        format: str | None = None,
+        number: int | None = None,
         forceSource: bool = False,
         **keywords,
     ) -> None:
@@ -750,7 +752,7 @@ class Converter:
 
         if forceSource is True or not fp.exists():
             environLocal.printDebug([f'downloading to: {fp}'])
-            r = requests.get(url, allow_redirects=True)
+            r = requests.get(url, allow_redirects=True, timeout=20)
             if r.status_code != 200:
                 raise ConverterException(
                     f'Could not download {url}, error: {r.status_code} {responses[r.status_code]}')
@@ -785,7 +787,7 @@ class Converter:
     def subconvertersList(
         self,
         converterType: t.Literal['any', 'input', 'output'] = 'any'
-    ) -> t.List[t.Type[subConverters.SubConverter]]:
+    ) -> list[type[subConverters.SubConverter]]:
         '''
         Gives a list of all the subconverter classes that are registered.
 
@@ -870,7 +872,7 @@ class Converter:
 
         return filteredSubConvertersList
 
-    def defaultSubconverters(self) -> t.List[t.Type[subConverters.SubConverter]]:
+    def defaultSubconverters(self) -> list[type[subConverters.SubConverter]]:
         '''
         return an alphabetical list of the default subconverters: those in converter.subConverters
         with the class Subconverter.
@@ -902,7 +904,7 @@ class Converter:
         <class 'music21.converter.subConverters.ConverterVolpiano'>
         <class 'music21.converter.subConverters.SubConverter'>
         '''
-        defaultSubconverters: t.List[t.Type[subConverters.SubConverter]] = []
+        defaultSubconverters: list[type[subConverters.SubConverter]] = []
         for i in sorted(subConverters.__dict__):
             possibleSubConverter = getattr(subConverters, i)
             # noinspection PyTypeChecker
@@ -978,7 +980,7 @@ class Converter:
     def formatFromHeader(
         self,
         dataStr: _StrOrBytes
-    ) -> t.Tuple[t.Optional[str], _StrOrBytes]:
+    ) -> tuple[str | None, _StrOrBytes]:
         '''
         if dataStr begins with a text header such as  "tinyNotation:" then
         return that format plus the dataStr with the head removed.
@@ -1047,7 +1049,7 @@ class Converter:
                     break
         return (foundFormat, dataStr)
 
-    def regularizeFormat(self, fmt: str) -> t.Optional[str]:
+    def regularizeFormat(self, fmt: str) -> str | None:
         '''
         Take in a string representing a format, a file extension (w/ or without leading dot)
         etc. and find the format string that best represents the format that should be used.
@@ -1119,7 +1121,7 @@ class Converter:
     # --------------------------------------------------------------------------
     # properties
     @property
-    def stream(self) -> t.Union[stream.Score, stream.Part, stream.Opus, None]:
+    def stream(self) -> stream.Score | stream.Part | stream.Opus | None:
         '''
         Returns the .subConverter.stream object.
         '''
@@ -1142,7 +1144,7 @@ def parseFile(fp,
               number=None,
               format=None,
               forceSource=False,
-              **keywords) -> t.Union[stream.Score, stream.Part, stream.Opus]:
+              **keywords) -> stream.Score | stream.Part | stream.Opus:
     '''
     Given a file path, attempt to parse the file into a Stream.
     '''
@@ -1158,7 +1160,7 @@ def parseFile(fp,
 def parseData(dataStr,
               number=None,
               format=None,
-              **keywords) -> t.Union[stream.Score, stream.Part, stream.Opus]:
+              **keywords) -> stream.Score | stream.Part | stream.Opus:
     '''
     Given musical data represented within a Python string, attempt to parse the
     data into a Stream.
@@ -1176,7 +1178,7 @@ def parseURL(url,
              format=None,
              number=None,
              forceSource=False,
-             **keywords) -> t.Union[stream.Score, stream.Part, stream.Opus]:
+             **keywords) -> stream.Score | stream.Part | stream.Opus:
     '''
     Given a URL, attempt to download and parse the file into a Stream. Note:
     URL downloading will not happen automatically unless the user has set their
@@ -1191,12 +1193,12 @@ def parseURL(url,
     return v.stream
 
 
-def parse(value: t.Union[bundles.MetadataEntry, bytes, str, pathlib.Path],
-          *args,
+def parse(value: bundles.MetadataEntry | bytes | str | pathlib.Path,
+          *,
           forceSource: bool = False,
-          number: t.Optional[int] = None,
-          format: t.Optional[str] = None,  # pylint: disable=redefined-builtin
-          **keywords) -> t.Union[stream.Score, stream.Part, stream.Opus]:
+          number: int | None = None,
+          format: str | None = None,  # pylint: disable=redefined-builtin
+          **keywords) -> stream.Score | stream.Part | stream.Opus:
     r'''
     Given a file path, encoded data in a Python string, or a URL, attempt to
     parse the item into a Stream.  Note: URL downloading will not happen
@@ -1509,20 +1511,8 @@ class TestExternal(unittest.TestCase):
 class Test(unittest.TestCase):
 
     def testCopyAndDeepcopy(self):
-        '''Test copying all objects defined in this module
-        '''
-        for part in sys.modules[self.__module__].__dict__:
-            match = False
-            for skip in ['_', '__', 'Test', 'Exception']:
-                if part.startswith(skip) or part.endswith(skip):
-                    match = True
-            if match:
-                continue
-            obj = getattr(sys.modules[self.__module__], part)
-            # noinspection PyTypeChecker
-            if callable(obj) and not isinstance(obj, types.FunctionType):
-                i = copy.copy(obj)
-                j = copy.deepcopy(obj)
+        from music21.test.commonTest import testCopyAll
+        testCopyAll(self, globals())
 
     def testConversionMX(self):
         from music21.musicxml import testPrimitive

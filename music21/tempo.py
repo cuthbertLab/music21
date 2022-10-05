@@ -6,26 +6,27 @@
 # Authors:      Christopher Ariza
 #               Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2009-22 Michael Scott Asato Cuthbert and the music21 Project
+# Copyright:    Copyright © 2009-22 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
 This module defines objects for describing tempo and changes in tempo.
 '''
+from __future__ import annotations
+
 import copy
 import unittest
-import typing as t
 
 from music21 import base
 from music21 import common
 from music21 import duration
+from music21 import environment
 from music21 import exceptions21
 from music21 import expressions
 from music21 import note
 from music21 import spanner
 from music21 import style
 
-from music21 import environment
 environLocal = environment.Environment('tempo')
 
 
@@ -380,7 +381,7 @@ class MetronomeMark(TempoIndication):
     >>> tm2.number
     144
     '''
-    _DOC_ATTR: t.Dict[str, str] = {
+    _DOC_ATTR: dict[str, str] = {
         'placement': '''
             Staff placement: 'above', 'below', or None.
 
@@ -768,7 +769,6 @@ class MetronomeMark(TempoIndication):
         Return the duration in seconds for each quarter length
         (not necessarily the referent) of this MetronomeMark.
 
-        >>> from music21 import tempo
         >>> mm1 = tempo.MetronomeMark(referent=1.0, number=60.0)
         >>> mm1.secondsPerQuarter()
         1.0
@@ -790,7 +790,6 @@ class MetronomeMark(TempoIndication):
         quarter length, return the resultant time in seconds at the tempo specified by
         this MetronomeMark.
 
-        >>> from music21 import tempo
         >>> mm1 = tempo.MetronomeMark(referent=1.0, number=60.0)
         >>> mm1.durationToSeconds(60)
         60.0
@@ -809,7 +808,6 @@ class MetronomeMark(TempoIndication):
         Given a duration in seconds,
         return a :class:`~music21.duration.Duration` object equal to that time.
 
-        >>> from music21 import tempo
         >>> mm1 = tempo.MetronomeMark(referent=1.0, number=60.0)
         >>> mm1.secondsToDuration(0.25)
         <music21.duration.Duration 0.25>
@@ -1147,8 +1145,8 @@ class MetricModulation(TempoIndication):
 
     def setOtherByReferent(
         self,
-        side: t.Optional[str] = None,
-        referent: t.Union[str, int, float] = 1.0
+        side: str | None = None,
+        referent: str | int | float = 1.0
     ):
         '''
         Set the other side of the metric modulation not based on equality,
@@ -1309,22 +1307,8 @@ class AccelerandoSpanner(TempoChangeSpanner):
 # ------------------------------------------------------------------------------
 class Test(unittest.TestCase):
     def testCopyAndDeepcopy(self):
-        '''Test copying all objects defined in this module
-        '''
-        import sys
-        import types
-        for part in sys.modules[self.__module__].__dict__:
-            match = False
-            for skip in ['_', '__', 'Test', 'Exception']:
-                if part.startswith(skip) or part.endswith(skip):
-                    match = True
-            if match:
-                continue
-            obj = getattr(sys.modules[self.__module__], part)
-            # noinspection PyTypeChecker
-            if callable(obj) and not isinstance(obj, types.FunctionType):
-                copy.copy(obj)
-                copy.deepcopy(obj)
+        from music21.test.commonTest import testCopyAll
+        testCopyAll(self, globals())
 
     def testSetup(self):
         mm1 = MetronomeMark(number=60, referent=note.Note(type='quarter'))

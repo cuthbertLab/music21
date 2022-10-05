@@ -6,7 +6,7 @@
 # Authors:      Michael Scott Asato Cuthbert
 #               Christopher Ariza
 #
-# Copyright:    Copyright © 2009-2015 Michael Scott Asato Cuthbert and the music21 Project
+# Copyright:    Copyright © 2009-2015 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
@@ -27,14 +27,12 @@ import pathlib
 import subprocess
 import unittest
 
-import typing as t
-
 from music21 import common
 from music21 import defaults
-from music21 import stream
-from music21 import exceptions21
-
 from music21 import environment
+from music21 import exceptions21
+from music21 import stream
+
 environLocal = environment.Environment('converter.subConverters')
 
 # pylint complains when abstract methods are not overwritten, but that's okay.
@@ -73,18 +71,18 @@ class SubConverter:
     '''
     readBinary = False
     canBePickled = True
-    registerFormats: t.Tuple[str, ...] = ()
-    registerShowFormats: t.Tuple[str, ...] = ()
-    registerInputExtensions: t.Tuple[str, ...] = ()  # if converter supports input
-    registerOutputExtensions: t.Tuple[str, ...] = ()  # if converter supports output
-    registerOutputSubformatExtensions: t.Dict[str, str] = {}
-    launchKey: t.Union[str, pathlib.Path, None] = None
+    registerFormats: tuple[str, ...] = ()
+    registerShowFormats: tuple[str, ...] = ()
+    registerInputExtensions: tuple[str, ...] = ()  # if converter supports input
+    registerOutputExtensions: tuple[str, ...] = ()  # if converter supports output
+    registerOutputSubformatExtensions: dict[str, str] = {}
+    launchKey: str | pathlib.Path | None = None
 
     codecWrite = False
     stringEncoding = 'utf-8'
 
     def __init__(self, **keywords):
-        self._stream: t.Union[stream.Score, stream.Part, stream.Opus] = stream.Score()
+        self._stream: stream.Score | stream.Part | stream.Opus = stream.Score()
         self.keywords = keywords
 
     def parseData(self, dataString, number=None):
@@ -99,13 +97,13 @@ class SubConverter:
         # return self.stream
 
     def parseFile(self,
-                  filePath: t.Union[str, pathlib.Path],
-                  number: t.Optional[int] = None,
+                  filePath: str | pathlib.Path,
+                  number: int | None = None,
                   **keywords):
         '''
         Called when a file is encountered. If all that needs to be done is
         loading the file and putting the data into parseData then there is no need
-        to implement this method.  Just set self.readBinary to True|False.
+        to implement this method.  Just set self.readBinary to True | False.
         '''
         if self.readBinary is False:
             import locale
@@ -274,7 +272,7 @@ class SubConverter:
 
     def writeDataStream(self,
                         fp,
-                        dataStr: t.Union[str, bytes],
+                        dataStr: str | bytes,
                         **keywords) -> pathlib.Path:  # pragma: no cover
         '''
         Writes the data stream to `fp` or to a temporary file and returns the
@@ -714,8 +712,8 @@ class ConverterHumdrum(SubConverter):
         return self.data
 
     def parseFile(self,
-                  filePath: t.Union[pathlib.Path, str],
-                  number: t.Optional[int] = None,
+                  filePath: pathlib.Path | str,
+                  number: int | None = None,
                   **keywords):
         '''
         Open Humdrum data from a file path.
@@ -827,8 +825,8 @@ class ConverterNoteworthy(SubConverter):
         self.stream = noteworthyTranslate.NoteworthyTranslator().parseString(nwcData)
 
     def parseFile(self,
-                  filePath: t.Union[pathlib.Path, str],
-                  number: t.Optional[int] = None,
+                  filePath: pathlib.Path | str,
+                  number: int | None = None,
                   **keywords):
         # noinspection SpellCheckingInspection,PyShadowingNames
         '''
@@ -864,8 +862,8 @@ class ConverterNoteworthyBinary(SubConverter):
         self.stream = noteworthyBinary.NWCConverter().parseString(nwcData)
 
     def parseFile(self,
-                  filePath: t.Union[pathlib.Path, str],
-                  number: t.Optional[int] = None,
+                  filePath: pathlib.Path | str,
+                  number: int | None = None,
                   **keywords):
         from music21.noteworthy import binaryTranslate as noteworthyBinary
         self.stream = noteworthyBinary.NWCConverter().parseFile(filePath)
@@ -886,7 +884,7 @@ class ConverterMusicXML(SubConverter):
                                          }
 
     @staticmethod
-    def findNumberedPNGPath(inputFp: t.Union[str, pathlib.Path]) -> pathlib.Path:
+    def findNumberedPNGPath(inputFp: str | pathlib.Path) -> pathlib.Path:
         '''
         Find the first numbered file path corresponding to the provided unnumbered file path
         ending in ".png". Raises an exception if no file can be found.
@@ -921,8 +919,8 @@ class ConverterMusicXML(SubConverter):
         self.stream = c.stream
 
     def parseFile(self,
-                  filePath: t.Union[str, pathlib.Path],
-                  number: t.Optional[int] = None,
+                  filePath: str | pathlib.Path,
+                  number: int | None = None,
                   **keywords):
         '''
         Open from a file path; check to see if there is a pickled
@@ -957,7 +955,7 @@ class ConverterMusicXML(SubConverter):
                             fp,
                             subformats=None,
                             *,
-                            dpi: t.Optional[int] = None,
+                            dpi: int | None = None,
                             **keywords) -> pathlib.Path:  # pragma: no cover
         '''
         Take the output of the conversion process and run it through musescore to convert it
@@ -1028,7 +1026,7 @@ class ConverterMusicXML(SubConverter):
 
     def writeDataStream(self,
                         fp,
-                        dataStr: t.Union[str, bytes],
+                        dataStr: str | bytes,
                         **keywords) -> pathlib.Path:  # pragma: no cover
         # noinspection PyShadowingNames
         '''
@@ -1081,7 +1079,7 @@ class ConverterMusicXML(SubConverter):
               subformats=None,
               *,
               makeNotation=True,
-              compress: t.Optional[bool] = None,
+              compress: bool | None = None,
               **keywords):
         '''
         Write to a .musicxml file.
@@ -1186,8 +1184,8 @@ class ConverterMidi(SubConverter):
         self.stream = midiTranslate.midiStringToStream(strData, **self.keywords)
 
     def parseFile(self,
-                  filePath: t.Union[pathlib.Path, str],
-                  number: t.Optional[int] = None,
+                  filePath: pathlib.Path | str,
+                  number: int | None = None,
                   **keywords):
         '''
         Get MIDI data from a file path.
@@ -1251,8 +1249,8 @@ class ConverterABC(SubConverter):
             abcFormat.translate.abcToStreamScore(abcHandler, self.stream)
 
     def parseFile(self,
-                  filePath: t.Union[pathlib.Path, str],
-                  number: t.Optional[int] = None,
+                  filePath: pathlib.Path | str,
+                  number: int | None = None,
                   **keywords):
         '''
         Get ABC data from a file path. If more than one work is defined in the ABC
@@ -1302,8 +1300,8 @@ class ConverterRomanText(SubConverter):
             romanTextTranslate.romanTextToStreamScore(rtHandler, self.stream)
 
     def parseFile(self,
-                  filePath: t.Union[pathlib.Path, str],
-                  number: t.Optional[int] = None,
+                  filePath: pathlib.Path | str,
+                  number: int | None = None,
                   **keywords):
         from music21.romanText import rtObjects
         from music21.romanText import translate as romanTextTranslate
@@ -1323,9 +1321,14 @@ class ConverterRomanText(SubConverter):
         if fp is None:
             fp = self.getTemporaryFile()
 
-        with open(fp, 'w', encoding='utf-8') as text_file:
+        if not hasattr(fp, 'write'):
+            with open(fp, 'w', encoding='utf-8') as text_file:
+                for entry in writeRoman.RnWriter(obj).combinedList:
+                    text_file.write(entry + '\n')
+        else:
+            # file-like object
             for entry in writeRoman.RnWriter(obj).combinedList:
-                text_file.write(entry + '\n')
+                fp.write(entry + '\n')
 
         return fp
 
@@ -1344,7 +1347,7 @@ class ConverterClercqTemperley(SubConverter):
         self.stream = ctSong.toScore()
 
     def parseFile(self,
-                  filePath: t.Union[pathlib.Path, str],
+                  filePath: pathlib.Path | str,
                   number=None,
                   **keywords):
         self.parseData(filePath)
@@ -1371,8 +1374,8 @@ class ConverterCapella(SubConverter):
         self.stream = partScore
 
     def parseFile(self,
-                  filePath: t.Union[str, pathlib.Path],
-                  number: t.Optional[int] = None,
+                  filePath: str | pathlib.Path,
+                  number: int | None = None,
                   **keywords):
         '''
         Parse a Capella file
@@ -1409,8 +1412,8 @@ class ConverterMuseData(SubConverter):
         musedataTranslate.museDataWorkToStreamScore(mdw, self.stream)
 
     def parseFile(self,
-                  filePath: t.Union[str, pathlib.Path],
-                  number: t.Optional[int] = None,
+                  filePath: str | pathlib.Path,
+                  number: int | None = None,
                   **keywords):
         '''
         parse fp (a pathlib.Path()) and number
@@ -1465,7 +1468,7 @@ class ConverterMEI(SubConverter):
     # registerShowFormats = ('mei',)
     # registerOutputExtensions = ('mei',)
 
-    def parseData(self, dataString: str, number=None) -> 'music21.stream.Stream':
+    def parseData(self, dataString: str, number=None) -> stream.Stream:
         '''
         Convert a string with an MEI document into its corresponding music21 elements.
 
@@ -1485,10 +1488,10 @@ class ConverterMEI(SubConverter):
 
     def parseFile(
         self,
-        filePath: t.Union[str, pathlib.Path],
-        number: t.Optional[int] = None,
+        filePath: str | pathlib.Path,
+        number: int | None = None,
         **keywords,
-    ) -> 'music21.stream.Stream':
+    ) -> stream.Stream:
         '''
         Convert a file with an MEI document into its corresponding music21 elements.
 
@@ -1687,6 +1690,19 @@ class Test(unittest.TestCase):
             self.assertIn('<music21.braille.segment BrailleSegment>', f.read())
         os.remove(out)
 
+    def testWriteRomanText(self):
+        import textwrap
+        from io import StringIO
+        from music21 import converter
+
+        rntxt = textwrap.dedent('''
+            Time Signature: 3/4
+            m1 C: I
+        ''')
+        s = converter.parse(rntxt, format='romanText')
+        text_stream = StringIO()
+        s.write('romanText', text_stream)
+        self.assertTrue(text_stream.getvalue().endswith(rntxt))
 
 class TestExternal(unittest.TestCase):
     show = True

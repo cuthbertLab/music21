@@ -6,7 +6,7 @@
 # Authors:      Michael Scott Asato Cuthbert
 #               Christopher Ariza
 #
-# Copyright:    Copyright © 2009-2012 Michael Scott Asato Cuthbert and the music21 Project
+# Copyright:    Copyright © 2009-2012 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
@@ -17,18 +17,17 @@ including :class:`~music21.serial.ToneRow` subclasses.
 Serial searching methods that were previously here have been moved to
 :mod:`~music21.search.serial`.
 '''
-import unittest
-import copy
+from __future__ import annotations
+
 import typing as t
+import unittest
 
-from music21 import exceptions21
-
-from music21 import note
 from music21 import chord
-from music21 import stream
-from music21 import pitch
-
 from music21 import environment
+from music21 import exceptions21
+from music21 import note
+from music21 import pitch
+from music21 import stream
 
 environLocal = environment.Environment('serial')
 
@@ -281,7 +280,7 @@ class ToneRow(stream.Stream):
     >>> len(rcsRow)
     10
     '''
-    _DOC_ATTR: t.Dict[str, str] = {
+    _DOC_ATTR: dict[str, str] = {
         'row': 'A list representing the pitch class values of the row.',
     }
 
@@ -290,8 +289,8 @@ class ToneRow(stream.Stream):
                   'zeroCenteredTransformation', 'originalCenteredTransformation',
                   'findZeroCenteredTransformations', 'findOriginalCenteredTransformations']
 
-    def __init__(self, row=None, *arguments, **keywords):
-        super().__init__(*arguments, **keywords)
+    def __init__(self, row=None, **keywords):
+        super().__init__(**keywords)
         if row is not None:
             self.row = row
         else:
@@ -555,7 +554,7 @@ class ToneRow(stream.Stream):
 
         return self.zeroCenteredTransformation(transformationType, newIndex)
 
-    def findZeroCenteredTransformations(self, otherRow) -> t.Union[bool, t.List[t.Any]]:
+    def findZeroCenteredTransformations(self, otherRow) -> t.Union[bool, list[t.Any]]:
         '''
         Gives the list of zero-centered serial transformations
         taking one :class:`~music21.serial.ToneRow`
@@ -666,22 +665,8 @@ class TwelveToneRow(ToneRow):
     '''
     A Stream representation of a twelve-tone row, capable of producing a 12-tone matrix.
     '''
-    # row = None
-
-    # _DOC_ATTR: t.Dict[str, str] = {
-    # 'row': 'A list representing the pitch class values of the row.',
-    # }
-
     _DOC_ORDER = ['matrix', 'isAllInterval',
                   'getLinkClassification', 'isLinkChord', 'areCombinatorial']
-
-    # def __init__(self, *arguments, **keywords):
-    #     super().__init__(*arguments, **keywords)
-    #     # environLocal.printDebug(['TwelveToneRow.__init__: length of elements', len(self)])
-    #
-    #     # if self.row != None:
-    #     #    for pc in self.row:
-    #     #        self.append(pitch.Pitch(pc))
 
     def matrix(self):
         # noinspection PyShadowingNames
@@ -1096,22 +1081,23 @@ class HistoricalTwelveToneRow(TwelveToneRow):
     Subclass of :class:`~music21.serial.TwelveToneRow` storing additional attributes of a
     twelve-tone row used in the historical literature.
     '''
-    _DOC_ATTR: t.Dict[str, str] = {
+    _DOC_ATTR: dict[str, str] = {
         'composer': 'The name of the composer, or None.  (String)',
         'opus': 'The opus of the work, or None.  (String)',
         'title': 'The title of the work, or None.  (String)',
     }
 
-    composer: t.Union[None, str] = None
-    opus: t.Union[None, str] = None
-    title: t.Union[None, str] = None
+    composer: None | str = None
+    opus: None | str = None
+    title: None | str = None
 
     def __init__(self,
-                 composer: t.Union[None, str] = None,
-                 opus: t.Union[None, str] = None,
-                 title: t.Union[None, str] = None,
-                 row=None):
-        super().__init__(row)
+                 composer: None | str = None,
+                 opus: None | str = None,
+                 title: None | str = None,
+                 row=None,
+                 **keywords):
+        super().__init__(row, **keywords)
         self.composer = composer
         self.opus = opus
         self.title = title
@@ -1313,7 +1299,7 @@ def pcToToneRow(pcSet):
     return a
 
 
-def rowToMatrix(p: t.List[int]) -> str:
+def rowToMatrix(p: list[int]) -> str:
     # noinspection PyShadowingNames
     '''
     Takes a list of numbers of converts it to a string representation of a
@@ -1426,23 +1412,9 @@ class Test(unittest.TestCase):
             bStream.append(c)
 
     def testCopyAndDeepcopy(self):
-        '''
-        Test copying all objects defined in this module
-        '''
-        import sys
-        import types
-        for part in sys.modules[self.__module__].__dict__:
-            match = False
-            for skip in ['_', '__', 'Test', 'Exception']:
-                if part.startswith(skip) or part.endswith(skip):
-                    match = True
-            if match:
-                continue
-            obj = getattr(sys.modules[self.__module__], part)
-            # noinspection PyTypeChecker
-            if callable(obj) and not isinstance(obj, types.FunctionType):
-                i = copy.copy(obj)
-                j = copy.deepcopy(obj)
+        from music21.test.commonTest import testCopyAll
+        testCopyAll(self, globals())
+
 
     # def testRows(self):
     #     from music21 import interval
@@ -1463,8 +1435,8 @@ class Test(unittest.TestCase):
     #         if thisRow[0].pitchClass == 0:
     #             cRows += 1
     #
-    #          if interval.notesToInterval(thisRow[0],
-    #                                 thisRow[6]).intervalClass == 6:
+    #          if interval.Interval(thisRow[0],
+    #                               thisRow[6]).intervalClass == 6:
     #           # between element 1 and element 7 is there a TriTone?
     #           rowsWithTTRelations += 1
 

@@ -8,7 +8,6 @@
 #               Evan Lynch
 #
 # Copyright:    Copyright © 2009-2022 Michael Scott Asato Cuthbert
-#               and the music21 Project
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
@@ -39,14 +38,19 @@ From highest level to lowest level usage, ways of graphing are as follows:
     4. Use `matplotlib` directly to create any graph, musical or non-musical.
 
 '''
+from __future__ import annotations
+
 __all__ = [
     'axis', 'findPlot', 'plot', 'primitives', 'utilities',
     'plotStream',
 ]
 
+import typing as t
+from typing import TYPE_CHECKING  # pylint needs no alias
 import unittest
 
 from music21 import common
+from music21 import environment
 
 from music21.graph import axis
 from music21.graph import findPlot
@@ -54,13 +58,17 @@ from music21.graph import plot
 from music21.graph import primitives
 from music21.graph import utilities
 
-from music21 import environment
+
+if TYPE_CHECKING:
+    from music21 import stream
+
+
 environLocal = environment.Environment('graph')
 
 
 def plotStream(
-    streamObj,
-    graphFormat=None,
+    streamObj: stream.Stream,
+    graphFormat: str | None = None,
     xValue=None,
     yValue=None,
     zValue=None,
@@ -166,27 +174,8 @@ class TestExternal(unittest.TestCase):
 class Test(unittest.TestCase):
 
     def testCopyAndDeepcopy(self):
-        '''Test copying all objects defined in this module
-        '''
-        import copy
-        import sys
-        import types
-        for part in sys.modules[self.__module__].__dict__:
-            match = False
-            for skip in ['_', '__', 'Test', 'Exception']:
-                if part.startswith(skip) or part.endswith(skip):
-                    match = True
-            if match:
-                continue
-            name = getattr(sys.modules[self.__module__], part)
-            # noinspection PyTypeChecker
-            if callable(name) and not isinstance(name, types.FunctionType):
-                try:  # see if obj can be made w/ args
-                    obj = name()
-                except TypeError:
-                    continue
-                unused_a = copy.copy(obj)
-                unused_b = copy.deepcopy(obj)
+        from music21.test.commonTest import testCopyAll
+        testCopyAll(self, globals())
 
     def testAll(self):
         from music21 import corpus
@@ -213,21 +202,20 @@ class Test(unittest.TestCase):
         s.append(sc.getChord('f4', 'g5', quarterLength=3))
         s.append(note.Note('c5', quarterLength=3))
 
-        for args in [
-            ('histogram', 'pitch'),
-            ('histogram', 'pitchclass'),
-            ('histogram', 'quarterlength'),
+        for plotType, xValue, yValue in [
+            ('histogram', 'pitch', None),
+            ('histogram', 'pitchclass', None),
+            ('histogram', 'quarterlength', None),
             ('scatter', 'pitch', 'quarterlength'),
             ('scatter', 'pitchspace', 'offset'),
             ('scatter', 'pitch', 'offset'),
-            ('scatter', 'dynamics'),
-            ('bar', 'pitch'),
-            ('bar', 'pc'),
+            ('scatter', 'dynamics', None),
+            ('bar', 'pitch', None),
+            ('bar', 'pc', None),
             ('weighted', 'pc', 'duration'),
-            ('weighted', 'dynamics'),
+            ('weighted', 'dynamics', None),
         ]:
-            # s.plot(*args, doneAction='write')
-            s.plot(*args, doneAction=None)
+            s.plot(plotType, xValue=xValue, yValue=yValue, doneAction=None)
 
     def testHorizontalInstrumentationB(self):
         from music21 import corpus

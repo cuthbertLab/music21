@@ -5,7 +5,7 @@
 #               to debug braille output with a minimum of screen reader output
 # Author:       Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2016 Michael Scott Asato Cuthbert and the music21 Project
+# Copyright:    Copyright © 2016 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
@@ -18,6 +18,8 @@ to people who are programming music21 on a screen reader.
 
 For Bo-Cheng Jhan with my thanks.
 '''
+from __future__ import annotations
+
 import re
 import subprocess
 import sys

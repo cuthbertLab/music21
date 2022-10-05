@@ -5,7 +5,7 @@
 #
 # Authors:      Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2006-2013 Michael Scott Asato Cuthbert and the music21 Project
+# Copyright:    Copyright © 2006-2013 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
@@ -74,9 +74,11 @@ convert the file into .xml or .nwctxt first.
         {4.0} <music21.stream.Measure 0 offset=4.0>
             {0.0} <music21.note.Note C>
 '''
+from __future__ import annotations
+
 import pathlib
 import struct
-import typing as t
+
 from music21 import environment
 from music21 import exceptions21
 
@@ -105,7 +107,7 @@ class NWCConverter:
     >>> nwcc.staves
     []
     '''
-    def __init__(self, *args, **keywords):
+    def __init__(self, **keywords):
         self.fileContents = None
         self.parsePosition = 0
         self.version = 200
@@ -135,7 +137,7 @@ class NWCConverter:
         self.staffHeight = 0
 
     # noinspection SpellCheckingInspection
-    def parseFile(self, fp: t.Union[pathlib.Path, str]):
+    def parseFile(self, fp: pathlib.Path | str):
         # noinspection PyShadowingNames
         r'''
         Parse a file (calls .toStream)

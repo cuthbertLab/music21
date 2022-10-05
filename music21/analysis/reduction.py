@@ -6,7 +6,7 @@
 # Authors:      Christopher Ariza
 #               Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2011-2013 Michael Scott Asato Cuthbert and the music21 Project
+# Copyright:    Copyright © 2011-2013 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
@@ -15,6 +15,8 @@ and one or more reductive representation lines.
 
 Used by graph.PlotHorizontalBarWeighted()
 '''
+from __future__ import annotations
+
 import copy
 import re
 import typing as t
@@ -24,15 +26,15 @@ from music21 import exceptions21
 
 from music21 import chord
 from music21 import common
+from music21.common.types import DocOrder
+from music21 import environment
 from music21 import expressions
 from music21 import instrument
 from music21 import note
 from music21 import pitch
 from music21 import prebase
 from music21 import stream
-from music21.common.types import DocOrder
 
-from music21 import environment
 environLocal = environment.Environment('analysis.reduction')
 
 
@@ -113,7 +115,7 @@ class ReductiveNote(prebase.ProtoM21Object):
     def __getitem__(self, key):
         return self._parameters[key]
 
-    def _parseSpecification(self, spec):
+    def _parseSpecification(self, spec: str):
         # start with the defaults
         self._parameters = copy.deepcopy(self._defaultParameters)
         spec = spec.strip()
@@ -133,7 +135,7 @@ class ReductiveNote(prebase.ProtoM21Object):
                 self._parameters[attr] = value
         self._isParsed = True
 
-    def isParsed(self):
+    def isParsed(self) -> bool:
         return self._isParsed
 
     def getNoteAndTextExpression(self):
@@ -199,7 +201,7 @@ class ScoreReduction:
     '''
     An object to reduce a score.
     '''
-    def __init__(self, *args, **keywords):
+    def __init__(self, **keywords):
         # store a list of one or more reductions
         self._reductiveNotes = {}
         self._reductiveVoices = []
@@ -464,8 +466,8 @@ class PartReduction:
     '''
     def __init__(self,
                  srcScore=None,
-                 *args,
-                 partGroups: t.Optional[t.List[t.Dict[str, t.Any]]] = None,
+                 *,
+                 partGroups: list[dict[str, t.Any]] | None = None,
                  fillByMeasure: bool = True,
                  segmentByTarget: bool = True,
                  normalize: bool = True,
@@ -479,9 +481,9 @@ class PartReduction:
         # an ordered list of dictionaries for
         # part id, part color, and a list of Part objs
         # TODO: typed dict
-        self._partBundles: t.List[t.Dict[str, t.Any]] = []
+        self._partBundles: list[dict[str, t.Any]] = []
         # a dictionary of part id to a list of events
-        self._eventSpans: t.Dict[t.Union[str, int], t.List[t.Any]] = {}
+        self._eventSpans: dict[str | int, list[t.Any]] = {}
 
         # define how parts are grouped
         # a list of dictionaries, with keys for name, color, and a match list

@@ -5,12 +5,14 @@
 #
 # Authors:      Mark Gotham
 #
-# Copyright:    Copyright © 2018 Michael Scott Asato Cuthbert and the music21 Project
+# Copyright:    Copyright © 2018 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
 Placeholder dicts for the 0th and 1st order of Hewlett's base40 system (base12 and 26).
 '''
+from __future__ import annotations
+
 import unittest
 
 # ------------------------------------------------------------------------------

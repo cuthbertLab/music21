@@ -7,9 +7,10 @@
 #               Michael Scott Asato Cuthbert
 #
 # Copyright:    Copyright © 2009-2022 Michael Scott Asato Cuthbert
-#               and the music21 Project
 # License:      BSD, see license.txt
 # -----------------------------------------------------------------------------
+from __future__ import annotations
+
 from music21.exceptions21 import TimeSignatureException, MeterException
 from music21.meter.base import (
     TimeSignature, bestTimeSignature, SenzaMisuraTimeSignature, TimeSignatureBase,
