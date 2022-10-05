@@ -248,17 +248,26 @@ class RnWriter(prebase.ProtoM21Object):
         Time Signature (:class:`~music21.meter.TimeSignature`) changes and
         Repeats marks (:class:`~music21.bar.Repeat`)
         but only (currently) between measures.
-        Mid-measure repeats are an open issue (much wider than rntxt).
+        
+        Let's add a new measure to the stream we started,
+        with a time signature change before hand and 
+        both start and end repeats in it:
 
         >>> m2 = stream.Measure(number=2)
         >>> m2.insert(0, meter.TimeSignature('3/4'))
         >>> m2.leftBarline = bar.Repeat(direction='start')
         >>> m2.rightBarline = bar.Repeat(direction='end')
         >>> m2.insert(0, roman.RomanNumeral('I', 'G'))
-        >>> p.insert(m2)
+        >>> p.insert(0, m2)
         >>> testCase = romanText.writeRoman.RnWriter(p)
+
+        The last line of the `.combinedList` gives the new measure:
         >>> testCase.combinedList[-1]
         'm2 ||: I :||'
+
+        The line before that gives the time signature change: 
+        >>> testCase.combinedList[-2]
+        'Time Signature: 3/4'
 
         '''
 
