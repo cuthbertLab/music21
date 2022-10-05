@@ -248,9 +248,9 @@ class RnWriter(prebase.ProtoM21Object):
         Time Signature (:class:`~music21.meter.TimeSignature`) changes and
         Repeats marks (:class:`~music21.bar.Repeat`)
         but only (currently) between measures.
-        
+
         Let's add a new measure to the stream we started,
-        with a time signature change before hand and 
+        with a time signature change beforehand and
         both start and end repeats in it:
 
         >>> m2 = stream.Measure(number=2)
@@ -265,7 +265,7 @@ class RnWriter(prebase.ProtoM21Object):
         >>> testCase.combinedList[-1]
         'm2 ||: I :||'
 
-        The line before that gives the time signature change: 
+        The line before that gives the time signature change:
         >>> testCase.combinedList[-2]
         'Time Signature: 3/4'
 
