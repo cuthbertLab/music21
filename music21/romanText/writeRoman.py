@@ -325,12 +325,7 @@ class RnWriter(prebase.ProtoM21Object):
                                          inString=measureString,
                                          )
 
-            # End repeat
-            if thisMeasure.rightBarline:
-                if 'Repeat' in thisMeasure.rightBarline.classes:
-                    measureString += ' :||'  # EOL
-
-            if measureString != 'm' + thisMeasureNumber:  # not if empty (number only)
+            if measureString:
                 self.combinedList.append(measureString)
 
     def getChordString(self,
