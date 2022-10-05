@@ -618,8 +618,15 @@ class Test(unittest.TestCase):
         writer = RnWriter(s)
         assert '\n'.join(writer.combinedList).strip().endswith(rntxt.strip())
 
+    def testRnString(self):
+        test = rnString(1, 1, 'G: I')
+        self.assertEqual(test, 'm1 G: I')  # no beat number given for b1
 
-# ------------------------------------------------------------------------------
+        test = rnString(0, 4, 'b: V')
+        self.assertEqual(test, 'm0 b4 b: V')  # beat number is given for all other cases
+
+        with self.assertRaises(ValueError):  # error when the measure numbers don't match
+            rnString(15, 1, 'viio6', 'm14 G: I')
 
     def testIntBeat(self):
         testInt = intBeat(1, roundValue=2)
