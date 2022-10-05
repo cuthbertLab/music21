@@ -20,7 +20,7 @@ can be found in modules such as :ref:`moduleDynamics` (for things such as cresce
 '''
 from __future__ import annotations
 
-from collections.abc import Sequence
+from collections.abc import Collection, Sequence, Iterable
 import copy
 import typing as t
 import unittest
@@ -1227,7 +1227,7 @@ class RepeatBracket(Spanner):
     >>> sp.number = 3
     >>> sp
     <music21.spanner.RepeatBracket 3 <music21.stream.Measure 0 offset=0.0>>
-    >>> sp.getNumberList()  # the list of repeat numbers
+    >>> sp.numberRange  # the list of repeat numbers
     [3]
     >>> sp.number
     '3'
@@ -1235,7 +1235,7 @@ class RepeatBracket(Spanner):
     Range of repeats as string:
 
     >>> sp.number = '1-3'
-    >>> sp.getNumberList()
+    >>> sp.numberRange
     [1, 2, 3]
     >>> sp.number
     '1-3'
@@ -1243,7 +1243,7 @@ class RepeatBracket(Spanner):
     Range of repeats as list:
 
     >>> sp.number = [2, 3]
-    >>> sp.getNumberList()
+    >>> sp.numberRange
     [2, 3]
     >>> sp.number
     '2, 3'
@@ -1251,7 +1251,7 @@ class RepeatBracket(Spanner):
     Comma separated numbers:
 
     >>> sp.number = '1, 2, 3'
-    >>> sp.getNumberList()
+    >>> sp.numberRange
     [1, 2, 3]
     >>> sp.number
     '1-3'
@@ -1259,7 +1259,7 @@ class RepeatBracket(Spanner):
     Disjunct numbers:
 
     >>> sp.number = '1, 2, 3, 7'
-    >>> sp.getNumberList()
+    >>> sp.numberRange
     [1, 2, 3, 7]
     >>> sp.number
     '1, 2, 3, 7'
@@ -1276,131 +1276,130 @@ class RepeatBracket(Spanner):
     >>> sp.number
     '1, 2, 3, 7'
     '''
+
+    _DOC_ATTR = {
+        'numberRange': '''
+            Get a contiguous list of repeat numbers that are applicable for this instance.
+
+            Will always have at least one element, but [0] means undefined
+
+            >>> rb = spanner.RepeatBracket()
+            >>> rb.numberRange
+            [0]
+
+            >>> rb.number = '1,2'
+            >>> rb.numberRange
+            [1, 2]
+        ''',
+        'overrideDisplay': '''
+            Override the string representation of this bracket, or use
+            None to not override.
+        ''',
+    }
+
     def __init__(self,
                  *spannedElements,
-                 number: int | str | list[int | str] | None = None,
+                 number: int | str | Iterable[int] = 0,
                  overrideDisplay: str | None = None,
                  **keywords):
         super().__init__(*spannedElements, **keywords)
-
-        self._number: int | None = None
         # store a range, inclusive of the single number assignment
-        self._numberRange: list[int] = []
-        # are there exactly two numbers that should be written as  3, 4 not 3-4.
-        self._numberSpanIsAdjacent: bool = False
-        # can we write as '3, 4' or '5-10' and not as '1, 5, 6, 11'
-        self._numberSpanIsContiguous: bool = True
+        self.numberRange: list[int] = []
         self.overrideDisplay = overrideDisplay
+        self.number = number
 
-        if number is not None:
-            self.number = number
+    @property
+    def _numberSpanIsAdjacent(self) -> bool:
+        '''
+        are there exactly two numbers that should be written as 3, 4 not 3-4.
+        '''
+        return len(self.numberRange) == 2 and self.numberRange[0] == self.numberRange[1] - 1
+
+    @property
+    def _numberSpanIsContiguous(self) -> bool:
+        '''
+        can we write as '3, 4' or '5-10' and not as '1, 5, 6, 11'
+        '''
+        return common.contiguousList(self.numberRange)
 
     # property to enforce numerical numbers
     def _getNumber(self) -> str:
         '''
         This must return a string, as we may have single numbers or lists.
-        For a raw numerical list, use getNumberList() below.
+        For a raw numerical list, look at `.numberRange`.
         '''
-        if not self._numberRange:
-            return ''
-        elif len(self._numberRange) == 1:
-            return str(self._number)
+        if len(self.numberRange) == 1:
+            if self.numberRange[0] == 0:
+                return ''
+            return str(self.numberRange[0])
         else:
             if not self._numberSpanIsContiguous:
-                return ', '.join([str(x) for x in self._numberRange])
+                return ', '.join([str(x) for x in self.numberRange])
             elif self._numberSpanIsAdjacent:
-                return f'{self._numberRange[0]}, {self._numberRange[-1]}'
+                return f'{self.numberRange[0]}, {self.numberRange[-1]}'
             else:  # range of values
-                return f'{self._numberRange[0]}-{self._numberRange[-1]}'
+                return f'{self.numberRange[0]}-{self.numberRange[-1]}'
 
-    def _setNumber(self, value: int | str | list[int | str] | None):
+    def _setNumber(self, value: int | str | Iterable[int]):
         '''
         Set the bracket number. There may be range of values provided
         '''
-        if value in ('', None):
-            # assume this is 1
-            self._numberRange = [1]
-            self._number = 1
-        elif common.isIterable(value):
-            self._numberRange = []  # clear
+        if value == '':
+            # undefined.
+            self.numberRange = [0]
+        elif common.holdsType(value, int):
+            value = t.cast(Collection[int], value)  # unnecessary, but not working in mypy 0.982
+            self.numberRange = []  # clear
             for x in value:
-                if common.isNum(x):
-                    self._numberRange.append(x)
-                else:
-                    raise SpannerException(
-                        f'number for RepeatBracket must be a number, not {value!r}')
-            self._number = min(self._numberRange)
-            self._numberSpanIsContiguous = common.contiguousList(self._numberRange)
-            if (len(self._numberRange) == 2) and (self._numberRange[0] == self._numberRange[1] - 1):
-                self._numberSpanIsAdjacent = True
-            else:
-                self._numberSpanIsAdjacent = False
-
+                self.numberRange.append(x)
         elif isinstance(value, str):
             # assume defined a range with a dash; assumed inclusive
             if '-' in value:
                 start, end = value.split('-')
-                self._numberRange = list(range(int(start), int(end) + 1))
-                self._numberSpanIsAdjacent = False
-                self._numberSpanIsContiguous = True
+                self.numberRange = list(range(int(start), int(end) + 1))
 
             elif ',' in value:
-                self._numberRange = []  # clear
-                for x in value.split(','):
-                    x = int(x.strip())
-                    self._numberRange.append(x)
-                self._number = min(self._numberRange)
-
-                # returns bool
-                self._numberSpanIsContiguous = common.contiguousList(self._numberRange)
-                if ((len(self._numberRange) == 2)
-                        and (self._numberRange[0] == self._numberRange[1] - 1)):
-                    self._numberSpanIsAdjacent = True
-                else:
-                    self._numberSpanIsAdjacent = False
-
+                self.numberRange = []  # clear
+                for one_letter_value in value.split(','):
+                    one_number = int(one_letter_value.strip())
+                    self.numberRange.append(one_number)
             elif value.isdigit():
-                self._numberRange.append(int(value))
+                self.numberRange.append(int(value))
             else:
                 raise SpannerException(f'number for RepeatBracket must be a number, not {value!r}')
-            self._number = min(self._numberRange)
-        elif common.isNum(value):
-            self._numberRange = []  # clear
-            self._number = value
-            if value not in self._numberRange:
-                self._numberRange.append(value)
+        elif common.isInt(value):
+            self.numberRange = []  # clear
+            if value not in self.numberRange:
+                self.numberRange.append(value)
         else:
             raise SpannerException(f'number for RepeatBracket must be a number, not {value!r}')
 
     number = property(_getNumber, _setNumber, doc='''
+            Get or set the number -- returning a string always.
+
+            >>> rb = spanner.RepeatBracket()
+            >>> rb.number
+            ''
+            >>> rb.number = '5-7'
+            >>> rb.number
+            '5-7'
+            >>> rb.numberRange
+            [5, 6, 7]
+            >>> rb.number = 1
         ''')
 
-    def getNumberList(self):
-        '''Get a contiguous list of repeat numbers that are applicable for this instance.
-
-        Will always have at least one element, but [0] means undefined
-
-        >>> rb = spanner.RepeatBracket()
-        >>> rb.getNumberList()
-        [0]
-
-        >>> rb.number = '1,2'
-        >>> rb.getNumberList()
-        [1, 2]
+    @common.deprecated('v9', 'v10', 'Look at .numberRange instead')
+    def getNumberList(self):  # pragma: no cover
         '''
-        nr = self._numberRange
-        if not nr:
-            return [0]
-        else:
-            return nr
+        Deprecated -- just look at .numberRange
+        '''
+        return self.numberRange
 
     def _reprInternal(self):
         if self.overrideDisplay is not None:
             msg = self.overrideDisplay + ' '
-        elif self.number is not None:
-            msg = str(self.number) + ' '
         else:
-            msg = ''
+            msg = self.number + ' '
         return msg + super()._reprInternal()
 
 
@@ -1684,8 +1683,8 @@ class Line(Spanner):
         super().__init__(*spannedElements, **keywords)
 
         DEFAULT_TICK = 'down'
-        self._endTick = DEFAULT_TICK  # can ne up/down/arrow/both/None
-        self._startTick = DEFAULT_TICK  # can ne up/down/arrow/both/None
+        self._endTick = DEFAULT_TICK  # can be up/down/arrow/both/None
+        self._startTick = DEFAULT_TICK  # can be up/down/arrow/both/None
 
         self._endHeight = None  # for up/down, specified in tenths
         self._startHeight = None  # for up/down, specified in tenths
