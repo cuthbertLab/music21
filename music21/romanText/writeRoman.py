@@ -273,7 +273,8 @@ class RnWriter(prebase.ProtoM21Object):
 
         for thisMeasure in self.container.getElementsByClass(stream.Measure):
 
-            # TimeSignatures (extra elements supported between measures, see also Repeats)
+            # Separate line for elements supported before/between measures.
+            # (Note: Repeats within measure below)
             tsThisMeasure = thisMeasure.getElementsByClass(meter.TimeSignature)
             if tsThisMeasure:
                 firstTS = tsThisMeasure[0]
@@ -287,10 +288,9 @@ class RnWriter(prebase.ProtoM21Object):
             if thisMeasure.numberSuffix is not None:
                 measureNumberString += thisMeasure.numberSuffix
 
-            # RomanNumerals
             measureString = ''  # Clear for each measure
 
-            rnsThisMeasure = thisMeasure.getElementsByClass(roman.RomanNumeral)
+            # Start repeat (within measure)
             if (isinstance(thisMeasure.leftBarline, bar.Repeat)
                     and thisMeasure.leftBarline.direction == 'start'):
                 measureString = rnString(measureNumber=measureNumberString,
@@ -299,7 +299,7 @@ class RnWriter(prebase.ProtoM21Object):
                                          inString=measureString,
                                          )
 
-            # Roman Numerals
+            # Roman Numerals (within measure)
             rnsThisMeasure = thisMeasure.getElementsByClass(roman.RomanNumeral)
             for rn in rnsThisMeasure:
                 if rn.tie is None or rn.tie.type == 'start':  # Ignore tied-to Roman numerals
@@ -309,6 +309,8 @@ class RnWriter(prebase.ProtoM21Object):
                                              chordString=chordString,
                                              inString=measureString,  # Creating update
                                              )
+
+            # End repeat (within measure)
             if (isinstance(thisMeasure.rightBarline, bar.Repeat)
                     and thisMeasure.rightBarline.direction == 'end'):
                 # we want to put the repeat at the beat of the last roman
@@ -471,7 +473,7 @@ class Test(unittest.TestCase):
     Tests for two analysis cases (the smallest rntxt files in the music21 corpus)
     along with two test by modifying those scores.
 
-    Additional tests for the standalone intBeat function and
+    Additional tests for the standalone functions rnString and intBeat and
     for handling the special case of opus objects.
     '''
 
