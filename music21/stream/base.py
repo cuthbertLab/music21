@@ -323,6 +323,9 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         # restrictClass: type[M21ObjType] = base.Music21Object,
         super().__init__(**keywords)
 
+        # TEMPORARY variable for v9 to deprecate the flat property. -- remove in v10
+        self._created_via_deprecated_flat = False
+
         self.streamStatus = streamStatus.StreamStatus(self)
         self._unlinkedDuration = None
 
@@ -438,6 +441,13 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         specialized :class:`music21.stream.StreamIterator` class, which
         adds necessary Stream-specific features.
         '''
+        # temporary for v9 -- remove in v10
+        if self._created_via_deprecated_flat:
+            warnings.warn('.flat is deprecated.  Call .flatten() instead',
+                          exceptions21.Music21DeprecationWarning,
+                          stacklevel=2)
+            self._created_via_deprecated_flat = False
+
         return t.cast(iterator.StreamIterator[M21ObjType],
                       iterator.StreamIterator(self))
 
@@ -7798,14 +7808,8 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
 
         See :meth:`~music21.stream.base.Stream.flatten()` for documentation.
         '''
-        def warn_then_iter(self_):
-            warnings.warn('.flat will disappear in v10.  Use .flatten() instead',
-                          exceptions21.Music21DeprecationWarning,
-                          stacklevel=2)
-            return iterator.StreamIterator(self_)
-
         flatStream = self.flatten(retainContainers=False)
-        flatStream.__iter__ = warn_then_iter
+        flatStream._created_via_deprecated_flat = True
         return flatStream
 
     @overload

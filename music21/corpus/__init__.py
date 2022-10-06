@@ -287,12 +287,14 @@ def getWork(
 
     >>> import os, pathlib
     >>> luca = corpus.getWork('luca/gloria')
-    >>> type(luca)
-    <class 'pathlib....Path'>
+    >>> isinstance(luca, pathlib.Path)
+    True
     >>> luca.name
     'gloria.xml'
     >>> luca.parent.name
     'luca'
+
+    Multiple works give multiple paths.
 
     >>> trecentoFiles = corpus.getWork('trecento')
     >>> isinstance(trecentoFiles, list)

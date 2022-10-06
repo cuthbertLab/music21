@@ -1183,6 +1183,8 @@ class MetadataBundle(prebase.ProtoM21Object):
         >>> metadataBundle.search(composer='cicon')
         <music21.metadata.bundles.MetadataBundle {1 entry}>
         '''
+        acceptable_extensions: set[str] = set(fileExtensions)
+
         newMetadataBundle = MetadataBundle()
         if query is None and field is None:
             if not keywords:
@@ -1194,24 +1196,13 @@ class MetadataBundle(prebase.ProtoM21Object):
             if metadataEntry.metadata is None:
                 continue
             sp = metadataEntry.sourcePath
+            if acceptable_extensions and sp.suffix not in acceptable_extensions:
+                continue
+            if key in newMetadataBundle._metadataEntries:
+                continue  # duplicate key?
 
             if metadataEntry.search(query, field)[0]:
-                include = False
-                for fileExtension in fileExtensions:
-                    if fileExtension and fileExtension[0] != '.':
-                        fileExtension = '.' + fileExtension
-
-                    if sp.suffix == fileExtension:
-                        include = True
-                        break
-                    elif (fileExtension.endswith('xml')
-                            and sp.suffix == '.mxl'):
-                        include = True
-                        break
-                else:
-                    include = True
-                if include and key not in newMetadataBundle._metadataEntries:
-                    newMetadataBundle._metadataEntries[key] = metadataEntry
+                newMetadataBundle._metadataEntries[key] = metadataEntry
         newMetadataBundle._metadataEntries = OrderedDict(
             sorted(list(newMetadataBundle._metadataEntries.items()),
                    key=lambda mde: mde[1].sourcePath))
