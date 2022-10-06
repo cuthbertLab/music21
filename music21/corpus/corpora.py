@@ -322,7 +322,7 @@ class Corpus(prebase.ProtoM21Object):
             # store one or more possible mappings of movement number
             movementStrList = []
             # see if this is a pair
-            if common.isIterable(movementNumber):
+            if common.holdsType(movementNumber, int):
                 movementStrList.append(
                     ''.join(str(x) for x in movementNumber))
                 movementStrList.append(
