@@ -44,9 +44,10 @@ class Corpus(prebase.ProtoM21Object):
 
     # TODO: this should be wiped if a SubConverter is registered or deregistered.
     # mypy online (but not local) having a problem determining type of findInputExtension
+    # https://github.com/python/mypy/issues/1032
     _allExtensions: tuple[str, ...] = tuple(  # type: ignore
         common.flattenList(
-            [common.formats.findInputExtension(x)
+            [common.formats.findInputExtension(x)  # type: ignore
              for x in _acceptableExtensions]
         )
     )
