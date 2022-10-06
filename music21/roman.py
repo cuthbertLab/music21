@@ -936,6 +936,34 @@ def romanNumeralFromChord(
     <music21.roman.RomanNumeral io6b5b3 in c# minor>
 
 
+    The preferSecondaryDominants option defaults to False, but if set to True,
+    then certain rare figures are swapped with their
+    more common secondary dominant equivalent to produce
+    Roman numerals like 'V/V' instead of 'II'.
+    
+    This has no effect on most chords.
+    A change is triggered if and only if:
+
+    * the chord is a major triad or dominant seventh
+    
+    * the chord is not diatonic to the primary key (i.e., chromatically altered)
+
+    * the root of secondary key is diatonic to the primary key.
+        
+    So first without setting preferSecondaryDominants:
+
+    >>> cd = chord.Chord('D F# A')
+    >>> rn = roman.romanNumeralFromChord(cd, 'C')
+    >>> rn.figure
+    'II'
+
+    And now with preferSecondaryDominants=True:
+
+    >>> rn = roman.romanNumeralFromChord(cd, 'C', preferSecondaryDominants=True)
+    >>> rn.figure
+    'V/V'
+
+
     OMIT_FROM_DOCS
 
     Note that this should be III+642 gives III+#642 (# before 6 is unnecessary)
@@ -1026,17 +1054,6 @@ def romanNumeralFromChord(
         '64#3': '43[#7]',  # minor key 2nd inversion
         '42': '42[#7]',  # minor key form of 3rd inversion mM7...
     }
-    secondaryDominantSwapsMajor = {
-        'II': 'V',  # II > V/V
-        'III': 'vi',  # III > V/vi
-        'VI': 'ii',  # VI > V/ii
-    }
-    secondaryDominantSwapsMinor = {
-        'I': 'iv',  # Debatable
-        'II': 'V',  # Only one shared with major
-        'III': 'VI',  # NB upper (VI)
-        'IV': 'VII',  # sic, no flat (bVII) by default
-    }
 
     noKeyGiven = (keyObj is None)
 
@@ -1121,11 +1138,18 @@ def romanNumeralFromChord(
         elif nationalityStart in ('Fr', 'Sw'):
             keyObj = _getKeyFromCache(chordObj.seventh.name.lower())
 
-    if preferSecondaryDominants and (ft.prefix == ''):  # Nothing on altered scale degrees
-        if (keyObj.mode == 'major') and (stepRoman in secondaryDominantSwapsMajor):
-            rnString = f'V{inversionString}/{secondaryDominantSwapsMajor[stepRoman]}'
-        elif (keyObj.mode == 'minor') and (stepRoman in secondaryDominantSwapsMinor):
-            rnString = f'V{inversionString}/{secondaryDominantSwapsMinor[stepRoman]}'
+    if preferSecondaryDominants:
+        if stepRoman != 'V':  # ignore if already "primary" dominant
+            if chordObj.isDominantSeventh() or chordObj.isMajorTriad():
+                possibleSecondaryTonic = chordObj.root().transpose('P4').name
+                degree = keyObj.getScaleDegreeFromPitch(possibleSecondaryTonic)
+                if degree:  # None if not in chord
+                    secondaryAsRoman = keyObj.romanNumeral(degree).romanNumeralAlone  # NB
+                    primaryFigure = romanNumeralFromChord(chordObj, 
+                                        key.Key(possibleSecondaryTonic)
+                                        # Note preferSecondaryDominants now False
+                                        ).figure
+                    rnString = f'{primaryFigure}/{secondaryAsRoman}'
 
     try:
         rn = RomanNumeral(rnString, keyObj, updatePitches=False,
