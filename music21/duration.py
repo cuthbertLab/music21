@@ -1095,6 +1095,19 @@ class Tuplet(prebase.ProtoM21Object):
                 # type ignore until https://github.com/python/mypy/issues/3004 resolved
                 self.durationActual = durationActual  # type: ignore
 
+        # # crashes mypy-0.982 -- fixed in 0.999 dev.
+        # match durationActual:
+        #     case None:
+        #         pass
+        #     case str(durAct):
+        #         self.durationActual = durationTupleFromTypeDots(durAct, 0)
+        #     case (str(durActType), int(dots)):
+        #         self.durationActual = durationTupleFromTypeDots(durActType, dots)
+        #     case _:
+        #         # type ignore until https://github.com/python/mypy/issues/3004 resolved
+        #         self.durationActual = durationActual  # type: ignore
+
+
         # normal is the space that would normally be occupied by the tuplet span
         self.numberNotesNormal: int = numberNotesNormal
 
@@ -1107,6 +1120,18 @@ class Tuplet(prebase.ProtoM21Object):
             else:
                 # type ignore until https://github.com/python/mypy/issues/3004 resolved
                 self.durationNormal = durationNormal  # type: ignore
+
+        # # crashes mypy-0.982 -- fixed in 0.999 dev.
+        # match durationNormal:
+        #     case None:
+        #         pass
+        #     case str(durNor):
+        #         self.durationNormal = durationTupleFromTypeDots(durNor, 0)
+        #     case(str(durNorType), int(dots)):
+        #         self.durationNormal = durationTupleFromTypeDots(durNorType, dots)
+        #     case _:
+        #         # type ignore until https://github.com/python/mypy/issues/3004 resolved
+        #         self.durationNormal = durationNormal  # type: ignore
 
         # Type is 'start', 'stop', 'startStop', False or None: determines whether to start or stop
         # the bracket/group drawing
@@ -1160,10 +1185,10 @@ class Tuplet(prebase.ProtoM21Object):
     # PRIVATE METHODS #
 
     def _reprInternal(self):
-        base = f'{self.numberNotesActual!r}/{self.numberNotesNormal!r}'
+        base_rep = f'{self.numberNotesActual!r}/{self.numberNotesNormal!r}'
         if self.durationNormal is not None:
-            base += f'/{self.durationNormal.type}'
-        return base
+            base_rep += f'/{self.durationNormal.type}'
+        return base_rep
 
     def _checkFrozen(self):
         if self.frozen is True:
@@ -3179,7 +3204,6 @@ class TupletFixer:
     reflect proper beaming, etc.  It does not alter the quarterLength
     of any notes.
     '''
-
     def __init__(self, streamIn=None):
         self.streamIn = streamIn
 
@@ -3359,51 +3383,48 @@ class TupletFixer:
 
         if currentTupletDuration == totalTupletDuration:
             return
-        else:
-            excessRatio = opFrac(currentTupletDuration / totalTupletDuration)
-            inverseExcessRatio = opFrac(1 / excessRatio)
 
-            if excessRatio == int(excessRatio):  # divide tuplets into smaller
-                largestTupletType = ordinalTypeFromNum[largestTupletTypeOrdinal]
+        excessRatio = opFrac(currentTupletDuration / totalTupletDuration)
+        inverseExcessRatio = opFrac(1 / excessRatio)
 
-                for n in tupletGroup:
-                    normalDots = 0
-                    n.duration.tuplets[0].frozen = False  # bad
-                    if n.duration.tuplets[0].durationNormal is not None:
-                        normalDots = n.duration.tuplets[0].durationNormal.dots
-                    n.duration.tuplets[0].durationNormal = durationTupleFromTypeDots(
-                        largestTupletType, normalDots)
-                    actualDots = 0
-                    if n.duration.tuplets[0].durationActual is not None:
-                        actualDots = n.duration.tuplets[0].durationActual.dots
-                    n.duration.tuplets[0].durationActual = durationTupleFromTypeDots(
-                        largestTupletType, actualDots)
-                    n.duration.tuplets[0].frozen = True
-                    n.duration.informClient()
+        if excessRatio == int(excessRatio):  # divide tuplets into smaller
+            largestTupletType = ordinalTypeFromNum[largestTupletTypeOrdinal]
 
-            elif inverseExcessRatio == int(inverseExcessRatio):  # redefine tuplets by GCD
-                smallestTupletType = ordinalTypeFromNum[smallestTupletTypeOrdinal]
-                for n in tupletGroup:
-                    normalDots = 0
-                    n.duration.tuplets[0].frozen = False  # bad
-                    if n.duration.tuplets[0].durationNormal is not None:
-                        normalDots = n.duration.tuplets[0].durationNormal.dots
-                    # TODO: this should be frozen!
-                    durTuple = durationTupleFromTypeDots(smallestTupletType, normalDots)
-                    n.duration.tuplets[0].durationNormal = durTuple
+            for n in tupletGroup:
+                normalDots = 0
+                n.duration.tuplets[0].frozen = False  # bad
+                if n.duration.tuplets[0].durationNormal is not None:
+                    normalDots = n.duration.tuplets[0].durationNormal.dots
+                n.duration.tuplets[0].durationNormal = durationTupleFromTypeDots(
+                    largestTupletType, normalDots)
+                actualDots = 0
+                if n.duration.tuplets[0].durationActual is not None:
+                    actualDots = n.duration.tuplets[0].durationActual.dots
+                n.duration.tuplets[0].durationActual = durationTupleFromTypeDots(
+                    largestTupletType, actualDots)
+                n.duration.tuplets[0].frozen = True
+                n.duration.informClient()
 
-                    actualDots = 0
-                    if n.duration.tuplets[0].durationActual is not None:
-                        actualDots = n.duration.tuplets[0].durationActual.dots
-                    durTuple = durationTupleFromTypeDots(smallestTupletType,
-                                                         actualDots)
-                    n.duration.tuplets[0].durationActual = durTuple
-                    n.duration.tuplets[0].frozen = True
-                    n.duration.informClient()
+        elif inverseExcessRatio == int(inverseExcessRatio):  # redefine tuplets by GCD
+            smallestTupletType = ordinalTypeFromNum[smallestTupletTypeOrdinal]
+            for n in tupletGroup:
+                normalDots = 0
+                n.duration.tuplets[0].frozen = False  # bad
+                if n.duration.tuplets[0].durationNormal is not None:
+                    normalDots = n.duration.tuplets[0].durationNormal.dots
+                # TODO: this should be frozen!
+                durTuple = durationTupleFromTypeDots(smallestTupletType, normalDots)
+                n.duration.tuplets[0].durationNormal = durTuple
 
-            else:
-                pass
-                # print('Crazy!', currentTupletDuration, totalTupletDuration, excess)
+                actualDots = 0
+                if n.duration.tuplets[0].durationActual is not None:
+                    actualDots = n.duration.tuplets[0].durationActual.dots
+                durTuple = durationTupleFromTypeDots(smallestTupletType,
+                                                     actualDots)
+                n.duration.tuplets[0].durationActual = durTuple
+                n.duration.tuplets[0].frozen = True
+                n.duration.informClient()
+        # else: pass
 
 # -------------------------------------------------------------------------------
 
@@ -3699,16 +3720,15 @@ class Test(unittest.TestCase):
         self.assertEqual(d.type, '16th')
         self.assertFalse(d.linked)  # note set
 
-
-#         d = duration.Duration()
-#         d.setTypeUnlinked('quarter')
-#         self.assertEqual(d.type, 'quarter')
-#         self.assertEqual(d.quarterLength, 0.0)  # note set
-#         self.assertFalse(d.linked)  # note set
-#
-#         d.setQuarterLengthUnlinked(20)
-#         self.assertEqual(d.quarterLength, 20.0)
-#         self.assertFalse(d.linked)  # note set
+        # d = duration.Duration()
+        # d.setTypeUnlinked('quarter')
+        # self.assertEqual(d.type, 'quarter')
+        # self.assertEqual(d.quarterLength, 0.0)  # note set
+        # self.assertFalse(d.linked)  # note set
+        #
+        # d.setQuarterLengthUnlinked(20)
+        # self.assertEqual(d.quarterLength, 20.0)
+        # self.assertFalse(d.linked)  # note set
 
 
     def x_testStrangeMeasure(self):

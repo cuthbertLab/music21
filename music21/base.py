@@ -40,7 +40,6 @@ from __future__ import annotations
 import builtins
 from collections.abc import Generator, Iterable
 import copy
-import fractions  # for type annotation only
 from importlib.util import find_spec
 import typing as t
 from typing import overload  # Pycharm can't do alias
@@ -57,7 +56,7 @@ from music21.common.types import OffsetQL, OffsetQLIn
 from music21 import defaults
 from music21.derivation import Derivation
 from music21.duration import Duration, DurationException
-from music21.editorial import Editorial
+from music21.editorial import Editorial  # import class directly to not conflict with property.
 from music21 import environment
 from music21 import exceptions21
 from music21 import prebase
@@ -68,6 +67,7 @@ from music21.sorting import SortTuple, ZeroSortTupleLow, ZeroSortTupleHigh
 from music21 import tie
 
 if TYPE_CHECKING:
+    import fractions
     from music21 import meter
     from music21 import stream
     from music21 import spanner
@@ -685,8 +685,6 @@ class Music21Object(prebase.ProtoM21Object):
 
     @editorial.setter
     def editorial(self, ed: Editorial):
-        # Dev note: because the property "editorial" shadows module editorial,
-        # typing has to be in quotes.
         self._editorial = ed
 
     @property
@@ -743,8 +741,6 @@ class Music21Object(prebase.ProtoM21Object):
 
     @style.setter
     def style(self, newStyle: Style | None):
-        # Dev note: because property style shadows module style,
-        # typing has to be in quotes.
         self._style = newStyle
 
     # convenience.

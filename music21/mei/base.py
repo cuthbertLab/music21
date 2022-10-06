@@ -176,7 +176,6 @@ from __future__ import annotations
 
 from collections import defaultdict
 from copy import deepcopy
-from fractions import Fraction  # for typing
 import typing as t
 from uuid import uuid4
 from xml.etree.ElementTree import Element, ParseError, fromstring, ElementTree
@@ -200,6 +199,10 @@ from music21 import pitch
 from music21 import stream
 from music21 import spanner
 from music21 import tie
+
+
+if t.TYPE_CHECKING:
+    from fractions import Fraction
 
 environLocal = environment.Environment('mei.base')
 

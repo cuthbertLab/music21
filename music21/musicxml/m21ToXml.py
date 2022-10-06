@@ -6431,7 +6431,7 @@ class MeasureExporter(XMLExporterBase):
 
             if endingType:
                 mxEnding = Element('ending')
-                numberList = self.rbSpanners[0].getNumberList()
+                numberList = self.rbSpanners[0].numberRange
                 numberStr = str(numberList[0])
                 # 0 is not a valid "ending-number"
                 if numberStr == '0':

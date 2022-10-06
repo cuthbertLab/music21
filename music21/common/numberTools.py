@@ -819,7 +819,7 @@ def lcm(filterList: Iterable[int]) -> int:
     common.lcm({3, 5, 6})
     30
 
-    Deprecated in v9 since Python 3.9 is the minimum version
+    Deprecated in v9 since Python 3.10 is the minimum version
     and math.lcm works in C and is faster
     '''
     def _lcm(a, b):

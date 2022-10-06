@@ -1625,11 +1625,8 @@ class Metadata(base.Music21Object):
 
         >>> md.bestTitle = 'Bonaparte'
         Traceback (most recent call last):
-        AttributeError: can't set...
+        AttributeError: can't set attribute 'bestTitle'
         '''
-        # When 3.10 is minimum version, change to:
-        # AttributeError: can't set attribute 'bestTitle'
-
         searchId = (
             'title',
             'popularTitle',

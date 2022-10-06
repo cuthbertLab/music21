@@ -402,7 +402,7 @@ repeatExpressionReference = [
 ]
 
 # ------------------------------
-def insertRepeatEnding(s, start, end, endingNumber=1, *, inPlace=False):
+def insertRepeatEnding(s, start, end, endingNumber: int = 1, *, inPlace=False):
     '''
     Designates a range of measures as being repeated endings (i.e. first and second endings)
     within a stream s, where s either contains measures,
@@ -738,7 +738,7 @@ class Expander:
 
         # see if there are any repeat brackets
         self._repeatBrackets = self._src.flatten().getElementsByClass(
-            'RepeatBracket'
+            spanner.RepeatBracket
         ).stream()
 
         self._srcMeasureCount = len(self._srcMeasureStream)
@@ -1114,13 +1114,13 @@ class Expander:
                 # environLocal.printDebug(['_groupRepeatBracketIndices', rb])
                 # match = False
                 if rb.isFirst(m):  # for this rb, is this the first measures
-                    if rb.getNumberList()[0] in foundRBNumbers:
+                    if rb.numberRange[0] in foundRBNumbers:
                         # we have a new group
                         groups.append(groupIndices)
                         foundRBNumbers = []
                         groupIndices = {'repeatBrackets': [], 'measureIndices': []}
                     # store rb numbers to monitor when we are in a new group
-                    foundRBNumbers += rb.getNumberList()  # concat list
+                    foundRBNumbers += rb.numberRange  # concat list
                     # groupIndices['measureIndices'].append(i)
                     # need to jump to the index of the last measure this
                     # rb contains; need to add indices for measures found within
@@ -1175,7 +1175,7 @@ class Expander:
                     # get number list will return inclusive values; i.e.,
                     # 1,3 will
                     # return 1, 2, 3
-                    target += rb.getNumberList()
+                    target += rb.numberRange
                 match = list(range(1, max(target) + 1))  # max of target + 1
                 if match != target:
                     environLocal.printDebug([
@@ -1678,7 +1678,7 @@ class Expander:
             # are at the last repeat under this bracket
             if data['validIndices'] is not None:
                 # repeat times is the number of elements in the list
-                repeatTimes = len(data['repeatBracket'].getNumberList())
+                repeatTimes = len(data['repeatBracket'].numberRange)
                 # just get the expanded section
                 # streamObj.show('t')
                 out = self.processInnermostRepeatBars(
