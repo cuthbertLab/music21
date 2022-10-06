@@ -940,16 +940,16 @@ def romanNumeralFromChord(
     then certain rare figures are swapped with their
     more common secondary dominant equivalent to produce
     Roman numerals like 'V/V' instead of 'II'.
-    
+
     This has no effect on most chords.
     A change is triggered if and only if:
 
     * the chord is a major triad or dominant seventh
-    
+
     * the chord is not diatonic to the primary key (i.e., chromatically altered)
 
     * the root of secondary key is diatonic to the primary key.
-        
+
     So first without setting preferSecondaryDominants:
 
     >>> cd = chord.Chord('D F# A')
@@ -1145,10 +1145,10 @@ def romanNumeralFromChord(
                 degree = keyObj.getScaleDegreeFromPitch(possibleSecondaryTonic)
                 if degree:  # None if not in chord
                     secondaryAsRoman = keyObj.romanNumeral(degree).romanNumeralAlone  # NB
-                    primaryFigure = romanNumeralFromChord(chordObj, 
-                                        key.Key(possibleSecondaryTonic)
-                                        # Note preferSecondaryDominants now False
-                                        ).figure
+                    primaryFigure = romanNumeralFromChord(chordObj,
+                                                          key.Key(possibleSecondaryTonic),
+                                                          # Note preferSecondaryDominants False
+                                                          ).figure
                     rnString = f'{primaryFigure}/{secondaryAsRoman}'
 
     try:
