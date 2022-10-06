@@ -12,7 +12,7 @@
 from __future__ import annotations
 
 import abc
-from collections.abc import Sequence, Iterable
+from collections.abc import Collection, Sequence, Iterable
 import pathlib
 import typing as t
 
@@ -44,7 +44,7 @@ class Corpus(prebase.ProtoM21Object):
     ]
 
     # TODO: this should be wiped if a SubConverter is registered or deregistered.
-    _allExtensions = tuple(common.flattenList([common.findInputExtension(x)
+    _allExtensions = tuple(common.flattenList([common.findInputExtension(x)  # type: ignore
                                                for x in _acceptableExtensions]))
 
     _pathsCache: dict[tuple[str, tuple[str, ...]], list[pathlib.Path]] = {}
@@ -258,7 +258,7 @@ class Corpus(prebase.ProtoM21Object):
     def getWorkList(
         self,
         workName: str,
-        movementNumber: int | None = None,
+        movementNumber: int | Collection[int] | None = None,
         fileExtensions=(),
     ):
         r'''
