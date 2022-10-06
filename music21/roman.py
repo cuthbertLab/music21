@@ -963,6 +963,56 @@ def romanNumeralFromChord(
     >>> rn.figure
     'V/V'
 
+    Dominant sevenths must be spelt correctly
+    (see conditions at :meth:`~music21.chord.Chord.isDominantSeventh`).
+
+    So let's try D dominant seventh in various contexts.
+
+    >>> cd = chord.Chord('F#4 A4 C5 D5')
+
+    In G major this still comes out without recourse to a secondary,
+    whether preferSecondaryDominants is True or False.
+
+    >>> rn = roman.romanNumeralFromChord(cd, 'G')
+    >>> rn.figure
+    'V65'
+
+    >>> rn = roman.romanNumeralFromChord(cd, 'G', preferSecondaryDominants=True)
+    >>> rn.figure
+    'V65'
+
+    In C major it does come through as a secondary
+
+    >>> rn = roman.romanNumeralFromChord(cd, 'C', preferSecondaryDominants=True)
+    >>> rn.figure
+    'V65/V'
+
+    "German Augmented sixth" chords are left intact, without change.
+    This is thanks to the constraints on
+    spelling and on the root of the secondry degree.
+
+    >>> cd = chord.Chord('Ab4 C5 Eb5 F#5')
+    >>> rn = roman.romanNumeralFromChord(cd, 'C', preferSecondaryDominants=True)
+    >>> rn.figure
+    'Ger65'
+
+    Let's check that with a dominant seventh spelling and minor key context:
+
+    >>> cd = chord.Chord('Ab4 C5 Eb5 Gb5')
+    >>> rn = roman.romanNumeralFromChord(cd, 'c', preferSecondaryDominants=True)
+    >>> rn.figure
+    'bVIb753'
+
+    So that's a context in which the root is diatonic,
+    but the possible secondary root is not.
+    No let's do the opposite case with a root that is not diatonic
+    and a secondary that is.
+
+    >>> cd = chord.Chord('Ab4 C5 Eb5 Gb5')
+    >>> rn = roman.romanNumeralFromChord(cd, 'c', preferSecondaryDominants=True)
+    >>> rn.figure
+    'bVIb753'
+
 
     OMIT_FROM_DOCS
 
