@@ -267,7 +267,7 @@ class RnWriter(prebase.ProtoM21Object):
         'm2 ||: I :||'
 
         The line before that gives the time signature change:
-        
+
         >>> testCase.combinedList[-2]
         'Time Signature: 3/4'
 
