@@ -292,13 +292,15 @@ def getWork(workName: str,
 
 # pylint: disable=redefined-builtin
 # noinspection PyShadowingBuiltins
-def parse(workName,
-            movementNumber=None,
-            number=None,
-            fileExtensions=None,
-            forceSource=False,
-            format=None
-          ):
+def parse(
+    workName: str,
+    movementNumber: int | None = None,
+    *,
+    number: int | None = None,
+    fileExtensions=None,
+    forceSource: bool = False,
+    format: str | = None
+):
     '''
     The most important method call for corpus.
 

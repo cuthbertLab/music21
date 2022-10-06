@@ -84,7 +84,7 @@ def getCorpusContentDirs() -> list[str]:
      'demos', 'essenFolksong', 'handel', 'haydn', 'joplin', 'josquin',
      'leadSheet', 'luca', 'miscFolk', 'monteverdi', 'mozart', 'nottingham-dataset',
      'oneills1850', 'palestrina',
-     'ryansMammoth', 'schoenberg', 'schubert', 'schumann', 'schumann_clara',
+     'ryansMammoth', 'schoenberg', 'schubert', 'schumann_clara', 'schumann_robert',
      'theoryExercises', 'trecento', 'verdi', 'weber']
 
     Make sure that all corpus data has a directoryInformation tag in

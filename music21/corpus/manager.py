@@ -120,10 +120,11 @@ def iterateCorpora(returnObjects=True):
                 yield cn
 
 
-def getWork(workName,
-            movementNumber=None,
-            fileExtensions=None,
-            ) -> t.Union[pathlib.Path, list[pathlib.Path]]:
+def getWork(
+    workName: str,
+    movementNumber: int | None = None,
+    fileExtensions=None,
+) -> t.Union[pathlib.Path, list[pathlib.Path]]:
     '''
     this parse function is called from `corpus.parse()` and does nothing differently from it.
 
@@ -171,13 +172,15 @@ def getWork(workName,
 
 # pylint: disable=redefined-builtin
 # noinspection PyShadowingBuiltins
-def parse(workName,
-            movementNumber=None,
-            number=None,
-            fileExtensions=None,
-            forceSource=False,
-            format=None
-          ) -> t.Union[stream.Score, stream.Part, stream.Opus]:
+def parse(
+    workName: str,
+    *,
+    movementNumber: int | None = None,
+    number: int | None = None,
+    fileExtensions=None,
+    forceSource: bool = False,
+    format: str | None = None,
+) -> t.Union[stream.Score, stream.Part, stream.Opus]:
     filePaths = getWork(workName=workName,
                         movementNumber=movementNumber,
                         fileExtensions=fileExtensions,

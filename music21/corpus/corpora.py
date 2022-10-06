@@ -255,8 +255,8 @@ class Corpus(prebase.ProtoM21Object):
 
     def getWorkList(
         self,
-        workName,
-        movementNumber=None,
+        workName: str,
+        movementNumber: int | None = None,
         fileExtensions=(),
     ):
         r'''
@@ -267,7 +267,7 @@ class Corpus(prebase.ProtoM21Object):
 
         >>> coreCorpus = corpus.corpora.CoreCorpus()
 
-        # returns 1 even though there is a '.mus' file, which cannot be read...
+        This returns 1 even though there is a '.mus' file, which cannot be read...
 
         >>> len(coreCorpus.getWorkList('cpebach/h186'))
         1
@@ -286,6 +286,10 @@ class Corpus(prebase.ProtoM21Object):
         1
 
         '''
+        if workName.beginsWith('schumann/'):  # pragma: no cover
+            # no default schumanns, but older examples showed this.
+            workName = workName.replace('schumann/', 'schumann_robert/')
+
         if not common.isListLike(fileExtensions):
             fileExtensions = [fileExtensions]
         paths = self.getPaths(fileExtensions)
@@ -524,7 +528,6 @@ class CoreCorpus(Corpus):
     A model of the *core* corpus.
 
     >>> coreCorpus = corpus.corpora.CoreCorpus()
-
     '''
 
     # CLASS VARIABLES #
