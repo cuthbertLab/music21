@@ -7791,15 +7791,22 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
     @property
     def flat(self):
         '''
+        Deprecated: use `.flatten()` instead
+
         A property that returns the same flattened representation as `.flatten()`
         as of music21 v7.
 
         See :meth:`~music21.stream.base.Stream.flatten()` for documentation.
-
-        This property will be deprecated in v8 and removed in v9.
         '''
-        print('.flat will be removed in the next version of music21.  Use .flatten() instead.')
-        return self.flatten(retainContainers=False)
+        def warn_then_iter(self_):
+            warnings.warn('.flat will disappear in v10.  Use .flatten() instead',
+                          exceptions21.Music21DeprecationWarning,
+                          stacklevel=2)
+            return iterator.StreamIterator(self_)
+
+        flatStream = self.flatten(retainContainers=False)
+        flatStream.__iter__ = warn_then_iter
+        return flatStream
 
     @overload
     def recurse(self,

@@ -19,6 +19,7 @@ seemed inappropriate since these work across corpora.
 '''
 from __future__ import annotations
 
+from collections.abc import Iterable
 import pathlib
 import os
 from typing import TYPE_CHECKING
@@ -122,9 +123,10 @@ def iterateCorpora(returnObjects=True):
 
 
 def getWork(
-    workName: str,
+    workName: str | pathlib.Path,
     movementNumber: int | None = None,
-    fileExtensions=None,
+    *,
+    fileExtensions: Iterable[str] = (),
 ) -> pathlib.Path | list[pathlib.Path]:
     '''
     this parse function is called from `corpus.parse()` and does nothing differently from it.
@@ -137,8 +139,6 @@ def getWork(
 
     if not workName:
         raise CorpusException('a work name must be provided as an argument')
-    if not common.isListLike(fileExtensions):
-        fileExtensions = [fileExtensions]
 
     if workNameJoined.endswith('.xml') or workNameJoined.endswith('.musicxml'):
         # might be compressed MXL file
@@ -147,9 +147,13 @@ def getWork(
 
     filePaths = None
     for corpusObject in iterateCorpora():
-        workList = corpusObject.getWorkList(workName, movementNumber, fileExtensions)
+        workList = corpusObject.getWorkList(workName,
+                                            movementNumber,
+                                            fileExtensions=fileExtensions)
         if not workList and addXMLWarning:
-            workList = corpusObject.getWorkList(mxlWorkName, movementNumber, fileExtensions)
+            workList = corpusObject.getWorkList(mxlWorkName,
+                                                movementNumber,
+                                                fileExtensions=fileExtensions)
             if not workList:
                 continue
         if workList:
@@ -174,11 +178,11 @@ def getWork(
 # pylint: disable=redefined-builtin
 # noinspection PyShadowingBuiltins
 def parse(
-    workName: str,
+    workName: str | pathlib.Path,
     *,
     movementNumber: int | None = None,
     number: int | None = None,
-    fileExtensions=None,
+    fileExtensions: Iterable[str] = (),
     forceSource: bool = False,
     format: str | None = None,
 ) -> stream.Score | stream.Part | stream.Opus:
@@ -228,7 +232,14 @@ def _addCorpusFilepathToStreamObject(streamObj, filePath):
         streamObj.corpusFilepath = filePath
 
 
-def search(query=None, field=None, corpusNames=None, fileExtensions=None, **keywords):
+def search(
+    query: str | None = None,
+    field: str | None = None,
+    *,
+    corpusNames=None,
+    fileExtensions: Iterable[str] = (),
+    **keywords
+):
     '''
     Search all stored metadata bundles and return a list of file paths.
 
@@ -239,8 +250,8 @@ def search(query=None, field=None, corpusNames=None, fileExtensions=None, **keyw
     >>> corpus.search('china', corpusNames=('core',))  #_DOCS_HIDE
     <music21.metadata.bundles.MetadataBundle {1235 entries}>
 
-    >>> #_DOCS_SHOW corpus.search('china', fileExtensions='.mid')
-    >>> corpus.search('china', fileExtensions='.mid', corpusNames=('core',))  #_DOCS_HIDE
+    >>> #_DOCS_SHOW corpus.search('china', fileExtensions=('.mid',))
+    >>> corpus.search('china', fileExtensions=('.mid',), corpusNames=('core',))  #_DOCS_HIDE
     <music21.metadata.bundles.MetadataBundle {0 entries}>
 
     >>> #_DOCS_SHOW corpus.search('bach', field='composer')
@@ -280,8 +291,8 @@ def search(query=None, field=None, corpusNames=None, fileExtensions=None, **keyw
     See usersGuide (chapter 11) for more information on searching
 
     '''
-#     >>> corpus.search('coltrane', corpusNames=('virtual',))
-#     <music21.metadata.bundles.MetadataBundle {1 entry}>
+    # >>> corpus.search('coltrane', corpusNames=('virtual',))
+    # <music21.metadata.bundles.MetadataBundle {1 entry}>
 
     readAllMetadataBundlesFromDisk()
     allSearchResults = metadata.bundles.MetadataBundle()
@@ -292,7 +303,11 @@ def search(query=None, field=None, corpusNames=None, fileExtensions=None, **keyw
     for corpusName in corpusNames:
         c = fromName(corpusName)
         searchResults = c.metadataBundle.search(
-            query, field, fileExtensions=fileExtensions, **keywords)
+            query,
+            field,
+            fileExtensions=fileExtensions,
+            **keywords,
+        )
         allSearchResults = allSearchResults.union(searchResults)
 
     return allSearchResults

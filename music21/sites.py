@@ -1034,7 +1034,7 @@ class Test(unittest.TestCase):
         violin1 = corpus.parse(
             'beethoven/opus18no1',
             3,
-            fileExtensions='xml',
+            fileExtensions=('xml',),
         ).getElementById('Violin I')
         lastNote = violin1.flatten().notes[-1]
         lastNoteClef = lastNote.getContextByClass(clef.Clef)

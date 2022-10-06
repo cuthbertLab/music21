@@ -101,7 +101,7 @@ class QMConverter(converter.subConverters.SubConverter):
         with open(filePath, 'r', encoding='utf-8') as f:
             self.parseData(f.read())
 
-    def write(self, obj, fmt, fp=None, subformats=None, **keywords):  # pragma: no cover
+    def write(self, obj, fmt, fp=None, subformats=(), **keywords):  # pragma: no cover
         music = ''
         if fp is None:
             fp = environLocal.getTempFile('.qm')

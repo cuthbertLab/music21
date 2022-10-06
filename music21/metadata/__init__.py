@@ -143,7 +143,6 @@ import copy
 from dataclasses import dataclass
 import datetime
 import pathlib
-import os
 import re
 import typing as t
 import unittest
@@ -165,7 +164,7 @@ from music21.metadata.primitives import (Date, DatePrimitive,
                                          DateSelection, Text, Contributor, Creator,
                                          Imprint, Copyright, ValueType)
 # -----------------------------------------------------------------------------
-environLocal = environment.Environment(os.path.basename(__file__))
+environLocal = environment.Environment('metadata')
 
 AmbitusShort = namedtuple('AmbitusShort',
                           ['semitones', 'diatonic', 'pitchLowest', 'pitchHighest'])

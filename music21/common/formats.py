@@ -57,7 +57,7 @@ VALID_AUTO_DOWNLOAD = ['ask', 'deny', 'allow']
 # ------------------------------------------------------------------------------
 
 
-def findSubConverterForFormat(fmt: str) -> t.Union[type[SubConverter], None]:
+def findSubConverterForFormat(fmt: str) -> type[SubConverter] | None:
     '''
     return a converter.subConverter.SubConverter subclass
     for a given format -- this is a music21 format name,
@@ -85,6 +85,7 @@ def findSubConverterForFormat(fmt: str) -> t.Union[type[SubConverter], None]:
         formats = sc.registerFormats
         if fmt in formats:
             return sc
+    return None
 
 
 # @deprecated('May 2014', '[soonest possible]', 'Moved to converter')
@@ -173,17 +174,8 @@ def findFormat(fmt):
 
     return fileFormat, firstOutput
 
-#     for key in sorted(list(fileExtensions)):
-#         if fmt.startswith('.'):
-#             fmt = fmt[1:]  # strip .
-#         if fmt == key or fmt in fileExtensions[key]['input']:
-#             # add leading dot to extension on output
-#             return key, '.' + fileExtensions[key]['output']
-#     return None, None   # if no match found
 
 # @deprecated('May 2014', '[soonest possible]', 'Moved to converter')
-
-
 @cache
 def findInputExtension(fmt: str) -> tuple[str, ...]:
     '''
