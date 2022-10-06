@@ -1964,7 +1964,12 @@ class Test(unittest.TestCase):
         mockNFEreturns = ['mockNoteFromElement return 1', 'mockNoteFromElement return 2']
         mockNoteFromElement.side_effect = lambda *unused: mockNFEreturns.pop(0)
         mockTuplets.side_effect = lambda x: x
-        mockVoice.return_value = mock.MagicMock(spec_set=stream.Stream(), name='Voice')
+
+        import warnings
+        from music21 import exceptions21
+        with warnings.catch_warnings():  # catch deprecation warning on flat
+            warnings.simplefilter('ignore', category=exceptions21.Music21DeprecationWarning)
+            mockVoice.return_value = mock.MagicMock(spec_set=stream.Stream(), name='Voice')
         expectedAppendCalls = [mock.call(mockNFEreturns[0]), mock.call(mockNFEreturns[1])]
 
         actual = base.layerFromElement(elem)
@@ -2000,7 +2005,11 @@ class Test(unittest.TestCase):
         mockNFEreturns = ['mockNoteFromElement return 1', 'mockNoteFromElement return 2']
         mockNoteFromElement.side_effect = lambda *unused: mockNFEreturns.pop(0)
         mockTuplets.side_effect = lambda x: x
-        mockVoice.return_value = mock.MagicMock(spec_set=stream.Stream(), name='Voice')
+        import warnings
+        from music21 import exceptions21
+        with warnings.catch_warnings():  # catch deprecation warning on flat
+            warnings.simplefilter('ignore', category=exceptions21.Music21DeprecationWarning)
+            mockVoice.return_value = mock.MagicMock(spec_set=stream.Stream(), name='Voice')
         expectedAppendCalls = [mock.call(mockNFEreturns[0]), mock.call(mockNFEreturns[1])]
         overrideN = 'my own @n'
 
@@ -2042,7 +2051,12 @@ class Test(unittest.TestCase):
         mockNFEReturns = ['mockNoteFromElement return 1', 'mockNoteFromElement return 2',
                           'mockNoteFromElement return 1', 'mockNoteFromElement return 2']
         mockNoteFromElement.side_effect = lambda *unused: mockNFEReturns.pop(0)
-        mockVoice.return_value = mock.MagicMock(spec_set=stream.Stream(), name='Voice')
+
+        import warnings
+        from music21 import exceptions21
+        with warnings.catch_warnings():  # catch deprecation warning on flat
+            warnings.simplefilter('ignore', category=exceptions21.Music21DeprecationWarning)
+            mockVoice.return_value = mock.MagicMock(spec_set=stream.Stream(), name='Voice')
 
         self.assertRaises(base.MeiAttributeError, base.layerFromElement, elem)
 

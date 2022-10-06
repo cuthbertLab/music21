@@ -49,7 +49,7 @@ class Test(unittest.TestCase):
         self.assertEqual(filePath.parent.name, 'essenFolksong')
         filePathCollection = corpus.getComposer('essenFolksong')
         self.assertEqual(len(filePathCollection), 31)
-        filePathCollection = corpus.getComposer('essenFolksong', ['abc'])
+        filePathCollection = corpus.getComposer('essenFolksong', fileExtensions=('abc',))
         self.assertEqual(len(filePathCollection), 31)
 
     def testDesPrezImport(self):
@@ -59,7 +59,7 @@ class Test(unittest.TestCase):
         self.assertTrue(filePath.endswith('josquin/fortunaDunGranTempo.abc'))
         filePathCollection = corpus.getComposer('josquin')
         self.assertGreaterEqual(len(filePathCollection), 8)
-        filePathCollection = corpus.getComposer('josquin', ['abc'])
+        filePathCollection = corpus.getComposer('josquin', fileExtensions=('abc',))
         self.assertGreaterEqual(len(filePathCollection), 8)
 
     # def testHandelImport(self):

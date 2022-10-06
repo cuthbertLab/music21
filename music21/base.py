@@ -27,7 +27,7 @@ available after importing `music21`.
 <class 'music21.base.Music21Object'>
 
 >>> music21.VERSION_STR
-'9.0.0a2'
+'9.0.0a3'
 
 Alternatively, after doing a complete import, these classes are available
 under the module "base":
@@ -68,6 +68,8 @@ from music21 import tie
 
 if TYPE_CHECKING:
     import fractions
+    from io import IOBase
+    import pathlib
     from music21 import meter
     from music21 import stream
     from music21 import spanner
@@ -2776,7 +2778,12 @@ class Music21Object(prebase.ProtoM21Object):
     # -------------------------------------------------------------------------
     # display and writing
 
-    def write(self, fmt=None, fp=None, **keywords):  # pragma: no cover
+    def write(
+        self,
+        fmt: str | None = None,
+        fp: str | pathlib.Path | IOBase | None = None,
+        **keywords
+    ) -> pathlib.Path:  # pragma: no cover
         '''
         Write out a file of music notation (or an image, etc.) in a given format.  If
         fp is specified as a file path then the file will be placed there.  If it is not
@@ -2802,13 +2809,15 @@ class Music21Object(prebase.ProtoM21Object):
 
         regularizedConverterFormat, unused_ext = common.findFormat(fmt)
         if regularizedConverterFormat is None:
-            raise Music21ObjectException(f'cannot support showing in this format yet: {fmt}')
+            raise Music21ObjectException(f'cannot support output in this format yet: {fmt}')
 
         formatSubs = fmt.split('.')
         fmt = formatSubs[0]
         subformats = formatSubs[1:]
 
         scClass = common.findSubConverterForFormat(regularizedConverterFormat)
+        if scClass is None:  # pragma: no cover
+            raise Music21ObjectException(f'cannot support output in this format yet: {fmt}')
         formatWriter = scClass()
         return formatWriter.write(self,
                                   regularizedConverterFormat,

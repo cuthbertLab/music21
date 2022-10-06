@@ -15,8 +15,13 @@ If it doesn't fit anywhere else in the common directory, you'll find it here...
 from __future__ import annotations
 
 from collections.abc import Callable, Iterable
+import copy
+import os
 import platform
 import re
+import sys
+import textwrap
+import time
 import typing as t
 
 __all__ = [
@@ -32,16 +37,13 @@ __all__ = [
     'cleanedFlatNotation',
 ]
 
-import copy
-import os
-import sys
-import textwrap
-import time
+if t.TYPE_CHECKING:
+    _T = t.TypeVar('_T')
 
 # -----------------------------------------------------------------------------
 
 
-def flattenList(originalList: list) -> list:
+def flattenList(originalList: Iterable[Iterable[_T]]) -> list[_T]:
     '''
     Flatten a list of lists into a flat list
 

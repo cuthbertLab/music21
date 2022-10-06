@@ -16077,17 +16077,20 @@ tabTest = '''<?xml version="1.0" encoding="UTF-8" ?>
 #
 # dictionary storing does not work
 
-# CONTENTS = {'mozartTrioK581Excerpt': mozartTrioK581Excerpt,
-#             'schumannOp48No1': schumannOp48No1,
-#         'chantQuemQueritis': chantQuemQueritis,
+# CONTENTS = {
+#     'mozartTrioK581Excerpt': mozartTrioK581Excerpt,
+#     'schumannOp48No1': schumannOp48No1,
+#     'chantQuemQueritis': chantQuemQueritis,
 #     'beethovenOp98': beethovenOp98,
-#             }
+# }
 #
 # ALL1 = CONTENTS.items()
 
 
-ALL = [chantQuemQueritis, mozartTrioK581Excerpt, schumannOp48No1,
-                binchoisMagnificat, edgefield82b, tabTest]
+ALL = [
+    chantQuemQueritis, mozartTrioK581Excerpt, schumannOp48No1,
+    binchoisMagnificat, edgefield82b, tabTest,
+]
 
 
 def get(contentRequest):

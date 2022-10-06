@@ -132,10 +132,10 @@ class Test(unittest.TestCase):
         '''
         junk = corpus.parse('haydn/opus74no1/movement3', forceSource=True)
 
-    def runParseSchumann(self):
-        '''Loading file: schumann/opus41no1/movement2
+    def runParseRobertSchumann(self):
+        '''Loading file: schumann_robert/opus41no1/movement2
         '''
-        junk = corpus.parse('schumann/opus41no1/movement2', forceSource=True)
+        junk = corpus.parse('schumann_robert/opus41no1/movement2', forceSource=True)
 
     def runParseLuca(self):
         '''
@@ -354,7 +354,7 @@ class Test(unittest.TestCase):
             #                  '2010.06.24': 3.932,
             #                  '2010.07.08': 1.935,
             #                 }),
-            #             (self.runParseSchumann,
+            #             (self.runParseRobertSchumann,
             #                 {'2009.12.14': 5.88,
             #                  '2009.12.15': 5.126,
             #                  '2010.06.24': 5.799,

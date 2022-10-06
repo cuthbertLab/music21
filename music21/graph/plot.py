@@ -508,7 +508,7 @@ class ScatterPitchSpaceDynamicSymbol(Scatter):
     >>> s.insert(0.0, dynamics.Dynamic('pp')) #_DOCS_HIDE
     >>> s.insert(2.0, dynamics.Dynamic('ff')) #_DOCS_HIDE
     >>> p = graph.plot.ScatterPitchSpaceDynamicSymbol(s, doneAction=None) #_DOCS_HIDE
-    >>> #_DOCS_SHOW s = converter.parse('/Desktop/schumann/opus41no1/movement2.xml')
+    >>> #_DOCS_SHOW s = corpus.parse('schumann_robert/opus41no1/movement2.xml')
     >>> #_DOCS_SHOW p = graph.plot.ScatterPitchSpaceDynamicSymbol(s)
     >>> p.run()
 
@@ -793,7 +793,7 @@ class ScatterWeightedPitchClassQuarterLength(ScatterWeighted):
 class ScatterWeightedPitchSpaceDynamicSymbol(ScatterWeighted):
     '''A graph of dynamics used by pitch space.
 
-    >>> #_DOCS_SHOW s = converter.parse('/Desktop/schumann/opus41no1/movement2.xml')
+    >>> #_DOCS_SHOW s = corpus.parse('schumann_robert/opus41no1/movement2.xml')
     >>> s = converter.parse('tinynotation: 4/4 C4 d E f', makeNotation=False) #_DOCS_HIDE
     >>> s.insert(0.0, dynamics.Dynamic('pp')) #_DOCS_HIDE
     >>> s.insert(2.0, dynamics.Dynamic('ff')) #_DOCS_HIDE
@@ -1623,12 +1623,16 @@ class TestExternalManual(unittest.TestCase):  # pragma: no cover
         b.run()
 
     def testScatterPitchSpaceDynamicSymbol(self):
-        a = corpus.parse('schumann/opus41no1', 2)
-        b = ScatterPitchSpaceDynamicSymbol(a.parts[0].flatten(), title='Schumann (soprano voice)')
+        a = corpus.parse('schumann_robert/opus41no1', 2)
+        b = ScatterPitchSpaceDynamicSymbol(
+            a.parts[0].flatten(),
+            title='Robert Schumann (soprano voice)'
+        )
         b.run()
 
-        b = ScatterWeightedPitchSpaceDynamicSymbol(a.parts[0].flatten(),
-                                                       title='Schumann (soprano voice)')
+        b = ScatterWeightedPitchSpaceDynamicSymbol(
+            a.parts[0].flatten(),
+            title='Robert Schumann (soprano voice)')
         b.run()
 
     def testPlot3DPitchSpaceQuarterLengthCount(self):
@@ -1654,9 +1658,13 @@ class TestExternalManual(unittest.TestCase):  # pragma: no cover
             (ScatterPitchSpaceQuarterLength, None, None),
             (ScatterPitchClassQuarterLength, None, None),
             (ScatterPitchClassOffset, None, None),
-            (ScatterPitchSpaceDynamicSymbol,
-             corpus.getWork('schumann/opus41no1', 2),
-             'Schumann Opus 41 No 1'),
+            (
+                ScatterPitchSpaceDynamicSymbol,
+                corpus.getWork(
+                    'schumann_robert/opus41no1', 2
+                ),
+                'Robert Schumann Opus 41 No 1'
+            ),
 
             # offset based horizontal
             (HorizontalBarPitchSpaceOffset, None, None),
@@ -1665,8 +1673,8 @@ class TestExternalManual(unittest.TestCase):  # pragma: no cover
             (ScatterWeightedPitchSpaceQuarterLength, None, None),
             (ScatterWeightedPitchClassQuarterLength, None, None),
             (ScatterWeightedPitchSpaceDynamicSymbol,
-             corpus.getWork('schumann/opus41no1', 2),
-             'Schumann Opus 41 No 1'),
+             corpus.getWork('schumann_robert/opus41no1', 2),
+             'Robert Schumann Opus 41 No 1'),
 
 
             # 3d graphs

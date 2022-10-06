@@ -677,7 +677,7 @@ class Test(unittest.TestCase):
 #     212.    Identify any works that are classified as `Ballads'.
 #     213.    Identify any works that are in irregular meters.
 #     214.    Identify any works that are in simple triple meters.
-#     215.    Identify any works that are not composed by Schumann.
+#     215.    Identify any works that are not composed by [Robert] Schumann.
 #     216.    Identify any works that bear a dedication.
 #     217.    Identify any works that contain passages in 9/8 meter.
 #     218.    Identify any works that contain passages in either 3/8 or 9/8 meter.

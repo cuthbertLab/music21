@@ -21,7 +21,6 @@ __all__ = [
 ]
 
 import multiprocessing
-import os
 import pathlib
 import pickle
 import traceback
@@ -32,7 +31,7 @@ from music21 import environment
 from music21 import exceptions21
 
 # -----------------------------------------------------------------------------
-environLocal = environment.Environment(os.path.basename(__file__))
+environLocal = environment.Environment('metadata.caching')
 # -----------------------------------------------------------------------------
 
 

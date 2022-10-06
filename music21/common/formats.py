@@ -28,7 +28,14 @@ __all__ = [
     'VALID_AUTO_DOWNLOAD',
 ]
 
+from functools import cache
 import pathlib
+import typing as t
+
+
+if t.TYPE_CHECKING:
+    from music21.converter.subConverters import SubConverter
+
 
 # used for checking preferences, and for setting environment variables
 # TODO: only check top-level.  Let subconverters check sub formats.
@@ -50,7 +57,7 @@ VALID_AUTO_DOWNLOAD = ['ask', 'deny', 'allow']
 # ------------------------------------------------------------------------------
 
 
-def findSubConverterForFormat(fmt):
+def findSubConverterForFormat(fmt: str) -> type[SubConverter] | None:
     '''
     return a converter.subConverter.SubConverter subclass
     for a given format -- this is a music21 format name,
@@ -78,6 +85,7 @@ def findSubConverterForFormat(fmt):
         formats = sc.registerFormats
         if fmt in formats:
             return sc
+    return None
 
 
 # @deprecated('May 2014', '[soonest possible]', 'Moved to converter')
@@ -166,21 +174,12 @@ def findFormat(fmt):
 
     return fileFormat, firstOutput
 
-#     for key in sorted(list(fileExtensions)):
-#         if fmt.startswith('.'):
-#             fmt = fmt[1:]  # strip .
-#         if fmt == key or fmt in fileExtensions[key]['input']:
-#             # add leading dot to extension on output
-#             return key, '.' + fileExtensions[key]['output']
-#     return None, None   # if no match found
 
 # @deprecated('May 2014', '[soonest possible]', 'Moved to converter')
-
-
-def findInputExtension(fmt):
+@cache
+def findInputExtension(fmt: str) -> tuple[str, ...]:
     '''
     Will be fully deprecated when there's an exact equivalent in converter...
-
 
     Given an input format or music21 format, find and return all possible
     input extensions.
@@ -199,10 +198,10 @@ def findInputExtension(fmt):
     >>> common.findInputExtension('.mxl')
     ('.xml', '.mxl', '.musicxml')
 
-    blah is neither
+    Blah is not a format
 
-    >>> common.findInputExtension('blah') is None
-    True
+    >>> common.findInputExtension('blah')
+    ()
     '''
     from music21 import converter
     fmt = fmt.lower().strip()
@@ -212,7 +211,7 @@ def findInputExtension(fmt):
     sc = findSubConverterForFormat(fmt)
     if sc is None:
         # file extension
-        post = []
+        post: list[str] = []
         for sc in converter.Converter().subconvertersList():
             if fmt not in sc.registerInputExtensions:
                 continue
@@ -222,7 +221,7 @@ def findInputExtension(fmt):
                 post.append(ext)
             if post:
                 return tuple(post)
-        return None
+        return tuple(post)  # empty
     else:
         # music21 format
         post = []
