@@ -45,7 +45,7 @@ class Corpus(prebase.ProtoM21Object):
     # TODO: this should be wiped if a SubConverter is registered or deregistered.
     _allExtensions: tuple[str, ...] = tuple(
         common.flattenList(
-            [common.findInputExtension(x)
+            [common.formats.findInputExtension(x)
              for x in _acceptableExtensions]
         )
     )
@@ -169,7 +169,7 @@ class Corpus(prebase.ProtoM21Object):
         elif expandExtensions:
             expandedExtensions: list[str] = []
             for extension in fileExtensions:
-                allInputExtensions = common.findInputExtension(extension)
+                allInputExtensions = common.formats.findInputExtension(extension)
                 if allInputExtensions:
                     # inefficient, but very few loops.
                     expandedExtensions += allInputExtensions
