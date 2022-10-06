@@ -1203,6 +1203,7 @@ class MetadataBundle(prebase.ProtoM21Object):
 
             if metadataEntry.search(query, field)[0]:
                 newMetadataBundle._metadataEntries[key] = metadataEntry
+        # noinspection PyTypeChecker  # pycharm can't figure out that it works.
         newMetadataBundle._metadataEntries = OrderedDict(
             sorted(list(newMetadataBundle._metadataEntries.items()),
                    key=lambda mde: mde[1].sourcePath))

@@ -445,7 +445,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         if self._created_via_deprecated_flat:
             warnings.warn('.flat is deprecated.  Call .flatten() instead',
                           exceptions21.Music21DeprecationWarning,
-                          stacklevel=2)
+                          stacklevel=3)
             self._created_via_deprecated_flat = False
 
         return t.cast(iterator.StreamIterator[M21ObjType],

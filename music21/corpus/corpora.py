@@ -603,14 +603,13 @@ class CoreCorpus(Corpus):
         >>> 3000 < len(corpusFilePaths) < 4000
         True
 
-        >>> kernFilePaths = coreCorpus.getPaths('krn')
+        >>> kernFilePaths = coreCorpus.getPaths(['krn'])
         >>> len(kernFilePaths) >= 500
         True
 
-        >>> abcFilePaths = coreCorpus.getPaths('abc')
+        >>> abcFilePaths = coreCorpus.getPaths(['abc'])
         >>> len(abcFilePaths) >= 100
         True
-
         '''
         fileExtensions_out = self._translateExtensions(
             fileExtensions=fileExtensions,
