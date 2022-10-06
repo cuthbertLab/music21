@@ -250,7 +250,14 @@ class RnWriter(prebase.ProtoM21Object):
             tsThisMeasure = thisMeasure.getElementsByClass(meter.TimeSignature)
             if tsThisMeasure:
                 firstTS = tsThisMeasure[0]
-                self.combinedList.append(f'Time Signature: {firstTS.ratioString}')
+                if (firstTS.ratioString in ('3/8', '6/8')
+                        and firstTS.beatDivisionCountName == 'Simple'):
+                    tsPrefix = 'slow '
+                else:
+                    tsPrefix = ''
+                self.combinedList.append(
+                    f'Time Signature: {tsPrefix}{firstTS.ratioString}'
+                )
                 if len(tsThisMeasure) > 1:
                     unprocessedTSs = [x.ratioString for x in tsThisMeasure[1:]]
                     msg = f'further time signature change(s) unprocessed: {unprocessedTSs}'
@@ -443,7 +450,8 @@ class Test(unittest.TestCase):
     along with two test by modifying those scores.
 
     Additional tests for the standalone functions rnString and intBeat and
-    for handling the special case of opus objects.
+    for handling the special case of opus objects, plus a test to verify
+    handling of 'slow' 6/8 and 3/8.
     '''
 
     def testOpus(self):
@@ -572,6 +580,24 @@ class Test(unittest.TestCase):
         rn = roman.RomanNumeral('viio6', 'G')
         RnWriter(rn)  # and even (perhaps dubiously) directly on other music21 objects
 
+    def test_slow_meters(self):
+        from io import StringIO
+        from itertools import product
+        import textwrap
+        from music21 import converter
+        for ts, fast_or_slow in product(('3/8', '6/8'), ('slow ', 'fast ', '')):
+            rntxt = textwrap.dedent(f'''Time Signature: {fast_or_slow}{ts}
+                m1 C: I
+            ''')
+            text_stream = StringIO()
+            s = converter.parse(rntxt, format='romanText')
+            s.write('romanText', text_stream)
+            new_rntxt = text_stream.getvalue()
+            # Since the default is 'fast', it is not written out.
+            if fast_or_slow == 'fast ':
+                fast_or_slow = ''
+            self.assertIn(f'Time Signature: {fast_or_slow}{ts}', new_rntxt)
+
     def testRepeats(self):
         from music21 import converter
         rntxt = textwrap.dedent('''
@@ -587,9 +613,7 @@ class Test(unittest.TestCase):
         writer = RnWriter(s)
         assert '\n'.join(writer.combinedList).strip().endswith(rntxt.strip())
 
-
 # ------------------------------------------------------------------------------
-
     def testRnString(self):
 
         test = rnString(1, 1, 'G: I')
