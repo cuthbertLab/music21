@@ -181,10 +181,11 @@ def parse(
     forceSource: bool = False,
     format: str | None = None,
 ) -> t.Union[stream.Score, stream.Part, stream.Opus]:
-    filePaths = getWork(workName=workName,
-                        movementNumber=movementNumber,
-                        fileExtensions=fileExtensions,
-                       )
+    filePaths = getWork(
+        workName=workName,
+        movementNumber=movementNumber,
+        fileExtensions=fileExtensions,
+    )
     if isinstance(filePaths, list):
         filePath = filePaths[0]
     else:

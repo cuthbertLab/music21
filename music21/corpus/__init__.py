@@ -299,7 +299,7 @@ def parse(
     number: int | None = None,
     fileExtensions=None,
     forceSource: bool = False,
-    format: str | = None
+    format: str | None = None
 ):
     '''
     The most important method call for corpus.

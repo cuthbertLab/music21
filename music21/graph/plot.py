@@ -1658,10 +1658,12 @@ class TestExternalManual(unittest.TestCase):  # pragma: no cover
             (ScatterPitchSpaceQuarterLength, None, None),
             (ScatterPitchClassQuarterLength, None, None),
             (ScatterPitchClassOffset, None, None),
-            (ScatterPitchSpaceDynamicSymbol,
-             corpus.getWork(
-                 'schumann_robert/opus41no1', 2),
-             'Robert Schumann Opus 41 No 1'
+            (
+                ScatterPitchSpaceDynamicSymbol,
+                corpus.getWork(
+                    'schumann_robert/opus41no1', 2
+                ),
+                'Robert Schumann Opus 41 No 1'
             ),
 
             # offset based horizontal
