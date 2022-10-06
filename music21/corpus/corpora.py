@@ -49,7 +49,7 @@ class Corpus(prebase.ProtoM21Object):
 
     _pathsCache: dict[tuple[str, tuple[str, ...]], list[pathlib.Path]] = {}
 
-    _directoryInformation: t.Union[tuple[()], Sequence[tuple[str, str, bool]]] = ()
+    _directoryInformation: tuple[()] | Sequence[tuple[str, str, bool]] = ()
 
     parseUsingCorpus = True
 
@@ -71,7 +71,7 @@ class Corpus(prebase.ProtoM21Object):
     def _findPaths(
         self,
         rootDirectoryPath: pathlib.Path,
-        fileExtensions: tuple[str]
+        fileExtensions: Iterable[str],
     ) -> list[pathlib.Path]:
         '''
         Given a root filePath file path, recursively search all contained paths
@@ -85,7 +85,7 @@ class Corpus(prebase.ProtoM21Object):
 
         Generally cached.
         '''
-        rdp = t.cast(pathlib.Path, common.cleanpath(rootDirectoryPath, returnPathlib=True))
+        rdp = common.cleanpath(rootDirectoryPath, returnPathlib=True)
         matched = []
 
         for filename in sorted(rdp.rglob('*')):
@@ -106,7 +106,7 @@ class Corpus(prebase.ProtoM21Object):
 
     @staticmethod
     def _translateExtensions(
-        fileExtensions: t.Union[Iterable[str], str] = (),
+        fileExtensions: Iterable[str] | str = (),
         expandExtensions=True,
     ) -> tuple[str, ...]:
         # noinspection PyShadowingNames
@@ -168,7 +168,7 @@ class Corpus(prebase.ProtoM21Object):
         elif not isinstance(fileExtensions, tuple):
             fileExtensionsTuple = tuple(fileExtensions)
         else:
-            fileExtensionsTuple = t.cast(tuple[str], fileExtensions)
+            fileExtensionsTuple = t.cast(tuple[str, ...], fileExtensions)
 
         if not fileExtensionsTuple:
             fileExtensionsTuple = Corpus._allExtensions
@@ -247,7 +247,7 @@ class Corpus(prebase.ProtoM21Object):
 
     @abc.abstractmethod
     def getPaths(self,
-                 fileExtensions: t.Union[Iterable[str], str] = (),
+                 fileExtensions: Iterable[str] | str = (),
                  expandExtensions: bool = True
                  ) -> list[pathlib.Path]:
         r'''
@@ -584,7 +584,7 @@ class CoreCorpus(Corpus):
 
     def getPaths(
         self,
-        fileExtensions: t.Union[Iterable[str], str] = (),
+        fileExtensions: Iterable[str] | str = (),
         expandExtensions=True,
     ) -> list[pathlib.Path]:
         '''
@@ -611,17 +611,17 @@ class CoreCorpus(Corpus):
         True
 
         '''
-        fileExtensions = self._translateExtensions(
+        fileExtensions_out = self._translateExtensions(
             fileExtensions=fileExtensions,
             expandExtensions=expandExtensions,
         )
-        cacheKey = ('core', tuple(fileExtensions))
+        cacheKey = ('core', tuple(fileExtensions_out))
         # not cached, fetch and reset
         if cacheKey not in Corpus._pathsCache:
             basePath = common.getCorpusFilePath()
             Corpus._pathsCache[cacheKey] = self._findPaths(
                 basePath,
-                fileExtensions,
+                fileExtensions_out,
             )
         return Corpus._pathsCache[cacheKey]
 
@@ -832,7 +832,7 @@ class LocalCorpus(Corpus):
 
     def getPaths(
         self,
-        fileExtensions: t.Union[Iterable[str], str] = (),
+        fileExtensions: Iterable[str] | str = (),
         expandExtensions=True,
     ) -> list[pathlib.Path]:
         '''
@@ -843,11 +843,11 @@ class LocalCorpus(Corpus):
         :func:`~music21.corpus.addPath` function, these paths are also returned
         with this method.
         '''
-        fileExtensions: tuple[str] = self._translateExtensions(
+        fileExtensions_trans: tuple[str, ...] = self._translateExtensions(
             fileExtensions=fileExtensions,
             expandExtensions=expandExtensions,
         )
-        cacheKey = (self.name, fileExtensions)
+        cacheKey = (self.name, fileExtensions_trans)
         # not cached, fetch and reset
         # if cacheKey not in Corpus._pathsCache:
         # check paths before trying to search
@@ -861,7 +861,7 @@ class LocalCorpus(Corpus):
         # append successive matches into one list
         matches = []
         for directoryPath in validPaths:
-            matches.extend(self._findPaths(directoryPath, fileExtensions))
+            matches.extend(self._findPaths(directoryPath, fileExtensions_trans))
         Corpus._pathsCache[cacheKey] = matches
 
         return Corpus._pathsCache[cacheKey]

@@ -34,6 +34,7 @@ from music21.corpus import corpora
 
 if TYPE_CHECKING:
     from music21.metadata import bundles
+    from music21 import stream
 
 
 _metadataBundles: dict[str, bundles.MetadataBundle | None] = {
