@@ -38,14 +38,16 @@ class Corpus(prebase.ProtoM21Object):
     __metaclass__ = abc.ABCMeta
 
     # TODO: this is volatile -- should be elsewhere...
-    _acceptableExtensions = ['abc', 'capella', 'midi', 'musicxml', 'musedata',
-                             'humdrum', 'romantext', 'noteworthytext', 'noteworthy']
+    _acceptableExtensions: list[str] = [
+        'abc', 'capella', 'midi', 'musicxml', 'musedata',
+        'humdrum', 'romantext', 'noteworthytext', 'noteworthy'
+    ]
 
     # TODO: this should be wiped if a SubConverter is registered or deregistered.
     _allExtensions = tuple(common.flattenList([common.findInputExtension(x)
                                                for x in _acceptableExtensions]))
 
-    _pathsCache: dict[tuple[str, tuple[str]], list[pathlib.Path]] = {}
+    _pathsCache: dict[tuple[str, tuple[str, ...]], list[pathlib.Path]] = {}
 
     _directoryInformation: t.Union[tuple[()], Sequence[tuple[str, str, bool]]] = ()
 
@@ -106,7 +108,7 @@ class Corpus(prebase.ProtoM21Object):
     def _translateExtensions(
         fileExtensions: t.Union[Iterable[str], str] = (),
         expandExtensions=True,
-    ) -> tuple[str]:
+    ) -> tuple[str, ...]:
         # noinspection PyShadowingNames
         '''
         Utility to get default extensions, or, optionally, expand extensions to
@@ -160,7 +162,7 @@ class Corpus(prebase.ProtoM21Object):
 
         Changed in v9: returns a tuple, not a list.  first element should be a tuple of strings
         '''
-        fileExtensionsTuple: tuple[str]
+        fileExtensionsTuple: tuple[str, ...]
         if isinstance(fileExtensions, str):
             fileExtensionsTuple = (fileExtensions,)
         elif not isinstance(fileExtensions, tuple):
@@ -286,7 +288,7 @@ class Corpus(prebase.ProtoM21Object):
         1
 
         '''
-        if workName.beginsWith('schumann/'):  # pragma: no cover
+        if workName.startswith('schumann/'):  # pragma: no cover
             # no default schumanns, but older examples showed this.
             workName = workName.replace('schumann/', 'schumann_robert/')
 
@@ -399,7 +401,7 @@ class Corpus(prebase.ProtoM21Object):
     # PUBLIC PROPERTIES #
 
     @property
-    def directoryInformation(self) -> tuple[work.DirectoryInformation]:
+    def directoryInformation(self) -> tuple[work.DirectoryInformation, ...]:
         '''
         Returns a tuple of DirectoryInformation objects for
         each directory in self._directoryInformation.

@@ -37,6 +37,20 @@ And use `corpus.search` if you do not:
 <music21.stream.Score 0x1050ce940>
 '''
 from __future__ import annotations
+import typing as t
+
+from music21 import common
+from music21 import metadata
+
+from music21.corpus import chorales
+from music21.corpus import corpora
+from music21.corpus import manager
+from music21.corpus import virtual
+from music21.corpus import work
+
+from music21.corpus.manager import search
+from music21 import environment
+from music21.exceptions21 import CorpusException
 
 __all__ = [
     'chorales', 'corpora', 'manager',
@@ -56,18 +70,9 @@ __all__ = [
 ]
 
 
-from music21 import common
-from music21 import metadata
+if t.TYPE_CHECKING:
+    import pathlib
 
-from music21.corpus import chorales
-from music21.corpus import corpora
-from music21.corpus import manager
-from music21.corpus import virtual
-from music21.corpus import work
-
-from music21.corpus.manager import search
-from music21 import environment
-from music21.exceptions21 import CorpusException
 
 environLocal = environment.Environment('corpus')
 
@@ -256,9 +261,11 @@ def noCorpus():
 # -----------------------------------------------------------------------------
 
 
-def getWork(workName: str,
-            movementNumber: t.Union[int, None] = None,
-            fileExtensions=None) -> t.Union[pathlib.Path, list[pathlib.Path]]:
+def getWork(
+    workName: str,
+    movementNumber: int | None = None,
+    fileExtensions=None
+) -> pathlib.Path | list[pathlib.Path]:
     '''
     Search all Corpora for a work, and return a file path.
     N.B. does not parse the work: but it's suitable for passing

@@ -185,7 +185,7 @@ def findFormat(fmt):
 
 
 @cache
-def findInputExtension(fmt: str) -> tuple[str]:
+def findInputExtension(fmt: str) -> tuple[str, ...]:
     '''
     Will be fully deprecated when there's an exact equivalent in converter...
 

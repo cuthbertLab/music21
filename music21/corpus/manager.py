@@ -124,7 +124,7 @@ def getWork(
     workName: str,
     movementNumber: int | None = None,
     fileExtensions=None,
-) -> t.Union[pathlib.Path, list[pathlib.Path]]:
+) -> pathlib.Path | list[pathlib.Path]:
     '''
     this parse function is called from `corpus.parse()` and does nothing differently from it.
 
@@ -180,7 +180,7 @@ def parse(
     fileExtensions=None,
     forceSource: bool = False,
     format: str | None = None,
-) -> t.Union[stream.Score, stream.Part, stream.Opus]:
+) -> stream.Score | stream.Part | stream.Opus:
     filePaths = getWork(
         workName=workName,
         movementNumber=movementNumber,
