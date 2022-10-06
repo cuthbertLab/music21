@@ -20,7 +20,7 @@ can be found in modules such as :ref:`moduleDynamics` (for things such as cresce
 '''
 from __future__ import annotations
 
-from collections.abc import Collection, Sequence, Iterable
+from collections.abc import Sequence, Iterable
 import copy
 import typing as t
 import unittest

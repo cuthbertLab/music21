@@ -1676,7 +1676,7 @@ class DiatonicInterval(IntervalBase):
 
         if isinstance(generic, GenericInterval):
             self.generic = generic
-        elif common.isNum(generic) or isinstance(generic, str):
+        elif common.isInt(generic) or isinstance(generic, str):
             self.generic = GenericInterval(generic)
         else:  # pragma: no cover
             # too rare to cover.

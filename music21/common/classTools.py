@@ -40,14 +40,14 @@ def isInt(usrData: t.Any) -> t.TypeGuard[int]:
     return isinstance(usrData, int) and usrData is not True and usrData is not False
 
 
-def isNum(usrData: t.Any) -> t.TypeGuard[numbers.Number]:
+def isNum(usrData: t.Any) -> t.TypeGuard[numbers.Rational]:
     '''
     check if usrData is a number (float, int, long, Decimal),
-    return boolean
+    return boolean and if True casts the value as a Rational number
 
-    unlike `isinstance(usrData, Number)` does not return True for `True, False`.
+    unlike `isinstance(usrData, Rational)` does not return True for `True, False`.
 
-    Does not use `isinstance(usrData, Number)` which is 2-6 times slower
+    Does not use `isinstance(usrData, Rational)` which is 2-6 times slower
     than calling this function (except in the case of Fraction, when
     it's 6 times faster, but that's rarer).  (6 times slower on Py3.4, now
     only 2x slower in Python 3.10)

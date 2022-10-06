@@ -456,7 +456,7 @@ class Lyric(prebase.ProtoM21Object, style.StyleMixin):
 
     @number.setter
     def number(self, value: int) -> None:
-        if not common.isNum(value):
+        if not common.isInt(value):
             raise LyricException('Number best be number')
         self._number = value
 
