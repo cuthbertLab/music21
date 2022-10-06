@@ -438,46 +438,45 @@ class Test(unittest.TestCase):
             str(post),
             '<music21.beam.Beams <music21.beam.Beam 1/stop>/<music21.beam.Beam 2/partial/right>>')
 
-
-#         s = corpus.parse('hwv56', '1-18')
-#         self.assertEqual(len(s.parts), 5)
-#         # the fourth part is vocal, and has no beams defined
-#         self.assertEqual(str(s.parts[3].getElementsByClass(
-#             'Measure')[3].notesAndRests[0].beams), '<music21.beam.Beams >')
-#         self.assertEqual(str(s.parts[3].getElementsByClass(
-#             'Measure')[3].notesAndRests[0].lyric), 'sud')
-#
-#         # the bottom part has 8ths beamed two to a bar
-#         self.assertEqual(str(s.parts[4].getElementsByClass(
-#             'Measure')[3].notesAndRests[0].beams),
-#             '<music21.beam.Beams <music21.beam.Beam 1/start>>')
-#         self.assertEqual(str(s.parts[4].getElementsByClass(
-#             'Measure')[3].notesAndRests[1].beams),
-#             '<music21.beam.Beams <music21.beam.Beam 1/continue>>')
-#         self.assertEqual(str(s.parts[4].getElementsByClass(
-#             'Measure')[3].notesAndRests[2].beams),
-#             '<music21.beam.Beams <music21.beam.Beam 1/continue>>')
-#         self.assertEqual(str(s.parts[4].getElementsByClass(
-#             'Measure')[3].notesAndRests[3].beams),
-#             '<music21.beam.Beams <music21.beam.Beam 1/stop>>')
-#
-#         # s.show()
-#         # test that stage1 files continue to have makeBeams called
-#         s = corpus.parse('bwv1080', '16')
-#         # measure two has 9/16 beamed in three beats of 16ths
-#         self.assertEqual(len(s.parts), 2)
-#
-#         # s.parts[0].getElementsByClass(stream.Measure)[1].show()
-#
-#         self.assertEqual(str(s.parts[0].getElementsByClass(
-#             'Measure')[1].notesAndRests[0].beams),
-#             '<music21.beam.Beams <music21.beam.Beam 1/start>/<music21.beam.Beam 2/start>>')
-#         self.assertEqual(str(s.parts[0].getElementsByClass(
-#             'Measure')[1].notesAndRests[1].beams),
-#             '<music21.beam.Beams <music21.beam.Beam 1/continue>/<music21.beam.Beam 2/continue>>')
-#         self.assertEqual(str(s.parts[0].getElementsByClass(
-#             'Measure')[1].notesAndRests[2].beams),
-#             '<music21.beam.Beams <music21.beam.Beam 1/stop>/<music21.beam.Beam 2/stop>>')
+        # s = corpus.parse('hwv56', '1-18')
+        # self.assertEqual(len(s.parts), 5)
+        # # the fourth part is vocal, and has no beams defined
+        # self.assertEqual(str(s.parts[3].getElementsByClass(
+        #     'Measure')[3].notesAndRests[0].beams), '<music21.beam.Beams >')
+        # self.assertEqual(str(s.parts[3].getElementsByClass(
+        #     'Measure')[3].notesAndRests[0].lyric), 'sud')
+        #
+        # # the bottom part has 8ths beamed two to a bar
+        # self.assertEqual(str(s.parts[4].getElementsByClass(
+        #     'Measure')[3].notesAndRests[0].beams),
+        #     '<music21.beam.Beams <music21.beam.Beam 1/start>>')
+        # self.assertEqual(str(s.parts[4].getElementsByClass(
+        #     'Measure')[3].notesAndRests[1].beams),
+        #     '<music21.beam.Beams <music21.beam.Beam 1/continue>>')
+        # self.assertEqual(str(s.parts[4].getElementsByClass(
+        #     'Measure')[3].notesAndRests[2].beams),
+        #     '<music21.beam.Beams <music21.beam.Beam 1/continue>>')
+        # self.assertEqual(str(s.parts[4].getElementsByClass(
+        #     'Measure')[3].notesAndRests[3].beams),
+        #     '<music21.beam.Beams <music21.beam.Beam 1/stop>>')
+        #
+        # # s.show()
+        # # test that stage1 files continue to have makeBeams called
+        # s = corpus.parse('bwv1080', '16')
+        # # measure two has 9/16 beamed in three beats of 16ths
+        # self.assertEqual(len(s.parts), 2)
+        #
+        # # s.parts[0].getElementsByClass(stream.Measure)[1].show()
+        #
+        # self.assertEqual(str(s.parts[0].getElementsByClass(
+        #     'Measure')[1].notesAndRests[0].beams),
+        #     '<music21.beam.Beams <music21.beam.Beam 1/start>/<music21.beam.Beam 2/start>>')
+        # self.assertEqual(str(s.parts[0].getElementsByClass(
+        #     'Measure')[1].notesAndRests[1].beams),
+        #     '<music21.beam.Beams <music21.beam.Beam 1/continue>/<music21.beam.Beam 2/continue>>')
+        # self.assertEqual(str(s.parts[0].getElementsByClass(
+        #     'Measure')[1].notesAndRests[2].beams),
+        #     '<music21.beam.Beams <music21.beam.Beam 1/stop>/<music21.beam.Beam 2/stop>>')
 
 
     def testAccidentals(self):
@@ -526,87 +525,86 @@ class Test(unittest.TestCase):
         # s.show()
 
 
-#     def testMuseDataStage1A(self):
-#         from music21 import corpus
-#         s = corpus.parse('k168', 1)
-#
-#         self.assertEqual(len(s.parts), 4)
-#         self.assertEqual(str(s.parts[0][meter.TimeSignature].first()),
-#                '<music21.meter.TimeSignature 4/4>')
-#
-#         self.assertEqual(
-#            [n.offset for n in s.parts[0].getElementsByClass(stream.Measure)[0].notes],
-#            [0.0, 3.0, 3.5, 3.75])
-#
-#         self.assertEqual([n.nameWithOctave for
-#                n in s.parts[0].getElementsByClass(stream.Measure)[0].notes],
-#                    ['F5', 'F5', 'E5', 'D5'])
-#
-#         self.assertEqual(
-#             [n.offset for n in s.parts[1].getElementsByClass(stream.Measure)[0].notes],
-#             [1.0, 2.0, 3.0])
+    # def testMuseDataStage1A(self):
+    #     from music21 import corpus
+    #     s = corpus.parse('k168', 1)
+    #
+    #     self.assertEqual(len(s.parts), 4)
+    #     self.assertEqual(str(s.parts[0][meter.TimeSignature].first()),
+    #            '<music21.meter.TimeSignature 4/4>')
+    #
+    #     self.assertEqual(
+    #        [n.offset for n in s.parts[0].getElementsByClass(stream.Measure)[0].notes],
+    #        [0.0, 3.0, 3.5, 3.75])
+    #
+    #     self.assertEqual([n.nameWithOctave for
+    #            n in s.parts[0].getElementsByClass(stream.Measure)[0].notes],
+    #                ['F5', 'F5', 'E5', 'D5'])
+    #
+    #     self.assertEqual(
+    #         [n.offset for n in s.parts[1].getElementsByClass(stream.Measure)[0].notes],
+    #         [1.0, 2.0, 3.0])
 
-#     def testMuseDataStage1B(self):
-#         from music21 import corpus
-#         s = corpus.parse('k169', 3)
-#
-#         self.assertEqual(len(s.parts), 4)
-#         self.assertEqual(str(s.parts[0][meter.TimeSignature].first()),
-#             '<music21.meter.TimeSignature 3/4>')
-#
-#         self.assertEqual(
-#             [n.offset for n in s.parts[0].getElementsByClass(stream.Measure)[0].notes],
-#                [0.0, 2.0])
-#
-#         self.assertEqual([n.nameWithOctave for
-#                    n in s.parts[0].getElementsByClass(stream.Measure)[0].notes], ['A4', 'B4'])
-#
-#         self.assertEqual([n.offset
-#                           for n in s.parts[2].getElementsByClass(stream.Measure)[0].notes],
-#            [0.0, 1.0, 2.0])
+    # def testMuseDataStage1B(self):
+    #     from music21 import corpus
+    #     s = corpus.parse('k169', 3)
+    #
+    #     self.assertEqual(len(s.parts), 4)
+    #     self.assertEqual(str(s.parts[0][meter.TimeSignature].first()),
+    #         '<music21.meter.TimeSignature 3/4>')
+    #
+    #     self.assertEqual(
+    #         [n.offset for n in s.parts[0].getElementsByClass(stream.Measure)[0].notes],
+    #            [0.0, 2.0])
+    #
+    #     self.assertEqual([n.nameWithOctave for
+    #                n in s.parts[0].getElementsByClass(stream.Measure)[0].notes], ['A4', 'B4'])
+    #
+    #     self.assertEqual([n.offset
+    #                       for n in s.parts[2].getElementsByClass(stream.Measure)[0].notes],
+    #        [0.0, 1.0, 2.0])
 
 
-#     def testMuseDataImportTempoA(self):
-#         from music21 import corpus
-#         # a small file
-#         s = corpus.parse('movement2-09.md')
-#         self.assertEqual(len(s.parts), 5)
-#         # the tempo is found in the 4th part here
-#         self.assertEqual(str(
-#             s.parts[3][tempo.TempoIndication].first()),
-#             '<music21.tempo.MetronomeMark Largo e piano Quarter=46>')
-#         # s.show()
-#
-#         s = corpus.parse('movement2-07.md')
-#         self.assertEqual(str(
-#             s[tempo.TempoIndication].first()),
-#             '<music21.tempo.MetronomeMark Largo Quarter=46>')
+    # def testMuseDataImportTempoA(self):
+    #     from music21 import corpus
+    #     # a small file
+    #     s = corpus.parse('movement2-09.md')
+    #     self.assertEqual(len(s.parts), 5)
+    #     # the tempo is found in the 4th part here
+    #     self.assertEqual(str(
+    #         s.parts[3][tempo.TempoIndication].first()),
+    #         '<music21.tempo.MetronomeMark Largo e piano Quarter=46>')
+    #     # s.show()
+    #
+    #     s = corpus.parse('movement2-07.md')
+    #     self.assertEqual(str(
+    #         s[tempo.TempoIndication].first()),
+    #         '<music21.tempo.MetronomeMark Largo Quarter=46>')
 
-#     def testMuseDataImportDynamicsA(self):
-#         # note: this is importing a large work, but this seems to presently
-#         # be the only one with dynamics
-#
-#         # TODO: Turn back on when a smaller work is found...
-#         from music21 import corpus
-#         s = corpus.parse('symphony94', 3)
-#         sFlat = s.flatten()
-#         # s.show()
-#         self.assertEqual(len(sFlat.getElementsByClass(dynamics.Dynamic)), 79)
-#
-#
-#     def testMuseDataImportErrorA(self):
-#         from music21 import corpus
-#         # this files was crashing in the handling of an error in beam notation
-#         s = corpus.parse('haydn/opus55no1/movement2.md')
-#         self.assertEqual(len(s[note.Note]), 1735)
-#
-#         # s.show('t')
-#
-#     def testMuseDataImportErrorB(self):
-#         # this file has a malformed END repeated twice
-#         from music21 import corpus
-#         s = corpus.parse('haydn/opus71no1/movement1.zip')
-#         self.assertEqual(len(s[note.Note]), 2792)
+    # def testMuseDataImportDynamicsA(self):
+    #     # note: this is importing a large work, but this seems to presently
+    #     # be the only one with dynamics
+    #
+    #     # TODO: Turn back on when a smaller work is found...
+    #     from music21 import corpus
+    #     s = corpus.parse('symphony94', 3)
+    #     sFlat = s.flatten()
+    #     # s.show()
+    #     self.assertEqual(len(sFlat.getElementsByClass(dynamics.Dynamic)), 79)
+
+    # def testMuseDataImportErrorA(self):
+    #     from music21 import corpus
+    #     # this files was crashing in the handling of an error in beam notation
+    #     s = corpus.parse('haydn/opus55no1/movement2.md')
+    #     self.assertEqual(len(s[note.Note]), 1735)
+    #
+    #     # s.show('t')
+
+    # def testMuseDataImportErrorB(self):
+    #     # this file has a malformed END repeated twice
+    #     from music21 import corpus
+    #     s = corpus.parse('haydn/opus71no1/movement1.zip')
+    #     self.assertEqual(len(s[note.Note]), 2792)
 
 # ------------------------------------------------------------------------------
 # define presented order in documentation

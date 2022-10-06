@@ -32,7 +32,7 @@ from music21.exceptions21 import StreamException
 from music21 import note
 from music21.stream import filters
 from music21 import prebase
-from music21 import base   # just for typing.
+from music21 import base   # just for typing. (but in a bound, so keep here)
 
 from music21.sites import SitesException
 

@@ -15,29 +15,24 @@ from __future__ import annotations
 import copy
 import fractions
 import io
-import re
-import warnings
-
 from math import isclose
+import re
 import typing as t
-
+import warnings
 import xml.etree.ElementTree as ET
-
-from music21 import common
-from music21 import exceptions21
-from music21.musicxml import xmlObjects
-from music21.musicxml.xmlObjects import MusicXMLImportException, MusicXMLWarning
 
 from music21 import articulations
 from music21 import bar
-from music21 import base  # for typing
 from music21 import beam
 from music21 import chord
 from music21 import clef
+from music21 import common
 from music21 import defaults
 from music21 import duration
 from music21 import dynamics
 from music21 import editorial
+from music21 import environment
+from music21 import exceptions21
 from music21 import expressions
 from music21 import harmony  # for chord symbols
 from music21 import instrument
@@ -45,9 +40,9 @@ from music21 import interval  # for transposing instruments
 from music21 import key
 from music21 import layout
 from music21 import metadata
+from music21 import meter
 from music21.midi.percussion import MIDIPercussionException, PercussionMapper
 from music21 import note
-from music21 import meter
 from music21 import percussion
 from music21 import pitch
 from music21 import repeat
@@ -59,12 +54,15 @@ from music21 import tempo
 from music21 import text  # for text boxes
 from music21 import tie
 
-from music21 import environment
+from music21.musicxml import xmlObjects
+from music21.musicxml.xmlObjects import MusicXMLImportException, MusicXMLWarning
+
+if t.TYPE_CHECKING:
+    from music21 import base
+    # what goes in a `.staffReference`
+    StaffReferenceType = dict[int, list[base.Music21Object]]
 
 environLocal = environment.Environment('musicxml.xmlToM21')
-
-# what goes in a `.staffReference`
-StaffReferenceType = dict[int, list[base.Music21Object]]
 
 # const
 NO_STAFF_ASSIGNED = 0
@@ -879,6 +877,8 @@ class MusicXMLImporter(XMLParserBase):
             self.xmlText = self.xmlText.decode('utf-8')
         sio = io.StringIO(self.xmlText)
         try:
+            # StringIO is a SupportsRead[str] type.
+            # noinspection PyTypeChecker
             etree = ET.parse(sio)
             self.xmlRoot = etree.getroot()
         except ET.ParseError:
@@ -4732,7 +4732,9 @@ class MeasureParser(XMLParserBase):
             # not complete
 
             # TODO: this should also filter by number (in theory.)
-            rbSpanners = self.spannerBundle.getByClass('RepeatBracket').getByCompleteStatus(False)
+            rbSpanners = self.spannerBundle.getByClass(
+                spanner.RepeatBracket
+            ).getByCompleteStatus(False)
             # if we have no complete bracket objects, must start a new one
             if not rbSpanners:
                 # create with this measure as the object

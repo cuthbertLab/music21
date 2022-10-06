@@ -1117,7 +1117,7 @@ class Test(unittest.TestCase):
         bars = s2.parts[0].flatten().getElementsByClass(bar.Repeat)
         self.assertEqual(len(bars), 0)
 
-#         self.assertEqual(len(s2.parts[0].flatten().notes), 111)
+        # self.assertEqual(len(s2.parts[0].flatten().notes), 111)
 
     def testExpandRepeatsImportedC(self):
         s = converter.parse(testPrimitive.repeatExpressionsA)
@@ -1600,10 +1600,10 @@ class Test(unittest.TestCase):
 
         # p.show()
 
-        #         ex = repeat.Expander(p)
-        #         self.assertTrue(ex.isExpandable())
-        #         post = ex.process()
-        #         post.show()
+        # ex = repeat.Expander(p)
+        # self.assertTrue(ex.isExpandable())
+        # post = ex.process()
+        # post.show()
 
         post = p.expandRepeats()
         self.assertEqual(len(post), 37)

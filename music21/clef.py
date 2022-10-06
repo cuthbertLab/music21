@@ -25,7 +25,7 @@ import unittest
 from music21 import base
 from music21 import exceptions21
 from music21 import environment
-from music21 import pitch  # for typing only
+from music21 import pitch
 from music21 import style
 
 

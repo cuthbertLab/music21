@@ -799,11 +799,10 @@ class Test(unittest.TestCase):
         assert s is not None
 
         # s.show()
-#         self.assertEqual(len(s.parts), 3)
-#         self.assertEqual(len(s.parts[0].notesAndRests), 6)
-#         self.assertEqual(len(s.parts[1].notesAndRests), 20)
-#         self.assertEqual(len(s.parts[2].notesAndRests), 6)
-#
+        # self.assertEqual(len(s.parts), 3)
+        # self.assertEqual(len(s.parts[0].notesAndRests), 6)
+        # self.assertEqual(len(s.parts[1].notesAndRests), 20)
+        # self.assertEqual(len(s.parts[2].notesAndRests), 6)
         # s.show()
         # s.show('midi')
 
