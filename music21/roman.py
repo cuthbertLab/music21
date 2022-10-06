@@ -1013,6 +1013,32 @@ def romanNumeralFromChord(
     >>> rn.figure
     'bVIb753'
 
+    Watch out, because there are still a lot of chords that
+    preferSecondaryDominants will alter.
+    This is deliberate: this option defaults to false
+    so it does not run unless a user specifically initiates it
+    and actively wants to make modifications.
+    Power users could create more specific conditions in which to call it,
+    e.g., before/after specific chords,
+    and they can only do so if it errs on the side of more changes.
+
+    For example, in minor, 'I' will be mapped to 'V/iv'.
+
+    >>> cd = chord.Chord('F4 A4 C5')
+    >>> rn = roman.romanNumeralFromChord(cd, 'f')
+    >>> rn.figure
+    'I'
+
+    >>> cd = chord.Chord('F4 A4 C5')
+    >>> rn = roman.romanNumeralFromChord(cd, 'f', preferSecondaryDominants=True)
+    >>> rn.figure
+    'V/IV'
+
+    This might be appropriate in the middle of a progression like
+    i, V/iv, iv.
+    By contrast, it's probably not wanted for a tierce de picardie at the end
+    iv6, V, I.
+    This kind of context-sensitivity is not currently included.
 
     OMIT_FROM_DOCS
 
