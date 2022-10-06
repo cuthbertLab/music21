@@ -239,7 +239,7 @@ class RnWriter(prebase.ProtoM21Object):
         >>> m = stream.Measure(number=1)
         >>> m.insert(0, meter.TimeSignature('4/4'))
         >>> m.insert(0, roman.RomanNumeral('V', 'G'))
-        >>> p.insert(m)
+        >>> p.insert(0, m)
         >>> testCase = romanText.writeRoman.RnWriter(p)
         >>> testCase.combinedList[-1]  # Last entry, after the metadata
         'm1 G: V'
