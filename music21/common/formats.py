@@ -198,7 +198,7 @@ def findInputExtension(fmt: str) -> tuple[str, ...]:
     >>> common.findInputExtension('.mxl')
     ('.xml', '.mxl', '.musicxml')
 
-    blah is neither
+    Blah is not a format
 
     >>> common.findInputExtension('blah')
     ()
