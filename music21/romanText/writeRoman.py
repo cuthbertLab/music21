@@ -262,10 +262,12 @@ class RnWriter(prebase.ProtoM21Object):
         >>> testCase = romanText.writeRoman.RnWriter(p)
 
         The last line of the `.combinedList` gives the new measure:
+
         >>> testCase.combinedList[-1]
         'm2 ||: I :||'
 
         The line before that gives the time signature change:
+        
         >>> testCase.combinedList[-2]
         'Time Signature: 3/4'
 
