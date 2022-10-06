@@ -2820,10 +2820,11 @@ class Music21Object(prebase.ProtoM21Object):
             raise Music21ObjectException(f'cannot support output in this format yet: {fmt}')
         formatWriter = scClass()
         return formatWriter.write(self,
-                                  regularizedConverterFormat,
+                                  fmt=regularizedConverterFormat,
                                   fp=fp,
                                   subformats=subformats,
                                   **keywords)
+
 
     def _reprText(self, **keywords):
         '''
@@ -2873,7 +2874,7 @@ class Music21Object(prebase.ProtoM21Object):
             if common.runningUnderIPython():
                 try:
                     fmt = environLocal['ipythonShowFormat']
-                except environment.EnvironmentException:
+                except (environment.EnvironmentException, KeyError):
                     fmt = 'ipython.musicxml.png'
             else:
                 fmt = environLocal['showFormat']

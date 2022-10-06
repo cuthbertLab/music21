@@ -463,22 +463,37 @@ def scoreToBraille(music21Score,
     return '\n'.join(allBrailleLines)
 
 
-def metadataToString(music21Metadata, returnBrailleUnicode=False):
+def metadataToString(music21Metadata: metadata.Metadata, returnBrailleUnicode=False) -> str:
     '''
+    Convert a Metadata format to a format for BRF.
+
     >>> from music21.braille import translate
     >>> corelli = corpus.parse('monteverdi/madrigal.3.1.rntxt')
     >>> mdObject = corelli.getElementsByClass(metadata.Metadata).first()
     >>> mdObject.__class__
     <class 'music21.metadata.Metadata'>
+
+    The default is very close to ascii.
+
     >>> print(translate.metadataToString(mdObject))
     Alternative Title: 3.1
     Composer: Claudio Monteverdi
     Title: La Giovinetta Pianta
 
-    >>> print(translate.metadataToString(mdObject, returnBrailleUnicode=True))
+    And in Braille Unicode.
+
+    >>> unicodeVersion = translate.metadataToString(mdObject, returnBrailleUnicode=True)
+    >>> print(unicodeVersion)
     ⠠⠁⠇⠞⠑⠗⠝⠁⠞⠊⠧⠑⠀⠠⠞⠊⠞⠇⠑⠒⠀⠼⠉⠲⠁
     ⠠⠉⠕⠍⠏⠕⠎⠑⠗⠒⠀⠠⠉⠇⠁⠥⠙⠊⠕⠀⠠⠍⠕⠝⠞⠑⠧⠑⠗⠙⠊
     ⠠⠞⠊⠞⠇⠑⠒⠀⠠⠇⠁⠀⠠⠛⠊⠕⠧⠊⠝⠑⠞⠞⠁⠀⠠⠏⠊⠁⠝⠞⠁
+
+    Note the difference between the first and then translating back to ASCII Braille:
+
+    >>> print(braille.basic.brailleUnicodeToBrailleAscii(unicodeVersion))
+    ,ALTERNATIVE ,TITLE3 #C4A
+    ,COMPOSER3 ,CLAUDIO ,MONTEVERDI
+    ,TITLE3 ,LA ,GIOVINETTA ,PIANTA
     '''
     allBrailleLines = []
     for uniqueName, value in music21Metadata.all(returnPrimitives=True, returnSorted=False):
