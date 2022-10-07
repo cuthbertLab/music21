@@ -2662,12 +2662,12 @@ class Chord(ChordBase):
         # noinspection PyShadowingNames
         '''
         Returns True if the chord is:
-        
+
         * one pitch (always consonant)
-        
+
         * two pitches: uses :meth:`~music21.interval.Interval.isConsonant()` , which
              checks if the interval is a major or minor third or sixth or perfect fifth.
-        
+
         * three pitches: if chord is a major or minor triad not in second inversion.
 
         These rules define all common-practice consonances
