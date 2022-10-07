@@ -112,6 +112,8 @@ def deprecated(method, startDate=None, removeDate=None, message=None):
     else:
         funcName = method.__name__
 
+    method._isDeprecated = True
+
     if startDate is not None:
         startDate = ' on ' + startDate
     else:

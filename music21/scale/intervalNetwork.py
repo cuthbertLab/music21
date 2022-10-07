@@ -51,6 +51,10 @@ from music21 import prebase
 environLocal = environment.Environment('scale.intervalNetwork')
 
 class Terminus(enum.Enum):
+    '''
+    One of the two Termini of a scale, either Terminus.LOW or
+    Terminus.HIGH
+    '''
     LOW = 'terminusLow'
     HIGH = 'terminusHigh'
 
@@ -61,6 +65,10 @@ class Terminus(enum.Enum):
         return 'Terminus.' + self.name
 
 class Direction(enum.Enum):
+    '''
+    An enumerated Direction for a scale, either Direction.ASCENDING,
+    Direction.DESCENDING, or Direction.BI (bidirectional)
+    '''
     BI = 'bi'
     ASCENDING = 'ascending'
     DESCENDING = 'descending'
