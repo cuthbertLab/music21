@@ -3564,7 +3564,7 @@ class Chord(ChordBase):
 
     def isSwissAugmentedSixth(self, *, permitAnyInversion=False):
         '''
-        Returns true is it is a respelled German augmented 6th chord with
+        Returns true if it is a respelled German augmented 6th chord with
         sharp 2 instead of flat 3.  This chord has many names,
         Swiss Augmented Sixth, Alsatian Chord, English A6, Norwegian, etc.
         as well as doubly-augmented sixth, which is a bit of a misnomer since
