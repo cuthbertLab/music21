@@ -583,6 +583,10 @@ class GeneralNote(base.Music21Object):
                 tempDuration = Duration(1.0)
             else:
                 tempDuration = Duration(**keywords)
+                if 'quarterLength' in keywords:
+                    del keywords['quarterLength']
+                if 'type' in keywords:
+                    del keywords['type']
                 # only apply default if components are empty
                 # looking at currentComponents so as not to trigger
                 # _updateComponents
