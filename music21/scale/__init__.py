@@ -104,10 +104,19 @@ class ScaleException(exceptions21.Music21Exception):
 class Scale(base.Music21Object):
     '''
     Generic base class for all scales, both abstract and concrete.
-    '''
 
-    def __init__(self):
-        super().__init__()
+    >>> s = scale.Scale()
+    >>> s.type
+    'Scale'
+    >>> s.name  # default same as type.
+    'Scale'
+    >>> s.isConcrete
+    False
+
+    Not a useful class on its own.  See its subclasses.
+    '''
+    def __init__(self, **keywords):
+        super().__init__(**keywords)
         self.type = 'Scale'  # could be mode, could be other indicator
 
     @property
@@ -224,8 +233,8 @@ class AbstractScale(Scale):
 
     # TODO: make a subclass of IntervalNetwork and remove the ._net aspect.
     '''
-    def __init__(self):
-        super().__init__()
+    def __init__(self, **keywords):
+        super().__init__(**keywords)
         # store interval network within abstract scale
         self._net = None
         # in most cases tonic/final of scale is step one, but not always
@@ -295,7 +304,7 @@ class AbstractScale(Scale):
         [<music21.pitch.Pitch D5>, <music21.pitch.Pitch F#5>,
          <music21.pitch.Pitch A#5>, <music21.pitch.Pitch D6>]
 
-        Also possible with implicit octaves:
+        It is also possible to use implicit octaves:
 
         >>> abstract_scale = scale.AbstractScale()
         >>> abstract_scale.buildNetworkFromPitches(['C', 'F'])
@@ -659,8 +668,8 @@ class AbstractDiatonicScale(AbstractScale):
     True
 
     '''
-    def __init__(self, mode: str | None = None):
-        super().__init__()
+    def __init__(self, mode: str | None = None, **keywords):
+        super().__init__(**keywords)
         self.mode = mode
         self.type = 'Abstract diatonic'
         self.tonicDegree = None  # step of tonic
@@ -814,8 +823,8 @@ class AbstractOctatonicScale(AbstractScale):
     Abstract scale representing the two octatonic scales.
     '''
 
-    def __init__(self, mode=None):
-        super().__init__()
+    def __init__(self, mode=None, **keywords):
+        super().__init__(**keywords)
         self.type = 'Abstract Octatonic'
         # all octatonic scales are octave duplicating
         self.octaveDuplicating = True
@@ -857,8 +866,8 @@ class AbstractHarmonicMinorScale(AbstractScale):
     This is the only scale to use the "_alteredDegrees" property.
     '''
 
-    def __init__(self, mode=None):
-        super().__init__()
+    def __init__(self, mode=None, **keywords):
+        super().__init__(**keywords)
         self.type = 'Abstract Harmonic Minor'
         self.octaveDuplicating = True
         self.dominantDegree: int = -1
@@ -885,8 +894,8 @@ class AbstractMelodicMinorScale(AbstractScale):
     A directional scale.
     '''
 
-    def __init__(self, mode=None):
-        super().__init__()
+    def __init__(self, mode=None, **keywords):
+        super().__init__(**keywords)
         self.type = 'Abstract Melodic Minor'
         self.octaveDuplicating = True
         self.dominantDegree: int = -1
@@ -907,8 +916,8 @@ class AbstractCyclicalScale(AbstractScale):
     The resulting scale may be non octave repeating.
     '''
 
-    def __init__(self, mode=None):
-        super().__init__()
+    def __init__(self, mode=None, **keywords):
+        super().__init__(**keywords)
         self.type = 'Abstract Cyclical'
         self.octaveDuplicating = False
         self.buildNetwork(mode=mode)
@@ -939,8 +948,8 @@ class AbstractOctaveRepeatingScale(AbstractScale):
     be provided.
     '''
 
-    def __init__(self, mode=None):
-        super().__init__()
+    def __init__(self, mode=None, **keywords):
+        super().__init__(**keywords)
         self.type = 'Abstract Octave Repeating'
 
         if mode is None:
@@ -974,8 +983,8 @@ class AbstractRagAsawari(AbstractScale):
     '''
     A pseudo raga-scale.
     '''
-    def __init__(self):
-        super().__init__()
+    def __init__(self, **keywords):
+        super().__init__(**keywords)
         self.type = 'Abstract Rag Asawari'
         self.octaveDuplicating = True
         self.dominantDegree: int = -1
@@ -1062,8 +1071,8 @@ class AbstractRagMarwa(AbstractScale):
     '''
     A pseudo raga-scale.
     '''
-    def __init__(self):
-        super().__init__()
+    def __init__(self, **keywords):
+        super().__init__(**keywords)
         self.type = 'Abstract Rag Marwa'
         self.octaveDuplicating = True
         self.dominantDegree: int = -1
@@ -1148,8 +1157,8 @@ class AbstractWeightedHexatonicBlues(AbstractScale):
     A dynamic, probabilistic mixture of minor pentatonic and a hexatonic blues scale
     '''
 
-    def __init__(self):
-        super().__init__()
+    def __init__(self, **keywords):
+        super().__init__(**keywords)
         self.type = 'Abstract Weighted Hexatonic Blues'
         # probably not, as all may not have some pitches in each octave
         self.octaveDuplicating = True
@@ -1259,8 +1268,9 @@ class ConcreteScale(Scale):
 
     def __init__(self,
                  tonic: str | pitch.Pitch | note.Note | None = None,
-                 pitches: list[pitch.Pitch | str] | None = None):
-        super().__init__()
+                 pitches: list[pitch.Pitch | str] | None = None,
+                 **keywords):
+        super().__init__(**keywords)
 
         self.type = 'Concrete'
         # store an instance of an abstract scale
@@ -2556,9 +2566,9 @@ class DiatonicScale(ConcreteScale):
     '''
     usePitchDegreeCache = True
 
-    def __init__(self, tonic=None):
-        super().__init__(tonic=tonic)
-        self._abstract: AbstractDiatonicScale = AbstractDiatonicScale()
+    def __init__(self, tonic=None, **keywords):
+        super().__init__(tonic=tonic, **keywords)
+        self._abstract: AbstractDiatonicScale = AbstractDiatonicScale(**keywords)
         self.type = 'diatonic'
 
     def getTonic(self):
@@ -2704,8 +2714,8 @@ class MajorScale(DiatonicScale):
     'C#'
     '''
 
-    def __init__(self, tonic=None):
-        super().__init__(tonic=tonic)
+    def __init__(self, tonic=None, **keywords):
+        super().__init__(tonic=tonic, **keywords)
         self.type = 'major'
         # build the network for the appropriate scale
         self._abstract.buildNetwork(self.type)
@@ -2722,8 +2732,8 @@ class MinorScale(DiatonicScale):
     ['G4', 'A4', 'B-4', 'C5', 'D5', 'E-5', 'F5', 'G5']
     '''
 
-    def __init__(self, tonic=None):
-        super().__init__(tonic=tonic)
+    def __init__(self, tonic=None, **keywords):
+        super().__init__(tonic=tonic, **keywords)
         self.type = 'minor'
         self._abstract.buildNetwork(self.type)
 
@@ -2737,8 +2747,8 @@ class DorianScale(DiatonicScale):
     ['D4', 'E4', 'F4', 'G4', 'A4', 'B4', 'C5', 'D5']
     '''
 
-    def __init__(self, tonic=None):
-        super().__init__(tonic=tonic)
+    def __init__(self, tonic=None, **keywords):
+        super().__init__(tonic=tonic, **keywords)
         self.type = 'dorian'
         self._abstract.buildNetwork(self.type)
 
@@ -2751,8 +2761,8 @@ class PhrygianScale(DiatonicScale):
     ['E4', 'F4', 'G4', 'A4', 'B4', 'C5', 'D5', 'E5']
     '''
 
-    def __init__(self, tonic=None):
-        super().__init__(tonic=tonic)
+    def __init__(self, tonic=None, **keywords):
+        super().__init__(tonic=tonic, **keywords)
         self.type = 'phrygian'
         self._abstract.buildNetwork(self.type)
 
@@ -2771,8 +2781,8 @@ class LydianScale(DiatonicScale):
     ['C4', 'D4', 'E4', 'F#4', 'G4', 'A4', 'B4', 'C5']
     '''
 
-    def __init__(self, tonic=None):
-        super().__init__(tonic=tonic)
+    def __init__(self, tonic=None, **keywords):
+        super().__init__(tonic=tonic, **keywords)
         self.type = 'lydian'
         self._abstract.buildNetwork(self.type)
 
@@ -2789,8 +2799,8 @@ class MixolydianScale(DiatonicScale):
     ['C4', 'D4', 'E4', 'F4', 'G4', 'A4', 'B-4', 'C5']
     '''
 
-    def __init__(self, tonic=None):
-        super().__init__(tonic=tonic)
+    def __init__(self, tonic=None, **keywords):
+        super().__init__(tonic=tonic, **keywords)
         self.type = 'mixolydian'
         self._abstract.buildNetwork(self.type)
 
@@ -2807,8 +2817,8 @@ class HypodorianScale(DiatonicScale):
     ['G3', 'A3', 'B-3', 'C4', 'D4', 'E-4', 'F4', 'G4']
     '''
 
-    def __init__(self, tonic=None):
-        super().__init__(tonic=tonic)
+    def __init__(self, tonic=None, **keywords):
+        super().__init__(tonic=tonic, **keywords)
         self.type = 'hypodorian'
         self._abstract.buildNetwork(self.type)
 
@@ -2828,8 +2838,8 @@ class HypophrygianScale(DiatonicScale):
     >>> sc.pitchFromDegree(1)  # scale degree 1 is treated as lowest
     <music21.pitch.Pitch B3>
     '''
-    def __init__(self, tonic=None):
-        super().__init__(tonic=tonic)
+    def __init__(self, tonic=None, **keywords):
+        super().__init__(tonic=tonic, **keywords)
         self.type = 'hypophrygian'
         self._abstract.buildNetwork(self.type)
 
@@ -2844,8 +2854,8 @@ class HypolydianScale(DiatonicScale):
     >>> [str(p) for p in sc.pitches]
     ['G3', 'A3', 'B3', 'C4', 'D4', 'E4', 'F#4', 'G4']
     '''
-    def __init__(self, tonic=None):
-        super().__init__(tonic=tonic)
+    def __init__(self, tonic=None, **keywords):
+        super().__init__(tonic=tonic, **keywords)
         self.type = 'hypolydian'
         self._abstract.buildNetwork(self.type)
 
@@ -2860,8 +2870,8 @@ class HypomixolydianScale(DiatonicScale):
     >>> [str(p) for p in sc.pitches]
     ['G3', 'A3', 'B-3', 'C4', 'D4', 'E4', 'F4', 'G4']
     '''
-    def __init__(self, tonic=None):
-        super().__init__(tonic=tonic)
+    def __init__(self, tonic=None, **keywords):
+        super().__init__(tonic=tonic, **keywords)
         self.type = 'hypomixolydian'
         self._abstract.buildNetwork(self.type)
 
@@ -2878,8 +2888,8 @@ class LocrianScale(DiatonicScale):
     ['C4', 'D-4', 'E-4', 'F4', 'G-4', 'A-4', 'B-4', 'C5']
     '''
 
-    def __init__(self, tonic=None):
-        super().__init__(tonic=tonic)
+    def __init__(self, tonic=None, **keywords):
+        super().__init__(tonic=tonic, **keywords)
         self.type = 'locrian'
         self._abstract.buildNetwork(self.type)
 
@@ -2896,8 +2906,8 @@ class HypolocrianScale(DiatonicScale):
     ['G-3', 'A-3', 'B-3', 'C4', 'D-4', 'E-4', 'F4', 'G-4']
     '''
 
-    def __init__(self, tonic=None):
-        super().__init__(tonic=tonic)
+    def __init__(self, tonic=None, **keywords):
+        super().__init__(tonic=tonic, **keywords)
         self.type = 'hypolocrian'
         self._abstract.buildNetwork(self.type)
 
@@ -2913,8 +2923,8 @@ class HypoaeolianScale(DiatonicScale):
     >>> [str(p) for p in sc.pitches]
     ['G3', 'A-3', 'B-3', 'C4', 'D4', 'E-4', 'F4', 'G4']
     '''
-    def __init__(self, tonic=None):
-        super().__init__(tonic=tonic)
+    def __init__(self, tonic=None, **keywords):
+        super().__init__(tonic=tonic, **keywords)
         self.type = 'hypoaeolian'
         self._abstract.buildNetwork(self.type)
 
@@ -2952,8 +2962,8 @@ class HarmonicMinorScale(DiatonicScale):
     chooses among ties.
     '''
 
-    def __init__(self, tonic=None):
-        super().__init__(tonic=tonic)
+    def __init__(self, tonic=None, **keywords):
+        super().__init__(tonic=tonic, **keywords)
         self.type = 'harmonic minor'
 
         # note: this changes the previously assigned AbstractDiatonicScale
@@ -2971,8 +2981,8 @@ class MelodicMinorScale(DiatonicScale):
     >>> sc = scale.MelodicMinorScale('e4')
     '''
 
-    def __init__(self, tonic=None):
-        super().__init__(tonic=tonic)
+    def __init__(self, tonic=None, **keywords):
+        super().__init__(tonic=tonic, **keywords)
         self.type = 'melodic minor'
 
         # note: this changes the previously assigned AbstractDiatonicScale
@@ -2989,8 +2999,8 @@ class OctatonicScale(ConcreteScale):
     '''
     usePitchDegreeCache = True
 
-    def __init__(self, tonic=None, mode=None):
-        super().__init__(tonic=tonic)
+    def __init__(self, tonic=None, mode=None, **keywords):
+        super().__init__(tonic=tonic, **keywords)
         self._abstract = AbstractOctatonicScale(mode=mode)
         self.type = 'Octatonic'
 
@@ -3018,8 +3028,8 @@ class OctaveRepeatingScale(ConcreteScale):
     [<music21.pitch.Pitch C4>, <music21.pitch.Pitch D-4>, <music21.pitch.Pitch C5>]
     '''
 
-    def __init__(self, tonic=None, intervalList: list | None = None):
-        super().__init__(tonic=tonic)
+    def __init__(self, tonic=None, intervalList: list | None = None, **keywords):
+        super().__init__(tonic=tonic, **keywords)
         mode = intervalList if intervalList else ['m2']
         self._abstract = AbstractOctaveRepeatingScale(mode=mode)
         self.type = 'Octave Repeating'
@@ -3048,8 +3058,9 @@ class CyclicalScale(ConcreteScale):
 
     def __init__(self,
                  tonic: str | pitch.Pitch | note.Note | None = None,
-                 intervalList: list | None = None):
-        super().__init__(tonic=tonic)
+                 intervalList: list | None = None,
+                 **keywords):
+        super().__init__(tonic=tonic, **keywords)
         mode = intervalList if intervalList else ['m2']
         self._abstract = AbstractCyclicalScale(mode=mode)
         self.type = 'Cyclical'
@@ -3084,8 +3095,8 @@ class ChromaticScale(ConcreteScale):
     '''
     usePitchDegreeCache = True
 
-    def __init__(self, tonic=None):
-        super().__init__(tonic=tonic)
+    def __init__(self, tonic=None, **keywords):
+        super().__init__(tonic=tonic, **keywords)
         self._abstract = AbstractCyclicalScale(mode=[
             'm2', 'm2', 'm2',
             'm2', 'm2', 'm2', 'm2', 'm2', 'm2', 'm2', 'm2', 'm2'])
@@ -3118,8 +3129,8 @@ class WholeToneScale(ConcreteScale):
     '''
     usePitchDegreeCache = True
 
-    def __init__(self, tonic=None):
-        super().__init__(tonic=tonic)
+    def __init__(self, tonic=None, **keywords):
+        super().__init__(tonic=tonic, **keywords)
         self._abstract = AbstractCyclicalScale(mode=['M2', 'M2', 'M2', 'M2', 'M2', 'M2'])
         self.type = 'Whole tone'
 
@@ -3152,8 +3163,9 @@ class SieveScale(ConcreteScale):
     def __init__(self,
                  tonic=None,
                  sieveString='2@0',
-                 eld: int | float = 1):
-        super().__init__(tonic=tonic)
+                 eld: int | float = 1,
+                 **keywords):
+        super().__init__(tonic=tonic, **keywords)
 
         # self.tonic is a Pitch
         if self.tonic is not None:
@@ -3199,7 +3211,7 @@ class ScalaScale(ConcreteScale):
     music21.scale.ScaleException: Could not find a file named badFileName.scl in the scala database
     '''
 
-    def __init__(self, tonic=None, scalaString=None):
+    def __init__(self, tonic=None, scalaString=None, **keywords):
         if (tonic is not None
             and scalaString is None
             and isinstance(tonic, str)
@@ -3209,7 +3221,7 @@ class ScalaScale(ConcreteScale):
             scalaString = tonic
             tonic = 'C4'
 
-        super().__init__(tonic=tonic)
+        super().__init__(tonic=tonic, **keywords)
 
         self._scalaData = None
         self.description = None
@@ -3249,8 +3261,8 @@ class RagAsawari(ConcreteScale):
     ['C3', 'B-2', 'A-2', 'G2', 'F2', 'E-2', 'D2', 'C2']
     '''
 
-    def __init__(self, tonic=None):
-        super().__init__(tonic=tonic)
+    def __init__(self, tonic=None, **keywords):
+        super().__init__(tonic=tonic, **keywords)
         self._abstract = AbstractRagAsawari()
         self.type = 'Rag Asawari'
 
@@ -3267,8 +3279,8 @@ class RagMarwa(ConcreteScale):
     ['C2', 'D-2', 'E2', 'F#2', 'A2', 'B2', 'A2', 'C3', 'D-3']
     '''
 
-    def __init__(self, tonic=None):
-        super().__init__(tonic=tonic)
+    def __init__(self, tonic=None, **keywords):
+        super().__init__(tonic=tonic, **keywords)
         self._abstract = AbstractRagMarwa()
         self.type = 'Rag Marwa'
         # >>> sc.getPitches(direction=Direction.DESCENDING)
@@ -3281,8 +3293,8 @@ class WeightedHexatonicBlues(ConcreteScale):
     and the hexatonic blues scale.
     '''
 
-    def __init__(self, tonic=None):
-        super().__init__(tonic=tonic)
+    def __init__(self, tonic=None, **keywords):
+        super().__init__(tonic=tonic, **keywords)
         self._abstract = AbstractWeightedHexatonicBlues()
         self.type = 'Weighted Hexatonic Blues'
 

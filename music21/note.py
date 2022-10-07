@@ -583,6 +583,10 @@ class GeneralNote(base.Music21Object):
                 tempDuration = Duration(1.0)
             else:
                 tempDuration = Duration(**keywords)
+                if 'quarterLength' in keywords:
+                    del keywords['quarterLength']
+                if 'type' in keywords:
+                    del keywords['type']
                 # only apply default if components are empty
                 # looking at currentComponents so as not to trigger
                 # _updateComponents
@@ -592,7 +596,7 @@ class GeneralNote(base.Music21Object):
         else:
             tempDuration = duration
         # this sets the stored duration defined in Music21Object
-        super().__init__(duration=tempDuration)
+        super().__init__(duration=tempDuration, **keywords)
 
         self.lyrics: list[Lyric] = []  # a list of lyric objects
         self.expressions: list[expressions.Expression] = []

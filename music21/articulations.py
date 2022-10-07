@@ -111,8 +111,8 @@ class Articulation(base.Music21Object):
     '''
     _styleClass: type[style.Style] = style.TextStyle
 
-    def __init__(self):
-        super().__init__()
+    def __init__(self, **keywords):
+        super().__init__(**keywords)
         self.placement = None
         # declare a unit interval shift for the performance of this articulation
         self._volumeShift: float = 0.0
@@ -214,8 +214,8 @@ class LengthArticulation(Articulation):
     '''
     Superclass for all articulations that change the length of a note.
     '''
-    def __init__(self):
-        super().__init__()
+    def __init__(self, **keywords):
+        super().__init__(**keywords)
         self.tieAttach = 'last'
 
 class DynamicArticulation(Articulation):
@@ -240,8 +240,8 @@ class Accent(DynamicArticulation):
 
     >>> a = articulations.Accent()
     '''
-    def __init__(self):
-        super().__init__()
+    def __init__(self, **keywords):
+        super().__init__(**keywords)
         self._volumeShift = 0.1
 
 
@@ -257,8 +257,8 @@ class StrongAccent(Accent):
     >>> a.pointDirection
     'down'
     '''
-    def __init__(self):
-        super().__init__()
+    def __init__(self, **keywords):
+        super().__init__(**keywords)
         self._volumeShift = 0.15
         self.pointDirection = 'up'
 
@@ -267,8 +267,8 @@ class Staccato(LengthArticulation):
 
     >>> a = articulations.Staccato()
     '''
-    def __init__(self):
-        super().__init__()
+    def __init__(self, **keywords):
+        super().__init__(**keywords)
         self._volumeShift = 0.05
         self.lengthShift = 0.7
 
@@ -279,8 +279,8 @@ class Staccatissimo(Staccato):
 
     >>> a = articulations.Staccatissimo()
     '''
-    def __init__(self):
-        super().__init__()
+    def __init__(self, **keywords):
+        super().__init__(**keywords)
         self._volumeShift = 0.05
         self.lengthShift = 0.5
 
@@ -296,7 +296,7 @@ class Spiccato(Staccato, Accent):
     >>> spiccato.volumeShift == accent.volumeShift
     True
     '''
-    def __init__(self):
+    def __init__(self, **keywords):
         Staccato.__init__(self)
         with tempAttribute(self, 'lengthShift'):
             Accent.__init__(self)  # order matters...
@@ -306,8 +306,8 @@ class Tenuto(LengthArticulation):
     '''
     >>> a = articulations.Tenuto()
     '''
-    def __init__(self):
-        super().__init__()
+    def __init__(self, **keywords):
+        super().__init__(**keywords)
         self._volumeShift = -0.05  # is this the right thing to do?
         self.lengthShift = 1.1
 
@@ -315,8 +315,8 @@ class DetachedLegato(LengthArticulation):
     '''
     >>> a = articulations.DetachedLegato()
     '''
-    def __init__(self):
-        super().__init__()
+    def __init__(self, **keywords):
+        super().__init__(**keywords)
         self.lengthShift = 0.9
 
 # --------- indeterminate slides
@@ -353,8 +353,8 @@ class Doit(IndeterminateSlide):
 
     >>> a = articulations.Doit()
     '''
-    def __init__(self):
-        super().__init__()
+    def __init__(self, **keywords):
+        super().__init__(**keywords)
         self.tieAttach = 'last'
 
 class Falloff(IndeterminateSlide):
@@ -363,8 +363,8 @@ class Falloff(IndeterminateSlide):
 
     >>> a = articulations.Falloff()
     '''
-    def __init__(self):
-        super().__init__()
+    def __init__(self, **keywords):
+        super().__init__(**keywords)
         self.tieAttach = 'last'
 
 # --------- end indeterminate slide
@@ -377,8 +377,8 @@ class BreathMark(LengthArticulation):
     >>> a = articulations.BreathMark()
     >>> a.symbol = 'comma'
     '''
-    def __init__(self):
-        super().__init__()
+    def __init__(self, **keywords):
+        super().__init__(**keywords)
         self.lengthShift = 0.7
         self.symbol = None
 
@@ -393,8 +393,8 @@ class Stress(DynamicArticulation, LengthArticulation):
 
     >>> a = articulations.Stress()
     '''
-    def __init__(self):
-        super().__init__()
+    def __init__(self, **keywords):
+        super().__init__(**keywords)
         self._volumeShift = 0.05
         self.lengthShift = 1.1
 
@@ -404,8 +404,8 @@ class Unstress(DynamicArticulation):
 
     >>> a = articulations.Unstress()
     '''
-    def __init__(self):
-        super().__init__()
+    def __init__(self, **keywords):
+        super().__init__(**keywords)
         self._volumeShift = -0.05
 
 
@@ -461,8 +461,8 @@ class Fingering(TechnicalIndication):
     are mapped implicitly to the notes of a chord in order. Superfluous
     Fingerings will be ignored and may be discarded when serializing.
     '''
-    def __init__(self, fingerNumber=None):
-        super().__init__()
+    def __init__(self, fingerNumber=None, **keywords):
+        super().__init__(**keywords)
         self.fingerNumber = fingerNumber
         self.substitution = False
         self.alternate = False
@@ -496,8 +496,8 @@ class StringHarmonic(Bowing, Harmonic):
 
     >>> h.pitchType = 'base'
     '''
-    def __init__(self):
-        super().__init__()
+    def __init__(self, **keywords):
+        super().__init__(**keywords)
         self.harmonicType = 'natural'
         self.pitchType = None
 
@@ -518,8 +518,8 @@ class StringIndication(Bowing):
 
     If no argument to the constructor is specified, number defaults to 0.
     '''
-    def __init__(self, number=0):
-        super().__init__()
+    def __init__(self, number=0, **keywords):
+        super().__init__(**keywords)
         self.number = number
 
     def _reprInternal(self):
@@ -570,8 +570,8 @@ class FretIndication(TechnicalIndication):
 
     If no argument to the constructor is specified, number defaults to 0.
     '''
-    def __init__(self, number=0):
-        super().__init__()
+    def __init__(self, number=0, **keywords):
+        super().__init__(**keywords)
         self.number = number
 
     def _reprInternal(self):
@@ -629,8 +629,8 @@ class OrganIndication(TechnicalIndication):
     Has one attribute, "substitution" default to False, which
     indicates whether the mark is a substitution mark
     '''
-    def __init__(self):
-        super().__init__()
+    def __init__(self, **keywords):
+        super().__init__(**keywords)
         self.substitution = False
 
 

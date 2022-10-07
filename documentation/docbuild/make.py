@@ -91,6 +91,7 @@ class DocBuilder:
 
     def runSphinx(self):
         try:
+            # noinspection PyPackageRequirements
             import sphinx
         except ImportError:
             message = 'Sphinx is required to build documentation; '
