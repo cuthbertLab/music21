@@ -105,7 +105,7 @@ class Scale(base.Music21Object):
     '''
     Generic base class for all scales, both abstract and concrete.
 
-    >>> s = scale.Scale
+    >>> s = scale.Scale()
     >>> s.type
     'Scale'
     >>> s.name  # default same as type.

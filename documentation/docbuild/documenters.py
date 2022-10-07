@@ -274,7 +274,7 @@ class MethodDocumenter(MemberDocumenter):
         indent = ''
         if getattr(self.referent, '_isDeprecated', False):
             indent = '    '
-            result.append(f'.. cssclass:: strike')
+            result.append('.. cssclass:: strike')
             result.append('')
         result.append(f'{indent}.. automethod:: {self.referentPackageSystemPath}')
         result.append('')
