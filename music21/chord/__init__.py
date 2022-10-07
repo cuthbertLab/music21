@@ -2661,11 +2661,14 @@ class Chord(ChordBase):
     def isConsonant(self):
         # noinspection PyShadowingNames
         '''
-        returns True if the chord is
-             one pitch
-             two pitches: uses :meth:`~music21.interval.Interval.isConsonant()` , which
-             checks if interval is a major or minor third or sixth or perfect fifth.
-             three pitches: if chord is a major or minor triad not in second inversion.
+        Returns True if the chord is:
+
+        * one pitch (always consonant)
+
+        * two pitches: uses :meth:`~music21.interval.Interval.isConsonant()` , which
+             checks if the interval is a major or minor third or sixth or perfect fifth.
+
+        * three pitches: if chord is a major or minor triad not in second inversion.
 
         These rules define all common-practice consonances
         (and earlier back to about 1300 all imperfect consonances)
@@ -3564,7 +3567,7 @@ class Chord(ChordBase):
 
     def isSwissAugmentedSixth(self, *, permitAnyInversion=False):
         '''
-        Returns true is it is a respelled German augmented 6th chord with
+        Returns true if it is a respelled German augmented 6th chord with
         sharp 2 instead of flat 3.  This chord has many names,
         Swiss Augmented Sixth, Alsatian Chord, English A6, Norwegian, etc.
         as well as doubly-augmented sixth, which is a bit of a misnomer since

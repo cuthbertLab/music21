@@ -13,7 +13,7 @@
 Classes for representing and processing articulations.
 Specific articulations are modeled as :class:`~music21.articulations.Articulation` subclasses.
 
-A :class:`~music21.note.Note` object has a :attr:`~music21.note.Note.articulations` attribute.
+A :class:`~music21.note.Note` object has an :attr:`~music21.note.Note.articulations` attribute.
 This list can be used to store one or more :class:`music21.articulations.Articulation` subclasses.
 
 As much as possible, MusicXML names are used for Articulation classes,
