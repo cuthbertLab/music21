@@ -592,7 +592,7 @@ class GeneralNote(base.Music21Object):
         else:
             tempDuration = duration
         # this sets the stored duration defined in Music21Object
-        super().__init__(duration=tempDuration)
+        super().__init__(duration=tempDuration, **keywords)
 
         self.lyrics: list[Lyric] = []  # a list of lyric objects
         self.expressions: list[expressions.Expression] = []

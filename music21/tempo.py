@@ -131,8 +131,8 @@ class TempoIndication(base.Music21Object):
     classSortOrder = 1
     _styleClass = style.TextStyle
 
-    # def __init__(self):
-    #     super().__init__()
+    # def __init__(self, **keywords):
+    #     super().__init__(**keywords)
     #     # self.style.justify = 'left'  # creates a style object to share.
 
     def getSoundingMetronomeMark(self, found=None):
@@ -184,8 +184,8 @@ class TempoText(TempoIndication):
     >>> print(tm.text)
     adagio
     '''
-    def __init__(self, text=None):
-        super().__init__()
+    def __init__(self, text=None, **keywords):
+        super().__init__(**keywords)
 
         # store text in a TextExpression instance
         self._textExpression = None  # a stored object
@@ -394,8 +394,8 @@ class MetronomeMark(TempoIndication):
             ''',
     }
 
-    def __init__(self, text=None, number=None, referent=None, parentheses=False):
-        super().__init__()
+    def __init__(self, text=None, number=None, referent=None, *, parentheses=False, **keywords):
+        super().__init__(**keywords)
 
         if number is None and isinstance(text, int):
             number = text
@@ -899,8 +899,8 @@ class MetricModulation(TempoIndication):
             Quarter=60>=<music21.tempo.MetronomeMark larghetto Eighth=60>>
     '''
 
-    def __init__(self):
-        super().__init__()
+    def __init__(self, **keywords):
+        super().__init__(**keywords)
 
         self.classicalStyle = False
         self.maintainBeat = False

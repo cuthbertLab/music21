@@ -53,8 +53,8 @@ class RepeatMark(prebase.ProtoM21Object):
 
 
     >>> class PartialRepeat(repeat.RepeatMark, base.Music21Object):
-    ...    def __init__(self):
-    ...        super().__init__()
+    ...    def __init__(self, **keywords):
+    ...        super().__init__(**keywords)
 
     >>> s = stream.Stream()
     >>> s.append(note.Note())
@@ -88,8 +88,8 @@ class RepeatExpression(RepeatMark, expressions.Expression):
     '''
     _styleClass = style.TextStyle
 
-    def __init__(self):
-        super().__init__()
+    def __init__(self, **keywords):
+        super().__init__(**keywords)
         # store a text version of this expression
         self._textExpression = None
         # store a lost of alternative text representations
@@ -182,8 +182,8 @@ class RepeatExpressionMarker(RepeatExpression):
     such as Coda, Segno, and Fine, which are subclassed below.
     '''
 
-    def __init__(self):
-        super().__init__()
+    def __init__(self, **keywords):
+        super().__init__(**keywords)
         # these are generally centered
         self.style.justify = 'center'
 
@@ -196,8 +196,8 @@ class Coda(RepeatExpressionMarker):
     '''
     # note that only Coda and Segno have non-text expression forms
 
-    def __init__(self, text=None):
-        super().__init__()
+    def __init__(self, text=None, **keywords):
+        super().__init__(**keywords)
         # default text expression is coda
         self.style.justify = 'center'
 
@@ -220,8 +220,8 @@ class Segno(RepeatExpressionMarker):
     '''
     # note that only Coda and Segno have non-text expression forms
 
-    def __init__(self):
-        super().__init__()
+    def __init__(self, **keywords):
+        super().__init__(**keywords)
         # default text expression is coda
         self._textAlternatives = ['Segno']
         self.setText(self._textAlternatives[0])
@@ -235,8 +235,8 @@ class Fine(RepeatExpressionMarker):
     >>> rm = repeat.Fine()
     '''
 
-    def __init__(self):
-        super().__init__()
+    def __init__(self, **keywords):
+        super().__init__(**keywords)
         # default text expression is coda
         self._textAlternatives = ['fine']
         self.setText(self._textAlternatives[0])
@@ -249,8 +249,8 @@ class RepeatExpressionCommand(RepeatExpression):
     the reader to go somewhere else. DaCapo and
     related are examples.
     '''
-    def __init__(self):
-        super().__init__()
+    def __init__(self, **keywords):
+        super().__init__(**keywords)
         # whether any internal repeats encountered within a jumped region are also repeated.
         self.repeatAfterJump = False
         # generally these should be right aligned, as they are placed
@@ -265,8 +265,8 @@ class DaCapo(RepeatExpressionCommand):
     `repeatAfterJump` is False, indicating that any repeats
     encountered on the Da Capo repeat not be repeated.
     '''
-    def __init__(self, text=None):
-        super().__init__()
+    def __init__(self, text=None, **keywords):
+        super().__init__(**keywords)
         # default text expression is coda
         self._textAlternatives = ['Da Capo', 'D.C.']
         if text is not None and self.isValidText(text):
@@ -286,8 +286,8 @@ class DaCapoAlFine(RepeatExpressionCommand):
 
     >>> rm = repeat.DaCapoAlFine()
     '''
-    def __init__(self, text=None):
-        super().__init__()
+    def __init__(self, text=None, **keywords):
+        super().__init__(**keywords)
         # default text expression is coda
         self._textAlternatives = ['Da Capo al fine', 'D.C. al fine']
         if text is not None and self.isValidText(text):
@@ -310,8 +310,8 @@ class DaCapoAlCoda(RepeatExpressionCommand):
     >>> rm = repeat.DaCapoAlCoda()
     '''
 
-    def __init__(self, text=None):
-        super().__init__()
+    def __init__(self, text=None, **keywords):
+        super().__init__(**keywords)
 
         self._textAlternatives = ['Da Capo al Coda', 'D.C. al Coda']
         if text is not None and self.isValidText(text):
@@ -326,8 +326,8 @@ class AlSegno(RepeatExpressionCommand):
 
     >>> rm = repeat.AlSegno()
     '''
-    def __init__(self, text=None):
-        super().__init__()
+    def __init__(self, text=None, **keywords):
+        super().__init__(**keywords)
         self._textAlternatives = ['al Segno']
         if text is not None and self.isValidText(text):
             self.setText(text)
@@ -344,8 +344,8 @@ class DalSegno(RepeatExpressionCommand):
 
     >>> rm = repeat.DaCapoAlFine()
     '''
-    def __init__(self, text=None):
-        super().__init__()
+    def __init__(self, text=None, **keywords):
+        super().__init__(**keywords)
         self._textAlternatives = ['Dal Segno', 'D.S.']
         if text is not None and self.isValidText(text):
             self.setText(text)
@@ -363,8 +363,8 @@ class DalSegnoAlFine(RepeatExpressionCommand):
 
     >>> rm = repeat.DaCapoAlFine()
     '''
-    def __init__(self, text=None):
-        super().__init__()
+    def __init__(self, text=None, **keywords):
+        super().__init__(**keywords)
         self._textAlternatives = ['Dal Segno al fine', 'D.S. al fine']
         if text is not None and self.isValidText(text):
             self.setText(text)
@@ -383,8 +383,8 @@ class DalSegnoAlCoda(RepeatExpressionCommand):
 
     >>> rm = repeat.DaCapoAlCoda()
     '''
-    def __init__(self, text=None):
-        super().__init__()
+    def __init__(self, text=None, **keywords):
+        super().__init__(**keywords)
         self._textAlternatives = ['Dal Segno al Coda', 'D.S. al Coda']
         if text is not None and self.isValidText(text):
             self.setText(text)

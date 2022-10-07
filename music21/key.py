@@ -342,8 +342,8 @@ class KeySignature(base.Music21Object):
 
     classSortOrder = 2
 
-    def __init__(self, sharps: int | None = 0):
-        super().__init__()
+    def __init__(self, sharps: int | None = 0, **keywords):
+        super().__init__(**keywords)
         # position on the circle of fifths, where 1 is one sharp, -1 is one flat
 
         try:
@@ -943,7 +943,8 @@ class Key(KeySignature, scale.DiatonicScale):
 
     def __init__(self,
                  tonic: str | pitch.Pitch | note.Note = 'C',
-                 mode=None):
+                 mode=None,
+                 **keywords):
         if isinstance(tonic, (note.Note, pitch.Pitch)):
             tonicStr = tonic.name
         else:
@@ -973,8 +974,8 @@ class Key(KeySignature, scale.DiatonicScale):
         else:
             tonicPitch = pitch.Pitch(tonicStr)
 
-        KeySignature.__init__(self, sharps)
-        scale.DiatonicScale.__init__(self, tonic=tonicPitch)
+        KeySignature.__init__(self, sharps, **keywords)
+        scale.DiatonicScale.__init__(self, tonic=tonicPitch, **keywords)
 
         self.tonic = tonicPitch
         self.type: str = mode
