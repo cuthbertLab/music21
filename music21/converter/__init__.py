@@ -1320,7 +1320,7 @@ def parse(value: bundles.MetadataEntry | bytes | str | pathlib.Path,
         # all else, including MidiBytes
         return parseData(value, number=number, format=format, **keywords)
 
-def toData(obj: base.Music21Object, fmt: str, **keywords) -> t.AnyStr:
+def toData(obj: base.Music21Object, fmt: str, **keywords) -> str | bytes:
     '''
     Convert `obj` to the given format `fmt` and return the information retrieved.
 

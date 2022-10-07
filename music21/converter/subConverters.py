@@ -335,7 +335,7 @@ class SubConverter:
         fmt: str | None,
         subformats: Iterable[str] = (),
         **keywords,
-    ) -> t.AnyStr:
+    ) -> str | bytes:
         '''
         Write the object out in the given format and then read it back in
         and return the object (str or bytes) returned.

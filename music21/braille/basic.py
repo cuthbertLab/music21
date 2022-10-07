@@ -9,7 +9,7 @@
 # Copyright:    Copyright © 2011-22 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
-'''
+r'''
 Basic tools for working with Braille in `music21`.  Most users will not need to
 use these.  Simply call `.show('braille')` or `.show('braille.ascii')`
 
