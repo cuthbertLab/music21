@@ -329,6 +329,31 @@ class SubConverter:
             fp.close()
             return pathlib.Path('')
 
+    def toData(
+        self,
+        obj,
+        fmt: str | None,
+        subformats: Iterable[str] = (),
+        **keywords,
+    ) -> str | bytes:
+        '''
+        Write the object out in the given format and then read it back in
+        and return the object (str or bytes) returned.
+        '''
+        fp = self.write(obj, fmt=fmt, subformats=subformats, **keywords)
+        if self.readBinary is False:
+            readFlags = 'r'
+        else:
+            readFlags = 'rb'
+        with open(fp,
+                  mode=readFlags,
+                  encoding=self.stringEncoding if self.codecWrite else None
+                  ) as f:
+            out = f.read()
+        fp.unlink(missing_ok=True)
+        return out
+
+
 class ConverterIPython(SubConverter):
     '''
     Meta-subconverter for displaying image data in a Notebook
@@ -547,7 +572,14 @@ class ConverterBraille(SubConverter):
     registerOutputExtensions = ('txt',)
     codecWrite = True
 
-    def show(self, obj, fmt, app=None, subformats=(), **keywords):  # pragma: no cover
+    def show(
+        self,
+        obj,
+        fmt,
+        app=None,
+        subformats=(),
+        **keywords
+    ):  # pragma: no cover
         if not common.runningUnderIPython():
             super().show(obj, fmt, app=None, subformats=subformats, **keywords)
         else:
@@ -555,10 +587,17 @@ class ConverterBraille(SubConverter):
             dataStr = braille.translate.objectToBraille(obj)
             print(dataStr)
 
-    def write(self, obj, fmt, fp=None, subformats=(), **keywords):  # pragma: no cover
+    def write(
+        self,
+        obj,
+        fmt,
+        fp=None,
+        subformats=(),
+        **keywords
+    ):  # pragma: no cover
         from music21 import braille
         dataStr = braille.translate.objectToBraille(obj, **keywords)
-        if subformats is not None and 'ascii' in subformats:
+        if 'ascii' in subformats:
             dataStr = braille.basic.brailleUnicodeToBrailleAscii(dataStr)
         fp = self.writeDataStream(fp, dataStr)
         return fp
@@ -1770,8 +1809,6 @@ class TestExternal(unittest.TestCase):
 
 if __name__ == '__main__':
     import music21
-    # import sys
-    # sys.argv.append('SimpleTextShow')
     music21.mainTest(Test)
     # run command below to test commands that open musescore, etc.
     # music21.mainTest(TestExternal)

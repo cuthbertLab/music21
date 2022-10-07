@@ -9,6 +9,35 @@
 # Copyright:    Copyright © 2011-22 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
+r'''
+Basic tools for working with Braille in `music21`.  Most users will not need to
+use these.  Simply call `.show('braille')` or `.show('braille.ascii')`
+
+>>> soprano = corpus.parse('bwv66.6').parts[0]
+>>> #_DOCS_SHOW soprano.show('braille.ascii')
+>>> print(converter.toData(soprano, 'braille.ascii'))  # _DOCS_HIDE
+                     %%%.C
+    #J .DJ [W?<L$ ?W[<L? IJ\]<L[ WW]$ [W?<L?
+      "[W?[ \]R<L Q]]@C ]G%F]<L<K
+
+Normally this would open up in a new window.  But to store the data, use
+`converter.toData(..., 'braille')`.  Here we show this in Unicode braille
+(the default for format braille)
+
+>>> data = converter.toData(soprano, 'braille')
+>>> print(data)
+    ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠩⠩⠩⠨⠉⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+    ⠼⠚⠀⠨⠙⠚⠀⠪⠺⠹⠣⠇⠫⠀⠹⠺⠪⠣⠇⠹⠀⠊⠚⠳⠻⠣⠇⠪⠀⠺⠺⠻⠫⠀⠪⠺⠹⠣⠇⠹
+    ⠀⠀⠐⠪⠺⠹⠪⠀⠳⠻⠗⠣⠇⠀⠟⠻⠻⠈⠉⠀⠻⠛⠩⠋⠻⠣⠇⠣⠅
+
+Any :class:`~music21.base.Music21Object` which cannot be transcribed in
+:mod:`~music21.braille.basic` returns a braille literary question mark
+and outputs a warning to the console, rather than raising an exception.
+This is so that a transcription of a :class:`~music21.stream.Stream` in
+:class:`~music21.braille.translate` is completed as thoroughly as possible.
+'''
+
+
 from __future__ import annotations
 
 import typing as t
@@ -51,15 +80,6 @@ TEMPORARY_ATTRIBUTES = ['beginLongBracketSlur',
 
 # ------------------------------------------------------------------------------
 # music21Object to braille unicode methods
-
-# noinspection PyStatementEffect
-'''
-Any :class:`~music21.base.Music21Object` which cannot be transcribed in
-:mod:`~music21.braille.basic` returns a braille literary question mark
-and outputs a warning to the console, rather than raising an exception.
-This is so that a transcription of a :class:`~music21.stream.Stream` in
-:class:`~music21.braille.translate` is completed as thoroughly as possible.
-'''
 
 def barlineToBraille(music21Barline):
     r'''
@@ -1449,17 +1469,15 @@ def brailleUnicodeToBrailleAscii(brailleUnicode):
     translates a braille UTF-8 unicode string into braille ASCII,
     which is the format compatible with most braille embossers.
 
-
     .. note:: The function works by corresponding braille symbols to ASCII symbols.
         The table which corresponds to said values can be found
         `here <https://en.wikipedia.org/wiki/Braille_ASCII#Braille_ASCII_values>`_.
         Because of the way in which the braille symbols translate, the resulting
         ASCII string will look to a non-reader as gibberish. Also, the eighth-note notes
-        in braille
-        music are one-off their corresponding letters in both ASCII and written braille.
+        in braille music are one-off their corresponding letters
+        in both ASCII and written braille.
         The written D is really a C eighth-note, the written E is really a
         D eighth note, etc.
-
 
     >>> from music21.braille.basic import brailleUnicodeToBrailleAscii, noteToBraille
     >>> brailleUnicodeToBrailleAscii('\u2800')
@@ -1621,6 +1639,9 @@ def wordToBraille(sampleWord: str, isTextExpression=False) -> str:
                 add_letter(letter.lower())
             elif letter == '.':
                 wordTrans.append(symbols['dot'])
+            elif letter == 'ß':
+                add_letter('s')
+                add_letter('s')
             else:
                 try:
                     add_letter(letter)
@@ -1646,6 +1667,9 @@ def wordToBraille(sampleWord: str, isTextExpression=False) -> str:
                 add_letter(letter.lower())
             elif letter.isdigit():
                 wordTrans.append(lookup.numbersUpper[int(letter)])
+            elif letter == 'ß':
+                add_letter('s')
+                add_letter('s')
             else:
                 add_letter(letter)
 

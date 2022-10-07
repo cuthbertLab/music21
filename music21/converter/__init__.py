@@ -63,6 +63,10 @@ from music21 import stream
 from music21.metadata import bundles
 
 
+if t.TYPE_CHECKING:
+    from music21 import base
+
+
 __all__ = [
     'subConverters', 'ArchiveManagerException', 'PickleFilterException',
     'ConverterException', 'ConverterFileException',
@@ -1315,6 +1319,41 @@ def parse(value: bundles.MetadataEntry | bytes | str | pathlib.Path,
     else:
         # all else, including MidiBytes
         return parseData(value, number=number, format=format, **keywords)
+
+def toData(obj: base.Music21Object, fmt: str, **keywords) -> str | bytes:
+    '''
+    Convert `obj` to the given format `fmt` and return the information retrieved.
+
+    Currently, this is somewhat inefficient: it calls Subconverter.toData which
+    calls `write()` on the object and reads back the value of the file.
+
+    >>> tiny = converter.parse('tinyNotation: 4/4 C4 D E F G1')
+    >>> data = converter.toData(tiny, 'braille.ascii')
+    >>> type(data)
+    <class 'str'>
+    >>> print(data)
+        #D4
+    #A _?:$] (<K
+    '''
+    if fmt.startswith('.'):
+        fmt = fmt[1:]
+    regularizedConverterFormat, unused_ext = common.findFormat(fmt)
+    if regularizedConverterFormat is None:
+        raise ConverterException(f'cannot support output in this format yet: {fmt}')
+
+    formatSubs = fmt.split('.')
+    fmt = formatSubs[0]
+    subformats = formatSubs[1:]
+
+    scClass = common.findSubConverterForFormat(regularizedConverterFormat)
+    if scClass is None:  # pragma: no cover
+        raise ConverterException(f'cannot support output in this format yet: {fmt}')
+    formatWriter = scClass()
+    return formatWriter.toData(
+        obj,
+        fmt=regularizedConverterFormat,
+        subformats=subformats,
+        **keywords)
 
 
 def freeze(streamObj, fmt=None, fp=None, fastButUnsafe=False, zipType='zlib') -> pathlib.Path:
