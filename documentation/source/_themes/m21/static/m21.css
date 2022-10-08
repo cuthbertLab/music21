@@ -9,7 +9,7 @@
 body {
     font-family: 'Bitter', serif;
     font-size: 15px;
-    line-height: 150%;
+    line-height: 160%;
     text-align: center;
     color: #2b3600;
     padding: 0;
@@ -124,7 +124,7 @@ div.sphinxsidebar h3, div.sphinxsidebar h4 {
     font-size: 1em;
     padding: 0.7em;
     color: white;
-    background-color: #7a4f5a;
+    background-color: #7a4f6d;
     border-radius: 8px;
     }
 
@@ -169,7 +169,7 @@ p {
     }
 
 div.body a, div.sphinxsidebarwrapper a {
-    color: #b73862;
+    color: #704c97;
     /* color: #268bd2; */
     text-decoration: none;
     }
@@ -288,7 +288,7 @@ hr {
 
 .highlight {
     border-radius: 8px;
-    background-color: #fff4fa;
+    background-color: #ededed;
     }
 
 div.ipython-result div.highlight {
@@ -434,9 +434,6 @@ div.viewcode-block:target {
     letter-spacing: 0.015em;
     line-height: 120%;
     padding: 0.7em;
-    white-space: pre-wrap;
-    white-space: -moz-pre-wrap;
-    white-space: -o-pre-wrap;
     word-wrap: break-word;
     }
 
@@ -487,7 +484,7 @@ dt em.sig-param .w + .o {
 /* When linked from somewhere else */
 dt:target, span.highlighted {
     /* yellow was too obnoxious */
-    background-color: #F3C693;
+    background-color: #ffeedb;
 }
 
 /* To have blue background of width of the block (instead of width of content) */
