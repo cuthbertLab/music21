@@ -19,6 +19,7 @@ from __future__ import annotations
 import copy
 import unittest
 
+from music21 import common
 from music21 import environment
 from music21 import exceptions21
 from music21 import metadata
@@ -1094,7 +1095,7 @@ class Iterator:
         '''
         self._currentIndex = None
         self._highestIndex = None
-        self._titleList = None
+        self._titleList = []
         self._numberList = None
         self._numberingSystem = None
         self._returnType = 'stream'
@@ -1243,7 +1244,7 @@ class Iterator:
             raise BachException('Cannot parse Chorales because no .numberingSystem set.')
 
         if self.numberingSystem == 'title':
-            if self._titleList is None:
+            if not self._titleList:
                 raise BachException('Cannot parse Chorales because no titles to parse.')
             title = self.titleList[choraleIndex]
             filename = 'bach/bwv' + str(self._choraleList2.byTitle[title]['bwv'])
@@ -1354,7 +1355,7 @@ class Iterator:
         if self._numberingSystem == 'title':
             self._numberList = None
             self.currentNumber = 0
-            if self._titleList is None:
+            if not self._titleList:
                 self.highestNumber = 0
             else:
                 self.highestNumber = len(self.titleList) - 1
@@ -1407,7 +1408,7 @@ class Iterator:
             self._initializeNumberList()
         elif value == 'title':
             self._numberingSystem = 'title'
-            self._setTitleList()
+            self.titleList = []
         else:
             raise BachException(f'{value} is not a valid numbering system for Bach Chorales.')
 
@@ -1431,18 +1432,12 @@ class Iterator:
         A list of titles to iterate over
         if `.numberingSystem` is set to 'title'.
         '''
-        if self._titleList is None:
-            return []
-        else:
-            return self._titleList
+        return self._titleList
 
     @titleList.setter
-    def titleList(self, value=None):
-        if value is None:
-            self._titleList = None
-            value = []
-        elif not isinstance(value, list):
-            raise BachException(f'{value} is not and must be a list.')
+    def titleList(self, value):
+        if not common.isIterable(value):
+            raise BachException(f'{value!r} must be a list.')
         else:
             self._titleList = []
             for v in value:
@@ -1450,9 +1445,6 @@ class Iterator:
                     self._titleList.append(v)
                 else:
                     print(f'{v} will be skipped because it is not a recognized title')
-        if not self._titleList:
-            self._titleList = None
-
         self._initializeNumberList()
 
     # - Number List
@@ -1474,7 +1466,7 @@ class Iterator:
     @numberList.setter
     def numberList(self, value):
         if not isinstance(value, list):
-            raise BachException(f'{value} is not and must be a list.')
+            raise BachException(f'{value!r} must be a list.')
         if self._numberingSystem == 'title':
             self._numberList = None
             raise BachException("Cannot set numberList when .numberingSystem == 'title'")
@@ -1566,7 +1558,7 @@ class Iterator:
             raise Exception('Numbering System is not set.')
         if self._iterationType == 'number':
             if self._numberingSystem == 'title':
-                if self._titleList is None:
+                if not self._titleList:
                     self._currentIndex = 0
                     return
                 else:
@@ -1597,7 +1589,7 @@ class Iterator:
 
         elif self._iterationType == 'index':
             if self._numberingSystem == 'title':
-                if self._titleList is None:
+                if not self._titleList:
                     self._currentIndex = 0
                     return
                 else:
@@ -1651,7 +1643,7 @@ class Iterator:
             raise Exception('Numbering System is not set.')
         if self.iterationType == 'number':
             if self._numberingSystem == 'title':
-                if self._titleList is None:
+                if not self._titleList:
                     self._highestIndex = 0
                     return
                 else:
@@ -1683,7 +1675,7 @@ class Iterator:
 
         elif self.iterationType == 'index':
             if self._numberingSystem == 'title':
-                if self._titleList is None:
+                if not self._titleList:
                     self._highestIndex = 0
                     return
                 else:
