@@ -1007,7 +1007,7 @@ class Iterator:
     >>> BCI.titleList = ['Jesu, meine Freude',
     ...                  'Gott hat das Evangelium',
     ...                  'Not a Chorale']
-    Not a Chorale will be skipped because it is not a recognized title
+    'Not a Chorale' will be skipped because it is not a recognized title.
 
     >>> for chorale in BCI:
     ...    print(chorale)
@@ -1095,7 +1095,7 @@ class Iterator:
         '''
         self._currentIndex = None
         self._highestIndex = None
-        self._titleList = []
+        self._titleList: list[str] = []
         self._numberList = None
         self._numberingSystem = None
         self._returnType = 'stream'
@@ -1427,7 +1427,7 @@ class Iterator:
     # - Title List
 
     @property
-    def titleList(self):
+    def titleList(self) -> list[str]:
         '''
         A list of titles to iterate over
         if `.numberingSystem` is set to 'title'.
@@ -1435,16 +1435,15 @@ class Iterator:
         return self._titleList
 
     @titleList.setter
-    def titleList(self, value):
+    def titleList(self, value: list[str]):
         if not common.isIterable(value):
             raise BachException(f'{value!r} must be a list.')
-        else:
-            self._titleList = []
-            for v in value:
-                if v in self._choraleList2.byTitle:
-                    self._titleList.append(v)
-                else:
-                    print(f'{v} will be skipped because it is not a recognized title')
+        self._titleList = []
+        for v in value:
+            if v in self._choraleList2.byTitle:
+                self._titleList.append(v)
+            else:
+                print(f'{v!r} will be skipped because it is not a recognized title.')
         self._initializeNumberList()
 
     # - Number List
