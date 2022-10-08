@@ -272,12 +272,14 @@ class Dialog:
         self._platforms = ['win', 'darwin', 'nix']
 
     def _writeToUser(self, msg):
-        '''Write output to user. Call module-level function
+        '''
+        Write output to user. Call module-level function
         '''
         writeToUser(msg)
 
     def _readFromUser(self):
-        '''Collect from user; return None if an empty response.
+        '''
+        Collect from user; return None if an empty response.
         '''
         # noinspection PyBroadException
         try:
@@ -290,8 +292,8 @@ class Dialog:
             return DialogError()
 
     def prependPromptHeader(self, msg):
-        '''Add a message to the front of the stored prompt header.
-
+        '''
+        Add a message to the front of the stored prompt header.
 
         >>> d = configure.Dialog()
         >>> d.prependPromptHeader('test')
@@ -354,7 +356,8 @@ class Dialog:
             return post
 
     def _rawQueryPrepareHeader(self, msg=''):
-        '''Prepare the header, given a string.
+        '''
+        Prepare the header, given a string.
 
         >>> from music21 import configure
         >>> d = configure.Dialog()
@@ -381,7 +384,8 @@ class Dialog:
         return msg
 
     def _rawQueryPrepareFooter(self, msg=''):
-        '''Prepare the end of the query message
+        '''
+        Prepare the end of the query message
         '''
         if self._default is not None:
             msg = msg.strip()
@@ -397,12 +401,14 @@ class Dialog:
         return msg
 
     def _rawIntroduction(self):
-        '''Return a multiline presentation of an introduction.
+        '''
+        Return a multiline presentation of an introduction.
         '''
         return None
 
     def _rawQuery(self):
-        '''Return a multiline presentation of the question.
+        '''
+        Return a multiline presentation of the question.
         '''
         pass
 
@@ -719,7 +725,8 @@ class AskOpenInBrowser(YesOrNo):
             self.appendPromptHeader(msg)
 
     def _performAction(self, simulate=False):
-        '''The action here is to open the stored URL in a browser, if the user agrees.
+        '''
+        The action here is to open the stored URL in a browser, if the user agrees.
         '''
         result = self.getResult()
         if result is True:
@@ -825,7 +832,8 @@ class SelectFromList(Dialog):
             return []
 
     def _formatResultForUser(self, result):
-        '''Reduce each complete file path to stub, or otherwise compact display
+        '''
+        Reduce each complete file path to stub, or otherwise compact display
         '''
         return result
 
@@ -959,7 +967,8 @@ class AskAutoDownload(SelectFromList):
         super().__init__(default=default, tryAgain=tryAgain, promptHeader=promptHeader)
 
     def _rawIntroduction(self):
-        '''Return a multiline presentation of an introduction.
+        '''
+        Return a multiline presentation of an introduction.
         '''
         return ['The BSD-licensed music21 software is distributed with a corpus of encoded '
                 'compositions which are distributed with the permission of the encoders '
@@ -987,7 +996,8 @@ class AskAutoDownload(SelectFromList):
                 ]
 
     def _getValidResults(self, force=None):
-        '''Just return number options
+        '''
+        Just return number options
         '''
         if force is not None:
             return force
@@ -1000,7 +1010,8 @@ class AskAutoDownload(SelectFromList):
             ]
 
     def _evaluateUserInput(self, raw):
-        '''Evaluate the user's string entry after parsing; do not return None:
+        '''
+        Evaluate the user's string entry after parsing; do not return None:
         either return a valid response, default if available, IncompleteInput, NoInput objects.
         '''
         rawParsed = self._parseUserInput(raw)

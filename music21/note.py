@@ -2045,7 +2045,8 @@ class TestExternal(unittest.TestCase):
     show = True
 
     def testSingle(self):
-        '''Need to test direct meter creation w/o stream
+        '''
+        Need to test direct note creation w/o stream
         '''
         from music21 import note
         a = note.Note('D-3')

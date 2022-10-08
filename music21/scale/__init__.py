@@ -128,7 +128,8 @@ class Scale(base.Music21Object):
 
     @property
     def isConcrete(self):
-        '''To be concrete, a Scale must have a defined tonic.
+        '''
+        To be concrete, a Scale must have a defined tonic.
         An abstract Scale is not Concrete, nor is a Concrete scale
         without a defined tonic.  Thus, is always false.
         '''
@@ -431,7 +432,8 @@ class AbstractScale(Scale):
         return self._net.degreeMaxUnique
 
     # def reverse(self):
-    #     '''Reverse all intervals in this scale.
+    #     '''
+    #     Reverse all intervals in this scale.
     #     '''
     #     pass
 
@@ -1641,8 +1643,9 @@ class ConcreteScale(Scale):
 
     # this needs to stay separate from getPitches; both are needed
     pitches = property(getPitches,
-                       doc='''Get a default pitch list from this scale.
-        ''')
+                       doc='''
+                           Get a default pitch list from this scale.
+                           ''')
 
     def getChord(
         self,
@@ -2707,7 +2710,8 @@ class DiatonicScale(ConcreteScale):
 # ------------------------------------------------------------------------------
 # diatonic scales and modes
 class MajorScale(DiatonicScale):
-    '''A Major Scale
+    '''
+    A Major Scale
 
     >>> sc = scale.MajorScale(pitch.Pitch('d'))
     >>> sc.pitchFromDegree(7).name
@@ -2725,7 +2729,8 @@ class MajorScale(DiatonicScale):
 
 
 class MinorScale(DiatonicScale):
-    '''A natural minor scale, or the Aeolian mode.
+    '''
+    A natural minor scale, or the Aeolian mode.
 
     >>> sc = scale.MinorScale(pitch.Pitch('g'))
     >>> [str(p) for p in sc.pitches]
@@ -2754,7 +2759,8 @@ class DorianScale(DiatonicScale):
 
 
 class PhrygianScale(DiatonicScale):
-    '''A Phrygian scale (E-E white key)
+    '''
+    A Phrygian scale (E-E white key)
 
     >>> sc = scale.PhrygianScale(pitch.Pitch('e'))
     >>> [str(p) for p in sc.pitches]
@@ -2788,7 +2794,8 @@ class LydianScale(DiatonicScale):
 
 
 class MixolydianScale(DiatonicScale):
-    '''A mixolydian scale
+    '''
+    A mixolydian scale
 
     >>> sc = scale.MixolydianScale(pitch.Pitch('g'))
     >>> [str(p) for p in sc.pitches]
@@ -2824,7 +2831,8 @@ class HypodorianScale(DiatonicScale):
 
 
 class HypophrygianScale(DiatonicScale):
-    '''A hypophrygian scale
+    '''
+    A hypophrygian scale
 
     >>> sc = scale.HypophrygianScale(pitch.Pitch('e'))
     >>> sc.abstract.octaveDuplicating
@@ -2845,7 +2853,8 @@ class HypophrygianScale(DiatonicScale):
 
 
 class HypolydianScale(DiatonicScale):
-    '''A hypolydian scale
+    '''
+    A hypolydian scale
 
     >>> sc = scale.HypolydianScale(pitch.Pitch('f'))
     >>> [str(p) for p in sc.pitches]
@@ -2861,7 +2870,8 @@ class HypolydianScale(DiatonicScale):
 
 
 class HypomixolydianScale(DiatonicScale):
-    '''A hypomixolydian scale
+    '''
+    A hypomixolydian scale
 
     >>> sc = scale.HypomixolydianScale(pitch.Pitch('g'))
     >>> [str(p) for p in sc.pitches]
@@ -2877,7 +2887,8 @@ class HypomixolydianScale(DiatonicScale):
 
 
 class LocrianScale(DiatonicScale):
-    '''A so-called "locrian" scale
+    '''
+    A so-called "locrian" scale
 
     >>> sc = scale.LocrianScale(pitch.Pitch('b'))
     >>> [str(p) for p in sc.pitches]
@@ -2895,7 +2906,8 @@ class LocrianScale(DiatonicScale):
 
 
 class HypolocrianScale(DiatonicScale):
-    '''A hypolocrian scale
+    '''
+    A hypolocrian scale
 
     >>> sc = scale.HypolocrianScale(pitch.Pitch('b'))
     >>> [str(p) for p in sc.pitches]
@@ -2913,7 +2925,8 @@ class HypolocrianScale(DiatonicScale):
 
 
 class HypoaeolianScale(DiatonicScale):
-    '''A hypoaeolian scale
+    '''
+    A hypoaeolian scale
 
     >>> sc = scale.HypoaeolianScale(pitch.Pitch('a'))
     >>> [str(p) for p in sc.pitches]
@@ -3105,8 +3118,8 @@ class ChromaticScale(ConcreteScale):
 
 
 class WholeToneScale(ConcreteScale):
-    '''A concrete whole-tone scale.
-
+    '''
+    A concrete whole-tone scale.
 
     >>> sc = scale.WholeToneScale('g2')
     >>> [str(p) for p in sc.pitches]

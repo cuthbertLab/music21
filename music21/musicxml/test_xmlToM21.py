@@ -348,7 +348,9 @@ class Test(unittest.TestCase):
         # s.show()
 
     def testImportMetronomeMarksC(self):
-        '''Import tempo into only the first PartStaff'''
+        '''
+        Import tempo into only the first PartStaff
+        '''
         from music21 import corpus
         s = corpus.parse('demos/two-parts')
         self.assertEqual(len(s.parts.first()[tempo.MetronomeMark]), 1)

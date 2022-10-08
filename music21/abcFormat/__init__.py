@@ -1243,7 +1243,8 @@ class ABCBrokenRhythmMarker(ABCToken):
         self.data: str | None = None
 
     def preParse(self):
-        '''Called before context adjustments: need to have access to data
+        '''
+        Called before context adjustments: need to have access to data
 
         >>> brokenRhythm = abcFormat.ABCBrokenRhythmMarker('>>>')
         >>> brokenRhythm.preParse()

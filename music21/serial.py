@@ -1396,7 +1396,9 @@ class Test(unittest.TestCase):
         self.assertEqual(nonRows, [])
 
     def testExtractRowParts(self):
-        '''Was a problem in slices'''
+        '''
+        Was a problem in slices
+        '''
         aRow = getHistoricalRowByName('BergViolinConcerto')
         unused_aRow2 = aRow[0:3]
 

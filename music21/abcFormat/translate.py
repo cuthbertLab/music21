@@ -453,7 +453,8 @@ def abcToStreamScore(abcHandler, inputM21=None):
     return s
 
 def abcToStreamOpus(abcHandler, inputM21=None, number=None):
-    '''Convert a multi-work stream into one or more complete works packed into an Opus Stream.
+    '''
+    Convert a multi-work stream into one or more complete works packed into an Opus Stream.
 
     If a `number` argument is given, and a work is defined by
     that number, that work is returned.

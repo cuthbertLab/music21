@@ -1546,7 +1546,8 @@ class MidiFile(prebase.ProtoM21Object):
         self.file = open(filename, attrib)
 
     def openFileLike(self, fileLike):
-        '''Assign a file-like object, such as those provided by BytesIO, as an open file object.
+        '''
+        Assign a file-like object, such as those provided by BytesIO, as an open file object.
 
         >>> from io import BytesIO
         >>> fileLikeOpen = BytesIO()

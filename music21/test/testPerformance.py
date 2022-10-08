@@ -33,7 +33,8 @@ environLocal = environment.Environment('test.testPerformance')
 class Test(unittest.TestCase):
 
     def runStreamIterationByIterator(self):
-        '''Stream iteration by iterator
+        '''
+        Stream iteration by iterator
         '''
         from music21 import note
         from music21 import stream
@@ -51,7 +52,8 @@ class Test(unittest.TestCase):
                 pass
 
     def runStreamIterationByElements(self):
-        '''Stream iteration by .elements access
+        '''
+        Stream iteration by .elements access
         '''
         from music21 import note
         from music21 import stream
@@ -69,7 +71,8 @@ class Test(unittest.TestCase):
                 pass
 
     def runGetElementsByClassType(self):
-        '''Getting elements by class type
+        '''
+        Getting elements by class type
         '''
         from music21 import note
         from music21 import stream
@@ -88,7 +91,8 @@ class Test(unittest.TestCase):
             self.assertEqual(len(post), 1500)
 
     def runGetElementsByClassString(self):
-        '''Getting elements by string
+        '''
+        Getting elements by string
         '''
         from music21 import note
         from music21 import stream
@@ -107,12 +111,14 @@ class Test(unittest.TestCase):
             self.assertEqual(len(post), 1500)
 
     def runParseBeethoven(self):
-        '''Loading file: beethoven/opus59no2/movement3
+        '''
+        Loading file: beethoven/opus59no2/movement3
         '''
         junk = corpus.parse('beethoven/opus59no2/movement3', forceSource=True)
 
     def runMusicxmlOutPartsBeethoven(self):
-        '''Loading file and rendering musicxml output for each part: beethoven/opus59no2/movement3
+        '''
+        Loading file and rendering musicxml output for each part: beethoven/opus59no2/movement3
         '''
         x = corpus.parse('beethoven/opus59no2/movement3', forceSource=True)
         # problem: doing each part is much faster than the whole score
@@ -128,12 +134,14 @@ class Test(unittest.TestCase):
         junk = GEX().parse(x)
 
     def runParseHaydn(self):
-        '''Loading file: haydn/opus74no1/movement3
+        '''
+        Loading file: haydn/opus74no1/movement3
         '''
         junk = corpus.parse('haydn/opus74no1/movement3', forceSource=True)
 
     def runParseRobertSchumann(self):
-        '''Loading file: schumann_robert/opus41no1/movement2
+        '''
+        Loading file: schumann_robert/opus41no1/movement2
         '''
         junk = corpus.parse('schumann_robert/opus41no1/movement2', forceSource=True)
 
@@ -151,7 +159,8 @@ class Test(unittest.TestCase):
         junk = GEX().parse(x)
 
     def runCreateTimeSignatures(self):
-        '''Creating 500 TimeSignature objects
+        '''
+        Creating 500 TimeSignature objects
         '''
         from music21 import meter
         tsStr = ['4/4', '4/4', '4/4', '3/4', '3/4', '2/4', '2/4', '2/2',
@@ -186,12 +195,14 @@ class Test(unittest.TestCase):
             p.transpose('p5', inPlace=True)
 
     def runParseABC(self):
-        '''Creating loading a large multiple work abc file (han1)
+        '''
+        Creating loading a large multiple work abc file (han1)
         '''
         dummy = corpus.parse('essenFolksong/han1')
 
     def runGetElementsByContext(self):
-        '''Test getting elements by context from a Stream
+        '''
+        Test getting elements by context from a Stream
         '''
         from music21 import stream
         from music21 import clef
@@ -223,7 +234,8 @@ class Test(unittest.TestCase):
                     assert post is not None
 
     def runGetElementsByPrevious(self):
-        '''Test getting elements by using the previous method
+        '''
+        Test getting elements by using the previous method
         '''
         from music21 import stream
         from music21 import clef
@@ -255,7 +267,8 @@ class Test(unittest.TestCase):
                     assert post is not None
 
     def runParseMonteverdiRNText(self):
-        '''Loading file: beethoven/opus59no2/movement3
+        '''
+        Loading file: beethoven/opus59no2/movement3
         '''
         unused = corpus.parse('monteverdi/madrigal.5.3.rntxt', forceSource=True)
 

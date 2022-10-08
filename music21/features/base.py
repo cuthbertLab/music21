@@ -1650,7 +1650,8 @@ class Test(unittest.TestCase):
     # all these are written using orange-Py2 code; need better.
 
     # def xtestOrangeBayesA(self):  # pragma: no cover
-    #     '''Using an already created test file with a BayesLearner.
+    #     '''
+    #     Using an already created test file with a BayesLearner.
     #     '''
     #     import orange  # pylint: disable=import-error
     #     data = orange.ExampleTable(
@@ -1662,7 +1663,8 @@ class Test(unittest.TestCase):
 
 
     # def xtestClassifiersA(self):  # pragma: no cover
-    #     '''Using an already created test file with a BayesLearner.
+    #     '''
+    #     Using an already created test file with a BayesLearner.
     #     '''
     #     import orange, orngTree  # pylint: disable=import-error
     #     data1 = orange.ExampleTable(
@@ -1702,7 +1704,8 @@ class Test(unittest.TestCase):
 
 
     # def xtestClassifiersB(self):  # pragma: no cover
-    #     '''Using an already created test file with a BayesLearner.
+    #     '''
+    #     Using an already created test file with a BayesLearner.
     #     '''
     #     import orange, orngTree  # pylint: disable=import-error
     #     data1 = orange.ExampleTable(

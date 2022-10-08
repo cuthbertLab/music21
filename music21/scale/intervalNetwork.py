@@ -1091,7 +1091,8 @@ class IntervalNetwork:
             raise IntervalNetworkException(f'cannot filter by: {nodeId}')
 
     def getNext(self, nodeStart, direction):
-        '''Given a Node, get two lists, one of next Edges, and one of next Nodes,
+        '''
+        Given a Node, get two lists, one of next Edges, and one of next Nodes,
         searching all Edges to find all matches.
 
         There may be more than one possibility. If so, the caller must look
@@ -2030,8 +2031,8 @@ class IntervalNetwork:
         alteredDegrees=None,
         reverse=False,
     ) -> list[interval.Interval]:
-        '''Realize the sequence of intervals between the specified pitches, or the termini.
-
+        '''
+        Realize the sequence of intervals between the specified pitches, or the termini.
 
         >>> edgeList = ['M2', 'M2', 'm2', 'M2', 'M2', 'M2', 'm2']
         >>> net = scale.intervalNetwork.IntervalNetwork()

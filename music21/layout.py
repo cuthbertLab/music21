@@ -127,7 +127,8 @@ class LayoutBase(base.Music21Object):
 
 
 class ScoreLayout(LayoutBase):
-    '''Parameters for configuring a score's layout.
+    '''
+    Parameters for configuring a score's layout.
 
     PageLayout objects may be found on Measure or Part Streams.
 

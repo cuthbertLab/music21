@@ -1754,8 +1754,10 @@ class Choir(Vocalist):
 
 
 class Conductor(Instrument):
-    '''Presently used only for tracking the MIDI track containing tempo,
-    key signature, and related metadata.'''
+    '''
+    Presently used only for tracking the MIDI track containing tempo,
+    key signature, and related metadata.
+    '''
 
     def __init__(self, **keywords):
         super().__init__(instrumentName='Conductor', **keywords)

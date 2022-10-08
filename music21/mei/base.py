@@ -227,22 +227,30 @@ _IGNORE_UNPROCESSED = (
 # Exceptions
 # -----------------------------------------------------------------------------
 class MeiValidityError(exceptions21.Music21Exception):
-    '''When there is an otherwise-unspecified validity error that prevents parsing.'''
+    '''
+    When there is an otherwise-unspecified validity error that prevents parsing.
+    '''
     pass
 
 
 class MeiValueError(exceptions21.Music21Exception):
-    '''When an attribute has an invalid value.'''
+    '''
+    When an attribute has an invalid value.
+    '''
     pass
 
 
 class MeiAttributeError(exceptions21.Music21Exception):
-    '''When an element has an invalid attribute.'''
+    '''
+    When an element has an invalid attribute.
+    '''
     pass
 
 
 class MeiElementError(exceptions21.Music21Exception):
-    '''When an element itself is invalid.'''
+    '''
+    When an element itself is invalid.
+    '''
     pass
 
 
@@ -1178,7 +1186,9 @@ def addSlurs(elem, obj, slurBundle):
     addedSlur = False
 
     def wrapGetByIdLocal(theId):
-        '''Avoid crashing when getByIdLocl() doesn't find the slur'''
+        '''
+        Avoid crashing when getByIdLocl() doesn't find the slur
+        '''
         try:
             slurBundle.getByIdLocal(theId)[0].addSpannedElements(obj)
             return True

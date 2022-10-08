@@ -1008,7 +1008,8 @@ class MusicXMLImporter(XMLParserBase):
 
     def xmlCreditToTextBox(self, mxCredit):
         # noinspection PyShadowingNames
-        '''Convert a MusicXML credit to a music21 TextBox
+        '''
+        Convert a MusicXML credit to a music21 TextBox
 
         >>> import xml.etree.ElementTree as ET
         >>> credit = ET.fromstring(

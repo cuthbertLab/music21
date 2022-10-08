@@ -1866,7 +1866,8 @@ class ChordSymbol(Harmony):
         return False
 
     def _notationString(self):
-        '''returns NotationString of ChordSymbolObject which dictates which scale
+        '''
+        returns NotationString of ChordSymbolObject which dictates which scale
         degrees and how those scale degrees are altered in this chord.
 
         >>> h = harmony.ChordSymbol('F-dim7')

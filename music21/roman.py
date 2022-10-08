@@ -4184,7 +4184,9 @@ class Test(unittest.TestCase):
             self.assertEqual(rn.figure, rn_out.figure, f'{aug6}: {rn_out}')
 
     def testSetFigureAgain(self):
-        '''Setting the figure again doesn't double the alterations'''
+        '''
+        Setting the figure again doesn't double the alterations
+        '''
         ger = RomanNumeral('Ger7')
         pitches_before = ger.pitches
         ger.figure = 'Ger7'

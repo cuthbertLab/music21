@@ -42,18 +42,20 @@ class VirtualWork:
         # these probably should all be the same format
         self.urlList = []
 
-#     def _getDstFp(self, dir):
-#         '''Given a directory (usually the users scratch directory) create
-#         a file path based on the md5 of the works title. This means that all
-#         works must have unique titles in the virtual corpus.
-#         '''
-#         dir = pathlib.Path(dir)
-#         if dir is None:
-#             raise ValueError
-#         return dir / ('m21-' + common.getMd5(self.title) + '.p')
+    # def _getDstFp(self, dir):
+    #     '''
+    #     Given a directory (usually the users scratch directory) create
+    #     a file path based on the md5 of the works title. This means that all
+    #     works must have unique titles in the virtual corpus.
+    #     '''
+    #     dir = pathlib.Path(dir)
+    #     if dir is None:
+    #         raise ValueError
+    #     return dir / ('m21-' + common.getMd5(self.title) + '.p')
 
     def getUrlByExt(self, extList=None):
-        '''Given a request for an extension, find the best match for a URL from
+        '''
+        Given a request for an extension, find the best match for a URL from
         the list of known URLs. If ext is None, return the first URL.
         '''
         if not common.isListLike(extList):
@@ -192,7 +194,8 @@ class TestExternal(unittest.TestCase):
 class Test(unittest.TestCase):
 
     def testBasic(self):
-        '''Test copying all objects defined in the virtual corpus module
+        '''
+        Test instantiating all objects defined in the virtual corpus module
         '''
         a = BachBWV1007Prelude()
         self.assertNotEqual(a.getUrlByExt(['.xml']), [])

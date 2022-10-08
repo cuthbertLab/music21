@@ -204,7 +204,8 @@ def holdsType(usrData: t.Any, checkType: type[_T]) -> t.TypeGuard[Collection[_T]
 
 
 def classToClassStr(classObj: type) -> str:
-    '''Convert a class object to a class string.
+    '''
+    Convert a class object to a class string.
 
     >>> common.classToClassStr(note.Note)
     'Note'

@@ -112,7 +112,8 @@ class RepeatExpression(RepeatMark, expressions.Expression):
             return ''
 
     def getText(self):
-        '''Get the text used for this expression.
+        '''
+        Get the text used for this expression.
         '''
         return self._textExpression.content
 
@@ -140,7 +141,8 @@ class RepeatExpression(RepeatMark, expressions.Expression):
         return te
 
     def setTextExpression(self, value):
-        '''Directly set a TextExpression object.
+        '''
+        Directly set a TextExpression object.
         '''
         if not isinstance(value, expressions.TextExpression):
             raise RepeatExpressionException(
@@ -158,7 +160,8 @@ class RepeatExpression(RepeatMark, expressions.Expression):
             return copy.deepcopy(self._textExpression)
 
     def isValidText(self, value):
-        '''Return True or False if the supplied text could be used for this RepeatExpression.
+        '''
+        Return True or False if the supplied text could be used for this RepeatExpression.
         '''
         def stripText(s):
             # remove all spaces, punctuation, and make lower
@@ -229,8 +232,8 @@ class Segno(RepeatExpressionMarker):
 
 
 class Fine(RepeatExpressionMarker):
-    '''The fine word as placed in a score.
-
+    '''
+    The fine word as placed in a score.
 
     >>> rm = repeat.Fine()
     '''
@@ -994,12 +997,14 @@ class Expander:
             raise ExpanderException('no repeat command found')
 
     def _getRepeatExpressionCommand(self, streamObj):
-        '''Get the instance found in this stream; assumes that there is one.
+        '''
+        Get the instance found in this stream; assumes that there is one.
         '''
         return streamObj.flatten().getElementsByClass(RepeatExpressionCommand).first()
 
     def _daCapoIsCoherent(self):
-        '''Check of a DC statement is coherent.
+        '''
+        Check of a DC statement is coherent.
         '''
         # there can be only one da capo statement for the provided span
         sumDc = self._dcCount + self._dcafCount + self._dcacCount
@@ -1025,7 +1030,8 @@ class Expander:
         return False
 
     def _dalSegnoIsCoherent(self):
-        '''Check of a sa segno statement is coherent.
+        '''
+        Check of a sa segno statement is coherent.
         '''
         # there can be only one da segno statement for the provided span
         sumDs = (self._asCount
@@ -1148,7 +1154,8 @@ class Expander:
         return groups
 
     def _repeatBracketsAreCoherent(self):
-        '''Check if repeat brackets are coherent.
+        '''
+        Check if repeat brackets are coherent.
 
         This must be done for each group of brackets, not for the entire Stream.
         '''

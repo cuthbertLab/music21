@@ -59,7 +59,8 @@ def getMetadataCacheFilePath() -> pathlib.Path:
 
 
 def getCorpusFilePath() -> pathlib.Path:
-    r'''Get the stored music21 directory that contains the corpus metadata cache.
+    r'''
+    Get the stored music21 directory that contains the corpus metadata cache.
 
     >>> fp = common.getCorpusFilePath()
     >>> fp.name == 'corpus' and fp.parent.name == 'music21'

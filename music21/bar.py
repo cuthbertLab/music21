@@ -93,10 +93,10 @@ def standardizeBarType(value):
 
 # ------------------------------------------------------------------------------
 class Barline(base.Music21Object):
-    '''A representation of a barline.
+    '''
+    A representation of a barline.
     Barlines are conventionally assigned to Measure objects
     using the leftBarline and rightBarline attributes.
-
 
     >>> bl = bar.Barline('double')
     >>> bl

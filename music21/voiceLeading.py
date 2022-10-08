@@ -673,7 +673,8 @@ class VoiceLeadingQuartet(base.Music21Object):
                 and self.hIntervals[0].direction == interval.Direction.DESCENDING)
 
     def antiParallelMotion(self, simpleName=None) -> bool:
-        '''Returns True if the simple interval before is the same as the simple
+        '''
+        Returns True if the simple interval before is the same as the simple
         interval after and the motion is contrary. if simpleName is
         specified as an Interval object or a string then it only returns
         true if the simpleName of both intervals is the same as simpleName
@@ -1812,8 +1813,9 @@ class VerticalityNTuplet(base.Music21Object):
 
 
 class VerticalityTriplet(VerticalityNTuplet):
-    '''a collection of three Verticalities'''
-
+    '''
+    a collection of three Verticalities
+    '''
     def __init__(self, listOfVerticalities, **keywords):
         super().__init__(listOfVerticalities, **keywords)
 
@@ -1915,7 +1917,8 @@ class VerticalityTriplet(VerticalityNTuplet):
 
 
 class NNoteLinearSegment(base.Music21Object):
-    '''a list of n notes strung together in a sequence
+    '''
+    a list of n notes strung together in a sequence
     noteList = [note1, note2, note3, ..., note-n ] Once this
     object is created with a noteList, the noteList may not
     be changed

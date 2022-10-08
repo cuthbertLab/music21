@@ -524,7 +524,8 @@ def _greedyEnharmonicsSearch(oldPitches, scoreFunc=_dissonanceScore):
 
 
 def simplifyMultipleEnharmonics(pitches, criterion=_dissonanceScore, keyContext=None):
-    r'''Tries to simplify the enharmonic spelling of a list of pitches, pitch-
+    r'''
+    Tries to simplify the enharmonic spelling of a list of pitches, pitch-
     or pitch-class numbers according to a given criterion.
 
     A function can be passed as an argument to `criterion`, that is tried to be
@@ -1490,7 +1491,8 @@ class Accidental(prebase.ProtoM21Object, style.StyleMixin):
 
     @property
     def fullName(self):
-        '''Return the most complete representation of this Accidental.
+        '''
+        Return the most complete representation of this Accidental.
 
         >>> a = pitch.Accidental('double-flat')
         >>> a.fullName
@@ -2690,7 +2692,8 @@ class Pitch(prebase.ProtoM21Object):
 
     @property
     def unicodeName(self) -> str:
-        '''Name presently returns pitch name and accidental without octave.
+        '''
+        Name presently returns pitch name and accidental without octave.
 
         >>> a = pitch.Pitch('G#')
         >>> a.unicodeName

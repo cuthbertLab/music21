@@ -541,7 +541,8 @@ class TsvHandler:
         self.tsvData = self._importTsv()  # converted to private
 
     def _get_heading_indices(self, header_row: list[str]) -> None:
-        '''Private method to get column name/column index correspondences.
+        '''
+        Private method to get column name/column index correspondences.
 
         Expected column indices (those in HEADERS, which correspond to TabChord
         attributes) are stored in self._head_indices. Others go in
