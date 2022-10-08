@@ -2565,7 +2565,8 @@ class Test(unittest.TestCase):
 
 
     def testVariantGroupA(self):
-        '''Variant groups are used to distinguish
+        '''
+        Variant groups are used to distinguish
         '''
         v1 = Variant()
         v1.groups.append('alt-a')

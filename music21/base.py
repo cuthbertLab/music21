@@ -4114,7 +4114,8 @@ class ElementWrapper(Music21Object):
             object.__setattr__(self, name, value)
 
     def __getattr__(self, name: str) -> t.Any:
-        '''This method is only called when __getattribute__() fails.
+        '''
+        This method is only called when __getattribute__() fails.
         Using this also avoids the potential recursion problems of subclassing
         __getattribute__()_
 

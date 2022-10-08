@@ -609,7 +609,9 @@ def decimalToTuplet(decNum: float) -> tuple[int, int]:
     ZeroDivisionError: number must be greater than zero
     '''
     def findSimpleFraction(inner_working):
-        '''Utility function.'''
+        '''
+        Utility function.
+        '''
         for index in range(1, 1000):
             for j in range(index, index * 2):
                 if isclose(inner_working, j / index, abs_tol=1e-7):
@@ -734,7 +736,8 @@ def weightedSelection(values: list[int],
 
 
 def approximateGCD(values: list[int | float], grain: float = 1e-4) -> float:
-    '''Given a list of values, find the lowest common divisor of floating point values.
+    '''
+    Given a list of values, find the lowest common divisor of floating point values.
 
     >>> common.approximateGCD([2.5, 10, 0.25])
     0.25
@@ -823,7 +826,9 @@ def lcm(filterList: Iterable[int]) -> int:
     and math.lcm works in C and is faster
     '''
     def _lcm(a, b):
-        '''find the least common multiple of a, b'''
+        '''
+        find the least common multiple of a, b
+        '''
         # // forces integer style division (no remainder)
         return abs(a * b) // gcd(a, b)
 

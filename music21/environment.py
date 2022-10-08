@@ -932,7 +932,8 @@ class Environment:
         return dstDir
 
     def getKeysToPaths(self):
-        ''' Get the keys that refer to file paths.
+        '''
+        Get the keys that refer to file paths.
 
         >>> a = environment.Environment()
         >>> for x in sorted(a.getKeysToPaths()):

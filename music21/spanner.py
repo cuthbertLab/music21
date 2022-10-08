@@ -529,8 +529,8 @@ class Spanner(base.Music21Object):
         #    'id(new)', id(new)])
 
     def isFirst(self, spannedElement):
-        '''Given a spannedElement, is it first?
-
+        '''
+        Given a spannedElement, is it first?
 
         >>> n1 = note.Note('g')
         >>> n2 = note.Note('f#')
@@ -2331,7 +2331,8 @@ class Test(unittest.TestCase):
         self.assertTrue(sp3.hasSpannedElement(m5))
 
     def testOttavaShiftA(self):
-        '''Test basic octave shift creation and output, as well as passing
+        '''
+        Test basic octave shift creation and output, as well as passing
         objects through make measure calls.
         '''
         from music21 import stream
@@ -2384,7 +2385,8 @@ class Test(unittest.TestCase):
         self.assertEqual(raw.count('type="up"'), 1)
 
     def testOttavaShiftB(self):
-        '''Test a single note octave
+        '''
+        Test a single note octave
         '''
         from music21 import stream
         from music21 import note

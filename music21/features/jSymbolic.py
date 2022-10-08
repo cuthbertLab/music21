@@ -11,8 +11,6 @@
 '''
 The features implemented here are based on those found in jSymbolic and
 defined in Cory McKay's MA Thesis, "Automatic Genre Classification of MIDI Recordings"
-
-The LGPL jSymbolic system can be found here: http://jmir.sourceforge.net/jSymbolic.html
 '''
 from __future__ import annotations
 
@@ -21,6 +19,7 @@ import copy
 import math
 from math import isclose
 import statistics
+from textwrap import dedent
 import unittest
 
 from music21 import base
@@ -64,7 +63,8 @@ class MelodicIntervalHistogramFeature(featuresModule.FeatureExtractor):
         self.normalize = True
 
     def process(self):
-        '''Do processing necessary, storing result in feature.
+        '''
+        Do processing necessary, storing result in feature.
         '''
         for i, value in enumerate(self.data['midiIntervalHistogram']):
             self.feature.vector[i] = value
@@ -91,7 +91,8 @@ class AverageMelodicIntervalFeature(featuresModule.FeatureExtractor):
         self.dimensions = 1
 
     def process(self):
-        '''Do processing necessary, storing result in feature.
+        '''
+        Do processing necessary, storing result in feature.
         '''
         values = []
         # already summed by part if parts exist
@@ -124,7 +125,8 @@ class MostCommonMelodicIntervalFeature(featuresModule.FeatureExtractor):
         self.dimensions = 1
 
     def process(self):
-        '''Do processing necessary, storing result in feature.
+        '''
+        Do processing necessary, storing result in feature.
         '''
         # already summed by part if parts exist
         histo = self.data['midiIntervalHistogram']
@@ -156,7 +158,8 @@ class DistanceBetweenMostCommonMelodicIntervalsFeature(
         self.dimensions = 1
 
     def process(self):
-        '''Do processing necessary, storing result in feature.
+        '''
+        Do processing necessary, storing result in feature.
         '''
         # copy b/c will manipulate
         histo = copy.deepcopy(self.data['midiIntervalHistogram'])
@@ -191,7 +194,8 @@ class MostCommonMelodicIntervalPrevalenceFeature(
         self.dimensions = 1
 
     def process(self):
-        '''Do processing necessary, storing result in feature.
+        '''
+        Do processing necessary, storing result in feature.
         '''
         # copy b/c will manipulate
         histo = copy.deepcopy(self.data['midiIntervalHistogram'])
@@ -225,7 +229,8 @@ class RelativeStrengthOfMostCommonIntervalsFeature(
         self.dimensions = 1
 
     def process(self):
-        '''Do processing necessary, storing result in feature.
+        '''
+        Do processing necessary, storing result in feature.
         '''
         # copy b/c will manipulate
         histo = copy.deepcopy(self.data['midiIntervalHistogram'])
@@ -262,7 +267,8 @@ class NumberOfCommonMelodicIntervalsFeature(featuresModule.FeatureExtractor):
         self.dimensions = 1
 
     def process(self):
-        '''Do processing necessary, storing result in feature.
+        '''
+        Do processing necessary, storing result in feature.
         '''
         histo = self.data['midiIntervalHistogram']
         total = sum(histo)
@@ -301,7 +307,8 @@ class AmountOfArpeggiationFeature(featuresModule.FeatureExtractor):
         self.dimensions = 1
 
     def process(self):
-        '''Do processing necessary, storing result in feature.
+        '''
+        Do processing necessary, storing result in feature.
         '''
         histo = self.data['midiIntervalHistogram']
         total = sum(histo)
@@ -339,7 +346,8 @@ class RepeatedNotesFeature(featuresModule.FeatureExtractor):
         self.dimensions = 1
 
     def process(self):
-        '''Do processing necessary, storing result in feature.
+        '''
+        Do processing necessary, storing result in feature.
         '''
         histo = self.data['midiIntervalHistogram']
         total = sum(histo)
@@ -377,7 +385,8 @@ class ChromaticMotionFeature(featuresModule.FeatureExtractor):
         self.dimensions = 1
 
     def process(self):
-        '''Do processing necessary, storing result in feature.
+        '''
+        Do processing necessary, storing result in feature.
         '''
         histo = self.data['midiIntervalHistogram']
         total = sum(histo)
@@ -413,7 +422,8 @@ class StepwiseMotionFeature(featuresModule.FeatureExtractor):
         self.dimensions = 1
 
     def process(self):
-        '''Do processing necessary, storing result in feature.
+        '''
+        Do processing necessary, storing result in feature.
         '''
         histo = self.data['midiIntervalHistogram']
         total = sum(histo)
@@ -448,7 +458,8 @@ class MelodicThirdsFeature(featuresModule.FeatureExtractor):
         self.dimensions = 1
 
     def process(self):
-        '''Do processing necessary, storing result in feature.
+        '''
+        Do processing necessary, storing result in feature.
         '''
         histo = self.data['midiIntervalHistogram']
         total = sum(histo)
@@ -483,7 +494,8 @@ class MelodicFifthsFeature(featuresModule.FeatureExtractor):
         self.dimensions = 1
 
     def process(self):
-        '''Do processing necessary, storing result in feature.
+        '''
+        Do processing necessary, storing result in feature.
         '''
         histo = self.data['midiIntervalHistogram']
         total = sum(histo)
@@ -518,7 +530,8 @@ class MelodicTritonesFeature(featuresModule.FeatureExtractor):
         self.dimensions = 1
 
     def process(self):
-        '''Do processing necessary, storing result in feature.
+        '''
+        Do processing necessary, storing result in feature.
         '''
         histo = self.data['midiIntervalHistogram']
         total = sum(histo)
@@ -553,7 +566,8 @@ class MelodicOctavesFeature(featuresModule.FeatureExtractor):
         self.dimensions = 1
 
     def process(self):
-        '''Do processing necessary, storing result in feature.
+        '''
+        Do processing necessary, storing result in feature.
         '''
         histo = self.data['midiIntervalHistogram']
         total = sum(histo)
@@ -589,7 +603,8 @@ class DirectionOfMotionFeature(featuresModule.FeatureExtractor):
         self.dimensions = 1
 
     def process(self):
-        '''Do processing necessary, storing result in feature.
+        '''
+        Do processing necessary, storing result in feature.
         '''
         rising = 0
         falling = 0
@@ -650,7 +665,8 @@ class DurationOfMelodicArcsFeature(featuresModule.FeatureExtractor):
         self.dimensions = 1
 
     def process(self):
-        '''Do processing necessary, storing result in feature.
+        '''
+        Do processing necessary, storing result in feature.
         '''
         # `cList` contains a list of melodic intervals in a part.
         # For example, C4 E4 G4 E4 C4 results in a cList of [4, 3, -3, -4].
@@ -743,7 +759,8 @@ class SizeOfMelodicArcsFeature(featuresModule.FeatureExtractor):
         self.dimensions = 1
 
     def process(self):
-        '''Do processing necessary, storing result in feature.
+        '''
+        Do processing necessary, storing result in feature.
         '''
         # `cList` contains a list of melodic intervals in a part.
         # For example, C4 E4 G4 E4 C4 results in a cList of [4, 3, -3, -4].
@@ -830,7 +847,8 @@ class MostCommonPitchPrevalenceFeature(featuresModule.FeatureExtractor):
         self.discrete = False
 
     def process(self):
-        '''Do processing necessary, storing result in feature.
+        '''
+        Do processing necessary, storing result in feature.
         '''
         histo = self.data['pitches.midiPitchHistogram']
         if not histo:
@@ -864,7 +882,8 @@ class MostCommonPitchClassPrevalenceFeature(featuresModule.FeatureExtractor):
         self.discrete = False
 
     def process(self):
-        '''Do processing necessary, storing result in feature.
+        '''
+        Do processing necessary, storing result in feature.
         '''
         histo = self.data['pitches.pitchClassHistogram']
         # if a tie this will return the first
@@ -899,7 +918,8 @@ class RelativeStrengthOfTopPitchesFeature(featuresModule.FeatureExtractor):
         self.discrete = False
 
     def process(self):
-        '''Do processing necessary, storing result in feature.
+        '''
+        Do processing necessary, storing result in feature.
         '''
         histo = self.data['pitches.midiPitchHistogram']
         # if a tie this will return the first
@@ -934,7 +954,8 @@ class RelativeStrengthOfTopPitchClassesFeature(featuresModule.FeatureExtractor):
         self.discrete = False
 
     def process(self):
-        '''Do processing necessary, storing result in feature.
+        '''
+        Do processing necessary, storing result in feature.
         '''
         # copy b/c will edit
         histo = copy.deepcopy(self.data['pitches.pitchClassHistogram'])
@@ -973,7 +994,8 @@ class IntervalBetweenStrongestPitchesFeature(featuresModule.FeatureExtractor):
         self.dimensions = 1
 
     def process(self):
-        '''Do processing necessary, storing result in feature.
+        '''
+        Do processing necessary, storing result in feature.
         '''
         histo = self.data['pitches.midiPitchHistogram']
         # if a tie this will return the first
@@ -1007,7 +1029,8 @@ class IntervalBetweenStrongestPitchClassesFeature(
         self.dimensions = 1
 
     def process(self):
-        '''Do processing necessary, storing result in feature.
+        '''
+        Do processing necessary, storing result in feature.
         '''
         histo = copy.deepcopy(self.data['pitches.pitchClassHistogram'])
         # if a tie this will return the first
@@ -1042,7 +1065,8 @@ class NumberOfCommonPitchesFeature(featuresModule.FeatureExtractor):
         self.dimensions = 1
 
     def process(self):
-        '''Do processing necessary, storing result in feature.
+        '''
+        Do processing necessary, storing result in feature.
         '''
         histo = self.data['pitches.midiPitchHistogram']
         total = sum(histo.values())
@@ -1073,7 +1097,8 @@ class PitchVarietyFeature(featuresModule.FeatureExtractor):
         self.dimensions = 1
 
     def process(self):
-        '''Do processing necessary, storing result in feature.
+        '''
+        Do processing necessary, storing result in feature.
         '''
         histo = self.data['pitches.midiPitchHistogram']
         post = 0
@@ -1103,7 +1128,8 @@ class PitchClassVarietyFeature(featuresModule.FeatureExtractor):
         self.dimensions = 1
 
     def process(self):
-        '''Do processing necessary, storing result in feature.
+        '''
+        Do processing necessary, storing result in feature.
         '''
         histo = self.data['pitches.pitchClassHistogram']
         post = 0
@@ -1133,7 +1159,8 @@ class RangeFeature(featuresModule.FeatureExtractor):
         self.dimensions = 1
 
     def process(self):
-        '''Do processing necessary, storing result in feature.
+        '''
+        Do processing necessary, storing result in feature.
         '''
         histo = self.data['pitches.midiPitchHistogram']
         if not histo:
@@ -1165,7 +1192,8 @@ class MostCommonPitchFeature(featuresModule.FeatureExtractor):
         self.discrete = False
 
     def process(self):
-        '''Do processing necessary, storing result in feature.
+        '''
+        Do processing necessary, storing result in feature.
         '''
         histo = self.data['pitches.midiPitchHistogram']
         try:
@@ -1226,7 +1254,8 @@ class ImportanceOfBassRegisterFeature(featuresModule.FeatureExtractor):
         self.discrete = False
 
     def process(self):
-        '''Do processing necessary, storing result in feature.
+        '''
+        Do processing necessary, storing result in feature.
         '''
         histo = self.data['pitches.midiPitchHistogram']
         if not histo:
@@ -1262,7 +1291,8 @@ class ImportanceOfMiddleRegisterFeature(featuresModule.FeatureExtractor):
         self.discrete = False
 
     def process(self):
-        '''Do processing necessary, storing result in feature.
+        '''
+        Do processing necessary, storing result in feature.
         '''
         histo = self.data['pitches.midiPitchHistogram']
         if not histo:
@@ -1298,7 +1328,8 @@ class ImportanceOfHighRegisterFeature(featuresModule.FeatureExtractor):
         self.discrete = False
 
     def process(self):
-        '''Do processing necessary, storing result in feature.
+        '''
+        Do processing necessary, storing result in feature.
         '''
         histo = self.data['pitches.midiPitchHistogram']
         if not histo:
@@ -1333,7 +1364,8 @@ class MostCommonPitchClassFeature(featuresModule.FeatureExtractor):
         self.dimensions = 1
 
     def process(self):
-        '''Do processing necessary, storing result in feature.
+        '''
+        Do processing necessary, storing result in feature.
         '''
         histo = self.data['pitches.pitchClassHistogram']
         pIndexMax = histo.index(max(histo))
@@ -1421,7 +1453,8 @@ class BasicPitchHistogramFeature(featuresModule.FeatureExtractor):
         self.normalize = True
 
     def process(self):
-        '''Do processing necessary, storing result in feature.
+        '''
+        Do processing necessary, storing result in feature.
         '''
         for i, count in self.data['pitches.midiPitchHistogram'].items():
             self.feature.vector[i] = count
@@ -1457,7 +1490,8 @@ class PitchClassDistributionFeature(featuresModule.FeatureExtractor):
         self.normalize = True
 
     def process(self):
-        '''Do processing necessary, storing result in feature.
+        '''
+        Do processing necessary, storing result in feature.
         '''
         # Create vector with [C, C#, D...]
         temp = [0] * self.dimensions
@@ -1505,7 +1539,8 @@ class FifthsPitchHistogramFeature(featuresModule.FeatureExtractor):
             self._mapping[i] = (7 * i) % 12
 
     def process(self):
-        '''Do processing necessary, storing result in feature.
+        '''
+        Do processing necessary, storing result in feature.
         '''
         for i, count in enumerate(self.data['pitches.pitchClassHistogram']):
             self.feature.vector[self._mapping[i]] = count
@@ -1548,7 +1583,8 @@ class QualityFeature(featuresModule.FeatureExtractor):
         self.dimensions = 1
 
     def process(self):
-        '''Do processing necessary, storing result in feature.
+        '''
+        Do processing necessary, storing result in feature.
         '''
         allKeys = self.data['flat.getElementsByClass(Key)']
         keyFeature = None
@@ -1972,8 +2008,8 @@ class NumberOfRelativelyStrongPulsesFeature(featuresModule.FeatureExtractor):
         super().__init__(dataOrStream=dataOrStream, **keywords)
 
         self.name = 'Number of Relatively Strong Pulses'
-        self.description = '''Number of beat peaks with frequencies at least 30% as high as
-                'the frequency of the bin with the highest frequency.'''
+        self.description = ('Number of beat peaks with frequencies at least 30% as high as '
+                            'the frequency of the bin with the highest frequency.')
         self.isSequential = True
         self.dimensions = 1
 
@@ -1993,10 +2029,11 @@ class RhythmicLoosenessFeature(featuresModule.FeatureExtractor):
         super().__init__(dataOrStream=dataOrStream, **keywords)
 
         self.name = 'Rhythmic Looseness'
-        self.description = '''Average width of beat histogram peaks (in beats per minute).
-        Width is measured for all peaks with frequencies at least 30% as high as the
-        highest peak, and is defined by the distance between the points on the peak in
-        question that are 30% of the height of the peak.'''
+        self.description = dedent('''
+            Average width of beat histogram peaks (in beats per minute).
+            Width is measured for all peaks with frequencies at least 30% as high as the
+            highest peak, and is defined by the distance between the points on the peak in
+            question that are 30% of the height of the peak.''')
         self.isSequential = True
         self.dimensions = 1
 
@@ -2163,7 +2200,8 @@ class AverageNoteDurationFeature(featuresModule.FeatureExtractor):
 
 
 class VariabilityOfNoteDurationFeature(featuresModule.FeatureExtractor):
-    '''Standard deviation of note durations in seconds.
+    '''
+    Standard deviation of note durations in seconds.
 
     # In this piece, we have:
     #     9 half notes or tied pair of quarters
@@ -2172,6 +2210,7 @@ class VariabilityOfNoteDurationFeature(featuresModule.FeatureExtractor):
     # BPM = 120 means a half note is a second.
     # Mean duration should thus be 0.44171779141104295
     # and standard deviation should be  0.17854763448902145
+
     >>> s = corpus.parse('bwv66.6')
     >>> for p in s.parts:
     ...     p.insert(0, tempo.MetronomeMark(number=120))
@@ -2767,7 +2806,8 @@ class QuintupleMeterFeature(featuresModule.FeatureExtractor):
 
 
 class ChangesOfMeterFeature(featuresModule.FeatureExtractor):
-    '''Returns 1 if the time signature is changed one or more
+    '''
+    Returns 1 if the time signature is changed one or more
     times during the recording.
 
     >>> s1 = stream.Stream()
@@ -2812,7 +2852,8 @@ class ChangesOfMeterFeature(featuresModule.FeatureExtractor):
 
 
 class DurationFeature(featuresModule.FeatureExtractor):
-    '''A feature extractor that extracts the duration of the piece in seconds.
+    '''
+    A feature extractor that extracts the duration of the piece in seconds.
 
     >>> s = corpus.parse('bwv66.6')
     >>> for p in s.parts:
@@ -3149,8 +3190,10 @@ class VoiceEqualityMelodicLeapsFeature(featuresModule.FeatureExtractor):
         super().__init__(dataOrStream=dataOrStream, **keywords)
 
         self.name = 'Voice Equality - Melodic Leaps'
-        self.description = '''Standard deviation of the average melodic leap in MIDI pitches
-        for each channel that contains at least one note.'''
+        self.description = dedent('''
+            Standard deviation
+            of the average melodic leap in MIDI pitches
+            for each channel that contains at least one note.''')
         self.isSequential = True
         self.dimensions = 1
 
@@ -3168,8 +3211,9 @@ class VoiceEqualityRangeFeature(featuresModule.FeatureExtractor):
         super().__init__(dataOrStream=dataOrStream, **keywords)
 
         self.name = 'Voice Equality - Range'
-        self.description = '''Standard deviation of the differences between the
-        highest and lowest pitches in each channel that contains at least one note.'''
+        self.description = dedent('''
+            Standard deviation of the differences between the
+            highest and lowest pitches in each channel that contains at least one note.''')
         self.isSequential = True
         self.dimensions = 1
 
@@ -3178,10 +3222,7 @@ class ImportanceOfLoudestVoiceFeature(featuresModule.FeatureExtractor):
     '''
     Not implemented
 
-
-
     TODO: implement
-
     '''
     id = 'T9'
 
@@ -3189,8 +3230,10 @@ class ImportanceOfLoudestVoiceFeature(featuresModule.FeatureExtractor):
         super().__init__(dataOrStream=dataOrStream, **keywords)
 
         self.name = 'Importance of Loudest Voice'
-        self.description = '''Difference between the average loudness of the loudest channel
-        and the average loudness of the other channels that contain at least one note.'''
+        self.description = dedent('''
+            Difference between the average loudness
+            of the loudest channel and the average loudness of the other channels
+            that contain at least one note.''')
         self.isSequential = True
         self.dimensions = 1
 
@@ -3199,10 +3242,7 @@ class RelativeRangeOfLoudestVoiceFeature(featuresModule.FeatureExtractor):
     '''
     Not implemented
 
-
-
     TODO: implement
-
     '''
     id = 'T10'
 
@@ -3210,9 +3250,10 @@ class RelativeRangeOfLoudestVoiceFeature(featuresModule.FeatureExtractor):
         super().__init__(dataOrStream=dataOrStream, **keywords)
 
         self.name = 'Relative Range of Loudest Voice'
-        self.description = '''Difference between the highest note and the lowest note
-        played in the channel with the highest average loudness divided by the difference
-        between the highest note and the lowest note overall in the piece.'''
+        self.description = dedent('''
+            Difference between the highest note and the lowest note
+            played in the channel with the highest average loudness divided by the difference
+            between the highest note and the lowest note overall in the piece.''')
         self.isSequential = True
         self.dimensions = 1
 
@@ -3221,10 +3262,7 @@ class RangeOfHighestLineFeature(featuresModule.FeatureExtractor):
     '''
     Not implemented
 
-
-
     TODO: implement
-
     '''
     id = 'T12'
 
@@ -3232,9 +3270,10 @@ class RangeOfHighestLineFeature(featuresModule.FeatureExtractor):
         super().__init__(dataOrStream=dataOrStream, **keywords)
 
         self.name = 'Range of Highest Line'
-        self.description = '''Difference between the highest note and the lowest note
-        played in the channel with the highest average pitch divided by the difference
-        between the highest note and the lowest note in the piece.'''
+        self.description = dedent('''
+            Difference between the highest note and the lowest note
+            played in the channel with the highest average pitch divided by the difference
+            between the highest note and the lowest note in the piece.''')
         self.isSequential = True
         self.dimensions = 1
 
@@ -3254,9 +3293,10 @@ class RelativeNoteDensityOfHighestLineFeature(featuresModule.FeatureExtractor):
         super().__init__(dataOrStream=dataOrStream, **keywords)
 
         self.name = 'Relative Note Density of Highest Line'
-        self.description = '''Number of Note Ons in the channel with the highest average
-        pitch divided by the average number of Note Ons in all channels that contain at
-        least one note.'''
+        self.description = dedent('''
+            Number of Note Ons in the channel with the highest average
+            pitch divided by the average number of Note Ons in all channels that contain at
+            least one note.''')
         self.isSequential = True
         self.dimensions = 1
 
@@ -3265,10 +3305,7 @@ class MelodicIntervalsInLowestLineFeature(featuresModule.FeatureExtractor):
     '''
     Not implemented
 
-
-
     TODO: implement
-
     '''
     id = 'T15'
 
@@ -3276,9 +3313,10 @@ class MelodicIntervalsInLowestLineFeature(featuresModule.FeatureExtractor):
         super().__init__(dataOrStream=dataOrStream, **keywords)
 
         self.name = 'Melodic Intervals in Lowest Line'
-        self.description = '''Average melodic interval in semitones of the channel
-        with the lowest average pitch divided by the average melodic interval of all
-        channels that contain at least two notes.'''
+        self.description = dedent('''
+            Average melodic interval in semitones of the channel
+            with the lowest average pitch divided by the average melodic interval of all
+            channels that contain at least two notes.''')
         self.isSequential = True
         self.dimensions = 1
 
@@ -3296,9 +3334,10 @@ class VoiceSeparationFeature(featuresModule.FeatureExtractor):
         super().__init__(dataOrStream=dataOrStream, **keywords)
 
         self.name = 'Voice Separation'
-        self.description = '''Average separation in semi-tones between the average pitches of
-        consecutive channels (after sorting based/non average pitch) that contain at
-        least one note.'''
+        self.description = dedent('''
+            Average separation in semi-tones between the average pitches of
+            consecutive channels (after sorting based/non average pitch) that contain at
+            least one note.''')
         self.isSequential = True
         self.dimensions = 1
 
@@ -3347,15 +3386,17 @@ class PitchedInstrumentsPresentFeature(featuresModule.FeatureExtractor):
         super().__init__(dataOrStream=dataOrStream, **keywords)
 
         self.name = 'Pitched Instruments Present'
-        self.description = '''Which pitched General MIDI Instruments are present.
-        There is one entry for each instrument, which is set to 1.0 if there is at
-        least one Note On in the recording corresponding to the instrument and to
-        0.0 if there is not.'''
+        self.description = dedent('''
+            Which pitched General MIDI Instruments are present.
+            There is one entry for each instrument, which is set to 1.0 if there is at
+            least one Note On in the recording corresponding to the instrument and to
+            0.0 if there is not.''')
         self.isSequential = True
         self.dimensions = 128
 
     def process(self):
-        '''Do processing necessary, storing result in feature.
+        '''
+        Do processing necessary, storing result in feature.
         '''
         s = self.data['partitionByInstrument']
         # each part has content for each instrument
@@ -3392,11 +3433,12 @@ class UnpitchedInstrumentsPresentFeature(featuresModule.FeatureExtractor):
         super().__init__(dataOrStream=dataOrStream, **keywords)
 
         self.name = 'Unpitched Instruments Present'
-        self.description = '''Which unpitched MIDI Percussion Key Map instruments are present.
-        There is one entry for each instrument, which is set to 1.0 if there is at least one
-        Note On in the recording corresponding to the instrument and to 0.0 if there is not.
-        It should be noted that only instruments 35 to 81 are included here, as they are the
-        ones that meet the official standard. They are numbered in this array from 0 to 46.'''
+        self.description = dedent('''
+            Which unpitched MIDI Percussion Key Map instruments are present.
+            There is one entry for each instrument, which is set to 1.0 if there is at least one
+            Note On in the recording corresponding to the instrument and to 0.0 if there is not.
+            It should be noted that only instruments 35 to 81 are included here, as they are the
+            ones that meet the official standard. They are numbered in this array from 0 to 46.''')
         self.isSequential = True
         self.dimensions = 47
 
@@ -3447,7 +3489,8 @@ class NotePrevalenceOfPitchedInstrumentsFeature(
         self.dimensions = 128
 
     def process(self):
-        '''Do processing necessary, storing result in feature.
+        '''
+        Do processing necessary, storing result in feature.
         '''
         s = self.data['partitionByInstrument']
         total = sum(self.data['pitches.pitchClassHistogram'])
@@ -3482,12 +3525,13 @@ class NotePrevalenceOfUnpitchedInstrumentsFeature(
         super().__init__(dataOrStream=dataOrStream, **keywords)
 
         self.name = 'Note Prevalence of Unpitched Instruments'
-        self.description = '''The fraction of (unpitched) notes played by each General MIDI
-        Percussion Key Map Instrument. There is one entry for each instrument, which is set
-        to the number of Note Ons played using the corresponding MIDI note value divided by
-        the total number of Note Ons in the recording. It should be noted that only instruments
-        35 to 81 are included here, as they are the ones that meet the official standard.
-        They are numbered in this array from 0 to 46.'''
+        self.description = dedent('''
+            The fraction of (unpitched) notes played by each General MIDI
+            Percussion Key Map Instrument. There is one entry for each instrument, which is set
+            to the number of Note Ons played using the corresponding MIDI note value divided by
+            the total number of Note Ons in the recording. It should be noted that only instruments
+            35 to 81 are included here, as they are the ones that meet the official standard.
+            They are numbered in this array from 0 to 46.''')
         self.isSequential = True
         self.dimensions = 47
 
@@ -3632,7 +3676,8 @@ class NumberOfPitchedInstrumentsFeature(featuresModule.FeatureExtractor):
         self.dimensions = 1
 
     def process(self):
-        '''Do processing necessary, storing result in feature.
+        '''
+        Do processing necessary, storing result in feature.
         '''
         s = self.data['partitionByInstrument']
         # each part has content for each instrument
@@ -3705,7 +3750,8 @@ class InstrumentFractionFeature(featuresModule.FeatureExtractor):
         self._targetPrograms = []
 
     def process(self):
-        '''Do processing necessary, storing result in feature.
+        '''
+        Do processing necessary, storing result in feature.
         '''
         s = self.data['partitionByInstrument']
         total = sum(self.data['pitches.pitchClassHistogram'])

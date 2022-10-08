@@ -1,8 +1,16 @@
 #! /usr/bin/env python
+'''
+Not used: we do not indent code blocks.
+'''
 
 import inspect
+import pathlib
+import sys
 import types
-from music21.documentation.iterators import CodebaseIterator
+
+sys.path.insert(0, str(pathlib.Path(__file__).parent.parent))
+
+from docbuild.iterators import CodebaseIterator
 
 
 def hasUnindentedCodeBlocks(docstring):
@@ -14,15 +22,14 @@ def hasUnindentedCodeBlocks(docstring):
 
 
 def main():
-    print 'Inspecting docstrings...'
-    print 
+    print('Inspecting docstrings...\n')
     count = 0
     for x in CodebaseIterator():
         address = '.'.join((x.__module__, x.__name__))
         # inspect.getdoc() strips whitespace for us
         docstring = inspect.getdoc(x)
         if docstring is not None and hasUnindentedCodeBlocks(docstring):
-            print address
+            print(address)
             count += 1
         if isinstance(x, type):
             for attr in inspect.classify_class_attrs(x):
@@ -31,13 +38,12 @@ def main():
                 attrAddress = ':'.join((address, attr.name)) 
                 docstring = inspect.getdoc(attr.object)
                 if docstring is not None and hasUnindentedCodeBlocks(docstring):
-                    print attrAddress
+                    print(attrAddress)
                     count += 1
     if count:
-        print
-        print 'Found {} docstring(s) with unindented code blocks.'.format(count)
+        print(f'Found {count} docstring(s) with unindented code blocks.')
     else:
-        print 'Found no docstrings with unindented code blocks.'
+        print('Found no docstrings with unindented code blocks.')
 
 
 if __name__ == '__main__':

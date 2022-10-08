@@ -3642,7 +3642,9 @@ class Test(unittest.TestCase):
             self.assertIn(ts, m)
 
     def testMidiExportConductorA(self):
-        '''Export conductor data to MIDI conductor track.'''
+        '''
+        Export conductor data to MIDI conductor track.
+        '''
         p1 = stream.Part()
         p1.repeatAppend(note.Note('c4'), 12)
         p1.insert(0, meter.TimeSignature('3/4'))
@@ -3703,7 +3705,9 @@ class Test(unittest.TestCase):
         self.assertEqual(mtsRepr.count('SET_TEMPO'), 100)
 
     def testMidiExportConductorD(self):
-        '''120 bpm and 4/4 are supplied by default.'''
+        '''
+        120 bpm and 4/4 are supplied by default.
+        '''
         s = stream.Stream()
         s.insert(note.Note())
         mts = streamHierarchyToMidiTracks(s)
@@ -3715,7 +3719,9 @@ class Test(unittest.TestCase):
         self.assertEqual(condTrkRepr.count('PITCH_BEND'), 0)
 
     def testMidiExportConductorE(self):
-        '''The conductor only gets the first element at an offset.'''
+        '''
+        The conductor only gets the first element at an offset.
+        '''
         from music21 import converter
 
         s = stream.Stream()
@@ -3735,7 +3741,9 @@ class Test(unittest.TestCase):
         self.assertEqual(len(keySignatures), 1)
 
     def testMidiExportConductorF(self):
-        '''Multiple meter changes'''
+        '''
+        Multiple meter changes
+        '''
         from music21 import converter
         from music21 import midi as midiModule
 

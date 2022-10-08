@@ -160,7 +160,8 @@ class ChordBase(note.NotRest):
         return True
 
     def __deepcopy__(self: _ChordBaseType, memo=None) -> _ChordBaseType:
-        '''As Chord objects have one or more Volume, objects, and Volume
+        '''
+        As Chord objects have one or more Volume, objects, and Volume
         objects store weak refs to the client object, need to specialize
         deepcopy handling depending on if the chord has its own volume object.
         '''
@@ -1947,7 +1948,8 @@ class Chord(ChordBase):
             return None
 
     def getNotehead(self, p):
-        '''Given a pitch in this Chord, return an associated notehead
+        '''
+        Given a pitch in this Chord, return an associated notehead
         attribute, or return 'normal' if not defined for that Pitch.
 
         If the pitch is not found, None will be returned.
@@ -1982,7 +1984,8 @@ class Chord(ChordBase):
         return None
 
     def getNoteheadFill(self, p):
-        '''Given a pitch in this Chord, return an associated noteheadFill
+        '''
+        Given a pitch in this Chord, return an associated noteheadFill
         attribute, or return None if not defined for that Pitch.
 
         If the pitch is not found, None will also be returned.
@@ -2020,7 +2023,8 @@ class Chord(ChordBase):
         return None
 
     def getStemDirection(self, p):
-        '''Given a pitch in this Chord, return an associated stem attribute, or
+        '''
+        Given a pitch in this Chord, return an associated stem attribute, or
         return 'unspecified' if not defined for that Pitch or None.
 
         If the pitch is not found, None will be returned.
@@ -2763,14 +2767,14 @@ class Chord(ChordBase):
 
     @cacheMethod
     def isDiminishedSeventh(self):
-        '''Returns True if chord is a Diminished Seventh, that is,
+        '''
+        Returns True if chord is a Diminished Seventh, that is,
         if it contains only notes that are
         either in unison with the root, a minor third above the root,
         a diminished fifth, or a minor seventh
         above the root. Additionally, must contain at least one of
         each third and fifth above the root.
         Chord must be spelled correctly. Otherwise returns false.
-
 
         >>> a = chord.Chord(['c', 'e-', 'g-', 'b--'])
         >>> a.isDiminishedSeventh()
@@ -2813,14 +2817,14 @@ class Chord(ChordBase):
 
     @cacheMethod
     def isDiminishedTriad(self) -> bool:
-        '''Returns True if chord is a Diminished Triad, that is,
+        '''
+        Returns True if chord is a Diminished Triad, that is,
         if it contains only notes that are
         either in unison with the root, a minor third above the
         root, or a diminished fifth above the
         root. Additionally, must contain at least one of each
         third and fifth above the root.
         Chord must be spelled correctly. Otherwise returns false.
-
 
         >>> cChord = chord.Chord(['C', 'E-', 'G-'])
         >>> cChord.isDiminishedTriad()
@@ -2837,6 +2841,7 @@ class Chord(ChordBase):
         >>> other.isDiminishedTriad()
         False
 
+        This is in an OMIT section
         '''
         return self._checkTriadType((3, 10, 0), 3, 6)
 
@@ -4186,7 +4191,8 @@ class Chord(ChordBase):
                 f'the given pitch is not in the Chord: {pitchTarget}')
 
     def setNotehead(self, nh, pitchTarget):
-        '''Given a notehead attribute as a string and a pitch object in this
+        '''
+        Given a notehead attribute as a string and a pitch object in this
         Chord, set the notehead attribute of that pitch to the value of that
         notehead. Valid notehead type names are found in note.noteheadTypeNames
         (see below):
@@ -4285,7 +4291,8 @@ class Chord(ChordBase):
             raise ChordException(f'the given pitch is not in the Chord: {pitchTarget}')
 
     def setNoteheadFill(self, nh, pitchTarget):
-        '''Given a noteheadFill attribute as a string and a pitch object in this
+        '''
+        Given a noteheadFill attribute as a string (or False) and a pitch object in this
         Chord, set the noteheadFill attribute of that pitch to the value of that
         notehead. Valid noteheadFill names are True, False, None (default)
 
@@ -4896,7 +4903,9 @@ class Chord(ChordBase):
         # forteClassTn = self.forteClassTn
 
         def _isSeventhWithPerfectFifthAboveRoot(c: Chord) -> bool:
-            '''For testing minor-minor sevenths and major-major sevenths'''
+            '''
+            For testing minor-minor sevenths and major-major sevenths
+            '''
             if not c.isSeventh():
                 return False
             hypothetical_fifth = c.root().transpose('P5')
@@ -5038,7 +5047,8 @@ class Chord(ChordBase):
 
     @property
     def forteClass(self):
-        '''Return the Forte set class name as a string. This assumes a Tn
+        '''
+        Return the Forte set class name as a string. This assumes a Tn
         formation, where inversion distinctions are represented.
 
         (synonym: forteClassTn)

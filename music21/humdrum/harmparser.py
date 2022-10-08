@@ -117,7 +117,9 @@ def convertHarmToRoman(harmStr):
 
 
 class HarmDefs:
-    ''' Regular expression definitions for the HarmParser class '''
+    '''
+    Regular expression definitions for the HarmParser class
+    '''
 
     # Detect lowered or raised root (-|lowered, #|raised)
     accidental = r'''
@@ -195,7 +197,9 @@ class HarmDefs:
 
 
 class HarmParser:
-    '''Parses an expression in `**harm` syntax'''
+    '''
+    Parses an expression in `**harm` syntax
+    '''
 
     defs = HarmDefs()
 

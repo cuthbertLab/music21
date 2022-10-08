@@ -136,7 +136,8 @@ class TempoIndication(base.Music21Object):
     #     # self.style.justify = 'left'  # creates a style object to share.
 
     def getSoundingMetronomeMark(self, found=None):
-        '''Get the appropriate MetronomeMark from any sort of TempoIndication, regardless of class.
+        '''
+        Get the appropriate MetronomeMark from any sort of TempoIndication, regardless of class.
         '''
         if found is None:
             found = self
@@ -437,7 +438,8 @@ class MetronomeMark(TempoIndication):
             return f'{self.text} {self.referent.fullName}={self.number}'
 
     def _updateTextFromNumber(self):
-        '''Update text if number is given and text is not defined
+        '''
+        Update text if number is given and text is not defined
         '''
         if self._tempoText is None and self._number is not None:
             # PyCharm inspection does not like using attributes on functions that become properties
@@ -448,7 +450,8 @@ class MetronomeMark(TempoIndication):
                 self.textImplicit = True
 
     def _updateNumberFromText(self):
-        '''Update number if text is given and number is not defined
+        '''
+        Update number if text is given and number is not defined
         '''
         if self._number is None and self._tempoText is not None:
             self._number = self._getDefaultNumber(self._tempoText)
@@ -786,7 +789,8 @@ class MetronomeMark(TempoIndication):
             raise MetronomeMarkException('cannot derive seconds as getQuarterBPM() returns None')
 
     def durationToSeconds(self, durationOrQuarterLength):
-        '''Given a duration specified as a :class:`~music21.duration.Duration` object or a
+        '''
+        Given a duration specified as a :class:`~music21.duration.Duration` object or a
         quarter length, return the resultant time in seconds at the tempo specified by
         this MetronomeMark.
 
@@ -1087,7 +1091,8 @@ class MetricModulation(TempoIndication):
     # --------------------------------------------------------------------------
     # high-level configuration methods
     def updateByContext(self):
-        '''Update this metric modulation based on the context,
+        '''
+        Update this metric modulation based on the context,
         or the surrounding MetronomeMarks or MetricModulations.
         The object needs to reside in a Stream for this to be effective.
         '''
@@ -1113,10 +1118,10 @@ class MetricModulation(TempoIndication):
             self._newMetronome.number = self._oldMetronome.number
 
     def setEqualityByReferent(self, side=None, referent=1.0):
-        '''Set the other side of the metric modulation to
+        '''
+        Set the other side of the metric modulation to
         an equality; side can be specified, or if one side
         is None, that side will be set.
-
 
         >>> mm1 = tempo.MetronomeMark(number=60, referent=1)
         >>> mmod1 = tempo.MetricModulation()
@@ -1542,10 +1547,11 @@ class Test(unittest.TestCase):
                          '<music21.tempo.MetronomeMark lento 16th=52>')
 
     def testSetReferentA(self):
-        '''Test setting referents directly via context searches.
         '''
-        from music21 import tempo
+        Test setting referents directly via context searches.
+        '''
         from music21 import stream
+        from music21 import tempo
         p = stream.Part()
         m1 = stream.Measure()
         m1.repeatAppend(note.Note(quarterLength=1), 4)

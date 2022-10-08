@@ -1358,7 +1358,8 @@ def toData(obj: base.Music21Object, fmt: str, **keywords) -> str | bytes:
 
 def freeze(streamObj, fmt=None, fp=None, fastButUnsafe=False, zipType='zlib') -> pathlib.Path:
     # noinspection PyShadowingNames
-    '''Given a StreamObject and a file path, serialize and store the Stream to a file.
+    '''
+    Given a StreamObject and a file path, serialize and store the Stream to a file.
 
     This function is based on the :class:`~music21.converter.StreamFreezer` object.
 
@@ -1408,7 +1409,8 @@ def freeze(streamObj, fmt=None, fp=None, fastButUnsafe=False, zipType='zlib') ->
 
 
 def thaw(fp, zipType='zlib'):
-    '''Given a file path of a serialized Stream, defrost the file into a Stream.
+    '''
+    Given a file path of a serialized Stream, defrost the file into a Stream.
 
     This function is based on the :class:`~music21.converter.StreamFreezer` object.
 

@@ -1619,12 +1619,16 @@ class SpineCollection(prebase.ProtoM21Object):
         self.newSpine = None
 
     def __iter__(self):
-        '''Resets the counter to len(self.spines) so that iteration is correct'''
+        '''
+        Resets the counter to len(self.spines) so that iteration is correct
+        '''
         self.iterIndex = len(self.spines) - 1
         return self
 
     def __next__(self):
-        '''Returns the current spine and decrements the iteration index.'''
+        '''
+        Returns the current spine and decrements the iteration index.
+        '''
         if self.iterIndex < 0:
             raise StopIteration
         thisSpine = self.spines[self.iterIndex]

@@ -73,7 +73,8 @@ if t.TYPE_CHECKING:
 # ------------------------------------------------------------------------------
 
 def typeToMusicXMLType(value):
-    '''Convert a music21 type to a MusicXML type.
+    '''
+    Convert a music21 type to a MusicXML type.
 
     >>> musicxml.m21ToXml.typeToMusicXMLType('longa')
     'long'

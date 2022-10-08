@@ -398,19 +398,24 @@ class TextExpression(Expression):
             return
         self.style.enclosure = value
 
-    def _getContent(self):
-        return self._content
-
-    def _setContent(self, value):
-        self._content = str(value)
-
-    content = property(_getContent, _setContent,
-                       doc='''Get or set the content.
+    @property
+    def content(self):
+        '''
+        Get or set the content.
 
         >>> te = expressions.TextExpression('dolce')
         >>> te.content
         'dolce'
-        ''')
+        >>> te.content = 'sweeter'
+        >>> te
+        <music21.expressions.TextExpression 'sweeter'>
+        '''
+        return self._content
+
+    @content.setter
+    def content(self, value):
+        self._content = str(value)
+
 
     # --------------------------------------------------------------------------
     # text expression in musicxml may be repeat expressions
@@ -517,7 +522,8 @@ class Ornament(Expression):
 
 # ------------------------------------------------------------------------------
 class GeneralMordent(Ornament):
-    '''Base class for all Mordent types.
+    '''
+    Base class for all Mordent types.
     '''
 
     def __init__(self):

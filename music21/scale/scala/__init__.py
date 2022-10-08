@@ -408,7 +408,8 @@ class ScalaFile:
         self.fileName = os.path.basename(fp)
 
     def openFileLike(self, fileLike):
-        '''Assign a file-like object, such as those provided by StringIO, as an open file object.
+        '''
+        Assign a file-like object, such as those provided by StringIO, as an open file object.
         '''
         self.file = fileLike  # already 'open'
 
@@ -428,7 +429,8 @@ class ScalaFile:
         return self.readstr(self.file.read())
 
     def readstr(self, strSrc):
-        '''Read a string and process all Tokens. Returns a ABCHandler instance.
+        '''
+        Read a string and process all Tokens. Returns a ABCHandler instance.
         '''
         ss = ScalaData(strSrc, self.fileName)
         ss.parse()
@@ -522,7 +524,8 @@ def parse(target):
 
 def search(target):
     # noinspection SpellCheckingInspection
-    '''Search the scala archive for matches based on a string
+    '''
+    Search the scala archive for matches based on a string
 
     >>> mbiraScales = scale.scala.search('mbira')
     >>> mbiraScales

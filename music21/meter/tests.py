@@ -26,7 +26,8 @@ class TestExternal(unittest.TestCase):
     show = True
 
     def testSingle(self):
-        '''Need to test direct meter creation w/o stream
+        '''
+        Need to test direct meter creation w/o stream
         '''
         a = TimeSignature('3/16')
         if self.show:

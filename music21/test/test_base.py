@@ -230,7 +230,8 @@ class Test(unittest.TestCase):
         self.assertIsInstance(post, clef.BassClef)
 
     def testSitesMeasures(self):
-        '''Can a measure determine the last Clef used?
+        '''
+        Can a measure determine the last Clef used?
         '''
         a = corpus.parse('bach/bwv324.xml')
         measures = a.parts[0].getElementsByClass(stream.Measure).stream()  # measures of first part
@@ -291,7 +292,8 @@ class Test(unittest.TestCase):
         self.assertTrue(isinstance(post, clef.AltoClef), post)
 
     def testBeatAccess(self):
-        '''Test getting beat data from various Music21Objects.
+        '''
+        Test getting beat data from various Music21Objects.
         '''
         s = corpus.parse('bach/bwv66.6.xml')
         p1 = s.parts['#Soprano']
@@ -381,7 +383,8 @@ class Test(unittest.TestCase):
         self.assertEqual([1.0, 0.25, 0.5, 0.25, 1.0, 0.25, 0.5, 0.25, 1.0, 0.25, 0.5, 0.25], match)
 
     def testMeasureNumberAccess(self):
-        '''Test getting measure number data from various Music21Objects.
+        '''
+        Test getting measure number data from various Music21Objects.
         '''
         s = corpus.parse('bach/bwv66.6.xml')
         p1 = s.parts['#Soprano']

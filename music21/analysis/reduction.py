@@ -420,7 +420,8 @@ class ScoreReduction:
         return s
 
     def reduce(self):
-        '''Given a score, populate this Score reduction
+        '''
+        Given a score, populate this Score reduction
         '''
         # if not set here or before
         if self.score is None and self.chordReduction is None:
@@ -827,7 +828,8 @@ class PartReduction:
 #                 print(ds)
 
     def _normalize(self, byPart=False):
-        '''Normalize, either within each Part, or for all parts
+        '''
+        Normalize, either within each Part, or for all parts
         '''
         partMaxRef = {}
         for partBundle in self._partBundles:
@@ -855,7 +857,8 @@ class PartReduction:
                     ds['weight'] = 1  # error?
 
     def process(self):
-        '''Core processing routines.
+        '''
+        Core processing routines.
         '''
         self._createPartBundles()
         self._createEventSpans()
@@ -1011,7 +1014,6 @@ class Test(unittest.TestCase):
         unused_post = sr.reduce()
         # post.show()
 
-
     def testExtractionD2(self):
         # this shows a score, extracting a single pitch
         from music21 import analysis
@@ -1035,8 +1037,6 @@ class Test(unittest.TestCase):
         unused_post = sr.reduce()
         # post.show()
 
-
-
     def testExtractionE(self):
         from music21 import analysis
         from music21 import corpus
@@ -1050,8 +1050,6 @@ class Test(unittest.TestCase):
         sr.score = src
         unused_post = sr.reduce()
         # post.show()
-
-
 
     def testPartReductionA(self):
         from music21 import analysis
@@ -1078,7 +1076,8 @@ class Test(unittest.TestCase):
 
 
     def _matchWeightedData(self, match, target):
-        '''Utility function to compare known data but not compare floating point weights.
+        '''
+        Utility function to compare known data but not compare floating point weights.
         '''
         for partId, b in enumerate(target):
             a = match[partId]
@@ -1098,11 +1097,12 @@ class Test(unittest.TestCase):
                 )
 
     def testPartReductionB(self, show=False):
-        '''Artificially create test cases.
         '''
+        Artificially create test cases.
+        '''
+        from music21 import analysis
         from music21 import dynamics
         from music21 import graph
-        from music21 import analysis
         durDynPairsA = [(1, 'mf'), (3, 'f'), (2, 'p'), (4, 'ff'), (2, 'mf')]
         durDynPairsB = [(1, 'mf'), (3, 'f'), (2, 'p'), (4, 'ff'), (2, 'mf')]
 
@@ -1145,10 +1145,11 @@ class Test(unittest.TestCase):
 
 
     def testPartReductionC(self):
-        '''Artificially create test cases.
         '''
-        from music21 import dynamics
+        Artificially create test cases.
+        '''
         from music21 import analysis
+        from music21 import dynamics
 
         s = stream.Score()
         p1 = stream.Part()
@@ -1180,10 +1181,11 @@ class Test(unittest.TestCase):
 
 
     def testPartReductionD(self):
-        '''Artificially create test cases. Here, uses rests.
         '''
-        from music21 import dynamics
+        Artificially create test cases. Here, uses rests.
+        '''
         from music21 import analysis
+        from music21 import dynamics
 
         s = stream.Score()
         p1 = stream.Part()
@@ -1221,10 +1223,11 @@ class Test(unittest.TestCase):
 
 
     def testPartReductionE(self):
-        '''Artificially create test cases.
         '''
-        from music21 import dynamics
+        Artificially create test cases.
+        '''
         from music21 import analysis
+        from music21 import dynamics
         s = stream.Score()
         p1 = stream.Part()
         p1.id = 0

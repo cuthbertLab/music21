@@ -4156,7 +4156,8 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
             return None
 
     # def getElementAfterOffset(self, offset, classList=None):
-    #    '''Get element after a provided offset
+    #    '''
+    #    Get element after a provided offset
     #
     #    TODO: write this
     #    '''
@@ -4164,7 +4165,8 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
     #
     #
     # def getElementBeforeElement(self, element, classList=None):
-    #    '''given an element, get the element before
+    #    '''
+    #    given an element, get the element before
     #
     #    TODO: write this
     #    '''
@@ -8107,7 +8109,8 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         return self._cache['HighestOffset']
 
     def _setHighestTime(self, value):
-        '''For internal use only.
+        '''
+        For internal use only.
         '''
         self._cache['HighestTime'] = value
 

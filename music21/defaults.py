@@ -66,7 +66,8 @@ clefLine = 2
 # define a default notehead for notes that know they are unpitched
 noteheadUnpitched = 'square'
 
-'''Divisions are a MusicXML concept that music21 does not share
+'''
+Divisions are a MusicXML concept that music21 does not share
 It basically represents the lowest time unit that all other notes
 are integer multiples of.  Useful for compatibility with MIDI, but
 ultimately restricting since it must be less than 16384, so thus
@@ -118,12 +119,9 @@ minIdNumberToConsiderMemoryLocation = 100_000_001
 
 
 class Test(unittest.TestCase):
-    '''Unit tests
     '''
-
-    def setUp(self):
-        pass
-
+    Unit tests
+    '''
     def testTest(self):
         self.assertEqual(1, 1)
 

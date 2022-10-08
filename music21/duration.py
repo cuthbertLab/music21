@@ -1296,7 +1296,8 @@ class Tuplet(prebase.ProtoM21Object):
         self.durationNormal = durationTupleFromTypeDots(durType, dots)
 
     def setRatio(self, actual, normal):
-        '''Set the ratio of actual divisions to represented in normal divisions.
+        '''
+        Set the ratio of actual divisions to represented in normal divisions.
         A triplet is 3 actual in the time of 2 normal.
 
         >>> a = duration.Tuplet()

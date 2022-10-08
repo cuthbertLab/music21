@@ -156,7 +156,8 @@ class DiscreteAnalysis:
         return post
 
     def solutionLegend(self, compress=False):
-        '''A list of pairs showing all discrete results and the assigned color.
+        '''
+        A list of pairs showing all discrete results and the assigned color.
         Data should be organized to be passed to
         :class:`music21.graph.GraphColorGridLegend`.
 
@@ -911,7 +912,8 @@ class TemperleyKostkaPayne(KeyWeightKeyAnalysis):
         super().__init__(referenceStream=referenceStream)
 
     def getWeights(self, weightType='major'):
-        ''' Returns the key weights.
+        '''
+        Returns the key weights.
 
         >>> a = analysis.discrete.TemperleyKostkaPayne()
         >>> len(a.getWeights('major'))
@@ -1283,7 +1285,8 @@ class MelodicIntervalDiversity(DiscreteAnalysis):
         return len(uniqueIntervals), self.solutionToColor(len(uniqueIntervals))
 
     def getSolution(self, sStream):
-        '''Solution is the number of unique intervals.
+        '''
+        Solution is the number of unique intervals.
         '''
         solution, unused_color = self.process(sStream.flatten())
         return solution

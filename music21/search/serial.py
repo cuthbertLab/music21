@@ -93,7 +93,9 @@ class ContiguousSegmentOfNotes(base.Music21Object):
 
     @property
     def startMeasureNumber(self):
-        '''The measure number on which the contiguous segment begins.'''
+        '''
+        The measure number on which the contiguous segment begins.
+        '''
         if self.segment:
             return self.segment[0].measureNumber
         else:
@@ -140,7 +142,8 @@ class ContiguousSegmentOfNotes(base.Music21Object):
 
     @property
     def originalCenteredTransformationsFromMatched(self):
-        '''The list of original-centered transformations taking a segment being
+        '''
+        The list of original-centered transformations taking a segment being
         searched for to a found segment, for example, in
         :func:`~music21.search.serial.findTransformedSegments`.
         For an explanation of the

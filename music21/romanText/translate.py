@@ -300,7 +300,8 @@ def _copyMultipleMeasures(rtMeasure: rtObjects.RTMeasure,
 
 
 def _getKeyAndPrefix(rtKeyOrString):
-    '''Given an RTKey specification, return the Key and a string prefix based
+    '''
+    Given an RTKey specification, return the Key and a string prefix based
     on the tonic:
 
     >>> romanText.translate._getKeyAndPrefix('c')
@@ -1165,7 +1166,8 @@ def fixPickupMeasure(partObject):
 
 
 def romanTextToStreamOpus(rtHandler, inputM21=None):
-    '''The main processing routine for RomanText objects that may or may not
+    '''
+    The main processing routine for RomanText objects that may or may not
     be multi movement.
 
     Takes in a romanText.rtObjects.RTFile() object, or a string as rtHandler.

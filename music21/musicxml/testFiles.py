@@ -16094,7 +16094,8 @@ ALL = [
 
 
 def get(contentRequest):
-    '''Get test material by type of content
+    '''
+    Get test material by type of content
 
     >>> from music21.musicxml.testFiles import get
 

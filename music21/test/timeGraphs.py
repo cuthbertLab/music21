@@ -22,7 +22,8 @@ import music21
 
 
 class Test:
-    '''Base class for timed tests that need music21 imported
+    '''
+    Base class for timed tests that need music21 imported
     '''
 
 

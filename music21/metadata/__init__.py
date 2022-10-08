@@ -624,7 +624,9 @@ class Metadata(base.Music21Object):
 
     @copyright.setter
     def copyright(self, value: str) -> None:
-        '''For type checking only. Does not run.'''
+        '''
+        For type checking only. Does not run.
+        '''
         setattr(self, 'copyright', value)
 
     # SPECIAL METHODS #
@@ -1226,7 +1228,9 @@ class Metadata(base.Music21Object):
 
     @alternativeTitle.setter
     def alternativeTitle(self, value: str) -> None:
-        '''For type checking only. Does not run.'''
+        '''
+        For type checking only. Does not run.
+        '''
         setattr(self, 'alternativeTitle', value)
 
     @property
@@ -1258,7 +1262,9 @@ class Metadata(base.Music21Object):
 
     @composer.setter
     def composer(self, value: str) -> None:
-        '''For type checking only. Does not run.'''
+        '''
+        For type checking only. Does not run.
+        '''
         setattr(self, 'composer', value)
 
     @property
@@ -1292,7 +1298,9 @@ class Metadata(base.Music21Object):
 
     @composers.setter
     def composers(self, value: Iterable[str]) -> None:
-        '''For type checking only. Does not run.'''
+        '''
+        For type checking only. Does not run.
+        '''
         setattr(self, 'composers', value)
 
     @property
@@ -1305,7 +1313,9 @@ class Metadata(base.Music21Object):
 
     @date.setter
     def date(self, value: str) -> None:
-        '''For type checking only. Does not run.'''
+        '''
+        For type checking only. Does not run.
+        '''
         setattr(self, 'date', value)
 
     @property
@@ -1336,7 +1346,9 @@ class Metadata(base.Music21Object):
 
     @dateCreated.setter
     def dateCreated(self, value: str) -> None:
-        '''For type checking only. Does not run.'''
+        '''
+        For type checking only. Does not run.
+        '''
         setattr(self, 'dateCreated', value)
 
     @property
@@ -1348,7 +1360,9 @@ class Metadata(base.Music21Object):
 
     @fileFormat.setter
     def fileFormat(self, value: str) -> None:
-        '''For type checking only. Does not run.'''
+        '''
+        For type checking only. Does not run.
+        '''
         setattr(self, 'fileFormat', value)
 
     @property
@@ -1360,7 +1374,9 @@ class Metadata(base.Music21Object):
 
     @filePath.setter
     def filePath(self, value: str) -> None:
-        '''For type checking only. Does not run.'''
+        '''
+        For type checking only. Does not run.
+        '''
         setattr(self, 'filePath', value)
 
     @property
@@ -1372,7 +1388,9 @@ class Metadata(base.Music21Object):
 
     @fileNumber.setter
     def fileNumber(self, value: str) -> None:
-        '''For type checking only. Does not run.'''
+        '''
+        For type checking only. Does not run.
+        '''
         setattr(self, 'fileNumber', value)
 
     @property
@@ -1389,7 +1407,9 @@ class Metadata(base.Music21Object):
 
     @localeOfComposition.setter
     def localeOfComposition(self, value: str) -> None:
-        '''For type checking only. Does not run.'''
+        '''
+        For type checking only. Does not run.
+        '''
         setattr(self, 'localeOfComposition', value)
 
     @property
@@ -1410,7 +1430,9 @@ class Metadata(base.Music21Object):
 
     @librettist.setter
     def librettist(self, value: str) -> None:
-        '''For type checking only. Does not run.'''
+        '''
+        For type checking only. Does not run.
+        '''
         setattr(self, 'librettist', value)
 
     @property
@@ -1429,7 +1451,9 @@ class Metadata(base.Music21Object):
 
     @librettists.setter
     def librettists(self, value: Iterable[str]) -> None:
-        '''For type checking only. Does not run.'''
+        '''
+        For type checking only. Does not run.
+        '''
         setattr(self, 'librettists', value)
 
     @property
@@ -1453,7 +1477,9 @@ class Metadata(base.Music21Object):
 
     @lyricist.setter
     def lyricist(self, value: str) -> None:
-        '''For type checking only. Does not run.'''
+        '''
+        For type checking only. Does not run.
+        '''
         setattr(self, 'lyricist', value)
 
     @property
@@ -1472,7 +1498,9 @@ class Metadata(base.Music21Object):
 
     @lyricists.setter
     def lyricists(self, value: Iterable[str]) -> None:
-        '''For type checking only. Does not run.'''
+        '''
+        For type checking only. Does not run.
+        '''
         setattr(self, 'lyricists', value)
 
     @property
@@ -1493,7 +1521,9 @@ class Metadata(base.Music21Object):
 
     @movementName.setter
     def movementName(self, value: str) -> None:
-        '''For type checking only. Does not run.'''
+        '''
+        For type checking only. Does not run.
+        '''
         setattr(self, 'movementName', value)
 
     @property
@@ -1514,7 +1544,9 @@ class Metadata(base.Music21Object):
 
     @movementNumber.setter
     def movementNumber(self, value: str) -> None:
-        '''For type checking only. Does not run.'''
+        '''
+        For type checking only. Does not run.
+        '''
         setattr(self, 'movementNumber', value)
 
     @property
@@ -1542,7 +1574,9 @@ class Metadata(base.Music21Object):
 
     @number.setter
     def number(self, value: str) -> None:
-        '''For type checking only. Does not run.'''
+        '''
+        For type checking only. Does not run.
+        '''
         setattr(self, 'number', value)
 
     @property
@@ -1570,7 +1604,9 @@ class Metadata(base.Music21Object):
 
     @opusNumber.setter
     def opusNumber(self, value: str) -> None:
-        '''For type checking only. Does not run.'''
+        '''
+        For type checking only. Does not run.
+        '''
         setattr(self, 'opusNumber', value)
 
     @property
@@ -1590,7 +1626,9 @@ class Metadata(base.Music21Object):
 
     @title.setter
     def title(self, value: str) -> None:
-        '''For type checking only. Does not run.'''
+        '''
+        For type checking only. Does not run.
+        '''
         setattr(self, 'title', value)
 
     @property

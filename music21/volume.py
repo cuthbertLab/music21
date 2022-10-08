@@ -143,8 +143,8 @@ class Volume(prebase.ProtoM21Object, SlottedObjectMixin):
                                                  ] = True,
                        baseLevel=0.5,
                        clip=True):
-        '''Return the realized as rounded and formatted string value. Useful for testing.
-
+        '''
+        Return the realized as rounded and formatted string value. Useful for testing.
 
         >>> v = volume.Volume(velocity=64)
         >>> v.getRealizedStr()

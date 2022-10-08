@@ -866,7 +866,8 @@ class ConverterNoteworthy(SubConverter):
     # --------------------------------------------------------------------------
     def parseData(self, nwcData):
         # noinspection PyShadowingNames
-        r'''Open Noteworthy data from a string or list
+        r'''
+        Open Noteworthy data from a string or list
 
         >>> nwcData = ('!NoteWorthyComposer(2.0)\n|AddStaff\n|Clef|' +
         ...     'Type:Treble\n|Note|Dur:Whole|Pos:1^')
@@ -1339,7 +1340,8 @@ class ConverterABC(SubConverter):
 
 
 class ConverterRomanText(SubConverter):
-    '''Simple class wrapper for parsing roman text harmonic definitions.
+    '''
+    Simple class wrapper for parsing roman text harmonic definitions.
     '''
     registerFormats = ('romantext', 'rntext')
     registerInputExtensions = ('rntxt', 'rntext', 'romantext', 'rtxt')
@@ -1444,14 +1446,15 @@ class ConverterCapella(SubConverter):
 
 # ------------------------------------------------------------------------------
 class ConverterMuseData(SubConverter):
-    '''Simple class wrapper for parsing MuseData.
+    '''
+    Simple class wrapper for parsing MuseData.
     '''
     registerFormats = ('musedata',)
     registerInputExtensions = ('md', 'musedata', 'zip')
 
     def parseData(self, strData, number=None):  # pragma: no cover
-        '''Get musedata from a string representation.
-
+        '''
+        Get musedata from a string representation.
         '''
         from music21 import musedata as musedataModule
         from music21.musedata import translate as musedataTranslate
