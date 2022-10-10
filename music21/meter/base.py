@@ -490,9 +490,7 @@ class TimeSignature(TimeSignatureBase):
     def _reprInternal(self):
         return self.ratioString
 
-    def __eq__(self,
-               other: meter.TimeSignature
-               ) -> bool:
+    def __eq__(self, other) -> bool:
         '''
         Establishes equality between two time signatures
         on the basis of their having both
