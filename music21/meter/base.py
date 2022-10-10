@@ -495,17 +495,17 @@ class TimeSignature(TimeSignatureBase):
                ) -> bool:
         '''
         Establishes equality between two time signatures
-        on the basis of their having both 
+        on the basis of their having both
         the same beatSequence (e.g., {{1/8+1/8}+{1/8+1/8+1/8}})
         and the same ratioString (e.g., '2/8+3/8').
-        
-        We need the two-part comparison for 
+
+        We need the two-part comparison for
         pulling apart equality among a range of metrical structures.
 
         For example, two 5-time meters with a different
         beat structure count as different metres
         despite the fact that they could both be written as '5/8'.
-        As such, this is a more restrictive test than 
+        As such, this is a more restrictive test than
         :meth:`~music21.meter.TimeSignature.ratioEqual`
         which would return True for all '5/8's.
 
@@ -523,13 +523,13 @@ class TimeSignature(TimeSignatureBase):
         >>> otherKindOf5 = meter.TimeSignature('3+2/8')
         >>> otherKindOf5.ratioString
         '3/8+2/8'
-        
+
         >>> oneKindOf5.__eq__(otherKindOf5)
         False
-    
+
         Now for a complementary test the other way round:
-        two meters with the same internal structure 
-        but a different written time signature.        
+        two meters with the same internal structure
+        but a different written time signature.
 
         >>> oneKindOf44 = meter.TimeSignature('4/4')
         >>> sameKindOf44 = meter.TimeSignature()
@@ -539,9 +539,9 @@ class TimeSignature(TimeSignatureBase):
         >>> otherKindOf44 = meter.TimeSignature('Cut')
         >>> oneKindOf44 == otherKindOf44
         False
-                
+
         '''
-        
+
         if self.ratioString == other.ratioString:  # test 1
             if self.beatSequence == other.beatSequence:  # test 2
                 return True
