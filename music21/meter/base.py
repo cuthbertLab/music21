@@ -543,7 +543,6 @@ class TimeSignature(TimeSignatureBase):
         '''
         
         if self.ratioString == other.ratioString:  # test 1
-            return True
             if self.beatSequence == other.beatSequence:  # test 2
                 return True
             else:
