@@ -612,33 +612,36 @@ class Test(unittest.TestCase):
 
     def testEquality(self):
         '''
-        Test timeSignature equality on the basis of 
+        Test timeSignature equality on the basis of
         same ratioString and beatSequence
-        
+
         TODO:
         These tests set out expected behaviour
-        but are not currently passing.
+        but the assertEqual tests are not currently passing.
         '''
-        
+
         # 5/8: but different internal structure
+
         oneKindOf5 = TimeSignature('2+3/8')
         sameKindOf5 = TimeSignature('2+3/8')
-        
-        self.assertEqual(oneKindOf5.ratioString, '2/8+3/8')
-        self.assertEqual(oneKindOf5.ratioString, '2/8+3/8')
-        self.assertEqual(oneKindOf5, sameKindOf5)
 
-        otherKindOf5 = meter.TimeSignature('3+2/8')
+        self.assertEqual(oneKindOf5.ratioString, '2/8+3/8')
+        self.assertEqual(str(oneKindOf5.beatSequence), '{{1/8+1/8}+{1/8+1/8+1/8}}')
+        self.assertEqual(sameKindOf5.ratioString, '2/8+3/8')
+        self.assertEqual(str(sameKindOf5.beatSequence), '{{1/8+1/8}+{1/8+1/8+1/8}}')
+        self.assertEqual(oneKindOf5, sameKindOf5)  # TODO fails, despite the above
+
+        otherKindOf5 = TimeSignature('3+2/8')
         self.assertEqual(otherKindOf5.ratioString, '3/8+2/8')
         self.assertNotEqual(oneKindOf5, otherKindOf5)
 
         # 4/4: same internal structure, different written time signature.
 
-        oneKindOf44 = meter.TimeSignature('4/4')
-        sameKindOf44 = meter.TimeSignature()
-        self.assertEqual(oneKindOf44, sameKindOf44)
+        oneKindOf44 = TimeSignature('4/4')
+        sameKindOf44 = TimeSignature()
+        self.assertEqual(oneKindOf44, sameKindOf44)  # TODO fails
 
-        otherKindOf44 = meter.TimeSignature('Cut')
+        otherKindOf44 = TimeSignature('Cut')
         self.assertNotEqual(oneKindOf5, otherKindOf44)
 
 
