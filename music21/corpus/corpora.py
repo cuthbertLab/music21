@@ -183,7 +183,7 @@ class Corpus(prebase.ProtoM21Object):
 
     @property
     @abc.abstractmethod
-    def cacheFilePath(self):
+    def cacheFilePath(self) -> pathlib.Path:
         raise NotImplementedError
 
     # PUBLIC METHODS #
@@ -197,14 +197,11 @@ class Corpus(prebase.ProtoM21Object):
 
         Return the rebuilt metadata bundle.
         '''
-        mdb = self.metadataBundle
-        if mdb is None:
-            return self
         if self.cacheFilePath is None:
-            return self
-
-        mdb.clear()
-        mdb.delete()
+            raise ValueError('Cannot find the metadata bundle')
+        if self.cacheFilePath.exists():
+            self.cacheFilePath.unlink()
+        self.metadataBundle.clear()
         self.cacheMetadata(useMultiprocessing=useMultiprocessing, verbose=True)
         return self.metadataBundle
 
@@ -578,7 +575,7 @@ class CoreCorpus(Corpus):
     # PRIVATE PROPERTIES #
 
     @property
-    def cacheFilePath(self):
+    def cacheFilePath(self) -> pathlib.Path:
         filePath = common.getMetadataCacheFilePath() / 'core.p.gz'
         return filePath
 
@@ -752,7 +749,7 @@ class LocalCorpus(Corpus):
     # PRIVATE PROPERTIES #
 
     @property
-    def cacheFilePath(self):
+    def cacheFilePath(self) -> pathlib.Path:
         '''
         Get the path to the file path that stores the .json file.
 

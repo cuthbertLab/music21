@@ -1659,8 +1659,8 @@ class Duration(prebase.ProtoM21Object, SlottedObjectMixin):
             >>> d = n.duration
             >>> d.client is n
             True
-            '''
-        }
+            ''',
+    }
 
     # INITIALIZER #
 
@@ -3327,6 +3327,9 @@ class TupletFixer:
         >>> len(tupletGroups[0])
         9
         '''
+        if self.streamIn is None:
+            raise ValueError('Call setStream(Stream) before running.')
+
         self.allTupletGroups = []
         currentTupletGroup: list[note.GeneralNote] = []
         tupletActive = False
@@ -3349,7 +3352,7 @@ class TupletFixer:
 
         return self.allTupletGroups
 
-    def fixBrokenTupletDuration(self, tupletGroup):
+    def fixBrokenTupletDuration(self, tupletGroup: list[list[note.GeneralNote]]) -> None:
         r'''
         tries to fix cases like triplet quarter followed by triplet
         eighth to be a coherent tuplet.
