@@ -41,7 +41,6 @@ from music21.meter.core import MeterSequence
 environLocal = environment.Environment('meter')
 
 if TYPE_CHECKING:
-    from music21 import meter
     from music21 import stream
 
 # this is just a placeholder so that .beamSequence, etc. do not need to
