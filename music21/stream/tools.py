@@ -15,8 +15,6 @@ import typing as t
 from music21 import clef
 from music21 import environment
 from music21 import key
-from music21 import meter
-from music21 import note
 
 if t.TYPE_CHECKING:
     from music21 import stream
