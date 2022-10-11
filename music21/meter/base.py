@@ -449,6 +449,18 @@ class TimeSignature(TimeSignatureBase):
     '2/4+3/16' or '11/16 (2/4+3/16)'.  Or you might want the written
     TimeSignature to contradict what the notes imply.  All this can be done
     with .displaySequence.
+
+    Two time signatures are considered equal if they have both
+    the same beatSequence (e.g., {{1/8+1/8}+{1/8+1/8+1/8}})
+    and the same ratioString (e.g., '2/8+3/8').
+    For example, two 5-time meters with a different
+    beat structure count as different metres
+    despite the fact that they could both be written as '5/8'.
+
+    For a less restrictive test, see
+    :meth:`~music21.meter.TimeSignature.ratioEqual`
+    which returns True for all cases of '5/8'.
+
     '''
     _styleClass = style.TextStyle
     classSortOrder = 4
@@ -492,38 +504,6 @@ class TimeSignature(TimeSignatureBase):
 
     def __eq__(self, other) -> bool:
         '''
-        Establishes equality between two time signatures
-        on the basis of their having both
-        the same beatSequence (e.g., {{1/8+1/8}+{1/8+1/8+1/8}})
-        and the same ratioString (e.g., '2/8+3/8').
-
-        We need the two-part comparison for
-        pulling apart equality among a range of metrical structures.
-
-        For example, two 5-time meters with a different
-        beat structure count as different metres
-        despite the fact that they could both be written as '5/8'.
-        As such, this is a more restrictive test than
-        :meth:`~music21.meter.TimeSignature.ratioEqual`
-        which would return True for all '5/8's.
-
-        >>> oneKindOf5 = meter.TimeSignature('2+3/8')
-        >>> oneKindOf5.ratioString
-        '2/8+3/8'
-
-        >>> sameKindOf5 = meter.TimeSignature('2+3/8')
-        >>> sameKindOf5.ratioString
-        '2/8+3/8'
-
-        >>> oneKindOf5.__eq__(sameKindOf5)
-        True
-
-        >>> otherKindOf5 = meter.TimeSignature('3+2/8')
-        >>> otherKindOf5.ratioString
-        '3/8+2/8'
-
-        >>> oneKindOf5.__eq__(otherKindOf5)
-        False
 
         Now for a complementary test the other way round:
         two meters with the same internal structure

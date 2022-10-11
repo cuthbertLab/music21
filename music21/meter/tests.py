@@ -610,6 +610,27 @@ class Test(unittest.TestCase):
         beatSeq = ts328.beamSequence
         self.assertEqual(str(beatSeq), '{3/8+2/8}')
 
+    def testEquality(self):
+        '''
+        Test timeSignature equality on the basis of 
+        same ratioString and beatSequence
+        
+        TODO:
+        These tests set out expected behaviour
+        but are not currently passing.
+        '''
+        
+        oneKindOf5 = TimeSignature('2+3/8')
+        sameKindOf5 = TimeSignature('2+3/8')
+        
+        self.assertEqual(oneKindOf5.ratioString, '2/8+3/8')
+        self.assertEqual(oneKindOf5.ratioString, '2/8+3/8')
+        self.assertEqual(oneKindOf5, sameKindOf5)
+
+        otherKindOf5 = meter.TimeSignature('3+2/8')
+        self.assertEqual(otherKindOf5.ratioString, '3/8+2/8')
+        self.assertNotEqual(oneKindOf5, otherKindOf5)
+
 
 if __name__ == '__main__':
     import music21
