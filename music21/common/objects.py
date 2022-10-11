@@ -284,11 +284,11 @@ class FrozenObject(EqualSlottedObjectMixin):
             return True
 
         for st in inspect.stack():
-            if (st.frame.f_code.co_name in ('__init__', '__new__')
+            if (st.frame.f_code.co_name in ('__init__', '__new__', '__setstate__')
                     and 'self' in st.frame.f_locals
                     and st.frame.f_locals['self'].__class__ == self.__class__):
                 return True
-        raise TypeError(f'This {self.__class__} instance is immutable')
+        raise TypeError(f'This {self.__class__.__name__} instance is immutable.')
 
     def __setattr__(self, key: str, value):
         self._check_init(key)
@@ -296,7 +296,7 @@ class FrozenObject(EqualSlottedObjectMixin):
 
     def __delattr__(self, key: str):
         self._check_init(key)
-        super().__setattr__(key)
+        super().__delattr__(key)
 
     def __setitem__(self, key, value):
         if hasattr(super(), '__setitem__'):

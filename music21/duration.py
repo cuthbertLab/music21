@@ -70,6 +70,8 @@ from music21 import prebase
 
 if TYPE_CHECKING:
     from music21 import base
+    from music21 import note
+    from music21 import stream
 
 environLocal = environment.Environment('duration')
 
@@ -169,6 +171,8 @@ class QuarterLengthConversion(t.NamedTuple):
 
 def unitSpec(durationObjectOrObjects):
     '''
+    DEPRECATED and to be removed in v10.
+
     A simple data representation of most Duration objects. Processes a single
     Duration or a List of Durations, returning a single or list of unitSpecs.
 
@@ -616,12 +620,18 @@ def quarterConversion(qLen: OffsetQLIn) -> QuarterLengthConversion:
                             tuplet=None)
 
 
-    Since tuplets now apply to the entire Duration, expect some odder tuplets for unusual
+    Since tuplets apply to the entire Duration (since v2), expect some odder tuplets for unusual
     values that should probably be split generally...
 
     >>> duration.quarterConversion(7/3)
     QuarterLengthConversion(components=(DurationTuple(type='whole', dots=0, quarterLength=4.0),),
         tuplet=<music21.duration.Tuplet 12/7/16th>)
+
+    Note that because this method is cached, the tuplet returned will be reused, so
+    it should generally be copied before assigning.
+
+    >>> duration.quarterConversion(1/3).tuplet is duration.quarterConversion(1/3).tuplet
+    True
 
 
     This is a very close approximation:
@@ -1620,32 +1630,43 @@ class Duration(prebase.ProtoM21Object, SlottedObjectMixin):
         '_unlinkedType',
         '_dotGroups',
         'expressionIsInferred',
-        '_client'
+        'client',
     )
 
-    _DOC_ATTR = {'expressionIsInferred':
-                 '''
-                 Boolean indicating whether this duration was created from a
-                 number rather than a type and thus can be changed to another
-                 expression.  For instance the duration of 0.5 is generally
-                 an eighth note, but in the middle of a triplet group might be
-                 better written as a dotted-eighth triplet.  If expressionIsInferred
-                 is True then `music21` can change it according to complex.  If
-                 False, then the type, dots, and tuplets are considered immutable.
+    _DOC_ATTR = {
+        'expressionIsInferred': '''
+             Boolean indicating whether this duration was created from a
+             number rather than a type and thus can be changed to another
+             expression.  For instance the duration of 0.5 is generally
+             an eighth note, but in the middle of a triplet group might be
+             better written as a dotted-eighth triplet.  If expressionIsInferred
+             is True then `music21` can change it according to complex.  If
+             False, then the type, dots, and tuplets are considered immutable.
 
-                 >>> d = duration.Duration(0.5)
-                 >>> d.expressionIsInferred
-                 True
+             >>> d = duration.Duration(0.5)
+             >>> d.expressionIsInferred
+             True
 
-                 >>> d = duration.Duration('eighth')
-                 >>> d.expressionIsInferred
-                 False
-                 '''}
+             >>> d = duration.Duration('eighth')
+             >>> d.expressionIsInferred
+             False
+             ''',
+        'client': '''
+            A duration's "client" is the object that holds this
+            duration as a property.  It is informed whenever the duration changes.
+
+            >>> n = note.Note('C#5', type='whole')
+            >>> d = n.duration
+            >>> d.client is n
+            True
+            '''
+        }
 
     # INITIALIZER #
 
     def __init__(self,
                  typeOrDuration: str | OffsetQLIn | DurationTuple | None = None,
+                 /,
                  *,
                  type: str | None = None,  # pylint: disable=redefined-builtin
                  dots: int | None = None,
@@ -1658,7 +1679,8 @@ class Duration(prebase.ProtoM21Object, SlottedObjectMixin):
         # no need for super() on ProtoM21 or SlottedObjectMixin
 
         # store a reference to the object that has this duration object as a property
-        self._client = None
+        # Will assign at end, so as not to informClient during creation.
+        self.client: base.Music21Object | None = None
 
         self._componentsNeedUpdating = False
         self._quarterLengthNeedsUpdating = False
@@ -1711,8 +1733,9 @@ class Duration(prebase.ProtoM21Object, SlottedObjectMixin):
             self.quarterLength = quarterLength
             self.expressionIsInferred = True
 
-        if client is not None:
-            self.client = client
+        # now assign the client so further changes are informed.
+        self.client = client
+
 
     # SPECIAL METHODS #
     def __eq__(self, other):
@@ -1807,25 +1830,6 @@ class Duration(prebase.ProtoM21Object, SlottedObjectMixin):
         else:
             return common.defaultDeepcopy(self, memo)
 
-    def __getstate__(self):
-        self._client = common.unwrapWeakref(self._client)
-        return SlottedObjectMixin.__getstate__(self)
-
-    def __setstate__(self, state):
-        SlottedObjectMixin.__setstate__(self, state)
-        self._client = common.wrapWeakref(self._client)
-
-    def _getClient(self):
-        return common.unwrapWeakref(self._client)
-
-    def _setClient(self, newClient):
-        self._client = common.wrapWeakref(newClient)
-
-    client = property(_getClient, _setClient, doc='''
-        A duration's "client" is the object that holds this
-        duration as a property.  It is informed whenever the duration changes.
-    ''')
-
     # PRIVATE METHODS #
 
     def _updateComponents(self):
@@ -1839,7 +1843,7 @@ class Duration(prebase.ProtoM21Object, SlottedObjectMixin):
             qlc = quarterConversion(self._qtrLength)
             self.components = tuple(qlc.components)
             if qlc.tuplet is not None:
-                self.tuplets = (qlc.tuplet,)
+                self.tuplets = (copy.deepcopy(qlc.tuplet),)
         self._componentsNeedUpdating = False
 
     # PUBLIC METHODS #
@@ -2336,29 +2340,30 @@ class Duration(prebase.ProtoM21Object, SlottedObjectMixin):
         return True
 
     def sliceComponentAtPosition(self, quarterPosition):
+        # noinspection PyShadowingNames
         '''
         Given a quarter position within a component, divide that
         component into two components.
 
-        >>> a = duration.Duration()
-        >>> a.clear()  # need to remove default
+        >>> d = duration.Duration()
+        >>> d.clear()  # need to remove default
         >>> components = []
 
-        >>> a.addDurationTuple(duration.Duration('quarter'))
-        >>> a.addDurationTuple(duration.Duration('quarter'))
-        >>> a.addDurationTuple(duration.Duration('quarter'))
-        >>> a.quarterLength
+        >>> d.addDurationTuple(duration.Duration('quarter'))
+        >>> d.addDurationTuple(duration.Duration('quarter'))
+        >>> d.addDurationTuple(duration.Duration('quarter'))
+        >>> d.quarterLength
         3.0
-        >>> a.sliceComponentAtPosition(0.5)
-        >>> a.quarterLength
+        >>> d.sliceComponentAtPosition(0.5)
+        >>> d.quarterLength
         3.0
-        >>> len(a.components)
+        >>> len(d.components)
         4
-        >>> a.components[0].type
+        >>> d.components[0].type
         'eighth'
-        >>> a.components[1].type
+        >>> d.components[1].type
         'eighth'
-        >>> a.components[2].type
+        >>> d.components[2].type
         'quarter'
         '''
         # this may return a Duration object; we are not sure
@@ -2398,11 +2403,27 @@ class Duration(prebase.ProtoM21Object, SlottedObjectMixin):
 
         returns the current components WITHOUT running the component updater.
 
-        Needed by some internal methods.
+        Needed by some internal methods.  Components are made on the fly.
 
-        >>> d = duration.Duration()
+        >>> d = duration.Duration(1.25)
         >>> d.currentComponents()
         ()
+
+        Like in quantum physics, an observation affects the state:
+
+        >>> d.type
+        'complex'
+        >>> d.currentComponents()
+        (DurationTuple(type='quarter', dots=0, quarterLength=1.0),
+         DurationTuple(type='16th', dots=0, quarterLength=0.25))
+
+
+        Generally, just look at `.components`
+
+        >>> d = duration.Duration(1.25)
+        >>> d.components
+        (DurationTuple(type='quarter', dots=0, quarterLength=1.0),
+         DurationTuple(type='16th', dots=0, quarterLength=0.25))
         '''
         return self._components
 
@@ -2577,7 +2598,8 @@ class Duration(prebase.ProtoM21Object, SlottedObjectMixin):
     @property
     def dotGroups(self) -> tuple[int, ...]:
         '''
-        Dot groups are medieval dotted-dotted notes (written one above another).
+        Dot groups are a convenience for transcribing medieval music.
+        They represent dotted-dotted notes (written one above another).
         For instance a half note with dotGroups = (1, 1) represents a dotted half note that
         is itself dotted.  Worth 9 eighth notes (dotted-half tied to dotted-quarter).  It
         is not the same as a double-dotted half note, which is only worth 7 eighth notes.
@@ -2587,7 +2609,6 @@ class Duration(prebase.ProtoM21Object, SlottedObjectMixin):
         >>> a.dotGroups
         (0,)
         >>> a.dots = 1
-
 
         >>> a.dotGroups = (1, 1)
         >>> a.quarterLength
@@ -3069,6 +3090,19 @@ class Duration(prebase.ProtoM21Object, SlottedObjectMixin):
 
 
 class FrozenDuration(common.objects.FrozenObject, Duration):
+    '''
+    A FrozenDuration is one that must have all of its arguments specified
+    at the time of construction.  After that, it is immutable, like a Tuple
+    and thus can be shared across different objects (like in MeterTerminals)
+    or used as a hash.
+
+    >>> fd = duration.FrozenDuration(type='half', dots=2)
+    >>> fd.quarterLength
+    3.5
+    >>> fd.dots = 1
+    Traceback (most recent call last):
+    TypeError: This FrozenDuration instance is immutable.
+    '''
     __slots__ = ()
 
     def __init__(self, *arguments, **keywords):
@@ -3226,33 +3260,23 @@ class TupletFixer:
     brackets and time modification values of the tuplet so that they
     reflect proper beaming, etc.  It does not alter the quarterLength
     of any notes.
+
+    See :meth:`~music21.duration.TupletFixer.findTupletGroups` and
+    :meth:`~music21.duration.TupletFixer.fixBrokenTupletDuration` for
+    demonstrations.
     '''
-    def __init__(self, streamIn=None):
-        self.streamIn = streamIn
+    def __init__(self, streamIn: stream.Stream | None = None):
+        self.streamIn: stream.Stream | None = streamIn
+        self.allTupletGroups: list[list[note.GeneralNote]] = []
 
-        self.allTupletGroups = None
-        self.currentTupletNotes = None
-        self.currentTupletDefinition = None
-        self.totalTupletDuration = None
-        self.currentTupletDuration = None
-
-        self._resetValues()
-
-    def setStream(self, streamIn):
+    def setStream(self, streamIn: stream.Stream) -> None:
         '''
         Define a stream to work on and reset all temporary variables.
         '''
         self.streamIn = streamIn
-        self._resetValues()
-
-    def _resetValues(self):
         self.allTupletGroups = []
-        self.currentTupletNotes = []
-        self.currentTupletDefinition = None
-        self.totalTupletDuration = None
-        self.currentTupletDuration = None
 
-    def findTupletGroups(self, incorporateGroupings=False):
+    def findTupletGroups(self, incorporateGroupings: bool = False) -> list[list[note.GeneralNote]]:
         # noinspection PyShadowingNames
         '''
         Finds all tuplets in the stream and puts them into groups.
@@ -3304,7 +3328,7 @@ class TupletFixer:
         9
         '''
         self.allTupletGroups = []
-        currentTupletGroup = []
+        currentTupletGroup: list[note.Note] = []
         tupletActive = False
         for n in self.streamIn.notesAndRests:
             if not n.duration.tuplets:  # most common case first
@@ -3313,14 +3337,13 @@ class TupletFixer:
                     currentTupletGroup = []
                     tupletActive = False
                 continue
-            else:
-                if tupletActive is False:
-                    tupletActive = True
-                currentTupletGroup.append(n)
-                if incorporateGroupings and n.duration.tuplets[0].type == 'stop':
-                    self.allTupletGroups.append(currentTupletGroup)
-                    currentTupletGroup = []
-                    tupletActive = False
+            if tupletActive is False:
+                tupletActive = True
+            currentTupletGroup.append(n)
+            if incorporateGroupings and n.duration.tuplets[0].type == 'stop':
+                self.allTupletGroups.append(currentTupletGroup)
+                currentTupletGroup = []
+                tupletActive = False
         if tupletActive:
             self.allTupletGroups.append(currentTupletGroup)
 
