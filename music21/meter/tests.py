@@ -644,6 +644,14 @@ class Test(unittest.TestCase):
         otherKindOf44 = TimeSignature('Cut')
         self.assertNotEqual(oneKindOf5, otherKindOf44)
 
+        # Further tests
+        self.assertNotEqual(TimeSignature('Cut'), TimeSignature('2/2'))
+        self.assertNotEqual(TimeSignature('slow 6/8'), TimeSignature('fast 6/8'))
+
+        with self.assertRaises(AttributeError):  # TODO fails - does not raise
+            TimeSignature() == note.Note()
+        with self.assertRaises(AttributeError):
+            note.Note() == TimeSignature()
 
 if __name__ == '__main__':
     import music21
