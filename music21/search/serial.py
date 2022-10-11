@@ -11,7 +11,7 @@
 # -------------------------------------------------
 from __future__ import annotations
 
-from collections import Counter
+from collections import Counter, deque
 import copy
 from operator import attrgetter
 import unittest
@@ -783,7 +783,7 @@ class ContiguousSegmentSearcher:
             self.addActiveChords(partNumber)
 
     def searchRowsOnlyInclude(self, n, partNumber):
-        chordList = self.chordList
+        chordList = deque(self.chordList)
         chordList.append(n)
         self.totalLength += len(n.pitches)
         lengthOfActive = self.totalLength
