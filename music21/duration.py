@@ -431,6 +431,7 @@ def quarterLengthToNonPowerOf2Tuplet(
                    numberNotesNormal=qFrac.denominator,
                    durationActual=tupletDuration,
                    durationNormal=tupletDuration,
+                   frozen=True,
                    ), representativeDuration)
 
 
@@ -493,7 +494,9 @@ def quarterLengthToTuplet(
                         newTuplet = Tuplet(numberNotesActual=i,
                                            numberNotesNormal=m,
                                            durationActual=tupletDuration,
-                                           durationNormal=tupletDuration,)
+                                           durationNormal=tupletDuration,
+                                           frozen=True,
+                                           )
                         post.append(newTuplet)
                         break
             # not looking for these matches will add tuple alternative
@@ -506,6 +509,7 @@ def quarterLengthToTuplet(
     return post
 
 
+@lru_cache(1024)
 def quarterConversion(qLen: OffsetQLIn) -> QuarterLengthConversion:
     '''
     Returns a 2-element namedtuple of (components, tuplet)
@@ -718,6 +722,7 @@ def quarterConversion(qLen: OffsetQLIn) -> QuarterLengthConversion:
         return QuarterLengthConversion((DurationTuple(type='inexpressible',
                                                       dots=0,
                                                       quarterLength=qLen),), None)
+    tuplet.frozen = True
     return QuarterLengthConversion((component,), tuplet)
 
 
@@ -1063,6 +1068,7 @@ class Tuplet(prebase.ProtoM21Object):
         placement: t.Literal['above', 'below'] = 'above',
         tupletActualShow: TupletShowOptions = 'number',
         tupletNormalShow: TupletShowOptions = None,
+        frozen: bool = False,
         **keywords
     ):
         self.frozen = False
@@ -1149,6 +1155,8 @@ class Tuplet(prebase.ProtoM21Object):
         # for ratios. Options are same as above.
         self.tupletNormalShow: TupletShowOptions = tupletNormalShow
 
+        # set frozen after all inits are done
+        self.frozen = frozen
         # this attribute is not yet used anywhere
         # self.nestedInside = ''  # could be a tuplet object
 
@@ -1662,7 +1670,7 @@ class Duration(prebase.ProtoM21Object, SlottedObjectMixin):
         self._qtrLength: OffsetQL = 0.0
 
         # DurationTuples go here
-        self._components: list[DurationTuple] = []
+        self._components: tuple[DurationTuple, ...] = ()
 
         # defer updating until necessary
         self._quarterLengthNeedsUpdating = False
@@ -1829,7 +1837,7 @@ class Duration(prebase.ProtoM21Object, SlottedObjectMixin):
         self._quarterLengthNeedsUpdating = False
         if self.linked and self.expressionIsInferred:
             qlc = quarterConversion(self._qtrLength)
-            self.components = list(qlc.components)
+            self.components = tuple(qlc.components)
             if qlc.tuplet is not None:
                 self.tuplets = (qlc.tuplet,)
         self._componentsNeedUpdating = False
@@ -1895,13 +1903,13 @@ class Duration(prebase.ProtoM21Object, SlottedObjectMixin):
         if isinstance(dur, DurationTuple):
             if isnan(dur.quarterLength):
                 raise ValueError('Invalid quarterLength for DurationTuple: nan')
-            self._components.append(dur)
+            self._components = self._components + (dur,)
         elif isinstance(dur, Duration):  # it's a Duration object
             for c in dur.components:
-                self._components.append(c)
+                self._components = self._components + (dur,)
         else:  # it's a number that may produce more than one component
             for c in Duration(dur).components:
-                self._components.append(c)
+                self._components = self._components + (c,)
 
         if self.linked:
             self._quarterLengthNeedsUpdating = True
@@ -2060,7 +2068,7 @@ class Duration(prebase.ProtoM21Object, SlottedObjectMixin):
         0.0
         '''
         self._dotGroups = (0,)
-        self._components = []
+        self._components = ()
         self._componentsNeedUpdating = False
         self._quarterLengthNeedsUpdating = True
         self.informClient()
@@ -2379,7 +2387,8 @@ class Duration(prebase.ProtoM21Object, SlottedObjectMixin):
         d1 = durationTupleFromQuarterLength(slicePoint)
         d2 = durationTupleFromQuarterLength(remainder)
 
-        self._components[sliceIndex: (sliceIndex + 1)] = [d1, d2]
+        components = self.components[:sliceIndex] + (d1, d2) + self._components[sliceIndex+1:]
+        self._components = components
         # lengths should be the same as it was before
         self._updateQuarterLength()
 
@@ -2393,7 +2402,7 @@ class Duration(prebase.ProtoM21Object, SlottedObjectMixin):
 
         >>> d = duration.Duration()
         >>> d.currentComponents()
-        []
+        ()
         '''
         return self._components
 
@@ -2549,7 +2558,7 @@ class Duration(prebase.ProtoM21Object, SlottedObjectMixin):
         '''
         if self._componentsNeedUpdating:
             self._updateComponents()
-        return tuple(self._components)
+        return self._components
 
     @components.setter
     def components(self, value: Iterable[DurationTuple]):
@@ -2596,8 +2605,10 @@ class Duration(prebase.ProtoM21Object, SlottedObjectMixin):
         if not isinstance(value, tuple):
             raise TypeError('only tuple dotGroups values can be used with this method.')
         # removes dots from all components...
+        components = list(self._components)
         for i in range(len(self._components)):
-            self._components[i] = durationTupleFromTypeDots(self._components[i].type, 0)
+            components[i] = durationTupleFromTypeDots(self._components[i].type, 0)
+        self._components = tuple(components)
 
         self._dotGroups = value
         self._quarterLengthNeedsUpdating = True
@@ -2694,8 +2705,10 @@ class Duration(prebase.ProtoM21Object, SlottedObjectMixin):
             self.dots = 0
             return
 
+        comonents = list(self._components)
         for i, dt in enumerate(self._components):
-            self._components[i] = durationTupleFromTypeDots(dt.type, value)
+            components[i] = durationTupleFromTypeDots(dt.type, value)
+        self._components = tuple(components)
         self._quarterLengthNeedsUpdating = True
         if self.linked is True:
             self.expressionIsInferred = False
@@ -3053,6 +3066,15 @@ class Duration(prebase.ProtoM21Object, SlottedObjectMixin):
 
         else:
             self._unlinkedType = value
+
+
+class FrozenDuration(common.objects.FrozenObject, Duration):
+    __slots__ = ()
+
+    def __init__(self, *arguments, **keywords):
+        super().__init__(*arguments, **keywords)
+        self._updateComponents()
+        self._updateQuarterLength()
 
 
 class GraceDuration(Duration):
@@ -3745,7 +3767,7 @@ class Test(unittest.TestCase):
         d = Duration()
         d.quarterLength = 1 / 3
         self.assertEqual(repr(d.quarterLength), 'Fraction(1, 3)')
-        self.assertEqual(d._components, [])
+        self.assertEqual(d._components, ())
         self.assertTrue(d._componentsNeedUpdating)
         self.assertEqual(str(d.components),
                          "(DurationTuple(type='eighth', dots=0, quarterLength=0.5),)")
