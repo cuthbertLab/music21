@@ -16,6 +16,7 @@ This module defines two component objects for defining nested metrical structure
 from __future__ import annotations
 
 import copy
+from functools import lru_cache
 
 from music21 import prebase
 from music21.common.numberTools import opFrac
@@ -56,14 +57,25 @@ class MeterTerminal(prebase.ProtoM21Object, SlottedObjectMixin):
     )
 
     # INITIALIZER #
-    def __init__(self, slashNotation: str | None = None, weight=1):
+    def __init__(self,
+                 slashNotation: str | None = None,
+                 weight: int = 1,
+                 *,
+                 numerator: int = 0,
+                 denominator: int = 1,
+                 overriddenDuration: duration.Duration | None = None,
+                 ):
         # because of how they are copied, MeterTerminals must not have any
         # initialization parameters without defaults
         self._duration = None
-        self._numerator = 0
-        self._denominator = 1
-        self._weight = None
-        self._overriddenDuration = None
+        self._numerator = numerator
+        self._denominator = denominator
+
+        # this will set the underlying weight attribute directly for data checking
+        # explicitly calling base class method to avoid problems
+        # in the derived class MeterSequence
+        self._weight = weight
+        self._overriddenDuration = overriddenDuration
 
         if slashNotation is not None:
             # assign directly to values, not properties, to avoid
@@ -72,14 +84,18 @@ class MeterTerminal(prebase.ProtoM21Object, SlottedObjectMixin):
             self._numerator = values.numerator
             self._denominator = values.denominator
 
-        self._ratioChanged()  # sets self._duration
-
-        # this will set the underlying weight attribute directly for data checking
-        # explicitly calling base class method to avoid problems
-        # in the derived class MeterSequence
-        self._weight = weight
-
     # SPECIAL METHODS #
+
+    def __eq__(self, other):
+        if type(other) != type(self):
+            return False
+
+        return (
+            self.numerator == other.numerator
+            and self.denominator == other.denominator
+            and self.weight == other.weight
+            and self._overriddenDuration == other._overriddenDuration
+        )
 
     def __deepcopy__(self, memo=None):
         '''
@@ -96,9 +112,9 @@ class MeterTerminal(prebase.ProtoM21Object, SlottedObjectMixin):
         # for name in dir(self):
         new._numerator = self._numerator
         new._denominator = self._denominator
-        new._ratioChanged()  # faster than copying dur
-        # new._duration = copy.deepcopy(self._duration, memo)
+        new._overriddenDuration = self._overriddenDuration
         new._weight = self._weight  # these are numbers
+        # new._duration = copy.deepcopy(self._duration, memo)
         return new
 
     def _reprInternal(self):
@@ -276,43 +292,30 @@ class MeterTerminal(prebase.ProtoM21Object, SlottedObjectMixin):
     def weight(self, value):
         self._weight = value
 
-    def _getNumerator(self):
+    @property
+    def numerator(self):
+        '''
+        >>> a = meter.MeterTerminal('2/4')
+        >>> a.numerator
+        2
+        >>> a.duration.quarterLength
+        2.0
+        '''
         return self._numerator
 
-    def _setNumerator(self, value):
+    @property
+    def denominator(self):
         '''
+        Read-only attribute of a MeterTerminal
+
         >>> a = meter.MeterTerminal('2/4')
+        >>> a.denominator
+        4
         >>> a.duration.quarterLength
         2.0
-        >>> a.numerator = 11
-        >>> a.duration.quarterLength
-        11.0
+
         '''
-        self._numerator = value
-        self._ratioChanged()
-
-    numerator = property(_getNumerator, _setNumerator)
-
-    def _getDenominator(self):
         return self._denominator
-
-    def _setDenominator(self, value):
-        '''
-
-        >>> a = meter.MeterTerminal('2/4')
-        >>> a.duration.quarterLength
-        2.0
-        >>> a.numerator = 11
-        >>> a.duration.quarterLength
-        11.0
-        '''
-        # use duration.typeFromNumDict?
-        if value not in tools.validDenominatorsSet:
-            raise MeterException(f'bad denominator value: {value}')
-        self._denominator = value
-        self._ratioChanged()
-
-    denominator = property(_getDenominator, _setDenominator)
 
     def _ratioChanged(self):
         '''
@@ -338,14 +341,14 @@ class MeterTerminal(prebase.ProtoM21Object, SlottedObjectMixin):
                 )
                 self._duration = None
 
-    def _getDuration(self):
+    @property
+    @lru_cache(1024)
+    def duration(self):
         '''
-        duration gets or sets a duration value that
+        duration gets a duration value that
         is equal in length of the terminal.
 
-        >>> a = meter.MeterTerminal()
-        >>> a.numerator = 3
-        >>> a.denominator = 8
+        >>> a = meter.MeterTerminal(numerator=3, denominator=8)
         >>> d = a.duration
         >>> d.type
         'quarter'
@@ -392,11 +395,17 @@ class MeterSequence(MeterTerminal):
 
     # INITIALIZER #
 
-    def __init__(self, value=None, partitionRequest=None):
+    def __init__(self,
+                 value=None,
+                 partitionRequest=None,
+                 *,
+                 numerator: int|None = None,
+                 denominator: int|None = None
+                 ):
         super().__init__()
 
-        self._numerator = None  # rationalized
-        self._denominator = None  # lowest common multiple
+        self._numerator = numerator  # rationalized
+        self._denominator = denominator  # lowest common multiple
         self._partition = []  # a list of terminals or MeterSequences
         self._overriddenDuration = None
         self._levelListCache = {}
@@ -442,8 +451,6 @@ class MeterSequence(MeterTerminal):
         new._denominator = self._denominator
         # noinspection PyArgumentList
         new._partition = copy.deepcopy(self._partition, memo)
-        new._ratioChanged()  # faster than copying dur
-        # new._duration = copy.deepcopy(self._duration, memo)
 
         new._overriddenDuration = self._overriddenDuration
         new.summedNumerator = self.summedNumerator
@@ -996,8 +1003,8 @@ class MeterSequence(MeterTerminal):
                 divFirst = 2
             elif firstPartitionForm in [3]:
                 divFirst = 3
-    #             elif firstPartitionForm in [6, 9, 12, 15, 18]:
-    #                 divFirst = firstPartitionForm / 3
+            # elif firstPartitionForm in [6, 9, 12, 15, 18]:
+            #     divFirst = firstPartitionForm / 3
             # otherwise, set the first div to the number of beats; in 18/4
             # this should be 6
             else:  # set to numerator
@@ -1008,8 +1015,8 @@ class MeterSequence(MeterTerminal):
             # self[h] = self[h].subdivide(divFirst)
             depthCount += 1
 
-#         environLocal.printDebug(['subdivideNestedHierarchy(): firstPartitionForm:',
-#   firstPartitionForm, ': self: ', self])
+        # environLocal.printDebug(['subdivideNestedHierarchy(): firstPartitionForm:',
+        #                          firstPartitionForm, ': self: ', self])
 
         # all other partitions are recursive; start first with list
         post = [self[0]]
