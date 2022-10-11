@@ -520,6 +520,9 @@ class TimeSignature(TimeSignatureBase):
 
         '''
 
+        if not isinstance(other, type(self)):
+            return False  # or return NotImplemented -- we do both in the current code, should unify
+
         if self.ratioString == other.ratioString:  # test 1
             if self.beatSequence == other.beatSequence:  # test 2
                 return True
