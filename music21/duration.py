@@ -3328,7 +3328,7 @@ class TupletFixer:
         9
         '''
         self.allTupletGroups = []
-        currentTupletGroup: list[note.Note] = []
+        currentTupletGroup: list[note.GeneralNote] = []
         tupletActive = False
         for n in self.streamIn.notesAndRests:
             if not n.duration.tuplets:  # most common case first
