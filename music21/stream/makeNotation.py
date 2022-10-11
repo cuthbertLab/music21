@@ -1344,8 +1344,6 @@ def makeTupletBrackets(s: StreamType, *, inPlace=False) -> StreamType | None:
     Given a flat Stream of mixed durations, designates the first and last tuplet of any group
     of tuplets as the start or end of the tuplet, respectively.
 
-    TODO: does not handle nested tuplets
-
     >>> n = note.Note()
     >>> n.duration.quarterLength = 1/3
     >>> s = stream.Stream()
@@ -1358,6 +1356,11 @@ def makeTupletBrackets(s: StreamType, *, inPlace=False) -> StreamType | None:
     >>> tupletTypes = [x.duration.tuplets[0].type for x in s.notes]
     >>> tupletTypes
     ['start', None, 'stop', 'start', None, 'stop']
+
+    The tuplets must already be coherent.  See :class:`~music21.duration.TupletFixer`
+    for how to get that set up.
+
+    TODO: does not handle nested tuplets
 
     Changed in v1.8: `inPlace` is False by default
     Changed in v7: Legacy behavior of taking in a list of durations removed.

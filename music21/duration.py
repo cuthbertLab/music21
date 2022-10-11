@@ -3352,12 +3352,15 @@ class TupletFixer:
 
         return self.allTupletGroups
 
-    def fixBrokenTupletDuration(self, tupletGroup: list[list[note.GeneralNote]]) -> None:
+    def fixBrokenTupletDuration(self, tupletGroup: list[note.GeneralNote]) -> None:
+        # noinspection PyShadowingNames
         r'''
-        tries to fix cases like triplet quarter followed by triplet
+        Tries to fix cases like triplet quarter followed by triplet
         eighth to be a coherent tuplet.
 
-        requires a tuplet group from findTupletGroups() or TupletFixer.allTupletGroups
+        Requires a tuplet group from `findTupletGroups()` or TupletFixer.allTupletGroups.
+        Note: this works on a single tupletGroup while `findTupletGroups()`
+        returns a list of groups.
 
         >>> s = stream.Stream()
 
@@ -3372,16 +3375,38 @@ class TupletFixer:
         Fraction(1, 3)
         >>> s.append(n2)
 
+        Here are the current tuplets for the two notes:
+
         >>> n1.duration.tuplets[0]
         <music21.duration.Tuplet 3/2/quarter>
         >>> n2.duration.tuplets[0]
         <music21.duration.Tuplet 3/2/eighth>
 
-        >>> tf = duration.TupletFixer(s)  # no need to flatten this stream
+        Notice how the first note is waiting for 3 triplet quarters to
+        complete itself.  But it could be 2/3 of a quarter note divided into
+        eighth note triplets.  TupletFixer will work on this.
+
+        It takes in a flattened stream, like this one:
+
+        >>> tf = duration.TupletFixer(s)
+
+        Find the tuplet groups.  Returning a list of one group, which has
+        two notes in it:
+
         >>> tupletGroups = tf.findTupletGroups()
         >>> tupletGroups
         [[<music21.note.Note C>, <music21.note.Note D>]]
-        >>> tf.fixBrokenTupletDuration(tupletGroups[0])
+
+        Now fix that single group:
+
+        >>> tg0 = tupletGroups[0]
+        >>> [n.duration.tuplets[0].type for n in tg0]
+        [None, None]
+
+        >>> tf.fixBrokenTupletDuration(tg0)
+
+        Now the first quarter-note triplet knows that its group
+        will be complete after the next note:
 
         >>> n1.duration.tuplets[0]
         <music21.duration.Tuplet 3/2/eighth>
@@ -3390,42 +3415,113 @@ class TupletFixer:
         >>> n2.duration.tuplets[0]
         <music21.duration.Tuplet 3/2/eighth>
 
+        Note that the tuplet type is not affected by this call:
+
+        >>> [n.duration.tuplets[0].type for n in tg0]
+        [None, None]
+
+        To do that, call :func:`~music21.stream.makeNotation.makeTupletBrackets`
+        on the flattened stream:
+
+        >>> stream.makeNotation.makeTupletBrackets(s, inPlace=True)
+        >>> [n.duration.tuplets[0].type for n in tg0]
+        ['start', 'stop']
+
+
         More complex example, from a piece by Josquin:
 
         >>> humdrumExcerpt = '**kern *M3/1 3.c 6d 3e 3f 3d 3%2g 3e 3f#'
         >>> humdrumLines = '\n'.join(humdrumExcerpt.split())
+
+        There is a side format of humdrum that the Josquin Research Project uses
+        for long notes like the 3%2.
+
         >>> humdrum.spineParser.flavors['JRP'] = True
+
+        Since Humdrum parsing is going to apply TupletFixer, we will temporarily
+        disable it:
+
+        >>> saved_fixed_broken = duration.TupletFixer.fixBrokenTupletDuration
+        >>> duration.TupletFixer.fixBrokenTupletDuration = lambda x,y: None
+
         >>> s = converter.parse(humdrumLines, format='humdrum')
 
         >>> m1 = s.parts.first().measure(1)
+        >>> m1.show('text', addEndTimes=True)
+        {0.0 - 0.0} <music21.meter.TimeSignature 3/1>
+        {0.0 - 2.0} <music21.note.Note C>
+        {2.0 - 2.6667} <music21.note.Note D>
+        {2.6667 - 4.0} <music21.note.Note E>
+        {4.0 - 5.3333} <music21.note.Note F>
+        {5.3333 - 6.6667} <music21.note.Note D>
+        {6.6667 - 9.3333} <music21.note.Note G>
+        {9.3333 - 10.6667} <music21.note.Note E>
+        {10.6667 - 12.0} <music21.note.Note F#>
+
+        >>> duration.TupletFixer.fixBrokenTupletDuration = saved_fixed_broken
         >>> tf = duration.TupletFixer(m1)
         >>> tupletGroups = tf.findTupletGroups(incorporateGroupings=True)
-        >>> tf.fixBrokenTupletDuration(tupletGroups[-1])
+        >>> tupletGroups
+        [[<music21.note.Note C>, <music21.note.Note D>, <music21.note.Note E>],
+         [<music21.note.Note F>, <music21.note.Note D>, <music21.note.Note G>,
+          <music21.note.Note E>, <music21.note.Note F#>]]
+
+        There's a problem with the last group: it contains 5 notes and the
+        third note is twice as long as the others, so none of them form a coherent
+        triplet.
+
+        >>> [n.duration.tuplets[0] for n in tupletGroups[1]]
+        [<music21.duration.Tuplet 3/2/half>, <music21.duration.Tuplet 3/2/half>,
+         <music21.duration.Tuplet 3/2/whole>,
+         <music21.duration.Tuplet 3/2/half>, <music21.duration.Tuplet 3/2/half>]
+        >>> [n.duration.tuplets[0].type for n in tupletGroups[1]]
+        ['start', None, None, None, 'stop']
+
+
+        Fix the last broken tuplet group.
+
+        >>> tf.fixBrokenTupletDuration(tupletGroups[1])
+        >>> [n.duration.tuplets[0] for n in tupletGroups[1]]
+        [<music21.duration.Tuplet 3/2/whole>, <music21.duration.Tuplet 3/2/whole>,
+         <music21.duration.Tuplet 3/2/whole>,
+         <music21.duration.Tuplet 3/2/whole>, <music21.duration.Tuplet 3/2/whole>]
+
+        Note that the changes appear in the notes in the Stream as well.
+
         >>> m1.last().duration.tuplets[0]
         <music21.duration.Tuplet 3/2/whole>
-        >>> m1.last().duration.quarterLength
-        Fraction(4, 3)
+
+        Again, TupletFixer is automatically called when parsing from Humdrum.
+        (MusicXML specifies its tuplet groups explicitly.) But you may need it
+        when building up a stream from scratch in your own projects.
         '''
+        SMALL_SENTINEL = 1000
+        LARGE_SENTINEL = -1
+
         if not tupletGroup:
             return
         firstTup = tupletGroup[0].duration.tuplets[0]
         totalTupletDuration = opFrac(firstTup.totalTupletLength())
         currentTupletDuration = 0.0
-        smallestTupletTypeOrdinal = None
-        largestTupletTypeOrdinal = None
+        smallestTupletTypeOrdinal: int = SMALL_SENTINEL
+        largestTupletTypeOrdinal: int = LARGE_SENTINEL
 
         for n in tupletGroup:
             currentTupletDuration = opFrac(currentTupletDuration + n.duration.quarterLength)
             thisTup = n.duration.tuplets[0]
-            thisTupType = thisTup.durationActual.type
+            tupDurationActual = thisTup.durationActual
+            if TYPE_CHECKING:
+                assert tupDurationActual is not None
+
+            thisTupType = tupDurationActual.type
             thisTupTypeOrdinal = ordinalTypeFromNum.index(thisTupType)
 
-            if smallestTupletTypeOrdinal is None:
+            if smallestTupletTypeOrdinal == SMALL_SENTINEL:
                 smallestTupletTypeOrdinal = thisTupTypeOrdinal
             elif thisTupTypeOrdinal > smallestTupletTypeOrdinal:
                 smallestTupletTypeOrdinal = thisTupTypeOrdinal
 
-            if largestTupletTypeOrdinal is None:
+            if largestTupletTypeOrdinal == LARGE_SENTINEL:
                 largestTupletTypeOrdinal = thisTupTypeOrdinal
             elif thisTupTypeOrdinal < largestTupletTypeOrdinal:
                 largestTupletTypeOrdinal = thisTupTypeOrdinal
