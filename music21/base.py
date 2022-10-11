@@ -265,6 +265,8 @@ class Groups(list):  # no need to inherit from slotted object
 
 
 # -----------------------------------------------------------------------------
+_EQUALITY_SENTINEL_SELF = object()
+_EQUALITY_SENTINEL_OTHER = object()
 
 
 class Music21Object(prebase.ProtoM21Object):
@@ -306,6 +308,8 @@ class Music21Object(prebase.ProtoM21Object):
     isStream = False
 
     _styleClass: type[Style] = Style
+
+    equalityAttributes = ('duration',)
 
     # define order for presenting names in documentation; use strings
     _DOC_ORDER: list[str] = []
@@ -401,6 +405,12 @@ class Music21Object(prebase.ProtoM21Object):
             self.duration.quarterLength = quarterLength
         elif duration is not None:
             self.duration = duration
+
+    # def __eq__(self, other):
+    #     '''
+    #     Two music21 objects are
+    #     '''
+
 
     @property
     def id(self) -> int | str:

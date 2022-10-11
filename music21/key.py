@@ -363,10 +363,6 @@ class KeySignature(base.Music21Object):
         self._alteredPitches: list[pitch.Pitch] | None = None
         self.accidentalsApplyOnlyToOctave = False
 
-    def __hash__(self):
-        hashTuple = (self._sharps, tuple(self._alteredPitches), self.accidentalsApplyOnlyToOctave)
-        return hash(hashTuple)
-
     # --------------------------------------------------------------------------
 
     def _strDescription(self):
@@ -992,10 +988,6 @@ class Key(KeySignature, scale.DiatonicScale):
 
         # store an ordered list of alternative Key objects
         self.alternateInterpretations: list[Key] = []
-
-    def __hash__(self):
-        hashTuple = (self.tonic, self.mode)
-        return hash(hashTuple)
 
     def _reprInternal(self):
         return 'of ' + str(self)

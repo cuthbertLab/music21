@@ -947,7 +947,7 @@ class Accidental(prebase.ProtoM21Object, style.StyleMixin):
         >>> a == c
         False
         '''
-        if other is None or not isinstance(other, Accidental):
+        if not isinstance(other, Accidental):
             return False
         if self.name == other.name:
             return True

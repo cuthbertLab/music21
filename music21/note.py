@@ -614,8 +614,7 @@ class GeneralNote(base.Music21Object):
         they have the same articulation and expression classes (in any order),
         and their ties are equal.
         '''
-
-        if other is None or not isinstance(other, GeneralNote):
+        if not isinstance(other, GeneralNote):
             return NotImplemented
         # checks type, dots, tuplets, quarterLength, uses Pitch.__eq__
         if self.duration != other.duration:
@@ -1519,7 +1518,7 @@ class Note(NotRest):
         >>> n1 == 5
         False
         '''
-        if other is None or not isinstance(other, Note):
+        if not isinstance(other, type(self)):
             return NotImplemented
 
         # checks pitch.octave, pitch.accidental, uses Pitch.__eq__

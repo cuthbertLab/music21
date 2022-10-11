@@ -775,7 +775,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
 
     def __contains__(self, el):
         '''
-        Returns True if `el` definitely is in the stream and False otherwise.
+        Returns True if `el` is in the stream (compared with Identity) and False otherwise.
 
         >>> nC = note.Note('C4')
         >>> nD = note.Note('D4')
@@ -801,10 +801,8 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         >>> nC2 in s.elements
         True
         '''
-        for sEl in self.elements:  # for speed do not set active sites
-            if el is sEl:
-                return True
-        return False
+        return (any(sEl is el for sEl in self._elements)
+                or any(sEl is el for sEl in self._endElements))
 
     @property
     def elements(self) -> tuple[M21ObjType, ...]:
@@ -818,6 +816,14 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
 
         In other words:  Don't use unless you really know what you're doing.
         Treat a Stream like a list!
+
+        See how these are equivalent:
+
+        >>> m = stream.Measure([note.Note('F4'), note.Note('G4')])
+        >>> m.elements
+        (<music21.note.Note F>, <music21.note.Note G>)
+        >>> tuple(m)
+        (<music21.note.Note F>, <music21.note.Note G>)
 
         When setting .elements, a list of Music21Objects can be provided, or a complete Stream.
         If a complete Stream is provided, elements are extracted
@@ -848,6 +854,28 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         False
 
         >>> len(a.recurse().notes) == len(b.recurse().notes) == 20
+        True
+
+        There is one good use for .elements as opposed to treating a Stream like a list,
+        and that is that `in` for Streams compares on object identity, i.e.,
+        id(a) == id(b) [this is for historical reasons], while since `.elements`
+        is a tuple.  Recall our measure with the notes F4 and G4 above.
+
+        >>> other_g = note.Note('G4')
+
+        This new G can't be found in m, because it is not physically in the Measure
+
+        >>> other_g in m
+        False
+
+        But it is *equal* to something in the Measure:
+
+        >>> other_g in m.elements
+        True
+
+        But again, this could be done simply with:
+
+        >>> other_g in tuple(m)
         True
         '''
         # combines _elements and _endElements into one.
@@ -1512,11 +1540,11 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         be found.
 
         >>> s = stream.Stream()
-        >>> n1 = note.Note('g')
-        >>> n2 = note.Note('g#')
+        >>> n1 = note.Note('G')
+        >>> n2 = note.Note('A')
 
-        >>> s.insert(0, n1)
-        >>> s.insert(5, n2)
+        >>> s.insert(0.0, n1)
+        >>> s.insert(5.0, n2)
         >>> len(s)
         2
         >>> s.index(n1)
@@ -1524,10 +1552,20 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         >>> s.index(n2)
         1
 
-        >>> n3 = note.Note('a')
+        Note that this is done via Object identity, so another identical
+        G won't be found in the stream.
+
+        >>> n3 = note.Note('G')
         >>> s.index(n3)
         Traceback (most recent call last):
-        music21.exceptions21.StreamException: cannot find object (<music21.note.Note A>) in Stream
+        music21.exceptions21.StreamException: cannot find object (<music21.note.Note G>) in Stream
+
+        To find the index of something equal to the object in the stream, cast the
+        stream to a tuple or list first:
+
+        >>> tuple(s).index(n3)
+        0
+
         '''
         if not self.isSorted and self.autoSort:
             self.sort()  # will set isSorted to True
@@ -1830,6 +1868,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
             sectionList = getattr(self, section)  # self._elements or self._endElements
             popList = popDict[section]
             for popIndex in reversed(popList):
+                # Note: repeated pops do not seem to be O(n) in Python.
                 removeElement = sectionList.pop(popIndex)
                 try:
                     del self._offsetDict[id(removeElement)]
