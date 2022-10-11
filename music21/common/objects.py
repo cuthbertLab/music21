@@ -17,10 +17,12 @@ __all__ = [
     'RelativeCounter',
     'SlottedObjectMixin',
     'EqualSlottedObjectMixin',
+    'FrozenObject',
     'Timer',
 ]
 
 import collections
+import inspect
 import time
 import weakref
 
@@ -181,6 +183,8 @@ class SlottedObjectMixin:
     >>> outLoad = bsc #_DOCS_HIDE -- cannot define classes for pickling in doctests
     >>> outLoad.amplitude
     2
+
+    This is in OMIT
     '''
 
     # CLASS VARIABLES #
@@ -249,6 +253,8 @@ class EqualSlottedObjectMixin(SlottedObjectMixin):
 
     The equal comparison ignores differences in .id
     '''
+    __slots__: tuple[str, ...] = ()
+
     def __eq__(self, other):
         if type(self) is not type(other):
             return False
@@ -264,6 +270,51 @@ class EqualSlottedObjectMixin(SlottedObjectMixin):
         Defining __ne__ explicitly so that it inherits the same as __eq__
         '''
         return not (self == other)
+
+
+# my own version which Ned Batchelder (as usual) already anticipated:
+# https://stackoverflow.com/questions/4828080/how-to-make-an-immutable-object-in-python
+class FrozenObject(EqualSlottedObjectMixin):
+    __slots__: tuple[str, ...] = ()
+
+    def _check_init(self, key=None) -> bool:
+        if key == '__class__':
+            return True
+        if not getattr(self, 'frozen', True):
+            return True
+
+        for st in inspect.stack():
+            if (st.frame.f_code.co_name in ('__init__', '__new__', '__setstate__')
+                    and 'self' in st.frame.f_locals
+                    and st.frame.f_locals['self'].__class__ == self.__class__):
+                return True
+        raise TypeError(f'This {self.__class__.__name__} instance is immutable.')
+
+    def __setattr__(self, key: str, value):
+        self._check_init(key)
+        super().__setattr__(key, value)
+
+    def __delattr__(self, key: str):
+        self._check_init(key)
+        super().__delattr__(key)
+
+    def __setitem__(self, key, value):
+        if hasattr(super(), '__setitem__'):
+            self._check_init()
+            super().__setitem__(key, value)
+        raise TypeError(f'{self.__class__} object is not subscriptable')
+
+    def __delitem__(self, key):
+        if hasattr(super(), '__delitem__'):
+            self._check_init()
+            super().__delitem__(key)
+        raise TypeError(f'{self.__class__} object is not subscriptable')
+
+    def __hash__(self) -> int:
+        out = []
+        for s in self._getSlotsRecursive():
+            out.append((s, getattr(self, s)))
+        return hash(tuple(out))
 
 
 # ------------------------------------------------------------------------------
