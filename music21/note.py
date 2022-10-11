@@ -557,6 +557,7 @@ class GeneralNote(base.Music21Object):
     isRest = False
     isChord = False
     _styleClass: type[style.Style] = style.NoteStyle
+    equalityAttributes = ('tie',)
 
     # define order for presenting names in documentation; use strings
     _DOC_ORDER = ['duration', 'quarterLength']
@@ -614,25 +615,21 @@ class GeneralNote(base.Music21Object):
         they have the same articulation and expression classes (in any order),
         and their ties are equal.
         '''
-        if not isinstance(other, GeneralNote):
-            return NotImplemented
-        # checks type, dots, tuplets, quarterLength, uses Pitch.__eq__
-        if self.duration != other.duration:
+        if not super().__eq__(other):
             return False
+
         # Articulations are a list of Articulation objects.
         # Converting them to Set objects produces ordered cols that remove duplicates.
         # However, we must then convert to list to match based on class ==
         # not on class id().
-        if (sorted({x.classes[0] for x in self.articulations})
-                != sorted({x.classes[0] for x in other.articulations})):
-            return False
-        if (sorted({x.classes[0] for x in self.expressions})
-                != sorted({x.classes[0] for x in other.expressions})):
-            return False
+        for search in 'articulations', 'expressions':
+            my_artic_classes = [type(x) for x in getattr(self, search)]
+            other_artic_classes = [type(x) for x in getattr(other, search)]
+            if len(my_artic_classes) != len(other_artic_classes):
+                return False
+            if set(my_artic_classes) != set(other_artic_classes):
+                return False
 
-        # Tie objects if present compare only type
-        if self.tie != other.tie:
-            return False
         return True
 
     # --------------------------------------------------------------------------
@@ -981,6 +978,9 @@ class NotRest(GeneralNote):
             information about the beaming of this note.''',
     }
 
+    # Should volume be here too?  and _chordAttached?
+    equalityAttributes = ('notehead', 'noteheadFill', 'noteheadParenthesis', 'beams')
+
     def __init__(self,
                  beams: beam.Beams | None = None,
                  **keywords):
@@ -1000,24 +1000,6 @@ class NotRest(GeneralNote):
     # ==============================================================================================
     # Special functions
     # ==============================================================================================
-    def __eq__(self, other):
-        if super().__eq__(other) is NotImplemented:
-            return NotImplemented
-        if not super().__eq__(other):
-            return False
-        if not isinstance(other, NotRest):
-            return False
-
-        if self.notehead != other.notehead:
-            return False
-        if self.noteheadFill != other.noteheadFill:
-            return False
-        if self.noteheadParenthesis != other.noteheadParenthesis:
-            return False
-        # Q: should volume need to be equal?
-        if self.beams != other.beams:
-            return False
-        return True
 
     def __deepcopy__(self, memo=None):
         '''
@@ -1432,15 +1414,21 @@ class Note(NotRest):
     'E4'
 
     Two notes are considered equal if their most important attributes
-    (such as pitch, duration,
-    articulations, and ornaments) are equal.  Attributes
+    (such as pitch, duration, articulations, and expressions) are equal.  Attributes
     that might change based on the wider context
-    of a note (such as offset)
-    are not compared. This test does not look at lyrics in
+    of a note (such as offset) are not compared. This test does not look at lyrics in
     establishing equality.  (It may in the future.)
 
     >>> note.Note('C4') == note.Note('C4')
     True
+
+    Enharmonics are not equal:
+
+    >>> note.Note('D#4') == note.Note('E-4')
+    False
+
+    >>> note.Note('C4', type='half') == note.Note('C4', type='quarter')
+    False
 
     All keyword args that are valid for Duration or Pitch objects
     are valid (as well as those for superclasses, NotRest, GeneralNote,
@@ -1453,6 +1441,7 @@ class Note(NotRest):
     <music21.duration.Duration 0.875>
     '''
     isNote = True
+    equalityAttributes = ('pitch',)
 
     # Defines the order of presenting names in the documentation; use strings
     _DOC_ORDER = ['duration', 'quarterLength', 'nameWithOctave']
@@ -1496,36 +1485,6 @@ class Note(NotRest):
     def _reprInternal(self):
         return self.name
 
-    def __eq__(self, other):
-        '''
-        Tests Equality. See docs under Note above
-        (since __eq__'s docs don't display)
-
-        >>> n1 = note.Note()
-        >>> n1.pitch.name = 'G#'
-        >>> n2 = note.Note()
-        >>> n2.pitch.name = 'A-'
-        >>> n3 = note.Note()
-        >>> n3.pitch.name = 'G#'
-        >>> n1 == n2
-        False
-        >>> n1 == n3
-        True
-        >>> n3.duration.quarterLength = 3
-        >>> n1 == n3
-        False
-
-        >>> n1 == 5
-        False
-        '''
-        if not isinstance(other, type(self)):
-            return NotImplemented
-
-        # checks pitch.octave, pitch.accidental, uses Pitch.__eq__
-        if self.pitch != other.pitch:
-            return False
-
-        return super().__eq__(other)
 
     def __lt__(self, other):
         '''
@@ -1836,6 +1795,8 @@ class Unpitched(NotRest):
     AttributeError: 'Unpitched' object has no attribute 'pitch'
     '''
 
+    equalityAttributes = ('displayStep', 'displayOctave')
+
     def __init__(self,
                  displayName=None,
                  **keywords):
@@ -1848,19 +1809,6 @@ class Unpitched(NotRest):
             display_pitch = Pitch(displayName)
             self.displayStep = display_pitch.step
             self.displayOctave = display_pitch.octave
-
-    def __eq__(self, other):
-        if super().__eq__(other) is NotImplemented:
-            return NotImplemented
-        if not super().__eq__(other):
-            return False
-        if not isinstance(other, Unpitched):
-            return False
-        if self.displayStep != other.displayStep:
-            return False
-        if self.displayOctave != other.displayOctave:
-            return False
-        return True
 
     def _getStoredInstrument(self):
         return self._storedInstrument
@@ -1939,6 +1887,24 @@ class Rest(GeneralNote):
     True
     >>> r3.duration.quarterLength
     2.0
+
+    Two rests are considered equal if their durations are equal.
+
+    >>> r1 = note.Rest('quarter')
+    >>> r2 = note.Rest('quarter')
+    >>> r1 == r2
+    True
+    >>> r1 != r2
+    False
+
+    >>> r2.duration.quarterLength = 4/3
+    >>> r1 == r2
+    False
+
+    A rest is never equal to a note.
+
+    >>> r1 == note.Note()
+    False
     '''
     isRest = True
     name = 'rest'
@@ -1994,29 +1960,6 @@ class Rest(GeneralNote):
                 ql = int(ql)
             ql_string = str(ql)
             return f'{ql_string}ql'
-
-    def __eq__(self, other):
-        '''
-        A Music21 rest is equal to another object if that object is also a rest which
-        has the same duration.
-
-        >>> r1 = note.Rest()
-        >>> r2 = note.Rest()
-        >>> r1 == r2
-        True
-        >>> r1 != r2
-        False
-
-        >>> r2.duration.quarterLength = 4/3
-        >>> r1 == r2
-        False
-        >>> r1 == note.Note()
-        False
-        '''
-        if not isinstance(other, Rest):
-            return NotImplemented
-
-        return super().__eq__(other)
 
     @property
     def fullName(self) -> str:

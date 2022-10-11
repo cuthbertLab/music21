@@ -203,6 +203,8 @@ class Spanner(base.Music21Object):
     >>> sp1.completeStatus = True
     '''
 
+    equalityAttributes = ('spannerStorage',)
+
     def __init__(self,
                  *spannedElements: t.Union[base.Music21Object,
                                            Sequence[base.Music21Object]],

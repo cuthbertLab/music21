@@ -40,6 +40,7 @@ from __future__ import annotations
 import builtins
 from collections.abc import Generator, Iterable
 import copy
+import functools
 from importlib.util import find_spec
 import typing as t
 from typing import overload  # Pycharm can't do alias
@@ -269,6 +270,25 @@ _EQUALITY_SENTINEL_SELF = object()
 _EQUALITY_SENTINEL_OTHER = object()
 
 
+@functools.cache
+def _getEqualityAttributes(cls) -> frozenset[str]:
+    '''
+    Get equality attributes for a class.  Cached.
+
+    >>> base._getEqualityAttributes(base.Music21Object)
+    frozenset({'duration'})
+    >>> 'location' in base._getEqualityAttributes(bar.Barline)
+    True
+    >>> 'pitch' in base._getEqualityAttributes(bar.Barline)
+    False
+    '''
+    equalityAttributes = set()
+    for klass in [cls, *cls.mro()]:
+        if hasattr(klass, 'equalityAttributes'):
+            equalityAttributes |= set(klass.equalityAttributes)
+    return frozenset(equalityAttributes)
+
+
 class Music21Object(prebase.ProtoM21Object):
     '''
     Base class for all music21 objects.
@@ -406,11 +426,39 @@ class Music21Object(prebase.ProtoM21Object):
         elif duration is not None:
             self.duration = duration
 
-    # def __eq__(self, other):
-    #     '''
-    #     Two music21 objects are
-    #     '''
+    def __eq__(self, other) -> bool:
+        '''
+        Two music21 objects are equal if they are the same class and same duration.
 
+        Their offset, activeSite, id, and groups do not matter for equality.
+
+        Subclasses need to apply stricter criteria for equality.
+
+        >>> bar1 = bar.Barline('double', 'left')
+        >>> bar2 = bar.Barline('double', 'right')
+        >>> bar1 == bar2
+        False
+        >>> bar2.location = 'left'
+        >>> bar1 == bar2
+        True
+        >>> bar1.duration.type = 'whole'  # Buh?
+        >>> bar1 == bar2
+        False
+        '''
+        if not isinstance(other, self.__class__):
+            return False
+
+        for attr in _getEqualityAttributes(self.__class__):
+            if (getattr(self, attr, _EQUALITY_SENTINEL_SELF)
+                    != getattr(other, attr, _EQUALITY_SENTINEL_OTHER)):
+                return False
+        return True
+
+    def __hash__(self) -> int:
+        '''
+        Restore hashing, but only on id(self)
+        '''
+        return id(self) >> 4
 
     @property
     def id(self) -> int | str:
@@ -1111,55 +1159,55 @@ class Music21Object(prebase.ProtoM21Object):
         Stream subclass, SpannerStorage, internally to keep track
         of the elements that are spanned.
 
-        >>> n1 = note.Note('C4')
-        >>> n2 = note.Note('D4')
-        >>> sp1 = spanner.Slur(n1, n2)
-        >>> n1.getSpannerSites() == [sp1]
+        >>> c = note.Note('C4')
+        >>> d = note.Note('D4')
+        >>> slur1 = spanner.Slur(c, d)
+        >>> c.getSpannerSites() == [slur1]
         True
 
         Note that not all Spanners are in the spanner module. They
         tend to reside in modules closer to their musical function:
 
-        >>> sp2 = dynamics.Crescendo(n2, n1)
+        >>> cresc = dynamics.Crescendo(d, c)
 
-        The order that Spanners are returned is usually the order they
-        were created, but on fast computers there can be ties, so use
-        a set comparison if you expect multiple:
+        The order that Spanners are returned is by sortTuple.  For spanners
+        created the same way and in the same order, the order returned will
+        be consistent:
 
-        >>> set(n2.getSpannerSites()) == {sp1, sp2}
+        >>> d.getSpannerSites() == [slur1, cresc]
         True
 
         Optionally a class name or list of class names (as Classes or strings)
         can be specified and only Spanners of that class will be returned
 
-        >>> sp3 = dynamics.Diminuendo(n1, n2)
-        >>> n2.getSpannerSites(dynamics.Diminuendo) == [sp3]
+        >>> dim = dynamics.Diminuendo(c, d)
+        >>> d.getSpannerSites(dynamics.Diminuendo) == [dim]
         True
 
         A larger class name can be used to get all subclasses:
 
-        >>> set(n2.getSpannerSites(dynamics.DynamicWedge)) == {sp2, sp3}
+        >>> d.getSpannerSites(dynamics.DynamicWedge) == [cresc, dim]
         True
-        >>> set(n2.getSpannerSites(['Slur', 'Diminuendo'])) == {sp1, sp3}
+        >>> d.getSpannerSites(['Slur', 'Diminuendo']) == [slur1, dim]
         True
 
         Note that the order of spanners returned from this routine can vary, so
-        changing to a set is useful:
+        changing to a set is useful for comparisons
 
-        >>> set(n2.getSpannerSites(['Slur', 'Diminuendo'])) == {sp3, sp1}
+        >>> set(d.getSpannerSites(['Slur', 'Diminuendo'])) == {dim, slur1}
         True
 
 
         Example: see which pairs of notes are in the same slur.
 
-        >>> n3 = note.Note('E4')
-        >>> sp4 = spanner.Slur(n1, n3)
+        >>> e = note.Note('E4')
+        >>> slur2 = spanner.Slur(c, e)
 
-        >>> for n in [n1, n2, n3]:
-        ...    for nOther in [n1, n2, n3]:
+        >>> for n in [c, d, e]:
+        ...    nSlurs = n.getSpannerSites(spanner.Slur)
+        ...    for nOther in [c, d, e]:
         ...        if n is nOther:
         ...            continue
-        ...        nSlurs = n.getSpannerSites(spanner.Slur)
         ...        nOtherSlurs = nOther.getSpannerSites(spanner.Slur)
         ...        for thisSlur in nSlurs:
         ...            if thisSlur in nOtherSlurs:
@@ -1170,7 +1218,7 @@ class Music21Object(prebase.ProtoM21Object):
         E shares a slur with C
         '''
         found = self.sites.getSitesByClass('SpannerStorage')
-        post = []
+        post: list[spanner.Spanner] = []
         if spannerClassList is not None:
             if not common.isIterable(spannerClassList):
                 spannerClassList = [spannerClassList]
@@ -1186,7 +1234,7 @@ class Music21Object(prebase.ProtoM21Object):
                         post.append(obj.client)
                         break
 
-        return post
+        return sorted(post, key=lambda x: x.sortTuple())
 
     def purgeOrphans(self, excludeStorageStreams=True) -> None:
         '''

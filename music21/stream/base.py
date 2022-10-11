@@ -21,7 +21,7 @@ and :class:`~music21.stream.Score` objects, are also in this module.
 '''
 from __future__ import annotations
 
-from collections import namedtuple, OrderedDict
+from collections import deque, namedtuple, OrderedDict
 from collections.abc import Collection, Iterable, Sequence
 import copy
 from fractions import Fraction
@@ -377,6 +377,15 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
                 self.coreInsert(e.offset, e)
 
         self.coreElementsChanged()
+
+    def __eq__(self, other) -> bool:
+        '''
+        No two streams are ever equal unless they are the same Stream
+        '''
+        return id(self) == id(other)
+
+    def __hash__(self) -> int:
+        return id(self) >> 4
 
     def _reprInternal(self) -> str:
         if self.id is not None:
@@ -11596,6 +11605,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         ...    v1measure.insert(e.offset, e)
 
         >>> v2 = variant.Variant()
+        >>> v2.replacementDuration = 4.0
         >>> v2measure1 = stream.Measure()
         >>> v2measure2 = stream.Measure()
         >>> v2.insert(0.0, v2measure1)
@@ -11606,13 +11616,12 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         ...    v2measure2.insert(e.offset, e)
 
         >>> v3 = variant.Variant()
-        >>> v2.replacementDuration = 4.0
         >>> v3.replacementDuration = 4.0
         >>> v1.groups = ['docVariants']
         >>> v2.groups = ['docVariants']
         >>> v3.groups = ['docVariants']
 
-        >>> s.insert(4.0, v1)    # replacement variant
+        >>> s.insert(4.0, v1)   # replacement variant
         >>> s.insert(12.0, v2)  # insertion variant (2 bars replace 1 bar)
         >>> s.insert(20.0, v3)  # deletion variant (0 bars replace 1 bar)
         >>> s.show('text')
@@ -11782,9 +11791,8 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         # Loop through all variants, deal with replacement variants and
         # save insertion and deletion for later.
         for v in returnObj.getElementsByClass(variant.Variant):
-            if group is not None:
-                if group not in v.groups:
-                    continue  # skip those that are not part of this group
+            if group is not None and group not in v.groups:
+                continue  # skip those that are not part of this group
 
             lengthType = v.lengthType
 
@@ -12080,7 +12088,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         '''
         from music21 import variant
 
-        deletedMeasures = []  # For keeping track of what measure numbers are deleted
+        deletedMeasures = deque()  # For keeping track of what measure numbers are deleted
         # length of the deleted region
         lengthDifference = v.replacementDuration - v.containedHighestTime
 
@@ -12095,7 +12103,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
 
         # this will always remove elements before inserting
         for e in targets:
-            if getattr(e, 'isMeasure', False):  # if a measure is deleted, save its number
+            if isinstance(e, Measure):  # if a measure is deleted, save its number
                 deletedMeasures.append(e.number)
             oInVariant = self.elementOffset(e) - vStart
             removed.insert(oInVariant, e)
@@ -12105,11 +12113,11 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         highestNumber = None
         insertedMeasures = []
         for e in v.elements:
-            if getattr(e, 'isMeasure', False):
+            if not isinstance(e, Measure):
                 # If there are deleted numbers still saved, assign this measure the
                 # next highest and remove it from the list.
                 if deletedMeasures:
-                    e.number = deletedMeasures.pop(False)
+                    e.number = deletedMeasures.popleft()
                     # Save the highest number assigned so far. If there are numberless
                     # inserted measures at the end, this will name where to begin numbering.
                     highestNumber = e.number
