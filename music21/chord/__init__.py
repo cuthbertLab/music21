@@ -17,6 +17,7 @@ from __future__ import annotations
 
 __all__ = ['tools', 'tables', 'Chord', 'ChordException', 'fromIntervalVector', 'fromForteClass']
 
+from collections import deque
 from collections.abc import Iterable, Sequence
 import copy
 import typing as t
@@ -1806,7 +1807,8 @@ class Chord(ChordBase):
         for i in range(1, len(sortedPitchClassList)):
             if sortedPitchClassList[i] != sortedPitchClassList[i - 1]:
                 uniquePitchClassList.append(sortedPitchClassList[i])
-        intervalList = []
+
+        intervalList = deque()
         for i in range(1, len(uniquePitchClassList)):
             lPC = (uniquePitchClassList[i] - uniquePitchClassList[i - 1]) % 12
             intervalList.append(lPC)
@@ -1814,7 +1816,7 @@ class Chord(ChordBase):
         # make list of rotations
         rotationList = []
         for i in range(0, len(intervalList)):
-            b = intervalList.pop(0)
+            b = intervalList.popleft()
             intervalList.append(b)
             intervalTuple = tuple(intervalList)
             rotationList.append(intervalTuple)
