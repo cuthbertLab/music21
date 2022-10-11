@@ -131,16 +131,20 @@ def removeDuplicates(thisStream: stream.Stream,
     listOfObjectsToRemove = []
 
     for thisClass in classesToRemove:
+
         if thisClass not in [key.KeySignature, clef.Clef]:
             raise ValueError('key.KeySignature and clef.Clef are the only classes supported.')
         allStates = thisStream.recurse().getElementsByClass(thisClass)
+
+        if len(allStates) < 2:  # Not used, or doesn't change
+            continue
+
         currentState = allStates[0]  # First to initialize: can't be a duplicate
-        if len(allStates) > 1:
-            for thisState in allStates[1:]:
-                if thisState == currentState:
-                    listOfObjectsToRemove.append(thisState)
-                else:
-                    currentState = thisState
+        for thisState in allStates[1:]:
+            if thisState == currentState:
+                listOfObjectsToRemove.append(thisState)
+            else:
+                currentState = thisState
 
     for item in listOfObjectsToRemove:
         m = item.getContextByClass('Measure')
