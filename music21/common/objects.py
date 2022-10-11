@@ -17,6 +17,7 @@ __all__ = [
     'RelativeCounter',
     'SlottedObjectMixin',
     'EqualSlottedObjectMixin',
+    'FrozenObject',
     'Timer',
 ]
 
@@ -182,6 +183,8 @@ class SlottedObjectMixin:
     >>> outLoad = bsc #_DOCS_HIDE -- cannot define classes for pickling in doctests
     >>> outLoad.amplitude
     2
+
+    This is in OMIT
     '''
 
     # CLASS VARIABLES #
@@ -269,39 +272,10 @@ class EqualSlottedObjectMixin(SlottedObjectMixin):
         return not (self == other)
 
 
-# class ImmutableType(type):
-#     # see https://stackoverflow.com/questions/4828080/how-to-make-an-immutable-object-in-python
-#     @classmethod
-#     def change_init(mcs, original_init_method):
-#         def __new_init__(self, *args, **kwargs):
-#             if callable(original_init_method):
-#                 original_init_method(self, *args, **kwargs)
-#
-#             cls = self.__class__
-#
-#             def raiser(*a):
-#                 raise TypeError('This {cls} instance is immutable')
-#
-#             cls.__setattr__ = raiser
-#             cls.__delattr__ = raiser
-#             if hasattr(cls, '__setitem__'):
-#                 cls.__setitem__ = raiser
-#                 cls.__delitem__ = raiser
-#
-#         return __new_init__
-#
-#     def __new__(mcs, name, parents, kwargs):
-#         kwargs['__init__'] = mcs.change_init(kwargs.get('__init__'))
-#         return type.__new__(mcs, name, parents, kwargs)
-
-
-# class FrozenObject(metaclass=ImmutableType):
-#     pass
-
 # my own version which Ned Batchelder (as usual) already anticipated:
 # https://stackoverflow.com/questions/4828080/how-to-make-an-immutable-object-in-python
 class FrozenObject(EqualSlottedObjectMixin):
-    __slots__ = ()
+    __slots__: tuple[str, ...] = ()
 
     def _check_init(self, key=None) -> bool:
         if key == '__class__':
@@ -311,30 +285,29 @@ class FrozenObject(EqualSlottedObjectMixin):
 
         for st in inspect.stack():
             if (st.frame.f_code.co_name in ('__init__', '__new__')
-                and 'self' in st.frame.f_locals
-                and st.frame.f_locals['self'].__class__ == self.__class__
-            ):
+                    and 'self' in st.frame.f_locals
+                    and st.frame.f_locals['self'].__class__ == self.__class__):
                 return True
         raise TypeError(f'This {self.__class__} instance is immutable')
 
     def __setattr__(self, key: str, value):
         self._check_init(key)
-        return super().__setattr__(key, value)
+        super().__setattr__(key, value)
 
-    def __delattr__(self, key: str, value):
+    def __delattr__(self, key: str):
         self._check_init(key)
-        return super().__setattr__(key, value)
+        super().__setattr__(key)
 
     def __setitem__(self, key, value):
         if hasattr(super(), '__setitem__'):
             self._check_init()
-            return super().__setitem__(key, value)
+            super().__setitem__(key, value)
         raise TypeError(f'{self.__class__} object is not subscriptable')
 
-    def __delitem__(self, key, value):
+    def __delitem__(self, key):
         if hasattr(super(), '__delitem__'):
             self._check_init()
-            return super().__delitem__(key, value)
+            super().__delitem__(key)
         raise TypeError(f'{self.__class__} object is not subscriptable')
 
     def __hash__(self) -> int:

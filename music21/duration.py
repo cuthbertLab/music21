@@ -1906,7 +1906,7 @@ class Duration(prebase.ProtoM21Object, SlottedObjectMixin):
             self._components = self._components + (dur,)
         elif isinstance(dur, Duration):  # it's a Duration object
             for c in dur.components:
-                self._components = self._components + (dur,)
+                self._components = self._components + (c,)
         else:  # it's a number that may produce more than one component
             for c in Duration(dur).components:
                 self._components = self._components + (c,)
@@ -2387,7 +2387,7 @@ class Duration(prebase.ProtoM21Object, SlottedObjectMixin):
         d1 = durationTupleFromQuarterLength(slicePoint)
         d2 = durationTupleFromQuarterLength(remainder)
 
-        components = self.components[:sliceIndex] + (d1, d2) + self._components[sliceIndex+1:]
+        components = self.components[:sliceIndex] + (d1, d2) + self._components[sliceIndex + 1:]
         self._components = components
         # lengths should be the same as it was before
         self._updateQuarterLength()
@@ -2705,7 +2705,7 @@ class Duration(prebase.ProtoM21Object, SlottedObjectMixin):
             self.dots = 0
             return
 
-        comonents = list(self._components)
+        components = list(self._components)
         for i, dt in enumerate(self._components):
             components[i] = durationTupleFromTypeDots(dt.type, value)
         self._components = tuple(components)
