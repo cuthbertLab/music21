@@ -503,20 +503,7 @@ class TimeSignature(TimeSignatureBase):
 
     def __eq__(self, other) -> bool:
         '''
-
-        Now for a complementary test the other way round:
-        two meters with the same internal structure
-        but a different written time signature.
-
-        >>> oneKindOf44 = meter.TimeSignature('4/4')
-        >>> sameKindOf44 = meter.TimeSignature()
-        >>> oneKindOf44 == sameKindOf44
-        True
-
-        >>> otherKindOf44 = meter.TimeSignature('Cut')
-        >>> oneKindOf44 == otherKindOf44
-        False
-
+        See notes at class doc and in meter.tests
         '''
 
         if not isinstance(other, type(self)):

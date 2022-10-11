@@ -620,6 +620,7 @@ class Test(unittest.TestCase):
         but are not currently passing.
         '''
         
+        # 5/8: but different internal structure
         oneKindOf5 = TimeSignature('2+3/8')
         sameKindOf5 = TimeSignature('2+3/8')
         
@@ -630,6 +631,15 @@ class Test(unittest.TestCase):
         otherKindOf5 = meter.TimeSignature('3+2/8')
         self.assertEqual(otherKindOf5.ratioString, '3/8+2/8')
         self.assertNotEqual(oneKindOf5, otherKindOf5)
+
+        # 4/4: same internal structure, different written time signature.
+
+        oneKindOf44 = meter.TimeSignature('4/4')
+        sameKindOf44 = meter.TimeSignature()
+        self.assertEqual(oneKindOf44, sameKindOf44)
+
+        otherKindOf44 = meter.TimeSignature('Cut')
+        self.assertNotEqual(oneKindOf5, otherKindOf44)
 
 
 if __name__ == '__main__':
