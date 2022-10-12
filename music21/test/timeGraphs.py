@@ -439,7 +439,7 @@ class TestRecursion(Test):
         self.bach = music21.corpus.parse('bwv66.6')
 
     def testFocus(self):
-        for el in self.bach.recurse():
+        for _ in self.bach.recurse():
             pass
 
 
