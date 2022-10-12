@@ -113,8 +113,8 @@ class Expression(base.Music21Object):
     '''
     _styleClass = style.TextStyle
 
-    def __init__(self):
-        super().__init__()
+    def __init__(self, **keywords):
+        super().__init__(**keywords)
         self.tieAttach = 'first'  # attach to first note of a tied group.
 
     def _reprInternal(self) -> str:
@@ -344,8 +344,8 @@ class TextExpression(Expression):
             ''',
     }
 
-    def __init__(self, content=None):
-        super().__init__()
+    def __init__(self, content=None, **keywords):
+        super().__init__(**keywords)
         # numerous properties are inherited from TextFormat
         # the text string to be displayed; not that line breaks
         # are given in the xml with this non-printing character: (#)

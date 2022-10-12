@@ -247,7 +247,7 @@ class Spanner(base.Music21Object):
             msg.append(repr(objRef))
         return ''.join(msg)
 
-    def _deepcopySubclassable(self, memo=None, ignoreAttributes=None, removeFromIgnore=None):
+    def _deepcopySubclassable(self, memo=None, ignoreAttributes=None):
         '''
         see __deepcopy__ for tests and docs
         '''
@@ -258,10 +258,7 @@ class Spanner(base.Music21Object):
         else:
             ignoreAttributes = ignoreAttributes | defaultIgnoreSet
 
-        new = super()._deepcopySubclassable(memo, ignoreAttributes, removeFromIgnore)
-
-        if removeFromIgnore is not None:
-            ignoreAttributes = ignoreAttributes - removeFromIgnore
+        new = super()._deepcopySubclassable(memo, ignoreAttributes)
 
         if 'spannerStorage' in ignoreAttributes:
             # there used to be a bug here where spannerStorage would

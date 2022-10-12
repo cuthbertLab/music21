@@ -112,7 +112,7 @@ class Variant(base.Music21Object):
             self.groups.append(name)
 
 
-    def _deepcopySubclassable(self, memo=None, ignoreAttributes=None, removeFromIgnore=None):
+    def _deepcopySubclassable(self, memo=None, ignoreAttributes=None):
         '''
         see __deepcopy__ on Spanner for tests and docs
         '''
@@ -123,7 +123,7 @@ class Variant(base.Music21Object):
         else:
             ignoreAttributes = ignoreAttributes | defaultIgnoreSet
 
-        new = super()._deepcopySubclassable(memo, ignoreAttributes, removeFromIgnore)
+        new = super()._deepcopySubclassable(memo, ignoreAttributes)
 
         return new
 
