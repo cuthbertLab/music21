@@ -483,16 +483,19 @@ class Music21Object(prebase.ProtoM21Object):
             ignoreAttributes = ignoreAttributes | defaultIgnoreSet
 
         # call class to get a new, empty instance
-        # TODO: this creates an extra duration object for notes... optimize...
-        if '_duration' in ignoreAttributes and self._duration is not None:
-            d = self._duration
-            clientStore = d.client
-            d.client = None
-            newDuration = copy.deepcopy(d, memo)
-            d.client = clientStore
-            new = self.__class__(duration=newDuration)
-        else:
-            new = self.__class__()
+        try:
+            if '_duration' in ignoreAttributes and self._duration is not None:
+                # prevent creating an extra Duration.  deepcopy on Duration is optimized
+                d = self._duration
+                clientStore = d.client
+                d.client = None
+                newDuration = copy.deepcopy(d, memo)
+                d.client = clientStore
+                new = self.__class__(duration=newDuration)
+            else:
+                new = self.__class__()
+        except TypeError:
+            return common.defaultDeepcopy(self, memo)
 
         if '_derivation' in ignoreAttributes:
             # was: keep the old ancestor but need to update the client
