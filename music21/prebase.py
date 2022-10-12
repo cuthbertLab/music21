@@ -283,6 +283,10 @@ del t
 
 
 class Test(unittest.TestCase):
+    def testCopyAndDeepcopy(self):
+        from music21.test.commonTest import testCopyAll
+        testCopyAll(self, globals())
+
     def test_reprInternal(self):
         from music21.base import Music21Object
         b = Music21Object()

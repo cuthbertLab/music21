@@ -375,6 +375,9 @@ class Repeat(repeat.RepeatMark, Barline):
 
 # ------------------------------------------------------------------------------
 class Test(unittest.TestCase):
+    def testCopyAndDeepcopy(self):
+        from music21.test.commonTest import testCopyAll
+        testCopyAll(self, globals())
 
     def testSortOrder(self):
         from music21 import stream

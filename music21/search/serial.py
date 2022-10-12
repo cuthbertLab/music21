@@ -76,8 +76,8 @@ class ContiguousSegmentOfNotes(base.Music21Object):
     _DOC_ORDER = ['startMeasureNumber', 'startOffset', 'zeroCenteredTransformationsFromMatched',
                   'originalCenteredTransformationsFromMatched']
 
-    def __init__(self, segment=None, containerStream=None, partNumber=0):
-        super().__init__()
+    def __init__(self, segment=None, containerStream=None, partNumber=0, **keywords):
+        super().__init__(**keywords)
         self.segment = segment
         self.containerStream = containerStream
         self.partNumber = partNumber
