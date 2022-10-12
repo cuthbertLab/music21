@@ -1843,8 +1843,12 @@ class PartParser(XMLParserBase):
         partStaffs: list[stream.PartStaff] = []
         appendedElementIds: set[int] = set()  # id is id(el) not el.id
 
-        def copy_into_partStaff(source, target, omitTheseElementIds):
-            for sourceElem in source.getElementsByClass(STAFF_SPECIFIC_CLASSES):
+        def copy_into_partStaff(source: stream.Stream,
+                                target: stream.Stream,
+                                omitTheseElementIds: set[int]):
+            elementIterator = source.getElementsByClass(STAFF_SPECIFIC_CLASSES)
+            elementIterator.restoreActiveSites = False
+            for sourceElem in elementIterator:
                 idSource = id(sourceElem)
                 if idSource in omitTheseElementIds:
                     continue
@@ -1855,11 +1859,12 @@ class PartParser(XMLParserBase):
                     appendedElementIds.add(idSource)
                 sourceOffset = source.elementOffset(sourceElem, returnSpecial=True)
                 if sourceOffset != 'highestTime':
-                    target.coreInsert(sourceElem.offset, targetElem)
+                    target.coreInsert(sourceOffset, targetElem)
                 else:
                     target.coreStoreAtEnd(targetElem)
             target.coreElementsChanged()
 
+        sourceMeasureIterator = self.stream.getElementsByClass(stream.Measure)
         for staffIndex, staffKey in enumerate(uniqueStaffKeys):
             # staffIndex should be staffKey - 1, but you never know...
             removeClasses = STAFF_SPECIFIC_CLASSES[:]
@@ -1868,7 +1873,8 @@ class PartParser(XMLParserBase):
             newPartStaff = self.stream.template(removeClasses=removeClasses, fillWithRests=False)
             partStaffId = f'{self.partId}-Staff{staffKey}'
             newPartStaff.id = partStaffId
-            newPartStaff.addGroupForElements(partStaffId)  # set group for components (recurse?)
+            # set group for components (recurse?)
+            newPartStaff.addGroupForElements(partStaffId, setActiveSite=False)
             newPartStaff.groups.append(partStaffId)
             partStaffs.append(newPartStaff)
             self.parent.m21PartObjectsById[partStaffId] = newPartStaff
@@ -1882,7 +1888,7 @@ class PartParser(XMLParserBase):
                     elementsIdsNotToGoInThisStaff.add(id(el))
 
             for sourceMeasure, copyMeasure in zip(
-                self.stream.getElementsByClass(stream.Measure),
+                sourceMeasureIterator,
                 newPartStaff.getElementsByClass(stream.Measure)
             ):
                 copy_into_partStaff(sourceMeasure, copyMeasure, elementsIdsNotToGoInThisStaff)
@@ -1891,6 +1897,10 @@ class PartParser(XMLParserBase):
                 copyMeasure.flattenUnnecessaryVoices(force=False, inPlace=True)
 
         score = self.parent.stream
+        staffGroup = layout.StaffGroup(partStaffs, name=self.stream.partName, symbol='brace')
+        staffGroup.style.hideObjectOnPrint = True  # in truth, hide the name, not the brace
+        score.coreInsert(0, staffGroup)
+
         for partStaff in partStaffs:
             score.coreInsert(0, partStaff)
         score.coreElementsChanged()
@@ -1900,10 +1910,6 @@ class PartParser(XMLParserBase):
         # score.remove(originalPartStaff)
         # del self.parent.m21PartObjectsById[originalPartStaff.id]
 
-        staffGroup = layout.StaffGroup(partStaffs, name=self.stream.partName, symbol='brace')
-        staffGroup.style.hideObjectOnPrint = True  # in truth, hide the name, not the brace
-        self.parent.stream.insert(0, staffGroup)
-
     def _getStaffExclude(
         self,
         staffReference: StaffReferenceType,
@@ -1911,7 +1917,7 @@ class PartParser(XMLParserBase):
     ) -> list[base.Music21Object]:
         '''
         Given a staff reference dictionary, remove and combine in a list all elements that
-        are NOT part of the given key. Thus, return a list of all entries to remove.
+        are NOT part of the given targetKey. Thus, return a list of all entries to remove.
         It keeps those elements under the staff key None (common to all) and
         those under given key. This then is the list of all elements that should be deleted.
 
@@ -2227,7 +2233,7 @@ class PartParser(XMLParserBase):
                 if m.barDurationProportion() < 1.0:
                     m.padAsAnacrusis()
                     # environLocal.printDebug(['incompletely filled Measure found on musicxml
-                    #    import; interpreting as a anacrusis:', 'paddingLeft:', m.paddingLeft])
+                    #    import; interpreting as an anacrusis:', 'paddingLeft:', m.paddingLeft])
                 mOffsetShift = mHighestTime
 
             else:

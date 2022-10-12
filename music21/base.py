@@ -388,7 +388,9 @@ class Music21Object(prebase.ProtoM21Object):
         self._editorial: Editorial | None = None
 
         # private duration storage; managed by property
-        self._duration: Duration | None = None
+        self._duration: Duration | None = duration
+        if duration is not None:
+            duration.client = self
         self._priority = 0  # default is zero
 
         # store cached values here:
@@ -403,8 +405,6 @@ class Music21Object(prebase.ProtoM21Object):
             self.activeSite = activeSite
         if quarterLength is not None:
             self.duration.quarterLength = quarterLength
-        elif duration is not None:
-            self.duration = duration
 
     # def __eq__(self, other):
     #     '''
@@ -460,8 +460,7 @@ class Music21Object(prebase.ProtoM21Object):
     # noinspection PyArgumentList
     def _deepcopySubclassable(self: _M21T,
                               memo=None,
-                              ignoreAttributes=None,
-                              removeFromIgnore=None) -> _M21T:
+                              ignoreAttributes=None) -> _M21T:
         '''
         Subclassable __deepcopy__ helper so that the same attributes
         do not need to be called
@@ -471,10 +470,10 @@ class Music21Object(prebase.ProtoM21Object):
         the default deepcopy style.
         More can be passed to it.
 
-        removeFromIgnore can be a set of attributes to remove
-        from ignoreAttributes of a superclass.
-
         TODO: move to class attributes to cache.
+
+        Changed in v9: removeFromIgnore removed; never used and this is performance
+        critical.
         '''
         defaultIgnoreSet = {'_derivation', '_activeSite',
                             'sites', '_duration', '_style', '_cache'}
@@ -483,24 +482,17 @@ class Music21Object(prebase.ProtoM21Object):
         else:
             ignoreAttributes = ignoreAttributes | defaultIgnoreSet
 
-        if removeFromIgnore is not None:
-            ignoreAttributes = ignoreAttributes - removeFromIgnore
-
         # call class to get a new, empty instance
         # TODO: this creates an extra duration object for notes... optimize...
-        new = self.__class__()
-        # environLocal.printDebug(['Music21Object.__deepcopy__', self, id(self)])
-        # for name in dir(self):
-        if '_duration' in ignoreAttributes:
-            # this can be done much faster in most cases...
+        if '_duration' in ignoreAttributes and self._duration is not None:
             d = self._duration
-            if d is not None:
-                clientStore = d.client
-                d.client = None
-                newValue = copy.deepcopy(d, memo)
-                d.client = clientStore
-                newValue.client = new
-                setattr(new, '_duration', newValue)
+            clientStore = d.client
+            d.client = None
+            newDuration = copy.deepcopy(d, memo)
+            d.client = clientStore
+            new = self.__class__(duration=newDuration)
+        else:
+            new = self.__class__()
 
         if '_derivation' in ignoreAttributes:
             # was: keep the old ancestor but need to update the client
@@ -4053,8 +4045,8 @@ class ElementWrapper(Music21Object):
         if so, you might as well put that directly into the Stream itself.''',
     }
 
-    def __init__(self, obj: t.Any = None):
-        super().__init__()
+    def __init__(self, obj: t.Any = None, **keywords):
+        super().__init__(**keywords)
         self.obj = obj  # object stored here
 
     # -------------------------------------------------------------------------
