@@ -1413,9 +1413,6 @@ def analysisClassFromMethodName(method: str) -> type[DiscreteAnalysis] | None:
 
 
 class Test(unittest.TestCase):
-    def testCopyAndDeepcopy(self):
-        from music21.test.commonTest import testCopyAll
-        testCopyAll(self, globals())
 
     def testKeyAnalysisKrumhansl(self):
         from music21 import converter

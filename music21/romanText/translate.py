@@ -167,8 +167,8 @@ class RomanTextUnprocessedToken(base.ElementWrapper):
 
 
 class RomanTextUnprocessedMetadata(base.Music21Object):
-    def __init__(self, tag='', data='', **keywords):
-        super().__init__(**keywords)
+    def __init__(self, tag='', data=''):
+        super().__init__()
         self.tag = tag
         self.data = data
 

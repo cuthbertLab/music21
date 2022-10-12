@@ -662,9 +662,6 @@ class HandbellIndication(TechnicalIndication):
 
 # ------------------------------------------------------------------------------
 class Test(unittest.TestCase):
-    def testCopyAndDeepcopy(self):
-        from music21.test.commonTest import testCopyAll
-        testCopyAll(self, globals())
 
     def testBasic(self):
         a = FretBend()

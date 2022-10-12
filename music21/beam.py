@@ -702,9 +702,7 @@ class Beams(prebase.ProtoM21Object, EqualSlottedObjectMixin):
 
 
 class Test(unittest.TestCase):
-    def testCopyAndDeepcopy(self):
-        from music21.test.commonTest import testCopyAll
-        testCopyAll(self, globals())
+    pass
 
 
 # -----------------------------------------------------------------------------

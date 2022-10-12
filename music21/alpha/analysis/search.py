@@ -251,9 +251,6 @@ def findConsecutiveScale(source, targetScale, degreesRequired=5,
 
 # ------------------------------------------------------------------------------
 class Test(unittest.TestCase):
-    def testCopyAndDeepcopy(self):
-        from music21.test.commonTest import testCopyAll
-        testCopyAll(self, globals())
 
     def testFindConsecutiveScaleA(self):
         sc = scale.MajorScale('a4')

@@ -3439,9 +3439,6 @@ class ABCFile(prebase.ProtoM21Object):
 
 # ------------------------------------------------------------------------------
 class Test(unittest.TestCase):
-    def testCopyAndDeepcopy(self):
-        from music21.test.commonTest import testCopyAll
-        testCopyAll(self, globals())
 
     def testTokenization(self):
         from music21.abcFormat import testFiles

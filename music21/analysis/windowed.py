@@ -363,9 +363,6 @@ class TestMockProcessor:
 
 
 class Test(unittest.TestCase):
-    def testCopyAndDeepcopy(self):
-        from music21.test.commonTest import testCopyAll
-        testCopyAll(self, globals())
 
     def testBasic(self):
         from music21 import corpus

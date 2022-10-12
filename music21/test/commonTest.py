@@ -50,9 +50,7 @@ def testCopyAll(testInstance: unittest.TestCase, globals_: typing.Dict[str, typi
 
         try:  # see if obj can be made w/o args
             instance = obj()
-        except TypeError as te:
-            if issubclass(obj, music21.base.Music21Object):
-                raise TypeError('Define Music21Objects to be instantiated without initial args')
+        except TypeError:
             continue
 
         try:

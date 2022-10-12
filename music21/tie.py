@@ -147,9 +147,7 @@ class Tie(prebase.ProtoM21Object, SlottedObjectMixin):
 
 
 class Test(unittest.TestCase):
-    def testCopyAndDeepcopy(self):
-        from music21.test.commonTest import testCopyAll
-        testCopyAll(self, globals())
+    pass
 
 
 # ------------------------------------------------------------------------------

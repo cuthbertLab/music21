@@ -585,9 +585,6 @@ class NoteHash(tuple):
 
 
 class Test(unittest.TestCase):
-    def testCopyAndDeepcopy(self):
-        from music21.test.commonTest import testCopyAll
-        testCopyAll(self, globals())
 
     def _approximatelyEqual(self, a, b, sig_fig=2):
         '''
