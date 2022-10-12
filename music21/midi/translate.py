@@ -663,7 +663,10 @@ def midiEventsToChord(
 
 
 def chordToMidiEvents(
-    inputM21: chord.ChordBase, *, includeDeltaTime=True, channel=1
+    inputM21: chord.ChordBase,
+    *,
+    includeDeltaTime: bool = True,
+    channel: int = 1
 ) -> list[midi.DeltaTime | midi.MidiEvent]:
     # noinspection PyShadowingNames
     '''
@@ -698,7 +701,7 @@ def chordToMidiEvents(
     from music21 import midi as midiModule
     mt = None  # midi track
     eventList: list[midi.DeltaTime | midi.MidiEvent] = []
-    c = inputM21
+    c: chord.ChordBase = inputM21
 
     # temporary storage for setting correspondence
     noteOn: list[midi.MidiEvent] = []
@@ -747,6 +750,7 @@ def chordToMidiEvents(
         eventList.append(me)
         noteOn.append(me)
 
+    # TODO: chords with independent durations.
     # must create each note on in chord before each note on
     for i, noteOnEvent in enumerate(noteOn):
         if includeDeltaTime:
@@ -791,10 +795,10 @@ def _get_unpitched_pitch_value(unp: note.Unpitched) -> int:
 
 
 # ------------------------------------------------------------------------------
-def instrumentToMidiEvents(inputM21,
-                           includeDeltaTime=True,
+def instrumentToMidiEvents(inputM21: instrument.Instrument,
+                           includeDeltaTime: bool = True,
                            midiTrack=None,
-                           channel=1):
+                           channel: int = 1):
     '''
     Converts a :class:`~music21.instrument.Instrument` object to a list of MidiEvents
 

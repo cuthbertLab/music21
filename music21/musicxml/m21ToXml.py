@@ -3825,7 +3825,7 @@ class MeasureExporter(XMLExporterBase):
         # TODO: attr: time-only
         _synchronizeIds(mxNote, n)
 
-        d = chordOrN.duration
+        d = n.duration  # durations can be independent
 
         if isinstance(d, duration.GraceDuration):
             graceElement = SubElement(mxNote, 'grace')
@@ -4289,10 +4289,16 @@ class MeasureExporter(XMLExporterBase):
         </note>
         '''
         mxNoteList = []
+        notes = list(c)
         if isinstance(c, chord.Chord):
-            c.sortAscending()
+            if not len(notes):
+                return mxNoteList
+            # sort notes
+            notes.sort(key=lambda cn: (-cn.duration.quarterLength,
+                                       cn.pitch.diatonicNoteNum,
+                                       cn.pitch.ps))
 
-        for i, n in enumerate(c):
+        for i, n in enumerate(notes):
             if 'Unpitched' in n.classSet:
                 mxNoteList.append(self.unpitchedToXml(n, noteIndexInChord=i, chordParent=c))
             else:
