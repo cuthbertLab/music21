@@ -2530,6 +2530,10 @@ class Test(unittest.TestCase):
         out += ']'
         return out
 
+    def testCopyAndDeepcopy(self):
+        from music21.test.commonTest import testCopyAll
+        testCopyAll(self, globals())
+
     def testBasicA(self):
         o = Variant()
         o.append(note.Note('G3', quarterLength=2.0))
