@@ -877,6 +877,23 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
 
         >>> other_g in tuple(m)
         True
+
+        One reason to use `.elements` is to iterate quickly without setting
+        activeSite:
+
+        >>> n = note.Note()
+        >>> m1 = stream.Measure([n])
+        >>> m2 = stream.Measure([n])
+        >>> n.activeSite is m2
+        True
+        >>> for el in m1.elements:
+        ...     pass
+        >>> n.activeSite is m2
+        True
+        >>> for el in m1:
+        ...     pass
+        >>> n.activeSite is m1
+        True
         '''
         # combines _elements and _endElements into one.
         if 'elements' not in self._cache or self._cache['elements'] is None:
@@ -1937,7 +1954,6 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
     def _deepcopySubclassable(self: StreamType,
                               memo=None,
                               ignoreAttributes=None,
-                              removeFromIgnore=None
                               ) -> StreamType:
         # NOTE: this is a performance critical operation
         defaultIgnoreSet = {
@@ -1950,10 +1966,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
 
         # PyCharm seems to think that this is a StreamCore
         # noinspection PyTypeChecker
-        new: StreamType = super()._deepcopySubclassable(memo, ignoreAttributes, removeFromIgnore)
-
-        if removeFromIgnore is not None:  # pragma: no cover
-            ignoreAttributes = ignoreAttributes - removeFromIgnore
+        new: StreamType = super()._deepcopySubclassable(memo, ignoreAttributes)
 
         # new._offsetDict will get filled when ._elements is copied.
         newOffsetDict: dict[int, tuple[OffsetQLSpecial, base.Music21Object]] = {}
@@ -3477,7 +3490,12 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
     # --------------------------------------------------------------------------
     # methods that act on individual elements without requiring
     # coreElementsChanged to fire
-    def addGroupForElements(self, group, classFilter=None, *, recurse=False):
+    def addGroupForElements(self,
+                            group: str,
+                            classFilter=None,
+                            *,
+                            recurse=False,
+                            setActiveSite=True):
         '''
         Add the group to the groups attribute of all elements.
         if `classFilter` is set then only those elements whose objects
@@ -3527,6 +3545,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         sIterator = self.iter() if not recurse else self.recurse()
         if classFilter is not None:
             sIterator = sIterator.addFilter(filters.ClassFilter(classFilter))
+        sIterator.restoreActiveSites = not setActiveSite
         for el in sIterator:
             if group not in el.groups:
                 el.groups.append(group)
@@ -9476,10 +9495,10 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
                 m.sliceByGreatestDivisor(addTies=addTies, inPlace=True)
             return returnObj  # exit
 
-        uniqueQuarterLengths = []
+        uniqueQuarterLengths = set()
         for e in returnObj.notesAndRests:
             if e.quarterLength not in uniqueQuarterLengths:
-                uniqueQuarterLengths.append(e.quarterLength)
+                uniqueQuarterLengths.add(e.quarterLength)
 
         # environLocal.printDebug(['unique quarter lengths', uniqueQuarterLengths])
 
