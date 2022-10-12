@@ -4045,8 +4045,8 @@ class ElementWrapper(Music21Object):
         if so, you might as well put that directly into the Stream itself.''',
     }
 
-    def __init__(self, obj: t.Any = None):
-        super().__init__()
+    def __init__(self, obj: t.Any = None, **keywords):
+        super().__init__(**keywords)
         self.obj = obj  # object stored here
 
     # -------------------------------------------------------------------------
