@@ -1889,6 +1889,10 @@ class Test(unittest.TestCase):
         from music21.musicxml.m21ToXml import GeneralObjectExporter
         self.GEX = GeneralObjectExporter()
 
+    def testCopyAndDeepcopy(self):
+        from music21.test.commonTest import testCopyAll
+        testCopyAll(self, globals())
+
     def xmlStr(self, obj):
         xmlBytes = self.GEX.parse(obj)
         return xmlBytes.decode('utf-8')

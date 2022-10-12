@@ -1279,7 +1279,6 @@ def getIndex(featureString, extractorType=None):
 class Test(unittest.TestCase):
 
     def testStreamFormsA(self):
-
         from music21 import features
         self.maxDiff = None
 
