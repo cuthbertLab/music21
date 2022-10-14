@@ -1995,7 +1995,10 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
             if not e.isStream:
                 # noinspection PyArgumentList
                 newElement = copy.deepcopy(e, memo)
-            else:  # this prevents needing to make multiple replacements of spanner bundles
+            else:
+                # this prevents needing to make multiple replacements of spanner bundles
+                # apparently that was at some point a HUGE slowdown.  not 100% sure if
+                # it is still a problem or why.
                 newElement = e._deepcopySubclassable(memo)
 
             # ## TEST on copying!!!!
@@ -2021,14 +2024,10 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         Deepcopy the stream from copy.deepcopy()
         '''
         new = self._deepcopySubclassable(memo)
+        # see custom _deepcopySubclassable for why this is here rather than there.
         if new._elements:  # pylint: disable:no-member
             self._replaceSpannerBundleForDeepcopy(new)
 
-        # does not purgeOrphans -- q: is that a bug or by design?
-        # purging these orphans works in nearly all cases, but there are a few
-        # cases where we rely on a Stream having access to Stream it was
-        # part of after deepcopying
-        # new.purgeOrphans()
         return new
 
     def _replaceSpannerBundleForDeepcopy(self, new):
