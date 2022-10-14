@@ -1257,12 +1257,14 @@ class Minor67Default(enum.Enum):
 
 # -----------------------------------------------------------------------------
 
-
+# Delete RomanException in v10
 class RomanException(exceptions21.Music21Exception):
-    pass
+    '''
+    RomanException will be removed in v10.  Catch RomanNumeralException instead.
+    '''
 
 
-class RomanNumeralException(exceptions21.Music21Exception):
+class RomanNumeralException(ValueError, RomanException):
     pass
 
 
@@ -2340,7 +2342,7 @@ class RomanNumeral(harmony.Harmony):
         Called from the superclass, Harmony.__init__()
         '''
         if not isinstance(self._figure, str):  # pragma: no cover
-            raise RomanException(f'got a non-string figure: {self._figure!r}')
+            raise RomanNumeralException(f'got a non-string figure: {self._figure!r}')
 
         if not self.useImpliedScale:
             useScale = self._scale
@@ -2399,7 +2401,7 @@ class RomanNumeral(harmony.Harmony):
         elif 'd' in workingFigure:
             m = re.match(r'(?P<leading>.*)d(?P<figure>7|6/?5|4/?3|4/?2|2)$', workingFigure)
             if m is None:
-                raise RomanException(
+                raise RomanNumeralException(
                     f'Cannot make a dominant-seventh chord out of {workingFigure}. '
                     "Figure should be in ('7', '65', '43', '42', '2').")
             # this one is different
@@ -2843,8 +2845,8 @@ class RomanNumeral(harmony.Harmony):
         romanNormalMatch = self._romanNumeralAloneRegex.match(workingFigure)
         aug6Match = self._augmentedSixthRegex.match(workingFigure)  # 250ns not worth short-circuit
 
-        if not romanNormalMatch and not aug6Match:
-            raise RomanException(f'No roman numeral found in {workingFigure!r}')  # pragma: no cover
+        if not romanNormalMatch and not aug6Match:  # pragma: no cover
+            raise RomanNumeralException(f'No roman numeral found in {workingFigure!r}')
 
         if aug6Match:
             # NB -- could be Key or Scale
