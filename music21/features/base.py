@@ -125,10 +125,6 @@ class Feature:
 
 
 # ------------------------------------------------------------------------------
-class FeatureExtractorException(exceptions21.Music21Exception):
-    pass
-
-
 class FeatureExtractor:
     '''
     A model of process that extracts a feature from a Music21 Stream.

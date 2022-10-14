@@ -95,9 +95,6 @@ if TYPE_CHECKING:
 environLocal = environment.Environment('articulations')
 
 
-class ArticulationException(exceptions21.Music21Exception):
-    pass
-
 # ------------------------------------------------------------------------------
 class Articulation(base.Music21Object):
     '''
