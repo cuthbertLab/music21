@@ -314,7 +314,7 @@ class StreamFreezer(StreamFreezeThawBase):
         streamObj (not recursive).  Called by setupSerializationScaffold.
         '''
         if hasattr(streamObj, 'streamStatus'):
-            streamObj.streamStatus._client = None
+            streamObj.streamStatus.client = None
 
     def recursiveClearSites(self, startObj):
         '''

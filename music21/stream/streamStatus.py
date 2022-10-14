@@ -57,7 +57,6 @@ class StreamStatus(SlottedObjectMixin):
     __slots__ = (
         '_accidentals',
         '_beams',
-        '_client',
         '_concertPitch',
         '_dirty',
         '_enharmonics',
@@ -66,12 +65,12 @@ class StreamStatus(SlottedObjectMixin):
         '_rests',
         '_ties',
         '_tuplets',
+        'client',
     )
 
     # INITIALIZER #
 
     def __init__(self, client=None):
-        self._client = None
         self._accidentals = None
         self._beams = None
         self._concertPitch = None
@@ -93,22 +92,10 @@ class StreamStatus(SlottedObjectMixin):
         '''
         new = type(self)()
         for x in self.__slots__:
-            if x == '_client':
-                new._client = None
-            else:
+            if x != 'client':
                 setattr(new, x, getattr(self, x))
 
         return new
-
-    # unwrap weakref for pickling
-
-    def __getstate__(self):
-        self._client = common.unwrapWeakref(self._client)
-        return SlottedObjectMixin.__getstate__(self)
-
-    def __setstate__(self, state):
-        SlottedObjectMixin.__setstate__(self, state)
-        self._client = common.wrapWeakref(self._client)
 
     # PUBLIC METHODS #
 
@@ -172,15 +159,6 @@ class StreamStatus(SlottedObjectMixin):
             return None
 
     # PUBLIC PROPERTIES #
-
-    @property
-    def client(self):
-        return common.unwrapWeakref(self._client)
-
-    @client.setter
-    def client(self, client):
-        # client is the Stream that this status lives on
-        self._client = common.wrapWeakref(client)
 
     @property
     def accidentals(self):

@@ -231,7 +231,7 @@ def runningUnderIPython() -> bool:
 # NB -- temp files (tempFile) etc. are in environment.py
 
 # ------------------------------------------------------------------------------
-def defaultDeepcopy(obj, memo, callInit=True):
+def defaultDeepcopy(obj: t.Any, memo=None, *, ignoreAttributes: Iterable[str] = ()):
     '''
     Unfortunately, it is not possible to do something like::
 
@@ -251,31 +251,22 @@ def defaultDeepcopy(obj, memo, callInit=True):
             else:
                 return common.defaultDeepcopy(self, memo)
 
-    looks through both __slots__ and __dict__ and does a deepcopy
-    of anything in each of them and returns the new object.
+    Does a deepcopy of the state returned by `__reduce_ex__` for protocol 4.
 
-    If callInit is False, then only __new__() is called.  This is
-    much faster if you're just going to overload every instance variable
-    or is required if __init__ has required variables in initialization.
+    * Changed in v9: callInit is removed, replaced with ignoreAttributes.
+      uses `__reduce_ex__` and `copy._reconstruct` internally.
     '''
-    if callInit is False:
-        new = obj.__class__.__new__(obj.__class__)
-    else:
-        new = obj.__class__()
+    if memo is None:
+        memo = {}
 
-    dictState = getattr(obj, '__dict__', None)
-    if dictState is not None:
-        for k in dictState:
-            # noinspection PyArgumentList
-            setattr(new, k, copy.deepcopy(dictState[k], memo=memo))
-    slots = set()
-    for cls in obj.__class__.mro():  # it is okay that it's in reverse order, since it's just names
-        slots.update(getattr(cls, '__slots__', ()))
-    for slot in slots:
-        slotValue = getattr(obj, slot, None)
-        # might be none if slot was deleted; it will be recreated here
-        setattr(new, slot, copy.deepcopy(slotValue))
+    rv = obj.__reduce_ex__(4)  # get a protocol 4 reduction
+    state = rv[2]
 
+    # set up reducer to not copy the ignoreAttributes set.
+    for ignore_attr in ignoreAttributes:
+        if ignore_attr in state:
+            state[ignore_attr] = None  # atomic copy.
+    new = copy._reconstruct(obj, memo, *rv)
     return new
 
 

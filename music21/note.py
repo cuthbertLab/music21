@@ -1035,22 +1035,9 @@ class NotRest(GeneralNote):
         new = super().__deepcopy__(memo=memo)
         # after copying, if a Volume exists, it is linked to the old object
         # look at _volume so as not to create object if not already there
-        # pylint: disable=no-member
-        if self._volume is not None:
+        if self.hasVolumeInformation():
             new.volume.client = new  # update with new instance
         return new
-
-    def __getstate__(self):
-        state = super().__getstate__()
-        if '_volume' in state and state['_volume'] is not None:
-            state['_volume'].client = None
-        return state
-
-    def __setstate__(self, state):
-        super().__setstate__(state)
-        if self._volume is not None:
-            self._volume.client = self
-    ####
 
     def _getStemDirection(self) -> str:
         return self._stemDirection
@@ -1591,6 +1578,7 @@ class Note(NotRest):
         '''
         After doing a deepcopy of the pitch, be sure to set the client
         '''
+        breakpoint()
         new = super().__deepcopy__(memo=memo)
         # noinspection PyProtectedMember
         new.pitch._client = new  # pylint: disable=no-member

@@ -1808,27 +1808,14 @@ class Duration(prebase.ProtoM21Object, SlottedObjectMixin):
         else:
             return f'unlinked type:{self.type} quarterLength:{self.quarterLength}'
 
-    # unwrap weakref for pickling
     def __deepcopy__(self, memo):
         '''
-        Do some very fast creations...
+        Don't copy client when creating
         '''
-        if (self._componentsNeedUpdating is False
-                and len(self._components) == 1
-                and self._dotGroups == (0,)
-                and self._linked is True
-                and not self._tuplets):  # 99% of notes...
-            # ignore all but components
-            return self.__class__(durationTuple=self._components[0])
-        elif (self._componentsNeedUpdating is False
-                and not self._components
-                and self._dotGroups == (0,)
-                and not self._tuplets
-                and self._linked is True):
-            # ignore all
-            return self.__class__()
-        else:
-            return common.defaultDeepcopy(self, memo)
+        rv = self.__reduce_ex__(4)
+        state = rv[2]
+        state['client'] = None
+        return copy._reconstruct(self, memo, *rv)
 
     # PRIVATE METHODS #
 
@@ -3110,6 +3097,11 @@ class FrozenDuration(common.objects.FrozenObject, Duration):
         self._updateComponents()
         self._updateQuarterLength()
 
+    def __deepcopy__(self, memo=None):
+        '''
+        Immutable objects return themselves
+        '''
+        return self
 
 class GraceDuration(Duration):
     '''
