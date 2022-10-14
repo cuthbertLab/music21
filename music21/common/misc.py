@@ -266,7 +266,7 @@ def defaultDeepcopy(obj: t.Any, memo=None, *, ignoreAttributes: Iterable[str] = 
     for ignore_attr in ignoreAttributes:
         if ignore_attr in state:
             state[ignore_attr] = None  # atomic copy.
-    new = copy._reconstruct(obj, memo, *rv)
+    new = copy._reconstruct(obj, memo, *rv)  # type: ignore
     return new
 
 

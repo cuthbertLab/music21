@@ -1952,7 +1952,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
 
     # pylint: disable=no-member
     def _deepcopySubclassable(self: StreamType,
-                              memo=None,
+                              memo: dict[int, t.Any] | None = None,
                               *,
                               ignoreAttributes=None,
                               ) -> StreamType:
@@ -5268,7 +5268,10 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         '''
         at_sounding = self.atSoundingPitch
         if self.atSoundingPitch == 'unknown':
-            for site in self.sites:
+            for contextTuple in self.contextSites():
+                # follow derivations to find one something in a derived hierarchy
+                # where soundingPitch might be defined.
+                site = contextTuple.site
                 if site.isStream and site.atSoundingPitch != 'unknown':
                     at_sounding = site.atSoundingPitch
                     break

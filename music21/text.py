@@ -372,7 +372,7 @@ class TextBox(base.Music21Object):
 
 
 # ------------------------------------------------------------------------------
-_stored_trigrams = {}
+_stored_trigrams: dict[str, Trigram] = {}
 
 
 class LanguageDetector:

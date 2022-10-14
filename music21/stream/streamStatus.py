@@ -14,7 +14,6 @@ from __future__ import annotations
 import unittest
 
 from music21 import environment
-from music21 import common
 from music21.common.objects import SlottedObjectMixin
 
 environLocal = environment.Environment(__file__)

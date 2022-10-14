@@ -856,6 +856,7 @@ class Sites(common.SlottedObjectMixin):
         have the element. This results b/c Sites are shallow-copied, and then
         elements are re-added.
 
+        >>> import gc
         >>> class Mock(base.Music21Object):
         ...     pass
         >>> aStream = stream.Stream()
@@ -866,6 +867,7 @@ class Sites(common.SlottedObjectMixin):
         >>> mySites.add(aStream)
         >>> mySites.add(bStream)
         >>> del aStream
+        >>> numObjectsCollected = gc.collect()  # make sure to garbage collect
 
         We still have 3 locations -- just because aStream is gone, doesn't
         make it disappear from sites

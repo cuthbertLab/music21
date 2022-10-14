@@ -310,14 +310,18 @@ class Spanner(base.Music21Object):
     # this is the same as with Variants
 
     def purgeOrphans(self, excludeStorageStreams=True):
-        self.spannerStorage.purgeOrphans(excludeStorageStreams)
+        if self.spannerStorage:
+            # might not be defined in the middle of a deepcopy.
+            self.spannerStorage.purgeOrphans(excludeStorageStreams)
         base.Music21Object.purgeOrphans(self, excludeStorageStreams)
 
     def purgeLocations(self, rescanIsDead=False):
         # must override Music21Object to purge locations from the contained
         # Stream
         # base method to perform purge on the Stream
-        self.spannerStorage.purgeLocations(rescanIsDead=rescanIsDead)
+        if self.spannerStorage:
+            # might not be defined in the middle of a deepcopy.
+            self.spannerStorage.purgeLocations(rescanIsDead=rescanIsDead)
         base.Music21Object.purgeLocations(self, rescanIsDead=rescanIsDead)
 
     # --------------------------------------------------------------------------

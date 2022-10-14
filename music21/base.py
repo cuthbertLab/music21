@@ -457,7 +457,7 @@ class Music21Object(prebase.ProtoM21Object):
         self.groups = copy.deepcopy(other.groups)
 
     def _deepcopySubclassable(self: _M21T,
-                              memo: dict[str, t.Any] | None = None,
+                              memo: dict[int, t.Any] | None = None,
                               *,
                               ignoreAttributes: set[str] | None = None) -> _M21T:
         '''
@@ -490,6 +490,9 @@ class Music21Object(prebase.ProtoM21Object):
         newDerivation.method = '__deepcopy__'
         setattr(new, '_derivation', newDerivation)
         # None activeSite is correct for new value
+
+        # must do this after copying
+        new.purgeOrphans()
 
         return new
 
@@ -534,8 +537,6 @@ class Music21Object(prebase.ProtoM21Object):
         '''
         # environLocal.printDebug(['calling Music21Object.__deepcopy__', self])
         new = self._deepcopySubclassable(memo)
-        # must do this after copying
-        new.purgeOrphans()
         # environLocal.printDebug([self, 'end deepcopy', 'self._activeSite', self._activeSite])
         return new
 
@@ -1763,8 +1764,8 @@ class Music21Object(prebase.ProtoM21Object):
 
         Here we make a copy of the earlier measure, and we see that its contextSites
         follow the derivationChain from the original measure and still find the Part
-        and Score of the original Measure 3 even though mCopy is not in any of these
-        objects.
+        and Score of the original Measure 3 (and also the original Measure 3)
+        even though mCopy is not in any of these objects.
 
         >>> import copy
         >>> mCopy = copy.deepcopy(m)
@@ -1772,6 +1773,9 @@ class Music21Object(prebase.ProtoM21Object):
         >>> for csTuple in mCopy.contextSites():
         ...      print(csTuple, mCopy in csTuple.site)
         ContextTuple(site=<music21.stream.Measure 3333 offset=0.0>,
+                     offset=0.0,
+                     recurseType=<RecursionType.ELEMENTS_FIRST>) False
+        ContextTuple(site=<music21.stream.Measure 3 offset=9.0>,
                      offset=0.0,
                      recurseType=<RecursionType.ELEMENTS_FIRST>) False
         ContextTuple(site=<music21.stream.Part Alto>,
