@@ -22,10 +22,6 @@ from music21 import pitch
 environLocal = environment.Environment('analysis.transposition')
 
 
-class TranspositionException(exceptions21.Music21Exception):
-    pass
-
-
 class TranspositionChecker:
     '''
     Given a list of pitches, checks for the number of distinct transpositions.
@@ -55,14 +51,14 @@ class TranspositionChecker:
     '''
     def __init__(self, pitches: Iterable[pitch.Pitch] = ()):
         if not pitches:
-            raise TranspositionException(
+            raise TypeError(
                 'Must have at least one element in list'
             )
         if not common.isIterable(pitches):
-            raise TranspositionException('Must be a list or tuple')
+            raise TypeError('Must be a list or tuple')
         # p0 = pitches[0]
         # if not isinstance(p0, pitch.Pitch):
-        #     raise TranspositionException('List must have pitch objects')
+        #     raise TypeError('List must have pitch objects')
         self.pitches: Iterable[pitch.Pitch] = pitches
         self.allTranspositions: list = []
         self.allNormalOrders: list = []

@@ -1713,7 +1713,7 @@ class Duration(prebase.ProtoM21Object, SlottedObjectMixin):
                 )
 
         if durationTuple is not None:
-            self.addDurationTuple(durationTuple)
+            self.addDurationTuple(durationTuple, _skipInform=True)
 
         if dots is not None:
             storeDots = dots
@@ -1727,7 +1727,7 @@ class Duration(prebase.ProtoM21Object, SlottedObjectMixin):
 
         if type is not None:
             nt = durationTupleFromTypeDots(type, storeDots)
-            self.addDurationTuple(nt)
+            self.addDurationTuple(nt, _skipInform=True)
         # permit as keyword so can be passed from notes
         elif quarterLength is not None:
             self.quarterLength = quarterLength
@@ -1812,7 +1812,22 @@ class Duration(prebase.ProtoM21Object, SlottedObjectMixin):
         '''
         Don't copy client when creating
         '''
-        return common.defaultDeepcopy(self, memo, ignoreAttributes={'client'})
+        if (self._componentsNeedUpdating is False
+            and len(self._components) == 1
+            and self._dotGroups == (0,)
+            and self._linked is True
+            and not self._tuplets):  # 99% of notes...
+            # ignore all but components
+            return self.__class__(durationTuple=self._components[0])
+        elif (self._componentsNeedUpdating is False
+              and not self._components
+              and self._dotGroups == (0,)
+              and not self._tuplets
+              and self._linked is True):
+            # ignore all
+            return self.__class__()
+        else:
+            return common.defaultDeepcopy(self, memo, ignoreAttributes={'client'})
 
     # PRIVATE METHODS #
 
@@ -1870,7 +1885,10 @@ class Duration(prebase.ProtoM21Object, SlottedObjectMixin):
 
     linked = property(_getLinked, _setLinked)
 
-    def addDurationTuple(self, dur: DurationTuple | Duration | str | OffsetQLIn):
+    def addDurationTuple(self,
+                         dur: DurationTuple | Duration | str | OffsetQLIn,
+                         *,
+                         _skipInform=False):
         '''
         Add a DurationTuple or a Duration's components to this Duration.
         Does not simplify the Duration.  For instance, adding two
@@ -1902,7 +1920,8 @@ class Duration(prebase.ProtoM21Object, SlottedObjectMixin):
         if self.linked:
             self._quarterLengthNeedsUpdating = True
 
-        self.informClient()
+        if not _skipInform:
+            self.informClient()
 
     def appendTuplet(self, newTuplet: Tuplet) -> None:
         '''
