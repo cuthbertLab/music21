@@ -471,7 +471,9 @@ class Music21Object(prebase.ProtoM21Object):
         Changed in v9: removeFromIgnore removed; never used and this is performance
         critical.
         '''
-        defaultIgnoreSet = {'_derivation', '_activeSite', '_cache'}
+        defaultIgnoreSet = {'_derivation', '_activeSite', '_sites', '_cache'}
+        if not self.groups:
+            defaultIgnoreSet.add('groups')
         # duration is smart enough to do itself.
         # sites is smart enough to do itself
 
@@ -482,6 +484,9 @@ class Music21Object(prebase.ProtoM21Object):
 
         new = common.defaultDeepcopy(self, memo, ignoreAttributes=ignoreAttributes)
         setattr(new, '_cache', {})
+        setattr(new, '_sites', Sites())
+        if 'groups' in defaultIgnoreSet:
+            new.groups = Groups()
 
         # was: keep the old ancestor but need to update the client
         # 2.1 : NO, add a derivation of __deepcopy__ to the client
@@ -535,10 +540,7 @@ class Music21Object(prebase.ProtoM21Object):
         >>> ('flute' in n.groups, 'flute' in b.groups)
         (False, True)
         '''
-        # environLocal.printDebug(['calling Music21Object.__deepcopy__', self])
-        new = self._deepcopySubclassable(memo)
-        # environLocal.printDebug([self, 'end deepcopy', 'self._activeSite', self._activeSite])
-        return new
+        return self._deepcopySubclassable(memo)
 
     def __getstate__(self) -> dict[str, t.Any]:
         state = self.__dict__.copy()

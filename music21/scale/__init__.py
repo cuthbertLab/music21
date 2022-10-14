@@ -413,10 +413,10 @@ class AbstractScale(Scale):
         for p in pitchList:
             if p.octave is None:
                 if lastPs > p.ps:
-                    p.defaultOctave = lastOctave
+                    p.octave = lastOctave
                 while lastPs > p.ps:
                     lastOctave += 1
-                    p.defaultOctave = lastOctave
+                    p.octave = lastOctave
 
             lastPs = p.ps
             lastOctave = p.implicitOctave

@@ -16,7 +16,6 @@ import unittest
 from music21 import chord
 from music21 import common
 from music21 import environment
-from music21 import exceptions21
 from music21 import pitch
 
 environLocal = environment.Environment('analysis.transposition')

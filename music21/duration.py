@@ -907,7 +907,6 @@ def durationTupleFromQuarterLength(ql=1.0) -> DurationTuple:
             return DurationTuple('inexpressible', 0, ql)
 
 
-@lru_cache(1024)
 def durationTupleFromTypeDots(durType='quarter', dots=0):
     '''
     Returns a DurationTuple (which knows its quarterLength) for
@@ -1669,7 +1668,7 @@ class Duration(prebase.ProtoM21Object, SlottedObjectMixin):
                  /,
                  *,
                  type: str | None = None,  # pylint: disable=redefined-builtin
-                 dots: int | None = None,
+                 dots: int | None = 0,
                  quarterLength: OffsetQLIn | None = None,
                  durationTuple: DurationTuple | None = None,
                  components: Iterable[DurationTuple] | None = None,
@@ -1715,18 +1714,13 @@ class Duration(prebase.ProtoM21Object, SlottedObjectMixin):
         if durationTuple is not None:
             self.addDurationTuple(durationTuple, _skipInform=True)
 
-        if dots is not None:
-            storeDots = dots
-        else:
-            storeDots = 0
-
         if components is not None:
             self.components = t.cast(tuple[DurationTuple, ...], components)
             # this is set in _setComponents
             # self._quarterLengthNeedsUpdating = True
 
         if type is not None:
-            nt = durationTupleFromTypeDots(type, storeDots)
+            nt = durationTupleFromTypeDots(type, dots)
             self.addDurationTuple(nt, _skipInform=True)
         # permit as keyword so can be passed from notes
         elif quarterLength is not None:
@@ -1812,15 +1806,16 @@ class Duration(prebase.ProtoM21Object, SlottedObjectMixin):
         '''
         Don't copy client when creating
         '''
-        if (self._componentsNeedUpdating is False
-            and len(self._components) == 1
-            and self._dotGroups == (0,)
-            and self._linked is True
-            and not self._tuplets):  # 99% of notes...
+        if self._componentsNeedUpdating:
+            self._updateComponents()
+
+        if (len(self._components) == 1
+                and self._dotGroups == (0,)
+                and self._linked is True
+                and not self._tuplets):  # 99% of notes...
             # ignore all but components
             return self.__class__(durationTuple=self._components[0])
-        elif (self._componentsNeedUpdating is False
-              and not self._components
+        elif (not self._components
               and self._dotGroups == (0,)
               and not self._tuplets
               and self._linked is True):
