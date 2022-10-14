@@ -1812,10 +1812,7 @@ class Duration(prebase.ProtoM21Object, SlottedObjectMixin):
         '''
         Don't copy client when creating
         '''
-        rv = self.__reduce_ex__(4)
-        state = rv[2]
-        state['client'] = None
-        return copy._reconstruct(self, memo, *rv)
+        return common.defaultDeepcopy(self, memo, ignoreAttributes={'client'})
 
     # PRIVATE METHODS #
 
