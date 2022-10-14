@@ -1585,7 +1585,8 @@ class Pitch(prebase.ProtoM21Object):
     Sometimes we need an octave for a `Pitch` even if it's not
     specified.  For instance, we can't play an octave-less `Pitch`
     in MIDI or display it on a staff.  So there is an `.implicitOctave`
-    tag to deal with these situations; by default it's always 4.
+    tag to deal with these situations; by default it's always 4 (unless
+    defaults.pitchOctave is changed)
 
     >>> anyGSharp.implicitOctave
     4
@@ -1595,7 +1596,6 @@ class Pitch(prebase.ProtoM21Object):
 
     >>> highEflat.implicitOctave
     6
-
 
     If an integer or float >= 12 is passed to the constructor then it is
     used as the `.ps` attribute, which is for most common piano notes, the
@@ -1830,11 +1830,12 @@ class Pitch(prebase.ProtoM21Object):
         # 5% of pitch creation time; it'll be created in a sec anyhow
         self._microtone: Microtone | None = None
 
-        # CA, Q: should this remain an attribute or only refer to value in defaults?
-        # MSC A: no, it's a useful attribute for cases such as scales where if there are
-        #        no octaves we give a defaultOctave higher than the previous
-        #        (MSC 12 years later: maybe Chris was right...)
-        self.defaultOctave: int = defaults.pitchOctave
+        # # CA, Q: should this remain an attribute or only refer to value in defaults?
+        # # MSC A: no, it's a useful attribute for cases such as scales where if there are
+        # #        no octaves we give a defaultOctave higher than the previous
+        # #        MSC 12 years later: maybe Chris was right...
+        # self.defaultOctave: int = defaults.pitchOctave
+        # # MSC: even later: Chris Ariza was right
         self._octave: int | None = None
 
         # if True, accidental is not known; is determined algorithmically
@@ -1919,7 +1920,6 @@ class Pitch(prebase.ProtoM21Object):
         >>> d = pitch.Pitch('d-4')
         >>> b == d
         False
-
         '''
         if other is None:
             return False
@@ -1946,10 +1946,12 @@ class Pitch(prebase.ProtoM21Object):
             new = Pitch.__new__(Pitch)
             for k in self.__dict__:
                 v = getattr(self, k, None)
-                if k in ('_step', '_overridden_freq440', 'defaultOctave',
+                if k in ('_step', '_overridden_freq440',
                          '_octave', 'spellingIsInferred'):
                     setattr(new, k, v)
                 elif k == '_client':
+                    setattr(new, k, None)
+                elif v is None:  # common -- save time over deepcopy.
                     setattr(new, k, None)
                 else:
                     setattr(new, k, copy.deepcopy(v, memo))
@@ -2465,7 +2467,7 @@ class Pitch(prebase.ProtoM21Object):
         >>> d.ps
         63.0
 
-        >>> d.defaultOctave = 5
+        >>> d.octave = 5
         >>> d.ps
         75.0
 
@@ -2489,9 +2491,6 @@ class Pitch(prebase.ProtoM21Object):
 
         The property is called when self.step, self.octave
         or self.accidental are changed.
-
-        Should be called when .defaultOctave is changed if octave is None,
-        but isn't yet.
         '''
         step = self._step
         ps = float(((self.implicitOctave + 1) * 12) + STEPREF[step])
@@ -3078,7 +3077,7 @@ class Pitch(prebase.ProtoM21Object):
         Cannot be set.  Instead, just change the `.octave` of the pitch
         '''
         if self.octave is None:
-            return self.defaultOctave
+            return defaults.pitchOctave
         else:
             return self.octave
 

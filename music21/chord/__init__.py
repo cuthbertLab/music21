@@ -90,6 +90,7 @@ class ChordBase(note.NotRest):
                                 str,
                                 Sequence[str],
                                 Sequence[pitch.Pitch],
+                                Sequence[ChordBase],
                                 Sequence[note.NotRest],
                                 Sequence[int]] = None,
                  **keywords):
@@ -727,6 +728,7 @@ class Chord(ChordBase):
                  notes: t.Union[None,
                                 Sequence[pitch.Pitch],
                                 Sequence[note.Note],
+                                Sequence[Chord],
                                 Sequence[str],
                                 str,
                                 Sequence[int]] = None,

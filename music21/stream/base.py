@@ -1952,12 +1952,13 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
 
     # pylint: disable=no-member
     def _deepcopySubclassable(self: StreamType,
-                              memo=None,
+                              memo: dict[int, t.Any] | None = None,
+                              *,
                               ignoreAttributes=None,
                               ) -> StreamType:
         # NOTE: this is a performance critical operation
         defaultIgnoreSet = {
-            '_offsetDict', 'streamStatus', '_elements', '_endElements', '_cache',
+            '_offsetDict', '_elements', '_endElements',
         }
         if ignoreAttributes is None:
             ignoreAttributes = defaultIgnoreSet
@@ -1966,53 +1967,53 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
 
         # PyCharm seems to think that this is a StreamCore
         # noinspection PyTypeChecker
-        new: StreamType = super()._deepcopySubclassable(memo, ignoreAttributes)
+        new: StreamType = super()._deepcopySubclassable(memo, ignoreAttributes=ignoreAttributes)
 
         # new._offsetDict will get filled when ._elements is copied.
         newOffsetDict: dict[int, tuple[OffsetQLSpecial, base.Music21Object]] = {}
         new._offsetDict = newOffsetDict
+        new._elements = []
+        new._endElements = []
 
-        if 'streamStatus' in ignoreAttributes:
-            # update the client
-            # self.streamStatus.client = None
-            newStreamStatus = copy.deepcopy(self.streamStatus)
-            newStreamStatus.client = new
-            setattr(new, 'streamStatus', newStreamStatus)
-            # self.streamStatus.client = storedClient
-        if '_elements' in ignoreAttributes:
-            # must manually add elements to new Stream
-            for e in self._elements:
-                # environLocal.printDebug(['deepcopy()', e, 'old', old, 'id(old)', id(old),
-                #     'new', new, 'id(new)', id(new), 'old.hasElement(e)', old.hasElement(e),
-                #     'e.activeSite', e.activeSite, 'e.getSites()', e.getSites(), 'e.getSiteIds()',
-                #     e.getSiteIds()], format='block')
-                #
-                # this will work for all with __deepcopy___
-                # get the old offset from the activeSite Stream
-                # user here to provide new offset
-                #
-                # new.insert(e.getOffsetBySite(old), newElement,
-                #            ignoreSort=True)
-                offset = self.elementOffset(e)
-                if not e.isStream:
-                    # noinspection PyArgumentList
-                    newElement = copy.deepcopy(e, memo)
-                else:  # this prevents needing to make multiple replacements of spanner bundles
-                    newElement = e._deepcopySubclassable(memo)
+        # streamStatus's deepcopy is smart enough to ignore client.  set new
+        new.streamStatus.client = new
 
-                # ## TEST on copying!!!!
-                # if isinstance(newElement, note.Note):
-                #     newElement.pitch.ps += 2.0
-                new.coreInsert(offset, newElement, ignoreSort=True)
-        if '_endElements' in ignoreAttributes:
-            # must manually add elements to
-            for e in self._endElements:
-                # this will work for all with __deepcopy___
-                # get the old offset from the activeSite Stream
-                # user here to provide new offset
-
+        # must manually add elements to new Stream
+        for e in self._elements:
+            # environLocal.printDebug(['deepcopy()', e, 'old', old, 'id(old)', id(old),
+            #     'new', new, 'id(new)', id(new), 'old.hasElement(e)', old.hasElement(e),
+            #     'e.activeSite', e.activeSite, 'e.getSites()', e.getSites(), 'e.getSiteIds()',
+            #     e.getSiteIds()], format='block')
+            #
+            # this will work for all with __deepcopy___
+            # get the old offset from the activeSite Stream
+            # user here to provide new offset
+            #
+            # new.insert(e.getOffsetBySite(old), newElement,
+            #            ignoreSort=True)
+            offset = self.elementOffset(e)
+            if not e.isStream:
                 # noinspection PyArgumentList
-                new.coreStoreAtEnd(copy.deepcopy(e, memo))
+                newElement = copy.deepcopy(e, memo)
+            else:
+                # this prevents needing to make multiple replacements of spanner bundles
+                # apparently that was at some point a HUGE slowdown.  not 100% sure if
+                # it is still a problem or why.
+                newElement = e._deepcopySubclassable(memo)
+
+            # ## TEST on copying!!!!
+            # if isinstance(newElement, note.Note):
+            #     newElement.pitch.ps += 2.0
+            new.coreInsert(offset, newElement, ignoreSort=True)
+
+        # must manually add elements to
+        for e in self._endElements:
+            # this will work for all with __deepcopy___
+            # get the old offset from the activeSite Stream
+            # user here to provide new offset
+
+            # noinspection PyArgumentList
+            new.coreStoreAtEnd(copy.deepcopy(e, memo))
 
         new.coreElementsChanged()
 
@@ -2022,15 +2023,11 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         '''
         Deepcopy the stream from copy.deepcopy()
         '''
-        # does not purgeOrphans -- q: is that a bug or by design?
         new = self._deepcopySubclassable(memo)
+        # see custom _deepcopySubclassable for why this is here rather than there.
         if new._elements:  # pylint: disable:no-member
             self._replaceSpannerBundleForDeepcopy(new)
 
-        # purging these orphans works in nearly all cases, but there are a few
-        # cases where we rely on a Stream having access to Stream it was
-        # part of after deepcopying
-        # new.purgeOrphans()
         return new
 
     def _replaceSpannerBundleForDeepcopy(self, new):
@@ -4303,10 +4300,98 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
     # -------------------------------------------------------------------------
     # routines for obtaining specific types of elements from a Stream
     # _getNotes and _getPitches are found with the interval routines
+    def _getMeasureNumberListByStartEnd(
+        self,
+        numberStart,
+        numberEnd,
+        *,
+        indicesNotNumbers: bool
+    ) -> list[Measure]:
+        def hasMeasureNumberInformation(measureIterator):
+            '''
+            Many people create streams where every number is zero.
+            This will check for that as quickly as possible.
+            '''
+            for m in measureIterator:
+                try:
+                    mNumber = int(m.number)
+                except ValueError:  # pragma: no cover
+                    # should never happen.
+                    raise StreamException(f'found problematic measure for numbering: {m}')
+                if mNumber != 0:
+                    return True
+            return False
+
+        mStreamIter: iterator.StreamIterator[Measure] = self.getElementsByClass(Measure)
+
+        # FIND THE CORRECT ORIGINAL MEASURE OBJECTS
+        # for indicesNotNumbers, this is simple...
+        if indicesNotNumbers:
+            # noinspection PyTypeChecker
+            return t.cast(list[Measure], list(mStreamIter[numberStart:numberEnd]))
+
+        hasUniqueMeasureNumbers = hasMeasureNumberInformation(mStreamIter)
+
+        # unused...
+        # originalNumberStart = numberStart
+        # originalNumberEnd = numberEnd
+        startSuffix = None
+        endSuffix = None
+        if isinstance(numberStart, str):
+            numberStart, startSuffixTemp = common.getNumFromStr(numberStart)
+            if startSuffixTemp:
+                startSuffix = startSuffixTemp
+            numberStart = int(numberStart)
+
+        if isinstance(numberEnd, str):
+            numberEnd, endSuffixTemp = common.getNumFromStr(numberEnd)
+            if endSuffixTemp:
+                endSuffix = endSuffixTemp
+            numberEnd = int(numberEnd)
+
+        matches: list[Measure]
+        if numberEnd is not None:
+            matchingMeasureNumbers = set(range(numberStart, numberEnd + 1))
+
+            if hasUniqueMeasureNumbers:
+                matches = [m for m in mStreamIter if m.number in matchingMeasureNumbers]
+            else:
+                matches = [m for i, m in enumerate(mStreamIter)
+                                if i + 1 in matchingMeasureNumbers]
+        else:
+            if hasUniqueMeasureNumbers:
+                matches = [m for m in mStreamIter if m.number >= numberStart]
+            else:
+                matches = [m for i, m in enumerate(mStreamIter)
+                                    if i + 1 >= numberStart]
+
+        if startSuffix is not None:
+            oldMatches = matches
+            matches = []
+            for m in oldMatches:
+                if m.number != numberStart:
+                    matches.append(m)
+                elif not m.numberSuffix:
+                    matches.append(m)
+                elif m.numberSuffix >= startSuffix:
+                    matches.append(m)
+
+        if endSuffix is not None:
+            oldMatches = matches
+            matches = []
+            for m in oldMatches:
+                if m.number != numberEnd:
+                    matches.append(m)
+                elif not m.numberSuffix:
+                    matches.append(m)
+                elif m.numberSuffix <= endSuffix:
+                    matches.append(m)
+        return matches
 
     def measures(self,
                  numberStart,
                  numberEnd,
+                 *,
                  collect=('Clef', 'TimeSignature', 'Instrument', 'KeySignature'),
                  gatherSpanners=GatherSpanners.ALL,
                  indicesNotNumbers=False):
@@ -4341,7 +4426,6 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         >>> firstExcerptMeasure.number
         1
 
-
         To get all measures from the beginning, go ahead and always request measure 0 to x,
         there will be no error if there is not a pickup measure.
 
@@ -4367,7 +4451,6 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         0
         <music21.stream.Measure 1 offset=1.0>
         1
-
 
         If `numberEnd=None` then it is interpreted as the last measure of the stream:
 
@@ -4412,7 +4495,6 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         D- major
         ...
 
-
         What is collected is determined by the "collect" iterable.  To collect nothing
         send an empty list:
 
@@ -4421,7 +4503,6 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         ...     print(thing)
         <music21.stream.Measure 8 offset=0.0>
         <music21.stream.Measure 9 offset=4.0>
-
 
         If a stream has measure suffixes, then Streams having that suffix or no suffix
         are returned.
@@ -4459,7 +4540,6 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         {0.0} <music21.stream.Measure 4a offset=0.0>
         <BLANKLINE>
 
-
         Changed in v.7 -- If `gatherSpanners` is True or GatherSpanners.ALL (default),
         then just the spanners pertaining to the requested measure region
         are provided, rather than the entire bundle from the source.
@@ -4482,96 +4562,19 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         ...    print(sp)
         <music21.layout.StaffGroup <music21.stream.PartStaff P5-Staff1><... P5-Staff2>>
         <music21.layout.StaffGroup <music21.stream.Part Soprano I><...Alto II>>
+
+        This is in OMIT
         '''
         startMeasure: Measure | None
-
-        def hasMeasureNumberInformation(measureIterator):
-            '''
-            Many people create streams where every number is zero.
-            This will check for that as quickly as possible.
-            '''
-            uniqueMeasureNumbers = set()
-            for m in measureIterator:
-                try:
-                    mNumber = int(m.number)
-                except ValueError:  # pragma: no cover
-                    # should never happen.
-                    raise StreamException(f'found problematic measure for numbering: {m}')
-                uniqueMeasureNumbers.add(mNumber)
-                if len(uniqueMeasureNumbers) > 1:
-                    break
-            if len(uniqueMeasureNumbers) > 1:
-                return True
-            elif len(uniqueMeasureNumbers.union({0})) > 1:
-                return True  # is there a number other than zero? (or any number at all
-            else:
-                return False
 
         returnObj = self.cloneEmpty(derivationMethod='measures')
         srcObj = self
 
-        mStreamIter: iterator.StreamIterator[Measure] = self.getElementsByClass(Measure)
-
-        # FIND THE CORRECT ORIGINAL MEASURE OBJECTS
-        # for indicesNotNumbers, this is simple...
-        if indicesNotNumbers:
-            matches = mStreamIter[numberStart:numberEnd]
-        else:
-            hasUniqueMeasureNumbers = hasMeasureNumberInformation(mStreamIter)
-
-            # unused...
-            # originalNumberStart = numberStart
-            # originalNumberEnd = numberEnd
-            startSuffix = None
-            endSuffix = None
-            if isinstance(numberStart, str):
-                numberStart, startSuffixTemp = common.getNumFromStr(numberStart)
-                if startSuffixTemp:
-                    startSuffix = startSuffixTemp
-                numberStart = int(numberStart)
-
-            if isinstance(numberEnd, str):
-                numberEnd, endSuffixTemp = common.getNumFromStr(numberEnd)
-                if endSuffixTemp:
-                    endSuffix = endSuffixTemp
-                numberEnd = int(numberEnd)
-
-            if numberEnd is not None:
-                matchingMeasureNumbers = set(range(numberStart, numberEnd + 1))
-
-                if hasUniqueMeasureNumbers:
-                    matches = [m for m in mStreamIter if m.number in matchingMeasureNumbers]
-                else:
-                    matches = [m for i, m in enumerate(mStreamIter)
-                                    if i + 1 in matchingMeasureNumbers]
-            else:
-                if hasUniqueMeasureNumbers:
-                    matches = [m for m in mStreamIter if m.number >= numberStart]
-                else:
-                    matches = [m for i, m in enumerate(mStreamIter)
-                                        if i + 1 >= numberStart]
-
-            if startSuffix is not None:
-                oldMatches = matches
-                matches = []
-                for m in oldMatches:
-                    if m.number != numberStart:
-                        matches.append(m)
-                    elif not m.numberSuffix:
-                        matches.append(m)
-                    elif m.numberSuffix >= startSuffix:
-                        matches.append(m)
-
-            if endSuffix is not None:
-                oldMatches = matches
-                matches = []
-                for m in oldMatches:
-                    if m.number != numberEnd:
-                        matches.append(m)
-                    elif not m.numberSuffix:
-                        matches.append(m)
-                    elif m.numberSuffix <= endSuffix:
-                        matches.append(m)
+        matches = self._getMeasureNumberListByStartEnd(
+            numberStart,
+            numberEnd,
+            indicesNotNumbers=indicesNotNumbers
+        )
 
         if not matches:
             startMeasure = None
@@ -4612,8 +4615,10 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         # environLocal.printDebug(['len(returnObj.flatten())', len(returnObj.flatten())])
         return returnObj
 
+    # this is generic Stream.measure, also used by Parts
     def measure(self,
                 measureNumber,
+                *,
                 collect=('Clef', 'TimeSignature', 'Instrument', 'KeySignature'),
                 indicesNotNumbers=False) -> Measure | None:
         '''
@@ -4623,7 +4628,6 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         This method is distinguished from :meth:`~music21.stream.Stream.measures`
         in that this method returns a single Measure object, not a Stream containing
         one or more Measure objects.
-
 
         >>> a = corpus.parse('bach/bwv324.xml')
         >>> a.parts[0].measure(3)
@@ -4659,27 +4663,16 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
             if startMeasureNumber == -1:
                 endMeasureNumber = None
 
-        # we must be able to obtain a measure from this (not a flat)
-        # representation (e.g., this is a Stream or Part, not a Score)
-        if self.getElementsByClass(Measure):
-            # environLocal.printDebug(['got measures from getElementsByClass'])
-            s = self.measures(startMeasureNumber,
-                              endMeasureNumber,
-                              collect=collect,
-                              indicesNotNumbers=indicesNotNumbers)
-            measureIter = s.getElementsByClass(Measure)
-            m: Measure | None
-            # noinspection PyTypeChecker
-            m = measureIter.first()
-            if m is None:  # not 'if not m' because m might be an empty measure.
-                return None
-            else:
-                self.coreSelfActiveSite(m)
-                # ^^ this sets its offset to something meaningful...
-                return m
-        else:
-            # environLocal.printDebug(['got not measures from getElementsByClass'])
-            return None
+        matchingMeasures = self._getMeasureNumberListByStartEnd(
+            startMeasureNumber,
+            endMeasureNumber,
+            indicesNotNumbers=indicesNotNumbers
+        )
+        if matchingMeasures:
+            m = matchingMeasures[0]
+            self.coreSelfActiveSite(m)  # not needed?
+            return m
+        return None
 
     def template(self,
                  *,
@@ -5274,7 +5267,10 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         '''
         at_sounding = self.atSoundingPitch
         if self.atSoundingPitch == 'unknown':
-            for site in self.sites:
+            for contextTuple in self.contextSites():
+                # follow derivations to find one something in a derived hierarchy
+                # where soundingPitch might be defined.
+                site = contextTuple.site
                 if site.isStream and site.atSoundingPitch != 'unknown':
                     at_sounding = site.atSoundingPitch
                     break
@@ -13710,7 +13706,7 @@ class Score(Stream):
             # insert all at zero
             measuredPart = p.measures(numberStart,
                                       numberEnd,
-                                      collect,
+                                      collect=collect,
                                       gatherSpanners=gatherSpanners,
                                       indicesNotNumbers=indicesNotNumbers)
             post.insert(0, measuredPart)
@@ -13726,6 +13722,7 @@ class Score(Stream):
         post.derivation.method = 'measures'
         return post
 
+    # this is Score.measure
     def measure(self,
                 measureNumber,
                 collect=(clef.Clef, meter.TimeSignature, instrument.Instrument, key.KeySignature),
@@ -13739,7 +13736,6 @@ class Score(Stream):
 
         This method overrides the :meth:`~music21.stream.Stream.measure` method on Stream to
         allow for finding a single "measure slice" within parts:
-
 
         >>> bachIn = corpus.parse('bach/bwv324.xml')
         >>> excerpt = bachIn.measure(2)
@@ -14356,7 +14352,6 @@ class SpannerStorage(Stream):
 
     Changed in v8: spannerParent is renamed client.
     '''
-
     def __init__(self, givenElements=None, *, client: spanner.Spanner, **keywords):
         # No longer need store as weakref since Py2.3 and better references
         self.client = client

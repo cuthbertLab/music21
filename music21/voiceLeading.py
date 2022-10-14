@@ -2029,7 +2029,7 @@ class ThreeNoteLinearSegment(NNoteLinearSegment):
     >>> ex2 = voiceLeading.ThreeNoteLinearSegment('a', 'b', 'c')
     >>> ex2.n1
     <music21.note.Note A>
-    >>> ex2.n1.pitch.defaultOctave
+    >>> defaults.pitchOctave
     4
 
     '''

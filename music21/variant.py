@@ -111,25 +111,6 @@ class Variant(base.Music21Object):
         if name is not None:
             self.groups.append(name)
 
-
-    def _deepcopySubclassable(self, memo=None, ignoreAttributes=None):
-        '''
-        see __deepcopy__ on Spanner for tests and docs
-        '''
-        # NOTE: this is a performance critical operation
-        defaultIgnoreSet = {'_cache'}
-        if ignoreAttributes is None:
-            ignoreAttributes = defaultIgnoreSet
-        else:
-            ignoreAttributes = ignoreAttributes | defaultIgnoreSet
-
-        new = super()._deepcopySubclassable(memo, ignoreAttributes)
-
-        return new
-
-    def __deepcopy__(self, memo=None):
-        return self._deepcopySubclassable(memo)
-
     # --------------------------------------------------------------------------
     # as _stream is a private Stream, unwrap/wrap methods need to override
     # Music21Object to get at these objects
@@ -2521,6 +2502,9 @@ def _getPreviousElement(s, v):
 
 # ------------------------------------------------------------------------------
 class Test(unittest.TestCase):
+    def testCopyAndDeepcopy(self):
+        from music21.test.commonTest import testCopyAll
+        testCopyAll(self, globals())
 
     def pitchOut(self, listIn):
         out = '['

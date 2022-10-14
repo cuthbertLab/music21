@@ -957,6 +957,7 @@ class Test(unittest.TestCase):
         self.assertEqual(
             siteList,
             ['(<music21.stream.Measure 3333 offset=0.0>, 0.0, <RecursionType.ELEMENTS_FIRST>)',
+             '(<music21.stream.Measure 3 offset=9.0>, 0.0, <RecursionType.ELEMENTS_FIRST>)',
              '(<music21.stream.Part Alto>, 9.0, <RecursionType.FLATTEN>)',
              '(<music21.stream.Score bach>, 9.0, <RecursionType.ELEMENTS_ONLY>)']
         )

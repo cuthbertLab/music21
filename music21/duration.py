@@ -907,7 +907,6 @@ def durationTupleFromQuarterLength(ql=1.0) -> DurationTuple:
             return DurationTuple('inexpressible', 0, ql)
 
 
-@lru_cache(1024)
 def durationTupleFromTypeDots(durType='quarter', dots=0):
     '''
     Returns a DurationTuple (which knows its quarterLength) for
@@ -1669,7 +1668,7 @@ class Duration(prebase.ProtoM21Object, SlottedObjectMixin):
                  /,
                  *,
                  type: str | None = None,  # pylint: disable=redefined-builtin
-                 dots: int | None = None,
+                 dots: int | None = 0,
                  quarterLength: OffsetQLIn | None = None,
                  durationTuple: DurationTuple | None = None,
                  components: Iterable[DurationTuple] | None = None,
@@ -1713,12 +1712,7 @@ class Duration(prebase.ProtoM21Object, SlottedObjectMixin):
                 )
 
         if durationTuple is not None:
-            self.addDurationTuple(durationTuple)
-
-        if dots is not None:
-            storeDots = dots
-        else:
-            storeDots = 0
+            self.addDurationTuple(durationTuple, _skipInform=True)
 
         if components is not None:
             self.components = t.cast(tuple[DurationTuple, ...], components)
@@ -1726,8 +1720,8 @@ class Duration(prebase.ProtoM21Object, SlottedObjectMixin):
             # self._quarterLengthNeedsUpdating = True
 
         if type is not None:
-            nt = durationTupleFromTypeDots(type, storeDots)
-            self.addDurationTuple(nt)
+            nt = durationTupleFromTypeDots(type, dots)
+            self.addDurationTuple(nt, _skipInform=True)
         # permit as keyword so can be passed from notes
         elif quarterLength is not None:
             self.quarterLength = quarterLength
@@ -1808,27 +1802,27 @@ class Duration(prebase.ProtoM21Object, SlottedObjectMixin):
         else:
             return f'unlinked type:{self.type} quarterLength:{self.quarterLength}'
 
-    # unwrap weakref for pickling
     def __deepcopy__(self, memo):
         '''
-        Do some very fast creations...
+        Don't copy client when creating
         '''
-        if (self._componentsNeedUpdating is False
-                and len(self._components) == 1
+        if self._componentsNeedUpdating:
+            self._updateComponents()
+
+        if (len(self._components) == 1
                 and self._dotGroups == (0,)
                 and self._linked is True
                 and not self._tuplets):  # 99% of notes...
             # ignore all but components
             return self.__class__(durationTuple=self._components[0])
-        elif (self._componentsNeedUpdating is False
-                and not self._components
-                and self._dotGroups == (0,)
-                and not self._tuplets
-                and self._linked is True):
+        elif (not self._components
+              and self._dotGroups == (0,)
+              and not self._tuplets
+              and self._linked is True):
             # ignore all
             return self.__class__()
         else:
-            return common.defaultDeepcopy(self, memo)
+            return common.defaultDeepcopy(self, memo, ignoreAttributes={'client'})
 
     # PRIVATE METHODS #
 
@@ -1886,7 +1880,10 @@ class Duration(prebase.ProtoM21Object, SlottedObjectMixin):
 
     linked = property(_getLinked, _setLinked)
 
-    def addDurationTuple(self, dur: DurationTuple | Duration | str | OffsetQLIn):
+    def addDurationTuple(self,
+                         dur: DurationTuple | Duration | str | OffsetQLIn,
+                         *,
+                         _skipInform=False):
         '''
         Add a DurationTuple or a Duration's components to this Duration.
         Does not simplify the Duration.  For instance, adding two
@@ -1918,7 +1915,8 @@ class Duration(prebase.ProtoM21Object, SlottedObjectMixin):
         if self.linked:
             self._quarterLengthNeedsUpdating = True
 
-        self.informClient()
+        if not _skipInform:
+            self.informClient()
 
     def appendTuplet(self, newTuplet: Tuplet) -> None:
         '''
@@ -3110,6 +3108,11 @@ class FrozenDuration(common.objects.FrozenObject, Duration):
         self._updateComponents()
         self._updateQuarterLength()
 
+    def __deepcopy__(self, memo=None):
+        '''
+        Immutable objects return themselves
+        '''
+        return self
 
 class GraceDuration(Duration):
     '''
