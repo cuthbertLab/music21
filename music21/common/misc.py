@@ -22,7 +22,9 @@ import re
 import sys
 import textwrap
 import time
+import types
 import typing as t
+import weakref
 
 __all__ = [
     'flattenList',
@@ -231,6 +233,15 @@ def runningUnderIPython() -> bool:
 # NB -- temp files (tempFile) etc. are in environment.py
 
 # ------------------------------------------------------------------------------
+# From copy.py
+_IMMUTABLE_DEEPCOPY_TYPES = {
+    type(None), type(Ellipsis), type(NotImplemented),
+    int, float, bool, complex, bytes, str,
+    types.CodeType, type, range,
+    types.BuiltinFunctionType, types.FunctionType,
+    weakref.ref, property,
+}
+
 def defaultDeepcopy(obj: t.Any, memo=None, *, ignoreAttributes: Iterable[str] = ()):
     '''
     Unfortunately, it is not possible to do something like::
@@ -260,13 +271,18 @@ def defaultDeepcopy(obj: t.Any, memo=None, *, ignoreAttributes: Iterable[str] = 
         memo = {}
 
     rv = obj.__reduce_ex__(4)  # get a protocol 4 reduction
-    state = rv[2]
+    func, args, state = rv[:3]
+    new = func(*args)
+    memo[id(obj)] = new
 
     # set up reducer to not copy the ignoreAttributes set.
-    for ignore_attr in ignoreAttributes:
-        if ignore_attr in state:
-            state[ignore_attr] = None  # atomic copy.
-    new = copy._reconstruct(obj, memo, *rv)  # type: ignore
+    for attr, value in state.items():
+        if attr in ignoreAttributes:
+            setattr(new, attr, None)
+        elif type(value) in _IMMUTABLE_DEEPCOPY_TYPES:
+            setattr(new, attr, value)
+        else:
+            setattr(new, attr, copy.deepcopy(value, memo))
     return new
 
 
