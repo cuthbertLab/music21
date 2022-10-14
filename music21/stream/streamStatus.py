@@ -14,6 +14,7 @@ from __future__ import annotations
 import unittest
 
 from music21 import environment
+from music21.common.misc import defaultDeepcopy
 from music21.common.objects import SlottedObjectMixin
 
 environLocal = environment.Environment(__file__)
@@ -89,12 +90,7 @@ class StreamStatus(SlottedObjectMixin):
         Manage deepcopying by creating a new reference to the same object.
         leaving out the client
         '''
-        new = type(self)()
-        for x in self.__slots__:
-            if x != 'client':
-                setattr(new, x, getattr(self, x))
-
-        return new
+        return defaultDeepcopy(self, memo, ignoreAttributes={'client'})
 
     # PUBLIC METHODS #
 
