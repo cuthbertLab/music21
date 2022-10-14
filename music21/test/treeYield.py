@@ -183,14 +183,15 @@ def find_all_exception_classes_in_m21():  # pragma: no cover
         print(m)
         for mm_name in dir(m):
             mm = getattr(m, mm_name)
-            if (type(mm) == types.ModuleType
+            if (isinstance(mm, types.ModuleType)
                     and mm not in seen
                     and 'music21' in getattr(mm, '__file__', '')):
                 d.append(mm)
-            if type(mm) == type and issubclass(mm, music21.exceptions21.Music21Exception):
+            elif isinstance(mm, type) and issubclass(mm, music21.exceptions21.Music21Exception):
                 tous.add(mm)
         seen.add(m)
     return tous
+
 
 if __name__ == '__main__':
     pass

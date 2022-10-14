@@ -21,7 +21,8 @@ from music21 import exceptions21
 from music21.common.objects import SlottedObjectMixin
 from music21 import prebase
 
-class TieException(exceptions21.Music21Exception):
+# Delete in v10.  Raise ValueError instead.
+class TieException(ValueError, exceptions21.Music21Exception):
     pass
 
 
