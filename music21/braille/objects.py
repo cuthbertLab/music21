@@ -79,7 +79,9 @@ class BrailleExplicitNoteExtraSmaller(BrailleExplicitNoteLength):
 
 # ------------------------------------------------------------------------------
 class Test(unittest.TestCase):
-    pass
+    def testCopyAndDeepcopy(self):
+        from music21.test.commonTest import testCopyAll
+        testCopyAll(self, globals())
 
 
 if __name__ == '__main__':

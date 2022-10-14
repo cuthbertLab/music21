@@ -702,13 +702,14 @@ class Beams(prebase.ProtoM21Object, EqualSlottedObjectMixin):
 
 
 class Test(unittest.TestCase):
-    pass
+
+    def testCopyAndDeepcopy(self):
+        from music21.test.commonTest import testCopyAll
+        testCopyAll(self, globals())
 
 
 # -----------------------------------------------------------------------------
 # define presented order in documentation
-
-
 _DOC_ORDER = [Beams, Beam]
 
 

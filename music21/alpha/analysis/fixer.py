@@ -504,6 +504,10 @@ class TurnFixer(OrnamentFixer):
         super().__init__(changes, midiStream, omrStream, recognizer)
 
 class Test(unittest.TestCase):
+    def testCopyAndDeepcopy(self):
+        from music21.test.commonTest import testCopyAll
+        testCopyAll(self, globals())
+
     def measuresEqual(self, m1, m2):
         '''
         Returns a tuple of (True/False, reason)

@@ -262,6 +262,10 @@ class _TestCondition:
         self.isInverted = isInverted
 
 class Test(unittest.TestCase):
+    def testCopyAndDeepcopy(self):
+        from music21.test.commonTest import testCopyAll
+        testCopyAll(self, globals())
+
     def testRecognizeTurn(self):
         # set up experiment
         testConditions = []

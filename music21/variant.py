@@ -2502,6 +2502,9 @@ def _getPreviousElement(s, v):
 
 # ------------------------------------------------------------------------------
 class Test(unittest.TestCase):
+    def testCopyAndDeepcopy(self):
+        from music21.test.commonTest import testCopyAll
+        testCopyAll(self, globals())
 
     def pitchOut(self, listIn):
         out = '['
