@@ -28,7 +28,6 @@ from music21 import common
 from music21.common.classTools import tempAttribute, saveAttributes
 from music21.common.enums import OffsetSpecial
 from music21.common.types import M21ObjType, StreamType
-from music21.exceptions21 import StreamException
 from music21 import note
 from music21.stream import filters
 from music21 import prebase
@@ -47,13 +46,8 @@ StreamIteratorType = t.TypeVar('StreamIteratorType', bound='StreamIterator')
 # pipe | version not passing mypy.
 FilterType = t.Union[Callable[[t.Any, t.Optional[t.Any]], t.Any], filters.StreamFilter]
 
+
 # -----------------------------------------------------------------------------
-
-
-class StreamIteratorException(StreamException):
-    pass
-
-
 class StreamIteratorInefficientWarning(UserWarning):
     pass
 

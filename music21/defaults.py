@@ -23,14 +23,10 @@ StepName = t.Literal['C', 'D', 'E', 'F', 'G', 'A', 'B']  # restating so as not t
 
 
 # TODO: defaults should check the environment object to see
-# if there are any preferences set for values used here
+#     if there are any preferences set for values used here
 
 
 # ------------------------------------------------------------------------------
-class DefaultsException(Exception):
-    pass
-
-
 title = 'Music21 Fragment'
 author = 'Music21'
 software = 'music21 v.' + _version.__version__  # used in xml encoding source software

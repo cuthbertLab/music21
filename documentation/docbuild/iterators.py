@@ -159,7 +159,6 @@ class CodebaseIterator(Iterator):
     ...     print(x)
     <class 'music21.articulations.Accent'>
     <class 'music21.articulations.Articulation'>
-    <class 'music21.articulations.ArticulationException'>
     <class 'music21.articulations.Bowing'>
     <class 'music21.articulations.BrassIndication'>
     <class 'music21.articulations.BreathMark'>

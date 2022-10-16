@@ -297,13 +297,8 @@ class RehearsalMark(Expression):
         '''
         return RehearsalMark(self.nextContent(), numbering=self.numbering)
 
+
 # ------------------------------------------------------------------------------
-
-
-class TextExpressionException(ExpressionException):
-    pass
-
-
 class TextExpression(Expression):
     '''
     A TextExpression is a word, phrase, or similar

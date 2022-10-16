@@ -16,15 +16,11 @@ from math import inf
 import unittest
 
 from music21 import environment
-from music21 import exceptions21
 from music21 import pitch
 from music21 import musedata
 
 environLocal = environment.Environment('analysis.enharmonics')
 
-
-class EnharmonicsException(exceptions21.Music21Exception):
-    pass
 
 class EnharmonicScoreRules:
     def __init__(self):

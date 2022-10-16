@@ -1981,10 +1981,6 @@ class NNoteLinearSegment(base.Music21Object):
         ''')
 
 
-class NNoteLinearSegmentException(exceptions21.Music21Exception):
-    pass
-
-
 class ThreeNoteLinearSegmentException(exceptions21.Music21Exception):
     pass
 

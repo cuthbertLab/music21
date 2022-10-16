@@ -63,10 +63,6 @@ class RTHandlerException(exceptions21.Music21Exception):
     pass
 
 
-class RTFileException(exceptions21.Music21Exception):
-    pass
-
-
 # ------------------------------------------------------------------------------
 
 class RTToken(prebase.ProtoM21Object):

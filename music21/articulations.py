@@ -85,7 +85,6 @@ from music21 import base
 from music21 import common
 from music21.common.classTools import tempAttribute
 from music21 import environment
-from music21 import exceptions21
 from music21 import style
 
 if TYPE_CHECKING:
@@ -94,9 +93,6 @@ if TYPE_CHECKING:
 
 environLocal = environment.Environment('articulations')
 
-
-class ArticulationException(exceptions21.Music21Exception):
-    pass
 
 # ------------------------------------------------------------------------------
 class Articulation(base.Music21Object):
