@@ -245,11 +245,6 @@ class TextException(exceptions21.Music21Exception):
 
 
 # ------------------------------------------------------------------------------
-class TextBoxException(exceptions21.Music21Exception):
-    pass
-
-
-# ------------------------------------------------------------------------------
 class TextBox(base.Music21Object):
     '''
     A TextBox is arbitrary text that might be positioned anywhere on a page,
@@ -372,7 +367,7 @@ class TextBox(base.Music21Object):
 
 
 # ------------------------------------------------------------------------------
-_stored_trigrams = {}
+_stored_trigrams: dict[str, Trigram] = {}
 
 
 class LanguageDetector:

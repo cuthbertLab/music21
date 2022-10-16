@@ -44,6 +44,7 @@ if TYPE_CHECKING:
     from music21 import chord
     from music21 import instrument
     from music21 import percussion
+    _NotRestType = t.TypeVar('_NotRestType', bound='NotRest')
 
 environLocal = environment.Environment('note')
 
@@ -1001,6 +1002,19 @@ class NotRest(GeneralNote):
     # Special functions
     # ==============================================================================================
 
+    def _deepcopySubclassable(self: _NotRestType,
+                              memo: dict[int, t.Any] | None = None,
+                              *,
+                              ignoreAttributes: set[str] | None = None) -> _NotRestType:
+        new = super()._deepcopySubclassable(memo, ignoreAttributes={'_chordAttached'})
+        # let the chord restore _chordAttached
+
+        # after copying, if a Volume exists, it is linked to the old object
+        # look at _volume so as not to create object if not already there
+        if self.hasVolumeInformation():
+            new.volume.client = new  # update with new instance
+        return new
+
     def __deepcopy__(self, memo=None):
         '''
         As NotRest objects have a Volume, objects, and Volume objects
@@ -1014,25 +1028,7 @@ class NotRest(GeneralNote):
         True
         '''
         # environLocal.printDebug(['calling NotRest.__deepcopy__', self])
-        new = super().__deepcopy__(memo=memo)
-        # after copying, if a Volume exists, it is linked to the old object
-        # look at _volume so as not to create object if not already there
-        # pylint: disable=no-member
-        if self._volume is not None:
-            new.volume.client = new  # update with new instance
-        return new
-
-    def __getstate__(self):
-        state = super().__getstate__()
-        if '_volume' in state and state['_volume'] is not None:
-            state['_volume'].client = None
-        return state
-
-    def __setstate__(self, state):
-        super().__setstate__(state)
-        if self._volume is not None:
-            self._volume.client = self
-    ####
+        return self._deepcopySubclassable(memo=memo)
 
     def _getStemDirection(self) -> str:
         return self._stemDirection
@@ -1207,7 +1203,7 @@ class NotRest(GeneralNote):
             return True
 
     def _getVolume(self,
-                   forceClient: base.Music21Object | None = None
+                   forceClient: NotRest | None = None
                    ) -> volume.Volume:
         # DO NOT CHANGE TO @property because of optional attributes
         # lazy volume creation.  property is set below.
@@ -1550,7 +1546,7 @@ class Note(NotRest):
         '''
         After doing a deepcopy of the pitch, be sure to set the client
         '''
-        new = super().__deepcopy__(memo=memo)
+        new = self._deepcopySubclassable(memo)
         # noinspection PyProtectedMember
         new.pitch._client = new  # pylint: disable=no-member
         return new

@@ -1981,10 +1981,6 @@ class NNoteLinearSegment(base.Music21Object):
         ''')
 
 
-class NNoteLinearSegmentException(exceptions21.Music21Exception):
-    pass
-
-
 class ThreeNoteLinearSegmentException(exceptions21.Music21Exception):
     pass
 
@@ -2029,7 +2025,7 @@ class ThreeNoteLinearSegment(NNoteLinearSegment):
     >>> ex2 = voiceLeading.ThreeNoteLinearSegment('a', 'b', 'c')
     >>> ex2.n1
     <music21.note.Note A>
-    >>> ex2.n1.pitch.defaultOctave
+    >>> defaults.pitchOctave
     4
 
     '''

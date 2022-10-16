@@ -10,7 +10,6 @@
 from __future__ import annotations
 
 import unittest
-from music21 import exceptions21
 from music21 import prebase
 
 doc_forbidIncompletePossibilities = '''True by default. If True,
@@ -179,10 +178,6 @@ class Rules(prebase.ProtoM21Object):
 
     def _reprInternal(self):
         return ''
-
-
-class FiguredBassRulesException(exceptions21.Music21Exception):
-    pass
 
 
 # ------------------------------------------------------------------------------

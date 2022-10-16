@@ -11,7 +11,7 @@
 # ------------------------------------------------------------------------------
 from __future__ import annotations
 
-from collections.abc import Iterable, Sequence
+from collections.abc import Iterable, Sequence, Collection
 from fractions import Fraction
 from functools import cache
 import math
@@ -94,7 +94,7 @@ def numToIntOrFloat(value: int | float) -> int | float:
     >>> common.numToIntOrFloat(halfFlat.alter)
     -0.5
 
-    Also can take in a string representing an int or float
+    Can also take in a string representing an int or float
 
     >>> common.numToIntOrFloat('1.0')
     1
@@ -735,7 +735,7 @@ def weightedSelection(values: list[int],
     return values[index]
 
 
-def approximateGCD(values: list[int | float], grain: float = 1e-4) -> float:
+def approximateGCD(values: Collection[int | float], grain: float = 1e-4) -> float:
     '''
     Given a list of values, find the lowest common divisor of floating point values.
 
@@ -765,8 +765,8 @@ def approximateGCD(values: list[int | float], grain: float = 1e-4) -> float:
     # quick method: see if the smallest value is a common divisor of the rest
     count = 0
     for x in values:
-        # lowest is already a float
-        unused_int, floatingValue = divmod(x / lowest, 1.0)
+        x_adjust = x / lowest
+        floatingValue = x_adjust - int(x_adjust)
         # if almost an even division
         if isclose(floatingValue, 0.0, abs_tol=grain):
             count += 1
@@ -774,16 +774,15 @@ def approximateGCD(values: list[int | float], grain: float = 1e-4) -> float:
         return lowest
 
     # assume that one of these divisions will match
-    divisors = [1., 2., 3., 4., 5., 6., 7., 8., 9., 10., 11., 12., 13., 14., 15., 16.]
+    divisors = (1., 2., 3., 4., 5., 6., 7., 8., 9., 10., 11., 12., 13., 14., 15., 16.)
     divisions = []  # a list of lists, one for each entry
-    uniqueDivisions = []
+    uniqueDivisions = set()
     for index in values:
         coll = []
         for d in divisors:
             v = index / d
             coll.append(v)  # store all divisions
-            if v not in uniqueDivisions:
-                uniqueDivisions.append(v)
+            uniqueDivisions.add(v)
         divisions.append(coll)
     # find a unique divisor that is found in collected divisors
     commonUniqueDivisions = []

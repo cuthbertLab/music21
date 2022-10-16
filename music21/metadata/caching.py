@@ -16,7 +16,6 @@ __all__ = [
     'JobProcessor',
     'MetadataCachingJob',
     'cacheMetadata',
-    'MetadataCacheException',
     'WorkerProcess',
 ]
 
@@ -28,16 +27,8 @@ import unittest
 
 from music21 import common
 from music21 import environment
-from music21 import exceptions21
 
-# -----------------------------------------------------------------------------
 environLocal = environment.Environment('metadata.caching')
-# -----------------------------------------------------------------------------
-
-
-class MetadataCacheException(exceptions21.Music21Exception):
-    pass
-# -----------------------------------------------------------------------------
 
 
 def cacheMetadata(corpusNames=None,

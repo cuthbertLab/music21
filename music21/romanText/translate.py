@@ -167,8 +167,8 @@ class RomanTextUnprocessedToken(base.ElementWrapper):
 
 
 class RomanTextUnprocessedMetadata(base.Music21Object):
-    def __init__(self, tag='', data=''):
-        super().__init__()
+    def __init__(self, tag='', data='', **keywords):
+        super().__init__(**keywords)
         self.tag = tag
         self.data = data
 
@@ -885,8 +885,7 @@ class PartTranslator:
                 self.setKeyChangeToken = False
             else:
                 rn.followsKeyChange = False
-        except (roman.RomanNumeralException,
-                exceptions21.Music21CommonException):  # pragma: no cover
+        except roman.RomanNumeralException:  # pragma: no cover
             # environLocal.printDebug(f' cannot create RN from: {a.src}')
             rn = note.Note()  # create placeholder
 
