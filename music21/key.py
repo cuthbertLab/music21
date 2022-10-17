@@ -331,10 +331,24 @@ class KeySignature(base.Music21Object):
     False
     >>> unusual.accidentalsApplyOnlyToOctave = True
 
+    Equality
+    --------
+    Two KeySignatures are equal if they pass all `super().__eq__` checks and
+    their sharps are equal.  Currently, non-standard key signatures are not
+    checked (this may change).
+
+    >>> sharp2 = key.KeySignature(2)
+    >>> flat4 = key.KeySignature(-4)
+    >>> sharp2 == flat4
+    False
+    >>> sharp2 == key.KeySignature(2)
+    True
+
     Changed in v.7 -- `sharps` defaults to 0 (key of no flats/sharps)
     rather than `None` for nontraditional keys.
     '''
     _styleClass = style.TextStyle
+    equalityAttributes = ('sharps',)
 
     # note that musicxml permits non-traditional keys by specifying
     # one or more altered tones; these are given as pairs of
@@ -381,18 +395,6 @@ class KeySignature(base.Music21Object):
         else:
             output = f'{abs(ns)} flats'
         return output
-
-    def __eq__(self, other):
-        '''
-        two KeySignatures are equal if their sharps are equal.
-        '''
-        try:
-            if self.sharps == other.sharps:
-                return True
-            else:
-                return False
-        except AttributeError:
-            return False
 
     def _reprInternal(self):
         return 'of ' + self._strDescription()
@@ -932,6 +934,21 @@ class Key(KeySignature, scale.DiatonicScale):
     <music21.key.Key of E major>
     >>> key.Key('F#m')
     <music21.key.Key of f# minor>
+
+    Equality
+    --------
+    Two Keys are equal if their tonics' names are equal, their sharps are equal,
+    and their modes are equal (and they pass all superclass tests)
+
+    >>> k = key.Key(pitch.Pitch('C4'))
+    >>> k2 = key.Key(pitch.Pitch('C5'))
+    >>> k == k2
+    True
+    >>> k.mode = 'minor'
+    >>> k == k2
+    False
+
+    Changed in v8: keys now compare equal regardless of the octave of their tonics.
     '''
     _sharps = 0
     _mode: str | None = None
@@ -999,18 +1016,9 @@ class Key(KeySignature, scale.DiatonicScale):
         return f'{tonic} {self.mode}'
 
     def __eq__(self, other):
-        '''
-        Two Keys are equal if their tonics are equal and their modes are equal.
-
-        Changed in v8: keys now compare equal regardless of the octave of their tonics:
-
-        >>> k = key.Key(pitch.Pitch('C4'))
-        >>> k2 = key.Key(pitch.Pitch('C5'))
-        >>> k == k2
-        True
-        '''
-        if not isinstance(other, Key):
-            return NotImplemented
+        if not KeySignature.__eq__(self, other):
+            return False
+        # don't check on Scale equality
         return self.tonic.name == other.tonic.name and self.mode == other.mode
 
     @property

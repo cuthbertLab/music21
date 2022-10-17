@@ -64,7 +64,31 @@ class Clef(base.Music21Object):
 
     >>> tc.lowestLine
     31
+
+    Equality
+    --------
+    Two Clefs are equal if their class is the same, their sign is the same,
+    their line is the same and their octaveChange is the same.
+
+    >>> c1 = clef.PercussionClef()
+    >>> c2 = clef.NoClef()
+    >>> c1 == c2
+    False
+    >>> c3 = clef.TrebleClef()
+    >>> c4 = clef.TrebleClef()
+    >>> c3 == c4
+    True
+    >>> c4.octaveChange = -1
+    >>> c3 == c4
+    False
+
+    Note that these are not equal:
+
+    >>> clef.TrebleClef() == clef.GClef(line=2)
+    False
     '''
+    equalityAttributes = ('sign', 'line', 'octaveChange')
+
     _DOC_ATTR: dict[str, str] = {
         'sign': '''
             The sign of the clef, generally, 'C', 'G', 'F', 'percussion', 'none' or None.
@@ -110,35 +134,6 @@ class Clef(base.Music21Object):
         self._octaveChange: int = 0  # set to zero as default
         # musicxml has an attribute for clefOctaveChange,
         # an integer to show transposing clef
-
-    def __eq__(self, other):
-        '''
-        two Clefs are equal if their class is the same, their sign is the same,
-        their line is the same and their octaveChange is the same.
-
-
-        >>> c1 = clef.PercussionClef()
-        >>> c2 = clef.NoClef()
-        >>> c1 == c2
-        False
-        >>> c3 = clef.TrebleClef()
-        >>> c4 = clef.TrebleClef()
-        >>> c3 == c4
-        True
-        >>> c4.octaveChange = -1
-        >>> c3 == c4
-        False
-        '''
-        try:
-            if (self.__class__ == other.__class__
-                    and self.sign == other.sign
-                    and self.line == other.line
-                    and self.octaveChange == other.octaveChange):
-                return True
-            else:
-                return False
-        except AttributeError:
-            return False
 
     def _reprInternal(self):
         return ''

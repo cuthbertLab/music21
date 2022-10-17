@@ -2498,6 +2498,40 @@ def _getPreviousElement(s, v):
     return returnElement
 
 
+def makeVariantBlocks(s):
+    '''
+    Unknown and undocumented.  Used only in lily/translate -- for musicdiff.
+    '''
+    from music21 import variant
+    variantsToBeDone = s.getElementsByClass(variant.Variant)
+
+    for v in variantsToBeDone:
+        startOffset = s.elementOffset(v)
+        endOffset = v.replacementDuration + startOffset
+        conflictingVariants = s.getElementsByOffset(offsetStart=startOffset,
+                                                    offsetEnd=endOffset,
+                                                    includeEndBoundary=False,
+                                                    mustFinishInSpan=False,
+                                                    mustBeginInSpan=True,
+                                                    classList=[variant.Variant])
+        for cV in conflictingVariants:
+            oldReplacementDuration = cV.replacementDuration
+            if s.elementOffset(cV) == startOffset:
+                continue  # do nothing
+            else:
+                shiftOffset = s.elementOffset(cV) - startOffset
+                r = note.Rest()
+                r.duration.quarterLength = shiftOffset
+                r.style.hideObjectOnPrint = True
+                for el in cV._stream:
+                    oldOffset = el.getOffsetBySite(cV._stream)
+                    cV._stream.coreSetElementOffset(el, oldOffset + shiftOffset)
+                cV.coreElementsChanged()
+                cV.insert(0.0, r)
+                cV.replacementDuration = oldReplacementDuration
+                s.remove(cV)
+                s.insert(startOffset, cV)
+                variantsToBeDone.append(cV)
 
 
 # ------------------------------------------------------------------------------

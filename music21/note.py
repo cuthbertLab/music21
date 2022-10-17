@@ -553,6 +553,12 @@ class GeneralNote(base.Music21Object):
     >>> gn = note.GeneralNote(type='16th', dots=2)
     >>> gn.quarterLength
     0.4375
+
+    Equality
+    --------
+    GeneralNote objects are equal if they pass superclass tests (e.g., their durations are equal),
+    and they have the same articulation and expression classes (in any order),
+    and their ties are equal.
     '''
     isNote = False
     isRest = False
@@ -611,27 +617,27 @@ class GeneralNote(base.Music21Object):
         self._tie: tie.Tie | None = None  # store a Tie object
 
     def __eq__(self, other):
-        '''
-        General Note objects are equal if their durations are equal, and
-        they have the same articulation and expression classes (in any order),
-        and their ties are equal.
-        '''
         if not super().__eq__(other):
             return False
+
+        # note: tie is in equalityClasses, so already checked above.
 
         # Articulations are a list of Articulation objects.
         # Converting them to Set objects produces ordered cols that remove duplicates.
         # However, we must then convert to list to match based on class ==
         # not on class id().
         for search in 'articulations', 'expressions':
-            my_artic_classes = [type(x) for x in getattr(self, search)]
-            other_artic_classes = [type(x) for x in getattr(other, search)]
-            if len(my_artic_classes) != len(other_artic_classes):
+            my_art_express_classes = [type(x) for x in getattr(self, search)]
+            other_art_express_classes = [type(x) for x in getattr(other, search)]
+            if len(my_art_express_classes) != len(other_art_express_classes):
                 return False
-            if set(my_artic_classes) != set(other_artic_classes):
+            if set(my_art_express_classes) != set(other_art_express_classes):
                 return False
 
         return True
+
+    def __hash__(self):
+        return super().__hash__()
 
     # --------------------------------------------------------------------------
     @property
@@ -1006,7 +1012,8 @@ class NotRest(GeneralNote):
                               memo: dict[int, t.Any] | None = None,
                               *,
                               ignoreAttributes: set[str] | None = None) -> _NotRestType:
-        new = super()._deepcopySubclassable(memo, ignoreAttributes={'_chordAttached'})
+        new = t.cast(type(self),
+                     super()._deepcopySubclassable(memo, ignoreAttributes={'_chordAttached'}))
         # let the chord restore _chordAttached
 
         # after copying, if a Volume exists, it is linked to the old object
@@ -1018,13 +1025,15 @@ class NotRest(GeneralNote):
     def __deepcopy__(self, memo=None):
         '''
         As NotRest objects have a Volume, objects, and Volume objects
-        store weak refs to the client object, need to specialize deep copy handling
+        store refs to the client object, need to specialize deepcopy handling
 
         >>> import copy
         >>> n = note.NotRest()
         >>> n.volume = volume.Volume(50)
         >>> m = copy.deepcopy(n)
         >>> m.volume.client is m
+        True
+        >>> n.volume.client is n
         True
         '''
         # environLocal.printDebug(['calling NotRest.__deepcopy__', self])
@@ -1371,11 +1380,9 @@ class Note(NotRest):
     for instance a C quarter-note and a D# eighth-tied-to-32nd are both
     a single Note object.
 
-
     A Note knows both its total duration and how to express itself as a set of
     tied notes of different lengths. For instance, a note of 2.5 quarters in
     length could be half tied to eighth or dotted quarter tied to quarter.
-
 
     The first argument to the Note is the pitch name (with or without
     octave, see the introduction to :class:`music21.pitch.Pitch`).
@@ -1409,9 +1416,22 @@ class Note(NotRest):
     >>> note.Note(64).nameWithOctave
     'E4'
 
-    Two notes are considered equal if their most important attributes
-    (such as pitch, duration, articulations, and expressions) are equal.  Attributes
-    that might change based on the wider context
+    All keyword args that are valid for Duration or Pitch objects
+    are valid (as well as those for superclasses, NotRest, GeneralNote,
+    Music21Object):
+
+    >>> n = note.Note(step='C', accidental='sharp', octave=2, id='csharp', type='eighth', dots=2)
+    >>> n.nameWithOctave
+    'C#2'
+    >>> n.duration
+    <music21.duration.Duration 0.875>
+
+    Equality and ordering
+    ---------------------
+    Two notes are equal if they pass all the equality tests for NotRest and their
+    pitches are equal.
+
+    Attributes that might change based on the wider context
     of a note (such as offset) are not compared. This test does not look at lyrics in
     establishing equality.  (It may in the future.)
 
@@ -1426,15 +1446,47 @@ class Note(NotRest):
     >>> note.Note('C4', type='half') == note.Note('C4', type='quarter')
     False
 
-    All keyword args that are valid for Duration or Pitch objects
-    are valid (as well as those for superclasses, NotRest, GeneralNote,
-    Music21Object):
+    Notes, like pitches, also have an ordering based on their pitches.
 
-    >>> n = note.Note(step='C', accidental='sharp', octave=2, id='csharp', type='eighth', dots=2)
-    >>> n.nameWithOctave
-    'C#2'
-    >>> n.duration
-    <music21.duration.Duration 0.875>
+    >>> highE = note.Note('E5')
+    >>> lowF = note.Note('F2')
+    >>> otherHighE = note.Note('E5')
+
+    >>> highE > lowF
+    True
+    >>> highE < lowF
+    False
+    >>> highE >= otherHighE
+    True
+    >>> highE <= otherHighE
+    True
+
+    Notice you cannot compare Notes w/ ints or anything that does not a have a
+    `.pitch` attribute.
+
+    >>> highE < 50
+    Traceback (most recent call last):
+    TypeError: '<' not supported between instances of 'Note' and 'int'
+
+    Note also that two objects can be >= and <= without being equal, because
+    only pitch-height is being compared in <, <=, >, >= but duration and other
+    elements are compared in equality.
+
+    >>> otherHighE.duration.type = 'whole'
+
+    Now otherHighE is != highE
+
+    >>> highE == otherHighE
+    False
+
+    But it is both >= and <= it:
+
+    >>> highE >= otherHighE
+    True
+    >>> highE <= otherHighE
+    True
+
+    (The pigeonhole principle police have a bounty out on my head for this.)
     '''
     isNote = True
     equalityAttributes = ('pitch',)
@@ -1483,40 +1535,6 @@ class Note(NotRest):
 
 
     def __lt__(self, other):
-        '''
-        __lt__, __gt__, __le__, __ge__ all use a pitch comparison.
-
-        >>> highE = note.Note('E5')
-        >>> lowF = note.Note('F2')
-        >>> otherHighE = note.Note('E5')
-
-        >>> highE > lowF
-        True
-        >>> highE < lowF
-        False
-        >>> highE >= otherHighE
-        True
-        >>> highE <= otherHighE
-        True
-
-        Notice you cannot compare Notes w/ ints or anything not pitched.
-
-        >>> highE < 50
-        Traceback (most recent call last):
-        TypeError: '<' not supported between instances of 'Note' and 'int'
-
-        Note also that two objects can be >= and <= without being equal, because
-        only pitch-height is being compared in <, <=, >, >= but duration and other
-        elements are compared in equality.
-
-        >>> otherHighE.duration.type = 'whole'
-        >>> highE >= otherHighE
-        True
-        >>> highE <= otherHighE
-        True
-        >>> highE == otherHighE
-        False
-        '''
         try:
             return self.pitch < other.pitch
         except AttributeError:

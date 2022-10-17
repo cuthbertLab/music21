@@ -290,7 +290,7 @@ class LilypondConverter:
             if m21ObjectIn[variant.Variant]:
                 # has variants. so we need to make a deepcopy...
                 m21ObjectIn = variant.makeAllVariantsReplacements(m21ObjectIn, recurse=True)
-                m21ObjectIn.makeVariantBlocks()
+                variant.makeVariantBlocks(m21ObjectIn)
 
         if ('Stream' not in c) or ('Measure' in c) or ('Voice' in c):
             scoreObj = stream.Score()

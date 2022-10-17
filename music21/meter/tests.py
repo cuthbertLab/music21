@@ -86,15 +86,24 @@ class Test(unittest.TestCase):
         a[3] = a[3].subdivide(4)
         self.assertEqual(str(a), '{{1/8+1/8}+1/4+1/4+{1/16+1/16+1/16+1/16}}')
 
-    def testMeterDeepcopy(self):
+    def testMeterSequenceDeepcopy(self):
         a = MeterSequence()
         a.load('4/4', 4)
         b = copy.deepcopy(a)
-        self.assertNotEqual(a, b)
+        self.assertIsNot(a, b)
+        # TODO: this is work in progress.
+        # self.assertEqual(a, b)
 
+    def testTimeSignatureDeepcopy(self):
         c = TimeSignature('4/4')
         d = copy.deepcopy(c)
-        self.assertNotEqual(c, d)
+        self.assertIsNot(c, d)
+        self.assertEqual(c, d)
+
+        # TODO: this is work in progress
+        # e = TimeSignature('slow 6/8')
+        # f = TimeSignature('fast 6/8')
+        # self.assertNotEqual(e, f)
 
     def testGetBeams(self):
         ts = TimeSignature('6/8')
