@@ -100,7 +100,8 @@ class Test(unittest.TestCase):
         a = Music21Object()
         a.id = 'test'
         b = copy.deepcopy(a)
-        self.assertNotEqual(a, b)
+        self.assertIsNot(a, b)
+        self.assertEqual(a, b)
         self.assertEqual(b.id, 'test')
 
     def testM21BaseSites(self):

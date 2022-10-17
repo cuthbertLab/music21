@@ -128,6 +128,8 @@ class Barline(base.Music21Object):
 
     classSortOrder = -5
 
+    equalityAttributes = ('type', 'pause', 'location')
+
     def __init__(self,
                  type=None,  # pylint: disable=redefined-builtin
                  location=None,

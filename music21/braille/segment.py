@@ -19,7 +19,7 @@ and will henceforth be referred to as BMTM.
 '''
 from __future__ import annotations
 
-import collections
+from collections import deque, namedtuple
 import copy
 import enum
 import typing as t
@@ -145,10 +145,9 @@ SEGMENT_MAXNOTESFORSHORTSLUR = 4
 
 MAX_ELEMENTS_IN_SEGMENT = 48  # 8 measures of 6 notes, etc. each
 
-_ThreeDigitNumber = collections.namedtuple('_ThreeDigitNumber', ['hundreds', 'tens', 'ones'])
+_ThreeDigitNumber = namedtuple('_ThreeDigitNumber', ['hundreds', 'tens', 'ones'])
 
-SegmentKey = collections.namedtuple('SegmentKey',
-                                    ['measure', 'ordinal', 'affinity', 'hand'])
+SegmentKey = namedtuple('SegmentKey', ['measure', 'ordinal', 'affinity', 'hand'])
 SegmentKey.__new__.__defaults__ = (0, 0, None, None)
 
 
@@ -358,7 +357,7 @@ class BrailleSegment(text.BrailleText):
         super().__init__(lineLength=lineLength)
         self._groupingDict: dict[SegmentKey, BrailleElementGrouping] = {}
 
-        self.groupingKeysToProcess: list[SegmentKey] = []
+        self.groupingKeysToProcess: deque[SegmentKey] = deque()
         self.currentGroupingKey: SegmentKey | None = None
         self.previousGroupingKey: SegmentKey | None = None
         self.lastNote = None
@@ -450,7 +449,7 @@ class BrailleSegment(text.BrailleText):
 
         Returns brailleText
         '''
-        self.groupingKeysToProcess = list(sorted(self.keys()))
+        self.groupingKeysToProcess = deque(sorted(self.keys()))
 
         if self.showHeading:
             self.extractHeading()  # Heading
@@ -463,7 +462,7 @@ class BrailleSegment(text.BrailleText):
 
         self.previousGroupingKey = None
         while self.groupingKeysToProcess:
-            self.currentGroupingKey = self.groupingKeysToProcess.pop(0)
+            self.currentGroupingKey = self.groupingKeysToProcess.popleft()
 
             cgkAffinityGroup = self.currentGroupingKey.affinity
 
@@ -534,7 +533,7 @@ class BrailleSegment(text.BrailleText):
         >>> print(seg.brailleText)
         ⠼⠙⠄
         '''
-        gkp = self.groupingKeysToProcess or sorted(self.keys())
+        gkp = self.groupingKeysToProcess or deque(sorted(self.keys()))
         firstSegmentKey = gkp[0]
         initMeasureNumber = firstSegmentKey.measure
         brailleNumber = basic.numberToBraille(initMeasureNumber)
@@ -555,12 +554,12 @@ class BrailleSegment(text.BrailleText):
         metronomeMark = None
         # find the first keySignature and timeSignature...
 
-        groupingKeysToProcess = self.groupingKeysToProcess or sorted(self.keys())
+        groupingKeysToProcess = self.groupingKeysToProcess or deque(sorted(self.keys()))
 
         while groupingKeysToProcess:
             if groupingKeysToProcess[0].affinity > Affinity.MMARK:
                 break
-            cgk = groupingKeysToProcess.pop(0)  # cgk = currentGroupingKey
+            cgk = groupingKeysToProcess.popleft()  # cgk = currentGroupingKey
 
             cgkAffinityGroup = cgk.affinity
             currentBrailleGrouping = self._groupingDict.get(cgk)  # currentGrouping...
@@ -912,9 +911,9 @@ class BrailleSegment(text.BrailleText):
         '''
         extracts a tempo text and processes it...
         '''
-        self.groupingKeysToProcess.insert(0, self.currentGroupingKey)
+        self.groupingKeysToProcess.appendleft(self.currentGroupingKey)
         if self.previousGroupingKey.affinity == Affinity.SIGNATURE:
-            self.groupingKeysToProcess.insert(0, self.previousGroupingKey)
+            self.groupingKeysToProcess.appendleft(self.previousGroupingKey)
         self.extractHeading()
         self.extractMeasureNumber()
 
@@ -1092,8 +1091,8 @@ class BrailleGrandSegment(BrailleSegment, text.BrailleKeyboard):
     def __init__(self, lineLength: int = 40):
         BrailleSegment.__init__(self, lineLength=lineLength)
         text.BrailleKeyboard.__init__(self, lineLength=lineLength)
-        self.allKeyPairs: list[tuple[SegmentKey | None,
-                                     SegmentKey | None]] = []
+        self.allKeyPairs: deque[tuple[SegmentKey | None,
+                                      SegmentKey | None]] = deque()
         self.previousGroupingPair = None
         self.currentGroupingPair = None
 
@@ -1260,7 +1259,7 @@ class BrailleGrandSegment(BrailleSegment, text.BrailleKeyboard):
         '''
         Returns the BrailleText from the combined grouping keys
         '''
-        self.allKeyPairs = list(self.yieldCombinedGroupingKeys())
+        self.allKeyPairs = deque(self.yieldCombinedGroupingKeys())
         lastPair = self.allKeyPairs[-1]
         highestMeasure = lastPair[0].measure if lastPair[0] else lastPair[1].measure
         self.highestMeasureNumberLength = len(str(highestMeasure))
@@ -1269,7 +1268,7 @@ class BrailleGrandSegment(BrailleSegment, text.BrailleKeyboard):
         self.currentGroupingPair = None
         while self.allKeyPairs:
             self.previousGroupingPair = self.currentGroupingPair
-            self.currentGroupingPair = self.allKeyPairs.pop(0)
+            self.currentGroupingPair = self.allKeyPairs.popleft()
             (rightKey, leftKey) = self.currentGroupingPair
 
             if ((rightKey is not None and rightKey.affinity >= Affinity.INACCORD)
@@ -1295,7 +1294,7 @@ class BrailleGrandSegment(BrailleSegment, text.BrailleKeyboard):
         tempoText = None
         metronomeMark = None
 
-        while True:
+        while self.allKeyPairs:
             (rightKey, leftKey) = self.allKeyPairs[0]
             useKey = rightKey
             try:
@@ -1308,7 +1307,7 @@ class BrailleGrandSegment(BrailleSegment, text.BrailleKeyboard):
                     raise ke
             if useKey.affinity > Affinity.MMARK:
                 break
-            self.allKeyPairs.pop(0)
+            self.allKeyPairs.popleft()
             if useKey.affinity == Affinity.SIGNATURE:
                 try:
                     keySignature, timeSignature = useElement[0], useElement[1]

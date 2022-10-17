@@ -1199,6 +1199,7 @@ class Tuplet(prebase.ProtoM21Object):
                 return False
         return True
 
+
     # PRIVATE METHODS #
 
     def _reprInternal(self):
@@ -1744,7 +1745,6 @@ class Duration(prebase.ProtoM21Object, SlottedObjectMixin):
         False
         >>> aDur != bDur
         True
-
 
         >>> cDur == bDur
         True
@@ -3100,6 +3100,17 @@ class FrozenDuration(common.objects.FrozenObject, Duration):
     >>> fd.dots = 1
     Traceback (most recent call last):
     TypeError: This FrozenDuration instance is immutable.
+
+    FrozenDurations can be used as set/dict keys with stability.
+
+    >>> {fd}
+    {<music21.duration.FrozenDuration 3.5>}
+
+    Copying a FrozenDuration returns the original, so it is super fast.
+
+    >>> import copy
+    >>> copy.deepcopy(fd) is fd
+    True
     '''
     __slots__ = ()
 

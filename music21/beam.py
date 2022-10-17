@@ -239,6 +239,9 @@ class Beams(prebase.ProtoM21Object, EqualSlottedObjectMixin):
     def __eq__(self, other):
         return isinstance(other, self.__class__) and repr(self) == repr(other)
 
+    def __hash__(self):
+        return id(self) >> 4
+
     def _reprInternal(self):
         msg = []
         for beam in self.beamsList:

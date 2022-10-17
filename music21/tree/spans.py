@@ -345,10 +345,7 @@ class ElementTimespan(Timespan):
 
     # SPECIAL METHODS #
     def __eq__(self, other):
-        if self is other:
-            return True
-        else:
-            return False
+        return self is other
 
     def __repr__(self):
         typeName = type(self).__name__

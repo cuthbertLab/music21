@@ -40,6 +40,7 @@ from __future__ import annotations
 import builtins
 from collections.abc import Generator, Iterable
 import copy
+import functools
 from importlib.util import find_spec
 import typing as t
 from typing import overload  # Pycharm can't do alias
@@ -74,7 +75,7 @@ if TYPE_CHECKING:
     from music21 import stream
     from music21 import spanner
 
-_M21T = t.TypeVar('_M21T', bound='music21.base.Music21Object')
+    _M21T = t.TypeVar('_M21T', bound='music21.base.Music21Object')
 
 # all other music21 modules below...
 
@@ -177,6 +178,8 @@ class Groups(list):  # no need to inherit from slotted object
     Groups is a list (subclass) of strings used to identify
     associations that an element might have.
 
+    (in the future, Groups will become a set subclass)
+
     The Groups object enforces that all elements must be strings, and that
     the same element cannot be provided more than once.
 
@@ -269,9 +272,44 @@ _EQUALITY_SENTINEL_SELF = object()
 _EQUALITY_SENTINEL_OTHER = object()
 
 
+@functools.cache
+def _getEqualityAttributes(cls) -> frozenset[str]:
+    '''
+    Get equality attributes for a class.  Cached.
+
+    >>> base._getEqualityAttributes(base.Music21Object)
+    frozenset({'duration'})
+    >>> 'location' in base._getEqualityAttributes(bar.Barline)
+    True
+    >>> 'pitch' in base._getEqualityAttributes(bar.Barline)
+    False
+
+    '''
+    equalityAttributes = set()
+    # equalityAttributesIgnore works, but not yet needed.
+    # equalityAttributesIgnore = set()
+    # for klass in [cls, *cls.mro()]:
+    #     if hasattr(klass, 'equalityAttributesIgnore'):
+    #         ka = klass.equalityAttributesIgnore
+    #         if isinstance(ka, str):  # mistake.  Happens TOO often:
+    #             ka = (ka,)
+    #         equalityAttributesIgnore |= set(ka)
+
+    for klass in [cls, *cls.mro()]:
+        if hasattr(klass, 'equalityAttributes'):
+            ka = klass.equalityAttributes
+            if isinstance(ka, str):  # mistake.  Happens TOO often:
+                ka = (ka,)
+            equalityAttributes |= set(ka)
+    # equalityAttributes.difference_update(equalityAttributesIgnore)
+    return frozenset(equalityAttributes)
+
+
 class Music21Object(prebase.ProtoM21Object):
     '''
-    Base class for all music21 objects.
+    Music21Object is the base class for all elements that can go into Streams.
+    Notes, Clefs, TimeSignatures are all sublcasses of Music21Object.  Durations
+    and Pitches (which need to be attached to Notes, etc.) are not.
 
     All music21 objects have these pieces of information:
 
@@ -280,9 +318,9 @@ class Music21Object(prebase.ProtoM21Object):
     2.  groups: a :class:`~music21.base.Groups` object: which is a
         list of strings identifying internal sub-collections
         (voices, parts, selections) to which this element belongs
-    3.  duration: Duration object representing the length of the object
-    4.  activeSite: a reference to the currently active Stream or None
-    5.  offset: a floating point value, generally in quarter lengths,
+    3.  duration: :class:`~music21.duration.Duration` object representing the length of the object
+    4.  activeSite: a reference to the currently active :class:`~music21.stream.Stream` or None
+    5.  offset: a floating point or Fraction value, generally in quarter lengths,
         specifying the position of the object in a site.
     6.  priority: int representing the position of an object among all
         objects at the same offset.
@@ -296,11 +334,79 @@ class Music21Object(prebase.ProtoM21Object):
         if that is not desired.
     10. editorial: a :class:`~music21.editorial.Editorial` object
 
-
     Each of these may be passed in as a named keyword to any music21 object.
 
     Some of these may be intercepted by the subclassing object (e.g., duration
     within Note)
+
+    Equality
+    --------
+    For historical reasons, music21 uses a different idea of object equality
+    for Music21Objects than recommended by modern Python standards.
+
+    Two Music21Objects are equal if they are the same class and same duration.
+
+    Their offset, activeSite, id, and groups do not matter for equality.
+
+    Since these two objects are therefore not interchangable, they do not have
+    the same hash value.
+
+    >>> obj1 = base.Music21Object(id='obj1')
+    >>> obj2 = base.Music21Object(id='obj2')
+    >>> obj1 == obj2
+    True
+    >>> hash(obj1) == hash(obj2)
+    False
+
+    This has the stange side effect that structures that use equality to
+    report containment (such as lists and tuples) will report differently from
+    structures that use hash values to report containment (such as dicts and sets):
+
+    >>> obj1 in [obj2]
+    True
+    >>> obj1 in {obj2}
+    False
+
+    Subclasses need to apply stricter criteria for equality, like Barline does here
+    with `.location`
+
+    >>> bar1 = bar.Barline('double', 'left')
+    >>> bar2 = bar.Barline('double', 'right')
+    >>> bar1 == bar2
+    False
+    >>> bar2.location = 'left'
+    >>> bar1 == bar2
+    True
+    >>> bar1.duration.type = 'whole'  # Buh?
+    >>> bar1 == bar2
+    False
+
+    In general, a subclass of Music21Object must match all super-class criteria for
+    equality before they can be considered equal themselves.  However, there are some
+    exceptions.  For instance, RomanNumeral objects with the same figure and key are
+    equal even if their notes are in different octaves or have different doublings.
+
+    Developers creating their own Music21Object subclasses should add a class attribute
+    `equalityAttributes = ('one', 'two')`.  (Remember that as a tuple of strings, if there
+    is only one string, don't forget the trailing comma: `('only',)`.
+
+    >>> class CarolineShawBreathMark(base.Music21Object):
+    ...     equalityAttributes = ('direction',)
+    ...     def __init__(self, direction, speed):
+    ...         super().__init__(self)
+    ...         self.direction = direction
+    ...         self.speed = speed
+    >>> bm1 = CarolineShawBreathMark('in', 'fast')
+    >>> bm2 = CarolineShawBreathMark('out', 'fast')
+    >>> bm1 == bm2
+    False
+
+    "speed" is not in the equalityAttributes so it can differ while objects are still
+    equal.
+
+    >>> bm3 = CarolineShawBreathMark('in', 'slow')
+    >>> bm1 == bm3
+    True
     '''
 
     classSortOrder: int | float = 20  # default classSortOrder
@@ -309,7 +415,8 @@ class Music21Object(prebase.ProtoM21Object):
 
     _styleClass: type[Style] = Style
 
-    equalityAttributes = ('duration',)
+    equalityAttributes: tuple[str, ...] = ('duration',)
+    # equalityAttributesIgnore: tuple[str, ...] = ()  # this must be defined anew in each subclass.
 
     # define order for presenting names in documentation; use strings
     _DOC_ORDER: list[str] = []
@@ -406,11 +513,25 @@ class Music21Object(prebase.ProtoM21Object):
         if quarterLength is not None:
             self.duration.quarterLength = quarterLength
 
-    # def __eq__(self, other):
-    #     '''
-    #     Two music21 objects are
-    #     '''
+    def __eq__(self: _M21T, other) -> t.TypeGuard[_M21T]:
+        '''
+        Define equality for Music21Objects.  See main class docs.
+        '''
+        cls = t.cast(type, self.__class__)
+        if not isinstance(other, cls):
+            return False
 
+        for attr in _getEqualityAttributes(cls):
+            if (getattr(self, attr, _EQUALITY_SENTINEL_SELF)
+                    != getattr(other, attr, _EQUALITY_SENTINEL_OTHER)):
+                return False
+        return True
+
+    def __hash__(self) -> int:
+        '''
+        Restore hashing, but only on id(self)
+        '''
+        return id(self) >> 4
 
     @property
     def id(self) -> int | str:
@@ -436,7 +557,7 @@ class Music21Object(prebase.ProtoM21Object):
             warnings.warn(msg)
         self._id = new_id
 
-    def mergeAttributes(self, other: 'Music21Object') -> None:
+    def mergeAttributes(self, other: Music21Object) -> None:
         '''
         Merge all elementary, static attributes. Namely,
         `id` and `groups` attributes from another music21 object.
@@ -1038,55 +1159,55 @@ class Music21Object(prebase.ProtoM21Object):
         Stream subclass, SpannerStorage, internally to keep track
         of the elements that are spanned.
 
-        >>> n1 = note.Note('C4')
-        >>> n2 = note.Note('D4')
-        >>> sp1 = spanner.Slur(n1, n2)
-        >>> n1.getSpannerSites() == [sp1]
+        >>> c = note.Note('C4')
+        >>> d = note.Note('D4')
+        >>> slur1 = spanner.Slur(c, d)
+        >>> c.getSpannerSites() == [slur1]
         True
 
         Note that not all Spanners are in the spanner module. They
         tend to reside in modules closer to their musical function:
 
-        >>> sp2 = dynamics.Crescendo(n2, n1)
+        >>> cresc = dynamics.Crescendo(d, c)
 
-        The order that Spanners are returned is usually the order they
-        were created, but on fast computers there can be ties, so use
-        a set comparison if you expect multiple:
+        The order that Spanners are returned is by sortTuple.  For spanners
+        created the same way and in the same order, the order returned will
+        be consistent:
 
-        >>> set(n2.getSpannerSites()) == {sp1, sp2}
+        >>> d.getSpannerSites() == [slur1, cresc]
         True
 
         Optionally a class name or list of class names (as Classes or strings)
         can be specified and only Spanners of that class will be returned
 
-        >>> sp3 = dynamics.Diminuendo(n1, n2)
-        >>> n2.getSpannerSites(dynamics.Diminuendo) == [sp3]
+        >>> dim = dynamics.Diminuendo(c, d)
+        >>> d.getSpannerSites(dynamics.Diminuendo) == [dim]
         True
 
         A larger class name can be used to get all subclasses:
 
-        >>> set(n2.getSpannerSites(dynamics.DynamicWedge)) == {sp2, sp3}
+        >>> d.getSpannerSites(dynamics.DynamicWedge) == [cresc, dim]
         True
-        >>> set(n2.getSpannerSites(['Slur', 'Diminuendo'])) == {sp1, sp3}
+        >>> d.getSpannerSites(['Slur', 'Diminuendo']) == [slur1, dim]
         True
 
         Note that the order of spanners returned from this routine can vary, so
-        changing to a set is useful:
+        changing to a set is useful for comparisons
 
-        >>> set(n2.getSpannerSites(['Slur', 'Diminuendo'])) == {sp3, sp1}
+        >>> set(d.getSpannerSites(['Slur', 'Diminuendo'])) == {dim, slur1}
         True
 
 
         Example: see which pairs of notes are in the same slur.
 
-        >>> n3 = note.Note('E4')
-        >>> sp4 = spanner.Slur(n1, n3)
+        >>> e = note.Note('E4')
+        >>> slur2 = spanner.Slur(c, e)
 
-        >>> for n in [n1, n2, n3]:
-        ...    for nOther in [n1, n2, n3]:
+        >>> for n in [c, d, e]:
+        ...    nSlurs = n.getSpannerSites(spanner.Slur)
+        ...    for nOther in [c, d, e]:
         ...        if n is nOther:
         ...            continue
-        ...        nSlurs = n.getSpannerSites(spanner.Slur)
         ...        nOtherSlurs = nOther.getSpannerSites(spanner.Slur)
         ...        for thisSlur in nSlurs:
         ...            if thisSlur in nOtherSlurs:
@@ -1097,7 +1218,7 @@ class Music21Object(prebase.ProtoM21Object):
         E shares a slur with C
         '''
         found = self.sites.getSitesByClass('SpannerStorage')
-        post = []
+        post: list[spanner.Spanner] = []
         if spannerClassList is not None:
             if not common.isIterable(spannerClassList):
                 spannerClassList = [spannerClassList]
@@ -1113,7 +1234,7 @@ class Music21Object(prebase.ProtoM21Object):
                         post.append(obj.client)
                         break
 
-        return post
+        return sorted(post, key=lambda x: x.sortTuple())
 
     def purgeOrphans(self, excludeStorageStreams=True) -> None:
         '''
@@ -4000,7 +4121,7 @@ class ElementWrapper(Music21Object):
         else:
             return f'offset={self.offset} obj={shortObj!r}'
 
-    def __eq__(self, other) -> bool:
+    def __eq__(self, other):
         '''
         Test ElementWrapper equality
 

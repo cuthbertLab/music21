@@ -96,9 +96,16 @@ class Test(unittest.TestCase):
         b = copy.deepcopy(a)
         self.assertEqual(a, b)
 
+    def testTimeSignatureDeepcopy(self):
         c = TimeSignature('4/4')
         d = copy.deepcopy(c)
+        self.assertIsNot(c, d)
         self.assertEqual(c, d)
+
+        # TODO: this is work in progress
+        # e = TimeSignature('slow 6/8')
+        # f = TimeSignature('fast 6/8')
+        # self.assertNotEqual(e, f)
 
     def testGetBeams(self):
         ts = TimeSignature('6/8')
