@@ -239,6 +239,9 @@ class Beams(prebase.ProtoM21Object, EqualSlottedObjectMixin):
     def __eq__(self, other):
         return isinstance(other, self.__class__) and repr(self) == repr(other)
 
+    def __hash__(self):
+        return id(self) >> 4
+
     def _reprInternal(self):
         msg = []
         for beam in self.beamsList:
@@ -702,13 +705,14 @@ class Beams(prebase.ProtoM21Object, EqualSlottedObjectMixin):
 
 
 class Test(unittest.TestCase):
-    pass
+
+    def testCopyAndDeepcopy(self):
+        from music21.test.commonTest import testCopyAll
+        testCopyAll(self, globals())
 
 
 # -----------------------------------------------------------------------------
 # define presented order in documentation
-
-
 _DOC_ORDER = [Beams, Beam]
 
 

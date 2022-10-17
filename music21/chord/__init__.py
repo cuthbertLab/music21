@@ -63,6 +63,31 @@ class ChordBase(note.NotRest):
 
     As of Version 7, ChordBase lies between Chord and NotRest in the music21
     hierarchy, so that features can be shared with PercussionChord.
+
+    >>> cb = chord.ChordBase('C4 E4 G4')
+    >>> cb.notes
+    (<music21.note.Note C>, <music21.note.Note E>, <music21.note.Note G>)
+
+
+    Equality
+    --------
+    Equality on ChordBase is strange, but necessary to help Chord and PercussionChord
+    do meaningful equality checks themselves.
+
+    Two ChordBase objects are equal if they pass all `super()`
+    equality tests and the **number** of stored Notes are the same.
+
+    >>> cb1 = chord.ChordBase('C4 E4 G4')
+    >>> cb2 = chord.ChordBase('C4 E4')
+    >>> cb1 == cb2
+    False
+
+    This is surprising, but it's necessary to make checking equality
+    of Chord objects and PercussionChord objects themselves easier.
+
+    >>> cb3 = chord.ChordBase('A#4 A#4 A#4')
+    >>> cb1 == cb3
+    True
     '''
     isNote = False
     isRest = False
@@ -90,6 +115,7 @@ class ChordBase(note.NotRest):
                                 str,
                                 Sequence[str],
                                 Sequence[pitch.Pitch],
+                                Sequence[ChordBase],
                                 Sequence[note.NotRest],
                                 Sequence[int]] = None,
                  **keywords):
@@ -129,35 +155,14 @@ class ChordBase(note.NotRest):
 
 
     def __eq__(self, other):
-        '''
-        True if the ChordBase passes all `super()`
-        equality tests and the pitches
-        (or display pitches, for Unpitched objects)
-        are the same (but possibly in a different order).
-
-        >>> c1 = chord.Chord('C4 E4 G4')
-        >>> c2 = chord.Chord('E4 C4 G4')
-        >>> c1 == c2
-        True
-        >>> c3 = chord.Chord('E4 C#4 G4')
-        >>> c2 == c3
-        False
-        >>> n1 = note.Note('C4')
-        >>> c1 == n1
-        False
-        >>> c2.duration.quarterLength = 2.0
-        >>> c1 == c2
-        False
-        >>> c1 != c2
-        True
-        '''
         if not super().__eq__(other):
-            return False
-        if not hasattr(other, 'notes'):
             return False
         if not len(self.notes) == len(other.notes):
             return False
         return True
+
+    def __hash__(self):
+        return super().__hash__()
 
     def __deepcopy__(self: _ChordBaseType, memo=None) -> _ChordBaseType:
         '''
@@ -385,7 +390,7 @@ class ChordBase(note.NotRest):
 
     @property
     def notes(self) -> tuple[note.NotRest, ...]:
-        return ()
+        return tuple(self._notes)
 
     @property
     def tie(self) -> tie.Tie | None:
@@ -706,6 +711,28 @@ class Chord(ChordBase):
     Traceback (most recent call last):
     music21.chord.ChordException: Could not process input
                                     argument <module 'music21.base' from '...base...'>
+
+    Equality
+    --------
+    Two chords are equal if the Chord passes all `super()`
+    equality tests and all their pitches are equal
+    (possibly in a different order)
+
+    >>> c1 = chord.Chord('C4 E4 G4')
+    >>> c2 = chord.Chord('E4 C4 G4')
+    >>> c1 == c2
+    True
+    >>> c3 = chord.Chord('E4 C#4 G4')
+    >>> c2 == c3
+    False
+    >>> n1 = note.Note('C4')
+    >>> c1 == n1
+    False
+    >>> c2.duration.quarterLength = 2.0
+    >>> c1 == c2
+    False
+    >>> c1 != c2
+    True
     '''
     # CLASS VARIABLES #
     isChord = True
@@ -727,6 +754,7 @@ class Chord(ChordBase):
                  notes: t.Union[None,
                                 Sequence[pitch.Pitch],
                                 Sequence[note.Note],
+                                Sequence[Chord],
                                 Sequence[str],
                                 str,
                                 Sequence[int]] = None,
@@ -747,34 +775,14 @@ class Chord(ChordBase):
     # SPECIAL METHODS #
 
     def __eq__(self, other):
-        '''
-        True if the Chord passes all `super()`
-        equality tests and the pitches are the same
-        (possibly in a different order)
-
-        >>> c1 = chord.Chord('C4 E4 G4')
-        >>> c2 = chord.Chord('E4 C4 G4')
-        >>> c1 == c2
-        True
-        >>> c3 = chord.Chord('E4 C#4 G4')
-        >>> c2 == c3
-        False
-        >>> n1 = note.Note('C4')
-        >>> c1 == n1
-        False
-        >>> c2.duration.quarterLength = 2.0
-        >>> c1 == c2
-        False
-        >>> c1 != c2
-        True
-        '''
-        if super().__eq__(other) is NotImplemented:
-            return NotImplemented
         if not super().__eq__(other):
             return False
         if set(self.pitches) != set(other.pitches):
             return False
         return True
+
+    def __hash__(self):
+        return super().__hash__()
 
     def __getitem__(self, key: int | str | note.Note | pitch.Pitch):
         '''

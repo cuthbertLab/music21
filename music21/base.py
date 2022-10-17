@@ -27,7 +27,7 @@ available after importing `music21`.
 <class 'music21.base.Music21Object'>
 
 >>> music21.VERSION_STR
-'9.0.0a4'
+'9.0.0a5'
 
 Alternatively, after doing a complete import, these classes are available
 under the module "base":
@@ -40,6 +40,7 @@ from __future__ import annotations
 import builtins
 from collections.abc import Generator, Iterable
 import copy
+import functools
 from importlib.util import find_spec
 import typing as t
 from typing import overload  # Pycharm can't do alias
@@ -74,7 +75,7 @@ if TYPE_CHECKING:
     from music21 import stream
     from music21 import spanner
 
-_M21T = t.TypeVar('_M21T', bound='music21.base.Music21Object')
+    _M21T = t.TypeVar('_M21T', bound='music21.base.Music21Object')
 
 # all other music21 modules below...
 
@@ -177,6 +178,8 @@ class Groups(list):  # no need to inherit from slotted object
     Groups is a list (subclass) of strings used to identify
     associations that an element might have.
 
+    (in the future, Groups will become a set subclass)
+
     The Groups object enforces that all elements must be strings, and that
     the same element cannot be provided more than once.
 
@@ -269,9 +272,44 @@ _EQUALITY_SENTINEL_SELF = object()
 _EQUALITY_SENTINEL_OTHER = object()
 
 
+@functools.cache
+def _getEqualityAttributes(cls) -> frozenset[str]:
+    '''
+    Get equality attributes for a class.  Cached.
+
+    >>> base._getEqualityAttributes(base.Music21Object)
+    frozenset({'duration'})
+    >>> 'location' in base._getEqualityAttributes(bar.Barline)
+    True
+    >>> 'pitch' in base._getEqualityAttributes(bar.Barline)
+    False
+
+    '''
+    equalityAttributes = set()
+    # equalityAttributesIgnore works, but not yet needed.
+    # equalityAttributesIgnore = set()
+    # for klass in [cls, *cls.mro()]:
+    #     if hasattr(klass, 'equalityAttributesIgnore'):
+    #         ka = klass.equalityAttributesIgnore
+    #         if isinstance(ka, str):  # mistake.  Happens TOO often:
+    #             ka = (ka,)
+    #         equalityAttributesIgnore |= set(ka)
+
+    for klass in [cls, *cls.mro()]:
+        if hasattr(klass, 'equalityAttributes'):
+            ka = klass.equalityAttributes
+            if isinstance(ka, str):  # mistake.  Happens TOO often:
+                ka = (ka,)
+            equalityAttributes |= set(ka)
+    # equalityAttributes.difference_update(equalityAttributesIgnore)
+    return frozenset(equalityAttributes)
+
+
 class Music21Object(prebase.ProtoM21Object):
     '''
-    Base class for all music21 objects.
+    Music21Object is the base class for all elements that can go into Streams.
+    Notes, Clefs, TimeSignatures are all sublcasses of Music21Object.  Durations
+    and Pitches (which need to be attached to Notes, etc.) are not.
 
     All music21 objects have these pieces of information:
 
@@ -280,9 +318,9 @@ class Music21Object(prebase.ProtoM21Object):
     2.  groups: a :class:`~music21.base.Groups` object: which is a
         list of strings identifying internal sub-collections
         (voices, parts, selections) to which this element belongs
-    3.  duration: Duration object representing the length of the object
-    4.  activeSite: a reference to the currently active Stream or None
-    5.  offset: a floating point value, generally in quarter lengths,
+    3.  duration: :class:`~music21.duration.Duration` object representing the length of the object
+    4.  activeSite: a reference to the currently active :class:`~music21.stream.Stream` or None
+    5.  offset: a floating point or Fraction value, generally in quarter lengths,
         specifying the position of the object in a site.
     6.  priority: int representing the position of an object among all
         objects at the same offset.
@@ -296,11 +334,79 @@ class Music21Object(prebase.ProtoM21Object):
         if that is not desired.
     10. editorial: a :class:`~music21.editorial.Editorial` object
 
-
     Each of these may be passed in as a named keyword to any music21 object.
 
     Some of these may be intercepted by the subclassing object (e.g., duration
     within Note)
+
+    Equality
+    --------
+    For historical reasons, music21 uses a different idea of object equality
+    for Music21Objects than recommended by modern Python standards.
+
+    Two Music21Objects are equal if they are the same class and same duration.
+
+    Their offset, activeSite, id, and groups do not matter for equality.
+
+    Since these two objects are therefore not interchangable, they do not have
+    the same hash value.
+
+    >>> obj1 = base.Music21Object(id='obj1')
+    >>> obj2 = base.Music21Object(id='obj2')
+    >>> obj1 == obj2
+    True
+    >>> hash(obj1) == hash(obj2)
+    False
+
+    This has the stange side effect that structures that use equality to
+    report containment (such as lists and tuples) will report differently from
+    structures that use hash values to report containment (such as dicts and sets):
+
+    >>> obj1 in [obj2]
+    True
+    >>> obj1 in {obj2}
+    False
+
+    Subclasses need to apply stricter criteria for equality, like Barline does here
+    with `.location`
+
+    >>> bar1 = bar.Barline('double', 'left')
+    >>> bar2 = bar.Barline('double', 'right')
+    >>> bar1 == bar2
+    False
+    >>> bar2.location = 'left'
+    >>> bar1 == bar2
+    True
+    >>> bar1.duration.type = 'whole'  # Buh?
+    >>> bar1 == bar2
+    False
+
+    In general, a subclass of Music21Object must match all super-class criteria for
+    equality before they can be considered equal themselves.  However, there are some
+    exceptions.  For instance, RomanNumeral objects with the same figure and key are
+    equal even if their notes are in different octaves or have different doublings.
+
+    Developers creating their own Music21Object subclasses should add a class attribute
+    `equalityAttributes = ('one', 'two')`.  (Remember that as a tuple of strings, if there
+    is only one string, don't forget the trailing comma: `('only',)`.
+
+    >>> class CarolineShawBreathMark(base.Music21Object):
+    ...     equalityAttributes = ('direction',)
+    ...     def __init__(self, direction, speed):
+    ...         super().__init__(self)
+    ...         self.direction = direction
+    ...         self.speed = speed
+    >>> bm1 = CarolineShawBreathMark('in', 'fast')
+    >>> bm2 = CarolineShawBreathMark('out', 'fast')
+    >>> bm1 == bm2
+    False
+
+    "speed" is not in the equalityAttributes so it can differ while objects are still
+    equal.
+
+    >>> bm3 = CarolineShawBreathMark('in', 'slow')
+    >>> bm1 == bm3
+    True
     '''
 
     classSortOrder: int | float = 20  # default classSortOrder
@@ -309,7 +415,8 @@ class Music21Object(prebase.ProtoM21Object):
 
     _styleClass: type[Style] = Style
 
-    equalityAttributes = ('duration',)
+    equalityAttributes: tuple[str, ...] = ('duration',)
+    # equalityAttributesIgnore: tuple[str, ...] = ()  # this must be defined anew in each subclass.
 
     # define order for presenting names in documentation; use strings
     _DOC_ORDER: list[str] = []
@@ -406,11 +513,25 @@ class Music21Object(prebase.ProtoM21Object):
         if quarterLength is not None:
             self.duration.quarterLength = quarterLength
 
-    # def __eq__(self, other):
-    #     '''
-    #     Two music21 objects are
-    #     '''
+    def __eq__(self: _M21T, other) -> t.TypeGuard[_M21T]:
+        '''
+        Define equality for Music21Objects.  See main class docs.
+        '''
+        cls = t.cast(type, self.__class__)
+        if not isinstance(other, cls):
+            return False
 
+        for attr in _getEqualityAttributes(cls):
+            if (getattr(self, attr, _EQUALITY_SENTINEL_SELF)
+                    != getattr(other, attr, _EQUALITY_SENTINEL_OTHER)):
+                return False
+        return True
+
+    def __hash__(self) -> int:
+        '''
+        Restore hashing, but only on id(self)
+        '''
+        return id(self) >> 4
 
     @property
     def id(self) -> int | str:
@@ -436,7 +557,7 @@ class Music21Object(prebase.ProtoM21Object):
             warnings.warn(msg)
         self._id = new_id
 
-    def mergeAttributes(self, other: 'Music21Object') -> None:
+    def mergeAttributes(self, other: Music21Object) -> None:
         '''
         Merge all elementary, static attributes. Namely,
         `id` and `groups` attributes from another music21 object.
@@ -456,108 +577,48 @@ class Music21Object(prebase.ProtoM21Object):
             self.id = other.id
         self.groups = copy.deepcopy(other.groups)
 
-    # PyCharm 2019 does not know that copy.deepcopy can take a memo argument
-    # noinspection PyArgumentList
     def _deepcopySubclassable(self: _M21T,
-                              memo=None,
-                              ignoreAttributes=None) -> _M21T:
+                              memo: dict[int, t.Any] | None = None,
+                              *,
+                              ignoreAttributes: set[str] | None = None) -> _M21T:
         '''
         Subclassable __deepcopy__ helper so that the same attributes
-        do not need to be called
-        for each Music21Object subclass.
+        do not need to be called for each Music21Object subclass.
 
         ignoreAttributes is a set of attributes not to copy via
-        the default deepcopy style.
-        More can be passed to it.
-
-        TODO: move to class attributes to cache.
+        the default deepcopy style. More can be passed to it.  But calling
+        functions are responsible
 
         Changed in v9: removeFromIgnore removed; never used and this is performance
         critical.
         '''
-        defaultIgnoreSet = {'_derivation', '_activeSite',
-                            'sites', '_duration', '_style', '_cache'}
+        defaultIgnoreSet = {'_derivation', '_activeSite', '_sites', '_cache'}
+        if not self.groups:
+            defaultIgnoreSet.add('groups')
+        # duration is smart enough to do itself.
+        # sites is smart enough to do itself
+
         if ignoreAttributes is None:
             ignoreAttributes = defaultIgnoreSet
         else:
             ignoreAttributes = ignoreAttributes | defaultIgnoreSet
 
-        # call class to get a new, empty instance
-        # TODO: this creates an extra duration object for notes... optimize...
-        if '_duration' in ignoreAttributes and self._duration is not None:
-            d = self._duration
-            clientStore = d.client
-            d.client = None
-            newDuration = copy.deepcopy(d, memo)
-            d.client = clientStore
-            new = self.__class__(duration=newDuration)
-        else:
-            new = self.__class__()
+        new = common.defaultDeepcopy(self, memo, ignoreAttributes=ignoreAttributes)
+        setattr(new, '_cache', {})
+        setattr(new, '_sites', Sites())
+        if 'groups' in defaultIgnoreSet:
+            new.groups = Groups()
 
-        if '_derivation' in ignoreAttributes:
-            # was: keep the old ancestor but need to update the client
-            # 2.1 : NO, add a derivation of __deepcopy__ to the client
-            newDerivation = Derivation(client=new)
-            newDerivation.origin = self
-            newDerivation.method = '__deepcopy__'
-            setattr(new, '_derivation', newDerivation)
+        # was: keep the old ancestor but need to update the client
+        # 2.1 : NO, add a derivation of __deepcopy__ to the client
+        newDerivation = Derivation(client=new)
+        newDerivation.origin = self
+        newDerivation.method = '__deepcopy__'
+        setattr(new, '_derivation', newDerivation)
+        # None activeSite is correct for new value
 
-        if '_activeSite' in ignoreAttributes:
-            # TODO: Fix this so as not to allow incorrect _activeSite (???)
-            # keep a reference, not a deepcopy
-            # do not use property: .activeSite; set to same weakref obj
-            # TODO: restore jan 2020 (was Jan 2018)
-            #            setattr(new, '_activeSite', None)
-            setattr(new, '_activeSite', self._activeSite)
-
-        if 'sites' in ignoreAttributes:
-            # we make a copy of the sites value even though it is obsolete because
-            # the spanners will need to be preserved and then set to the new value
-            # elsewhere.  The purgeOrphans call later will remove all but
-            # spanners and variants.
-            value = getattr(self, 'sites')
-            # this calls __deepcopy__ in Sites
-            newValue = copy.deepcopy(value, memo)
-            setattr(new, 'sites', newValue)
-        if '_style' in ignoreAttributes:
-            value = getattr(self, '_style', None)
-            if value is not None:
-                newValue = copy.deepcopy(value, memo)
-                setattr(new, '_style', newValue)
-
-        for name in self.__dict__:
-            if name.startswith('__'):
-                continue
-            if name in ignoreAttributes:
-                continue
-
-            attrValue = getattr(self, name)
-            # attributes that do not require special handling
-            try:
-                deeplyCopiedObject = copy.deepcopy(attrValue, memo)
-                setattr(new, name, deeplyCopiedObject)
-            except TypeError as te:  # pragma: no cover
-                if not isinstance(attrValue, Music21Object):
-                    # shallow copy then...
-                    try:
-                        shallowlyCopiedObject = copy.copy(attrValue)
-                        setattr(new, name, shallowlyCopiedObject)
-                        environLocal.printDebug(
-                            '__deepcopy__: Could not deepcopy '
-                            + f'{name} in {self}, not a Music21Object'
-                            + 'so making a shallow copy')
-                    except TypeError:
-                        # just link...
-                        environLocal.printDebug(
-                            '__deepcopy__: Could not copy (deep or shallow) '
-                            + f'{name} in {self}, not a Music21Object so just making a link'
-                        )
-                        setattr(new, name, attrValue)
-                else:  # raise error for our own problem.  # pragma: no cover
-                    raise Music21Exception(
-                        '__deepcopy__: Cannot deepcopy Music21Object '
-                        + f'{name} probably because it requires a default value in instantiation.'
-                    ) from te
+        # must do this after copying
+        new.purgeOrphans()
 
         return new
 
@@ -600,12 +661,7 @@ class Music21Object(prebase.ProtoM21Object):
         >>> ('flute' in n.groups, 'flute' in b.groups)
         (False, True)
         '''
-        # environLocal.printDebug(['calling Music21Object.__deepcopy__', self])
-        new = self._deepcopySubclassable(memo)
-        # must do this after copying
-        new.purgeOrphans()
-        # environLocal.printDebug([self, 'end deepcopy', 'self._activeSite', self._activeSite])
-        return new
+        return self._deepcopySubclassable(memo)
 
     def __getstate__(self) -> dict[str, t.Any]:
         state = self.__dict__.copy()
@@ -1103,55 +1159,55 @@ class Music21Object(prebase.ProtoM21Object):
         Stream subclass, SpannerStorage, internally to keep track
         of the elements that are spanned.
 
-        >>> n1 = note.Note('C4')
-        >>> n2 = note.Note('D4')
-        >>> sp1 = spanner.Slur(n1, n2)
-        >>> n1.getSpannerSites() == [sp1]
+        >>> c = note.Note('C4')
+        >>> d = note.Note('D4')
+        >>> slur1 = spanner.Slur(c, d)
+        >>> c.getSpannerSites() == [slur1]
         True
 
         Note that not all Spanners are in the spanner module. They
         tend to reside in modules closer to their musical function:
 
-        >>> sp2 = dynamics.Crescendo(n2, n1)
+        >>> cresc = dynamics.Crescendo(d, c)
 
-        The order that Spanners are returned is usually the order they
-        were created, but on fast computers there can be ties, so use
-        a set comparison if you expect multiple:
+        The order that Spanners are returned is by sortTuple.  For spanners
+        created the same way and in the same order, the order returned will
+        be consistent:
 
-        >>> set(n2.getSpannerSites()) == {sp1, sp2}
+        >>> d.getSpannerSites() == [slur1, cresc]
         True
 
         Optionally a class name or list of class names (as Classes or strings)
         can be specified and only Spanners of that class will be returned
 
-        >>> sp3 = dynamics.Diminuendo(n1, n2)
-        >>> n2.getSpannerSites(dynamics.Diminuendo) == [sp3]
+        >>> dim = dynamics.Diminuendo(c, d)
+        >>> d.getSpannerSites(dynamics.Diminuendo) == [dim]
         True
 
         A larger class name can be used to get all subclasses:
 
-        >>> set(n2.getSpannerSites(dynamics.DynamicWedge)) == {sp2, sp3}
+        >>> d.getSpannerSites(dynamics.DynamicWedge) == [cresc, dim]
         True
-        >>> set(n2.getSpannerSites(['Slur', 'Diminuendo'])) == {sp1, sp3}
+        >>> d.getSpannerSites(['Slur', 'Diminuendo']) == [slur1, dim]
         True
 
         Note that the order of spanners returned from this routine can vary, so
-        changing to a set is useful:
+        changing to a set is useful for comparisons
 
-        >>> set(n2.getSpannerSites(['Slur', 'Diminuendo'])) == {sp3, sp1}
+        >>> set(d.getSpannerSites(['Slur', 'Diminuendo'])) == {dim, slur1}
         True
 
 
         Example: see which pairs of notes are in the same slur.
 
-        >>> n3 = note.Note('E4')
-        >>> sp4 = spanner.Slur(n1, n3)
+        >>> e = note.Note('E4')
+        >>> slur2 = spanner.Slur(c, e)
 
-        >>> for n in [n1, n2, n3]:
-        ...    for nOther in [n1, n2, n3]:
+        >>> for n in [c, d, e]:
+        ...    nSlurs = n.getSpannerSites(spanner.Slur)
+        ...    for nOther in [c, d, e]:
         ...        if n is nOther:
         ...            continue
-        ...        nSlurs = n.getSpannerSites(spanner.Slur)
         ...        nOtherSlurs = nOther.getSpannerSites(spanner.Slur)
         ...        for thisSlur in nSlurs:
         ...            if thisSlur in nOtherSlurs:
@@ -1162,7 +1218,7 @@ class Music21Object(prebase.ProtoM21Object):
         E shares a slur with C
         '''
         found = self.sites.getSitesByClass('SpannerStorage')
-        post = []
+        post: list[spanner.Spanner] = []
         if spannerClassList is not None:
             if not common.isIterable(spannerClassList):
                 spannerClassList = [spannerClassList]
@@ -1178,7 +1234,7 @@ class Music21Object(prebase.ProtoM21Object):
                         post.append(obj.client)
                         break
 
-        return post
+        return sorted(post, key=lambda x: x.sortTuple())
 
     def purgeOrphans(self, excludeStorageStreams=True) -> None:
         '''
@@ -1804,7 +1860,7 @@ class Music21Object(prebase.ProtoM21Object):
         indices to ensure that no other temporary
         streams are created; normally, we would do `c.parts['#Alto'].measure(3)`.
 
-        >>> m = c[2][4]
+        >>> m = c.parts['#Alto'].getElementsByClass(stream.Measure)[3]
         >>> m
         <music21.stream.Measure 3 offset=9.0>
 
@@ -1829,11 +1885,10 @@ class Music21Object(prebase.ProtoM21Object):
         (<music21.stream.Part Alto>, '9.0 <0.-20...>', <RecursionType.FLATTEN>)
         (<music21.stream.Score bach>, '9.0 <0.-20...>', <RecursionType.ELEMENTS_ONLY>)
 
-
         Here we make a copy of the earlier measure, and we see that its contextSites
         follow the derivationChain from the original measure and still find the Part
-        and Score of the original Measure 3 even though mCopy is not in any of these
-        objects.
+        and Score of the original Measure 3 (and also the original Measure 3)
+        even though mCopy is not in any of these objects.
 
         >>> import copy
         >>> mCopy = copy.deepcopy(m)
@@ -1841,6 +1896,9 @@ class Music21Object(prebase.ProtoM21Object):
         >>> for csTuple in mCopy.contextSites():
         ...      print(csTuple, mCopy in csTuple.site)
         ContextTuple(site=<music21.stream.Measure 3333 offset=0.0>,
+                     offset=0.0,
+                     recurseType=<RecursionType.ELEMENTS_FIRST>) False
+        ContextTuple(site=<music21.stream.Measure 3 offset=9.0>,
                      offset=0.0,
                      recurseType=<RecursionType.ELEMENTS_FIRST>) False
         ContextTuple(site=<music21.stream.Part Alto>,
@@ -1955,7 +2013,7 @@ class Music21Object(prebase.ProtoM21Object):
         from music21 import stream
 
         if memo is None:
-            memo = []
+            memo = set()
 
         if callerFirst is None:
             callerFirst = self
@@ -1972,7 +2030,7 @@ class Music21Object(prebase.ProtoM21Object):
                     yield ContextSortTuple(streamSelf, selfSortTuple, recursionType)
                 else:
                     yield ContextTuple(streamSelf, 0.0, recursionType)
-                memo.append(streamSelf)
+                memo.add(streamSelf)
 
         if priorityTarget is None and sortByCreationTime is False:
             priorityTarget = self.activeSite
@@ -2009,7 +2067,7 @@ class Music21Object(prebase.ProtoM21Object):
             else:
                 yield ContextTuple(siteObj, positionInStream.offset, recursionType)
 
-            memo.append(siteObj)
+            memo.add(siteObj)
             environLocal.printDebug(
                 f'looking in contextSites for {siteObj}'
                 + f' with position {positionInStream.shortRepr()}')
@@ -2037,7 +2095,7 @@ class Music21Object(prebase.ProtoM21Object):
                         yield ContextSortTuple(topLevel, hypotheticalPosition, recurType)
                     else:
                         yield ContextTuple(topLevel, inStreamOffset, recurType)
-                    memo.append(topLevel)
+                    memo.add(topLevel)
             if priorityTargetOnly:
                 break
 
@@ -2070,7 +2128,7 @@ class Music21Object(prebase.ProtoM21Object):
                         yield ContextTuple(offsetAdjustedCsTuple.site,
                                            offsetAdjustedCsTuple.offset.offset,
                                            offsetAdjustedCsTuple.recurseType)
-                    memo.append(derivedCsTuple.site)
+                    memo.add(derivedCsTuple.site)
 
         environLocal.printDebug('--returning from derivedObject search')
 
@@ -4063,7 +4121,7 @@ class ElementWrapper(Music21Object):
         else:
             return f'offset={self.offset} obj={shortObj!r}'
 
-    def __eq__(self, other) -> bool:
+    def __eq__(self, other):
         '''
         Test ElementWrapper equality
 

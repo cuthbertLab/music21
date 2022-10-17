@@ -109,12 +109,7 @@ class DynamicException(exceptions21.Music21Exception):
     pass
 
 
-class WedgeException(exceptions21.Music21Exception):
-    pass
-
 # ------------------------------------------------------------------------------
-
-
 class Dynamic(base.Music21Object):
     '''
     Object representation of Dynamics.

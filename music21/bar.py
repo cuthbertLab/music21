@@ -128,6 +128,8 @@ class Barline(base.Music21Object):
 
     classSortOrder = -5
 
+    equalityAttributes = ('type', 'pause', 'location')
+
     def __init__(self,
                  type=None,  # pylint: disable=redefined-builtin
                  location=None,
@@ -375,6 +377,9 @@ class Repeat(repeat.RepeatMark, Barline):
 
 # ------------------------------------------------------------------------------
 class Test(unittest.TestCase):
+    def testCopyAndDeepcopy(self):
+        from music21.test.commonTest import testCopyAll
+        testCopyAll(self, globals())
 
     def testSortOrder(self):
         from music21 import stream

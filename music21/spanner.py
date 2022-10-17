@@ -203,6 +203,8 @@ class Spanner(base.Music21Object):
     >>> sp1.completeStatus = True
     '''
 
+    equalityAttributes = ('spannerStorage',)
+
     def __init__(self,
                  *spannedElements: t.Union[base.Music21Object,
                                            Sequence[base.Music21Object]],
@@ -247,29 +249,26 @@ class Spanner(base.Music21Object):
             msg.append(repr(objRef))
         return ''.join(msg)
 
-    def _deepcopySubclassable(self, memo=None, ignoreAttributes=None):
+    def _deepcopySubclassable(self, memo=None, *, ignoreAttributes=None):
         '''
         see __deepcopy__ for tests and docs
         '''
         # NOTE: this is a performance critical operation
-        defaultIgnoreSet = {'_cache', 'spannerStorage'}
+        defaultIgnoreSet = {'spannerStorage'}
         if ignoreAttributes is None:
             ignoreAttributes = defaultIgnoreSet
         else:
             ignoreAttributes = ignoreAttributes | defaultIgnoreSet
+        new = t.cast(Spanner,
+                     super()._deepcopySubclassable(memo, ignoreAttributes=ignoreAttributes))
 
-        new = super()._deepcopySubclassable(memo, ignoreAttributes)
-
-        if 'spannerStorage' in ignoreAttributes:
-            # there used to be a bug here where spannerStorage would
-            # try to append twice.  I've removed the guardrail here in v7.
-            # because I'm pretty sure we have solved it.
-            # disable pylint check until this inheritance bug is solved:
-            # https://github.com/PyCQA/astroid/issues/457
-            # pylint: disable=no-member
-            for c in self.spannerStorage._elements:
-                new.spannerStorage.coreAppend(c)
-            new.spannerStorage.coreElementsChanged(updateIsFlat=False)
+        # we are temporarily putting in the PREVIOUS elements, to replace them later
+        # with replaceSpannedElement()
+        new.spannerStorage = type(self.spannerStorage)(client=new)
+        for c in self.spannerStorage._elements:
+            new.spannerStorage.coreAppend(c)
+        # updateIsSorted too?
+        new.spannerStorage.coreElementsChanged(updateIsFlat=False)
         return new
 
     def __deepcopy__(self, memo=None):
@@ -313,14 +312,18 @@ class Spanner(base.Music21Object):
     # this is the same as with Variants
 
     def purgeOrphans(self, excludeStorageStreams=True):
-        self.spannerStorage.purgeOrphans(excludeStorageStreams)
+        if self.spannerStorage:
+            # might not be defined in the middle of a deepcopy.
+            self.spannerStorage.purgeOrphans(excludeStorageStreams)
         base.Music21Object.purgeOrphans(self, excludeStorageStreams)
 
     def purgeLocations(self, rescanIsDead=False):
         # must override Music21Object to purge locations from the contained
         # Stream
         # base method to perform purge on the Stream
-        self.spannerStorage.purgeLocations(rescanIsDead=rescanIsDead)
+        if self.spannerStorage:
+            # might not be defined in the middle of a deepcopy.
+            self.spannerStorage.purgeLocations(rescanIsDead=rescanIsDead)
         base.Music21Object.purgeLocations(self, rescanIsDead=rescanIsDead)
 
     # --------------------------------------------------------------------------
@@ -2678,8 +2681,8 @@ class Test(unittest.TestCase):
         from music21 import stream
         from music21.spanner import Spanner
 
-        n1 = note.Note('g')
-        n2 = note.Note('f#')
+        n1 = note.Note('G4')
+        n2 = note.Note('F#4')
 
         sp1 = Spanner(n1, n2)
         st1 = stream.Stream()
@@ -2687,7 +2690,6 @@ class Test(unittest.TestCase):
         st1.insert(0.0, n1)
         st1.insert(1.0, n2)
         st2 = copy.deepcopy(st1)
-
         n3 = st2.notes[0]
         self.assertEqual(len(n3.getSpannerSites()), 1)
         sp2 = n3.getSpannerSites()[0]

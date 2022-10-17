@@ -305,6 +305,14 @@ class Derivation(SlottedObjectMixin):
             # self._origin = common.wrapWeakref(origin)
 
     @property
+    def originId(self) -> int | None:
+        '''
+        Return the Python id (=memory location) of the origin.
+        (Same as id(derivation.origin).  Not the same as derivation.origin.ind)
+        '''
+        return self._originId
+
+    @property
     def rootDerivation(self) -> base.Music21Object | None:
         r'''
         Return a reference to the oldest source of this Stream; that is, chain

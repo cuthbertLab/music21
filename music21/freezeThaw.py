@@ -75,7 +75,6 @@ import pathlib
 import pickle
 import time
 import unittest
-import weakref
 import zlib
 
 from music21 import base
@@ -314,7 +313,7 @@ class StreamFreezer(StreamFreezeThawBase):
         streamObj (not recursive).  Called by setupSerializationScaffold.
         '''
         if hasattr(streamObj, 'streamStatus'):
-            streamObj.streamStatus._client = None
+            streamObj.streamStatus.client = None
 
     def recursiveClearSites(self, startObj):
         '''
@@ -1214,6 +1213,8 @@ class Test(unittest.TestCase):
 
     def testPickleMidi(self):
         from music21 import converter
+        from music21 import note
+
         a = str(common.getSourceFilePath()
                          / 'midi'
                          / 'testPrimitive'
@@ -1224,8 +1225,8 @@ class Test(unittest.TestCase):
         f = converter.freezeStr(c)
         d = converter.thawStr(f)
         self.assertIsInstance(
-            d.parts[1].flatten().notes[20].volume._client,
-            weakref.ReferenceType)
+            d.parts[1].flatten().notes[20].volume.client,
+            note.NotRest)
 
 
 # -----------------------------------------------------------------------------

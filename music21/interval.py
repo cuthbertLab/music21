@@ -3123,11 +3123,8 @@ class Interval(IntervalBase):
         >>> a == 'a4'
         False
         '''
-        if other is None:
+        if not super().__eq__(other):
             return False
-        elif not hasattr(other, 'diatonic') or not hasattr(other, 'chromatic'):
-            return False
-
         if (self.diatonic == other.diatonic
                 and self.chromatic == other.chromatic):
             return True

@@ -27,16 +27,11 @@ import unittest
 
 from music21 import clef
 from music21 import environment
-from music21 import exceptions21
 
 environLocal = environment.Environment('musedata.translate')
 
 
 # ------------------------------------------------------------------------------
-class MuseDataTranslateException(exceptions21.Music21Exception):
-    pass
-
-
 def _musedataBeamToBeams(beamSymbol):
     '''
     Given a musedata beam symbol, converter to a music21 Beams object representation.
@@ -72,7 +67,6 @@ def _musedataBeamToBeams(beamSymbol):
             beamType = 'partial'
             direction = 'left'
         else:
-            # raise MuseDataTranslateException('cannot interpret beams char: %s' % char)
             environLocal.printDebug(['cannot interpret beams char:', char])
             continue
         # will automatically increment number
