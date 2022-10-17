@@ -1580,7 +1580,7 @@ class Test(unittest.TestCase):
         s2.repeatAppend(note.Note('c#'), 2)
         k = s2.analyze('key')
         # Ensure all pitch classes are present
-        self.assertEqual(len(set(k.alternateInterpretations)), 23)
+        self.assertEqual(len(k.alternateInterpretations), 23)
 
 
 # define presented order in documentation

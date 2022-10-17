@@ -482,8 +482,8 @@ class TimeSignature(TimeSignatureBase):
             so do not expect proper output yet.''',
     }
 
-    def __init__(self, value: str = '4/4', divisions=None):
-        super().__init__()
+    def __init__(self, value: str = '4/4', divisions=None, **keywords):
+        super().__init__(**keywords)
 
         if value is None:
             value = f'{defaults.meterNumerator}/{defaults.meterDenominatorBeatType}'

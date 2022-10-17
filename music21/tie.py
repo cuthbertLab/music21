@@ -136,7 +136,7 @@ class Tie(prebase.ProtoM21Object, SlottedObjectMixin):
         >>> t2 == None
         False
         '''
-        if other is None or not isinstance(other, Tie):
+        if not isinstance(other, type(self)):
             return False
         elif self.type == other.type:
             return True

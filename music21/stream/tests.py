@@ -5319,8 +5319,7 @@ class Test(unittest.TestCase):
 
     def testSliceByGreatestDivisorImported(self):
 
-        sSrc = corpus.parse('bwv66.6')
-        s = copy.deepcopy(sSrc)
+        s = corpus.parse('bwv66.6')
         for p in s.parts:
             p.sliceByGreatestDivisor(inPlace=True, addTies=True)
             # p.makeBeams(inPlace=True)
@@ -5333,8 +5332,8 @@ class Test(unittest.TestCase):
         self.assertEqual(len(s.parts[2].flatten().notesAndRests), 61)
         self.assertEqual(len(s.parts[3].flatten().notesAndRests), 53)
 
-        s = copy.deepcopy(sSrc)
-        s.sliceByGreatestDivisor(inPlace=True, addTies=True)
+        # s = corpus.parse('bwv66.6')
+        # s.sliceByGreatestDivisor(inPlace=True, addTies=True)
         # s.flatten().chordify().show()
         # s.show()
 
