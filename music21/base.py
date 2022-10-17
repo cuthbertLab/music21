@@ -27,7 +27,7 @@ available after importing `music21`.
 <class 'music21.base.Music21Object'>
 
 >>> music21.VERSION_STR
-'9.0.0a3'
+'9.0.0a5'
 
 Alternatively, after doing a complete import, these classes are available
 under the module "base":
@@ -388,7 +388,9 @@ class Music21Object(prebase.ProtoM21Object):
         self._editorial: Editorial | None = None
 
         # private duration storage; managed by property
-        self._duration: Duration | None = None
+        self._duration: Duration | None = duration
+        if duration is not None:
+            duration.client = self
         self._priority = 0  # default is zero
 
         # store cached values here:
@@ -403,8 +405,6 @@ class Music21Object(prebase.ProtoM21Object):
             self.activeSite = activeSite
         if quarterLength is not None:
             self.duration.quarterLength = quarterLength
-        elif duration is not None:
-            self.duration = duration
 
     # def __eq__(self, other):
     #     '''
@@ -456,116 +456,48 @@ class Music21Object(prebase.ProtoM21Object):
             self.id = other.id
         self.groups = copy.deepcopy(other.groups)
 
-    # PyCharm 2019 does not know that copy.deepcopy can take a memo argument
-    # noinspection PyArgumentList
     def _deepcopySubclassable(self: _M21T,
-                              memo=None,
-                              ignoreAttributes=None,
-                              removeFromIgnore=None) -> _M21T:
+                              memo: dict[int, t.Any] | None = None,
+                              *,
+                              ignoreAttributes: set[str] | None = None) -> _M21T:
         '''
         Subclassable __deepcopy__ helper so that the same attributes
-        do not need to be called
-        for each Music21Object subclass.
+        do not need to be called for each Music21Object subclass.
 
         ignoreAttributes is a set of attributes not to copy via
-        the default deepcopy style.
-        More can be passed to it.
+        the default deepcopy style. More can be passed to it.  But calling
+        functions are responsible
 
-        removeFromIgnore can be a set of attributes to remove
-        from ignoreAttributes of a superclass.
-
-        TODO: move to class attributes to cache.
+        Changed in v9: removeFromIgnore removed; never used and this is performance
+        critical.
         '''
-        defaultIgnoreSet = {'_derivation', '_activeSite',
-                            'sites', '_duration', '_style', '_cache'}
+        defaultIgnoreSet = {'_derivation', '_activeSite', '_sites', '_cache'}
+        if not self.groups:
+            defaultIgnoreSet.add('groups')
+        # duration is smart enough to do itself.
+        # sites is smart enough to do itself
+
         if ignoreAttributes is None:
             ignoreAttributes = defaultIgnoreSet
         else:
             ignoreAttributes = ignoreAttributes | defaultIgnoreSet
 
-        if removeFromIgnore is not None:
-            ignoreAttributes = ignoreAttributes - removeFromIgnore
+        new = common.defaultDeepcopy(self, memo, ignoreAttributes=ignoreAttributes)
+        setattr(new, '_cache', {})
+        setattr(new, '_sites', Sites())
+        if 'groups' in defaultIgnoreSet:
+            new.groups = Groups()
 
-        # call class to get a new, empty instance
-        # TODO: this creates an extra duration object for notes... optimize...
-        new = self.__class__()
-        # environLocal.printDebug(['Music21Object.__deepcopy__', self, id(self)])
-        # for name in dir(self):
-        if '_duration' in ignoreAttributes:
-            # this can be done much faster in most cases...
-            d = self._duration
-            if d is not None:
-                clientStore = d._client
-                d._client = None
-                newValue = copy.deepcopy(d, memo)
-                d._client = clientStore
-                newValue.client = new
-                setattr(new, '_duration', newValue)
+        # was: keep the old ancestor but need to update the client
+        # 2.1 : NO, add a derivation of __deepcopy__ to the client
+        newDerivation = Derivation(client=new)
+        newDerivation.origin = self
+        newDerivation.method = '__deepcopy__'
+        setattr(new, '_derivation', newDerivation)
+        # None activeSite is correct for new value
 
-        if '_derivation' in ignoreAttributes:
-            # was: keep the old ancestor but need to update the client
-            # 2.1 : NO, add a derivation of __deepcopy__ to the client
-            newDerivation = Derivation(client=new)
-            newDerivation.origin = self
-            newDerivation.method = '__deepcopy__'
-            setattr(new, '_derivation', newDerivation)
-
-        if '_activeSite' in ignoreAttributes:
-            # TODO: Fix this so as not to allow incorrect _activeSite (???)
-            # keep a reference, not a deepcopy
-            # do not use property: .activeSite; set to same weakref obj
-            # TODO: restore jan 2020 (was Jan 2018)
-            #            setattr(new, '_activeSite', None)
-            setattr(new, '_activeSite', self._activeSite)
-
-        if 'sites' in ignoreAttributes:
-            # we make a copy of the sites value even though it is obsolete because
-            # the spanners will need to be preserved and then set to the new value
-            # elsewhere.  The purgeOrphans call later will remove all but
-            # spanners and variants.
-            value = getattr(self, 'sites')
-            # this calls __deepcopy__ in Sites
-            newValue = copy.deepcopy(value, memo)
-            setattr(new, 'sites', newValue)
-        if '_style' in ignoreAttributes:
-            value = getattr(self, '_style', None)
-            if value is not None:
-                newValue = copy.deepcopy(value, memo)
-                setattr(new, '_style', newValue)
-
-        for name in self.__dict__:
-            if name.startswith('__'):
-                continue
-            if name in ignoreAttributes:
-                continue
-
-            attrValue = getattr(self, name)
-            # attributes that do not require special handling
-            try:
-                deeplyCopiedObject = copy.deepcopy(attrValue, memo)
-                setattr(new, name, deeplyCopiedObject)
-            except TypeError as te:  # pragma: no cover
-                if not isinstance(attrValue, Music21Object):
-                    # shallow copy then...
-                    try:
-                        shallowlyCopiedObject = copy.copy(attrValue)
-                        setattr(new, name, shallowlyCopiedObject)
-                        environLocal.printDebug(
-                            '__deepcopy__: Could not deepcopy '
-                            + f'{name} in {self}, not a Music21Object'
-                            + 'so making a shallow copy')
-                    except TypeError:
-                        # just link...
-                        environLocal.printDebug(
-                            '__deepcopy__: Could not copy (deep or shallow) '
-                            + f'{name} in {self}, not a Music21Object so just making a link'
-                        )
-                        setattr(new, name, attrValue)
-                else:  # raise error for our own problem.  # pragma: no cover
-                    raise Music21Exception(
-                        '__deepcopy__: Cannot deepcopy Music21Object '
-                        + f'{name} probably because it requires a default value in instantiation.'
-                    ) from te
+        # must do this after copying
+        new.purgeOrphans()
 
         return new
 
@@ -608,12 +540,7 @@ class Music21Object(prebase.ProtoM21Object):
         >>> ('flute' in n.groups, 'flute' in b.groups)
         (False, True)
         '''
-        # environLocal.printDebug(['calling Music21Object.__deepcopy__', self])
-        new = self._deepcopySubclassable(memo)
-        # must do this after copying
-        new.purgeOrphans()
-        # environLocal.printDebug([self, 'end deepcopy', 'self._activeSite', self._activeSite])
-        return new
+        return self._deepcopySubclassable(memo)
 
     def __getstate__(self) -> dict[str, t.Any]:
         state = self.__dict__.copy()
@@ -1812,7 +1739,7 @@ class Music21Object(prebase.ProtoM21Object):
         indices to ensure that no other temporary
         streams are created; normally, we would do `c.parts['#Alto'].measure(3)`.
 
-        >>> m = c[2][4]
+        >>> m = c.parts['#Alto'].getElementsByClass(stream.Measure)[3]
         >>> m
         <music21.stream.Measure 3 offset=9.0>
 
@@ -1837,11 +1764,10 @@ class Music21Object(prebase.ProtoM21Object):
         (<music21.stream.Part Alto>, '9.0 <0.-20...>', <RecursionType.FLATTEN>)
         (<music21.stream.Score bach>, '9.0 <0.-20...>', <RecursionType.ELEMENTS_ONLY>)
 
-
         Here we make a copy of the earlier measure, and we see that its contextSites
         follow the derivationChain from the original measure and still find the Part
-        and Score of the original Measure 3 even though mCopy is not in any of these
-        objects.
+        and Score of the original Measure 3 (and also the original Measure 3)
+        even though mCopy is not in any of these objects.
 
         >>> import copy
         >>> mCopy = copy.deepcopy(m)
@@ -1849,6 +1775,9 @@ class Music21Object(prebase.ProtoM21Object):
         >>> for csTuple in mCopy.contextSites():
         ...      print(csTuple, mCopy in csTuple.site)
         ContextTuple(site=<music21.stream.Measure 3333 offset=0.0>,
+                     offset=0.0,
+                     recurseType=<RecursionType.ELEMENTS_FIRST>) False
+        ContextTuple(site=<music21.stream.Measure 3 offset=9.0>,
                      offset=0.0,
                      recurseType=<RecursionType.ELEMENTS_FIRST>) False
         ContextTuple(site=<music21.stream.Part Alto>,
@@ -1963,7 +1892,7 @@ class Music21Object(prebase.ProtoM21Object):
         from music21 import stream
 
         if memo is None:
-            memo = []
+            memo = set()
 
         if callerFirst is None:
             callerFirst = self
@@ -1980,7 +1909,7 @@ class Music21Object(prebase.ProtoM21Object):
                     yield ContextSortTuple(streamSelf, selfSortTuple, recursionType)
                 else:
                     yield ContextTuple(streamSelf, 0.0, recursionType)
-                memo.append(streamSelf)
+                memo.add(streamSelf)
 
         if priorityTarget is None and sortByCreationTime is False:
             priorityTarget = self.activeSite
@@ -2017,7 +1946,7 @@ class Music21Object(prebase.ProtoM21Object):
             else:
                 yield ContextTuple(siteObj, positionInStream.offset, recursionType)
 
-            memo.append(siteObj)
+            memo.add(siteObj)
             environLocal.printDebug(
                 f'looking in contextSites for {siteObj}'
                 + f' with position {positionInStream.shortRepr()}')
@@ -2045,7 +1974,7 @@ class Music21Object(prebase.ProtoM21Object):
                         yield ContextSortTuple(topLevel, hypotheticalPosition, recurType)
                     else:
                         yield ContextTuple(topLevel, inStreamOffset, recurType)
-                    memo.append(topLevel)
+                    memo.add(topLevel)
             if priorityTargetOnly:
                 break
 
@@ -2078,7 +2007,7 @@ class Music21Object(prebase.ProtoM21Object):
                         yield ContextTuple(offsetAdjustedCsTuple.site,
                                            offsetAdjustedCsTuple.offset.offset,
                                            offsetAdjustedCsTuple.recurseType)
-                    memo.append(derivedCsTuple.site)
+                    memo.add(derivedCsTuple.site)
 
         environLocal.printDebug('--returning from derivedObject search')
 
@@ -4053,8 +3982,8 @@ class ElementWrapper(Music21Object):
         if so, you might as well put that directly into the Stream itself.''',
     }
 
-    def __init__(self, obj: t.Any = None):
-        super().__init__()
+    def __init__(self, obj: t.Any = None, **keywords):
+        super().__init__(**keywords)
         self.obj = obj  # object stored here
 
     # -------------------------------------------------------------------------

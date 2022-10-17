@@ -15,7 +15,7 @@ from __future__ import annotations
 
 import weakref
 
-class TreeYielder:
+class TreeYielder:  # pragma: no cover
     def __init__(self, yieldValue=None):
         '''
         `yieldValue` should be a lambda function that
@@ -118,7 +118,7 @@ class TreeYielder:
         return currentStr
 
 
-def testCode():
+def testCode():  # pragma: no cover
     class Mock:
         def __init__(self, mockThing, embedMock=True):
             self.abby = 30
@@ -141,7 +141,7 @@ def testCode():
         print(val, ty.currentLevel())
 
 
-def testMIDIParse():
+def testMIDIParse():  # pragma: no cover
     from music21 import converter
     from music21 import common
     from music21 import freezeThaw
@@ -166,6 +166,31 @@ def testMIDIParse():
     ty = TreeYielder(mockType)
     for val in ty.run(c):
         print(val, ty.currentLevel())
+
+
+def find_all_exception_classes_in_m21():  # pragma: no cover
+    from collections import deque
+    import music21
+    import types
+
+    d = deque([music21])
+    seen = set()
+    tous = set()
+    while d:
+        m = d.popleft()
+        if m in seen:
+            continue
+        print(m)
+        for mm_name in dir(m):
+            mm = getattr(m, mm_name)
+            if (isinstance(mm, types.ModuleType)
+                    and mm not in seen
+                    and 'music21' in getattr(mm, '__file__', '')):
+                d.append(mm)
+            elif isinstance(mm, type) and issubclass(mm, music21.exceptions21.Music21Exception):
+                tous.add(mm)
+        seen.add(m)
+    return tous
 
 
 if __name__ == '__main__':

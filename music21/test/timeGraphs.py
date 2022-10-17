@@ -12,6 +12,7 @@
 # pragma: no cover
 from __future__ import annotations
 
+import copy
 import cProfile
 import pstats
 # import time
@@ -425,17 +426,44 @@ class TestRomantextParse(Test):
         self.converter.parse(self.tf.monteverdi_3_13)
 
 
+class TestDeepcopyNote(Test):
+    def __init__(self):
+        self.bach = music21.corpus.parse('bwv66.6')
+
+    def testFocus(self):
+        copy.deepcopy(self.bach)
+
+
+class TestRecursion(Test):
+    def __init__(self):
+        self.bach = music21.corpus.parse('bwv66.6')
+
+    def testFocus(self):
+        for _ in self.bach.recurse():
+            pass
+
+
+class TestChordifySchumann(Test):
+    def __init__(self):
+        self.schumann = music21.corpus.parse('schumann_robert/opus41no1/movement1')
+
+    def testFocus(self):
+        self.schumann.chordify()
+
+
 def main(TestClass):
+    MIN_FRACTION_TO_REPORT = 0.3
+
     t = TestClass()
     with cProfile.Profile() as pr:
         t.testFocus()
 
     stats = pstats.Stats(pr)
-    stats.sort_stats(pstats.SortKey.CUMULATIVE)
-    stats.print_stats(0.3)
+    stats.sort_stats(pstats.SortKey.TIME)
+    stats.print_stats(MIN_FRACTION_TO_REPORT)
 
 
 if __name__ == '__main__':
-    main(TestImportPiano)
+    main(TestChordifySchumann)
 
 

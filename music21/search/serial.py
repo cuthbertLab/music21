@@ -46,7 +46,6 @@ class ContiguousSegmentOfNotes(base.Music21Object):
     >>> cdContiguousSegment = search.serial.ContiguousSegmentOfNotes([n1, n2], s, 0)
     >>> cdContiguousSegment
     <music21.search.serial.ContiguousSegmentOfNotes ['C4', 'D4']>
-
     '''
     _DOC_ATTR: dict[str, str] = {
         'segment': 'The list of notes and chords in the contiguous segment.',
@@ -76,8 +75,8 @@ class ContiguousSegmentOfNotes(base.Music21Object):
     _DOC_ORDER = ['startMeasureNumber', 'startOffset', 'zeroCenteredTransformationsFromMatched',
                   'originalCenteredTransformationsFromMatched']
 
-    def __init__(self, segment=None, containerStream=None, partNumber=0):
-        super().__init__()
+    def __init__(self, segment=None, containerStream=None, partNumber=0, **keywords):
+        super().__init__(**keywords)
         self.segment = segment
         self.containerStream = containerStream
         self.partNumber = partNumber
