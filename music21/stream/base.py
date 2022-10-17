@@ -378,7 +378,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
 
         self.coreElementsChanged()
 
-    def __eq__(self, other) -> bool:
+    def __eq__(self, other):
         '''
         No two streams are ever equal unless they are the same Stream
         '''
@@ -1847,21 +1847,35 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
             #     pass  # This should maybe just call a function renumberMeasures
         self.coreElementsChanged(clearIsSorted=False)
 
-    def pop(self, index: int) -> base.Music21Object:
+    def pop(self, index: int | None = None) -> base.Music21Object:
         '''
         Return and remove the object found at the
         user-specified index value. Index values are
         those found in `elements` and are not necessary offset order.
 
         >>> a = stream.Stream()
-        >>> a.repeatInsert(note.Note('C'), list(range(10)))
-        >>> junk = a.pop(0)
+        >>> for i in range(12):  # notes C, C#, etc. to B
+        ...     a.append(note.Note(i))
+        >>> a.pop(0)
+        <music21.note.Note C>
         >>> len(a)
-        9
+        11
+
+        If nothing is given, then it pops the last thing from the stream.
+
+        >>> a.pop()
+        <music21.note.Note B>
+        >>> len(a)
+        10
         '''
         eLen = len(self._elements)
         # if less than base length, it is in _elements
-        if index < eLen:
+        if index is None:
+            if self._endElements:
+                post = self._endElements.pop()
+            else:
+                post = self._elements.pop()
+        elif index < eLen:
             post = self._elements.pop(index)
         else:  # it is in the _endElements
             post = self._endElements.pop(index - eLen)
@@ -11980,7 +11994,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         # matching by span means that we remove all elements with the
         # span defined by the variant
         else:
-            deletedMeasures = []
+            deletedMeasures = deque()
             insertedMeasures = []
             highestNumber = None
 
@@ -11994,17 +12008,17 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
                 # environLocal.printDebug(
                 #     ['matchBySpan', matchBySpan, 'activateVariants', 'removing', e])
                 self.remove(e)
-                if getattr(e, 'isMeasure', False):
+                if isinstance(e, Measure):
                     # Save deleted measure numbers.
                     deletedMeasures.append(e.number)
 
             for e in v.elements:
                 oInStream = vStart + e.getOffsetBySite(v.containedSite)
                 self.insert(oInStream, e)
-                if getattr(e, 'isMeasure', False):
+                if isinstance(e, Measure):
                     if deletedMeasures:  # If there measure numbers left to use, use them.
                         # Assign the next highest deleted measure number
-                        e.number = deletedMeasures.pop(False)
+                        e.number = deletedMeasures.popleft()
                         # Save the highest number used so far (for use in the case
                         # that there are extra measures with no numbers at the end)
                         highestNumber = e.number
@@ -12021,7 +12035,8 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
 
             # If deletedMeasures != [], then there were more deleted measures than
             # inserted and the remaining numbers in deletedMeasures are those that were removed.
-            return deletedMeasures, (highestNumber, insertedMeasures)
+            return (list(deletedMeasures),
+                    (highestNumber, insertedMeasures))
             # In the case that the variant and stream are in the same time-signature,
             # this should return []
 
@@ -12239,7 +12254,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         '''
         from music21 import variant
 
-        deletedMeasures = []
+        deletedMeasures = deque()
         removed = variant.Variant()  # what group should this have?
         removed.groups = ['default']  # for now, default
         removed.replacementDuration = v.containedHighestTime
@@ -12250,7 +12265,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
 
         # this will always remove elements before inserting
         for e in targets:
-            if getattr(e, 'isMeasure', False):  # Save deleted measure numbers.
+            if isinstance(e, Measure):  # Save deleted measure numbers.
                 deletedMeasures.append(e.number)
             oInVariant = self.elementOffset(e) - vStart
             removed.insert(oInVariant, e)
@@ -12260,11 +12275,11 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         highestMeasure = None
         insertedMeasures = []
         for e in v.elements:
-            if getattr(e, 'isMeasure', False):
+            if isinstance(e, Measure):
                 # If there are deleted measure numbers left, assign the next
                 # inserted measure the next highest number and remove it.
                 if deletedMeasures:
-                    e.number = deletedMeasures.pop(False)
+                    e.number = deletedMeasures.popleft()
                     highestMeasure = e.number
                     # Save the highest number assigned so far,
                     # so we know where to begin numbering new measures.

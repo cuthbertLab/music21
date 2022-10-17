@@ -3096,7 +3096,7 @@ class Interval(IntervalBase):
 
     # -------------------------------------
     # special method
-    def __eq__(self, other) -> t.TypeGuard[Interval]:
+    def __eq__(self, other):
         '''
         True if .diatonic and .chromatic are equal.
 

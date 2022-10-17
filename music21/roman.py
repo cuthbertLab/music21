@@ -2322,7 +2322,7 @@ class RomanNumeral(harmony.Harmony):
         self._functionalityScore: int | None = None
         self.followsKeyChange: bool = False
 
-    def __eq__(self, other) -> bool:
+    def __eq__(self, other):
         '''
         Compare equality, just based on NotRest and on figure and key
         '''

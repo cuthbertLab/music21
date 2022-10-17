@@ -415,8 +415,8 @@ class Music21Object(prebase.ProtoM21Object):
 
     _styleClass: type[Style] = Style
 
-    equalityAttributes: tuple[str] = ('duration',)
-    # equalityAttributesIgnore: tuple[str] = ()  # this must be defined anew in each subclass.
+    equalityAttributes: tuple[str, ...] = ('duration',)
+    # equalityAttributesIgnore: tuple[str, ...] = ()  # this must be defined anew in each subclass.
 
     # define order for presenting names in documentation; use strings
     _DOC_ORDER: list[str] = []
@@ -517,7 +517,7 @@ class Music21Object(prebase.ProtoM21Object):
         '''
         Define equality for Music21Objects.  See main class docs.
         '''
-        cls = self.__class__
+        cls = t.cast(type, self.__class__)
         if not isinstance(other, cls):
             return False
 
@@ -4121,7 +4121,7 @@ class ElementWrapper(Music21Object):
         else:
             return f'offset={self.offset} obj={shortObj!r}'
 
-    def __eq__(self, other) -> bool:
+    def __eq__(self, other):
         '''
         Test ElementWrapper equality
 

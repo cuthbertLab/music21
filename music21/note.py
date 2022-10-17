@@ -564,7 +564,7 @@ class GeneralNote(base.Music21Object):
     isRest = False
     isChord = False
     _styleClass: type[style.Style] = style.NoteStyle
-    equalityAttributes = ('tie',)
+    equalityAttributes: tuple[str, ...] = ('tie',)
 
     # define order for presenting names in documentation; use strings
     _DOC_ORDER = ['duration', 'quarterLength']
@@ -986,7 +986,9 @@ class NotRest(GeneralNote):
     }
 
     # Should volume be here too?  and _chordAttached?
-    equalityAttributes = ('notehead', 'noteheadFill', 'noteheadParenthesis', 'beams')
+    equalityAttributes: tuple[str, ...] = (
+        'notehead', 'noteheadFill', 'noteheadParenthesis', 'beams'
+    )
 
     def __init__(self,
                  beams: beam.Beams | None = None,
@@ -1012,8 +1014,9 @@ class NotRest(GeneralNote):
                               memo: dict[int, t.Any] | None = None,
                               *,
                               ignoreAttributes: set[str] | None = None) -> _NotRestType:
-        new = t.cast(type(self),
-                     super()._deepcopySubclassable(memo, ignoreAttributes={'_chordAttached'}))
+        new = super()._deepcopySubclassable(memo, ignoreAttributes={'_chordAttached'})
+        if TYPE_CHECKING:
+            new = t.cast(_NotRestType, new)
         # let the chord restore _chordAttached
 
         # after copying, if a Volume exists, it is linked to the old object
@@ -1489,7 +1492,7 @@ class Note(NotRest):
     (The pigeonhole principle police have a bounty out on my head for this.)
     '''
     isNote = True
-    equalityAttributes = ('pitch',)
+    equalityAttributes: tuple[str, ...] = ('pitch',)
 
     # Defines the order of presenting names in the documentation; use strings
     _DOC_ORDER = ['duration', 'quarterLength', 'nameWithOctave']
