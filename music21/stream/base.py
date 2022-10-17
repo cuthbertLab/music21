@@ -21,7 +21,7 @@ and :class:`~music21.stream.Score` objects, are also in this module.
 '''
 from __future__ import annotations
 
-from collections import namedtuple, OrderedDict
+from collections import deque, namedtuple, OrderedDict
 from collections.abc import Collection, Iterable, Sequence
 import copy
 from fractions import Fraction
@@ -377,6 +377,15 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
                 self.coreInsert(e.offset, e)
 
         self.coreElementsChanged()
+
+    def __eq__(self, other):
+        '''
+        No two streams are ever equal unless they are the same Stream
+        '''
+        return self is other
+
+    def __hash__(self) -> int:
+        return id(self) >> 4
 
     def _reprInternal(self) -> str:
         if self.id is not None:
@@ -1838,21 +1847,35 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
             #     pass  # This should maybe just call a function renumberMeasures
         self.coreElementsChanged(clearIsSorted=False)
 
-    def pop(self, index: int) -> base.Music21Object:
+    def pop(self, index: int | None = None) -> base.Music21Object:
         '''
         Return and remove the object found at the
         user-specified index value. Index values are
         those found in `elements` and are not necessary offset order.
 
         >>> a = stream.Stream()
-        >>> a.repeatInsert(note.Note('C'), list(range(10)))
-        >>> junk = a.pop(0)
+        >>> for i in range(12):  # notes C, C#, etc. to B
+        ...     a.append(note.Note(i))
+        >>> a.pop(0)
+        <music21.note.Note C>
         >>> len(a)
-        9
+        11
+
+        If nothing is given, then it pops the last thing from the stream.
+
+        >>> a.pop()
+        <music21.note.Note B>
+        >>> len(a)
+        10
         '''
         eLen = len(self._elements)
         # if less than base length, it is in _elements
-        if index < eLen:
+        if index is None:
+            if self._endElements:
+                post = self._endElements.pop()
+            else:
+                post = self._elements.pop()
+        elif index < eLen:
             post = self._elements.pop(index)
         else:  # it is in the _endElements
             post = self._endElements.pop(index - eLen)
@@ -11611,6 +11634,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         ...    v1measure.insert(e.offset, e)
 
         >>> v2 = variant.Variant()
+        >>> v2.replacementDuration = 4.0
         >>> v2measure1 = stream.Measure()
         >>> v2measure2 = stream.Measure()
         >>> v2.insert(0.0, v2measure1)
@@ -11621,13 +11645,12 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         ...    v2measure2.insert(e.offset, e)
 
         >>> v3 = variant.Variant()
-        >>> v2.replacementDuration = 4.0
         >>> v3.replacementDuration = 4.0
         >>> v1.groups = ['docVariants']
         >>> v2.groups = ['docVariants']
         >>> v3.groups = ['docVariants']
 
-        >>> s.insert(4.0, v1)    # replacement variant
+        >>> s.insert(4.0, v1)   # replacement variant
         >>> s.insert(12.0, v2)  # insertion variant (2 bars replace 1 bar)
         >>> s.insert(20.0, v3)  # deletion variant (0 bars replace 1 bar)
         >>> s.show('text')
@@ -11797,9 +11820,8 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         # Loop through all variants, deal with replacement variants and
         # save insertion and deletion for later.
         for v in returnObj.getElementsByClass(variant.Variant):
-            if group is not None:
-                if group not in v.groups:
-                    continue  # skip those that are not part of this group
+            if group is not None and group not in v.groups:
+                continue  # skip those that are not part of this group
 
             lengthType = v.lengthType
 
@@ -11873,7 +11895,6 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         '''
         Helper function for activateVariants. Activates variants which are the same size there the
         region they replace.
-
 
         >>> v = variant.Variant()
         >>> variantDataM1 = [('b', 'eighth'), ('c', 'eighth'),
@@ -11973,7 +11994,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         # matching by span means that we remove all elements with the
         # span defined by the variant
         else:
-            deletedMeasures = []
+            deletedMeasures = deque()
             insertedMeasures = []
             highestNumber = None
 
@@ -11987,17 +12008,17 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
                 # environLocal.printDebug(
                 #     ['matchBySpan', matchBySpan, 'activateVariants', 'removing', e])
                 self.remove(e)
-                if getattr(e, 'isMeasure', False):
+                if isinstance(e, Measure):
                     # Save deleted measure numbers.
                     deletedMeasures.append(e.number)
 
             for e in v.elements:
                 oInStream = vStart + e.getOffsetBySite(v.containedSite)
                 self.insert(oInStream, e)
-                if getattr(e, 'isMeasure', False):
+                if isinstance(e, Measure):
                     if deletedMeasures:  # If there measure numbers left to use, use them.
                         # Assign the next highest deleted measure number
-                        e.number = deletedMeasures.pop(False)
+                        e.number = deletedMeasures.popleft()
                         # Save the highest number used so far (for use in the case
                         # that there are extra measures with no numbers at the end)
                         highestNumber = e.number
@@ -12014,7 +12035,8 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
 
             # If deletedMeasures != [], then there were more deleted measures than
             # inserted and the remaining numbers in deletedMeasures are those that were removed.
-            return deletedMeasures, (highestNumber, insertedMeasures)
+            return (list(deletedMeasures),
+                    (highestNumber, insertedMeasures))
             # In the case that the variant and stream are in the same time-signature,
             # this should return []
 
@@ -12095,7 +12117,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         '''
         from music21 import variant
 
-        deletedMeasures = []  # For keeping track of what measure numbers are deleted
+        deletedMeasures = deque()  # For keeping track of what measure numbers are deleted
         # length of the deleted region
         lengthDifference = v.replacementDuration - v.containedHighestTime
 
@@ -12110,7 +12132,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
 
         # this will always remove elements before inserting
         for e in targets:
-            if getattr(e, 'isMeasure', False):  # if a measure is deleted, save its number
+            if isinstance(e, Measure):  # if a measure is deleted, save its number
                 deletedMeasures.append(e.number)
             oInVariant = self.elementOffset(e) - vStart
             removed.insert(oInVariant, e)
@@ -12120,11 +12142,11 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         highestNumber = None
         insertedMeasures = []
         for e in v.elements:
-            if getattr(e, 'isMeasure', False):
+            if isinstance(e, Measure):
                 # If there are deleted numbers still saved, assign this measure the
                 # next highest and remove it from the list.
                 if deletedMeasures:
-                    e.number = deletedMeasures.pop(False)
+                    e.number = deletedMeasures.popleft()
                     # Save the highest number assigned so far. If there are numberless
                     # inserted measures at the end, this will name where to begin numbering.
                     highestNumber = e.number
@@ -12144,8 +12166,11 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
 
         # each variant leaves a gap, this saves the required information about those gaps
         # In most cases, inserted measures should be [].
-        return (deletionStart, lengthDifference, []), deletedMeasures, (
-            highestNumber, insertedMeasures)
+        return (
+            (deletionStart, lengthDifference, []),
+            list(deletedMeasures),
+            (highestNumber, insertedMeasures)
+        )
 
     def _insertInsertionVariant(self, v, matchBySpan=True):
         # noinspection PyShadowingNames
@@ -12229,7 +12254,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         '''
         from music21 import variant
 
-        deletedMeasures = []
+        deletedMeasures = deque()
         removed = variant.Variant()  # what group should this have?
         removed.groups = ['default']  # for now, default
         removed.replacementDuration = v.containedHighestTime
@@ -12240,7 +12265,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
 
         # this will always remove elements before inserting
         for e in targets:
-            if getattr(e, 'isMeasure', False):  # Save deleted measure numbers.
+            if isinstance(e, Measure):  # Save deleted measure numbers.
                 deletedMeasures.append(e.number)
             oInVariant = self.elementOffset(e) - vStart
             removed.insert(oInVariant, e)
@@ -12250,11 +12275,11 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         highestMeasure = None
         insertedMeasures = []
         for e in v.elements:
-            if getattr(e, 'isMeasure', False):
+            if isinstance(e, Measure):
                 # If there are deleted measure numbers left, assign the next
                 # inserted measure the next highest number and remove it.
                 if deletedMeasures:
-                    e.number = deletedMeasures.pop(False)
+                    e.number = deletedMeasures.popleft()
                     highestMeasure = e.number
                     # Save the highest number assigned so far,
                     # so we know where to begin numbering new measures.
@@ -12289,7 +12314,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         return (highestMeasure, insertedMeasures), deletedMeasures
 
     def _removeOrExpandGaps(self, listOffsetDurExemption,
-                            isRemove=True, inPlace=False, exemptClasses=None):
+                            isRemove=True, inPlace=False):
         '''
         Helper for activateVariants. Takes a list of tuples in the form
         (startOffset, duration, [list, of, exempt, objects]). If isRemove is True,
@@ -12298,7 +12323,6 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         that occur after the insertion ahead, but the variant object
         itself should not be moved except by other gaps. This is poorly written
         and should be re-written, but it is difficult to describe.
-
 
         >>> s = stream.Stream()
         >>> s.insert(5.0, note.Note('a'))
@@ -12340,22 +12364,12 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         returnObjDuration = returnObj.duration.quarterLength
 
         # If any classes should be exempt from gap closing or expanding, this deals with those.
-        classList = []
-        if exemptClasses is None:
-            classList = None
-        else:
-            for e in returnObj.elements:
-                if type(e) not in classList:  # pylint: disable=unidiomatic-typecheck
-                    classList.append(type(e))
-            for c in exemptClasses:
-                if c in classList:
-                    classList.remove(c)
-
         if isRemove is True:
             shiftDur = 0.0
             listSorted = sorted(listOffsetDurExemption, key=lambda target: target[0])
             for i, durTuple in enumerate(listSorted):
                 startOffset, durationAmount, exemptObjects = durTuple
+                exemptObjectSet = set(id(e) for e in exemptObjects)  # use set id, not == checking
                 if i + 1 < len(listSorted):
                     endOffset = listSorted[i + 1][0]
                     includeEnd = False
@@ -12368,10 +12382,11 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
                                                        endOffset,
                                                        includeEndBoundary=includeEnd,
                                                        mustFinishInSpan=False,
-                                                       mustBeginInSpan=True,
-                                                       classList=classList):
+                                                       mustBeginInSpan=True):
 
-                    if e in exemptObjects:
+                    if id(e) in exemptObjectSet:
+                        continue
+                    if not inPlace and e.derivation.originId in exemptObjectSet:
                         continue
 
                     elementOffset = e.getOffsetBySite(returnObj)
@@ -12397,14 +12412,18 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
 
             for offset in sorted(shiftsDict, key=lambda off: -1 * off):
                 shiftDur, endOffset, includeEnd, exemptObjects, exemptShift = shiftsDict[offset]
+                # for speed and ID not == checking
+                exemptObjectSet = set(id(e) for e in exemptObjects)
                 for e in returnObj.getElementsByOffset(offset,
                                                        endOffset,
                                                        includeEndBoundary=includeEnd,
                                                        mustFinishInSpan=False,
-                                                       mustBeginInSpan=True,
-                                                       classList=classList):
+                                                       mustBeginInSpan=True):
 
-                    if e in exemptObjects:
+                    if (
+                        id(e) in exemptObjectSet
+                        or (not inPlace and e.derivation.originId in exemptObjectSet)
+                    ):
                         elementOffset = e.getOffsetBySite(returnObj)
                         returnObj.coreSetElementOffset(e, elementOffset + exemptShift)
                         continue
@@ -12696,42 +12715,6 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
             return
         else:
             return returnObj
-
-    def makeVariantBlocks(self):
-        '''
-        from music21 import *
-        '''
-        from music21 import variant
-        variantsToBeDone = self.getElementsByClass(variant.Variant)
-
-        for v in variantsToBeDone:
-            startOffset = self.elementOffset(v)
-            endOffset = v.replacementDuration + startOffset
-            conflictingVariants = self.getElementsByOffset(offsetStart=startOffset,
-                                                           offsetEnd=endOffset,
-                                                           includeEndBoundary=False,
-                                                           mustFinishInSpan=False,
-                                                           mustBeginInSpan=True,
-                                                           classList=['Variant'])
-            for cV in conflictingVariants:
-                oldReplacementDuration = cV.replacementDuration
-                if self.elementOffset(cV) == startOffset:
-                    continue  # do nothing
-                else:
-                    shiftOffset = self.elementOffset(cV) - startOffset
-                    r = note.Rest()
-                    r.duration.quarterLength = shiftOffset
-                    r.style.hideObjectOnPrint = True
-                    for el in cV._stream:
-                        oldOffset = el.getOffsetBySite(cV._stream)
-                        cV._stream.coreSetElementOffset(el, oldOffset + shiftOffset)
-                    cV.coreElementsChanged()
-                    cV.insert(0.0, r)
-                    cV.replacementDuration = oldReplacementDuration
-                    self.remove(cV)
-                    self.insert(startOffset, cV)
-                    variantsToBeDone.append(cV)
-
 
 # -----------------------------------------------------------------------------
 

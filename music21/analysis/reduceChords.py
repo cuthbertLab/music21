@@ -181,7 +181,7 @@ class ChordReducer:
         return frozenset(result)
 
     def _iterateElementsPairwise(self, inputStream):
-        elementBuffer = []
+        elementBuffer = collections.deque()
         prototype = (
             chord.Chord,
             note.Note,
@@ -193,7 +193,7 @@ class ChordReducer:
             elementBuffer.append(element)
             if len(elementBuffer) == 2:
                 yield tuple(elementBuffer)
-                elementBuffer.pop(0)
+                elementBuffer.popleft()
 
     # PUBLIC METHODS #
     def alignHockets(self, scoreTree):

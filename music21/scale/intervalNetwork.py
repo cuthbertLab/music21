@@ -493,8 +493,13 @@ class IntervalNetwork:
         '''
         # compare all nodes and edges; if the same, and all keys are the same,
         # then matched
-        return (isinstance(other, self.__class__)
-                and self.__dict__ == other.__dict__)
+        if not isinstance(other, self.__class__):
+            return False
+        for attr in ('edgeIdCount', 'nodeIdCount', 'edges', 'nodes',
+                     'octaveDuplicating', 'deterministic', 'pitchSimplification'):
+            if getattr(self, attr) != getattr(other, attr):
+                return False
+        return True
 
     def fillBiDirectedEdges(self, edgeList: Sequence[interval.Interval | str]):
         # noinspection PyShadowingNames
