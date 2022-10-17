@@ -12371,6 +12371,8 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
 
                     if id(e) in exemptObjectSet:
                         continue
+                    if not inPlace and e.derivation.originId in exemptObjectSet:
+                        continue
 
                     elementOffset = e.getOffsetBySite(returnObj)
                     returnObj.coreSetElementOffset(e, elementOffset - shiftDur)
@@ -12403,7 +12405,10 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
                                                        mustFinishInSpan=False,
                                                        mustBeginInSpan=True):
 
-                    if id(e) in exemptObjectSet:
+                    if (
+                        id(e) in exemptObjectSet
+                        or (not inPlace and e.derivation.originId in exemptObjectSet)
+                    ):
                         elementOffset = e.getOffsetBySite(returnObj)
                         returnObj.coreSetElementOffset(e, elementOffset + exemptShift)
                         continue

@@ -161,6 +161,9 @@ class ChordBase(note.NotRest):
             return False
         return True
 
+    def __hash__(self):
+        return super().__hash__()
+
     def __deepcopy__(self: _ChordBaseType, memo=None) -> _ChordBaseType:
         '''
         As Chord objects have one or more Volume, objects, and Volume
@@ -777,6 +780,9 @@ class Chord(ChordBase):
         if set(self.pitches) != set(other.pitches):
             return False
         return True
+
+    def __hash__(self):
+        return super().__hash__()
 
     def __getitem__(self, key: int | str | note.Note | pitch.Pitch):
         '''
