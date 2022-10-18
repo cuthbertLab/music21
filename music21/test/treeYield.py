@@ -177,6 +177,7 @@ def find_all_exception_classes_in_m21():  # pragma: no cover
     )
 
 def find_all_non_hashable_m21objects():  # pragma: no cover
+    # is a bug if not empty
     def is_unhashable(mm):
         if not issubclass(mm, music21.base.Music21Object):
             return False
@@ -186,6 +187,20 @@ def find_all_non_hashable_m21objects():  # pragma: no cover
             return 'unhashable' in str(te)
         return False
     return find_all_classes_by_criteria(is_unhashable)
+
+def find_all_non_default_instantiation_m21objects():  # pragma: no cover
+    # Lack of default instantiation is not necessarily a bug, but
+    # let's try not to have them
+    def needs_attributes(mm):
+        if not issubclass(mm, music21.base.Music21Object):
+            return False
+        try:
+            mm()
+        except TypeError as te:
+            return True
+        return False
+    return find_all_classes_by_criteria(needs_attributes)
+
 
 def find_all_classes_by_criteria(criteria):  # pragma: no cover
     from collections import deque
@@ -205,6 +220,7 @@ def find_all_classes_by_criteria(criteria):  # pragma: no cover
             if (isinstance(mm, types.ModuleType)
                     and mm not in seen
                     and 'music21' in getattr(mm, '__file__', '')):
+                # noinspection PyTypeChecker
                 d.append(mm)
             elif isinstance(mm, type) and mm not in seen and criteria(mm):
                 matches.add(mm)

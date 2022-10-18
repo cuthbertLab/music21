@@ -589,8 +589,8 @@ class Music21Object(prebase.ProtoM21Object):
         the default deepcopy style. More can be passed to it.  But calling
         functions are responsible
 
-        Changed in v9: removeFromIgnore removed; never used and this is performance
-        critical.
+        * Changed in v9: removeFromIgnore removed; never used
+          and this is performance critical.
         '''
         defaultIgnoreSet = {'_derivation', '_activeSite', '_sites', '_cache'}
         if not self.groups:
@@ -979,7 +979,8 @@ class Music21Object(prebase.ProtoM21Object):
         >>> n3.getOffsetBySite(s3, returnSpecial=True)
         0.0
 
-        Changed in v7. -- stringReturns renamed to returnSpecial.  Returns an OffsetSpecial Enum.
+        * Changed in v7. -- stringReturns renamed to returnSpecial.
+          Returns an OffsetSpecial Enum.
         '''
         if site is None:
             return self._naiveOffset
@@ -2543,7 +2544,7 @@ class Music21Object(prebase.ProtoM21Object):
         When in doubt, use `.getOffsetBySite(streamObj)`
         which is safer or streamObj.elementOffset(self) which is 3x faster.
 
-        Changed in v.8 -- using a Duration object as an offset is not allowed.
+        * Changed in v.8 -- using a Duration object as an offset is not allowed.
         '''
         # There is a branch that does slow searches.
         # See test/testSerialization to have it active.
@@ -3167,7 +3168,7 @@ class Music21Object(prebase.ProtoM21Object):
         music21.duration.DurationException: cannot split a duration (0.5)
             at this quarterLength (7/10)
 
-        Changed in v7. -- all but quarterLength are keyword only
+        * Changed in v7. -- all but quarterLength are keyword only
         '''
         from music21 import chord
         from music21 import note
@@ -3714,8 +3715,8 @@ class Music21Object(prebase.ProtoM21Object):
         True
 
 
-        Changed in v.6.3 -- returns `nan` if
-        there is no TimeSignature in sites.  Previously raised an exception.
+        * Changed in v.6.3 -- returns `nan` if
+          there is no TimeSignature in sites.  Previously raised an exception.
         '''
         try:
             ts = self._getTimeSignatureForBeat()
@@ -3756,8 +3757,8 @@ class Music21Object(prebase.ProtoM21Object):
         >>> isolatedNote.beatStr
         'nan'
 
-        Changed in v.6.3 -- returns 'nan' if
-        there is no TimeSignature in sites.  Previously raised an exception.
+        * Changed in v6.3 -- returns 'nan' if
+          there is no TimeSignature in sites.  Previously raised an exception.
         '''
         try:
             ts = self._getTimeSignatureForBeat()
@@ -3813,8 +3814,8 @@ class Music21Object(prebase.ProtoM21Object):
         >>> isolatedNote.beatDuration
         <music21.duration.Duration 0.0>
 
-        Changed in v.6.3 -- returns a duration.Duration object of length 0 if
-        there is no TimeSignature in sites.  Previously raised an exception.
+        * Changed in v6.3 -- returns a duration.Duration object of length 0 if
+          there is no TimeSignature in sites.  Previously raised an exception.
         '''
         try:
             ts = self._getTimeSignatureForBeat()
@@ -3909,7 +3910,7 @@ class Music21Object(prebase.ProtoM21Object):
         >>> isnan(n2.beatStrength)
         True
 
-        Changed in v6.3 -- return 'nan' instead of raising an exception.
+        * Changed in v6.3 -- return 'nan' instead of raising an exception.
         '''
         try:
             ts = self._getTimeSignatureForBeat()
@@ -4023,12 +4024,12 @@ class Music21Object(prebase.ProtoM21Object):
         >>> r.duration.type
         'half'
 
-        Changed in v6.3 -- return nan instead of raising an exception.
+        * Changed in v6.3 -- return nan instead of raising an exception.
         ''')
 
 
 # ------------------------------------------------------------------------------
-
+_m21ObjDefaultDefinedKeys: tuple[str, ...] = tuple(Music21Object().__dict__)
 
 class ElementWrapper(Music21Object):
     '''
@@ -4093,8 +4094,40 @@ class ElementWrapper(Music21Object):
     <music21.base.ElementWrapper id=0_wrapper offset=0.0 obj='<...Wave_read object...'>
     <music21.base.ElementWrapper id=1_wrapper offset=1.0 obj='<...Wave_read object...'>
     <music21.base.ElementWrapper offset=2.0 obj='<...Wave_read object...>'>
+
+    Equality
+    --------
+    Two ElementWrappers are equal if they would be equal as Music21Objects and they
+    wrap objects that are equal.
+
+    >>> list1 = ['a', 'b', 'c']
+    >>> a = base.ElementWrapper(lst1)
+    >>> a.offset = 3.0
+
+    >>> list2 = ['a', 'b', 'c']
+    >>> b = base.ElementWrapper(lst2)
+    >>> b.offset = 3.0
+    >>> a == b
+    True
+    >>> a is not b
+    True
+
+    Offset does not need to be equal for equality:
+
+    >>> b.offset = 4.0
+    >>> a == b
+    True
+
+    But elements must compare equal
+
+    >>> list2.append('d')
+    >>> a == b
+    False
+
+    * Changed in v9: completely different approach to equality, unified w/
+      the rest of music21.
     '''
-    obj: t.Any = None
+    equalityAttributes = ('obj',)
 
     _DOC_ORDER = ['obj']
     _DOC_ATTR: dict[str, str] = {
@@ -4104,8 +4137,10 @@ class ElementWrapper(Music21Object):
     }
 
     def __init__(self, obj: t.Any = None, **keywords):
+        # note that because of how __setattr__ is overridden and needs
+        # to have a self.obj, we set this here.
+        self.obj: t.Any = obj  # object stored here
         super().__init__(**keywords)
-        self.obj = obj  # object stored here
 
     # -------------------------------------------------------------------------
 
@@ -4121,42 +4156,10 @@ class ElementWrapper(Music21Object):
         else:
             return f'offset={self.offset} obj={shortObj!r}'
 
-    def __eq__(self, other):
-        '''
-        Test ElementWrapper equality
-
-        >>> import music21
-        >>> n = note.Note('C#')
-        >>> a = music21.ElementWrapper(n)
-        >>> a.offset = 3.0
-        >>> b = music21.ElementWrapper(n)
-        >>> b.offset = 3.0
-        >>> a == b
-        True
-        >>> a is not b
-        True
-        >>> c = music21.ElementWrapper(n)
-        >>> c.offset = 2.0
-        >>> c.offset
-        2.0
-        >>> a == c
-        False
-        '''
-        # TODO: call super on eq.
-        for other_prop in ('obj', 'offset', 'priority', 'groups', 'activeSite', 'duration'):
-            if not hasattr(other, other_prop):
-                return False
-
-        if (self.obj == other.obj
-                and self.offset == other.offset
-                and self.priority == other.priority
-                and self.groups == other.groups
-                and self.duration == self.duration):
-            return True
-        else:
-            return False
-
     def __setattr__(self, name: str, value: t.Any) -> None:
+        if name == 'obj':
+            object.__setattr__(self, 'obj', value)
+            return
         # environLocal.printDebug(['calling __setattr__ of ElementWrapper', name, value])
 
         # if in the ElementWrapper already, set that first
@@ -4165,7 +4168,7 @@ class ElementWrapper(Music21Object):
 
         # if not, change the attribute in the stored object
         storedObj = object.__getattribute__(self, 'obj')
-        if (name not in ('offset', '_offset', '_activeSite')
+        if (name not in _m21ObjDefaultDefinedKeys
                 and storedObj is not None
                 and hasattr(storedObj, name)):
             setattr(storedObj, name, value)

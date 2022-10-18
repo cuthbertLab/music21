@@ -1426,8 +1426,10 @@ class Verticality(base.Music21Object):
             in a single part)''',
     }
 
-    def __init__(self, contentDict: dict, **keywords):
+    def __init__(self, contentDict: dict | None = None, **keywords):
         super().__init__(**keywords)
+        if contentDict is None:
+            contentDict = {}
         for partNum, element in contentDict.items():
             if not isinstance(element, list):
                 contentDict[partNum] = [element]
@@ -1793,7 +1795,7 @@ class VerticalityNTuplet(base.Music21Object):
     motion and music theory elements such as passing tones
     '''
 
-    def __init__(self, listOfVerticalities, **keywords):
+    def __init__(self, listOfVerticalities=(), **keywords):
         super().__init__(**keywords)
 
         self.verticalities = listOfVerticalities
@@ -1816,11 +1818,12 @@ class VerticalityTriplet(VerticalityNTuplet):
     '''
     a collection of three Verticalities
     '''
-    def __init__(self, listOfVerticalities, **keywords):
+    def __init__(self, listOfVerticalities=(), **keywords):
         super().__init__(listOfVerticalities, **keywords)
 
-        self.tnlsDict = {}  # defaultdict(int)  # Three Note Linear Segments
-        self._calcTNLS()
+        self.tnlsDict = {}  # Three Note Linear Segments
+        if listOfVerticalities:
+            self._calcTNLS()
 
     def _calcTNLS(self):
         '''
@@ -1927,8 +1930,7 @@ class NNoteLinearSegment(base.Music21Object):
     >>> n.noteList
     [<music21.note.Note A>, <music21.note.Note C>, <music21.note.Note D>]
     '''
-
-    def __init__(self, noteList, **keywords):
+    def __init__(self, noteList=(), **keywords):
         super().__init__(**keywords)
         self._noteList = []
         for value in noteList:
@@ -2316,7 +2318,7 @@ class NChordLinearSegmentException(exceptions21.Music21Exception):
 
 
 class NObjectLinearSegment(base.Music21Object):
-    def __init__(self, objectList, **keywords):
+    def __init__(self, objectList=(), **keywords):
         super().__init__(**keywords)
         self.objectList = objectList
 
@@ -2325,7 +2327,7 @@ class NObjectLinearSegment(base.Music21Object):
 
 
 class NChordLinearSegment(NObjectLinearSegment):
-    def __init__(self, chordList, **keywords):
+    def __init__(self, chordList=(), **keywords):
         super().__init__(chordList, **keywords)
         self._chordList = []
         for value in chordList:
@@ -2364,9 +2366,9 @@ class NChordLinearSegment(NObjectLinearSegment):
         return f'chordList={self.chordList}'
 
 class TwoChordLinearSegment(NChordLinearSegment):
-    def __init__(self, chordList, chord2=None, **keywords):
+    def __init__(self, chordList=(), chord2=None, **keywords):
         if isinstance(chordList, (list, tuple)):
-            if len(chordList) != 2:  # pragma: no cover
+            if chordList and len(chordList) != 2:  # pragma: no cover
                 raise ValueError(
                     f'First argument must be a list of length 2, not {chordList!r}'
                 )

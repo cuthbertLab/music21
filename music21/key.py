@@ -1021,6 +1021,9 @@ class Key(KeySignature, scale.DiatonicScale):
         # don't check on Scale equality
         return self.tonic.name == other.tonic.name and self.mode == other.mode
 
+    def __hash__(self):
+        return id(self) >> 4
+
     @property
     def relative(self) -> Key:
         '''

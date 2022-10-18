@@ -1873,7 +1873,6 @@ class RomanNumeral(harmony.Harmony):
     '''
     equalityAttributes = ('figure', 'key')
 
-
     # TODO: document better! what is inherited and what is new?
     _alterationRegex = re.compile(r'^(b+|-+|#+)')
     _omittedStepsRegex = re.compile(r'(\[(no[1-9]+)+]\s*)+')
@@ -2330,6 +2329,8 @@ class RomanNumeral(harmony.Harmony):
         # will be picked up as well.
         return note.NotRest.__eq__(self, other)
 
+    def __hash__(self):
+        return id(self) >> 4
 
     def _reprInternal(self):
         if hasattr(self.key, 'tonic'):
