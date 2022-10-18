@@ -14333,17 +14333,27 @@ class SpannerStorage(Stream):
 
     A `client` keyword argument must be provided by the Spanner in creation.
 
-    Changed in v8: spannerParent is renamed client.
+    >>> stream.SpannerStorage(client=spanner.Slur())
+    <music21.stream.SpannerStorage for music21.spanner.Slur>
+
+    * Changed in v8: spannerParent is renamed client.
     '''
-    def __init__(self, givenElements=None, *, client: spanner.Spanner, **keywords):
+    def __init__(self, givenElements=None, *, client: spanner.Spanner | None = None, **keywords):
         # No longer need store as weakref since Py2.3 and better references
-        self.client = client
+        if client is None:  # should never be none.  Just for testing
+            from music21 import spanner
+            client = spanner.Spanner()
+        self.client: spanner.Spanner = client
         super().__init__(givenElements, **keywords)
 
         # must provide a keyword argument with a reference to the spanner
         # parent could name spannerContainer or other?
 
         # environLocal.printDebug('keywords', keywords)
+
+    def _reprInternal(self):
+        tc = type(self.client)
+        return f'for {tc.__module__}.{tc.__qualname__}'
 
     # NOTE: for serialization, this will need to properly tag
     # the spanner parent by updating the scaffolding code.

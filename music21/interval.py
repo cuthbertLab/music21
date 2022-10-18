@@ -926,6 +926,9 @@ class GenericInterval(IntervalBase):
         else:
             return False
 
+    def __hash__(self):
+        return id(self) >> 4
+
     @property
     def value(self) -> int:
         '''
@@ -1736,6 +1739,9 @@ class DiatonicInterval(IntervalBase):
         else:
             return False
 
+    def __hash__(self):
+        return id(self) >> 4
+
     @property
     def name(self) -> str:
         '''
@@ -2262,9 +2268,11 @@ class ChromaticInterval(IntervalBase):
         else:
             return False
 
+    def __hash__(self):
+        return id(self) >> 4
+
     # -------------------------------------------------------
     # properties
-
     @property
     def cents(self) -> float:
         '''
@@ -3131,10 +3139,11 @@ class Interval(IntervalBase):
         else:
             return False
 
+    def __hash__(self):
+        return id(self) >> 4
 
     # -------------------------------------
     # properties
-
     @property
     def generic(self) -> GenericInterval:
         '''

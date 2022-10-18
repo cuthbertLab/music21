@@ -89,6 +89,9 @@ class PercussionChord(chord.ChordBase):
                 return False
         return True
 
+    def __hash__(self):
+        return id(self) >> 4
+
     @property
     def notes(self) -> tuple[note.NotRest, ...]:
         return tuple(self._notes)
