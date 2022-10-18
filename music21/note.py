@@ -1098,7 +1098,6 @@ class NotRest(GeneralNote):
         Get or set the notehead type of this NotRest object.
         Valid notehead type names are found in note.noteheadTypeNames (see below):
 
-
         >>> note.noteheadTypeNames
         ('arrow down', 'arrow up', 'back slashed', 'circle dot', 'circle-x', 'circled', 'cluster',
          'cross', 'diamond', 'do', 'fa', 'inverted triangle', 'la', 'left triangle',

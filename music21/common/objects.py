@@ -22,6 +22,7 @@ __all__ = [
 ]
 
 import collections
+import copy
 import inspect
 import time
 import weakref
@@ -284,9 +285,19 @@ class FrozenObject(EqualSlottedObjectMixin):
             return True
 
         for st in inspect.stack():
-            if (st.frame.f_code.co_name in ('__init__', '__new__', '__setstate__')
-                    and 'self' in st.frame.f_locals
-                    and st.frame.f_locals['self'].__class__ == self.__class__):
+            func_name = st.frame.f_code.co_name
+            func_locals = st.frame.f_locals
+            if (
+                func_name in ('__init__', '__new__', '__setstate__')
+                and 'self' in func_locals
+                and func_locals['self'].__class__ == self.__class__
+            ):
+                return True
+            elif (
+                func_name == 'modify'
+                and 'new' in func_locals
+                and func_locals['new'].__class__ == self.__class__
+            ):
                 return True
         raise TypeError(f'This {self.__class__.__name__} instance is immutable.')
 
@@ -310,10 +321,31 @@ class FrozenObject(EqualSlottedObjectMixin):
             super().__delitem__(key)
         raise TypeError(f'{self.__class__} object is not subscriptable')
 
+    def modify(self, **keywords):
+        '''
+        Return a new Frozen object instance where those keywords are
+        changed.  Assumes that the constructor can take all slot attributes.
+
+        >>> fd = duration.FrozenDuration(2/3)
+        >>> fd2 = fd.modify(dots=2, type='whole')
+        >>> fd2
+        <music21.duration.FrozenDuration 14/3>
+        '''
+        new = copy.copy(self)
+        for s in self._getSlotsRecursive():
+            if s in keywords:
+                setattr(new, s, keywords[s])
+                del keywords[s]
+            else:
+                setattr(new, s, getattr(self, s))
+        for k, v in keywords.items():  # attributes not in __slots__
+            setattr(new, k, v)
+        return new
+
     def __hash__(self) -> int:
         out = []
         for s in self._getSlotsRecursive():
-            out.append((s, getattr(self, s)))
+            out.append(getattr(self, s))
         return hash(tuple(out))
 
 

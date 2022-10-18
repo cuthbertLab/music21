@@ -2315,7 +2315,10 @@ def splitNoteGrouping(noteGrouping, beatDivisionOffset=0):
     return leftBrailleElements, rightBrailleElements
 
 
-def splitMeasure(music21Measure, beatDivisionOffset=0, useTimeSignature=None):
+def splitMeasure(music21Measure: stream.Measure,
+                 beatDivisionOffset: int | float = 0.0,
+                 useTimeSignature: meter.TimeSignature | None = None
+                 ):
     '''
     Takes a :class:`~music21.stream.Measure`, divides it in two parts, and returns a
     two-tuple of (leftMeasure, rightMeasure). The parameters are as
@@ -2358,7 +2361,7 @@ def splitMeasure(music21Measure, beatDivisionOffset=0, useTimeSignature=None):
                               + f'{music21Measure.number}, offset may be wrong')
     bs = copy.deepcopy(ts.beatSequence)
 
-    numberOfPartitions = 2
+    numberOfPartitions: int = 2
     try:
         bs.partitionByCount(numberOfPartitions, loadDefault=False)
         (startOffsetZero, endOffsetZero) = bs.getLevelSpan()[0]
