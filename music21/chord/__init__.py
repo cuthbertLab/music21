@@ -253,7 +253,7 @@ class ChordBase(note.NotRest):
                     self._notes.append(note.Note(n))
                 # self._notes.append({'pitch':music21.pitch.Pitch(n)})
             else:
-                # TODO: v.8 raise TypeError
+                # TODO: v8 raise TypeError
                 raise ChordException(f'Could not process input argument {n}')
 
         for n in self._notes:
@@ -442,7 +442,7 @@ class ChordBase(note.NotRest):
         <music21.volume.Volume realized=0.5>
 
         * Changed in v8: setting volume to a list of volumes is no longer supported.
-            See :meth:`~music21.chord.ChordBase.setVolumes` instead
+          See :meth:`~music21.chord.ChordBase.setVolumes` instead
 
         OMIT_FROM_DOCS
 
@@ -1873,8 +1873,6 @@ class Chord(ChordBase):
         >>> c9.getChordStep(2)
         <music21.pitch.Pitch D5>
 
-        * Changed in v8.3 --
-
         OMIT_FROM_DOCS
 
         If `root` has been explicitly overridden as `None`, calling this raises `ChordException`:
@@ -2947,9 +2945,7 @@ class Chord(ChordBase):
         >>> fr6c.isFrenchAugmentedSixth(permitAnyInversion=True)
         True
 
-
         * Changed in v7: `permitAnyInversion` added
-
 
         OMIT_FROM_DOCS
 
@@ -2995,7 +2991,6 @@ class Chord(ChordBase):
         True
 
         * Changed in v7: `permitAnyInversion` added
-
 
         OMIT_FROM_DOCS
 
@@ -3193,7 +3188,7 @@ class Chord(ChordBase):
         >>> c5.isItalianAugmentedSixth(restrictDoublings=False)
         True
 
-        * Changed in v7.  `restrictDoublings` is keyword only.  Added `permitAnyInversion`.
+        * Changed in v7: `restrictDoublings` is keyword only.  Added `permitAnyInversion`.
         '''
         aug6check = self._isAugmentedSixthHelper(
             (3, 8, 1),
@@ -3919,7 +3914,8 @@ class Chord(ChordBase):
         Traceback (most recent call last):
         music21.chord.ChordException: no pitches in chord <music21.chord.Chord ...>
 
-        * Changed in v5.2: find is a keyword-only parameter, newroot finds pitch in chord
+        * Changed in v5.2: `find` is a keyword-only parameter,
+          `newroot` finds `Pitch` in `Chord`
         '''
         # None value for find indicates: return override if overridden, cache if cached
         # or find new value if neither is the case.
@@ -4518,7 +4514,7 @@ class Chord(ChordBase):
         '''
         Set the :class:`~music21.volume.Volume` object of a specific Pitch.
 
-        * Changed in v8: after appearing in ChordBase in v.7, it has been properly
+        * Changed in v8: after appearing in ChordBase in v7, it has been properly
             moved back to Chord itself.  The ability to change just the first note's
             volume has been removed.  Use `Chord().volume = vol` to change the
             volume for a whole chord.
@@ -5615,7 +5611,6 @@ class Chord(ChordBase):
         >>> chord.Chord().pitchedCommonName
         'empty chord'
 
-
         * Changed in v5.5: octaves never included, flats are converted,
           special tools for enharmonics.
         * Changed in v6.5: special names for 0-, 1-, and 2-pitchClass chords.
@@ -5885,10 +5880,12 @@ class Chord(ChordBase):
         [(1, None), (1, <music21.pitch.Accidental sharp>), (2, None),
          (3, <music21.pitch.Accidental flat>), (3, None), (4, None)]
 
-        * Changed in v6.5: will return None if no context can be found:
+        If no context can be found, return `None`:
 
         >>> chord.Chord('C4 E4 G4').scaleDegrees is None
         True
+
+        * Changed in v6.5: will return `None` if no context can be found:
         '''
         from music21 import scale
         # roman numerals have this built in as the key attribute
@@ -5963,7 +5960,7 @@ class Chord(ChordBase):
         >>> cMaj1stInv.third.octave
         3
 
-        * Changed in v6.5: return None on empty chords/errors
+        * Changed in v6.5: return `None` on empty chords/errors
 
         OMIT_FROM_DOCS
 

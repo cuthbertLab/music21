@@ -399,7 +399,7 @@ class Spanner(base.Music21Object):
     def getSpannedElementIds(self):
         '''
         Return all id() for all stored objects.
-        Was performance critical, until most uses removed in v.7.
+        Was performance critical, until most uses removed in v7.
         Used only as a testing tool now.
         Spanner.__contains__() was optimized in 839c7e5.
         '''

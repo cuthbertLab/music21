@@ -15,7 +15,7 @@ easily with immediate visual feedback (see the CANTUS database).
 This module parses chants encoded in Volpiano and can generate Volpiano
 from any music21 Stream.
 
-This module will move to a medren package hopefully by v.7
+This module will move to a medren package hopefully by v7
 '''
 from __future__ import annotations
 

@@ -200,7 +200,7 @@ class Style(ProtoM21Object):
         Other legal positions are 'above' and 'below' which
         are synonyms for 10 and -70 respectively (for 5-line
         staves; other staves are not yet implemented)
-        This behavior may change in music21 v.8 or after.
+        This behavior may change in music21 v8 or after.
 
         >>> te = style.Style()
         >>> te.absoluteY = 10

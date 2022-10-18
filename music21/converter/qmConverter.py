@@ -21,7 +21,6 @@ and turns each of them into a quarter note in octave 4 in 4/4.
 Consult the code to see how it works.  To use, call
 `converter.registerSubconverter(converter.qmConverter.QMConverter)`
 then `myStream = converter.parse('quarterMusic: C E G D F')`
-
 '''
 from __future__ import annotations
 

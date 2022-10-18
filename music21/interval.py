@@ -82,7 +82,7 @@ class Specifier(enum.IntEnum):
     <Specifier.PERFECT>
 
     Value numbers are arbitrary and just there for backwards compatibility
-    with pre v.6 work:
+    with pre v6 work:
 
     >>> Specifier.PERFECT.value
     1

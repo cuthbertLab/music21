@@ -337,7 +337,8 @@ class PercussionClef(Clef):
     >>> pc.lowestLine == clef.TrebleClef().lowestLine
     True
 
-    * Changed in v7.3: setting octaveChange no longer affects lowestLine
+    * Changed in v7.3: setting `octaveChange` no longer affects
+      `lowestLine`
     '''
     _DOC_ATTR: dict[str, str] = {}
 

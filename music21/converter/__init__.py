@@ -1477,7 +1477,7 @@ def _osCanLoad(fp: str) -> bool:
 
     os.path.exists raises ValueError for paths over 260 chars
     on all versions of Windows lacking the `LongPathsEnabled` setting,
-    which is absent below Windows 10 v.1607 and opt-in on higher versions.
+    which is absent below Windows 10.1607 and opt-in on higher versions.
     '''
     try:
         return os.path.exists(fp)

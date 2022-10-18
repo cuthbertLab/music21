@@ -52,7 +52,6 @@ The :class:`music21.sieve.PitchSieve` class provides a quick generation of
 >>> ', '.join([str(p) for p in pitches])
 'F#1, A1, C2, G2, B-2, C#3, G#3, B3, D4, A4, C5, E-5, B-5, C#6, E6, B6, D7,
  F7, C8, E-8, F#8, C#9, E9, G9'
-
 '''
 from __future__ import annotations
 

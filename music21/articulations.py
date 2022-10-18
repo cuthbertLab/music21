@@ -73,7 +73,6 @@ A longer test showing the utility of the module:
 
 .. image:: images/prova_articolazioni.*
     :width: 628
-
 '''
 from __future__ import annotations
 

@@ -2153,7 +2153,6 @@ lyricsMelisma61d = '''<?xml version="1.0" encoding="UTF-8"?>
   </part>
   <!--=========================================================-->
 </score-partwise>
-
 '''
 
 # noinspection SpellCheckingInspection
@@ -3576,7 +3575,6 @@ restsDurations02a = '''<?xml version="1.0" encoding="UTF-8"?>
   </part>
   <!--=========================================================-->
 </score-partwise>
-
 '''
 
 arpeggio32d = '''<?xml version="1.0" encoding="UTF-8"?>
@@ -11396,8 +11394,8 @@ spannersSlurs33c = '''<?xml version="1.0" encoding="UTF-8"?>
   </part>
   <!--=========================================================-->
 </score-partwise>
-
 '''
+
 repeatMultipleTimes45c = '''<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE score-partwise PUBLIC "-//Recordare//DTD MusicXML 1.0 Partwise//EN"
                                 "http://www.musicxml.org/dtds/partwise.dtd">
@@ -13754,7 +13752,6 @@ repeatBracketsA = '''<?xml version="1.0" encoding="UTF-8"?>
   </part>
   <!--=========================================================-->
 </score-partwise>
-
 '''
 
 graceNotes24a = '''<?xml version="1.0" encoding="UTF-8"?>
@@ -14548,7 +14545,6 @@ mixedVoices1b = '''<?xml version="1.0" encoding="UTF-8"?>
   </part>
   <!--=========================================================-->
 </score-partwise>
-
 '''
 
 mixedVoices2 = '''<?xml version="1.0" encoding="UTF-8"?>
@@ -14996,7 +14992,6 @@ mixedVoices2 = '''<?xml version="1.0" encoding="UTF-8"?>
   </part>
   <!--=========================================================-->
 </score-partwise>
-
 '''
 
 metronomeMarks31c = '''<?xml version="1.0" encoding="UTF-8"?>

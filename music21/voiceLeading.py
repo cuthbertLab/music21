@@ -32,7 +32,6 @@ The list of objects included here are:
 * :class:`~music21.voiceLeading.NChordLinearSegment` :
     preliminary implementation of n(any number) chords
 * :class:`~music21.voiceLeading.TwoChordLinearSegment` : 2 chord objects
-
 '''
 from __future__ import annotations
 

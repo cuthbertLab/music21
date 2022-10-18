@@ -61,7 +61,6 @@ clefLine = 2
 
 # define a default notehead for notes that know they are unpitched
 noteheadUnpitched = 'square'
-
 '''
 Divisions are a MusicXML concept that music21 does not share
 It basically represents the lowest time unit that all other notes

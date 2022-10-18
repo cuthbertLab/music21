@@ -1119,7 +1119,7 @@ class Music21Object(prebase.ProtoM21Object):
         See also :meth:`music21.stream.iterator.RecursiveIterator.currentHierarchyOffset`
         for a method that is about 10x faster when running through a recursed stream.
 
-        *new in v.3*
+        * New in v3.
 
         OMIT_FROM_DOCS
 
@@ -1400,7 +1400,7 @@ class Music21Object(prebase.ProtoM21Object):
         need a flat representation, the caller needs to be the source Stream,
         not its Sites reference.
 
-        The `getElementMethod` is an enum value (new in v.7) from
+        The `getElementMethod` is an enum value (new in v7) from
         :class:`~music21.common.enums.ElementSearch` that selects which
         Stream method is used to get elements for searching. (The historical form
         of supplying one of the following values as a string is also supported.)
@@ -1515,12 +1515,6 @@ class Music21Object(prebase.ProtoM21Object):
         >>> n2.getOffsetBySite(n2.getContextByClass(stream.Measure))
         2.0
 
-        * changed in v.5.7 -- added followDerivation=False and made
-            everything but the class keyword only
-        * added in v.6 -- added priorityTargetOnly -- see contextSites for description.
-        * added in v.7 -- added getElementMethod `all` and `ElementSearch` enum.
-        * changed in v.8 -- class-based calls return properly typed items.  Putting
-            multiple types into className (never documented) is no longer allowed.
 
         Raises `ValueError` if `getElementMethod` is not a value in `ElementSearch`.
 
@@ -1530,6 +1524,13 @@ class Music21Object(prebase.ProtoM21Object):
 
         Raises `ValueError` for incompatible values `followDerivation=True`
         and `priorityTargetOnly=True`.
+
+        * Changed in v5.7: added followDerivation=False and made
+          everything but the class keyword only
+        * New in v6: added priorityTargetOnly -- see contextSites for description.
+        * New in v7: added getElementMethod `all` and `ElementSearch` enum.
+        * Changed in v8: class-based calls return properly typed items.  Putting
+          multiple types into className (never documented) is no longer allowed.
 
         OMIT_FROM_DOCS
 
@@ -2004,12 +2005,12 @@ class Music21Object(prebase.ProtoM21Object):
         None
 
 
-        *  removed in v3: priorityTarget cannot be set, in order
-            to use `.sites.yieldSites()`
-        *  changed in v5.5: all arguments are keyword only.
-        *  changed in v6: added `priorityTargetOnly=False` to only search in the
-            context of the priorityTarget.
-        *  changed in v8: returnSortTuple=True returns a new ContextSortTuple
+        *  Removed in v3: priorityTarget cannot be set, in order
+           to use `.sites.yieldSites()`
+        *  Changed in v5.5: all arguments are keyword only.
+        *  Changed in v6: added `priorityTargetOnly=False` to only search in the
+           context of the priorityTarget.
+        *  Changed in v8: `returnSortTuple=True` returns a new ContextSortTuple
         '''
         from music21 import stream
 
@@ -2243,7 +2244,7 @@ class Music21Object(prebase.ProtoM21Object):
         <music21.note.Note F#> <music21.stream.Part Soprano>
         <music21.bar.Barline type=final> <music21.stream.Part Soprano>
 
-        * changed in v.6 -- added activeSiteOnly -- see description in `.contextSites()`
+        * Changed in v6: added activeSiteOnly -- see description in `.contextSites()`
         '''
         allSiteContexts = list(self.contextSites(
             returnSortTuples=True,
@@ -2329,7 +2330,7 @@ class Music21Object(prebase.ProtoM21Object):
         <music21.metadata.Metadata object at 0x11116d080>
         <music21.stream.Score 0x10513af98>
 
-        * changed in v.6 -- added activeSiteOnly -- see description in `.contextSites()`
+        * Changed in v6: added activeSiteOnly -- see description in `.contextSites()`
         '''
         # allSiteContexts = list(self.contextSites(returnSortTuples=True))
         # maxRecurse = 20
@@ -3023,7 +3024,8 @@ class Music21Object(prebase.ProtoM21Object):
         [<music21.stream.Measure 20 offset=0.0>,
          <music21.stream.Part newPart>]
 
-        * changed in v.5.7: followDerivation and includeNonStreamDerivations are now keyword only
+        * Changed in v5.7: `followDerivation` and
+          `includeNonStreamDerivations` are now keyword only
         '''
         post = []
         focus = self
@@ -3714,9 +3716,9 @@ class Music21Object(prebase.ProtoM21Object):
         >>> math.isnan(isolatedNote.beat)
         True
 
-
         * Changed in v6.3: returns `nan` if
-          there is no TimeSignature in sites.  Previously raised an exception.
+          there is no TimeSignature in sites.
+          Previously raised an exception.
         '''
         try:
             ts = self._getTimeSignatureForBeat()
@@ -3758,7 +3760,8 @@ class Music21Object(prebase.ProtoM21Object):
         'nan'
 
         * Changed in v6.3: returns 'nan' if
-          there is no TimeSignature in sites.  Previously raised an exception.
+          there is no TimeSignature in sites.
+          Previously raised an exception.
         '''
         try:
             ts = self._getTimeSignatureForBeat()
@@ -4024,7 +4027,7 @@ class Music21Object(prebase.ProtoM21Object):
         >>> r.duration.type
         'half'
 
-        * Changed in v6.3: return nan instead of raising an exception.
+        * Changed in v6.3: return `nan` instead of raising an exception.
         ''')
 
 

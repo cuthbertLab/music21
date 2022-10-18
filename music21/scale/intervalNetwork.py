@@ -29,8 +29,8 @@ A scale or harmony may be composed of one or more IntervalNetwork objects.
 Both nodes and edges can be weighted to suggest tonics, dominants,
 finals, or other attributes of the network.
 
-Changed in v8 -- nodeId and nodeName standardized.  TERMINUS and DIRECTION
-    are now Enums.
+Changed in v8: nodeId and nodeName standardized.  TERMINUS and DIRECTION
+are now Enums.
 '''
 from __future__ import annotations
 
