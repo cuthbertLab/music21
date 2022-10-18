@@ -1073,8 +1073,8 @@ class Metadata(base.Music21Object):
         (True, 'composer')
 
 
-        New in v.4 -- use a keyword argument to search
-        that field directly:
+        * New in v4: use a keyword argument to search
+          that field directly:
 
         >>> md.search(composer='Joplin')
         (True, 'composer')

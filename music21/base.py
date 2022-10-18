@@ -339,8 +339,8 @@ class Music21Object(prebase.ProtoM21Object):
     Some of these may be intercepted by the subclassing object (e.g., duration
     within Note)
 
-    Equality
-    --------
+    **Equality**
+
     For historical reasons, music21 uses a different idea of object equality
     for Music21Objects than recommended by modern Python standards.
 
@@ -589,8 +589,8 @@ class Music21Object(prebase.ProtoM21Object):
         the default deepcopy style. More can be passed to it.  But calling
         functions are responsible
 
-        Changed in v9: removeFromIgnore removed; never used and this is performance
-        critical.
+        * Changed in v9: removeFromIgnore removed;
+          never used and this is performance critical.
         '''
         defaultIgnoreSet = {'_derivation', '_activeSite', '_sites', '_cache'}
         if not self.groups:
@@ -876,7 +876,7 @@ class Music21Object(prebase.ProtoM21Object):
         Look at :func:`~music21.common.decorators.cacheMethod` for the other half of this
         utility.
 
-        New in v.6 -- exposes previously hidden functionality.
+        * New in v6: exposes previously hidden functionality.
         '''
         # do not replace with self._cache.clear() -- leaves terrible
         # state for shallow copies.
@@ -979,7 +979,7 @@ class Music21Object(prebase.ProtoM21Object):
         >>> n3.getOffsetBySite(s3, returnSpecial=True)
         0.0
 
-        Changed in v7. -- stringReturns renamed to returnSpecial.  Returns an OffsetSpecial Enum.
+        * Changed in v7: stringReturns renamed to returnSpecial.  Returns an OffsetSpecial Enum.
         '''
         if site is None:
             return self._naiveOffset
@@ -2543,7 +2543,7 @@ class Music21Object(prebase.ProtoM21Object):
         When in doubt, use `.getOffsetBySite(streamObj)`
         which is safer or streamObj.elementOffset(self) which is 3x faster.
 
-        Changed in v.8 -- using a Duration object as an offset is not allowed.
+        * Changed in v8: using a Duration object as an offset is not allowed.
         '''
         # There is a branch that does slow searches.
         # See test/testSerialization to have it active.
@@ -3167,7 +3167,7 @@ class Music21Object(prebase.ProtoM21Object):
         music21.duration.DurationException: cannot split a duration (0.5)
             at this quarterLength (7/10)
 
-        Changed in v7. -- all but quarterLength are keyword only
+        * Changed in v7: all but quarterLength are keyword only
         '''
         from music21 import chord
         from music21 import note
@@ -3714,8 +3714,8 @@ class Music21Object(prebase.ProtoM21Object):
         True
 
 
-        Changed in v.6.3 -- returns `nan` if
-        there is no TimeSignature in sites.  Previously raised an exception.
+        * Changed in v6.3: returns `nan` if
+          there is no TimeSignature in sites.  Previously raised an exception.
         '''
         try:
             ts = self._getTimeSignatureForBeat()
@@ -3756,8 +3756,8 @@ class Music21Object(prebase.ProtoM21Object):
         >>> isolatedNote.beatStr
         'nan'
 
-        Changed in v.6.3 -- returns 'nan' if
-        there is no TimeSignature in sites.  Previously raised an exception.
+        * Changed in v6.3: returns 'nan' if
+          there is no TimeSignature in sites.  Previously raised an exception.
         '''
         try:
             ts = self._getTimeSignatureForBeat()
@@ -3813,8 +3813,8 @@ class Music21Object(prebase.ProtoM21Object):
         >>> isolatedNote.beatDuration
         <music21.duration.Duration 0.0>
 
-        Changed in v.6.3 -- returns a duration.Duration object of length 0 if
-        there is no TimeSignature in sites.  Previously raised an exception.
+        * Changed in v6.3: returns a duration.Duration object of length 0 if
+          there is no TimeSignature in sites.  Previously raised an exception.
         '''
         try:
             ts = self._getTimeSignatureForBeat()
@@ -3909,7 +3909,7 @@ class Music21Object(prebase.ProtoM21Object):
         >>> isnan(n2.beatStrength)
         True
 
-        Changed in v6.3 -- return 'nan' instead of raising an exception.
+        * Changed in v6.3: return 'nan' instead of raising an exception.
         '''
         try:
             ts = self._getTimeSignatureForBeat()
@@ -4023,7 +4023,7 @@ class Music21Object(prebase.ProtoM21Object):
         >>> r.duration.type
         'half'
 
-        Changed in v6.3 -- return nan instead of raising an exception.
+        * Changed in v6.3: return nan instead of raising an exception.
         ''')
 
 

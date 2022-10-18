@@ -400,9 +400,9 @@ def makeMeasures(
     >>> [allNotes[0].lyric, allNotes[1].lyric, allNotes[2].lyric]
     ['hi', None, None]
 
-    Changed in v6 -- all but first attribute are keyword only
+    * Changed in v6: all but first attribute are keyword only
 
-    Changed in v7 -- now safe to call `makeMeasures` directly on a score containing parts
+    * Changed in v7: now safe to call `makeMeasures` directly on a score containing parts
     '''
     from music21 import spanner
     from music21 import stream
@@ -828,15 +828,12 @@ def makeRests(
         {1.0 - 4.0} <music21.note.Rest dotted-half>
         {4.0 - 4.0} <music21.bar.Barline type=final>
 
-    Changed in v6 -- all but first attribute are keyword only
-
-    Changed in v7:
-
+    * Changed in v6: all but first attribute are keyword only
+    * Changed in v7:
       - `inPlace` defaults False
       - Recurses into parts, measures, voices
       - Gave priority to `timeRangeFromBarDuration` over `refStreamOrTimeRange`
-
-    Changed in v8: scores (or other streams having parts) edited `inPlace` return `None`.
+    * Changed in v8: scores (or other streams having parts) edited `inPlace` return `None`.
     '''
     from music21 import stream
 
@@ -1085,13 +1082,11 @@ def makeTies(
     Notes: uses base.Music21Object.splitAtQuarterLength() once it has figured out
     what to split.
 
-    Changed in v. 4 -- inPlace = False by default.
-
-    Changed in v6 -- all but first attribute are keyword only
-
-    Added in v. 7 -- `classFilterList` acts as a filter on what elements will
-    be operated on (i.e. have durations split and/or ties made.)
-    The default `(note.GeneralNote,)` includes Notes, Chords, and Rests.
+    * Changed in v4: inPlace = False by default.
+    * Changed in v6: all but first attribute are keyword only
+    * New in v7: `classFilterList` acts as a filter on what elements will
+      be operated on (i.e. have durations split and/or ties made.)
+      The default `(note.GeneralNote,)` includes Notes, Chords, and Rests.
 
     Here will we split and make ties only on Notes, leaving the too-long
     rest in measure 1 alone.
@@ -1362,8 +1357,8 @@ def makeTupletBrackets(s: StreamType, *, inPlace=False) -> StreamType | None:
 
     TODO: does not handle nested tuplets
 
-    Changed in v1.8: `inPlace` is False by default
-    Changed in v7: Legacy behavior of taking in a list of durations removed.
+    * Changed in v1.8: `inPlace` is False by default
+    * Changed in v7: Legacy behavior of taking in a list of durations removed.
     '''
     durationList: list[duration.Duration] = []
 
@@ -1646,7 +1641,7 @@ def makeAccidentalsInMeasureStream(
 
     Operates on the measures in place; make a copy first if this is not desired.
 
-    Changed in v8: the Stream may have other elements besides measures and the method
+    * Changed in v8: the Stream may have other elements besides measures and the method
         will still work.
     '''
     from music21.stream import Measure, Stream
@@ -1755,7 +1750,7 @@ def iterateBeamGroups(
     [<music21.note.Note E>, <music21.note.Note F>]
     [<music21.note.Note B>, <music21.note.Note A>, <music21.note.Note G>]
 
-    New in v6.7.
+    * New in v6.7.
     '''
     iterator: 'music21.stream.iterator.StreamIterator' = s.recurse() if recurse else s.iter()
     current_beam_group: list[note.NotRest] = []
@@ -1804,7 +1799,7 @@ def setStemDirectionForBeamGroups(
 
     Operates in place.  Run `copy.deepcopy(s)` beforehand for a non-inPlace version.
 
-    New in v6.7.
+    * New in v6.7.
     '''
     beamGroup: list[note.NotRest]
     for beamGroup in iterateBeamGroups(s, skipNoBeams=True, recurse=True):
@@ -1826,7 +1821,7 @@ def setStemDirectionOneGroup(
 
     See setStemDirectionForBeamGroups for detailed information.
 
-    New in v6.7.
+    * New in v6.7.
     '''
     if not group:  # pragma: no cover
         return  # should not happen
@@ -1882,7 +1877,7 @@ def splitElementsToCompleteTuplets(
     (Destructive edit, so make a copy first if desired.)
     Relies on :meth:`~music21.stream.base.splitAtQuarterLength`.
 
-    New in v8.
+    * New in v8.
 
     >>> from music21.stream.makeNotation import splitElementsToCompleteTuplets
     >>> s = stream.Stream(
@@ -1964,7 +1959,7 @@ def consolidateCompletedTuplets(
     and removing the subsequent elements from the stream. (Destructive edit,
     so make a copy first if desired.)
 
-    New in v8.
+    * New in v8.
 
     >>> s = stream.Stream()
     >>> r = note.Rest(quarterLength=1/6)

@@ -1069,7 +1069,7 @@ def mostCommonMeasureRhythms(streamIn, transposeDiatonic=False):
     {3.0} <music21.note.Note B->
     -----
 
-    Changed in v7 -- bars are ordered first by number, then by part.
+    * Changed in v7: bars are ordered first by number, then by part.
     '''
     returnDicts = []
     distanceToTranspose = 0

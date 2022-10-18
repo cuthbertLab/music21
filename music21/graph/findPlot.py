@@ -227,7 +227,7 @@ def axisMatchesValue(axisClass: type[axis.Axis] | axis.Axis,
     >>> graph.findPlot.axisMatchesValue(ax, 'flute')
     False
 
-    Changed in v.8 -- Must send a subclass of axis.Axis or an instance.
+    * Changed in v8: Must send a subclass of axis.Axis or an instance.
         `None` is no longer supported.
     '''
     axisValue = axisValue.lower()

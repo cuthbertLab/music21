@@ -2350,7 +2350,7 @@ class IntervalNetwork:
 
         Requires `networkx` to be installed.
 
-        Changed in v8 -- other parameters were unused and removed.
+        * Changed in v8: other parameters were unused and removed.
         '''
         #
         # >>> s = corpus.parse('bach/bwv324.xml') #_DOCS_HIDE
@@ -2792,7 +2792,7 @@ class IntervalNetwork:
         Traceback (most recent call last):
         ValueError: There must be at least one pitch given.
 
-        Changed in v8 -- staticmethod.  Raise value error on empty
+        * Changed in v8: staticmethod.  Raise value error on empty
         '''
         pitchList: list[pitch.Pitch]
         if not isinstance(pitchTarget, (list, tuple)):

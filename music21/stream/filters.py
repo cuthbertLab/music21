@@ -346,8 +346,8 @@ class OffsetFilter(StreamFilter):
 
     Finds elements that match a given offset range.
 
-    Changed in v5.5 -- all arguments except offsetStart and offsetEnd are keyword only.
-    Added in v6.5 -- stopAfterEnd can be set globally.
+    * Changed in v5.5: all arguments except offsetStart and offsetEnd are keyword only.
+    * Changed in v6.5: stopAfterEnd can be set globally.
     '''
     derivationStr = 'getElementsByOffset'
 

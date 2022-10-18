@@ -884,7 +884,7 @@ def romanNumeralFromChord(
 
     Augmented 6th chords in other inversions do not currently find correct roman numerals
 
-    Changed in v7 -- i7 is given for a tonic or subdominant minor-seventh chord in major:
+    * Changed in v7: i7 is given for a tonic or subdominant minor-seventh chord in major:
 
     >>> roman.romanNumeralFromChord(
     ...     chord.Chord('C4 E-4 G4 B-4'),
@@ -1246,8 +1246,8 @@ class Minor67Default(enum.Enum):
     >>> vi('V/VI', roman.Minor67Default.FLAT)
     'E- G B-'
 
-    Changed in v8 -- previously `sixthMinor` and `seventhMinor` did
-    not carry over to secondary roman numerals.
+    * Changed in v8: previously `sixthMinor` and `seventhMinor` did
+      not carry over to secondary roman numerals.
     '''
     QUALITY = 1
     CAUTIONARY = 2
@@ -1743,8 +1743,7 @@ class RomanNumeral(harmony.Harmony):
     >>> r.pitches
     ()
 
-    Equality:
-    ---------
+    **Equality**
 
     Two RomanNumerals compare equal if their `NotRest` components
     (noteheads, beams, expressions, articulations, etc.) are equal
@@ -1941,7 +1940,7 @@ class RomanNumeral(harmony.Harmony):
             >>> [p.name for p in rn2.pitches]
             ['G', 'D-', 'F']
 
-            Changed in v6.5 -- always returns a list, even if it is empty.
+            * Changed in v6.5: always returns a list, even if it is empty.
             ''',
         'caseMatters': '''
             Boolean to determine whether the case (upper or lowercase) of the
@@ -2007,7 +2006,7 @@ class RomanNumeral(harmony.Harmony):
 
             Changing this value will not change existing pitches.
 
-            Changed in v6.5 -- always returns a string, never None
+            * Changed in v6.5: always returns a string, never None
             ''',
         'frontAlterationString': '''
             A string representing the chromatic alteration of a RomanNumeral, if any
@@ -2019,7 +2018,7 @@ class RomanNumeral(harmony.Harmony):
 
             Changing this value will not change existing pitches.
 
-            Changed in v6.5 -- always returns a string, never None
+            * Changed in v6.5: always returns a string, never None
             ''',
         'frontAlterationTransposeInterval': '''
             An optional :class:`~music21.interval.Interval` object
@@ -2198,7 +2197,7 @@ class RomanNumeral(harmony.Harmony):
 
             Changing this value will not change existing pitches.
 
-            Changed in v6.5 -- empty RomanNumeral objects get scaleDegree 0, not None.
+            * Changed in v6.5: empty RomanNumeral objects get scaleDegree 0, not None.
             ''',
         'secondaryRomanNumeral': '''
             An optional roman.RomanNumeral object that represents the part
@@ -2935,7 +2934,7 @@ class RomanNumeral(harmony.Harmony):
         >>> rn.frontAlterationAccidental is None
         True
 
-        Changed in v.6.4: public function became hook to private function having the actual guts
+        * Changed in v6.4: public function became hook to private function having the actual guts
         '''
         unused_workingFigure = self._adjustMinorVIandVIIByQuality('', useScale)
 
@@ -3820,7 +3819,7 @@ RomanNumeral.figure.__doc__ = '''
 
     Changing this value will not change existing pitches.
 
-    Changed in v6.5 -- empty RomanNumerals now have figure of '' not None
+    * Changed in v6.5: empty RomanNumerals now have figure of '' not None
     '''
 
 

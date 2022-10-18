@@ -2514,7 +2514,7 @@ class Duration(prebase.ProtoM21Object, SlottedObjectMixin):
         '''
         Look to components and determine quarter length.
 
-        Changed in v7. -- made private.  And faster
+        * Changed in v7: made private.  And faster
         '''
         if self.linked is False:
             return
@@ -2879,7 +2879,7 @@ class Duration(prebase.ProtoM21Object, SlottedObjectMixin):
         8
 
         Complex values have an ordinal of the string 'complex'.  This might
-        change to NaN in v8.
+        change to NaN in a later version.
 
         >>> d.quarterLength = 2.5
         >>> d.ordinal

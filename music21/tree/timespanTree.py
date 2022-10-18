@@ -227,8 +227,8 @@ class TimespanTree(trees.OffsetTree):
         '''
         this is just for mimicking elements as streams.
 
-        Changed in v7 -- this was always meant to be a property, but was
-        incorrectly a method earlier.
+        * Changed in v7: this was always meant to be a property, but was
+          incorrectly a method earlier.
         '''
         return self.lowestPosition()
 
@@ -584,7 +584,7 @@ class TimespanTree(trees.OffsetTree):
             ]>
 
 
-        Changed in v8 -- added padEnd.  Streams with fewer than n elements
+        * Changed in v8: added padEnd.  Streams with fewer than n elements
             also return an empty sentinel entry.
         '''
         from music21.tree.verticality import VerticalitySequence, Verticality

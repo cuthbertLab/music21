@@ -86,7 +86,7 @@ def figuredBassFromStream(streamPart):
     .. image:: images/figuredBass/fbRealizer_fbStreamPart.*
         :width: 500
 
-    Changed in v7.3: multiple figures in same lyric (e.g. '64') now supported.
+    * Changed in v7.3: multiple figures in same lyric (e.g. '64') now supported.
     '''
     sf = streamPart.flatten()
     sfn = sf.notes

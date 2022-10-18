@@ -1392,7 +1392,7 @@ class MeterSequence(MeterTerminal):
         >>> ms.isUniformPartition()
         False
 
-        Changed in v7 -- depth is keyword only
+        * Changed in v7: depth is keyword only
         '''
         n = []
         d = []
@@ -1803,8 +1803,8 @@ class MeterSequence(MeterTerminal):
         Traceback (most recent call last):
         music21.exceptions21.MeterException: cannot access from qLenPos -1.0
 
-        Changed in v.7 -- `index` can be provided, if known, for a long
-        `MeterSequence` to improve performance.
+        * Changed in v7: `index` can be provided, if known, for a long
+          `MeterSequence` to improve performance.
         '''
         qLenPos = opFrac(qLenPos)
         if qLenPos >= self.duration.quarterLength or qLenPos < 0:
