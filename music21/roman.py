@@ -399,7 +399,7 @@ def postFigureFromChordAndKey(chordObj, keyObj=None):
 
 def figureTuples(chordObject: chord.Chord, keyObject: key.Key) -> list[ChordFigureTuple]:
     '''
-    (This will become a private function in v.10)
+    (This will become a private function in v10)
 
     Return a set of tuplets for each pitch showing the presence of a note, its
     interval above the bass its alteration (float) from a step in the given
@@ -1780,17 +1780,16 @@ class RomanNumeral(harmony.Harmony):
     False
 
 
-    * Changed in v6.5 -- caseMatters is keyword only. It along with sixthMinor and
+    * Changed in v6.5: caseMatters is keyword only. It along with sixthMinor and
       seventhMinor are now the only allowable keywords to pass in.
-
-    * Changed in v7 -- RomanNumeral.romanNumeral will always give a "b" for a flattened
+    * Changed in v7: RomanNumeral.romanNumeral will always give a "b" for a flattened
       degree (i.e., '-II' becomes 'bII') as this is what people expect in looking at
       the figure.
 
-    * Changed in v.7.3 -- figures that are not normally used to indicate inversion
+    * Changed in v7.3: figures that are not normally used to indicate inversion
       such as V54 (a suspension) no longer give strange inversions.
 
-    * Changed in v8 -- Figures are now validated as alphanumeric or containing one of
+    * Changed in v8: Figures are now validated as alphanumeric or containing one of
       the following symbols (after the example "V"):
 
     >>> specialCharacterFigure = roman.RomanNumeral('V#+-/[]')
@@ -2947,9 +2946,6 @@ class RomanNumeral(harmony.Harmony):
         '''
         Fix minor vi and vii to always be #vi and #vii if `.caseMatters`.
 
-        Made private in v.6.4 when `workingFigure` was added to the signature
-        and returned.
-
         Altering `workingFigure` became necessary to handle these chromatic figures:
         https://github.com/cuthbertLab/music21/issues/437
 
@@ -2968,6 +2964,9 @@ class RomanNumeral(harmony.Harmony):
         >>> rn = roman.RomanNumeral('viio##853', 'a')
         >>> ' '.join([p.name for p in rn.pitches])
         'G# B D G##'
+
+        * Changed in v6.4: Made private when `workingFigure`
+          was added to the signature and returned.
         '''
         def sharpen(wFig: str) -> str:
             changeFrontAlteration(interval.Interval('A1'), 1)

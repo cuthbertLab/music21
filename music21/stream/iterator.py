@@ -111,10 +111,10 @@ class StreamIterator(prebase.ProtoM21Object, Sequence[M21ObjType]):
     * For `activeInformation` see above.
 
     * Changed in v5.2: all arguments except srcStream are keyword only.
-
-    * Changed in v8: filterList must be a list or None, not a single filter.
-                      StreamIterator inherits from typing.Sequence, hence index
-                      was moved to elementIndex.
+    * Changed in v8:
+      - filterList must be a list or None, not a single filter.
+      - StreamIterator inherits from typing.Sequence, hence index
+      was moved to elementIndex.
 
     OMIT_FROM_DOCS
 
@@ -228,10 +228,10 @@ class StreamIterator(prebase.ProtoM21Object, Sequence[M21ObjType]):
         In case an attribute is defined on Stream but not on a StreamIterator,
         create a Stream and then return that attribute.  This is NOT performance
         optimized -- calling this repeatedly will mean creating a lot of different
-        streams.  However, it will prevent most code that worked on v.2. from breaking
-        on v.3 and onwards.
+        streams.  However, it will prevent most code that worked on v2. from breaking
+        on v3 and onwards.
 
-        Deprecated in v.8. The upgrade path is to just call `.stream()` on the iterator
+        Deprecated in v8. The upgrade path is to just call `.stream()` on the iterator
         before accessing the attribute.
 
         >>> s = stream.Measure()
@@ -406,9 +406,9 @@ class StreamIterator(prebase.ProtoM21Object, Sequence[M21ObjType]):
         (nothing is printed)
 
         * Changed in v8: for strings: prepend a '#' sign to get elements by id.
-            The old behavior still works until v9.
-            This is an attempt to unify __getitem__ behavior in
-            StreamIterators and Streams.
+          The old behavior still works until v9.
+          This is an attempt to unify __getitem__ behavior in
+          StreamIterators and Streams.
         '''
         fe = self.matchingElements()
         if isinstance(k, str):

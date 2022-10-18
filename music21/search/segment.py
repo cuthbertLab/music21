@@ -22,8 +22,8 @@ Speed notes:
    python-Levenshtein can be installed via **pip install python-Levenshtein**.
    The ratios are very slightly different, but the speedup is between 10 and 100x!
    (But then PyPy probably won't work.)
-
 '''
+
 from __future__ import annotations
 
 from collections import OrderedDict

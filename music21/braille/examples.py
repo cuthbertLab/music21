@@ -158,7 +158,6 @@ Dot ⠄
 ====
 <BLANKLINE>
 ---end grand segment---
-
 '''
 from __future__ import annotations
 

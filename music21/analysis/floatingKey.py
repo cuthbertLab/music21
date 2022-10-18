@@ -64,8 +64,6 @@ class KeyAnalyzer:
      <music21.key.Key of f# minor>, <music21.key.Key of f# minor>,
      <music21.key.Key of f# minor>, <music21.key.Key of f# minor>]
 
-    Fixed in v.7 -- analysis now incorporates final measures in pieces without pickup measures:
-
     >>> tiny = converter.parse('tinyNotation: c1 e1 g1 c1 d-4 d-4 d-4 d-4')
     >>> ka = analysis.floatingKey.KeyAnalyzer(tiny)
     >>> ka.windowSize = 1
@@ -79,6 +77,8 @@ class KeyAnalyzer:
     >>> ka = analysis.floatingKey.KeyAnalyzer(s)
     Traceback (most recent call last):
     music21.analysis.floatingKey.FloatingKeyException: Stream must have Measures inside it
+
+    * Changed in v7: analysis now incorporates final measures in pieces without pickup measures:
     '''
     def __init__(self, s=None):
         if s is None:

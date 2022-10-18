@@ -1422,7 +1422,7 @@ class ConcreteScale(Scale):
         >>> [p.name for p in scVague.getPitches()]
         ['D', 'E', 'F', 'G', 'A-', 'B-', 'C-', 'D-', 'D']
 
-        New and beta in v.6 -- changing `.abstract` is now allowed.
+        * Changed in v6: changing `.abstract` is now allowed.
         '''
         # copy before returning? (No... too slow)
         return self._abstract

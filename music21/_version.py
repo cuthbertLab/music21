@@ -2,7 +2,7 @@
 '''
 This file contains Music21's version number information.
 
-As of v.2.0.0, Music21 uses something close to the principles of Semantic Versioning, we'll
+As of v2.0.0, Music21 uses something close to the principles of Semantic Versioning, we'll
 try very hard so that X.Y.Z have meanings about changes to the system.
 Changes in X represent changes that will break old features.
 New Y numbers add new features; Z -- bug fixes.  The X number change about once per year.

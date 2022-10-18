@@ -1468,7 +1468,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         >>> s.hasElementOfClass('Measure')
         False
 
-        To be deprecated in v.8 -- to be removed in version 9, use:
+        To be deprecated in v8 -- to be removed in v9, use:
 
         >>> bool(s.getElementsByClass(meter.TimeSignature))
         True
@@ -2129,12 +2129,10 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         music21.exceptions21.StreamException: Cannot set the offset for element
             <music21.note.Note D>, not in Stream <music21.stream.Stream Stream1>.
 
-        * Changed in v5.5 -- also sets .activeSite for the element
-
-        * In v6.7 -- also runs coreElementsChanged()
-
-        * In v7. -- addElement is removed; see
-            :meth:`~music21.stream.core.StreamCoreMixin.coreSetElementOffset`
+        * Changed in v5.5: also sets .activeSite for the element
+        * Changed in v6.7: also runs coreElementsChanged()
+        * Changed in v7: addElement is removed;
+          see :meth:`~music21.stream.core.StreamCoreMixin.coreSetElementOffset`
         '''
         self.coreSetElementOffset(element,
                                   offset,
@@ -2262,9 +2260,9 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         offsets and items; the method then, obviously, inserts the items
         at the specified offsets.
 
-        Note: This functionality will be deprecated in v.9 and replaced
+        Note: This functionality will be deprecated in v9 and replaced
         with a list of tuples of [(offset, element), (offset, element)]
-        and removed in v.10
+        and removed in v10
 
         >>> n1 = note.Note('G')
         >>> n2 = note.Note('F#')
@@ -3011,12 +3009,12 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
             {0.0} <music21.stream.Measure 0 offset=0.0>
                 {0.0} <music21.note.Note D->
 
-        * Changed by v.5: allTargetSites RENAMED to allDerived -- only
+        * Changed by v5: `allTargetSites` renamed to `allDerived` -- only
           searches in derivation chain.
-        * Changed in v5.3: firstMatchOnly removed -- impossible to have element
-          in stream twice.  recurse and shiftOffsets changed to keywordOnly arguments
+        * Changed in v5.3: `firstMatchOnly` removed -- impossible to have element
+          in stream twice.  `recurse` and `shiftOffsets` changed to keywordOnly arguments
         * Changed in v6: recurse works
-        * Changed in v7: raises StreamException if replacement is already in the stream.
+        * Changed in v7: raises `StreamException` if replacement is already in the stream.
         '''
         def replaceDerived(startSite=self):
             if not allDerived:
@@ -4559,9 +4557,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         {0.0} <music21.stream.Measure 4a offset=0.0>
         <BLANKLINE>
 
-        * Changed in v7: If `gatherSpanners` is True or GatherSpanners.ALL (default),
-          then just the spanners pertaining to the requested measure region
-          are provided, rather than the entire bundle from the source.
+        GatherSpanners can change the output:
 
         >>> from music21.common.enums import GatherSpanners
         >>> beachIn = corpus.parse('beach')
@@ -4572,6 +4568,9 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         93
 
         * Changed in v7: does not create measures automatically.
+        * Changed in v7: If `gatherSpanners` is True or GatherSpanners.ALL (default),
+          then just the spanners pertaining to the requested measure region
+          are provided, rather than the entire bundle from the source.
 
         OMIT_FROM_DOCS
 
@@ -5315,8 +5314,6 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
 
         Affected by the presence of Instruments and by Ottava spanners
 
-        v2.0.10 changes -- inPlace is False; v. 5 returns None if inPlace=True
-
         >>> sc = stream.Score()
         >>> p = stream.Part(id='barisax')
         >>> p.append(instrument.BaritoneSaxophone())
@@ -5355,6 +5352,9 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         <music21.stream.Part partEmpty>
         >>> sp.derivation.origin is p
         True
+
+        * Changed in v2.0.10: inPlace is False
+        * Changed in v5: returns None if inPlace=True
         '''
         from music21 import spanner
 
@@ -5411,8 +5411,8 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         >>> scWritten.recurse().notes[0].nameWithOctave
         'A4'
 
-        v.3 -- inPlace defaults to False
-        v.5 -- returns None if inPlace=True
+        * Changed in v3: `inPlace` defaults to `False`
+        * Changed in v5 returns `None` if `inPlace=True`
         '''
         from music21 import spanner
 
@@ -5550,8 +5550,8 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
 
 
         * Changed in v8: time signatures within recursed streams are found by default.
-            Added recurse. Removed option for recurse=False and still getting the
-            first time signature in the first measure.  This was wholly inconsistent.
+          Added recurse. Removed option for recurse=False and still getting the
+          first time signature in the first measure.  This was wholly inconsistent.
         '''
         # even if this is a Measure, the TimeSignature in the Stream will be
         # found
@@ -5722,9 +5722,6 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         into 5 sharps in measure 2 and then invert around F4, creating
         a new piece.
 
-        * Changed in v5: inPlace is False by default.
-
-
         >>> qj = corpus.parse('ciconia/quod_jactatur').parts[0].measures(1, 2)
         >>> qj.id = 'measureExcerpt'
 
@@ -5765,6 +5762,8 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
             {0.5} <music21.note.Note A#>
             {1.0} <music21.note.Note B>
             {1.5} <music21.note.Note A#>
+
+        * Changed in v5: inPlace is False by default.
         '''
         if inPlace:
             returnStream = self
@@ -6827,7 +6826,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         notation, including creating voices for overlapped regions, Measures
         if necessary, creating ties, beams, accidentals, and tuplet brackets.
 
-        If `inPlace` is True, this is done in-place (changed in v7 -- returns None);
+        If `inPlace` is True, this is done in-place.
         if `inPlace` is False, this returns a modified deep copy.
 
         The following additional parameters are documented on
@@ -6853,6 +6852,8 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         4
         >>> sMeasures.getElementsByClass(stream.Measure).last().rightBarline.type
         'final'
+
+        * Changed in v7: `inPlace=True` returns `None`.
         '''
         # determine what is the object to work on first
         returnStream: StreamType | Stream[t.Any]
@@ -7076,8 +7077,8 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         >>> len(strippedTransposed.flatten().notes)
         1
 
-        * Changed in v7: `matchByPitch` defaults True, and the following
-          behavior defined regarding chords with a tie type "continue":
+        When `matchByPitch` is True (as it is by default) the following
+        behavior defined regarding chords with a tie type "continue":
 
         >>> c1.notes[0].tie = tie.Tie('continue')
         >>> c1.notes[1].tie = tie.Tie('start')
@@ -7129,6 +7130,8 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         >>> stripped5 = m2.stripTies(matchByPitch=False)
         >>> stripped5.elements
         (<music21.note.Note C>, <music21.chord.Chord C4 E4 G4>)
+
+        * Changed in v7: `matchByPitch` defaults True
         '''
         # environLocal.printDebug(['calling stripTies'])
         if not inPlace:  # make a copy
@@ -7503,8 +7506,6 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         If this Stream is not flat, then only the elements directly in the stream itself are sorted.
         To sort all, run myStream.flatten().sorted().
 
-        * Changed in v7: made into a method, not a property.
-
         For instance, here is an unsorted Stream:
 
         >>> s = stream.Stream()
@@ -7567,6 +7568,8 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         '0.0: C#; 1.0: D-; 2.0: C#; 2.0: E; 3.0: D-; 4.0: C#; 5.0: D-; '
         >>> z[2].name, z[3].name
         ('C#', 'E')
+
+        * Changed in v7: made into a method, not a property.
         '''
         cache_sorted = self._cache.get('sorted')
         if cache_sorted is not None:
@@ -8229,7 +8232,6 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         >>> r = q.flatten()
 
         * Changed in v6.5: highestTime can return a Fraction.
-
 
         OMIT_FROM_DOCS
 
@@ -10132,9 +10134,10 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
          <music21.note.Note D>, <music21.note.Note D>, <music21.note.Note D>,
          <music21.note.Note B->, <music21.note.Note A->]
 
-        * Changed in v7: now finds notes in Voices without requiring `getOverlaps=True`
-          and iterates over Parts rather than flattening.
-          If `noNone=False`, inserts `None` when backing up to scan a subsequent voice or part.
+        * Changed in v7:
+            - now finds notes in Voices without requiring `getOverlaps=True`
+            and iterates over Parts rather than flattening.
+            - If `noNone=False`, inserts `None` when backing up to scan a subsequent voice or part.
         * Changed in v8: all parameters are keyword only.
 
 
@@ -11401,7 +11404,10 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         * If `force` is True, even if there is more than one Voice left,
           all voices will be flattened.
 
-        * Changed in v5: inPlace is default False and a keyword only arg.
+        This leaves a stream where all voices appear when another appears in
+        the same measure.
+
+        More demonstrations of `recurse=True`:
 
         >>> s = stream.Stream(note.Note())
         >>> s.insert(0, note.Note())
@@ -11415,6 +11421,8 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         >>> voicesFlattened = s.flattenUnnecessaryVoices()
         >>> len(voicesFlattened.voices)
         0
+
+        * Changed in v5: inPlace is default False and a keyword only arg.
         '''
         if not self.voices:
             return None  # do not make copy; return immediately
