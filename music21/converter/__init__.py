@@ -170,7 +170,7 @@ class ArchiveManager:
         For 'musedata' format this will be a list of strings.
         For 'musicxml' this will be a single string.
 
-        Changed in v.8 -- name is not used.
+        * Changed in v8: name is not used.
         '''
         post = None
         if self.archiveType != 'zip':
@@ -729,7 +729,7 @@ class Converter:
         >>> #_DOCS_SHOW c.parseURL(joplinURL)
         >>> #_DOCS_SHOW joplinStream = c.stream
 
-        Changed in v.7 -- made keyword-only and added `forceSource` option.
+        * Changed in v7: made keyword-only and added `forceSource` option.
         '''
         autoDownload = environLocal['autoDownload']
         if autoDownload in ('deny', 'ask'):
@@ -1188,7 +1188,7 @@ def parseURL(url,
     URL downloading will not happen automatically unless the user has set their
     Environment "autoDownload" preference to "allow".
 
-    Changed in v.7 -- made keyword-only.
+    * Changed in v7: made keyword-only.
     '''
     v = Converter()
     v.parseURL(url, format=format, forceSource=forceSource, **keywords)
@@ -1248,7 +1248,7 @@ def parse(value: bundles.MetadataEntry | bytes | str | pathlib.Path,
     >>> s[meter.TimeSignature].first()
     <music21.meter.TimeSignature 2/16>
 
-    Changed in v.8 -- passing a list of tinyNotation strings was never documented as a
+    * Changed in v8: passing a list of tinyNotation strings was never documented as a
         possibility and has been removed.
     '''
     # environLocal.printDebug(['attempting to parse()', value])

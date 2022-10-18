@@ -134,7 +134,7 @@ def isIterable(usrData: t.Any) -> t.TypeGuard[Iterable]:
     >>> common.isIterable(stream.Stream)
     False
 
-    Changed in v7.3 -- Classes (not instances) are not iterable
+    * Changed in v7.3: Classes (not instances) are not iterable
     '''
     if isinstance(usrData, (str, bytes)):
         return False
@@ -191,7 +191,7 @@ def holdsType(usrData: t.Any, checkType: type[_T]) -> t.TypeGuard[Collection[_T]
     >>> next(iter(r))
     1
 
-    New in v9.
+    * New in v9.
     '''
     if not isIterable(usrData):
         return False
@@ -284,7 +284,7 @@ def tempAttribute(obj, attribute: str, new_val=TEMP_ATTRIBUTE_SENTINEL):
 
     For working with multiple attributes see :func:`~music21.classTools.saveAttributes`.
 
-    New in v7.
+    * New in v7.
     '''
     tempStorage = getattr(obj, attribute)
     if new_val is not TEMP_ATTRIBUTE_SENTINEL:
@@ -311,7 +311,7 @@ def saveAttributes(obj, *attributeList):
     For storing and setting a value on a single attribute see
     :func:`~music21.classTools.tempAttribute`.
 
-    New in v7.
+    * New in v7.
     '''
     tempStorage: dict[str, t.Any] = {}
     for attribute in attributeList:

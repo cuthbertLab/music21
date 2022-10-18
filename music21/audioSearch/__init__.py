@@ -591,9 +591,9 @@ def smoothFrequencies(
     This function always returns a list of ints -- rounding to the nearest
     hertz (you did want it smoothed right?)
 
-    Changed in v.6 -- inPlace defaults to False (like other music21
-    functions) and if done in Place, returns nothing.  smoothLevels and inPlace
-    became keyword only.
+    * Changed in v6: inPlace defaults to False (like other music21
+      functions) and if done in Place, returns nothing.  smoothLevels and inPlace
+      became keyword only.
     '''
     if smoothLevels < 1:
         raise ValueError('smoothLevels must be >= 1')

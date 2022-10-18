@@ -110,9 +110,9 @@ class StreamIterator(prebase.ProtoM21Object, Sequence[M21ObjType]):
 
     * For `activeInformation` see above.
 
-    Changed in v.5.2 -- all arguments except srcStream are keyword only.
+    * Changed in v5.2: all arguments except srcStream are keyword only.
 
-    Changed in v.8 -- filterList must be a list or None, not a single filter.
+    * Changed in v8: filterList must be a list or None, not a single filter.
                       StreamIterator inherits from typing.Sequence, hence index
                       was moved to elementIndex.
 
@@ -405,8 +405,7 @@ class StreamIterator(prebase.ProtoM21Object, Sequence[M21ObjType]):
 
         (nothing is printed)
 
-        Changed in v8:
-          - for strings: prepend a '#' sign to get elements by id.
+        * Changed in v8: for strings: prepend a '#' sign to get elements by id.
             The old behavior still works until v9.
             This is an attempt to unify __getitem__ behavior in
             StreamIterators and Streams.
@@ -544,7 +543,7 @@ class StreamIterator(prebase.ProtoM21Object, Sequence[M21ObjType]):
         >>> print(s[chord.Chord].first())
         None
 
-        New in v7.
+        * New in v7.
 
         OMIT_FROM_DOCS
 
@@ -590,7 +589,7 @@ class StreamIterator(prebase.ProtoM21Object, Sequence[M21ObjType]):
         >>> s[note.Rest].last()
         <music21.note.Rest quarter>
 
-        New in v7.
+        * New in v7.
 
         OMIT_FROM_DOCS
 
@@ -726,7 +725,7 @@ class StreamIterator(prebase.ProtoM21Object, Sequence[M21ObjType]):
         their activeSites changed (callers should use it when they do not plan to actually
         expose the elements to users, such as in `__len__`).
 
-        Added in v7. -- restoreActiveSites
+        * New in v7: restoreActiveSites
         '''
         if self._matchingElements is not None:
             return self._matchingElements
@@ -931,8 +930,8 @@ class StreamIterator(prebase.ProtoM21Object, Sequence[M21ObjType]):
 
         If returnClone is False then adds without creating a new StreamIterator
 
-        Changed in v.6 -- Encourage creating new StreamIterators: change
-        default to return a new StreamIterator.
+        * Changed in v6: Encourage creating new StreamIterators: change
+          default to return a new StreamIterator.
         '''
         if returnClone:
             out = self.clone()
@@ -1122,7 +1121,7 @@ class StreamIterator(prebase.ProtoM21Object, Sequence[M21ObjType]):
         >>> s.recurse().getElementsByQuerySelector('#last').first()
         <music21.note.Note F>
 
-        New in v.7
+        * New in v7.
         '''
         if querySelector.startswith('#'):
             return self.addFilter(filters.IdFilter(querySelector[1:]), returnClone=returnClone)
@@ -1391,8 +1390,8 @@ class StreamIterator(prebase.ProtoM21Object, Sequence[M21ObjType]):
         >>> len(soprano.recurse().getElementsByOffset(2.0, stopAfterEnd=False))
         9
 
-        Changed in v5.5 -- all arguments changing behavior are keyword only.
-        Added in v6.5 -- `stopAfterEnd` keyword.
+        * Changed in v5.5: all arguments changing behavior are keyword only.
+        * New in v6.5: `stopAfterEnd` keyword.
 
         OMIT_FROM_DOCS
 
@@ -1987,7 +1986,7 @@ class RecursiveIterator(StreamIterator, Sequence[M21ObjType]):
         0 20.0 <music21.note.Note C#>
         ...
 
-        New in v.4
+        * New in v4.
         '''
         lastYield = self.activeInformation['lastYielded']
         if lastYield is None:
@@ -2038,7 +2037,7 @@ class RecursiveIterator(StreamIterator, Sequence[M21ObjType]):
         <music21.note.Note F#> 9.0 3 Bass
         <music21.note.Note B> 9.5 3 Bass
 
-        Changed in v5.5 -- all behavior changing options are keyword only.
+        * Changed in v5.5: all behavior changing options are keyword only.
         '''
         f = filters.OffsetHierarchyFilter(
             offsetStart,

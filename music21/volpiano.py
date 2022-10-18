@@ -191,7 +191,7 @@ def toPart(volpianoText, *, breaksToLayout=False):
     >>> breakTest.recurse().notes[1].notehead
     'x'
 
-    Changed in v5.7 -- corrected spelling of liquescence.
+    * Changed in v5.7: corrected spelling of liquescence.
     '''
     p = stream.Part()
     m = stream.Measure()

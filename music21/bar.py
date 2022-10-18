@@ -191,7 +191,7 @@ class Barline(base.Music21Object):
         >>> b.musicXMLBarStyle()
         'light-heavy'
 
-        Changed in v.5.7 -- was a property before.
+        * Changed in v5.7: was a property before.
         '''
         return typeToMusicXMLBarStyle(self.type)
 

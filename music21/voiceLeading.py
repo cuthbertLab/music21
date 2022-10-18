@@ -353,9 +353,9 @@ class VoiceLeadingQuartet(base.Music21Object):
         >>> vl.motionType(allowAntiParallel=True)
         <MotionType.antiParallel: 'Anti-Parallel'>
 
-        Changed in v.6 -- anti-parallel motion was supposed to be
-        able to be returned in previous versions, but a bug prevented it.
-        To preserve backwards compatibility, it must be explicitly enabled.
+        * Changed in v6: anti-parallel motion was supposed to be
+          able to be returned in previous versions, but a bug prevented it.
+          To preserve backwards compatibility, it must be explicitly enabled.
         '''
         motionType = ''
         if self.obliqueMotion():
@@ -1740,7 +1740,7 @@ class Verticality(base.Music21Object):
         >>> vs.getVerticalityOffset(leftAlign=False)
         1.0
 
-        Changed in v8 -- renamed getVerticalityOffset to not conflict with
+        * Changed in v8: renamed getVerticalityOffset to not conflict with
             .offset property.  Made leftAlign keyword only
         '''
         if not self.objects:

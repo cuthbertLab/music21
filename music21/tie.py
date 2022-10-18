@@ -143,6 +143,9 @@ class Tie(prebase.ProtoM21Object, SlottedObjectMixin):
             return True
         return False
 
+    def __hash__(self):
+        return id(self) >> 4
+
     def _reprInternal(self):
         return self.type
 

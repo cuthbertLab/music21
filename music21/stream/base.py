@@ -176,7 +176,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         {0.0} <music21.note.Rest quarter>
     {1.0} <music21.note.Note E->
 
-    New in v7 -- providing a single element now works:
+    * New in v7: providing a single element now works:
 
     >>> s = stream.Stream(meter.TimeSignature())
     >>> s.first()
@@ -253,8 +253,8 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
             def __init__(self, givenElements, craziness, **keywords):
                 ...
 
-    New in v.7 -- smart appending
-    New in v.8 -- givenElementsBehavior keyword configures the smart appending.
+    * New in v7: smart appending
+    * New in v8: givenElementsBehavior keyword configures the smart appending.
     '''
     # this static attributes offer a performance boost over other
     # forms of checking class
@@ -647,15 +647,14 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         >>> s['#nothing'] is None
         True
 
-
         Any other query raises a TypeError:
 
         >>> s[0.5]
         Traceback (most recent call last):
         TypeError: Streams can get items by int, slice, class, class iterable, or string query;
-         got <class 'float'>
+           got <class 'float'>
 
-        Changed in v7:
+        * Changed in v7:
           - out of range indexes now raise an IndexError, not StreamException
           - strings ('music21.note.Note', '#id', '.group') are now treated like a query selector.
           - slices with negative indices now supported
@@ -663,14 +662,15 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
           - Class and Group searches now return a recursive `StreamIterator` rather than a `Stream`
           - Slice searches now return a list of elements rather than a `Stream`
 
-        Changed in v8:
+        * Changed in v8:
           - for strings: only fully-qualified names such as "music21.note.Note" or
-            partially-qualified names such as "note.Note" are
-            supported as class names.  Better to use a literal type or explicitly call
-            .recurse().getElementsByClass to get the earlier behavior.  Old behavior
-            still works until v9.  This is an attempt to unify __getitem__ behavior in
-            StreamIterators and Streams.
+          partially-qualified names such as "note.Note" are
+          supported as class names.  Better to use a literal type or explicitly call
+          .recurse().getElementsByClass to get the earlier behavior.  Old behavior
+          still works until v9.  This is an attempt to unify __getitem__ behavior in
+          StreamIterators and Streams.
           - allowed iterables of qualified class names, e.g. `[note.Note, note.Rest]`
+
         '''
         # need to sort if not sorted, as this call may rely on index positions
         if not self.isSorted and self.autoSort:
@@ -750,7 +750,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         >>> print(empty.first())
         None
 
-        New in v7.
+        * New in v7.
         '''
         try:
             return self[0]
@@ -775,7 +775,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         >>> print(empty.last())
         None
 
-        New in v7.
+        * New in v7.
         '''
         try:
             return self[-1]
@@ -1749,8 +1749,8 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         >>> barline in streamWithBarline
         False
 
-        Changed in v5.3 -- firstMatchOnly removed -- impossible to have element
-        in stream twice.  recurse and shiftOffsets changed to keywordOnly arguments
+        * Changed in v5.3: firstMatchOnly removed -- impossible to have element
+          in stream twice.  recurse and shiftOffsets changed to keywordOnly arguments
         '''
         # experimental
         if self._mutable is False:  # pragma: no cover
@@ -3011,16 +3011,12 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
             {0.0} <music21.stream.Measure 0 offset=0.0>
                 {0.0} <music21.note.Note D->
 
-        Changed by v.5:
-
-        allTargetSites RENAMED to allDerived -- only searches in derivation chain.
-
-        Changed in v5.3 -- firstMatchOnly removed -- impossible to have element
-        in stream twice.  recurse and shiftOffsets changed to keywordOnly arguments
-
-        Changed in v6 -- recurse works
-
-        Changed in v7 -- raises StreamException if replacement is already in the stream.
+        * Changed by v.5: allTargetSites RENAMED to allDerived -- only
+          searches in derivation chain.
+        * Changed in v5.3: firstMatchOnly removed -- impossible to have element
+          in stream twice.  recurse and shiftOffsets changed to keywordOnly arguments
+        * Changed in v6: recurse works
+        * Changed in v7: raises StreamException if replacement is already in the stream.
         '''
         def replaceDerived(startSite=self):
             if not allDerived:
@@ -3240,7 +3236,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
 
         Most arguments are passed to Music21Object.splitAtQuarterLength.
 
-        Changed in v7. -- all but quarterLength are keyword only
+        * Changed in v7: all but quarterLength are keyword only
         '''
         quarterLength = opFrac(quarterLength)
         if retainOrigin:
@@ -3560,7 +3556,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         >>> s.recurse().notes[3].groups
         ['scaleNote']
 
-        Added in v6.7.1 -- recurse
+        * New in v6.7.1: recurse
         '''
         sIterator = self.iter() if not recurse else self.recurse()
         if classFilter is not None:
@@ -3775,7 +3771,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         >>> ew.activeSite is a
         True
 
-        Changed in v7. -- remove classFilter.
+        * Changed in v7: remove classFilter.
         '''
         sIterator = self.iter().addFilter(filters.IdFilter(elementId))
         for e in sIterator:
@@ -4017,7 +4013,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         >>> [el.step for el in out7]
         ['C', 'D']
 
-        Changed in v5.5: all arguments changing behavior are keyword only.
+        * Changed in v5.5: all arguments changing behavior are keyword only.
         '''
         sIterator = self.iter().getElementsByOffset(
             offsetStart=offsetStart,
@@ -4563,9 +4559,9 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         {0.0} <music21.stream.Measure 4a offset=0.0>
         <BLANKLINE>
 
-        Changed in v.7 -- If `gatherSpanners` is True or GatherSpanners.ALL (default),
-        then just the spanners pertaining to the requested measure region
-        are provided, rather than the entire bundle from the source.
+        * Changed in v7: If `gatherSpanners` is True or GatherSpanners.ALL (default),
+          then just the spanners pertaining to the requested measure region
+          are provided, rather than the entire bundle from the source.
 
         >>> from music21.common.enums import GatherSpanners
         >>> beachIn = corpus.parse('beach')
@@ -4575,7 +4571,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         >>> len(beachIn.spannerBundle)
         93
 
-        Changed in v.7 -- does not create measures automatically.
+        * Changed in v7: does not create measures automatically.
 
         OMIT_FROM_DOCS
 
@@ -4852,7 +4848,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         times faster than a deepcopy of the stream (about 4x faster
         on bwv66.6)
 
-        Changed in v7. -- all arguments are keyword only.
+        * Changed in v7: all arguments are keyword only.
         '''
         out = self.cloneEmpty(derivationMethod='template')
         if removeClasses is None:
@@ -5139,8 +5135,8 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         >>> s.finalBarline is None
         True
 
-        Changed in v6.3 -- does not raise an exception if queried or set on a measure-less stream.
-        Previously raised a StreamException
+        * Changed in v6.3: does not raise an exception if queried or set on a measure-less stream.
+          Previously raised a StreamException
         ''')
 
     @property
@@ -5553,7 +5549,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         <music21.meter.TimeSignature 4/4>
 
 
-        Changed in v.8: time signatures within recursed streams are found by default.
+        * Changed in v8: time signatures within recursed streams are found by default.
             Added recurse. Removed option for recurse=False and still getting the
             first time signature in the first measure.  This was wholly inconsistent.
         '''
@@ -5633,7 +5629,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         >>> len(searchedNaive)
         0
 
-        Changed in v.8: recurse is True by default.
+        * Changed in v8: recurse is True by default.
         '''
         instObj = None
 
@@ -5703,7 +5699,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         >>> p2.getInstrument(returnDefault=False).instrumentName
         'Viola'
 
-        Changed in v.7 -- added `recurse` (default False)
+        * Changed in v7: added `recurse` (default False)
         '''
         post: Stream[instrument.Instrument] = self.getInstruments(
             searchActiveSite=searchActiveSite,
@@ -5726,7 +5722,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         into 5 sharps in measure 2 and then invert around F4, creating
         a new piece.
 
-        Changed in v. 5 -- inPlace is False by default.
+        * Changed in v5: inPlace is False by default.
 
 
         >>> qj = corpus.parse('ciconia/quod_jactatur').parts[0].measures(1, 2)
@@ -6006,7 +6002,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         {6.0} <music21.note.Note B->
         {8.0} <music21.note.Note C>
 
-        Changed in v7. -- forceOutputClass removed.
+        * Changed in v7: forceOutputClass removed.
 
         OMIT_FROM_DOCS
         TODO: maxBefore -- maximum number of elements to return before; etc.
@@ -6261,16 +6257,11 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         >>> n01
         <music21.note.Note G>
 
-        Changes in v.5:
-
-        Runs a little faster for small scores and run a TON faster for big scores
-        running in O(n) time not O(n^2)
-
-        no longer supported: displayTiedAccidentals=False,
-
-        Changes in v.6.3:
-
-        Added copyPitches
+        * Changed in v5:
+          - Runs a little faster for small scores and run a TON faster for big scores
+          running in O(n) time not O(n^2)
+          - no longer supported: displayTiedAccidentals=False,
+        * Changed in v6.3: Added copyPitches
 
         OMIT_FROM_DOCS
 
@@ -6564,7 +6555,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         '''
         Calls :py:func:`~music21.stream.makeNotation.makeRests`.
 
-        Changed in v.7, inPlace=False by default.
+        * Changed in v7, inPlace=False by default.
         '''
         return makeNotation.makeRests(
             self,
@@ -6584,8 +6575,8 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         '''
         Calls :py:func:`~music21.stream.makeNotation.makeTies`.
 
-        Changed in v.4., inPlace=False by default.
-        Added in v.7, `classFilterList`.
+        * Changed in v4: inPlace=False by default.
+        * New in v.7: `classFilterList`.
         '''
         return makeNotation.makeTies(
             self,
@@ -6602,9 +6593,9 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
 
         See :py:func:`~music21.stream.makeNotation.makeBeams`.
 
-        New in v6.7 -- setStemDirections.
-        New in v.7 -- failOnNoTimeSignature raises StreamException if no TimeSignature
-        exists in the stream context from which to make measures.
+        * New in v6.7: setStemDirections.
+        * New in v7: failOnNoTimeSignature raises StreamException if no TimeSignature
+          exists in the stream context from which to make measures.
         '''
         return makeNotation.makeBeams(
             self,
@@ -6677,9 +6668,9 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         If `inPlace` is True, this is done in-place; if `inPlace` is False,
         this returns a modified deep copy.
 
-        Changed in v.6: does not return anything if inPlace is True.
-        Changed in v.7: default inPlace is False
-        Changed in v.8: altered unisons/octaves in Chords now supply clarifying naturals.
+        * Changed in v6: does not return anything if inPlace is True.
+        * Changed in v7: default inPlace is False
+        * Changed in v8: altered unisons/octaves in Chords now supply clarifying naturals.
 
         All arguments are keyword only.
         '''
@@ -7085,8 +7076,8 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         >>> len(strippedTransposed.flatten().notes)
         1
 
-        Changed in v.7 -- `matchByPitch` defaults True, and the following
-        behavior defined regarding chords with a tie type "continue":
+        * Changed in v7: `matchByPitch` defaults True, and the following
+          behavior defined regarding chords with a tie type "continue":
 
         >>> c1.notes[0].tie = tie.Tie('continue')
         >>> c1.notes[1].tie = tie.Tie('start')
@@ -7512,7 +7503,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         If this Stream is not flat, then only the elements directly in the stream itself are sorted.
         To sort all, run myStream.flatten().sorted().
 
-        Changed in v7 -- made into a method, not a property.
+        * Changed in v7: made into a method, not a property.
 
         For instance, here is an unsorted Stream:
 
@@ -8051,9 +8042,8 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
             the components of the Stream being iterated over during iteration.
             if you need to edit while recursing, list(s.recurse()) is safer.
 
-        Changed in v5.5 -- All attributes are keyword only.
-
-        Changed in v8 -- removed parameter `skipSelf`.  Use `includeSelf` instead.
+        * Changed in v5.5: All attributes are keyword only.
+        * Changed in v8: removed parameter `skipSelf`.  Use `includeSelf` instead.
         '''
         ri: iterator.RecursiveIterator[M21ObjType] = iterator.RecursiveIterator(
             self,
@@ -8238,7 +8228,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         47.0
         >>> r = q.flatten()
 
-        Changed in v6.5 -- highestTime can return a Fraction.
+        * Changed in v6.5: highestTime can return a Fraction.
 
 
         OMIT_FROM_DOCS
@@ -8513,8 +8503,8 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         >>> math.isnan(s.seconds)
         True
 
-        Changed in v6.3 -- return nan rather than raising an exception.  Do not
-        attempt to change seconds on a stream, as it did not do what you would expect.
+        * Changed in v6.3: return nan rather than raising an exception.  Do not
+          attempt to change seconds on a stream, as it did not do what you would expect.
         ''')
 
     def metronomeMarkBoundaries(self, srcObj=None):
@@ -8937,7 +8927,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         >>> [str(p) for p in cStream.pitches[:10]]
         ['F6', 'A-6', 'F6', 'F6', 'F6', 'F6', 'G-6', 'F6', 'E-6', 'E-6']
 
-        Changed in v8: first value is position only, all other values are keyword only
+        * Changed in v8: first value is position only, all other values are keyword only
         '''
         # only change the copy
         if not inPlace:
@@ -9017,8 +9007,8 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         To shift all the elements in a Stream, see the
         :meth:`~music21.stream.Stream.shiftElements` method.
 
-        Changed in v.5 -- inPlace is default False, and anchorZero, anchorZeroRecurse
-        and inPlace are keyword only arguments.
+        * Changed in v5: inPlace is default False, and anchorZero, anchorZeroRecurse
+          and inPlace are keyword only arguments.
         '''
         # if we have offsets at 0, 2, 4
         # we scale by 2, getting offsets at 0, 4, 8
@@ -9179,7 +9169,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         If `recurse` is True, then all substreams are also quantized.
         If False (default), then only the highest level of the Stream is quantized.
 
-        Changed in v.7:
+        * Changed in v7:
            - `recurse` defaults False
            - look-ahead approach to choosing divisors to avoid gaps when processing durations
 
@@ -9229,10 +9219,10 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         >>> [e.offset for e in myPart.measure(1).notes]
         [0.0, 0.0, 0.25, Fraction(1, 3)]
 
-        New in v.7: if both `processDurations` and `processOffsets` are True, then
-        the next note's quantized offset is taken into account when quantizing the
-        duration of the current note. This is to prevent unnecessary gaps from applying
-        different quantization units to adjacent notes:
+        * New in v7: if both `processDurations` and `processOffsets` are True, then
+          the next note's quantized offset is taken into account when quantizing the
+          duration of the current note. This is to prevent unnecessary gaps from applying
+          different quantization units to adjacent notes:
 
         >>> s2 = stream.Stream()
         >>> nOddLength = note.Note(quarterLength=0.385)
@@ -9630,7 +9620,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         Slice all elements in the Stream that have a Duration at
         the offsets determined to be the beat from the local TimeSignature.
 
-        Changed in v7. -- return None if inPlace is True
+        * Changed in v7: return None if inPlace is True
         '''
 
         if not inPlace:  # make a copy
@@ -10116,14 +10106,14 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
 
         How to determine consecutive pitches is a little tricky and there are many options:
 
-            The `skipUnisons` parameter uses the midi-note value (.ps) to determine unisons,
-            so enharmonic transitions (F# -> Gb) are
-            also skipped if `skipUnisons` is true.  We believe that this is the most common usage.
-            However, because
-            of this, you cannot completely be sure that the
-            x.findConsecutiveNotes() - x.findConsecutiveNotes(skipUnisons=True)
-            will give you the number of P1s in the piece, because there could be
-            d2's in there as well.
+        * The `skipUnisons` parameter uses the midi-note value (.ps) to determine unisons,
+          so enharmonic transitions (F# -> Gb) are
+          also skipped if `skipUnisons` is true.  We believe that this is the most common usage.
+        * However, because
+          of this, you cannot completely be sure that the
+          x.findConsecutiveNotes() - x.findConsecutiveNotes(skipUnisons=True)
+          will give you the number of P1s in the piece, because there could be
+          d2's in there as well.
 
         See test.TestStream.testFindConsecutiveNotes() for usage details.
 
@@ -10142,11 +10132,10 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
          <music21.note.Note D>, <music21.note.Note D>, <music21.note.Note D>,
          <music21.note.Note B->, <music21.note.Note A->]
 
-        Changed in v7 -- now finds notes in Voices without requiring `getOverlaps=True`
-        and iterates over Parts rather than flattening.
-        If `noNone=False`, inserts `None` when backing up to scan a subsequent voice or part.
-
-        Changed in v.8 -- all parameters are keyword only.
+        * Changed in v7: now finds notes in Voices without requiring `getOverlaps=True`
+          and iterates over Parts rather than flattening.
+          If `noNone=False`, inserts `None` when backing up to scan a subsequent voice or part.
+        * Changed in v8: all parameters are keyword only.
 
 
         OMIT_FROM_DOCS
@@ -10522,7 +10511,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         >>> s2.findGaps() is None
         True
 
-        Changed in v7. -- gapStream is filled with rests instead of Music21Objects
+        * Changed in v7: gapStream is filled with rests instead of Music21Objects
         '''
         if 'findGaps' in self._cache and self._cache['findGaps'] is not None:
             return self._cache['findGaps']
@@ -10995,8 +10984,8 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         >>> [str(n.pitch) for n in s.voices[1].notes]
         ['B-4', 'B-4', 'B-4', 'B-4', 'B-4', 'B-4', 'B-4', 'B-4']
 
-        Changed in v7 -- if `fillGaps=True` and called on an incomplete measure,
-        makes trailing rests in voices. This scenario occurs when parsing MIDI.
+        * Changed in v7: if `fillGaps=True` and called on an incomplete measure,
+          makes trailing rests in voices. This scenario occurs when parsing MIDI.
         '''
         # this method may not always
         # produce the optimal voice assignment based on context (register
@@ -11412,7 +11401,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         * If `force` is True, even if there is more than one Voice left,
           all voices will be flattened.
 
-        Changed in v. 5 -- inPlace is default False and a keyword only arg.
+        * Changed in v5: inPlace is default False and a keyword only arg.
 
         >>> s = stream.Stream(note.Note())
         >>> s.insert(0, note.Note())
@@ -13550,7 +13539,7 @@ class Part(Stream):
         which is called after managing the `inPlace` keyword and finding
         measures to iterate.
 
-        Changed in v.7 -- `inPlace` defaults False
+        * Changed in v7: `inPlace` defaults False
         '''
         if not inPlace:  # make a copy
             returnObj = self.coreCopyAsDerivation('makeAccidentals')
@@ -14377,7 +14366,7 @@ class SpannerStorage(Stream):
         whether `replacement` already exists in `self`. If so, delete `target` from
         `self` and return; otherwise call the superclass method.
 
-        New in v7.
+        * New in v7.
         '''
         # Does not perform a recursive search, but shouldn't need to
         if replacement in self:
@@ -14399,7 +14388,7 @@ class VariantStorage(Stream):
     ensures that they are pickled properly as Streams on a non-Stream
     object.
 
-    Changed in v.8 -- variantParent is removed.  Never used.
+    * Changed in v8: variantParent is removed.  Never used.
     '''
 # -----------------------------------------------------------------------------
 

@@ -331,8 +331,8 @@ class KeySignature(base.Music21Object):
     False
     >>> unusual.accidentalsApplyOnlyToOctave = True
 
-    Equality
-    --------
+    **Equality**
+
     Two KeySignatures are equal if they pass all `super().__eq__` checks and
     their sharps are equal.  Currently, non-standard key signatures are not
     checked (this may change).
@@ -344,8 +344,8 @@ class KeySignature(base.Music21Object):
     >>> sharp2 == key.KeySignature(2)
     True
 
-    Changed in v.7 -- `sharps` defaults to 0 (key of no flats/sharps)
-    rather than `None` for nontraditional keys.
+    * Changed in v7: `sharps` defaults to 0 (key of no flats/sharps)
+      rather than `None` for nontraditional keys.
     '''
     _styleClass = style.TextStyle
     equalityAttributes = ('sharps',)
@@ -430,7 +430,7 @@ class KeySignature(base.Music21Object):
         >>> ks2.asKey(tonic='C')
         <music21.key.Key of C ionian>
 
-        New in v7 -- `tonic` argument to solve for mode.
+        * New in v7: `tonic` argument to solve for mode.
         '''
         our_sharps = self.sharps or 0  # || 0 in case of None -- non-standard key-signature
         if mode is not None and tonic is not None:
@@ -935,8 +935,8 @@ class Key(KeySignature, scale.DiatonicScale):
     >>> key.Key('F#m')
     <music21.key.Key of f# minor>
 
-    Equality
-    --------
+    **Equality**
+
     Two Keys are equal if their tonics' names are equal, their sharps are equal,
     and their modes are equal (and they pass all superclass tests)
 
@@ -948,7 +948,7 @@ class Key(KeySignature, scale.DiatonicScale):
     >>> k == k2
     False
 
-    Changed in v8: keys now compare equal regardless of the octave of their tonics.
+    * Changed in v8: keys now compare equal regardless of the octave of their tonics.
     '''
     _sharps = 0
     _mode: str | None = None
@@ -1143,7 +1143,7 @@ class Key(KeySignature, scale.DiatonicScale):
         searching, melodic minor scales cannot be used as abstracts
         for deriving by degree.
 
-        New in v.6 -- preserve mode in key.Key.deriveByDegree
+        * New in v6: preserve mode in key.Key.deriveByDegree
         '''
         ret = super().deriveByDegree(degree, pitchRef)
         ret.mode = self.mode

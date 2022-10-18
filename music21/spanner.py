@@ -628,8 +628,8 @@ class SpannerBundle(prebase.ProtoM21Object):
     Not to be confused with SpannerStorage (which is a Stream class inside
     a spanner that stores Elements that are spanned)
 
-    Changed in v7: only argument must be a List of spanners.
-    Creators of SpannerBundles are required to check that this constraint is True
+    * Changed in v7: only argument must be a List of spanners.
+      Creators of SpannerBundles are required to check that this constraint is True
     '''
     def __init__(self, spanners: list[Spanner] | None = None):
         self._cache: dict[str, t.Any] = {}  # cache is defined on Music21Object not ProtoM21Object
@@ -840,7 +840,7 @@ class SpannerBundle(prebase.ProtoM21Object):
         >>> su2
         <music21.spanner.Glissando <music21.note.Note E><music21.note.Note C>>
 
-        Changed in v.7 -- id() is no longer allowed for `old`.
+        * Changed in v7: id() is no longer allowed for `old`.
 
         >>> sb.replaceSpannedElement(id(n1), n2)
         Traceback (most recent call last):

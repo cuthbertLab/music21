@@ -1719,7 +1719,7 @@ class Sieve:
         >>> c.period()
         40
 
-        Changed in v9: state is taken from the object.
+        * Changed in v9: state is taken from the object.
         '''
         # two periods are possible; if residuals are the same
         # for both exp and cmd, only one is calculated

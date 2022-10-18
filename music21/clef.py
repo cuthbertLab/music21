@@ -65,8 +65,8 @@ class Clef(base.Music21Object):
     >>> tc.lowestLine
     31
 
-    Equality
-    --------
+    **Equality**
+
     Two Clefs are equal if their class is the same, their sign is the same,
     their line is the same and their octaveChange is the same.
 
@@ -337,7 +337,7 @@ class PercussionClef(Clef):
     >>> pc.lowestLine == clef.TrebleClef().lowestLine
     True
 
-    Changed in v7.3 -- setting octaveChange no longer affects lowestLine
+    * Changed in v7.3: setting octaveChange no longer affects lowestLine
     '''
     _DOC_ATTR: dict[str, str] = {}
 

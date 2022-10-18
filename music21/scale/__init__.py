@@ -717,7 +717,7 @@ class AbstractDiatonicScale(AbstractScale):
         music21.scale.ScaleException: Cannot create a
             scale of the following mode: 'blues-like'
 
-        Changed in v.6 -- case-insensitive modes
+        * Changed in v6: case-insensitive modes
         '''
         # reference: http://cnx.org/content/m11633/latest/
         # most diatonic scales will start with this collection
