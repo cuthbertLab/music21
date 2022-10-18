@@ -27,7 +27,7 @@ available after importing `music21`.
 <class 'music21.base.Music21Object'>
 
 >>> music21.VERSION_STR
-'9.0.0a5'
+'9.0.0a6'
 
 Alternatively, after doing a complete import, these classes are available
 under the module "base":
@@ -671,7 +671,7 @@ class Music21Object(prebase.ProtoM21Object):
 
     def __setstate__(self, state: dict[str, t.Any]):
         # defining self.__dict__ upon initialization currently breaks everything
-        self.__dict__ = state  # pylint: disable=attribute-defined-outside-init
+        object.__setattr__(self, '__dict__', state)  # pylint: disable=attribute-defined-outside-init
 
     def _reprInternal(self) -> str:
         '''
@@ -979,7 +979,8 @@ class Music21Object(prebase.ProtoM21Object):
         >>> n3.getOffsetBySite(s3, returnSpecial=True)
         0.0
 
-        * Changed in v7: stringReturns renamed to returnSpecial.  Returns an OffsetSpecial Enum.
+        * Changed in v7: stringReturns renamed to returnSpecial.
+          Returns an OffsetSpecial Enum.
         '''
         if site is None:
             return self._naiveOffset
@@ -4028,7 +4029,7 @@ class Music21Object(prebase.ProtoM21Object):
 
 
 # ------------------------------------------------------------------------------
-
+_m21ObjDefaultDefinedKeys: tuple[str, ...] = tuple(dir(Music21Object()))
 
 class ElementWrapper(Music21Object):
     '''
@@ -4093,8 +4094,40 @@ class ElementWrapper(Music21Object):
     <music21.base.ElementWrapper id=0_wrapper offset=0.0 obj='<...Wave_read object...'>
     <music21.base.ElementWrapper id=1_wrapper offset=1.0 obj='<...Wave_read object...'>
     <music21.base.ElementWrapper offset=2.0 obj='<...Wave_read object...>'>
+
+    Equality
+    --------
+    Two ElementWrappers are equal if they would be equal as Music21Objects and they
+    wrap objects that are equal.
+
+    >>> list1 = ['a', 'b', 'c']
+    >>> a = base.ElementWrapper(list1)
+    >>> a.offset = 3.0
+
+    >>> list2 = ['a', 'b', 'c']
+    >>> b = base.ElementWrapper(list2)
+    >>> b.offset = 3.0
+    >>> a == b
+    True
+    >>> a is not b
+    True
+
+    Offset does not need to be equal for equality:
+
+    >>> b.offset = 4.0
+    >>> a == b
+    True
+
+    But elements must compare equal
+
+    >>> list2.append('d')
+    >>> a == b
+    False
+
+    * Changed in v9: completely different approach to equality, unified w/
+      the rest of music21.
     '''
-    obj: t.Any = None
+    equalityAttributes = ('obj',)
 
     _DOC_ORDER = ['obj']
     _DOC_ATTR: dict[str, str] = {
@@ -4104,8 +4137,10 @@ class ElementWrapper(Music21Object):
     }
 
     def __init__(self, obj: t.Any = None, **keywords):
+        # note that because of how __setattr__ is overridden and needs
+        # to have a self.obj, we set this here.
+        self.obj: t.Any = obj  # object stored here
         super().__init__(**keywords)
-        self.obj = obj  # object stored here
 
     # -------------------------------------------------------------------------
 
@@ -4121,42 +4156,10 @@ class ElementWrapper(Music21Object):
         else:
             return f'offset={self.offset} obj={shortObj!r}'
 
-    def __eq__(self, other):
-        '''
-        Test ElementWrapper equality
-
-        >>> import music21
-        >>> n = note.Note('C#')
-        >>> a = music21.ElementWrapper(n)
-        >>> a.offset = 3.0
-        >>> b = music21.ElementWrapper(n)
-        >>> b.offset = 3.0
-        >>> a == b
-        True
-        >>> a is not b
-        True
-        >>> c = music21.ElementWrapper(n)
-        >>> c.offset = 2.0
-        >>> c.offset
-        2.0
-        >>> a == c
-        False
-        '''
-        # TODO: call super on eq.
-        for other_prop in ('obj', 'offset', 'priority', 'groups', 'activeSite', 'duration'):
-            if not hasattr(other, other_prop):
-                return False
-
-        if (self.obj == other.obj
-                and self.offset == other.offset
-                and self.priority == other.priority
-                and self.groups == other.groups
-                and self.duration == self.duration):
-            return True
-        else:
-            return False
-
     def __setattr__(self, name: str, value: t.Any) -> None:
+        if name == 'obj':
+            object.__setattr__(self, 'obj', value)
+            return
         # environLocal.printDebug(['calling __setattr__ of ElementWrapper', name, value])
 
         # if in the ElementWrapper already, set that first
@@ -4165,12 +4168,12 @@ class ElementWrapper(Music21Object):
 
         # if not, change the attribute in the stored object
         storedObj = object.__getattribute__(self, 'obj')
-        if (name not in ('offset', '_offset', '_activeSite')
+        if (name not in _m21ObjDefaultDefinedKeys
                 and storedObj is not None
                 and hasattr(storedObj, name)):
             setattr(storedObj, name, value)
-        # unless neither has the attribute, in which case add it to the ElementWrapper
         else:
+            # unless neither has the attribute, in which case add it to the ElementWrapper
             object.__setattr__(self, name, value)
 
     def __getattr__(self, name: str) -> t.Any:
