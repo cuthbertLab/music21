@@ -329,7 +329,6 @@ class MeterTerminal(prebase.ProtoM21Object, MeterCoreMixin, common.FrozenObject)
 
     # INITIALIZER #
     def __init__(self,
-                 slashNotation: str | None = None,
                  *,
                  weight: int = 1,
                  numerator: int = 0,
@@ -345,13 +344,6 @@ class MeterTerminal(prebase.ProtoM21Object, MeterCoreMixin, common.FrozenObject)
         self.weight = weight
         self._overriddenDuration = overriddenDuration
 
-        if slashNotation is not None:
-            # assign directly to values, not properties, to avoid
-            # calling _ratioChanged more than necessary
-            values = tools.slashToTuple(slashNotation)  # raise MeterException early if problem.
-            self._numerator = values.numerator
-            self._denominator = values.denominator
-
     # SPECIAL METHODS #
 
     def __eq__(self, other):
@@ -364,6 +356,9 @@ class MeterTerminal(prebase.ProtoM21Object, MeterCoreMixin, common.FrozenObject)
             and self.weight == other.weight
             and self._overriddenDuration == other._overriddenDuration
         )
+
+    def __hash__(self):
+        return hash((self.numerator, self.denominator, self.weight, id(self._overriddenDuration)))
 
     def __deepcopy__(self: _T, memo=None) -> _T:
         return self
@@ -406,6 +401,27 @@ class MeterTerminal(prebase.ProtoM21Object, MeterCoreMixin, common.FrozenObject)
         Return how many levels deep this part is -- the depth of a terminal is always 1
         '''
         return 1
+
+
+_meterTerminalCache: dict[tuple[int, int, int, duration.Duration | None], MeterTerminal] = {}
+
+def getMeterTerminal(
+    numerator: int,
+    denominator: int,
+    weight: int = 1,
+    overriddenDuration: duration.Duration | None = None
+) -> MeterTerminal:
+    key = (numerator, denominator, weight, overriddenDuration)
+    if key in _meterTerminalCache:
+        return _meterTerminalCache[key]
+    else:
+        mt = MeterTerminal(numerator=numerator,
+                           denominator=denominator,
+                           weight=weight,
+                           overriddenDuration=overriddenDuration)
+        _meterTerminalCache[key] = mt
+        return mt
+
 
 # -----------------------------------------------------------------------------
 class MeterSequence(MeterCoreMixin, prebase.ProtoM21Object):
@@ -1125,7 +1141,6 @@ class MeterSequence(MeterCoreMixin, prebase.ProtoM21Object):
         >>> ms.partitionStr
         '13-uple'
 
-
         Single partition:
 
         >>> ms = meter.MeterSequence('3/4', 1)
@@ -1149,6 +1164,7 @@ class MeterSequence(MeterCoreMixin, prebase.ProtoM21Object):
     def load(self,
              value: str | MeterTerminal | Iterable[str | MeterTerminal],
              partitionRequest=None,
+             *,
              autoWeight=False,
              targetWeight=None):
         '''
@@ -1160,7 +1176,6 @@ class MeterSequence(MeterCoreMixin, prebase.ProtoM21Object):
         targetWeight, if given, will be used instead of self.weight
 
         loading is a destructive operation.
-
 
         >>> a = meter.MeterSequence()
         >>> a.load('4/4', 4)
