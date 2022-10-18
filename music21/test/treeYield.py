@@ -15,6 +15,9 @@ from __future__ import annotations
 
 import weakref
 
+import music21.exceptions21
+
+
 class TreeYielder:  # pragma: no cover
     def __init__(self, yieldValue=None):
         '''
@@ -169,13 +172,29 @@ def testMIDIParse():  # pragma: no cover
 
 
 def find_all_exception_classes_in_m21():  # pragma: no cover
+    return find_all_classes_by_criteria(
+        lambda mm: issubclass(mm, music21.exceptions21.Music21Exception)
+    )
+
+def find_all_non_hashable_m21objects():  # pragma: no cover
+    def is_unhashable(mm):
+        if not issubclass(mm, music21.base.Music21Object):
+            return False
+        try:
+            {mm()}
+        except TypeError as te:
+            return 'unhashable' in str(te)
+        return False
+    return find_all_classes_by_criteria(is_unhashable)
+
+def find_all_classes_by_criteria(criteria):  # pragma: no cover
     from collections import deque
     import music21
     import types
 
     d = deque([music21])
     seen = set()
-    tous = set()
+    matches = set()
     while d:
         m = d.popleft()
         if m in seen:
@@ -187,10 +206,10 @@ def find_all_exception_classes_in_m21():  # pragma: no cover
                     and mm not in seen
                     and 'music21' in getattr(mm, '__file__', '')):
                 d.append(mm)
-            elif isinstance(mm, type) and issubclass(mm, music21.exceptions21.Music21Exception):
-                tous.add(mm)
+            elif isinstance(mm, type) and mm not in seen and criteria(mm):
+                matches.add(mm)
         seen.add(m)
-    return tous
+    return matches
 
 
 if __name__ == '__main__':
