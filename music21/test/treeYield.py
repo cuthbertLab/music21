@@ -15,8 +15,7 @@ from __future__ import annotations
 
 import weakref
 
-import music21.exceptions21
-
+import music21
 
 class TreeYielder:  # pragma: no cover
     def __init__(self, yieldValue=None):
@@ -196,7 +195,7 @@ def find_all_non_default_instantiation_m21objects():  # pragma: no cover
             return False
         try:
             mm()
-        except TypeError as te:
+        except TypeError:
             return True
         return False
     return find_all_classes_by_criteria(needs_attributes)
@@ -204,7 +203,6 @@ def find_all_non_default_instantiation_m21objects():  # pragma: no cover
 
 def find_all_classes_by_criteria(criteria):  # pragma: no cover
     from collections import deque
-    import music21
     import types
 
     d = deque([music21])

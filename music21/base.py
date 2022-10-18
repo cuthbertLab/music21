@@ -27,7 +27,7 @@ available after importing `music21`.
 <class 'music21.base.Music21Object'>
 
 >>> music21.VERSION_STR
-'9.0.0a5'
+'9.0.0a6'
 
 Alternatively, after doing a complete import, these classes are available
 under the module "base":
@@ -671,7 +671,7 @@ class Music21Object(prebase.ProtoM21Object):
 
     def __setstate__(self, state: dict[str, t.Any]):
         # defining self.__dict__ upon initialization currently breaks everything
-        self.__dict__ = state  # pylint: disable=attribute-defined-outside-init
+        object.__setattr__(self, '__dict__', state)  # pylint: disable=attribute-defined-outside-init
 
     def _reprInternal(self) -> str:
         '''
@@ -4029,7 +4029,7 @@ class Music21Object(prebase.ProtoM21Object):
 
 
 # ------------------------------------------------------------------------------
-_m21ObjDefaultDefinedKeys: tuple[str, ...] = tuple(Music21Object().__dict__)
+_m21ObjDefaultDefinedKeys: tuple[str, ...] = tuple(dir(Music21Object()))
 
 class ElementWrapper(Music21Object):
     '''
@@ -4101,11 +4101,11 @@ class ElementWrapper(Music21Object):
     wrap objects that are equal.
 
     >>> list1 = ['a', 'b', 'c']
-    >>> a = base.ElementWrapper(lst1)
+    >>> a = base.ElementWrapper(list1)
     >>> a.offset = 3.0
 
     >>> list2 = ['a', 'b', 'c']
-    >>> b = base.ElementWrapper(lst2)
+    >>> b = base.ElementWrapper(list2)
     >>> b.offset = 3.0
     >>> a == b
     True
@@ -4172,8 +4172,8 @@ class ElementWrapper(Music21Object):
                 and storedObj is not None
                 and hasattr(storedObj, name)):
             setattr(storedObj, name, value)
-        # unless neither has the attribute, in which case add it to the ElementWrapper
         else:
+            # unless neither has the attribute, in which case add it to the ElementWrapper
             object.__setattr__(self, name, value)
 
     def __getattr__(self, name: str) -> t.Any:
