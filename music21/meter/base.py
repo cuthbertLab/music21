@@ -1057,17 +1057,17 @@ class TimeSignature(TimeSignatureBase):
         return f'{self.beatDivisionCountName} {self.beatCountName}'
 
     @property
-    def isSummedNumerator(self) -> bool:
+    def denominatorIsShared(self) -> bool:
         '''
         Returns or sets whether the numerator is represented as a series of sums.
 
         * Changed in v9: was called `summedNumerator` before which was confusing.
         '''
-        return self.displaySequence.isSummedNumerator
+        return self.displaySequence.denominatorIsShared
 
-    @isSummedNumerator.setter
-    def isSummedNumerator(self, value: bool):
-        self.displaySequence.isSummedNumerator = value
+    @denominatorIsShared.setter
+    def denominatorIsShared(self, value: bool):
+        self.displaySequence.denominatorIsShared = value
 
     # --------------------------------------------------------------------------
     # private methods -- most to be put into the various sequences.
@@ -1132,7 +1132,7 @@ class TimeSignature(TimeSignatureBase):
         This method sets default beam partitions when partitionRequest is None.
         '''
         # beam short measures of 8ths, 16ths, or 32nds all together
-        if self.beamSequence.isSummedNumerator:
+        if self.beamSequence.denominatorIsShared:
             pass  # do not mess with a numerator such as (3+2)/8
         elif self.denominator == 8 and self.numerator in (1, 2, 3):
             pass  # doing nothing will beam all together

@@ -104,6 +104,88 @@ def slashCompoundToFraction(value: str) -> NumDenomTuple:
     return tuple(post)
 
 
+def separateSharedDenominators(valueSrc: str) -> list[tuple[tuple[int, ...], int, MeterDivision]]:
+    '''
+    Returns a tuple of tuples from a string where each element represents
+    a set of meters that share an expressed denominator.  The first sub-element is a tuple
+    of all the numerators sharing a denominator.  Normally there is one
+    element in it.  The second sub-element is that shared denominator.
+
+    For instance, '4/4' would be [((4,), 4)].
+
+    '3/8+5/16' would be [((3,), 8), ((5,), 16)]
+
+    However, '2+3+2/8' would be [((2, 3, 2), 8)] and '2+3+2/8+3/16' would be:
+    [((2, 3, 2), 8), ((3,), 16)]
+
+    However, there is a third part to each inner tuple, not shown above which
+    specifies if the compound meter division is slow, fast, or unspecified.
+
+    Raises ValueError if no denominator can be found.
+
+    >>> ssd = meter.tools.separateSharedDenominators
+    >>> ssd('4/4')
+    [((4,), 4, <MeterDivision.NONE>)]
+
+    >>> ssd('3/8 + 5/16')
+    [((3,), 8, <MeterDivision.NONE>), ((5,), 16, <MeterDivision.NONE>)]
+
+    >>> ssd('2+3+2/8')
+    [((2, 3, 2), 8, <MeterDivision.NONE>)]
+
+    Some denominators are shared and some are not:
+
+    >>> ssd('2+3+2/8+3/16')
+    [((2, 3, 2), 8, <MeterDivision.NONE>), ((3,), 16, <MeterDivision.NONE>)]
+
+    This is a pretty absurd meter:
+
+    >>> ssd('slow 6/8 + fast 9/8')
+    [((6,), 8, <MeterDivision.SLOW>), ((9,), 8, <MeterDivision.FAST>)]
+
+    Presumably a '/8' was left off below:
+
+    >>> ssd('3/4+2+3')
+    Traceback (most recent call last):
+    ValueError: cannot match denominator to numerator in '3/4+2+3'
+
+    This routine replaces 'slashToMixedFraction' from before; it presumes that
+    in an expression like 2+3+2/8 + 3/4 that 2+3+2/8 represents one entity and
+    that 3/4 represents another, and that 2/8, 3/8, 2/8 are sub-elements withing
+    that first entity rather than being at the same level of division as 3/4.
+    This was a backwards incompatible change in v9--previously all 4 components
+    would have been considered at the same level--but presumably it will not
+    affect many rhythmic analyses.
+    '''
+    parts: list[str] = valueSrc.split('+')
+    out = []
+    seeking_denominator: list[int] = []
+    for part in parts:
+        part = part.strip()
+        if '/' in part:
+            # normal case: a full signature.
+            try:
+                tup = slashToTuple(part)
+            except MeterException as me:
+                raise TimeSignatureException(
+                    f'Cannot create time signature from "{valueSrc}"') from me
+            if seeking_denominator:
+                # others were waiting to find a denominator
+                seeking_denominator.append(tup.numerator)
+                current = (tuple(seeking_denominator), tup.denominator, tup.division)
+                out.append(current)
+                seeking_denominator = []
+            else:  # normal case.
+                out.append(((tup.numerator,), tup.denominator, tup.division))
+        else:  # its just a numerator
+            seeking_denominator.append(int(part))
+
+    if seeking_denominator:
+        raise ValueError(f'cannot match denominator to numerator in {valueSrc!r}')
+
+    return out
+
+
 @lru_cache(512)
 def slashMixedToFraction(valueSrc: str) -> tuple[NumDenomTuple, bool]:
     '''
@@ -144,9 +226,10 @@ def slashMixedToFraction(valueSrc: str) -> tuple[NumDenomTuple, bool]:
 
     * Changed in v7: new location and returns a tuple as first value.
     '''
+    # REFACTOR: TODO: record which parts have a shared denominator and which don't.
     pre: list[NumDenom | tuple[int, None]] = []
     post: list[NumDenom] = []
-    isSummedNumerator = False
+    denominatorIsShared = False
     value = valueSrc.strip()  # rem whitespace
     value = value.split('+')
     for part in value:
@@ -178,7 +261,7 @@ def slashMixedToFraction(valueSrc: str) -> tuple[NumDenomTuple, bool]:
                 assert isinstance(intNum, int) and isinstance(intDenom, int)
             post.append((intNum, intDenom))
         else:  # search ahead for next defined denominator
-            isSummedNumerator = True
+            denominatorIsShared = True
             match: int | None = None
             for j in range(i, len(pre)):  # this O(n^2) operation is easily simplified to O(n)
                 if pre[j][1] is not None:
@@ -190,7 +273,7 @@ def slashMixedToFraction(valueSrc: str) -> tuple[NumDenomTuple, bool]:
             preBothAreInts = (pre[i][0], match)
             post.append(preBothAreInts)
 
-    return tuple(post), isSummedNumerator
+    return tuple(post), denominatorIsShared
 
 
 @lru_cache(512)

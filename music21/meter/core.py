@@ -77,11 +77,10 @@ class MeterCoreMixin:
         if TYPE_CHECKING:
             assert isinstance(self, (MeterTerminal, MeterSequence))
         # elevate to meter sequence
-        ms = MeterSequence()
+        ms = MeterSequence(self, countRequest, autoWeight=True, targetWeight=self.weight)
         # cannot set the weight of this MeterSequence w/o having offsets
         # pass this MeterTerminal as an argument
         # when subdividing, use autoWeight
-        ms.load(self, countRequest, autoWeight=True, targetWeight=self.weight)
         return ms
 
     def subdivideByList(self, numeratorList):
@@ -386,7 +385,7 @@ class MeterSequence(MeterCoreMixin, prebase.ProtoM21Object):
 
     * Changed in v9:
       - remove unused overriddenDuration.
-      - `summedNumerator` renamed to `isSummedNumerator`.
+      - `summedNumerator` renamed to `denominatorIsShared`.
     '''
 
     # CLASS VARIABLES #
@@ -394,22 +393,27 @@ class MeterSequence(MeterCoreMixin, prebase.ProtoM21Object):
     __slots__ = (
         'numerator',
         'denominator',
-        '_levelListCache',
+        '_cacheLevelList',
         '_partition',
         'parenthesis',
-        'isSummedNumerator',
+        'denominatorIsShared',
     )
 
     # INITIALIZER #
 
     def __init__(self,
-                 value=None,
+                 value: str | MeterTerminal | MeterSequence
+                        | Iterable[str | MeterTerminal | MeterSequence]
+                        | None = None,
                  partitionRequest=None,
                  *,
                  numerator: int | None = None,
                  denominator: int | None = None,
+                 autoWeight: bool = False,
+                 targetWeight: int | float | None = None,
+                 parenthesis: bool = False,
                  ):
-        self._levelListCache = {}
+        self._cacheLevelList = {}
         self.numerator: int | None = numerator
         self.denominator: int | None = denominator
         self._partition = []  # a list of MeterTerminals or MeterSequences
@@ -420,14 +424,14 @@ class MeterSequence(MeterCoreMixin, prebase.ProtoM21Object):
         # del self._weight -- no -- screws up pickling -- cannot del a slotted object
 
         # Bool stores whether this meter was provided as a summed numerator
-        self.isSummedNumerator = False
+        self.denominatorIsShared = False
 
         # An optional parameter used only in meter display sequences.
         # Needed in cases where a meter component is parenthetical
-        self.parenthesis = False
+        self.parenthesis = parenthesis
 
         if value is not None:
-            self.load(value, partitionRequest)
+            self.load(value, partitionRequest, autoWeight=autoWeight, targetWeight=targetWeight)
 
     # SPECIAL METHODS #
 
@@ -438,7 +442,7 @@ class MeterSequence(MeterCoreMixin, prebase.ProtoM21Object):
         Defining a custom __deepcopy__ here is a performance boost,
         particularly in not copying _duration and other benefits.
 
-        Notably, self._levelListCache is not copied,
+        Notably, self._cacheLevelList is not copied,
         which may not be needed in the copy and may be large.
 
         >>> from copy import deepcopy
@@ -454,7 +458,7 @@ class MeterSequence(MeterCoreMixin, prebase.ProtoM21Object):
         new.denominator = self.denominator
         # noinspection PyArgumentList
         new._partition = copy.deepcopy(self._partition, memo)
-        new.isSummedNumerator = self.isSummedNumerator
+        new.denominatorIsShared = self.denominatorIsShared
         new.parenthesis = self.parenthesis
 
         return new
@@ -509,7 +513,7 @@ class MeterSequence(MeterCoreMixin, prebase.ProtoM21Object):
             raise MeterException(f'cannot insert {value} into space of {self[index]}')
 
         # clear cache
-        self._levelListCache = {}
+        self._cacheLevelList = {}
 
     def __iter__(self):
         '''
@@ -577,7 +581,7 @@ class MeterSequence(MeterCoreMixin, prebase.ProtoM21Object):
         '''
         self._partition = []
         # clear cache
-        self._levelListCache = {}
+        self._cacheLevelList = {}
 
     def addTerminal(self, value: MeterTerminal | MeterSequence | NumDenom):
         '''
@@ -597,7 +601,7 @@ class MeterSequence(MeterCoreMixin, prebase.ProtoM21Object):
                                   denominator=value[1])
         self._partition.append(mt)
         # clear cache
-        self._levelListCache = {}
+        self._cacheLevelList = {}
 
     def getPartitionOptions(self) -> tools.MeterOptions:
         '''
@@ -724,7 +728,7 @@ class MeterSequence(MeterCoreMixin, prebase.ProtoM21Object):
         self.weight = targetWeight
 
         # clear cache
-        self._levelListCache = {}
+        self._cacheLevelList = {}
 
     def partitionByList(self, numeratorList: Iterable[int | str]):
         '''
@@ -807,7 +811,7 @@ class MeterSequence(MeterCoreMixin, prebase.ProtoM21Object):
         self.weight = targetWeight
 
         # clear cache
-        self._levelListCache = {}
+        self._cacheLevelList = {}
 
     def partitionByOtherMeterSequence(self, other: MeterSequence):
         '''
@@ -834,7 +838,7 @@ class MeterSequence(MeterCoreMixin, prebase.ProtoM21Object):
             self.addTerminal(copy.deepcopy(mt))  # REFACTOR: do not deepcopy.
         self.weight = targetWeight
         # clear cache
-        self._levelListCache = {}
+        self._cacheLevelList = {}
 
     def partition(
         self,
@@ -895,7 +899,7 @@ class MeterSequence(MeterCoreMixin, prebase.ProtoM21Object):
         else:
             raise MeterException(f'cannot process partition argument {value}')
 
-    def subdividePartitionsEqual(self, divisions=None):
+    def subdividePartitionsEqual(self, divisions: int | None = None):
         '''
         Subdivide all partitions by equally-spaced divisions,
         given a divisions value. Manipulates this MeterSequence in place.
@@ -939,9 +943,13 @@ class MeterSequence(MeterCoreMixin, prebase.ProtoM21Object):
             self[i] = self[i].subdivide(divisionsLocal)
 
         # clear cache
-        self._levelListCache = {}
+        self._cacheLevelList = {}
 
-    def _subdivideNested(self, processObjList, divisions):
+    def _subdivideNested(
+        self,
+        processObjList: Iterable[MeterSequence | MeterTerminal],
+        divisions: int,
+    ):
         # noinspection PyShadowingNames
         '''
         Recursive nested call routine. Return a reference to the newly created level.
@@ -953,6 +961,9 @@ class MeterSequence(MeterCoreMixin, prebase.ProtoM21Object):
         >>> post = ms._subdivideNested([ms], 2)
         >>> ms
         <music21.meter.core.MeterSequence {{1/8+1/8}+{1/8+1/8}}>
+        >>> post
+        [<music21.meter.core.MeterSequence {1/8+1/8}>, <music21.meter.core.MeterSequence {1/8+1/8}>]
+
         >>> post = ms._subdivideNested(post, 2)  # pass post here
         >>> ms
         <music21.meter.core.MeterSequence {{{1/16+1/16}+{1/16+1/16}}+{{1/16+1/16}+{1/16+1/16}}}>
@@ -965,7 +976,7 @@ class MeterSequence(MeterCoreMixin, prebase.ProtoM21Object):
             for sub in obj:
                 post.append(sub)
         # clear cache
-        self._levelListCache = {}
+        self._cacheLevelList = {}
         return post
 
     def subdivideNestedHierarchy(
@@ -1074,7 +1085,7 @@ class MeterSequence(MeterCoreMixin, prebase.ProtoM21Object):
 
         # clear cache; done in self._subdivideNested and possibly not
         # needed here
-        self._levelListCache = {}
+        self._cacheLevelList = {}
 
         # environLocal.printDebug(['subdivideNestedHierarchy(): post nested processing:',  self])
 
@@ -1135,8 +1146,8 @@ class MeterSequence(MeterCoreMixin, prebase.ProtoM21Object):
                     Iterable[str | MeterTerminal | MeterSequence],
              partitionRequest=None,
              *,
-             autoWeight=False,
-             targetWeight=None):
+             autoWeight: bool = False,
+             targetWeight: None | int | float = None):
         '''
         This method is called when a MeterSequence is created, or if a MeterSequence is re-set.
 
@@ -1175,7 +1186,7 @@ class MeterSequence(MeterCoreMixin, prebase.ProtoM21Object):
         self._clearPartition()
 
         if isinstance(value, str):
-            ratioList, self.isSummedNumerator = tools.slashMixedToFraction(value)
+            ratioList, self.denominatorIsShared = tools.slashMixedToFraction(value)
             for n, d in ratioList:
                 self.addTerminal(getMeterTerminal(n, d))
             self.updateRatio()
@@ -1194,7 +1205,7 @@ class MeterSequence(MeterCoreMixin, prebase.ProtoM21Object):
             #    'created MeterSequence from MeterTerminal; old weight, new weight',
             #    value.weight, self.weight])
 
-        elif common.isIterable(value):  # a list of Terminals or Sequence es
+        elif common.isIterable(value):  # a list of Terminals or Sequences
             for obj in value:
                 # environLocal.printDebug('creating MeterSequence with %s' % obj)
                 self.addTerminal(obj)
@@ -1207,7 +1218,7 @@ class MeterSequence(MeterCoreMixin, prebase.ProtoM21Object):
             self.partition(partitionRequest)
 
         # clear cache
-        self._levelListCache = {}
+        self._cacheLevelList = {}
 
     def updateRatio(self):
         '''
@@ -1480,7 +1491,7 @@ class MeterSequence(MeterCoreMixin, prebase.ProtoM21Object):
         '''
         cacheKey = (levelCount, flat)
         try:  # check in cache
-            return self._levelListCache[cacheKey]
+            return self._cacheLevelList[cacheKey]
         except KeyError:
             pass
 
@@ -1508,7 +1519,7 @@ class MeterSequence(MeterCoreMixin, prebase.ProtoM21Object):
                     else:  # its not a terminal, its a meter sequence
                         mtList.append(el)
         # store in cache
-        self._levelListCache[cacheKey] = mtList
+        self._cacheLevelList[cacheKey] = mtList
         return mtList
 
     def getLevel(self, level: int, flat=True) -> MeterSequence:
@@ -1846,6 +1857,44 @@ class MeterSequence(MeterCoreMixin, prebase.ProtoM21Object):
                     score += 1
 
         return score
+
+def _stretchToMeterTerminalOrSequence(stretch: str) -> MeterTerminal | MeterSequence:
+    '''
+    Convert a stretch of non-braced text to a MeterSequence.
+
+    Because of shared denominators, the MeterSequence might itself contain MeterSequences
+    '''
+    shared = tools.separateSharedDenominators(stretch)
+    if len(shared) == 1 and len(shared[0]) == 1:
+        # dispose of most common case first: 4/4, etc.
+        tup = shared[0]
+        num = tup[0][0]
+        denom = tup[1]
+        # do something with MeterDivision.  slow 6/8 etc.
+        return getMeterTerminal(num, denom)
+
+    # combine compatible
+
+    # loadValue: list[MeterTerminal | MeterSequence] = []
+
+
+
+def _constructMeterPartition(value: str) -> list[MeterTerminal | MeterSequence]:
+    out: list[MeterTerminal | MeterSequence] = []
+    open_brackets = 0
+    transition_index = -1
+    for i, ch in enumerate(value):
+        if ch == '{':
+            if not open_brackets:
+                transition_index = i
+            open_brackets += 1
+        elif ch == '}':
+            open_brackets -= 1
+            if not open_brackets:
+                adjusted_
+
+    return out
+
 
 @lru_cache(1024)
 def constructMeterSequence(value: str, divisions: int) -> MeterSequence:

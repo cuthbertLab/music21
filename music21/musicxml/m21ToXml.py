@@ -6718,7 +6718,7 @@ class MeasureExporter(XMLExporterBase):
         #    case of not summed numerators.
         # always get a flat version to display any subdivisions created
         fList = tuple((mt.numerator, mt.denominator) for mt in ts.displaySequence.flatten())
-        if ts.isSummedNumerator:
+        if len(fList) > 1 and ts.denominatorIsShared:
             # this will try to reduce any common denominators into
             # a common group
             fList = meter.tools.fractionToSlashMixed(fList)

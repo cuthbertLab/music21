@@ -281,6 +281,9 @@ class FrozenObject(EqualSlottedObjectMixin):
     def _check_init(self, key=None) -> bool:
         if key == '__class__':
             return True
+        if '_cache' in key:
+            return True
+
         if not getattr(self, 'frozen', True):
             return True
 
