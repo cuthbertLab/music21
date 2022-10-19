@@ -1191,16 +1191,16 @@ class TimeSignature(TimeSignatureBase):
 
         '''
         # NOTE: this is a performance critical method
-        firstPartitionForm: MeterSequence | int | None
+        firstPartitionForm: MeterSequence | None
 
         # create a scratch MeterSequence for structure
         tsStr = f'{self.numerator}/{self.denominator}'
         if self.beatSequence.isUniformPartition():
             if len(self.beatSequence) > 1:
-                firstPartitionForm = len(self.beatSequence)
+                firstPartitionForm = self.beatSequence
             else:
                 firstPartitionForm = None
-            cacheKey = (tsStr, firstPartitionForm, depth)
+            cacheKey = (tsStr, len(firstPartitionForm), depth)
         else:  # derive from meter sequence
             firstPartitionForm = self.beatSequence
             cacheKey = _meterSequenceAccentArchetypesNoneCache  # cannot cache based on beat form

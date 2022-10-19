@@ -30,10 +30,11 @@ from music21 import common
 from music21 import duration
 from music21 import environment
 from music21.exceptions21 import MeterException
+
 from music21.meter import tools
 
-
 if t.TYPE_CHECKING:
+    from music21.meter.tools import NumDenom
     _T = t.TypeVar('_T')
 
 
@@ -458,7 +459,7 @@ class MeterSequence(MeterCoreMixin, prebase.ProtoM21Object):
 
         return new
 
-    def __getitem__(self, key):
+    def __getitem__(self, index):
         '''
         Get a MeterTerminal or MeterSequence from partitions
 
@@ -467,38 +468,14 @@ class MeterSequence(MeterCoreMixin, prebase.ProtoM21Object):
         1
         >>> a[99]
         Traceback (most recent call last):
-        IndexError: MeterSequence does not have level 99.
+        IndexError: MeterSequence does not have entry 99.
         '''
         try:
-            return self._partition[key]
+            return self._partition[index]
         except IndexError as ie:
-            raise IndexError(f'MeterSequence does not have level {key}.') from ie
+            raise IndexError(f'MeterSequence does not have entry {index}.') from ie
 
-    def __iter__(self):
-        '''
-        Support iteration of top level partitions
-
-        >>> a = meter.MeterSequence('4/4', 2)
-        >>> for x in a:
-        ...     print(repr(x))
-        <music21.meter.core.MeterTerminal 1/2>
-        <music21.meter.core.MeterTerminal 1/2>
-        '''
-        return iter(self._partition)
-
-    def __len__(self):
-        '''
-        Return the length of the partition list
-
-        >>> a = meter.MeterSequence('4/4', 4)
-        >>> a
-        <music21.meter.core.MeterSequence {1/4+1/4+1/4+1/4}>
-        >>> len(a)
-        4
-        '''
-        return len(self._partition)
-
-    def __setitem__(self, key, value):
+    def __setitem__(self, index, value):
         '''
         Insert items at index positions.
 
@@ -525,14 +502,38 @@ class MeterSequence(MeterCoreMixin, prebase.ProtoM21Object):
         if not isinstance(value, (MeterTerminal, MeterSequence)):
             raise MeterException('values in MeterSequences must be MeterTerminals or '
                                  + f'MeterSequences, not {value}')
-        sequence_to_replace = self[key]
+        sequence_to_replace = self[index]
         if value.ratioEqual(sequence_to_replace):
-            self._partition[key] = value
+            self._partition[index] = value
         else:
-            raise MeterException(f'cannot insert {value} into space of {self[key]}')
+            raise MeterException(f'cannot insert {value} into space of {self[index]}')
 
         # clear cache
         self._levelListCache = {}
+
+    def __iter__(self):
+        '''
+        Support iteration of top level partitions
+
+        >>> a = meter.MeterSequence('4/4', 2)
+        >>> for x in a:
+        ...     print(repr(x))
+        <music21.meter.core.MeterTerminal 1/2>
+        <music21.meter.core.MeterTerminal 1/2>
+        '''
+        return iter(self._partition)
+
+    def __len__(self):
+        '''
+        Return the length of the partition list
+
+        >>> a = meter.MeterSequence('4/4', 4)
+        >>> a
+        <music21.meter.core.MeterSequence {1/4+1/4+1/4+1/4}>
+        >>> len(a)
+        4
+        '''
+        return len(self._partition)
 
     def _reprInternal(self):
         return str(self)
@@ -578,7 +579,7 @@ class MeterSequence(MeterCoreMixin, prebase.ProtoM21Object):
         # clear cache
         self._levelListCache = {}
 
-    def addTerminal(self, value: MeterTerminal | MeterSequence | str):
+    def addTerminal(self, value: MeterTerminal | MeterSequence | NumDenom):
         '''
         Add an object to the partition list.
 
@@ -591,10 +592,9 @@ class MeterSequence(MeterCoreMixin, prebase.ProtoM21Object):
 
         if isinstance(value, (MeterTerminal, MeterSequence)):
             mt = value
-        else:  # assume it is a string
-            value_tuple = tools.slashToTuple(value)
-            mt = getMeterTerminal(numerator=value_tuple.numerator,
-                                  denominator=value_tuple.denominator)
+        else:  # assume it is a tuple of numerator and denominator
+            mt = getMeterTerminal(numerator=value[0],
+                                  denominator=value[1])
         self._partition.append(mt)
         # clear cache
         self._levelListCache = {}
@@ -609,22 +609,30 @@ class MeterSequence(MeterCoreMixin, prebase.ProtoM21Object):
         Works on anything that has a .numerator and .denominator.
 
         >>> meter.MeterSequence('3/4').getPartitionOptions()
-        (('1/4', '1/4', '1/4'),
-         ('1/8', '1/8', '1/8', '1/8', '1/8', '1/8'),
-         ('1/16', '1/16', '1/16', '1/16', '1/16', '1/16', '1/16',
-          '1/16', '1/16', '1/16', '1/16', '1/16'),
-         ('3/4',), ('6/8',), ('12/16',), ('24/32',), ('48/64',), ('96/128',))
+        (((1, 4), (1, 4), (1, 4)),
+         ((1, 8), (1, 8), (1, 8), (1, 8), (1, 8), (1, 8)),
+         ((1, 16), (1, 16), (1, 16), (1, 16), (1, 16), (1, 16),
+          (1, 16), (1, 16), (1, 16), (1, 16), (1, 16), (1, 16)),
+         ((3, 4),),
+         ((6, 8),),
+         ((12, 16),),
+         ((24, 32),),
+         ((48, 64),),
+         ((96, 128),))
 
         The additional 2 + 2 + 1 and 2 + 1 + 2 options for numerator 5 are at the end.
 
         >>> meter.MeterSequence('5/32').getPartitionOptions()
-        (('2/32', '3/32'),
-         ('3/32', '2/32'),
-         ('1/32', '1/32', '1/32', '1/32', '1/32'),
-         ('1/64', '1/64', '1/64', '1/64', '1/64',
-          '1/64', '1/64', '1/64', '1/64', '1/64'),
-         ('5/32',), ('10/64',), ('20/128',),
-         ('2/32', '2/32', '1/32'), ('2/32', '1/32', '2/32'))
+        (((2, 32), (3, 32)),
+         ((3, 32), (2, 32)),
+         ((1, 32), (1, 32), (1, 32), (1, 32), (1, 32)),
+         ((1, 64), (1, 64), (1, 64), (1, 64), (1, 64),
+          (1, 64), (1, 64), (1, 64), (1, 64), (1, 64)),
+         ((5, 32),),
+         ((10, 64),),
+         ((20, 128),),
+         ((2, 32), (2, 32), (1, 32)),
+         ((2, 32), (1, 32), (2, 32)))
         '''
         # all-string python dictionaries are optimized; use string key
         n = int(self.numerator)
@@ -752,13 +760,13 @@ class MeterSequence(MeterCoreMixin, prebase.ProtoM21Object):
         Traceback (most recent call last):
         music21.exceptions21.MeterException: Cannot set partition by ['3/4', '1/8', '5/8']
         '''
-        optMatch: MeterSequence | tuple[str, ...] | None = None
+        optMatch: MeterSequence | tuple[NumDenom, ...] | None = None
 
         # assume a list of terminal definitions
         if isinstance(numeratorList[0], str):
             test = MeterSequence()
             for mtStr in numeratorList:
-                test.addTerminal(mtStr)
+                test.addTerminal(tools.slashToTuple(mtStr)[:2])
             test.updateRatio()
             # if durations are equal, this can be used as a partition
             if self.duration.quarterLength == test.duration.quarterLength:
@@ -769,9 +777,9 @@ class MeterSequence(MeterCoreMixin, prebase.ProtoM21Object):
         elif sum(numeratorList) in [self.numerator * x for x in range(1, 9)]:
             for i in range(1, 9):
                 if sum(numeratorList) == self.numerator * i:
-                    optMatchList: list[str] = []
+                    optMatchList: list[NumDenom] = []
                     for n in numeratorList:
-                        optMatchList.append(f'{n}/{self.denominator * i}')
+                        optMatchList.append((n, self.denominator * i))
                     optMatch = tuple(optMatchList)
                     break
 
@@ -781,7 +789,7 @@ class MeterSequence(MeterCoreMixin, prebase.ProtoM21Object):
             optMatch = None
             for opt in opts:
                 # get numerators as numbers
-                nFound = [int(x.split('/')[0]) for x in opt]
+                nFound = [x[0] for x in opt]
                 if nFound == numeratorList:
                     optMatch = opt
                     break
@@ -960,8 +968,13 @@ class MeterSequence(MeterCoreMixin, prebase.ProtoM21Object):
         self._levelListCache = {}
         return post
 
-    def subdivideNestedHierarchy(self, depth, firstPartitionForm=None,
-                                 normalizeDenominators=True):
+    def subdivideNestedHierarchy(
+        self,
+        depth: int,
+        *,
+        firstPartitionForm: MeterSequence | None = None,
+        normalizeDenominators: bool = True
+    ):
         '''
         Create nested structure down to a specified depth;
         the first division is set to one; the second division
@@ -1217,15 +1230,26 @@ class MeterSequence(MeterCoreMixin, prebase.ProtoM21Object):
     # do not permit setting of numerator/denominator
 
     @property
-    def weight(self):
+    def weight(self) -> float:
         '''
         Get or set the weight for each object in this MeterSequence
 
         >>> a = meter.MeterSequence('3/4')
         >>> a.partition(3)
         >>> a.weight = 1
-        >>> a[0].weight
-        0.333...
+
+        Weights are always converted to floats.
+
+        >>> a.weight
+        1.0
+
+        By default the weight is divided among all contained sequences and terminals.
+
+        >>> [subObj.weight for subObj in a]
+        [0.333..., 0.333..., 0.333...]
+
+        The weight that is reported is the sum of all subobject weights.
+
         >>> b = meter.MeterTerminal(1, 4, weight=0.25)
         >>> c = meter.MeterTerminal(1, 4, weight=0.25)
         >>> d = meter.MeterSequence([b, c])
@@ -1242,39 +1266,39 @@ class MeterSequence(MeterCoreMixin, prebase.ProtoM21Object):
         return summation
 
     @weight.setter
-    def weight(self, value):
+    def weight(self, value: int | float | None):
         # environLocal.printDebug(['calling setWeight with value', value])
 
         if value is None:
-            pass  # do nothing
-        else:
-            if not common.isNum(value):
-                raise MeterException('weight values must be numbers')
-            try:
-                totalRatio = self.numerator / self.denominator
-            except TypeError:
-                raise MeterException(
-                    'Something wrong with the type of '
-                    + 'this numerator %s %s or this denominator %s %s' %
-                    (self.numerator, type(self.numerator),
+            return  # do nothing
+        if not isinstance(value, (int, float)):
+            raise MeterException('weight values must be numbers')
+
+        try:
+            totalRatio = self.numerator / self.denominator
+        except TypeError:
+            raise MeterException(
+                'Something wrong with the type of '
+                + 'this numerator %s %s or this denominator %s %s' %
+                (self.numerator, type(self.numerator),
                      self.denominator, type(self.denominator)))
 
-            new_partition = []
-            for mt in self._partition:
-                partRatio = mt.numerator / mt.denominator
-                new_weight = value * (partRatio / totalRatio)
-                if isinstance(mt, MeterTerminal):
-                    new_mt = getMeterTerminal(mt.numerator,
-                                              mt.denominator,
-                                              weight=new_weight)
-                    new_partition.append(new_mt)
-                else:
-                    # MeterSequence
-                    mt.weight = new_weight
-                    new_partition.append(mt)
-                # mt.weight = (partRatio/totalRatio) #* totalRatio
-                # environLocal.printDebug(['setting weight based on part, total, weight',
-                #    partRatio, totalRatio, mt.weight])
+        new_partition = []
+        for mt in self._partition:
+            partRatio = mt.numerator / mt.denominator
+            new_weight = value * (partRatio / totalRatio)
+            if isinstance(mt, MeterTerminal):
+                new_mt = getMeterTerminal(mt.numerator,
+                                          mt.denominator,
+                                          weight=new_weight)
+                new_partition.append(new_mt)
+            else:
+                # MeterSequence
+                mt.weight = new_weight
+                new_partition.append(mt)
+            # mt.weight = (partRatio/totalRatio) #* totalRatio
+            # environLocal.printDebug(['setting weight based on part, total, weight',
+            #    partRatio, totalRatio, mt.weight])
             self._partition = new_partition
 
     def _getFlatList(self):
@@ -1286,12 +1310,21 @@ class MeterSequence(MeterCoreMixin, prebase.ProtoM21Object):
         are generally immutable and thus it does not make sense
         to concatenate them.
 
-
         >>> a = meter.MeterSequence('3/4')
+        >>> a
+        <music21.meter.core.MeterSequence {3/4}>
+
         >>> a.partition(3)
+        >>> a
+        <music21.meter.core.MeterSequence {1/4+1/4+1/4}>
+
         >>> b = a._getFlatList()
         >>> len(b)
         3
+        >>> b
+        [<music21.meter.core.MeterTerminal 1/4>,
+         <music21.meter.core.MeterTerminal 1/4>,
+         <music21.meter.core.MeterTerminal 1/4>]
 
         >>> a[1] = a[1].subdivide(4)
         >>> a
@@ -1301,6 +1334,13 @@ class MeterSequence(MeterCoreMixin, prebase.ProtoM21Object):
         >>> b = a._getFlatList()
         >>> len(b)
         6
+        >>> b
+        [<music21.meter.core.MeterTerminal 1/4>,
+         <music21.meter.core.MeterTerminal 1/16>,
+         <music21.meter.core.MeterTerminal 1/16>,
+         <music21.meter.core.MeterTerminal 1/16>,
+         <music21.meter.core.MeterTerminal 1/16>,
+         <music21.meter.core.MeterTerminal 1/4>]
 
         >>> a[1][2] = a[1][2].subdivide(4)
         >>> a
@@ -1345,19 +1385,7 @@ class MeterSequence(MeterCoreMixin, prebase.ProtoM21Object):
         >>> len(b)
         9
         '''
-        post = MeterSequence()
-        post.load(self._getFlatList())
-        return post
-
-    @property
-    def flatWeight(self):
-        '''
-        Return a list of flat weight values
-        '''
-        post = []
-        for mt in self._getFlatList():
-            post.append(mt.weight)
-        return post
+        return MeterSequence(self._getFlatList())
 
     @property
     def depth(self):
