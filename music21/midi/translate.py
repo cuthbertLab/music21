@@ -301,7 +301,7 @@ def _constructOrUpdateNotRestSubclass(
     is constructed instead. Raises TypeError if an incompatible class is provided
     for returnClass.
 
-    Changed in v8 -- no inputM21
+    * Changed in v8: no inputM21
     '''
     if not issubclass(returnClass, note.NotRest):
         raise TypeError(f'Expected subclass of note.NotRest; got {returnClass}')
@@ -385,9 +385,9 @@ def midiEventsToNote(
     >>> unp.storedInstrument
     <music21.instrument.UnpitchedPercussion 'Percussion'>
 
-    Changed in v7.3 -- Returns None if `inputM21` is provided. Returns a
+    * Changed in v7.3: Returns None if `inputM21` is provided. Returns a
         :class:`~music21.note.Unpitched` instance if the event is on Channel 10.
-    Changed in v8 -- `inputM21` is no longer supported.
+    * Changed in v8: `inputM21` is no longer supported.
         The only supported usage now is two tuples.
     '''
     tOn, eOn = eventTuple[0]
@@ -469,8 +469,8 @@ def noteToMidiEvents(
     [<music21.midi.MidiEvent NOTE_ON, track=None, channel=9, pitch=61, velocity=90>,
      <music21.midi.MidiEvent NOTE_OFF, track=None, channel=9, pitch=61, velocity=0>]
 
-    Changed in v7 -- made keyword-only.
-    Changed in v8 -- added support for :class:`~music21.note.Unpitched`
+    * Changed in v7: made keyword-only.
+    * Changed in v8: added support for :class:`~music21.note.Unpitched`
     '''
     from music21 import midi as midiModule
 
@@ -602,10 +602,10 @@ def midiEventsToChord(
     ...                                   ((dt2.time, me2), (dt4.time, me4))])
     <music21.percussion.PercussionChord [Tom-Tom Hi-Hat Cymbal]>
 
-    Changed in v7 -- Uses the last DeltaTime in the list to get the end time.
-    Changed in v7.3 -- Returns a :class:`~music21.percussion.PercussionChord` if
-    any event is on channel 10.
-    Changed in v8 -- inputM21 is no longer supported.  Flat list format is removed.
+    * Changed in v7: Uses the last DeltaTime in the list to get the end time.
+    * Changed in v7.3: Returns a :class:`~music21.percussion.PercussionChord` if
+      any event is on channel 10.
+    * Changed in v8: inputM21 is no longer supported.  Flat list format is removed.
     '''
     tOn: int = 0  # ticks
     tOff: int = 0  # ticks
@@ -692,8 +692,8 @@ def chordToMidiEvents(
      <music21.midi.DeltaTime (empty) track=None, channel=None>,
      <music21.midi.MidiEvent NOTE_OFF, track=None, channel=1, pitch=83, velocity=0>]
 
-    Changed in v7 -- made keyword-only.
-    Changed in v8 -- added support for :class:`~music21.percussion.PercussionChord`
+    * Changed in v7: made keyword-only.
+    * Changed in v8: added support for :class:`~music21.percussion.PercussionChord`
     '''
     from music21 import midi as midiModule
     mt = None  # midi track
@@ -1942,8 +1942,8 @@ def midiTrackToStream(
         {2.5} <music21.note.Rest dotted-quarter>
         {4.0} <music21.bar.Barline type=final>
 
-    Changed in v7 -- Now makes measures.
-    Changed in v8 -- all but the first attribute are keyword only.
+    * Changed in v7: Now makes measures.
+    * Changed in v8: all but the first attribute are keyword only.
     '''
     # environLocal.printDebug(['midiTrackToStream(): got midi track: events',
     # len(mt.events), 'ticksPerQuarter', ticksPerQuarter])
@@ -2523,8 +2523,8 @@ def streamHierarchyToMidiTracks(
 
     2. we make a list of all instruments that are being used in the piece.
 
-    Changed in v.6 -- acceptableChannelList is keyword only.  addStartDelay is new.
-    Changed in v.6.5 -- Track 0 (tempo/conductor track) always exported.
+    * Changed in v6: acceptableChannelList is keyword only.  addStartDelay is new.
+    * Changed in v6.5: Track 0 (tempo/conductor track) always exported.
     '''
     # makes a deepcopy
     s = prepareStreamForMidi(inputM21)
@@ -2704,7 +2704,7 @@ def midiFilePathToStream(
     >>> streamScore
     <music21.stream.Score ...>
 
-    Changed in v8: inputM21 is keyword only.
+    * Changed in v8: inputM21 is keyword only.
     '''
     from music21 import midi as midiModule
     mf = midiModule.MidiFile()
@@ -2869,7 +2869,7 @@ def midiFileToStream(
     >>> len(s.flatten().notesAndRests)
     14
 
-    Changed in v8: inputM21 and quantizePost are keyword only.
+    * Changed in v8: inputM21 and quantizePost are keyword only.
     '''
     # environLocal.printDebug(['got midi file: tracks:', len(mf.tracks)])
     if inputM21 is None:

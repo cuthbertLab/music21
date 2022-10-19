@@ -426,7 +426,6 @@ chantQuemQueritis = '''<?xml version="1.0" standalone="no"?>
         </measure>
     </part>
 </score-partwise>
-
 '''
 
 
@@ -8016,7 +8015,6 @@ schumannOp48No1 = '''<?xml version="1.0" encoding="UTF-8"?>
   </part>
   <!--=========================================================-->
 </score-partwise>
-
 '''
 
 
@@ -11119,7 +11117,6 @@ mozartTrioK581Excerpt = '''<?xml version="1.0" standalone="no"?>
         </measure>
     </part>
 </score-partwise>
-
 '''
 
 
@@ -13300,7 +13297,6 @@ binchoisMagnificat = '''<?xml version="1.0" encoding="utf-8"?>
     </measure>
   </part>
 </score-partwise>
-
 '''
 
 

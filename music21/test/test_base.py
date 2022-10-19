@@ -57,11 +57,10 @@ class Test(unittest.TestCase):
         a = ElementWrapper(n)
         a.offset = 3.0
         c = ElementWrapper(n)
-        c.offset = 3.0
+        c.offset = 2.0
         self.assertEqual(a, c)
         self.assertIsNot(a, c)
-        b = ElementWrapper(n)
-        b.offset = 2.0
+        b = ElementWrapper(note.Note('G'))
         self.assertNotEqual(a, b)
 
     def testNoteCreation(self):

@@ -39,7 +39,6 @@ For most people you'll want to do something like this:
 >>> sc = scale.ScalaScale('a4', 'mbira_banda.scl')
 >>> [str(p) for p in sc.pitches]
 ['A4', 'B4(-15c)', 'C#5(-11c)', 'E-5(-7c)', 'E~5(+6c)', 'F#5(+14c)', 'G~5(+1c)', 'B-5(+2c)']
-
 '''
 from __future__ import annotations
 
@@ -621,7 +620,6 @@ Franck Jedrzejewski continued fractions approx. of 12-tet
 98/55
 15/8
 2/1
-
 '''
         ss = ScalaData(msg)
         ss.parse()

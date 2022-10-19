@@ -474,9 +474,9 @@ class Ornament(Expression):
         the "main note" itself (or None) to keep processing for ornaments,
         and a list of notes after the "main note".
 
-        Added in v.8 -- inPlace boolean; note that some ornaments
-        might not return a Note in the second position at all (such as trills)
-        so inPlace does nothing.
+        * New in v8: inPlace boolean; note that some ornaments
+          might not return a Note in the second position at all (such as trills)
+          so inPlace does nothing.
         '''
         if not inPlace:
             srcObj = copy.deepcopy(srcObj)
@@ -612,8 +612,8 @@ class Mordent(GeneralMordent):
     >>> m.size
     <music21.interval.GenericInterval 2>
 
-    Changed in v7: Mordent sizes are GenericIntervals -- as was originally
-    intended but programmed incorrectly.
+    * Changed in v7: Mordent sizes are GenericIntervals -- as was originally
+      intended but programmed incorrectly.
     '''
     def __init__(self, **keywords):
         super().__init__(**keywords)
@@ -670,8 +670,8 @@ class InvertedMordent(GeneralMordent):
     >>> m.size
     <music21.interval.GenericInterval 2>
 
-    Changed in v7: InvertedMordent sizes are GenericIntervals -- as was originally
-    intended but programmed incorrectly.
+    * Changed in v7: InvertedMordent sizes are GenericIntervals -- as was originally
+      intended but programmed incorrectly.
     '''
     def __init__(self, **keywords):
         super().__init__(**keywords)
@@ -734,7 +734,7 @@ class Trill(Ornament):
     >>> tr.quarterLength == duration.Duration('32nd').quarterLength
     True
 
-    Changed in v.7 -- the size should be a generic second.
+    * Changed in v7: the size should be a generic second.
     '''
     def __init__(self, **keywords):
         super().__init__(**keywords)
@@ -1012,7 +1012,7 @@ class Schleifer(Ornament):
     '''
     A slide or culee
 
-    Changed in v.7 -- size is a Generic second.  removed unused nachschlag component.
+    * Changed in v7: size is a Generic second.  removed unused nachschlag component.
     '''
     def __init__(self, **keywords):
         super().__init__(**keywords)
@@ -1025,7 +1025,7 @@ class Turn(Ornament):
     '''
     A turn or Gruppetto.
 
-    Changed in v.7 -- size is a Generic second.  removed unused nachschlag component.
+    * Changed in v7: size is a Generic second.  removed unused nachschlag component.
     '''
     def __init__(self, **keywords):
         super().__init__(**keywords)

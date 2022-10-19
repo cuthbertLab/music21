@@ -232,8 +232,26 @@ class AbstractScale(Scale):
     Subclasses can define altered nodes in AbstractScale that are passed
     to the :class:`~music21.intervalNetwork.IntervalNetwork`.
 
-    # TODO: make a subclass of IntervalNetwork and remove the ._net aspect.
+    Equality
+    --------
+    Two abstract scales are the same if they have the same class and the
+    same tonicDegree and octaveDuplicating attributes and the same intervalNetwork,
+    and it satisfies all other music21 superclass attributes.
+
+    >>> as1 = scale.AbstractOctatonicScale()
+    >>> as2 = scale.AbstractOctatonicScale()
+    >>> as1 == as2
+    True
+    >>> as2.tonicDegree = 5
+    >>> as1 == as2
+    False
+
+    >>> as1 == scale.AbstractDiatonicScale()
+    False
     '''
+    # TODO: make a subclass of IntervalNetwork and remove the ._net aspect.
+    equalityAttributes = ('tonicDegree', '_net', 'octaveDuplicating')
+
     def __init__(self, **keywords):
         super().__init__(**keywords)
         # store interval network within abstract scale
@@ -251,27 +269,6 @@ class AbstractScale(Scale):
         # entries are in the form:
         # step: {'direction':Direction.BI, 'interval':Interval}
         self._alteredDegrees = {}
-
-    def __eq__(self, other):
-        '''
-        Two abstract scales are the same if they have the same class and the
-        same tonicDegree and the same intervalNetwork.
-
-        >>> as1 = scale.AbstractScale()
-        >>> as2 = scale.AbstractScale()
-        >>> as1 == as2
-        True
-        >>> as1.isConcrete
-        False
-        '''
-        # have to test each so as not to confuse with a subclass
-        if (isinstance(other, self.__class__)
-                and isinstance(self, other.__class__)
-                and self.tonicDegree == other.tonicDegree
-                and self._net == other._net):
-            return True
-        else:
-            return False
 
     def buildNetwork(self):
         '''
@@ -669,6 +666,25 @@ class AbstractDiatonicScale(AbstractScale):
     >>> as1.octaveDuplicating
     True
 
+    Equality
+    --------
+    AbstractDiatonicScales must satisfy all the characteristics of a
+    general AbstractScale but also need to have equal dominantDegrees.
+
+    >>> as1 = scale.AbstractDiatonicScale('major')
+    >>> as2 = scale.AbstractDiatonicScale('lydian')
+    >>> as1 == as2
+    False
+
+    Note that their modes do not need to be the same.
+    For instance for the case of major and Ionian which have
+    the same networks:
+
+    >>> as3 = scale.AbstractDiatonicScale('ionian')
+    >>> (as1.mode, as3.mode)
+    ('major', 'ionian')
+    >>> as1 == as3
+    True
     '''
     def __init__(self, mode: str | None = None, **keywords):
         super().__init__(**keywords)
@@ -681,41 +697,6 @@ class AbstractDiatonicScale(AbstractScale):
         self.relativeMinorDegree: int = -1
         self.relativeMajorDegree: int = -1
         self.buildNetwork(mode=mode)
-
-    def __eq__(self, other):
-        '''
-        Two AbstractDiatonicScale objects are equal if
-        their tonicDegrees, their dominantDegrees, and
-        their networks are the same.
-
-        >>> as1 = scale.AbstractDiatonicScale('major')
-        >>> as2 = scale.AbstractDiatonicScale('lydian')
-        >>> as1 == as2
-        False
-
-        Note that their modes do not need to be the same.
-        For instance for the case of major and Ionian which have
-        the same networks:
-
-        >>> as3 = scale.AbstractDiatonicScale('ionian')
-        >>> (as1.mode, as3.mode)
-        ('major', 'ionian')
-        >>> as1 == as3
-        True
-        '''
-        if not isinstance(other, self.__class__):
-            return False
-        if not isinstance(self, other.__class__):
-            return False
-
-        # have to test each so as not to confuse with a subclass
-        if (self.type == other.type
-            and self.tonicDegree == other.tonicDegree
-            and self.dominantDegree == other.dominantDegree
-                and self._net == other._net):
-            return True
-        else:
-            return False
 
     def buildNetwork(self, mode=None):
         '''
@@ -736,7 +717,7 @@ class AbstractDiatonicScale(AbstractScale):
         music21.scale.ScaleException: Cannot create a
             scale of the following mode: 'blues-like'
 
-        Changed in v.6 -- case-insensitive modes
+        * Changed in v6: case-insensitive modes
         '''
         # reference: http://cnx.org/content/m11633/latest/
         # most diatonic scales will start with this collection
@@ -1260,11 +1241,21 @@ class ConcreteScale(Scale):
     >>> [str(p) for p in complexScale.getPitches('C7', 'C5')]
     ['A6', 'F#6', 'D~6', 'B5', 'G5', 'F5', 'E-5', 'C#5']
 
+    Equality
+    --------
+    Two ConcreteScales are the same if they satisfy all general Music21Object
+    equality methods and their Abstract scales, their tonics, and their
+    boundRanges are the same:
+
+
+
     OMIT_FROM_DOCS
 
     >>> scale.ConcreteScale(tonic=4)
     Traceback (most recent call last):
     ValueError: Tonic must be a Pitch, Note, or str, not <class 'int'>
+
+    This is in OMIT
     '''
     usePitchDegreeCache = False
 
@@ -1358,19 +1349,13 @@ class ConcreteScale(Scale):
         True
         >>> sc5 == sc3  # implicit abstract comparison
         False
-
         '''
-        # have to test each so as not to confuse with a subclass
-        # TODO: add pitch range comparison if defined
-        if other is None:
-            return False
-        if (not hasattr(self, 'isConcrete')) or (not hasattr(other, 'isConcrete')):
+        if not super().__eq__(other):
             return False
 
         if not self.isConcrete or not other.isConcrete:
             # if tonic is none, then we automatically do an abstract comparison
             return self._abstract == other._abstract
-
         else:
             if (isinstance(other, self.__class__)
                     and isinstance(self, other.__class__)
@@ -1380,6 +1365,9 @@ class ConcreteScale(Scale):
                 return True
             else:
                 return False
+
+    def __hash__(self):
+        return id(self) >> 4
 
     @property
     def name(self):
@@ -1434,7 +1422,7 @@ class ConcreteScale(Scale):
         >>> [p.name for p in scVague.getPitches()]
         ['D', 'E', 'F', 'G', 'A-', 'B-', 'C-', 'D-', 'D']
 
-        New and beta in v.6 -- changing `.abstract` is now allowed.
+        * Changed in v6: changing `.abstract` is now allowed.
         '''
         # copy before returning? (No... too slow)
         return self._abstract

@@ -729,9 +729,9 @@ class KrumhanslSchmuckler(KeyWeightKeyAnalysis):
     Values from from http://extras.humdrum.org/man/keycor/, which describes these
     weightings as "Strong tendency to identify the dominant key as the tonic."
 
-    Changed in v.6.3 -- it used to be that these were different from the
-    Kessler profiles, but that was likely a typo.  Thus, KrumhanslKessler and
-    KrumhanslSchmuckler are synonyms of each other.
+    * Changed in v6.3: it used to be that these were different from the
+      Kessler profiles, but that was likely a typo.  Thus, KrumhanslKessler and
+      KrumhanslSchmuckler are synonyms of each other.
     '''
     _DOC_ALL_INHERITED = False
     name = 'Krumhansl Schmuckler/Kessler Key Analysis'

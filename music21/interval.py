@@ -82,7 +82,7 @@ class Specifier(enum.IntEnum):
     <Specifier.PERFECT>
 
     Value numbers are arbitrary and just there for backwards compatibility
-    with pre v.6 work:
+    with pre v6 work:
 
     >>> Specifier.PERFECT.value
     1
@@ -883,7 +883,7 @@ class GenericInterval(IntervalBase):
     >>> threeOctaveThird.simpleNiceName
     'Third'
 
-    Changed in v.6 -- large intervals get abbreviations
+    * Changed in v6: large intervals get abbreviations
     '''
     def __init__(self,
                  value: int | str = 'Unison',
@@ -925,6 +925,9 @@ class GenericInterval(IntervalBase):
             return True
         else:
             return False
+
+    def __hash__(self):
+        return id(self) >> 4
 
     @property
     def value(self) -> int:
@@ -1210,7 +1213,7 @@ class GenericInterval(IntervalBase):
         >>> interval.GenericInterval(44).niceName
         '44th'
 
-        Changed in v6: large numbers get the 'th' or 'rd' etc. suffix
+        * Changed in v6: large numbers get the 'th' or 'rd' etc. suffix
         '''
         return self._nameFromInt(self.undirected)
 
@@ -1736,6 +1739,9 @@ class DiatonicInterval(IntervalBase):
         else:
             return False
 
+    def __hash__(self):
+        return id(self) >> 4
+
     @property
     def name(self) -> str:
         '''
@@ -2154,7 +2160,7 @@ class DiatonicInterval(IntervalBase):
         <music21.pitch.Pitch F#5>
 
 
-        Changed in v.6 -- added inPlace
+        * Changed in v6: added inPlace
         '''
         fullIntervalObject = Interval(diatonic=self, chromatic=self.getChromatic())
         return fullIntervalObject.transposePitch(p, inPlace=inPlace)
@@ -2262,9 +2268,11 @@ class ChromaticInterval(IntervalBase):
         else:
             return False
 
+    def __hash__(self):
+        return id(self) >> 4
+
     # -------------------------------------------------------
     # properties
-
     @property
     def cents(self) -> float:
         '''
@@ -2489,7 +2497,7 @@ class ChromaticInterval(IntervalBase):
         >>> p.spellingIsInferred
         True
 
-        Changed in v.6 -- added inPlace
+        * Changed in v6: added inPlace
         '''
         if p.octave is None:
             useImplicitOctave = True
@@ -2953,16 +2961,12 @@ class Interval(IntervalBase):
     >>> interval.Interval(pitch.Pitch('e##4'), pitch.Pitch('f--5'))
     <music21.interval.Interval dddd9>
 
-    Changed in v8:
-
-    * Pitches are emphasized over notes.
-
-    * It is not possible to create an interval with a name and a pitchStart/noteStart
+    * Changed in v8:
+      - Pitches are emphasized over notes.
+      - It is not possible to create an interval with a name and a pitchStart/noteStart
       and automatically get a pitchEnd/noteEnd in the process.  Set them later.
-
-    * Incompatible keywords raise ValueError not IntervalException.
-
-    * An empty instantiation gives a P1 interval.
+      - Incompatible keywords raise ValueError not IntervalException.
+      - An empty instantiation gives a P1 interval.
 
     OMIT_FROM_DOCS
 
@@ -3131,10 +3135,11 @@ class Interval(IntervalBase):
         else:
             return False
 
+    def __hash__(self):
+        return id(self) >> 4
 
     # -------------------------------------
     # properties
-
     @property
     def generic(self) -> GenericInterval:
         '''
@@ -3288,7 +3293,7 @@ class Interval(IntervalBase):
         >>> interval.Interval().intervalClass
         0
 
-        Changed in v6.5 -- empty intervals return 0
+        * Changed in v6.5: empty intervals return 0
         '''
         return self.chromatic.intervalClass
 
@@ -3379,8 +3384,8 @@ class Interval(IntervalBase):
         it is the same as `i.reverse().transposePitch(x)` and that format
         will be much faster when calling many times.
 
-        Changed in v.6 -- inPlace parameter added.  Reverse and maxAccidental
-        changed to keyword only.
+        * Changed in v6: inPlace parameter added.  Reverse and maxAccidental
+          changed to keyword only.
 
         OMIT_FROM_DOCS
 
@@ -3829,7 +3834,7 @@ def transposePitch(
     >>> C4
     <music21.pitch.Pitch G4>
 
-    Changed in v.6 -- added inPlace parameter
+    * Changed in v6: added inPlace parameter
     '''
 
     # check if interval1 is a string,

@@ -2216,7 +2216,7 @@ def partitionByInstrument(streamObj: stream.Stream) -> stream.Stream:
             {0.0} <music21.note.Note C#>
             {4.0} <music21.bar.Barline type=final>
 
-    Changes in v8: returns the original stream if there are no instruments.
+    * Changed in v8: returns the original stream if there are no instruments.
 
     TODO: parts should be in Score Order. Coincidence that this almost works.
     TODO: use proper recursion to make a copy of the stream.

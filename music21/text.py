@@ -148,7 +148,7 @@ def assembleAllLyrics(streamIn, maxLyrics=10, lyricSeparation='\n'):
     >>> l
     '1. First\n2. Second\n3. Third\n4. Fourth\n5. Fifth'
 
-    Changed in v.8: no lyric separator appears at the beginning.
+    * Changed in v8: no lyric separator appears at the beginning.
     '''
     lyrics = ''
     for i in range(1, maxLyrics):

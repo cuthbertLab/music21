@@ -184,8 +184,8 @@ class Lyric(prebase.ProtoM21Object, style.StyleMixin):
 
     Custom elision elements for composite components will be supported later.
 
-    New in v6.7 -- composite components, elisionBefore
-    Changed in v8 -- lyric text can be an empty string, but not None.
+    * New in v6.7: composite components, elisionBefore
+    * Changed in v8: lyric text can be an empty string, but not None.
     '''
     _styleClass = style.TextStylePlacement
     # CLASS VARIABLES #
@@ -554,8 +554,8 @@ class GeneralNote(base.Music21Object):
     >>> gn.quarterLength
     0.4375
 
-    Equality
-    --------
+    **Equality**
+
     GeneralNote objects are equal if they pass superclass tests (e.g., their durations are equal),
     and they have the same articulation and expression classes (in any order),
     and their ties are equal.
@@ -723,8 +723,8 @@ class GeneralNote(base.Music21Object):
         >>> b.lyric
         'bon'
 
-        Changed in v6.7 -- added setting to a Lyric object.  Removed undocumented
-        setting to False instead of setting to None
+        * Changed in v6.7: added setting to a Lyric object.  Removed undocumented
+          setting to False instead of setting to None
         ''')
 
     def addLyric(self,
@@ -867,7 +867,7 @@ class GeneralNote(base.Music21Object):
         If `inPlace` is True, this is done in-place and the method returns None.
         If `inPlace` is False [default], this returns a modified deepcopy.
 
-        Changed -- inPlace is now False as of version 5.
+        * Changed in v5: inPlace is now False.
 
         >>> n = note.Note('g#')
         >>> n.quarterLength = 3
@@ -940,7 +940,7 @@ class GeneralNote(base.Music21Object):
         (DurationTuple(type='half', dots=0, quarterLength=0.0),)
 
         Appoggiaturas are still a work in progress...
-        Changed in v.6 -- corrected spelling of `appoggiatura` keyword.
+        * Changed in v6: corrected spelling of `appoggiatura` keyword.
 
         >>> ng2 = n.getGrace(appoggiatura=True)
         >>> ng2.duration
@@ -1428,8 +1428,8 @@ class Note(NotRest):
     >>> n.duration
     <music21.duration.Duration 0.875>
 
-    Equality and ordering
-    ---------------------
+    **Equality and ordering**
+
     Two notes are equal if they pass all the equality tests for NotRest and their
     pitches are equal.
 

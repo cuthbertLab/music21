@@ -170,8 +170,8 @@ tool.
 * <pb>: a page break
 * <lb>: a line break
 * <sb>: a system break
-
 '''
+
 from __future__ import annotations
 
 from collections import defaultdict

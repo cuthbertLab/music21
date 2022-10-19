@@ -71,7 +71,7 @@ def fromObject(thisObject, *, mode='html', local=False):
     </body>
     </html>
 
-    Changed in v.8 -- mode and useLocal are keyword only.
+    * Changed in v8: mode and useLocal are keyword only.
     '''
     conv = VexflowPickler()
     conv.mode = mode

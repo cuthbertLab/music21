@@ -70,8 +70,8 @@ class ChordBase(note.NotRest):
     (<music21.note.Note C>, <music21.note.Note E>, <music21.note.Note G>)
 
 
-    Equality
-    --------
+    **Equality**
+
     Equality on ChordBase is strange, but necessary to help Chord and PercussionChord
     do meaningful equality checks themselves.
 
@@ -254,7 +254,7 @@ class ChordBase(note.NotRest):
                     self._notes.append(note.Note(n))
                 # self._notes.append({'pitch':music21.pitch.Pitch(n)})
             else:
-                # TODO: v.8 raise TypeError
+                # TODO: v8 raise TypeError
                 raise ChordException(f'Could not process input argument {n}')
 
         for n in self._notes:
@@ -442,8 +442,8 @@ class ChordBase(note.NotRest):
         >>> c.volume
         <music21.volume.Volume realized=0.5>
 
-        Changed in v.8 -- setting volume to a list of volumes is no longer supported.
-            See :meth:`~music21.chord.ChordBase.setVolumes` instead
+        * Changed in v8: setting volume to a list of volumes is no longer supported.
+          See :meth:`~music21.chord.ChordBase.setVolumes` instead
 
         OMIT_FROM_DOCS
 
@@ -575,7 +575,7 @@ class ChordBase(note.NotRest):
         >>> c.volume
         <music21.volume.Volume realized=0.76>
 
-        New in v.8 -- replaces setting .volume to a list
+        * New in v8: replaces setting .volume to a list
         '''
         # if setting components, remove single velocity
         self._volume = None
@@ -713,8 +713,8 @@ class Chord(ChordBase):
     music21.chord.ChordException: Could not process input
                                     argument <module 'music21.base' from '...base...'>
 
-    Equality
-    --------
+    **Equality**
+
     Two chords are equal if the Chord passes all `super()`
     equality tests and all their pitches are equal
     (possibly in a different order)
@@ -1328,8 +1328,8 @@ class Chord(ChordBase):
         >>> print(em.bass(find=False))
         None
 
-        Changed in v8: raise an exception if setting a new bass
-        to a pitch not in the chord, unless new keyword `allow_add` is `True`.
+        * Changed in v8: raise an exception if setting a new bass
+          to a pitch not in the chord, unless new keyword `allow_add` is `True`.
 
         OMIT_FROM_DOCS
 
@@ -1875,8 +1875,6 @@ class Chord(ChordBase):
         >>> c9.getChordStep(2)
         <music21.pitch.Pitch D5>
 
-        * Changed in v8.3 --
-
         OMIT_FROM_DOCS
 
         If `root` has been explicitly overridden as `None`, calling this raises `ChordException`:
@@ -2407,7 +2405,7 @@ class Chord(ChordBase):
         sets the value to be returned later, which might be useful for
         cases where the chords are poorly spelled, or there is an added note.
 
-        Changed in v.8 -- chords without pitches
+        * Changed in v8: chords without pitches
         '''
         if not self.pitches:
             return -1
@@ -2949,9 +2947,7 @@ class Chord(ChordBase):
         >>> fr6c.isFrenchAugmentedSixth(permitAnyInversion=True)
         True
 
-
-        Changed in v7: `permitAnyInversion` added
-
+        * Changed in v7: `permitAnyInversion` added
 
         OMIT_FROM_DOCS
 
@@ -2996,8 +2992,7 @@ class Chord(ChordBase):
         >>> gr6c.isGermanAugmentedSixth(permitAnyInversion=True)
         True
 
-        Changed in v7: `permitAnyInversion` added
-
+        * Changed in v7: `permitAnyInversion` added
 
         OMIT_FROM_DOCS
 
@@ -3195,7 +3190,7 @@ class Chord(ChordBase):
         >>> c5.isItalianAugmentedSixth(restrictDoublings=False)
         True
 
-        Changed in v7.  `restrictDoublings` is keyword only.  Added `permitAnyInversion`.
+        * Changed in v7: `restrictDoublings` is keyword only.  Added `permitAnyInversion`.
         '''
         aug6check = self._isAugmentedSixthHelper(
             (3, 8, 1),
@@ -3607,7 +3602,7 @@ class Chord(ChordBase):
         >>> ch3.isSwissAugmentedSixth(permitAnyInversion=True)
         True
 
-        Changed in v7: `permitAnyInversion` added
+        * Changed in v7: `permitAnyInversion` added
         '''
         return self._isAugmentedSixthHelper(
             (4, 27, -1),
@@ -3721,7 +3716,7 @@ class Chord(ChordBase):
         >>> c3.pitches[0] is p2
         False
 
-        Changed in v.6 -- inPlace defaults to False.
+        * Changed in v6: inPlace defaults to False.
         '''
         return self._removePitchByRedundantAttribute('nameWithOctave',
                                                      inPlace=inPlace)
@@ -3744,7 +3739,7 @@ class Chord(ChordBase):
         >>> c2.pitches
         (<music21.pitch.Pitch C5>, <music21.pitch.Pitch E3>, <music21.pitch.Pitch G4>)
 
-        Changed in v.6 -- inPlace defaults to False.
+        * Changed in v6: inPlace defaults to False.
         '''
         return self._removePitchByRedundantAttribute('pitchClass',
                                                      inPlace=inPlace)
@@ -3769,7 +3764,7 @@ class Chord(ChordBase):
         >>> rem
         [<music21.pitch.Pitch C2>, <music21.pitch.Pitch E3>]
 
-        Changed in v.6 -- inPlace defaults to False.
+        * Changed in v6: inPlace defaults to False.
         '''
         return self._removePitchByRedundantAttribute('name',
                                                      inPlace=inPlace)
@@ -3921,7 +3916,8 @@ class Chord(ChordBase):
         Traceback (most recent call last):
         music21.chord.ChordException: no pitches in chord <music21.chord.Chord ...>
 
-        Changed in v5.2 -- find is a keyword-only parameter, newroot finds pitch in chord
+        * Changed in v5.2: `find` is a keyword-only parameter,
+          `newroot` finds `Pitch` in `Chord`
         '''
         # None value for find indicates: return override if overridden, cache if cached
         # or find new value if neither is the case.
@@ -4520,7 +4516,7 @@ class Chord(ChordBase):
         '''
         Set the :class:`~music21.volume.Volume` object of a specific Pitch.
 
-        Changed in v.8 -- after appearing in ChordBase in v.7, it has been properly
+        * Changed in v8: after appearing in ChordBase in v7, it has been properly
             moved back to Chord itself.  The ability to change just the first note's
             volume has been removed.  Use `Chord().volume = vol` to change the
             volume for a whole chord.
@@ -4610,7 +4606,7 @@ class Chord(ChordBase):
         >>> c2
         <music21.chord.Chord C4 E4 G4>
 
-        Changed in v.6 -- if inPlace is True do not return anything.
+        * Changed in v6: if inPlace is True do not return anything.
         '''
         if inPlace:
             if self._cache.get('isSortedAscendingDiatonic', False):
@@ -4846,10 +4842,10 @@ class Chord(ChordBase):
         >>> chord.Chord('C4 E-4 G4 A#4 D4').commonName
         'enharmonic equivalent to minor-ninth chord'
 
-        Changed in v5.5: special cases for checking enharmonics in some cases
-        Changed in v6.5: better handling of 0-, 1-, and 2-pitchClass and microtonal chords.
-        Changed in v7: Inversions of augmented sixth-chords are specified.
-        Changed in v7.3: Enharmonic equivalents to common seventh and ninth chords are specified.
+        * Changed in v5.5: special cases for checking enharmonics in some cases
+        * Changed in v6.5: better handling of 0-, 1-, and 2-pitchClass and microtonal chords.
+        * Changed in v7: Inversions of augmented sixth-chords are specified.
+        * Changed in v7.3: Enharmonic equivalents to common seventh and ninth chords are specified.
 
         OMIT_FROM_DOCS
 
@@ -5328,7 +5324,7 @@ class Chord(ChordBase):
         >>> c1
         <music21.chord.Chord D#4 C#4>
 
-        new in v5.7
+        * New in v5.7
         '''
         return tuple(self._notes)
 
@@ -5617,10 +5613,9 @@ class Chord(ChordBase):
         >>> chord.Chord().pitchedCommonName
         'empty chord'
 
-
-        Changed in v5.5 -- octaves never included, flats are converted,
-        special tools for enharmonics.
-        Changed in v6.5 -- special names for 0-, 1-, and 2-pitchClass chords.
+        * Changed in v5.5: octaves never included, flats are converted,
+          special tools for enharmonics.
+        * Changed in v6.5: special names for 0-, 1-, and 2-pitchClass chords.
         '''
         nameStr = self.commonName
         if nameStr == 'empty chord':
@@ -5887,10 +5882,12 @@ class Chord(ChordBase):
         [(1, None), (1, <music21.pitch.Accidental sharp>), (2, None),
          (3, <music21.pitch.Accidental flat>), (3, None), (4, None)]
 
-        Changed in v6.5 -- will return None if no context can be found:
+        If no context can be found, return `None`:
 
         >>> chord.Chord('C4 E4 G4').scaleDegrees is None
         True
+
+        * Changed in v6.5: will return `None` if no context can be found:
         '''
         from music21 import scale
         # roman numerals have this built in as the key attribute
@@ -5940,7 +5937,7 @@ class Chord(ChordBase):
         >>> c.seventh
         <music21.pitch.Pitch B#4>
 
-        Changed in v6.5 -- return None on empty chords/errors
+        * Changed in v6.5: return None on empty chords/errors
 
         OMIT_FROM_DOCS
 
@@ -5965,7 +5962,7 @@ class Chord(ChordBase):
         >>> cMaj1stInv.third.octave
         3
 
-        Changed in v6.5 -- return None on empty chords/errors
+        * Changed in v6.5: return `None` on empty chords/errors
 
         OMIT_FROM_DOCS
 

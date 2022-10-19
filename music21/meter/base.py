@@ -883,7 +883,7 @@ class TimeSignature(TimeSignatureBase):
         Traceback (most recent call last):
         music21.exceptions21.TimeSignatureException: non-uniform beat unit: [2.0, 0.75]
 
-        Changed in v7. -- return NaN rather than raising Exception in property.
+        * Changed in v7: return NaN rather than raising Exception in property.
         '''
         post = []
         for ms in self.beatSequence:
@@ -919,7 +919,7 @@ class TimeSignature(TimeSignatureBase):
         >>> ts.beatDivisionCount
         1
 
-        Changed in v7. -- return 1 instead of a TimeSignatureException.
+        * Changed in v7: return 1 instead of a TimeSignatureException.
         '''
         # first, find if there is more than one beat and if all beats are uniformly partitioned
         post = []
@@ -1086,7 +1086,7 @@ class TimeSignature(TimeSignatureBase):
         >>> len(ts.beatSequence)
         6
 
-        Changed in v7 -- favorCompound is keyword only
+        * Changed in v7: favorCompound is keyword only
         '''
         # if a non-compound meter has been given, as in
         # not 3+1/4; just 5/4

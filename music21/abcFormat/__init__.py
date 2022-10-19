@@ -182,7 +182,7 @@ class ABCToken(prebase.ProtoM21Object, common.objects.EqualSlottedObjectMixin):
         >>> abcFormat.ABCToken.stripComment('b1 % a b-flat actually')
         'b1 '
 
-        Changed: v6.2 -- made a staticmethod
+        * Changed in v6.2: made a staticmethod
         '''
         if '%' in strSrc:
             return strSrc.split('%')[0]
@@ -1799,7 +1799,7 @@ class ABCHandler:
     define new phrases.  This is useful for parsing extra information from
     the Essen Folksong repertory
 
-    New in v6.3 -- lineBreaksDefinePhrases -- does not yet do anything
+    * New in v6.3: lineBreaksDefinePhrases -- does not yet do anything
     '''
     def __init__(self,
                  abcVersion: tuple[int, ...] | None = None,
@@ -3390,7 +3390,7 @@ class ABCFile(prebase.ProtoM21Object):
         If the same number is defined twice in one file (should not be) only
         the first data is returned.
 
-        Changed in v6.2: now a static method.
+        * Changed in v6.2: now a static method.
         '''
         collect = []
         gather = False
