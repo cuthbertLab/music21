@@ -76,8 +76,7 @@ class TestExternal(unittest.TestCase):
 
 class Test(unittest.TestCase):
     def testMeterSubdivision(self):
-        a = MeterSequence()
-        a.load('4/4', 4)
+        a = MeterSequence('4/4', 4)
         self.assertEqual(str(a), '{1/4+1/4+1/4+1/4}')
 
         a[0] = a[0].subdivide(2)
@@ -91,8 +90,7 @@ class Test(unittest.TestCase):
         mt2 = copy.deepcopy(mt)
         self.assertEqual(mt, mt2)
 
-        a = MeterSequence()
-        a.load('4/4', 4)
+        a = MeterSequence('4/4', 4)
         b = copy.deepcopy(a)
         self.assertEqual(a, b)
 

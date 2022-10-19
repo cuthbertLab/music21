@@ -122,8 +122,7 @@ class MeterCoreMixin:
         if TYPE_CHECKING:
             assert isinstance(self, (MeterTerminal, MeterSequence))
         # elevate to meter sequence
-        ms = MeterSequence()
-        ms.load(self)  # do not need to autoWeight here
+        ms = MeterSequence(self)  # do not need to autoWeight here
         ms.partitionByList(numeratorList)  # this will split weight
         return ms
 
@@ -150,8 +149,7 @@ class MeterCoreMixin:
             raise MeterException(f'cannot subdivide by other: {other}')
 
         # elevate to meter sequence
-        ms = MeterSequence()
-        ms.load(other)  # do not need to autoWeight here
+        ms = MeterSequence(other)  # do not need to autoWeight here
         # ms.partitionByOtherMeterSequence(other)  # this will split weight
         return ms
 
@@ -260,10 +258,10 @@ class MeterTerminal(prebase.ProtoM21Object, MeterCoreMixin, common.FrozenObject)
     >>> mt.weight
     1
 
-    And they always have a depth of 1
+    And they always have a depth of 0
 
     >>> mt.depth
-    1
+    0
 
     Meter terminals can calulate their durations.
 
@@ -353,9 +351,11 @@ class MeterTerminal(prebase.ProtoM21Object, MeterCoreMixin, common.FrozenObject)
     @property
     def depth(self):
         '''
-        Return how many levels deep this part is -- the depth of a terminal is always 1
+        Return how many levels deep this part is -- the depth of a terminal is always 0
+
+        * Changed in v9: A MeterTerminal is depth 0.
         '''
-        return 1
+        return 0
 
 
 _meterTerminalCache: dict[tuple[int, int, float | int], MeterTerminal] = {}
@@ -1147,20 +1147,19 @@ class MeterSequence(MeterCoreMixin, prebase.ProtoM21Object):
 
         loading is a destructive operation.
 
-        >>> a = meter.MeterSequence()
-        >>> a.load('4/4', 4)
+        >>> a = meter.MeterSequence('4/4', 4)
         >>> str(a)
         '{1/4+1/4+1/4+1/4}'
 
-        >>> a.load('4/4', 2)  # request 2 beats
+        >>> a = meter.MeterSequence('4/4', 2)  # request 2 beats
         >>> str(a)
         '{1/2+1/2}'
 
-        >>> a.load('5/8', 2)  # request 2 beats
+        >>> a = meter.MeterSequence('5/8', 2)  # request 2 beats
         >>> str(a)
         '{2/8+3/8}'
 
-        >>> a.load('5/8+4/4')
+        >>> a = meter.MeterSequence('5/8+4/4')
         >>> str(a)
         '{5/8+4/4}'
         '''
@@ -1392,18 +1391,18 @@ class MeterSequence(MeterCoreMixin, prebase.ProtoM21Object):
         '''
         Return how many unique levels deep this part is
         This should be optimized to store values unless the structure has changed.
-        '''
-        depth = 0  # start with 0, will count this level
 
-        lastMatch = None
-        while True:
-            test = self.getLevelList(depth)
-            if test != lastMatch:
-                depth += 1
-                lastMatch = test
-            else:
-                break
-        return depth
+        >>> a = meter.MeterSequence('3/4')
+        >>> a.depth
+        1
+        >>> a.partition(3)
+
+        >>> a.depth
+        1
+        '''
+        if not self._partition:
+            return 0
+        return 1 + max(ms.depth for ms in self._partition)
 
     def isUniformPartition(self, *, depth=0):
         # noinspection PyShadowingNames
@@ -1440,21 +1439,20 @@ class MeterSequence(MeterCoreMixin, prebase.ProtoM21Object):
 
         * Changed in v7: depth is keyword only
         '''
-        n = []
-        d = []
-        for ms in self.getLevelList(depth):
-            if ms.numerator not in n:
-                n.append(ms.numerator)
-            if ms.denominator not in d:
-                d.append(ms.denominator)
-            # as soon as we have more than on entry, we do not have uniform
-            if len(n) > 1 or len(d) > 1:
+        # Optimized 2022.
+        levelList = self.getLevelList(depth)
+        if not levelList:
+            return True
+        first_ms = levelList[0]
+        n = first_ms.numerator
+        d = first_ms.denominator
+        for ms in levelList[1:]:
+            if ms.numerator != n or ms.denominator != d:
                 return False
         return True
 
     # --------------------------------------------------------------------------
     # alternative representations
-
     def getLevelList(self, levelCount, flat=True) -> list[MeterTerminal | MeterSequence]:
         '''
         Recursive utility function that gets everything at a certain level.
@@ -1513,7 +1511,7 @@ class MeterSequence(MeterCoreMixin, prebase.ProtoM21Object):
         self._levelListCache[cacheKey] = mtList
         return mtList
 
-    def getLevel(self, level=0, flat=True):
+    def getLevel(self, level: int, flat=True) -> MeterSequence:
         '''
         Return a complete MeterSequence with the same numerator/denominator
         relationship but that represents any partitions found at the requested
@@ -1534,7 +1532,7 @@ class MeterSequence(MeterCoreMixin, prebase.ProtoM21Object):
         '''
         return MeterSequence(self.getLevelList(level, flat))
 
-    def getLevelSpan(self, level=0):
+    def getLevelSpan(self, level=0) -> list[tuple[float, float]]:
         '''
         For a given level, return the time span of each terminal or sequence
 
@@ -1557,7 +1555,7 @@ class MeterSequence(MeterCoreMixin, prebase.ProtoM21Object):
 
         for i in range(len(ms)):
             start = pos
-            end = opFrac(pos + ms[i].duration.quarterLength)
+            end = opFrac(pos + 4.0 * ms[i].numerator / ms[i].denominator)
             mapping.append((start, end))
             pos = end
         return mapping

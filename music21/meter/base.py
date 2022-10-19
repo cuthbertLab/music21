@@ -251,8 +251,7 @@ def bestTimeSignature(meas: stream.Stream) -> 'music21.meter.TimeSignature':
             return ts2
 
     else:
-        ts = TimeSignature()
-        ts.load(f'{numerator}/{denominator}')
+        ts = TimeSignature(f'{numerator}/{denominator}')
         return ts
 
 
@@ -508,25 +507,26 @@ class TimeSignature(TimeSignatureBase):
 
     def load(self, value: str, divisions=None):
         '''
+        DEPRECATED: just create a TimeSignature itself.
+
         Load up a TimeSignature with a string value.
 
-        >>> ts = meter.TimeSignature()
-        >>> ts.load('4/4')
+        >>> ts = meter.TimeSignature('4/4')
         >>> ts
         <music21.meter.TimeSignature 4/4>
 
-        >>> ts.load('c')
+        >>> ts = meter.TimeSignature('c')
         >>> ts.symbol
         'common'
 
-        >>> ts.load('2/4+3/8')
+        >>> ts = meter.TimeSignature('2/4+3/8')
         >>> ts
         <music21.meter.TimeSignature 2/4+3/8>
 
-        >>> ts.load('fast 6/8')
+        >>> ts = meter.TimeSignature('fast 6/8')
         >>> ts.beatCount
         2
-        >>> ts.load('slow 6/8')
+        >>> ts = meter.TimeSignature('slow 6/8')
         >>> ts.beatCount
         6
 
@@ -1521,8 +1521,7 @@ class TimeSignature(TimeSignatureBase):
         '''
         Set an independent display value for a meter.
 
-        >>> a = meter.TimeSignature()
-        >>> a.load('3/4')
+        >>> a = meter.TimeSignature('3/4')
         >>> a.setDisplay('2/8+2/8+2/8')
         >>> a.displaySequence
         <music21.meter.core.MeterSequence {2/8+2/8+2/8}>

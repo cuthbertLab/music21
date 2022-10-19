@@ -1144,6 +1144,8 @@ class Converter:
 
     def load(self, stringRep: str) -> None:
         '''
+        DEPRECATED: just create a new TinyNotationConverter instead
+
         Loads a stringRepresentation into `.stringRep`
         and resets the parsing state.
 
