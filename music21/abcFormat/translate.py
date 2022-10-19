@@ -544,7 +544,7 @@ def reBar(music21Part, *, inPlace=False):
     {0.0} <music21.meter.TimeSignature 1/8>
     {0.0} <music21.note.Note E>
 
-    Changed in v.5: inPlace is False by default, and a keyword only argument.
+    * Changed in v5: inPlace is False by default, and a keyword only argument.
     '''
     if not inPlace:
         music21Part = copy.deepcopy(music21Part)

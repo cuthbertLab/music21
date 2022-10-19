@@ -573,8 +573,8 @@ def simplifyMultipleEnharmonics(pitches, criterion=_dissonanceScore, keyContext=
     ...                                    keyContext=key.Key('C'))
     [<music21.pitch.Pitch C3>, <music21.pitch.Pitch E3>, <music21.pitch.Pitch G3>]
 
-    Changed in v7.3 -- fixed a bug with compound intervals (such as formed against
-    the tonic of a KeySignature defaulting to octave 4):
+    * Changed in v7.3: fixed a bug with compound intervals (such as formed against
+      the tonic of a KeySignature defaulting to octave 4):
 
     >>> pitch.simplifyMultipleEnharmonics([pitch.Pitch('B5')], keyContext=key.Key('D'))
     [<music21.pitch.Pitch B5>]
@@ -1111,7 +1111,7 @@ class Accidental(prebase.ProtoM21Object, style.StyleMixin):
         This is the argument that .name and .alter use to allow non-standard names
 
 
-        Changed in v. 5 -- added allowNonStandardValue
+        * Changed in v5: added allowNonStandardValue
         '''
         if isinstance(name, str):
             name = name.lower()  # sometimes args get capitalized
@@ -1232,7 +1232,7 @@ class Accidental(prebase.ProtoM21Object, style.StyleMixin):
         Traceback (most recent call last):
         music21.pitch.AccidentalException: Cannot set attribute color independently of other parts.
 
-        New in v.5 -- needed because .name, .alter, and .modifier run .set()
+        * New in v5: needed because .name, .alter, and .modifier run .set()
         '''
         if attribute not in ('name', 'alter', 'modifier'):
             raise AccidentalException(
@@ -1291,7 +1291,7 @@ class Accidental(prebase.ProtoM21Object, style.StyleMixin):
         >>> a.alter
         -1.0
 
-        Changed in v. 5 -- changing the name here changes other values, conditionally
+        * Changed in v5: changing the name here changes other values, conditionally
         '''
         return self._name
 
@@ -1325,7 +1325,7 @@ class Accidental(prebase.ProtoM21Object, style.StyleMixin):
         >>> notSoFlat.name
         'flat'
 
-        Changed in v. 5 -- changing the alter here changes other values, conditionally
+        * Changed in v5: changing the alter here changes other values, conditionally
         '''
         return self._alter
 
@@ -1357,8 +1357,8 @@ class Accidental(prebase.ProtoM21Object, style.StyleMixin):
         >>> f.name
         'sharp'
 
-        Changed in v. 5 -- changing the modifier here changes
-        other values, conditionally
+        * Changed in v5: changing the modifier here changes
+          other values, conditionally
         '''
         return self._modifier
 
@@ -4562,7 +4562,7 @@ class Pitch(prebase.ProtoM21Object):
         >>> pitch.Pitch('f4').transposeBelowTarget(pitch.Pitch('e'), minimize=True)
         <music21.pitch.Pitch F3>
 
-        Changed -- v.3 (August 1, 2016), default for inPlace=False.
+        * Changed in v3: default for inPlace=False.
         '''
         if self.octave is None:
             raise PitchException('Cannot call transposeBelowTarget with an octaveless Pitch.')
@@ -4648,7 +4648,7 @@ class Pitch(prebase.ProtoM21Object):
         >>> pitch.Pitch('d4').transposeAboveTarget(pitch.Pitch('e'), minimize=True)
         <music21.pitch.Pitch D5>
 
-        Changed -- v.3 (August 1, 2016), default for inPlace=False.
+        * Changed in v3: default for inPlace=False.
         '''
         if self.octave is None:
             raise PitchException('Cannot call transposeAboveTarget with an octaveless Pitch.')

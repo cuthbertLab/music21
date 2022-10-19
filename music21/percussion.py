@@ -48,8 +48,8 @@ class PercussionChord(chord.ChordBase):
     Traceback (most recent call last):
     TypeError: every element of notes must be a note.Note or note.Unpitched object
 
-    Equality
-    --------
+    **Equality**
+
     Two PercussionChord objects are equal if their notes are equal *and in the same
     order* (this is different from Chord, but necessary because we cannot compare
     based just on pitch equality)
@@ -88,6 +88,9 @@ class PercussionChord(chord.ChordBase):
             if my_n != other_n:
                 return False
         return True
+
+    def __hash__(self):
+        return id(self) >> 4
 
     @property
     def notes(self) -> tuple[note.NotRest, ...]:

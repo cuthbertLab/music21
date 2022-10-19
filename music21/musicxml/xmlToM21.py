@@ -1805,7 +1805,7 @@ class PartParser(XMLParserBase):
         remove the rest there (for backwards compatibility, esp.
         since bwv66.6 uses it)
 
-        New in v7.
+        * New in v7.
         '''
         if self.lastMeasureParser is None:  # pragma: no cover
             return  # should not happen

@@ -978,7 +978,7 @@ class Tuplet(prebase.ProtoM21Object):
     If duration values are not provided then `durationActual` and `durationNormal` are
     left as None -- meaning that it is unspecified what the duration that completes the
     tuplet is.  And this tuplet just represents a Ratio.
-    PRIOR TO v.4 `durationActual` and `durationNormal` were assumed to be eighths.
+    PRIOR TO v4 `durationActual` and `durationNormal` were assumed to be eighths.
 
     If only one duration, either `durationActual` or `durationNormal`, is
     provided, both are set to the same value.
@@ -2514,7 +2514,7 @@ class Duration(prebase.ProtoM21Object, SlottedObjectMixin):
         '''
         Look to components and determine quarter length.
 
-        Changed in v7. -- made private.  And faster
+        * Changed in v7: made private.  And faster
         '''
         if self.linked is False:
             return
@@ -2879,7 +2879,7 @@ class Duration(prebase.ProtoM21Object, SlottedObjectMixin):
         8
 
         Complex values have an ordinal of the string 'complex'.  This might
-        change to NaN in v8.
+        change to NaN in a later version.
 
         >>> d.quarterLength = 2.5
         >>> d.ordinal
@@ -3246,7 +3246,7 @@ class GraceDuration(Duration):
 
 class AppoggiaturaDuration(GraceDuration):
     '''
-    Renamed in v.6 to correct spelling.
+    Renamed in v6 to correct spelling.
     '''
     # CLASS VARIABLES #
 

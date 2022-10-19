@@ -73,7 +73,6 @@ A longer test showing the utility of the module:
 
 .. image:: images/prova_articolazioni.*
     :width: 628
-
 '''
 from __future__ import annotations
 
@@ -104,8 +103,8 @@ class Articulation(base.Music21Object):
     >>> x.style.absoluteY = 20
     >>> x.displayText = '>'
 
-    Equality
-    --------
+    **Equality**
+
     Equality of articulations is based only on the class, as other attributes are independent
     of context and deployment.
 

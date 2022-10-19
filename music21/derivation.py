@@ -10,8 +10,7 @@
 # Copyright:    Copyright © 2011-2014 Michael Scott Asato Cuthbert and the music21
 #               Project
 # License:      BSD, see license.txt
-# -----------------------------------------------------------------------------
-
+# ----------------------------------------------------------------------------
 '''
 This module defines objects for tracking the derivation of one
 :class:`~music21.stream.Stream` from another.

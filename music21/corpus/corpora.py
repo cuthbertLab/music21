@@ -164,7 +164,7 @@ class Corpus(prebase.ProtoM21Object):
         >>> coreCorpus._translateExtensions(('.mid', '.musicxml'), True)
         ('.mid', '.midi', '.xml', '.mxl', '.musicxml')
 
-        Changed in v9: returns a tuple, not a list.  first element must be an Iterable of strings
+        * Changed in v9: returns a tuple, not a list.  first element must be an Iterable of strings
         '''
         if not fileExtensions:
             return Corpus._allExtensions

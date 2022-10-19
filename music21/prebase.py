@@ -218,7 +218,7 @@ class ProtoM21Object:
          <class 'music21.prebase.ProtoM21Object'>,
          <class 'object'>]
 
-        changed in v8 -- partially qualified objects such as 'note.Note' have been added.
+        * Changed in v8: partially qualified objects such as 'note.Note' have been added.
         '''
         try:
             return self._classSetCacheDict[self.__class__]

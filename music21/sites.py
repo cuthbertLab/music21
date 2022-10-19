@@ -463,10 +463,10 @@ class Sites(common.SlottedObjectMixin):
         b
         a
 
-        * Changed in v.3: changed dramatically from previously unused version
+        * Changed in v3: changed dramatically from previously unused version
           `sortByCreationTime='reverse'` is removed, since the ordered dict takes
           care of it and was not working.
-        * Changed in v.8: arguments are keyword only
+        * Changed in v8: arguments are keyword only
         '''
         keyRepository = list(self.siteDict.keys())
         if sortByCreationTime is True:

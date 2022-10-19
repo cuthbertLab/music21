@@ -105,7 +105,7 @@ def iterateCorpora(returnObjects=True):
     core
     local
 
-    New in v.3
+    * New in v3.
     '''
     if returnObjects is True:
         yield corpora.CoreCorpus()

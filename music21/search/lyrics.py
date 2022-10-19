@@ -190,7 +190,7 @@ class LyricSearcher:
              lyric=<music21.note.Lyric number=1 syllabic=single text='pax'>, text='pax',
              identifier=1)]
 
-        Changed in v6.7 -- indexed lyrics get an identifier.
+        * Changed in v6.7: indexed lyrics get an identifier.
         '''
         if s is None:
             s = self.stream

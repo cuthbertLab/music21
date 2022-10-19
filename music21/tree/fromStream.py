@@ -88,7 +88,7 @@ def listOfTreesByClass(
     [<TimespanTree {12} (0.0 to 8.0) <music21.stream.Score ...>>,
      <TimespanTree {4} (0.0 to 0.0) <music21.stream.Score ...>>]
 
-    Changed in v8: it is now a stickler that classLists must be sequences of sequences,
+    * Changed in v8: it is now a stickler that classLists must be sequences of sequences,
         such as tuples of tuples.
     '''
     from music21 import stream

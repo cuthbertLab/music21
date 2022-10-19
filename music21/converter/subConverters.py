@@ -270,7 +270,7 @@ class SubConverter:
         >>> import os  #_DOCS_HIDE
         >>> os.remove(tf)  #_DOCS_HIDE
 
-        Changed in v.6 -- returns pathlib.Path
+        * Changed in v6: returns pathlib.Path
         '''
         ext = self.getExtensionForSubformats(subformats)
         fp = environLocal.getTempFile(ext, returnPathlib=True)
@@ -1091,7 +1091,7 @@ class ConverterMusicXML(SubConverter):
         Writes `dataStr` which must be bytes to `fp`.
         Adds `.musicxml` suffix to `fp` if it does not already contain some suffix.
 
-        Changed in v7 -- returns a pathlib.Path
+        * Changed in v7: returns a pathlib.Path
 
         OMIT_FROM_DOCS
 

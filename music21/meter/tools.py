@@ -81,7 +81,7 @@ def slashCompoundToFraction(value: str) -> NumDenomTuple:
     >>> meter.tools.slashCompoundToFraction('5/8+2/4+6/8')
     ((5, 8), (2, 4), (6, 8))
 
-    Changed in v7 -- new location and returns a tuple.
+    * Changed in v7: new location and returns a tuple.
     '''
     post: list[NumDenom] = []
     value = value.strip()  # rem whitespace
@@ -131,7 +131,7 @@ def slashMixedToFraction(valueSrc: str) -> tuple[NumDenomTuple, bool]:
     Traceback (most recent call last):
     music21.exceptions21.TimeSignatureException: Cannot create time signature from "3.0/4.0"
 
-    Changed in v7 -- new location and returns a tuple as first value.
+    * Changed in v7: new location and returns a tuple as first value.
     '''
     pre: list[NumDenom | tuple[int, None]] = []
     post: list[NumDenom] = []
@@ -192,7 +192,7 @@ def fractionToSlashMixed(fList: NumDenomTuple) -> tuple[tuple[str, int], ...]:
     >>> fractionToSlashMixed(((3, 8), (2, 8), (5, 8), (3, 4), (2, 16), (1, 16), (4, 16)))
     (('3+2+5', 8), ('3', 4), ('2+1+4', 16))
 
-    Changed in v7 -- new location and returns a tuple.
+    * Changed in v7: new location and returns a tuple.
     '''
     pre: list[tuple[list[int], int]] = []
     for i in range(len(fList)):
