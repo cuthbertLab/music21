@@ -502,7 +502,7 @@ class TimeSignature(TimeSignatureBase):
     _styleClass = style.TextStyle
     classSortOrder = 4
 
-    equalityAttributes = ('beatSequence', 'ratioString', 'symbol')
+    equalityAttributes = ('symbol', 'ratioString', 'beatCount')
 
     _DOC_ATTR: dict[str, str] = {
         'beatSequence': 'A :class:`~music21.meter.MeterSequence` governing beat partitioning.',
@@ -548,17 +548,6 @@ class TimeSignature(TimeSignatureBase):
 
         if not super().__eq__(other):
             return False
-
-        if self.symbol != other.symbol:  # first to solve most comparisons
-            return False
-
-        if self.ratioString != other.ratioString:
-            return False
-
-        if self.beatCount != other.beatCount:
-            return False
-
-        # Note: self.beatSequence apparently not needed.
 
         return True
 
