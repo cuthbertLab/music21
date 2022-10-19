@@ -87,7 +87,7 @@ class Test(unittest.TestCase):
         self.assertEqual(str(a), '{{1/8+1/8}+1/4+1/4+{1/16+1/16+1/16+1/16}}')
 
     def testMeterDeepcopy(self):
-        mt = MeterTerminal('4/4')
+        mt = MeterTerminal(4, 4)
         mt2 = copy.deepcopy(mt)
         self.assertEqual(mt, mt2)
 

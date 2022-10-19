@@ -29,7 +29,7 @@ MeterTerminalTuple = collections.namedtuple('MeterTerminalTuple',
                                             ['numerator', 'denominator', 'division'])
 NumDenom = tuple[int, int]
 NumDenomTuple = tuple[NumDenom, ...]
-MeterOptions = tuple[tuple[str, ...], ...]
+MeterOptions = tuple[tuple[NumDenom, ...], ...]
 
 validDenominators = [1, 2, 4, 8, 16, 32, 64, 128]  # in order
 validDenominatorsSet = set(validDenominators)
@@ -48,6 +48,15 @@ def slashToTuple(value: str) -> MeterTerminalTuple:
     >>> meter.tools.slashToTuple('slow 6/8')
     MeterTerminalTuple(numerator=6, denominator=8, division=<MeterDivision.SLOW>)
     '''
+    # quick return:
+    try:
+        top, bottom = value.split('/')
+        return MeterTerminalTuple(int(top), int(bottom), MeterDivision.NONE)
+    except (ValueError, AttributeError, TypeError):
+        pass
+
+    # now the slow way.
+
     # split by numbers, include slash
     valueNumbers, valueChars = common.getNumFromStr(value,
                                                     numbers='0123456789/.')
@@ -127,6 +136,8 @@ def slashMixedToFraction(valueSrc: str) -> tuple[NumDenomTuple, bool]:
     Traceback (most recent call last):
     music21.exceptions21.MeterException: cannot match denominator to numerator in: 3+2+5/8+3/4+2+1+4
 
+    Float values are not acceptable here.
+
     >>> meter.tools.slashMixedToFraction('3.0/4.0')
     Traceback (most recent call last):
     music21.exceptions21.TimeSignatureException: Cannot create time signature from "3.0/4.0"
@@ -135,7 +146,7 @@ def slashMixedToFraction(valueSrc: str) -> tuple[NumDenomTuple, bool]:
     '''
     pre: list[NumDenom | tuple[int, None]] = []
     post: list[NumDenom] = []
-    summedNumerator = False
+    isSummedNumerator = False
     value = valueSrc.strip()  # rem whitespace
     value = value.split('+')
     for part in value:
@@ -167,7 +178,7 @@ def slashMixedToFraction(valueSrc: str) -> tuple[NumDenomTuple, bool]:
                 assert isinstance(intNum, int) and isinstance(intDenom, int)
             post.append((intNum, intDenom))
         else:  # search ahead for next defined denominator
-            summedNumerator = True
+            isSummedNumerator = True
             match: int | None = None
             for j in range(i, len(pre)):  # this O(n^2) operation is easily simplified to O(n)
                 if pre[j][1] is not None:
@@ -179,7 +190,7 @@ def slashMixedToFraction(valueSrc: str) -> tuple[NumDenomTuple, bool]:
             preBothAreInts = (pre[i][0], match)
             post.append(preBothAreInts)
 
-    return tuple(post), summedNumerator
+    return tuple(post), isSummedNumerator
 
 
 @lru_cache(512)
@@ -323,6 +334,8 @@ def divisionOptionsFractionsUpward(n, d) -> tuple[str, ...]:
     ('6/8', '12/16', '24/32', '48/64', '96/128')
 
     Note that this returns a tuple of strings not MeterOptions
+
+    * Changed in v9: returns a list of MeterOptions
     '''
     opts = []
     # equivalent fractions upward

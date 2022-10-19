@@ -12,6 +12,8 @@
 '''
 This module defines two component objects for defining nested metrical structures:
 :class:`~music21.meter.core.MeterTerminal` and :class:`~music21.meter.core.MeterSequence`.
+
+This is a **core** module, meaning its implementation may change at any time.
 '''
 from __future__ import annotations
 
@@ -45,7 +47,7 @@ class MeterCoreMixin:
         subdividing it into the given number of parts.  Each of those parts
         is a MeterTerminal
 
-        >>> a = meter.MeterTerminal('3/4')
+        >>> a = meter.MeterTerminal(3, 4)
         >>> b = a.subdivideByCount(3)
         >>> b
         <music21.meter.core.MeterSequence {1/4+1/4+1/4}>
@@ -56,7 +58,7 @@ class MeterCoreMixin:
 
         What happens if we do this?
 
-        >>> a = meter.MeterTerminal('5/8')
+        >>> a = meter.MeterTerminal(5, 8)
         >>> b = a.subdivideByCount(2)
         >>> b
         <music21.meter.core.MeterSequence {2/8+3/8}>
@@ -86,7 +88,7 @@ class MeterCoreMixin:
         Return a MeterSequence dividing this
         MeterTerminal according to the numeratorList
 
-        >>> a = meter.MeterTerminal('3/4')
+        >>> a = meter.MeterTerminal(3, 4)
         >>> b = a.subdivideByList([1, 1, 1])
         >>> b
         <music21.meter.core.MeterSequence {1/4+1/4+1/4}>
@@ -135,7 +137,7 @@ class MeterCoreMixin:
         >>> a.subdivideByOther(b)
         <music21.meter.core.MeterSequence {3/8+3/8}>
 
-        >>> terminal = meter.MeterTerminal('1/4')
+        >>> terminal = meter.MeterTerminal(1, 4)
         >>> divider = meter.MeterSequence('1/8+1/8')
         >>> terminal.subdivideByOther(divider)
         <music21.meter.core.MeterSequence {1/8+1/8}>
@@ -176,10 +178,10 @@ class MeterCoreMixin:
         Compare the numerator and denominator of another object.
         Note that these have to be exact matches; 3/4 is not the same as 6/8
 
-        >>> a = meter.MeterTerminal('3/4')
-        >>> b = meter.MeterTerminal('6/4')
-        >>> c = meter.MeterTerminal('2/4')
-        >>> d = meter.MeterTerminal('3/4')
+        >>> a = meter.MeterTerminal(3, 4)
+        >>> b = meter.MeterTerminal(6, 4)
+        >>> c = meter.MeterTerminal(2, 4)
+        >>> d = meter.MeterTerminal(3, 4)
         >>> a.ratioEqual(b)
         False
         >>> a.ratioEqual(c)
@@ -197,24 +199,6 @@ class MeterCoreMixin:
                 return False
         except AttributeError:
             return False
-
-    @property
-    def numerator(self):
-        return self._numerator
-
-    @property
-    def denominator(self):
-        '''
-        Read-only attribute of a MeterTerminal
-
-        >>> a = meter.MeterTerminal('2/4')
-        >>> a.denominator
-        4
-        >>> a.duration.quarterLength
-        2.0
-
-        '''
-        return self._denominator
 
     @staticmethod
     @lru_cache(1024)
@@ -255,10 +239,7 @@ class MeterCoreMixin:
         >>> d.quarterLength
         1.5
         '''
-        if self._overriddenDuration:
-            return self._overriddenDuration
-        else:
-            return self._durationFromNumeratorDenominator(self.numerator, self.denominator)
+        return self._durationFromNumeratorDenominator(self.numerator, self.denominator)
 
 
 class MeterTerminal(prebase.ProtoM21Object, MeterCoreMixin, common.FrozenObject):
@@ -267,7 +248,7 @@ class MeterTerminal(prebase.ProtoM21Object, MeterCoreMixin, common.FrozenObject)
 
     It is an immutable object, so specify all parameters at creation.
 
-    >>> mt = meter.MeterTerminal('2/4')
+    >>> mt = meter.MeterTerminal(2, 4)
     >>> mt.numerator
     2
     >>> mt.denominator
@@ -288,32 +269,35 @@ class MeterTerminal(prebase.ProtoM21Object, MeterCoreMixin, common.FrozenObject)
     >>> mt.duration.quarterLength
     2.0
 
-    >>> threeEight = meter.MeterTerminal('3/8')
+    >>> threeEight = meter.MeterTerminal(3, 8)
     >>> threeEight.duration.quarterLength
     1.5
-    >>> fiveTwo = meter.MeterTerminal('5/2')
+    >>> fiveTwo = meter.MeterTerminal(5, 2)
     >>> fiveTwo.duration.quarterLength
     10.0
 
-    Weights can be specified from the start, along with durations.
+    Weights can be specified from the start.
 
-    >>> dur = duration.Duration(type='eighth', tuplets=[duration.Tuplet(2, 3)])
-    >>> three16 = meter.MeterTerminal(numerator=3, denominator=16, weight=3,
-    ...                               overriddenDuration=dur)
+    >>> three16 = meter.MeterTerminal(3, 16, weight=0.5)
     >>> three16.numerator
     3
-    >>> three16.duration is dur
+    >>> three16.weight
+    0.5
+    >>> three16.duration.quarterLength == 0.75
     True
-    >>> three16.duration.quarterLength == 0.5
-    True
+
+    * Changed in v9:
+      - MeterTerminals are frozen (immutable) objects that need
+      to have all their characteristics from start.
+      - Nearly all attributes are keyword only
+      - Remove overriddenDuration.
     '''
 
     # CLASS VARIABLES #
 
     __slots__ = (
-        '_denominator',
-        '_numerator',
-        '_overriddenDuration',
+        'denominator',
+        'numerator',
         'weight',
     )
 
@@ -321,7 +305,7 @@ class MeterTerminal(prebase.ProtoM21Object, MeterCoreMixin, common.FrozenObject)
         'weight': '''
             Return the weight of a MeterTerminal
 
-            >>> a = meter.MeterTerminal('2/4', weight=0.5)
+            >>> a = meter.MeterTerminal(2, 4, weight=0.5)
             >>> a.weight
             0.5
             ''',
@@ -329,20 +313,14 @@ class MeterTerminal(prebase.ProtoM21Object, MeterCoreMixin, common.FrozenObject)
 
     # INITIALIZER #
     def __init__(self,
-                 *,
-                 weight: int = 1,
                  numerator: int = 0,
                  denominator: int = 1,
-                 overriddenDuration: duration.Duration | None = None,
+                 *,
+                 weight: float = 1,
                  ):
-        self._numerator = numerator
-        self._denominator = denominator
-
-        # this will set the underlying weight attribute directly for data checking
-        # explicitly calling base class method to avoid problems
-        # in the derived class MeterSequence
+        self.numerator = numerator
+        self.denominator = denominator
         self.weight = weight
-        self._overriddenDuration = overriddenDuration
 
     # SPECIAL METHODS #
 
@@ -354,13 +332,15 @@ class MeterTerminal(prebase.ProtoM21Object, MeterCoreMixin, common.FrozenObject)
             self.numerator == other.numerator
             and self.denominator == other.denominator
             and self.weight == other.weight
-            and self._overriddenDuration == other._overriddenDuration
         )
 
     def __hash__(self):
-        return hash((self.numerator, self.denominator, self.weight, id(self._overriddenDuration)))
+        return hash((self.numerator, self.denominator, self.weight))
 
     def __deepcopy__(self: _T, memo=None) -> _T:
+        '''
+        Immutable objects return themselves
+        '''
         return self
 
     def _reprInternal(self):
@@ -368,32 +348,6 @@ class MeterTerminal(prebase.ProtoM21Object, MeterCoreMixin, common.FrozenObject)
 
     def __str__(self):
         return str(int(self.numerator)) + '/' + str(int(self.denominator))
-
-    # -------------------------------------------------------------------------
-    # properties
-    @property
-    def numerator(self):
-        '''
-        >>> a = meter.MeterTerminal('2/4')
-        >>> a.numerator
-        2
-        >>> a.duration.quarterLength
-        2.0
-        '''
-        return self._numerator
-
-    @property
-    def denominator(self):
-        '''
-        Read-only attribute of a MeterTerminal
-
-        >>> a = meter.MeterTerminal('2/4')
-        >>> a.denominator
-        4
-        >>> a.duration.quarterLength
-        2.0
-        '''
-        return self._denominator
 
     @property
     def depth(self):
@@ -403,22 +357,23 @@ class MeterTerminal(prebase.ProtoM21Object, MeterCoreMixin, common.FrozenObject)
         return 1
 
 
-_meterTerminalCache: dict[tuple[int, int, int, duration.Duration | None], MeterTerminal] = {}
+_meterTerminalCache: dict[tuple[int, int, float | int], MeterTerminal] = {}
 
 def getMeterTerminal(
     numerator: int,
     denominator: int,
-    weight: int = 1,
-    overriddenDuration: duration.Duration | None = None
+    weight: float | int = 1.0,
 ) -> MeterTerminal:
-    key = (numerator, denominator, weight, overriddenDuration)
+    '''
+    Returns a MeterTerminal from a cache if necessary
+    '''
+    key = (numerator, denominator, weight)
     if key in _meterTerminalCache:
         return _meterTerminalCache[key]
     else:
         mt = MeterTerminal(numerator=numerator,
                            denominator=denominator,
-                           weight=weight,
-                           overriddenDuration=overriddenDuration)
+                           weight=weight)
         _meterTerminalCache[key] = mt
         return mt
 
@@ -427,18 +382,21 @@ def getMeterTerminal(
 class MeterSequence(MeterCoreMixin, prebase.ProtoM21Object):
     '''
     A meter sequence is a list of MeterTerminals, or other MeterSequences
+
+    * Changed in v9:
+      - remove unused overriddenDuration.
+      - `summedNumerator` renamed to `isSummedNumerator`.
     '''
 
     # CLASS VARIABLES #
 
     __slots__ = (
-        '_numerator',
-        '_denominator',
-        '_overriddenDuration',
+        'numerator',
+        'denominator',
         '_levelListCache',
         '_partition',
         'parenthesis',
-        'summedNumerator',
+        'isSummedNumerator',
     )
 
     # INITIALIZER #
@@ -449,13 +407,11 @@ class MeterSequence(MeterCoreMixin, prebase.ProtoM21Object):
                  *,
                  numerator: int | None = None,
                  denominator: int | None = None,
-                 overriddenDuration: duration.Duration | None = None,
                  ):
-        self._numerator: int | None = numerator
-        self._denominator: int | None = denominator
-        self._partition = []  # a list of terminals or MeterSequences
-        self._overriddenDuration = overriddenDuration
         self._levelListCache = {}
+        self.numerator: int | None = numerator
+        self.denominator: int | None = denominator
+        self._partition = []  # a list of MeterTerminals or MeterSequences
 
         # this attribute is only used in MeterTerminals, and note
         # in MeterSequences; a MeterSequence's weight is based solely
@@ -463,7 +419,7 @@ class MeterSequence(MeterCoreMixin, prebase.ProtoM21Object):
         # del self._weight -- no -- screws up pickling -- cannot del a slotted object
 
         # Bool stores whether this meter was provided as a summed numerator
-        self.summedNumerator = False
+        self.isSummedNumerator = False
 
         # An optional parameter used only in meter display sequences.
         # Needed in cases where a meter component is parenthetical
@@ -493,13 +449,11 @@ class MeterSequence(MeterCoreMixin, prebase.ProtoM21Object):
         # call class to get a new, empty instance
         new = self.__class__()
         # for name in dir(self):
-        new._numerator = self._numerator
-        new._denominator = self._denominator
+        new.numerator = self.numerator
+        new.denominator = self.denominator
         # noinspection PyArgumentList
         new._partition = copy.deepcopy(self._partition, memo)
-
-        new._overriddenDuration = self._overriddenDuration
-        new.summedNumerator = self.summedNumerator
+        new.isSummedNumerator = self.isSummedNumerator
         new.parenthesis = self.parenthesis
 
         return new
@@ -594,15 +548,20 @@ class MeterSequence(MeterCoreMixin, prebase.ProtoM21Object):
         >>> a = meter.MeterSequence('4/4')
         >>> a.partitionDisplay
         '4/4'
+
         >>> a = meter.MeterSequence('2/4+6/8')
         >>> a.partitionDisplay
         '2/4+6/8'
+
 
         partitionDisplay is most useful for non-divided meter sequences. This is less helpful:
 
         >>> a = meter.MeterSequence('4/4', 4)
         >>> a.partitionDisplay
         '1/4+1/4+1/4+1/4'
+        >>> a = meter.MeterSequence([a, a])
+        >>> a.partitionDisplay
+        '{1/4+1/4+1/4+1/4}+{1/4+1/4+1/4+1/4}'
         '''
         msg = []
         for mt in self._partition:
@@ -619,26 +578,23 @@ class MeterSequence(MeterCoreMixin, prebase.ProtoM21Object):
         # clear cache
         self._levelListCache = {}
 
-    def _addTerminal(self, value: MeterTerminal | str):
+    def addTerminal(self, value: MeterTerminal | MeterSequence | str):
         '''
-        Add an object to the partition list. This does not update numerator and denominator.
+        Add an object to the partition list.
+
+        This does not update numerator and denominator.  Call updateRatio afterwards.
 
         ???: (targetWeight is the expected total Weight for this MeterSequence. This
-        would be self.weight, but often partitions are cleared before _addTerminal is called.)
+        would be self.weight, but often partitions are cleared before addTerminal is called.)
         '''
         # NOTE: this is a performance critical method
 
-        if isinstance(value, MeterTerminal):  # may be a MeterSequence
+        if isinstance(value, (MeterTerminal, MeterSequence)):
             mt = value
         else:  # assume it is a string
-            mt = MeterTerminal(value)
-
-        # if isinstance(value, str):
-        #     mt = MeterTerminal(value)
-        # elif isinstance(value, MeterTerminal):  # may be a MeterSequence
-        #     mt = value
-        # else:
-        #     raise MeterException('cannot add %s to this sequence' % value)
+            value_tuple = tools.slashToTuple(value)
+            mt = getMeterTerminal(numerator=value_tuple.numerator,
+                                  denominator=value_tuple.denominator)
         self._partition.append(mt)
         # clear cache
         self._levelListCache = {}
@@ -756,7 +712,7 @@ class MeterSequence(MeterCoreMixin, prebase.ProtoM21Object):
         # environLocal.printDebug(['partitionByCount, targetWeight', targetWeight])
         self._clearPartition()  # weight will now be zero
         for mStr in optMatch:
-            self._addTerminal(mStr)
+            self.addTerminal(mStr)
         self.weight = targetWeight
 
         # clear cache
@@ -802,8 +758,8 @@ class MeterSequence(MeterCoreMixin, prebase.ProtoM21Object):
         if isinstance(numeratorList[0], str):
             test = MeterSequence()
             for mtStr in numeratorList:
-                test._addTerminal(mtStr)
-            test._updateRatio()
+                test.addTerminal(mtStr)
+            test.updateRatio()
             # if durations are equal, this can be used as a partition
             if self.duration.quarterLength == test.duration.quarterLength:
                 optMatch = test
@@ -839,7 +795,7 @@ class MeterSequence(MeterCoreMixin, prebase.ProtoM21Object):
         targetWeight = self.weight
         self._clearPartition()  # clears self.weight
         for mStr in optMatch:
-            self._addTerminal(mStr)
+            self.addTerminal(mStr)
         self.weight = targetWeight
 
         # clear cache
@@ -867,7 +823,7 @@ class MeterSequence(MeterCoreMixin, prebase.ProtoM21Object):
         targetWeight = self.weight
         self._clearPartition()
         for mt in other:
-            self._addTerminal(copy.deepcopy(mt))
+            self.addTerminal(copy.deepcopy(mt))  # REFACTOR: do not deepcopy.
         self.weight = targetWeight
         # clear cache
         self._levelListCache = {}
@@ -960,12 +916,12 @@ class MeterSequence(MeterCoreMixin, prebase.ProtoM21Object):
         '''
         for i in range(len(self)):
             if divisions is None:  # get dynamically
-                if self[i].numerator in [1, 2, 4, 8, 16]:
+                if self[i].numerator.bit_count() == 1:  # (1, 2, 4, 8, 16, etc.)
                     divisionsLocal = 2
-                elif self[i].numerator in [3]:
+                elif self[i].numerator == 3:
                     divisionsLocal = 3
-                elif self[i].numerator in [6, 9, 12, 15, 18]:
-                    divisionsLocal = self[i].numerator / 3
+                elif not self[i].numerator % 3:
+                    divisionsLocal = self[i].numerator // 3
                 else:
                     divisionsLocal = self[i].numerator
             else:
@@ -1162,7 +1118,8 @@ class MeterSequence(MeterCoreMixin, prebase.ProtoM21Object):
     # loading is always destructive
 
     def load(self,
-             value: str | MeterTerminal | Iterable[str | MeterTerminal],
+             value: str | MeterTerminal | MeterSequence |
+                    Iterable[str | MeterTerminal | MeterSequence],
              partitionRequest=None,
              *,
              autoWeight=False,
@@ -1206,11 +1163,10 @@ class MeterSequence(MeterCoreMixin, prebase.ProtoM21Object):
         self._clearPartition()
 
         if isinstance(value, str):
-            ratioList, self.summedNumerator = tools.slashMixedToFraction(value)
+            ratioList, self.isSummedNumerator = tools.slashMixedToFraction(value)
             for n, d in ratioList:
-                slashNotation = f'{n}/{d}'
-                self._addTerminal(MeterTerminal(slashNotation))
-            self._updateRatio()
+                self.addTerminal(getMeterTerminal(n, d))
+            self.updateRatio()
             self.weight = targetWeight  # may be None
 
         elif isinstance(value, MeterTerminal):
@@ -1218,9 +1174,9 @@ class MeterSequence(MeterCoreMixin, prebase.ProtoM21Object):
             # set this terminal to the old weight
             mt = value
             if targetWeight is not None:
-                mt = value.modify(weight=targetWeight)
-            self._addTerminal(mt)
-            self._updateRatio()
+                mt = getMeterTerminal(mt.numerator, mt.denominator, weight=targetWeight)
+            self.addTerminal(mt)
+            self.updateRatio()
             # do not need to set weight, as based on terminal
             # environLocal.printDebug([
             #    'created MeterSequence from MeterTerminal; old weight, new weight',
@@ -1229,8 +1185,8 @@ class MeterSequence(MeterCoreMixin, prebase.ProtoM21Object):
         elif common.isIterable(value):  # a list of Terminals or Sequence es
             for obj in value:
                 # environLocal.printDebug('creating MeterSequence with %s' % obj)
-                self._addTerminal(obj)
-            self._updateRatio()
+                self.addTerminal(obj)
+            self.updateRatio()
             self.weight = targetWeight  # may be None
         else:
             raise MeterException(f'cannot create a MeterSequence with a {value!r}')
@@ -1241,7 +1197,7 @@ class MeterSequence(MeterCoreMixin, prebase.ProtoM21Object):
         # clear cache
         self._levelListCache = {}
 
-    def _updateRatio(self):
+    def updateRatio(self):
         '''
         Look at _partition to determine the total
         numerator and denominator values for this sequence
@@ -1252,8 +1208,8 @@ class MeterSequence(MeterCoreMixin, prebase.ProtoM21Object):
         fTuple = tuple((mt.numerator, mt.denominator) for mt in self._partition)
         # clear first to avoid partial updating
         # can only set to private attributes
-        # self._numerator, self._denominator = None, 1
-        self._numerator, self._denominator = tools.fractionSum(fTuple)
+        # self.numerator, self.denominator = None, 1
+        self.numerator, self.denominator = tools.fractionSum(fTuple)
         # must call ratio changed directly as not using properties
 
     # --------------------------------------------------------------------------
@@ -1270,8 +1226,8 @@ class MeterSequence(MeterCoreMixin, prebase.ProtoM21Object):
         >>> a.weight = 1
         >>> a[0].weight
         0.333...
-        >>> b = meter.MeterTerminal('1/4', weight=0.25)
-        >>> c = meter.MeterTerminal('1/4', weight=0.25)
+        >>> b = meter.MeterTerminal(1, 4, weight=0.25)
+        >>> c = meter.MeterTerminal(1, 4, weight=0.25)
         >>> d = meter.MeterSequence([b, c])
         >>> d.weight
         0.5
@@ -1295,32 +1251,31 @@ class MeterSequence(MeterCoreMixin, prebase.ProtoM21Object):
             if not common.isNum(value):
                 raise MeterException('weight values must be numbers')
             try:
-                totalRatio = self._numerator / self._denominator
+                totalRatio = self.numerator / self.denominator
             except TypeError:
                 raise MeterException(
                     'Something wrong with the type of '
                     + 'this numerator %s %s or this denominator %s %s' %
-                    (self._numerator, type(self._numerator),
-                                      self._denominator, type(self._denominator)))
+                    (self.numerator, type(self.numerator),
+                     self.denominator, type(self.denominator)))
 
             new_partition = []
             for mt in self._partition:
-                # for mt in self:
-                partRatio = mt._numerator / mt._denominator
-                new_partition.append(mt.modify(weight=value * (partRatio / totalRatio)))
+                partRatio = mt.numerator / mt.denominator
+                new_weight = value * (partRatio / totalRatio)
+                if isinstance(mt, MeterTerminal):
+                    new_mt = getMeterTerminal(mt.numerator,
+                                              mt.denominator,
+                                              weight=new_weight)
+                    new_partition.append(new_mt)
+                else:
+                    # MeterSequence
+                    mt.weight = new_weight
+                    new_partition.append(mt)
                 # mt.weight = (partRatio/totalRatio) #* totalRatio
                 # environLocal.printDebug(['setting weight based on part, total, weight',
                 #    partRatio, totalRatio, mt.weight])
             self._partition = new_partition
-
-    @property
-    def numerator(self):
-        return self._numerator
-
-    @property
-    def denominator(self):
-        return self._denominator
-
 
     def _getFlatList(self):
         '''
@@ -1517,10 +1472,10 @@ class MeterSequence(MeterCoreMixin, prebase.ProtoM21Object):
                         levelCount - 1, flat)
                 else:  # level count is at zero
                     if flat:  # make sequence into a terminal
-                        mt = MeterTerminal(
-                            numerator = el.numerator,
-                            denominator = el.denominator,
-                            weight = el.weight,
+                        mt = getMeterTerminal(
+                            numerator=el.numerator,
+                            denominator=el.denominator,
+                            weight=el.weight,
                         )
                         # set weight to that of the sequence
                         mtList.append(mt)
@@ -1745,7 +1700,6 @@ class MeterSequence(MeterCoreMixin, prebase.ProtoM21Object):
         greater than the duration of the Meter will be accepted
         as the modulus of the total meter duration.
 
-
         >>> a = meter.MeterSequence('3/4', 3)
         >>> a.offsetToSpan(0.5)
         (0, 1.0)
@@ -1866,6 +1820,14 @@ class MeterSequence(MeterCoreMixin, prebase.ProtoM21Object):
                     score += 1
 
         return score
+
+@lru_cache(1024)
+def constructMeterSequence(value: str, divisions: int) -> MeterSequence:
+    '''
+    Construct a meter sequence from a string and a number of divisions.
+    '''
+    return MeterSequence()
+
 
 
 if __name__ == '__main__':

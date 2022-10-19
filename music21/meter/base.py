@@ -45,7 +45,7 @@ if TYPE_CHECKING:
 
 # this is just a placeholder so that .beamSequence, etc. do not need to
 # be typed as Optional.  It should never be touched or queried
-_SENTINEL_METER_SEQUENCE = MeterSequence()
+_SENTINEL_METER_SEQUENCE = MeterSequence(())
 
 # -----------------------------------------------------------------------------
 
@@ -1057,15 +1057,17 @@ class TimeSignature(TimeSignatureBase):
         return f'{self.beatDivisionCountName} {self.beatCountName}'
 
     @property
-    def summedNumerator(self) -> bool:
-        if self.displaySequence is None:
-            return False
-        return self.displaySequence.summedNumerator
+    def isSummedNumerator(self) -> bool:
+        '''
+        Returns or sets whether the numerator is represented as a series of sums.
 
-    @summedNumerator.setter
-    def summedNumerator(self, value: bool):
-        if self.displaySequence is not None:
-            self.displaySequence.summedNumerator = value
+        * Changed in v9: was called `summedNumerator` before which was confusing.
+        '''
+        return self.displaySequence.isSummedNumerator
+
+    @isSummedNumerator.setter
+    def isSummedNumerator(self, value: bool):
+        self.displaySequence.isSummedNumerator = value
 
     # --------------------------------------------------------------------------
     # private methods -- most to be put into the various sequences.
@@ -1130,14 +1132,14 @@ class TimeSignature(TimeSignatureBase):
         This method sets default beam partitions when partitionRequest is None.
         '''
         # beam short measures of 8ths, 16ths, or 32nds all together
-        if self.beamSequence.summedNumerator:
+        if self.beamSequence.isSummedNumerator:
             pass  # do not mess with a numerator such as (3+2)/8
         elif self.denominator == 8 and self.numerator in (1, 2, 3):
             pass  # doing nothing will beam all together
-        elif self.denominator == 16 and self.numerator in range(1, 6):
+        elif self.denominator == 16 and self.numerator < 6:
             # 1 - 5 -- beam all together
             pass
-        elif self.denominator == 32 and self.numerator in range(1, 12):
+        elif self.denominator == 32 and self.numerator < 12:
             # 1 - 11 -- beam all together.
             pass
 
@@ -1159,8 +1161,8 @@ class TimeSignature(TimeSignatureBase):
         elif self.numerator == 7:
             self.beamSequence.partition(3)  # divide into three groups
 
-        elif self.numerator in [6, 9, 12, 15, 18, 21]:
-            self.beamSequence.partition([3] * int(self.numerator / 3))
+        elif not self.numerator % 3:  # (6, 9, 12, 15, etc.)
+            self.beamSequence.partition([3] * (self.numerator // 3))
         else:
             pass  # doing nothing will beam all together
         # environLocal.printDebug('default beam partitions set to: %s' % self.beamSequence)

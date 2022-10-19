@@ -6714,9 +6714,11 @@ class MeasureExporter(XMLExporterBase):
                 mxSenzaMisura.text = ts.text
             return mxTime
 
+        # TODO: this could be extremely optimized for common
+        #    case of not summed numerators.
         # always get a flat version to display any subdivisions created
         fList = tuple((mt.numerator, mt.denominator) for mt in ts.displaySequence.flatten())
-        if ts.summedNumerator:
+        if ts.isSummedNumerator:
             # this will try to reduce any common denominators into
             # a common group
             fList = meter.tools.fractionToSlashMixed(fList)
