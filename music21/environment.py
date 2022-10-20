@@ -398,10 +398,10 @@ class _EnvironmentCore:
             for name, value in [
                 ('lilypondPath', 'lilypond'),
                 ('musicxmlPath',
-                 common.cleanpath(r'%PROGRAMFILES%\MuseScore 3\MuseScore.exe')
+                 common.cleanpath(r'%PROGRAMFILES%\MuseScore 3\bin\MuseScore3.exe')
                  ),
                 ('musescoreDirectPNGPath',
-                 common.cleanpath(r'%PROGRAMFILES%\MuseScore 3\MuseScore.exe')
+                 common.cleanpath(r'%PROGRAMFILES%\MuseScore 3\bin\MuseScore3.exe')
                  ),
             ]:
                 self[name] = value  # use for key checking
