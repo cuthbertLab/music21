@@ -11,7 +11,6 @@
 # -----------------------------------------------------------------------------
 from __future__ import annotations
 
-import collections
 import fractions
 from functools import lru_cache
 import math
@@ -25,8 +24,12 @@ from music21.exceptions21 import MeterException, Music21Exception, TimeSignature
 
 environLocal = environment.Environment('meter.tools')
 
-MeterTerminalTuple = collections.namedtuple('MeterTerminalTuple',
-                                            ['numerator', 'denominator', 'division'])
+class MeterTerminalTuple(t.NamedTuple):
+    numerator: int
+    denominator: int
+    division: MeterDivision
+
+
 NumDenom = tuple[int, int]
 NumDenomTuple = tuple[NumDenom, ...]
 MeterOptions = tuple[tuple[NumDenom, ...], ...]
@@ -62,6 +65,8 @@ def slashToTuple(value: str) -> MeterTerminalTuple:
                                                     numbers='0123456789/.')
     valueNumbers = valueNumbers.strip()  # remove whitespace
     valueChars = valueChars.strip()  # remove whitespace
+
+    division: MeterDivision
     if 'slow' in valueChars.lower():
         division = MeterDivision.SLOW
     elif 'fast' in valueChars.lower():

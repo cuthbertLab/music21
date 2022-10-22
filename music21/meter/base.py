@@ -35,7 +35,7 @@ from music21 import environment
 from music21.exceptions21 import MeterException, TimeSignatureException
 from music21 import style
 
-from music21.meter.tools import slashToTuple, proportionToFraction
+from music21.meter.tools import slashToTuple, proportionToFraction, MeterTerminalTuple
 from music21.meter.core import MeterSequence
 
 environLocal = environment.Environment('meter')
@@ -380,7 +380,7 @@ class TimeSignature(TimeSignatureBase):
     >>> [thisNote.beatStr for thisNote in m3.notes]
     ['1', '2', '3', '4', '5', '6']
 
-    As of v7., 3/8 also defaults to fast 3/8, that is, one beat:
+    3/8 also defaults to fast 3/8, that is, one beat:
 
     >>> meter.TimeSignature('3/8').beatCount
     1
@@ -388,33 +388,29 @@ class TimeSignature(TimeSignatureBase):
     `TimeSignatures` can also use symbols instead of numbers
 
     >>> tsCommon = meter.TimeSignature('c')  # or common
+    >>> tsCommon.symbol
+    'common'
     >>> tsCommon.beatCount
     4
     >>> tsCommon.denominator
     4
 
-    >>> tsCommon.symbol
-    'common'
-
     >>> tsCut = meter.TimeSignature('cut')
+    >>> tsCut.symbol
+    'cut'
     >>> tsCut.beatCount
     2
     >>> tsCut.denominator
     2
-
-    >>> tsCut.symbol
-    'cut'
 
     For other time signatures, the symbol is '' (not set) or 'normal'
 
     >>> sixEight.symbol
     ''
 
-
     For complete details on using this object, see
     :ref:`User's Guide Chapter 14: Time Signatures <usersGuide_14_timeSignatures>` and
     :ref:`User's Guide Chapter 55: Advanced Meter <usersGuide_55_advancedMeter>` and
-
 
     That's it for the simple aspects of `TimeSignature` objects.  You know
     enough to get started now!
@@ -447,6 +443,8 @@ class TimeSignature(TimeSignatureBase):
     '2/4+3/16' or '11/16 (2/4+3/16)'.  Or you might want the written
     TimeSignature to contradict what the notes imply.  All this can be done
     with .displaySequence.
+
+    * Changed in v7:  3/8 defaults to one beat (fast 3/8)
     '''
     _styleClass = style.TextStyle
     classSortOrder = 4
@@ -550,7 +548,8 @@ class TimeSignature(TimeSignatureBase):
 
         # get simple representation; presently, only slashToTuple
         # supports the fast/slow indication
-        numerator, denominator, division = slashToTuple(value)
+        mtTuple: MeterTerminalTuple = slashToTuple(value)
+        numerator, denominator, division = mtTuple
         if division == MeterDivision.NONE:
             if numerator % 3 == 0 and denominator >= 8:
                 division = MeterDivision.FAST
