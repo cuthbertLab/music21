@@ -768,13 +768,13 @@ class MeterSequence(MeterCoreMixin, prebase.ProtoM21Object):
 
         # assume a list of terminal definitions
         if isinstance(numeratorList[0], str):
-            test = MeterSequence()
+            testSequence = MeterSequence()
             for mtStr in numeratorList:
-                test.addTerminal(tools.slashToTuple(mtStr)[:2])
-            test.updateRatio()
+                testSequence.addTerminal(tools.slashToTuple(mtStr)[:2])
+            testSequence.updateRatio()
             # if durations are equal, this can be used as a partition
-            if self.duration.quarterLength == test.duration.quarterLength:
-                optMatch = test
+            if self.duration.quarterLength == testSequence.duration.quarterLength:
+                optMatch = testSequence
             else:
                 raise MeterException(f'Cannot set partition by {numeratorList}')
 
