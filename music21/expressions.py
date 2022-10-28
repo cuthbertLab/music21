@@ -26,7 +26,7 @@ from __future__ import annotations
 
 import copy
 import string
-from typing import TYPE_CHECKING  # pylint needs no alias
+import typing as t
 
 from music21 import base
 from music21 import common
@@ -37,7 +37,7 @@ from music21 import spanner
 from music21 import style
 
 
-if TYPE_CHECKING:
+if t.TYPE_CHECKING:
     from music21 import note
 
 

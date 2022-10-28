@@ -19,7 +19,6 @@ from collections.abc import Sequence
 import copy
 import math
 import typing as t
-from typing import TYPE_CHECKING
 import unittest
 import warnings
 
@@ -43,7 +42,7 @@ from music21 import tempo
 from music21.midi.percussion import MIDIPercussionException, PercussionMapper
 
 
-if TYPE_CHECKING:
+if t.TYPE_CHECKING:
     from music21 import base
     from music21 import midi
 
@@ -2084,7 +2083,7 @@ def midiTrackToStream(
         ts_iter = conductorPart['TimeSignature']
         if ts_iter:
             meterStream = ts_iter.stream()
-            if TYPE_CHECKING:
+            if t.TYPE_CHECKING:
                 assert meterStream is not None
 
             # Supply any missing time signature at the start

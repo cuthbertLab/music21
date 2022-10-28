@@ -23,7 +23,6 @@ import copy
 import itertools
 import math
 import typing as t
-from typing import TYPE_CHECKING  # pylint needs no alias
 from typing import overload  # Pycharm can't use an alias
 import unittest
 
@@ -38,7 +37,7 @@ from music21 import interval
 from music21 import prebase
 from music21 import style
 
-if TYPE_CHECKING:
+if t.TYPE_CHECKING:
     from music21 import note
 
 PitchType = t.TypeVar('PitchType', bound='Pitch')

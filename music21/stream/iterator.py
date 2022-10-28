@@ -20,7 +20,6 @@ from collections.abc import Callable, Iterable, Sequence
 import copy
 import typing as t
 from typing import overload  # PyCharm can't use alias
-from typing import TYPE_CHECKING  # pylint needs no alias
 import unittest
 import warnings
 
@@ -35,7 +34,7 @@ from music21 import base   # just for typing. (but in a bound, so keep here)
 
 from music21.sites import SitesException
 
-if TYPE_CHECKING:
+if t.TYPE_CHECKING:
     from music21 import stream
 
 T = t.TypeVar('T')
@@ -753,7 +752,7 @@ class StreamIterator(prebase.ProtoM21Object, Sequence[M21ObjType]):
                     if f(e, self) is False:
                         return False
                 except TypeError:  # one element filters are acceptable.
-                    if TYPE_CHECKING:
+                    if t.TYPE_CHECKING:
                         assert isinstance(f, filters.StreamFilter)
                     if f(e) is False:
                         return False
@@ -1840,7 +1839,7 @@ class RecursiveIterator(StreamIterator, Sequence[M21ObjType]):
             # in a recursive filter, the stream does not need to match the filter,
             # only the internal elements.
             if e.isStream:
-                if TYPE_CHECKING:
+                if t.TYPE_CHECKING:
                     assert isinstance(e, stream.Stream)
 
                 childRecursiveIterator: RecursiveIterator[M21ObjType] = RecursiveIterator(

@@ -25,7 +25,7 @@ from __future__ import annotations
 
 import copy
 from fractions import Fraction
-from typing import TYPE_CHECKING  # pylint needs no alias
+import typing as t
 import unittest
 
 from music21.base import Music21Object
@@ -38,7 +38,7 @@ from music21.exceptions21 import StreamException, ImmutableStreamException
 from music21.stream.iterator import StreamIterator, RecursiveIterator
 
 
-if TYPE_CHECKING:
+if t.TYPE_CHECKING:
     from music21.stream import Stream
 
 
@@ -546,7 +546,7 @@ class StreamCore(Music21Object):
         >>> scoreTree
         <ElementTree {20} (0.0 <0.-25...> to 8.0) <music21.stream.Score exampleScore>>
         '''
-        if TYPE_CHECKING:
+        if t.TYPE_CHECKING:
             assert isinstance(self, Stream)
         hashedAttributes = hash((tuple(classList or ()),
                                   flatten,

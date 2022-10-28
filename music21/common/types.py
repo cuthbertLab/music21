@@ -13,11 +13,10 @@ from __future__ import annotations
 from collections.abc import Callable, Iterable
 from fractions import Fraction
 import typing as t
-from typing import TYPE_CHECKING
 
 from music21.common.enums import OffsetSpecial
 
-if TYPE_CHECKING:
+if t.TYPE_CHECKING:
     import music21  # pylint: disable=unused-import
 
 DocOrder = list[str | Callable]

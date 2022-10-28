@@ -28,7 +28,6 @@ from collections.abc import Iterable
 import importlib
 import unittest
 import typing as t
-from typing import TYPE_CHECKING  # must be imported separately
 
 from music21 import base
 from music21 import common
@@ -39,7 +38,7 @@ from music21 import note
 from music21 import pitch
 from music21.tree.trees import OffsetTree
 
-if TYPE_CHECKING:
+if t.TYPE_CHECKING:
     from music21 import stream
 
 environLocal = environment.Environment('instrument')

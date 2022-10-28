@@ -21,7 +21,6 @@ from collections.abc import Iterable, Sequence
 import copy
 import typing as t
 from typing import overload  # pycharm bug
-from typing import TYPE_CHECKING  # pylint bug
 import unittest
 
 from music21 import beam
@@ -41,7 +40,7 @@ from music21.chord import tables
 from music21.chord import tools
 
 
-if TYPE_CHECKING:
+if t.TYPE_CHECKING:
     from music21 import stream
 
 
@@ -470,7 +469,7 @@ class ChordBase(note.NotRest):
         if velocities:  # avoid division by zero error
             self._volume.velocity = int(round(sum(velocities) / len(velocities)))
 
-        if TYPE_CHECKING:
+        if t.TYPE_CHECKING:
             assert self._volume is not None
         return self._volume
 
@@ -487,7 +486,7 @@ class ChordBase(note.NotRest):
             note.NotRest._setVolume(self, expr, setClient=False)
         elif common.isNum(expr):
             vol = self._getVolume()
-            if TYPE_CHECKING:
+            if t.TYPE_CHECKING:
                 assert isinstance(expr, (int, float))
 
             if expr < 1:  # assume a scalar
@@ -4042,7 +4041,7 @@ class Chord(ChordBase):
         if inPlace is True:
             c2 = self
 
-        if TYPE_CHECKING:
+        if t.TYPE_CHECKING:
             from music21.stream import Stream
             assert isinstance(c2, Stream)
         # startOctave = c2.bass().octave
@@ -5009,7 +5008,7 @@ class Chord(ChordBase):
             self._duration = pitchZeroDuration
 
         d_out = self._duration
-        if TYPE_CHECKING:
+        if t.TYPE_CHECKING:
             assert isinstance(d_out, Duration)
         return d_out
 

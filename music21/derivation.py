@@ -19,7 +19,7 @@ from __future__ import annotations
 
 from collections.abc import Generator
 import functools
-from typing import TYPE_CHECKING  # Pylint bug
+import typing as t
 import unittest
 
 from music21 import common
@@ -27,7 +27,7 @@ from music21.common.objects import SlottedObjectMixin
 from music21 import environment
 
 
-if TYPE_CHECKING:
+if t.TYPE_CHECKING:
     from music21 import base
 
 
