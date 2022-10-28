@@ -44,7 +44,6 @@ import functools
 from importlib.util import find_spec
 import typing as t
 from typing import overload  # Pycharm can't do alias
-from typing import TYPE_CHECKING  # pylint needs no alias
 import unittest
 import warnings
 import weakref
@@ -67,7 +66,7 @@ from music21.sorting import SortTuple, ZeroSortTupleLow, ZeroSortTupleHigh
 # needed for temporal manipulations; not music21 objects
 from music21 import tie
 
-if TYPE_CHECKING:
+if t.TYPE_CHECKING:
     import fractions
     from io import IOBase
     import pathlib
@@ -2749,7 +2748,7 @@ class Music21Object(prebase.ProtoM21Object):
             self._duration = Duration(0)
 
         d_out = self._duration
-        if TYPE_CHECKING:
+        if t.TYPE_CHECKING:
             assert d_out is not None
 
         return d_out

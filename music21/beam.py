@@ -75,7 +75,7 @@ To get rid of beams on a note do:
 from __future__ import annotations
 
 from collections.abc import Iterable
-from typing import TYPE_CHECKING  # pylint bug
+import typing as t
 import unittest
 
 from music21 import exceptions21
@@ -86,7 +86,7 @@ from music21 import style
 from music21.common.objects import EqualSlottedObjectMixin
 
 
-if TYPE_CHECKING:
+if t.TYPE_CHECKING:
     from music21 import base
 
 

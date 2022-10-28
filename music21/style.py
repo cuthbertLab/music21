@@ -15,7 +15,7 @@ etc. such that precise positioning information, layout, size, etc. can be specif
 '''
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+import typing as t
 import unittest
 
 from music21 import common
@@ -23,7 +23,7 @@ from music21 import exceptions21
 from music21.prebase import ProtoM21Object
 
 
-if TYPE_CHECKING:
+if t.TYPE_CHECKING:
     from music21 import editorial
 
 

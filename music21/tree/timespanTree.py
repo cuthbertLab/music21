@@ -20,7 +20,7 @@ from __future__ import annotations
 from collections.abc import Generator, Iterable
 import itertools
 import random
-from typing import TYPE_CHECKING
+import typing as t
 import unittest
 
 import more_itertools
@@ -33,7 +33,7 @@ from music21.tree import spans
 from music21.tree import trees
 
 
-if TYPE_CHECKING:
+if t.TYPE_CHECKING:
     from music21.tree.verticality import VerticalitySequence
 
 

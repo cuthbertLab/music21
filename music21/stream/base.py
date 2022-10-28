@@ -32,7 +32,6 @@ import os
 import pathlib
 import typing as t
 from typing import overload  # pycharm bug disallows alias
-from typing import TYPE_CHECKING  # pylint bug
 import unittest
 import warnings
 
@@ -69,7 +68,7 @@ from music21.stream import filters
 from music21.stream.enums import GivenElementsBehavior, RecursionType
 
 
-if TYPE_CHECKING:
+if t.TYPE_CHECKING:
     from music21 import pitch
     from music21 import spanner
 

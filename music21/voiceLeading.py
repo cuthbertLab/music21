@@ -36,7 +36,7 @@ The list of objects included here are:
 from __future__ import annotations
 
 import enum
-from typing import TYPE_CHECKING  # pylint bug; does not arise here though.
+import typing as t
 import unittest
 
 from music21 import base
@@ -535,7 +535,7 @@ class VoiceLeadingQuartet(base.Music21Object):
         vInt1 = self.vIntervals[1]
         vInt1_generic = vInt1.generic
 
-        if TYPE_CHECKING:
+        if t.TYPE_CHECKING:
             assert vInt0_generic is not None
             assert vInt1_generic is not None
 
@@ -1134,7 +1134,7 @@ class VoiceLeadingQuartet(base.Music21Object):
 
         firstHarmony = self.vIntervals[0].simpleName
         secondGeneric = self.vIntervals[1].generic
-        if TYPE_CHECKING:
+        if t.TYPE_CHECKING:
             assert secondGeneric is not None
         secondHarmony = secondGeneric.simpleUndirected
 
@@ -1202,7 +1202,7 @@ class VoiceLeadingQuartet(base.Music21Object):
 
         hInt0_generic = self.hIntervals[0].generic
         hInt1_generic = self.hIntervals[1].generic
-        if TYPE_CHECKING:
+        if t.TYPE_CHECKING:
             assert hInt0_generic is not None
             assert hInt1_generic is not None
 
@@ -1263,7 +1263,7 @@ class VoiceLeadingQuartet(base.Music21Object):
         v1ns = v1.noteStart
         v1ne = v1.noteEnd
 
-        if TYPE_CHECKING:
+        if t.TYPE_CHECKING:
             assert v0ns is not None and v0ne is not None
             assert v1ns is not None and v1ne is not None
 
@@ -1318,7 +1318,7 @@ class VoiceLeadingQuartet(base.Music21Object):
 
         vInt0_generic = self.vIntervals[0].generic
         vInt1_generic = self.vIntervals[1].generic
-        if TYPE_CHECKING:
+        if t.TYPE_CHECKING:
             assert vInt0_generic is not None
             assert vInt1_generic is not None
 

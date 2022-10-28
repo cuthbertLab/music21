@@ -17,7 +17,7 @@ Chord from FretBoard Object with tuning.
 '''
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+import typing as t
 import unittest
 
 from music21 import common
@@ -27,7 +27,7 @@ from music21 import pitch
 from music21 import prebase
 
 
-if TYPE_CHECKING:
+if t.TYPE_CHECKING:
     from music21 import duration
 
 

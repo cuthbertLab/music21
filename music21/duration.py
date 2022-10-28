@@ -55,7 +55,6 @@ from functools import lru_cache
 import io
 from math import inf, isnan
 import typing as t
-from typing import TYPE_CHECKING  # pylint bug
 import unittest
 
 from music21 import common
@@ -68,7 +67,7 @@ from music21 import exceptions21
 from music21 import prebase
 
 
-if TYPE_CHECKING:
+if t.TYPE_CHECKING:
     from music21 import base
     from music21 import note
     from music21 import stream
@@ -3524,7 +3523,7 @@ class TupletFixer:
             currentTupletDuration = opFrac(currentTupletDuration + n.duration.quarterLength)
             thisTup = n.duration.tuplets[0]
             tupDurationActual = thisTup.durationActual
-            if TYPE_CHECKING:
+            if t.TYPE_CHECKING:
                 assert tupDurationActual is not None
 
             thisTupType = tupDurationActual.type
