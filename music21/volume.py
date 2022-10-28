@@ -48,17 +48,23 @@ class Volume(prebase.ProtoM21Object, SlottedObjectMixin):
     The Volume object lives on NotRest objects and subclasses. It is not a
     Music21Object subclass.
 
-    >>> v = volume.Volume(velocity=90)
-    >>> v
-    <music21.volume.Volume realized=0.71>
-    >>> v.velocity
-    90
+    Generally, just assume that a Note has a volume object and don't worry
+    about creating this class directly:
 
     >>> n = note.Note('C5')
     >>> v = n.volume
     >>> v.velocity = 20
     >>> v.client is n
     True
+
+    But if you want to create it yourself, you can specify the client, velocity,
+    velocityScalar, and
+
+    >>> v = volume.Volume(velocity=90)
+    >>> v
+    <music21.volume.Volume realized=0.71>
+    >>> v.velocity
+    90
     '''
     # CLASS VARIABLES #
     __slots__ = (
@@ -70,10 +76,11 @@ class Volume(prebase.ProtoM21Object, SlottedObjectMixin):
 
     def __init__(
         self,
+        *,
         client: note.NotRest | None = None,
-        velocity=None,
-        velocityScalar=None,
-        velocityIsRelative=True,
+        velocity: int | float | None = None,
+        velocityScalar: int | float | None = None,
+        velocityIsRelative: bool = True,
     ):
         # store a reference to the client, as we use this to do context
         # will use property; if None will leave as None
@@ -103,8 +110,14 @@ class Volume(prebase.ProtoM21Object, SlottedObjectMixin):
         '''
         Return the dynamic context of this Volume, based on the position of the
         client of this object.
+
+        >>> n = note.Note()
+        >>> n.volume.velocityScalar = 0.9
+        >>> s = stream.Measure([dynamics.Dynamic('ff'), n])
+        >>> n.volume.getDynamicContext()
+        <music21.dynamics.Dynamic ff>
         '''
-        # TODO: find wedges and crescendi too  and demo/test.
+        # TODO: find wedges and crescendi too and demo/test.
         return self.client.getContextByClass('Dynamic')
 
     def mergeAttributes(self, other):
@@ -113,9 +126,8 @@ class Volume(prebase.ProtoM21Object, SlottedObjectMixin):
         Values are always copied, not passed by reference.
 
         >>> n1 = note.Note()
-        >>> v1 = volume.Volume()
+        >>> v1 = n1.volume
         >>> v1.velocity = 111
-        >>> v1.client = n1
 
         >>> v2 = volume.Volume()
         >>> v2.mergeAttributes(v1)
@@ -249,8 +261,10 @@ class Volume(prebase.ProtoM21Object, SlottedObjectMixin):
                 elif self.client is not None:
                     dm = self.getDynamicContext()  # dm may be None
                 else:
-                    environLocal.printDebug(['getRealized():',
-                    'useDynamicContext is True but no dynamic supplied or found in context'])
+                    environLocal.printDebug([
+                        'getRealized():',
+                        'useDynamicContext is True but no dynamic supplied or found in context',
+                    ])
                 if dm is not None:
                     # double scalar (so range is between 0 and 1) and scale
                     # the current val (around the base)
@@ -314,7 +328,7 @@ class Volume(prebase.ProtoM21Object, SlottedObjectMixin):
         return self.getRealized()
 
     @property
-    def velocity(self):
+    def velocity(self) -> int:
         '''
         Get or set the velocity value, a numerical value between 0 and 127 and
         available setting amplitude on each Note or Pitch in chord.
@@ -338,7 +352,7 @@ class Volume(prebase.ProtoM21Object, SlottedObjectMixin):
         return round(v)
 
     @velocity.setter
-    def velocity(self, value):
+    def velocity(self, value: int | float):
         if not common.isNum(value):
             raise VolumeException(f'value provided for velocity must be a number, not {value}')
         if value < 0:

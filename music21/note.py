@@ -1032,7 +1032,7 @@ class NotRest(GeneralNote):
 
         >>> import copy
         >>> n = note.NotRest()
-        >>> n.volume = volume.Volume(50)
+        >>> n.volume = volume.Volume(velocity=50)
         >>> m = copy.deepcopy(n)
         >>> m.volume.client is m
         True
