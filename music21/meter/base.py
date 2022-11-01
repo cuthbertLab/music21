@@ -502,7 +502,10 @@ class TimeSignature(TimeSignatureBase):
     _styleClass = style.TextStyle
     classSortOrder = 4
 
-    equalityAttributes = ('symbol', 'ratioString', 'beatCount')
+    equalityAttributes = ('symbol',  # '2/2' != 'Cut'
+                          'ratioString',  # '2+3' != '3+2'
+                          'beatCount'  # 'slow 6/8' != 'fast 6/8'
+                          )
 
     _DOC_ATTR: dict[str, str] = {
         'beatSequence': 'A :class:`~music21.meter.MeterSequence` governing beat partitioning.',
