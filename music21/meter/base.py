@@ -541,16 +541,6 @@ class TimeSignature(TimeSignatureBase):
     def _reprInternal(self):
         return self.ratioString
 
-    def __eq__(self, other) -> bool:
-        '''
-        See notes at class doc and in meter.tests
-        '''
-
-        if not super().__eq__(other):
-            return False
-
-        return True
-
     def resetValues(self, value: str = '4/4', divisions=None):
         '''
         reset all values according to a new value and optionally, the number of
