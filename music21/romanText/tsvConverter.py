@@ -25,7 +25,6 @@ import unittest
 from music21 import chord
 from music21 import common
 from music21 import environment
-from music21 import exceptions21
 from music21 import harmony
 from music21 import key
 from music21 import metadata
@@ -36,14 +35,6 @@ from music21 import stream
 environLocal = environment.Environment()
 
 # ------------------------------------------------------------------------------
-
-
-class TsvException(exceptions21.Music21Exception):
-    pass
-
-
-# ------------------------------------------------------------------------------
-
 # V1_HEADERS and V2_HEADERS specify the columns that we process from the DCML
 # files, together with the type that the columns should be coerced to (usually
 # str)
@@ -541,7 +532,8 @@ class TsvHandler:
         self.tsvData = self._importTsv()  # converted to private
 
     def _get_heading_indices(self, header_row: list[str]) -> None:
-        '''Private method to get column name/column index correspondences.
+        '''
+        Private method to get column name/column index correspondences.
 
         Expected column indices (those in HEADERS, which correspond to TabChord
         attributes) are stored in self._head_indices. Others go in

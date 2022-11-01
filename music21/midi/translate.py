@@ -19,7 +19,6 @@ from collections.abc import Sequence
 import copy
 import math
 import typing as t
-from typing import TYPE_CHECKING
 import unittest
 import warnings
 
@@ -43,7 +42,7 @@ from music21 import tempo
 from music21.midi.percussion import MIDIPercussionException, PercussionMapper
 
 
-if TYPE_CHECKING:
+if t.TYPE_CHECKING:
     from music21 import base
     from music21 import midi
 
@@ -301,7 +300,7 @@ def _constructOrUpdateNotRestSubclass(
     is constructed instead. Raises TypeError if an incompatible class is provided
     for returnClass.
 
-    Changed in v8 -- no inputM21
+    * Changed in v8: no inputM21
     '''
     if not issubclass(returnClass, note.NotRest):
         raise TypeError(f'Expected subclass of note.NotRest; got {returnClass}')
@@ -385,9 +384,9 @@ def midiEventsToNote(
     >>> unp.storedInstrument
     <music21.instrument.UnpitchedPercussion 'Percussion'>
 
-    Changed in v7.3 -- Returns None if `inputM21` is provided. Returns a
+    * Changed in v7.3: Returns None if `inputM21` is provided. Returns a
         :class:`~music21.note.Unpitched` instance if the event is on Channel 10.
-    Changed in v8 -- `inputM21` is no longer supported.
+    * Changed in v8: `inputM21` is no longer supported.
         The only supported usage now is two tuples.
     '''
     tOn, eOn = eventTuple[0]
@@ -469,8 +468,8 @@ def noteToMidiEvents(
     [<music21.midi.MidiEvent NOTE_ON, track=None, channel=9, pitch=61, velocity=90>,
      <music21.midi.MidiEvent NOTE_OFF, track=None, channel=9, pitch=61, velocity=0>]
 
-    Changed in v7 -- made keyword-only.
-    Changed in v8 -- added support for :class:`~music21.note.Unpitched`
+    * Changed in v7: made keyword-only.
+    * Changed in v8: added support for :class:`~music21.note.Unpitched`
     '''
     from music21 import midi as midiModule
 
@@ -602,10 +601,10 @@ def midiEventsToChord(
     ...                                   ((dt2.time, me2), (dt4.time, me4))])
     <music21.percussion.PercussionChord [Tom-Tom Hi-Hat Cymbal]>
 
-    Changed in v7 -- Uses the last DeltaTime in the list to get the end time.
-    Changed in v7.3 -- Returns a :class:`~music21.percussion.PercussionChord` if
-    any event is on channel 10.
-    Changed in v8 -- inputM21 is no longer supported.  Flat list format is removed.
+    * Changed in v7: Uses the last DeltaTime in the list to get the end time.
+    * Changed in v7.3: Returns a :class:`~music21.percussion.PercussionChord` if
+      any event is on channel 10.
+    * Changed in v8: inputM21 is no longer supported.  Flat list format is removed.
     '''
     tOn: int = 0  # ticks
     tOff: int = 0  # ticks
@@ -692,8 +691,8 @@ def chordToMidiEvents(
      <music21.midi.DeltaTime (empty) track=None, channel=None>,
      <music21.midi.MidiEvent NOTE_OFF, track=None, channel=1, pitch=83, velocity=0>]
 
-    Changed in v7 -- made keyword-only.
-    Changed in v8 -- added support for :class:`~music21.percussion.PercussionChord`
+    * Changed in v7: made keyword-only.
+    * Changed in v8: added support for :class:`~music21.percussion.PercussionChord`
     '''
     from music21 import midi as midiModule
     mt = None  # midi track
@@ -1261,9 +1260,10 @@ def getPacketFromMidiEvent(
     return post
 
 
+# noinspection PyTypeChecker
 def elementToMidiEventList(
     el: base.Music21Object
-) -> list[midi.MidiEvent] | None:
+) -> list[midi.MidiEvent | midi.MidiEvent] | None:
     '''
     Return a list of MidiEvents (or None) from a Music21Object,
     assuming that dynamics have already been applied, etc.
@@ -1278,42 +1278,40 @@ def elementToMidiEventList(
     [<music21.midi.MidiEvent NOTE_ON, track=None, channel=1, pitch=60, velocity=90>,
      <music21.midi.MidiEvent NOTE_OFF, track=None, channel=1, pitch=60, velocity=0>]
     '''
-    # TODO: this is the best use of the switch statement when minimum Python
-    #    version is 3.10
-    sub: list[midi.DeltaTime | midi.MidiEvent] | None
-    if isinstance(el, note.Rest):
-        return None
-    elif isinstance(el, note.Note):
-        # get a list of midi events
-        # using this property here is easier than using the above conversion
-        # methods, as we do not need to know what the object is
-        sub = noteToMidiEvents(el, includeDeltaTime=False)
-    elif isinstance(el, note.Unpitched):
-        sub = noteToMidiEvents(el, includeDeltaTime=False, channel=10)
-    elif isinstance(el, chord.Chord):
-        # TODO: skip Harmony unless showAsChord
-        sub = chordToMidiEvents(el, includeDeltaTime=False)
-    elif isinstance(el, percussion.PercussionChord):
-        sub = chordToMidiEvents(el, includeDeltaTime=False, channel=10)
-    elif isinstance(el, dynamics.Dynamic):
-        return None  # dynamics have already been applied to notes
-    elif isinstance(el, meter.TimeSignature):
-        # return a pair of events
-        sub = timeSignatureToMidiEvents(el, includeDeltaTime=False)
-    elif isinstance(el, key.KeySignature):
-        sub = keySignatureToMidiEvents(el, includeDeltaTime=False)
-    elif isinstance(el, tempo.MetronomeMark):
-        # any tempo indication will work
-        # note: tempo indications need to be in channel one for most playback
-        sub = tempoToMidiEvents(el, includeDeltaTime=False)
-    elif isinstance(el, instrument.Instrument):
-        # first instrument will have been gathered above with get start elements
-        sub = instrumentToMidiEvents(el, includeDeltaTime=False)
-    else:
-        # other objects may have already been added
-        return None
-
-    return sub
+    # remove Jetbrains "noinspection PyTypeChecker" when
+    # https://youtrack.jetbrains.com/issue/PY-48011/Pattern-Matching-Type-inference
+    # is fixed.  Until then, don't implement more Structural Pattern Matching.
+    match el:
+        case note.Rest():
+            return None
+        case note.Note():
+            # get a list of midi events
+            # using this property here is easier than using the above conversion
+            # methods, as we do not need to know what the object is
+            return noteToMidiEvents(el, includeDeltaTime=False)
+        case note.Unpitched():
+            return noteToMidiEvents(el, includeDeltaTime=False, channel=10)
+        case chord.Chord():
+            # TODO: skip Harmony unless showAsChord
+            return chordToMidiEvents(el, includeDeltaTime=False)
+        case percussion.PercussionChord():
+            return chordToMidiEvents(el, includeDeltaTime=False, channel=10)
+        case dynamics.Dynamic():
+            return None  # dynamics have already been applied to notes
+        case meter.TimeSignature():
+            return timeSignatureToMidiEvents(el, includeDeltaTime=False)
+        case key.KeySignature():
+            return keySignatureToMidiEvents(el, includeDeltaTime=False)
+        case tempo.MetronomeMark():
+            # any tempo indication will work
+            # note: tempo indications need to be in channel one for most playback
+            return tempoToMidiEvents(el, includeDeltaTime=False)
+        case instrument.Instrument():
+            # first instrument will have been gathered above with get start elements
+            return instrumentToMidiEvents(el, includeDeltaTime=False)
+        case _:
+            # other objects may have already been added
+            return None
 
 
 def streamToPackets(
@@ -1943,8 +1941,8 @@ def midiTrackToStream(
         {2.5} <music21.note.Rest dotted-quarter>
         {4.0} <music21.bar.Barline type=final>
 
-    Changed in v7 -- Now makes measures.
-    Changed in v8 -- all but the first attribute are keyword only.
+    * Changed in v7: Now makes measures.
+    * Changed in v8: all but the first attribute are keyword only.
     '''
     # environLocal.printDebug(['midiTrackToStream(): got midi track: events',
     # len(mt.events), 'ticksPerQuarter', ticksPerQuarter])
@@ -2085,7 +2083,7 @@ def midiTrackToStream(
         ts_iter = conductorPart['TimeSignature']
         if ts_iter:
             meterStream = ts_iter.stream()
-            if TYPE_CHECKING:
+            if t.TYPE_CHECKING:
                 assert meterStream is not None
 
             # Supply any missing time signature at the start
@@ -2524,8 +2522,8 @@ def streamHierarchyToMidiTracks(
 
     2. we make a list of all instruments that are being used in the piece.
 
-    Changed in v.6 -- acceptableChannelList is keyword only.  addStartDelay is new.
-    Changed in v.6.5 -- Track 0 (tempo/conductor track) always exported.
+    * Changed in v6: acceptableChannelList is keyword only.  addStartDelay is new.
+    * Changed in v6.5: Track 0 (tempo/conductor track) always exported.
     '''
     # makes a deepcopy
     s = prepareStreamForMidi(inputM21)
@@ -2705,7 +2703,7 @@ def midiFilePathToStream(
     >>> streamScore
     <music21.stream.Score ...>
 
-    Changed in v8: inputM21 is keyword only.
+    * Changed in v8: inputM21 is keyword only.
     '''
     from music21 import midi as midiModule
     mf = midiModule.MidiFile()
@@ -2870,7 +2868,7 @@ def midiFileToStream(
     >>> len(s.flatten().notesAndRests)
     14
 
-    Changed in v8: inputM21 and quantizePost are keyword only.
+    * Changed in v8: inputM21 and quantizePost are keyword only.
     '''
     # environLocal.printDebug(['got midi file: tracks:', len(mf.tracks)])
     if inputM21 is None:
@@ -3227,6 +3225,8 @@ class Test(unittest.TestCase):
                  instrument.Trumpet]
 
         sc = scale.MinorScale()
+        # something strange with PyCharm type checker here.  Thinks it is off one argument.
+        # noinspection PyTypeChecker
         pitches = sc.getPitches('c2', 'c5')
         random.shuffle(pitches)
 
@@ -3276,6 +3276,8 @@ class Test(unittest.TestCase):
         import random
 
         sc = scale.MajorScale()
+        # something strange with PyCharm type checker here.  Thinks it is off one argument.
+        # noinspection PyTypeChecker
         pitches = sc.getPitches('c2', 'c5')
         random.shuffle(pitches)
 
@@ -3328,6 +3330,8 @@ class Test(unittest.TestCase):
                  instrument.Piano]
 
         sc = scale.MajorScale()
+        # something strange with PyCharm type checker here.  Thinks it is off one argument.
+        # noinspection PyTypeChecker
         pitches = sc.getPitches('c2', 'c5')
         # random.shuffle(pitches)
 
@@ -3637,7 +3641,9 @@ class Test(unittest.TestCase):
             self.assertIn(ts, m)
 
     def testMidiExportConductorA(self):
-        '''Export conductor data to MIDI conductor track.'''
+        '''
+        Export conductor data to MIDI conductor track.
+        '''
         p1 = stream.Part()
         p1.repeatAppend(note.Note('c4'), 12)
         p1.insert(0, meter.TimeSignature('3/4'))
@@ -3698,7 +3704,9 @@ class Test(unittest.TestCase):
         self.assertEqual(mtsRepr.count('SET_TEMPO'), 100)
 
     def testMidiExportConductorD(self):
-        '''120 bpm and 4/4 are supplied by default.'''
+        '''
+        120 bpm and 4/4 are supplied by default.
+        '''
         s = stream.Stream()
         s.insert(note.Note())
         mts = streamHierarchyToMidiTracks(s)
@@ -3710,7 +3718,9 @@ class Test(unittest.TestCase):
         self.assertEqual(condTrkRepr.count('PITCH_BEND'), 0)
 
     def testMidiExportConductorE(self):
-        '''The conductor only gets the first element at an offset.'''
+        '''
+        The conductor only gets the first element at an offset.
+        '''
         from music21 import converter
 
         s = stream.Stream()
@@ -3730,7 +3740,9 @@ class Test(unittest.TestCase):
         self.assertEqual(len(keySignatures), 1)
 
     def testMidiExportConductorF(self):
-        '''Multiple meter changes'''
+        '''
+        Multiple meter changes
+        '''
         from music21 import converter
         from music21 import midi as midiModule
 
@@ -4072,17 +4084,19 @@ class Test(unittest.TestCase):
     def testExportUnpitched(self):
         from music21 import midi as midiModule
 
-        m = stream.Measure(
-            [instrument.BassDrum(),
+        m = stream.Measure([
+            instrument.BassDrum(),
             note.Unpitched(),
-            percussion.PercussionChord([note.Unpitched(), note.Unpitched()])]
-        )
-        trks = streamHierarchyToMidiTracks(m)
-        bd_trk = trks[1]
+            percussion.PercussionChord([note.Unpitched(), note.Unpitched()]),
+        ])
+        tracks = streamHierarchyToMidiTracks(m)
+        bass_drum_track = tracks[1]
 
-        self.assertTrue({ev.channel for ev in bd_trk.events}, {10})
+        self.assertTrue({ev.channel for ev in bass_drum_track.events}, {10})
         note_ons = [
-            ev for ev in bd_trk.events if ev.type is midiModule.ChannelVoiceMessages.NOTE_ON]
+            ev for ev in bass_drum_track.events
+            if ev.type is midiModule.ChannelVoiceMessages.NOTE_ON
+        ]
         self.assertEqual(len(note_ons), 3)
         self.assertEqual({ev.pitch for ev in note_ons}, {35})
 
@@ -4090,24 +4104,24 @@ class Test(unittest.TestCase):
         m.pop(0)
         m.insert(0, instrument.Instrument())
 
-        trks = streamHierarchyToMidiTracks(m)
-        drum_trk = trks[1]
+        tracks = streamHierarchyToMidiTracks(m)
+        drum_track = tracks[1]
 
-        self.assertTrue({ev.channel for ev in drum_trk.events}, {10})
+        self.assertTrue({ev.channel for ev in drum_track.events}, {10})
         note_ons = [
-            ev for ev in drum_trk.events if ev.type is midiModule.ChannelVoiceMessages.NOTE_ON]
+            ev for ev in drum_track.events if ev.type is midiModule.ChannelVoiceMessages.NOTE_ON]
         self.assertEqual(len(note_ons), 3)
         self.assertEqual({ev.pitch for ev in note_ons}, {60})  # fallback
 
         # Change the stored instrument: affects that note only
         m.notes.first().storedInstrument = instrument.Agogo()
 
-        trks = streamHierarchyToMidiTracks(m)
-        mixed_trk = trks[1]
+        tracks = streamHierarchyToMidiTracks(m)
+        mixed_track = tracks[1]
 
-        self.assertTrue({ev.channel for ev in mixed_trk.events}, {10})
+        self.assertTrue({ev.channel for ev in mixed_track.events}, {10})
         note_ons = [
-            ev for ev in mixed_trk.events if ev.type is midiModule.ChannelVoiceMessages.NOTE_ON]
+            ev for ev in mixed_track.events if ev.type is midiModule.ChannelVoiceMessages.NOTE_ON]
         self.assertEqual(len(note_ons), 3)
         self.assertEqual([ev.pitch for ev in note_ons], [67, 60, 60])
 

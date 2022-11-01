@@ -463,22 +463,37 @@ def scoreToBraille(music21Score,
     return '\n'.join(allBrailleLines)
 
 
-def metadataToString(music21Metadata, returnBrailleUnicode=False):
+def metadataToString(music21Metadata: metadata.Metadata, returnBrailleUnicode=False) -> str:
     '''
+    Convert a Metadata format to a format for BRF.
+
     >>> from music21.braille import translate
     >>> corelli = corpus.parse('monteverdi/madrigal.3.1.rntxt')
     >>> mdObject = corelli.getElementsByClass(metadata.Metadata).first()
     >>> mdObject.__class__
     <class 'music21.metadata.Metadata'>
+
+    The default is very close to ascii.
+
     >>> print(translate.metadataToString(mdObject))
     Alternative Title: 3.1
     Composer: Claudio Monteverdi
     Title: La Giovinetta Pianta
 
-    >>> print(translate.metadataToString(mdObject, returnBrailleUnicode=True))
+    And in Braille Unicode.
+
+    >>> unicodeVersion = translate.metadataToString(mdObject, returnBrailleUnicode=True)
+    >>> print(unicodeVersion)
     ⠠⠁⠇⠞⠑⠗⠝⠁⠞⠊⠧⠑⠀⠠⠞⠊⠞⠇⠑⠒⠀⠼⠉⠲⠁
     ⠠⠉⠕⠍⠏⠕⠎⠑⠗⠒⠀⠠⠉⠇⠁⠥⠙⠊⠕⠀⠠⠍⠕⠝⠞⠑⠧⠑⠗⠙⠊
     ⠠⠞⠊⠞⠇⠑⠒⠀⠠⠇⠁⠀⠠⠛⠊⠕⠧⠊⠝⠑⠞⠞⠁⠀⠠⠏⠊⠁⠝⠞⠁
+
+    Note the difference between the first and then translating back to ASCII Braille:
+
+    >>> print(braille.basic.brailleUnicodeToBrailleAscii(unicodeVersion))
+    ,ALTERNATIVE ,TITLE3 #C4A
+    ,COMPOSER3 ,CLAUDIO ,MONTEVERDI
+    ,TITLE3 ,LA ,GIOVINETTA ,PIANTA
     '''
     allBrailleLines = []
     for uniqueName, value in music21Metadata.all(returnPrimitives=True, returnSorted=False):
@@ -790,8 +805,10 @@ class Test(unittest.TestCase):
         self.assertEqual([len(line) for line in x.splitlines()], [12, 12, 12])
 
     def testSplitNoteGroupingLineLength(self):
-        '''Tests loosening the constraint on trailing spaces when there is
-        no other solution.'''
+        '''
+        Tests loosening the constraint on trailing spaces when there is
+        no other solution.
+        '''
         from music21 import converter
         s = converter.parse('tinyNotation: 2/4 c4 d e f8 g a2 B2 c4. d8 e2')
         x = objectToBraille(s, maxLineLength=10)

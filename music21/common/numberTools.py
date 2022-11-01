@@ -11,7 +11,7 @@
 # ------------------------------------------------------------------------------
 from __future__ import annotations
 
-from collections.abc import Iterable, Sequence
+from collections.abc import Iterable, Sequence, Collection
 from fractions import Fraction
 from functools import cache
 import math
@@ -94,7 +94,7 @@ def numToIntOrFloat(value: int | float) -> int | float:
     >>> common.numToIntOrFloat(halfFlat.alter)
     -0.5
 
-    Also can take in a string representing an int or float
+    Can also take in a string representing an int or float
 
     >>> common.numToIntOrFloat('1.0')
     1
@@ -609,7 +609,9 @@ def decimalToTuplet(decNum: float) -> tuple[int, int]:
     ZeroDivisionError: number must be greater than zero
     '''
     def findSimpleFraction(inner_working):
-        '''Utility function.'''
+        '''
+        Utility function.
+        '''
         for index in range(1, 1000):
             for j in range(index, index * 2):
                 if isclose(inner_working, j / index, abs_tol=1e-7):
@@ -733,8 +735,9 @@ def weightedSelection(values: list[int],
     return values[index]
 
 
-def approximateGCD(values: list[int | float], grain: float = 1e-4) -> float:
-    '''Given a list of values, find the lowest common divisor of floating point values.
+def approximateGCD(values: Collection[int | float], grain: float = 1e-4) -> float:
+    '''
+    Given a list of values, find the lowest common divisor of floating point values.
 
     >>> common.approximateGCD([2.5, 10, 0.25])
     0.25
@@ -762,8 +765,8 @@ def approximateGCD(values: list[int | float], grain: float = 1e-4) -> float:
     # quick method: see if the smallest value is a common divisor of the rest
     count = 0
     for x in values:
-        # lowest is already a float
-        unused_int, floatingValue = divmod(x / lowest, 1.0)
+        x_adjust = x / lowest
+        floatingValue = x_adjust - int(x_adjust)
         # if almost an even division
         if isclose(floatingValue, 0.0, abs_tol=grain):
             count += 1
@@ -771,16 +774,15 @@ def approximateGCD(values: list[int | float], grain: float = 1e-4) -> float:
         return lowest
 
     # assume that one of these divisions will match
-    divisors = [1., 2., 3., 4., 5., 6., 7., 8., 9., 10., 11., 12., 13., 14., 15., 16.]
+    divisors = (1., 2., 3., 4., 5., 6., 7., 8., 9., 10., 11., 12., 13., 14., 15., 16.)
     divisions = []  # a list of lists, one for each entry
-    uniqueDivisions = []
+    uniqueDivisions = set()
     for index in values:
         coll = []
         for d in divisors:
             v = index / d
             coll.append(v)  # store all divisions
-            if v not in uniqueDivisions:
-                uniqueDivisions.append(v)
+            uniqueDivisions.add(v)
         divisions.append(coll)
     # find a unique divisor that is found in collected divisors
     commonUniqueDivisions = []
@@ -819,11 +821,13 @@ def lcm(filterList: Iterable[int]) -> int:
     common.lcm({3, 5, 6})
     30
 
-    Deprecated in v9 since Python 3.9 is the minimum version
+    Deprecated in v9 since Python 3.10 is the minimum version
     and math.lcm works in C and is faster
     '''
     def _lcm(a, b):
-        '''find the least common multiple of a, b'''
+        '''
+        find the least common multiple of a, b
+        '''
         # // forces integer style division (no remainder)
         return abs(a * b) // gcd(a, b)
 

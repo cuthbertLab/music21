@@ -13,9 +13,6 @@ from __future__ import annotations
 import math
 import unittest
 
-from music21 import exceptions21
-
-
 def nPVI(streamForAnalysis):
     '''
     Algorithm to give the normalized pairwise variability index
@@ -83,12 +80,21 @@ def melodicIntervalVariability(streamForAnalysis, **skipKeywords):
     >>> s4 = corpus.parse('bwv66.6').parts[0][note.GeneralNote].stream()
     >>> analysis.patel.melodicIntervalVariability(s4)
     65.287...
+
+    Too short streams raise a ValueError:
+
+    >>> s5 = converter.parse('tinynotation: 4/4 C2 D2')[note.Note].stream()
+    >>> analysis.patel.melodicIntervalVariability(s5)
+    Traceback (most recent call last):
+    ValueError: need at least three notes to have a std-deviation of intervals (and thus a MIV)
+
+    * Changed in v9: ValueError rather than a Music21Exception raised.
     '''
     s = streamForAnalysis  # shorter
     intervalStream = s.melodicIntervals(**skipKeywords)
     totalElements = len(intervalStream)
-    if totalElements < 2:
-        raise PatelException('need at least three notes to have '
+    if totalElements < 2:  # this is correct.
+        raise ValueError('need at least three notes to have '
                              + 'a std-deviation of intervals (and thus a MIV)')
     # summation = 0
     semitoneList = [myInt.chromatic.undirected for myInt in intervalStream]
@@ -102,8 +108,6 @@ def melodicIntervalVariability(streamForAnalysis, **skipKeywords):
     std = math.sqrt(std / (totalElements - 1))
     return 100 * (std / mean)
 
-class PatelException(exceptions21.Music21Exception):
-    pass
 
 class Test(unittest.TestCase):
     pass

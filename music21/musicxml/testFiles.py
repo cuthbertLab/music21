@@ -426,7 +426,6 @@ chantQuemQueritis = '''<?xml version="1.0" standalone="no"?>
         </measure>
     </part>
 </score-partwise>
-
 '''
 
 
@@ -8016,7 +8015,6 @@ schumannOp48No1 = '''<?xml version="1.0" encoding="UTF-8"?>
   </part>
   <!--=========================================================-->
 </score-partwise>
-
 '''
 
 
@@ -11119,7 +11117,6 @@ mozartTrioK581Excerpt = '''<?xml version="1.0" standalone="no"?>
         </measure>
     </part>
 </score-partwise>
-
 '''
 
 
@@ -13300,7 +13297,6 @@ binchoisMagnificat = '''<?xml version="1.0" encoding="utf-8"?>
     </measure>
   </part>
 </score-partwise>
-
 '''
 
 
@@ -16077,21 +16073,25 @@ tabTest = '''<?xml version="1.0" encoding="UTF-8" ?>
 #
 # dictionary storing does not work
 
-# CONTENTS = {'mozartTrioK581Excerpt': mozartTrioK581Excerpt,
-#             'schumannOp48No1': schumannOp48No1,
-#         'chantQuemQueritis': chantQuemQueritis,
+# CONTENTS = {
+#     'mozartTrioK581Excerpt': mozartTrioK581Excerpt,
+#     'schumannOp48No1': schumannOp48No1,
+#     'chantQuemQueritis': chantQuemQueritis,
 #     'beethovenOp98': beethovenOp98,
-#             }
+# }
 #
 # ALL1 = CONTENTS.items()
 
 
-ALL = [chantQuemQueritis, mozartTrioK581Excerpt, schumannOp48No1,
-                binchoisMagnificat, edgefield82b, tabTest]
+ALL = [
+    chantQuemQueritis, mozartTrioK581Excerpt, schumannOp48No1,
+    binchoisMagnificat, edgefield82b, tabTest,
+]
 
 
 def get(contentRequest):
-    '''Get test material by type of content
+    '''
+    Get test material by type of content
 
     >>> from music21.musicxml.testFiles import get
 

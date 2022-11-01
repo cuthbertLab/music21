@@ -27,7 +27,6 @@ __all__ = [
 
 from collections.abc import Iterable
 import datetime
-import os
 import typing as t
 import unittest
 
@@ -38,7 +37,7 @@ from music21 import prebase
 
 # -----------------------------------------------------------------------------
 
-environLocal = environment.Environment(os.path.basename(__file__))
+environLocal = environment.Environment('metadata.primitives')
 
 
 

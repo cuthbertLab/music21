@@ -346,7 +346,7 @@ alphabet: dict[str, str] = {
     ']': _B[2356] + _B[3],
     '*': _B[35] + _B[35],
 }
-alphabet.update({str(k): v for k, v in numbersUpper.items()})
+alphabet |= {str(k): v for k, v in numbersUpper.items()}
 
 chordSymbols = {
     'plus': _B[346],

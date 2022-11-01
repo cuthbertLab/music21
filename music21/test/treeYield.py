@@ -15,7 +15,9 @@ from __future__ import annotations
 
 import weakref
 
-class TreeYielder:
+import music21
+
+class TreeYielder:  # pragma: no cover
     def __init__(self, yieldValue=None):
         '''
         `yieldValue` should be a lambda function that
@@ -118,7 +120,7 @@ class TreeYielder:
         return currentStr
 
 
-def testCode():
+def testCode():  # pragma: no cover
     class Mock:
         def __init__(self, mockThing, embedMock=True):
             self.abby = 30
@@ -141,7 +143,7 @@ def testCode():
         print(val, ty.currentLevel())
 
 
-def testMIDIParse():
+def testMIDIParse():  # pragma: no cover
     from music21 import converter
     from music21 import common
     from music21 import freezeThaw
@@ -166,6 +168,62 @@ def testMIDIParse():
     ty = TreeYielder(mockType)
     for val in ty.run(c):
         print(val, ty.currentLevel())
+
+
+def find_all_exception_classes_in_m21():  # pragma: no cover
+    return find_all_classes_by_criteria(
+        lambda mm: issubclass(mm, music21.exceptions21.Music21Exception)
+    )
+
+def find_all_non_hashable_m21objects():  # pragma: no cover
+    # is a bug if not empty
+    def is_unhashable(mm):
+        if not issubclass(mm, music21.base.Music21Object):
+            return False
+        try:
+            {mm()}
+        except TypeError as te:
+            return 'unhashable' in str(te)
+        return False
+    return find_all_classes_by_criteria(is_unhashable)
+
+def find_all_non_default_instantiation_m21objects():  # pragma: no cover
+    # Lack of default instantiation is not necessarily a bug, but
+    # let's try not to have them
+    def needs_attributes(mm):
+        if not issubclass(mm, music21.base.Music21Object):
+            return False
+        try:
+            mm()
+        except TypeError:
+            return True
+        return False
+    return find_all_classes_by_criteria(needs_attributes)
+
+
+def find_all_classes_by_criteria(criteria):  # pragma: no cover
+    from collections import deque
+    import types
+
+    d = deque([music21])
+    seen = set()
+    matches = set()
+    while d:
+        m = d.popleft()
+        if m in seen:
+            continue
+        print(m)
+        for mm_name in dir(m):
+            mm = getattr(m, mm_name)
+            if (isinstance(mm, types.ModuleType)
+                    and mm not in seen
+                    and 'music21' in getattr(mm, '__file__', '')):
+                # noinspection PyTypeChecker
+                d.append(mm)
+            elif isinstance(mm, type) and mm not in seen and criteria(mm):
+                matches.add(mm)
+        seen.add(m)
+    return matches
 
 
 if __name__ == '__main__':

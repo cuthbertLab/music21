@@ -348,7 +348,9 @@ class Test(unittest.TestCase):
         # s.show()
 
     def testImportMetronomeMarksC(self):
-        '''Import tempo into only the first PartStaff'''
+        '''
+        Import tempo into only the first PartStaff
+        '''
         from music21 import corpus
         s = corpus.parse('demos/two-parts')
         self.assertEqual(len(s.parts.first()[tempo.MetronomeMark]), 1)
@@ -1256,13 +1258,13 @@ class Test(unittest.TestCase):
         # Measure 3, right barline: <ending number="3" type="stop"/>
         score = converter.parse(testPrimitive.multiDigitEnding)
         repeatBrackets = score.recurse().getElementsByClass(spanner.RepeatBracket)
-        self.assertListEqual(repeatBrackets[0].getNumberList(), [1, 2])
-        self.assertListEqual(repeatBrackets[1].getNumberList(), [3])
+        self.assertListEqual(repeatBrackets[0].numberRange, [1, 2])
+        self.assertListEqual(repeatBrackets[1].numberRange, [3])
 
         nonconformingInput = testPrimitive.multiDigitEnding.replace('1,2', 'ad lib.')
         score2 = converter.parse(nonconformingInput)
         repeatBracket = score2.recurse().getElementsByClass(spanner.RepeatBracket).first()
-        self.assertListEqual(repeatBracket.getNumberList(), [1])
+        self.assertListEqual(repeatBracket.numberRange, [1])
 
     def testChordAlteration(self):
         from music21 import musicxml

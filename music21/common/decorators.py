@@ -112,6 +112,8 @@ def deprecated(method, startDate=None, removeDate=None, message=None):
     else:
         funcName = method.__name__
 
+    method._isDeprecated = True
+
     if startDate is not None:
         startDate = ' on ' + startDate
     else:
@@ -169,7 +171,7 @@ def cacheMethod(method):
 
     Uses the name of the function as the cache key.
 
-    New in v.6 -- helps to make all the caches easier to work with.
+    * New in v6: helps to make all the caches easier to work with.
     '''
     if hasattr(method, '__qualname__'):
         funcName = method.__qualname__

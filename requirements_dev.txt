@@ -1,5 +1,5 @@
 -r requirements.txt
-pylint
+pylint>=2.15.4
 flake8
 flake8-quotes
 hatchling
@@ -8,7 +8,6 @@ coveralls
 scipy
 sphinx
 python-Levenshtein
-setuptools
 coverage
 nbconvert
 jupyter

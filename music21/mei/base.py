@@ -170,13 +170,12 @@ tool.
 * <pb>: a page break
 * <lb>: a line break
 * <sb>: a system break
-
 '''
+
 from __future__ import annotations
 
 from collections import defaultdict
 from copy import deepcopy
-from fractions import Fraction  # for typing
 import typing as t
 from uuid import uuid4
 from xml.etree.ElementTree import Element, ParseError, fromstring, ElementTree
@@ -201,6 +200,10 @@ from music21 import stream
 from music21 import spanner
 from music21 import tie
 
+
+if t.TYPE_CHECKING:
+    from fractions import Fraction
+
 environLocal = environment.Environment('mei.base')
 
 
@@ -224,22 +227,30 @@ _IGNORE_UNPROCESSED = (
 # Exceptions
 # -----------------------------------------------------------------------------
 class MeiValidityError(exceptions21.Music21Exception):
-    '''When there is an otherwise-unspecified validity error that prevents parsing.'''
+    '''
+    When there is an otherwise-unspecified validity error that prevents parsing.
+    '''
     pass
 
 
 class MeiValueError(exceptions21.Music21Exception):
-    '''When an attribute has an invalid value.'''
+    '''
+    When an attribute has an invalid value.
+    '''
     pass
 
 
 class MeiAttributeError(exceptions21.Music21Exception):
-    '''When an element has an invalid attribute.'''
+    '''
+    When an element has an invalid attribute.
+    '''
     pass
 
 
 class MeiElementError(exceptions21.Music21Exception):
-    '''When an element itself is invalid.'''
+    '''
+    When an element itself is invalid.
+    '''
     pass
 
 
@@ -1175,7 +1186,9 @@ def addSlurs(elem, obj, slurBundle):
     addedSlur = False
 
     def wrapGetByIdLocal(theId):
-        '''Avoid crashing when getByIdLocl() doesn't find the slur'''
+        '''
+        Avoid crashing when getByIdLocl() doesn't find the slur
+        '''
         try:
             slurBundle.getByIdLocal(theId)[0].addSpannedElements(obj)
             return True

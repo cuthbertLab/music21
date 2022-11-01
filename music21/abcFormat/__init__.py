@@ -7,7 +7,7 @@
 #               Michael Scott Asato Cuthbert
 #               Dylan J. Nagler
 #
-# Copyright:    Copyright © 2010, 2013 Michael Scott Asato Cuthbert
+# Copyright:    Copyright © 2010-22 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
@@ -60,7 +60,6 @@ from collections.abc import Sequence
 import io
 import re
 import typing as t
-from typing import TYPE_CHECKING  # pylint needs no alias
 import unittest
 
 from music21 import common
@@ -70,7 +69,7 @@ from music21 import prebase
 
 from music21.abcFormat import translate
 
-if TYPE_CHECKING:
+if t.TYPE_CHECKING:
     from music21 import bar
     from music21 import clef
     from music21 import duration
@@ -136,7 +135,7 @@ class ABCFileException(exceptions21.Music21Exception):
 
 
 # ------------------------------------------------------------------------------
-class ABCToken(prebase.ProtoM21Object):
+class ABCToken(prebase.ProtoM21Object, common.objects.EqualSlottedObjectMixin):
     '''
     ABC processing works with a multi-pass procedure. The first pass
     breaks the data stream into a list of ABCToken objects. ABCToken
@@ -154,6 +153,8 @@ class ABCToken(prebase.ProtoM21Object):
     Because of how copying ABCTokens works, all tokens must have default parameters in their
     initializers
     '''
+    __slots__ = ('src',)
+
     def __init__(self, src=''):
         self.src: str = src  # store source character sequence
 
@@ -180,7 +181,7 @@ class ABCToken(prebase.ProtoM21Object):
         >>> abcFormat.ABCToken.stripComment('b1 % a b-flat actually')
         'b1 '
 
-        Changed: v6.2 -- made a staticmethod
+        * Changed in v6.2: made a staticmethod
         '''
         if '%' in strSrc:
             return strSrc.split('%')[0]
@@ -225,6 +226,8 @@ class ABCMetadata(ABCToken):
     >>> md.data
     'linebreak'
     '''
+    __slots__ = ('tag', 'data')
+
     # given a logical unit, create an object
     # may be a chord, notes, metadata, bars
     def __init__(self, src=''):
@@ -780,6 +783,8 @@ class ABCMetadata(ABCToken):
 class ABCBar(ABCToken):
     # given a logical unit, create an object
     # may be a chord, notes, metadata, bars
+    __slots__ = ('barType', 'barStyle', 'repeatForm')
+
     def __init__(self, src):
         super().__init__(src)
         self.barType = None  # repeat or barline
@@ -929,6 +934,8 @@ class ABCTuplet(ABCToken):
 
     In ABCHandler.tokenProcess(), rhythms are adjusted.
     '''
+    __slots__ = ('noteCount', 'numberNotesActual', 'numberNotesNormal', 'tupletObj')
+
     def __init__(self, src: str = ''):
         super().__init__(src)
 
@@ -1118,6 +1125,8 @@ class ABCTie(ABCToken):
     Ties are treated as an attribute of the note before the '-';
     the note after is marked as the end of the tie.
     '''
+    __slots__ = ('noteObj',)
+
     def __init__(self, src=''):
         super().__init__(src)
         self.noteObj = None
@@ -1128,6 +1137,8 @@ class ABCSlurStart(ABCToken):
     ABCSlurStart tokens always precede the notes in a slur.
     For nested slurs, each open parenthesis gets its own token.
     '''
+    __slots__ = ('slurObj',)
+
     def __init__(self, src=''):
         super().__init__(src)
         self.slurObj: spanner.Slur | None = None
@@ -1146,6 +1157,7 @@ class ABCParenStop(ABCToken):
     A general parenthesis stop;
     comes at the end of a tuplet, slur, or dynamic marking.
     '''
+    __slots__ = ()
 
 
 class ABCCrescStart(ABCToken):
@@ -1154,6 +1166,7 @@ class ABCCrescStart(ABCToken):
     These tokens coincide with the string "!crescendo(";
     the closing string "!crescendo)" counts as an ABCParenStop.
     '''
+    __slots__ = ('crescObj',)
 
     def __init__(self, src=''):
         super().__init__(src)
@@ -1169,6 +1182,8 @@ class ABCDimStart(ABCToken):
     ABCDimStart tokens always precede the notes in a diminuendo.
     They function identically to ABCCrescStart tokens.
     '''
+    __slots__ = ('dimObj',)
+
     def __init__(self, src=''):
         super().__init__(src)
         self.dimObj: dynamics.Diminuendo | None = None
@@ -1183,20 +1198,23 @@ class ABCStaccato(ABCToken):
     ABCStaccato tokens "." precede a note or chord;
     they are a property of that note/chord.
     '''
+    __slots__ = ()
 
 
 class ABCUpbow(ABCToken):
     '''
-    ABCStaccato tokens "." precede a note or chord;
+    ABCUpbow tokens "u" precede a note or chord;
     they are a property of that note/chord.
     '''
+    __slots__ = ()
 
 
 class ABCDownbow(ABCToken):
     '''
-    ABCStaccato tokens "." precede a note or chord;
+    ABCDownbow tokens "v" precede a note or chord;
     they are a property of that note/chord.
     '''
+    __slots__ = ()
 
 
 class ABCAccent(ABCToken):
@@ -1205,6 +1223,7 @@ class ABCAccent(ABCToken):
     they are a property of that note/chord.
     These appear as ">" in the output.
     '''
+    __slots__ = ()
 
 
 class ABCStraccent(ABCToken):
@@ -1213,6 +1232,7 @@ class ABCStraccent(ABCToken):
     they are a property of that note/chord.
     These appear as "^" in the output.
     '''
+    __slots__ = ()
 
 
 class ABCTenuto(ABCToken):
@@ -1220,30 +1240,36 @@ class ABCTenuto(ABCToken):
     ABCTenuto tokens "M" precede a note or chord;
     they are a property of that note/chord.
     '''
+    __slots__ = ()
 
 
 class ABCGraceStart(ABCToken):
     '''
     Grace note start
     '''
+    __slots__ = ()
 
 
 class ABCGraceStop(ABCToken):
     '''
     Grace note end
     '''
+    __slots__ = ()
 
 
 class ABCBrokenRhythmMarker(ABCToken):
     '''
     Marks that rhythm is broken with '>>>'
     '''
+    __slots__ = ('data',)
+
     def __init__(self, src=''):
         super().__init__(src)
         self.data: str | None = None
 
     def preParse(self):
-        '''Called before context adjustments: need to have access to data
+        '''
+        Called before context adjustments: need to have access to data
 
         >>> brokenRhythm = abcFormat.ABCBrokenRhythmMarker('>>>')
         >>> brokenRhythm.preParse()
@@ -1268,6 +1294,12 @@ class ABCNote(ABCToken):
     these guitar chords) associated with this note. This attribute is
     updated when parse() is called.
     '''
+    __slots__ = ('carriedAccidental', 'chordSymbols', 'inBar', 'inBeam',
+                 'inGrace', 'activeDefaultQuarterLength', 'brokenRhythmMarker',
+                 'activeKeySignature', 'activeTuplet', 'applicableSpanners', 'tie',
+                 'articulations', 'accidentalDisplayStatus', 'isRest',
+                 'pitchName', 'quarterLength',)
+
     def __init__(self, src='', carriedAccidental: str = ''):
         super().__init__(src)
 
@@ -1602,7 +1634,7 @@ class ABCNote(ABCToken):
         # assume we have a complete fraction
         elif '/' in numStr:
             nStr, dStr = numStr.split('/')
-            if TYPE_CHECKING:
+            if t.TYPE_CHECKING:
                 assert nStr is not None
                 assert dStr is not None
             n = int(nStr.strip())
@@ -1766,7 +1798,7 @@ class ABCHandler:
     define new phrases.  This is useful for parsing extra information from
     the Essen Folksong repertory
 
-    New in v6.3 -- lineBreaksDefinePhrases -- does not yet do anything
+    * New in v6.3: lineBreaksDefinePhrases -- does not yet do anything
     '''
     def __init__(self,
                  abcVersion: tuple[int, ...] | None = None,
@@ -3045,9 +3077,9 @@ class ABCHandler:
                 lbCandidate: ABCBar = tokenAtX
                 # if we get an end repeat, probably already assigned this
                 # in the last measure, so skip
-                # environLocal.printDebug(['reading pairs, got token:', lbCandidate,
-                #    'lbCandidate.barType', lbCandidate.barType,
-                #    'lbCandidate.repeatForm', lbCandidate.repeatForm])
+                # environLocal.printDebug(f'''reading pairs, got token: {lbCandidate}
+                #    {lbCandidate.barType=}
+                #    {lbCandidate.repeatForm=}''')
                 # skip end repeats assigned (improperly) to the left
                 if (lbCandidate.barType == 'repeat'
                         and lbCandidate.repeatForm == 'end'):
@@ -3055,7 +3087,7 @@ class ABCHandler:
                 else:  # assign
                     ah.leftBarToken = lbCandidate
                     # environLocal.printDebug(['splitByMeasure(); assigning left bar token',
-                    #                        lbCandidate])
+                    #                          lbCandidate])
                 # always trim if we have a bar
                 xClip = x + 1
                 # ah.tokens = ah.tokens[1:]  # remove first, as not done above
@@ -3146,7 +3178,6 @@ class ABCHandler:
         '''
         If tokens are processed, return True if ABCNote or
         ABCChord classes are defined
-
 
         >>> abcStr = 'M:6/8\\nL:1/8\\nK:G\\n'
         >>> ah1 = abcFormat.ABCHandler()
@@ -3358,7 +3389,7 @@ class ABCFile(prebase.ProtoM21Object):
         If the same number is defined twice in one file (should not be) only
         the first data is returned.
 
-        Changed in v6.2: now a static method.
+        * Changed in v6.2: now a static method.
         '''
         collect = []
         gather = False
@@ -3407,6 +3438,9 @@ class ABCFile(prebase.ProtoM21Object):
 
 # ------------------------------------------------------------------------------
 class Test(unittest.TestCase):
+    def testCopyAndDeepcopy(self):
+        from music21.test.commonTest import testCopyAll
+        testCopyAll(self, globals())
 
     def testTokenization(self):
         from music21.abcFormat import testFiles

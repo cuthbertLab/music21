@@ -19,6 +19,7 @@ from __future__ import annotations
 import copy
 import unittest
 
+from music21 import common
 from music21 import environment
 from music21 import exceptions21
 from music21 import metadata
@@ -1006,7 +1007,7 @@ class Iterator:
     >>> BCI.titleList = ['Jesu, meine Freude',
     ...                  'Gott hat das Evangelium',
     ...                  'Not a Chorale']
-    Not a Chorale will be skipped because it is not a recognized title
+    'Not a Chorale' will be skipped because it is not a recognized title.
 
     >>> for chorale in BCI:
     ...    print(chorale)
@@ -1094,7 +1095,7 @@ class Iterator:
         '''
         self._currentIndex = None
         self._highestIndex = None
-        self._titleList = None
+        self._titleList: list[str] = []
         self._numberList = None
         self._numberingSystem = None
         self._returnType = 'stream'
@@ -1243,7 +1244,7 @@ class Iterator:
             raise BachException('Cannot parse Chorales because no .numberingSystem set.')
 
         if self.numberingSystem == 'title':
-            if self._titleList is None:
+            if not self._titleList:
                 raise BachException('Cannot parse Chorales because no titles to parse.')
             title = self.titleList[choraleIndex]
             filename = 'bach/bwv' + str(self._choraleList2.byTitle[title]['bwv'])
@@ -1354,7 +1355,7 @@ class Iterator:
         if self._numberingSystem == 'title':
             self._numberList = None
             self.currentNumber = 0
-            if self._titleList is None:
+            if not self._titleList:
                 self.highestNumber = 0
             else:
                 self.highestNumber = len(self.titleList) - 1
@@ -1407,62 +1408,64 @@ class Iterator:
             self._initializeNumberList()
         elif value == 'title':
             self._numberingSystem = 'title'
-            self._setTitleList()
+            self.titleList = []
         else:
             raise BachException(f'{value} is not a valid numbering system for Bach Chorales.')
 
     numberingSystem = property(_getNumberingSystem, _setNumberingSystem,
-                               doc='''This property determines which numbering
-                                system to iterate through chorales with.
-                                It can be set to 'bwv', 'kalmus', 'baerenreiter',
-                                'budapest', or 'riemenschneider'.
-                                It can also be set to 'title' in which case the
-                                iterator needs to be given a list
-                                of chorale titles in .titleList. At this time,
-                                the titles need to be exactly as they
-                                appear in the dictionary it queries.''')
+                               doc='''
+                                    This property determines which numbering
+                                    system to iterate through chorales with.
+                                    It can be set to 'bwv', 'kalmus', 'baerenreiter',
+                                    'budapest', or 'riemenschneider'.
+                                    It can also be set to 'title' in which case the
+                                    iterator needs to be given a list
+                                    of chorale titles in .titleList. At this time,
+                                    the titles need to be exactly as they
+                                    appear in the dictionary it queries.''')
 
     # - Title List
 
-    def _getTitleList(self):
-        if self._titleList is None:
-            return []
-        else:
-            return self._titleList
+    @property
+    def titleList(self) -> list[str]:
+        '''
+        A list of titles to iterate over
+        if `.numberingSystem` is set to 'title'.
+        '''
+        return self._titleList
 
-    def _setTitleList(self, value=None):
-        if value is None:
-            self._titleList = None
-            value = []
-        elif not isinstance(value, list):
-            raise BachException(f'{value} is not and must be a list.')
-        else:
-            self._titleList = []
-            for v in value:
-                if v in self._choraleList2.byTitle:
-                    self._titleList.append(v)
-                else:
-                    print(f'{v} will be skipped because it is not a recognized title')
-        if not self._titleList:
-            self._titleList = None
-
+    @titleList.setter
+    def titleList(self, value: list[str]):
+        if not common.isIterable(value):
+            raise BachException(f'{value!r} must be a list.')
+        self._titleList = []
+        for v in value:
+            if v in self._choraleList2.byTitle:
+                self._titleList.append(v)
+            else:
+                print(f'{v!r} will be skipped because it is not a recognized title.')
         self._initializeNumberList()
-
-    titleList = property(_getTitleList, _setTitleList,
-                         doc='''This is to store the list of titles to iterate
-                                 over if .numberingSystem is set to 'title'.''')
 
     # - Number List
 
-    def _getNumberList(self):
+    @property
+    def numberList(self):
+        '''
+        Allows access to the catalogue numbers
+        (or indices if iterationType == 'index')
+        that will be iterated over. This can be
+        set to a specific list of numbers.
+        The list will be sorted.
+        '''
         if self._numberList is None:
             return []
         else:
             return self._numberList
 
-    def _setNumberList(self, value):
+    @numberList.setter
+    def numberList(self, value):
         if not isinstance(value, list):
-            raise BachException(f'{value} is not and must be a list.')
+            raise BachException(f'{value!r} must be a list.')
         if self._numberingSystem == 'title':
             self._numberList = None
             raise BachException("Cannot set numberList when .numberingSystem == 'title'")
@@ -1528,27 +1531,33 @@ class Iterator:
             self.currentNumber = 0
             self.highestNumber = len(self._numberList) - 1
 
-    numberList = property(_getNumberList, _setNumberList,
-                          doc='''Allows access to the catalogue numbers
-                                (or indices if iterationType == 'index')
-                                that will be iterated over. This can be
-                                set to a specific list of numbers.
-                                They will be sorted.''')
-
     # - Current Number
 
-    def _getCurrentNumber(self):
+    @property
+    def currentNumber(self):
+        '''
+        The currentNumber is the number of the
+        chorale (in the set numberingSystem) for the
+        next chorale to be parsed by the iterator.
+        It is initially the first chorale in whatever
+        numberingSystem is set, but it can be changed
+        to any other number in the numberingSystem
+        as desired as long as it does not go above
+        the highestNumber which is the boundary
+        of the iteration.
+        '''
         if self._iterationType == 'index' or self._numberingSystem == 'title':
             return self._currentIndex
         else:
             return self._numberList[self._currentIndex]
 
-    def _setCurrentNumber(self, value):
+    @currentNumber.setter
+    def currentNumber(self, value):
         if self._numberingSystem is None:
             raise Exception('Numbering System is not set.')
         if self._iterationType == 'number':
             if self._numberingSystem == 'title':
-                if self._titleList is None:
+                if not self._titleList:
                     self._currentIndex = 0
                     return
                 else:
@@ -1579,7 +1588,7 @@ class Iterator:
 
         elif self._iterationType == 'index':
             if self._numberingSystem == 'title':
-                if self._titleList is None:
+                if not self._titleList:
                     self._currentIndex = 0
                     return
                 else:
@@ -1608,31 +1617,32 @@ class Iterator:
                         + f'{self.numberingSystem} numbering system'
                     )
 
-    currentNumber = property(_getCurrentNumber, _setCurrentNumber,
-                             doc='''The currentNumber is the number of the
-                                    chorale (in the set numberingSystem) for the
-                                    next chorale to be parsed by the iterator.
-                                    It is initially the first chorale in whatever
-                                    numberingSystem is set, but it can be changed
-                                    to any other number in the numberingSystem
-                                    as desired as long as it does not go above
-                                    the highestNumber which is the boundary
-                                    of the iteration.''')
-
     # - Highest Number
 
-    def _getHighestNumber(self):
+    @property
+    def highestNumber(self):
+        '''
+        The highestNumber is the number of the chorale
+        (in the set numberingSystem) for the
+        last chorale to be parsed by the iterator.
+        It is initially the highest numbered chorale in whatever
+        numberingSystem is set, but it can be changed
+        to any other number in the numberingSystem
+        as desired as long as it does not go below
+        the currentNumber of the iteration.
+        '''
         if self.iterationType == 'index' or self._numberingSystem == 'title':
             return self._highestIndex
         else:
             return self._numberList[self._highestIndex]
 
-    def _setHighestNumber(self, value):
+    @highestNumber.setter
+    def highestNumber(self, value):
         if self._numberingSystem is None:
             raise Exception('Numbering System is not set.')
         if self.iterationType == 'number':
             if self._numberingSystem == 'title':
-                if self._titleList is None:
+                if not self._titleList:
                     self._highestIndex = 0
                     return
                 else:
@@ -1664,7 +1674,7 @@ class Iterator:
 
         elif self.iterationType == 'index':
             if self._numberingSystem == 'title':
-                if self._titleList is None:
+                if not self._titleList:
                     self._highestIndex = 0
                     return
                 else:
@@ -1693,42 +1703,37 @@ class Iterator:
                         + f'{self.numberingSystem} numbering system'
                     )
 
-    highestNumber = property(_getHighestNumber, _setHighestNumber,
-                             doc='''The highestNumber is the number of the chorale
-                                    (in the set numberingSystem) for the
-                                    last chorale to be parsed by the iterator.
-                                    It is initially the highest numbered chorale in whatever
-                                    numberingSystem is set, but it can be changed
-                                    to any other number in the numberingSystem
-                                    as desired as long as it does not go below
-                                    the currentNumber of the iteration.''')
-
     # - Return Type
-    def _getReturnType(self):
+    @property
+    def returnType(self):
+        '''
+        This property determines what the iterator
+        returns; 'stream' is the default and causes the iterator to parse
+        each chorale. If this is set to 'filename', the
+        iterator will return the filename of each chorale but not
+        parse it.
+        '''
         return self._returnType
 
-    def _setReturnType(self, value):
+    @returnType.setter
+    def returnType(self, value):
         if value in ['stream', 'filename']:
             self._returnType = value
         else:
             raise BachException(f'{value} is not a proper returnType for this iterator. '
                                 + "Only 'stream' and 'filename' are acceptable.")
 
-    returnType = property(_getReturnType,
-                          _setReturnType,
-                          doc='''
-        This property determines what the iterator
-        returns; 'stream' is the default and causes the iterator to parse
-        each chorale. If this is set to 'filename', the
-        iterator will return the filename of each chorale but not
-        parse it.''')
-
     # - Iteration Type
-
-    def _getIterationType(self):
+    @property
+    def iterationType(self):
+        '''
+        This property determines how boundary numbers are
+        interpreted, as indices or as catalogue numbers.
+        '''
         return self._iterationType
 
-    def _setIterationType(self, value):
+    @iterationType.setter
+    def iterationType(self, value):
         if value in ['number', 'index']:
             self._iterationType = value
             self._initializeNumberList()
@@ -1736,9 +1741,6 @@ class Iterator:
             raise BachException(
                 f'{value} is not a proper iterationType for this iterator. '
                 + "Only 'number' and 'index' are acceptable.")
-    iterationType = property(_getIterationType, _setIterationType,
-                             doc='''This property determines how boundary numbers are
-                                 interpreted, as indices or as catalogue numbers.''')
 
 
 def getByTitle(title):

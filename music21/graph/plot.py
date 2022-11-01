@@ -414,8 +414,8 @@ class Scatter(primitives.GraphScatter, PlotStreamMixin):
 
 
 class ScatterPitchSpaceQuarterLength(Scatter):
-    r'''A scatter plot of pitch space and quarter length
-
+    r'''
+    A scatter plot of pitch space and quarter length
 
     >>> s = corpus.parse('bach/bwv324.xml')
     >>> p = graph.plot.ScatterPitchSpaceQuarterLength(s)
@@ -445,7 +445,8 @@ class ScatterPitchSpaceQuarterLength(Scatter):
 
 
 class ScatterPitchClassQuarterLength(ScatterPitchSpaceQuarterLength):
-    '''A scatter plot of pitch class and quarter length
+    '''
+    A scatter plot of pitch class and quarter length
 
     >>> s = corpus.parse('bach/bwv324.xml') #_DOCS_HIDE
     >>> p = graph.plot.ScatterPitchClassQuarterLength(s, doneAction=None) #_DOCS_HIDE
@@ -470,7 +471,8 @@ class ScatterPitchClassQuarterLength(ScatterPitchSpaceQuarterLength):
 
 
 class ScatterPitchClassOffset(Scatter):
-    '''A scatter plot of pitch class and offset
+    '''
+    A scatter plot of pitch class and offset
 
     >>> s = corpus.parse('bach/bwv324.xml') #_DOCS_HIDE
     >>> p = graph.plot.ScatterPitchClassOffset(s, doneAction=None) #_DOCS_HIDE
@@ -508,7 +510,7 @@ class ScatterPitchSpaceDynamicSymbol(Scatter):
     >>> s.insert(0.0, dynamics.Dynamic('pp')) #_DOCS_HIDE
     >>> s.insert(2.0, dynamics.Dynamic('ff')) #_DOCS_HIDE
     >>> p = graph.plot.ScatterPitchSpaceDynamicSymbol(s, doneAction=None) #_DOCS_HIDE
-    >>> #_DOCS_SHOW s = converter.parse('/Desktop/schumann/opus41no1/movement2.xml')
+    >>> #_DOCS_SHOW s = corpus.parse('schumann_robert/opus41no1/movement2.xml')
     >>> #_DOCS_SHOW p = graph.plot.ScatterPitchSpaceDynamicSymbol(s)
     >>> p.run()
 
@@ -618,8 +620,8 @@ class Histogram(primitives.GraphHistogram, PlotStreamMixin):
 
 
 class HistogramPitchSpace(Histogram):
-    '''A histogram of pitch space.
-
+    '''
+    A histogram of pitch space.
 
     >>> s = corpus.parse('bach/bwv324.xml') #_DOCS_HIDE
     >>> p = graph.plot.HistogramPitchSpace(s, doneAction=None) #_DOCS_HIDE
@@ -676,8 +678,8 @@ class HistogramPitchClass(Histogram):
 
 
 class HistogramQuarterLength(Histogram):
-    '''A histogram of pitch class
-
+    '''
+    A histogram of pitch class.
 
     >>> s = corpus.parse('bach/bwv324.xml') #_DOCS_HIDE
     >>> p = graph.plot.HistogramQuarterLength(s, doneAction=None) #_DOCS_HIDE
@@ -727,8 +729,8 @@ class ScatterWeighted(primitives.GraphScatterWeighted, PlotStreamMixin):
 
 
 class ScatterWeightedPitchSpaceQuarterLength(ScatterWeighted):
-    '''A graph of event, sorted by pitch, over time
-
+    '''
+    A graph of event, sorted by pitch, over time.
 
     >>> s = corpus.parse('bach/bwv324.xml') #_DOCS_HIDE
     >>> p = graph.plot.ScatterWeightedPitchSpaceQuarterLength(s, doneAction=None) #_DOCS_HIDE
@@ -758,8 +760,8 @@ class ScatterWeightedPitchSpaceQuarterLength(ScatterWeighted):
 
 
 class ScatterWeightedPitchClassQuarterLength(ScatterWeighted):
-    '''A graph of event, sorted by pitch class, over time.
-
+    '''
+    A graph of event, sorted by pitch class, over time.
 
     >>> s = corpus.parse('bach/bwv324.xml') #_DOCS_HIDE
     >>> p = graph.plot.ScatterWeightedPitchClassQuarterLength(s, doneAction=None) #_DOCS_HIDE
@@ -791,9 +793,10 @@ class ScatterWeightedPitchClassQuarterLength(ScatterWeighted):
 
 
 class ScatterWeightedPitchSpaceDynamicSymbol(ScatterWeighted):
-    '''A graph of dynamics used by pitch space.
+    '''
+    A graph of dynamics used by pitch space.
 
-    >>> #_DOCS_SHOW s = converter.parse('/Desktop/schumann/opus41no1/movement2.xml')
+    >>> #_DOCS_SHOW s = corpus.parse('schumann_robert/opus41no1/movement2.xml')
     >>> s = converter.parse('tinynotation: 4/4 C4 d E f', makeNotation=False) #_DOCS_HIDE
     >>> s.insert(0.0, dynamics.Dynamic('pp')) #_DOCS_HIDE
     >>> s.insert(2.0, dynamics.Dynamic('ff')) #_DOCS_HIDE
@@ -1623,12 +1626,16 @@ class TestExternalManual(unittest.TestCase):  # pragma: no cover
         b.run()
 
     def testScatterPitchSpaceDynamicSymbol(self):
-        a = corpus.parse('schumann/opus41no1', 2)
-        b = ScatterPitchSpaceDynamicSymbol(a.parts[0].flatten(), title='Schumann (soprano voice)')
+        a = corpus.parse('schumann_robert/opus41no1', 2)
+        b = ScatterPitchSpaceDynamicSymbol(
+            a.parts[0].flatten(),
+            title='Robert Schumann (soprano voice)'
+        )
         b.run()
 
-        b = ScatterWeightedPitchSpaceDynamicSymbol(a.parts[0].flatten(),
-                                                       title='Schumann (soprano voice)')
+        b = ScatterWeightedPitchSpaceDynamicSymbol(
+            a.parts[0].flatten(),
+            title='Robert Schumann (soprano voice)')
         b.run()
 
     def testPlot3DPitchSpaceQuarterLengthCount(self):
@@ -1654,9 +1661,13 @@ class TestExternalManual(unittest.TestCase):  # pragma: no cover
             (ScatterPitchSpaceQuarterLength, None, None),
             (ScatterPitchClassQuarterLength, None, None),
             (ScatterPitchClassOffset, None, None),
-            (ScatterPitchSpaceDynamicSymbol,
-             corpus.getWork('schumann/opus41no1', 2),
-             'Schumann Opus 41 No 1'),
+            (
+                ScatterPitchSpaceDynamicSymbol,
+                corpus.getWork(
+                    'schumann_robert/opus41no1', 2
+                ),
+                'Robert Schumann Opus 41 No 1'
+            ),
 
             # offset based horizontal
             (HorizontalBarPitchSpaceOffset, None, None),
@@ -1665,8 +1676,8 @@ class TestExternalManual(unittest.TestCase):  # pragma: no cover
             (ScatterWeightedPitchSpaceQuarterLength, None, None),
             (ScatterWeightedPitchClassQuarterLength, None, None),
             (ScatterWeightedPitchSpaceDynamicSymbol,
-             corpus.getWork('schumann/opus41no1', 2),
-             'Schumann Opus 41 No 1'),
+             corpus.getWork('schumann_robert/opus41no1', 2),
+             'Robert Schumann Opus 41 No 1'),
 
 
             # 3d graphs

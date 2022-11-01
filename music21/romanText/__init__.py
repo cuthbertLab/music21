@@ -11,7 +11,8 @@
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 
-'''Objects for processing Roman numeral analysis files, in formats defined and demonstrated by:
+'''
+Objects for processing Roman numeral analysis files, in formats defined and demonstrated by:
 Dmitri Tymoczko, Trevor De Clercq & David Temperley, and the DCMLab.
 '''
 from __future__ import annotations

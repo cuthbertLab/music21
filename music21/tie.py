@@ -21,7 +21,8 @@ from music21 import exceptions21
 from music21.common.objects import SlottedObjectMixin
 from music21 import prebase
 
-class TieException(exceptions21.Music21Exception):
+# Delete in v10.  Raise ValueError instead.
+class TieException(ValueError, exceptions21.Music21Exception):
     pass
 
 
@@ -136,22 +137,26 @@ class Tie(prebase.ProtoM21Object, SlottedObjectMixin):
         >>> t2 == None
         False
         '''
-        if other is None or not isinstance(other, Tie):
+        if not isinstance(other, type(self)):
             return False
         elif self.type == other.type:
             return True
         return False
+
+    def __hash__(self):
+        return id(self) >> 4
 
     def _reprInternal(self):
         return self.type
 
 
 class Test(unittest.TestCase):
-    pass
+    def testCopyAndDeepcopy(self):
+        from music21.test.commonTest import testCopyAll
+        testCopyAll(self, globals())
 
 
 # ------------------------------------------------------------------------------
-
 if __name__ == '__main__':
     import music21
     music21.mainTest(Test)

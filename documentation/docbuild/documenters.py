@@ -80,7 +80,7 @@ class Documenter:
 
 class ObjectDocumenter(Documenter):
     '''
-    Base class for object documenting sub-classes. such as ClassDocumenter
+    Base class for object documenting subclasses. such as ClassDocumenter
     '''
 
     _DOC_ATTR: dict[str, str] = {
@@ -195,15 +195,15 @@ class MemberDocumenter(ObjectDocumenter):
     '''
     _DOC_ATTR: dict[str, str] = {
         'memberName': 'the short name of the member, for instance "mode"',
-        'referent': '''the attribute or method itself, such as (no quotes)
-                       key.KeySignature.mode''',
-        'definingClass': '''the class the referent belongs to, such as (no quotes)
-                            key.KeySignature''',
+        'referent': '''the attribute or method itself, such as
+                       <function KeySignature.mode at ...>''',
+        'definingClass': '''the class the referent belongs to, such as
+                            <class 'music21.key.KeySignature'>''',
     }
 
     # INITIALIZER #
 
-    def __init__(self, referent, memberName, definingClass):
+    def __init__(self, referent, memberName: str, definingClass: type):
         if not isinstance(definingClass, type):
             raise Music21Exception(f'referent must be a class, not {referent}')
         super().__init__(referent)
@@ -271,7 +271,12 @@ class MethodDocumenter(MemberDocumenter):
     @property
     def rstAutodocDirectiveFormat(self):
         result = []
-        result.append(f'.. automethod:: {self.referentPackageSystemPath}')
+        indent = ''
+        if getattr(self.referent, '_isDeprecated', False):
+            indent = '    '
+            result.append('.. cssclass:: strike')
+            result.append('')
+        result.append(f'{indent}.. automethod:: {self.referentPackageSystemPath}')
         result.append('')
         return result
 
@@ -1453,7 +1458,8 @@ class ModuleDocumenter(ObjectDocumenter):
 
     @property
     def referenceName(self):
-        '''The short name of the module:
+        '''
+        The short name of the module:
 
         >>> from music21 import serial
         >>> module = serial
@@ -1479,11 +1485,11 @@ class ModuleDocumenter(ObjectDocumenter):
 
 
 class CorpusDocumenter(Documenter):
-    '''A documenter for music21's corpus:
+    '''
+    A documenter for music21's corpus:
 
     >>> documenter = CorpusDocumenter()
     >>> restructuredText = documenter.run()
-
     '''
 
     # SPECIAL METHODS #

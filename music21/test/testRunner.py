@@ -52,10 +52,10 @@ def addDocAttrTestsToSuite(suite,
     >>> test.testRunner.addDocAttrTestsToSuite(s1, allLocals)
     >>> s1TestsAfter = len(s1._tests)
     >>> s1TestsAfter - s1TestsBefore
-    3
+    4
     >>> lastTest = s1._tests[-1]
     >>> lastTest
-    expressionIsInferred ()
+    client ()
     '''
     dtp = doctest.DocTestParser()
     if globs is False:

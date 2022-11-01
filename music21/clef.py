@@ -19,17 +19,17 @@ within :class:`~music21.stream.Measure` objects.
 from __future__ import annotations
 
 from collections.abc import Iterable, Sequence
-from typing import TYPE_CHECKING  # pylint needs no alias
+import typing as t
 import unittest
 
 from music21 import base
 from music21 import exceptions21
 from music21 import environment
-from music21 import pitch  # for typing only
+from music21 import pitch
 from music21 import style
 
 
-if TYPE_CHECKING:
+if t.TYPE_CHECKING:
     from music21 import stream
 
 
@@ -64,7 +64,31 @@ class Clef(base.Music21Object):
 
     >>> tc.lowestLine
     31
+
+    **Equality**
+
+    Two Clefs are equal if their class is the same, their sign is the same,
+    their line is the same and their octaveChange is the same.
+
+    >>> c1 = clef.PercussionClef()
+    >>> c2 = clef.NoClef()
+    >>> c1 == c2
+    False
+    >>> c3 = clef.TrebleClef()
+    >>> c4 = clef.TrebleClef()
+    >>> c3 == c4
+    True
+    >>> c4.octaveChange = -1
+    >>> c3 == c4
+    False
+
+    Note that these are not equal:
+
+    >>> clef.TrebleClef() == clef.GClef(line=2)
+    False
     '''
+    equalityAttributes = ('sign', 'line', 'octaveChange')
+
     _DOC_ATTR: dict[str, str] = {
         'sign': '''
             The sign of the clef, generally, 'C', 'G', 'F', 'percussion', 'none' or None.
@@ -102,43 +126,14 @@ class Clef(base.Music21Object):
     _styleClass = style.TextStyle
     classSortOrder = 0
 
-    def __init__(self):
-        super().__init__()
+    def __init__(self, **keywords):
+        super().__init__(**keywords)
         self.sign: str | None = None
         # line counts start from the bottom up, the reverse of musedata
         self.line: int | None = None
         self._octaveChange: int = 0  # set to zero as default
         # musicxml has an attribute for clefOctaveChange,
         # an integer to show transposing clef
-
-    def __eq__(self, other):
-        '''
-        two Clefs are equal if their class is the same, their sign is the same,
-        their line is the same and their octaveChange is the same.
-
-
-        >>> c1 = clef.PercussionClef()
-        >>> c2 = clef.NoClef()
-        >>> c1 == c2
-        False
-        >>> c3 = clef.TrebleClef()
-        >>> c4 = clef.TrebleClef()
-        >>> c3 == c4
-        True
-        >>> c4.octaveChange = -1
-        >>> c3 == c4
-        False
-        '''
-        try:
-            if (self.__class__ == other.__class__
-                    and self.sign == other.sign
-                    and self.line == other.line
-                    and self.octaveChange == other.octaveChange):
-                return True
-            else:
-                return False
-        except AttributeError:
-            return False
 
     def _reprInternal(self):
         return ''
@@ -288,8 +283,8 @@ class PitchClef(Clef):
             ''',
     }
 
-    def __init__(self):
-        super().__init__()
+    def __init__(self, **keywords):
+        super().__init__(**keywords)
         self.lowestLine: int = 31
 
     @property
@@ -342,12 +337,13 @@ class PercussionClef(Clef):
     >>> pc.lowestLine == clef.TrebleClef().lowestLine
     True
 
-    Changed in v7.3 -- setting octaveChange no longer affects lowestLine
+    * Changed in v7.3: setting `octaveChange` no longer affects
+      `lowestLine`
     '''
     _DOC_ATTR: dict[str, str] = {}
 
-    def __init__(self):
-        super().__init__()
+    def __init__(self, **keywords):
+        super().__init__(**keywords)
         self.sign = 'percussion'
         self.lowestLine = (7 * 4) + 3  # 4 octaves + 3 notes = e4
 
@@ -367,8 +363,8 @@ class NoClef(Clef):
     '''
     _DOC_ATTR: dict[str, str] = {}
 
-    def __init__(self):
-        super().__init__()
+    def __init__(self, **keywords):
+        super().__init__(**keywords)
         self.sign = 'none'
 
 
@@ -382,8 +378,8 @@ class JianpuClef(NoClef):
     'jianpu'
     '''
 
-    def __init__(self):
-        super().__init__()
+    def __init__(self, **keywords):
+        super().__init__(**keywords)
         self.sign = 'jianpu'
 
 
@@ -396,8 +392,8 @@ class TabClef(PitchClef):
     'TAB'
     '''
 
-    def __init__(self):
-        super().__init__()
+    def __init__(self, **keywords):
+        super().__init__(**keywords)
         self.sign = 'TAB'
         self.line = 5
 
@@ -430,8 +426,8 @@ class GClef(PitchClef):
     31
     '''
 
-    def __init__(self):
-        super().__init__()
+    def __init__(self, **keywords):
+        super().__init__(**keywords)
         self.sign = 'G'
 
 
@@ -448,8 +444,8 @@ class FrenchViolinClef(GClef):
     1
     '''
 
-    def __init__(self):
-        super().__init__()
+    def __init__(self, **keywords):
+        super().__init__(**keywords)
         self.line = 1
         self.lowestLine = (7 * 4) + 5
 
@@ -469,8 +465,8 @@ class TrebleClef(GClef):
     31
     '''
 
-    def __init__(self):
-        super().__init__()
+    def __init__(self, **keywords):
+        super().__init__(**keywords)
         self.line = 2
         self.lowestLine = (7 * 4) + 3  # 4 octaves + 3 notes = e4
 
@@ -486,8 +482,8 @@ class Treble8vbClef(TrebleClef):
     -1
     '''
 
-    def __init__(self):
-        super().__init__()
+    def __init__(self, **keywords):
+        super().__init__(**keywords)
         self.octaveChange = -1
         self.lowestLine = (7 * 3) + 3
 
@@ -503,8 +499,8 @@ class Treble8vaClef(TrebleClef):
     1
     '''
 
-    def __init__(self):
-        super().__init__()
+    def __init__(self, **keywords):
+        super().__init__(**keywords)
         self.octaveChange = 1
         self.lowestLine = (7 * 3) + 3
 
@@ -521,8 +517,8 @@ class GSopranoClef(GClef):
     3
     '''
 
-    def __init__(self):
-        super().__init__()
+    def __init__(self, **keywords):
+        super().__init__(**keywords)
         self.line = 3
         self.lowestLine = (7 * 4) + 1
 
@@ -538,8 +534,8 @@ class CClef(PitchClef):
     'C'
     '''
 
-    def __init__(self):
-        super().__init__()
+    def __init__(self, **keywords):
+        super().__init__(**keywords)
         self.sign = 'C'
 
 
@@ -555,8 +551,8 @@ class SopranoClef(CClef):
     1
     '''
 
-    def __init__(self):
-        super().__init__()
+    def __init__(self, **keywords):
+        super().__init__(**keywords)
         self.line = 1
         self.lowestLine = (7 * 4) + 1
 
@@ -573,8 +569,8 @@ class MezzoSopranoClef(CClef):
     2
     '''
 
-    def __init__(self):
-        super().__init__()
+    def __init__(self, **keywords):
+        super().__init__(**keywords)
         self.line = 2
         self.lowestLine = (7 * 3) + 6
 
@@ -590,8 +586,8 @@ class AltoClef(CClef):
     3
     '''
 
-    def __init__(self):
-        super().__init__()
+    def __init__(self, **keywords):
+        super().__init__(**keywords)
         self.line = 3
         self.lowestLine = (7 * 3) + 4
 
@@ -609,8 +605,8 @@ class TenorClef(CClef):
 
     '''
 
-    def __init__(self):
-        super().__init__()
+    def __init__(self, **keywords):
+        super().__init__(**keywords)
         self.line = 4
         self.lowestLine = (7 * 3) + 2
 
@@ -626,8 +622,8 @@ class CBaritoneClef(CClef):
     5
     '''
 
-    def __init__(self):
-        super().__init__()
+    def __init__(self, **keywords):
+        super().__init__(**keywords)
         self.line = 5
         self.lowestLine = (7 * 2) + 7
 
@@ -642,8 +638,8 @@ class FClef(PitchClef):
     'F'
     '''
 
-    def __init__(self):
-        super().__init__()
+    def __init__(self, **keywords):
+        super().__init__(**keywords)
         self.sign = 'F'
 
 
@@ -663,8 +659,8 @@ class FBaritoneClef(FClef):
     False
     '''
 
-    def __init__(self):
-        super().__init__()
+    def __init__(self, **keywords):
+        super().__init__(**keywords)
         self.line = 3
         self.lowestLine = (7 * 2) + 7
 
@@ -678,8 +674,8 @@ class BassClef(FClef):
     'F'
     '''
 
-    def __init__(self):
-        super().__init__()
+    def __init__(self, **keywords):
+        super().__init__(**keywords)
         self.line = 4
         self.lowestLine = (7 * 2) + 5
 
@@ -695,8 +691,8 @@ class Bass8vbClef(FClef):
     -1
     '''
 
-    def __init__(self):
-        super().__init__()
+    def __init__(self, **keywords):
+        super().__init__(**keywords)
         self.line = 4
         self.octaveChange = -1
         self.lowestLine = (7 * 2) + 5
@@ -711,8 +707,8 @@ class Bass8vaClef(FClef):
     'F'
     '''
 
-    def __init__(self):
-        super().__init__()
+    def __init__(self, **keywords):
+        super().__init__(**keywords)
         self.line = 4
         self.octaveChange = 1
         self.lowestLine = (7 * 2) + 5
@@ -727,8 +723,8 @@ class SubBassClef(FClef):
     'F'
     '''
 
-    def __init__(self):
-        super().__init__()
+    def __init__(self, **keywords):
+        super().__init__(**keywords)
         self.line = 5
         self.lowestLine = (7 * 2) + 3
 
@@ -883,7 +879,7 @@ def clefFromString(clefString, octaveShift=0) -> Clef:
             clefObj.line = lineNum
         else:
             ClefType = line_list[lineNum]
-            if TYPE_CHECKING:
+            if t.TYPE_CHECKING:
                 assert ClefType is not None
                 assert issubclass(ClefType, PitchClef)
             clefObj = ClefType()

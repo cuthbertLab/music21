@@ -25,9 +25,11 @@ from music21.common.types import M21ObjType
 from music21.key import KeySignature
 from music21.layout import StaffGroup
 from music21.meter import TimeSignature
-from music21 import stream  # for typing
+from music21 import stream
+
 from music21.musicxml import helpers
 from music21.musicxml.xmlObjects import MusicXMLExportException, MusicXMLWarning
+
 
 def addStaffTags(
     measure: Element,
@@ -1139,7 +1141,9 @@ class Test(unittest.TestCase):
         self.assertEqual(len(root.findall('part/measure/attributes/time')), 3)
 
     def testBackupAmount(self):
-        '''Regression test for chord members causing too-large backup amounts.'''
+        '''
+        Regression test for chord members causing too-large backup amounts.
+        '''
         from music21 import chord
         from music21 import defaults
         from music21 import layout
@@ -1156,7 +1160,9 @@ class Test(unittest.TestCase):
         )
 
     def testForwardRepeatMarks(self):
-        '''Regression test for losing forward repeat marks.'''
+        '''
+        Regression test for losing forward repeat marks.
+        '''
         from music21 import bar
         from music21 import layout
         from music21 import note

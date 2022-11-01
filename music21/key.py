@@ -331,10 +331,24 @@ class KeySignature(base.Music21Object):
     False
     >>> unusual.accidentalsApplyOnlyToOctave = True
 
-    Changed in v.7 -- `sharps` defaults to 0 (key of no flats/sharps)
-    rather than `None` for nontraditional keys.
+    **Equality**
+
+    Two KeySignatures are equal if they pass all `super().__eq__` checks and
+    their sharps are equal.  Currently, non-standard key signatures are not
+    checked (this may change).
+
+    >>> sharp2 = key.KeySignature(2)
+    >>> flat4 = key.KeySignature(-4)
+    >>> sharp2 == flat4
+    False
+    >>> sharp2 == key.KeySignature(2)
+    True
+
+    * Changed in v7: `sharps` defaults to 0 (key of no flats/sharps)
+      rather than `None` for nontraditional keys.
     '''
     _styleClass = style.TextStyle
+    equalityAttributes = ('sharps',)
 
     # note that musicxml permits non-traditional keys by specifying
     # one or more altered tones; these are given as pairs of
@@ -342,8 +356,8 @@ class KeySignature(base.Music21Object):
 
     classSortOrder = 2
 
-    def __init__(self, sharps: int | None = 0):
-        super().__init__()
+    def __init__(self, sharps: int | None = 0, **keywords):
+        super().__init__(**keywords)
         # position on the circle of fifths, where 1 is one sharp, -1 is one flat
 
         try:
@@ -363,10 +377,6 @@ class KeySignature(base.Music21Object):
         self._alteredPitches: list[pitch.Pitch] | None = None
         self.accidentalsApplyOnlyToOctave = False
 
-    def __hash__(self):
-        hashTuple = (self._sharps, tuple(self._alteredPitches), self.accidentalsApplyOnlyToOctave)
-        return hash(hashTuple)
-
     # --------------------------------------------------------------------------
 
     def _strDescription(self):
@@ -385,18 +395,6 @@ class KeySignature(base.Music21Object):
         else:
             output = f'{abs(ns)} flats'
         return output
-
-    def __eq__(self, other):
-        '''
-        two KeySignatures are equal if their sharps are equal.
-        '''
-        try:
-            if self.sharps == other.sharps:
-                return True
-            else:
-                return False
-        except AttributeError:
-            return False
 
     def _reprInternal(self):
         return 'of ' + self._strDescription()
@@ -432,7 +430,7 @@ class KeySignature(base.Music21Object):
         >>> ks2.asKey(tonic='C')
         <music21.key.Key of C ionian>
 
-        New in v7 -- `tonic` argument to solve for mode.
+        * New in v7: `tonic` argument to solve for mode.
         '''
         our_sharps = self.sharps or 0  # || 0 in case of None -- non-standard key-signature
         if mode is not None and tonic is not None:
@@ -936,6 +934,21 @@ class Key(KeySignature, scale.DiatonicScale):
     <music21.key.Key of E major>
     >>> key.Key('F#m')
     <music21.key.Key of f# minor>
+
+    **Equality**
+
+    Two Keys are equal if their tonics' names are equal, their sharps are equal,
+    and their modes are equal (and they pass all superclass tests)
+
+    >>> k = key.Key(pitch.Pitch('C4'))
+    >>> k2 = key.Key(pitch.Pitch('C5'))
+    >>> k == k2
+    True
+    >>> k.mode = 'minor'
+    >>> k == k2
+    False
+
+    * Changed in v8: keys now compare equal regardless of the octave of their tonics.
     '''
     _sharps = 0
     _mode: str | None = None
@@ -943,7 +956,8 @@ class Key(KeySignature, scale.DiatonicScale):
 
     def __init__(self,
                  tonic: str | pitch.Pitch | note.Note = 'C',
-                 mode=None):
+                 mode=None,
+                 **keywords):
         if isinstance(tonic, (note.Note, pitch.Pitch)):
             tonicStr = tonic.name
         else:
@@ -973,8 +987,8 @@ class Key(KeySignature, scale.DiatonicScale):
         else:
             tonicPitch = pitch.Pitch(tonicStr)
 
-        KeySignature.__init__(self, sharps)
-        scale.DiatonicScale.__init__(self, tonic=tonicPitch)
+        KeySignature.__init__(self, sharps, **keywords)
+        scale.DiatonicScale.__init__(self, tonic=tonicPitch, **keywords)
 
         self.tonic = tonicPitch
         self.type: str = mode
@@ -992,10 +1006,6 @@ class Key(KeySignature, scale.DiatonicScale):
         # store an ordered list of alternative Key objects
         self.alternateInterpretations: list[Key] = []
 
-    def __hash__(self):
-        hashTuple = (self.tonic, self.mode)
-        return hash(hashTuple)
-
     def _reprInternal(self):
         return 'of ' + str(self)
 
@@ -1006,19 +1016,13 @@ class Key(KeySignature, scale.DiatonicScale):
         return f'{tonic} {self.mode}'
 
     def __eq__(self, other):
-        '''
-        Two Keys are equal if their tonics are equal and their modes are equal.
-
-        Changed in v8: keys now compare equal regardless of the octave of their tonics:
-
-        >>> k = key.Key(pitch.Pitch('C4'))
-        >>> k2 = key.Key(pitch.Pitch('C5'))
-        >>> k == k2
-        True
-        '''
-        if not isinstance(other, Key):
-            return NotImplemented
+        if not KeySignature.__eq__(self, other):
+            return False
+        # don't check on Scale equality
         return self.tonic.name == other.tonic.name and self.mode == other.mode
+
+    def __hash__(self):
+        return id(self) >> 4
 
     @property
     def relative(self) -> Key:
@@ -1139,7 +1143,7 @@ class Key(KeySignature, scale.DiatonicScale):
         searching, melodic minor scales cannot be used as abstracts
         for deriving by degree.
 
-        New in v.6 -- preserve mode in key.Key.deriveByDegree
+        * New in v6: preserve mode in key.Key.deriveByDegree
         '''
         ret = super().deriveByDegree(degree, pitchRef)
         ret.mode = self.mode

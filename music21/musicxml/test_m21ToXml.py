@@ -482,7 +482,9 @@ class Test(unittest.TestCase):
                     self.assertTrue(gotRightBarline)
 
     def testTextExpressionOffset(self):
-        '''Transfer element offset after calling getTextExpression().'''
+        '''
+        Transfer element offset after calling getTextExpression().
+        '''
         # https://github.com/cuthbertLab/music21/issues/624
         s = converter.parse('tinynotation: 4/4 c1')
         c = repeat.Coda()
@@ -755,7 +757,9 @@ class Test(unittest.TestCase):
         realizeDurationsAndAssertTags(m, forwardTag=False, offsetTag=False)
 
     def test_inexpressible_hidden_rests_become_forward_tags(self):
-        '''Express hidden rests with inexpressible durations as <forward> tags.'''
+        '''
+        Express hidden rests with inexpressible durations as <forward> tags.
+        '''
         m = stream.Measure()
         # 7 eighths in the space of 4 eighths, imported as 137/480
         # (137/480) * 7 = 1.9979, not 2.0

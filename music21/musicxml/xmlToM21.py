@@ -15,29 +15,24 @@ from __future__ import annotations
 import copy
 import fractions
 import io
-import re
-import warnings
-
 from math import isclose
+import re
 import typing as t
-
+import warnings
 import xml.etree.ElementTree as ET
-
-from music21 import common
-from music21 import exceptions21
-from music21.musicxml import xmlObjects
-from music21.musicxml.xmlObjects import MusicXMLImportException, MusicXMLWarning
 
 from music21 import articulations
 from music21 import bar
-from music21 import base  # for typing
 from music21 import beam
 from music21 import chord
 from music21 import clef
+from music21 import common
 from music21 import defaults
 from music21 import duration
 from music21 import dynamics
 from music21 import editorial
+from music21 import environment
+from music21 import exceptions21
 from music21 import expressions
 from music21 import harmony  # for chord symbols
 from music21 import instrument
@@ -45,9 +40,9 @@ from music21 import interval  # for transposing instruments
 from music21 import key
 from music21 import layout
 from music21 import metadata
+from music21 import meter
 from music21.midi.percussion import MIDIPercussionException, PercussionMapper
 from music21 import note
-from music21 import meter
 from music21 import percussion
 from music21 import pitch
 from music21 import repeat
@@ -59,12 +54,15 @@ from music21 import tempo
 from music21 import text  # for text boxes
 from music21 import tie
 
-from music21 import environment
+from music21.musicxml import xmlObjects
+from music21.musicxml.xmlObjects import MusicXMLImportException, MusicXMLWarning
+
+if t.TYPE_CHECKING:
+    from music21 import base
+    # what goes in a `.staffReference`
+    StaffReferenceType = dict[int, list[base.Music21Object]]
 
 environLocal = environment.Environment('musicxml.xmlToM21')
-
-# what goes in a `.staffReference`
-StaffReferenceType = dict[int, list[base.Music21Object]]
 
 # const
 NO_STAFF_ASSIGNED = 0
@@ -879,6 +877,8 @@ class MusicXMLImporter(XMLParserBase):
             self.xmlText = self.xmlText.decode('utf-8')
         sio = io.StringIO(self.xmlText)
         try:
+            # StringIO is a SupportsRead[str] type.
+            # noinspection PyTypeChecker
             etree = ET.parse(sio)
             self.xmlRoot = etree.getroot()
         except ET.ParseError:
@@ -1008,7 +1008,8 @@ class MusicXMLImporter(XMLParserBase):
 
     def xmlCreditToTextBox(self, mxCredit):
         # noinspection PyShadowingNames
-        '''Convert a MusicXML credit to a music21 TextBox
+        '''
+        Convert a MusicXML credit to a music21 TextBox
 
         >>> import xml.etree.ElementTree as ET
         >>> credit = ET.fromstring(
@@ -1804,7 +1805,7 @@ class PartParser(XMLParserBase):
         remove the rest there (for backwards compatibility, esp.
         since bwv66.6 uses it)
 
-        New in v7.
+        * New in v7.
         '''
         if self.lastMeasureParser is None:  # pragma: no cover
             return  # should not happen
@@ -1842,8 +1843,12 @@ class PartParser(XMLParserBase):
         partStaffs: list[stream.PartStaff] = []
         appendedElementIds: set[int] = set()  # id is id(el) not el.id
 
-        def copy_into_partStaff(source, target, omitTheseElementIds):
-            for sourceElem in source.getElementsByClass(STAFF_SPECIFIC_CLASSES):
+        def copy_into_partStaff(source: stream.Stream,
+                                target: stream.Stream,
+                                omitTheseElementIds: set[int]):
+            elementIterator = source.getElementsByClass(STAFF_SPECIFIC_CLASSES)
+            elementIterator.restoreActiveSites = False
+            for sourceElem in elementIterator:
                 idSource = id(sourceElem)
                 if idSource in omitTheseElementIds:
                     continue
@@ -1854,11 +1859,12 @@ class PartParser(XMLParserBase):
                     appendedElementIds.add(idSource)
                 sourceOffset = source.elementOffset(sourceElem, returnSpecial=True)
                 if sourceOffset != 'highestTime':
-                    target.coreInsert(sourceElem.offset, targetElem)
+                    target.coreInsert(sourceOffset, targetElem)
                 else:
                     target.coreStoreAtEnd(targetElem)
             target.coreElementsChanged()
 
+        sourceMeasureIterator = self.stream.getElementsByClass(stream.Measure)
         for staffIndex, staffKey in enumerate(uniqueStaffKeys):
             # staffIndex should be staffKey - 1, but you never know...
             removeClasses = STAFF_SPECIFIC_CLASSES[:]
@@ -1867,7 +1873,8 @@ class PartParser(XMLParserBase):
             newPartStaff = self.stream.template(removeClasses=removeClasses, fillWithRests=False)
             partStaffId = f'{self.partId}-Staff{staffKey}'
             newPartStaff.id = partStaffId
-            newPartStaff.addGroupForElements(partStaffId)  # set group for components (recurse?)
+            # set group for components (recurse?)
+            newPartStaff.addGroupForElements(partStaffId, setActiveSite=False)
             newPartStaff.groups.append(partStaffId)
             partStaffs.append(newPartStaff)
             self.parent.m21PartObjectsById[partStaffId] = newPartStaff
@@ -1881,7 +1888,7 @@ class PartParser(XMLParserBase):
                     elementsIdsNotToGoInThisStaff.add(id(el))
 
             for sourceMeasure, copyMeasure in zip(
-                self.stream.getElementsByClass(stream.Measure),
+                sourceMeasureIterator,
                 newPartStaff.getElementsByClass(stream.Measure)
             ):
                 copy_into_partStaff(sourceMeasure, copyMeasure, elementsIdsNotToGoInThisStaff)
@@ -1890,6 +1897,10 @@ class PartParser(XMLParserBase):
                 copyMeasure.flattenUnnecessaryVoices(force=False, inPlace=True)
 
         score = self.parent.stream
+        staffGroup = layout.StaffGroup(partStaffs, name=self.stream.partName, symbol='brace')
+        staffGroup.style.hideObjectOnPrint = True  # in truth, hide the name, not the brace
+        score.coreInsert(0, staffGroup)
+
         for partStaff in partStaffs:
             score.coreInsert(0, partStaff)
         score.coreElementsChanged()
@@ -1899,10 +1910,6 @@ class PartParser(XMLParserBase):
         # score.remove(originalPartStaff)
         # del self.parent.m21PartObjectsById[originalPartStaff.id]
 
-        staffGroup = layout.StaffGroup(partStaffs, name=self.stream.partName, symbol='brace')
-        staffGroup.style.hideObjectOnPrint = True  # in truth, hide the name, not the brace
-        self.parent.stream.insert(0, staffGroup)
-
     def _getStaffExclude(
         self,
         staffReference: StaffReferenceType,
@@ -1910,7 +1917,7 @@ class PartParser(XMLParserBase):
     ) -> list[base.Music21Object]:
         '''
         Given a staff reference dictionary, remove and combine in a list all elements that
-        are NOT part of the given key. Thus, return a list of all entries to remove.
+        are NOT part of the given targetKey. Thus, return a list of all entries to remove.
         It keeps those elements under the staff key None (common to all) and
         those under given key. This then is the list of all elements that should be deleted.
 
@@ -2226,7 +2233,7 @@ class PartParser(XMLParserBase):
                 if m.barDurationProportion() < 1.0:
                     m.padAsAnacrusis()
                     # environLocal.printDebug(['incompletely filled Measure found on musicxml
-                    #    import; interpreting as a anacrusis:', 'paddingLeft:', m.paddingLeft])
+                    #    import; interpreting as an anacrusis:', 'paddingLeft:', m.paddingLeft])
                 mOffsetShift = mHighestTime
 
             else:
@@ -4732,7 +4739,9 @@ class MeasureParser(XMLParserBase):
             # not complete
 
             # TODO: this should also filter by number (in theory.)
-            rbSpanners = self.spannerBundle.getByClass('RepeatBracket').getByCompleteStatus(False)
+            rbSpanners = self.spannerBundle.getByClass(
+                spanner.RepeatBracket
+            ).getByCompleteStatus(False)
             # if we have no complete bracket objects, must start a new one
             if not rbSpanners:
                 # create with this measure as the object

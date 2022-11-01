@@ -135,7 +135,8 @@ class TestExternal(unittest.TestCase):
             score1.show('lily.png')
 
     def testMXOutput(self):
-        '''A simple test of adding notes to measures in a stream.
+        '''
+        A simple test of adding notes to measures in a stream.
         '''
         c = Stream()
         for dummy in range(4):
@@ -148,7 +149,8 @@ class TestExternal(unittest.TestCase):
             c.show()
 
     def testMxMeasures(self):
-        '''A test of the automatic partitioning of notes in a measure and the creation of ties.
+        '''
+        A test of the automatic partitioning of notes in a measure and the creation of ties.
         '''
 
         n = note.Note()
@@ -166,8 +168,8 @@ class TestExternal(unittest.TestCase):
             a.show()
 
     def testMultipartStreams(self):
-        '''Test the creation of multipart streams by simply having streams within streams.
-
+        '''
+        Test the creation of multipart streams by simply having streams within streams.
         '''
         q = Stream()
         r = Stream()
@@ -267,7 +269,8 @@ class TestExternal(unittest.TestCase):
             s.show()
 
     def testBeamsStream(self):
-        '''A test of beams applied to different time signatures.
+        '''
+        A test of beams applied to different time signatures.
         '''
         q = Stream()
         r = Stream()
@@ -593,7 +596,8 @@ class Test(unittest.TestCase):
         self.assertEqual(s.duration.quarterLength, Fraction(4, 9))
 
     def testMeasureStream(self):
-        '''An approach to setting TimeSignature measures in offsets and durations
+        '''
+        An approach to setting TimeSignature measures in offsets and durations
         '''
         a = meter.TimeSignature('3/4')
         b = meter.TimeSignature('5/4')
@@ -707,7 +711,8 @@ class Test(unittest.TestCase):
         self.assertEqual(r.activeSite, s)
 
     def testActiveSitesMultiple(self):
-        '''Test an object having multiple activeSites.
+        '''
+        Test an object having multiple activeSites.
         '''
         a = Stream()
         b = Stream()
@@ -783,7 +788,8 @@ class Test(unittest.TestCase):
         unused_mx = GEX.parse(s).decode('utf-8')
 
     def testMeasureAndTieCreation(self):
-        '''A test of the automatic partitioning of notes in a measure and the creation of ties.
+        '''
+        A test of the automatic partitioning of notes in a measure and the creation of ties.
         '''
 
         n = note.Note()
@@ -800,7 +806,8 @@ class Test(unittest.TestCase):
         unused_mx = GEX.parse(a).decode('utf-8')
 
     def testStreamCopy(self):
-        '''Test copying a stream
+        '''
+        Test copying a stream
         '''
         # import pdb; pdb.set_trace()
         # search activeSite from a measure within
@@ -832,7 +839,8 @@ class Test(unittest.TestCase):
             post.insert(aElement.offset, bElement)
 
     def testIteration(self):
-        '''This test was designed to illustrate a past problem with stream
+        '''
+        This test was designed to illustrate a past problem with stream
         Iterations.
         '''
         q = Stream()
@@ -896,10 +904,9 @@ class Test(unittest.TestCase):
         self.assertEqual(offsets, [0.0, 10.0, 3.0, 20.0, 40.0])
 
     def testElements(self):
-        '''Test basic Elements wrapping non music21 objects
         '''
-        # needed to do fully-qualified isinstance name checking music21 vs base
-
+        Test basic Elements wrapping non music21 objects
+        '''
         a = Stream()
         a.insert(50, music21.Music21Object())
         self.assertEqual(len(a), 1)
@@ -1370,7 +1377,8 @@ class Test(unittest.TestCase):
         self.assertEqual(l2, 3)
 
     def testStripTiesScore(self):
-        '''Test stripTies using the Score method
+        '''
+        Test stripTies using the Score method
         '''
         from music21.musicxml import testPrimitive
 
@@ -1772,7 +1780,8 @@ class Test(unittest.TestCase):
         self.assertEqual(list(post.keys()), correctMeasureOffsetMap)
 
     def testMusicXMLGenerationViaPropertyA(self):
-        '''Test output tests above just by calling the musicxml attribute
+        '''
+        Test output tests above just by calling the musicxml attribute
         '''
         a = ['c', 'g#', 'd-', 'f#', 'e', 'f'] * 4
 
@@ -1813,7 +1822,8 @@ class Test(unittest.TestCase):
         unused_mx = GEX.parse(p).decode('utf-8')
 
     def testMusicXMLGenerationViaPropertyB(self):
-        '''Test output tests above just by calling the musicxml attribute
+        '''
+        Test output tests above just by calling the musicxml attribute
         '''
         n = note.Note()
         n.quarterLength = 3
@@ -1830,7 +1840,8 @@ class Test(unittest.TestCase):
         unused_mx = GEX.parse(a).decode('utf-8')
 
     def testMusicXMLGenerationViaPropertyC(self):
-        '''Test output tests above just by calling the musicxml attribute
+        '''
+        Test output tests above just by calling the musicxml attribute
         '''
 
         a = ['c', 'g#', 'd-', 'f#', 'e', 'f'] * 4
@@ -1853,7 +1864,8 @@ class Test(unittest.TestCase):
         unused_mx = GEX.parse(p).decode('utf-8')
 
     def testContextNestedA(self):
-        '''Testing getting clefs from higher-level streams
+        '''
+        Testing getting clefs from higher-level streams
         '''
         s1 = Stream()
         s2 = Stream()
@@ -1911,7 +1923,8 @@ class Test(unittest.TestCase):
         self.assertEqual(len(post), 1)
 
     def testContextNestedB(self):
-        '''Testing getting clefs from higher-level streams
+        '''
+        Testing getting clefs from higher-level streams
         '''
         sInner = Stream()
         sInner.id = 'innerStream'
@@ -1933,19 +1946,17 @@ class Test(unittest.TestCase):
         sInnerFlat = sInner.flatten()
         sInnerFlat.id = 'sInnerFlat'
 
-#         # but it has sOuter has a context
-#         self.assertIn(sOuter, sInnerFlat.sites)
-#         # environLocal.printDebug(['sites.get() of sInnerFlat', sInnerFlat.sites.get()])
-#         # environLocal.printDebug(['sites.siteDict of sInnerFlat', sInnerFlat.sites.siteDict])
-#
-#
-#         self.assertIn(sOuter, sInnerFlat.sites)
-#
-#         # this returns the proper dictionary entry
-#         # environLocal.printDebug(
-#         #    ['sInnerFlat.sites.siteDict[id(sInner)', sInnerFlat.sites.siteDict[id(sOuter)]])
-#         # we can extract out the same reference
-#         unused_sOuterOut = sInnerFlat.sites.getById(id(sOuter))
+        # # but it has sOuter has a context
+        # self.assertIn(sOuter, sInnerFlat.sites)
+        # # environLocal.printDebug(['sites.get() of sInnerFlat', sInnerFlat.sites.get()])
+        # # environLocal.printDebug(['sites.siteDict of sInnerFlat', sInnerFlat.sites.siteDict])
+        # self.assertIn(sOuter, sInnerFlat.sites)
+
+        # # this returns the proper dictionary entry
+        # # environLocal.printDebug(
+        # #    ['sInnerFlat.sites.siteDict[id(sInner)', sInnerFlat.sites.siteDict[id(sOuter)]])
+        # # we can extract out the same reference
+        # unused_sOuterOut = sInnerFlat.sites.getById(id(sOuter))
 
         # this works
         post = sInnerFlat.getContextByClass(clef.Clef)
@@ -1959,7 +1970,8 @@ class Test(unittest.TestCase):
         # self.assertIsInstance(post, clef.AltoClef)
 
     def testContextNestedC(self):
-        '''Testing getting clefs from higher-level streams
+        '''
+        Testing getting clefs from higher-level streams
         '''
         from music21.common.enums import ElementSearch
 
@@ -2310,7 +2322,8 @@ class Test(unittest.TestCase):
         self.assertEqual(len(sPartitioned.getElementsByClass(Measure)), 1)
 
     def testMakeMeasuresWithBarlines(self):
-        '''Test makeMeasures with optional barline parameters.
+        '''
+        Test makeMeasures with optional barline parameters.
         '''
         s = Stream()
         s.repeatAppend(note.Note(quarterLength=0.5), 20)
@@ -2359,7 +2372,8 @@ class Test(unittest.TestCase):
         self.assertEqual(len(s['Expression']), 1)
 
     def testRemove(self):
-        '''Test removing components from a Stream.
+        '''
+        Test removing components from a Stream.
         '''
         s = Stream()
         n1 = note.Note('g')
@@ -2400,7 +2414,8 @@ class Test(unittest.TestCase):
         self.assertEqual(len(s.notes), 0)
 
     def testReplace(self):
-        '''Test replacing components from a Stream.
+        '''
+        Test replacing components from a Stream.
         '''
         s = Stream()
         n1 = note.Note('g')
@@ -2531,7 +2546,8 @@ class Test(unittest.TestCase):
         unused_s3Measures = s3.makeMeasures()
 
     def testBestTimeSignature(self):
-        '''Get a time signature based on components in a measure.
+        '''
+        Get a time signature based on components in a measure.
         '''
         m = Measure()
         for ql in [2, 3, 2]:
@@ -2561,7 +2577,8 @@ class Test(unittest.TestCase):
         self.assertEqual(ts.denominator, 16)
 
     def testGetKeySignatures(self):
-        '''Searching contexts for key signatures
+        '''
+        Searching contexts for key signatures
         '''
         s = Stream()
         ks1 = key.KeySignature(1)
@@ -2603,7 +2620,8 @@ class Test(unittest.TestCase):
         self.assertIs(post, ks1)
 
     def testGetKeySignaturesThreeMeasures(self):
-        '''Searching contexts for key signatures
+        '''
+        Searching contexts for key signatures
         '''
 
         ks1 = key.KeySignature(1)
@@ -2644,7 +2662,8 @@ class Test(unittest.TestCase):
         self.assertIs(post, ks1)
 
     def testMakeAccidentalsA(self):
-        '''Test accidental display setting
+        '''
+        Test accidental display setting
         '''
         s = Stream()
         n1 = note.Note('a#')
@@ -3210,7 +3229,8 @@ class Test(unittest.TestCase):
                     )
 
     def testScaleDurationsBasic(self):
-        '''Scale some durations, independent of offsets.
+        '''
+        Scale some durations, independent of offsets.
         '''
 
         def procCompare(s, scalar, match):
@@ -3286,7 +3306,8 @@ class Test(unittest.TestCase):
                     [1.5, 4.5, 6, 9, 0.75, 0.75, 1.5])
 
     def testAugmentOrDiminishHighestTimes(self):
-        '''Need to make sure that highest offset and time are properly updated
+        '''
+        Need to make sure that highest offset and time are properly updated
         '''
         src = corpus.parse('bach/bwv324.xml')
         # get some measures of the soprano; just get the notes
@@ -3313,7 +3334,8 @@ class Test(unittest.TestCase):
         self.assertEqual(ex.highestTime, 84.0)
 
     def testAugmentOrDiminishCorpus(self):
-        '''Extract phrases from the corpus and use for testing
+        '''
+        Extract phrases from the corpus and use for testing
         '''
         # first method: iterating through notes
         src = corpus.parse('bach/bwv324.xml')
@@ -3359,13 +3381,13 @@ class Test(unittest.TestCase):
         self.assertEqual(m.barDurationProportion(), Fraction(1, 3), 4)
         self.assertEqual(m.barDuration.quarterLength, 3, 4)
 
-# temporarily commented out
-#         m.shiftElementsAsAnacrusis()
-#         self.assertTrue(m in m.notesAndRests[0].sites)
-#         self.assertEqual(m.notesAndRests[0].offset, 2.0)
-#         # now the duration is full
-#         self.assertAlmostEqual(m.barDurationProportion(), 1.0, 4)
-#         self.assertAlmostEqual(m.highestOffset, 2.0, 4)
+        # temporarily commented out
+        # m.shiftElementsAsAnacrusis()
+        # self.assertTrue(m in m.notesAndRests[0].sites)
+        # self.assertEqual(m.notesAndRests[0].offset, 2.0)
+        # # now the duration is full
+        # self.assertAlmostEqual(m.barDurationProportion(), 1.0, 4)
+        # self.assertAlmostEqual(m.highestOffset, 2.0, 4)
 
         m = Measure()
         m.timeSignature = meter.TimeSignature('5/4')
@@ -3379,11 +3401,11 @@ class Test(unittest.TestCase):
         self.assertEqual(m.barDurationProportion(), Fraction(2, 5), 4)
         self.assertEqual(m.barDuration.quarterLength, 5.0)
 
-#         m.shiftElementsAsAnacrusis()
-#         self.assertEqual(m.notesAndRests[0].offset, 3.0)
-#         self.assertEqual(n1.offset, 3.0)
-#         self.assertEqual(n2.offset, 3.5)
-#         self.assertAlmostEqual(m.barDurationProportion(), 1.0, 4)
+        # m.shiftElementsAsAnacrusis()
+        # self.assertEqual(m.notesAndRests[0].offset, 3.0)
+        # self.assertEqual(n1.offset, 3.0)
+        # self.assertEqual(n2.offset, 3.5)
+        # self.assertAlmostEqual(m.barDurationProportion(), 1.0, 4)
 
     def testInsertAndShiftBasic(self):
         offsets = [0, 2, 4, 6, 8, 10, 12]
@@ -3579,7 +3601,9 @@ class Test(unittest.TestCase):
         self.assertEqual(m2.rightBarline, b4)  # this is on elements
 
     def testMeasureLayout(self):
-        '''test both system layout and measure width'''
+        '''
+        test both system layout and measure width
+        '''
 
         # Note: Measure.layoutWidth is not currently read by musicxml
         s = Stream()
@@ -4127,7 +4151,8 @@ class Test(unittest.TestCase):
                 self.assertEqual(post.mode, matchArden[i][1])
 
     def testMakeTupletBracketsA(self):
-        '''Creating brackets
+        '''
+        Creating brackets
         '''
         from music21.stream import makeNotation
 
@@ -4163,7 +4188,8 @@ class Test(unittest.TestCase):
         # s.show()
 
     def testMakeTupletBracketsB(self):
-        '''Creating brackets
+        '''
+        Creating brackets
         '''
         from music21.stream import makeNotation
 
@@ -4270,7 +4296,8 @@ class Test(unittest.TestCase):
         # s.show()
 
     def testMakeNotationA(self):
-        '''This is a test of many make procedures
+        '''
+        This is a test of many make procedures
         '''
         def collectTupletType(s_inner):
             post = []
@@ -4315,7 +4342,8 @@ class Test(unittest.TestCase):
         # s.show()
 
     def testMakeNotationB(self):
-        '''Testing voices making routines within make notation
+        '''
+        Testing voices making routines within make notation
         '''
         from music21.instrument import Xylophone
         s = Stream()
@@ -4342,7 +4370,8 @@ class Test(unittest.TestCase):
         self.assertIsInstance(sPost.getInstruments(recurse=True)[0], Xylophone)
 
     def testMakeNotationC(self):
-        '''Test creating diverse, overlapping durations and notes
+        '''
+        Test creating diverse, overlapping durations and notes
         '''
         s = Stream()
         for dur in [0.5, 1.5, 3]:
@@ -4359,7 +4388,8 @@ class Test(unittest.TestCase):
         self.assertIsNotNone(sPost.flatten().notes[-1].tie)
 
     def testMakeNotationScoreA(self):
-        '''Test makeNotation on Score objects
+        '''
+        Test makeNotation on Score objects
         '''
         s = Score()
         p1 = Stream()
@@ -4385,7 +4415,8 @@ class Test(unittest.TestCase):
         self.assertEqual(len(post.flatten().getElementsByClass(clef.Clef)), 2)
 
     def testMakeNotationScoreB(self):
-        '''Test makeNotation on Score objects
+        '''
+        Test makeNotation on Score objects
         '''
         s = Score()
         p1 = Stream()
@@ -4413,7 +4444,8 @@ class Test(unittest.TestCase):
         self.assertEqual(len(post.flatten().getElementsByClass(clef.Clef)), 2)
 
     def testMakeNotationScoreC(self):
-        '''Test makeNotation on Score objects
+        '''
+        Test makeNotation on Score objects
         '''
         s = Score()
         p1 = Stream()
@@ -4874,7 +4906,8 @@ class Test(unittest.TestCase):
         self.assertEqual(m.number, 2)
 
     def testElementsHighestTimeA(self):
-        '''Test adding elements at the highest time position
+        '''
+        Test adding elements at the highest time position
         '''
         n1 = note.Note()
         n1.quarterLength = 30
@@ -5009,7 +5042,8 @@ class Test(unittest.TestCase):
             s.storeAtEnd(b2)
 
     def testElementsHighestTimeB(self):
-        '''Test adding elements at the highest time position
+        '''
+        Test adding elements at the highest time position
         '''
         n1 = note.Note()
         n1.quarterLength = 30
@@ -5285,8 +5319,7 @@ class Test(unittest.TestCase):
 
     def testSliceByGreatestDivisorImported(self):
 
-        sSrc = corpus.parse('bwv66.6')
-        s = copy.deepcopy(sSrc)
+        s = corpus.parse('bwv66.6')
         for p in s.parts:
             p.sliceByGreatestDivisor(inPlace=True, addTies=True)
             # p.makeBeams(inPlace=True)
@@ -5299,8 +5332,8 @@ class Test(unittest.TestCase):
         self.assertEqual(len(s.parts[2].flatten().notesAndRests), 61)
         self.assertEqual(len(s.parts[3].flatten().notesAndRests), 53)
 
-        s = copy.deepcopy(sSrc)
-        s.sliceByGreatestDivisor(inPlace=True, addTies=True)
+        # s = corpus.parse('bwv66.6')
+        # s.sliceByGreatestDivisor(inPlace=True, addTies=True)
         # s.flatten().chordify().show()
         # s.show()
 
@@ -5907,52 +5940,49 @@ class Test(unittest.TestCase):
 
         # s1.show()
 
-#         s0 = corpus.parse('hwv56', '1-05')
-#         # can use index values
-#         s2 = s0.partsToVoices(([0, 1], [2, 4], 3), permitOneVoicePerPart=True)
-#         self.assertEqual(len(s2.parts), 3)
-#         self.assertEqual(len(s2.parts[0].getElementsByClass(
-#             'Measure')[0].voices), 2)
-#         self.assertEqual(len(s2.parts[1].getElementsByClass(
-#             'Measure')[0].voices), 2)
-#         self.assertEqual(len(s2.parts[2].getElementsByClass(
-#             'Measure')[0].voices), 1)
-#
-#         s2 = s0.partsToVoices((['Violino I', 'Violino II'], ['Viola', 'Bassi'], ['Basso']),
-#                permitOneVoicePerPart=True)
-#         self.assertEqual(len(s2.parts), 3)
-#         self.assertEqual(len(s2.parts[0].getElementsByClass(
-#             'Measure')[0].voices), 2)
-#         self.assertEqual(len(s2.parts[1].getElementsByClass(
-#             'Measure')[0].voices), 2)
-#         self.assertEqual(len(s2.parts[2].getElementsByClass(
-#             'Measure')[0].voices), 1)
-#
-#
-#         # this will keep the voice part unaltered
-#         s2 = s0.partsToVoices((['Violino I', 'Violino II'], ['Viola', 'Bassi'], 'Basso'),
-#                permitOneVoicePerPart=False)
-#         self.assertEqual(len(s2.parts), 3)
-#         self.assertEqual(len(s2.parts[0].getElementsByClass(
-#             'Measure')[0].voices), 2)
-#         self.assertEqual(len(s2.parts[1].getElementsByClass(
-#             'Measure')[0].voices), 2)
-#         self.assertEqual(s2.parts[2].getElementsByClass(
-#             'Measure')[0].hasVoices(), False)
-#
-#
-#         # mm 16-19 are a good examples
-#         s1 = corpus.parse('hwv56', '1-05').measures(16, 19)
-#         s2 = s1.partsToVoices((['Violino I', 'Violino II'], ['Viola', 'Bassi'], 'Basso'))
-#         # s.show()
-#
-#         self.assertEqual(len(s2.parts), 3)
-#         self.assertEqual(len(s2.parts[0].getElementsByClass(
-#             'Measure')[0].voices), 2)
-#         self.assertEqual(len(s2.parts[1].getElementsByClass(
-#             'Measure')[0].voices), 2)
-#         self.assertEqual(s2.parts[2].getElementsByClass(
-#             'Measure')[0].hasVoices(), False)
+        # s0 = corpus.parse('hwv56', '1-05')
+        # # can use index values
+        # s2 = s0.partsToVoices(([0, 1], [2, 4], 3), permitOneVoicePerPart=True)
+        # self.assertEqual(len(s2.parts), 3)
+        # self.assertEqual(len(s2.parts[0].getElementsByClass(
+        #     'Measure')[0].voices), 2)
+        # self.assertEqual(len(s2.parts[1].getElementsByClass(
+        #     'Measure')[0].voices), 2)
+        # self.assertEqual(len(s2.parts[2].getElementsByClass(
+        #     'Measure')[0].voices), 1)
+
+        # s2 = s0.partsToVoices((['Violino I', 'Violino II'], ['Viola', 'Bassi'], ['Basso']),
+        #        permitOneVoicePerPart=True)
+        # self.assertEqual(len(s2.parts), 3)
+        # self.assertEqual(len(s2.parts[0].getElementsByClass(
+        #     'Measure')[0].voices), 2)
+        # self.assertEqual(len(s2.parts[1].getElementsByClass(
+        #     'Measure')[0].voices), 2)
+        # self.assertEqual(len(s2.parts[2].getElementsByClass(
+        #     'Measure')[0].voices), 1)
+        # # this will keep the voice part unaltered
+        # s2 = s0.partsToVoices((['Violino I', 'Violino II'], ['Viola', 'Bassi'], 'Basso'),
+        #        permitOneVoicePerPart=False)
+        # self.assertEqual(len(s2.parts), 3)
+        # self.assertEqual(len(s2.parts[0].getElementsByClass(
+        #     'Measure')[0].voices), 2)
+        # self.assertEqual(len(s2.parts[1].getElementsByClass(
+        #     'Measure')[0].voices), 2)
+        # self.assertEqual(s2.parts[2].getElementsByClass(
+        #     'Measure')[0].hasVoices(), False)
+
+        # # mm 16-19 are a good examples
+        # s1 = corpus.parse('hwv56', '1-05').measures(16, 19)
+        # s2 = s1.partsToVoices((['Violino I', 'Violino II'], ['Viola', 'Bassi'], 'Basso'))
+        # # s.show()
+
+        # self.assertEqual(len(s2.parts), 3)
+        # self.assertEqual(len(s2.parts[0].getElementsByClass(
+        #     'Measure')[0].voices), 2)
+        # self.assertEqual(len(s2.parts[1].getElementsByClass(
+        #     'Measure')[0].voices), 2)
+        # self.assertEqual(s2.parts[2].getElementsByClass(
+        #     'Measure')[0].hasVoices(), False)
 
     def testVoicesToPartsA(self):
 
@@ -7013,11 +7043,11 @@ class Test(unittest.TestCase):
         self.assertEqual([m.seconds for m in s.getElementsByClass(Measure)], [6.0, 10.0, 4.0])
 
     # TODO: New piece with Metronome Mark Boundaries
-#     def testMetronomeMarkBoundaries(self):
-# #         s = corpus.parse('hwv56/movement2-09.md')
-#         mmBoundaries = s.metronomeMarkBoundaries()
-#         self.assertEqual(str(mmBoundaries),
-#                '[(0.0, 20.0, <music21.tempo.MetronomeMark Largo e piano Quarter=46>)]')
+    # def testMetronomeMarkBoundaries(self):
+    #     s = corpus.parse('hwv56/movement2-09.md')
+    #     mmBoundaries = s.metronomeMarkBoundaries()
+    #     self.assertEqual(str(mmBoundaries),
+    #            '[(0.0, 20.0, <music21.tempo.MetronomeMark Largo e piano Quarter=46>)]')
 
     def testAccumulatedTimeA(self):
         s = Stream()
@@ -7859,7 +7889,8 @@ class Test(unittest.TestCase):
 
 
     def testSplitAtQuarterLengthB(self):
-        '''Test if recursive calls work over voices in a Measure
+        '''
+        Test if recursive calls work over voices in a Measure
         '''
         m1 = Measure()
         v1 = Voice()
@@ -7882,7 +7913,8 @@ class Test(unittest.TestCase):
         # sPost.show()
 
     def testSplitAtQuarterLengthC(self):
-        '''Test splitting a Score
+        '''
+        Test splitting a Score
         '''
         s = corpus.parse('bwv66.6')
         sLeft, sRight = s.splitAtQuarterLength(6)
@@ -7905,7 +7937,9 @@ class Test(unittest.TestCase):
         # sRight.show()
 
     def testGracesInStream(self):
-        '''testing grace notes'''
+        '''
+        testing grace notes
+        '''
         s = Measure()
         s.append(note.Note('G3'))
         self.assertEqual(s.highestTime, 1.0)
@@ -7991,7 +8025,8 @@ class Test(unittest.TestCase):
         self.assertEqual(len(s[variant.Variant]), 2)
 
     def testActivateVariantsA(self):
-        '''This tests a single-measure variant
+        '''
+        This tests a single-measure variant
         '''
         s = Stream()
         s.repeatAppend(note.Note('d2'), 12)
@@ -8022,7 +8057,8 @@ class Test(unittest.TestCase):
         self.assertEqual(len(s[variant.Variant]), 1)
 
     def testActivateVariantsB(self):
-        '''This tests two variants with different groups, each a single measure
+        '''
+        This tests two variants with different groups, each a single measure
         '''
         s = Stream()
         s.repeatAppend(note.Note('d2'), 12)
@@ -8071,7 +8107,8 @@ class Test(unittest.TestCase):
         self.assertEqual(str(match), "[['default'], ['default']]")
 
     def testActivateVariantsC(self):
-        '''This tests a two-measure variant
+        '''
+        This tests a two-measure variant
         '''
         s = Stream()
         s.repeatAppend(note.Note('d2'), 12)
@@ -8106,7 +8143,8 @@ class Test(unittest.TestCase):
         self.assertEqual(len(s[variant.Variant]), 1)
 
     def testActivateVariantsD(self):
-        '''This tests a note-level variant
+        '''
+        This tests a note-level variant
         '''
         s = Stream()
         s.repeatAppend(note.Note('d2'), 12)
@@ -8141,7 +8179,8 @@ class Test(unittest.TestCase):
         # variant part will not be matched
 
     def testActivateVariantsE(self):
-        '''This tests a note-level variant with miss-matched rhythms
+        '''
+        This tests a note-level variant with miss-matched rhythms
         '''
         s = Stream()
         s.repeatAppend(note.Note('d2'), 12)
@@ -8210,7 +8249,9 @@ class Test(unittest.TestCase):
         # s.show()
 
     def testActivateVariantsBySpanB(self):
-        '''test replacing 2 measures by a longer single measure'''
+        '''
+        test replacing 2 measures by a longer single measure
+        '''
         s = Stream()
         s.repeatAppend(note.Note('d2'), 16)
         s.makeMeasures(inPlace=True)
@@ -8333,11 +8374,15 @@ class Test(unittest.TestCase):
 
     @staticmethod
     def get_beams_from_stream(srcList):
-        '''Helper function to return beam list for all notes and rests in the stream.'''
+        '''
+        Helper function to return beam list for all notes and rests in the stream.
+        '''
         return [n.beams for n in srcList if isinstance(n, GeneralNote)]
 
     def test_makeBeams__all_quarters(self):
-        '''Test that for a measure full of quarters, there are no beams'''
+        '''
+        Test that for a measure full of quarters, there are no beams
+        '''
         m = Measure()
         m.timeSignature = meter.TimeSignature('4/4')
         m.repeatAppend(note.Note(quarterLength=1), 4)
@@ -8348,7 +8393,9 @@ class Test(unittest.TestCase):
         self.assertEqual([beam.Beams(), beam.Beams(), beam.Beams(), beam.Beams()], beams)
 
     def test_makeBeams__all_eighths(self):
-        '''Test a full measure full of eighth is grouped by beams into couples'''
+        '''
+        Test a full measure full of eighth is grouped by beams into couples
+        '''
         m = Measure()
         m.timeSignature = meter.TimeSignature('4/4')
         m.repeatAppend(note.Note(quarterLength=0.5), 8)
@@ -8377,7 +8424,9 @@ class Test(unittest.TestCase):
         self.assertEqual(second_note_beams, beams[7])
 
     def test_makeBeams__eighth_rests_and_eighth(self):
-        '''Test a full measure of 8th rest followed by 8th note'''
+        '''
+        Test a full measure of 8th rest followed by 8th note
+        '''
         m = Measure()
         m.timeSignature = meter.TimeSignature('4/4')
         for i in range(4):
@@ -8427,7 +8476,9 @@ class Test(unittest.TestCase):
         self.assertEqual(third_note_beams, beams[5])
 
     def test_makeBeams__1_e_n_a(self):
-        '''Test that 4 16th notes have proper beams across them all.'''
+        '''
+        Test that 4 16th notes have proper beams across them all.
+        '''
         m = Measure()
         m.timeSignature = meter.TimeSignature('1/4')
         m.repeatAppend(note.Note(quarterLength=0.25), 4)

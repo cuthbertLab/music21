@@ -10,8 +10,7 @@
 # Copyright:    Copyright © 2011-2014 Michael Scott Asato Cuthbert and the music21
 #               Project
 # License:      BSD, see license.txt
-# -----------------------------------------------------------------------------
-
+# ----------------------------------------------------------------------------
 '''
 This module defines objects for tracking the derivation of one
 :class:`~music21.stream.Stream` from another.
@@ -20,7 +19,7 @@ from __future__ import annotations
 
 from collections.abc import Generator
 import functools
-from typing import TYPE_CHECKING  # Pylint bug
+import typing as t
 import unittest
 
 from music21 import common
@@ -28,7 +27,7 @@ from music21.common.objects import SlottedObjectMixin
 from music21 import environment
 
 
-if TYPE_CHECKING:
+if t.TYPE_CHECKING:
     from music21 import base
 
 
@@ -303,6 +302,14 @@ class Derivation(SlottedObjectMixin):
             self._originId = id(origin)
             self._origin = origin
             # self._origin = common.wrapWeakref(origin)
+
+    @property
+    def originId(self) -> int | None:
+        '''
+        Return the Python id (=memory location) of the origin.
+        (Same as id(derivation.origin).  Not the same as derivation.origin.ind)
+        '''
+        return self._originId
 
     @property
     def rootDerivation(self) -> base.Music21Object | None:

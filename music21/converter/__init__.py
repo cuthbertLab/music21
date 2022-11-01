@@ -63,6 +63,10 @@ from music21 import stream
 from music21.metadata import bundles
 
 
+if t.TYPE_CHECKING:
+    from music21 import base
+
+
 __all__ = [
     'subConverters', 'ArchiveManagerException', 'PickleFilterException',
     'ConverterException', 'ConverterFileException',
@@ -166,7 +170,7 @@ class ArchiveManager:
         For 'musedata' format this will be a list of strings.
         For 'musicxml' this will be a single string.
 
-        Changed in v.8 -- name is not used.
+        * Changed in v8: name is not used.
         '''
         post = None
         if self.archiveType != 'zip':
@@ -725,7 +729,7 @@ class Converter:
         >>> #_DOCS_SHOW c.parseURL(joplinURL)
         >>> #_DOCS_SHOW joplinStream = c.stream
 
-        Changed in v.7 -- made keyword-only and added `forceSource` option.
+        * Changed in v7: made keyword-only and added `forceSource` option.
         '''
         autoDownload = environLocal['autoDownload']
         if autoDownload in ('deny', 'ask'):
@@ -1184,7 +1188,7 @@ def parseURL(url,
     URL downloading will not happen automatically unless the user has set their
     Environment "autoDownload" preference to "allow".
 
-    Changed in v.7 -- made keyword-only.
+    * Changed in v7: made keyword-only.
     '''
     v = Converter()
     v.parseURL(url, format=format, forceSource=forceSource, **keywords)
@@ -1244,7 +1248,7 @@ def parse(value: bundles.MetadataEntry | bytes | str | pathlib.Path,
     >>> s[meter.TimeSignature].first()
     <music21.meter.TimeSignature 2/16>
 
-    Changed in v.8 -- passing a list of tinyNotation strings was never documented as a
+    * Changed in v8: passing a list of tinyNotation strings was never documented as a
         possibility and has been removed.
     '''
     # environLocal.printDebug(['attempting to parse()', value])
@@ -1316,10 +1320,46 @@ def parse(value: bundles.MetadataEntry | bytes | str | pathlib.Path,
         # all else, including MidiBytes
         return parseData(value, number=number, format=format, **keywords)
 
+def toData(obj: base.Music21Object, fmt: str, **keywords) -> str | bytes:
+    '''
+    Convert `obj` to the given format `fmt` and return the information retrieved.
+
+    Currently, this is somewhat inefficient: it calls Subconverter.toData which
+    calls `write()` on the object and reads back the value of the file.
+
+    >>> tiny = converter.parse('tinyNotation: 4/4 C4 D E F G1')
+    >>> data = converter.toData(tiny, 'braille.ascii')
+    >>> type(data)
+    <class 'str'>
+    >>> print(data)
+        #D4
+    #A _?:$] (<K
+    '''
+    if fmt.startswith('.'):
+        fmt = fmt[1:]
+    regularizedConverterFormat, unused_ext = common.findFormat(fmt)
+    if regularizedConverterFormat is None:
+        raise ConverterException(f'cannot support output in this format yet: {fmt}')
+
+    formatSubs = fmt.split('.')
+    fmt = formatSubs[0]
+    subformats = formatSubs[1:]
+
+    scClass = common.findSubConverterForFormat(regularizedConverterFormat)
+    if scClass is None:  # pragma: no cover
+        raise ConverterException(f'cannot support output in this format yet: {fmt}')
+    formatWriter = scClass()
+    return formatWriter.toData(
+        obj,
+        fmt=regularizedConverterFormat,
+        subformats=subformats,
+        **keywords)
+
 
 def freeze(streamObj, fmt=None, fp=None, fastButUnsafe=False, zipType='zlib') -> pathlib.Path:
     # noinspection PyShadowingNames
-    '''Given a StreamObject and a file path, serialize and store the Stream to a file.
+    '''
+    Given a StreamObject and a file path, serialize and store the Stream to a file.
 
     This function is based on the :class:`~music21.converter.StreamFreezer` object.
 
@@ -1369,7 +1409,8 @@ def freeze(streamObj, fmt=None, fp=None, fastButUnsafe=False, zipType='zlib') ->
 
 
 def thaw(fp, zipType='zlib'):
-    '''Given a file path of a serialized Stream, defrost the file into a Stream.
+    '''
+    Given a file path of a serialized Stream, defrost the file into a Stream.
 
     This function is based on the :class:`~music21.converter.StreamFreezer` object.
 
@@ -1436,7 +1477,7 @@ def _osCanLoad(fp: str) -> bool:
 
     os.path.exists raises ValueError for paths over 260 chars
     on all versions of Windows lacking the `LongPathsEnabled` setting,
-    which is absent below Windows 10 v.1607 and opt-in on higher versions.
+    which is absent below Windows 10.1607 and opt-in on higher versions.
     '''
     try:
         return os.path.exists(fp)

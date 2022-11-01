@@ -51,9 +51,6 @@ class TreeException(Music21Exception):
 class InstrumentException(Music21Exception):
     pass
 
-class Music21CommonException(Music21Exception):
-    pass
-
 class CorpusException(Music21Exception):
     pass
 

@@ -15,7 +15,7 @@ etc. such that precise positioning information, layout, size, etc. can be specif
 '''
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+import typing as t
 import unittest
 
 from music21 import common
@@ -23,7 +23,7 @@ from music21 import exceptions21
 from music21.prebase import ProtoM21Object
 
 
-if TYPE_CHECKING:
+if t.TYPE_CHECKING:
     from music21 import editorial
 
 
@@ -200,7 +200,7 @@ class Style(ProtoM21Object):
         Other legal positions are 'above' and 'below' which
         are synonyms for 10 and -70 respectively (for 5-line
         staves; other staves are not yet implemented)
-        This behavior may change in music21 v.8 or after.
+        This behavior may change in music21 v8 or after.
 
         >>> te = style.Style()
         >>> te.absoluteY = 10

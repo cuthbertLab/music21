@@ -130,7 +130,8 @@ class Test(unittest.TestCase):
                           'D4', 'D4', 'D4', 'D4', 'F4', 'F4', 'F4', 'F4'])
 
     def testRepeatCoherenceC(self):
-        '''Using da capo/dal segno
+        '''
+        Using da capo/dal segno
         '''
         # no repeats
         s = stream.Part()
@@ -1117,7 +1118,7 @@ class Test(unittest.TestCase):
         bars = s2.parts[0].flatten().getElementsByClass(bar.Repeat)
         self.assertEqual(len(bars), 0)
 
-#         self.assertEqual(len(s2.parts[0].flatten().notes), 111)
+        # self.assertEqual(len(s2.parts[0].flatten().notes), 111)
 
     def testExpandRepeatsImportedC(self):
         s = converter.parse(testPrimitive.repeatExpressionsA)
@@ -1321,7 +1322,8 @@ class Test(unittest.TestCase):
         # self.assertTrue(ex._repeatBracketsAreCoherent())
 
     def testRepeatEndingsE(self):
-        '''Expanding two endings (1, 2, then 3) without a start repeat
+        '''
+        Expanding two endings (1, 2, then 3) without a start repeat
         '''
         p = stream.Part()
         m1 = stream.Measure()
@@ -1354,7 +1356,8 @@ class Test(unittest.TestCase):
         self.assertEqual(post[0]['measureIndices'], [1, 2, 3])
 
     def testRepeatEndingsF(self):
-        '''Two sets of two endings (1, 2, then 3) without a start repeat
+        '''
+        Two sets of two endings (1, 2, then 3) without a start repeat
         '''
         p = stream.Part()
         m1 = stream.Measure()
@@ -1406,7 +1409,8 @@ class Test(unittest.TestCase):
         self.assertEqual(post[1]['measureIndices'], [5, 6, 7])
 
     def testRepeatEndingsG(self):
-        '''Two sets of two endings (1, 2, then 3) without a start repeat
+        '''
+        Two sets of two endings (1, 2, then 3) without a start repeat
         '''
         p = stream.Part()
         m1 = stream.Measure()
@@ -1445,7 +1449,8 @@ class Test(unittest.TestCase):
         # post.show()
 
     def testRepeatEndingsH(self):
-        '''Two sets of two endings (1, 2, then 3) without a start repeat
+        '''
+        Two sets of two endings (1, 2, then 3) without a start repeat
         '''
         p = stream.Part()
         m1 = stream.Measure(number=1)
@@ -1488,7 +1493,8 @@ class Test(unittest.TestCase):
                          ['C', 'D', 'E', 'C', 'D', 'E', 'C', 'F', 'C', 'G', 'A', 'B', 'C'])
 
     def testRepeatEndingsI(self):
-        '''Two sets of two endings (1, 2, then 3) without a start repeat
+        '''
+        Two sets of two endings (1, 2, then 3) without a start repeat
         '''
         p = stream.Part()
         m1 = stream.Measure(number=1)
@@ -1542,7 +1548,8 @@ class Test(unittest.TestCase):
                           'G', 'A', 'G', 'A', 'G', 'B', 'G', 'C'])
 
     def testRepeatEndingsJ(self):
-        '''Two sets of two endings (1, 2, then 3) without a start repeat
+        '''
+        Two sets of two endings (1, 2, then 3) without a start repeat
         '''
         p = stream.Part()
         m1 = stream.Measure(number=1)
@@ -1600,10 +1607,10 @@ class Test(unittest.TestCase):
 
         # p.show()
 
-        #         ex = repeat.Expander(p)
-        #         self.assertTrue(ex.isExpandable())
-        #         post = ex.process()
-        #         post.show()
+        # ex = repeat.Expander(p)
+        # self.assertTrue(ex.isExpandable())
+        # post = ex.process()
+        # post.show()
 
         post = p.expandRepeats()
         self.assertEqual(len(post), 37)

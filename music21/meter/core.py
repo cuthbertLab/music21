@@ -315,7 +315,8 @@ class MeterTerminal(prebase.ProtoM21Object, SlottedObjectMixin):
     denominator = property(_getDenominator, _setDenominator)
 
     def _ratioChanged(self):
-        '''If ratio has been changed, call this to update duration
+        '''
+        If ratio has been changed, call this to update duration
         '''
         # NOTE: this is a performance critical method and should only be
         # called when necessary
@@ -418,7 +419,8 @@ class MeterSequence(MeterTerminal):
     # SPECIAL METHODS #
 
     def __deepcopy__(self, memo=None):
-        '''Helper method to copy.py's deepcopy function. Call it from there.
+        '''
+        Helper method to copy.py's deepcopy function. Call it from there.
 
         Defining a custom __deepcopy__ here is a performance boost,
         particularly in not copying _duration and other benefits.
@@ -450,8 +452,8 @@ class MeterSequence(MeterTerminal):
         return new
 
     def __getitem__(self, key):
-        '''Get an MeterTerminal from _partition
-
+        '''
+        Get an MeterTerminal from _partition
 
         >>> a = meter.MeterSequence('4/4', 4)
         >>> a[3].numerator
@@ -916,7 +918,8 @@ class MeterSequence(MeterTerminal):
 
     def _subdivideNested(self, processObjList, divisions):
         # noinspection PyShadowingNames
-        '''Recursive nested call routine. Return a reference to the newly created level.
+        '''
+        Recursive nested call routine. Return a reference to the newly created level.
 
         >>> ms = meter.MeterSequence('2/4')
         >>> ms.partition(2)
@@ -1257,7 +1260,9 @@ class MeterSequence(MeterTerminal):
         return self._denominator
 
     def _getFlatList(self):
-        '''Return a flat version of this MeterSequence as a list of MeterTerminals.
+        '''
+        Return a flattened version of this
+        MeterSequence as a list of MeterTerminals.
 
         This return a list and not a new MeterSequence b/c MeterSequence objects
         are generally immutable and thus it does not make sense
@@ -1387,7 +1392,7 @@ class MeterSequence(MeterTerminal):
         >>> ms.isUniformPartition()
         False
 
-        Changed in v7 -- depth is keyword only
+        * Changed in v7: depth is keyword only
         '''
         n = []
         d = []
@@ -1798,8 +1803,8 @@ class MeterSequence(MeterTerminal):
         Traceback (most recent call last):
         music21.exceptions21.MeterException: cannot access from qLenPos -1.0
 
-        Changed in v.7 -- `index` can be provided, if known, for a long
-        `MeterSequence` to improve performance.
+        * Changed in v7: `index` can be provided, if known, for a long
+          `MeterSequence` to improve performance.
         '''
         qLenPos = opFrac(qLenPos)
         if qLenPos >= self.duration.quarterLength or qLenPos < 0:

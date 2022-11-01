@@ -130,9 +130,7 @@ B,,z [FDB,]z B,,z [FDB,]z| \
 A,,z [ECA,]z A,,z [ECA,]z| \
 B,,z [FDB,]z A,,z [ECA,]z| \
 B,,z [ECA,]z B,,z [FDB,]
-
 '''
-
 # http://abcnotation.com/tunePage?a=abc.sourceforge.net/NMD/nmd/reelsh-l.txt/0056
 # noinspection SpellCheckingInspection
 kitchGirl = '''X: 57
@@ -524,10 +522,8 @@ T:Test Tuplet Primitive
 (3.c2=c2^c2 (3.c2=c2^c2
 
 (6c/c/c/c/c/=f/ (6B/c/c/^^c/c/^f/ z4
-
 '''
 # (9Bc^C ^c=cc =Cc=f
-
 
 # abc-2.1 code + allowing shared header information.
 # noinspection SpellCheckingInspection
@@ -637,12 +633,10 @@ K:G
 V:1 treble
 V:1
 g^G_ag a=ffF|=F2^c2 FB =ca|]
-
 '''
 
 
 # ------------------------------------------------------------------------------
-
 ALL = [fyrareprisarn, mysteryReel, fullRiggedShip, aleIsDear, kitchGirl,
         williamAndNancy, morrisonsJig, hectorTheHero, kingOfTheFairies,
         sicutRosa, theAleWifesDaughter, theBeggerBoy, theBattleOfTheSnaBas,

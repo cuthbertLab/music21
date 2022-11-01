@@ -27,7 +27,6 @@ from __future__ import annotations
 from collections import OrderedDict
 from collections.abc import Iterable, Sequence
 import typing as t
-from typing import TYPE_CHECKING  # pylint needs no alias
 import unittest
 
 from music21 import environment
@@ -39,7 +38,7 @@ from music21 import key
 from music21 import pitch
 
 
-if TYPE_CHECKING:
+if t.TYPE_CHECKING:
     from music21 import stream
 
 
@@ -156,7 +155,8 @@ class DiscreteAnalysis:
         return post
 
     def solutionLegend(self, compress=False):
-        '''A list of pairs showing all discrete results and the assigned color.
+        '''
+        A list of pairs showing all discrete results and the assigned color.
         Data should be organized to be passed to
         :class:`music21.graph.GraphColorGridLegend`.
 
@@ -728,9 +728,9 @@ class KrumhanslSchmuckler(KeyWeightKeyAnalysis):
     Values from from http://extras.humdrum.org/man/keycor/, which describes these
     weightings as "Strong tendency to identify the dominant key as the tonic."
 
-    Changed in v.6.3 -- it used to be that these were different from the
-    Kessler profiles, but that was likely a typo.  Thus, KrumhanslKessler and
-    KrumhanslSchmuckler are synonyms of each other.
+    * Changed in v6.3: it used to be that these were different from the
+      Kessler profiles, but that was likely a typo.  Thus, KrumhanslKessler and
+      KrumhanslSchmuckler are synonyms of each other.
     '''
     _DOC_ALL_INHERITED = False
     name = 'Krumhansl Schmuckler/Kessler Key Analysis'
@@ -911,7 +911,8 @@ class TemperleyKostkaPayne(KeyWeightKeyAnalysis):
         super().__init__(referenceStream=referenceStream)
 
     def getWeights(self, weightType='major'):
-        ''' Returns the key weights.
+        '''
+        Returns the key weights.
 
         >>> a = analysis.discrete.TemperleyKostkaPayne()
         >>> len(a.getWeights('major'))
@@ -1283,7 +1284,8 @@ class MelodicIntervalDiversity(DiscreteAnalysis):
         return len(uniqueIntervals), self.solutionToColor(len(uniqueIntervals))
 
     def getSolution(self, sStream):
-        '''Solution is the number of unique intervals.
+        '''
+        Solution is the number of unique intervals.
         '''
         solution, unused_color = self.process(sStream.flatten())
         return solution
@@ -1410,6 +1412,9 @@ def analysisClassFromMethodName(method: str) -> type[DiscreteAnalysis] | None:
 
 
 class Test(unittest.TestCase):
+    def testCopyAndDeepcopy(self):
+        from music21.test.commonTest import testCopyAll
+        testCopyAll(self, globals())
 
     def testKeyAnalysisKrumhansl(self):
         from music21 import converter
@@ -1577,7 +1582,7 @@ class Test(unittest.TestCase):
         s2.repeatAppend(note.Note('c#'), 2)
         k = s2.analyze('key')
         # Ensure all pitch classes are present
-        self.assertEqual(len(set(k.alternateInterpretations)), 23)
+        self.assertEqual(len(k.alternateInterpretations), 23)
 
 
 # define presented order in documentation

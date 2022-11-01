@@ -218,7 +218,7 @@ class ProtoM21Object:
          <class 'music21.prebase.ProtoM21Object'>,
          <class 'object'>]
 
-        changed in v8 -- partially qualified objects such as 'note.Note' have been added.
+        * Changed in v8: partially qualified objects such as 'note.Note' have been added.
         '''
         try:
             return self._classSetCacheDict[self.__class__]
@@ -283,6 +283,10 @@ del t
 
 
 class Test(unittest.TestCase):
+    def testCopyAndDeepcopy(self):
+        from music21.test.commonTest import testCopyAll
+        testCopyAll(self, globals())
+
     def test_reprInternal(self):
         from music21.base import Music21Object
         b = Music21Object()

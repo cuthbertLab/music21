@@ -21,7 +21,6 @@ and turns each of them into a quarter note in octave 4 in 4/4.
 Consult the code to see how it works.  To use, call
 `converter.registerSubconverter(converter.qmConverter.QMConverter)`
 then `myStream = converter.parse('quarterMusic: C E G D F')`
-
 '''
 from __future__ import annotations
 
@@ -101,7 +100,7 @@ class QMConverter(converter.subConverters.SubConverter):
         with open(filePath, 'r', encoding='utf-8') as f:
             self.parseData(f.read())
 
-    def write(self, obj, fmt, fp=None, subformats=None, **keywords):  # pragma: no cover
+    def write(self, obj, fmt, fp=None, subformats=(), **keywords):  # pragma: no cover
         music = ''
         if fp is None:
             fp = environLocal.getTempFile('.qm')

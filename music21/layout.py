@@ -127,7 +127,8 @@ class LayoutBase(base.Music21Object):
 
 
 class ScoreLayout(LayoutBase):
-    '''Parameters for configuring a score's layout.
+    '''
+    Parameters for configuring a score's layout.
 
     PageLayout objects may be found on Measure or Part Streams.
 
@@ -429,7 +430,7 @@ class StaffGroup(spanner.Spanner):
                  name: str | None = None,
                  barTogether: t.Literal[True, False, None, 'Mensurstrich'] = True,
                  abbreviation: str | None = None,
-                 symbol: t.Literal['bracket', 'line', 'grace', 'square'] = None,
+                 symbol: t.Literal['bracket', 'line', 'brace', 'square'] = None,
                  **keywords):
         super().__init__(*spannedElements, **keywords)
 

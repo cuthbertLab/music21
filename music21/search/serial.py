@@ -46,7 +46,6 @@ class ContiguousSegmentOfNotes(base.Music21Object):
     >>> cdContiguousSegment = search.serial.ContiguousSegmentOfNotes([n1, n2], s, 0)
     >>> cdContiguousSegment
     <music21.search.serial.ContiguousSegmentOfNotes ['C4', 'D4']>
-
     '''
     _DOC_ATTR: dict[str, str] = {
         'segment': 'The list of notes and chords in the contiguous segment.',
@@ -76,8 +75,8 @@ class ContiguousSegmentOfNotes(base.Music21Object):
     _DOC_ORDER = ['startMeasureNumber', 'startOffset', 'zeroCenteredTransformationsFromMatched',
                   'originalCenteredTransformationsFromMatched']
 
-    def __init__(self, segment=None, containerStream=None, partNumber=0):
-        super().__init__()
+    def __init__(self, segment=None, containerStream=None, partNumber=0, **keywords):
+        super().__init__(**keywords)
         self.segment = segment
         self.containerStream = containerStream
         self.partNumber = partNumber
@@ -93,7 +92,9 @@ class ContiguousSegmentOfNotes(base.Music21Object):
 
     @property
     def startMeasureNumber(self):
-        '''The measure number on which the contiguous segment begins.'''
+        '''
+        The measure number on which the contiguous segment begins.
+        '''
         if self.segment:
             return self.segment[0].measureNumber
         else:
@@ -140,7 +141,8 @@ class ContiguousSegmentOfNotes(base.Music21Object):
 
     @property
     def originalCenteredTransformationsFromMatched(self):
-        '''The list of original-centered transformations taking a segment being
+        '''
+        The list of original-centered transformations taking a segment being
         searched for to a found segment, for example, in
         :func:`~music21.search.serial.findTransformedSegments`.
         For an explanation of the

@@ -93,10 +93,10 @@ def standardizeBarType(value):
 
 # ------------------------------------------------------------------------------
 class Barline(base.Music21Object):
-    '''A representation of a barline.
+    '''
+    A representation of a barline.
     Barlines are conventionally assigned to Measure objects
     using the leftBarline and rightBarline attributes.
-
 
     >>> bl = bar.Barline('double')
     >>> bl
@@ -128,10 +128,13 @@ class Barline(base.Music21Object):
 
     classSortOrder = -5
 
+    equalityAttributes = ('type', 'pause', 'location')
+
     def __init__(self,
                  type=None,  # pylint: disable=redefined-builtin
-                 location=None):
-        super().__init__()
+                 location=None,
+                 **keywords):
+        super().__init__(**keywords)
 
         self._type = None  # same as style...
         # this will raise an exception on error from property
@@ -188,7 +191,7 @@ class Barline(base.Music21Object):
         >>> b.musicXMLBarStyle()
         'light-heavy'
 
-        Changed in v.5.7 -- was a property before.
+        * Changed in v5.7: was a property before.
         '''
         return typeToMusicXMLBarStyle(self.type)
 
@@ -213,7 +216,6 @@ class Repeat(repeat.RepeatMark, Barline):
     The `direction` parameter can be one of `start` or `end`.
     An `end` followed by a `start`
     should be encoded as two `bar.Repeat` signs.
-
 
     >>> rep = bar.Repeat(direction='end', times=3)
     >>> rep
@@ -264,13 +266,13 @@ class Repeat(repeat.RepeatMark, Barline):
         {4.0} <music21.bar.Barline type=double>
     '''
     # _repeatDots = None  # not sure what this is for; inherited from old modules
-    def __init__(self, direction='start', times=None):
+    def __init__(self, direction='start', times=None, **keywords):
         repeat.RepeatMark.__init__(self)
         if direction == 'start':
             barType = 'heavy-light'
         else:
             barType = 'final'
-        Barline.__init__(self, type=barType)
+        Barline.__init__(self, type=barType, **keywords)
 
         self._direction: str | None = None  # either start or end
         self._times: int | None = None  # if an end, how many repeats
@@ -375,6 +377,9 @@ class Repeat(repeat.RepeatMark, Barline):
 
 # ------------------------------------------------------------------------------
 class Test(unittest.TestCase):
+    def testCopyAndDeepcopy(self):
+        from music21.test.commonTest import testCopyAll
+        testCopyAll(self, globals())
 
     def testSortOrder(self):
         from music21 import stream

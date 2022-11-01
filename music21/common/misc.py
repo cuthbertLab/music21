@@ -15,9 +15,16 @@ If it doesn't fit anywhere else in the common directory, you'll find it here...
 from __future__ import annotations
 
 from collections.abc import Callable, Iterable
+import copy
+import os
 import platform
 import re
+import sys
+import textwrap
+import time
+import types
 import typing as t
+import weakref
 
 __all__ = [
     'flattenList',
@@ -32,16 +39,13 @@ __all__ = [
     'cleanedFlatNotation',
 ]
 
-import copy
-import os
-import sys
-import textwrap
-import time
+if t.TYPE_CHECKING:
+    _T = t.TypeVar('_T')
 
 # -----------------------------------------------------------------------------
 
 
-def flattenList(originalList: list) -> list:
+def flattenList(originalList: Iterable[Iterable[_T]]) -> list[_T]:
     '''
     Flatten a list of lists into a flat list
 
@@ -229,7 +233,16 @@ def runningUnderIPython() -> bool:
 # NB -- temp files (tempFile) etc. are in environment.py
 
 # ------------------------------------------------------------------------------
-def defaultDeepcopy(obj, memo, callInit=True):
+# From copy.py
+_IMMUTABLE_DEEPCOPY_TYPES = {
+    type(None), type(Ellipsis), type(NotImplemented),
+    int, float, bool, complex, bytes, str,
+    types.CodeType, type, range,
+    types.BuiltinFunctionType, types.FunctionType,
+    weakref.ref, property,
+}
+
+def defaultDeepcopy(obj: t.Any, memo=None, *, ignoreAttributes: Iterable[str] = ()):
     '''
     Unfortunately, it is not possible to do something like::
 
@@ -249,31 +262,27 @@ def defaultDeepcopy(obj, memo, callInit=True):
             else:
                 return common.defaultDeepcopy(self, memo)
 
-    looks through both __slots__ and __dict__ and does a deepcopy
-    of anything in each of them and returns the new object.
+    Does a deepcopy of the state returned by `__reduce_ex__` for protocol 4.
 
-    If callInit is False, then only __new__() is called.  This is
-    much faster if you're just going to overload every instance variable
-    or is required if __init__ has required variables in initialization.
+    * Changed in v9: callInit is removed, replaced with ignoreAttributes.
+      uses `__reduce_ex__` and `copy._reconstruct` internally.
     '''
-    if callInit is False:
-        new = obj.__class__.__new__(obj.__class__)
-    else:
-        new = obj.__class__()
+    if memo is None:
+        memo = {}
 
-    dictState = getattr(obj, '__dict__', None)
-    if dictState is not None:
-        for k in dictState:
-            # noinspection PyArgumentList
-            setattr(new, k, copy.deepcopy(dictState[k], memo=memo))
-    slots = set()
-    for cls in obj.__class__.mro():  # it is okay that it's in reverse order, since it's just names
-        slots.update(getattr(cls, '__slots__', ()))
-    for slot in slots:
-        slotValue = getattr(obj, slot, None)
-        # might be none if slot was deleted; it will be recreated here
-        setattr(new, slot, copy.deepcopy(slotValue))
+    rv = obj.__reduce_ex__(4)  # get a protocol 4 reduction
+    func, args, state = rv[:3]
+    new = func(*args)
+    memo[id(obj)] = new
 
+    # set up reducer to not copy the ignoreAttributes set.
+    for attr, value in state.items():
+        if attr in ignoreAttributes:
+            setattr(new, attr, None)
+        elif type(value) in _IMMUTABLE_DEEPCOPY_TYPES:
+            setattr(new, attr, value)
+        else:
+            setattr(new, attr, copy.deepcopy(value, memo))
     return new
 
 

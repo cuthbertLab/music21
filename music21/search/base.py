@@ -65,16 +65,14 @@ class Wildcard(m21Base.Music21Object):
     matches a single object in a music21 stream.  Equivalent to the
     regular expression "."
 
-
     >>> wc1 = search.Wildcard()
     >>> wc1.pitch = pitch.Pitch('C')
     >>> st1 = stream.Stream()
     >>> st1.append(note.Note('D', type='half'))
     >>> st1.append(wc1)
     '''
-
-    def __init__(self):
-        super().__init__()
+    def __init__(self, **keywords):
+        super().__init__(**keywords)
         self.duration = WildcardDuration()
 
 
@@ -1071,7 +1069,7 @@ def mostCommonMeasureRhythms(streamIn, transposeDiatonic=False):
     {3.0} <music21.note.Note B->
     -----
 
-    Changed in v7 -- bars are ordered first by number, then by part.
+    * Changed in v7: bars are ordered first by number, then by part.
     '''
     returnDicts = []
     distanceToTranspose = 0

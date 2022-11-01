@@ -26,7 +26,7 @@ from __future__ import annotations
 
 import copy
 import string
-from typing import TYPE_CHECKING  # pylint needs no alias
+import typing as t
 
 from music21 import base
 from music21 import common
@@ -37,7 +37,7 @@ from music21 import spanner
 from music21 import style
 
 
-if TYPE_CHECKING:
+if t.TYPE_CHECKING:
     from music21 import note
 
 
@@ -113,8 +113,8 @@ class Expression(base.Music21Object):
     '''
     _styleClass = style.TextStyle
 
-    def __init__(self):
-        super().__init__()
+    def __init__(self, **keywords):
+        super().__init__(**keywords)
         self.tieAttach = 'first'  # attach to first note of a tied group.
 
     def _reprInternal(self) -> str:
@@ -158,8 +158,8 @@ class RehearsalMark(Expression):
     classSortOrder = -30
     _styleClass = style.TextStylePlacement
 
-    def __init__(self, content=None, *, numbering=None):
-        super().__init__()
+    def __init__(self, content=None, *, numbering=None, **keywords):
+        super().__init__(**keywords)
         self.content = content
         if numbering not in ('alphabetical', 'roman', 'number', None):
             raise ExpressionException(
@@ -297,13 +297,8 @@ class RehearsalMark(Expression):
         '''
         return RehearsalMark(self.nextContent(), numbering=self.numbering)
 
+
 # ------------------------------------------------------------------------------
-
-
-class TextExpressionException(ExpressionException):
-    pass
-
-
 class TextExpression(Expression):
     '''
     A TextExpression is a word, phrase, or similar
@@ -344,8 +339,8 @@ class TextExpression(Expression):
             ''',
     }
 
-    def __init__(self, content=None):
-        super().__init__()
+    def __init__(self, content=None, **keywords):
+        super().__init__(**keywords)
         # numerous properties are inherited from TextFormat
         # the text string to be displayed; not that line breaks
         # are given in the xml with this non-printing character: (#)
@@ -398,19 +393,24 @@ class TextExpression(Expression):
             return
         self.style.enclosure = value
 
-    def _getContent(self):
-        return self._content
-
-    def _setContent(self, value):
-        self._content = str(value)
-
-    content = property(_getContent, _setContent,
-                       doc='''Get or set the content.
+    @property
+    def content(self):
+        '''
+        Get or set the content.
 
         >>> te = expressions.TextExpression('dolce')
         >>> te.content
         'dolce'
-        ''')
+        >>> te.content = 'sweeter'
+        >>> te
+        <music21.expressions.TextExpression 'sweeter'>
+        '''
+        return self._content
+
+    @content.setter
+    def content(self, value):
+        self._content = str(value)
+
 
     # --------------------------------------------------------------------------
     # text expression in musicxml may be repeat expressions
@@ -446,16 +446,16 @@ class TextExpression(Expression):
 
 # ------------------------------------------------------------------------------
 class Ornament(Expression):
-    def __init__(self):
-        '''
-        An Ornament is a type of Expression that, when attached to a Note
-        (in the future: Notes) can transform into the main note.
+    '''
+    An Ornament is a type of Expression that, when attached to a Note
+    (in the future: Notes) can transform into the main note.
 
-        All ornaments have an `.autoScale` boolean which determines
-        whether to shrink (not currently to expand) the ornament if the
-        note it is attached to is too short to realize.
-        '''
-        super().__init__()
+    All ornaments have an `.autoScale` boolean which determines
+    whether to shrink (not currently to expand) the ornament if the
+    note it is attached to is too short to realize.
+    '''
+    def __init__(self, **keywords):
+        super().__init__(**keywords)
         self.connectedToPrevious = True
         self.autoScale = True
         # should follow directly on previous; true for most "ornaments".
@@ -474,9 +474,9 @@ class Ornament(Expression):
         the "main note" itself (or None) to keep processing for ornaments,
         and a list of notes after the "main note".
 
-        Added in v.8 -- inPlace boolean; note that some ornaments
-        might not return a Note in the second position at all (such as trills)
-        so inPlace does nothing.
+        * New in v8: inPlace boolean; note that some ornaments
+          might not return a Note in the second position at all (such as trills)
+          so inPlace does nothing.
         '''
         if not inPlace:
             srcObj = copy.deepcopy(srcObj)
@@ -517,11 +517,11 @@ class Ornament(Expression):
 
 # ------------------------------------------------------------------------------
 class GeneralMordent(Ornament):
-    '''Base class for all Mordent types.
     '''
-
-    def __init__(self):
-        super().__init__()
+    Base class for all Mordent types.
+    '''
+    def __init__(self, **keywords):
+        super().__init__(**keywords)
         self.direction = ''  # up or down
         self.size = None  # interval.Interval (General, etc.) class
         self.quarterLength = 0.125  # 32nd note default
@@ -612,11 +612,11 @@ class Mordent(GeneralMordent):
     >>> m.size
     <music21.interval.GenericInterval 2>
 
-    Changed in v7: Mordent sizes are GenericIntervals -- as was originally
-    intended but programmed incorrectly.
+    * Changed in v7: Mordent sizes are GenericIntervals -- as was originally
+      intended but programmed incorrectly.
     '''
-    def __init__(self):
-        super().__init__()
+    def __init__(self, **keywords):
+        super().__init__(**keywords)
         self.direction = 'down'  # up or down
 
 
@@ -630,9 +630,8 @@ class HalfStepMordent(Mordent):
     >>> m.size
     <music21.interval.Interval m2>
     '''
-
-    def __init__(self):
-        super().__init__()
+    def __init__(self, **keywords):
+        super().__init__(**keywords)
         self.size = interval.Interval('m2')
 
 
@@ -646,9 +645,8 @@ class WholeStepMordent(Mordent):
     >>> m.size
     <music21.interval.Interval M2>
     '''
-
-    def __init__(self):
-        super().__init__()
+    def __init__(self, **keywords):
+        super().__init__(**keywords)
         self.size = interval.Interval('M2')
 
 
@@ -672,12 +670,11 @@ class InvertedMordent(GeneralMordent):
     >>> m.size
     <music21.interval.GenericInterval 2>
 
-    Changed in v7: InvertedMordent sizes are GenericIntervals -- as was originally
-    intended but programmed incorrectly.
+    * Changed in v7: InvertedMordent sizes are GenericIntervals -- as was originally
+      intended but programmed incorrectly.
     '''
-
-    def __init__(self):
-        super().__init__()
+    def __init__(self, **keywords):
+        super().__init__(**keywords)
         self.direction = 'up'
 
 
@@ -691,9 +688,8 @@ class HalfStepInvertedMordent(InvertedMordent):
     >>> m.size
     <music21.interval.Interval m2>
     '''
-
-    def __init__(self):
-        super().__init__()
+    def __init__(self, **keywords):
+        super().__init__(**keywords)
         self.size = interval.Interval('m2')
 
 
@@ -707,9 +703,8 @@ class WholeStepInvertedMordent(InvertedMordent):
     >>> m.size
     <music21.interval.Interval M2>
     '''
-
-    def __init__(self):
-        super().__init__()
+    def __init__(self, **keywords):
+        super().__init__(**keywords)
         self.size = interval.Interval('M2')
 
 
@@ -739,10 +734,10 @@ class Trill(Ornament):
     >>> tr.quarterLength == duration.Duration('32nd').quarterLength
     True
 
-    Changed in v.7 -- the size should be a generic second.
+    * Changed in v7: the size should be a generic second.
     '''
-    def __init__(self):
-        super().__init__()
+    def __init__(self, **keywords):
+        super().__init__(**keywords)
         self.size: interval.IntervalBase = interval.GenericInterval(2)
 
         self.placement = 'above'
@@ -962,9 +957,8 @@ class HalfStepTrill(Trill):
       <music21.note.Note B>,
       <music21.note.Note C>], None, [])
     '''
-
-    def __init__(self):
-        super().__init__()
+    def __init__(self, **keywords):
+        super().__init__(**keywords)
         self.size = interval.Interval('m2')
         self._setAccidentalFromKeySig = False
 
@@ -991,9 +985,8 @@ class WholeStepTrill(Trill):
       <music21.note.Note B>,
       <music21.note.Note C#>], None, [])
     '''
-
-    def __init__(self):
-        super().__init__()
+    def __init__(self, **keywords):
+        super().__init__(**keywords)
         self.size = interval.Interval('M2')
         self._setAccidentalFromKeySig = False
 
@@ -1006,8 +999,8 @@ class Shake(Trill):
     >>> shake.quarterLength
     0.25
     '''
-    def __init__(self):
-        super().__init__()
+    def __init__(self, **keywords):
+        super().__init__(**keywords)
         self.quarterLength = 0.25
 
 
@@ -1019,10 +1012,10 @@ class Schleifer(Ornament):
     '''
     A slide or culee
 
-    Changed in v.7 -- size is a Generic second.  removed unused nachschlag component.
+    * Changed in v7: size is a Generic second.  removed unused nachschlag component.
     '''
-    def __init__(self):
-        super().__init__()
+    def __init__(self, **keywords):
+        super().__init__(**keywords)
         self.size = interval.GenericInterval(2)
         self.quarterLength = 0.25
 
@@ -1032,10 +1025,10 @@ class Turn(Ornament):
     '''
     A turn or Gruppetto.
 
-    Changed in v.7 -- size is a Generic second.  removed unused nachschlag component.
+    * Changed in v7: size is a Generic second.  removed unused nachschlag component.
     '''
-    def __init__(self):
-        super().__init__()
+    def __init__(self, **keywords):
+        super().__init__(**keywords)
         self.size = interval.GenericInterval(2)
         self.placement = 'above'
         self.tieAttach = 'all'
@@ -1176,8 +1169,8 @@ class Turn(Ornament):
 
 
 class InvertedTurn(Turn):
-    def __init__(self):
-        super().__init__()
+    def __init__(self, **keywords):
+        super().__init__(**keywords)
         self.size = self.size.reverse()
 
 
@@ -1186,8 +1179,8 @@ class GeneralAppoggiatura(Ornament):
     # up or down -- up means the grace note is below and goes up to the actual note
     direction = ''
 
-    def __init__(self):
-        super().__init__()
+    def __init__(self, **keywords):
+        super().__init__(**keywords)
         self.size = interval.Interval(2)
 
     def realize(self, srcObj: 'music21.note.Note', *, inPlace=False):
@@ -1251,14 +1244,14 @@ class Appoggiatura(GeneralAppoggiatura):
 
 
 class HalfStepAppoggiatura(Appoggiatura):
-    def __init__(self):
-        super().__init__()
+    def __init__(self, **keywords):
+        super().__init__(**keywords)
         self.size = interval.Interval('m2')
 
 
 class WholeStepAppoggiatura(Appoggiatura):
-    def __init__(self):
-        super().__init__()
+    def __init__(self, **keywords):
+        super().__init__(**keywords)
         self.size = interval.Interval('M2')
 
 
@@ -1267,14 +1260,14 @@ class InvertedAppoggiatura(GeneralAppoggiatura):
 
 
 class HalfStepInvertedAppoggiatura(InvertedAppoggiatura):
-    def __init__(self):
-        super().__init__()
+    def __init__(self, **keywords):
+        super().__init__(**keywords)
         self.size = interval.Interval('m2')
 
 
 class WholeStepInvertedAppoggiatura(InvertedAppoggiatura):
-    def __init__(self):
-        super().__init__()
+    def __init__(self, **keywords):
+        super().__init__(**keywords)
         self.size = interval.Interval('M2')
 
 # ------------------------------------------------------------------------------
@@ -1304,9 +1297,8 @@ class Tremolo(Ornament):
     TODO: (someday) realize triplet Tremolos, etc. differently from other tremolos.
     TODO: deal with unmeasured tremolos.
     '''
-
-    def __init__(self):
-        super().__init__()
+    def __init__(self, **keywords):
+        super().__init__(**keywords)
         self.measured = True
         self._numberOfMarks = 3
 
@@ -1408,9 +1400,8 @@ class Fermata(Expression):
     .. image:: images/expressionsFermata.*
          :width: 193
     '''
-
-    def __init__(self):
-        super().__init__()
+    def __init__(self, **keywords):
+        super().__init__(**keywords)
         self.shape = 'normal'  # angled, square.
         # for musicmxml, can be upright or inverted, but Finale's idea of an
         # inverted fermata is backwards.
@@ -1430,7 +1421,6 @@ class TrillExtension(spanner.Spanner):
     A wavy line trill extension, placed between two notes. N
     ote that some MusicXML readers include a trill symbol with the wavy line.
 
-
     >>> s = stream.Stream()
     >>> s.repeatAppend(note.Note(), 8)
 
@@ -1444,7 +1434,6 @@ class TrillExtension(spanner.Spanner):
     # musicxml defines a "start", "stop", and a "continue" type;
     # We will try to avoid "continue".
     # N.B. this extension always includes a trill symbol
-
     def __init__(self, *spannedElements, **keywords):
         super().__init__(*spannedElements, **keywords)
         self._placement = None  # can above or below or None, after musicxml
@@ -1533,8 +1522,8 @@ class ArpeggioMark(Expression):
     >>> am.type
     'down'
     '''
-    def __init__(self, arpeggioType: str | None = None):
-        super().__init__()
+    def __init__(self, arpeggioType: str | None = None, **keywords):
+        super().__init__(**keywords)
         if arpeggioType is None:
             arpeggioType = 'normal'
         if arpeggioType not in ('normal', 'up', 'down', 'non-arpeggio'):

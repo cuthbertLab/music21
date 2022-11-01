@@ -73,7 +73,8 @@ if t.TYPE_CHECKING:
 # ------------------------------------------------------------------------------
 
 def typeToMusicXMLType(value):
-    '''Convert a music21 type to a MusicXML type.
+    '''
+    Convert a music21 type to a MusicXML type.
 
     >>> musicxml.m21ToXml.typeToMusicXMLType('longa')
     'long'
@@ -469,8 +470,8 @@ class GeneralObjectExporter:
         >>> s[note.NotRest].first().duration
         <music21.duration.Duration 3.0>
 
-        Changed in v8 -- fills gaps with rests before calling makeNotation
-        to avoid duplicating effort with :meth:`PartExporter.fixupNotationMeasured`.
+        * Changed in v8: fills gaps with rests before calling makeNotation
+          to avoid duplicating effort with :meth:`PartExporter.fixupNotationMeasured`.
 
         >>> v = stream.Voice(note.Note())
         >>> m = stream.Measure([meter.TimeSignature(), v])
@@ -1852,8 +1853,8 @@ class ScoreExporter(XMLExporterBase, PartStaffExporterMixin):
         >>> SX.dump(mxCredit)
         <credit page="1">...</credit>
 
-        Changed in v.8 -- Multi-line text now exports as one `<credit-words>`
-        element (preserving newlines).
+        * Changed in v8: Multi-line text now exports as one `<credit-words>`
+          element (preserving newlines).
 
         >>> tb = text.TextBox('Snare\nCymbals')
         >>> mxCredit = SX.textBoxToXmlCredit(tb)
@@ -2899,7 +2900,7 @@ class PartExporter(XMLExporterBase):
         Checks if makeAccidentals is run, and haveBeamsBeenMade is done, and
         tuplets have been made.
 
-        Changed in v7 -- no longer accepts `measureStream` argument.
+        * Changed in v7: no longer accepts `measureStream` argument.
         '''
         part = self.stream
         measures = part.getElementsByClass(stream.Measure)
@@ -5731,7 +5732,7 @@ class MeasureExporter(XMLExporterBase):
         Places the mxObj <element> inside <direction><direction-type>
         and sets <offset> if needed.
 
-        Changed in v8 -- added `setSound` keyword (see :meth:`setOffsetOptional`).
+        * Changed in v8: added `setSound` keyword (see :meth:`setOffsetOptional`).
         '''
         mxDirection = Element('direction')
         mxDirectionType = SubElement(mxDirection, 'direction-type')
@@ -6431,7 +6432,7 @@ class MeasureExporter(XMLExporterBase):
 
             if endingType:
                 mxEnding = Element('ending')
-                numberList = self.rbSpanners[0].getNumberList()
+                numberList = self.rbSpanners[0].numberRange
                 numberStr = str(numberList[0])
                 # 0 is not a valid "ending-number"
                 if numberStr == '0':

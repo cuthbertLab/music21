@@ -75,7 +75,7 @@ To get rid of beams on a note do:
 from __future__ import annotations
 
 from collections.abc import Iterable
-from typing import TYPE_CHECKING  # pylint bug
+import typing as t
 import unittest
 
 from music21 import exceptions21
@@ -86,7 +86,7 @@ from music21 import style
 from music21.common.objects import EqualSlottedObjectMixin
 
 
-if TYPE_CHECKING:
+if t.TYPE_CHECKING:
     from music21 import base
 
 
@@ -238,6 +238,9 @@ class Beams(prebase.ProtoM21Object, EqualSlottedObjectMixin):
 
     def __eq__(self, other):
         return isinstance(other, self.__class__) and repr(self) == repr(other)
+
+    def __hash__(self):
+        return id(self) >> 4
 
     def _reprInternal(self):
         msg = []
@@ -702,13 +705,14 @@ class Beams(prebase.ProtoM21Object, EqualSlottedObjectMixin):
 
 
 class Test(unittest.TestCase):
-    pass
+
+    def testCopyAndDeepcopy(self):
+        from music21.test.commonTest import testCopyAll
+        testCopyAll(self, globals())
 
 
 # -----------------------------------------------------------------------------
 # define presented order in documentation
-
-
 _DOC_ORDER = [Beams, Beam]
 
 

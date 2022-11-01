@@ -125,10 +125,6 @@ class Feature:
 
 
 # ------------------------------------------------------------------------------
-class FeatureExtractorException(exceptions21.Music21Exception):
-    pass
-
-
 class FeatureExtractor:
     '''
     A model of process that extracts a feature from a Music21 Stream.
@@ -1279,7 +1275,6 @@ def getIndex(featureString, extractorType=None):
 class Test(unittest.TestCase):
 
     def testStreamFormsA(self):
-
         from music21 import features
         self.maxDiff = None
 
@@ -1650,7 +1645,8 @@ class Test(unittest.TestCase):
     # all these are written using orange-Py2 code; need better.
 
     # def xtestOrangeBayesA(self):  # pragma: no cover
-    #     '''Using an already created test file with a BayesLearner.
+    #     '''
+    #     Using an already created test file with a BayesLearner.
     #     '''
     #     import orange  # pylint: disable=import-error
     #     data = orange.ExampleTable(
@@ -1662,7 +1658,8 @@ class Test(unittest.TestCase):
 
 
     # def xtestClassifiersA(self):  # pragma: no cover
-    #     '''Using an already created test file with a BayesLearner.
+    #     '''
+    #     Using an already created test file with a BayesLearner.
     #     '''
     #     import orange, orngTree  # pylint: disable=import-error
     #     data1 = orange.ExampleTable(
@@ -1702,7 +1699,8 @@ class Test(unittest.TestCase):
 
 
     # def xtestClassifiersB(self):  # pragma: no cover
-    #     '''Using an already created test file with a BayesLearner.
+    #     '''
+    #     Using an already created test file with a BayesLearner.
     #     '''
     #     import orange, orngTree  # pylint: disable=import-error
     #     data1 = orange.ExampleTable(

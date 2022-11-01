@@ -16,14 +16,9 @@ import unittest
 from music21 import chord
 from music21 import common
 from music21 import environment
-from music21 import exceptions21
 from music21 import pitch
 
 environLocal = environment.Environment('analysis.transposition')
-
-
-class TranspositionException(exceptions21.Music21Exception):
-    pass
 
 
 class TranspositionChecker:
@@ -55,14 +50,14 @@ class TranspositionChecker:
     '''
     def __init__(self, pitches: Iterable[pitch.Pitch] = ()):
         if not pitches:
-            raise TranspositionException(
+            raise TypeError(
                 'Must have at least one element in list'
             )
         if not common.isIterable(pitches):
-            raise TranspositionException('Must be a list or tuple')
+            raise TypeError('Must be a list or tuple')
         # p0 = pitches[0]
         # if not isinstance(p0, pitch.Pitch):
-        #     raise TranspositionException('List must have pitch objects')
+        #     raise TypeError('List must have pitch objects')
         self.pitches: Iterable[pitch.Pitch] = pitches
         self.allTranspositions: list = []
         self.allNormalOrders: list = []
@@ -191,6 +186,9 @@ class TranspositionChecker:
 
 # ------------------------------------------------------------------------------
 class Test(unittest.TestCase):
+    def testCopyAndDeepcopy(self):
+        from music21.test.commonTest import testCopyAll
+        testCopyAll(self, globals())
 
     def testConstructTranspositionChecker(self):
         p = [pitch.Pitch('D#')]

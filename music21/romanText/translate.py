@@ -167,8 +167,8 @@ class RomanTextUnprocessedToken(base.ElementWrapper):
 
 
 class RomanTextUnprocessedMetadata(base.Music21Object):
-    def __init__(self, tag='', data=''):
-        super().__init__()
+    def __init__(self, tag='', data='', **keywords):
+        super().__init__(**keywords)
         self.tag = tag
         self.data = data
 
@@ -300,7 +300,8 @@ def _copyMultipleMeasures(rtMeasure: rtObjects.RTMeasure,
 
 
 def _getKeyAndPrefix(rtKeyOrString):
-    '''Given an RTKey specification, return the Key and a string prefix based
+    '''
+    Given an RTKey specification, return the Key and a string prefix based
     on the tonic:
 
     >>> romanText.translate._getKeyAndPrefix('c')
@@ -884,8 +885,7 @@ class PartTranslator:
                 self.setKeyChangeToken = False
             else:
                 rn.followsKeyChange = False
-        except (roman.RomanNumeralException,
-                exceptions21.Music21CommonException):  # pragma: no cover
+        except roman.RomanNumeralException:  # pragma: no cover
             # environLocal.printDebug(f' cannot create RN from: {a.src}')
             rn = note.Note()  # create placeholder
 
@@ -1165,7 +1165,8 @@ def fixPickupMeasure(partObject):
 
 
 def romanTextToStreamOpus(rtHandler, inputM21=None):
-    '''The main processing routine for RomanText objects that may or may not
+    '''
+    The main processing routine for RomanText objects that may or may not
     be multi movement.
 
     Takes in a romanText.rtObjects.RTFile() object, or a string as rtHandler.

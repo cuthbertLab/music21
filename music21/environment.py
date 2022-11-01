@@ -400,10 +400,10 @@ class _EnvironmentCore:
             for name, value in [
                 ('lilypondPath', 'lilypond'),
                 ('musicxmlPath',
-                 common.cleanpath(r'%PROGRAMFILES%\MuseScore 3\MuseScore.exe')
+                 common.cleanpath(r'%PROGRAMFILES%\MuseScore 3\bin\MuseScore3.exe')
                  ),
                 ('musescoreDirectPNGPath',
-                 common.cleanpath(r'%PROGRAMFILES%\MuseScore 3\MuseScore.exe')
+                 common.cleanpath(r'%PROGRAMFILES%\MuseScore 3\bin\MuseScore3.exe')
                  ),
             ]:
                 self[name] = value  # use for key checking
@@ -932,7 +932,8 @@ class Environment:
         return dstDir
 
     def getKeysToPaths(self):
-        ''' Get the keys that refer to file paths.
+        '''
+        Get the keys that refer to file paths.
 
         >>> a = environment.Environment()
         >>> for x in sorted(a.getKeysToPaths()):

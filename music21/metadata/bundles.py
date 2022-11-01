@@ -25,6 +25,7 @@ import os
 import pathlib
 import pickle
 import time
+import typing as t
 import unittest
 
 from music21 import common
@@ -33,8 +34,13 @@ from music21 import environment
 from music21 import exceptions21
 from music21 import prebase
 
+
+if t.TYPE_CHECKING:
+    from collections.abc import Iterable
+
+
 # -----------------------------------------------------------------------------
-environLocal = environment.Environment(os.path.basename(__file__))
+environLocal = environment.Environment('metadata.bundles')
 
 
 class MetadataBundleException(exceptions21.Music21Exception):
@@ -1123,7 +1129,14 @@ class MetadataBundle(prebase.ProtoM21Object):
         ])
         return self
 
-    def search(self, query=None, field=None, fileExtensions=None, **keywords):
+    def search(
+        self,
+        query: str | None = None,
+        field=None,
+        *,
+        fileExtensions: Iterable[str] = (),
+        **keywords
+    ):
         r'''
         Perform search, on all stored metadata, permit regular expression
         matching.
@@ -1170,8 +1183,7 @@ class MetadataBundle(prebase.ProtoM21Object):
         >>> metadataBundle.search(composer='cicon')
         <music21.metadata.bundles.MetadataBundle {1 entry}>
         '''
-        if fileExtensions is not None and not common.isIterable(fileExtensions):
-            fileExtensions = [fileExtensions]
+        acceptable_extensions: set[str] = set(fileExtensions)
 
         newMetadataBundle = MetadataBundle()
         if query is None and field is None:
@@ -1184,28 +1196,19 @@ class MetadataBundle(prebase.ProtoM21Object):
             if metadataEntry.metadata is None:
                 continue
             sp = metadataEntry.sourcePath
+            if acceptable_extensions and sp.suffix not in acceptable_extensions:
+                continue
+            if key in newMetadataBundle._metadataEntries:
+                continue  # duplicate key?
 
             if metadataEntry.search(query, field)[0]:
-                include = False
-                if fileExtensions is not None:
-                    for fileExtension in fileExtensions:
-                        if fileExtension and fileExtension[0] != '.':
-                            fileExtension = '.' + fileExtension
+                newMetadataBundle._metadataEntries[key] = metadataEntry
 
-                        if sp.suffix == fileExtension:
-                            include = True
-                            break
-                        elif (fileExtension.endswith('xml')
-                                and sp.suffix == '.mxl'):
-                            include = True
-                            break
-                else:
-                    include = True
-                if include and key not in newMetadataBundle._metadataEntries:
-                    newMetadataBundle._metadataEntries[key] = metadataEntry
+        # pycharm can't figure out that it works.
+        # noinspection PyTypeChecker
         newMetadataBundle._metadataEntries = OrderedDict(
             sorted(list(newMetadataBundle._metadataEntries.items()),
-                                                        key=lambda mde: mde[1].sourcePath))
+                   key=lambda mde: mde[1].sourcePath))
 
         if keywords:
             return newMetadataBundle.search(**keywords)
