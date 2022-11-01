@@ -449,8 +449,7 @@ class TimeSignature(TimeSignatureBase):
     TimeSignature to contradict what the notes imply.  All this can be done
     with .displaySequence.
 
-    Equality
-    --------
+    **Equality**
 
     For two time signatures to be considered equal,
     they have the same name and internal structure.
