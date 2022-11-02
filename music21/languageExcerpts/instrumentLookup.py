@@ -228,6 +228,7 @@ englishToClassName = {
     'hi-hat': 'HiHatCymbal',
     'hi-hat cymbal': 'HiHatCymbal',
     'horn': 'Horn',
+    'horns': 'Horn',
     'jingle bells': 'SleighBells',
     'kalimba': 'Kalimba',
     'kettle drums': 'Timpani',
