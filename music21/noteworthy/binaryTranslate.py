@@ -433,8 +433,11 @@ class NWCConverter:
         self.skipBytes(1)
 
     def dumpToNWCText(self) -> t.List[str]:
-        infos = '|SongInfo|Title:' + self.title.decode('latin_1')
-        infos += '|Author:' + self.author.decode('latin_1')
+        infos = ''
+        if self.title:
+            infos += '|SongInfo|Title:' + self.title.decode('latin_1')
+        if self.author:
+            infos += '|Author:' + self.author.decode('latin_1')
         dumpObjects = [infos]
         for s in self.staves:
             staffDumpObjects = s.dump()
@@ -489,7 +492,8 @@ class NWCStaff:
     def dump(self) -> t.List[str]:
         dumpObjects = []
 
-        instruName = self.instrumentName if self.instrumentName else 'NoName'
+        # default to first midi instrument
+        instruName = self.instrumentName if self.instrumentName else 'Acoustic Grand Piano'
         label = self.label.decode('utf-8') if self.label else instruName
 
         staffString = '|AddStaff|Name:' + label
@@ -498,7 +502,7 @@ class NWCStaff:
         staffInstruString = '|StaffInstrument|Name:' + instruName
         if instruName in constants.MidiInstruments:
             staffInstruString += '|Patch:'
-            staffInstruString += str(constants.MidiInstruments.index(self.instrumentName))
+            staffInstruString += str(constants.MidiInstruments.index(instruName))
 
         staffInstruString += '|Trans:' + str(self.transposition)
 
@@ -639,7 +643,7 @@ class NWCObject:
     '''
     NWCObject class is an union that can be used for each type of object contained in a staff.
 
-    An object binary blob start with its type.
+    An object binary blob starts with its type.
     The parse() method calls the appropriate method depending on the object type.
     Each parsing method should set up the 'dumpMethod' method that return the nwctxt version
     of the object.
@@ -814,18 +818,17 @@ class NWCObject:
         '''
         p = self.parserParent
         self.type = 'Instrument'
-        p.skipBytes(8)
         # self.name = p.readToNUL()
         # p.skipBytes(1)
-        # p.skipBytes(8)  # velocity
+        p.skipBytes(8)  # velocity
 
-    def timeSignature(self):
+    def timeSig(self):
         '''
         Time signature
         6 bytes
         '''
         p = self.parserParent
-        self.type = 'TimeSignature'
+        self.type = 'TimeSig'
         self.numerator = p.readLEShort()
         self.bits = p.readLEShort()
         self.denominator = 1 << self.bits
@@ -969,7 +972,7 @@ class NWCObject:
 
         # in NWC, alteration is not specified for other octave
         if self.alterationStr == '':
-            self.alterationStr = self.parserParent.currentAlterations.get(self.pos % 7)
+            self.alterationStr = self.parserParent.currentAlterations.get(self.pos % 7, '')
         if self.alterationStr is None:
             self.alterationStr = ''
         self.parserParent.currentAlterations[self.pos % 7] = self.alterationStr
@@ -1218,7 +1221,7 @@ class NWCObject:
                   barline,           # 2
                   ending,            # 3
                   instrument,        # 4
-                  timeSignature,     # 5
+                  timeSig,           # 5
                   tempo,             # 6
                   dynamic,           # 7
                   note,              # 8

@@ -60,7 +60,6 @@ Module to translate Noteworthy Composer's NWCTXT format to music21.
 from __future__ import annotations
 
 import unittest
-import warnings
 
 from music21 import bar
 from music21 import chord
@@ -70,7 +69,6 @@ from music21 import duration
 from music21 import dynamics
 from music21 import environment
 from music21 import expressions
-from music21.exceptions21 import InstrumentException
 from music21.exceptions21 import Music21Exception
 from music21 import instrument
 from music21 import interval
@@ -492,10 +490,10 @@ class NoteworthyTranslator:
 
         if self.currentClef == 'PERCUSSION':
             n = note.Unpitched()
-            n.fromDisplayPitch(p)
+            n.displayStep = p.step
+            n.displayOctave = p.octave
         else:
-            n = note.Note()   # note!
-            n.pitch = p
+            n = note.Note(p)   # note!
 
         # durationInfo
         self.setDurationForObject(n, durationInfo)
@@ -507,20 +505,20 @@ class NoteworthyTranslator:
         if self.lyrics and self.lyricPosition < len(self.lyrics):
             n.addLyric(self.lyrics[self.lyricPosition])
 
-        self.getCurrentVoice().append(n)
+        self.getShortestStream().append(n)
 
-    # current voice has shorter duration. If no voices, return current measure
-    def getCurrentVoice(self):
-        voice = None
-        shorter = 999
-        for item in self.currentMeasure:
-            if isinstance(item, stream.Voice):
-                d = item.quarterLength
-                if d < shorter:
-                    voice = item
-                    shorter = d
+    # Returns the shortest stream. It can be the shortest Voice
+    # or current measure if no voice.
+    def getShortestStream(self):
+        if self.currentMeasure.isFlat:
+            # O(1) in most cases.
+             return self.currentMeasure
 
-        return voice if voice is not None else self.currentMeasure
+        # O(n) only if voices already exist.
+        return min(
+             self.currentMeasure.getElementsByClass(stream.Voice), 
+             key=lambda v: v.quarterLength
+        )
 
     def translateChord(self, attributes):
         r'''
@@ -542,27 +540,22 @@ class NoteworthyTranslator:
         '''
         durationInfos = attributes['Dur']
         pitchInfos = attributes['Pos']
-        currentDuration = self.getCurrentVoice().duration
+        currentDuration = self.getShortestStream().duration
         isRestChord = 'Dur2' in attributes
         i = 0
 
         def getVoiceAtDuration(inner_self, voiceId, dur):
             # first check if voice already exists in measure
             voice = None
-            hasVoice = False
-            for item in inner_self.currentMeasure:
-                if isinstance(item, stream.Voice):
-                    hasVoice = True
-                    if item.id == voiceId:
-                        voice = item
-                        break
+            voices = inner_self.currentMeasure.getElementsByClass(stream.Voice)
+            voice = voices.getElementById(voiceId)
 
             # otherwise create it
             if voice is None:
                 voice = stream.Voice()
                 voice.id = voiceId
                 # if creating the first voice, add current measure contents to it
-                if not hasVoice:
+                if len(voices) == 0:
                     notes = []
                     for item in inner_self.currentMeasure:
                         if isinstance(item, note.GeneralNote):
@@ -601,7 +594,7 @@ class NoteworthyTranslator:
                 c.addLyric(self.lyrics[self.lyricPosition])
 
             if len(durationInfos) == 1 and isRestChord is not None:
-                self.getCurrentVoice().append(c)
+                self.getShortestStream().append(c)
             else:
                 v = getVoiceAtDuration(self, i, currentDuration)
                 v.append(c)
@@ -640,7 +633,7 @@ class NoteworthyTranslator:
         r = note.Rest()
         self.setDurationForObject(r, durationInfo)
 
-        self.getCurrentVoice().append(r)
+        self.getShortestStream().append(r)
 
     def createClef(self, attributes):
         r'''
