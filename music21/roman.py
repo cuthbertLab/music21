@@ -989,7 +989,7 @@ def romanNumeralFromChord(
 
     "German Augmented sixth" chords are left intact, without change.
     This is thanks to the constraints on
-    spelling and on the root of the secondry degree.
+    spelling and on the root of the secondary degree.
 
     >>> cd = chord.Chord('Ab4 C5 Eb5 F#5')
     >>> rn = roman.romanNumeralFromChord(cd, 'C', preferSecondaryDominants=True)
@@ -1005,7 +1005,7 @@ def romanNumeralFromChord(
 
     So that's a context in which the root is diatonic,
     but the possible secondary root is not.
-    No let's do the opposite case with a root that is not diatonic
+    Now let's do the opposite case with a root that is not diatonic
     and a secondary that is.
 
     >>> cd = chord.Chord('Ab4 C5 Eb5 Gb5')
@@ -1214,9 +1214,11 @@ def romanNumeralFromChord(
         elif nationalityStart in ('Fr', 'Sw'):
             keyObj = _getKeyFromCache(chordObj.seventh.name.lower())
 
-    if preferSecondaryDominants:
-        if stepRoman != 'V':  # ignore if already "primary" dominant
-            if chordObj.isDominantSeventh() or chordObj.isMajorTriad():
+    if (
+        preferSecondaryDominants:
+        and stepRoman != 'V':  # ignore if already "primary" dominant
+        and (chordObj.isDominantSeventh() or chordObj.isMajorTriad())
+    ):
                 possibleSecondaryTonic = chordObj.root().transpose('P4').name
                 degree = keyObj.getScaleDegreeFromPitch(possibleSecondaryTonic)
                 if degree:  # None if not in chord
