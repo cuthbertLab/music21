@@ -989,7 +989,7 @@ def romanNumeralFromChord(
 
     "German Augmented sixth" chords are left intact, without change.
     This is thanks to the constraints on
-    spelling and on the root of the secondry degree.
+    spelling and on the root of the secondary degree.
 
     >>> cd = chord.Chord('Ab4 C5 Eb5 F#5')
     >>> rn = roman.romanNumeralFromChord(cd, 'C', preferSecondaryDominants=True)
