@@ -1032,7 +1032,7 @@ def romanNumeralFromChord(
     >>> cd = chord.Chord('F4 A4 C5')
     >>> rn = roman.romanNumeralFromChord(cd, 'f', preferSecondaryDominants=True)
     >>> rn.figure
-    'V/IV'
+    'V/iv'
 
     This might be appropriate in the middle of a progression like
     i, V/iv, iv.
@@ -1222,10 +1222,17 @@ def romanNumeralFromChord(
         possibleSecondaryTonic = chordObj.root().transpose('P4').name
         degree = keyObj.getScaleDegreeFromPitch(possibleSecondaryTonic)
         if degree:  # None if not in chord
-            secondaryAsRoman = keyObj.romanNumeral(degree).romanNumeralAlone  # NB
+            # Note: This is super verbose but the alternatives are bug-ridden. See #1450
+            fake2ndChordDegrees = [degree, degree+2 % 8, degree+4 % 8]
+            fake2ndChordPitches = keyObj.pitchesFromScaleDegrees(fake2ndChordDegrees)
+            fake2ndChord = chord.Chord(fake2ndChordPitches)
+            secondaryAsRoman = romanNumeralFromChord(fake2ndChord,
+                                                     keyObj,
+                                                     preferSecondaryDominants=False
+                                                     ).romanNumeralAlone
             primaryFigure = romanNumeralFromChord(chordObj,
                                                   key.Key(possibleSecondaryTonic),
-                                                  # Note preferSecondaryDominants False
+                                                  preferSecondaryDominants=False
                                                   ).figure
             rnString = f'{primaryFigure}/{secondaryAsRoman}'
 
