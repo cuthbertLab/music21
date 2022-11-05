@@ -1214,9 +1214,11 @@ def romanNumeralFromChord(
         elif nationalityStart in ('Fr', 'Sw'):
             keyObj = _getKeyFromCache(chordObj.seventh.name.lower())
 
-    if preferSecondaryDominants:
-        if stepRoman != 'V':  # ignore if already "primary" dominant
-            if chordObj.isDominantSeventh() or chordObj.isMajorTriad():
+    if (
+        preferSecondaryDominants:
+        and stepRoman != 'V':  # ignore if already "primary" dominant
+        and (chordObj.isDominantSeventh() or chordObj.isMajorTriad())
+    ):
                 possibleSecondaryTonic = chordObj.root().transpose('P4').name
                 degree = keyObj.getScaleDegreeFromPitch(possibleSecondaryTonic)
                 if degree:  # None if not in chord
