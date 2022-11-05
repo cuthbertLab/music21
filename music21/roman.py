@@ -1005,7 +1005,7 @@ def romanNumeralFromChord(
 
     So that's a context in which the root is diatonic,
     but the possible secondary root is not.
-    No let's do the opposite case with a root that is not diatonic
+    Now let's do the opposite case with a root that is not diatonic
     and a secondary that is.
 
     >>> cd = chord.Chord('Ab4 C5 Eb5 Gb5')
