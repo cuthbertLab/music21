@@ -1215,19 +1215,19 @@ def romanNumeralFromChord(
             keyObj = _getKeyFromCache(chordObj.seventh.name.lower())
 
     if (
-        preferSecondaryDominants:
-        and stepRoman != 'V':  # ignore if already "primary" dominant
+        preferSecondaryDominants
+        and stepRoman != 'V'  # ignore if already "primary" dominant
         and (chordObj.isDominantSeventh() or chordObj.isMajorTriad())
     ):
-                possibleSecondaryTonic = chordObj.root().transpose('P4').name
-                degree = keyObj.getScaleDegreeFromPitch(possibleSecondaryTonic)
-                if degree:  # None if not in chord
-                    secondaryAsRoman = keyObj.romanNumeral(degree).romanNumeralAlone  # NB
-                    primaryFigure = romanNumeralFromChord(chordObj,
-                                                          key.Key(possibleSecondaryTonic),
-                                                          # Note preferSecondaryDominants False
-                                                          ).figure
-                    rnString = f'{primaryFigure}/{secondaryAsRoman}'
+        possibleSecondaryTonic = chordObj.root().transpose('P4').name
+        degree = keyObj.getScaleDegreeFromPitch(possibleSecondaryTonic)
+        if degree:  # None if not in chord
+            secondaryAsRoman = keyObj.romanNumeral(degree).romanNumeralAlone  # NB
+            primaryFigure = romanNumeralFromChord(chordObj,
+                                                  key.Key(possibleSecondaryTonic),
+                                                  # Note preferSecondaryDominants False
+                                                  ).figure
+            rnString = f'{primaryFigure}/{secondaryAsRoman}'
 
     try:
         rn = RomanNumeral(rnString, keyObj, updatePitches=False,
