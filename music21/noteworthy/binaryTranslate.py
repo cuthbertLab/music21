@@ -78,6 +78,114 @@ This is very beta.  Much better would be to convert the file into .xml or .nwctx
             {3.0} <music21.note.Note G>
         {4.0} <music21.stream.Measure 0 offset=4.0>
             {0.0} <music21.note.Note C>
+
+    >>> p = common.getSourceFilePath() / 'noteworthy' / 'jingle_v175.nwc' #_DOCS_HIDE
+    >>> c = converter.parse(str(p)) #_DOCS_HIDE
+    >>> c.show('text')
+    {0.0} <music21.metadata.Metadata object at 0x7fe8c0a5ffa0>
+    {0.0} <music21.stream.Part 0x7fe8c0920100>
+        {0.0} <music21.instrument.Piano 'Piano'>
+        {0.0} <music21.stream.Measure 0 offset=0.0>
+            {0.0} <music21.expressions.TextExpression 'Lively'>
+            {0.0} <music21.expressions.TextExpression 'F'>
+            {0.0} <music21.clef.TrebleClef>
+            {0.0} <music21.tempo.MetronomeMark animato Quarter=120>
+            {0.0} <music21.key.KeySignature of 1 flat>
+            {0.0} <music21.meter.TimeSignature 4/4>
+            {0.0} <music21.note.Note A>
+            {1.0} <music21.note.Note A>
+            {2.0} <music21.note.Note A>
+            {3.0} <music21.note.Rest quarter>
+        {4.0} <music21.stream.Measure 0 offset=4.0>
+            {0.0} <music21.note.Note A>
+            {1.0} <music21.note.Note A>
+            {2.0} <music21.note.Note A>
+            {3.0} <music21.note.Rest quarter>
+        {8.0} <music21.stream.Measure 1 offset=8.0>
+            {0.0} <music21.note.Note A>
+            {1.0} <music21.note.Note C>
+            {2.0} <music21.note.Note F>
+            {3.5} <music21.note.Note G>
+        {12.0} <music21.stream.Measure 2 offset=12.0>
+            {0.0} <music21.note.Note A>
+            {3.0} <music21.note.Rest quarter>
+        {16.0} <music21.stream.Measure 3 offset=16.0>
+            {0.0} <music21.expressions.TextExpression 'Bb'>
+            {0.0} <music21.note.Note B->
+            {1.0} <music21.note.Note B->
+            {2.0} <music21.note.Note B->
+            {3.5} <music21.note.Note B->
+        {20.0} <music21.stream.Measure 4 offset=20.0>
+            {0.0} <music21.expressions.TextExpression 'F'>
+            {0.0} <music21.note.Note B->
+            {1.0} <music21.note.Note A>
+            {2.0} <music21.note.Note A>
+            {3.0} <music21.note.Note A>
+            {3.5} <music21.note.Note A>
+        {24.0} <music21.stream.Measure 5 offset=24.0>
+            {0.0} <music21.expressions.TextExpression 'G'>
+            {0.0} <music21.bar.Barline type=regular>
+            {0.0} <music21.note.Note A>
+            {1.0} <music21.note.Note G>
+            {2.0} <music21.note.Note G>
+            {3.0} <music21.note.Note A>
+        {28.0} <music21.stream.Measure 6 offset=28.0>
+            {0.0} <music21.expressions.TextExpression 'C7'>
+            {0.0} <music21.note.Note G>
+            {2.0} <music21.note.Note C>
+            {4.0} <music21.bar.Repeat direction=end>
+        {28.0} <music21.spanner.RepeatBracket 1 <music21.stream.Measure 5 offset=24.0><music21.stream.Measure 6 offset=28.0>>
+        {32.0} <music21.stream.Measure 7 offset=32.0>
+            {0.0} <music21.expressions.TextExpression 'C7'>
+            {0.0} <music21.bar.Barline type=regular>
+            {0.0} <music21.note.Note C>
+            {1.0} <music21.note.Note C>
+            {2.0} <music21.note.Note B->
+            {3.0} <music21.note.Note G>
+        {36.0} <music21.stream.Measure 8 offset=36.0>
+            {0.0} <music21.expressions.TextExpression 'F'>
+            {0.0} <music21.note.Note F>
+            {3.0} <music21.note.Rest quarter>
+    {0.0} <music21.stream.Part 0x7fe8c0921660>
+        {0.0} <music21.instrument.Piano 'Piano'>
+        {0.0} <music21.stream.Measure 0 offset=0.0>
+            {0.0} <music21.clef.BassClef>
+            {0.0} <music21.key.KeySignature of 1 flat>
+            {0.0} <music21.meter.TimeSignature 4/4>
+            {0.0} <music21.chord.Chord F3 A3 C4>
+        {4.0} <music21.stream.Measure 0 offset=4.0>
+            {0.0} <music21.chord.Chord F3 A3 C4>
+        {8.0} <music21.stream.Measure 1 offset=8.0>
+            {0.0} <music21.chord.Chord F3 A3 C4>
+        {12.0} <music21.stream.Measure 2 offset=12.0>
+            {0.0} <music21.chord.Chord F3 A3 C4>
+            {1.0} <music21.note.Rest quarter>
+            {2.0} <music21.chord.Chord F3 A3 C4>
+            {3.0} <music21.note.Rest quarter>
+        {16.0} <music21.stream.Measure 3 offset=16.0>
+            {0.0} <music21.chord.Chord F3 B-3 D4>
+        {20.0} <music21.stream.Measure 4 offset=20.0>
+            {0.0} <music21.chord.Chord F3 A3 C4>
+            {1.0} <music21.note.Rest quarter>
+            {2.0} <music21.note.Rest half>
+        {24.0} <music21.stream.Measure 5 offset=24.0>
+            {0.0} <music21.bar.Barline type=regular>
+            {0.0} <music21.chord.Chord G3 B3>
+            {2.0} <music21.note.Rest half>
+        {28.0} <music21.stream.Measure 6 offset=28.0>
+            {0.0} <music21.chord.Chord E3 B-3 C4>
+            {4.0} <music21.bar.Repeat direction=end>
+        {28.0} <music21.spanner.RepeatBracket 1 <music21.stream.Measure 5 offset=24.0><music21.stream.Measure 6 offset=28.0>>
+        {32.0} <music21.stream.Measure 7 offset=32.0>
+            {0.0} <music21.bar.Barline type=regular>
+            {0.0} <music21.chord.Chord E3 B-3 C4>
+            {1.0} <music21.note.Rest quarter>
+            {2.0} <music21.note.Rest half>
+        {36.0} <music21.stream.Measure 8 offset=36.0>
+            {0.0} <music21.chord.Chord F3 A3 C4>
+            {3.0} <music21.note.Rest quarter>
+
+
 '''
 from __future__ import annotations
 
