@@ -512,12 +512,12 @@ class NoteworthyTranslator:
     def getShortestStream(self):
         if self.currentMeasure.isFlat:
             # O(1) in most cases.
-             return self.currentMeasure
+            return self.currentMeasure
 
         # O(n) only if voices already exist.
         return min(
-             self.currentMeasure.getElementsByClass(stream.Voice), 
-             key=lambda v: v.quarterLength
+            self.currentMeasure.getElementsByClass(stream.Voice),
+            key=lambda v: v.quarterLength
         )
 
     def translateChord(self, attributes):
@@ -656,7 +656,11 @@ class NoteworthyTranslator:
         >>> nwt.currentMeasure.show('text')
         {0.0} <music21.clef.TrebleClef>
         {0.0} <music21.clef.Bass8vbClef>
-
+        >>> nwt.createClef({'Type' : 'Percussion'})
+        >>> nwt.currentMeasure.show('text')
+        {0.0} <music21.clef.TrebleClef>
+        {0.0} <music21.clef.Bass8vbClef>
+        {0.0} <music21.clef.PercussionClef>
 
 
 

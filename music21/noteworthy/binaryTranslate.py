@@ -432,7 +432,7 @@ class NWCConverter:
         # print('StaffCount', self.numberOfStaves)
         self.skipBytes(1)
 
-    def dumpToNWCText(self) -> t.List[str]:
+    def dumpToNWCText(self) -> list[str]:
         infos = ''
         if self.title:
             infos += '|SongInfo|Title:' + self.title.decode('latin_1')
@@ -489,7 +489,7 @@ class NWCStaff:
         self.parseObjects()
         # environLocal.warn([self.parent.parsePosition, self.objects])
 
-    def dump(self) -> t.List[str]:
+    def dump(self) -> list[str]:
         dumpObjects = []
 
         # default to first midi instrument
