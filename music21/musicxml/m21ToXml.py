@@ -3273,10 +3273,9 @@ class MeasureExporter(XMLExporterBase):
 
             for n in notesAndAnchorsForLater:
                 if (isinstance(n, note.GeneralNote)
-                    and n.isRest
-                    and n.style.hideObjectOnPrint
-                    and n.duration.type == 'inexpressible'
-                ):
+                        and n.isRest
+                        and n.style.hideObjectOnPrint
+                        and n.duration.type == 'inexpressible'):
                     # Prefer a gap in stream, to be filled with a <forward> tag by
                     # fill_gap_with_forward_tag() rather than raising exceptions
                     continue
