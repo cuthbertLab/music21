@@ -3294,6 +3294,16 @@ class MeasureExporter(XMLExporterBase):
         self.objectSpannerBundle = self.spannerBundle.getBySpannedElement(obj)
         preList, postList = self.prePostObjectSpanners(obj)
 
+        # SpannerAnchors only have a preList and postList, nothing else.
+        # They do not have any effect on self.offsetInMeasure, since they
+        # have an immutable duration of 0.
+        if isinstance(obj, spanner.SpannerAnchor):
+            for sp in preList:  # directions that precede the element
+                root.append(sp)
+            for sp in postList:  # directions that follow the element
+                root.append(sp)
+            return
+
         for sp in preList:  # directions that precede the element
             root.append(sp)
 

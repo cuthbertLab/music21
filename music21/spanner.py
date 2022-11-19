@@ -28,10 +28,13 @@ import unittest
 from music21 import base
 from music21 import common
 from music21 import defaults
+from music21 import duration
 from music21 import environment
 from music21 import exceptions21
 from music21 import prebase
 from music21 import style
+from music21.common.types import OffsetQL
+from music21.common.types import OffsetQLIn
 
 environLocal = environment.Environment('spanner')
 
@@ -609,6 +612,43 @@ class _SpannerRef(t.TypedDict):
     # noinspection PyTypedDict
     spanner: 'Spanner'
     className: str
+
+class SpannerAnchor(base.Music21Object):
+    '''
+    A simple Music21Object that can be used in place of a GeneralNote as
+    an element of a spanner that defines its beginning or end offset.
+
+    SpannerAnchors aways have a duration of 0, and if an attempt is made to
+    change this, TypeError will be raised.
+    '''
+    def __init__(self, *spannedElements, **keywords):
+        if 'duration' in keywords or 'quarterLength' in keywords:
+            raise TypeError(
+                'SpannerAnchor cannot be initialized with a duration/quarterLength.'
+            )
+
+        super().__init__(*spannedElements, **keywords)
+        self._duration = duration.FrozenDuration(quarterLength=0)
+
+    @property
+    def duration(self) -> duration.Duration:
+        d_out = self._duration
+        if t.TYPE_CHECKING:
+            assert d_out is not None
+        return d_out
+
+    @duration.setter
+    def duration(self, durationObj: duration.Duration):
+        raise TypeError('SpannerAnchor has an immutable zero duration.')
+
+    @property
+    def quarterLength(self) -> OffsetQL:
+        return self.duration.quarterLength
+
+    @quarterLength.setter
+    def quarterLength(self, value: OffsetQLIn):
+        raise TypeError('SpannerAnchor has an immutable zero quarterLength.')
+
 
 class SpannerBundle(prebase.ProtoM21Object):
     '''
