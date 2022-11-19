@@ -3247,7 +3247,9 @@ class MeasureExporter(XMLExporterBase):
             amountToMoveForward = int(round(divisions * (groupOffset
                                                              - self.offsetInMeasure)))
             if amountToMoveForward > 0 and any(
-                    isinstance(obj, (note.GeneralNote, clef.Clef)) for obj in objGroup):
+                    isinstance(
+                        obj, (note.GeneralNote, clef.Clef, spanner.SpannerAnchor)
+                    ) for obj in objGroup):
                 # gap in stream between GeneralNote/Clef objects: create <forward>
                 mxForward = Element('forward')
                 mxDuration = SubElement(mxForward, 'duration')
@@ -3255,20 +3257,26 @@ class MeasureExporter(XMLExporterBase):
                 root.append(mxForward)
                 self.offsetInMeasure = groupOffset
 
-            notesForLater = []
+            notesAndAnchorsForLater = []
             for obj in objGroup:
-                # we do all non-note elements (including ChordSymbols not written as chord)
-                # first before note elements, in musicxml
-                if isinstance(obj, note.GeneralNote) and (
+                # we do all non-note/non-anchor elements (including ChordSymbols not
+                # written as chord) first before note elements (and anchors), in musicxml
+                if isinstance(obj, spanner.SpannerAnchor):
+                    notesAndAnchorsForLater.append(obj)
+                elif isinstance(obj, note.GeneralNote) and (
                     not (isHarm := isinstance(obj, harmony.Harmony))
                     or (isHarm and obj.writeAsChord)
                 ):
-                    notesForLater.append(obj)
+                    notesAndAnchorsForLater.append(obj)
                 else:
                     self.parseOneElement(obj)
 
-            for n in notesForLater:
-                if n.isRest and n.style.hideObjectOnPrint and n.duration.type == 'inexpressible':
+            for n in notesAndAnchorsForLater:
+                if (isinstance(n, note.GeneralNote)
+                    and n.isRest
+                    and n.style.hideObjectOnPrint
+                    and n.duration.type == 'inexpressible'
+                ):
                     # Prefer a gap in stream, to be filled with a <forward> tag by
                     # fill_gap_with_forward_tag() rather than raising exceptions
                     continue
