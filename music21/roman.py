@@ -4402,8 +4402,10 @@ class Test(unittest.TestCase):
         self.assertEqual(rn.seventh.name, 'A')
 
     def test_int_figure_case_matters(self):
-        '''https://github.com/cuthbertLab/music21/issues/1450'''
-        minorKeyObj = key.Key("c")
+        '''
+        Fix for https://github.com/cuthbertLab/music21/issues/1450
+        '''
+        minorKeyObj = key.Key('c')
         rn = RomanNumeral(2, minorKeyObj)
         self.assertEqual(rn.figure, 'ii')
         rn = RomanNumeral(2, minorKeyObj, caseMatters=False)
