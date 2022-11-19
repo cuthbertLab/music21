@@ -3239,6 +3239,37 @@ class MeasureExporter(XMLExporterBase):
 
         self.currentVoiceId = voiceId
 
+        # If this flat stream (measure/voice) contains any SpannerAnchors, we will perform
+        # a first pass, emitting any pre/postList for any object that is functioning as a
+        # spanner anchor (the SpannerAnchors, as well as any GeneralNotes that are in
+        # spanners). Then we will back up and actually emit the notes, etc.
+        hasSpannerAnchors: bool = bool(list(m[spanner.SpannerAnchor]))
+        if hasSpannerAnchors:
+            for objGroup in OffsetIterator(m):
+                if not any(self._hasPrePostObjectSpanners(obj) for obj in objGroup):
+                    continue
+                groupOffset = m.elementOffset(objGroup[0])
+                amountToMoveForward = int(round(divisions * (groupOffset
+                                                                 - self.offsetInMeasure)))
+                if amountToMoveForward > 0:
+                    # gap in stream before spanner start/stop: create <forward>
+                    mxForward = Element('forward')
+                    mxDuration = SubElement(mxForward, 'duration')
+                    mxDuration.text = str(amountToMoveForward)
+                    root.append(mxForward)
+                    self.offsetInMeasure = groupOffset
+
+                for obj in objGroup:
+                    self.parseOneElement(obj, prePostObjectSpannersOnly=True)
+
+        # return to the beginning of the measure, to emit everything else.
+        amountToBackup = round(divisions * self.offsetInMeasure)
+        if amountToBackup:
+            mxBackup = Element('backup')
+            mxDuration = SubElement(mxBackup, 'duration')
+            mxDuration.text = str(amountToBackup)
+            root.append(mxBackup)
+
         # group all objects by offsets and then do a different order than normal sort.
         # that way chord symbols and other 0-width objects appear before notes as much as
         # possible.
@@ -3247,9 +3278,7 @@ class MeasureExporter(XMLExporterBase):
             amountToMoveForward = int(round(divisions * (groupOffset
                                                              - self.offsetInMeasure)))
             if amountToMoveForward > 0 and any(
-                    isinstance(
-                        obj, (note.GeneralNote, clef.Clef, spanner.SpannerAnchor)
-                    ) for obj in objGroup):
+                    isinstance(obj, (note.GeneralNote, clef.Clef)) for obj in objGroup):
                 # gap in stream between GeneralNote/Clef objects: create <forward>
                 mxForward = Element('forward')
                 mxDuration = SubElement(mxForward, 'duration')
@@ -3257,29 +3286,29 @@ class MeasureExporter(XMLExporterBase):
                 root.append(mxForward)
                 self.offsetInMeasure = groupOffset
 
-            notesAndAnchorsForLater = []
+            notesForLater = []
             for obj in objGroup:
-                # we do all non-note/non-anchor elements (including ChordSymbols not
-                # written as chord) first before note elements (and anchors), in musicxml
+                # we do all non-note elements (including ChordSymbols not written as chord)
+                # first before note elements, in musicxml
                 if isinstance(obj, spanner.SpannerAnchor):
-                    notesAndAnchorsForLater.append(obj)
-                elif isinstance(obj, note.GeneralNote) and (
+                    # nothing left to do with this (only prePostObjectSpanners, and
+                    # we did that above)
+                    continue
+
+                if isinstance(obj, note.GeneralNote) and (
                     not (isHarm := isinstance(obj, harmony.Harmony))
                     or (isHarm and obj.writeAsChord)
                 ):
-                    notesAndAnchorsForLater.append(obj)
+                    notesForLater.append(obj)
                 else:
-                    self.parseOneElement(obj)
+                    self.parseOneElement(obj, skipPrePostObjectSpanners=hasSpannerAnchors)
 
-            for n in notesAndAnchorsForLater:
-                if (isinstance(n, note.GeneralNote)
-                        and n.isRest
-                        and n.style.hideObjectOnPrint
-                        and n.duration.type == 'inexpressible'):
+            for n in notesForLater:
+                if n.isRest and n.style.hideObjectOnPrint and n.duration.type == 'inexpressible':
                     # Prefer a gap in stream, to be filled with a <forward> tag by
                     # fill_gap_with_forward_tag() rather than raising exceptions
                     continue
-                self.parseOneElement(n)
+                self.parseOneElement(n, skipPrePostObjectSpanners=hasSpannerAnchors)
 
         if backupAfterwards:
             # return to the beginning of the measure.
@@ -3292,27 +3321,49 @@ class MeasureExporter(XMLExporterBase):
 
         self.currentVoiceId = None
 
-    def parseOneElement(self, obj):
+    def parseOneElement(
+        self,
+        obj,
+        prePostObjectSpannersOnly: bool = False,
+        skipPrePostObjectSpanners: bool = False
+    ):
         '''
         parse one element completely and add it to xmlRoot, updating
         offsetInMeasure, etc.
         '''
         root = self.xmlRoot
+        divisions = self.currentDivisions
         self.objectSpannerBundle = self.spannerBundle.getBySpannedElement(obj)
         preList, postList = self.prePostObjectSpanners(obj)
 
-        # SpannerAnchors only have a preList and postList, nothing else.
-        # They do not have any effect on self.offsetInMeasure, since they
-        # have an immutable duration of 0.
-        if isinstance(obj, spanner.SpannerAnchor):
+        if prePostObjectSpannersOnly:
+            if not preList and not postList:
+                return
+
             for sp in preList:  # directions that precede the element
                 root.append(sp)
+
+            if postList and obj.quarterLength > 0:
+                # go forward by quarterLength (with a <forward> element)
+                classes = obj.classes
+                # Ignore Harmony objects having writeAsChord = False
+                if 'GeneralNote' in classes and getattr(obj, 'writeAsChord', True):
+                    amountToMoveForward = int(round(divisions * obj.duration.quarterLength))
+                    if amountToMoveForward > 0:
+                        # gap in stream before spanner start/stop: create <forward>
+                        mxForward = Element('forward')
+                        mxDuration = SubElement(mxForward, 'duration')
+                        mxDuration.text = str(amountToMoveForward)
+                        root.append(mxForward)
+                        self.offsetInMeasure += obj.duration.quarterLength
+
             for sp in postList:  # directions that follow the element
                 root.append(sp)
             return
 
-        for sp in preList:  # directions that precede the element
-            root.append(sp)
+        if not skipPrePostObjectSpanners:
+            for sp in preList:  # directions that precede the element
+                root.append(sp)
 
         classes = obj.classes
         # Ignore Harmony objects having writeAsChord = False
@@ -3358,8 +3409,28 @@ class MeasureExporter(XMLExporterBase):
             if parsedObject is False:
                 environLocal.printDebug(['did not convert object', obj])
 
-        for sp in postList:  # directions that follow the element
-            root.append(sp)
+        if not skipPrePostObjectSpanners:
+            for sp in postList:  # directions that follow the element
+                root.append(sp)
+
+    def _hasPrePostObjectSpanners(self, obj) -> bool:
+        '''
+        returns True if and only if:
+        (1) there are spanners related to the object that should appear before the object
+        to the <measure> tag, or (2) there are spanners related to the object that should
+        appear after the object in the measure tag.
+        '''
+        spannerBundle = self.spannerBundle.getBySpannedElement(obj)
+        if not spannerBundle:
+            return False
+
+        # this list of spanner classes must match the paramsSet keys in prePostObjectSpanners()
+        for m21spannerClass in ('Ottava', 'DynamicWedge', 'Line'):
+            for thisSpanner in spannerBundle.getByClass(m21spannerClass):
+                if thisSpanner.isFirst(obj) or thisSpanner.isLast(obj):
+                    return True
+
+        return False
 
     def prePostObjectSpanners(self, target):
         '''

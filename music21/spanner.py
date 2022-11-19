@@ -615,10 +615,34 @@ class _SpannerRef(t.TypedDict):
 
 class SpannerAnchor(base.Music21Object):
     '''
-    A simple Music21Object that can be used in place of a GeneralNote as
-    an element of a spanner that defines its beginning or end offset.
+    A simple Music21Object that can be used to define the beginning or end
+    of a Spanner, in the place of a GeneralNote.
 
-    SpannerAnchors aways have a duration of 0, and if an attempt is made to
+    This is useful for (e.g.) a Crescendo that ends partway through a
+    note (e.g. in a violin part).
+
+    Here's an example of a whole note that has a Crescendo for the first
+    half of the note, and a Diminuendo for the second half of the note.
+
+    >>> score = stream.Score()
+    >>> part = stream.Part()
+    >>> score.insert(0, part)
+    >>> measure = stream.Measure()
+    >>> part.insert(0, measure)
+    >>> voice = stream.Voice()
+    >>> measure.insert(0, voice)
+
+    >>> n = note.Note('C', quarterLength = 4)
+    >>> sa1 = spanner.SpannerAnchor()
+    >>> sa2 = spanner.SpannerAnchor()
+    >>> voice.insert(0, n)
+    >>> voice.insert(2, sa1)
+    >>> voice.insert(4, sa2)
+    >>> cresc = dynamics.Crescendo(n, sa1)   # cresc from n to sa1
+    >>> dim = dynamics.Diminuendo(sa1, sa2)  # dim from sa1 to sa2
+    >>> score.append((cresc, dim))
+
+    SpannerAnchors aways have a duration of 0, and if any attempt is made to
     change this, TypeError will be raised.
     '''
     def __init__(self, *spannedElements, **keywords):
