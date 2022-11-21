@@ -61,7 +61,7 @@ from music21 import tie
 from music21.musicxml import helpers
 from music21.musicxml.partStaffExporter import PartStaffExporterMixin
 from music21.musicxml import xmlObjects
-from music21.musicxml.xmlObjects import MusicXMLExportException
+from music21.musicxml.xmlObjects import MusicXMLExportException, booleanToYesNo
 from music21.musicxml.xmlObjects import MusicXMLWarning
 
 environLocal = environment.Environment('musicxml.m21ToXml')
@@ -5159,7 +5159,7 @@ class MeasureExporter(XMLExporterBase):
         <other-technical>unda maris</other-technical>
 
         Same with technical marks not yet supported.
-        TODO: support HammerOn, PullOff, Bend, Hole, Arrow.
+        TODO: support HammerOn, PullOff, Hole, Arrow.
 
         >>> h = articulations.HammerOn()
         >>> mxOther = MEX.articulationToXmlTechnical(h)
@@ -5169,7 +5169,6 @@ class MeasureExporter(XMLExporterBase):
         # these technical have extra information
         # TODO: hammer-on
         # TODO: pull-off
-        # TODO: bend
         # TODO: hole
         # TODO: arrow
         musicXMLTechnicalName = None
@@ -5181,7 +5180,7 @@ class MeasureExporter(XMLExporterBase):
             musicXMLTechnicalName = 'other-technical'
 
         # TODO: support additional technical marks listed above
-        if musicXMLTechnicalName in ('hammer-on', 'pull-off', 'bend', 'hole', 'arrow'):
+        if musicXMLTechnicalName in ('hammer-on', 'pull-off', 'hole', 'arrow'):
             musicXMLTechnicalName = 'other-technical'
 
         mxTechnicalMark = Element(musicXMLTechnicalName)
@@ -5206,7 +5205,17 @@ class MeasureExporter(XMLExporterBase):
             mxTechnicalMark.text = str(articulationMark.number)
         if musicXMLTechnicalName == 'fret':
             mxTechnicalMark.text = str(articulationMark.number)
-
+        if musicXMLTechnicalName == 'bend':
+            bendAlterSubElement = SubElement(mxTechnicalMark, "bend-alter")
+            bendAlterSubElement.text = str(articulationMark.bendAlter.semitones)
+            if articulationMark.preBend:
+                preBendSubElement = SubElement(mxTechnicalMark, "pre-bend")
+            if articulationMark.release is not None:
+                releaseSubElement = SubElement(mxTechnicalMark, "release")
+                releaseSubElement.set("offset", str(articulationMark.release))
+            if articulationMark.withBar is not None:
+                withBarSubElement = SubElement(mxTechnicalMark, "with-bar")
+                withBarSubElement.text = str(articulationMark.withBar)
         # harmonic needs to check for whether it is artificial or natural, and
         # whether it is base-pitch, sounding-pitch, or touching-pitch
         if musicXMLTechnicalName == 'harmonic':
