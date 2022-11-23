@@ -15,6 +15,9 @@ Modified version of music21 for the TABASCO project, with additional support to 
 - *87*: import `interval` for `bendAlter`
 - **578**: add attributes to `FretBend` class;
 
+`music21/note.py`:
+- **1787:1828**: add utility properties to music21.note.Note
+
 ___
 `music21` -- A Toolkit for Computer-Aided Musical Analysis and 
 Computational Musicology
