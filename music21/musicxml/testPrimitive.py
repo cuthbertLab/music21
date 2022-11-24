@@ -13,7 +13,7 @@ import unittest
 
 _DOC_IGNORE_MODULE_OR_PACKAGE = True
 
-
+# Needs triple double quotes because of embedded c'''' below.
 pitches01a = """<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE score-partwise PUBLIC "-//Recordare//DTD MusicXML 1.0 Partwise//EN"
                                 "http://www.musicxml.org/dtds/partwise.dtd">
@@ -18953,7 +18953,7 @@ multiMeasureEnding = (
 </score-partwise>
 ''')
 
-multipleFingeringsOnChord = """
+multipleFingeringsOnChord = '''
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE score-partwise PUBLIC "-//Recordare//DTD MusicXML 3.1 Partwise//EN" "http://www.musicxml.org/dtds/partwise.dtd">
 <score-partwise version="3.1">
@@ -19045,7 +19045,7 @@ multipleFingeringsOnChord = """
       </measure>
     </part>
   </score-partwise>
-"""
+'''
 
 ALL = [
     articulations01, pitches01a, directions31a, lyricsMelisma61d, notations32a,  # 0
