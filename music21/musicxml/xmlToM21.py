@@ -2875,7 +2875,7 @@ class MeasureParser(XMLParserBase):
 
         # move spanners, expressions, articulations from first note to Chord.
         # See slur in m2 of schoenberg/op19 #2
-        # but move only one of each class
+        # but move only one of each class, unless a fingering.
         # Is there anything else that should be moved???
 
         seenArticulations = set()
@@ -2892,7 +2892,8 @@ class MeasureParser(XMLParserBase):
                 if type(art) in seenArticulations:  # pylint: disable=unidiomatic-typecheck
                     continue
                 c.articulations.append(art)
-                seenArticulations.add(type(art))
+                if not isinstance(art, articulations.Fingering):
+                    seenArticulations.add(type(art))
             for exp in n.expressions:
                 if type(exp) in seenExpressions:  # pylint: disable=unidiomatic-typecheck
                     continue

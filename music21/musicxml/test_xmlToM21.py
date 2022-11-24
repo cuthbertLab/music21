@@ -1117,6 +1117,14 @@ class Test(unittest.TestCase):
         self.assertIsInstance(notes[3].articulations[0], articulations.StringIndication)
         self.assertEqual(notes[3].articulations[0].number, 2)
 
+    def testArticulationsOnChord(self):
+        from music21 import converter
+        from music21.musicxml import testPrimitive
+
+        s = converter.parse(testPrimitive.multipleFingeringsOnChord)
+        c = s[chord.Chord].first()
+        self.assertEqual(len(c.articulations), 3)
+
     def testFretIndication(self):
         from music21 import converter
 

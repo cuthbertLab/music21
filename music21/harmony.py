@@ -597,6 +597,14 @@ class ChordStepModification(prebase.ProtoM21Object):
     def _reprInternal(self):
         return f'modType={self.modType} degree={self.degree} interval={self.interval}'
 
+    def __eq__(self, other):
+        return (
+            isinstance(other, ChordStepModification)
+            and self.modType == other.modType
+            and self.degree == other.degree
+            and self.interval == other.interval
+        )
+
     # PUBLIC PROPERTIES #
 
     @property
