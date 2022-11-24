@@ -33,11 +33,17 @@ or wherever you have downloaded EasyABC to
 (PC users might need: 'c:/program files (x86)/easyabc/easyabc.exe')
 (Thanks to Norman Schmidt for the heads-up)
 
-There is a two-step process in converting ABC files to Music21 Streams.  First this module
+There is a two-step process in converting ABC files to music21 Streams.  First this module
 reads in the text-based .abc file and converts all the information into ABCToken objects.  Then
 the function :func:`music21.abcFormat.translate.abcToStreamScore` of
 the :ref:`moduleAbcFormatTranslate` module
 translates those Tokens into music21 objects.
+
+Music21 implements the entire v1.6 ABC standard (January 1997) found at
+https://abcnotation.com/standard/abc_v1.6.txt .  The system aims to support the
+v2.1 ABC standard (December 2011) found at
+https://abcnotation.com/wiki/abc:standard:v2.1 but some parts (e.g. 4.10 Variant Endings) are not
+implemented.  No support is yet given for the draft 2.2 standard.
 '''
 from __future__ import annotations
 
@@ -103,6 +109,7 @@ ABC_BARS = [
     ('|', 'regular'),
     (':', 'dotted'),
 ]
+ABC_BARS_DICT = {d[0]: d[1] for d in ABC_BARS}
 
 # store a mapping of ABC representation to pitch values
 # key is (srcStr, carriedAccidental, str(keySignature)
@@ -781,15 +788,20 @@ class ABCMetadata(ABCToken):
 
 
 class ABCBar(ABCToken):
+    '''
+    An ABCBar token represents a barline, possibly with repeat information.
+
+    Currently 4.10 Variant
+    '''
     # given a logical unit, create an object
     # may be a chord, notes, metadata, bars
     __slots__ = ('barType', 'barStyle', 'repeatForm')
 
     def __init__(self, src):
         super().__init__(src)
-        self.barType = None  # repeat or barline
-        self.barStyle = None  # regular, heavy-light, etc
-        self.repeatForm = None  # end, start, bidrectional, first, second
+        self.barType = ''  # repeat or barline
+        self.barStyle = ''  # regular, heavy-light, etc
+        self.repeatForm = ''  # end, start, bidrectional, first, second
 
     def parse(self):
         '''
@@ -821,41 +833,44 @@ class ABCBar(ABCToken):
         >>> ab.repeatForm
         'start'
         '''
-        for abcStr, barTypeString in ABC_BARS:
-            if abcStr == self.src.strip():
-                # this gets lists of elements like
-                # light-heavy-repeat-end
-                barTypeComponents = barTypeString.split('-')
-                # this is a list of attributes
-                if 'repeat' in barTypeComponents:
-                    self.barType = 'repeat'
-                elif ('first' in barTypeComponents
-                      or 'second' in barTypeComponents):
-                    self.barType = 'barline'
-                    # environLocal.printDebug(['got repeat 1/2:', self.src])
-                else:
-                    self.barType = 'barline'
+        src_strip: str = self.src.strip()
+        if src_strip not in ABC_BARS_DICT:
+            return
 
-                # case of regular, dotted
-                if len(barTypeComponents) == 1:
-                    self.barStyle = barTypeComponents[0]
+        barTypeString = ABC_BARS_DICT[src_strip]
+        # this gets lists of elements like
+        # light-heavy-repeat-end
+        barTypeComponents = barTypeString.split('-')
+        # this is a list of attributes
+        if 'repeat' in barTypeComponents:
+            self.barType = 'repeat'
+        elif ('first' in barTypeComponents
+              or 'second' in barTypeComponents):
+            self.barType = 'barline'
+            # environLocal.printDebug(['got repeat 1/2:', self.src])
+        else:
+            self.barType = 'barline'
 
-                # case of light-heavy, light-light, etc
-                elif len(barTypeComponents) >= 2:
-                    # must get out cases of the start-tags for repeat boundaries
-                    # not yet handling
-                    if 'first' in barTypeComponents:
-                        self.barStyle = 'regular'
-                        self.repeatForm = 'first'  # not a repeat
-                    elif 'second' in barTypeComponents:
-                        self.barStyle = 'regular'
-                        self.repeatForm = 'second'  # not a repeat
-                    else:
-                        self.barStyle = barTypeComponents[0] + '-' + barTypeComponents[1]
-                # repeat form is either start/end for normal repeats
-                # get extra repeat information; start, end, first, second
-                if len(barTypeComponents) > 2:
-                    self.repeatForm = barTypeComponents[3]
+        # case of regular, dotted
+        if len(barTypeComponents) == 1:
+            self.barStyle = barTypeComponents[0]
+
+        # case of light-heavy, light-light, etc
+        elif len(barTypeComponents) >= 2:
+            # must get out cases of the start-tags for repeat boundaries
+            # not yet handling
+            if 'first' in barTypeComponents:
+                self.barStyle = 'regular'
+                self.repeatForm = 'first'  # not a repeat
+            elif 'second' in barTypeComponents:
+                self.barStyle = 'regular'
+                self.repeatForm = 'second'  # not a repeat
+            else:
+                self.barStyle = barTypeComponents[0] + '-' + barTypeComponents[1]
+        # repeat form is either start/end for normal repeats
+        # get extra repeat information; start, end, first, second
+        if len(barTypeComponents) > 2:
+            self.repeatForm = barTypeComponents[3]
 
     def isRepeat(self) -> bool:
         if self.barType == 'repeat':
@@ -1733,7 +1748,13 @@ class ABCChord(ABCNote):
         self.chordSymbols, nonChordSymStr = self._splitChordSymbols(self.src)
 
         # position of the closing bracket
-        pos = nonChordSymStr.index(']')
+        try:
+            pos = nonChordSymStr.index(']')
+        except ValueError:
+            raise ABCHandlerException(
+                f'Bad chord indicator: {self.src}: no closing bracket found.'
+            )
+
         # Length modifier string behind the chord brackets
         outerLengthModifierStr = nonChordSymStr[pos + 1:]
         # String in the chord brackets
