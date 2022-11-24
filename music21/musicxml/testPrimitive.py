@@ -14,7 +14,7 @@ import unittest
 _DOC_IGNORE_MODULE_OR_PACKAGE = True
 
 # Needs triple double quotes because of embedded c'''' below.
-pitches01a = """"<?xml version="1.0" encoding="UTF-8"?>
+pitches01a = """<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE score-partwise PUBLIC "-//Recordare//DTD MusicXML 1.0 Partwise//EN"
                                 "http://www.musicxml.org/dtds/partwise.dtd">
 <score-partwise>
