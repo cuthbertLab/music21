@@ -5383,11 +5383,17 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         if not inPlace:
             return returnObj  # the Stream or None
 
-    def toWrittenPitch(self, *, inPlace=False):
+    def toWrittenPitch(self, *, ottavasToSounding=False, inPlace=False):
         '''
         If not at written pitch, transpose all Pitch elements to
         written pitch. The atSoundingPitch property is used to
-        determine if transposition is necessary.
+        determine if transposition is necessary.  Note that if
+        ottavasToSounding is True, any notes/chords within
+        an Ottava will _then_ be transposed to sounding Pitch (this
+        is useful for the MusicXML writer, since MusicXML likes
+        all pitches to be written pitches, except for those in
+        ottavas, which should be transposed to written (by instrument)
+        and then transposed to sounding (by ottava).
 
         >>> sc = stream.Score()
         >>> p = stream.Part(id='baritoneSax')
@@ -5423,20 +5429,22 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         if returnObj.hasPartLikeStreams() or 'Opus' in returnObj.classes:
             for partLike in returnObj.getElementsByClass('Stream'):
                 # call on each part
-                partLike.toWrittenPitch(inPlace=True)
+                partLike.toWrittenPitch(inPlace=True, ottavasToSounding=ottavasToSounding)
             returnObj.atSoundingPitch = False
-            return returnObj if not inPlace else None
+        else:
+            at_sounding = returnObj._treatAtSoundingPitch()
+            if at_sounding is True:
+                # need to reverse to go to written
+                returnObj._transposeByInstrument(reverse=True, inPlace=True)
+                for container in returnObj.recurse(streamsOnly=True, includeSelf=True):
+                    container.atSoundingPitch = False
 
-        at_sounding = returnObj._treatAtSoundingPitch()
-
-        if at_sounding is True:
-            # need to reverse to go to written
-            returnObj._transposeByInstrument(reverse=True, inPlace=True)
-            for container in returnObj.recurse(streamsOnly=True, includeSelf=True):
-                container.atSoundingPitch = False
-
-        for ottava in returnObj[spanner.Ottava]:
-            ottava.undoTransposition()
+        if ottavasToSounding:
+            for ottava in returnObj[spanner.Ottava]:
+                ottava.performTransposition()
+        else:
+            for ottava in returnObj[spanner.Ottava]:
+                ottava.undoTransposition()
 
         if not inPlace:
             return returnObj

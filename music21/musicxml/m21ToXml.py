@@ -1506,9 +1506,8 @@ class ScoreExporter(XMLExporterBase, PartStaffExporterMixin):
         if not s:
             return self.emptyObject()
 
-        if s.atSoundingPitch is True:
-            # A copy was already made or elected NOT to be made.
-            s.toWrittenPitch(inPlace=True)
+        # A copy was already made or elected NOT to be made.
+        s.toWrittenPitch(inPlace=True, ottavasToSounding=True)
 
         self.scorePreliminaries()
 
@@ -2707,8 +2706,7 @@ class PartExporter(XMLExporterBase):
         # unless makeNotation=False, but the user
         # should have called toWrittenPitch() first
         # and is explicitly asking for no further copies to be made
-        if self.stream.atSoundingPitch is True:
-            self.stream.toWrittenPitch(inPlace=True)
+        self.stream.toWrittenPitch(inPlace=True, ottavasToSounding=True)
 
         # Suppose that everything below this is a measure
         if self.makeNotation:
