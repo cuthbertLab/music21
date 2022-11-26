@@ -5292,7 +5292,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
                     at_sounding = site.atSoundingPitch
                     break
             else:
-                raise StreamException('atSoundingPitch is unknown: cannot transpose')
+                return 'unknown'
 
         for substream in self.recurse(streamsOnly=True, includeSelf=False):
             if substream.atSoundingPitch == 'unknown':
@@ -5337,14 +5337,13 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         'C3'
 
         If 'atSoundingPitch' is unknown for this Stream and all of its parent Streams
-        then will raise a StreamException:
+        then no transposition will take place (this used to raise an exception):
 
         >>> s = stream.Score()
         >>> p = stream.Part(id='partEmpty')
         >>> s.append(p)
         >>> p.toSoundingPitch()
-        Traceback (most recent call last):
-        music21.exceptions21.StreamException: atSoundingPitch is unknown: cannot transpose
+        <music21.stream.Part partEmpty>
         >>> s.atSoundingPitch = False
         >>> sp = p.toSoundingPitch()
         >>> sp
