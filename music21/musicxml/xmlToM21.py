@@ -1587,21 +1587,44 @@ class PartParser(XMLParserBase):
 
         # copy spanners that are complete into the part, as this is the
         # highest level container that needs them
-        rm = []
+        completedSpanners = []
         for sp in self.spannerBundle.getByCompleteStatus(True):
             self.stream.coreInsert(0, sp)
-            rm.append(sp)
+            completedSpanners.append(sp)
         # remove from original spanner bundle
-        for sp in rm:
+        for sp in completedSpanners:
             self.spannerBundle.remove(sp)
         # s is the score; adding the part to the score
         self.stream.coreElementsChanged()
 
+        partStaffs: list[stream.PartStaff] = []
         if self.maxStaves > 1:
-            self.separateOutPartStaves()
+            partStaffs = self.separateOutPartStaves()
         else:
             self.stream.addGroupForElements(self.partId)  # set group for components (recurse?)
             self.stream.groups.append(self.partId)  # set group for stream itself
+
+        for sp in completedSpanners:
+            if isinstance(sp, spanner.Ottava):
+                ottavaPart: stream.Part | None = None
+                if partStaffs:
+                    ottavaPart = self.findFirstPartContaining(sp.getFirst(), partStaffs)
+                else:
+                    ottavaPart = self.stream
+
+                if ottavaPart:
+                    sp.fillIntermediateSpannedElements(ottavaPart)
+
+    def findFirstPartContaining(
+        self,
+        obj: base.Music21Object,
+        parts: list[stream.Part]
+    ) -> stream.Part | None:
+        for part in parts:
+            for mObj in part.recurse().getElementsByClass(obj.classes[0]):
+                if mObj is obj:
+                    return part
+        return None
 
     def parseXmlScorePart(self):
         '''
@@ -1820,7 +1843,7 @@ class PartParser(XMLParserBase):
         if lmp.stream.recurse().notesAndRests.last() is endedForwardRest:
             lmp.stream.remove(endedForwardRest, recurse=True)
 
-    def separateOutPartStaves(self):
+    def separateOutPartStaves(self) -> list[stream.PartStaff]:
         '''
         Take a `Part` with multiple staves and make them a set of `PartStaff` objects.
 
@@ -1909,6 +1932,7 @@ class PartParser(XMLParserBase):
         # and thus that these next two lines are not needed:
         # score.remove(originalPartStaff)
         # del self.parent.m21PartObjectsById[originalPartStaff.id]
+        return partStaffs
 
     def _getStaffExclude(
         self,
