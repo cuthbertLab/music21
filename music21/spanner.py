@@ -212,6 +212,7 @@ class Spanner(base.Music21Object):
                  *spannedElements: t.Union[base.Music21Object,
                                            Sequence[base.Music21Object]],
                  **keywords):
+        from music21 import note
         super().__init__(**keywords)
 
         # store a Stream inside of Spanner
@@ -240,10 +241,25 @@ class Spanner(base.Music21Object):
 
         # parameters that spanners need in loading and processing
         # local id is the id for the local area; used by musicxml
-        self.idLocal = None
+        self.idLocal: str | None = None
         # after all spannedElements have been gathered, setting complete
         # will mark that all parts have been gathered.
         self.completeStatus = False
+
+        # data for fillIntermediateElements:
+
+        # fillElementTypes is a list of types of object to search for.  This
+        # can be set to something different in the __init__ of a particular
+        # type of Spanner.
+        self.fillElementType: list[t.Type] = [note.GeneralNote, SpannerAnchor]
+
+        # After a fillIntermediateElements operation, filledStatus
+        # will be set to True.  Parsers and other clients can also set
+        # this to False or True to mark whether or not a fill operation
+        # is needed (False means fill is needed, True means fill is
+        # not needed, presumably because the fill was done by hand).
+        # Initialized to 'unknown'.
+        self.filledStatus: bool | t.Literal['unknown'] = 'unknown'
 
     def _reprInternal(self):
         msg = []
@@ -530,6 +546,68 @@ class Spanner(base.Music21Object):
 
         # environLocal.printDebug(['replaceSpannedElement()', 'id(old)', id(old),
         #    'id(new)', id(new)])
+
+    def fillIntermediateElements(
+        self,
+        searchStream,  # yikes
+        *,
+        includeEndBoundary: bool = True,
+        mustFinishInSpan: bool = False,
+        mustBeginInSpan: bool = True,
+        includeElementsThatEndAtStart: bool = False
+    ):
+        if self.filledStatus is True:
+            # Don't fill twice.  If client wants this they can set fillComplete to False first.
+            return
+        if self.getFirst() is None:
+            # no spanned elements?  Nothing to fill.
+            return
+
+        if t.TYPE_CHECKING:
+            from music21.stream import Stream
+            assert isinstance(searchStream, Stream)
+
+        endElement: base.Music21Object | None = None
+        if len(self) > 1:
+            # Start and end elements are different, we can't just append everything, we need
+            # to save off the end element, remove it, add everything, then add the end element
+            # again.  Note that if there are actually more than 2 elements before we start
+            # filling, the new intermediate elements will come after the existing ones,
+            # regardless of offset.  But first and last will still be the same two elements
+            # as before, which is the most important thing.
+            endElement = self.getLast()
+            if t.TYPE_CHECKING:
+                assert endElement is not None
+            self.spannerStorage.remove(endElement)
+
+        startOffsetInHierarchy: OffsetQL = self.getFirst().getOffsetInHierarchy(searchStream)
+        endOffsetInHierarchy: OffsetQL
+        if endElement is not None:
+            endOffsetInHierarchy = (
+                endElement.getOffsetInHierarchy(searchStream) + endElement.quarterLength
+            )
+        else:
+            endOffsetInHierarchy = (
+                self.getLast().getOffsetInHierarchy(searchStream) + self.getLast().quarterLength
+            )
+
+        for foundElement in (searchStream
+                .recurse()
+                .getElementsByOffsetInHierarchy(
+                    startOffsetInHierarchy,
+                    endOffsetInHierarchy,
+                    includeEndBoundary=includeEndBoundary,
+                    mustFinishInSpan=mustFinishInSpan,
+                    mustBeginInSpan=mustBeginInSpan,
+                    includeElementsThatEndAtStart=includeElementsThatEndAtStart)
+                .getElementsByClass(self.fillElementType)):
+            self.addSpannedElements(foundElement)
+
+        if endElement is not None:
+            # add it back in as the end element
+            self.addSpannedElements(endElement)
+
+        self.filledStatus = True
 
     def isFirst(self, spannedElement):
         '''
