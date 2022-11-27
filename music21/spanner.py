@@ -550,7 +550,7 @@ class Spanner(base.Music21Object):
         self,
         searchStream,  # yikes
         *,
-        includeEndBoundary: bool = True,
+        includeEndBoundary: bool = False,
         mustFinishInSpan: bool = False,
         mustBeginInSpan: bool = True,
         includeElementsThatEndAtStart: bool = False
