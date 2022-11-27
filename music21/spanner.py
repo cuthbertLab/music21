@@ -564,8 +564,8 @@ class Spanner(base.Music21Object):
             return
 
         if t.TYPE_CHECKING:
-            from music21.stream import Stream
-            assert isinstance(searchStream, Stream)
+            from music21 import stream
+            assert isinstance(searchStream, stream.Stream)
 
         endElement: base.Music21Object | None = None
         if len(self) > 1:
@@ -601,7 +601,8 @@ class Spanner(base.Music21Object):
                     mustBeginInSpan=mustBeginInSpan,
                     includeElementsThatEndAtStart=includeElementsThatEndAtStart)
                 .getElementsByClass(self.fillElementType)):
-            self.addSpannedElements(foundElement)
+            if endElement is None or foundElement is not endElement:
+                self.addSpannedElements(foundElement)
 
         if endElement is not None:
             # add it back in as the end element
