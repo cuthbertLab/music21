@@ -212,7 +212,6 @@ class Spanner(base.Music21Object):
                  *spannedElements: t.Union[base.Music21Object,
                                            Sequence[base.Music21Object]],
                  **keywords):
-        from music21 import note
         super().__init__(**keywords)
 
         # store a Stream inside of Spanner
@@ -251,7 +250,7 @@ class Spanner(base.Music21Object):
         # fillElementTypes is a list of types of object to search for.  This
         # can be set to something different in the __init__ of a particular
         # type of Spanner.
-        self.fillElementType: list[t.Type] = [note.GeneralNote, SpannerAnchor]
+        self.fillElementTypes: list[t.Type] = [base.Music21Object]
 
         # After a fillIntermediateElements operation, filledStatus
         # will be set to True.  Parsers and other clients can also set
@@ -547,7 +546,7 @@ class Spanner(base.Music21Object):
         # environLocal.printDebug(['replaceSpannedElement()', 'id(old)', id(old),
         #    'id(new)', id(new)])
 
-    def fillIntermediateElements(
+    def fillIntermediateSpannedElements(
         self,
         searchStream,  # yikes
         *,
@@ -559,6 +558,7 @@ class Spanner(base.Music21Object):
         if self.filledStatus is True:
             # Don't fill twice.  If client wants this they can set fillComplete to False first.
             return
+
         if self.getFirst() is None:
             # no spanned elements?  Nothing to fill.
             return
@@ -600,7 +600,7 @@ class Spanner(base.Music21Object):
                     mustFinishInSpan=mustFinishInSpan,
                     mustBeginInSpan=mustBeginInSpan,
                     includeElementsThatEndAtStart=includeElementsThatEndAtStart)
-                .getElementsByClass(self.fillElementType)):
+                .getElementsByClass(self.fillElementTypes)):
             if endElement is None or foundElement is not endElement:
                 self.addSpannedElements(foundElement)
 
@@ -1621,7 +1621,9 @@ class Ottava(Spanner):
                  transposing: bool = True,
                  placement: t.Literal['above', 'below'] = 'above',
                  **keywords):
+        from music21 import note
         super().__init__(*spannedElements, **keywords)
+        self.fillElementTypes = [note.NotRest]
         self._type = None  # can be 8va, 8vb, 15ma, 15mb
         self.type = type
 
