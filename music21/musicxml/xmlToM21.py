@@ -1605,15 +1605,14 @@ class PartParser(XMLParserBase):
             self.stream.groups.append(self.partId)  # set group for stream itself
 
         for sp in completedSpanners:
-            if isinstance(sp, spanner.Ottava):
-                ottavaPart: stream.Part | None = None
-                if partStaffs:
-                    ottavaPart = self.findFirstPartContaining(sp.getFirst(), partStaffs)
-                else:
-                    ottavaPart = self.stream
+            spannerPart: stream.Part | None = None
+            if partStaffs:
+                spannerPart = self.findFirstPartContaining(sp.getFirst(), partStaffs)
+            else:
+                spannerPart = self.stream
 
-                if ottavaPart:
-                    sp.fillIntermediateSpannedElements(ottavaPart)
+            if spannerPart:
+                sp.fillIntermediateSpannedElements(spannerPart)
 
     def findFirstPartContaining(
         self,

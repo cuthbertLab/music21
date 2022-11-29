@@ -587,12 +587,21 @@ class Spanner(base.Music21Object):
                 assert endElement is not None
             self.spannerStorage.remove(endElement)
 
-        startOffsetInHierarchy: OffsetQL = self.getFirst().getOffsetInHierarchy(searchStream)
+        try:
+            startOffsetInHierarchy: OffsetQL = self.getFirst().getOffsetInHierarchy(searchStream)
+        except:
+            # print('start element not in searchStream')
+            return
+
         endOffsetInHierarchy: OffsetQL
         if endElement is not None:
-            endOffsetInHierarchy = (
-                endElement.getOffsetInHierarchy(searchStream) + endElement.quarterLength
-            )
+            try:
+                endOffsetInHierarchy = (
+                    endElement.getOffsetInHierarchy(searchStream) + endElement.quarterLength
+                )
+            except:
+                # print('end element not in searchStream')
+                return
         else:
             endOffsetInHierarchy = (
                 self.getLast().getOffsetInHierarchy(searchStream) + self.getLast().quarterLength
