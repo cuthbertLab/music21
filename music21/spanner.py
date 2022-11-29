@@ -32,6 +32,7 @@ from music21 import duration
 from music21 import environment
 from music21 import exceptions21
 from music21 import prebase
+from music21 import sites
 from music21 import style
 from music21.common.types import OffsetQL
 from music21.common.types import OffsetQLIn
@@ -589,7 +590,7 @@ class Spanner(base.Music21Object):
 
         try:
             startOffsetInHierarchy: OffsetQL = self.getFirst().getOffsetInHierarchy(searchStream)
-        except:
+        except sites.SitesException:
             # print('start element not in searchStream')
             return
 
@@ -599,7 +600,7 @@ class Spanner(base.Music21Object):
                 endOffsetInHierarchy = (
                     endElement.getOffsetInHierarchy(searchStream) + endElement.quarterLength
                 )
-            except:
+            except sites.SitesException:
                 # print('end element not in searchStream')
                 return
         else:
