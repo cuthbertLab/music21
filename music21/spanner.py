@@ -592,6 +592,8 @@ class Spanner(base.Music21Object):
             startOffsetInHierarchy: OffsetQL = self.getFirst().getOffsetInHierarchy(searchStream)
         except sites.SitesException:
             # print('start element not in searchStream')
+            if endElement is not None:
+                self.addSpannedElements(endElement)
             return
 
         endOffsetInHierarchy: OffsetQL
@@ -602,6 +604,7 @@ class Spanner(base.Music21Object):
                 )
             except sites.SitesException:
                 # print('end element not in searchStream')
+                self.addSpannedElements(endElement)
                 return
         else:
             endOffsetInHierarchy = (
@@ -1755,8 +1758,10 @@ class Ottava(Spanner):
     def performTransposition(self):
         '''
         On a transposing spanner, switch to non-transposing,
-        set style.hideObjectOnPrint to True, and transpose all notes and chords
-        in the spanner.  Called by :meth:`~music21.stream.Stream.toSoundingPitch` in Stream
+        and transpose all notes and chords in the spanner.
+        The note/chords will all be transposed to their sounding
+        pitch (at least as far as the ottava is concerned;
+        transposing instruments are handled separately).
 
         >>> ottava = spanner.Ottava(type='8va')
         >>> n1 = note.Note('D#4')
@@ -1775,22 +1780,26 @@ class Ottava(Spanner):
         if not self.transposing:
             return
         self.transposing = False
-        self.style.hideObjectOnPrint = True
 
         myInterval = self.interval()
         for n in self.getSpannedElements():
             if not hasattr(n, 'pitches'):
                 continue
             for p in n.pitches:
+                # Since we are transposing by octave(s), the accidental configuration
+                # is still valid.  Restore it after the transposition (which loses
+                # some info, like whether or not the accidental should be displayed).
+                oldAccidental: pitch.Accidental | None = copy.deepcopy(p.accidental)
                 p.transpose(myInterval, inPlace=True)
+                p.accidental = oldAccidental
 
     def undoTransposition(self):
         '''
         Change a non-transposing spanner to a transposing spanner,
-        making sure it is not hidden and transpose back all the notes
-        and chords in the spanner.
-
-        Called by :meth:`~music21.stream.Stream.toWrittenPitch` in Stream
+        and transpose back all the notes and chords in the spanner.
+        The notes/chords will all be transposed to their written
+        pitch (at least as far as the ottava is concerned;
+        transposing instruments are handled separately).
 
         >>> ottava = spanner.Ottava(type='8va')
         >>> n1 = note.Note('D#4')
@@ -1808,14 +1817,18 @@ class Ottava(Spanner):
         if self.transposing:
             return
         self.transposing = True
-        self.style.hideObjectOnPrint = False
 
         myInterval = self.interval(reverse=True)
         for n in self.getSpannedElements():
             if not hasattr(n, 'pitches'):
                 continue
             for p in n.pitches:
+                # Since we are transposing by octave(s), the accidental configuration
+                # is still valid.  Restore it after the transposition (which loses
+                # some info, like whether or not the accidental should be displayed).
+                oldAccidental: pitch.Accidental | None = copy.deepcopy(p.accidental)
                 p.transpose(myInterval, inPlace=True)
+                p.accidental = oldAccidental
 
 
 

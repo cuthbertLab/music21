@@ -1495,6 +1495,19 @@ class TremoloSpanner(spanner.Spanner):
         self.measured = True
         self._numberOfMarks = 3
 
+    def fillIntermediateSpannedElements(
+        self,
+        searchStream,  # yikes
+        *,
+        includeEndBoundary: bool = False,
+        mustFinishInSpan: bool = False,
+        mustBeginInSpan: bool = True,
+        includeElementsThatEndAtStart: bool = False
+    ):
+        # TremoloSpanners need to be filled by hand with the exact notes involved.
+        # We cannot automatically fill them.
+        return
+
     @property
     def numberOfMarks(self):
         '''
