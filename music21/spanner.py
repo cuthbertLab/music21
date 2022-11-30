@@ -1755,7 +1755,7 @@ class Ottava(Spanner):
         header += str(self.shiftMagnitude())
         return Interval(header)
 
-    def performTransposition(self):
+    def performTransposition(self) -> None:
         '''
         On a transposing spanner, switch to non-transposing,
         and transpose all notes and chords in the spanner.
@@ -1777,6 +1777,8 @@ class Ottava(Spanner):
         >>> n1.nameWithOctave
         'D#5'
         '''
+        from music21 import pitch
+
         if not self.transposing:
             return
         self.transposing = False
@@ -1793,7 +1795,7 @@ class Ottava(Spanner):
                 p.transpose(myInterval, inPlace=True)
                 p.accidental = oldAccidental
 
-    def undoTransposition(self):
+    def undoTransposition(self) -> None:
         '''
         Change a non-transposing spanner to a transposing spanner,
         and transpose back all the notes and chords in the spanner.
@@ -1814,6 +1816,8 @@ class Ottava(Spanner):
         >>> n1.nameWithOctave
         'D#3'
         '''
+        from music21 import pitch
+
         if self.transposing:
             return
         self.transposing = True
