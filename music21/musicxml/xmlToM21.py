@@ -1586,10 +1586,14 @@ class PartParser(XMLParserBase):
         # will be copied into the Score
 
         # copy spanners that are complete into the part, as this is the
-        # highest level container that needs them
+        # highest level container that needs them. Ottavas are the exception,
+        # they should be put in the PartStaff that contains the first note
+        # in the Ottava.
         completedSpanners = []
         for sp in self.spannerBundle.getByCompleteStatus(True):
-            self.stream.coreInsert(0, sp)
+            if not isinstance(sp, spanner.Ottava):
+                # don't insert Ottavas, we'll do that after separateOutPartStaves().
+                self.stream.coreInsert(0, sp)
             completedSpanners.append(sp)
         # remove from original spanner bundle
         for sp in completedSpanners:
@@ -1605,6 +1609,10 @@ class PartParser(XMLParserBase):
             self.stream.groups.append(self.partId)  # set group for stream itself
 
         for sp in completedSpanners:
+            if not isinstance(sp, spanner.Ottava):
+                # non-Ottavas do not need to be inserted into a particular PartStaff,
+                # nor do they need to be filled.
+                continue
             spannerPart: stream.Part | None = None
             if partStaffs:
                 spannerPart = self.findFirstPartContaining(sp.getFirst(), partStaffs)
@@ -1612,6 +1620,8 @@ class PartParser(XMLParserBase):
                 spannerPart = self.stream
 
             if spannerPart:
+                spannerPart.coreInsert(0, sp)
+                spannerPart.coreElementsChanged()
                 sp.fillIntermediateSpannedElements(spannerPart)
 
     def findFirstPartContaining(
@@ -1619,6 +1629,8 @@ class PartParser(XMLParserBase):
         obj: base.Music21Object,
         parts: list[stream.Part]
     ) -> stream.Part | None:
+        # This can be quite slow if the object is a long way into the first partstaff
+        # or in a second (or third?) partstaff.  I hope for a faster alternative.
         for part in parts:
             for mObj in part.recurse().getElementsByClass(obj.classes[0]):
                 if mObj is obj:
