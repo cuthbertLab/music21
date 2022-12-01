@@ -3163,7 +3163,7 @@ class RomanNumeral(harmony.Harmony):
                 f'_updatePitches() was unable to derive pitches from the figure: {self.figure!r}'
             )  # pragma: no cover
 
-    def transpose(self: T, value, *, inPlace=False) -> T | None:
+    def transpose(self: T, value, *, inPlace=False, inheritAccidentalDisplay=False) -> T | None:
         '''
         Overrides :meth:`~music21.harmony.Harmony.transpose` so that `key`
         attribute is transposed as well.
@@ -3179,10 +3179,14 @@ class RomanNumeral(harmony.Harmony):
         '''
         post = super().transpose(value, inPlace=inPlace)
         if not inPlace:
-            post.key = self.key.transpose(value, inPlace=False)
+            post.key = self.key.transpose(
+                value, inPlace=False, inheritAccidentalDisplay=inheritAccidentalDisplay
+            )
             return post
         else:
-            self.key = self.key.transpose(value, inPlace=False)
+            self.key = self.key.transpose(
+                value, inPlace=False, inheritAccidentalDisplay=inheritAccidentalDisplay
+            )
             return None
 
 

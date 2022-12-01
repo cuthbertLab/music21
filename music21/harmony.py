@@ -2444,7 +2444,12 @@ class NoChord(ChordSymbol):
         # do nothing, everything is already set.
         return
 
-    def transpose(self: NCT, _value, *, inPlace=False, inheritAccidentalDisplay=False) -> NCT | None:
+    def transpose(
+        self: NCT,
+        _value, *,
+        inPlace=False,
+        inheritAccidentalDisplay=False
+    ) -> NCT | None:
         '''
         Overrides :meth:`~music21.chord.Chord.transpose` to do nothing.
 
