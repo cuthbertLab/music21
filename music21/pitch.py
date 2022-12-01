@@ -4466,15 +4466,12 @@ class Pitch(prebase.ProtoM21Object):
         else:  # try to process
             intervalObj = interval.Interval(value)
 
-        p = intervalObj.transposePitch(self)
+        p = intervalObj.transposePitch(self)  # always inheritsAccidentalDisplay
         if not isinstance(value, int):
             p.spellingIsInferred = self.spellingIsInferred
 
         if p.spellingIsInferred is True:
-            p.simplifyEnharmonic(inPlace=True, mostCommon=True)
-
-        if inheritAccidentalDisplay:
-            p.inheritDisplay(self)
+            p.simplifyEnharmonic(inPlace=True, mostCommon=True)  # might have to not inherit
 
         if not inPlace:
             return p
