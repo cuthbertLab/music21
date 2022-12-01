@@ -3335,7 +3335,8 @@ class Interval(IntervalBase):
                        *,
                        reverse=False,
                        maxAccidental: int | None = 4,
-                       inPlace=False):
+                       inPlace=False,
+                       inheritAccidentalDisplay=False):
         '''
         Given a :class:`~music21.pitch.Pitch` object, return a new,
         transposed Pitch, that is transformed
@@ -3400,7 +3401,12 @@ class Interval(IntervalBase):
         <music21.pitch.Pitch D4>
         '''
         if reverse:
-            return self.reverse().transposePitch(p, maxAccidental=maxAccidental, inPlace=inPlace)
+            return self.reverse().transposePitch(
+                p,
+                maxAccidental=maxAccidental,
+                inPlace=inPlace,
+                inheritAccidentalDisplay=inheritAccidentalDisplay
+            )
 
         if maxAccidental is None:
             maxAccidental = 99999
@@ -3415,7 +3421,8 @@ class Interval(IntervalBase):
             pOut = self._diatonicTransposePitch(
                 p,
                 maxAccidental=maxAccidental,
-                inPlace=inPlace
+                inPlace=inPlace,
+                inheritAccidentalDisplay=inheritAccidentalDisplay
             )
 
         if p.fundamental is not None:
@@ -3435,7 +3442,8 @@ class Interval(IntervalBase):
                                 p: pitch.Pitch,
                                 *,
                                 maxAccidental: int,
-                                inPlace: bool = False):
+                                inPlace: bool = False,
+                                inheritAccidentalDisplay: bool = False):
         '''
         abstracts out the diatonic aspects of transposing, so that implicitDiatonic and
         regular diatonic can use some of the same code.
@@ -3490,10 +3498,12 @@ class Interval(IntervalBase):
                 # cannot import Accidental here.
                 pitch2.accidental = halfStepsToFix  # type:ignore
 
-            # inherit accidental display type etc. but not current status
+            # inherit accidental display type etc. but not current status (unless
+            # inheritAccidentalDisplay is set, in which case inherit everything)
             if pitch2.accidental is not None and pitch1.accidental is not None:
                 pitch2.accidental.inheritDisplay(pitch1.accidental)
-                pitch2.accidental.displayStatus = None  # set accidental display to None
+                if not inheritAccidentalDisplay:
+                    pitch2.accidental.displayStatus = None  # set accidental display to None
 
         if useImplicitOctave is True:
             pitch2.octave = None

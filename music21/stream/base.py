@@ -5203,9 +5203,10 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
             raise StreamException(f'not a valid at sounding pitch value: {value}')
 
     def _transposeByInstrument(self,
-                               reverse=False,
-                               inPlace=False,
-                               transposeKeySignature=True):
+                               reverse: bool = False,
+                               inPlace: bool = False,
+                               transposeKeySignature: bool = True,
+                               inheritAccidentalDisplay: bool = False):
         '''
         Transpose the Stream according to each instrument's transposition.
 
@@ -5255,7 +5256,8 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
                 trans = trans.reverse()
             focus.transpose(trans,
                             inPlace=True,
-                            classFilterList=classFilterList)
+                            classFilterList=classFilterList,
+                            inheritAccidentalDisplay=inheritAccidentalDisplay)
 
         # restore original durations
         for inst, original_ql in instrument_map.items():
@@ -5263,7 +5265,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
 
         return returnObj
 
-    def _treatAtSoundingPitch(self) -> bool | str:
+    def _treatAtSoundingPitch(self, inheritAccidentalDisplay: bool = False) -> bool | str:
         '''
         `atSoundingPitch` might be True, False, or 'unknown'. Given that
         setting the property does not automatically synchronize the corresponding
@@ -5298,13 +5300,17 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
             if substream.atSoundingPitch == 'unknown':
                 continue
             if substream.atSoundingPitch is False and at_sounding is True:
-                substream.toSoundingPitch(inPlace=True)
+                substream.toSoundingPitch(
+                    inPlace=True, inheritAccidentalDisplay=inheritAccidentalDisplay
+                )
             elif substream.atSoundingPitch is True and at_sounding is False:
-                substream.toWrittenPitch(inPlace=True)
+                substream.toWrittenPitch(
+                    inPlace=True, inheritAccidentalDisplay=inheritAccidentalDisplay
+                )
 
         return at_sounding
 
-    def toSoundingPitch(self, *, inPlace=False):
+    def toSoundingPitch(self, *, inheritAccidentalDisplay: bool = False, inPlace: bool = False):
         # noinspection PyShadowingNames
         '''
         If not at sounding pitch, transpose all Pitch
@@ -5364,25 +5370,37 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         if returnObj.hasPartLikeStreams() or 'Opus' in returnObj.classSet:
             for partLike in returnObj.getElementsByClass(Stream):
                 # call on each part
-                partLike.toSoundingPitch(inPlace=True)
+                partLike.toSoundingPitch(
+                    inPlace=True, inheritAccidentalDisplay=inheritAccidentalDisplay
+                )
             returnObj.atSoundingPitch = True
             return returnObj if not inPlace else None
 
-        at_sounding = returnObj._treatAtSoundingPitch()
+        at_sounding = returnObj._treatAtSoundingPitch(
+            inheritAccidentalDisplay=inheritAccidentalDisplay
+        )
 
         if at_sounding is False:
             # transposition defined on instrument goes from written to sounding
-            returnObj._transposeByInstrument(reverse=False, inPlace=True)
+            returnObj._transposeByInstrument(
+                reverse=False, inPlace=True, inheritAccidentalDisplay=inheritAccidentalDisplay
+            )
             for container in returnObj.recurse(streamsOnly=True, includeSelf=True):
                 container.atSoundingPitch = True
 
         for ottava in returnObj[spanner.Ottava]:
-            ottava.performTransposition()
+            ottava.performTransposition(inheritAccidentalDisplay=inheritAccidentalDisplay)
 
         if not inPlace:
             return returnObj  # the Stream or None
 
-    def toWrittenPitch(self, *, ottavasToSounding=False, inPlace=False):
+    def toWrittenPitch(
+        self,
+        *,
+        ottavasToSounding: bool = False,
+        inheritAccidentalDisplay: bool = False,
+        inPlace: bool = False
+    ):
         '''
         If not at written pitch, transpose all Pitch elements to
         written pitch. The atSoundingPitch property is used to
@@ -5419,6 +5437,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         * Changed in v5 returns `None` if `inPlace=True`
         '''
         from music21 import spanner
+        from music21 import stream
 
         if not inPlace:  # make a copy
             returnObj = self.coreCopyAsDerivation('toWrittenPitch')
@@ -5428,22 +5447,30 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         if returnObj.hasPartLikeStreams() or 'Opus' in returnObj.classes:
             for partLike in returnObj.getElementsByClass('Stream'):
                 # call on each part
-                partLike.toWrittenPitch(inPlace=True, ottavasToSounding=ottavasToSounding)
+                if t.TYPE_CHECKING:
+                    assert isinstance(partLike, stream.Stream)
+                partLike.toWrittenPitch(
+                    inPlace=True,
+                    ottavasToSounding=ottavasToSounding,
+                    inheritAccidentalDisplay=inheritAccidentalDisplay
+                )
             returnObj.atSoundingPitch = False
         else:
             at_sounding = returnObj._treatAtSoundingPitch()
             if at_sounding is True:
                 # need to reverse to go to written
-                returnObj._transposeByInstrument(reverse=True, inPlace=True)
+                returnObj._transposeByInstrument(
+                    reverse=True, inPlace=True, inheritAccidentalDisplay=inheritAccidentalDisplay
+                )
                 for container in returnObj.recurse(streamsOnly=True, includeSelf=True):
                     container.atSoundingPitch = False
 
         if ottavasToSounding:
             for ottava in returnObj[spanner.Ottava]:
-                ottava.performTransposition()
+                ottava.performTransposition(inheritAccidentalDisplay=inheritAccidentalDisplay)
         else:
             for ottava in returnObj[spanner.Ottava]:
-                ottava.undoTransposition()
+                ottava.undoTransposition(inheritAccidentalDisplay=inheritAccidentalDisplay)
 
         if not inPlace:
             return returnObj
@@ -8892,9 +8919,10 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         value: str | int | 'music21.interval.IntervalBase',
         /,
         *,
-        inPlace=False,
-        recurse=True,
-        classFilterList=None
+        inPlace: bool = False,
+        recurse: bool = True,
+        classFilterList=None,
+        inheritAccidentalDisplay: bool = False
     ):
         # noinspection PyShadowingNames
         '''
@@ -8978,7 +9006,9 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
                         for p in e.pitches:  # type: ignore
                             intv.transposePitchKeyAware(p, k, inPlace=True)
                 else:
-                    e.transpose(value, inPlace=True)
+                    e.transpose(
+                        value, inPlace=True, inheritAccidentalDisplay=inheritAccidentalDisplay
+                    )
         if not inPlace:
             return post
         else:

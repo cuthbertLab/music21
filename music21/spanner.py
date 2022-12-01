@@ -557,6 +557,10 @@ class Spanner(base.Music21Object):
         mustBeginInSpan: bool = True,
         includeElementsThatEndAtStart: bool = False
     ):
+        if t.TYPE_CHECKING:
+            from music21 import stream
+            assert isinstance(searchStream, stream.Stream)
+
         if self.filledStatus is True:
             # Don't fill twice.  If client wants this they can set fillComplete to False first.
             return
@@ -570,10 +574,6 @@ class Spanner(base.Music21Object):
 #             # types that are already there.
 #             for el in self.spannerStorage:
 #                 self.fillElementTypes.append(type(el))
-
-        if t.TYPE_CHECKING:
-            from music21 import stream
-            assert isinstance(searchStream, stream.Stream)
 
         endElement: base.Music21Object | None = None
         if len(self) > 1:
@@ -1755,7 +1755,7 @@ class Ottava(Spanner):
         header += str(self.shiftMagnitude())
         return Interval(header)
 
-    def performTransposition(self) -> None:
+    def performTransposition(self, inheritAccidentalDisplay: bool = False):
         '''
         On a transposing spanner, switch to non-transposing,
         and transpose all notes and chords in the spanner.
@@ -1777,8 +1777,6 @@ class Ottava(Spanner):
         >>> n1.nameWithOctave
         'D#5'
         '''
-        from music21 import pitch
-
         if not self.transposing:
             return
         self.transposing = False
@@ -1788,14 +1786,11 @@ class Ottava(Spanner):
             if not hasattr(n, 'pitches'):
                 continue
             for p in n.pitches:
-                # Since we are transposing by octave(s), the accidental configuration
-                # is still valid.  Restore it after the transposition (which loses
-                # some info, like whether or not the accidental should be displayed).
-                oldAccidental: pitch.Accidental | None = copy.deepcopy(p.accidental)
-                p.transpose(myInterval, inPlace=True)
-                p.accidental = oldAccidental
+                p.transpose(
+                    myInterval, inheritAccidentalDisplay=inheritAccidentalDisplay, inPlace=True
+                )
 
-    def undoTransposition(self) -> None:
+    def undoTransposition(self, inheritAccidentalDisplay: bool = False):
         '''
         Change a non-transposing spanner to a transposing spanner,
         and transpose back all the notes and chords in the spanner.
@@ -1816,8 +1811,6 @@ class Ottava(Spanner):
         >>> n1.nameWithOctave
         'D#3'
         '''
-        from music21 import pitch
-
         if self.transposing:
             return
         self.transposing = True
@@ -1827,12 +1820,9 @@ class Ottava(Spanner):
             if not hasattr(n, 'pitches'):
                 continue
             for p in n.pitches:
-                # Since we are transposing by octave(s), the accidental configuration
-                # is still valid.  Restore it after the transposition (which loses
-                # some info, like whether or not the accidental should be displayed).
-                oldAccidental: pitch.Accidental | None = copy.deepcopy(p.accidental)
-                p.transpose(myInterval, inPlace=True)
-                p.accidental = oldAccidental
+                p.transpose(
+                    myInterval, inheritAccidentalDisplay=inheritAccidentalDisplay, inPlace=True
+                )
 
 
 
