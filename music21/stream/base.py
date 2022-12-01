@@ -5235,6 +5235,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         instrument_stream = instrument_stream.extendDuration('Instrument', inPlace=False)
 
         # store class filter list for transposition
+        classFilterList: t.Tuple[t.Type, ...]
         if transposeKeySignature:
             classFilterList = (note.Note, chord.Chord, key.KeySignature)
         else:
@@ -5245,7 +5246,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
                 continue
             start = inst.offset
             end = start + inst.quarterLength
-            focus = returnObj.flatten().getElementsByOffset(
+            focus: Stream = returnObj.flatten().getElementsByOffset(
                 start,
                 end,
                 includeEndBoundary=False,
