@@ -3494,6 +3494,7 @@ class Interval(IntervalBase):
         newStep, newOctave = convertDiatonicNumberToStep(newDiatonicNumber)
         pitch2.step = newStep
         pitch2.octave = newOctave
+        oldPitch2Accidental = pitch2.accidental
         pitch2.accidental = None
         # if this is not set to None then terrible things happen
         pitch2.microtone = None  # type: ignore
@@ -3531,6 +3532,11 @@ class Interval(IntervalBase):
                 pitch2.accidental.inheritDisplay(pitch1.accidental)
                 if not inheritAccidentalDisplay:
                     pitch2.accidental.displayStatus = None  # set accidental display to None
+        else:
+            # no halfStepsToFix, restore oldPitch2Accidental if possible
+            if (pitch2.accidental is None
+                    and oldPitch2Accidental is not None and oldPitch2Accidental.name == 'natural'):
+                pitch2.accidental = oldPitch2Accidental
 
         if useImplicitOctave is True:
             pitch2.octave = None
