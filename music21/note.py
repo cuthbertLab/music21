@@ -37,6 +37,7 @@ from music21 import prebase
 from music21 import style
 from music21 import tie
 from music21 import volume
+from music21 import articulations
 
 if t.TYPE_CHECKING:
     from music21 import articulations
