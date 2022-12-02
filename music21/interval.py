@@ -743,7 +743,8 @@ class IntervalBase(base.Music21Object):
     def transposePitch(self,
                        pitch1: pitch.Pitch,
                        *,
-                       inPlace: bool = False):
+                       inPlace: bool = False,
+                       inheritAccidentalDisplay=False):
         '''
         IntervalBase does not know how to do this, so it must be overridden in
         derived classes.
@@ -1369,9 +1370,17 @@ class GenericInterval(IntervalBase):
         else:
             return GenericInterval(self.undirected * (-1 * self.direction))
 
-    def transposePitch(self, p: pitch.Pitch, *, inPlace=False):
+    def transposePitch(
+        self,
+        p: pitch.Pitch,
+        *,
+        inPlace=False,
+        inheritAccidentalDisplay=False
+    ):
         '''
         transpose a pitch, retaining the accidental if any.
+        Always inherits accidental display, despite being
+        passed inheritAccidentalDisplay.
 
         >>> aPitch = pitch.Pitch('g4')
         >>> genericFifth = interval.GenericInterval(5)
@@ -2136,7 +2145,13 @@ class DiatonicInterval(IntervalBase):
 
         return ChromaticInterval(semitones)
 
-    def transposePitch(self, p: pitch.Pitch, *, inPlace=False):
+    def transposePitch(
+        self,
+        p: pitch.Pitch,
+        *,
+        inPlace=False,
+        inheritAccidentalDisplay=False
+    ):
         # noinspection PyShadowingNames
         '''
         Calls transposePitch from a full interval object.
@@ -2162,7 +2177,9 @@ class DiatonicInterval(IntervalBase):
         * Changed in v6: added inPlace
         '''
         fullIntervalObject = Interval(diatonic=self, chromatic=self.getChromatic())
-        return fullIntervalObject.transposePitch(p, inPlace=inPlace)
+        return fullIntervalObject.transposePitch(
+            p, inPlace=inPlace, inheritAccidentalDisplay=inheritAccidentalDisplay
+        )
 
     @property
     def specifierAbbreviation(self) -> str:
@@ -2444,12 +2461,20 @@ class ChromaticInterval(IntervalBase):
         specifier, generic = convertSemitoneToSpecifierGeneric(self.semitones)
         return DiatonicInterval(specifier, generic)
 
-    def transposePitch(self, p: pitch.Pitch, *, inPlace=False):
+    def transposePitch(
+        self,
+        p: pitch.Pitch,
+        *,
+        inPlace=False,
+        inheritAccidentalDisplay=False
+    ):
         # noinspection PyShadowingNames
         '''
         Given a :class:`~music21.pitch.Pitch` object, return a new,
         transposed Pitch, that is transformed
         according to this ChromaticInterval.
+        Never inherits accidental display, despite being
+        passed inheritAccidentalDisplay.
 
         Because :class:`~music21.interval.ChromaticInterval` object
         do not take into account diatonic spelling,
@@ -3416,6 +3441,7 @@ class Interval(IntervalBase):
             pOut = self.chromatic.transposePitch(
                 p,
                 inPlace=inPlace,
+                inheritAccidentalDisplay=inheritAccidentalDisplay
             )
         else:
             pOut = self._diatonicTransposePitch(
@@ -3430,6 +3456,7 @@ class Interval(IntervalBase):
             pOut.fundamental = self.transposePitch(
                 p.fundamental,
                 maxAccidental=maxAccidental,
+                inheritAccidentalDisplay=inheritAccidentalDisplay
             )
 
             if p.fundamental.octave is None:

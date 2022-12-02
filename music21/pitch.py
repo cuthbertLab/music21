@@ -4466,7 +4466,7 @@ class Pitch(prebase.ProtoM21Object):
         else:  # try to process
             intervalObj = interval.Interval(value)
 
-        p = intervalObj.transposePitch(self)  # always inheritsAccidentalDisplay
+        p = intervalObj.transposePitch(self, inheritAccidentalDisplay=inheritAccidentalDisplay)
         if not isinstance(value, int):
             p.spellingIsInferred = self.spellingIsInferred
 
