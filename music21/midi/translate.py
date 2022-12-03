@@ -2223,8 +2223,6 @@ def conductorStream(s: stream.Stream) -> stream.Part:
         for s_or_inner_stream in s.recurse(streamsOnly=True, includeSelf=True):
             s_or_inner_stream.removeByClass(klass)
 
-    conductorPart.coreElementsChanged()
-
     # Defaults
     if not conductorPart.getElementsByClass(tempo.MetronomeMark):
         conductorPart.insert(tempo.MetronomeMark(number=120))
