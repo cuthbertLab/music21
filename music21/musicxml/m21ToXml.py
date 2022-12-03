@@ -402,7 +402,7 @@ class GeneralObjectExporter:
           <!--=========================== Part 1 ===========================-->
           <part id="...">
             <!--========================= Measure 1 ==========================-->
-            <measure number="1">
+            <measure implicit="no" number="1">
               <attributes>
                 <divisions>10080</divisions>
                 <time>
@@ -1724,7 +1724,7 @@ class ScoreExporter(XMLExporterBase, PartStaffExporterMixin):
         >>> SX.dump(SX.partExporterList[0].xmlRoot)
         <part id="...">
           <!--========================= Measure 1 ==========================-->
-          <measure number="1">...</measure>
+          <measure implicit="no" number="1">...</measure>
         </part>
         >>> del SX.partExporterList[:]  # for garbage collection
         '''
@@ -7016,15 +7016,15 @@ class MeasureExporter(XMLExporterBase):
     def setMxAttributes(self):
         '''
         sets the attributes (x=y) for a measure,
-        that is, number, and layoutWidth
+        that is, number, implicit, and layoutWidth
 
         Does not create the <attributes> tag. That's elsewhere...
-
         '''
         m = self.stream
         if hasattr(m, 'measureNumberWithSuffix'):
             self.xmlRoot.set('number', m.measureNumberWithSuffix())
-        # TODO: attr: implicit
+        _setAttributeFromAttribute(
+            m, self.xmlRoot, 'implicit', 'numberImplicit', xmlObjects.booleanToYesNo)
         # TODO: attr: non-controlling
         if hasattr(m, 'layoutWidth') and m.layoutWidth is not None:
             _setAttributeFromAttribute(m, self.xmlRoot, 'width', 'layoutWidth')

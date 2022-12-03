@@ -12790,6 +12790,8 @@ class Measure(Stream):
             prefixes to measure numbers.  In music21 (like most measure
             numbering systems), these
             numbers appear as suffixes.''',
+        'numberImplicit': '''
+            Boolean describing if the measure number should not be displayed.''',
         'layoutWidth': '''
             A suggestion for layout width, though most rendering systems do not support
             this designation. Use :class:`~music21.layout.SystemLayout`
@@ -12843,6 +12845,7 @@ class Measure(Stream):
                 self.numberSuffix = suffix
         else:
             self.number = number
+        self.numberImplicit = False
         # we can request layout width, using the same units used
         # in layout.py for systems; most musicxml readers do not support this
         # on input
@@ -12874,7 +12877,7 @@ class Measure(Stream):
         ...
         <part id="...">
             <!--========================= Measure 4 ==========================-->
-            <measure number="4A">
+            <measure implicit="no" number="4A">
         ...
 
         Test round tripping:

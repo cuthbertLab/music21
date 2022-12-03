@@ -1458,6 +1458,14 @@ class Test(unittest.TestCase):
         self.assertIsInstance(unp, instrument.UnpitchedPercussion)
         self.assertEqual(unp.percMapPitch, 69)
 
+    def testImportImplicitMeasureNumber(self):
+        from music21 import converter
+
+        xml_dir = common.getSourceFilePath() / 'musicxml' / 'lilypondTestSuite'
+        s = converter.parse(xml_dir / '46d-PickupMeasure-ImplicitMeasures.xml')
+        m = s[stream.Measure].first()
+        self.assertIs(m.numberImplicit, True)
+
 
 if __name__ == '__main__':
     import music21

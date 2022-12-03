@@ -5346,10 +5346,12 @@ class MeasureParser(XMLParserBase):
 
         calls parseMeasureNumbers(), and gets the width from the width tag.
 
-        # TODO: implicit
         # TODO: non-controlling
         # may need to do a format/unit conversion?
         '''
+        implicit = self.mxMeasure.get('implicit')
+        self.stream.numberImplicit = xmlObjects.yesNoToBoolean(implicit)
+
         self.parseMeasureNumbers()
         width = self.mxMeasure.get('width')
         if width is not None:
