@@ -1464,7 +1464,7 @@ class Test(unittest.TestCase):
         xml_dir = common.getSourceFilePath() / 'musicxml' / 'lilypondTestSuite'
         s = converter.parse(xml_dir / '46d-PickupMeasure-ImplicitMeasures.xml')
         m = s[stream.Measure].first()
-        self.assertIs(m.numberImplicit, True)
+        self.assertIs(m.showNumber, stream.enums.ShowNumber.NEVER)
 
 
 if __name__ == '__main__':

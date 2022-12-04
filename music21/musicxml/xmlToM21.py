@@ -5350,7 +5350,10 @@ class MeasureParser(XMLParserBase):
         # may need to do a format/unit conversion?
         '''
         implicit = self.mxMeasure.get('implicit')
-        self.stream.numberImplicit = xmlObjects.yesNoToBoolean(implicit)
+        if xmlObjects.yesNoToBoolean(implicit):
+            self.stream.showNumber = stream.enums.ShowNumber.NEVER
+        else:
+            self.stream.showNumber = stream.enums.ShowNumber.DEFAULT
 
         self.parseMeasureNumbers()
         width = self.mxMeasure.get('width')

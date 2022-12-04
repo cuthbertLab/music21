@@ -7024,7 +7024,8 @@ class MeasureExporter(XMLExporterBase):
         if hasattr(m, 'measureNumberWithSuffix'):
             self.xmlRoot.set('number', m.measureNumberWithSuffix())
         _setAttributeFromAttribute(
-            m, self.xmlRoot, 'implicit', 'numberImplicit', xmlObjects.booleanToYesNo)
+            m, self.xmlRoot, 'implicit', 'showNumber',
+            lambda showNum: xmlObjects.booleanToYesNo(showNum is stream.enums.ShowNumber.NEVER))
         # TODO: attr: non-controlling
         if hasattr(m, 'layoutWidth') and m.layoutWidth is not None:
             _setAttributeFromAttribute(m, self.xmlRoot, 'width', 'layoutWidth')
