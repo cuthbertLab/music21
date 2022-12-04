@@ -65,7 +65,7 @@ from music21.stream import makeNotation
 from music21.stream import streamStatus
 from music21.stream import iterator
 from music21.stream import filters
-from music21.stream.enums import GivenElementsBehavior, RecursionType
+from music21.stream.enums import GivenElementsBehavior, RecursionType, ShowNumber
 
 
 if t.TYPE_CHECKING:
@@ -12845,7 +12845,7 @@ class Measure(Stream):
                 self.numberSuffix = suffix
         else:
             self.number = number
-        self.showNumber = False
+        self.showNumber = ShowNumber.DEFAULT
         # we can request layout width, using the same units used
         # in layout.py for systems; most musicxml readers do not support this
         # on input
