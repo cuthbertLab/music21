@@ -297,7 +297,7 @@ class PartStaffExporterMixin:
         >>> root = SX.parse()
         >>> m1 = root.find('part/measure')
         >>> SX.dump(m1)
-        <measure number="1">
+        <measure implicit="no" number="1">
         ...
           <note>
             <pitch>
@@ -479,7 +479,7 @@ class PartStaffExporterMixin:
         >>> root = SX.parse()
         >>> m1 = root.find('part/measure')
         >>> SX.dump(m1)
-        <measure number="1">
+        <measure implicit="no" number="1">
           <attributes>
             <divisions>10080</divisions>
             <key number="1">
@@ -513,7 +513,7 @@ class PartStaffExporterMixin:
         >>> root = SX.parse()
         >>> m1 = root.find('part/measure')
         >>> SX.dump(m1)
-        <measure number="1">
+        <measure implicit="no" number="1">
             <attributes>
             <divisions>10080</divisions>
             <key>

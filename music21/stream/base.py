@@ -65,7 +65,7 @@ from music21.stream import makeNotation
 from music21.stream import streamStatus
 from music21.stream import iterator
 from music21.stream import filters
-from music21.stream.enums import GivenElementsBehavior, RecursionType
+from music21.stream.enums import GivenElementsBehavior, RecursionType, ShowNumber
 
 
 if t.TYPE_CHECKING:
@@ -12790,6 +12790,8 @@ class Measure(Stream):
             prefixes to measure numbers.  In music21 (like most measure
             numbering systems), these
             numbers appear as suffixes.''',
+        'showNumber': '''
+            Enum describing if the measure number should be displayed.''',
         'layoutWidth': '''
             A suggestion for layout width, though most rendering systems do not support
             this designation. Use :class:`~music21.layout.SystemLayout`
@@ -12843,6 +12845,7 @@ class Measure(Stream):
                 self.numberSuffix = suffix
         else:
             self.number = number
+        self.showNumber = ShowNumber.DEFAULT
         # we can request layout width, using the same units used
         # in layout.py for systems; most musicxml readers do not support this
         # on input
@@ -12874,7 +12877,7 @@ class Measure(Stream):
         ...
         <part id="...">
             <!--========================= Measure 4 ==========================-->
-            <measure number="4A">
+            <measure implicit="no" number="4A">
         ...
 
         Test round tripping:
