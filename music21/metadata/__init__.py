@@ -1662,8 +1662,11 @@ class Metadata(base.Music21Object):
 
         >>> md.bestTitle = 'Bonaparte'
         Traceback (most recent call last):
-        AttributeError: can't set attribute 'bestTitle'
+        AttributeError: ...'bestTitle'...
         '''
+        # TODO: once Py3.11 is the minimum, change doctest output to:
+        #    AttributeError: property 'bestTitle' of 'Metadata' object has no setter
+
         searchId = (
             'title',
             'popularTitle',
