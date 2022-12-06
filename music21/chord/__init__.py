@@ -1720,7 +1720,7 @@ class Chord(ChordBase):
 
         return True
 
-    def _findRoot(self):
+    def _findRoot(self) -> pitch.Pitch:
         '''
         Looks for the root usually by finding the note with the most 3rds above
         it.
@@ -2539,7 +2539,7 @@ class Chord(ChordBase):
         self._cache['inversion'] = inv
         return inv
 
-    def inversionName(self):
+    def inversionName(self) -> int | None:
         '''
         Returns an integer representing the common abbreviation for the
         inversion the chord is in. If chord is not in a common inversion,
@@ -4755,7 +4755,7 @@ class Chord(ChordBase):
 
     @property    # type: ignore
     @cacheMethod
-    def commonName(self):
+    def commonName(self) -> str:
         '''
         Return the most common name associated with this Chord as a string.
         Checks some common enharmonic equivalents.

@@ -30,6 +30,7 @@ import math
 from math import isclose
 import os
 import pathlib
+import types
 import typing as t
 from typing import overload  # pycharm bug disallows alias
 import unittest
@@ -4344,7 +4345,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         # FIND THE CORRECT ORIGINAL MEASURE OBJECTS
         # for indicesNotNumbers, this is simple...
         if indicesNotNumbers:
-            if not isinstance(numberStart, int) or not isinstance(numberEnd, int):
+            if not isinstance(numberStart, int) or not isinstance(numberEnd, (int, types.NoneType)):
                 raise ValueError(
                     'numberStart and numberEnd must be integers with indicesNotNumbers=True'
                 )

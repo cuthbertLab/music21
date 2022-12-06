@@ -1038,7 +1038,12 @@ class Metadata(base.Music21Object):
                 result.append(contrib)
         return tuple(result)
 
-    def search(self, query=None, field=None, **keywords):
+    def search(
+        self,
+        query=None,
+        field=None,
+        **keywords
+    ):
         r'''
         Search one or all fields with a query, given either as a string or a
         regular expression match.
@@ -1654,7 +1659,7 @@ class Metadata(base.Music21Object):
         setattr(self, 'title', value)
 
     @property
-    def bestTitle(self):
+    def bestTitle(self) -> str | None:
         r'''
         Get the title of the work, or the next-matched title string
         available from a related parameter fields.

@@ -859,7 +859,7 @@ class Music21Object(prebase.ProtoM21Object):
     def derivation(self, newDerivation: Derivation | None) -> None:
         self._derivation = newDerivation
 
-    def clearCache(self, **keywords):
+    def clearCache(self, **keywords) -> None:
         '''
         A number of music21 attributes (especially with Chords and RomanNumerals, etc.)
         are expensive to compute and are therefore cached.  Generally speaking
@@ -879,7 +879,7 @@ class Music21Object(prebase.ProtoM21Object):
         '''
         # do not replace with self._cache.clear() -- leaves terrible
         # state for shallow copies.
-        self._cache: dict[str, t.Any] = {}
+        self._cache = {}
 
     @overload
     def getOffsetBySite(
