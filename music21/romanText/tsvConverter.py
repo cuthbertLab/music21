@@ -24,7 +24,6 @@ import unittest
 
 from music21 import chord
 from music21 import common
-from music21.common.types import OffsetQL
 from music21 import environment
 from music21 import harmony
 from music21 import key

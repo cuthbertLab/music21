@@ -1159,16 +1159,18 @@ class DeltaTime(MidiEvent):
 
         >>> mt = midi.MidiTrack(1)
         >>> dt = midi.DeltaTime(mt)
-        >>> dt.read(b'\x20')
+        >>> dt.readUntilLowByte(b'\x20')
         (32, b'')
-        >>> dt.read(b'\x20hello')
+        >>> dt.readUntilLowByte(b'\x20hello')
         (32, b'hello')
 
         here the '\x82' is above 0x80 so the 'h' is read
         as part of the continuation.
 
-        >>> dt.read(b'\x82hello')
+        >>> dt.readUntilLowByte(b'\x82hello')
         (360, b'ello')
+
+        Changed in v9: was read() but had an incompatible signature with MidiEvent
         '''
         self.time, newBytes = getVariableLengthNumber(oldBytes)
         return self.time, newBytes

@@ -850,7 +850,7 @@ def midiEventsToInstrument(
     from music21 import midi as midiModule
 
     if not common.isListLike(eventList):
-        event = t.cast(midi.MidiEvent, eventList)
+        event = t.cast(midiModule.MidiEvent, eventList)
     else:  # get the second event; first is delta time
         event = eventList[1]
 
