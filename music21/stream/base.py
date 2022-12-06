@@ -4917,7 +4917,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
 
     def measureOffsetMap(
         self,
-        classFilterList: list[t.Type] | list[str] | tuple[t.Type] | tuple[str] = (Measure,)
+        classFilterList: list[t.Type] | list[str] | tuple[t.Type] | tuple[str] = ('Measure',)
     ):
         '''
         If this Stream contains Measures, returns an OrderedDict
@@ -4993,6 +4993,8 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         <music21.stream.Measure 3 offset=8.0> Alto
         <music21.stream.Measure 3 offset=8.0> Tenor
         <music21.stream.Measure 3 offset=8.0> Bass
+
+        Changed in v9: classFilterList must be a list or tuple of strings or Music21Objects
 
         OMIT_FROM_DOCS
 
