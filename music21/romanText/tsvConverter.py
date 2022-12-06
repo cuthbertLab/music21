@@ -24,6 +24,7 @@ import unittest
 
 from music21 import chord
 from music21 import common
+from music21.common.types import OffsetQL
 from music21 import environment
 from music21 import harmony
 from music21 import key
@@ -161,29 +162,29 @@ class TabChordBase(abc.ABC):
     between tabular data and music21 chords.
     '''
 
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__()
-        self.numeral = None
-        self.relativeroot = None
-        self.representationType = None  # Added (not in DCML)
+        self.numeral: str = ''
+        self.relativeroot: str | None = None
+        self.representationType: str | None = None  # Added (not in DCML)
         self.extra: dict[str, str] = {}
         self.dcml_version = -1
 
         # shared between DCML v1 and v2
-        self.chord = None
-        self.timesig = None
-        self.pedal = None
-        self.form = None
-        self.figbass = None
-        self.changes = None
-        self.phraseend = None
+        self.chord: str = ''
+        self.timesig: str = ''
+        self.pedal: str | None = None
+        self.form: str | None = None
+        self.figbass: str | None = None
+        self.changes: str | None = None
+        self.phraseend: str | None = None
 
         # the following attributes are overwritten by properties in TabChordV2
         # because of changed column names in DCML v2
-        self.local_key = None
-        self.global_key = None
-        self.beat = None
-        self.measure = None
+        self.local_key: str = ''
+        self.global_key: str = ''
+        self.beat: float = 1.0
+        self.measure: int = 1
 
     @property
     def combinedChord(self) -> str:
@@ -268,36 +269,36 @@ class TabChordBase(abc.ABC):
             if self.relativeroot:  # If there's a relative root ...
                 if isMinor(self.relativeroot):  # ... and it's minor too, change it and the figure
                     self.relativeroot = characterSwaps(self.relativeroot,
-                                                        minor=True,
-                                                        direction=direction)
+                                                       minor=True,
+                                                       direction=direction)
                     self.numeral = characterSwaps(self.numeral,
-                                                        minor=True,
-                                                        direction=direction)
+                                                  minor=True,
+                                                  direction=direction)
                 else:  # ... rel. root but not minor
                     self.relativeroot = characterSwaps(self.relativeroot,
-                                                        minor=False,
-                                                        direction=direction)
+                                                       minor=False,
+                                                       direction=direction)
             else:  # No relative root
                 self.numeral = characterSwaps(self.numeral,
-                                                minor=True,
-                                                direction=direction)
+                                              minor=True,
+                                              direction=direction)
         else:  # local key not minor
             if self.relativeroot:  # if there's a relativeroot ...
                 if isMinor(self.relativeroot):  # ... and it's minor, change it and the figure
                     self.relativeroot = characterSwaps(self.relativeroot,
-                                                        minor=False,
-                                                        direction=direction)
+                                                       minor=False,
+                                                       direction=direction)
                     self.numeral = characterSwaps(self.numeral,
-                                                    minor=True,
-                                                    direction=direction)
+                                                  minor=True,
+                                                  direction=direction)
                 else:  # ... rel. root but not minor
                     self.relativeroot = characterSwaps(self.relativeroot,
-                                                        minor=False,
-                                                        direction=direction)
+                                                       minor=False,
+                                                       direction=direction)
             else:  # No relative root
                 self.numeral = characterSwaps(self.numeral,
-                                                minor=False,
-                                                direction=direction)
+                                              minor=False,
+                                              direction=direction)
 
     def tabToM21(self) -> harmony.Harmony:
         '''
@@ -697,7 +698,7 @@ class TsvHandler:
                 if entry.timesig != currentTimeSig:
                     newTS = meter.TimeSignature(entry.timesig)
                     m.insert(entry.beat - 1, newTS)
-                    currentTimeSig = entry.timesig
+                    currentTimeSig = entry.timesig or ''
                     currentMeasureLength = newTS.barDuration.quarterLength
 
                 previousMeasure = entry.measure
@@ -771,8 +772,8 @@ class M21toTSV:
 
             thisEntry.combinedChord = thisRN.figure  # NB: slightly different from DCML: no key.
             thisEntry.altchord = altChord
-            thisEntry.measure = thisRN.measureNumber
-            thisEntry.beat = thisRN.beat
+            thisEntry.measure = thisRN.measureNumber if thisRN.measureNumber is not None else 1
+            thisEntry.beat = float(thisRN.beat)
             thisEntry.totbeat = None
             ts = thisRN.getContextByClass(meter.TimeSignature)
             if ts is None:

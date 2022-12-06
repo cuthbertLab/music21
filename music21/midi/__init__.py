@@ -842,7 +842,7 @@ class MidiEvent(prebase.ProtoM21Object):
             return midiBytes[3:]
         raise TypeError(f'expected ChannelVoiceMessage, got {self.type}')  # pragma: no cover
 
-    def read(self, midiBytes):
+    def read(self, midiBytes: bytes) -> bytes:
         r'''
         Parse the bytes given and take the beginning
         section and convert it into data for this event and return the
@@ -852,7 +852,6 @@ class MidiEvent(prebase.ProtoM21Object):
         >>> noteOnMessage = midi.ChannelVoiceMessages.NOTE_ON | channel
         >>> hex(noteOnMessage)
         '0x92'
-
 
         This is how the system reads note-on messages (0x90-0x9F) and channels
 
@@ -1060,7 +1059,6 @@ class MidiEvent(prebase.ProtoM21Object):
         '''
         Return a boolean if this is a DeltaTime subclass.
 
-
         >>> mt = midi.MidiTrack(1)
         >>> dt = midi.DeltaTime(mt)
         >>> dt.isDeltaTime()
@@ -1154,7 +1152,7 @@ class DeltaTime(MidiEvent):
             rep = '(empty) ' + rep
         return rep
 
-    def read(self, oldBytes: bytes) -> tuple[int, bytes]:
+    def readUntilLowByte(self, oldBytes: bytes) -> tuple[int, bytes]:
         r'''
         Read a byte-string until hitting a character below 0x80
         and return the converted number and the rest of the bytes
@@ -1274,10 +1272,10 @@ class MidiTrack(prebase.ProtoM21Object):
     def length(self):
         return len(self.data)
 
-    def read(self, midiBytes):
+    def read(self, midiBytes: bytes) -> bytes:
         '''
-        Read as much of the string (representing midi data) as necessary;
-        return the remaining string for reassignment and further processing.
+        Read as much of the bytes object (representing midi data) as necessary;
+        return the remaining bytes object for reassignment and further processing.
 
         The string should begin with `MTrk`, specifying a Midi Track
 
@@ -1299,7 +1297,7 @@ class MidiTrack(prebase.ProtoM21Object):
         self.processDataToEvents(trackData)
         return remainder  # remainder string after extracting track data
 
-    def processDataToEvents(self, trackData: bytes = b''):
+    def processDataToEvents(self, trackData: bytes = b'') -> None:
         '''
         Populate .events with trackData.  Called by .read()
         '''
@@ -1309,7 +1307,7 @@ class MidiTrack(prebase.ProtoM21Object):
             # shave off the time stamp from the event
             delta_t = DeltaTime(track=self)
             # return extracted time, as well as remaining bytes
-            dt, trackDataCandidate = delta_t.read(trackData)
+            dt, trackDataCandidate = delta_t.readUntilLowByte(trackData)
             # this is the offset that this event happens at, in ticks
             timeCandidate = time + dt
 
@@ -1763,10 +1761,10 @@ class Test(unittest.TestCase):
         mf.write()
         mf.close()
 
-#         mf = MidiFile()
-#         mf.open(fp)
-#         mf.read()
-#         mf.close()
+        # mf = MidiFile()
+        # mf.open(fp)
+        # mf.read()
+        # mf.close()
 
     def testInternalDataModel(self):
         dirLib = common.getSourceFilePath() / 'midi' / 'testPrimitive'

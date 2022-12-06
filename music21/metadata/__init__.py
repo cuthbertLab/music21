@@ -236,9 +236,9 @@ class Metadata(base.Music21Object):
 
     # INITIALIZER #
 
-    def __init__(self, **keywords):
-        m21BaseKeywords = {}
-        myKeywords = {}
+    def __init__(self, **keywords) -> None:
+        m21BaseKeywords: dict[str, t.Any] = {}
+        myKeywords: dict[str, t.Any] = {}
 
         # We allow the setting of metadata values (attribute-style) via **keywords.
         # Any keywords that are uniqueNames, grandfathered workIds, or grandfathered
@@ -1040,10 +1040,10 @@ class Metadata(base.Music21Object):
 
     def search(
         self,
-        query=None,
-        field=None,
+        query: str | t.Pattern | t.Callable[[str], bool] | None = None,
+        field: str | None = None,
         **keywords
-    ):
+    ) -> tuple[bool, str | None]:
         r'''
         Search one or all fields with a query, given either as a string or a
         regular expression match.
@@ -1109,7 +1109,7 @@ class Metadata(base.Music21Object):
         # TODO: Change to a namedtuple and add as a third element
         #    during a successful search, the full value of the retrieved
         #    field (so that 'Joplin' would return 'Joplin, Scott')
-        reQuery = None
+        reQuery: t.Pattern | None = None
         valueFieldPairs = []
         if query is None and field is None and not keywords:
             return (False, None)
@@ -1181,7 +1181,7 @@ class Metadata(base.Music21Object):
         # ultimately, can look for regular expressions by checking for
         # .search
         useRegex = False
-        if hasattr(query, 'search'):
+        if isinstance(query, t.Pattern):
             useRegex = True
             reQuery = query  # already compiled
         # look for regex characters
@@ -1190,12 +1190,12 @@ class Metadata(base.Music21Object):
             useRegex = True
             reQuery = re.compile(query, flags=re.IGNORECASE)
 
-        if useRegex:
+        if useRegex and reQuery is not None:
             for value, innerField in valueFieldPairs:
                 # "re.IGNORECASE" makes case-insensitive search
                 if isinstance(value, str):
-                    match = reQuery.search(value)
-                    if match is not None:
+                    matchReSearch = reQuery.search(value)
+                    if matchReSearch is not None:
                         return True, innerField
         elif callable(query):
             for value, innerField in valueFieldPairs:

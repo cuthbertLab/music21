@@ -736,7 +736,7 @@ class Trill(Ornament):
 
     * Changed in v7: the size should be a generic second.
     '''
-    def __init__(self, **keywords):
+    def __init__(self, **keywords) -> None:
         super().__init__(**keywords)
         self.size: interval.IntervalBase = interval.GenericInterval(2)
 

@@ -59,6 +59,7 @@ from music21.musicxml.xmlObjects import MusicXMLImportException, MusicXMLWarning
 
 if t.TYPE_CHECKING:
     from music21 import base
+
     # what goes in a `.staffReference`
     StaffReferenceType = dict[int, list[base.Music21Object]]
 
@@ -89,7 +90,7 @@ def _clean(badStr: str | None) -> str | None:
 
 # Durations
 
-def textNotNone(mxObj):
+def textNotNone(mxObj: ET.Element | None) -> bool:
     '''
     returns True is mxObj is not None
     and mxObj.text is not None
@@ -111,7 +112,7 @@ def textNotNone(mxObj):
     return True
 
 
-def textStripValid(mxObj: ET.Element):
+def textStripValid(mxObj: ET.Element | None) -> bool:
     '''
     returns True if textNotNone(mxObj)
     and mxObj.text.strip() is not empty
@@ -130,7 +131,7 @@ def textStripValid(mxObj: ET.Element):
     if not textNotNone(mxObj):
         return False
     if t.TYPE_CHECKING:
-        assert mxObj.text is not None
+        assert mxObj is not None and mxObj.text is not None
 
     if not mxObj.text.strip():
         return False
@@ -3655,7 +3656,7 @@ class MeasureParser(XMLParserBase):
 
         return post
 
-    def xmlNotations(self, mxNotations, n):
+    def xmlNotations(self, mxNotations: ET.Element, n: note.GeneralNote):
         # noinspection PyShadowingNames
         '''
         >>> from xml.etree.ElementTree import fromstring as EL
@@ -3718,7 +3719,7 @@ class MeasureParser(XMLParserBase):
             if fermataType is not None:
                 fermata.type = fermataType
             if textStripValid(mxObj):
-                fermata.shape = mxObj.text.strip()
+                fermata.shape = mxObj.text.strip()  # type: ignore
             n.expressions.append(fermata)
 
         # get any arpeggios, store in expressions.
@@ -3729,7 +3730,7 @@ class MeasureParser(XMLParserBase):
                 if tagSearch == 'non-arpeggiate':
                     arpeggioType = 'non-arpeggio'
                 else:
-                    arpeggioType = mxObj.get('direction')
+                    arpeggioType = mxObj.get('direction') or ''
                 idFound: str | None = mxObj.get('number')
                 if idFound is None:
                     arpeggio = expressions.ArpeggioMark(arpeggioType)
@@ -4321,7 +4322,7 @@ class MeasureParser(XMLParserBase):
                         tieObj.placement = 'below'
         return tieObj
 
-    def xmlToTuplets(self, mxNote):
+    def xmlToTuplets(self, mxNote: ET.Element) -> list[duration.Tuplet]:
         # noinspection PyShadowingNames
         '''
         Given an mxNote, based on mxTimeModification
@@ -4350,6 +4351,9 @@ class MeasureParser(XMLParserBase):
         '''
         tup = duration.Tuplet()
         mxTimeModification = mxNote.find('time-modification')
+        if mxTimeModification is None:
+            raise MusicXMLImportException('Note without time-modification in xmlToTuplets')
+
         # environLocal.printDebug(['got mxTimeModification', mxTimeModification])
 
         # This should only be a backup in case there are no tuplet definitions
@@ -4359,10 +4363,11 @@ class MeasureParser(XMLParserBase):
         seta(tup, mxTimeModification, 'normal-notes', 'numberNotesNormal', transform=int)
 
         mxNormalType = mxTimeModification.find('normal-type')
+        musicXMLNormalType: str
         if textStripValid(mxNormalType):
-            musicXMLNormalType = mxNormalType.text.strip()
+            musicXMLNormalType = mxNormalType.text.strip()  # type: ignore
         else:
-            musicXMLNormalType = mxNote.find('type').text.strip()
+            musicXMLNormalType = mxNote.find('type').text.strip()  # type: ignore
 
         durationNormalType = musicXMLTypeToType(musicXMLNormalType)
         numDots = len(mxTimeModification.findall('normal-dot'))
@@ -4394,7 +4399,7 @@ class MeasureParser(XMLParserBase):
                 if this_tuplet_type == 'stop':
                     if self.activeTuplets[tupletIndex] is not None:
                         activeT = self.activeTuplets[tupletIndex]
-                        if activeT in returnTuplets:
+                        if activeT in returnTuplets and activeT is not None:
                             activeT.type = 'startStop'
                         removeFromActiveTuplets.add(tupletIndex)
                         tupletsToStop.add(tupletIndex)
@@ -4414,21 +4419,24 @@ class MeasureParser(XMLParserBase):
                          'tuplet-number', 'numberNotesNormal', transform=int)
 
                     mxActualType = mxTupletActual.find('tuplet-type')
-                    if mxActualType is not None:
-                        xmlActualType = mxActualType.text.strip()
+                    if (mxActualType is not None
+                            and (xmlActualType := mxActualType.text) is not None):
+                        xmlActualType = xmlActualType.strip()
                         durType = musicXMLTypeToType(xmlActualType)
                         dots = len(mxActualType.findall('tuplet-dot'))
                         tup.durationActual = duration.durationTupleFromTypeDots(durType, dots)
 
                     mxNormalType = mxTupletNormal.find('tuplet-type')
-                    if mxNormalType is not None:
-                        xmlNormalType = mxNormalType.text.strip()
+                    if (mxNormalType is not None
+                            and (mxNormalTypeText := mxNormalType.text) is not None):
+                        xmlNormalType = mxNormalTypeText.strip()
                         durType = musicXMLTypeToType(xmlNormalType)
                         dots = len(mxNormalType.findall('tuplet-dot'))
                         tup.durationNormal = duration.durationTupleFromTypeDots(durType, dots)
 
                 # TODO: combine start + stop into startStop.
-                tup.type = this_tuplet_type
+                tup.type = t.cast(t.Literal['start', 'stop', 'startStop', False] | None,
+                                  this_tuplet_type)
 
                 bracketMaybe = mxTuplet.get('bracket')
                 if bracketMaybe is not None:
@@ -4453,7 +4461,7 @@ class MeasureParser(XMLParserBase):
                 if lineShape is not None and lineShape == 'curved':
                     tup.bracket = 'slur'
                 # TODO: default-x, default-y, relative-x, relative-y
-                tup.placement = mxTuplet.get('placement')
+                tup.placement = t.cast(t.Literal['above', 'below'], mxTuplet.get('placement'))
                 returnTuplets[tupletIndex] = tup
                 remainingTupletAmountToAccountFor /= tup.tupletMultiplier()
                 self.activeTuplets[tupletIndex] = tup
@@ -4914,7 +4922,10 @@ class MeasureParser(XMLParserBase):
         self.insertCoreAndRef(self.offsetMeasureNote + chordOffset,
                               mxHarmony, h)
 
-    def xmlToChordSymbol(self, mxHarmony):
+    def xmlToChordSymbol(
+        self,
+        mxHarmony: ET.Element
+    ) -> harmony.ChordSymbol | harmony.NoChord | tablature.ChordWithFretBoard:
         # noinspection PyShadowingNames
         '''
         Convert a <harmony> tag to a harmony.ChordSymbol object:
@@ -4970,29 +4981,43 @@ class MeasureParser(XMLParserBase):
 
         mxKind = mxHarmony.find('kind')
         if textStripValid(mxKind):
-            chordKind = mxKind.text.strip()
+            if t.TYPE_CHECKING:
+                assert mxKind is not None
+            mxKindText = mxKind.text
+            if t.TYPE_CHECKING:
+                assert mxKindText is not None
+            chordKind = mxKindText.strip()
 
         mxFrame = mxHarmony.find('frame')
 
         mxBass = mxHarmony.find('bass')
         if mxBass is not None:
             # required
-            b = pitch.Pitch(mxBass.find('bass-step').text)
+            bassStep = mxBass.find('bass-step')
+            if bassStep is None:
+                raise MusicXMLImportException('bass-step missing')
+
+            b = pitch.Pitch(bassStep.text)
             # optional
             mxBassAlter = mxBass.find('bass-alter')
-            if mxBassAlter is not None:
+            if mxBassAlter is not None and (alterText := mxBassAlter.text) is not None:
                 # can provide integer or float to create accidental on pitch
-                b.accidental = pitch.Accidental(float(mxBassAlter.text))
+                b.accidental = pitch.Accidental(float(alterText))
             # TODO: musicxml 4: bass-separator: use something besides slash on output.
 
         mxInversion = mxHarmony.find('inversion')
         if textStripValid(mxInversion):
             # TODO: print-style for inversion
             # TODO: musicxml 4: text attribute overrides display of the inversion.
+            if t.TYPE_CHECKING:
+                assert mxInversion is not None and mxInversion.text is not None
+
             inversion = int(mxInversion.text.strip())
         # TODO: print-style
 
         if chordKind:  # two ways of doing it...
+            if t.TYPE_CHECKING:
+                assert mxKind is not None
             # Get m21 chord kind from dict of musicxml aliases ("dominant" -> "dominant-seventh")
             if chordKind in harmony.CHORD_ALIASES:
                 chordKind = harmony.CHORD_ALIASES[chordKind]
@@ -5005,18 +5030,24 @@ class MeasureParser(XMLParserBase):
         mxRoot = mxHarmony.find('root')
         if mxRoot is not None:  # choice: <root> or <function>
             mxRS = mxRoot.find('root-step')
+            if t.TYPE_CHECKING:
+                assert mxRS is not None
+
             rootText = mxRS.text
             if rootText in (None, ''):
                 rootText = mxRS.get('text')  # two ways to do it... this should do display even
                 # if content is supported.
-            r = pitch.Pitch(rootText)
-            mxRootAlter = mxRoot.find('root-alter')
-            if mxRootAlter is not None:
-                # can provide integer or float to create accidental on pitch
-                r.accidental = pitch.Accidental(float(mxRootAlter.text))
+            if rootText is not None:
+                r = pitch.Pitch(rootText)
+                mxRootAlter = mxRoot.find('root-alter')
+                if mxRootAlter is not None:
+                    # can provide integer or float to create accidental on pitch
+                    alterFloat = float(mxRootAlter.text)  # type: ignore
+                    r.accidental = pitch.Accidental(alterFloat)
 
         # TODO: musicxml 4: numeral -- pretty important.
 
+        cs_class: type[harmony.ChordSymbol | harmony.NoChord | tablature.ChordWithFretBoard]
         if mxFrame is not None:
             cs_class = tablature.ChordWithFretBoard
         elif chordKind == 'none':

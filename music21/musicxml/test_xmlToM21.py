@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import fractions
+import typing as t
 import unittest
 import xml.etree.ElementTree as ET
 
@@ -1187,16 +1188,16 @@ class Test(unittest.TestCase):
 
                     gnote_index += 1
 
-    def testArpeggioMarkSpanners(self):
+    def testArpeggioMarkSpanners(self) -> None:
         from music21 import converter
         from music21.musicxml import testPrimitive
 
-        s = converter.parse(testPrimitive.multiStaffArpeggios)
+        s = t.cast(stream.Score, converter.parse(testPrimitive.multiStaffArpeggios))
         sb = s.spannerBundle.getByClass(expressions.ArpeggioMarkSpanner)
         self.assertIsNotNone(sb)
         sp = sb[0]
         # go find all the chords and check for spanner vs expressions
-        chords: [chord.Chord] = []
+        chords: list[chord.Chord] = []
         for i, p in enumerate(s.parts):
             # ArpeggioMarkSpanner spans the second chord (index == 1) across both parts
             chords.append(p[chord.Chord][1])

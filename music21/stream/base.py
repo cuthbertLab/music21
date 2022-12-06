@@ -5664,7 +5664,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
 
         * Changed in v8: recurse is True by default.
         '''
-        instObj = None
+        instObj: instrument.Instrument | None = None
 
         if not recurse:
             sIter = self.iter()

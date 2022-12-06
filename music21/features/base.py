@@ -135,7 +135,10 @@ class FeatureExtractor:
     Usage of a DataInstance offers significant performance advantages, as common forms of
     the Stream are cached for easy processing.
     '''
-    def __init__(self, dataOrStream=None, **keywords):
+    def __init__(self,
+                 dataOrStream=None,
+                 **keywords
+                 ) -> None:
         self.stream = None  # the original Stream, or None
         self.data: DataInstance | None = None  # a DataInstance object: use to get data
         self.setData(dataOrStream)

@@ -49,8 +49,8 @@ partGroupAbbreviation = 'PG'
 
 durationType = 'quarter'
 
-instrumentName = ''
-partName = ''
+instrumentName: str = ''
+partName: str = ''
 
 keyFifths = 0
 keyMode = 'major'
