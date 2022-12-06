@@ -566,9 +566,9 @@ class StreamCore(Music21Object):
     def coreGatherMissingSpanners(
         self,
         *,
-        recurse=True,
-        requireAllPresent=True,
-        insert=True,
+        recurse: bool = True,
+        requireAllPresent: bool = True,
+        insert: bool = True,
         constrainingSpannerBundle: spanner.SpannerBundle | None = None
     ) -> list[spanner.Spanner] | None:
         '''

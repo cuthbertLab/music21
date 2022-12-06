@@ -19,14 +19,14 @@ from __future__ import annotations
 
 import copy
 from math import inf
-from typing import TYPE_CHECKING
+import typing as t
 import unittest
 
 from music21.common.types import OffsetQLIn
 from music21 import environment
 from music21 import exceptions21
 
-if TYPE_CHECKING:
+if t.TYPE_CHECKING:
     from music21 import base
     from music21 import stream
 

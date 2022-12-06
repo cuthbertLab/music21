@@ -16,14 +16,13 @@ from __future__ import annotations
 from collections import namedtuple, OrderedDict
 import re
 import typing as t
-from typing import TYPE_CHECKING
 import unittest
 
 from music21.exceptions21 import Music21Exception
 from music21 import note
 # from music21 import common
 
-if TYPE_CHECKING:
+if t.TYPE_CHECKING:
     from music21.common.types import StreamType
 
 LINEBREAK_TOKEN = ' // '

@@ -19,7 +19,7 @@ from __future__ import annotations
 from collections.abc import Iterable, Sequence
 import copy
 import itertools
-from typing import TYPE_CHECKING
+import typing as t
 import unittest
 
 from music21 import chord
@@ -887,7 +887,7 @@ class Verticality(prebase.ProtoM21Object):
                     for subEl in list(el)[1:]:
                         conditionalAdd(timeSpan, subEl)
             else:
-                if TYPE_CHECKING:
+                if t.TYPE_CHECKING:
                     assert isinstance(el, note.Note)
                 conditionalAdd(timeSpan, el)
 

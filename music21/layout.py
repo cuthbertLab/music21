@@ -499,7 +499,11 @@ class StaffGroup(spanner.Spanner):
 # ---------------------------------------------------------------
 # Stream subclasses for layout
 
-def divideByPages(scoreIn, printUpdates=False, fastMeasures=False):
+def divideByPages(
+    scoreIn: stream.Score,
+    printUpdates: bool = False,
+    fastMeasures: bool = False
+) -> LayoutScore:
     '''
     Divides a score into a series of smaller scores according to page
     breaks.  Only searches for PageLayout.isNew or SystemLayout.isNew
@@ -667,7 +671,8 @@ def divideByPages(scoreIn, printUpdates=False, fastMeasures=False):
                 staffObject.pageNumber = pageNumber
                 staffObject.pageSystemNumber = pageSystemNumber
 
-                staffObject.elements = p
+                # until getters/setters can have different types
+                staffObject.elements = p  # type: ignore
                 thisSystem.replace(p, staffObject)
                 allStaffLayouts: list[StaffLayout] = list(p[StaffLayout])
                 if not allStaffLayouts:

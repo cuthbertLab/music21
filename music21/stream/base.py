@@ -4319,12 +4319,12 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
     # _getNotes and _getPitches are found with the interval routines
     def _getMeasureNumberListByStartEnd(
         self,
-        numberStart,
-        numberEnd,
+        numberStart: int | str,
+        numberEnd: int | str,
         *,
         indicesNotNumbers: bool
     ) -> list[Measure]:
-        def hasMeasureNumberInformation(measureIterator):
+        def hasMeasureNumberInformation(measureIterator: iterator.StreamIterator[Measure]) -> bool:
             '''
             Many people create streams where every number is zero.
             This will check for that as quickly as possible.
@@ -4344,6 +4344,10 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         # FIND THE CORRECT ORIGINAL MEASURE OBJECTS
         # for indicesNotNumbers, this is simple...
         if indicesNotNumbers:
+            if not isinstance(numberStart, int) or not isinstance(numberEnd, int):
+                raise ValueError(
+                    'numberStart and numberEnd must be integers with indicesNotNumbers=True'
+                )
             # noinspection PyTypeChecker
             return t.cast(list[Measure], list(mStreamIter[numberStart:numberEnd]))
 
@@ -4405,13 +4409,15 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
                     matches.append(m)
         return matches
 
-    def measures(self,
-                 numberStart,
-                 numberEnd,
-                 *,
-                 collect=('Clef', 'TimeSignature', 'Instrument', 'KeySignature'),
-                 gatherSpanners=GatherSpanners.ALL,
-                 indicesNotNumbers=False):
+    def measures(
+        self,
+        numberStart,
+        numberEnd,
+        *,
+        collect=('Clef', 'TimeSignature', 'Instrument', 'KeySignature'),
+        gatherSpanners=GatherSpanners.ALL,
+        indicesNotNumbers=False
+    ) -> Stream[Measure]:
         '''
         Get a region of Measures based on a start and end Measure number
         where the boundary numbers are both included.
@@ -4585,7 +4591,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         '''
         startMeasure: Measure | None
 
-        returnObj = self.cloneEmpty(derivationMethod='measures')
+        returnObj = t.cast(Stream[Measure], self.cloneEmpty(derivationMethod='measures'))
         srcObj = self
 
         matches = self._getMeasureNumberListByStartEnd(
@@ -4594,9 +4600,10 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
             indicesNotNumbers=indicesNotNumbers
         )
 
+        startOffset: OffsetQL
         if not matches:
             startMeasure = None
-            startOffset = 0  # does not matter; could be any number...
+            startOffset = 0.0  # does not matter; could be any number...
         else:
             startMeasure = matches[0]
             startOffset = startMeasure.getOffsetBySite(srcObj)

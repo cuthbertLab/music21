@@ -865,6 +865,13 @@ class Metadata(base.Music21Object):
         pass
 
     @overload
+    def __getitem__(self,
+                    key: t.Literal[
+                        'copyright',
+                    ]) -> tuple[Copyright, ...]:
+        pass
+
+    @overload
     def __getitem__(self, key: str) -> tuple[Text, ...]:
         pass
 
