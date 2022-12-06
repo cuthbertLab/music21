@@ -1524,7 +1524,7 @@ class ArpeggioMark(Expression):
     '''
     def __init__(self, arpeggioType: str | None = None, **keywords):
         super().__init__(**keywords)
-        if arpeggioType is None:
+        if not arpeggioType:
             arpeggioType = 'normal'
         if arpeggioType not in ('normal', 'up', 'down', 'non-arpeggio'):
             raise ValueError(

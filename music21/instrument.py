@@ -2271,7 +2271,7 @@ def partitionByInstrument(streamObj: stream.Stream) -> stream.Stream:
             # duration will have been set with sub.extendDuration above
             end = i.offset + i.duration.quarterLength
             # get destination Part
-            p = names[i.instrumentName]['Part']
+            p = names[i.instrumentName or '']['Part']
 
             coll = subStream.getElementsByOffset(
                 start,
