@@ -145,6 +145,7 @@ import datetime
 import pathlib
 import re
 import typing as t
+from typing import overload
 import unittest
 
 from music21 import base
@@ -853,7 +854,21 @@ class Metadata(base.Music21Object):
         # bare attributes (including the ones in base classes).
         super().__setattr__(name, value)
 
-    def __getitem__(self, key: str) -> tuple[ValueType, ...]:
+
+    @overload
+    def __getitem__(self,
+                    key: t.Literal[
+                        'movementName',
+                        'movementNumber',
+                        'title',
+                    ]) -> tuple[Text, ...]:
+        pass
+
+    @overload
+    def __getitem__(self, key: str) -> tuple[Text, ...]:
+        pass
+
+    def __getitem__(self, key: str) -> tuple[ValueType, ...] | tuple[Text, ...]:
         '''
         "Dictionary key" access for all standard uniqueNames and
         standard keys of the form 'namespace:name'.

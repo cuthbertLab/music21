@@ -16,11 +16,15 @@ from __future__ import annotations
 from collections import namedtuple, OrderedDict
 import re
 import typing as t
+from typing import TYPE_CHECKING
 import unittest
 
 from music21.exceptions21 import Music21Exception
 from music21 import note
 # from music21 import common
+
+if TYPE_CHECKING:
+    from music21.common.types import StreamType
 
 LINEBREAK_TOKEN = ' // '
 
@@ -132,8 +136,8 @@ class LyricSearcher:
         found if a work contains multiple voices.
     '''
 
-    def __init__(self, s=None):
-        self.stream = s
+    def __init__(self, s: StreamType | None = None):
+        self.stream: StreamType | None = s
         self.includeIntermediateElements = False  # currently does nothing
         self.includeTrailingMelisma = False  # currently does nothing
 

@@ -705,12 +705,11 @@ class Chord(ChordBase):
     >>> riteOfSpring
     <music21.chord.Chord F-2 A-2 C-3 F-3 G3 B-3 D-4 E-4>
 
-    Incorrect entries raise a ChordException:
+    Incorrect entries raise a TypeError:
 
     >>> chord.Chord([base])
     Traceback (most recent call last):
-    music21.chord.ChordException: Could not process input
-                                    argument <module 'music21.base' from '...base...'>
+    TypeError: Could not process input argument <module 'music21.base' from '...base...'>
 
     **Equality**
 
@@ -1190,7 +1189,7 @@ class Chord(ChordBase):
         This chord was giving us problems:
 
         >>> c4 = chord.Chord(['G4', 'E4', 'B3', 'E3'])
-        >>> c4.annotateIntervals(stripSpecifiers=False)
+        >>> c4.annotateIntervals(inPlace=True, stripSpecifiers=False)
         >>> [ly.text for ly in c4.lyrics]
         ['m3', 'P8', 'P5']
         >>> c4.annotateIntervals(inPlace=True, stripSpecifiers=False, returnList=True)

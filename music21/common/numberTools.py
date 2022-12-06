@@ -735,7 +735,7 @@ def weightedSelection(values: list[int],
     return values[index]
 
 
-def approximateGCD(values: Collection[int | float], grain: float = 1e-4) -> float:
+def approximateGCD(values: Collection[int | float | Fraction], grain: float = 1e-4) -> float:
     '''
     Given a list of values, find the lowest common divisor of floating point values.
 
