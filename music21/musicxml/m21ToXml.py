@@ -132,7 +132,7 @@ def normalizeColor(color):
         return color.upper()
 
 
-def getMetadataFromContext(s):
+def getMetadataFromContext(s: stream.Stream) -> metadata.Metadata | None:
     # noinspection PyShadowingNames
     '''
     Get metadata from site or context, so that a Part
