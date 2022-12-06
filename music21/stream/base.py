@@ -4915,7 +4915,10 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
 
         return out
 
-    def measureOffsetMap(self, classFilterList=None):
+    def measureOffsetMap(
+        self,
+        classFilterList: list[t.Type] | list[str] | tuple[t.Type] | tuple[str] = (Measure,)
+    ):
         '''
         If this Stream contains Measures, returns an OrderedDict
         whose keys are the offsets of the start of each measure
@@ -4996,15 +4999,10 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         see important examples in testMeasureOffsetMap() and
         testMeasureOffsetMapPostTie()
         '''
-        if classFilterList is None:
-            classFilterList = [Measure]
-        elif not isinstance(classFilterList, (list, tuple)):
-            classFilterList = [classFilterList]
-
         # environLocal.printDebug(['calling measure offsetMap()'])
 
         # environLocal.printDebug([classFilterList])
-        offsetMap = {}
+        offsetMap: dict[float | Fraction, list[Measure]] = {}
         # first, try to get measures
         # this works best of this is a Part or Score
         if Measure in classFilterList or 'Measure' in classFilterList:
@@ -5017,7 +5015,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
 
         # try other classes
         for className in classFilterList:
-            if className in [Measure or 'Measure']:  # do not redo
+            if className in (Measure, 'Measure'):  # do not redo
                 continue
             for e in self.getElementsByClass(className):
                 # environLocal.printDebug(['calling measure offsetMap(); e:', e])
@@ -5025,10 +5023,11 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
                 # long time to process
                 # 'reverse' here is a reverse sort, where the oldest objects
                 # are returned first
-                m = e.getContextByClass('Measure')  # , sortByCreationTime='reverse')
-                if m is None:  # pragma: no cover
+                maybe_m = e.getContextByClass(Measure)  # , sortByCreationTime='reverse')
+                if maybe_m is None:  # pragma: no cover
                     # hard to think of a time this would happen...But...
                     continue
+                m = maybe_m
                 # assuming that the offset returns the proper offset context
                 # this is, the current offset may not be the stream that
                 # contains this Measure; its current activeSite

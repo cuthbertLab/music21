@@ -75,7 +75,6 @@ def isNum(usrData: t.Any) -> t.TypeGuard[numbers.Rational]:
     '''
     # noinspection PyBroadException
     try:
-        # TODO: this may have unexpected consequences: find
         dummy = usrData + 0
         if usrData is not True and usrData is not False:
             return True

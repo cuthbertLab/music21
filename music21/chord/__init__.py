@@ -214,6 +214,8 @@ class ChordBase(note.NotRest):
         Does not clear any caches.
 
         Also requires that notes be iterable.
+
+        Changed in v9: incorrect arguments raise TypeError
         '''
         # quickDuration specifies whether the duration object for the chord
         # should be taken from the first note of the list.
@@ -252,8 +254,7 @@ class ChordBase(note.NotRest):
                     self._notes.append(note.Note(n))
                 # self._notes.append({'pitch':music21.pitch.Pitch(n)})
             else:
-                # TODO: v8 raise TypeError
-                raise ChordException(f'Could not process input argument {n}')
+                raise TypeError(f'Could not process input argument {n}')
 
         for n in self._notes:
             # noinspection PyProtectedMember
@@ -1116,14 +1117,47 @@ class Chord(ChordBase):
         if runSort:
             self.sortAscending(inPlace=True)
 
+    @overload
     def annotateIntervals(
-        self,
+        self: _ChordType,
         *,
-        inPlace=True,
-        stripSpecifiers=True,
-        sortPitches=True,
-        returnList=False
-    ):
+        inPlace: bool = False,
+        stripSpecifiers: bool = True,
+        sortPitches: bool = True,
+        returnList: t.Literal[True]
+    ) -> list[str]:
+        pass
+
+    @overload
+    def annotateIntervals(
+        self: _ChordType,
+        *,
+        inPlace: t.Literal[True],
+        stripSpecifiers: bool = True,
+        sortPitches: bool = True,
+        returnList: t.Literal[False] = False
+    ) -> None:
+        pass
+
+    @overload
+    def annotateIntervals(
+        self: _ChordType,
+        *,
+        inPlace: t.Literal[False] = False,
+        stripSpecifiers: bool = True,
+        sortPitches: bool = True,
+        returnList: t.Literal[False] = False
+    ) -> _ChordType:
+        pass
+
+    def annotateIntervals(
+        self: _ChordType,
+        *,
+        inPlace: bool = False,
+        stripSpecifiers: bool = True,
+        sortPitches: bool = True,
+        returnList: bool = False
+    ) -> _ChordType | None | list[str]:
         # noinspection PyShadowingNames
         '''
         Add lyrics to the chord that show the distance of each note from
@@ -1189,7 +1223,6 @@ class Chord(ChordBase):
         >>> [ly.text for ly in c.lyrics]
         ['5', '3']
         '''
-        # TODO: -- decide, should inPlace be False like others?
         # make a copy of self for reducing pitches, but attach to self
         c = copy.deepcopy(self)
         # this could be an option
@@ -1209,19 +1242,19 @@ class Chord(ChordBase):
                 notation = str(i.diatonic.generic.semiSimpleUndirected)
             lyricsList.append(notation)
 
-        if stripSpecifiers is True and sortPitches is True:
+        if stripSpecifiers and sortPitches:
             lyricsList.sort(reverse=True)
 
-        if returnList is True:
+        if returnList:
             return lyricsList
 
         for notation in lyricsList:
-            if inPlace is True:
+            if inPlace:
                 self.addLyric(notation)
             else:
                 c.addLyric(notation)
 
-        if inPlace is False:
+        if not inPlace:
             return c
 
     def areZRelations(self: _ChordType, other: _ChordType) -> bool:

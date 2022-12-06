@@ -1304,7 +1304,6 @@ class Music21Object(prebase.ProtoM21Object):
     ) -> Music21Object | None:
         return None  # until Astroid #1015
 
-
     def getContextByClass(
         self,
         className: type[_M21T] | str | None,

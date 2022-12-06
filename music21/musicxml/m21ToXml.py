@@ -4342,7 +4342,7 @@ class MeasureExporter(XMLExporterBase):
     def unpitchedToXml(self,
                        up: note.Unpitched,
                        noteIndexInChord: int = 0,
-                       chordParent: chord.ChordBase = None) -> Element:
+                       chordParent: chord.ChordBase | None = None) -> Element:
         # noinspection PyShadowingNames
         '''
         Convert an :class:`~music21.note.Unpitched` to a <note>

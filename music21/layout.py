@@ -430,13 +430,13 @@ class StaffGroup(spanner.Spanner):
                  name: str | None = None,
                  barTogether: t.Literal[True, False, None, 'Mensurstrich'] = True,
                  abbreviation: str | None = None,
-                 symbol: t.Literal['bracket', 'line', 'brace', 'square'] = None,
+                 symbol: t.Literal['bracket', 'line', 'brace', 'square'] | None = None,
                  **keywords):
         super().__init__(*spannedElements, **keywords)
 
         self.name = name or abbreviation  # if this group has a name
         self.abbreviation = abbreviation
-        self._symbol = None  # Choices: bracket, line, brace, square
+        self._symbol: t.Literal['bracket', 'line', 'brace', 'square'] | None = None
         self.symbol = symbol
         # determines if barlines are grouped through; this is group barline
         # in musicxml
@@ -475,14 +475,14 @@ class StaffGroup(spanner.Spanner):
         'Mensurstrich'
         ''')
 
-    def _getSymbol(self):
+    def _getSymbol(self) -> t.Literal['bracket', 'line', 'brace', 'square'] | None:
         return self._symbol
 
-    def _setSymbol(self, value):
+    def _setSymbol(self, value: t.Literal['bracket', 'line', 'brace', 'square'] | None):
         if value is None or str(value).lower() == 'none':
             self._symbol = None
         elif value.lower() in ['brace', 'line', 'bracket', 'square']:
-            self._symbol = value.lower()
+            self._symbol = t.cast(t.Literal['bracket', 'line', 'brace', 'square'], value.lower())
         else:
             raise StaffGroupException(f'the symbol value {value} is not acceptable')
 

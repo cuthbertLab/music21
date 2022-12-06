@@ -1501,7 +1501,7 @@ class ConverterMuseData(SubConverter):
                 # environLocal.printDebug(['partStr', len(partStr)])
                 mdw.addString(partStr)
         else:
-            if fp.is_dir:
+            if fp.is_dir():
                 mdd = musedataModule.MuseDataDirectory(fp)
                 fpList = mdd.getPaths()
             elif not common.isListLike(fp):
