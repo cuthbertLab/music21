@@ -1528,7 +1528,8 @@ class ArpeggioMark(Expression):
             arpeggioType = 'normal'
         if arpeggioType not in ('normal', 'up', 'down', 'non-arpeggio'):
             raise ValueError(
-                'Arpeggio type must be "normal", "up", "down", or "non-arpeggio"'
+                'Arpeggio type must be "normal", "up", "down", or "non-arpeggio", '
+                + f'not {arpeggioType!r}.'
             )
         self.type = arpeggioType
 
@@ -1565,7 +1566,8 @@ class ArpeggioMarkSpanner(spanner.Spanner):
         super().__init__(*spannedElements, **keywords)
         if arpeggioType not in ('normal', 'up', 'down', 'non-arpeggio'):
             raise ValueError(
-                'Arpeggio type must be "normal", "up", "down", or "non-arpeggio"'
+                'Arpeggio type must be "normal", "up", "down", or "non-arpeggio", '
+                + f'not {arpeggioType!r}.'
             )
         self.type = arpeggioType
 
