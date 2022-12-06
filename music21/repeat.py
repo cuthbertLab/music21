@@ -713,14 +713,12 @@ class Expander(t.Generic[StreamType]):
         {0.0} <music21.note.Note F>
         {3.0} <music21.bar.Barline type=final>
 
+    Changed in v9: Expander must be initialized with a Stream object.
+
     OMIT_FROM_DOCS
 
     TODO: Note bug: barline style = double for each!
     Clefs and TimesSignatures should only be in first one!
-
-    Test empty expander:
-
-    >>> e = repeat.Expander()
 
     THIS IS IN OMIT
     '''
@@ -1724,11 +1722,10 @@ class Expander(t.Generic[StreamType]):
         stream of measures. This requires the provided stream
         to only have measures.
 
-
         >>> s = converter.parse('tinynotation: 3/4 A2. C4 D E F2.')
         >>> s.makeMeasures(inPlace=True)
         >>> s.measure(3).append(repeat.Segno())
-        >>> e = repeat.Expander()
+        >>> e = repeat.Expander(s)
 
         getRepeatExpressionIndex returns the measureIndex not measure number
 

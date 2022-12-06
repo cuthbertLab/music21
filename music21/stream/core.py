@@ -263,7 +263,7 @@ class StreamCore(Music21Object):
         if self._derivation is not None:
             sdm = self._derivation.method
             if sdm in ('flat', 'semiflat'):
-                origin: 'music21.base.Stream' = t.cast('music21.base.Stream',
+                origin: 'music21.base.Stream' = t.cast('music21.stream.Stream',
                                                        self._derivation.origin)
                 origin.clearCache()
 

@@ -11594,8 +11594,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
                     if k not in returnLists:
                         returnLists[k] = []
                     returnLists[k].append(sublists[k])
-            elif isinstance(e, note.NotRest):  # elif 'Stream' not in eClasses and hasattr(e, 'lyrics'):
-                # noinspection PyTypeChecker
+            elif isinstance(e, note.NotRest):
                 if skipTies is True:
                     if e.tie is None or e.tie.type == 'start':
                         appendLyricsFromNote(e, returnLists, numNotes)
