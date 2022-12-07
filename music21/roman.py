@@ -1222,14 +1222,10 @@ def romanNumeralFromChord(
         possibleSecondaryTonic = chordObj.root().transpose('P4').name
         degree = keyObj.getScaleDegreeFromPitch(possibleSecondaryTonic)
         if degree:  # None if not in chord
-            # Note: This is super verbose but the alternatives are bug-ridden. See #1450
-            fake2ndChordDegrees = [degree, degree + 2 % 8, degree + 4 % 8]
-            fake2ndChordPitches = keyObj.pitchesFromScaleDegrees(fake2ndChordDegrees)
-            fake2ndChord = chord.Chord(fake2ndChordPitches)
-            secondaryAsRoman = romanNumeralFromChord(fake2ndChord,
-                                                     keyObj,
-                                                     preferSecondaryDominants=False
-                                                     ).romanNumeralAlone
+            secondaryAsRoman = RomanNumeral(degree,
+                                            keyObj,
+                                            preferSecondaryDominants=False
+                                            ).romanNumeralAlone
             primaryFigure = romanNumeralFromChord(chordObj,
                                                   key.Key(possibleSecondaryTonic),
                                                   preferSecondaryDominants=False
