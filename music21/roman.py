@@ -746,8 +746,7 @@ def romanNumeralFromChord(
     '''
     Takes a chord object and returns an appropriate chord name.  If keyObj is
     omitted, the root of the chord is considered the key (if the chord has a
-    major third, it's major; otherwise it's minor).  preferSecondaryDominants does not currently
-    do anything.
+    major third, it's major; otherwise it's minor).
 
     >>> rn = roman.romanNumeralFromChord(
     ...     chord.Chord(['E-3', 'C4', 'G-6']),
@@ -937,6 +936,110 @@ def romanNumeralFromChord(
     <music21.roman.RomanNumeral io6b5b3 in c# minor>
 
 
+    The preferSecondaryDominants option defaults to False, but if set to True,
+    then certain rare figures are swapped with their
+    more common secondary dominant equivalent to produce
+    Roman numerals like 'V/V' instead of 'II'.
+
+    This has no effect on most chords.
+    A change is triggered if and only if:
+
+    * the chord is a major triad or dominant seventh
+
+    * the chord is not diatonic to the primary key (i.e., chromatically altered)
+
+    * the root of secondary key is diatonic to the primary key.
+
+    So first without setting preferSecondaryDominants:
+
+    >>> cd = chord.Chord('D F# A')
+    >>> rn = roman.romanNumeralFromChord(cd, 'C')
+    >>> rn.figure
+    'II'
+
+    And now with preferSecondaryDominants=True:
+
+    >>> rn = roman.romanNumeralFromChord(cd, 'C', preferSecondaryDominants=True)
+    >>> rn.figure
+    'V/V'
+
+    Dominant sevenths must be spelt correctly
+    (see conditions at :meth:`~music21.chord.Chord.isDominantSeventh`).
+
+    So let's try D dominant seventh in various contexts.
+
+    >>> cd = chord.Chord('F#4 A4 C5 D5')
+
+    In G major this still comes out without recourse to a secondary,
+    whether preferSecondaryDominants is True or False.
+
+    >>> rn = roman.romanNumeralFromChord(cd, 'G')
+    >>> rn.figure
+    'V65'
+
+    >>> rn = roman.romanNumeralFromChord(cd, 'G', preferSecondaryDominants=True)
+    >>> rn.figure
+    'V65'
+
+    In C major it does come through as a secondary
+
+    >>> rn = roman.romanNumeralFromChord(cd, 'C', preferSecondaryDominants=True)
+    >>> rn.figure
+    'V65/V'
+
+    "German Augmented sixth" chords are left intact, without change.
+    This is thanks to the constraints on
+    spelling and on the root of the secondary degree.
+
+    >>> cd = chord.Chord('Ab4 C5 Eb5 F#5')
+    >>> rn = roman.romanNumeralFromChord(cd, 'C', preferSecondaryDominants=True)
+    >>> rn.figure
+    'Ger65'
+
+    Let's check that with a dominant seventh spelling and minor key context:
+
+    >>> cd = chord.Chord('Ab4 C5 Eb5 Gb5')
+    >>> rn = roman.romanNumeralFromChord(cd, 'c', preferSecondaryDominants=True)
+    >>> rn.figure
+    'bVIb753'
+
+    So that's a context in which the root is diatonic,
+    but the possible secondary root is not.
+    Now let's do the opposite case with a root that is not diatonic
+    and a secondary that is.
+
+    >>> cd = chord.Chord('Ab4 C5 Eb5 Gb5')
+    >>> rn = roman.romanNumeralFromChord(cd, 'c', preferSecondaryDominants=True)
+    >>> rn.figure
+    'bVIb753'
+
+    Watch out, because there are still a lot of chords that
+    preferSecondaryDominants will alter.
+    This is deliberate: this option defaults to false
+    so it does not run unless a user specifically initiates it
+    and actively wants to make modifications.
+    Power users could create more specific conditions in which to call it,
+    e.g., before/after specific chords,
+    and they can only do so if it errs on the side of more changes.
+
+    For example, in minor, 'I' will be mapped to 'V/iv'.
+
+    >>> cd = chord.Chord('F4 A4 C5')
+    >>> rn = roman.romanNumeralFromChord(cd, 'f')
+    >>> rn.figure
+    'I'
+
+    >>> cd = chord.Chord('F4 A4 C5')
+    >>> rn = roman.romanNumeralFromChord(cd, 'f', preferSecondaryDominants=True)
+    >>> rn.figure
+    'V/iv'
+
+    This might be appropriate in the middle of a progression like
+    i, V/iv, iv.
+    By contrast, it's probably not wanted for a tierce de picardie at the end
+    iv6, V, I.
+    This kind of context-sensitivity is not currently included.
+
     OMIT_FROM_DOCS
 
     Note that this should be III+642 gives III+#642 (# before 6 is unnecessary)
@@ -1110,6 +1213,24 @@ def romanNumeralFromChord(
             keyObj = _getKeyFromCache(chordObj.fifth.name.lower())
         elif nationalityStart in ('Fr', 'Sw'):
             keyObj = _getKeyFromCache(chordObj.seventh.name.lower())
+
+    if (
+        preferSecondaryDominants
+        and stepRoman != 'V'  # ignore if already "primary" dominant
+        and (chordObj.isDominantSeventh() or chordObj.isMajorTriad())
+    ):
+        possibleSecondaryTonic = chordObj.root().transpose('P4').name
+        degree = keyObj.getScaleDegreeFromPitch(possibleSecondaryTonic)
+        if degree:  # None if not in chord
+            secondaryAsRoman = RomanNumeral(degree,
+                                            keyObj,
+                                            preferSecondaryDominants=False
+                                            ).romanNumeralAlone
+            primaryFigure = romanNumeralFromChord(chordObj,
+                                                  key.Key(possibleSecondaryTonic),
+                                                  preferSecondaryDominants=False
+                                                  ).figure
+            rnString = f'{primaryFigure}/{secondaryAsRoman}'
 
     try:
         rn = RomanNumeral(rnString, keyObj, updatePitches=False,
