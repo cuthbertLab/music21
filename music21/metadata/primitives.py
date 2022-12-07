@@ -473,9 +473,9 @@ class DatePrimitive(prebase.ProtoM21Object):
     '''
     # INITIALIZER #
 
-    def __init__(self, relevance='certain'):
+    def __init__(self, relevance: str = 'certain'):
         self._data: list[Date] = []
-        self._relevance = None  # managed by property
+        self._relevance = ''  # managed by property
         # not yet implemented
         # store an array of values marking if date data itself
         # is certain, approximate, or uncertain

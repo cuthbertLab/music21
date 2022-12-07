@@ -829,23 +829,23 @@ class PartStaffExporterMixin:
             <music21.stream.PartStaff unrelated> not found in self.partExporterList
         '''
         for pex in self.partExporterList:
-            if partStaff is pex.stream:
+            if partStaff is pex.stream and pex.xmlRoot is not None:
                 return pex.xmlRoot
 
         # now try derivations:
         for pex in self.partExporterList:
             for derived in pex.stream.derivation.chain():
-                if derived is partStaff:
+                if derived is partStaff and pex.xmlRoot is not None:
                     return pex.xmlRoot
 
         # now just match on id:
         for pex in self.partExporterList:
-            if partStaff.id == pex.stream.id:
+            if partStaff.id == pex.stream.id and pex.xmlRoot is not None:
                 return pex.xmlRoot
 
         for pex in self.partExporterList:
             for derived in pex.stream.derivation.chain():
-                if partStaff.id == derived.id:
+                if partStaff.id == derived.id and pex.xmlRoot is not None:
                     return pex.xmlRoot
 
         raise MusicXMLExportException(

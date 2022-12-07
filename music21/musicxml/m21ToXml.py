@@ -72,7 +72,7 @@ if t.TYPE_CHECKING:
 
 # ------------------------------------------------------------------------------
 
-def typeToMusicXMLType(value):
+def typeToMusicXMLType(value: str) -> str:
     '''
     Convert a music21 type to a MusicXML type.
 
@@ -113,7 +113,7 @@ def typeToMusicXMLType(value):
         return value
 
 
-def normalizeColor(color):
+def normalizeColor(color: str) -> str:
     '''
     Normalize a css3 name to hex or leave it alone...
 
@@ -124,15 +124,15 @@ def normalizeColor(color):
     >>> musicxml.m21ToXml.normalizeColor('#00ff00')
     '#00FF00'
     '''
-    if color in (None, ''):
-        return color
+    if not color:
+        return ''
     if '#' not in color:
         return webcolors.name_to_hex(color).upper()
     else:
         return color.upper()
 
 
-def getMetadataFromContext(s):
+def getMetadataFromContext(s: stream.Stream) -> metadata.Metadata | None:
     # noinspection PyShadowingNames
     '''
     Get metadata from site or context, so that a Part
@@ -166,14 +166,14 @@ def getMetadataFromContext(s):
 
 
 def _setTagTextFromAttribute(
-    m21El,
+    m21El: t.Any,
     xmlEl: Element,
     tag: str,
     attributeName: str | None = None,
     *,
-    transform=None,
-    forceEmpty=False
-):
+    transform: t.Callable[[t.Any], t.Any] | None = None,
+    forceEmpty: bool = False
+) -> Element | None:
     '''
     If m21El has an attribute called attributeName, create a new SubElement
     for xmlEl and set its text to the value of the m21El attribute.
@@ -234,7 +234,13 @@ def _setTagTextFromAttribute(
     return subElement
 
 
-def _setAttributeFromAttribute(m21El, xmlEl, xmlAttributeName, attributeName=None, transform=None):
+def _setAttributeFromAttribute(
+    m21El: t.Any,
+    xmlEl: Element,
+    xmlAttributeName: str,
+    attributeName: str | None = None,
+    transform: t.Callable[[t.Any], t.Any] | None = None
+):
     '''
     If m21El has at least one element of tag==tag with some text. If
     it does, set the attribute either with the same name (with "foo-bar" changed to
@@ -356,11 +362,11 @@ class GeneralObjectExporter:
         ('Music21Object', 'fromMusic21Object'),
     ])
 
-    def __init__(self, obj=None):
+    def __init__(self, obj: prebase.ProtoM21Object | None = None):
         self.generalObj = obj
         self.makeNotation: bool = True
 
-    def parse(self, obj=None):
+    def parse(self, obj: prebase.ProtoM21Object | None = None) -> bytes:
         r'''
         Return a bytes object representation of anything from a
         Score to a single pitch.
@@ -430,6 +436,9 @@ class GeneralObjectExporter:
         '''
         if obj is None:
             obj = self.generalObj
+        if obj is None:
+            raise MusicXMLExportException('Must have an object to export')
+
         if self.makeNotation:
             outObj = self.fromGeneralObject(obj)
             return self.parseWellformedObject(outObj)
@@ -438,7 +447,7 @@ class GeneralObjectExporter:
                 raise MusicXMLExportException('Can only export Scores with makeNotation=False')
             return self.parseWellformedObject(obj)
 
-    def parseWellformedObject(self, sc) -> bytes:
+    def parseWellformedObject(self, sc: stream.Score) -> bytes:
         '''
         Parse an object that has already gone through the
         `.fromGeneralObject` conversion, which has produced a copy with
@@ -451,7 +460,7 @@ class GeneralObjectExporter:
         scoreExporter.parse()
         return scoreExporter.asBytes()
 
-    def fromGeneralObject(self, obj):
+    def fromGeneralObject(self, obj: prebase.ProtoM21Object):
         '''
         Converts any Music21Object (or a duration or a pitch) to something that
         can be passed to ScoreExporter()
@@ -806,8 +815,8 @@ class XMLExporterBase:
     contains functions that could be called
     at multiple levels of exporting (Score, Part, Measure).
     '''
-    def __init__(self):
-        self.xmlRoot = None
+    def __init__(self) -> None:
+        self.xmlRoot = Element('override-me-in-subclasses')
         self.stream: stream.Stream | None = None
 
     def asBytes(self, noCopy=True) -> bytes:
@@ -1459,9 +1468,9 @@ class ScoreExporter(XMLExporterBase, PartStaffExporterMixin):
             self.stream = score
 
         self.xmlRoot = Element('score-partwise', version=defaults.musicxmlVersion)
-        self.mxIdentification = None
+        self.mxIdentification: Element | None = None
 
-        self.scoreMetadata = None
+        self.scoreMetadata: metadata.Metadata | None = None
 
         self.spannerBundle: spanner.SpannerBundle | None = None
         self.meterStream: stream.Stream[meter.TimeSignatureBase] | None = None
@@ -1748,7 +1757,7 @@ class ScoreExporter(XMLExporterBase, PartStaffExporterMixin):
 
             partExp.staffGroup = joinableGroup
 
-    def renumberVoicesWithinStaffGroups(self):
+    def renumberVoicesWithinStaffGroups(self) -> None:
         '''
         Renumbers voices (as appropriate) in each StaffGroup, so that
         voices have unique numbers across the entire group.
@@ -1767,8 +1776,12 @@ class ScoreExporter(XMLExporterBase, PartStaffExporterMixin):
 
             # renumber the voices in this StaffGroup
             staffGroupScore = stream.Score(partExp.staffGroup.getSpannedElements())
-            measuresStream = staffGroupScore.recurse().getElementsByClass(stream.Measure).stream()
-            for measureStack in OffsetIterator(measuresStream):
+            measuresStream: stream.Stream[stream.Measure] = (
+                staffGroupScore.recurse().getElementsByClass(stream.Measure).stream()
+            )
+            offsetIterator: OffsetIterator[stream.Measure] = OffsetIterator(measuresStream)
+            measureStack: t.Sequence[stream.Stream[stream.Measure]]
+            for measureStack in offsetIterator:
                 nextVoiceId: int = 1
                 for m in measureStack:
                     for v in m[stream.Voice]:
@@ -2273,7 +2286,7 @@ class ScoreExporter(XMLExporterBase, PartStaffExporterMixin):
         # environLocal.printDebug(['configureMxPartGroupFromStaffGroup: mxPartGroup', mxPartGroup])
         return mxPartGroup
 
-    def setIdentification(self):
+    def setIdentification(self) -> Element:
         # noinspection SpellCheckingInspection, PyShadowingNames
         '''
         Returns an identification object from self.scoreMetadata.  And appends to the score...
@@ -2372,7 +2385,10 @@ class ScoreExporter(XMLExporterBase, PartStaffExporterMixin):
 
         return mxId
 
-    def metadataToMiscellaneous(self, md=None):
+    def metadataToMiscellaneous(
+        self,
+        md: metadata.Metadata | None = None
+    ) -> Element | None:
         # noinspection PyShadowingNames
         '''
         Returns an mxMiscellaneous of information from metadata object md or
@@ -2397,11 +2413,13 @@ class ScoreExporter(XMLExporterBase, PartStaffExporterMixin):
         elif md is None:
             md = self.scoreMetadata
 
+        if t.TYPE_CHECKING:
+            assert md is not None
+
         mxMiscellaneous = Element('miscellaneous')
 
         foundOne = False
-        allItems: list[tuple[str, t.Any]] = []
-
+        allItems: tuple[tuple[str, t.Any], ...]
         allItems = md.all(
             skipContributors=True,  # we don't want the contributors (already handled them)
             returnPrimitives=True,  # we want ValueType values
@@ -2553,13 +2571,16 @@ class ScoreExporter(XMLExporterBase, PartStaffExporterMixin):
 
         return supportsList
 
-    def setTitles(self):
+    def setTitles(self) -> None:
         '''
         puts work (with work-title), movement-number, movement-title into the self.xmlRoot
         '''
         mdObj = self.scoreMetadata
         if self.scoreMetadata is None:
             mdObj = metadata.Metadata()
+        if t.TYPE_CHECKING:
+            assert mdObj is not None
+
         mxScoreHeader = self.xmlRoot
         mxWork = Element('work')
         # TODO: work-number
@@ -2580,7 +2601,7 @@ class ScoreExporter(XMLExporterBase, PartStaffExporterMixin):
 
         # musicxml often defaults to show only movement title
         # if no movementName is found in mdObj, set movement title to
-        # the mdObj's first title instead. Fall back to defaults.title if
+        # first title of the mdObj instead. Fall back to defaults.title if
         # necessary (and if possible).
 
         movement_title: str = ''
@@ -3148,7 +3169,7 @@ class MeasureExporter(XMLExporterBase):
         self.mxTranspose = None
         self.measureOffsetStart = 0.0
         self.offsetInMeasure = 0.0
-        self.currentVoiceId: int | None = None
+        self.currentVoiceId: int | str | None = None
         self.nextFreeVoiceNumber: int = 1
         self.nextArpeggioNumber: int = 1
         self.arpeggioNumbers: dict[expressions.ArpeggioMarkSpanner, int] = {}
@@ -3207,7 +3228,12 @@ class MeasureExporter(XMLExporterBase):
             # Assumes voices are flat...
             self.parseFlatElements(v, backupAfterwards=backupAfterwards)
 
-    def parseFlatElements(self, m, *, backupAfterwards=False):
+    def parseFlatElements(
+        self,
+        m: stream.Measure | stream.Voice,
+        *,
+        backupAfterwards: bool = False
+    ) -> None:
         '''
         Deals with parsing all the elements in .elements, assuming that .elements is flat.
 
@@ -3222,8 +3248,8 @@ class MeasureExporter(XMLExporterBase):
         root = self.xmlRoot
         divisions = self.currentDivisions
         self.offsetInMeasure = 0.0
+        voiceId: int | str | None
         if isinstance(m, stream.Voice):
-            m: stream.Voice
             if isinstance(m.id, int) and m.id < defaults.minIdNumberToConsiderMemoryLocation:
                 voiceId = m.id
                 self.nextFreeVoiceNumber = voiceId + 1
@@ -3242,7 +3268,9 @@ class MeasureExporter(XMLExporterBase):
         # group all objects by offsets and then do a different order than normal sort.
         # that way chord symbols and other 0-width objects appear before notes as much as
         # possible.
-        for objGroup in OffsetIterator(m):
+        objGroup: list[base.Music21Object]
+        objIterator: OffsetIterator[base.Music21Object] = OffsetIterator(m)
+        for objGroup in objIterator:
             groupOffset = m.elementOffset(objGroup[0])
             amountToMoveForward = int(round(divisions * (groupOffset
                                                              - self.offsetInMeasure)))
@@ -4342,7 +4370,7 @@ class MeasureExporter(XMLExporterBase):
     def unpitchedToXml(self,
                        up: note.Unpitched,
                        noteIndexInChord: int = 0,
-                       chordParent: chord.ChordBase = None) -> Element:
+                       chordParent: chord.ChordBase | None = None) -> Element:
         # noinspection PyShadowingNames
         '''
         Convert an :class:`~music21.note.Unpitched` to a <note>
@@ -4601,7 +4629,7 @@ class MeasureExporter(XMLExporterBase):
         setb(n, mxNotehead, 'parentheses', 'noteheadParenthesis',
              transform=xmlObjects.booleanToYesNo)
         # TODO: font
-        if n.hasStyleInformation and n.style.color not in (None, ''):
+        if n.hasStyleInformation and n.style.color:
             color = normalizeColor(n.style.color)
             mxNotehead.set('color', color)
         return mxNotehead
