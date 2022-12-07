@@ -1039,9 +1039,17 @@ class HorizontalBar(primitives.GraphHorizontalBar, PlotStreamMixin):
         'y': axis.PitchSpaceAxis,
     }
 
-    def __init__(self, streamObj=None, *, colorByPart=False, **keywords):
+    def __init__(
+        self,
+        streamObj: stream.Stream | None = None,
+        *,
+        colorByPart=False,
+        **keywords
+    ) -> None:
         self.colorByPart = colorByPart
         self._partsToColor: dict[stream.Part, str] = {}
+
+        self.axisY: axis.PitchSpaceAxis
 
         primitives.GraphHorizontalBar.__init__(self, **keywords)
         PlotStreamMixin.__init__(self, streamObj, **keywords)

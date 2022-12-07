@@ -23,7 +23,6 @@ music encoding in the corpus may have different licenses and/or copyrights.
 A no-corpus version of `music21` is available also on GitHub.
 
 [![Build Status](https://github.com/cuthbertLab/music21/workflows/maincheck/badge.svg)](https://github.com/cuthbertLab/music21)
-[![Lint Status](https://github.com/cuthbertLab/music21/workflows/PyLint/badge.svg)](https://github.com/cuthbertLab/music21)
 [![Coverage Status](https://coveralls.io/repos/github/cuthbertLab/music21/badge.svg?branch=master)](https://coveralls.io/github/cuthbertLab/music21?branch=master)
 
 ## Documentation ##

@@ -36,6 +36,7 @@ from music21.exceptions21 import StreamException
 
 
 if t.TYPE_CHECKING:
+    from fractions import Fraction
     from music21 import stream
     from music21.stream.iterator import StreamIterator
 
@@ -199,7 +200,7 @@ def makeBeams(
                 continue
 
             # getBeams
-            offset = 0.0
+            offset: float | Fraction = 0.0
             if m.paddingLeft != 0.0:
                 offset = opFrac(m.paddingLeft)
             elif m.paddingRight != 0.0:

@@ -597,6 +597,14 @@ class ChordStepModification(prebase.ProtoM21Object):
     def _reprInternal(self):
         return f'modType={self.modType} degree={self.degree} interval={self.interval}'
 
+    def __eq__(self, other):
+        return (
+            isinstance(other, ChordStepModification)
+            and self.modType == other.modType
+            and self.degree == other.degree
+            and self.interval == other.interval
+        )
+
     # PUBLIC PROPERTIES #
 
     @property
@@ -1890,7 +1898,7 @@ class ChordSymbol(Harmony):
 
         return notationString
 
-    def _parseFigure(self):
+    def _parseFigure(self) -> None:
         '''
         Translate the figure string (regular expression) into a meaningful
         Harmony object by identifying the root, bass, inversion, kind, and

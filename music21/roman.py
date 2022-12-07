@@ -2393,8 +2393,20 @@ class RomanNumeral(harmony.Harmony):
         self.scaleCardinality: int = 7
 
         if isinstance(figure, int):
-            self.caseMatters = False
             figure = common.toRoman(figure)
+            if self.caseMatters:
+                mode = ''
+                if isinstance(keyOrScale, key.Key):
+                    mode = keyOrScale.mode
+                elif isinstance(keyOrScale, scale.DiatonicScale):
+                    mode = keyOrScale.type
+                elif isinstance(keyOrScale, str) and keyOrScale:
+                    mode = 'major' if keyOrScale[0].isupper() else 'minor'
+                if (
+                    (mode == 'major' and figure in ('II', 'III', 'VI', 'VII'))
+                    or (mode == 'minor' and figure in ('I', 'II', 'IV', 'V'))
+                ):
+                    figure = figure.lower()
 
         # immediately fix low-preference figures
         if isinstance(figure, str):
@@ -4513,6 +4525,26 @@ class Test(unittest.TestCase):
         self.assertEqual(rn.seventh.name, 'A-')
         rn = RomanNumeral('bVII7', 'C', seventhMinor=Minor67Default.CAUTIONARY)
         self.assertEqual(rn.seventh.name, 'A')
+
+    def test_int_figure_case_matters(self):
+        '''
+        Fix for https://github.com/cuthbertLab/music21/issues/1450
+        '''
+        minorKeyObj = key.Key('c')
+        rn = RomanNumeral(2, minorKeyObj)
+        self.assertEqual(rn.figure, 'ii')
+        rn = RomanNumeral(2, minorKeyObj, caseMatters=False)
+        self.assertEqual(rn.figure, 'II')
+
+        rn = RomanNumeral(4, 'c')
+        self.assertEqual(rn.figure, 'iv')
+
+        rn = RomanNumeral(6, scale.MajorScale('c'))
+        self.assertEqual(rn.figure, 'vi')
+
+        # Major still works
+        rn = RomanNumeral(4, 'C')
+        self.assertEqual(rn.figure, 'IV')
 
 
 class TestExternal(unittest.TestCase):

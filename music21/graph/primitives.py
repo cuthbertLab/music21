@@ -980,7 +980,7 @@ class GraphHorizontalBar(Graph):
     def barHeight(self):
         return self.barSpace - (self.margin * 2)
 
-    def renderSubplot(self, subplot):
+    def renderSubplot(self, subplot) -> None:
         self.figure.subplots_adjust(left=0.15)
 
         yPos = 0

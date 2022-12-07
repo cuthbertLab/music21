@@ -1010,7 +1010,7 @@ class Sieve:
     >>> c = sieve.Sieve('(5|2)&4&8')
     '''
 
-    def __init__(self, usrStr, z=None):
+    def __init__(self, usrStr: str | list[str], z: list[int] | None = None):
         # note: this z should only be used if usrStr is a str, and not a list
         if z is None and isinstance(usrStr, str):
             z = list(range(100))
@@ -1025,7 +1025,7 @@ class Sieve:
 
         self._nonCompressible = False  # if current z provides a nullSeg; no compression
         # variables will re-initialize w/ dedicated methods
-        self._resLib = {}  # store id and object
+        self._resLib: dict[int, Residual] = {}  # store id and object
         self._resId = 0  # used to calculate residual ids
 
         # expanded, compressed form
