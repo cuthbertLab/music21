@@ -3314,7 +3314,7 @@ class Music21Object(prebase.ProtoM21Object):
 
     def splitByQuarterLengths(
         self,
-        quarterLengthList: list[int | float],
+        quarterLengthList: list[int | float | fractions.Fraction],
         addTies=True,
         displayTiedAccidentals=False
     ) -> _SplitTuple:

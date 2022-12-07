@@ -59,6 +59,7 @@ from music21.musicxml.xmlObjects import MusicXMLImportException, MusicXMLWarning
 
 if t.TYPE_CHECKING:
     from music21 import base
+    from music21.common.types import OffsetQL
 
     # what goes in a `.staffReference`
     StaffReferenceType = dict[int, list[base.Music21Object]]
@@ -2403,7 +2404,7 @@ class MeasureParser(XMLParserBase):
         self.parseIndex = 0
 
         # what is the offset in the measure of the current note position?
-        self.offsetMeasureNote = 0.0
+        self.offsetMeasureNote: OffsetQL = 0.0
 
         # keep track of the last rest that was added with a forward tag.
         # there are many pieces that end with incomplete measures that

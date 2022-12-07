@@ -191,7 +191,8 @@ class StreamCore(Music21Object):
         # Note: not documenting 'highestTime' is on purpose, since can only be done for
         # elements already stored at end.  Infinite loop.
         try:
-            offset = opFrac(offset)
+            # try first, for the general case of not OffsetSpecial.
+            offset = opFrac(offset)  # type: ignore
         except TypeError:
             if offset not in OffsetSpecial:  # pragma: no cover
                 raise StreamException(f'Cannot set offset to {offset!r} for {element}')

@@ -19,6 +19,7 @@ from math import isclose, gcd
 import numbers
 import random
 import typing as t
+from typing import overload
 import unittest
 
 from music21 import defaults
@@ -207,6 +208,18 @@ _KNOWN_PASSES = frozenset([
     0.0625, 0.09375, 0.125, 0.1875,
     0.25, 0.375, 0.5, 0.75, 1.0, 1.5, 2.0, 3.0, 4.0, 6.0
 ])
+
+@overload
+def opFrac(num: None) -> None:
+    pass
+
+@overload
+def opFrac(num: int) -> float:
+    pass
+
+@overload
+def opFrac(num: float | Fraction) -> float | Fraction:
+    pass
 
 # no type checking due to accessing protected attributes (for speed)
 @t.no_type_check
