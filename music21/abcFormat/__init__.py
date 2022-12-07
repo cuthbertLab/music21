@@ -162,7 +162,7 @@ class ABCToken(prebase.ProtoM21Object, common.objects.EqualSlottedObjectMixin):
     '''
     __slots__ = ('src',)
 
-    def __init__(self, src=''):
+    def __init__(self, src: str = ''):
         self.src: str = src  # store source character sequence
 
     def _reprInternal(self):
@@ -237,7 +237,7 @@ class ABCMetadata(ABCToken):
 
     # given a logical unit, create an object
     # may be a chord, notes, metadata, bars
-    def __init__(self, src=''):
+    def __init__(self, src: str = ''):
         super().__init__(src)
         self.tag: str = ''
         self.data: str = ''
@@ -803,7 +803,7 @@ class ABCBar(ABCToken):
         self.barStyle = ''  # regular, heavy-light, etc
         self.repeatForm = ''  # end, start, bidrectional, first, second
 
-    def parse(self):
+    def parse(self) -> None:
         '''
         Assign the bar-type based on the source string.
 
@@ -1154,7 +1154,7 @@ class ABCSlurStart(ABCToken):
     '''
     __slots__ = ('slurObj',)
 
-    def __init__(self, src=''):
+    def __init__(self, src: str = ''):
         super().__init__(src)
         self.slurObj: spanner.Slur | None = None
 
@@ -1183,11 +1183,11 @@ class ABCCrescStart(ABCToken):
     '''
     __slots__ = ('crescObj',)
 
-    def __init__(self, src=''):
+    def __init__(self, src: str = ''):
         super().__init__(src)
         self.crescObj: dynamics.Crescendo | None = None
 
-    def fillCresc(self):
+    def fillCresc(self) -> None:
         from music21 import dynamics
         self.crescObj = dynamics.Crescendo()
 
@@ -1199,7 +1199,7 @@ class ABCDimStart(ABCToken):
     '''
     __slots__ = ('dimObj',)
 
-    def __init__(self, src=''):
+    def __init__(self, src: str = ''):
         super().__init__(src)
         self.dimObj: dynamics.Diminuendo | None = None
 
@@ -1278,9 +1278,9 @@ class ABCBrokenRhythmMarker(ABCToken):
     '''
     __slots__ = ('data',)
 
-    def __init__(self, src=''):
+    def __init__(self, src: str = ''):
         super().__init__(src)
-        self.data: str | None = None
+        self.data: str = ''
 
     def preParse(self):
         '''
@@ -1328,26 +1328,26 @@ class ABCNote(ABCToken):
         self.chordSymbols: list[str] = []
 
         # context attributes
-        self.inBar = None
-        self.inBeam = None
-        self.inGrace = None
+        self.inBar: bool | None = None
+        self.inBeam: bool | None = None
+        self.inGrace: bool | None = None
 
         # provide default duration from handler; may change during piece
         self.activeDefaultQuarterLength: float | None = None
         # store if a broken symbol applies; a pair of symbols, position (left, right)
-        self.brokenRhythmMarker = None
+        self.brokenRhythmMarker: tuple[str, str] | None = None
 
         # store key signature for pitch processing; this is an M21Object
-        self.activeKeySignature = None
+        self.activeKeySignature: key.KeySignature | None = None
 
         # store a tuplet if active
-        self.activeTuplet = None
+        self.activeTuplet: duration.Tuplet | None = None
 
         # store a spanner if active
         self.applicableSpanners: list[spanner.Spanner] = []
 
-        # store a tie if active
-        self.tie = None
+        # store a tie type if active
+        self.tie: str | None = None
 
         # store articulations if active
         self.articulations: list[str] = []
@@ -2501,7 +2501,7 @@ class ABCHandler:
             # no action: normal continuation of 1 char
             pass
 
-    def tokenProcess(self):
+    def tokenProcess(self) -> None:
         '''
         Process all token objects. First, calls preParse(), then
         does context assignments, then calls parse().
@@ -2582,6 +2582,9 @@ class ABCHandler:
             # notes within slur marks need to be added to the spanner
             if isinstance(token, ABCSlurStart):
                 token.fillSlur()
+                if t.TYPE_CHECKING:
+                    assert token.slurObj is not None
+
                 self.activeSpanners.append(token.slurObj)
                 self.activeParens.append('Slur')
             elif isinstance(token, ABCParenStop):
@@ -2618,11 +2621,15 @@ class ABCHandler:
 
             if isinstance(token, ABCCrescStart):
                 token.fillCresc()
+                if t.TYPE_CHECKING:
+                    assert token.crescObj is not None
                 self.activeSpanners.append(token.crescObj)
                 self.activeParens.append('Crescendo')
 
             if isinstance(token, ABCDimStart):
                 token.fillDim()
+                if t.TYPE_CHECKING:
+                    assert token.dimObj is not None
                 self.activeSpanners.append(token.dimObj)
                 self.activeParens.append('Diminuendo')
 
@@ -3247,7 +3254,7 @@ class ABCHandlerBar(ABCHandler):
     # divide elements of a character stream into objects and handle
     # store in a list, and pass global information to components
 
-    def __init__(self):
+    def __init__(self) -> None:
         # tokens are ABC objects in a linear stream
         super().__init__()
 

@@ -1637,7 +1637,7 @@ class PartParser(XMLParserBase):
 
         # TODO: MusicXML 4.0: player tags
 
-    def getDefaultInstrument(self, mxScorePart=None):
+    def getDefaultInstrument(self, mxScorePart: ET.Element | None = None) -> instrument.Instrument:
         # noinspection PyShadowingNames
         r'''
         >>> scorePart = ('<score-part id="P4"><part-name>Bass</part-name>'
@@ -1675,6 +1675,8 @@ class PartParser(XMLParserBase):
 
         >>> mxScorePart = EL(scorePart)
         >>> i = PP.getDefaultInstrument(mxScorePart)
+        >>> i
+        <music21.instrument.Trumpet ': C Trumpet'>
         >>> i.instrumentName
         'C Trumpet'
         >>> i.transposition
@@ -1682,6 +1684,11 @@ class PartParser(XMLParserBase):
         '''
         if mxScorePart is None:
             mxScorePart = self.mxScorePart
+
+        if mxScorePart is None:
+            raise MusicXMLImportException(
+                'score-part must be defined before calling this.'
+            )
 
         def _adjustMidiData(mc):
             adjusted = int(mc) - 1
@@ -1739,7 +1746,8 @@ class PartParser(XMLParserBase):
                 i = inst_from_name
 
         i.partId = self.partId
-        i.groups.append(self.partId)
+        if self.partId is not None:
+            i.groups.append(self.partId)
         i.partName = self.stream.partName
         i.partAbbreviation = self.stream.partAbbreviation
         # TODO: groups
@@ -1803,7 +1811,7 @@ class PartParser(XMLParserBase):
         if lmp.stream.recurse().notesAndRests.last() is endedForwardRest:
             lmp.stream.remove(endedForwardRest, recurse=True)
 
-    def separateOutPartStaves(self):
+    def separateOutPartStaves(self) -> None:
         '''
         Take a `Part` with multiple staves and make them a set of `PartStaff` objects.
 

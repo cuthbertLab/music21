@@ -51,7 +51,7 @@ def wrapWeakref(referent: _T) -> weakref.ReferenceType | _T:
         return referent
 
 
-def unwrapWeakref(referent: weakref.ReferenceType) -> t.Any:
+def unwrapWeakref(referent: weakref.ReferenceType | t.Any) -> t.Any:
     '''
     Utility function that gets an object that might be an object itself
     or a weak reference to an object.  It returns obj() if it's a weakref.

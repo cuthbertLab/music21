@@ -1898,7 +1898,7 @@ class ChordSymbol(Harmony):
 
         return notationString
 
-    def _parseFigure(self):
+    def _parseFigure(self) -> None:
         '''
         Translate the figure string (regular expression) into a meaningful
         Harmony object by identifying the root, bass, inversion, kind, and

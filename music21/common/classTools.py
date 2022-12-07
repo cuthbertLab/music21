@@ -294,7 +294,7 @@ def tempAttribute(obj, attribute: str, new_val=TEMP_ATTRIBUTE_SENTINEL):
         setattr(obj, attribute, tempStorage)
 
 @contextlib.contextmanager
-def saveAttributes(obj, *attributeList):
+def saveAttributes(obj, *attributeList: str) -> t.Generator[None, None, None]:
     '''
     Save a number of attributes in an object and then restore them afterwards.
 

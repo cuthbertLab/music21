@@ -87,7 +87,7 @@ class SubConverter:
     codecWrite: bool = False
     stringEncoding: str = 'utf-8'
 
-    def __init__(self, **keywords):
+    def __init__(self, **keywords) -> None:
         self._stream: stream.Score | stream.Part | stream.Opus = stream.Score()
         self.keywords: dict[str, t.Any] = keywords
 

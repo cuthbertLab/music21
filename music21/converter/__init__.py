@@ -493,7 +493,7 @@ class Converter:
             ''',
     }
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.subConverter: subConverters.SubConverter | None = None
         # a stream object unthawed
         self._thawedStream: stream.Score | stream.Part | stream.Opus | None = None

@@ -710,9 +710,8 @@ class LocalCorpus(Corpus):
     Traceback (most recent call last):
     music21.exceptions21.CorpusException: The name 'core' is reserved.
     '''
-
     # CLASS VARIABLES #
-    _temporaryLocalPaths: dict[str, set] = {}
+    _temporaryLocalPaths: dict[str, set[pathlib.Path]] = {}
     parseUsingCorpus: bool = False
 
     # INITIALIZER #
@@ -867,7 +866,7 @@ class LocalCorpus(Corpus):
 
         return Corpus._pathsCache[cacheKey]
 
-    def removePath(self, directoryPath):
+    def removePath(self, directoryPath: str | pathlib.Path) -> None:
         r'''
         Remove a directory path from a local corpus.
 
@@ -885,8 +884,8 @@ class LocalCorpus(Corpus):
         TODO: test for corpus persisted to disk without actually reindexing
         files on user's Desktop.
         '''
-        temporaryPaths = LocalCorpus._temporaryLocalPaths.get(
-            self.name, [])
+        temporaryPaths: set[pathlib.Path] = LocalCorpus._temporaryLocalPaths.get(
+            self.name, set())
         directoryPathObj: pathlib.Path = common.cleanpath(directoryPath, returnPathlib=True)
         if directoryPathObj in temporaryPaths:
             temporaryPaths.remove(directoryPathObj)
