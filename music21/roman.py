@@ -1490,6 +1490,16 @@ class RomanNumeral(harmony.Harmony):
     >>> cp(roman.RomanNumeral('vii/o7', 'F'))
     ['E5', 'G5', 'B-5', 'D6']
 
+    RomanNumeral objects can also be created with an int (number)
+    for the scale degree:
+
+    >>> majorKeyObj = key.Key('C')
+    >>> roman.RomanNumeral(1, majorKeyObj)
+    <music21.roman.RomanNumeral I in C major>
+
+    >>> minorKeyObj = key.Key('c')
+    >>> roman.RomanNumeral(1, minorKeyObj)
+    <music21.roman.RomanNumeral i in c minor>
 
     A little modal mixture:
 
