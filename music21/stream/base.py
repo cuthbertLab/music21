@@ -81,6 +81,7 @@ ImmutableStreamException = exceptions21.ImmutableStreamException
 
 T = t.TypeVar('T')
 # we sometimes need to return a different type.
+M21ObjTypez = t.TypeVar('M21ObjTypez', bound=base.Music21Object, covariant=True)
 ChangedM21ObjType = t.TypeVar('ChangedM21ObjType', bound=base.Music21Object)
 RecursiveLyricList = note.Lyric | None | list['RecursiveLyricList']
 
@@ -244,6 +245,25 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         {0.0} <music21.stream.Measure 0 offset=0.0>
             {0.0} <music21.note.Note D>
 
+
+    For developers using typing systems (highly recommended), Streams and
+    subclasses such as Measure, can be given a music21 class in square brackets
+    that limits what types of elements will be found in it:
+
+    >>> noteStream = stream.Measure[note.Note]([note.Note('C')])
+
+    then your type checker should know that n will be a `note.Note` object
+    in this code:
+
+    >>> n = noteStream.first()
+
+    And your type checker should reject this code:
+
+    >>> noteStream.append(note.Rest())
+
+    Notice that only your type checker (such as `mypy`) will flag the code
+    as incorrect.  Python itself will let the code go through.
+
     For developers of subclasses, please note that because of how Streams
     are copied, there cannot be
     required parameters (i.e., without defaults) in initialization.
@@ -308,11 +328,11 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
             musicxml <supports attribute="new-page"> tag) and only if this is
             the outermost Stream being shown.
             ''',
-        # 'restrictClass': '''
-        #     All elements in the stream are required to be of this class
-        #     or a subclass of that class.  Currently not enforced.  Used
-        #     for type-checking.
-        #     ''',
+        'restrictClass': '''
+            All elements in the stream are required to be of this class
+            or a subclass of that class.  Currently not enforced.  Used
+            for type-checking.
+            ''',
     }
     def __init__(self,
                  givenElements: t.Union[None,
@@ -320,8 +340,8 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
                                         Sequence[base.Music21Object]] = None,
                  *,
                  givenElementsBehavior: GivenElementsBehavior = GivenElementsBehavior.OFFSETS,
+                 restrictClass: type[M21ObjTypez] = base.Music21Object,
                  **keywords):
-        # restrictClass: type[M21ObjType] = base.Music21Object,
         super().__init__(**keywords)
 
         # TEMPORARY variable for v9 to deprecate the flat property. -- remove in v10
@@ -12742,7 +12762,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
 # -----------------------------------------------------------------------------
 
 
-class Voice(Stream):
+class Voice(Stream[M21ObjType]):
     '''
     A Stream subclass for declaring that all the music in the
     stream belongs to a certain "voice" for analysis or display
@@ -12759,7 +12779,7 @@ class Voice(Stream):
 # -----------------------------------------------------------------------------
 
 
-class Measure(Stream):
+class Measure(Stream[M21ObjType]):
     '''
     A representation of a Measure organized as a Stream.
 
@@ -13406,7 +13426,7 @@ class Measure(Stream):
         ''')
 
 
-class Part(Stream):
+class Part(Stream[M21ObjType]):
     '''
     A Stream subclass for designating music that is considered a single part.
 
@@ -13619,7 +13639,7 @@ class PartStaff(Part):
     '''
 
 
-# class Performer(Stream):
+# class Performer(Stream[M21ObjType]):
 #     '''
 #     A Stream subclass for designating music to be performed by a
 #     single Performer.  Should only be used when a single performer
@@ -13638,7 +13658,7 @@ class PartStaff(Part):
 #     # NOTE: not yet implemented
 #     pass
 
-class System(Stream):
+class System(Stream[M21ObjType]):
     '''
     Totally optional and used only in OMR and Capella: a designation that all the
     music in this Stream belongs in a single system.
@@ -13651,7 +13671,7 @@ class System(Stream):
     systemNumbering = 'Score'  # or Page; when do system numbers reset?
 
 
-class Score(Stream):
+class Score(Stream[M21ObjType]):
     '''
     A Stream subclass for handling music with more than one Part.
 
@@ -14183,7 +14203,7 @@ class Score(Stream):
             return returnStream
 
 
-class Opus(Stream):
+class Opus(Stream[M21ObjType]):
     '''
     A Stream subclass for handling multi-work music encodings.
     Many ABC files, for example, define multiple works or parts within a single file.
@@ -14380,7 +14400,7 @@ class Opus(Stream):
 # other Music21Objects (i.e., Spanner and Variant).
 
 
-class SpannerStorage(Stream):
+class SpannerStorage(Stream[M21ObjType]):
     '''
     For advanced use. This Stream subclass is only used
     inside a Spanner object to provide object storage
@@ -14445,7 +14465,7 @@ class SpannerStorage(Stream):
         super().replace(target, replacement, recurse=recurse, allDerived=allDerived)
 
 
-class VariantStorage(Stream):
+class VariantStorage(Stream[M21ObjType]):
     '''
     For advanced use. This Stream subclass is only
     used inside a Variant object to provide object

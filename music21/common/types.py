@@ -24,10 +24,12 @@ OffsetQL = float | Fraction
 OffsetQLSpecial = float | Fraction | OffsetSpecial
 OffsetQLIn = int | float | Fraction
 
-StreamType = t.TypeVar('StreamType', bound='music21.stream.Stream')
-StreamType2 = t.TypeVar('StreamType2', bound='music21.stream.Stream')
-M21ObjType = t.TypeVar('M21ObjType', bound='music21.base.Music21Object')
-M21ObjType2 = t.TypeVar('M21ObjType2', bound='music21.base.Music21Object')  # when you need another
+StreamType = t.TypeVar('StreamType', bound='music21.stream.Stream', covariant=True)
+StreamType2 = t.TypeVar('StreamType2', bound='music21.stream.Stream', covariant=True)
+M21ObjType = t.TypeVar('M21ObjType', bound='music21.base.Music21Object', covariant=True)
+M21ObjType2 = t.TypeVar('M21ObjType2',
+                        bound='music21.base.Music21Object'
+                        , covariant=True)  # when you need another
 
 # does not seem to like the | way of spelling
 ClassListType = t.Union[str, Iterable[str], type[M21ObjType], Iterable[type[M21ObjType]]]
