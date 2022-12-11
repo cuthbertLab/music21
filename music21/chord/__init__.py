@@ -4619,8 +4619,10 @@ class Chord(ChordBase):
 
     def sortDiatonicAscending(self, *, inPlace=False):
         '''
-        The notes are sorted by Scale degree and then by Offset (so F## sorts below G-).
-        Notes that are the identical pitch retain their order
+        The notes are sorted by :attr:`~music21.pitch.Pitch.diatonicNoteNum`
+        and then by Offset (so F## sorts below G-).
+        Notes that are the identical diatonicNoteNum are further sorted by
+        :attr:`~music21.pitch.Pitch.ps` (midi numbers that accommodate floats).
 
         After talking with Daniel Jackson, let's try to make the chord object as immutable
         as possible, so we return a new Chord object with the notes arranged from lowest to highest
@@ -4634,6 +4636,10 @@ class Chord(ChordBase):
         >>> c2.sortDiatonicAscending(inPlace=True)
         >>> c2
         <music21.chord.Chord C4 E4 G4>
+
+        >>> sameDNN = chord.Chord(['F#4', 'F4'])
+        >>> sameDNN.sortDiatonicAscending()
+        <music21.chord.Chord F F#>
 
         * Changed in v6: if inPlace is True do not return anything.
         '''
