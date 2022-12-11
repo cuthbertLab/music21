@@ -4639,7 +4639,7 @@ class Chord(ChordBase):
 
         >>> sameDNN = chord.Chord(['F#4', 'F4'])
         >>> sameDNN.sortDiatonicAscending()
-        <music21.chord.Chord F F#>
+        <music21.chord.Chord F4 F#4>
 
         * Changed in v6: if inPlace is True do not return anything.
         '''
