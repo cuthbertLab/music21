@@ -9,21 +9,21 @@
 # Copyright:    Copyright © 2009-2022 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
-
 '''
 Classes and functions for creating and manipulating dynamic symbols. Rather than
 subclasses, the :class:`~music21.dynamics.Dynamic` object is often specialized by parameters.
 '''
-import typing as t
+from __future__ import annotations
+
 import unittest
 
 from music21 import base
-from music21 import exceptions21
 from music21 import common
+from music21 import environment
+from music21 import exceptions21
 from music21 import spanner
 from music21 import style
 
-from music21 import environment
 environLocal = environment.Environment('dynamics')
 
 
@@ -109,12 +109,7 @@ class DynamicException(exceptions21.Music21Exception):
     pass
 
 
-class WedgeException(exceptions21.Music21Exception):
-    pass
-
 # ------------------------------------------------------------------------------
-
-
 class Dynamic(base.Music21Object):
     '''
     Object representation of Dynamics.
@@ -127,7 +122,6 @@ class Dynamic(base.Music21Object):
     >>> pp1.englishName
     'very soft'
 
-
     Dynamics can also be specified on a 0 to 1 scale with 1 being the
     loudest (see dynamicStrFromDecimal() above)
 
@@ -136,7 +130,6 @@ class Dynamic(base.Music21Object):
     'ppp'
     >>> print('%.2f' % ppp.volumeScalar)
     0.15
-
 
     Note that we got lucky last time because the dynamic 0.15 exactly corresponds
     to what we've considered the default for 'ppp'.  Here we assign 0.98 which
@@ -158,7 +151,6 @@ class Dynamic(base.Music21Object):
     >>> print('%.2f' % loud2.volumeScalar)
     0.90
 
-
     Custom dynamics are possible:
 
     >>> myDyn = dynamics.Dynamic('rfzsfmp')
@@ -169,9 +161,6 @@ class Dynamic(base.Music21Object):
     >>> myDyn.volumeScalar = 0.87
     >>> myDyn.volumeScalar
     0.87
-
-
-
 
     Dynamics can be placed anywhere in a stream.
 
@@ -184,17 +173,15 @@ class Dynamic(base.Music21Object):
     >>> s.insert(3, dynamics.Dynamic('fff'))
     >>> #_DOCS_SHOW s.show()
 
-
     .. image:: images/dynamics_simple.*
         :width: 344
-
 
     '''
     classSortOrder = 10
     _styleClass = style.TextStyle
 
     _DOC_ORDER = ['longName', 'englishName']
-    _DOC_ATTR: t.Dict[str, str] = {
+    _DOC_ATTR: dict[str, str] = {
         'longName': r'''
             the name of this dynamic in Italian.
 
@@ -225,9 +212,8 @@ class Dynamic(base.Music21Object):
             only to the left hand.
             ''',
     }
-
-    def __init__(self, value=None):
-        super().__init__()
+    def __init__(self, value=None, **keywords):
+        super().__init__(**keywords)
 
         # the scalar is used to calculate the final output of a note
         # under this dynamic. if this property is set, it will override

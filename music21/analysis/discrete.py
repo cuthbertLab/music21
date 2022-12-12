@@ -24,13 +24,12 @@ The :class:`music21.analysis.discrete.KrumhanslSchmuckler`
 '''
 from __future__ import annotations
 
-# TODO: make an analysis.base for the Discrete and analyzeStream aspects, then create
-#     range and key modules in analysis
-
-import unittest
-import typing as t
-
 from collections import OrderedDict
+from collections.abc import Iterable, Sequence
+import typing as t
+import unittest
+
+from music21 import environment
 from music21 import exceptions21
 from music21 import harmony
 from music21 import interval
@@ -38,10 +37,14 @@ from music21 import note
 from music21 import key
 from music21 import pitch
 
+if t.TYPE_CHECKING:
+    from music21 import stream
 
-from music21 import environment
 environLocal = environment.Environment('analysis.discrete')
 
+
+# TODO: make an analysis.base for the Discrete and analyzeStream aspects, then create
+#     range and key modules in analysis
 
 # -----------------------------------------------------------------------------
 class DiscreteAnalysisException(exceptions21.Music21Exception):
@@ -60,7 +63,7 @@ class DiscreteAnalysis:
     '''
     # define in subclass
     name = ''
-    identifiers: t.List[str] = []
+    identifiers: list[str] = []
 
     def __init__(self, referenceStream=None):
         # store a reference stream if needed
@@ -75,7 +78,7 @@ class DiscreteAnalysis:
         # store alternative solutions, which may be sorted or not
         self.alternativeSolutions = []
 
-    def _rgbToHex(self, rgb: t.Sequence[t.Union[float, int]]) -> str:
+    def _rgbToHex(self, rgb: Sequence[float | int]) -> str:
         '''
         Utility conversion method
 
@@ -87,7 +90,7 @@ class DiscreteAnalysis:
         rgb = round(rgb[0]), round(rgb[1]), round(rgb[2])
         return f'#{rgb[0]:02x}{rgb[1]:02x}{rgb[2]:02x}'
 
-    def _hexToRgb(self, value: str) -> t.List[int]:
+    def _hexToRgb(self, value: str) -> list[int]:
         '''
         Utility conversion method for six-digit hex values to RGB lists.
 
@@ -150,7 +153,8 @@ class DiscreteAnalysis:
         return post
 
     def solutionLegend(self, compress=False):
-        '''A list of pairs showing all discrete results and the assigned color.
+        '''
+        A list of pairs showing all discrete results and the assigned color.
         Data should be organized to be passed to
         :class:`music21.graph.GraphColorGridLegend`.
 
@@ -295,7 +299,7 @@ class KeyWeightKeyAnalysis(DiscreteAnalysis):
                 # add to dictionary
                 dst[validKey.name] = self._rgbToHex(rgbStep)
 
-    def _getSharpFlatCount(self, subStream) -> t.Tuple[int, int]:
+    def _getSharpFlatCount(self, subStream) -> tuple[int, int]:
         # noinspection PyShadowingNames
         '''
         Determine count of sharps and flats in a Stream
@@ -316,7 +320,7 @@ class KeyWeightKeyAnalysis(DiscreteAnalysis):
                     sharpCount += 1
         return sharpCount, flatCount
 
-    def getWeights(self, weightType='major') -> t.List[float]:
+    def getWeights(self, weightType='major') -> list[float]:
         '''
         Returns the key weights. To provide different key weights,
         subclass and override this method. The defaults here are KrumhanslSchmuckler.
@@ -386,7 +390,7 @@ class KeyWeightKeyAnalysis(DiscreteAnalysis):
                 solution[i] += (toneWeights[(j - i) % 12] * pcDistribution[j])
         return solution
 
-    def _getLikelyKeys(self, keyResults, differences):
+    def _getLikelyKeys(self, keyResults, differences) -> list[t.Any] | None:
         ''' Takes in a list of probable key results in points and returns a
             list of keys in letters, sorted from most likely to least likely.
         '''
@@ -394,7 +398,7 @@ class KeyWeightKeyAnalysis(DiscreteAnalysis):
         if keyResults is None:
             return None
 
-        likelyKeys: t.List[t.Any] = [0] * 12
+        likelyKeys: list[t.Any] = [0] * 12
         a = sorted((result, pc) for (pc, result) in enumerate(keyResults))
         a.reverse()
 
@@ -404,15 +408,16 @@ class KeyWeightKeyAnalysis(DiscreteAnalysis):
             # environLocal.printDebug(['added likely key', likelyKeys[pc]])
         return likelyKeys
 
-    def _getDifference(self, keyResults, pcDistribution, weightType):
-        ''' Takes in a list of numerical probable key results and returns the
-            difference of the top two keys
+    def _getDifference(self, keyResults, pcDistribution, weightType) -> None | list[int | float]:
+        '''
+        Takes in a list of numerical probable key results and returns the
+        difference of the top two keys.
         '''
         # case of empty analysis
         if keyResults is None:
             return None
 
-        solution: t.List[t.Union[int, float]] = [0.0] * 12
+        solution: list[int | float] = [0.0] * 12
         top = [0.0] * 12
         bottomRight = [0.0] * 12
         bottomLeft = [0.0] * 12
@@ -722,9 +727,9 @@ class KrumhanslSchmuckler(KeyWeightKeyAnalysis):
     Values from from http://extras.humdrum.org/man/keycor/, which describes these
     weightings as "Strong tendency to identify the dominant key as the tonic."
 
-    Changed in v.6.3 -- it used to be that these were different from the
-    Kessler profiles, but that was likely a typo.  Thus, KrumhanslKessler and
-    KrumhanslSchmuckler are synonyms of each other.
+    * Changed in v6.3: it used to be that these were different from the
+      Kessler profiles, but that was likely a typo.  Thus, KrumhanslKessler and
+      KrumhanslSchmuckler are synonyms of each other.
     '''
     _DOC_ALL_INHERITED = False
     name = 'Krumhansl Schmuckler/Kessler Key Analysis'
@@ -905,7 +910,8 @@ class TemperleyKostkaPayne(KeyWeightKeyAnalysis):
         super().__init__(referenceStream=referenceStream)
 
     def getWeights(self, weightType='major'):
-        ''' Returns the key weights.
+        '''
+        Returns the key weights.
 
         >>> a = analysis.discrete.TemperleyKostkaPayne()
         >>> len(a.getWeights('major'))
@@ -946,14 +952,14 @@ class Ambitus(DiscreteAnalysis):
     # provide possible string matches for this processor
     identifiers = ['ambitus', 'span']
 
-    def __init__(self, referenceStream=None):
+    def __init__(self, referenceStream: stream.Stream | None = None):
         super().__init__(referenceStream=referenceStream)
         # Store the min and max Pitch instances for referenceStream
         # set by getPitchSpan(), which is called by _generateColors()
-        self.minPitchObj: t.Optional[pitch.Pitch] = None
-        self.maxPitchObj: t.Optional[pitch.Pitch] = None
+        self.minPitchObj: pitch.Pitch | None = None
+        self.maxPitchObj: pitch.Pitch | None = None
 
-        self._pitchSpanColors = OrderedDict()
+        self._pitchSpanColors: OrderedDict[int, str] = OrderedDict()
         self._generateColors()
 
     def _generateColors(self, numColors=None):
@@ -996,7 +1002,7 @@ class Ambitus(DiscreteAnalysis):
 
         # environLocal.printDebug([self._pitchSpanColors])
 
-    def getPitchSpan(self, subStream) -> t.Optional[t.Tuple[pitch.Pitch, pitch.Pitch]]:
+    def getPitchSpan(self, subStream) -> tuple[pitch.Pitch, pitch.Pitch] | None:
         '''
         For a given subStream, return a tuple consisting of the two pitches
         with the minimum and maximum pitch space value.
@@ -1043,11 +1049,11 @@ class Ambitus(DiscreteAnalysis):
             return None
 
         # find the min and max pitch space value for all pitches
-        psFound: t.List[float] = []
-        pitchesFound: t.List[pitch.Pitch] = []
+        psFound: list[float] = []
+        pitchesFound: list[pitch.Pitch] = []
         for n in justNotes:
             # environLocal.printDebug([n])
-            pitches: t.Iterable[pitch.Pitch] = ()
+            pitches: Iterable[pitch.Pitch] = ()
             if isinstance(n, note.GeneralNote) and not isinstance(n, harmony.ChordSymbol):
                 pitches = n.pitches
             psFound += [p.ps for p in pitches]
@@ -1277,7 +1283,8 @@ class MelodicIntervalDiversity(DiscreteAnalysis):
         return len(uniqueIntervals), self.solutionToColor(len(uniqueIntervals))
 
     def getSolution(self, sStream):
-        '''Solution is the number of unique intervals.
+        '''
+        Solution is the number of unique intervals.
         '''
         solution, unused_color = self.process(sStream.flatten())
         return solution
@@ -1287,7 +1294,7 @@ class MelodicIntervalDiversity(DiscreteAnalysis):
 # public access function
 
 def analyzeStream(
-    streamObj: 'music21.stream.Stream',
+    streamObj: stream.Stream,
     method: str,
     **keywords
 ):
@@ -1328,7 +1335,7 @@ def analyzeStream(
         # this synonym is being added for compatibility
         method = 'span'
 
-    analysisClassName: t.Optional[t.Type[DiscreteAnalysis]] = analysisClassFromMethodName(method)
+    analysisClassName: type[DiscreteAnalysis] | None = analysisClassFromMethodName(method)
 
     if analysisClassName is not None:
         obj = analysisClassName()
@@ -1340,7 +1347,7 @@ def analyzeStream(
 
 
 # noinspection SpellCheckingInspection
-def analysisClassFromMethodName(method: str) -> t.Optional[t.Type[DiscreteAnalysis]]:
+def analysisClassFromMethodName(method: str) -> type[DiscreteAnalysis] | None:
     '''
     Returns an analysis class given a method name, or None if none can be found
 
@@ -1361,7 +1368,7 @@ def analysisClassFromMethodName(method: str) -> t.Optional[t.Type[DiscreteAnalys
     >>> print(repr(acfmn('unknown-format')))
     None
     '''
-    analysisClasses: t.List[t.Type[DiscreteAnalysis]] = [
+    analysisClasses: list[type[DiscreteAnalysis]] = [
         Ambitus,
         KrumhanslSchmuckler,
         AardenEssen,
@@ -1369,7 +1376,7 @@ def analysisClassFromMethodName(method: str) -> t.Optional[t.Type[DiscreteAnalys
         BellmanBudge,
         TemperleyKostkaPayne,
     ]
-    match: t.Optional[t.Type[DiscreteAnalysis]] = None
+    match: type[DiscreteAnalysis] | None = None
     for analysisClass in analysisClasses:
         # this is a very loose matching, as there are few classes now
         if (method.lower() in analysisClass.__name__.lower()
@@ -1404,6 +1411,9 @@ def analysisClassFromMethodName(method: str) -> t.Optional[t.Type[DiscreteAnalys
 
 
 class Test(unittest.TestCase):
+    def testCopyAndDeepcopy(self):
+        from music21.test.commonTest import testCopyAll
+        testCopyAll(self, globals())
 
     def testKeyAnalysisKrumhansl(self):
         from music21 import converter
@@ -1571,7 +1581,7 @@ class Test(unittest.TestCase):
         s2.repeatAppend(note.Note('c#'), 2)
         k = s2.analyze('key')
         # Ensure all pitch classes are present
-        self.assertEqual(len(set(k.alternateInterpretations)), 23)
+        self.assertEqual(len(k.alternateInterpretations), 23)
 
 
 # define presented order in documentation

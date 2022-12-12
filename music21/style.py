@@ -13,12 +13,18 @@
 The style module represents information about the style of a Note, Accidental,
 etc. such that precise positioning information, layout, size, etc. can be specified.
 '''
+from __future__ import annotations
+
 import typing as t
 import unittest
 
 from music21 import common
 from music21 import exceptions21
 from music21.prebase import ProtoM21Object
+
+
+if t.TYPE_CHECKING:
+    from music21 import editorial
 
 
 class TextFormatException(exceptions21.Music21Exception):
@@ -59,7 +65,7 @@ class Style(ProtoM21Object):
     20.4
 
     '''
-    _DOC_ATTR: t.Dict[str, str] = {
+    _DOC_ATTR: dict[str, str] = {
         'hideObjectOnPrint': '''
             If set to `True`, the Music21Object will not print upon output
             (only used in MusicXML output at this point and
@@ -72,31 +78,31 @@ class Style(ProtoM21Object):
             ''',
     }
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.size = None
 
-        self.relativeX: t.Optional[t.Union[float, int]] = None
-        self.relativeY: t.Optional[t.Union[float, int]] = None
-        self.absoluteX: t.Optional[t.Union[float, int]] = None
+        self.relativeX: float | int | None = None
+        self.relativeY: float | int | None = None
+        self.absoluteX: float | int | None = None
 
         # managed by property below.
-        self._absoluteY: t.Optional[t.Union[float, int]] = None
+        self._absoluteY: float | int | None = None
 
-        self._enclosure: t.Optional[Enclosure] = None
+        self._enclosure: Enclosure | None = None
 
         # how should this symbol be represented in the font?
         # SMuFL characters are allowed.
         self.fontRepresentation = None
 
-        self.color: t.Optional[str] = None
+        self.color: str | None = None
 
         self.units: str = 'tenths'
         self.hideObjectOnPrint: bool = False
 
-    def _getEnclosure(self) -> t.Optional[Enclosure]:
+    def _getEnclosure(self) -> Enclosure | None:
         return self._enclosure
 
-    def _setEnclosure(self, value: t.Optional[Enclosure]):
+    def _setEnclosure(self, value: Enclosure | None):
         if value is None:
             self._enclosure = value
         elif value == Enclosure.NONE:
@@ -194,7 +200,7 @@ class Style(ProtoM21Object):
         Other legal positions are 'above' and 'below' which
         are synonyms for 10 and -70 respectively (for 5-line
         staves; other staves are not yet implemented)
-        This behavior may change in music21 v.8 or after.
+        This behavior may change in music21 v8 or after.
 
         >>> te = style.Style()
         >>> te.absoluteY = 10
@@ -221,7 +227,7 @@ class NoteStyle(Style):
     Beam style is stored on the Beams object.  Lyric style is stored on the Lyric
     object.
     '''
-    _DOC_ATTR: t.Dict[str, str] = {
+    _DOC_ATTR: dict[str, str] = {
         'stemStyle': '''
             An optional style.Style object describing what the stem looks like.
 
@@ -261,11 +267,11 @@ class NoteStyle(Style):
             ''',
     }
 
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__()
-        self.stemStyle: t.Optional[Style] = None
-        self.accidentalStyle: t.Optional[Style] = None
-        self.noteSize: t.Optional[str] = None  # can be 'cue' etc.
+        self.stemStyle: Style | None = None
+        self.accidentalStyle: Style | None = None
+        self.noteSize: str | None = None  # can be 'cue' etc.
 
 
 class TextStyle(Style):
@@ -616,11 +622,11 @@ class StyleMixin(common.SlottedObjectMixin):
 
     __slots__ = ('_style', '_editorial')
 
-    def __init__(self):
+    def __init__(self) -> None:
         # no need to call super().__init__() on SlottedObjectMixin
         # This might be dangerous though
-        self._style: t.Optional[Style] = None
-        self._editorial: t.Optional['music21.editorial.Editorial'] = None
+        self._style: Style | None = None
+        self._editorial: editorial.Editorial | None = None
 
     @property
     def hasStyleInformation(self) -> bool:
@@ -703,7 +709,7 @@ class StyleMixin(common.SlottedObjectMixin):
         return not (self._editorial is None)
 
     @property
-    def editorial(self) -> 'music21.editorial.Editorial':
+    def editorial(self) -> editorial.Editorial:
         '''
         a :class:`~music21.editorial.Editorial` object that stores editorial information
         (comments, footnotes, harmonic information, ficta).
@@ -726,7 +732,7 @@ class StyleMixin(common.SlottedObjectMixin):
         return self._editorial
 
     @editorial.setter
-    def editorial(self, ed: 'music21.editorial.Editorial'):
+    def editorial(self, ed: editorial.Editorial):
         self._editorial = ed
 
 

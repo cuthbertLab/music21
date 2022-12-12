@@ -9,9 +9,10 @@
 # Copyright:    Copyright © 2009-2015 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
-import warnings
+from __future__ import annotations
 
 from functools import wraps
+import warnings
 
 from music21 import exceptions21
 
@@ -111,6 +112,8 @@ def deprecated(method, startDate=None, removeDate=None, message=None):
     else:
         funcName = method.__name__
 
+    method._isDeprecated = True
+
     if startDate is not None:
         startDate = ' on ' + startDate
     else:
@@ -168,7 +171,7 @@ def cacheMethod(method):
 
     Uses the name of the function as the cache key.
 
-    New in v.6 -- helps to make all the caches easier to work with.
+    * New in v6: helps to make all the caches easier to work with.
     '''
     if hasattr(method, '__qualname__'):
         funcName = method.__qualname__

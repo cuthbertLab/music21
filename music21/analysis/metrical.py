@@ -16,12 +16,14 @@ See the chapter :ref:`User's Guide Chapter 14: Time Signatures <usersGuide_14_ti
 for more information on defining
 metrical structures in music21.
 '''
+from __future__ import annotations
+
 import copy
 import unittest
 
+from music21 import environment
 from music21 import stream
 
-from music21 import environment
 environLocal = environment.Environment('analysis.metrical')
 
 
@@ -167,7 +169,8 @@ class TestExternal(unittest.TestCase):
     show = True
 
     def testSingle(self):
-        '''Need to test direct meter creation w/o stream
+        '''
+        Need to test direct meter creation w/o stream
         '''
         from music21 import note
         from music21 import meter

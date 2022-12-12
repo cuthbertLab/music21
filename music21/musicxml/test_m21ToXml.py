@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import copy
 import difflib
 import fractions
@@ -480,7 +482,9 @@ class Test(unittest.TestCase):
                     self.assertTrue(gotRightBarline)
 
     def testTextExpressionOffset(self):
-        '''Transfer element offset after calling getTextExpression().'''
+        '''
+        Transfer element offset after calling getTextExpression().
+        '''
         # https://github.com/cuthbertLab/music21/issues/624
         s = converter.parse('tinynotation: 4/4 c1')
         c = repeat.Coda()
@@ -548,7 +552,7 @@ class Test(unittest.TestCase):
         '''
         alto = corpus.parse('bach/bwv57.8').parts['#Alto']
         alto.measure(7).timeSignature = meter.TimeSignature('6/8')
-        newAlto = alto.flat.getElementsNotOfClass(meter.TimeSignature).stream()
+        newAlto = alto.flatten().getElementsNotOfClass(meter.TimeSignature).stream()
         newAlto.insert(0, meter.TimeSignature('2/4'))
         newAlto.makeMeasures(inPlace=True)
         newAltoFixed = newAlto.makeNotation()
@@ -753,7 +757,9 @@ class Test(unittest.TestCase):
         realizeDurationsAndAssertTags(m, forwardTag=False, offsetTag=False)
 
     def test_inexpressible_hidden_rests_become_forward_tags(self):
-        '''Express hidden rests with inexpressible durations as <forward> tags.'''
+        '''
+        Express hidden rests with inexpressible durations as <forward> tags.
+        '''
         m = stream.Measure()
         # 7 eighths in the space of 4 eighths, imported as 137/480
         # (137/480) * 7 = 1.9979, not 2.0
@@ -775,6 +781,41 @@ class Test(unittest.TestCase):
         # Only one <forward> tag to get from 1.9979 -> 2.0
         # No <forward> tag is necessary to finish the incomplete measure (3.9979 -> 4.0)
         self.assertEqual(len(tree.findall('.//forward')), 1)
+
+    def test_roman_musicxml_two_kinds(self):
+        from music21.roman import RomanNumeral
+
+        # normal roman numerals take up no time in xml output.
+        rn1 = RomanNumeral('I', 'C')
+        rn1.duration.type = 'half'
+        rn2 = RomanNumeral('V', 'C')
+        rn2.duration.type = 'half'
+
+        m = stream.Measure()
+        m.insert(0.0, rn1)
+        m.insert(2.0, rn2)
+
+        # with writeAsChord=True, they get their own Chord objects and durations.
+        self.assertTrue(rn1.writeAsChord)
+        xmlOut = GeneralObjectExporter().parse(m).decode('utf-8')
+        self.assertNotIn('<forward>', xmlOut)
+        self.assertIn('<chord', xmlOut)
+
+        rn1.writeAsChord = False
+        rn2.writeAsChord = False
+        xmlOut = GeneralObjectExporter().parse(m).decode('utf-8')
+        self.assertIn('<numeral', xmlOut)
+        self.assertIn('<forward>', xmlOut)
+        self.assertNotIn('<chord', xmlOut)
+        self.assertNotIn('<offset', xmlOut)
+        self.assertNotIn('<rest', xmlOut)
+
+        rn1.duration.quarterLength = 0.0
+        rn2.duration.quarterLength = 0.0
+        xmlOut = GeneralObjectExporter().parse(m).decode('utf-8')
+        self.assertIn('<rest', xmlOut)
+        self.assertNotIn('<forward>', xmlOut)
+
 
 
 class TestExternal(unittest.TestCase):

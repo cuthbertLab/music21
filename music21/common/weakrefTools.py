@@ -9,6 +9,7 @@
 # Copyright:    Copyright © 2009-2015 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
+from __future__ import annotations
 
 __all__ = ['wrapWeakref', 'unwrapWeakref']
 
@@ -19,7 +20,7 @@ _T = t.TypeVar('_T')
 # ------------------------------------------------------------------------------
 
 
-def wrapWeakref(referent: _T) -> t.Union[weakref.ReferenceType, _T]:
+def wrapWeakref(referent: _T) -> weakref.ReferenceType | _T:
     '''
     utility function that wraps objects as weakrefs but does not wrap
     already wrapped objects; also prevents wrapping the unwrappable "None" type, etc.
@@ -50,7 +51,7 @@ def wrapWeakref(referent: _T) -> t.Union[weakref.ReferenceType, _T]:
         return referent
 
 
-def unwrapWeakref(referent: weakref.ReferenceType) -> t.Any:
+def unwrapWeakref(referent: weakref.ReferenceType | t.Any) -> t.Any:
     '''
     Utility function that gets an object that might be an object itself
     or a weak reference to an object.  It returns obj() if it's a weakref.

@@ -8,6 +8,8 @@
 # Copyright:    Copyright © 2021-2022 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
+from __future__ import annotations
+
 from enum import Enum, EnumMeta
 
 
@@ -155,7 +157,7 @@ class OffsetSpecial(StrEnum):
     >>> str(OffsetSpecial.AT_END)
     'highestTime'
 
-    New in v7.
+    * New in v7.
     '''
     AT_END: str = 'highestTime'
     LOWEST_OFFSET: str = 'lowestOffset'
@@ -199,7 +201,7 @@ class MeterDivision(StrEnum):
     '''
     Represents an indication of how to divide a TimeSignature
 
-    new in v7.
+    * New in v7.
     '''
     FAST = 'fast'
     SLOW = 'slow'

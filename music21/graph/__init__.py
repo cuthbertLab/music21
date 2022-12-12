@@ -36,8 +36,9 @@ From highest level to lowest level usage, ways of graphing are as follows:
     2. `graph.plot.Class(streamObj).run()`
     3. `plotter = graph.primitives.Class(); plotter.data = ...; plotter.process()`
     4. Use `matplotlib` directly to create any graph, musical or non-musical.
-
 '''
+from __future__ import annotations
+
 __all__ = [
     'axis', 'findPlot', 'plot', 'primitives', 'utilities',
     'plotStream',
@@ -47,6 +48,7 @@ import typing as t
 import unittest
 
 from music21 import common
+from music21 import environment
 
 from music21.graph import axis
 from music21.graph import findPlot
@@ -54,13 +56,17 @@ from music21.graph import plot
 from music21.graph import primitives
 from music21.graph import utilities
 
-from music21 import environment
+
+if t.TYPE_CHECKING:
+    from music21 import stream
+
+
 environLocal = environment.Environment('graph')
 
 
 def plotStream(
-    streamObj: 'music21.stream.Stream',
-    graphFormat: t.Optional[str] = None,
+    streamObj: stream.Stream,
+    graphFormat: str | None = None,
     xValue=None,
     yValue=None,
     zValue=None,

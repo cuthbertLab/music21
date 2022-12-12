@@ -12,15 +12,23 @@
 '''
 sites.py -- Objects for keeping track of relationships among Music21Objects
 '''
+from __future__ import annotations
+
 import collections
-import unittest
-import weakref
+from collections.abc import Generator, MutableMapping
 import typing as t
 from typing import overload  # for some reason does not work in PyCharm if not directly imported
+import unittest
+import weakref
 
 from music21 import common
 from music21 import exceptions21
 from music21 import prebase
+
+
+if t.TYPE_CHECKING:
+    from music21 import stream
+
 
 # define whether weakrefs are used for storage of object locations
 WEAKREF_ACTIVE = True
@@ -35,7 +43,7 @@ WEAKREF_ACTIVE = True
 # that still exists, then restore it from the dictionary; otherwise, do not
 # sweat it.  Should make pickle deepcopies of music21 objects in Streams still
 # possible without needing to recreate the whole stream.
-GLOBAL_SITE_STATE_DICT: t.MutableMapping[str, t.Optional[t.Any]] = weakref.WeakValueDictionary()
+GLOBAL_SITE_STATE_DICT: MutableMapping[str, t.Any | None] = weakref.WeakValueDictionary()
 
 
 class SitesException(exceptions21.Music21Exception):
@@ -386,7 +394,7 @@ class Sites(common.SlottedObjectMixin):
                    excludeNone: t.Literal[True],
                    sortByCreationTime: t.Union[bool, t.Literal['reverse']] = False,
                    priorityTarget=None,
-                   ) -> t.Generator['music21.stream.Stream', None, None]:
+                   ) -> Generator[stream.Stream, None, None]:
         from music21 import stream
         yield stream.Stream()
 
@@ -396,7 +404,7 @@ class Sites(common.SlottedObjectMixin):
                    excludeNone: bool = False,
                    sortByCreationTime: t.Union[bool, t.Literal['reverse']] = False,
                    priorityTarget=None,
-                   ) -> t.Generator[t.Union['music21.stream.Stream', None], None, None]:
+                   ) -> Generator[stream.Stream | None, None, None]:
         yield None
 
     def yieldSites(self,
@@ -404,7 +412,7 @@ class Sites(common.SlottedObjectMixin):
                    excludeNone: bool = False,
                    sortByCreationTime: t.Union[bool, t.Literal['reverse']] = False,
                    priorityTarget=None,
-                   ) -> t.Generator[t.Union['music21.stream.Stream', None], None, None]:
+                   ) -> Generator[stream.Stream | None, None, None]:
         # noinspection PyDunderSlots
         '''
         Yield references; order, based on dictionary keys, is from least
@@ -454,10 +462,10 @@ class Sites(common.SlottedObjectMixin):
         b
         a
 
-        * Changed in v.3: changed dramatically from previously unused version
+        * Changed in v3: changed dramatically from previously unused version
           `sortByCreationTime='reverse'` is removed, since the ordered dict takes
           care of it and was not working.
-        * Changed in v.8: arguments are keyword only
+        * Changed in v8: arguments are keyword only
         '''
         keyRepository = list(self.siteDict.keys())
         if sortByCreationTime is True:
@@ -847,6 +855,7 @@ class Sites(common.SlottedObjectMixin):
         have the element. This results b/c Sites are shallow-copied, and then
         elements are re-added.
 
+        >>> import gc
         >>> class Mock(base.Music21Object):
         ...     pass
         >>> aStream = stream.Stream()
@@ -857,6 +866,7 @@ class Sites(common.SlottedObjectMixin):
         >>> mySites.add(aStream)
         >>> mySites.add(bStream)
         >>> del aStream
+        >>> numObjectsCollected = gc.collect()  # make sure to garbage collect
 
         We still have 3 locations -- just because aStream is gone, doesn't
         make it disappear from sites
@@ -1025,7 +1035,7 @@ class Test(unittest.TestCase):
         violin1 = corpus.parse(
             'beethoven/opus18no1',
             3,
-            fileExtensions='xml',
+            fileExtensions=('xml',),
         ).getElementById('Violin I')
         lastNote = violin1.flatten().notes[-1]
         lastNoteClef = lastNote.getContextByClass(clef.Clef)

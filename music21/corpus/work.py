@@ -11,6 +11,8 @@
 '''
 This is a lightweight module that stores information about individual corpus works.
 '''
+from __future__ import annotations
+
 from collections import namedtuple, OrderedDict
 import os
 

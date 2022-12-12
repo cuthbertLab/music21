@@ -9,6 +9,8 @@
 # Copyright:    Copyright © 2012, 2017 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
+from __future__ import annotations
+
 import unittest
 
 from music21 import pitch

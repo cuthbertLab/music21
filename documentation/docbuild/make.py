@@ -10,6 +10,7 @@
 # Copyright:    Copyright © 2013-17 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
+from __future__ import annotations
 
 import os
 import shutil
@@ -90,6 +91,7 @@ class DocBuilder:
 
     def runSphinx(self):
         try:
+            # noinspection PyPackageRequirements
             import sphinx
         except ImportError:
             message = 'Sphinx is required to build documentation; '
@@ -129,7 +131,7 @@ class DocBuilder:
             import sphinx.cmd.build  # pylint: disable=import-error
             sphinx_main_command = sphinx.cmd.build.main
         else:
-            sphinx_main_command = sphinx.main
+            sphinx_main_command = sphinx.main  # pylint: disable=no-member
 
         try:  # pylint: disable=assignment-from-no-return
             returnCode = sphinx_main_command(sphinxOptions)

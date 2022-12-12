@@ -13,6 +13,13 @@
 # -----------------------------------------------------------------------------
 from __future__ import annotations
 
+__all__ = [
+    'MetadataEntry',
+    'MetadataBundle',
+    'MetadataBundleException',
+]
+
+from collections import OrderedDict
 import gzip
 import os
 import pathlib
@@ -21,23 +28,19 @@ import time
 import typing as t
 import unittest
 
-from collections import OrderedDict
-
 from music21 import common
 from music21.common.fileTools import readPickleGzip
+from music21 import environment
 from music21 import exceptions21
 from music21 import prebase
 
+
+if t.TYPE_CHECKING:
+    from collections.abc import Iterable
+
+
 # -----------------------------------------------------------------------------
-__all__ = [
-    'MetadataEntry',
-    'MetadataBundle',
-    'MetadataBundleException',
-]
-
-
-from music21 import environment
-environLocal = environment.Environment(os.path.basename(__file__))
+environLocal = environment.Environment('metadata.bundles')
 
 
 class MetadataBundleException(exceptions21.Music21Exception):
@@ -265,13 +268,15 @@ class MetadataBundle(prebase.ProtoM21Object):
 
     # INITIALIZER #
 
-    def __init__(self, expr=None):
+    def __init__(self, expr: 'music21.corpus.corpora.Corpus' | str | None = None):
         from music21 import corpus
-        self._metadataEntries: t.OrderedDict[str, MetadataEntry] = OrderedDict()
+
+        self._metadataEntries: OrderedDict[str, MetadataEntry] = OrderedDict()
         if not isinstance(expr, (str, corpus.corpora.Corpus, type(None))):
             raise MetadataBundleException('Need to take a string, corpus, or None as expression')
 
-        self._corpus = None
+        self._corpus: corpus.corpora.Corpus | None = None
+        self._name: str | None
 
         if isinstance(expr, corpus.corpora.Corpus):
             self._name = expr.name
@@ -587,7 +592,7 @@ class MetadataBundle(prebase.ProtoM21Object):
             raise MetadataBundleException('metadataBundle must be a MetadataBundle')
         selfKeys = set(self._metadataEntries.keys())
         otherKeys = set(metadataBundle._metadataEntries.keys())
-        resultKeys: t.List[str] = getattr(selfKeys, operator)(otherKeys)
+        resultKeys: list[str] = getattr(selfKeys, operator)(otherKeys)
         resultBundle: MetadataBundle = type(self)()
         for key in resultKeys:
             metadataEntry: MetadataEntry
@@ -598,7 +603,7 @@ class MetadataBundle(prebase.ProtoM21Object):
             resultBundle._metadataEntries[key] = metadataEntry
 
         # noinspection PyTypeChecker
-        mdbItems: t.List[t.Tuple[str, MetadataEntry]] = list(resultBundle._metadataEntries.items())
+        mdbItems: list[tuple[str, MetadataEntry]] = list(resultBundle._metadataEntries.items())
         resultBundle._metadataEntries = OrderedDict(sorted(mdbItems,
                                                            key=lambda mde: mde[1].sourcePath))
         return resultBundle
@@ -1068,11 +1073,12 @@ class MetadataBundle(prebase.ProtoM21Object):
         'title'
         ...
         '''
-        from music21 import metadata
+        from music21.metadata import properties
+        from music21.metadata import RichMetadata
         return tuple(sorted(
-            metadata.properties.ALL_UNIQUE_NAMES
-            + metadata.properties.ALL_MUSIC21_WORK_IDS
-            + list(metadata.RichMetadata.additionalRichMetadataAttributes)
+            properties.ALL_UNIQUE_NAMES
+            + properties.ALL_MUSIC21_WORK_IDS
+            + list(RichMetadata.additionalRichMetadataAttributes)
         ))
 
     def read(self, filePath=None):
@@ -1125,7 +1131,14 @@ class MetadataBundle(prebase.ProtoM21Object):
         ])
         return self
 
-    def search(self, query=None, field=None, fileExtensions=None, **keywords):
+    def search(
+        self,
+        query: str | None = None,
+        field=None,
+        *,
+        fileExtensions: Iterable[str] = (),
+        **keywords
+    ):
         r'''
         Perform search, on all stored metadata, permit regular expression
         matching.
@@ -1172,8 +1185,7 @@ class MetadataBundle(prebase.ProtoM21Object):
         >>> metadataBundle.search(composer='cicon')
         <music21.metadata.bundles.MetadataBundle {1 entry}>
         '''
-        if fileExtensions is not None and not common.isIterable(fileExtensions):
-            fileExtensions = [fileExtensions]
+        acceptable_extensions: set[str] = set(fileExtensions)
 
         newMetadataBundle = MetadataBundle()
         if query is None and field is None:
@@ -1186,28 +1198,19 @@ class MetadataBundle(prebase.ProtoM21Object):
             if metadataEntry.metadata is None:
                 continue
             sp = metadataEntry.sourcePath
+            if acceptable_extensions and sp.suffix not in acceptable_extensions:
+                continue
+            if key in newMetadataBundle._metadataEntries:
+                continue  # duplicate key?
 
             if metadataEntry.search(query, field)[0]:
-                include = False
-                if fileExtensions is not None:
-                    for fileExtension in fileExtensions:
-                        if fileExtension and fileExtension[0] != '.':
-                            fileExtension = '.' + fileExtension
+                newMetadataBundle._metadataEntries[key] = metadataEntry
 
-                        if sp.suffix == fileExtension:
-                            include = True
-                            break
-                        elif (fileExtension.endswith('xml')
-                                and sp.suffix == '.mxl'):
-                            include = True
-                            break
-                else:
-                    include = True
-                if include and key not in newMetadataBundle._metadataEntries:
-                    newMetadataBundle._metadataEntries[key] = metadataEntry
+        # pycharm can't figure out that it works.
+        # noinspection PyTypeChecker
         newMetadataBundle._metadataEntries = OrderedDict(
             sorted(list(newMetadataBundle._metadataEntries.items()),
-                                                        key=lambda mde: mde[1].sourcePath))
+                   key=lambda mde: mde[1].sourcePath))
 
         if keywords:
             return newMetadataBundle.search(**keywords)

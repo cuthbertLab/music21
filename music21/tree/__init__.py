@@ -18,6 +18,8 @@ organized by start and stop offsets.
 This is a lower-level tool that for now at least normal music21
 users won't need to worry about.
 '''
+from __future__ import annotations
+
 __all__ = [
     'analysis',
     'core',

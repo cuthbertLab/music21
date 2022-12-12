@@ -8,7 +8,10 @@
 # Copyright:    Copyright © 2020 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # -----------------------------------------------------------------------------
+from __future__ import annotations
+
 import enum
+
 from music21.common.enums import StrEnum
 
 class StaffType(enum.Enum):
@@ -50,6 +53,12 @@ class RecursionType(StrEnum):
     ELEMENTS_FIRST = 'elementsFirst'
     FLATTEN = 'flatten'
     ELEMENTS_ONLY = 'elementsOnly'
+
+
+class ShowNumber(StrEnum):
+    DEFAULT = 'default'
+    ALWAYS = 'always'
+    NEVER = 'never'
 
 
 if __name__ == '__main__':

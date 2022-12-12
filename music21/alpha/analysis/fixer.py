@@ -8,12 +8,10 @@
 # Copyright:    Copyright © 2016 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
-import unittest
-from copy import deepcopy
-import typing as t
+from __future__ import annotations
 
-from music21.alpha.analysis import aligner
-from music21.alpha.analysis import ornamentRecognizer
+from copy import deepcopy
+import unittest
 
 from music21 import duration
 from music21 import expressions
@@ -22,6 +20,8 @@ from music21 import note
 from music21 import pitch
 from music21 import stream
 
+from music21.alpha.analysis import aligner
+from music21.alpha.analysis import ornamentRecognizer
 
 class OMRMidiFixer:
     '''
@@ -350,7 +350,7 @@ class OrnamentFixer(OMRMidiFixer):
             self.recognizers = recognizers
         self.markChangeColor = markChangeColor
 
-    def findOrnament(self, busyNotes, simpleNotes) -> t.Optional[expressions.Ornament]:
+    def findOrnament(self, busyNotes, simpleNotes) -> expressions.Ornament | None:
         '''
         Finds an ornament in busyNotes based from simpleNote
         using provided recognizers.
@@ -368,8 +368,8 @@ class OrnamentFixer(OMRMidiFixer):
         return None
 
     def addOrnament(self,
-                    selectedNote: 'music21.note.Note',
-                    ornament: 'music21.expressions.Ornament',
+                    selectedNote: note.Note,
+                    ornament: expressions.Ornament,
                     *,
                     show=False) -> bool:
         '''
@@ -389,7 +389,7 @@ class OrnamentFixer(OMRMidiFixer):
             return True
         return False
 
-    def fix(self, *, show=False, inPlace=True) -> t.Optional[OMRMidiFixer]:
+    def fix(self, *, show=False, inPlace=True) -> OMRMidiFixer | None:
         '''
         Corrects missed ornaments in omrStream according to midiStream
         :param show: Whether to show results
@@ -397,7 +397,7 @@ class OrnamentFixer(OMRMidiFixer):
         return a new OrnamentFixer with changes
         '''
         changes = self.changes
-        sa: t.Optional[aligner.StreamAligner] = None
+        sa: aligner.StreamAligner | None = None
         omrNotesLabeledOrnament = []
         midiNotesAlreadyFixedForOrnament = []
 
@@ -504,6 +504,10 @@ class TurnFixer(OrnamentFixer):
         super().__init__(changes, midiStream, omrStream, recognizer)
 
 class Test(unittest.TestCase):
+    def testCopyAndDeepcopy(self):
+        from music21.test.commonTest import testCopyAll
+        testCopyAll(self, globals())
+
     def measuresEqual(self, m1, m2):
         '''
         Returns a tuple of (True/False, reason)

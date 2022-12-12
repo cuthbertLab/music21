@@ -16,17 +16,25 @@ This module provides the base class for all RepeatMark objects: entities that de
 Some RepeatMark objects are Expression objects; others are Bar objects. See for instance,
 the :class:`~music21.bar.Repeat` which represents a normal barline repeat.
 '''
+from __future__ import annotations
+
 import copy
 import string
 import typing as t
 
+from music21.common.types import StreamType
+from music21 import environment
 from music21 import exceptions21
 from music21 import expressions
 from music21 import prebase
 from music21 import spanner
 from music21 import style
 
-from music21 import environment
+
+if t.TYPE_CHECKING:
+    from music21 import stream
+
+
 environLocal = environment.Environment('repeat')
 
 
@@ -46,8 +54,8 @@ class RepeatMark(prebase.ProtoM21Object):
 
 
     >>> class PartialRepeat(repeat.RepeatMark, base.Music21Object):
-    ...    def __init__(self):
-    ...        super().__init__()
+    ...    def __init__(self, **keywords):
+    ...        super().__init__(**keywords)
 
     >>> s = stream.Stream()
     >>> s.append(note.Note())
@@ -81,8 +89,8 @@ class RepeatExpression(RepeatMark, expressions.Expression):
     '''
     _styleClass = style.TextStyle
 
-    def __init__(self):
-        super().__init__()
+    def __init__(self, **keywords):
+        super().__init__(**keywords)
         # store a text version of this expression
         self._textExpression = None
         # store a lost of alternative text representations
@@ -105,7 +113,8 @@ class RepeatExpression(RepeatMark, expressions.Expression):
             return ''
 
     def getText(self):
-        '''Get the text used for this expression.
+        '''
+        Get the text used for this expression.
         '''
         return self._textExpression.content
 
@@ -133,7 +142,8 @@ class RepeatExpression(RepeatMark, expressions.Expression):
         return te
 
     def setTextExpression(self, value):
-        '''Directly set a TextExpression object.
+        '''
+        Directly set a TextExpression object.
         '''
         if not isinstance(value, expressions.TextExpression):
             raise RepeatExpressionException(
@@ -151,7 +161,8 @@ class RepeatExpression(RepeatMark, expressions.Expression):
             return copy.deepcopy(self._textExpression)
 
     def isValidText(self, value):
-        '''Return True or False if the supplied text could be used for this RepeatExpression.
+        '''
+        Return True or False if the supplied text could be used for this RepeatExpression.
         '''
         def stripText(s):
             # remove all spaces, punctuation, and make lower
@@ -175,8 +186,8 @@ class RepeatExpressionMarker(RepeatExpression):
     such as Coda, Segno, and Fine, which are subclassed below.
     '''
 
-    def __init__(self):
-        super().__init__()
+    def __init__(self, **keywords):
+        super().__init__(**keywords)
         # these are generally centered
         self.style.justify = 'center'
 
@@ -189,8 +200,8 @@ class Coda(RepeatExpressionMarker):
     '''
     # note that only Coda and Segno have non-text expression forms
 
-    def __init__(self, text=None):
-        super().__init__()
+    def __init__(self, text=None, **keywords):
+        super().__init__(**keywords)
         # default text expression is coda
         self.style.justify = 'center'
 
@@ -213,8 +224,8 @@ class Segno(RepeatExpressionMarker):
     '''
     # note that only Coda and Segno have non-text expression forms
 
-    def __init__(self):
-        super().__init__()
+    def __init__(self, **keywords):
+        super().__init__(**keywords)
         # default text expression is coda
         self._textAlternatives = ['Segno']
         self.setText(self._textAlternatives[0])
@@ -222,14 +233,14 @@ class Segno(RepeatExpressionMarker):
 
 
 class Fine(RepeatExpressionMarker):
-    '''The fine word as placed in a score.
-
+    '''
+    The fine word as placed in a score.
 
     >>> rm = repeat.Fine()
     '''
 
-    def __init__(self):
-        super().__init__()
+    def __init__(self, **keywords):
+        super().__init__(**keywords)
         # default text expression is coda
         self._textAlternatives = ['fine']
         self.setText(self._textAlternatives[0])
@@ -242,8 +253,8 @@ class RepeatExpressionCommand(RepeatExpression):
     the reader to go somewhere else. DaCapo and
     related are examples.
     '''
-    def __init__(self):
-        super().__init__()
+    def __init__(self, **keywords):
+        super().__init__(**keywords)
         # whether any internal repeats encountered within a jumped region are also repeated.
         self.repeatAfterJump = False
         # generally these should be right aligned, as they are placed
@@ -258,8 +269,8 @@ class DaCapo(RepeatExpressionCommand):
     `repeatAfterJump` is False, indicating that any repeats
     encountered on the Da Capo repeat not be repeated.
     '''
-    def __init__(self, text=None):
-        super().__init__()
+    def __init__(self, text=None, **keywords):
+        super().__init__(**keywords)
         # default text expression is coda
         self._textAlternatives = ['Da Capo', 'D.C.']
         if text is not None and self.isValidText(text):
@@ -279,8 +290,8 @@ class DaCapoAlFine(RepeatExpressionCommand):
 
     >>> rm = repeat.DaCapoAlFine()
     '''
-    def __init__(self, text=None):
-        super().__init__()
+    def __init__(self, text=None, **keywords):
+        super().__init__(**keywords)
         # default text expression is coda
         self._textAlternatives = ['Da Capo al fine', 'D.C. al fine']
         if text is not None and self.isValidText(text):
@@ -303,8 +314,8 @@ class DaCapoAlCoda(RepeatExpressionCommand):
     >>> rm = repeat.DaCapoAlCoda()
     '''
 
-    def __init__(self, text=None):
-        super().__init__()
+    def __init__(self, text=None, **keywords):
+        super().__init__(**keywords)
 
         self._textAlternatives = ['Da Capo al Coda', 'D.C. al Coda']
         if text is not None and self.isValidText(text):
@@ -319,8 +330,8 @@ class AlSegno(RepeatExpressionCommand):
 
     >>> rm = repeat.AlSegno()
     '''
-    def __init__(self, text=None):
-        super().__init__()
+    def __init__(self, text=None, **keywords):
+        super().__init__(**keywords)
         self._textAlternatives = ['al Segno']
         if text is not None and self.isValidText(text):
             self.setText(text)
@@ -337,8 +348,8 @@ class DalSegno(RepeatExpressionCommand):
 
     >>> rm = repeat.DaCapoAlFine()
     '''
-    def __init__(self, text=None):
-        super().__init__()
+    def __init__(self, text=None, **keywords):
+        super().__init__(**keywords)
         self._textAlternatives = ['Dal Segno', 'D.S.']
         if text is not None and self.isValidText(text):
             self.setText(text)
@@ -356,8 +367,8 @@ class DalSegnoAlFine(RepeatExpressionCommand):
 
     >>> rm = repeat.DaCapoAlFine()
     '''
-    def __init__(self, text=None):
-        super().__init__()
+    def __init__(self, text=None, **keywords):
+        super().__init__(**keywords)
         self._textAlternatives = ['Dal Segno al fine', 'D.S. al fine']
         if text is not None and self.isValidText(text):
             self.setText(text)
@@ -376,8 +387,8 @@ class DalSegnoAlCoda(RepeatExpressionCommand):
 
     >>> rm = repeat.DaCapoAlCoda()
     '''
-    def __init__(self, text=None):
-        super().__init__()
+    def __init__(self, text=None, **keywords):
+        super().__init__(**keywords)
         self._textAlternatives = ['Dal Segno al Coda', 'D.S. al Coda']
         if text is not None and self.isValidText(text):
             self.setText(text)
@@ -395,7 +406,7 @@ repeatExpressionReference = [
 ]
 
 # ------------------------------
-def insertRepeatEnding(s, start, end, endingNumber=1, *, inPlace=False):
+def insertRepeatEnding(s, start, end, endingNumber: int = 1, *, inPlace=False):
     '''
     Designates a range of measures as being repeated endings (i.e. first and second endings)
     within a stream s, where s either contains measures,
@@ -639,7 +650,7 @@ class ExpanderException(exceptions21.Music21Exception):
     pass
 
 
-class Expander:
+class Expander(t.Generic[StreamType]):
     '''
     The Expander object can expand a single Part or Part-like Stream with repeats. Nested
     repeats given with :class:`~music21.bar.Repeat` objects, or
@@ -702,45 +713,44 @@ class Expander:
         {0.0} <music21.note.Note F>
         {3.0} <music21.bar.Barline type=final>
 
+    Changed in v9: Expander must be initialized with a Stream object.
+
     OMIT_FROM_DOCS
 
     TODO: Note bug: barline style = double for each!
     Clefs and TimesSignatures should only be in first one!
 
-    Test empty expander:
-
-    >>> e = repeat.Expander()
+    THIS IS IN OMIT
     '''
-    def __init__(self, streamObj=None):
-        self._src = streamObj
-        self._repeatBrackets = None
-        if streamObj is not None:
-            self._setup()
-
-    def _setup(self):
-        '''
-        run several setup routines.
-        '''
+    def __init__(self, streamObj: StreamType):
         from music21 import stream
+
+        self._src: StreamType = streamObj
 
         # get and store the source measure count; this is presumed to
         # be a Stream with Measures
-        self._srcMeasureStream = self._src.getElementsByClass(stream.Measure).stream()
+        self._srcMeasureStream: stream.Stream[stream.Measure] = self._src.getElementsByClass(
+            stream.Measure
+        ).stream()
         # store all top-level non Measure elements for later insertion
-        self._srcNotMeasureStream = self._src.getElementsNotOfClass(stream.Measure).stream()
-
-        # see if there are any repeat brackets
-        self._repeatBrackets = self._src.flatten().getElementsByClass(
-            'RepeatBracket'
+        self._srcNotMeasureStream: stream.Stream = self._src.getElementsNotOfClass(
+            stream.Measure
         ).stream()
 
-        self._srcMeasureCount = len(self._srcMeasureStream)
+        # see if there are any repeat brackets
+        self._repeatBrackets: stream.Stream[spanner.RepeatBracket] = (
+            self._src.flatten().getElementsByClass(spanner.RepeatBracket).stream()
+        )
+
+        self._srcMeasureCount: int = len(self._srcMeasureStream)
         if self._srcMeasureCount == 0:
             raise ExpanderException('no measures found in the source stream to be expanded')
 
         # store counts of all non barline elements.
         # doing class matching by string as problems matching in some test cases
-        reStream = self._srcMeasureStream.flatten().getElementsByClass(RepeatExpression).stream()
+        reStream: stream.Stream[RepeatExpression] = (
+            self._srcMeasureStream.flatten().getElementsByClass(RepeatExpression).stream()
+        )
         self._codaCount = len(reStream.getElementsByClass(Coda))
         self._segnoCount = len(reStream.getElementsByClass(Segno))
         self._fineCount = len(reStream.getElementsByClass(Fine))
@@ -754,7 +764,7 @@ class Expander:
         self._dsafCount = len(reStream.getElementsByClass(DalSegnoAlFine))
         self._dsacCount = len(reStream.getElementsByClass(DalSegnoAlCoda))
 
-    def process(self, deepcopy=True):
+    def process(self, deepcopy: bool = True) -> StreamType:
         '''
         This is the main call for Expander
 
@@ -779,7 +789,7 @@ class Expander:
             srcStream = self._srcMeasureStream
 
         if canExpand is None:
-            return srcStream
+            return t.cast(StreamType, srcStream)
 
         # these must be copied, otherwise we have the original still
         self._repeatBrackets = copy.deepcopy(self._repeatBrackets)
@@ -877,7 +887,7 @@ class Expander:
         if rb is not None and 'music21.bar.Repeat' in rb.classSet:
             m.rightBarline = bar.Barline(newType)
 
-    def _stripRepeatExpressions(self, streamObj: 'music21.stream.Stream'):
+    def _stripRepeatExpressions(self, streamObj: stream.Stream):
         '''
         Given a Stream of measures or a Measure, strip all RepeatExpression
         objects in place.
@@ -987,12 +997,14 @@ class Expander:
             raise ExpanderException('no repeat command found')
 
     def _getRepeatExpressionCommand(self, streamObj):
-        '''Get the instance found in this stream; assumes that there is one.
+        '''
+        Get the instance found in this stream; assumes that there is one.
         '''
         return streamObj.flatten().getElementsByClass(RepeatExpressionCommand).first()
 
     def _daCapoIsCoherent(self):
-        '''Check of a DC statement is coherent.
+        '''
+        Check of a DC statement is coherent.
         '''
         # there can be only one da capo statement for the provided span
         sumDc = self._dcCount + self._dcafCount + self._dcacCount
@@ -1018,7 +1030,8 @@ class Expander:
         return False
 
     def _dalSegnoIsCoherent(self):
-        '''Check of a sa segno statement is coherent.
+        '''
+        Check of a sa segno statement is coherent.
         '''
         # there can be only one da segno statement for the provided span
         sumDs = (self._asCount
@@ -1107,13 +1120,13 @@ class Expander:
                 # environLocal.printDebug(['_groupRepeatBracketIndices', rb])
                 # match = False
                 if rb.isFirst(m):  # for this rb, is this the first measures
-                    if rb.getNumberList()[0] in foundRBNumbers:
+                    if rb.numberRange[0] in foundRBNumbers:
                         # we have a new group
                         groups.append(groupIndices)
                         foundRBNumbers = []
                         groupIndices = {'repeatBrackets': [], 'measureIndices': []}
                     # store rb numbers to monitor when we are in a new group
-                    foundRBNumbers += rb.getNumberList()  # concat list
+                    foundRBNumbers += rb.numberRange  # concat list
                     # groupIndices['measureIndices'].append(i)
                     # need to jump to the index of the last measure this
                     # rb contains; need to add indices for measures found within
@@ -1141,7 +1154,8 @@ class Expander:
         return groups
 
     def _repeatBracketsAreCoherent(self):
-        '''Check if repeat brackets are coherent.
+        '''
+        Check if repeat brackets are coherent.
 
         This must be done for each group of brackets, not for the entire Stream.
         '''
@@ -1168,7 +1182,7 @@ class Expander:
                     # get number list will return inclusive values; i.e.,
                     # 1,3 will
                     # return 1, 2, 3
-                    target += rb.getNumberList()
+                    target += rb.numberRange
                 match = list(range(1, max(target) + 1))  # max of target + 1
                 if match != target:
                     environLocal.printDebug([
@@ -1671,7 +1685,7 @@ class Expander:
             # are at the last repeat under this bracket
             if data['validIndices'] is not None:
                 # repeat times is the number of elements in the list
-                repeatTimes = len(data['repeatBracket'].getNumberList())
+                repeatTimes = len(data['repeatBracket'].numberRange)
                 # just get the expanded section
                 # streamObj.show('t')
                 out = self.processInnermostRepeatBars(
@@ -1708,11 +1722,10 @@ class Expander:
         stream of measures. This requires the provided stream
         to only have measures.
 
-
         >>> s = converter.parse('tinynotation: 3/4 A2. C4 D E F2.')
         >>> s.makeMeasures(inPlace=True)
         >>> s.measure(3).append(repeat.Segno())
-        >>> e = repeat.Expander()
+        >>> e = repeat.Expander(s)
 
         getRepeatExpressionIndex returns the measureIndex not measure number
 
@@ -1730,7 +1743,7 @@ class Expander:
             return post
         return None
 
-    def isExpandable(self) -> t.Union[bool, None]:
+    def isExpandable(self) -> bool | None:
         '''
         Return True or False if this Stream is expandable, that is,
         if it has balanced repeats or sensible Da Capo or Dal Segno
@@ -1949,7 +1962,7 @@ class RepeatFinder:
                   'getQuarterLengthOfPickupMeasure',
                   'hasPickup']
 
-    _DOC_ATTR: t.Dict[str, str] = {
+    _DOC_ATTR: dict[str, str] = {
         'defaultHash': r'''A function that takes a stream of notes and rests and
                                 returns a string or an
                                 integer such that two measures are equal if their

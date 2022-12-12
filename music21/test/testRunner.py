@@ -15,6 +15,8 @@ The testRunner module contains the all important "mainTest" function that runs t
 in a given module.  Except for the one instance of "defaultImports", everything here
 can run on any system, not just music21.
 '''
+from __future__ import annotations
+
 import doctest
 import inspect
 import platform
@@ -50,10 +52,10 @@ def addDocAttrTestsToSuite(suite,
     >>> test.testRunner.addDocAttrTestsToSuite(s1, allLocals)
     >>> s1TestsAfter = len(s1._tests)
     >>> s1TestsAfter - s1TestsBefore
-    3
+    4
     >>> lastTest = s1._tests[-1]
     >>> lastTest
-    expressionIsInferred ()
+    client ()
     '''
     dtp = doctest.DocTestParser()
     if globs is False:
@@ -81,7 +83,7 @@ def addDocAttrTestsToSuite(suite,
             suite.addTest(dtc)
 
 
-def fixDoctests(doctestSuite):
+def fixDoctests(doctestSuite: doctest._DocTestSuite) -> None:
     r'''
     Fix doctests so that addresses are sanitized.
 

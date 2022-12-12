@@ -66,6 +66,8 @@ like the idea of thawing something that's frozen; "unpickling" just doesn't
 seem possible.  In any event, I needed a name that wouldn't already
 exist in the Python namespace.
 '''
+from __future__ import annotations
+
 import copy
 import io
 import os
@@ -73,20 +75,16 @@ import pathlib
 import pickle
 import time
 import unittest
-import weakref
 import zlib
-
-import typing as t
 
 from music21 import base
 from music21 import common
 from music21 import derivation
+from music21 import environment
 from music21 import exceptions21
 from music21 import spanner
 from music21 import variant
-# from music21.tree.trees import ElementTree
 
-from music21 import environment
 environLocal = environment.Environment('freezeThaw')
 
 # -----------------------------------------------------------------------------
@@ -107,7 +105,7 @@ class StreamFreezeThawBase:
     def __init__(self):
         self.stream = None
 
-    def getPickleFp(self, directory: t.Union[str, pathlib.Path]) -> pathlib.Path:
+    def getPickleFp(self, directory: str | pathlib.Path) -> pathlib.Path:
         if not isinstance(directory, pathlib.Path):
             directory = pathlib.Path(directory)
 
@@ -115,7 +113,7 @@ class StreamFreezeThawBase:
         streamStr = str(time.time())
         return directory / ('m21-' + common.getMd5(streamStr) + '.p')
 
-    def getJsonFp(self, directory: t.Union[str, pathlib.Path]) -> pathlib.Path:
+    def getJsonFp(self, directory: str | pathlib.Path) -> pathlib.Path:
         return self.getPickleFp(directory).with_suffix('.p.json')
 
 
@@ -315,7 +313,7 @@ class StreamFreezer(StreamFreezeThawBase):
         streamObj (not recursive).  Called by setupSerializationScaffold.
         '''
         if hasattr(streamObj, 'streamStatus'):
-            streamObj.streamStatus._client = None
+            streamObj.streamStatus.client = None
 
     def recursiveClearSites(self, startObj):
         '''
@@ -487,7 +485,7 @@ class StreamFreezer(StreamFreezeThawBase):
         hierarchyObject=None,
         getSpanners=True,
         getVariants=True
-    ) -> t.List[int]:
+    ) -> list[int]:
         '''
         Return a list of all Stream ids anywhere in the hierarchy.  By id,
         we mean `id(s)` not `s.id` -- so they are memory locations and unique.
@@ -1215,6 +1213,8 @@ class Test(unittest.TestCase):
 
     def testPickleMidi(self):
         from music21 import converter
+        from music21 import note
+
         a = str(common.getSourceFilePath()
                          / 'midi'
                          / 'testPrimitive'
@@ -1225,8 +1225,8 @@ class Test(unittest.TestCase):
         f = converter.freezeStr(c)
         d = converter.thawStr(f)
         self.assertIsInstance(
-            d.parts[1].flatten().notes[20].volume._client,
-            weakref.ReferenceType)
+            d.parts[1].flatten().notes[20].volume.client,
+            note.NotRest)
 
 
 # -----------------------------------------------------------------------------

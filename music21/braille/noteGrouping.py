@@ -8,9 +8,10 @@
 # Copyright:    Copyright © 2012, 2016 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
-import unittest
+from __future__ import annotations
 
 from collections import OrderedDict
+import unittest
 
 from music21 import clef
 from music21 import dynamics

@@ -37,22 +37,12 @@ False
 >>> n.hasEditorialInformation
 True
 '''
-import typing as t
+from __future__ import annotations
+
 import unittest
-from music21 import exceptions21
+
 from music21 import prebase
 from music21 import style
-
-# -----------------------------------------------------------------------------
-
-
-class EditorialException(exceptions21.Music21Exception):
-    pass
-
-
-class CommentException(exceptions21.Music21Exception):
-    pass
-
 
 # -----------------------------------------------------------------------------
 class Editorial(prebase.ProtoM21Object, dict):
@@ -86,7 +76,7 @@ class Editorial(prebase.ProtoM21Object, dict):
         :width: 103
 
     '''
-    _DOC_ATTR: t.Dict[str, str] = {
+    _DOC_ATTR: dict[str, str] = {
         'comments': '''
             a list of :class:`~music21.editorial.Comment` objects that represent any comments
             about the object.

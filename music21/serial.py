@@ -17,17 +17,17 @@ including :class:`~music21.serial.ToneRow` subclasses.
 Serial searching methods that were previously here have been moved to
 :mod:`~music21.search.serial`.
 '''
-import unittest
+from __future__ import annotations
+
 import typing as t
+import unittest
 
-from music21 import exceptions21
-
-from music21 import note
 from music21 import chord
-from music21 import stream
-from music21 import pitch
-
 from music21 import environment
+from music21 import exceptions21
+from music21 import note
+from music21 import pitch
+from music21 import stream
 
 environLocal = environment.Environment('serial')
 
@@ -280,7 +280,7 @@ class ToneRow(stream.Stream):
     >>> len(rcsRow)
     10
     '''
-    _DOC_ATTR: t.Dict[str, str] = {
+    _DOC_ATTR: dict[str, str] = {
         'row': 'A list representing the pitch class values of the row.',
     }
 
@@ -554,7 +554,7 @@ class ToneRow(stream.Stream):
 
         return self.zeroCenteredTransformation(transformationType, newIndex)
 
-    def findZeroCenteredTransformations(self, otherRow) -> t.Union[bool, t.List[t.Any]]:
+    def findZeroCenteredTransformations(self, otherRow) -> t.Union[bool, list[t.Any]]:
         '''
         Gives the list of zero-centered serial transformations
         taking one :class:`~music21.serial.ToneRow`
@@ -1059,8 +1059,8 @@ class TwelveToneRow(ToneRow):
         >>> moses.areCombinatorial('R', 6, 'RI', 4)
         False
 
-        Changed in v.7 -- `convention` is no longer necessary and no longer used.
-        Renamed to `unused_convention` and defaults None; to be removed in v.8.
+        * Changed in v7: `convention` is no longer necessary and no longer used.
+          Renamed to `unused_convention` and defaults None; to be removed in v8.
         '''
         if self.isTwelveToneRow() is False:
             raise SerialException('Combinatoriality applies only to twelve-tone rows.')
@@ -1081,20 +1081,20 @@ class HistoricalTwelveToneRow(TwelveToneRow):
     Subclass of :class:`~music21.serial.TwelveToneRow` storing additional attributes of a
     twelve-tone row used in the historical literature.
     '''
-    _DOC_ATTR: t.Dict[str, str] = {
+    _DOC_ATTR: dict[str, str] = {
         'composer': 'The name of the composer, or None.  (String)',
         'opus': 'The opus of the work, or None.  (String)',
         'title': 'The title of the work, or None.  (String)',
     }
 
-    composer: t.Union[None, str] = None
-    opus: t.Union[None, str] = None
-    title: t.Union[None, str] = None
+    composer: None | str = None
+    opus: None | str = None
+    title: None | str = None
 
     def __init__(self,
-                 composer: t.Union[None, str] = None,
-                 opus: t.Union[None, str] = None,
-                 title: t.Union[None, str] = None,
+                 composer: None | str = None,
+                 opus: None | str = None,
+                 title: None | str = None,
                  row=None,
                  **keywords):
         super().__init__(row, **keywords)
@@ -1209,7 +1209,7 @@ def getHistoricalRowByName(rowName):
     >>> web.isLinkChord()
     False
 
-    NOTE: before v.6, these rows had 'Row' in front of them,
+    NOTE: before v6, these rows had 'Row' in front of them,
     like 'RowWebernOp29' instead of 'WebernOp29'.  They can still be accessed
     by the old name.
 
@@ -1299,7 +1299,7 @@ def pcToToneRow(pcSet):
     return a
 
 
-def rowToMatrix(p: t.List[int]) -> str:
+def rowToMatrix(p: list[int]) -> str:
     # noinspection PyShadowingNames
     '''
     Takes a list of numbers of converts it to a string representation of a
@@ -1396,7 +1396,9 @@ class Test(unittest.TestCase):
         self.assertEqual(nonRows, [])
 
     def testExtractRowParts(self):
-        '''Was a problem in slices'''
+        '''
+        Was a problem in slices
+        '''
         aRow = getHistoricalRowByName('BergViolinConcerto')
         unused_aRow2 = aRow[0:3]
 

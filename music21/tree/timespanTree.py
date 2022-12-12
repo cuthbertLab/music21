@@ -15,7 +15,9 @@ Tools for grouping elements, timespans, and especially
 pitched elements into kinds of searchable tree organized by start and stop offsets
 and other positions.
 '''
-import collections.abc
+from __future__ import annotations
+
+from collections.abc import Generator, Iterable
 import itertools
 import random
 import typing as t
@@ -24,11 +26,17 @@ import unittest
 import more_itertools
 
 from music21 import common
+from music21 import environment
 from music21 import exceptions21
 
-from music21.tree import spans, trees
+from music21.tree import spans
+from music21.tree import trees
 
-from music21 import environment
+
+if t.TYPE_CHECKING:
+    from music21.tree.verticality import VerticalitySequence
+
+
 environLocal = environment.Environment('tree.timespanTree')
 
 
@@ -219,8 +227,8 @@ class TimespanTree(trees.OffsetTree):
         '''
         this is just for mimicking elements as streams.
 
-        Changed in v7 -- this was always meant to be a property, but was
-        incorrectly a method earlier.
+        * Changed in v7: this was always meant to be a property, but was
+          incorrectly a method earlier.
         '''
         return self.lowestPosition()
 
@@ -503,7 +511,7 @@ class TimespanTree(trees.OffsetTree):
 
     def iterateVerticalitiesNwise(
             self, n: int = 3, *, reverse: bool = False, padEnd: bool = False
-    ) -> t.Generator['music21.tree.verticality.VerticalitySequence', None, None]:
+    ) -> Generator[VerticalitySequence, None, None]:
         r'''
         Iterates :class:`~music21.tree.verticality.Verticality` objects in groups of length `n`.
 
@@ -576,7 +584,7 @@ class TimespanTree(trees.OffsetTree):
             ]>
 
 
-        Changed in v8 -- added padEnd.  Streams with fewer than n elements
+        * Changed in v8: added padEnd.  Streams with fewer than n elements
             also return an empty sentinel entry.
         '''
         from music21.tree.verticality import VerticalitySequence, Verticality
@@ -659,7 +667,7 @@ class TimespanTree(trees.OffsetTree):
         >>> scoreTree.elementsOverlappingOffset(0.1)
         ()
         '''
-        if not isinstance(offsets, collections.abc.Iterable):
+        if not isinstance(offsets, Iterable):
             offsets = [offsets]
         for offset in offsets:
             overlaps = self.elementsOverlappingOffset(offset)

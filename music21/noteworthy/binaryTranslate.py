@@ -74,9 +74,11 @@ convert the file into .xml or .nwctxt first.
         {4.0} <music21.stream.Measure 0 offset=4.0>
             {0.0} <music21.note.Note C>
 '''
+from __future__ import annotations
+
 import pathlib
 import struct
-import typing as t
+
 from music21 import environment
 from music21 import exceptions21
 
@@ -135,7 +137,7 @@ class NWCConverter:
         self.staffHeight = 0
 
     # noinspection SpellCheckingInspection
-    def parseFile(self, fp: t.Union[pathlib.Path, str]):
+    def parseFile(self, fp: pathlib.Path | str):
         # noinspection PyShadowingNames
         r'''
         Parse a file (calls .toStream)

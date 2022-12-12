@@ -5,12 +5,10 @@
 #
 # Authors:      Michael Scott Asato Cuthbert
 #               Christopher Ariza
+#               Michael Bodenbach
 #
-# Copyright:    Copyright © 2009-2012 Michael Scott Asato Cuthbert
+# Copyright:    Copyright © 2009-2022 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
-#
-# Changes:      04 March 2014 by Michael Bodenbach
-#               - TabClef added
 # ------------------------------------------------------------------------------
 '''
 This module defines numerous subclasses of
@@ -18,14 +16,22 @@ This module defines numerous subclasses of
 commonly used clefs. Clef objects are often found
 within :class:`~music21.stream.Measure` objects.
 '''
-import unittest
+from __future__ import annotations
+
+from collections.abc import Iterable, Sequence
 import typing as t
+import unittest
 
 from music21 import base
 from music21 import exceptions21
 from music21 import environment
-from music21 import pitch  # for typing only
+from music21 import pitch
 from music21 import style
+
+
+if t.TYPE_CHECKING:
+    from music21 import stream
+
 
 environLocal = environment.Environment('clef')
 
@@ -58,8 +64,32 @@ class Clef(base.Music21Object):
 
     >>> tc.lowestLine
     31
+
+    **Equality**
+
+    Two Clefs are equal if their class is the same, their sign is the same,
+    their line is the same and their octaveChange is the same.
+
+    >>> c1 = clef.PercussionClef()
+    >>> c2 = clef.NoClef()
+    >>> c1 == c2
+    False
+    >>> c3 = clef.TrebleClef()
+    >>> c4 = clef.TrebleClef()
+    >>> c3 == c4
+    True
+    >>> c4.octaveChange = -1
+    >>> c3 == c4
+    False
+
+    Note that these are not equal:
+
+    >>> clef.TrebleClef() == clef.GClef(line=2)
+    False
     '''
-    _DOC_ATTR: t.Dict[str, str] = {
+    equalityAttributes = ('sign', 'line', 'octaveChange')
+
+    _DOC_ATTR: dict[str, str] = {
         'sign': '''
             The sign of the clef, generally, 'C', 'G', 'F', 'percussion', 'none' or None.
 
@@ -96,43 +126,14 @@ class Clef(base.Music21Object):
     _styleClass = style.TextStyle
     classSortOrder = 0
 
-    def __init__(self):
-        super().__init__()
-        self.sign: t.Optional[str] = None
+    def __init__(self, **keywords) -> None:
+        super().__init__(**keywords)
+        self.sign: str | None = None
         # line counts start from the bottom up, the reverse of musedata
-        self.line: t.Optional[int] = None
+        self.line: int | None = None
         self._octaveChange: int = 0  # set to zero as default
         # musicxml has an attribute for clefOctaveChange,
         # an integer to show transposing clef
-
-    def __eq__(self, other):
-        '''
-        two Clefs are equal if their class is the same, their sign is the same,
-        their line is the same and their octaveChange is the same.
-
-
-        >>> c1 = clef.PercussionClef()
-        >>> c2 = clef.NoClef()
-        >>> c1 == c2
-        False
-        >>> c3 = clef.TrebleClef()
-        >>> c4 = clef.TrebleClef()
-        >>> c3 == c4
-        True
-        >>> c4.octaveChange = -1
-        >>> c3 == c4
-        False
-        '''
-        try:
-            if (self.__class__ == other.__class__
-                    and self.sign == other.sign
-                    and self.line == other.line
-                    and self.octaveChange == other.octaveChange):
-                return True
-            else:
-                return False
-        except AttributeError:
-            return False
 
     def _reprInternal(self):
         return ''
@@ -184,7 +185,7 @@ class Clef(base.Music21Object):
 
     def getStemDirectionForPitches(
         self,
-        pitches: t.Union[pitch.Pitch, t.Sequence[pitch.Pitch]],
+        pitches: pitch.Pitch | Sequence[pitch.Pitch],
         *,
         firstLastOnly: bool = True,
         extremePitchOnly: bool = False,
@@ -227,12 +228,12 @@ class Clef(base.Music21Object):
         >>> bc.getStemDirectionForPitches(pitchList, extremePitchOnly=True)
         'up'
         '''
-        pitchList: t.Sequence[pitch.Pitch]
+        pitchList: Sequence[pitch.Pitch]
         if isinstance(pitches, pitch.Pitch):
             pitchList = [pitches]
         else:
             pitchList = pitches
-        relevantPitches: t.Sequence[pitch.Pitch]
+        relevantPitches: Sequence[pitch.Pitch]
 
         if not pitchList:
             raise ValueError('getStemDirectionForPitches cannot operate on an empty list')
@@ -272,7 +273,7 @@ class PitchClef(Clef):
     '''
     superclass for all other clef subclasses that use pitches...
     '''
-    _DOC_ATTR: t.Dict[str, str] = {
+    _DOC_ATTR: dict[str, str] = {
         'lowestLine': '''
             The diatonicNoteNumber of the lowest line of the clef.
             (Can be none...)
@@ -282,8 +283,8 @@ class PitchClef(Clef):
             ''',
     }
 
-    def __init__(self):
-        super().__init__()
+    def __init__(self, **keywords) -> None:
+        super().__init__(**keywords)
         self.lowestLine: int = 31
 
     @property
@@ -336,12 +337,13 @@ class PercussionClef(Clef):
     >>> pc.lowestLine == clef.TrebleClef().lowestLine
     True
 
-    Changed in v7.3 -- setting octaveChange no longer affects lowestLine
+    * Changed in v7.3: setting `octaveChange` no longer affects
+      `lowestLine`
     '''
-    _DOC_ATTR: t.Dict[str, str] = {}
+    _DOC_ATTR: dict[str, str] = {}
 
-    def __init__(self):
-        super().__init__()
+    def __init__(self, **keywords):
+        super().__init__(**keywords)
         self.sign = 'percussion'
         self.lowestLine = (7 * 4) + 3  # 4 octaves + 3 notes = e4
 
@@ -359,10 +361,10 @@ class NoClef(Clef):
     >>> nc.sign is None
     False
     '''
-    _DOC_ATTR: t.Dict[str, str] = {}
+    _DOC_ATTR: dict[str, str] = {}
 
-    def __init__(self):
-        super().__init__()
+    def __init__(self, **keywords):
+        super().__init__(**keywords)
         self.sign = 'none'
 
 
@@ -376,8 +378,8 @@ class JianpuClef(NoClef):
     'jianpu'
     '''
 
-    def __init__(self):
-        super().__init__()
+    def __init__(self, **keywords):
+        super().__init__(**keywords)
         self.sign = 'jianpu'
 
 
@@ -390,14 +392,14 @@ class TabClef(PitchClef):
     'TAB'
     '''
 
-    def __init__(self):
-        super().__init__()
+    def __init__(self, **keywords):
+        super().__init__(**keywords)
         self.sign = 'TAB'
         self.line = 5
 
     def getStemDirectionForPitches(
         self,
-        pitchList: t.Union[pitch.Pitch, t.Iterable[pitch.Pitch]],
+        pitchList: pitch.Pitch | Iterable[pitch.Pitch],
         *,
         firstLastOnly: bool = True,
         extremePitchOnly: bool = False,
@@ -424,8 +426,8 @@ class GClef(PitchClef):
     31
     '''
 
-    def __init__(self):
-        super().__init__()
+    def __init__(self, **keywords):
+        super().__init__(**keywords)
         self.sign = 'G'
 
 
@@ -442,8 +444,8 @@ class FrenchViolinClef(GClef):
     1
     '''
 
-    def __init__(self):
-        super().__init__()
+    def __init__(self, **keywords):
+        super().__init__(**keywords)
         self.line = 1
         self.lowestLine = (7 * 4) + 5
 
@@ -463,8 +465,8 @@ class TrebleClef(GClef):
     31
     '''
 
-    def __init__(self):
-        super().__init__()
+    def __init__(self, **keywords):
+        super().__init__(**keywords)
         self.line = 2
         self.lowestLine = (7 * 4) + 3  # 4 octaves + 3 notes = e4
 
@@ -480,8 +482,8 @@ class Treble8vbClef(TrebleClef):
     -1
     '''
 
-    def __init__(self):
-        super().__init__()
+    def __init__(self, **keywords):
+        super().__init__(**keywords)
         self.octaveChange = -1
         self.lowestLine = (7 * 3) + 3
 
@@ -497,8 +499,8 @@ class Treble8vaClef(TrebleClef):
     1
     '''
 
-    def __init__(self):
-        super().__init__()
+    def __init__(self, **keywords):
+        super().__init__(**keywords)
         self.octaveChange = 1
         self.lowestLine = (7 * 3) + 3
 
@@ -515,8 +517,8 @@ class GSopranoClef(GClef):
     3
     '''
 
-    def __init__(self):
-        super().__init__()
+    def __init__(self, **keywords):
+        super().__init__(**keywords)
         self.line = 3
         self.lowestLine = (7 * 4) + 1
 
@@ -532,8 +534,8 @@ class CClef(PitchClef):
     'C'
     '''
 
-    def __init__(self):
-        super().__init__()
+    def __init__(self, **keywords):
+        super().__init__(**keywords)
         self.sign = 'C'
 
 
@@ -549,8 +551,8 @@ class SopranoClef(CClef):
     1
     '''
 
-    def __init__(self):
-        super().__init__()
+    def __init__(self, **keywords):
+        super().__init__(**keywords)
         self.line = 1
         self.lowestLine = (7 * 4) + 1
 
@@ -567,8 +569,8 @@ class MezzoSopranoClef(CClef):
     2
     '''
 
-    def __init__(self):
-        super().__init__()
+    def __init__(self, **keywords):
+        super().__init__(**keywords)
         self.line = 2
         self.lowestLine = (7 * 3) + 6
 
@@ -584,8 +586,8 @@ class AltoClef(CClef):
     3
     '''
 
-    def __init__(self):
-        super().__init__()
+    def __init__(self, **keywords):
+        super().__init__(**keywords)
         self.line = 3
         self.lowestLine = (7 * 3) + 4
 
@@ -603,8 +605,8 @@ class TenorClef(CClef):
 
     '''
 
-    def __init__(self):
-        super().__init__()
+    def __init__(self, **keywords):
+        super().__init__(**keywords)
         self.line = 4
         self.lowestLine = (7 * 3) + 2
 
@@ -620,8 +622,8 @@ class CBaritoneClef(CClef):
     5
     '''
 
-    def __init__(self):
-        super().__init__()
+    def __init__(self, **keywords):
+        super().__init__(**keywords)
         self.line = 5
         self.lowestLine = (7 * 2) + 7
 
@@ -636,8 +638,8 @@ class FClef(PitchClef):
     'F'
     '''
 
-    def __init__(self):
-        super().__init__()
+    def __init__(self, **keywords):
+        super().__init__(**keywords)
         self.sign = 'F'
 
 
@@ -657,8 +659,8 @@ class FBaritoneClef(FClef):
     False
     '''
 
-    def __init__(self):
-        super().__init__()
+    def __init__(self, **keywords):
+        super().__init__(**keywords)
         self.line = 3
         self.lowestLine = (7 * 2) + 7
 
@@ -672,8 +674,8 @@ class BassClef(FClef):
     'F'
     '''
 
-    def __init__(self):
-        super().__init__()
+    def __init__(self, **keywords):
+        super().__init__(**keywords)
         self.line = 4
         self.lowestLine = (7 * 2) + 5
 
@@ -689,8 +691,8 @@ class Bass8vbClef(FClef):
     -1
     '''
 
-    def __init__(self):
-        super().__init__()
+    def __init__(self, **keywords):
+        super().__init__(**keywords)
         self.line = 4
         self.octaveChange = -1
         self.lowestLine = (7 * 2) + 5
@@ -705,8 +707,8 @@ class Bass8vaClef(FClef):
     'F'
     '''
 
-    def __init__(self):
-        super().__init__()
+    def __init__(self, **keywords):
+        super().__init__(**keywords)
         self.line = 4
         self.octaveChange = 1
         self.lowestLine = (7 * 2) + 5
@@ -721,14 +723,14 @@ class SubBassClef(FClef):
     'F'
     '''
 
-    def __init__(self):
-        super().__init__()
+    def __init__(self, **keywords):
+        super().__init__(**keywords)
         self.line = 5
         self.lowestLine = (7 * 2) + 3
 
 
 # ------------------------------------------------------------------------------
-CLASS_FROM_TYPE: t.Dict[str, t.List[t.Optional[t.Type[Clef]]]] = {
+CLASS_FROM_TYPE: dict[str, list[type[Clef] | None]] = {
     'G': [None, FrenchViolinClef, TrebleClef, GSopranoClef, None, None],
     'C': [None, SopranoClef, MezzoSopranoClef, AltoClef, TenorClef, CBaritoneClef],
     'F': [None, None, None, FBaritoneClef, BassClef, SubBassClef],
@@ -892,7 +894,7 @@ def clefFromString(clefString, octaveShift=0) -> Clef:
     return clefObj
 
 
-def bestClef(streamObj: 'music21.stream.Stream',
+def bestClef(streamObj: stream.Stream,
              allowTreble8vb=False,
              recurse=False) -> PitchClef:
     # noinspection PyShadowingNames
@@ -1003,133 +1005,12 @@ def bestClef(streamObj: 'music21.stream.Stream',
 
 
 # ------------------------------------------------------------------------------
+# all other tests in test/test_clef
 class Test(unittest.TestCase):
 
     def testCopyAndDeepcopy(self):
         from music21.test.commonTest import testCopyAll
         testCopyAll(self, globals())
-
-    def testConversionClassMatch(self):
-        from xml.etree.ElementTree import fromstring as El
-        from music21.musicxml.xmlToM21 import MeasureParser
-        from music21 import clef
-        # need to get music21.clef.X, not X, because
-        # we are comparing the result to a translation outside
-        # clef.py
-        src = [
-            [('G', 1, 0), clef.FrenchViolinClef],
-            [('G', 2, 0), clef.TrebleClef],
-            [('G', 2, -1), clef.Treble8vbClef],
-            [('G', 2, 1), clef.Treble8vaClef],
-            [('G', 3, 0), clef.GSopranoClef],
-            [('C', 1, 0), clef.SopranoClef],
-            [('C', 2, 0), clef.MezzoSopranoClef],
-            [('C', 3, 0), clef.AltoClef],
-            [('C', 4, 0), clef.TenorClef],
-            [('C', 5, 0), clef.CBaritoneClef],
-            [('F', 3, 0), clef.FBaritoneClef],
-            [('F', 4, 0), clef.BassClef],
-            [('F', 4, 1), clef.Bass8vaClef],
-            [('F', 4, -1), clef.Bass8vbClef],
-            [('F', 5, 0), clef.SubBassClef],
-            [('TAB', 5, 0), clef.TabClef]
-        ]
-
-        MP = MeasureParser()
-
-        for params, className in src:
-            sign, line, octaveChange = params
-            mxClef = El(r'<clef><sign>'
-                        + sign + '</sign><line>'
-                        + str(line) + '</line>'
-                        + '<clef-octave-change>'
-                        + str(octaveChange)
-                        + '</clef-octave-change></clef>')
-            c = MP.xmlToClef(mxClef)
-
-            # environLocal.printDebug([type(c).__name__])
-
-            self.assertEqual(c.sign, params[0])
-            self.assertEqual(c.line, params[1])
-            self.assertEqual(c.octaveChange, params[2])
-            self.assertIsInstance(c, className,
-                                  f'Failed Conversion of classes: {c} is not a {className}')
-
-    def testContexts(self):
-        from music21 import stream
-        from music21 import note
-        from music21 import meter
-
-        n1 = note.Note('C')
-        n1.offset = 10
-        c1 = AltoClef()
-        c1.offset = 0
-        s1 = stream.Stream([c1, n1])
-
-        self.assertIs(s1.recurse().notes[0].getContextByClass(Clef), c1)
-        # equally good: getContextsByClass(Clef)[0]
-
-        del s1
-
-        n2 = note.Note('D')
-        n2.duration.type = 'whole'
-        n3 = note.Note('E')
-        n3.duration.type = 'whole'
-        ts1 = meter.TimeSignature('4/4')
-        s2 = stream.Stream()
-        s2.append(c1)
-        s2.append(ts1)
-        s2.append(n2)
-        s2.append(n3)
-        s2.makeMeasures()
-        self.assertIs(n2.getContextByClass(Clef), c1)
-
-        del s2
-
-        n4 = note.Note('F')
-        n4.duration.type = 'half'
-        n5 = note.Note('G')
-        n5.duration.type = 'half'
-        n6 = note.Note('A')
-        n6.duration.type = 'whole'
-
-        ts2 = meter.TimeSignature('4/4')
-        bc1 = BassClef()
-        tc1 = TrebleClef()
-
-        s3 = stream.Stream()
-        s3.append(bc1)
-        s3.append(ts2)
-        s3.append(n4)
-        s3.append(tc1)
-        s3.append(n5)
-        s3.append(n6)
-        s3.makeMeasures()
-
-        self.assertIs(n4.getContextByClass(stream.Measure), n5.getContextByClass(stream.Measure))
-        self.assertIs(n4.getContextByClass(Clef), bc1)
-        self.assertIs(n5.getContextByClass(Clef), tc1)
-        self.assertIs(n6.getContextByClass(Clef), tc1)
-
-    def testTabClefBeamDirections(self):
-
-        from music21 import stream
-        from music21 import clef
-        from music21 import meter
-        from music21 import note
-
-        m = stream.Measure()
-
-        n1 = note.Note(64, quarterLength=0.25)
-        n2 = note.Note(67, quarterLength=0.25)
-
-        m.append(clef.TabClef())
-        m.append(meter.TimeSignature('4/4'))
-        m.append(n1)
-        m.append(n2)
-        m.makeBeams(inPlace=True)
-
-        self.assertEqual(m.notes[0].stemDirection, 'down')
 
 
 # ------------------------------------------------------------------------------

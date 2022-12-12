@@ -10,16 +10,17 @@
 # Copyright:    Copyright © 2011 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # -----------------------------------------------------------------------------
+from __future__ import annotations
+
 import math
+from time import time
 import unittest
 
-from time import time
-
+from music21 import environment
 from music21 import scale
 from music21 import search
 from music21 import stream
 
-from music21 import environment
 environLocal = environment.Environment('audioSearch.scoreFollower')
 
 

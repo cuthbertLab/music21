@@ -11,12 +11,13 @@
 '''
 Writer for the 'RomanText' format (Tymoczko, Gotham, Cuthbert, & Ariza ISMIR 2019)
 '''
+from __future__ import annotations
 
 import fractions
+import textwrap
 import unittest
 
-import typing as t
-
+from music21 import bar
 from music21 import base
 from music21 import metadata
 from music21 import meter
@@ -125,8 +126,8 @@ class RnWriter(prebase.ProtoM21Object):
         self.title = 'Title unknown'
         self.analyst = ''
         self.proofreader = ''
-        self.combinedList: t.List[str] = []
-        self.container: t.Union[stream.Part, stream.Score]
+        self.combinedList: list[str] = []
+        self.container: stream.Part | stream.Score
 
         if isinstance(obj, stream.Stream):
             if isinstance(obj, stream.Opus):
@@ -179,7 +180,7 @@ class RnWriter(prebase.ProtoM21Object):
         self.prepSequentialListOfLines()
 
     def _makeContainer(self,
-                       obj: t.Union[stream.Stream, t.List]):
+                       obj: stream.Stream | list):
         '''
         Makes a placeholder container for the unusual cases where this class is called on
         generic- or non-stream object as opposed to
@@ -235,17 +236,47 @@ class RnWriter(prebase.ProtoM21Object):
         adding this to the (already prepared) metadata preamble ready for printing.
 
         >>> p = stream.Part()
-        >>> m = stream.Measure()
+        >>> m = stream.Measure(number=1)
         >>> m.insert(0, meter.TimeSignature('4/4'))
         >>> m.insert(0, roman.RomanNumeral('V', 'G'))
         >>> p.insert(0, m)
         >>> testCase = romanText.writeRoman.RnWriter(p)
         >>> testCase.combinedList[-1]  # Last entry, after the metadata
-        'm0 G: V'
+        'm1 G: V'
+
+        This follows the wider rntxt syntax in supporting
+        Time Signature (:class:`~music21.meter.TimeSignature`) changes and
+        Repeats marks (:class:`~music21.bar.Repeat`)
+        but only (currently) between measures.
+
+        Let's add a new measure to the stream we started,
+        with a time signature change beforehand and
+        both start and end repeats in it:
+
+        >>> m2 = stream.Measure(number=2)
+        >>> m2.insert(0, meter.TimeSignature('3/4'))
+        >>> m2.leftBarline = bar.Repeat(direction='start')
+        >>> m2.rightBarline = bar.Repeat(direction='end')
+        >>> m2.insert(0, roman.RomanNumeral('I', 'G'))
+        >>> p.insert(0, m2)
+        >>> testCase = romanText.writeRoman.RnWriter(p)
+
+        The last line of the `.combinedList` gives the new measure:
+
+        >>> testCase.combinedList[-1]
+        'm2 ||: I :||'
+
+        The line before that gives the time signature change:
+
+        >>> testCase.combinedList[-2]
+        'Time Signature: 3/4'
+
         '''
 
         for thisMeasure in self.container.getElementsByClass(stream.Measure):
-            # TimeSignatures  # TODO KeySignatures
+
+            # Separate line for elements supported before/between measures.
+            # (Note: Repeats within measure below)
             tsThisMeasure = thisMeasure.getElementsByClass(meter.TimeSignature)
             if tsThisMeasure:
                 firstTS = tsThisMeasure[0]
@@ -255,19 +286,48 @@ class RnWriter(prebase.ProtoM21Object):
                     msg = f'further time signature change(s) unprocessed: {unprocessedTSs}'
                     self.combinedList.append(f'Note: {msg}')
 
-            # RomanNumerals
+            measureNumberString = str(thisMeasure.measureNumber)
+            if thisMeasure.numberSuffix is not None:
+                measureNumberString += thisMeasure.numberSuffix
+
             measureString = ''  # Clear for each measure
 
-            rnsThisMeasure = thisMeasure.getElementsByClass(roman.RomanNumeral)
+            # Start repeat (within measure)
+            if (isinstance(thisMeasure.leftBarline, bar.Repeat)
+                    and thisMeasure.leftBarline.direction == 'start'):
+                measureString = rnString(measureNumber=measureNumberString,
+                                         beat=1.0,
+                                         chordString='||:',
+                                         inString=measureString,
+                                         )
 
+            # Roman Numerals (within measure)
+            rnsThisMeasure = thisMeasure.getElementsByClass(roman.RomanNumeral)
             for rn in rnsThisMeasure:
-                if rn.tie is None or rn.tie.type == 'start':  # Ignore tied to Roman numerals
+                if rn.tie is None or rn.tie.type == 'start':  # Ignore tied-to Roman numerals
                     chordString = self.getChordString(rn)
-                    measureString = rnString(measureNumber=thisMeasure.measureNumber,  # Suffix?
+                    measureString = rnString(measureNumber=measureNumberString,
                                              beat=rn.beat,
                                              chordString=chordString,
                                              inString=measureString,  # Creating update
                                              )
+
+            # End repeat (within measure)
+            if (isinstance(thisMeasure.rightBarline, bar.Repeat)
+                    and thisMeasure.rightBarline.direction == 'end'):
+                # we want to put the repeat at the beat of the last roman
+                #   numeral to avoid printing an unnecessary indication like
+                #   'b3' prior to the repeat
+                last_rn = thisMeasure[roman.RomanNumeral].last()
+                if last_rn is None:
+                    beat = 1.0
+                else:
+                    beat = last_rn.beat
+                measureString = rnString(measureNumber=measureNumberString,
+                                         beat=beat,
+                                         chordString=':||',
+                                         inString=measureString,
+                                         )
 
             if measureString:
                 self.combinedList.append(measureString)
@@ -275,7 +335,7 @@ class RnWriter(prebase.ProtoM21Object):
     def getChordString(self,
                        rn: roman.RomanNumeral):
         '''
-        Produce a string from a Roman number with the chord and
+        Produce a string from a Roman numeral with the chord and
         the key if that key constitutes a change from the foregoing context.
 
         >>> p = stream.Part()
@@ -303,10 +363,10 @@ class RnWriter(prebase.ProtoM21Object):
 
 # ------------------------------------------------------------------------------
 
-def rnString(measureNumber: int,
-             beat: t.Union[str, int, float, fractions.Fraction],
+def rnString(measureNumber: int | str,
+             beat: str | int | float | fractions.Fraction,
              chordString: str,
-             inString: t.Optional[str] = ''):
+             inString: str | None = ''):
     '''
     Creates or extends a string of RomanText such that the output corresponds to a single
     measure line.
@@ -332,11 +392,14 @@ def rnString(measureNumber: int,
     '''
 
     if inString:
-        inStringMeasureNumber = int(inString.split(' ')[0][1:])
-        if inStringMeasureNumber != measureNumber:
+        inStringMeasureNumber = inString.split(' ')[0][1:]
+        # inStringMeasureNumber was previously cast to int, but this fails on
+        #   measures with suffixes ("m1a"). However, now we need to cast
+        #   measureNumber to string in the following comparison.
+        if inStringMeasureNumber != str(measureNumber):
             msg = f'The current measureNumber is given as {measureNumber}, but '
             msg += f'the contextual inString ({inString}) refers to '
-            msg += 'measure number {measureNumber}. They should match.'
+            msg += f'measure number {measureNumber}. They should match.'
             raise ValueError(msg)
     else:  # inString and therefore start new line
         inString = f'm{measureNumber}'
@@ -350,7 +413,7 @@ def rnString(measureNumber: int,
     return newString
 
 
-def intBeat(beat: t.Union[str, int, float, fractions.Fraction],
+def intBeat(beat: str | int | float | fractions.Fraction,
             roundValue: int = 2):
     '''
     Converts beats to integers if possible, and otherwise to rounded decimals.
@@ -455,12 +518,14 @@ class Test(unittest.TestCase):
         self.assertIsInstance(testOpus, stream.Opus)
 
         testOpusRnWriter = RnWriter(testOpus)
-        self.assertIn('Title: Fake piece - No.1:', testOpusRnWriter.combinedList)
-        self.assertIn('Title: Fake piece - No.2:', testOpusRnWriter.combinedList)
-        self.assertIn('Title: Fake piece - No.3:', testOpusRnWriter.combinedList)
-        self.assertIn('m2 I', testOpusRnWriter.combinedList)  # mvt 1
-        self.assertIn('m5 I', testOpusRnWriter.combinedList)  # mvt 2
-        self.assertIn('m3 I', testOpusRnWriter.combinedList)  # mvt 3
+        for x in ['Title: Fake piece - No.1:',
+                  'Title: Fake piece - No.2:',
+                  'Title: Fake piece - No.3:',
+                  'm2 I',  # mvt 1
+                  'm5 I',  # mvt 2
+                  'm3 I',  # mvt 3
+                  ]:
+            self.assertIn(x, testOpusRnWriter.combinedList)
 
     def testTwoCorpusPiecesAndTwoCorruptions(self):
         '''
@@ -522,7 +587,7 @@ class Test(unittest.TestCase):
         p = stream.Part()
         romanText.writeRoman.RnWriter(p)  # or on a part
 
-        s.insert(p)
+        s.insert(0, p)
         romanText.writeRoman.RnWriter(s)  # or on a score with part
 
         m = stream.Measure()
@@ -542,10 +607,22 @@ class Test(unittest.TestCase):
         rn = roman.RomanNumeral('viio6', 'G')
         RnWriter(rn)  # and even (perhaps dubiously) directly on other music21 objects
 
-# ------------------------------------------------------------------------------
+    def testRepeats(self):
+        from music21 import converter
+        rntxt = textwrap.dedent('''
+            Time Signature: 2/4
+            m1 ||: C: I
+            m2 V :||
+            m3 ||: I :||
+            m4 ||: I
+            m5a V :||
+            m5b I
+        ''')
+        s = converter.parse(rntxt, format='romanText')
+        writer = RnWriter(s)
+        assert '\n'.join(writer.combinedList).strip().endswith(rntxt.strip())
 
     def testRnString(self):
-
         test = rnString(1, 1, 'G: I')
         self.assertEqual(test, 'm1 G: I')  # no beat number given for b1
 
@@ -554,8 +631,6 @@ class Test(unittest.TestCase):
 
         with self.assertRaises(ValueError):  # error when the measure numbers don't match
             rnString(15, 1, 'viio6', 'm14 G: I')
-
-# ------------------------------------------------------------------------------
 
     def testIntBeat(self):
         testInt = intBeat(1, roundValue=2)

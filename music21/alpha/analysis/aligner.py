@@ -8,6 +8,8 @@
 # Copyright:    Copyright © 2015 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
+from __future__ import annotations
+
 from collections import Counter
 import enum
 import operator
@@ -16,6 +18,7 @@ import unittest
 from music21 import base
 from music21 import exceptions21
 from music21 import metadata
+
 from music21.alpha.analysis import hasher
 
 

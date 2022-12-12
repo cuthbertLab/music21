@@ -12,7 +12,8 @@
 Objects for processing roman numeral analysis text files,
 as defined and demonstrated by Dmitri Tymoczko.
 '''
-import typing as t
+from __future__ import annotations
+
 import unittest
 
 _DOC_IGNORE_MODULE_OR_PACKAGE = True
@@ -700,7 +701,7 @@ class Test(unittest.TestCase):
 
 # ------------------------------------------------------------------------------
 # define presented order in documentation
-_DOC_ORDER: t.List[type] = []
+_DOC_ORDER: list[type] = []
 
 
 if __name__ == '__main__':

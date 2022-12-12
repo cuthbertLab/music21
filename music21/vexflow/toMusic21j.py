@@ -12,6 +12,8 @@
 '''
 Convert a music21 object into JSON and send it to the browser for music21j to use.
 '''
+from __future__ import annotations
+
 import unittest
 
 from music21.exceptions21 import Music21Exception
@@ -69,7 +71,7 @@ def fromObject(thisObject, *, mode='html', local=False):
     </body>
     </html>
 
-    Changed in v.8 -- mode and useLocal are keyword only.
+    * Changed in v8: mode and useLocal are keyword only.
     '''
     conv = VexflowPickler()
     conv.mode = mode

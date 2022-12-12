@@ -235,9 +235,9 @@ import re
 import typing  # not importing as t, because of extensive preexisting use of `t` as token
 import unittest
 
-from music21.base import Music21Object  # for typing only.
 from music21 import note
 from music21 import duration
+from music21 import environment
 from music21 import exceptions21
 from music21 import stream
 from music21 import tie
@@ -245,7 +245,11 @@ from music21 import expressions
 from music21 import meter
 from music21 import pitch
 
-from music21 import environment
+
+if typing.TYPE_CHECKING:
+    from music21.base import Music21Object
+
+
 environLocal = environment.Environment('tinyNotation')
 
 
@@ -269,7 +273,7 @@ class State:
     2
     '''
     # expires after N tokens or never.
-    autoExpires: typing.Union[typing.Literal[False], int] = False
+    autoExpires: typing.Literal[False] | int = False
 
     def __init__(self, parent=None, stateInfo=None):
         self.affectedTokens = []
@@ -283,7 +287,7 @@ class State:
         '''
         pass
 
-    def end(self) -> typing.Optional[Music21Object]:
+    def end(self) -> Music21Object | None:
         '''
         called just after removing state
         '''
@@ -759,12 +763,7 @@ class NoteToken(NoteOrRestToken):
         return t
 
 
-def _getDefaultTokenMap() -> typing.List[
-        typing.Tuple[
-            str,
-            typing.Type[Token]
-        ]
-]:
+def _getDefaultTokenMap() -> list[tuple[str, type[Token]]]:
     '''
     Returns the default tokenMap for TinyNotation.
 
@@ -1124,8 +1123,8 @@ class Converter:
         self.stream = stream.Part()
         self.stateDict = copy.copy(_stateDictDefault)
         self.stringRep = stringRep
-        self.activeStates: typing.List[State] = []
-        self.preTokens: typing.List[str] = []
+        self.activeStates: list[State] = []
+        self.preTokens: list[str] = []
 
         self.generalBracketStateRe = re.compile(r'(\w+){')
         self.tieStateRe = re.compile(r'~')
@@ -1141,7 +1140,7 @@ class Converter:
         self.makeNotation = makeNotation
         self.raiseExceptions = raiseExceptions
         # will be filled by self.setupRegularExpressions()
-        self._tokenMapRe: typing.List[typing.Tuple[typing.Pattern, typing.Type]] = []
+        self._tokenMapRe: list[tuple[typing.Pattern, type]] = []
 
     def load(self, stringRep: str) -> None:
         '''
@@ -1363,7 +1362,7 @@ class Converter:
 
         return t
 
-    def parseEndStates(self, t: str) -> typing.Tuple[str, int]:
+    def parseEndStates(self, t: str) -> tuple[str, int]:
         # noinspection GrazieInspection
         '''
         Trims the endState token (`}`) from the t string

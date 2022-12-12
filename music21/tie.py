@@ -9,18 +9,20 @@
 # Copyright:    Copyright © 2009-2022 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
-
 '''
 The `tie` module contains a single class, `Tie` that represents the visual and
 conceptual idea of tied notes.  They can be start or stop ties.
 '''
-import typing as t
+from __future__ import annotations
+
 import unittest
+
 from music21 import exceptions21
 from music21.common.objects import SlottedObjectMixin
 from music21 import prebase
 
-class TieException(exceptions21.Music21Exception):
+# Delete in v10.  Raise ValueError instead.
+class TieException(ValueError, exceptions21.Music21Exception):
     pass
 
 
@@ -88,7 +90,7 @@ class Tie(prebase.ProtoM21Object, SlottedObjectMixin):
         'type',
     )
 
-    _DOC_ATTR: t.Dict[str, str] = {
+    _DOC_ATTR: dict[str, str] = {
         'type': '''
             The tie type, can be 'start', 'stop', 'continue', 'let-ring', or 'continue-let-ring'.
             ''',
@@ -135,22 +137,26 @@ class Tie(prebase.ProtoM21Object, SlottedObjectMixin):
         >>> t2 == None
         False
         '''
-        if other is None or not isinstance(other, Tie):
+        if not isinstance(other, type(self)):
             return False
         elif self.type == other.type:
             return True
         return False
+
+    def __hash__(self):
+        return id(self) >> 4
 
     def _reprInternal(self):
         return self.type
 
 
 class Test(unittest.TestCase):
-    pass
+    def testCopyAndDeepcopy(self):
+        from music21.test.commonTest import testCopyAll
+        testCopyAll(self, globals())
 
 
 # ------------------------------------------------------------------------------
-
 if __name__ == '__main__':
     import music21
     music21.mainTest(Test)

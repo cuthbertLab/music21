@@ -11,16 +11,18 @@
 '''
 Various tools and utilities to find correlations between disparate objects in a Stream.
 '''
-import unittest
+from __future__ import annotations
+
 from collections import OrderedDict
+import unittest
 
 from music21 import exceptions21
 
 from music21 import note
 from music21 import chord
 from music21 import dynamics
-
 from music21 import environment
+
 environLocal = environment.Environment('analysis.correlate')
 
 
@@ -31,7 +33,8 @@ class CorrelateException(exceptions21.Music21Exception):
 
 # ------------------------------------------------------------------------------
 class ActivityMatch:
-    '''Given a Stream, find if one object is active while another is also active.
+    '''
+    Given a Stream, find if one object is active while another is also active.
 
     Plotting routines to graph the output of dedicated methods in this class are available.
 
@@ -53,8 +56,8 @@ class ActivityMatch:
 
 
     def _findActive(self, objNameSrc=None, objNameDst=None):
-        '''D
-        o the analysis, finding correlations of src with dst
+        '''
+        Do the analysis, finding correlations of src with dst
         returns an ordered list of dictionaries, in the form
         {'src': obj, 'dst': [objs]}
 

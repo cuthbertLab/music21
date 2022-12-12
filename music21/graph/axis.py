@@ -14,10 +14,11 @@
 Definitions for extracting data from a Stream to place on one axis of a
 :class:`~music21.graph.plot.PlotStream` or similar object.
 '''
+from __future__ import annotations
+
 import collections
 import math
 import re
-import typing as t
 import unittest
 
 from music21.graph.utilities import accidentalLabelToUnicode, GraphException
@@ -44,7 +45,7 @@ class Axis(prebase.ProtoM21Object):
     Client should be a .plot.PlotStream or None.  Eventually a Stream may be allowed,
     but not yet.
     '''
-    _DOC_ATTR: t.Dict[str, str] = {
+    _DOC_ATTR: dict[str, str] = {
         'axisName': 'the name of the axis.  One of "x" or "y" or for 3D Plots, "z"',
         'minValue': '''
             None or number representing the axis minimum.  Default None.
@@ -81,7 +82,7 @@ class Axis(prebase.ProtoM21Object):
 
     labelDefault = 'an axis'
     axisDataMap = {'x': 0, 'y': 1, 'z': 2}
-    quantities: t.Tuple[str, ...] = ('generic', 'one', 'nothing', 'blank')
+    quantities: tuple[str, ...] = ('generic', 'one', 'nothing', 'blank')
 
     def __init__(self, client=None, axisName='x'):
         if isinstance(client, str):
@@ -291,7 +292,7 @@ class PitchAxis(Axis):
     '''
     Axis subclass for dealing with Pitches
     '''
-    _DOC_ATTR: t.Dict[str, str] = {
+    _DOC_ATTR: dict[str, str] = {
         'showEnharmonic': '''
             bool on whether to show both common enharmonics in labels, default True
             ''',
@@ -308,7 +309,7 @@ class PitchAxis(Axis):
             ''',
     }
     labelDefault = 'Pitch'
-    quantities: t.Tuple[str, ...] = ('pitchGeneric', )
+    quantities: tuple[str, ...] = ('pitchGeneric', )
 
     def __init__(self, client=None, axisName='x'):
         super().__init__(client, axisName)
@@ -443,7 +444,7 @@ class PitchClassAxis(PitchAxis):
     By default, axis is not set from data, but set to 0, 11
     '''
     labelDefault = 'Pitch Class'
-    quantities: t.Tuple[str, ...] = ('pitchClass', 'pitchclass', 'pc')
+    quantities: tuple[str, ...] = ('pitchClass', 'pitchclass', 'pc')
 
     def __init__(self, client=None, axisName='x'):
         self.showOctaves = False
@@ -578,7 +579,7 @@ class PitchSpaceAxis(PitchAxis):
     Axis subclass for dealing with PitchSpace (MIDI numbers...)
     '''
     labelDefault = 'Pitch'
-    quantities: t.Tuple[str, ...] = ('pitchSpace', 'pitch', 'pitchspace', 'ps')
+    quantities: tuple[str, ...] = ('pitchSpace', 'pitch', 'pitchspace', 'ps')
 
     def extractOneElement(self, n, formatDict):
         if hasattr(n, 'pitch'):
@@ -642,7 +643,7 @@ class PitchSpaceOctaveAxis(PitchSpaceAxis):
     An axis similar to pitch classes, but just shows the octaves
     '''
     labelDefault = 'Octave'
-    quantities: t.Tuple[str, ...] = ('octave', 'octaves')
+    quantities: tuple[str, ...] = ('octave', 'octaves')
 
     def __init__(self, client=None, axisName='x'):
         super().__init__(client, axisName)
@@ -677,7 +678,7 @@ class PitchSpaceOctaveAxis(PitchSpaceAxis):
 #     Axis subclass for dealing with Diatonic Values (.diatonicNoteNum)
 #     '''
 #     labelDefault = 'Step'
-#     quantities: t.Tuple[str, ...] = ('diatonic', 'diatonicNoteNum')
+#     quantities: tuple[str, ...] = ('diatonic', 'diatonicNoteNum')
 #
 #     def extractOneElement(self, n, formatDict):
 #         if hasattr(n, 'pitch'):
@@ -737,7 +738,7 @@ class PositionAxis(Axis):
     '''
     Axis subclass for dealing with Positions
     '''
-    _DOC_ATTR: t.Dict[str, str] = {
+    _DOC_ATTR: dict[str, str] = {
         'graceNoteQL': '''
             length to substitute a grace note or other Zero-length element for.
             Default is the length of a 64th note (1/16 of a QL)
@@ -745,7 +746,7 @@ class PositionAxis(Axis):
     }
 
     labelDefault = 'Position'
-    quantities: t.Tuple[str, ...] = ('position', 'positions')
+    quantities: tuple[str, ...] = ('position', 'positions')
 
     def __init__(self, client=None, axisName='x'):
         super().__init__(client, axisName)
@@ -756,7 +757,7 @@ class OffsetAxis(PositionAxis):
     '''
     Axis subclass for dealing with Offsets
     '''
-    _DOC_ATTR: t.Dict[str, str] = {
+    _DOC_ATTR: dict[str, str] = {
         'useMeasures': '''
             bool or None for whether offsets (False) or measure numbers (True) should be used
             in the case of an offset access.  Default, None, meaning to check whether
@@ -781,7 +782,7 @@ class OffsetAxis(PositionAxis):
 
     }
     labelDefault = 'Offset'
-    quantities: t.Tuple[str, ...] = ('offset', 'measure', 'offsets', 'measures', 'time')
+    quantities: tuple[str, ...] = ('offset', 'measure', 'offsets', 'measures', 'time')
 
     def __init__(self, client=None, axisName='x'):
         super().__init__(client, axisName)
@@ -1106,7 +1107,7 @@ class QuarterLengthAxis(PositionAxis):
     '''
     Axis subclass for dealing with QuarterLengths
     '''
-    _DOC_ATTR: t.Dict[str, str] = {
+    _DOC_ATTR: dict[str, str] = {
         'useLogScale': '''
             bool or int for whether to scale numbers logarithmically.  Adds (log2) to the
             axis label if used.  If True (default) then log2 is assumed.  If an int, then
@@ -1119,12 +1120,12 @@ class QuarterLengthAxis(PositionAxis):
     }
 
     labelDefault = 'Quarter Length'
-    quantities: t.Tuple[str, ...] = ('quarterLength',
-                                     'ql',
-                                     'quarterlengths',
-                                     'durations',
-                                     'duration',
-                                     )
+    quantities: tuple[str, ...] = ('quarterLength',
+                                   'ql',
+                                   'quarterlengths',
+                                   'durations',
+                                   'duration',
+                                   )
 
     def __init__(self, client=None, axisName='x'):
         super().__init__(client, axisName)
@@ -1259,13 +1260,13 @@ class OffsetEndAxis(OffsetAxis):
     '''
     An Axis that gives beginning and ending values for each element
     '''
-    _DOC_ATTR: t.Dict[str, str] = {
+    _DOC_ATTR: dict[str, str] = {
         'noteSpacing': '''
             amount in QL to leave blank between untied notes.
             (default = self.graceNoteQL)
             '''
     }
-    quantities: t.Tuple[str, ...] = ('offsetEnd', 'timespans', 'timespan')
+    quantities: tuple[str, ...] = ('offsetEnd', 'timespans', 'timespan')
 
     def __init__(self, client=None, axisName='x', noteSpacing=USE_GRACE_NOTE_SPACING):
         super().__init__(client, axisName)
@@ -1294,7 +1295,7 @@ class DynamicsAxis(Axis):
     Axis subclass for dealing with Dynamics
     '''
     labelDefault = 'Dynamic'
-    quantities: t.Tuple[str, ...] = ('dynamic', 'dynamics', 'volume')
+    quantities: tuple[str, ...] = ('dynamic', 'dynamics', 'volume')
 
     def setBoundariesFromData(self, values=None):
         if values is None:
@@ -1349,14 +1350,14 @@ class CountingAxis(Axis):
     >>> plotS.data
     [(42.0, 1, {}), (45.0, 1, {}), (46.0, 1, {}), (47.0, 5, {}), (49.0, 6, {}), ...]
     '''
-    _DOC_ATTR: t.Dict[str, str] = {
+    _DOC_ATTR: dict[str, str] = {
         'countAxes': '''
             a string or tuple of strings representing an axis or axes to use in counting
             ''',
     }
 
     labelDefault = 'Count'
-    quantities: t.Tuple[str, ...] = ('count', 'quantity', 'frequency', 'counting')
+    quantities: tuple[str, ...] = ('count', 'quantity', 'frequency', 'counting')
 
     def __init__(self, client=None, axisName='y'):
         super().__init__(client, axisName)

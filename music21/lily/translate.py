@@ -13,16 +13,16 @@ music21 translates to Lilypond format and if Lilypond is installed on the
 local computer, can automatically generate .pdf, .png, and .svg versions
 of musical files using Lilypond.
 '''
+from __future__ import annotations
+
+from collections import OrderedDict
+from importlib.util import find_spec
 import os
 import pathlib
 import re
 import subprocess
 import sys
-import typing as t
 import unittest
-
-from collections import OrderedDict
-from importlib.util import find_spec
 
 from music21 import clef
 from music21 import common
@@ -35,6 +35,7 @@ from music21 import key
 from music21 import note
 from music21 import stream
 from music21 import variant
+
 from music21.lily import lilyObjects as lyo
 
 environLocal = environment.Environment('lily.translate')
@@ -52,7 +53,7 @@ del find_spec
 # TODO: speed up tests everywhere! move these to music21 base...
 
 class _sharedCorpusTestObject:
-    sharedCache: t.Dict[str, stream.Stream] = {}
+    sharedCache: dict[str, stream.Stream] = {}
 
 
 sharedCacheObject = _sharedCorpusTestObject()
@@ -289,7 +290,7 @@ class LilypondConverter:
             if m21ObjectIn[variant.Variant]:
                 # has variants. so we need to make a deepcopy...
                 m21ObjectIn = variant.makeAllVariantsReplacements(m21ObjectIn, recurse=True)
-                m21ObjectIn.makeVariantBlocks()
+                variant.makeVariantBlocks(m21ObjectIn)
 
         if ('Stream' not in c) or ('Measure' in c) or ('Voice' in c):
             scoreObj = stream.Score()
@@ -1526,7 +1527,7 @@ class LilypondConverter:
 
     def lyMultipliedDurationFromDuration(
         self,
-        durationObj: t.Union[duration.Duration, duration.DurationTuple],
+        durationObj: duration.Duration | duration.DurationTuple,
     ):
         r'''
         take a simple Duration (that is, one with one DurationTuple)
@@ -1566,7 +1567,7 @@ class LilypondConverter:
         >>> [str(lpc.lyMultipliedDurationFromDuration(c)) for c in components]
         ['1 ', '4 ']
         '''
-        number_type: t.Union[float, int, str]
+        number_type: float | int | str
         try:
             number_type = duration.convertTypeToNumber(durationObj.type)  # module call
         except duration.DurationException as de:

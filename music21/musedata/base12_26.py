@@ -11,6 +11,8 @@
 '''
 Placeholder dicts for the 0th and 1st order of Hewlett's base40 system (base12 and 26).
 '''
+from __future__ import annotations
+
 import unittest
 
 # ------------------------------------------------------------------------------

@@ -21,7 +21,6 @@ import copy
 import io
 import pathlib
 import re
-import typing as t
 import unittest
 
 from collections import OrderedDict
@@ -289,23 +288,23 @@ class CTSong(prebase.ProtoM21Object):
 
     """
     _DOC_ORDER = ['text', 'toScore', 'title', 'homeTimeSig', 'homeKeySig', 'comments', 'rules']
-    _DOC_ATTR: t.Dict[str, str] = {
+    _DOC_ATTR: dict[str, str] = {
         'year': '''
             The year of the CTSong; not formally defined
             by the Clercq-Temperley format.
             ''',
     }
 
-    def __init__(self, textFile: t.Union[str, pathlib.Path] = '', **keywords):
+    def __init__(self, textFile: str | pathlib.Path = '', **keywords):
         self._title = None
         self.text = ''
-        self.lines: t.List[str] = []
+        self.lines: list[str] = []
         # Dictionary of all component rules of the type CTRule
-        self._rules: t.Dict[str, CTRule] = OrderedDict()
+        self._rules: dict[str, CTRule] = OrderedDict()
         # keeps a list of all key signatures in the Score -- avoids duplicates
-        self.ksList: t.List[key.KeySignature] = []
+        self.ksList: list[key.KeySignature] = []
         # same for time signatures
-        self.tsList: t.List[meter.TimeSignature] = []
+        self.tsList: list[meter.TimeSignature] = []
 
         self._scoreObj = None
         self.year = None
@@ -328,7 +327,7 @@ class CTSong(prebase.ProtoM21Object):
         return f'title={self.title!r} year={self.year}'
 
     # --------------------------------------------------------------------------
-    def parse(self, textFile: t.Union[str, pathlib.Path]):
+    def parse(self, textFile: str | pathlib.Path):
         '''
         Called when a CTSong is created by passing a string or filename;
         in the second case, it opens the file
@@ -555,7 +554,7 @@ class CTRule(prebase.ProtoM21Object):
     which is the stream from the entire score that the rule corresponds to.
     '''
     _DOC_ORDER = ['LHS', 'sectionName', 'musicText', 'homeTimeSig', 'homeKeySig', 'comments']
-    _DOC_ATTR: t.Dict[str, str] = {
+    _DOC_ATTR: dict[str, str] = {
         'text': '''
             The full text of the CTRule, including the LHS, chords, and comments.''',
     }
@@ -1025,7 +1024,7 @@ class TestExternal(unittest.TestCase):
 
 # --------------------------------------------------------------------------
 # define presented class order in documentation
-_DOC_ORDER: t.List[t.Type] = [CTSong, CTRule]
+_DOC_ORDER: list[type] = [CTSong, CTRule]
 
 if __name__ == '__main__':
     import music21

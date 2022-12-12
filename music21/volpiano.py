@@ -15,8 +15,10 @@ easily with immediate visual feedback (see the CANTUS database).
 This module parses chants encoded in Volpiano and can generate Volpiano
 from any music21 Stream.
 
-This module will move to a medren package hopefully by v.7
+This module will move to a medren package hopefully by v7
 '''
+from __future__ import annotations
+
 import enum
 import unittest
 
@@ -189,7 +191,7 @@ def toPart(volpianoText, *, breaksToLayout=False):
     >>> breakTest.recurse().notes[1].notehead
     'x'
 
-    Changed in v5.7 -- corrected spelling of liquescence.
+    * Changed in v5.7: corrected spelling of liquescence.
     '''
     p = stream.Part()
     m = stream.Measure()

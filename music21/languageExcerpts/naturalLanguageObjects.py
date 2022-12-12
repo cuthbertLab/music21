@@ -11,9 +11,10 @@
 '''
 Multilingual conversion of pitch, etc. objects
 '''
+from __future__ import annotations
 
-import typing as t
 import unittest
+
 from music21 import pitch
 
 SUPPORTED_LANGUAGES = ['de', 'fr', 'it', 'es']
@@ -268,7 +269,7 @@ class Test(unittest.TestCase):
 # define presented order in documentation
 
 
-_DOC_ORDER: t.List[type] = []
+_DOC_ORDER: list[type] = []
 
 
 if __name__ == '__main__':

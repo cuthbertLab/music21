@@ -13,6 +13,7 @@
 This module takes two XML files and displays the number of measures that
 differ between the two before and after running the combined correction models
 '''
+from __future__ import annotations
 
 from music21.omr import correctors
 from music21 import converter

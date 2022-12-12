@@ -7,12 +7,12 @@
 # Copyright:    Copyright © 2011 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
+from __future__ import annotations
+
 import collections
 import copy
 import itertools
 import unittest
-
-import typing as t
 
 from music21 import chord
 from music21 import environment
@@ -28,7 +28,7 @@ from music21.figuredBass import rules
 # used below
 _MOD = 'figuredBass.segment'
 
-_defaultRealizerScale: t.Dict[str, t.Optional[realizerScale.FiguredBassScale]] = {
+_defaultRealizerScale: dict[str, realizerScale.FiguredBassScale | None] = {
     'scale': None,  # singleton
 }
 
@@ -43,7 +43,7 @@ class Segment:
                   'resolveDominantSeventhSegment',
                   'resolveDiminishedSeventhSegment',
                   'resolveAugmentedSixthSegment']
-    _DOC_ATTR: t.Dict[str, str] = {
+    _DOC_ATTR: dict[str, str] = {
         'bassNote': '''A :class:`~music21.note.Note` whose pitch
              forms the bass of each possibility.''',
         'numParts': '''The number of parts (including the bass) that possibilities
@@ -65,12 +65,12 @@ class Segment:
     }
 
     def __init__(self,
-                 bassNote: t.Union[str, note.Note] = 'C3',
-                 notationString: t.Optional[str] = None,
-                 fbScale: t.Optional[realizerScale.FiguredBassScale] = None,
-                 fbRules: t.Optional[rules.Rules] = None,
+                 bassNote: str | note.Note = 'C3',
+                 notationString: str | None = None,
+                 fbScale: realizerScale.FiguredBassScale | None = None,
+                 fbRules: rules.Rules | None = None,
                  numParts=4,
-                 maxPitch: t.Union[str, pitch.Pitch] = 'B5',
+                 maxPitch: str | pitch.Pitch = 'B5',
                  listOfPitches=None):
         '''
         A Segment corresponds to a 1:1 realization of a bassNote and notationString
@@ -862,8 +862,8 @@ class OverlaidSegment(Segment):
 # HELPER METHODS
 # --------------
 def getPitches(pitchNames=('C', 'E', 'G'),
-               bassPitch: t.Union[str, pitch.Pitch] = 'C3',
-               maxPitch: t.Union[str, pitch.Pitch] = 'C8'):
+               bassPitch: str | pitch.Pitch = 'C3',
+               maxPitch: str | pitch.Pitch = 'C8'):
     '''
     Given a list of pitchNames, a bassPitch, and a maxPitch, returns a sorted list of
     pitches between the two limits (inclusive) which correspond to items in pitchNames.

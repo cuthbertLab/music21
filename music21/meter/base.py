@@ -14,28 +14,33 @@ This module defines the :class:`~music21.meter.TimeSignature` object,
 as well as component objects for defining nested metrical structures,
 :class:`~music21.meter.MeterTerminal` and :class:`~music21.meter.MeterSequence` objects.
 '''
+from __future__ import annotations
+
+from collections.abc import Sequence
 import copy
-from math import gcd
 import fractions
+from math import gcd
 import typing as t
 import unittest
 
 from music21 import base
 from music21 import beam
 from music21 import common
+from music21.common.enums import MeterDivision
+from music21.common.numberTools import opFrac
 from music21 import defaults
 from music21 import duration
 from music21 import environment
-from music21 import style
 from music21.exceptions21 import MeterException, TimeSignatureException
+from music21 import style
 
-from music21.common.enums import MeterDivision
-from music21.common.numberTools import opFrac
 from music21.meter.tools import slashToTuple, proportionToFraction
 from music21.meter.core import MeterSequence
 
 environLocal = environment.Environment('meter')
 
+if t.TYPE_CHECKING:
+    from music21 import stream
 
 # this is just a placeholder so that .beamSequence, etc. do not need to
 # be typed as Optional.  It should never be touched or queried
@@ -48,10 +53,10 @@ MIN_DENOMINATOR_TYPE = '128th'
 
 # store a module-level dictionary of partitioned meter sequences used
 # for setting default accent weights; store as needed
-_meterSequenceAccentArchetypes: t.Dict[t.Tuple[str, t.Any, int], MeterSequence] = {}
+_meterSequenceAccentArchetypes: dict[tuple[str, t.Any, int], MeterSequence] = {}
 _meterSequenceAccentArchetypesNoneCache = ('', -1, -1)  # a cache key representing None
 
-def bestTimeSignature(meas: 'music21.stream.Stream') -> 'music21.meter.TimeSignature':
+def bestTimeSignature(meas: stream.Stream) -> 'music21.meter.TimeSignature':
     # noinspection PyShadowingNames
     '''
     Given a Measure (or any Stream) with elements in it, get a TimeSignature that contains all
@@ -446,7 +451,7 @@ class TimeSignature(TimeSignatureBase):
     _styleClass = style.TextStyle
     classSortOrder = 4
 
-    _DOC_ATTR: t.Dict[str, str] = {
+    _DOC_ATTR: dict[str, str] = {
         'beatSequence': 'A :class:`~music21.meter.MeterSequence` governing beat partitioning.',
         'beamSequence': 'A :class:`~music21.meter.MeterSequence` governing automatic beaming.',
         'accentSequence': 'A :class:`~music21.meter.MeterSequence` governing accent partitioning.',
@@ -464,13 +469,13 @@ class TimeSignature(TimeSignatureBase):
             so do not expect proper output yet.''',
     }
 
-    def __init__(self, value: str = '4/4', divisions=None):
-        super().__init__()
+    def __init__(self, value: str = '4/4', divisions=None, **keywords):
+        super().__init__(**keywords)
 
         if value is None:
             value = f'{defaults.meterNumerator}/{defaults.meterDenominatorBeatType}'
 
-        self._overriddenBarDuration: t.Optional[duration.Duration] = None
+        self._overriddenBarDuration: duration.Duration | None = None
         self.symbol: str = ''
         self.displaySequence: MeterSequence = _SENTINEL_METER_SEQUENCE
         self.beatSequence: MeterSequence = _SENTINEL_METER_SEQUENCE
@@ -877,7 +882,7 @@ class TimeSignature(TimeSignatureBase):
         Traceback (most recent call last):
         music21.exceptions21.TimeSignatureException: non-uniform beat unit: [2.0, 0.75]
 
-        Changed in v7. -- return NaN rather than raising Exception in property.
+        * Changed in v7: return NaN rather than raising Exception in property.
         '''
         post = []
         for ms in self.beatSequence:
@@ -913,7 +918,7 @@ class TimeSignature(TimeSignatureBase):
         >>> ts.beatDivisionCount
         1
 
-        Changed in v7. -- return 1 instead of a TimeSignatureException.
+        * Changed in v7: return 1 instead of a TimeSignatureException.
         '''
         # first, find if there is more than one beat and if all beats are uniformly partitioned
         post = []
@@ -971,7 +976,7 @@ class TimeSignature(TimeSignatureBase):
             return 'Other'
 
     @property
-    def beatDivisionDurations(self) -> t.List[duration.Duration]:
+    def beatDivisionDurations(self) -> list[duration.Duration]:
         '''
         Return the beat division, or the durations that make up one beat,
         as a list of :class:`~music21.duration.Duration` objects, if and only if
@@ -1007,7 +1012,7 @@ class TimeSignature(TimeSignatureBase):
             raise TimeSignatureException(f'non uniform beat division: {post}')
 
     @property
-    def beatSubDivisionDurations(self) -> t.List[duration.Duration]:
+    def beatSubDivisionDurations(self) -> list[duration.Duration]:
         '''
         Return a subdivision of the beat division, or a list
         of :class:`~music21.duration.Duration` objects representing each beat division
@@ -1078,7 +1083,7 @@ class TimeSignature(TimeSignatureBase):
         >>> len(ts.beatSequence)
         6
 
-        Changed in v7 -- favorCompound is keyword only
+        * Changed in v7: favorCompound is keyword only
         '''
         # if a non-compound meter has been given, as in
         # not 3+1/4; just 5/4
@@ -1183,7 +1188,7 @@ class TimeSignature(TimeSignatureBase):
 
         '''
         # NOTE: this is a performance critical method
-        firstPartitionForm: t.Union[MeterSequence, int, None]
+        firstPartitionForm: MeterSequence | int | None
 
         # create a scratch MeterSequence for structure
         tsStr = f'{self.numerator}/{self.denominator}'
@@ -1213,8 +1218,8 @@ class TimeSignature(TimeSignatureBase):
             ms.subdivideNestedHierarchy(depth,
                                         firstPartitionForm=firstPartitionForm)
 
-            # provide a partition for each flat division
-            accentCount = len(ms.flat)
+            # provide a partition for each flattened division
+            accentCount = len(ms.flatten())
             # environLocal.printDebug(['got accentCount', accentCount, 'ms: ', ms])
             divStep = self.barDuration.quarterLength / accentCount
             weightInts = [0] * accentCount  # weights as integer/depth counts
@@ -1242,7 +1247,7 @@ class TimeSignature(TimeSignatureBase):
 
     # --------------------------------------------------------------------------
     # access data for other processing
-    def getBeams(self, srcList, measureStartOffset=0.0) -> t.List[t.Optional[beam.Beams]]:
+    def getBeams(self, srcList, measureStartOffset=0.0) -> list[beam.Beams | None]:
         '''
         Given a qLen position and an iterable of Music21Objects, return a list of Beams objects.
 
@@ -1557,7 +1562,9 @@ class TimeSignature(TimeSignatureBase):
             pos += self.accentSequence[i].duration.quarterLength
         return False
 
-    def setAccentWeight(self, weights: t.Union[t.Sequence[float], float], level: int = 0) -> None:
+    def setAccentWeight(self,
+                        weights: Sequence[float] | float,
+                        level: int = 0) -> None:
         '''
         Set accent weight, or floating point scalars, for the accent MeterSequence.
         Provide a list of float values; if this list is shorter than the length
@@ -1582,8 +1589,8 @@ class TimeSignature(TimeSignatureBase):
         >>> a.getAccentWeight(3.5)
         0.2...
         '''
-        weightList: t.Sequence[float]
-        if not isinstance(weights, t.Sequence):
+        weightList: Sequence[float]
+        if not isinstance(weights, Sequence):
             weightList = [weights]
         else:
             weightList = weights
@@ -1678,7 +1685,8 @@ class TimeSignature(TimeSignatureBase):
 
     def getAccentWeight(self, qLenPos, level=0, forcePositionMatch=False,
                         permitMeterModulus=False):
-        '''Given a qLenPos,  return an accent level. In general, accents are assumed to
+        '''
+        Given a qLenPos,  return an accent level. In general, accents are assumed to
         define only a first-level weight.
 
         If `forcePositionMatch` is True, an accent will only be returned if the
@@ -1688,11 +1696,9 @@ class TimeSignature(TimeSignatureBase):
         If `permitMeterModulus` is True, quarter length positions greater than
         the duration of the Meter will be accepted as the modulus of the total meter duration.
 
-
         >>> ts1 = meter.TimeSignature('3/4')
         >>> [ts1.getAccentWeight(x) for x in range(3)]
         [1.0, 0.5, 0.5]
-
 
         Returns an error...
 
@@ -1705,7 +1711,6 @@ class TimeSignature(TimeSignatureBase):
 
         >>> [ts1.getAccentWeight(x, permitMeterModulus=True) for x in range(6)]
         [1.0, 0.5, 0.5, 1.0, 0.5, 0.5]
-
         '''
         qLenPos = opFrac(qLenPos)
         # might store this weight every time it is set, rather than
@@ -1751,7 +1756,8 @@ class TimeSignature(TimeSignatureBase):
         return self.beatSequence.offsetToIndex(offset) + 1
 
     def getBeatOffsets(self):
-        '''Return offset positions in a list for the start of each beat,
+        '''
+        Return offset positions in a list for the start of each beat,
         assuming this object is found at offset zero.
 
         >>> a = meter.TimeSignature('3/4')
@@ -1959,7 +1965,8 @@ class TimeSignature(TimeSignatureBase):
         return opFrac(beatIndex + 1 + (progress / totalRange))
 
     def getBeatProportionStr(self, qLenPos):
-        '''Return a string presentation of the beat.
+        '''
+        Return a string presentation of the beat.
 
         >>> ts1 = meter.TimeSignature('3/4')
         >>> ts1.getBeatProportionStr(0.0)
@@ -1989,7 +1996,8 @@ class TimeSignature(TimeSignatureBase):
         return post
 
     def getBeatDepth(self, qLenPos, align='quantize'):
-        '''Return the number of levels of beat partitioning given a QL into the TimeSignature.
+        '''
+        Return the number of levels of beat partitioning given a QL into the TimeSignature.
         Note that by default beat partitioning always has a single, top-level partition.
 
         The `align` parameter is passed to the :meth:`~music21.meter.MeterSequence.offsetToDepth`

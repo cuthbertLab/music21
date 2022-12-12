@@ -5,9 +5,10 @@
 #
 # Authors:      Josiah Wolf Oberholtzer
 #
-# Copyright:    Copyright © 2013 Michael Scott Asato Cuthbert
+# Copyright:    Copyright © 2013-22 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # -----------------------------------------------------------------------------
+from __future__ import annotations
 
 # loaded by source/conf.py
 
@@ -39,7 +40,9 @@ def fixLines(lines):
     lines[:] = newLines
 
 def processDocstring(app, what, name, obj, options, lines):
-    '''Process the ``lines`` of each docstring, in place.'''
+    '''
+    Process the ``lines`` of each docstring, in place.
+    '''
     #    print('WHAT ', what)
     #    print('NAME ', name)
     #    print('OBJ  ', obj)

@@ -16,13 +16,13 @@ from collections.abc import KeysView
 import os
 import pathlib
 import pickle
-import typing as t
 import unittest
 
 from music21 import common
 from music21.common.types import StreamType
 from music21 import converter
 from music21 import corpus
+from music21 import environment
 from music21 import exceptions21
 from music21 import note
 from music21 import stream
@@ -30,7 +30,6 @@ from music21 import text
 
 from music21.metadata.bundles import MetadataEntry
 
-from music21 import environment
 environLocal = environment.Environment('features.base')
 # ------------------------------------------------------------------------------
 
@@ -126,10 +125,6 @@ class Feature:
 
 
 # ------------------------------------------------------------------------------
-class FeatureExtractorException(exceptions21.Music21Exception):
-    pass
-
-
 class FeatureExtractor:
     '''
     A model of process that extracts a feature from a Music21 Stream.
@@ -140,9 +135,12 @@ class FeatureExtractor:
     Usage of a DataInstance offers significant performance advantages, as common forms of
     the Stream are cached for easy processing.
     '''
-    def __init__(self, dataOrStream=None, **keywords):
+    def __init__(self,
+                 dataOrStream=None,
+                 **keywords
+                 ) -> None:
         self.stream = None  # the original Stream, or None
-        self.data: t.Optional[DataInstance] = None  # a DataInstance object: use to get data
+        self.data: DataInstance | None = None  # a DataInstance object: use to get data
         self.setData(dataOrStream)
 
         self.feature = None  # Feature object that results from processing
@@ -307,7 +305,7 @@ class StreamForms:
             self.prepared = None
 
         # basic data storage is a dictionary
-        self.forms: t.Dict[str, stream.Stream] = {}
+        self.forms: dict[str, stream.Stream] = {}
 
     def keys(self) -> KeysView[str]:
         # will only return forms that are established
@@ -356,11 +354,11 @@ class StreamForms:
 
         return prepared
 
-    def _getIntervalHistogram(self, algorithm='midi') -> t.List[int]:
+    def _getIntervalHistogram(self, algorithm='midi') -> list[int]:
         # note that this does not optimize and cache part presentations
         histo = [0] * 128
         # if we have parts, must add one at a time
-        parts: t.List[stream.Stream]
+        parts: list[stream.Stream]
         if isinstance(self.prepared, stream.Score):
             parts = list(self.prepared.parts)
         else:
@@ -1280,7 +1278,6 @@ def getIndex(featureString, extractorType=None):
 class Test(unittest.TestCase):
 
     def testStreamFormsA(self):
-
         from music21 import features
         self.maxDiff = None
 
@@ -1651,7 +1648,8 @@ class Test(unittest.TestCase):
     # all these are written using orange-Py2 code; need better.
 
     # def xtestOrangeBayesA(self):  # pragma: no cover
-    #     '''Using an already created test file with a BayesLearner.
+    #     '''
+    #     Using an already created test file with a BayesLearner.
     #     '''
     #     import orange  # pylint: disable=import-error
     #     data = orange.ExampleTable(
@@ -1663,7 +1661,8 @@ class Test(unittest.TestCase):
 
 
     # def xtestClassifiersA(self):  # pragma: no cover
-    #     '''Using an already created test file with a BayesLearner.
+    #     '''
+    #     Using an already created test file with a BayesLearner.
     #     '''
     #     import orange, orngTree  # pylint: disable=import-error
     #     data1 = orange.ExampleTable(
@@ -1703,7 +1702,8 @@ class Test(unittest.TestCase):
 
 
     # def xtestClassifiersB(self):  # pragma: no cover
-    #     '''Using an already created test file with a BayesLearner.
+    #     '''
+    #     Using an already created test file with a BayesLearner.
     #     '''
     #     import orange, orngTree  # pylint: disable=import-error
     #     data1 = orange.ExampleTable(

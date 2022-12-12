@@ -151,6 +151,7 @@ ydelta_       Not needed
 .. _yank: https://www.humdrum.org/Humdrum/commands/yank.html
 .. _ydelta: https://www.humdrum.org/Humdrum/commands/ydelta.html
 '''
+from __future__ import annotations
 
 __all__ = [
     'spineParser',

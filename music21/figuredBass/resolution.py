@@ -24,12 +24,14 @@ possibilities formed around the same chord. If provided with additional
 arguments, the methods only :meth:`~music21.pitch.Pitch.transpose` each
 :class:`~music21.pitch.Pitch` in a possibility by the appropriate interval.
 '''
+from __future__ import annotations
+
 import unittest
-import typing as t
 
 from music21 import exceptions21
 from music21 import chord
 from music21 import note
+from music21 import pitch
 from music21 import stream
 
 
@@ -743,8 +745,8 @@ def _resolvePitches(possibToResolve, howToResolve):
 
 
 def _unpackSeventhChord(
-    seventhChord: 'music21.chord.Chord'
-) -> t.List[t.Optional['music21.pitch.Pitch']]:
+    seventhChord: chord.Chord
+) -> list[pitch.Pitch | None]:
     '''
     Takes in a Chord and returns a list of Pitches (or Nones) corresponding
     to the bass, root, fifth, seventh.

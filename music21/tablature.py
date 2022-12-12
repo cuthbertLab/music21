@@ -15,14 +15,20 @@ TODO:
 Chord from Figure
 Chord from FretBoard Object with tuning.
 '''
-import unittest
+from __future__ import annotations
+
 import typing as t
+import unittest
 
 from music21 import common
 from music21 import exceptions21
 from music21 import harmony
 from music21 import pitch
 from music21 import prebase
+
+
+if t.TYPE_CHECKING:
+    from music21 import duration
 
 
 class TablatureException(exceptions21.Music21Exception):
@@ -196,7 +202,7 @@ class FretBoard(prebase.ProtoM21Object):
 
         return None
 
-    def getPitches(self):
+    def getPitches(self) -> list[None | pitch.Pitch]:
         '''
         Returns a list of all the pitches (or None for each) given the FretNote information. This
         requires a tuning to be set.
@@ -227,7 +233,7 @@ class FretBoard(prebase.ProtoM21Object):
                     self.numStrings
                 ))
 
-        pitchList: t.List[t.Optional['music21.pitch.Pitch']] = [None] * self.numStrings
+        pitchList: list[pitch.Pitch | None] = [None] * self.numStrings
 
         if not self.fretNotes:
             return pitchList

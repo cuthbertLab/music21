@@ -17,16 +17,18 @@ and used to configure, :class:`~music21.note.Note` objects.
 '''
 from __future__ import annotations
 
+from collections.abc import Iterable, Sequence
 import copy
-import unittest
-
 import typing as t
-from typing import overload
+from typing import overload  # PyCharm bug
+import unittest
 
 from music21 import base
 from music21 import beam
 from music21 import common
+from music21.common.types import StepName, OffsetQLIn
 from music21.duration import Duration
+from music21 import environment
 from music21 import exceptions21
 from music21 import expressions
 from music21 import interval
@@ -35,8 +37,14 @@ from music21 import prebase
 from music21 import style
 from music21 import tie
 from music21 import volume
-from music21.common.types import StepName, OffsetQLIn
-from music21 import environment
+
+if t.TYPE_CHECKING:
+    from music21 import articulations
+    from music21 import chord
+    from music21 import instrument
+    from music21 import percussion
+    _NotRestType = t.TypeVar('_NotRestType', bound='NotRest')
+
 environLocal = environment.Environment('note')
 
 noteheadTypeNames = (
@@ -102,7 +110,7 @@ class NotRestException(exceptions21.Music21Exception):
 # ------------------------------------------------------------------------------
 SyllabicChoices = t.Literal[None, 'begin', 'single', 'end', 'middle', 'composite']
 
-SYLLABIC_CHOICES: t.List[SyllabicChoices] = [
+SYLLABIC_CHOICES: list[SyllabicChoices] = [
     None, 'begin', 'single', 'end', 'middle', 'composite',
 ]
 
@@ -175,8 +183,8 @@ class Lyric(prebase.ProtoM21Object, style.StyleMixin):
 
     Custom elision elements for composite components will be supported later.
 
-    New in v6.7 -- composite components, elisionBefore
-    Changed in v8 -- lyric text can be an empty string, but not None.
+    * New in v6.7: composite components, elisionBefore
+    * Changed in v8: lyric text can be an empty string, but not None.
     '''
     _styleClass = style.TextStylePlacement
     # CLASS VARIABLES #
@@ -198,14 +206,14 @@ class Lyric(prebase.ProtoM21Object, style.StyleMixin):
                  *,
                  applyRaw: bool = False,
                  syllabic: SyllabicChoices = None,
-                 identifier: t.Optional[str] = None,
+                 identifier: str | None = None,
                  **keywords):
         super().__init__()
-        self._identifier: t.Optional[str] = None
+        self._identifier: str | None = None
         self._number: int = 1
         self._text: str = ''
         self._syllabic: SyllabicChoices = None
-        self.components: t.Optional[t.List['music21.note.Lyric']] = None
+        self.components: list[Lyric] | None = None
         self.elisionBefore = ' '
 
         # these are set by setTextAndSyllabic
@@ -273,7 +281,7 @@ class Lyric(prebase.ProtoM21Object, style.StyleMixin):
         if not self.isComposite:
             return self._text
         else:
-            assert isinstance(self.components, t.Sequence), \
+            assert isinstance(self.components, Sequence), \
                 'Programming error: isComposite implies that components exists'  # mypy
             text_out = self.components[0].text
             if text_out is None:
@@ -327,7 +335,7 @@ class Lyric(prebase.ProtoM21Object, style.StyleMixin):
         self._syllabic = newSyllabic
 
     @property
-    def identifier(self) -> t.Union[str, int]:
+    def identifier(self) -> str | int:
         '''
         By default, this is the same as self.number. However, if there is a
         descriptive identifier like 'part2verse1', it is stored here and
@@ -355,7 +363,7 @@ class Lyric(prebase.ProtoM21Object, style.StyleMixin):
             return self._identifier
 
     @identifier.setter
-    def identifier(self, value: t.Union[str, None]):
+    def identifier(self, value: str | None):
         self._identifier = value
 
     @property
@@ -406,7 +414,7 @@ class Lyric(prebase.ProtoM21Object, style.StyleMixin):
             else:
                 return text
         else:
-            assert isinstance(self.components, t.Sequence), \
+            assert isinstance(self.components, Sequence), \
                 'Programming error: isComposite should assert components exists'  # for mypy
             firstSyllabic = self.components[0].syllabic
             lastSyllabic = self.components[-1].syllabic
@@ -448,7 +456,7 @@ class Lyric(prebase.ProtoM21Object, style.StyleMixin):
 
     @number.setter
     def number(self, value: int) -> None:
-        if not common.isNum(value):
+        if not common.isInt(value):
             raise LyricException('Number best be number')
         self._number = value
 
@@ -544,16 +552,23 @@ class GeneralNote(base.Music21Object):
     >>> gn = note.GeneralNote(type='16th', dots=2)
     >>> gn.quarterLength
     0.4375
+
+    **Equality**
+
+    GeneralNote objects are equal if they pass superclass tests (e.g., their durations are equal),
+    and they have the same articulation and expression classes (in any order),
+    and their ties are equal.
     '''
     isNote = False
     isRest = False
     isChord = False
-    _styleClass: t.Type[style.Style] = style.NoteStyle
+    _styleClass: type[style.Style] = style.NoteStyle
+    equalityAttributes: tuple[str, ...] = ('tie',)
 
     # define order for presenting names in documentation; use strings
     _DOC_ORDER = ['duration', 'quarterLength']
     # documentation for all attributes (not properties or methods)
-    _DOC_ATTR: t.Dict[str, str] = {
+    _DOC_ATTR: dict[str, str] = {
         'isChord': 'Boolean read-only value describing if this object is a Chord.',
         'lyrics': 'A list of :class:`~music21.note.Lyric` objects.',
         'expressions': '''a list of expressions (such
@@ -565,8 +580,8 @@ class GeneralNote(base.Music21Object):
 
     def __init__(self,
                  *,
-                 duration: t.Optional[Duration] = None,
-                 lyric: t.Union[None, str, Lyric] = None,
+                 duration: Duration | None = None,
+                 lyric: None | str | Lyric = None,
                  **keywords
                  ):
         if duration is None:
@@ -575,6 +590,10 @@ class GeneralNote(base.Music21Object):
                 tempDuration = Duration(1.0)
             else:
                 tempDuration = Duration(**keywords)
+                if 'quarterLength' in keywords:
+                    del keywords['quarterLength']
+                if 'type' in keywords:
+                    del keywords['type']
                 # only apply default if components are empty
                 # looking at currentComponents so as not to trigger
                 # _updateComponents
@@ -584,49 +603,44 @@ class GeneralNote(base.Music21Object):
         else:
             tempDuration = duration
         # this sets the stored duration defined in Music21Object
-        super().__init__(duration=tempDuration)
+        super().__init__(duration=tempDuration, **keywords)
 
-        self.lyrics: t.List[Lyric] = []  # a list of lyric objects
-        self.expressions: t.List[expressions.Expression] = []
-        self.articulations: t.List['music21.articulations.Articulation'] = []
+        self.lyrics: list[Lyric] = []  # a list of lyric objects
+        self.expressions: list[expressions.Expression] = []
+        self.articulations: list[articulations.Articulation] = []
 
         if lyric is not None:
             self.addLyric(lyric)
 
         # note: Chords handle ties differently
-        self._tie: t.Optional[tie.Tie] = None  # store a Tie object
+        self._tie: tie.Tie | None = None  # store a Tie object
 
     def __eq__(self, other):
-        '''
-        General Note objects are equal if their durations are equal, and
-        they have the same articulation and expression classes (in any order),
-        and their ties are equal.
-        '''
-
-        if other is None or not isinstance(other, GeneralNote):
-            return NotImplemented
-        # checks type, dots, tuplets, quarterLength, uses Pitch.__eq__
-        if self.duration != other.duration:
+        if not super().__eq__(other):
             return False
+
+        # note: tie is in equalityClasses, so already checked above.
+
         # Articulations are a list of Articulation objects.
         # Converting them to Set objects produces ordered cols that remove duplicates.
         # However, we must then convert to list to match based on class ==
         # not on class id().
-        if (sorted({x.classes[0] for x in self.articulations})
-                != sorted({x.classes[0] for x in other.articulations})):
-            return False
-        if (sorted({x.classes[0] for x in self.expressions})
-                != sorted({x.classes[0] for x in other.expressions})):
-            return False
+        for search in 'articulations', 'expressions':
+            my_art_express_classes = [type(x) for x in getattr(self, search)]
+            other_art_express_classes = [type(x) for x in getattr(other, search)]
+            if len(my_art_express_classes) != len(other_art_express_classes):
+                return False
+            if set(my_art_express_classes) != set(other_art_express_classes):
+                return False
 
-        # Tie objects if present compare only type
-        if self.tie != other.tie:
-            return False
         return True
+
+    def __hash__(self):
+        return super().__hash__()
 
     # --------------------------------------------------------------------------
     @property
-    def tie(self) -> t.Optional[tie.Tie]:
+    def tie(self) -> tie.Tie | None:
         '''
         Return and set a :class:`~music21.note.Tie` object, or None.
 
@@ -638,17 +652,17 @@ class GeneralNote(base.Music21Object):
         return self._tie
 
     @tie.setter
-    def tie(self, value: t.Optional[tie.Tie]):
+    def tie(self, value: tie.Tie | None):
         self._tie = value
 
-    def _getLyric(self) -> t.Optional[str]:
+    def _getLyric(self) -> str | None:
         if not self.lyrics:
             return None
 
         allText = [ly.text for ly in self.lyrics]
         return '\n'.join([textStr for textStr in allText if textStr is not None])
 
-    def _setLyric(self, value: t.Union[str, Lyric, None]) -> None:
+    def _setLyric(self, value: str | Lyric | None) -> None:
         self.lyrics = []
         if value is None:
             return
@@ -708,8 +722,8 @@ class GeneralNote(base.Music21Object):
         >>> b.lyric
         'bon'
 
-        Changed in v6.7 -- added setting to a Lyric object.  Removed undocumented
-        setting to False instead of setting to None
+        * Changed in v6.7: added setting to a Lyric object.  Removed undocumented
+          setting to False instead of setting to None
         ''')
 
     def addLyric(self,
@@ -833,7 +847,7 @@ class GeneralNote(base.Music21Object):
         return self.classes[0]  # override in subclasses
 
     @property
-    def pitches(self) -> t.Tuple[Pitch, ...]:
+    def pitches(self) -> tuple[Pitch, ...]:
         '''
         Returns an empty tuple.  (Useful for iterating over NotRests since they
         include Notes and Chords.)
@@ -841,7 +855,7 @@ class GeneralNote(base.Music21Object):
         return ()
 
     @pitches.setter
-    def pitches(self, _value: t.Iterable[Pitch]):
+    def pitches(self, _value: Iterable[Pitch]):
         pass
 
 
@@ -852,7 +866,7 @@ class GeneralNote(base.Music21Object):
         If `inPlace` is True, this is done in-place and the method returns None.
         If `inPlace` is False [default], this returns a modified deepcopy.
 
-        Changed -- inPlace is now False as of version 5.
+        * Changed in v5: inPlace is now False.
 
         >>> n = note.Note('g#')
         >>> n.quarterLength = 3
@@ -925,7 +939,7 @@ class GeneralNote(base.Music21Object):
         (DurationTuple(type='half', dots=0, quarterLength=0.0),)
 
         Appoggiaturas are still a work in progress...
-        Changed in v.6 -- corrected spelling of `appoggiatura` keyword.
+        * Changed in v6: corrected spelling of `appoggiatura` keyword.
 
         >>> ng2 = n.getGrace(appoggiatura=True)
         >>> ng2.duration
@@ -964,54 +978,56 @@ class NotRest(GeneralNote):
     # unspecified means that there may be a stem, but its orientation
     # has not been declared.
 
-    _DOC_ATTR: t.Dict[str, str] = {
+    _DOC_ATTR: dict[str, str] = {
         'beams': '''
             A :class:`~music21.beam.Beams` object that contains
             information about the beaming of this note.''',
     }
 
+    # Should volume be here too?  and _chordAttached?
+    equalityAttributes: tuple[str, ...] = (
+        'notehead', 'noteheadFill', 'noteheadParenthesis', 'beams'
+    )
+
     def __init__(self,
-                 beams: t.Optional[beam.Beams] = None,
+                 beams: beam.Beams | None = None,
                  **keywords):
         super().__init__(**keywords)
         self._notehead: str = 'normal'
-        self._noteheadFill: t.Optional[bool] = None
+        self._noteheadFill: bool | None = None
         self._noteheadParenthesis: bool = False
         self._stemDirection: str = 'unspecified'
-        self._volume: t.Optional[volume.Volume] = None  # created on demand
+        self._volume: volume.Volume | None = None  # created on demand
         if beams is not None:
             self.beams = beams
         else:
             self.beams = beam.Beams()
-        self._storedInstrument: t.Optional['music21.instrument.Instrument'] = None
-        self._chordAttached: t.Optional['music21.chord.ChordBase'] = None
+        self._storedInstrument: instrument.Instrument | None = None
+        self._chordAttached: chord.ChordBase | None = None
 
     # ==============================================================================================
     # Special functions
     # ==============================================================================================
-    def __eq__(self, other):
-        if super().__eq__(other) is NotImplemented:
-            return NotImplemented
-        if not super().__eq__(other):
-            return False
-        if not isinstance(other, NotRest):
-            return False
 
-        if self.notehead != other.notehead:
-            return False
-        if self.noteheadFill != other.noteheadFill:
-            return False
-        if self.noteheadParenthesis != other.noteheadParenthesis:
-            return False
-        # Q: should volume need to be equal?
-        if self.beams != other.beams:
-            return False
-        return True
+    def _deepcopySubclassable(self: _NotRestType,
+                              memo: dict[int, t.Any] | None = None,
+                              *,
+                              ignoreAttributes: set[str] | None = None) -> _NotRestType:
+        new = super()._deepcopySubclassable(memo, ignoreAttributes={'_chordAttached'})
+        if t.TYPE_CHECKING:
+            new = t.cast(_NotRestType, new)
+        # let the chord restore _chordAttached
+
+        # after copying, if a Volume exists, it is linked to the old object
+        # look at _volume so as not to create object if not already there
+        if self.hasVolumeInformation():
+            new.volume.client = new  # update with new instance
+        return new
 
     def __deepcopy__(self, memo=None):
         '''
         As NotRest objects have a Volume, objects, and Volume objects
-        store weak refs to the client object, need to specialize deep copy handling
+        store refs to the client object, need to specialize deepcopy handling
 
         >>> import copy
         >>> n = note.NotRest()
@@ -1019,27 +1035,11 @@ class NotRest(GeneralNote):
         >>> m = copy.deepcopy(n)
         >>> m.volume.client is m
         True
+        >>> n.volume.client is n
+        True
         '''
         # environLocal.printDebug(['calling NotRest.__deepcopy__', self])
-        new = super().__deepcopy__(memo=memo)
-        # after copying, if a Volume exists, it is linked to the old object
-        # look at _volume so as not to create object if not already there
-        # pylint: disable=no-member
-        if self._volume is not None:
-            new.volume.client = new  # update with new instance
-        return new
-
-    def __getstate__(self):
-        state = super().__getstate__()
-        if '_volume' in state and state['_volume'] is not None:
-            state['_volume'].client = None
-        return state
-
-    def __setstate__(self, state):
-        super().__setstate__(state)
-        if self._volume is not None:
-            self._volume.client = self
-    ####
+        return self._deepcopySubclassable(memo=memo)
 
     def _getStemDirection(self) -> str:
         return self._stemDirection
@@ -1123,7 +1123,7 @@ class NotRest(GeneralNote):
         self._notehead = value
 
     @property
-    def noteheadFill(self) -> t.Union[bool, None]:
+    def noteheadFill(self) -> bool | None:
         '''
         Get or set the note head fill status of this NotRest. Valid note head fill values are
         True, False, or None (meaning default).  "yes" and "no" are converted to True
@@ -1144,8 +1144,8 @@ class NotRest(GeneralNote):
         return self._noteheadFill
 
     @noteheadFill.setter
-    def noteheadFill(self, value: t.Union[bool, None, str]):
-        boolValue: t.Optional[bool]
+    def noteheadFill(self, value: bool | None | str):
+        boolValue: bool | None
         if value in ('none', None, 'default'):
             boolValue = None  # allow setting to none or None
         elif value in (True, 'filled', 'yes'):
@@ -1183,7 +1183,7 @@ class NotRest(GeneralNote):
         return self._noteheadParenthesis
 
     @noteheadParenthesis.setter
-    def noteheadParenthesis(self, value: t.Union[bool, str, int]):
+    def noteheadParenthesis(self, value: bool | str | int):
         boolValue: bool
         if value in (True, 'yes', 1):
             boolValue = True
@@ -1214,7 +1214,7 @@ class NotRest(GeneralNote):
             return True
 
     def _getVolume(self,
-                   forceClient: t.Optional[base.Music21Object] = None
+                   forceClient: NotRest | None = None
                    ) -> volume.Volume:
         # DO NOT CHANGE TO @property because of optional attributes
         # lazy volume creation.  property is set below.
@@ -1231,7 +1231,7 @@ class NotRest(GeneralNote):
 
         return volume_out
 
-    def _setVolume(self, value: t.Union[None, volume.Volume, int, float], setClient=True):
+    def _setVolume(self, value: None | volume.Volume | int | float, setClient=True):
         # DO NOT CHANGE TO @property because of optional attributes
         # setClient is only False when Chords are bundling Notes.
         if value is None:
@@ -1255,7 +1255,7 @@ class NotRest(GeneralNote):
             raise Exception(f'this must be a Volume object, not {value}')
 
     @property
-    def volume(self) -> 'music21.volume.Volume':
+    def volume(self) -> volume.Volume:
         '''
         Get and set the :class:`~music21.volume.Volume` object of this object.
         Volume objects are created on demand.
@@ -1272,7 +1272,7 @@ class NotRest(GeneralNote):
         return self._getVolume()
 
     @volume.setter
-    def volume(self, value: t.Union[None, 'music21.volume.Volume', int, float]):
+    def volume(self, value: None | volume.Volume | int | float):
         self._setVolume(value)
 
     def _getStoredInstrument(self):
@@ -1298,7 +1298,7 @@ class NotRest(GeneralNote):
     def getInstrument(self,
                       *,
                       returnDefault: t.Literal[True] = True
-                      ) -> 'music21.instrument.Instrument':
+                      ) -> instrument.Instrument:
         from music21 import instrument
         return instrument.Instrument()  # astroid #1015
 
@@ -1306,13 +1306,13 @@ class NotRest(GeneralNote):
     def getInstrument(self,
                       *,
                       returnDefault: t.Literal[False]
-                      ) -> t.Optional['music21.instrument.Instrument']:
+                      ) -> instrument.Instrument | None:
         return None  # astroid #1015
 
     def getInstrument(self,
                       *,
                       returnDefault: bool = True
-                      ) -> t.Optional['music21.instrument.Instrument']:
+                      ) -> instrument.Instrument | None:
         '''
         Retrieves the `.storedInstrument` on this `NotRest` instance, if any.
         If one is not found, executes a context search (without following
@@ -1382,11 +1382,9 @@ class Note(NotRest):
     for instance a C quarter-note and a D# eighth-tied-to-32nd are both
     a single Note object.
 
-
     A Note knows both its total duration and how to express itself as a set of
     tied notes of different lengths. For instance, a note of 2.5 quarters in
     length could be half tied to eighth or dotted quarter tied to quarter.
-
 
     The first argument to the Note is the pitch name (with or without
     octave, see the introduction to :class:`music21.pitch.Pitch`).
@@ -1420,17 +1418,6 @@ class Note(NotRest):
     >>> note.Note(64).nameWithOctave
     'E4'
 
-    Two notes are considered equal if their most important attributes
-    (such as pitch, duration,
-    articulations, and ornaments) are equal.  Attributes
-    that might change based on the wider context
-    of a note (such as offset)
-    are not compared. This test does not look at lyrics in
-    establishing equality.  (It may in the future.)
-
-    >>> note.Note('C4') == note.Note('C4')
-    True
-
     All keyword args that are valid for Duration or Pitch objects
     are valid (as well as those for superclasses, NotRest, GeneralNote,
     Music21Object):
@@ -1440,13 +1427,76 @@ class Note(NotRest):
     'C#2'
     >>> n.duration
     <music21.duration.Duration 0.875>
+
+    **Equality and ordering**
+
+    Two notes are equal if they pass all the equality tests for NotRest and their
+    pitches are equal.
+
+    Attributes that might change based on the wider context
+    of a note (such as offset) are not compared. This test does not look at lyrics in
+    establishing equality.  (It may in the future.)
+
+    >>> note.Note('C4') == note.Note('C4')
+    True
+
+    Enharmonics are not equal:
+
+    >>> note.Note('D#4') == note.Note('E-4')
+    False
+
+    >>> note.Note('C4', type='half') == note.Note('C4', type='quarter')
+    False
+
+    Notes, like pitches, also have an ordering based on their pitches.
+
+    >>> highE = note.Note('E5')
+    >>> lowF = note.Note('F2')
+    >>> otherHighE = note.Note('E5')
+
+    >>> highE > lowF
+    True
+    >>> highE < lowF
+    False
+    >>> highE >= otherHighE
+    True
+    >>> highE <= otherHighE
+    True
+
+    Notice you cannot compare Notes w/ ints or anything that does not a have a
+    `.pitch` attribute.
+
+    >>> highE < 50
+    Traceback (most recent call last):
+    TypeError: '<' not supported between instances of 'Note' and 'int'
+
+    Note also that two objects can be >= and <= without being equal, because
+    only pitch-height is being compared in <, <=, >, >= but duration and other
+    elements are compared in equality.
+
+    >>> otherHighE.duration.type = 'whole'
+
+    Now otherHighE is != highE
+
+    >>> highE == otherHighE
+    False
+
+    But it is both >= and <= it:
+
+    >>> highE >= otherHighE
+    True
+    >>> highE <= otherHighE
+    True
+
+    (The pigeonhole principle police have a bounty out on my head for this.)
     '''
     isNote = True
+    equalityAttributes: tuple[str, ...] = ('pitch',)
 
     # Defines the order of presenting names in the documentation; use strings
     _DOC_ORDER = ['duration', 'quarterLength', 'nameWithOctave']
     # documentation for all attributes (not properties or methods)
-    _DOC_ATTR: t.Dict[str, str] = {
+    _DOC_ATTR: dict[str, str] = {
         'isNote': 'Boolean read-only value describing if this Note is a Note (True).',
         'isRest': 'Boolean read-only value describing if this Note is a Rest (False).',
         'pitch': '''A :class:`~music21.pitch.Pitch` object containing all the
@@ -1456,13 +1506,13 @@ class Note(NotRest):
 
     # Accepts an argument for pitch
     def __init__(self,
-                 pitch: t.Union[str, int, Pitch, None] = None,
+                 pitch: str | int | Pitch | None = None,
                  *,
-                 name: t.Optional[str] = None,
-                 nameWithOctave: t.Optional[str] = None,
+                 name: str | None = None,
+                 nameWithOctave: str | None = None,
                  **keywords):
         super().__init__(**keywords)
-        self._chordAttached: t.Optional['music21.chord.Chord']
+        self._chordAttached: chord.Chord | None
 
         if pitch is not None:
             if isinstance(pitch, Pitch):
@@ -1485,72 +1535,8 @@ class Note(NotRest):
     def _reprInternal(self):
         return self.name
 
-    def __eq__(self, other):
-        '''
-        Tests Equality. See docs under Note above
-        (since __eq__'s docs don't display)
-
-        >>> n1 = note.Note()
-        >>> n1.pitch.name = 'G#'
-        >>> n2 = note.Note()
-        >>> n2.pitch.name = 'A-'
-        >>> n3 = note.Note()
-        >>> n3.pitch.name = 'G#'
-        >>> n1 == n2
-        False
-        >>> n1 == n3
-        True
-        >>> n3.duration.quarterLength = 3
-        >>> n1 == n3
-        False
-
-        >>> n1 == 5
-        False
-        '''
-        if other is None or not isinstance(other, Note):
-            return NotImplemented
-
-        # checks pitch.octave, pitch.accidental, uses Pitch.__eq__
-        if self.pitch != other.pitch:
-            return False
-
-        return super().__eq__(other)
 
     def __lt__(self, other):
-        '''
-        __lt__, __gt__, __le__, __ge__ all use a pitch comparison.
-
-        >>> highE = note.Note('E5')
-        >>> lowF = note.Note('F2')
-        >>> otherHighE = note.Note('E5')
-
-        >>> highE > lowF
-        True
-        >>> highE < lowF
-        False
-        >>> highE >= otherHighE
-        True
-        >>> highE <= otherHighE
-        True
-
-        Notice you cannot compare Notes w/ ints or anything not pitched.
-
-        >>> highE < 50
-        Traceback (most recent call last):
-        TypeError: '<' not supported between instances of 'Note' and 'int'
-
-        Note also that two objects can be >= and <= without being equal, because
-        only pitch-height is being compared in <, <=, >, >= but duration and other
-        elements are compared in equality.
-
-        >>> otherHighE.duration.type = 'whole'
-        >>> highE >= otherHighE
-        True
-        >>> highE <= otherHighE
-        True
-        >>> highE == otherHighE
-        False
-        '''
         try:
             return self.pitch < other.pitch
         except AttributeError:
@@ -1580,7 +1566,7 @@ class Note(NotRest):
         '''
         After doing a deepcopy of the pitch, be sure to set the client
         '''
-        new = super().__deepcopy__(memo=memo)
+        new = self._deepcopySubclassable(memo)
         # noinspection PyProtectedMember
         new.pitch._client = new  # pylint: disable=no-member
         return new
@@ -1626,10 +1612,10 @@ class Note(NotRest):
     def step(self, value: StepName):
         self.pitch.step = value
 
-    def _getOctave(self) -> t.Optional[int]:
+    def _getOctave(self) -> int | None:
         return self.pitch.octave
 
-    def _setOctave(self, value: t.Optional[int]):
+    def _setOctave(self, value: int | None):
         self.pitch.octave = value
 
     octave = property(_getOctave,
@@ -1640,7 +1626,7 @@ class Note(NotRest):
         ''')
 
     @property
-    def pitches(self) -> t.Tuple[Pitch, ...]:
+    def pitches(self) -> tuple[Pitch, ...]:
         '''
         Return the single :class:`~music21.pitch.Pitch` object in a tuple.
         This property is designed to provide an interface analogous to
@@ -1682,7 +1668,7 @@ class Note(NotRest):
         return (self.pitch,)
 
     @pitches.setter
-    def pitches(self, value: t.Sequence[Pitch]):
+    def pitches(self, value: Sequence[Pitch]):
         if common.isListLike(value) and value:
             self.pitch = value[0]
         else:
@@ -1825,31 +1811,22 @@ class Unpitched(NotRest):
     AttributeError: 'Unpitched' object has no attribute 'pitch'
     '''
 
-    def __init__(self,
-                 displayName=None,
-                 **keywords):
+    equalityAttributes = ('displayStep', 'displayOctave')
+
+    def __init__(
+        self,
+        displayName: str | None = None,
+        **keywords
+    ):
         super().__init__(**keywords)
-        self._chordAttached: t.Optional['music21.percussion.PercussionChord'] = None
+        self._chordAttached: percussion.PercussionChord | None = None
 
         self.displayStep: StepName = 'B'
         self.displayOctave: int = 4
         if displayName:
             display_pitch = Pitch(displayName)
             self.displayStep = display_pitch.step
-            self.displayOctave = display_pitch.octave
-
-    def __eq__(self, other):
-        if super().__eq__(other) is NotImplemented:
-            return NotImplemented
-        if not super().__eq__(other):
-            return False
-        if not isinstance(other, Unpitched):
-            return False
-        if self.displayStep != other.displayStep:
-            return False
-        if self.displayOctave != other.displayOctave:
-            return False
-        return True
+            self.displayOctave = display_pitch.implicitOctave
 
     def _getStoredInstrument(self):
         return self._storedInstrument
@@ -1928,11 +1905,29 @@ class Rest(GeneralNote):
     True
     >>> r3.duration.quarterLength
     2.0
+
+    Two rests are considered equal if their durations are equal.
+
+    >>> r1 = note.Rest('quarter')
+    >>> r2 = note.Rest('quarter')
+    >>> r1 == r2
+    True
+    >>> r1 != r2
+    False
+
+    >>> r2.duration.quarterLength = 4/3
+    >>> r1 == r2
+    False
+
+    A rest is never equal to a note.
+
+    >>> r1 == note.Note()
+    False
     '''
     isRest = True
     name = 'rest'
 
-    _DOC_ATTR: t.Dict[str, str] = {
+    _DOC_ATTR: dict[str, str] = {
         'isNote': 'Boolean read-only value describing if this Rest is a Note (False).',
         'isRest': 'Boolean read-only value describing if this Rest is a Rest (True, obviously).',
         'name': '''returns "rest" always.  It is here so that you can get
@@ -1958,7 +1953,7 @@ class Rest(GeneralNote):
     }
 
     def __init__(self,
-                 length: t.Union[str, OffsetQLIn, None] = None,
+                 length: str | OffsetQLIn | None = None,
                  *,
                  stepShift: int = 0,
                  fullMeasure: t.Literal[True, False, 'auto', 'always'] = 'auto',
@@ -1983,29 +1978,6 @@ class Rest(GeneralNote):
                 ql = int(ql)
             ql_string = str(ql)
             return f'{ql_string}ql'
-
-    def __eq__(self, other):
-        '''
-        A Music21 rest is equal to another object if that object is also a rest which
-        has the same duration.
-
-        >>> r1 = note.Rest()
-        >>> r2 = note.Rest()
-        >>> r1 == r2
-        True
-        >>> r1 != r2
-        False
-
-        >>> r2.duration.quarterLength = 4/3
-        >>> r1 == r2
-        False
-        >>> r1 == note.Note()
-        False
-        '''
-        if not isinstance(other, Rest):
-            return NotImplemented
-
-        return super().__eq__(other)
 
     @property
     def fullName(self) -> str:
@@ -2033,7 +2005,8 @@ class TestExternal(unittest.TestCase):
     show = True
 
     def testSingle(self):
-        '''Need to test direct meter creation w/o stream
+        '''
+        Need to test direct note creation w/o stream
         '''
         from music21 import note
         a = note.Note('D-3')
@@ -2066,345 +2039,6 @@ class Test(unittest.TestCase):
     def testCopyAndDeepcopy(self):
         from music21.test.commonTest import testCopyAll
         testCopyAll(self, globals())
-
-    def testLyricRepr(self):
-        from music21 import note
-        ly = note.Lyric()
-        self.assertEqual(repr(ly), '<music21.note.Lyric number=1>')
-        ly.text = 'hi'
-        self.assertEqual(repr(ly), "<music21.note.Lyric number=1 text='hi'>")
-        ly.identifier = 'verse'
-        self.assertEqual(repr(ly), "<music21.note.Lyric number=1 identifier='verse' text='hi'>")
-        ly.text = None
-        self.assertEqual(repr(ly), "<music21.note.Lyric number=1 identifier='verse'>")
-
-    def testComplex(self):
-        from music21 import note
-        from music21.duration import DurationTuple
-        note1 = note.Note()
-        note1.duration.clear()
-        d1 = DurationTuple('whole', 0, 4.0)
-        d2 = DurationTuple('quarter', 0, 1.0)
-        note1.duration.addDurationTuple(d1)
-        note1.duration.addDurationTuple(d2)
-        self.assertEqual(note1.duration.quarterLength, 5.0)
-        self.assertEqual(note1.duration.componentIndexAtQtrPosition(2), 0)
-        self.assertEqual(note1.duration.componentIndexAtQtrPosition(4), 1)
-        self.assertEqual(note1.duration.componentIndexAtQtrPosition(4.5), 1)
-        note1.duration.sliceComponentAtPosition(1.0)
-
-        matchStr = "c'4~\nc'2.~\nc'4"
-        from music21.lily.translate import LilypondConverter
-        conv = LilypondConverter()
-        conv.appendM21ObjectToContext(note1)
-        outStr = str(conv.context).replace(' ', '').strip()
-        # print(outStr)
-        self.assertEqual(matchStr, outStr)
-        i = 0
-        for thisNote in note1.splitAtDurations():
-            matchSub = matchStr.split('\n')[i]  # pylint: disable=use-maxsplit-arg
-            conv = LilypondConverter()
-            conv.appendM21ObjectToContext(thisNote)
-            outStr = str(conv.context).replace(' ', '').strip()
-            self.assertEqual(matchSub, outStr)
-            i += 1
-
-    def testNote(self):
-        from music21 import note
-        note2 = note.Rest()
-        self.assertTrue(note2.isRest)
-        note3 = note.Note()
-        note3.pitch.name = 'B-'
-        # not sure how to test not None
-        # self.assertFalse (note3.pitch.accidental, None)
-        self.assertEqual(note3.pitch.accidental.name, 'flat')
-        self.assertEqual(note3.pitch.pitchClass, 10)
-
-        a5 = note.Note()
-        a5.name = 'A'
-        a5.octave = 5
-        self.assertAlmostEqual(a5.pitch.frequency, 880.0)
-        self.assertEqual(a5.pitch.pitchClass, 9)
-
-    def testCopyNote(self):
-        from music21 import note
-        a = note.Note()
-        a.quarterLength = 3.5
-        a.name = 'D'
-        b = copy.deepcopy(a)
-        self.assertEqual(b.name, a.name)
-
-    def testMusicXMLFermata(self):
-        from music21 import corpus
-        a = corpus.parse('bach/bwv5.7')
-        found = []
-        for n in a.flatten().notesAndRests:
-            for obj in n.expressions:
-                if isinstance(obj, expressions.Fermata):
-                    found.append(obj)
-        self.assertEqual(len(found), 24)
-
-    def testNoteBeatProperty(self):
-        from music21 import meter
-        from music21 import note
-        from music21 import stream
-
-        data = [
-            ['3/4', 0.5, 6, [1.0, 1.5, 2.0, 2.5, 3.0, 3.5],
-             [1.0] * 6, ],
-            ['3/4', 0.25, 8, [1.0, 1.25, 1.5, 1.75, 2.0, 2.25, 2.5, 2.75],
-             [1.0] * 8],
-            ['3/2', 0.5, 8, [1.0, 1.25, 1.5, 1.75, 2.0, 2.25, 2.5, 2.75],
-             [2.0] * 8],
-
-            ['6/8', 0.5, 6, [1.0, 1.3333, 1.66666, 2.0, 2.3333, 2.666666],
-             [1.5] * 6],
-            ['9/8', 0.5, 6, [1.0, 1.3333, 1.66666, 2.0, 2.3333, 2.666666],
-             [1.5] * 6],
-            ['12/8', 0.5, 6, [1.0, 1.3333, 1.66666, 2.0, 2.3333, 2.666666],
-             [1.5] * 6],
-
-            ['6/16', 0.25, 6, [1.0, 1.3333, 1.66666, 2.0, 2.3333, 2.666666],
-             [0.75] * 6],
-
-            ['5/4', 1, 5, [1.0, 2.0, 3.0, 4.0, 5.0],
-             [1.] * 5],
-
-            ['2/8+3/8+2/8', 0.5, 6, [1.0, 1.5, 2.0, 2.33333, 2.66666, 3.0],
-             [1., 1., 1.5, 1.5, 1.5, 1.]],
-
-        ]
-
-        # one measure case
-        for tsStr, nQL, nCount, matchBeat, matchBeatDur in data:
-            n = note.Note()  # need fully qualified name
-            n.quarterLength = nQL
-            m = stream.Measure()
-            m.timeSignature = meter.TimeSignature(tsStr)
-            m.repeatAppend(n, nCount)
-
-            self.assertEqual(len(m), nCount + 1)
-
-            # test matching beat proportion value
-            post = [m.notesAndRests[i].beat for i in range(nCount)]
-            for i in range(len(matchBeat)):
-                self.assertAlmostEqual(post[i], matchBeat[i], 4)
-
-            # test getting beat duration
-            post = [m.notesAndRests[i].beatDuration.quarterLength for i in range(nCount)]
-
-            for i in range(len(matchBeat)):
-                self.assertAlmostEqual(post[i], matchBeatDur[i], 4)
-
-        # two measure case
-        for tsStr, nQL, nCount, matchBeat, matchBeatDur in data:
-            p = stream.Part()
-            n = note.Note()
-            n.quarterLength = nQL
-
-            # m1 has time signature
-            m1 = stream.Measure()
-            m1.timeSignature = meter.TimeSignature(tsStr)
-            p.append(m1)
-
-            # m2 does not have time signature
-            m2 = stream.Measure()
-            m2.repeatAppend(n, nCount)
-            self.assertEqual(len(m2), nCount)
-            self.assertEqual(len(m2.notesAndRests), nCount)
-
-            p.append(m2)
-
-            # test matching beat proportion value
-            post = [m2.notesAndRests[i].beat for i in range(nCount)]
-            for i in range(len(matchBeat)):
-                self.assertAlmostEqual(post[i], matchBeat[i], 4)
-            # test getting beat duration
-            post = [m2.notesAndRests[i].beatDuration.quarterLength for i in range(nCount)]
-            for i in range(len(matchBeat)):
-                self.assertAlmostEqual(post[i], matchBeatDur[i], 4)
-
-    def testNoteBeatPropertyCorpus(self):
-        data = [['bach/bwv255', [4.0, 1.0, 2.5, 3.0, 4.0, 4.5, 1.0, 1.5]],
-                ['bach/bwv153.9', [1.0, 2.0, 3.0, 1.0, 2.0, 3.0, 1.0, 3.0, 1.0]]
-                ]
-
-        for work, match in data:
-            from music21 import corpus
-            s = corpus.parse(work)
-            # always use tenor line
-            found = []
-            for n in s.parts[2].flatten().notesAndRests:
-                n.lyric = n.beatStr
-                found.append(n.beat)
-
-            for i in range(len(match)):
-                self.assertEqual(match[i], found[i])
-
-            # s.show()
-
-    def testNoteEquality(self):
-        from music21 import articulations
-        from music21 import note
-
-        n1 = note.Note('A#')
-        n2 = note.Note('G')
-        n3 = note.Note('A-')
-        n4 = note.Note('A#')
-
-        self.assertNotEqual(n1, n2)
-        self.assertNotEqual(n1, n3)
-        self.assertEqual(n1, n4)
-
-        # test durations with the same pitch
-        for x, y, match in [
-            (1, 1, True),
-            (1, 0.5, False),
-            (1, 2, False),
-            (1, 1.5, False)
-        ]:
-            n1.quarterLength = x
-            n4.quarterLength = y
-            self.assertEqual(n1 == n4, match)  # sub1
-
-        # test durations with different pitch
-        for x, y, match in [(1, 1, False), (1, 0.5, False),
-                            (1, 2, False), (1, 1.5, False)]:
-            n1.quarterLength = x
-            n2.quarterLength = y
-            self.assertEqual(n1 == n2, match)  # sub2
-
-        # same pitches different octaves
-        n1.quarterLength = 1.0
-        n4.quarterLength = 1.0
-        for x, y, match in [(4, 4, True), (3, 4, False), (2, 4, False)]:
-            n1.pitch.octave = x
-            n4.pitch.octave = y
-            self.assertEqual(n1 == n4, match)  # sub4
-
-        # with and without ties
-        n1.pitch.octave = 4
-        n4.pitch.octave = 4
-        t1 = tie.Tie()
-        t2 = tie.Tie()
-        for x, y, match in [(t1, None, False), (t1, t2, True)]:
-            n1.tie = x
-            n4.tie = y
-            self.assertEqual(n1 == n4, match)  # sub4
-
-        # with ties but different pitches
-        for n in [n1, n2, n3, n4]:
-            n.quarterLength = 1.0
-        t1 = tie.Tie()
-        t2 = tie.Tie()
-        for a, b, match in [(n1, n2, False), (n1, n3, False),
-                            (n2, n3, False), (n1, n4, True)]:
-            a.tie = t1
-            b.tie = t2
-            self.assertEqual(a == b, match)  # sub5
-
-        # articulation groups
-        a1 = [articulations.Accent()]
-        a2 = [articulations.Accent(), articulations.StrongAccent()]
-        a3 = [articulations.StrongAccent(), articulations.Accent()]
-        a4 = [articulations.StrongAccent(), articulations.Accent(),
-              articulations.Tenuto()]
-        a5 = [articulations.Accent(), articulations.Tenuto(),
-              articulations.StrongAccent()]
-
-        for a, b, c, d, match in [(n1, n4, a1, a1, True),
-                                      (n1, n2, a1, a1, False), (n1, n3, a1, a1, False),
-                                  # same pitch different orderings
-                                  (n1, n4, a2, a3, True), (n1, n4, a4, a5, True),
-                                  # different pitch same orderings
-                                  (n1, n2, a2, a3, False), (n1, n3, a4, a5, False),
-                                  ]:
-            a.articulations = c
-            b.articulations = d
-            self.assertEqual(a == b, match)  # sub6
-
-    def testMetricalAccent(self):
-        from music21 import meter
-        from music21 import note
-        from music21 import stream
-        data = [
-            ('4/4', 8, 0.5, [1.0, 0.125, 0.25, 0.125, 0.5, 0.125, 0.25, 0.125]),
-            ('3/4', 6, 0.5, [1.0, 0.25, 0.5, 0.25, 0.5, 0.25]),
-            ('6/8', 6, 0.5, [1.0, 0.25, 0.25, 0.5, 0.25, 0.25]),
-
-            ('12/32', 12, 0.125, [1.0, 0.125, 0.125, 0.25, 0.125, 0.125,
-                                  0.5, 0.125, 0.125, 0.25, 0.125, 0.125]),
-
-            ('5/8', 10, 0.25, [1.0, 0.25, 0.5, 0.25, 0.5, 0.25, 0.5, 0.25, 0.5, 0.25]),
-
-            # test notes that do not have defined accents
-            ('4/4', 16, 0.25, [1.0, 0.0625, 0.125, 0.0625, 0.25, 0.0625, 0.125, 0.0625,
-                               0.5, 0.0625, 0.125, 0.0625, 0.25, 0.0625, 0.125, 0.0625]),
-            ('4/4', 32, 0.125, [1.0, 0.0625, 0.0625, 0.0625, 0.125, 0.0625, 0.0625, 0.0625,
-                                0.25, 0.0625, 0.0625, 0.0625, 0.125, 0.0625, 0.0625, 0.0625,
-                                0.5, 0.0625, 0.0625, 0.0625, 0.125, 0.0625, 0.0625, 0.0625,
-                                0.25, 0.0625, 0.0625, 0.0625, 0.125, 0.0625, 0.0625, 0.0625]),
-        ]
-
-        for tsStr, nCount, dur, match in data:
-            m = stream.Measure()
-            m.timeSignature = meter.TimeSignature(tsStr)
-            n = note.Note()
-            n.quarterLength = dur
-            m.repeatAppend(n, nCount)
-
-            self.assertEqual([n.beatStrength for n in m.notesAndRests], match)
-
-    def testTieContinue(self):
-        from music21 import note
-        from music21 import stream
-
-        n1 = note.Note()
-        n1.tie = tie.Tie()
-        n1.tie.type = 'start'
-
-        n2 = note.Note()
-        n2.tie = tie.Tie()
-        n2.tie.type = 'continue'
-
-        n3 = note.Note()
-        n3.tie = tie.Tie()
-        n3.tie.type = 'stop'
-
-        s = stream.Stream()
-        s.append([n1, n2, n3])
-
-        # need to test that this gets us a "continue" tie, but hard to test
-        # post musicxml processing
-        # s.show()
-
-    def testVolumeA(self):
-        from music21 import note
-        v1 = volume.Volume()
-
-        n1 = note.Note()
-        n2 = note.Note()
-
-        n1.volume = v1  # can set as v1 has no client
-        self.assertEqual(n1.volume, v1)
-        self.assertEqual(n1.volume.client, n1)
-
-        # object is created on demand
-        self.assertIsNot(n2.volume, v1)
-        self.assertIsNotNone(n2.volume)
-
-    def testVolumeB(self):
-        from music21 import note
-        # manage deepcopying properly
-        n1 = note.Note()
-
-        n1.volume.velocity = 100
-        self.assertEqual(n1.volume.velocity, 100)
-        self.assertEqual(n1.volume.client, n1)
-
-        n1Copy = copy.deepcopy(n1)
-        self.assertEqual(n1Copy.volume.velocity, 100)
-        self.assertEqual(n1Copy.volume.client, n1Copy)
 
 
 # ------------------------------------------------------------------------------

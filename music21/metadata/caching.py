@@ -10,35 +10,25 @@
 #               Project
 # License:      BSD, see license.txt
 # -----------------------------------------------------------------------------
-import multiprocessing
-import os
-import pathlib
-import pickle
-import traceback
-import typing as t
-import unittest
+from __future__ import annotations
 
-from music21 import common
-from music21 import exceptions21
-
-# -----------------------------------------------------------------------------
 __all__ = [
     'JobProcessor',
     'MetadataCachingJob',
     'cacheMetadata',
-    'MetadataCacheException',
     'WorkerProcess',
 ]
 
+import multiprocessing
+import pathlib
+import pickle
+import traceback
+import unittest
 
+from music21 import common
 from music21 import environment
-environLocal = environment.Environment(os.path.basename(__file__))
-# -----------------------------------------------------------------------------
 
-
-class MetadataCacheException(exceptions21.Music21Exception):
-    pass
-# -----------------------------------------------------------------------------
+environLocal = environment.Environment('metadata.caching')
 
 
 def cacheMetadata(corpusNames=None,
@@ -423,7 +413,7 @@ class Test(unittest.TestCase):
 
 
 # -----------------------------------------------------------------------------
-_DOC_ORDER: t.List[type] = []
+_DOC_ORDER: list[type] = []
 
 if __name__ == '__main__':
     import music21

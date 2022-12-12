@@ -170,15 +170,16 @@ tool.
 * <pb>: a page break
 * <lb>: a line break
 * <sb>: a system break
-
 '''
-import typing as t
-from xml.etree.ElementTree import Element, ParseError, fromstring, ElementTree
+
+from __future__ import annotations
 
 from collections import defaultdict
 from copy import deepcopy
-from fractions import Fraction  # for typing
+import typing as t
 from uuid import uuid4
+from xml.etree.ElementTree import Element, ParseError, fromstring, ElementTree
+
 
 # music21
 from music21 import articulations
@@ -198,6 +199,10 @@ from music21 import pitch
 from music21 import stream
 from music21 import spanner
 from music21 import tie
+
+
+if t.TYPE_CHECKING:
+    from fractions import Fraction
 
 environLocal = environment.Environment('mei.base')
 
@@ -222,22 +227,30 @@ _IGNORE_UNPROCESSED = (
 # Exceptions
 # -----------------------------------------------------------------------------
 class MeiValidityError(exceptions21.Music21Exception):
-    '''When there is an otherwise-unspecified validity error that prevents parsing.'''
+    '''
+    When there is an otherwise-unspecified validity error that prevents parsing.
+    '''
     pass
 
 
 class MeiValueError(exceptions21.Music21Exception):
-    '''When an attribute has an invalid value.'''
+    '''
+    When an attribute has an invalid value.
+    '''
     pass
 
 
 class MeiAttributeError(exceptions21.Music21Exception):
-    '''When an element has an invalid attribute.'''
+    '''
+    When an element has an invalid attribute.
+    '''
     pass
 
 
 class MeiElementError(exceptions21.Music21Exception):
-    '''When an element itself is invalid.'''
+    '''
+    When an element itself is invalid.
+    '''
     pass
 
 
@@ -340,8 +353,8 @@ class MeiToM21Converter:
 # -----------------------------------------------------------------------------
 def safePitch(
     name: str,
-    accidental: t.Optional[str] = None,
-    octave: t.Union[str, int] = ''
+    accidental: str | None = None,
+    octave: str | int = ''
 ) -> pitch.Pitch:
     '''
     Safely build a :class:`~music21.pitch.Pitch` from a string.
@@ -379,9 +392,9 @@ def safePitch(
 
 
 def makeDuration(
-    base: t.Union[float, int, Fraction] = 0.0,
+    base: float | int | Fraction = 0.0,
     dots: int = 0
-) -> 'music21.duration.Duration':
+) -> duration.Duration:
     '''
     Given a ``base`` duration and a number of ``dots``, create a :class:`~music21.duration.Duration`
     instance with the
@@ -410,7 +423,7 @@ def makeDuration(
     return returnDuration
 
 
-def allPartsPresent(scoreElem) -> t.Tuple[str, ...]:
+def allPartsPresent(scoreElem) -> tuple[str, ...]:
     # noinspection PyShadowingNames
     '''
     Find the @n values for all <staffDef> elements in a <score> element. This assumes that every
@@ -615,7 +628,8 @@ def _makeArticList(attr):
     return articList
 
 
-def _getOctaveShift(dis: t.Union[t.Literal['8', '15', '22'], None], disPlace: str) -> int:
+def _getOctaveShift(dis: t.Literal['8', '15', '22'] | None,
+                    disPlace: str) -> int:
     '''
     Use :func:`_getOctaveShift` to calculate the :attr:`octaveShift` attribute for a
     :class:`~music21.clef.Clef` subclass. Any of the arguments may be ``None``.
@@ -945,7 +959,7 @@ def _ppConclude(theConverter):
 # Helper Functions
 # -----------------------------------------------------------------------------
 def _processEmbeddedElements(
-    elements: t.List[Element],
+    elements: list[Element],
     mapping,
     callerTag=None,
     slurBundle=None
@@ -1024,7 +1038,7 @@ def _timeSigFromAttrs(elem):
     return meter.TimeSignature(f"{elem.get('meter.count')!s}/{elem.get('meter.unit')!s}")
 
 
-def _keySigFromAttrs(elem: Element) -> t.Union[key.Key, key.KeySignature]:
+def _keySigFromAttrs(elem: Element) -> key.Key | key.KeySignature:
     '''
     From any tag with (at minimum) either @key.pname or @key.sig attributes, make a
     :class:`KeySignature` or :class:`Key`, as possible.
@@ -1172,7 +1186,9 @@ def addSlurs(elem, obj, slurBundle):
     addedSlur = False
 
     def wrapGetByIdLocal(theId):
-        '''Avoid crashing when getByIdLocl() doesn't find the slur'''
+        '''
+        Avoid crashing when getByIdLocl() doesn't find the slur
+        '''
         try:
             slurBundle.getByIdLocal(theId)[0].addSpannedElements(obj)
             return True
@@ -1877,14 +1893,14 @@ def articFromElement(elem, slurBundle=None):  # pylint: disable=unused-argument
     :attr:`~music21.note.GeneralNote.articulations` attribute.
 
     >>> from xml.etree import ElementTree as ET
-    >>> meiSnippet = """<artic artic="acc" xmlns="http://www.music-encoding.org/ns/mei"/>"""
+    >>> meiSnippet = '<artic artic="acc" xmlns="http://www.music-encoding.org/ns/mei"/>'
     >>> meiSnippet = ET.fromstring(meiSnippet)
     >>> mei.base.articFromElement(meiSnippet)
     [<music21.articulations.Accent>]
 
     A single <artic> element may indicate many :class:`Articulation` objects.
 
-    >>> meiSnippet = """<artic artic="acc ten" xmlns="http://www.music-encoding.org/ns/mei"/>"""
+    >>> meiSnippet = '<artic artic="acc ten" xmlns="http://www.music-encoding.org/ns/mei"/>'
     >>> meiSnippet = ET.fromstring(meiSnippet)
     >>> mei.base.articFromElement(meiSnippet)
     [<music21.articulations.Accent>, <music21.articulations.Tenuto>]
@@ -1936,11 +1952,11 @@ def accidFromElement(elem, slurBundle=None):  # pylint: disable=unused-argument
     a string. Accidentals up to triple-sharp and triple-flat are supported.
 
     >>> from xml.etree import ElementTree as ET
-    >>> meiSnippet = """<accid accid="s" xmlns="http://www.music-encoding.org/ns/mei"/>"""
+    >>> meiSnippet = '<accid accid="s" xmlns="http://www.music-encoding.org/ns/mei"/>'
     >>> meiSnippet = ET.fromstring(meiSnippet)
     >>> mei.base.accidFromElement(meiSnippet)
     '#'
-    >>> meiSnippet = """<accid accid="tf" xmlns="http://www.music-encoding.org/ns/mei"/>"""
+    >>> meiSnippet = '<accid accid="tf" xmlns="http://www.music-encoding.org/ns/mei"/>'
     >>> meiSnippet = ET.fromstring(meiSnippet)
     >>> mei.base.accidFromElement(meiSnippet)
     '---'

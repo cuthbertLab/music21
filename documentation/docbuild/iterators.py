@@ -9,6 +9,8 @@
 # Copyright:    Copyright © 2013, 17 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
+from __future__ import annotations
+
 import abc  # for @abc.abstractmethod decorator: requires a function to be defined in subclasses
 import os
 import types
@@ -157,7 +159,6 @@ class CodebaseIterator(Iterator):
     ...     print(x)
     <class 'music21.articulations.Accent'>
     <class 'music21.articulations.Articulation'>
-    <class 'music21.articulations.ArticulationException'>
     <class 'music21.articulations.Bowing'>
     <class 'music21.articulations.BrassIndication'>
     <class 'music21.articulations.BreathMark'>

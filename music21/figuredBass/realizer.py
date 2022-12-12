@@ -40,12 +40,13 @@ See :meth:`~music21.figuredBass.realizer.figuredBassFromStream` for more details
 >>> allSols2.getNumSolutions()
 30
 '''
+from __future__ import annotations
+
 import collections
 import copy
 import random
 import typing as t
 import unittest
-
 
 from music21 import chord
 from music21 import clef
@@ -61,7 +62,11 @@ from music21.figuredBass import realizerScale
 from music21.figuredBass import rules
 from music21.figuredBass import segment
 
-def figuredBassFromStream(streamPart):
+if t.TYPE_CHECKING:
+    from music21.stream.iterator import StreamIterator
+
+
+def figuredBassFromStream(streamPart: stream.Stream) -> FiguredBassLine:
     # noinspection PyShadowingNames
     '''
     Takes a :class:`~music21.stream.Part` (or another :class:`~music21.stream.Stream` subclass)
@@ -86,31 +91,30 @@ def figuredBassFromStream(streamPart):
     .. image:: images/figuredBass/fbRealizer_fbStreamPart.*
         :width: 500
 
-    Changed in v7.3: multiple figures in same lyric (e.g. '64') now supported.
+    * Changed in v7.3: multiple figures in same lyric (e.g. '64') now supported.
     '''
     sf = streamPart.flatten()
-    sfn = sf.notes
-
-    keyList = sf.getElementsByClass(key.Key)
-    myKey = None
-    if not keyList:
-        keyList = sf.getElementsByClass(key.KeySignature)
-        if not keyList:
-            myKey = key.Key('C')
-        else:
-            myKey = keyList[0].asKey('major')
+    sfn = sf.getElementsByClass(note.Note)
+    myKey: key.Key
+    if firstKey := sf[key.Key].first():
+        myKey = firstKey
+    elif firstKeySignature := sf[key.KeySignature].first():
+        myKey = firstKeySignature.asKey('major')
     else:
-        myKey = keyList[0]
+        myKey = key.Key('C')
 
-    tsList = sf.getElementsByClass(meter.TimeSignature)
-    if not tsList:
+    ts: meter.TimeSignature
+    if first_ts := sf[meter.TimeSignature].first():
+        ts = first_ts
+    else:
         ts = meter.TimeSignature('4/4')
-    else:
-        ts = tsList[0]
 
     fb = FiguredBassLine(myKey, ts)
     if streamPart.hasMeasures():
-        paddingLeft = streamPart.measure(0).paddingLeft
+        m_first = streamPart.measure(0, indicesNotNumbers=True)
+        if t.TYPE_CHECKING:
+            assert m_first is not None
+        paddingLeft = m_first.paddingLeft
         if paddingLeft != 0.0:
             fb._paddingLeft = paddingLeft
 
@@ -213,7 +217,7 @@ class FiguredBassLine:
     <music21.meter.TimeSignature 3/4>
     '''
     _DOC_ORDER = ['addElement', 'generateBassLine', 'realize']
-    _DOC_ATTR: t.Dict[str, str] = {
+    _DOC_ATTR: dict[str, str] = {
         'inKey': '''
             A :class:`~music21.key.Key` which implies a scale value,
             scale mode, and key signature for a
@@ -561,7 +565,7 @@ class Realization:
                   'generateRandomRealizations', 'generateAllRealizations',
                   'getAllPossibilityProgressions', 'getRandomPossibilityProgression',
                   'generateRealizationFromPossibilityProgression']
-    _DOC_ATTR: t.Dict[str, str] = {
+    _DOC_ATTR: dict[str, str] = {
         'keyboardStyleOutput': '''
             True by default. If True, generated realizations
             are represented in keyboard style, with two staves. If False,

@@ -25,10 +25,12 @@ the music21 converter module's :func:`~music21.converter.parse` function.
 Low level MuseData conversion is facilitated by the objects in this module and
 :func:`music21.musedata.translate.museDataToStreamScore`.
 '''
+from __future__ import annotations
 
-import unittest
 import os
+import unittest
 
+from music21 import environment
 from music21 import exceptions21
 from music21.musedata import base12_26
 from music21.musedata import base40
@@ -37,7 +39,6 @@ from music21.musedata import translate
 from music21 import common
 from music21 import prebase
 
-from music21 import environment
 environLocal = environment.Environment('musedata')
 
 # for implementation
@@ -71,7 +72,8 @@ class MuseDataRecord(prebase.ProtoM21Object):
         self._cache = {}
 
     def isRest(self):
-        '''Return a boolean if this record is a rest.
+        '''
+        Return a boolean if this record is a rest.
 
         >>> mdr = musedata.MuseDataRecord('D4     1        s     d  ]]')
         >>> mdr.isRest()
@@ -86,8 +88,8 @@ class MuseDataRecord(prebase.ProtoM21Object):
         return False
 
     def isTied(self):
-        '''Return a boolean if this record is tied.
-
+        '''
+        Return a boolean if this record is tied.
 
         >>> mdr = musedata.MuseDataRecord('D4     8-       h     d        -')
         >>> mdr.isTied()
@@ -176,8 +178,8 @@ class MuseDataRecord(prebase.ProtoM21Object):
         return ''.join(pStr)
 
     def _getAccidentalObject(self):
-        '''Return a music21 Accidental object for the representation.
-
+        '''
+        Return a music21 Accidental object for the representation.
 
         >>> mdr = musedata.MuseDataRecord('Ef4    1        s     d  ==')
         >>> mdr._getAccidentalObject()
@@ -345,8 +347,8 @@ class MuseDataRecord(prebase.ProtoM21Object):
 #            return data
 
     def getLyrics(self):
-        '''Return lyrics as a list.
-
+        '''
+        Return lyrics as a list.
 
         >>> mdr = musedata.MuseDataRecord('D4     2        e     u                    con-')
         >>> mdr.stage = 2
@@ -366,8 +368,8 @@ class MuseDataRecord(prebase.ProtoM21Object):
         return data
 
     def getBeams(self):
-        '''Return complete span of characters defining beams.
-
+        '''
+        Return complete span of characters defining beams.
 
         >>> mdr = musedata.MuseDataRecord('E2     1        s     u  =')
         >>> mdr.getBeams()
@@ -393,8 +395,8 @@ class MuseDataRecord(prebase.ProtoM21Object):
     # (), {}, []
 
     def _getAdditionalNotations(self):
-        '''Return an articulation object or None
-
+        '''
+        Return an articulation object or None
 
         >>> mdr = musedata.MuseDataRecord('C4    12        e     u  [      .p')
         >>> mdr._getAdditionalNotations()
@@ -428,8 +430,8 @@ class MuseDataRecord(prebase.ProtoM21Object):
         return data
 
     def getArticulationObjects(self):
-        '''Return a list of 0 or more music21 Articulation objects
-
+        '''
+        Return a list of 0 or more music21 Articulation objects
 
         >>> mdr = musedata.MuseDataRecord('C4    12        e     u  [      .p')
         >>> mdr.getArticulationObjects()
@@ -468,8 +470,8 @@ class MuseDataRecord(prebase.ProtoM21Object):
         return post
 
     def getExpressionObjects(self):
-        '''Return a list of 0 or more music21 Articulation objects
-
+        '''
+        Return a list of 0 or more music21 Articulation objects
 
         >>> mdr = musedata.MuseDataRecord('C4    12        e     u  [      t')
         >>> mdr.getExpressionObjects()
@@ -502,8 +504,8 @@ class MuseDataRecord(prebase.ProtoM21Object):
         return post
 
     def getDynamicObjects(self):
-        '''Return a list of 0 or more music21 Dynamic objects
-
+        '''
+        Return a list of 0 or more music21 Dynamic objects
 
         >>> mdr = musedata.MuseDataRecord('C5    12        e     u         ff')
         >>> mdr.getDynamicObjects()
@@ -668,7 +670,8 @@ class MuseDataMeasure(prebase.ProtoM21Object):
         return bl
 
     def getMeasureObject(self):
-        '''Return a configured music21 :class:`~music21.stream.Measure`.
+        '''
+        Return a configured music21 :class:`~music21.stream.Measure`.
         '''
         from music21 import stream
 
@@ -702,7 +705,8 @@ class MuseDataMeasure(prebase.ProtoM21Object):
         return False
 
     def hasVoices(self):
-        '''Return True of if this Measure defines one or more 'back' indication.
+        '''
+        Return True of if this Measure defines one or more 'back' indication.
 
         Note: this does not instantiate MuseDataRecord instances.
         '''
@@ -718,14 +722,16 @@ class MuseDataMeasure(prebase.ProtoM21Object):
         return MuseDataRecordIterator(self.src, self)
 
     def getRecords(self):
-        '''Return a lost of all records stored in this measure as MuseDataRecord.
+        '''
+        Return a list of all records stored in this measure as MuseDataRecord.
         '''
         return list(self)
 
 
 # ------------------------------------------------------------------------------
 class MuseDataMeasureIterator:
-    '''Create MuseDataMeasure objects on demand, in order
+    '''
+    Create MuseDataMeasure objects on demand, in order
     '''
 
     def __init__(self, src, boundaries, parent):
@@ -750,7 +756,8 @@ class MuseDataMeasureIterator:
 
 
 class MuseDataPart(prebase.ProtoM21Object):
-    '''A MuseData part is defined by collection of lines
+    '''
+    A MuseData part is defined by collection of lines
     '''
 
     def __init__(self, src=None, stage=None):
@@ -1208,7 +1215,8 @@ class MuseDataPart(prebase.ProtoM21Object):
             return post
 
     def getClefObject(self, voice=1):
-        '''Return a music21 clef object based on a two character clef definition.
+        '''
+        Return a music21 clef object based on a two character clef definition.
 
         >>> fp1 = (common.getSourceFilePath() / 'musedata' / 'testPrimitive'
         ...                    / 'test01' / '01.md')
@@ -1289,7 +1297,8 @@ class MuseDataPart(prebase.ProtoM21Object):
                 return int(raw)
 
     def getTranspositionIntervalObject(self):
-        '''If this part defines a transposition, return a corresponding Interval object.
+        '''
+        If this part defines a transposition, return a corresponding Interval object.
 
         >>> fp1 = (common.getSourceFilePath() / 'musedata' / 'testPrimitive'
         ...                    / 'test01' / '01.md')
@@ -1421,7 +1430,8 @@ class MuseDataPart(prebase.ProtoM21Object):
         return MuseDataMeasureIterator(self.src, self._measureBoundaries, self)
 
     def getMeasures(self):
-        '''Return a list of all measures stored in this part as MuseDataMeasure objects.
+        '''
+        Return a list of all measures stored in this part as MuseDataMeasure objects.
         '''
         return list(self)
 
@@ -1513,7 +1523,8 @@ class MuseDataFile(prebase.ProtoM21Object):
 
 # ------------------------------------------------------------------------------
 class MuseDataWork(prebase.ProtoM21Object):
-    '''A work might consist of one or more files.
+    '''
+    A work might consist of one or more files.
     '''
 
     def __init__(self):
@@ -1682,7 +1693,8 @@ class MuseDataDirectory(prebase.ProtoM21Object):
         return True
 
     def getPaths(self, group=None):
-        '''Return sorted paths for a group, or None
+        '''
+        Return sorted paths for a group, or None
         '''
         # environLocal.printDebug(['getPaths() called with self.paths', self.paths])
         return self.paths

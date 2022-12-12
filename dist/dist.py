@@ -17,8 +17,8 @@ To do a release,
 1. update the VERSION in _version.py and the single test cases in base.py.
 2. run `corpus.corpora.CoreCorpus().cacheMetadata()`.
     for a major change run corpus.corpora.CoreCorpus().rebuildMetadataCache()
-    (40 min on MacPro) -- either of these MAY change a lot of tests in corpus, metadata, etc.
-    so don't skip the next step!
+    (20 min on IntelMacbook Air) -- either of these MAY change a
+    lot of tests in corpus, metadata, etc. so don't skip the next step!
 3. run test/warningMultiprocessTest.py for lowest and highest Py version -- fix all warnings!
 4. run test/testLint.py and fix any lint errors (covered now by CI)
 5. commit and then check test/testSingleCoreAll.py or wait for results on GitHub Actions
@@ -65,7 +65,8 @@ the announcement while it's running.
 
     Finish this before doing the next step, even though it looks like it could be done in parallel.
 
-19. Upload the new file to PyPI with "twine upload music21-7.3.5a2.tar.gz" [*]
+19. Upload the new file to PyPI with "twine upload music21-7.3.5a2.tar.gz", and same for the
+    whl file (but NOT no corpus) [*]
 
     [*] Requires twine to be installed
 
@@ -79,7 +80,7 @@ the announcement while it's running.
         username:your_username
         password:your_password
 
-20. Delete the two .tar.gz files in dist...
+20. Delete the two .tar.gz files and .whl file in dist...
 
 21. For starting a new major release create a GitHub branch for the old one.
 

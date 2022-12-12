@@ -23,23 +23,23 @@ From the highest level to the lowest level of usage, ways of graphing are as fol
     3. plotter = graph.primitives.Class(); plotter.data = ...; plotter.process()
     4. Use matplotlib directly to create your graph.
 '''
+from __future__ import annotations
+
 import math
 import random
 import unittest
-import typing as t
 
 from music21 import common
+from music21.converter.subConverters import SubConverter
+from music21 import environment
 from music21.graph.utilities import (getExtendedModules,
                                      GraphException,
                                      getColor,
                                      accidentalLabelToUnicode,
                                      )
 from music21 import prebase
-from music21.converter.subConverters import SubConverter
 
-from music21 import environment
 environLocal = environment.Environment('graph.primitives')
-
 
 # ------------------------------------------------------------------------------
 class Graph(prebase.ProtoM21Object):
@@ -97,10 +97,10 @@ class Graph(prebase.ProtoM21Object):
     'genericGraph'
     '''
     graphType = 'genericGraph'
-    axisKeys: t.Tuple[str, ...] = ('x', 'y')
-    figureSizeDefault: t.Tuple[t.Union[int, float], ...] = (6, 6)
+    axisKeys: tuple[str, ...] = ('x', 'y')
+    figureSizeDefault: tuple[int | float, ...] = (6, 6)
 
-    keywordConfigurables: t.Tuple[str, ...] = (
+    keywordConfigurables: tuple[str, ...] = (
         'alpha',
         'colorBackgroundData',
         'colorBackgroundFigure',
@@ -589,7 +589,7 @@ class GraphNetworkxGraph(Graph):
     #
     # .. image:: images/GraphNetworkxGraph.*
     #     :width: 600
-    _DOC_ATTR: t.Dict[str, str] = {
+    _DOC_ATTR: dict[str, str] = {
         'networkxGraph': '''An instance of a networkx graph object.''',
         'hideLeftBottomSpines': 'bool to hide the left and bottom axis spines; default True',
     }
@@ -686,7 +686,7 @@ class GraphColorGrid(Graph):
     .. image:: images/GraphColorGrid.*
         :width: 600
     '''
-    _DOC_ATTR: t.Dict[str, str] = {
+    _DOC_ATTR: dict[str, str] = {
         'hideLeftBottomSpines': 'bool to hide the left and bottom axis spines; default True',
     }
 
@@ -793,7 +793,7 @@ class GraphColorGridLegend(Graph):
         :width: 600
 
     '''
-    _DOC_ATTR: t.Dict[str, str] = {
+    _DOC_ATTR: dict[str, str] = {
         'hideLeftBottomSpines': 'bool to hide the left and bottom axis spines; default True',
     }
 
@@ -953,7 +953,7 @@ class GraphHorizontalBar(Graph):
         `('', [], {})`
 
     '''
-    _DOC_ATTR: t.Dict[str, str] = {
+    _DOC_ATTR: dict[str, str] = {
         'barSpace': 'Amount of vertical space each bar takes; default 8',
         'margin': '''
             Vertical space above and below the bars, default 2 (= total4 space between bars)
@@ -980,7 +980,7 @@ class GraphHorizontalBar(Graph):
     def barHeight(self):
         return self.barSpace - (self.margin * 2)
 
-    def renderSubplot(self, subplot):
+    def renderSubplot(self, subplot) -> None:
         self.figure.subplots_adjust(left=0.15)
 
         yPos = 0
@@ -1004,7 +1004,7 @@ class GraphHorizontalBar(Graph):
 
             if points:
                 uniformFormatPerRow = (len(points[0]) == 2)
-                rowFaceColors: t.Union[str, t.List[str]]
+                rowFaceColors: str | list[str]
                 if uniformFormatPerRow:
                     rowFaceColors = faceColor
                     positionPoints = points
@@ -1063,7 +1063,7 @@ class GraphHorizontalBarWeighted(Graph):
     can have different heights and colors within their
     respective channel.
     '''
-    _DOC_ATTR: t.Dict[str, str] = {
+    _DOC_ATTR: dict[str, str] = {
         'barSpace': 'Amount of vertical space each bar takes; default 8',
         'margin': 'Space around the bars, default 2',
     }
@@ -1209,7 +1209,7 @@ class GraphScatterWeighted(Graph):
         :width: 600
 
     '''
-    _DOC_ATTR: t.Dict[str, str] = {
+    _DOC_ATTR: dict[str, str] = {
         'maxDiameter': 'the maximum diameter of any ellipse, default 1.25',
         'minDiameter': 'the minimum diameter of any ellipse, default 0.25',
     }
@@ -1410,7 +1410,7 @@ class GraphHistogram(Graph):
     .. image:: images/GraphHistogram.*
         :width: 600
     '''
-    _DOC_ATTR: t.Dict[str, str] = {
+    _DOC_ATTR: dict[str, str] = {
         'binWidth': '''
             Size of each bin; if the bins are equally spaced at intervals of 1,
             then 0.8 is a good default to allow a little space. 1.0 will give no
