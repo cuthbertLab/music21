@@ -679,19 +679,17 @@ class TsvHandler:
         for entry in self.chordList:
             if self.dcml_version == 2 and entry.volta != previousVolta:
                 if entry.volta:
-                    # ending_i += 1
                     repeatBracket = spanner.RepeatBracket(number=entry.volta)
                     # According to the docs, "the convention is to put the
                     #   spanner at the beginning of the innermost Stream that
                     #   contains all the Spanners"
                     p.insert(0, repeatBracket)
                 else:
-                    # ending_i = -1
                     repeatBracket = None
                 previousVolta = entry.volta
             elif entry.measure == previousMeasure:
                 # NB we only want to continue here if the 'volta' (ending) has
-                #   not changed
+                #   not changed, hence the elif
                 continue
             if entry.measure > previousMeasure + 1:  # Not every measure has a chord change.
                 for mNo in range(previousMeasure + 1, entry.measure + 1):
@@ -1354,7 +1352,5 @@ class Test(unittest.TestCase):
 
 
 if __name__ == '__main__':
-    # TODO
-    # Test().testRepeats()
     import music21
     music21.mainTest(Test)
