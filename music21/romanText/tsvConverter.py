@@ -608,8 +608,8 @@ class TsvHandler:
 
         for thisChord in self.chordList:
             offsetInMeasure = thisChord.beat - 1  # beats always measured in quarter notes
-            if self.dcml_version == 2 and thisChord.volta:
-                measureNumber = (
+            if isinstance(thisChord, TabChordV2) and thisChord.volta:
+                measureNumber: str | int = (
                     f'{thisChord.measure}{string.ascii_lowercase[int(thisChord.volta) - 1]}'
                 )
             else:
@@ -677,7 +677,7 @@ class TsvHandler:
         previousVolta: str = ''
         repeatBracket: t.Optional[spanner.RepeatBracket] = None
         for entry in self.chordList:
-            if self.dcml_version == 2 and entry.volta != previousVolta:
+            if isinstance(entry, TabChordV2) and entry.volta != previousVolta:
                 if entry.volta:
                     # Should we warn the user that, although we're writing
                     # repeat brackets, we aren't writing repeat signs since
@@ -705,8 +705,8 @@ class TsvHandler:
                     currentOffset = m.offset
                     previousMeasure = mNo
             else:  # entry.measure <= previousMeasure + 1
-                if self.dcml_version == 2 and entry.volta:
-                    measureNumber = (
+                if isinstance(entry, TabChordV2) and entry.volta:
+                    measureNumber: str | int = (
                         f'{entry.measure}{string.ascii_lowercase[int(entry.volta) - 1]}'
                     )
                 else:
