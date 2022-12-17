@@ -679,10 +679,15 @@ class TsvHandler:
         for entry in self.chordList:
             if self.dcml_version == 2 and entry.volta != previousVolta:
                 if entry.volta:
+                    # Should we warn the user that, although we're writing
+                    # repeat brackets, we aren't writing repeat signs since
+                    # the .tsv file doesn't tell us where the forward repeat
+                    # should be?
                     repeatBracket = spanner.RepeatBracket(number=entry.volta)
-                    # According to the docs, "the convention is to put the
-                    #   spanner at the beginning of the innermost Stream that
-                    #   contains all the Spanners"
+                    # According to the docs at
+                    # https://web.mit.edu/music21/doc/moduleReference/moduleSpanner.html#spanner
+                    #   "the convention is to put the spanner at the beginning
+                    #   of the innermost Stream that contains all the Spanners"
                     p.insert(0, repeatBracket)
                 else:
                     repeatBracket = None
@@ -1346,7 +1351,6 @@ class Test(unittest.TestCase):
         first_ending, second_ending = rb_iter
         _test_ending_contents(first_ending, ['2a'])
         _test_ending_contents(second_ending, ['2b'])
-
 
 # ------------------------------------------------------------------------------
 
