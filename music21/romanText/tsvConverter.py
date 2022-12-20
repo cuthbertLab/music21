@@ -389,28 +389,28 @@ class TabChord(TabChordBase):
     An intermediate representation format for moving between tabular data in
     DCML v1 and music21 chords.
     '''
-    def __init__(self):
+    def __init__(self) -> None:
         # self.numeral and self.relativeroot defined in super().__init__()
         super().__init__()
-        self.altchord = None
-        self.totbeat = None
-        self.length = None
-        self.dcml_version = 1
+        self.altchord: str | None = None
+        self.totbeat: str | None = None
+        self.length: fractions.Fraction | float | None = None
+        self.dcml_version: int = 1
 
 class TabChordV2(TabChordBase):
     '''
     An intermediate representation format for moving between tabular data in
     DCML v2 and music21 chords.
     '''
-    def __init__(self):
+    def __init__(self) -> None:
         # self.numeral and self.relativeroot defined in super().__init__()
         super().__init__()
-        self.mn = None
-        self.mn_onset = None
-        self.volta = None
-        self.globalkey = None
-        self.localkey = None
-        self.dcml_version = 2
+        self.mn: int = 0
+        self.mn_onset: float = 0.0
+        self.volta: str = ''
+        self.globalkey: str = ''
+        self.localkey: str = ''
+        self.dcml_version: int = 2
 
     @property
     def beat(self) -> float:
