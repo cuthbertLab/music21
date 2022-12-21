@@ -1515,7 +1515,7 @@ class Chord(ChordBase):
         self: _ChordType,
         *,
         forceOctave: int | None = None,
-        inPlace: t.Literal[True] | t.Literal[False] = False,
+        inPlace: bool = False,
         leaveRedundantPitches: bool = False
     ) -> _ChordType | None:
         '''
