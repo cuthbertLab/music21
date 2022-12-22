@@ -3267,9 +3267,11 @@ class MeasureExporter(XMLExporterBase):
         # a first pass, emitting any pre/postList for any object that is functioning as a
         # spanner anchor (the SpannerAnchors, as well as any GeneralNotes that are in
         # spanners). Then we will back up and actually emit the notes, etc.
+        objGroup: list[base.Music21Object]
+        objIterator: OffsetIterator[base.Music21Object] = OffsetIterator(m)
         hasSpannerAnchors: bool = bool(list(m[spanner.SpannerAnchor]))
         if hasSpannerAnchors:
-            for objGroup in OffsetIterator(m):
+            for objGroup in objIterator:
                 if not any(self._hasPrePostObjectSpanners(obj) for obj in objGroup):
                     continue
                 groupOffset = m.elementOffset(objGroup[0])
@@ -3297,7 +3299,6 @@ class MeasureExporter(XMLExporterBase):
         # group all objects by offsets and then do a different order than normal sort.
         # that way chord symbols and other 0-width objects appear before notes as much as
         # possible.
-        objGroup: list[base.Music21Object]
         objIterator: OffsetIterator[base.Music21Object] = OffsetIterator(m)
         for objGroup in objIterator:
             groupOffset = m.elementOffset(objGroup[0])
