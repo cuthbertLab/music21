@@ -1815,9 +1815,11 @@ class Unpitched(NotRest):
 
     equalityAttributes = ('displayStep', 'displayOctave')
 
-    def __init__(self,
-                 displayName=None,
-                 **keywords):
+    def __init__(
+        self,
+        displayName: str | None = None,
+        **keywords
+    ):
         super().__init__(**keywords)
         self._chordAttached: percussion.PercussionChord | None = None
 
@@ -1826,7 +1828,7 @@ class Unpitched(NotRest):
         if displayName:
             display_pitch = Pitch(displayName)
             self.displayStep = display_pitch.step
-            self.displayOctave = display_pitch.octave
+            self.displayOctave = display_pitch.implicitOctave
 
     def _getStoredInstrument(self):
         return self._storedInstrument

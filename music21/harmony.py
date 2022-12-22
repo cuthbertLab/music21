@@ -94,8 +94,8 @@ CHORD_TYPES = collections.OrderedDict([
     ('minor-11th', ['1,-3,5,-7,9,11', ['m11', 'min11']]),  # Y
     ('augmented-major-11th', ['1,3,#5,7,9,11', ['+M11', 'augmaj11']]),  # N
     ('augmented-11th', ['1,3,#5,-7,9,11', ['+11', 'aug11']]),  # N
-    ('half-diminished-11th', ['1,-3,-5,-7,-9,11', ['ø11']]),  # N
-    ('diminished-11th', ['1,-3,-5,--7,-9,-11', ['o11', 'dim11']]),  # N
+    ('half-diminished-11th', ['1,-3,-5,-7,9,11', ['ø11']]),  # N
+    ('diminished-11th', ['1,-3,-5,--7,9,11', ['o11', 'dim11']]),  # N
 
     # thirteenths
     ('major-13th', ['1,3,5,7,9,11,13', ['M13', 'Maj13']]),  # Y
@@ -597,6 +597,14 @@ class ChordStepModification(prebase.ProtoM21Object):
     def _reprInternal(self):
         return f'modType={self.modType} degree={self.degree} interval={self.interval}'
 
+    def __eq__(self, other):
+        return (
+            isinstance(other, ChordStepModification)
+            and self.modType == other.modType
+            and self.degree == other.degree
+            and self.interval == other.interval
+        )
+
     # PUBLIC PROPERTIES #
 
     @property
@@ -912,11 +920,11 @@ def chordSymbolFigureFromChord(inChord: chord.Chord, includeChordType=False):
     >>> harmony.chordSymbolFigureFromChord(c, True)
     ('F+11', 'augmented-11th')
 
-    >>> c = chord.Chord(['G3', 'B-3', 'D-4', 'F4', 'A-3', 'C4'])
+    >>> c = chord.Chord(['G3', 'B-3', 'D-4', 'F4', 'A3', 'C4'])
     >>> harmony.chordSymbolFigureFromChord(c, True)
     ('Gø11', 'half-diminished-11th')
 
-    >>> c = chord.Chord(['E-3', 'G-3', 'B--3', 'D--4', 'F-3', 'A--3'])
+    >>> c = chord.Chord(['E-3', 'G-3', 'B--3', 'D--4', 'F3', 'A-3'])
     >>> harmony.chordSymbolFigureFromChord(c, True)
     ('E-o11', 'diminished-11th')
 
@@ -1890,7 +1898,7 @@ class ChordSymbol(Harmony):
 
         return notationString
 
-    def _parseFigure(self):
+    def _parseFigure(self) -> None:
         '''
         Translate the figure string (regular expression) into a meaningful
         Harmony object by identifying the root, bass, inversion, kind, and

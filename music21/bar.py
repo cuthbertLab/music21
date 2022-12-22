@@ -266,7 +266,7 @@ class Repeat(repeat.RepeatMark, Barline):
         {4.0} <music21.bar.Barline type=double>
     '''
     # _repeatDots = None  # not sure what this is for; inherited from old modules
-    def __init__(self, direction='start', times=None, **keywords):
+    def __init__(self, direction: str = 'start', times: int | None = None, **keywords):
         repeat.RepeatMark.__init__(self)
         if direction == 'start':
             barType = 'heavy-light'

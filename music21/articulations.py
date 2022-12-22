@@ -140,7 +140,7 @@ class Articulation(base.Music21Object):
     '''
     _styleClass: type[style.Style] = style.TextStyle
 
-    def __init__(self, **keywords):
+    def __init__(self, **keywords) -> None:
         super().__init__(**keywords)
         self.placement = None
         # declare a unit interval shift for the performance of this articulation

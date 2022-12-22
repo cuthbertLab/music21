@@ -48,6 +48,7 @@ from __future__ import annotations
 import copy
 import math
 import re
+import typing as t
 import unittest
 
 from music21 import articulations
@@ -75,6 +76,9 @@ from music21 import tie
 from music21.humdrum import testFiles
 from music21.humdrum import harmparser
 from music21.humdrum import instruments
+
+if t.TYPE_CHECKING:
+    import pathlib
 
 environLocal = environment.Environment('humdrum.spineParser')
 
@@ -786,11 +790,11 @@ class HumdrumFile(HumdrumDataCollection):
     as a mandatory argument a filename to be opened and read.
     '''
 
-    def __init__(self, filename=None):
+    def __init__(self, filename: str | pathlib.Path | None = None):
         super().__init__()
         self.filename = filename
 
-    def parseFilename(self, filename=None):
+    def parseFilename(self, filename: str | pathlib.Path | None = None):
         if filename is None:
             filename = self.filename
         if filename is None:
@@ -855,7 +859,7 @@ class SpineLine(HumdrumLine):
     isSpineLine = True
     numSpines = 0
 
-    def __init__(self, position=0, contents=''):
+    def __init__(self, position: int = 0, contents: str = ''):
         self.position = position
         contents = contents.rstrip()
         returnList = re.split('\t+', contents)
@@ -910,7 +914,7 @@ class GlobalReferenceLine(HumdrumLine):
     isSpineLine = False
     numSpines = 0
 
-    def __init__(self, position=0, contents='!!! NUL: None'):
+    def __init__(self, position: int = 0, contents: str = '!!! NUL: None'):
         self.position = position
         noExclaim = re.sub(r'^!!!+', '', contents)
         try:
@@ -961,7 +965,7 @@ class GlobalCommentLine(HumdrumLine):
     isSpineLine = False
     numSpines = 0
 
-    def __init__(self, position=0, contents=''):
+    def __init__(self, position: int = 0, contents: str = ''):
         self.position = position
         value = re.sub(r'^!!+\s?', '', contents)
         self.contents = contents
@@ -1564,23 +1568,22 @@ class SpineEvent(prebase.ProtoM21Object):
     >>> n
     <music21.note.Note E->
     '''
-    def __init__(self, contents=None, position=0):
-        self.contents = contents
-        self.position = position
+    def __init__(self, contents: str = '', position: int = 0):
+        self.contents: str = contents
+        self.position: int = position
         self.protoSpineId: int = 0
         self.spineId: int | None = None
 
     def _reprInternal(self):
-        return str(self.contents)
+        return self.contents
 
     def __str__(self):
-        return str(self.contents)
+        return self.contents
 
     def toNote(self, convertString=None):
         r'''
         parse the object as a \*\*kern note and return a
         :class:`~music21.note.Note` object (or Rest, or Chord)
-
 
         >>> se = humdrum.spineParser.SpineEvent('DD#4')
         >>> n = se.toNote()
@@ -1983,7 +1986,7 @@ class SpineCollection(prebase.ProtoM21Object):
                             lyric = prioritiesToSearch[el.priority].contents
                             el.lyric = lyric
 
-    def makeVoices(self):
+    def makeVoices(self) -> None:
         '''
         make voices for each kernSpine -- why not just run
         stream.makeVoices() ? because we have more information
@@ -2018,9 +2021,12 @@ class SpineCollection(prebase.ProtoM21Object):
                     voiceNumber = int(voiceName[5])
                     voicePart = voices[voiceNumber]
                     if voicePart is None:
-                        voices[voiceNumber] = stream.Voice()
-                        voicePart = voices[voiceNumber]
+                        voicePart = stream.Voice()
+                        voices[voiceNumber] = voicePart
                         voicePart.groups.append(voiceName)
+                    if t.TYPE_CHECKING:
+                        assert voicePart is not None
+
                     mElOffset = mEl.offset
                     el.remove(mEl)
                     voicePart.coreInsert(mElOffset - lowestVoiceOffset, mEl)
@@ -2833,7 +2839,7 @@ class GlobalReference(base.Music21Object):
         'RWB': ''  # a warning about the representation
     }
 
-    def updateMetadata(self, md):
+    def updateMetadata(self, md: metadata.Metadata):
         '''
         update a metadata object according to information in this GlobalReference
 

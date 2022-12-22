@@ -1714,7 +1714,7 @@ class Test(unittest.TestCase):
         a = corpus.parse('bach/bwv324.xml')
         # get notes from one measure
 
-        mOffsetMap = a.parts[0].flatten().measureOffsetMap(note.Note)
+        mOffsetMap = a.parts[0].flatten().measureOffsetMap([note.Note])
         self.assertEqual(sorted(list(mOffsetMap.keys())),
                          [0.0, 4.0, 8.0, 12.0, 16.0, 20.0, 24.0, 34.0, 38.0])
 
@@ -1728,22 +1728,21 @@ class Test(unittest.TestCase):
 
         m1 = a.parts[0].getElementsByClass(Measure)[1]
         # m1.show('text')
-        mOffsetMap = m1.measureOffsetMap(note.Note)
+        mOffsetMap = m1.measureOffsetMap([note.Note])
         # offset here is that of measure that originally contained this note
         # environLocal.printDebug(['m1', m1, 'mOffsetMap', mOffsetMap])
         self.assertEqual(sorted(list(mOffsetMap.keys())), [4.0])
 
         m2 = a.parts[0].getElementsByClass(Measure)[2]
-        mOffsetMap = m2.measureOffsetMap(note.Note)
+        mOffsetMap = m2.measureOffsetMap([note.Note])
         # offset here is that of measure that originally contained this note
         self.assertEqual(sorted(list(mOffsetMap.keys())), [8.0])
 
-        mOffsetMap = a.flatten().measureOffsetMap('Note')
+        mOffsetMap = a.flatten().measureOffsetMap(['Note'])
         self.assertEqual(sorted(mOffsetMap.keys()),
                          [0.0, 4.0, 8.0, 12.0, 16.0, 20.0, 24.0, 34.0, 38.0])
 
     def testMeasureOffsetMapPostTie(self):
-
         a = corpus.parse('bach/bwv4.8')
         # alto line syncopated/tied notes across bars
         # a.show()
@@ -1775,7 +1774,7 @@ class Test(unittest.TestCase):
         self.assertEqual(mNo, 4)
 
         # can we get an offset Measure map by looking for measures
-        post = altoPostTie.measureOffsetMap(Measure)
+        post = altoPostTie.measureOffsetMap([Measure])
         # yes, retainContainers defaults to True
         self.assertEqual(list(post.keys()), correctMeasureOffsetMap)
 

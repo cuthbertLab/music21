@@ -87,7 +87,7 @@ class SubConverter:
     codecWrite: bool = False
     stringEncoding: str = 'utf-8'
 
-    def __init__(self, **keywords):
+    def __init__(self, **keywords) -> None:
         self._stream: stream.Score | stream.Part | stream.Opus = stream.Score()
         self.keywords: dict[str, t.Any] = keywords
 
@@ -1501,7 +1501,7 @@ class ConverterMuseData(SubConverter):
                 # environLocal.printDebug(['partStr', len(partStr)])
                 mdw.addString(partStr)
         else:
-            if fp.is_dir:
+            if fp.is_dir():
                 mdd = musedataModule.MuseDataDirectory(fp)
                 fpList = mdd.getPaths()
             elif not common.isListLike(fp):

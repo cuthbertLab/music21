@@ -1577,7 +1577,7 @@ class OffsetIterator(StreamIterator, Sequence[list[M21ObjType]]):
                  restoreActiveSites=True,
                  activeInformation=None,
                  ignoreSorting=False
-                 ):
+                 ) -> None:
         super().__init__(srcStream,
                          # restrictClass=restrictClass,
                          filterList=filterList,
@@ -1593,7 +1593,7 @@ class OffsetIterator(StreamIterator, Sequence[list[M21ObjType]]):
         if self.raiseStopIterationNext:
             raise StopIteration
 
-        retElementList = None
+        retElementList: list[M21ObjType] = []
         # make sure that cleanup is not called during the loop...
         try:
             if self.nextToYield:
@@ -1761,17 +1761,18 @@ class RecursiveIterator(StreamIterator, Sequence[M21ObjType]):
     >>> bool(expressive)
     True
     '''
-    def __init__(self,
-                 srcStream,
-                 *,
-                 # restrictClass: type[M21ObjType] = base.Music21Object,
-                 filterList=None,
-                 restoreActiveSites=True,
-                 activeInformation=None,
-                 streamsOnly=False,
-                 includeSelf=False,
-                 ignoreSorting=False
-                 ):  # , parentIterator=None):
+    def __init__(
+        self,
+        srcStream,
+        *,
+        # restrictClass: type[M21ObjType] = base.Music21Object,
+        filterList=None,
+        restoreActiveSites=True,
+        activeInformation=None,
+        streamsOnly=False,
+        includeSelf=False,
+        ignoreSorting=False
+    ) -> None:  # , parentIterator=None):
         super().__init__(srcStream,
                          # restrictClass=restrictClass,
                          filterList=filterList,

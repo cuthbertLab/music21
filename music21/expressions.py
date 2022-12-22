@@ -736,7 +736,7 @@ class Trill(Ornament):
 
     * Changed in v7: the size should be a generic second.
     '''
-    def __init__(self, **keywords):
+    def __init__(self, **keywords) -> None:
         super().__init__(**keywords)
         self.size: interval.IntervalBase = interval.GenericInterval(2)
 
@@ -1545,11 +1545,12 @@ class ArpeggioMark(Expression):
     '''
     def __init__(self, arpeggioType: str | None = None, **keywords):
         super().__init__(**keywords)
-        if arpeggioType is None:
+        if not arpeggioType:
             arpeggioType = 'normal'
         if arpeggioType not in ('normal', 'up', 'down', 'non-arpeggio'):
             raise ValueError(
-                'Arpeggio type must be "normal", "up", "down", or "non-arpeggio"'
+                'Arpeggio type must be "normal", "up", "down", or "non-arpeggio", '
+                + f'not {arpeggioType!r}.'
             )
         self.type = arpeggioType
 
@@ -1590,7 +1591,8 @@ class ArpeggioMarkSpanner(spanner.Spanner):
 
         if arpeggioType not in ('normal', 'up', 'down', 'non-arpeggio'):
             raise ValueError(
-                'Arpeggio type must be "normal", "up", "down", or "non-arpeggio"'
+                'Arpeggio type must be "normal", "up", "down", or "non-arpeggio", '
+                + f'not {arpeggioType!r}.'
             )
         self.type = arpeggioType
 
