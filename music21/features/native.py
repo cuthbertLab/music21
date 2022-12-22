@@ -106,10 +106,13 @@ class QualityFeature(featuresModule.FeatureExtractor):
         self.isSequential = True
         self.dimensions = 1
 
-    def process(self):
+    def process(self) -> None:
         '''
         Do processing necessary, storing result in feature.
         '''
+        if self.data is None or self.feature is None:  # pragma: no cover
+            raise ValueError('Cannot process without a data instance or feature.')
+
         allKeys = self.data['flat.getElementsByClass(Key)']
         keyFeature: int | None = None
         if len(allKeys) == 1:

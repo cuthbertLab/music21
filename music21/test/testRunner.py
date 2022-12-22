@@ -83,7 +83,7 @@ def addDocAttrTestsToSuite(suite,
             suite.addTest(dtc)
 
 
-def fixDoctests(doctestSuite):
+def fixDoctests(doctestSuite: doctest._DocTestSuite) -> None:
     r'''
     Fix doctests so that addresses are sanitized.
 

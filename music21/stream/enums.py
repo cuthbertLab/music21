@@ -55,6 +55,12 @@ class RecursionType(StrEnum):
     ELEMENTS_ONLY = 'elementsOnly'
 
 
+class ShowNumber(StrEnum):
+    DEFAULT = 'default'
+    ALWAYS = 'always'
+    NEVER = 'never'
+
+
 if __name__ == '__main__':
     from music21 import mainTest
     mainTest()

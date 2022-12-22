@@ -263,7 +263,7 @@ def nextSmallerType(durType: str) -> str:
     return ordinalTypeFromNum[thisOrdinal + 1]
 
 
-def quarterLengthToClosestType(qLen: OffsetQLIn):
+def quarterLengthToClosestType(qLen: OffsetQLIn) -> tuple[str, bool]:
     '''
     Returns a two-unit tuple consisting of
 
@@ -301,6 +301,7 @@ def quarterLengthToClosestType(qLen: OffsetQLIn):
     music21.duration.DurationException: Cannot return types smaller than 2048th;
         qLen was: 0.00146484375
     '''
+    noteLengthType: OffsetQL
     if isinstance(qLen, fractions.Fraction):
         noteLengthType = 4 / qLen  # divides right...
     else:
@@ -784,7 +785,7 @@ def convertTypeToQuarterLength(
         raise DurationException(
             f'no such type ({dType}) available for conversion')
 
-    qtrLength = durationFromType
+    qtrLength: OffsetQL = durationFromType
 
     # weird medieval notational device; rarely used.
     if dotGroups is not None and len(dotGroups) > 1:

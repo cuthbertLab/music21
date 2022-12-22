@@ -126,7 +126,7 @@ class Clef(base.Music21Object):
     _styleClass = style.TextStyle
     classSortOrder = 0
 
-    def __init__(self, **keywords):
+    def __init__(self, **keywords) -> None:
         super().__init__(**keywords)
         self.sign: str | None = None
         # line counts start from the bottom up, the reverse of musedata
@@ -283,7 +283,7 @@ class PitchClef(Clef):
             ''',
     }
 
-    def __init__(self, **keywords):
+    def __init__(self, **keywords) -> None:
         super().__init__(**keywords)
         self.lowestLine: int = 31
 
