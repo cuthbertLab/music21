@@ -117,7 +117,7 @@ class Test(unittest.TestCase):
 
         self.assertIn(
             stripInnerSpaces(
-                '''<measure number="0">
+                '''<measure implicit="no" number="0">
                       <attributes>
                         <divisions>10080</divisions>
                       </attributes>
