@@ -5,13 +5,14 @@
 #
 # Authors:      Mark Gotham
 #
-# Copyright:    Copyright © 2019 Michael Scott Asato Cuthbert and the music21 Project
+# Copyright:    Copyright © 2019 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
 Converter for parsing the tabular representations of harmonic analysis such as the
 DCMLab's Annotated Beethoven Corpus (Neuwirth et al. 2018).
 '''
+from __future__ import annotations
 
 import abc
 import csv
@@ -23,6 +24,7 @@ import unittest
 
 from music21 import chord
 from music21 import common
+from music21 import environment
 from music21 import harmony
 from music21 import key
 from music21 import metadata
@@ -30,20 +32,9 @@ from music21 import meter
 from music21 import roman
 from music21 import stream
 
-from music21 import exceptions21
-
-from music21 import environment
 environLocal = environment.Environment()
 
 # ------------------------------------------------------------------------------
-
-
-class TsvException(exceptions21.Music21Exception):
-    pass
-
-
-# ------------------------------------------------------------------------------
-
 # V1_HEADERS and V2_HEADERS specify the columns that we process from the DCML
 # files, together with the type that the columns should be coerced to (usually
 # str)
@@ -170,29 +161,29 @@ class TabChordBase(abc.ABC):
     between tabular data and music21 chords.
     '''
 
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__()
-        self.numeral = None
-        self.relativeroot = None
-        self.representationType = None  # Added (not in DCML)
-        self.extra: t.Dict[str, str] = {}
+        self.numeral: str = ''
+        self.relativeroot: str | None = None
+        self.representationType: str | None = None  # Added (not in DCML)
+        self.extra: dict[str, str] = {}
         self.dcml_version = -1
 
         # shared between DCML v1 and v2
-        self.chord = None
-        self.timesig = None
-        self.pedal = None
-        self.form = None
-        self.figbass = None
-        self.changes = None
-        self.phraseend = None
+        self.chord: str = ''
+        self.timesig: str = ''
+        self.pedal: str | None = None
+        self.form: str | None = None
+        self.figbass: str | None = None
+        self.changes: str | None = None
+        self.phraseend: str | None = None
 
         # the following attributes are overwritten by properties in TabChordV2
         # because of changed column names in DCML v2
-        self.local_key = None
-        self.global_key = None
-        self.beat = None
-        self.measure = None
+        self.local_key: str = ''
+        self.global_key: str = ''
+        self.beat: float = 1.0
+        self.measure: int = 1
 
     @property
     def combinedChord(self) -> str:
@@ -277,36 +268,36 @@ class TabChordBase(abc.ABC):
             if self.relativeroot:  # If there's a relative root ...
                 if isMinor(self.relativeroot):  # ... and it's minor too, change it and the figure
                     self.relativeroot = characterSwaps(self.relativeroot,
-                                                        minor=True,
-                                                        direction=direction)
+                                                       minor=True,
+                                                       direction=direction)
                     self.numeral = characterSwaps(self.numeral,
-                                                        minor=True,
-                                                        direction=direction)
+                                                  minor=True,
+                                                  direction=direction)
                 else:  # ... rel. root but not minor
                     self.relativeroot = characterSwaps(self.relativeroot,
-                                                        minor=False,
-                                                        direction=direction)
+                                                       minor=False,
+                                                       direction=direction)
             else:  # No relative root
                 self.numeral = characterSwaps(self.numeral,
-                                                minor=True,
-                                                direction=direction)
+                                              minor=True,
+                                              direction=direction)
         else:  # local key not minor
             if self.relativeroot:  # if there's a relativeroot ...
                 if isMinor(self.relativeroot):  # ... and it's minor, change it and the figure
                     self.relativeroot = characterSwaps(self.relativeroot,
-                                                        minor=False,
-                                                        direction=direction)
+                                                       minor=False,
+                                                       direction=direction)
                     self.numeral = characterSwaps(self.numeral,
-                                                    minor=True,
-                                                    direction=direction)
+                                                  minor=True,
+                                                  direction=direction)
                 else:  # ... rel. root but not minor
                     self.relativeroot = characterSwaps(self.relativeroot,
-                                                        minor=False,
-                                                        direction=direction)
+                                                       minor=False,
+                                                       direction=direction)
             else:  # No relative root
                 self.numeral = characterSwaps(self.numeral,
-                                                minor=False,
-                                                direction=direction)
+                                              minor=False,
+                                              direction=direction)
 
     def tabToM21(self) -> harmony.Harmony:
         '''
@@ -376,9 +367,9 @@ class TabChordBase(abc.ABC):
 
     def populateFromRow(
         self,
-        row: t.List[str],
-        headIndices: t.Dict[str, t.Tuple[int, t.Type]],
-        extraIndices: t.Dict[int, str]
+        row: list[str],
+        headIndices: dict[str, tuple[int, type]],
+        extraIndices: dict[int, str]
     ) -> None:
         # To implement without calling setattr we would need to repeat lines
         #   similar to the following three lines for every attribute (with
@@ -526,22 +517,23 @@ class TsvHandler:
     def __init__(self, tsvFile: str, dcml_version: int = 1):
         if dcml_version == 1:
             self.heading_names = HEADERS[1]
-            self._tab_chord_cls: t.Type[TabChordBase] = TabChord
+            self._tab_chord_cls: type[TabChordBase] = TabChord
         elif dcml_version == 2:
             self.heading_names = HEADERS[2]
             self._tab_chord_cls = TabChordV2
         else:
             raise ValueError(f'dcml_version {dcml_version} is not in (1, 2)')
         self.tsvFileName = tsvFile
-        self.chordList: t.List[TabChordBase] = []
-        self.m21stream: t.Optional[stream.Score] = None
-        self._head_indices: t.Dict[str, t.Tuple[int, t.Union[t.Type, t.Any]]] = {}
-        self._extra_indices: t.Dict[int, str] = {}
+        self.chordList: list[TabChordBase] = []
+        self.m21stream: stream.Score | None = None
+        self._head_indices: dict[str, tuple[int, type | t.Any]] = {}
+        self._extra_indices: dict[int, str] = {}
         self.dcml_version = dcml_version
         self.tsvData = self._importTsv()  # converted to private
 
-    def _get_heading_indices(self, header_row: t.List[str]) -> None:
-        '''Private method to get column name/column index correspondences.
+    def _get_heading_indices(self, header_row: list[str]) -> None:
+        '''
+        Private method to get column name/column index correspondences.
 
         Expected column indices (those in HEADERS, which correspond to TabChord
         attributes) are stored in self._head_indices. Others go in
@@ -556,7 +548,7 @@ class TsvHandler:
             else:
                 self._extra_indices[i] = col_name
 
-    def _importTsv(self) -> t.List[t.List[str]]:
+    def _importTsv(self) -> list[list[str]]:
         '''
         Imports TSV file data for further processing.
         '''
@@ -569,7 +561,7 @@ class TsvHandler:
             self._get_heading_indices(next(tsvreader))
             return list(tsvreader)
 
-    def _makeTabChord(self, row: t.List[str]) -> TabChordBase:
+    def _makeTabChord(self, row: list[str]) -> TabChordBase:
         '''
         Makes a TabChord out of a list imported from TSV data
         (a row of the original tabular format -- see TsvHandler.importTsv()).
@@ -682,7 +674,7 @@ class TsvHandler:
 
         currentMeasureLength = ts.barDuration.quarterLength
 
-        currentOffset: t.Union[float, fractions.Fraction] = 0.0
+        currentOffset: float | fractions.Fraction = 0.0
 
         previousMeasure: int = self.chordList[0].measure - 1  # Covers pickups
         for entry in self.chordList:
@@ -705,7 +697,7 @@ class TsvHandler:
                 if entry.timesig != currentTimeSig:
                     newTS = meter.TimeSignature(entry.timesig)
                     m.insert(entry.beat - 1, newTS)
-                    currentTimeSig = entry.timesig
+                    currentTimeSig = entry.timesig or ''
                     currentMeasureLength = newTS.barDuration.quarterLength
 
                 previousMeasure = entry.measure
@@ -748,7 +740,7 @@ class M21toTSV:
             raise ValueError(f'dcml_version {dcml_version} is not in (1, 2)')
         self.tsvData = self.m21ToTsv()
 
-    def m21ToTsv(self) -> t.List[t.List[str]]:
+    def m21ToTsv(self) -> list[list[str]]:
         '''
         Converts a list of music21 chords to a list of lists
         which can then be written to a tsv file with toTsv(), or processed another way.
@@ -757,7 +749,7 @@ class M21toTSV:
             return self._m21ToTsv_v1()
         return self._m21ToTsv_v2()
 
-    def _m21ToTsv_v1(self) -> t.List[t.List[str]]:
+    def _m21ToTsv_v1(self) -> list[list[str]]:
         tsvData = []
         # take the global_key from the first item
         global_key = next(
@@ -779,8 +771,8 @@ class M21toTSV:
 
             thisEntry.combinedChord = thisRN.figure  # NB: slightly different from DCML: no key.
             thisEntry.altchord = altChord
-            thisEntry.measure = thisRN.measureNumber
-            thisEntry.beat = thisRN.beat
+            thisEntry.measure = thisRN.measureNumber if thisRN.measureNumber is not None else 1
+            thisEntry.beat = float(thisRN.beat)
             thisEntry.totbeat = None
             ts = thisRN.getContextByClass(meter.TimeSignature)
             if ts is None:
@@ -814,8 +806,8 @@ class M21toTSV:
 
         return tsvData
 
-    def _m21ToTsv_v2(self) -> t.List[t.List[str]]:
-        tsvData: t.List[t.List[str]] = []
+    def _m21ToTsv_v2(self) -> list[list[str]]:
+        tsvData: list[list[str]] = []
 
         # take the global_key from the first item
         first_rn = self.m21Stream[roman.RomanNumeral].first()
@@ -970,7 +962,7 @@ def handleAddedTones(dcmlChord: str) -> str:
     figure = m.group('figure')
     if primary == 'V' and added_tones == '64':
         return 'Cad64' + secondary
-    added_tone_tuples: t.List[t.Tuple[str, str, str, str]] = re.findall(
+    added_tone_tuples: list[tuple[str, str, str, str]] = re.findall(
         r'''
             (\+|-)?  # indicates whether to add or remove chord factor
             (\^|v)?  # indicates whether tone replaces chord factor above/below
@@ -980,8 +972,8 @@ def handleAddedTones(dcmlChord: str) -> str:
         added_tones,
         re.VERBOSE
     )
-    additions: t.List[str] = []
-    omissions: t.List[str] = []
+    additions: list[str] = []
+    omissions: list[str] = []
     if figure in ('', '5', '53', '5/3', '3', '7'):
         omission_threshold = 7
     else:

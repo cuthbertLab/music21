@@ -7,27 +7,29 @@
 #               Michael Scott Asato Cuthbert
 #
 # Copyright:    Copyright © 2009-2022 Michael Scott Asato Cuthbert
-#               and the music21 Project
 # License:      BSD, see license.txt
 # -----------------------------------------------------------------------------
+from __future__ import annotations
+
 import collections
 import fractions
 from functools import lru_cache
+import math
 import re
 import typing as t
 
 from music21 import common
-from music21 import environment
 from music21.common.enums import MeterDivision
+from music21 import environment
 from music21.exceptions21 import MeterException, Music21Exception, TimeSignatureException
 
 environLocal = environment.Environment('meter.tools')
 
 MeterTerminalTuple = collections.namedtuple('MeterTerminalTuple',
                                             ['numerator', 'denominator', 'division'])
-NumDenom = t.Tuple[int, int]
-NumDenomTuple = t.Tuple[NumDenom, ...]
-MeterOptions = t.Tuple[t.Tuple[str, ...], ...]
+NumDenom = tuple[int, int]
+NumDenomTuple = tuple[NumDenom, ...]
+MeterOptions = tuple[tuple[str, ...], ...]
 
 validDenominators = [1, 2, 4, 8, 16, 32, 64, 128]  # in order
 validDenominatorsSet = set(validDenominators)
@@ -79,9 +81,9 @@ def slashCompoundToFraction(value: str) -> NumDenomTuple:
     >>> meter.tools.slashCompoundToFraction('5/8+2/4+6/8')
     ((5, 8), (2, 4), (6, 8))
 
-    Changed in v7 -- new location and returns a tuple.
+    * Changed in v7: new location and returns a tuple.
     '''
-    post: t.List[NumDenom] = []
+    post: list[NumDenom] = []
     value = value.strip()  # rem whitespace
     valueList = value.split('+')
     for part in valueList:
@@ -94,7 +96,7 @@ def slashCompoundToFraction(value: str) -> NumDenomTuple:
 
 
 @lru_cache(512)
-def slashMixedToFraction(valueSrc: str) -> t.Tuple[NumDenomTuple, bool]:
+def slashMixedToFraction(valueSrc: str) -> tuple[NumDenomTuple, bool]:
     '''
     Given a mixture if possible meter fraction representations, return a tuple
     of two elements: The first element is a tuple of pairs of numerator, denominators
@@ -129,10 +131,10 @@ def slashMixedToFraction(valueSrc: str) -> t.Tuple[NumDenomTuple, bool]:
     Traceback (most recent call last):
     music21.exceptions21.TimeSignatureException: Cannot create time signature from "3.0/4.0"
 
-    Changed in v7 -- new location and returns a tuple as first value.
+    * Changed in v7: new location and returns a tuple as first value.
     '''
-    pre: t.List[t.Union[NumDenom, t.Tuple[int, None]]] = []
-    post: t.List[NumDenom] = []
+    pre: list[NumDenom | tuple[int, None]] = []
+    post: list[NumDenom] = []
     summedNumerator = False
     value = valueSrc.strip()  # rem whitespace
     value = value.split('+')
@@ -166,7 +168,7 @@ def slashMixedToFraction(valueSrc: str) -> t.Tuple[NumDenomTuple, bool]:
             post.append((intNum, intDenom))
         else:  # search ahead for next defined denominator
             summedNumerator = True
-            match: t.Optional[int] = None
+            match: int | None = None
             for j in range(i, len(pre)):  # this O(n^2) operation is easily simplified to O(n)
                 if pre[j][1] is not None:
                     match = pre[j][1]
@@ -181,7 +183,7 @@ def slashMixedToFraction(valueSrc: str) -> t.Tuple[NumDenomTuple, bool]:
 
 
 @lru_cache(512)
-def fractionToSlashMixed(fList: NumDenomTuple) -> t.Tuple[t.Tuple[str, int], ...]:
+def fractionToSlashMixed(fList: NumDenomTuple) -> tuple[tuple[str, int], ...]:
     '''
     Given a tuple of fraction values, compact numerators by sum if denominators
     are the same
@@ -190,9 +192,9 @@ def fractionToSlashMixed(fList: NumDenomTuple) -> t.Tuple[t.Tuple[str, int], ...
     >>> fractionToSlashMixed(((3, 8), (2, 8), (5, 8), (3, 4), (2, 16), (1, 16), (4, 16)))
     (('3+2+5', 8), ('3', 4), ('2+1+4', 16))
 
-    Changed in v7 -- new location and returns a tuple.
+    * Changed in v7: new location and returns a tuple.
     '''
-    pre: t.List[t.Tuple[t.List[int], int]] = []
+    pre: list[tuple[list[int], int]] = []
     for i in range(len(fList)):
         n: int
         d: int
@@ -215,7 +217,7 @@ def fractionToSlashMixed(fList: NumDenomTuple) -> t.Tuple[t.Tuple[str, int], ...
             pre[match][0].append(n)
 
     # create string representation
-    post: t.List[t.Tuple[str, int]] = []
+    post: list[tuple[str, int]] = []
     for part in pre:
         nStrList = [str(x) for x in part[0]]
         nStr = '+'.join(nStrList)
@@ -266,7 +268,7 @@ def fractionSum(numDenomTuple: NumDenomTuple) -> NumDenom:
         return (n, d)
     else:  # there might be a better way to do this
         d = 1
-        d = common.numberTools.lcm(dListUnique)
+        d = math.lcm(*dListUnique)
         # after finding d, multiply each numerator
         nShift = []
         for i in range(len(nList)):
@@ -310,7 +312,7 @@ def proportionToFraction(value: float) -> NumDenom:
 # load common meter templates into this sequence
 # no need to cache these -- getPartitionOptions is cached
 
-def divisionOptionsFractionsUpward(n, d) -> t.Tuple[str, ...]:
+def divisionOptionsFractionsUpward(n, d) -> tuple[str, ...]:
     '''
     This simply gets restatements of the same fraction in smaller units,
     up to the largest valid denominator.
@@ -336,7 +338,7 @@ def divisionOptionsFractionsUpward(n, d) -> t.Tuple[str, ...]:
     return tuple(opts)
 
 
-def divisionOptionsFractionsDownward(n, d) -> t.Tuple[str, ...]:
+def divisionOptionsFractionsDownward(n, d) -> tuple[str, ...]:
     '''
     Get restatements of the same fraction in larger units
 
@@ -580,7 +582,7 @@ def divisionOptionsAlgo(n, d) -> MeterOptions:
     (('1/128', '1/128', '1/128'), ('3/128',))
     '''
     opts = []
-    group: t.Tuple[int, ...]
+    group: tuple[int, ...]
 
     # compound meters; 6, 9, 12, 15, 18
     # 9/4, 9/2, 6/2 are all considered compound without d>4
@@ -639,7 +641,7 @@ def divisionOptionsPreset(n, d) -> MeterOptions:
     Provide fixed set of meter divisions that will not be easily
     obtained algorithmically.
 
-    Currently does nothing except to allow partitioning 5/8 as 2/8, 2/8, 1/8 as a possibility
+    Currently, does nothing except to allow partitioning 5/8 as 2/8, 2/8, 1/8 as a possibility
     (sim for 5/16, etc.)
 
     >>> meter.tools.divisionOptionsPreset(5, 8)

@@ -6,17 +6,17 @@
 # Authors:      Michael Scott Asato Cuthbert
 #               Christopher Ariza
 #
-# Copyright:    Copyright © 2012-13 Michael Scott Asato Cuthbert and the music21 Project
+# Copyright:    Copyright © 2012-13 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
-
+from __future__ import annotations
 
 import unittest
-import music21  # needed to do fully-qualified isinstance name checking
 
+import music21  # needed to do fully-qualified isinstance name checking
+from music21 import environment
 from music21 import freezeThaw
 
-from music21 import environment
 environLocal = environment.Environment('test.testSerialization')
 
 

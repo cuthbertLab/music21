@@ -1,4 +1,7 @@
+from __future__ import annotations
+
 import fractions
+import typing as t
 import unittest
 import xml.etree.ElementTree as ET
 
@@ -346,7 +349,9 @@ class Test(unittest.TestCase):
         # s.show()
 
     def testImportMetronomeMarksC(self):
-        '''Import tempo into only the first PartStaff'''
+        '''
+        Import tempo into only the first PartStaff
+        '''
         from music21 import corpus
         s = corpus.parse('demos/two-parts')
         self.assertEqual(len(s.parts.first()[tempo.MetronomeMark]), 1)
@@ -1113,6 +1118,14 @@ class Test(unittest.TestCase):
         self.assertIsInstance(notes[3].articulations[0], articulations.StringIndication)
         self.assertEqual(notes[3].articulations[0].number, 2)
 
+    def testArticulationsOnChord(self):
+        from music21 import converter
+        from music21.musicxml import testPrimitive
+
+        s = converter.parse(testPrimitive.multipleFingeringsOnChord)
+        c = s[chord.Chord].first()
+        self.assertEqual(len(c.articulations), 3)
+
     def testFretIndication(self):
         from music21 import converter
 
@@ -1175,16 +1188,16 @@ class Test(unittest.TestCase):
 
                     gnote_index += 1
 
-    def testArpeggioMarkSpanners(self):
+    def testArpeggioMarkSpanners(self) -> None:
         from music21 import converter
         from music21.musicxml import testPrimitive
 
-        s = converter.parse(testPrimitive.multiStaffArpeggios)
+        s = t.cast(stream.Score, converter.parse(testPrimitive.multiStaffArpeggios))
         sb = s.spannerBundle.getByClass(expressions.ArpeggioMarkSpanner)
         self.assertIsNotNone(sb)
         sp = sb[0]
         # go find all the chords and check for spanner vs expressions
-        chords: [chord.Chord] = []
+        chords: list[chord.Chord] = []
         for i, p in enumerate(s.parts):
             # ArpeggioMarkSpanner spans the second chord (index == 1) across both parts
             chords.append(p[chord.Chord][1])
@@ -1254,13 +1267,13 @@ class Test(unittest.TestCase):
         # Measure 3, right barline: <ending number="3" type="stop"/>
         score = converter.parse(testPrimitive.multiDigitEnding)
         repeatBrackets = score.recurse().getElementsByClass(spanner.RepeatBracket)
-        self.assertListEqual(repeatBrackets[0].getNumberList(), [1, 2])
-        self.assertListEqual(repeatBrackets[1].getNumberList(), [3])
+        self.assertListEqual(repeatBrackets[0].numberRange, [1, 2])
+        self.assertListEqual(repeatBrackets[1].numberRange, [3])
 
         nonconformingInput = testPrimitive.multiDigitEnding.replace('1,2', 'ad lib.')
         score2 = converter.parse(nonconformingInput)
         repeatBracket = score2.recurse().getElementsByClass(spanner.RepeatBracket).first()
-        self.assertListEqual(repeatBracket.getNumberList(), [1])
+        self.assertListEqual(repeatBracket.numberRange, [1])
 
     def testChordAlteration(self):
         from music21 import musicxml
@@ -1445,6 +1458,14 @@ class Test(unittest.TestCase):
             unp = PP.getDefaultInstrument(mxScorePart)
         self.assertIsInstance(unp, instrument.UnpitchedPercussion)
         self.assertEqual(unp.percMapPitch, 69)
+
+    def testImportImplicitMeasureNumber(self):
+        from music21 import converter
+
+        xml_dir = common.getSourceFilePath() / 'musicxml' / 'lilypondTestSuite'
+        s = converter.parse(xml_dir / '46d-PickupMeasure-ImplicitMeasures.xml')
+        m = s[stream.Measure].first()
+        self.assertIs(m.showNumber, stream.enums.ShowNumber.NEVER)
 
 
 if __name__ == '__main__':

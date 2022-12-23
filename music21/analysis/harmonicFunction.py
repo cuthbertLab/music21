@@ -5,10 +5,11 @@
 #
 # Authors:      Mark Gotham
 #
-# Copyright:    Copyright © 2022 Michael Scott Asato Cuthbert and the music21 Project
+# Copyright:    Copyright © 2022 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
-import typing as t
+from __future__ import annotations
+
 import unittest
 
 from music21 import common
@@ -101,8 +102,8 @@ functionFigureTuplesMinor = {
 
 
 def functionToRoman(thisHarmonicFunction: HarmonicFunction,
-                    keyOrScale: t.Union[key.Key, scale.Scale, str] = 'C'
-                    ) -> t.Optional[roman.RomanNumeral]:
+                    keyOrScale: key.Key | scale.ConcreteScale | str = 'C'
+                    ) -> roman.RomanNumeral | None:
     '''
     Takes harmonic function labels (such as 'T' for major tonic)
     with a key (keyOrScale, default = 'C') and
@@ -196,7 +197,7 @@ def functionToRoman(thisHarmonicFunction: HarmonicFunction,
 
 def romanToFunction(rn: roman.RomanNumeral,
                     onlyHauptHarmonicFunction: bool = False
-                    ) -> t.Optional[HarmonicFunction]:
+                    ) -> HarmonicFunction | None:
     '''
     Takes a Roman numeral and returns a corresponding harmonic function label.
 

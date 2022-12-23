@@ -10,21 +10,28 @@
 # Copyright:    Copyright © 2011-2014 Michael Scott Asato Cuthbert and the music21
 #               Project
 # License:      BSD, see license.txt
-# -----------------------------------------------------------------------------
-
+# ----------------------------------------------------------------------------
 '''
 This module defines objects for tracking the derivation of one
 :class:`~music21.stream.Stream` from another.
 '''
+from __future__ import annotations
+
+import weakref
+from collections.abc import Generator
 import functools
 import typing as t
 import unittest
 
 from music21 import common
 from music21.common.objects import SlottedObjectMixin
-# imported by stream
-
 from music21 import environment
+
+
+if t.TYPE_CHECKING:
+    from music21 import base
+
+
 environLocal = environment.Environment('derivation')
 
 
@@ -142,14 +149,14 @@ class Derivation(SlottedObjectMixin):
 
     # INITIALIZER #
 
-    def __init__(self, client=None):
+    def __init__(self, client: base.Music21Object | None = None):
         # store a reference to the Music21Object that has this Derivation object as a property
-        self._client = None
-        self._clientId: t.Optional[int] = None  # store python-id to optimize w/o unwrapping
-        self._method: t.Optional[str] = None
+        self._client: weakref.ReferenceType | None = None
+        self._clientId: int | None = None  # store python-id to optimize w/o unwrapping
+        self._method: str | None = None
         # origin should be stored as a weak ref -- the place where the client was derived from.
         self._origin = None
-        self._originId: t.Optional[int] = None  # store id to optimize w/o unwrapping
+        self._originId: int | None = None  # store id to optimize w/o unwrapping
 
         # set client; can handle None
         self.client = client
@@ -188,7 +195,7 @@ class Derivation(SlottedObjectMixin):
     # PUBLIC PROPERTIES #
 
     @property
-    def client(self) -> t.Optional['music21.base.Music21Object']:
+    def client(self) -> base.Music21Object | None:
         c = common.unwrapWeakref(self._client)
         if c is None and self._clientId is not None:
             self._clientId = None
@@ -198,16 +205,16 @@ class Derivation(SlottedObjectMixin):
         return c
 
     @client.setter
-    def client(self, client: t.Optional['music21.base.Music21Object']):
+    def client(self, client: base.Music21Object | None):
         # client is the Stream that this derivation lives on
         if client is None:
             self._clientId = None
             self._client = None
         else:
             self._clientId = id(client)
-            self._client = common.wrapWeakref(client)
+            self._client = common.wrapWeakref(client)  # type: ignore
 
-    def chain(self) -> t.Generator['music21.base.Music21Object', None, None]:
+    def chain(self) -> Generator[base.Music21Object, None, None]:
         '''
         Iterator/Generator
 
@@ -239,7 +246,7 @@ class Derivation(SlottedObjectMixin):
             origin = origin.derivation.origin
 
     @property
-    def method(self) -> t.Optional[str]:
+    def method(self) -> str | None:
         '''
         Returns or sets the string of the method that was used to generate this
         Stream.
@@ -279,15 +286,15 @@ class Derivation(SlottedObjectMixin):
         return self._method
 
     @method.setter
-    def method(self, method: t.Optional[str]):
+    def method(self, method: str | None):
         self._method = method
 
     @property
-    def origin(self) -> t.Optional['music21.base.Music21Object']:
+    def origin(self) -> base.Music21Object | None:
         return self._origin
 
     @origin.setter
-    def origin(self, origin: t.Optional['music21.base.Music21Object']):
+    def origin(self, origin: base.Music21Object | None):
         # for now, origin is not a weak ref
         if origin is None:
             self._originId = None
@@ -298,7 +305,15 @@ class Derivation(SlottedObjectMixin):
             # self._origin = common.wrapWeakref(origin)
 
     @property
-    def rootDerivation(self) -> t.Optional['music21.base.Music21Object']:
+    def originId(self) -> int | None:
+        '''
+        Return the Python id (=memory location) of the origin.
+        (Same as id(derivation.origin).  Not the same as derivation.origin.ind)
+        '''
+        return self._originId
+
+    @property
+    def rootDerivation(self) -> base.Music21Object | None:
         r'''
         Return a reference to the oldest source of this Stream; that is, chain
         calls to :attr:`~music21.stream.Stream.derivesFrom` until we get to a

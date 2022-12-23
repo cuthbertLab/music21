@@ -1,13 +1,9 @@
 # -*- coding: utf-8 -*-
 '''
-The music21 Framework is Copyright © 2006-2022 Michael Scott Asato Cuthbert
-and the music21 Project
-
-(Michael Scott Asato Cuthbert, principal investigator; cuthbert@mit.edu)
+The music21 Framework is Copyright © 2006-2022 Michael Scott Asato Cuthbert.
 
 Some Rights Reserved
-Released under the BSD (3-clause) license.  For historical reasons, music21
-can also be used under an LGPL license.
+Released under the BSD (3-clause) license.  See license.txt.
 
 See license.txt file for the full license which represents your legal
 obligations in using, modifying, or distributing music21.
@@ -35,20 +31,23 @@ standard, Copyright © 2004-2022 the Contributors to the MusicXML Specification.
 The corpus files have copyrights retained by their
 owners who have allowed them to be included with music21.
 '''
+from __future__ import annotations
+
 import sys
 
-minPythonVersion = (3, 8)
+minPythonVersion = (3, 10)
 minPythonVersionStr = '.'.join([str(x) for x in minPythonVersion])
 if sys.version_info < minPythonVersion:
     # DO NOT CHANGE THIS TO AN f-String -- it needs to run on old python.
     raise ImportError('''
-    Music21 v.8.0+ is a Python {}+ only library.
+    Music21 v9.0+ is a Python {}+ only library.
     Use music21 v1 to run on Python 2.1-2.6.
     Use music21 v4 to run on Python 2.7.
     Use music21 v5.1 to run on Python 3.4.
     Use music21 v5.7 to run on Python 3.5.
     Use music21 v6.7 to run on Python 3.6.
     Use music21 v7.3 to run on Python 3.7
+    Use music21 v8.1 to run on Python 3.8/3.9
 
     If you have the wrong version there are several options for getting
     the right one.
@@ -63,7 +62,8 @@ if sys.version_info < minPythonVersion:
          Try running "python3" instead of "python"
 
     - 2. Upgrade pip and setuptools to the latest version
-         and then "upgrade" music21 to pre-version 5.
+         and then "upgrade" music21 to an earlier version.
+         For instance to install version 4 you'd run:
 
          $ pip install --upgrade pip setuptools
          $ pip install 'music21<5.0'

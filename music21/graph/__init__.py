@@ -8,7 +8,6 @@
 #               Evan Lynch
 #
 # Copyright:    Copyright © 2009-2022 Michael Scott Asato Cuthbert
-#               and the music21 Project
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
@@ -37,16 +36,19 @@ From highest level to lowest level usage, ways of graphing are as follows:
     2. `graph.plot.Class(streamObj).run()`
     3. `plotter = graph.primitives.Class(); plotter.data = ...; plotter.process()`
     4. Use `matplotlib` directly to create any graph, musical or non-musical.
-
 '''
+from __future__ import annotations
+
 __all__ = [
     'axis', 'findPlot', 'plot', 'primitives', 'utilities',
     'plotStream',
 ]
 
+import typing as t
 import unittest
 
 from music21 import common
+from music21 import environment
 
 from music21.graph import axis
 from music21.graph import findPlot
@@ -54,13 +56,17 @@ from music21.graph import plot
 from music21.graph import primitives
 from music21.graph import utilities
 
-from music21 import environment
+
+if t.TYPE_CHECKING:
+    from music21 import stream
+
+
 environLocal = environment.Environment('graph')
 
 
 def plotStream(
-    streamObj,
-    graphFormat=None,
+    streamObj: stream.Stream,
+    graphFormat: str | None = None,
     xValue=None,
     yValue=None,
     zValue=None,
@@ -166,27 +172,8 @@ class TestExternal(unittest.TestCase):
 class Test(unittest.TestCase):
 
     def testCopyAndDeepcopy(self):
-        '''Test copying all objects defined in this module
-        '''
-        import copy
-        import sys
-        import types
-        for part in sys.modules[self.__module__].__dict__:
-            match = False
-            for skip in ['_', '__', 'Test', 'Exception']:
-                if part.startswith(skip) or part.endswith(skip):
-                    match = True
-            if match:
-                continue
-            name = getattr(sys.modules[self.__module__], part)
-            # noinspection PyTypeChecker
-            if callable(name) and not isinstance(name, types.FunctionType):
-                try:  # see if obj can be made w/ args
-                    obj = name()
-                except TypeError:
-                    continue
-                unused_a = copy.copy(obj)
-                unused_b = copy.deepcopy(obj)
+        from music21.test.commonTest import testCopyAll
+        testCopyAll(self, globals())
 
     def testAll(self):
         from music21 import corpus

@@ -1,6 +1,6 @@
 #-------------------------------------------------------------------------------
 # Name:         corpus/license.txt
-# Purpose:      The music21 Project assumes no copyright or change in licensing
+# Purpose:      The music21 creators assume no copyright or change in licensing
 #               for content distributed in the corpus.                
 #
 #-------------------------------------------------------------------------------
@@ -25,6 +25,6 @@ The encodings may be under copyright but have been licensed for use, though ther
 restrictions on commercial use.
 These works, along with any works linked to in the virtual corpus, may or may not be 
 free in your jurisdiction. If you believe this message to be in error regarding one 
-or more works please contact Michael Scott Cuthbert at the address provided on the contact page.
+or more works please contact Michael Scott Asato Cuthbert at the address provided on the contact page.
 
 

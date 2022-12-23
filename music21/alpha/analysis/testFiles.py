@@ -5,11 +5,13 @@
 #
 # Authors:      Emily Zhang
 #
-# Copyright:    Copyright © 2015 Michael Scott Asato Cuthbert and the music21 Project
+# Copyright:    Copyright © 2015 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
-import os
+from __future__ import annotations
+
 import inspect
+import os
 
 def _dummy():
     pass  # something for getting our path name

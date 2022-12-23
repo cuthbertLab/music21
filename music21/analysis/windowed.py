@@ -6,7 +6,7 @@
 # Authors:      Jared Sadoian
 # Authors:      Christopher Ariza
 #
-# Copyright:    Copyright © 2010 Michael Scott Asato Cuthbert and the music21 Project
+# Copyright:    Copyright © 2010 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
@@ -19,20 +19,20 @@ Modular analysis procedures inherit from :class:`music21.analysis.discrete.Discr
 The :class:`music21.analysis.discrete.KrumhanslSchmuckler` (for algorithmic key detection)
 and :class:`music21.analysis.discrete.Ambitus` (for pitch range analysis) classes provide examples.
 '''
+from __future__ import annotations
+
 import unittest
 import warnings
-import typing as t
 
 from music21 import exceptions21
 
 from music21 import common
+from music21 import environment
 from music21 import meter
 from music21 import stream
 
 from music21.analysis.discrete import DiscreteAnalysisException
 
-
-from music21 import environment
 environLocal = environment.Environment('analysis.windowed')
 
 
@@ -244,9 +244,9 @@ class WindowedAnalysis:
 
 
     def process(self,
-                minWindow: t.Union[int, None] = 1,
-                maxWindow: t.Union[int, None] = 1,
-                windowStepSize: t.Union[int, str] = 1,
+                minWindow: int | None = 1,
+                maxWindow: int | None = 1,
+                windowStepSize: int | str = 1,
                 windowType='overlap',
                 includeTotalWindow=True):
         # noinspection PyShadowingNames
@@ -349,19 +349,20 @@ class WindowedAnalysis:
 
 
 # -----------------------------------------------------------------------------
-class TestExternal(unittest.TestCase):
-    pass
-
 
 class TestMockProcessor:
 
     def process(self, subStream):
-        '''Simply count the number of notes found
+        '''
+        Simply count the number of notes found
         '''
         return len(subStream.flatten().notesAndRests), None
 
 
 class Test(unittest.TestCase):
+    def testCopyAndDeepcopy(self):
+        from music21.test.commonTest import testCopyAll
+        testCopyAll(self, globals())
 
     def testBasic(self):
         from music21 import corpus
@@ -381,7 +382,8 @@ class Test(unittest.TestCase):
                 unused_x, unused_y, unused_z = wa.process(i, i)
 
     def testWindowing(self):
-        '''Test that windows are doing what they are supposed to do
+        '''
+        Test that windows are doing what they are supposed to do
         '''
         p = TestMockProcessor()
 

@@ -6,12 +6,12 @@
 # Authors:      Michael Scott Asato Cuthbert
 #               Christopher Ariza
 #
-# Copyright:    Copyright © 2008-2022 Michael Scott Asato Cuthbert and the music21 Project
+# Copyright:    Copyright © 2008-2022 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
+from __future__ import annotations
+
 import copy
-import sys
-import types
 import unittest
 
 from music21 import common
@@ -28,27 +28,7 @@ from music21.pitch import Pitch, Accidental
 
 class Test(unittest.TestCase):
 
-    def testCopyAndDeepcopy(self):
-        '''
-        Test copying all objects defined in this module
-        '''
-        for part in sys.modules[self.__module__].__dict__:
-            match = False
-            for skip in ['_', '__', 'Test', 'Exception']:
-                if part.startswith(skip) or part.endswith(skip):
-                    match = True
-            if match:
-                continue
-            name = getattr(sys.modules[self.__module__], part)
-            # noinspection PyTypeChecker
-            if callable(name) and not isinstance(name, types.FunctionType):
-                try:  # see if obj can be made w/ args
-                    obj = name()
-                except TypeError:
-                    continue
-                copy.copy(obj)
-                copy.deepcopy(obj)
-
+    def testCopyManually(self):
         p1 = Pitch('C#3')
         p2 = copy.deepcopy(p1)
         self.assertIsNot(p1, p2)
@@ -63,7 +43,8 @@ class Test(unittest.TestCase):
         self.assertEqual(b.octave, 3)
 
     def testAccidentalImport(self):
-        '''Test that we are getting the properly set accidentals
+        '''
+        Test that we are getting the properly set accidentals
         '''
         s = corpus.parse('bwv438.xml')
         tenorMeasures = s.parts[2].getElementsByClass(stream.Measure)
@@ -79,7 +60,8 @@ class Test(unittest.TestCase):
         self.assertTrue(pAltered.accidental.displayStatus)
 
     def testUpdateAccidentalDisplaySimple(self):
-        '''Test updating accidental display.
+        '''
+        Test updating accidental display.
         '''
         past = [Pitch('A#3'), Pitch('C#'), Pitch('C')]
 
@@ -97,7 +79,8 @@ class Test(unittest.TestCase):
         self.assertEqual(b.accidental.name, 'natural')
 
     def testUpdateAccidentalDisplaySeries(self):
-        '''Test updating accidental display.
+        '''
+        Test updating accidental display.
         '''
         def proc(_pList, past):
             for p in _pList:
@@ -202,7 +185,8 @@ class Test(unittest.TestCase):
         compare(pList, result)
 
     def testUpdateAccidentalDisplaySeriesKeySignature(self):
-        '''Test updating accidental display against a KeySignature
+        '''
+        Test updating accidental display against a KeySignature
         '''
         def proc(_pList, past, alteredPitches):
             for p in _pList:

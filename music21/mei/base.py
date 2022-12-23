@@ -5,7 +5,7 @@
 #
 # Authors:      Christopher Antila
 #
-# Copyright:    Copyright © 2014 Michael Scott Asato Cuthbert and the music21 Project
+# Copyright:    Copyright © 2014 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # -----------------------------------------------------------------------------
 '''
@@ -54,7 +54,6 @@ document.
 ...     </music>
 ... </mei>
 ... """
->>> from music21 import *
 >>> conv = mei.MeiToM21Converter(meiString)
 >>> result = conv.run()
 >>> result
@@ -171,15 +170,16 @@ tool.
 * <pb>: a page break
 * <lb>: a line break
 * <sb>: a system break
-
 '''
-import typing as t
-from xml.etree.ElementTree import Element, ParseError, fromstring, ElementTree
+
+from __future__ import annotations
 
 from collections import defaultdict
 from copy import deepcopy
-from fractions import Fraction  # for typing
+import typing as t
 from uuid import uuid4
+from xml.etree.ElementTree import Element, ParseError, fromstring, ElementTree
+
 
 # music21
 from music21 import articulations
@@ -199,6 +199,10 @@ from music21 import pitch
 from music21 import stream
 from music21 import spanner
 from music21 import tie
+
+
+if t.TYPE_CHECKING:
+    from fractions import Fraction
 
 environLocal = environment.Environment('mei.base')
 
@@ -223,22 +227,30 @@ _IGNORE_UNPROCESSED = (
 # Exceptions
 # -----------------------------------------------------------------------------
 class MeiValidityError(exceptions21.Music21Exception):
-    '''When there is an otherwise-unspecified validity error that prevents parsing.'''
+    '''
+    When there is an otherwise-unspecified validity error that prevents parsing.
+    '''
     pass
 
 
 class MeiValueError(exceptions21.Music21Exception):
-    '''When an attribute has an invalid value.'''
+    '''
+    When an attribute has an invalid value.
+    '''
     pass
 
 
 class MeiAttributeError(exceptions21.Music21Exception):
-    '''When an element has an invalid attribute.'''
+    '''
+    When an element has an invalid attribute.
+    '''
     pass
 
 
 class MeiElementError(exceptions21.Music21Exception):
-    '''When an element itself is invalid.'''
+    '''
+    When an element itself is invalid.
+    '''
     pass
 
 
@@ -341,8 +353,8 @@ class MeiToM21Converter:
 # -----------------------------------------------------------------------------
 def safePitch(
     name: str,
-    accidental: t.Optional[str] = None,
-    octave: t.Union[str, int] = ''
+    accidental: str | None = None,
+    octave: str | int = ''
 ) -> pitch.Pitch:
     '''
     Safely build a :class:`~music21.pitch.Pitch` from a string.
@@ -380,9 +392,9 @@ def safePitch(
 
 
 def makeDuration(
-    base: t.Union[float, int, Fraction] = 0.0,
+    base: float | int | Fraction = 0.0,
     dots: int = 0
-) -> 'music21.duration.Duration':
+) -> duration.Duration:
     '''
     Given a ``base`` duration and a number of ``dots``, create a :class:`~music21.duration.Duration`
     instance with the
@@ -392,7 +404,6 @@ def makeDuration(
 
     **Examples**
 
-    >>> from music21 import *
     >>> from fractions import Fraction
     >>> mei.base.makeDuration(base=2.0, dots=0).quarterLength  # half note, no dots
     2.0
@@ -412,7 +423,7 @@ def makeDuration(
     return returnDuration
 
 
-def allPartsPresent(scoreElem) -> t.Tuple[str, ...]:
+def allPartsPresent(scoreElem) -> tuple[str, ...]:
     # noinspection PyShadowingNames
     '''
     Find the @n values for all <staffDef> elements in a <score> element. This assumes that every
@@ -438,7 +449,6 @@ def allPartsPresent(scoreElem) -> t.Tuple[str, ...]:
     ...     </section>
     ... </score>"""
     >>> import xml.etree.ElementTree as ETree
-    >>> from music21 import *
     >>> meiDoc = ETree.fromstring(meiDoc)
     >>> mei.base.allPartsPresent(meiDoc)
     ('1', '2')
@@ -559,7 +569,6 @@ def _accidentalFromAttr(attr):
     '''
     Use :func:`_attrTranslator` to convert the value of an "accid" attribute to its music21 string.
 
-    >>> from music21 import *
     >>> mei.base._accidentalFromAttr('s')
     '#'
     '''
@@ -571,7 +580,6 @@ def _accidGesFromAttr(attr):
     Use :func:`_attrTranslator` to convert the value of an @accid.ges
     attribute to its music21 string.
 
-    >>> from music21 import *
     >>> mei.base._accidGesFromAttr('s')
     '#'
     '''
@@ -582,7 +590,6 @@ def _qlDurationFromAttr(attr):
     '''
     Use :func:`_attrTranslator` to convert an MEI "dur" attribute to a music21 quarterLength.
 
-    >>> from music21 import *
     >>> mei.base._qlDurationFromAttr('4')
     1.0
 
@@ -621,7 +628,8 @@ def _makeArticList(attr):
     return articList
 
 
-def _getOctaveShift(dis: t.Union[t.Literal['8', '15', '22'], None], disPlace: str) -> int:
+def _getOctaveShift(dis: t.Literal['8', '15', '22'] | None,
+                    disPlace: str) -> int:
     '''
     Use :func:`_getOctaveShift` to calculate the :attr:`octaveShift` attribute for a
     :class:`~music21.clef.Clef` subclass. Any of the arguments may be ``None``.
@@ -714,7 +722,6 @@ def _ppSlurs(theConverter):
     ...     </section>
     ...     </score></music>
     ... </mei>"""
-    >>> from music21 import *
     >>> theConverter = mei.base.MeiToM21Converter(meiDoc)
     >>>
     >>> mei.base._ppSlurs(theConverter)
@@ -952,7 +959,7 @@ def _ppConclude(theConverter):
 # Helper Functions
 # -----------------------------------------------------------------------------
 def _processEmbeddedElements(
-    elements: t.List[Element],
+    elements: list[Element],
     mapping,
     callerTag=None,
     slurBundle=None
@@ -986,7 +993,6 @@ def _processEmbeddedElements(
     Because there is no ``'rest'`` key in the ``mapping``, that :class:`Element` is ignored.
 
     >>> from xml.etree.ElementTree import Element
-    >>> from music21 import *
     >>> elements = [Element('note'), Element('rest'), Element('note')]
     >>> mapping = {'note': lambda x, y: note.Note('D2')}
     >>> mei.base._processEmbeddedElements(elements, mapping, 'doctest')
@@ -1032,7 +1038,7 @@ def _timeSigFromAttrs(elem):
     return meter.TimeSignature(f"{elem.get('meter.count')!s}/{elem.get('meter.unit')!s}")
 
 
-def _keySigFromAttrs(elem: Element) -> t.Union[key.Key, key.KeySignature]:
+def _keySigFromAttrs(elem: Element) -> key.Key | key.KeySignature:
     '''
     From any tag with (at minimum) either @key.pname or @key.sig attributes, make a
     :class:`KeySignature` or :class:`Key`, as possible.
@@ -1180,7 +1186,9 @@ def addSlurs(elem, obj, slurBundle):
     addedSlur = False
 
     def wrapGetByIdLocal(theId):
-        '''Avoid crashing when getByIdLocl() doesn't find the slur'''
+        '''
+        Avoid crashing when getByIdLocl() doesn't find the slur
+        '''
         try:
             slurBundle.getByIdLocal(theId)[0].addSpannedElements(obj)
             return True
@@ -1547,7 +1555,6 @@ def scoreDefFromElement(elem, slurBundle=None):  # pylint: disable=unused-argume
     ...     </staffGrp>
     ... </scoreDef>
     ... """
-    >>> from music21 import *
     >>> from xml.etree import ElementTree as ET
     >>> scoreDef = ET.fromstring(meiDoc)
     >>> result = mei.base.scoreDefFromElement(scoreDef)
@@ -1714,7 +1721,6 @@ def staffDefFromElement(elem, slurBundle=None):  # pylint: disable=unused-argume
     >>> meiDoc = """<?xml version="1.0" encoding="UTF-8"?>
     ... <staffDef n="1" label="Clarinet" xmlns="http://www.music-encoding.org/ns/mei"/>
     ... """
-    >>> from music21 import *
     >>> from xml.etree import ElementTree as ET
     >>> staffDef = ET.fromstring(meiDoc)
     >>> result = mei.base.staffDefFromElement(staffDef)
@@ -1735,7 +1741,6 @@ def staffDefFromElement(elem, slurBundle=None):  # pylint: disable=unused-argume
     ...     <clef shape="F" line="4"/>
     ... </staffDef>
     ... """
-    >>> from music21 import *
     >>> from xml.etree import ElementTree as ET
     >>> staffDef = ET.fromstring(meiDoc)
     >>> result = mei.base.staffDefFromElement(staffDef)
@@ -1888,15 +1893,14 @@ def articFromElement(elem, slurBundle=None):  # pylint: disable=unused-argument
     :attr:`~music21.note.GeneralNote.articulations` attribute.
 
     >>> from xml.etree import ElementTree as ET
-    >>> from music21 import *
-    >>> meiSnippet = """<artic artic="acc" xmlns="http://www.music-encoding.org/ns/mei"/>"""
+    >>> meiSnippet = '<artic artic="acc" xmlns="http://www.music-encoding.org/ns/mei"/>'
     >>> meiSnippet = ET.fromstring(meiSnippet)
     >>> mei.base.articFromElement(meiSnippet)
     [<music21.articulations.Accent>]
 
     A single <artic> element may indicate many :class:`Articulation` objects.
 
-    >>> meiSnippet = """<artic artic="acc ten" xmlns="http://www.music-encoding.org/ns/mei"/>"""
+    >>> meiSnippet = '<artic artic="acc ten" xmlns="http://www.music-encoding.org/ns/mei"/>'
     >>> meiSnippet = ET.fromstring(meiSnippet)
     >>> mei.base.articFromElement(meiSnippet)
     [<music21.articulations.Accent>, <music21.articulations.Tenuto>]
@@ -1948,12 +1952,11 @@ def accidFromElement(elem, slurBundle=None):  # pylint: disable=unused-argument
     a string. Accidentals up to triple-sharp and triple-flat are supported.
 
     >>> from xml.etree import ElementTree as ET
-    >>> from music21 import *
-    >>> meiSnippet = """<accid accid="s" xmlns="http://www.music-encoding.org/ns/mei"/>"""
+    >>> meiSnippet = '<accid accid="s" xmlns="http://www.music-encoding.org/ns/mei"/>'
     >>> meiSnippet = ET.fromstring(meiSnippet)
     >>> mei.base.accidFromElement(meiSnippet)
     '#'
-    >>> meiSnippet = """<accid accid="tf" xmlns="http://www.music-encoding.org/ns/mei"/>"""
+    >>> meiSnippet = '<accid accid="tf" xmlns="http://www.music-encoding.org/ns/mei"/>'
     >>> meiSnippet = ET.fromstring(meiSnippet)
     >>> mei.base.accidFromElement(meiSnippet)
     '---'
@@ -2601,7 +2604,6 @@ def beamFromElement(elem, slurBundle=None):
     a list of three objects, none of which is a :class:`Beam` or similar.
 
     >>> from xml.etree import ElementTree as ET
-    >>> from music21 import *
     >>> meiSnippet = """<beam xmlns="http://www.music-encoding.org/ns/mei">
     ...     <note pname='A' oct='7' dur='8'/>
     ...     <note pname='B' oct='7' dur='8'/>

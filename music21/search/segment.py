@@ -5,7 +5,7 @@
 #
 # Authors:      Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2011-2018 Michael Scott Asato Cuthbert and the music21 Project
+# Copyright:    Copyright © 2011-2018 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
@@ -22,17 +22,17 @@ Speed notes:
    python-Levenshtein can be installed via **pip install python-Levenshtein**.
    The ratios are very slightly different, but the speedup is between 10 and 100x!
    (But then PyPy probably won't work.)
-
 '''
+
+from __future__ import annotations
+
+from collections import OrderedDict
 import difflib
+from functools import partial
 import json
 import math
 import pathlib
 import random
-
-from collections import OrderedDict
-from functools import partial
-import typing as t
 
 from music21 import common
 from music21 import converter
@@ -61,7 +61,6 @@ def translateMonophonicPartToSegments(
     If algorithm is None then a default algorithm of music21.search.translateStreamToStringNoRhythm
     is used
 
-    >>> from music21 import *
     >>> luca = corpus.parse('luca/gloria')
     >>> lucaCantus = luca.parts[0]
     >>> segments, measureLists = search.segment.translateMonophonicPartToSegments(lucaCantus)
@@ -399,7 +398,7 @@ def scoreSimilarity(
 
 # ------------------------------------------------------------------------------
 # define presented order in documentation
-_DOC_ORDER: t.List[type] = []
+_DOC_ORDER: list[type] = []
 
 
 if __name__ == '__main__':

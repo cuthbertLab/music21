@@ -5,17 +5,16 @@
 #
 # Authors:      Christopher Ariza
 #
-# Copyright:    Copyright © 2010, 16 Michael Scott Asato Cuthbert and the music21 Project
+# Copyright:    Copyright © 2010-22 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
-
 # noinspection SpellCheckingInspection
 '''
 This module defines classes for representing Scala scale data,
 including Scala pitch representations, storage, and files.
 
 The Scala format is defined at the following URL:
-http://www.huygens-fokker.org/scala/scl_format.html
+https://www.huygens-fokker.org/scala/scl_format.html
 
 We thank Manuel Op de Coul for allowing us to include
 the repository (as of May 11, 2011) with music21
@@ -40,29 +39,30 @@ For most people you'll want to do something like this:
 >>> sc = scale.ScalaScale('a4', 'mbira_banda.scl')
 >>> [str(p) for p in sc.pitches]
 ['A4', 'B4(-15c)', 'C#5(-11c)', 'E-5(-7c)', 'E~5(+6c)', 'F#5(+14c)', 'G~5(+1c)', 'B-5(+2c)']
-
 '''
-import typing as t
+from __future__ import annotations
 
 import io
 import math
 import os
 import pathlib
+import typing as t
 import unittest
 
 
 from music21 import common
+from music21 import environment
 from music21 import interval
+
 # scl is the library of scala files
 from music21.scale.scala import scl
 
-from music21 import environment
 environLocal = environment.Environment('scale.scala')
 
 
 # ------------------------------------------------------------------------------
 # global variable to cache the paths returned from getPaths()
-SCALA_PATHS: t.Dict[str, t.Optional[t.Dict[str, t.List[str]]]] = {'allPaths': None}
+SCALA_PATHS: dict[str, dict[str, list[str]] | None] = {'allPaths': None}
 
 def getPaths():
     '''
@@ -128,7 +128,7 @@ class ScalaPitch:
      600.0883..., 699.9976..., 800.9095..., 900.0260...,
      1000.0201..., 1088.2687..., 1200.0]
     '''
-    # pitch values; if it has a period, it is cents.  Otherwise it is a ratio
+    # pitch values; if it has a period, it is cents.  Otherwise, it is a ratio
     # above the implied base ratio
     # integer values w/ no period or slash: 2 is 2/1
     def __init__(self, sourceString=None):
@@ -407,7 +407,8 @@ class ScalaFile:
         self.fileName = os.path.basename(fp)
 
     def openFileLike(self, fileLike):
-        '''Assign a file-like object, such as those provided by StringIO, as an open file object.
+        '''
+        Assign a file-like object, such as those provided by StringIO, as an open file object.
         '''
         self.file = fileLike  # already 'open'
 
@@ -427,7 +428,8 @@ class ScalaFile:
         return self.readstr(self.file.read())
 
     def readstr(self, strSrc):
-        '''Read a string and process all Tokens. Returns a ABCHandler instance.
+        '''
+        Read a string and process all Tokens. Returns a ABCHandler instance.
         '''
         ss = ScalaData(strSrc, self.fileName)
         ss.parse()
@@ -521,7 +523,8 @@ def parse(target):
 
 def search(target):
     # noinspection SpellCheckingInspection
-    '''Search the scala archive for matches based on a string
+    '''
+    Search the scala archive for matches based on a string
 
     >>> mbiraScales = scale.scala.search('mbira')
     >>> mbiraScales
@@ -617,7 +620,6 @@ Franck Jedrzejewski continued fractions approx. of 12-tet
 98/55
 15/8
 2/1
-
 '''
         ss = ScalaData(msg)
         ss.parse()
@@ -721,7 +723,7 @@ Aristoxenos' Chromatic/Enharmonic, 3 + 9 + 18 parts
 
 # ------------------------------------------------------------------------------
 # define presented order in documentation
-_DOC_ORDER: t.List[t.Callable] = []
+_DOC_ORDER: list[type] = []
 
 
 if __name__ == '__main__':

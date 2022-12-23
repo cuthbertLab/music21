@@ -7,17 +7,18 @@
 #               Michael Scott Asato Cuthbert
 #
 # Copyright:    Copyright © 2001-11 Christopher Ariza
-# Copyright:    Copyright © 2011-22 Michael Scott Asato Cuthbert and the music21 Project
+# Copyright:    Copyright © 2011-22 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
-
 '''
 This module stores numerous data lists used in deriving set-class values and other post-tonal
 chord representations. All features of this module are made available through
 :class:`~music21.chord.Chord` objects. Use of this module directly is thus not necessary.
 '''
+
+from __future__ import annotations
+
 from collections import namedtuple
-import typing as t
 import unittest
 
 from music21 import environment
@@ -52,10 +53,10 @@ class ChordTablesException(exceptions21.Music21Exception):
 # For index 2 (python [1]), a value of 1 or higher
 # is symmetrical under inversion.
 
-TNIStructure = t.Tuple[
-    t.Tuple[int, ...],
-    t.Tuple[int, int, int, int, int, int],
-    t.Tuple[int, int, int, int, int, int, int, int],
+TNIStructure = tuple[
+    tuple[int, ...],
+    tuple[int, int, int, int, int, int],
+    tuple[int, int, int, int, int, int, int, int],
     int,
 ]
 
@@ -978,10 +979,11 @@ forteNumberWithInversionToTnIndex = {
 #      TODO: more removing and/or de-emphasizing of ethnic-stereotype names.
 
 tnIndexToChordInfo = {
+    # Cardinality 1
     (1,  1,  0): {'name': ('unison',
                            'monad',
                            'singleton')},
-
+    # Cardinality 2
     (2,  1,  0): {'name': ('interval class 1',
                            'minor second',
                            'm2',
@@ -1005,6 +1007,7 @@ tnIndexToChordInfo = {
                            'diminished fifth',
                            'augmented fourth')},
 
+    # Cardinality 3
     (3,  1,  0): {'name': ('chromatic trimirror',)},
     (3,  2,  1): {'name': ('phrygian trichord',)},
     (3,  2, -1): {'name': ('minor trichord',)},
@@ -1027,6 +1030,7 @@ tnIndexToChordInfo = {
     (3, 12,  0): {'name': ('augmented triad',
                            'equal 3-part octave division')},
 
+    # Cardinality 4
     (4,  1,  0): {'name': ('chromatic tetramirror',
                            'BACH')},
     (4,  2,  1): {'name': ('major-second tetracluster', )},
@@ -1077,6 +1081,7 @@ tnIndexToChordInfo = {
     (4, 29,  1): {'name': ('all-interval tetrachord',)},
     (4, 29, -1): {'name': ('all-interval tetrachord',)},
 
+    # Cardinality 5
     (5,  1,  0): {'name': ('chromatic pentamirror',)},
     (5,  2,  1): {'name': ('major-second pentacluster',)},
     (5,  2, -1): {'name': ('major-second pentacluster',)},
@@ -1166,6 +1171,7 @@ tnIndexToChordInfo = {
     (5, 38,  1): {'name': ('diminished pentacluster',)},
     (5, 38, -1): {'name': ('diminished pentacluster',)},
 
+    # Cardinality 6
     (6,  1,  0): {'name': ('A all combinatorial (P6, I11, RI5, RI11)',
                            'chromatic hexamirror',
                            'first-order all-combinatorial')},
@@ -1283,6 +1289,7 @@ tnIndexToChordInfo = {
     (6, 49,  0): {'name': ('combinatorial RI (RI4)', 'Prometheus Neapolitan mode')},
     (6, 50,  0): {'name': ('combinatorial RI (RI1)',)},
 
+    # Cardinality 7
     (7,  1,  0): {'name': ('chromatic heptamirror',)},
     (7,  2,  1): {},
     (7,  2, -1): {},
@@ -1325,11 +1332,9 @@ tnIndexToChordInfo = {
     (7, 21,  1): {},
     (7, 21, -1): {'name': ('Roma (Gypsy) hepatonic',)},
     (7, 22,  0): {'name': ('double harmonic scale',
-                           'Persian',
                            'major Roma (Gypsy)',
                            'Hungarian minor',
                            'double harmonic scale',
-                           'Asian',
                            'quasi raga Mayamdavagaula')},
     (7, 23,  1): {},
     (7, 23, -1): {'name': ('tritone major heptachord',)},
@@ -1379,6 +1384,7 @@ tnIndexToChordInfo = {
     (7, 38,  1): {},
     (7, 38, -1): {},
 
+    # Cardinality 8
     (8,  1,  0): {'name': ('chromatic octamirror',)},
     (8,  2,  1): {},
     (8,  2, -1): {},
@@ -1414,13 +1420,12 @@ tnIndexToChordInfo = {
     (8, 22,  1): {},
     (8, 22, -1): {'name': ('Spanish octatonic scale',)},
     (8, 23,  0): {'name': ('Greek',
-                           'blues',
                            'quartal octachord',
-                           'diatonic octad')},
+                           'diatonic octad',)},
     (8, 24,  0): {},
     (8, 25,  0): {'name': ("Messiaen's mode 6",)},
-    (8, 26,  0): {'name': ('blues',
-                           'Spanish phrygian',)},
+    (8, 26,  0): {'name': ('Spanish phrygian',
+                           'blues',)},
     (8, 27,  1): {},
     (8, 27, -1): {},
     (8, 28,  0): {'name': ('octatonic scale',
@@ -1430,6 +1435,7 @@ tnIndexToChordInfo = {
     (8, 29,  1): {},
     (8, 29, -1): {},
 
+    # Cardinality 9
     (9,  1,  0): {'name': ('chromatic nonamirror',)},
     (9,  2,  1): {},
     (9,  2, -1): {},
@@ -1451,6 +1457,7 @@ tnIndexToChordInfo = {
     (9, 12,  0): {'name': ("Messiaen's mode 3",
                            'Tsjerepnin')},
 
+    # Cardinality 10
     (10, 1,  0): {'name': ('chromatic decamirror',)},
     (10, 2,  0): {},
     (10, 3,  0): {},
@@ -1458,14 +1465,15 @@ tnIndexToChordInfo = {
     (10, 5,  0): {'name': ('major-minor mixed',)},
     (10, 6,  0): {'name': ("Messiaen's mode 7",)},
 
+    # Cardinality 11
     (11, 1,  0): {'name': ('chromatic undecamirror',)},
 
+    # Cardinality 12
     (12, 1,  0): {'name': ('aggregate',
                            'dodecachord',
                            'twelve-tone chromatic',
                            'chromatic scale',
-                           'dodecamirror')},
-}
+                           'dodecamirror')},}
 
 # ------------------------------------------------------------------------------
 # function to access data
@@ -1728,7 +1736,7 @@ def addressToCommonNames(address):
     non-post-tonal spellings.
 
     Note that names referring to ethnic stereotypes that are not in
-    common usage will be removed in music21 v.8 or at any time
+    common usage will be removed in music21 v8 or at any time
     thereafter without a deprecation cycle.
     Those matching this description that are still in common use will be demoted
     to the end of the list of names and may still be removed in the future.

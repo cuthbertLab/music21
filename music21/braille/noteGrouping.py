@@ -5,12 +5,13 @@
 # Authors:      Jose Cabal-Ugaz
 #               Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2012, 2016 Michael Scott Asato Cuthbert and the music21 Project
+# Copyright:    Copyright © 2012, 2016 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
-import unittest
+from __future__ import annotations
 
 from collections import OrderedDict
+import unittest
 
 from music21 import clef
 from music21 import dynamics

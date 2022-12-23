@@ -7,26 +7,25 @@
 #               Michael Scott Asato Cuthbert
 #
 # Copyright:    Copyright © 2009-2022 Michael Scott Asato Cuthbert,
-#               and the music21 Project
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
 Functions for finding external modules, converting colors to Matplotlib colors, etc.
 '''
-import unittest
+from __future__ import annotations
+
 from collections import namedtuple
 import typing as t
-
-import webcolors  # type: ignore
+import unittest
+import webcolors  # type: ignore  # no typing in module
 
 # TODO: Move _missingImport to environment or common so this is unnecessary.
 from music21.base import _missingImport
-
 from music21 import common
+from music21 import environment
 from music21 import exceptions21
 from music21 import pitch
 
-from music21 import environment
 environLocal = environment.Environment('graph.utilities')
 
 
@@ -180,7 +179,7 @@ def getColor(color):
             if len(color) == 1:
                 color = [color[0], color[0], color[0]]
             # convert to 0 100% values as strings with % symbol
-            colorStrList = t.cast(t.Tuple[str, str, str], tuple(str(x * 100) + '%' for x in color))
+            colorStrList = t.cast(tuple[str, str, str], tuple(str(x * 100) + '%' for x in color))
             return webcolors.rgb_percent_to_hex(colorStrList)
         else:  # assume integers
             return webcolors.rgb_to_hex(tuple(color))

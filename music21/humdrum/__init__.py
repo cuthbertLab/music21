@@ -5,7 +5,7 @@
 #
 # Authors:      Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2009-2020 Michael Scott Asato Cuthbert and the music21 Project
+# Copyright:    Copyright © 2009-2020 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 # pylint: disable=line-too-long
@@ -151,6 +151,7 @@ ydelta_       Not needed
 .. _yank: https://www.humdrum.org/Humdrum/commands/yank.html
 .. _ydelta: https://www.humdrum.org/Humdrum/commands/ydelta.html
 '''
+from __future__ import annotations
 
 __all__ = [
     'spineParser',

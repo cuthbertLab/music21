@@ -5,17 +5,19 @@
 #
 # Authors:      Emily Zhang
 #
-# Copyright:    Copyright © 2015 Michael Scott Asato Cuthbert and the music21 Project
+# Copyright:    Copyright © 2015 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
-
-import unittest
+from __future__ import annotations
 
 import collections
 import difflib
+import unittest
 
-from music21 import note, chord, key
+from music21 import chord
+from music21 import key
 from music21 import interval
+from music21 import note
 from music21 import stream
 
 
@@ -583,6 +585,9 @@ class NoteHash(tuple):
 
 
 class Test(unittest.TestCase):
+    def testCopyAndDeepcopy(self):
+        from music21.test.commonTest import testCopyAll
+        testCopyAll(self, globals())
 
     def _approximatelyEqual(self, a, b, sig_fig=2):
         '''

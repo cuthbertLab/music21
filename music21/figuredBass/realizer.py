@@ -5,7 +5,7 @@
 #                and figures in a given key.
 # Authors:      Jose Cabal-Ugaz
 #
-# Copyright:    Copyright © 2011 Michael Scott Asato Cuthbert and the music21 Project
+# Copyright:    Copyright © 2011 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
@@ -16,7 +16,6 @@ bass line is a few lines of music21 code,
 from start to finish. See :class:`~music21.figuredBass.realizer.FiguredBassLine` for more details.
 
 >>> from music21.figuredBass import realizer
->>> from music21 import note
 >>> fbLine = realizer.FiguredBassLine()
 >>> fbLine.addElement(note.Note('C3'))
 >>> fbLine.addElement(note.Note('D3'), '4,3')
@@ -41,12 +40,13 @@ See :meth:`~music21.figuredBass.realizer.figuredBassFromStream` for more details
 >>> allSols2.getNumSolutions()
 30
 '''
+from __future__ import annotations
+
 import collections
 import copy
 import random
 import typing as t
 import unittest
-
 
 from music21 import chord
 from music21 import clef
@@ -62,7 +62,11 @@ from music21.figuredBass import realizerScale
 from music21.figuredBass import rules
 from music21.figuredBass import segment
 
-def figuredBassFromStream(streamPart):
+if t.TYPE_CHECKING:
+    from music21.stream.iterator import StreamIterator
+
+
+def figuredBassFromStream(streamPart: stream.Stream) -> FiguredBassLine:
     # noinspection PyShadowingNames
     '''
     Takes a :class:`~music21.stream.Part` (or another :class:`~music21.stream.Stream` subclass)
@@ -87,31 +91,30 @@ def figuredBassFromStream(streamPart):
     .. image:: images/figuredBass/fbRealizer_fbStreamPart.*
         :width: 500
 
-    Changed in v7.3: multiple figures in same lyric (e.g. '64') now supported.
+    * Changed in v7.3: multiple figures in same lyric (e.g. '64') now supported.
     '''
     sf = streamPart.flatten()
-    sfn = sf.notes
-
-    keyList = sf.getElementsByClass(key.Key)
-    myKey = None
-    if not keyList:
-        keyList = sf.getElementsByClass(key.KeySignature)
-        if not keyList:
-            myKey = key.Key('C')
-        else:
-            myKey = keyList[0].asKey('major')
+    sfn = sf.getElementsByClass(note.Note)
+    myKey: key.Key
+    if firstKey := sf[key.Key].first():
+        myKey = firstKey
+    elif firstKeySignature := sf[key.KeySignature].first():
+        myKey = firstKeySignature.asKey('major')
     else:
-        myKey = keyList[0]
+        myKey = key.Key('C')
 
-    tsList = sf.getElementsByClass(meter.TimeSignature)
-    if not tsList:
+    ts: meter.TimeSignature
+    if first_ts := sf[meter.TimeSignature].first():
+        ts = first_ts
+    else:
         ts = meter.TimeSignature('4/4')
-    else:
-        ts = tsList[0]
 
     fb = FiguredBassLine(myKey, ts)
     if streamPart.hasMeasures():
-        paddingLeft = streamPart.measure(0).paddingLeft
+        m_first = streamPart.measure(0, indicesNotNumbers=True)
+        if t.TYPE_CHECKING:
+            assert m_first is not None
+        paddingLeft = m_first.paddingLeft
         if paddingLeft != 0.0:
             fb._paddingLeft = paddingLeft
 
@@ -168,7 +171,6 @@ def addLyricsToBassNote(bassNote, notationString=None):
     useful when displaying the figured bass in external software.
 
     >>> from music21.figuredBass import realizer
-    >>> from music21 import note
     >>> n1 = note.Note('G3')
     >>> realizer.addLyricsToBassNote(n1, '6,4')
     >>> n1.lyrics[0].text
@@ -208,8 +210,6 @@ class FiguredBassLine:
     `inTime` defaults to 4/4.
 
     >>> from music21.figuredBass import realizer
-    >>> from music21 import key
-    >>> from music21 import meter
     >>> fbLine = realizer.FiguredBassLine(key.Key('B'), meter.TimeSignature('3/4'))
     >>> fbLine.inKey
     <music21.key.Key of B major>
@@ -217,7 +217,7 @@ class FiguredBassLine:
     <music21.meter.TimeSignature 3/4>
     '''
     _DOC_ORDER = ['addElement', 'generateBassLine', 'realize']
-    _DOC_ATTR: t.Dict[str, str] = {
+    _DOC_ATTR: dict[str, str] = {
         'inKey': '''
             A :class:`~music21.key.Key` which implies a scale value,
             scale mode, and key signature for a
@@ -250,9 +250,6 @@ class FiguredBassLine:
 
 
         >>> from music21.figuredBass import realizer
-        >>> from music21 import key
-        >>> from music21 import meter
-        >>> from music21 import note
         >>> fbLine = realizer.FiguredBassLine(key.Key('B'), meter.TimeSignature('3/4'))
         >>> fbLine.addElement(note.Note('B2'))
         >>> fbLine.addElement(note.Note('C#3'), '6')
@@ -290,9 +287,6 @@ class FiguredBassLine:
         Generates the bass line as a :class:`~music21.stream.Score`.
 
         >>> from music21.figuredBass import realizer
-        >>> from music21 import key
-        >>> from music21 import meter
-        >>> from music21 import note
         >>> fbLine = realizer.FiguredBassLine(key.Key('B'), meter.TimeSignature('3/4'))
         >>> fbLine.addElement(note.Note('B2'))
         >>> fbLine.addElement(note.Note('C#3'), '6')
@@ -303,7 +297,6 @@ class FiguredBassLine:
             :width: 200
 
 
-        >>> from music21 import corpus
         >>> sBach = corpus.parse('bach/bwv307')
         >>> sBach.parts.last().measure(0).show('text')
         {0.0} ...
@@ -419,9 +412,6 @@ class FiguredBassLine:
 
         >>> from music21.figuredBass import realizer
         >>> from music21.figuredBass import rules
-        >>> from music21 import key
-        >>> from music21 import meter
-        >>> from music21 import note
         >>> fbLine = realizer.FiguredBassLine(key.Key('B'), meter.TimeSignature('3/4'))
         >>> fbLine.addElement(note.Note('B2'))
         >>> fbLine.addElement(note.Note('C#3'), '6')
@@ -575,7 +565,7 @@ class Realization:
                   'generateRandomRealizations', 'generateAllRealizations',
                   'getAllPossibilityProgressions', 'getRandomPossibilityProgression',
                   'generateRealizationFromPossibilityProgression']
-    _DOC_ATTR: t.Dict[str, str] = {
+    _DOC_ATTR: dict[str, str] = {
         'keyboardStyleOutput': '''
             True by default. If True, generated realizations
             are represented in keyboard style, with two staves. If False,

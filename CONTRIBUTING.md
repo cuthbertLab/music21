@@ -19,6 +19,17 @@ own projects that import and extend `music21`.
 [Code of Conduct](README.md)
 
 
+## Preparing to Contribute ##
+
+Be sure to install all of the requirements in `requirements_dev.txt` via:
+
+```
+pip3 install -r requirements_dev.txt
+```
+
+There are several tools needed for fully testing music21 that aren't included
+in the standard `requirements.txt`.
+
 ## Issue Tickets ##
 
 Please use the provided templates for bug reports or feature proposals. For issues
@@ -77,6 +88,8 @@ Conventions:
 
   - **strings MUST be 'single-quoted', but "double quotes" are allowed internally**
     - this rule applies to triple quotes and doc strings also, contrary to PEP 257.
+    - Docstrings must begin and end on their own lines.  No one-line doc-strings or text
+      immediately following the triple quotes.
     - when there is a hyphen or single quote in the string, double quotes should be used, 
       not escaping/backslashing.
     - For long streams of TinyNotation or Lilypond code, which both use single quotes to indicate octave,
@@ -86,17 +99,16 @@ Conventions:
        discussing code.  So for instance, a quotation in documentation is in double quotes.
   - variable names:
     - need to be unambiguous, even if rather long.
-    - must begin with lowercase
-    - snake_case is allowed/encouraged for private variables
+    - must begin with lowercase (or underscore + lowercase) unless they represent classes.
+    - snake_case is allowed/encouraged for private variables for accessibility.
     - camelCase is required for public.
   - line lengths are capped at 100, but if approaching this limit, look for ways to avoid one-lining.
     - if it's easy to split your line into two which are both under 80 characters, do so.
   - line continuation characters (`\`) are not allowed; use open parentheses.
   - prefer f-strings to `.format()`.  The `%` interpolation is no longer allowed.
   - annotating types is required in new code, and encouraged to be added to older code.
-    - e.g. `self.counter: int = 0` or `def makeNoises() -> t.List['noise.Noise']:`
+    - e.g. `self.counter: int = 0` or `def makeNoises() -> list['noise.Noise']:`
     - The typing library should always be imported as `t`.
-    - Until `music21` no longer supports Python 3.8, use `t.List[]` rather than `list[]`.
     - Until `music21` no longer supports Python 3.9, use `t.Optional[x]` rather than `x|None`.
   - prefer enums to string configurations
     - in music21.common.enums, there is a StrEnum class for nearly-backwards compatible
@@ -109,7 +121,7 @@ Conventions:
       it hard for people whose native language is not English to parse and impossible for
       screen readers.
   - methods:
-    - no more than three positional arguments (in addition to `self`)
+    - no more than three positional arguments (four, if the first is `self`)
     - keyword arguments should be keyword-only by using `*`
       to consume any other positional arguments: `def makeNoise(self, volume, *, color=noise.PINK):`
     - avoid generic `**keywords`; make keywords explicit. 
@@ -120,12 +132,13 @@ Conventions:
       It is permitted and encouraged to have an `inPlace: bool = False` argument that allows for
       manipulation of the original object.  When `inPlace` is True, nothing should be returned
       (not true for `music21j` since passing through objects is so expected in JavaScript thanks
-      to JQuery and other libraries).
+      to JQuery and other libraries).  Use the `@overload` decorator to show how this parameter
+      affects the return value.
   - New classes should strongly endeavor to follow Liskov Substitution Principle.
     - Exceptions may be granted if the class structures follow names that are in common musical use
       but whose real world objects do not follow this principle.  For instance, a `Manx` is a subclass
       of `Cat` without `self.tail`.  Sometimes, however, rewriting the superclass might be possible
-      (perhaps `self.tail: Optional[Tail]`).
+      (perhaps `self.tail: t.Optional[Tail]`).
     - `Music21` was originally designed without this principle in mind, so you will find
       parts of the system that do not follow LSP and for backwards compatibility never will.
       I (Myke) have personally apologized to Barbara Liskov for my past ignorance. 
@@ -159,9 +172,10 @@ lowered the overall coverage, but that's okay).
 
 For changes to file parsing, please test both import and export (when supported for
 that format), and please increment the most minor version number in `music21.__version__`
-so that cached files will be invalidated. Your tests can use `converter.parse(fp, forceSource=True)`
-so that tests have a chance to fail locally, but in most cases we will ask you to 
-remove this keyword when polishing the patch.
+so that cached files will be invalidated. When writing a PR that changes imports, feel
+free to use `converter.parse(fp, forceSource=True)` so that tests have a chance 
+to fail locally, but in most cases we will ask you to remove this keyword 
+when polishing the patch.
 
 
 ## Finally ##

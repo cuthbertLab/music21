@@ -5,21 +5,21 @@
 #
 # Authors:      Christopher Ariza
 #
-# Copyright:    Copyright © 2011 Michael Scott Asato Cuthbert and the music21 Project
+# Copyright:    Copyright © 2011 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
+from __future__ import annotations
 
 import unittest
 
-from music21 import exceptions21
-
 from music21 import chord
+from music21 import environment
+from music21 import exceptions21
 from music21 import note
 from music21 import pitch
 from music21 import scale
 from music21 import stream
 
-from music21 import environment
 environLocal = environment.Environment('alpha.analysis.search')
 
 
@@ -251,6 +251,9 @@ def findConsecutiveScale(source, targetScale, degreesRequired=5,
 
 # ------------------------------------------------------------------------------
 class Test(unittest.TestCase):
+    def testCopyAndDeepcopy(self):
+        from music21.test.commonTest import testCopyAll
+        testCopyAll(self, globals())
 
     def testFindConsecutiveScaleA(self):
         sc = scale.MajorScale('a4')

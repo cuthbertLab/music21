@@ -6,7 +6,7 @@
 # Authors:      Christopher Ariza
 #               Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2010-2012 Michael Scott Asato Cuthbert and the music21 Project
+# Copyright:    Copyright © 2010-2012 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
@@ -18,18 +18,21 @@ connect notes in different Measure objects or even between different parts.
 This package defines some of the most common spanners.  Other spanners
 can be found in modules such as :ref:`moduleDynamics` (for things such as crescendos).
 '''
-import unittest
+from __future__ import annotations
+
+from collections.abc import Sequence, Iterable
 import copy
 import typing as t
+import unittest
 
-from music21 import exceptions21
 from music21 import base
 from music21 import common
 from music21 import defaults
+from music21 import environment
+from music21 import exceptions21
 from music21 import prebase
 from music21 import style
 
-from music21 import environment
 environLocal = environment.Environment('spanner')
 
 
@@ -200,9 +203,11 @@ class Spanner(base.Music21Object):
     >>> sp1.completeStatus = True
     '''
 
+    equalityAttributes = ('spannerStorage',)
+
     def __init__(self,
                  *spannedElements: t.Union[base.Music21Object,
-                                           t.Sequence[base.Music21Object]],
+                                           Sequence[base.Music21Object]],
                  **keywords):
         super().__init__(**keywords)
 
@@ -222,7 +227,7 @@ class Spanner(base.Music21Object):
         self.spannerStorage.autoSort = False
 
         # add arguments as a list or single item
-        proc: t.List[base.Music21Object] = []
+        proc: list[base.Music21Object] = []
         for spannedElement in spannedElements:
             if isinstance(spannedElement, base.Music21Object):
                 proc.append(spannedElement)
@@ -244,32 +249,26 @@ class Spanner(base.Music21Object):
             msg.append(repr(objRef))
         return ''.join(msg)
 
-    def _deepcopySubclassable(self, memo=None, ignoreAttributes=None, removeFromIgnore=None):
+    def _deepcopySubclassable(self, memo=None, *, ignoreAttributes=None):
         '''
         see __deepcopy__ for tests and docs
         '''
         # NOTE: this is a performance critical operation
-        defaultIgnoreSet = {'_cache', 'spannerStorage'}
+        defaultIgnoreSet = {'spannerStorage'}
         if ignoreAttributes is None:
             ignoreAttributes = defaultIgnoreSet
         else:
             ignoreAttributes = ignoreAttributes | defaultIgnoreSet
+        new = t.cast(Spanner,
+                     super()._deepcopySubclassable(memo, ignoreAttributes=ignoreAttributes))
 
-        new = super()._deepcopySubclassable(memo, ignoreAttributes, removeFromIgnore)
-
-        if removeFromIgnore is not None:
-            ignoreAttributes = ignoreAttributes - removeFromIgnore
-
-        if 'spannerStorage' in ignoreAttributes:
-            # there used to be a bug here where spannerStorage would
-            # try to append twice.  I've removed the guardrail here in v7.
-            # because I'm pretty sure we have solved it.
-            # disable pylint check until this inheritance bug is solved:
-            # https://github.com/PyCQA/astroid/issues/457
-            # pylint: disable=no-member
-            for c in self.spannerStorage._elements:
-                new.spannerStorage.coreAppend(c)
-            new.spannerStorage.coreElementsChanged(updateIsFlat=False)
+        # we are temporarily putting in the PREVIOUS elements, to replace them later
+        # with replaceSpannedElement()
+        new.spannerStorage = type(self.spannerStorage)(client=new)
+        for c in self.spannerStorage._elements:
+            new.spannerStorage.coreAppend(c)
+        # updateIsSorted too?
+        new.spannerStorage.coreElementsChanged(updateIsFlat=False)
         return new
 
     def __deepcopy__(self, memo=None):
@@ -313,14 +312,18 @@ class Spanner(base.Music21Object):
     # this is the same as with Variants
 
     def purgeOrphans(self, excludeStorageStreams=True):
-        self.spannerStorage.purgeOrphans(excludeStorageStreams)
+        if self.spannerStorage:
+            # might not be defined in the middle of a deepcopy.
+            self.spannerStorage.purgeOrphans(excludeStorageStreams)
         base.Music21Object.purgeOrphans(self, excludeStorageStreams)
 
     def purgeLocations(self, rescanIsDead=False):
         # must override Music21Object to purge locations from the contained
         # Stream
         # base method to perform purge on the Stream
-        self.spannerStorage.purgeLocations(rescanIsDead=rescanIsDead)
+        if self.spannerStorage:
+            # might not be defined in the middle of a deepcopy.
+            self.spannerStorage.purgeLocations(rescanIsDead=rescanIsDead)
         base.Music21Object.purgeLocations(self, rescanIsDead=rescanIsDead)
 
     # --------------------------------------------------------------------------
@@ -396,7 +399,7 @@ class Spanner(base.Music21Object):
     def getSpannedElementIds(self):
         '''
         Return all id() for all stored objects.
-        Was performance critical, until most uses removed in v.7.
+        Was performance critical, until most uses removed in v7.
         Used only as a testing tool now.
         Spanner.__contains__() was optimized in 839c7e5.
         '''
@@ -404,7 +407,7 @@ class Spanner(base.Music21Object):
 
     def addSpannedElements(
         self,
-        spannedElements: t.Union[t.Sequence[base.Music21Object],
+        spannedElements: t.Union[Sequence[base.Music21Object],
                                  base.Music21Object],
         *otherElements: base.Music21Object,
     ):
@@ -526,8 +529,8 @@ class Spanner(base.Music21Object):
         #    'id(new)', id(new)])
 
     def isFirst(self, spannedElement):
-        '''Given a spannedElement, is it first?
-
+        '''
+        Given a spannedElement, is it first?
 
         >>> n1 = note.Note('g')
         >>> n2 = note.Note('f#')
@@ -625,13 +628,13 @@ class SpannerBundle(prebase.ProtoM21Object):
     Not to be confused with SpannerStorage (which is a Stream class inside
     a spanner that stores Elements that are spanned)
 
-    Changed in v7: only argument must be a List of spanners.
-    Creators of SpannerBundles are required to check that this constraint is True
+    * Changed in v7: only argument must be a List of spanners.
+      Creators of SpannerBundles are required to check that this constraint is True
     '''
-    def __init__(self, spanners: t.Optional[t.List[Spanner]] = None):
-        self._cache: t.Dict[str, t.Any] = {}  # cache is defined on Music21Object not ProtoM21Object
+    def __init__(self, spanners: list[Spanner] | None = None):
+        self._cache: dict[str, t.Any] = {}  # cache is defined on Music21Object not ProtoM21Object
 
-        self._storage: t.List[Spanner]
+        self._storage: list[Spanner]
         if spanners:
             self._storage = spanners[:]  # a simple List, not a Stream
         else:
@@ -641,7 +644,7 @@ class SpannerBundle(prebase.ProtoM21Object):
         # SpannerBundle as missing a spannedElement; the next obj that meets
         # the class expectation will then be assigned and the spannedElement
         # cleared
-        self._pendingSpannedElementAssignment: t.List[_SpannerRef] = []
+        self._pendingSpannedElementAssignment: list[_SpannerRef] = []
 
     def append(self, other):
         '''
@@ -801,7 +804,7 @@ class SpannerBundle(prebase.ProtoM21Object):
         self,
         old: base.Music21Object,
         new: base.Music21Object
-    ) -> t.List[Spanner]:
+    ) -> list[Spanner]:
         # noinspection PyShadowingNames
         '''
         Given a spanner spannedElement (an object), replace all old spannedElements
@@ -837,7 +840,7 @@ class SpannerBundle(prebase.ProtoM21Object):
         >>> su2
         <music21.spanner.Glissando <music21.note.Note E><music21.note.Note C>>
 
-        Changed in v.7 -- id() is no longer allowed for `old`.
+        * Changed in v7: id() is no longer allowed for `old`.
 
         >>> sb.replaceSpannedElement(id(n1), n2)
         Traceback (most recent call last):
@@ -868,7 +871,7 @@ class SpannerBundle(prebase.ProtoM21Object):
 
         return replacedSpanners
 
-    def getByClass(self, className: t.Union[str, type]) -> 'SpannerBundle':
+    def getByClass(self, className: str | type) -> 'SpannerBundle':
         '''
         Given a spanner class, return a new SpannerBundle of all Spanners of the desired class.
 
@@ -1141,7 +1144,7 @@ class MultiMeasureRest(Spanner):
     '''
     _styleClass = style.TextStyle
 
-    _DOC_ATTR: t.Dict[str, str] = {
+    _DOC_ATTR: dict[str, str] = {
         'useSymbols': '''
             Boolean to indicate whether rest symbols
             (breve, longa, etc.) should be used when
@@ -1224,7 +1227,7 @@ class RepeatBracket(Spanner):
     >>> sp.number = 3
     >>> sp
     <music21.spanner.RepeatBracket 3 <music21.stream.Measure 0 offset=0.0>>
-    >>> sp.getNumberList()  # the list of repeat numbers
+    >>> sp.numberRange  # the list of repeat numbers
     [3]
     >>> sp.number
     '3'
@@ -1232,7 +1235,7 @@ class RepeatBracket(Spanner):
     Range of repeats as string:
 
     >>> sp.number = '1-3'
-    >>> sp.getNumberList()
+    >>> sp.numberRange
     [1, 2, 3]
     >>> sp.number
     '1-3'
@@ -1240,7 +1243,7 @@ class RepeatBracket(Spanner):
     Range of repeats as list:
 
     >>> sp.number = [2, 3]
-    >>> sp.getNumberList()
+    >>> sp.numberRange
     [2, 3]
     >>> sp.number
     '2, 3'
@@ -1248,7 +1251,7 @@ class RepeatBracket(Spanner):
     Comma separated numbers:
 
     >>> sp.number = '1, 2, 3'
-    >>> sp.getNumberList()
+    >>> sp.numberRange
     [1, 2, 3]
     >>> sp.number
     '1-3'
@@ -1256,7 +1259,7 @@ class RepeatBracket(Spanner):
     Disjunct numbers:
 
     >>> sp.number = '1, 2, 3, 7'
-    >>> sp.getNumberList()
+    >>> sp.numberRange
     [1, 2, 3, 7]
     >>> sp.number
     '1, 2, 3, 7'
@@ -1273,131 +1276,129 @@ class RepeatBracket(Spanner):
     >>> sp.number
     '1, 2, 3, 7'
     '''
+
+    _DOC_ATTR = {
+        'numberRange': '''
+            Get a contiguous list of repeat numbers that are applicable for this instance.
+
+            Will always have at least one element, but [0] means undefined
+
+            >>> rb = spanner.RepeatBracket()
+            >>> rb.numberRange
+            [0]
+
+            >>> rb.number = '1,2'
+            >>> rb.numberRange
+            [1, 2]
+        ''',
+        'overrideDisplay': '''
+            Override the string representation of this bracket, or use
+            None to not override.
+        ''',
+    }
+
     def __init__(self,
                  *spannedElements,
-                 number: t.Optional[int] = None,
-                 overrideDisplay: t.Optional[str] = None,
+                 number: int | str | Iterable[int] = 0,
+                 overrideDisplay: str | None = None,
                  **keywords):
         super().__init__(*spannedElements, **keywords)
-
-        self._number: t.Optional[int] = None
         # store a range, inclusive of the single number assignment
-        self._numberRange: t.List[int] = []
-        # are there exactly two numbers that should be written as  3, 4 not 3-4.
-        self._numberSpanIsAdjacent: bool = False
-        # can we write as '3, 4' or '5-10' and not as '1, 5, 6, 11'
-        self._numberSpanIsContiguous: bool = True
+        self.numberRange: list[int] = []
         self.overrideDisplay = overrideDisplay
+        self.number = number
 
-        if number is not None:
-            self.number = number
+    @property
+    def _numberSpanIsAdjacent(self) -> bool:
+        '''
+        are there exactly two numbers that should be written as 3, 4 not 3-4.
+        '''
+        return len(self.numberRange) == 2 and self.numberRange[0] == self.numberRange[1] - 1
+
+    @property
+    def _numberSpanIsContiguous(self) -> bool:
+        '''
+        can we write as '3, 4' or '5-10' and not as '1, 5, 6, 11'
+        '''
+        return common.contiguousList(self.numberRange)
 
     # property to enforce numerical numbers
-    def _getNumber(self):
+    def _getNumber(self) -> str:
         '''
         This must return a string, as we may have single numbers or lists.
-        For a raw numerical list, use getNumberList() below.
+        For a raw numerical list, look at `.numberRange`.
         '''
-        if not self._numberRange:
-            return ''
-        elif len(self._numberRange) == 1:
-            return str(self._number)
+        if len(self.numberRange) == 1:
+            if self.numberRange[0] == 0:
+                return ''
+            return str(self.numberRange[0])
         else:
             if not self._numberSpanIsContiguous:
-                return ', '.join([str(x) for x in self._numberRange])
+                return ', '.join([str(x) for x in self.numberRange])
             elif self._numberSpanIsAdjacent:
-                return f'{self._numberRange[0]}, {self._numberRange[-1]}'
+                return f'{self.numberRange[0]}, {self.numberRange[-1]}'
             else:  # range of values
-                return f'{self._numberRange[0]}-{self._numberRange[-1]}'
+                return f'{self.numberRange[0]}-{self.numberRange[-1]}'
 
-    def _setNumber(self, value):
+    def _setNumber(self, value: int | str | Iterable[int]):
         '''
         Set the bracket number. There may be range of values provided
         '''
-        if value in ('', None):
-            # assume this is 1
-            self._numberRange = [1]
-            self._number = 1
-        elif common.isIterable(value):
-            self._numberRange = []  # clear
+        if value == '':
+            # undefined.
+            self.numberRange = [0]
+        elif common.holdsType(value, int):
+            self.numberRange = []  # clear
             for x in value:
-                if common.isNum(x):
-                    self._numberRange.append(x)
-                else:
-                    raise SpannerException(
-                        f'number for RepeatBracket must be a number, not {value!r}')
-            self._number = min(self._numberRange)
-            self._numberSpanIsContiguous = common.contiguousList(self._numberRange)
-            if (len(self._numberRange) == 2) and (self._numberRange[0] == self._numberRange[1] - 1):
-                self._numberSpanIsAdjacent = True
-            else:
-                self._numberSpanIsAdjacent = False
-
+                self.numberRange.append(x)
         elif isinstance(value, str):
             # assume defined a range with a dash; assumed inclusive
             if '-' in value:
                 start, end = value.split('-')
-                self._numberRange = list(range(int(start), int(end) + 1))
-                self._numberSpanIsAdjacent = False
-                self._numberSpanIsContiguous = True
+                self.numberRange = list(range(int(start), int(end) + 1))
 
             elif ',' in value:
-                self._numberRange = []  # clear
-                for x in value.split(','):
-                    x = int(x.strip())
-                    self._numberRange.append(x)
-                self._number = min(self._numberRange)
-
-                # returns bool
-                self._numberSpanIsContiguous = common.contiguousList(self._numberRange)
-                if ((len(self._numberRange) == 2)
-                        and (self._numberRange[0] == self._numberRange[1] - 1)):
-                    self._numberSpanIsAdjacent = True
-                else:
-                    self._numberSpanIsAdjacent = False
-
+                self.numberRange = []  # clear
+                for one_letter_value in value.split(','):
+                    one_number = int(one_letter_value.strip())
+                    self.numberRange.append(one_number)
             elif value.isdigit():
-                self._numberRange.append(int(value))
+                self.numberRange = [int(value)]
             else:
                 raise SpannerException(f'number for RepeatBracket must be a number, not {value!r}')
-            self._number = min(self._numberRange)
-        elif common.isNum(value):
-            self._numberRange = []  # clear
-            self._number = value
-            if value not in self._numberRange:
-                self._numberRange.append(value)
+        elif common.isInt(value):
+            self.numberRange = []  # clear
+            if value not in self.numberRange:
+                self.numberRange.append(value)
         else:
             raise SpannerException(f'number for RepeatBracket must be a number, not {value!r}')
 
     number = property(_getNumber, _setNumber, doc='''
+            Get or set the number -- returning a string always.
+
+            >>> rb = spanner.RepeatBracket()
+            >>> rb.number
+            ''
+            >>> rb.number = '5-7'
+            >>> rb.number
+            '5-7'
+            >>> rb.numberRange
+            [5, 6, 7]
+            >>> rb.number = 1
         ''')
 
-    def getNumberList(self):
-        '''Get a contiguous list of repeat numbers that are applicable for this instance.
-
-        Will always have at least one element, but [0] means undefined
-
-        >>> rb = spanner.RepeatBracket()
-        >>> rb.getNumberList()
-        [0]
-
-        >>> rb.number = '1,2'
-        >>> rb.getNumberList()
-        [1, 2]
+    @common.deprecated('v9', 'v10', 'Look at .numberRange instead')
+    def getNumberList(self):  # pragma: no cover
         '''
-        nr = self._numberRange
-        if not nr:
-            return [0]
-        else:
-            return nr
+        Deprecated -- just look at .numberRange
+        '''
+        return self.numberRange
 
     def _reprInternal(self):
         if self.overrideDisplay is not None:
             msg = self.overrideDisplay + ' '
-        elif self.number is not None:
-            msg = str(self.number) + ' '
         else:
-            msg = ''
+            msg = self.number + ' '
         return msg + super()._reprInternal()
 
 
@@ -1674,15 +1675,15 @@ class Line(Spanner):
         tick: str = 'down',
         startTick: str = 'down',
         endTick: str = 'down',
-        startHeight: t.Optional[t.Union[int, float]] = None,
-        endHeight: t.Optional[t.Union[int, float]] = None,
+        startHeight: int | float | None = None,
+        endHeight: int | float | None = None,
         **keywords
     ):
         super().__init__(*spannedElements, **keywords)
 
         DEFAULT_TICK = 'down'
-        self._endTick = DEFAULT_TICK  # can ne up/down/arrow/both/None
-        self._startTick = DEFAULT_TICK  # can ne up/down/arrow/both/None
+        self._endTick = DEFAULT_TICK  # can be up/down/arrow/both/None
+        self._startTick = DEFAULT_TICK  # can be up/down/arrow/both/None
 
         self._endHeight = None  # for up/down, specified in tenths
         self._startHeight = None  # for up/down, specified in tenths
@@ -1835,7 +1836,7 @@ class Glissando(Spanner):
     def __init__(self,
                  *spannedElements,
                  lineType: str = 'wavy',
-                 label: t.Optional[str] = None,
+                 label: str | None = None,
                  **keywords):
         super().__init__(*spannedElements, **keywords)
 
@@ -1896,23 +1897,8 @@ class Test(unittest.TestCase):
         return xmlBytes.decode('utf-8')
 
     def testCopyAndDeepcopy(self):
-        '''
-        Test copying all objects defined in this module
-        '''
-        import sys
-        import types
-        for part in sys.modules[self.__module__].__dict__:
-            match = False
-            for skip in ['_', '__', 'Test', 'Exception']:
-                if part.startswith(skip) or part.endswith(skip):
-                    match = True
-            if match:
-                continue
-            obj = getattr(sys.modules[self.__module__], part)
-            # noinspection PyTypeChecker
-            if callable(obj) and not isinstance(obj, types.FunctionType):
-                i = copy.copy(obj)
-                j = copy.deepcopy(obj)
+        from music21.test.commonTest import testCopyAll
+        testCopyAll(self, globals())
 
     def testBasic(self):
 
@@ -2345,7 +2331,8 @@ class Test(unittest.TestCase):
         self.assertTrue(sp3.hasSpannedElement(m5))
 
     def testOttavaShiftA(self):
-        '''Test basic octave shift creation and output, as well as passing
+        '''
+        Test basic octave shift creation and output, as well as passing
         objects through make measure calls.
         '''
         from music21 import stream
@@ -2398,7 +2385,8 @@ class Test(unittest.TestCase):
         self.assertEqual(raw.count('type="up"'), 1)
 
     def testOttavaShiftB(self):
-        '''Test a single note octave
+        '''
+        Test a single note octave
         '''
         from music21 import stream
         from music21 import note
@@ -2693,8 +2681,8 @@ class Test(unittest.TestCase):
         from music21 import stream
         from music21.spanner import Spanner
 
-        n1 = note.Note('g')
-        n2 = note.Note('f#')
+        n1 = note.Note('G4')
+        n2 = note.Note('F#4')
 
         sp1 = Spanner(n1, n2)
         st1 = stream.Stream()
@@ -2702,7 +2690,6 @@ class Test(unittest.TestCase):
         st1.insert(0.0, n1)
         st1.insert(1.0, n2)
         st2 = copy.deepcopy(st1)
-
         n3 = st2.notes[0]
         self.assertEqual(len(n3.getSpannerSites()), 1)
         sp2 = n3.getSpannerSites()[0]
@@ -2760,7 +2747,7 @@ class Test(unittest.TestCase):
 
 # ------------------------------------------------------------------------------
 # define presented order in documentation
-_DOC_ORDER: t.List[type] = [Spanner]
+_DOC_ORDER: list[type] = [Spanner]
 
 
 if __name__ == '__main__':

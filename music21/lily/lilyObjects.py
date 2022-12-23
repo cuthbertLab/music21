@@ -5,7 +5,7 @@
 #
 # Authors:      Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2007-2012 Michael Scott Asato Cuthbert and the music21 Project
+# Copyright:    Copyright © 2007-2012 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 # pylint: disable=too-many-function-args
@@ -20,8 +20,11 @@ this replaces (April 2012) the old LilyString() conversion methods.
 The Grammar for Lilypond comes from
 http://lilypond.org/doc/v2.14/Documentation/notation/lilypond-grammar
 '''
+from __future__ import annotations
+
 import typing as t
 import unittest
+
 from music21 import common
 from music21 import exceptions21
 from music21 import prebase
@@ -40,9 +43,9 @@ class LyObject(prebase.ProtoM21Object):
     ''
 
     '''
-    supportedClasses: t.List[object] = []  # ordered list of classes to support
-    m21toLy: t.Dict[str, dict] = {}
-    defaultAttributes: t.Dict[str, t.Any] = {}
+    supportedClasses: list[object] = []  # ordered list of classes to support
+    m21toLy: dict[str, dict] = {}
+    defaultAttributes: dict[str, t.Any] = {}
     backslash = '\\'
 
     def __init__(self):

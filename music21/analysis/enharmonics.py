@@ -6,25 +6,21 @@
 # Authors:      Mark Gotham
 #               Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2017 Michael Scott Asato Cuthbert and the music21 Project
+# Copyright:    Copyright © 2017 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
+from __future__ import annotations
 
 import itertools
 from math import inf
 import unittest
 
-
-from music21 import exceptions21
+from music21 import environment
 from music21 import pitch
 from music21 import musedata
 
-from music21 import environment
 environLocal = environment.Environment('analysis.enharmonics')
 
-
-class EnharmonicsException(exceptions21.Music21Exception):
-    pass
 
 class EnharmonicScoreRules:
     def __init__(self):

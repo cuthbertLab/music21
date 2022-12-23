@@ -6,15 +6,25 @@
 # Authors:      Michael Scott Asato Cuthbert
 #               Christopher Ariza
 #
-# Copyright:    Copyright © 2009-2020 Michael Scott Asato Cuthbert and the music21 Project
+# Copyright:    Copyright © 2009-2020 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
 If it doesn't fit anywhere else in the common directory, you'll find it here...
 '''
-import typing as t
+from __future__ import annotations
+
+from collections.abc import Callable, Iterable
+import copy
+import os
 import platform
 import re
+import sys
+import textwrap
+import time
+import types
+import typing as t
+import weakref
 
 __all__ = [
     'flattenList',
@@ -29,16 +39,13 @@ __all__ = [
     'cleanedFlatNotation',
 ]
 
-import copy
-import os
-import sys
-import textwrap
-import time
+if t.TYPE_CHECKING:
+    _T = t.TypeVar('_T')
 
 # -----------------------------------------------------------------------------
 
 
-def flattenList(originalList: t.List) -> t.List:
+def flattenList(originalList: Iterable[Iterable[_T]]) -> list[_T]:
     '''
     Flatten a list of lists into a flat list
 
@@ -51,7 +58,7 @@ def flattenList(originalList: t.List) -> t.List:
     return [item for sublist in originalList for item in sublist]
 
 
-def unique(originalList: t.Iterable, *, key: t.Optional[t.Callable] = None) -> t.List:
+def unique(originalList: Iterable, *, key: Callable | None = None) -> list:
     '''
     Return a List of unique items from an iterable, preserving order.
     (unlike casting to a set and back)
@@ -145,7 +152,7 @@ def getPlatform() -> str:
     else:
         return os.name
 
-def macOSVersion() -> t.Tuple[int, int, int]:  # pragma: no cover
+def macOSVersion() -> tuple[int, int, int]:  # pragma: no cover
     '''
     On a Mac returns the current version as a tuple of (currently 3) ints,
     such as: (10, 5, 6) for 10.5.6.
@@ -165,7 +172,7 @@ def macOSVersion() -> t.Tuple[int, int, int]:  # pragma: no cover
     return (major, minor, maintenance)
 
 
-def sortModules(moduleList: t.Iterable[t.Any]) -> t.List[object]:
+def sortModules(moduleList: Iterable[t.Any]) -> list[object]:
     '''
     Sort a list of imported module names such that most recently modified is
     first.  In ties, last access time is used then module name
@@ -226,7 +233,16 @@ def runningUnderIPython() -> bool:
 # NB -- temp files (tempFile) etc. are in environment.py
 
 # ------------------------------------------------------------------------------
-def defaultDeepcopy(obj, memo, callInit=True):
+# From copy.py
+_IMMUTABLE_DEEPCOPY_TYPES = {
+    type(None), type(Ellipsis), type(NotImplemented),
+    int, float, bool, complex, bytes, str,
+    types.CodeType, type, range,
+    types.BuiltinFunctionType, types.FunctionType,
+    weakref.ref, property,
+}
+
+def defaultDeepcopy(obj: t.Any, memo=None, *, ignoreAttributes: Iterable[str] = ()):
     '''
     Unfortunately, it is not possible to do something like::
 
@@ -246,31 +262,27 @@ def defaultDeepcopy(obj, memo, callInit=True):
             else:
                 return common.defaultDeepcopy(self, memo)
 
-    looks through both __slots__ and __dict__ and does a deepcopy
-    of anything in each of them and returns the new object.
+    Does a deepcopy of the state returned by `__reduce_ex__` for protocol 4.
 
-    If callInit is False, then only __new__() is called.  This is
-    much faster if you're just going to overload every instance variable
-    or is required if __init__ has required variables in initialization.
+    * Changed in v9: callInit is removed, replaced with ignoreAttributes.
+      uses `__reduce_ex__` and `copy._reconstruct` internally.
     '''
-    if callInit is False:
-        new = obj.__class__.__new__(obj.__class__)
-    else:
-        new = obj.__class__()
+    if memo is None:
+        memo = {}
 
-    dictState = getattr(obj, '__dict__', None)
-    if dictState is not None:
-        for k in dictState:
-            # noinspection PyArgumentList
-            setattr(new, k, copy.deepcopy(dictState[k], memo=memo))
-    slots = set()
-    for cls in obj.__class__.mro():  # it is okay that it's in reverse order, since it's just names
-        slots.update(getattr(cls, '__slots__', ()))
-    for slot in slots:
-        slotValue = getattr(obj, slot, None)
-        # might be none if slot was deleted; it will be recreated here
-        setattr(new, slot, copy.deepcopy(slotValue))
+    rv = obj.__reduce_ex__(4)  # get a protocol 4 reduction
+    func, args, state = rv[:3]
+    new = func(*args)
+    memo[id(obj)] = new
 
+    # set up reducer to not copy the ignoreAttributes set.
+    for attr, value in state.items():
+        if attr in ignoreAttributes:
+            setattr(new, attr, None)
+        elif type(value) in _IMMUTABLE_DEEPCOPY_TYPES:
+            setattr(new, attr, value)
+        else:
+            setattr(new, attr, copy.deepcopy(value, memo))
     return new
 
 

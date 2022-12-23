@@ -15,20 +15,20 @@ Tools for grouping elements, timespans, and especially
 pitched elements into kinds of searchable tree organized by start and stop offsets
 and other positions.
 '''
-import unittest
-import weakref
+from __future__ import annotations
+
 from math import inf
 import typing as t
+import unittest
+import weakref
 
 from music21 import common
+from music21 import environment
 from music21 import exceptions21
-
 from music21.sorting import SortTuple
 
 from music21.tree import core
 from music21.tree import node as nodeModule
-
-from music21 import environment
 
 environLocal = environment.Environment('tree.trees')
 
@@ -96,7 +96,7 @@ class ElementTree(core.AVLTree):
     6.0
     '''
     # TYPING #
-    rootNode: t.Optional[nodeModule.ElementNode]
+    rootNode: nodeModule.ElementNode | None
 
     # CLASS VARIABLES #
     nodeClass = nodeModule.ElementNode
@@ -553,7 +553,7 @@ class ElementTree(core.AVLTree):
         <ElementNode: Start:36.0 <0.-5...> Indices:(l:193 *194* r:195)
             Payload:<music21.bar.Barline type=final>>
         '''
-        def recurse(subListOfTuples, globalStartOffset) -> t.Optional[core.AVLNode]:
+        def recurse(subListOfTuples, globalStartOffset) -> core.AVLNode | None:
             '''
             Divide and conquer.
             '''
@@ -898,7 +898,7 @@ class OffsetTree(ElementTree):
     __slots__ = ()
 
     # TYPING #
-    rootNode: t.Optional[nodeModule.OffsetNode]
+    rootNode: nodeModule.OffsetNode | None
 
     nodeClass = nodeModule.OffsetNode
 

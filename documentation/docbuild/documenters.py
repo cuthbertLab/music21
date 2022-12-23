@@ -7,15 +7,15 @@
 #               Christopher Ariza
 #               Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2013-17 Michael Scott Asato Cuthbert and the music21 Project
+# Copyright:    Copyright © 2013-17 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # -----------------------------------------------------------------------------
+from __future__ import annotations
 
 import builtins
 import inspect
 import re
 import types
-import typing as t
 import unittest
 
 from music21 import common
@@ -80,10 +80,10 @@ class Documenter:
 
 class ObjectDocumenter(Documenter):
     '''
-    Base class for object documenting sub-classes. such as ClassDocumenter
+    Base class for object documenting subclasses. such as ClassDocumenter
     '''
 
-    _DOC_ATTR: t.Dict[str, str] = {
+    _DOC_ATTR: dict[str, str] = {
         'referent':
             ''''
             The object being documented.
@@ -103,7 +103,7 @@ class ObjectDocumenter(Documenter):
         return ''
 
     @property
-    def rstAutodocDirectiveFormat(self) -> t.List[str]:
+    def rstAutodocDirectiveFormat(self) -> list[str]:
         return []
 
     @property
@@ -174,7 +174,7 @@ class FunctionDocumenter(ObjectDocumenter):
         return path.replace('.__init__', '')
 
     @property
-    def rstAutodocDirectiveFormat(self) -> t.List[str]:
+    def rstAutodocDirectiveFormat(self) -> list[str]:
         '''
         >>> function = common.opFrac
         >>> documenter = FunctionDocumenter(function)
@@ -193,17 +193,17 @@ class MemberDocumenter(ObjectDocumenter):
     '''
     Abstract base class for documenting class members such as Methods and Attributes and Properties
     '''
-    _DOC_ATTR: t.Dict[str, str] = {
+    _DOC_ATTR: dict[str, str] = {
         'memberName': 'the short name of the member, for instance "mode"',
-        'referent': '''the attribute or method itself, such as (no quotes)
-                       key.KeySignature.mode''',
-        'definingClass': '''the class the referent belongs to, such as (no quotes)
-                            key.KeySignature''',
+        'referent': '''the attribute or method itself, such as
+                       <function KeySignature.mode at ...>''',
+        'definingClass': '''the class the referent belongs to, such as
+                            <class 'music21.key.KeySignature'>''',
     }
 
     # INITIALIZER #
 
-    def __init__(self, referent, memberName, definingClass):
+    def __init__(self, referent, memberName: str, definingClass: type):
         if not isinstance(definingClass, type):
             raise Music21Exception(f'referent must be a class, not {referent}')
         super().__init__(referent)
@@ -271,7 +271,12 @@ class MethodDocumenter(MemberDocumenter):
     @property
     def rstAutodocDirectiveFormat(self):
         result = []
-        result.append(f'.. automethod:: {self.referentPackageSystemPath}')
+        indent = ''
+        if getattr(self.referent, '_isDeprecated', False):
+            indent = '    '
+            result.append('.. cssclass:: strike')
+            result.append('')
+        result.append(f'{indent}.. automethod:: {self.referentPackageSystemPath}')
         result.append('')
         return result
 
@@ -393,6 +398,7 @@ class ClassDocumenter(ObjectDocumenter):
        - :attr:`~music21.base.Music21Object.classSortOrder`
        - :attr:`~music21.base.Music21Object.groups`
        - :attr:`~music21.base.Music21Object.isStream`
+       - :attr:`~music21.base.Music21Object.sites`
     '''
 
     # CLASS VARIABLES #
@@ -438,7 +444,7 @@ class ClassDocumenter(ObjectDocumenter):
         find all attributes in self.referent and set classes appropriately.
         '''
 
-        attrs: t.List[inspect.Attribute] = inspect.classify_class_attrs(self.referent)
+        attrs: list[inspect.Attribute] = inspect.classify_class_attrs(self.referent)
         for attr in attrs:
             self.findOneAttribute(attr)
 
@@ -1056,6 +1062,7 @@ class ClassDocumenter(ObjectDocumenter):
         ''
         '   - :attr:`~music21.note.GeneralNote.lyric`'
         '   - :attr:`~music21.note.GeneralNote.pitches`'
+        '   - :attr:`~music21.note.GeneralNote.tie`'
         ''
         'Read/write properties inherited from :class:`~music21.base.Music21Object`:'
         ''
@@ -1451,7 +1458,8 @@ class ModuleDocumenter(ObjectDocumenter):
 
     @property
     def referenceName(self):
-        '''The short name of the module:
+        '''
+        The short name of the module:
 
         >>> from music21 import serial
         >>> module = serial
@@ -1477,11 +1485,11 @@ class ModuleDocumenter(ObjectDocumenter):
 
 
 class CorpusDocumenter(Documenter):
-    '''A documenter for music21's corpus:
+    '''
+    A documenter for music21's corpus:
 
     >>> documenter = CorpusDocumenter()
     >>> restructuredText = documenter.run()
-
     '''
 
     # SPECIAL METHODS #

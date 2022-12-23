@@ -7,9 +7,10 @@
 #               Michael Scott Asato Cuthbert
 #
 # Copyright:    Copyright © 2009-2022 Michael Scott Asato Cuthbert
-#               and the music21 Project
 # License:      BSD, see license.txt
 # -----------------------------------------------------------------------------
+from __future__ import annotations
+
 import copy
 import random
 import unittest
@@ -25,7 +26,8 @@ class TestExternal(unittest.TestCase):
     show = True
 
     def testSingle(self):
-        '''Need to test direct meter creation w/o stream
+        '''
+        Need to test direct meter creation w/o stream
         '''
         a = TimeSignature('3/16')
         if self.show:
@@ -73,28 +75,6 @@ class TestExternal(unittest.TestCase):
 
 
 class Test(unittest.TestCase):
-    def testCopyAndDeepcopy(self):
-        '''Test copying all objects defined in this module
-        '''
-        import sys
-        import types
-        for part in sys.modules[self.__module__].__dict__:
-            match = False
-            for skip in ['_', '__', 'Test', 'Exception']:
-                if part.startswith(skip) or part.endswith(skip):
-                    match = True
-            if match:
-                continue
-            name = getattr(sys.modules[self.__module__], part)
-            # noinspection PyTypeChecker
-            if callable(name) and not isinstance(name, types.FunctionType):
-                try:  # see if obj can be made w/ args
-                    obj = name()
-                except TypeError:
-                    continue
-                i = copy.copy(obj)
-                j = copy.deepcopy(obj)
-
     def testMeterSubdivision(self):
         a = MeterSequence()
         a.load('4/4', 4)
@@ -106,15 +86,24 @@ class Test(unittest.TestCase):
         a[3] = a[3].subdivide(4)
         self.assertEqual(str(a), '{{1/8+1/8}+1/4+1/4+{1/16+1/16+1/16+1/16}}')
 
-    def testMeterDeepcopy(self):
+    def testMeterSequenceDeepcopy(self):
         a = MeterSequence()
         a.load('4/4', 4)
         b = copy.deepcopy(a)
-        self.assertNotEqual(a, b)
+        self.assertIsNot(a, b)
+        # TODO: this is work in progress.
+        # self.assertEqual(a, b)
 
+    def testTimeSignatureDeepcopy(self):
         c = TimeSignature('4/4')
         d = copy.deepcopy(c)
-        self.assertNotEqual(c, d)
+        self.assertIsNot(c, d)
+        self.assertEqual(c, d)
+
+        # TODO: this is work in progress
+        # e = TimeSignature('slow 6/8')
+        # f = TimeSignature('fast 6/8')
+        # self.assertNotEqual(e, f)
 
     def testGetBeams(self):
         ts = TimeSignature('6/8')

@@ -6,13 +6,15 @@
 # Authors:      Jacob Tyler Walls
 #               Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2020-22 Michael Scott Asato Cuthbert and the music21 Project
+# Copyright:    Copyright © 2020-22 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
 A mixin to ScoreExporter that includes the capabilities for producing a single
 MusicXML `<part>` from multiple music21 `PartStaff` objects.
 '''
+from __future__ import annotations
+
 import typing as t
 import unittest
 import warnings
@@ -23,14 +25,16 @@ from music21.common.types import M21ObjType
 from music21.key import KeySignature
 from music21.layout import StaffGroup
 from music21.meter import TimeSignature
-from music21 import stream  # for typing
+from music21 import stream
+
 from music21.musicxml import helpers
 from music21.musicxml.xmlObjects import MusicXMLExportException, MusicXMLWarning
+
 
 def addStaffTags(
     measure: Element,
     staffNumber: int,
-    tagList: t.List[str]
+    tagList: list[str]
 ):
     '''
     For a <measure> tag `measure`, add a <staff> grandchild to any instance of
@@ -149,7 +153,7 @@ class PartStaffExporterMixin:
             self.setEarliestAttributesAndClefsPartStaff(group)
             self.cleanUpSubsequentPartStaffs(group)
 
-    def joinableGroups(self) -> t.List[StaffGroup]:
+    def joinableGroups(self) -> list[StaffGroup]:
         # noinspection PyShadowingNames
         '''
         Returns a list of :class:`~music21.layout.StaffGroup` objects that
@@ -234,7 +238,7 @@ class PartStaffExporterMixin:
             from music21.musicxml.m21ToXml import XMLExporterBase
             assert isinstance(self, XMLExporterBase)
         staffGroups = list(s.getElementsByClass(StaffGroup)) if (s := self.stream) else []
-        joinableGroups: t.List[StaffGroup] = []
+        joinableGroups: list[StaffGroup] = []
         # Joinable groups must consist of only PartStaffs with Measures
         # and exist in self.stream
         for sg in staffGroups:
@@ -253,7 +257,7 @@ class PartStaffExporterMixin:
 
         # Deduplicate joinable groups (ex: bracket and brace enclose same PartStaffs)
         permutations = set()
-        deduplicatedGroups: t.List[StaffGroup] = []
+        deduplicatedGroups: list[StaffGroup] = []
         for jg in joinableGroups:
             containedParts = tuple(jg)
             if containedParts not in permutations:
@@ -293,7 +297,7 @@ class PartStaffExporterMixin:
         >>> root = SX.parse()
         >>> m1 = root.find('part/measure')
         >>> SX.dump(m1)
-        <measure number="1">
+        <measure implicit="no" number="1">
         ...
           <note>
             <pitch>
@@ -320,7 +324,7 @@ class PartStaffExporterMixin:
           </note>
         </measure>
         '''
-        initialPartStaffRoot: t.Optional[Element] = None
+        initialPartStaffRoot: Element | None = None
         for i, ps in enumerate(group):
             staffNumber: int = i + 1  # 1-indexed
             thisPartStaffRoot: Element = self.getRootForPartStaff(ps)
@@ -372,7 +376,7 @@ class PartStaffExporterMixin:
                                    target: Element,
                                    source: Element,
                                    staffNum: int
-                                   ) -> t.Dict[int, t.List[Element]]:
+                                   ) -> dict[int, list[Element]]:
         '''
         Move elements from subsequent PartStaff's measures into `target`: the <part>
         element representing the initial PartStaff that will soon represent the merged whole.
@@ -385,12 +389,12 @@ class PartStaffExporterMixin:
         DIVIDER_COMMENT = '========================= Measure [NNN] =========================='
         PLACEHOLDER = '[NNN]'
 
-        def makeDivider(inner_sourceNumber: t.Union[int, str]) -> Element:
+        def makeDivider(inner_sourceNumber: int | str) -> Element:
             return Comment(DIVIDER_COMMENT.replace(PLACEHOLDER, str(inner_sourceNumber)))
 
         sourceMeasures = iter(source.findall('measure'))
         sourceMeasure = None  # Set back to None when disposed of
-        insertions: t.Dict[int, t.List[Element]] = {}
+        insertions: dict[int, list[Element]] = {}
 
         # Walk through <measures> of the target <part>, compare measure numbers
         for i, targetMeasure in enumerate(target):
@@ -475,7 +479,7 @@ class PartStaffExporterMixin:
         >>> root = SX.parse()
         >>> m1 = root.find('part/measure')
         >>> SX.dump(m1)
-        <measure number="1">
+        <measure implicit="no" number="1">
           <attributes>
             <divisions>10080</divisions>
             <key number="1">
@@ -509,7 +513,7 @@ class PartStaffExporterMixin:
         >>> root = SX.parse()
         >>> m1 = root.find('part/measure')
         >>> SX.dump(m1)
-        <measure number="1">
+        <measure implicit="no" number="1">
             <attributes>
             <divisions>10080</divisions>
             <key>
@@ -538,14 +542,14 @@ class PartStaffExporterMixin:
         </measure>
         '''
 
-        def isMultiAttribute(m21Class: t.Type[M21ObjType],
+        def isMultiAttribute(m21Class: type[M21ObjType],
                              comparison: str = '__eq__') -> bool:
             '''
             Return True if any first instance of m21Class in any subsequent staff
             in this StaffGroup does not compare to the first instance of that class
             in the earliest staff where found (not necessarily the first) using `comparison`.
             '''
-            initialM21Instance: t.Optional[M21ObjType] = None
+            initialM21Instance: M21ObjType | None = None
             # noinspection PyShadowingNames
             for ps in group:  # ps okay to reuse.
                 if initialM21Instance is None:
@@ -563,8 +567,8 @@ class PartStaffExporterMixin:
         multiKey: bool = isMultiAttribute(KeySignature)
         multiMeter: bool = isMultiAttribute(TimeSignature, comparison='ratioEqual')
 
-        initialPartStaffRoot: t.Optional[Element] = None
-        mxAttributes: t.Optional[Element] = None
+        initialPartStaffRoot: Element | None = None
+        mxAttributes: Element | None = None
         for i, ps in enumerate(group):
             staffNumber: int = i + 1  # 1-indexed
 
@@ -572,7 +576,7 @@ class PartStaffExporterMixin:
             if initialPartStaffRoot is None:
                 initialPartStaffRoot = self.getRootForPartStaff(ps)
                 mxAttributes = initialPartStaffRoot.find('measure/attributes')
-                clef1: t.Optional[Element] = mxAttributes.find('clef') if mxAttributes else None
+                clef1: Element | None = mxAttributes.find('clef') if mxAttributes else None
                 if clef1 is not None:
                     clef1.set('number', '1')
 
@@ -597,7 +601,7 @@ class PartStaffExporterMixin:
             # Subsequent PartStaffs in group: set additional clefs on mxAttributes
             else:
                 thisPartStaffRoot: Element = self.getRootForPartStaff(ps)
-                oldClef: t.Optional[Element] = thisPartStaffRoot.find('measure/attributes/clef')
+                oldClef: Element | None = thisPartStaffRoot.find('measure/attributes/clef')
                 if oldClef is not None and mxAttributes is not None:
                     clefsInMxAttributesAlready = mxAttributes.findall('clef')
                     if len(clefsInMxAttributesAlready) >= staffNumber:
@@ -627,7 +631,7 @@ class PartStaffExporterMixin:
                     )
 
                 if multiMeter:
-                    oldMeter: t.Optional[Element] = thisPartStaffRoot.find(
+                    oldMeter: Element | None = thisPartStaffRoot.find(
                         'measure/attributes/time'
                     )
                     if oldMeter:
@@ -638,7 +642,7 @@ class PartStaffExporterMixin:
                             tagList=['staves']
                         )
                 if multiKey:
-                    oldKey: t.Optional[Element] = thisPartStaffRoot.find('measure/attributes/key')
+                    oldKey: Element | None = thisPartStaffRoot.find('measure/attributes/key')
                     if oldKey:
                         oldKey.set('number', str(staffNumber))
                         helpers.insertBeforeElements(
@@ -670,7 +674,7 @@ class PartStaffExporterMixin:
             partStaffRoot: Element = self.getRootForPartStaff(ps)
             # Remove PartStaff from export list
             # noinspection PyAttributeOutsideInit
-            self.partExporterList: t.List[music21.musicxml.m21ToXml.PartExporter] = [
+            self.partExporterList: list[music21.musicxml.m21ToXml.PartExporter] = [
                 pex for pex in self.partExporterList if pex.xmlRoot != partStaffRoot
             ]
 
@@ -778,9 +782,11 @@ class PartStaffExporterMixin:
                 for midMeasureClef in elem.findall('clef'):
                     midMeasureClef.set('number', str(staffNumber))
             if elem.tag == 'barline':
-                # Remove existing <barline>, if any
+                # Remove existing <barline> with the same direction, if any
+                thisBarlineLocation = elem.get('location')
                 for existingBarline in otherMeasure.findall('barline'):
-                    otherMeasure.remove(existingBarline)
+                    if existingBarline.get('location') == thisBarlineLocation:
+                        otherMeasure.remove(existingBarline)
             if elem.tag == 'note':
                 voice = elem.find('voice')
                 if voice is not None:
@@ -823,23 +829,23 @@ class PartStaffExporterMixin:
             <music21.stream.PartStaff unrelated> not found in self.partExporterList
         '''
         for pex in self.partExporterList:
-            if partStaff is pex.stream:
+            if partStaff is pex.stream and pex.xmlRoot is not None:
                 return pex.xmlRoot
 
         # now try derivations:
         for pex in self.partExporterList:
             for derived in pex.stream.derivation.chain():
-                if derived is partStaff:
+                if derived is partStaff and pex.xmlRoot is not None:
                     return pex.xmlRoot
 
         # now just match on id:
         for pex in self.partExporterList:
-            if partStaff.id == pex.stream.id:
+            if partStaff.id == pex.stream.id and pex.xmlRoot is not None:
                 return pex.xmlRoot
 
         for pex in self.partExporterList:
             for derived in pex.stream.derivation.chain():
-                if partStaff.id == derived.id:
+                if partStaff.id == derived.id and pex.xmlRoot is not None:
                     return pex.xmlRoot
 
         raise MusicXMLExportException(
@@ -1135,7 +1141,9 @@ class Test(unittest.TestCase):
         self.assertEqual(len(root.findall('part/measure/attributes/time')), 3)
 
     def testBackupAmount(self):
-        '''Regression test for chord members causing too-large backup amounts.'''
+        '''
+        Regression test for chord members causing too-large backup amounts.
+        '''
         from music21 import chord
         from music21 import defaults
         from music21 import layout
@@ -1149,6 +1157,32 @@ class Test(unittest.TestCase):
         self.assertEqual(
             root.findall('part/measure/backup/duration')[0].text,
             str(defaults.divisionsPerQuarter)
+        )
+
+    def testForwardRepeatMarks(self):
+        '''
+        Regression test for losing forward repeat marks.
+        '''
+        from music21 import bar
+        from music21 import layout
+        from music21 import note
+
+        measureRH = stream.Measure(
+            [bar.Repeat(direction='start'), note.Note(type='whole')])
+        measureRH.storeAtEnd(bar.Repeat(direction='end'))
+        measureLH = stream.Measure(
+            [bar.Repeat(direction='start'), note.Note(type='whole')])
+        measureLH.storeAtEnd(bar.Repeat(direction='end'))
+
+        ps1 = stream.PartStaff(measureRH)
+        ps2 = stream.PartStaff(measureLH)
+        sg = layout.StaffGroup([ps1, ps2])
+        s = stream.Score([sg, ps1, ps2])
+
+        root = self.getET(s)
+        self.assertEqual(
+            [r.get('direction') for r in root.findall('.//repeat')],
+            ['forward', 'backward']
         )
 
 

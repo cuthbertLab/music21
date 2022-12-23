@@ -7,7 +7,7 @@
 #               Michael Scott Asato Cuthbert
 #               (Will Ware -- see docs)
 #
-# Copyright:    Copyright © 2011-2013, 2019 Michael Scott Asato Cuthbert and the music21 Project
+# Copyright:    Copyright © 2011-2013, 2019 Michael Scott Asato Cuthbert
 #               Some parts of this module are in the Public Domain, see details.
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
@@ -23,6 +23,8 @@ This module originally used routines from Will Ware's public domain midi.py
 library from 2001 which was once posted at (http link)
 groups.google.com/g/alt.sources/msg/0c5fc523e050c35e
 '''
+from __future__ import annotations
+
 __all__ = [
     'realtime', 'percussion',
     'MidiEvent', 'MidiFile', 'MidiTrack', 'MidiException',
@@ -464,31 +466,31 @@ class MidiEvent(prebase.ProtoM21Object):
     '''
     # pylint: disable=redefined-builtin
     def __init__(self,
-                 track: t.Optional['music21.midi.MidiTrack'] = None,
+                 track: MidiTrack | None = None,
                  type=None,
                  time: int = 0,
-                 channel: t.Optional[int] = None):
-        self.track: t.Optional['music21.midi.MidiTrack'] = track  # a MidiTrack object
+                 channel: int | None = None):
+        self.track: MidiTrack | None = track  # a MidiTrack object
         self.type = type
         self.time: int = time
-        self.channel: t.Optional[int] = channel
+        self.channel: int | None = channel
 
-        self.parameter1: t.Union[int, bytes, None] = None  # pitch or first data value
-        self.parameter2: t.Union[int, bytes, None] = None  # velocity or second data value
+        self.parameter1: int | bytes | None = None  # pitch or first data value
+        self.parameter2: int | bytes | None = None  # velocity or second data value
 
         # data is a property...
 
         # if this is a Note on/off, need to store original
         # pitch space value in order to determine if this has a microtone
-        self.centShift: t.Optional[int] = None
+        self.centShift: int | None = None
 
         # store a reference to a corresponding event
         # if a noteOn, store the note off, and vice versa
         # circular ref -- but modern Python will garbage collect it.
-        self.correspondingEvent: t.Optional[MidiEvent] = None
+        self.correspondingEvent: MidiEvent | None = None
 
         # store and pass on a running status if found
-        self.lastStatusByte: t.Optional[int] = None
+        self.lastStatusByte: int | None = None
 
     @property
     def sortOrder(self) -> int:
@@ -840,7 +842,7 @@ class MidiEvent(prebase.ProtoM21Object):
             return midiBytes[3:]
         raise TypeError(f'expected ChannelVoiceMessage, got {self.type}')  # pragma: no cover
 
-    def read(self, midiBytes):
+    def read(self, midiBytes: bytes) -> bytes:
         r'''
         Parse the bytes given and take the beginning
         section and convert it into data for this event and return the
@@ -850,7 +852,6 @@ class MidiEvent(prebase.ProtoM21Object):
         >>> noteOnMessage = midi.ChannelVoiceMessages.NOTE_ON | channel
         >>> hex(noteOnMessage)
         '0x92'
-
 
         This is how the system reads note-on messages (0x90-0x9F) and channels
 
@@ -1058,7 +1059,6 @@ class MidiEvent(prebase.ProtoM21Object):
         '''
         Return a boolean if this is a DeltaTime subclass.
 
-
         >>> mt = midi.MidiTrack(1)
         >>> dt = midi.DeltaTime(mt)
         >>> dt.isDeltaTime()
@@ -1152,23 +1152,25 @@ class DeltaTime(MidiEvent):
             rep = '(empty) ' + rep
         return rep
 
-    def read(self, oldBytes: bytes) -> t.Tuple[int, bytes]:
+    def readUntilLowByte(self, oldBytes: bytes) -> tuple[int, bytes]:
         r'''
         Read a byte-string until hitting a character below 0x80
         and return the converted number and the rest of the bytes
 
         >>> mt = midi.MidiTrack(1)
         >>> dt = midi.DeltaTime(mt)
-        >>> dt.read(b'\x20')
+        >>> dt.readUntilLowByte(b'\x20')
         (32, b'')
-        >>> dt.read(b'\x20hello')
+        >>> dt.readUntilLowByte(b'\x20hello')
         (32, b'hello')
 
         here the '\x82' is above 0x80 so the 'h' is read
         as part of the continuation.
 
-        >>> dt.read(b'\x82hello')
+        >>> dt.readUntilLowByte(b'\x82hello')
         (360, b'ello')
+
+        Changed in v9: was read() but had an incompatible signature with MidiEvent
         '''
         self.time, newBytes = getVariableLengthNumber(oldBytes)
         return self.time, newBytes
@@ -1272,10 +1274,10 @@ class MidiTrack(prebase.ProtoM21Object):
     def length(self):
         return len(self.data)
 
-    def read(self, midiBytes):
+    def read(self, midiBytes: bytes) -> bytes:
         '''
-        Read as much of the string (representing midi data) as necessary;
-        return the remaining string for reassignment and further processing.
+        Read as much of the bytes object (representing midi data) as necessary;
+        return the remaining bytes object for reassignment and further processing.
 
         The string should begin with `MTrk`, specifying a Midi Track
 
@@ -1297,7 +1299,7 @@ class MidiTrack(prebase.ProtoM21Object):
         self.processDataToEvents(trackData)
         return remainder  # remainder string after extracting track data
 
-    def processDataToEvents(self, trackData: bytes = b''):
+    def processDataToEvents(self, trackData: bytes = b'') -> None:
         '''
         Populate .events with trackData.  Called by .read()
         '''
@@ -1307,7 +1309,7 @@ class MidiTrack(prebase.ProtoM21Object):
             # shave off the time stamp from the event
             delta_t = DeltaTime(track=self)
             # return extracted time, as well as remaining bytes
-            dt, trackDataCandidate = delta_t.read(trackData)
+            dt, trackDataCandidate = delta_t.readUntilLowByte(trackData)
             # this is the offset that this event happens at, in ticks
             timeCandidate = time + dt
 
@@ -1544,7 +1546,8 @@ class MidiFile(prebase.ProtoM21Object):
         self.file = open(filename, attrib)
 
     def openFileLike(self, fileLike):
-        '''Assign a file-like object, such as those provided by BytesIO, as an open file object.
+        '''
+        Assign a file-like object, such as those provided by BytesIO, as an open file object.
 
         >>> from io import BytesIO
         >>> fileLikeOpen = BytesIO()
@@ -1760,10 +1763,10 @@ class Test(unittest.TestCase):
         mf.write()
         mf.close()
 
-#         mf = MidiFile()
-#         mf.open(fp)
-#         mf.read()
-#         mf.close()
+        # mf = MidiFile()
+        # mf.open(fp)
+        # mf.read()
+        # mf.close()
 
     def testInternalDataModel(self):
         dirLib = common.getSourceFilePath() / 'midi' / 'testPrimitive'
@@ -1986,7 +1989,7 @@ class Test(unittest.TestCase):
 
 # ------------------------------------------------------------------------------
 # define presented order in documentation
-_DOC_ORDER: t.List[type] = []
+_DOC_ORDER: list[type] = []
 
 if __name__ == '__main__':
     import music21

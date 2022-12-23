@@ -6,12 +6,14 @@
 # Authors:      Christopher Ariza
 #               Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2009-2022 Michael Scott Asato Cuthbert and the music21 Project
+# Copyright:    Copyright © 2009-2022 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
-import re
+from __future__ import annotations
 
 from collections import OrderedDict
+import re
+
 # these single-entity tags are bundled together.
 from music21 import articulations
 from music21 import exceptions21
@@ -103,7 +105,7 @@ ORNAMENT_MARKS = {'trill-mark': expressions.Trill,
 # ------------------------------------------------------------------------------
 
 class MusicXMLException(exceptions21.Music21Exception):
-    def __init__(self, message):
+    def __init__(self, message: str):
         super().__init__(message)
         self.measureNumber: str = ''
         self.partName: str = ''

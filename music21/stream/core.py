@@ -6,7 +6,7 @@
 # Authors:      Michael Scott Asato Cuthbert
 #               Christopher Ariza
 #
-# Copyright:    Copyright © 2008-2022 Michael Scott Asato Cuthbert and the music21 Project
+# Copyright:    Copyright © 2008-2022 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # -----------------------------------------------------------------------------
 '''
@@ -24,18 +24,22 @@ All functions here will eventually begin with `.core`.
 from __future__ import annotations
 
 import copy
-import typing as t
 from fractions import Fraction
+import typing as t
 import unittest
 
 from music21.base import Music21Object
 from music21.common.enums import OffsetSpecial
 from music21.common.numberTools import opFrac
-from music21.common.types import OffsetQLSpecial, M21ObjType
+from music21.common.types import OffsetQL, OffsetQLSpecial, M21ObjType
 from music21 import spanner
 from music21 import tree
 from music21.exceptions21 import StreamException, ImmutableStreamException
 from music21.stream.iterator import StreamIterator, RecursiveIterator
+
+
+if t.TYPE_CHECKING:
+    from music21.stream import Stream
 
 
 class StreamCore(Music21Object):
@@ -43,20 +47,20 @@ class StreamCore(Music21Object):
     Core aspects of a Stream's behavior.  Any of these can change at any time.
     Users are encouraged only to create stream.Stream objects.
     '''
-    def __init__(self, **keywords):
+    def __init__(self, **keywords) -> None:
         super().__init__(**keywords)
         # hugely important -- keeps track of where the _elements are
         # the _offsetDict is a dictionary where id(element) is the
         # index and the value is a tuple of offset and element.
         # offsets can be floats, Fractions, or a member of the enum OffsetSpecial
-        self._offsetDict: t.Dict[int, t.Tuple[OffsetQLSpecial, Music21Object]] = {}
+        self._offsetDict: dict[int, tuple[OffsetQLSpecial, Music21Object]] = {}
 
         # self._elements stores Music21Object objects.
-        self._elements: t.List[Music21Object] = []
+        self._elements: list[Music21Object] = []
 
         # self._endElements stores Music21Objects found at
         # the highestTime of this Stream.
-        self._endElements: t.List[Music21Object] = []
+        self._endElements: list[Music21Object] = []
 
         self.isSorted = True
         # should isFlat become readonly?
@@ -67,7 +71,7 @@ class StreamCore(Music21Object):
 
     def coreInsert(
         self,
-        offset: t.Union[float, Fraction],
+        offset: OffsetQL,
         element: Music21Object,
         *,
         ignoreSort=False,
@@ -162,7 +166,7 @@ class StreamCore(Music21Object):
     def coreSetElementOffset(
         self,
         element: Music21Object,
-        offset: t.Union[int, float, Fraction, OffsetSpecial],
+        offset: int | float | Fraction | OffsetSpecial,
         *,
         addElement=False,
         setActiveSite=True
@@ -187,7 +191,8 @@ class StreamCore(Music21Object):
         # Note: not documenting 'highestTime' is on purpose, since can only be done for
         # elements already stored at end.  Infinite loop.
         try:
-            offset = opFrac(offset)
+            # try first, for the general case of not OffsetSpecial.
+            offset = opFrac(offset)  # type: ignore
         except TypeError:
             if offset not in OffsetSpecial:  # pragma: no cover
                 raise StreamException(f'Cannot set offset to {offset!r} for {element}')
@@ -203,11 +208,11 @@ class StreamCore(Music21Object):
     def coreElementsChanged(
         self,
         *,
-        updateIsFlat=True,
-        clearIsSorted=True,
-        memo=None,
-        keepIndex=False,
-    ):
+        updateIsFlat: bool = True,
+        clearIsSorted: bool = True,
+        memo: list[int] | None = None,
+        keepIndex: bool = False,
+    ) -> None:
         '''
         NB -- a "core" stream method that is not necessary for most users.
 
@@ -235,7 +240,7 @@ class StreamCore(Music21Object):
         False
         '''
         # experimental
-        if not self._mutable:
+        if not getattr(self, '_mutable', True):
             raise ImmutableStreamException(
                 'coreElementsChanged should not be triggered on an immutable stream'
             )
@@ -259,7 +264,8 @@ class StreamCore(Music21Object):
         if self._derivation is not None:
             sdm = self._derivation.method
             if sdm in ('flat', 'semiflat'):
-                origin: 'music21.stream.Stream' = self._derivation.origin
+                origin: 'music21.stream.Stream' = t.cast('music21.stream.Stream',
+                                                         self._derivation.origin)
                 origin.clearCache()
 
         # may not always need to clear cache of all living sites, but may
@@ -543,8 +549,7 @@ class StreamCore(Music21Object):
         <ElementTree {20} (0.0 <0.-25...> to 8.0) <music21.stream.Score exampleScore>>
         '''
         if t.TYPE_CHECKING:
-            from music21 import stream
-            assert isinstance(self, stream.Stream)
+            assert isinstance(self, Stream)
         hashedAttributes = hash((tuple(classList or ()),
                                   flatten,
                                   useTimespans,
@@ -562,11 +567,11 @@ class StreamCore(Music21Object):
     def coreGatherMissingSpanners(
         self,
         *,
-        recurse=True,
-        requireAllPresent=True,
-        insert=True,
-        constrainingSpannerBundle: t.Optional[spanner.SpannerBundle] = None
-    ) -> t.Optional[t.List[spanner.Spanner]]:
+        recurse: bool = True,
+        requireAllPresent: bool = True,
+        insert: bool = True,
+        constrainingSpannerBundle: spanner.SpannerBundle | None = None
+    ) -> list[spanner.Spanner] | None:
         '''
         find all spanners that are referenced by elements in the
         (recursed if recurse=True) stream and either inserts them in the Stream
@@ -711,7 +716,7 @@ class StreamCore(Music21Object):
         {1.0} <music21.note.Note D>
         '''
         sb = self.spannerBundle
-        sIter: t.Union[StreamIterator, RecursiveIterator]
+        sIter: StreamIterator | RecursiveIterator
         if recurse is True:
             sIter = self.recurse()  # type: ignore
         else:

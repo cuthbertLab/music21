@@ -8,13 +8,15 @@
 #               Jacob Tyler Walls
 #               Christopher Ariza
 #
-# Copyright:    Copyright © 2011-2022, Michael Scott Asato Cuthbert and the music21 Project
+# Copyright:    Copyright © 2011-2022, Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
 An object representation of harmony, a subclass of chord, as encountered as chord symbols or
 roman numerals, or other chord representations with a defined root.
 '''
+from __future__ import annotations
+
 import collections
 import copy
 import re
@@ -26,16 +28,15 @@ from music21 import base
 from music21 import chord
 from music21 import common
 from music21 import duration
+from music21 import environment
 from music21 import exceptions21
+from music21.figuredBass import realizerScale
 from music21 import interval
 from music21 import key
 from music21 import pitch
 from music21 import prebase
 from music21 import style
 
-from music21.figuredBass import realizerScale
-
-from music21 import environment
 environLocal = environment.Environment('harmony')
 
 T = t.TypeVar('T', bound='ChordSymbol')
@@ -93,8 +94,8 @@ CHORD_TYPES = collections.OrderedDict([
     ('minor-11th', ['1,-3,5,-7,9,11', ['m11', 'min11']]),  # Y
     ('augmented-major-11th', ['1,3,#5,7,9,11', ['+M11', 'augmaj11']]),  # N
     ('augmented-11th', ['1,3,#5,-7,9,11', ['+11', 'aug11']]),  # N
-    ('half-diminished-11th', ['1,-3,-5,-7,-9,11', ['ø11']]),  # N
-    ('diminished-11th', ['1,-3,-5,--7,-9,-11', ['o11', 'dim11']]),  # N
+    ('half-diminished-11th', ['1,-3,-5,-7,9,11', ['ø11']]),  # N
+    ('diminished-11th', ['1,-3,-5,--7,9,11', ['o11', 'dim11']]),  # N
 
     # thirteenths
     ('major-13th', ['1,3,5,7,9,11,13', ['M13', 'Maj13']]),  # Y
@@ -207,10 +208,10 @@ class Harmony(chord.Chord):
     # INITIALIZER #
 
     def __init__(self,
-                 figure: t.Optional[str] = None,
-                 root: t.Union[str, pitch.Pitch, None] = None,
-                 bass: t.Union[str, pitch.Pitch, None] = None,
-                 inversion: t.Optional[int] = None,
+                 figure: str | None = None,
+                 root: str | pitch.Pitch | None = None,
+                 bass: str | pitch.Pitch | None = None,
+                 inversion: int | None = None,
                  updatePitches: bool = True,
                  **keywords
                  ):
@@ -226,8 +227,8 @@ class Harmony(chord.Chord):
         # called <function> which might conflict with the Harmony...
         self._roman = None
         # specify an array of degree alteration objects
-        self.chordStepModifications: t.List[ChordStepModification] = []
-        self._degreesList: t.List[str] = []
+        self.chordStepModifications: list[ChordStepModification] = []
+        self._degreesList: list[str] = []
         self._key = None
         # senseless to parse inversion until chord members are populated
         self._updateFromParameters(root=root, bass=bass)
@@ -272,7 +273,7 @@ class Harmony(chord.Chord):
         '''
         return
 
-    def _updateFromParameters(self, root, bass, inversion: t.Optional[int] = None):
+    def _updateFromParameters(self, root, bass, inversion: int | None = None):
         '''
         This method must be called twice, once before the pitches
         are rendered, and once after. This is because after the pitches
@@ -428,7 +429,7 @@ class Harmony(chord.Chord):
             if not self.pitches:
                 return roman.RomanNumeral()
 
-
+            # what is manipulating this so that write as chord matters?
             storedWriteAsChord = self._writeAsChord
             self.writeAsChord = True
             if self.key is None:
@@ -495,7 +496,7 @@ class Harmony(chord.Chord):
         >>> h.pitches
         (<music21.pitch.Pitch C3>, <music21.pitch.Pitch E3>, <music21.pitch.Pitch G-3>)
 
-        Changed in v7. -- updatePitches is True by default
+        * Changed in v7: updatePitches is True by default
         '''
         if not isinstance(degree, ChordStepModification):
             # TODO: possibly create ChordStepModification objects from other
@@ -595,6 +596,14 @@ class ChordStepModification(prebase.ProtoM21Object):
 
     def _reprInternal(self):
         return f'modType={self.modType} degree={self.degree} interval={self.interval}'
+
+    def __eq__(self, other):
+        return (
+            isinstance(other, ChordStepModification)
+            and self.modType == other.modType
+            and self.degree == other.degree
+            and self.interval == other.interval
+        )
 
     # PUBLIC PROPERTIES #
 
@@ -759,7 +768,7 @@ def changeAbbreviationFor(chordType, changeTo):
     CHORD_TYPES[chordType][1].insert(0, changeTo)
 
 
-def chordSymbolFigureFromChord(inChord, includeChordType=False):
+def chordSymbolFigureFromChord(inChord: chord.Chord, includeChordType=False):
     # noinspection SpellCheckingInspection
     '''
     Analyze the given chord, and attempt to describe its pitches using a
@@ -911,11 +920,11 @@ def chordSymbolFigureFromChord(inChord, includeChordType=False):
     >>> harmony.chordSymbolFigureFromChord(c, True)
     ('F+11', 'augmented-11th')
 
-    >>> c = chord.Chord(['G3', 'B-3', 'D-4', 'F4', 'A-3', 'C4'])
+    >>> c = chord.Chord(['G3', 'B-3', 'D-4', 'F4', 'A3', 'C4'])
     >>> harmony.chordSymbolFigureFromChord(c, True)
     ('Gø11', 'half-diminished-11th')
 
-    >>> c = chord.Chord(['E-3', 'G-3', 'B--3', 'D--4', 'F-3', 'A--3'])
+    >>> c = chord.Chord(['E-3', 'G-3', 'B--3', 'D--4', 'F3', 'A-3'])
     >>> harmony.chordSymbolFigureFromChord(c, True)
     ('E-o11', 'diminished-11th')
 
@@ -1322,7 +1331,7 @@ def chordSymbolFigureFromChord(inChord, includeChordType=False):
         return cs
 
 
-def chordSymbolFromChord(inChord):
+def chordSymbolFromChord(inChord: chord.Chord) -> ChordSymbol:
     '''
     Get the :class:`~music21.harmony.chordSymbol` object from the chord, using
     :meth:`music21.harmony.Harmony.chordSymbolFigureFromChord`
@@ -1384,7 +1393,7 @@ def removeChordSymbols(chordType):
 
 
 # --------------------------------------------------------------------------
-realizerScaleCache: t.Dict[t.Tuple[str, str], realizerScale.FiguredBassScale] = {}
+realizerScaleCache: dict[tuple[str, str], realizerScale.FiguredBassScale] = {}
 
 # --------------------------------------------------------------------------
 
@@ -1576,9 +1585,9 @@ class ChordSymbol(Harmony):
 
     def __init__(self,
                  figure=None,
-                 root: t.Union[pitch.Pitch, str, None] = None,
-                 bass: t.Union[pitch.Pitch, str, None] = None,
-                 inversion: t.Optional[int] = None,
+                 root: pitch.Pitch | str | None = None,
+                 bass: pitch.Pitch | str | None = None,
+                 inversion: int | None = None,
                  kind='',
                  kindStr='',
                  **keywords
@@ -1865,7 +1874,8 @@ class ChordSymbol(Harmony):
         return False
 
     def _notationString(self):
-        '''returns NotationString of ChordSymbolObject which dictates which scale
+        '''
+        returns NotationString of ChordSymbolObject which dictates which scale
         degrees and how those scale degrees are altered in this chord.
 
         >>> h = harmony.ChordSymbol('F-dim7')
@@ -1888,7 +1898,7 @@ class ChordSymbol(Harmony):
 
         return notationString
 
-    def _parseFigure(self):
+    def _parseFigure(self) -> None:
         '''
         Translate the figure string (regular expression) into a meaningful
         Harmony object by identifying the root, bass, inversion, kind, and
@@ -2334,7 +2344,7 @@ class ChordSymbol(Harmony):
         else:
             return False
 
-    def transpose(self: T, value, *, inPlace=False) -> t.Optional[T]:
+    def transpose(self: T, value, *, inPlace=False) -> T | None:
         '''
         Overrides :meth:`~music21.chord.Chord.transpose` so that this ChordSymbol's
         `figure` is appropriately cleared afterward.
@@ -2365,7 +2375,6 @@ class NoChord(ChordSymbol):
     encode absence of chords. This is especially useful to stop a chord
     without playing another.
 
-    >>> from music21 import stream, note, harmony
     >>> from music21.harmony import ChordSymbol, NoChord
     >>> s = stream.Score()
     >>> s.repeatAppend(note.Note('C'), 4)
@@ -2441,7 +2450,7 @@ class NoChord(ChordSymbol):
         # do nothing, everything is already set.
         return
 
-    def transpose(self: NCT, _value, *, inPlace=False) -> t.Optional[NCT]:
+    def transpose(self: NCT, _value, *, inPlace=False) -> NCT | None:
         '''
         Overrides :meth:`~music21.chord.Chord.transpose` to do nothing.
 

@@ -4,7 +4,7 @@
 # Purpose:      Defines standard resolutions for possibility instances
 # Authors:      Jose Cabal-Ugaz
 #
-# Copyright:    Copyright © 2011 Michael Scott Asato Cuthbert and the music21 Project
+# Copyright:    Copyright © 2011 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
@@ -24,12 +24,14 @@ possibilities formed around the same chord. If provided with additional
 arguments, the methods only :meth:`~music21.pitch.Pitch.transpose` each
 :class:`~music21.pitch.Pitch` in a possibility by the appropriate interval.
 '''
+from __future__ import annotations
+
 import unittest
-import typing as t
 
 from music21 import exceptions21
 from music21 import chord
 from music21 import note
+from music21 import pitch
 from music21 import stream
 
 
@@ -41,7 +43,6 @@ def augmentedSixthToDominant(augSixthPossib, augSixthType=None, augSixthChordInf
 
     Proper Italian augmented sixth resolutions not supported within this method.
 
-    >>> from music21 import pitch
     >>> from music21.figuredBass import resolution
     >>> Bb2 = pitch.Pitch('B-2')
     >>> D4 = pitch.Pitch('D4')
@@ -118,7 +119,6 @@ def augmentedSixthToMajorTonic(augSixthPossib, augSixthType=None, augSixthChordI
 
     Proper Italian augmented sixth resolutions not supported within this method.
 
-    >>> from music21 import pitch
     >>> from music21.figuredBass import resolution
     >>> Bb2 = pitch.Pitch('B-2')
     >>> D4 = pitch.Pitch('D4')
@@ -190,7 +190,6 @@ def augmentedSixthToMinorTonic(augSixthPossib, augSixthType=None, augSixthChordI
 
     Proper Italian augmented sixth resolutions not supported within this method.
 
-    >>> from music21 import pitch
     >>> from music21.figuredBass import resolution
     >>> Bb2 = pitch.Pitch('B-2')
     >>> D4 = pitch.Pitch('D4')
@@ -267,7 +266,6 @@ def dominantSeventhToMajorTonic(domPossib, resolveV43toI6=False, domChordInfo=No
     of a :class:`~music21.figuredBass.segment.Segment`
     spells out a dominant seventh chord in second inversion.
 
-    >>> from music21 import pitch
     >>> from music21.figuredBass import resolution
     >>> G2 = pitch.Pitch('G2')
     >>> C3 = pitch.Pitch('C3')
@@ -343,7 +341,6 @@ def dominantSeventhToMinorTonic(domPossib, resolveV43toi6=False, domChordInfo=No
     of a :class:`~music21.figuredBass.segment.Segment`
     spells out a dominant seventh chord in second inversion.
 
-    >>> from music21 import pitch
     >>> from music21.figuredBass import resolution
     >>> G2 = pitch.Pitch('G2')
     >>> C3 = pitch.Pitch('C3')
@@ -408,7 +405,6 @@ def dominantSeventhToMajorSubmediant(domPossib, domChordInfo=None):
     Resolves a dominant seventh chord in root position to the
     major submediant (VI) in root position.
 
-    >>> from music21 import pitch
     >>> from music21.figuredBass import resolution
     >>> G2 = pitch.Pitch('G2')
     >>> B3 = pitch.Pitch('B3')
@@ -445,7 +441,6 @@ def dominantSeventhToMinorSubmediant(domPossib, domChordInfo=None):
     Resolves a dominant seventh chord in root position to the
     minor submediant (vi) in root position.
 
-    >>> from music21 import pitch
     >>> from music21.figuredBass import resolution
     >>> G2 = pitch.Pitch('G2')
     >>> B3 = pitch.Pitch('B3')
@@ -482,7 +477,6 @@ def dominantSeventhToMajorSubdominant(domPossib, domChordInfo=None):
     Resolves a dominant seventh chord in root position
     to the major subdominant (IV) in first inversion.
 
-    >>> from music21 import pitch
     >>> from music21.figuredBass import resolution
     >>> G2 = pitch.Pitch('G2')
     >>> B3 = pitch.Pitch('B3')
@@ -518,7 +512,6 @@ def dominantSeventhToMinorSubdominant(domPossib, domChordInfo=None):
     Resolves a dominant seventh chord in root position
     to the minor subdominant (iv) in first inversion.
 
-    >>> from music21 import pitch
     >>> from music21.figuredBass import resolution
     >>> G2 = pitch.Pitch('G2')
     >>> B3 = pitch.Pitch('B3')
@@ -562,7 +555,6 @@ def diminishedSeventhToMajorTonic(dimPossib, doubledRoot=False, dimChordInfo=Non
     attained using doubledRoot, and is set by
     :meth:`~music21.figuredBass.segment.Segment.resolveDiminishedSeventhSegment`.
 
-    >>> from music21 import pitch
     >>> from music21.figuredBass import resolution
     >>> Cs3 = pitch.Pitch('C#3')
     >>> G3 = pitch.Pitch('G3')
@@ -609,7 +601,6 @@ def diminishedSeventhToMinorTonic(dimPossib, doubledRoot=False, dimChordInfo=Non
     attained using doubledRoot, and is set by
     :meth:`~music21.figuredBass.segment.Segment.resolveDiminishedSeventhSegment`.
 
-    >>> from music21 import pitch
     >>> from music21.figuredBass import resolution
     >>> Cs3 = pitch.Pitch('C#3')
     >>> G3 = pitch.Pitch('G3')
@@ -648,7 +639,6 @@ def diminishedSeventhToMajorSubdominant(dimPossib, dimChordInfo=None):
     Resolves a fully diminished seventh chord to the
     major subdominant (IV).
 
-    >>> from music21 import pitch
     >>> from music21.figuredBass import resolution
     >>> Cs3 = pitch.Pitch('C#3')
     >>> G3 = pitch.Pitch('G3')
@@ -682,7 +672,6 @@ def diminishedSeventhToMinorSubdominant(dimPossib, dimChordInfo=None):
     Resolves a fully diminished seventh chord to the
     minor subdominant (iv).
 
-    >>> from music21 import pitch
     >>> from music21.figuredBass import resolution
     >>> Cs3 = pitch.Pitch('C#3')
     >>> G3 = pitch.Pitch('G3')
@@ -756,8 +745,8 @@ def _resolvePitches(possibToResolve, howToResolve):
 
 
 def _unpackSeventhChord(
-    seventhChord: 'music21.chord.Chord'
-) -> t.List[t.Optional['music21.pitch.Pitch']]:
+    seventhChord: chord.Chord
+) -> list[pitch.Pitch | None]:
     '''
     Takes in a Chord and returns a list of Pitches (or Nones) corresponding
     to the bass, root, fifth, seventh.

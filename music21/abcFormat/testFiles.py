@@ -5,6 +5,7 @@
 #
 # Authors:      Christopher Ariza
 # ------------------------------------------------------------------------------
+from __future__ import annotations
 
 import unittest
 
@@ -14,8 +15,8 @@ import unittest
 
 # abc standard
 # http://abcnotation.com/abc2mtex/abc.txt
-
 from music21 import environment
+
 environLocal = environment.Environment('abcFormat.testFiles')
 
 _DOC_IGNORE_MODULE_OR_PACKAGE = True
@@ -129,9 +130,7 @@ B,,z [FDB,]z B,,z [FDB,]z| \
 A,,z [ECA,]z A,,z [ECA,]z| \
 B,,z [FDB,]z A,,z [ECA,]z| \
 B,,z [ECA,]z B,,z [FDB,]
-
 '''
-
 # http://abcnotation.com/tunePage?a=abc.sourceforge.net/NMD/nmd/reelsh-l.txt/0056
 # noinspection SpellCheckingInspection
 kitchGirl = '''X: 57
@@ -523,10 +522,8 @@ T:Test Tuplet Primitive
 (3.c2=c2^c2 (3.c2=c2^c2
 
 (6c/c/c/c/c/=f/ (6B/c/c/^^c/c/^f/ z4
-
 '''
 # (9Bc^C ^c=cc =Cc=f
-
 
 # abc-2.1 code + allowing shared header information.
 # noinspection SpellCheckingInspection
@@ -548,7 +545,7 @@ X:2
 T:Kitchen Girl
 C:Trad.
 K:D
-[c4a4] [B4g4]|efed c2cd|e2f2 gaba|g2e2 e2fg|
+[c4a4] [B4g4] | efed c2cd|e2f2 gaba|g2e2 e2fg|
 a4 g4|efed cdef|g2d2 efed|c2A2 A4:|
 K:G
 ABcA BAGB|ABAG EDEG|A2AB c2d2|e3f edcB|ABcA BAGB|
@@ -636,12 +633,10 @@ K:G
 V:1 treble
 V:1
 g^G_ag a=ffF|=F2^c2 FB =ca|]
-
 '''
 
 
 # ------------------------------------------------------------------------------
-
 ALL = [fyrareprisarn, mysteryReel, fullRiggedShip, aleIsDear, kitchGirl,
         williamAndNancy, morrisonsJig, hectorTheHero, kingOfTheFairies,
         sicutRosa, theAleWifesDaughter, theBeggerBoy, theBattleOfTheSnaBas,

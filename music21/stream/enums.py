@@ -5,10 +5,14 @@
 #
 # Authors:      Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2020 Michael Scott Asato Cuthbert and the music21 Project
+# Copyright:    Copyright © 2020 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # -----------------------------------------------------------------------------
+from __future__ import annotations
+
 import enum
+
+from music21.common.enums import StrEnum
 
 class StaffType(enum.Enum):
     '''
@@ -37,6 +41,24 @@ class StaffType(enum.Enum):
     EDITORIAL = 'editorial'
     ALTERNATE = 'alternate'
     OTHER = 'other'
+
+
+class GivenElementsBehavior(StrEnum):
+    APPEND = 'append'
+    OFFSETS = 'offsets'
+    INSERT = 'insert'
+
+
+class RecursionType(StrEnum):
+    ELEMENTS_FIRST = 'elementsFirst'
+    FLATTEN = 'flatten'
+    ELEMENTS_ONLY = 'elementsOnly'
+
+
+class ShowNumber(StrEnum):
+    DEFAULT = 'default'
+    ALWAYS = 'always'
+    NEVER = 'never'
 
 
 if __name__ == '__main__':

@@ -37,22 +37,12 @@ False
 >>> n.hasEditorialInformation
 True
 '''
-import typing as t
+from __future__ import annotations
+
 import unittest
-from music21 import exceptions21
+
 from music21 import prebase
 from music21 import style
-
-# -----------------------------------------------------------------------------
-
-
-class EditorialException(exceptions21.Music21Exception):
-    pass
-
-
-class CommentException(exceptions21.Music21Exception):
-    pass
-
 
 # -----------------------------------------------------------------------------
 class Editorial(prebase.ProtoM21Object, dict):
@@ -86,7 +76,7 @@ class Editorial(prebase.ProtoM21Object, dict):
         :width: 103
 
     '''
-    _DOC_ATTR: t.Dict[str, str] = {
+    _DOC_ATTR: dict[str, str] = {
         'comments': '''
             a list of :class:`~music21.editorial.Comment` objects that represent any comments
             about the object.
@@ -177,31 +167,8 @@ class Comment(prebase.ProtoM21Object, style.StyleMixin):  # type: ignore
 class Test(unittest.TestCase):
 
     def testCopyAndDeepcopy(self):
-        '''
-        Test copying all objects defined in this module
-        '''
-        import copy
-        import sys
-        import types
-        for part in sys.modules[self.__module__].__dict__:
-            match = False
-            for skip in ['_', '__', 'Test', 'Exception']:
-                if part.startswith(skip) or part.endswith(skip):
-                    match = True
-            if match:
-                continue
-            name = getattr(sys.modules[self.__module__], part)
-            # noinspection PyTypeChecker
-            if callable(name) and not isinstance(name, types.FunctionType):
-                try:  # see if obj can be made w/ args
-                    obj = name()
-                except TypeError:
-                    continue
-                a = copy.copy(obj)
-                b = copy.deepcopy(obj)
-                self.assertIsNot(a, None)
-                self.assertIsNot(b, None)
-
+        from music21.test.commonTest import testCopyAll
+        testCopyAll(self, globals())
 
 # -----------------------------------------------------------------------------
 

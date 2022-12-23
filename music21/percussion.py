@@ -7,11 +7,12 @@
 #               Michael Scott Asato Cuthbert
 #               Christopher Ariza
 #
-# Copyright:    Copyright © 2006-2019 Michael Scott Asato Cuthbert and the music21 Project
+# Copyright:    Copyright © 2006-2019 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
+from __future__ import annotations
 
-import typing as t
+from collections.abc import Iterable
 import unittest
 
 from music21 import common
@@ -47,14 +48,27 @@ class PercussionChord(chord.ChordBase):
     Traceback (most recent call last):
     TypeError: every element of notes must be a note.Note or note.Unpitched object
 
+    **Equality**
+
+    Two PercussionChord objects are equal if their notes are equal *and in the same
+    order* (this is different from Chord, but necessary because we cannot compare
+    based just on pitch equality)
+
+    >>> pChord == pChord2
+    True
+    >>> pChord3 = percussion.PercussionChord([note.Unpitched('D4')])
+    >>> pChord == pChord3
+    False
+
     OMIT_FROM_DOCS
 
     See the repr of an empty percussion chord:
 
     >>> percussion.PercussionChord()
     <music21.percussion.PercussionChord object at 0x...>
-    '''
 
+    This is in OMIT
+    '''
     isChord = False
 
     def __deepcopy__(self, memo=None):
@@ -63,12 +77,27 @@ class PercussionChord(chord.ChordBase):
             n._chordAttached = new
         return new
 
+    def __eq__(self, other):
+        '''
+        Returns True if all the notes are equal and in the same order.
+        '''
+        if not super().__eq__(other):
+            return False
+        # super ensures that both have same number of notes.
+        for my_n, other_n in zip(self.notes, other.notes):
+            if my_n != other_n:
+                return False
+        return True
+
+    def __hash__(self):
+        return id(self) >> 4
+
     @property
-    def notes(self) -> t.Tuple[note.NotRest, ...]:
+    def notes(self) -> tuple[note.NotRest, ...]:
         return tuple(self._notes)
 
     @notes.setter
-    def notes(self, newNotes: t.Iterable[t.Union[note.Unpitched, note.Note]]) -> None:
+    def notes(self, newNotes: Iterable[note.Unpitched | note.Note]) -> None:
         '''
         Sets notes to an iterable of Note or Unpitched objects
         '''

@@ -4,7 +4,7 @@
 # Purpose:      rule checking functions for a "possibility" represented as a tuple.
 # Authors:      Jose Cabal-Ugaz
 #
-# Copyright:    Copyright © 2011 Michael Scott Asato Cuthbert and the music21 Project
+# Copyright:    Copyright © 2011 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
@@ -24,8 +24,6 @@ Here, a possibility is created. G5 is in the highest part, and C4 is the bass. T
 part contains the highest Pitch, and the lowest part contains the lowest Pitch. No voice
 crossing is present.
 
-
->>> from music21 import pitch
 >>> G5 = pitch.Pitch('G5')
 >>> C5 = pitch.Pitch('C5')
 >>> E4 = pitch.Pitch('E4')
@@ -68,7 +66,8 @@ The application of these methods is controlled by corresponding instance variabl
 .. note:: The number of parts and maxPitch are universal for a
     :class:`~music21.figuredBass.realizer.FiguredBassLine`.
 '''
-import typing as t
+from __future__ import annotations
+
 import unittest
 
 from music21 import chord
@@ -89,7 +88,6 @@ def voiceCrossing(possibA):
     comparison methods, which are based on pitch space values
     (see :class:`~music21.pitch.Pitch`).
 
-    >>> from music21 import pitch
     >>> from music21.figuredBass import possibility
     >>> C4 = pitch.Pitch('C4')
     >>> E4 = pitch.Pitch('E4')
@@ -126,7 +124,6 @@ def isIncomplete(possibA, pitchNamesToContain):
     raised, although this is not a concern with the current implementation
     of fbRealizer.
 
-    >>> from music21 import pitch
     >>> from music21.figuredBass import possibility
     >>> C3 = pitch.Pitch('C3')
     >>> E4 = pitch.Pitch('E4')
@@ -169,7 +166,6 @@ def upperPartsWithinLimit(possibA, maxSemitoneSeparation=12):
     the upper parts can be played by most adult pianists using
     just the right hand.
 
-    >>> from music21 import pitch
     >>> from music21.figuredBass import possibility
     >>> C3 = pitch.Pitch('C3')
     >>> E3 = pitch.Pitch('E3')
@@ -219,7 +215,6 @@ def pitchesWithinLimit(possibA, maxPitch=pitch.Pitch('B5')):
 
     >>> from music21.figuredBass import possibility
     >>> from music21.figuredBass import resolution
-    >>> from music21 import pitch
     >>> G2 = pitch.Pitch('G2')
     >>> D4 = pitch.Pitch('D4')
     >>> F5 = pitch.Pitch('F5')
@@ -250,7 +245,6 @@ def limitPartToPitch(possibA, partPitchLimits=None):
     Returns True if all limits are followed in possibA, False otherwise.
 
     >>> from music21.figuredBass import possibility
-    >>> from music21 import pitch
     >>> C4 = pitch.Pitch('C4')
     >>> E4 = pitch.Pitch('E4')
     >>> G4 = pitch.Pitch('G4')
@@ -276,8 +270,8 @@ def limitPartToPitch(possibA, partPitchLimits=None):
 # CONSECUTIVE POSSIBILITY RULE-CHECKING METHODS
 # ---------------------------------------------
 # Speedup tables
-PITCH_QUARTET_TO_BOOL_TYPE = t.Dict[
-    t.Tuple[pitch.Pitch, pitch.Pitch, pitch.Pitch, pitch.Pitch],
+PITCH_QUARTET_TO_BOOL_TYPE = dict[
+    tuple[pitch.Pitch, pitch.Pitch, pitch.Pitch, pitch.Pitch],
     bool
 ]
 parallelFifthsTable: PITCH_QUARTET_TO_BOOL_TYPE = {}
@@ -303,7 +297,6 @@ def parallelFifths(possibA, possibB):
     have parallel fifths. The method returns True as soon
     as two shared parts with parallel fifths are found.
 
-    >>> from music21 import pitch
     >>> from music21.figuredBass import possibility
     >>> C3 = pitch.Pitch('C3')
     >>> D3 = pitch.Pitch('D3')
@@ -384,8 +377,6 @@ def parallelOctaves(possibA, possibB):
     have parallel octaves. The method returns True as soon
     as two shared parts with parallel octaves are found.
 
-
-    >>> from music21 import pitch
     >>> from music21.figuredBass import possibility
     >>> C3 = pitch.Pitch('C3')
     >>> D3 = pitch.Pitch('D3')
@@ -461,7 +452,6 @@ def hiddenFifth(possibA, possibB):
     between sopranoPitchB and bassPitchB is that of a perfect fifth,
     then this constitutes a hidden octave between the two possibilities.
 
-    >>> from music21 import pitch
     >>> from music21.figuredBass import possibility
     >>> C3 = pitch.Pitch('C3')
     >>> D3 = pitch.Pitch('D3')
@@ -536,8 +526,6 @@ def hiddenOctave(possibA, possibB):
     between sopranoPitchB and bassPitchB is that of a perfect octave,
     then this constitutes a hidden octave between the two possibilities.
 
-
-    >>> from music21 import pitch
     >>> from music21.figuredBass import possibility
     >>> C3 = pitch.Pitch('C3')
     >>> D3 = pitch.Pitch('D3')
@@ -613,7 +601,6 @@ def voiceOverlap(possibA, possibB):
     If the bass moves up to C5 in possibB, that would constitute voice overlap
     because the bass in possibB would be higher than the soprano in possibA.
 
-    >>> from music21 import pitch
     >>> from music21.figuredBass import possibility
     >>> C4 = pitch.Pitch('C4')
     >>> D4 = pitch.Pitch('D4')
@@ -677,7 +664,6 @@ def partMovementsWithinLimits(possibA, possibB, partMovementLimits=None):
     * maxSeparation: For a given part, the maximum separation to allow
       between a pitch in possibA and a corresponding pitch in possibB, in semitones.
 
-    >>> from music21 import pitch
     >>> from music21.figuredBass import possibility
     >>> C4 = pitch.Pitch('C4')
     >>> D4 = pitch.Pitch('D4')
@@ -721,7 +707,6 @@ def upperPartsSame(possibA, possibB):
     Returns True if the upper parts are the same.
     False otherwise.
 
-    >>> from music21 import pitch
     >>> from music21.figuredBass import possibility
     >>> C4 = pitch.Pitch('C4')
     >>> D4 = pitch.Pitch('D4')
@@ -752,7 +737,6 @@ def partsSame(possibA, possibB, partsToCheck=None):
     Takes in partsToCheck, a list of part numbers. Checks if pitches at those part numbers of
     possibA and possibB are equal, determined by pitch space.
 
-    >>> from music21 import pitch
     >>> from music21.figuredBass import possibility
     >>> C4 = pitch.Pitch('C4')
     >>> E4 = pitch.Pitch('E4')
@@ -789,8 +773,6 @@ def couldBeItalianA6Resolution(possibA, possibB, threePartChordInfo=None, restri
     in the :class:`~music21.figuredBass.rules.Rules`
     object by :attr:`~music21.figuredBass.rules.Rules.restrictDoublingsInItalianA6Resolution`.
 
-
-    >>> from music21 import pitch
     >>> from music21.figuredBass import possibility
     >>> A2 = pitch.Pitch('A2')
     >>> Bb2 = pitch.Pitch('B-2')
@@ -952,7 +934,6 @@ def partPairs(possibA, possibB):
     Groups together pitches of possibA and possibB which correspond to the same part,
     constituting a shared part.
 
-    >>> from music21 import pitch
     >>> from music21.figuredBass import possibility
     >>> C4 = pitch.Pitch('C4')
     >>> D4 = pitch.Pitch('D4')

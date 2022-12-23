@@ -6,7 +6,7 @@
 # Authors:      Jordi Bartolome
 #               Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2011-2012 Michael Scott Asato Cuthbert and the music21 Project
+# Copyright:    Copyright © 2011-2012 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
@@ -57,15 +57,19 @@ Module to translate Noteworthy Composer's NWCTXT format to music21.
 #
 # Pos2? Dur2?
 # |Chord|Dur:8th|Pos:-4,n-3,b-2,#-1,x0,v1,2x|Opts:Stem=Down,Crescendo|Dur2:8th,DblDotted|Pos2:3x
+from __future__ import annotations
 
 import unittest
 import warnings
+
 from music21 import bar
 from music21 import chord
 from music21 import clef
 from music21 import common
 from music21 import duration
 from music21 import dynamics
+from music21 import environment
+from music21.exceptions21 import Music21Exception
 from music21 import key
 from music21 import meter
 from music21 import note
@@ -74,9 +78,7 @@ from music21 import repeat
 from music21 import spanner
 from music21 import stream
 from music21 import tie
-from music21.exceptions21 import Music21Exception
 
-from music21 import environment
 environLocal = environment.Environment('noteworthy.translate')
 
 
