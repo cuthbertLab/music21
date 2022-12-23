@@ -1718,7 +1718,7 @@ class Duration(prebase.ProtoM21Object, SlottedObjectMixin):
         '_dotGroups',
         'expressionIsInferred',
         'forceSingleComponent',
-        'client'
+        'client',
     )
 
     _DOC_ATTR = {
