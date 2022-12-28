@@ -9867,6 +9867,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         False
 
         Only Measures and Voices are allowed to contain notes and rests directly:
+
         >>> m.isWellFormedNotation()
         True
         >>> s2.append(note.Rest())
