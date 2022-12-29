@@ -8723,7 +8723,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
     # --------------------------------------------------------------------------
     # Metadata access
 
-    def _getMetadata(self):
+    def _getMetadata(self) -> metadata.Metadata | None:
         '''
         >>> a = stream.Stream()
         >>> a.metadata = metadata.Metadata()
@@ -8733,7 +8733,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         mdList = mdList.getElementsByOffset(0)
         return mdList.first()
 
-    def _setMetadata(self, metadataObj):
+    def _setMetadata(self, metadataObj: metadata.Metadata | None) -> None:
         '''
         >>> a = stream.Stream()
         >>> a.metadata = metadata.Metadata()
@@ -8756,6 +8756,8 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         >>> s.metadata.composer = 'frank'
         >>> s.metadata.composer
         'frank'
+
+        May also return None if nothing is there.
         ''')
 
     # --------------------------------------------------------------------------
