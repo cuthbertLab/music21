@@ -33,7 +33,6 @@ from music21 import environment
 from music21 import exceptions21
 from music21 import prebase
 from music21 import style
-from music21.common.types import OffsetQL, OffsetQLIn
 
 environLocal = environment.Environment('spanner')
 
