@@ -3271,7 +3271,7 @@ class MeasureExporter(XMLExporterBase):
         # spanners). Then we will back up and actually emit the notes, etc.
         objGroup: list[base.Music21Object]
         objIterator: OffsetIterator[base.Music21Object] = OffsetIterator(m)
-        hasSpannerAnchors: bool = bool(list(m[spanner.SpannerAnchor]))
+        hasSpannerAnchors: bool = bool(m[spanner.SpannerAnchor])
         if hasSpannerAnchors:
             for objGroup in objIterator:
                 if not any(self._hasPrePostObjectSpanners(obj) for obj in objGroup):

@@ -58,6 +58,13 @@ class Test(unittest.TestCase):
         helpers.indent(mxScore)
         return mxScore
 
+    def stripInnerSpaces(self, txt):
+        '''
+        Collapse all whitespace (say, in some XML) to a single space,
+        for ease of comparison.
+        '''
+        return re.sub(r'\s+', ' ', txt)
+
     def testExceptionMessage(self):
         s = stream.Score()
         p = stream.Part()
@@ -112,11 +119,8 @@ class Test(unittest.TestCase):
 
         xmlOut = self.getXml(score)
 
-        def stripInnerSpaces(txt):
-            return re.sub(r'\s+', ' ', txt)
-
         self.assertIn(
-            stripInnerSpaces(
+            self.stripInnerSpaces(
                 '''<measure implicit="no" number="0">
                       <attributes>
                         <divisions>10080</divisions>
@@ -159,7 +163,7 @@ class Test(unittest.TestCase):
                         <type>whole</type>
                       </note>
                 </measure>'''),
-            stripInnerSpaces(xmlOut)
+            self.stripInnerSpaces(xmlOut)
         )
 
 
@@ -190,18 +194,15 @@ class Test(unittest.TestCase):
         xmlOut = self.getXml(s)
         xmlAfterFirstBackup = xmlOut.split('</backup>\n')[1]
 
-        def stripInnerSpaces(txt):
-            return re.sub(r'\s+', ' ', txt)
-
         self.assertIn(
-            stripInnerSpaces(
+            self.stripInnerSpaces(
                 ''' <direction placement="below">
                         <direction-type>
                             <wedge number="1" spread="0" type="crescendo" />
                         </direction-type>
                         <staff>2</staff>
                     </direction>'''),
-            stripInnerSpaces(xmlAfterFirstBackup)
+            self.stripInnerSpaces(xmlAfterFirstBackup)
         )
 
     def testLowVoiceNumbers(self):
