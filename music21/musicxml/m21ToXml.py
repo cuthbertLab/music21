@@ -37,6 +37,7 @@ from music21 import bar
 from music21 import clef
 from music21 import chord
 from music21 import common
+from music21.common.types import OffsetQLIn
 from music21 import defaults
 from music21 import duration
 from music21 import environment
@@ -3226,6 +3227,24 @@ class MeasureExporter(XMLExporterBase):
             # Assumes voices are flat...
             self.parseFlatElements(v, backupAfterwards=backupAfterwards)
 
+    def moveForward(self, byOffset: OffsetQLIn):
+        amountToMoveForward: int = int(round(byOffset * self.currentDivisions))
+        if amountToMoveForward:
+            mxForward = Element('forward')
+            mxDuration = SubElement(mxForward, 'duration')
+            mxDuration.text = str(amountToMoveForward)
+            self.xmlRoot.append(mxForward)
+            self.offsetInMeasure += byOffset
+
+    def moveBackward(self, byOffset: OffsetQLIn):
+        amountToBackup: int = int(round(byOffset * self.currentDivisions))
+        if amountToBackup:
+            mxBackup = Element('backup')
+            mxDuration = SubElement(mxBackup, 'duration')
+            mxDuration.text = str(amountToBackup)
+            self.xmlRoot.append(mxBackup)
+            self.offsetInMeasure -= byOffset
+
     def parseFlatElements(
         self,
         m: stream.Measure | stream.Voice,
@@ -3243,8 +3262,6 @@ class MeasureExporter(XMLExporterBase):
         Note that if the .id is high enough to be an id(x) memory location, then a small
         voice number is used instead.
         '''
-        root = self.xmlRoot
-        divisions = self.currentDivisions
         self.offsetInMeasure = 0.0
         voiceId: int | str | None
         if isinstance(m, stream.Voice):
@@ -3263,63 +3280,35 @@ class MeasureExporter(XMLExporterBase):
 
         self.currentVoiceId = voiceId
 
-        # If this flat stream (measure/voice) contains any SpannerAnchors, we will perform
-        # a first pass, emitting any pre/postList for any object that is functioning as a
-        # spanner anchor (the SpannerAnchors, as well as any GeneralNotes that are in
-        # spanners). Then we will back up and actually emit the notes, etc.
-        objGroup: list[base.Music21Object]
-        objIterator: OffsetIterator[base.Music21Object] = OffsetIterator(m)
-        hasSpannerAnchors: bool = bool(list(m[spanner.SpannerAnchor]))
-        if hasSpannerAnchors:
-            for objGroup in objIterator:
-                if not any(self._hasPrePostObjectSpanners(obj) for obj in objGroup):
-                    continue
-                groupOffset = m.elementOffset(objGroup[0])
-                amountToMoveForward = int(round(divisions * (groupOffset
-                                                                 - self.offsetInMeasure)))
-                if amountToMoveForward > 0:
-                    # gap in stream before spanner start/stop: create <forward>
-                    mxForward = Element('forward')
-                    mxDuration = SubElement(mxForward, 'duration')
-                    mxDuration.text = str(amountToMoveForward)
-                    root.append(mxForward)
-                    self.offsetInMeasure = groupOffset
+        # We order things differently if there are any SpannerAnchors in the flat stream.
+        # If there are SpannerAnchors, we do two passes. The first pass skips all
+        # prePostObjectSpanners processing, and then the second pass goes back to the
+        # beginning and does all the prePostObjectSpanners processing.
+        # If there are no SpannerAnchors, we do one pass, doing any prePostObjectSpanners
+        # processing as we process each element.
 
-                for obj in objGroup:
-                    self.parseOneElement(obj, prePostObjectSpannersOnly=True)
+        hasSpannerAnchors: bool = bool(m[spanner.SpannerAnchor])
 
-        # return to the beginning of the measure, to emit everything else.
-        amountToBackup = round(divisions * self.offsetInMeasure)
-        if amountToBackup:
-            mxBackup = Element('backup')
-            mxDuration = SubElement(mxBackup, 'duration')
-            mxDuration.text = str(amountToBackup)
-            root.append(mxBackup)
-
-        # group all objects by offsets and then do a different order than normal sort.
-        # that way chord symbols and other 0-width objects appear before notes as much as
+        # First (and possibly only) pass:
+        # Group all objects by offsets and then do a different order than normal sort.
+        # That way chord symbols and other 0-width objects appear before notes as much as
         # possible.
         objIterator: OffsetIterator[base.Music21Object] = OffsetIterator(m)
         for objGroup in objIterator:
             groupOffset = m.elementOffset(objGroup[0])
-            amountToMoveForward = int(round(divisions * (groupOffset
-                                                             - self.offsetInMeasure)))
-            if amountToMoveForward > 0 and any(
+            offsetToMoveForward = groupOffset - self.offsetInMeasure
+            if offsetToMoveForward > 0 and any(
                     isinstance(obj, (note.GeneralNote, clef.Clef)) for obj in objGroup):
                 # gap in stream between GeneralNote/Clef objects: create <forward>
-                mxForward = Element('forward')
-                mxDuration = SubElement(mxForward, 'duration')
-                mxDuration.text = str(amountToMoveForward)
-                root.append(mxForward)
-                self.offsetInMeasure = groupOffset
+                self.moveForward(offsetToMoveForward)
 
             notesForLater = []
             for obj in objGroup:
                 # we do all non-note elements (including ChordSymbols not written as chord)
                 # first before note elements, in musicxml
                 if isinstance(obj, spanner.SpannerAnchor):
-                    # nothing left to do with this (only prePostObjectSpanners, and
-                    # we did that above)
+                    # nothing to do with this (only prePostObjectSpanners, and
+                    # we will do that below)
                     continue
 
                 if isinstance(obj, note.GeneralNote) and (
@@ -3337,14 +3326,33 @@ class MeasureExporter(XMLExporterBase):
                     continue
                 self.parseOneElement(n, skipPrePostObjectSpanners=hasSpannerAnchors)
 
+        # Second pass: If this flat stream (measure/voice) contains any SpannerAnchors, we
+        # will perform a second pass, emitting any pre/postList for any object that is
+        # functioning as a spanner anchor (the SpannerAnchors, as well as any GeneralNotes
+        # that start or end spanners).
+
+        if hasSpannerAnchors:
+            # return to the beginning of the measure, to emit any SpannerAnchors.
+            if self.offsetInMeasure:
+                self.moveBackward(self.offsetInMeasure)
+
+            objIterator = OffsetIterator(m)
+            for objGroup in objIterator:
+                if not any(self._hasPrePostObjectSpanners(obj) for obj in objGroup):
+                    continue
+                groupOffset = m.elementOffset(objGroup[0])
+                offsetToMoveForward = groupOffset - self.offsetInMeasure
+                if offsetToMoveForward > 0:
+                    # gap in stream before spanner start/stop: create <forward>
+                    self.moveForward(offsetToMoveForward)
+
+                for obj in objGroup:
+                    self.parseOneElement(obj, prePostObjectSpannersOnly=True)
+
         if backupAfterwards:
             # return to the beginning of the measure.
-            amountToBackup = round(divisions * self.offsetInMeasure)
-            if amountToBackup:
-                mxBackup = Element('backup')
-                mxDuration = SubElement(mxBackup, 'duration')
-                mxDuration.text = str(amountToBackup)
-                root.append(mxBackup)
+            if self.offsetInMeasure:
+                self.moveBackward(self.offsetInMeasure)
 
         self.currentVoiceId = None
 
@@ -3359,7 +3367,6 @@ class MeasureExporter(XMLExporterBase):
         offsetInMeasure, etc.
         '''
         root = self.xmlRoot
-        divisions = self.currentDivisions
         self.objectSpannerBundle = self.spannerBundle.getBySpannedElement(obj)
         preList, postList = self.prePostObjectSpanners(obj)
 
@@ -3371,18 +3378,10 @@ class MeasureExporter(XMLExporterBase):
                 root.append(sp)
 
             if postList and obj.quarterLength > 0:
-                # go forward by quarterLength (with a <forward> element)
-                classes = obj.classes
+                # gap in stream before spanner stop: create <forward>
                 # Ignore Harmony objects having writeAsChord = False
-                if 'GeneralNote' in classes and getattr(obj, 'writeAsChord', True):
-                    amountToMoveForward = int(round(divisions * obj.duration.quarterLength))
-                    if amountToMoveForward > 0:
-                        # gap in stream before spanner start/stop: create <forward>
-                        mxForward = Element('forward')
-                        mxDuration = SubElement(mxForward, 'duration')
-                        mxDuration.text = str(amountToMoveForward)
-                        root.append(mxForward)
-                        self.offsetInMeasure += obj.duration.quarterLength
+                if 'GeneralNote' in obj.classes and getattr(obj, 'writeAsChord', True):
+                    self.moveForward(obj.duration.quarterLength)
 
             for sp in postList:  # directions that follow the element
                 root.append(sp)
