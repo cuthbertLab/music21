@@ -3381,13 +3381,10 @@ class MeasureExporter(XMLExporterBase):
                 root.append(sp)
 
             if postList and obj.quarterLength > 0:
-                # go forward by quarterLength (with a <forward> element)
-                classes = obj.classes
+                # gap in stream before spanner stop: create <forward>
                 # Ignore Harmony objects having writeAsChord = False
-                if 'GeneralNote' in classes and getattr(obj, 'writeAsChord', True):
-                    if obj.duration.quarterLength > 0:
-                        # gap in stream before spanner start/stop: create <forward>
-                        self.moveForward(obj.duration.quarterLength)
+                if 'GeneralNote' in obj.classes and getattr(obj, 'writeAsChord', True):
+                    self.moveForward(obj.duration.quarterLength)
 
             for sp in postList:  # directions that follow the element
                 root.append(sp)
