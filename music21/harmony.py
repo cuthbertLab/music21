@@ -8,7 +8,7 @@
 #               Jacob Tyler Walls
 #               Christopher Ariza
 #
-# Copyright:    Copyright © 2011-2022, Michael Scott Asato Cuthbert
+# Copyright:    Copyright © 2011-2023 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
