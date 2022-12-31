@@ -639,9 +639,34 @@ class SpannerAnchor(base.Music21Object):
     >>> cresc = dynamics.Crescendo(n, sa1)   # cresc from n to sa1
     >>> dim = dynamics.Diminuendo(sa1, sa2)  # dim from sa1 to sa2
     >>> score.append((cresc, dim))
+    >>> score.show('text')
+    {0.0} <music21.stream.Part 0x...>
+        {0.0} <music21.stream.Measure 0 offset=0.0>
+            {0.0} <music21.stream.Voice 0x...>
+                {0.0} <music21.note.Note C>
+                {2.0} <music21.spanner.SpannerAnchor object at 0x...>
+                {4.0} <music21.spanner.SpannerAnchor object at 0x...>
+    {4.0} <music21.dynamics.Crescendo <music21.note.Note C><music21.spanner.SpannerAnchor...>>
+    {4.0} <music21.dynamics.Diminuendo <...SpannerAnchor...><...SpannerAnchor...>>
 
     SpannerAnchors aways have a duration of 0, and if any attempt is made to
     change this, TypeError will be raised.
+
+    >>> sa3 = spanner.SpannerAnchor(quarterLength=1)
+    Traceback (most recent call last):
+    TypeError: SpannerAnchor cannot be initialized with a duration/quarterLength.
+    >>> sa4 = spanner.SpannerAnchor()
+    >>> sa4.duration = duration.Duration(4)
+    Traceback (most recent call last):
+    TypeError: SpannerAnchor has an immutable zero duration.
+    >>> sa4.duration.quarterLength = 0.5
+    Traceback (most recent call last):
+    TypeError: This FrozenDuration instance is immutable.
+    >>> sa4.quarterLength = 2
+    Traceback (most recent call last):
+    TypeError: This FrozenDuration instance is immutable.
+    >>> sa4.duration.quarterLength
+    0.0
     '''
     def __init__(self, **keywords):
         if 'duration' in keywords or 'quarterLength' in keywords:
