@@ -122,47 +122,47 @@ class Test(unittest.TestCase):
         self.assertIn(
             self.stripInnerSpaces(
                 '''<measure implicit="no" number="0">
-                      <attributes>
-                        <divisions>10080</divisions>
-                      </attributes>
-                      <direction placement="below">
-                        <direction-type>
-                          <wedge number="1" spread="0" type="crescendo" />
-                        </direction-type>
-                      </direction>
-                      <forward>
-                        <duration>20160</duration>
-                      </forward>
-                      <direction placement="below">
-                        <direction-type>
-                          <wedge number="2" spread="15" type="diminuendo" />
-                        </direction-type>
-                      </direction>
-                      <direction placement="below">
-                        <direction-type>
-                          <wedge number="1" spread="15" type="stop" />
-                        </direction-type>
-                      </direction>
-                      <forward>
-                        <duration>20160</duration>
-                      </forward>
-                      <direction placement="below">
-                        <direction-type>
-                          <wedge number="2" spread="0" type="stop" />
-                        </direction-type>
-                      </direction>
-                      <backup>
-                        <duration>40320</duration>
-                      </backup>
-                      <note>
-                        <pitch>
-                          <step>C</step>
-                          <octave>4</octave>
-                        </pitch>
-                        <duration>40320</duration>
-                        <type>whole</type>
-                      </note>
-                </measure>'''),
+                       <attributes>
+                           <divisions>10080</divisions>
+                       </attributes>
+                       <note>
+                           <pitch>
+                               <step>C</step>
+                               <octave>4</octave>
+                           </pitch>
+                           <duration>40320</duration>
+                           <type>whole</type>
+                       </note>
+                       <backup>
+                           <duration>40320</duration>
+                       </backup>
+                       <direction placement="below">
+                           <direction-type>
+                               <wedge number="1" spread="0" type="crescendo" />
+                           </direction-type>
+                       </direction>
+                       <forward>
+                           <duration>20160</duration>
+                       </forward>
+                       <direction placement="below">
+                           <direction-type>
+                               <wedge number="2" spread="15" type="diminuendo" />
+                           </direction-type>
+                       </direction>
+                       <direction placement="below">
+                           <direction-type>
+                               <wedge number="1" spread="15" type="stop" />
+                           </direction-type>
+                       </direction>
+                       <forward>
+                           <duration>20160</duration>
+                       </forward>
+                       <direction placement="below">
+                           <direction-type>
+                               <wedge number="2" spread="0" type="stop" />
+                           </direction-type>
+                       </direction>
+                   </measure>'''),
             self.stripInnerSpaces(xmlOut)
         )
 
