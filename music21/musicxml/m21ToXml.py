@@ -3269,6 +3269,7 @@ class MeasureExporter(XMLExporterBase):
         # that way chord symbols and other 0-width objects appear before notes as much as
         # possible.
         hasSpannerAnchors: bool = bool(m[spanner.SpannerAnchor])
+        objGroup: list[base.Music21Object]
         objIterator: OffsetIterator[base.Music21Object] = OffsetIterator(m)
         for objGroup in objIterator:
             groupOffset = m.elementOffset(objGroup[0])
@@ -3322,8 +3323,7 @@ class MeasureExporter(XMLExporterBase):
                 root.append(mxBackup)
                 self.offsetInMeasure = 0.0
 
-            objGroup: list[base.Music21Object]
-            objIterator: OffsetIterator[base.Music21Object] = OffsetIterator(m)
+            objIterator = OffsetIterator(m)
             for objGroup in objIterator:
                 if not any(self._hasPrePostObjectSpanners(obj) for obj in objGroup):
                     continue
