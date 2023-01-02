@@ -1632,7 +1632,9 @@ class ChordSymbol(Harmony):
 
         return list(c.pitches)
 
-    def _adjustPitchesForChordStepModifications(self, pitches):
+    def _adjustPitchesForChordStepModifications(
+        self, pitches: t.Iterable[pitch.Pitch]
+    ) -> list[pitch.Pitch]:
         '''
         degree-value element: indicates degree in chord, positive integers only
 
@@ -1796,7 +1798,7 @@ class ChordSymbol(Harmony):
             elif chordStepModification.modType == 'alter':
                 typeAlter(chordStepModification)
 
-        return tuple(pitches)
+        return pitches
 
     def _parseAddAlterSubtract(self, remaining: str, modType: str) -> str:
         '''
@@ -2120,7 +2122,7 @@ class ChordSymbol(Harmony):
             self.inversion(None, transposeOnSet=False)
             inversionNum = None
 
-        pitches = list(self._adjustPitchesForChordStepModifications(pitches))
+        pitches = self._adjustPitchesForChordStepModifications(pitches)
 
         if inversionNum not in (0, None):
             for p in pitches[0:inversionNum]:
