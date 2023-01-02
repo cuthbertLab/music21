@@ -504,7 +504,8 @@ class Harmony(chord.Chord):
             raise HarmonyException(
                 f'cannot add this object as a degree: {degree}')
 
-        self.chordStepModifications.append(degree)
+        if degree not in self.chordStepModifications:
+            self.chordStepModifications.append(degree)
         if updatePitches:
             self._updatePitches()
 
