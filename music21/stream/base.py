@@ -10163,6 +10163,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
             - now finds notes in Voices without requiring `getOverlaps=True`
             and iterates over Parts rather than flattening.
             - If `noNone=False`, inserts `None` when backing up to scan a subsequent voice or part.
+
         * Changed in v8: all parameters are keyword only.
 
 
