@@ -323,6 +323,22 @@ class Harmony(chord.Chord):
         >>> h.bass(note.Note('E'))
         >>> h.figure
         'CM'
+
+        OMIT_FROM_DOCS
+
+        Fixed storing deduced figures by avoiding duplicate chordStepModifications:
+
+        >>> h = harmony.ChordSymbol('CM7omit5')
+        >>> h.addChordStepModification(harmony.ChordStepModification(modType='add', degree=4))
+        >>> h.findFigure()
+        'Cmaj7 subtract 5 add 4'
+
+        >>> h.figure
+        'CM7omit5'
+
+        >>> h.figure = h.findFigure()
+        >>> h.figure
+        'Cmaj7 subtract 5 add 4'
         '''
         if self._figure is None:
             return self.findFigure()
