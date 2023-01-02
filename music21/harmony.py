@@ -563,7 +563,8 @@ class ChordStepModification(prebase.ProtoM21Object):
 
     >>> hd = harmony.ChordStepModification('add', 4)
     >>> hd
-    <music21.harmony.ChordStepModification modType=add degree=4 interval=None>
+    <music21.harmony.ChordStepModification modType=add
+        degree=4 interval=<music21.interval.Interval P1>>
 
     >>> hd = harmony.ChordStepModification('alter', 3, 1)
     >>> hd
