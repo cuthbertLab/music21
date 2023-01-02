@@ -581,11 +581,11 @@ class ChordStepModification(prebase.ProtoM21Object):
 
     # INITIALIZER #
 
-    def __init__(self, modType=None, degree=None, intervalObj=None):
-        self._modType = None  # add, alter, subtract
-        self._interval = None  # alteration of degree, alter ints in mxl
-        self._degree = None  # the degree number, where 3 is the third
-        # use properties if defined
+    def __init__(self, modType=None, degree=None, intervalObj=interval.Interval('P1')):
+        self._modType: str | None = None  # add, alter, subtract
+        self._interval: interval.Interval | None = None  # alteration of degree, alter ints in mxl
+        self._degree: int | None = None  # the degree number, where 3 is the third
+        # use properties if defined: runs certain type conversions
         if modType is not None:
             self.modType = modType
         if degree is not None:
