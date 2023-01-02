@@ -568,12 +568,6 @@ class Spanner(base.Music21Object):
             # no spanned elements?  Nothing to fill.
             return
 
-#         if not self.fillElementTypes:
-#             # no types of objects to fill.  Fill with objects with same
-#             # types that are already there.
-#             for el in self.spannerStorage:
-#                 self.fillElementTypes.append(type(el))
-
         endElement: base.Music21Object | None = None
         if len(self) > 1:
             # Start and end elements are different, we can't just append everything, we need

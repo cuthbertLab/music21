@@ -1605,8 +1605,8 @@ class ArpeggioMarkSpanner(spanner.Spanner):
         mustBeginInSpan: bool = True,
         includeElementsThatEndAtStart: bool = False
     ):
-        # 888 ArpeggioMarkSpanner needs a completely different fillIntermediateSpannedElements
-        # 888 search (vertically, all at the same offset, across multiple parts/staffs).
+        # ArpeggioMarkSpanners need to be filled by hand with the exact notes involved.
+        # We cannot automatically fill them.
         return
 
     def noteExtremes(self) -> tuple[note.Note | None,
