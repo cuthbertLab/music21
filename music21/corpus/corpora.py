@@ -548,6 +548,7 @@ class CoreCorpus(Corpus):
         ('handel', 'George Frideric Handel', True),
         ('haydn', 'Joseph Haydn', True),
         ('joplin', 'Scott Joplin', True),
+        ('johnson_j_r', 'J. Rosamund Johnson', True),
         ('josquin', 'Josquin des Prez', True),
         ('leadSheet', 'Leadsheet demos', False),
         ('luca', 'D. Luca', True),
