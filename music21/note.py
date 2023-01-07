@@ -1933,20 +1933,26 @@ class Rest(GeneralNote):
         'name': '''returns "rest" always.  It is here so that you can get
                `x.name` on all `.notesAndRests` objects''',
         'stepShift': 'number of lines/spaces to shift the note upwards or downwards for display.',
-        'fullMeasure': '''does this rest last a full measure (thus display as whole, center, etc.)
-                Options are False, True, "always", "auto" (default)
+        'fullMeasure': '''does this rest last a full measure or if it does, should it display
+                itself as whole rest (or breve rest) and centered.
 
-                False means do not set as full measure, no matter what.
-
-                True keeps the set duration, but will always display as a full measure rest.
-
-                "always" means the duration will (EVENTUALLY, not yet!)
-                update automatically to match the time signature context; and is True.
-                Does not work yet -- functions as True.
+                Options are "auto" (default), False, True, and "always"
 
                 "auto" is the default, where if the rest value happens to match the current
-                time signature context, then display it as a whole rest, centered, etc.
-                otherwise will display normally.
+                time signature context (and there is no pickup or other padding),
+                then display it as a whole rest, centered, etc. otherwise will display normally.
+
+                False means do not display the rest as full measure whole rest,
+                no matter what.  This setting is often used by composers in very small time
+                signatures such as 1/8, where a whole rest can look incongruous.
+
+                True keeps the set duration, but will always display as a full measure rest
+                even if it's not the length of the measure
+                (generally a whole note unless the time signature is very long).
+
+                "always" means that on export, the duration will (EVENTUALLY, not yet!)
+                update automatically to match the time signature context and always display
+                as a whole rest. "always" does not work yet -- functions as True.
 
                 See examples in :meth:`music21.musicxml.m21ToXml.MeasureExporter.restToXml`
                 ''',

@@ -208,7 +208,7 @@ class Groups(list):  # no need to inherit from slotted object
     # this speeds up creation slightly...
     __slots__ = ()
 
-    def _validName(self, value: str):
+    def _validName(self, value: str) -> None:
         if not isinstance(value, str):
             raise exceptions21.GroupException('Only strings can be used as group names, '
                                               + f'not {value!r}')

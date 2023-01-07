@@ -551,6 +551,7 @@ class CoreCorpus(Corpus):
         ('johnson_j_r', 'J. Rosamund Johnson', True),
         ('josquin', 'Josquin des Prez', True),
         ('leadSheet', 'Leadsheet demos', False),
+        ('liliuokalani', 'Queen Liliʻuokalani', True),
         ('luca', 'D. Luca', True),
         ('miscFolk', 'Miscellaneous Folk', False),
         ('monteverdi', 'Claudio Monteverdi', True),

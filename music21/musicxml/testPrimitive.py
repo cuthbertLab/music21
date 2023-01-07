@@ -19068,7 +19068,7 @@ ALL = [
 ]
 
 
-def get(contentRequest):
+def get(contentRequest: str) -> str:
     '''
     Get test material by type of content
 

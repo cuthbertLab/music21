@@ -2001,28 +2001,7 @@ class PartParser(XMLParserBase):
 
         m = measureParser.stream
         self.setLastMeasureInfo(m)
-        # TODO: move this into the measure parsing,
-        #     because it should happen on a voice level.
-        if measureParser.fullMeasureRest is True:
-            # recurse is necessary because it could be in voices...
-            r1 = m[note.Rest].first()
-
-            if t.TYPE_CHECKING:
-                # fullMeasureRest is True, means Rest will be found
-                assert r1 is not None
-
-            if self.lastTimeSignature is not None:
-                lastTSQl = self.lastTimeSignature.barDuration.quarterLength
-            else:
-                lastTSQl = 4.0  # sensible default.
-
-            if (r1.fullMeasure is True  # set by xml measure='yes'
-                                    or (r1.duration.quarterLength != lastTSQl
-                                        and r1.duration.type in ('whole', 'breve')
-                                        and r1.duration.dots == 0
-                                        and not r1.duration.tuplets)):
-                r1.duration.quarterLength = lastTSQl
-                r1.fullMeasure = True
+        warnings.warn(f'{m} {m.highestTime} {self}', MusicXMLWarning)
 
         # NB: not coreInsert, because barDurationProportion()
         # is called in adjustTimeAttributesFromMeasure()
@@ -2205,6 +2184,7 @@ class PartParser(XMLParserBase):
         # use this as the next offset
 
         mHighestTime = m.highestTime
+        # warnings.warn(f'{m} {mHighestTime} {self}', MusicXMLWarning)
         # warnings.warn([self.lastTimeSignature], MusicXMLWarning)
         # warnings.warn([self.lastTimeSignature.barDuration], MusicXMLWarning)
 
@@ -2325,6 +2305,8 @@ class MeasureParser(XMLParserBase):
     >>> mp.restAndNoteCount['note']
     0
 
+    fullMeasureRest is now just a counting/debug tool.
+
     >>> mp.fullMeasureRest
     True
     '''
@@ -2395,6 +2377,10 @@ class MeasureParser(XMLParserBase):
         # there is an effort to translate the voice text to an int, but if that fails (unlikely)
         # we store whatever we find
         self.lastVoice: str | int | None = None
+
+        # fullMeasureRest is now just a counting/debug tool.  Because pickup measures
+        # in Finale set <rest measure="yes"> but then define a type like "quarter",
+        # this cannot be trusted to give a whole rest.
         self.fullMeasureRest = False
 
         # for keeping track of full-measureRests.
@@ -3359,7 +3345,9 @@ class MeasureParser(XMLParserBase):
         True
 
         Note that we do NOT set `r`'s `.fullMeasure` to True or always, but keep it as
-        "auto" so that changes in time signature, etc. will affect output.
+        "auto" so that changes in time signature, etc. will affect output.  Also
+        because pickup measures often use measure="yes" in Finale, but display
+        as quarter rests.  See https://github.com/w3c/musicxml/issues/478
         '''
         d = self.xmlToDuration(mxRest)
         r = note.Rest(duration=d)
@@ -3369,6 +3357,7 @@ class MeasureParser(XMLParserBase):
                                           + 'contains a rest tag.')
         isFullMeasure = mxRestTag.get('measure')
         if isFullMeasure == 'yes':
+            # fullMeasureRest is now just a counting/debug tool.
             self.fullMeasureRest = True  # force full measure rest...
             r.fullMeasure = True
             # this attribute is not 100% necessary to get a multi-measure rest spanner

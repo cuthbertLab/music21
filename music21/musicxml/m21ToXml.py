@@ -4114,7 +4114,11 @@ class MeasureExporter(XMLExporterBase):
         </note>
 
 
-        display-step and display-octave should work:
+        Note that if a measure has paddingLeft/paddingRight (such as a pickup)
+        then a fullMeasure duration might not match the TimeSignature duration.
+
+
+        The display-step and display-octave are set from a Rest's stepShift:
 
         >>> r = note.Rest()
         >>> r.stepShift = 1
