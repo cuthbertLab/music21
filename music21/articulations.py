@@ -577,7 +577,7 @@ class PullOff(FretIndication):
 
 class FretBend(FretIndication):
     bendAlter: interval.IntervalBase | None = None
-    preBend: t.Any = None
+    preBend: bool = False
     release: t.Any = None
     withBar: t.Any = None
 
