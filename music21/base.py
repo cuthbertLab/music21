@@ -267,6 +267,9 @@ class Groups(list):  # no need to inherit from slotted object
 
 
 # -----------------------------------------------------------------------------
+# these are two sentinel objects that are returned when getattr(self, attr) or
+# getattr(other, attr) fail, that ensure that the two failed attributes will
+# never equal each other.
 _EQUALITY_SENTINEL_SELF = object()
 _EQUALITY_SENTINEL_OTHER = object()
 

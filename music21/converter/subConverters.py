@@ -419,9 +419,10 @@ class ConverterIPython(SubConverter):
         helperSubConverter = helperConverter.subConverter
 
         if helperFormat in ('musicxml', 'xml', 'lilypond', 'lily'):
-            # hack to make musescore excerpts -- fix with a converter class in MusicXML
             from music21.ipython21 import objects as ipythonObjects
 
+            # hack to make musescore excerpts -- fix with a converter class in MusicXML
+            # or make a new keyword to ignoreTitles, etc.
             savedDefaultTitle = defaults.title
             savedDefaultAuthor = defaults.author
             defaults.title = ''
@@ -439,19 +440,24 @@ class ConverterIPython(SubConverter):
                                               **keywords
                                               )
 
-                if helperSubformats[0] == 'png':
-                    if not str(environLocal['musescoreDirectPNGPath']).startswith('/skip'):
-                        ipo = ipythonObjects.IPythonPNGObject(fp)
-                        # noinspection PyTypeChecker
-                        display(Image(data=ipo.getData(), retina=True))
-                    else:
-                        # smallest transparent pixel
-                        # noinspection SpellCheckingInspection
-                        pngData64 = (b'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAAAAAA'
-                                     + b'6fptVAAAACklEQVQYV2P4DwABAQEAWk1v8QAAAABJRU5ErkJggg==')
-                        pngData = base64.b64decode(pngData64)
-                        # noinspection PyTypeChecker
-                        display(Image(data=pngData, retina=True))
+                if helperSubformats[0] != 'png':
+                    continue
+
+                if not str(environLocal['musescoreDirectPNGPath']).startswith('/skip'):
+                    ipo = ipythonObjects.IPythonPNGObject(fp)
+                    # noinspection PyTypeChecker
+                    display(Image(data=ipo.getData(), retina=True))
+                else:
+                    # During documentation testing of the Notebooks, we don't generate
+                    # images since they take too long, so we just display the
+                    # smallest transparent pixel instead.
+
+                    # noinspection SpellCheckingInspection
+                    pngData64 = (b'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAAAAAA'
+                                 + b'6fptVAAAACklEQVQYV2P4DwABAQEAWk1v8QAAAABJRU5ErkJggg==')
+                    pngData = base64.b64decode(pngData64)
+                    # noinspection PyTypeChecker
+                    display(Image(data=pngData, retina=True))
 
             defaults.title = savedDefaultTitle
             defaults.author = savedDefaultAuthor
