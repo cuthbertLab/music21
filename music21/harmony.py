@@ -323,6 +323,22 @@ class Harmony(chord.Chord):
         >>> h.bass(note.Note('E'))
         >>> h.figure
         'CM'
+
+        OMIT_FROM_DOCS
+
+        Fixed storing deduced figures by avoiding duplicate chordStepModifications:
+
+        >>> h = harmony.ChordSymbol('CM7omit5')
+        >>> h.addChordStepModification(harmony.ChordStepModification(modType='add', degree=4))
+        >>> h.findFigure()
+        'Cmaj7 subtract 5 add 4'
+
+        >>> h.figure
+        'CM7omit5'
+
+        >>> h.figure = h.findFigure()
+        >>> h.figure
+        'Cmaj7 subtract 5 add 4'
         '''
         if self._figure is None:
             return self.findFigure()
@@ -504,7 +520,8 @@ class Harmony(chord.Chord):
             raise HarmonyException(
                 f'cannot add this object as a degree: {degree}')
 
-        self.chordStepModifications.append(degree)
+        if degree not in self.chordStepModifications:
+            self.chordStepModifications.append(degree)
         if updatePitches:
             self._updatePitches()
 
@@ -546,7 +563,8 @@ class ChordStepModification(prebase.ProtoM21Object):
 
     >>> hd = harmony.ChordStepModification('add', 4)
     >>> hd
-    <music21.harmony.ChordStepModification modType=add degree=4 interval=None>
+    <music21.harmony.ChordStepModification modType=add
+        degree=4 interval=<music21.interval.Interval P1>>
 
     >>> hd = harmony.ChordStepModification('alter', 3, 1)
     >>> hd
@@ -581,16 +599,18 @@ class ChordStepModification(prebase.ProtoM21Object):
     # INITIALIZER #
 
     def __init__(self, modType=None, degree=None, intervalObj=None):
-        self._modType = None  # add, alter, subtract
-        self._interval = None  # alteration of degree, alter ints in mxl
-        self._degree = None  # the degree number, where 3 is the third
-        # use properties if defined
+        self._modType: str | None = None  # add, alter, subtract
+        self._interval: interval.Interval  # alteration of degree, alter ints in mxl
+        self._degree: int | None = None  # the degree number, where 3 is the third
+        # use properties if defined: runs certain type conversions
         if modType is not None:
             self.modType = modType
         if degree is not None:
             self.degree = degree
         if intervalObj is not None:
             self.interval = intervalObj
+        else:
+            self.interval = interval.Interval('P1')
 
     # SPECIAL METHODS #
 
@@ -1632,7 +1652,9 @@ class ChordSymbol(Harmony):
 
         return list(c.pitches)
 
-    def _adjustPitchesForChordStepModifications(self, pitches):
+    def _adjustPitchesForChordStepModifications(
+        self, pitches: t.Iterable[pitch.Pitch]
+    ) -> list[pitch.Pitch]:
         '''
         degree-value element: indicates degree in chord, positive integers only
 
@@ -1796,7 +1818,7 @@ class ChordSymbol(Harmony):
             elif chordStepModification.modType == 'alter':
                 typeAlter(chordStepModification)
 
-        return tuple(pitches)
+        return pitches
 
     def _parseAddAlterSubtract(self, remaining: str, modType: str) -> str:
         '''
@@ -2120,7 +2142,7 @@ class ChordSymbol(Harmony):
             self.inversion(None, transposeOnSet=False)
             inversionNum = None
 
-        pitches = list(self._adjustPitchesForChordStepModifications(pitches))
+        pitches = self._adjustPitchesForChordStepModifications(pitches)
 
         if inversionNum not in (0, None):
             for p in pitches[0:inversionNum]:
