@@ -526,6 +526,7 @@ class GeneralMordent(Ornament):
         self.size = None  # interval.Interval (General, etc.) class
         self.quarterLength = 0.125  # 32nd note default
         self.size = interval.GenericInterval(2)
+        self.placement = 'above'
 
     def realize(self, srcObj: 'music21.note.Note', *, inPlace=False):
         '''
