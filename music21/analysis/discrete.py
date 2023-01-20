@@ -7,7 +7,7 @@
 #               Christopher Ariza
 #               Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2010-2022 Michael Scott Asato Cuthbert
+# Copyright:    Copyright © 2010-2023 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''

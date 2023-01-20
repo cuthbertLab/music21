@@ -8,7 +8,7 @@
 #               Jacob Walls
 #               Evan Lynch
 #
-# Copyright:    Copyright © 2008-2022 Michael Scott Asato Cuthbert
+# Copyright:    Copyright © 2008-2023 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # -----------------------------------------------------------------------------
 from __future__ import annotations
