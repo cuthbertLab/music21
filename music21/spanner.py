@@ -1765,7 +1765,7 @@ class Ottava(Spanner):
         header += str(self.shiftMagnitude())
         return Interval(header)
 
-    def performTransposition(self, inheritAccidentalDisplay: bool = False):
+    def performTransposition(self):
         '''
         On a transposing spanner, switch to non-transposing,
         and transpose all notes and chords in the spanner.
@@ -1796,11 +1796,9 @@ class Ottava(Spanner):
             if not hasattr(n, 'pitches'):
                 continue
             for p in n.pitches:
-                p.transpose(
-                    myInterval, inheritAccidentalDisplay=inheritAccidentalDisplay, inPlace=True
-                )
+                p.transpose(myInterval, inPlace=True)
 
-    def undoTransposition(self, inheritAccidentalDisplay: bool = False):
+    def undoTransposition(self):
         '''
         Change a non-transposing spanner to a transposing spanner,
         and transpose back all the notes and chords in the spanner.
@@ -1830,9 +1828,7 @@ class Ottava(Spanner):
             if not hasattr(n, 'pitches'):
                 continue
             for p in n.pitches:
-                p.transpose(
-                    myInterval, inheritAccidentalDisplay=inheritAccidentalDisplay, inPlace=True
-                )
+                p.transpose(myInterval, inPlace=True)
 
 
 

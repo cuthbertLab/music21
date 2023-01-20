@@ -4575,18 +4575,17 @@ class Test(unittest.TestCase):
 
         # mStream.show()
 
-        # after transposition all accidentals are reset
-        # note: last d# is not showing in Finale, but this seems to be a
-        # finale error, as the musicxml is the same in all D# cases
+        # after diatonic transposition no accidentals are reset
+        self.maxDiff = None
         self.assertEqual(collectAccidentalDisplayStatus(mStream),
-                         ['x', ('G#', None), ('G#', None), 'x', 'x', 'x', 'x',
-                          ('B#', None), ('B#', None), ('C#', None), ('F#', None), ('G#', None),
-                          ('G#', None), ('C#', None), ('C#', None), ('C#', None), ('C#', None),
-                          ('D#', None), ('D#', None), ('C#', None), ('D#', None), 'x', 'x',
-                          ('F#', None), ('F#', None), ('G#', None), ('G#', None), ('C#', None),
-                          ('C#', None), ('D#', None), ('D#', None), 'x', 'x', 'x', 'x', 'x', 'x',
-                          ('F#', None), ('F#', None), ('B#', None), ('B#', None),
-                          ('C#', None), ('C#', None)]
+                         ['x', ('G#', False), ('G#', False), 'x', 'x', 'x', 'x',
+                          ('B#', True), ('B#', False), ('C#', False), ('F#', False), ('G#', False),
+                          ('G#', False), ('C#', False), ('C#', False), ('C#', False), ('C#', False),
+                          ('D#', False), ('D#', False), ('C#', False), ('D#', False), 'x', 'x',
+                          ('F#', False), ('F#', False), ('G#', False), ('G#', False), ('C#', False),
+                          ('C#', False), ('D#', False), ('D#', False), 'x', 'x', 'x', 'x', 'x', 'x',
+                          ('F#', False), ('F#', False), ('B#', True), ('B#', False),
+                          ('C#', False), ('C#', False)]
                          )
 
     def testMakeTiesAddNewMeasure(self):

@@ -238,9 +238,9 @@ class Test(unittest.TestCase):
         # sTransposed.show()
 
         self.assertEqual(collectAccidentalDisplayStatus(sTransposed),
-                         ['x', None, 'x', 'x', None, None, None, None, None,
-                          None, None, None, None, 'x', None, None, None, None,
-                          None, 'x', 'x', 'x', None, None, None])
+                         ['x', False, 'x', 'x', True, False, False, False, False, False,
+                          False, False, False, 'x', False, False, False, False, False,
+                          'x', 'x', 'x', False, True, False])
 
     def testIntervalMicrotonesA(self):
         i = interval.Interval('m3')

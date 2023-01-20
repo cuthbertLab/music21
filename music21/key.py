@@ -664,23 +664,20 @@ class KeySignature(base.Music21Object):
     def transpose(self: KeySignatureType,
                   value: TransposeTypes,
                   *,
-                  inPlace: t.Literal[False] = False,
-                  inheritAccidentalDisplay: bool = False) -> KeySignatureType:
+                  inPlace: t.Literal[False] = False) -> KeySignatureType:
         return self  # astroid 1015
 
     @overload
     def transpose(self: KeySignatureType,
                   value: TransposeTypes,
                   *,
-                  inPlace: t.Literal[True],
-                  inheritAccidentalDisplay: bool = False) -> None:
+                  inPlace: t.Literal[True]) -> None:
         return None  # astroid 1015
 
     def transpose(self: KeySignatureType,
                   value: TransposeTypes,
                   *,
-                  inPlace: bool = False,
-                  inheritAccidentalDisplay: bool = False) -> KeySignatureType | None:
+                  inPlace: bool = False) -> KeySignatureType | None:
         '''
         Transpose the KeySignature by the user-provided value.
         If the value is an integer, the transposition is treated
@@ -1238,8 +1235,7 @@ class Key(KeySignature, scale.DiatonicScale):
     def transpose(self: KeyType,
                   value: TransposeTypes,
                   *,
-                  inPlace: t.Literal[False] = False,
-                  inheritAccidentalDisplay: bool = False
+                  inPlace: t.Literal[False] = False
                   ) -> KeyType:
         return self  # astroid 1015
 
@@ -1247,16 +1243,14 @@ class Key(KeySignature, scale.DiatonicScale):
     def transpose(self: KeyType,
                   value: TransposeTypes,
                   *,
-                  inPlace: t.Literal[True],
-                  inheritAccidentalDisplay: bool = False
+                  inPlace: t.Literal[True]
                   ) -> None:
         return None
 
     def transpose(self: KeyType,
                   value: TransposeTypes,
                   *,
-                  inPlace: bool = False,
-                  inheritAccidentalDisplay: bool = False
+                  inPlace: bool = False
                   ) -> KeyType | None:
         '''
         Transpose the Key by the user-provided value.
@@ -1308,14 +1302,10 @@ class Key(KeySignature, scale.DiatonicScale):
         <music21.key.Key of g# minor>
         '''
         if inPlace is True:
-            super().transpose(
-                value, inPlace=inPlace, inheritAccidentalDisplay=inheritAccidentalDisplay
-            )
+            super().transpose(value, inPlace=inPlace)
             post = self
         else:
-            post = super().transpose(
-                value, inPlace=inPlace, inheritAccidentalDisplay=inheritAccidentalDisplay
-            )
+            post = super().transpose(value, inPlace=inPlace)
 
         postKey = post.asKey(self.mode)
         post.tonic = postKey.tonic

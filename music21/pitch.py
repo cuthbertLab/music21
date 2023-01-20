@@ -4376,7 +4376,6 @@ class Pitch(prebase.ProtoM21Object):
         self: PitchType,
         value: interval.IntervalBase | str | int,
         *,
-        inheritAccidentalDisplay: bool = False,
         inPlace: bool = False
     ) -> PitchType | None:
         '''
@@ -4466,12 +4465,12 @@ class Pitch(prebase.ProtoM21Object):
         else:  # try to process
             intervalObj = interval.Interval(value)
 
-        p = intervalObj.transposePitch(self, inheritAccidentalDisplay=inheritAccidentalDisplay)
+        p = intervalObj.transposePitch(self)
         if not isinstance(value, int):
             p.spellingIsInferred = self.spellingIsInferred
 
         if p.spellingIsInferred is True:
-            p.simplifyEnharmonic(inPlace=True, mostCommon=True)  # might have to not inherit
+            p.simplifyEnharmonic(inPlace=True, mostCommon=True)
 
         if not inPlace:
             return p

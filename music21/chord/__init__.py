@@ -4667,7 +4667,7 @@ class Chord(ChordBase):
         newChord._notes.sort(key=lambda x: x.pitch.frequency)
         return newChord
 
-    def transpose(self, value, *, inPlace=False, inheritAccidentalDisplay=False):
+    def transpose(self, value, *, inPlace=False):
         '''
         Transpose the Chord by the user-provided value. If the value
         is an integer, the transposition is treated in half steps and
@@ -4712,9 +4712,7 @@ class Chord(ChordBase):
             post = self
         # call transpose on component Notes
         for n in post._notes:
-            n.transpose(
-                intervalObj, inPlace=True, inheritAccidentalDisplay=inheritAccidentalDisplay
-            )
+            n.transpose(intervalObj, inPlace=True)
         # for p in post.pitches:
         #     # we are either operating on self or a copy; always use inPlace
         #     p.transpose(intervalObj, inPlace=True)

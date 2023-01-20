@@ -5218,7 +5218,6 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         *,
         reverse: bool = False,
         transposeKeySignature: bool = True,
-        inheritAccidentalDisplay: bool = False,
         inPlace: t.Literal[True],
     ) -> None:
         pass
@@ -5229,7 +5228,6 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         *,
         reverse: bool = False,
         transposeKeySignature: bool = True,
-        inheritAccidentalDisplay: bool = False,
         inPlace: t.Literal[False] = False,
     ) -> StreamType:
         pass
@@ -5239,7 +5237,6 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         *,
         reverse: bool = False,
         transposeKeySignature: bool = True,
-        inheritAccidentalDisplay: bool = False,
         inPlace: bool = False,
     ) -> StreamType | None:
         '''
@@ -5292,8 +5289,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
                 trans = trans.reverse()
             focus.transpose(trans,
                             inPlace=True,
-                            classFilterList=classFilterList,
-                            inheritAccidentalDisplay=inheritAccidentalDisplay)
+                            classFilterList=classFilterList)
 
         # restore original durations
         for inst, original_ql in instrument_map.items():
@@ -5301,7 +5297,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
 
         return returnObj
 
-    def _treatAtSoundingPitch(self, inheritAccidentalDisplay: bool = False) -> bool | str:
+    def _treatAtSoundingPitch(self) -> bool | str:
         '''
         `atSoundingPitch` might be True, False, or 'unknown'. Given that
         setting the property does not automatically synchronize the corresponding
@@ -5336,17 +5332,13 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
             if substream.atSoundingPitch == 'unknown':
                 continue
             if substream.atSoundingPitch is False and at_sounding is True:
-                substream.toSoundingPitch(
-                    inPlace=True, inheritAccidentalDisplay=inheritAccidentalDisplay
-                )
+                substream.toSoundingPitch(inPlace=True)
             elif substream.atSoundingPitch is True and at_sounding is False:
-                substream.toWrittenPitch(
-                    inPlace=True, inheritAccidentalDisplay=inheritAccidentalDisplay
-                )
+                substream.toWrittenPitch(inPlace=True)
 
         return at_sounding
 
-    def toSoundingPitch(self, *, inheritAccidentalDisplay: bool = False, inPlace: bool = False):
+    def toSoundingPitch(self, *, inPlace=False):
         # noinspection PyShadowingNames
         '''
         If not at sounding pitch, transpose all Pitch
@@ -5406,26 +5398,20 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         if returnObj.hasPartLikeStreams() or 'Opus' in returnObj.classSet:
             for partLike in returnObj.getElementsByClass(Stream):
                 # call on each part
-                partLike.toSoundingPitch(
-                    inPlace=True, inheritAccidentalDisplay=inheritAccidentalDisplay
-                )
+                partLike.toSoundingPitch(inPlace=True)
             returnObj.atSoundingPitch = True
             return returnObj if not inPlace else None
 
-        at_sounding = returnObj._treatAtSoundingPitch(
-            inheritAccidentalDisplay=inheritAccidentalDisplay
-        )
+        at_sounding = returnObj._treatAtSoundingPitch()
 
         if at_sounding is False:
             # transposition defined on instrument goes from written to sounding
-            returnObj._transposeByInstrument(
-                reverse=False, inPlace=True, inheritAccidentalDisplay=inheritAccidentalDisplay
-            )
+            returnObj._transposeByInstrument(reverse=False, inPlace=True)
             for container in returnObj.recurse(streamsOnly=True, includeSelf=True):
                 container.atSoundingPitch = True
 
         for ottava in returnObj[spanner.Ottava]:
-            ottava.performTransposition(inheritAccidentalDisplay=inheritAccidentalDisplay)
+            ottava.performTransposition()
 
         if not inPlace:
             return returnObj  # the Stream or None
@@ -5434,7 +5420,6 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         self,
         *,
         ottavasToSounding: bool = False,
-        inheritAccidentalDisplay: bool = False,
         inPlace: bool = False
     ):
         '''
@@ -5488,25 +5473,22 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
                 partLike.toWrittenPitch(
                     inPlace=True,
                     ottavasToSounding=ottavasToSounding,
-                    inheritAccidentalDisplay=inheritAccidentalDisplay
                 )
             returnObj.atSoundingPitch = False
         else:
             at_sounding = returnObj._treatAtSoundingPitch()
             if at_sounding is True:
                 # need to reverse to go to written
-                returnObj._transposeByInstrument(
-                    reverse=True, inPlace=True, inheritAccidentalDisplay=inheritAccidentalDisplay
-                )
+                returnObj._transposeByInstrument(reverse=True, inPlace=True)
                 for container in returnObj.recurse(streamsOnly=True, includeSelf=True):
                     container.atSoundingPitch = False
 
         if ottavasToSounding:
             for ottava in returnObj[spanner.Ottava]:
-                ottava.performTransposition(inheritAccidentalDisplay=inheritAccidentalDisplay)
+                ottava.performTransposition()
         else:
             for ottava in returnObj[spanner.Ottava]:
-                ottava.undoTransposition(inheritAccidentalDisplay=inheritAccidentalDisplay)
+                ottava.undoTransposition()
 
         if not inPlace:
             return returnObj
@@ -8953,10 +8935,9 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         value: str | int | 'music21.interval.IntervalBase',
         /,
         *,
-        inPlace: bool = False,
-        recurse: bool = True,
-        classFilterList=None,
-        inheritAccidentalDisplay: bool = False
+        inPlace=False,
+        recurse=True,
+        classFilterList=None
     ):
         # noinspection PyShadowingNames
         '''
@@ -9040,9 +9021,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
                         for p in e.pitches:  # type: ignore
                             intv.transposePitchKeyAware(p, k, inPlace=True)
                 else:
-                    e.transpose(
-                        value, inPlace=True, inheritAccidentalDisplay=inheritAccidentalDisplay
-                    )
+                    e.transpose(value, inPlace=True)
         if not inPlace:
             return post
         else:

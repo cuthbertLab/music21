@@ -743,8 +743,7 @@ class IntervalBase(base.Music21Object):
     def transposePitch(self,
                        pitch1: pitch.Pitch,
                        *,
-                       inPlace: bool = False,
-                       inheritAccidentalDisplay=False):
+                       inPlace: bool = False):
         '''
         IntervalBase does not know how to do this, so it must be overridden in
         derived classes.
@@ -1370,17 +1369,9 @@ class GenericInterval(IntervalBase):
         else:
             return GenericInterval(self.undirected * (-1 * self.direction))
 
-    def transposePitch(
-        self,
-        p: pitch.Pitch,
-        *,
-        inPlace=False,
-        inheritAccidentalDisplay=False
-    ):
+    def transposePitch(self, p: pitch.Pitch, *, inPlace=False):
         '''
         transpose a pitch, retaining the accidental if any.
-        Always inherits accidental display, despite being
-        passed inheritAccidentalDisplay.
 
         >>> aPitch = pitch.Pitch('g4')
         >>> genericFifth = interval.GenericInterval(5)
@@ -2145,13 +2136,7 @@ class DiatonicInterval(IntervalBase):
 
         return ChromaticInterval(semitones)
 
-    def transposePitch(
-        self,
-        p: pitch.Pitch,
-        *,
-        inPlace=False,
-        inheritAccidentalDisplay=False
-    ):
+    def transposePitch(self, p: pitch.Pitch, *, inPlace=False):
         # noinspection PyShadowingNames
         '''
         Calls transposePitch from a full interval object.
@@ -2177,9 +2162,7 @@ class DiatonicInterval(IntervalBase):
         * Changed in v6: added inPlace
         '''
         fullIntervalObject = Interval(diatonic=self, chromatic=self.getChromatic())
-        return fullIntervalObject.transposePitch(
-            p, inPlace=inPlace, inheritAccidentalDisplay=inheritAccidentalDisplay
-        )
+        return fullIntervalObject.transposePitch(p, inPlace=inPlace)
 
     @property
     def specifierAbbreviation(self) -> str:
@@ -2461,20 +2444,12 @@ class ChromaticInterval(IntervalBase):
         specifier, generic = convertSemitoneToSpecifierGeneric(self.semitones)
         return DiatonicInterval(specifier, generic)
 
-    def transposePitch(
-        self,
-        p: pitch.Pitch,
-        *,
-        inPlace=False,
-        inheritAccidentalDisplay=False
-    ):
+    def transposePitch(self, p: pitch.Pitch, *, inPlace=False):
         # noinspection PyShadowingNames
         '''
         Given a :class:`~music21.pitch.Pitch` object, return a new,
         transposed Pitch, that is transformed
         according to this ChromaticInterval.
-        Never inherits accidental display, despite being
-        passed inheritAccidentalDisplay.
 
         Because :class:`~music21.interval.ChromaticInterval` object
         do not take into account diatonic spelling,
@@ -3360,8 +3335,7 @@ class Interval(IntervalBase):
                        *,
                        reverse=False,
                        maxAccidental: int | None = 4,
-                       inPlace=False,
-                       inheritAccidentalDisplay=False):
+                       inPlace=False):
         '''
         Given a :class:`~music21.pitch.Pitch` object, return a new,
         transposed Pitch, that is transformed
@@ -3426,12 +3400,7 @@ class Interval(IntervalBase):
         <music21.pitch.Pitch D4>
         '''
         if reverse:
-            return self.reverse().transposePitch(
-                p,
-                maxAccidental=maxAccidental,
-                inPlace=inPlace,
-                inheritAccidentalDisplay=inheritAccidentalDisplay
-            )
+            return self.reverse().transposePitch(p, maxAccidental=maxAccidental, inPlace=inPlace)
 
         if maxAccidental is None:
             maxAccidental = 99999
@@ -3441,14 +3410,12 @@ class Interval(IntervalBase):
             pOut = self.chromatic.transposePitch(
                 p,
                 inPlace=inPlace,
-                inheritAccidentalDisplay=inheritAccidentalDisplay
             )
         else:
             pOut = self._diatonicTransposePitch(
                 p,
                 maxAccidental=maxAccidental,
-                inPlace=inPlace,
-                inheritAccidentalDisplay=inheritAccidentalDisplay
+                inPlace=inPlace
             )
 
         if p.fundamental is not None:
@@ -3456,7 +3423,6 @@ class Interval(IntervalBase):
             pOut.fundamental = self.transposePitch(
                 p.fundamental,
                 maxAccidental=maxAccidental,
-                inheritAccidentalDisplay=inheritAccidentalDisplay
             )
 
             if p.fundamental.octave is None:
@@ -3469,8 +3435,7 @@ class Interval(IntervalBase):
                                 p: pitch.Pitch,
                                 *,
                                 maxAccidental: int,
-                                inPlace: bool = False,
-                                inheritAccidentalDisplay: bool = False):
+                                inPlace: bool = False):
         '''
         abstracts out the diatonic aspects of transposing, so that implicitDiatonic and
         regular diatonic can use some of the same code.
@@ -3478,6 +3443,8 @@ class Interval(IntervalBase):
         PRIVATE METHOD: Return p even if inPlace is True
         '''
         # NOTE: this is a performance critical method
+        from music21.pitch import Accidental
+
         if p.octave is None:
             useImplicitOctave = True
         else:
@@ -3526,16 +3493,39 @@ class Interval(IntervalBase):
                 # cannot import Accidental here.
                 pitch2.accidental = halfStepsToFix  # type:ignore
 
-            # inherit accidental display type etc. but not current status (unless
-            # inheritAccidentalDisplay is set, in which case inherit everything)
-            if pitch2.accidental is not None and pitch1.accidental is not None:
-                pitch2.accidental.inheritDisplay(pitch1.accidental)
-                if not inheritAccidentalDisplay:
-                    pitch2.accidental.displayStatus = None  # set accidental display to None
+            # inherit accidental display options
+            accid1: Accidental
+            if pitch1.accidental is None:
+                # Make a real Accidental that represents "non-displayed natural"
+                accid1 = Accidental('natural')
+                accid1.displayStatus = False  # implied by pitch1.accidental is None
+            else:
+                accid1 = pitch1.accidental
+
+            accid2: Accidental
+            if pitch2.accidental is None:
+                # Make a real Accidental that represents "non-displayed natural"
+                accid2 = Accidental('natural')
+                accid2.displayStatus = False  # implied by pitch2.accidental is None
+            else:
+                accid2 = pitch2.accidental
+
+            accid2.inheritDisplay(accid1)
+
+            if pitch2.accidental is None:
+                # accid2 was a made-up Accidental that represents "non-displayed natural",
+                # and then it inherited some display options.  If those display options
+                # still say "non-displayed", we can leave pitch2.accidental as None. But
+                # otherwise we need to set accid2 into pitch2.accidental.
+                if accid2.displayStatus is not False:
+                    pitch2.accidental = accid2
         else:
-            # no halfStepsToFix, restore oldPitch2Accidental if possible
+            # no halfStepsToFix, so pitch2 is fine as is, but...
+            # We set pitch2.accidental to None, so we might have lost some
+            # display options. So we restore oldPitch2Accidental if that makes sense.
             if (pitch2.accidental is None
-                    and oldPitch2Accidental is not None and oldPitch2Accidental.name == 'natural'):
+                    and oldPitch2Accidental is not None
+                    and oldPitch2Accidental.name == 'natural'):
                 pitch2.accidental = oldPitch2Accidental
 
         if useImplicitOctave is True:

@@ -2366,7 +2366,7 @@ class ChordSymbol(Harmony):
         else:
             return False
 
-    def transpose(self: T, value, *, inPlace=False, inheritAccidentalDisplay=False) -> T | None:
+    def transpose(self: T, value, *, inPlace=False) -> T | None:
         '''
         Overrides :meth:`~music21.chord.Chord.transpose` so that this ChordSymbol's
         `figure` is appropriately cleared afterward.
@@ -2382,9 +2382,7 @@ class ChordSymbol(Harmony):
         >>> cs.figure
         'Dm'
         '''
-        post = super().transpose(
-            value, inPlace=inPlace, inheritAccidentalDisplay=inheritAccidentalDisplay
-        )
+        post = super().transpose(value, inPlace=inPlace)
         if not inPlace:
             post.figure = None
             return post
@@ -2474,12 +2472,7 @@ class NoChord(ChordSymbol):
         # do nothing, everything is already set.
         return
 
-    def transpose(
-        self: NCT,
-        _value, *,
-        inPlace=False,
-        inheritAccidentalDisplay=False
-    ) -> NCT | None:
+    def transpose(self: NCT, _value, *, inPlace=False) -> NCT | None:
         '''
         Overrides :meth:`~music21.chord.Chord.transpose` to do nothing.
 
