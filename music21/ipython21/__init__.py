@@ -13,7 +13,11 @@ IPython extension to music21.  In Jupyter Notebook call:
 
    %load_ext music21.ipython21
 
-and show will take place inside the browser.  But currently not needed.
+and show will take place inside the browser.
+
+Since at least music21 v5, however, when music21 is imported we set a timer
+for two seconds to everything to settle and then load our extension (which
+now just calls matplotlib inline)
 '''
 from __future__ import annotations
 
@@ -28,6 +32,7 @@ from music21.ipython21.ipExtension import load_ipython_extension
 def loadNoMagic():
     '''
     Load the magic functions of load_ipython_extension when running IPython
+    without needing to call a %magic function
     '''
     if common.runningUnderIPython():
         # noinspection PyPackageRequirements
@@ -50,8 +55,8 @@ def inGoogleColabNotebook():
 
 
 # if we are imported in an IPython environment, then load magic after two seconds
+# so that everything can settle.
 if common.runningUnderIPython():
     from threading import Timer
     t = Timer(2, loadNoMagic)
     t.start()
-    # ipython21.load_no_magic()

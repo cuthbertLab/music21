@@ -53,6 +53,21 @@ class SubConverterFileIOException(SubConverterException):
     pass
 
 
+def run_subprocess_capturing_stderr(subprocess_command):
+    completed_process = subprocess.run(subprocess_command, capture_output=True, check=False)
+    if completed_process.returncode != 0:
+        # Raise same exception class as findNumberedPNGPath()
+        # for backward compatibility
+        stderr_bytes = completed_process.stderr
+        try:
+            import locale
+            stderr_str = stderr_bytes.decode(locale.getpreferredencoding(do_setlocale=False))
+        except UnicodeDecodeError:
+            # not really a str, but best we can do.
+            stderr_str = stderr_bytes.decode('ascii', errors='ignore')
+        raise SubConverterFileIOException(stderr_str)
+
+
 class SubConverter:
     '''
     Class wrapper for parsing data or outputting data.
@@ -397,13 +412,6 @@ class ConverterIPython(SubConverter):
         from music21 import converter
         from music21.ipython21 import inGoogleColabNotebook
 
-        if subformats is None:
-            subformats = ['vexflow']
-
-        if subformats and subformats[0] == 'vexflow':
-            raise NotImplementedError
-            # return self.vfshow(obj)
-            # subformats = ['lilypond', 'png']
         if subformats:
             helperFormat = subformats[0]
             helperSubformats = subformats[1:]
@@ -443,11 +451,9 @@ class ConverterIPython(SubConverter):
                 if helperSubformats[0] != 'png':
                     continue
 
-                if not str(environLocal['musescoreDirectPNGPath']).startswith('/skip'):
-                    ipo = ipythonObjects.IPythonPNGObject(fp)
-                    # noinspection PyTypeChecker
-                    display(Image(data=ipo.getData(), retina=True))
-                else:
+                last_png = ConverterMusicXML.findLastPNGPath(fp)
+
+                if str(environLocal['musescoreDirectPNGPath']).startswith('/skip'):
                     # During documentation testing of the Notebooks, we don't generate
                     # images since they take too long, so we just display the
                     # smallest transparent pixel instead.
@@ -458,6 +464,27 @@ class ConverterIPython(SubConverter):
                     pngData = base64.b64decode(pngData64)
                     # noinspection PyTypeChecker
                     display(Image(data=pngData, retina=True))
+                elif fp.name == last_png.name:
+                    # one page PNG -- display normally.
+                    display(Image(data=fp.read_bytes(), retina=True))
+                else:
+                    # multi-page png -- use our widget.
+                    # noinspection PyPackageRequirements
+                    from ipywidgets import interact  # type: ignore
+                    last_number, num_digits = ConverterMusicXML.findPNGRange(fp, last_png)
+                    # return last_number, num_digits
+                    stem = str(fp)[:str(fp).rfind('-')]
+
+                    @interact(page=(1, last_number))
+                    def page_display(page=1):
+                        page_str = stem + '-' + str(page).zfill(num_digits) + '.png'
+                        page_fp = pathlib.Path(page_str)
+                        if page_fp.exists():
+                            display(Image(data=page_fp.read_bytes(), retina=True))
+                        else:
+                            print(f'No file for page {page}.')
+
+                    return page_display
 
             defaults.title = savedDefaultTitle
             defaults.author = savedDefaultAuthor
@@ -510,6 +537,9 @@ class ConverterIPython(SubConverter):
 class ConverterLilypond(SubConverter):
     '''
     Convert to Lilypond and from there usually to png, pdf, or svg.
+
+    Note: that the proper format for displaying Lilypond in Jupyter
+    notebook in v9 is ipython.lily.png and not lily.ipython.png
     '''
     registerFormats = ('lilypond', 'lily')
     registerOutputExtensions = ('ly', 'png', 'pdf', 'svg')
@@ -529,31 +559,17 @@ class ConverterLilypond(SubConverter):
         from music21 import lily
         conv = lily.translate.LilypondConverter()
         conv.coloredVariants = coloredVariants
+        conv.loadFromMusic21Object(obj)
 
-        if subformats is not None and 'pdf' in subformats:
-            conv.loadFromMusic21Object(obj)
+        if 'pdf' in subformats:
             convertedFilePath = conv.createPDF(fp)
-            return convertedFilePath
-
-        elif subformats is not None and 'png' in subformats:
-            conv.loadFromMusic21Object(obj)
+        elif 'png' in subformats:
             convertedFilePath = conv.createPNG(fp)
-            if 'ipython' in subformats:
-                from music21.ipython21 import objects as ipythonObjects
-                ipo = ipythonObjects.IPythonPNGObject(convertedFilePath)
-                return ipo
-            else:
-                return convertedFilePath
-
-        elif subformats is not None and 'svg' in subformats:
-            conv.loadFromMusic21Object(obj)
+        elif 'svg' in subformats:
             convertedFilePath = conv.createSVG(fp)
-            return convertedFilePath
-
         else:
-            conv.loadFromMusic21Object(obj)
             convertedFilePath = conv.writeLyFile(ext='.ly', fp=fp)
-            return convertedFilePath
+        return convertedFilePath
 
     def show(self, obj, fmt, app=None, subformats=(), **keywords):  # pragma: no cover
         '''
@@ -569,6 +585,7 @@ class ConverterLilypond(SubConverter):
         else:
             outFormat = 'png'
 
+        # TODO: replace with run_subprocess_capturing_stderr.
         launchKey = environLocal.formatToKey(outFormat)
         self.launch(returnedFilePath, fmt=outFormat, app=app, launchKey=launchKey)
 
@@ -971,6 +988,58 @@ class ConverterMusicXML(SubConverter):
             + 'The conversion to png failed'
         )
 
+    @staticmethod
+    def findLastPNGPath(inputFp: pathlib.Path) -> pathlib.Path:
+        '''
+        Find the last numbered file path corresponding to the provided NUMBERED file path
+        ending in ".png". Raises an exception if no file can be found.
+
+        For instance, if there was a file named abc-01.png it might find abc-22.png.
+        '''
+        inputFpStr = inputFp.name  # not pathlib.
+        if not inputFpStr.endswith('.png'):
+            raise SubConverterException(f'inputFp must end with ".png"; got {inputFp}')
+
+        dash_location = inputFpStr.rfind('-')
+        if dash_location == -1:
+            raise SubConverterException(
+                f'inputFp must end with "-0001.png" or similar; got {inputFp}'
+            )
+        base_name = inputFpStr[:dash_location]
+        last_name = list(sorted(inputFp.parent.glob(f'{base_name}-*.png'),
+                                key=lambda p: p.name))[-1]
+        return last_name
+
+    @staticmethod
+    def findPNGRange(
+        firstFp: pathlib.Path,
+        lastFp: pathlib.Path | None = None
+    ) -> tuple[int, int]:
+        '''
+        Return a 2-tuple of the maximum PNG number and the number of digits used to
+        specify the PNG (for MuseScore generated PNGs, for use in the widget)
+        '''
+        inputFpStr = firstFp.name  # not pathlib.
+        if not inputFpStr.endswith('.png'):
+            raise SubConverterException(f'firstFp must end with ".png"; got {firstFp}')
+
+        if lastFp is None:
+            lastFp = ConverterMusicXML.findLastPNGPath(firstFp)
+
+        dash_location = inputFpStr.rfind('-')
+        if dash_location == -1:
+            raise SubConverterException(
+                f'inputFp must end with "-0001.png" or similar; got {inputFp}'
+            )
+        suffix_len = 4  # len('.png')
+        num_digits = len(inputFpStr) - dash_location - suffix_len - 1
+        num_string = lastFp.name[dash_location + 1:dash_location + 1 + num_digits]
+        # print(inputFpStr, dash_location, num_digits, lastFp, num_string)
+        last_number = int(num_string)
+        return (last_number, num_digits)
+
+
+
     def parseData(self, xmlString: str, number=None):
         '''
         Open MusicXML data from a string.
@@ -1045,7 +1114,8 @@ class ConverterMusicXML(SubConverter):
         fpOut = str(fp)[:-1 * len('musicxml')]
         fpOut += subformatExtension
 
-        musescoreRun = [str(musescorePath), fp, '-o', fpOut, '-T', '0']
+        # -T 0 = trim to zero pixel margin
+        musescoreRun = [str(musescorePath), fp, '-o', fpOut] # , '-T', '0']
         if dpi is not None:
             musescoreRun.extend(['-r', str(dpi)])
 
@@ -1062,18 +1132,7 @@ class ConverterMusicXML(SubConverter):
 
             musescoreRun.extend(['-r', str(defaults.ipythonImageDpi)])
 
-        completed_process = subprocess.run(musescoreRun, capture_output=True, check=False)
-        if completed_process.returncode != 0:
-            # Raise same exception class as findNumberedPNGPath()
-            # for backward compatibility
-            stderr_bytes = completed_process.stderr
-            try:
-                import locale
-                stderr_str = stderr_bytes.decode(locale.getpreferredencoding(do_setlocale=False))
-            except UnicodeDecodeError:
-                # not really a str, but best we can do.
-                stderr_str = stderr_bytes.decode('ascii', errors='ignore')
-            raise SubConverterFileIOException(stderr_str)
+        run_subprocess_capturing_stderr(musescoreRun)
 
         if common.runningUnderIPython() and common.getPlatform() == 'nix':
             # Leave environment in original state
@@ -1172,7 +1231,7 @@ class ConverterMusicXML(SubConverter):
                 compress = False
 
         # hack to make musescore excerpts -- fix with a converter class in MusicXML
-        if subformats is not None and 'png' in subformats:
+        if 'png' in subformats:
             # do not print a title or author -- to make the PNG smaller.
             defaults.title = ''
             defaults.author = ''
@@ -1190,12 +1249,11 @@ class ConverterMusicXML(SubConverter):
 
         xmlFp: pathlib.Path = self.writeDataStream(writeDataStreamFp, dataBytes)
 
-        if subformats is not None and 'png' in subformats:
+        if 'png' in subformats:
             defaults.title = savedDefaultTitle
             defaults.author = savedDefaultAuthor
 
-        if (subformats is not None
-                and ('png' in subformats or 'pdf' in subformats)
+        if (('png' in subformats or 'pdf' in subformats)
                 and not str(environLocal['musescoreDirectPNGPath']).startswith('/skip')):
             outFp = self.runThroughMusescore(xmlFp, subformats, **keywords)
         elif compress:
@@ -1215,11 +1273,10 @@ class ConverterMusicXML(SubConverter):
         Override to do something with png...
         '''
         returnedFilePath = self.write(obj, fmt, subformats=subformats, **keywords)
-        if subformats is not None:
-            if 'png' in subformats:
-                fmt = 'png'
-            elif 'pdf' in subformats:
-                fmt = 'pdf'
+        if 'png' in subformats:
+            fmt = 'png'
+        elif 'pdf' in subformats:
+            fmt = 'pdf'
         self.launch(returnedFilePath, fmt=fmt, app=app)
 
 
