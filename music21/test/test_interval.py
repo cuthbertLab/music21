@@ -234,13 +234,24 @@ class Test(unittest.TestCase):
                           False, False, False, 'x', 'x', 'x', False, False, False,
                           'x', 'x', 'x', 'x', True, False])
 
-        sTransposed = sSub.flatten().transpose('p5')
+        # transpose with treatAsKeyChange=True will keep every displayStatus on
+        # transposed accidentals.
+        sTransposed = sSub.flatten().transpose('p5', treatAsKeyChange=True)
         # sTransposed.show()
 
         self.assertEqual(collectAccidentalDisplayStatus(sTransposed),
                          ['x', False, 'x', 'x', True, False, False, False, False, False,
                           False, False, False, 'x', False, False, False, False, False,
                           'x', 'x', 'x', False, True, False])
+
+        # transpose without treatAsKeyChange=True will set every displayStatus to None
+        # on transposed accidentals.
+        sTransposed.flatten().transpose('p4', inPlace=True)
+        self.assertEqual(collectAccidentalDisplayStatus(sTransposed),
+                         ['x', None, 'x', 'x', None, None, 'x', None, None, None,
+                          None, None, None, 'x', 'x', 'x', None, None, None,
+                          'x', 'x', 'x', 'x', None, None])
+
 
     def testIntervalMicrotonesA(self):
         i = interval.Interval('m3')

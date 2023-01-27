@@ -5289,6 +5289,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
                 trans = trans.reverse()
             focus.transpose(trans,
                             inPlace=True,
+                            treatAsKeyChange=transposeKeySignature,
                             classFilterList=classFilterList)
 
         # restore original durations
@@ -8937,6 +8938,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         *,
         inPlace=False,
         recurse=True,
+        treatAsKeyChange=False,
         classFilterList=None
     ):
         # noinspection PyShadowingNames
@@ -8986,10 +8988,16 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         else:
             post = self
 
-        intv: interval.IntervalBase
+        intv: interval.Interval | interval.GenericInterval
         if isinstance(value, (int, str)):
             intv = interval.Interval(value)
+        elif isinstance(value, interval.ChromaticInterval):
+            intv = interval.Interval(chromatic=value)
+        elif isinstance(value, interval.DiatonicInterval):
+            intv = interval.Interval(diatonic=value)
         else:
+            if t.TYPE_CHECKING:
+                assert isinstance(value, (interval.GenericInterval, interval.Interval))
             intv = value
 
         # for p in post.pitches:  # includes chords
@@ -9021,7 +9029,10 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
                         for p in e.pitches:  # type: ignore
                             intv.transposePitchKeyAware(p, k, inPlace=True)
                 else:
-                    e.transpose(value, inPlace=True)
+                    if isinstance(e, (key.Key, key.KeySignature)):
+                        e.transpose(intv, inPlace=True)
+                    else:
+                        e.transpose(intv, treatAsKeyChange=treatAsKeyChange, inPlace=True)
         if not inPlace:
             return post
         else:

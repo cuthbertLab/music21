@@ -720,7 +720,10 @@ class IntervalBase(base.Music21Object):
     '''
     General base class for inheritance.
     '''
-    def transposeNote(self, note1: note.Note) -> note.Note:
+    def transposeNote(self,
+                      note1: note.Note,
+                      *,
+                      treatAsKeyChange: bool = False) -> note.Note:
         '''
         Uses self.transposePitch to do the same to a note.
 
@@ -734,7 +737,7 @@ class IntervalBase(base.Music21Object):
         >>> n2.duration.type
         'half'
         '''
-        newPitch = self.transposePitch(note1.pitch)
+        newPitch = self.transposePitch(note1.pitch, treatAsKeyChange=treatAsKeyChange)
         newNote = copy.deepcopy(note1)
         newNote.pitch = newPitch
         return newNote
@@ -743,6 +746,7 @@ class IntervalBase(base.Music21Object):
     def transposePitch(self,
                        pitch1: pitch.Pitch,
                        *,
+                       treatAsKeyChange: bool = False,
                        inPlace: bool = False):
         '''
         IntervalBase does not know how to do this, so it must be overridden in
@@ -1369,7 +1373,11 @@ class GenericInterval(IntervalBase):
         else:
             return GenericInterval(self.undirected * (-1 * self.direction))
 
-    def transposePitch(self, p: pitch.Pitch, *, inPlace=False):
+    def transposePitch(self,
+                       p: pitch.Pitch,
+                       *,
+                       treatAsKeyChange: bool = False,
+                       inPlace: bool = False):
         '''
         transpose a pitch, retaining the accidental if any.
 
@@ -2136,7 +2144,11 @@ class DiatonicInterval(IntervalBase):
 
         return ChromaticInterval(semitones)
 
-    def transposePitch(self, p: pitch.Pitch, *, inPlace=False):
+    def transposePitch(self,
+                       p: pitch.Pitch,
+                       *,
+                       treatAsKeyChange: bool = False,
+                       inPlace: bool = False):
         # noinspection PyShadowingNames
         '''
         Calls transposePitch from a full interval object.
@@ -2162,7 +2174,9 @@ class DiatonicInterval(IntervalBase):
         * Changed in v6: added inPlace
         '''
         fullIntervalObject = Interval(diatonic=self, chromatic=self.getChromatic())
-        return fullIntervalObject.transposePitch(p, inPlace=inPlace)
+        return fullIntervalObject.transposePitch(
+            p, treatAsKeyChange=treatAsKeyChange, inPlace=inPlace
+        )
 
     @property
     def specifierAbbreviation(self) -> str:
@@ -2444,7 +2458,11 @@ class ChromaticInterval(IntervalBase):
         specifier, generic = convertSemitoneToSpecifierGeneric(self.semitones)
         return DiatonicInterval(specifier, generic)
 
-    def transposePitch(self, p: pitch.Pitch, *, inPlace=False):
+    def transposePitch(self,
+                       p: pitch.Pitch,
+                       *,
+                       treatAsKeyChange: bool = False,
+                       inPlace: bool = False):
         # noinspection PyShadowingNames
         '''
         Given a :class:`~music21.pitch.Pitch` object, return a new,
@@ -3348,6 +3366,7 @@ class Interval(IntervalBase):
                        *,
                        reverse=False,
                        maxAccidental: int | None = 4,
+                       treatAsKeyChange: bool = False,
                        inPlace=False):
         '''
         Given a :class:`~music21.pitch.Pitch` object, return a new,
@@ -3413,7 +3432,11 @@ class Interval(IntervalBase):
         <music21.pitch.Pitch D4>
         '''
         if reverse:
-            return self.reverse().transposePitch(p, maxAccidental=maxAccidental, inPlace=inPlace)
+            return self.reverse().transposePitch(
+                p,
+                maxAccidental=maxAccidental,
+                treatAsKeyChange=treatAsKeyChange,
+                inPlace=inPlace)
 
         if maxAccidental is None:
             maxAccidental = 99999
@@ -3428,6 +3451,7 @@ class Interval(IntervalBase):
             pOut = self._diatonicTransposePitch(
                 p,
                 maxAccidental=maxAccidental,
+                treatAsKeyChange=treatAsKeyChange,
                 inPlace=inPlace
             )
 
@@ -3436,6 +3460,7 @@ class Interval(IntervalBase):
             pOut.fundamental = self.transposePitch(
                 p.fundamental,
                 maxAccidental=maxAccidental,
+                treatAsKeyChange=treatAsKeyChange,
             )
 
             if p.fundamental.octave is None:
@@ -3448,7 +3473,7 @@ class Interval(IntervalBase):
                                 p: pitch.Pitch,
                                 *,
                                 maxAccidental: int,
-                                treatAsKeyChange: bool = False,
+                                treatAsKeyChange: bool,
                                 inPlace: bool = False):
         '''
         abstracts out the diatonic aspects of transposing, so that implicitDiatonic and
