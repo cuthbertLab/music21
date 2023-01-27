@@ -1438,8 +1438,8 @@ class TrillExtension(spanner.Spanner):
     def __init__(self, *spannedElements, **keywords):
         super().__init__(*spannedElements, **keywords)
 
-        from music21 import note
-        self.fillElementTypes = [note.NotRest]
+        # from music21 import note
+        # self.fillElementTypes = [note.NotRest]
 
         self._placement = None  # can above or below or None, after musicxml
 
@@ -1489,25 +1489,9 @@ class TremoloSpanner(spanner.Spanner):
     def __init__(self, *spannedElements, **keywords):
         super().__init__(*spannedElements, **keywords)
 
-        from music21 import note
-        self.fillElementTypes = [note.NotRest]
-
         self.placement = None
         self.measured = True
         self._numberOfMarks = 3
-
-    def fillIntermediateSpannedElements(
-        self,
-        searchStream,  # yikes
-        *,
-        includeEndBoundary: bool = False,
-        mustFinishInSpan: bool = False,
-        mustBeginInSpan: bool = True,
-        includeElementsThatEndAtStart: bool = False
-    ):
-        # TremoloSpanners need to be filled by hand with the exact notes involved.
-        # We cannot automatically fill them.
-        return
 
     @property
     def numberOfMarks(self):
@@ -1587,28 +1571,12 @@ class ArpeggioMarkSpanner(spanner.Spanner):
                  **keywords):
         super().__init__(*spannedElements, **keywords)
 
-        from music21 import note
-        self.fillElementTypes = [note.NotRest]
-
         if arpeggioType not in ('normal', 'up', 'down', 'non-arpeggio'):
             raise ValueError(
                 'Arpeggio type must be "normal", "up", "down", or "non-arpeggio", '
                 + f'not {arpeggioType!r}.'
             )
         self.type = arpeggioType
-
-    def fillIntermediateSpannedElements(
-        self,
-        searchStream,  # yikes
-        *,
-        includeEndBoundary: bool = False,
-        mustFinishInSpan: bool = False,
-        mustBeginInSpan: bool = True,
-        includeElementsThatEndAtStart: bool = False
-    ):
-        # ArpeggioMarkSpanners need to be filled by hand with the exact notes involved.
-        # We cannot automatically fill them.
-        return
 
     def noteExtremes(self) -> tuple[note.Note | None,
                                     note.Note | None]:

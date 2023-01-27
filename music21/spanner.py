@@ -212,7 +212,6 @@ class Spanner(base.Music21Object):
                  *spannedElements: t.Union[base.Music21Object,
                                            Sequence[base.Music21Object]],
                  **keywords):
-        from music21 import note
         super().__init__(**keywords)
 
         # store a Stream inside of Spanner
@@ -246,18 +245,19 @@ class Spanner(base.Music21Object):
         # will mark that all parts have been gathered.
         self.completeStatus = False
 
-        # data for fillIntermediateElements:
+        # data for fill:
 
         # fillElementTypes is a list of types of object to search for.  This
         # can be set to something different in the __init__ of a particular
         # type of Spanner.
-        self.fillElementTypes: list[t.Type] = [note.GeneralNote]
+        # Set here to the empty list, so that by default, fill() does nothing.
+        self.fillElementTypes: list[t.Type] = []
 
-        # After a fillIntermediateElements operation, filledStatus
-        # will be set to True.  Parsers and other clients can also set
-        # this to False or True to mark whether or not a fill operation
-        # is needed (False means fill is needed, True means fill is
-        # not needed, presumably because the fill was done by hand).
+        # After a fill operation, filledStatus will be set to True.
+        # Parsers and other clients can also set this to False or
+        # True to mark whether or not a fill operation is needed
+        # (False means fill is needed, True means fill is not
+        # needed, presumably because the fill was done by hand).
         # Initialized to 'unknown'.
         self.filledStatus: bool | t.Literal['unknown'] = 'unknown'
 
@@ -547,9 +547,9 @@ class Spanner(base.Music21Object):
         # environLocal.printDebug(['replaceSpannedElement()', 'id(old)', id(old),
         #    'id(new)', id(new)])
 
-    def fillIntermediateSpannedElements(
+    def fill(
         self,
-        searchStream,  # yikes
+        searchStream,  # must be stream.Stream, but cannot import stream here
         *,
         includeEndBoundary: bool = False,
         mustFinishInSpan: bool = False,
@@ -559,6 +559,10 @@ class Spanner(base.Music21Object):
         if t.TYPE_CHECKING:
             from music21 import stream
             assert isinstance(searchStream, stream.Stream)
+
+        if not self.fillElementTypes:
+            # nothing to fill
+            return
 
         if self.filledStatus is True:
             # Don't fill twice.  If client wants this they can set fillComplete to False first.
@@ -1301,11 +1305,11 @@ class Slur(Spanner):
     '''
 
     def __init__(self, *spannedElements, **keywords):
-        from music21 import note
         super().__init__(*spannedElements, **keywords)
         self.placement = None  # can above or below, after musicxml
         self.lineType = None  # can be 'dashed' or None
-        self.fillElementTypes = [note.NotRest]
+        # from music21 import note
+        # self.fillElementTypes = [note.NotRest]
 
     # TODO: add property for placement
 
@@ -1341,9 +1345,10 @@ class MultiMeasureRest(Spanner):
     }
 
     def __init__(self, *spannedElements, **keywords):
-        from music21 import note
         super().__init__(*spannedElements, **keywords)
-        self.fillElementTypes = [note.Rest]
+
+        # from music21 import note
+        # self.fillElementTypes = [note.Rest]
         self._overriddenNumber = None
         self.useSymbols = keywords.get('useSymbols', defaults.multiMeasureRestUseSymbols)
         self.maxSymbols = keywords.get('maxSymbols', defaults.multiMeasureRestMaxSymbols)
@@ -1479,9 +1484,11 @@ class RepeatBracket(Spanner):
                  number: int | str | Iterable[int] = 0,
                  overrideDisplay: str | None = None,
                  **keywords):
-        from music21 import stream
         super().__init__(*spannedElements, **keywords)
-        self.fillElementTypes = [stream.Measure]
+
+        # from music21 import stream
+        # self.fillElementTypes = [stream.Measure]
+
         # store a range, inclusive of the single number assignment
         self.numberRange: list[int] = []
         self.overrideDisplay = overrideDisplay
@@ -1860,9 +1867,9 @@ class Line(Spanner):
         endHeight: int | float | None = None,
         **keywords
     ):
-        from music21 import note
         super().__init__(*spannedElements, **keywords)
-        self.fillElementTypes = [note.GeneralNote]
+        # from music21 import note
+        # self.fillElementTypes = [note.GeneralNote]
 
         DEFAULT_TICK = 'down'
         self._endTick = DEFAULT_TICK  # can be up/down/arrow/both/None
@@ -2021,9 +2028,9 @@ class Glissando(Spanner):
                  lineType: str = 'wavy',
                  label: str | None = None,
                  **keywords):
-        from music21 import note
         super().__init__(*spannedElements, **keywords)
-        self.fillElementTypes = [note.NotRest]
+        # from music21 import note
+        # self.fillElementTypes = [note.NotRest]
 
         GLISSANDO_DEFAULT_LINE_TYPE = 'wavy'
         self._lineType = GLISSANDO_DEFAULT_LINE_TYPE

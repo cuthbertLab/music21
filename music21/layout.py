@@ -442,19 +442,6 @@ class StaffGroup(spanner.Spanner):
         # in musicxml
         self._barTogether = barTogether
 
-    def fillIntermediateSpannedElements(
-        self,
-        searchStream,  # yikes
-        *,
-        includeEndBoundary: bool = False,
-        mustFinishInSpan: bool = False,
-        mustBeginInSpan: bool = True,
-        includeElementsThatEndAtStart: bool = False
-    ):
-        # There is no fill of intermediate elements in a StaffGroup.  All elements must be
-        # chosen carefully by the client.
-        return
-
     # --------------------------------------------------------------------------
 
     def _getBarTogether(self) -> t.Literal[True, False, None, 'Mensurstrich']:

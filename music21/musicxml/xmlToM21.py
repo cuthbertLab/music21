@@ -1607,7 +1607,7 @@ class PartParser(XMLParserBase):
             if spannerPart:
                 spannerPart.coreInsert(0, sp)
                 spannerPart.coreElementsChanged()
-                sp.fillIntermediateSpannedElements(spannerPart)
+                sp.fill(spannerPart)
 
     def findFirstPartContaining(
         self,

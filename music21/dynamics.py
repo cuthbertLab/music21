@@ -348,8 +348,8 @@ class DynamicWedge(spanner.Spanner):
     def __init__(self, *spannedElements, **keywords):
         super().__init__(*spannedElements, **keywords)
 
-        from music21 import note
-        self.fillElementTypes = [note.GeneralNote]
+        # from music21 import note
+        # self.fillElementTypes = [note.GeneralNote]
 
         self.type = None  # crescendo or diminuendo
         self.placement = 'below'  # can above or below, after musicxml
