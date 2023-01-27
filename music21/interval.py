@@ -2832,6 +2832,11 @@ class Interval(IntervalBase):
     >>> aInterval.semiSimpleName
     'P8'
 
+    Check if transposition would change pitch class:
+
+    >>> aInterval.transpositionChangesPitchClass
+    False
+
     An interval can also be specified directly:
 
     >>> aInterval = interval.Interval('m3')
@@ -2850,6 +2855,8 @@ class Interval(IntervalBase):
     False
     >>> aInterval.isStep
     False
+    >>> aInterval.transpositionChangesPitchClass
+    True
 
     Some ways of creating half-steps.
 
@@ -2956,6 +2963,8 @@ class Interval(IntervalBase):
     >>> iInterval = interval.Interval(gPitch, hPitch)
     >>> iInterval
     <music21.interval.Interval AAAA1>
+    >>> iInterval.transpositionChangesPitchClass
+    True
 
     >>> interval.Interval(pitch.Pitch('e##4'), pitch.Pitch('f--5'))
     <music21.interval.Interval dddd9>
@@ -3232,6 +3241,10 @@ class Interval(IntervalBase):
     def isSkip(self) -> bool:
         return self.diatonic.isSkip
 
+    @property
+    def transpositionChangesPitchClass(self) -> bool:
+        return self.simpleName != 'P1'
+
     # -------------------------------------
     # methods
     def isConsonant(self) -> bool:
@@ -3435,6 +3448,7 @@ class Interval(IntervalBase):
                                 p: pitch.Pitch,
                                 *,
                                 maxAccidental: int,
+                                treatAsKeyChange: bool = False,
                                 inPlace: bool = False):
         '''
         abstracts out the diatonic aspects of transposing, so that implicitDiatonic and
@@ -3443,6 +3457,11 @@ class Interval(IntervalBase):
         PRIVATE METHOD: Return p even if inPlace is True
         '''
         # NOTE: this is a performance critical method
+
+        inheritAccidentalDisplayStatus: bool = False
+        if treatAsKeyChange or not self.transpositionChangesPitchClass:
+            inheritAccidentalDisplayStatus = True
+
         if p.octave is None:
             useImplicitOctave = True
         else:
@@ -3490,26 +3509,33 @@ class Interval(IntervalBase):
             else:
                 pitch2.accidental = halfStepsToFix  # type:ignore
 
-            # inherit accidental display options
-            if pitch2.accidental is None:
-                if pitch1.accidental is not None:
-                    pitch2.accidental = 0  # type:ignore
-                    if t.TYPE_CHECKING:
-                        assert pitch2.accidental is not None
+            if not inheritAccidentalDisplayStatus:
+                # inherit accidental display type etc. but not current status
+                if pitch2.accidental is not None and pitch1.accidental is not None:
                     pitch2.accidental.inheritDisplay(pitch1.accidental)
+                    pitch2.accidental.displayStatus = None  # set accidental display to None
             else:
-                if pitch1.accidental is not None:
-                    pitch2.accidental.inheritDisplay(pitch1.accidental)
+                # inherit all accidental display options (including status)
+                if pitch2.accidental is None:
+                    if pitch1.accidental is not None:
+                        pitch2.accidental = 0  # type:ignore
+                        if t.TYPE_CHECKING:
+                            assert pitch2.accidental is not None
+                        pitch2.accidental.inheritDisplay(pitch1.accidental)
                 else:
-                    pitch2.accidental.displayStatus = False
+                    if pitch1.accidental is not None:
+                        pitch2.accidental.inheritDisplay(pitch1.accidental)
+                    else:
+                        pitch2.accidental.displayStatus = False
 
         else:
             # no halfStepsToFix, so pitch2 is fine as is, but...
-            # We set pitch2.accidental to None, so we might have lost some
-            # display options. So we restore oldPitch2Accidental if that makes sense.
-            if (oldPitch2Accidental is not None
-                    and oldPitch2Accidental.name == 'natural'):
-                pitch2.accidental = oldPitch2Accidental
+            if inheritAccidentalDisplayStatus:
+                # We have set pitch2.accidental to None, so we might have lost some
+                # display options. So we restore oldPitch2Accidental if that makes sense.
+                if (oldPitch2Accidental is not None
+                        and oldPitch2Accidental.name == 'natural'):
+                    pitch2.accidental = oldPitch2Accidental
 
         if useImplicitOctave is True:
             pitch2.octave = None
