@@ -3443,8 +3443,6 @@ class Interval(IntervalBase):
         PRIVATE METHOD: Return p even if inPlace is True
         '''
         # NOTE: this is a performance critical method
-        from music21.pitch import Accidental
-
         if p.octave is None:
             useImplicitOctave = True
         else:
@@ -3490,41 +3488,26 @@ class Interval(IntervalBase):
                 # pitch2 = pitchAlt
                 pitch2.ps = pitch2.ps + halfStepsToFix
             else:
-                # cannot import Accidental here.
                 pitch2.accidental = halfStepsToFix  # type:ignore
 
             # inherit accidental display options
-            accid1: Accidental
-            if pitch1.accidental is None:
-                # Make a real Accidental that represents "non-displayed natural"
-                accid1 = Accidental('natural')
-                accid1.displayStatus = False  # implied by pitch1.accidental is None
-            else:
-                accid1 = pitch1.accidental
-
-            accid2: Accidental
             if pitch2.accidental is None:
-                # Make a real Accidental that represents "non-displayed natural"
-                accid2 = Accidental('natural')
-                accid2.displayStatus = False  # implied by pitch2.accidental is None
+                if pitch1.accidental is not None:
+                    pitch2.accidental = 0  # type:ignore
+                    if t.TYPE_CHECKING:
+                        assert pitch2.accidental is not None
+                    pitch2.accidental.inheritDisplay(pitch1.accidental)
             else:
-                accid2 = pitch2.accidental
+                if pitch1.accidental is not None:
+                    pitch2.accidental.inheritDisplay(pitch1.accidental)
+                else:
+                    pitch2.accidental.displayStatus = False
 
-            accid2.inheritDisplay(accid1)
-
-            if pitch2.accidental is None:
-                # accid2 was a made-up Accidental that represents "non-displayed natural",
-                # and then it inherited some display options.  If those display options
-                # still say "non-displayed", we can leave pitch2.accidental as None. But
-                # otherwise we need to set accid2 into pitch2.accidental.
-                if accid2.displayStatus is not False:
-                    pitch2.accidental = accid2
         else:
             # no halfStepsToFix, so pitch2 is fine as is, but...
             # We set pitch2.accidental to None, so we might have lost some
             # display options. So we restore oldPitch2Accidental if that makes sense.
-            if (pitch2.accidental is None
-                    and oldPitch2Accidental is not None
+            if (oldPitch2Accidental is not None
                     and oldPitch2Accidental.name == 'natural'):
                 pitch2.accidental = oldPitch2Accidental
 
