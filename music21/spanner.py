@@ -549,28 +549,36 @@ class Spanner(base.Music21Object):
 
     def fill(
         self,
-        searchStream,  # must be stream.Stream, but cannot import stream here
+        searchStream,  # stream.Stream | None, but cannot import stream here
         *,
         includeEndBoundary: bool = False,
         mustFinishInSpan: bool = False,
         mustBeginInSpan: bool = True,
         includeElementsThatEndAtStart: bool = False
     ):
-        if t.TYPE_CHECKING:
-            from music21 import stream
-            assert isinstance(searchStream, stream.Stream)
-
         if not self.fillElementTypes:
             # nothing to fill
             return
 
         if self.filledStatus is True:
-            # Don't fill twice.  If client wants this they can set fillComplete to False first.
+            # Don't fill twice.  If client wants a refill they can set filledStatus to False.
             return
 
-        if self.getFirst() is None:
+        startElement: base.Music21Object | None = self.getFirst()
+        if startElement is None:
             # no spanned elements?  Nothing to fill.
             return
+
+        if searchStream is None:
+            searchStream = startElement.activeSite
+            if searchStream is None:
+                raise SpannerException(
+                    'Spanner.fill() requires a searchStream or getFirst().activeSite'
+                )
+
+        if t.TYPE_CHECKING:
+            from music21 import stream
+            assert isinstance(searchStream, stream.Stream)
 
         endElement: base.Music21Object | None = None
         if len(self) > 1:
