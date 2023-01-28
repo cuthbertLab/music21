@@ -580,21 +580,21 @@ class Spanner(base.Music21Object):
             from music21 import stream
             assert isinstance(searchStream, stream.Stream)
 
-        endElement: base.Music21Object | None = None
-        if len(self) > 1:
-            # Start and end elements are different, we can't just append everything, we need
-            # to save off the end element, remove it, add everything, then add the end element
+        endElement: base.Music21Object | None = self.getLast()
+        if endElement is startElement:
+            endElement = None
+
+        if endElement is not None:
+            # Start and end elements are different; we can't just append everything, we need
+            # to save the end element, remove it, add everything, then add the end element
             # again.  Note that if there are actually more than 2 elements before we start
             # filling, the new intermediate elements will come after the existing ones,
             # regardless of offset.  But first and last will still be the same two elements
             # as before, which is the most important thing.
-            endElement = self.getLast()
-            if t.TYPE_CHECKING:
-                assert endElement is not None
             self.spannerStorage.remove(endElement)
 
         try:
-            startOffsetInHierarchy: OffsetQL = self.getFirst().getOffsetInHierarchy(searchStream)
+            startOffsetInHierarchy: OffsetQL = startElement.getOffsetInHierarchy(searchStream)
         except sites.SitesException:
             # print('start element not in searchStream')
             if endElement is not None:
@@ -613,21 +613,29 @@ class Spanner(base.Music21Object):
                 return
         else:
             endOffsetInHierarchy = (
-                self.getLast().getOffsetInHierarchy(searchStream) + self.getLast().quarterLength
+                startOffsetInHierarchy + startElement.quarterLength
             )
 
-        for foundElement in (searchStream
-                .recurse()
-                .getElementsByOffsetInHierarchy(
-                    startOffsetInHierarchy,
-                    endOffsetInHierarchy,
-                    includeEndBoundary=includeEndBoundary,
-                    mustFinishInSpan=mustFinishInSpan,
-                    mustBeginInSpan=mustBeginInSpan,
-                    includeElementsThatEndAtStart=includeElementsThatEndAtStart)
-                .getElementsByClass(self.fillElementTypes)):
-            if endElement is None or foundElement is not endElement:
-                self.addSpannedElements(foundElement)
+        matchIterator = (searchStream
+            .recurse()
+            .getElementsByOffsetInHierarchy(
+                startOffsetInHierarchy,
+                endOffsetInHierarchy,
+                includeEndBoundary=includeEndBoundary,
+                mustFinishInSpan=mustFinishInSpan,
+                mustBeginInSpan=mustBeginInSpan,
+                includeElementsThatEndAtStart=includeElementsThatEndAtStart)
+            .getElementsByClass(self.fillElementTypes)
+        )
+
+        for foundElement in matchIterator:
+            if foundElement is startElement:
+                # it's already in the spanner, skip it
+                continue
+            if foundElement is endElement:
+                # we'll add it below, skip it
+                continue
+            self.addSpannedElements(foundElement)
 
         if endElement is not None:
             # add it back in as the end element
