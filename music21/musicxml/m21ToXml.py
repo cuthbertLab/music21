@@ -3232,6 +3232,20 @@ class MeasureExporter(XMLExporterBase):
         '''
         Moves self.offsetInMeasure forward by an OffsetQL, appending the appropriate
         <forward> tag (expressed in divisions) to self.xmlRoot.
+
+        >>> MEX = musicxml.m21ToXml.MeasureExporter()
+        >>> len(MEX.xmlRoot)
+        0
+        >>> MEX.moveForward(1)
+        >>> MEX.dump(MEX.xmlRoot)
+        <measure>
+          <forward>
+            <duration>10080</duration>
+          </forward>
+        </measure>
+        >>> len(MEX.xmlRoot)
+        1
+
         '''
         amountToMoveForward: int = int(round(byOffset * self.currentDivisions))
         if amountToMoveForward:
@@ -3245,6 +3259,19 @@ class MeasureExporter(XMLExporterBase):
         '''
         Moves self.offsetInMeasure backward by an OffsetQL, appending the appropriate
         <backup> tag (expressed in divisions) to self.xmlRoot.
+
+        >>> MEX = musicxml.m21ToXml.MeasureExporter()
+        >>> len(MEX.xmlRoot)
+        0
+        >>> MEX.moveBackward(2)
+        >>> MEX.dump(MEX.xmlRoot)
+        <measure>
+          <backup>
+            <duration>20160</duration>
+          </backup>
+        </measure>
+        >>> len(MEX.xmlRoot)
+        1
         '''
         amountToBackup: int = int(round(byOffset * self.currentDivisions))
         if amountToBackup:
