@@ -4779,7 +4779,11 @@ class MeasureExporter(XMLExporterBase):
                 fingeringNumber += 1
             elif isSingleNoteOrFirstInChord:
                 # Ignore hammer-on/pull-off:
-                # are written from their Spanner representation instead
+                # are written from their Spanner representation instead.
+                # It's an anti-pattern to find spanners in the articulations
+                # array, and the musicxml importer doesn't put them here,
+                # but it's a potential point of user confusion, so we guard
+                # against it here to avoid writing out superfluous <other-technical>
                 if not isinstance(a, (articulations.HammerOn, articulations.PullOff)):
                     applicableArticulations.append(a)
 
