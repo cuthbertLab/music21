@@ -3345,6 +3345,11 @@ class MeasureExporter(XMLExporterBase):
         # will perform a second pass, emitting any pre/postList for any object that is
         # functioning as a spanner anchor (the SpannerAnchors, as well as any GeneralNotes
         # that start or end spanners).
+
+        # Before second pass, stash off self.offsetInMeasure in case we need to jump forward
+        # to it after the second pass.
+        firstPassEndOffsetInMeasure: OffsetQL = self.offsetInMeasure
+
         if hasSpannerAnchors:
             # return to the beginning of the measure, to emit any SpannerAnchors.
             if self.offsetInMeasure:
@@ -3367,6 +3372,10 @@ class MeasureExporter(XMLExporterBase):
             # return to the beginning of the measure.
             if self.offsetInMeasure:
                 self.moveBackward(self.offsetInMeasure)
+        else:
+            # if necessary, jump to end of the measure.
+            if self.offsetInMeasure < firstPassEndOffsetInMeasure:
+                self.moveForward(firstPassEndOffsetInMeasure)
 
         self.currentVoiceId = None
 
