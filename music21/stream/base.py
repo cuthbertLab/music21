@@ -5388,6 +5388,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
 
         * Changed in v2.0.10: inPlace is False
         * Changed in v5: returns None if inPlace=True
+        * Changed in v9: no transposition instead of exception if atSoundPitch is 'unknown'
         '''
         from music21 import spanner
 
