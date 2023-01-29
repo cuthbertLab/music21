@@ -5391,7 +5391,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
 
         * Changed in v2.0.10: inPlace is False
         * Changed in v5: returns None if inPlace=True
-        * Changed in v9: no transposition instead of exception if atSoundPitch is 'unknown'
+        * Changed in v9: no transposition instead of exception if atSoundingPitch is 'unknown'
         '''
         from music21 import spanner
 
@@ -5461,9 +5461,9 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
 
         * Changed in v3: `inPlace` defaults to `False`
         * Changed in v5 returns `None` if `inPlace=True`
+        * Changed in v9: no transposition instead of exception if atSoundingPitch is 'unknown'
         '''
         from music21 import spanner
-        from music21 import stream
 
         if not inPlace:  # make a copy
             returnObj = self.coreCopyAsDerivation('toWrittenPitch')
@@ -5474,7 +5474,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
             for partLike in returnObj.getElementsByClass('Stream'):
                 # call on each part
                 if t.TYPE_CHECKING:
-                    assert isinstance(partLike, stream.Stream)
+                    assert isinstance(partLike, Stream)
                 partLike.toWrittenPitch(
                     inPlace=True,
                     ottavasToSounding=ottavasToSounding,
