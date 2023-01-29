@@ -4415,7 +4415,8 @@ class MeasureExporter(XMLExporterBase):
                     applicableArticulations.append(a)
                 fingeringNumber += 1
             elif isSingleNoteOrFirstInChord:
-                # hammer-on/pull-off are written from their Spanner representation
+                # Ignore hammer-on/pull-off:
+                # are written from their Spanner representation instead
                 if not isinstance(a, (articulations.HammerOn, articulations.PullOff)):
                     applicableArticulations.append(a)
 
@@ -6978,6 +6979,11 @@ class Test(unittest.TestCase):
         a = articulations.StringIndication()
         n1.articulations.append(a)
         h = articulations.HammerOn()
+        # Appending a spanner such as HammerOn to the articulations
+        # array is contrary to the documentation and contrary to the
+        # behavior of the musicxml importer, but we're testing it here
+        # anyway to just ensure that *IF* a user decides to do this themselves,
+        # we don't create a superfluous <other-technical> tag on export.
         n1.articulations.append(h)
 
         # Legal values for StringIndication begin at 1
