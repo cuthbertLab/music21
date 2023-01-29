@@ -4,6 +4,8 @@ Runs MultiprocessTest with all warnings including traceback...
 '''
 #
 # https://stackoverflow.com/questions/22373927/get-traceback-of-warnings
+from __future__ import annotations
+
 import traceback
 import warnings
 import sys
@@ -19,6 +21,6 @@ def warn_with_traceback(message, category, filename, lineno, file=None, line=Non
 
 if __name__ == '__main__':
     warnings.showwarning = warn_with_traceback
-    warnings.simplefilter("always")
+    warnings.simplefilter('always')
     from music21.test import multiprocessTest
     multiprocessTest.mainPoolRunner()

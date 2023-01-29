@@ -4,18 +4,22 @@
 # Purpose:      Tools for eliminating passing chords, etc.
 #
 # Authors:      Josiah Wolf Oberholtzer
-#               Michael Scott Cuthbert
+#               Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2013 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2013 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # -----------------------------------------------------------------------------
 '''
 Automatically reduce a MeasureStack to a single chord or group of chords.
 '''
+from __future__ import annotations
+
 import collections
 import itertools
 import unittest
+
 from music21 import chord
+from music21.common.types import DocOrder
 from music21 import exceptions21
 from music21 import environment
 from music21 import meter
@@ -73,11 +77,11 @@ class ChordReducer:
             forbiddenChords=None,
             maximumNumberOfChords=3):
         if not isinstance(inputScore, stream.Score):
-            raise ChordReducerException("Must be called on a stream.Score")
+            raise ChordReducerException('Must be called on a stream.Score')
 
         if allowableChords is not None:
             if not all(isinstance(x, chord.Chord) for x in allowableChords):
-                raise ChordReducerException("All allowableChords must be Chords")
+                raise ChordReducerException('All allowableChords must be Chords')
             intervalClassSets = []
             for x in allowableChords:
                 intervalClassSet = self._getIntervalClassSet(x.pitches)
@@ -86,16 +90,17 @@ class ChordReducer:
 
         if forbiddenChords is not None:
             if not all(isinstance(x, chord.Chord) for x in forbiddenChords):
-                raise ChordReducerException("All forbiddenChords must be Chords")
+                raise ChordReducerException('All forbiddenChords must be Chords')
             intervalClassSets = []
             for x in allowableChords:
                 intervalClassSet = self._getIntervalClassSet(x.pitches)
                 intervalClassSets.append(intervalClassSet)
             forbiddenChords = frozenset(intervalClassSets)
 
-        scoreTree = tree.fromStream.asTimespans(inputScore,
-                                              flatten=True,
-                                              classList=(note.Note, chord.Chord))
+        scoreTree = tree.fromStream.asTimespans(
+            inputScore,
+            flatten=True,
+            classList=(note.Note, chord.Chord))
 
         self.removeZeroDurationTimespans(scoreTree)
         self.splitByBass(scoreTree)
@@ -130,7 +135,7 @@ class ChordReducer:
                 templateStream=inputScore,
             )
         chordifiedPart = stream.Part()
-        for measure in chordifiedReduction.getElementsByClass('Measure'):
+        for measure in chordifiedReduction.getElementsByClass(stream.Measure):
             reducedMeasure = self.reduceMeasureToNChords(
                 measure,
                 maximumNumberOfChords=maximumNumberOfChords,
@@ -141,7 +146,7 @@ class ChordReducer:
         reduction.append(chordifiedPart)
 
         if closedPosition:
-            for x in reduction.recurse().getElementsByClass('Chord'):
+            for x in reduction[chord.Chord]:
                 x.closedPosition(forceOctave=4, inPlace=True)
 
         return reduction
@@ -176,7 +181,7 @@ class ChordReducer:
         return frozenset(result)
 
     def _iterateElementsPairwise(self, inputStream):
-        elementBuffer = []
+        elementBuffer = collections.deque()
         prototype = (
             chord.Chord,
             note.Note,
@@ -188,7 +193,7 @@ class ChordReducer:
             elementBuffer.append(element)
             if len(elementBuffer) == 2:
                 yield tuple(elementBuffer)
-                elementBuffer.pop(0)
+                elementBuffer.popleft()
 
     # PUBLIC METHODS #
     def alignHockets(self, scoreTree):
@@ -763,7 +768,7 @@ class TestExternal(unittest.TestCase):
 
 # -----------------------------------------------------------------------------
 # define presented order in documentation
-_DOC_ORDER = []
+_DOC_ORDER: DocOrder = []
 
 
 if __name__ == '__main__':

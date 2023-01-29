@@ -1,17 +1,19 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 # Name:         checker.py
-# Purpose:      music21 class which can parse a stream of parts and check your homework
+# Purpose:      checks figured basses for following voice-leading rules
 # Authors:      Jose Cabal-Ugaz
 #
-# Copyright:    Copyright © 2012 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2012 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
+from __future__ import annotations
 
 import collections
 import copy
 import unittest
 
+from music21 import pitch
 from music21 import stream
 from music21 import voiceLeading
 from music21.common.numberTools import opFrac
@@ -43,10 +45,10 @@ def getVoiceLeadingMoments(music21Stream):
             :width: 700
     '''
     allHarmonies = extractHarmonies(music21Stream)
-    allParts = music21Stream.getElementsByClass('Part').stream()
+    allParts = music21Stream.getElementsByClass(stream.Part).stream()
     newParts = [allParts[i].flatten().getElementsNotOfClass('GeneralNote').stream()
                 for i in range(len(allParts))]
-    paddingLeft = allParts[0].getElementsByClass('Measure').first().paddingLeft
+    paddingLeft = allParts[0].getElementsByClass(stream.Measure).first().paddingLeft
     for (offsets, notes) in sorted(allHarmonies.items()):
         (initOffset, endTime) = offsets
         for genNoteIndex in range(len(notes)):
@@ -66,6 +68,7 @@ def getVoiceLeadingMoments(music21Stream):
 
 
 def extractHarmonies(music21Stream):
+    # noinspection PyShadowingNames
     '''
     Takes in a :class:`~music21.stream.Stream` and returns a dictionary whose values
     are the voice leading moments of the :class:`~music21.stream.Stream` and whose
@@ -73,7 +76,6 @@ def extractHarmonies(music21Stream):
     moments are spelled out from the first or highest :class:`~music21.stream.Part`
     to the lowest one.
 
-    >>> from music21 import corpus
     >>> score = corpus.parse('corelli/opus3no1/1grave').measures(1, 3)
     >>> #_DOCS_SHOW score.show()
 
@@ -84,7 +86,7 @@ def extractHarmonies(music21Stream):
     >>> from music21.figuredBass import checker
     >>> allHarmonies = checker.extractHarmonies(score)
     >>> for (offsets, notes) in sorted(allHarmonies.items()):
-    ...    print("{0!s:15}[{1!s:23}{2!s:23}{3!s:22}]".format(offsets, notes[0], notes[1], notes[2]))
+    ...    print('{0!s:15}[{1!s:23}{2!s:23}{3!s:22}]'.format(offsets, notes[0], notes[1], notes[2]))
     (0.0, 1.5)     [<music21.note.Note C>  <music21.note.Note A>  <music21.note.Note F> ]
     (1.5, 2.0)     [<music21.note.Note C>  <music21.note.Note A>  <music21.note.Note F> ]
     (2.0, 3.0)     [<music21.note.Note B-> <music21.note.Note G>  <music21.note.Note G> ]
@@ -104,7 +106,7 @@ def extractHarmonies(music21Stream):
     (11.0, 11.5)   [<music21.note.Note A>  <music21.note.Note F>  <music21.note.Note D> ]
     (11.5, 12.0)   [<music21.note.Note A>  <music21.note.Note F>  <music21.note.Note A> ]
     '''
-    allParts = music21Stream.getElementsByClass('Part')
+    allParts = music21Stream.getElementsByClass(stream.Part)
     if len(allParts) < 2:
         raise Music21Exception('There must be at least two parts to extract harmonies')
     allHarmonies = createOffsetMapping(allParts[0])
@@ -117,13 +119,12 @@ def createOffsetMapping(music21Part):
     '''
     Creates an initial offset mapping of a :class:`~music21.stream.Part`.
 
-    >>> from music21 import corpus
     >>> from music21.figuredBass import checker
     >>> score = corpus.parse('corelli/opus3no1/1grave').measures(1, 3)
     >>> v0 = score[0]
     >>> offsetMapping = checker.createOffsetMapping(v0)
     >>> for (offsets, notes) in sorted(offsetMapping.items()):
-    ...    print("{0!s:15}[{1!s:22}]".format(offsets, notes[0]))
+    ...    print('{0!s:15}[{1!s:22}]'.format(offsets, notes[0]))
     (0.0, 1.5)     [<music21.note.Note C> ]
     (1.5, 2.0)     [<music21.note.Note C> ]
     (2.0, 3.0)     [<music21.note.Note B->]
@@ -138,7 +139,7 @@ def createOffsetMapping(music21Part):
     (11.0, 12.0)   [<music21.note.Note A> ]
     '''
     currentMapping = collections.defaultdict(list)
-    for music21GeneralNote in music21Part.flatten().getElementsByClass('GeneralNote'):
+    for music21GeneralNote in music21Part.flatten().notesAndRests:
         initOffset = music21GeneralNote.offset
         endTime = initOffset + music21GeneralNote.quarterLength
         currentMapping[(initOffset, endTime)].append(music21GeneralNote)
@@ -146,10 +147,10 @@ def createOffsetMapping(music21Part):
 
 
 def correlateHarmonies(currentMapping, music21Part):
+    # noinspection PyShadowingNames
     '''
     Adds a new :class:`~music21.stream.Part` to an existing offset mapping.
 
-    >>> from music21 import corpus
     >>> from music21.figuredBass import checker
     >>> score = corpus.parse('corelli/opus3no1/1grave').measures(1, 3)
     >>> v0 = score[0]
@@ -157,7 +158,7 @@ def correlateHarmonies(currentMapping, music21Part):
     >>> v1 = score[1]
     >>> newMapping = checker.correlateHarmonies(offsetMapping, v1)
     >>> for (offsets, notes) in sorted(newMapping.items()):
-    ...    print("{0!s:15}[{1!s:23}{2!s:21}]".format(offsets, notes[0], notes[1]))
+    ...    print('{0!s:15}[{1!s:23}{2!s:21}]'.format(offsets, notes[0], notes[1]))
     (0.0, 1.5)     [<music21.note.Note C>  <music21.note.Note A>]
     (1.5, 2.0)     [<music21.note.Note C>  <music21.note.Note A>]
     (2.0, 3.0)     [<music21.note.Note B-> <music21.note.Note G>]
@@ -179,7 +180,7 @@ def correlateHarmonies(currentMapping, music21Part):
 
     for offsets in sorted(currentMapping.keys()):
         (initOffset, endTime) = offsets
-        notesInRange = music21Part.flatten().getElementsByClass('GeneralNote').getElementsByOffset(
+        notesInRange = music21Part.flatten().notesAndRests.getElementsByOffset(
             initOffset, offsetEnd=endTime,
             includeEndBoundary=False, mustFinishInSpan=False,
             mustBeginInSpan=False, includeElementsThatEndAtStart=False)
@@ -198,10 +199,11 @@ def correlateHarmonies(currentMapping, music21Part):
     return newMapping
 
 # ------------------------------------------------------------------------------
-# Generic methods for checking for composition rule violations in streams
+# Generic functions for checking for composition rule violations in streams
 
 
-def checkSinglePossibilities(music21Stream, functionToApply, color="#FF0000", debug=False):
+def checkSinglePossibilities(music21Stream, functionToApply, color='#FF0000', debug=False):
+    # noinspection PyShadowingNames
     '''
     Takes in a :class:`~music21.stream.Score` and a functionToApply which takes in a possibility
     instance, a tuple with pitches or rests comprising a vertical sonority. Changes the color of
@@ -211,7 +213,6 @@ def checkSinglePossibilities(music21Stream, functionToApply, color="#FF0000", de
 
     .. note:: Colored notes are NOT supported in Finale.
 
-    >>> from music21 import corpus
     >>> music21Stream = corpus.parse('corelli/opus3no1/1grave').measures(1, 6)
     >>> #_DOCS_SHOW music21Stream.show()
 
@@ -238,11 +239,11 @@ def checkSinglePossibilities(music21Stream, functionToApply, color="#FF0000", de
     '''
     debugInfo = []
     if debug is True:
-        debugInfo.append("Function To Apply: " + functionToApply.__name__)
+        debugInfo.append('Function To Apply: ' + functionToApply.__name__)
         debugInfo.append(f"{'(Offset, End Time):'!s:25}Part Numbers:")
 
     allHarmonies = sorted(list(extractHarmonies(music21Stream).items()))
-    allParts = [p.flatten() for p in music21Stream.getElementsByClass('Part')]
+    allParts = [p.flatten() for p in music21Stream.getElementsByClass(stream.Part)]
     for (offsets, notes) in allHarmonies:
         vlm = [generalNoteToPitch(n) for n in notes]
         vlm_violations = functionToApply(vlm)
@@ -256,16 +257,17 @@ def checkSinglePossibilities(music21Stream, functionToApply, color="#FF0000", de
                         mustBeginInSpan=False)[0]
                     noteA.style.color = color
             if debug is True:
-                debugInfo.append(f"{offsets!s:25}{partNumberTuple!s}")
+                debugInfo.append(f'{offsets!s:25}{partNumberTuple!s}')
 
     if debug is True:
         if len(debugInfo) == 2:
-            debugInfo.append("No violations to report.")
+            debugInfo.append('No violations to report.')
         for lineInfo in debugInfo:
             print(lineInfo)
 
 
-def checkConsecutivePossibilities(music21Stream, functionToApply, color="#FF0000", debug=False):
+def checkConsecutivePossibilities(music21Stream, functionToApply, color='#FF0000', debug=False):
+    # noinspection PyShadowingNames
     '''
     Takes in a :class:`~music21.stream.Score` and a functionToApply which takes in two consecutive
     possibility instances, each a tuple with pitches or rests comprising a vertical sonority.
@@ -275,7 +277,6 @@ def checkConsecutivePossibilities(music21Stream, functionToApply, color="#FF0000
 
     .. note:: Colored notes are NOT supported in Finale.
 
-    >>> from music21 import corpus
     >>> music21Stream = corpus.parse('theoryExercises/checker_demo.xml')
     >>> #_DOCS_SHOW music21Stream.show()
 
@@ -308,7 +309,7 @@ def checkConsecutivePossibilities(music21Stream, functionToApply, color="#FF0000
         debugInfo.append('(Offset A, End Time A):  (Offset B, End Time B): Part Numbers:')
 
     allHarmonies = sorted(extractHarmonies(music21Stream).items())
-    allParts = [p.flatten() for p in music21Stream.getElementsByClass('Part')]
+    allParts = [p.flatten() for p in music21Stream.getElementsByClass(stream.Part)]
     (previousOffsets, previousNotes) = allHarmonies[0]
     vlmA = [generalNoteToPitch(n) for n in previousNotes]
     initOffsetA = previousOffsets[0]
@@ -327,7 +328,7 @@ def checkConsecutivePossibilities(music21Stream, functionToApply, color="#FF0000
                     noteA.style.color = color
                     noteB.style.color = color
             if debug is True:
-                debugInfo.append(f"{previousOffsets!s:25}{offsets!s:25}{partNumberTuple!s}")
+                debugInfo.append(f'{previousOffsets!s:25}{offsets!s:25}{partNumberTuple!s}')
         # Current vlm becomes previous
         previousOffsets = offsets
         vlmA = vlmB
@@ -335,7 +336,7 @@ def checkConsecutivePossibilities(music21Stream, functionToApply, color="#FF0000
 
     if debug is True:
         if len(debugInfo) == 2:
-            debugInfo.append("No violations to report.")
+            debugInfo.append('No violations to report.')
         for lineInfo in debugInfo:
             print(lineInfo)
 
@@ -349,13 +350,12 @@ def checkConsecutivePossibilities(music21Stream, functionToApply, color="#FF0000
 def voiceCrossing(possibA):
     '''
     Returns a list of (partNumberA, partNumberB) pairs, each representing
-    two voices which form a voice crossing. The parts from lowest part to
-    highest part (right to left) must correspond to increasingly higher
+    two voices which form a voice crossing. The parts from the lowest part to
+    the highest part (right to left) must correspond to increasingly higher
     pitches in order for there to be no voice crossing. Comparisons between
     pitches are done using pitch comparison methods, which are based on pitch
     space values (see :class:`~music21.pitch.Pitch`).
 
-    >>> from music21 import pitch
     >>> from music21.figuredBass import checker
     >>> C4 = pitch.Pitch('C4')
     >>> E4 = pitch.Pitch('E4')
@@ -391,10 +391,14 @@ def voiceCrossing(possibA):
 # Consecutive Possibility Rule-Checking Methods
 
 
-parallelFifthsTable = {}
-hiddenFifthsTable = {}
-parallelOctavesTable = {}
-hiddenOctavesTable = {}
+PITCH_QUARTET_TO_BOOL_TYPE = dict[
+    tuple[pitch.Pitch, pitch.Pitch, pitch.Pitch, pitch.Pitch],
+    bool
+]
+parallelFifthsTable: PITCH_QUARTET_TO_BOOL_TYPE = {}
+parallelOctavesTable: PITCH_QUARTET_TO_BOOL_TYPE = {}
+hiddenFifthsTable: PITCH_QUARTET_TO_BOOL_TYPE = {}
+hiddenOctavesTable: PITCH_QUARTET_TO_BOOL_TYPE = {}
 
 
 def parallelFifths(possibA, possibB):
@@ -409,7 +413,6 @@ def parallelFifths(possibA, possibB):
     by the simple interval of a perfect fifth, then this
     constitutes parallel fifths between these two parts.
 
-    >>> from music21 import pitch
     >>> from music21.figuredBass import checker
     >>> C3 = pitch.Pitch('C3')
     >>> D3 = pitch.Pitch('D3')
@@ -487,7 +490,6 @@ def hiddenFifth(possibA, possibB):
     between sopranoPitchB and bassPitchB is that of a perfect fifth,
     then this constitutes a hidden octave between the two possibilities.
 
-    >>> from music21 import pitch
     >>> from music21.figuredBass import checker
     >>> C3 = pitch.Pitch('C3')
     >>> D3 = pitch.Pitch('D3')
@@ -569,7 +571,6 @@ def parallelOctaves(possibA, possibB):
     by the simple interval of a perfect octave, then this
     constitutes parallel octaves between these two parts.
 
-    >>> from music21 import pitch
     >>> from music21.figuredBass import checker
     >>> C3 = pitch.Pitch('C3')
     >>> D3 = pitch.Pitch('D3')
@@ -647,7 +648,6 @@ def hiddenOctave(possibA, possibB):
     between sopranoPitchB and bassPitchB is that of a perfect octave,
     then this constitutes a hidden octave between the two possibilities.
 
-    >>> from music21 import pitch
     >>> from music21.figuredBass import checker
     >>> C3 = pitch.Pitch('C3')
     >>> D3 = pitch.Pitch('D3')
@@ -724,7 +724,7 @@ def generalNoteToPitch(music21GeneralNote):
     if music21GeneralNote.isNote:
         return music21GeneralNote.pitch
     else:
-        return "RT"
+        return 'RT'
 
 
 _DOC_ORDER = [extractHarmonies, getVoiceLeadingMoments,

@@ -1,7 +1,0 @@
-global-include *.p.gz *.py *.txt *.xml *.krn *.mxl *.musicxml *.pdf *.html *.ipynb *.css *.js *.png *.jpg *.mid *.abc *.json *.md *.rst *.rntxt *.command *.scl *nwc *.nwctxt *.wav *.mei LICENSE
-global-exclude *ipynb_checkpoints* *-checkpoint.ipynb
-prune dist
-prunt .mypy_cache
-prune music21/.mypy_cache
-prune obsolete
-prune documentation

@@ -3,19 +3,18 @@
 # Name:         articulations.py
 # Purpose:      music21 classes for representing articulations
 #
-# Authors:      Michael Scott Cuthbert
+# Authors:      Michael Scott Asato Cuthbert
 #               Christopher Ariza
 #
-# Copyright:    Copyright © 2009-2013 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2009-2013 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
-
 '''
 Classes for representing and processing articulations.
-Specific articulations are modeled as :class:`~music21.articulation.Articulation` subclasses.
+Specific articulations are modeled as :class:`~music21.articulations.Articulation` subclasses.
 
-A :class:`~music21.note.Note` object has a :attr:`~music21.note.Note.articulations` attribute.
-This list can be used to store one or more :class:`music21.articulation.Articulation` subclasses.
+A :class:`~music21.note.Note` object has an :attr:`~music21.note.Note.articulations` attribute.
+This list can be used to store one or more :class:`music21.articulations.Articulation` subclasses.
 
 As much as possible, MusicXML names are used for Articulation classes,
 with xxx-yyy changed to XxxYyy.  For instance, "strong-accent" in
@@ -23,8 +22,6 @@ MusicXML is "StrongAccent" here.
 
 Fingering and other playing marks are found here.  Fermatas, trills, etc.
 are found in music21.expressions.
-
-
 
 >>> n1 = note.Note('D#4')
 >>> n1.articulations.append(articulations.Tenuto())
@@ -76,26 +73,25 @@ A longer test showing the utility of the module:
 
 .. image:: images/prova_articolazioni.*
     :width: 628
-
 '''
-from typing import Optional
+from __future__ import annotations
+
+import typing as t
 import unittest
 
 from music21 import base
 from music21 import common
 from music21.common.classTools import tempAttribute
-from music21 import exceptions21
 from music21 import environment
 from music21 import style
 from music21 import spanner
 
-_MOD = 'articulations'
-environLocal = environment.Environment(_MOD)
+if t.TYPE_CHECKING:
+    from music21 import interval
 
 
+environLocal = environment.Environment('articulations')
 
-class ArticulationException(exceptions21.Music21Exception):
-    pass
 
 # ------------------------------------------------------------------------------
 class Articulation(base.Music21Object):
@@ -107,17 +103,52 @@ class Articulation(base.Music21Object):
     >>> x.style.absoluteY = 20
     >>> x.displayText = '>'
 
-    '''
-    _styleClass = style.TextStyle
+    **Equality**
 
-    def __init__(self):
-        super().__init__()
+    Equality of articulations is based only on the class, as other attributes are independent
+    of context and deployment.
+
+    >>> at1 = articulations.StrongAccent()
+    >>> at2 = articulations.StrongAccent()
+    >>> at1.placement = 'above'
+    >>> at2.placement = 'below'
+    >>> at1 == at2
+    True
+
+    Comparison between classes and with the object itself behaves as expected:
+
+    >>> at3 = articulations.Accent()
+    >>> at4 = articulations.Staccatissimo()
+    >>> at1 == at3
+    False
+    >>> at4 == at4
+    True
+
+    OMIT_FROM_DOCS
+
+    >>> at5 = articulations.Staccato()
+    >>> at6 = articulations.Spiccato()
+    >>> [at1, at4, at3] == [at1, at4, at3]
+    True
+    >>> [at1, at2, at3] == [at2, at3, at1]
+    False
+    >>> {at1, at2, at3} == {at2, at3, at1}
+    True
+    >>> at6 == True
+    False
+
+    This is in OMIT
+    '''
+    _styleClass: type[style.Style] = style.TextStyle
+
+    def __init__(self, **keywords) -> None:
+        super().__init__(**keywords)
         self.placement = None
         # declare a unit interval shift for the performance of this articulation
         self._volumeShift: float = 0.0
         self.lengthShift: float = 1.0
         self.tieAttach: str = 'first'  # attach to first or last or all notes after split
-        self.displayText: Optional[str] = None
+        self.displayText: str | None = None
 
     def _reprInternal(self):
         return ''
@@ -140,52 +171,6 @@ class Articulation(base.Music21Object):
         '''
         className = self.__class__.__name__
         return common.camelCaseToHyphen(className, replacement=' ')
-
-    # def __eq__(self, other):
-    #     '''
-    #     Equality. Based only on the class name,
-    #     as other other attributes are independent of context and deployment.
-    #
-    #
-    #     >>> at1 = articulations.StrongAccent()
-    #     >>> at2 = articulations.StrongAccent()
-    #     >>> at1.placement = 'above'
-    #     >>> at2.placement = 'below'
-    #     >>> at1 == at2
-    #     True
-    #
-    #
-    #     Comparison between classes and with the object itself behaves as expected
-    #
-    #
-    #     >>> at3 = articulations.Accent()
-    #     >>> at4 = articulations.Staccatissimo()
-    #     >>> at1 == at3
-    #     False
-    #     >>> at4 == at4
-    #     True
-    #
-    #
-    #     OMIT_FROM_DOCS
-    #
-    #     >>> at5 = articulations.Staccato()
-    #     >>> at6 = articulations.Spiccato()
-    #     >>> [at1, at4, at3] == [at1, at4, at3]
-    #     True
-    #     >>> [at1, at2, at3] == [at2, at3, at1]
-    #     False
-    #     >>> set([at1, at2, at3]) == set([at2, at3, at1])
-    #     True
-    #     >>> at6 == None
-    #     False
-    #     '''
-    #     # checks pitch.octave, pitch.accidental, uses Pitch.__eq__
-    #     if other == None or not isinstance(other, Articulation):
-    #         return False
-    #     elif self.__class__ == other.__class__:
-    #         return True
-    #     return False
-    #
 
     def _getVolumeShift(self):
         return self._volumeShift
@@ -213,8 +198,8 @@ class LengthArticulation(Articulation):
     '''
     Superclass for all articulations that change the length of a note.
     '''
-    def __init__(self):
-        super().__init__()
+    def __init__(self, **keywords):
+        super().__init__(**keywords)
         self.tieAttach = 'last'
 
 class DynamicArticulation(Articulation):
@@ -239,8 +224,8 @@ class Accent(DynamicArticulation):
 
     >>> a = articulations.Accent()
     '''
-    def __init__(self):
-        super().__init__()
+    def __init__(self, **keywords):
+        super().__init__(**keywords)
         self._volumeShift = 0.1
 
 
@@ -256,8 +241,8 @@ class StrongAccent(Accent):
     >>> a.pointDirection
     'down'
     '''
-    def __init__(self):
-        super().__init__()
+    def __init__(self, **keywords):
+        super().__init__(**keywords)
         self._volumeShift = 0.15
         self.pointDirection = 'up'
 
@@ -266,8 +251,8 @@ class Staccato(LengthArticulation):
 
     >>> a = articulations.Staccato()
     '''
-    def __init__(self):
-        super().__init__()
+    def __init__(self, **keywords):
+        super().__init__(**keywords)
         self._volumeShift = 0.05
         self.lengthShift = 0.7
 
@@ -278,8 +263,8 @@ class Staccatissimo(Staccato):
 
     >>> a = articulations.Staccatissimo()
     '''
-    def __init__(self):
-        super().__init__()
+    def __init__(self, **keywords):
+        super().__init__(**keywords)
         self._volumeShift = 0.05
         self.lengthShift = 0.5
 
@@ -295,7 +280,7 @@ class Spiccato(Staccato, Accent):
     >>> spiccato.volumeShift == accent.volumeShift
     True
     '''
-    def __init__(self):
+    def __init__(self, **keywords):
         Staccato.__init__(self)
         with tempAttribute(self, 'lengthShift'):
             Accent.__init__(self)  # order matters...
@@ -305,8 +290,8 @@ class Tenuto(LengthArticulation):
     '''
     >>> a = articulations.Tenuto()
     '''
-    def __init__(self):
-        super().__init__()
+    def __init__(self, **keywords):
+        super().__init__(**keywords)
         self._volumeShift = -0.05  # is this the right thing to do?
         self.lengthShift = 1.1
 
@@ -314,8 +299,8 @@ class DetachedLegato(LengthArticulation):
     '''
     >>> a = articulations.DetachedLegato()
     '''
-    def __init__(self):
-        super().__init__()
+    def __init__(self, **keywords):
+        super().__init__(**keywords)
         self.lengthShift = 0.9
 
 # --------- indeterminate slides
@@ -352,8 +337,8 @@ class Doit(IndeterminateSlide):
 
     >>> a = articulations.Doit()
     '''
-    def __init__(self):
-        super().__init__()
+    def __init__(self, **keywords):
+        super().__init__(**keywords)
         self.tieAttach = 'last'
 
 class Falloff(IndeterminateSlide):
@@ -362,8 +347,8 @@ class Falloff(IndeterminateSlide):
 
     >>> a = articulations.Falloff()
     '''
-    def __init__(self):
-        super().__init__()
+    def __init__(self, **keywords):
+        super().__init__(**keywords)
         self.tieAttach = 'last'
 
 # --------- end indeterminate slide
@@ -376,8 +361,8 @@ class BreathMark(LengthArticulation):
     >>> a = articulations.BreathMark()
     >>> a.symbol = 'comma'
     '''
-    def __init__(self):
-        super().__init__()
+    def __init__(self, **keywords):
+        super().__init__(**keywords)
         self.lengthShift = 0.7
         self.symbol = None
 
@@ -392,8 +377,8 @@ class Stress(DynamicArticulation, LengthArticulation):
 
     >>> a = articulations.Stress()
     '''
-    def __init__(self):
-        super().__init__()
+    def __init__(self, **keywords):
+        super().__init__(**keywords)
         self._volumeShift = 0.05
         self.lengthShift = 1.1
 
@@ -403,8 +388,8 @@ class Unstress(DynamicArticulation):
 
     >>> a = articulations.Unstress()
     '''
-    def __init__(self):
-        super().__init__()
+    def __init__(self, **keywords):
+        super().__init__(**keywords)
         self._volumeShift = -0.05
 
 
@@ -460,8 +445,8 @@ class Fingering(TechnicalIndication):
     are mapped implicitly to the notes of a chord in order. Superfluous
     Fingerings will be ignored and may be discarded when serializing.
     '''
-    def __init__(self, fingerNumber=None):
-        super().__init__()
+    def __init__(self, fingerNumber=None, **keywords):
+        super().__init__(**keywords)
         self.fingerNumber = fingerNumber
         self.substitution = False
         self.alternate = False
@@ -495,8 +480,8 @@ class StringHarmonic(Bowing, Harmonic):
 
     >>> h.pitchType = 'base'
     '''
-    def __init__(self):
-        super().__init__()
+    def __init__(self, **keywords):
+        super().__init__(**keywords)
         self.harmonicType = 'natural'
         self.pitchType = None
 
@@ -517,8 +502,8 @@ class StringIndication(Bowing):
 
     If no argument to the constructor is specified, number defaults to 0.
     '''
-    def __init__(self, number=0):
-        super().__init__()
+    def __init__(self, number=0, **keywords):
+        super().__init__(**keywords)
         self.number = number
 
     def _reprInternal(self):
@@ -569,8 +554,8 @@ class FretIndication(TechnicalIndication):
 
     If no argument to the constructor is specified, number defaults to 0.
     '''
-    def __init__(self, number=0):
-        super().__init__()
+    def __init__(self, number=0, **keywords):
+        super().__init__(**keywords)
         self.number = number
 
     def _reprInternal(self):
@@ -597,10 +582,10 @@ class PullOff(spanner.Spanner, TechnicalIndication):
     pass
 
 class FretBend(FretIndication):
-    bendAlter = None  # music21.interval.Interval object
-    preBend = None
-    release = None
-    withBar = None
+    bendAlter: interval.IntervalBase | None = None
+    preBend: t.Any = None
+    release: t.Any = None
+    withBar: t.Any = None
 
 class FretTap(FretIndication):
     pass
@@ -634,8 +619,8 @@ class OrganIndication(TechnicalIndication):
     Has one attribute, "substitution" default to False, which
     indicates whether the mark is a substitution mark
     '''
-    def __init__(self):
-        super().__init__()
+    def __init__(self, **keywords):
+        super().__init__(**keywords)
         self.substitution = False
 
 
@@ -667,29 +652,33 @@ class HandbellIndication(TechnicalIndication):
 
 # ------------------------------------------------------------------------------
 class Test(unittest.TestCase):
+    def testCopyAndDeepcopy(self):
+        from music21.test.commonTest import testCopyAll
+        testCopyAll(self, globals())
+
 
     def testBasic(self):
         a = FretBend()
         self.assertEqual(a.bendAlter, None)
 
 
-#     def testArticulationEquality(self):
-#         a1 = Accent()
-#         a2 = Accent()
-#         a3 = StrongAccent()
-#         a4 = StrongAccent()
-#
-#         self.assertEqual(a1, a2)
-#         self.assertEqual(a3, a4)
-#
-#         # in order lists
-#         self.assertEqual([a1, a3], [a2, a4])
-#
-#         self.assertEqual(set([a1, a3]), set([a1, a3]))
-#         self.assertEqual(set([a1, a3]), set([a3, a1]))
-#
-#         # comparison of sets of different objects do not pass
-#         # self.assertEqual(list(set([a1, a3])), list(set([a2, a4])))
+    # def testArticulationEquality(self):
+    #     a1 = Accent()
+    #     a2 = Accent()
+    #     a3 = StrongAccent()
+    #     a4 = StrongAccent()
+    #
+    #     self.assertEqual(a1, a2)
+    #     self.assertEqual(a3, a4)
+    #
+    #     # in order lists
+    #     self.assertEqual([a1, a3], [a2, a4])
+    #
+    #     self.assertEqual(set([a1, a3]), set([a1, a3]))
+    #     self.assertEqual(set([a1, a3]), set([a3, a1]))
+    #
+    #     # comparison of sets of different objects do not pass
+    #     # self.assertEqual(list(set([a1, a3])), list(set([a2, a4])))
 
 
 # ------------------------------------------------------------------------------

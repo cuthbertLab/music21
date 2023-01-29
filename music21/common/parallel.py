@@ -3,11 +3,13 @@
 # Name:         common/parallel.py
 # Purpose:      Utilities for parallel computing
 #
-# Authors:      Michael Scott Cuthbert
+# Authors:      Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2015-16 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2015-16 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
+from __future__ import annotations
+
 __all__ = [
     'runParallel',
     'runNonParallel',
@@ -55,7 +57,7 @@ def runParallel(iterable, parallelFunction, *,
     ...     c = corpus.parse(fn)  # this is the slow call that is good to parallelize
     ...     return len(c.recurse().notes)
     >>> #_DOCS_SHOW outputs = common.runParallel(files, countNotes)
-    >>> outputs = common.runNonParallel(files, countNotes) #_DOCS_HIDE cant pickle doctest funcs.
+    >>> outputs = common.runNonParallel(files, countNotes) #_DOCS_HIDE cannot pickle doctest funcs.
     >>> outputs
     [165, 50, 131]
 
@@ -125,7 +127,7 @@ def runParallel(iterable, parallelFunction, *,
     def callUpdate(ii):
         if updateFunction is True:
             tasksDone = min([ii, iterLength])
-            print(f"Done {tasksDone} tasks of {iterLength}")
+            print(f'Done {tasksDone} tasks of {iterLength}')
         elif updateFunction not in (False, None):
             for thisPosition in range(ii - (updateMultiply * numCpus), ii):
                 if thisPosition < 0:
@@ -142,7 +144,7 @@ def runParallel(iterable, parallelFunction, *,
                     updateFunction(thisPosition, iterLength, thisResult, iterable[thisPosition])
 
     callUpdate(0)
-    from joblib import Parallel, delayed
+    from joblib import Parallel, delayed  # type: ignore
 
     with Parallel(n_jobs=numCpus) as para:
         delayFunction = delayed(parallelFunction)
@@ -180,7 +182,7 @@ def runNonParallel(iterable, parallelFunction, *,
 
         if updateFunction is True:
             tasksDone = min([ii, iterLength])
-            print(f"Done {tasksDone} tasks of {iterLength}")
+            print(f'Done {tasksDone} tasks of {iterLength}')
         elif updateFunction not in (False, None):
             for thisPosition in range(ii - updateMultiply, ii):
                 if thisPosition < 0:

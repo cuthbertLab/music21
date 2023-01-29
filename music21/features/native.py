@@ -5,20 +5,21 @@
 #
 # Authors:      Christopher Ariza
 #
-# Copyright:    Copyright © 2011 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2011 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
 Original music21 feature extractors.
 '''
-import unittest
-from typing import Optional
+from __future__ import annotations
 
+import unittest
+
+from music21 import environment
 from music21.features import base as featuresModule
 from music21 import text
-from music21 import environment
-_MOD = 'features.native'
-environLocal = environment.Environment(_MOD)
+
+environLocal = environment.Environment('features.native')
 
 # ------------------------------------------------------------------------------
 # ideas for other music21 features extractors
@@ -90,8 +91,8 @@ class QualityFeature(featuresModule.FeatureExtractor):
     '''
     id = 'P22'
 
-    def __init__(self, dataOrStream=None, *arguments, **keywords):
-        super().__init__(dataOrStream=dataOrStream, *arguments, **keywords)
+    def __init__(self, dataOrStream=None, **keywords):
+        super().__init__(dataOrStream=dataOrStream, **keywords)
 
         self.name = 'Quality'
         self.description = '''
@@ -105,12 +106,15 @@ class QualityFeature(featuresModule.FeatureExtractor):
         self.isSequential = True
         self.dimensions = 1
 
-    def process(self):
+    def process(self) -> None:
         '''
         Do processing necessary, storing result in feature.
         '''
+        if self.data is None or self.feature is None:  # pragma: no cover
+            raise ValueError('Cannot process without a data instance or feature.')
+
         allKeys = self.data['flat.getElementsByClass(Key)']
-        keyFeature: Optional[int] = None
+        keyFeature: int | None = None
         if len(allKeys) == 1:
             k0 = allKeys[0]
             if k0.mode == 'major':
@@ -171,8 +175,8 @@ class TonalCertainty(featuresModule.FeatureExtractor):
     '''
     id = 'K1'  # TODO: need id
 
-    def __init__(self, dataOrStream=None, *arguments, **keywords):
-        super().__init__(dataOrStream=dataOrStream, *arguments, **keywords)
+    def __init__(self, dataOrStream=None, **keywords):
+        super().__init__(dataOrStream=dataOrStream, **keywords)
 
         self.name = 'Tonal Certainty'
         self.description = ('A floating point magnitude value that suggest tonal '
@@ -181,7 +185,8 @@ class TonalCertainty(featuresModule.FeatureExtractor):
         self.discrete = False
 
     def process(self):
-        '''Do processing necessary, storing result in feature.
+        '''
+        Do processing necessary, storing result in feature.
         '''
         self.feature.vector[0] = self.data['flat.analyzedKey.tonalCertainty']
 
@@ -203,8 +208,8 @@ class FirstBeatAttackPrevalence(featuresModule.FeatureExtractor):
     '''
     id = 'MP1'
 
-    def __init__(self, dataOrStream=None, *arguments, **keywords):
-        super().__init__(dataOrStream=dataOrStream, *arguments, **keywords)
+    def __init__(self, dataOrStream=None, **keywords):
+        super().__init__(dataOrStream=dataOrStream, **keywords)
 
         self.name = 'First Beat Attack Prevalence'
         self.description = ('Fraction of first beats of a measure that have notes '
@@ -226,8 +231,8 @@ class UniqueNoteQuarterLengths(featuresModule.FeatureExtractor):
     '''
     id = 'QL1'
 
-    def __init__(self, dataOrStream=None, *arguments, **keywords):
-        super().__init__(dataOrStream=dataOrStream, *arguments, **keywords)
+    def __init__(self, dataOrStream=None, **keywords):
+        super().__init__(dataOrStream=dataOrStream, **keywords)
 
         self.name = 'Unique Note Quarter Lengths'
         self.description = 'The number of unique note quarter lengths.'
@@ -235,7 +240,8 @@ class UniqueNoteQuarterLengths(featuresModule.FeatureExtractor):
         self.discrete = True
 
     def process(self):
-        '''Do processing necessary, storing result in feature.
+        '''
+        Do processing necessary, storing result in feature.
         '''
         count = 0
         histo = self.data['flat.notes.quarterLengthHistogram']
@@ -255,8 +261,8 @@ class MostCommonNoteQuarterLength(featuresModule.FeatureExtractor):
     '''
     id = 'QL2'
 
-    def __init__(self, dataOrStream=None, *arguments, **keywords):
-        super().__init__(dataOrStream=dataOrStream, *arguments, **keywords)
+    def __init__(self, dataOrStream=None, **keywords):
+        super().__init__(dataOrStream=dataOrStream, **keywords)
 
         self.name = 'Most Common Note Quarter Length'
         self.description = 'The value of the most common quarter length.'
@@ -264,7 +270,8 @@ class MostCommonNoteQuarterLength(featuresModule.FeatureExtractor):
         self.discrete = False
 
     def process(self):
-        '''Do processing necessary, storing result in feature.
+        '''
+        Do processing necessary, storing result in feature.
         '''
         histo = self.data['flat.notes.quarterLengthHistogram']
         maximum = 0
@@ -279,6 +286,8 @@ class MostCommonNoteQuarterLength(featuresModule.FeatureExtractor):
 
 class MostCommonNoteQuarterLengthPrevalence(featuresModule.FeatureExtractor):
     '''
+    Fraction of notes that have the most common quarter length.
+
     >>> s = corpus.parse('bwv66.6')
     >>> fe = features.native.MostCommonNoteQuarterLengthPrevalence(s)
     >>> fe.extract().vector
@@ -286,8 +295,8 @@ class MostCommonNoteQuarterLengthPrevalence(featuresModule.FeatureExtractor):
     '''
     id = 'QL3'
 
-    def __init__(self, dataOrStream=None, *arguments, **keywords):
-        super().__init__(dataOrStream=dataOrStream, *arguments, **keywords)
+    def __init__(self, dataOrStream=None, **keywords):
+        super().__init__(dataOrStream=dataOrStream, **keywords)
 
         self.name = 'Most Common Note Quarter Length Prevalence'
         self.description = 'Fraction of notes that have the most common quarter length.'
@@ -295,7 +304,8 @@ class MostCommonNoteQuarterLengthPrevalence(featuresModule.FeatureExtractor):
         self.discrete = False
 
     def process(self):
-        '''Do processing necessary, storing result in feature.
+        '''
+        Do processing necessary, storing result in feature.
         '''
         summation = 0  # count of all
         histo = self.data['flat.notes.quarterLengthHistogram']
@@ -312,7 +322,8 @@ class MostCommonNoteQuarterLengthPrevalence(featuresModule.FeatureExtractor):
 
 
 class RangeOfNoteQuarterLengths(featuresModule.FeatureExtractor):
-    '''Difference between the longest and shortest quarter lengths.
+    '''
+    Difference between the longest and shortest quarter lengths.
 
     >>> s = corpus.parse('bwv66.6')
     >>> fe = features.native.RangeOfNoteQuarterLengths(s)
@@ -321,8 +332,8 @@ class RangeOfNoteQuarterLengths(featuresModule.FeatureExtractor):
     '''
     id = 'QL4'
 
-    def __init__(self, dataOrStream=None, *arguments, **keywords):
-        super().__init__(dataOrStream=dataOrStream, *arguments, **keywords)
+    def __init__(self, dataOrStream=None, **keywords):
+        super().__init__(dataOrStream=dataOrStream, **keywords)
 
         self.name = 'Range of Note Quarter Lengths'
         self.description = 'Difference between the longest and shortest quarter lengths.'
@@ -330,7 +341,8 @@ class RangeOfNoteQuarterLengths(featuresModule.FeatureExtractor):
         self.discrete = False
 
     def process(self):
-        '''Do processing necessary, storing result in feature.
+        '''
+        Do processing necessary, storing result in feature.
         '''
         histo = self.data['flat.notes.quarterLengthHistogram']
         if not histo:
@@ -351,7 +363,8 @@ class RangeOfNoteQuarterLengths(featuresModule.FeatureExtractor):
 
 
 class UniquePitchClassSetSimultaneities(featuresModule.FeatureExtractor):
-    '''Number of unique pitch class simultaneities.
+    '''
+    Number of unique pitch class simultaneities.
 
     >>> s = corpus.parse('bwv66.6')
     >>> fe = features.native.UniquePitchClassSetSimultaneities(s)
@@ -360,8 +373,8 @@ class UniquePitchClassSetSimultaneities(featuresModule.FeatureExtractor):
     '''
     id = 'CS1'
 
-    def __init__(self, dataOrStream=None, *arguments, **keywords):
-        super().__init__(dataOrStream=dataOrStream, *arguments, **keywords)
+    def __init__(self, dataOrStream=None, **keywords):
+        super().__init__(dataOrStream=dataOrStream, **keywords)
 
         self.name = 'Unique Pitch Class Set Simultaneities'
         self.description = 'Number of unique pitch class simultaneities.'
@@ -369,7 +382,8 @@ class UniquePitchClassSetSimultaneities(featuresModule.FeatureExtractor):
         self.discrete = False
 
     def process(self):
-        '''Do processing necessary, storing result in feature.
+        '''
+        Do processing necessary, storing result in feature.
         '''
         count = 0
         histo = self.data['chordify.flat.getElementsByClass(Chord).pitchClassSetHistogram']
@@ -381,7 +395,8 @@ class UniquePitchClassSetSimultaneities(featuresModule.FeatureExtractor):
 
 
 class UniqueSetClassSimultaneities(featuresModule.FeatureExtractor):
-    '''Number of unique set class simultaneities.
+    '''
+    Number of unique set class simultaneities.
 
     >>> s = corpus.parse('bwv66.6')
     >>> fe = features.native.UniqueSetClassSimultaneities(s)
@@ -390,8 +405,8 @@ class UniqueSetClassSimultaneities(featuresModule.FeatureExtractor):
     '''
     id = 'CS2'
 
-    def __init__(self, dataOrStream=None, *arguments, **keywords):
-        super().__init__(dataOrStream=dataOrStream, *arguments, **keywords)
+    def __init__(self, dataOrStream=None, **keywords):
+        super().__init__(dataOrStream=dataOrStream, **keywords)
 
         self.name = 'Unique Set Class Simultaneities'
         self.description = 'Number of unique set class simultaneities.'
@@ -399,7 +414,8 @@ class UniqueSetClassSimultaneities(featuresModule.FeatureExtractor):
         self.discrete = False
 
     def process(self):
-        '''Do processing necessary, storing result in feature.
+        '''
+        Do processing necessary, storing result in feature.
         '''
         count = 0
         histo = self.data['chordify.flat.getElementsByClass(Chord).setClassHistogram']
@@ -412,7 +428,8 @@ class UniqueSetClassSimultaneities(featuresModule.FeatureExtractor):
 
 class MostCommonPitchClassSetSimultaneityPrevalence(
         featuresModule.FeatureExtractor):
-    '''Fraction of all pitch class simultaneities that are the most common simultaneity.
+    '''
+    Fraction of all pitch class simultaneities that are the most common simultaneity.
 
     >>> s = corpus.parse('bwv66.6')
     >>> fe = features.native.MostCommonPitchClassSetSimultaneityPrevalence(s)
@@ -421,8 +438,8 @@ class MostCommonPitchClassSetSimultaneityPrevalence(
     '''
     id = 'CS3'
 
-    def __init__(self, dataOrStream=None, *arguments, **keywords):
-        super().__init__(dataOrStream=dataOrStream, *arguments, **keywords)
+    def __init__(self, dataOrStream=None, **keywords):
+        super().__init__(dataOrStream=dataOrStream, **keywords)
 
         self.name = 'Most Common Pitch Class Set Simultaneity Prevalence'
         self.description = ('Fraction of all pitch class simultaneities that are '
@@ -431,7 +448,8 @@ class MostCommonPitchClassSetSimultaneityPrevalence(
         self.discrete = False
 
     def process(self):
-        '''Do processing necessary, storing result in feature.
+        '''
+        Do processing necessary, storing result in feature.
         '''
         summation = 0  # count of all
         histo = self.data['chordify.flat.getElementsByClass(Chord).pitchClassSetHistogram']
@@ -466,8 +484,8 @@ class MostCommonSetClassSimultaneityPrevalence(featuresModule.FeatureExtractor):
     '''
     id = 'CS4'
 
-    def __init__(self, dataOrStream=None, *arguments, **keywords):
-        super().__init__(dataOrStream=dataOrStream, *arguments, **keywords)
+    def __init__(self, dataOrStream=None, **keywords):
+        super().__init__(dataOrStream=dataOrStream, **keywords)
 
         self.name = 'Most Common Set Class Simultaneity Prevalence'
         self.description = ('Fraction of all set class simultaneities that '
@@ -507,8 +525,8 @@ class MajorTriadSimultaneityPrevalence(featuresModule.FeatureExtractor):
     '''
     id = 'CS5'
 
-    def __init__(self, dataOrStream=None, *arguments, **keywords):
-        super().__init__(dataOrStream=dataOrStream, *arguments, **keywords)
+    def __init__(self, dataOrStream=None, **keywords):
+        super().__init__(dataOrStream=dataOrStream, **keywords)
 
         self.name = 'Major Triad Simultaneity Prevalence'
         self.description = 'Percentage of all simultaneities that are major triads.'
@@ -516,7 +534,8 @@ class MajorTriadSimultaneityPrevalence(featuresModule.FeatureExtractor):
         self.discrete = False
 
     def process(self):
-        '''Do processing necessary, storing result in feature.
+        '''
+        Do processing necessary, storing result in feature.
         '''
         # use for total number of chords
         total = len(self.data['chordify.flat.getElementsByClass(Chord)'])
@@ -530,7 +549,8 @@ class MajorTriadSimultaneityPrevalence(featuresModule.FeatureExtractor):
 
 
 class MinorTriadSimultaneityPrevalence(featuresModule.FeatureExtractor):
-    '''Percentage of all simultaneities that are minor triads.
+    '''
+    Percentage of all simultaneities that are minor triads.
 
     >>> s = corpus.parse('bwv66.6')
     >>> fe = features.native.MinorTriadSimultaneityPrevalence(s)
@@ -539,8 +559,8 @@ class MinorTriadSimultaneityPrevalence(featuresModule.FeatureExtractor):
     '''
     id = 'CS6'
 
-    def __init__(self, dataOrStream=None, *arguments, **keywords):
-        super().__init__(dataOrStream=dataOrStream, *arguments, **keywords)
+    def __init__(self, dataOrStream=None, **keywords):
+        super().__init__(dataOrStream=dataOrStream, **keywords)
 
         self.name = 'Minor Triad Simultaneity Prevalence'
         self.description = 'Percentage of all simultaneities that are minor triads.'
@@ -548,7 +568,8 @@ class MinorTriadSimultaneityPrevalence(featuresModule.FeatureExtractor):
         self.discrete = False
 
     def process(self):
-        '''Do processing necessary, storing result in feature.
+        '''
+        Do processing necessary, storing result in feature.
         '''
         # use for total number of chords
         total = len(self.data['chordify.flat.getElementsByClass(Chord)'])
@@ -562,7 +583,8 @@ class MinorTriadSimultaneityPrevalence(featuresModule.FeatureExtractor):
 
 
 class DominantSeventhSimultaneityPrevalence(featuresModule.FeatureExtractor):
-    '''Percentage of all simultaneities that are dominant seventh.
+    '''
+    Percentage of all simultaneities that are dominant seventh.
 
     >>> s = corpus.parse('bwv66.6')
     >>> fe = features.native.DominantSeventhSimultaneityPrevalence(s)
@@ -571,8 +593,8 @@ class DominantSeventhSimultaneityPrevalence(featuresModule.FeatureExtractor):
     '''
     id = 'CS7'
 
-    def __init__(self, dataOrStream=None, *arguments, **keywords):
-        super().__init__(dataOrStream=dataOrStream, *arguments, **keywords)
+    def __init__(self, dataOrStream=None, **keywords):
+        super().__init__(dataOrStream=dataOrStream, **keywords)
 
         self.name = 'Dominant Seventh Simultaneity Prevalence'
         self.description = 'Percentage of all simultaneities that are dominant seventh.'
@@ -580,7 +602,8 @@ class DominantSeventhSimultaneityPrevalence(featuresModule.FeatureExtractor):
         self.discrete = False
 
     def process(self):
-        '''Do processing necessary, storing result in feature.
+        '''
+        Do processing necessary, storing result in feature.
         '''
         # use for total number of chords
         total = len(self.data['chordify.flat.getElementsByClass(Chord)'])
@@ -594,7 +617,8 @@ class DominantSeventhSimultaneityPrevalence(featuresModule.FeatureExtractor):
 
 
 class DiminishedTriadSimultaneityPrevalence(featuresModule.FeatureExtractor):
-    '''Percentage of all simultaneities that are diminished triads.
+    '''
+    Percentage of all simultaneities that are diminished triads.
 
     >>> s = corpus.parse('bwv66.6')
     >>> fe = features.native.DiminishedTriadSimultaneityPrevalence(s)
@@ -603,8 +627,8 @@ class DiminishedTriadSimultaneityPrevalence(featuresModule.FeatureExtractor):
     '''
     id = 'CS8'
 
-    def __init__(self, dataOrStream=None, *arguments, **keywords):
-        super().__init__(dataOrStream=dataOrStream, *arguments, **keywords)
+    def __init__(self, dataOrStream=None, **keywords):
+        super().__init__(dataOrStream=dataOrStream, **keywords)
 
         self.name = 'Diminished Triad Simultaneity Prevalence'
         self.description = 'Percentage of all simultaneities that are diminished triads.'
@@ -612,7 +636,8 @@ class DiminishedTriadSimultaneityPrevalence(featuresModule.FeatureExtractor):
         self.discrete = False
 
     def process(self):
-        '''Do processing necessary, storing result in feature.
+        '''
+        Do processing necessary, storing result in feature.
         '''
         # use for total number of chords
         total = len(self.data['chordify.flat.getElementsByClass(Chord)'])
@@ -642,8 +667,8 @@ class TriadSimultaneityPrevalence(featuresModule.FeatureExtractor):
     '''
     id = 'CS9'
 
-    def __init__(self, dataOrStream=None, *arguments, **keywords):
-        super().__init__(dataOrStream=dataOrStream, *arguments, **keywords)
+    def __init__(self, dataOrStream=None, **keywords):
+        super().__init__(dataOrStream=dataOrStream, **keywords)
 
         self.name = 'Triad Simultaneity Prevalence'
         self.description = 'Proportion of all simultaneities that form triads.'
@@ -651,7 +676,8 @@ class TriadSimultaneityPrevalence(featuresModule.FeatureExtractor):
         self.discrete = False
 
     def process(self):
-        '''Do processing necessary, storing result in feature.
+        '''
+        Do processing necessary, storing result in feature.
         '''
         # use for total number of chords
         total = len(self.data['chordify.flat.getElementsByClass(Chord)'])
@@ -665,7 +691,8 @@ class TriadSimultaneityPrevalence(featuresModule.FeatureExtractor):
 
 
 class DiminishedSeventhSimultaneityPrevalence(featuresModule.FeatureExtractor):
-    '''Percentage of all simultaneities that are diminished seventh chords.
+    '''
+    Percentage of all simultaneities that are diminished seventh chords.
 
     >>> s = corpus.parse('bwv66.6')
     >>> fe = features.native.DiminishedSeventhSimultaneityPrevalence(s)
@@ -674,8 +701,8 @@ class DiminishedSeventhSimultaneityPrevalence(featuresModule.FeatureExtractor):
     '''
     id = 'CS10'
 
-    def __init__(self, dataOrStream=None, *arguments, **keywords):
-        super().__init__(dataOrStream=dataOrStream, *arguments, **keywords)
+    def __init__(self, dataOrStream=None, **keywords):
+        super().__init__(dataOrStream=dataOrStream, **keywords)
 
         self.name = 'Diminished Seventh Simultaneity Prevalence'
         self.description = 'Percentage of all simultaneities that are diminished seventh chords.'
@@ -683,7 +710,8 @@ class DiminishedSeventhSimultaneityPrevalence(featuresModule.FeatureExtractor):
         self.discrete = False
 
     def process(self):
-        '''Do processing necessary, storing result in feature.
+        '''
+        Do processing necessary, storing result in feature.
         '''
         # use for total number of chords
         total = len(self.data['chordify.flat.getElementsByClass(Chord)'])
@@ -717,8 +745,8 @@ class IncorrectlySpelledTriadPrevalence(featuresModule.FeatureExtractor):
     '''
     id = 'CS11'
 
-    def __init__(self, dataOrStream=None, *arguments, **keywords):
-        super().__init__(dataOrStream=dataOrStream, *arguments, **keywords)
+    def __init__(self, dataOrStream=None, **keywords):
+        super().__init__(dataOrStream=dataOrStream, **keywords)
 
         self.name = 'Incorrectly Spelled Triad Prevalence'
         self.description = 'Percentage of all triads that are spelled incorrectly.'
@@ -726,7 +754,8 @@ class IncorrectlySpelledTriadPrevalence(featuresModule.FeatureExtractor):
         self.discrete = False
 
     def process(self):
-        '''Do processing necessary, storing result in feature.
+        '''
+        Do processing necessary, storing result in feature.
         '''
         # use for total number of chords
         histo = self.data['chordify.flat.getElementsByClass(Chord).typesHistogram']
@@ -778,8 +807,8 @@ class ChordBassMotionFeature(featuresModule.FeatureExtractor):
     '''
     id = 'CS12'
 
-    def __init__(self, dataOrStream=None, *arguments, **keywords):
-        super().__init__(dataOrStream=dataOrStream, *arguments, **keywords)
+    def __init__(self, dataOrStream=None, **keywords):
+        super().__init__(dataOrStream=dataOrStream, **keywords)
 
         self.name = 'Chord Bass Motion'
         self.description = ('12-element vector showing the fraction of chords that move '
@@ -789,7 +818,8 @@ class ChordBassMotionFeature(featuresModule.FeatureExtractor):
         self.discrete = False
 
     def process(self):
-        '''Do processing necessary, storing result in feature.
+        '''
+        Do processing necessary, storing result in feature.
         '''
         # use for total number of chords
         harms = self.data['flat.getElementsByClass(Harmony)']
@@ -853,8 +883,8 @@ class LandiniCadence(featuresModule.FeatureExtractor):
     '''
     id = 'MC1'
 
-    def __init__(self, dataOrStream=None, *arguments, **keywords):
-        super().__init__(dataOrStream=dataOrStream, *arguments, **keywords)
+    def __init__(self, dataOrStream=None, **keywords):
+        super().__init__(dataOrStream=dataOrStream, **keywords)
 
         self.name = 'Ends With Landini Melodic Contour'
         self.description = ('Boolean that indicates the presence of a Landini-like '
@@ -922,8 +952,8 @@ class LanguageFeature(featuresModule.FeatureExtractor):
     '''
     id = 'TX1'
 
-    def __init__(self, dataOrStream=None, *arguments, **keywords):
-        super().__init__(dataOrStream=dataOrStream, *arguments, **keywords)
+    def __init__(self, dataOrStream=None, **keywords):
+        super().__init__(dataOrStream=dataOrStream, **keywords)
 
         self.name = 'Language Feature'
         self.description = ('Language of the lyrics of the piece given as a numeric '

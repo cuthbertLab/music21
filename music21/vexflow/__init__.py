@@ -4,11 +4,12 @@
 # Purpose:      music21 classes for converting music21 objects to vexflow
 #
 # Authors:      Christopher Reyes
-#               Michael Scott Cuthbert
+#               Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2012-14 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2012-14 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
+from __future__ import annotations
 
 __all__ = ['toMusic21j', 'fromObject']
 

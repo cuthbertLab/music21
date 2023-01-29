@@ -5,9 +5,9 @@
 #               routines
 #
 # Authors:      Jordi Bartolome
-#               Michael Scott Cuthbert
+#               Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2011-2020 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2011-2020 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # -----------------------------------------------------------------------------
 '''
@@ -16,6 +16,8 @@ Base routines used throughout audioSearching and score-following.
 Requires numpy and matplotlib.  Installing scipy makes the process faster
 and more accurate using FFT convolve.
 '''
+from __future__ import annotations
+
 __all__ = [
     'transcriber', 'recording', 'scoreFollower',
     'histogram', 'autocorrelationFunction',
@@ -36,18 +38,16 @@ __all__ = [
 
 import copy
 import math
-import os
 import pathlib
 import wave
 import warnings
 import unittest
 
-from typing import List, Union
-
 # cannot call this base, because when audioSearch.__init__.py
 # imports * from base, it overwrites audioSearch!
 from music21 import base
 from music21 import common
+from music21 import environment
 from music21 import exceptions21
 from music21 import features
 from music21 import metadata
@@ -59,9 +59,7 @@ from music21 import stream
 from music21.audioSearch import recording
 from music21.audioSearch import transcriber
 
-from music21 import environment
-_MOD = 'audioSearch'
-environLocal = environment.Environment(_MOD)
+environLocal = environment.Environment('audioSearch')
 
 audioChunkLength = 1024
 recordSampleRate = 44100
@@ -71,7 +69,7 @@ def histogram(data, bins):
     # noinspection PyShadowingNames
     '''
     Partition the list in `data` into a number of bins defined by `bins`
-    and return the number of elements in each bins and a set of `bins` + 1
+    and return the number of elements in each bin and a set of `bins` + 1
     elements where the first element (0) is the start of the first bin,
     the last element (-1) is the end of the last bin, and every remaining element (i)
     is the dividing point between one bin and another.
@@ -145,7 +143,7 @@ def autocorrelationFunction(recordedSignal, recordSampleRateIn):
             # numpy warns scipy that oldnumeric will be dropped soon.
             warnings.simplefilter('ignore', DeprecationWarning)
             # noinspection PyPackageRequirements
-            from scipy.signal import fftconvolve as convolve
+            from scipy.signal import fftconvolve as convolve  # type: ignore
     except ImportError:  # pragma: no cover
         warnings.warn('Running convolve without scipy -- will be slower')
         convolve = numpy.convolve
@@ -181,7 +179,7 @@ def prepareThresholds(useScale=None):
     A and B-flat will be 450.  Notes below 450 should be considered As and those
     above 450 should be considered B-flats.
 
-    Thus the list returned has one less element than the number of notes in the
+    Thus, the list returned has one less element than the number of notes in the
     scale + octave repetition.  If useScale is a ChromaticScale, `prepareThresholds`
     will return a 12 element list.  If it's a diatonic scale, it'll have 7 elements.
 
@@ -527,11 +525,11 @@ def detectPitchFrequencies(freqFromAQList, useScale=None):
 
 
 def smoothFrequencies(
-    frequencyList: List[Union[int, float]],
+    frequencyList: list[int | float],
     *,
     smoothLevels=7,
     inPlace=False
-) -> List[int]:
+) -> list[int] | None:
     '''
     Smooths the shape of the signal in order to avoid false detections in the fundamental
     frequency.  Takes in a list of ints or floats.
@@ -545,7 +543,7 @@ def smoothFrequencies(
     >>> result
     [409, 409, 409, 428, 435, 438, 442, 444, 441, 441, 441,
      441, 434, 433, 432, 431, 437, 438, 439, 440, 440, 440,
-     440, 440, 440, 441, 441, 441, 441, 441, 441, 441]
+     440, 440, 440, 441, 441, 441, 440, 440, 440, 440]
 
     Original list is unchanged:
 
@@ -553,7 +551,7 @@ def smoothFrequencies(
     220
 
     Different levels of smoothing have different effects.  At smoothLevel=2,
-    the isolated 220hz sample is pulling down the samples around it:
+    the isolated 220hz sample is pulling down the surrounding samples:
 
     >>> audioSearch.smoothFrequencies(inputPitches, smoothLevels=2)[:5]
     [330, 275, 358, 399, 420]
@@ -593,9 +591,9 @@ def smoothFrequencies(
     This function always returns a list of ints -- rounding to the nearest
     hertz (you did want it smoothed right?)
 
-    Changed in v.6 -- inPlace defaults to False (like other music21
-    functions) and if done in Place, returns nothing.  smoothLevels and inPlace
-    became keyword only.
+    * Changed in v6: inPlace defaults to False (like other music21
+      functions) and if done in Place, returns nothing.  smoothLevels and inPlace
+      became keyword only.
     '''
     if smoothLevels < 1:
         raise ValueError('smoothLevels must be >= 1')
@@ -607,10 +605,11 @@ def smoothFrequencies(
         )
 
     dpf = frequencyList
+    detectedPitchesFreq: list[float]
     if inPlace:
-        detectedPitchesFreq = dpf
+        detectedPitchesFreq = [float(f) for f in dpf]
     else:
-        detectedPitchesFreq = copy.copy(dpf)
+        detectedPitchesFreq = [float(f) for f in copy.copy(dpf)]
 
     # smoothing
     beginning = 0.0
@@ -623,21 +622,23 @@ def smoothFrequencies(
     ends = ends / smoothLevels
 
     for i in range(numFreqs):
+        # TODO: replace this O(i*smoothLevels) routine with an O(i) routine
         if i < int(math.floor(smoothLevels / 2.0)):
-            detectedPitchesFreq[i] = beginning
+            detectedPitchesFreq[i] = int(beginning)
         elif i > numFreqs - int(math.ceil(smoothLevels / 2.0)) - 1:
-            detectedPitchesFreq[i] = ends
+            detectedPitchesFreq[i] = int(ends)
         else:
-            t = 0
+            change = 0.0
             for j in range(smoothLevels):
-                t = t + detectedPitchesFreq[i + j - int(math.floor(smoothLevels / 2.0))]
-            detectedPitchesFreq[i] = t / smoothLevels
+                change += detectedPitchesFreq[i + j - int(math.floor(smoothLevels / 2.0))]
+            detectedPitchesFreq[i] = change / smoothLevels
 
-    for i in range(numFreqs):
-        detectedPitchesFreq[i] = int(round(detectedPitchesFreq[i]))
-
+    out: list[int] = [int(round(f)) for f in detectedPitchesFreq]
     if not inPlace:
-        return detectedPitchesFreq
+        return out
+    else:
+        for i in range(len(frequencyList)):
+            frequencyList[i] = out[i]
 
 
 # ------------------------------------------------------
@@ -814,7 +815,7 @@ def notesAndDurationsToStream(
     '''
     take a list of :class:`~music21.note.Note` objects or rests
     and an equally long list of how long
-    each ones lasts in terms of samples and returns a
+    each one lasts in terms of samples and returns a
     Stream using the information from quarterLengthEstimation
     and quantizeDurations.
 
@@ -970,11 +971,11 @@ def decisionProcess(
         countdown = countdown + 1
     elif dist > 20 and countdown == 0:
         countdown += 1
-        environLocal.printDebug(f'Excessive distance....? dist={dist}')  # 3.8 replace {dist=}
+        environLocal.printDebug(f'Excessive distance....? {dist=}')
 
     elif dist > 30 and countdown == 1:
         countdown += 1
-        environLocal.printDebug(f'Excessive distance....? dist={dist}')  # 3.8 replace {dist=}
+        environLocal.printDebug(f'Excessive distance....? {dist=}')
 
     elif ((firstNotePage is not None and lastNotePage is not None)
           and ((positionBeginningData < firstNotePage
@@ -1002,7 +1003,7 @@ class Test(unittest.TestCase):
 
 # ------------------------------------------------------------------------------
 # define presented order in documentation
-_DOC_ORDER = []  # type: List[Class]
+_DOC_ORDER: list[type] = []
 
 
 if __name__ == '__main__':

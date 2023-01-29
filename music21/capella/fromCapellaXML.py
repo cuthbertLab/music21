@@ -3,9 +3,9 @@
 # Name:         fromCapellaXML.py
 # Purpose:      Module for importing capellaXML (.capx) files.
 #
-# Authors:      Michael Scott Cuthbert
+# Authors:      Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2012 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2012 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
@@ -17,11 +17,13 @@ Slurs, Dynamics, Ornamentation, etc.
 Does not handle pickup notes, which are defined simply with an early barline
 (same as incomplete bars at the end).
 '''
-import xml.etree.ElementTree
-import unittest
-import zipfile
+from __future__ import annotations
 
 from io import StringIO
+import typing as t
+import unittest
+import xml.etree.ElementTree
+import zipfile
 
 from music21 import bar
 from music21 import chord
@@ -29,16 +31,13 @@ from music21 import clef
 from music21 import common
 from music21 import duration
 from music21 import exceptions21
+from music21 import layout
 from music21 import key
 from music21 import meter
 from music21 import note
 from music21 import pitch
 from music21 import stream
 from music21 import tie
-
-# from music21 import environment
-# _MOD = 'capella.fromCapellaXML.py'
-# environLocal = environment.Environment(_MOD)
 
 # capellaDynamics = {'r': 'ppp',
 #                   'q': 'pp',
@@ -84,7 +83,7 @@ class CapellaImportException(exceptions21.Music21Exception):
 class CapellaImporter:
     '''
     Object for importing .capx, CapellaXML files into music21 (from which they can be
-    converted to musicxml, MIDI, lilypond, etc.
+    converted to musicxml, MIDI, lilypond, etc.)
 
     Note that Capella stores files closer to their printed versions -- that is to say,
     Systems enclose all the parts for that system and have new clefs etc.
@@ -167,7 +166,7 @@ class CapellaImporter:
         '''
         return xml.etree.ElementTree.fromstring(xmlText)
 
-    def partScoreFromSystemScore(self, systemScore):
+    def partScoreFromSystemScore(self, systemScore: stream.Score) -> stream.Score:
         '''
         Take a :class:`~music21.stream.Score` object which is organized
         by Systems and return a new `Score` object which is organized by
@@ -175,13 +174,13 @@ class CapellaImporter:
         '''
         # this line is redundant currently, since all we have in systemScore
         # are Systems, but later there will be other things.
-        systemStream = systemScore.getElementsByClass('System')
-        partDictById = {}
+        systemStream = systemScore.getElementsByClass(layout.System)
+        partDictById: dict[str | int, dict[str, t.Any]] = {}
         for thisSystem in systemStream:
             # this line is redundant currently, since all we have in
             # thisSystem are Parts, but later there will be other things.
             systemOffset = systemScore.elementOffset(thisSystem)
-            partStream = thisSystem.getElementsByClass('Part')
+            partStream = thisSystem.getElementsByClass(stream.Part)
             for j, thisPart in enumerate(partStream):
                 if thisPart.id not in partDictById:
                     newPart = stream.Part()
@@ -194,7 +193,7 @@ class CapellaImporter:
                 newPart.coreElementsChanged()
         newScore = stream.Score()
         # ORDERED DICT
-        parts = [None for i in range(len(partDictById))]
+        parts: list[stream.Part | None] = [None for i in range(len(partDictById))]
         for partId in partDictById:
             partDict = partDictById[partId]
             parts[partDict['number']] = partDict['part']
@@ -203,8 +202,8 @@ class CapellaImporter:
             if p is None:
                 print('part entries do not match partDict!')
                 continue
-            clefs = p.getElementsByClass('Clef')
-            keySignatures = p.getElementsByClass('KeySignature')
+            clefs = p.getElementsByClass(clef.Clef)
+            keySignatures = p.getElementsByClass(key.KeySignature)
             lastClef = None
             lastKeySignature = None
             for c in clefs:
@@ -218,8 +217,8 @@ class CapellaImporter:
                 else:
                     lastKeySignature = ks
             p.makeMeasures(inPlace=True)
-            # for m in p.getElementsByClass('Measure'):
-            #    barLines = m.getElementsByClass('Barline')
+            # for m in p.getElementsByClass(stream.Measure):
+            #    barLines = m.getElementsByClass(bar.Barline)
             #    for bl in barLines:
             #        blOffset = bl.offset
             #        if blOffset == 0.0:
@@ -276,7 +275,7 @@ class CapellaImporter:
         TODO: Handle multiple <voices>
         '''
         if systemObj is None:
-            systemObj = stream.System()
+            systemObj = layout.System()
 
         stavesList = systemElement.findall('staves')
         if not stavesList:
@@ -327,13 +326,12 @@ class CapellaImporter:
         return systemObj
 
     def streamFromNoteObjects(self, noteObjectsElement, streamObj=None):
+        # noinspection PyShadowingNames
         r'''
-
         Converts a <noteObjects> tag into a :class:`~music21.stream.Stream` object
         which is returned.
         A Stream can be given as an optional argument, in which case the objects of this
         Stream are appended to this object.
-
 
         >>> ci = capella.fromCapellaXML.CapellaImporter()
         >>> noteObjectsString = r"""
@@ -364,15 +362,15 @@ class CapellaImporter:
         ...            </noteObjects>
         ...            """
         >>> noteObjectsElement = ci.domElementFromText(noteObjectsString)
-        >>> s = ci.streamFromNoteObjects(noteObjectsElement)
-        >>> s.show('text')
+        >>> streamObj = ci.streamFromNoteObjects(noteObjectsElement)
+        >>> streamObj.show('text')
         {0.0} <music21.clef.Treble8vbClef>
         {0.0} <music21.key.KeySignature of 1 flat>
         {0.0} <music21.note.Note G>
         {2.0} <music21.note.Note A>
         {4.0} <music21.bar.Barline type=final>
 
-        >>> s.highestTime
+        >>> streamObj.highestTime
         4.0
         '''
         if streamObj is None:
@@ -390,11 +388,11 @@ class CapellaImporter:
 
         for d in noteObjectsElement:
             el = None
-            t = d.tag
-            if t not in mapping:
-                print(f'Unknown tag type: {t}')
+            dTag = d.tag
+            if dTag not in mapping:
+                print(f'Unknown tag type: {dTag}')
             else:
-                el = mapping[t](d)
+                el = mapping[dTag](d)
                 if isinstance(el, list):  # barlineList returns a list
                     for elSub in el:
                         s.coreAppend(elSub)
@@ -407,6 +405,7 @@ class CapellaImporter:
         return s
 
     def restFromRest(self, restElement):
+        # noinspection PyShadowingNames
         '''
         Returns a :class:`~music21.rest.Rest` object from a <rest> tag.
 
@@ -424,6 +423,7 @@ class CapellaImporter:
         return r
 
     def chordOrNoteFromChord(self, chordElement):
+        # noinspection PyShadowingNames
         '''
         returns a :class:`~music21.note.Note` or :class:`~music21.chord.Chord`
         from a chordElement -- a `Note`
@@ -479,9 +479,9 @@ class CapellaImporter:
         return noteOrChord
 
     def notesFromHeads(self, headsElement):
+        # noinspection PyShadowingNames
         '''
         returns a list of :class:`~music21.note.Note` elements for each <head> in <heads>
-
 
         >>> ci = capella.fromCapellaXML.CapellaImporter()
         >>> headsElement = ci.domElementFromText(
@@ -496,11 +496,11 @@ class CapellaImporter:
         return notes
 
     def noteFromHead(self, headElement):
+        # noinspection PyShadowingNames
         '''
         return a :class:`~music21.note.Note` object from a <head> element.  This will become
         part of Chord._notes if there are multiple, but in any case, it needs to be a Note
         not a Pitch for now, because it could have Tie information
-
 
         >>> ci = capella.fromCapellaXML.CapellaImporter()
         >>> headElement = ci.domElementFromText(
@@ -543,7 +543,6 @@ class CapellaImporter:
         '''
         return a :class:`~music21.pitch.Accidental` object from an <alter> tag.
 
-
         >>> ci = capella.fromCapellaXML.CapellaImporter()
         >>> alter = ci.domElementFromText('<alter step="-1"/>')
         >>> ci.accidentalFromAlter(alter)
@@ -552,10 +551,10 @@ class CapellaImporter:
         The only known display type is "suppress"
 
         >>> alter = ci.domElementFromText('<alter step="2" display="suppress"/>')
-        >>> acc = ci.accidentalFromAlter(alter)
-        >>> acc
+        >>> accidentalObject = ci.accidentalFromAlter(alter)
+        >>> accidentalObject
         <music21.pitch.Accidental double-sharp>
-        >>> acc.displayType
+        >>> accidentalObject.displayType
         'never'
         '''
         if 'step' in alterElement.attrib:
@@ -636,9 +635,9 @@ class CapellaImporter:
         return lyricList
 
     def lyricFromVerse(self, verse):
+        # noinspection PyShadowingNames
         '''
         returns a :class:`~music21.note.Lyric` object from a <verse> tag
-
 
         >>> ci = capella.fromCapellaXML.CapellaImporter()
         >>> verse = ci.domElementFromText('<verse i="0" hyphen="true">di&quot;</verse>')
@@ -674,9 +673,9 @@ class CapellaImporter:
                    }
 
     def clefFromClefSign(self, clefSign):
+        # noinspection PyShadowingNames
         '''
         returns a :class:`~music21.clef.Clef` object or subclass from a <clefSign> tag.
-
 
         >>> ci = capella.fromCapellaXML.CapellaImporter()
         >>> clefSign = ci.domElementFromText('<clefSign clef="treble"/>')
@@ -718,9 +717,9 @@ class CapellaImporter:
         return None
 
     def keySignatureFromKeySign(self, keySign):
+        # noinspection PyShadowingNames
         '''
         Returns a :class:`~music21.key.KeySignature` object from a keySign tag.
-
 
         >>> ci = capella.fromCapellaXML.CapellaImporter()
         >>> keySign = ci.domElementFromText('<keySign fifths="-1"/>')
@@ -732,9 +731,9 @@ class CapellaImporter:
             return key.KeySignature(keyFifths)
 
     def timeSignatureFromTimeSign(self, timeSign):
+        # noinspection PyShadowingNames
         '''
         Returns a :class:`~music21.meter.TimeSignature` object from a timeSign tag.
-
 
         >>> ci = capella.fromCapellaXML.CapellaImporter()
         >>> timeSign = ci.domElementFromText('<timeSign time="4/4"/>')
@@ -756,16 +755,20 @@ class CapellaImporter:
 
     def durationFromDuration(self, durationElement):
         '''
+        Return a music21.duration.Duration element from an XML Element representing
+        a duration.
 
         >>> ci = capella.fromCapellaXML.CapellaImporter()
         >>> durationTag = ci.domElementFromText('<duration base="1/32" dots="1"/>')
-        >>> d = ci.durationFromDuration(durationTag)
-        >>> d
+        >>> durationObj = ci.durationFromDuration(durationTag)
+        >>> durationObj
         <music21.duration.Duration 0.1875>
-        >>> d.type
+        >>> durationObj.type
         '32nd'
-        >>> d.dots
+        >>> durationObj.dots
         1
+
+        Here with Tuplets
 
         >>> durationTag2 = ci.domElementFromText(
         ...      '<duration base="1/4"><tuplet count="3"/></duration>')
@@ -889,8 +892,17 @@ class CapellaImporter:
 
 
 class Test(unittest.TestCase):
-    pass
+    def testComplete(self):
+        from music21 import text
 
+        ci = CapellaImporter()
+        capellaDirPath = common.getSourceFilePath() / 'capella'
+        oswaldPath = capellaDirPath / r'Nu_rue_mit_sorgen.capx'
+        partScore = ci.scoreFromFile(oswaldPath)
+        self.assertEqual(len(partScore.parts), 3)
+        self.assertGreater(len(partScore.recurse().notes), 20)
+        self.assertIn('mass!', text.assembleLyrics(partScore.parts[0], 1))
+        self.assertIn('scherz', text.assembleLyrics(partScore.parts[0], 2))
 
 class TestExternal(unittest.TestCase):
     show = True
@@ -924,4 +936,4 @@ class TestExternal(unittest.TestCase):
 
 if __name__ == '__main__':
     import music21
-    music21.mainTest(Test, TestExternal)
+    music21.mainTest(Test)  # , TestExternal)

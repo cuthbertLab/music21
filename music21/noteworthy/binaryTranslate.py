@@ -3,9 +3,9 @@
 # Name:         noteworthy/binaryTranslate.py
 # Purpose:      parses .nwc binary files, compressed and uncompressed
 #
-# Authors:      Michael Scott Cuthbert
+# Authors:      Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2006-2013 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2006-2013 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
@@ -32,6 +32,7 @@ convert the file into .xml or .nwctxt first.
     >>> p = common.getSourceFilePath() / 'noteworthy' / 'cuthbert_test1.nwc' #_DOCS_HIDE
     >>> c = converter.parse(str(p)) #_DOCS_HIDE
     >>> c.show('text')
+    {0.0} <music21.metadata.Metadata object at ...>
     {0.0} <music21.stream.Part ...>
         {0.0} <music21.stream.Measure 0 offset=0.0>
             {0.0} <music21.clef.TrebleClef>
@@ -72,9 +73,12 @@ convert the file into .xml or .nwctxt first.
             {3.0} <music21.note.Note G>
         {4.0} <music21.stream.Measure 0 offset=4.0>
             {0.0} <music21.note.Note C>
-
 '''
+from __future__ import annotations
+
+import pathlib
 import struct
+
 from music21 import environment
 from music21 import exceptions21
 
@@ -89,12 +93,9 @@ class NWCConverter:
     '''
     A converter object for binary .nwc files.  Do not normally use directly; use converter.parse.
 
-    >>> fp = '/Users/cuthbert/test.nwc'
-    >>> nwcc = noteworthy.binaryTranslate.NWCConverter(fp=fp)
+    >>> nwcc = noteworthy.binaryTranslate.NWCConverter()
     >>> nwcc
     <music21.noteworthy.binaryTranslate.NWCConverter object at 0x...>
-    >>> nwcc.fp
-    '/Users/cuthbert/test.nwc'
     >>> nwcc.fileContents is None
     True
     >>> nwcc.parsePosition
@@ -106,12 +107,7 @@ class NWCConverter:
     >>> nwcc.staves
     []
     '''
-
-    def __init__(self, *args, **keywords):
-        if 'fp' in keywords:
-            self.fp = keywords['fp']
-        else:
-            self.fp = None
+    def __init__(self, **keywords):
         self.fileContents = None
         self.parsePosition = 0
         self.version = 200
@@ -141,15 +137,17 @@ class NWCConverter:
         self.staffHeight = 0
 
     # noinspection SpellCheckingInspection
-    def parseFile(self, fp=None):
+    def parseFile(self, fp: pathlib.Path | str):
+        # noinspection PyShadowingNames
         r'''
         Parse a file (calls .toStream)
 
         >>> #_DOCS_SHOW fp = '/Users/cuthbert/desktop/cuthbert_test1.nwc'
         >>> fp = str(common.getSourceFilePath()/'noteworthy'/'cuthbert_test1.nwc') #_DOCS_HIDE
-        >>> nwcc = noteworthy.binaryTranslate.NWCConverter(fp=fp)
-        >>> nwcc.fileContents
-        >>> streamObj = nwcc.parseFile()
+        >>> nwcc = noteworthy.binaryTranslate.NWCConverter()
+        >>> nwcc.fileContents is None
+        True
+        >>> streamObj = nwcc.parseFile(fp)
         >>> len(nwcc.fileContents)  # binary
         1139
         >>> nwcc.fileContents[0:80]
@@ -158,8 +156,6 @@ class NWCConverter:
         >>> streamObj
         <music21.stream.Score ...>
         '''
-        if fp is None:
-            fp = self.fp
         with open(fp, 'rb') as f:
             self.fileContents = f.read()
         self.parse()

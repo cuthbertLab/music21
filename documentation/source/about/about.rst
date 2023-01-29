@@ -48,7 +48,7 @@ Acknowledgements
 Funding
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The music21 project was made possible by generous research funding
+`music21` was made possible by generous research funding
 from the **Seaver Institute** and
 the **National Endowment for the Humanities**/Digging into Data research fund.
 
@@ -76,7 +76,7 @@ working on other music and technology projects, in particular:
   contributing to the knowledge of music since 1984, and
   publishers of *Computing in Musicology*.
 
-.. _David Huron: https://www.musiccognition.osu.edu/people/david-huron/
+.. _David Huron: https://music.osu.edu/people/david-huron
 .. _Humdrum: https://www.humdrum.org
 .. _Michael Good: https://www.musicxml.com
 .. _Center for Computer-Assisted Research in the Humanities: http://www.ccarh.org/
@@ -109,7 +109,7 @@ to this project.  Their contributions and generosity are greatly appreciated.
 * `Ewa Dahlig-Turek`_ has kindly given permission to distribute the
    Essen folksong database with music21.
 
-* `Margaret Greentree`_ kindly gave permission for distribution of her edited
+* `Margaret Greentree` kindly gave permission for distribution of her edited
    collection of the Bach chorales in MusicXML format as part of the music21 corpus.
    Her website contains all these chorales in additional formats.
    Any discoveries we make regarding these chorales are done in her memory.
@@ -118,7 +118,7 @@ to this project.  Their contributions and generosity are greatly appreciated.
 
 * Walter B. Hewlett and Craig Sapp of Stanford's CCARH for support.
 
-* `Justin London`_ compiled and maintained the list of Second-Viennese
+* `Justin London` compiled and maintained the list of Second-Viennese
    row forms now available in serial.py.
 
 * `McGill University`_ ELVIS project for including the MEI parser. Special thanks to Julie
@@ -137,15 +137,13 @@ to this project.  Their contributions and generosity are greatly appreciated.
 * `Project Gutenberg`_ houses public domain music, including the quartets of Beethoven,
   Haydn, and Mozart, in musicxml format which we have been able to include in music21.
 
-.. _Donald Byrd: https://homes.luddy.indiana.edu/donbyrd/CMNExtremes.htm
+.. _Donald Byrd: https://web.archive.org/web/20220610200930/https://homes.luddy.indiana.edu/donbyrd/CMNExtremes.htm
 .. _Laura E. Conrad: http://www.serpentpublications.org/drupal7/
-.. _Margaret Greentree: http://www.jsbchorales.net
 .. _MuseScore: https://musescore.com/
-.. _Justin London: https://people.carleton.edu/~jlondon/2ndviennese.htm
 .. _Bryen Travis: http://www.bachcentral.com/
 .. _Ewa Dahlig-Turek: http://www.esac-data.org
-.. _Seymour Shlien: tps://ifdo.ca/~seymour/runabc/esac/esacdatabase.html
-.. _Manuel Op de Coul: http://www.huygens-fokker.org/scala
+.. _Seymour Shlien: https://ifdo.ca/~seymour/runabc/esac/esacdatabase.html
+.. _Manuel Op de Coul: https://www.huygens-fokker.org/scala
 .. _John Chambers: http://trillian.mit.edu/~jc/music/book
 .. _Jack Campin: http://www.campin.me.uk/
 .. _McGill University: https://hcommons.org/deposits/item/hc:12359/
@@ -176,7 +174,7 @@ Licensing and Copyright
 The `music21` Toolkit
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Music21 is Copyright © 2006-2021, Michael Scott Cuthbert and cuthbertLab.
+Music21 is Copyright © 2006-2023 Michael Scott Asato Cuthbert.
 Music21 code (excluding content encoded in the corpus) is
 free and open-source software, licensed under the BSD License.
 

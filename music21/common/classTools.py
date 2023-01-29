@@ -3,32 +3,54 @@
 # Name:         common/classTools.py
 # Purpose:      Utilities for classes
 #
-# Authors:      Michael Scott Cuthbert
+# Authors:      Michael Scott Asato Cuthbert
 #               Christopher Ariza
 #
-# Copyright:    Copyright © 2009-2015 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2009-2015 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
-import contextlib
-from typing import Any, Type, Dict
+from __future__ import annotations
 
-# from music21 import exceptions21
+from collections.abc import Iterable, Collection
+import contextlib
+import numbers
+import typing as t
+
 __all__ = [
-    'isNum', 'isListLike', 'isIterable', 'classToClassStr', 'getClassSet',
+    'holdsType',
+    'isNum', 'isInt', 'isListLike', 'isIterable', 'classToClassStr', 'getClassSet',
     'tempAttribute', 'saveAttributes',
 ]
 
 
-def isNum(usrData: Any) -> bool:
+_T = t.TypeVar('_T')
+
+
+def isInt(usrData: t.Any) -> t.TypeGuard[int]:
+    '''
+    Check if usrData is an integer and not True or False.
+
+    >>> common.isInt(3)
+    True
+    >>> common.isInt(False)
+    False
+    >>> common.isInt(2.0)
+    False
+    '''
+    return isinstance(usrData, int) and usrData is not True and usrData is not False
+
+
+def isNum(usrData: t.Any) -> t.TypeGuard[numbers.Rational]:
     '''
     check if usrData is a number (float, int, long, Decimal),
-    return boolean
+    return boolean and if True casts the value as a Rational number
 
-    unlike `isinstance(usrData, Number)` does not return True for `True, False`.
+    unlike `isinstance(usrData, Rational)` does not return True for `True, False`.
 
-    Does not use `isinstance(usrData, Number)` which is 6 times slower
+    Does not use `isinstance(usrData, Rational)` which is 2-6 times slower
     than calling this function (except in the case of Fraction, when
-    it's 6 times faster, but that's rarer)
+    it's 6 times faster, but that's rarer).  (6 times slower on Py3.4, now
+    only 2x slower in Python 3.10)
 
     Runs by adding 0 to the "number" -- so anything that implements
     add to a scalar works
@@ -53,7 +75,6 @@ def isNum(usrData: Any) -> bool:
     '''
     # noinspection PyBroadException
     try:
-        # TODO: this may have unexpected consequences: find
         dummy = usrData + 0
         if usrData is not True and usrData is not False:
             return True
@@ -63,16 +84,16 @@ def isNum(usrData: Any) -> bool:
         return False
 
 
-def isListLike(usrData: Any) -> bool:
+def isListLike(usrData: t.Any) -> t.TypeGuard[list | tuple]:
     '''
-    Returns True if is a List or Tuple
+    Returns True if is a List or Tuple or their subclasses.
 
     Formerly allowed for set here, but that does not allow for
     subscripting (`set([1, 2, 3])[0]` is undefined).
 
     Differs from isinstance(collections.abc.Sequence()) in that
     we do not want Streams included even if __contains__, __reversed__,
-    and count are added.
+    and count are added, and we do not want to include str or bytes.
 
     >>> common.isListLike([])
     True
@@ -88,10 +109,10 @@ def isListLike(usrData: Any) -> bool:
     return isinstance(usrData, (list, tuple))
 
 
-def isIterable(usrData: Any) -> bool:
+def isIterable(usrData: t.Any) -> t.TypeGuard[Iterable]:
     '''
     Returns True if is the object can be iter'd over
-    and is NOT a string
+    and is NOT a string.  Marks it as an Iterable for type checking.
 
     >>> common.isIterable([5, 10])
     True
@@ -106,16 +127,84 @@ def isIterable(usrData: Any) -> bool:
 
     >>> common.isIterable(range(20))
     True
+
+    Classes are not iterable even if their instances are:
+
+    >>> common.isIterable(stream.Stream)
+    False
+
+    * Changed in v7.3: Classes (not instances) are not iterable
     '''
     if isinstance(usrData, (str, bytes)):
         return False
     if hasattr(usrData, '__iter__'):
+        if usrData.__class__ is type:
+            return False
         return True
     return False
 
 
-def classToClassStr(classObj: Type) -> str:
-    '''Convert a class object to a class string.
+def holdsType(usrData: t.Any, checkType: type[_T]) -> t.TypeGuard[Collection[_T]]:
+    '''
+    Returns True if usrData is a Collection of type checkType.
+
+    This reads an item from usrData, so don't use it on something
+    where iterating destroys the type.
+
+    >>> y = [1, 2, 3]
+    >>> common.classTools.holdsType(y, int)
+    True
+    >>> common.classTools.holdsType(5, int)
+    False
+    >>> common.classTools.holdsType(['hello'], str)
+    True
+
+    Empty iterators hold the type:
+
+    >>> common.classTools.holdsType([], float)
+    True
+
+    Note that a mixed collection holds whatever is first
+
+    >>> common.classTools.holdsType((4, 'hello'), int)
+    True
+    >>> common.classTools.holdsType((4, 'hello'), str)
+    False
+
+    Works on sets with arbitrary order:
+
+    >>> common.classTools.holdsType({2, 10}, int)
+    True
+
+    Intelligent collections will not have their position affected.
+
+    >>> m = stream.Measure([note.Note('C'), note.Rest()])
+    >>> common.classTools.holdsType(m, note.GeneralNote)
+    True
+    >>> next(iter(m))
+    <music21.note.Note C>
+
+    >>> r = range(1, 100)
+    >>> common.classTools.holdsType(r, int)
+    True
+    >>> next(iter(r))
+    1
+
+    * New in v9.
+    '''
+    if not isIterable(usrData):
+        return False
+    try:
+        first = next(iter(usrData))
+        return isinstance(first, checkType)
+    except StopIteration:
+        return True
+
+
+
+def classToClassStr(classObj: type) -> str:
+    '''
+    Convert a class object to a class string.
 
     >>> common.classToClassStr(note.Note)
     'Note'
@@ -128,7 +217,7 @@ def classToClassStr(classObj: Type) -> str:
 
 def getClassSet(instance, classNameTuple=None):
     '''
-    Return the classSet for an instance (whether a Music21Object or something else.
+    Return the classSet for an instance (whether a Music21Object or something else).
     See base.Music21Object.classSet for more details.
 
     >>> p = pitch.Pitch()
@@ -145,6 +234,8 @@ def getClassSet(instance, classNameTuple=None):
     True
     >>> 'object' in cs
     True
+    >>> note.Note in cs
+    False
 
     To save time (this IS a performance-critical operation), classNameTuple
     can be passed a tuple of names such as ('Pitch', 'object') that
@@ -192,7 +283,7 @@ def tempAttribute(obj, attribute: str, new_val=TEMP_ATTRIBUTE_SENTINEL):
 
     For working with multiple attributes see :func:`~music21.classTools.saveAttributes`.
 
-    New in v7.
+    * New in v7.
     '''
     tempStorage = getattr(obj, attribute)
     if new_val is not TEMP_ATTRIBUTE_SENTINEL:
@@ -203,7 +294,7 @@ def tempAttribute(obj, attribute: str, new_val=TEMP_ATTRIBUTE_SENTINEL):
         setattr(obj, attribute, tempStorage)
 
 @contextlib.contextmanager
-def saveAttributes(obj, *attributeList):
+def saveAttributes(obj, *attributeList: str) -> t.Generator[None, None, None]:
     '''
     Save a number of attributes in an object and then restore them afterwards.
 
@@ -219,9 +310,9 @@ def saveAttributes(obj, *attributeList):
     For storing and setting a value on a single attribute see
     :func:`~music21.classTools.tempAttribute`.
 
-    New in v7.
+    * New in v7.
     '''
-    tempStorage: Dict[str, Any] = {}
+    tempStorage: dict[str, t.Any] = {}
     for attribute in attributeList:
         tempStorage[attribute] = getattr(obj, attribute)
     try:
@@ -233,7 +324,6 @@ def saveAttributes(obj, *attributeList):
 
 # ------------------------------------------------------------------------------
 # define presented order in documentation
-# _DOC_ORDER = [fromRoman, toRoman]
 
 if __name__ == '__main__':
     import music21

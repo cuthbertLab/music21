@@ -5,14 +5,16 @@
 #
 # Authors:      Janelle Sands
 #
-# Copyright:    Copyright © 2016 Michael Scott Cuthbert and the music21 Project
-# License:      LGPL or BSD, see license.txt
+# Copyright:    Copyright © 2016 Michael Scott Asato Cuthbert
+# License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
-import unittest
+from __future__ import annotations
+
 from copy import deepcopy
-from typing import List, Optional, Union
+import unittest
 
 from music21.common.numberTools import opFrac
+from music21.common.types import OffsetQL
 from music21 import duration
 from music21 import expressions
 from music21 import interval
@@ -45,9 +47,9 @@ class OrnamentRecognizer:
 
     def calculateOrnamentTotalQl(
         self,
-        busyNotes: List[note.GeneralNote],
-        simpleNotes: Optional[List[note.GeneralNote]] = None
-    ):
+        busyNotes: list[note.GeneralNote],
+        simpleNotes: list[note.GeneralNote] | None = None
+    ) -> OffsetQL:
         '''
         Returns total length of trill assuming busy notes are all an expanded trill.
         This is either the time of all busy notes combined or
@@ -55,7 +57,7 @@ class OrnamentRecognizer:
         '''
         if simpleNotes:
             return simpleNotes[0].duration.quarterLength
-        trillQl = 0
+        trillQl: OffsetQL = 0.0
         for n in busyNotes:
             trillQl += float(n.duration.quarterLength)
         return opFrac(trillQl)
@@ -75,7 +77,7 @@ class TrillRecognizer(OrnamentRecognizer):
         self.acceptableInterval = 3
         self.minimumLengthForNachschlag = 5
 
-    def recognize(self, busyNotes, simpleNotes=None) -> Union[bool, expressions.Trill]:
+    def recognize(self, busyNotes, simpleNotes=None) -> bool | expressions.Trill:
         '''
         Tries to identify the busy notes as a trill.
 
@@ -175,7 +177,7 @@ class TurnRecognizer(OrnamentRecognizer):
         self,
         busyNotes,
         simpleNotes=None,
-    ) -> Union[bool, expressions.Turn, expressions.InvertedTurn]:
+    ) -> bool | expressions.Turn | expressions.InvertedTurn:
         '''
         Tries to identify the busy notes as a turn or inverted turn.
 
@@ -260,6 +262,10 @@ class _TestCondition:
         self.isInverted = isInverted
 
 class Test(unittest.TestCase):
+    def testCopyAndDeepcopy(self):
+        from music21.test.commonTest import testCopyAll
+        testCopyAll(self, globals())
+
     def testRecognizeTurn(self):
         # set up experiment
         testConditions = []

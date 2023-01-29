@@ -3,10 +3,10 @@
 # Name:         midi.realtime.py
 # Purpose:      music21 classes for playing midi data in realtime
 #
-# Authors:      Michael Scott Cuthbert
+# Authors:      Michael Scott Asato Cuthbert
 #               (from an idea by Joe "Codeswell")
 #
-# Copyright:    Copyright © 2012 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2012 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
@@ -20,15 +20,17 @@ https://stackoverflow.com/questions/10983462/how-can-i-produce-real-time-audio-o
 
 Requires pygame: http://www.pygame.org/download.shtml
 '''
+from __future__ import annotations
+
 from importlib.util import find_spec
-import unittest
 from io import BytesIO
+import unittest
 
 from music21 import defaults
-
 from music21.exceptions21 import Music21Exception
-from music21.midi import translate as midiTranslate
+from music21 import stream
 
+from music21.midi import translate as midiTranslate
 
 class StreamPlayerException(Music21Exception):
     pass
@@ -52,7 +54,7 @@ class StreamPlayer:  # pragma: no cover
     >>> #_DOCS_SHOW for n in b.flatten().notes:
     >>> class PitchMock: midi = 20  #_DOCS_HIDE
     >>> class Mock: pitch = PitchMock()  #_DOCS_HIDE
-    >>> #_DOCS_HIDE -- should not playback in doctests, see TestExternal
+    >>> #_DOCS_HIDE -- should not play back in doctests, see TestExternal
     >>> n = Mock()  #_DOCS_HIDE
     >>> for i in [1]:  #_DOCS_HIDE
     ...    n.pitch.microtone = keyDetune[n.pitch.midi]
@@ -72,42 +74,35 @@ class StreamPlayer:  # pragma: no cover
     '''
     mixerInitialized = False
 
-    def __init__(self, streamIn, **keywords):
+    def __init__(
+        self,
+        streamIn: stream.Stream,
+        reinitMixer: bool = False,
+        mixerFreq: int = 44100,
+        mixerBitSize: int = -16,
+        mixerChannels: int = 2,
+        mixerBuffer: int = 1024,
+    ):
         try:
             # noinspection PyPackageRequirements
-            import pygame
+            import pygame  # type: ignore
             self.pygame = pygame
         except ImportError:
             raise StreamPlayerException('StreamPlayer requires pygame.  Install first')
-        if (self.mixerInitialized is False
-                or ('reinitMixer' in keywords and keywords['reinitMixer'] is not False)):
-            if 'mixerFreq' in keywords:
-                mixerFreq = keywords['mixerFreq']
-            else:
-                mixerFreq = 44100
-
-            if 'mixerBitSize' in keywords:
-                mixerBitSize = keywords['mixerBitSize']
-            else:
-                mixerBitSize = -16
-
-            if 'mixerChannels' in keywords:
-                mixerChannels = keywords['mixerChannels']
-            else:
-                mixerChannels = 2
-
-            if 'mixerBuffer' in keywords:
-                mixerBuffer = keywords['mixerBuffer']
-            else:
-                mixerBuffer = 1024
-
+        if self.mixerInitialized is False or reinitMixer:
             pygame.mixer.init(mixerFreq, mixerBitSize, mixerChannels, mixerBuffer)
 
         self.streamIn = streamIn
 
-    def play(self, busyFunction=None, busyArgs=None,
-             endFunction=None, endArgs=None, busyWaitMilliseconds=50,
-             *, playForMilliseconds=float("inf"), blocked=True):
+    def play(self,
+             busyFunction=None,
+             busyArgs=None,
+             endFunction=None,
+             endArgs=None,
+             busyWaitMilliseconds=50,
+             *,
+             playForMilliseconds=float('inf'),
+             blocked=True):
         '''
         busyFunction is a function that is called with busyArgs when the music is busy every
         busyWaitMilliseconds.
@@ -115,15 +110,20 @@ class StreamPlayer:  # pragma: no cover
         endFunction is a function that is called with endArgs when the music finishes playing.
 
         playForMilliseconds is the amount of time in milliseconds after which
-        the playback will automatically stopped
+        the playback will be automatically stopped.
 
         If blocked is False, the method will finish before ending the stream, allowing
         you to completely control whether to stop it. Ignore every other arguments
         '''
         streamStringIOFile = self.getStringOrBytesIOFile()
-        self.playStringIOFile(streamStringIOFile, busyFunction, busyArgs,
-                              endFunction, endArgs, busyWaitMilliseconds,
-                              playForMilliseconds=playForMilliseconds, blocked=blocked)
+        self.playStringIOFile(streamStringIOFile,
+                              busyFunction=busyFunction,
+                              busyArgs=busyArgs,
+                              endFunction=endFunction,
+                              endArgs=endArgs,
+                              busyWaitMilliseconds=busyWaitMilliseconds,
+                              playForMilliseconds=playForMilliseconds,
+                              blocked=blocked)
 
     def getStringOrBytesIOFile(self):
         streamMidiFile = midiTranslate.streamToMidiFile(self.streamIn)
@@ -133,7 +133,7 @@ class StreamPlayer:  # pragma: no cover
     def playStringIOFile(self, stringIOFile, busyFunction=None, busyArgs=None,
                          endFunction=None, endArgs=None, busyWaitMilliseconds=50,
                          *,
-                         playForMilliseconds=float("inf"), blocked=True):
+                         playForMilliseconds=float('inf'), blocked=True):
         '''
         busyFunction is a function that is called with busyArgs when the music is busy every
         busyWaitMilliseconds.
@@ -141,7 +141,7 @@ class StreamPlayer:  # pragma: no cover
         endFunction is a function that is called with endArgs when the music finishes playing.
 
         playForMilliseconds is the amount of time in milliseconds after which the
-        playback will automatically stopped.
+        playback will be automatically stopped.
 
         If blocked is False, the method will finish before ending the stream, allowing you to
         completely control whether to stop it. Ignore every other arguments but for stringIOFile
@@ -159,14 +159,14 @@ class StreamPlayer:  # pragma: no cover
         start_time = self.pygame.time.get_ticks()
         while self.pygame.mixer.music.get_busy():
             if busyFunction is not None:
-                busyFunction.__call__(busyArgs)
+                busyFunction(busyArgs)
             if self.pygame.time.get_ticks() - start_time > playForMilliseconds:
                 self.pygame.mixer.music.stop()
                 break
             pygameClock.tick(framerate)
 
         if endFunction is not None:
-            endFunction.__call__(endArgs)
+            endFunction(endArgs)
 
     def stop(self):
         self.pygame.mixer.music.stop()
@@ -239,7 +239,7 @@ class TestExternal(unittest.TestCase):  # pragma: no cover
         defaults.ticksAtStart = 0
         b = corpus.parse('bwv66.6')
         measures = []  # store for later
-        maxMeasure = len(b.parts[0].getElementsByClass('Measure'))
+        maxMeasure = len(b.parts[0].getElementsByClass(stream.Measure))
         for i in range(maxMeasure):
             measures.append(b.measure(i))
         sp = StreamPlayer(b)
@@ -253,7 +253,6 @@ class TestExternal(unittest.TestCase):  # pragma: no cover
         doesn't work -- no matter what there's always at least a small lag, even with queues
         '''
         # pylint: disable=attribute-defined-outside-init
-        from music21 import stream
         from music21 import note
         import random
 

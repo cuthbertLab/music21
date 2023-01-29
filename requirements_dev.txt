@@ -1,0 +1,17 @@
+-r requirements.txt
+pylint>=2.15.4
+flake8<6.0.0
+flake8-quotes
+hatchling
+mypy>=0.990
+coveralls
+scipy
+sphinx
+python-Levenshtein
+coverage
+nbconvert
+jupyter
+nbval
+pytest
+docutils
+types-requests

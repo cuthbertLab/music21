@@ -3,15 +3,16 @@
 # Name:         common/decorators.py
 # Purpose:      Decorators for functions
 #
-# Authors:      Michael Scott Cuthbert
+# Authors:      Michael Scott Asato Cuthbert
 #               Christopher Ariza
 #
-# Copyright:    Copyright © 2009-2015 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2009-2015 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
-import warnings
+from __future__ import annotations
 
 from functools import wraps
+import warnings
 
 from music21 import exceptions21
 
@@ -26,27 +27,27 @@ def optional_arg_decorator(fn):
     a decorator for decorators.  Allows them to either have or not have arguments.
     '''
     @wraps(fn)
-    def wrapped_decorator(*args, **kwargs):
-        is_bound_method = hasattr(args[0], fn.__name__) if args else False
+    def wrapped_decorator(*arguments, **keywords):
+        is_bound_method = hasattr(arguments[0], fn.__name__) if arguments else False
         klass = None
 
         if is_bound_method:
-            klass = args[0]
-            args = args[1:]
+            klass = arguments[0]
+            arguments = arguments[1:]
 
         # If no arguments were passed...
-        if len(args) == 1 and not kwargs and callable(args[0]):
+        if len(arguments) == 1 and not keywords and callable(arguments[0]):
             if is_bound_method:
-                return fn(klass, args[0])
+                return fn(klass, arguments[0])
             else:
-                return fn(args[0])
+                return fn(arguments[0])
 
         else:
             def real_decorator(toBeDecorated):
                 if is_bound_method:
-                    return fn(klass, toBeDecorated, *args, **kwargs)
+                    return fn(klass, toBeDecorated, *arguments, **keywords)
                 else:
-                    return fn(toBeDecorated, *args, **kwargs)
+                    return fn(toBeDecorated, *arguments, **keywords)
             return real_decorator
     return wrapped_decorator
 
@@ -111,6 +112,8 @@ def deprecated(method, startDate=None, removeDate=None, message=None):
     else:
         funcName = method.__name__
 
+    method._isDeprecated = True
+
     if startDate is not None:
         startDate = ' on ' + startDate
     else:
@@ -129,14 +132,26 @@ def deprecated(method, startDate=None, removeDate=None, message=None):
                 'message': m}
 
     @wraps(method)
-    def func_wrapper(*args, **kwargs):
+    def func_wrapper(*arguments, **keywords):
+        if len(arguments) > 1 and arguments[1] in (
+            '_ipython_canary_method_should_not_exist_',
+            '_repr_mimebundle_',
+            '_is_coroutine'
+        ):
+            # false positive from IPython for StreamIterator.__getattr__
+            # can remove after v9.
+            falsePositive = True
+        else:
+
+            falsePositive = False
+
         # TODO: look at sys.warnstatus.
-        if callInfo['calledAlready'] is False:
+        if callInfo['calledAlready'] is False and not falsePositive:
             warnings.warn(callInfo['message'],
                           exceptions21.Music21DeprecationWarning,
                           stacklevel=2)
             callInfo['calledAlready'] = True
-        return method(*args, **kwargs)
+        return method(*arguments, **keywords)
 
     return func_wrapper
 
@@ -156,7 +171,7 @@ def cacheMethod(method):
 
     Uses the name of the function as the cache key.
 
-    New in v.6 -- helps to make all the caches easier to work with.
+    * New in v6: helps to make all the caches easier to work with.
     '''
     if hasattr(method, '__qualname__'):
         funcName = method.__qualname__
@@ -164,11 +179,11 @@ def cacheMethod(method):
         funcName = method.__name__
 
     @wraps(method)
-    def inner(instance, *args, **kwargs):
+    def inner(instance, *arguments, **keywords):
         if funcName in instance._cache:
             return instance._cache[funcName]
 
-        instance._cache[funcName] = method(instance, *args, **kwargs)
+        instance._cache[funcName] = method(instance, *arguments, **keywords)
         return instance._cache[funcName]
 
     return inner

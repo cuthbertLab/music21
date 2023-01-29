@@ -4,30 +4,24 @@
 # Purpose:      Break up a part into its contiguous melodies.
 #
 # Authors:      Mark Gotham
-#               Michael Scott Cuthbert
+#               Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2018 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2018 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
+from __future__ import annotations
 
 import unittest
 
 from music21 import clef
 from music21 import converter
-from music21 import exceptions21
+from music21 import environment
 from music21 import note
 from music21 import interval
 
-
-from music21 import environment
-_MOD = 'analysis.segmentByRests'
-environLocal = environment.Environment(_MOD)
+environLocal = environment.Environment('analysis.segmentByRests')
 
 # ------------------------------------------------------------------------------
-
-class SegmentationException(exceptions21.Music21Exception):
-    pass
-
 class Segmenter:
     '''
     Given a work or part, returns a list of melodic segments or intervals.
@@ -38,7 +32,7 @@ class Segmenter:
                         removeEmptyLists=True):
         # noinspection PyShadowingNames
         '''
-        Segments a part by its rests (and clefs) and returns a returns a list of lists where
+        Segments a part by its rests (and clefs) and returns a list of lists where
         each sublist is one segment of contiguous notes. NB Uses .recurse() internally.
 
         >>> example = converter.parse("tinyNotation: C4 r D E r r F r G r A B r c")
@@ -102,14 +96,14 @@ class Segmenter:
 class Test(unittest.TestCase):
 
     def testGetSegmentsList(self):
-        ex = converter.parse("tinyNotation: E4 r F G A r g c r c")
+        ex = converter.parse('tinyNotation: E4 r F G A r g c r c')
         segments = Segmenter.getSegmentsList(ex)
 
         self.assertIsInstance(segments[0], list)
         self.assertEqual(segments[1][0].name, 'F')
 
     def testGetIntervalList(self):
-        ex = converter.parse("tinyNotation: E4 r F G A r g c r c")
+        ex = converter.parse('tinyNotation: E4 r F G A r g c r c')
         intervalList = Segmenter.getIntervalList(ex)
 
         self.assertEqual(intervalList[0].name, 'M2')

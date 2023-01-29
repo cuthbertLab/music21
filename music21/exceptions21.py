@@ -3,9 +3,9 @@
 # Name:         exceptions21.py
 # Purpose:      music21 Exceptions (called out to not require import music21 to access)
 #
-# Authors:      Michael Scott Cuthbert
+# Authors:      Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2012 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2012 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
@@ -15,6 +15,8 @@ which all other m21 exceptions should derive from.
 Do not import anything within this module.  Needs to be import free so other modules
 can freely import from it.
 '''
+from __future__ import annotations
+
 # This one is a very general exception that is here because it's very general
 
 class Music21Exception(Exception):
@@ -47,9 +49,6 @@ class TreeException(Music21Exception):
     pass
 
 class InstrumentException(Music21Exception):
-    pass
-
-class Music21CommonException(Music21Exception):
     pass
 
 class CorpusException(Music21Exception):

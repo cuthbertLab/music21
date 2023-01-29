@@ -3,9 +3,9 @@
 # Name:         prebase.py
 # Purpose:      classes for anything in music21 to inherit from.
 #
-# Authors:      Michael Scott Cuthbert
+# Authors:      Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2019 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2019 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
@@ -15,23 +15,18 @@ should inherit from are given below.
 
 Concept borrowed from m21j.
 '''
-import unittest
+from __future__ import annotations
 
-from typing import (
-    Dict,
-    FrozenSet,
-    List,
-    Sequence,
-    Union,
-    Tuple,
-)
+from collections.abc import Sequence
+import typing as t
+import unittest
 
 from music21.common import deprecated
 
 class ProtoM21Object:
     '''
     A class for pseudo-m21 objects to inherit from.  Any object can inherit from
-    ProtoM21Object and it makes sense for anything a user is likely to encounter
+    ProtoM21Object, and it makes sense for anything a user is likely to encounter
     to inherit from it.  Certain translators, etc. can choose to skip it.
 
     >>> class PitchCounter(prebase.ProtoM21Object):
@@ -70,26 +65,24 @@ class ProtoM21Object:
     objects that only inherit from ProtoM21Object unless you like wasting 200ns.
     '''
 
-    # define order to present names in documentation; use strings
+    # Defines the order of presenting names in the documentation; use strings
     _DOC_ORDER = [
         'classes',
         'classSet',
     ]
 
     # documentation for all attributes (not properties or methods)
-    _DOC_ATTR = {}
+    _DOC_ATTR: dict[str, str] = {}
 
     # this dictionary stores as a tuple of strings for each Class so that
     # it only needs to be made once (11 microseconds per call, can be
     # a big part of iteration; from cache just 1 microsecond)
-    _classTupleCacheDict = {}
-    _classSetCacheDict: Dict[type, FrozenSet[Union[str, type]]] = {}
-    # same with fully qualified names
-    _classListFullyQualifiedCacheDict = {}
+    _classTupleCacheDict: dict[type, tuple[str, ...]] = {}
+    _classSetCacheDict: dict[type, frozenset[str | type]] = {}
 
-    __slots__ = ()
+    __slots__: tuple[str, ...] = ()
 
-    @deprecated('v7', 'v8', 'use `someClass in .classSet`'
+    @deprecated('v7', 'v10', 'use `someClass in .classSet`'
         'or for intersection: `not classSet.isdisjoint(classList)`')
     def isClassOrSubclass(self, classFilterList: Sequence) -> bool:
         '''
@@ -120,7 +113,7 @@ class ProtoM21Object:
         return not self.classSet.isdisjoint(classFilterList)
 
     @property
-    def classes(self) -> Tuple[str]:
+    def classes(self) -> tuple[str, ...]:
         '''
         Returns a tuple containing the names (strings, not objects) of classes that this
         object belongs to -- starting with the object's class name and going up the mro()
@@ -150,9 +143,9 @@ class ProtoM21Object:
         >>> s.insert(40, clef.Treble8vbClef())
         >>> s.insert(50, clef.BassClef())
         >>> s2 = stream.Stream()
-        >>> for t in s:
-        ...    if isinstance(t, clef.GClef) and not isinstance(t, clef.TrebleClef):
-        ...        s2.insert(t)
+        >>> for thing in s:
+        ...    if isinstance(thing, clef.GClef) and not isinstance(thing, clef.TrebleClef):
+        ...        s2.insert(thing)
         >>> s2.show('text')
         {10.0} <music21.clef.GClef>
         {30.0} <music21.clef.FrenchViolinClef>
@@ -167,13 +160,13 @@ class ProtoM21Object:
             return classTuple
 
     @property
-    def classSet(self) -> FrozenSet[Union[str, type]]:
+    def classSet(self) -> frozenset[str | type]:
         '''
-        Returns a set (that is, unordered, but indexed) of all of the classes that
+        Returns a set (that is, unordered, but indexed) of all classes that
         this class belongs to, including
         string names, fullyQualified string names, and objects themselves.
 
-        It's cached on a per class basis, so makes for a really fast way of checking to
+        It's cached on a per-class basis, so makes for a really fast way of checking to
         see if something belongs
         to a particular class when you don't know if the user has given a string,
         a fully qualified string name, or an object.
@@ -199,12 +192,23 @@ class ProtoM21Object:
         True
 
         >>> sorted([s for s in n.classSet if isinstance(s, str)])
-        ['GeneralNote', 'Music21Object', 'NotRest', 'Note', 'ProtoM21Object',
+        ['GeneralNote',
+         'Music21Object',
+         'NotRest',
+         'Note',
+         'ProtoM21Object',
+         'base.Music21Object',
          'builtins.object',
          'music21.base.Music21Object',
-         'music21.note.GeneralNote', 'music21.note.NotRest', 'music21.note.Note',
+         'music21.note.GeneralNote',
+         'music21.note.NotRest',
+         'music21.note.Note',
          'music21.prebase.ProtoM21Object',
-         'object']
+         'note.GeneralNote',
+         'note.NotRest',
+         'note.Note',
+         'object',
+         'prebase.ProtoM21Object']
 
         >>> sorted([s for s in n.classSet if not isinstance(s, str)], key=lambda x: x.__name__)
         [<class 'music21.note.GeneralNote'>,
@@ -213,14 +217,18 @@ class ProtoM21Object:
          <class 'music21.note.Note'>,
          <class 'music21.prebase.ProtoM21Object'>,
          <class 'object'>]
+
+        * Changed in v8: partially qualified objects such as 'note.Note' have been added.
         '''
         try:
             return self._classSetCacheDict[self.__class__]
         except KeyError:
-            classList: List[Union[str, type]] = list(self.classes)
+            classList: list[str | type] = list(self.classes)
             classList.extend(self.__class__.mro())
-            classList.extend(x.__module__ + '.' + x.__name__ for x in self.__class__.mro())
-
+            fullyQualifiedStrings = [x.__module__ + '.' + x.__name__ for x in self.__class__.mro()]
+            classList.extend(fullyQualifiedStrings)
+            partiallyQualifiedStrings = [x.replace('music21.', '') for x in fullyQualifiedStrings]
+            classList.extend(partiallyQualifiedStrings)
             classSet = frozenset(classList)
             self._classSetCacheDict[self.__class__] = classSet
             return classSet
@@ -265,37 +273,20 @@ class ProtoM21Object:
         >>> p._reprInternal()
         'object at 0x112590380'
 
-        If an object has `.id` defined and `x.id` is not the same as `id(x)`
-        then that id is used instead:
-
-        >>> b = base.Music21Object()
-        >>> b._reprInternal()
-        'object at 0x129a903b1'
-        >>> b.id = 'hi'
-        >>> b._reprInternal()
-        'id=hi'
+        A more complex `_reprInternal` that handles the case of objects
+        with `.id` defined is found in Music21Object.
         '''
-        if not hasattr(self, 'id') or self.id == id(self):
-            return f'object at {hex(id(self))}'
-        else:
-            reprId = self.id
-            try:
-                reprId = hex(reprId)
-            except (ValueError, TypeError):
-                pass
-            return f'id={reprId}'
+        return f'object at {hex(id(self))}'
 
 
-del (
-    Dict,
-    FrozenSet,
-    Sequence,
-    Union,
-    Tuple,
-)
+del t
 
 
 class Test(unittest.TestCase):
+    def testCopyAndDeepcopy(self):
+        from music21.test.commonTest import testCopyAll
+        testCopyAll(self, globals())
+
     def test_reprInternal(self):
         from music21.base import Music21Object
         b = Music21Object()

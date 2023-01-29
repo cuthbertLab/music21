@@ -4,37 +4,33 @@
 # Purpose:      Storage for user environment settings and defaults
 #
 # Authors:      Christopher Ariza
-#               Michael Scott Cuthbert
+#               Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2009-2010 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2009-2010 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
 Simple storage for data defaults used throughout music21.
 '''
-
+from __future__ import annotations
 
 import unittest
+import typing as t
 from music21 import _version
 
 # note: this module should not import any higher level modules
-
-_MOD = 'defaults'
+StepName = t.Literal['C', 'D', 'E', 'F', 'G', 'A', 'B']  # restating so as not to import.
 
 
 # TODO: defaults should check the environment object to see
-# if there are any preferences set for values used here
+#     if there are any preferences set for values used here
 
 
 # ------------------------------------------------------------------------------
-class DefaultsException(Exception):
-    pass
-
-
 title = 'Music21 Fragment'
 author = 'Music21'
 software = 'music21 v.' + _version.__version__  # used in xml encoding source software
-musicxmlVersion = '3.1'
+musicxmlVersion = '4.0'
 
 meterNumerator = 4
 meterDenominator = 'quarter'
@@ -45,7 +41,7 @@ limitOffsetDenominator = 65535  # > CD track level precision.
 # not allowing more can be construed as a feature.
 
 
-pitchStep = 'C'
+pitchStep: StepName = 'C'
 pitchOctave = 4
 
 partGroup = 'Part Group'
@@ -53,8 +49,8 @@ partGroupAbbreviation = 'PG'
 
 durationType = 'quarter'
 
-instrumentName = ''
-partName = ''
+instrumentName: str = ''
+partName: str = ''
 
 keyFifths = 0
 keyMode = 'major'
@@ -65,8 +61,8 @@ clefLine = 2
 
 # define a default notehead for notes that know they are unpitched
 noteheadUnpitched = 'square'
-
-'''Divisions are a MusicXML concept that music21 does not share
+'''
+Divisions are a MusicXML concept that music21 does not share
 It basically represents the lowest time unit that all other notes
 are integer multiples of.  Useful for compatibility with MIDI, but
 ultimately restricting since it must be less than 16384, so thus
@@ -111,19 +107,16 @@ multiMeasureRestUseSymbols = True
 multiMeasureRestMaxSymbols = 11
 
 # id numbers above this number will be considered memory locations
-# and rewritten on thaw.
+# and rewritten on thaw, etc.
 minIdNumberToConsiderMemoryLocation = 100_000_001
 
 # ----------------------------------------------------------------||||||||||||--
 
 
 class Test(unittest.TestCase):
-    '''Unit tests
     '''
-
-    def setUp(self):
-        pass
-
+    Unit tests
+    '''
     def testTest(self):
         self.assertEqual(1, 1)
 

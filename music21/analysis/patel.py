@@ -3,17 +3,15 @@
 # Name:         patel.py
 # Purpose:      Tools for testing Aniruddh D. Patel's analysis theories
 #
-# Authors:      Michael Scott Cuthbert
+# Authors:      Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2011 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2011 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
-import unittest
+from __future__ import annotations
+
 import math
-
-from music21 import exceptions21
-_MOD = 'analysis.patel'
-
+import unittest
 
 def nPVI(streamForAnalysis):
     '''
@@ -60,38 +58,43 @@ def nPVI(streamForAnalysis):
     final = summation * 100 / (totalElements - 1)
     return final
 
-def melodicIntervalVariability(streamForAnalysis, *skipArgs, **skipKeywords):
+def melodicIntervalVariability(streamForAnalysis, **skipKeywords):
     '''
-    gives the Melodic Interval Variability (MIV) for a Stream,
+    Gives the Melodic Interval Variability (MIV) for a Stream,
     as defined by Aniruddh D. Patel in "Music, Language, and the Brain"
     p. 223, as 100 x the coefficient of variation (standard deviation/mean)
     of the interval size (measured in semitones) between consecutive elements.
 
+    The multiplication by 100x exists to put it in the same range as nPVI.
 
-    the 100x is designed to put it in the same range as nPVI
+    Keywords are passed on to
+    Stream.findConsecutiveNotes() via Stream.melodicIntervals for
+    determining how to find consecutive intervals.
 
-
-    this method takes the same arguments of skipArgs and skipKeywords as
-    Stream.melodicIntervals() for determining how to find consecutive
-    intervals.
-
-
-
-    >>> s2 = converter.parse('tinynotation: 4/4 C4 D E F# G#').flatten().notesAndRests.stream()
+    >>> s2 = converter.parse('tinynotation: 4/4 C4 D E F# G#')[note.Note].stream()
     >>> analysis.patel.melodicIntervalVariability(s2)
     0.0
-    >>> s3 = converter.parse('tinynotation: 4/4 C4 D E F G C').flatten().notesAndRests.stream()
+    >>> s3 = converter.parse('tinynotation: 4/4 C4 D E F G C')[note.Note].stream()
     >>> analysis.patel.melodicIntervalVariability(s3)
     85.266688...
-    >>> s4 = corpus.parse('bwv66.6').parts[0].flatten().notesAndRests.stream()
+    >>> s4 = corpus.parse('bwv66.6').parts[0][note.GeneralNote].stream()
     >>> analysis.patel.melodicIntervalVariability(s4)
     65.287...
+
+    Too short streams raise a ValueError:
+
+    >>> s5 = converter.parse('tinynotation: 4/4 C2 D2')[note.Note].stream()
+    >>> analysis.patel.melodicIntervalVariability(s5)
+    Traceback (most recent call last):
+    ValueError: need at least three notes to have a std-deviation of intervals (and thus a MIV)
+
+    * Changed in v9: ValueError rather than a Music21Exception raised.
     '''
     s = streamForAnalysis  # shorter
-    intervalStream = s.melodicIntervals(skipArgs, skipKeywords)
+    intervalStream = s.melodicIntervals(**skipKeywords)
     totalElements = len(intervalStream)
-    if totalElements < 2:
-        raise PatelException('need at least three notes to have '
+    if totalElements < 2:  # this is correct.
+        raise ValueError('need at least three notes to have '
                              + 'a std-deviation of intervals (and thus a MIV)')
     # summation = 0
     semitoneList = [myInt.chromatic.undirected for myInt in intervalStream]
@@ -105,8 +108,6 @@ def melodicIntervalVariability(streamForAnalysis, *skipArgs, **skipKeywords):
     std = math.sqrt(std / (totalElements - 1))
     return 100 * (std / mean)
 
-class PatelException(exceptions21.Music21Exception):
-    pass
 
 class Test(unittest.TestCase):
     pass

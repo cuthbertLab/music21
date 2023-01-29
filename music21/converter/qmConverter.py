@@ -3,9 +3,9 @@
 # Name:         converter/qmConverter.py
 # Purpose:      Example of subclassing Subconverter to parse a new format
 #
-# Authors:      Michael Scott Cuthbert
+# Authors:      Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2015 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2015 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
@@ -21,15 +21,19 @@ and turns each of them into a quarter note in octave 4 in 4/4.
 Consult the code to see how it works.  To use, call
 `converter.registerSubconverter(converter.qmConverter.QMConverter)`
 then `myStream = converter.parse('quarterMusic: C E G D F')`
-
 '''
-from music21 import converter, note, stream, meter, environment
+from __future__ import annotations
 
-environLocal = environment.Environment()
+from music21 import converter
+from music21 import environment
+from music21 import meter
+from music21 import note
+from music21 import stream
+
+environLocal = environment.Environment('converter.qmConverter')
 
 
 class QMConverter(converter.subConverters.SubConverter):
-
     registerFormats = ('qm', 'quarterMusic')
     registerInputExtensions = ('qm',)
     registerOutputExtensions = ('qm',)
@@ -41,8 +45,8 @@ class QMConverter(converter.subConverters.SubConverter):
         >>> from music21.converter.qmConverter import QMConverter
         >>> qmc = QMConverter()
         >>> qmc.parseData('C D E G C')
-        >>> s = qmc.stream
-        >>> s.show('text')
+        >>> q_stream = qmc.stream
+        >>> q_stream.show('text')
         {0.0} <music21.stream.Measure 1 offset=0.0>
             {0.0} <music21.clef.TrebleClef>
             {0.0} <music21.meter.TimeSignature 4/4>
@@ -66,7 +70,7 @@ class QMConverter(converter.subConverters.SubConverter):
 
         self.stream = s.makeMeasures()
 
-    def parseFile(self, filePath, number=None):
+    def parseFile(self, filePath, number=None, **keywords):
         '''
         parse a file from disk.  If QMConverter is registered, then any
         file ending in .qm will automatically be parsed.
@@ -96,7 +100,7 @@ class QMConverter(converter.subConverters.SubConverter):
         with open(filePath, 'r', encoding='utf-8') as f:
             self.parseData(f.read())
 
-    def write(self, obj, fmt, fp=None, subformats=None, **keywords):  # pragma: no cover
+    def write(self, obj, fmt, fp=None, subformats=(), **keywords):  # pragma: no cover
         music = ''
         if fp is None:
             fp = environLocal.getTempFile('.qm')

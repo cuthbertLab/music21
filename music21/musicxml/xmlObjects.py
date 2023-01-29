@@ -4,14 +4,16 @@
 # Purpose:      MusicXML objects for conversion to and from music21
 #
 # Authors:      Christopher Ariza
-#               Michael Scott Cuthbert
+#               Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2009-2015 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2009-2023 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
-import re
+from __future__ import annotations
 
 from collections import OrderedDict
+import re
+
 # these single-entity tags are bundled together.
 from music21 import articulations
 from music21 import exceptions21
@@ -43,7 +45,7 @@ ARTICULATION_MARKS = OrderedDict(
      ('other-articulation', articulations.Articulation),
      ])
 
-# A reversed dictionary mapping classes to names, excepting Articulation
+# A reversed dictionary mapping class to name, excepting Articulation
 # which does not get mapped, and Staccato which must come after Staccatissimo,
 # and Accent which must come after StrongAccent
 ARTICULATION_MARKS_REV = OrderedDict([(v, k) for k, v in ARTICULATION_MARKS.items()])
@@ -69,7 +71,7 @@ TECHNICAL_MARKS = OrderedDict([('up-bow', articulations.UpBow),
                                # in method objectAttachedSpannersToTechnicals of m21ToXml.py
                                # ('hammer-on', articulations.HammerOn),
                                # ('pull-off', articulations.PullOff),
-                               # bend not implemented because it needs many sub components
+                               # bend not implemented because it needs many subcomponents
                                # ('bend', articulations.FretBend),
                                ('tap', articulations.FretTap),
                                ('fret', articulations.FretIndication),
@@ -105,7 +107,7 @@ ORNAMENT_MARKS = {'trill-mark': expressions.Trill,
 # ------------------------------------------------------------------------------
 
 class MusicXMLException(exceptions21.Music21Exception):
-    def __init__(self, message):
+    def __init__(self, message: str):
         super().__init__(message)
         self.measureNumber: str = ''
         self.partName: str = ''

@@ -7,6 +7,8 @@ omit =
 
 [report]
 exclude_lines =
+    if TYPE_CHECKING:
+    if t.TYPE_CHECKING:
     if __name__ == .__main__.:
     if debug:
     if self.debug:
@@ -14,3 +16,6 @@ exclude_lines =
     def x_test
     def xtest
     pragma: no cover
+    class TestExternal(unittest.TestCase):
+    class TestSlow(unittest.TestCase):
+

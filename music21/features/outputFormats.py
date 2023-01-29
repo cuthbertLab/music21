@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
-from music21 import exceptions21
+from __future__ import annotations
+
 from music21 import environment
+from music21 import exceptions21
 
 environLocal = environment.Environment('features.outputFormats')
 
@@ -21,8 +23,12 @@ class OutputFormat:
         self._dataSet = dataSet
 
     def getHeaderLines(self):
-        '''Get the header as a list of lines.
         '''
+        Get the header as a list of lines.
+        '''
+        pass  # define in subclass
+
+    def getString(self, includeClassLabel=True, includeId=True, lineBreak=None):
         pass  # define in subclass
 
     def write(self, fp=None, includeClassLabel=True, includeId=True):
@@ -53,8 +59,9 @@ class OutputTabOrange(OutputFormat):
         self.ext = '.tab'
 
     def getHeaderLines(self, includeClassLabel=True, includeId=True):
-        '''Get the header as a list of lines.
-
+        # noinspection PyShadowingNames
+        '''
+        Get the header as a list of lines.
 
         >>> f = [features.jSymbolic.ChangesOfMeterFeature]
         >>> ds = features.DataSet()
@@ -78,7 +85,7 @@ class OutputTabOrange(OutputFormat):
         post.append(self._dataSet.getAttributeLabels(
             includeClassLabel=includeClassLabel, includeId=includeId))
 
-        # second row meta data
+        # second row metadata
         row = []
         for x in self._dataSet.getDiscreteLabels(
                 includeClassLabel=includeClassLabel, includeId=includeId):
@@ -103,7 +110,8 @@ class OutputTabOrange(OutputFormat):
         return post
 
     def getString(self, includeClassLabel=True, includeId=True, lineBreak=None):
-        '''Get the complete DataSet as a string with the appropriate headers.
+        '''
+        Get the complete DataSet as a string with the appropriate headers.
         '''
         if lineBreak is None:
             lineBreak = '\n'
@@ -130,7 +138,8 @@ class OutputCSV(OutputFormat):
         self.ext = '.csv'
 
     def getHeaderLines(self, includeClassLabel=True, includeId=True):
-        '''Get the header as a list of lines.
+        '''
+        Get the header as a list of lines.
 
 
         >>> f = [features.jSymbolic.ChangesOfMeterFeature]
@@ -162,7 +171,8 @@ class OutputCSV(OutputFormat):
 
 
 class OutputARFF(OutputFormat):
-    '''An ARFF (Attribute-Relation File Format) file.
+    '''
+    An ARFF (Attribute-Relation File Format) file.
 
     See
     https://web.archive.org/web/20160212022757/http://weka.wikispaces.com/ARFF+%28stable+version%29
@@ -179,8 +189,8 @@ class OutputARFF(OutputFormat):
         self.ext = '.arff'
 
     def getHeaderLines(self, includeClassLabel=True, includeId=True):
-        '''Get the header as a list of lines.
-
+        '''
+        Get the header as a list of lines.
 
         >>> f = [features.jSymbolic.ChangesOfMeterFeature]
         >>> ds = features.DataSet(classLabel='Composer')

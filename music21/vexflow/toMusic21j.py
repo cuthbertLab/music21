@@ -3,15 +3,17 @@
 # Name:         vexflow/toMusic21j.py
 # Purpose:      music21 classes for converting music21 objects to music21j
 #
-# Authors:      Michael Scott Cuthbert
+# Authors:      Michael Scott Asato Cuthbert
 #               based on an earlier version by Christopher Reyes
 #
-# Copyright:    Copyright © 2012-14 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2012-14 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
 Convert a music21 object into JSON and send it to the browser for music21j to use.
 '''
+from __future__ import annotations
+
 import unittest
 
 from music21.exceptions21 import Music21Exception
@@ -26,7 +28,7 @@ supportedDisplayModes = [
 ]
 
 
-def fromObject(thisObject, mode='html', local=False):
+def fromObject(thisObject, *, mode='html', local=False):
     '''
     returns a string of data for a given Music21Object such as a Score, Note, etc. that
     can be displayed in a browser using the music21j package.  Called by .show('vexflow').
@@ -68,6 +70,8 @@ def fromObject(thisObject, mode='html', local=False):
     <body>
     </body>
     </html>
+
+    * Changed in v8: mode and useLocal are keyword only.
     '''
     conv = VexflowPickler()
     conv.mode = mode
@@ -129,7 +133,7 @@ class VexflowPickler:
     def splitLongJSON(self, jsonString, chunkSize=110):
         allJSONList = []
         for i in range(0, len(jsonString), chunkSize):
-            allJSONList.append('\'' + jsonString[i:i + chunkSize] + '\'')
+            allJSONList.append("'" + jsonString[i:i + chunkSize] + "'")
         return ' + \n    '.join(allJSONList)
 
     def getLoadTemplate(self, urls=None):

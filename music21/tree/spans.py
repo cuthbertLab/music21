@@ -5,9 +5,9 @@
 #               elements and which can be manipulated quickly in a tree
 #
 # Authors:      Josiah Wolf Oberholtzer
-#               Michael Scott Cuthbert
+#               Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2013-15 Michael Scott Cuthbert and the music21
+# Copyright:    Copyright © 2013-15 Michael Scott Asato Cuthbert and the music21
 #               Project
 # License:      BSD, see license.txt
 # -----------------------------------------------------------------------------
@@ -15,16 +15,22 @@
 Tools for grouping notes and chords into a searchable tree
 organized by start and stop offsets.
 '''
+from __future__ import annotations
 
 import copy
-import unittest
 from math import inf
+import typing as t
+import unittest
 
+from music21.common.types import OffsetQLIn
 from music21 import environment
 from music21 import exceptions21
 
+if t.TYPE_CHECKING:
+    from music21 import base
+    from music21 import stream
 
-environLocal = environment.Environment("tree.spans")
+environLocal = environment.Environment('tree.spans')
 # -----------------------------------------------------------------------------
 
 
@@ -162,7 +168,7 @@ class Timespan:
                 or (other.endTime == self.offset)):
             message = f'Cannot merge {self} with {other}: not contiguous'
             return (False, message)
-        return (True, "")
+        return (True, '')
 
     def mergeWith(self, other):
         r'''
@@ -297,7 +303,7 @@ class ElementTimespan(Timespan):
     '''
 
     # CLASS VARIABLES #
-    _DOC_ATTR = {
+    _DOC_ATTR: dict[str, str] = {
         'parentage': r'''
             The Stream hierarchy above the element in a ElementTimespan.
 
@@ -317,19 +323,18 @@ class ElementTimespan(Timespan):
 
     # INITIALIZER #
 
-    def __init__(self,
-                 element=None,
-                 parentOffset=None,
-                 parentEndTime=None,
-                 parentage=None,
-                 offset=None,
-                 endTime=None,
-                 ):
+    def __init__(
+        self,
+        element: base.Music21Object | None = None,
+        parentOffset: OffsetQLIn | None = None,
+        parentEndTime: OffsetQLIn | None = None,
+        parentage: tuple[stream.Stream, ...] = (),
+        offset: OffsetQLIn | None = None,
+        endTime: OffsetQLIn | None = None,
+    ):
         super().__init__(offset=offset, endTime=endTime)
 
-        self.element = element
-        if parentage is not None:
-            parentage = tuple(parentage)
+        self.element: base.Music21Object | None = element
         self.parentage = parentage
         if parentOffset is not None:
             parentOffset = float(parentOffset)
@@ -344,10 +349,7 @@ class ElementTimespan(Timespan):
 
     # SPECIAL METHODS #
     def __eq__(self, other):
-        if self is other:
-            return True
-        else:
-            return False
+        return self is other
 
     def __repr__(self):
         typeName = type(self).__name__
@@ -394,7 +396,7 @@ class ElementTimespan(Timespan):
             ):
         '''
         Create a new object that is identical to the calling object
-        but with some of the parameters overridden.
+        but with some parameters overridden.
 
         >>> n = note.Note('C#')
         >>> pts = tree.spans.PitchedTimespan(n, offset=11.0, endTime=12.0)
@@ -496,7 +498,7 @@ class ElementTimespan(Timespan):
         from music21 import stream
         return self.getParentageByClass(classList=(stream.Part,))
 
-    def makeElement(self, makeCopy=True):
+    def makeElement(self, makeCopy: bool = True) -> base.Music21Object | None:
         '''
         Return a copy of the element (or the same one if makeCopy is False)
         with the quarterLength set to the length of the timespan
@@ -506,7 +508,10 @@ class ElementTimespan(Timespan):
             return None
 
         if makeCopy:
-            el = copy.deepcopy(el)
+            el_old = el
+            el = copy.deepcopy(el_old)
+            el.derivation.origin = el_old
+            el.derivation.method = 'spans.makeElement'
 
         el.duration.quarterLength = self.quarterLength
         return el
@@ -524,11 +529,11 @@ class PitchedTimespan(ElementTimespan):
                  endTime=None,
                  ):
         super().__init__(element=element,
-                                              parentOffset=parentOffset,
-                                              parentEndTime=parentEndTime,
-                                              parentage=parentage,
-                                              offset=offset,
-                                              endTime=endTime)
+                         parentOffset=parentOffset,
+                         parentEndTime=parentEndTime,
+                         parentage=parentage,
+                         offset=offset,
+                         endTime=endTime)
 
     @property
     def pitches(self):
