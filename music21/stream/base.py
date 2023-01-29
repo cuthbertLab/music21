@@ -5372,17 +5372,20 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         'C3'
 
         If 'atSoundingPitch' is unknown for this Stream and all of its parent Streams
-        then no transposition will take place (this used to raise an exception):
+        then no transposition will take place, and atSoundingPitch will remain unknown
+        (this used to raise an exception):
 
         >>> s = stream.Score()
         >>> p = stream.Part(id='partEmpty')
-        >>> s.append(p)
+        >>> s.insert(0.0, p)
         >>> p.toSoundingPitch()
         <music21.stream.Part partEmpty>
         >>> s.atSoundingPitch = False
         >>> sp = p.toSoundingPitch()
         >>> sp
         <music21.stream.Part partEmpty>
+        >>> sp.atSoundingPitch
+        'unknown'
         >>> sp.derivation.origin is p
         True
 
