@@ -36,6 +36,14 @@ from music21.musicxml.m21ToXml import (
     MusicXMLWarning, MusicXMLExportException
 )
 
+def stripInnerSpaces(txt: str):
+    '''
+    Collapse all whitespace (say, in some XML) to a single space,
+    for ease of comparison.
+    '''
+    return re.sub(r'\s+', ' ', txt)
+
+
 class Test(unittest.TestCase):
 
     def getXml(self, obj):
@@ -91,6 +99,75 @@ class Test(unittest.TestCase):
         p.insert(0.0, sl3)
         self.assertEqual(self.getXml(p).count('<slur '), 6)
 
+    def testSpannerAnchors(self):
+        score = stream.Score()
+        part = stream.Part()
+        score.insert(0, part)
+        measure = stream.Measure()
+        part.insert(0, measure)
+        voice = stream.Voice()
+        measure.insert(0, voice)
+
+        n = note.Note('C', quarterLength=4)
+        sa1 = spanner.SpannerAnchor()
+        sa2 = spanner.SpannerAnchor()
+        voice.insert(0, n)
+        voice.insert(2, sa1)
+        voice.insert(4, sa2)
+        cresc = dynamics.Crescendo(n, sa1)  # cresc from n to sa1
+        dim = dynamics.Diminuendo(sa1, sa2)   # dim from sa1 to sa2
+        score.append((cresc, dim))
+
+        xmlOut = self.getXml(score)
+
+        self.assertIn(
+            stripInnerSpaces(
+                '''<measure implicit="no" number="0">
+                       <attributes>
+                           <divisions>10080</divisions>
+                       </attributes>
+                       <note>
+                           <pitch>
+                               <step>C</step>
+                               <octave>4</octave>
+                           </pitch>
+                           <duration>40320</duration>
+                           <type>whole</type>
+                       </note>
+                       <backup>
+                           <duration>40320</duration>
+                       </backup>
+                       <direction placement="below">
+                           <direction-type>
+                               <wedge number="1" spread="0" type="crescendo" />
+                           </direction-type>
+                       </direction>
+                       <forward>
+                           <duration>20160</duration>
+                       </forward>
+                       <direction placement="below">
+                           <direction-type>
+                               <wedge number="2" spread="15" type="diminuendo" />
+                           </direction-type>
+                       </direction>
+                       <direction placement="below">
+                           <direction-type>
+                               <wedge number="1" spread="15" type="stop" />
+                           </direction-type>
+                       </direction>
+                       <forward>
+                           <duration>20160</duration>
+                       </forward>
+                       <direction placement="below">
+                           <direction-type>
+                               <wedge number="2" spread="0" type="stop" />
+                           </direction-type>
+                       </direction>
+                   </measure>'''),
+            stripInnerSpaces(xmlOut)
+        )
+
+
     def testSpannersWritePartStaffs(self):
         '''
         Test that spanners are gathered on the PartStaffs that need them.
@@ -117,9 +194,6 @@ class Test(unittest.TestCase):
         # and written after the backup tag, i.e. on the LH?
         xmlOut = self.getXml(s)
         xmlAfterFirstBackup = xmlOut.split('</backup>\n')[1]
-
-        def stripInnerSpaces(txt):
-            return re.sub(r'\s+', ' ', txt)
 
         self.assertIn(
             stripInnerSpaces(

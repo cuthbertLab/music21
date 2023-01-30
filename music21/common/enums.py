@@ -197,6 +197,24 @@ class GatherSpanners(BooleanEnum):
     COMPLETE_ONLY = 'completeOnly'
 
 
+class AppendSpanners(StrEnum):
+    '''
+    An enumeration for how to append related spanners when appending objects to a written file.
+
+    AppendSpanners.NORMAL means append the spanners that start with the object, then append
+        the object, then append the spanners that end with the object.
+    AppendSpanners.RELATED_ONLY means append the spanners that start with the object, then
+        append the spanners that end with the object (i.e. do not append the object).
+    AppendSpanners.NONE means do not append the related spanners at all (i.e. only append
+        the object).
+
+    * new in v9.
+    '''
+    NORMAL = 'normal'
+    RELATED_ONLY = 'related_only'
+    NONE = 'none'
+
+
 class MeterDivision(StrEnum):
     '''
     Represents an indication of how to divide a TimeSignature
