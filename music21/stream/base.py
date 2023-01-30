@@ -8,7 +8,7 @@
 #               Josiah Wolf Oberholtzer
 #               Evan Lynch
 #
-# Copyright:    Copyright © 2008-2022 Michael Scott Asato Cuthbert
+# Copyright:    Copyright © 2008-2023 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # -----------------------------------------------------------------------------
 '''
@@ -8723,7 +8723,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
     # --------------------------------------------------------------------------
     # Metadata access
 
-    def _getMetadata(self):
+    def _getMetadata(self) -> metadata.Metadata | None:
         '''
         >>> a = stream.Stream()
         >>> a.metadata = metadata.Metadata()
@@ -8733,7 +8733,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         mdList = mdList.getElementsByOffset(0)
         return mdList.first()
 
-    def _setMetadata(self, metadataObj):
+    def _setMetadata(self, metadataObj: metadata.Metadata | None) -> None:
         '''
         >>> a = stream.Stream()
         >>> a.metadata = metadata.Metadata()
@@ -8756,6 +8756,8 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         >>> s.metadata.composer = 'frank'
         >>> s.metadata.composer
         'frank'
+
+        May also return None if nothing is there.
         ''')
 
     # --------------------------------------------------------------------------
@@ -9867,6 +9869,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         False
 
         Only Measures and Voices are allowed to contain notes and rests directly:
+
         >>> m.isWellFormedNotation()
         True
         >>> s2.append(note.Rest())
@@ -10160,6 +10163,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
             - now finds notes in Voices without requiring `getOverlaps=True`
             and iterates over Parts rather than flattening.
             - If `noNone=False`, inserts `None` when backing up to scan a subsequent voice or part.
+
         * Changed in v8: all parameters are keyword only.
 
 
@@ -10539,6 +10543,11 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         * Changed in v7: gapStream is filled with rests instead of Music21Objects
         '''
         if 'findGaps' in self._cache and self._cache['findGaps'] is not None:
+            if self._cache['findGaps'] is False:
+                # We are using False to represent the None that would be
+                # returned by calling findGaps() on a gapless stream, because
+                # None is music21's convention for forcing cache misses.
+                return None
             return self._cache['findGaps']
 
         gapStream = self.cloneEmpty(derivationMethod='findGaps')
@@ -10561,6 +10570,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         gapStream.sort()
 
         if not gapStream:
+            self._cache['findGaps'] = False
             return None
         else:
             self._cache['findGaps'] = gapStream

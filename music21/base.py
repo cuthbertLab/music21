@@ -6,7 +6,7 @@
 # Authors:      Michael Scott Asato Cuthbert
 #               Christopher Ariza
 #
-# Copyright:    Copyright © 2006-2022 Michael Scott Asato Cuthbert
+# Copyright:    Copyright © 2006-2023 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # -----------------------------------------------------------------------------
 '''
@@ -2425,7 +2425,7 @@ class Music21Object(prebase.ProtoM21Object):
         A reference to the most-recent object used to
         contain this object. In most cases, this will be a
         Stream or Stream sub-class. In most cases, an object's
-        activeSite attribute is automatically set when an the
+        activeSite attribute is automatically set when the
         object is attached to a Stream.
 
 
