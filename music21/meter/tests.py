@@ -91,8 +91,7 @@ class Test(unittest.TestCase):
         a.load('4/4', 4)
         b = copy.deepcopy(a)
         self.assertIsNot(a, b)
-        # TODO: this is work in progress.
-        # self.assertEqual(a, b)
+        # TODO: equity of meter sequences not yet defined.
         # self.assertEqual(a, b)
 
     def testTimeSignatureDeepcopy(self):
