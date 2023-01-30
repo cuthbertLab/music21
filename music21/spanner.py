@@ -2164,6 +2164,24 @@ class Test(unittest.TestCase):
 
         self.assertEqual(sl1.getSpannerSites(), [sp])
 
+    def testSpannerAnchorRepr(self):
+        from music21 import stream
+        from music21 import note
+        from music21 import spanner
+
+        # SpannerAnchor with no activeSite
+        sa1 = spanner.SpannerAnchor()
+        self.assertEqual(repr(sa1), '<music21.spanner.SpannerAnchor unanchored>')
+
+        # SpannerAnchor with activeSite, but no duration
+        m = stream.Measure()
+        m.insert(0.5, sa1)
+        self.assertEqual(repr(sa1), '<music21.spanner.SpannerAnchor at 0.5>')
+
+        # SpannerAnchor with activeSite and duration
+        sa1.quarterLength = 2.5
+        self.assertEqual(repr(sa1), '<music21.spanner.SpannerAnchor at 0.5-3.0>')
+
     def testSpannerRepr(self):
         from music21 import spanner
         su1 = spanner.Slur()
