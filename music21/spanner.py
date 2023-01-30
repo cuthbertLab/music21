@@ -548,7 +548,7 @@ class Spanner(base.Music21Object):
 
     def fill(
         self,
-        searchStream = None,  # stream.Stream | None, but cannot import stream here
+        searchStream=None,  # stream.Stream | None, but cannot import stream here
         *,
         includeEndBoundary: bool = False,
         mustFinishInSpan: bool = False,
@@ -2166,7 +2166,6 @@ class Test(unittest.TestCase):
 
     def testSpannerAnchorRepr(self):
         from music21 import stream
-        from music21 import note
         from music21 import spanner
 
         # SpannerAnchor with no activeSite
