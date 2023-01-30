@@ -36,6 +36,14 @@ from music21.musicxml.m21ToXml import (
     MusicXMLWarning, MusicXMLExportException
 )
 
+def stripInnerSpaces(txt: str):
+    '''
+    Collapse all whitespace (say, in some XML) to a single space,
+    for ease of comparison.
+    '''
+    return re.sub(r'\s+', ' ', txt)
+
+
 class Test(unittest.TestCase):
 
     def getXml(self, obj):
@@ -57,13 +65,6 @@ class Test(unittest.TestCase):
         mxScore = SX.parse()
         helpers.indent(mxScore)
         return mxScore
-
-    def stripInnerSpaces(self, txt):
-        '''
-        Collapse all whitespace (say, in some XML) to a single space,
-        for ease of comparison.
-        '''
-        return re.sub(r'\s+', ' ', txt)
 
     def testExceptionMessage(self):
         s = stream.Score()
@@ -120,7 +121,7 @@ class Test(unittest.TestCase):
         xmlOut = self.getXml(score)
 
         self.assertIn(
-            self.stripInnerSpaces(
+            stripInnerSpaces(
                 '''<measure implicit="no" number="0">
                        <attributes>
                            <divisions>10080</divisions>
@@ -163,7 +164,7 @@ class Test(unittest.TestCase):
                            </direction-type>
                        </direction>
                    </measure>'''),
-            self.stripInnerSpaces(xmlOut)
+            stripInnerSpaces(xmlOut)
         )
 
 
@@ -195,14 +196,14 @@ class Test(unittest.TestCase):
         xmlAfterFirstBackup = xmlOut.split('</backup>\n')[1]
 
         self.assertIn(
-            self.stripInnerSpaces(
+            stripInnerSpaces(
                 ''' <direction placement="below">
                         <direction-type>
                             <wedge number="1" spread="0" type="crescendo" />
                         </direction-type>
                         <staff>2</staff>
                     </direction>'''),
-            self.stripInnerSpaces(xmlAfterFirstBackup)
+            stripInnerSpaces(xmlAfterFirstBackup)
         )
 
     def testLowVoiceNumbers(self):

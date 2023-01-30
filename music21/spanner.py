@@ -27,8 +27,8 @@ import unittest
 
 from music21 import base
 from music21 import common
+from music21.common.types import OffsetQL
 from music21 import defaults
-from music21 import duration
 from music21 import environment
 from music21 import exceptions21
 from music21 import prebase
@@ -617,76 +617,50 @@ class SpannerAnchor(base.Music21Object):
     of a Spanner, in the place of a GeneralNote.
 
     This is useful for (e.g.) a Crescendo that ends partway through a
-    note (e.g. in a violin part).
+    note (e.g. in a violin part).  Exporters (like MusicXML) are configured
+    to remove the SpannerAnchor itself on output, exporting only the Spanner
+    start and stop locations.
 
     Here's an example of a whole note that has a Crescendo for the first
     half of the note, and a Diminuendo for the second half of the note.
 
-    >>> score = stream.Score()
-    >>> part = stream.Part()
-    >>> score.insert(0, part)
-    >>> measure = stream.Measure()
-    >>> part.insert(0, measure)
-    >>> voice = stream.Voice()
-    >>> measure.insert(0, voice)
+    >>> n = note.Note('C4', quarterLength=4)
+    >>> measure = stream.Measure([n], number=1)
+    >>> part = stream.Part([measure], id='violin')
+    >>> score = stream.Score([part])
 
-    >>> n = note.Note('C', quarterLength = 4)
-    >>> sa1 = spanner.SpannerAnchor()
-    >>> sa2 = spanner.SpannerAnchor()
-    >>> voice.insert(0, n)
-    >>> voice.insert(2, sa1)
-    >>> voice.insert(4, sa2)
-    >>> cresc = dynamics.Crescendo(n, sa1)   # cresc from n to sa1
-    >>> dim = dynamics.Diminuendo(sa1, sa2)  # dim from sa1 to sa2
+    Add a crescendo from the note's start to the first anchor, place in the
+    middle of the note, and then a diminuendo from that first anchor to the
+    second, placed at the end of the note.
+
+    >>> anchor1 = spanner.SpannerAnchor()
+    >>> anchor2 = spanner.SpannerAnchor()
+    >>> measure.insert(2.0, anchor1)
+    >>> measure.insert(4.0, anchor2)
+    >>> cresc = dynamics.Crescendo(n, anchor1)
+    >>> dim = dynamics.Diminuendo(anchor1, anchor2)
     >>> score.append((cresc, dim))
     >>> score.show('text')
-    {0.0} <music21.stream.Part 0x...>
-        {0.0} <music21.stream.Measure 0 offset=0.0>
-            {0.0} <music21.stream.Voice 0x...>
-                {0.0} <music21.note.Note C>
-                {2.0} <music21.spanner.SpannerAnchor object at 0x...>
-                {4.0} <music21.spanner.SpannerAnchor object at 0x...>
-    {4.0} <music21.dynamics.Crescendo <music21.note.Note C><music21.spanner.SpannerAnchor...>>
-    {4.0} <music21.dynamics.Diminuendo <...SpannerAnchor...><...SpannerAnchor...>>
-
-    SpannerAnchors aways have a duration of 0, and if any attempt is made to
-    change this, TypeError will be raised.
-
-    >>> sa3 = spanner.SpannerAnchor(quarterLength=1)
-    Traceback (most recent call last):
-    TypeError: SpannerAnchor cannot be initialized with a duration/quarterLength.
-    >>> sa4 = spanner.SpannerAnchor()
-    >>> sa4.duration = duration.Duration(4)
-    Traceback (most recent call last):
-    TypeError: SpannerAnchor has an immutable zero duration.
-    >>> sa4.duration.quarterLength = 0.5
-    Traceback (most recent call last):
-    TypeError: This FrozenDuration instance is immutable.
-    >>> sa4.quarterLength = 2
-    Traceback (most recent call last):
-    TypeError: This FrozenDuration instance is immutable.
-    >>> sa4.duration.quarterLength
-    0.0
+    {0.0} <music21.stream.Part violin>
+        {0.0} <music21.stream.Measure 1 offset=0.0>
+            {0.0} <music21.note.Note C>
+            {2.0} <music21.spanner.SpannerAnchor at 2.0>
+            {4.0} <music21.spanner.SpannerAnchor at 4.0>
+    {4.0} <music21.dynamics.Crescendo <music21.note.Note C><...SpannerAnchor at 2.0>>
+    {4.0} <music21.dynamics.Diminuendo <...SpannerAnchor at 2.0><...SpannerAnchor at 4.0>>
     '''
     def __init__(self, **keywords):
-        if 'duration' in keywords or 'quarterLength' in keywords:
-            raise TypeError(
-                'SpannerAnchor cannot be initialized with a duration/quarterLength.'
-            )
-
         super().__init__(**keywords)
-        self._duration = duration.FrozenDuration(quarterLength=0)
 
-    @property
-    def duration(self) -> duration.Duration:
-        d_out = self._duration
-        if t.TYPE_CHECKING:
-            assert d_out is not None
-        return d_out
+    def _reprInternal(self) -> str:
+        if self.activeSite is None:
+            return 'unanchored'
 
-    @duration.setter
-    def duration(self, durationObj: duration.Duration):
-        raise TypeError('SpannerAnchor has an immutable zero duration.')
+        ql: OffsetQL = self.duration.quarterLength
+        if ql == 0:
+            return f'at {self.offset}'
+
+        return f'at {self.offset}-{self.offset+ql}'
 
 
 class SpannerBundle(prebase.ProtoM21Object):
