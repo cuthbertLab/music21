@@ -1253,7 +1253,6 @@ class Accidental(prebase.ProtoM21Object, style.StyleMixin):
 
         This is needed when transposing Pitches: we need to retain accidental display properties.
 
-
         >>> a = pitch.Accidental('double-flat')
         >>> a.displayType = 'always'
         >>> b = pitch.Accidental('sharp')
@@ -2103,7 +2102,10 @@ class Pitch(prebase.ProtoM21Object):
         elif isinstance(value, str):
             # int version is used in interval.py which cannot import Pitch directly
             self._accidental = Accidental(value)
-        elif isinstance(value, (int, float)):
+        elif isinstance(value, int):
+            self._accidental = Accidental(value)
+            self._microtone = None
+        elif isinstance(value, float):
             # check and add any microtones
             alter, cents = _convertCentsToAlterAndCents(value * 100.0)
             self._accidental = Accidental(alter)
@@ -3937,7 +3939,7 @@ class Pitch(prebase.ProtoM21Object):
 
         >>> p4.getHigherEnharmonic()
         Traceback (most recent call last):
-        music21.pitch.AccidentalException: -5.0 is not a supported accidental type
+        music21.pitch.AccidentalException: -5 is not a supported accidental type
 
         Note that half accidentals (~ = half-sharp, ` = half-flat)
         get converted to microtones:

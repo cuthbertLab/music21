@@ -404,7 +404,7 @@ class Test(unittest.TestCase):
              ]
         )
         with self.assertRaisesRegex(pitch.AccidentalException,
-                                    '5.0 is not a supported accidental type'):
+                                    '5 is not a supported accidental type'):
             intv.transposePitch(p, maxAccidental=None)
         p2 = intv.transposePitch(p)
         self.assertEqual(p2.nameWithOctave, 'B-20')
