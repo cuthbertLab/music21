@@ -467,7 +467,7 @@ class TimeSignature(TimeSignatureBase):
 
     The check of :attr:`~music21.meter.TimeSignature.beatCount`
     helps to distinguish the 'fast' (2-beat) from 'slow' (6-beat)
-    versions of 6/8.
+    versions of 6/8, for example.
 
     >>> fast68 = meter.TimeSignature('fast 6/8')
     >>> slow68 = meter.TimeSignature('slow 6/8')
@@ -485,9 +485,12 @@ class TimeSignature(TimeSignatureBase):
     >>> ts2n3 == ts3n2
     False
 
-    (Note: for a less restrictive test of this, see
+    For a less restrictive test of this, see
     :meth:`~music21.meter.TimeSignature.ratioEqual`
-    which returns True for all cases of '5/8').
+    which returns True for all cases of '5/8'.
+
+    >>> ts2n3.ratioEqual(ts3n2)
+    True
 
     Yes, equality is ever True:
 
