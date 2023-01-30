@@ -6,7 +6,7 @@
 # Authors:      Michael Scott Asato Cuthbert
 #               Christopher Ariza
 #
-# Copyright:    Copyright © 2008-2022 Michael Scott Asato Cuthbert
+# Copyright:    Copyright © 2008-2023 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
@@ -55,7 +55,6 @@ from functools import lru_cache
 import io
 from math import inf, isnan
 import typing as t
-from typing import TYPE_CHECKING  # pylint bug
 import unittest
 
 from music21 import common
@@ -68,7 +67,7 @@ from music21 import exceptions21
 from music21 import prebase
 
 
-if TYPE_CHECKING:
+if t.TYPE_CHECKING:
     from music21 import base
     from music21 import note
     from music21 import stream
@@ -264,7 +263,7 @@ def nextSmallerType(durType: str) -> str:
     return ordinalTypeFromNum[thisOrdinal + 1]
 
 
-def quarterLengthToClosestType(qLen: OffsetQLIn):
+def quarterLengthToClosestType(qLen: OffsetQLIn) -> tuple[str, bool]:
     '''
     Returns a two-unit tuple consisting of
 
@@ -302,6 +301,7 @@ def quarterLengthToClosestType(qLen: OffsetQLIn):
     music21.duration.DurationException: Cannot return types smaller than 2048th;
         qLen was: 0.00146484375
     '''
+    noteLengthType: OffsetQL
     if isinstance(qLen, fractions.Fraction):
         noteLengthType = 4 / qLen  # divides right...
     else:
@@ -785,7 +785,7 @@ def convertTypeToQuarterLength(
         raise DurationException(
             f'no such type ({dType}) available for conversion')
 
-    qtrLength = durationFromType
+    qtrLength: OffsetQL = durationFromType
 
     # weird medieval notational device; rarely used.
     if dotGroups is not None and len(dotGroups) > 1:
@@ -3524,7 +3524,7 @@ class TupletFixer:
             currentTupletDuration = opFrac(currentTupletDuration + n.duration.quarterLength)
             thisTup = n.duration.tuplets[0]
             tupDurationActual = thisTup.durationActual
-            if TYPE_CHECKING:
+            if t.TYPE_CHECKING:
                 assert tupDurationActual is not None
 
             thisTupType = tupDurationActual.type

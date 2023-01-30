@@ -7,7 +7,7 @@
 #               Christopher Ariza
 #               Neena Parikh
 #
-# Copyright:    Copyright © 2009-2022 Michael Scott Asato Cuthbert
+# Copyright:    Copyright © 2009-2023 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
@@ -26,7 +26,7 @@ from __future__ import annotations
 
 import copy
 import string
-from typing import TYPE_CHECKING  # pylint needs no alias
+import typing as t
 
 from music21 import base
 from music21 import common
@@ -37,7 +37,7 @@ from music21 import spanner
 from music21 import style
 
 
-if TYPE_CHECKING:
+if t.TYPE_CHECKING:
     from music21 import note
 
 
@@ -526,6 +526,7 @@ class GeneralMordent(Ornament):
         self.size = None  # interval.Interval (General, etc.) class
         self.quarterLength = 0.125  # 32nd note default
         self.size = interval.GenericInterval(2)
+        self.placement = 'above'
 
     def realize(self, srcObj: 'music21.note.Note', *, inPlace=False):
         '''
@@ -736,7 +737,7 @@ class Trill(Ornament):
 
     * Changed in v7: the size should be a generic second.
     '''
-    def __init__(self, **keywords):
+    def __init__(self, **keywords) -> None:
         super().__init__(**keywords)
         self.size: interval.IntervalBase = interval.GenericInterval(2)
 
@@ -1524,11 +1525,12 @@ class ArpeggioMark(Expression):
     '''
     def __init__(self, arpeggioType: str | None = None, **keywords):
         super().__init__(**keywords)
-        if arpeggioType is None:
+        if not arpeggioType:
             arpeggioType = 'normal'
         if arpeggioType not in ('normal', 'up', 'down', 'non-arpeggio'):
             raise ValueError(
-                'Arpeggio type must be "normal", "up", "down", or "non-arpeggio"'
+                'Arpeggio type must be "normal", "up", "down", or "non-arpeggio", '
+                + f'not {arpeggioType!r}.'
             )
         self.type = arpeggioType
 
@@ -1565,7 +1567,8 @@ class ArpeggioMarkSpanner(spanner.Spanner):
         super().__init__(*spannedElements, **keywords)
         if arpeggioType not in ('normal', 'up', 'down', 'non-arpeggio'):
             raise ValueError(
-                'Arpeggio type must be "normal", "up", "down", or "non-arpeggio"'
+                'Arpeggio type must be "normal", "up", "down", or "non-arpeggio", '
+                + f'not {arpeggioType!r}.'
             )
         self.type = arpeggioType
 

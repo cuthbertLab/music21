@@ -6,7 +6,7 @@
 # Authors:      Christopher Ariza
 #               Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2010-2022 Michael Scott Asato Cuthbert
+# Copyright:    Copyright © 2010-2023 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
@@ -19,7 +19,6 @@ from collections.abc import Sequence
 import copy
 import math
 import typing as t
-from typing import TYPE_CHECKING
 import unittest
 import warnings
 
@@ -43,7 +42,7 @@ from music21 import tempo
 from music21.midi.percussion import MIDIPercussionException, PercussionMapper
 
 
-if TYPE_CHECKING:
+if t.TYPE_CHECKING:
     from music21 import base
     from music21 import midi
 
@@ -825,7 +824,9 @@ def instrumentToMidiEvents(inputM21,
 # ------------------------------------------------------------------------------
 # Meta events
 
-def midiEventsToInstrument(eventList):
+def midiEventsToInstrument(
+    eventList: midi.MidiEvent | tuple[int, midi.MidiEvent]
+) -> instrument.Instrument:
     '''
     Convert a single MIDI event into a music21 Instrument object.
 
@@ -849,7 +850,7 @@ def midiEventsToInstrument(eventList):
     from music21 import midi as midiModule
 
     if not common.isListLike(eventList):
-        event = eventList
+        event = t.cast(midiModule.MidiEvent, eventList)
     else:  # get the second event; first is delta time
         event = eventList[1]
 
@@ -1816,10 +1817,12 @@ def getNotesFromEvents(
     return notes
 
 
-def getMetaEvents(events):
+def getMetaEvents(
+    events: list[tuple[int, midi.MidiEvent]]
+) -> list[tuple[int, base.Music21Object]]:
     from music21.midi import MetaEvents, ChannelVoiceMessages
 
-    metaEvents = []  # store pairs of abs time, m21 object
+    metaEvents: list[tuple[int, base.Music21Object]] = []  # store pairs of abs time, m21 object
     last_program: int = -1
     for eventTuple in events:
         timeEvent, e = eventTuple
@@ -2084,7 +2087,7 @@ def midiTrackToStream(
         ts_iter = conductorPart['TimeSignature']
         if ts_iter:
             meterStream = ts_iter.stream()
-            if TYPE_CHECKING:
+            if t.TYPE_CHECKING:
                 assert meterStream is not None
 
             # Supply any missing time signature at the start
@@ -2223,8 +2226,6 @@ def conductorStream(s: stream.Stream) -> stream.Part:
             lastOffset = offset_in_s
         for s_or_inner_stream in s.recurse(streamsOnly=True, includeSelf=True):
             s_or_inner_stream.removeByClass(klass)
-
-    conductorPart.coreElementsChanged()
 
     # Defaults
     if not conductorPart.getElementsByClass(tempo.MetronomeMark):
@@ -3772,34 +3773,38 @@ class Test(unittest.TestCase):
         self.assertEqual(mtsRepr.count('velocity=114'), 1)
         self.assertEqual(mtsRepr.count('velocity=13'), 1)
 
-    def testMidiExportVelocityB(self):
+    def testMidiExportVelocityB(self) -> None:
         import random
         from music21 import volume
 
-        s1 = stream.Stream()
+        s1: stream.Stream = stream.Stream()
         shift = [0, 6, 12]
         amps = [(x / 10. + 0.4) for x in range(6)]
         amps = amps + list(reversed(amps))
 
         qlList = [1.5] * 6 + [1] * 8 + [2] * 6 + [1.5] * 8 + [1] * 4
+
+        c: note.Rest | chord.Chord
         for j, ql in enumerate(qlList):
             if random.random() > 0.6:
                 c = note.Rest()
             else:
-                c = chord.Chord(['c3', 'd-4', 'g5'])
+                ch = chord.Chord(['c3', 'd-4', 'g5'])
                 vChord: list[volume.Volume] = []
-                for i, unused_cSub in enumerate(c):
+                for i, unused_cSub in enumerate(ch):
                     v = volume.Volume()
                     v.velocityScalar = amps[(j + shift[i]) % len(amps)]
                     v.velocityIsRelative = False
                     vChord.append(v)
-                c.setVolumes(vChord)
+                ch.setVolumes(vChord)
+                c = ch
             c.duration.quarterLength = ql
             s1.append(c)
 
-        s2 = stream.Stream()
         random.shuffle(qlList)
         random.shuffle(amps)
+
+        s2: stream.Stream[note.Note] = stream.Stream()
         for j, ql in enumerate(qlList):
             n = note.Note(random.choice(['f#2', 'f#2', 'e-2']))
             n.duration.quarterLength = ql

@@ -45,6 +45,7 @@ from __future__ import annotations
 import collections
 import copy
 import random
+import typing as t
 import unittest
 
 from music21 import chord
@@ -61,7 +62,11 @@ from music21.figuredBass import realizerScale
 from music21.figuredBass import rules
 from music21.figuredBass import segment
 
-def figuredBassFromStream(streamPart):
+if t.TYPE_CHECKING:
+    from music21.stream.iterator import StreamIterator
+
+
+def figuredBassFromStream(streamPart: stream.Stream) -> FiguredBassLine:
     # noinspection PyShadowingNames
     '''
     Takes a :class:`~music21.stream.Part` (or another :class:`~music21.stream.Stream` subclass)
@@ -89,28 +94,27 @@ def figuredBassFromStream(streamPart):
     * Changed in v7.3: multiple figures in same lyric (e.g. '64') now supported.
     '''
     sf = streamPart.flatten()
-    sfn = sf.notes
-
-    keyList = sf.getElementsByClass(key.Key)
-    myKey = None
-    if not keyList:
-        keyList = sf.getElementsByClass(key.KeySignature)
-        if not keyList:
-            myKey = key.Key('C')
-        else:
-            myKey = keyList[0].asKey('major')
+    sfn = sf.getElementsByClass(note.Note)
+    myKey: key.Key
+    if firstKey := sf[key.Key].first():
+        myKey = firstKey
+    elif firstKeySignature := sf[key.KeySignature].first():
+        myKey = firstKeySignature.asKey('major')
     else:
-        myKey = keyList[0]
+        myKey = key.Key('C')
 
-    tsList = sf.getElementsByClass(meter.TimeSignature)
-    if not tsList:
+    ts: meter.TimeSignature
+    if first_ts := sf[meter.TimeSignature].first():
+        ts = first_ts
+    else:
         ts = meter.TimeSignature('4/4')
-    else:
-        ts = tsList[0]
 
     fb = FiguredBassLine(myKey, ts)
     if streamPart.hasMeasures():
-        paddingLeft = streamPart.measure(0).paddingLeft
+        m_first = streamPart.measure(0, indicesNotNumbers=True)
+        if t.TYPE_CHECKING:
+            assert m_first is not None
+        paddingLeft = m_first.paddingLeft
         if paddingLeft != 0.0:
             fb._paddingLeft = paddingLeft
 

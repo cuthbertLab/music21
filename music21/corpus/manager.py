@@ -22,7 +22,7 @@ from __future__ import annotations
 from collections.abc import Iterable
 import pathlib
 import os
-from typing import TYPE_CHECKING
+import typing as t
 
 from music21 import common
 from music21 import converter
@@ -33,7 +33,7 @@ from music21 import metadata
 from music21.corpus import corpora
 
 
-if TYPE_CHECKING:
+if t.TYPE_CHECKING:
     from music21.metadata import bundles
     from music21 import stream
 

@@ -6,7 +6,7 @@
 # Authors:      Michael Scott Asato Cuthbert
 #               Christopher Ariza
 #
-# Copyright:    Copyright © 2009-2022 Michael Scott Asato Cuthbert
+# Copyright:    Copyright © 2009-2023 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
@@ -21,7 +21,6 @@ from collections.abc import Iterable, Sequence
 import copy
 import typing as t
 from typing import overload  # pycharm bug
-from typing import TYPE_CHECKING  # pylint bug
 import unittest
 
 from music21 import beam
@@ -41,7 +40,7 @@ from music21.chord import tables
 from music21.chord import tools
 
 
-if TYPE_CHECKING:
+if t.TYPE_CHECKING:
     from music21 import stream
 
 
@@ -215,6 +214,8 @@ class ChordBase(note.NotRest):
         Does not clear any caches.
 
         Also requires that notes be iterable.
+
+        Changed in v9: incorrect arguments raise TypeError
         '''
         # quickDuration specifies whether the duration object for the chord
         # should be taken from the first note of the list.
@@ -253,8 +254,7 @@ class ChordBase(note.NotRest):
                     self._notes.append(note.Note(n))
                 # self._notes.append({'pitch':music21.pitch.Pitch(n)})
             else:
-                # TODO: v8 raise TypeError
-                raise ChordException(f'Could not process input argument {n}')
+                raise TypeError(f'Could not process input argument {n}')
 
         for n in self._notes:
             # noinspection PyProtectedMember
@@ -470,7 +470,7 @@ class ChordBase(note.NotRest):
         if velocities:  # avoid division by zero error
             self._volume.velocity = int(round(sum(velocities) / len(velocities)))
 
-        if TYPE_CHECKING:
+        if t.TYPE_CHECKING:
             assert self._volume is not None
         return self._volume
 
@@ -487,7 +487,7 @@ class ChordBase(note.NotRest):
             note.NotRest._setVolume(self, expr, setClient=False)
         elif common.isNum(expr):
             vol = self._getVolume()
-            if TYPE_CHECKING:
+            if t.TYPE_CHECKING:
                 assert isinstance(expr, (int, float))
 
             if expr < 1:  # assume a scalar
@@ -705,12 +705,11 @@ class Chord(ChordBase):
     >>> riteOfSpring
     <music21.chord.Chord F-2 A-2 C-3 F-3 G3 B-3 D-4 E-4>
 
-    Incorrect entries raise a ChordException:
+    Incorrect entries raise a TypeError:
 
     >>> chord.Chord([base])
     Traceback (most recent call last):
-    music21.chord.ChordException: Could not process input
-                                    argument <module 'music21.base' from '...base...'>
+    TypeError: Could not process input argument <module 'music21.base' from '...base...'>
 
     **Equality**
 
@@ -1117,14 +1116,47 @@ class Chord(ChordBase):
         if runSort:
             self.sortAscending(inPlace=True)
 
+    @overload
     def annotateIntervals(
-        self,
+        self: _ChordType,
         *,
-        inPlace=True,
-        stripSpecifiers=True,
-        sortPitches=True,
-        returnList=False
-    ):
+        inPlace: bool = False,
+        stripSpecifiers: bool = True,
+        sortPitches: bool = True,
+        returnList: t.Literal[True]
+    ) -> list[str]:
+        pass
+
+    @overload
+    def annotateIntervals(
+        self: _ChordType,
+        *,
+        inPlace: t.Literal[True],
+        stripSpecifiers: bool = True,
+        sortPitches: bool = True,
+        returnList: t.Literal[False] = False
+    ) -> None:
+        pass
+
+    @overload
+    def annotateIntervals(
+        self: _ChordType,
+        *,
+        inPlace: t.Literal[False] = False,
+        stripSpecifiers: bool = True,
+        sortPitches: bool = True,
+        returnList: t.Literal[False] = False
+    ) -> _ChordType:
+        pass
+
+    def annotateIntervals(
+        self: _ChordType,
+        *,
+        inPlace: bool = False,
+        stripSpecifiers: bool = True,
+        sortPitches: bool = True,
+        returnList: bool = False
+    ) -> _ChordType | None | list[str]:
         # noinspection PyShadowingNames
         '''
         Add lyrics to the chord that show the distance of each note from
@@ -1157,7 +1189,7 @@ class Chord(ChordBase):
         This chord was giving us problems:
 
         >>> c4 = chord.Chord(['G4', 'E4', 'B3', 'E3'])
-        >>> c4.annotateIntervals(stripSpecifiers=False)
+        >>> c4.annotateIntervals(inPlace=True, stripSpecifiers=False)
         >>> [ly.text for ly in c4.lyrics]
         ['m3', 'P8', 'P5']
         >>> c4.annotateIntervals(inPlace=True, stripSpecifiers=False, returnList=True)
@@ -1190,7 +1222,6 @@ class Chord(ChordBase):
         >>> [ly.text for ly in c.lyrics]
         ['5', '3']
         '''
-        # TODO: -- decide, should inPlace be False like others?
         # make a copy of self for reducing pitches, but attach to self
         c = copy.deepcopy(self)
         # this could be an option
@@ -1210,19 +1241,19 @@ class Chord(ChordBase):
                 notation = str(i.diatonic.generic.semiSimpleUndirected)
             lyricsList.append(notation)
 
-        if stripSpecifiers is True and sortPitches is True:
+        if stripSpecifiers and sortPitches:
             lyricsList.sort(reverse=True)
 
-        if returnList is True:
+        if returnList:
             return lyricsList
 
         for notation in lyricsList:
-            if inPlace is True:
+            if inPlace:
                 self.addLyric(notation)
             else:
                 c.addLyric(notation)
 
-        if inPlace is False:
+        if not inPlace:
             return c
 
     def areZRelations(self: _ChordType, other: _ChordType) -> bool:
@@ -1484,7 +1515,7 @@ class Chord(ChordBase):
         self: _ChordType,
         *,
         forceOctave: int | None = None,
-        inPlace: t.Literal[True] | t.Literal[False] = False,
+        inPlace: bool = False,
         leaveRedundantPitches: bool = False
     ) -> _ChordType | None:
         '''
@@ -1689,7 +1720,7 @@ class Chord(ChordBase):
 
         return True
 
-    def _findRoot(self):
+    def _findRoot(self) -> pitch.Pitch:
         '''
         Looks for the root usually by finding the note with the most 3rds above
         it.
@@ -2508,7 +2539,7 @@ class Chord(ChordBase):
         self._cache['inversion'] = inv
         return inv
 
-    def inversionName(self):
+    def inversionName(self) -> int | None:
         '''
         Returns an integer representing the common abbreviation for the
         inversion the chord is in. If chord is not in a common inversion,
@@ -4042,7 +4073,7 @@ class Chord(ChordBase):
         if inPlace is True:
             c2 = self
 
-        if TYPE_CHECKING:
+        if t.TYPE_CHECKING:
             from music21.stream import Stream
             assert isinstance(c2, Stream)
         # startOctave = c2.bass().octave
@@ -4588,11 +4619,13 @@ class Chord(ChordBase):
 
     def sortDiatonicAscending(self, *, inPlace=False):
         '''
-        The notes are sorted by Scale degree and then by Offset (so F## sorts below G-).
-        Notes that are the identical pitch retain their order
+        The notes are sorted by :attr:`~music21.pitch.Pitch.diatonicNoteNum`
+        or vertical position on a grand staff (so F## sorts below G-).
+        Notes that are the identical diatonicNoteNum are further sorted by
+        :attr:`~music21.pitch.Pitch.ps` (midi numbers that accommodate floats).
 
-        After talking with Daniel Jackson, let's try to make the chord object as immutable
-        as possible, so we return a new Chord object with the notes arranged from lowest to highest
+        We return a new Chord object with the notes arranged from lowest to highest
+        (unless inPlace=True)
 
         >>> cMajUnsorted = chord.Chord(['E4', 'C4', 'G4'])
         >>> cMajSorted = cMajUnsorted.sortDiatonicAscending()
@@ -4603,6 +4636,10 @@ class Chord(ChordBase):
         >>> c2.sortDiatonicAscending(inPlace=True)
         >>> c2
         <music21.chord.Chord C4 E4 G4>
+
+        >>> sameDNN = chord.Chord(['F#4', 'F4'])
+        >>> sameDNN.sortDiatonicAscending()
+        <music21.chord.Chord F4 F#4>
 
         * Changed in v6: if inPlace is True do not return anything.
         '''
@@ -4724,7 +4761,7 @@ class Chord(ChordBase):
 
     @property    # type: ignore
     @cacheMethod
-    def commonName(self):
+    def commonName(self) -> str:
         '''
         Return the most common name associated with this Chord as a string.
         Checks some common enharmonic equivalents.
@@ -5009,7 +5046,7 @@ class Chord(ChordBase):
             self._duration = pitchZeroDuration
 
         d_out = self._duration
-        if TYPE_CHECKING:
+        if t.TYPE_CHECKING:
             assert isinstance(d_out, Duration)
         return d_out
 

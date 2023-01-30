@@ -17,7 +17,6 @@ from __future__ import annotations
 
 from collections.abc import Sequence
 import typing as t
-from typing import TYPE_CHECKING  # pylint needs no alias
 import unittest
 
 from music21.base import Music21Object
@@ -28,7 +27,7 @@ from music21.tree import spans
 from music21.tree import timespanTree
 from music21.tree import trees
 
-if TYPE_CHECKING:
+if t.TYPE_CHECKING:
     from music21 import stream
 
 

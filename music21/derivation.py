@@ -17,9 +17,10 @@ This module defines objects for tracking the derivation of one
 '''
 from __future__ import annotations
 
+import weakref
 from collections.abc import Generator
 import functools
-from typing import TYPE_CHECKING  # Pylint bug
+import typing as t
 import unittest
 
 from music21 import common
@@ -27,7 +28,7 @@ from music21.common.objects import SlottedObjectMixin
 from music21 import environment
 
 
-if TYPE_CHECKING:
+if t.TYPE_CHECKING:
     from music21 import base
 
 
@@ -148,9 +149,9 @@ class Derivation(SlottedObjectMixin):
 
     # INITIALIZER #
 
-    def __init__(self, client=None):
+    def __init__(self, client: base.Music21Object | None = None):
         # store a reference to the Music21Object that has this Derivation object as a property
-        self._client = None
+        self._client: weakref.ReferenceType | None = None
         self._clientId: int | None = None  # store python-id to optimize w/o unwrapping
         self._method: str | None = None
         # origin should be stored as a weak ref -- the place where the client was derived from.
@@ -211,7 +212,7 @@ class Derivation(SlottedObjectMixin):
             self._client = None
         else:
             self._clientId = id(client)
-            self._client = common.wrapWeakref(client)
+            self._client = common.wrapWeakref(client)  # type: ignore
 
     def chain(self) -> Generator[base.Music21Object, None, None]:
         '''

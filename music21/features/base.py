@@ -6,7 +6,7 @@
 # Authors:      Christopher Ariza
 #               Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2011-2022 Michael Scott Asato Cuthbert
+# Copyright:    Copyright © 2011-2023 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 from __future__ import annotations
@@ -135,7 +135,10 @@ class FeatureExtractor:
     Usage of a DataInstance offers significant performance advantages, as common forms of
     the Stream are cached for easy processing.
     '''
-    def __init__(self, dataOrStream=None, **keywords):
+    def __init__(self,
+                 dataOrStream=None,
+                 **keywords
+                 ) -> None:
         self.stream = None  # the original Stream, or None
         self.data: DataInstance | None = None  # a DataInstance object: use to get data
         self.setData(dataOrStream)

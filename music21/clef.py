@@ -7,7 +7,7 @@
 #               Christopher Ariza
 #               Michael Bodenbach
 #
-# Copyright:    Copyright © 2009-2022 Michael Scott Asato Cuthbert
+# Copyright:    Copyright © 2009-2023 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
@@ -19,7 +19,7 @@ within :class:`~music21.stream.Measure` objects.
 from __future__ import annotations
 
 from collections.abc import Iterable, Sequence
-from typing import TYPE_CHECKING  # pylint needs no alias
+import typing as t
 import unittest
 
 from music21 import base
@@ -29,7 +29,7 @@ from music21 import pitch
 from music21 import style
 
 
-if TYPE_CHECKING:
+if t.TYPE_CHECKING:
     from music21 import stream
 
 
@@ -126,7 +126,7 @@ class Clef(base.Music21Object):
     _styleClass = style.TextStyle
     classSortOrder = 0
 
-    def __init__(self, **keywords):
+    def __init__(self, **keywords) -> None:
         super().__init__(**keywords)
         self.sign: str | None = None
         # line counts start from the bottom up, the reverse of musedata
@@ -283,7 +283,7 @@ class PitchClef(Clef):
             ''',
     }
 
-    def __init__(self, **keywords):
+    def __init__(self, **keywords) -> None:
         super().__init__(**keywords)
         self.lowestLine: int = 31
 
@@ -879,7 +879,7 @@ def clefFromString(clefString, octaveShift=0) -> Clef:
             clefObj.line = lineNum
         else:
             ClefType = line_list[lineNum]
-            if TYPE_CHECKING:
+            if t.TYPE_CHECKING:
                 assert ClefType is not None
                 assert issubclass(ClefType, PitchClef)
             clefObj = ClefType()

@@ -7,7 +7,7 @@
 #               Michael Scott Asato Cuthbert
 #               Evan Lynch
 #
-# Copyright:    Copyright © 2009-2022 Michael Scott Asato Cuthbert
+# Copyright:    Copyright © 2009-2023 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
@@ -45,7 +45,6 @@ __all__ = [
 ]
 
 import typing as t
-from typing import TYPE_CHECKING  # pylint needs no alias
 import unittest
 
 from music21 import common
@@ -58,7 +57,7 @@ from music21.graph import primitives
 from music21.graph import utilities
 
 
-if TYPE_CHECKING:
+if t.TYPE_CHECKING:
     from music21 import stream
 
 

@@ -6,7 +6,7 @@
 # Authors:      Christopher Ariza
 #               Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2009-2022 Michael Scott Asato Cuthbert
+# Copyright:    Copyright © 2009-2023 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # -----------------------------------------------------------------------------
 '''
@@ -21,7 +21,6 @@ import copy
 import fractions
 from math import gcd
 import typing as t
-from typing import TYPE_CHECKING  # pylint needs no alias
 import unittest
 
 from music21 import base
@@ -40,7 +39,7 @@ from music21.meter.core import MeterSequence
 
 environLocal = environment.Environment('meter')
 
-if TYPE_CHECKING:
+if t.TYPE_CHECKING:
     from music21 import stream
 
 # this is just a placeholder so that .beamSequence, etc. do not need to

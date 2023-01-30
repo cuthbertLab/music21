@@ -8,7 +8,7 @@
 #               Amy Hailes
 #               Christopher Ariza
 #
-# Copyright:    Copyright © 2009-2022 Michael Scott Asato Cuthbert
+# Copyright:    Copyright © 2009-2023 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
@@ -27,7 +27,6 @@ import enum
 import math
 import re
 import typing as t
-from typing import TYPE_CHECKING  # pylint needs no alias
 
 from music21 import base
 from music21 import common
@@ -37,7 +36,7 @@ from music21 import environment
 from music21 import exceptions21
 
 
-if TYPE_CHECKING:
+if t.TYPE_CHECKING:
     from music21 import key
     from music21 import note
     from music21 import pitch
@@ -3072,7 +3071,7 @@ class Interval(IntervalBase):
 
         # both self.diatonic and self.chromatic can still both be None if an
         # empty Interval class is being created, such as in deepcopy
-        if TYPE_CHECKING:
+        if t.TYPE_CHECKING:
             assert diatonic is not None
             assert chromatic is not None
 

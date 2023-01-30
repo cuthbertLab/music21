@@ -8,7 +8,7 @@
 #               Jacob Tyler Walls
 #               Christopher Ariza
 #
-# Copyright:    Copyright © 2011-2022, Michael Scott Asato Cuthbert
+# Copyright:    Copyright © 2011-2023 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
@@ -94,8 +94,8 @@ CHORD_TYPES = collections.OrderedDict([
     ('minor-11th', ['1,-3,5,-7,9,11', ['m11', 'min11']]),  # Y
     ('augmented-major-11th', ['1,3,#5,7,9,11', ['+M11', 'augmaj11']]),  # N
     ('augmented-11th', ['1,3,#5,-7,9,11', ['+11', 'aug11']]),  # N
-    ('half-diminished-11th', ['1,-3,-5,-7,-9,11', ['ø11']]),  # N
-    ('diminished-11th', ['1,-3,-5,--7,-9,-11', ['o11', 'dim11']]),  # N
+    ('half-diminished-11th', ['1,-3,-5,-7,9,11', ['ø11']]),  # N
+    ('diminished-11th', ['1,-3,-5,--7,9,11', ['o11', 'dim11']]),  # N
 
     # thirteenths
     ('major-13th', ['1,3,5,7,9,11,13', ['M13', 'Maj13']]),  # Y
@@ -323,6 +323,22 @@ class Harmony(chord.Chord):
         >>> h.bass(note.Note('E'))
         >>> h.figure
         'CM'
+
+        OMIT_FROM_DOCS
+
+        Fixed storing deduced figures by avoiding duplicate chordStepModifications:
+
+        >>> h = harmony.ChordSymbol('CM7omit5')
+        >>> h.addChordStepModification(harmony.ChordStepModification(modType='add', degree=4))
+        >>> h.findFigure()
+        'Cmaj7 subtract 5 add 4'
+
+        >>> h.figure
+        'CM7omit5'
+
+        >>> h.figure = h.findFigure()
+        >>> h.figure
+        'Cmaj7 subtract 5 add 4'
         '''
         if self._figure is None:
             return self.findFigure()
@@ -504,7 +520,8 @@ class Harmony(chord.Chord):
             raise HarmonyException(
                 f'cannot add this object as a degree: {degree}')
 
-        self.chordStepModifications.append(degree)
+        if degree not in self.chordStepModifications:
+            self.chordStepModifications.append(degree)
         if updatePitches:
             self._updatePitches()
 
@@ -546,7 +563,8 @@ class ChordStepModification(prebase.ProtoM21Object):
 
     >>> hd = harmony.ChordStepModification('add', 4)
     >>> hd
-    <music21.harmony.ChordStepModification modType=add degree=4 interval=None>
+    <music21.harmony.ChordStepModification modType=add
+        degree=4 interval=<music21.interval.Interval P1>>
 
     >>> hd = harmony.ChordStepModification('alter', 3, 1)
     >>> hd
@@ -581,21 +599,31 @@ class ChordStepModification(prebase.ProtoM21Object):
     # INITIALIZER #
 
     def __init__(self, modType=None, degree=None, intervalObj=None):
-        self._modType = None  # add, alter, subtract
-        self._interval = None  # alteration of degree, alter ints in mxl
-        self._degree = None  # the degree number, where 3 is the third
-        # use properties if defined
+        self._modType: str | None = None  # add, alter, subtract
+        self._interval: interval.Interval  # alteration of degree, alter ints in mxl
+        self._degree: int | None = None  # the degree number, where 3 is the third
+        # use properties if defined: runs certain type conversions
         if modType is not None:
             self.modType = modType
         if degree is not None:
             self.degree = degree
         if intervalObj is not None:
             self.interval = intervalObj
+        else:
+            self.interval = interval.Interval('P1')
 
     # SPECIAL METHODS #
 
     def _reprInternal(self):
         return f'modType={self.modType} degree={self.degree} interval={self.interval}'
+
+    def __eq__(self, other):
+        return (
+            isinstance(other, ChordStepModification)
+            and self.modType == other.modType
+            and self.degree == other.degree
+            and self.interval == other.interval
+        )
 
     # PUBLIC PROPERTIES #
 
@@ -912,11 +940,11 @@ def chordSymbolFigureFromChord(inChord: chord.Chord, includeChordType=False):
     >>> harmony.chordSymbolFigureFromChord(c, True)
     ('F+11', 'augmented-11th')
 
-    >>> c = chord.Chord(['G3', 'B-3', 'D-4', 'F4', 'A-3', 'C4'])
+    >>> c = chord.Chord(['G3', 'B-3', 'D-4', 'F4', 'A3', 'C4'])
     >>> harmony.chordSymbolFigureFromChord(c, True)
     ('Gø11', 'half-diminished-11th')
 
-    >>> c = chord.Chord(['E-3', 'G-3', 'B--3', 'D--4', 'F-3', 'A--3'])
+    >>> c = chord.Chord(['E-3', 'G-3', 'B--3', 'D--4', 'F3', 'A-3'])
     >>> harmony.chordSymbolFigureFromChord(c, True)
     ('E-o11', 'diminished-11th')
 
@@ -1624,7 +1652,9 @@ class ChordSymbol(Harmony):
 
         return list(c.pitches)
 
-    def _adjustPitchesForChordStepModifications(self, pitches):
+    def _adjustPitchesForChordStepModifications(
+        self, pitches: t.Iterable[pitch.Pitch]
+    ) -> list[pitch.Pitch]:
         '''
         degree-value element: indicates degree in chord, positive integers only
 
@@ -1788,7 +1818,7 @@ class ChordSymbol(Harmony):
             elif chordStepModification.modType == 'alter':
                 typeAlter(chordStepModification)
 
-        return tuple(pitches)
+        return pitches
 
     def _parseAddAlterSubtract(self, remaining: str, modType: str) -> str:
         '''
@@ -1890,7 +1920,7 @@ class ChordSymbol(Harmony):
 
         return notationString
 
-    def _parseFigure(self):
+    def _parseFigure(self) -> None:
         '''
         Translate the figure string (regular expression) into a meaningful
         Harmony object by identifying the root, bass, inversion, kind, and
@@ -2112,7 +2142,7 @@ class ChordSymbol(Harmony):
             self.inversion(None, transposeOnSet=False)
             inversionNum = None
 
-        pitches = list(self._adjustPitchesForChordStepModifications(pitches))
+        pitches = self._adjustPitchesForChordStepModifications(pitches)
 
         if inversionNum not in (0, None):
             for p in pitches[0:inversionNum]:

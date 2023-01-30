@@ -6,7 +6,7 @@
 # Authors:      Michael Scott Asato Cuthbert
 #               Christopher Ariza
 #
-# Copyright:    Copyright © 2006-2022 Michael Scott Asato Cuthbert
+# Copyright:    Copyright © 2006-2023 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
@@ -21,7 +21,6 @@ from collections.abc import Iterable, Sequence
 import copy
 import typing as t
 from typing import overload  # PyCharm bug
-from typing import TYPE_CHECKING  # PyLint bug
 import unittest
 
 from music21 import base
@@ -39,7 +38,7 @@ from music21 import style
 from music21 import tie
 from music21 import volume
 
-if TYPE_CHECKING:
+if t.TYPE_CHECKING:
     from music21 import articulations
     from music21 import chord
     from music21 import instrument
@@ -1015,7 +1014,7 @@ class NotRest(GeneralNote):
                               *,
                               ignoreAttributes: set[str] | None = None) -> _NotRestType:
         new = super()._deepcopySubclassable(memo, ignoreAttributes={'_chordAttached'})
-        if TYPE_CHECKING:
+        if t.TYPE_CHECKING:
             new = t.cast(_NotRestType, new)
         # let the chord restore _chordAttached
 
@@ -1227,7 +1226,7 @@ class NotRest(GeneralNote):
                 self._volume = volume.Volume(client=forceClient)
 
         volume_out = self._volume
-        if TYPE_CHECKING:
+        if t.TYPE_CHECKING:
             assert volume_out is not None
 
         return volume_out
@@ -1814,9 +1813,11 @@ class Unpitched(NotRest):
 
     equalityAttributes = ('displayStep', 'displayOctave')
 
-    def __init__(self,
-                 displayName=None,
-                 **keywords):
+    def __init__(
+        self,
+        displayName: str | None = None,
+        **keywords
+    ):
         super().__init__(**keywords)
         self._chordAttached: percussion.PercussionChord | None = None
 
@@ -1825,7 +1826,7 @@ class Unpitched(NotRest):
         if displayName:
             display_pitch = Pitch(displayName)
             self.displayStep = display_pitch.step
-            self.displayOctave = display_pitch.octave
+            self.displayOctave = display_pitch.implicitOctave
 
     def _getStoredInstrument(self):
         return self._storedInstrument

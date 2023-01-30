@@ -33,11 +33,17 @@ or wherever you have downloaded EasyABC to
 (PC users might need: 'c:/program files (x86)/easyabc/easyabc.exe')
 (Thanks to Norman Schmidt for the heads-up)
 
-There is a two-step process in converting ABC files to Music21 Streams.  First this module
+There is a two-step process in converting ABC files to music21 Streams.  First this module
 reads in the text-based .abc file and converts all the information into ABCToken objects.  Then
 the function :func:`music21.abcFormat.translate.abcToStreamScore` of
 the :ref:`moduleAbcFormatTranslate` module
 translates those Tokens into music21 objects.
+
+Music21 implements the entire v1.6 ABC standard (January 1997) found at
+https://abcnotation.com/standard/abc_v1.6.txt .  The system aims to support the
+v2.1 ABC standard (December 2011) found at
+https://abcnotation.com/wiki/abc:standard:v2.1 but some parts (e.g. 4.10 Variant Endings) are not
+implemented.  No support is yet given for the draft 2.2 standard.
 '''
 from __future__ import annotations
 
@@ -60,7 +66,6 @@ from collections.abc import Sequence
 import io
 import re
 import typing as t
-from typing import TYPE_CHECKING  # pylint needs no alias
 import unittest
 
 from music21 import common
@@ -70,7 +75,7 @@ from music21 import prebase
 
 from music21.abcFormat import translate
 
-if TYPE_CHECKING:
+if t.TYPE_CHECKING:
     from music21 import bar
     from music21 import clef
     from music21 import duration
@@ -104,6 +109,7 @@ ABC_BARS = [
     ('|', 'regular'),
     (':', 'dotted'),
 ]
+ABC_BARS_DICT = {d[0]: d[1] for d in ABC_BARS}
 
 # store a mapping of ABC representation to pitch values
 # key is (srcStr, carriedAccidental, str(keySignature)
@@ -156,7 +162,7 @@ class ABCToken(prebase.ProtoM21Object, common.objects.EqualSlottedObjectMixin):
     '''
     __slots__ = ('src',)
 
-    def __init__(self, src=''):
+    def __init__(self, src: str = ''):
         self.src: str = src  # store source character sequence
 
     def _reprInternal(self):
@@ -231,7 +237,7 @@ class ABCMetadata(ABCToken):
 
     # given a logical unit, create an object
     # may be a chord, notes, metadata, bars
-    def __init__(self, src=''):
+    def __init__(self, src: str = ''):
         super().__init__(src)
         self.tag: str = ''
         self.data: str = ''
@@ -782,17 +788,22 @@ class ABCMetadata(ABCToken):
 
 
 class ABCBar(ABCToken):
+    '''
+    An ABCBar token represents a barline, possibly with repeat information.
+
+    Currently 4.10 Variant
+    '''
     # given a logical unit, create an object
     # may be a chord, notes, metadata, bars
     __slots__ = ('barType', 'barStyle', 'repeatForm')
 
     def __init__(self, src):
         super().__init__(src)
-        self.barType = None  # repeat or barline
-        self.barStyle = None  # regular, heavy-light, etc
-        self.repeatForm = None  # end, start, bidrectional, first, second
+        self.barType = ''  # repeat or barline
+        self.barStyle = ''  # regular, heavy-light, etc
+        self.repeatForm = ''  # end, start, bidrectional, first, second
 
-    def parse(self):
+    def parse(self) -> None:
         '''
         Assign the bar-type based on the source string.
 
@@ -822,41 +833,44 @@ class ABCBar(ABCToken):
         >>> ab.repeatForm
         'start'
         '''
-        for abcStr, barTypeString in ABC_BARS:
-            if abcStr == self.src.strip():
-                # this gets lists of elements like
-                # light-heavy-repeat-end
-                barTypeComponents = barTypeString.split('-')
-                # this is a list of attributes
-                if 'repeat' in barTypeComponents:
-                    self.barType = 'repeat'
-                elif ('first' in barTypeComponents
-                      or 'second' in barTypeComponents):
-                    self.barType = 'barline'
-                    # environLocal.printDebug(['got repeat 1/2:', self.src])
-                else:
-                    self.barType = 'barline'
+        src_strip: str = self.src.strip()
+        if src_strip not in ABC_BARS_DICT:
+            return
 
-                # case of regular, dotted
-                if len(barTypeComponents) == 1:
-                    self.barStyle = barTypeComponents[0]
+        barTypeString = ABC_BARS_DICT[src_strip]
+        # this gets lists of elements like
+        # light-heavy-repeat-end
+        barTypeComponents = barTypeString.split('-')
+        # this is a list of attributes
+        if 'repeat' in barTypeComponents:
+            self.barType = 'repeat'
+        elif ('first' in barTypeComponents
+              or 'second' in barTypeComponents):
+            self.barType = 'barline'
+            # environLocal.printDebug(['got repeat 1/2:', self.src])
+        else:
+            self.barType = 'barline'
 
-                # case of light-heavy, light-light, etc
-                elif len(barTypeComponents) >= 2:
-                    # must get out cases of the start-tags for repeat boundaries
-                    # not yet handling
-                    if 'first' in barTypeComponents:
-                        self.barStyle = 'regular'
-                        self.repeatForm = 'first'  # not a repeat
-                    elif 'second' in barTypeComponents:
-                        self.barStyle = 'regular'
-                        self.repeatForm = 'second'  # not a repeat
-                    else:
-                        self.barStyle = barTypeComponents[0] + '-' + barTypeComponents[1]
-                # repeat form is either start/end for normal repeats
-                # get extra repeat information; start, end, first, second
-                if len(barTypeComponents) > 2:
-                    self.repeatForm = barTypeComponents[3]
+        # case of regular, dotted
+        if len(barTypeComponents) == 1:
+            self.barStyle = barTypeComponents[0]
+
+        # case of light-heavy, light-light, etc
+        elif len(barTypeComponents) >= 2:
+            # must get out cases of the start-tags for repeat boundaries
+            # not yet handling
+            if 'first' in barTypeComponents:
+                self.barStyle = 'regular'
+                self.repeatForm = 'first'  # not a repeat
+            elif 'second' in barTypeComponents:
+                self.barStyle = 'regular'
+                self.repeatForm = 'second'  # not a repeat
+            else:
+                self.barStyle = barTypeComponents[0] + '-' + barTypeComponents[1]
+        # repeat form is either start/end for normal repeats
+        # get extra repeat information; start, end, first, second
+        if len(barTypeComponents) > 2:
+            self.repeatForm = barTypeComponents[3]
 
     def isRepeat(self) -> bool:
         if self.barType == 'repeat':
@@ -1140,7 +1154,7 @@ class ABCSlurStart(ABCToken):
     '''
     __slots__ = ('slurObj',)
 
-    def __init__(self, src=''):
+    def __init__(self, src: str = ''):
         super().__init__(src)
         self.slurObj: spanner.Slur | None = None
 
@@ -1169,11 +1183,11 @@ class ABCCrescStart(ABCToken):
     '''
     __slots__ = ('crescObj',)
 
-    def __init__(self, src=''):
+    def __init__(self, src: str = ''):
         super().__init__(src)
         self.crescObj: dynamics.Crescendo | None = None
 
-    def fillCresc(self):
+    def fillCresc(self) -> None:
         from music21 import dynamics
         self.crescObj = dynamics.Crescendo()
 
@@ -1185,7 +1199,7 @@ class ABCDimStart(ABCToken):
     '''
     __slots__ = ('dimObj',)
 
-    def __init__(self, src=''):
+    def __init__(self, src: str = ''):
         super().__init__(src)
         self.dimObj: dynamics.Diminuendo | None = None
 
@@ -1264,9 +1278,9 @@ class ABCBrokenRhythmMarker(ABCToken):
     '''
     __slots__ = ('data',)
 
-    def __init__(self, src=''):
+    def __init__(self, src: str = ''):
         super().__init__(src)
-        self.data: str | None = None
+        self.data: str = ''
 
     def preParse(self):
         '''
@@ -1314,26 +1328,26 @@ class ABCNote(ABCToken):
         self.chordSymbols: list[str] = []
 
         # context attributes
-        self.inBar = None
-        self.inBeam = None
-        self.inGrace = None
+        self.inBar: bool | None = None
+        self.inBeam: bool | None = None
+        self.inGrace: bool | None = None
 
         # provide default duration from handler; may change during piece
         self.activeDefaultQuarterLength: float | None = None
         # store if a broken symbol applies; a pair of symbols, position (left, right)
-        self.brokenRhythmMarker = None
+        self.brokenRhythmMarker: tuple[str, str] | None = None
 
         # store key signature for pitch processing; this is an M21Object
-        self.activeKeySignature = None
+        self.activeKeySignature: key.KeySignature | None = None
 
         # store a tuplet if active
-        self.activeTuplet = None
+        self.activeTuplet: duration.Tuplet | None = None
 
         # store a spanner if active
         self.applicableSpanners: list[spanner.Spanner] = []
 
-        # store a tie if active
-        self.tie = None
+        # store a tie type if active
+        self.tie: str | None = None
 
         # store articulations if active
         self.articulations: list[str] = []
@@ -1635,7 +1649,7 @@ class ABCNote(ABCToken):
         # assume we have a complete fraction
         elif '/' in numStr:
             nStr, dStr = numStr.split('/')
-            if TYPE_CHECKING:
+            if t.TYPE_CHECKING:
                 assert nStr is not None
                 assert dStr is not None
             n = int(nStr.strip())
@@ -1734,7 +1748,13 @@ class ABCChord(ABCNote):
         self.chordSymbols, nonChordSymStr = self._splitChordSymbols(self.src)
 
         # position of the closing bracket
-        pos = nonChordSymStr.index(']')
+        try:
+            pos = nonChordSymStr.index(']')
+        except ValueError:
+            raise ABCHandlerException(
+                f'Bad chord indicator: {self.src}: no closing bracket found.'
+            )
+
         # Length modifier string behind the chord brackets
         outerLengthModifierStr = nonChordSymStr[pos + 1:]
         # String in the chord brackets
@@ -2481,7 +2501,7 @@ class ABCHandler:
             # no action: normal continuation of 1 char
             pass
 
-    def tokenProcess(self):
+    def tokenProcess(self) -> None:
         '''
         Process all token objects. First, calls preParse(), then
         does context assignments, then calls parse().
@@ -2562,6 +2582,9 @@ class ABCHandler:
             # notes within slur marks need to be added to the spanner
             if isinstance(token, ABCSlurStart):
                 token.fillSlur()
+                if t.TYPE_CHECKING:
+                    assert token.slurObj is not None
+
                 self.activeSpanners.append(token.slurObj)
                 self.activeParens.append('Slur')
             elif isinstance(token, ABCParenStop):
@@ -2598,11 +2621,15 @@ class ABCHandler:
 
             if isinstance(token, ABCCrescStart):
                 token.fillCresc()
+                if t.TYPE_CHECKING:
+                    assert token.crescObj is not None
                 self.activeSpanners.append(token.crescObj)
                 self.activeParens.append('Crescendo')
 
             if isinstance(token, ABCDimStart):
                 token.fillDim()
+                if t.TYPE_CHECKING:
+                    assert token.dimObj is not None
                 self.activeSpanners.append(token.dimObj)
                 self.activeParens.append('Diminuendo')
 
@@ -3227,7 +3254,7 @@ class ABCHandlerBar(ABCHandler):
     # divide elements of a character stream into objects and handle
     # store in a list, and pass global information to components
 
-    def __init__(self):
+    def __init__(self) -> None:
         # tokens are ABC objects in a linear stream
         super().__init__()
 

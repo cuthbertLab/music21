@@ -82,7 +82,7 @@ def getCorpusContentDirs() -> list[str]:
     >>> fp  # this list will be fragile, depending on composition of dirs
     ['airdsAirs', 'bach', 'beach', 'beethoven', 'chopin',
      'ciconia', 'corelli', 'cpebach',
-     'demos', 'essenFolksong', 'handel', 'haydn', 'joplin', 'josquin',
+     'demos', 'essenFolksong', 'handel', 'haydn', 'johnson_j_r', 'joplin', 'josquin',
      'leadSheet', 'luca', 'miscFolk', 'monteverdi', 'mozart', 'nottingham-dataset',
      'oneills1850', 'palestrina',
      'ryansMammoth', 'schoenberg', 'schubert', 'schumann_clara', 'schumann_robert',

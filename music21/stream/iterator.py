@@ -6,7 +6,7 @@
 # Authors:      Michael Scott Asato Cuthbert
 #               Christopher Ariza
 #
-# Copyright:    Copyright © 2008-2022 Michael Scott Asato Cuthbert
+# Copyright:    Copyright © 2008-2023 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # -----------------------------------------------------------------------------
 '''
@@ -20,7 +20,6 @@ from collections.abc import Callable, Iterable, Sequence
 import copy
 import typing as t
 from typing import overload  # PyCharm can't use alias
-from typing import TYPE_CHECKING  # pylint needs no alias
 import unittest
 import warnings
 
@@ -35,7 +34,7 @@ from music21 import base   # just for typing. (but in a bound, so keep here)
 
 from music21.sites import SitesException
 
-if TYPE_CHECKING:
+if t.TYPE_CHECKING:
     from music21 import stream
 
 T = t.TypeVar('T')
@@ -753,7 +752,7 @@ class StreamIterator(prebase.ProtoM21Object, Sequence[M21ObjType]):
                     if f(e, self) is False:
                         return False
                 except TypeError:  # one element filters are acceptable.
-                    if TYPE_CHECKING:
+                    if t.TYPE_CHECKING:
                         assert isinstance(f, filters.StreamFilter)
                     if f(e) is False:
                         return False
@@ -1578,7 +1577,7 @@ class OffsetIterator(StreamIterator, Sequence[list[M21ObjType]]):
                  restoreActiveSites=True,
                  activeInformation=None,
                  ignoreSorting=False
-                 ):
+                 ) -> None:
         super().__init__(srcStream,
                          # restrictClass=restrictClass,
                          filterList=filterList,
@@ -1594,7 +1593,7 @@ class OffsetIterator(StreamIterator, Sequence[list[M21ObjType]]):
         if self.raiseStopIterationNext:
             raise StopIteration
 
-        retElementList = None
+        retElementList: list[M21ObjType] = []
         # make sure that cleanup is not called during the loop...
         try:
             if self.nextToYield:
@@ -1762,17 +1761,18 @@ class RecursiveIterator(StreamIterator, Sequence[M21ObjType]):
     >>> bool(expressive)
     True
     '''
-    def __init__(self,
-                 srcStream,
-                 *,
-                 # restrictClass: type[M21ObjType] = base.Music21Object,
-                 filterList=None,
-                 restoreActiveSites=True,
-                 activeInformation=None,
-                 streamsOnly=False,
-                 includeSelf=False,
-                 ignoreSorting=False
-                 ):  # , parentIterator=None):
+    def __init__(
+        self,
+        srcStream,
+        *,
+        # restrictClass: type[M21ObjType] = base.Music21Object,
+        filterList=None,
+        restoreActiveSites=True,
+        activeInformation=None,
+        streamsOnly=False,
+        includeSelf=False,
+        ignoreSorting=False
+    ) -> None:  # , parentIterator=None):
         super().__init__(srcStream,
                          # restrictClass=restrictClass,
                          filterList=filterList,
@@ -1840,7 +1840,7 @@ class RecursiveIterator(StreamIterator, Sequence[M21ObjType]):
             # in a recursive filter, the stream does not need to match the filter,
             # only the internal elements.
             if e.isStream:
-                if TYPE_CHECKING:
+                if t.TYPE_CHECKING:
                     assert isinstance(e, stream.Stream)
 
                 childRecursiveIterator: RecursiveIterator[M21ObjType] = RecursiveIterator(

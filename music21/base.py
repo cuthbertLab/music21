@@ -6,7 +6,7 @@
 # Authors:      Michael Scott Asato Cuthbert
 #               Christopher Ariza
 #
-# Copyright:    Copyright © 2006-2022 Michael Scott Asato Cuthbert
+# Copyright:    Copyright © 2006-2023 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # -----------------------------------------------------------------------------
 '''
@@ -44,7 +44,6 @@ import functools
 from importlib.util import find_spec
 import typing as t
 from typing import overload  # Pycharm can't do alias
-from typing import TYPE_CHECKING  # pylint needs no alias
 import unittest
 import warnings
 import weakref
@@ -67,7 +66,7 @@ from music21.sorting import SortTuple, ZeroSortTupleLow, ZeroSortTupleHigh
 # needed for temporal manipulations; not music21 objects
 from music21 import tie
 
-if TYPE_CHECKING:
+if t.TYPE_CHECKING:
     import fractions
     from io import IOBase
     import pathlib
@@ -860,7 +859,7 @@ class Music21Object(prebase.ProtoM21Object):
     def derivation(self, newDerivation: Derivation | None) -> None:
         self._derivation = newDerivation
 
-    def clearCache(self, **keywords):
+    def clearCache(self, **keywords) -> None:
         '''
         A number of music21 attributes (especially with Chords and RomanNumerals, etc.)
         are expensive to compute and are therefore cached.  Generally speaking
@@ -880,7 +879,7 @@ class Music21Object(prebase.ProtoM21Object):
         '''
         # do not replace with self._cache.clear() -- leaves terrible
         # state for shallow copies.
-        self._cache: dict[str, t.Any] = {}
+        self._cache = {}
 
     @overload
     def getOffsetBySite(
@@ -1304,7 +1303,6 @@ class Music21Object(prebase.ProtoM21Object):
         priorityTargetOnly=False,
     ) -> Music21Object | None:
         return None  # until Astroid #1015
-
 
     def getContextByClass(
         self,
@@ -2427,7 +2425,7 @@ class Music21Object(prebase.ProtoM21Object):
         A reference to the most-recent object used to
         contain this object. In most cases, this will be a
         Stream or Stream sub-class. In most cases, an object's
-        activeSite attribute is automatically set when an the
+        activeSite attribute is automatically set when the
         object is attached to a Stream.
 
 
@@ -2749,7 +2747,7 @@ class Music21Object(prebase.ProtoM21Object):
             self._duration = Duration(0)
 
         d_out = self._duration
-        if TYPE_CHECKING:
+        if t.TYPE_CHECKING:
             assert d_out is not None
 
         return d_out
@@ -3316,7 +3314,7 @@ class Music21Object(prebase.ProtoM21Object):
 
     def splitByQuarterLengths(
         self,
-        quarterLengthList: list[int | float],
+        quarterLengthList: list[int | float | fractions.Fraction],
         addTies=True,
         displayTiedAccidentals=False
     ) -> _SplitTuple:

@@ -6,7 +6,7 @@
 # Authors:      Michael Scott Asato Cuthbert
 #               Christopher Ariza
 #
-# Copyright:    Copyright © 2008-2022 Michael Scott Asato Cuthbert
+# Copyright:    Copyright © 2008-2023 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # -----------------------------------------------------------------------------
 '''
@@ -25,7 +25,7 @@ from __future__ import annotations
 
 import copy
 from fractions import Fraction
-from typing import TYPE_CHECKING  # pylint needs no alias
+import typing as t
 import unittest
 
 from music21.base import Music21Object
@@ -38,7 +38,7 @@ from music21.exceptions21 import StreamException, ImmutableStreamException
 from music21.stream.iterator import StreamIterator, RecursiveIterator
 
 
-if TYPE_CHECKING:
+if t.TYPE_CHECKING:
     from music21.stream import Stream
 
 
@@ -47,7 +47,7 @@ class StreamCore(Music21Object):
     Core aspects of a Stream's behavior.  Any of these can change at any time.
     Users are encouraged only to create stream.Stream objects.
     '''
-    def __init__(self, **keywords):
+    def __init__(self, **keywords) -> None:
         super().__init__(**keywords)
         # hugely important -- keeps track of where the _elements are
         # the _offsetDict is a dictionary where id(element) is the
@@ -191,7 +191,8 @@ class StreamCore(Music21Object):
         # Note: not documenting 'highestTime' is on purpose, since can only be done for
         # elements already stored at end.  Infinite loop.
         try:
-            offset = opFrac(offset)
+            # try first, for the general case of not OffsetSpecial.
+            offset = opFrac(offset)  # type: ignore
         except TypeError:
             if offset not in OffsetSpecial:  # pragma: no cover
                 raise StreamException(f'Cannot set offset to {offset!r} for {element}')
@@ -207,11 +208,11 @@ class StreamCore(Music21Object):
     def coreElementsChanged(
         self,
         *,
-        updateIsFlat=True,
-        clearIsSorted=True,
-        memo=None,
-        keepIndex=False,
-    ):
+        updateIsFlat: bool = True,
+        clearIsSorted: bool = True,
+        memo: list[int] | None = None,
+        keepIndex: bool = False,
+    ) -> None:
         '''
         NB -- a "core" stream method that is not necessary for most users.
 
@@ -239,7 +240,7 @@ class StreamCore(Music21Object):
         False
         '''
         # experimental
-        if not self._mutable:
+        if not getattr(self, '_mutable', True):
             raise ImmutableStreamException(
                 'coreElementsChanged should not be triggered on an immutable stream'
             )
@@ -263,7 +264,8 @@ class StreamCore(Music21Object):
         if self._derivation is not None:
             sdm = self._derivation.method
             if sdm in ('flat', 'semiflat'):
-                origin: Stream = self._derivation.origin
+                origin: 'music21.stream.Stream' = t.cast('music21.stream.Stream',
+                                                         self._derivation.origin)
                 origin.clearCache()
 
         # may not always need to clear cache of all living sites, but may
@@ -546,7 +548,7 @@ class StreamCore(Music21Object):
         >>> scoreTree
         <ElementTree {20} (0.0 <0.-25...> to 8.0) <music21.stream.Score exampleScore>>
         '''
-        if TYPE_CHECKING:
+        if t.TYPE_CHECKING:
             assert isinstance(self, Stream)
         hashedAttributes = hash((tuple(classList or ()),
                                   flatten,
@@ -565,9 +567,9 @@ class StreamCore(Music21Object):
     def coreGatherMissingSpanners(
         self,
         *,
-        recurse=True,
-        requireAllPresent=True,
-        insert=True,
+        recurse: bool = True,
+        requireAllPresent: bool = True,
+        insert: bool = True,
         constrainingSpannerBundle: spanner.SpannerBundle | None = None
     ) -> list[spanner.Spanner] | None:
         '''

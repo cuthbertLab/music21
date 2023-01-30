@@ -7,7 +7,7 @@
 #               Christopher Ariza
 #               Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2010-2022 Michael Scott Asato Cuthbert
+# Copyright:    Copyright © 2010-2023 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
@@ -27,7 +27,6 @@ from __future__ import annotations
 from collections import OrderedDict
 from collections.abc import Iterable, Sequence
 import typing as t
-from typing import TYPE_CHECKING  # pylint needs no alias
 import unittest
 
 from music21 import environment
@@ -38,10 +37,8 @@ from music21 import note
 from music21 import key
 from music21 import pitch
 
-
-if TYPE_CHECKING:
+if t.TYPE_CHECKING:
     from music21 import stream
-
 
 environLocal = environment.Environment('analysis.discrete')
 
@@ -393,7 +390,7 @@ class KeyWeightKeyAnalysis(DiscreteAnalysis):
                 solution[i] += (toneWeights[(j - i) % 12] * pcDistribution[j])
         return solution
 
-    def _getLikelyKeys(self, keyResults, differences):
+    def _getLikelyKeys(self, keyResults, differences) -> list[t.Any] | None:
         ''' Takes in a list of probable key results in points and returns a
             list of keys in letters, sorted from most likely to least likely.
         '''
@@ -411,9 +408,10 @@ class KeyWeightKeyAnalysis(DiscreteAnalysis):
             # environLocal.printDebug(['added likely key', likelyKeys[pc]])
         return likelyKeys
 
-    def _getDifference(self, keyResults, pcDistribution, weightType):
-        ''' Takes in a list of numerical probable key results and returns the
-            difference of the top two keys
+    def _getDifference(self, keyResults, pcDistribution, weightType) -> None | list[int | float]:
+        '''
+        Takes in a list of numerical probable key results and returns the
+        difference of the top two keys.
         '''
         # case of empty analysis
         if keyResults is None:
@@ -954,14 +952,14 @@ class Ambitus(DiscreteAnalysis):
     # provide possible string matches for this processor
     identifiers = ['ambitus', 'span']
 
-    def __init__(self, referenceStream=None):
+    def __init__(self, referenceStream: stream.Stream | None = None):
         super().__init__(referenceStream=referenceStream)
         # Store the min and max Pitch instances for referenceStream
         # set by getPitchSpan(), which is called by _generateColors()
         self.minPitchObj: pitch.Pitch | None = None
         self.maxPitchObj: pitch.Pitch | None = None
 
-        self._pitchSpanColors = OrderedDict()
+        self._pitchSpanColors: OrderedDict[int, str] = OrderedDict()
         self._generateColors()
 
     def _generateColors(self, numColors=None):

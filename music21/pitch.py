@@ -23,7 +23,6 @@ import copy
 import itertools
 import math
 import typing as t
-from typing import TYPE_CHECKING  # pylint needs no alias
 from typing import overload  # Pycharm can't use an alias
 import unittest
 
@@ -38,7 +37,7 @@ from music21 import interval
 from music21 import prebase
 from music21 import style
 
-if TYPE_CHECKING:
+if t.TYPE_CHECKING:
     from music21 import note
 
 PitchType = t.TypeVar('PitchType', bound='Pitch')
@@ -1254,7 +1253,6 @@ class Accidental(prebase.ProtoM21Object, style.StyleMixin):
 
         This is needed when transposing Pitches: we need to retain accidental display properties.
 
-
         >>> a = pitch.Accidental('double-flat')
         >>> a.displayType = 'always'
         >>> b = pitch.Accidental('sharp')
@@ -2104,7 +2102,10 @@ class Pitch(prebase.ProtoM21Object):
         elif isinstance(value, str):
             # int version is used in interval.py which cannot import Pitch directly
             self._accidental = Accidental(value)
-        elif isinstance(value, (int, float)):
+        elif isinstance(value, int):
+            self._accidental = Accidental(value)
+            self._microtone = None
+        elif isinstance(value, float):
             # check and add any microtones
             alter, cents = _convertCentsToAlterAndCents(value * 100.0)
             self._accidental = Accidental(alter)
@@ -3938,7 +3939,7 @@ class Pitch(prebase.ProtoM21Object):
 
         >>> p4.getHigherEnharmonic()
         Traceback (most recent call last):
-        music21.pitch.AccidentalException: -5.0 is not a supported accidental type
+        music21.pitch.AccidentalException: -5 is not a supported accidental type
 
         Note that half accidentals (~ = half-sharp, ` = half-flat)
         get converted to microtones:

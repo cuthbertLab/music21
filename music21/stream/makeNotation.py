@@ -8,7 +8,7 @@
 #               Jacob Walls
 #               Evan Lynch
 #
-# Copyright:    Copyright © 2008-2022 Michael Scott Asato Cuthbert
+# Copyright:    Copyright © 2008-2023 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # -----------------------------------------------------------------------------
 from __future__ import annotations
@@ -16,7 +16,6 @@ from __future__ import annotations
 from collections.abc import Iterable, Generator
 import copy
 import typing as t
-from typing import TYPE_CHECKING  # pylint needs no alias
 import unittest
 
 from music21 import beam
@@ -36,7 +35,8 @@ from music21.common.types import StreamType, OffsetQL
 from music21.exceptions21 import StreamException
 
 
-if TYPE_CHECKING:
+if t.TYPE_CHECKING:
+    from fractions import Fraction
     from music21 import stream
     from music21.stream.iterator import StreamIterator
 
@@ -200,7 +200,7 @@ def makeBeams(
                 continue
 
             # getBeams
-            offset = 0.0
+            offset: float | Fraction = 0.0
             if m.paddingLeft != 0.0:
                 offset = opFrac(m.paddingLeft)
             elif m.paddingRight != 0.0:

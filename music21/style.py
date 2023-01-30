@@ -15,7 +15,7 @@ etc. such that precise positioning information, layout, size, etc. can be specif
 '''
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+import typing as t
 import unittest
 
 from music21 import common
@@ -23,7 +23,7 @@ from music21 import exceptions21
 from music21.prebase import ProtoM21Object
 
 
-if TYPE_CHECKING:
+if t.TYPE_CHECKING:
     from music21 import editorial
 
 
@@ -78,7 +78,7 @@ class Style(ProtoM21Object):
             ''',
     }
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.size = None
 
         self.relativeX: float | int | None = None
@@ -267,7 +267,7 @@ class NoteStyle(Style):
             ''',
     }
 
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__()
         self.stemStyle: Style | None = None
         self.accidentalStyle: Style | None = None
@@ -622,7 +622,7 @@ class StyleMixin(common.SlottedObjectMixin):
 
     __slots__ = ('_style', '_editorial')
 
-    def __init__(self):
+    def __init__(self) -> None:
         # no need to call super().__init__() on SlottedObjectMixin
         # This might be dangerous though
         self._style: Style | None = None

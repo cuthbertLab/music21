@@ -174,7 +174,7 @@ Licensing and Copyright
 The `music21` Toolkit
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Music21 is Copyright © 2006-2022, Michael Scott Asato Cuthbert.
+Music21 is Copyright © 2006-2023 Michael Scott Asato Cuthbert.
 Music21 code (excluding content encoded in the corpus) is
 free and open-source software, licensed under the BSD License.
 
