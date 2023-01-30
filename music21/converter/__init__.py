@@ -863,6 +863,7 @@ class Converter:
         Show that this musicxml file by Amy Beach is now parsed by BadMusicXMLConverter:
 
         >>> #_DOCS_SHOW s = corpus.parse('beach/prayer_of_a_tired_child')
+        >>> #_DOCS_HIDE -- we cannot know if the piece is already parsed or not.
         >>> s = corpus.parse('beach/prayer_of_a_tired_child', forceSource=True)  #_DOCS_HIDE
         >>> s.id
         'empty'
@@ -874,7 +875,8 @@ class Converter:
         newly registered subconverter:
 
         >>> converter.unregisterSubconverter(BadMusicXMLConverter)
-        >>> s = corpus.parse('beach/prayer_of_a_tired_child')
+        >>> #_DOCS_HIDE -- the forceSource will not have created a pickle.
+        >>> #_DOCS_SHOW s = corpus.parse('beach/prayer_of_a_tired_child')
         >>> s.id
         'empty'
         >>> s = corpus.parse('beach/prayer_of_a_tired_child', forceSource=True)
