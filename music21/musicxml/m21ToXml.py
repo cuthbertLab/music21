@@ -3164,6 +3164,9 @@ class MeasureExporter(XMLExporterBase):
         self.xmlRoot = Element('measure')
         self.currentDivisions = defaults.divisionsPerQuarter
 
+        # Adding ids to measure in the MusicXML export
+        _synchronizeIds(self.xmlRoot, self.stream)
+
         # TODO: allow for mid-measure transposition changes.
         self.transpositionInterval = None
         self.mxTranspose = None

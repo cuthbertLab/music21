@@ -805,7 +805,7 @@ class SpannerAnchor(base.Music21Object):
         if ql == 0:
             return f'at {self.offset}'
 
-        return f'at {self.offset}-{self.offset+ql}'
+        return f'at {self.offset}-{self.offset + ql}'
 
 
 class SpannerBundle(prebase.ProtoM21Object):

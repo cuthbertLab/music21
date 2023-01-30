@@ -452,6 +452,20 @@ class Test(unittest.TestCase):
         )
         self.assertEqual(len(tree.findall('.//measure/note/instrument')), 6)
 
+    def testExportIdOfMeasure(self):
+        ''' Check that id of measure are exported
+            as attributes of the <measure> eelement in MusicXML
+        '''
+        measure = stream.Measure(id='test', number=1)
+        measure.append(note.Note(type='whole'))
+        s = stream.Score(measure)
+        scEx = ScoreExporter(s)
+        tree = scEx.parse()
+
+        for measure_xml in tree.findall('.//measure'):
+            self.assertTrue('id' in measure_xml.attrib)
+            self.assertEqual(measure_xml.get('id'), 'test')
+
     def testMidiInstrumentNoName(self):
         i = instrument.Instrument()
         i.midiProgram = 42
