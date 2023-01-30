@@ -548,13 +548,48 @@ class Spanner(base.Music21Object):
 
     def fill(
         self,
-        searchStream,  # stream.Stream | None, but cannot import stream here
+        searchStream = None,  # stream.Stream | None, but cannot import stream here
         *,
         includeEndBoundary: bool = False,
         mustFinishInSpan: bool = False,
         mustBeginInSpan: bool = True,
         includeElementsThatEndAtStart: bool = False
     ):
+        '''
+        Fills in the intermediate elements of a spanner, that are found in searchStream between
+        the first element's offset and the last element's offset+duration.  If searchStream
+        is None, the first element's activeSite is used.  If the first element's activeSite
+        is None, a SpannerException is raised.  self.fillElementTypes is used to figure out
+        which of the elements in searchStream are appropriate to add to the spanner.  If
+        self.fillElementTypes is empty, no fill will take place.
+
+        Ottava is an example of a Spanner that can be filled. The spanner does not need
+        to be inserted into the stream in order to be filled.
+
+        >>> m = stream.Measure([note.Note('A'), note.Note('B'), note.Note('C')])
+        >>> ott1 = spanner.Ottava(m.notes[0], m.notes[2])
+        >>> ott1.fill(m)
+        >>> ott1
+        <music21.spanner.Ottava 8va transposing<...Note A><...Note B><...Note C>>
+
+        If the searchStream is not passed in, fill still happens in this case, because
+        the first note's activeSite is used instead.
+
+        >>> ott2 = spanner.Ottava(m.notes[0], m.notes[2])
+        >>> ott2.fill()
+        >>> ott2
+        <music21.spanner.Ottava 8va transposing<...Note A><...Note B><...Note C>>
+
+        If the searchStream is not passed, and the spanner's first element doesn't have
+        an activeSite, a SpannerException is raised.
+
+        >>> ott3 = spanner.Ottava(note.Note('D'), note.Note('E'))
+        >>> ott3.fill()
+        Traceback (most recent call last):
+        music21.spanner.SpannerException: ...requires a searchStream or getFirst().activeSite
+
+
+        '''
         if not self.fillElementTypes:
             # nothing to fill
             return
