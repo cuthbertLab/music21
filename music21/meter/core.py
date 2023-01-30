@@ -418,9 +418,6 @@ class MeterSequence(MeterTerminal):
 
     # SPECIAL METHODS #
 
-    def __eq__(self, other) -> bool:
-        return True
-
     def __deepcopy__(self, memo=None):
         '''
         Helper method to copy.py's deepcopy function. Call it from there.
