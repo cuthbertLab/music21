@@ -559,11 +559,9 @@ class Spanner(base.Music21Object):
         Fills in the intermediate elements of a spanner, that are found in searchStream between
         the first element's offset and the last element's offset+duration.  If searchStream
         is None, the first element's activeSite is used.  If the first element's activeSite
-        is None, a SpannerException is raised.  self.fillElementTypes is used to figure out
-        which of the elements in searchStream are appropriate to add to the spanner.  If
-        self.fillElementTypes is empty, no fill will take place.
+        is None, a SpannerException is raised.
 
-        Ottava is an example of a Spanner that can be filled. The spanner does not need
+        Ottava is an example of a Spanner that can be filled. The Ottava does not need
         to be inserted into the stream in order to be filled.
 
         >>> m = stream.Measure([note.Note('A'), note.Note('B'), note.Note('C')])
@@ -587,9 +585,8 @@ class Spanner(base.Music21Object):
         >>> ott3.fill()
         Traceback (most recent call last):
         music21.spanner.SpannerException: ...requires a searchStream or getFirst().activeSite
-
-
         '''
+
         if not self.fillElementTypes:
             # nothing to fill
             return
