@@ -4361,7 +4361,6 @@ class Pitch(prebase.ProtoM21Object):
         self: PitchType,
         value: interval.IntervalBase | str | int,
         *,
-        treatAsKeyChange: bool = False,
         inPlace: t.Literal[True]
     ) -> None:
         return None  # dummy until Astroid 1015
@@ -4371,7 +4370,6 @@ class Pitch(prebase.ProtoM21Object):
         self: PitchType,
         value: interval.IntervalBase | str | int,
         *,
-        treatAsKeyChange: bool = False,
         inPlace: t.Literal[False] = False
     ) -> PitchType:
         return self  # dummy until Astroid 1015
@@ -4380,7 +4378,6 @@ class Pitch(prebase.ProtoM21Object):
         self: PitchType,
         value: interval.IntervalBase | str | int,
         *,
-        treatAsKeyChange: bool = False,
         inPlace: bool = False
     ) -> PitchType | None:
         '''
@@ -4470,7 +4467,7 @@ class Pitch(prebase.ProtoM21Object):
         else:  # try to process
             intervalObj = interval.Interval(value)
 
-        p = intervalObj.transposePitch(self, treatAsKeyChange=treatAsKeyChange)
+        p = intervalObj.transposePitch(self)
         if not isinstance(value, int):
             p.spellingIsInferred = self.spellingIsInferred
 

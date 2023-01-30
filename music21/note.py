@@ -1674,7 +1674,7 @@ class Note(NotRest):
         else:
             raise NoteException(f'cannot set pitches with provided object: {value}')
 
-    def transpose(self, value, *, treatAsKeyChange=False, inPlace=False):
+    def transpose(self, value, *, inPlace=False):
         '''
         Transpose the Note by the user-provided
         value. If the value is an integer, the transposition is treated in half steps.
@@ -1734,7 +1734,7 @@ class Note(NotRest):
 
         # use inPlace, b/c if we are inPlace, we operate on self;
         # if we are not inPlace, post is a copy
-        post.pitch.transpose(intervalObj, treatAsKeyChange=treatAsKeyChange, inPlace=True)
+        post.pitch.transpose(intervalObj, inPlace=True)
         if (post.pitch.accidental is not None
                 and isinstance(value, (int, interval.ChromaticInterval))):
             ksContext = self.getContextByClass(key.KeySignature)

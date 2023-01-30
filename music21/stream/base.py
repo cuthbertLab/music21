@@ -5273,6 +5273,8 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         else:
             classFilterList = (note.Note, chord.Chord)
 
+        displayStatusesAreSet: bool = self.haveAccidentalsBeenMade()
+
         for inst in instrument_stream:
             if inst.transposition is None:
                 continue
@@ -5287,10 +5289,32 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
             trans = inst.transposition
             if reverse:
                 trans = trans.reverse()
+
+            displayStatuses = {}
+            if transposeKeySignature and displayStatusesAreSet:
+                # This is a key change, all of the accidental displayStatus
+                # values will still be valid after.  Stash them all off here.
+                for p in focus.pitches:
+                    if p.accidental is not None:
+                        displayStatuses[id(p)] = p.accidental.displayStatus
+                        continue
+                    displayStatuses[id(p)] = False
+
             focus.transpose(trans,
                             inPlace=True,
-                            treatAsKeyChange=transposeKeySignature,
                             classFilterList=classFilterList)
+
+            if transposeKeySignature and displayStatusesAreSet:
+                # Restore all the accidental displayStatus values here
+                # (transpose cleared them all).
+                for p in focus.pitches:
+                    if p.accidental is not None:
+                        p.accidental.displayStatus = displayStatuses[id(p)]
+                        continue
+                    if displayStatuses[id(p)] is True:
+                        p.accidental = pitch.Accidental(0)
+                        p.accidental.displayStatus = True
+
 
         # restore original durations
         for inst, original_ql in instrument_map.items():
@@ -8942,7 +8966,6 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         *,
         inPlace=False,
         recurse=True,
-        treatAsKeyChange=False,
         classFilterList=None
     ):
         # noinspection PyShadowingNames
@@ -9033,10 +9056,8 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
                         for p in e.pitches:  # type: ignore
                             intv.transposePitchKeyAware(p, k, inPlace=True)
                 else:
-                    if isinstance(e, (key.Key, key.KeySignature)):
-                        e.transpose(intv, inPlace=True)
-                    else:
-                        e.transpose(intv, treatAsKeyChange=treatAsKeyChange, inPlace=True)
+                    e.transpose(intv, inPlace=True)
+
         if not inPlace:
             return post
         else:

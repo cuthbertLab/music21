@@ -4570,36 +4570,20 @@ class Test(unittest.TestCase):
                           ('E#', True), ('E#', False), ('F#', False), ('F#', False)]
                          )
 
-        # transposing with treatAsKeyChange=True should keep displayStatus for all
-        # transposed accidentals
-        mStream.flatten().transpose('p5', treatAsKeyChange=True, inPlace=True)
+        mStream.flatten().transpose('p5', inPlace=True)
 
         # mStream.show()
 
         self.maxDiff = None
         self.assertEqual(collectAccidentalDisplayStatus(mStream),
-                         ['x', ('G#', False), ('G#', False), 'x', 'x', 'x', 'x',
-                          ('B#', True), ('B#', False), ('C#', False), ('F#', False), ('G#', False),
-                          ('G#', False), ('C#', False), ('C#', False), ('C#', False), ('C#', False),
-                          ('D#', False), ('D#', False), ('C#', False), ('D#', False), 'x', 'x',
-                          ('F#', False), ('F#', False), ('G#', False), ('G#', False), ('C#', False),
-                          ('C#', False), ('D#', False), ('D#', False), 'x', 'x', 'x', 'x', 'x', 'x',
-                          ('F#', False), ('F#', False), ('B#', True), ('B#', False),
-                          ('C#', False), ('C#', False)]
-                         )
-
-        # transposing without treatAsKeyChange=True should set displayStatus to None for all
-        # transposed accidentals
-        mStream.flatten().transpose('p4', inPlace=True)
-        self.assertEqual(collectAccidentalDisplayStatus(mStream),
-                         ['x', ('C#', None), ('C#', None), 'x', 'x', 'x', 'x',
-                          ('E#', None), ('E#', None), ('F#', None), 'x',
-                          ('C#', None), ('C#', None), ('F#', None), ('F#', None),
-                          ('F#', None), ('F#', None), ('G#', None), ('G#', None),
-                          ('F#', None), ('G#', None), 'x', 'x', 'x', 'x', ('C#', None),
-                          ('C#', None), ('F#', None), ('F#', None), ('G#', None),
-                          ('G#', None), 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x',
-                          ('E#', None), ('E#', None), ('F#', None), ('F#', None)]
+                         ['x', ('G#', None), ('G#', None), 'x', 'x', 'x', 'x',
+                          ('B#', None), ('B#', None), ('C#', None), ('F#', None), ('G#', None),
+                          ('G#', None), ('C#', None), ('C#', None), ('C#', None), ('C#', None),
+                          ('D#', None), ('D#', None), ('C#', None), ('D#', None), 'x', 'x',
+                          ('F#', None), ('F#', None), ('G#', None), ('G#', None), ('C#', None),
+                          ('C#', None), ('D#', None), ('D#', None), 'x', 'x', 'x', 'x', 'x', 'x',
+                          ('F#', None), ('F#', None), ('B#', None), ('B#', None),
+                          ('C#', None), ('C#', None)]
                          )
 
     def testMakeTiesAddNewMeasure(self):
