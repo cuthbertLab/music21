@@ -3243,7 +3243,9 @@ class Interval(IntervalBase):
 
     @property
     def transpositionChangesPitchClass(self) -> bool:
-        return self.simpleName != 'P1'
+        if self.simpleName == 'P1' and float(self.semitones) == float(int(self.semitones)):
+            return False
+        return True
 
     # -------------------------------------
     # methods
@@ -3460,10 +3462,7 @@ class Interval(IntervalBase):
         inheritAccidentalDisplayStatus: bool = False
         if not self.transpositionChangesPitchClass:
             # unison and any multiple of octave
-            # But check for fractional semitones, because those can slip
-            # through the "changes pitch class" check.
-            if float(self.semitones) == float(int(self.semitones)):
-                inheritAccidentalDisplayStatus = True
+            inheritAccidentalDisplayStatus = True
 
         if p.octave is None:
             useImplicitOctave = True
