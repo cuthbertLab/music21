@@ -2186,6 +2186,67 @@ class Test(unittest.TestCase):
         su1 = spanner.Slur()
         self.assertEqual(repr(su1), '<music21.spanner.Slur>')
 
+    def testSpannerFill(self):
+        from music21 import stream
+        from music21 import note
+        from music21 import spanner
+        theNotes = [note.Note('A'), note.Note('B'), note.Note('C'), note.Note('D')]
+        m = stream.Measure(theNotes)
+
+        # Spanner with no fillElementTypes
+        sp = spanner.Spanner(theNotes[0], theNotes[3])
+        sp.fill(m)
+        # should not have done anything
+        noFillElements = [theNotes[0], theNotes[3]]
+        self.assertEqual(len(sp), 2)
+        for i, el in enumerate(sp.getSpannedElements()):
+            self.assertIs(el, noFillElements[i])
+
+        # Ottava with filledStatus == True
+        ott1 = spanner.Ottava(noFillElements)
+        ott1.filledStatus = True  # pretend it has already been filled
+        ott1.fill(m)
+        # should not have done anything
+        self.assertEqual(len(sp), 2)
+        for i, el in enumerate(sp.getSpannedElements()):
+            self.assertIs(el, noFillElements[i])
+
+        # same Ottava but with filledStatus == False
+        ott1.filledStatus = False
+        ott1.fill(m)
+        # ott1 should have been filled
+        self.assertEqual(len(ott1), 4)
+        for i, el in enumerate(ott1.getSpannedElements()):
+            self.assertIs(el, theNotes[i])
+
+        # Ottava with no elements
+        ott2 = spanner.Ottava()
+        ott2.fill(m)
+        self.assertEqual(len(ott2), 0)
+
+        # Ottava with only element not in searchStream
+        expectedElements = [note.Note('E')]
+        ott3 = spanner.Ottava(expectedElements)
+        ott3.fill(m)
+        self.assertEqual(len(ott3), 1)
+        self.assertIs(ott3.getFirst(), expectedElements[0])
+
+        # Ottava with start element not in searchStream, end element is
+        expectedElements = [note.Note('F'), m.notes[0]]
+        ott4 = spanner.Ottava(expectedElements)
+        ott4.fill(m)
+        self.assertEqual(len(ott4), 2)
+        for i, el in enumerate(ott4.getSpannedElements()):
+            self.assertIs(el, expectedElements[i])
+
+        # Ottava with endElement not in searchStream, startElement is
+        expectedElements = [m.notes[0], note.Note('G')]
+        ott5 = spanner.Ottava(expectedElements)
+        ott5.fill(m)
+        self.assertEqual(len(ott5), 2)
+        for i, el in enumerate(ott5.getSpannedElements()):
+            self.assertIs(el, expectedElements[i])
+
     def testSpannerBundle(self):
         from music21 import spanner
         from music21 import stream
