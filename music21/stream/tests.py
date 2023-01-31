@@ -7408,18 +7408,38 @@ class Test(unittest.TestCase):
         self.assertEqual(str(s.parts[1].getElementsByClass(instrument.Instrument)[0].transposition),
                          '<music21.interval.Interval M-6>')
 
+        # Set each part's first note's natural to be visible, to test that it will remain so
+        # after transposition
+        for p in s.parts:
+            firstPitch = p.pitches[0]
+            self.assertIsNone(firstPitch.accidental)
+            firstPitch.accidental = 0
+            firstPitch.accidental.displayStatus = True
+
         self.assertEqual([str(p) for p in s.parts[0].pitches],
                          ['D4', 'E4', 'F#4', 'G4', 'A4', 'B4', 'C#5', 'D5'])
+        self.assertEqual([None if p.accidental is None else p.accidental.displayStatus
+                            for p in s.parts[0].pitches],
+                         [True, None, False, None, None, None, False, None])
         self.assertEqual([str(p) for p in s.parts[1].pitches],
                          ['A4', 'B4', 'C#5', 'D5', 'E5', 'F#5', 'G#5', 'A5'])
+        self.assertEqual([None if p.accidental is None else p.accidental.displayStatus
+                            for p in s.parts[1].pitches],
+                         [True, None, False, None, None, False, False, None])
 
         self.assertEqual(s.atSoundingPitch, 'unknown')
         s.toSoundingPitch(inPlace=True)
 
         self.assertEqual([str(p) for p in s.parts[0].pitches],
                          ['C4', 'D4', 'E4', 'F4', 'G4', 'A4', 'B4', 'C5'])
+        self.assertEqual([None if p.accidental is None else p.accidental.displayStatus
+                            for p in s.parts[0].pitches],
+                         [True, None, None, None, None, None, None, None])
         self.assertEqual([str(p) for p in s.parts[1].pitches],
                          ['C4', 'D4', 'E4', 'F4', 'G4', 'A4', 'B4', 'C5'])
+        self.assertEqual([None if p.accidental is None else p.accidental.displayStatus
+                            for p in s.parts[1].pitches],
+                         [True, None, None, None, None, None, None, None])
 
     def testTransposeByPitchC(self):
         p = converter.parse('tinyNotation: c1 d1')
