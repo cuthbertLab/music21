@@ -55,6 +55,7 @@ from music21 import key
 from music21 import metadata
 from music21 import meter
 from music21 import note
+from music21 import pitch
 from music21 import tie
 from music21 import repeat
 from music21 import sites
@@ -70,7 +71,6 @@ from music21.stream.enums import GivenElementsBehavior, RecursionType, ShowNumbe
 
 
 if t.TYPE_CHECKING:
-    from music21 import pitch
     from music21 import spanner
 
 
