@@ -166,6 +166,26 @@ class Test(unittest.TestCase):
         lastOffset = lastMeasure.elementOffset(lastElement, returnSpecial=True)
         self.assertEqual(lastOffset, 'highestTime')
 
+    def testMultipleStavesInPartWithOttava(self):
+        from music21 import converter
+        from music21.musicxml import testPrimitive
+        s = converter.parse(testPrimitive.pianoStaffWithOttava)
+        self.assertEqual(len(s.getElementsByClass(stream.PartStaff)), 2)
+        ps0 = s[stream.PartStaff][0]
+        self.assertEqual(len(ps0.getElementsByClass(spanner.Ottava)), 1)
+        m0 = ps0[stream.Measure][0]
+        self.assertEqual(
+            [p.nameWithOctave for p in m0.pitches],
+            ['E-5', 'E-6', 'D5', 'D6', 'C5', 'C6', 'E-5', 'E-6', 'F5', 'F6', 'E5', 'E6',
+             'D5', 'D6', 'F5', 'F6', 'F#5', 'A5', 'G#5', 'B5']
+        )
+        s.toWrittenPitch(inPlace=True)
+        self.assertEqual(
+            [p.nameWithOctave for p in m0.pitches],
+            ['E-4', 'E-5', 'D4', 'D5', 'C4', 'C5', 'E-4', 'E-5', 'F4', 'F5', 'E4', 'E5',
+             'D4', 'D5', 'F4', 'F5', 'F#4', 'A4', 'G#4', 'B4']
+        )
+
     def testSpannersA(self):
         from music21 import converter
         from music21.musicxml import testPrimitive
