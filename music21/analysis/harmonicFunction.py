@@ -5,7 +5,7 @@
 #
 # Authors:      Mark Gotham
 #
-# Copyright:    Copyright © 2022 Michael Scott Asato Cuthbert
+# Copyright:    Copyright © 2022-2023 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 from __future__ import annotations

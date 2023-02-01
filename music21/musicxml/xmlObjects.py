@@ -6,7 +6,7 @@
 # Authors:      Christopher Ariza
 #               Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2009-2022 Michael Scott Asato Cuthbert
+# Copyright:    Copyright © 2009-2023 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 from __future__ import annotations
@@ -105,7 +105,7 @@ ORNAMENT_MARKS = {'trill-mark': expressions.Trill,
 # ------------------------------------------------------------------------------
 
 class MusicXMLException(exceptions21.Music21Exception):
-    def __init__(self, message):
+    def __init__(self, message: str):
         super().__init__(message)
         self.measureNumber: str = ''
         self.partName: str = ''

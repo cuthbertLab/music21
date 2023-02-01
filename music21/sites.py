@@ -18,7 +18,6 @@ import collections
 from collections.abc import Generator, MutableMapping
 import typing as t
 from typing import overload  # for some reason does not work in PyCharm if not directly imported
-from typing import TYPE_CHECKING  # pylint needs no alias
 import unittest
 import weakref
 
@@ -27,7 +26,7 @@ from music21 import exceptions21
 from music21 import prebase
 
 
-if TYPE_CHECKING:
+if t.TYPE_CHECKING:
     from music21 import stream
 
 
@@ -463,10 +462,10 @@ class Sites(common.SlottedObjectMixin):
         b
         a
 
-        * Changed in v.3: changed dramatically from previously unused version
+        * Changed in v3: changed dramatically from previously unused version
           `sortByCreationTime='reverse'` is removed, since the ordered dict takes
           care of it and was not working.
-        * Changed in v.8: arguments are keyword only
+        * Changed in v8: arguments are keyword only
         '''
         keyRepository = list(self.siteDict.keys())
         if sortByCreationTime is True:
@@ -856,6 +855,7 @@ class Sites(common.SlottedObjectMixin):
         have the element. This results b/c Sites are shallow-copied, and then
         elements are re-added.
 
+        >>> import gc
         >>> class Mock(base.Music21Object):
         ...     pass
         >>> aStream = stream.Stream()
@@ -866,6 +866,7 @@ class Sites(common.SlottedObjectMixin):
         >>> mySites.add(aStream)
         >>> mySites.add(bStream)
         >>> del aStream
+        >>> numObjectsCollected = gc.collect()  # make sure to garbage collect
 
         We still have 3 locations -- just because aStream is gone, doesn't
         make it disappear from sites

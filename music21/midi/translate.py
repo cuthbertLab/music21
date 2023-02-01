@@ -6,7 +6,7 @@
 # Authors:      Christopher Ariza
 #               Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2010-2022 Michael Scott Asato Cuthbert
+# Copyright:    Copyright © 2010-2023 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
@@ -19,7 +19,6 @@ from collections.abc import Sequence
 import copy
 import math
 import typing as t
-from typing import TYPE_CHECKING
 import unittest
 import warnings
 
@@ -43,7 +42,7 @@ from music21 import tempo
 from music21.midi.percussion import MIDIPercussionException, PercussionMapper
 
 
-if TYPE_CHECKING:
+if t.TYPE_CHECKING:
     from music21 import base
     from music21 import midi
 
@@ -301,7 +300,7 @@ def _constructOrUpdateNotRestSubclass(
     is constructed instead. Raises TypeError if an incompatible class is provided
     for returnClass.
 
-    Changed in v8 -- no inputM21
+    * Changed in v8: no inputM21
     '''
     if not issubclass(returnClass, note.NotRest):
         raise TypeError(f'Expected subclass of note.NotRest; got {returnClass}')
@@ -385,9 +384,9 @@ def midiEventsToNote(
     >>> unp.storedInstrument
     <music21.instrument.UnpitchedPercussion 'Percussion'>
 
-    Changed in v7.3 -- Returns None if `inputM21` is provided. Returns a
+    * Changed in v7.3: Returns None if `inputM21` is provided. Returns a
         :class:`~music21.note.Unpitched` instance if the event is on Channel 10.
-    Changed in v8 -- `inputM21` is no longer supported.
+    * Changed in v8: `inputM21` is no longer supported.
         The only supported usage now is two tuples.
     '''
     tOn, eOn = eventTuple[0]
@@ -469,8 +468,8 @@ def noteToMidiEvents(
     [<music21.midi.MidiEvent NOTE_ON, track=None, channel=9, pitch=61, velocity=90>,
      <music21.midi.MidiEvent NOTE_OFF, track=None, channel=9, pitch=61, velocity=0>]
 
-    Changed in v7 -- made keyword-only.
-    Changed in v8 -- added support for :class:`~music21.note.Unpitched`
+    * Changed in v7: made keyword-only.
+    * Changed in v8: added support for :class:`~music21.note.Unpitched`
     '''
     from music21 import midi as midiModule
 
@@ -602,10 +601,10 @@ def midiEventsToChord(
     ...                                   ((dt2.time, me2), (dt4.time, me4))])
     <music21.percussion.PercussionChord [Tom-Tom Hi-Hat Cymbal]>
 
-    Changed in v7 -- Uses the last DeltaTime in the list to get the end time.
-    Changed in v7.3 -- Returns a :class:`~music21.percussion.PercussionChord` if
-    any event is on channel 10.
-    Changed in v8 -- inputM21 is no longer supported.  Flat list format is removed.
+    * Changed in v7: Uses the last DeltaTime in the list to get the end time.
+    * Changed in v7.3: Returns a :class:`~music21.percussion.PercussionChord` if
+      any event is on channel 10.
+    * Changed in v8: inputM21 is no longer supported.  Flat list format is removed.
     '''
     tOn: int = 0  # ticks
     tOff: int = 0  # ticks
@@ -692,8 +691,8 @@ def chordToMidiEvents(
      <music21.midi.DeltaTime (empty) track=None, channel=None>,
      <music21.midi.MidiEvent NOTE_OFF, track=None, channel=1, pitch=83, velocity=0>]
 
-    Changed in v7 -- made keyword-only.
-    Changed in v8 -- added support for :class:`~music21.percussion.PercussionChord`
+    * Changed in v7: made keyword-only.
+    * Changed in v8: added support for :class:`~music21.percussion.PercussionChord`
     '''
     from music21 import midi as midiModule
     mt = None  # midi track
@@ -825,7 +824,9 @@ def instrumentToMidiEvents(inputM21,
 # ------------------------------------------------------------------------------
 # Meta events
 
-def midiEventsToInstrument(eventList):
+def midiEventsToInstrument(
+    eventList: midi.MidiEvent | tuple[int, midi.MidiEvent]
+) -> instrument.Instrument:
     '''
     Convert a single MIDI event into a music21 Instrument object.
 
@@ -849,7 +850,7 @@ def midiEventsToInstrument(eventList):
     from music21 import midi as midiModule
 
     if not common.isListLike(eventList):
-        event = eventList
+        event = t.cast(midiModule.MidiEvent, eventList)
     else:  # get the second event; first is delta time
         event = eventList[1]
 
@@ -1816,10 +1817,12 @@ def getNotesFromEvents(
     return notes
 
 
-def getMetaEvents(events):
+def getMetaEvents(
+    events: list[tuple[int, midi.MidiEvent]]
+) -> list[tuple[int, base.Music21Object]]:
     from music21.midi import MetaEvents, ChannelVoiceMessages
 
-    metaEvents = []  # store pairs of abs time, m21 object
+    metaEvents: list[tuple[int, base.Music21Object]] = []  # store pairs of abs time, m21 object
     last_program: int = -1
     for eventTuple in events:
         timeEvent, e = eventTuple
@@ -1942,8 +1945,8 @@ def midiTrackToStream(
         {2.5} <music21.note.Rest dotted-quarter>
         {4.0} <music21.bar.Barline type=final>
 
-    Changed in v7 -- Now makes measures.
-    Changed in v8 -- all but the first attribute are keyword only.
+    * Changed in v7: Now makes measures.
+    * Changed in v8: all but the first attribute are keyword only.
     '''
     # environLocal.printDebug(['midiTrackToStream(): got midi track: events',
     # len(mt.events), 'ticksPerQuarter', ticksPerQuarter])
@@ -2084,7 +2087,7 @@ def midiTrackToStream(
         ts_iter = conductorPart['TimeSignature']
         if ts_iter:
             meterStream = ts_iter.stream()
-            if TYPE_CHECKING:
+            if t.TYPE_CHECKING:
                 assert meterStream is not None
 
             # Supply any missing time signature at the start
@@ -2223,8 +2226,6 @@ def conductorStream(s: stream.Stream) -> stream.Part:
             lastOffset = offset_in_s
         for s_or_inner_stream in s.recurse(streamsOnly=True, includeSelf=True):
             s_or_inner_stream.removeByClass(klass)
-
-    conductorPart.coreElementsChanged()
 
     # Defaults
     if not conductorPart.getElementsByClass(tempo.MetronomeMark):
@@ -2523,8 +2524,8 @@ def streamHierarchyToMidiTracks(
 
     2. we make a list of all instruments that are being used in the piece.
 
-    Changed in v.6 -- acceptableChannelList is keyword only.  addStartDelay is new.
-    Changed in v.6.5 -- Track 0 (tempo/conductor track) always exported.
+    * Changed in v6: acceptableChannelList is keyword only.  addStartDelay is new.
+    * Changed in v6.5: Track 0 (tempo/conductor track) always exported.
     '''
     # makes a deepcopy
     s = prepareStreamForMidi(inputM21)
@@ -2704,7 +2705,7 @@ def midiFilePathToStream(
     >>> streamScore
     <music21.stream.Score ...>
 
-    Changed in v8: inputM21 is keyword only.
+    * Changed in v8: inputM21 is keyword only.
     '''
     from music21 import midi as midiModule
     mf = midiModule.MidiFile()
@@ -2869,7 +2870,7 @@ def midiFileToStream(
     >>> len(s.flatten().notesAndRests)
     14
 
-    Changed in v8: inputM21 and quantizePost are keyword only.
+    * Changed in v8: inputM21 and quantizePost are keyword only.
     '''
     # environLocal.printDebug(['got midi file: tracks:', len(mf.tracks)])
     if inputM21 is None:
@@ -3642,7 +3643,9 @@ class Test(unittest.TestCase):
             self.assertIn(ts, m)
 
     def testMidiExportConductorA(self):
-        '''Export conductor data to MIDI conductor track.'''
+        '''
+        Export conductor data to MIDI conductor track.
+        '''
         p1 = stream.Part()
         p1.repeatAppend(note.Note('c4'), 12)
         p1.insert(0, meter.TimeSignature('3/4'))
@@ -3703,7 +3706,9 @@ class Test(unittest.TestCase):
         self.assertEqual(mtsRepr.count('SET_TEMPO'), 100)
 
     def testMidiExportConductorD(self):
-        '''120 bpm and 4/4 are supplied by default.'''
+        '''
+        120 bpm and 4/4 are supplied by default.
+        '''
         s = stream.Stream()
         s.insert(note.Note())
         mts = streamHierarchyToMidiTracks(s)
@@ -3715,7 +3720,9 @@ class Test(unittest.TestCase):
         self.assertEqual(condTrkRepr.count('PITCH_BEND'), 0)
 
     def testMidiExportConductorE(self):
-        '''The conductor only gets the first element at an offset.'''
+        '''
+        The conductor only gets the first element at an offset.
+        '''
         from music21 import converter
 
         s = stream.Stream()
@@ -3735,7 +3742,9 @@ class Test(unittest.TestCase):
         self.assertEqual(len(keySignatures), 1)
 
     def testMidiExportConductorF(self):
-        '''Multiple meter changes'''
+        '''
+        Multiple meter changes
+        '''
         from music21 import converter
         from music21 import midi as midiModule
 
@@ -3764,34 +3773,38 @@ class Test(unittest.TestCase):
         self.assertEqual(mtsRepr.count('velocity=114'), 1)
         self.assertEqual(mtsRepr.count('velocity=13'), 1)
 
-    def testMidiExportVelocityB(self):
+    def testMidiExportVelocityB(self) -> None:
         import random
         from music21 import volume
 
-        s1 = stream.Stream()
+        s1: stream.Stream = stream.Stream()
         shift = [0, 6, 12]
         amps = [(x / 10. + 0.4) for x in range(6)]
         amps = amps + list(reversed(amps))
 
         qlList = [1.5] * 6 + [1] * 8 + [2] * 6 + [1.5] * 8 + [1] * 4
+
+        c: note.Rest | chord.Chord
         for j, ql in enumerate(qlList):
             if random.random() > 0.6:
                 c = note.Rest()
             else:
-                c = chord.Chord(['c3', 'd-4', 'g5'])
+                ch = chord.Chord(['c3', 'd-4', 'g5'])
                 vChord: list[volume.Volume] = []
-                for i, unused_cSub in enumerate(c):
+                for i, unused_cSub in enumerate(ch):
                     v = volume.Volume()
                     v.velocityScalar = amps[(j + shift[i]) % len(amps)]
                     v.velocityIsRelative = False
                     vChord.append(v)
-                c.setVolumes(vChord)
+                ch.setVolumes(vChord)
+                c = ch
             c.duration.quarterLength = ql
             s1.append(c)
 
-        s2 = stream.Stream()
         random.shuffle(qlList)
         random.shuffle(amps)
+
+        s2: stream.Stream[note.Note] = stream.Stream()
         for j, ql in enumerate(qlList):
             n = note.Note(random.choice(['f#2', 'f#2', 'e-2']))
             n.duration.quarterLength = ql

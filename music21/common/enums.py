@@ -5,7 +5,7 @@
 #
 # Authors:      Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2021-2022 Michael Scott Asato Cuthbert
+# Copyright:    Copyright © 2021-2023 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 from __future__ import annotations
@@ -157,7 +157,7 @@ class OffsetSpecial(StrEnum):
     >>> str(OffsetSpecial.AT_END)
     'highestTime'
 
-    New in v7.
+    * New in v7.
     '''
     AT_END: str = 'highestTime'
     LOWEST_OFFSET: str = 'lowestOffset'
@@ -197,11 +197,29 @@ class GatherSpanners(BooleanEnum):
     COMPLETE_ONLY = 'completeOnly'
 
 
+class AppendSpanners(StrEnum):
+    '''
+    An enumeration for how to append related spanners when appending objects to a written file.
+
+    AppendSpanners.NORMAL means append the spanners that start with the object, then append
+        the object, then append the spanners that end with the object.
+    AppendSpanners.RELATED_ONLY means append the spanners that start with the object, then
+        append the spanners that end with the object (i.e. do not append the object).
+    AppendSpanners.NONE means do not append the related spanners at all (i.e. only append
+        the object).
+
+    * new in v9.
+    '''
+    NORMAL = 'normal'
+    RELATED_ONLY = 'related_only'
+    NONE = 'none'
+
+
 class MeterDivision(StrEnum):
     '''
     Represents an indication of how to divide a TimeSignature
 
-    new in v7.
+    * New in v7.
     '''
     FAST = 'fast'
     SLOW = 'slow'

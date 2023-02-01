@@ -10,17 +10,17 @@
 # Copyright:    Copyright © 2011-2014 Michael Scott Asato Cuthbert and the music21
 #               Project
 # License:      BSD, see license.txt
-# -----------------------------------------------------------------------------
-
+# ----------------------------------------------------------------------------
 '''
 This module defines objects for tracking the derivation of one
 :class:`~music21.stream.Stream` from another.
 '''
 from __future__ import annotations
 
+import weakref
 from collections.abc import Generator
 import functools
-from typing import TYPE_CHECKING  # Pylint bug
+import typing as t
 import unittest
 
 from music21 import common
@@ -28,7 +28,7 @@ from music21.common.objects import SlottedObjectMixin
 from music21 import environment
 
 
-if TYPE_CHECKING:
+if t.TYPE_CHECKING:
     from music21 import base
 
 
@@ -149,9 +149,9 @@ class Derivation(SlottedObjectMixin):
 
     # INITIALIZER #
 
-    def __init__(self, client=None):
+    def __init__(self, client: base.Music21Object | None = None):
         # store a reference to the Music21Object that has this Derivation object as a property
-        self._client = None
+        self._client: weakref.ReferenceType | None = None
         self._clientId: int | None = None  # store python-id to optimize w/o unwrapping
         self._method: str | None = None
         # origin should be stored as a weak ref -- the place where the client was derived from.
@@ -212,7 +212,7 @@ class Derivation(SlottedObjectMixin):
             self._client = None
         else:
             self._clientId = id(client)
-            self._client = common.wrapWeakref(client)
+            self._client = common.wrapWeakref(client)  # type: ignore
 
     def chain(self) -> Generator[base.Music21Object, None, None]:
         '''
@@ -303,6 +303,14 @@ class Derivation(SlottedObjectMixin):
             self._originId = id(origin)
             self._origin = origin
             # self._origin = common.wrapWeakref(origin)
+
+    @property
+    def originId(self) -> int | None:
+        '''
+        Return the Python id (=memory location) of the origin.
+        (Same as id(derivation.origin).  Not the same as derivation.origin.ind)
+        '''
+        return self._originId
 
     @property
     def rootDerivation(self) -> base.Music21Object | None:

@@ -127,7 +127,8 @@ class LayoutBase(base.Music21Object):
 
 
 class ScoreLayout(LayoutBase):
-    '''Parameters for configuring a score's layout.
+    '''
+    Parameters for configuring a score's layout.
 
     PageLayout objects may be found on Measure or Part Streams.
 
@@ -429,13 +430,13 @@ class StaffGroup(spanner.Spanner):
                  name: str | None = None,
                  barTogether: t.Literal[True, False, None, 'Mensurstrich'] = True,
                  abbreviation: str | None = None,
-                 symbol: t.Literal['bracket', 'line', 'brace', 'square'] = None,
+                 symbol: t.Literal['bracket', 'line', 'brace', 'square'] | None = None,
                  **keywords):
         super().__init__(*spannedElements, **keywords)
 
         self.name = name or abbreviation  # if this group has a name
         self.abbreviation = abbreviation
-        self._symbol = None  # Choices: bracket, line, brace, square
+        self._symbol: t.Literal['bracket', 'line', 'brace', 'square'] | None = None
         self.symbol = symbol
         # determines if barlines are grouped through; this is group barline
         # in musicxml
@@ -474,14 +475,14 @@ class StaffGroup(spanner.Spanner):
         'Mensurstrich'
         ''')
 
-    def _getSymbol(self):
+    def _getSymbol(self) -> t.Literal['bracket', 'line', 'brace', 'square'] | None:
         return self._symbol
 
-    def _setSymbol(self, value):
+    def _setSymbol(self, value: t.Literal['bracket', 'line', 'brace', 'square'] | None):
         if value is None or str(value).lower() == 'none':
             self._symbol = None
         elif value.lower() in ['brace', 'line', 'bracket', 'square']:
-            self._symbol = value.lower()
+            self._symbol = t.cast(t.Literal['bracket', 'line', 'brace', 'square'], value.lower())
         else:
             raise StaffGroupException(f'the symbol value {value} is not acceptable')
 
@@ -498,7 +499,11 @@ class StaffGroup(spanner.Spanner):
 # ---------------------------------------------------------------
 # Stream subclasses for layout
 
-def divideByPages(scoreIn, printUpdates=False, fastMeasures=False):
+def divideByPages(
+    scoreIn: stream.Score,
+    printUpdates: bool = False,
+    fastMeasures: bool = False
+) -> LayoutScore:
     '''
     Divides a score into a series of smaller scores according to page
     breaks.  Only searches for PageLayout.isNew or SystemLayout.isNew
@@ -666,7 +671,8 @@ def divideByPages(scoreIn, printUpdates=False, fastMeasures=False):
                 staffObject.pageNumber = pageNumber
                 staffObject.pageSystemNumber = pageSystemNumber
 
-                staffObject.elements = p
+                # until getters/setters can have different types
+                staffObject.elements = p  # type: ignore
                 thisSystem.replace(p, staffObject)
                 allStaffLayouts: list[StaffLayout] = list(p[StaffLayout])
                 if not allStaffLayouts:

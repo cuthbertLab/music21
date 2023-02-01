@@ -8,7 +8,7 @@
 #               Jackie Rogoff
 #               Beth Hadley
 #
-# Copyright:    Copyright © 2009-2022 Michael Scott Asato Cuthbert
+# Copyright:    Copyright © 2009-2023 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
@@ -32,12 +32,11 @@ The list of objects included here are:
 * :class:`~music21.voiceLeading.NChordLinearSegment` :
     preliminary implementation of n(any number) chords
 * :class:`~music21.voiceLeading.TwoChordLinearSegment` : 2 chord objects
-
 '''
 from __future__ import annotations
 
 import enum
-from typing import TYPE_CHECKING  # pylint bug; does not arise here though.
+import typing as t
 import unittest
 
 from music21 import base
@@ -97,7 +96,15 @@ class VoiceLeadingQuartet(base.Music21Object):
             ''',
     }
 
-    def __init__(self, v1n1=None, v1n2=None, v2n1=None, v2n2=None, analyticKey=None, **keywords):
+    def __init__(
+        self,
+        v1n1: None | str | note.Note | pitch.Pitch = None,
+        v1n2: None | str | note.Note | pitch.Pitch = None,
+        v2n1: None | str | note.Note | pitch.Pitch = None,
+        v2n2: None | str | note.Note | pitch.Pitch = None,
+        analyticKey: key.Key | None = None,
+        **keywords
+    ):
         super().__init__(**keywords)
         if not intervalCache:
             # populate interval cache if not done yet
@@ -200,7 +207,11 @@ class VoiceLeadingQuartet(base.Music21Object):
                 )
         self._key = keyValue
 
-    def _setVoiceNote(self, value, which):
+    def _setVoiceNote(
+        self,
+        value: None | str | note.Note | pitch.Pitch,
+        which: t.Literal['_v1n1', '_v1n2', '_v2n1', '_v2n2']
+    ):
         if value is None:
             setattr(self, which, None)
         elif isinstance(value, str):
@@ -219,10 +230,10 @@ class VoiceLeadingQuartet(base.Music21Object):
                     f'not a valid note specification: {value!r}'
                 ) from e
 
-    def _getV1n1(self):
+    def _getV1n1(self) -> None | note.Note:
         return self._v1n1
 
-    def _setV1n1(self, value):
+    def _setV1n1(self, value: None | str | note.Note | pitch.Pitch):
         self._setVoiceNote(value, '_v1n1')
 
     v1n1 = property(_getV1n1, _setV1n1, doc='''
@@ -233,10 +244,10 @@ class VoiceLeadingQuartet(base.Music21Object):
         <music21.note.Note C>
         ''')
 
-    def _getV1n2(self):
+    def _getV1n2(self) -> None | note.Note:
         return self._v1n2
 
-    def _setV1n2(self, value):
+    def _setV1n2(self, value: None | str | note.Note | pitch.Pitch):
         self._setVoiceNote(value, '_v1n2')
 
     v1n2 = property(_getV1n2, _setV1n2, doc='''
@@ -247,10 +258,10 @@ class VoiceLeadingQuartet(base.Music21Object):
         <music21.note.Note D>
         ''')
 
-    def _getV2n1(self):
+    def _getV2n1(self) -> None | note.Note:
         return self._v2n1
 
-    def _setV2n1(self, value):
+    def _setV2n1(self, value: None | str | note.Note | pitch.Pitch):
         self._setVoiceNote(value, '_v2n1')
 
     v2n1 = property(_getV2n1, _setV2n1, doc='''
@@ -261,10 +272,10 @@ class VoiceLeadingQuartet(base.Music21Object):
         <music21.note.Note E>
         ''')
 
-    def _getV2n2(self):
+    def _getV2n2(self) -> None | note.Note:
         return self._v2n2
 
-    def _setV2n2(self, value):
+    def _setV2n2(self, value: None | str | note.Note | pitch.Pitch):
         self._setVoiceNote(value, '_v2n2')
 
     v2n2 = property(_getV2n2, _setV2n2, doc='''
@@ -353,9 +364,9 @@ class VoiceLeadingQuartet(base.Music21Object):
         >>> vl.motionType(allowAntiParallel=True)
         <MotionType.antiParallel: 'Anti-Parallel'>
 
-        Changed in v.6 -- anti-parallel motion was supposed to be
-        able to be returned in previous versions, but a bug prevented it.
-        To preserve backwards compatibility, it must be explicitly enabled.
+        * Changed in v6: anti-parallel motion was supposed to be
+          able to be returned in previous versions, but a bug prevented it.
+          To preserve backwards compatibility, it must be explicitly enabled.
         '''
         motionType = ''
         if self.obliqueMotion():
@@ -536,7 +547,7 @@ class VoiceLeadingQuartet(base.Music21Object):
         vInt1 = self.vIntervals[1]
         vInt1_generic = vInt1.generic
 
-        if TYPE_CHECKING:
+        if t.TYPE_CHECKING:
             assert vInt0_generic is not None
             assert vInt1_generic is not None
 
@@ -673,7 +684,8 @@ class VoiceLeadingQuartet(base.Music21Object):
                 and self.hIntervals[0].direction == interval.Direction.DESCENDING)
 
     def antiParallelMotion(self, simpleName=None) -> bool:
-        '''Returns True if the simple interval before is the same as the simple
+        '''
+        Returns True if the simple interval before is the same as the simple
         interval after and the motion is contrary. if simpleName is
         specified as an Interval object or a string then it only returns
         true if the simpleName of both intervals is the same as simpleName
@@ -1134,7 +1146,7 @@ class VoiceLeadingQuartet(base.Music21Object):
 
         firstHarmony = self.vIntervals[0].simpleName
         secondGeneric = self.vIntervals[1].generic
-        if TYPE_CHECKING:
+        if t.TYPE_CHECKING:
             assert secondGeneric is not None
         secondHarmony = secondGeneric.simpleUndirected
 
@@ -1202,7 +1214,7 @@ class VoiceLeadingQuartet(base.Music21Object):
 
         hInt0_generic = self.hIntervals[0].generic
         hInt1_generic = self.hIntervals[1].generic
-        if TYPE_CHECKING:
+        if t.TYPE_CHECKING:
             assert hInt0_generic is not None
             assert hInt1_generic is not None
 
@@ -1263,7 +1275,7 @@ class VoiceLeadingQuartet(base.Music21Object):
         v1ns = v1.noteStart
         v1ne = v1.noteEnd
 
-        if TYPE_CHECKING:
+        if t.TYPE_CHECKING:
             assert v0ns is not None and v0ne is not None
             assert v1ns is not None and v1ne is not None
 
@@ -1318,7 +1330,7 @@ class VoiceLeadingQuartet(base.Music21Object):
 
         vInt0_generic = self.vIntervals[0].generic
         vInt1_generic = self.vIntervals[1].generic
-        if TYPE_CHECKING:
+        if t.TYPE_CHECKING:
             assert vInt0_generic is not None
             assert vInt1_generic is not None
 
@@ -1425,8 +1437,10 @@ class Verticality(base.Music21Object):
             in a single part)''',
     }
 
-    def __init__(self, contentDict: dict, **keywords):
+    def __init__(self, contentDict: dict | None = None, **keywords):
         super().__init__(**keywords)
+        if contentDict is None:
+            contentDict = {}
         for partNum, element in contentDict.items():
             if not isinstance(element, list):
                 contentDict[partNum] = [element]
@@ -1737,7 +1751,7 @@ class Verticality(base.Music21Object):
         >>> vs.getVerticalityOffset(leftAlign=False)
         1.0
 
-        Changed in v8 -- renamed getVerticalityOffset to not conflict with
+        * Changed in v8: renamed getVerticalityOffset to not conflict with
             .offset property.  Made leftAlign keyword only
         '''
         if not self.objects:
@@ -1792,7 +1806,7 @@ class VerticalityNTuplet(base.Music21Object):
     motion and music theory elements such as passing tones
     '''
 
-    def __init__(self, listOfVerticalities, **keywords):
+    def __init__(self, listOfVerticalities=(), **keywords):
         super().__init__(**keywords)
 
         self.verticalities = listOfVerticalities
@@ -1812,13 +1826,15 @@ class VerticalityNTuplet(base.Music21Object):
 
 
 class VerticalityTriplet(VerticalityNTuplet):
-    '''a collection of three Verticalities'''
-
-    def __init__(self, listOfVerticalities, **keywords):
+    '''
+    a collection of three Verticalities
+    '''
+    def __init__(self, listOfVerticalities=(), **keywords):
         super().__init__(listOfVerticalities, **keywords)
 
-        self.tnlsDict = {}  # defaultdict(int)  # Three Note Linear Segments
-        self._calcTNLS()
+        self.tnlsDict = {}  # Three Note Linear Segments
+        if listOfVerticalities:
+            self._calcTNLS()
 
     def _calcTNLS(self):
         '''
@@ -1915,7 +1931,8 @@ class VerticalityTriplet(VerticalityNTuplet):
 
 
 class NNoteLinearSegment(base.Music21Object):
-    '''a list of n notes strung together in a sequence
+    '''
+    a list of n notes strung together in a sequence
     noteList = [note1, note2, note3, ..., note-n ] Once this
     object is created with a noteList, the noteList may not
     be changed
@@ -1924,8 +1941,7 @@ class NNoteLinearSegment(base.Music21Object):
     >>> n.noteList
     [<music21.note.Note A>, <music21.note.Note C>, <music21.note.Note D>]
     '''
-
-    def __init__(self, noteList, **keywords):
+    def __init__(self, noteList=(), **keywords):
         super().__init__(**keywords)
         self._noteList = []
         for value in noteList:
@@ -1978,10 +1994,6 @@ class NNoteLinearSegment(base.Music21Object):
         ''')
 
 
-class NNoteLinearSegmentException(exceptions21.Music21Exception):
-    pass
-
-
 class ThreeNoteLinearSegmentException(exceptions21.Music21Exception):
     pass
 
@@ -2026,7 +2038,7 @@ class ThreeNoteLinearSegment(NNoteLinearSegment):
     >>> ex2 = voiceLeading.ThreeNoteLinearSegment('a', 'b', 'c')
     >>> ex2.n1
     <music21.note.Note A>
-    >>> ex2.n1.pitch.defaultOctave
+    >>> defaults.pitchOctave
     4
 
     '''
@@ -2317,7 +2329,7 @@ class NChordLinearSegmentException(exceptions21.Music21Exception):
 
 
 class NObjectLinearSegment(base.Music21Object):
-    def __init__(self, objectList, **keywords):
+    def __init__(self, objectList=(), **keywords):
         super().__init__(**keywords)
         self.objectList = objectList
 
@@ -2326,7 +2338,7 @@ class NObjectLinearSegment(base.Music21Object):
 
 
 class NChordLinearSegment(NObjectLinearSegment):
-    def __init__(self, chordList, **keywords):
+    def __init__(self, chordList=(), **keywords):
         super().__init__(chordList, **keywords)
         self._chordList = []
         for value in chordList:
@@ -2365,9 +2377,9 @@ class NChordLinearSegment(NObjectLinearSegment):
         return f'chordList={self.chordList}'
 
 class TwoChordLinearSegment(NChordLinearSegment):
-    def __init__(self, chordList, chord2=None, **keywords):
+    def __init__(self, chordList=(), chord2=None, **keywords):
         if isinstance(chordList, (list, tuple)):
-            if len(chordList) != 2:  # pragma: no cover
+            if chordList and len(chordList) != 2:  # pragma: no cover
                 raise ValueError(
                     f'First argument must be a list of length 2, not {chordList!r}'
                 )

@@ -145,6 +145,7 @@ import datetime
 import pathlib
 import re
 import typing as t
+from typing import overload
 import unittest
 
 from music21 import base
@@ -235,9 +236,9 @@ class Metadata(base.Music21Object):
 
     # INITIALIZER #
 
-    def __init__(self, **keywords):
-        m21BaseKeywords = {}
-        myKeywords = {}
+    def __init__(self, **keywords) -> None:
+        m21BaseKeywords: dict[str, t.Any] = {}
+        myKeywords: dict[str, t.Any] = {}
 
         # We allow the setting of metadata values (attribute-style) via **keywords.
         # Any keywords that are uniqueNames, grandfathered workIds, or grandfathered
@@ -624,7 +625,9 @@ class Metadata(base.Music21Object):
 
     @copyright.setter
     def copyright(self, value: str) -> None:
-        '''For type checking only. Does not run.'''
+        '''
+        For type checking only. Does not run.
+        '''
         setattr(self, 'copyright', value)
 
     # SPECIAL METHODS #
@@ -851,7 +854,28 @@ class Metadata(base.Music21Object):
         # bare attributes (including the ones in base classes).
         super().__setattr__(name, value)
 
-    def __getitem__(self, key: str) -> tuple[ValueType, ...]:
+
+    @overload
+    def __getitem__(self,
+                    key: t.Literal[
+                        'movementName',
+                        'movementNumber',
+                        'title',
+                    ]) -> tuple[Text, ...]:
+        pass
+
+    @overload
+    def __getitem__(self,
+                    key: t.Literal[
+                        'copyright',
+                    ]) -> tuple[Copyright, ...]:
+        pass
+
+    @overload
+    def __getitem__(self, key: str) -> tuple[Text, ...]:
+        pass
+
+    def __getitem__(self, key: str) -> tuple[ValueType, ...] | tuple[Text, ...]:
         '''
         "Dictionary key" access for all standard uniqueNames and
         standard keys of the form 'namespace:name'.
@@ -1014,7 +1038,12 @@ class Metadata(base.Music21Object):
                 result.append(contrib)
         return tuple(result)
 
-    def search(self, query=None, field=None, **keywords):
+    def search(
+        self,
+        query: str | t.Pattern | t.Callable[[str], bool] | None = None,
+        field: str | None = None,
+        **keywords
+    ) -> tuple[bool, str | None]:
         r'''
         Search one or all fields with a query, given either as a string or a
         regular expression match.
@@ -1071,8 +1100,8 @@ class Metadata(base.Music21Object):
         (True, 'composer')
 
 
-        New in v.4 -- use a keyword argument to search
-        that field directly:
+        * New in v4: use a keyword argument to search
+          that field directly:
 
         >>> md.search(composer='Joplin')
         (True, 'composer')
@@ -1080,7 +1109,7 @@ class Metadata(base.Music21Object):
         # TODO: Change to a namedtuple and add as a third element
         #    during a successful search, the full value of the retrieved
         #    field (so that 'Joplin' would return 'Joplin, Scott')
-        reQuery = None
+        reQuery: t.Pattern | None = None
         valueFieldPairs = []
         if query is None and field is None and not keywords:
             return (False, None)
@@ -1152,7 +1181,7 @@ class Metadata(base.Music21Object):
         # ultimately, can look for regular expressions by checking for
         # .search
         useRegex = False
-        if hasattr(query, 'search'):
+        if isinstance(query, t.Pattern):
             useRegex = True
             reQuery = query  # already compiled
         # look for regex characters
@@ -1161,12 +1190,12 @@ class Metadata(base.Music21Object):
             useRegex = True
             reQuery = re.compile(query, flags=re.IGNORECASE)
 
-        if useRegex:
+        if useRegex and reQuery is not None:
             for value, innerField in valueFieldPairs:
                 # "re.IGNORECASE" makes case-insensitive search
                 if isinstance(value, str):
-                    match = reQuery.search(value)
-                    if match is not None:
+                    matchReSearch = reQuery.search(value)
+                    if matchReSearch is not None:
                         return True, innerField
         elif callable(query):
             for value, innerField in valueFieldPairs:
@@ -1226,7 +1255,9 @@ class Metadata(base.Music21Object):
 
     @alternativeTitle.setter
     def alternativeTitle(self, value: str) -> None:
-        '''For type checking only. Does not run.'''
+        '''
+        For type checking only. Does not run.
+        '''
         setattr(self, 'alternativeTitle', value)
 
     @property
@@ -1258,7 +1289,9 @@ class Metadata(base.Music21Object):
 
     @composer.setter
     def composer(self, value: str) -> None:
-        '''For type checking only. Does not run.'''
+        '''
+        For type checking only. Does not run.
+        '''
         setattr(self, 'composer', value)
 
     @property
@@ -1292,7 +1325,9 @@ class Metadata(base.Music21Object):
 
     @composers.setter
     def composers(self, value: Iterable[str]) -> None:
-        '''For type checking only. Does not run.'''
+        '''
+        For type checking only. Does not run.
+        '''
         setattr(self, 'composers', value)
 
     @property
@@ -1305,7 +1340,9 @@ class Metadata(base.Music21Object):
 
     @date.setter
     def date(self, value: str) -> None:
-        '''For type checking only. Does not run.'''
+        '''
+        For type checking only. Does not run.
+        '''
         setattr(self, 'date', value)
 
     @property
@@ -1336,7 +1373,9 @@ class Metadata(base.Music21Object):
 
     @dateCreated.setter
     def dateCreated(self, value: str) -> None:
-        '''For type checking only. Does not run.'''
+        '''
+        For type checking only. Does not run.
+        '''
         setattr(self, 'dateCreated', value)
 
     @property
@@ -1348,7 +1387,9 @@ class Metadata(base.Music21Object):
 
     @fileFormat.setter
     def fileFormat(self, value: str) -> None:
-        '''For type checking only. Does not run.'''
+        '''
+        For type checking only. Does not run.
+        '''
         setattr(self, 'fileFormat', value)
 
     @property
@@ -1360,7 +1401,9 @@ class Metadata(base.Music21Object):
 
     @filePath.setter
     def filePath(self, value: str) -> None:
-        '''For type checking only. Does not run.'''
+        '''
+        For type checking only. Does not run.
+        '''
         setattr(self, 'filePath', value)
 
     @property
@@ -1372,7 +1415,9 @@ class Metadata(base.Music21Object):
 
     @fileNumber.setter
     def fileNumber(self, value: str) -> None:
-        '''For type checking only. Does not run.'''
+        '''
+        For type checking only. Does not run.
+        '''
         setattr(self, 'fileNumber', value)
 
     @property
@@ -1389,7 +1434,9 @@ class Metadata(base.Music21Object):
 
     @localeOfComposition.setter
     def localeOfComposition(self, value: str) -> None:
-        '''For type checking only. Does not run.'''
+        '''
+        For type checking only. Does not run.
+        '''
         setattr(self, 'localeOfComposition', value)
 
     @property
@@ -1410,7 +1457,9 @@ class Metadata(base.Music21Object):
 
     @librettist.setter
     def librettist(self, value: str) -> None:
-        '''For type checking only. Does not run.'''
+        '''
+        For type checking only. Does not run.
+        '''
         setattr(self, 'librettist', value)
 
     @property
@@ -1429,7 +1478,9 @@ class Metadata(base.Music21Object):
 
     @librettists.setter
     def librettists(self, value: Iterable[str]) -> None:
-        '''For type checking only. Does not run.'''
+        '''
+        For type checking only. Does not run.
+        '''
         setattr(self, 'librettists', value)
 
     @property
@@ -1453,7 +1504,9 @@ class Metadata(base.Music21Object):
 
     @lyricist.setter
     def lyricist(self, value: str) -> None:
-        '''For type checking only. Does not run.'''
+        '''
+        For type checking only. Does not run.
+        '''
         setattr(self, 'lyricist', value)
 
     @property
@@ -1472,7 +1525,9 @@ class Metadata(base.Music21Object):
 
     @lyricists.setter
     def lyricists(self, value: Iterable[str]) -> None:
-        '''For type checking only. Does not run.'''
+        '''
+        For type checking only. Does not run.
+        '''
         setattr(self, 'lyricists', value)
 
     @property
@@ -1493,7 +1548,9 @@ class Metadata(base.Music21Object):
 
     @movementName.setter
     def movementName(self, value: str) -> None:
-        '''For type checking only. Does not run.'''
+        '''
+        For type checking only. Does not run.
+        '''
         setattr(self, 'movementName', value)
 
     @property
@@ -1514,7 +1571,9 @@ class Metadata(base.Music21Object):
 
     @movementNumber.setter
     def movementNumber(self, value: str) -> None:
-        '''For type checking only. Does not run.'''
+        '''
+        For type checking only. Does not run.
+        '''
         setattr(self, 'movementNumber', value)
 
     @property
@@ -1542,7 +1601,9 @@ class Metadata(base.Music21Object):
 
     @number.setter
     def number(self, value: str) -> None:
-        '''For type checking only. Does not run.'''
+        '''
+        For type checking only. Does not run.
+        '''
         setattr(self, 'number', value)
 
     @property
@@ -1570,7 +1631,9 @@ class Metadata(base.Music21Object):
 
     @opusNumber.setter
     def opusNumber(self, value: str) -> None:
-        '''For type checking only. Does not run.'''
+        '''
+        For type checking only. Does not run.
+        '''
         setattr(self, 'opusNumber', value)
 
     @property
@@ -1590,11 +1653,13 @@ class Metadata(base.Music21Object):
 
     @title.setter
     def title(self, value: str) -> None:
-        '''For type checking only. Does not run.'''
+        '''
+        For type checking only. Does not run.
+        '''
         setattr(self, 'title', value)
 
     @property
-    def bestTitle(self):
+    def bestTitle(self) -> str | None:
         r'''
         Get the title of the work, or the next-matched title string
         available from a related parameter fields.
@@ -1624,8 +1689,11 @@ class Metadata(base.Music21Object):
 
         >>> md.bestTitle = 'Bonaparte'
         Traceback (most recent call last):
-        AttributeError: can't set attribute 'bestTitle'
+        AttributeError: ...'bestTitle'...
         '''
+        # TODO: once Py3.11 is the minimum, change doctest output to:
+        #    AttributeError: property 'bestTitle' of 'Metadata' object has no setter
+
         searchId = (
             'title',
             'popularTitle',

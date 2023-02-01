@@ -39,7 +39,6 @@ For most people you'll want to do something like this:
 >>> sc = scale.ScalaScale('a4', 'mbira_banda.scl')
 >>> [str(p) for p in sc.pitches]
 ['A4', 'B4(-15c)', 'C#5(-11c)', 'E-5(-7c)', 'E~5(+6c)', 'F#5(+14c)', 'G~5(+1c)', 'B-5(+2c)']
-
 '''
 from __future__ import annotations
 
@@ -408,7 +407,8 @@ class ScalaFile:
         self.fileName = os.path.basename(fp)
 
     def openFileLike(self, fileLike):
-        '''Assign a file-like object, such as those provided by StringIO, as an open file object.
+        '''
+        Assign a file-like object, such as those provided by StringIO, as an open file object.
         '''
         self.file = fileLike  # already 'open'
 
@@ -428,7 +428,8 @@ class ScalaFile:
         return self.readstr(self.file.read())
 
     def readstr(self, strSrc):
-        '''Read a string and process all Tokens. Returns a ABCHandler instance.
+        '''
+        Read a string and process all Tokens. Returns a ABCHandler instance.
         '''
         ss = ScalaData(strSrc, self.fileName)
         ss.parse()
@@ -522,7 +523,8 @@ def parse(target):
 
 def search(target):
     # noinspection SpellCheckingInspection
-    '''Search the scala archive for matches based on a string
+    '''
+    Search the scala archive for matches based on a string
 
     >>> mbiraScales = scale.scala.search('mbira')
     >>> mbiraScales
@@ -618,7 +620,6 @@ Franck Jedrzejewski continued fractions approx. of 12-tet
 98/55
 15/8
 2/1
-
 '''
         ss = ScalaData(msg)
         ss.parse()

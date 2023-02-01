@@ -111,25 +111,6 @@ class Variant(base.Music21Object):
         if name is not None:
             self.groups.append(name)
 
-
-    def _deepcopySubclassable(self, memo=None, ignoreAttributes=None, removeFromIgnore=None):
-        '''
-        see __deepcopy__ on Spanner for tests and docs
-        '''
-        # NOTE: this is a performance critical operation
-        defaultIgnoreSet = {'_cache'}
-        if ignoreAttributes is None:
-            ignoreAttributes = defaultIgnoreSet
-        else:
-            ignoreAttributes = ignoreAttributes | defaultIgnoreSet
-
-        new = super()._deepcopySubclassable(memo, ignoreAttributes, removeFromIgnore)
-
-        return new
-
-    def __deepcopy__(self, memo=None):
-        return self._deepcopySubclassable(memo)
-
     # --------------------------------------------------------------------------
     # as _stream is a private Stream, unwrap/wrap methods need to override
     # Music21Object to get at these objects
@@ -2517,10 +2498,47 @@ def _getPreviousElement(s, v):
     return returnElement
 
 
+def makeVariantBlocks(s):
+    '''
+    Unknown and undocumented.  Used only in lily/translate -- for musicdiff.
+    '''
+    from music21 import variant
+    variantsToBeDone = s.getElementsByClass(variant.Variant)
+
+    for v in variantsToBeDone:
+        startOffset = s.elementOffset(v)
+        endOffset = v.replacementDuration + startOffset
+        conflictingVariants = s.getElementsByOffset(offsetStart=startOffset,
+                                                    offsetEnd=endOffset,
+                                                    includeEndBoundary=False,
+                                                    mustFinishInSpan=False,
+                                                    mustBeginInSpan=True,
+                                                    classList=[variant.Variant])
+        for cV in conflictingVariants:
+            oldReplacementDuration = cV.replacementDuration
+            if s.elementOffset(cV) == startOffset:
+                continue  # do nothing
+            else:
+                shiftOffset = s.elementOffset(cV) - startOffset
+                r = note.Rest()
+                r.duration.quarterLength = shiftOffset
+                r.style.hideObjectOnPrint = True
+                for el in cV._stream:
+                    oldOffset = el.getOffsetBySite(cV._stream)
+                    cV._stream.coreSetElementOffset(el, oldOffset + shiftOffset)
+                cV.coreElementsChanged()
+                cV.insert(0.0, r)
+                cV.replacementDuration = oldReplacementDuration
+                s.remove(cV)
+                s.insert(startOffset, cV)
+                variantsToBeDone.append(cV)
 
 
 # ------------------------------------------------------------------------------
 class Test(unittest.TestCase):
+    def testCopyAndDeepcopy(self):
+        from music21.test.commonTest import testCopyAll
+        testCopyAll(self, globals())
 
     def pitchOut(self, listIn):
         out = '['
@@ -2565,7 +2583,8 @@ class Test(unittest.TestCase):
 
 
     def testVariantGroupA(self):
-        '''Variant groups are used to distinguish
+        '''
+        Variant groups are used to distinguish
         '''
         v1 = Variant()
         v1.groups.append('alt-a')

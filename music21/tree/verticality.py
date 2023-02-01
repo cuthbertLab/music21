@@ -19,6 +19,7 @@ from __future__ import annotations
 from collections.abc import Iterable, Sequence
 import copy
 import itertools
+import typing as t
 import unittest
 
 from music21 import chord
@@ -718,7 +719,7 @@ class Verticality(prebase.ProtoM21Object):
          <...AllAttachArticulation>,
          <...OtherAllAttachArticulation>]
 
-        Added in v6.3: copyPitches option
+        * New in v6.3: copyPitches option
 
         OMIT_FROM_DOCS
 
@@ -731,8 +732,8 @@ class Verticality(prebase.ProtoM21Object):
         >>> n2
         <music21.note.Note D#>
 
-        Changed in v7.3 -- if quarterLength is not given, the duration
-        to the next quarterLength is used.
+        * Changed in v7.3: if quarterLength is not given, the duration
+          to the next quarterLength is used.
         '''
         if quarterLength is None:
             event_duration = self.timeToNextEvent
@@ -886,6 +887,8 @@ class Verticality(prebase.ProtoM21Object):
                     for subEl in list(el)[1:]:
                         conditionalAdd(timeSpan, subEl)
             else:
+                if t.TYPE_CHECKING:
+                    assert isinstance(el, note.Note)
                 conditionalAdd(timeSpan, el)
 
         seenArticulations = set()
@@ -987,7 +990,7 @@ class Verticality(prebase.ProtoM21Object):
         <music21.voiceLeading.VoiceLeadingQuartet
             v1n1=E4, v1n2=F4, v2n1=A3, v2n2=A3>
 
-        Changed in v8: all parameters are keyword only.
+        * Changed in v8: all parameters are keyword only.
         '''
         from music21.voiceLeading import VoiceLeadingQuartet
         pairedMotionList = self.getPairedMotion(includeRests=includeRests,

@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import re
+import typing as t
 import unittest
 
 from music21 import converter
@@ -198,7 +199,7 @@ class Test(unittest.TestCase):
             self,
             uniqueName: str,
             namespaceName: str,
-            contributorRole: str = None,
+            contributorRole: t.Optional[str] = None,
             valueType: type = metadata.Text):
 
         if ':' not in namespaceName:

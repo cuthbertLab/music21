@@ -805,8 +805,10 @@ class Test(unittest.TestCase):
         self.assertEqual([len(line) for line in x.splitlines()], [12, 12, 12])
 
     def testSplitNoteGroupingLineLength(self):
-        '''Tests loosening the constraint on trailing spaces when there is
-        no other solution.'''
+        '''
+        Tests loosening the constraint on trailing spaces when there is
+        no other solution.
+        '''
         from music21 import converter
         s = converter.parse('tinyNotation: 2/4 c4 d e f8 g a2 B2 c4. d8 e2')
         x = objectToBraille(s, maxLineLength=10)

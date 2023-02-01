@@ -15,7 +15,7 @@ etc. such that precise positioning information, layout, size, etc. can be specif
 '''
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+import typing as t
 import unittest
 
 from music21 import common
@@ -23,7 +23,7 @@ from music21 import exceptions21
 from music21.prebase import ProtoM21Object
 
 
-if TYPE_CHECKING:
+if t.TYPE_CHECKING:
     from music21 import editorial
 
 
@@ -78,7 +78,7 @@ class Style(ProtoM21Object):
             ''',
     }
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.size = None
 
         self.relativeX: float | int | None = None
@@ -200,7 +200,7 @@ class Style(ProtoM21Object):
         Other legal positions are 'above' and 'below' which
         are synonyms for 10 and -70 respectively (for 5-line
         staves; other staves are not yet implemented)
-        This behavior may change in music21 v.8 or after.
+        This behavior may change in music21 v8 or after.
 
         >>> te = style.Style()
         >>> te.absoluteY = 10
@@ -267,7 +267,7 @@ class NoteStyle(Style):
             ''',
     }
 
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__()
         self.stemStyle: Style | None = None
         self.accidentalStyle: Style | None = None
@@ -622,7 +622,7 @@ class StyleMixin(common.SlottedObjectMixin):
 
     __slots__ = ('_style', '_editorial')
 
-    def __init__(self):
+    def __init__(self) -> None:
         # no need to call super().__init__() on SlottedObjectMixin
         # This might be dangerous though
         self._style: Style | None = None

@@ -119,7 +119,8 @@ class Test(unittest.TestCase):
 
 
     def testTrillExtensionA(self):
-        '''Test basic wave line creation and output, as well as passing
+        '''
+        Test basic wave line creation and output, as well as passing
         objects through make measure calls.
         '''
         s = stream.Stream()

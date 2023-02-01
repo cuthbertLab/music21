@@ -6,7 +6,7 @@
 # Authors:      Michael Scott Asato Cuthbert
 #               Christopher Ariza
 #
-# Copyright:    Copyright © 2008-2022 Michael Scott Asato Cuthbert
+# Copyright:    Copyright © 2008-2023 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 from __future__ import annotations
@@ -43,7 +43,8 @@ class Test(unittest.TestCase):
         self.assertEqual(b.octave, 3)
 
     def testAccidentalImport(self):
-        '''Test that we are getting the properly set accidentals
+        '''
+        Test that we are getting the properly set accidentals
         '''
         s = corpus.parse('bwv438.xml')
         tenorMeasures = s.parts[2].getElementsByClass(stream.Measure)
@@ -59,7 +60,8 @@ class Test(unittest.TestCase):
         self.assertTrue(pAltered.accidental.displayStatus)
 
     def testUpdateAccidentalDisplaySimple(self):
-        '''Test updating accidental display.
+        '''
+        Test updating accidental display.
         '''
         past = [Pitch('A#3'), Pitch('C#'), Pitch('C')]
 
@@ -77,7 +79,8 @@ class Test(unittest.TestCase):
         self.assertEqual(b.accidental.name, 'natural')
 
     def testUpdateAccidentalDisplaySeries(self):
-        '''Test updating accidental display.
+        '''
+        Test updating accidental display.
         '''
         def proc(_pList, past):
             for p in _pList:
@@ -182,7 +185,8 @@ class Test(unittest.TestCase):
         compare(pList, result)
 
     def testUpdateAccidentalDisplaySeriesKeySignature(self):
-        '''Test updating accidental display against a KeySignature
+        '''
+        Test updating accidental display against a KeySignature
         '''
         def proc(_pList, past, alteredPitches):
             for p in _pList:

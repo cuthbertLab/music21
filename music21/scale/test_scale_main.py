@@ -6,7 +6,7 @@
 # Authors:      Christopher Ariza
 #               Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2010-2022 Michael Scott Asato Cuthbert
+# Copyright:    Copyright © 2010-2023 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 from __future__ import annotations
@@ -905,7 +905,9 @@ class Test(unittest.TestCase):
             e.deriveRanked(['C4', 'E4', 'G4'], comparisonAttribute='name')
 
     def test_getPitches_multiple_times(self):
-        '''Worth testing because we found cached lists being mutated.'''
+        '''
+        Worth testing because we found cached lists being mutated.
+        '''
         c_maj = scale.MajorScale('C')
 
         for i in range(3):  # catch both even and odd states

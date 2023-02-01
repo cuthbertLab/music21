@@ -13,7 +13,7 @@ import unittest
 
 _DOC_IGNORE_MODULE_OR_PACKAGE = True
 
-
+# Needs triple double quotes because of embedded c'''' below.
 pitches01a = """<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE score-partwise PUBLIC "-//Recordare//DTD MusicXML 1.0 Partwise//EN"
                                 "http://www.musicxml.org/dtds/partwise.dtd">
@@ -2153,7 +2153,6 @@ lyricsMelisma61d = '''<?xml version="1.0" encoding="UTF-8"?>
   </part>
   <!--=========================================================-->
 </score-partwise>
-
 '''
 
 # noinspection SpellCheckingInspection
@@ -3576,7 +3575,6 @@ restsDurations02a = '''<?xml version="1.0" encoding="UTF-8"?>
   </part>
   <!--=========================================================-->
 </score-partwise>
-
 '''
 
 arpeggio32d = '''<?xml version="1.0" encoding="UTF-8"?>
@@ -11396,8 +11394,8 @@ spannersSlurs33c = '''<?xml version="1.0" encoding="UTF-8"?>
   </part>
   <!--=========================================================-->
 </score-partwise>
-
 '''
+
 repeatMultipleTimes45c = '''<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE score-partwise PUBLIC "-//Recordare//DTD MusicXML 1.0 Partwise//EN"
                                 "http://www.musicxml.org/dtds/partwise.dtd">
@@ -13754,7 +13752,6 @@ repeatBracketsA = '''<?xml version="1.0" encoding="UTF-8"?>
   </part>
   <!--=========================================================-->
 </score-partwise>
-
 '''
 
 graceNotes24a = '''<?xml version="1.0" encoding="UTF-8"?>
@@ -14548,7 +14545,6 @@ mixedVoices1b = '''<?xml version="1.0" encoding="UTF-8"?>
   </part>
   <!--=========================================================-->
 </score-partwise>
-
 '''
 
 mixedVoices2 = '''<?xml version="1.0" encoding="UTF-8"?>
@@ -14996,7 +14992,6 @@ mixedVoices2 = '''<?xml version="1.0" encoding="UTF-8"?>
   </part>
   <!--=========================================================-->
 </score-partwise>
-
 '''
 
 metronomeMarks31c = '''<?xml version="1.0" encoding="UTF-8"?>
@@ -18958,6 +18953,99 @@ multiMeasureEnding = (
 </score-partwise>
 ''')
 
+multipleFingeringsOnChord = '''
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE score-partwise PUBLIC "-//Recordare//DTD MusicXML 3.1 Partwise//EN" "http://www.musicxml.org/dtds/partwise.dtd">
+<score-partwise version="3.1">
+  <part-list>
+    <score-part id="P1">
+      <part-name>Piano</part-name>
+      </score-part>
+    </part-list>
+  <part id="P1">
+    <measure number="1">
+      <attributes>
+        <divisions>1</divisions>
+        <key>
+          <fifths>0</fifths>
+          </key>
+        <time>
+          <beats>4</beats>
+          <beat-type>4</beat-type>
+          </time>
+        <staves>2</staves>
+        <clef number="1">
+          <sign>G</sign>
+          <line>2</line>
+          </clef>
+        <clef number="2">
+          <sign>F</sign>
+          <line>4</line>
+          </clef>
+        </attributes>
+      <note>
+        <pitch>
+          <step>C</step>
+          <octave>4</octave>
+          </pitch>
+        <duration>4</duration>
+        <voice>1</voice>
+        <type>whole</type>
+        <staff>1</staff>
+        <notations>
+          <technical>
+            <fingering>1</fingering>
+            </technical>
+          </notations>
+        </note>
+      <note>
+        <chord/>
+        <pitch>
+          <step>E</step>
+          <octave>4</octave>
+          </pitch>
+        <duration>4</duration>
+        <voice>1</voice>
+        <type>whole</type>
+        <staff>1</staff>
+        <notations>
+          <technical>
+            <fingering>3</fingering>
+            </technical>
+          </notations>
+        </note>
+      <note>
+        <chord/>
+        <pitch>
+          <step>G</step>
+          <octave>4</octave>
+          </pitch>
+        <duration>4</duration>
+        <voice>1</voice>
+        <type>whole</type>
+        <staff>1</staff>
+        <notations>
+          <technical>
+            <fingering>5</fingering>
+            </technical>
+          </notations>
+        </note>
+      <backup>
+        <duration>4</duration>
+        </backup>
+      <note>
+        <rest measure="yes"/>
+        <duration>4</duration>
+        <voice>5</voice>
+        <staff>2</staff>
+        </note>
+      <barline location="right">
+        <bar-style>light-heavy</bar-style>
+        </barline>
+      </measure>
+    </part>
+  </score-partwise>
+'''
 
 ALL = [
     articulations01, pitches01a, directions31a, lyricsMelisma61d, notations32a,  # 0
@@ -18976,7 +19064,7 @@ ALL = [
     unicodeStrNoNonAscii, unicodeStrWithNonAscii,  # 44
     tremoloTest, hiddenRests, multiDigitEnding, tupletsImplied, pianoStaffPolymeter,  # 46
     arpeggio32d, multiStaffArpeggios, multiMeasureEnding,   # 51
-    pianoStaffPolymeterWithClefOctaveChange,  # 54
+    pianoStaffPolymeterWithClefOctaveChange, multipleFingeringsOnChord  # 54
 ]
 
 

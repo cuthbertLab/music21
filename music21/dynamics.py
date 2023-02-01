@@ -6,7 +6,7 @@
 # Authors:      Michael Scott Asato Cuthbert
 #               Christopher Ariza
 #
-# Copyright:    Copyright © 2009-2022 Michael Scott Asato Cuthbert
+# Copyright:    Copyright © 2009-2023 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
@@ -109,12 +109,7 @@ class DynamicException(exceptions21.Music21Exception):
     pass
 
 
-class WedgeException(exceptions21.Music21Exception):
-    pass
-
 # ------------------------------------------------------------------------------
-
-
 class Dynamic(base.Music21Object):
     '''
     Object representation of Dynamics.

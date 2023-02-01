@@ -87,7 +87,7 @@ class SubConverter:
     codecWrite: bool = False
     stringEncoding: str = 'utf-8'
 
-    def __init__(self, **keywords):
+    def __init__(self, **keywords) -> None:
         self._stream: stream.Score | stream.Part | stream.Opus = stream.Score()
         self.keywords: dict[str, t.Any] = keywords
 
@@ -270,7 +270,7 @@ class SubConverter:
         >>> import os  #_DOCS_HIDE
         >>> os.remove(tf)  #_DOCS_HIDE
 
-        Changed in v.6 -- returns pathlib.Path
+        * Changed in v6: returns pathlib.Path
         '''
         ext = self.getExtensionForSubformats(subformats)
         fp = environLocal.getTempFile(ext, returnPathlib=True)
@@ -866,7 +866,8 @@ class ConverterNoteworthy(SubConverter):
     # --------------------------------------------------------------------------
     def parseData(self, nwcData):
         # noinspection PyShadowingNames
-        r'''Open Noteworthy data from a string or list
+        r'''
+        Open Noteworthy data from a string or list
 
         >>> nwcData = ('!NoteWorthyComposer(2.0)\n|AddStaff\n|Clef|' +
         ...     'Type:Treble\n|Note|Dur:Whole|Pos:1^')
@@ -1090,7 +1091,7 @@ class ConverterMusicXML(SubConverter):
         Writes `dataStr` which must be bytes to `fp`.
         Adds `.musicxml` suffix to `fp` if it does not already contain some suffix.
 
-        Changed in v7 -- returns a pathlib.Path
+        * Changed in v7: returns a pathlib.Path
 
         OMIT_FROM_DOCS
 
@@ -1339,7 +1340,8 @@ class ConverterABC(SubConverter):
 
 
 class ConverterRomanText(SubConverter):
-    '''Simple class wrapper for parsing roman text harmonic definitions.
+    '''
+    Simple class wrapper for parsing roman text harmonic definitions.
     '''
     registerFormats = ('romantext', 'rntext')
     registerInputExtensions = ('rntxt', 'rntext', 'romantext', 'rtxt')
@@ -1444,14 +1446,15 @@ class ConverterCapella(SubConverter):
 
 # ------------------------------------------------------------------------------
 class ConverterMuseData(SubConverter):
-    '''Simple class wrapper for parsing MuseData.
+    '''
+    Simple class wrapper for parsing MuseData.
     '''
     registerFormats = ('musedata',)
     registerInputExtensions = ('md', 'musedata', 'zip')
 
     def parseData(self, strData, number=None):  # pragma: no cover
-        '''Get musedata from a string representation.
-
+        '''
+        Get musedata from a string representation.
         '''
         from music21 import musedata as musedataModule
         from music21.musedata import translate as musedataTranslate
@@ -1498,7 +1501,7 @@ class ConverterMuseData(SubConverter):
                 # environLocal.printDebug(['partStr', len(partStr)])
                 mdw.addString(partStr)
         else:
-            if fp.is_dir:
+            if fp.is_dir():
                 mdd = musedataModule.MuseDataDirectory(fp)
                 fpList = mdd.getPaths()
             elif not common.isListLike(fp):

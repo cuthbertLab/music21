@@ -65,16 +65,14 @@ class Wildcard(m21Base.Music21Object):
     matches a single object in a music21 stream.  Equivalent to the
     regular expression "."
 
-
     >>> wc1 = search.Wildcard()
     >>> wc1.pitch = pitch.Pitch('C')
     >>> st1 = stream.Stream()
     >>> st1.append(note.Note('D', type='half'))
     >>> st1.append(wc1)
     '''
-
-    def __init__(self):
-        super().__init__()
+    def __init__(self, **keywords):
+        super().__init__(**keywords)
         self.duration = WildcardDuration()
 
 
@@ -196,7 +194,7 @@ class StreamSearcher:
     why doesn't this work?  thisStream[found].expressions.append(expressions.TextExpression('*'))
     '''
 
-    def __init__(self, streamSearch=None, searchList=None):
+    def __init__(self, streamSearch: Stream, searchList: list[m21Base.Music21Object]):
         self.streamSearch = streamSearch
         self.searchList = searchList
         self.recurse = False
@@ -204,7 +202,7 @@ class StreamSearcher:
         self.filterNotesAndRests = False
 
         self.algorithms: list[
-            Callable[[Stream, m21Base.Music21Object],
+            Callable[[StreamSearcher, Stream, m21Base.Music21Object],
                      bool | None]
         ] = [StreamSearcher.wildcardAlgorithm]
 
@@ -261,23 +259,23 @@ class StreamSearcher:
 
         return foundEls
 
-    def wildcardAlgorithm(self, streamEl, searchEl):
+    def wildcardAlgorithm(self, streamEl: Stream, searchEl: m21Base.Music21Object):
         '''
         An algorithm that supports Wildcards -- added by default to the search function.
         '''
-        if Wildcard in searchEl.classSet:
+        if isinstance(searchEl, Wildcard):
             return True
         else:
             return None
 
-    def rhythmAlgorithm(self, streamEl, searchEl):
-        if 'WildcardDuration' in searchEl.duration.classes:
+    def rhythmAlgorithm(self, streamEl: Stream, searchEl: m21Base.Music21Object):
+        if isinstance(searchEl.duration, WildcardDuration):
             return True
         if searchEl.duration.quarterLength != streamEl.duration.quarterLength:
             return False
         return None
 
-    def noteNameAlgorithm(self, streamEl, searchEl):
+    def noteNameAlgorithm(self, streamEl: Stream, searchEl: m21Base.Music21Object):
         if not hasattr(searchEl, 'name'):
             return False
         if not hasattr(streamEl, 'name'):
@@ -1071,7 +1069,7 @@ def mostCommonMeasureRhythms(streamIn, transposeDiatonic=False):
     {3.0} <music21.note.Note B->
     -----
 
-    Changed in v7 -- bars are ordered first by number, then by part.
+    * Changed in v7: bars are ordered first by number, then by part.
     '''
     returnDicts = []
     distanceToTranspose = 0

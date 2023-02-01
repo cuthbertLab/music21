@@ -20,8 +20,9 @@ from __future__ import annotations
 
 import copy
 import string
-from typing import TYPE_CHECKING  # pylint needs no alias
+import typing as t
 
+from music21.common.types import StreamType
 from music21 import environment
 from music21 import exceptions21
 from music21 import expressions
@@ -30,7 +31,7 @@ from music21 import spanner
 from music21 import style
 
 
-if TYPE_CHECKING:
+if t.TYPE_CHECKING:
     from music21 import stream
 
 
@@ -112,7 +113,8 @@ class RepeatExpression(RepeatMark, expressions.Expression):
             return ''
 
     def getText(self):
-        '''Get the text used for this expression.
+        '''
+        Get the text used for this expression.
         '''
         return self._textExpression.content
 
@@ -140,7 +142,8 @@ class RepeatExpression(RepeatMark, expressions.Expression):
         return te
 
     def setTextExpression(self, value):
-        '''Directly set a TextExpression object.
+        '''
+        Directly set a TextExpression object.
         '''
         if not isinstance(value, expressions.TextExpression):
             raise RepeatExpressionException(
@@ -158,7 +161,8 @@ class RepeatExpression(RepeatMark, expressions.Expression):
             return copy.deepcopy(self._textExpression)
 
     def isValidText(self, value):
-        '''Return True or False if the supplied text could be used for this RepeatExpression.
+        '''
+        Return True or False if the supplied text could be used for this RepeatExpression.
         '''
         def stripText(s):
             # remove all spaces, punctuation, and make lower
@@ -229,8 +233,8 @@ class Segno(RepeatExpressionMarker):
 
 
 class Fine(RepeatExpressionMarker):
-    '''The fine word as placed in a score.
-
+    '''
+    The fine word as placed in a score.
 
     >>> rm = repeat.Fine()
     '''
@@ -646,7 +650,7 @@ class ExpanderException(exceptions21.Music21Exception):
     pass
 
 
-class Expander:
+class Expander(t.Generic[StreamType]):
     '''
     The Expander object can expand a single Part or Part-like Stream with repeats. Nested
     repeats given with :class:`~music21.bar.Repeat` objects, or
@@ -709,45 +713,44 @@ class Expander:
         {0.0} <music21.note.Note F>
         {3.0} <music21.bar.Barline type=final>
 
+    Changed in v9: Expander must be initialized with a Stream object.
+
     OMIT_FROM_DOCS
 
     TODO: Note bug: barline style = double for each!
     Clefs and TimesSignatures should only be in first one!
 
-    Test empty expander:
-
-    >>> e = repeat.Expander()
+    THIS IS IN OMIT
     '''
-    def __init__(self, streamObj=None):
-        self._src = streamObj
-        self._repeatBrackets = None
-        if streamObj is not None:
-            self._setup()
-
-    def _setup(self):
-        '''
-        run several setup routines.
-        '''
+    def __init__(self, streamObj: StreamType):
         from music21 import stream
+
+        self._src: StreamType = streamObj
 
         # get and store the source measure count; this is presumed to
         # be a Stream with Measures
-        self._srcMeasureStream = self._src.getElementsByClass(stream.Measure).stream()
+        self._srcMeasureStream: stream.Stream[stream.Measure] = self._src.getElementsByClass(
+            stream.Measure
+        ).stream()
         # store all top-level non Measure elements for later insertion
-        self._srcNotMeasureStream = self._src.getElementsNotOfClass(stream.Measure).stream()
-
-        # see if there are any repeat brackets
-        self._repeatBrackets = self._src.flatten().getElementsByClass(
-            spanner.RepeatBracket
+        self._srcNotMeasureStream: stream.Stream = self._src.getElementsNotOfClass(
+            stream.Measure
         ).stream()
 
-        self._srcMeasureCount = len(self._srcMeasureStream)
+        # see if there are any repeat brackets
+        self._repeatBrackets: stream.Stream[spanner.RepeatBracket] = (
+            self._src.flatten().getElementsByClass(spanner.RepeatBracket).stream()
+        )
+
+        self._srcMeasureCount: int = len(self._srcMeasureStream)
         if self._srcMeasureCount == 0:
             raise ExpanderException('no measures found in the source stream to be expanded')
 
         # store counts of all non barline elements.
         # doing class matching by string as problems matching in some test cases
-        reStream = self._srcMeasureStream.flatten().getElementsByClass(RepeatExpression).stream()
+        reStream: stream.Stream[RepeatExpression] = (
+            self._srcMeasureStream.flatten().getElementsByClass(RepeatExpression).stream()
+        )
         self._codaCount = len(reStream.getElementsByClass(Coda))
         self._segnoCount = len(reStream.getElementsByClass(Segno))
         self._fineCount = len(reStream.getElementsByClass(Fine))
@@ -761,7 +764,7 @@ class Expander:
         self._dsafCount = len(reStream.getElementsByClass(DalSegnoAlFine))
         self._dsacCount = len(reStream.getElementsByClass(DalSegnoAlCoda))
 
-    def process(self, deepcopy=True):
+    def process(self, deepcopy: bool = True) -> StreamType:
         '''
         This is the main call for Expander
 
@@ -786,7 +789,7 @@ class Expander:
             srcStream = self._srcMeasureStream
 
         if canExpand is None:
-            return srcStream
+            return t.cast(StreamType, srcStream)
 
         # these must be copied, otherwise we have the original still
         self._repeatBrackets = copy.deepcopy(self._repeatBrackets)
@@ -994,12 +997,14 @@ class Expander:
             raise ExpanderException('no repeat command found')
 
     def _getRepeatExpressionCommand(self, streamObj):
-        '''Get the instance found in this stream; assumes that there is one.
+        '''
+        Get the instance found in this stream; assumes that there is one.
         '''
         return streamObj.flatten().getElementsByClass(RepeatExpressionCommand).first()
 
     def _daCapoIsCoherent(self):
-        '''Check of a DC statement is coherent.
+        '''
+        Check of a DC statement is coherent.
         '''
         # there can be only one da capo statement for the provided span
         sumDc = self._dcCount + self._dcafCount + self._dcacCount
@@ -1025,7 +1030,8 @@ class Expander:
         return False
 
     def _dalSegnoIsCoherent(self):
-        '''Check of a sa segno statement is coherent.
+        '''
+        Check of a sa segno statement is coherent.
         '''
         # there can be only one da segno statement for the provided span
         sumDs = (self._asCount
@@ -1148,7 +1154,8 @@ class Expander:
         return groups
 
     def _repeatBracketsAreCoherent(self):
-        '''Check if repeat brackets are coherent.
+        '''
+        Check if repeat brackets are coherent.
 
         This must be done for each group of brackets, not for the entire Stream.
         '''
@@ -1715,11 +1722,10 @@ class Expander:
         stream of measures. This requires the provided stream
         to only have measures.
 
-
         >>> s = converter.parse('tinynotation: 3/4 A2. C4 D E F2.')
         >>> s.makeMeasures(inPlace=True)
         >>> s.measure(3).append(repeat.Segno())
-        >>> e = repeat.Expander()
+        >>> e = repeat.Expander(s)
 
         getRepeatExpressionIndex returns the measureIndex not measure number
 

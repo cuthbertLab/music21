@@ -57,7 +57,8 @@ class MetadataEntry(prebase.ProtoM21Object):
     and can be parsed to reconstitute the score object the metadata was
     derived from:
 
-    >>> coreBundle = corpus.corpora.CoreCorpus().metadataBundle
+    >>> #_DOCS_SHOW coreBundle = corpus.corpora.CoreCorpus().metadataBundle
+    >>> coreBundle = metadata.bundles.demo_bundle('core')  #_DOCS_HIDE
     >>> metadataEntry = coreBundle.search('bwv66.6')[0]
     >>> metadataEntry
     <music21.metadata.bundles.MetadataEntry 'bach_bwv66_6_mxl'>
@@ -169,11 +170,16 @@ class MetadataBundle(prebase.ProtoM21Object):
     An object that provides access to, searches within, and stores and loads
     multiple Metadata objects.
 
-    >>> coreBundle = corpus.corpora.CoreCorpus().metadataBundle
+    >>> #_DOCS_SHOW coreBundle = corpus.corpora.CoreCorpus().metadataBundle
+    >>> coreBundle = metadata.bundles.demo_bundle('core')  #_DOCS_HIDE
     >>> coreBundle
     <music21.metadata.bundles.MetadataBundle 'core': {151... entries}>
 
-    >>> searchResults = coreBundle.search('bach', field='composer')
+    (The coreBundle has around 15100 entries; I've put '...' in the
+    docs so I don't need to rewrite them every time we add a new piece)
+
+    >>> #_DOCS_SHOW searchResults = coreBundle.search('bach', field='composer')
+    >>> searchResults = metadata.bundles.demo_bundle('bach')  #_DOCS_HIDE
     >>> searchResults
     <music21.metadata.bundles.MetadataBundle {363 entries}>
 
@@ -239,14 +245,14 @@ class MetadataBundle(prebase.ProtoM21Object):
     Additionally, any two metadata bundles can be operated on together as
     though they were sets, allowing us to build up more complex searches:
 
-    >>> coreBundle = corpus.corpora.CoreCorpus().metadataBundle
-    >>> bachBundle = coreBundle.search(
-    ...     'bach',
-    ...     field='composer',
-    ...     )
+    >>> #_DOCS_SHOW coreBundle = corpus.corpora.CoreCorpus().metadataBundle
+    >>> coreBundle = metadata.bundles.demo_bundle('core')  #_DOCS_HIDE
+    >>> #_DOCS_SHOW bachBundle = coreBundle.search('bach', 'composer')
+    >>> bachBundle = metadata.bundles.demo_bundle('bach')  #_DOCS_HIDE
     >>> bachBundle
     <music21.metadata.bundles.MetadataBundle {363 entries}>
-    >>> tripleMeterBundle = coreBundle.search('3/4')
+    >>> #_DOCS_SHOW tripleMeterBundle = coreBundle.search('3/4')
+    >>> tripleMeterBundle = metadata.bundles.demo_bundle('3/4')  #_DOCS_HIDE
     >>> tripleMeterBundle
     <music21.metadata.bundles.MetadataBundle {1875 entries}>
     >>> bachBundle.intersection(tripleMeterBundle)
@@ -268,13 +274,15 @@ class MetadataBundle(prebase.ProtoM21Object):
 
     # INITIALIZER #
 
-    def __init__(self, expr=None):
+    def __init__(self, expr: 'music21.corpus.corpora.Corpus' | str | None = None):
         from music21 import corpus
+
         self._metadataEntries: OrderedDict[str, MetadataEntry] = OrderedDict()
         if not isinstance(expr, (str, corpus.corpora.Corpus, type(None))):
             raise MetadataBundleException('Need to take a string, corpus, or None as expression')
 
-        self._corpus = None
+        self._corpus: corpus.corpora.Corpus | None = None
+        self._name: str | None
 
         if isinstance(expr, corpus.corpora.Corpus):
             self._name = expr.name
@@ -289,14 +297,14 @@ class MetadataBundle(prebase.ProtoM21Object):
         r'''
         Compute the set-wise `and` of two metadata bundles:
 
-        >>> coreBundle = corpus.corpora.CoreCorpus().metadataBundle
-        >>> bachBundle = coreBundle.search(
-        ...     'bach',
-        ...     field='composer',
-        ...     )
+        >>> #_DOCS_SHOW coreBundle = corpus.corpora.CoreCorpus().metadataBundle
+        >>> coreBundle = metadata.bundles.demo_bundle('core')  #_DOCS_HIDE
+        >>> #_DOCS_SHOW bachBundle = coreBundle.search('bach', 'composer')
+        >>> bachBundle = metadata.bundles.demo_bundle('bach')  #_DOCS_HIDE
         >>> bachBundle
         <music21.metadata.bundles.MetadataBundle {363 entries}>
-        >>> tripleMeterBundle = coreBundle.search('3/4')
+        >>> #_DOCS_SHOW tripleMeterBundle = coreBundle.search('3/4')
+        >>> tripleMeterBundle = metadata.bundles.demo_bundle('3/4')  #_DOCS_HIDE
         >>> tripleMeterBundle
         <music21.metadata.bundles.MetadataBundle {1875 entries}>
         >>> bachBundle & tripleMeterBundle
@@ -314,15 +322,12 @@ class MetadataBundle(prebase.ProtoM21Object):
         True if `expr` is of the same type, and contains an identical set of
         entries, otherwise false:
 
-        >>> coreBundle = corpus.corpora.CoreCorpus().metadataBundle
-        >>> bachBundle = coreBundle.search(
-        ...     'bach',
-        ...     field='composer',
-        ...     )
-        >>> corelliBundle = coreBundle.search(
-        ...     'corelli',
-        ...     field='composer',
-        ...     )
+        >>> #_DOCS_SHOW coreBundle = corpus.corpora.CoreCorpus().metadataBundle
+        >>> coreBundle = metadata.bundles.demo_bundle('core')  #_DOCS_HIDE
+        >>> #_DOCS_SHOW bachBundle = coreBundle.search('bach', 'composer')
+        >>> bachBundle = metadata.bundles.demo_bundle('bach')  #_DOCS_HIDE
+        >>> #_DOCS_SHOW corelliBundle = coreBundle.search('corelli', 'composer')
+        >>> corelliBundle = metadata.bundles.demo_bundle('corelli')  #_DOCS_HIDE
         >>> bachBundle == corelliBundle
         False
         >>> bachBundle == coreBundle.search(
@@ -344,15 +349,12 @@ class MetadataBundle(prebase.ProtoM21Object):
         True when one metadata bundle is either a superset or an identical set
         to another bundle:
 
-        >>> coreBundle = corpus.corpora.CoreCorpus().metadataBundle
-        >>> bachBundle = coreBundle.search(
-        ...     'bach',
-        ...     field='composer',
-        ...     )
-        >>> corelliBundle = coreBundle.search(
-        ...     'corelli',
-        ...     field='composer',
-        ...     )
+        >>> #_DOCS_SHOW coreBundle = corpus.corpora.CoreCorpus().metadataBundle
+        >>> coreBundle = metadata.bundles.demo_bundle('core')  #_DOCS_HIDE
+        >>> #_DOCS_SHOW bachBundle = coreBundle.search('bach', 'composer')
+        >>> bachBundle = metadata.bundles.demo_bundle('bach')  #_DOCS_HIDE
+        >>> #_DOCS_SHOW corelliBundle = coreBundle.search('corelli', 'composer')
+        >>> corelliBundle = metadata.bundles.demo_bundle('corelli')  #_DOCS_HIDE
         >>> bachBundle >= bachBundle
         True
         >>> bachBundle >= corelliBundle
@@ -384,15 +386,12 @@ class MetadataBundle(prebase.ProtoM21Object):
         True when one metadata bundle is either a subset or an identical set to
         another bundle:
 
-        >>> coreBundle = corpus.corpora.CoreCorpus().metadataBundle
-        >>> bachBundle = coreBundle.search(
-        ...     'bach',
-        ...     field='composer',
-        ...     )
-        >>> corelliBundle = coreBundle.search(
-        ...     'corelli',
-        ...     field='composer',
-        ...     )
+        >>> #_DOCS_SHOW coreBundle = corpus.corpora.CoreCorpus().metadataBundle
+        >>> coreBundle = metadata.bundles.demo_bundle('core')  #_DOCS_HIDE
+        >>> #_DOCS_SHOW bachBundle = coreBundle.search('bach', 'composer')
+        >>> bachBundle = metadata.bundles.demo_bundle('bach')  #_DOCS_HIDE
+        >>> #_DOCS_SHOW corelliBundle = coreBundle.search('corelli', 'composer')
+        >>> corelliBundle = metadata.bundles.demo_bundle('corelli')  #_DOCS_HIDE
         >>> bachBundle > bachBundle
         False
         >>> bachBundle > corelliBundle
@@ -422,16 +421,12 @@ class MetadataBundle(prebase.ProtoM21Object):
         True when one metadata bundle is either a subset or an identical set to
         another bundle:
 
-        >>> coreBundle = corpus.corpora.CoreCorpus().metadataBundle
-        >>> bachBundle = coreBundle.search(
-        ...     'bach',
-        ...     field='composer',
-        ...     )
-        >>> corelliBundle = coreBundle.search(
-        ...     'corelli',
-        ...     field='composer',
-        ...     )
-
+        >>> #_DOCS_SHOW coreBundle = corpus.corpora.CoreCorpus().metadataBundle
+        >>> coreBundle = metadata.bundles.demo_bundle('core')  #_DOCS_HIDE
+        >>> #_DOCS_SHOW bachBundle = coreBundle.search('bach', 'composer')
+        >>> bachBundle = metadata.bundles.demo_bundle('bach')  #_DOCS_HIDE
+        >>> #_DOCS_SHOW corelliBundle = coreBundle.search('corelli', 'composer')
+        >>> corelliBundle = metadata.bundles.demo_bundle('corelli')  #_DOCS_HIDE
         >>> bachBundle <= bachBundle
         True
         >>> bachBundle <= corelliBundle
@@ -462,15 +457,12 @@ class MetadataBundle(prebase.ProtoM21Object):
         '''
         True when one metadata bundle is a subset of another bundle:
 
-        >>> coreBundle = corpus.corpora.CoreCorpus().metadataBundle
-        >>> bachBundle = coreBundle.search(
-        ...     'bach',
-        ...     field='composer',
-        ...     )
-        >>> corelliBundle = coreBundle.search(
-        ...     'corelli',
-        ...     field='composer',
-        ...     )
+        >>> #_DOCS_SHOW coreBundle = corpus.corpora.CoreCorpus().metadataBundle
+        >>> coreBundle = metadata.bundles.demo_bundle('core')  #_DOCS_HIDE
+        >>> #_DOCS_SHOW bachBundle = coreBundle.search('bach', 'composer')
+        >>> bachBundle = metadata.bundles.demo_bundle('bach')  #_DOCS_HIDE
+        >>> #_DOCS_SHOW corelliBundle = coreBundle.search('corelli', 'composer')
+        >>> corelliBundle = metadata.bundles.demo_bundle('corelli')  #_DOCS_HIDE
         >>> bachBundle < bachBundle
         False
         >>> bachBundle < corelliBundle
@@ -498,17 +490,14 @@ class MetadataBundle(prebase.ProtoM21Object):
         r'''
         Compute the set-wise `or` of two metadata bundles:
 
-        >>> coreBundle = corpus.corpora.CoreCorpus().metadataBundle
-        >>> bachBundle = coreBundle.search(
-        ...     'bach',
-        ...     field='composer',
-        ...     )
+        >>> #_DOCS_SHOW coreBundle = corpus.corpora.CoreCorpus().metadataBundle
+        >>> coreBundle = metadata.bundles.demo_bundle('core')  #_DOCS_HIDE
+        >>> #_DOCS_SHOW bachBundle = coreBundle.search('bach', 'composer')
+        >>> bachBundle = metadata.bundles.demo_bundle('bach')  #_DOCS_HIDE
         >>> bachBundle
         <music21.metadata.bundles.MetadataBundle {363 entries}>
-        >>> corelliBundle = coreBundle.search(
-        ...     'corelli',
-        ...     field='composer',
-        ...     )
+        >>> #_DOCS_SHOW corelliBundle = coreBundle.search('corelli', 'composer')
+        >>> corelliBundle = metadata.bundles.demo_bundle('corelli')  #_DOCS_HIDE
         >>> corelliBundle
         <music21.metadata.bundles.MetadataBundle {1 entry}>
         >>> bachBundle | corelliBundle
@@ -535,14 +524,14 @@ class MetadataBundle(prebase.ProtoM21Object):
         r'''
         Compute the set-wise `subtraction` of two metadata bundles:
 
-        >>> coreBundle = corpus.corpora.CoreCorpus().metadataBundle
-        >>> bachBundle = coreBundle.search(
-        ...     'bach',
-        ...     field='composer',
-        ...     )
+        >>> #_DOCS_SHOW coreBundle = corpus.corpora.CoreCorpus().metadataBundle
+        >>> coreBundle = metadata.bundles.demo_bundle('core')  #_DOCS_HIDE
+        >>> #_DOCS_SHOW bachBundle = coreBundle.search('bach', 'composer')
+        >>> bachBundle = metadata.bundles.demo_bundle('bach')  #_DOCS_HIDE
         >>> bachBundle
         <music21.metadata.bundles.MetadataBundle {363 entries}>
-        >>> tripleMeterBundle = coreBundle.search('3/4')
+        >>> #_DOCS_SHOW tripleMeterBundle = coreBundle.search('3/4')
+        >>> tripleMeterBundle = metadata.bundles.demo_bundle('3/4')  #_DOCS_HIDE
         >>> tripleMeterBundle
         <music21.metadata.bundles.MetadataBundle {1875 entries}>
         >>> bachBundle - tripleMeterBundle
@@ -562,15 +551,15 @@ class MetadataBundle(prebase.ProtoM21Object):
         r'''
         Compute the set-wise `exclusive or` of two metadata bundles:
 
-        >>> coreBundle = corpus.corpora.CoreCorpus().metadataBundle
-        >>> bachBundle = coreBundle.search(
-        ...     'bach',
-        ...     field='composer',
-        ...     )
+        >>> #_DOCS_SHOW coreBundle = corpus.corpora.CoreCorpus().metadataBundle
+        >>> coreBundle = metadata.bundles.demo_bundle('core')  #_DOCS_HIDE
+        >>> #_DOCS_SHOW bachBundle = coreBundle.search('bach', 'composer')
+        >>> bachBundle = metadata.bundles.demo_bundle('bach')  #_DOCS_HIDE
         >>> bachBundle
         <music21.metadata.bundles.MetadataBundle {363 entries}>
 
-        >>> tripleMeterBundle = coreBundle.search('3/4')
+        >>> #_DOCS_SHOW tripleMeterBundle = coreBundle.search('3/4')
+        >>> tripleMeterBundle = metadata.bundles.demo_bundle('3/4')  #_DOCS_HIDE
         >>> tripleMeterBundle
         <music21.metadata.bundles.MetadataBundle {1875 entries}>
         >>> bachBundle ^ tripleMeterBundle
@@ -626,7 +615,8 @@ class MetadataBundle(prebase.ProtoM21Object):
         The `corpus.corpora.Corpus` object associated with the metadata
         bundle's name.
 
-        >>> coreBundle = corpus.corpora.CoreCorpus().metadataBundle
+        >>> #_DOCS_SHOW coreBundle = corpus.corpora.CoreCorpus().metadataBundle
+        >>> coreBundle = metadata.bundles.demo_bundle('core')  #_DOCS_HIDE
         >>> coreBundle
         <music21.metadata.bundles.MetadataBundle 'core': {151... entries}>
         >>> coreBundle.corpus
@@ -820,11 +810,9 @@ class MetadataBundle(prebase.ProtoM21Object):
         r'''
         Clear all keys in a metadata bundle:
 
-        >>> coreBundle = corpus.corpora.CoreCorpus().metadataBundle
-        >>> bachBundle = coreBundle.search(
-        ...     'bach',
-        ...     field='composer',
-        ...     )
+        >>> #_DOCS_SHOW coreBundle = corpus.corpora.CoreCorpus().metadataBundle
+        >>> coreBundle = metadata.bundles.demo_bundle('core')  #_DOCS_HIDE
+        >>> bachBundle = coreBundle.search('bach', 'composer')
         >>> bachBundle
         <music21.metadata.bundles.MetadataBundle {363 entries}>
 
@@ -833,6 +821,10 @@ class MetadataBundle(prebase.ProtoM21Object):
         <music21.metadata.bundles.MetadataBundle {0 entries}>
 
         Returns None.
+
+        OMIT_FROM_DOCS
+
+        Do not use the cached bach on this -- the .clear() manipulates the metadata bundle.
         '''
         self._metadataEntries.clear()
 
@@ -879,33 +871,31 @@ class MetadataBundle(prebase.ProtoM21Object):
             return f'{corpusPath}_{number}'
         return corpusPath
 
-    def delete(self):
+    def delete(self) -> None:
         r'''
         Delete the filesystem cache of a named metadata bundle.
 
         Does not delete the in-memory metadata bundle.
 
-        Return none.
+        Return None.
         '''
         if self.filePath is not None:
             if self.filePath.exists():
                 self.filePath.unlink()
-        return self
 
     def difference(self, metadataBundle):
         r'''
         Compute the set-wise difference of two metadata bundles:
 
-        >>> coreBundle = corpus.corpora.CoreCorpus().metadataBundle
-
-        >>> bachBundle = coreBundle.search(
-        ...     'bach',
-        ...     field='composer',
-        ...     )
+        >>> #_DOCS_SHOW coreBundle = corpus.corpora.CoreCorpus().metadataBundle
+        >>> coreBundle = metadata.bundles.demo_bundle('core')  #_DOCS_HIDE
+        >>> #_DOCS_SHOW bachBundle = coreBundle.search('bach', 'composer')
+        >>> bachBundle = metadata.bundles.demo_bundle('bach')  #_DOCS_HIDE
         >>> bachBundle
         <music21.metadata.bundles.MetadataBundle {363 entries}>
 
-        >>> tripleMeterBundle = coreBundle.search('3/4')
+        >>> #_DOCS_SHOW tripleMeterBundle = coreBundle.search('3/4')
+        >>> tripleMeterBundle = metadata.bundles.demo_bundle('3/4')  #_DOCS_HIDE
         >>> tripleMeterBundle
         <music21.metadata.bundles.MetadataBundle {1875 entries}>
 
@@ -923,16 +913,15 @@ class MetadataBundle(prebase.ProtoM21Object):
         r'''
         Compute the set-wise intersection of two metadata bundles:
 
-        >>> coreBundle = corpus.corpora.CoreCorpus().metadataBundle
-
-        >>> bachBundle = coreBundle.search(
-        ...     'bach',
-        ...     field='composer',
-        ...     )
+        >>> #_DOCS_SHOW coreBundle = corpus.corpora.CoreCorpus().metadataBundle
+        >>> coreBundle = metadata.bundles.demo_bundle('core')  #_DOCS_HIDE
+        >>> #_DOCS_SHOW bachBundle = coreBundle.search('bach', 'composer')
+        >>> bachBundle = metadata.bundles.demo_bundle('bach')  #_DOCS_HIDE
         >>> bachBundle
         <music21.metadata.bundles.MetadataBundle {363 entries}>
 
-        >>> tripleMeterBundle = coreBundle.search('3/4')
+        >>> #_DOCS_SHOW tripleMeterBundle = coreBundle.search('3/4')
+        >>> tripleMeterBundle = metadata.bundles.demo_bundle('3/4')  #_DOCS_HIDE
         >>> tripleMeterBundle
         <music21.metadata.bundles.MetadataBundle {1875 entries}>
 
@@ -951,26 +940,23 @@ class MetadataBundle(prebase.ProtoM21Object):
         True if the set of keys in one metadata bundle are disjoint with
         the set of keys in another:
 
-        >>> coreBundle = corpus.corpora.CoreCorpus().metadataBundle
-
-        >>> bachBundle = coreBundle.search(
-        ...     'bach',
-        ...     field='composer',
-        ...     )
+        >>> #_DOCS_SHOW coreBundle = corpus.corpora.CoreCorpus().metadataBundle
+        >>> coreBundle = metadata.bundles.demo_bundle('core')  #_DOCS_HIDE
+        >>> #_DOCS_SHOW bachBundle = coreBundle.search('bach', 'composer')
+        >>> bachBundle = metadata.bundles.demo_bundle('bach')  #_DOCS_HIDE
         >>> bachBundle
         <music21.metadata.bundles.MetadataBundle {363 entries}>
 
-        >>> corelliBundle = coreBundle.search(
-        ...     'corelli',
-        ...     field='composer',
-        ...     )
+        >>> #_DOCS_SHOW corelliBundle = coreBundle.search('corelli', 'composer')
+        >>> corelliBundle = metadata.bundles.demo_bundle('corelli')  #_DOCS_HIDE
         >>> corelliBundle
         <music21.metadata.bundles.MetadataBundle {1 entry}>
 
         >>> bachBundle.isdisjoint(corelliBundle)
         True
 
-        >>> tripleMeterBundle = coreBundle.search('3/4')
+        >>> #_DOCS_SHOW tripleMeterBundle = coreBundle.search('3/4')
+        >>> tripleMeterBundle = metadata.bundles.demo_bundle('3/4')  #_DOCS_HIDE
         >>> tripleMeterBundle
         <music21.metadata.bundles.MetadataBundle {1875 entries}>
 
@@ -986,12 +972,10 @@ class MetadataBundle(prebase.ProtoM21Object):
         True if the set of keys in one metadata bundle are a subset of
         the keys in another:
 
-        >>> coreBundle = corpus.corpora.CoreCorpus().metadataBundle
-
-        >>> bachBundle = coreBundle.search(
-        ...     'bach',
-        ...     field='composer',
-        ...     )
+        >>> #_DOCS_SHOW coreBundle = corpus.corpora.CoreCorpus().metadataBundle
+        >>> coreBundle = metadata.bundles.demo_bundle('core')  #_DOCS_HIDE
+        >>> #_DOCS_SHOW bachBundle = coreBundle.search('bach', 'composer')
+        >>> bachBundle = metadata.bundles.demo_bundle('bach')  #_DOCS_HIDE
         >>> bachBundle
         <music21.metadata.bundles.MetadataBundle {363 entries}>
 
@@ -1014,12 +998,10 @@ class MetadataBundle(prebase.ProtoM21Object):
         True if the set of keys in one metadata bundle are a superset of
         the keys in another:
 
-        >>> coreBundle = corpus.corpora.CoreCorpus().metadataBundle
-
-        >>> bachBundle = coreBundle.search(
-        ...     'bach',
-        ...     field='composer',
-        ...     )
+        >>> #_DOCS_SHOW coreBundle = corpus.corpora.CoreCorpus().metadataBundle
+        >>> coreBundle = metadata.bundles.demo_bundle('core')  #_DOCS_HIDE
+        >>> #_DOCS_SHOW bachBundle = coreBundle.search('bach', 'composer')
+        >>> bachBundle = metadata.bundles.demo_bundle('bach')  #_DOCS_HIDE
         >>> bachBundle
         <music21.metadata.bundles.MetadataBundle {363 entries}>
 
@@ -1219,14 +1201,14 @@ class MetadataBundle(prebase.ProtoM21Object):
         r'''
         Compute the set-wise symmetric difference of two metadata bundles:
 
-        >>> coreBundle = corpus.corpora.CoreCorpus().metadataBundle
-        >>> bachBundle = coreBundle.search(
-        ...     'bach',
-        ...     field='composer',
-        ...     )
+        >>> #_DOCS_SHOW coreBundle = corpus.corpora.CoreCorpus().metadataBundle
+        >>> coreBundle = metadata.bundles.demo_bundle('core')  #_DOCS_HIDE
+        >>> #_DOCS_SHOW bachBundle = coreBundle.search('bach', 'composer')
+        >>> bachBundle = metadata.bundles.demo_bundle('bach')  #_DOCS_HIDE
         >>> bachBundle
         <music21.metadata.bundles.MetadataBundle {363 entries}>
-        >>> tripleMeterBundle = coreBundle.search('3/4')
+        >>> #_DOCS_SHOW tripleMeterBundle = coreBundle.search('3/4')
+        >>> tripleMeterBundle = metadata.bundles.demo_bundle('3/4')  #_DOCS_HIDE
         >>> tripleMeterBundle
         <music21.metadata.bundles.MetadataBundle {1875 entries}>
         >>> bachBundle.symmetric_difference(tripleMeterBundle)
@@ -1243,11 +1225,10 @@ class MetadataBundle(prebase.ProtoM21Object):
         r'''
         Compute the set-wise union of two metadata bundles:
 
-        >>> coreBundle = corpus.corpora.CoreCorpus().metadataBundle
-        >>> bachBundle = coreBundle.search(
-        ...     'bach',
-        ...     field='composer',
-        ...     )
+        >>> #_DOCS_SHOW coreBundle = corpus.corpora.CoreCorpus().metadataBundle
+        >>> coreBundle = metadata.bundles.demo_bundle('core')  #_DOCS_HIDE
+        >>> #_DOCS_SHOW bachBundle = coreBundle.search('bach', 'composer')
+        >>> bachBundle = metadata.bundles.demo_bundle('bach')  #_DOCS_HIDE
         >>> bachBundle
         <music21.metadata.bundles.MetadataBundle {363 entries}>
         >>> beethovenBundle = coreBundle.search(
@@ -1314,10 +1295,10 @@ class MetadataBundle(prebase.ProtoM21Object):
 
         Returns the metadata bundle.
 
-        >>> bachBundle = corpus.corpora.CoreCorpus().metadataBundle.search(
-        ...     'bach',
-        ...     'composer',
-        ...     )
+        >>> #_DOCS_SHOW bachBundle = coreBundle.search('bach', 'composer')
+        >>> bachBundle = metadata.bundles.demo_bundle('bach')  #_DOCS_HIDE
+        >>> bachBundle
+        <music21.metadata.bundles.MetadataBundle {363 entries}>
         >>> bachBundle.filePath is None
         True
 
@@ -1342,6 +1323,33 @@ class MetadataBundle(prebase.ProtoM21Object):
             self._corpus = storedCorpusClient
 
         return self
+
+
+_test_bundles: dict[str, MetadataBundle] = {}
+
+def demo_bundle(which: str):
+    '''
+    This helps with testing by reusing bundles.
+    '''
+    if which in _test_bundles:
+        return _test_bundles[which]
+    if which == 'core':
+        from music21.corpus.corpora import CoreCorpus
+        _test_bundles['core'] = CoreCorpus().metadataBundle
+        return _test_bundles['core']
+    if which == 'bach':
+        bachBundle = demo_bundle('core').search('bach', 'composer')
+        _test_bundles['bach'] = bachBundle
+        return bachBundle
+    if which == 'corelli':
+        corelliBundle = demo_bundle('core').search('corelli', field='composer')
+        _test_bundles['corelli'] = corelliBundle
+        return corelliBundle
+    if which == '3/4':
+        tripleMeterBundle = demo_bundle('core').search('3/4')
+        _test_bundles['3/4'] = tripleMeterBundle
+        return tripleMeterBundle
+    raise ValueError(f'no demo bundle called {which!r}')  # pragma: no-cover
 
 
 # -----------------------------------------------------------------------------

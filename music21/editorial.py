@@ -41,20 +41,8 @@ from __future__ import annotations
 
 import unittest
 
-from music21 import exceptions21
 from music21 import prebase
 from music21 import style
-
-# -----------------------------------------------------------------------------
-
-
-class EditorialException(exceptions21.Music21Exception):
-    pass
-
-
-class CommentException(exceptions21.Music21Exception):
-    pass
-
 
 # -----------------------------------------------------------------------------
 class Editorial(prebase.ProtoM21Object, dict):

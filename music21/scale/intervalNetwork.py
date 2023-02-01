@@ -6,7 +6,7 @@
 # Authors:      Christopher Ariza
 #               Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2010-2022 Michael Scott Asato Cuthbert
+# Copyright:    Copyright © 2010-2023 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
@@ -29,8 +29,8 @@ A scale or harmony may be composed of one or more IntervalNetwork objects.
 Both nodes and edges can be weighted to suggest tonics, dominants,
 finals, or other attributes of the network.
 
-Changed in v8 -- nodeId and nodeName standardized.  TERMINUS and DIRECTION
-    are now Enums.
+Changed in v8: nodeId and nodeName standardized.  TERMINUS and DIRECTION
+are now Enums.
 '''
 from __future__ import annotations
 
@@ -493,8 +493,13 @@ class IntervalNetwork:
         '''
         # compare all nodes and edges; if the same, and all keys are the same,
         # then matched
-        return (isinstance(other, self.__class__)
-                and self.__dict__ == other.__dict__)
+        if not isinstance(other, self.__class__):
+            return False
+        for attr in ('edgeIdCount', 'nodeIdCount', 'edges', 'nodes',
+                     'octaveDuplicating', 'deterministic', 'pitchSimplification'):
+            if getattr(self, attr) != getattr(other, attr):
+                return False
+        return True
 
     def fillBiDirectedEdges(self, edgeList: Sequence[interval.Interval | str]):
         # noinspection PyShadowingNames
@@ -1091,7 +1096,8 @@ class IntervalNetwork:
             raise IntervalNetworkException(f'cannot filter by: {nodeId}')
 
     def getNext(self, nodeStart, direction):
-        '''Given a Node, get two lists, one of next Edges, and one of next Nodes,
+        '''
+        Given a Node, get two lists, one of next Edges, and one of next Nodes,
         searching all Edges to find all matches.
 
         There may be more than one possibility. If so, the caller must look
@@ -2030,8 +2036,8 @@ class IntervalNetwork:
         alteredDegrees=None,
         reverse=False,
     ) -> list[interval.Interval]:
-        '''Realize the sequence of intervals between the specified pitches, or the termini.
-
+        '''
+        Realize the sequence of intervals between the specified pitches, or the termini.
 
         >>> edgeList = ['M2', 'M2', 'm2', 'M2', 'M2', 'M2', 'm2']
         >>> net = scale.intervalNetwork.IntervalNetwork()
@@ -2344,7 +2350,7 @@ class IntervalNetwork:
 
         Requires `networkx` to be installed.
 
-        Changed in v8 -- other parameters were unused and removed.
+        * Changed in v8: other parameters were unused and removed.
         '''
         #
         # >>> s = corpus.parse('bach/bwv324.xml') #_DOCS_HIDE
@@ -2786,7 +2792,7 @@ class IntervalNetwork:
         Traceback (most recent call last):
         ValueError: There must be at least one pitch given.
 
-        Changed in v8 -- staticmethod.  Raise value error on empty
+        * Changed in v8: staticmethod.  Raise value error on empty
         '''
         pitchList: list[pitch.Pitch]
         if not isinstance(pitchTarget, (list, tuple)):

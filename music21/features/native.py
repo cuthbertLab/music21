@@ -106,10 +106,13 @@ class QualityFeature(featuresModule.FeatureExtractor):
         self.isSequential = True
         self.dimensions = 1
 
-    def process(self):
+    def process(self) -> None:
         '''
         Do processing necessary, storing result in feature.
         '''
+        if self.data is None or self.feature is None:  # pragma: no cover
+            raise ValueError('Cannot process without a data instance or feature.')
+
         allKeys = self.data['flat.getElementsByClass(Key)']
         keyFeature: int | None = None
         if len(allKeys) == 1:
@@ -182,7 +185,8 @@ class TonalCertainty(featuresModule.FeatureExtractor):
         self.discrete = False
 
     def process(self):
-        '''Do processing necessary, storing result in feature.
+        '''
+        Do processing necessary, storing result in feature.
         '''
         self.feature.vector[0] = self.data['flat.analyzedKey.tonalCertainty']
 
@@ -236,7 +240,8 @@ class UniqueNoteQuarterLengths(featuresModule.FeatureExtractor):
         self.discrete = True
 
     def process(self):
-        '''Do processing necessary, storing result in feature.
+        '''
+        Do processing necessary, storing result in feature.
         '''
         count = 0
         histo = self.data['flat.notes.quarterLengthHistogram']
@@ -265,7 +270,8 @@ class MostCommonNoteQuarterLength(featuresModule.FeatureExtractor):
         self.discrete = False
 
     def process(self):
-        '''Do processing necessary, storing result in feature.
+        '''
+        Do processing necessary, storing result in feature.
         '''
         histo = self.data['flat.notes.quarterLengthHistogram']
         maximum = 0
@@ -280,6 +286,8 @@ class MostCommonNoteQuarterLength(featuresModule.FeatureExtractor):
 
 class MostCommonNoteQuarterLengthPrevalence(featuresModule.FeatureExtractor):
     '''
+    Fraction of notes that have the most common quarter length.
+
     >>> s = corpus.parse('bwv66.6')
     >>> fe = features.native.MostCommonNoteQuarterLengthPrevalence(s)
     >>> fe.extract().vector
@@ -296,7 +304,8 @@ class MostCommonNoteQuarterLengthPrevalence(featuresModule.FeatureExtractor):
         self.discrete = False
 
     def process(self):
-        '''Do processing necessary, storing result in feature.
+        '''
+        Do processing necessary, storing result in feature.
         '''
         summation = 0  # count of all
         histo = self.data['flat.notes.quarterLengthHistogram']
@@ -313,7 +322,8 @@ class MostCommonNoteQuarterLengthPrevalence(featuresModule.FeatureExtractor):
 
 
 class RangeOfNoteQuarterLengths(featuresModule.FeatureExtractor):
-    '''Difference between the longest and shortest quarter lengths.
+    '''
+    Difference between the longest and shortest quarter lengths.
 
     >>> s = corpus.parse('bwv66.6')
     >>> fe = features.native.RangeOfNoteQuarterLengths(s)
@@ -331,7 +341,8 @@ class RangeOfNoteQuarterLengths(featuresModule.FeatureExtractor):
         self.discrete = False
 
     def process(self):
-        '''Do processing necessary, storing result in feature.
+        '''
+        Do processing necessary, storing result in feature.
         '''
         histo = self.data['flat.notes.quarterLengthHistogram']
         if not histo:
@@ -352,7 +363,8 @@ class RangeOfNoteQuarterLengths(featuresModule.FeatureExtractor):
 
 
 class UniquePitchClassSetSimultaneities(featuresModule.FeatureExtractor):
-    '''Number of unique pitch class simultaneities.
+    '''
+    Number of unique pitch class simultaneities.
 
     >>> s = corpus.parse('bwv66.6')
     >>> fe = features.native.UniquePitchClassSetSimultaneities(s)
@@ -370,7 +382,8 @@ class UniquePitchClassSetSimultaneities(featuresModule.FeatureExtractor):
         self.discrete = False
 
     def process(self):
-        '''Do processing necessary, storing result in feature.
+        '''
+        Do processing necessary, storing result in feature.
         '''
         count = 0
         histo = self.data['chordify.flat.getElementsByClass(Chord).pitchClassSetHistogram']
@@ -382,7 +395,8 @@ class UniquePitchClassSetSimultaneities(featuresModule.FeatureExtractor):
 
 
 class UniqueSetClassSimultaneities(featuresModule.FeatureExtractor):
-    '''Number of unique set class simultaneities.
+    '''
+    Number of unique set class simultaneities.
 
     >>> s = corpus.parse('bwv66.6')
     >>> fe = features.native.UniqueSetClassSimultaneities(s)
@@ -400,7 +414,8 @@ class UniqueSetClassSimultaneities(featuresModule.FeatureExtractor):
         self.discrete = False
 
     def process(self):
-        '''Do processing necessary, storing result in feature.
+        '''
+        Do processing necessary, storing result in feature.
         '''
         count = 0
         histo = self.data['chordify.flat.getElementsByClass(Chord).setClassHistogram']
@@ -413,7 +428,8 @@ class UniqueSetClassSimultaneities(featuresModule.FeatureExtractor):
 
 class MostCommonPitchClassSetSimultaneityPrevalence(
         featuresModule.FeatureExtractor):
-    '''Fraction of all pitch class simultaneities that are the most common simultaneity.
+    '''
+    Fraction of all pitch class simultaneities that are the most common simultaneity.
 
     >>> s = corpus.parse('bwv66.6')
     >>> fe = features.native.MostCommonPitchClassSetSimultaneityPrevalence(s)
@@ -432,7 +448,8 @@ class MostCommonPitchClassSetSimultaneityPrevalence(
         self.discrete = False
 
     def process(self):
-        '''Do processing necessary, storing result in feature.
+        '''
+        Do processing necessary, storing result in feature.
         '''
         summation = 0  # count of all
         histo = self.data['chordify.flat.getElementsByClass(Chord).pitchClassSetHistogram']
@@ -517,7 +534,8 @@ class MajorTriadSimultaneityPrevalence(featuresModule.FeatureExtractor):
         self.discrete = False
 
     def process(self):
-        '''Do processing necessary, storing result in feature.
+        '''
+        Do processing necessary, storing result in feature.
         '''
         # use for total number of chords
         total = len(self.data['chordify.flat.getElementsByClass(Chord)'])
@@ -531,7 +549,8 @@ class MajorTriadSimultaneityPrevalence(featuresModule.FeatureExtractor):
 
 
 class MinorTriadSimultaneityPrevalence(featuresModule.FeatureExtractor):
-    '''Percentage of all simultaneities that are minor triads.
+    '''
+    Percentage of all simultaneities that are minor triads.
 
     >>> s = corpus.parse('bwv66.6')
     >>> fe = features.native.MinorTriadSimultaneityPrevalence(s)
@@ -549,7 +568,8 @@ class MinorTriadSimultaneityPrevalence(featuresModule.FeatureExtractor):
         self.discrete = False
 
     def process(self):
-        '''Do processing necessary, storing result in feature.
+        '''
+        Do processing necessary, storing result in feature.
         '''
         # use for total number of chords
         total = len(self.data['chordify.flat.getElementsByClass(Chord)'])
@@ -563,7 +583,8 @@ class MinorTriadSimultaneityPrevalence(featuresModule.FeatureExtractor):
 
 
 class DominantSeventhSimultaneityPrevalence(featuresModule.FeatureExtractor):
-    '''Percentage of all simultaneities that are dominant seventh.
+    '''
+    Percentage of all simultaneities that are dominant seventh.
 
     >>> s = corpus.parse('bwv66.6')
     >>> fe = features.native.DominantSeventhSimultaneityPrevalence(s)
@@ -581,7 +602,8 @@ class DominantSeventhSimultaneityPrevalence(featuresModule.FeatureExtractor):
         self.discrete = False
 
     def process(self):
-        '''Do processing necessary, storing result in feature.
+        '''
+        Do processing necessary, storing result in feature.
         '''
         # use for total number of chords
         total = len(self.data['chordify.flat.getElementsByClass(Chord)'])
@@ -595,7 +617,8 @@ class DominantSeventhSimultaneityPrevalence(featuresModule.FeatureExtractor):
 
 
 class DiminishedTriadSimultaneityPrevalence(featuresModule.FeatureExtractor):
-    '''Percentage of all simultaneities that are diminished triads.
+    '''
+    Percentage of all simultaneities that are diminished triads.
 
     >>> s = corpus.parse('bwv66.6')
     >>> fe = features.native.DiminishedTriadSimultaneityPrevalence(s)
@@ -613,7 +636,8 @@ class DiminishedTriadSimultaneityPrevalence(featuresModule.FeatureExtractor):
         self.discrete = False
 
     def process(self):
-        '''Do processing necessary, storing result in feature.
+        '''
+        Do processing necessary, storing result in feature.
         '''
         # use for total number of chords
         total = len(self.data['chordify.flat.getElementsByClass(Chord)'])
@@ -652,7 +676,8 @@ class TriadSimultaneityPrevalence(featuresModule.FeatureExtractor):
         self.discrete = False
 
     def process(self):
-        '''Do processing necessary, storing result in feature.
+        '''
+        Do processing necessary, storing result in feature.
         '''
         # use for total number of chords
         total = len(self.data['chordify.flat.getElementsByClass(Chord)'])
@@ -666,7 +691,8 @@ class TriadSimultaneityPrevalence(featuresModule.FeatureExtractor):
 
 
 class DiminishedSeventhSimultaneityPrevalence(featuresModule.FeatureExtractor):
-    '''Percentage of all simultaneities that are diminished seventh chords.
+    '''
+    Percentage of all simultaneities that are diminished seventh chords.
 
     >>> s = corpus.parse('bwv66.6')
     >>> fe = features.native.DiminishedSeventhSimultaneityPrevalence(s)
@@ -684,7 +710,8 @@ class DiminishedSeventhSimultaneityPrevalence(featuresModule.FeatureExtractor):
         self.discrete = False
 
     def process(self):
-        '''Do processing necessary, storing result in feature.
+        '''
+        Do processing necessary, storing result in feature.
         '''
         # use for total number of chords
         total = len(self.data['chordify.flat.getElementsByClass(Chord)'])
@@ -727,7 +754,8 @@ class IncorrectlySpelledTriadPrevalence(featuresModule.FeatureExtractor):
         self.discrete = False
 
     def process(self):
-        '''Do processing necessary, storing result in feature.
+        '''
+        Do processing necessary, storing result in feature.
         '''
         # use for total number of chords
         histo = self.data['chordify.flat.getElementsByClass(Chord).typesHistogram']
@@ -790,7 +818,8 @@ class ChordBassMotionFeature(featuresModule.FeatureExtractor):
         self.discrete = False
 
     def process(self):
-        '''Do processing necessary, storing result in feature.
+        '''
+        Do processing necessary, storing result in feature.
         '''
         # use for total number of chords
         harms = self.data['flat.getElementsByClass(Harmony)']

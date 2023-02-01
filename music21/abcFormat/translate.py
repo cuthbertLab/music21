@@ -7,7 +7,7 @@
 #               Michael Scott Asato Cuthbert
 #               Dylan Nagler
 #
-# Copyright:    Copyright © 2010-2013 Michael Scott Asato Cuthbert and the music21
+# Copyright:    Copyright © 2010-2023 Michael Scott Asato Cuthbert and the music21
 #               Project
 # License:      BSD, see license.txt
 # -----------------------------------------------------------------------------
@@ -453,7 +453,8 @@ def abcToStreamScore(abcHandler, inputM21=None):
     return s
 
 def abcToStreamOpus(abcHandler, inputM21=None, number=None):
-    '''Convert a multi-work stream into one or more complete works packed into an Opus Stream.
+    '''
+    Convert a multi-work stream into one or more complete works packed into an Opus Stream.
 
     If a `number` argument is given, and a work is defined by
     that number, that work is returned.
@@ -543,7 +544,7 @@ def reBar(music21Part, *, inPlace=False):
     {0.0} <music21.meter.TimeSignature 1/8>
     {0.0} <music21.note.Note E>
 
-    Changed in v.5: inPlace is False by default, and a keyword only argument.
+    * Changed in v5: inPlace is False by default, and a keyword only argument.
     '''
     if not inPlace:
         music21Part = copy.deepcopy(music21Part)

@@ -1485,11 +1485,11 @@ class ModuleDocumenter(ObjectDocumenter):
 
 
 class CorpusDocumenter(Documenter):
-    '''A documenter for music21's corpus:
+    '''
+    A documenter for music21's corpus:
 
     >>> documenter = CorpusDocumenter()
     >>> restructuredText = documenter.run()
-
     '''
 
     # SPECIAL METHODS #

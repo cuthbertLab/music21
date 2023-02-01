@@ -148,7 +148,7 @@ def assembleAllLyrics(streamIn, maxLyrics=10, lyricSeparation='\n'):
     >>> l
     '1. First\n2. Second\n3. Third\n4. Fourth\n5. Fifth'
 
-    Changed in v.8: no lyric separator appears at the beginning.
+    * Changed in v8: no lyric separator appears at the beginning.
     '''
     lyrics = ''
     for i in range(1, maxLyrics):
@@ -245,11 +245,6 @@ class TextException(exceptions21.Music21Exception):
 
 
 # ------------------------------------------------------------------------------
-class TextBoxException(exceptions21.Music21Exception):
-    pass
-
-
-# ------------------------------------------------------------------------------
 class TextBox(base.Music21Object):
     '''
     A TextBox is arbitrary text that might be positioned anywhere on a page,
@@ -327,18 +322,10 @@ class TextBox(base.Music21Object):
             return ''
 
 
-    def _getContent(self):
-        return self._content
-
-    def _setContent(self, value):
-        if not isinstance(value, str):
-            self._content = str(value)
-        else:
-            self._content = value
-
-    content = property(_getContent, _setContent,
-        doc='''Get or set the content.
-
+    @property
+    def content(self):
+        '''
+        Get or set the content.
 
         >>> te = text.TextBox('Con fuoco')
         >>> te.content
@@ -346,19 +333,20 @@ class TextBox(base.Music21Object):
         >>> te.style.justify = 'center'
         >>> te.style.justify
         'center'
+        '''
+        return self._content
 
-        ''')
+    @content.setter
+    def content(self, value):
+        if not isinstance(value, str):
+            self._content = str(value)
+        else:
+            self._content = value
 
-    def _getPage(self):
-        return self._page
-
-    def _setPage(self, value):
-        if value is not None:
-            self._page = int(value)  # must be an integer
-        # do not set otherwise
-
-    page = property(_getPage, _setPage,
-        doc='''Get or set the page number. The first page (page 1) is the default.
+    @property
+    def page(self):
+        '''
+        Get or set the page number. The first page (page 1) is the default.
 
         >>> te = text.TextBox('Great Score')
         >>> te.content
@@ -368,20 +356,50 @@ class TextBox(base.Music21Object):
         >>> te.page = 2
         >>> te.page
         2
-        ''')
+        '''
+        return self._page
+
+    @page.setter
+    def page(self, value):
+        if value is not None:
+            self._page = int(value)  # must be an integer
+        # do not set otherwise
 
 
 # ------------------------------------------------------------------------------
+_stored_trigrams: dict[str, Trigram] = {}
+
+
 class LanguageDetector:
+    # noinspection SpellCheckingInspection
     '''
-    Attempts to detect language on the basis of trigrams
+    Attempts to detect language on the basis of trigrams.
 
-    uses code from
-    https://code.activestate.com/recipes/326576-language-detection-using-character-trigrams/
-    unknown author.  No license given.
+    >>> ld = text.LanguageDetector()
+    >>> ld.mostLikelyLanguage('Guten Morgen Frau Wieck. Ich bin Robert.')
+    'de'
 
-    See Trigram docs below.
+    Note that accuracy improves with longer texts, and that the trigrams are
+    case sensitive.  Putting "Morgen" in lowercase evaluates the text as Dutch.
+
+    Supported languages are currently:
+
+    >>> text.LanguageDetector.languageLong
+    {'en': 'English',
+     'fr': 'French',
+     'it': 'Italian',
+     'de': 'German',
+     'cn': 'Chinese',
+     'la': 'Latin',
+     'nl': 'Dutch'}
+
+    See also, documentation for :class:`~music21.text.Trigram`.
     '''
+    # uses code from
+    # https://code.activestate.com/recipes/326576-language-detection-using-character-trigrams/
+    # Previously unattributed w/o license given, now attributed to
+    # Douglas Bagnall under the BSD-compatible PSF (Python) license.
+
     languageCodes = ['en', 'fr', 'it', 'de', 'cn', 'la', 'nl']
     languageLong = {
         'en': 'English',
@@ -392,26 +410,37 @@ class LanguageDetector:
         'la': 'Latin',
         'nl': 'Dutch',
     }
+    @classmethod
+    def readExcerpts(cls):
+        '''
+        Read the stored trigrams once and store them for later.
 
-    def __init__(self, text=None):
-        self.text = text
-        self.trigrams = {}
-        self.readExcerpts()
-
-    def readExcerpts(self):
-        for languageCode in self.languageCodes:
+        Called on first LanguageDectector read.
+        '''
+        for languageCode in cls.languageCodes:
             thisExcerpt = (common.getSourceFilePath() / 'languageExcerpts'
                             / 'trainingData' / (languageCode + '.txt'))
 
             with thisExcerpt.open(encoding='utf-8') as f:
                 excerptWords = f.read().split()
-                self.trigrams[languageCode] = Trigram(excerptWords)
+                _stored_trigrams[languageCode] = Trigram(excerptWords)
+        return _stored_trigrams.copy()
 
-    def mostLikelyLanguage(self, excerpt):
+
+    def __init__(self, text=None):
+        self.text = text
+        self.trigrams = _stored_trigrams.copy() or LanguageDetector.readExcerpts()
+
+    def mostLikelyLanguage(self, excerpt: str) -> str | None:
         # noinspection SpellCheckingInspection
         '''
-        returns the code of the most likely language for a passage, works on
-        unicode or ascii. current languages: en, fr, de, it, cn, or None
+        Returns the code of the most likely language for a passage, works on
+        unicode or ascii. Current languages are:
+
+        >>> text.LanguageDetector.languageCodes
+        ['en', 'fr', 'it', 'de', 'cn', 'la', 'nl']
+
+        or None if no language is detected.
 
         >>> ld = text.LanguageDetector()
         >>> ld.mostLikelyLanguage('Hello there, how are you doing today? '

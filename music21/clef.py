@@ -7,7 +7,7 @@
 #               Christopher Ariza
 #               Michael Bodenbach
 #
-# Copyright:    Copyright © 2009-2022 Michael Scott Asato Cuthbert
+# Copyright:    Copyright © 2009-2023 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
@@ -19,7 +19,7 @@ within :class:`~music21.stream.Measure` objects.
 from __future__ import annotations
 
 from collections.abc import Iterable, Sequence
-from typing import TYPE_CHECKING  # pylint needs no alias
+import typing as t
 import unittest
 
 from music21 import base
@@ -29,7 +29,7 @@ from music21 import pitch
 from music21 import style
 
 
-if TYPE_CHECKING:
+if t.TYPE_CHECKING:
     from music21 import stream
 
 
@@ -64,7 +64,31 @@ class Clef(base.Music21Object):
 
     >>> tc.lowestLine
     31
+
+    **Equality**
+
+    Two Clefs are equal if their class is the same, their sign is the same,
+    their line is the same and their octaveChange is the same.
+
+    >>> c1 = clef.PercussionClef()
+    >>> c2 = clef.NoClef()
+    >>> c1 == c2
+    False
+    >>> c3 = clef.TrebleClef()
+    >>> c4 = clef.TrebleClef()
+    >>> c3 == c4
+    True
+    >>> c4.octaveChange = -1
+    >>> c3 == c4
+    False
+
+    Note that these are not equal:
+
+    >>> clef.TrebleClef() == clef.GClef(line=2)
+    False
     '''
+    equalityAttributes = ('sign', 'line', 'octaveChange')
+
     _DOC_ATTR: dict[str, str] = {
         'sign': '''
             The sign of the clef, generally, 'C', 'G', 'F', 'percussion', 'none' or None.
@@ -102,7 +126,7 @@ class Clef(base.Music21Object):
     _styleClass = style.TextStyle
     classSortOrder = 0
 
-    def __init__(self, **keywords):
+    def __init__(self, **keywords) -> None:
         super().__init__(**keywords)
         self.sign: str | None = None
         # line counts start from the bottom up, the reverse of musedata
@@ -110,35 +134,6 @@ class Clef(base.Music21Object):
         self._octaveChange: int = 0  # set to zero as default
         # musicxml has an attribute for clefOctaveChange,
         # an integer to show transposing clef
-
-    def __eq__(self, other):
-        '''
-        two Clefs are equal if their class is the same, their sign is the same,
-        their line is the same and their octaveChange is the same.
-
-
-        >>> c1 = clef.PercussionClef()
-        >>> c2 = clef.NoClef()
-        >>> c1 == c2
-        False
-        >>> c3 = clef.TrebleClef()
-        >>> c4 = clef.TrebleClef()
-        >>> c3 == c4
-        True
-        >>> c4.octaveChange = -1
-        >>> c3 == c4
-        False
-        '''
-        try:
-            if (self.__class__ == other.__class__
-                    and self.sign == other.sign
-                    and self.line == other.line
-                    and self.octaveChange == other.octaveChange):
-                return True
-            else:
-                return False
-        except AttributeError:
-            return False
 
     def _reprInternal(self):
         return ''
@@ -288,7 +283,7 @@ class PitchClef(Clef):
             ''',
     }
 
-    def __init__(self, **keywords):
+    def __init__(self, **keywords) -> None:
         super().__init__(**keywords)
         self.lowestLine: int = 31
 
@@ -342,7 +337,8 @@ class PercussionClef(Clef):
     >>> pc.lowestLine == clef.TrebleClef().lowestLine
     True
 
-    Changed in v7.3 -- setting octaveChange no longer affects lowestLine
+    * Changed in v7.3: setting `octaveChange` no longer affects
+      `lowestLine`
     '''
     _DOC_ATTR: dict[str, str] = {}
 
@@ -883,7 +879,7 @@ def clefFromString(clefString, octaveShift=0) -> Clef:
             clefObj.line = lineNum
         else:
             ClefType = line_list[lineNum]
-            if TYPE_CHECKING:
+            if t.TYPE_CHECKING:
                 assert ClefType is not None
                 assert issubclass(ClefType, PitchClef)
             clefObj = ClefType()

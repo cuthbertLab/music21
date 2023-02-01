@@ -297,7 +297,7 @@ class PartStaffExporterMixin:
         >>> root = SX.parse()
         >>> m1 = root.find('part/measure')
         >>> SX.dump(m1)
-        <measure number="1">
+        <measure implicit="no" number="1">
         ...
           <note>
             <pitch>
@@ -479,7 +479,7 @@ class PartStaffExporterMixin:
         >>> root = SX.parse()
         >>> m1 = root.find('part/measure')
         >>> SX.dump(m1)
-        <measure number="1">
+        <measure implicit="no" number="1">
           <attributes>
             <divisions>10080</divisions>
             <key number="1">
@@ -513,7 +513,7 @@ class PartStaffExporterMixin:
         >>> root = SX.parse()
         >>> m1 = root.find('part/measure')
         >>> SX.dump(m1)
-        <measure number="1">
+        <measure implicit="no" number="1">
             <attributes>
             <divisions>10080</divisions>
             <key>
@@ -829,23 +829,23 @@ class PartStaffExporterMixin:
             <music21.stream.PartStaff unrelated> not found in self.partExporterList
         '''
         for pex in self.partExporterList:
-            if partStaff is pex.stream:
+            if partStaff is pex.stream and pex.xmlRoot is not None:
                 return pex.xmlRoot
 
         # now try derivations:
         for pex in self.partExporterList:
             for derived in pex.stream.derivation.chain():
-                if derived is partStaff:
+                if derived is partStaff and pex.xmlRoot is not None:
                     return pex.xmlRoot
 
         # now just match on id:
         for pex in self.partExporterList:
-            if partStaff.id == pex.stream.id:
+            if partStaff.id == pex.stream.id and pex.xmlRoot is not None:
                 return pex.xmlRoot
 
         for pex in self.partExporterList:
             for derived in pex.stream.derivation.chain():
-                if partStaff.id == derived.id:
+                if partStaff.id == derived.id and pex.xmlRoot is not None:
                     return pex.xmlRoot
 
         raise MusicXMLExportException(
@@ -1141,7 +1141,9 @@ class Test(unittest.TestCase):
         self.assertEqual(len(root.findall('part/measure/attributes/time')), 3)
 
     def testBackupAmount(self):
-        '''Regression test for chord members causing too-large backup amounts.'''
+        '''
+        Regression test for chord members causing too-large backup amounts.
+        '''
         from music21 import chord
         from music21 import defaults
         from music21 import layout
@@ -1158,7 +1160,9 @@ class Test(unittest.TestCase):
         )
 
     def testForwardRepeatMarks(self):
-        '''Regression test for losing forward repeat marks.'''
+        '''
+        Regression test for losing forward repeat marks.
+        '''
         from music21 import bar
         from music21 import layout
         from music21 import note

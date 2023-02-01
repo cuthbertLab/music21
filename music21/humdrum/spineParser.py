@@ -48,6 +48,7 @@ from __future__ import annotations
 import copy
 import math
 import re
+import typing as t
 import unittest
 
 from music21 import articulations
@@ -75,6 +76,9 @@ from music21 import tie
 from music21.humdrum import testFiles
 from music21.humdrum import harmparser
 from music21.humdrum import instruments
+
+if t.TYPE_CHECKING:
+    import pathlib
 
 environLocal = environment.Environment('humdrum.spineParser')
 
@@ -685,7 +689,6 @@ class HumdrumDataCollection(prebase.ProtoM21Object):
         Insert the Global Events (GlobalReferenceLines and GlobalCommentLines) into an appropriate
         place in the outer Stream.
 
-
         Run after self.spineCollection.createMusic21Streams().
         Is run automatically by self.parse().
         uses self.spineCollection.getOffsetsAndPrioritiesByPosition()
@@ -737,31 +740,31 @@ class HumdrumDataCollection(prebase.ProtoM21Object):
         if appendList:
             self.stream.coreElementsChanged()
 
-#     @property
-#     def stream(self):
-#         if self._storedStream is not None:
-#             return self._storedStream
-#         if self.parsedLines is False:
-#             self.parse()
-#
-#         if self.spineCollection is None:
-#             raise HumdrumException('parsing got no spine collections!')
-#         elif self.spineCollection.spines is None:
-#             raise HumdrumException('not a single spine in your data... um, not my problem! ' +
-#                                    '(well, maybe it is...file a bug report if you ' +
-#                                    'have doubled checked your data)')
-#         elif self.spineCollection.spines[0].stream is None:
-#             raise HumdrumException('okay, you got at least one spine, but it ain\'t got ' +
-#                                    'a stream in it; (check your data or file a bug report)')
-#         else:
-#             masterStream = stream.Score()
-#             for thisSpine in self.spineCollection:
-#                 thisSpine.stream.id = 'spine_' + str(thisSpine.id)
-#             for thisSpine in self.spineCollection:
-#                 if thisSpine.parentSpine is None and thisSpine.spineType == 'kern':
-#                     masterStream.insert(thisSpine.stream)
-#             self._storedStream = masterStream
-#             return masterStream
+    # @property
+    # def stream(self):
+    #     if self._storedStream is not None:
+    #         return self._storedStream
+    #     if self.parsedLines is False:
+    #         self.parse()
+    #
+    #     if self.spineCollection is None:
+    #         raise HumdrumException('parsing got no spine collections!')
+    #     elif self.spineCollection.spines is None:
+    #         raise HumdrumException('not a single spine in your data... um, not my problem! ' +
+    #                                '(well, maybe it is...file a bug report if you ' +
+    #                                'have doubled checked your data)')
+    #     elif self.spineCollection.spines[0].stream is None:
+    #         raise HumdrumException('okay, you got at least one spine, but it ain\'t got ' +
+    #                                'a stream in it; (check your data or file a bug report)')
+    #     else:
+    #         masterStream = stream.Score()
+    #         for thisSpine in self.spineCollection:
+    #             thisSpine.stream.id = 'spine_' + str(thisSpine.id)
+    #         for thisSpine in self.spineCollection:
+    #             if thisSpine.parentSpine is None and thisSpine.spineType == 'kern':
+    #                 masterStream.insert(thisSpine.stream)
+    #         self._storedStream = masterStream
+    #         return masterStream
 
     def parseMetadata(self, s=None):
         '''
@@ -787,11 +790,11 @@ class HumdrumFile(HumdrumDataCollection):
     as a mandatory argument a filename to be opened and read.
     '''
 
-    def __init__(self, filename=None):
+    def __init__(self, filename: str | pathlib.Path | None = None):
         super().__init__()
         self.filename = filename
 
-    def parseFilename(self, filename=None):
+    def parseFilename(self, filename: str | pathlib.Path | None = None):
         if filename is None:
             filename = self.filename
         if filename is None:
@@ -856,7 +859,7 @@ class SpineLine(HumdrumLine):
     isSpineLine = True
     numSpines = 0
 
-    def __init__(self, position=0, contents=''):
+    def __init__(self, position: int = 0, contents: str = ''):
         self.position = position
         contents = contents.rstrip()
         returnList = re.split('\t+', contents)
@@ -911,7 +914,7 @@ class GlobalReferenceLine(HumdrumLine):
     isSpineLine = False
     numSpines = 0
 
-    def __init__(self, position=0, contents='!!! NUL: None'):
+    def __init__(self, position: int = 0, contents: str = '!!! NUL: None'):
         self.position = position
         noExclaim = re.sub(r'^!!!+', '', contents)
         try:
@@ -962,7 +965,7 @@ class GlobalCommentLine(HumdrumLine):
     isSpineLine = False
     numSpines = 0
 
-    def __init__(self, position=0, contents=''):
+    def __init__(self, position: int = 0, contents: str = ''):
         self.position = position
         value = re.sub(r'^!!+\s?', '', contents)
         self.contents = contents
@@ -1439,7 +1442,6 @@ class DynamSpine(HumdrumSpine):
     attribute set and thus events are processed as if they
     are dynamics.
     '''
-
     def parse(self):
         thisContainer = None
         for event in self.eventList:
@@ -1566,23 +1568,22 @@ class SpineEvent(prebase.ProtoM21Object):
     >>> n
     <music21.note.Note E->
     '''
-    def __init__(self, contents=None, position=0):
-        self.contents = contents
-        self.position = position
+    def __init__(self, contents: str = '', position: int = 0):
+        self.contents: str = contents
+        self.position: int = position
         self.protoSpineId: int = 0
         self.spineId: int | None = None
 
     def _reprInternal(self):
-        return str(self.contents)
+        return self.contents
 
     def __str__(self):
-        return str(self.contents)
+        return self.contents
 
     def toNote(self, convertString=None):
         r'''
         parse the object as a \*\*kern note and return a
         :class:`~music21.note.Note` object (or Rest, or Chord)
-
 
         >>> se = humdrum.spineParser.SpineEvent('DD#4')
         >>> n = se.toNote()
@@ -1619,12 +1620,16 @@ class SpineCollection(prebase.ProtoM21Object):
         self.newSpine = None
 
     def __iter__(self):
-        '''Resets the counter to len(self.spines) so that iteration is correct'''
+        '''
+        Resets the counter to len(self.spines) so that iteration is correct
+        '''
         self.iterIndex = len(self.spines) - 1
         return self
 
     def __next__(self):
-        '''Returns the current spine and decrements the iteration index.'''
+        '''
+        Returns the current spine and decrements the iteration index.
+        '''
         if self.iterIndex < 0:
             raise StopIteration
         thisSpine = self.spines[self.iterIndex]
@@ -1981,7 +1986,7 @@ class SpineCollection(prebase.ProtoM21Object):
                             lyric = prioritiesToSearch[el.priority].contents
                             el.lyric = lyric
 
-    def makeVoices(self):
+    def makeVoices(self) -> None:
         '''
         make voices for each kernSpine -- why not just run
         stream.makeVoices() ? because we have more information
@@ -2016,9 +2021,12 @@ class SpineCollection(prebase.ProtoM21Object):
                     voiceNumber = int(voiceName[5])
                     voicePart = voices[voiceNumber]
                     if voicePart is None:
-                        voices[voiceNumber] = stream.Voice()
-                        voicePart = voices[voiceNumber]
+                        voicePart = stream.Voice()
+                        voices[voiceNumber] = voicePart
                         voicePart.groups.append(voiceName)
+                    if t.TYPE_CHECKING:
+                        assert voicePart is not None
+
                     mElOffset = mEl.offset
                     el.remove(mEl)
                     voicePart.coreInsert(mElOffset - lowestVoiceOffset, mEl)
@@ -2500,7 +2508,6 @@ def kernTandemToObject(tandem):
     >>> m
     <music21.meter.TimeSignature 3/1>
 
-
     Unknown objects are converted to MiscTandem objects:
 
     >>> m2 = humdrum.spineParser.kernTandemToObject('*TandyUnk')
@@ -2615,8 +2622,8 @@ def kernTandemToObject(tandem):
 
 
 class MiscTandem(base.Music21Object):
-    def __init__(self, tandem=''):
-        super().__init__()
+    def __init__(self, tandem='', **keywords):
+        super().__init__(**keywords)
         self.tandem = tandem
 
     def _reprInternal(self):
@@ -2634,9 +2641,8 @@ class SpineComment(base.Music21Object):
     >>> sc.comment
     'this is a spine comment'
     '''
-
-    def __init__(self, comment=''):
-        super().__init__()
+    def __init__(self, comment='', **keywords):
+        super().__init__(**keywords)
         commentPart = re.sub(r'^!+\s?', '', comment)
         self.comment = commentPart
 
@@ -2648,16 +2654,14 @@ class GlobalComment(base.Music21Object):
     '''
     A Music21Object that represents a comment for the whole score
 
-
     >>> sc = humdrum.spineParser.GlobalComment('!! this is a global comment')
     >>> sc
     <music21.humdrum.spineParser.GlobalComment 'this is a global comment'>
     >>> sc.comment
     'this is a global comment'
     '''
-
-    def __init__(self, comment=''):
-        super().__init__()
+    def __init__(self, comment='', **keywords):
+        super().__init__(**keywords)
         commentPart = re.sub(r'^!!+\s?', '', comment)
         commentPart = commentPart.strip()
         self.comment = commentPart
@@ -2708,9 +2712,8 @@ class GlobalReference(base.Music21Object):
     >>> sc.isPrimary
     False
     '''
-
-    def __init__(self, codeOrAll='', valueOrNone=None):
-        super().__init__()
+    def __init__(self, codeOrAll='', valueOrNone=None, **keywords):
+        super().__init__(**keywords)
         codeOrAll = re.sub(r'^!!!+', '', codeOrAll)
         codeOrAll = codeOrAll.strip()
         if valueOrNone is None and ':' in codeOrAll:
@@ -2812,7 +2815,7 @@ class GlobalReference(base.Music21Object):
         'EED': 'electronicEditor',  # electronic editor
         'ENC': 'electronicEncoder',  # electronic encoder (person)
         'END': '',  # encoding date
-        'EMD': '',  # electronic document modification description (one per modificiation)
+        'EMD': '',  # electronic document modification description (one per modification)
         'EEV': '',  # electronic edition version
         'EFL': '',  # file number e.g. '1/4' for one of four
         'EST': '',  # encoding status (free form, normally eliminated prior to distribution)
@@ -2836,7 +2839,7 @@ class GlobalReference(base.Music21Object):
         'RWB': ''  # a warning about the representation
     }
 
-    def updateMetadata(self, md):
+    def updateMetadata(self, md: metadata.Metadata):
         '''
         update a metadata object according to information in this GlobalReference
 
@@ -2860,6 +2863,9 @@ class GlobalReference(base.Music21Object):
 
 
 class Test(unittest.TestCase):
+    def testCopyAndDeepcopy(self):
+        from music21.test.commonTest import testCopyAll
+        testCopyAll(self, globals())
 
     def testLoadMazurka(self):
         # hf1 = HumdrumFile('d:/web/eclipse/music21misc/mazurka06-2.krn')
@@ -2867,22 +2873,22 @@ class Test(unittest.TestCase):
         hf1 = HumdrumDataCollection(testFiles.mazurka6)
         hf1.parse()
 
-    #    hf1 = HumdrumFile('d:/web/eclipse/music21misc/ojibway.krn')
-    #    for thisEventCollection in hf1.eventCollections:
-    #        ev = thisEventCollection.getSpineEvent(0).contents
-    #        if ev is not None:
-    #            print(ev)
-    #        else:
-    #            print('NONE')
-
-    #    for mySpine in hf1.spineCollection:
-    #        print('\n\n***NEW SPINE: No. ' + str(mySpine.id) + ' parentSpine: '
-    #            + str(mySpine.parentSpine) + ' childSpines: ' + str(mySpine.childSpines))
-    #        print(mySpine.spineType)
-    #        for childSpinesSpine in mySpine.childSpinesSpines():
-    #            print(str(childSpinesSpine.id) + ' *** testing spineCollection code ***')
-    #        for thisEvent in mySpine:
-    #            print(thisEvent.contents)
+        # hf1 = HumdrumFile('d:/web/eclipse/music21misc/ojibway.krn')
+        # for thisEventCollection in hf1.eventCollections:
+        #     ev = thisEventCollection.getSpineEvent(0).contents
+        #     if ev is not None:
+        #         print(ev)
+        #     else:
+        #         print('NONE')
+        #
+        # for mySpine in hf1.spineCollection:
+        #     print('\n\n***NEW SPINE: No. ' + str(mySpine.id) + ' parentSpine: '
+        #         + str(mySpine.parentSpine) + ' childSpines: ' + str(mySpine.childSpines))
+        #     print(mySpine.spineType)
+        #     for childSpinesSpine in mySpine.childSpinesSpines():
+        #         print(str(childSpinesSpine.id) + ' *** testing spineCollection code ***')
+        #     for thisEvent in mySpine:
+        #         print(thisEvent.contents)
         spine5 = hf1.spineCollection.getSpineById(5)
         self.assertEqual(spine5.id, 5)
         self.assertEqual(spine5.parentSpine.id, 1)

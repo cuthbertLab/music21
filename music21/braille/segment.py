@@ -19,7 +19,7 @@ and will henceforth be referred to as BMTM.
 '''
 from __future__ import annotations
 
-import collections
+from collections import deque, namedtuple
 import copy
 import enum
 import typing as t
@@ -145,16 +145,56 @@ SEGMENT_MAXNOTESFORSHORTSLUR = 4
 
 MAX_ELEMENTS_IN_SEGMENT = 48  # 8 measures of 6 notes, etc. each
 
-_ThreeDigitNumber = collections.namedtuple('_ThreeDigitNumber', ['hundreds', 'tens', 'ones'])
+_ThreeDigitNumber = namedtuple('_ThreeDigitNumber', ['hundreds', 'tens', 'ones'])
 
-SegmentKey = collections.namedtuple('SegmentKey',
-                                    ['measure', 'ordinal', 'affinity', 'hand'])
+SegmentKey = namedtuple('SegmentKey', ['measure', 'ordinal', 'affinity', 'hand'])
 SegmentKey.__new__.__defaults__ = (0, 0, None, None)
 
 
 # ------------------------------------------------------------------------------
 
 class BrailleElementGrouping(ProtoM21Object):
+    '''
+    A BrailleElementGrouping mimics a list of objects which should be displayed
+    without a space in braille.
+
+    >>> from music21.braille import segment
+    >>> bg = segment.BrailleElementGrouping()
+    >>> bg.append(note.Note('C4'))
+    >>> bg.append(note.Note('D4'))
+    >>> bg.append(note.Rest())
+    >>> bg.append(note.Note('F4'))
+    >>> bg
+    <music21.braille.segment.BrailleElementGrouping [<music21.note.Note C>,
+        <music21.note.Note D>, <music21.note.Rest quarter>, <music21.note.Note F>]>
+    >>> print(bg)
+    <music21.note.Note C>
+    <music21.note.Note D>
+    <music21.note.Rest quarter>
+    <music21.note.Note F>
+
+    These are the defaults, and they are shared across all objects...
+
+    >>> bg.keySignature
+    <music21.key.KeySignature of no sharps or flats>
+    >>> bg.timeSignature
+    <music21.meter.TimeSignature 4/4>
+
+    >>> bg.descendingChords
+    True
+
+    >>> bg.showClefSigns
+    False
+
+    >>> bg.upperFirstInNoteFingering
+    True
+
+    >>> bg.withHyphen
+    False
+
+    >>> bg.numRepeats
+    0
+    '''
     _DOC_ATTR: dict[str, str] = {
         'keySignature': 'The last :class:`~music21.key.KeySignature` preceding the grouping.',
         'timeSignature': 'The last :class:`~music21.meter.TimeSignature` preceding the grouping.',
@@ -170,47 +210,6 @@ class BrailleElementGrouping(ProtoM21Object):
         'numRepeats': 'The number of times this grouping is repeated.'
     }
     def __init__(self, *listElements):
-        '''
-        A BrailleElementGrouping mimics a list of objects which should be displayed
-        without a space in braille.
-
-        >>> from music21.braille import segment
-        >>> bg = segment.BrailleElementGrouping()
-        >>> bg.append(note.Note('C4'))
-        >>> bg.append(note.Note('D4'))
-        >>> bg.append(note.Rest())
-        >>> bg.append(note.Note('F4'))
-        >>> bg
-        <music21.braille.segment.BrailleElementGrouping [<music21.note.Note C>,
-            <music21.note.Note D>, <music21.note.Rest quarter>, <music21.note.Note F>]>
-        >>> print(bg)
-        <music21.note.Note C>
-        <music21.note.Note D>
-        <music21.note.Rest quarter>
-        <music21.note.Note F>
-
-        These are the defaults, and they are shared across all objects...
-
-        >>> bg.keySignature
-        <music21.key.KeySignature of no sharps or flats>
-        >>> bg.timeSignature
-        <music21.meter.TimeSignature 4/4>
-
-        >>> bg.descendingChords
-        True
-
-        >>> bg.showClefSigns
-        False
-
-        >>> bg.upperFirstInNoteFingering
-        True
-
-        >>> bg.withHyphen
-        False
-
-        >>> bg.numRepeats
-        0
-        '''
         self.internalList = list(*listElements)
         setGroupingGlobals()
 
@@ -221,6 +220,9 @@ class BrailleElementGrouping(ProtoM21Object):
         self.upperFirstInNoteFingering = True
         self.withHyphen = False
         self.numRepeats = 0
+
+    def __iter__(self):
+        return iter(self.internalList)
 
     def __getitem__(self, item):
         return self.internalList[item]
@@ -236,7 +238,7 @@ class BrailleElementGrouping(ProtoM21Object):
             raise AttributeError('internalList not defined yet')
         return getattr(self.internalList, attr)
 
-    def __str__(self):
+    def __str__(self) -> str:
         '''
         Return a unicode braille representation
         of each object in the BrailleElementGrouping.
@@ -358,10 +360,10 @@ class BrailleSegment(text.BrailleText):
         super().__init__(lineLength=lineLength)
         self._groupingDict: dict[SegmentKey, BrailleElementGrouping] = {}
 
-        self.groupingKeysToProcess: list[SegmentKey] = []
+        self.groupingKeysToProcess: deque[SegmentKey] = deque()
         self.currentGroupingKey: SegmentKey | None = None
         self.previousGroupingKey: SegmentKey | None = None
-        self.lastNote = None
+        self.lastNote: note.Note | None = None
 
         self.showClefSigns: bool = False
         self.upperFirstInNoteFingering: bool = True
@@ -450,7 +452,7 @@ class BrailleSegment(text.BrailleText):
 
         Returns brailleText
         '''
-        self.groupingKeysToProcess = list(sorted(self.keys()))
+        self.groupingKeysToProcess = deque(sorted(self.keys()))
 
         if self.showHeading:
             self.extractHeading()  # Heading
@@ -463,7 +465,7 @@ class BrailleSegment(text.BrailleText):
 
         self.previousGroupingKey = None
         while self.groupingKeysToProcess:
-            self.currentGroupingKey = self.groupingKeysToProcess.pop(0)
+            self.currentGroupingKey = self.groupingKeysToProcess.popleft()
 
             cgkAffinityGroup = self.currentGroupingKey.affinity
 
@@ -534,7 +536,7 @@ class BrailleSegment(text.BrailleText):
         >>> print(seg.brailleText)
         ⠼⠙⠄
         '''
-        gkp = self.groupingKeysToProcess or sorted(self.keys())
+        gkp = self.groupingKeysToProcess or deque(sorted(self.keys()))
         firstSegmentKey = gkp[0]
         initMeasureNumber = firstSegmentKey.measure
         brailleNumber = basic.numberToBraille(initMeasureNumber)
@@ -555,12 +557,12 @@ class BrailleSegment(text.BrailleText):
         metronomeMark = None
         # find the first keySignature and timeSignature...
 
-        groupingKeysToProcess = self.groupingKeysToProcess or sorted(self.keys())
+        groupingKeysToProcess = self.groupingKeysToProcess or deque(sorted(self.keys()))
 
         while groupingKeysToProcess:
             if groupingKeysToProcess[0].affinity > Affinity.MMARK:
                 break
-            cgk = groupingKeysToProcess.pop(0)  # cgk = currentGroupingKey
+            cgk = groupingKeysToProcess.popleft()  # cgk = currentGroupingKey
 
             cgkAffinityGroup = cgk.affinity
             currentBrailleGrouping = self._groupingDict.get(cgk)  # currentGrouping...
@@ -591,8 +593,10 @@ class BrailleSegment(text.BrailleText):
             self.addHeading(brailleHeading)
 
 
-    def extractInaccordGrouping(self):
-        inaccords = self._groupingDict.get(self.currentGroupingKey)
+    def extractInaccordGrouping(self) -> None:
+        if self.currentGroupingKey is None:
+            raise ValueError('currentGroupingKey must not be None to call extractInaccordGrouping')
+        inaccords = self._groupingDict[self.currentGroupingKey]
         last_clef: clef.Clef | None = None
         seen_voice: bool = False
         for music21VoiceOrClef in inaccords:
@@ -625,7 +629,7 @@ class BrailleSegment(text.BrailleText):
         longExprInBraille = basic.textExpressionToBraille(longTextExpression)
         self.addLongExpression(longExprInBraille)
 
-    def showLeadingOctaveFromNoteGrouping(self, noteGrouping):
+    def showLeadingOctaveFromNoteGrouping(self, noteGrouping: BrailleElementGrouping):
         '''
         Given a noteGrouping, should we show the octave symbol?
 
@@ -794,12 +798,14 @@ class BrailleSegment(text.BrailleText):
 
         return (brailleNoteGroupingA, brailleNoteGroupingB)
 
-    def extractNoteGrouping(self):
+    def extractNoteGrouping(self) -> None:
         '''
         Fundamentally important method that adds a noteGrouping to the braille line.
         '''
         transcriber = ngMod.NoteGroupingTranscriber()
-        noteGrouping = self._groupingDict.get(self.currentGroupingKey)
+        if self.currentGroupingKey is None:
+            raise ValueError('currentGroupingKey must not be None to call extractNoteGrouping')
+        noteGrouping = self._groupingDict[self.currentGroupingKey]
 
         showLeadingOctave = self.showLeadingOctaveFromNoteGrouping(noteGrouping)
         transcriber.showLeadingOctave = showLeadingOctave
@@ -912,9 +918,9 @@ class BrailleSegment(text.BrailleText):
         '''
         extracts a tempo text and processes it...
         '''
-        self.groupingKeysToProcess.insert(0, self.currentGroupingKey)
+        self.groupingKeysToProcess.appendleft(self.currentGroupingKey)
         if self.previousGroupingKey.affinity == Affinity.SIGNATURE:
-            self.groupingKeysToProcess.insert(0, self.previousGroupingKey)
+            self.groupingKeysToProcess.appendleft(self.previousGroupingKey)
         self.extractHeading()
         self.extractMeasureNumber()
 
@@ -1092,8 +1098,8 @@ class BrailleGrandSegment(BrailleSegment, text.BrailleKeyboard):
     def __init__(self, lineLength: int = 40):
         BrailleSegment.__init__(self, lineLength=lineLength)
         text.BrailleKeyboard.__init__(self, lineLength=lineLength)
-        self.allKeyPairs: list[tuple[SegmentKey | None,
-                                     SegmentKey | None]] = []
+        self.allKeyPairs: deque[tuple[SegmentKey | None,
+                                      SegmentKey | None]] = deque()
         self.previousGroupingPair = None
         self.currentGroupingPair = None
 
@@ -1260,7 +1266,7 @@ class BrailleGrandSegment(BrailleSegment, text.BrailleKeyboard):
         '''
         Returns the BrailleText from the combined grouping keys
         '''
-        self.allKeyPairs = list(self.yieldCombinedGroupingKeys())
+        self.allKeyPairs = deque(self.yieldCombinedGroupingKeys())
         lastPair = self.allKeyPairs[-1]
         highestMeasure = lastPair[0].measure if lastPair[0] else lastPair[1].measure
         self.highestMeasureNumberLength = len(str(highestMeasure))
@@ -1269,7 +1275,7 @@ class BrailleGrandSegment(BrailleSegment, text.BrailleKeyboard):
         self.currentGroupingPair = None
         while self.allKeyPairs:
             self.previousGroupingPair = self.currentGroupingPair
-            self.currentGroupingPair = self.allKeyPairs.pop(0)
+            self.currentGroupingPair = self.allKeyPairs.popleft()
             (rightKey, leftKey) = self.currentGroupingPair
 
             if ((rightKey is not None and rightKey.affinity >= Affinity.INACCORD)
@@ -1295,7 +1301,7 @@ class BrailleGrandSegment(BrailleSegment, text.BrailleKeyboard):
         tempoText = None
         metronomeMark = None
 
-        while True:
+        while self.allKeyPairs:
             (rightKey, leftKey) = self.allKeyPairs[0]
             useKey = rightKey
             try:
@@ -1308,7 +1314,7 @@ class BrailleGrandSegment(BrailleSegment, text.BrailleKeyboard):
                     raise ke
             if useKey.affinity > Affinity.MMARK:
                 break
-            self.allKeyPairs.pop(0)
+            self.allKeyPairs.popleft()
             if useKey.affinity == Affinity.SIGNATURE:
                 try:
                     keySignature, timeSignature = useElement[0], useElement[1]
@@ -1980,7 +1986,9 @@ def getRawSegments(music21Part,
     return allSegments
 
 
-def extractBrailleElements(music21MeasureOrVoice: stream.Measure | stream.Voice):
+def extractBrailleElements(
+    music21MeasureOrVoice: stream.Measure | stream.Voice
+) -> BrailleElementGrouping:
     '''
     Takes in a :class:`~music21.stream.Measure` or :class:`~music21.stream.Voice`
     and returns a :class:`~music21.braille.segment.BrailleElementGrouping` of correctly ordered

@@ -7,7 +7,7 @@
 #               Michael Scott Asato Cuthbert
 #               Evan Lynch
 #
-# Copyright:    Copyright © 2009-2022 Michael Scott Asato Cuthbert,
+# Copyright:    Copyright © 2009-2023 Michael Scott Asato Cuthbert,
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
@@ -414,8 +414,8 @@ class Scatter(primitives.GraphScatter, PlotStreamMixin):
 
 
 class ScatterPitchSpaceQuarterLength(Scatter):
-    r'''A scatter plot of pitch space and quarter length
-
+    r'''
+    A scatter plot of pitch space and quarter length
 
     >>> s = corpus.parse('bach/bwv324.xml')
     >>> p = graph.plot.ScatterPitchSpaceQuarterLength(s)
@@ -445,7 +445,8 @@ class ScatterPitchSpaceQuarterLength(Scatter):
 
 
 class ScatterPitchClassQuarterLength(ScatterPitchSpaceQuarterLength):
-    '''A scatter plot of pitch class and quarter length
+    '''
+    A scatter plot of pitch class and quarter length
 
     >>> s = corpus.parse('bach/bwv324.xml') #_DOCS_HIDE
     >>> p = graph.plot.ScatterPitchClassQuarterLength(s, doneAction=None) #_DOCS_HIDE
@@ -470,7 +471,8 @@ class ScatterPitchClassQuarterLength(ScatterPitchSpaceQuarterLength):
 
 
 class ScatterPitchClassOffset(Scatter):
-    '''A scatter plot of pitch class and offset
+    '''
+    A scatter plot of pitch class and offset
 
     >>> s = corpus.parse('bach/bwv324.xml') #_DOCS_HIDE
     >>> p = graph.plot.ScatterPitchClassOffset(s, doneAction=None) #_DOCS_HIDE
@@ -618,8 +620,8 @@ class Histogram(primitives.GraphHistogram, PlotStreamMixin):
 
 
 class HistogramPitchSpace(Histogram):
-    '''A histogram of pitch space.
-
+    '''
+    A histogram of pitch space.
 
     >>> s = corpus.parse('bach/bwv324.xml') #_DOCS_HIDE
     >>> p = graph.plot.HistogramPitchSpace(s, doneAction=None) #_DOCS_HIDE
@@ -676,8 +678,8 @@ class HistogramPitchClass(Histogram):
 
 
 class HistogramQuarterLength(Histogram):
-    '''A histogram of pitch class
-
+    '''
+    A histogram of pitch class.
 
     >>> s = corpus.parse('bach/bwv324.xml') #_DOCS_HIDE
     >>> p = graph.plot.HistogramQuarterLength(s, doneAction=None) #_DOCS_HIDE
@@ -727,8 +729,8 @@ class ScatterWeighted(primitives.GraphScatterWeighted, PlotStreamMixin):
 
 
 class ScatterWeightedPitchSpaceQuarterLength(ScatterWeighted):
-    '''A graph of event, sorted by pitch, over time
-
+    '''
+    A graph of event, sorted by pitch, over time.
 
     >>> s = corpus.parse('bach/bwv324.xml') #_DOCS_HIDE
     >>> p = graph.plot.ScatterWeightedPitchSpaceQuarterLength(s, doneAction=None) #_DOCS_HIDE
@@ -758,8 +760,8 @@ class ScatterWeightedPitchSpaceQuarterLength(ScatterWeighted):
 
 
 class ScatterWeightedPitchClassQuarterLength(ScatterWeighted):
-    '''A graph of event, sorted by pitch class, over time.
-
+    '''
+    A graph of event, sorted by pitch class, over time.
 
     >>> s = corpus.parse('bach/bwv324.xml') #_DOCS_HIDE
     >>> p = graph.plot.ScatterWeightedPitchClassQuarterLength(s, doneAction=None) #_DOCS_HIDE
@@ -791,7 +793,8 @@ class ScatterWeightedPitchClassQuarterLength(ScatterWeighted):
 
 
 class ScatterWeightedPitchSpaceDynamicSymbol(ScatterWeighted):
-    '''A graph of dynamics used by pitch space.
+    '''
+    A graph of dynamics used by pitch space.
 
     >>> #_DOCS_SHOW s = corpus.parse('schumann_robert/opus41no1/movement2.xml')
     >>> s = converter.parse('tinynotation: 4/4 C4 d E f', makeNotation=False) #_DOCS_HIDE
@@ -1036,9 +1039,17 @@ class HorizontalBar(primitives.GraphHorizontalBar, PlotStreamMixin):
         'y': axis.PitchSpaceAxis,
     }
 
-    def __init__(self, streamObj=None, *, colorByPart=False, **keywords):
+    def __init__(
+        self,
+        streamObj: stream.Stream | None = None,
+        *,
+        colorByPart=False,
+        **keywords
+    ) -> None:
         self.colorByPart = colorByPart
         self._partsToColor: dict[stream.Part, str] = {}
+
+        self.axisY: axis.PitchSpaceAxis
 
         primitives.GraphHorizontalBar.__init__(self, **keywords)
         PlotStreamMixin.__init__(self, streamObj, **keywords)

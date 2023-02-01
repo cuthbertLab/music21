@@ -6,7 +6,7 @@
 # Authors:      Michael Scott Asato Cuthbert
 #               Christopher Ariza
 #
-# Copyright:    Copyright © 2008-2022 Michael Scott Asato Cuthbert
+# Copyright:    Copyright © 2008-2023 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 from __future__ import annotations
@@ -57,11 +57,10 @@ class Test(unittest.TestCase):
         a = ElementWrapper(n)
         a.offset = 3.0
         c = ElementWrapper(n)
-        c.offset = 3.0
+        c.offset = 2.0
         self.assertEqual(a, c)
         self.assertIsNot(a, c)
-        b = ElementWrapper(n)
-        b.offset = 2.0
+        b = ElementWrapper(note.Note('G'))
         self.assertNotEqual(a, b)
 
     def testNoteCreation(self):
@@ -100,7 +99,8 @@ class Test(unittest.TestCase):
         a = Music21Object()
         a.id = 'test'
         b = copy.deepcopy(a)
-        self.assertNotEqual(a, b)
+        self.assertIsNot(a, b)
+        self.assertEqual(a, b)
         self.assertEqual(b.id, 'test')
 
     def testM21BaseSites(self):
@@ -230,7 +230,8 @@ class Test(unittest.TestCase):
         self.assertIsInstance(post, clef.BassClef)
 
     def testSitesMeasures(self):
-        '''Can a measure determine the last Clef used?
+        '''
+        Can a measure determine the last Clef used?
         '''
         a = corpus.parse('bach/bwv324.xml')
         measures = a.parts[0].getElementsByClass(stream.Measure).stream()  # measures of first part
@@ -291,7 +292,8 @@ class Test(unittest.TestCase):
         self.assertTrue(isinstance(post, clef.AltoClef), post)
 
     def testBeatAccess(self):
-        '''Test getting beat data from various Music21Objects.
+        '''
+        Test getting beat data from various Music21Objects.
         '''
         s = corpus.parse('bach/bwv66.6.xml')
         p1 = s.parts['#Soprano']
@@ -381,7 +383,8 @@ class Test(unittest.TestCase):
         self.assertEqual([1.0, 0.25, 0.5, 0.25, 1.0, 0.25, 0.5, 0.25, 1.0, 0.25, 0.5, 0.25], match)
 
     def testMeasureNumberAccess(self):
-        '''Test getting measure number data from various Music21Objects.
+        '''
+        Test getting measure number data from various Music21Objects.
         '''
         s = corpus.parse('bach/bwv66.6.xml')
         p1 = s.parts['#Soprano']
@@ -954,6 +957,7 @@ class Test(unittest.TestCase):
         self.assertEqual(
             siteList,
             ['(<music21.stream.Measure 3333 offset=0.0>, 0.0, <RecursionType.ELEMENTS_FIRST>)',
+             '(<music21.stream.Measure 3 offset=9.0>, 0.0, <RecursionType.ELEMENTS_FIRST>)',
              '(<music21.stream.Part Alto>, 9.0, <RecursionType.FLATTEN>)',
              '(<music21.stream.Score bach>, 9.0, <RecursionType.ELEMENTS_ONLY>)']
         )

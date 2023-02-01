@@ -7,9 +7,9 @@
 /* -- page layout ----------------------------------------------------------- */
 
 body {
-    font-family: 'Open Sans', sans-serif;
+    font-family: 'Bitter', serif;
     font-size: 15px;
-    line-height: 150%;
+    line-height: 160%;
     text-align: center;
     color: #2b3600;
     padding: 0;
@@ -18,7 +18,7 @@ body {
     -moz-box-shadow: 0px 0px 10px #93a1a1;
     -webkit-box-shadow: 0px 0px 10px #93a1a1;
     box-shadow: 0px 0px 10px #93a1a1;
-    background: #b3cccc;
+    background: #93787e;
     }
 
 .clearer {
@@ -30,6 +30,7 @@ body {
 .strike {
   text-decoration: line-through;
 }
+
 
 pre, div[class*="highlight-"] {
     clear: left;
@@ -59,7 +60,7 @@ div.body {
 div.related {
     font-size: 1em;
     /*background: #002b36;*/
-    background-color: #2e3436;
+    background-color: #473d42;
     color: #839496;
     padding: 5px 0px;
     }
@@ -122,11 +123,13 @@ div.sphinxsidebar h3, div.sphinxsidebar h4 {
     margin: 1em 0 0.5em 0;
     font-size: 1em;
     padding: 0.7em;
-    background-color: #eeeff1;
+    color: white;
+    background-color: #7a4f6d;
+    border-radius: 8px;
     }
 
 div.sphinxsidebar h3 a {
-    color: #2E3436;
+    color: #f9c7d1;
     }
 
 div.sphinxsidebar ul {
@@ -166,17 +169,18 @@ p {
     }
 
 div.body a, div.sphinxsidebarwrapper a {
-    color: #dc322f;
+    color: #704c97;
     /* color: #268bd2; */
     text-decoration: none;
     }
 
 div.body a:hover, div.sphinxsidebarwrapper a:hover {
-    border-bottom: 1px solid #268bd2;
+    border-bottom: 1px solid #d22688;
+    // this is the text-decoration alternative
     }
 
 h1, h2, h3, h4, h5, h6, p.rubric {
-    font-family: "Open Sans", sans-serif;
+    font-family: 'Bitter', serif;
     font-weight: 400;
     }
 
@@ -270,9 +274,9 @@ a.headerlink:hover {
 
 
 cite, code, tt {
-    font-family: 'Source Code Pro', monospace;
-    font-size: 0.9em;
-    letter-spacing: 0.05em;
+    font-family: 'Courier Prime', monospace;
+    font-size: 1.1em;
+    // letter-spacing: 0.05em;
     font-style: normal;
     }
 
@@ -283,19 +287,19 @@ hr {
     }
 
 .highlight {
-    -webkit-border-radius: 2px;
-    -moz-border-radius: 2px;
-    border-radius: 2px;
-    background-color: #eef6f6;
+    border-radius: 8px;
+    background-color: #ededed;
     }
 
 div.ipython-result div.highlight {
-    background-color: #e8e8db;
-    margin-top: -12px; /* close the gap!  */
+    background-color: #e8dbdb;
+    border-top-left-radius: 0px;
+    border-top-right-radius: 0px;
+    margin-top: -20px; /* close the gap!  */
 }
 
 pre {
-    font-family: 'Source Code Pro', monospace;
+    font-family: 'Courier Prime', monospace;
     font-style: normal;
     font-size: 0.9em;
     letter-spacing: 0.015em;
@@ -424,16 +428,12 @@ div.viewcode-block:target {
     background-color: #FFFFf0;
     /*border: 1px dashed #aaa;*/
     color: #304030;
-    font-family: 'Source Code Pro', monospace;
+    font-family: 'Courier Prime', monospace;
     font-style: normal;
     font-size: 0.9em;
     letter-spacing: 0.015em;
     line-height: 120%;
     padding: 0.7em;
-    white-space: pre-wrap;
-    white-space: -moz-pre-wrap;
-    white-space: -pre-wrap;
-    white-space: -o-pre-wrap;
     word-wrap: break-word;
     }
 
@@ -460,6 +460,31 @@ blockquote::after {
 dt em.sig-param:last-of-type::after {
     content: "\a";
     white-space: pre;
+}
+
+/* parameter name in method/function and ':' */
+dt em.sig-param .n, dt em.sig-param .p {
+    font-style: normal;
+}
+
+/* equal sign small space. */
+dt em.sig-param .o {
+    font-style: normal;
+    padding-left: 2px;
+    padding-right: 2px;
+}
+
+/* ...except if there already is a space. */
+dt em.sig-param .w + .o {
+    padding-left: 0px;
+    padding-right: 0px;
+}
+
+
+/* When linked from somewhere else */
+dt:target, span.highlighted {
+    /* yellow was too obnoxious */
+    background-color: #ffeedb;
 }
 
 /* To have blue background of width of the block (instead of width of content) */

@@ -23,7 +23,6 @@ import copy
 import itertools
 import math
 import typing as t
-from typing import TYPE_CHECKING  # pylint needs no alias
 from typing import overload  # Pycharm can't use an alias
 import unittest
 
@@ -38,7 +37,7 @@ from music21 import interval
 from music21 import prebase
 from music21 import style
 
-if TYPE_CHECKING:
+if t.TYPE_CHECKING:
     from music21 import note
 
 PitchType = t.TypeVar('PitchType', bound='Pitch')
@@ -524,7 +523,8 @@ def _greedyEnharmonicsSearch(oldPitches, scoreFunc=_dissonanceScore):
 
 
 def simplifyMultipleEnharmonics(pitches, criterion=_dissonanceScore, keyContext=None):
-    r'''Tries to simplify the enharmonic spelling of a list of pitches, pitch-
+    r'''
+    Tries to simplify the enharmonic spelling of a list of pitches, pitch-
     or pitch-class numbers according to a given criterion.
 
     A function can be passed as an argument to `criterion`, that is tried to be
@@ -572,8 +572,8 @@ def simplifyMultipleEnharmonics(pitches, criterion=_dissonanceScore, keyContext=
     ...                                    keyContext=key.Key('C'))
     [<music21.pitch.Pitch C3>, <music21.pitch.Pitch E3>, <music21.pitch.Pitch G3>]
 
-    Changed in v7.3 -- fixed a bug with compound intervals (such as formed against
-    the tonic of a KeySignature defaulting to octave 4):
+    * Changed in v7.3: fixed a bug with compound intervals (such as formed against
+      the tonic of a KeySignature defaulting to octave 4):
 
     >>> pitch.simplifyMultipleEnharmonics([pitch.Pitch('B5')], keyContext=key.Key('D'))
     [<music21.pitch.Pitch B5>]
@@ -946,7 +946,7 @@ class Accidental(prebase.ProtoM21Object, style.StyleMixin):
         >>> a == c
         False
         '''
-        if other is None or not isinstance(other, Accidental):
+        if not isinstance(other, Accidental):
             return False
         if self.name == other.name:
             return True
@@ -1110,7 +1110,7 @@ class Accidental(prebase.ProtoM21Object, style.StyleMixin):
         This is the argument that .name and .alter use to allow non-standard names
 
 
-        Changed in v. 5 -- added allowNonStandardValue
+        * Changed in v5: added allowNonStandardValue
         '''
         if isinstance(name, str):
             name = name.lower()  # sometimes args get capitalized
@@ -1231,7 +1231,7 @@ class Accidental(prebase.ProtoM21Object, style.StyleMixin):
         Traceback (most recent call last):
         music21.pitch.AccidentalException: Cannot set attribute color independently of other parts.
 
-        New in v.5 -- needed because .name, .alter, and .modifier run .set()
+        * New in v5: needed because .name, .alter, and .modifier run .set()
         '''
         if attribute not in ('name', 'alter', 'modifier'):
             raise AccidentalException(
@@ -1252,7 +1252,6 @@ class Accidental(prebase.ProtoM21Object, style.StyleMixin):
         of that object.
 
         This is needed when transposing Pitches: we need to retain accidental display properties.
-
 
         >>> a = pitch.Accidental('double-flat')
         >>> a.displayType = 'always'
@@ -1290,7 +1289,7 @@ class Accidental(prebase.ProtoM21Object, style.StyleMixin):
         >>> a.alter
         -1.0
 
-        Changed in v. 5 -- changing the name here changes other values, conditionally
+        * Changed in v5: changing the name here changes other values, conditionally
         '''
         return self._name
 
@@ -1324,7 +1323,7 @@ class Accidental(prebase.ProtoM21Object, style.StyleMixin):
         >>> notSoFlat.name
         'flat'
 
-        Changed in v. 5 -- changing the alter here changes other values, conditionally
+        * Changed in v5: changing the alter here changes other values, conditionally
         '''
         return self._alter
 
@@ -1356,8 +1355,8 @@ class Accidental(prebase.ProtoM21Object, style.StyleMixin):
         >>> f.name
         'sharp'
 
-        Changed in v. 5 -- changing the modifier here changes
-        other values, conditionally
+        * Changed in v5: changing the modifier here changes
+          other values, conditionally
         '''
         return self._modifier
 
@@ -1490,7 +1489,8 @@ class Accidental(prebase.ProtoM21Object, style.StyleMixin):
 
     @property
     def fullName(self):
-        '''Return the most complete representation of this Accidental.
+        '''
+        Return the most complete representation of this Accidental.
 
         >>> a = pitch.Accidental('double-flat')
         >>> a.fullName
@@ -1583,7 +1583,8 @@ class Pitch(prebase.ProtoM21Object):
     Sometimes we need an octave for a `Pitch` even if it's not
     specified.  For instance, we can't play an octave-less `Pitch`
     in MIDI or display it on a staff.  So there is an `.implicitOctave`
-    tag to deal with these situations; by default it's always 4.
+    tag to deal with these situations; by default it's always 4 (unless
+    defaults.pitchOctave is changed)
 
     >>> anyGSharp.implicitOctave
     4
@@ -1593,7 +1594,6 @@ class Pitch(prebase.ProtoM21Object):
 
     >>> highEflat.implicitOctave
     6
-
 
     If an integer or float >= 12 is passed to the constructor then it is
     used as the `.ps` attribute, which is for most common piano notes, the
@@ -1828,11 +1828,12 @@ class Pitch(prebase.ProtoM21Object):
         # 5% of pitch creation time; it'll be created in a sec anyhow
         self._microtone: Microtone | None = None
 
-        # CA, Q: should this remain an attribute or only refer to value in defaults?
-        # MSC A: no, it's a useful attribute for cases such as scales where if there are
-        #        no octaves we give a defaultOctave higher than the previous
-        #        (MSC 12 years later: maybe Chris was right...)
-        self.defaultOctave: int = defaults.pitchOctave
+        # # CA, Q: should this remain an attribute or only refer to value in defaults?
+        # # MSC A: no, it's a useful attribute for cases such as scales where if there are
+        # #        no octaves we give a defaultOctave higher than the previous
+        # #        MSC 12 years later: maybe Chris was right...
+        # self.defaultOctave: int = defaults.pitchOctave
+        # # MSC: even later: Chris Ariza was right
         self._octave: int | None = None
 
         # if True, accidental is not known; is determined algorithmically
@@ -1917,7 +1918,6 @@ class Pitch(prebase.ProtoM21Object):
         >>> d = pitch.Pitch('d-4')
         >>> b == d
         False
-
         '''
         if other is None:
             return False
@@ -1944,10 +1944,12 @@ class Pitch(prebase.ProtoM21Object):
             new = Pitch.__new__(Pitch)
             for k in self.__dict__:
                 v = getattr(self, k, None)
-                if k in ('_step', '_overridden_freq440', 'defaultOctave',
+                if k in ('_step', '_overridden_freq440',
                          '_octave', 'spellingIsInferred'):
                     setattr(new, k, v)
                 elif k == '_client':
+                    setattr(new, k, None)
+                elif v is None:  # common -- save time over deepcopy.
                     setattr(new, k, None)
                 else:
                     setattr(new, k, copy.deepcopy(v, memo))
@@ -2100,7 +2102,10 @@ class Pitch(prebase.ProtoM21Object):
         elif isinstance(value, str):
             # int version is used in interval.py which cannot import Pitch directly
             self._accidental = Accidental(value)
-        elif isinstance(value, (int, float)):
+        elif isinstance(value, int):
+            self._accidental = Accidental(value)
+            self._microtone = None
+        elif isinstance(value, float):
             # check and add any microtones
             alter, cents = _convertCentsToAlterAndCents(value * 100.0)
             self._accidental = Accidental(alter)
@@ -2463,7 +2468,7 @@ class Pitch(prebase.ProtoM21Object):
         >>> d.ps
         63.0
 
-        >>> d.defaultOctave = 5
+        >>> d.octave = 5
         >>> d.ps
         75.0
 
@@ -2487,9 +2492,6 @@ class Pitch(prebase.ProtoM21Object):
 
         The property is called when self.step, self.octave
         or self.accidental are changed.
-
-        Should be called when .defaultOctave is changed if octave is None,
-        but isn't yet.
         '''
         step = self._step
         ps = float(((self.implicitOctave + 1) * 12) + STEPREF[step])
@@ -2690,7 +2692,8 @@ class Pitch(prebase.ProtoM21Object):
 
     @property
     def unicodeName(self) -> str:
-        '''Name presently returns pitch name and accidental without octave.
+        '''
+        Name presently returns pitch name and accidental without octave.
 
         >>> a = pitch.Pitch('G#')
         >>> a.unicodeName
@@ -3075,7 +3078,7 @@ class Pitch(prebase.ProtoM21Object):
         Cannot be set.  Instead, just change the `.octave` of the pitch
         '''
         if self.octave is None:
-            return self.defaultOctave
+            return defaults.pitchOctave
         else:
             return self.octave
 
@@ -3936,7 +3939,7 @@ class Pitch(prebase.ProtoM21Object):
 
         >>> p4.getHigherEnharmonic()
         Traceback (most recent call last):
-        music21.pitch.AccidentalException: -5.0 is not a supported accidental type
+        music21.pitch.AccidentalException: -5 is not a supported accidental type
 
         Note that half accidentals (~ = half-sharp, ` = half-flat)
         get converted to microtones:
@@ -4560,7 +4563,7 @@ class Pitch(prebase.ProtoM21Object):
         >>> pitch.Pitch('f4').transposeBelowTarget(pitch.Pitch('e'), minimize=True)
         <music21.pitch.Pitch F3>
 
-        Changed -- v.3 (August 1, 2016), default for inPlace=False.
+        * Changed in v3: default for inPlace=False.
         '''
         if self.octave is None:
             raise PitchException('Cannot call transposeBelowTarget with an octaveless Pitch.')
@@ -4646,7 +4649,7 @@ class Pitch(prebase.ProtoM21Object):
         >>> pitch.Pitch('d4').transposeAboveTarget(pitch.Pitch('e'), minimize=True)
         <music21.pitch.Pitch D5>
 
-        Changed -- v.3 (August 1, 2016), default for inPlace=False.
+        * Changed in v3: default for inPlace=False.
         '''
         if self.octave is None:
             raise PitchException('Cannot call transposeAboveTarget with an octaveless Pitch.')

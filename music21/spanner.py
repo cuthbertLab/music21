@@ -27,6 +27,7 @@ import unittest
 
 from music21 import base
 from music21 import common
+from music21.common.types import OffsetQL
 from music21 import defaults
 from music21 import environment
 from music21 import exceptions21
@@ -203,6 +204,8 @@ class Spanner(base.Music21Object):
     >>> sp1.completeStatus = True
     '''
 
+    equalityAttributes = ('spannerStorage',)
+
     def __init__(self,
                  *spannedElements: t.Union[base.Music21Object,
                                            Sequence[base.Music21Object]],
@@ -247,32 +250,26 @@ class Spanner(base.Music21Object):
             msg.append(repr(objRef))
         return ''.join(msg)
 
-    def _deepcopySubclassable(self, memo=None, ignoreAttributes=None, removeFromIgnore=None):
+    def _deepcopySubclassable(self, memo=None, *, ignoreAttributes=None):
         '''
         see __deepcopy__ for tests and docs
         '''
         # NOTE: this is a performance critical operation
-        defaultIgnoreSet = {'_cache', 'spannerStorage'}
+        defaultIgnoreSet = {'spannerStorage'}
         if ignoreAttributes is None:
             ignoreAttributes = defaultIgnoreSet
         else:
             ignoreAttributes = ignoreAttributes | defaultIgnoreSet
+        new = t.cast(Spanner,
+                     super()._deepcopySubclassable(memo, ignoreAttributes=ignoreAttributes))
 
-        new = super()._deepcopySubclassable(memo, ignoreAttributes, removeFromIgnore)
-
-        if removeFromIgnore is not None:
-            ignoreAttributes = ignoreAttributes - removeFromIgnore
-
-        if 'spannerStorage' in ignoreAttributes:
-            # there used to be a bug here where spannerStorage would
-            # try to append twice.  I've removed the guardrail here in v7.
-            # because I'm pretty sure we have solved it.
-            # disable pylint check until this inheritance bug is solved:
-            # https://github.com/PyCQA/astroid/issues/457
-            # pylint: disable=no-member
-            for c in self.spannerStorage._elements:
-                new.spannerStorage.coreAppend(c)
-            new.spannerStorage.coreElementsChanged(updateIsFlat=False)
+        # we are temporarily putting in the PREVIOUS elements, to replace them later
+        # with replaceSpannedElement()
+        new.spannerStorage = type(self.spannerStorage)(client=new)
+        for c in self.spannerStorage._elements:
+            new.spannerStorage.coreAppend(c)
+        # updateIsSorted too?
+        new.spannerStorage.coreElementsChanged(updateIsFlat=False)
         return new
 
     def __deepcopy__(self, memo=None):
@@ -316,14 +313,18 @@ class Spanner(base.Music21Object):
     # this is the same as with Variants
 
     def purgeOrphans(self, excludeStorageStreams=True):
-        self.spannerStorage.purgeOrphans(excludeStorageStreams)
+        if self.spannerStorage:
+            # might not be defined in the middle of a deepcopy.
+            self.spannerStorage.purgeOrphans(excludeStorageStreams)
         base.Music21Object.purgeOrphans(self, excludeStorageStreams)
 
     def purgeLocations(self, rescanIsDead=False):
         # must override Music21Object to purge locations from the contained
         # Stream
         # base method to perform purge on the Stream
-        self.spannerStorage.purgeLocations(rescanIsDead=rescanIsDead)
+        if self.spannerStorage:
+            # might not be defined in the middle of a deepcopy.
+            self.spannerStorage.purgeLocations(rescanIsDead=rescanIsDead)
         base.Music21Object.purgeLocations(self, rescanIsDead=rescanIsDead)
 
     # --------------------------------------------------------------------------
@@ -399,7 +400,7 @@ class Spanner(base.Music21Object):
     def getSpannedElementIds(self):
         '''
         Return all id() for all stored objects.
-        Was performance critical, until most uses removed in v.7.
+        Was performance critical, until most uses removed in v7.
         Used only as a testing tool now.
         Spanner.__contains__() was optimized in 839c7e5.
         '''
@@ -529,8 +530,8 @@ class Spanner(base.Music21Object):
         #    'id(new)', id(new)])
 
     def isFirst(self, spannedElement):
-        '''Given a spannedElement, is it first?
-
+        '''
+        Given a spannedElement, is it first?
 
         >>> n1 = note.Note('g')
         >>> n2 = note.Note('f#')
@@ -610,6 +611,58 @@ class _SpannerRef(t.TypedDict):
     spanner: 'Spanner'
     className: str
 
+class SpannerAnchor(base.Music21Object):
+    '''
+    A simple Music21Object that can be used to define the beginning or end
+    of a Spanner, in the place of a GeneralNote.
+
+    This is useful for (e.g.) a Crescendo that ends partway through a
+    note (e.g. in a violin part).  Exporters (like MusicXML) are configured
+    to remove the SpannerAnchor itself on output, exporting only the Spanner
+    start and stop locations.
+
+    Here's an example of a whole note that has a Crescendo for the first
+    half of the note, and a Diminuendo for the second half of the note.
+
+    >>> n = note.Note('C4', quarterLength=4)
+    >>> measure = stream.Measure([n], number=1)
+    >>> part = stream.Part([measure], id='violin')
+    >>> score = stream.Score([part])
+
+    Add a crescendo from the note's start to the first anchor, place in the
+    middle of the note, and then a diminuendo from that first anchor to the
+    second, placed at the end of the note.
+
+    >>> anchor1 = spanner.SpannerAnchor()
+    >>> anchor2 = spanner.SpannerAnchor()
+    >>> measure.insert(2.0, anchor1)
+    >>> measure.insert(4.0, anchor2)
+    >>> cresc = dynamics.Crescendo(n, anchor1)
+    >>> dim = dynamics.Diminuendo(anchor1, anchor2)
+    >>> score.append((cresc, dim))
+    >>> score.show('text')
+    {0.0} <music21.stream.Part violin>
+        {0.0} <music21.stream.Measure 1 offset=0.0>
+            {0.0} <music21.note.Note C>
+            {2.0} <music21.spanner.SpannerAnchor at 2.0>
+            {4.0} <music21.spanner.SpannerAnchor at 4.0>
+    {4.0} <music21.dynamics.Crescendo <music21.note.Note C><...SpannerAnchor at 2.0>>
+    {4.0} <music21.dynamics.Diminuendo <...SpannerAnchor at 2.0><...SpannerAnchor at 4.0>>
+    '''
+    def __init__(self, **keywords):
+        super().__init__(**keywords)
+
+    def _reprInternal(self) -> str:
+        if self.activeSite is None:
+            return 'unanchored'
+
+        ql: OffsetQL = self.duration.quarterLength
+        if ql == 0:
+            return f'at {self.offset}'
+
+        return f'at {self.offset}-{self.offset + ql}'
+
+
 class SpannerBundle(prebase.ProtoM21Object):
     '''
     An advanced utility object for collecting and processing
@@ -628,8 +681,8 @@ class SpannerBundle(prebase.ProtoM21Object):
     Not to be confused with SpannerStorage (which is a Stream class inside
     a spanner that stores Elements that are spanned)
 
-    Changed in v7: only argument must be a List of spanners.
-    Creators of SpannerBundles are required to check that this constraint is True
+    * Changed in v7: only argument must be a List of spanners.
+      Creators of SpannerBundles are required to check that this constraint is True
     '''
     def __init__(self, spanners: list[Spanner] | None = None):
         self._cache: dict[str, t.Any] = {}  # cache is defined on Music21Object not ProtoM21Object
@@ -840,7 +893,7 @@ class SpannerBundle(prebase.ProtoM21Object):
         >>> su2
         <music21.spanner.Glissando <music21.note.Note E><music21.note.Note C>>
 
-        Changed in v.7 -- id() is no longer allowed for `old`.
+        * Changed in v7: id() is no longer allowed for `old`.
 
         >>> sb.replaceSpannedElement(id(n1), n2)
         Traceback (most recent call last):
@@ -2331,7 +2384,8 @@ class Test(unittest.TestCase):
         self.assertTrue(sp3.hasSpannedElement(m5))
 
     def testOttavaShiftA(self):
-        '''Test basic octave shift creation and output, as well as passing
+        '''
+        Test basic octave shift creation and output, as well as passing
         objects through make measure calls.
         '''
         from music21 import stream
@@ -2384,7 +2438,8 @@ class Test(unittest.TestCase):
         self.assertEqual(raw.count('type="up"'), 1)
 
     def testOttavaShiftB(self):
-        '''Test a single note octave
+        '''
+        Test a single note octave
         '''
         from music21 import stream
         from music21 import note
@@ -2679,8 +2734,8 @@ class Test(unittest.TestCase):
         from music21 import stream
         from music21.spanner import Spanner
 
-        n1 = note.Note('g')
-        n2 = note.Note('f#')
+        n1 = note.Note('G4')
+        n2 = note.Note('F#4')
 
         sp1 = Spanner(n1, n2)
         st1 = stream.Stream()
@@ -2688,7 +2743,6 @@ class Test(unittest.TestCase):
         st1.insert(0.0, n1)
         st1.insert(1.0, n2)
         st2 = copy.deepcopy(st1)
-
         n3 = st2.notes[0]
         self.assertEqual(len(n3.getSpannerSites()), 1)
         sp2 = n3.getSpannerSites()[0]

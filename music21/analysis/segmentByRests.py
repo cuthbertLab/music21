@@ -16,17 +16,12 @@ import unittest
 from music21 import clef
 from music21 import converter
 from music21 import environment
-from music21 import exceptions21
 from music21 import note
 from music21 import interval
 
 environLocal = environment.Environment('analysis.segmentByRests')
 
 # ------------------------------------------------------------------------------
-
-class SegmentationException(exceptions21.Music21Exception):
-    pass
-
 class Segmenter:
     '''
     Given a work or part, returns a list of melodic segments or intervals.

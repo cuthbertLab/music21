@@ -75,7 +75,6 @@ def isNum(usrData: t.Any) -> t.TypeGuard[numbers.Rational]:
     '''
     # noinspection PyBroadException
     try:
-        # TODO: this may have unexpected consequences: find
         dummy = usrData + 0
         if usrData is not True and usrData is not False:
             return True
@@ -134,7 +133,7 @@ def isIterable(usrData: t.Any) -> t.TypeGuard[Iterable]:
     >>> common.isIterable(stream.Stream)
     False
 
-    Changed in v7.3 -- Classes (not instances) are not iterable
+    * Changed in v7.3: Classes (not instances) are not iterable
     '''
     if isinstance(usrData, (str, bytes)):
         return False
@@ -191,7 +190,7 @@ def holdsType(usrData: t.Any, checkType: type[_T]) -> t.TypeGuard[Collection[_T]
     >>> next(iter(r))
     1
 
-    New in v9.
+    * New in v9.
     '''
     if not isIterable(usrData):
         return False
@@ -204,7 +203,8 @@ def holdsType(usrData: t.Any, checkType: type[_T]) -> t.TypeGuard[Collection[_T]
 
 
 def classToClassStr(classObj: type) -> str:
-    '''Convert a class object to a class string.
+    '''
+    Convert a class object to a class string.
 
     >>> common.classToClassStr(note.Note)
     'Note'
@@ -283,7 +283,7 @@ def tempAttribute(obj, attribute: str, new_val=TEMP_ATTRIBUTE_SENTINEL):
 
     For working with multiple attributes see :func:`~music21.classTools.saveAttributes`.
 
-    New in v7.
+    * New in v7.
     '''
     tempStorage = getattr(obj, attribute)
     if new_val is not TEMP_ATTRIBUTE_SENTINEL:
@@ -294,7 +294,7 @@ def tempAttribute(obj, attribute: str, new_val=TEMP_ATTRIBUTE_SENTINEL):
         setattr(obj, attribute, tempStorage)
 
 @contextlib.contextmanager
-def saveAttributes(obj, *attributeList):
+def saveAttributes(obj, *attributeList: str) -> t.Generator[None, None, None]:
     '''
     Save a number of attributes in an object and then restore them afterwards.
 
@@ -310,7 +310,7 @@ def saveAttributes(obj, *attributeList):
     For storing and setting a value on a single attribute see
     :func:`~music21.classTools.tempAttribute`.
 
-    New in v7.
+    * New in v7.
     '''
     tempStorage: dict[str, t.Any] = {}
     for attribute in attributeList:

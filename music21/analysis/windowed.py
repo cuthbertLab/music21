@@ -349,19 +349,20 @@ class WindowedAnalysis:
 
 
 # -----------------------------------------------------------------------------
-class TestExternal(unittest.TestCase):
-    pass
-
 
 class TestMockProcessor:
 
     def process(self, subStream):
-        '''Simply count the number of notes found
+        '''
+        Simply count the number of notes found
         '''
         return len(subStream.flatten().notesAndRests), None
 
 
 class Test(unittest.TestCase):
+    def testCopyAndDeepcopy(self):
+        from music21.test.commonTest import testCopyAll
+        testCopyAll(self, globals())
 
     def testBasic(self):
         from music21 import corpus
@@ -381,7 +382,8 @@ class Test(unittest.TestCase):
                 unused_x, unused_y, unused_z = wa.process(i, i)
 
     def testWindowing(self):
-        '''Test that windows are doing what they are supposed to do
+        '''
+        Test that windows are doing what they are supposed to do
         '''
         p = TestMockProcessor()
 

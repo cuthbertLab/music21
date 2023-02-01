@@ -24,7 +24,7 @@ def attributeCount(streamOrStreamIter, attrName='quarterLength') -> collections.
     >>> qlCount.most_common(3)
     [(1.0, 12), (2.0, 11), (4.0, 2)]
 
-    Changed in v4: Returns a collections.Counter object.
+    * Changed in v4: Returns a collections.Counter object.
     '''
     post: collections.Counter[t.Any] = collections.Counter()
     for e in streamOrStreamIter:

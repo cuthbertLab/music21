@@ -7,7 +7,7 @@
 #               Christopher Ariza
 #               Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2010-2022 Michael Scott Asato Cuthbert
+# Copyright:    Copyright © 2010-2023 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
@@ -27,7 +27,6 @@ from __future__ import annotations
 from collections import OrderedDict
 from collections.abc import Iterable, Sequence
 import typing as t
-from typing import TYPE_CHECKING  # pylint needs no alias
 import unittest
 
 from music21 import environment
@@ -38,10 +37,8 @@ from music21 import note
 from music21 import key
 from music21 import pitch
 
-
-if TYPE_CHECKING:
+if t.TYPE_CHECKING:
     from music21 import stream
-
 
 environLocal = environment.Environment('analysis.discrete')
 
@@ -156,7 +153,8 @@ class DiscreteAnalysis:
         return post
 
     def solutionLegend(self, compress=False):
-        '''A list of pairs showing all discrete results and the assigned color.
+        '''
+        A list of pairs showing all discrete results and the assigned color.
         Data should be organized to be passed to
         :class:`music21.graph.GraphColorGridLegend`.
 
@@ -392,7 +390,7 @@ class KeyWeightKeyAnalysis(DiscreteAnalysis):
                 solution[i] += (toneWeights[(j - i) % 12] * pcDistribution[j])
         return solution
 
-    def _getLikelyKeys(self, keyResults, differences):
+    def _getLikelyKeys(self, keyResults, differences) -> list[t.Any] | None:
         ''' Takes in a list of probable key results in points and returns a
             list of keys in letters, sorted from most likely to least likely.
         '''
@@ -410,9 +408,10 @@ class KeyWeightKeyAnalysis(DiscreteAnalysis):
             # environLocal.printDebug(['added likely key', likelyKeys[pc]])
         return likelyKeys
 
-    def _getDifference(self, keyResults, pcDistribution, weightType):
-        ''' Takes in a list of numerical probable key results and returns the
-            difference of the top two keys
+    def _getDifference(self, keyResults, pcDistribution, weightType) -> None | list[int | float]:
+        '''
+        Takes in a list of numerical probable key results and returns the
+        difference of the top two keys.
         '''
         # case of empty analysis
         if keyResults is None:
@@ -728,9 +727,9 @@ class KrumhanslSchmuckler(KeyWeightKeyAnalysis):
     Values from from http://extras.humdrum.org/man/keycor/, which describes these
     weightings as "Strong tendency to identify the dominant key as the tonic."
 
-    Changed in v.6.3 -- it used to be that these were different from the
-    Kessler profiles, but that was likely a typo.  Thus, KrumhanslKessler and
-    KrumhanslSchmuckler are synonyms of each other.
+    * Changed in v6.3: it used to be that these were different from the
+      Kessler profiles, but that was likely a typo.  Thus, KrumhanslKessler and
+      KrumhanslSchmuckler are synonyms of each other.
     '''
     _DOC_ALL_INHERITED = False
     name = 'Krumhansl Schmuckler/Kessler Key Analysis'
@@ -911,7 +910,8 @@ class TemperleyKostkaPayne(KeyWeightKeyAnalysis):
         super().__init__(referenceStream=referenceStream)
 
     def getWeights(self, weightType='major'):
-        ''' Returns the key weights.
+        '''
+        Returns the key weights.
 
         >>> a = analysis.discrete.TemperleyKostkaPayne()
         >>> len(a.getWeights('major'))
@@ -952,14 +952,14 @@ class Ambitus(DiscreteAnalysis):
     # provide possible string matches for this processor
     identifiers = ['ambitus', 'span']
 
-    def __init__(self, referenceStream=None):
+    def __init__(self, referenceStream: stream.Stream | None = None):
         super().__init__(referenceStream=referenceStream)
         # Store the min and max Pitch instances for referenceStream
         # set by getPitchSpan(), which is called by _generateColors()
         self.minPitchObj: pitch.Pitch | None = None
         self.maxPitchObj: pitch.Pitch | None = None
 
-        self._pitchSpanColors = OrderedDict()
+        self._pitchSpanColors: OrderedDict[int, str] = OrderedDict()
         self._generateColors()
 
     def _generateColors(self, numColors=None):
@@ -1283,7 +1283,8 @@ class MelodicIntervalDiversity(DiscreteAnalysis):
         return len(uniqueIntervals), self.solutionToColor(len(uniqueIntervals))
 
     def getSolution(self, sStream):
-        '''Solution is the number of unique intervals.
+        '''
+        Solution is the number of unique intervals.
         '''
         solution, unused_color = self.process(sStream.flatten())
         return solution
@@ -1410,6 +1411,9 @@ def analysisClassFromMethodName(method: str) -> type[DiscreteAnalysis] | None:
 
 
 class Test(unittest.TestCase):
+    def testCopyAndDeepcopy(self):
+        from music21.test.commonTest import testCopyAll
+        testCopyAll(self, globals())
 
     def testKeyAnalysisKrumhansl(self):
         from music21 import converter
@@ -1577,7 +1581,7 @@ class Test(unittest.TestCase):
         s2.repeatAppend(note.Note('c#'), 2)
         k = s2.analyze('key')
         # Ensure all pitch classes are present
-        self.assertEqual(len(set(k.alternateInterpretations)), 23)
+        self.assertEqual(len(k.alternateInterpretations), 23)
 
 
 # define presented order in documentation

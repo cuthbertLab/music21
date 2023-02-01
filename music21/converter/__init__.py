@@ -35,6 +35,7 @@ the temp folder on the disk.
 '''
 from __future__ import annotations
 
+from collections import deque
 import collections.abc
 import copy
 from http.client import responses
@@ -170,7 +171,7 @@ class ArchiveManager:
         For 'musedata' format this will be a list of strings.
         For 'musicxml' this will be a single string.
 
-        Changed in v.8 -- name is not used.
+        * Changed in v8: name is not used.
         '''
         post = None
         if self.archiveType != 'zip':
@@ -378,24 +379,24 @@ class PickleFilter:
 
 
 # ------------------------------------------------------------------------------
-_registeredSubconverters: list[type[subConverters.SubConverter]] = []
+# a deque of additional subconverters to use (in addition to the default ones)
+_registeredSubconverters: deque[type[subConverters.SubConverter]] = deque()
+
 # default subconverters to skip
-_deregisteredSubconverters: list[
+_deregisteredSubconverters: deque[
     type[subConverters.SubConverter] | t.Literal['all']
-] = []
+] = deque()
 
 
 def resetSubconverters():
     '''
     Reset state to default (removing all registered and deregistered subconverters).
     '''
-    global _registeredSubconverters  # pylint: disable=global-statement
-    global _deregisteredSubconverters  # pylint: disable=global-statement
-    _registeredSubconverters = []
-    _deregisteredSubconverters = []
+    _registeredSubconverters.clear()
+    _deregisteredSubconverters.clear()
 
 
-def registerSubconverter(newSubConverter) -> None:
+def registerSubconverter(newSubConverter: type[subConverters.SubConverter]) -> None:
     '''
     Add a Subconverter to the list of registered subconverters.
 
@@ -418,8 +419,9 @@ def registerSubconverter(newSubConverter) -> None:
 
     >>> converter.resetSubconverters() #_DOCS_HIDE
 
+    Changed in v.9 -- custom subconverters are registered above default subconverters.
     '''
-    _registeredSubconverters.append(newSubConverter)
+    _registeredSubconverters.appendleft(newSubConverter)
 
 
 def unregisterSubconverter(
@@ -457,13 +459,11 @@ def unregisterSubconverter(
     []
 
     >>> converter.resetSubconverters() #_DOCS_HIDE
-
     '''
-    global _registeredSubconverters  # pylint: disable=global-statement
-    global _deregisteredSubconverters  # pylint: disable=global-statement
     if removeSubconverter == 'all':
-        _registeredSubconverters = []
-        _deregisteredSubconverters = ['all']
+        _registeredSubconverters.clear()
+        _deregisteredSubconverters.clear()
+        _deregisteredSubconverters.append('all')
         return
 
     try:
@@ -493,7 +493,7 @@ class Converter:
             ''',
     }
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.subConverter: subConverters.SubConverter | None = None
         # a stream object unthawed
         self._thawedStream: stream.Score | stream.Part | stream.Opus | None = None
@@ -539,7 +539,6 @@ class Converter:
 
         if useFormat is None:
             useFormat = self.getFormatFromFileExtension(fpPathlib)
-
         self.setSubconverterFromFormat(useFormat)
         if t.TYPE_CHECKING:
             assert isinstance(self.subConverter, subConverters.SubConverter)
@@ -729,7 +728,7 @@ class Converter:
         >>> #_DOCS_SHOW c.parseURL(joplinURL)
         >>> #_DOCS_SHOW joplinStream = c.stream
 
-        Changed in v.7 -- made keyword-only and added `forceSource` option.
+        * Changed in v7: made keyword-only and added `forceSource` option.
         '''
         autoDownload = environLocal['autoDownload']
         if autoDownload in ('deny', 'ask'):
@@ -792,6 +791,7 @@ class Converter:
         self,
         converterType: t.Literal['any', 'input', 'output'] = 'any'
     ) -> list[type[subConverters.SubConverter]]:
+        # noinspection PyAttributeOutsideInit
         '''
         Gives a list of all the subconverter classes that are registered.
 
@@ -843,6 +843,45 @@ class Converter:
         >>> converter.registerSubconverter(ConverterSonix)
         >>> ConverterSonix in c.subconvertersList()
         True
+
+        Newly registered subconveters appear first, so they will be used instead
+        of any default subconverters that work on the same format or extension.
+
+        >>> class BadMusicXMLConverter(converter.subConverters.SubConverter):
+        ...    registerFormats = ('musicxml',)
+        ...    registerInputExtensions = ('xml', 'mxl', 'musicxml')
+        ...    def parseData(self, strData, number=None):
+        ...        self.stream = stream.Score(id='empty')
+
+        >>> converter.registerSubconverter(BadMusicXMLConverter)
+        >>> c.subconvertersList()
+        [<class 'music21.BadMusicXMLConverter'>,
+         ...
+         <class 'music21.converter.subConverters.ConverterMusicXML'>,
+         ...]
+
+        Show that this musicxml file by Amy Beach is now parsed by BadMusicXMLConverter:
+
+        >>> #_DOCS_SHOW s = corpus.parse('beach/prayer_of_a_tired_child')
+        >>> #_DOCS_HIDE -- we cannot know if the piece is already parsed or not.
+        >>> s = corpus.parse('beach/prayer_of_a_tired_child', forceSource=True)  #_DOCS_HIDE
+        >>> s.id
+        'empty'
+        >>> len(s.parts)
+        0
+
+        Note that if the file has already been parsed by another subconverter format
+        the parameter `forceSource` is required to force the file to be parsed by the
+        newly registered subconverter:
+
+        >>> converter.unregisterSubconverter(BadMusicXMLConverter)
+        >>> #_DOCS_HIDE -- the forceSource will not have created a pickle.
+        >>> #_DOCS_SHOW s = corpus.parse('beach/prayer_of_a_tired_child')
+        >>> s.id
+        'empty'
+        >>> s = corpus.parse('beach/prayer_of_a_tired_child', forceSource=True)
+        >>> len(s.parts)
+        6
 
         >>> converter.resetSubconverters() #_DOCS_HIDE
         '''
@@ -960,7 +999,9 @@ class Converter:
             if hasattr(name, 'registerFormats'):
                 formatsTuple = name.registerFormats
                 for f in formatsTuple:
-                    converterFormats[f.lower()] = name
+                    f = f.lower()
+                    if f not in converterFormats:
+                        converterFormats[f] = name
         return converterFormats
 
     def setSubconverterFromFormat(self, converterFormat: str):
@@ -1188,7 +1229,7 @@ def parseURL(url,
     URL downloading will not happen automatically unless the user has set their
     Environment "autoDownload" preference to "allow".
 
-    Changed in v.7 -- made keyword-only.
+    * Changed in v7: made keyword-only.
     '''
     v = Converter()
     v.parseURL(url, format=format, forceSource=forceSource, **keywords)
@@ -1248,7 +1289,7 @@ def parse(value: bundles.MetadataEntry | bytes | str | pathlib.Path,
     >>> s[meter.TimeSignature].first()
     <music21.meter.TimeSignature 2/16>
 
-    Changed in v.8 -- passing a list of tinyNotation strings was never documented as a
+    * Changed in v8: passing a list of tinyNotation strings was never documented as a
         possibility and has been removed.
     '''
     # environLocal.printDebug(['attempting to parse()', value])
@@ -1358,7 +1399,8 @@ def toData(obj: base.Music21Object, fmt: str, **keywords) -> str | bytes:
 
 def freeze(streamObj, fmt=None, fp=None, fastButUnsafe=False, zipType='zlib') -> pathlib.Path:
     # noinspection PyShadowingNames
-    '''Given a StreamObject and a file path, serialize and store the Stream to a file.
+    '''
+    Given a StreamObject and a file path, serialize and store the Stream to a file.
 
     This function is based on the :class:`~music21.converter.StreamFreezer` object.
 
@@ -1408,7 +1450,8 @@ def freeze(streamObj, fmt=None, fp=None, fastButUnsafe=False, zipType='zlib') ->
 
 
 def thaw(fp, zipType='zlib'):
-    '''Given a file path of a serialized Stream, defrost the file into a Stream.
+    '''
+    Given a file path of a serialized Stream, defrost the file into a Stream.
 
     This function is based on the :class:`~music21.converter.StreamFreezer` object.
 
@@ -1475,7 +1518,7 @@ def _osCanLoad(fp: str) -> bool:
 
     os.path.exists raises ValueError for paths over 260 chars
     on all versions of Windows lacking the `LongPathsEnabled` setting,
-    which is absent below Windows 10 v.1607 and opt-in on higher versions.
+    which is absent below Windows 10.1607 and opt-in on higher versions.
     '''
     try:
         return os.path.exists(fp)

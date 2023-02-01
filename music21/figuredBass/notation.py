@@ -422,10 +422,6 @@ class Figure(prebase.ProtoM21Object):
         return f'{self.number} {mod}'
 
 
-class FigureException(exceptions21.Music21Exception):
-    pass
-
-
 # ------------------------------------------------------------------------------
 specialModifiers = {'+': '#',
                     '/': '-',

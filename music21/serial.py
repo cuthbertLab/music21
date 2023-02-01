@@ -1059,8 +1059,8 @@ class TwelveToneRow(ToneRow):
         >>> moses.areCombinatorial('R', 6, 'RI', 4)
         False
 
-        Changed in v.7 -- `convention` is no longer necessary and no longer used.
-        Renamed to `unused_convention` and defaults None; to be removed in v.8.
+        * Changed in v7: `convention` is no longer necessary and no longer used.
+          Renamed to `unused_convention` and defaults None; to be removed in v8.
         '''
         if self.isTwelveToneRow() is False:
             raise SerialException('Combinatoriality applies only to twelve-tone rows.')
@@ -1209,7 +1209,7 @@ def getHistoricalRowByName(rowName):
     >>> web.isLinkChord()
     False
 
-    NOTE: before v.6, these rows had 'Row' in front of them,
+    NOTE: before v6, these rows had 'Row' in front of them,
     like 'RowWebernOp29' instead of 'WebernOp29'.  They can still be accessed
     by the old name.
 
@@ -1396,7 +1396,9 @@ class Test(unittest.TestCase):
         self.assertEqual(nonRows, [])
 
     def testExtractRowParts(self):
-        '''Was a problem in slices'''
+        '''
+        Was a problem in slices
+        '''
         aRow = getHistoricalRowByName('BergViolinConcerto')
         unused_aRow2 = aRow[0:3]
 

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 '''
-The music21 Framework is Copyright © 2006-2022 Michael Scott Asato Cuthbert.
+The music21 Framework is Copyright © 2006-2023 Michael Scott Asato Cuthbert.
 
 Some Rights Reserved
 Released under the BSD (3-clause) license.  See license.txt.
@@ -26,7 +26,7 @@ and Social Sciences.  Portions of music21 were originally part of
 the PMusic (Perl) library, developed by Cuthbert prior to arriving at MIT.
 
 music21 outputs a subset of XML data defined by the MusicXML 4.0
-standard, Copyright © 2004-2022 the Contributors to the MusicXML Specification.
+standard, Copyright © 2004-2022 W3C, open source.
 
 The corpus files have copyrights retained by their
 owners who have allowed them to be included with music21.
@@ -40,7 +40,7 @@ minPythonVersionStr = '.'.join([str(x) for x in minPythonVersion])
 if sys.version_info < minPythonVersion:
     # DO NOT CHANGE THIS TO AN f-String -- it needs to run on old python.
     raise ImportError('''
-    Music21 v.9.0+ is a Python {}+ only library.
+    Music21 v9.0+ is a Python {}+ only library.
     Use music21 v1 to run on Python 2.1-2.6.
     Use music21 v4 to run on Python 2.7.
     Use music21 v5.1 to run on Python 3.4.

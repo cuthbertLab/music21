@@ -170,8 +170,8 @@ tool.
 * <pb>: a page break
 * <lb>: a line break
 * <sb>: a system break
-
 '''
+
 from __future__ import annotations
 
 from collections import defaultdict
@@ -227,22 +227,30 @@ _IGNORE_UNPROCESSED = (
 # Exceptions
 # -----------------------------------------------------------------------------
 class MeiValidityError(exceptions21.Music21Exception):
-    '''When there is an otherwise-unspecified validity error that prevents parsing.'''
+    '''
+    When there is an otherwise-unspecified validity error that prevents parsing.
+    '''
     pass
 
 
 class MeiValueError(exceptions21.Music21Exception):
-    '''When an attribute has an invalid value.'''
+    '''
+    When an attribute has an invalid value.
+    '''
     pass
 
 
 class MeiAttributeError(exceptions21.Music21Exception):
-    '''When an element has an invalid attribute.'''
+    '''
+    When an element has an invalid attribute.
+    '''
     pass
 
 
 class MeiElementError(exceptions21.Music21Exception):
-    '''When an element itself is invalid.'''
+    '''
+    When an element itself is invalid.
+    '''
     pass
 
 
@@ -1178,7 +1186,9 @@ def addSlurs(elem, obj, slurBundle):
     addedSlur = False
 
     def wrapGetByIdLocal(theId):
-        '''Avoid crashing when getByIdLocl() doesn't find the slur'''
+        '''
+        Avoid crashing when getByIdLocl() doesn't find the slur
+        '''
         try:
             slurBundle.getByIdLocal(theId)[0].addSpannedElements(obj)
             return True
@@ -1883,14 +1893,14 @@ def articFromElement(elem, slurBundle=None):  # pylint: disable=unused-argument
     :attr:`~music21.note.GeneralNote.articulations` attribute.
 
     >>> from xml.etree import ElementTree as ET
-    >>> meiSnippet = """<artic artic="acc" xmlns="http://www.music-encoding.org/ns/mei"/>"""
+    >>> meiSnippet = '<artic artic="acc" xmlns="http://www.music-encoding.org/ns/mei"/>'
     >>> meiSnippet = ET.fromstring(meiSnippet)
     >>> mei.base.articFromElement(meiSnippet)
     [<music21.articulations.Accent>]
 
     A single <artic> element may indicate many :class:`Articulation` objects.
 
-    >>> meiSnippet = """<artic artic="acc ten" xmlns="http://www.music-encoding.org/ns/mei"/>"""
+    >>> meiSnippet = '<artic artic="acc ten" xmlns="http://www.music-encoding.org/ns/mei"/>'
     >>> meiSnippet = ET.fromstring(meiSnippet)
     >>> mei.base.articFromElement(meiSnippet)
     [<music21.articulations.Accent>, <music21.articulations.Tenuto>]
@@ -1942,11 +1952,11 @@ def accidFromElement(elem, slurBundle=None):  # pylint: disable=unused-argument
     a string. Accidentals up to triple-sharp and triple-flat are supported.
 
     >>> from xml.etree import ElementTree as ET
-    >>> meiSnippet = """<accid accid="s" xmlns="http://www.music-encoding.org/ns/mei"/>"""
+    >>> meiSnippet = '<accid accid="s" xmlns="http://www.music-encoding.org/ns/mei"/>'
     >>> meiSnippet = ET.fromstring(meiSnippet)
     >>> mei.base.accidFromElement(meiSnippet)
     '#'
-    >>> meiSnippet = """<accid accid="tf" xmlns="http://www.music-encoding.org/ns/mei"/>"""
+    >>> meiSnippet = '<accid accid="tf" xmlns="http://www.music-encoding.org/ns/mei"/>'
     >>> meiSnippet = ET.fromstring(meiSnippet)
     >>> mei.base.accidFromElement(meiSnippet)
     '---'

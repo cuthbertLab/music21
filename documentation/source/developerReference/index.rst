@@ -11,6 +11,8 @@ Developer Reference
 
     usingGit
     musicxmlTest
+    
+    startingOver
 
 
 Documentation and tests in progress

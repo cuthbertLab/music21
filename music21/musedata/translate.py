@@ -27,18 +27,14 @@ import unittest
 
 from music21 import clef
 from music21 import environment
-from music21 import exceptions21
 
 environLocal = environment.Environment('musedata.translate')
 
 
 # ------------------------------------------------------------------------------
-class MuseDataTranslateException(exceptions21.Music21Exception):
-    pass
-
-
 def _musedataBeamToBeams(beamSymbol):
-    '''Given a musedata beam symbol, converter to a music21 Beams object representation.
+    '''
+    Given a musedata beam symbol, converter to a music21 Beams object representation.
 
     >>> from music21.musedata import translate
     >>> translate._musedataBeamToBeams('[[')
@@ -71,7 +67,6 @@ def _musedataBeamToBeams(beamSymbol):
             beamType = 'partial'
             direction = 'left'
         else:
-            # raise MuseDataTranslateException('cannot interpret beams char: %s' % char)
             environLocal.printDebug(['cannot interpret beams char:', char])
             continue
         # will automatically increment number
@@ -82,7 +77,8 @@ def _musedataBeamToBeams(beamSymbol):
 
 
 def _musedataRecordListToNoteOrChord(records, previousElement=None):
-    '''Given a list of MuseDataRecord objects, return a configured
+    '''
+    Given a list of MuseDataRecord objects, return a configured
     :class:`~music21.note.Note` or :class:`~music21.chord.Chord`.
 
     Optionally pass a previous element, which may be music21 Note, Chord, or Rest;
@@ -159,7 +155,8 @@ def _processPending(hasVoices, pendingRecords, eLast, m, vActive):
 
 
 def musedataPartToStreamPart(museDataPart, inputM21=None):
-    '''Translate a musedata part to a :class:`~music21.stream.Part`.
+    '''
+    Translate a musedata part to a :class:`~music21.stream.Part`.
     '''
     from music21 import stream
     from music21 import note

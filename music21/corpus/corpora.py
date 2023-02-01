@@ -164,7 +164,7 @@ class Corpus(prebase.ProtoM21Object):
         >>> coreCorpus._translateExtensions(('.mid', '.musicxml'), True)
         ('.mid', '.midi', '.xml', '.mxl', '.musicxml')
 
-        Changed in v9: returns a tuple, not a list.  first element must be an Iterable of strings
+        * Changed in v9: returns a tuple, not a list.  first element must be an Iterable of strings
         '''
         if not fileExtensions:
             return Corpus._allExtensions
@@ -183,7 +183,7 @@ class Corpus(prebase.ProtoM21Object):
 
     @property
     @abc.abstractmethod
-    def cacheFilePath(self):
+    def cacheFilePath(self) -> pathlib.Path:
         raise NotImplementedError
 
     # PUBLIC METHODS #
@@ -197,14 +197,11 @@ class Corpus(prebase.ProtoM21Object):
 
         Return the rebuilt metadata bundle.
         '''
-        mdb = self.metadataBundle
-        if mdb is None:
-            return self
         if self.cacheFilePath is None:
-            return self
-
-        mdb.clear()
-        mdb.delete()
+            raise ValueError('Cannot find the metadata bundle')
+        if self.cacheFilePath.exists():
+            self.cacheFilePath.unlink()
+        self.metadataBundle.clear()
         self.cacheMetadata(useMultiprocessing=useMultiprocessing, verbose=True)
         return self.metadataBundle
 
@@ -551,6 +548,7 @@ class CoreCorpus(Corpus):
         ('handel', 'George Frideric Handel', True),
         ('haydn', 'Joseph Haydn', True),
         ('joplin', 'Scott Joplin', True),
+        ('johnson_j_r', 'J. Rosamund Johnson', True),
         ('josquin', 'Josquin des Prez', True),
         ('leadSheet', 'Leadsheet demos', False),
         ('luca', 'D. Luca', True),
@@ -578,7 +576,7 @@ class CoreCorpus(Corpus):
     # PRIVATE PROPERTIES #
 
     @property
-    def cacheFilePath(self):
+    def cacheFilePath(self) -> pathlib.Path:
         filePath = common.getMetadataCacheFilePath() / 'core.p.gz'
         return filePath
 
@@ -713,9 +711,8 @@ class LocalCorpus(Corpus):
     Traceback (most recent call last):
     music21.exceptions21.CorpusException: The name 'core' is reserved.
     '''
-
     # CLASS VARIABLES #
-    _temporaryLocalPaths: dict[str, set] = {}
+    _temporaryLocalPaths: dict[str, set[pathlib.Path]] = {}
     parseUsingCorpus: bool = False
 
     # INITIALIZER #
@@ -752,7 +749,7 @@ class LocalCorpus(Corpus):
     # PRIVATE PROPERTIES #
 
     @property
-    def cacheFilePath(self):
+    def cacheFilePath(self) -> pathlib.Path:
         '''
         Get the path to the file path that stores the .json file.
 
@@ -870,7 +867,7 @@ class LocalCorpus(Corpus):
 
         return Corpus._pathsCache[cacheKey]
 
-    def removePath(self, directoryPath):
+    def removePath(self, directoryPath: str | pathlib.Path) -> None:
         r'''
         Remove a directory path from a local corpus.
 
@@ -888,8 +885,8 @@ class LocalCorpus(Corpus):
         TODO: test for corpus persisted to disk without actually reindexing
         files on user's Desktop.
         '''
-        temporaryPaths = LocalCorpus._temporaryLocalPaths.get(
-            self.name, [])
+        temporaryPaths: set[pathlib.Path] = LocalCorpus._temporaryLocalPaths.get(
+            self.name, set())
         directoryPathObj: pathlib.Path = common.cleanpath(directoryPath, returnPathlib=True)
         if directoryPathObj in temporaryPaths:
             temporaryPaths.remove(directoryPathObj)
