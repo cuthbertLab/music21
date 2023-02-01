@@ -11,7 +11,6 @@
 
 from __future__ import annotations
 
-import typing as t
 from music21 import clef
 from music21 import environment
 from music21 import key
