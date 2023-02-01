@@ -15,9 +15,8 @@ import typing as t
 from music21 import clef
 from music21 import environment
 from music21 import key
-
-if t.TYPE_CHECKING:
-    from music21 import stream
+from music21 import meter
+from music21 import stream
 
 environLocal = environment.Environment('stream.tools')
 
@@ -25,18 +24,18 @@ environLocal = environment.Environment('stream.tools')
 # ------------------------------------------------------------------------------
 
 def removeDuplicates(thisStream: stream.Stream,
-                     classesToRemove: list = [key.KeySignature, clef.Clef]
+                     classesToRemove: list = [meter.TimeSignature, key.KeySignature, clef.Clef]
                      ) -> stream.Stream:
     '''
     Removes objects of the specified classes which
     duplicate the existing context and which make no change.
 
-    Options are the objects by type: currently
-    only key signatures, and clefs.
+    Options are the objects by type: defaults to
+    time signatures, key signatures, and clefs.
     More classes (especially time signatures) will probably be added soon
     but calling this now will raise a ValueError.
 
-    This does not run by default becuase
+    This does not run by default because
     although explicitly repetition of identical classes on a stream
     is usually an error (e.g., the result of a copy),
     there are some legitimate reasons to do so.
@@ -56,16 +55,18 @@ def removeDuplicates(thisStream: stream.Stream,
     >>> s.append(note.Note('C'))
     >>> s.append(note.Note('D'))
 
+    >>> s.append(meter.TimeSignature('3/4'))  # duplicate
     >>> s.append(key.KeySignature(6))  # duplicate
     >>> s.append(clef.TrebleClef())  # duplicate
 
     Finally, a few more notes, followed by a
-    change of key signature, and clef.
+    change of time signature, key signature, and clef.
 
     >>> s.append(note.Note('E'))
     >>> s.append(note.Note('F'))
     >>> s.append(note.Note('G'))
 
+    >>> s.append(meter.TimeSignature('2/4'))
     >>> s.append(key.KeySignature(-5))
     >>> s.append(clef.BassClef())
 
@@ -74,7 +75,7 @@ def removeDuplicates(thisStream: stream.Stream,
     >>> s.append(note.Note('C5'))
 
     Now we'll make it into a proper part with measures and see
-    how it looks in its original, unaltered form::
+    how it looks in its original, unaltered form:
 
     >>> s = s.makeMeasures()
     >>> s.show('t')
@@ -88,16 +89,19 @@ def removeDuplicates(thisStream: stream.Stream,
     {3.0} <music21.stream.Measure 2 offset=3.0>
         {0.0} <music21.clef.TrebleClef>
         {0.0} <music21.key.KeySignature of 6 sharps>
+        {0.0} <music21.meter.TimeSignature 3/4>
         {0.0} <music21.note.Note E>
         {1.0} <music21.note.Note F>
         {2.0} <music21.note.Note G>
     {6.0} <music21.stream.Measure 3 offset=6.0>
         {0.0} <music21.clef.BassClef>
         {0.0} <music21.key.KeySignature of 5 flats>
+        {0.0} <music21.meter.TimeSignature 2/4>
         {0.0} <music21.note.Note A>
         {1.0} <music21.note.Note B>
-        {2.0} <music21.note.Note C>
-        {3.0} <music21.bar.Barline type=final>
+    {8.0} <music21.stream.Measure 4 offset=8.0>
+        {0.0} <music21.note.Note C>
+        {1.0} <music21.bar.Barline type=final>
 
     Calling removeDuplicates should remove the duplicates
     even with those changes now stored within measures,
@@ -122,18 +126,22 @@ def removeDuplicates(thisStream: stream.Stream,
     {6.0} <music21.stream.Measure 3 offset=6.0>
         {0.0} <music21.clef.BassClef>
         {0.0} <music21.key.KeySignature of 5 flats>
+        {0.0} <music21.meter.TimeSignature 2/4>
         {0.0} <music21.note.Note A>
         {1.0} <music21.note.Note B>
-        {2.0} <music21.note.Note C>
-        {3.0} <music21.bar.Barline type=final>
+    {8.0} <music21.stream.Measure 4 offset=8.0>
+        {0.0} <music21.note.Note C>
+        {1.0} <music21.bar.Barline type=final>
 
     '''
     listOfObjectsToRemove = []
+    supportedClasses = [meter.TimeSignature, key.KeySignature, clef.Clef]
 
     for thisClass in classesToRemove:
 
-        if thisClass not in [key.KeySignature, clef.Clef]:
-            raise ValueError('key.KeySignature and clef.Clef are the only classes supported.')
+        if thisClass not in supportedClasses:
+            raise ValueError(f'Invalid class. Only {supportedClasses} are supported.')
+
         allStates = thisStream.recurse().getElementsByClass(thisClass)
 
         if len(allStates) < 2:  # Not used, or doesn't change
@@ -147,7 +155,7 @@ def removeDuplicates(thisStream: stream.Stream,
                 currentState = thisState
 
     for item in listOfObjectsToRemove:
-        m = item.getContextByClass('Measure')
+        m = item.getContextByClass(stream.Measure)
         m.remove(item, recurse=True)
 
     return thisStream
