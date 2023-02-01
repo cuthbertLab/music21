@@ -23,21 +23,20 @@ environLocal = environment.Environment('stream.tools')
 # ------------------------------------------------------------------------------
 
 def removeDuplicates(thisStream: stream.Stream,
-                     classesToRemove: list = [meter.TimeSignature, key.KeySignature, clef.Clef]
+                     classesToRemove: list | None = None,
                      ) -> stream.Stream:
     '''
-    Removes objects of the specified classes which
-    duplicate the existing context and which make no change.
+    The repetition of some classes like notes is common.
+    By contrast, the explicit repetition of certain other objects like clefs
+    usually indicates an error e.g., resulting from a copy'n'paste.
+    This function serves to remove those that are likely in error and make no change.
 
-    Options are the objects by type: defaults to
-    time signatures, key signatures, and clefs.
-    More classes (especially time signatures) will probably be added soon
-    but calling this now will raise a ValueError.
-
-    This does not run by default because
-    although explicitly repetition of identical classes on a stream
-    is usually an error (e.g., the result of a copy),
-    there are some legitimate reasons to do so.
+    Use the `classesToRemove` arument to specify which music21 classes to check and remove.
+    The classes currently supported are: time signatures, key signatures, and clefs.
+    The `classesToRemove` arument defaults all three.
+    Sometimes there are legitimate reasons to duplicate even these classes.
+    In that case, override the default by specifying the list of which of the three of classes.
+    More classes may be added, but for now they will simply raise a ValueError.
 
     So let's create an example part with an initial set of
     time signature, key signature, and clef.
@@ -133,8 +132,12 @@ def removeDuplicates(thisStream: stream.Stream,
         {1.0} <music21.bar.Barline type=final>
 
     '''
-    listOfObjectsToRemove = []
+
     supportedClasses = [meter.TimeSignature, key.KeySignature, clef.Clef]
+    if classesToRemove is None:
+        classesToRemove = supportedClasses
+
+    listOfObjectsToRemove = []
 
     for thisClass in classesToRemove:
 
