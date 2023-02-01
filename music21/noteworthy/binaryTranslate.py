@@ -134,7 +134,7 @@ This is very beta.  Much better would be to convert the file into .xml or .nwctx
             {0.0} <music21.note.Note G>
             {2.0} <music21.note.Note C>
             {4.0} <music21.bar.Repeat direction=end>
-        {28.0} <music21.spanner.RepeatBracket 1 
+        {28.0} <music21.spanner.RepeatBracket 1
                 <music21.stream.Measure 5 offset=24.0><music21.stream.Measure 6 offset=28.0>>
         {32.0} <music21.stream.Measure 7 offset=32.0>
             {0.0} <music21.expressions.TextExpression 'C7'>
@@ -176,7 +176,7 @@ This is very beta.  Much better would be to convert the file into .xml or .nwctx
         {28.0} <music21.stream.Measure 6 offset=28.0>
             {0.0} <music21.chord.Chord E3 B-3 C4>
             {4.0} <music21.bar.Repeat direction=end>
-        {28.0} <music21.spanner.RepeatBracket 1 
+        {28.0} <music21.spanner.RepeatBracket 1
                  <music21.stream.Measure 5 offset=24.0><music21.stream.Measure 6 offset=28.0>>
         {32.0} <music21.stream.Measure 7 offset=32.0>
             {0.0} <music21.bar.Barline type=regular>
