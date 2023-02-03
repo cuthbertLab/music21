@@ -14,6 +14,7 @@
 from __future__ import annotations
 
 from collections.abc import Iterable, Generator
+import contextlib
 import copy
 import typing as t
 import unittest
@@ -2063,6 +2064,38 @@ def consolidateCompletedTuplets(
                     last_tuplet = None
                     completion_target = None
 
+@contextlib.contextmanager
+def saveAccidentalDisplayStatus(s) -> t.Generator[None, None, None]:
+    '''
+    Restore accidental displayStatus on a Stream after an (inPlace) operation
+    that sets accidental displayStatus (e.g. a transposition).  Note that you
+    should not do this unless you know that the displayStatus values will still
+    be valid after the operation.
+
+        classList = (key.KeySignature, note.Note, chord.Chord)
+        with saveAccidentalDisplayStatus(s):
+            m.transpose(intv, inPlace=True, classFilterList=classList)
+
+    * New in v9.
+    '''
+    displayStatuses: dict[int, bool | None] = {}
+    for p in s.pitches:
+        if p.accidental is not None:
+            displayStatuses[id(p)] = p.accidental.displayStatus
+            continue
+        displayStatuses[id(p)] = False
+
+    try:
+        yield
+    finally:
+        for p in s.pitches:
+            if p.accidental is not None:
+                p.accidental.displayStatus = displayStatuses.get(id(p), None)
+                continue
+            if displayStatuses.get(id(p), False) is True:
+                p.accidental = pitch.Accidental(0)
+                p.accidental.displayStatus = True
+
 
 # -----------------------------------------------------------------------------
 
@@ -2244,6 +2277,28 @@ class Test(unittest.TestCase):
         self.assertEqual(pp[stream.Measure][1].notes.first().duration.quarterLength, 24.0)
         self.assertEqual(len(pp[stream.Measure][2].notes), 1)
         self.assertEqual(pp[stream.Measure][2].notes.first().duration.quarterLength, 24.0)
+
+    def testSaveAccidentalDisplayStatus(self):
+        from music21 import interval
+        from music21 import stream
+        m = stream.Measure([key.Key('C'), note.Note('C2'), note.Note('D2')])
+        m.notes[0].pitch.accidental = 0
+        m.notes[0].pitch.accidental.displayStatus = True
+        m.notes[1].pitch.accidental = 0
+        m.notes[1].pitch.accidental.displayStatus = False
+        classList = (note.Note, chord.Chord, key.KeySignature)
+        with saveAccidentalDisplayStatus(m):
+            m.transpose(interval.Interval('m2'), inPlace=True, classFilterList=classList)
+            self.assertEqual(m.notes[0].nameWithOctave, 'D-2')
+            self.assertIsNone(m.notes[0].pitch.accidental.displayStatus)
+            self.assertEqual(m.notes[1].nameWithOctave, 'E-2')
+            self.assertIsNone(m.notes[1].pitch.accidental.displayStatus)
+
+        # After exiting the with statement, accidental displayStatus will have been restored
+        self.assertEqual(m.notes[0].nameWithOctave, 'D-2')
+        self.assertIs(m.notes[0].pitch.accidental.displayStatus, True)
+        self.assertEqual(m.notes[1].nameWithOctave, 'E-2')
+        self.assertIs(m.notes[1].pitch.accidental.displayStatus, False)
 
 
 # -----------------------------------------------------------------------------

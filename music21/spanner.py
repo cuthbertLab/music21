@@ -2215,6 +2215,7 @@ class Test(unittest.TestCase):
         ott1.filledStatus = False
         ott1.fill(m)
         # ott1 should have been filled
+        self.assertIs(ott1.filledStatus, True)
         self.assertEqual(len(ott1), 4)
         for i, el in enumerate(ott1.getSpannedElements()):
             self.assertIs(el, theNotes[i])

@@ -5218,6 +5218,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         *,
         reverse: bool = False,
         transposeKeySignature: bool = True,
+        preserveAccidentalDisplay: bool = False,
         inPlace: t.Literal[True],
     ) -> None:
         pass
@@ -5228,6 +5229,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         *,
         reverse: bool = False,
         transposeKeySignature: bool = True,
+        preserveAccidentalDisplay: bool = False,
         inPlace: t.Literal[False] = False,
     ) -> StreamType:
         pass
@@ -5237,6 +5239,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         *,
         reverse: bool = False,
         transposeKeySignature: bool = True,
+        preserveAccidentalDisplay: bool = False,
         inPlace: bool = False,
     ) -> StreamType | None:
         '''
@@ -5290,31 +5293,11 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
             if reverse:
                 trans = trans.reverse()
 
-            displayStatuses = {}
-            if transposeKeySignature and displayStatusesAreSet:
-                # This is a key change, all of the accidental displayStatus
-                # values will still be valid after.  Stash them all off here.
-                for p in focus.pitches:
-                    if p.accidental is not None:
-                        displayStatuses[id(p)] = p.accidental.displayStatus
-                        continue
-                    displayStatuses[id(p)] = False
-
-            focus.transpose(trans,
-                            inPlace=True,
-                            classFilterList=classFilterList)
-
-            if transposeKeySignature and displayStatusesAreSet:
-                # Restore all the accidental displayStatus values here
-                # (transpose cleared them all).
-                for p in focus.pitches:
-                    if p.accidental is not None:
-                        p.accidental.displayStatus = displayStatuses[id(p)]
-                        continue
-                    if displayStatuses[id(p)] is True:
-                        p.accidental = pitch.Accidental(0)
-                        p.accidental.displayStatus = True
-
+            if preserveAccidentalDisplay and displayStatusesAreSet:
+                with makeNotation.saveAccidentalDisplayStatus(focus):
+                    focus.transpose(trans, inPlace=True, classFilterList=classFilterList)
+            else:
+                focus.transpose(trans, inPlace=True, classFilterList=classFilterList)
 
         # restore original durations
         for inst, original_ql in instrument_map.items():
@@ -5363,7 +5346,12 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
 
         return at_sounding
 
-    def toSoundingPitch(self, *, inPlace=False):
+    def toSoundingPitch(
+        self,
+        *,
+        preserveAccidentalDisplay: bool = False,
+        inPlace=False
+    ):
         # noinspection PyShadowingNames
         '''
         If not at sounding pitch, transpose all Pitch
@@ -5427,7 +5415,10 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         if returnObj.hasPartLikeStreams() or 'Opus' in returnObj.classSet:
             for partLike in returnObj.getElementsByClass(Stream):
                 # call on each part
-                partLike.toSoundingPitch(inPlace=True)
+                partLike.toSoundingPitch(
+                    inPlace=True,
+                    preserveAccidentalDisplay=preserveAccidentalDisplay
+                )
             returnObj.atSoundingPitch = True
             return returnObj if not inPlace else None
 
@@ -5435,7 +5426,11 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
 
         if at_sounding is False:
             # transposition defined on instrument goes from written to sounding
-            returnObj._transposeByInstrument(reverse=False, inPlace=True)
+            returnObj._transposeByInstrument(
+                reverse=False,
+                preserveAccidentalDisplay=preserveAccidentalDisplay,
+                inPlace=True
+            )
             for container in returnObj.recurse(streamsOnly=True, includeSelf=True):
                 container.atSoundingPitch = True
 
@@ -5449,6 +5444,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         self,
         *,
         ottavasToSounding: bool = False,
+        preserveAccidentalDisplay: bool = False,
         inPlace: bool = False
     ):
         '''
@@ -5502,13 +5498,18 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
                 partLike.toWrittenPitch(
                     inPlace=True,
                     ottavasToSounding=ottavasToSounding,
+                    preserveAccidentalDisplay=preserveAccidentalDisplay
                 )
             returnObj.atSoundingPitch = False
         else:
             at_sounding = returnObj._treatAtSoundingPitch()
             if at_sounding is True:
                 # need to reverse to go to written
-                returnObj._transposeByInstrument(reverse=True, inPlace=True)
+                returnObj._transposeByInstrument(
+                    reverse=True,
+                    preserveAccidentalDisplay=preserveAccidentalDisplay,
+                    inPlace=True
+                )
                 for container in returnObj.recurse(streamsOnly=True, includeSelf=True):
                     container.atSoundingPitch = False
 

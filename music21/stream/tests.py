@@ -7428,7 +7428,7 @@ class Test(unittest.TestCase):
                          [True, None, False, None, None, False, False, None])
 
         self.assertEqual(s.atSoundingPitch, 'unknown')
-        s.toSoundingPitch(inPlace=True)
+        s.toSoundingPitch(inPlace=True, preserveAccidentalDisplay=True)
 
         self.assertEqual([str(p) for p in s.parts[0].pitches],
                          ['C4', 'D4', 'E4', 'F4', 'G4', 'A4', 'B4', 'C5'])
