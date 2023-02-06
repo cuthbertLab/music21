@@ -238,7 +238,7 @@ def main(runOne: str | bool = False):
                 print(f'all {testCount} tests ran successfully')
             totalTests += testCount
             totalFailures += failCount
-        except Exception as e:  # pylint: disable=broad-except
+        except Exception as e:  # pylint: disable=broad-exception-caught
             print(f'failed miserably! {e}')
             import traceback
             tb = traceback.format_exc()

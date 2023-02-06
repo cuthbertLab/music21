@@ -559,7 +559,7 @@ def nearestMultiple(n: float, unit: float) -> tuple[float, float, float]:
     # print(['mult, halfUnit, matchLow, matchHigh', mult, halfUnit, matchLow, matchHigh])
 
     if matchLow >= n >= matchHigh:
-        raise Exception(f'cannot place n between multiples: {matchLow}, {matchHigh}')
+        raise ValueError(f'cannot place n between multiples: {matchLow}, {matchHigh}')
 
     if matchLow <= n <= (matchLow + halfUnit):
         return matchLow, round(n - matchLow, 7), round(n - matchLow, 7)
@@ -645,7 +645,7 @@ def decimalToTuplet(decNum: float) -> tuple[int, int]:
     (jy, iy) = findSimpleFraction(working)
 
     if iy == 0:
-        raise Exception('No such luck')
+        raise ValueError('No such luck')
 
     jy *= multiplier
     my_gcd = gcd(int(jy), int(iy))
@@ -812,7 +812,7 @@ def approximateGCD(values: Collection[int | float | Fraction], grain: float = 1e
         if count == len(divisions):
             commonUniqueDivisions.append(v)
     if not commonUniqueDivisions:
-        raise Exception('cannot find a common divisor')
+        raise ValueError('cannot find a common divisor')
     return max(commonUniqueDivisions)
 
 

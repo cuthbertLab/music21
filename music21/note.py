@@ -1252,7 +1252,7 @@ class NotRest(GeneralNote):
                 vol.velocity = value
 
         else:
-            raise Exception(f'this must be a Volume object, not {value}')
+            raise TypeError(f'this must be a Volume object, not {value}')
 
     @property
     def volume(self) -> volume.Volume:
