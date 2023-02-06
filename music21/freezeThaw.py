@@ -513,10 +513,10 @@ class StreamFreezer(StreamFreezeThawBase):
         >>> foundIds = sf.findActiveStreamIdsInHierarchy()
         >>> for thisId in shouldFindIds:
         ...     if thisId not in foundIds:
-        ...         raise Exception('Missing Id')
+        ...         raise ValueError('Missing Id')
         >>> for thisId in foundIds:
         ...     if thisId not in shouldFindIds:
-        ...         raise Exception('Additional Id Found')
+        ...         raise ValueError('Additional Id Found')
 
         Spanners are included unless getSpanners is False
 

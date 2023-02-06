@@ -407,7 +407,7 @@ def _convertCentsToAlterAndCents(shift) -> tuple[float, float]:
         alterShift = 1.0
         cents = value - 100
     else:  # pragma: no cover
-        raise Exception(f'value exceeded range: {value}')
+        raise ValueError(f'value exceeded range: {value}')
     return alterShift + alterAdd, float(cents)
 
 

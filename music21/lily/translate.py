@@ -1087,7 +1087,7 @@ class LilypondConverter:
             currentMusicList.append(lyObject)
             lyObject.setParent(contextObject)
             # except AttributeError as ae:
-            #    raise Exception('Cannot parse %s: %s' % (thisObject, str(ae)))
+            #    raise ValueError('Cannot parse %s: %s' % (thisObject, str(ae)))
         elif 'Note' in c or 'Rest' in c:
             self.appendContextFromNoteOrRest(thisObject)
         elif 'Chord' in c:
@@ -2490,7 +2490,7 @@ class LilypondConverter:
         '''
         lF = self.createPDF()
         if not lF.exists():  # pragma: no cover
-            raise Exception('Something went wrong with PDF Creation')
+            raise RuntimeError('Something went wrong with PDF Creation')
 
         if os.name == 'nt':
             command = f'start /wait {str(lF)} && del /f {str(lF)}'
@@ -2517,7 +2517,7 @@ class LilypondConverter:
                 lilyImage = Image.open(str(lilyFile))
                 lilyImage2 = ImageOps.expand(lilyImage, 10, 'white')  # type: ignore
                 lilyImage2.save(str(lilyFile))
-            except Exception:  # pylint: disable=broad-except
+            except Exception:  # pylint: disable=broad-exception-caught
                 pass  # no big deal probably...
         return lilyFile
 

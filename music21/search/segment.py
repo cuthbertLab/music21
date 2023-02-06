@@ -148,7 +148,7 @@ def _indexSingleMulticore(filePath, failFast=False, **keywords):
 
     try:
         indexOutput = indexOnePath(filePath, **keywords)
-    except Exception as e:  # pylint: disable=broad-except
+    except Exception as e:  # pylint: disable=broad-exception-caught
         if not failFast:
             print(f'Failed on parse/index for, {filePath}: {e}')
             indexOutput = ''

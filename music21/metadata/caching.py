@@ -132,7 +132,7 @@ class MetadataCachingJob:
                 parsedObject = converter.parse(self.filePath, forceSource=True)
             else:
                 parsedObject = corpus.parse(str(self.filePath), forceSource=True)
-        except Exception as e:  # wide catch is fine. pylint: disable=broad-except
+        except Exception as e:  # wide catch is fine. pylint: disable=broad-exception-caught
             environLocal.printDebug(f'parse failed: {self.filePath}, {e}')
             environLocal.printDebug(traceback.format_exc())
             self.filePathErrors.append(self.filePath)
@@ -167,7 +167,7 @@ class MetadataCachingJob:
                     corpusName=self.corpusName,
                 )
                 self.results.append(metadataEntry)
-        except Exception:  # wide catch is fine. pylint: disable=broad-except
+        except Exception:  # wide catch is fine. pylint: disable=broad-exception-caught
             environLocal.warn('Had a problem with extracting metadata '
                               'for {0}, piece ignored'.format(self.filePath))
             environLocal.warn(traceback.format_exc())
@@ -182,7 +182,7 @@ class MetadataCachingJob:
             for scoreNumber, score in enumerate(parsedObject.scores):
                 self.parseScoreInsideOpus(score, scoreNumber)
                 del score  # for memory conservation
-        except Exception as exception:  # wide catch is fine. pylint: disable=broad-except
+        except Exception as exception:  # wide catch is fine. pylint: disable=broad-exception-caught
             environLocal.warn(
                 'Had a problem with extracting metadata for score {0} '
                 'in {1}, whole opus ignored: {2}'.format(
@@ -226,7 +226,7 @@ class MetadataCachingJob:
                     metadataPayload=richMetadata,
                 )
                 self.results.append(metadataEntry)
-        except Exception as exception:  # pylint: disable=broad-except
+        except Exception as exception:  # pylint: disable=broad-exception-caught
             environLocal.warn(
                 'Had a problem with extracting metadata '
                 'for score {0} in {1}, whole opus ignored: '

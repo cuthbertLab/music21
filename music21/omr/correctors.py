@@ -799,7 +799,7 @@ class MeasureHash:
         elif duration1to127 < 0:
             byteEncoding = chr(1)
         else:
-            raise Exception('Invalid Byte Encoding')
+            raise ValueError('Invalid Byte Encoding')
 
         return byteEncoding
 
@@ -1016,7 +1016,7 @@ class MeasureHash:
         if destination is None:
             destination = self.hashString
             if destination is None:
-                raise Exception('HashString has not yet been set!')
+                raise ValueError('HashString has not yet been set!')
 
         opCodeType = opCodeTuple[0]
         if opCodeType == 'equal':
@@ -1033,7 +1033,7 @@ class MeasureHash:
             numberOfAdditions = opCodeTuple[2] - opCodeTuple[1]
             return self.getProbabilityOnAddition() ** numberOfAdditions
         else:
-            raise Exception('Incorrect opCode type!')
+            raise ValueError('Incorrect opCodeType value.')
 
     def getProbabilityOnEquality(self):
         '''

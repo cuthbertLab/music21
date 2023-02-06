@@ -1339,7 +1339,7 @@ class KernSpine(HumdrumSpine):
                     thisObject.humdrumPosition = event.position
                     thisObject.priority = event.position
                     self.stream.coreAppend(thisObject)
-            except Exception as e:  # pylint: disable=broad-except  # pragma: no cover
+            except Exception as e:  # pylint: disable=broad-exception-caught  # pragma: no cover
                 import traceback
                 environLocal.warn(
                     f'Error in parsing event ({event.contents!r}) '

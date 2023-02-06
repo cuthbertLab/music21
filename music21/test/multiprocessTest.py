@@ -117,7 +117,7 @@ def runOneModuleWithoutImp(args):
                                   failures=failures,
                                   testsRun=testResult.testsRun,
                                   runTime=runTime)
-        except Exception as excp:  # pylint: disable=broad-except
+        except Exception as excp:  # pylint: disable=broad-exception-caught
             environLocal.printDebug(f'*** Exception in running {moduleName}: {excp}...\n')
             return ModuleResponse(returnCode='TrappedException',
                                   fp=fp,
@@ -125,7 +125,7 @@ def runOneModuleWithoutImp(args):
                                   success=None,
                                   testRunner=str(excp)
                                   )
-    except Exception as excp:  # pylint: disable=broad-except
+    except Exception as excp:  # pylint: disable=broad-exception-caught
         environLocal.printDebug(f'*** Large Exception in running {fp}: {excp}...\n')
         return ModuleResponse(returnCode='LargeException',
                               fp=fp,
@@ -210,7 +210,7 @@ def mainPoolRunner(testGroup=('test',), restoreEnvironmentDefaults=False, leaveO
                 continueIt = False
                 pool.close()
                 pool.join()
-            except Exception as excp:  # pylint: disable=broad-except
+            except Exception as excp:  # pylint: disable=broad-exception-caught
                 eventsProcessed += 1
                 exceptionLog = ModuleResponse(
                     returnCode='UntrappedException',
