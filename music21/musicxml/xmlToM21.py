@@ -4159,6 +4159,12 @@ class MeasureParser(XMLParserBase):
                                     )
             self.setColor(mxObj, slur)
 
+        for mxObj in mxNotations.findall('technical/hammer-on'):
+            self.xmlOneSpanner(mxObj, n, articulations.HammerOn)
+
+        for mxObj in mxNotations.findall('technical/pull-off'):
+            self.xmlOneSpanner(mxObj, n, articulations.PullOff)
+
         for tagSearch in ('glissando', 'slide'):
             for mxObj in mxNotations.findall(tagSearch):
                 gliss = self.xmlOneSpanner(mxObj, n, spanner.Glissando)
