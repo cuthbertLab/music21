@@ -2832,11 +2832,6 @@ class Interval(IntervalBase):
     >>> aInterval.semiSimpleName
     'P8'
 
-    Check if transposition would change pitch class:
-
-    >>> aInterval.transpositionChangesPitchName
-    False
-
     An interval can also be specified directly:
 
     >>> aInterval = interval.Interval('m3')
@@ -2855,8 +2850,6 @@ class Interval(IntervalBase):
     False
     >>> aInterval.isStep
     False
-    >>> aInterval.transpositionChangesPitchName
-    True
 
     Some ways of creating half-steps.
 
@@ -2963,8 +2956,6 @@ class Interval(IntervalBase):
     >>> iInterval = interval.Interval(gPitch, hPitch)
     >>> iInterval
     <music21.interval.Interval AAAA1>
-    >>> iInterval.transpositionChangesPitchName
-    True
 
     >>> interval.Interval(pitch.Pitch('e##4'), pitch.Pitch('f--5'))
     <music21.interval.Interval dddd9>
@@ -3241,12 +3232,6 @@ class Interval(IntervalBase):
     def isSkip(self) -> bool:
         return self.diatonic.isSkip
 
-    @property
-    def transpositionChangesPitchName(self) -> bool:
-        if self.simpleName == 'P1' and float(self.semitones) == float(int(self.semitones)):
-            return False
-        return True
-
     # -------------------------------------
     # methods
     def isConsonant(self) -> bool:
@@ -3460,8 +3445,8 @@ class Interval(IntervalBase):
         # NOTE: this is a performance critical method
 
         inheritAccidentalDisplayStatus: bool = False
-        if not self.transpositionChangesPitchName:
-            # unison and any multiple of octave
+        if self.simpleName == 'P1' and float(self.semitones) == float(int(self.semitones)):
+            # true unison and any multiple of true octave
             inheritAccidentalDisplayStatus = True
 
         if p.octave is None:
