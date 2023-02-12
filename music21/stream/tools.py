@@ -141,7 +141,7 @@ def removeDuplicates(thisStream: stream.Stream,
 
     for thisClass in classesToRemove:
 
-        if thisClass not in supportedClasses:
+        if not any(issubclass(thisClass, supportedClass) for supportedClass in supportedClasses):
             raise ValueError(f'Invalid class. Only {supportedClasses} are supported.')
 
         allStates = thisStream.recurse().getElementsByClass(thisClass)
