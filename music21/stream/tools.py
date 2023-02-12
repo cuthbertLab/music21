@@ -23,7 +23,7 @@ environLocal = environment.Environment('stream.tools')
 # ------------------------------------------------------------------------------
 
 def removeDuplicates(thisStream: stream.Stream,
-                     classesToRemove: list = (meter.TimeSignature, key.KeySignature, clef.Clef),
+                     classesToRemove: tuple = (meter.TimeSignature, key.KeySignature, clef.Clef),
                      inPlace: bool = True
                      ) -> stream.Stream:
     '''
