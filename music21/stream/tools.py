@@ -17,8 +17,6 @@ from music21 import key
 from music21 import meter
 from music21 import stream
 
-from copy import deepcopy
-
 environLocal = environment.Environment('stream.tools')
 
 
