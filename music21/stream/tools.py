@@ -75,7 +75,7 @@ def removeDuplicates(thisStream: stream.Stream,
     Now we'll make it into a proper part with measures and see
     how it looks in its original, unaltered form:
 
-    >>> s = s.makeMeasures()
+    >>> s.makeMeasures(inPlace=True)
     >>> s.show('t')
     {0.0} <music21.stream.Measure 1 offset=0.0>
         {0.0} <music21.clef.TrebleClef>
