@@ -158,7 +158,7 @@ def removeDuplicates(thisStream: stream.Stream,
 
     supportedClasses = (meter.TimeSignature, key.KeySignature, clef.Clef)
 
-    removalDict = {}
+    removalDict = dict()
 
     if not inPlace:
         thisStream = thisStream.coreCopyAsDerivation('removeDuplicates')
