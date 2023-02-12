@@ -31,7 +31,7 @@ def removeDuplicates(thisStream: stream.Stream,
     usually indicates an error e.g., resulting from a copy'n'paste.
     This function serves to remove those that are likely in error and make no change.
 
-    Use the `classesToRemove` arument to specify which music21 classes to check and remove.
+    Use the `classesToRemove` argument to specify which music21 classes to check and remove.
     The classes currently supported are: time signatures, key signatures, and clefs.
     The `classesToRemove` arument defaults all three.
     Sometimes there are legitimate reasons to duplicate even these classes.
