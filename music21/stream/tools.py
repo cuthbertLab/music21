@@ -161,7 +161,7 @@ def removeDuplicates(thisStream: stream.Stream,
     removalDict = {}
 
     if not inPlace:
-        thisStream = deepcopy(thisStream)
+        thisStream = thisStream.coreCopyAsDerivation('removeDuplicates')
 
     if 'Score' in thisStream.classes:
         for p in thisStream.parts:
