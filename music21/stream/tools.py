@@ -186,7 +186,7 @@ def removeDuplicates(thisStream: stream.Stream,
                 currentState = thisState
 
     for activeSiteKey, valuesToRemove in removalDict.items():
-        activeSiteKey.remove(items, recurse=True)
+        activeSiteKey.remove(valuesToRemove, recurse=True)
 
     return thisStream
 
