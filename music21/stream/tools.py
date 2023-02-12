@@ -17,6 +17,8 @@ from music21 import key
 from music21 import meter
 from music21 import stream
 
+from copy import deepcopy
+
 environLocal = environment.Environment('stream.tools')
 
 
@@ -24,6 +26,7 @@ environLocal = environment.Environment('stream.tools')
 
 def removeDuplicates(thisStream: stream.Stream,
                      classesToRemove: list = [meter.TimeSignature, key.KeySignature, clef.Clef],
+                     inPlace: bool = True
                      ) -> stream.Stream:
     '''
     The repetition of some classes like notes is common.
@@ -108,8 +111,8 @@ def removeDuplicates(thisStream: stream.Stream,
     the duplicates entries are removed from measure 2
     and the actual changes in measure 3 remain.
 
-    >>> s = stream.tools.removeDuplicates(s)
-    >>> s.show('t')
+    >>> testInPlace = stream.tools.removeDuplicates(s)
+    >>> testInPlace.show('t')
     {0.0} <music21.stream.Measure 1 offset=0.0>
         {0.0} <music21.clef.TrebleClef>
         {0.0} <music21.key.KeySignature of 6 sharps>
@@ -131,11 +134,25 @@ def removeDuplicates(thisStream: stream.Stream,
         {0.0} <music21.note.Note C>
         {1.0} <music21.bar.Barline type=final>
 
+    As the example shows, this function defaults to working on a stream inPlace.
+
+    >>> testInPlace == s
+    True
+
+    To avoid this, set inPlace to False.
+
+    >>> testNotInPlace = stream.tools.removeDuplicates(s, inPlace=False)
+    >>> testNotInPlace == s
+    False
+
     '''
 
     supportedClasses = [meter.TimeSignature, key.KeySignature, clef.Clef]
 
     listOfObjectsToRemove = []
+
+    if not inPlace:
+        thisStream = deepcopy(thisStream)
 
     for thisClass in classesToRemove:
 
