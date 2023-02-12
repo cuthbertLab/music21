@@ -149,7 +149,7 @@ def removeDuplicates(thisStream: stream.Stream,
 
     supportedClasses = [meter.TimeSignature, key.KeySignature, clef.Clef]
 
-    listOfObjectsToRemove = []
+    removalDict = {}
 
     if not inPlace:
         thisStream = deepcopy(thisStream)
@@ -167,13 +167,16 @@ def removeDuplicates(thisStream: stream.Stream,
         currentState = allStates[0]  # First to initialize: can't be a duplicate
         for thisState in allStates[1:]:
             if thisState == currentState:
-                listOfObjectsToRemove.append(thisState)
+                if thisState.activeSite in removalDict:  # May be several in same (e.g., measure)
+                    removalDict[thisState.activeSite].append(thisState)
+                else:
+                    removalDict[thisState.activeSite] = [thisState]
             else:
                 currentState = thisState
 
-    for item in listOfObjectsToRemove:
-        m = item.getContextByClass(stream.Measure)
-        m.remove(item, recurse=True)
+    for activeSiteKey in removalDict:
+        for x in removalDict[activeSiteKey]:
+            activeSiteKey.remove(x, recurse=True)
 
     return thisStream
 
