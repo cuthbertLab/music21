@@ -44,42 +44,42 @@ def removeDuplicates(thisStream: stream.Stream,
     So let's create an example part with an initial set of
     time signature, key signature, and clef.
 
-    >>> s = stream.Part()
-    >>> s.append(meter.TimeSignature('3/4'))  # first TS
-    >>> s.append(key.KeySignature(6))  # first KS
-    >>> s.append(clef.TrebleClef())  # first Clef
+    >>> p = stream.Part()
+    >>> p.append(meter.TimeSignature('3/4'))  # first TS
+    >>> p.append(key.KeySignature(6))  # first KS
+    >>> p.append(clef.TrebleClef())  # first Clef
 
     Then a few notes, followed by a duplicates of the
     key signature, and clef.
 
-    >>> s.append(note.Note('C'))
-    >>> s.append(note.Note('C'))
-    >>> s.append(note.Note('D'))
+    >>> p.append(note.Note('C'))
+    >>> p.append(note.Note('C'))
+    >>> p.append(note.Note('D'))
 
-    >>> s.append(meter.TimeSignature('3/4'))  # duplicate
-    >>> s.append(key.KeySignature(6))  # duplicate
-    >>> s.append(clef.TrebleClef())  # duplicate
+    >>> p.append(meter.TimeSignature('3/4'))  # duplicate
+    >>> p.append(key.KeySignature(6))  # duplicate
+    >>> p.append(clef.TrebleClef())  # duplicate
 
     Finally, a few more notes, followed by a
     change of time signature, key signature, and clef.
 
-    >>> s.append(note.Note('E'))
-    >>> s.append(note.Note('F'))
-    >>> s.append(note.Note('G'))
+    >>> p.append(note.Note('E'))
+    >>> p.append(note.Note('F'))
+    >>> p.append(note.Note('G'))
 
-    >>> s.append(meter.TimeSignature('2/4'))
-    >>> s.append(key.KeySignature(-5))
-    >>> s.append(clef.BassClef())
+    >>> p.append(meter.TimeSignature('2/4'))
+    >>> p.append(key.KeySignature(-5))
+    >>> p.append(clef.BassClef())
 
-    >>> s.append(note.Note('A'))
-    >>> s.append(note.Note('B'))
-    >>> s.append(note.Note('C5'))
+    >>> p.append(note.Note('A'))
+    >>> p.append(note.Note('B'))
+    >>> p.append(note.Note('C5'))
 
     Now we'll make it into a proper part with measures and see
     how it looks in its original, unaltered form:
 
-    >>> s.makeMeasures(inPlace=True)
-    >>> s.show('t')
+    >>> p.makeMeasures(inPlace=True)
+    >>> p.show('t')
     {0.0} <music21.stream.Measure 1 offset=0.0>
         {0.0} <music21.clef.TrebleClef>
         {0.0} <music21.key.KeySignature of 6 sharps>
@@ -111,7 +111,7 @@ def removeDuplicates(thisStream: stream.Stream,
     the duplicates entries are removed from measure 2
     and the actual changes in measure 3 remain.
 
-    >>> testInPlace = stream.tools.removeDuplicates(s)
+    >>> testInPlace = stream.tools.removeDuplicates(p)
     >>> testInPlace.show('t')
     {0.0} <music21.stream.Measure 1 offset=0.0>
         {0.0} <music21.clef.TrebleClef>
@@ -136,14 +136,23 @@ def removeDuplicates(thisStream: stream.Stream,
 
     As the example shows, this function defaults to working on a stream inPlace.
 
-    >>> testInPlace == s
+    >>> testInPlace == p
     True
 
     To avoid this, set inPlace to False.
 
-    >>> testNotInPlace = stream.tools.removeDuplicates(s, inPlace=False)
-    >>> testNotInPlace == s
+    >>> testNotInPlace = stream.tools.removeDuplicates(p, inPlace=False)
+    >>> testNotInPlace == p
     False
+
+    This function is primarily designed and intended for use on a stream.Part object.
+    If called on a steam.Score, it will simply be applied to each of that score's parts in turn.
+
+    >>> s = stream.Score()
+    >>> s.append(p)
+    >>> t = stream.tools.removeDuplicates(s, inPlace=False)
+    >>> s.parts[0] == testInPlace
+    True
 
     '''
 
@@ -153,6 +162,10 @@ def removeDuplicates(thisStream: stream.Stream,
 
     if not inPlace:
         thisStream = deepcopy(thisStream)
+
+    if 'Score' in thisStream.classes:
+        for p in thisStream.parts:
+            removeDuplicates(p, inPlace=True)  # whatever the argument above.
 
     for thisClass in classesToRemove:
 
