@@ -165,7 +165,7 @@ def removeDuplicates(thisStream: stream.Stream,
 
     if isinstance(thisStream, stream.Score):
         for p in thisStream.parts:
-            removeDuplicates(p, inPlace=True)  # whatever the argument above.
+            removeDuplicates(p, classesToRemove=classesToRemove, inPlace=True)  # whatever the argument above.
 
     for thisClass in classesToRemove:
 
