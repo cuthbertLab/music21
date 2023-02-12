@@ -23,7 +23,7 @@ environLocal = environment.Environment('stream.tools')
 # ------------------------------------------------------------------------------
 
 def removeDuplicates(thisStream: stream.Stream,
-                     classesToRemove: list | None = None,
+                     classesToRemove: list = [meter.TimeSignature, key.KeySignature, clef.Clef],
                      ) -> stream.Stream:
     '''
     The repetition of some classes like notes is common.
@@ -134,8 +134,6 @@ def removeDuplicates(thisStream: stream.Stream,
     '''
 
     supportedClasses = [meter.TimeSignature, key.KeySignature, clef.Clef]
-    if classesToRemove is None:
-        classesToRemove = supportedClasses
 
     listOfObjectsToRemove = []
 
