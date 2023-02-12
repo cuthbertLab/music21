@@ -25,7 +25,7 @@ environLocal = environment.Environment('stream.tools')
 # ------------------------------------------------------------------------------
 
 def removeDuplicates(thisStream: stream.Stream,
-                     classesToRemove: list = [meter.TimeSignature, key.KeySignature, clef.Clef],
+                     classesToRemove: list = (meter.TimeSignature, key.KeySignature, clef.Clef),
                      inPlace: bool = True
                      ) -> stream.Stream:
     '''
@@ -156,7 +156,7 @@ def removeDuplicates(thisStream: stream.Stream,
 
     '''
 
-    supportedClasses = [meter.TimeSignature, key.KeySignature, clef.Clef]
+    supportedClasses = (meter.TimeSignature, key.KeySignature, clef.Clef)
 
     removalDict = {}
 
