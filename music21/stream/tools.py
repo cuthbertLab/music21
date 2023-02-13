@@ -10,12 +10,16 @@
 # ------------------------------------------------------------------------------
 
 from __future__ import annotations
+import typing as t
 
 from music21 import clef
 from music21 import environment
 from music21 import key
 from music21 import meter
 from music21 import stream
+
+if t.TYPE_CHECKING:
+    from music21.base import Music21Object
 
 environLocal = environment.Environment('stream.tools')
 
@@ -156,7 +160,7 @@ def removeDuplicates(thisStream: stream.Stream,
 
     supportedClasses = (meter.TimeSignature, key.KeySignature, clef.Clef)
 
-    removalDict = {}
+    removalDict: dict[stream.Stream, list[Music21Object]] = {}
 
     if not inPlace:
         thisStream = thisStream.coreCopyAsDerivation('removeDuplicates')
