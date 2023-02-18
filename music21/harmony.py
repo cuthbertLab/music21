@@ -245,9 +245,10 @@ class Harmony(chord.Chord):
             self.bass(self._overrides['root'], allow_add=True)
 
         if (updatePitches
-                and self._figure  # == '' or is not None
-                or 'root' in self._overrides
-                or 'bass' in self._overrides):
+                and (
+                    self._figure  # == '' or is not None
+                    or 'root' in self._overrides
+                    or 'bass' in self._overrides)):
             self._updatePitches()
         self._updateFromParameters(root=root, bass=bass, inversion=inversion)
 
@@ -3184,6 +3185,12 @@ class Test(unittest.TestCase):
         m.insert(1.0, cs)
         realizeChordSymbolDurations(m)
         self.assertEqual(cs.quarterLength, 3.0)
+
+    def testUpdatePitchesFalse(self):
+        bass_note = pitch.Pitch('C3')
+        h = Harmony(bass=bass_note, updatePitches=False)
+        # No other pitches are created
+        self.assertEqual(h.pitches, (bass_note,))
 
 
 class TestExternal(unittest.TestCase):
