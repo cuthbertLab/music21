@@ -66,6 +66,8 @@ class Test(unittest.TestCase):
         self.assertEqual(re.getTextExpression().content, 'd.s. al fine')
 
     def testExpandTurns(self):
+        # n1 is a half-note with a delayed turn
+        # n1 is a dotted-quarter-note with a non-delayed inverted turn
         p1 = stream.Part()
         m1 = stream.Measure()
         m2 = stream.Measure()
@@ -73,7 +75,7 @@ class Test(unittest.TestCase):
         p1.append(key.Key('F', 'major'))
         p1.append(meter.TimeSignature('2/4'))
         n1 = note.Note('C5', type='half')
-        turn0 = expressions.Turn()
+        turn0 = expressions.Turn(delay=1.)  # delay is a quarter-note
         n1.expressions.append(turn0)
         n2 = note.Note('B4', type='quarter')
         n2.duration.dots = 1
@@ -88,16 +90,33 @@ class Test(unittest.TestCase):
         realized1 = expressions.realizeOrnaments(n1)
         realized2 = expressions.realizeOrnaments(n2)
         self.assertEqual('C5 D5 C5 B-4 C5', ' '.join(n.pitch.nameWithOctave for n in realized1))
-        self.assertEqual('B4 A#4 B4 C#5 B4', ' '.join(n.pitch.nameWithOctave for n in realized2))
+        self.assertEqual('A#4 B4 C#5 B4', ' '.join(n.pitch.nameWithOctave for n in realized2))
+
+        # total length of realized1 is half-note (ql=2.0): quarter note (half the original note)
+        # followed by 4 turn notes that together add up to the other quarter note.
         self.assertEqual(realized1[0].quarterLength, 1.0)
         self.assertEqual(realized1[1].quarterLength, 0.25)
-        self.assertEqual(realized2[0].quarterLength, 0.5)
-        self.assertEqual(realized2[1].quarterLength, 0.25)
+        self.assertEqual(realized1[2].quarterLength, 0.25)
+        self.assertEqual(realized1[3].quarterLength, 0.25)
+        self.assertEqual(realized1[4].quarterLength, 0.25)
 
+        # because turn0.quarterLength defaults to 0.25 (16th-note), each of the four turn
+        # notes is ql=0.25 instead of 0.375 (realize doesn't stretch to fill).
+        self.assertEqual(realized2[0].quarterLength, 0.25)
+        self.assertEqual(realized2[1].quarterLength, 0.25)
+        self.assertEqual(realized2[2].quarterLength, 0.25)
+        self.assertEqual(realized2[3].quarterLength, 0.25)
+
+        # Here, delay is still a quarter-note (delay=1.0), and each of the four turn notes
+        # is ql=0.125 (because turn0.quarterLength has been set to 0.125, and realize
+        # doesn't stretch to fit).
         turn0.quarterLength = 0.125
         realized1b = expressions.realizeOrnaments(n1)
-        self.assertEqual(realized1b[0].quarterLength, 1.5)
+        self.assertEqual(realized1b[0].quarterLength, 1.0)
         self.assertEqual(realized1b[1].quarterLength, 0.125)
+        self.assertEqual(realized1b[2].quarterLength, 0.125)
+        self.assertEqual(realized1b[3].quarterLength, 0.125)
+        self.assertEqual(realized1b[4].quarterLength, 0.125)
 
 
     def testExpandTrills(self):
