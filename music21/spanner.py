@@ -3036,6 +3036,29 @@ class Test(unittest.TestCase):
         slList = sl.getSpannedElementIds()
         self.assertEqual(idList, slList)
 
+    def testHammerOnPullOff(self):
+        from music21 import converter
+        from music21.musicxml import testPrimitive
+
+        s = converter.parse(testPrimitive.notations32a)
+
+        num_hammer_on = len(s.flatten().getElementsByClass('HammerOn'))
+        num_pull_off = len(s.flatten().getElementsByClass('PullOff'))
+        self.assertEqual(num_hammer_on, 1)
+        self.assertEqual(num_pull_off, 1)
+
+        hammer_on = s.flatten().getElementsByClass('HammerOn')[0]
+        hammer_n0 = hammer_on.getSpannedElements()[0]
+        hammer_n1 = hammer_on.getSpannedElements()[1]
+        self.assertEqual(hammer_n0.getSpannerSites()[0], hammer_on)
+        self.assertEqual(hammer_n1.getSpannerSites()[0], hammer_on)
+
+        pull_off = s.flatten().getElementsByClass('PullOff')[0]
+        pull_n0 = pull_off.getSpannedElements()[0]
+        pull_n1 = pull_off.getSpannedElements()[1]
+        self.assertEqual(pull_n0.getSpannerSites()[0], pull_off)
+        self.assertEqual(pull_n1.getSpannerSites()[0], pull_off)
+
 
 # ------------------------------------------------------------------------------
 # define presented order in documentation

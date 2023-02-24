@@ -67,8 +67,10 @@ TECHNICAL_MARKS = OrderedDict([('up-bow', articulations.UpBow),
                                ('stopped', articulations.Stopped),
                                ('snap-pizzicato', articulations.SnapPizzicato),
                                ('string', articulations.StringIndication),
-                               ('hammer-on', articulations.HammerOn),
-                               ('pull-off', articulations.PullOff),
+                               # hammer-on and pull-off not implemented because handled
+                               # in method objectAttachedSpannersToTechnicals of m21ToXml.py
+                               # ('hammer-on', articulations.HammerOn),
+                               # ('pull-off', articulations.PullOff),
                                # bend not implemented because it needs many subcomponents
                                # ('bend', articulations.FretBend),
                                ('tap', articulations.FretTap),

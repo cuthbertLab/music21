@@ -1262,7 +1262,7 @@ class IntervalNetwork:
         <music21.pitch.Pitch B2>
         '''
         if pitchOrigin is None:
-            raise Exception('No pitch origin for calling next on this pitch!')
+            raise TypeError('No pitch origin for calling next on this pitch!')
 
         if isinstance(pitchOrigin, str):
             pitchOriginObj = pitch.Pitch(pitchOrigin)

@@ -4234,7 +4234,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
     #
     #    TODO: write this
     #    '''
-    #    raise Exception('not yet implemented')
+    #    raise TypeError('not yet implemented')
     #
     #
     # def getElementBeforeElement(self, element, classList=None):
@@ -4243,7 +4243,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
     #
     #    TODO: write this
     #    '''
-    #    raise Exception('not yet implemented')
+    #    raise TypeError('not yet implemented')
 
     def getElementAfterElement(self, element, classList=None):
         '''

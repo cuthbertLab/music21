@@ -123,7 +123,7 @@ def assembleLyrics(streamIn, lineNumber=1):
                     words.append(''.join(word))
                     word = []
             else:
-                raise Exception(f'no known Text syllabic setting: {lyricObj.syllabic}')
+                raise ValueError(f'no known Text syllabic setting: {lyricObj.syllabic}')
     return ' '.join(words)
 
 

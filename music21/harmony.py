@@ -245,9 +245,10 @@ class Harmony(chord.Chord):
             self.bass(self._overrides['root'], allow_add=True)
 
         if (updatePitches
-                and self._figure  # == '' or is not None
-                or 'root' in self._overrides
-                or 'bass' in self._overrides):
+                and (
+                    self._figure  # == '' or is not None
+                    or 'root' in self._overrides
+                    or 'bass' in self._overrides)):
             self._updatePitches()
         self._updateFromParameters(root=root, bass=bass, inversion=inversion)
 
@@ -598,7 +599,7 @@ class ChordStepModification(prebase.ProtoM21Object):
 
     # INITIALIZER #
 
-    def __init__(self, modType=None, degree=None, intervalObj=None):
+    def __init__(self, modType=None, degree=None, intervalObj=None) -> None:
         self._modType: str | None = None  # add, alter, subtract
         self._interval: interval.Interval  # alteration of degree, alter ints in mxl
         self._degree: int | None = None  # the degree number, where 3 is the third
@@ -3184,6 +3185,12 @@ class Test(unittest.TestCase):
         m.insert(1.0, cs)
         realizeChordSymbolDurations(m)
         self.assertEqual(cs.quarterLength, 3.0)
+
+    def testUpdatePitchesFalse(self):
+        bass_note = pitch.Pitch('C3')
+        h = Harmony(bass=bass_note, updatePitches=False)
+        # No other pitches are created
+        self.assertEqual(h.pitches, (bass_note,))
 
 
 class TestExternal(unittest.TestCase):

@@ -2025,7 +2025,7 @@ class PartParser(XMLParserBase):
             e.measureNumber = str(measureParser.measureNumber)
             e.partName = self.stream.partName
             raise e
-        except Exception as e:  # pylint: disable=broad-except
+        except Exception as e:  # pylint: disable=broad-exception-caught
             warnings.warn(
                 f'The following exception took place in m. {measureParser.measureNumber} in '
                 + f'part {self.stream.partName}.',
@@ -4203,6 +4203,12 @@ class MeasureParser(XMLParserBase):
                                      'bezier-x2', 'bezier-y2')
                                     )
             self.setColor(mxObj, slur)
+
+        for mxObj in mxNotations.findall('technical/hammer-on'):
+            self.xmlOneSpanner(mxObj, n, articulations.HammerOn)
+
+        for mxObj in mxNotations.findall('technical/pull-off'):
+            self.xmlOneSpanner(mxObj, n, articulations.PullOff)
 
         for tagSearch in ('glissando', 'slide'):
             for mxObj in mxNotations.findall(tagSearch):

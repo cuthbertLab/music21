@@ -981,7 +981,7 @@ class DataSet:
                 # in some cases there might be problem; to not fail
                 try:
                     fReturned = fe.extract()
-                except Exception as e:  # pylint: disable=broad-except
+                except Exception as e:  # pylint: disable=broad-exception-caught
                     # for now take any error
                     fList = ['failed feature extractor:', fe, str(e)]
                     if self.quiet is True:
@@ -1100,7 +1100,7 @@ def _dataSetParallelSubprocess(dataInstance, failFast):
         # in some cases there might be problem; to not fail
         try:
             fReturned = fe.extract()
-        except Exception as e:  # pylint: disable=broad-except
+        except Exception as e:  # pylint: disable=broad-exception-caught
             # for now take any error
             errors.append('failed feature extractor:' + str(fe) + ': ' + str(e))
             if failFast:

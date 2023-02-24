@@ -607,6 +607,13 @@ class Test(unittest.TestCase):
         n = note.Note()
         a = articulations.StringIndication()
         n.articulations.append(a)
+        h = articulations.HammerOn()
+        # Appending a spanner such as HammerOn to the articulations
+        # array is contrary to the documentation and contrary to the
+        # behavior of the musicxml importer, but we're testing it here
+        # anyway to just ensure that *IF* a user decides to do this themselves,
+        # we don't create a superfluous <other-technical> tag on export.
+        n.articulations.append(h)
 
         # Legal values for StringIndication begin at 1
         self.assertEqual(a.number, 0)
@@ -614,6 +621,7 @@ class Test(unittest.TestCase):
         gex = GeneralObjectExporter(n)
         tree = et_fromstring(gex.parse().decode('utf-8'))
         self.assertIsNone(tree.find('.//string'))
+        self.assertIsNone(tree.find('.//other-technical'))
 
     def testMeasurePadding(self):
         s = stream.Score([converter.parse('tinyNotation: 4/4 c4')])

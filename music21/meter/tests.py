@@ -91,7 +91,7 @@ class Test(unittest.TestCase):
         a.load('4/4', 4)
         b = copy.deepcopy(a)
         self.assertIsNot(a, b)
-        # TODO: this is work in progress.
+        # TODO: equity of meter sequences not yet defined.
         # self.assertEqual(a, b)
 
     def testTimeSignatureDeepcopy(self):
@@ -100,10 +100,9 @@ class Test(unittest.TestCase):
         self.assertIsNot(c, d)
         self.assertEqual(c, d)
 
-        # TODO: this is work in progress
-        # e = TimeSignature('slow 6/8')
-        # f = TimeSignature('fast 6/8')
-        # self.assertNotEqual(e, f)
+        e = TimeSignature('slow 6/8')
+        f = TimeSignature('fast 6/8')
+        self.assertNotEqual(e, f)
 
     def testGetBeams(self):
         ts = TimeSignature('6/8')
@@ -618,6 +617,48 @@ class Test(unittest.TestCase):
         ts328 = TimeSignature('3+2/8')
         beatSeq = ts328.beamSequence
         self.assertEqual(str(beatSeq), '{3/8+2/8}')
+
+    def testEquality(self):
+        '''
+        Additional tests of TimeSignature object equality.
+        Apart from this and the doc tests,
+        see also testTimeSignatureDeepcopy for a test of
+        time signatures with different structure with same ratioString
+        (fast vs slow 6/8).
+        '''
+
+        # 5/8: but different internal structure
+
+        oneKindOf5 = TimeSignature('2+3/8')
+        sameKindOf5 = TimeSignature('2+3/8')
+        self.assertEqual(oneKindOf5.ratioString, '2/8+3/8')
+        self.assertEqual(str(oneKindOf5.beatSequence), '{{1/8+1/8}+{1/8+1/8+1/8}}')
+        self.assertEqual(sameKindOf5.ratioString, '2/8+3/8')
+        self.assertEqual(str(sameKindOf5.beatSequence), '{{1/8+1/8}+{1/8+1/8+1/8}}')
+        self.assertEqual(oneKindOf5, sameKindOf5)
+
+        otherKindOf5 = TimeSignature('3+2/8')
+        self.assertEqual(otherKindOf5.ratioString, '3/8+2/8')
+        self.assertEqual(str(otherKindOf5.beatSequence), '{{1/8+1/8+1/8}+{1/8+1/8}}')
+        self.assertNotEqual(oneKindOf5, otherKindOf5)
+
+        # 4/4: same internal structure, different written time signature.
+
+        oneKindOf44 = TimeSignature('4/4')
+        sameKindOf44 = TimeSignature()
+        self.assertEqual(oneKindOf44, sameKindOf44)
+
+        otherKindOf44 = TimeSignature('Cut')
+        self.assertEqual(otherKindOf44.ratioString, '2/2')
+        self.assertNotEqual(oneKindOf5, otherKindOf44)
+        # Likewise, Different 'symbol'
+        self.assertNotEqual(TimeSignature('Cut'), TimeSignature('2/2'))
+
+        # Completely different class (either way round)
+
+        self.assertNotEqual(TimeSignature(), note.Note())
+        self.assertNotEqual(note.Note(), TimeSignature())
+        # NB: not self.assertRaises(AttributeError). Do we want that instead?
 
 
 if __name__ == '__main__':

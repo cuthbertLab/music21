@@ -3141,7 +3141,6 @@ class MeasureExporter(XMLExporterBase):
             ('RehearsalMark', 'rehearsalMarkToXml'),
         ]
     )
-
     # these need to be wrapped in an attributes tag if not at the beginning of the measure.
     wrapAttributeMethodClasses = OrderedDict(
         [('Clef', 'clefToXml'),
@@ -3831,6 +3830,80 @@ class MeasureExporter(XMLExporterBase):
             notations.append(mxOrnGroup)
 
         return notations
+
+    def objectAttachedSpannersToTechnicals(self, obj, objectSpannerBundle=None):
+        '''
+        return a list of <technical> from spanners related to the object that should appear
+        in the technical tag of the notations tag (hammer-on, pull-off etc.)
+
+        >>> n0 = note.Note('C')
+        >>> n1 = note.Note('D')
+        >>> n2 = note.Note('F')
+        >>> n3 = note.Note('E')
+        >>> hammerOn01 = articulations.HammerOn([n0, n1])
+        >>> pullOff23 = articulations.PullOff([n2, n3])
+        >>> m = stream.Measure()
+        >>> m.insert(0, hammerOn01)
+        >>> m.insert(0, pullOff23)
+        >>> m.append(n0)
+        >>> m.append(n1)
+        >>> m.append(n2)
+        >>> m.append(n3)
+        >>> mex = musicxml.m21ToXml.MeasureExporter(m)
+        >>> out = mex.objectAttachedSpannersToTechnicals(n0, m.spannerBundle)
+        >>> out
+        [<Element 'hammer-on' at 0x102857f40>]
+        >>> mex.dump(out[0])
+        <hammer-on number="1" type="start">H</hammer-on>
+        >>> out = mex.objectAttachedSpannersToTechnicals(n3, m.spannerBundle)
+        >>> mex.dump(out[0])
+        <pull-off number="1" type="stop" />
+
+        OMIT_FROM_DOCS
+
+        The other permutations of class and first/last:
+
+        >>> out = mex.objectAttachedSpannersToTechnicals(n1, m.spannerBundle)
+        >>> mex.dump(out[0])
+        <hammer-on number="1" type="stop" />
+        >>> out = mex.objectAttachedSpannersToTechnicals(n2, m.spannerBundle)
+        >>> mex.dump(out[0])
+        <pull-off number="1" type="start">P</pull-off>
+        '''
+        technicals = []
+        if objectSpannerBundle is not None:
+            sb = objectSpannerBundle
+        else:
+            sb = self.objectSpannerBundle
+
+        if not sb:
+            return technicals
+
+        for su in sb.getByClass(articulations.HammerOn):
+            mxHammerOn = Element('hammer-on')
+            if su.isFirst(obj):
+                mxHammerOn.set('type', 'start')
+                mxHammerOn.text = 'H'
+            elif su.isLast(obj):
+                mxHammerOn.set('type', 'stop')
+            else:
+                continue
+            mxHammerOn.set('number', '1')
+            technicals.append(mxHammerOn)
+
+        for su in sb.getByClass(articulations.PullOff):
+            mxPullOff = Element('pull-off')
+            if su.isFirst(obj):
+                mxPullOff.set('type', 'start')
+                mxPullOff.text = 'P'
+            elif su.isLast(obj):
+                mxPullOff.set('type', 'stop')
+            else:
+                continue
+            mxPullOff.set('number', '1')
+            technicals.append(mxPullOff)
+
+        return technicals
 
     def appendArpeggioMarkSpannersToNotations(
         self,
@@ -4834,7 +4907,8 @@ class MeasureExporter(XMLExporterBase):
                 else:
                     notations.append(mxExpression)
 
-        # apply all articulations apart from fingerings only to first note of chord
+        # apply all articulations apart from fingerings and hammer-on/pull-off
+        # only to first note of chord
         applicableArticulations = []
         fingeringNumber = 0
         for a in chordOrNote.articulations:
@@ -4843,7 +4917,14 @@ class MeasureExporter(XMLExporterBase):
                     applicableArticulations.append(a)
                 fingeringNumber += 1
             elif isSingleNoteOrFirstInChord:
-                applicableArticulations.append(a)
+                # Ignore hammer-on/pull-off:
+                # are written from their Spanner representation instead.
+                # It's an anti-pattern to find spanners in the articulations
+                # array, and the musicxml importer doesn't put them here,
+                # but it's a potential point of user confusion, so we guard
+                # against it here to avoid writing out superfluous <other-technical>
+                if not isinstance(a, (articulations.HammerOn, articulations.PullOff)):
+                    applicableArticulations.append(a)
 
         for artObj in applicableArticulations:
             if isinstance(artObj, articulations.Pizzicato):
@@ -4853,6 +4934,7 @@ class MeasureExporter(XMLExporterBase):
             if isinstance(artObj, articulations.TechnicalIndication):
                 if mxTechnicalMark is None:
                     mxTechnicalMark = Element('technical')
+
                 mxTechnicalMark.append(self.articulationToXmlTechnical(artObj))
             else:
                 if mxArticulations is None:
@@ -4877,6 +4959,17 @@ class MeasureExporter(XMLExporterBase):
         # TODO: slur
         # TODO: glissando
         # TODO: slide
+
+        if isSingleNoteOrFirstInChord and chordParent is not None:
+            spannerTechnicals = self.objectAttachedSpannersToTechnicals(chordParent)
+        elif chordParent is not None:
+            spannerTechnicals = None
+        else:
+            spannerTechnicals = self.objectAttachedSpannersToTechnicals(n)
+        if spannerTechnicals:
+            if mxTechnicalMark is None:
+                mxTechnicalMark = Element('technical')
+            mxTechnicalMark.extend(spannerTechnicals)
 
         for x in (mxArticulations,
                   mxTechnicalMark,
@@ -5324,14 +5417,6 @@ class MeasureExporter(XMLExporterBase):
         >>> mxOther = MEX.articulationToXmlTechnical(g)
         >>> MEX.dump(mxOther)
         <other-technical>unda maris</other-technical>
-
-        Same with technical marks not yet supported.
-        TODO: support HammerOn, PullOff, Bend, Hole, Arrow.
-
-        >>> h = articulations.HammerOn()
-        >>> mxOther = MEX.articulationToXmlTechnical(h)
-        >>> MEX.dump(mxOther)
-        <other-technical />
         '''
         # these technical have extra information
         # TODO: hammer-on
@@ -5348,7 +5433,7 @@ class MeasureExporter(XMLExporterBase):
             musicXMLTechnicalName = 'other-technical'
 
         # TODO: support additional technical marks listed above
-        if musicXMLTechnicalName in ('hammer-on', 'pull-off', 'bend', 'hole', 'arrow'):
+        if musicXMLTechnicalName in ('bend', 'hole', 'arrow'):
             musicXMLTechnicalName = 'other-technical'
 
         mxTechnicalMark = Element(musicXMLTechnicalName)

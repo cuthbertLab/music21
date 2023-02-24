@@ -80,7 +80,7 @@ def isNum(usrData: t.Any) -> t.TypeGuard[numbers.Rational]:
             return True
         else:
             return False
-    except Exception:  # pylint: disable=broad-except
+    except Exception:  # pylint: disable=broad-exception-caught
         return False
 
 

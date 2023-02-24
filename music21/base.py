@@ -2768,7 +2768,7 @@ class Music21Object(prebase.ProtoM21Object):
 
         except AttributeError as ae:
             # need to permit Duration object assignment here
-            raise Exception(
+            raise TypeError(
                 f'this must be a Duration object, not {durationObj}'
             ) from ae
 

@@ -55,11 +55,11 @@ def testCopyAll(testInstance: unittest.TestCase, globals_: typing.Dict[str, typi
 
         try:
             copy.copy(instance)
-        except Exception as e:  # pylint: disable=broad-except
+        except Exception as e:  # pylint: disable=broad-exception-caught
             testInstance.fail(f'Could not copy obj {part}: {e}')
         try:
             copy.deepcopy(instance)
-        except Exception as e:  # pylint: disable=broad-except
+        except Exception as e:  # pylint: disable=broad-exception-caught
             testInstance.fail(f'Could not deepcopy obj {part}: {e}')
 
 
@@ -423,7 +423,7 @@ class ModuleGather:
         try:
             with warnings.catch_warnings():
                 mod = load_source(name, fp)
-        except Exception as excp:  # pylint: disable=broad-except
+        except Exception as excp:  # pylint: disable=broad-exception-caught
             environLocal.warn(['failed import:', name, '\t', fp, '\n',
                                '\tEXCEPTION:', str(excp).strip()])
             return None
