@@ -1032,13 +1032,13 @@ class Turn(Ornament):
     * Changed in v7: size is a Generic second.  removed unused nachschlag component.
     * Changed in v9: Added support for delayed vs non-delayed Turn.
     '''
-    def __init__(self, delay: OrnamentDelay | OffsetQL = OrnamentDelay.NO_DELAY, **keywords):
+    def __init__(self, *, delay: OrnamentDelay | OffsetQL = OrnamentDelay.NO_DELAY, **keywords):
         super().__init__(**keywords)
         self.size: interval.IntervalBase = interval.GenericInterval(2)
         self.placement: str = 'above'
         self.tieAttach: str = 'all'
         self.quarterLength: OffsetQL = 0.25
-        self._delay: OrnamentDelay | OffsetQL = 0.
+        self._delay: OrnamentDelay | OffsetQL = 0.0
         self.delay = delay  # use property setter
 
     @property
@@ -1152,6 +1152,8 @@ class Turn(Ornament):
         '64th'
         >>> n2.expressions
         []
+        >>> newOrigNote is n2
+        True
 
         If `.autoScale` is off and the note is not long enough to realize 4
         32nd notes, then an exception is raised.
@@ -1173,7 +1175,7 @@ class Turn(Ornament):
 
         remainderDuration: OffsetQL
         if self.delay == OrnamentDelay.NO_DELAY:
-            remainderDuration = 0.
+            remainderDuration = 0.0
         elif self.delay == OrnamentDelay.DEFAULT_DELAY:
             # half the duration of the srcObj note
             remainderDuration = opFrac(srcObj.duration.quarterLength / 2)
@@ -1244,7 +1246,7 @@ class Turn(Ornament):
 
 
 class InvertedTurn(Turn):
-    def __init__(self, delay: OrnamentDelay | OffsetQL = OrnamentDelay.NO_DELAY, **keywords):
+    def __init__(self, *, delay: OrnamentDelay | OffsetQL = OrnamentDelay.NO_DELAY, **keywords):
         super().__init__(delay=delay, **keywords)
         self.size = self.size.reverse()
 
