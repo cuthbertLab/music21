@@ -1513,6 +1513,10 @@ class TrillExtension(spanner.Spanner):
     # N.B. this extension always includes a trill symbol
     def __init__(self, *spannedElements, **keywords):
         super().__init__(*spannedElements, **keywords)
+
+        # from music21 import note
+        # self.fillElementTypes = [note.NotRest]
+
         self._placement = None  # can above or below or None, after musicxml
 
     def _getPlacement(self):
@@ -1560,6 +1564,7 @@ class TremoloSpanner(spanner.Spanner):
 
     def __init__(self, *spannedElements, **keywords):
         super().__init__(*spannedElements, **keywords)
+
         self.placement = None
         self.measured = True
         self._numberOfMarks = 3
@@ -1641,6 +1646,7 @@ class ArpeggioMarkSpanner(spanner.Spanner):
                  arpeggioType: str = 'normal',
                  **keywords):
         super().__init__(*spannedElements, **keywords)
+
         if arpeggioType not in ('normal', 'up', 'down', 'non-arpeggio'):
             raise ValueError(
                 'Arpeggio type must be "normal", "up", "down", or "non-arpeggio", '
