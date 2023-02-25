@@ -1100,8 +1100,9 @@ class Turn(Ornament):
         The first element is an empty list because there are no notes at the start of a turn.
         The second element is the original note with a duration equal to the delay (but if there
         is no delay, the second element is None, because the turn "eats up" the entire note).
-        The third element is a list of the four turn notes, each of equal duration, adding
-        up to the duration of the original note (less the delay, if there is one).
+        The third element is a list of the four turn notes, adding up to the duration of the
+        original note (less the delay, if there is one).  The four turn notes will either be
+        of equal duration, or the fourth note will be longer, to "eat up" the entire note.
 
         >>> from  music21 import *
         >>> from music21.common.enums import OrnamentDelay
@@ -1155,6 +1156,28 @@ class Turn(Ornament):
         >>> newOrigNote is n2
         True
 
+        If the four turn notes (self.quarterLength each) don't add up to the original note
+        duration, the fourth turn note should be held to the length of any remaining unused
+        duration.  Here, for example, we have a dotted eighth note total duration, a delay
+        of a 16th note, and a turn note duration of a triplet 32nd note, leaving the fourth
+        turn note with a duration of a 16th note.  This sort of turn is seen all over the
+        music of Weber.
+
+        >>> from fractions import Fraction
+        >>> n3 = note.Note('C4')
+        >>> n3.quarterLength = 0.75
+        >>> t3 = expressions.Turn(delay=0.25)
+        >>> t3.quarterLength = 0.125 * Fraction(2, 3)
+        >>> _empty, newOrigNote, turnNotes = t3.realize(n3, inPlace=True)
+        >>> print(newOrigNote, newOrigNote.quarterLength)
+        <music21.note.Note C> 0.25
+        >>> for turnNote in turnNotes:
+        ...     print(turnNote, turnNote.quarterLength)
+        <music21.note.Note D> 1/12
+        <music21.note.Note C> 1/12
+        <music21.note.Note B> 1/12
+        <music21.note.Note C> 0.25
+
         If `.autoScale` is off and the note is not long enough to realize 4
         32nd notes, then an exception is raised.
 
@@ -1186,10 +1209,16 @@ class Turn(Ornament):
             remainderDuration = theDelay
 
         turnDuration = srcObj.duration.quarterLength - remainderDuration
+        fourthNoteQL: OffsetQL | None = None
         if turnDuration < 4 * self.quarterLength:
             if not self.autoScale:
                 raise ExpressionException('The note is not long enough to realize a turn')
             useQL = opFrac(turnDuration / 4)
+        elif turnDuration > 4 * self.quarterLength:
+            # in this case, we keep the first 3 turn notes as self.quarterLength, and
+            # extend the 4th turn note to finish up the turnDuration
+            useQL = self.quarterLength
+            fourthNoteQL = opFrac(turnDuration - (3 * useQL))
 
         transposeIntervalUp = self.size
         transposeIntervalDown = self.size.reverse()
@@ -1212,7 +1241,10 @@ class Turn(Ornament):
 
         fourthNote = copy.deepcopy(srcObj)
         fourthNote.expressions = []
-        fourthNote.duration.quarterLength = useQL
+        if fourthNoteQL is None:
+            fourthNote.duration.quarterLength = useQL
+        else:
+            fourthNote.duration.quarterLength = fourthNoteQL
 
         turnNotes.append(firstNote)
         turnNotes.append(secondNote)

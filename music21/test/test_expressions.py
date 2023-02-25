@@ -100,23 +100,23 @@ class Test(unittest.TestCase):
         self.assertEqual(realized1[3].quarterLength, 0.25)
         self.assertEqual(realized1[4].quarterLength, 0.25)
 
-        # because turn0.quarterLength defaults to 0.25 (16th-note), each of the four turn
-        # notes is ql=0.25 instead of 0.375 (realize doesn't stretch to fill).
+        # Because turn0.quarterLength defaults to 0.25 (16th-note), the first three turn
+        # notes are ql=0.25, and the fourth turn note has the remaining duration (0.75)
         self.assertEqual(realized2[0].quarterLength, 0.25)
         self.assertEqual(realized2[1].quarterLength, 0.25)
         self.assertEqual(realized2[2].quarterLength, 0.25)
-        self.assertEqual(realized2[3].quarterLength, 0.25)
+        self.assertEqual(realized2[3].quarterLength, 0.75)
 
-        # Here, delay is still a quarter-note (delay=1.0), and each of the four turn notes
-        # is ql=0.125 (because turn0.quarterLength has been set to 0.125, and realize
-        # doesn't stretch to fit).
+        # Here, delay is still a quarter-note (delay=1.0), the first three turn notes
+        # are ql=0.125 (because turn0.quarterLength has been set to 0.125), and the
+        # fourth turn note has the remaining duration (0.625)
         turn0.quarterLength = 0.125
         realized1b = expressions.realizeOrnaments(n1)
         self.assertEqual(realized1b[0].quarterLength, 1.0)
         self.assertEqual(realized1b[1].quarterLength, 0.125)
         self.assertEqual(realized1b[2].quarterLength, 0.125)
         self.assertEqual(realized1b[3].quarterLength, 0.125)
-        self.assertEqual(realized1b[4].quarterLength, 0.125)
+        self.assertEqual(realized1b[4].quarterLength, 0.625)
 
 
     def testExpandTrills(self):
