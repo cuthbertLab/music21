@@ -1571,22 +1571,66 @@ class PartParser(XMLParserBase):
         # will be copied into the Score
 
         # copy spanners that are complete into the part, as this is the
-        # highest level container that needs them
-        rm = []
+        # highest level container that needs them. Ottavas are the exception,
+        # they should be put in the PartStaff that contains the first note
+        # in the Ottava.
+        completedSpanners: list[spanner.Spanner] = []
         for sp in self.spannerBundle.getByCompleteStatus(True):
-            self.stream.coreInsert(0, sp)
-            rm.append(sp)
+            if not isinstance(sp, spanner.Ottava):
+                # don't insert Ottavas, we'll do that after separateOutPartStaves().
+                self.stream.coreInsert(0, sp)
+            completedSpanners.append(sp)
         # remove from original spanner bundle
-        for sp in rm:
+        for sp in completedSpanners:
             self.spannerBundle.remove(sp)
         # s is the score; adding the part to the score
         self.stream.coreElementsChanged()
 
+        partStaves: list[stream.PartStaff] = []
         if self.maxStaves > 1:
-            self.separateOutPartStaves()
+            partStaves = self.separateOutPartStaves()
         else:
             self.stream.addGroupForElements(self.partId)  # set group for components (recurse?)
             self.stream.groups.append(self.partId)  # set group for stream itself
+
+        self._fillAndInsertOttavasInPartStaff(completedSpanners, partStaves)
+
+    def _fillAndInsertOttavasInPartStaff(
+        self,
+        spanners: list[spanner.Spanner],
+        partStaves: list[stream.PartStaff]
+    ):
+        # Ottavas should be filled, so that later transpositions can find all the notes that
+        # should be octave-shifted.  Ottavas should also be inserted into the partStaff that
+        # contains the Ottava's first note.
+        for sp in spanners:
+            if not isinstance(sp, spanner.Ottava):
+                continue
+            spannerPart: stream.Part | None = None
+            if partStaves:
+                spannerPart = self._findFirstPartStaffContaining(sp.getFirst(), partStaves)
+            else:
+                spannerPart = self.stream
+
+            if spannerPart is not None:
+                spannerPart.coreInsert(0, sp)
+                spannerPart.coreElementsChanged()
+                sp.fill(spannerPart)
+
+    def _findFirstPartStaffContaining(
+        self,
+        obj: base.Music21Object | None,
+        partStaves: list[stream.PartStaff]
+    ) -> stream.PartStaff | None:
+        if obj is None:
+            return None
+
+        for partStaff in partStaves:
+            if partStaff.containerInHierarchy(obj, setActiveSite=False) is not None:
+                # obj is somewhere in the hierarchy of this partStaff
+                return partStaff
+
+        return None
 
     def parseXmlScorePart(self):
         '''
@@ -1812,7 +1856,7 @@ class PartParser(XMLParserBase):
         if lmp.stream.recurse().notesAndRests.last() is endedForwardRest:
             lmp.stream.remove(endedForwardRest, recurse=True)
 
-    def separateOutPartStaves(self) -> None:
+    def separateOutPartStaves(self) -> list[stream.PartStaff]:
         '''
         Take a `Part` with multiple staves and make them a set of `PartStaff` objects.
 
@@ -1832,7 +1876,7 @@ class PartParser(XMLParserBase):
         ]
 
         uniqueStaffKeys: list[int] = self._getUniqueStaffKeys()
-        partStaffs: list[stream.PartStaff] = []
+        partStaves: list[stream.PartStaff] = []
         appendedElementIds: set[int] = set()  # id is id(el) not el.id
 
         def copy_into_partStaff(source: stream.Stream,
@@ -1868,7 +1912,7 @@ class PartParser(XMLParserBase):
             # set group for components (recurse?)
             newPartStaff.addGroupForElements(partStaffId, setActiveSite=False)
             newPartStaff.groups.append(partStaffId)
-            partStaffs.append(newPartStaff)
+            partStaves.append(newPartStaff)
             self.parent.m21PartObjectsById[partStaffId] = newPartStaff
             elementsIdsNotToGoInThisStaff: set[int] = set()
             for staffReference in self.staffReferenceList:
@@ -1889,11 +1933,11 @@ class PartParser(XMLParserBase):
                 copyMeasure.flattenUnnecessaryVoices(force=False, inPlace=True)
 
         score = self.parent.stream
-        staffGroup = layout.StaffGroup(partStaffs, name=self.stream.partName, symbol='brace')
+        staffGroup = layout.StaffGroup(partStaves, name=self.stream.partName, symbol='brace')
         staffGroup.style.hideObjectOnPrint = True  # in truth, hide the name, not the brace
         score.coreInsert(0, staffGroup)
 
-        for partStaff in partStaffs:
+        for partStaff in partStaves:
             score.coreInsert(0, partStaff)
         score.coreElementsChanged()
 
@@ -1901,6 +1945,7 @@ class PartParser(XMLParserBase):
         # and thus that these next two lines are not needed:
         # score.remove(originalPartStaff)
         # del self.parent.m21PartObjectsById[originalPartStaff.id]
+        return partStaves
 
     def _getStaffExclude(
         self,

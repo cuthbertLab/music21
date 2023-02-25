@@ -3443,6 +3443,12 @@ class Interval(IntervalBase):
         PRIVATE METHOD: Return p even if inPlace is True
         '''
         # NOTE: this is a performance critical method
+
+        inheritAccidentalDisplayStatus: bool = False
+        if self.simpleName == 'P1' and float(self.semitones) == float(int(self.semitones)):
+            # true unison and any multiple of true octave
+            inheritAccidentalDisplayStatus = True
+
         if p.octave is None:
             useImplicitOctave = True
         else:
@@ -3459,6 +3465,7 @@ class Interval(IntervalBase):
         newStep, newOctave = convertDiatonicNumberToStep(newDiatonicNumber)
         pitch2.step = newStep
         pitch2.octave = newOctave
+        oldPitch2Accidental = pitch2.accidental
         pitch2.accidental = None
         # if this is not set to None then terrible things happen
         pitch2.microtone = None  # type: ignore
@@ -3487,13 +3494,35 @@ class Interval(IntervalBase):
                 # pitch2 = pitchAlt
                 pitch2.ps = pitch2.ps + halfStepsToFix
             else:
-                # cannot import Accidental here.
                 pitch2.accidental = halfStepsToFix  # type:ignore
 
-            # inherit accidental display type etc. but not current status
-            if pitch2.accidental is not None and pitch1.accidental is not None:
-                pitch2.accidental.inheritDisplay(pitch1.accidental)
-                pitch2.accidental.displayStatus = None  # set accidental display to None
+            if not inheritAccidentalDisplayStatus:
+                # inherit accidental display type etc. but not current status
+                if pitch2.accidental is not None and pitch1.accidental is not None:
+                    pitch2.accidental.inheritDisplay(pitch1.accidental)
+                    pitch2.accidental.displayStatus = None  # set accidental display to None
+            else:
+                # inherit all accidental display options (including status)
+                if pitch2.accidental is None:
+                    if pitch1.accidental is not None:
+                        pitch2.accidental = 0  # type:ignore
+                        if t.TYPE_CHECKING:
+                            assert pitch2.accidental is not None
+                        pitch2.accidental.inheritDisplay(pitch1.accidental)
+                else:
+                    if pitch1.accidental is not None:
+                        pitch2.accidental.inheritDisplay(pitch1.accidental)
+                    else:
+                        pitch2.accidental.displayStatus = False
+
+        else:
+            # no halfStepsToFix, so pitch2 is fine as is, but...
+            if inheritAccidentalDisplayStatus:
+                # We have set pitch2.accidental to None, so we might have lost some
+                # display options. So we restore oldPitch2Accidental if that makes sense.
+                if (oldPitch2Accidental is not None
+                        and oldPitch2Accidental.name == 'natural'):
+                    pitch2.accidental = oldPitch2Accidental
 
         if useImplicitOctave is True:
             pitch2.octave = None

@@ -55,6 +55,7 @@ from music21 import key
 from music21 import metadata
 from music21 import meter
 from music21 import note
+from music21 import pitch
 from music21 import tie
 from music21 import repeat
 from music21 import sites
@@ -70,7 +71,6 @@ from music21.stream.enums import GivenElementsBehavior, RecursionType, ShowNumbe
 
 
 if t.TYPE_CHECKING:
-    from music21 import pitch
     from music21 import spanner
 
 
@@ -5218,6 +5218,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         *,
         reverse: bool = False,
         transposeKeySignature: bool = True,
+        preserveAccidentalDisplay: bool = False,
         inPlace: t.Literal[True],
     ) -> None:
         pass
@@ -5228,6 +5229,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         *,
         reverse: bool = False,
         transposeKeySignature: bool = True,
+        preserveAccidentalDisplay: bool = False,
         inPlace: t.Literal[False] = False,
     ) -> StreamType:
         pass
@@ -5237,6 +5239,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         *,
         reverse: bool = False,
         transposeKeySignature: bool = True,
+        preserveAccidentalDisplay: bool = False,
         inPlace: bool = False,
     ) -> StreamType | None:
         '''
@@ -5273,6 +5276,8 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         else:
             classFilterList = (note.Note, chord.Chord)
 
+        displayStatusesAreSet: bool = self.haveAccidentalsBeenMade()
+
         for inst in instrument_stream:
             if inst.transposition is None:
                 continue
@@ -5287,9 +5292,12 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
             trans = inst.transposition
             if reverse:
                 trans = trans.reverse()
-            focus.transpose(trans,
-                            inPlace=True,
-                            classFilterList=classFilterList)
+
+            if preserveAccidentalDisplay and displayStatusesAreSet:
+                with makeNotation.saveAccidentalDisplayStatus(focus):
+                    focus.transpose(trans, inPlace=True, classFilterList=classFilterList)
+            else:
+                focus.transpose(trans, inPlace=True, classFilterList=classFilterList)
 
         # restore original durations
         for inst, original_ql in instrument_map.items():
@@ -5326,7 +5334,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
                     at_sounding = site.atSoundingPitch
                     break
             else:
-                raise StreamException('atSoundingPitch is unknown: cannot transpose')
+                return 'unknown'
 
         for substream in self.recurse(streamsOnly=True, includeSelf=False):
             if substream.atSoundingPitch == 'unknown':
@@ -5338,7 +5346,12 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
 
         return at_sounding
 
-    def toSoundingPitch(self, *, inPlace=False):
+    def toSoundingPitch(
+        self,
+        *,
+        preserveAccidentalDisplay: bool = False,
+        inPlace=False
+    ):
         # noinspection PyShadowingNames
         '''
         If not at sounding pitch, transpose all Pitch
@@ -5371,23 +5384,26 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         'C3'
 
         If 'atSoundingPitch' is unknown for this Stream and all of its parent Streams
-        then will raise a StreamException:
+        then no transposition will take place, and atSoundingPitch will remain unknown
+        (this used to raise an exception):
 
         >>> s = stream.Score()
         >>> p = stream.Part(id='partEmpty')
-        >>> s.append(p)
+        >>> s.insert(0.0, p)
         >>> p.toSoundingPitch()
-        Traceback (most recent call last):
-        music21.exceptions21.StreamException: atSoundingPitch is unknown: cannot transpose
+        <music21.stream.Part partEmpty>
         >>> s.atSoundingPitch = False
         >>> sp = p.toSoundingPitch()
         >>> sp
         <music21.stream.Part partEmpty>
+        >>> sp.atSoundingPitch
+        'unknown'
         >>> sp.derivation.origin is p
         True
 
         * Changed in v2.0.10: inPlace is False
         * Changed in v5: returns None if inPlace=True
+        * Changed in v9: no transposition instead of exception if atSoundingPitch is 'unknown'
         '''
         from music21 import spanner
 
@@ -5399,7 +5415,10 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         if returnObj.hasPartLikeStreams() or 'Opus' in returnObj.classSet:
             for partLike in returnObj.getElementsByClass(Stream):
                 # call on each part
-                partLike.toSoundingPitch(inPlace=True)
+                partLike.toSoundingPitch(
+                    inPlace=True,
+                    preserveAccidentalDisplay=preserveAccidentalDisplay
+                )
             returnObj.atSoundingPitch = True
             return returnObj if not inPlace else None
 
@@ -5407,7 +5426,11 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
 
         if at_sounding is False:
             # transposition defined on instrument goes from written to sounding
-            returnObj._transposeByInstrument(reverse=False, inPlace=True)
+            returnObj._transposeByInstrument(
+                reverse=False,
+                preserveAccidentalDisplay=preserveAccidentalDisplay,
+                inPlace=True
+            )
             for container in returnObj.recurse(streamsOnly=True, includeSelf=True):
                 container.atSoundingPitch = True
 
@@ -5417,11 +5440,23 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         if not inPlace:
             return returnObj  # the Stream or None
 
-    def toWrittenPitch(self, *, inPlace=False):
+    def toWrittenPitch(
+        self,
+        *,
+        ottavasToSounding: bool = False,
+        preserveAccidentalDisplay: bool = False,
+        inPlace: bool = False
+    ):
         '''
         If not at written pitch, transpose all Pitch elements to
         written pitch. The atSoundingPitch property is used to
-        determine if transposition is necessary.
+        determine if transposition is necessary.  Note that if
+        ottavasToSounding is True, any notes/chords within
+        an Ottava will _then_ be transposed to sounding Pitch (this
+        is useful for the MusicXML writer, since MusicXML likes
+        all pitches to be written pitches, except for those in
+        ottavas, which should be transposed to written (by instrument)
+        and then transposed to sounding (by ottava).
 
         >>> sc = stream.Score()
         >>> p = stream.Part(id='baritoneSax')
@@ -5446,6 +5481,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
 
         * Changed in v3: `inPlace` defaults to `False`
         * Changed in v5 returns `None` if `inPlace=True`
+        * Changed in v9: no transposition instead of exception if atSoundingPitch is 'unknown'
         '''
         from music21 import spanner
 
@@ -5457,20 +5493,32 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         if returnObj.hasPartLikeStreams() or 'Opus' in returnObj.classes:
             for partLike in returnObj.getElementsByClass('Stream'):
                 # call on each part
-                partLike.toWrittenPitch(inPlace=True)
+                if t.TYPE_CHECKING:
+                    assert isinstance(partLike, Stream)
+                partLike.toWrittenPitch(
+                    inPlace=True,
+                    ottavasToSounding=ottavasToSounding,
+                    preserveAccidentalDisplay=preserveAccidentalDisplay
+                )
             returnObj.atSoundingPitch = False
-            return returnObj if not inPlace else None
+        else:
+            at_sounding = returnObj._treatAtSoundingPitch()
+            if at_sounding is True:
+                # need to reverse to go to written
+                returnObj._transposeByInstrument(
+                    reverse=True,
+                    preserveAccidentalDisplay=preserveAccidentalDisplay,
+                    inPlace=True
+                )
+                for container in returnObj.recurse(streamsOnly=True, includeSelf=True):
+                    container.atSoundingPitch = False
 
-        at_sounding = returnObj._treatAtSoundingPitch()
-
-        if at_sounding is True:
-            # need to reverse to go to written
-            returnObj._transposeByInstrument(reverse=True, inPlace=True)
-            for container in returnObj.recurse(streamsOnly=True, includeSelf=True):
-                container.atSoundingPitch = False
-
-        for ottava in returnObj[spanner.Ottava]:
-            ottava.undoTransposition()
+        if ottavasToSounding:
+            for ottava in returnObj[spanner.Ottava]:
+                ottava.performTransposition()
+        else:
+            for ottava in returnObj[spanner.Ottava]:
+                ottava.undoTransposition()
 
         if not inPlace:
             return returnObj
@@ -8968,10 +9016,16 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         else:
             post = self
 
-        intv: interval.IntervalBase
+        intv: interval.Interval | interval.GenericInterval
         if isinstance(value, (int, str)):
             intv = interval.Interval(value)
+        elif isinstance(value, interval.ChromaticInterval):
+            intv = interval.Interval(chromatic=value)
+        elif isinstance(value, interval.DiatonicInterval):
+            intv = interval.Interval(diatonic=value)
         else:
+            if t.TYPE_CHECKING:
+                assert isinstance(value, (interval.GenericInterval, interval.Interval))
             intv = value
 
         # for p in post.pitches:  # includes chords
@@ -9003,7 +9057,8 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
                         for p in e.pitches:  # type: ignore
                             intv.transposePitchKeyAware(p, k, inPlace=True)
                 else:
-                    e.transpose(value, inPlace=True)
+                    e.transpose(intv, inPlace=True)
+
         if not inPlace:
             return post
         else:
