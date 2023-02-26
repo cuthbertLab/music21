@@ -31,6 +31,7 @@ from music21 import duration
 from music21 import environment
 from music21 import exceptions21
 from music21.figuredBass import realizerScale
+from music21.figuredBass import notation
 from music21 import interval
 from music21 import key
 from music21 import pitch
@@ -2492,6 +2493,32 @@ class NoChord(ChordSymbol):
 
 # ------------------------------------------------------------------------------
 
+class FiguredBassIndication(Harmony):
+    isFigure = True
+    tstamp = 1
+    def __init__(self, figs=None, **keywords):
+        super().__init__(**keywords)
+        if figs:
+            if isinstance(figs, list):
+                fig_string = str(figs[0])
+                for sf in figs:
+                    fig_string += f',{sf}'
+                figs = fig_string
+                #pass
+        else:
+            figs = ''
+        self.__fig_notation = notation.Notation(figs)
+
+    @property
+    def fig_notation(self) -> notation.Notation:
+        return self.__fig_notation
+    
+    @fig_notation.setter
+    def fig_notation(self, figs):
+        self.__fig_notation = notation.Notation(figs)
+
+    def __repr__(self):
+        return f'<{self.__class__.__name__} figures: {self.fig_notation.notationColumn}>'
 
 def realizeChordSymbolDurations(piece):
     '''
