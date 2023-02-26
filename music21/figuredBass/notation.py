@@ -15,6 +15,7 @@ import unittest
 
 from music21 import exceptions21
 from music21 import pitch
+from music21 import harmony
 from music21 import prebase
 
 shorthandNotation = {(None,): (5, 3),
@@ -634,6 +635,33 @@ def convertToPitch(pitchString):
             raise ValueError('Cannot convert string ' + pitchString + ' to a music21 Pitch.')
 
     raise TypeError('Cannot convert ' + pitchString + ' to a music21 Pitch.')
+
+class FiguredBassIndication(harmony.Harmony):
+    isFigure = True
+    tstamp = 1
+    def __init__(self, figs=None, **keywords):
+        super().__init__(**keywords)
+        if figs:
+            if isinstance(figs, list):
+                fig_string = str(figs[0])
+                for sf in figs:
+                    fig_string += f',{sf}'
+                figs = fig_string
+                #pass
+        else:
+            figs = ''
+        self.__fig_notation = Notation(figs)
+
+    @property
+    def fig_notation(self) -> Notation:
+        return self.__fig_notation
+    
+    @fig_notation.setter
+    def fig_notation(self, figs):
+        self.__fig_notation = Notation(figs)
+
+    def __repr__(self):
+        return f'<{self.__class__.__name__} figures: {self.fig_notation.notationColumn}>'
 
 
 _DOC_ORDER = [Notation, Figure, Modifier]
