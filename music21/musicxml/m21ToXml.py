@@ -365,6 +365,7 @@ class GeneralObjectExporter:
         ('DiatonicScale', 'fromDiatonicScale'),
         ('Scale', 'fromScale'),
         ('Music21Object', 'fromMusic21Object'),
+        ('FiguredBassIndication', 'fromFiguredBassIndication'),
     ])
 
     def __init__(self, obj: prebase.ProtoM21Object | None = None):
@@ -520,6 +521,9 @@ class GeneralObjectExporter:
                 + f'{self.generalObj} to a complete musicXML document; put it in a Stream first!'
             )
         return outObj
+
+    def fromFiguredBassIndication(self):
+        print('was here!')
 
     def fromScore(self, sc):
         '''
