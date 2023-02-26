@@ -200,7 +200,7 @@ from music21 import pitch
 from music21 import stream
 from music21 import spanner
 from music21 import tie
-from music21 import figuredBass
+from music21 import harmony
 
 _MOD = 'mei.base'
 environLocal = environment.Environment(_MOD)
@@ -2530,7 +2530,7 @@ def figuredbassFromElement(elem, slurBundle=None):
                 dauer = float(subElement.attrib['dur.metrical'])
 
     # Generate a FiguredBassIndication object and set the collected information
-    theFbNotation = figuredBass.notation.FiguredBassIndication(fb_notation)
+    theFbNotation = harmony.FiguredBassIndication(fb_notation)
     theFbNotation.id = id
     theFbNotation.duration = duration.Duration(quarterLength=dauer)
     
