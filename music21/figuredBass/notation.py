@@ -99,6 +99,7 @@ class Notation(prebase.ProtoM21Object):
 
     * '13' -> '13,11,9,7,5,3'
 
+    * '_' -> treated as an extender
 
     Figures are saved in order from left to right as found in the notationColumn.
 
@@ -209,6 +210,7 @@ class Notation(prebase.ProtoM21Object):
         self.origModStrings = None
         self.numbers = None
         self.modifierStrings = None
+        self.hasExtenders = False
         self._parseNotationColumn()
         self._translateToLonghand()
 
@@ -248,8 +250,8 @@ class Notation(prebase.ProtoM21Object):
         '''
         delimiter = '[,]'
         figures = re.split(delimiter, self.notationColumn)
-        patternA1 = '([0-9]*)'
-        patternA2 = '([^0-9]*)'
+        patternA1 = '([0-9_]*)'
+        patternA2 = '([^0-9_]*)'
         numbers = []
         modifierStrings = []
         figureStrings = []
@@ -269,7 +271,11 @@ class Notation(prebase.ProtoM21Object):
             number = None
             modifierString = None
             if m1:
-                number = int(m1[0].strip())
+                if '_' in m1:
+                    self.hasExtenders = True
+                    number = '_'
+                else:
+                    number = int(m1[0].strip())
             if m2:
                 modifierString = m2[0].strip()
 
@@ -442,14 +448,18 @@ class Figure(prebase.ProtoM21Object):
             ''',
     }
 
-    def __init__(self, number=1, modifierString=None):
+    def __init__(self, number=1, modifierString=None, isExtender=None):
         self.number = number
         self.modifierString = modifierString
         self.modifier = Modifier(modifierString)
+        if self.number == '_':
+            self.isExtender = True
+        else:
+            self.isExtender = False            
 
     def _reprInternal(self):
         mod = repr(self.modifier).replace('music21.figuredBass.notation.', '')
-        return f'{self.number} {mod}'
+        return f'{self.number} {mod} {self.isExtender}'
 
 
 # ------------------------------------------------------------------------------

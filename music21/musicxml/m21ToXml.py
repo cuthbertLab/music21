@@ -4637,7 +4637,12 @@ class MeasureExporter(XMLExporterBase):
             #get only the fbnumber without prefixes or suffixes
             mxFNumber = SubElement(mxFigure, 'figure-number')
             if fig.number:
-                mxFNumber.text = str(fig.number)
+                if fig.number == '_':
+                    mxFNumber.text = ''
+                    mxExtender = SubElement(mxFigure, 'extend')
+                    mxExtender.set('type', 'continue')
+                else:
+                    mxFNumber.text = str(fig.number)
             else:
                 mxFNumber.text = ''
             
@@ -4647,12 +4652,15 @@ class MeasureExporter(XMLExporterBase):
                 mxModifier = SubElement(mxFigure, 'prefix')
                 mxModifier.text = modifiersDictM21ToXml[fbModifier]
 
-            mxFbDuration = SubElement(mxFB, 'duration')
+            # look for information on duration. If duration is 0 
+            # jump over the <duration> tag
             duration = round(f.quarterLength * self.currentDivisions)
             if duration > 0:
-                mxFbDuration.text = str(duration)
-            else:
-                mxFbDuration.text = str(0)
+                mxFbDuration = SubElement(mxFB, 'duration')
+                if duration > 0:
+                    mxFbDuration.text = str(duration)
+                else:
+                    mxFbDuration.text = str(0)
 
         return mxFB
         #self.addDividerComment('END: figured-bass')

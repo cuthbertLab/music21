@@ -2532,7 +2532,7 @@ def figuredbassFromElement(elem, slurBundle=None):
         id = elem.get(_XMLID)
     fb_notation = ''
     dauer: float = 0
-
+    isExtender = False
     # loop through all child elements and collect <f> tags
     for subElement in elem.findall('*'):
         if subElement.tag == f'{MEI_NS}f':
@@ -2543,7 +2543,10 @@ def figuredbassFromElement(elem, slurBundle=None):
                     fb_notation = subElement.text
             else:
                 if 'extender' in subElement.attrib.keys():
-                    print('Extender found!')
+                    if fb_notation != '':
+                        fb_notation += f',_'
+                    else:
+                        fb_notation = '_'
             if 'dur.metrical' in subElement.attrib.keys():
                 dauer = float(subElement.attrib['dur.metrical'])
 
