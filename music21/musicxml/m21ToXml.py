@@ -60,6 +60,7 @@ from music21 import style
 from music21 import tempo
 from music21 import tie
 
+from music21.figuredBass.notation import Figure, prefixes, suffixes, modifiersDictM21ToXml
 from music21.musicxml import helpers
 from music21.musicxml.partStaffExporter import PartStaffExporterMixin
 from music21.musicxml import xmlObjects
@@ -362,7 +363,6 @@ class GeneralObjectExporter:
         ('DiatonicScale', 'fromDiatonicScale'),
         ('Scale', 'fromScale'),
         ('Music21Object', 'fromMusic21Object'),
-        ('FiguredBassIndication', 'fromFiguredBassIndication'),
     ])
 
     def __init__(self, obj: prebase.ProtoM21Object | None = None):
@@ -493,6 +493,7 @@ class GeneralObjectExporter:
         >>> '<note print-object="no" print-spacing="yes">' in outStr
         True
         '''
+
         classes = obj.classes
         outObj = None
 
@@ -515,9 +516,6 @@ class GeneralObjectExporter:
                 + f'{self.generalObj} to a complete musicXML document; put it in a Stream first!'
             )
         return outObj
-
-    def fromFiguredBassIndication(self):
-        print('was here!')
 
     def fromScore(self, sc):
         '''
@@ -1484,6 +1482,9 @@ class ScoreExporter(XMLExporterBase, PartStaffExporterMixin):
         self.firstScoreLayout = None
         self.textBoxes = None
         self.highestTime = 0.0
+        self.fb_part = -1
+        self.fbis_dict = {}
+        self.currentDivisions = defaults.divisionsPerQuarter
 
         self.refStreamOrTimeRange = [0.0, self.highestTime]
 
@@ -1594,6 +1595,7 @@ class ScoreExporter(XMLExporterBase, PartStaffExporterMixin):
         '''
         self.setScoreLayouts()
         self.setMeterStream()
+        self.getFiguredBassIndications()
         self.setPartsAndRefStream()
         # get all text boxes
         self.textBoxes = self.stream['TextBox']
@@ -1695,6 +1697,19 @@ class ScoreExporter(XMLExporterBase, PartStaffExporterMixin):
         self.scoreLayouts = scoreLayouts
         self.firstScoreLayout = scoreLayout
 
+    def getFiguredBassIndications(self):
+        '''
+        Collect all harmony.FiguredBassIndications found in the score and store them
+        in a dict. The dict is later passed to the PartExporter specified
+        (standard value -1 for the lowest part/staff). With in the MeasureExporter the objeccts are
+        inserted locally in the measure and finally parsed to the converter.
+        '''
+        for fbi in self.stream.getElementsByClass(harmony.FiguredBassIndication):
+            if fbi.offset not in self.fbis_dict.keys():
+                self.fbis_dict[fbi.offset] = [fbi]
+            else:
+                self.fbis_dict[fbi.offset].append([fbi])
+
     def _populatePartExporterList(self):
         count = 0
         sp = list(self.parts)
@@ -1707,6 +1722,11 @@ class ScoreExporter(XMLExporterBase, PartStaffExporterMixin):
 
             pp = PartExporter(innerStream, parent=self)
             pp.spannerBundle = self.spannerBundle
+
+            # add figuredBass information to the part where it should be attached later
+            if innerStream == sp[self.fb_part]:
+                pp.fbis = self.fbis_dict
+
             self.partExporterList.append(pp)
 
     def parsePartlikeScore(self):
@@ -2673,6 +2693,7 @@ class PartExporter(XMLExporterBase):
             partObj = stream.Part()
         self.stream: stream.Part | stream.Score = partObj
         self.parent = parent  # ScoreExporter
+        self.fbis = None
         self.xmlRoot = Element('part')
 
         if parent is None:
@@ -3131,6 +3152,7 @@ class MeasureExporter(XMLExporterBase):
             ('ChordWithFretBoard', 'chordWithFretBoardToXml'),  # these three
             ('ChordSymbol', 'chordSymbolToXml'),  # must come before
             ('RomanNumeral', 'romanNumeralToXml'),  # ChordBase
+            ('FiguredBassIndication', 'figuredBassToXml'),
             ('ChordBase', 'chordToXml'),
             ('Unpitched', 'unpitchedToXml'),
             ('Rest', 'restToXml'),
@@ -3203,9 +3225,15 @@ class MeasureExporter(XMLExporterBase):
         self.setMxPrint()
         self.setMxAttributesObjectForStartOfMeasure()
         self.setLeftBarline()
+        # Look for FiguredBassIndications and add them to the local copy of the measure 
+        # and after the other elements
+        if self.parent.fbis:
+            self.insertFiguredBassIndications()
+
         # BIG ONE
         self.mainElementsParse()
         # continue
+
         self.setRightBarline()
         return self.xmlRoot
 
@@ -3491,6 +3519,22 @@ class MeasureExporter(XMLExporterBase):
             # emit the related spanners that follow the element
             for sp in postList:
                 root.append(sp)
+
+    def insertFiguredBassIndications(self) -> None:
+        '''
+        Adds figured bass elements from the score to the measure. In a MusicXML file <figured-bass> tags
+        usually stand before the corresponding note object. The order is then provided by parseFlatElements()
+        '''
+        # get the measure range to map the corresponding figuredBass Items
+        measureRange = (self.stream.offset, self.stream.offset + self.stream.highestTime)
+
+        # look if there are figures in the current measure and insert them
+        # to add them later
+        for o, f in self.parent.fbis.items():
+            if o >= measureRange[0] and o < measureRange[1]:
+                for fbi in f:
+                    self.stream.insert(o - self.stream.offset, fbi)
+                    #print('FBI inserted:', fbi)
 
     def _hasRelatedSpanners(self, obj) -> bool:
         '''
@@ -4542,6 +4586,45 @@ class MeasureExporter(XMLExporterBase):
             else:
                 mxNoteList.append(self.noteToXml(n, noteIndexInChord=i, chordParent=c))
         return mxNoteList
+
+    def figuredBassToXml(self, f: harmony.FiguredBassIndication):
+        if isinstance(f, harmony.FiguredBassIndication):
+            mxFB = self._figuresToXml(f)
+        
+        self.xmlRoot.append(mxFB)
+        #_synchronizeIds(mxFB, f)
+        return mxFB
+    
+    def _figuresToXml(self, f: harmony.FiguredBassIndication, figureCnt=1, noteIndexInChord=0, chordParent=None):
+        #do Figure elements
+        #self.addDividerComment('BEGIN: figured-bass')
+
+        mxFB = Element('figured-bass')
+        for fig in f.fig_notation.figuresFromNotationColumn:
+            mxFigure = SubElement(mxFB, 'figure')
+
+            #get only the fbnumber without prefixes or suffixes
+            mxFNumber = SubElement(mxFigure, 'figure-number')
+            if fig.number:
+                mxFNumber.text = str(fig.number)
+            else:
+                mxFNumber.text = ''
+            
+            #modifiers are eother handled as prefixes or suffixes here
+            fbModifier = fig.modifierString
+            if fbModifier:
+                mxModifier = SubElement(mxFigure, 'prefix')
+                mxModifier.text = modifiersDictM21ToXml[fbModifier]
+
+            mxFbDuration = SubElement(mxFB, 'duration')
+            duration = round(f.quarterLength * self.currentDivisions)
+            if duration > 0:
+                mxFbDuration.text = str(duration)
+            else:
+                mxFbDuration.text = str(0)
+
+        return mxFB
+        #self.addDividerComment('END: figured-bass')
 
     def durationXml(self, dur: duration.Duration):
         # noinspection PyShadowingNames

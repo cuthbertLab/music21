@@ -31,6 +31,25 @@ shorthandNotation = {(None,): (5, 3),
                      (2,): (6, 4, 2),
                      }
 
+prefixes = ["+", "#", "++", "##"]
+suffixes = ["\\"]
+
+modifiersDictXmlToM21 = {
+                    "sharp": "#",
+                    "flat": "b",
+                    "double-sharp": "##",
+                    "flat-flat": "bb",
+                    "backslash": "\\"
+                }
+
+modifiersDictM21ToXml = {
+                    "#": "sharp",
+                    "b": "flat",
+                    "##": "double-sharp",
+                    "bb": "flat-flat",
+                    "\\": "backslash",
+                    "+": "sharp"
+}
 
 class Notation(prebase.ProtoM21Object):
     '''
@@ -196,6 +215,7 @@ class Notation(prebase.ProtoM21Object):
         # Convert to convenient notation
         self.modifiers = None
         self.figures = None
+        self.figuresFromNotationColumn = None
         self._getModifiers()
         self._getFigures()
 
@@ -372,6 +392,15 @@ class Notation(prebase.ProtoM21Object):
 
         self.figures = figures
 
+        figuresFromNotaCol = []
+
+        for i in range(len(self.origNumbers)):
+            number = self.origNumbers[i]
+            modifierString = self.origModStrings[i]
+            figure = Figure(number, modifierString)
+            figuresFromNotaCol.append(figure)
+
+        self.figuresFromNotationColumn = figuresFromNotaCol
 
 class NotationException(exceptions21.Music21Exception):
     pass
