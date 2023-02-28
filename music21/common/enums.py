@@ -215,6 +215,20 @@ class AppendSpanners(StrEnum):
     NONE = 'none'
 
 
+class OrnamentDelay(StrEnum):
+    '''
+    An enumeration for the delay in an ornament (e.g. a delayed turn).  The delay for an
+    ornament can be set to one of these values, or to an OffsetQL for a timed delay.
+
+    OrnamentDelay.NO_DELAY means there is no delay (this is equivalent to setting delay to 0.0)
+    OrnamentDelay.DEFAULT_DELAY means the delay is half the duration of the ornamented note.
+
+    * new in v9.
+    '''
+    NO_DELAY = 'noDelay'
+    DEFAULT_DELAY = 'defaultDelay'
+
+
 class MeterDivision(StrEnum):
     '''
     Represents an indication of how to divide a TimeSignature

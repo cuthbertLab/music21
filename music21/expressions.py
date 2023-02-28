@@ -27,9 +27,12 @@ from __future__ import annotations
 import copy
 import string
 import typing as t
+from fractions import Fraction
 
 from music21 import base
 from music21 import common
+from music21.common.enums import OrnamentDelay
+from music21.common.numberTools import opFrac
 from music21.common.types import OffsetQL
 from music21 import exceptions21
 from music21 import interval
@@ -1027,13 +1030,66 @@ class Turn(Ornament):
     A turn or Gruppetto.
 
     * Changed in v7: size is a Generic second.  removed unused nachschlag component.
+    * Changed in v9: Added support for delayed vs non-delayed Turn.
     '''
-    def __init__(self, **keywords):
+    def __init__(self, *, delay: OrnamentDelay | OffsetQL = OrnamentDelay.NO_DELAY, **keywords):
         super().__init__(**keywords)
-        self.size = interval.GenericInterval(2)
-        self.placement = 'above'
-        self.tieAttach = 'all'
-        self.quarterLength = 0.25
+        self.size: interval.IntervalBase = interval.GenericInterval(2)
+        self.placement: str = 'above'
+        self.tieAttach: str = 'all'
+        self.quarterLength: OffsetQL = 0.25
+        self._delay: OrnamentDelay | OffsetQL = 0.0
+        self.delay = delay  # use property setter
+
+    @property
+    def delay(self) -> OrnamentDelay | OffsetQL:
+        return self._delay
+
+    @delay.setter
+    def delay(self, newDelay: OrnamentDelay | OffsetQL):
+        # we convert to OrnamentDelay if possible now, to simplify life later
+        if isinstance(newDelay, (float, Fraction)) and newDelay <= 0:
+            newDelay = OrnamentDelay.NO_DELAY
+        self._delay = newDelay
+
+    @property
+    def isDelayed(self) -> bool:
+        # if self.delay is NO_DELAY, the turn is not delayed
+        # if self.delay is anything else (an OffsetQL or DEFAULT_DELAY), the turn is delayed
+        # Note that the implementation of the delay property ensures that if self.delay
+        # is an OffsetQL, it will always be > 0.
+        return self.delay != OrnamentDelay.NO_DELAY
+
+    @property
+    def name(self) -> str:
+        '''
+        returns the name of the Turn/InvertedTurn, which is generally the class
+        name lowercased, with spaces where a new capital occurs, but also with
+        a 'delayed' prefix, if the Turn/InvertedTurn is delayed.  If the delay
+        is of a specific duration, the prefix will include that duration.
+
+        Subclasses can override this as necessary.
+
+        >>> nonDelayedTurn = expressions.Turn()
+        >>> nonDelayedTurn.name
+        'turn'
+
+        >>> from music21.common.enums import OrnamentDelay
+        >>> delayedInvertedTurn = expressions.InvertedTurn(delay=OrnamentDelay.DEFAULT_DELAY)
+        >>> delayedInvertedTurn.name
+        'delayed inverted turn'
+
+        >>> delayedBy1Turn = expressions.Turn(delay=1.0)
+        >>> delayedBy1Turn.name
+        'delayed(delayQL=1.0) turn'
+
+        '''
+        superName: str = super().name
+        if self.delay == OrnamentDelay.DEFAULT_DELAY:
+            return 'delayed ' + superName
+        elif isinstance(self.delay, (float, Fraction)):
+            return f'delayed(delayQL={self.delay}) ' + superName
+        return superName
 
     def realize(self, srcObj: 'music21.note.Note', *, inPlace=False):
         # noinspection PyShadowingNames
@@ -1041,28 +1097,31 @@ class Turn(Ornament):
         realize a turn.
 
         returns a three-element tuple.
-        The first is a list of the four notes that the beginning of the note was converted to.
-        The second is a note of duration 0 because the turn "eats up" the whole note.
-        The third is a list of the notes at the end if nachschlag is True,
-        and empty list if False.
+        The first element is an empty list because there are no notes at the start of a turn.
+        The second element is the original note with a duration equal to the delay (but if there
+        is no delay, the second element is None, because the turn "eats up" the entire note).
+        The third element is a list of the four turn notes, adding up to the duration of the
+        original note (less the delay, if there is one).  The four turn notes will either be
+        of equal duration, or the fourth note will be longer, to "eat up" the entire note.
 
         >>> from  music21 import *
+        >>> from music21.common.enums import OrnamentDelay
         >>> m1 = stream.Measure()
         >>> m1.append(key.Key('F', 'major'))
         >>> n1 = note.Note('C5')
         >>> m1.append(n1)
         >>> t1 = expressions.Turn()
         >>> t1.realize(n1)
-        ([], <music21.note.Note C>, [<music21.note.Note D>,
-                                     <music21.note.Note C>,
-                                     <music21.note.Note B->,
-                                     <music21.note.Note C>])
+        ([], None, [<music21.note.Note D>,
+                    <music21.note.Note C>,
+                    <music21.note.Note B->,
+                    <music21.note.Note C>])
 
         >>> m2 = stream.Measure()
         >>> m2.append(key.KeySignature(5))
         >>> n2 = note.Note('B4', type='quarter')
         >>> m2.append(n2)
-        >>> t2 = expressions.InvertedTurn()
+        >>> t2 = expressions.InvertedTurn(delay=OrnamentDelay.DEFAULT_DELAY)
         >>> n2.expressions.append(t2)
         >>> t2.realize(n2)
         ([], <music21.note.Note B>, [<music21.note.Note A#>,
@@ -1082,18 +1141,42 @@ class Turn(Ornament):
 
         >>> n2 = note.Note('C4')
         >>> n2.duration.type = '32nd'
-        >>> t2 = expressions.Turn()
-        >>> _empty, _, turnNotes = t2.realize(n2, inPlace=True)
+        >>> t2 = expressions.Turn(delay=OrnamentDelay.DEFAULT_DELAY)
+        >>> _empty, newOrigNote, turnNotes = t2.realize(n2, inPlace=True)
         >>> for turnNote in turnNotes:
         ...     print(turnNote, turnNote.duration.type)
-        <music21.note.Note D> 128th
-        <music21.note.Note C> 128th
-        <music21.note.Note B> 128th
-        <music21.note.Note C> 128th
+        <music21.note.Note D> 256th
+        <music21.note.Note C> 256th
+        <music21.note.Note B> 256th
+        <music21.note.Note C> 256th
         >>> n2.duration.type
-        'zero'
+        '64th'
         >>> n2.expressions
         []
+        >>> newOrigNote is n2
+        True
+
+        If the four turn notes (self.quarterLength each) don't add up to the original note
+        duration, the fourth turn note should be held to the length of any remaining unused
+        duration.  Here, for example, we have a dotted eighth note total duration, a delay
+        of a 16th note, and a turn note duration of a triplet 32nd note, leaving the fourth
+        turn note with a duration of a 16th note.  This sort of turn is seen all over the
+        music of Weber.
+
+        >>> from fractions import Fraction
+        >>> n3 = note.Note('C4')
+        >>> n3.quarterLength = 0.75
+        >>> t3 = expressions.Turn(delay=0.25)
+        >>> t3.quarterLength = 0.125 * Fraction(2, 3)
+        >>> _empty, newOrigNote, turnNotes = t3.realize(n3, inPlace=True)
+        >>> print(newOrigNote, newOrigNote.quarterLength)
+        <music21.note.Note C> 0.25
+        >>> for turnNote in turnNotes:
+        ...     print(turnNote, turnNote.quarterLength)
+        <music21.note.Note D> 1/12
+        <music21.note.Note C> 1/12
+        <music21.note.Note B> 1/12
+        <music21.note.Note C> 0.25
 
         If `.autoScale` is off and the note is not long enough to realize 4
         32nd notes, then an exception is raised.
@@ -1112,12 +1195,31 @@ class Turn(Ornament):
             raise ExpressionException('Cannot realize a turn if there is no size given')
         if srcObj.duration.quarterLength == 0:
             raise ExpressionException('Cannot steal time from an object with no duration')
-        if srcObj.duration.quarterLength < 4 * self.quarterLength:
+
+        remainderDuration: OffsetQL
+        if self.delay == OrnamentDelay.NO_DELAY:
+            remainderDuration = 0.0
+        elif self.delay == OrnamentDelay.DEFAULT_DELAY:
+            # half the duration of the srcObj note
+            remainderDuration = opFrac(srcObj.duration.quarterLength / 2)
+        else:
+            theDelay = self.delay
+            if t.TYPE_CHECKING:
+                assert isinstance(theDelay, (float, Fraction))
+            remainderDuration = theDelay
+
+        turnDuration = srcObj.duration.quarterLength - remainderDuration
+        fourthNoteQL: OffsetQL | None = None
+        if turnDuration < 4 * self.quarterLength:
             if not self.autoScale:
                 raise ExpressionException('The note is not long enough to realize a turn')
-            useQL = srcObj.duration.quarterLength / 4
+            useQL = opFrac(turnDuration / 4)
+        elif turnDuration > 4 * self.quarterLength:
+            # in this case, we keep the first 3 turn notes as self.quarterLength, and
+            # extend the 4th turn note to finish up the turnDuration
+            useQL = self.quarterLength
+            fourthNoteQL = opFrac(turnDuration - (3 * useQL))
 
-        remainderDuration = srcObj.duration.quarterLength - 4 * useQL
         transposeIntervalUp = self.size
         transposeIntervalDown = self.size.reverse()
 
@@ -1139,7 +1241,10 @@ class Turn(Ornament):
 
         fourthNote = copy.deepcopy(srcObj)
         fourthNote.expressions = []
-        fourthNote.duration.quarterLength = useQL
+        if fourthNoteQL is None:
+            fourthNote.duration.quarterLength = useQL
+        else:
+            fourthNote.duration.quarterLength = fourthNoteQL
 
         turnNotes.append(firstNote)
         turnNotes.append(secondNote)
@@ -1158,6 +1263,9 @@ class Turn(Ornament):
         if self in srcObj.expressions:
             inExpressions = srcObj.expressions.index(self)
 
+        if remainderDuration == 0:
+            return ([], None, turnNotes)
+
         if not inPlace:
             remainderNote = copy.deepcopy(srcObj)
         else:
@@ -1170,8 +1278,8 @@ class Turn(Ornament):
 
 
 class InvertedTurn(Turn):
-    def __init__(self, **keywords):
-        super().__init__(**keywords)
+    def __init__(self, *, delay: OrnamentDelay | OffsetQL = OrnamentDelay.NO_DELAY, **keywords):
+        super().__init__(delay=delay, **keywords)
         self.size = self.size.reverse()
 
 
