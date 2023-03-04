@@ -1853,6 +1853,7 @@ class Pitch(prebase.ProtoM21Object):
             else:  # is a number
                 # is a midiNumber or a ps -- a float midiNumber
                 # get step and accidental w/o octave
+                print(name)
                 self.step, self._accidental = _convertPsToStep(name)[0:2]
                 self.spellingIsInferred = True
                 if name >= 12:  # is not a pitchClass

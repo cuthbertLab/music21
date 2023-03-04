@@ -15,7 +15,7 @@ import unittest
 
 from music21 import exceptions21
 from music21 import pitch
-from music21 import harmony
+
 from music21 import prebase
 
 shorthandNotation = {(None,): (5, 3),
@@ -48,7 +48,11 @@ modifiersDictM21ToXml = {
                     "##": "double-sharp",
                     "bb": "flat-flat",
                     "\\": "backslash",
-                    "+": "sharp"
+                    "+": "sharp",
+                    '\u266f': 'sharp',
+                    '\u266e': 'natural',
+                    '\u266d': 'flat',
+                    '\u20e5': 'sharp'
 }
 
 class Notation(prebase.ProtoM21Object):
@@ -369,6 +373,7 @@ class Notation(prebase.ProtoM21Object):
         modifiers = []
 
         for i in range(len(self.numbers)):
+            print(i, self.modifierStrings)
             modifierString = self.modifierStrings[i]
             modifier = Modifier(modifierString)
             modifiers.append(modifier)
@@ -459,7 +464,7 @@ class Figure(prebase.ProtoM21Object):
 
     def _reprInternal(self):
         mod = repr(self.modifier).replace('music21.figuredBass.notation.', '')
-        return f'{self.number} {mod} {self.isExtender}'
+        return f'{self.number} Mods: {mod} hasExt: {self.isExtender}'
 
 
 # ------------------------------------------------------------------------------
@@ -473,6 +478,10 @@ specialModifiers = {'+': '#',
                     '++': '##',
                     '+++': '###',
                     '++++': '####',
+                    '\u266f': '#',
+                    '\u266e': 'n',
+                    '\u266d': 'b',
+                    '\u20e5': '#'
                     }
 
 
@@ -532,6 +541,8 @@ class Modifier(prebase.ProtoM21Object):
     }
 
     def __init__(self, modifierString=None):
+        if modifierString is not None:
+            print('Input: ', modifierString, isinstance(modifierString, str), modifierString == '\u20e5')
         self.modifierString = modifierString
         self.accidental = self._toAccidental()
 
@@ -566,6 +577,7 @@ class Modifier(prebase.ProtoM21Object):
             return None
 
         a = pitch.Accidental()
+        print('Modifer String', self.modifierString)
         try:
             a.set(self.modifierString)
         except pitch.AccidentalException:
