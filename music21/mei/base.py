@@ -2205,13 +2205,9 @@ def noteFromElement(elem, slurBundle=None):
                      f'{MEI_NS}accid': accidFromElement,
                      f'{MEI_NS}syl': sylFromElement}
     
-    #print('note', elem, elem.attrib)
-
     # start with a Note with Pitch
     theNote = _accidentalFromAttr(elem.get('accid'))
     theNote = safePitch(elem.get('pname', ''), theNote, elem.get('oct', ''))
-    #print('thenote', theNote, isinstance(theNote, pitch.Pitch))
-
     theNote = note.Note(theNote)
 
     # set the Note's duration

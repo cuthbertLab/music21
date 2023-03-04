@@ -60,7 +60,7 @@ from music21 import style
 from music21 import tempo
 from music21 import tie
 
-from music21.figuredBass.notation import Figure, prefixes, suffixes, modifiersDictM21ToXml
+from music21.figuredBass.notation import modifiersDictM21ToXml
 from music21.musicxml import helpers
 from music21.musicxml.partStaffExporter import PartStaffExporterMixin
 from music21.musicxml import xmlObjects
@@ -493,7 +493,6 @@ class GeneralObjectExporter:
         >>> '<note print-object="no" print-spacing="yes">' in outStr
         True
         '''
-
         classes = obj.classes
         outObj = None
 
@@ -3372,7 +3371,7 @@ class MeasureExporter(XMLExporterBase):
         for els in objIterator:
             if len(groupedObjList) > 0:
                 if len(els) == 1 and isinstance(els[0], harmony.FiguredBassIndication):
-                    print('**multiple fb found**')
+                    #print('**multiple fb found**')
                     groupedObjList[-1].append(els[0])
                     continue
             groupedObjList.append(els)
@@ -4608,9 +4607,10 @@ class MeasureExporter(XMLExporterBase):
         # For FiguredBassElements we need to check whether there are
         # multiple figures for one note.
         # Therefore we compare offset of the figure and the current offsetInMeasure variable
-        print('*f:', f.offset, self.offsetInMeasure)
+        # print('*f:', f.offset, self.offsetInMeasure)
         if f.offset > self.offsetInMeasure:
-            print('more than one figure found', (f.offset - self.offsetInMeasure) * self.currentDivisions)
+            # Handle multiple figures or not
+            # print('more than one figure found', (f.offset - self.offsetInMeasure) * self.currentDivisions)
             multipleFigures = True
         else:
             multipleFigures = False

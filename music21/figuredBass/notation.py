@@ -373,7 +373,6 @@ class Notation(prebase.ProtoM21Object):
         modifiers = []
 
         for i in range(len(self.numbers)):
-            print(i, self.modifierStrings)
             modifierString = self.modifierStrings[i]
             modifier = Modifier(modifierString)
             modifiers.append(modifier)
@@ -541,8 +540,6 @@ class Modifier(prebase.ProtoM21Object):
     }
 
     def __init__(self, modifierString=None):
-        if modifierString is not None:
-            print('Input: ', modifierString, isinstance(modifierString, str), modifierString == '\u20e5')
         self.modifierString = modifierString
         self.accidental = self._toAccidental()
 
@@ -577,7 +574,6 @@ class Modifier(prebase.ProtoM21Object):
             return None
 
         a = pitch.Accidental()
-        print('Modifer String', self.modifierString)
         try:
             a.set(self.modifierString)
         except pitch.AccidentalException:
