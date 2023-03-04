@@ -2204,10 +2204,14 @@ def noteFromElement(elem, slurBundle=None):
                      f'{MEI_NS}artic': articFromElement,
                      f'{MEI_NS}accid': accidFromElement,
                      f'{MEI_NS}syl': sylFromElement}
+    
+    #print('note', elem, elem.attrib)
 
     # start with a Note with Pitch
     theNote = _accidentalFromAttr(elem.get('accid'))
     theNote = safePitch(elem.get('pname', ''), theNote, elem.get('oct', ''))
+    #print('thenote', theNote, isinstance(theNote, pitch.Pitch))
+
     theNote = note.Note(theNote)
 
     # set the Note's duration
@@ -2532,7 +2536,6 @@ def figuredbassFromElement(elem, slurBundle=None):
         id = elem.get(_XMLID)
     fb_notation = ''
     dauer: float = 0
-    isExtender = False
     # loop through all child elements and collect <f> tags
     for subElement in elem.findall('*'):
         if subElement.tag == f'{MEI_NS}f':

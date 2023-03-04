@@ -2514,15 +2514,15 @@ class FiguredBassIndication(Harmony):
                 #pass
         else:
             figs = ''
-        self.__fig_notation = notation.Notation(figs)
+        self._fig_notation = notation.Notation(figs)
 
     @property
     def fig_notation(self) -> notation.Notation:
-        return self.__fig_notation
+        return self._fig_notation
     
     @fig_notation.setter
     def fig_notation(self, figs):
-        self.__fig_notation = notation.Notation(figs)
+        self._fig_notation = notation.Notation(figs)
 
     def __repr__(self):
         return f'<{self.__class__.__name__} figures: {self.fig_notation.notationColumn}>'
