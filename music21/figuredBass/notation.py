@@ -15,7 +15,7 @@ import unittest
 
 from music21 import exceptions21
 from music21 import pitch
-from music21 import harmony
+
 from music21 import prebase
 
 shorthandNotation = {(None,): (5, 3),
@@ -31,6 +31,29 @@ shorthandNotation = {(None,): (5, 3),
                      (2,): (6, 4, 2),
                      }
 
+prefixes = ["+", "#", "++", "##"]
+suffixes = ["\\"]
+
+modifiersDictXmlToM21 = {
+                    "sharp": "#",
+                    "flat": "b",
+                    "double-sharp": "##",
+                    "flat-flat": "bb",
+                    "backslash": "\\"
+                }
+
+modifiersDictM21ToXml = {
+                    "#": "sharp",
+                    "b": "flat",
+                    "##": "double-sharp",
+                    "bb": "flat-flat",
+                    "\\": "backslash",
+                    "+": "sharp",
+                    '\u266f': 'sharp',
+                    '\u266e': 'natural',
+                    '\u266d': 'flat',
+                    '\u20e5': 'sharp'
+}
 
 class Notation(prebase.ProtoM21Object):
     '''
@@ -80,6 +103,7 @@ class Notation(prebase.ProtoM21Object):
 
     * '13' -> '13,11,9,7,5,3'
 
+    * '_' -> treated as an extender
 
     Figures are saved in order from left to right as found in the notationColumn.
 
@@ -190,12 +214,14 @@ class Notation(prebase.ProtoM21Object):
         self.origModStrings = None
         self.numbers = None
         self.modifierStrings = None
+        self.hasExtenders = False
         self._parseNotationColumn()
         self._translateToLonghand()
 
         # Convert to convenient notation
         self.modifiers = None
         self.figures = None
+        self.figuresFromNotationColumn = None
         self._getModifiers()
         self._getFigures()
 
@@ -228,8 +254,8 @@ class Notation(prebase.ProtoM21Object):
         '''
         delimiter = '[,]'
         figures = re.split(delimiter, self.notationColumn)
-        patternA1 = '([0-9]*)'
-        patternA2 = '([^0-9]*)'
+        patternA1 = '([0-9_]*)'
+        patternA2 = '([^0-9_]*)'
         numbers = []
         modifierStrings = []
         figureStrings = []
@@ -249,7 +275,11 @@ class Notation(prebase.ProtoM21Object):
             number = None
             modifierString = None
             if m1:
-                number = int(m1[0].strip())
+                if '_' in m1:
+                    self.hasExtenders = True
+                    number = '_'
+                else:
+                    number = int(m1[0].strip())
             if m2:
                 modifierString = m2[0].strip()
 
@@ -372,6 +402,15 @@ class Notation(prebase.ProtoM21Object):
 
         self.figures = figures
 
+        figuresFromNotaCol = []
+
+        for i in range(len(self.origNumbers)):
+            number = self.origNumbers[i]
+            modifierString = self.origModStrings[i]
+            figure = Figure(number, modifierString)
+            figuresFromNotaCol.append(figure)
+
+        self.figuresFromNotationColumn = figuresFromNotaCol
 
 class NotationException(exceptions21.Music21Exception):
     pass
@@ -413,14 +452,18 @@ class Figure(prebase.ProtoM21Object):
             ''',
     }
 
-    def __init__(self, number=1, modifierString=None):
+    def __init__(self, number=1, modifierString=None, isExtender=None):
         self.number = number
         self.modifierString = modifierString
         self.modifier = Modifier(modifierString)
+        if self.number == '_':
+            self.isExtender = True
+        else:
+            self.isExtender = False            
 
     def _reprInternal(self):
         mod = repr(self.modifier).replace('music21.figuredBass.notation.', '')
-        return f'{self.number} {mod}'
+        return f'{self.number} Mods: {mod} hasExt: {self.isExtender}'
 
 
 # ------------------------------------------------------------------------------
@@ -434,6 +477,10 @@ specialModifiers = {'+': '#',
                     '++': '##',
                     '+++': '###',
                     '++++': '####',
+                    '\u266f': '#',
+                    '\u266e': 'n',
+                    '\u266d': 'b',
+                    '\u20e5': '#'
                     }
 
 

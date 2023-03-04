@@ -92,9 +92,9 @@ TECHNICAL_MARKS_REV[articulations.Harmonic] = 'harmonic'
 # NON-spanner ornaments that go into Expressions
 ORNAMENT_MARKS = {'trill-mark': expressions.Trill,
                   'turn': expressions.Turn,
-                  # TODO: 'delayed-turn'
+                  'delayed-turn': expressions.Turn,
                   'inverted-turn': expressions.InvertedTurn,
-                  # TODO: 'delayed-inverted-turn'
+                  'delayed-inverted-turn': expressions.InvertedTurn,
                   # TODO: 'vertical-turn'
                   'shake': expressions.Shake,
                   'mordent': expressions.Mordent,

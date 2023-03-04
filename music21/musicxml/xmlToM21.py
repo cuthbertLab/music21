@@ -30,6 +30,7 @@ from music21 import common
 from music21 import defaults
 from music21 import duration
 from music21 import dynamics
+from music21.common.enums import OrnamentDelay
 from music21 import editorial
 from music21 import environment
 from music21 import exceptions21
@@ -4015,12 +4016,16 @@ class MeasureParser(XMLParserBase):
         >>> a is None
         True
 
-        Not supported currently: 'accidental-mark', 'vertical-turn',
-        'delayed-turn', 'delayed-inverted-turn'
+        Not supported currently: 'accidental-mark', 'vertical-turn'
         '''
         tag = mxObj.tag
         try:
-            orn = xmlObjects.ORNAMENT_MARKS[tag]()
+            if tag in ('delayed-turn', 'delayed-inverted-turn'):
+                orn = xmlObjects.ORNAMENT_MARKS[tag](delay=OrnamentDelay.DEFAULT_DELAY)
+            elif tag in ('turn', 'inverted-turn'):
+                orn = xmlObjects.ORNAMENT_MARKS[tag](delay=OrnamentDelay.NO_DELAY)
+            else:
+                orn = xmlObjects.ORNAMENT_MARKS[tag]()
         except KeyError:  # should already be checked...
             return None
         self.setPrintStyle(mxObj, orn)

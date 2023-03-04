@@ -60,6 +60,7 @@ from music21 import style
 from music21 import tempo
 from music21 import tie
 
+from music21.figuredBass.notation import modifiersDictM21ToXml
 from music21.musicxml import helpers
 from music21.musicxml.partStaffExporter import PartStaffExporterMixin
 from music21.musicxml import xmlObjects
@@ -1480,6 +1481,9 @@ class ScoreExporter(XMLExporterBase, PartStaffExporterMixin):
         self.firstScoreLayout = None
         self.textBoxes = None
         self.highestTime = 0.0
+        self.fb_part = -1
+        self.fbis_dict = {}
+        self.currentDivisions = defaults.divisionsPerQuarter
 
         self.refStreamOrTimeRange = [0.0, self.highestTime]
 
@@ -1590,6 +1594,7 @@ class ScoreExporter(XMLExporterBase, PartStaffExporterMixin):
         '''
         self.setScoreLayouts()
         self.setMeterStream()
+        self.getFiguredBassIndications()
         self.setPartsAndRefStream()
         # get all text boxes
         self.textBoxes = self.stream['TextBox']
@@ -1691,6 +1696,19 @@ class ScoreExporter(XMLExporterBase, PartStaffExporterMixin):
         self.scoreLayouts = scoreLayouts
         self.firstScoreLayout = scoreLayout
 
+    def getFiguredBassIndications(self):
+        '''
+        Collect all harmony.FiguredBassIndications found in the score and store them
+        in a dict. The dict is later passed to the PartExporter specified
+        (standard value -1 for the lowest part/staff). With in the MeasureExporter the objeccts are
+        inserted locally in the measure and finally parsed to the converter.
+        '''
+        for fbi in self.stream.getElementsByClass(harmony.FiguredBassIndication):
+            if fbi.offset not in self.fbis_dict.keys():
+                self.fbis_dict[fbi.offset] = [fbi]
+            else:
+                self.fbis_dict[fbi.offset].append([fbi])
+
     def _populatePartExporterList(self):
         count = 0
         sp = list(self.parts)
@@ -1703,6 +1721,11 @@ class ScoreExporter(XMLExporterBase, PartStaffExporterMixin):
 
             pp = PartExporter(innerStream, parent=self)
             pp.spannerBundle = self.spannerBundle
+
+            # add figuredBass information to the part where it should be attached later
+            if innerStream == sp[self.fb_part]:
+                pp.fbis = self.fbis_dict
+
             self.partExporterList.append(pp)
 
     def parsePartlikeScore(self):
@@ -2669,6 +2692,7 @@ class PartExporter(XMLExporterBase):
             partObj = stream.Part()
         self.stream: stream.Part | stream.Score = partObj
         self.parent = parent  # ScoreExporter
+        self.fbis = None
         self.xmlRoot = Element('part')
 
         if parent is None:
@@ -3127,6 +3151,7 @@ class MeasureExporter(XMLExporterBase):
             ('ChordWithFretBoard', 'chordWithFretBoardToXml'),  # these three
             ('ChordSymbol', 'chordSymbolToXml'),  # must come before
             ('RomanNumeral', 'romanNumeralToXml'),  # ChordBase
+            ('FiguredBassIndication', 'figuredBassToXml'),
             ('ChordBase', 'chordToXml'),
             ('Unpitched', 'unpitchedToXml'),
             ('Rest', 'restToXml'),
@@ -3199,9 +3224,15 @@ class MeasureExporter(XMLExporterBase):
         self.setMxPrint()
         self.setMxAttributesObjectForStartOfMeasure()
         self.setLeftBarline()
+        # Look for FiguredBassIndications and add them to the local copy of the measure 
+        # and after the other elements
+        if self.parent.fbis:
+            self.insertFiguredBassIndications()
+
         # BIG ONE
         self.mainElementsParse()
         # continue
+
         self.setRightBarline()
         return self.xmlRoot
 
@@ -3332,7 +3363,20 @@ class MeasureExporter(XMLExporterBase):
         # That way chord symbols and other 0-width objects appear before notes as much as
         # possible.
         objIterator: OffsetIterator[base.Music21Object] = OffsetIterator(m)
-        for objGroup in objIterator:
+
+        # Prepare the iteration by offsets. If there are FiguredBassIndication objects
+        # first group them in one list together with their note, instead of handling them
+        # seperately. O
+        groupedObjList = []
+        for els in objIterator:
+            if len(groupedObjList) > 0:
+                if len(els) == 1 and isinstance(els[0], harmony.FiguredBassIndication):
+                    #print('**multiple fb found**')
+                    groupedObjList[-1].append(els[0])
+                    continue
+            groupedObjList.append(els)
+
+        for objGroup in groupedObjList:
             groupOffset = m.elementOffset(objGroup[0])
             offsetToMoveForward = groupOffset - self.offsetInMeasure
             if offsetToMoveForward > 0 and any(
@@ -3358,6 +3402,7 @@ class MeasureExporter(XMLExporterBase):
                     if hasSpannerAnchors:
                         self.parseOneElement(obj, AppendSpanners.NONE)
                     else:
+                        # ENTRY FOR FB
                         self.parseOneElement(obj, AppendSpanners.NORMAL)
 
             for n in notesForLater:
@@ -3487,6 +3532,25 @@ class MeasureExporter(XMLExporterBase):
             # emit the related spanners that follow the element
             for sp in postList:
                 root.append(sp)
+
+    def insertFiguredBassIndications(self) -> None:
+        '''
+        Adds relevant figured bass elements collected from the stream.Score to the
+        current stream.Measure object parsed afterwards.
+        
+        In a MusicXML file <figured-bass> tags usually stand before the corresponding note object.
+        This order will be observed by parseFlatElements() function. Same for multiple figures at one note.
+        '''
+        # get the measure range to map the corresponding figuredBass Items
+        measureRange = (self.stream.offset, self.stream.offset + self.stream.highestTime)
+
+        # look if there are figures in the current measure and insert them
+        # to add them later
+        for o, f in self.parent.fbis.items():
+            if o >= measureRange[0] and o < measureRange[1]:
+                for fbi in f:
+                    self.stream.insert(o - self.stream.offset, fbi)
+                    #print('FBI inserted:', fbi, fbi.offset)
 
     def _hasRelatedSpanners(self, obj) -> bool:
         '''
@@ -4539,6 +4603,74 @@ class MeasureExporter(XMLExporterBase):
                 mxNoteList.append(self.noteToXml(n, noteIndexInChord=i, chordParent=c))
         return mxNoteList
 
+    def figuredBassToXml(self, f: harmony.FiguredBassIndication):
+        # For FiguredBassElements we need to check whether there are
+        # multiple figures for one note.
+        # Therefore we compare offset of the figure and the current offsetInMeasure variable
+        # print('*f:', f.offset, self.offsetInMeasure)
+        if f.offset > self.offsetInMeasure:
+            # Handle multiple figures or not
+            # print('more than one figure found', (f.offset - self.offsetInMeasure) * self.currentDivisions)
+            multipleFigures = True
+        else:
+            multipleFigures = False
+
+        if isinstance(f, harmony.FiguredBassIndication):
+            mxFB = self._figuresToXml(f, multipleFigures=multipleFigures)
+        
+        self.xmlRoot.append(mxFB)
+        self._fbiBefore = (f.offset, mxFB)
+        #_synchronizeIds(mxFB, f)
+        return mxFB
+    
+    def _figuresToXml(self, f: harmony.FiguredBassIndication, multipleFigures=False, figureCnt=1, noteIndexInChord=0, chordParent=None):
+        #do Figure elements
+        #self.addDividerComment('BEGIN: figured-bass')
+
+        mxFB = Element('figured-bass')
+        for fig in f.fig_notation.figuresFromNotationColumn:
+            mxFigure = SubElement(mxFB, 'figure')
+
+            #get only the fbnumber without prefixes or suffixes
+            mxFNumber = SubElement(mxFigure, 'figure-number')
+            if fig.number:
+                if fig.number == '_':
+                    mxFNumber.text = ''
+                    mxExtender = SubElement(mxFigure, 'extend')
+                    mxExtender.set('type', 'continue')
+                else:
+                    mxFNumber.text = str(fig.number)
+            else:
+                mxFNumber.text = ''
+            
+            #modifiers are eother handled as prefixes or suffixes here
+            fbModifier = fig.modifierString
+            if fbModifier:
+                mxModifier = SubElement(mxFigure, 'prefix')
+                mxModifier.text = modifiersDictM21ToXml[fbModifier]
+
+            # look for information on duration. If duration is 0 
+            # jump over the <duration> tag
+            # If we have multiple figures we have to set a <dutation> tag
+            # and update the <figured-bass> tag one before.
+            if multipleFigures:
+                dura = round((f.offset - self.offsetInMeasure) * self.currentDivisions)
+                # Update figures-bass tag before
+                fbDuration_before = self._fbiBefore[1]
+                if fbDuration_before.find('duration'):
+                    fbDuration_before.find('duration').text = str(dura)
+                else:
+                    SubElement(fbDuration_before, 'duration').text = str(dura)
+            else:
+                dura = round(f.quarterLength * self.currentDivisions)
+            # add <duration> to the figure itself if dura > 0
+            if dura > 0:
+                mxFbDuration = SubElement(mxFB, 'duration')
+                mxFbDuration.text = str(dura)
+                
+        return mxFB
+        #self.addDividerComment('END: figured-bass')
+
     def durationXml(self, dur: duration.Duration):
         # noinspection PyShadowingNames
         '''
@@ -5214,6 +5346,13 @@ class MeasureExporter(XMLExporterBase):
         >>> MEX.dump(mxExpression)
         <inverted-turn placement="above" />
 
+        >>> invDelayedTurn = expressions.InvertedTurn(delay=1.)
+        >>> invDelayedTurn.placement = 'below'
+        >>> MEX = musicxml.m21ToXml.MeasureExporter()
+        >>> mxExpression = MEX.expressionToXml(invDelayedTurn)
+        >>> MEX.dump(mxExpression)
+        <delayed-inverted-turn placement="below" />
+
         Some special types...
 
         >>> f = expressions.Fermata()
@@ -5249,40 +5388,52 @@ class MeasureExporter(XMLExporterBase):
         >>> MEX.dump(mxExpression)
         <non-arpeggiate />
         '''
-        mapping = OrderedDict([
-            ('Trill', 'trill-mark'),
-            # TODO: delayed-inverted-turn
-            # TODO: vertical-turn
-            # TODO: 'delayed-turn'
-            ('InvertedTurn', 'inverted-turn'),
-            # last as others are subclasses
-            ('Turn', 'turn'),
-            ('InvertedMordent', 'inverted-mordent'),
-            ('Mordent', 'mordent'),
-            ('Shake', 'shake'),
-            ('Schleifer', 'schleifer'),
-            # TODO: 'accidental-mark'
-            ('Tremolo', 'tremolo'),  # non-spanner
-            # non-ornaments...
-            ('Fermata', 'fermata'),
-            # keep last...
-            ('Ornament', 'other-ornament'),
-        ])
         mx = None
         classes = expression.classes
-        for k, v in mapping.items():
-            if k in classes:
-                mx = Element(v)
-                break
-        if mx is None:
-            # ArpeggioMark maps to two different elements
-            if isinstance(expression, expressions.ArpeggioMark):
-                if expression.type == 'non-arpeggio':
-                    mx = Element('non-arpeggiate')
+
+        # ArpeggioMark maps to two different elements
+        if isinstance(expression, expressions.ArpeggioMark):
+            if expression.type == 'non-arpeggio':
+                mx = Element('non-arpeggiate')
+            else:
+                mx = Element('arpeggiate')
+                if expression.type != 'normal':
+                    mx.set('direction', expression.type)
+
+        # InvertedTurn/Turn map to two different elements each
+        if isinstance(expression, expressions.Turn):
+            if isinstance(expression, expressions.InvertedTurn):
+                if expression.isDelayed:
+                    mx = Element('delayed-inverted-turn')
                 else:
-                    mx = Element('arpeggiate')
-                    if expression.type != 'normal':
-                        mx.set('direction', expression.type)
+                    mx = Element('inverted-turn')
+            else:
+                if expression.isDelayed:
+                    mx = Element('delayed-turn')
+                else:
+                    mx = Element('turn')
+
+        if mx is None:
+            mapping = OrderedDict([
+                ('Trill', 'trill-mark'),
+                # TODO: vertical-turn
+                ('InvertedMordent', 'inverted-mordent'),
+                ('Mordent', 'mordent'),
+                ('Shake', 'shake'),
+                ('Schleifer', 'schleifer'),
+                # TODO: 'accidental-mark'
+                ('Tremolo', 'tremolo'),  # non-spanner
+                # non-ornaments...
+                ('Fermata', 'fermata'),
+                # keep last...
+                ('Ornament', 'other-ornament'),
+            ])
+
+            for k, v in mapping.items():
+                if k in classes:
+                    mx = Element(v)
+                    break
+
         if mx is None:
             environLocal.printDebug(['no musicxml conversion for:', expression])
             return

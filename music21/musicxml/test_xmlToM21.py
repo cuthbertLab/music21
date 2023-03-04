@@ -610,7 +610,7 @@ class Test(unittest.TestCase):
             for e in n.expressions:
                 if 'Turn' in e.classes:
                     count += 1
-        self.assertEqual(count, 4)  # include inverted turn
+        self.assertEqual(count, 5)  # include inverted turn
 
         count = 0
         for n in s.recurse().notes:

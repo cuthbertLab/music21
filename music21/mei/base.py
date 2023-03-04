@@ -1797,7 +1797,8 @@ def staffDefFromElement(elem, slurBundle=None):  # pylint: disable=unused-argume
     - MEI.shared: clefGrp keySig label layerDef
     '''
     # mapping from tag name to our converter function
-    tagToFunction = {f'{MEI_NS}clef': clefFromElement}
+    tagToFunction = {f'{MEI_NS}clef': clefFromElement, 
+                    f'{MEI_NS}meterSig': meterSigFromElement}
 
     # first make the Instrument
     post = elem.find(f'{MEI_NS}instrDef')
@@ -1824,7 +1825,10 @@ def staffDefFromElement(elem, slurBundle=None):  # pylint: disable=unused-argume
     # --> time signature
     if elem.get('meter.count') is not None:
         post['meter'] = _timeSigFromAttrs(elem)
-
+    # --> or <meterSig>
+    if elem.find(f'{MEI_NS}meterSig') is not None:
+        post['meter'] = meterSigFromElement(elem.find(f'{MEI_NS}meterSig'))
+    
     # --> key signature
     if elem.get('key.pname') is not None or elem.get('key.sig') is not None:
         post['key'] = _keySigFromAttrs(elem)
@@ -1848,6 +1852,20 @@ def staffDefFromElement(elem, slurBundle=None):  # pylint: disable=unused-argume
 
     return post
 
+def meterSigFromElement(elem, slurBundle=None) -> meter.TimeSignature:
+    '''<meterSig> Container for information on meter and TimeSignature.
+
+    In MEI 4: (MEI.cmn module)
+
+    :returns: A meter.TimeSignature that is created from the @count und @unit attributes.
+    
+    If a xml:id is set it is provided.
+    '''
+
+    ts = meter.TimeSignature(f"{elem.get('count')!s}/{elem.get('unit')!s}")
+    if elem.get('xml:id') is not None:
+        ts.id = elem.get('xml:id')
+    return ts
 
 def dotFromElement(elem, slurBundle=None):  # pylint: disable=unused-argument
     '''
@@ -2186,7 +2204,7 @@ def noteFromElement(elem, slurBundle=None):
                      f'{MEI_NS}artic': articFromElement,
                      f'{MEI_NS}accid': accidFromElement,
                      f'{MEI_NS}syl': sylFromElement}
-
+    
     # start with a Note with Pitch
     theNote = _accidentalFromAttr(elem.get('accid'))
     theNote = safePitch(elem.get('pname', ''), theNote, elem.get('oct', ''))
@@ -2514,7 +2532,6 @@ def figuredbassFromElement(elem, slurBundle=None):
         id = elem.get(_XMLID)
     fb_notation = ''
     dauer: float = 0
-
     # loop through all child elements and collect <f> tags
     for subElement in elem.findall('*'):
         if subElement.tag == f'{MEI_NS}f':
@@ -2525,7 +2542,10 @@ def figuredbassFromElement(elem, slurBundle=None):
                     fb_notation = subElement.text
             else:
                 if 'extender' in subElement.attrib.keys():
-                    print('Extender found!')
+                    if fb_notation != '':
+                        fb_notation += f',_'
+                    else:
+                        fb_notation = '_'
             if 'dur.metrical' in subElement.attrib.keys():
                 dauer = float(subElement.attrib['dur.metrical'])
 
