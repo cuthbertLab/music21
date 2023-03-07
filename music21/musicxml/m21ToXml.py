@@ -3196,6 +3196,8 @@ class MeasureExporter(XMLExporterBase):
         self.mxTranspose = None
         self.measureOffsetStart = 0.0
         self.offsetInMeasure = 0.0
+        self.offsetFiguresInMeasure: float = 0.0
+        self.tempFigureDuration: float = 0.0
         self.currentVoiceId: int | str | None = None
         self.nextFreeVoiceNumber: int = 1
         self.nextArpeggioNumber: int = 1
@@ -4628,6 +4630,7 @@ class MeasureExporter(XMLExporterBase):
         #self.addDividerComment('BEGIN: figured-bass')
 
         mxFB = Element('figured-bass')
+        dura = 0
         for fig in f.fig_notation.figuresFromNotationColumn:
             mxFigure = SubElement(mxFB, 'figure')
 
@@ -4654,19 +4657,38 @@ class MeasureExporter(XMLExporterBase):
             # If we have multiple figures we have to set a <dutation> tag
             # and update the <figured-bass> tag one before.
             if multipleFigures:
-                dura = round((f.offset - self.offsetInMeasure) * self.currentDivisions)
+                dura = round((f.offset - self.offsetInMeasure - self.offsetFiguresInMeasure) * self.currentDivisions)
+                self.offsetFiguresInMeasure = f.offset - self.offsetInMeasure
+                #print('Dura', fig, dura, self.offsetFiguresInMeasure)
                 # Update figures-bass tag before
                 fbDuration_before = self._fbiBefore[1]
-                if fbDuration_before.find('duration'):
-                    fbDuration_before.find('duration').text = str(dura)
+
+                # Check whether the figured-bass tag before already has a <duration> tag.
+                # If not create one and set its value. Otherwise update the value
+                if fbDuration_before.find('duration') == None:
+                    #print('Create')
+                    newDura = SubElement(fbDuration_before, 'duration')
+                    newDura.text = str(dura)
+                    #newDura.attrib['created'] = f'with {dura}'
                 else:
-                    SubElement(fbDuration_before, 'duration').text = str(dura)
+                    #print('UPDATE')
+
+                    #duraBefore = fbDuration_before.find('duration').text
+                    for d in fbDuration_before.findall('duration'):
+                        d.text = str(dura)
+                        #d.attrib['update'] = f'from {duraBefore}'
+                self.tempFigureDuration = dura
             else:
-                dura = round(f.quarterLength * self.currentDivisions)
+                self.offsetFiguresInMeasure = 0.0
+                # dura is likely 0.
+            #    dura = round(f.quarterLength * self.currentDivisions)
+            #    print('Calc: ', dura)
             # add <duration> to the figure itself if dura > 0
-            if dura > 0:
+            if self.tempFigureDuration > 0:
+                #print(f.quarterLength * self.currentDivisions)
                 mxFbDuration = SubElement(mxFB, 'duration')
-                mxFbDuration.text = str(dura)
+                mxFbDuration.text = str(round(self.tempFigureDuration))
+                self.tempFigureDuration = 0.0
                 
         return mxFB
         #self.addDividerComment('END: figured-bass')
