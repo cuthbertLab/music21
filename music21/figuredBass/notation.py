@@ -15,7 +15,6 @@ import unittest
 
 from music21 import exceptions21
 from music21 import pitch
-
 from music21 import prebase
 
 shorthandNotation = {(None,): (5, 3),
