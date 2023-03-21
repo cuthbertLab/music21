@@ -2881,6 +2881,15 @@ class MeasureParser(XMLParserBase):
         # only increment Chords after completion
         self.offsetMeasureNote += offsetIncrement
         self.endedWithForwardTag = None
+        
+        # reset offset for figures. This is needed to put in
+        # multiple FiguredBassIndications at one note at the right offset.
+        # Musicxml puts <figured-bass> tags immediately before a <note> tag, 
+        # which means that we have to reset a given offset duration of some
+        # <figured-bass> tags after inserting the coressponding note and 
+        # before going to a new note.
+        self.lastFigureDuration = 0
+
 
     def xmlToChord(self, mxNoteList: list[ET.Element]) -> chord.ChordBase:
         # noinspection PyShadowingNames
@@ -5265,6 +5274,7 @@ class MeasureParser(XMLParserBase):
         sep = ','
         d: duration.Duration | None = None
         offsetFbi = self.offsetMeasureNote
+        #print('===')
 
         for figure in mxFiguredBass.findall('*'):
             for el in figure.findall('*'):
@@ -5279,19 +5289,27 @@ class MeasureParser(XMLParserBase):
             # If a <duration> is given, this usually means that there are multiple figures for a single note.
             # We have to look for offsets here.
             if figure.tag == 'duration':
-                #print('** Dauer:', figure.text, self.lastFigureDuration)
+                #print(fb_strings)
+                #print('** Dauer:', self.lastFigureDuration)
                 d = self.xmlToDuration(mxFiguredBass)
+                #print('** D:', d)
                 if self.lastFigureDuration > 0:
                     offsetFbi = self.offsetMeasureNote + self.lastFigureDuration
                     self.lastFigureDuration += d.quarterLength
+                #    print('***lfd', self.lastFigureDuration, 'offsetFbi', offsetFbi)
                 else:
                     offsetFbi = self.offsetMeasureNote
                     self.lastFigureDuration = d.quarterLength
-        
+                #    print('***lfd Ohne', self.lastFigureDuration, d.quarterLength, offsetFbi)
+            #else:
+            #    self.lastFigureDuration = 0
         # If <duration> is not in the tag list set self.lastFigureDuration to 0.
         # This missing duration in MuseScore3 XML usually means that the following figure is again at a note's offset.
-        if mxFiguredBass.find('duration'):
-            self.lastFigureDuration = 0
+        #if mxFiguredBass.find('duration'):
+        #    print('reset')
+        #    self.lastFigureDuration = 0
+        #else:
+        #    print('H', mxFiguredBass.find('duration'))
 
         fb_string = sep.join(fb_strings)
         #print(fb_string, 'Offset', offsetFbi, self.lastFigureDuration)
