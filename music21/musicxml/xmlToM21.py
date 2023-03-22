@@ -841,6 +841,7 @@ class MusicXMLImporter(XMLParserBase):
         self.m21PartObjectsById = {}
         self.partGroupList = []
         self.parts = []
+        self.fbis: list[harmony.FiguredBassIndication] | None = None
 
         self.musicXmlVersion = defaults.musicxmlVersion
 
@@ -924,6 +925,9 @@ class MusicXMLImporter(XMLParserBase):
             if part is not None:  # for instance, in partStreams
                 s.coreInsert(0.0, part)
                 self.m21PartObjectsById[partId] = part
+        for fbi in self.fbis:
+
+            s.insert(fbi[0], fbi[1])
 
         self.partGroups()
 
@@ -2352,6 +2356,13 @@ class PartParser(XMLParserBase):
             self.stream.insert(0, self.activeMultiMeasureRestSpanner)
             self.activeMultiMeasureRestSpanner = None
 
+    def appendFbis(self, fbi, measureOffset):
+        absOffset = self.lastMeasureOffset + measureOffset
+        if self.parent.fbis:
+            self.parent.fbis.append((absOffset, fbi))
+        else:
+            self.parent.fbis = [(absOffset, fbi)]
+        #print(self.parent.fbis)
 
 # -----------------------------------------------------------------------------
 class MeasureParser(XMLParserBase):
@@ -2388,7 +2399,7 @@ class MeasureParser(XMLParserBase):
         'direction': 'xmlDirection',
         'attributes': 'parseAttributesTag',
         'harmony': 'xmlHarmony',
-        'figured-bass': None,
+        'figured-bass': 'xmlToFiguredBass',
         'sound': None,
         'barline': 'xmlBarline',
         'grouping': None,
@@ -2451,7 +2462,10 @@ class MeasureParser(XMLParserBase):
 
         # what is the offset in the measure of the current note position?
         self.offsetMeasureNote: OffsetQL = 0.0
-
+        
+        # Offset Calc if more than one figure is set under a single note
+        self.lastFigureDuration = 0
+        
         # keep track of the last rest that was added with a forward tag.
         # there are many pieces that end with incomplete measures that
         # older versions of Finale put a forward tag at the end, but this
@@ -2849,6 +2863,15 @@ class MeasureParser(XMLParserBase):
         # only increment Chords after completion
         self.offsetMeasureNote += offsetIncrement
         self.endedWithForwardTag = None
+        
+        # reset offset for figures. This is needed to put in
+        # multiple FiguredBassIndications at one note at the right offset.
+        # Musicxml puts <figured-bass> tags immediately before a <note> tag, 
+        # which means that we have to reset a given offset duration of some
+        # <figured-bass> tags after inserting the coressponding note and 
+        # before going to a new note.
+        self.lastFigureDuration = 0
+
 
     def xmlToChord(self, mxNoteList: list[ET.Element]) -> chord.ChordBase:
         # noinspection PyShadowingNames
@@ -5147,6 +5170,44 @@ class MeasureParser(XMLParserBase):
             # self.xmlFrameToFretBoard(mxFrame, cs)
 
         return cs
+
+    def xmlToFiguredBass(self, mxFiguredBass):
+        #print('Hello from xmlToFiguredBass', mxFiguredBass.findall('*'))
+        fb_strings: list[str] = []
+        sep = ','
+        d: duration.Duration | None = None
+        offsetFbi = self.offsetMeasureNote
+
+        for figure in mxFiguredBass.findall('*'):
+            for el in figure.findall('*'):
+                #print('  ', el)
+                if el.tag == 'figure-number':
+                    fb_strings.append(el.text)
+                if el.tag == 'extend':
+                    if 'type' in el.attrib.keys():
+                        if el.attrib['type'] == 'continue':
+                            fb_strings.append('_')
+
+            # If a <duration> is given, this usually means that there are multiple figures for a single note.
+            # We have to look for offsets here.
+            if figure.tag == 'duration':
+                d = self.xmlToDuration(mxFiguredBass)
+                if self.lastFigureDuration > 0:
+                    offsetFbi = self.offsetMeasureNote + self.lastFigureDuration
+                    self.lastFigureDuration += d.quarterLength
+                else:
+                    offsetFbi = self.offsetMeasureNote
+                    self.lastFigureDuration = d.quarterLength
+
+
+        fb_string = sep.join(fb_strings)
+        fbi = harmony.FiguredBassIndication(fb_string)
+        # If a duration is provided, set length of the FigureBassIndication
+        if d:
+            fbi.quarterLength = d.quarterLength
+        # function in parent add add found objects.
+        #
+        self.parent.appendFbis(fbi, offsetFbi)
 
     def xmlDirection(self, mxDirection):
         '''
