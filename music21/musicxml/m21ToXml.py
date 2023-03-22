@@ -3392,13 +3392,14 @@ class MeasureExporter(XMLExporterBase):
         # seperately. O
         groupedObjList = []
         for els in objIterator:
+            print(els)
             if len(groupedObjList) > 0:
                 if len(els) == 1 and isinstance(els[0], harmony.FiguredBassIndication):
                     #print('**multiple fb found**')
                     groupedObjList[-1].append(els[0])
                     continue
             groupedObjList.append(els)
-
+        #print('üüü', groupedObjList)
         for objGroup in groupedObjList:
             groupOffset = m.elementOffset(objGroup[0])
             offsetToMoveForward = groupOffset - self.offsetInMeasure
@@ -3428,10 +3429,12 @@ class MeasureExporter(XMLExporterBase):
                     if hasSpannerAnchors:
                         self.parseOneElement(obj, AppendSpanners.NONE)
                     else:
-                        # ENTRY FOR FB
+                        # ENTRY FOR Figured Bass Indications
+                        print('object: ', obj)
                         self.parseOneElement(obj, AppendSpanners.NORMAL)
 
             for n in notesForLater:
+                print('notes:', n)
                 if n.isRest and n.style.hideObjectOnPrint and n.duration.type == 'inexpressible':
                     # Prefer a gap in stream, to be filled with a <forward> tag by
                     # fill_gap_with_forward_tag() rather than raising exceptions
@@ -3576,8 +3579,13 @@ class MeasureExporter(XMLExporterBase):
         # to add them later
         for o, f in self.parent.fbis.items():
             if o >= measureRange[0] and o < measureRange[1]:
+                print('figures: ', f, o)
                 for fbi in f:
+                    #if isinstance(fbi, harmony.FiguredBassIndication):
                     self.stream.insert(o - self.stream.offset, fbi)
+                    #elif isinstance(fbi, list):
+                    #    for i in fbi:
+                    #        self.stream.insert(o - self.stream.offset, i)
                     #print('FBI inserted:', fbi, fbi.offset)
 
     def _hasRelatedSpanners(self, obj) -> bool:
@@ -4642,11 +4650,13 @@ class MeasureExporter(XMLExporterBase):
         # Therefore we compare offset of the figure and the current offsetInMeasure variable
         # print('*f:', f.offset, self.offsetInMeasure)
         if f.offset > self.offsetInMeasure:
-            # Handle multiple figures or not
-            # print('more than one figure found', (f.offset - self.offsetInMeasure) * self.currentDivisions)
+            # Handle multiple figures or not# 
+            print('** more than one figure found', (f.offset - self.offsetInMeasure) * self.currentDivisions)
             multipleFigures = True
         else:
             multipleFigures = False
+            print('** stay:', (f.offset - self.offsetInMeasure) * self.currentDivisions)
+
 
         if isinstance(f, harmony.FiguredBassIndication):
             mxFB = self._figuresToXml(f, multipleFigures=multipleFigures)
@@ -4697,17 +4707,18 @@ class MeasureExporter(XMLExporterBase):
                 # Check whether the figured-bass tag before already has a <duration> tag.
                 # If not create one and set its value. Otherwise update the value
                 if fbDuration_before.find('duration') == None:
-                    #print('Create')
                     newDura = SubElement(fbDuration_before, 'duration')
                     newDura.text = str(dura)
                     #newDura.attrib['created'] = f'with {dura}'
                 else:
-                    #print('UPDATE')
-
                     #duraBefore = fbDuration_before.find('duration').text
-                    for d in fbDuration_before.findall('duration'):
-                        d.text = str(dura)
-                        #d.attrib['update'] = f'from {duraBefore}'
+                    
+                    # If dura is set to 0 skip. This happens e.g. at the beginning of a piece.
+                    # Otherwise an already set duration tag is resetted to 0
+                    if dura > 0:
+                        for d in fbDuration_before.findall('duration'):
+                            d.text = str(dura)
+                    #d.attrib['update'] = f'from {duraBefore}'
                 self.tempFigureDuration = dura
             else:
                 self.offsetFiguresInMeasure = 0.0
