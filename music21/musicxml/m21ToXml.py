@@ -3371,7 +3371,7 @@ class MeasureExporter(XMLExporterBase):
         # seperately. O
         groupedObjList = []
         for els in objIterator:
-            print(els)
+            #print(els)
             if len(groupedObjList) > 0:
                 if len(els) == 1 and isinstance(els[0], harmony.FiguredBassIndication):
                     #print('**multiple fb found**')
@@ -3406,11 +3406,9 @@ class MeasureExporter(XMLExporterBase):
                         self.parseOneElement(obj, AppendSpanners.NONE)
                     else:
                         # ENTRY FOR Figured Bass Indications
-                        print('object: ', obj)
                         self.parseOneElement(obj, AppendSpanners.NORMAL)
 
             for n in notesForLater:
-                print('notes:', n)
                 if n.isRest and n.style.hideObjectOnPrint and n.duration.type == 'inexpressible':
                     # Prefer a gap in stream, to be filled with a <forward> tag by
                     # fill_gap_with_forward_tag() rather than raising exceptions
@@ -3549,19 +3547,13 @@ class MeasureExporter(XMLExporterBase):
         # get the measure range to map the corresponding figuredBass Items
         measureRange = (self.stream.offset, self.stream.offset + self.stream.highestTime)
 
-        # look if there are figures in the current measure and insert them
-        # to add them later
+        # Look if there are figures in the current measure and insert them
+        # to add them later.
         for o, f in self.parent.fbis.items():
             if o >= measureRange[0] and o < measureRange[1]:
-                print('figures: ', f, o)
                 for fbi in f:
-                    #if isinstance(fbi, harmony.FiguredBassIndication):
                     self.stream.insert(o - self.stream.offset, fbi)
-                    #elif isinstance(fbi, list):
-                    #    for i in fbi:
-                    #        self.stream.insert(o - self.stream.offset, i)
-                    #print('FBI inserted:', fbi, fbi.offset)
-
+                
     def _hasRelatedSpanners(self, obj) -> bool:
         '''
         returns True if and only if:
@@ -4617,19 +4609,15 @@ class MeasureExporter(XMLExporterBase):
         # For FiguredBassElements we need to check whether there are
         # multiple figures for one note.
         # Therefore we compare offset of the figure and the current offsetInMeasure variable
-        # print('*f:', f.offset, self.offsetInMeasure)
         if f.offset > self.offsetInMeasure:
-            # Handle multiple figures or not# 
-            print('** more than one figure found', (f.offset - self.offsetInMeasure) * self.currentDivisions)
             multipleFigures = True
         else:
             multipleFigures = False
-            print('** stay:', (f.offset - self.offsetInMeasure) * self.currentDivisions)
 
-
-        if isinstance(f, harmony.FiguredBassIndication):
-            mxFB = self._figuresToXml(f, multipleFigures=multipleFigures)
+        # Hand the FiguredBassIndication over to the helper function.
+        mxFB = self._figuresToXml(f, multipleFigures=multipleFigures)
         
+        # Append it to xmlRoot
         self.xmlRoot.append(mxFB)
         self._fbiBefore = (f.offset, mxFB)
         #_synchronizeIds(mxFB, f)
@@ -4656,7 +4644,7 @@ class MeasureExporter(XMLExporterBase):
             else:
                 mxFNumber.text = ''
             
-            #modifiers are eother handled as prefixes or suffixes here
+            #modifiers are either handled as prefixes or suffixes here
             fbModifier = fig.modifierString
             if fbModifier:
                 mxModifier = SubElement(mxFigure, 'prefix')
@@ -4669,7 +4657,7 @@ class MeasureExporter(XMLExporterBase):
             if multipleFigures:
                 dura = round((f.offset - self.offsetInMeasure - self.offsetFiguresInMeasure) * self.currentDivisions)
                 self.offsetFiguresInMeasure = f.offset - self.offsetInMeasure
-                #print('Dura', fig, dura, self.offsetFiguresInMeasure)
+
                 # Update figures-bass tag before
                 fbDuration_before = self._fbiBefore[1]
 
@@ -4678,23 +4666,17 @@ class MeasureExporter(XMLExporterBase):
                 if fbDuration_before.find('duration') == None:
                     newDura = SubElement(fbDuration_before, 'duration')
                     newDura.text = str(dura)
-                    #newDura.attrib['created'] = f'with {dura}'
                 else:
-                    #duraBefore = fbDuration_before.find('duration').text
-                    
-                    # If dura is set to 0 skip. This happens e.g. at the beginning of a piece.
-                    # Otherwise an already set duration tag is resetted to 0
+                    # If dura is set to 0 skip the update process. 
+                    # This happens e.g. at the beginning of a piece.
+                    # Otherwise an already set duration tag is resetted to 0 which is not wanted.
                     if dura > 0:
                         for d in fbDuration_before.findall('duration'):
                             d.text = str(dura)
-                    #d.attrib['update'] = f'from {duraBefore}'
                 self.tempFigureDuration = dura
             else:
                 self.offsetFiguresInMeasure = 0.0
-                # dura is likely 0.
-            #    dura = round(f.quarterLength * self.currentDivisions)
-            #    print('Calc: ', dura)
-            # add <duration> to the figure itself if dura > 0
+                
             if self.tempFigureDuration > 0:
                 #print(f.quarterLength * self.currentDivisions)
                 mxFbDuration = SubElement(mxFB, 'duration')

@@ -926,8 +926,7 @@ class MusicXMLImporter(XMLParserBase):
                 s.coreInsert(0.0, part)
                 self.m21PartObjectsById[partId] = part
         for fbi in self.fbis:
-            print('Figure:', fbi[0], fbi[1], 'Stimmt\'s?')
-            # fbi.offset = 
+
             s.insert(fbi[0], fbi[1])
 
         self.partGroups()
@@ -5178,7 +5177,6 @@ class MeasureParser(XMLParserBase):
         sep = ','
         d: duration.Duration | None = None
         offsetFbi = self.offsetMeasureNote
-        #print('===')
 
         for figure in mxFiguredBass.findall('*'):
             for el in figure.findall('*'):
@@ -5193,31 +5191,18 @@ class MeasureParser(XMLParserBase):
             # If a <duration> is given, this usually means that there are multiple figures for a single note.
             # We have to look for offsets here.
             if figure.tag == 'duration':
-                #print(fb_strings)
-                #print('** Dauer:', self.lastFigureDuration)
                 d = self.xmlToDuration(mxFiguredBass)
-                #print('** D:', d)
                 if self.lastFigureDuration > 0:
                     offsetFbi = self.offsetMeasureNote + self.lastFigureDuration
                     self.lastFigureDuration += d.quarterLength
-                #    print('***lfd', self.lastFigureDuration, 'offsetFbi', offsetFbi)
                 else:
                     offsetFbi = self.offsetMeasureNote
                     self.lastFigureDuration = d.quarterLength
-                #    print('***lfd Ohne', self.lastFigureDuration, d.quarterLength, offsetFbi)
-            #else:
-            #    self.lastFigureDuration = 0
-        # If <duration> is not in the tag list set self.lastFigureDuration to 0.
-        # This missing duration in MuseScore3 XML usually means that the following figure is again at a note's offset.
-        #if mxFiguredBass.find('duration'):
-        #    print('reset')
-        #    self.lastFigureDuration = 0
-        #else:
-        #    print('H', mxFiguredBass.find('duration'))
+
 
         fb_string = sep.join(fb_strings)
-        #print(fb_string, 'Offset', offsetFbi, self.lastFigureDuration)
         fbi = harmony.FiguredBassIndication(fb_string)
+        # If a duration is provided, set length of the FigureBassIndication
         if d:
             fbi.quarterLength = d.quarterLength
         # function in parent add add found objects.
