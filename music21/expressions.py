@@ -36,6 +36,7 @@ from music21.common.numberTools import opFrac
 from music21.common.types import OffsetQL
 from music21 import exceptions21
 from music21 import interval
+from music21 import pitch
 from music21 import spanner
 from music21 import style
 
@@ -523,13 +524,43 @@ class GeneralMordent(Ornament):
     '''
     Base class for all Mordent types.
     '''
-    def __init__(self, **keywords):
+    def __init__(self, *, accid: pitch.Accidental | None = None, **keywords):
         super().__init__(**keywords)
-        self.direction = ''  # up or down
-        self.size = None  # interval.Interval (General, etc.) class
+        self._direction = ''  # up or down
+        self._accid: pitch.Accidental | None = accid
         self.quarterLength = 0.125  # 32nd note default
-        self.size = interval.GenericInterval(2)
         self.placement = 'above'
+
+    @property
+    def accid(self) -> pitch.Accidental | None:
+        return self._accid
+
+    @property
+    def direction(self) -> str:
+        return self._direction
+
+    def size(
+        self,
+        srcObj: 'music21.note.Note',
+    ) -> interval.IntervalBase:
+        if self.direction not in ('up', 'down'):
+            raise ExpressionException('Cannot compute mordent size if I do not know its direction')
+
+        srcOctave: int = srcObj.pitch.implicitOctave
+        otherPitch: pitch.Pitch
+        if self.direction == 'up':
+            otherPitch = pitch.Pitch(chr((ord(srcObj.pitch.step) + 1) % 7))
+            otherPitch.octave = srcOctave
+            if otherPitch.step == 'C':
+                otherPitch.octave = srcOctave + 1
+        else:
+            otherPitch = pitch.Pitch(chr((ord(srcObj.pitch.step) - 1) % 7))
+            otherPitch.octave = srcOctave
+            if otherPitch.step == 'B':
+                otherPitch.octave = srcOctave - 1
+
+        otherPitch.accidental = self.accid
+        return interval.Interval(srcObj.pitch, otherPitch)
 
     def realize(self, srcObj: 'music21.note.Note', *, inPlace=False):
         '''
@@ -558,10 +589,8 @@ class GeneralMordent(Ornament):
         '''
         from music21 import key
 
-        if self.direction not in ('up', 'down'):
+        if self._direction not in ('up', 'down'):
             raise ExpressionException('Cannot realize a mordent if I do not know its direction')
-        if self.size == '':
-            raise ExpressionException('Cannot realize a mordent if there is no size given')
         if srcObj.duration.quarterLength == 0:
             raise ExpressionException('Cannot steal time from an object with no duration')
 
@@ -572,10 +601,7 @@ class GeneralMordent(Ornament):
             use_ql = srcObj.duration.quarterLength / 4
 
         remainderQL = srcObj.duration.quarterLength - (2 * use_ql)
-        if self.direction == 'down':
-            transposeInterval = self.size.reverse()
-        else:
-            transposeInterval = self.size
+        transposeInterval = self.size(srcObj)
         mordNotes: list[note.Note] = []
         self.fillListOfRealizedNotes(srcObj, mordNotes, transposeInterval, useQL=use_ql)
 
@@ -583,8 +609,13 @@ class GeneralMordent(Ornament):
         if currentKeySig is None:
             currentKeySig = key.KeySignature(0)
 
-        for n in mordNotes:
-            n.pitch.accidental = currentKeySig.accidentalByStep(n.step)
+        # second (middle) note might need an accidental from the keysig (but
+        # only if it doesn't already have an accidental from accid)
+        for noteIdx, n in enumerate(mordNotes):
+            noteNum: int = noteIdx + 1
+            if n.pitch.accidental is None and noteNum == 2:
+                n.pitch.accidental = currentKeySig.accidentalByStep(n.pitch.step)
+
         inExpressions = -1
         if self in srcObj.expressions:
             inExpressions = srcObj.expressions.index(self)
@@ -619,9 +650,9 @@ class Mordent(GeneralMordent):
     * Changed in v7: Mordent sizes are GenericIntervals -- as was originally
       intended but programmed incorrectly.
     '''
-    def __init__(self, **keywords):
-        super().__init__(**keywords)
-        self.direction = 'down'  # up or down
+    def __init__(self, *, accid: pitch.Accidental | None = None, **keywords):
+        super().__init__(accid=accid, **keywords)
+        self._direction = 'down'  # up or down
 
 
 class HalfStepMordent(Mordent):
@@ -635,8 +666,14 @@ class HalfStepMordent(Mordent):
     <music21.interval.Interval m2>
     '''
     def __init__(self, **keywords):
+        # no accidental supported here, just "HalfStep"
+        if 'accid' in keywords:
+            del keywords['accid']
         super().__init__(**keywords)
-        self.size = interval.Interval('m2')
+        self._size = interval.Interval('m2')
+
+    def size(self, srcObj: note.Note) -> interval.IntervalBase:
+        return self._size
 
 
 class WholeStepMordent(Mordent):
@@ -650,8 +687,14 @@ class WholeStepMordent(Mordent):
     <music21.interval.Interval M2>
     '''
     def __init__(self, **keywords):
+        # no accidental supported here, just "WholeStep"
+        if 'accid' in keywords:
+            del keywords['accid']
         super().__init__(**keywords)
-        self.size = interval.Interval('M2')
+        self._size = interval.Interval('M2')
+
+    def size(self, srcObj: note.Note) -> interval.IntervalBase:
+        return self._size
 
 
 # ------------------------------------------------------------------------------
@@ -677,9 +720,9 @@ class InvertedMordent(GeneralMordent):
     * Changed in v7: InvertedMordent sizes are GenericIntervals -- as was originally
       intended but programmed incorrectly.
     '''
-    def __init__(self, **keywords):
-        super().__init__(**keywords)
-        self.direction = 'up'
+    def __init__(self, *, accid: pitch.Accidental | None = None, **keywords):
+        super().__init__(accid=accid, **keywords)
+        self._direction = 'up'
 
 
 class HalfStepInvertedMordent(InvertedMordent):
@@ -693,8 +736,14 @@ class HalfStepInvertedMordent(InvertedMordent):
     <music21.interval.Interval m2>
     '''
     def __init__(self, **keywords):
+        # no accidental supported here, just "HalfStep"
+        if 'accid' in keywords:
+            del keywords['accid']
         super().__init__(**keywords)
-        self.size = interval.Interval('m2')
+        self._size = interval.Interval('m2')
+
+    def size(self, srcObj: note.Note) -> interval.IntervalBase:
+        return self._size
 
 
 class WholeStepInvertedMordent(InvertedMordent):
@@ -708,8 +757,14 @@ class WholeStepInvertedMordent(InvertedMordent):
     <music21.interval.Interval M2>
     '''
     def __init__(self, **keywords):
+        # no accidental supported here, just "WholeStep"
+        if 'accid' in keywords:
+            del keywords['accid']
         super().__init__(**keywords)
-        self.size = interval.Interval('M2')
+        self._size = interval.Interval('M2')
+
+    def size(self, srcObj: note.Note) -> interval.IntervalBase:
+        return self._size
 
 
 # ------------------------------------------------------------------------------
@@ -740,15 +795,18 @@ class Trill(Ornament):
 
     * Changed in v7: the size should be a generic second.
     '''
-    def __init__(self, **keywords) -> None:
+    def __init__(self, *, accid: pitch.Accidental | None = None, **keywords) -> None:
         super().__init__(**keywords)
-        self.size: interval.IntervalBase = interval.GenericInterval(2)
-
+        self._accid: pitch.Accidental | None = accid
         self.placement = 'above'
         self.nachschlag = False  # play little notes at the end of the trill?
         self.tieAttach = 'all'
         self.quarterLength = 0.125
         self._setAccidentalFromKeySig = True
+
+    @property
+    def accid(self) -> pitch.Accidental | None:
+        return self._accid
 
     def splitClient(self, noteList):
         '''
@@ -771,6 +829,19 @@ class Trill(Ornament):
             returnSpanners.append(te)
 
         return returnSpanners
+
+    def size(
+        self,
+        srcObj: 'music21.note.Note',
+    ) -> interval.IntervalBase:
+        srcOctave: int = srcObj.pitch.implicitOctave
+        otherPitch: pitch.Pitch = pitch.Pitch(chr((ord(srcObj.pitch.step) + 1) % 7))
+        otherPitch.octave = srcOctave
+        if otherPitch.step == 'C':
+            otherPitch.octave = srcOctave + 1
+        otherPitch.accidental = self.accid
+
+        return interval.Interval(srcObj.pitch, otherPitch)
 
     def realize(
         self,
@@ -888,8 +959,8 @@ class Trill(Ornament):
                 raise ExpressionException('The note is not long enough for a nachschlag')
             useQL = srcObj.duration.quarterLength / 4
 
-        transposeInterval = self.size
-        transposeIntervalReverse = self.size.reverse()
+        transposeInterval = self.size(srcObj)
+        transposeIntervalReverse = transposeInterval.reverse()
 
         numberOfTrillNotes = int(srcObj.duration.quarterLength / useQL)
         if self.nachschlag:
@@ -909,7 +980,9 @@ class Trill(Ornament):
             for n in trillNotes:
                 if n.pitch.nameWithOctave != srcObj.pitch.nameWithOctave:
                     # do not correct original note, no matter what.
-                    n.pitch.accidental = currentKeySig.accidentalByStep(n.step)
+                    if n.pitch.accidental is None:
+                        # only correct if there isn't already an accidental (from accid)
+                        n.pitch.accidental = currentKeySig.accidentalByStep(n.step)
 
         if inPlace and self in srcObj.expressions:
             srcObj.expressions.remove(self)
@@ -962,9 +1035,15 @@ class HalfStepTrill(Trill):
       <music21.note.Note C>], None, [])
     '''
     def __init__(self, **keywords):
+        # no accidental supported here, just "HalfStep"
+        if 'accid' in keywords:
+            del keywords['accid']
         super().__init__(**keywords)
-        self.size = interval.Interval('m2')
+        self._size = interval.Interval('m2')
         self._setAccidentalFromKeySig = False
+
+    def size(self, srcObj: note.Note) -> interval.IntervalBase:
+        return self._size
 
 
 class WholeStepTrill(Trill):
@@ -990,9 +1069,15 @@ class WholeStepTrill(Trill):
       <music21.note.Note C#>], None, [])
     '''
     def __init__(self, **keywords):
+        # no accidental supported here, just "WholeStep"
+        if 'accid' in keywords:
+            del keywords['accid']
         super().__init__(**keywords)
-        self.size = interval.Interval('M2')
+        self._size = interval.Interval('M2')
         self._setAccidentalFromKeySig = False
+
+    def size(self, srcObj: note.Note) -> interval.IntervalBase:
+        return self._size
 
 
 class Shake(Trill):
@@ -1032,14 +1117,32 @@ class Turn(Ornament):
     * Changed in v7: size is a Generic second.  removed unused nachschlag component.
     * Changed in v9: Added support for delayed vs non-delayed Turn.
     '''
-    def __init__(self, *, delay: OrnamentDelay | OffsetQL = OrnamentDelay.NO_DELAY, **keywords):
+    def __init__(
+        self,
+        *,
+        delay: OrnamentDelay | OffsetQL = OrnamentDelay.NO_DELAY,
+        upperAccid: pitch.Accidental | None = None,
+        lowerAccid: pitch.Accidental | None = None,
+        **keywords
+    ):
         super().__init__(**keywords)
-        self.size: interval.IntervalBase = interval.GenericInterval(2)
+        # self.size: interval.IntervalBase = interval.GenericInterval(2)
+        self._upperAccid: pitch.Accidental | None = upperAccid
+        self._lowerAccid: pitch.Accidental | None = lowerAccid
+        self.isInverted: bool = False
         self.placement: str = 'above'
         self.tieAttach: str = 'all'
         self.quarterLength: OffsetQL = 0.25
         self._delay: OrnamentDelay | OffsetQL = 0.0
         self.delay = delay  # use property setter
+
+    @property
+    def upperAccid(self) -> pitch.Accidental | None:
+        return self._upperAccid
+
+    @property
+    def lowerAccid(self) -> pitch.Accidental | None:
+        return self._lowerAccid
 
     @property
     def delay(self) -> OrnamentDelay | OffsetQL:
@@ -1090,6 +1193,32 @@ class Turn(Ornament):
         elif isinstance(self.delay, (float, Fraction)):
             return f'delayed(delayQL={self.delay}) ' + superName
         return superName
+
+    def upperSize(
+        self,
+        srcObj: 'music21.note.Note',
+    ) -> interval.IntervalBase:
+        srcOctave: int = srcObj.pitch.implicitOctave
+        upperPitch: pitch.Pitch = pitch.Pitch(chr((ord(srcObj.pitch.step) + 1) % 7))
+        upperPitch.octave = srcOctave
+        if upperPitch.step == 'C':
+            upperPitch.octave = srcOctave + 1
+        upperPitch.accidental = self.upperAccid
+
+        return interval.Interval(srcObj.pitch, upperPitch)
+
+    def lowerSize(
+        self,
+        srcObj: 'music21.note.Note'
+    ) -> interval.IntervalBase:
+        srcOctave: int = srcObj.pitch.implicitOctave
+        lowerPitch: pitch.Pitch = pitch.Pitch(chr((ord(srcObj.pitch.step) - 1) & 7))
+        lowerPitch.octave = srcOctave
+        if lowerPitch.step == 'B':
+            lowerPitch.octave = srcOctave - 1
+        lowerPitch.accidental = self.lowerAccid
+
+        return interval.Interval(srcObj.pitch, lowerPitch)
 
     def realize(self, srcObj: 'music21.note.Note', *, inPlace=False):
         # noinspection PyShadowingNames
@@ -1191,10 +1320,10 @@ class Turn(Ornament):
         '''
         from music21 import key
         useQL = self.quarterLength
-        if self.size is None:
-            raise ExpressionException('Cannot realize a turn if there is no size given')
         if srcObj.duration.quarterLength == 0:
             raise ExpressionException('Cannot steal time from an object with no duration')
+
+        # here we compute size, and invert it if self.isInverted
 
         remainderDuration: OffsetQL
         if self.delay == OrnamentDelay.NO_DELAY:
@@ -1220,15 +1349,19 @@ class Turn(Ornament):
             useQL = self.quarterLength
             fourthNoteQL = opFrac(turnDuration - (3 * useQL))
 
-        transposeIntervalUp = self.size
-        transposeIntervalDown = self.size.reverse()
+        if not self.isInverted:
+            firstTransposeInterval = self.upperSize(srcObj)
+            secondTransposeInterval = self.lowerSize(srcObj)
+        else:
+            firstTransposeInterval = self.lowerSize(srcObj)
+            secondTransposeInterval = self.upperSize(srcObj)
 
         turnNotes: list[note.Note] = []
 
         firstNote = copy.deepcopy(srcObj)
         firstNote.expressions = []
         firstNote.duration.quarterLength = useQL
-        firstNote.transpose(transposeIntervalUp, inPlace=True)
+        firstNote.transpose(firstTransposeInterval, inPlace=True)
 
         secondNote = copy.deepcopy(srcObj)
         secondNote.expressions = []
@@ -1237,7 +1370,7 @@ class Turn(Ornament):
         thirdNote = copy.deepcopy(srcObj)
         thirdNote.expressions = []
         thirdNote.duration.quarterLength = useQL
-        thirdNote.transpose(transposeIntervalDown, inPlace=True)
+        thirdNote.transpose(secondTransposeInterval, inPlace=True)
 
         fourthNote = copy.deepcopy(srcObj)
         fourthNote.expressions = []
@@ -1255,9 +1388,12 @@ class Turn(Ornament):
         if currentKeySig is None:
             currentKeySig = key.KeySignature(0)
 
-        for n in turnNotes:
-            # TODO: like in trill, do not affect original note.
-            n.pitch.accidental = currentKeySig.accidentalByStep(n.pitch.step)
+        # first note and third note might need an accidental from the keysig (but
+        # only if they don't already have an accidental from upperAccid/lowerAccid)
+        for noteIdx, n in enumerate(turnNotes):
+            noteNum: int = noteIdx + 1
+            if n.pitch.accidental is None and noteNum in (1, 3):
+                n.pitch.accidental = currentKeySig.accidentalByStep(n.pitch.step)
 
         inExpressions = -1
         if self in srcObj.expressions:
@@ -1278,9 +1414,16 @@ class Turn(Ornament):
 
 
 class InvertedTurn(Turn):
-    def __init__(self, *, delay: OrnamentDelay | OffsetQL = OrnamentDelay.NO_DELAY, **keywords):
-        super().__init__(delay=delay, **keywords)
-        self.size = self.size.reverse()
+    def __init__(
+        self,
+        *,
+        delay: OrnamentDelay | OffsetQL = OrnamentDelay.NO_DELAY,
+        upperAccid: pitch.Accidental | None = None,
+        lowerAccid: pitch.Accidental | None = None,
+        **keywords
+    ):
+        super().__init__(delay=delay, upperAccid=upperAccid, lowerAccid=lowerAccid, **keywords)
+        self.isInverted = True
 
 
 # ------------------------------------------------------------------------------
