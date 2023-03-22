@@ -54,6 +54,7 @@ from music21 import tablature
 from music21 import tempo
 from music21 import text  # for text boxes
 from music21 import tie
+from music21.figuredBass.notation import modifiersDictXmlToM21
 
 from music21.musicxml import xmlObjects
 from music21.musicxml.xmlObjects import MusicXMLImportException, MusicXMLWarning
@@ -5181,8 +5182,20 @@ class MeasureParser(XMLParserBase):
         for figure in mxFiguredBass.findall('*'):
             for el in figure.findall('*'):
                 #print('  ', el)
+                fb_number: str = ''
+                fb_prefix: str = ''
                 if el.tag == 'figure-number':
-                    fb_strings.append(el.text)
+                    if el.text:
+                        fb_number = el.text
+                    if figure.findall('prefix'):
+                        for prefix in figure.findall('prefix'):
+                            
+                            if prefix.text:
+                                fb_prefix = modifiersDictXmlToM21[prefix.text]
+                    # put prefix and number together
+                    if fb_prefix + fb_number != '':
+                        fb_strings.append(fb_prefix + fb_number)
+
                 if el.tag == 'extend':
                     if 'type' in el.attrib.keys():
                         if el.attrib['type'] == 'continue':
@@ -5199,7 +5212,7 @@ class MeasureParser(XMLParserBase):
                     offsetFbi = self.offsetMeasureNote
                     self.lastFigureDuration = d.quarterLength
 
-
+        #print('ü', fb_strings)
         fb_string = sep.join(fb_strings)
         fbi = harmony.FiguredBassIndication(fb_string)
         # If a duration is provided, set length of the FigureBassIndication
