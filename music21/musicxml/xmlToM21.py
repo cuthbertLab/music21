@@ -926,9 +926,10 @@ class MusicXMLImporter(XMLParserBase):
             if part is not None:  # for instance, in partStreams
                 s.coreInsert(0.0, part)
                 self.m21PartObjectsById[partId] = part
-        for fbi in self.fbis:
-
-            s.insert(fbi[0], fbi[1])
+        
+        if self.fbis:
+            for fbi in self.fbis:
+                s.insert(fbi[0], fbi[1])
 
         self.partGroups()
 
@@ -5276,6 +5277,7 @@ class MeasureParser(XMLParserBase):
         offsetFbi = self.offsetMeasureNote
 
         for figure in mxFiguredBass.findall('*'):
+            # TODO: suffixes are ignored at the moment
             for el in figure.findall('*'):
                 #print('  ', el)
                 fb_number: str = ''
