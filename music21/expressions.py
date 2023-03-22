@@ -567,18 +567,13 @@ class GeneralMordent(Ornament):
         if srcObj is None:
             raise ExpressionException('Cannot compute mordent size without a srcObj')
 
-        srcOctave: int = srcObj.pitch.implicitOctave
-        otherPitch: pitch.Pitch
+        otherPitch: pitch.Pitch = copy.deepcopy(srcObj.pitch)
+        otherPitch.accidental = None
+
         if self.direction == 'up':
-            otherPitch = pitch.Pitch(chr((ord(srcObj.pitch.step) + 1) % 7))
-            otherPitch.octave = srcOctave
-            if otherPitch.step == 'C':
-                otherPitch.octave = srcOctave + 1
+            otherPitch.transpose(interval.GenericInterval(2), inPlace=True)
         else:
-            otherPitch = pitch.Pitch(chr((ord(srcObj.pitch.step) - 1) % 7))
-            otherPitch.octave = srcOctave
-            if otherPitch.step == 'B':
-                otherPitch.octave = srcOctave - 1
+            otherPitch.transpose(interval.GenericInterval(-2), inPlace=True)
 
         otherPitch.accidental = self.accid
         return interval.Interval(srcObj.pitch, otherPitch)
@@ -662,14 +657,30 @@ class Mordent(GeneralMordent):
         with the note immediately below it.
 
 
+    A mordent has the size of a second, of some form, depending on the note
+    that will have the mordent, the current key signature in that note's context, as
+    well as any accidental on the mordent itself.
+
     >>> m = expressions.Mordent()
     >>> m.direction
     'down'
-    >>> m.size
-    <music21.interval.GenericInterval 2>
+    >>> m.getSize(note.Note('C4'))
+    <music21.interval.Interval m-2>
+    >>> m.getSize(note.Note('B3'))
+    <music21.interval.Interval M-2>
+
+    >>> mFlat = expressions.Mordent(accid=pitch.Accidental('-'))
+    >>> mFlat.direction
+    'down'
+    >>> mFlat.getSize(note.Note('C4'))
+    <music21.interval.Interval M-2>
+    >>> mFlat.getSize(note.Note('B3'))
+    <music21.interval.Interval A-2>
 
     * Changed in v7: Mordent sizes are GenericIntervals -- as was originally
       intended but programmed incorrectly.
+    * Changed in v9: Support for mordents with accidentals, which implies support for
+      various sizes, depending on srcObj (note), current key sig, and mordent accidental.
     '''
     def __init__(self, *, accid: pitch.Accidental | None = None, **keywords):
         super().__init__(accid=accid, **keywords)
@@ -746,16 +757,30 @@ class InvertedMordent(GeneralMordent):
         An 18th-century ornament involving alternation of the
         written note with the note immediately above it.
 
-    An inverted mordent has the size of a generic second, of some form.
+    An inverted mordent has the size of a second, of some form, depending on the note
+    that will have the mordent, the current key signature in that note's context, as
+    well as any accidental on the mordent itself.
 
     >>> m = expressions.InvertedMordent()
     >>> m.direction
     'up'
-    >>> m.size
-    <music21.interval.GenericInterval 2>
+    >>> m.getSize(note.Note('C4'))
+    <music21.interval.Interval M2>
+    >>> m.getSize(note.Note('B3'))
+    <music21.interval.Interval m2>
+
+    >>> mSharp = expressions.InvertedMordent(accid=pitch.Accidental('#'))
+    >>> mSharp.direction
+    'up'
+    >>> mSharp.getSize(note.Note('C4'))
+    <music21.interval.Interval A2>
+    >>> mSharp.getSize(note.Note('B3'))
+    <music21.interval.Interval M2>
 
     * Changed in v7: InvertedMordent sizes are GenericIntervals -- as was originally
       intended but programmed incorrectly.
+    * Changed in v9: Support for inverted mordents with accidentals, which implies support for
+      various sizes, depending on srcObj (note), current key sig, and inverted mordent accidental.
     '''
     def __init__(self, *, accid: pitch.Accidental | None = None, **keywords):
         super().__init__(accid=accid, **keywords)
@@ -828,8 +853,10 @@ class Trill(Ornament):
     >>> tr = expressions.Trill()
     >>> tr.placement
     'above'
-    >>> tr.size
-    <music21.interval.GenericInterval 2>
+    >>> tr.getSize(note.Note('C4'))
+    <music21.interval.Interval M2>
+    >>> tr.getSize(note.Note('B4'))
+    <music21.interval.Interval m2>
 
     Trills have a `.nachschlag` attribute which determines whether there
     should be extra gracenotes at the end of the trill.
@@ -847,6 +874,8 @@ class Trill(Ornament):
     True
 
     * Changed in v7: the size should be a generic second.
+    * Changed in v9: Support for trills with accidentals, which implies support for
+      various sizes, depending on srcObj (note), current key sig, and trill accidental.
     '''
     def __init__(self, *, accid: pitch.Accidental | None = None, **keywords) -> None:
         super().__init__(**keywords)
@@ -906,11 +935,10 @@ class Trill(Ornament):
         if self._size is not None:
             return self._size
 
-        srcOctave: int = srcObj.pitch.implicitOctave
-        otherPitch: pitch.Pitch = pitch.Pitch(chr((ord(srcObj.pitch.step) + 1) % 7))
-        otherPitch.octave = srcOctave
-        if otherPitch.step == 'C':
-            otherPitch.octave = srcOctave + 1
+        otherPitch: pitch.Pitch = copy.deepcopy(srcObj.pitch)
+        otherPitch.accidental = None
+
+        otherPitch.transpose(interval.GenericInterval(2), inPlace=True)
         otherPitch.accidental = self.accid
 
         return interval.Interval(srcObj.pitch, otherPitch)
@@ -1286,11 +1314,10 @@ class Turn(Ornament):
         self,
         srcObj: note.Note,
     ) -> interval.IntervalBase:
-        srcOctave: int = srcObj.pitch.implicitOctave
-        upperPitch: pitch.Pitch = pitch.Pitch(chr((ord(srcObj.pitch.step) + 1) % 7))
-        upperPitch.octave = srcOctave
-        if upperPitch.step == 'C':
-            upperPitch.octave = srcOctave + 1
+        upperPitch: pitch.Pitch = copy.deepcopy(srcObj.pitch)
+        upperPitch.accidental = None
+
+        upperPitch.transpose(interval.GenericInterval(2), inPlace=True)
         upperPitch.accidental = self.upperAccid
 
         return interval.Interval(srcObj.pitch, upperPitch)
@@ -1299,11 +1326,10 @@ class Turn(Ornament):
         self,
         srcObj: note.Note
     ) -> interval.IntervalBase:
-        srcOctave: int = srcObj.pitch.implicitOctave
-        lowerPitch: pitch.Pitch = pitch.Pitch(chr((ord(srcObj.pitch.step) - 1) & 7))
-        lowerPitch.octave = srcOctave
-        if lowerPitch.step == 'B':
-            lowerPitch.octave = srcOctave - 1
+        lowerPitch: pitch.Pitch = copy.deepcopy(srcObj.pitch)
+        lowerPitch.accidental = None
+
+        lowerPitch.transpose(interval.GenericInterval(-2), inPlace=True)
         lowerPitch.accidental = self.lowerAccid
 
         return interval.Interval(srcObj.pitch, lowerPitch)
