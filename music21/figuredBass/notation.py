@@ -36,6 +36,7 @@ suffixes = ["\\"]
 modifiersDictXmlToM21 = {
                     "sharp": "#",
                     "flat": "b",
+                    "natural": "\u266e",
                     "double-sharp": "##",
                     "flat-flat": "bb",
                     "backslash": "\\"
