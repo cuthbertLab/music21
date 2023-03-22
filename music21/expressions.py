@@ -566,6 +566,8 @@ class GeneralMordent(Ornament):
             raise ExpressionException('Cannot compute mordent size if I do not know its direction')
         if srcObj is None:
             raise ExpressionException('Cannot compute mordent size without a srcObj')
+        if not hasattr(srcObj, 'pitch'):
+            raise TypeError('Cannot compute mordent size with Unpitched srcObj')
 
         otherPitch: pitch.Pitch = copy.deepcopy(srcObj.pitch)
         otherPitch.accidental = None
@@ -609,6 +611,8 @@ class GeneralMordent(Ornament):
             raise ExpressionException('Cannot realize a mordent if I do not know its direction')
         if srcObj.duration.quarterLength == 0:
             raise ExpressionException('Cannot steal time from an object with no duration')
+        if not hasattr(srcObj, 'pitch'):
+            raise TypeError('Cannot realize a mordent with an Unpitched srcObj')
 
         use_ql = self.quarterLength
         if srcObj.duration.quarterLength <= self.quarterLength * 2:
@@ -695,14 +699,14 @@ class HalfStepMordent(Mordent):
     >>> m.direction
     'down'
     >>> m.size
-    <music21.interval.Interval m2>
+    <music21.interval.Interval m-2>
     '''
     def __init__(self, **keywords) -> None:
         # no accidental supported here, just "HalfStep"
         if 'accid' in keywords:
             del keywords['accid']
         super().__init__(**keywords)
-        self._size: interval.IntervalBase = interval.Interval('m2')
+        self._size: interval.IntervalBase = interval.Interval('m-2')
 
     def getSize(self, srcObj: note.Note | None) -> interval.IntervalBase:
         return self._size
@@ -724,14 +728,14 @@ class WholeStepMordent(Mordent):
     >>> m.direction
     'down'
     >>> m.size
-    <music21.interval.Interval M2>
+    <music21.interval.Interval M-2>
     '''
     def __init__(self, **keywords) -> None:
         # no accidental supported here, just "WholeStep"
         if 'accid' in keywords:
             del keywords['accid']
         super().__init__(**keywords)
-        self._size: interval.IntervalBase = interval.Interval('M2')
+        self._size: interval.IntervalBase = interval.Interval('M-2')
 
     def getSize(self, srcObj: note.Note | None) -> interval.IntervalBase:
         return self._size
@@ -935,6 +939,9 @@ class Trill(Ornament):
         if self._size is not None:
             return self._size
 
+        if not hasattr(srcObj, 'pitch'):
+            raise TypeError('Cannot compute trill size with Unpitched srcObj')
+
         otherPitch: pitch.Pitch = copy.deepcopy(srcObj.pitch)
         otherPitch.accidental = None
 
@@ -1046,6 +1053,9 @@ class Trill(Ornament):
         inPlace is not used for Trills.
         '''
         from music21 import key
+
+        if not hasattr(srcObj, 'pitch'):
+            raise TypeError('Cannot realize trill with Unpitched srcObj')
 
         useQL = self.quarterLength
         if srcObj.duration.quarterLength == 0:
@@ -1314,6 +1324,9 @@ class Turn(Ornament):
         self,
         srcObj: note.Note,
     ) -> interval.IntervalBase:
+        if not hasattr(srcObj, 'pitch'):
+            raise TypeError('Cannot compute turn upper size with Unpitched srcObj')
+
         upperPitch: pitch.Pitch = copy.deepcopy(srcObj.pitch)
         upperPitch.accidental = None
 
@@ -1326,6 +1339,9 @@ class Turn(Ornament):
         self,
         srcObj: note.Note
     ) -> interval.IntervalBase:
+        if not hasattr(srcObj, 'pitch'):
+            raise TypeError('Cannot compute turn upper size with Unpitched srcObj')
+
         lowerPitch: pitch.Pitch = copy.deepcopy(srcObj.pitch)
         lowerPitch.accidental = None
 
@@ -1433,6 +1449,10 @@ class Turn(Ornament):
         music21.expressions.ExpressionException: The note is not long enough to realize a turn
         '''
         from music21 import key
+
+        if not hasattr(srcObj, 'pitch'):
+            raise TypeError('Cannot realize turn with Unpitched srcObj')
+
         useQL = self.quarterLength
         if srcObj.duration.quarterLength == 0:
             raise ExpressionException('Cannot steal time from an object with no duration')
