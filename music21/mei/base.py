@@ -1197,7 +1197,9 @@ def addSlurs(elem, obj, slurBundle):
     addedSlur = False
 
     def wrapGetByIdLocal(theId):
-        "Avoid crashing when getByIdLocl() doesn't find the slur"
+        '''
+        Avoid crashing when getByIdLocl() doesn't find the slur
+        '''
         try:
             slurBundle.getByIdLocal(theId)[0].addSpannedElements(obj)
             return True
@@ -1564,7 +1566,6 @@ def scoreDefFromElement(elem, slurBundle=None):  # pylint: disable=unused-argume
     ...     </staffGrp>
     ... </scoreDef>
     ... """
-    >>> from music21 import *
     >>> from xml.etree import ElementTree as ET
     >>> scoreDef = ET.fromstring(meiDoc)
     >>> result = mei.base.scoreDefFromElement(scoreDef)
@@ -1808,8 +1809,7 @@ def staffDefFromElement(elem, slurBundle=None):  # pylint: disable=unused-argume
     - MEI.shared: clefGrp keySig label layerDef
     '''
     # mapping from tag name to our converter function
-    tagToFunction = {f'{MEI_NS}clef': clefFromElement, 
-                    f'{MEI_NS}meterSig': meterSigFromElement}
+    tagToFunction = {f'{MEI_NS}clef': clefFromElement}
 
     # first make the Instrument
     post = elem.find(f'{MEI_NS}instrDef')
@@ -1860,20 +1860,6 @@ def staffDefFromElement(elem, slurBundle=None):  # pylint: disable=unused-argume
 
     return post
 
-def meterSigFromElement(elem, slurBundle=None) -> meter.TimeSignature:
-    '''<meterSig> Container for information on meter and TimeSignature.
-
-    In MEI 4: (MEI.cmn module)
-
-    :returns: A meter.TimeSignature that is created from the @count und @unit attributes.
-    
-    If a xml:id is set it is provided.
-    '''
-
-    ts = meter.TimeSignature(f"{elem.get('count')!s}/{elem.get('unit')!s}")
-    if elem.get('xml:id') is not None:
-        ts.id = elem.get('xml:id')
-    return ts
 
 def dotFromElement(elem, slurBundle=None):  # pylint: disable=unused-argument
     '''
@@ -2210,7 +2196,7 @@ def noteFromElement(elem, slurBundle=None):
                      f'{MEI_NS}artic': articFromElement,
                      f'{MEI_NS}accid': accidFromElement,
                      f'{MEI_NS}syl': sylFromElement}
-    
+
     # start with a Note with Pitch
     theNote = _accidentalFromAttr(elem.get('accid'))
     theNote = safePitch(elem.get('pname', ''), theNote, elem.get('oct', ''))
