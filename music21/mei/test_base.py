@@ -212,7 +212,7 @@ class Test(unittest.TestCase):
             staffDefs[i].get = mock.MagicMock(return_value=str(i + 1))
         elem = mock.MagicMock(spec_set=ETree.Element)
         elem.findall = mock.MagicMock(return_value=staffDefs)
-        expected = list('1234fb')
+        expected = ['1', '2', '3', '4', 'fb']
         actual = base.allPartsPresent(elem)
         self.assertSequenceEqual(expected, actual)
 
@@ -225,7 +225,7 @@ class Test(unittest.TestCase):
             staffDefs[i].get = mock.MagicMock(return_value=str((i % 4) + 1))
         elem = mock.MagicMock(spec_set=ETree.Element)
         elem.findall = mock.MagicMock(return_value=staffDefs)
-        expected = list('1234fb')
+        expected = ['1', '2', '3', '4', 'fb']
         actual = base.allPartsPresent(elem)
         self.assertSequenceEqual(expected, actual)
 
