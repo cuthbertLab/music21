@@ -3572,7 +3572,6 @@ def scoreFromElement(elem, slurBundle):
         allPartNs = allPartNs[0:-1]
     
     theScore = [stream.Part() for _ in range(len(allPartNs))]
-
     for i, eachN in enumerate(allPartNs):
         # set "atSoundingPitch" so transposition works
         theScore[i].atSoundingPitch = False
