@@ -3541,8 +3541,9 @@ class MeasureExporter(XMLExporterBase):
         Adds relevant figured bass elements collected from the stream.Score to the
         current stream.Measure object parsed afterwards.
         
-        In a MusicXML file <figured-bass> tags usually stand before the corresponding note object.
-        This order will be observed by parseFlatElements() function. Same for multiple figures at one note.
+        In a MusicXML file <figured-bass> tags usually stand before the corresponding
+        note object. This order will be observed by parseFlatElements() function. 
+        Same for multiple figures at one note.
         '''
         # get the measure range to map the corresponding figuredBass Items
         measureRange = (self.stream.offset, self.stream.offset + self.stream.highestTime)
@@ -4623,7 +4624,7 @@ class MeasureExporter(XMLExporterBase):
         #_synchronizeIds(mxFB, f)
         return mxFB
     
-    def _figuresToXml(self, f: harmony.FiguredBassIndication, multipleFigures=False, figureCnt=1, noteIndexInChord=0, chordParent=None):
+    def _figuresToXml(self, f: harmony.FiguredBassIndication, multipleFigures=False):
         #do Figure elements
         #self.addDividerComment('BEGIN: figured-bass')
 
@@ -4663,7 +4664,7 @@ class MeasureExporter(XMLExporterBase):
 
                 # Check whether the figured-bass tag before already has a <duration> tag.
                 # If not create one and set its value. Otherwise update the value
-                if fbDuration_before.find('duration') == None:
+                if fbDuration_before.find('duration') is None:
                     newDura = SubElement(fbDuration_before, 'duration')
                     newDura.text = str(dura)
                 else:

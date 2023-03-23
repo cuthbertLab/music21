@@ -1,18 +1,18 @@
 # -*- coding: utf-8 -*-
 # -----------------------------------------------------------------------------
 # Name:         mei/base.py
-# Purpose:      Public methods for the MEI module
+# Purpose:      Public interfaces for the MEI module
 #
 # Authors:      Christopher Antila
 #
-# Copyright:    Copyright © 2014 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2014 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # -----------------------------------------------------------------------------
 '''
-These are the public methods for the MEI module by Christopher Antila
+These are the public interfaces for the MEI module by Christopher Antila
 
 To convert a string with MEI markup into music21 objects,
-use :meth:`MeiToM21Converter.convertFromString`.
+use :meth:`~music21.mei.MeiToM21Converter.convertFromString`.
 
 In the future, most of the functions in this module should be moved to a separate, import-only
 module, so that functions for writing music21-to-MEI will fit nicely.
@@ -54,7 +54,6 @@ document.
 ...     </music>
 ... </mei>
 ... """
->>> from music21 import *
 >>> conv = mei.MeiToM21Converter(meiString)
 >>> result = conv.run()
 >>> result
@@ -171,16 +170,16 @@ tool.
 * <pb>: a page break
 * <lb>: a line break
 * <sb>: a system break
-
 '''
-# pylint: disable=misplaced-comparison-constant
-from typing import Optional, Union, List, Tuple
-from xml.etree import ElementTree as ETree
-from xml.etree.ElementTree import Element
+
+from __future__ import annotations
 
 from collections import defaultdict
-from fractions import Fraction  # for typing
+from copy import deepcopy
+import typing as t
 from uuid import uuid4
+from xml.etree.ElementTree import Element, ParseError, fromstring, ElementTree
+
 
 # music21
 from music21 import articulations
@@ -202,8 +201,11 @@ from music21 import spanner
 from music21 import tie
 from music21 import harmony
 
-_MOD = 'mei.base'
-environLocal = environment.Environment(_MOD)
+
+if t.TYPE_CHECKING:
+    from fractions import Fraction
+
+environLocal = environment.Environment('mei.base')
 
 
 # Module-Level Constants
@@ -226,22 +228,30 @@ _IGNORE_UNPROCESSED = (
 # Exceptions
 # -----------------------------------------------------------------------------
 class MeiValidityError(exceptions21.Music21Exception):
-    'When there is an otherwise-unspecified validity error that prevents parsing.'
+    '''
+    When there is an otherwise-unspecified validity error that prevents parsing.
+    '''
     pass
 
 
 class MeiValueError(exceptions21.Music21Exception):
-    'When an attribute has an invalid value.'
+    '''
+    When an attribute has an invalid value.
+    '''
     pass
 
 
 class MeiAttributeError(exceptions21.Music21Exception):
-    'When an element has an invalid attribute.'
+    '''
+    When an element has an invalid attribute.
+    '''
     pass
 
 
 class MeiElementError(exceptions21.Music21Exception):
-    'When an element itself is invalid.'
+    '''
+    When an element itself is invalid.
+    '''
     pass
 
 
@@ -290,14 +300,14 @@ class MeiToM21Converter:
             self.documentRoot = Element(f'{MEI_NS}mei')
         else:
             try:
-                self.documentRoot = ETree.fromstring(theDocument)
-            except ETree.ParseError as parseErr:
+                self.documentRoot = fromstring(theDocument)
+            except ParseError as parseErr:
                 environLocal.printDebug(
                     '\n\nERROR: Parsing the MEI document with ElementTree failed.')
                 environLocal.printDebug(f'We got the following error:\n{parseErr}')
                 raise MeiValidityError(_INVALID_XML_DOC)
 
-            if isinstance(self.documentRoot, ETree.ElementTree):
+            if isinstance(self.documentRoot, ElementTree):
                 # pylint warns that :class:`Element` doesn't have a getroot() method, which is
                 # true enough, but...
                 self.documentRoot = self.documentRoot.getroot()  # pylint: disable=maybe-no-member
@@ -344,8 +354,8 @@ class MeiToM21Converter:
 # -----------------------------------------------------------------------------
 def safePitch(
     name: str,
-    accidental: Optional[str] = None,
-    octave: Union[str, int] = ''
+    accidental: str | None = None,
+    octave: str | int = ''
 ) -> pitch.Pitch:
     '''
     Safely build a :class:`~music21.pitch.Pitch` from a string.
@@ -355,7 +365,9 @@ def safePitch(
     function instead returns a default :class:`~music21.pitch.Pitch` instance.
 
     name: Desired name of the :class:`~music21.pitch.Pitch`.
+
     accidental: (Optional) Symbol for the accidental.
+
     octave: (Optional) Octave number.
 
     Returns A :class:`~music21.pitch.Pitch` with the appropriate properties.
@@ -365,19 +377,25 @@ def safePitch(
     <music21.pitch.Pitch D#6>
     >>> safePitch('D', '#', '6')
     <music21.pitch.Pitch D#6>
+    >>> safePitch('D', '#')
+    <music21.pitch.Pitch D#>
     '''
     if not name:
         return pitch.Pitch()
-    elif accidental is None:
-        return pitch.Pitch(name + octave)
+    if octave and accidental is not None:
+        return pitch.Pitch(name, octave=int(octave), accidental=accidental)
+    if octave:
+        return pitch.Pitch(name, octave=int(octave))
+    if accidental is not None:
+        return pitch.Pitch(name, accidental=accidental)
     else:
-        return pitch.Pitch(name, accidental=accidental, octave=int(octave))
+        return pitch.Pitch(name)
 
 
 def makeDuration(
-    base: Union[float, int, Fraction] = 0.0,
+    base: float | int | Fraction = 0.0,
     dots: int = 0
-) -> 'music21.duration.Duration':
+) -> duration.Duration:
     '''
     Given a ``base`` duration and a number of ``dots``, create a :class:`~music21.duration.Duration`
     instance with the
@@ -387,7 +405,6 @@ def makeDuration(
 
     **Examples**
 
-    >>> from music21 import *
     >>> from fractions import Fraction
     >>> mei.base.makeDuration(base=2.0, dots=0).quarterLength  # half note, no dots
     2.0
@@ -407,7 +424,7 @@ def makeDuration(
     return returnDuration
 
 
-def allPartsPresent(scoreElem) -> Tuple[str, ...]:
+def allPartsPresent(scoreElem) -> tuple[str, ...]:
     # noinspection PyShadowingNames
     '''
     Find the @n values for all <staffDef> elements in a <score> element. This assumes that every
@@ -433,7 +450,6 @@ def allPartsPresent(scoreElem) -> Tuple[str, ...]:
     ...     </section>
     ... </score>"""
     >>> import xml.etree.ElementTree as ETree
-    >>> from music21 import *
     >>> meiDoc = ETree.fromstring(meiDoc)
     >>> mei.base.allPartsPresent(meiDoc)
     ('1', '2')
@@ -444,7 +460,6 @@ def allPartsPresent(scoreElem) -> Tuple[str, ...]:
     '''
     # xpathQuery = f'.//{MEI_NS}music//{MEI_NS}score//{MEI_NS}staffDef'
     xpathQuery = f'.//{MEI_NS}staffDef'
-    
     partNs = []  # hold the @n attribute for all the parts
 
     for staffDef in scoreElem.findall(xpathQuery):
@@ -565,7 +580,6 @@ def _accidentalFromAttr(attr):
     '''
     Use :func:`_attrTranslator` to convert the value of an "accid" attribute to its music21 string.
 
-    >>> from music21 import *
     >>> mei.base._accidentalFromAttr('s')
     '#'
     '''
@@ -577,7 +591,6 @@ def _accidGesFromAttr(attr):
     Use :func:`_attrTranslator` to convert the value of an @accid.ges
     attribute to its music21 string.
 
-    >>> from music21 import *
     >>> mei.base._accidGesFromAttr('s')
     '#'
     '''
@@ -588,7 +601,6 @@ def _qlDurationFromAttr(attr):
     '''
     Use :func:`_attrTranslator` to convert an MEI "dur" attribute to a music21 quarterLength.
 
-    >>> from music21 import *
     >>> mei.base._qlDurationFromAttr('4')
     1.0
 
@@ -627,7 +639,8 @@ def _makeArticList(attr):
     return articList
 
 
-def _getOctaveShift(dis, disPlace):
+def _getOctaveShift(dis: t.Literal['8', '15', '22'] | None,
+                    disPlace: str) -> int:
     '''
     Use :func:`_getOctaveShift` to calculate the :attr:`octaveShift` attribute for a
     :class:`~music21.clef.Clef` subclass. Any of the arguments may be ``None``.
@@ -720,7 +733,6 @@ def _ppSlurs(theConverter):
     ...     </section>
     ...     </score></music>
     ... </mei>"""
-    >>> from music21 import *
     >>> theConverter = mei.base.MeiToM21Converter(meiDoc)
     >>>
     >>> mei.base._ppSlurs(theConverter)
@@ -958,7 +970,7 @@ def _ppConclude(theConverter):
 # Helper Functions
 # -----------------------------------------------------------------------------
 def _processEmbeddedElements(
-    elements: List[Element],
+    elements: list[Element],
     mapping,
     callerTag=None,
     slurBundle=None
@@ -992,7 +1004,6 @@ def _processEmbeddedElements(
     Because there is no ``'rest'`` key in the ``mapping``, that :class:`Element` is ignored.
 
     >>> from xml.etree.ElementTree import Element
-    >>> from music21 import *
     >>> elements = [Element('note'), Element('rest'), Element('note')]
     >>> mapping = {'note': lambda x, y: note.Note('D2')}
     >>> mei.base._processEmbeddedElements(elements, mapping, 'doctest')
@@ -1038,7 +1049,7 @@ def _timeSigFromAttrs(elem):
     return meter.TimeSignature(f"{elem.get('meter.count')!s}/{elem.get('meter.unit')!s}")
 
 
-def _keySigFromAttrs(elem: Element) -> Union[key.Key, key.KeySignature]:
+def _keySigFromAttrs(elem: Element) -> key.Key | key.KeySignature:
     '''
     From any tag with (at minimum) either @key.pname or @key.sig attributes, make a
     :class:`KeySignature` or :class:`Key`, as possible.
@@ -1052,6 +1063,8 @@ def _keySigFromAttrs(elem: Element) -> Union[key.Key, key.KeySignature]:
         # noinspection PyTypeChecker
         mode = elem.get('key.mode', '')
         step = elem.get('key.pname')
+        if step is None:  # pragma: no cover
+            raise MeiValidityError('Key missing step')
         accidental = _accidentalFromAttr(elem.get('key.accid'))
         if accidental is None:
             tonic = step
@@ -1295,17 +1308,17 @@ def metaSetTitle(work, meta):
     :return: The ``meta`` argument, having relevant metadata added.
     '''
     # title, subtitle, and movement name
+    subtitle = None
     for title in work.findall(f'./{MEI_NS}titleStmt/{MEI_NS}title'):
-        if title.get('type', '') == 'subtitle':
-            meta.subtitle = title.text
+        if title.get('type', '') == 'subtitle':  # or 'subordinate', right?
+            subtitle = title.text
         elif meta.title is None:
             meta.title = title.text
 
-    if hasattr(meta, 'subtitle'):
+    if subtitle:
         # Since m21.Metadata doesn't actually have a "subtitle" attribute, we'll put the subtitle
         # in the title
-        meta.title = f'{meta.title} ({meta.subtitle})'
-        del meta.subtitle
+        meta.title = f'{meta.title} ({subtitle})'
 
     tempo = work.find(f'./{MEI_NS}tempo')
     if tempo is not None:
@@ -1336,7 +1349,7 @@ def metaSetComposer(work, meta):
     if len(composers) == 1:
         meta.composer = composers[0]
     elif len(composers) > 1:
-        meta.composer = composers
+        meta.composers = composers
 
     return meta
 
@@ -1360,12 +1373,12 @@ def metaSetDate(work, meta):
             except ValueError:
                 environLocal.warn(_MISSED_DATE.format(dateStr))
             else:
-                meta.date = theDate
+                meta.dateCreated = theDate
         else:
             dateStart = date.get('notbefore') if date.get('notbefore') else date.get('startdate')
             dateEnd = date.get('notafter') if date.get('notafter') else date.get('enddate')
             if dateStart and dateEnd:
-                meta.date = metadata.DateBetween((dateStart, dateEnd))
+                meta.dateCreated = metadata.DateBetween((dateStart, dateEnd))
 
     return meta
 
@@ -1718,7 +1731,6 @@ def staffDefFromElement(elem, slurBundle=None):  # pylint: disable=unused-argume
     >>> meiDoc = """<?xml version="1.0" encoding="UTF-8"?>
     ... <staffDef n="1" label="Clarinet" xmlns="http://www.music-encoding.org/ns/mei"/>
     ... """
-    >>> from music21 import *
     >>> from xml.etree import ElementTree as ET
     >>> staffDef = ET.fromstring(meiDoc)
     >>> result = mei.base.staffDefFromElement(staffDef)
@@ -1739,7 +1751,6 @@ def staffDefFromElement(elem, slurBundle=None):  # pylint: disable=unused-argume
     ...     <clef shape="F" line="4"/>
     ... </staffDef>
     ... """
-    >>> from music21 import *
     >>> from xml.etree import ElementTree as ET
     >>> staffDef = ET.fromstring(meiDoc)
     >>> result = mei.base.staffDefFromElement(staffDef)
@@ -1825,10 +1836,7 @@ def staffDefFromElement(elem, slurBundle=None):  # pylint: disable=unused-argume
     # --> time signature
     if elem.get('meter.count') is not None:
         post['meter'] = _timeSigFromAttrs(elem)
-    # --> or <meterSig>
-    if elem.find(f'{MEI_NS}meterSig') is not None:
-        post['meter'] = meterSigFromElement(elem.find(f'{MEI_NS}meterSig'))
-    
+
     # --> key signature
     if elem.get('key.pname') is not None or elem.get('key.sig') is not None:
         post['key'] = _keySigFromAttrs(elem)
@@ -1910,15 +1918,14 @@ def articFromElement(elem, slurBundle=None):  # pylint: disable=unused-argument
     :attr:`~music21.note.GeneralNote.articulations` attribute.
 
     >>> from xml.etree import ElementTree as ET
-    >>> from music21 import *
-    >>> meiSnippet = """<artic artic="acc" xmlns="http://www.music-encoding.org/ns/mei"/>"""
+    >>> meiSnippet = '<artic artic="acc" xmlns="http://www.music-encoding.org/ns/mei"/>'
     >>> meiSnippet = ET.fromstring(meiSnippet)
     >>> mei.base.articFromElement(meiSnippet)
     [<music21.articulations.Accent>]
 
     A single <artic> element may indicate many :class:`Articulation` objects.
 
-    >>> meiSnippet = """<artic artic="acc ten" xmlns="http://www.music-encoding.org/ns/mei"/>"""
+    >>> meiSnippet = '<artic artic="acc ten" xmlns="http://www.music-encoding.org/ns/mei"/>'
     >>> meiSnippet = ET.fromstring(meiSnippet)
     >>> mei.base.articFromElement(meiSnippet)
     [<music21.articulations.Accent>, <music21.articulations.Tenuto>]
@@ -1970,12 +1977,11 @@ def accidFromElement(elem, slurBundle=None):  # pylint: disable=unused-argument
     a string. Accidentals up to triple-sharp and triple-flat are supported.
 
     >>> from xml.etree import ElementTree as ET
-    >>> from music21 import *
-    >>> meiSnippet = """<accid accid="s" xmlns="http://www.music-encoding.org/ns/mei"/>"""
+    >>> meiSnippet = '<accid accid="s" xmlns="http://www.music-encoding.org/ns/mei"/>'
     >>> meiSnippet = ET.fromstring(meiSnippet)
     >>> mei.base.accidFromElement(meiSnippet)
     '#'
-    >>> meiSnippet = """<accid accid="tf" xmlns="http://www.music-encoding.org/ns/mei"/>"""
+    >>> meiSnippet = '<accid accid="tf" xmlns="http://www.music-encoding.org/ns/mei"/>'
     >>> meiSnippet = ET.fromstring(meiSnippet)
     >>> mei.base.accidFromElement(meiSnippet)
     '---'
@@ -2358,13 +2364,16 @@ def spaceFromElement(elem, slurBundle=None):  # pylint: disable=unused-argument
     <space>  A placeholder used to fill an incomplete measure, layer, etc. most often so that the
     combined duration of the events equals the number of beats in the measure.
 
+    Returns a Rest element with hideObjectOnPrint = True
+
     In MEI 2013: pg.440 (455 in PDF) (MEI.shared module)
     '''
     # NOTE: keep this in sync with restFromElement()
 
     theDuration = _qlDurationFromAttr(elem.get('dur'))
     theDuration = makeDuration(theDuration, int(elem.get('dots', 0)))
-    theSpace = note.SpacerRest(duration=theDuration)
+    theSpace = note.Rest(duration=theDuration)
+    theSpace.style.hideObjectOnPrint = True
 
     if elem.get(_XMLID) is not None:
         theSpace.id = elem.get(_XMLID)
@@ -2529,13 +2538,13 @@ def harmFromElement(elem, slurBundle=None):
 
 def figuredbassFromElement(elem, slurBundle=None):
     if elem.get(_XMLID):
-        id = elem.get(_XMLID)
+        fb_id = elem.get(_XMLID)
     fb_notation = ''
     dauer: float = 0
     # loop through all child elements and collect <f> tags
     for subElement in elem.findall('*'):
         if subElement.tag == f'{MEI_NS}f':
-            if subElement.text != None:
+            if subElement.text is not None:
                 if fb_notation != '':
                     fb_notation += f',{subElement.text}'
                 else:
@@ -2543,7 +2552,7 @@ def figuredbassFromElement(elem, slurBundle=None):
             else:
                 if 'extender' in subElement.attrib.keys():
                     if fb_notation != '':
-                        fb_notation += f',_'
+                        fb_notation += ',_'
                     else:
                         fb_notation = '_'
             if 'dur.metrical' in subElement.attrib.keys():
@@ -2551,7 +2560,7 @@ def figuredbassFromElement(elem, slurBundle=None):
 
     # Generate a FiguredBassIndication object and set the collected information
     theFbNotation = harmony.FiguredBassIndication(fb_notation)
-    theFbNotation.id = id
+    theFbNotation.id = fb_id
     theFbNotation.duration = duration.Duration(quarterLength=dauer)
     
     return theFbNotation
@@ -2666,7 +2675,6 @@ def beamFromElement(elem, slurBundle=None):
     a list of three objects, none of which is a :class:`Beam` or similar.
 
     >>> from xml.etree import ElementTree as ET
-    >>> from music21 import *
     >>> meiSnippet = """<beam xmlns="http://www.music-encoding.org/ns/mei">
     ...     <note pname='A' oct='7' dur='8'/>
     ...     <note pname='B' oct='7' dur='8'/>
@@ -3108,7 +3116,7 @@ def _makeBarlines(elem, staves):
             bars = bars[1]
         for eachMeasure in staves.values():
             if isinstance(eachMeasure, stream.Measure):
-                eachMeasure.leftBarline = bars
+                eachMeasure.leftBarline = deepcopy(bars)
 
     if elem.get('right') is not None:
         bars = _barlineFromAttr(elem.get('right'))
@@ -3118,7 +3126,7 @@ def _makeBarlines(elem, staves):
             bars = bars[0]
         for eachMeasure in staves.values():
             if isinstance(eachMeasure, stream.Measure):
-                eachMeasure.rightBarline = bars
+                eachMeasure.rightBarline = deepcopy(bars)
 
     return staves
 
@@ -3133,7 +3141,7 @@ def measureFromElement(elem, backupNum, expectedNs, slurBundle=None, activeMeter
     :param elem: The ``<measure>`` element to process.
     :type elem: :class:`~xml.etree.ElementTree.Element`
     :param int backupNum: A fallback value for the resulting
-        :class:`~music21.measure.Measure` objects' number attribute.
+        :class:`~music21.stream.Measure` objects' number attribute.
     :param expectedNs: A list of the expected @n attributes for the <staff> tags in this <measure>.
         If an expected <staff> isn't in the <measure>, it will be created with a full-measure rest.
     :type expectedNs: iterable of str
@@ -3352,7 +3360,6 @@ def sectionScoreCore(elem, allPartNs, slurBundle, *,
         # only process <measure> elements if this is a <section>
         if measureTag == eachElem.tag and sectionTag == elem.tag:
             backupMeasureNum += 1
-
             # process all the stuff in the <measure>
             measureResult = measureFromElement(eachElem, backupMeasureNum, allPartNs,
                                                slurBundle=slurBundle,
@@ -3365,7 +3372,7 @@ def sectionScoreCore(elem, allPartNs, slurBundle, *,
                 inNextThing[eachN] = []
                 # if we got a left-side barline from the previous measure, use it
                 if nextMeasureLeft is not None:
-                    measureResult[eachN].leftBarline = nextMeasureLeft
+                    measureResult[eachN].leftBarline = deepcopy(nextMeasureLeft)
                 # add this Measure to the Part
                 parsed[eachN].append(measureResult[eachN])
             # if we got a barline for the next <measure>
@@ -3379,8 +3386,13 @@ def sectionScoreCore(elem, allPartNs, slurBundle, *,
             for allPartObject in localResult['all-part objects']:
                 if isinstance(allPartObject, meter.TimeSignature):
                     activeMeter = allPartObject
-                for eachN in allPartNs:
-                    inNextThing[eachN].append(allPartObject)
+                for i, eachN in enumerate(allPartNs):
+                    if i == 0:
+                        to_insert = allPartObject
+                    else:
+                        # a single Music21Object should not exist in multiple parts
+                        to_insert = deepcopy(allPartObject)
+                    inNextThing[eachN].append(to_insert)
             for eachN in allPartNs:
                 if eachN in localResult:
                     for eachObj in localResult[eachN].values():
@@ -3414,7 +3426,6 @@ def sectionScoreCore(elem, allPartNs, slurBundle, *,
                 #        put those into the first Measure object we encounter in this Part
                 # TODO: this is where the Instruments get added
                 # TODO: I think "eachList" really means "each list that will become a Part"
-                
                 if inNextThing[eachN]:
                     # we have to put Instrument objects just before the Measure to which they apply
                     theInstr = None
@@ -3447,13 +3458,11 @@ def sectionScoreCore(elem, allPartNs, slurBundle, *,
                     # must "flatten" everything so it doesn't cause a disaster when we try to make
                     # a Part out of it.
                     for eachObj in eachList:
-                        if eachN in parsed.keys():
-                            parsed[eachN].append(eachObj)
+                        parsed[eachN].append(eachObj)
                 elif scoreTag == elem.tag:
                     # If this is a <score>, we can just append the result of each <section> to the
                     # list that will become the Part.
-                    if eachN in parsed.keys():
-                        parsed[eachN].append(eachList)
+                    parsed[eachN].append(eachList)
 
         elif eachElem.tag not in _IGNORE_UNPROCESSED:
             environLocal.printDebug(_UNPROCESSED_SUBELEMENT.format(eachElem.tag, elem.tag))
@@ -3561,7 +3570,6 @@ def scoreFromElement(elem, slurBundle):
     # UPDATE: If <harm> tags are found, they will also be collected as a separate 'part' to process them later.
     allPartNs = allPartsPresent(elem)
 
-    
     # This is the actual processing.
     parsed = sectionScoreCore(elem, allPartNs, slurBundle=slurBundle)[0]
 
@@ -3570,7 +3578,8 @@ def scoreFromElement(elem, slurBundle):
     # document. Iterating the keys in "parsed" would not preserve the order.
     environLocal.printDebug('*** making the Score')
 
-    # Extract collected <harm> information stored in the dict unter th 'fb' key
+    # Extract collected <harm> information stored in the dict unter the 'fb' key
+    harms: list[dict] | None = None
     if 'fb' in parsed.keys():
         harms = parsed['fb'][0]
         del parsed['fb']
@@ -3583,14 +3592,14 @@ def scoreFromElement(elem, slurBundle):
         theScore[i].atSoundingPitch = False
         for eachObj in parsed[eachN]:
             theScore[i].append(eachObj)
-
     theScore = stream.Score(theScore)
     
     # loop through measures to insert harm elements from harms list at the right offsets
-    for index, measureOffset in enumerate(theScore.measureOffsetMap().keys()):
-        hms = harms[index]['fb']
-        for h in hms:
-            theScore.insert(measureOffset + h[0], h[1])
+    if harms:
+        for index, measureOffset in enumerate(theScore.measureOffsetMap().keys()):
+            hms = harms[index]['fb']
+            for h in hms:
+                theScore.insert(measureOffset + h[0], h[1])
 
     # put slurs in the Score
     theScore.append(list(slurBundle))
