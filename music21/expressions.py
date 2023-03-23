@@ -533,6 +533,30 @@ class GeneralMordent(Ornament):
         self.placement = 'above'
 
     @property
+    def name(self) -> str:
+        '''
+        returns the name of the Mordent/InvertedMordent, which is generally
+        the class name lowercased, with spaces where a new capital occurs. The
+        name also will include the accidental, if it exists.
+
+        Subclasses can override this as necessary.
+
+        >>> mordent = expressions.Mordent()
+        >>> mordent.name
+        'mordent'
+
+        >>> sharpAccid = pitch.Accidental(1)
+        >>> invertedMordent = expressions.InvertedMordent(accid=sharpAccid)
+        >>> invertedMordent.name
+        'inverted mordent (sharp)'
+
+        '''
+        theName: str = super().name
+        if self.accid is not None:
+            theName += f' ({self.accid.name})'
+        return theName
+
+    @property
     def accid(self) -> pitch.Accidental | None:
         return self._accid
 
@@ -890,6 +914,30 @@ class Trill(Ornament):
         self.tieAttach = 'all'
         self.quarterLength = 0.125
         self._setAccidentalFromKeySig = True
+
+    @property
+    def name(self) -> str:
+        '''
+        returns the name of the Trill, which is generally the class name
+        lowercased, with spaces where a new capital occurs. The name also
+        will include the accidental, if it exists.
+
+        Subclasses can override this as necessary.
+
+        >>> trill = expressions.Trill()
+        >>> trill.name
+        'trill'
+
+        >>> doubleSharpAccid = pitch.Accidental(2)
+        >>> doubleSharpedTrill = expressions.Trill(accid=doubleSharpAccid)
+        >>> doubleSharpedTrill.name
+        'trill (double-sharp)'
+
+        '''
+        theName: str = super().name
+        if self.accid is not None:
+            theName += f' ({self.accid.name})'
+        return theName
 
     @property
     def accid(self) -> pitch.Accidental | None:
@@ -1295,7 +1343,8 @@ class Turn(Ornament):
         returns the name of the Turn/InvertedTurn, which is generally the class
         name lowercased, with spaces where a new capital occurs, but also with
         a 'delayed' prefix, if the Turn/InvertedTurn is delayed.  If the delay
-        is of a specific duration, the prefix will include that duration.
+        is of a specific duration, the prefix will include that duration. The
+        name also will include upper and lower accidentals, if they exist.
 
         Subclasses can override this as necessary.
 
@@ -1303,22 +1352,41 @@ class Turn(Ornament):
         >>> nonDelayedTurn.name
         'turn'
 
-        >>> from music21.common.enums import OrnamentDelay
-        >>> delayedInvertedTurn = expressions.InvertedTurn(delay=OrnamentDelay.DEFAULT_DELAY)
-        >>> delayedInvertedTurn.name
-        'delayed inverted turn'
+        >>> naturalAccid = pitch.Accidental(0)
+        >>> sharpAccid = pitch.Accidental(1)
+        >>> doubleflatAccid = pitch.Accidental(-2)
 
-        >>> delayedBy1Turn = expressions.Turn(delay=1.0)
+        >>> from music21.common.enums import OrnamentDelay
+        >>> delayedInvertedTurn = expressions.InvertedTurn(
+        ...     delay=OrnamentDelay.DEFAULT_DELAY,
+        ...     upperAccid=sharpAccid,
+        ...     lowerAccid=naturalAccid
+        ... )
+        >>> delayedInvertedTurn.name
+        'delayed inverted turn (upper=sharp, lower=natural)'
+
+        >>> delayedBy1Turn = expressions.Turn(delay=1.0, lowerAccid=doubleflatAccid)
         >>> delayedBy1Turn.name
-        'delayed(delayQL=1.0) turn'
+        'delayed(delayQL=1.0) turn (lower=double-flat)'
 
         '''
-        superName: str = super().name
+        theName: str = super().name
         if self.delay == OrnamentDelay.DEFAULT_DELAY:
-            return 'delayed ' + superName
+            theName = 'delayed ' + theName
         elif isinstance(self.delay, (float, Fraction)):
-            return f'delayed(delayQL={self.delay}) ' + superName
-        return superName
+            theName = f'delayed(delayQL={self.delay}) ' + theName
+
+        if self.upperAccid or self.lowerAccid:
+            theName += ' ('
+            if self.upperAccid:
+                theName += 'upper=' + self.upperAccid.name
+                if self.lowerAccid:
+                    theName += ', '
+            if self.lowerAccid:
+                theName += 'lower=' + self.lowerAccid.name
+            theName += ')'
+
+        return theName
 
     def getUpperSize(
         self,
