@@ -581,19 +581,15 @@ class GeneralMordent(Ornament):
 
     def getSize(
         self,
-        srcObj: note.Note | None,
+        srcPitch: pitch.Pitch,
     ) -> interval.IntervalBase:
         if self._size is not None:
             return self._size
 
         if self.direction not in ('up', 'down'):
             raise ExpressionException('Cannot compute mordent size if I do not know its direction')
-        if srcObj is None:
-            raise ExpressionException('Cannot compute mordent size without a srcObj')
-        if not hasattr(srcObj, 'pitch'):
-            raise TypeError('Cannot compute mordent size with Unpitched srcObj')
 
-        otherPitch: pitch.Pitch = copy.deepcopy(srcObj.pitch)
+        otherPitch: pitch.Pitch = copy.deepcopy(srcPitch)
         otherPitch.accidental = None
 
         if self.direction == 'up':
@@ -602,7 +598,7 @@ class GeneralMordent(Ornament):
             otherPitch.transpose(interval.GenericInterval(-2), inPlace=True)
 
         otherPitch.accidental = self.accid
-        return interval.Interval(srcObj.pitch, otherPitch)
+        return interval.Interval(srcPitch, otherPitch)
 
     def realize(self, srcObj: note.Note, *, inPlace=False):
         '''
@@ -645,7 +641,7 @@ class GeneralMordent(Ornament):
             use_ql = srcObj.duration.quarterLength / 4
 
         remainderQL = srcObj.duration.quarterLength - (2 * use_ql)
-        transposeInterval = self.getSize(srcObj)
+        transposeInterval = self.getSize(srcObj.pitch)
         mordNotes: list[note.Note] = []
         self.fillListOfRealizedNotes(srcObj, mordNotes, transposeInterval, useQL=use_ql)
 
@@ -732,7 +728,7 @@ class HalfStepMordent(Mordent):
         super().__init__(**keywords)
         self._size: interval.IntervalBase = interval.Interval('m-2')
 
-    def getSize(self, srcObj: note.Note | None) -> interval.IntervalBase:
+    def getSize(self, srcPitch: pitch.Pitch) -> interval.IntervalBase:
         return self._size
 
     @property
@@ -761,7 +757,7 @@ class WholeStepMordent(Mordent):
         super().__init__(**keywords)
         self._size: interval.IntervalBase = interval.Interval('M-2')
 
-    def getSize(self, srcObj: note.Note | None) -> interval.IntervalBase:
+    def getSize(self, srcPitch: pitch.Pitch) -> interval.IntervalBase:
         return self._size
 
     @property
@@ -832,7 +828,7 @@ class HalfStepInvertedMordent(InvertedMordent):
         super().__init__(**keywords)
         self._size: interval.IntervalBase = interval.Interval('m2')
 
-    def getSize(self, srcObj: note.Note | None) -> interval.IntervalBase:
+    def getSize(self, srcPitch: pitch.Pitch) -> interval.IntervalBase:
         return self._size
 
     @property
@@ -861,7 +857,7 @@ class WholeStepInvertedMordent(InvertedMordent):
         super().__init__(**keywords)
         self._size: interval.IntervalBase = interval.Interval('M2')
 
-    def getSize(self, srcObj: note.Note | None) -> interval.IntervalBase:
+    def getSize(self, srcPitch: pitch.Pitch) -> interval.IntervalBase:
         return self._size
 
     @property
@@ -982,21 +978,18 @@ class Trill(Ornament):
 
     def getSize(
         self,
-        srcObj: note.Note,
+        srcPitch: pitch.Pitch,
     ) -> interval.IntervalBase:
         if self._size is not None:
             return self._size
 
-        if not hasattr(srcObj, 'pitch'):
-            raise TypeError('Cannot compute trill size with Unpitched srcObj')
-
-        otherPitch: pitch.Pitch = copy.deepcopy(srcObj.pitch)
+        otherPitch: pitch.Pitch = copy.deepcopy(srcPitch)
         otherPitch.accidental = None
 
         otherPitch.transpose(interval.GenericInterval(2), inPlace=True)
         otherPitch.accidental = self.accid
 
-        return interval.Interval(srcObj.pitch, otherPitch)
+        return interval.Interval(srcPitch, otherPitch)
 
     def realize(
         self,
@@ -1117,7 +1110,7 @@ class Trill(Ornament):
                 raise ExpressionException('The note is not long enough for a nachschlag')
             useQL = srcObj.duration.quarterLength / 4
 
-        transposeInterval = self.getSize(srcObj)
+        transposeInterval = self.getSize(srcObj.pitch)
         transposeIntervalReverse = transposeInterval.reverse()
 
         numberOfTrillNotes = int(srcObj.duration.quarterLength / useQL)
@@ -1200,7 +1193,7 @@ class HalfStepTrill(Trill):
         self._size: interval.IntervalBase = interval.Interval('m2')
         self._setAccidentalFromKeySig = False
 
-    def getSize(self, srcObj: note.Note | None) -> interval.IntervalBase:
+    def getSize(self, srcPitch: pitch.Pitch) -> interval.IntervalBase:
         return self._size
 
     @property
@@ -1242,7 +1235,7 @@ class WholeStepTrill(Trill):
         self._size: interval.IntervalBase = interval.Interval('M2')
         self._setAccidentalFromKeySig = False
 
-    def getSize(self, srcObj: note.Note | None) -> interval.IntervalBase:
+    def getSize(self, srcPitch: pitch.Pitch) -> interval.IntervalBase:
         return self._size
 
     @property
@@ -1390,33 +1383,27 @@ class Turn(Ornament):
 
     def getUpperSize(
         self,
-        srcObj: note.Note,
+        srcPitch: pitch.Pitch,
     ) -> interval.IntervalBase:
-        if not hasattr(srcObj, 'pitch'):
-            raise TypeError('Cannot compute turn upper size with Unpitched srcObj')
-
-        upperPitch: pitch.Pitch = copy.deepcopy(srcObj.pitch)
+        upperPitch: pitch.Pitch = copy.deepcopy(srcPitch)
         upperPitch.accidental = None
 
         upperPitch.transpose(interval.GenericInterval(2), inPlace=True)
         upperPitch.accidental = self.upperAccid
 
-        return interval.Interval(srcObj.pitch, upperPitch)
+        return interval.Interval(srcPitch, upperPitch)
 
     def getLowerSize(
         self,
-        srcObj: note.Note
+        srcPitch: pitch.Pitch
     ) -> interval.IntervalBase:
-        if not hasattr(srcObj, 'pitch'):
-            raise TypeError('Cannot compute turn upper size with Unpitched srcObj')
-
-        lowerPitch: pitch.Pitch = copy.deepcopy(srcObj.pitch)
+        lowerPitch: pitch.Pitch = copy.deepcopy(srcPitch)
         lowerPitch.accidental = None
 
         lowerPitch.transpose(interval.GenericInterval(-2), inPlace=True)
         lowerPitch.accidental = self.lowerAccid
 
-        return interval.Interval(srcObj.pitch, lowerPitch)
+        return interval.Interval(srcPitch, lowerPitch)
 
     def realize(self, srcObj: note.Note, *, inPlace=False):
         # noinspection PyShadowingNames
@@ -1552,11 +1539,11 @@ class Turn(Ornament):
             fourthNoteQL = opFrac(turnDuration - (3 * useQL))
 
         if not self.isInverted:
-            firstTransposeInterval = self.getUpperSize(srcObj)
-            secondTransposeInterval = self.getLowerSize(srcObj)
+            firstTransposeInterval = self.getUpperSize(srcObj.pitch)
+            secondTransposeInterval = self.getLowerSize(srcObj.pitch)
         else:
-            firstTransposeInterval = self.getLowerSize(srcObj)
-            secondTransposeInterval = self.getUpperSize(srcObj)
+            firstTransposeInterval = self.getLowerSize(srcObj.pitch)
+            secondTransposeInterval = self.getUpperSize(srcObj.pitch)
 
         turnNotes: list[note.Note] = []
 
