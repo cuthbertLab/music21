@@ -5015,7 +5015,6 @@ class MeasureExporter(XMLExporterBase):
                 notations.append(x)
 
         # TODO: dynamics in notations
-        # TODO: accidental-mark
         # TODO: other-notation
         return notations
 
@@ -5326,7 +5325,6 @@ class MeasureExporter(XMLExporterBase):
                 ('Mordent', 'mordent'),
                 ('Shake', 'shake'),
                 ('Schleifer', 'schleifer'),
-                # TODO: 'accidental-mark'
                 ('Tremolo', 'tremolo'),  # non-spanner
                 # non-ornaments...
                 ('Fermata', 'fermata'),
