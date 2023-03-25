@@ -2344,7 +2344,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         updateIsFlat = False
         if element.isStream:
             updateIsFlat = True
-        self.coreElementsChanged(updateIsFlat=updateIsFlat)
+        self.coreElementsChanged(updateIsFlat=updateIsFlat, clearIsSorted=not ignoreSort)
         if ignoreSort is False:
             self.isSorted = storeSorted
 
@@ -9431,7 +9431,8 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
                         )
                         if next_element is not None and look_ahead_result is not None:
                             gapToFill = opFrac(look_ahead_result.match - e.offset)
-                            d_matchTuple = bestMatch(float(ql), quarterLengthDivisors, zeroAllowed, gapToFill)
+                            d_matchTuple = bestMatch(
+                                float(ql), quarterLengthDivisors, zeroAllowed, gapToFill)
                         else:
                             d_matchTuple = bestMatch(float(ql), quarterLengthDivisors, zeroAllowed)
                     else:

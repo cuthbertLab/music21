@@ -4026,7 +4026,7 @@ class Test(unittest.TestCase):
             for i in range(len(srcDur)):
                 n = note.Note()
                 n.quarterLength = srcDur[i]
-                s.insert(srcOffset[i], n)
+                s.insert(srcOffset[i], n, ignoreSort=True)
 
             s.quantize(divList, processOffsets=True, processDurations=True, inPlace=True)
 
@@ -4070,6 +4070,18 @@ class Test(unittest.TestCase):
                     [F('1/3'), F('1/3'), F('1/3'), 0.25, 0.25],
 
                     [8, 6])  # snap to 0.125 and 0.1666666
+
+        # User-reported example: contains overlap
+        # Smarter parsing in v.9, as long as stream is sorted
+        # https://github.com/cuthbertLab/music21/issues/1536
+        procCompare([2.016, 2.026, 2.333, 2.646, 3.0, 3.323, 3.651],
+                    [0.123, 0.656, 0.104, 0.094, 0.146, 0.099, 0.141],
+
+                    [2, 2, F('7/3'), F('8/3'), 3.0, F('10/3'), F('11/3')],
+                    [F('1/3'), F('2/3'), F('1/3'), F('1/3'),
+                     F('1/3'), F('1/3'), 0.25],
+
+                    [4, 3])
 
     def testQuantizeMinimumDuration(self):
         '''
