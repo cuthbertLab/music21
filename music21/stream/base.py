@@ -9361,17 +9361,20 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         # this presently is not trying to avoid overlaps that
         # result from quantization; this may be necessary
 
-        def bestMatch(target, divisors, gapToFill=0.0):
+        def bestMatch(target, divisors, zeroAllowed=True, gapToFill=0.0):
             found = []
             for div in divisors:
-                tick = 1 / div
+                tick = 1 / div  # divisor expressed as QL, e.g. 0.25
                 match, error, signedErrorInner = common.nearestMultiple(target, tick)
-                if match % tick:
-                    remainingGap = max(gapToFill - match, 0.0)
-                else:
+                if not zeroAllowed and match == 0.0:
+                    match = tick
+                    signedErrorInner = round(target - match, 7)
+                    error = abs(signedErrorInner)
+                if gapToFill % tick == 0:
                     remainingGap = 0.0
-                # Sort by remainingGap, then unsigned error, then "tick"
-                # (divisor expressed as QL, e.g. 0.25)
+                else:
+                    remainingGap = max(gapToFill - match, 0.0)
+                # Sort by remainingGap, then unsigned error, then tick
                 found.append(
                     BestQuantizationMatch(
                         remainingGap, error, tick, match, signedErrorInner, div))
@@ -9421,24 +9424,19 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
                 if processDurations:
                     ql = e.duration.quarterLength
                     ql = max(ql, 0)  # negative ql possible in buggy MIDI files?
+                    zeroAllowed = not isinstance(e, note.NotRest) or e.duration.isGrace
                     if processOffsets and originallySorted:
                         next_element, look_ahead_result = (
                             findNextElementNotCoincident(useStream, i + 1)
                         )
                         if next_element is not None and look_ahead_result is not None:
-                            gapToFill = look_ahead_result.match - e.offset
-                            d_matchTuple = bestMatch(float(ql), quarterLengthDivisors, gapToFill)
+                            gapToFill = opFrac(look_ahead_result.match - e.offset)
+                            d_matchTuple = bestMatch(float(ql), quarterLengthDivisors, zeroAllowed, gapToFill)
                         else:
-                            d_matchTuple = bestMatch(float(ql), quarterLengthDivisors)
+                            d_matchTuple = bestMatch(float(ql), quarterLengthDivisors, zeroAllowed)
                     else:
-                        d_matchTuple = bestMatch(float(ql), quarterLengthDivisors)
-                    # Enforce nonzero duration for non-grace notes
-                    if (d_matchTuple.match == 0
-                            and isinstance(e, note.NotRest)
-                            and not e.duration.isGrace):
-                        e.quarterLength = d_matchTuple.tick
-                        e.editorial.quarterLengthQuantizationError = ql - e.quarterLength
-                    elif d_matchTuple.match == 0 and isinstance(e, note.Rest):
+                        d_matchTuple = bestMatch(float(ql), quarterLengthDivisors, zeroAllowed)
+                    if d_matchTuple.match == 0 and isinstance(e, note.Rest):
                         rests_lacking_durations.append(e)
                     else:
                         e.duration.quarterLength = d_matchTuple.match
