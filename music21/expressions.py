@@ -936,6 +936,10 @@ class Trill(Ornament):
         return theName
 
     @property
+    def direction(self) -> str:
+        return 'up'
+
+    @property
     def accid(self) -> pitch.Accidental | None:
         return self._accid
 
