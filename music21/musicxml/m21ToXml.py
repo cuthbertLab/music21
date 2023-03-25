@@ -1364,7 +1364,7 @@ class XMLExporterBase:
 
 
         >>> a.set('one-and-a-half-sharp')
-        >>> XB.dump(a2m(a, 'accidental-mark'))
+        >>> XB.dump(a2m(a, elName='accidental-mark'))
         <accidental-mark>three-quarters-sharp</accidental-mark>
 
         >>> a.set('half-flat')

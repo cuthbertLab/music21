@@ -564,8 +564,8 @@ class GeneralMordent(Ornament):
     def size(self) -> interval.IntervalBase | None:
         if self._size is None:
             raise ExpressionException(
-                'Cannot compute mordent size without srcObj unless .size has been '
-                + 'explicitly set (use trill.getSize(srcObj) instead.)'
+                'Cannot compute mordent size without srcPitch unless .size has been '
+                + 'explicitly set (use trill.getSize(srcPitch) instead.)'
             )
         return self._size
 
@@ -688,17 +688,17 @@ class Mordent(GeneralMordent):
     >>> m = expressions.Mordent()
     >>> m.direction
     'down'
-    >>> m.getSize(note.Note('C4'))
+    >>> m.getSize(pitch.Pitch('C4'))
     <music21.interval.Interval m-2>
-    >>> m.getSize(note.Note('B3'))
+    >>> m.getSize(pitch.Pitch('B3'))
     <music21.interval.Interval M-2>
 
     >>> mFlat = expressions.Mordent(accid=pitch.Accidental('-'))
     >>> mFlat.direction
     'down'
-    >>> mFlat.getSize(note.Note('C4'))
+    >>> mFlat.getSize(pitch.Pitch('C4'))
     <music21.interval.Interval M-2>
-    >>> mFlat.getSize(note.Note('B3'))
+    >>> mFlat.getSize(pitch.Pitch('B3'))
     <music21.interval.Interval A-2>
 
     * Changed in v7: Mordent sizes are GenericIntervals -- as was originally
@@ -788,17 +788,17 @@ class InvertedMordent(GeneralMordent):
     >>> m = expressions.InvertedMordent()
     >>> m.direction
     'up'
-    >>> m.getSize(note.Note('C4'))
+    >>> m.getSize(pitch.Pitch('C4'))
     <music21.interval.Interval M2>
-    >>> m.getSize(note.Note('B3'))
+    >>> m.getSize(pitch.Pitch('B3'))
     <music21.interval.Interval m2>
 
     >>> mSharp = expressions.InvertedMordent(accid=pitch.Accidental('#'))
     >>> mSharp.direction
     'up'
-    >>> mSharp.getSize(note.Note('C4'))
+    >>> mSharp.getSize(pitch.Pitch('C4'))
     <music21.interval.Interval A2>
-    >>> mSharp.getSize(note.Note('B3'))
+    >>> mSharp.getSize(pitch.Pitch('B3'))
     <music21.interval.Interval M2>
 
     * Changed in v7: InvertedMordent sizes are GenericIntervals -- as was originally
@@ -877,9 +877,9 @@ class Trill(Ornament):
     >>> tr = expressions.Trill()
     >>> tr.placement
     'above'
-    >>> tr.getSize(note.Note('C4'))
+    >>> tr.getSize(pitch.Pitch('C4'))
     <music21.interval.Interval M2>
-    >>> tr.getSize(note.Note('B4'))
+    >>> tr.getSize(pitch.Pitch('B4'))
     <music21.interval.Interval m2>
 
     Trills have a `.nachschlag` attribute which determines whether there
@@ -947,8 +947,8 @@ class Trill(Ornament):
     def size(self) -> interval.IntervalBase | None:
         if self._size is None:
             raise ExpressionException(
-                'Cannot compute trill size without srcObj unless trill size has been '
-                + 'explicitly set (use trill.getSize(srcObj) instead.)'
+                'Cannot compute trill size without srcPitch unless trill size has been '
+                + 'explicitly set (use trill.getSize(srcPitch) instead.)'
             )
         return self._size
 
