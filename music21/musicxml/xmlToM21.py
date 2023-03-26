@@ -4059,7 +4059,7 @@ class MeasureParser(XMLParserBase):
                     mostRecentOrnament.lowerAccid = accid
                 else:
                     mostRecentOrnament.upperAccid = accid
-            else:
+            elif isinstance(mostRecentOrnament, (expressions.GeneralMordent, expressions.Trill)):
                 mostRecentOrnament.accid = accid
             return None
 
