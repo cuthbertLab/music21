@@ -619,6 +619,18 @@ class Test(unittest.TestCase):
                     count += 1
         self.assertEqual(count, 1)
 
+        uppercount = 0
+        lowercount = 0
+        for n in s.recurse().notes:
+            for e in n.expressions:
+                if 'Turn' in e.classes:
+                    if e.upperAccid is not None:
+                        uppercount += 1
+                    if e.lowerAccid is not None:
+                        lowercount += 1
+        self.assertEqual(uppercount, 2)
+        self.assertEqual(lowercount, 1)
+
         count = 0
         for n in s.recurse().notes:
             for e in n.expressions:
