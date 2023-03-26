@@ -9385,11 +9385,12 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         def findNextElementNotCoincident(
             useStream: Stream,
             startIndex: int,
+            startOffset: OffsetQL,
         ) -> tuple[base.Music21Object | None, BestQuantizationMatch | None]:
             for next_el in useStream._elements[startIndex:]:
                 next_offset = useStream.elementOffset(next_el)
                 look_ahead_result = bestMatch(float(next_offset), quarterLengthDivisors)
-                if look_ahead_result.match > o:
+                if look_ahead_result.match > startOffset:
                     return next_el, look_ahead_result
             return None, None
 
@@ -9427,8 +9428,8 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
                     zeroAllowed = not isinstance(e, note.NotRest) or e.duration.isGrace
                     if processOffsets and originallySorted:
                         next_element, look_ahead_result = (
-                            findNextElementNotCoincident(useStream, i + 1)
-                        )
+                            findNextElementNotCoincident(
+                                useStream=useStream, startIndex=i + 1, startOffset=o))
                         if next_element is not None and look_ahead_result is not None:
                             gapToFill = opFrac(look_ahead_result.match - e.offset)
                             d_matchTuple = bestMatch(
