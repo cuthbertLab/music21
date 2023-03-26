@@ -4742,7 +4742,7 @@ class Test(unittest.TestCase):
         '''A sorted stream does not become unsorted when ignoreSort=True.'''
         s = Stream()
         s.repeatAppend(note.Note(), 4)
-        s.insert(1, tempo.MetronomeMark(), ignoreSort=True)
+        s.insert(4, tempo.MetronomeMark(), ignoreSort=True)
         self.assertTrue(s.isSorted)
 
     def testMakeChordsBuiltA(self):
