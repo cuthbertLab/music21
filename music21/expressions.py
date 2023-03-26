@@ -560,19 +560,25 @@ class GeneralMordent(Ornament):
     def accid(self) -> pitch.Accidental | None:
         return self._accid
 
+    @accid.setter
+    def accid(self, newAccid: pitch.Accidental | None):
+        if self._size is not None:
+            raise ExpressionException('Cannot set mordent accid if size already set.')
+        self._accid = newAccid
+
     @property
     def size(self) -> interval.IntervalBase | None:
         if self._size is None:
             raise ExpressionException(
                 'Cannot compute mordent size without srcPitch unless .size has been '
-                + 'explicitly set (use trill.getSize(srcPitch) instead.)'
+                + 'explicitly set (use mordent.getSize(srcPitch) instead.)'
             )
         return self._size
 
     @size.setter
     def size(self, newSize: interval.IntervalBase | None):
         if self._accid is not None:
-            raise ExpressionException('Cannot set mordent size if mordent was created with accid.')
+            raise ExpressionException('Cannot set mordent size if accid already set.')
         self._size = newSize
 
     @property
@@ -943,6 +949,12 @@ class Trill(Ornament):
     def accid(self) -> pitch.Accidental | None:
         return self._accid
 
+    @accid.setter
+    def accid(self, newAccid: pitch.Accidental | None):
+        if self._size is not None:
+            raise ExpressionException('Cannot set trill accid if size already set.')
+        self._accid = newAccid
+
     @property
     def size(self) -> interval.IntervalBase | None:
         if self._size is None:
@@ -955,7 +967,7 @@ class Trill(Ornament):
     @size.setter
     def size(self, newSize: interval.IntervalBase | None):
         if self._accid is not None:
-            raise ExpressionException('Cannot set trill size if trill was created with accid.')
+            raise ExpressionException('Cannot set trill size if accid already set.')
         self._size = newSize
 
     def splitClient(self, noteList):
@@ -1311,9 +1323,17 @@ class Turn(Ornament):
     def upperAccid(self) -> pitch.Accidental | None:
         return self._upperAccid
 
+    @upperAccid.setter
+    def upperAccid(self, newUpperAccid: pitch.Accidental | None):
+        self._upperAccid = newUpperAccid
+
     @property
     def lowerAccid(self) -> pitch.Accidental | None:
         return self._lowerAccid
+
+    @lowerAccid.setter
+    def lowerAccid(self, newLowerAccid: pitch.Accidental | None):
+        self._lowerAccid = newLowerAccid
 
     @property
     def delay(self) -> OrnamentDelay | OffsetQL:
