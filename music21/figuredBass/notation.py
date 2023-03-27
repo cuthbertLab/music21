@@ -129,11 +129,11 @@ class Notation(prebase.ProtoM21Object):
      <music21.figuredBass.notation.Modifier + sharp>,
      <music21.figuredBass.notation.Modifier None None>)
     >>> n1.figures[0]
-    <music21.figuredBass.notation.Figure 6 <Modifier None None>>
+    <music21.figuredBass.notation.Figure 6 <Modifier None None> hasExt: False>
     >>> n1.figures[1]
-    <music21.figuredBass.notation.Figure 4 <Modifier + sharp>>
+    <music21.figuredBass.notation.Figure 4 <Modifier + sharp> hasExt: False>
     >>> n1.figures[2]
-    <music21.figuredBass.notation.Figure 2 <Modifier None None>>
+    <music21.figuredBass.notation.Figure 2 <Modifier None None> hasExt: False>
 
 
     Here, a stand-alone '#' is being passed to Notation.
@@ -146,9 +146,9 @@ class Notation(prebase.ProtoM21Object):
     (<music21.figuredBass.notation.Modifier None None>,
      <music21.figuredBass.notation.Modifier # sharp>)
     >>> n2.figures[0]
-    <music21.figuredBass.notation.Figure 5 <Modifier None None>>
+    <music21.figuredBass.notation.Figure 5 <Modifier None None> hasExt: False>
     >>> n2.figures[1]
-    <music21.figuredBass.notation.Figure 3 <Modifier # sharp>>
+    <music21.figuredBass.notation.Figure 3 <Modifier # sharp> hasExt: False>
 
 
     Now, a stand-alone b is being passed to Notation as part of a larger notationColumn.
@@ -161,9 +161,9 @@ class Notation(prebase.ProtoM21Object):
     (<music21.figuredBass.notation.Modifier b flat>,
      <music21.figuredBass.notation.Modifier b flat>)
     >>> n3.figures[0]
-    <music21.figuredBass.notation.Figure 6 <Modifier b flat>>
+    <music21.figuredBass.notation.Figure 6 <Modifier b flat> hasExt: False>
     >>> n3.figures[1]
-    <music21.figuredBass.notation.Figure 3 <Modifier b flat>>
+    <music21.figuredBass.notation.Figure 3 <Modifier b flat> hasExt: False>
     '''
     _DOC_ORDER = ['notationColumn', 'figureStrings', 'numbers', 'modifiers',
                   'figures', 'origNumbers', 'origModStrings', 'modifierStrings']
@@ -388,9 +388,9 @@ class Notation(prebase.ProtoM21Object):
         >>> from music21.figuredBass import notation as n
         >>> notation2 = n.Notation('-6,-')  #__init__ method calls _getFigures()
         >>> notation2.figures[0]
-        <music21.figuredBass.notation.Figure 6 <Modifier - flat>>
+        <music21.figuredBass.notation.Figure 6 <Modifier - flat> hasExt: False>
         >>> notation2.figures[1]
-        <music21.figuredBass.notation.Figure 3 <Modifier - flat>>
+        <music21.figuredBass.notation.Figure 3 <Modifier - flat> hasExt: False>
         '''
         figures = []
 
@@ -426,7 +426,7 @@ class Figure(prebase.ProtoM21Object):
     >>> from music21.figuredBass import notation
     >>> f1 = notation.Figure(4, '+')
     >>> f1
-    <music21.figuredBass.notation.Figure 4 <Modifier + sharp>>
+    <music21.figuredBass.notation.Figure 4 <Modifier + sharp> hasExt: False>
 
     >>> f1.number
     4
