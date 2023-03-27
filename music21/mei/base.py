@@ -2527,25 +2527,21 @@ def figuredbassFromElement(elem, slurBundle=None) -> harmony.FiguredBassIndicati
     if elem.get(_XMLID):
         fb_id = elem.get(_XMLID)
     fb_notation: str = ''
+    fb_notation_list: list[str] = []
     dauer: float = 0
     # loop through all child elements and collect <f> tags
     for subElement in elem.findall('*'):
         if subElement.tag == f'{MEI_NS}f':
             if subElement.text is not None:
-                if fb_notation != '':
-                    fb_notation += f',{subElement.text}'
-                else:
-                    fb_notation = subElement.text
+                fb_notation_list.append(subElement.text)
             else:
                 if 'extender' in subElement.attrib.keys():
-                    if fb_notation != '':
-                        fb_notation += ',_'
-                    else:
-                        fb_notation = '_'
+                    fb_notation_list.append('_')
             if 'dur.metrical' in subElement.attrib.keys():
                 dauer = float(subElement.attrib['dur.metrical'])
 
     # Generate a FiguredBassIndication object and set the collected information
+    fb_notation = ",".join(fb_notation_list)
     theFbNotation = harmony.FiguredBassIndication(fb_notation)
     theFbNotation.id = fb_id
     theFbNotation.duration = duration.Duration(quarterLength=dauer)
