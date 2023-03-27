@@ -2496,15 +2496,11 @@ class NoChord(ChordSymbol):
 class FiguredBassIndication(Harmony):
     isFigure = True
     tstamp = 1
-    def __init__(self, figs=None, **keywords):
+    def __init__(self, figs: list | None=None, **keywords):
         super().__init__(**keywords)
         if figs:
             if isinstance(figs, list):
-                fig_string = str(figs[0])
-                for sf in figs:
-                    fig_string += f',{sf}'
-                figs = fig_string
-                #pass
+                figs = ','.join(figs)
         else:
             figs = ''
         self._fig_notation = notation.Notation(figs)
@@ -2512,7 +2508,7 @@ class FiguredBassIndication(Harmony):
     @property
     def fig_notation(self) -> notation.Notation:
         return self._fig_notation
-    
+
     @fig_notation.setter
     def fig_notation(self, figs):
         self._fig_notation = notation.Notation(figs)

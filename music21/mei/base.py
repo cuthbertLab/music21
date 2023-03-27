@@ -469,7 +469,8 @@ def allPartsPresent(scoreElem) -> tuple[str, ...]:
         raise MeiValidityError(_SEEMINGLY_NO_PARTS)
 
     # Get information of possible <harm> tags in the score. If there are tags prepare a list to 
-    # store them and process them later. TODO: Maybe to be put in a separate function e.g. like allPartsPresent
+    # store them and process them later. 
+    # TODO: Maybe to be put in a separate function e.g. like allPartsPresent
     figuredBassQuery = f'.//{MEI_NS}fb'
     if scoreElem.findall(figuredBassQuery):
         environLocal.printDebug('harm tag found!')
@@ -2504,7 +2505,7 @@ def chordFromElement(elem, slurBundle=None):
 
     return theChord
 
-def harmFromElement(elem, slurBundle=None):
+def harmFromElement(elem, slurBundle=None) -> tuple:
     # other tags than <fb> to be added…
     tagToFunction = {f'{MEI_NS}fb': figuredbassFromElement}
 
@@ -2522,10 +2523,10 @@ def harmFromElement(elem, slurBundle=None):
 
     return fb_harmony_tag
 
-def figuredbassFromElement(elem, slurBundle=None):
+def figuredbassFromElement(elem, slurBundle=None) -> harmony.FiguredBassIndication:
     if elem.get(_XMLID):
         fb_id = elem.get(_XMLID)
-    fb_notation = ''
+    fb_notation: str = ''
     dauer: float = 0
     # loop through all child elements and collect <f> tags
     for subElement in elem.findall('*'):
@@ -3553,7 +3554,8 @@ def scoreFromElement(elem, slurBundle):
     # Get a tuple of all the @n attributes for the <staff> tags in this score. Each <staff> tag
     # corresponds to what will be a music21 Part.
 
-    # UPDATE: If <harm> tags are found, they will also be collected as a separate 'part' to process them later.
+    # UPDATE: If <harm> tags are found, they will also be collected as a separate 'part' 
+    # to process them later.
     allPartNs = allPartsPresent(elem)
 
     # This is the actual processing.

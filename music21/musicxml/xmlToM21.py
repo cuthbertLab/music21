@@ -926,7 +926,7 @@ class MusicXMLImporter(XMLParserBase):
             if part is not None:  # for instance, in partStreams
                 s.coreInsert(0.0, part)
                 self.m21PartObjectsById[partId] = part
-        
+
         if self.fbis:
             for fbi in self.fbis:
                 s.insert(fbi[0], fbi[1])
@@ -5183,28 +5183,28 @@ class MeasureParser(XMLParserBase):
         for figure in mxFiguredBass.findall('*'):
             # TODO: suffixes are ignored at the moment
             for el in figure.findall('*'):
-                #print('  ', el)
                 fb_number: str = ''
                 fb_prefix: str = ''
                 if el.tag == 'figure-number':
                     if el.text:
                         fb_number = el.text
-                    if figure.findall('prefix'):
-                        for prefix in figure.findall('prefix'):
-                            
-                            if prefix.text:
-                                fb_prefix = modifiersDictXmlToM21[prefix.text]
-                    # put prefix and number together
-                    if fb_prefix + fb_number != '':
-                        fb_strings.append(fb_prefix + fb_number)
+                    
+                    # Get prefix and/or suffix.
+                    # The function returns an empty string if nothing is found.
+                    fb_prefix = self._getFigurePrefixOrSuffix(figure, 'prefix')
+                    fb_suffix = self._getFigurePrefixOrSuffix(figure, 'suffix')
+
+                    # put prefix/suffix and number together
+                    if fb_prefix + fb_number + fb_suffix != '':
+                        fb_strings.append(fb_prefix + fb_number + fb_suffix)
 
                 if el.tag == 'extend':
                     if 'type' in el.attrib.keys():
                         if el.attrib['type'] == 'continue':
                             fb_strings.append('_')
 
-            # If a <duration> is given, this usually means that there are multiple figures for a single note.
-            # We have to look for offsets here.
+            # If a <duration> is given, this usually means that there are multiple figures
+            # for a single note. We have to look for offsets here.
             if figure.tag == 'duration':
                 d = self.xmlToDuration(mxFiguredBass)
                 if self.lastFigureDuration > 0:
@@ -5214,7 +5214,6 @@ class MeasureParser(XMLParserBase):
                     offsetFbi = self.offsetMeasureNote
                     self.lastFigureDuration = d.quarterLength
 
-        #print('ü', fb_strings)
         fb_string = sep.join(fb_strings)
         fbi = harmony.FiguredBassIndication(fb_string)
         # If a duration is provided, set length of the FigureBassIndication
@@ -5223,6 +5222,13 @@ class MeasureParser(XMLParserBase):
         # function in parent add add found objects.
         #
         self.parent.appendFbis(fbi, offsetFbi)
+
+    def _getFigurePrefixOrSuffix(self, figure, presuf: str='prefix') -> str:
+        if figure.findall(presuf):
+            for fix in figure.findall(presuf):
+                if fix.text:
+                    return modifiersDictXmlToM21[fix.text]
+        return ''
 
     def xmlDirection(self, mxDirection):
         '''

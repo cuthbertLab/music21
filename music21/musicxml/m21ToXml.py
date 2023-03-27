@@ -1482,7 +1482,7 @@ class ScoreExporter(XMLExporterBase, PartStaffExporterMixin):
         self.textBoxes = None
         self.highestTime = 0.0
         self.fb_part = -1
-        self.fbis_dict = {}
+        self.fbis_dict: dict = {}
         self.currentDivisions = defaults.divisionsPerQuarter
 
         self.refStreamOrTimeRange = [0.0, self.highestTime]
@@ -3211,6 +3211,7 @@ class MeasureExporter(XMLExporterBase):
             self.spannerBundle = parent.spannerBundle
 
         self.objectSpannerBundle = self.spannerBundle  # will change for each element.
+        self._fbiBefore: tuple[float, Element] = ()
 
     def parse(self):
         '''
@@ -3369,7 +3370,7 @@ class MeasureExporter(XMLExporterBase):
         # Prepare the iteration by offsets. If there are FiguredBassIndication objects
         # first group them in one list together with their note, instead of handling them
         # seperately. O
-        groupedObjList = []
+        groupedObjList: list = []
         for els in objIterator:
             #print(els)
             if len(groupedObjList) > 0:
@@ -3540,7 +3541,7 @@ class MeasureExporter(XMLExporterBase):
         '''
         Adds relevant figured bass elements collected from the stream.Score to the
         current stream.Measure object parsed afterwards.
-        
+
         In a MusicXML file <figured-bass> tags usually stand before the corresponding
         note object. This order will be observed by parseFlatElements() function. 
         Same for multiple figures at one note.
@@ -4625,15 +4626,15 @@ class MeasureExporter(XMLExporterBase):
         return mxFB
     
     def _figuresToXml(self, f: harmony.FiguredBassIndication, multipleFigures=False):
-        #do Figure elements
-        #self.addDividerComment('BEGIN: figured-bass')
+        # do Figure elements
+        # self.addDividerComment('BEGIN: figured-bass')
 
         mxFB = Element('figured-bass')
         dura = 0
         for fig in f.fig_notation.figuresFromNotationColumn:
             mxFigure = SubElement(mxFB, 'figure')
 
-            #get only the fbnumber without prefixes or suffixes
+            # get only the fbnumber without prefixes or suffixes
             mxFNumber = SubElement(mxFigure, 'figure-number')
             if fig.number:
                 if fig.number == '_':
@@ -4644,8 +4645,8 @@ class MeasureExporter(XMLExporterBase):
                     mxFNumber.text = str(fig.number)
             else:
                 mxFNumber.text = ''
-            
-            #modifiers are either handled as prefixes or suffixes here
+
+            # modifiers are either handled as prefixes or suffixes here
             fbModifier = fig.modifierString
             if fbModifier:
                 mxModifier = SubElement(mxFigure, 'prefix')
@@ -4656,7 +4657,8 @@ class MeasureExporter(XMLExporterBase):
             # If we have multiple figures we have to set a <dutation> tag
             # and update the <figured-bass> tag one before.
             if multipleFigures:
-                dura = round((f.offset - self.offsetInMeasure - self.offsetFiguresInMeasure) * self.currentDivisions)
+                dura = round((f.offset - self.offsetInMeasure - self.offsetFiguresInMeasure)
+                             * self.currentDivisions)
                 self.offsetFiguresInMeasure = f.offset - self.offsetInMeasure
 
                 # Update figures-bass tag before
@@ -4679,13 +4681,12 @@ class MeasureExporter(XMLExporterBase):
                 self.offsetFiguresInMeasure = 0.0
                 
             if self.tempFigureDuration > 0:
-                #print(f.quarterLength * self.currentDivisions)
+                # print(f.quarterLength * self.currentDivisions)
                 mxFbDuration = SubElement(mxFB, 'duration')
                 mxFbDuration.text = str(round(self.tempFigureDuration))
                 self.tempFigureDuration = 0.0
                 
         return mxFB
-        #self.addDividerComment('END: figured-bass')
 
     def durationXml(self, dur: duration.Duration):
         # noinspection PyShadowingNames
