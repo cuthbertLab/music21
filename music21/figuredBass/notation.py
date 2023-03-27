@@ -404,8 +404,7 @@ class Notation(prebase.ProtoM21Object):
 
         figuresFromNotaCol = []
 
-        for i in range(len(self.origNumbers)):
-            number = self.origNumbers[i]
+        for i, number in enumerate(self.origNumbers):
             modifierString = self.origModStrings[i]
             figure = Figure(number, modifierString)
             figuresFromNotaCol.append(figure)
@@ -452,14 +451,12 @@ class Figure(prebase.ProtoM21Object):
             ''',
     }
 
-    def __init__(self, number=1, modifierString=None, isExtender=None):
+    def __init__(self, number=1, modifierString=None):
         self.number = number
         self.modifierString = modifierString
         self.modifier = Modifier(modifierString)
-        if self.number == '_':
-            self.isExtender = True
-        else:
-            self.isExtender = False            
+        # look for extenders underscore 
+        self.isExtender: bool = (self.number == '_')
 
     def _reprInternal(self):
         mod = repr(self.modifier).replace('music21.figuredBass.notation.', '')

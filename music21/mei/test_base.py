@@ -3929,7 +3929,7 @@ class Test(unittest.TestCase):
             elem.append(eachStaff)
         # @n="4" is in "expectedNs" but we're leaving it out as part of the test
         backupNum = 900  # should be ignored by measureFromElement()
-        expectedNs = ['1', '2', '3', '4']
+        expectedNs = ['1', '2', '3', '4', 'fb']
         slurBundle = mock.MagicMock(name='slurBundle')
         activeMeter = mock.MagicMock(name='activeMeter')
         activeMeter.barDuration = duration.Duration(4.0)
