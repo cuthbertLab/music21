@@ -105,6 +105,8 @@ accidentalNameToModifier = {
     'one-and-a-half-flat': '-`',
 }
 
+modifierToAccidentalName = {v: k for k, v in accidentalNameToModifier.items()}
+
 unicodeFromModifier = OrderedDict([
     ('####', chr(0x1d12a) + chr(0x1d12a)),
     ('###', '\u266f' + chr(0x1d12a)),
@@ -121,6 +123,33 @@ unicodeFromModifier = OrderedDict([
     ('', '\u266e'),  # natural
 ])
 
+alternateNameToAccidentalName = {
+    'n': 'natural',
+    'is': 'sharp',
+    'isis': 'double-sharp',
+    'isisis': 'triple-sharp',
+    'isisisis': 'quadruple-sharp',
+    'es': 'flat',
+    'b': 'flat',
+    'eses': 'double-flat',
+    'eseses': 'triple-flat',
+    'eseseses': 'quadruple-flat',
+    'quarter-sharp': 'half-sharp',
+    'ih': 'half-sharp',
+    'semisharp': 'half-sharp',
+    'three-quarter-sharp': 'one-and-a-half-sharp',
+    'three-quarters-sharp': 'one-and-a-half-sharp',
+    'isih': 'one-and-a-half-sharp',
+    'sesquisharp': 'one-and-a-half-sharp',
+    'quarter-flat': 'half-flat',
+    'eh': 'half-flat',
+    'semiflat': 'half-flat',
+    'three-quarter-flat': 'one-and-a-half-flat',
+    'three-quarters-flat': 'one-and-a-half-flat',
+    'eseh': 'one-and-a-half-flat',
+    'sesquiflat': 'one-and-a-half-flat',
+}
+
 
 # sort modifiers by length, from longest to shortest
 def _sortModifiers():
@@ -133,6 +162,28 @@ def _sortModifiers():
 
 
 accidentalModifiersSorted = _sortModifiers()
+
+def isValidAccidentalName(name: str) -> bool:
+    # check against official names (e.g. 'double-flat')
+    if name in accidentalNameToModifier:
+        return True
+    # check against official modifiers (e.g. '--')
+    if name in accidentalNameToModifier.values():
+        return True
+    # check against alternate supported names (e.g. 'eses')
+    if name in alternateNameToAccidentalName:
+        return True
+    return False
+
+def makeAccidentalName(name: str) -> str | None:
+    if name in accidentalNameToModifier:
+        return name
+    if name in modifierToAccidentalName:
+        return modifierToAccidentalName[name]
+    if name in alternateNameToAccidentalName:
+        return alternateNameToAccidentalName[name]
+    return None
+
 
 
 # ------------------------------------------------------------------------------

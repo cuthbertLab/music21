@@ -458,11 +458,12 @@ class Ornament(Expression):
     whether to shrink (not currently to expand) the ornament if the
     note it is attached to is too short to realize.
     '''
-    def __init__(self, **keywords):
+    def __init__(self, **keywords) -> None:
         super().__init__(**keywords)
+        # should follow directly on previous; true for most "ornaments".
         self.connectedToPrevious = True
         self.autoScale = True
-        # should follow directly on previous; true for most "ornaments".
+        self._otherPitches: list[pitch.Pitch] = []
 
     def realize(self,
                 srcObj: note.Note,
@@ -518,16 +519,27 @@ class Ornament(Expression):
         fillObjects.append(firstNote)
         fillObjects.append(secondNote)
 
+    def resolveOtherPitches(self, srcPitch: pitch.Pitch):
+        # Only does something for ornament types that have "other pitches"
+        # (Turn, GeneralMordent, Trill)
+        return
+
+    @property
+    def otherPitches(self) -> list[pitch.Pitch]:
+        return self._otherPitches
+
 
 # ------------------------------------------------------------------------------
 class GeneralMordent(Ornament):
     '''
     Base class for all Mordent types.
     '''
-    def __init__(self, *, accid: pitch.Accidental | None = None, **keywords):
+    def __init__(self, *, accid: str | None = None, **keywords):
         super().__init__(**keywords)
         self._direction = ''  # up or down
-        self._accid: pitch.Accidental | None = accid
+        self._accid: str | None = None
+        if accid is not None and pitch.isValidAccidentalName(accid):
+            self._accid = accid
         self._size: interval.IntervalBase | None = None
         self.quarterLength = 0.125  # 32nd note default
         self.placement = 'above'
@@ -545,26 +557,30 @@ class GeneralMordent(Ornament):
         >>> mordent.name
         'mordent'
 
-        >>> sharpAccid = pitch.Accidental(1)
-        >>> invertedMordent = expressions.InvertedMordent(accid=sharpAccid)
+        >>> invertedMordent = expressions.InvertedMordent(accid='sharp')
         >>> invertedMordent.name
         'inverted mordent (sharp)'
 
         '''
         theName: str = super().name
         if self.accid is not None:
-            theName += f' ({self.accid.name})'
+            theName += ' (' + self.accid + ')'
         return theName
 
     @property
-    def accid(self) -> pitch.Accidental | None:
+    def accid(self) -> str | None:
         return self._accid
 
     @accid.setter
-    def accid(self, newAccid: pitch.Accidental | None):
+    def accid(self, newAccid: str | None):
         if self._size is not None:
             raise ExpressionException('Cannot set mordent accid if size already set.')
-        self._accid = newAccid
+
+        # silently ignore invalid accid
+        if newAccid is None:
+            self._accid = None
+        elif pitch.isValidAccidentalName(newAccid):
+            self._accid = pitch.makeAccidentalName(newAccid)
 
     @property
     def size(self) -> interval.IntervalBase | None:
@@ -603,8 +619,27 @@ class GeneralMordent(Ornament):
         else:
             otherPitch.transpose(interval.GenericInterval(-2), inPlace=True)
 
-        otherPitch.accidental = self.accid
+        if self.accid is not None:
+            otherPitch.accidental = pitch.Accidental(self.accid)
         return interval.Interval(srcPitch, otherPitch)
+
+    def resolveOtherPitches(self, srcPitch: pitch.Pitch):
+        if self._otherPitches:
+            # otherPitches have already been resolved
+            return
+
+        transposeInterval: interval.IntervalBase = self.getSize(srcPitch)
+        otherPitch: pitch.Pitch = srcPitch.transpose(transposeInterval, inPlace=False)
+        if self.accid is not None:
+            if otherPitch.accidental is None:
+                otherPitch.accidental = pitch.Accidental(0)
+            otherPitch.accidental.displayStatus = True
+        self._otherPitches = [otherPitch]
+
+    @property
+    def otherPitch(self) -> pitch.Pitch | None:
+        if self._otherPitches:
+            return self._otherPitches[0]
 
     def realize(self, srcObj: note.Note, *, inPlace=False):
         '''
@@ -699,7 +734,7 @@ class Mordent(GeneralMordent):
     >>> m.getSize(pitch.Pitch('B3'))
     <music21.interval.Interval M-2>
 
-    >>> mFlat = expressions.Mordent(accid=pitch.Accidental('-'))
+    >>> mFlat = expressions.Mordent(accid='flat')
     >>> mFlat.direction
     'down'
     >>> mFlat.getSize(pitch.Pitch('C4'))
@@ -712,7 +747,7 @@ class Mordent(GeneralMordent):
     * Changed in v9: Support for mordents with accidentals, which implies support for
       various sizes, depending on srcObj (note), current key sig, and mordent accidental.
     '''
-    def __init__(self, *, accid: pitch.Accidental | None = None, **keywords):
+    def __init__(self, *, accid: str | None = None, **keywords):
         super().__init__(accid=accid, **keywords)
         self._direction = 'down'  # up or down
 
@@ -729,9 +764,10 @@ class HalfStepMordent(Mordent):
     '''
     def __init__(self, **keywords) -> None:
         # no accidental supported here, just "HalfStep"
-        if 'accid' in keywords:
-            del keywords['accid']
-        super().__init__(**keywords)
+        kw = keywords.copy()
+        if 'accid' in kw:
+            del kw['accid']
+        super().__init__(**kw)
         self._size: interval.IntervalBase = interval.Interval('m-2')
 
     def getSize(self, srcPitch: pitch.Pitch) -> interval.IntervalBase:
@@ -758,8 +794,9 @@ class WholeStepMordent(Mordent):
     '''
     def __init__(self, **keywords) -> None:
         # no accidental supported here, just "WholeStep"
-        if 'accid' in keywords:
-            del keywords['accid']
+        kw = keywords.copy()
+        if 'accid' in kw:
+            del kw['accid']
         super().__init__(**keywords)
         self._size: interval.IntervalBase = interval.Interval('M-2')
 
@@ -799,7 +836,7 @@ class InvertedMordent(GeneralMordent):
     >>> m.getSize(pitch.Pitch('B3'))
     <music21.interval.Interval m2>
 
-    >>> mSharp = expressions.InvertedMordent(accid=pitch.Accidental('#'))
+    >>> mSharp = expressions.InvertedMordent(accid='sharp')
     >>> mSharp.direction
     'up'
     >>> mSharp.getSize(pitch.Pitch('C4'))
@@ -812,7 +849,7 @@ class InvertedMordent(GeneralMordent):
     * Changed in v9: Support for inverted mordents with accidentals, which implies support for
       various sizes, depending on srcObj (note), current key sig, and inverted mordent accidental.
     '''
-    def __init__(self, *, accid: pitch.Accidental | None = None, **keywords):
+    def __init__(self, *, accid: str | None = None, **keywords):
         super().__init__(accid=accid, **keywords)
         self._direction = 'up'
 
@@ -829,8 +866,9 @@ class HalfStepInvertedMordent(InvertedMordent):
     '''
     def __init__(self, **keywords) -> None:
         # no accidental supported here, just "HalfStep"
-        if 'accid' in keywords:
-            del keywords['accid']
+        kw = keywords.copy()
+        if 'accid' in kw:
+            del kw['accid']
         super().__init__(**keywords)
         self._size: interval.IntervalBase = interval.Interval('m2')
 
@@ -858,8 +896,9 @@ class WholeStepInvertedMordent(InvertedMordent):
     '''
     def __init__(self, **keywords) -> None:
         # no accidental supported here, just "WholeStep"
-        if 'accid' in keywords:
-            del keywords['accid']
+        kw = keywords.copy()
+        if 'accid' in kw:
+            del kw['accid']
         super().__init__(**keywords)
         self._size: interval.IntervalBase = interval.Interval('M2')
 
@@ -907,9 +946,11 @@ class Trill(Ornament):
     * Changed in v9: Support for trills with accidentals, which implies support for
       various sizes, depending on srcObj (note), current key sig, and trill accidental.
     '''
-    def __init__(self, *, accid: pitch.Accidental | None = None, **keywords) -> None:
+    def __init__(self, *, accid: str | None = None, **keywords) -> None:
         super().__init__(**keywords)
-        self._accid: pitch.Accidental | None = accid
+        self._accid: str | None = None
+        if accid is not None and pitch.isValidAccidentalName(accid):
+            self._accid = pitch.makeAccidentalName(accid)
         self._size: interval.IntervalBase | None = None
         self.placement = 'above'
         self.nachschlag = False  # play little notes at the end of the trill?
@@ -930,15 +971,14 @@ class Trill(Ornament):
         >>> trill.name
         'trill'
 
-        >>> doubleSharpAccid = pitch.Accidental(2)
-        >>> doubleSharpedTrill = expressions.Trill(accid=doubleSharpAccid)
+        >>> doubleSharpedTrill = expressions.Trill(accid='double-sharp')
         >>> doubleSharpedTrill.name
         'trill (double-sharp)'
 
         '''
         theName: str = super().name
         if self.accid is not None:
-            theName += f' ({self.accid.name})'
+            theName += ' (' + self.accid + ')'
         return theName
 
     @property
@@ -946,14 +986,19 @@ class Trill(Ornament):
         return 'up'
 
     @property
-    def accid(self) -> pitch.Accidental | None:
+    def accid(self) -> str | None:
         return self._accid
 
     @accid.setter
-    def accid(self, newAccid: pitch.Accidental | None):
+    def accid(self, newAccid: str | None):
         if self._size is not None:
             raise ExpressionException('Cannot set trill accid if size already set.')
-        self._accid = newAccid
+
+        # silently ignore invalid accid
+        if newAccid is None:
+            self._accid = None
+        elif pitch.isValidAccidentalName(newAccid):
+            self._accid = pitch.makeAccidentalName(newAccid)
 
     @property
     def size(self) -> interval.IntervalBase | None:
@@ -1003,9 +1048,28 @@ class Trill(Ornament):
         otherPitch.accidental = None
 
         otherPitch.transpose(interval.GenericInterval(2), inPlace=True)
-        otherPitch.accidental = self.accid
+        if self.accid is not None:
+            otherPitch.accidental = pitch.Accidental(self.accid)
 
         return interval.Interval(srcPitch, otherPitch)
+
+    def resolveOtherPitches(self, srcPitch: pitch.Pitch):
+        if self._otherPitches:
+            # otherPitches have already been resolved
+            return
+
+        transposeInterval: interval.IntervalBase = self.getSize(srcPitch)
+        otherPitch: pitch.Pitch = srcPitch.transpose(transposeInterval, inPlace=False)
+        if self.accid is not None:
+            if otherPitch.accidental is None:
+                otherPitch.accidental = pitch.Accidental(0)
+            otherPitch.accidental.displayStatus = True
+        self._otherPitches = [otherPitch]
+
+    @property
+    def otherPitch(self) -> pitch.Pitch | None:
+        if self._otherPitches:
+            return self._otherPitches[0]
 
     def realize(
         self,
@@ -1203,8 +1267,9 @@ class HalfStepTrill(Trill):
     '''
     def __init__(self, **keywords) -> None:
         # no accidental supported here, just "HalfStep"
-        if 'accid' in keywords:
-            del keywords['accid']
+        kw = keywords.copy()
+        if 'accid' in kw:
+            del kw['accid']
         super().__init__(**keywords)
         self._size: interval.IntervalBase = interval.Interval('m2')
         self._setAccidentalFromKeySig = False
@@ -1245,8 +1310,9 @@ class WholeStepTrill(Trill):
     '''
     def __init__(self, **keywords) -> None:
         # no accidental supported here, just "WholeStep"
-        if 'accid' in keywords:
-            del keywords['accid']
+        kw = keywords.copy()
+        if 'accid' in kw:
+            del kw['accid']
         super().__init__(**keywords)
         self._size: interval.IntervalBase = interval.Interval('M2')
         self._setAccidentalFromKeySig = False
@@ -1304,14 +1370,18 @@ class Turn(Ornament):
         self,
         *,
         delay: OrnamentDelay | OffsetQL = OrnamentDelay.NO_DELAY,
-        upperAccid: pitch.Accidental | None = None,
-        lowerAccid: pitch.Accidental | None = None,
+        upperAccid: str | None = None,
+        lowerAccid: str | None = None,
         **keywords
     ):
         super().__init__(**keywords)
         # self.size: interval.IntervalBase = interval.GenericInterval(2)
-        self._upperAccid: pitch.Accidental | None = upperAccid
-        self._lowerAccid: pitch.Accidental | None = lowerAccid
+        self._upperAccid: str | None = None
+        if upperAccid is not None and pitch.isValidAccidentalName(upperAccid):
+            self._upperAccid = pitch.makeAccidentalName(upperAccid)
+        self._lowerAccid: str | None = None
+        if lowerAccid is not None and pitch.isValidAccidentalName(lowerAccid):
+            self._lowerAccid = pitch.makeAccidentalName(lowerAccid)
         self.isInverted: bool = False
         self.placement: str = 'above'
         self.tieAttach: str = 'all'
@@ -1320,20 +1390,28 @@ class Turn(Ornament):
         self.delay = delay  # use property setter
 
     @property
-    def upperAccid(self) -> pitch.Accidental | None:
+    def upperAccid(self) -> str | None:
         return self._upperAccid
 
     @upperAccid.setter
-    def upperAccid(self, newUpperAccid: pitch.Accidental | None):
-        self._upperAccid = newUpperAccid
+    def upperAccid(self, newUpperAccid: str | None):
+        # silently ignore invalid accid
+        if newUpperAccid is None:
+            self._upperAccid = None
+        elif pitch.isValidAccidentalName(newUpperAccid):
+            self._upperAccid = pitch.makeAccidentalName(newUpperAccid)
 
     @property
-    def lowerAccid(self) -> pitch.Accidental | None:
+    def lowerAccid(self) -> str | None:
         return self._lowerAccid
 
     @lowerAccid.setter
-    def lowerAccid(self, newLowerAccid: pitch.Accidental | None):
-        self._lowerAccid = newLowerAccid
+    def lowerAccid(self, newLowerAccid: str | None):
+        # silently ignore invalid accid
+        if newLowerAccid is None:
+            self._lowerAccid = None
+        elif pitch.isValidAccidentalName(newLowerAccid):
+            self._lowerAccid = pitch.makeAccidentalName(newLowerAccid)
 
     @property
     def delay(self) -> OrnamentDelay | OffsetQL:
@@ -1369,20 +1447,16 @@ class Turn(Ornament):
         >>> nonDelayedTurn.name
         'turn'
 
-        >>> naturalAccid = pitch.Accidental(0)
-        >>> sharpAccid = pitch.Accidental(1)
-        >>> doubleflatAccid = pitch.Accidental(-2)
-
         >>> from music21.common.enums import OrnamentDelay
         >>> delayedInvertedTurn = expressions.InvertedTurn(
         ...     delay=OrnamentDelay.DEFAULT_DELAY,
-        ...     upperAccid=sharpAccid,
-        ...     lowerAccid=naturalAccid
+        ...     upperAccid='sharp',
+        ...     lowerAccid='natural'
         ... )
         >>> delayedInvertedTurn.name
         'delayed inverted turn (upper=sharp, lower=natural)'
 
-        >>> delayedBy1Turn = expressions.Turn(delay=1.0, lowerAccid=doubleflatAccid)
+        >>> delayedBy1Turn = expressions.Turn(delay=1.0, lowerAccid='double-flat')
         >>> delayedBy1Turn.name
         'delayed(delayQL=1.0) turn (lower=double-flat)'
 
@@ -1393,14 +1467,14 @@ class Turn(Ornament):
         elif isinstance(self.delay, (float, Fraction)):
             theName = f'delayed(delayQL={self.delay}) ' + theName
 
-        if self.upperAccid or self.lowerAccid:
+        if self.upperAccid is not None or self.lowerAccid is not None:
             theName += ' ('
-            if self.upperAccid:
-                theName += 'upper=' + self.upperAccid.name
+            if self.upperAccid is not None:
+                theName += 'upper=' + self.upperAccid
                 if self.lowerAccid:
                     theName += ', '
-            if self.lowerAccid:
-                theName += 'lower=' + self.lowerAccid.name
+            if self.lowerAccid is not None:
+                theName += 'lower=' + self.lowerAccid
             theName += ')'
 
         return theName
@@ -1413,7 +1487,8 @@ class Turn(Ornament):
         upperPitch.accidental = None
 
         upperPitch.transpose(interval.GenericInterval(2), inPlace=True)
-        upperPitch.accidental = self.upperAccid
+        if self.upperAccid is not None:
+            upperPitch.accidental = pitch.Accidental(self.upperAccid)
 
         return interval.Interval(srcPitch, upperPitch)
 
@@ -1425,9 +1500,46 @@ class Turn(Ornament):
         lowerPitch.accidental = None
 
         lowerPitch.transpose(interval.GenericInterval(-2), inPlace=True)
-        lowerPitch.accidental = self.lowerAccid
+        if self.lowerAccid is not None:
+            lowerPitch.accidental = pitch.Accidental(self.lowerAccid)
 
         return interval.Interval(srcPitch, lowerPitch)
+
+    def resolveOtherPitches(self, srcPitch: pitch.Pitch):
+        if self._otherPitches:
+            # otherPitches have already been resolved
+            return
+
+        transposeIntervalUp: interval.IntervalBase = self.getUpperSize(srcPitch)
+        upperPitch: pitch.Pitch = srcPitch.transpose(transposeIntervalUp, inPlace=False)
+        transposeIntervalDown: interval.IntervalBase = self.getLowerSize(srcPitch)
+        lowerPitch: pitch.Pitch = srcPitch.transpose(transposeIntervalDown, inPlace=False)
+
+        # existence of upperAccid (or lowerAccid) implies upperPitch.accidental (or
+        # lowerPitch.accidental) should be displayed.
+        if self.upperAccid is not None:
+            if upperPitch.accidental is None:
+                upperPitch.accidental = pitch.Accidental(0)
+            upperPitch.accidental.displayStatus = True
+        if self.lowerAccid is not None:
+            if lowerPitch.accidental is None:
+                lowerPitch.accidental = pitch.Accidental(0)
+            lowerPitch.accidental.displayStatus = True
+
+        # order matters, see upperPitch and lowerPitch properties below
+        self._otherPitches = [upperPitch, lowerPitch]
+
+    @property
+    def upperPitch(self) -> pitch.Pitch | None:
+        if len(self._otherPitches) >= 1:
+            return self._otherPitches[0]
+        return None
+
+    @property
+    def lowerPitch(self) -> pitch.Pitch | None:
+        if len(self._otherPitches) >= 2:
+            return self._otherPitches[1]
+        return None
 
     def realize(self, srcObj: note.Note, *, inPlace=False):
         # noinspection PyShadowingNames
@@ -1631,8 +1743,8 @@ class InvertedTurn(Turn):
         self,
         *,
         delay: OrnamentDelay | OffsetQL = OrnamentDelay.NO_DELAY,
-        upperAccid: pitch.Accidental | None = None,
-        lowerAccid: pitch.Accidental | None = None,
+        upperAccid: str | None = None,
+        lowerAccid: str | None = None,
         **keywords
     ):
         super().__init__(delay=delay, upperAccid=upperAccid, lowerAccid=lowerAccid, **keywords)

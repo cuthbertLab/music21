@@ -3798,6 +3798,11 @@ class MeasureParser(XMLParserBase):
                 self.setEditorial(mxNotations, post)
                 if post is not None:
                     n.expressions.append(post)
+                    if mostRecentOrnament is not None and hasattr(n, 'pitches'):
+                        # We have now finished up all the accids for mostRecentOrnament.
+                        # Resolve any other pitches (assume ornament goes with highest/last
+                        # note in chord)
+                        mostRecentOrnament.resolveOtherPitches(n.pitches[-1])
                     mostRecentOrnament = post
                 # environLocal.printDebug(['adding to expressions', post])
             elif mxObj.tag == 'wavy-line':
@@ -4039,7 +4044,7 @@ class MeasureParser(XMLParserBase):
         >>> a is None
         True
         >>> turn.lowerAccid
-        <music21.pitch.Accidental flat>
+        'flat'
         >>> turn.upperAccid is None
         True
 
@@ -4050,17 +4055,15 @@ class MeasureParser(XMLParserBase):
             if mostRecentOrnament is None:
                 return None
 
-            accid: pitch.Accidental = pitch.Accidental(mxObj.text)
-            accid.displayStatus = True  # <accidental-mark> should always be displayed
             if isinstance(mostRecentOrnament, expressions.Turn):
                 # upperAccid or lowerAccid? Look at placement (default to 'above').
                 placement: str = mxObj.get('placement', 'above')
                 if placement == 'below':
-                    mostRecentOrnament.lowerAccid = accid
+                    mostRecentOrnament.lowerAccid = mxObj.text
                 else:
-                    mostRecentOrnament.upperAccid = accid
+                    mostRecentOrnament.upperAccid = mxObj.text
             elif isinstance(mostRecentOrnament, (expressions.GeneralMordent, expressions.Trill)):
-                mostRecentOrnament.accid = accid
+                mostRecentOrnament.accid = mxObj.text
             return None
 
         try:
