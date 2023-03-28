@@ -10180,15 +10180,16 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
                 post.extend(list(e.pitches))
             elif isinstance(e, note.GeneralNote):
                 # GeneralNote is ultimately where we get all the pitches
-                post.extend(list(e.pitches))
-                # and also any of the GeneralNote's ornaments' otherPitches
-                for orn in e.expressions:
-                    if isinstance(orn, expressions.Ornament):
-                        # Figure out what the other pitches are, in case that hasn't
-                        # been done yet (this is a no-op if it has already been done).
-                        orn.resolveOtherPitches(e.pitches[-1])
-                        # Add them to the list
-                        post.extend(list(orn.otherPitches))
+                if e.pitches:
+                    post.extend(list(e.pitches))
+                    # and also any of the GeneralNote's ornaments' otherPitches
+                    for orn in e.expressions:
+                        if isinstance(orn, expressions.Ornament):
+                            # Figure out what the other pitches are, in case that hasn't
+                            # been done yet (this is a no-op if it has already been done).
+                            orn.resolveOtherPitches(e.pitches[-1])
+                            # Add them to the list
+                            post.extend(list(orn.otherPitches))
         return post
 
     # --------------------------------------------------------------------------
