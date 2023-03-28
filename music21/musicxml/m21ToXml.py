@@ -3232,7 +3232,7 @@ class MeasureExporter(XMLExporterBase):
             self.spannerBundle = parent.spannerBundle
 
         self.objectSpannerBundle = self.spannerBundle  # will change for each element.
-        self._fbiBefore: tuple[float, Element] = ()
+        self._fbiBefore: tuple = ()
 
     def parse(self):
         '''
@@ -3248,7 +3248,7 @@ class MeasureExporter(XMLExporterBase):
         self.setMxPrint()
         self.setMxAttributesObjectForStartOfMeasure()
         self.setLeftBarline()
-        # Look for FiguredBassIndications and add them to the local copy of the measure 
+        # Look for FiguredBassIndications and add them to the local copy of the measure
         # and after the other elements
         if self.parent.fbis:
             self.insertFiguredBassIndications()
@@ -3393,14 +3393,13 @@ class MeasureExporter(XMLExporterBase):
         # seperately. O
         groupedObjList: list = []
         for els in objIterator:
-            #print(els)
             if len(groupedObjList) > 0:
                 if len(els) == 1 and isinstance(els[0], harmony.FiguredBassIndication):
-                    #print('**multiple fb found**')
+                    # print('**multiple fb found**')
                     groupedObjList[-1].append(els[0])
                     continue
             groupedObjList.append(els)
-        #print('üüü', groupedObjList)
+
         for objGroup in groupedObjList:
             groupOffset = m.elementOffset(objGroup[0])
             offsetToMoveForward = groupOffset - self.offsetInMeasure
@@ -3569,19 +3568,23 @@ class MeasureExporter(XMLExporterBase):
         current stream.Measure object parsed afterwards.
 
         In a MusicXML file <figured-bass> tags usually stand before the corresponding
-        note object. This order will be observed by parseFlatElements() function. 
+        note object. This order will be observed by parseFlatElements() function.
         Same for multiple figures at one note.
         '''
         # get the measure range to map the corresponding figuredBass Items
-        measureRange = (self.stream.offset, self.stream.offset + self.stream.highestTime)
+        if self.stream:
+            measureRange = (self.stream.offset, self.stream.offset + self.stream.highestTime)
 
-        # Look if there are figures in the current measure and insert them
-        # to add them later.
-        for o, f in self.parent.fbis.items():
-            if o >= measureRange[0] and o < measureRange[1]:
-                for fbi in f:
-                    self.stream.insert(o - self.stream.offset, fbi)
-                
+            # Look if there are figures in the current measure and insert them
+            # to add them later.
+            if self.parent and self.parent.fbis:
+                for o, f in self.parent.fbis.items():
+                    if o >= measureRange[0] and o < measureRange[1]:
+                        for fbi in f:
+                            self.stream.insert(o - self.stream.offset, fbi)
+        else:
+            raise MusicXMLExportException('No stream found')
+
     def _hasRelatedSpanners(self, obj) -> bool:
         '''
         returns True if and only if:
@@ -4649,13 +4652,13 @@ class MeasureExporter(XMLExporterBase):
 
         # Hand the FiguredBassIndication over to the helper function.
         mxFB = self._figuresToXml(f, multipleFigures=multipleFigures)
-        
+
         # Append it to xmlRoot
         self.xmlRoot.append(mxFB)
         self._fbiBefore = (f.offset, mxFB)
-        #_synchronizeIds(mxFB, f)
+
         return mxFB
-    
+
     def _figuresToXml(self, f: harmony.FiguredBassIndication, multipleFigures=False):
         # do Figure elements
         # self.addDividerComment('BEGIN: figured-bass')
@@ -4683,7 +4686,7 @@ class MeasureExporter(XMLExporterBase):
                 mxModifier = SubElement(mxFigure, 'prefix')
                 mxModifier.text = modifiersDictM21ToXml[fbModifier]
 
-            # look for information on duration. If duration is 0 
+            # look for information on duration. If duration is 0
             # jump over the <duration> tag
             # If we have multiple figures we have to set a <dutation> tag
             # and update the <figured-bass> tag one before.
@@ -4701,7 +4704,7 @@ class MeasureExporter(XMLExporterBase):
                     newDura = SubElement(fbDuration_before, 'duration')
                     newDura.text = str(dura)
                 else:
-                    # If dura is set to 0 skip the update process. 
+                    # If dura is set to 0 skip the update process.
                     # This happens e.g. at the beginning of a piece.
                     # Otherwise an already set duration tag is resetted to 0 which is not wanted.
                     if dura > 0:
@@ -4710,13 +4713,13 @@ class MeasureExporter(XMLExporterBase):
                 self.tempFigureDuration = dura
             else:
                 self.offsetFiguresInMeasure = 0.0
-                
+
             if self.tempFigureDuration > 0:
                 # print(f.quarterLength * self.currentDivisions)
                 mxFbDuration = SubElement(mxFB, 'duration')
                 mxFbDuration.text = str(round(self.tempFigureDuration))
                 self.tempFigureDuration = 0.0
-                
+
         return mxFB
 
     def durationXml(self, dur: duration.Duration):
