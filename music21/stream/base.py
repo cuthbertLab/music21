@@ -49,6 +49,7 @@ from music21 import derivation
 from music21 import duration
 from music21 import environment
 from music21 import exceptions21
+from music21 import expressions
 from music21 import interval
 from music21 import instrument
 from music21 import key
@@ -6830,6 +6831,27 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
                 if e.tie is not None and e.tie.type != 'stop':
                     tiePitchSet.add(e.pitch.nameWithOctave)
 
+                # handle this note's ornaments' otherPitches
+                for orn in e.expressions:
+                    if not isinstance(orn, expressions.Ornament):
+                        continue
+
+                    orn.resolveOtherPitches(e.pitch)
+                    if not orn.otherPitches:
+                        continue
+
+                    orn.updateAccidentalDisplay(
+                        pitchPast=pitchPast,
+                        pitchPastMeasure=pitchPastMeasure,
+                        alteredPitches=alteredPitches,
+                        cautionaryPitchClass=cautionaryPitchClass,
+                        cautionaryAll=cautionaryAll,
+                        overrideStatus=overrideStatus,
+                        cautionaryNotImmediateRepeat=cautionaryNotImmediateRepeat,
+                        lastNoteWasTied=False)
+
+                    pitchPast += orn.otherPitches
+
             elif isinstance(e, chord.Chord):
                 # when reading a chord, this will apply an accidental
                 # if pitches in the chord suggest an accidental
@@ -6858,11 +6880,53 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
                     if n.tie is not None and n.tie.type != 'stop':
                         seenPitchNames.add(p.nameWithOctave)
 
+                    # handle this note-in-chord's ornaments' otherPitches
+                    for orn in n.expressions:
+                        if not isinstance(orn, expressions.Ornament):
+                            continue
+
+                        orn.resolveOtherPitches(n.pitch)
+                        if not orn.otherPitches:
+                            continue
+
+                        orn.updateAccidentalDisplay(
+                            pitchPast=pitchPast,
+                            pitchPastMeasure=pitchPastMeasure,
+                            alteredPitches=alteredPitches,
+                            cautionaryPitchClass=cautionaryPitchClass,
+                            cautionaryAll=cautionaryAll,
+                            overrideStatus=overrideStatus,
+                            cautionaryNotImmediateRepeat=cautionaryNotImmediateRepeat,
+                            lastNoteWasTied=False)
+
+                        pitchPast += orn.otherPitches
+
                 tiePitchSet.clear()
                 for pName in seenPitchNames:
                     tiePitchSet.add(pName)
 
                 pitchPast += e.pitches
+
+                # handle this chord's ornaments' otherPitches
+                for orn in e.expressions:
+                    if not isinstance(orn, expressions.Ornament):
+                        continue
+
+                    orn.resolveOtherPitches(e.pitches[-1])
+                    if not orn.otherPitches:
+                        continue
+
+                    orn.updateAccidentalDisplay(
+                        pitchPast=pitchPast,
+                        pitchPastMeasure=pitchPastMeasure,
+                        alteredPitches=alteredPitches,
+                        cautionaryPitchClass=cautionaryPitchClass,
+                        cautionaryAll=cautionaryAll,
+                        overrideStatus=overrideStatus,
+                        cautionaryNotImmediateRepeat=cautionaryNotImmediateRepeat,
+                        lastNoteWasTied=False)
+
+                    pitchPast += orn.otherPitches
             else:
                 tiePitchSet.clear()
 
@@ -10110,10 +10174,21 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         for e in self.elements:
             if isinstance(e, key.Key):
                 continue  # has .pitches but should not be added
-            # both GeneralNotes and Stream have a pitches properties; this just
-            # causes a recursive pitch gathering
-            elif isinstance(e, (note.GeneralNote, Stream)):
+            elif isinstance(e, Stream):
+                # Stream has a pitches properties; this just
+                # causes a recursive pitch gathering
                 post.extend(list(e.pitches))
+            elif isinstance(e, note.GeneralNote):
+                # GeneralNote is ultimately where we get all the pitches
+                post.extend(list(e.pitches))
+                # and also any of the GeneralNote's ornaments' otherPitches
+                for orn in e.expressions:
+                    if isinstance(orn, expressions.Ornament):
+                        # Figure out what the other pitches are, in case that hasn't
+                        # been done yet (this is a no-op if it has already been done).
+                        orn.resolveOtherPitches(e.pitches[-1])
+                        # Add them to the list
+                        post.extend(list(orn.otherPitches))
         return post
 
     # --------------------------------------------------------------------------

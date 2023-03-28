@@ -463,7 +463,7 @@ class Ornament(Expression):
         # should follow directly on previous; true for most "ornaments".
         self.connectedToPrevious = True
         self.autoScale = True
-        self._otherPitches: list[pitch.Pitch] = []
+        self._otherPitches: tuple[pitch.Pitch, ...] = ()
 
     def realize(self,
                 srcObj: note.Note,
@@ -524,8 +524,84 @@ class Ornament(Expression):
         # (Turn, GeneralMordent, Trill)
         return
 
+    def updateAccidentalDisplay(
+        self,
+        *,
+        pitchPast: list[pitch.Pitch] | None = None,
+        pitchPastMeasure: list[pitch.Pitch] | None = None,
+        otherSimultaneousPitches: list[pitch.Pitch] | None = None,
+        alteredPitches: list[pitch.Pitch] | None = None,
+        cautionaryPitchClass: bool = True,
+        cautionaryAll: bool = False,
+        overrideStatus: bool = False,
+        cautionaryNotImmediateRepeat: bool = True,
+        lastNoteWasTied: bool = False,
+    ):
+        '''
+        Updates accidental display for Ornaments with accidental(s): turns, mordents, and trills.
+        '''
+        if isinstance(self, Turn):
+            # upper first
+            p = self.upperPitch
+            if p is not None:
+                if self.upperAccid is not None:
+                    # force a visible upper accidental
+                    if p.accidental is None:
+                        p.accidental = pitch.Accidental(0)
+                    p.accidental.displayStatus = True
+                else:
+                    p.updateAccidentalDisplay(
+                        pitchPast=pitchPast,
+                        pitchPastMeasure=pitchPastMeasure,
+                        alteredPitches=alteredPitches,
+                        cautionaryPitchClass=cautionaryPitchClass,
+                        cautionaryAll=cautionaryAll,
+                        overrideStatus=overrideStatus,
+                        cautionaryNotImmediateRepeat=cautionaryNotImmediateRepeat,
+                        lastNoteWasTied=lastNoteWasTied)
+
+            # then lower
+            p = self.lowerPitch
+            if p is not None:
+                if self.lowerAccid is not None:
+                    # force a visible lower accidental
+                    if p.accidental is None:
+                        p.accidental = pitch.Accidental(0)
+                    p.accidental.displayStatus = True
+                else:
+                    p.updateAccidentalDisplay(
+                        pitchPast=pitchPast,
+                        pitchPastMeasure=pitchPastMeasure,
+                        alteredPitches=alteredPitches,
+                        cautionaryPitchClass=cautionaryPitchClass,
+                        cautionaryAll=cautionaryAll,
+                        overrideStatus=overrideStatus,
+                        cautionaryNotImmediateRepeat=cautionaryNotImmediateRepeat,
+                        lastNoteWasTied=lastNoteWasTied)
+            return
+
+        if isinstance(self, (GeneralMordent, Trill)):
+            # just one otherPitch
+            p = self.otherPitches[0]
+            if p is not None:
+                if self.accid is not None:
+                    # force a visible accidental
+                    if p.accidental is None:
+                        p.accidental = pitch.Accidental(0)
+                    p.accidental.displayStatus = True
+                else:
+                    p.updateAccidentalDisplay(
+                        pitchPast=pitchPast,
+                        pitchPastMeasure=pitchPastMeasure,
+                        alteredPitches=alteredPitches,
+                        cautionaryPitchClass=cautionaryPitchClass,
+                        cautionaryAll=cautionaryAll,
+                        overrideStatus=overrideStatus,
+                        cautionaryNotImmediateRepeat=cautionaryNotImmediateRepeat,
+                        lastNoteWasTied=lastNoteWasTied)
+
     @property
-    def otherPitches(self) -> list[pitch.Pitch]:
+    def otherPitches(self) -> tuple[pitch.Pitch, ...]:
         return self._otherPitches
 
 
@@ -634,7 +710,7 @@ class GeneralMordent(Ornament):
             if otherPitch.accidental is None:
                 otherPitch.accidental = pitch.Accidental(0)
             otherPitch.accidental.displayStatus = True
-        self._otherPitches = [otherPitch]
+        self._otherPitches = (otherPitch,)
 
     @property
     def otherPitch(self) -> pitch.Pitch | None:
@@ -1064,7 +1140,7 @@ class Trill(Ornament):
             if otherPitch.accidental is None:
                 otherPitch.accidental = pitch.Accidental(0)
             otherPitch.accidental.displayStatus = True
-        self._otherPitches = [otherPitch]
+        self._otherPitches = (otherPitch,)
 
     @property
     def otherPitch(self) -> pitch.Pitch | None:
@@ -1527,7 +1603,7 @@ class Turn(Ornament):
             lowerPitch.accidental.displayStatus = True
 
         # order matters, see upperPitch and lowerPitch properties below
-        self._otherPitches = [upperPitch, lowerPitch]
+        self._otherPitches = (upperPitch, lowerPitch)
 
     @property
     def upperPitch(self) -> pitch.Pitch | None:
