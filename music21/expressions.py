@@ -539,7 +539,7 @@ class GeneralMordent(Ornament):
         self._direction = ''  # up or down
         self._accid: str | None = None
         if accid is not None and pitch.isValidAccidentalName(accid):
-            self._accid = accid
+            self._accid = pitch.makeAccidentalName(accid)
         self._size: interval.IntervalBase | None = None
         self.quarterLength = 0.125  # 32nd note default
         self.placement = 'above'
