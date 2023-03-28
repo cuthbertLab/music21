@@ -30,30 +30,27 @@ shorthandNotation = {(None,): (5, 3),
                      (2,): (6, 4, 2),
                      }
 
-prefixes = ["+", "#", "++", "##"]
-suffixes = ["\\"]
+prefixes = ['+', '#', '++', '##']
+suffixes = ['\\']
 
-modifiersDictXmlToM21 = {
-                    "sharp": "#",
-                    "flat": "b",
-                    "natural": "\u266e",
-                    "double-sharp": "##",
-                    "flat-flat": "bb",
-                    "backslash": "\\"
-                }
+modifiersDictXmlToM21 = {'sharp': '#',
+                 'flat': 'b',
+                 'natural': '\u266e',
+                 'double-sharp': '##',
+                 'flat-flat': 'bb',
+                 'backslash': '\\',
+                 'slash': '/'}
 
-modifiersDictM21ToXml = {
-                    "#": "sharp",
-                    "b": "flat",
-                    "##": "double-sharp",
-                    "bb": "flat-flat",
-                    "\\": "backslash",
-                    "+": "sharp",
-                    '\u266f': 'sharp',
-                    '\u266e': 'natural',
-                    '\u266d': 'flat',
-                    '\u20e5': 'sharp'
-}
+modifiersDictM21ToXml = {'#': 'sharp',
+                     'b': 'flat',
+                     '##': 'double-sharp',
+                     'bb': 'flat-flat',
+                     '\\': 'backslash',
+                     '+': 'sharp',
+                     '\u266f': 'sharp',
+                     '\u266e': 'natural',
+                     '\u266d': 'flat',
+                     '\u20e5': 'sharp'}
 
 class Notation(prebase.ProtoM21Object):
     '''
@@ -129,11 +126,11 @@ class Notation(prebase.ProtoM21Object):
      <music21.figuredBass.notation.Modifier + sharp>,
      <music21.figuredBass.notation.Modifier None None>)
     >>> n1.figures[0]
-    <music21.figuredBass.notation.Figure 6 <Modifier None None> hasExt: False>
+    <music21.figuredBass.notation.Figure 6 Mods: <Modifier None None> hasExt: False>
     >>> n1.figures[1]
-    <music21.figuredBass.notation.Figure 4 <Modifier + sharp> hasExt: False>
+    <music21.figuredBass.notation.Figure 4 Mods: <Modifier + sharp> hasExt: False>
     >>> n1.figures[2]
-    <music21.figuredBass.notation.Figure 2 <Modifier None None> hasExt: False>
+    <music21.figuredBass.notation.Figure 2 Mods: <Modifier None None> hasExt: False>
 
 
     Here, a stand-alone '#' is being passed to Notation.
@@ -146,9 +143,9 @@ class Notation(prebase.ProtoM21Object):
     (<music21.figuredBass.notation.Modifier None None>,
      <music21.figuredBass.notation.Modifier # sharp>)
     >>> n2.figures[0]
-    <music21.figuredBass.notation.Figure 5 <Modifier None None> hasExt: False>
+    <music21.figuredBass.notation.Figure 5 Mods: <Modifier None None> hasExt: False>
     >>> n2.figures[1]
-    <music21.figuredBass.notation.Figure 3 <Modifier # sharp> hasExt: False>
+    <music21.figuredBass.notation.Figure 3 Mods: <Modifier # sharp> hasExt: False>
 
 
     Now, a stand-alone b is being passed to Notation as part of a larger notationColumn.
@@ -161,9 +158,9 @@ class Notation(prebase.ProtoM21Object):
     (<music21.figuredBass.notation.Modifier b flat>,
      <music21.figuredBass.notation.Modifier b flat>)
     >>> n3.figures[0]
-    <music21.figuredBass.notation.Figure 6 <Modifier b flat> hasExt: False>
+    <music21.figuredBass.notation.Figure 6 Mods: <Modifier b flat> hasExt: False>
     >>> n3.figures[1]
-    <music21.figuredBass.notation.Figure 3 <Modifier b flat> hasExt: False>
+    <music21.figuredBass.notation.Figure 3 Mods: <Modifier b flat> hasExt: False>
     '''
     _DOC_ORDER = ['notationColumn', 'figureStrings', 'numbers', 'modifiers',
                   'figures', 'origNumbers', 'origModStrings', 'modifierStrings']
@@ -388,9 +385,9 @@ class Notation(prebase.ProtoM21Object):
         >>> from music21.figuredBass import notation as n
         >>> notation2 = n.Notation('-6,-')  #__init__ method calls _getFigures()
         >>> notation2.figures[0]
-        <music21.figuredBass.notation.Figure 6 <Modifier - flat> hasExt: False>
+        <music21.figuredBass.notation.Figure 6 Mods: <Modifier - flat> hasExt: False>
         >>> notation2.figures[1]
-        <music21.figuredBass.notation.Figure 3 <Modifier - flat> hasExt: False>
+        <music21.figuredBass.notation.Figure 3 Mods: <Modifier - flat> hasExt: False>
         '''
         figures = []
 
@@ -426,7 +423,7 @@ class Figure(prebase.ProtoM21Object):
     >>> from music21.figuredBass import notation
     >>> f1 = notation.Figure(4, '+')
     >>> f1
-    <music21.figuredBass.notation.Figure 4 <Modifier + sharp> hasExt: False>
+    <music21.figuredBass.notation.Figure 4 Mods: <Modifier + sharp> hasExt: False>
 
     >>> f1.number
     4
@@ -455,7 +452,7 @@ class Figure(prebase.ProtoM21Object):
         self.number = number
         self.modifierString = modifierString
         self.modifier = Modifier(modifierString)
-        # look for extenders underscore 
+        # look for extenders underscore
         self.isExtender: bool = (self.number == '_')
 
     def _reprInternal(self):

@@ -3963,7 +3963,7 @@ class Test(unittest.TestCase):
         for eachStaff in innerStaffs:
             mockStaffFE.assert_any_call(eachStaff, slurBundle=slurBundle)
         # ensure Measure.__init__() was called properly
-        self.assertEqual(len(expected) -1, mockMeasure.call_count)
+        self.assertEqual(len(expected) - 1, mockMeasure.call_count)
         for i in range(len(innerStaffs)):
             mockMeasure.assert_any_call(i, number=int(elem.get('n')))
         mockMeasure.assert_any_call([mockVoice.return_value], number=int(elem.get('n')))

@@ -468,8 +468,8 @@ def allPartsPresent(scoreElem) -> tuple[str, ...]:
     if not partNs:
         raise MeiValidityError(_SEEMINGLY_NO_PARTS)
 
-    # Get information of possible <harm> tags in the score. If there are tags prepare a list to 
-    # store them and process them later. 
+    # Get information of possible <harm> tags in the score. If there are tags prepare a list to
+    # store them and process them later.
     # TODO: Maybe to be put in a separate function e.g. like allPartsPresent
     figuredBassQuery = f'.//{MEI_NS}fb'
     if scoreElem.findall(figuredBassQuery):
@@ -2510,7 +2510,7 @@ def harmFromElement(elem, slurBundle=None) -> tuple:
     tagToFunction = {f'{MEI_NS}fb': figuredbassFromElement}
 
     fb_harmony_tag: tuple = ()
-    
+
     # Collect all elements in a measure and go throug extenders
     # tstamp has to be used as a duration marker between two elements
 
@@ -2541,11 +2541,11 @@ def figuredbassFromElement(elem, slurBundle=None) -> harmony.FiguredBassIndicati
                 dauer = float(subElement.attrib['dur.metrical'])
 
     # Generate a FiguredBassIndication object and set the collected information
-    fb_notation = ",".join(fb_notation_list)
+    fb_notation = ','.join(fb_notation_list)
     theFbNotation = harmony.FiguredBassIndication(fb_notation)
     theFbNotation.id = fb_id
     theFbNotation.duration = duration.Duration(quarterLength=dauer)
-    
+
     return theFbNotation
 
 def clefFromElement(elem, slurBundle=None):  # pylint: disable=unused-argument
@@ -3225,7 +3225,7 @@ def measureFromElement(elem, backupNum, expectedNs, slurBundle=None, activeMeter
             # We must insert() these objects because a <staffDef> signals its changes for the
             # *start* of the <measure> in which it appears.
             staves[whichN].insert(0, eachObj)
-    
+
     # Add <harm> objects to the staves dict
     staves['fb'] = harmElements
     # other childs of <harm> tags can be added here…
@@ -3550,7 +3550,7 @@ def scoreFromElement(elem, slurBundle):
     # Get a tuple of all the @n attributes for the <staff> tags in this score. Each <staff> tag
     # corresponds to what will be a music21 Part.
 
-    # UPDATE: If <harm> tags are found, they will also be collected as a separate 'part' 
+    # UPDATE: If <harm> tags are found, they will also be collected as a separate 'part'
     # to process them later.
     allPartNs = allPartsPresent(elem)
 
@@ -3568,7 +3568,7 @@ def scoreFromElement(elem, slurBundle):
         harms = parsed['fb'][0]
         del parsed['fb']
         allPartNs = allPartNs[0:-1]
-    
+
     theScore = [stream.Part() for _ in range(len(allPartNs))]
     for i, eachN in enumerate(allPartNs):
         # set "atSoundingPitch" so transposition works
@@ -3576,7 +3576,7 @@ def scoreFromElement(elem, slurBundle):
         for eachObj in parsed[eachN]:
             theScore[i].append(eachObj)
     theScore = stream.Score(theScore)
-    
+
     # loop through measures to insert harm elements from harms list at the right offsets
     if harms:
         for index, measureOffset in enumerate(theScore.measureOffsetMap().keys()):

@@ -2364,7 +2364,6 @@ class PartParser(XMLParserBase):
             self.parent.fbis.append((absOffset, fbi))
         else:
             self.parent.fbis = [(absOffset, fbi)]
-        #print(self.parent.fbis)
 
 # -----------------------------------------------------------------------------
 class MeasureParser(XMLParserBase):
@@ -2464,10 +2463,10 @@ class MeasureParser(XMLParserBase):
 
         # what is the offset in the measure of the current note position?
         self.offsetMeasureNote: OffsetQL = 0.0
-        
+
         # Offset Calc if more than one figure is set under a single note
         self.lastFigureDuration = 0
-        
+
         # keep track of the last rest that was added with a forward tag.
         # there are many pieces that end with incomplete measures that
         # older versions of Finale put a forward tag at the end, but this
@@ -2865,12 +2864,12 @@ class MeasureParser(XMLParserBase):
         # only increment Chords after completion
         self.offsetMeasureNote += offsetIncrement
         self.endedWithForwardTag = None
-        
+
         # reset offset for figures. This is needed to put in
         # multiple FiguredBassIndications at one note at the right offset.
-        # Musicxml puts <figured-bass> tags immediately before a <note> tag, 
+        # Musicxml puts <figured-bass> tags immediately before a <note> tag,
         # which means that we have to reset a given offset duration of some
-        # <figured-bass> tags after inserting the coressponding note and 
+        # <figured-bass> tags after inserting the coressponding note and
         # before going to a new note.
         self.lastFigureDuration = 0
 
@@ -5174,7 +5173,7 @@ class MeasureParser(XMLParserBase):
         return cs
 
     def xmlToFiguredBass(self, mxFiguredBass):
-        #print('Hello from xmlToFiguredBass', mxFiguredBass.findall('*'))
+        # print('Hello from xmlToFiguredBass', mxFiguredBass.findall('*'))
         fb_strings: list[str] = []
         sep = ','
         d: duration.Duration | None = None
@@ -5188,7 +5187,6 @@ class MeasureParser(XMLParserBase):
                 if el.tag == 'figure-number':
                     if el.text:
                         fb_number = el.text
-                    
                     # Get prefix and/or suffix.
                     # The function returns an empty string if nothing is found.
                     fb_prefix = self._getFigurePrefixOrSuffix(figure, 'prefix')
@@ -5219,14 +5217,14 @@ class MeasureParser(XMLParserBase):
         # If a duration is provided, set length of the FigureBassIndication
         if d:
             fbi.quarterLength = d.quarterLength
-        # function in parent add add found objects.
-        #
+        # call function in parent to add found objects.
         self.parent.appendFbis(fbi, offsetFbi)
 
-    def _getFigurePrefixOrSuffix(self, figure, presuf: str='prefix') -> str:
+    def _getFigurePrefixOrSuffix(self, figure, presuf: str = 'prefix') -> str:
         if figure.findall(presuf):
             for fix in figure.findall(presuf):
                 if fix.text:
+                    print(fix.text)
                     return modifiersDictXmlToM21[fix.text]
         return ''
 
