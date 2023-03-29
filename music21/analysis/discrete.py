@@ -368,15 +368,8 @@ class KeyWeightKeyAnalysis(DiscreteAnalysis):
 
         for n in streamObj.notes:
             length = n.quarterLength
-            if n.isChord:
-                for m in n.pitchClasses:
-                    pcDist[m] += length
-            elif isinstance(n, percussion.PercussionChord):
-                for m in n.notes:
-                    if isinstance(m, note.Note):
-                        pcDist[m.pitch.pitchClass] += length
-            else:
-                pcDist[n.pitch.pitchClass] += length
+            for p in n.pitches:
+                  pcDist[p.pitchClass] += length
         return pcDist
 
     # noinspection SpellCheckingInspection
