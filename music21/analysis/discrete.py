@@ -369,7 +369,8 @@ class KeyWeightKeyAnalysis(DiscreteAnalysis):
         for n in streamObj.notes:
             length = n.quarterLength
             for p in n.pitches:
-                  pcDist[p.pitchClass] += length
+                pcDist[p.pitchClass] += length
+
         return pcDist
 
     # noinspection SpellCheckingInspection
