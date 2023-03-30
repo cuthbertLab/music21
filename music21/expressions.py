@@ -945,6 +945,8 @@ class Mordent(GeneralMordent):
     that will have the mordent, the current key signature in that note's context, as
     well as any accidental on the mordent itself.
 
+    e.g. Mordent without accidentals in default key (no flats or sharps)
+
     >>> m = expressions.Mordent()
     >>> m.direction
     'down'
@@ -953,6 +955,8 @@ class Mordent(GeneralMordent):
     >>> m.getSize(note.Note('B3'))
     <music21.interval.Interval M-2>
 
+    e.g. Mordent with flat, in default key (no flats or sharps)
+
     >>> mFlat = expressions.Mordent(accidentalName='flat')
     >>> mFlat.direction
     'down'
@@ -960,6 +964,32 @@ class Mordent(GeneralMordent):
     <music21.interval.Interval M-2>
     >>> mFlat.getSize(note.Note('B3'))
     <music21.interval.Interval A-2>
+
+    e.g. Mordent without accidentals, in key with one flat
+
+    >>> oneFlat = key.KeySignature(-1)
+    >>> mNotFlat = expressions.Mordent()
+    >>> mNotFlat.direction
+    'down'
+    >>> mNotFlat.getSize(note.Note('C4'), keySig=oneFlat)
+    <music21.interval.Interval M-2>
+    >>> mNotFlat.getSize(note.Note('B3'), keySig=oneFlat)
+    <music21.interval.Interval M-2>
+
+    e.g. Mordent without accidentals, with a key from context with one flat (same results)
+
+    >>> noteC4 = note.Note('C4')
+    >>> noteB3 = note.Note('B3')
+    >>> measure = stream.Measure([oneFlat, noteC4, noteB3])
+    >>> mNotFlatWithKeyFromContext = expressions.Mordent()
+    >>> mNotFlatWithKeyFromContext.direction
+    'down'
+    >>> mNotFlatWithKeyFromContext.getSize(noteC4)
+    <music21.interval.Interval M-2>
+    >>> mNotFlatWithKeyFromContext.getSize(noteB3)
+    <music21.interval.Interval M-2>
+
+
 
     * Changed in v7: Mordent sizes are GenericIntervals -- as was originally
       intended but programmed incorrectly.
