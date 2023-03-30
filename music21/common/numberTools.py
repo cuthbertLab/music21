@@ -241,7 +241,7 @@ def opFrac(num: OffsetQLIn | None) -> OffsetQL | None:
     Code Completion easily. That is to say, this function has been set up to be used, so please
     use it.
 
-    This is a performance critical operation. Do not alter it in any way without running
+    This is a performance-critical operation. Do not alter it in any way without running
     many timing tests.
 
     >>> from fractions import Fraction
@@ -256,8 +256,12 @@ def opFrac(num: OffsetQLIn | None) -> OffsetQL | None:
     >>> f = Fraction(1, 3)
     >>> common.opFrac(f + f + f)
     1.0
+    >>> common.opFrac(0.99999999842)
+    1.0
     >>> common.opFrac(0.123456789)
     Fraction(10, 81)
+    >>> common.opFrac(0.000001)
+    0.0
     >>> common.opFrac(None) is None
     True
     '''
@@ -282,6 +286,9 @@ def opFrac(num: OffsetQLIn | None) -> OffsetQL | None:
         #    (denominator & (denominator-1)) != 0
         # which is a nice test, but denominator here is always a power of two...
         # unused_numerator, denominator = num.as_integer_ratio()  # too slow
+        if num < 0.0000011:
+            return 0.0
+
         ir = num.as_integer_ratio()  # type: ignore
         if ir[1] > DENOM_LIMIT:  # slightly faster[SIC!] than hard coding 65535!
             # _preFracLimitDenominator uses a cache
@@ -308,6 +315,8 @@ def opFrac(num: OffsetQLIn | None) -> OffsetQL | None:
     elif isinstance(num, int):
         return num + 0.0
     elif isinstance(num, float):
+        if num < 0.0000011:
+            return 0.0
         ir = num.as_integer_ratio()
         if ir[1] > DENOM_LIMIT:  # slightly faster than hard coding 65535!
             return Fraction(*_preFracLimitDenominator(*ir))  # way faster!
