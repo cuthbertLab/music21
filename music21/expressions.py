@@ -20,8 +20,6 @@ A sub-category of Expressions are Ornaments.
 Unlike articulations, expressions can be attached to the Stream itself.
 For instance, TextExpressions.
 '''
-# TODO: replace .size with a string representing interval and then
-#     create interval.Interval objects only when necessary.
 from __future__ import annotations
 
 import copy
@@ -709,7 +707,6 @@ class GeneralMordent(Ornament):
         self._accidentalName: str = ''
         if accidentalName and pitch.isValidAccidentalName(accidentalName):
             self._accidentalName = pitch.standardizeAccidentalName(accidentalName)
-        self._size: interval.IntervalBase | None = None
         self.quarterLength = 0.125  # 32nd note default
         self.placement = 'above'
 
@@ -743,20 +740,9 @@ class GeneralMordent(Ornament):
     @accidentalName.setter
     def accidentalName(self, newAccidentalName: str):
         if newAccidentalName and pitch.isValidAccidentalName(newAccidentalName):
-            self._size = None
             self._accidentalName = pitch.standardizeAccidentalName(newAccidentalName)
         else:
-            self._size = None
             self._accidentalName = ''
-
-    @property
-    def size(self) -> interval.IntervalBase | None:
-        return self._size
-
-    @size.setter
-    def size(self, newSize: interval.IntervalBase):
-        self._accidentalName = ''
-        self._size = newSize
 
     @property
     def direction(self) -> str:
@@ -769,9 +755,6 @@ class GeneralMordent(Ornament):
         keySig: key.KeySignature | None = None,
         which: str = ''
     ) -> interval.IntervalBase:
-        if self._size is not None:
-            return self._size
-
         if self._direction not in ('up', 'down'):
             raise ExpressionException('Cannot compute mordent size if I do not know its direction')
 
@@ -986,7 +969,7 @@ class HalfStepMordent(Mordent):
     >>> m = expressions.HalfStepMordent()
     >>> m.direction
     'down'
-    >>> m.size
+    >>> m.getSize(note.Note('C4'))
     <music21.interval.Interval m-2>
     '''
     def __init__(self, **keywords) -> None:
@@ -994,7 +977,7 @@ class HalfStepMordent(Mordent):
         if 'accidentalName' in keywords:
             raise ExpressionException('Cannot initialize HalfStepMordent with accidentalName')
         super().__init__(**keywords)
-        self._size: interval.IntervalBase = interval.Interval('m-2')
+        self._minorSecondDown: interval.IntervalBase = interval.Interval('m-2')
 
     def getSize(
         self,
@@ -1003,15 +986,7 @@ class HalfStepMordent(Mordent):
         keySig: key.KeySignature | None = None,
         which: str = ''
     ) -> interval.IntervalBase:
-        return self._size
-
-    @property
-    def size(self) -> interval.IntervalBase | None:
-        return self._size
-
-    @size.setter
-    def size(self, newSize: interval.IntervalBase):
-        raise ExpressionException('Cannot change size of HalfStepMordent')
+        return self._minorSecondDown
 
     @property
     def accidentalName(self) -> str:
@@ -1029,7 +1004,7 @@ class WholeStepMordent(Mordent):
     >>> m = expressions.WholeStepMordent()
     >>> m.direction
     'down'
-    >>> m.size
+    >>> m.getSize(note.Note('C4'))
     <music21.interval.Interval M-2>
     '''
     def __init__(self, **keywords) -> None:
@@ -1037,7 +1012,7 @@ class WholeStepMordent(Mordent):
         if 'accidentalName' in keywords:
             raise ExpressionException('Cannot initialize WholeStepMordent with accidentalName')
         super().__init__(**keywords)
-        self._size: interval.IntervalBase = interval.Interval('M-2')
+        self._majorSecondDown: interval.IntervalBase = interval.Interval('M-2')
 
     def getSize(
         self,
@@ -1046,15 +1021,7 @@ class WholeStepMordent(Mordent):
         keySig: key.KeySignature | None = None,
         which: str = ''
     ) -> interval.IntervalBase:
-        return self._size
-
-    @property
-    def size(self) -> interval.IntervalBase | None:
-        return self._size
-
-    @size.setter
-    def size(self, newSize: interval.IntervalBase):
-        raise ExpressionException('Cannot change size of WholeStepMordent')
+        return self._majorSecondDown
 
     @property
     def accidentalName(self) -> str:
@@ -1112,7 +1079,7 @@ class HalfStepInvertedMordent(InvertedMordent):
     >>> m = expressions.HalfStepInvertedMordent()
     >>> m.direction
     'up'
-    >>> m.size
+    >>> m.getSize(note.Note('C4'))
     <music21.interval.Interval m2>
     '''
     def __init__(self, **keywords) -> None:
@@ -1121,7 +1088,7 @@ class HalfStepInvertedMordent(InvertedMordent):
             raise ExpressionException(
                 'Cannot initialize HalfStepInvertedMordent with accidentalName')
         super().__init__(**keywords)
-        self._size: interval.IntervalBase = interval.Interval('m2')
+        self._minorSecondUp: interval.IntervalBase = interval.Interval('m2')
 
     def getSize(
         self,
@@ -1130,15 +1097,7 @@ class HalfStepInvertedMordent(InvertedMordent):
         keySig: key.KeySignature | None = None,
         which: str = ''
     ) -> interval.IntervalBase:
-        return self._size
-
-    @property
-    def size(self) -> interval.IntervalBase | None:
-        return self._size
-
-    @size.setter
-    def size(self, newSize: interval.IntervalBase):
-        raise ExpressionException('Cannot change size of HalfStepInvertedMordent')
+        return self._minorSecondUp
 
     @property
     def accidentalName(self) -> str:
@@ -1156,7 +1115,7 @@ class WholeStepInvertedMordent(InvertedMordent):
     >>> m = expressions.WholeStepInvertedMordent()
     >>> m.direction
     'up'
-    >>> m.size
+    >>> m.getSize(note.Note('C4'))
     <music21.interval.Interval M2>
     '''
     def __init__(self, **keywords) -> None:
@@ -1165,7 +1124,7 @@ class WholeStepInvertedMordent(InvertedMordent):
             raise ExpressionException(
                 'Cannot initialize WholeStepInvertedMordent with accidentalName')
         super().__init__(**keywords)
-        self._size: interval.IntervalBase = interval.Interval('M2')
+        self._majorSecondUp: interval.IntervalBase = interval.Interval('M2')
 
     def getSize(
         self,
@@ -1174,15 +1133,7 @@ class WholeStepInvertedMordent(InvertedMordent):
         keySig: key.KeySignature | None = None,
         which: str = ''
     ) -> interval.IntervalBase:
-        return self._size
-
-    @property
-    def size(self) -> interval.IntervalBase | None:
-        return self._size
-
-    @size.setter
-    def size(self, newSize: interval.IntervalBase):
-        raise ExpressionException('Cannot change size of WholeStepInvertedMordent')
+        return self._majorSecondUp
 
     @property
     def accidentalName(self) -> str:
@@ -1230,7 +1181,6 @@ class Trill(Ornament):
         self._accidentalName: str = ''
         if accidentalName and pitch.isValidAccidentalName(accidentalName):
             self._accidentalName = pitch.standardizeAccidentalName(accidentalName)
-        self._size: interval.IntervalBase | None = None
         self.placement = 'above'
         self.nachschlag = False  # play little notes at the end of the trill?
         self.tieAttach = 'all'
@@ -1271,20 +1221,9 @@ class Trill(Ornament):
     @accidentalName.setter
     def accidentalName(self, newAccidentalName: str):
         if newAccidentalName and pitch.isValidAccidentalName(newAccidentalName):
-            self._size = None
             self._accidentalName = pitch.standardizeAccidentalName(newAccidentalName)
         else:
-            self._size = None
             self._accidentalName = ''
-
-    @property
-    def size(self) -> interval.IntervalBase | None:
-        return self._size
-
-    @size.setter
-    def size(self, newSize: interval.IntervalBase):
-        self._accidentalName = ''
-        self._size = newSize
 
     def splitClient(self, noteList):
         '''
@@ -1315,9 +1254,6 @@ class Trill(Ornament):
         keySig: key.KeySignature | None = None,
         which: str = ''
     ) -> interval.IntervalBase:
-        if self._size is not None:
-            return self._size
-
         if not srcObj.pitches:
             raise TypeError(
                 'Cannot compute trill\'s size with an unpitched srcObj')
@@ -1584,7 +1520,7 @@ class HalfStepTrill(Trill):
     >>> halfTrill = expressions.HalfStepTrill()
     >>> halfTrill.placement
     'above'
-    >>> halfTrill.size
+    >>> halfTrill.getSize(note.Note('C4'))
     <music21.interval.Interval m2>
 
     Here the key signature of 2 sharps will not affect the trill:
@@ -1605,7 +1541,7 @@ class HalfStepTrill(Trill):
             raise ExpressionException(
                 'Cannot initialize HalfStepTrill with accidentalName')
         super().__init__(**keywords)
-        self._size: interval.IntervalBase = interval.Interval('m2')
+        self._minorSecondUp: interval.IntervalBase = interval.Interval('m2')
         self._setAccidentalFromKeySig = False
 
     def getSize(
@@ -1615,15 +1551,7 @@ class HalfStepTrill(Trill):
         keySig: key.KeySignature | None = None,
         which: str = ''
     ) -> interval.IntervalBase:
-        return self._size
-
-    @property
-    def size(self) -> interval.IntervalBase | None:
-        return self._size
-
-    @size.setter
-    def size(self, newSize: interval.IntervalBase):
-        raise ExpressionException('Cannot change size of HalfStepTrill')
+        return self._minorSecondUp
 
     @property
     def accidentalName(self) -> str:
@@ -1641,7 +1569,7 @@ class WholeStepTrill(Trill):
     >>> wholeTrill = expressions.WholeStepTrill()
     >>> wholeTrill.placement
     'above'
-    >>> wholeTrill.size
+    >>> m.wholeTrill(note.Note('C4'))
     <music21.interval.Interval M2>
 
     Here the key signature of one sharp will not affect the trill:
@@ -1662,7 +1590,7 @@ class WholeStepTrill(Trill):
             raise ExpressionException(
                 'Cannot initialize WholeStepTrill with accidentalName')
         super().__init__(**keywords)
-        self._size: interval.IntervalBase = interval.Interval('M2')
+        self._majorSecondUp: interval.IntervalBase = interval.Interval('M2')
         self._setAccidentalFromKeySig = False
 
     def getSize(
@@ -1672,15 +1600,7 @@ class WholeStepTrill(Trill):
         keySig: key.KeySignature | None = None,
         which: str = ''
     ) -> interval.IntervalBase:
-        return self._size
-
-    @property
-    def size(self) -> interval.IntervalBase | None:
-        return self._size
-
-    @size.setter
-    def size(self, newSize: interval.IntervalBase):
-        raise ExpressionException('Cannot change size of WholeStepTrill')
+        return self._majorSecondUp
 
     @property
     def accidentalName(self) -> str:
@@ -1739,7 +1659,6 @@ class Turn(Ornament):
         **keywords
     ):
         super().__init__(**keywords)
-        # self.size: interval.IntervalBase = interval.GenericInterval(2)
         self._upperAccidentalName: str = ''
         if upperAccidentalName and pitch.isValidAccidentalName(upperAccidentalName):
             self._upperAccidentalName = pitch.standardizeAccidentalName(upperAccidentalName)
