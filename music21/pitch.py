@@ -167,22 +167,31 @@ def isValidAccidentalName(name: str) -> bool:
     # check against official names (e.g. 'double-flat')
     if name in accidentalNameToModifier:
         return True
+
     # check against official modifiers (e.g. '--')
     if name in accidentalNameToModifier.values():
         return True
+
     # check against alternate supported names (e.g. 'eses')
     if name in alternateNameToAccidentalName:
         return True
+
     return False
 
-def makeAccidentalName(name: str) -> str | None:
+def standardizeAccidentalName(name: str) -> str:
     if name in accidentalNameToModifier:
+        # it is already standardized, just return it
         return name
+
     if name in modifierToAccidentalName:
+        # it is a modifier, look up standardized name
         return modifierToAccidentalName[name]
+
     if name in alternateNameToAccidentalName:
+        # it is an alternate name, look up standardized name
         return alternateNameToAccidentalName[name]
-    return None
+
+    raise AccidentalException(f'{name} is not a supported accidental type')
 
 
 

@@ -3799,10 +3799,9 @@ class MeasureParser(XMLParserBase):
                 if post is not None:
                     n.expressions.append(post)
                     if mostRecentOrnament is not None and hasattr(n, 'pitches'):
-                        # We have now finished up all the accids for mostRecentOrnament.
-                        # Resolve any other pitches (assume ornament goes with highest/last
-                        # note in chord)
-                        mostRecentOrnament.resolveOtherPitches(n.pitches[-1])
+                        # We have now finished up all the accidentalNames for
+                        # mostRecentOrnament.  Resolve any ornamental pitches.
+                        mostRecentOrnament.resolveOrnamentalPitches(n)
                     mostRecentOrnament = post
                 # environLocal.printDebug(['adding to expressions', post])
             elif mxObj.tag == 'wavy-line':
@@ -4035,18 +4034,18 @@ class MeasureParser(XMLParserBase):
         If it is 'accidental-mark', add to mostRecentOrnament, and return None
 
         >>> turn = expressions.Turn()
-        >>> turn.lowerAccid is None
-        True
-        >>> turn.upperAccid is None
-        True
+        >>> turn.lowerAccidentalName
+        ''
+        >>> turn.upperAccidentalName
+        ''
         >>> mxOrn = EL('<accidental-mark placement="below">flat</accidental-mark>')
         >>> a = MP.xmlOrnamentToExpression(mxOrn, mostRecentOrnament=turn)
         >>> a is None
         True
-        >>> turn.lowerAccid
+        >>> turn.lowerAccidentalName
         'flat'
-        >>> turn.upperAccid is None
-        True
+        >>> turn.upperAccidentalName
+        ''
 
         Not supported currently: 'vertical-turn'
         '''
@@ -4056,14 +4055,15 @@ class MeasureParser(XMLParserBase):
                 return None
 
             if isinstance(mostRecentOrnament, expressions.Turn):
-                # upperAccid or lowerAccid? Look at placement (default to 'above').
+                # upperAccidentalName or lowerAccidentalName?
+                # Look at placement (default to 'above').
                 placement: str = mxObj.get('placement', 'above')
                 if placement == 'below':
-                    mostRecentOrnament.lowerAccid = mxObj.text
+                    mostRecentOrnament.lowerAccidentalName = mxObj.text
                 else:
-                    mostRecentOrnament.upperAccid = mxObj.text
+                    mostRecentOrnament.upperAccidentalName = mxObj.text
             elif isinstance(mostRecentOrnament, (expressions.GeneralMordent, expressions.Trill)):
-                mostRecentOrnament.accid = mxObj.text
+                mostRecentOrnament.accidentalName = mxObj.text
             return None
 
         try:

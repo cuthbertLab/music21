@@ -1664,14 +1664,17 @@ def makeAccidentalsInMeasureStream(
         # unless this measure has a key signature object
         if i > 0:
             if m.keySignature is None:
-                pitchPastMeasure = measuresOnly[i - 1].pitches
+                pitchPastMeasure = (
+                    measuresOnly[i - 1].pitches + measuresOnly[i - 1].ornamentalPitches
+                )
             elif ksLast:
                 # If there is any key signature object to the left,
                 # just get the chromatic pitches from previous measure
                 # G-naturals in C major following G-flats in F major need cautionary
                 # G-naturals in C major following G-flats in Db major don't
-                pitchPastMeasure = [p for p in measuresOnly[i - 1].pitches
-                                    if p.name not in ksLastDiatonic]
+                pitchPastMeasure = [p for p in
+                    measuresOnly[i - 1].pitches + measuresOnly[i - 1].ornamentalPitches
+                    if p.name not in ksLastDiatonic]
             # Get tiePitchSet from previous measure
             try:
                 previousNoteOrChord = measuresOnly[i - 1][note.NotRest][-1]

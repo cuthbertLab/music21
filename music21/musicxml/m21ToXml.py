@@ -4870,27 +4870,27 @@ class MeasureExporter(XMLExporterBase):
 
         if isinstance(ornamentObj, expressions.Turn):
             # 0, 1, or 2 accidental marks
-            if (ornamentObj.upperPitch
-                    and ornamentObj.upperPitch.accidental
-                    and ornamentObj.upperPitch.accidental.displayStatus is True):
+            if (ornamentObj.upperOrnamentalPitch
+                    and ornamentObj.upperOrnamentalPitch.accidental
+                    and ornamentObj.upperOrnamentalPitch.accidental.displayStatus is True):
                 mxAccidentalMarks.append(
-                    self.accidentalToMxAccidentalMark(ornamentObj.upperPitch.accidental)
+                    self.accidentalToMxAccidentalMark(ornamentObj.upperOrnamentalPitch.accidental)
                 )
                 mxAccidentalMarks[-1].set('placement', 'above')
-            if (ornamentObj.lowerPitch
-                    and ornamentObj.lowerPitch.accidental
-                    and ornamentObj.lowerPitch.accidental.displayStatus is True):
+            if (ornamentObj.lowerOrnamentalPitch
+                    and ornamentObj.lowerOrnamentalPitch.accidental
+                    and ornamentObj.lowerOrnamentalPitch.accidental.displayStatus is True):
                 mxAccidentalMarks.append(
-                    self.accidentalToMxAccidentalMark(ornamentObj.lowerPitch.accidental)
+                    self.accidentalToMxAccidentalMark(ornamentObj.lowerOrnamentalPitch.accidental)
                 )
                 mxAccidentalMarks[-1].set('placement', 'below')
         elif isinstance(ornamentObj, (expressions.GeneralMordent, expressions.Trill)):
             # 0 or 1 accidental marks
-            if (ornamentObj.otherPitch
-                    and ornamentObj.otherPitch.accidental
-                    and ornamentObj.otherPitch.accidental.displayStatus is True):
+            if (ornamentObj.ornamentalPitch
+                    and ornamentObj.ornamentalPitch.accidental
+                    and ornamentObj.ornamentalPitch.accidental.displayStatus is True):
                 mxAccidentalMarks.append(
-                    self.accidentalToMxAccidentalMark(ornamentObj.otherPitch.accidental)
+                    self.accidentalToMxAccidentalMark(ornamentObj.ornamentalPitch.accidental)
                 )
                 if ornamentObj.direction == 'down':
                     mxAccidentalMarks[-1].set('placement', 'below')
