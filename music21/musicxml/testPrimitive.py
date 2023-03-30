@@ -2724,7 +2724,7 @@ notations32a = '''<?xml version="1.0" encoding="UTF-8"?>
           <ornaments>
             <turn/>
             <accidental-mark placement="above">sharp</accidental-mark>
-            <accidental-mark placement="below">flat</accidental-mark>
+            <accidental-mark placement="below">three-quarters-flat</accidental-mark>
           </ornaments>
         </notations>
         <lyric number="1"><text>turn+acc.(ab.+bel./rel to turn)</text></lyric>

@@ -500,7 +500,7 @@ class Ornament(Expression):
         * New in v8: inPlace boolean; note that some ornaments
           might not return a Note in the second position at all (such as trills)
           so inPlace does nothing.
-        * New in v9: Optional keySig can be passed in (useful in cases where there
+        * Changed in v9: Optional keySig can be passed in (useful in cases where there
           is no keySig in srcObj's context, or where a different keySig is desired).
         '''
         if not inPlace:
@@ -646,7 +646,8 @@ class Ornament(Expression):
         Defined exactly like Pitch.updateAccidentalDisplay with two changes:
         1. We pay no attention to ties, since ornamental notes cannot be tied.
         2. Instead of self being the pitch to update, self is an ornament that
-        contains a (possibly empty) list of ornamentPitches that are to be updated.
+        contains a (possibly empty, possibly one or two pitches long) list of
+        ornamentPitches that are to be updated.
 
         Only implemented in Turn, GeneralMordent, and Trill.
 
@@ -699,6 +700,12 @@ class Ornament(Expression):
 class GeneralMordent(Ornament):
     '''
     Base class for all Mordent types.
+
+    * Changed in v9: Support an accidental on mordents. This also adds the concept of
+      an ornamental pitch that is processed by makeAccidentals.
+      The size property has been removed and replaced with `.getSize()` (which requires
+      a `srcObj` and optional `keySig` param).  Added optional `keySig` param to
+      `.realize()` as well.
     '''
     _direction = ''  # up or down
 
@@ -956,8 +963,6 @@ class Mordent(GeneralMordent):
 
     * Changed in v7: Mordent sizes are GenericIntervals -- as was originally
       intended but programmed incorrectly.
-    * Changed in v9: Support for mordents with accidentals, which implies support for
-      various sizes, depending on srcObj (note), current key sig, and mordent accidental.
     '''
     _direction = 'down'  # up or down
 
@@ -1066,8 +1071,6 @@ class InvertedMordent(GeneralMordent):
 
     * Changed in v7: InvertedMordent sizes are GenericIntervals -- as was originally
       intended but programmed incorrectly.
-    * Changed in v9: Support for inverted mordents with accidentals, which implies support for
-      various sizes, depending on srcObj (note), current key sig, and inverted mordent accidental.
     '''
     _direction = 'up'
 
@@ -1173,8 +1176,12 @@ class Trill(Ornament):
     True
 
     * Changed in v7: the size should be a generic second.
-    * Changed in v9: Support for trills with accidentals, which implies support for
-      various sizes, depending on srcObj (note), current key sig, and trill accidental.
+    * Changed in v9: Support an accidental on trills. This also adds the concept of
+      an ornamental pitch that is processed by makeAccidentals.
+      The size property has been removed and replaced with `.getSize()` (which requires
+      a `srcObj` and optional `keySig` param).  Added optional `keySig` param to
+      `.realize()` as well.
+
     '''
     def __init__(self, *, accidentalName: str = '', **keywords) -> None:
         super().__init__(**keywords)
@@ -1647,6 +1654,11 @@ class Turn(Ornament):
 
     * Changed in v7: size is a Generic second.  removed unused nachschlag component.
     * Changed in v9: Added support for delayed vs non-delayed Turn.
+    * Changed in v9: Support upper and lower accidentals on turns. This also adds
+      the concept of ornamental pitches that are processed by makeAccidentals.
+      The size property has been removed and replaced with `.getSize()` (which requires
+      a `srcObj` and optional `keySig` param).  Added optional `keySig` param to
+      `.realize()` as well.
     '''
     _isInverted: bool = False
 
