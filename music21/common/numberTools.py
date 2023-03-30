@@ -145,14 +145,17 @@ def _preFracLimitDenominator(n: int, d: int) -> tuple[int, int]:
     t is timeit.timeit
 
     t('Fraction(*common.numberTools._preFracLimitDenominator(*x.as_integer_ratio()))',
-       setup='x = 1000001/3000001.; from music21 import common;from fractions import Fraction',
+       setup='x = 1000001/3000001; from music21 import common;from fractions import Fraction',
        number=100000)
     1.0814228057861328
 
     t('Fraction(x).limit_denominator(65535)',
-       setup='x = 1000001/3000001.; from fractions import Fraction',
+       setup='x = 1000001/3000001; from fractions import Fraction',
        number=100000)
     7.941488981246948
+
+    Nothing changed in 2023, in fact, it's faster now with the cache, and even
+    without the cache, it's still 4x faster.
 
     Proof of working...
 
@@ -290,10 +293,13 @@ def opFrac(num: OffsetQLIn | None) -> OffsetQL | None:
         if ir[1] > DENOM_LIMIT:  # slightly faster[SIC!] than hard coding 65535!
             # _preFracLimitDenominator uses a cache
             f_out = Fraction(*_preFracLimitDenominator(*ir))  # way faster!
-            if f_out._denominator == 1:
-                return f_out._numerator + 0.0
+            # now, reduce denominator as Fraction -- just as below under numType == Fraction
+            d = f_out._denominator  # type: ignore
+            if (d & (d - 1)) == 0:  # power of two...
+                # 50% faster than float(num)
+                return f_out._numerator / (d + 0.0)  # type: ignore
             else:
-                return f_out
+                return f_out  # leave non-power of two fractions alone
             # return Fraction(*ir).limit_denominator(DENOM_LIMIT) # *ir instead of float--can happen
             # internally in Fraction constructor, but is twice as fast...
         else:
@@ -316,17 +322,7 @@ def opFrac(num: OffsetQLIn | None) -> OffsetQL | None:
     elif isinstance(num, int):
         return num + 0.0
     elif isinstance(num, float):
-        ir = num.as_integer_ratio()
-        if ir[1] > DENOM_LIMIT:  # slightly faster than hard coding 65535!
-            # _preFracLimitDenominator uses a cache
-            f_out = Fraction(*_preFracLimitDenominator(*ir))  # way faster!
-            if f_out._denominator == 1:
-                return f_out._numerator + 0.0
-            else:
-                return f_out
-        else:
-            return num
-
+        return opFrac(float(num))  # slower for inherited floats, but simpler than duplicating
     elif isinstance(num, Fraction):
         d = num.denominator  # Use properties since it is a subclass
         if (d & (d - 1)) == 0:  # power of two...
