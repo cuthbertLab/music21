@@ -5269,7 +5269,6 @@ class MeasureParser(XMLParserBase):
         return cs
 
     def xmlToFiguredBass(self, mxFiguredBass):
-        # print('Hello from xmlToFiguredBass', mxFiguredBass.findall('*'))
         fb_strings: list[str] = []
         sep = ','
         d: duration.Duration | None = None
