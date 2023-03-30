@@ -1590,7 +1590,7 @@ class PartParser(XMLParserBase):
         partStaves: list[stream.PartStaff] = []
         if self.maxStaves > 1:
             partStaves = self.separateOutPartStaves()
-        else:
+        elif self.partId is not None:
             self.stream.addGroupForElements(self.partId)  # set group for components (recurse?)
             self.stream.groups.append(self.partId)  # set group for stream itself
 
