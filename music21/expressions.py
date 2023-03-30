@@ -792,7 +792,7 @@ class GeneralMordent(Ornament):
     ):
         if not srcObj.pitches:
             raise TypeError(
-                'Cannot resolve mordent\'s ornamental pitches with an unpitched srcObj')
+                "Cannot resolve mordent's ornamental pitches with an unpitched srcObj")
 
         srcPitch: pitch.Pitch = srcObj.pitches[-1]
 
@@ -1256,7 +1256,7 @@ class Trill(Ornament):
     ) -> interval.IntervalBase:
         if not srcObj.pitches:
             raise TypeError(
-                'Cannot compute trill\'s size with an unpitched srcObj')
+                "Cannot compute trill's size with an unpitched srcObj")
 
         if keySig is None:
             keySig = srcObj.getContextByClass(key.KeySignature)
@@ -1285,7 +1285,7 @@ class Trill(Ornament):
     ):
         if not srcObj.pitches:
             raise TypeError(
-                'Cannot resolve trill\'s ornamental pitches with an unpitched srcObj')
+                "Cannot resolve trill's ornamental pitches with an unpitched srcObj")
 
         srcPitch: pitch.Pitch = srcObj.pitches[-1]
 
@@ -1768,7 +1768,7 @@ class Turn(Ornament):
     ) -> interval.IntervalBase:
         if which not in ('upper', 'lower'):
             raise ExpressionException(
-                'Turn.getSize requires \'which\' parameter be set to \'upper\' or \'lower\'')
+                "Turn.getSize requires 'which' parameter be set to 'upper' or 'lower'")
         if not srcObj.pitches:
             raise TypeError('Cannot compute Turn size with an unpitched srcObj')
 
@@ -1806,7 +1806,7 @@ class Turn(Ornament):
     ):
         if not srcObj.pitches:
             raise TypeError(
-                'Cannot resolve turn\'s ornamental pitches with an unpitched srcObj')
+                "Cannot resolve turn's ornamental pitches with an unpitched srcObj")
 
         srcPitch: pitch.Pitch = srcObj.pitches[-1]
 
