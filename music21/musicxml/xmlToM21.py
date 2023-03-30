@@ -1560,7 +1560,7 @@ class PartParser(XMLParserBase):
         self.appendToScoreAfterParse = True
         self.lastMeasureParser: MeasureParser | None = None
 
-    def parse(self):
+    def parse(self) -> None:
         '''
         Run the parser on a single part
         '''

@@ -286,13 +286,14 @@ def opFrac(num: OffsetQLIn | None) -> OffsetQL | None:
         #    (denominator & (denominator-1)) != 0
         # which is a nice test, but denominator here is always a power of two...
         # unused_numerator, denominator = num.as_integer_ratio()  # too slow
-        if num < 0.0000011:
-            return 0.0
-
         ir = num.as_integer_ratio()  # type: ignore
         if ir[1] > DENOM_LIMIT:  # slightly faster[SIC!] than hard coding 65535!
             # _preFracLimitDenominator uses a cache
-            return Fraction(*_preFracLimitDenominator(*ir))  # way faster!
+            f_out = Fraction(*_preFracLimitDenominator(*ir))  # way faster!
+            if f_out._denominator == 1:
+                return f_out._numerator + 0.0
+            else:
+                return f_out
             # return Fraction(*ir).limit_denominator(DENOM_LIMIT) # *ir instead of float--can happen
             # internally in Fraction constructor, but is twice as fast...
         else:
@@ -315,11 +316,14 @@ def opFrac(num: OffsetQLIn | None) -> OffsetQL | None:
     elif isinstance(num, int):
         return num + 0.0
     elif isinstance(num, float):
-        if num < 0.0000011:
-            return 0.0
         ir = num.as_integer_ratio()
         if ir[1] > DENOM_LIMIT:  # slightly faster than hard coding 65535!
-            return Fraction(*_preFracLimitDenominator(*ir))  # way faster!
+            # _preFracLimitDenominator uses a cache
+            f_out = Fraction(*_preFracLimitDenominator(*ir))  # way faster!
+            if f_out._denominator == 1:
+                return f_out._numerator + 0.0
+            else:
+                return f_out
         else:
             return num
 
