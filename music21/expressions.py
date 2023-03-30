@@ -1569,7 +1569,7 @@ class WholeStepTrill(Trill):
     >>> wholeTrill = expressions.WholeStepTrill()
     >>> wholeTrill.placement
     'above'
-    >>> m.wholeTrill(note.Note('C4'))
+    >>> wholeTrill.getSize(note.Note('C4'))
     <music21.interval.Interval M2>
 
     Here the key signature of one sharp will not affect the trill:
