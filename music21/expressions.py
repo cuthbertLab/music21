@@ -824,6 +824,8 @@ class GeneralMordent(Ornament):
 
         ornamentalPitch: pitch.Pitch = copy.deepcopy(srcPitch)
         ornamentalPitch.accidental = None
+        if ornamentalPitch.octave is None:
+            ornamentalPitch.octave = ornamentalPitch.implicitOctave
 
         if self._direction == 'up':
             ornamentalPitch.transpose(interval.GenericInterval(2), inPlace=True)
@@ -1387,6 +1389,8 @@ class Trill(Ornament):
 
         ornamentalPitch: pitch.Pitch = copy.deepcopy(srcPitch)
         ornamentalPitch.accidental = None
+        if ornamentalPitch.octave is None:
+            ornamentalPitch.octave = ornamentalPitch.implicitOctave
 
         ornamentalPitch.transpose(interval.GenericInterval(2), inPlace=True)
         if self.accidentalName:
@@ -1946,6 +1950,8 @@ class Turn(Ornament):
 
         ornamentalPitch: pitch.Pitch = copy.deepcopy(srcPitch)
         ornamentalPitch.accidental = None
+        if ornamentalPitch.octave is None:
+            ornamentalPitch.octave = ornamentalPitch.implicitOctave
 
         accidentalName: str = ''
         if which == 'upper':
