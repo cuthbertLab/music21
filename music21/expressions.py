@@ -1277,6 +1277,8 @@ class Trill(Ornament):
       `.realize()` as well.
 
     '''
+    _direction = 'up'
+
     def __init__(self, *, accidentalName: str = '', **keywords) -> None:
         super().__init__(**keywords)
         self._accidentalName: str = ''
@@ -1313,7 +1315,7 @@ class Trill(Ornament):
 
     @property
     def direction(self) -> str:
-        return 'up'
+        return self._direction
 
     @property
     def accidentalName(self) -> str:
@@ -1392,7 +1394,11 @@ class Trill(Ornament):
         if ornamentalPitch.octave is None:
             ornamentalPitch.octave = ornamentalPitch.implicitOctave
 
-        ornamentalPitch.transpose(interval.GenericInterval(2), inPlace=True)
+        if self._direction == 'up':
+            ornamentalPitch.transpose(interval.GenericInterval(2), inPlace=True)
+        else:
+            ornamentalPitch.transpose(interval.GenericInterval(-2), inPlace=True)
+
         if self.accidentalName:
             ornamentalPitch.accidental = pitch.Accidental(self.accidentalName)
         else:
@@ -1643,6 +1649,10 @@ class Trill(Ornament):
 
         else:
             return (trillNotes, None, [])
+
+
+class InvertedTrill(Trill):
+    _direction: bool = 'down'
 
 
 class HalfStepTrill(Trill):
@@ -2286,21 +2296,6 @@ class Turn(Ornament):
 
 class InvertedTurn(Turn):
     _isInverted: bool = True
-
-    def __init__(
-        self,
-        *,
-        delay: OrnamentDelay | OffsetQL = OrnamentDelay.NO_DELAY,
-        upperAccidentalName: str = '',
-        lowerAccidentalName: str = '',
-        **keywords
-    ):
-        super().__init__(
-            delay=delay,
-            upperAccidentalName=upperAccidentalName,
-            lowerAccidentalName=lowerAccidentalName,
-            **keywords
-        )
 
 
 # ------------------------------------------------------------------------------

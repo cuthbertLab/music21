@@ -131,13 +131,16 @@ class TrillRecognizer(OrnamentRecognizer):
             else:
                 return False
 
-        # set up trill
-        trill = expressions.Trill()
-        trill.quarterLength = self.calculateOrnamentNoteQl(busyNotes, simpleNotes)
-        if isNachschlag:
-            trill.nachschlag = True
-
         if not simpleNotes:
+            # set up trill (goes up) or inverted trill (goes down)
+            if n1.pitch.midi <= n2.pitch.midi:
+                trill = expressions.Trill()
+            else:
+                trill = expressions.InvertedTrill()
+            trill.quarterLength = self.calculateOrnamentNoteQl(busyNotes, simpleNotes)
+            if isNachschlag:
+                trill.nachschlag = True
+
             if n2.pitch.accidental is not None:
                 trill.accidentalName = n2.pitch.accidental.name
             trill.resolveOrnamentalPitches(n1)
@@ -155,6 +158,16 @@ class TrillRecognizer(OrnamentRecognizer):
         if simpleNote.pitch.midi == n2.pitch.midi:
             endNote = n1
             startNote = n2
+
+        # set up trill (goes up) or inverted trill (goes down)
+        if startNote.pitch.midi <= endNote.pitch.midi:
+            trill = expressions.Trill()
+        else:
+            trill = expressions.InvertedTrill()
+        trill.quarterLength = self.calculateOrnamentNoteQl(busyNotes, simpleNotes)
+        if isNachschlag:
+            trill.nachschlag = True
+
         if endNote.pitch.accidental is not None:
             trill.accidentalName = endNote.pitch.accidental.name
         trill.resolveOrnamentalPitches(startNote)
@@ -622,7 +635,14 @@ class Test(unittest.TestCase):
                 # ensure trill is correct
                 self.assertEqual(trill.nachschlag, cond.isNachschlag, cond.name)
                 if cond.ornamentSize:
-                    self.assertEqual(trill.getSize(cond.busyNotes[0]), cond.ornamentSize, cond.name)
+                    if cond.simpleNotes:
+                        if cond.simpleNotes[0].pitch.midi == cond.busyNotes[1].pitch.midi:
+                            size = trill.getSize(cond.busyNotes[1])
+                        else:
+                            size = trill.getSize(cond.busyNotes[0])
+                    else:
+                        size = trill.getSize(cond.busyNotes[0])
+                    self.assertEqual(size, cond.ornamentSize, cond.name)
             else:
                 self.assertFalse(trill, cond.name)
 
