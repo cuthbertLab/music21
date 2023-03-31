@@ -627,6 +627,32 @@ class Ornament(Expression):
 
     @property
     def ornamentalPitches(self) -> tuple[pitch.Pitch, ...]:
+        '''
+        Returns any ornamental pitches that have been resolved (see
+        `resolveOrnamentalPitches`, which must be called first, or an
+        empty tuple will be returned).
+
+        Only implemented in Turn, GeneralMordent, and Trill.  Turn can
+        have two ornamental pitches (one upper pitch and one lower pitch).
+        GeneralMordent and Trill can only have one ornamental pitch.
+        Other Ornaments always return an empty tuple.
+
+        e.g. A turn with a sharp under it, on a D, in a key with two
+        flats (upper ornamental pitch will be E flat, lower ornamental
+        pitch will be C#)
+
+        >>> twoFlats = key.KeySignature(sharps=-2)
+        >>> n = note.Note('D4')
+        >>> turn = expressions.Turn(lowerAccidentalName='sharp')
+        >>> turn.resolveOrnamentalPitches(n, keySig=twoFlats)
+        >>> turn.upperOrnamentalPitch
+        <music21.pitch.Pitch E-4>
+        >>> turn.lowerOrnamentalPitch
+        <music21.pitch.Pitch C#4>
+        >>> turn.ornamentalPitches
+        (<music21.pitch.Pitch E-4>, <music21.pitch.Pitch C#4>)
+
+        '''
         return self._ornamentalPitches
 
     def updateAccidentalDisplay(
@@ -651,9 +677,12 @@ class Ornament(Expression):
 
         Only implemented in Turn, GeneralMordent, and Trill.
 
-        These tests all test a Trill whose main note is a G in a key with no sharps or
-        flats, so the trill's ornamental note is an A. We test variously to see if the
-        A will end up with a natural accidental or not.
+        These examples show a Trill whose main note is a G in a key with no sharps or
+        flats, so the trill's ornamental pitch is an A. We show various situations
+        where the A might or might not end up with a natural accidental.
+
+        If updateAccidentalDisplay is called with cautionaryAll, the A gets a (cautionary)
+        natural accidental.
 
         >>> noSharpsOrFlats = key.KeySignature(0)
         >>> trill1 = expressions.Trill()
@@ -667,6 +696,9 @@ class Ornament(Expression):
         >>> trill1.ornamentalPitch.accidental, trill1.ornamentalPitch.accidental.displayStatus
         (<music21.pitch.Accidental natural>, True)
 
+        If updateAccidentalDisplay is called without cautionaryAll, the A gets a natural
+        accidental, because a previous A had a sharp accidental.
+
         >>> trill2 = expressions.Trill()
         >>> trill2.resolveOrnamentalPitches(note.Note('g4'), keySig=noSharpsOrFlats)
         >>> trill2.ornamentalPitch
@@ -678,8 +710,8 @@ class Ornament(Expression):
         >>> trill2.ornamentalPitch.accidental, trill2.ornamentalPitch.accidental.displayStatus
         (<music21.pitch.Accidental natural>, True)
 
-        In this example, the method will not add a natural because the match is
-        pitchSpace and our octave is different.
+        If updateAccidentalDisplay is called with cautionaryPitchClass=False, the A does
+        not get a natural accidental because the previous A# was in a different octave.
 
         >>> trill3 = expressions.Trill()
         >>> trill3.resolveOrnamentalPitches(note.Note('g4'), keySig=noSharpsOrFlats)
@@ -700,12 +732,6 @@ class Ornament(Expression):
 class GeneralMordent(Ornament):
     '''
     Base class for all Mordent types.
-
-    * Changed in v9: Support an accidental on mordents. This also adds the concept of
-      an ornamental pitch that is processed by makeAccidentals.
-      The size property has been removed and replaced with `.getSize()` (which requires
-      a `srcObj` and optional `keySig` param).  Added optional `keySig` param to
-      `.realize()` as well.
     '''
     _direction = ''  # up or down
 
@@ -742,6 +768,16 @@ class GeneralMordent(Ornament):
 
     @property
     def accidentalName(self) -> str:
+        '''
+        This is the GeneralMordent's accidentalName.  Note that if this is
+        not set, the GeneralMordent may still have an accidental (depending
+        on the srcNote, and the current key signature), and that accidental
+        may or may not be visible.  Setting the accidentalName mandates that
+        "this will be the accidental's name, and it will be visible", and both
+        `.resolveOrnamentalPitches` and `.updateAccidentalDisplay` will obey
+        that mandate.  accidentalName must be set to a valid accidental name
+        string as accepted by :class:`~music21.pitch.Accidental`.
+        '''
         return self._accidentalName
 
     @accidentalName.setter
@@ -760,8 +796,19 @@ class GeneralMordent(Ornament):
         srcObj: note.GeneralNote,
         *,
         keySig: key.KeySignature | None = None,
-        which: str = ''
     ) -> interval.IntervalBase:
+        '''
+        Returns the size of the mordent's interval, given a source note and
+        an optional key signature.  If the key signature is not specified, the
+        source note's context is searched for the current key signature, and if
+        there is no such key signature, a key signature with no sharps and no flats
+        will be used.  Any `accidentalName` that has been set on the mordent
+        will also be taken into account.
+
+        If keySig is specified, this can be considered to be a theoretical question:
+        "If this particular mordent were to be attached to this note, in this key,
+        what would the size of the mordent interval be?"
+        '''
         if self._direction not in ('up', 'down'):
             raise ExpressionException('Cannot compute mordent size if I do not know its direction')
 
@@ -806,6 +853,10 @@ class GeneralMordent(Ornament):
         transposeInterval: interval.IntervalBase = self.getSize(srcObj, keySig=keySig)
         ornamentalPitch: pitch.Pitch = srcPitch.transpose(transposeInterval, inPlace=False)
         if self.accidentalName:
+            # Note that we don't need to look at what the accidentalName actually is,
+            # since that has already been incorporated into transposeInterval and the
+            # ornamentalPitch via the call to getSize()/srcPitch.transpose().  But if
+            # accidentalName is set at all, we need to set displayStatus to True.
             if ornamentalPitch.accidental is None:
                 ornamentalPitch.accidental = pitch.Accidental(0)
             ornamentalPitch.accidental.displayStatus = True
@@ -813,8 +864,13 @@ class GeneralMordent(Ornament):
 
     @property
     def ornamentalPitch(self) -> pitch.Pitch | None:
+        '''
+        Returns the mordent's ornamentalPitch.  If resolveOrnamentalPitches
+        has not yet been called, None is returned.
+        '''
         if self._ornamentalPitches:
             return self._ornamentalPitches[0]
+        return None
 
     def updateAccidentalDisplay(
         self,
@@ -993,6 +1049,11 @@ class Mordent(GeneralMordent):
 
     * Changed in v7: Mordent sizes are GenericIntervals -- as was originally
       intended but programmed incorrectly.
+    * Changed in v9: Support an accidental on Mordent. This also adds the concept of
+      an ornamental pitch that is processed by makeAccidentals.
+      The size property has been removed and replaced with `.getSize()` (which requires
+      a `srcObj` and optional `keySig` param).  Added optional `keySig` param to
+      `.realize()` as well.
     '''
     _direction = 'down'  # up or down
 
@@ -1019,7 +1080,6 @@ class HalfStepMordent(Mordent):
         srcObj: note.GeneralNote,
         *,
         keySig: key.KeySignature | None = None,
-        which: str = ''
     ) -> interval.IntervalBase:
         return self._minorSecondDown
 
@@ -1054,7 +1114,6 @@ class WholeStepMordent(Mordent):
         srcObj: note.GeneralNote,
         *,
         keySig: key.KeySignature | None = None,
-        which: str = ''
     ) -> interval.IntervalBase:
         return self._majorSecondDown
 
@@ -1101,6 +1160,11 @@ class InvertedMordent(GeneralMordent):
 
     * Changed in v7: InvertedMordent sizes are GenericIntervals -- as was originally
       intended but programmed incorrectly.
+    * Changed in v9: Support an accidental on InvertedMordent. This also adds the concept of
+      an ornamental pitch that is processed by makeAccidentals.
+      The size property has been removed and replaced with `.getSize()` (which requires
+      a `srcObj` and optional `keySig` param).  Added optional `keySig` param to
+      `.realize()` as well.
     '''
     _direction = 'up'
 
@@ -1128,7 +1192,6 @@ class HalfStepInvertedMordent(InvertedMordent):
         srcObj: note.GeneralNote,
         *,
         keySig: key.KeySignature | None = None,
-        which: str = ''
     ) -> interval.IntervalBase:
         return self._minorSecondUp
 
@@ -1164,7 +1227,6 @@ class WholeStepInvertedMordent(InvertedMordent):
         srcObj: note.GeneralNote,
         *,
         keySig: key.KeySignature | None = None,
-        which: str = ''
     ) -> interval.IntervalBase:
         return self._majorSecondUp
 
@@ -1253,6 +1315,16 @@ class Trill(Ornament):
 
     @property
     def accidentalName(self) -> str:
+        '''
+        This is the Trill's accidentalName.  Note that if this is not
+        set, the Trill may still have an accidental (depending on the
+        srcNote, and the current key signature), and that accidental may
+        or may not be visible.  Setting the accidentalName mandates that
+        "this will be the accidental's name, and it will be visible", and
+        both `.resolveOrnamentalPitches` and `.updateAccidentalDisplay`
+        will obey that mandate.  accidentalName must be set to a valid
+        accidental name string as accepted by :class:`~music21.pitch.Accidental`.
+        '''
         return self._accidentalName
 
     @accidentalName.setter
@@ -1289,8 +1361,19 @@ class Trill(Ornament):
         srcObj: note.GeneralNote,
         *,
         keySig: key.KeySignature | None = None,
-        which: str = ''
     ) -> interval.IntervalBase:
+        '''
+        Returns the size of the trill's interval, given a source note and
+        an optional key signature.  If the key signature is not specified, the
+        source note's context is searched for the current key signature, and if
+        there is no such key signature, a key signature with no sharps and no flats
+        will be used.  Any `accidentalName` that has been set on the trill
+        will also be taken into account.
+
+        If keySig is specified, this can be considered to be a theoretical question:
+        "If this particular trill were to be attached to this note, in this key,
+        what would the size of the trill interval be?"
+        '''
         if not srcObj.pitches:
             raise TypeError(
                 "Cannot compute trill's size with an unpitched srcObj")
@@ -1329,6 +1412,10 @@ class Trill(Ornament):
         transposeInterval: interval.IntervalBase = self.getSize(srcObj, keySig=keySig)
         ornamentalPitch: pitch.Pitch = srcPitch.transpose(transposeInterval, inPlace=False)
         if self.accidentalName:
+            # Note that we don't need to look at what the accidentalName actually is,
+            # since that has already been incorporated into transposeInterval and the
+            # ornamentalPitch via the call to getSize()/srcPitch.transpose().  But if
+            # accidentalName is set at all, we need to set displayStatus to True.
             if ornamentalPitch.accidental is None:
                 ornamentalPitch.accidental = pitch.Accidental(0)
             ornamentalPitch.accidental.displayStatus = True
@@ -1336,6 +1423,10 @@ class Trill(Ornament):
 
     @property
     def ornamentalPitch(self) -> pitch.Pitch | None:
+        '''
+        Returns the trill's ornamentalPitch.  If resolveOrnamentalPitches
+        has not yet been called, None is returned.
+        '''
         if self._ornamentalPitches:
             return self._ornamentalPitches[0]
         return None
@@ -1586,7 +1677,6 @@ class HalfStepTrill(Trill):
         srcObj: note.GeneralNote,
         *,
         keySig: key.KeySignature | None = None,
-        which: str = ''
     ) -> interval.IntervalBase:
         return self._minorSecondUp
 
@@ -1635,7 +1725,6 @@ class WholeStepTrill(Trill):
         srcObj: note.GeneralNote,
         *,
         keySig: key.KeySignature | None = None,
-        which: str = ''
     ) -> interval.IntervalBase:
         return self._majorSecondUp
 
@@ -1687,8 +1776,8 @@ class Turn(Ornament):
     * Changed in v9: Support upper and lower accidentals on turns. This also adds
       the concept of ornamental pitches that are processed by makeAccidentals.
       The size property has been removed and replaced with `.getSize()` (which requires
-      a `srcObj` and optional `keySig` param).  Added optional `keySig` param to
-      `.realize()` as well.
+      a `srcObj` and optional `keySig` param, as well as which='upper' or which='lower').
+      Added optional `keySig` param to `.realize()` as well.
     '''
     _isInverted: bool = False
 
@@ -1715,6 +1804,16 @@ class Turn(Ornament):
 
     @property
     def upperAccidentalName(self) -> str:
+        '''
+        This is the Turn's upperAccidentalName.  Note that if this is not
+        set, the Trill may still have an upper accidental (depending on the
+        srcNote, and the current key signature), and that accidental may
+        or may not be visible.  Setting the upperAccidentalName mandates that
+        "this will be the upper accidental's name, and it will be visible", and
+        both `.resolveOrnamentalPitches` and `.updateAccidentalDisplay`
+        will obey that mandate.  upperAccidentalName must be set to a valid
+        accidental name string as accepted by :class:`~music21.pitch.Accidental`.
+        '''
         return self._upperAccidentalName
 
     @upperAccidentalName.setter
@@ -1726,6 +1825,16 @@ class Turn(Ornament):
 
     @property
     def lowerAccidentalName(self) -> str:
+        '''
+        This is the Turn's lowerAccidentalName.  Note that if this is not
+        set, the Trill may still have a lower accidental (depending on the
+        srcNote, and the current key signature), and that accidental may or
+        may not be visible.  Setting the lowerAccidentalName mandates that
+        "this will be the lower accidental's name, and it will be visible",
+        and both `.resolveOrnamentalPitches` and `.updateAccidentalDisplay`
+        will obey that mandate.  lowerAccidentalName must be set to a valid
+        accidental name string as accepted by :class:`~music21.pitch.Accidental`.
+        '''
         return self._lowerAccidentalName
 
     @lowerAccidentalName.setter
@@ -1804,10 +1913,24 @@ class Turn(Ornament):
     def getSize(
         self,
         srcObj: note.GeneralNote,
+        which: str,
         *,
         keySig: key.KeySignature | None = None,
-        which: str = ''
     ) -> interval.IntervalBase:
+        '''
+        Returns the size of one of the turn's two intervals (which='upper'
+        or which='lower'), given a source note and an optional key signature.
+        If the key signature is not specified, the source note's context is
+        searched for the current key signature, and if there is no such key
+        signature, a key signature with no sharps and no flats will be used.
+        Any `accidentalName` that has been set on the turn will also be taken
+        into account.
+
+        If keySig is specified, this can be considered to be a theoretical
+        question: "If this particular turn were to be attached to this note,
+        in this key, what would the ('upper' or 'lower') size of the turn
+        interval be?"
+        '''
         if which not in ('upper', 'lower'):
             raise ExpressionException(
                 "Turn.getSize requires 'which' parameter be set to 'upper' or 'lower'")
@@ -1853,14 +1976,17 @@ class Turn(Ornament):
         srcPitch: pitch.Pitch = srcObj.pitches[-1]
 
         transposeIntervalUp: interval.IntervalBase = self.getSize(
-            srcObj, keySig=keySig, which='upper')
+            srcObj, 'upper', keySig=keySig)
         upperPitch: pitch.Pitch = srcPitch.transpose(transposeIntervalUp, inPlace=False)
         transposeIntervalDown: interval.IntervalBase = self.getSize(
-            srcObj, keySig=keySig, which='lower')
+            srcObj, 'lower', keySig=keySig)
         lowerPitch: pitch.Pitch = srcPitch.transpose(transposeIntervalDown, inPlace=False)
 
-        # existence of upperAccidentalName (or lowerAccidentalName) implies
+        # The existence of upperAccidentalName (or lowerAccidentalName) implies
         # upperPitch.accidental (or lowerPitch.accidental) should be displayed.
+        # The actual non-'' value of upperAccidentalName (or lowerAccidentalName)
+        # is not relevant here, since it is already incorporated into the upperPitch
+        # (or lowerPitch) via getSize()/transpose().
         if self.upperAccidentalName:
             if upperPitch.accidental is None:
                 upperPitch.accidental = pitch.Accidental(0)
@@ -1875,12 +2001,20 @@ class Turn(Ornament):
 
     @property
     def upperOrnamentalPitch(self) -> pitch.Pitch | None:
+        '''
+        Returns the turn's upper ornamental pitch.  If resolveOrnamentalPitches
+        has not yet been called, None is returned.
+        '''
         if len(self._ornamentalPitches) >= 1:
             return self._ornamentalPitches[0]
         return None
 
     @property
     def lowerOrnamentalPitch(self) -> pitch.Pitch | None:
+        '''
+        Returns the turn's lower ornamental pitch.  If resolveOrnamentalPitches
+        has not yet been called, None is returned.
+        '''
         if len(self._ornamentalPitches) >= 2:
             return self._ornamentalPitches[1]
         return None
@@ -2081,11 +2215,11 @@ class Turn(Ornament):
             fourthNoteQL = opFrac(turnDuration - (3 * useQL))
 
         if not self._isInverted:
-            firstTransposeInterval = self.getSize(srcObj, keySig=keySig, which='upper')
-            secondTransposeInterval = self.getSize(srcObj, keySig=keySig, which='lower')
+            firstTransposeInterval = self.getSize(srcObj, 'upper', keySig=keySig)
+            secondTransposeInterval = self.getSize(srcObj, 'lower', keySig=keySig)
         else:
-            firstTransposeInterval = self.getSize(srcObj, keySig=keySig, which='lower')
-            secondTransposeInterval = self.getSize(srcObj, keySig=keySig, which='upper')
+            firstTransposeInterval = self.getSize(srcObj, 'lower', keySig=keySig)
+            secondTransposeInterval = self.getSize(srcObj, 'upper', keySig=keySig)
 
         turnNotes: list[note.Note] = []
 
