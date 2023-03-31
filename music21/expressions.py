@@ -1277,7 +1277,7 @@ class Trill(Ornament):
       `.realize()` as well.
 
     '''
-    _direction = 'up'
+    _direction: str = 'up'
 
     def __init__(self, *, accidentalName: str = '', **keywords) -> None:
         super().__init__(**keywords)
@@ -1652,7 +1652,7 @@ class Trill(Ornament):
 
 
 class InvertedTrill(Trill):
-    _direction: bool = 'down'
+    _direction: str = 'down'
 
 
 class HalfStepTrill(Trill):
