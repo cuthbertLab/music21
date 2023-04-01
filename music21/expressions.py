@@ -519,7 +519,8 @@ class Ornament(Expression):
         '''
         Used by trills and mordents to fill out their realization.
         '''
-        if not hasattr(srcObj, 'transpose'):
+        isTransposed: bool = transposeInterval != interval.Interval('P1')
+        if isTransposed and not hasattr(srcObj, 'transpose'):
             raise TypeError(f'Expected note; got {type(srcObj)}')
 
         if useQL is None:
@@ -534,7 +535,8 @@ class Ornament(Expression):
         secondNote.duration.quarterLength = useQL
         # TODO: remove expressions
         # secondNote.expressions = None
-        secondNote.transpose(transposeInterval, inPlace=True)
+        if isTransposed:
+            secondNote.transpose(transposeInterval, inPlace=True)
 
         fillObjects.append(firstNote)
         fillObjects.append(secondNote)
@@ -813,7 +815,8 @@ class GeneralMordent(Ornament):
             raise ExpressionException('Cannot compute mordent size if I do not know its direction')
 
         if not srcObj.pitches:
-            raise TypeError('Cannot compute mordent size with an unpitched srcObj')
+            # perfect unison
+            return interval.Interval('P1')
 
         if keySig is None:
             keySig = srcObj.getContextByClass(key.KeySignature)
@@ -847,8 +850,8 @@ class GeneralMordent(Ornament):
         keySig: key.KeySignature | None = None
     ):
         if not srcObj.pitches:
-            raise TypeError(
-                "Cannot resolve mordent's ornamental pitches with an unpitched srcObj")
+            # There are no ornamental pitches relative to this srcObj
+            return
 
         srcPitch: pitch.Pitch = srcObj.pitches[-1]
         transposeInterval: interval.IntervalBase = self.getSize(srcObj, keySig=keySig)
@@ -951,8 +954,6 @@ class GeneralMordent(Ornament):
             raise ExpressionException('Cannot realize a mordent if I do not know its direction')
         if srcObj.duration.quarterLength == 0:
             raise ExpressionException('Cannot steal time from an object with no duration')
-        if not srcObj.pitches:
-            raise TypeError('Cannot realize a mordent with an unpitched srcObj')
 
         use_ql = self.quarterLength
         if srcObj.duration.quarterLength <= self.quarterLength * 2:
@@ -971,12 +972,13 @@ class GeneralMordent(Ornament):
         mordNotes: list[note.Note] = []
         self.fillListOfRealizedNotes(srcObj, mordNotes, transposeInterval, useQL=use_ql)
 
-        # second (middle) note might need an accidental from the keysig (but
-        # only if it doesn't already have an accidental from accidentalName)
-        for noteIdx, n in enumerate(mordNotes):
-            noteNum: int = noteIdx + 1
-            if n.pitch.accidental is None and noteNum == 2:
-                n.pitch.accidental = currentKeySig.accidentalByStep(n.pitch.step)
+        if transposeInterval != interval.Interval('P1'):
+            # second (middle) note might need an accidental from the keysig (but
+            # only if it doesn't already have an accidental from accidentalName)
+            for noteIdx, n in enumerate(mordNotes):
+                noteNum: int = noteIdx + 1
+                if n.pitch.accidental is None and noteNum == 2:
+                    n.pitch.accidental = currentKeySig.accidentalByStep(n.pitch.step)
 
         inExpressions = -1
         if self in srcObj.expressions:
@@ -1382,9 +1384,12 @@ class Trill(Ornament):
         "If this particular trill were to be attached to this note, in this key,
         what would the size of the trill interval be?"
         '''
+        if self._direction not in ('up', 'down'):
+            raise ExpressionException('Cannot compute trill size if I do not know its direction')
+
         if not srcObj.pitches:
-            raise TypeError(
-                "Cannot compute trill's size with an unpitched srcObj")
+            # perfect unison (e.g. snare drum "trill")
+            return interval.Interval('P1')
 
         if keySig is None:
             keySig = srcObj.getContextByClass(key.KeySignature)
@@ -1418,8 +1423,8 @@ class Trill(Ornament):
         keySig: key.KeySignature | None = None
     ):
         if not srcObj.pitches:
-            raise TypeError(
-                "Cannot resolve trill's ornamental pitches with an unpitched srcObj")
+            # There are no ornamental pitches relative to this srcObj
+            return
 
         srcPitch: pitch.Pitch = srcObj.pitches[-1]
         transposeInterval: interval.IntervalBase = self.getSize(srcObj, keySig=keySig)
@@ -1590,9 +1595,6 @@ class Trill(Ornament):
 
         inPlace is not used for Trills.
         '''
-        if not srcObj.pitches:
-            raise TypeError('Cannot realize trill with an unpitched srcObj')
-
         useQL = self.quarterLength
         if srcObj.duration.quarterLength == 0:
             raise ExpressionException('Cannot steal time from an object with no duration')
@@ -1613,6 +1615,7 @@ class Trill(Ornament):
 
         transposeInterval = self.getSize(srcObj, keySig=currentKeySig)
         transposeIntervalReverse = transposeInterval.reverse()
+        isTransposed: bool = transposeInterval != interval.Interval('P1')
 
         numberOfTrillNotes = int(srcObj.duration.quarterLength / useQL)
         if self.nachschlag:
@@ -1622,14 +1625,15 @@ class Trill(Ornament):
         for unused_counter in range(int(numberOfTrillNotes / 2)):
             self.fillListOfRealizedNotes(srcObj, trillNotes, transposeInterval, useQL=useQL)
 
-        setAccidentalFromKeySig = self._setAccidentalFromKeySig
-        if setAccidentalFromKeySig:
-            for n in trillNotes:
-                if n.pitch.nameWithOctave != srcObj.pitch.nameWithOctave:
-                    # do not correct original note, no matter what.
-                    if n.pitch.accidental is None:
-                        # only correct if there isn't already an accidental (from accidentalName)
-                        n.pitch.accidental = currentKeySig.accidentalByStep(n.step)
+        if isTransposed:
+            setAccidentalFromKeySig = self._setAccidentalFromKeySig
+            if setAccidentalFromKeySig:
+                for n in trillNotes:
+                    if n.pitch.nameWithOctave != srcObj.pitch.nameWithOctave:
+                        # do not correct original note, no matter what.
+                        if n.pitch.accidental is None:
+                            # correct if there isn't already an accidental (from accidentalName)
+                            n.pitch.accidental = currentKeySig.accidentalByStep(n.step)
 
         if inPlace and self in srcObj.expressions:
             srcObj.expressions.remove(self)
@@ -1642,14 +1646,14 @@ class Trill(Ornament):
             secondNoteNachschlag = copy.deepcopy(srcObj)
             secondNoteNachschlag.expressions = []
             secondNoteNachschlag.duration.quarterLength = useQL
-            secondNoteNachschlag.transpose(transposeIntervalReverse,
-                                           inPlace=True)
-
-            if setAccidentalFromKeySig and currentKeySig:
-                firstNoteNachschlag.pitch.accidental = currentKeySig.accidentalByStep(
-                    firstNoteNachschlag.step)
-                secondNoteNachschlag.pitch.accidental = currentKeySig.accidentalByStep(
-                    secondNoteNachschlag.step)
+            if isTransposed:
+                secondNoteNachschlag.transpose(transposeIntervalReverse,
+                                                inPlace=True)
+                if setAccidentalFromKeySig and currentKeySig:
+                    firstNoteNachschlag.pitch.accidental = currentKeySig.accidentalByStep(
+                        firstNoteNachschlag.step)
+                    secondNoteNachschlag.pitch.accidental = currentKeySig.accidentalByStep(
+                        secondNoteNachschlag.step)
 
             nachschlag = [firstNoteNachschlag, secondNoteNachschlag]
 
@@ -1956,8 +1960,10 @@ class Turn(Ornament):
         if which not in ('upper', 'lower'):
             raise ExpressionException(
                 "Turn.getSize requires 'which' parameter be set to 'upper' or 'lower'")
+
         if not srcObj.pitches:
-            raise TypeError('Cannot compute Turn size with an unpitched srcObj')
+            # perfect unison
+            return interval.Interval('P1')
 
         srcPitch: pitch.Pitch = srcObj.pitches[-1]
 
@@ -1994,8 +2000,8 @@ class Turn(Ornament):
         keySig: key.KeySignature | None = None
     ):
         if not srcObj.pitches:
-            raise TypeError(
-                "Cannot resolve turn's ornamental pitches with an unpitched srcObj")
+            # There are no ornamental pitches relative to this srcObj
+            return
 
         srcPitch: pitch.Pitch = srcObj.pitches[-1]
 
@@ -2212,14 +2218,16 @@ class Turn(Ornament):
         Traceback (most recent call last):
         music21.expressions.ExpressionException: The note is not long enough to realize a turn
         '''
-        if not hasattr(srcObj, 'pitch'):
-            raise TypeError('Cannot realize turn with Unpitched srcObj')
-
         useQL = self.quarterLength
         if srcObj.duration.quarterLength == 0:
             raise ExpressionException('Cannot steal time from an object with no duration')
 
         # here we compute transposeIntervals, and invert them if self._isInverted
+        currentKeySig = keySig
+        if currentKeySig is None:
+            currentKeySig = srcObj.getContextByClass(key.KeySignature)
+            if currentKeySig is None:
+                currentKeySig = key.KeySignature(0)
 
         remainderDuration: OffsetQL
         if self.delay == OrnamentDelay.NO_DELAY:
@@ -2246,18 +2254,22 @@ class Turn(Ornament):
             fourthNoteQL = opFrac(turnDuration - (3 * useQL))
 
         if not self._isInverted:
-            firstTransposeInterval = self.getSize(srcObj, 'upper', keySig=keySig)
-            secondTransposeInterval = self.getSize(srcObj, 'lower', keySig=keySig)
+            firstTransposeInterval = self.getSize(srcObj, 'upper', keySig=currentKeySig)
+            secondTransposeInterval = self.getSize(srcObj, 'lower', keySig=currentKeySig)
         else:
-            firstTransposeInterval = self.getSize(srcObj, 'lower', keySig=keySig)
-            secondTransposeInterval = self.getSize(srcObj, 'upper', keySig=keySig)
+            firstTransposeInterval = self.getSize(srcObj, 'lower', keySig=currentKeySig)
+            secondTransposeInterval = self.getSize(srcObj, 'upper', keySig=currentKeySig)
+
+        # no need to check both intervals, they will both be perfectUnison, or neither will be.
+        isTransposed: bool = firstTransposeInterval != interval.Interval('P1')
 
         turnNotes: list[note.Note] = []
 
         firstNote = copy.deepcopy(srcObj)
         firstNote.expressions = []
         firstNote.duration.quarterLength = useQL
-        firstNote.transpose(firstTransposeInterval, inPlace=True)
+        if isTransposed:
+            firstNote.transpose(firstTransposeInterval, inPlace=True)
 
         secondNote = copy.deepcopy(srcObj)
         secondNote.expressions = []
@@ -2266,7 +2278,8 @@ class Turn(Ornament):
         thirdNote = copy.deepcopy(srcObj)
         thirdNote.expressions = []
         thirdNote.duration.quarterLength = useQL
-        thirdNote.transpose(secondTransposeInterval, inPlace=True)
+        if isTransposed:
+            thirdNote.transpose(secondTransposeInterval, inPlace=True)
 
         fourthNote = copy.deepcopy(srcObj)
         fourthNote.expressions = []
@@ -2280,16 +2293,13 @@ class Turn(Ornament):
         turnNotes.append(thirdNote)
         turnNotes.append(fourthNote)
 
-        currentKeySig = srcObj.getContextByClass(key.KeySignature)
-        if currentKeySig is None:
-            currentKeySig = key.KeySignature(0)
-
-        # first note and third note might need an accidental from the keySig (but
-        # only if they don't already have an accidental from upper/lowerAccidentalName)
-        for noteIdx, n in enumerate(turnNotes):
-            noteNum: int = noteIdx + 1
-            if n.pitch.accidental is None and noteNum in (1, 3):
-                n.pitch.accidental = currentKeySig.accidentalByStep(n.pitch.step)
+        if isTransposed:
+            # first note and third note might need an accidental from the keySig (but
+            # only if they don't already have an accidental from upper/lowerAccidentalName)
+            for noteIdx, n in enumerate(turnNotes):
+                noteNum: int = noteIdx + 1
+                if n.pitch.accidental is None and noteNum in (1, 3):
+                    n.pitch.accidental = currentKeySig.accidentalByStep(n.pitch.step)
 
         inExpressions = -1
         if self in srcObj.expressions:

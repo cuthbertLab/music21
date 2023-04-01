@@ -6,6 +6,7 @@ import unittest
 from music21 import chord
 from music21 import clef
 from music21 import expressions
+from music21 import interval
 from music21 import key
 from music21 import meter
 from music21.musicxml import m21ToXml
@@ -319,60 +320,98 @@ class Test(unittest.TestCase):
             True
         )
 
-    def testUnpitchedUnsupported(self):
+    def testUnpitchedOrnaments(self):
         unp = note.Unpitched()
 
         mord = expressions.Mordent()
-        with self.assertRaises(TypeError):
-            mord.realize(unp)  # type: ignore
-        with self.assertRaises(TypeError):
-            mord.getSize(unp)
-        with self.assertRaises(TypeError):
-            mord.resolveOrnamentalPitches(unp)
+        realized = mord.realize(unp)  # type: ignore
+        self.assertEqual(len(realized), 3)
+        self.assertEqual(len(realized[0]), 2)
+        self.assertEqual(type(realized[0][0]), note.Unpitched)
+        self.assertEqual(type(realized[0][1]), note.Unpitched)
+        self.assertEqual(type(realized[1]), note.Unpitched)
+        self.assertEqual(len(realized[2]), 0)
+        self.assertEqual(mord.getSize(unp), interval.Interval('P1'))
+        mord.resolveOrnamentalPitches(unp)
+        self.assertEqual(mord.ornamentalPitches, tuple())
 
         mord = expressions.InvertedMordent()
-        with self.assertRaises(TypeError):
-            mord.realize(unp)  # type: ignore
-        with self.assertRaises(TypeError):
-            mord.getSize(unp)
-        with self.assertRaises(TypeError):
-            mord.resolveOrnamentalPitches(unp)
+        realized = mord.realize(unp)  # type: ignore
+        self.assertEqual(len(realized), 3)
+        self.assertEqual(len(realized[0]), 2)
+        self.assertEqual(type(realized[0][0]), note.Unpitched)
+        self.assertEqual(type(realized[0][1]), note.Unpitched)
+        self.assertEqual(type(realized[1]), note.Unpitched)
+        self.assertEqual(len(realized[2]), 0)
+        self.assertEqual(mord.getSize(unp), interval.Interval('P1'))
+        mord.resolveOrnamentalPitches(unp)
+        self.assertEqual(mord.ornamentalPitches, tuple())
 
         turn = expressions.Turn()
-        with self.assertRaises(TypeError):
-            turn.realize(unp)
-        with self.assertRaises(TypeError):
-            turn.getSize(unp, which='upper')
-        with self.assertRaises(TypeError):
-            turn.getSize(unp, which='lower')
-        with self.assertRaises(TypeError):
-            turn.resolveOrnamentalPitches(unp)
+        realized = turn.realize(unp)
+        self.assertEqual(len(realized), 3)
+        self.assertEqual(len(realized[0]), 0)
+        self.assertIsNone(realized[1])
+        self.assertEqual(len(realized[2]), 4)
+        self.assertEqual(type(realized[2][0]), note.Unpitched)
+        self.assertEqual(type(realized[2][1]), note.Unpitched)
+        self.assertEqual(type(realized[2][2]), note.Unpitched)
+        self.assertEqual(type(realized[2][3]), note.Unpitched)
+        self.assertEqual(turn.getSize(unp, which='upper'), interval.Interval('P1'))
+        self.assertEqual(turn.getSize(unp, which='lower'), interval.Interval('P1'))
+        turn.resolveOrnamentalPitches(unp)
+        self.assertEqual(turn.ornamentalPitches, tuple())
 
         turn = expressions.InvertedTurn()
-        with self.assertRaises(TypeError):
-            turn.realize(unp)
-        with self.assertRaises(TypeError):
-            turn.getSize(unp, which='upper')
-        with self.assertRaises(TypeError):
-            turn.getSize(unp, which='lower')
-        with self.assertRaises(TypeError):
-            turn.resolveOrnamentalPitches(unp)
+        realized = turn.realize(unp)
+        self.assertEqual(len(realized), 3)
+        self.assertEqual(len(realized[0]), 0)
+        self.assertIsNone(realized[1])
+        self.assertEqual(len(realized[2]), 4)
+        self.assertEqual(type(realized[2][0]), note.Unpitched)
+        self.assertEqual(type(realized[2][1]), note.Unpitched)
+        self.assertEqual(type(realized[2][2]), note.Unpitched)
+        self.assertEqual(type(realized[2][3]), note.Unpitched)
+        self.assertEqual(turn.getSize(unp, which='upper'), interval.Interval('P1'))
+        self.assertEqual(turn.getSize(unp, which='lower'), interval.Interval('P1'))
+        turn.resolveOrnamentalPitches(unp)
+        self.assertEqual(turn.ornamentalPitches, tuple())
 
         trill = expressions.Trill()
-        with self.assertRaises(TypeError):
-            trill.realize(unp)
-        with self.assertRaises(TypeError):
-            trill.getSize(unp)
-        with self.assertRaises(TypeError):
-            trill.resolveOrnamentalPitches(unp)
+        realized = trill.realize(unp)
+        self.assertEqual(len(realized), 3)
+        self.assertEqual(len(realized[0]), 8)
+        self.assertEqual(type(realized[0][0]), note.Unpitched)
+        self.assertEqual(type(realized[0][1]), note.Unpitched)
+        self.assertEqual(type(realized[0][2]), note.Unpitched)
+        self.assertEqual(type(realized[0][3]), note.Unpitched)
+        self.assertEqual(type(realized[0][4]), note.Unpitched)
+        self.assertEqual(type(realized[0][5]), note.Unpitched)
+        self.assertEqual(type(realized[0][6]), note.Unpitched)
+        self.assertEqual(type(realized[0][7]), note.Unpitched)
+        self.assertIsNone(realized[1])
+        self.assertEqual(len(realized[2]), 0)
+        self.assertEqual(trill.getSize(unp), interval.Interval('P1'))
+        trill.resolveOrnamentalPitches(unp)
+        self.assertEqual(turn.ornamentalPitches, tuple())
 
         trill = expressions.InvertedTrill()
-        with self.assertRaises(TypeError):
-            trill.realize(unp)
-        with self.assertRaises(TypeError):
-            trill.getSize(unp)
-        with self.assertRaises(TypeError):
-            trill.resolveOrnamentalPitches(unp)
+        realized = trill.realize(unp)
+        self.assertEqual(len(realized), 3)
+        self.assertEqual(len(realized[0]), 8)
+        self.assertEqual(type(realized[0][0]), note.Unpitched)
+        self.assertEqual(type(realized[0][1]), note.Unpitched)
+        self.assertEqual(type(realized[0][2]), note.Unpitched)
+        self.assertEqual(type(realized[0][3]), note.Unpitched)
+        self.assertEqual(type(realized[0][4]), note.Unpitched)
+        self.assertEqual(type(realized[0][5]), note.Unpitched)
+        self.assertEqual(type(realized[0][6]), note.Unpitched)
+        self.assertEqual(type(realized[0][7]), note.Unpitched)
+        self.assertIsNone(realized[1])
+        self.assertEqual(len(realized[2]), 0)
+        self.assertEqual(trill.getSize(unp), interval.Interval('P1'))
+        trill.resolveOrnamentalPitches(unp)
+        self.assertEqual(turn.ornamentalPitches, tuple())
 
 
 # class TestExternal(unittest.TestCase):
