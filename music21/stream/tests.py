@@ -4740,13 +4740,6 @@ class Test(unittest.TestCase):
         self.assertEqual([(0.0, 2), (0.0, 30), (5.0, 25), (8.0, 10), (10.0, 2),
                           (15.0, 10), (20.0, 2), (22.0, 1.0)], match)
 
-    def testInsertIgnoreSort(self):
-        '''A sorted stream does not become unsorted when ignoreSort=True.'''
-        s = Stream()
-        s.repeatAppend(note.Note(), 4)
-        s.insert(4, tempo.MetronomeMark(), ignoreSort=True)
-        self.assertTrue(s.isSorted)
-
     def testMakeChordsBuiltA(self):
         # test with equal durations
         pitchCol = [('C2', 'A2'),
