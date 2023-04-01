@@ -10,6 +10,7 @@ from music21 import key
 from music21 import meter
 from music21.musicxml import m21ToXml
 from music21 import note
+from music21 import pitch
 from music21 import stream
 
 
@@ -161,11 +162,213 @@ class Test(unittest.TestCase):
         # s.show()
         self.assertEqual(raw.count(b'wavy-line'), 2)
 
+    def testAccidentalName(self):
+        # check that init with invalid accidental name sets it to ''
+        trill = expressions.Trill(accidentalName='invalid accidental name')
+        self.assertEqual(trill.accidentalName, '')
+        mord = expressions.Mordent(accidentalName='invalid accidental name')
+        self.assertEqual(mord.accidentalName, '')
+        turn = expressions.Turn(upperAccidentalName='invalid accidental name')
+        self.assertEqual(turn.upperAccidentalName, '')
+        turn = expressions.Turn(lowerAccidentalName='invalid accidental name')
+        self.assertEqual(turn.lowerAccidentalName, '')
+
+        # check that setting invalid accidental name clears it to ''
+        trill = expressions.InvertedTrill()
+        trill.accidentalName = 'flat'
+        self.assertEqual(trill.accidentalName, 'flat')
+        trill.accidentalName = 'invalid accidental name'
+        self.assertEqual(trill.accidentalName, '')
+
+        mord = expressions.InvertedMordent()
+        mord.accidentalName = 'flat'
+        self.assertEqual(mord.accidentalName, 'flat')
+        mord.accidentalName = 'invalid accidental name'
+        self.assertEqual(mord.accidentalName, '')
+
+        turn = expressions.InvertedTurn()
+        turn.upperAccidentalName = 'flat'
+        self.assertEqual(turn.upperAccidentalName, 'flat')
+        turn.upperAccidentalName = 'invalid accidental name'
+        self.assertEqual(turn.upperAccidentalName, '')
+        turn.lowerAccidentalName = 'flat'
+        self.assertEqual(turn.lowerAccidentalName, 'flat')
+        turn.lowerAccidentalName = 'invalid accidental name'
+        self.assertEqual(turn.lowerAccidentalName, '')
+
+        # check that accidentalName works as expected (i.e. not at all) on all the
+        # old-style fixed-size Trill/Mordent/Turn types.
+
+        # init with accidental name raises ExpressionException
+        with self.assertRaises(expressions.ExpressionException):
+            trill = expressions.HalfStepTrill(accidentalName='flat')
+        with self.assertRaises(expressions.ExpressionException):
+            trill = expressions.WholeStepTrill(accidentalName='flat')
+        with self.assertRaises(expressions.ExpressionException):
+            mord = expressions.HalfStepMordent(accidentalName='flat')
+        with self.assertRaises(expressions.ExpressionException):
+            mord = expressions.WholeStepMordent(accidentalName='flat')
+        with self.assertRaises(expressions.ExpressionException):
+            mord = expressions.HalfStepInvertedMordent(accidentalName='flat')
+        with self.assertRaises(expressions.ExpressionException):
+            mord = expressions.WholeStepInvertedMordent(accidentalName='flat')
+
+        # get accidentalName returns '', set accidental name raises ExpressionException
+        trill = expressions.HalfStepTrill()
+        self.assertEqual(trill.accidentalName, '')
+        with self.assertRaises(expressions.ExpressionException):
+            trill.accidentalName = 'sharp'
+        trill = expressions.WholeStepTrill()
+        self.assertEqual(trill.accidentalName, '')
+        with self.assertRaises(expressions.ExpressionException):
+            trill.accidentalName = 'sharp'
+        mord = expressions.HalfStepMordent()
+        self.assertEqual(mord.accidentalName, '')
+        with self.assertRaises(expressions.ExpressionException):
+            mord.accidentalName = 'sharp'
+        mord = expressions.WholeStepMordent()
+        self.assertEqual(mord.accidentalName, '')
+        with self.assertRaises(expressions.ExpressionException):
+            mord.accidentalName = 'sharp'
+        mord = expressions.HalfStepInvertedMordent()
+        self.assertEqual(mord.accidentalName, '')
+        with self.assertRaises(expressions.ExpressionException):
+            mord.accidentalName = 'sharp'
+        mord = expressions.WholeStepInvertedMordent()
+        self.assertEqual(mord.accidentalName, '')
+        with self.assertRaises(expressions.ExpressionException):
+            mord.accidentalName = 'sharp'
+
+    def testResolveOrnamentalPitches(self):
+        # with no accidentalName, no key, explicit octave
+        trill = expressions.Trill()
+        itrill = expressions.InvertedTrill()
+
+        noteWithExplicitOctave = note.Note('C4')
+        trill.resolveOrnamentalPitches(noteWithExplicitOctave)
+        self.assertEqual(trill.ornamentalPitches, (pitch.Pitch('D4'),))
+        self.assertIsNone(trill.ornamentalPitches[0].accidental)
+        itrill.resolveOrnamentalPitches(noteWithExplicitOctave)
+        self.assertEqual(itrill.ornamentalPitches, (pitch.Pitch('B3'),))
+        self.assertIsNone(itrill.ornamentalPitches[0].accidental)
+
+        # with no accidentalName, no key, implicit octave
+        noteWithImplicitOctave = note.Note('C')
+        trill.resolveOrnamentalPitches(noteWithImplicitOctave)
+        self.assertEqual(trill.ornamentalPitches, (pitch.Pitch('D4'),))
+        self.assertIsNone(trill.ornamentalPitches[0].accidental)
+        itrill.resolveOrnamentalPitches(noteWithImplicitOctave)
+        self.assertEqual(itrill.ornamentalPitches, (pitch.Pitch('B3'),))
+        self.assertIsNone(itrill.ornamentalPitches[0].accidental)
+
+        # with accidentalName='natural', no key, explicit octave
+        trill.accidentalName = 'natural'
+        itrill.accidentalName = 'natural'
+        trill.resolveOrnamentalPitches(noteWithExplicitOctave)
+        expectedPitch = pitch.Pitch('D4')
+        expectedPitch.accidental = pitch.Accidental('natural')
+        self.assertEqual(trill.ornamentalPitches, (expectedPitch,))
+        self.assertEqual(
+            trill.ornamentalPitches[0].accidental.name,
+            'natural'
+        )
+        self.assertEqual(
+            trill.ornamentalPitches[0].accidental.displayStatus,
+            True
+        )
+        itrill.resolveOrnamentalPitches(noteWithExplicitOctave)
+        expectedPitch = pitch.Pitch('B3')
+        expectedPitch.accidental = pitch.Accidental('natural')
+        self.assertEqual(itrill.ornamentalPitches, (expectedPitch,))
+        self.assertEqual(
+            itrill.ornamentalPitches[0].accidental.name,
+            'natural'
+        )
+        self.assertEqual(
+            itrill.ornamentalPitches[0].accidental.displayStatus,
+            True
+        )
+
+        # with accidentalName='double-sharp', no key, explicit octave
+        trill.accidentalName = 'double-sharp'
+        itrill.accidentalName = 'double-sharp'
+        trill.resolveOrnamentalPitches(noteWithExplicitOctave)
+        expectedPitch = pitch.Pitch('D4')
+        expectedPitch.accidental = pitch.Accidental('double-sharp')
+        expectedPitch.displayStatus = True
+        self.assertEqual(trill.ornamentalPitches, (expectedPitch,))
+        self.assertEqual(
+            trill.ornamentalPitches[0].accidental.name,
+            'double-sharp'
+        )
+        self.assertEqual(
+            trill.ornamentalPitches[0].accidental.displayStatus,
+            True
+        )
+        itrill.resolveOrnamentalPitches(noteWithExplicitOctave)
+        expectedPitch = pitch.Pitch('B3')
+        expectedPitch.accidental = pitch.Accidental('double-sharp')
+        expectedPitch.displayStatus = True
+        self.assertEqual(itrill.ornamentalPitches, (expectedPitch,))
+        self.assertEqual(
+            itrill.ornamentalPitches[0].accidental.name,
+            'double-sharp'
+        )
+        self.assertEqual(
+            itrill.ornamentalPitches[0].accidental.displayStatus,
+            True
+        )
+
     def testUnpitchedUnsupported(self):
         unp = note.Unpitched()
+
         mord = expressions.Mordent()
         with self.assertRaises(TypeError):
             mord.realize(unp)  # type: ignore
+        with self.assertRaises(TypeError):
+            mord.getSize(unp)
+        with self.assertRaises(TypeError):
+            mord.resolveOrnamentalPitches(unp)
+
+        mord = expressions.InvertedMordent()
+        with self.assertRaises(TypeError):
+            mord.realize(unp)  # type: ignore
+        with self.assertRaises(TypeError):
+            mord.getSize(unp)
+        with self.assertRaises(TypeError):
+            mord.resolveOrnamentalPitches(unp)
+
+        turn = expressions.Turn()
+        with self.assertRaises(TypeError):
+            turn.realize(unp)
+        with self.assertRaises(TypeError):
+            turn.getSize(unp)
+        with self.assertRaises(TypeError):
+            turn.resolveOrnamentalPitches(unp)
+
+        turn = expressions.InvertedTurn()
+        with self.assertRaises(TypeError):
+            turn.realize(unp)
+        with self.assertRaises(TypeError):
+            turn.getSize(unp)
+        with self.assertRaises(TypeError):
+            turn.resolveOrnamentalPitches(unp)
+
+        trill = expressions.Trill()
+        with self.assertRaises(TypeError):
+            trill.realize(unp)
+        with self.assertRaises(TypeError):
+            trill.getSize(unp)
+        with self.assertRaises(TypeError):
+            trill.resolveOrnamentalPitches(unp)
+
+        trill = expressions.InvertedTrill()
+        with self.assertRaises(TypeError):
+            trill.realize(unp)
+        with self.assertRaises(TypeError):
+            trill.getSize(unp)
+        with self.assertRaises(TypeError):
+            trill.resolveOrnamentalPitches(unp)
 
 
 # class TestExternal(unittest.TestCase):
