@@ -851,9 +851,13 @@ class GeneralMordent(Ornament):
                 "Cannot resolve mordent's ornamental pitches with an unpitched srcObj")
 
         srcPitch: pitch.Pitch = srcObj.pitches[-1]
-
         transposeInterval: interval.IntervalBase = self.getSize(srcObj, keySig=keySig)
-        ornamentalPitch: pitch.Pitch = srcPitch.transpose(transposeInterval, inPlace=False)
+
+        ornamentalPitch: pitch.Pitch = copy.deepcopy(srcPitch)
+        if ornamentalPitch.octave is None:
+            ornamentalPitch.octave = ornamentalPitch.implicitOctave
+        ornamentalPitch.transpose(transposeInterval, inPlace=True)
+
         if self.accidentalName:
             # Note that we don't need to look at what the accidentalName actually is,
             # since that has already been incorporated into transposeInterval and the
@@ -1418,9 +1422,13 @@ class Trill(Ornament):
                 "Cannot resolve trill's ornamental pitches with an unpitched srcObj")
 
         srcPitch: pitch.Pitch = srcObj.pitches[-1]
-
         transposeInterval: interval.IntervalBase = self.getSize(srcObj, keySig=keySig)
-        ornamentalPitch: pitch.Pitch = srcPitch.transpose(transposeInterval, inPlace=False)
+
+        ornamentalPitch: pitch.Pitch = copy.deepcopy(srcPitch)
+        if ornamentalPitch.octave is None:
+            ornamentalPitch.octave = ornamentalPitch.implicitOctave
+        ornamentalPitch.transpose(transposeInterval, inPlace=True)
+
         if self.accidentalName:
             # Note that we don't need to look at what the accidentalName actually is,
             # since that has already been incorporated into transposeInterval and the
@@ -1993,10 +2001,17 @@ class Turn(Ornament):
 
         transposeIntervalUp: interval.IntervalBase = self.getSize(
             srcObj, 'upper', keySig=keySig)
-        upperPitch: pitch.Pitch = srcPitch.transpose(transposeIntervalUp, inPlace=False)
         transposeIntervalDown: interval.IntervalBase = self.getSize(
             srcObj, 'lower', keySig=keySig)
-        lowerPitch: pitch.Pitch = srcPitch.transpose(transposeIntervalDown, inPlace=False)
+
+        upperPitch: pitch.Pitch = copy.deepcopy(srcPitch)
+        if upperPitch.octave is None:
+            upperPitch.octave = upperPitch.implicitOctave
+        upperPitch.transpose(transposeIntervalUp, inPlace=True)
+        lowerPitch: pitch.Pitch = copy.deepcopy(srcPitch)
+        if lowerPitch.octave is None:
+            lowerPitch.octave = lowerPitch.implicitOctave
+        lowerPitch.transpose(transposeIntervalDown, inPlace=True)
 
         # The existence of upperAccidentalName (or lowerAccidentalName) implies
         # upperPitch.accidental (or lowerPitch.accidental) should be displayed.
