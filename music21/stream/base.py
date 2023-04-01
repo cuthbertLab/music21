@@ -2344,7 +2344,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         updateIsFlat = False
         if element.isStream:
             updateIsFlat = True
-        self.coreElementsChanged(updateIsFlat=updateIsFlat, clearIsSorted=not ignoreSort)
+        self.coreElementsChanged(updateIsFlat=updateIsFlat)
         if ignoreSort is False:
             self.isSorted = storeSorted
 

@@ -4026,7 +4026,9 @@ class Test(unittest.TestCase):
             for i in range(len(srcDur)):
                 n = note.Note()
                 n.quarterLength = srcDur[i]
-                s.insert(srcOffset[i], n, ignoreSort=True)
+                s.insert(srcOffset[i], n)
+            # Must be sorted for quantizing to work optimally.
+            s.sort()
 
             s.quantize(divList, processOffsets=True, processDurations=True, inPlace=True)
 
