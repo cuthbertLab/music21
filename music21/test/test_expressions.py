@@ -342,7 +342,9 @@ class Test(unittest.TestCase):
         with self.assertRaises(TypeError):
             turn.realize(unp)
         with self.assertRaises(TypeError):
-            turn.getSize(unp)
+            turn.getSize(unp, which='upper')
+        with self.assertRaises(TypeError):
+            turn.getSize(unp, which='lower')
         with self.assertRaises(TypeError):
             turn.resolveOrnamentalPitches(unp)
 
@@ -350,7 +352,9 @@ class Test(unittest.TestCase):
         with self.assertRaises(TypeError):
             turn.realize(unp)
         with self.assertRaises(TypeError):
-            turn.getSize(unp)
+            turn.getSize(unp, which='upper')
+        with self.assertRaises(TypeError):
+            turn.getSize(unp, which='lower')
         with self.assertRaises(TypeError):
             turn.resolveOrnamentalPitches(unp)
 
