@@ -755,7 +755,7 @@ class GeneralMordent(Ornament):
     '''
     Base class for all Mordent types.
     '''
-    _direction = ''  # up or down
+    _direction: str = ''  # up or down
 
     def __init__(self, *, accidentalName: str = '', **keywords):
         super().__init__(**keywords)
@@ -1083,7 +1083,7 @@ class Mordent(GeneralMordent):
       a `srcObj` and optional `keySig` param).  Added optional `keySig` param to
       `.realize()` as well.
     '''
-    _direction = 'down'  # up or down
+    _direction: str = 'down'  # up or down
 
 
 class HalfStepMordent(Mordent):
@@ -1194,7 +1194,7 @@ class InvertedMordent(GeneralMordent):
       a `srcObj` and optional `keySig` param).  Added optional `keySig` param to
       `.realize()` as well.
     '''
-    _direction = 'up'
+    _direction: str = 'up'
 
 
 class HalfStepInvertedMordent(InvertedMordent):
