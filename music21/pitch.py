@@ -2171,6 +2171,7 @@ class Pitch(prebase.ProtoM21Object):
             self._accidental = Accidental(alter)
             if abs(cents) > 0.01:
                 self.microtone = Microtone(cents)
+                self.convertMicrotonesToQuarterTones(inPlace=True)
         else:
             raise ValueError(f'Accidental should be an Accidental object, not {value!r}')
 
