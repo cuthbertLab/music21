@@ -277,7 +277,7 @@ class Test(unittest.TestCase):
             trill.ornamentalPitches[0].accidental.displayStatus,
             True
         )
-        itrill.resolveOrnamentalPitches(noteWithExplicitOctave)
+        itrill.resolveOrnamentalPitches(noteWithImplicitOctave)
         expectedPitch = pitch.Pitch('B3')
         expectedPitch.accidental = pitch.Accidental('natural')
         self.assertEqual(itrill.ornamentalPitches, (expectedPitch,))
@@ -306,7 +306,7 @@ class Test(unittest.TestCase):
             trill.ornamentalPitches[0].accidental.displayStatus,
             True
         )
-        itrill.resolveOrnamentalPitches(noteWithExplicitOctave)
+        itrill.resolveOrnamentalPitches(noteWithImplicitOctave)
         expectedPitch = pitch.Pitch('B3')
         expectedPitch.accidental = pitch.Accidental('double-sharp')
         expectedPitch.displayStatus = True
@@ -319,6 +319,44 @@ class Test(unittest.TestCase):
             itrill.ornamentalPitches[0].accidental.displayStatus,
             True
         )
+
+    def testEdgeCases(self):
+        # Make sure you can call resolveOrnamentalPitches() on non-Trill/Mordent/Turn Ornaments
+        # without raising an exception (or actually doing anything interesting).
+        orn = expressions.Ornament()
+        orn.resolveOrnamentalPitches(note.Note('C4'))
+        self.assertEqual(orn.ornamentalPitches, tuple())
+
+        # Make sure you can call realize() on non-Trill/Mordent/Turn ornaments and
+        # just get an identical note back, with empty before and after lists.
+        n = note.Note('C4')
+        realized = orn.realize(n, inPlace=False)
+        self.assertEqual(realized, ([], n, []))
+        self.assertIsNot(realized[1], n)
+        realized = orn.realize(n, inPlace=True)
+        self.assertEqual(realized, ([], n, []))
+        self.assertIs(realized[1], n)
+
+        # Make sure that fillListOfRealizedNotes raises if srcObj is Unpitched, but
+        # transposeInterval is not unison.
+        filledList = []
+        with self.assertRaises(TypeError):
+            orn.fillListOfRealizedNotes(
+                note.Unpitched(),
+                fillObjects=filledList,
+                transposeInterval=interval.Interval('M2')
+            )
+        self.assertEqual(filledList, [])
+
+        # Make sure various Ornaments have correct direction
+        self.assertEqual(expressions.Trill().direction, 'up')
+        self.assertEqual(expressions.InvertedTrill().direction, 'down')
+        self.assertEqual(expressions.Mordent().direction, 'down')
+        self.assertEqual(expressions.InvertedMordent().direction, 'up')
+
+        # Make sure Turn.getSize raises on bad which value (must be 'upper' or 'lower')
+        with self.assertRaises(expressions.ExpressionException):
+            expressions.Turn().getSize(note.Note('C4'), which='bad: not upper or lower')
 
     def testUnpitchedOrnaments(self):
         unp = note.Unpitched()
