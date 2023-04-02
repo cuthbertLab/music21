@@ -726,6 +726,26 @@ class Ornament(Expression):
         >>> trill3.ornamentalPitch.accidental is None
         True
 
+        If we add a natural accidental to the trill, and then updateAccidentalDisplay
+        is called with cautionaryPitchClass=False, the A gets a natural accidental
+        because we requested it by setting trill.accidentalName = 'natural'.
+
+        >>> trill4 = expressions.Trill()
+        >>> trill4.accidentalName = 'natural'
+        >>> trill4.resolveOrnamentalPitches(note.Note('g4'), keySig=noSharpsOrFlats)
+        >>> trill4.ornamentalPitch
+        <music21.pitch.Pitch A4>
+        >>> trill4.ornamentalPitch.accidental
+        <music21.pitch.Accidental natural>
+        >>> trill4.ornamentalPitch.accidental.displayStatus
+        True
+        >>> past = [pitch.Pitch('a#3'), pitch.Pitch('c#'), pitch.Pitch('c')]
+        >>> trill4.updateAccidentalDisplay(pitchPast=past, cautionaryPitchClass=False)
+        >>> trill4.ornamentalPitch.accidental
+        <music21.pitch.Accidental natural>
+        >>> trill4.ornamentalPitch.accidental.displayStatus
+        True
+
         '''
         return
 

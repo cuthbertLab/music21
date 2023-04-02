@@ -320,6 +320,113 @@ class Test(unittest.TestCase):
             True
         )
 
+    def testUpdateAccidentalDisplay(self):
+        # Trill is already tested in header doc, test Mordent and Turn here
+        noSharpsOrFlats = key.KeySignature(0)
+        mord1 = expressions.InvertedMordent()
+        mord1.resolveOrnamentalPitches(note.Note('G4'), keySig=noSharpsOrFlats)
+        self.assertEqual(mord1.ornamentalPitch, pitch.Pitch('A4'))
+        self.assertIsNone(mord1.ornamentalPitch.accidental, None)
+        past = [pitch.Pitch('A#4'), pitch.Pitch('C#4'), pitch.Pitch('C4')]
+        mord1.updateAccidentalDisplay(pitchPast=past, cautionaryAll=True)
+        self.assertEqual(mord1.ornamentalPitch.accidental, pitch.Accidental('natural'))
+        self.assertTrue(mord1.ornamentalPitch.accidental.displayStatus)
+
+        mord2 = expressions.InvertedMordent()
+        mord2.resolveOrnamentalPitches(note.Note('G4'), keySig=noSharpsOrFlats)
+        self.assertEqual(mord2.ornamentalPitch, pitch.Pitch('A4'))
+        self.assertIsNone(mord2.ornamentalPitch.accidental, None)
+        past = [pitch.Pitch('A#4'), pitch.Pitch('C#4'), pitch.Pitch('C4')]
+        mord2.updateAccidentalDisplay(pitchPast=past)  # should add a natural
+        self.assertEqual(mord2.ornamentalPitch.accidental, pitch.Accidental('natural'))
+        self.assertTrue(mord2.ornamentalPitch.accidental.displayStatus)
+
+        mord3 = expressions.InvertedMordent()
+        mord3.resolveOrnamentalPitches(note.Note('G4'), keySig=noSharpsOrFlats)
+        self.assertEqual(mord3.ornamentalPitch, pitch.Pitch('A4'))
+        self.assertIsNone(mord3.ornamentalPitch.accidental, None)
+        past = [pitch.Pitch('A#3'), pitch.Pitch('C#'), pitch.Pitch('C')]
+        mord3.updateAccidentalDisplay(pitchPast=past, cautionaryPitchClass=False)
+        self.assertIsNone(mord3.ornamentalPitch.accidental)
+
+        turn1 = expressions.Turn()
+        turn1.resolveOrnamentalPitches(note.Note('G4'), keySig=noSharpsOrFlats)
+        self.assertEqual(turn1.upperOrnamentalPitch, pitch.Pitch('A4'))
+        self.assertIsNone(turn1.upperOrnamentalPitch.accidental, None)
+        self.assertEqual(turn1.lowerOrnamentalPitch, pitch.Pitch('F4'))
+        self.assertIsNone(turn1.lowerOrnamentalPitch.accidental, None)
+        past = [pitch.Pitch('A#4'), pitch.Pitch('C#4'), pitch.Pitch('C4')]
+        turn1.updateAccidentalDisplay(pitchPast=past, cautionaryAll=True)  # should add naturals
+        self.assertEqual(turn1.upperOrnamentalPitch.accidental, pitch.Accidental('natural'))
+        self.assertTrue(turn1.upperOrnamentalPitch.accidental.displayStatus)
+        self.assertEqual(turn1.lowerOrnamentalPitch.accidental, pitch.Accidental('natural'))
+        self.assertTrue(turn1.lowerOrnamentalPitch.accidental.displayStatus)
+
+        turn2 = expressions.Turn()
+        turn2.resolveOrnamentalPitches(note.Note('G4'), keySig=noSharpsOrFlats)
+        self.assertEqual(turn2.upperOrnamentalPitch, pitch.Pitch('A4'))
+        self.assertIsNone(turn2.upperOrnamentalPitch.accidental, None)
+        self.assertEqual(turn2.lowerOrnamentalPitch, pitch.Pitch('F4'))
+        self.assertIsNone(turn2.lowerOrnamentalPitch.accidental, None)
+        past = [pitch.Pitch('A#4'), pitch.Pitch('C#4'), pitch.Pitch('C4')]
+        turn2.updateAccidentalDisplay(pitchPast=past)  # should add upper natural
+        self.assertEqual(turn2.upperOrnamentalPitch.accidental, pitch.Accidental('natural'))
+        self.assertTrue(turn2.upperOrnamentalPitch.accidental.displayStatus)
+        self.assertIsNone(turn2.lowerOrnamentalPitch.accidental)
+
+        turn3 = expressions.Turn()
+        turn3.resolveOrnamentalPitches(note.Note('G4'), keySig=noSharpsOrFlats)
+        self.assertEqual(turn3.upperOrnamentalPitch, pitch.Pitch('A4'))
+        self.assertIsNone(turn3.upperOrnamentalPitch.accidental, None)
+        self.assertEqual(turn3.lowerOrnamentalPitch, pitch.Pitch('F4'))
+        self.assertIsNone(turn3.lowerOrnamentalPitch.accidental, None)
+        past = [pitch.Pitch('A#3'), pitch.Pitch('C#'), pitch.Pitch('C')]
+        turn3.updateAccidentalDisplay(pitchPast=past, cautionaryPitchClass=False)  # no naturals
+        self.assertIsNone(turn3.upperOrnamentalPitch.accidental)
+        self.assertIsNone(turn3.lowerOrnamentalPitch.accidental)
+
+    def testUpdateAccidentalDisplayWithAccidentNameSet(self):
+        # Trill is already tested in header doc, test Mordent and Turn here
+        noSharpsOrFlats = key.KeySignature(0)
+        mord = expressions.InvertedMordent()
+        mord.accidentalName = 'natural'
+        mord.resolveOrnamentalPitches(note.Note('G4'), keySig=noSharpsOrFlats)
+        expectedOrnamentalPitch = pitch.Pitch('A4')
+        expectedOrnamentalPitch.accidental = pitch.Accidental('natural')
+        expectedOrnamentalPitch.accidental.displayStatus = True
+        self.assertEqual(mord.ornamentalPitch, expectedOrnamentalPitch)
+        self.assertEqual(mord.ornamentalPitch.accidental, pitch.Accidental('natural'))
+        self.assertTrue(mord.ornamentalPitch.accidental.displayStatus)
+        past = [pitch.Pitch('a#3'), pitch.Pitch('c#'), pitch.Pitch('c')]
+        mord.updateAccidentalDisplay(pitchPast=past, cautionaryPitchClass=False)
+        self.assertEqual(mord.ornamentalPitch, expectedOrnamentalPitch)
+        self.assertEqual(mord.ornamentalPitch.accidental, pitch.Accidental('natural'))
+        self.assertTrue(mord.ornamentalPitch.accidental.displayStatus)
+
+        turn = expressions.Turn()
+        turn.upperAccidentalName = 'natural'
+        turn.lowerAccidentalName = 'natural'
+        turn.resolveOrnamentalPitches(note.Note('G4'), keySig=noSharpsOrFlats)
+        expectedOrnamentalPitches = (pitch.Pitch('A4'), pitch.Pitch('F4'))
+        expectedOrnamentalPitches[0].accidental = pitch.Accidental('natural')
+        expectedOrnamentalPitches[0].accidental.displayStatus = True
+        expectedOrnamentalPitches[1].accidental = pitch.Accidental('natural')
+        expectedOrnamentalPitches[1].accidental.displayStatus = True
+        self.assertEqual(turn.ornamentalPitches[0], expectedOrnamentalPitches[0])
+        self.assertEqual(turn.ornamentalPitches[0].accidental, pitch.Accidental('natural'))
+        self.assertTrue(turn.ornamentalPitches[0].accidental.displayStatus)
+        self.assertEqual(turn.ornamentalPitches[1], expectedOrnamentalPitches[1])
+        self.assertEqual(turn.ornamentalPitches[1].accidental, pitch.Accidental('natural'))
+        self.assertTrue(turn.ornamentalPitches[1].accidental.displayStatus)
+        past = [pitch.Pitch('a#3'), pitch.Pitch('c#'), pitch.Pitch('c')]
+        turn.updateAccidentalDisplay(pitchPast=past, cautionaryPitchClass=False)
+        self.assertEqual(turn.ornamentalPitches[0], expectedOrnamentalPitches[0])
+        self.assertEqual(turn.ornamentalPitches[0].accidental, pitch.Accidental('natural'))
+        self.assertTrue(turn.ornamentalPitches[0].accidental.displayStatus)
+        self.assertEqual(turn.ornamentalPitches[1], expectedOrnamentalPitches[1])
+        self.assertEqual(turn.ornamentalPitches[1].accidental, pitch.Accidental('natural'))
+        self.assertTrue(turn.ornamentalPitches[1].accidental.displayStatus)
+
     def testEdgeCases(self):
         # Make sure you can call resolveOrnamentalPitches() on non-Trill/Mordent/Turn Ornaments
         # without raising an exception (or actually doing anything interesting).
