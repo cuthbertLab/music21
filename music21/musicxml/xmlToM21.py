@@ -3794,15 +3794,14 @@ class MeasureParser(XMLParserBase):
                 post = self.xmlOrnamentToExpression(
                     mxObj, mostRecentOrnament=mostRecentOrnament
                 )
+                if mostRecentOrnament is not None and mxObj.tag == 'accidental-mark':
+                    # Resolve any ornamental pitch for that accidental-mark.
+                    mostRecentOrnament.resolveOrnamentalPitches(n)
                 optionalHideObject(post)
                 self.setEditorial(mxNotations, post)
                 if post is not None:
-                    n.expressions.append(post)
-                    if mostRecentOrnament is not None and hasattr(n, 'pitches'):
-                        # We have now finished up all the accidentalNames for
-                        # mostRecentOrnament.  Resolve any ornamental pitches.
-                        mostRecentOrnament.resolveOrnamentalPitches(n)
                     mostRecentOrnament = post
+                    n.expressions.append(post)
                 # environLocal.printDebug(['adding to expressions', post])
             elif mxObj.tag == 'wavy-line':
                 # TODO: musicxml 4: attr: smufl
