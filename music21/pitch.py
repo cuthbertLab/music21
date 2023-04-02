@@ -4003,12 +4003,12 @@ class Pitch(prebase.ProtoM21Object):
         music21.pitch.AccidentalException: -5 is not a supported accidental type
 
         Note that half accidentals (~ = half-sharp, ` = half-flat)
-        get converted to microtones:
+        work (but might switch to one-and-a-half accidentals):
 
         >>> pHalfSharp = pitch.Pitch('D~4')
         >>> p3QuartersFlat = pHalfSharp.getHigherEnharmonic()
         >>> print(p3QuartersFlat)
-        E-4(-50c)
+        E-`4
 
         OMIT_FROM_DOCS
 
@@ -4017,7 +4017,7 @@ class Pitch(prebase.ProtoM21Object):
         >>> pHalfSharp = pitch.Pitch('D~4')
         >>> pHalfSharp.getHigherEnharmonic(inPlace=True)
         >>> print(pHalfSharp)
-        E-4(-50c)
+        E-`4
         '''
         # sigh...mypy
         if inPlace:
@@ -4216,11 +4216,11 @@ class Pitch(prebase.ProtoM21Object):
         <music21.pitch.Pitch C>
 
 
-        Works with half-sharps, but converts them to microtones:
+        Works with half-sharps, but might convert to one-and-a-half-flats:
 
         >>> dHalfSharp = pitch.Pitch('D~')
         >>> print(dHalfSharp.getEnharmonic())
-        E-(-50c)
+        E-`
         '''
         if inPlace:
             post = self
