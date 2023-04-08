@@ -45,7 +45,7 @@ if t.TYPE_CHECKING:
 
 
 def realizeOrnaments(
-    srcObj: note.Note,
+    srcObj: note.Note | note.Unpitched,
     *,
     keySig: key.KeySignature | None = None
 ):
@@ -67,7 +67,7 @@ def realizeOrnaments(
 
     :type srcObj: note.GeneralNote
     '''
-    srcObject: note.Note | None = srcObj
+    srcObject: note.Note | note.Unpitched | None = srcObj
     if t.TYPE_CHECKING:
         # it comes in as not None
         assert srcObject is not None
@@ -483,13 +483,13 @@ class Ornament(Expression):
 
     def realize(
         self,
-        srcObj: note.Note,
+        srcObj: note.Note | note.Unpitched,
         *,
         keySig: key.KeySignature | None = None,
         inPlace: bool = False
-    ) -> tuple[list[note.Note],
-                note.Note | None,
-                list[note.Note]]:
+    ) -> tuple[list[note.Note | note.Unpitched],
+                note.Note | note.Unpitched | None,
+                list[note.Note | note.Unpitched]]:
         '''
         subclassable method call that takes a sourceObject and optional keySig
         and returns a three-element tuple of a list of notes before the
@@ -510,8 +510,8 @@ class Ornament(Expression):
 
     def fillListOfRealizedNotes(
         self,
-        srcObj: note.Note,
-        fillObjects: list[note.Note],
+        srcObj: note.Note | note.Unpitched,
+        fillObjects: list[note.Note | note.Unpitched],
         transposeInterval: interval.IntervalBase,
         *,
         useQL: OffsetQL | None = None
@@ -536,6 +536,8 @@ class Ornament(Expression):
         # TODO: remove expressions
         # secondNote.expressions = None
         if isTransposed:
+            if t.TYPE_CHECKING:
+                assert isinstance(secondNote, note.Note)
             secondNote.transpose(transposeInterval, inPlace=True)
 
         fillObjects.append(firstNote)
@@ -879,7 +881,11 @@ class GeneralMordent(Ornament):
         ornamentalPitch: pitch.Pitch = copy.deepcopy(srcPitch)
         if ornamentalPitch.octave is None:
             ornamentalPitch.octave = ornamentalPitch.implicitOctave
-        ornamentalPitch.transpose(transposeInterval, inPlace=True)
+        # we do the transpose NOT in place to avoid a bug where microtones get lost
+        ornamentalPitch = ornamentalPitch.transpose(transposeInterval, inPlace=False)
+        # if there are microtones, see if they can be converted to quarter tones.
+        if ornamentalPitch.microtone.cents != 0:
+            ornamentalPitch.convertMicrotonesToQuarterTones(inPlace=True)
 
         if self.accidentalName:
             # Note that we don't need to look at what the accidentalName actually is,
@@ -939,13 +945,13 @@ class GeneralMordent(Ornament):
 
     def realize(
         self,
-        srcObj: note.Note,
+        srcObj: note.Note | note.Unpitched,
         *,
         keySig: key.KeySignature | None = None,
         inPlace: bool = False
-    ) -> tuple[list[note.Note],
-                note.Note | None,
-                list[note.Note]]:
+    ) -> tuple[list[note.Note | note.Unpitched],
+                note.Note | note.Unpitched | None,
+                list[note.Note | note.Unpitched]]:
         '''
         Realize a mordent.
 
@@ -989,13 +995,15 @@ class GeneralMordent(Ornament):
 
         remainderQL = srcObj.duration.quarterLength - (2 * use_ql)
         transposeInterval = self.getSize(srcObj, keySig=currentKeySig)
-        mordNotes: list[note.Note] = []
+        mordNotes: list[note.Note | note.Unpitched] = []
         self.fillListOfRealizedNotes(srcObj, mordNotes, transposeInterval, useQL=use_ql)
 
         if transposeInterval != interval.Interval('P1'):
             # second (middle) note might need an accidental from the keysig (but
             # only if it doesn't already have an accidental from accidentalName)
             for noteIdx, n in enumerate(mordNotes):
+                if t.TYPE_CHECKING:
+                    assert isinstance(n, note.Note)
                 noteNum: int = noteIdx + 1
                 if n.pitch.accidental is None and noteNum == 2:
                     n.pitch.accidental = currentKeySig.accidentalByStep(n.pitch.step)
@@ -1452,7 +1460,11 @@ class Trill(Ornament):
         ornamentalPitch: pitch.Pitch = copy.deepcopy(srcPitch)
         if ornamentalPitch.octave is None:
             ornamentalPitch.octave = ornamentalPitch.implicitOctave
-        ornamentalPitch.transpose(transposeInterval, inPlace=True)
+        # we do the transpose NOT in place to avoid a bug where microtones get lost
+        ornamentalPitch = ornamentalPitch.transpose(transposeInterval, inPlace=False)
+        # if there are microtones, see if they can be converted to quarter tones.
+        if ornamentalPitch.microtone.cents != 0:
+            ornamentalPitch.convertMicrotonesToQuarterTones(inPlace=True)
 
         if self.accidentalName:
             # Note that we don't need to look at what the accidentalName actually is,
@@ -1512,13 +1524,13 @@ class Trill(Ornament):
 
     def realize(
         self,
-        srcObj: note.Note,
+        srcObj: note.Note | note.Unpitched,
         *,
         keySig: key.KeySignature | None = None,
         inPlace: bool = False
-    ) -> tuple[list[note.Note],
-                note.Note | None,
-                list[note.Note]]:
+    ) -> tuple[list[note.Note | note.Unpitched],
+                note.Note | note.Unpitched | None,
+                list[note.Note | note.Unpitched]]:
         '''
         realize a trill.
 
@@ -1641,7 +1653,7 @@ class Trill(Ornament):
         if self.nachschlag:
             numberOfTrillNotes -= 2
 
-        trillNotes: list[note.Note] = []
+        trillNotes: list[note.Note | note.Unpitched] = []
         for unused_counter in range(int(numberOfTrillNotes / 2)):
             self.fillListOfRealizedNotes(srcObj, trillNotes, transposeInterval, useQL=useQL)
 
@@ -1649,11 +1661,17 @@ class Trill(Ornament):
             setAccidentalFromKeySig = self._setAccidentalFromKeySig
             if setAccidentalFromKeySig:
                 for n in trillNotes:
-                    if n.pitch.nameWithOctave != srcObj.pitch.nameWithOctave:
+                    if t.TYPE_CHECKING:
+                        # for some reason, this assertion doesn't convince mypy that n
+                        # has a pitch attribute, so we have to "type: ignore" below.
+                        assert isinstance(n, note.Note)
+                    if n.pitch.nameWithOctave != srcObj.pitch.nameWithOctave:  # type: ignore
                         # do not correct original note, no matter what.
-                        if n.pitch.accidental is None:
+                        if n.pitch.accidental is None:  # type: ignore
                             # correct if there isn't already an accidental (from accidentalName)
-                            n.pitch.accidental = currentKeySig.accidentalByStep(n.step)
+                            n.pitch.accidental = (
+                                currentKeySig.accidentalByStep(n.step)  # type: ignore
+                            )
 
         if inPlace and self in srcObj.expressions:
             srcObj.expressions.remove(self)
@@ -1667,6 +1685,9 @@ class Trill(Ornament):
             secondNoteNachschlag.expressions = []
             secondNoteNachschlag.duration.quarterLength = useQL
             if isTransposed:
+                if t.TYPE_CHECKING:
+                    assert isinstance(secondNoteNachschlag, note.Note)
+                    assert isinstance(firstNoteNachschlag, note.Note)
                 secondNoteNachschlag.transpose(transposeIntervalReverse,
                                                 inPlace=True)
                 if setAccidentalFromKeySig and currentKeySig:
@@ -2033,11 +2054,20 @@ class Turn(Ornament):
         upperPitch: pitch.Pitch = copy.deepcopy(srcPitch)
         if upperPitch.octave is None:
             upperPitch.octave = upperPitch.implicitOctave
-        upperPitch.transpose(transposeIntervalUp, inPlace=True)
+        # we do the transpose NOT in place to avoid a bug where microtones get lost
+        upperPitch = upperPitch.transpose(transposeIntervalUp, inPlace=False)
+        # if there are microtones, see if they can be converted to quarter tones.
+        if upperPitch.microtone.cents != 0:
+            upperPitch.convertMicrotonesToQuarterTones(inPlace=True)
+
         lowerPitch: pitch.Pitch = copy.deepcopy(srcPitch)
         if lowerPitch.octave is None:
             lowerPitch.octave = lowerPitch.implicitOctave
-        lowerPitch.transpose(transposeIntervalDown, inPlace=True)
+        # we do the transpose NOT in place to avoid a bug where microtones get lost
+        lowerPitch = lowerPitch.transpose(transposeIntervalDown, inPlace=False)
+        # if there are microtones, see if they can be converted to quarter tones.
+        if lowerPitch.microtone.cents != 0:
+            lowerPitch.convertMicrotonesToQuarterTones(inPlace=True)
 
         # The existence of upperAccidentalName (or lowerAccidentalName) implies
         # upperPitch.accidental (or lowerPitch.accidental) should be displayed.
@@ -2134,13 +2164,13 @@ class Turn(Ornament):
 
     def realize(
         self,
-        srcObj: note.Note,
+        srcObj: note.Note | note.Unpitched,
         *,
         keySig: key.KeySignature | None = None,
         inPlace: bool = False
-    ) -> tuple[list[note.Note],
-                note.Note | None,
-                list[note.Note]]:
+    ) -> tuple[list[note.Note | note.Unpitched],
+                note.Note | note.Unpitched | None,
+                list[note.Note | note.Unpitched]]:
         # noinspection PyShadowingNames
         '''
         realize a turn.
@@ -2283,12 +2313,14 @@ class Turn(Ornament):
         # no need to check both intervals, they will both be perfectUnison, or neither will be.
         isTransposed: bool = firstTransposeInterval != interval.Interval('P1')
 
-        turnNotes: list[note.Note] = []
+        turnNotes: list[note.Note | note.Unpitched] = []
 
         firstNote = copy.deepcopy(srcObj)
         firstNote.expressions = []
         firstNote.duration.quarterLength = useQL
         if isTransposed:
+            if t.TYPE_CHECKING:
+                assert isinstance(firstNote, note.Note)
             firstNote.transpose(firstTransposeInterval, inPlace=True)
 
         secondNote = copy.deepcopy(srcObj)
@@ -2299,6 +2331,8 @@ class Turn(Ornament):
         thirdNote.expressions = []
         thirdNote.duration.quarterLength = useQL
         if isTransposed:
+            if t.TYPE_CHECKING:
+                assert isinstance(thirdNote, note.Note)
             thirdNote.transpose(secondTransposeInterval, inPlace=True)
 
         fourthNote = copy.deepcopy(srcObj)
@@ -2317,6 +2351,8 @@ class Turn(Ornament):
             # first note and third note might need an accidental from the keySig (but
             # only if they don't already have an accidental from upper/lowerAccidentalName)
             for noteIdx, n in enumerate(turnNotes):
+                if t.TYPE_CHECKING:
+                    assert isinstance(n, note.Note)
                 noteNum: int = noteIdx + 1
                 if n.pitch.accidental is None and noteNum in (1, 3):
                     n.pitch.accidental = currentKeySig.accidentalByStep(n.pitch.step)
@@ -2354,13 +2390,13 @@ class GeneralAppoggiatura(Ornament):
 
     def realize(
         self,
-        srcObj: note.Note,
+        srcObj: note.Note | note.Unpitched,
         *,
         keySig: key.KeySignature | None = None,
         inPlace: bool = False
-    ) -> tuple[list[note.Note],
-                note.Note | None,
-                list[note.Note]]:
+    ) -> tuple[list[note.Note | note.Unpitched],
+                note.Note | note.Unpitched | None,
+                list[note.Note | note.Unpitched]]:
         '''
         realize an appoggiatura
 
@@ -2399,7 +2435,10 @@ class GeneralAppoggiatura(Ornament):
 
         appoggiaturaNote = copy.deepcopy(srcObj)
         appoggiaturaNote.duration.quarterLength = newDuration
-        appoggiaturaNote.transpose(transposeInterval, inPlace=True)
+        if transposeInterval != interval.Interval('P1'):
+            if t.TYPE_CHECKING:
+                assert isinstance(appoggiaturaNote, note.Note)
+            appoggiaturaNote.transpose(transposeInterval, inPlace=True)
 
         inExpressions = -1
         if self in srcObj.expressions:
@@ -2500,13 +2539,13 @@ class Tremolo(Ornament):
 
     def realize(
         self,
-        srcObj: note.Note,
+        srcObj: note.Note | note.Unpitched,
         *,
         keySig: key.KeySignature | None = None,
         inPlace: bool = False
-    ) -> tuple[list[note.Note],
-                note.Note | None,
-                list[note.Note]]:
+    ) -> tuple[list[note.Note | note.Unpitched],
+                note.Note | note.Unpitched | None,
+                list[note.Note | note.Unpitched]]:
         '''
         Realize the ornament
 
