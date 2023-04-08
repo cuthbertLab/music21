@@ -10210,7 +10210,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
             elif hasattr(e, 'expressions'):
                 for orn in e.expressions:
                     if isinstance(orn, expressions.Ornament):
-                        post.extend(list(orn.ornamentalPitches))
+                        post.extend(orn.ornamentalPitches)
         return post
 
     # --------------------------------------------------------------------------
