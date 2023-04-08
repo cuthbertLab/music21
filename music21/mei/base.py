@@ -2528,21 +2528,29 @@ def figuredbassFromElement(elem, slurBundle=None) -> harmony.FiguredBassIndicati
         fb_id = elem.get(_XMLID)
     fb_notation: str = ''
     fb_notation_list: list[str] = []
+    fb_extenders: list[bool] = []
     dauer: float = 0
     # loop through all child elements and collect <f> tags
     for subElement in elem.findall('*'):
         if subElement.tag == f'{MEI_NS}f':
             if subElement.text is not None:
-                fb_notation_list.append(subElement.text)
+                # remove Parentheses around figure numbers
+                fb_fig = subElement.text.strip('()')
+                fb_notation_list.append(fb_fig)
+            if 'extender' in subElement.attrib.keys():
+                #if subElement.attrib['extender'] == 'true':
+                #fb_notation_list.append('_')
+                print('extender: ', (subElement.attrib['extender'] == 'true'))
+                fb_extenders.append((subElement.attrib['extender'] == 'true'))
             else:
-                if 'extender' in subElement.attrib.keys():
-                    fb_notation_list.append('_')
+                fb_extenders.append(False)
+
             if 'dur.metrical' in subElement.attrib.keys():
                 dauer = float(subElement.attrib['dur.metrical'])
 
     # Generate a FiguredBassIndication object and set the collected information
     fb_notation = ','.join(fb_notation_list)
-    theFbNotation = harmony.FiguredBassIndication(fb_notation)
+    theFbNotation = harmony.FiguredBassIndication(fb_notation, extenders=fb_extenders)
     theFbNotation.id = fb_id
     theFbNotation.duration = duration.Duration(quarterLength=dauer)
 

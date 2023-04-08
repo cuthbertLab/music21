@@ -46,11 +46,16 @@ modifiersDictM21ToXml = {'#': 'sharp',
                      '##': 'double-sharp',
                      'bb': 'flat-flat',
                      '\\': 'backslash',
+                     '/': 'slash',
                      '+': 'sharp',
                      '\u266f': 'sharp',
                      '\u266e': 'natural',
                      '\u266d': 'flat',
-                     '\u20e5': 'sharp'}
+                     '\u20e5': 'sharp',
+                     '\u0338': 'slash',
+                     '\U0001D12A': 'double-sharp',
+                     '\U0001D12B': 'flat-flat',
+                     }
 
 class Notation(prebase.ProtoM21Object):
     '''
@@ -201,17 +206,18 @@ class Notation(prebase.ProtoM21Object):
             ''',
     }
 
-    def __init__(self, notationColumn=None):
+    def __init__(self, notationColumn=None, extenders=None):
         # Parse notation string
         if notationColumn is None:
             notationColumn = ''
         self.notationColumn = notationColumn
+        self.extenders = extenders
         self.figureStrings = None
         self.origNumbers = None
         self.origModStrings = None
         self.numbers = None
         self.modifierStrings = None
-        self.hasExtenders = False
+        self.hasExtenders: bool = False
         self._parseNotationColumn()
         self._translateToLonghand()
 
@@ -256,6 +262,7 @@ class Notation(prebase.ProtoM21Object):
         numbers = []
         modifierStrings = []
         figureStrings = []
+        extenders = []
 
         for figure in figures:
             figure = figure.strip()
@@ -271,20 +278,40 @@ class Notation(prebase.ProtoM21Object):
 
             number = None
             modifierString = None
+            extender = False
             if m1:
+                # if no number is there and only an extender is found.
                 if '_' in m1:
                     self.hasExtenders = True
                     number = '_'
+                    extender = True
                 else:
-                    number = int(m1[0].strip())
+                    # is an extender part of the number string?
+                    if '_' in m1[0]:
+                        self.hasExtenders = True
+                        extender = True
+                        number = int(m1[0].strip('_'))
+                    else:
+                        number = int(m1[0].strip())
             if m2:
                 modifierString = m2[0].strip()
 
             numbers.append(number)
             modifierStrings.append(modifierString)
+            extenders.append(extender)
 
         numbers = tuple(numbers)
         modifierStrings = tuple(modifierStrings)
+        
+        # extenders come from the optional argument when instantionting the object.
+        # If nothing is provided, no extenders will be set.
+        # Otherwise we have to look if amount of extenders and figure numbers match
+        # 
+        if not self.extenders:
+            self.extenders = [False for i in range(len(modifierStrings))]
+        else:
+            extenders = tuple(self.extenders)
+        print('angekommen', numbers, modifierStrings, extenders)
 
         self.origNumbers = numbers  # Keep original numbers
         self.numbers = numbers  # Will be converted to longhand
@@ -394,7 +421,12 @@ class Notation(prebase.ProtoM21Object):
         for i in range(len(self.numbers)):
             number = self.numbers[i]
             modifierString = self.modifierStrings[i]
-            figure = Figure(number, modifierString)
+            if self.extenders:
+                if i < len(self.extenders):
+                    extender = self.extenders[i]
+            else:
+                extender = False
+            figure = Figure(number, modifierString, extender)
             figures.append(figure)
 
         self.figures = figures
@@ -431,6 +463,20 @@ class Figure(prebase.ProtoM21Object):
     '+'
     >>> f1.modifier
     <music21.figuredBass.notation.Modifier + sharp>
+    >>> f1.hasExtender
+    False
+    >>> f1.isExtender
+    False
+    >>> f2 = notation.Figure(6, '\', extender=True)
+    >>> f2.hasExtender
+    True
+    >>> f2.isExtender
+    False
+    >>> f3 = notation.Figure(extender=True)
+    >>> f3.isExtender
+    True
+    >>> f3.hasExtender
+    True
     '''
     _DOC_ATTR: dict[str, str] = {
         'number': '''
@@ -446,18 +492,28 @@ class Figure(prebase.ProtoM21Object):
             associated with an expanded
             :attr:`~music21.figuredBass.notation.Notation.notationColumn`.
             ''',
+        'hasExtender': '''
+            A bool value that indicates whether an extender is part of the figure.
+            It is set by a keyword argument.
+            ''',
+        'isExtender': '''
+            A bool value that returns true if an extender is part of the figure but no
+            number is given. Pure extender if you will.
+            It is set by evaluating the number and extender arguments.
+            '''
     }
 
-    def __init__(self, number=1, modifierString=None):
+    def __init__(self, number=1, modifierString=None, extender=False):
         self.number = number
         self.modifierString = modifierString
         self.modifier = Modifier(modifierString)
         # look for extenders underscore
-        self.isExtender: bool = (self.number == '_')
+        self.hasExtender: bool = extender
+        self.isExtender: bool = (self.number == 1 and self.hasExtender)
 
     def _reprInternal(self):
         mod = repr(self.modifier).replace('music21.figuredBass.notation.', '')
-        return f'{self.number} Mods: {mod} hasExt: {self.isExtender}'
+        return f'{self.number} Mods: {mod} hasExt: {self.hasExtender}'
 
 
 # ------------------------------------------------------------------------------
@@ -474,7 +530,10 @@ specialModifiers = {'+': '#',
                     '\u266f': '#',
                     '\u266e': 'n',
                     '\u266d': 'b',
-                    '\u20e5': '#'
+                    '\u20e5': '#',
+                    '\u0338': '#',
+                    '\U0001d12a': '##',
+                    '\U0001d12b': '--'
                     }
 
 
@@ -535,6 +594,7 @@ class Modifier(prebase.ProtoM21Object):
 
     def __init__(self, modifierString=None):
         self.modifierString = modifierString
+        self.originalString = modifierString
         self.accidental = self._toAccidental()
 
     def _reprInternal(self):
