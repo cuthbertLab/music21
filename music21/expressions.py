@@ -881,8 +881,7 @@ class GeneralMordent(Ornament):
         ornamentalPitch: pitch.Pitch = copy.deepcopy(srcPitch)
         if ornamentalPitch.octave is None:
             ornamentalPitch.octave = ornamentalPitch.implicitOctave
-        # we do the transpose NOT in place to avoid a bug where microtones get lost
-        ornamentalPitch = ornamentalPitch.transpose(transposeInterval, inPlace=False)
+        ornamentalPitch.transpose(transposeInterval, inPlace=True)
         # if there are microtones, see if they can be converted to quarter tones.
         if ornamentalPitch.microtone.cents != 0:
             ornamentalPitch.convertMicrotonesToQuarterTones(inPlace=True)
@@ -1460,8 +1459,7 @@ class Trill(Ornament):
         ornamentalPitch: pitch.Pitch = copy.deepcopy(srcPitch)
         if ornamentalPitch.octave is None:
             ornamentalPitch.octave = ornamentalPitch.implicitOctave
-        # we do the transpose NOT in place to avoid a bug where microtones get lost
-        ornamentalPitch = ornamentalPitch.transpose(transposeInterval, inPlace=False)
+        ornamentalPitch.transpose(transposeInterval, inPlace=True)
         # if there are microtones, see if they can be converted to quarter tones.
         if ornamentalPitch.microtone.cents != 0:
             ornamentalPitch.convertMicrotonesToQuarterTones(inPlace=True)
@@ -2054,8 +2052,7 @@ class Turn(Ornament):
         upperPitch: pitch.Pitch = copy.deepcopy(srcPitch)
         if upperPitch.octave is None:
             upperPitch.octave = upperPitch.implicitOctave
-        # we do the transpose NOT in place to avoid a bug where microtones get lost
-        upperPitch = upperPitch.transpose(transposeIntervalUp, inPlace=False)
+        upperPitch.transpose(transposeIntervalUp, inPlace=True)
         # if there are microtones, see if they can be converted to quarter tones.
         if upperPitch.microtone.cents != 0:
             upperPitch.convertMicrotonesToQuarterTones(inPlace=True)
@@ -2063,8 +2060,7 @@ class Turn(Ornament):
         lowerPitch: pitch.Pitch = copy.deepcopy(srcPitch)
         if lowerPitch.octave is None:
             lowerPitch.octave = lowerPitch.implicitOctave
-        # we do the transpose NOT in place to avoid a bug where microtones get lost
-        lowerPitch = lowerPitch.transpose(transposeIntervalDown, inPlace=False)
+        lowerPitch.transpose(transposeIntervalDown, inPlace=True)
         # if there are microtones, see if they can be converted to quarter tones.
         if lowerPitch.microtone.cents != 0:
             lowerPitch.convertMicrotonesToQuarterTones(inPlace=True)
