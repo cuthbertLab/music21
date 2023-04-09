@@ -4520,6 +4520,16 @@ class Pitch(prebase.ProtoM21Object):
         >>> pc6.transpose(10, inPlace=True)
         >>> pc6.spellingIsInferred
         True
+
+        Test an issue with inPlace not setting microtone.
+
+        >>> dFlatAndAHalf = pitch.Pitch('D2-`')
+        >>> dPitch = pitch.Pitch('D2')
+        >>> intv = interval.Interval(dFlatAndAHalf, dPitch)
+        >>> dPitch.transpose(intv, inPlace=True)
+        >>> dPitch
+        <music21.pitch.Pitch D#2(+50c)>
+
         '''
         # environLocal.printDebug(['Pitch.transpose()', value])
         if isinstance(value, interval.IntervalBase):
