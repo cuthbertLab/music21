@@ -164,21 +164,62 @@ def _sortModifiers():
 accidentalModifiersSorted = _sortModifiers()
 
 def isValidAccidentalName(name: str) -> bool:
-    # check against official names (e.g. 'double-flat')
+    '''
+    Check if name is a valid accidental name string that can
+    be used to initialize an Accidental.
+
+    Standard accidental names are valid:
+
+    >>> pitch.isValidAccidentalName('double-flat')
+    True
+
+    Accidental modifiers are valid:
+
+    >>> pitch.isValidAccidentalName('--')
+    True
+
+    Alternate accidental names are valid:
+
+    >>> pitch.isValidAccidentalName('eses')
+    True
+
+    Anything else is not valid:
+
+    >>> pitch.isValidAccidentalName('two flats')
+    False
+    '''
+    # check against official names
     if name in accidentalNameToModifier:
         return True
 
-    # check against official modifiers (e.g. '--')
+    # check against official modifiers
     if name in accidentalNameToModifier.values():
         return True
 
-    # check against alternate supported names (e.g. 'eses')
+    # check against alternate supported names
     if name in alternateNameToAccidentalName:
         return True
 
     return False
 
 def standardizeAccidentalName(name: str) -> str:
+    '''
+    Convert a valid accidental name to the standard accidental name.
+    Raises AccidentalException if name is not a valid accidental name.
+
+    >>> pitch.standardizeAccidentalName('double-flat')
+    'double-flat'
+
+    >>> pitch.standardizeAccidentalName('--')
+    'double-flat'
+
+    >>> pitch.standardizeAccidentalName('eses')
+    'double-flat'
+
+    >>> pitch.standardizeAccidentalName('two flats')
+    Traceback (most recent call last):
+    music21.pitch.AccidentalException: 'two flats' is not a supported accidental type
+    '''
     if name in accidentalNameToModifier:
         # it is already standardized, just return it
         return name
@@ -191,7 +232,7 @@ def standardizeAccidentalName(name: str) -> str:
         # it is an alternate name, look up standardized name
         return alternateNameToAccidentalName[name]
 
-    raise AccidentalException(f'{name} is not a supported accidental type')
+    raise AccidentalException(f"'{name}' is not a supported accidental type")
 
 
 
