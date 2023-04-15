@@ -582,7 +582,7 @@ class Ornament(Expression):
         e.g. A mordent with a natural, on a G, in a key with one sharp
         (ornamental pitch will be F)
 
-        >>> mordent.accidentalName = 'natural'
+        >>> mordent.accidental = pitch.Accidental('natural')
         >>> mordent.resolveOrnamentalPitches(n1, keySig=oneSharp)
         >>> mordent.ornamentalPitches
         (<music21.pitch.Pitch F4>,)
@@ -617,7 +617,9 @@ class Ornament(Expression):
         will be B flat)
 
         >>> n3 = note.Note('C4')
-        >>> turn = expressions.Turn(upperAccidentalName='sharp', lowerAccidentalName='flat')
+        >>> turn = expressions.Turn(
+        ...     upperAccidental=pitch.Accidental('sharp'),
+        ...     lowerAccidental=pitch.Accidental('flat'))
         >>> turn.resolveOrnamentalPitches(n3, keySig=noSharpsOrFlats)
         >>> turn.ornamentalPitches
         (<music21.pitch.Pitch D#4>, <music21.pitch.Pitch B-3>)
@@ -647,7 +649,7 @@ class Ornament(Expression):
 
         >>> twoFlats = key.KeySignature(sharps=-2)
         >>> n = note.Note('D4')
-        >>> turn = expressions.Turn(lowerAccidentalName='sharp')
+        >>> turn = expressions.Turn(lowerAccidental=pitch.Accidental('sharp'))
         >>> turn.resolveOrnamentalPitches(n, keySig=twoFlats)
         >>> turn.upperOrnamentalPitch
         <music21.pitch.Pitch E-4>
@@ -728,12 +730,14 @@ class Ornament(Expression):
         >>> trill3.ornamentalPitch.accidental is None
         True
 
-        If we add a natural accidental to the trill, and then updateAccidentalDisplay
-        is called with cautionaryPitchClass=False, the A gets a natural accidental
-        because we requested it by setting trill.accidentalName = 'natural'.
+        If we add a natural accidental to the trill (with displayStatus True), and then
+        updateAccidentalDisplay is called with cautionaryPitchClass=False, the A gets a
+        visible natural accidental because of that added natural accidental.
 
         >>> trill4 = expressions.Trill()
-        >>> trill4.accidentalName = 'natural'
+        >>> natural = pitch.Accidental('natural')
+        >>> natural.displayStatus = True
+        >>> trill4.accidental = natural
         >>> trill4.resolveOrnamentalPitches(note.Note('g4'), keySig=noSharpsOrFlats)
         >>> trill4.ornamentalPitch
         <music21.pitch.Pitch A4>
@@ -747,7 +751,6 @@ class Ornament(Expression):
         <music21.pitch.Accidental natural>
         >>> trill4.ornamentalPitch.accidental.displayStatus
         True
-
         '''
         return
 
@@ -759,11 +762,9 @@ class GeneralMordent(Ornament):
     '''
     _direction: str = ''  # up or down
 
-    def __init__(self, *, accidentalName: str = '', **keywords):
+    def __init__(self, *, accidental: pitch.Accidental | None = None, **keywords):
         super().__init__(**keywords)
-        self._accidentalName: str = ''
-        if accidentalName and pitch.isValidAccidentalName(accidentalName):
-            self._accidentalName = pitch.standardizeAccidentalName(accidentalName)
+        self._accidental: pitch.Accidental | None = accidental
         self.quarterLength = 0.125  # 32nd note default
         self.placement = 'above'
 
@@ -772,7 +773,7 @@ class GeneralMordent(Ornament):
         '''
         returns the name of the Mordent/InvertedMordent, which is generally
         the class name lowercased, with spaces where a new capital occurs. The
-        name also will include the accidental, if it exists.
+        name also will include any accidental, if it exists.
 
         Subclasses can override this as necessary.
 
@@ -780,36 +781,27 @@ class GeneralMordent(Ornament):
         >>> mordent.name
         'mordent'
 
-        >>> invertedMordent = expressions.InvertedMordent(accidentalName='sharp')
+        >>> sharp = pitch.Accidental('sharp')
+        >>> invertedMordent = expressions.InvertedMordent(accidental=sharp)
         >>> invertedMordent.name
         'inverted mordent (sharp)'
 
         '''
         theName: str = super().name
-        if self.accidentalName:
-            theName += ' (' + self.accidentalName + ')'
+        if self.accidental is not None:
+            theName += ' (' + self.accidental.name + ')'
         return theName
 
     @property
-    def accidentalName(self) -> str:
+    def accidental(self) -> pitch.Accidental | None:
         '''
-        This is the GeneralMordent's accidentalName.  Note that if this is
-        not set, the GeneralMordent may still have an accidental (depending
-        on the srcNote, and the current key signature), and that accidental
-        may or may not be visible.  Setting the accidentalName mandates that
-        "this will be the accidental's name, and it will be visible", and both
-        `.resolveOrnamentalPitches` and `.updateAccidentalDisplay` will obey
-        that mandate.  accidentalName must be set to a valid accidental name
-        string as accepted by :class:`~music21.pitch.Accidental`.
+        This is the GeneralMordent's accidental.
         '''
-        return self._accidentalName
+        return self._accidental
 
-    @accidentalName.setter
-    def accidentalName(self, newAccidentalName: str):
-        if newAccidentalName and pitch.isValidAccidentalName(newAccidentalName):
-            self._accidentalName = pitch.standardizeAccidentalName(newAccidentalName)
-        else:
-            self._accidentalName = ''
+    @accidental.setter
+    def accidental(self, newAccidental: pitch.Accidental | None):
+        self._accidental = newAccidental
 
     @property
     def direction(self) -> str:
@@ -826,8 +818,9 @@ class GeneralMordent(Ornament):
         an optional key signature.  If the key signature is not specified, the
         source note's context is searched for the current key signature, and if
         there is no such key signature, a key signature with no sharps and no flats
-        will be used.  Any `accidentalName` that has been set on the mordent
-        will also be taken into account.
+        will be used.  Any `accidental` that has been set on the mordent will also
+        be taken into account.  If no `accidental` has been set, the appropriate
+        accidental from the key signature will be used.
 
         If keySig is specified, this can be considered to be a theoretical question:
         "If this particular mordent were to be attached to this note, in this key,
@@ -857,8 +850,8 @@ class GeneralMordent(Ornament):
         else:
             ornamentalPitch.transpose(interval.GenericInterval(-2), inPlace=True)
 
-        if self.accidentalName:
-            ornamentalPitch.accidental = pitch.Accidental(self.accidentalName)
+        if self.accidental:
+            ornamentalPitch.accidental = self.accidental
         else:
             # use whatever accidental the key signature says
             ornamentalPitch.accidental = keySig.accidentalByStep(ornamentalPitch.step)
@@ -886,14 +879,14 @@ class GeneralMordent(Ornament):
         if ornamentalPitch.microtone.cents != 0:
             ornamentalPitch.convertMicrotonesToQuarterTones(inPlace=True)
 
-        if self.accidentalName:
-            # Note that we don't need to look at what the accidentalName actually is,
+        if self.accidental is not None:
+            # Note that we don't need to look at what the accidental actually is,
             # since that has already been incorporated into transposeInterval and the
             # ornamentalPitch via the call to getSize()/srcPitch.transpose().  But if
-            # accidentalName is set at all, we need to set displayStatus to True.
+            # accidental is set at all, we need to copy the displayStatus.
             if ornamentalPitch.accidental is None:
                 ornamentalPitch.accidental = pitch.Accidental(0)
-            ornamentalPitch.accidental.displayStatus = True
+            ornamentalPitch.accidental.displayStatus = self.accidental.displayStatus
         self._ornamentalPitches = (ornamentalPitch,)
 
     @property
@@ -925,11 +918,11 @@ class GeneralMordent(Ornament):
         if p is None:
             return
 
-        if self.accidentalName:
-            # force a visible accidental
+        if self.accidental is not None and self.accidental.displayStatus is not None:
+            # copy accidental visibility from self.accidental
             if p.accidental is None:
                 p.accidental = pitch.Accidental(0)
-            p.accidental.displayStatus = True
+            p.accidental.displayStatus = self.accidental.displayStatus
             return
 
         p.updateAccidentalDisplay(
@@ -999,7 +992,7 @@ class GeneralMordent(Ornament):
 
         if transposeInterval != interval.Interval('P1'):
             # second (middle) note might need an accidental from the keysig (but
-            # only if it doesn't already have an accidental from accidentalName)
+            # only if it doesn't already have an accidental, from self.accidental)
             for noteIdx, n in enumerate(mordNotes):
                 if t.TYPE_CHECKING:
                     assert isinstance(n, note.Note)
@@ -1048,7 +1041,7 @@ class Mordent(GeneralMordent):
 
     e.g. Mordent with flat, in default key (no flats or sharps)
 
-    >>> mFlat = expressions.Mordent(accidentalName='flat')
+    >>> mFlat = expressions.Mordent(accidental=pitch.Accidental('flat'))
     >>> mFlat.direction
     'down'
     >>> mFlat.getSize(note.Note('C4'))
@@ -1105,8 +1098,8 @@ class HalfStepMordent(Mordent):
     '''
     def __init__(self, **keywords) -> None:
         # no accidental supported here, just "HalfStep"
-        if 'accidentalName' in keywords:
-            raise ExpressionException('Cannot initialize HalfStepMordent with accidentalName')
+        if 'accidental' in keywords:
+            raise ExpressionException('Cannot initialize HalfStepMordent with accidental')
         super().__init__(**keywords)
         self._minorSecondDown: interval.IntervalBase = interval.Interval('m-2')
 
@@ -1119,12 +1112,12 @@ class HalfStepMordent(Mordent):
         return self._minorSecondDown
 
     @property
-    def accidentalName(self) -> str:
-        return ''
+    def accidental(self) -> pitch.Accidental | None:
+        return None
 
-    @accidentalName.setter
-    def accidentalName(self, newAccidentalName: str):
-        raise ExpressionException('Cannot set accidentalName of HalfStepMordent')
+    @accidental.setter
+    def accidental(self, newAccidental: pitch.Accidental | None):
+        raise ExpressionException('Cannot set accidental of HalfStepMordent')
 
 
 class WholeStepMordent(Mordent):
@@ -1139,8 +1132,8 @@ class WholeStepMordent(Mordent):
     '''
     def __init__(self, **keywords) -> None:
         # no accidental supported here, just "WholeStep"
-        if 'accidentalName' in keywords:
-            raise ExpressionException('Cannot initialize WholeStepMordent with accidentalName')
+        if 'accidental' in keywords:
+            raise ExpressionException('Cannot initialize WholeStepMordent with accidental')
         super().__init__(**keywords)
         self._majorSecondDown: interval.IntervalBase = interval.Interval('M-2')
 
@@ -1153,12 +1146,12 @@ class WholeStepMordent(Mordent):
         return self._majorSecondDown
 
     @property
-    def accidentalName(self) -> str:
-        return ''
+    def accidental(self) -> pitch.Accidental | None:
+        return None
 
-    @accidentalName.setter
-    def accidentalName(self, newAccidentalName: str):
-        raise ExpressionException('Cannot set accidentalName of WholeStepMordent')
+    @accidental.setter
+    def accidental(self, newAccidental: pitch.Accidental | None):
+        raise ExpressionException('Cannot set accidental of WholeStepMordent')
 
 
 # ------------------------------------------------------------------------------
@@ -1185,7 +1178,7 @@ class InvertedMordent(GeneralMordent):
     >>> m.getSize(note.Note('B3'))
     <music21.interval.Interval m2>
 
-    >>> mSharp = expressions.InvertedMordent(accidentalName='sharp')
+    >>> mSharp = expressions.InvertedMordent(accidental=pitch.Accidental('sharp'))
     >>> mSharp.direction
     'up'
     >>> mSharp.getSize(note.Note('C4'))
@@ -1216,9 +1209,9 @@ class HalfStepInvertedMordent(InvertedMordent):
     '''
     def __init__(self, **keywords) -> None:
         # no accidental supported here, just "HalfStep"
-        if 'accidentalName' in keywords:
+        if 'accidental' in keywords:
             raise ExpressionException(
-                'Cannot initialize HalfStepInvertedMordent with accidentalName')
+                'Cannot initialize HalfStepInvertedMordent with accidental')
         super().__init__(**keywords)
         self._minorSecondUp: interval.IntervalBase = interval.Interval('m2')
 
@@ -1231,12 +1224,12 @@ class HalfStepInvertedMordent(InvertedMordent):
         return self._minorSecondUp
 
     @property
-    def accidentalName(self) -> str:
-        return ''
+    def accidental(self) -> pitch.Accidental | None:
+        return None
 
-    @accidentalName.setter
-    def accidentalName(self, newAccidentalName: str):
-        raise ExpressionException('Cannot set accidentalName of HalfStepInvertedMordent')
+    @accidental.setter
+    def accidental(self, newAccidental: pitch.Accidental | None):
+        raise ExpressionException('Cannot set accidental of HalfStepInvertedMordent')
 
 
 class WholeStepInvertedMordent(InvertedMordent):
@@ -1251,9 +1244,9 @@ class WholeStepInvertedMordent(InvertedMordent):
     '''
     def __init__(self, **keywords) -> None:
         # no accidental supported here, just "WholeStep"
-        if 'accidentalName' in keywords:
+        if 'accidental' in keywords:
             raise ExpressionException(
-                'Cannot initialize WholeStepInvertedMordent with accidentalName')
+                'Cannot initialize WholeStepInvertedMordent with accidental')
         super().__init__(**keywords)
         self._majorSecondUp: interval.IntervalBase = interval.Interval('M2')
 
@@ -1266,12 +1259,12 @@ class WholeStepInvertedMordent(InvertedMordent):
         return self._majorSecondUp
 
     @property
-    def accidentalName(self) -> str:
-        return ''
+    def accidental(self) -> pitch.Accidental | None:
+        return None
 
-    @accidentalName.setter
-    def accidentalName(self, newAccidentalName: str):
-        raise ExpressionException('Cannot set accidentalName of WholeStepInvertedMordent')
+    @accidental.setter
+    def accidental(self, newAccidental: pitch.Accidental | None):
+        raise ExpressionException('Cannot set accidental of WholeStepInvertedMordent')
 
 
 # ------------------------------------------------------------------------------
@@ -1312,11 +1305,9 @@ class Trill(Ornament):
     '''
     _direction: str = 'up'
 
-    def __init__(self, *, accidentalName: str = '', **keywords) -> None:
+    def __init__(self, *, accidental: pitch.Accidental | None = None, **keywords) -> None:
         super().__init__(**keywords)
-        self._accidentalName: str = ''
-        if accidentalName and pitch.isValidAccidentalName(accidentalName):
-            self._accidentalName = pitch.standardizeAccidentalName(accidentalName)
+        self._accidental: pitch.Accidental | None = accidental
         self.placement = 'above'
         self.nachschlag = False  # play little notes at the end of the trill?
         self.tieAttach = 'all'
@@ -1336,14 +1327,14 @@ class Trill(Ornament):
         >>> trill.name
         'trill'
 
-        >>> doubleSharpedTrill = expressions.Trill(accidentalName='double-sharp')
+        >>> doubleSharpedTrill = expressions.Trill(accidental=pitch.Accidental('double-sharp'))
         >>> doubleSharpedTrill.name
         'trill (double-sharp)'
 
         '''
         theName: str = super().name
-        if self.accidentalName:
-            theName += ' (' + self.accidentalName + ')'
+        if self.accidental:
+            theName += ' (' + self.accidental.name + ')'
         return theName
 
     @property
@@ -1351,25 +1342,16 @@ class Trill(Ornament):
         return self._direction
 
     @property
-    def accidentalName(self) -> str:
+    def accidental(self) -> pitch.Accidental | None:
         '''
-        This is the Trill's accidentalName.  Note that if this is not
-        set, the Trill may still have an accidental (depending on the
-        srcNote, and the current key signature), and that accidental may
-        or may not be visible.  Setting the accidentalName mandates that
-        "this will be the accidental's name, and it will be visible", and
-        both `.resolveOrnamentalPitches` and `.updateAccidentalDisplay`
-        will obey that mandate.  accidentalName must be set to a valid
-        accidental name string as accepted by :class:`~music21.pitch.Accidental`.
+        This is the Trill's accidental.  Whether or not it is visible is dictated by
+        the accidental's displayStatus.
         '''
-        return self._accidentalName
+        return self._accidental
 
-    @accidentalName.setter
-    def accidentalName(self, newAccidentalName: str):
-        if newAccidentalName and pitch.isValidAccidentalName(newAccidentalName):
-            self._accidentalName = pitch.standardizeAccidentalName(newAccidentalName)
-        else:
-            self._accidentalName = ''
+    @accidental.setter
+    def accidental(self, newAccidental: pitch.Accidental | None):
+        self._accidental = newAccidental
 
     def splitClient(self, noteList):
         '''
@@ -1404,8 +1386,8 @@ class Trill(Ornament):
         an optional key signature.  If the key signature is not specified, the
         source note's context is searched for the current key signature, and if
         there is no such key signature, a key signature with no sharps and no flats
-        will be used.  Any `accidentalName` that has been set on the trill
-        will also be taken into account.
+        will be used.  Any `accidental` that has been set on the trill will also
+        be taken into account.
 
         If keySig is specified, this can be considered to be a theoretical question:
         "If this particular trill were to be attached to this note, in this key,
@@ -1435,8 +1417,8 @@ class Trill(Ornament):
         else:
             ornamentalPitch.transpose(interval.GenericInterval(-2), inPlace=True)
 
-        if self.accidentalName:
-            ornamentalPitch.accidental = pitch.Accidental(self.accidentalName)
+        if self.accidental:
+            ornamentalPitch.accidental = self.accidental
         else:
             # use whatever accidental the key signature says
             ornamentalPitch.accidental = keySig.accidentalByStep(ornamentalPitch.step)
@@ -1464,14 +1446,14 @@ class Trill(Ornament):
         if ornamentalPitch.microtone.cents != 0:
             ornamentalPitch.convertMicrotonesToQuarterTones(inPlace=True)
 
-        if self.accidentalName:
-            # Note that we don't need to look at what the accidentalName actually is,
+        if self.accidental is not None:
+            # Note that we don't need to look at what the accidental actually is,
             # since that has already been incorporated into transposeInterval and the
-            # ornamentalPitch via the call to getSize()/srcPitch.transpose().  But if
-            # accidentalName is set at all, we need to set displayStatus to True.
+            # ornamentalPitch via the call to getSize()/srcPitch.transpose().  But we
+            # do need to copy self.accidental.displayStatus.
             if ornamentalPitch.accidental is None:
                 ornamentalPitch.accidental = pitch.Accidental(0)
-            ornamentalPitch.accidental.displayStatus = True
+            ornamentalPitch.accidental.displayStatus = self.accidental.displayStatus
         self._ornamentalPitches = (ornamentalPitch,)
 
     @property
@@ -1503,11 +1485,11 @@ class Trill(Ornament):
         if p is None:
             return
 
-        if self.accidentalName:
-            # force a visible accidental
+        if self.accidental:
+            # copy displayStatus from self.accidental
             if p.accidental is None:
                 p.accidental = pitch.Accidental(0)
-            p.accidental.displayStatus = True
+            p.accidental.displayStatus = self.accidental.displayStatus
             return
 
         p.updateAccidentalDisplay(
@@ -1666,7 +1648,7 @@ class Trill(Ornament):
                     if n.pitch.nameWithOctave != srcObj.pitch.nameWithOctave:  # type: ignore
                         # do not correct original note, no matter what.
                         if n.pitch.accidental is None:  # type: ignore
-                            # correct if there isn't already an accidental (from accidentalName)
+                            # correct if there isn't already an accidental (from self.accidental)
                             n.pitch.accidental = (
                                 currentKeySig.accidentalByStep(n.step)  # type: ignore
                             )
@@ -1730,9 +1712,9 @@ class HalfStepTrill(Trill):
     '''
     def __init__(self, **keywords) -> None:
         # no accidental supported here, just "HalfStep"
-        if 'accidentalName' in keywords:
+        if 'accidental' in keywords:
             raise ExpressionException(
-                'Cannot initialize HalfStepTrill with accidentalName')
+                'Cannot initialize HalfStepTrill with accidental')
         super().__init__(**keywords)
         self._minorSecondUp: interval.IntervalBase = interval.Interval('m2')
         self._setAccidentalFromKeySig = False
@@ -1746,12 +1728,12 @@ class HalfStepTrill(Trill):
         return self._minorSecondUp
 
     @property
-    def accidentalName(self) -> str:
-        return ''
+    def accidental(self) -> pitch.Accidental | None:
+        return None
 
-    @accidentalName.setter
-    def accidentalName(self, newAccidentalName: str):
-        raise ExpressionException('Cannot set accidentalName of HalfStepTrill')
+    @accidental.setter
+    def accidental(self, newAccidental: pitch.Accidental | None):
+        raise ExpressionException('Cannot set accidental of HalfStepTrill')
 
 
 class WholeStepTrill(Trill):
@@ -1778,9 +1760,9 @@ class WholeStepTrill(Trill):
     '''
     def __init__(self, **keywords) -> None:
         # no accidental supported here, just "WholeStep"
-        if 'accidentalName' in keywords:
+        if 'accidental' in keywords:
             raise ExpressionException(
-                'Cannot initialize WholeStepTrill with accidentalName')
+                'Cannot initialize WholeStepTrill with accidental')
         super().__init__(**keywords)
         self._majorSecondUp: interval.IntervalBase = interval.Interval('M2')
         self._setAccidentalFromKeySig = False
@@ -1794,12 +1776,12 @@ class WholeStepTrill(Trill):
         return self._majorSecondUp
 
     @property
-    def accidentalName(self) -> str:
-        return ''
+    def accidental(self) -> pitch.Accidental | None:
+        return None
 
-    @accidentalName.setter
-    def accidentalName(self, newAccidentalName: str):
-        raise ExpressionException('Cannot set accidentalName of WholeStepTrill')
+    @accidental.setter
+    def accidental(self, newAccidental: pitch.Accidental | None):
+        raise ExpressionException('Cannot set accidental of WholeStepTrill')
 
 
 class Shake(Trill):
@@ -1850,17 +1832,13 @@ class Turn(Ornament):
         self,
         *,
         delay: OrnamentDelay | OffsetQL = OrnamentDelay.NO_DELAY,
-        upperAccidentalName: str = '',
-        lowerAccidentalName: str = '',
+        upperAccidental: pitch.Accidental | None = None,
+        lowerAccidental: pitch.Accidental | None = None,
         **keywords
     ):
         super().__init__(**keywords)
-        self._upperAccidentalName: str = ''
-        if upperAccidentalName and pitch.isValidAccidentalName(upperAccidentalName):
-            self._upperAccidentalName = pitch.standardizeAccidentalName(upperAccidentalName)
-        self._lowerAccidentalName: str = ''
-        if lowerAccidentalName and pitch.isValidAccidentalName(lowerAccidentalName):
-            self._lowerAccidentalName = pitch.standardizeAccidentalName(lowerAccidentalName)
+        self._upperAccidental: pitch.Accidental | None = upperAccidental
+        self._lowerAccidental: pitch.Accidental | None = lowerAccidental
         self.placement: str = 'above'
         self.tieAttach: str = 'all'
         self.quarterLength: OffsetQL = 0.25
@@ -1868,46 +1846,28 @@ class Turn(Ornament):
         self.delay = delay  # use property setter
 
     @property
-    def upperAccidentalName(self) -> str:
+    def upperAccidental(self) -> pitch.Accidental | None:
         '''
-        This is the Turn's upperAccidentalName.  Note that if this is not
-        set, the Trill may still have an upper accidental (depending on the
-        srcNote, and the current key signature), and that accidental may
-        or may not be visible.  Setting the upperAccidentalName mandates that
-        "this will be the upper accidental's name, and it will be visible", and
-        both `.resolveOrnamentalPitches` and `.updateAccidentalDisplay`
-        will obey that mandate.  upperAccidentalName must be set to a valid
-        accidental name string as accepted by :class:`~music21.pitch.Accidental`.
+        This is the Turn's upperAccidental. Whether or not it is visible is dictated by
+        the upperAccidental's displayStatus.
         '''
-        return self._upperAccidentalName
+        return self._upperAccidental
 
-    @upperAccidentalName.setter
-    def upperAccidentalName(self, newUpperAccidentalName: str):
-        if newUpperAccidentalName and pitch.isValidAccidentalName(newUpperAccidentalName):
-            self._upperAccidentalName = pitch.standardizeAccidentalName(newUpperAccidentalName)
-        else:
-            self._upperAccidentalName = ''
+    @upperAccidental.setter
+    def upperAccidental(self, newUpperAccidental: pitch.Accidental | None):
+        self._upperAccidental = newUpperAccidental
 
     @property
-    def lowerAccidentalName(self) -> str:
+    def lowerAccidental(self) -> pitch.Accidental | None:
         '''
-        This is the Turn's lowerAccidentalName.  Note that if this is not
-        set, the Trill may still have a lower accidental (depending on the
-        srcNote, and the current key signature), and that accidental may or
-        may not be visible.  Setting the lowerAccidentalName mandates that
-        "this will be the lower accidental's name, and it will be visible",
-        and both `.resolveOrnamentalPitches` and `.updateAccidentalDisplay`
-        will obey that mandate.  lowerAccidentalName must be set to a valid
-        accidental name string as accepted by :class:`~music21.pitch.Accidental`.
+        This is the Turn's lowerAccidental. Whether or not it is visible is dictated by
+        the upperAccidental's displayStatus.
         '''
-        return self._lowerAccidentalName
+        return self._lowerAccidental
 
-    @lowerAccidentalName.setter
-    def lowerAccidentalName(self, newLowerAccidentalName: str):
-        if newLowerAccidentalName and pitch.isValidAccidentalName(newLowerAccidentalName):
-            self._lowerAccidentalName = pitch.standardizeAccidentalName(newLowerAccidentalName)
-        else:
-            self._lowerAccidentalName = ''
+    @lowerAccidental.setter
+    def lowerAccidental(self, newLowerAccidental: pitch.Accidental | None):
+        self._lowerAccidental = newLowerAccidental
 
     @property
     def delay(self) -> OrnamentDelay | OffsetQL:
@@ -1946,13 +1906,14 @@ class Turn(Ornament):
         >>> from music21.common.enums import OrnamentDelay
         >>> delayedInvertedTurn = expressions.InvertedTurn(
         ...     delay=OrnamentDelay.DEFAULT_DELAY,
-        ...     upperAccidentalName='sharp',
-        ...     lowerAccidentalName='natural'
+        ...     upperAccidental=pitch.Accidental('sharp'),
+        ...     lowerAccidental=pitch.Accidental('natural')
         ... )
         >>> delayedInvertedTurn.name
         'delayed inverted turn (upper=sharp, lower=natural)'
 
-        >>> delayedBy1Turn = expressions.Turn(delay=1.0, lowerAccidentalName='double-flat')
+        >>> delayedBy1Turn = expressions.Turn(
+        ...     delay=1.0, lowerAccidental=pitch.Accidental('double-flat'))
         >>> delayedBy1Turn.name
         'delayed(delayQL=1.0) turn (lower=double-flat)'
 
@@ -1963,14 +1924,14 @@ class Turn(Ornament):
         elif isinstance(self.delay, (float, Fraction)):
             theName = f'delayed(delayQL={self.delay}) ' + theName
 
-        if self.upperAccidentalName or self.lowerAccidentalName:
+        if self.upperAccidental is not None or self.lowerAccidental is not None:
             theName += ' ('
-            if self.upperAccidentalName:
-                theName += 'upper=' + self.upperAccidentalName
-                if self.lowerAccidentalName:
+            if self.upperAccidental is not None:
+                theName += 'upper=' + self.upperAccidental.name
+                if self.lowerAccidental is not None:
                     theName += ', '
-            if self.lowerAccidentalName:
-                theName += 'lower=' + self.lowerAccidentalName
+            if self.lowerAccidental is not None:
+                theName += 'lower=' + self.lowerAccidental.name
             theName += ')'
 
         return theName
@@ -1988,8 +1949,9 @@ class Turn(Ornament):
         If the key signature is not specified, the source note's context is
         searched for the current key signature, and if there is no such key
         signature, a key signature with no sharps and no flats will be used.
-        Any `accidentalName` that has been set on the turn will also be taken
-        into account.
+        Any `upperAccidental` or `lowerAccidental` that has been set on the
+        turn will also be taken into account.  If either has not been set,
+        the appropriate accidental from the key signature will be used.
 
         If keySig is specified, this can be considered to be a theoretical
         question: "If this particular turn were to be attached to this note,
@@ -2016,16 +1978,16 @@ class Turn(Ornament):
         if ornamentalPitch.octave is None:
             ornamentalPitch.octave = ornamentalPitch.implicitOctave
 
-        accidentalName: str = ''
+        accidental: pitch.Accidental | None = None
         if which == 'upper':
             ornamentalPitch.transpose(interval.GenericInterval(2), inPlace=True)
-            accidentalName = self.upperAccidentalName
+            accidental = self.upperAccidental
         else:
             ornamentalPitch.transpose(interval.GenericInterval(-2), inPlace=True)
-            accidentalName = self.lowerAccidentalName
+            accidental = self.lowerAccidental
 
-        if accidentalName:
-            ornamentalPitch.accidental = pitch.Accidental(accidentalName)
+        if accidental:
+            ornamentalPitch.accidental = accidental
         else:
             # use whatever accidental the key signature says
             ornamentalPitch.accidental = keySig.accidentalByStep(ornamentalPitch.step)
@@ -2065,19 +2027,18 @@ class Turn(Ornament):
         if lowerPitch.microtone.cents != 0:
             lowerPitch.convertMicrotonesToQuarterTones(inPlace=True)
 
-        # The existence of upperAccidentalName (or lowerAccidentalName) implies
-        # upperPitch.accidental (or lowerPitch.accidental) should be displayed.
-        # The actual non-'' value of upperAccidentalName (or lowerAccidentalName)
-        # is not relevant here, since it is already incorporated into the upperPitch
-        # (or lowerPitch) via getSize()/transpose().
-        if self.upperAccidentalName:
+        # The actual value of upperAccidental (or lowerAccidental) is not
+        # relevant here, since it is already incorporated into the upperPitch
+        # (or lowerPitch) via getSize()/transpose().  We're just looking for
+        # displayStatus.
+        if self.upperAccidental is not None:
             if upperPitch.accidental is None:
                 upperPitch.accidental = pitch.Accidental(0)
-            upperPitch.accidental.displayStatus = True
-        if self.lowerAccidentalName:
+            upperPitch.accidental.displayStatus = self.upperAccidental.displayStatus
+        if self.lowerAccidental is not None:
             if lowerPitch.accidental is None:
                 lowerPitch.accidental = pitch.Accidental(0)
-            lowerPitch.accidental.displayStatus = True
+            lowerPitch.accidental.displayStatus = self.lowerAccidental.displayStatus
 
         # order matters, see upperOrnamentalPitch and lowerOrnamentalPitch properties below
         self._ornamentalPitches = (upperPitch, lowerPitch)
@@ -2123,11 +2084,11 @@ class Turn(Ornament):
         # upper ornamental pitch
         p = self.upperOrnamentalPitch
         if p is not None:
-            if self.upperAccidentalName:
-                # force a visible upper accidental
+            if self.upperAccidental is not None and self.upperAccidental.displayStatus is not None:
+                # force upper accidental visibility to be whatever self.upperAccidental's is
                 if p.accidental is None:
                     p.accidental = pitch.Accidental(0)
-                p.accidental.displayStatus = True
+                p.accidental.displayStatus = self.upperAccidental.displayStatus
             else:
                 p.updateAccidentalDisplay(
                     pitchPast=pitchPast,
@@ -2142,11 +2103,11 @@ class Turn(Ornament):
         # lower ornamental pitch
         p = self.lowerOrnamentalPitch
         if p is not None:
-            if self.lowerAccidentalName:
-                # force a visible lower accidental
+            if self.lowerAccidental is not None and self.lowerAccidental.displayStatus is not None:
+                # force lower accidental visibility to be whatever self.lowerAccidental's is
                 if p.accidental is None:
                     p.accidental = pitch.Accidental(0)
-                p.accidental.displayStatus = True
+                p.accidental.displayStatus = self.lowerAccidental.displayStatus
             else:
                 p.updateAccidentalDisplay(
                     pitchPast=pitchPast,
@@ -2345,7 +2306,7 @@ class Turn(Ornament):
 
         if isTransposed:
             # first note and third note might need an accidental from the keySig (but
-            # only if they don't already have an accidental from upper/lowerAccidentalName)
+            # only if they don't already have an accidental from upper/lowerAccidental)
             for noteIdx, n in enumerate(turnNotes):
                 if t.TYPE_CHECKING:
                     assert isinstance(n, note.Note)

@@ -142,7 +142,7 @@ class TrillRecognizer(OrnamentRecognizer):
                 trill.nachschlag = True
 
             if n2.pitch.accidental is not None:
-                trill.accidentalName = n2.pitch.accidental.name
+                trill.accidental = n2.pitch.accidental
             trill.resolveOrnamentalPitches(n1)
             return trill
 
@@ -169,7 +169,7 @@ class TrillRecognizer(OrnamentRecognizer):
             trill.nachschlag = True
 
         if endNote.pitch.accidental is not None:
-            trill.accidentalName = endNote.pitch.accidental.name
+            trill.accidental = endNote.pitch.accidental
         trill.resolveOrnamentalPitches(startNote)
         return trill
 

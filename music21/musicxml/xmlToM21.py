@@ -4033,18 +4033,18 @@ class MeasureParser(XMLParserBase):
         If it is 'accidental-mark', add to mostRecentOrnament, and return None
 
         >>> turn = expressions.Turn()
-        >>> turn.lowerAccidentalName
-        ''
-        >>> turn.upperAccidentalName
-        ''
+        >>> turn.lowerAccidental is None
+        True
+        >>> turn.upperAccidental is None
+        True
         >>> mxOrn = EL('<accidental-mark placement="below">flat</accidental-mark>')
         >>> a = MP.xmlOrnamentToExpression(mxOrn, mostRecentOrnament=turn)
         >>> a is None
         True
-        >>> turn.lowerAccidentalName
-        'flat'
-        >>> turn.upperAccidentalName
-        ''
+        >>> turn.lowerAccidental
+        <music21.pitch.Accidental flat>
+        >>> turn.upperAccidental is None
+        True
 
         Not supported currently: 'vertical-turn'
         '''
@@ -4053,16 +4053,19 @@ class MeasureParser(XMLParserBase):
             if mostRecentOrnament is None:
                 return None
 
+            accid: pitch.Accidental = self.xmlToAccidental(mxObj)
+            accid.displayStatus = True
+
             if isinstance(mostRecentOrnament, expressions.Turn):
                 # upperAccidentalName or lowerAccidentalName?
                 # Look at placement (default to 'above').
                 placement: str = mxObj.get('placement', 'above')
                 if placement == 'below':
-                    mostRecentOrnament.lowerAccidentalName = mxObj.text
+                    mostRecentOrnament.lowerAccidental = accid
                 else:
-                    mostRecentOrnament.upperAccidentalName = mxObj.text
+                    mostRecentOrnament.upperAccidental = accid
             elif isinstance(mostRecentOrnament, (expressions.GeneralMordent, expressions.Trill)):
-                mostRecentOrnament.accidentalName = mxObj.text
+                mostRecentOrnament.accidental = accid
             return None
 
         try:

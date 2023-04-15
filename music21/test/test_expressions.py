@@ -163,85 +163,54 @@ class Test(unittest.TestCase):
         # s.show()
         self.assertEqual(raw.count(b'wavy-line'), 2)
 
-    def testAccidentalName(self):
-        # check that init with invalid accidental name sets it to ''
-        trill = expressions.Trill(accidentalName='invalid accidental name')
-        self.assertEqual(trill.accidentalName, '')
-        mord = expressions.Mordent(accidentalName='invalid accidental name')
-        self.assertEqual(mord.accidentalName, '')
-        turn = expressions.Turn(upperAccidentalName='invalid accidental name')
-        self.assertEqual(turn.upperAccidentalName, '')
-        turn = expressions.Turn(lowerAccidentalName='invalid accidental name')
-        self.assertEqual(turn.lowerAccidentalName, '')
+    def testFixedSizeOrnamentAccidental(self):
+        # Check that accidental works as expected (i.e. not at all) on all the
+        # old-style fixed-size Trill/Mordent types.
 
-        # check that setting invalid accidental name clears it to ''
-        trill = expressions.InvertedTrill()
-        trill.accidentalName = 'flat'
-        self.assertEqual(trill.accidentalName, 'flat')
-        trill.accidentalName = 'invalid accidental name'
-        self.assertEqual(trill.accidentalName, '')
+        # init with accidental raises ExpressionException
+        flatAccid = pitch.Accidental('flat')
+        with self.assertRaises(expressions.ExpressionException):
+            trill = expressions.HalfStepTrill(accidental=flatAccid)
+        with self.assertRaises(expressions.ExpressionException):
+            trill = expressions.WholeStepTrill(accidental=flatAccid)
+        with self.assertRaises(expressions.ExpressionException):
+            mord = expressions.HalfStepMordent(accidental=flatAccid)
+        with self.assertRaises(expressions.ExpressionException):
+            mord = expressions.WholeStepMordent(accidental=flatAccid)
+        with self.assertRaises(expressions.ExpressionException):
+            mord = expressions.HalfStepInvertedMordent(accidental=flatAccid)
+        with self.assertRaises(expressions.ExpressionException):
+            mord = expressions.WholeStepInvertedMordent(accidental=flatAccid)
 
-        mord = expressions.InvertedMordent()
-        mord.accidentalName = 'flat'
-        self.assertEqual(mord.accidentalName, 'flat')
-        mord.accidentalName = 'invalid accidental name'
-        self.assertEqual(mord.accidentalName, '')
-
-        turn = expressions.InvertedTurn()
-        turn.upperAccidentalName = 'flat'
-        self.assertEqual(turn.upperAccidentalName, 'flat')
-        turn.upperAccidentalName = 'invalid accidental name'
-        self.assertEqual(turn.upperAccidentalName, '')
-        turn.lowerAccidentalName = 'flat'
-        self.assertEqual(turn.lowerAccidentalName, 'flat')
-        turn.lowerAccidentalName = 'invalid accidental name'
-        self.assertEqual(turn.lowerAccidentalName, '')
-
-        # check that accidentalName works as expected (i.e. not at all) on all the
-        # old-style fixed-size Trill/Mordent/Turn types.
-
-        # init with accidental name raises ExpressionException
-        with self.assertRaises(expressions.ExpressionException):
-            trill = expressions.HalfStepTrill(accidentalName='flat')
-        with self.assertRaises(expressions.ExpressionException):
-            trill = expressions.WholeStepTrill(accidentalName='flat')
-        with self.assertRaises(expressions.ExpressionException):
-            mord = expressions.HalfStepMordent(accidentalName='flat')
-        with self.assertRaises(expressions.ExpressionException):
-            mord = expressions.WholeStepMordent(accidentalName='flat')
-        with self.assertRaises(expressions.ExpressionException):
-            mord = expressions.HalfStepInvertedMordent(accidentalName='flat')
-        with self.assertRaises(expressions.ExpressionException):
-            mord = expressions.WholeStepInvertedMordent(accidentalName='flat')
-
-        # get accidentalName returns '', set accidental name raises ExpressionException
+        # get accidental returns None, set accidental raises ExpressionException
+        sharpAccid = pitch.Accidental('sharp')
         trill = expressions.HalfStepTrill()
-        self.assertEqual(trill.accidentalName, '')
+        self.assertIsNone(trill.accidental)
         with self.assertRaises(expressions.ExpressionException):
-            trill.accidentalName = 'sharp'
+            trill.accidental = sharpAccid
         trill = expressions.WholeStepTrill()
-        self.assertEqual(trill.accidentalName, '')
+        self.assertIsNone(trill.accidental)
         with self.assertRaises(expressions.ExpressionException):
-            trill.accidentalName = 'sharp'
+            trill.accidental = sharpAccid
         mord = expressions.HalfStepMordent()
-        self.assertEqual(mord.accidentalName, '')
+        self.assertIsNone(mord.accidental)
         with self.assertRaises(expressions.ExpressionException):
-            mord.accidentalName = 'sharp'
+            mord.accidental = sharpAccid
         mord = expressions.WholeStepMordent()
-        self.assertEqual(mord.accidentalName, '')
+        self.assertIsNone(mord.accidental)
         with self.assertRaises(expressions.ExpressionException):
-            mord.accidentalName = 'sharp'
+            mord.accidental = sharpAccid
         mord = expressions.HalfStepInvertedMordent()
-        self.assertEqual(mord.accidentalName, '')
+        self.assertIsNone(mord.accidental)
         with self.assertRaises(expressions.ExpressionException):
-            mord.accidentalName = 'sharp'
+            mord.accidental = sharpAccid
         mord = expressions.WholeStepInvertedMordent()
-        self.assertEqual(mord.accidentalName, '')
+        self.assertIsNone(mord.accidental)
         with self.assertRaises(expressions.ExpressionException):
-            mord.accidentalName = 'sharp'
+            mord.accidental = sharpAccid
 
     def testResolveOrnamentalPitches(self):
-        # with no accidentalName, no key, explicit octave
+        # with no accidental, no key, explicit octave
         trill = expressions.Trill()
         itrill = expressions.InvertedTrill()
 
@@ -253,7 +222,7 @@ class Test(unittest.TestCase):
         self.assertEqual(itrill.ornamentalPitches, (pitch.Pitch('B3'),))
         self.assertIsNone(itrill.ornamentalPitches[0].accidental)
 
-        # with no accidentalName, no key, implicit octave
+        # with no accidental, no key, implicit octave
         noteWithImplicitOctave = note.Note('C')
         trill.resolveOrnamentalPitches(noteWithImplicitOctave)
         self.assertEqual(trill.ornamentalPitches, (pitch.Pitch('D4'),))
@@ -262,9 +231,11 @@ class Test(unittest.TestCase):
         self.assertEqual(itrill.ornamentalPitches, (pitch.Pitch('B3'),))
         self.assertIsNone(itrill.ornamentalPitches[0].accidental)
 
-        # with accidentalName='natural', no key, explicit octave
-        trill.accidentalName = 'natural'
-        itrill.accidentalName = 'natural'
+        # with accidental=naturalAccid, no key, explicit octave
+        naturalAccid = pitch.Accidental(0)
+        naturalAccid.displayStatus = True
+        trill.accidental = naturalAccid
+        itrill.accidental = naturalAccid
         trill.resolveOrnamentalPitches(noteWithExplicitOctave)
         expectedPitch = pitch.Pitch('D4')
         expectedPitch.accidental = pitch.Accidental('natural')
@@ -290,9 +261,11 @@ class Test(unittest.TestCase):
             True
         )
 
-        # with accidentalName='double-sharp', no key, explicit octave
-        trill.accidentalName = 'double-sharp'
-        itrill.accidentalName = 'double-sharp'
+        # with accidental=doubleSharpAccid, no key, explicit octave
+        doubleSharpAccid = pitch.Accidental('##')
+        doubleSharpAccid.displayStatus = True
+        trill.accidental = doubleSharpAccid
+        itrill.accidental = doubleSharpAccid
         trill.resolveOrnamentalPitches(noteWithExplicitOctave)
         expectedPitch = pitch.Pitch('D4')
         expectedPitch.accidental = pitch.Accidental('double-sharp')
@@ -387,9 +360,11 @@ class Test(unittest.TestCase):
 
     def testUpdateAccidentalDisplayWithAccidentNameSet(self):
         # Trill is already tested in header doc, test Mordent and Turn here
+        naturalAccid = pitch.Accidental(0)
+        naturalAccid.displayStatus = True
         noSharpsOrFlats = key.KeySignature(0)
         mord = expressions.InvertedMordent()
-        mord.accidentalName = 'natural'
+        mord.accidental = naturalAccid
         mord.resolveOrnamentalPitches(note.Note('G4'), keySig=noSharpsOrFlats)
         expectedOrnamentalPitch = pitch.Pitch('A4')
         expectedOrnamentalPitch.accidental = pitch.Accidental('natural')
@@ -404,8 +379,8 @@ class Test(unittest.TestCase):
         self.assertTrue(mord.ornamentalPitch.accidental.displayStatus)
 
         turn = expressions.Turn()
-        turn.upperAccidentalName = 'natural'
-        turn.lowerAccidentalName = 'natural'
+        turn.upperAccidental = naturalAccid
+        turn.lowerAccidental = naturalAccid
         turn.resolveOrnamentalPitches(note.Note('G4'), keySig=noSharpsOrFlats)
         expectedOrnamentalPitches = (pitch.Pitch('A4'), pitch.Pitch('F4'))
         expectedOrnamentalPitches[0].accidental = pitch.Accidental('natural')

@@ -624,9 +624,9 @@ class Test(unittest.TestCase):
         for n in s.recurse().notes:
             for e in n.expressions:
                 if 'Turn' in e.classes:
-                    if e.upperAccidentalName:
+                    if e.upperAccidental is not None:
                         upperCount += 1
-                    if e.lowerAccidentalName:
+                    if e.lowerAccidental is not None:
                         lowerCount += 1
         self.assertEqual(upperCount, 2)
         self.assertEqual(lowerCount, 1)
