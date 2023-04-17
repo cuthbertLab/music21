@@ -50,7 +50,7 @@ def realizeOrnaments(
     keySig: key.KeySignature | None = None
 ):
     '''
-    given a Music21Object with Ornament expressions,
+    given a Note or Unpitched with Ornament expressions,
     convert them into a list of objects that represents
     the performed version of the object:
 
@@ -64,8 +64,6 @@ def realizeOrnaments(
 
     .. image:: images/expressionsMordentRealize.*
          :width: 218
-
-    :type srcObj: note.GeneralNote
     '''
     srcObject: note.Note | note.Unpitched | None = srcObj
     if t.TYPE_CHECKING:
@@ -550,116 +548,16 @@ class Ornament(Expression):
         keySig: key.KeySignature | None = None
     ):
         '''
-        Computes and stores the ornamental pitches for Ornaments, given the srcObj
-        (can be any kind of ornamented GeneralNote) and an optional keySig.
-
-        If keySig is None, srcNote's context will be searched for a key signature.
-        If no key signature is found, a key signature with no sharps and no flats
-        will be used.
-
         Only implemented in Turn, GeneralMordent, and Trill.
-
-        A mordent on a G in a key with no sharps or flats (ornamental pitch will be F)
-
-        >>> noSharpsOrFlats = key.KeySignature(sharps=0)
-        >>> n1 = note.Note('G4')
-        >>> mordent = expressions.Mordent()
-        >>> mordent.resolveOrnamentalPitches(n1, keySig=noSharpsOrFlats)
-        >>> mordent.ornamentalPitches
-        (<music21.pitch.Pitch F4>,)
-        >>> mordent.ornamentalPitch
-        <music21.pitch.Pitch F4>
-
-        e.g. A mordent on a G in a key with one sharp (ornamental pitch will be F#)
-
-        >>> oneSharp = key.KeySignature(sharps=1)
-        >>> mordent.resolveOrnamentalPitches(n1, keySig=oneSharp)
-        >>> mordent.ornamentalPitches
-        (<music21.pitch.Pitch F#4>,)
-        >>> mordent.ornamentalPitch
-        <music21.pitch.Pitch F#4>
-
-        e.g. A mordent with a natural, on a G, in a key with one sharp
-        (ornamental pitch will be F)
-
-        >>> mordent.accidental = pitch.Accidental('natural')
-        >>> mordent.resolveOrnamentalPitches(n1, keySig=oneSharp)
-        >>> mordent.ornamentalPitches
-        (<music21.pitch.Pitch F4>,)
-        >>> mordent.ornamentalPitch
-        <music21.pitch.Pitch F4>
-
-        e.g. A trill on a D in a key with no sharps or flats (ornamental pitch will be E)
-
-        >>> n2 = note.Note('D4')
-        >>> trill = expressions.Trill()
-        >>> trill.resolveOrnamentalPitches(n2, keySig=noSharpsOrFlats)
-        >>> trill.ornamentalPitches
-        (<music21.pitch.Pitch E4>,)
-        >>> trill.ornamentalPitch
-        <music21.pitch.Pitch E4>
-
-        e.g. A turn on a D in a key with two flats (upper ornamental pitch will be E flat,
-        lower ornamental pitch will be C)
-
-        >>> twoFlats = key.KeySignature(sharps=-2)
-        >>> turn = expressions.Turn()
-        >>> turn.resolveOrnamentalPitches(n2, keySig=twoFlats)
-        >>> turn.ornamentalPitches
-        (<music21.pitch.Pitch E-4>, <music21.pitch.Pitch C4>)
-        >>> turn.upperOrnamentalPitch
-        <music21.pitch.Pitch E-4>
-        >>> turn.lowerOrnamentalPitch
-        <music21.pitch.Pitch C4>
-
-        e.g. A turn with a sharp over it and a flat under it, on a C, in a key with
-        no sharps or flats (upper ornamental pitch will be D#, lower ornamental pitch
-        will be B flat)
-
-        >>> n3 = note.Note('C4')
-        >>> turn = expressions.Turn(
-        ...     upperAccidental=pitch.Accidental('sharp'),
-        ...     lowerAccidental=pitch.Accidental('flat'))
-        >>> turn.resolveOrnamentalPitches(n3, keySig=noSharpsOrFlats)
-        >>> turn.ornamentalPitches
-        (<music21.pitch.Pitch D#4>, <music21.pitch.Pitch B-3>)
-        >>> turn.upperOrnamentalPitch
-        <music21.pitch.Pitch D#4>
-        >>> turn.lowerOrnamentalPitch
-        <music21.pitch.Pitch B-3>
-
         '''
         return
 
     @property
     def ornamentalPitches(self) -> tuple[pitch.Pitch, ...]:
         '''
-        Returns any ornamental pitches that have been resolved (see
-        `resolveOrnamentalPitches`, which must be called first, or an
-        empty tuple will be returned).
-
-        Only implemented in Turn, GeneralMordent, and Trill.  Turn can
-        have two ornamental pitches (one upper pitch and one lower pitch).
-        GeneralMordent and Trill can only have one ornamental pitch.
-        Other Ornaments always return an empty tuple.
-
-        e.g. A turn with a sharp under it, on a D, in a key with two
-        flats (upper ornamental pitch will be E flat, lower ornamental
-        pitch will be C#)
-
-        >>> twoFlats = key.KeySignature(sharps=-2)
-        >>> n = note.Note('D4')
-        >>> turn = expressions.Turn(lowerAccidental=pitch.Accidental('sharp'))
-        >>> turn.resolveOrnamentalPitches(n, keySig=twoFlats)
-        >>> turn.upperOrnamentalPitch
-        <music21.pitch.Pitch E-4>
-        >>> turn.lowerOrnamentalPitch
-        <music21.pitch.Pitch C#4>
-        >>> turn.ornamentalPitches
-        (<music21.pitch.Pitch E-4>, <music21.pitch.Pitch C#4>)
-
+        Only implemented in Turn, GeneralMordent, and Trill.
         '''
-        return self._ornamentalPitches
+        return tuple()
 
     def updateAccidentalDisplay(
         self,
@@ -672,14 +570,13 @@ class Ornament(Expression):
         cautionaryAll: bool = False,
         overrideStatus: bool = False,
         cautionaryNotImmediateRepeat: bool = True,
-    ):
+    ) -> None:
         '''
         Updates accidental display for an Ornament's ornamental pitch(es).
-        Defined exactly like Pitch.updateAccidentalDisplay with two changes:
-        1. We pay no attention to ties, since ornamental notes cannot be tied.
-        2. Instead of self being the pitch to update, self is an ornament that
-        contains a (possibly empty, possibly one or two pitches long) list of
-        ornamentPitches that are to be updated.
+        Defined exactly like Pitch.updateAccidentalDisplay, with two changes:
+        Instead of self being the pitch to update, self is an ornament whose
+        ornamentalPitches are to be updated; and we pay no attention to ties,
+        since ornamental notes cannot be tied.
 
         Only implemented in Turn, GeneralMordent, and Trill.
 
@@ -805,6 +702,10 @@ class GeneralMordent(Ornament):
 
     @property
     def direction(self) -> str:
+        '''
+        The direction of the mordent's ornamental pitch from the main note.
+        Can be 'up' or 'down'.
+        '''
         return self._direction
 
     def getSize(
@@ -864,6 +765,45 @@ class GeneralMordent(Ornament):
         *,
         keySig: key.KeySignature | None = None
     ):
+        '''
+        Computes and stores the ornamental pitch for a GeneralMordent, given the srcObj
+        (can be any kind of ornamented GeneralNote) and an optional keySig.
+
+        If keySig is None, srcNote's context will be searched for a key signature.
+        If no key signature is found, a key signature with no sharps and no flats
+        will be used.
+
+
+        A mordent on a G in a key with no sharps or flats (ornamental pitch will be F).
+
+        >>> noSharpsOrFlats = key.KeySignature(sharps=0)
+        >>> n1 = note.Note('G4')
+        >>> mordent = expressions.Mordent()
+        >>> mordent.resolveOrnamentalPitches(n1, keySig=noSharpsOrFlats)
+        >>> mordent.ornamentalPitches
+        (<music21.pitch.Pitch F4>,)
+        >>> mordent.ornamentalPitch
+        <music21.pitch.Pitch F4>
+
+        e.g. A mordent on a G in a key with one sharp (ornamental pitch will be F#).
+
+        >>> oneSharp = key.KeySignature(sharps=1)
+        >>> mordent.resolveOrnamentalPitches(n1, keySig=oneSharp)
+        >>> mordent.ornamentalPitches
+        (<music21.pitch.Pitch F#4>,)
+        >>> mordent.ornamentalPitch
+        <music21.pitch.Pitch F#4>
+
+        e.g. A mordent with a natural, on a G, in a key with one sharp
+        (ornamental pitch will be F).
+
+        >>> mordent.accidental = pitch.Accidental('natural')
+        >>> mordent.resolveOrnamentalPitches(n1, keySig=oneSharp)
+        >>> mordent.ornamentalPitches
+        (<music21.pitch.Pitch F4>,)
+        >>> mordent.ornamentalPitch
+        <music21.pitch.Pitch F4>
+        '''
         if not srcObj.pitches:
             # There are no ornamental pitches relative to this srcObj
             return
@@ -899,6 +839,15 @@ class GeneralMordent(Ornament):
             return self._ornamentalPitches[0]
         return None
 
+    @property
+    def ornamentalPitches(self) -> tuple[pitch.Pitch, ...]:
+        '''
+        Returns any ornamental pitch that has been resolved (see
+        `resolveOrnamentalPitches`, which must be called first, or an
+        empty tuple will be returned).
+        '''
+        return self._ornamentalPitches
+
     def updateAccidentalDisplay(
         self,
         *,
@@ -912,7 +861,7 @@ class GeneralMordent(Ornament):
         cautionaryNotImmediateRepeat: bool = True,
     ):
         '''
-        Updates accidental display for an GeneralMordent's ornamental pitch.
+        Updates accidental display for a GeneralMordent's ornamental pitch.
         '''
         p = self.ornamentalPitch
         if p is None:
@@ -949,8 +898,8 @@ class GeneralMordent(Ornament):
 
         returns a three-element tuple.
         The first is a list of the two notes that the beginning of the note were converted to.
-        The second is the rest of the note
-        The third is an empty list (since there are no notes at the end of a mordent)
+        The second is the rest of the note.
+        The third is an empty list (since there are no notes at the end of a mordent).
 
         >>> n1 = note.Note('C4')
         >>> n1.quarterLength = 0.5
@@ -1339,6 +1288,10 @@ class Trill(Ornament):
 
     @property
     def direction(self) -> str:
+        '''
+        The direction of the trill's ornamental pitch from the main note.
+        Can be 'up' or 'down'.
+        '''
         return self._direction
 
     @property
@@ -1431,6 +1384,24 @@ class Trill(Ornament):
         *,
         keySig: key.KeySignature | None = None
     ):
+        '''
+        Computes and stores the ornamental pitch for a Trill, given the srcObj
+        (can be any kind of ornamented GeneralNote) and an optional keySig.
+
+        If keySig is None, srcNote's context will be searched for a key signature.
+        If no key signature is found, a key signature with no sharps and no flats
+        will be used.
+
+        e.g. A trill on a D in a key with no sharps or flats (ornamental pitch will be E).
+
+        >>> n2 = note.Note('D4')
+        >>> trill = expressions.Trill()
+        >>> trill.resolveOrnamentalPitches(n2, keySig=noSharpsOrFlats)
+        >>> trill.ornamentalPitches
+        (<music21.pitch.Pitch E4>,)
+        >>> trill.ornamentalPitch
+        <music21.pitch.Pitch E4>
+        '''
         if not srcObj.pitches:
             # There are no ornamental pitches relative to this srcObj
             return
@@ -1465,6 +1436,15 @@ class Trill(Ornament):
         if self._ornamentalPitches:
             return self._ornamentalPitches[0]
         return None
+
+    @property
+    def ornamentalPitches(self) -> tuple[pitch.Pitch, ...]:
+        '''
+        Returns any ornamental pitch that has been resolved (see
+        `resolveOrnamentalPitches`, which must be called first, or an
+        empty tuple will be returned).
+        '''
+        return self._ornamentalPitches
 
     def updateAccidentalDisplay(
         self,
@@ -1871,6 +1851,14 @@ class Turn(Ornament):
 
     @property
     def delay(self) -> OrnamentDelay | OffsetQL:
+        '''
+        If delay is NO_DELAY, the turn is not delayed.
+
+        If delay is anything else (an OffsetQL or DEFAULT_DELAY), the turn is delayed.
+
+        Note that if you set delay to OffsetQL(0), and then get the delay, you will
+        get NO_DELAY, not 0.
+        '''
         return self._delay
 
     @delay.setter
@@ -1882,10 +1870,10 @@ class Turn(Ornament):
 
     @property
     def isDelayed(self) -> bool:
-        # if self.delay is NO_DELAY, the turn is not delayed
-        # if self.delay is anything else (an OffsetQL or DEFAULT_DELAY), the turn is delayed
-        # Note that the implementation of the delay property ensures that if self.delay
-        # is an OffsetQL, it will always be > 0.
+        '''
+        Whether the Turn is delayed (i.e. between a specific note and the following note) or
+        not (i.e. exactly on a specific note).
+        '''
         return self.delay != OrnamentDelay.NO_DELAY
 
     @property
@@ -2000,6 +1988,43 @@ class Turn(Ornament):
         *,
         keySig: key.KeySignature | None = None
     ):
+        '''
+        Computes and stores the ornamental pitches for a Turn, given the srcObj
+        (can be any kind of ornamented GeneralNote) and an optional keySig.
+
+        If keySig is None, srcNote's context will be searched for a key signature.
+        If no key signature is found, a key signature with no sharps and no flats
+        will be used.
+
+        e.g. A turn on a D in a key with two flats (upper ornamental pitch will be E flat,
+        lower ornamental pitch will be C).
+
+        >>> twoFlats = key.KeySignature(sharps=-2)
+        >>> turn = expressions.Turn()
+        >>> turn.resolveOrnamentalPitches(n2, keySig=twoFlats)
+        >>> turn.ornamentalPitches
+        (<music21.pitch.Pitch E-4>, <music21.pitch.Pitch C4>)
+        >>> turn.upperOrnamentalPitch
+        <music21.pitch.Pitch E-4>
+        >>> turn.lowerOrnamentalPitch
+        <music21.pitch.Pitch C4>
+
+        e.g. A turn with a sharp over it and a flat under it, on a C, in a key with
+        no sharps or flats (upper ornamental pitch will be D#, lower ornamental pitch
+        will be B flat).
+
+        >>> n3 = note.Note('C4')
+        >>> turn = expressions.Turn(
+        ...     upperAccidental=pitch.Accidental('sharp'),
+        ...     lowerAccidental=pitch.Accidental('flat'))
+        >>> turn.resolveOrnamentalPitches(n3, keySig=noSharpsOrFlats)
+        >>> turn.ornamentalPitches
+        (<music21.pitch.Pitch D#4>, <music21.pitch.Pitch B-3>)
+        >>> turn.upperOrnamentalPitch
+        <music21.pitch.Pitch D#4>
+        >>> turn.lowerOrnamentalPitch
+        <music21.pitch.Pitch B-3>
+        '''
         if not srcObj.pitches:
             # There are no ornamental pitches relative to this srcObj
             return
@@ -2062,6 +2087,15 @@ class Turn(Ornament):
         if len(self._ornamentalPitches) >= 2:
             return self._ornamentalPitches[1]
         return None
+
+    @property
+    def ornamentalPitches(self) -> tuple[pitch.Pitch, ...]:
+        '''
+        Returns any ornamental pitches that have been resolved (see
+        `resolveOrnamentalPitches`, which must be called first, or an
+        empty tuple will be returned).
+        '''
+        return self._ornamentalPitches
 
     def updateAccidentalDisplay(
         self,
