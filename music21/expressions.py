@@ -1631,15 +1631,14 @@ class Trill(Ornament):
             if setAccidentalFromKeySig:
                 for n in trillNotes:
                     if t.TYPE_CHECKING:
-                        # for some reason, this assertion doesn't convince mypy that n
-                        # has a pitch attribute, so we have to "type: ignore" below.
                         assert isinstance(n, note.Note)
-                    if n.pitch.nameWithOctave != srcObj.pitch.nameWithOctave:  # type: ignore
+                        assert isinstance(srcObj, note.Note)
+                    if n.pitch.nameWithOctave != srcObj.pitch.nameWithOctave:
                         # do not correct original note, no matter what.
-                        if n.pitch.accidental is None:  # type: ignore
+                        if n.pitch.accidental is None:
                             # correct if there isn't already an accidental (from self.accidental)
                             n.pitch.accidental = (
-                                currentKeySig.accidentalByStep(n.step)  # type: ignore
+                                currentKeySig.accidentalByStep(n.step)
                             )
 
         if inPlace and self in srcObj.expressions:
@@ -2422,7 +2421,7 @@ class GeneralAppoggiatura(Ornament):
         appoggiaturaNote = copy.deepcopy(srcObj)
         appoggiaturaNote.duration.quarterLength = newDuration
         isTransposed: bool = not isUnison(transposeInterval)
-        if isTranposed:
+        if isTransposed:
             if t.TYPE_CHECKING:
                 assert isinstance(appoggiaturaNote, note.Note)
             appoggiaturaNote.transpose(transposeInterval, inPlace=True)
