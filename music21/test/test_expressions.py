@@ -444,7 +444,7 @@ class Test(unittest.TestCase):
         unp = note.Unpitched()
 
         mord = expressions.Mordent()
-        realized = mord.realize(unp)  # type: ignore
+        realized = mord.realize(unp)
         self.assertEqual(len(realized), 3)
         self.assertEqual(len(realized[0]), 2)
         self.assertIsInstance(realized[0][0], note.Unpitched)
@@ -456,7 +456,7 @@ class Test(unittest.TestCase):
         self.assertEqual(mord.ornamentalPitches, tuple())
 
         mord = expressions.InvertedMordent()
-        realized = mord.realize(unp)  # type: ignore
+        realized = mord.realize(unp)
         self.assertEqual(len(realized), 3)
         self.assertEqual(len(realized[0]), 2)
         self.assertIsInstance(realized[0][0], note.Unpitched)

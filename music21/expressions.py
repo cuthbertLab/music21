@@ -44,6 +44,15 @@ if t.TYPE_CHECKING:
     from music21 import note
 
 
+def isUnison(intv: interval.IntervalBase) -> bool:
+    if isinstance(intv, interval.Interval):
+        return intv.name == 'P1' and intv.chromatic.semitones == 0
+    elif isinstance(intv, interval.DiatonicInterval):
+        return intv.name == 'P1'
+    elif isinstance(intv, interval.ChromaticInterval):
+        return intv.semitones == 0
+    return False
+
 def realizeOrnaments(
     srcObj: note.Note | note.Unpitched,
     *,
@@ -517,7 +526,7 @@ class Ornament(Expression):
         '''
         Used by trills and mordents to fill out their realization.
         '''
-        isTransposed: bool = transposeInterval != interval.Interval('P1')
+        isTransposed: bool = not isUnison(transposeInterval)
         if isTransposed and not hasattr(srcObj, 'transpose'):
             raise TypeError(f'Expected note; got {type(srcObj)}')
 
@@ -572,82 +581,7 @@ class Ornament(Expression):
         cautionaryNotImmediateRepeat: bool = True,
     ) -> None:
         '''
-        Updates accidental display for an Ornament's ornamental pitch(es).
-        Defined exactly like Pitch.updateAccidentalDisplay, with two changes:
-        Instead of self being the pitch to update, self is an ornament whose
-        ornamentalPitches are to be updated; and we pay no attention to ties,
-        since ornamental notes cannot be tied.
-
         Only implemented in Turn, GeneralMordent, and Trill.
-
-        These examples show a Trill whose main note is a G in a key with no sharps or
-        flats, so the trill's ornamental pitch is an A. We show various situations
-        where the A might or might not end up with a natural accidental.
-
-        If updateAccidentalDisplay is called with cautionaryAll, the A gets a (cautionary)
-        natural accidental.
-
-        >>> noSharpsOrFlats = key.KeySignature(0)
-        >>> trill1 = expressions.Trill()
-        >>> trill1.resolveOrnamentalPitches(note.Note('g4'), keySig=noSharpsOrFlats)
-        >>> trill1.ornamentalPitch
-        <music21.pitch.Pitch A4>
-        >>> trill1.ornamentalPitch.accidental is None
-        True
-        >>> past = [pitch.Pitch('a#4'), pitch.Pitch('c#4'), pitch.Pitch('c4')]
-        >>> trill1.updateAccidentalDisplay(pitchPast=past, cautionaryAll=True)
-        >>> trill1.ornamentalPitch.accidental, trill1.ornamentalPitch.accidental.displayStatus
-        (<music21.pitch.Accidental natural>, True)
-
-        If updateAccidentalDisplay is called without cautionaryAll, the A gets a natural
-        accidental, because a previous A had a sharp accidental.
-
-        >>> trill2 = expressions.Trill()
-        >>> trill2.resolveOrnamentalPitches(note.Note('g4'), keySig=noSharpsOrFlats)
-        >>> trill2.ornamentalPitch
-        <music21.pitch.Pitch A4>
-        >>> trill2.ornamentalPitch.accidental is None
-        True
-        >>> past = [pitch.Pitch('a#4'), pitch.Pitch('c#4'), pitch.Pitch('c4')]
-        >>> trill2.updateAccidentalDisplay(pitchPast=past)  # should add a natural
-        >>> trill2.ornamentalPitch.accidental, trill2.ornamentalPitch.accidental.displayStatus
-        (<music21.pitch.Accidental natural>, True)
-
-        If updateAccidentalDisplay is called with cautionaryPitchClass=False, the A does
-        not get a natural accidental because the previous A# was in a different octave.
-
-        >>> trill3 = expressions.Trill()
-        >>> trill3.resolveOrnamentalPitches(note.Note('g4'), keySig=noSharpsOrFlats)
-        >>> trill3.ornamentalPitch
-        <music21.pitch.Pitch A4>
-        >>> trill3.ornamentalPitch.accidental is None
-        True
-        >>> past = [pitch.Pitch('a#3'), pitch.Pitch('c#'), pitch.Pitch('c')]
-        >>> trill3.updateAccidentalDisplay(pitchPast=past, cautionaryPitchClass=False)
-        >>> trill3.ornamentalPitch.accidental is None
-        True
-
-        If we add a natural accidental to the trill (with displayStatus True), and then
-        updateAccidentalDisplay is called with cautionaryPitchClass=False, the A gets a
-        visible natural accidental because of that added natural accidental.
-
-        >>> trill4 = expressions.Trill()
-        >>> natural = pitch.Accidental('natural')
-        >>> natural.displayStatus = True
-        >>> trill4.accidental = natural
-        >>> trill4.resolveOrnamentalPitches(note.Note('g4'), keySig=noSharpsOrFlats)
-        >>> trill4.ornamentalPitch
-        <music21.pitch.Pitch A4>
-        >>> trill4.ornamentalPitch.accidental
-        <music21.pitch.Accidental natural>
-        >>> trill4.ornamentalPitch.accidental.displayStatus
-        True
-        >>> past = [pitch.Pitch('a#3'), pitch.Pitch('c#'), pitch.Pitch('c')]
-        >>> trill4.updateAccidentalDisplay(pitchPast=past, cautionaryPitchClass=False)
-        >>> trill4.ornamentalPitch.accidental
-        <music21.pitch.Accidental natural>
-        >>> trill4.ornamentalPitch.accidental.displayStatus
-        True
         '''
         return
 
@@ -734,10 +668,8 @@ class GeneralMordent(Ornament):
             # perfect unison
             return interval.Interval('P1')
 
-        if keySig is None:
-            keySig = srcObj.getContextByClass(key.KeySignature)
-            if keySig is None:
-                keySig = key.KeySignature(0)
+        # Use keySig if passed in, else use keySig from context, else no sharps or flats.
+        keySig = keySig or srcObj.getContextByClass(key.KeySignature) or key.KeySignature(0)
 
         srcPitch: pitch.Pitch = srcObj.pitches[-1]
 
@@ -862,6 +794,10 @@ class GeneralMordent(Ornament):
     ):
         '''
         Updates accidental display for a GeneralMordent's ornamental pitch.
+        Defined exactly like Pitch.updateAccidentalDisplay, with two changes:
+        Instead of self being the pitch to update, self is a GeneralMordent whose
+        ornamentalPitch is to be updated; and we pay no attention to ties,
+        since ornamental notes cannot be tied.
         '''
         p = self.ornamentalPitch
         if p is None:
@@ -939,7 +875,8 @@ class GeneralMordent(Ornament):
         mordNotes: list[note.Note | note.Unpitched] = []
         self.fillListOfRealizedNotes(srcObj, mordNotes, transposeInterval, useQL=use_ql)
 
-        if transposeInterval != interval.Interval('P1'):
+        isTransposed: bool = not isUnison(transposeInterval)
+        if isTransposed:
             # second (middle) note might need an accidental from the keysig (but
             # only if it doesn't already have an accidental, from self.accidental)
             for noteIdx, n in enumerate(mordNotes):
@@ -1353,10 +1290,8 @@ class Trill(Ornament):
             # perfect unison (e.g. snare drum "trill")
             return interval.Interval('P1')
 
-        if keySig is None:
-            keySig = srcObj.getContextByClass(key.KeySignature)
-            if keySig is None:
-                keySig = key.KeySignature(0)
+        # Use keySig if passed in, else use keySig from context, else no sharps or flats.
+        keySig = keySig or srcObj.getContextByClass(key.KeySignature) or key.KeySignature(0)
 
         srcPitch: pitch.Pitch = srcObj.pitches[-1]
 
@@ -1394,6 +1329,7 @@ class Trill(Ornament):
 
         e.g. A trill on a D in a key with no sharps or flats (ornamental pitch will be E).
 
+        >>> noSharpsOrFlats = key.KeySignature(0)
         >>> n2 = note.Note('D4')
         >>> trill = expressions.Trill()
         >>> trill.resolveOrnamentalPitches(n2, keySig=noSharpsOrFlats)
@@ -1460,6 +1396,79 @@ class Trill(Ornament):
     ):
         '''
         Updates accidental display for a Trill's ornamental pitch.
+        Defined exactly like Pitch.updateAccidentalDisplay, with two changes:
+        Instead of self being the pitch to update, self is an Trill whose
+        ornamentalPitch is to be updated; and we pay no attention to ties,
+        since ornamental notes cannot be tied.
+
+        These examples show a Trill whose main note is a G in a key with no sharps or
+        flats, so the trill's ornamental pitch is an A. We show various situations
+        where the A might or might not end up with a natural accidental.
+
+        If updateAccidentalDisplay is called with cautionaryAll, the A gets a (cautionary)
+        natural accidental.
+
+        >>> noSharpsOrFlats = key.KeySignature(0)
+        >>> trill1 = expressions.Trill()
+        >>> trill1.resolveOrnamentalPitches(note.Note('g4'), keySig=noSharpsOrFlats)
+        >>> trill1.ornamentalPitch
+        <music21.pitch.Pitch A4>
+        >>> trill1.ornamentalPitch.accidental is None
+        True
+        >>> past = [pitch.Pitch('a#4'), pitch.Pitch('c#4'), pitch.Pitch('c4')]
+        >>> trill1.updateAccidentalDisplay(pitchPast=past, cautionaryAll=True)
+        >>> trill1.ornamentalPitch.accidental, trill1.ornamentalPitch.accidental.displayStatus
+        (<music21.pitch.Accidental natural>, True)
+
+        If updateAccidentalDisplay is called without cautionaryAll, the A gets a natural
+        accidental, because a previous A had a sharp accidental.
+
+        >>> trill2 = expressions.Trill()
+        >>> trill2.resolveOrnamentalPitches(note.Note('g4'), keySig=noSharpsOrFlats)
+        >>> trill2.ornamentalPitch
+        <music21.pitch.Pitch A4>
+        >>> trill2.ornamentalPitch.accidental is None
+        True
+        >>> past = [pitch.Pitch('a#4'), pitch.Pitch('c#4'), pitch.Pitch('c4')]
+        >>> trill2.updateAccidentalDisplay(pitchPast=past)  # should add a natural
+        >>> trill2.ornamentalPitch.accidental, trill2.ornamentalPitch.accidental.displayStatus
+        (<music21.pitch.Accidental natural>, True)
+
+        If updateAccidentalDisplay is called with cautionaryPitchClass=False, the A does
+        not get a natural accidental because the previous A# was in a different octave.
+
+        >>> trill3 = expressions.Trill()
+        >>> trill3.resolveOrnamentalPitches(note.Note('g4'), keySig=noSharpsOrFlats)
+        >>> trill3.ornamentalPitch
+        <music21.pitch.Pitch A4>
+        >>> trill3.ornamentalPitch.accidental is None
+        True
+        >>> past = [pitch.Pitch('a#3'), pitch.Pitch('c#'), pitch.Pitch('c')]
+        >>> trill3.updateAccidentalDisplay(pitchPast=past, cautionaryPitchClass=False)
+        >>> trill3.ornamentalPitch.accidental is None
+        True
+
+        If we add a natural accidental to the trill (with displayStatus True), and then
+        updateAccidentalDisplay is called with cautionaryPitchClass=False, the A gets a
+        visible natural accidental because of that added natural accidental.
+
+        >>> trill4 = expressions.Trill()
+        >>> natural = pitch.Accidental('natural')
+        >>> natural.displayStatus = True
+        >>> trill4.accidental = natural
+        >>> trill4.resolveOrnamentalPitches(note.Note('g4'), keySig=noSharpsOrFlats)
+        >>> trill4.ornamentalPitch
+        <music21.pitch.Pitch A4>
+        >>> trill4.ornamentalPitch.accidental
+        <music21.pitch.Accidental natural>
+        >>> trill4.ornamentalPitch.accidental.displayStatus
+        True
+        >>> past = [pitch.Pitch('a#3'), pitch.Pitch('c#'), pitch.Pitch('c')]
+        >>> trill4.updateAccidentalDisplay(pitchPast=past, cautionaryPitchClass=False)
+        >>> trill4.ornamentalPitch.accidental
+        <music21.pitch.Accidental natural>
+        >>> trill4.ornamentalPitch.accidental.displayStatus
+        True
         '''
         p = self.ornamentalPitch
         if p is None:
@@ -1607,7 +1616,7 @@ class Trill(Ornament):
 
         transposeInterval = self.getSize(srcObj, keySig=currentKeySig)
         transposeIntervalReverse = transposeInterval.reverse()
-        isTransposed: bool = transposeInterval != interval.Interval('P1')
+        isTransposed: bool = not isUnison(transposeInterval)
 
         numberOfTrillNotes = int(srcObj.duration.quarterLength / useQL)
         if self.nachschlag:
@@ -1956,10 +1965,8 @@ class Turn(Ornament):
 
         srcPitch: pitch.Pitch = srcObj.pitches[-1]
 
-        if keySig is None:
-            keySig = srcObj.getContextByClass(key.KeySignature)
-            if keySig is None:
-                keySig = key.KeySignature(0)
+        # Use keySig if passed in, else use keySig from context, else no sharps or flats.
+        keySig = keySig or srcObj.getContextByClass(key.KeySignature) or key.KeySignature(0)
 
         ornamentalPitch: pitch.Pitch = copy.deepcopy(srcPitch)
         ornamentalPitch.accidental = None
@@ -2000,8 +2007,9 @@ class Turn(Ornament):
         lower ornamental pitch will be C).
 
         >>> twoFlats = key.KeySignature(sharps=-2)
+        >>> n1 = note.Note('D4')
         >>> turn = expressions.Turn()
-        >>> turn.resolveOrnamentalPitches(n2, keySig=twoFlats)
+        >>> turn.resolveOrnamentalPitches(n1, keySig=twoFlats)
         >>> turn.ornamentalPitches
         (<music21.pitch.Pitch E-4>, <music21.pitch.Pitch C4>)
         >>> turn.upperOrnamentalPitch
@@ -2013,11 +2021,12 @@ class Turn(Ornament):
         no sharps or flats (upper ornamental pitch will be D#, lower ornamental pitch
         will be B flat).
 
-        >>> n3 = note.Note('C4')
+        >>> noSharpsOrFlats = key.KeySignature(0)
+        >>> n2 = note.Note('C4')
         >>> turn = expressions.Turn(
         ...     upperAccidental=pitch.Accidental('sharp'),
         ...     lowerAccidental=pitch.Accidental('flat'))
-        >>> turn.resolveOrnamentalPitches(n3, keySig=noSharpsOrFlats)
+        >>> turn.resolveOrnamentalPitches(n2, keySig=noSharpsOrFlats)
         >>> turn.ornamentalPitches
         (<music21.pitch.Pitch D#4>, <music21.pitch.Pitch B-3>)
         >>> turn.upperOrnamentalPitch
@@ -2111,47 +2120,34 @@ class Turn(Ornament):
     ):
         '''
         Updates accidental display for a Turn's ornamental pitches (upper and lower).
+        Defined exactly like Pitch.updateAccidentalDisplay, with two changes:
+        Instead of self being the pitch to update, self is a Turn whose
+        ornamentalPitches are to be updated; and we pay no attention to ties,
+        since ornamental notes cannot be tied.
         '''
         if not self.ornamentalPitches:
             return
 
-        # upper ornamental pitch
-        p = self.upperOrnamentalPitch
-        if p is not None:
-            if self.upperAccidental is not None and self.upperAccidental.displayStatus is not None:
-                # force upper accidental visibility to be whatever self.upperAccidental's is
-                if p.accidental is None:
-                    p.accidental = pitch.Accidental(0)
-                p.accidental.displayStatus = self.upperAccidental.displayStatus
-            else:
-                p.updateAccidentalDisplay(
-                    pitchPast=pitchPast,
-                    pitchPastMeasure=pitchPastMeasure,
-                    alteredPitches=alteredPitches,
-                    cautionaryPitchClass=cautionaryPitchClass,
-                    cautionaryAll=cautionaryAll,
-                    overrideStatus=overrideStatus,
-                    cautionaryNotImmediateRepeat=cautionaryNotImmediateRepeat,
-                    lastNoteWasTied=False)
-
-        # lower ornamental pitch
-        p = self.lowerOrnamentalPitch
-        if p is not None:
-            if self.lowerAccidental is not None and self.lowerAccidental.displayStatus is not None:
-                # force lower accidental visibility to be whatever self.lowerAccidental's is
-                if p.accidental is None:
-                    p.accidental = pitch.Accidental(0)
-                p.accidental.displayStatus = self.lowerAccidental.displayStatus
-            else:
-                p.updateAccidentalDisplay(
-                    pitchPast=pitchPast,
-                    pitchPastMeasure=pitchPastMeasure,
-                    alteredPitches=alteredPitches,
-                    cautionaryPitchClass=cautionaryPitchClass,
-                    cautionaryAll=cautionaryAll,
-                    overrideStatus=overrideStatus,
-                    cautionaryNotImmediateRepeat=cautionaryNotImmediateRepeat,
-                    lastNoteWasTied=False)
+        for p, acc in (
+            (self.upperOrnamentalPitch, self.upperAccidental),
+            (self.lowerOrnamentalPitch, self.lowerAccidental)
+        ):
+            if p is not None:
+                if acc is not None and acc.displayStatus is not None:
+                    # force accidental visibility to be whatever acc's visibility is
+                    if p.accidental is None:
+                        p.accidental = pitch.Accidental(0)
+                    p.accidental.displayStatus = acc.displayStatus
+                else:
+                    p.updateAccidentalDisplay(
+                        pitchPast=pitchPast,
+                        pitchPastMeasure=pitchPastMeasure,
+                        alteredPitches=alteredPitches,
+                        cautionaryPitchClass=cautionaryPitchClass,
+                        cautionaryAll=cautionaryAll,
+                        overrideStatus=overrideStatus,
+                        cautionaryNotImmediateRepeat=cautionaryNotImmediateRepeat,
+                        lastNoteWasTied=False)
 
     def realize(
         self,
@@ -2302,8 +2298,7 @@ class Turn(Ornament):
             secondTransposeInterval = self.getSize(srcObj, 'upper', keySig=currentKeySig)
 
         # no need to check both intervals, they will both be perfectUnison, or neither will be.
-        isTransposed: bool = firstTransposeInterval != interval.Interval('P1')
-
+        isTransposed: bool = not isUnison(firstTransposeInterval)
         turnNotes: list[note.Note | note.Unpitched] = []
 
         firstNote = copy.deepcopy(srcObj)
@@ -2426,7 +2421,8 @@ class GeneralAppoggiatura(Ornament):
 
         appoggiaturaNote = copy.deepcopy(srcObj)
         appoggiaturaNote.duration.quarterLength = newDuration
-        if transposeInterval != interval.Interval('P1'):
+        isTransposed: bool = not isUnison(transposeInterval)
+        if isTranposed:
             if t.TYPE_CHECKING:
                 assert isinstance(appoggiaturaNote, note.Note)
             appoggiaturaNote.transpose(transposeInterval, inPlace=True)
