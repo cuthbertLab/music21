@@ -1746,6 +1746,11 @@ def makeOrnamentalAccidentals(
     overrideStatus: bool = False,
     cautionaryNotImmediateRepeat: bool = True,
 ):
+    '''
+        Makes accidentals for the ornamental pitches for any Ornaments on noteOrChord.
+        This is very similar to the processing in pitch.updateAccidentalDisplay, except
+        that there is no tie processing, since ornamental pitches cannot be tied.
+    '''
     for orn in noteOrChord.expressions:
         if not isinstance(orn, expressions.Ornament):
             continue
