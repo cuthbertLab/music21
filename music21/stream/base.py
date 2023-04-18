@@ -49,7 +49,6 @@ from music21 import derivation
 from music21 import duration
 from music21 import environment
 from music21 import exceptions21
-from music21 import expressions
 from music21 import interval
 from music21 import instrument
 from music21 import key
@@ -6682,39 +6681,6 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
             failOnNoTimeSignature=failOnNoTimeSignature,
         )
 
-    def makeOrnamentalAccidentals(
-        self,
-        noteOrChord: note.Note | chord.Chord,
-        *,
-        pitchPast: list[pitch.Pitch] | None = None,
-        pitchPastMeasure: list[pitch.Pitch] | None = None,
-        otherSimultaneousPitches: list[pitch.Pitch] | None = None,
-        alteredPitches: list[pitch.Pitch] | None = None,
-        cautionaryPitchClass: bool = True,
-        cautionaryAll: bool = False,
-        overrideStatus: bool = False,
-        cautionaryNotImmediateRepeat: bool = True,
-    ):
-        for orn in noteOrChord.expressions:
-            if not isinstance(orn, expressions.Ornament):
-                continue
-
-            orn.resolveOrnamentalPitches(noteOrChord)
-            if not orn.ornamentalPitches:
-                continue
-
-            orn.updateAccidentalDisplay(
-                pitchPast=pitchPast,
-                pitchPastMeasure=pitchPastMeasure,
-                alteredPitches=alteredPitches,
-                cautionaryPitchClass=cautionaryPitchClass,
-                cautionaryAll=cautionaryAll,
-                overrideStatus=overrideStatus,
-                cautionaryNotImmediateRepeat=cautionaryNotImmediateRepeat)
-
-            if pitchPast is not None:
-                pitchPast += orn.ornamentalPitches
-
     def makeAccidentals(
         self,
         *,
@@ -6865,7 +6831,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
                     tiePitchSet.add(e.pitch.nameWithOctave)
 
                 # handle this note's ornaments' ornamentalPitches
-                self.makeOrnamentalAccidentals(
+                makeNotation.makeOrnamentalAccidentals(
                     e,
                     pitchPast=pitchPast,
                     pitchPastMeasure=pitchPastMeasure,
@@ -6904,7 +6870,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
                         seenPitchNames.add(p.nameWithOctave)
 
                     # handle this note-in-chord's ornaments' ornamentalPitches
-                    self.makeOrnamentalAccidentals(
+                    makeNotation.makeOrnamentalAccidentals(
                         n,
                         pitchPast=pitchPast,
                         pitchPastMeasure=pitchPastMeasure,
@@ -6921,7 +6887,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
                 pitchPast += e.pitches
 
                 # handle this chord's ornaments' ornamentalPitches
-                self.makeOrnamentalAccidentals(
+                makeNotation.makeOrnamentalAccidentals(
                     e,
                     pitchPast=pitchPast,
                     pitchPastMeasure=pitchPastMeasure,
@@ -10130,7 +10096,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
 
         Note that this does not include any ornamental pitches implied
         by any ornaments on those Notes and Chords.  To get those, use
-        the ornamentalPitches property.
+        the makeNotation.ornamentalPitches(s) method.
 
         Pitch objects are returned in a List, not a Stream.  This usage
         differs from the .notes property, but makes sense since Pitch
@@ -10186,31 +10152,6 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
             # causes a recursive pitch gathering
             elif isinstance(e, (note.GeneralNote, Stream)):
                 post.extend(list(e.pitches))
-        return post
-
-    @property
-    def ornamentalPitches(self) -> list[pitch.Pitch]:
-        '''
-        Returns all ornamental :class:`~music21.pitch.Pitch` objects found in any
-        ornaments in notes/chords in the stream (and substreams) as a Python list.
-
-        Very much like the pitches property, except that instead of returning all
-        the pitches found in notes and chords, it only returns the ornamental pitches
-        found in the ornaments on the notes and chords.
-
-        If you want a list of _all_ the pitches in a stream, including the ornamental
-        pitches, you can call .pitches and .ornamentalPitches, combining the two
-        resulting lists into one big list.
-        '''
-        post = []
-        for e in self.elements:
-            if isinstance(e, Stream):
-                # recurse
-                post.extend(e.ornamentalPitches)
-            elif hasattr(e, 'expressions'):
-                for orn in e.expressions:
-                    if isinstance(orn, expressions.Ornament):
-                        post.extend(orn.ornamentalPitches)
         return post
 
     # --------------------------------------------------------------------------

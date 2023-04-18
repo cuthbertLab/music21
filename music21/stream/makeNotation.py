@@ -26,6 +26,7 @@ from music21 import chord
 from music21 import defaults
 from music21 import duration
 from music21 import environment
+from music21 import expressions
 from music21 import key
 from music21 import meter
 from music21 import note
@@ -1665,7 +1666,7 @@ def makeAccidentalsInMeasureStream(
         if i > 0:
             if m.keySignature is None:
                 pitchPastMeasure = (
-                    measuresOnly[i - 1].pitches + measuresOnly[i - 1].ornamentalPitches
+                    measuresOnly[i - 1].pitches + ornamentalPitches(measuresOnly[i - 1])
                 )
             elif ksLast:
                 # If there is any key signature object to the left,
@@ -1673,7 +1674,7 @@ def makeAccidentalsInMeasureStream(
                 # G-naturals in C major following G-flats in F major need cautionary
                 # G-naturals in C major following G-flats in Db major don't
                 pitchPastMeasure = [p for p in
-                    measuresOnly[i - 1].pitches + measuresOnly[i - 1].ornamentalPitches
+                    measuresOnly[i - 1].pitches + ornamentalPitches(measuresOnly[i - 1])
                     if p.name not in ksLastDiatonic]
             # Get tiePitchSet from previous measure
             try:
@@ -1707,6 +1708,63 @@ def makeAccidentalsInMeasureStream(
         )
     if isinstance(s, Stream):
         s.streamStatus.accidentals = True
+
+def ornamentalPitches(s: StreamType) -> list[pitch.Pitch]:
+    '''
+    Returns all ornamental :class:`~music21.pitch.Pitch` objects found in any
+    ornaments in notes/chords in the stream (and substreams) as a Python list.
+
+    Very much like the pitches property, except that instead of returning all
+    the pitches found in notes and chords, it returns the ornamental pitches
+    found in the ornaments on the notes and chords.
+
+    If you want a list of _all_ the pitches in a stream, including the ornamental
+    pitches, you can call s.pitches and makeNotation.ornamentalPitches(s),
+    and then combine the two resulting lists into one big list.
+    '''
+    from music21.stream import Stream
+    post = []
+    for e in s.elements:
+        if isinstance(e, Stream):
+            # recurse
+            post.extend(ornamentalPitches(e))
+        elif hasattr(e, 'expressions'):
+            for orn in e.expressions:
+                if isinstance(orn, expressions.Ornament):
+                    post.extend(orn.ornamentalPitches)
+    return post
+
+def makeOrnamentalAccidentals(
+    noteOrChord: note.Note | chord.Chord,
+    *,
+    pitchPast: list[pitch.Pitch] | None = None,
+    pitchPastMeasure: list[pitch.Pitch] | None = None,
+    otherSimultaneousPitches: list[pitch.Pitch] | None = None,
+    alteredPitches: list[pitch.Pitch] | None = None,
+    cautionaryPitchClass: bool = True,
+    cautionaryAll: bool = False,
+    overrideStatus: bool = False,
+    cautionaryNotImmediateRepeat: bool = True,
+):
+    for orn in noteOrChord.expressions:
+        if not isinstance(orn, expressions.Ornament):
+            continue
+
+        orn.resolveOrnamentalPitches(noteOrChord)
+        if not orn.ornamentalPitches:
+            continue
+
+        orn.updateAccidentalDisplay(
+            pitchPast=pitchPast,
+            pitchPastMeasure=pitchPastMeasure,
+            alteredPitches=alteredPitches,
+            cautionaryPitchClass=cautionaryPitchClass,
+            cautionaryAll=cautionaryAll,
+            overrideStatus=overrideStatus,
+            cautionaryNotImmediateRepeat=cautionaryNotImmediateRepeat)
+
+        if pitchPast is not None:
+            pitchPast += orn.ornamentalPitches
 
 def iterateBeamGroups(
     s: StreamType,
