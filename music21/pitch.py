@@ -4564,7 +4564,9 @@ class Pitch(prebase.ProtoM21Object):
 
         Test an issue with inPlace not setting microtone.
 
-        >>> dFlatAndAHalf = pitch.Pitch('D2-`')
+        >>> flatAndAHalf = pitch.Accidental('one-and-a-half-flat')
+        >>> dFlatAndAHalf = pitch.Pitch('D2')
+        >>> dFlatAndAHalf.accidental = flatAndAHalf
         >>> dPitch = pitch.Pitch('D2')
         >>> intv = interval.Interval(dFlatAndAHalf, dPitch)
         >>> dPitch.transpose(intv, inPlace=True)
