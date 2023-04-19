@@ -3788,12 +3788,19 @@ class MeasureParser(XMLParserBase):
                         self.spannerBundle.append(arpeggioSpanner)
                     arpeggioSpanner.addSpannedElements(n)
 
+        mostRecentOrnament: expressions.Ornament | None = None
         for mxObj in flatten(mxNotations, 'ornaments'):
-            if mxObj.tag in xmlObjects.ORNAMENT_MARKS:
-                post = self.xmlOrnamentToExpression(mxObj)
+            if mxObj.tag in xmlObjects.ORNAMENT_MARKS or mxObj.tag == 'accidental-mark':
+                post = self.xmlOrnamentToExpression(
+                    mxObj, mostRecentOrnament=mostRecentOrnament
+                )
+                if mostRecentOrnament is not None and mxObj.tag == 'accidental-mark':
+                    # Resolve any ornamental pitch for that accidental-mark.
+                    mostRecentOrnament.resolveOrnamentalPitches(n)
                 optionalHideObject(post)
                 self.setEditorial(mxNotations, post)
                 if post is not None:
+                    mostRecentOrnament = post
                     n.expressions.append(post)
                 # environLocal.printDebug(['adding to expressions', post])
             elif mxObj.tag == 'wavy-line':
@@ -3986,14 +3993,21 @@ class MeasureParser(XMLParserBase):
             environLocal.printDebug(f'Cannot translate {tag} in {mxObj}.')
             return None
 
-    def xmlOrnamentToExpression(self, mxObj):
+    def xmlOrnamentToExpression(
+        self,
+        mxObj,
+        *,
+        mostRecentOrnament: expressions.Ornament | None = None
+    ):
         '''
         Convert mxOrnament into a music21 ornament.
 
         This only processes non-spanner ornaments.
         Many mxOrnaments are spanners: these are handled elsewhere.
 
-        Returns None if it cannot be converted or is not defined.
+        Returns None if it cannot be converted or is not defined, or if the
+        mxObj is an accidental-mark (in which case the accidental is placed
+        in the mostRecentOrnament instead).
 
         Return an articulation from an mxObj, setting placement
 
@@ -4016,9 +4030,44 @@ class MeasureParser(XMLParserBase):
         >>> a is None
         True
 
-        Not supported currently: 'accidental-mark', 'vertical-turn'
+        If it is 'accidental-mark', add to mostRecentOrnament, and return None
+
+        >>> turn = expressions.Turn()
+        >>> turn.lowerAccidental is None
+        True
+        >>> turn.upperAccidental is None
+        True
+        >>> mxOrn = EL('<accidental-mark placement="below">flat</accidental-mark>')
+        >>> a = MP.xmlOrnamentToExpression(mxOrn, mostRecentOrnament=turn)
+        >>> a is None
+        True
+        >>> turn.lowerAccidental
+        <music21.pitch.Accidental flat>
+        >>> turn.upperAccidental is None
+        True
+
+        Not supported currently: 'vertical-turn'
         '''
         tag = mxObj.tag
+        if tag == 'accidental-mark':
+            if mostRecentOrnament is None:
+                return None
+
+            accid: pitch.Accidental = self.xmlToAccidental(mxObj)
+            accid.displayStatus = True
+
+            if isinstance(mostRecentOrnament, expressions.Turn):
+                # upperAccidentalName or lowerAccidentalName?
+                # Look at placement (default to 'above').
+                placement: str = mxObj.get('placement', 'above')
+                if placement == 'below':
+                    mostRecentOrnament.lowerAccidental = accid
+                else:
+                    mostRecentOrnament.upperAccidental = accid
+            elif isinstance(mostRecentOrnament, (expressions.GeneralMordent, expressions.Trill)):
+                mostRecentOrnament.accidental = accid
+            return None
+
         try:
             if tag in ('delayed-turn', 'delayed-inverted-turn'):
                 orn = xmlObjects.ORNAMENT_MARKS[tag](delay=OrnamentDelay.DEFAULT_DELAY)

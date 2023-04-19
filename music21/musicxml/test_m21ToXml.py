@@ -479,6 +479,15 @@ class Test(unittest.TestCase):
         mxMidiInstrument = tree.findall('.//midi-instrument')[0]
         self.assertEqual(mxScoreInstrument.get('id'), mxMidiInstrument.get('id'))
 
+    def testOrnamentAccidentals(self):
+        s = converter.parse(testPrimitive.notations32a)
+        x = self.getET(s)
+        accidentalMarks = x.findall('.//ornaments/accidental-mark')
+        self.assertEqual(
+            [accMark.text for accMark in accidentalMarks],
+            ['natural', 'sharp', 'three-quarters-flat']
+        )
+
     def testMultiDigitEndingsWrite(self):
         # Relevant barlines:
         # Measure 2, left barline: <ending number="1,2" type="start"/>

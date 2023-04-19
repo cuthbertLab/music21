@@ -1344,10 +1344,9 @@ class XMLExporterBase:
         if mxStaffLayoutIn is None:
             return mxStaffLayout
 
-    def accidentalToMx(self, a):
-        # noinspection PyShadowingNames
+    def accidentalToMx(self, a: pitch.Accidental, *, elName: str = 'accidental') -> Element:
         '''
-        Convert a pitch.Accidental object to a Element of tag accidental
+        Convert a pitch.Accidental object to a Element of tag 'accidental' (or other name)
 
         >>> a = pitch.Accidental()
         >>> a.set('half-sharp')
@@ -1365,8 +1364,8 @@ class XMLExporterBase:
 
 
         >>> a.set('one-and-a-half-sharp')
-        >>> XB.dump(a2m(a))
-        <accidental>three-quarters-sharp</accidental>
+        >>> XB.dump(a2m(a, elName='accidental-mark'))
+        <accidental-mark>three-quarters-sharp</accidental-mark>
 
         >>> a.set('half-flat')
         >>> XB.dump(a2m(a))
@@ -1403,6 +1402,7 @@ class XMLExporterBase:
         >>> XB.dump(a2m(a))
         <accidental>other</accidental>
         '''
+        # noinspection PyShadowingNames
         otherMusicXMLAccidentals = (
             # v. 3.1
             'double-sharp-down', 'double-sharp-up',
@@ -1439,7 +1439,7 @@ class XMLExporterBase:
                     and mxName not in otherMusicXMLAccidentals):
                 mxName = 'other'
 
-        mxAccidental = Element('accidental')
+        mxAccidental = Element(elName)
         # need to remove display in this case and return None
         #         if self.displayStatus == False:
         #             pass
@@ -1451,6 +1451,10 @@ class XMLExporterBase:
 
         self.setPrintStyle(mxAccidental, a)
         return mxAccidental
+
+
+    def accidentalToMxAccidentalMark(self, a: pitch.Accidental) -> Element:
+        return self.accidentalToMx(a, elName='accidental-mark')
 
 
 # ---------
@@ -4861,6 +4865,39 @@ class MeasureExporter(XMLExporterBase):
             mxExpression = self.expressionToXml(arpeggioMark)
         return mxExpression
 
+    def ornamentToMxAccidentalMarks(self, ornamentObj: expressions.Ornament) -> list[Element]:
+        mxAccidentalMarks: list[Element] = []
+
+        if isinstance(ornamentObj, expressions.Turn):
+            # 0, 1, or 2 accidental marks
+            if (ornamentObj.upperOrnamentalPitch
+                    and ornamentObj.upperOrnamentalPitch.accidental
+                    and ornamentObj.upperOrnamentalPitch.accidental.displayStatus is True):
+                mxAccidentalMarks.append(
+                    self.accidentalToMxAccidentalMark(ornamentObj.upperOrnamentalPitch.accidental)
+                )
+                mxAccidentalMarks[-1].set('placement', 'above')
+            if (ornamentObj.lowerOrnamentalPitch
+                    and ornamentObj.lowerOrnamentalPitch.accidental
+                    and ornamentObj.lowerOrnamentalPitch.accidental.displayStatus is True):
+                mxAccidentalMarks.append(
+                    self.accidentalToMxAccidentalMark(ornamentObj.lowerOrnamentalPitch.accidental)
+                )
+                mxAccidentalMarks[-1].set('placement', 'below')
+        elif isinstance(ornamentObj, (expressions.GeneralMordent, expressions.Trill)):
+            # 0 or 1 accidental marks
+            if (ornamentObj.ornamentalPitch
+                    and ornamentObj.ornamentalPitch.accidental
+                    and ornamentObj.ornamentalPitch.accidental.displayStatus is True):
+                mxAccidentalMarks.append(
+                    self.accidentalToMxAccidentalMark(ornamentObj.ornamentalPitch.accidental)
+                )
+                if ornamentObj.direction == 'down':
+                    mxAccidentalMarks[-1].set('placement', 'below')
+                else:
+                    mxAccidentalMarks[-1].set('placement', 'above')
+
+        return mxAccidentalMarks
 
     def noteToNotations(self, n, noteIndexInChord=0, chordParent=None):
         '''
@@ -4903,6 +4940,12 @@ class MeasureExporter(XMLExporterBase):
                     if mxOrnaments is None:
                         mxOrnaments = Element('ornaments')
                     mxOrnaments.append(mxExpression)
+
+                    mxAccidMarks: list[Element] = (
+                        self.ornamentToMxAccidentalMarks(expObj)
+                    )
+                    for mxAccidMark in mxAccidMarks:
+                        mxOrnaments.append(mxAccidMark)
                     # print(mxExpression)
                 else:
                     notations.append(mxExpression)
@@ -4978,7 +5021,7 @@ class MeasureExporter(XMLExporterBase):
                 notations.append(x)
 
         # TODO: dynamics in notations
-        # TODO: accidental-mark
+        # TODO: accidental-mark (Notations; we've done Ornaments)
         # TODO: other-notation
         return notations
 
@@ -5289,7 +5332,6 @@ class MeasureExporter(XMLExporterBase):
                 ('Mordent', 'mordent'),
                 ('Shake', 'shake'),
                 ('Schleifer', 'schleifer'),
-                # TODO: 'accidental-mark'
                 ('Tremolo', 'tremolo'),  # non-spanner
                 # non-ornaments...
                 ('Fermata', 'fermata'),
