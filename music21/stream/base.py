@@ -7342,7 +7342,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
                     return False
 
                 for pitchIndex in range(len(nLast.pitches)):
-                    if nLast.pitches[pitchIndex] != nInner.pitches[pitchIndex]:
+                    if nLast.pitches[pitchIndex].midi != nInner.pitches[pitchIndex].midi:
                         return False
                 return True
 
