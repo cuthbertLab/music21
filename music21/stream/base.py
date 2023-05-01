@@ -25,6 +25,7 @@ from collections import deque, namedtuple, OrderedDict
 from collections.abc import Collection, Iterable, Sequence
 import copy
 from fractions import Fraction
+import heapq
 import itertools
 import math
 from math import isclose
@@ -9395,8 +9396,13 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         # this presently is not trying to avoid overlaps that
         # result from quantization; this may be necessary
 
-        def bestMatch(target, divisors, zeroAllowed=True, gapToFill=0.0):
-            found = []
+        def bestMatch(
+            target, 
+            divisors, 
+            zeroAllowed=True, 
+            gapToFill=0.0
+        ) -> BestQuantizationMatch:
+            found: list[BestQuantizationMatch] = []
             for div in divisors:
                 tick = 1 / div  # divisor expressed as QL, e.g. 0.25
                 match, error, signedErrorInner = common.nearestMultiple(target, tick)
@@ -9412,8 +9418,8 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
                 found.append(
                     BestQuantizationMatch(
                         remainingGap, error, tick, match, signedErrorInner, div))
-            # get first, and leave out the error
-            bestMatchTuple = sorted(found)[0]
+            # get smallest remainingGap, error, tick
+            bestMatchTuple = min(found)
             return bestMatchTuple
 
         def findNextElementNotCoincident(
