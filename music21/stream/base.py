@@ -86,7 +86,7 @@ RecursiveLyricList = note.Lyric | None | list['RecursiveLyricList']
 
 BestQuantizationMatch = namedtuple(
     'BestQuantizationMatch',
-    ['error', 'tick', 'match', 'signedError', 'divisor']
+    ['remainingGap', 'error', 'tick', 'match', 'signedError', 'divisor']
 )
 
 class StreamDeprecationWarning(UserWarning):
@@ -9395,18 +9395,43 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         # this presently is not trying to avoid overlaps that
         # result from quantization; this may be necessary
 
-        def bestMatch(target, divisors):
-            found = []
+        def bestMatch(
+            target,
+            divisors,
+            zeroAllowed=True,
+            gapToFill=0.0
+        ) -> BestQuantizationMatch:
+            found: list[BestQuantizationMatch] = []
             for div in divisors:
-                match, error, signedErrorInner = common.nearestMultiple(target, (1 / div))
-                # Sort by unsigned error, then "tick" (divisor expressed as QL, e.g. 0.25)
-                found.append(BestQuantizationMatch(error, 1 / div, match, signedErrorInner, div))
-            # get first, and leave out the error
-            bestMatchTuple = sorted(found)[0]
+                tick = 1 / div  # divisor expressed as QL, e.g. 0.25
+                match, error, signedErrorInner = common.nearestMultiple(target, tick)
+                if not zeroAllowed and match == 0.0:
+                    match = tick
+                    signedErrorInner = round(target - match, 7)
+                    error = abs(signedErrorInner)
+                if gapToFill % tick == 0:
+                    remainingGap = 0.0
+                else:
+                    remainingGap = max(gapToFill - match, 0.0)
+                # Sort by remainingGap, then unsigned error, then tick
+                found.append(
+                    BestQuantizationMatch(
+                        remainingGap, error, tick, match, signedErrorInner, div))
+            # get smallest remainingGap, error, tick
+            bestMatchTuple = min(found)
             return bestMatchTuple
 
-        # if we have a min of 0.25 (sixteenth)
-        # quarterLengthMin = quarterLengthDivisors[0]
+        def findNextElementNotCoincident(
+            useStream: Stream,
+            startIndex: int,
+            startOffset: OffsetQL,
+        ) -> tuple[base.Music21Object | None, BestQuantizationMatch | None]:
+            for next_el in useStream._elements[startIndex:]:
+                next_offset = useStream.elementOffset(next_el)
+                look_ahead_result = bestMatch(float(next_offset), quarterLengthDivisors)
+                if look_ahead_result.match > startOffset:
+                    return next_el, look_ahead_result
+            return None, None
 
         if inPlace is False:
             returnStream = self.coreCopyAsDerivation('quantize')
@@ -9419,6 +9444,11 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
 
         rests_lacking_durations: list[note.Rest] = []
         for useStream in useStreams:
+            # coreSetElementOffset() will immediately set isSorted = False,
+            # but we need to know if the stream was originally sorted to know
+            # if it's worth "looking ahead" to the next offset. If a stream
+            # is unsorted originally, this "looking ahead" could become O(n^2).
+            originallySorted = useStream.isSorted
             for i, e in enumerate(useStream._elements):
                 if processOffsets:
                     o = useStream.elementOffset(e)
@@ -9427,35 +9457,27 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
                         sign = -1
                         o = -1 * o
                     o_matchTuple = bestMatch(float(o), quarterLengthDivisors)
-                    useStream.coreSetElementOffset(e, o_matchTuple.match * sign)
+                    o = o_matchTuple.match * sign
+                    useStream.coreSetElementOffset(e, o)
                     if hasattr(e, 'editorial') and o_matchTuple.signedError != 0:
                         e.editorial.offsetQuantizationError = o_matchTuple.signedError * sign
                 if processDurations:
                     ql = e.duration.quarterLength
                     ql = max(ql, 0)  # negative ql possible in buggy MIDI files?
-                    d_matchTuple = bestMatch(float(ql), quarterLengthDivisors)
-                    # Check that any gaps from this quantized duration to the next onset
-                    # are at least as large as the smallest quantization unit (the largest divisor)
-                    # If not, then re-quantize this duration with the divisor
-                    # that will be used to quantize the next element's offset
-                    if processOffsets and i + 1 < len(useStream._elements):
-                        next_element = useStream._elements[i + 1]
-                        next_offset = useStream.elementOffset(next_element)
-                        look_ahead_result = bestMatch(float(next_offset), quarterLengthDivisors)
-                        next_offset = look_ahead_result.match
-                        next_divisor = look_ahead_result.divisor
-                        if (0 < next_offset - (e.offset + d_matchTuple.match)
-                                < 1 / max(quarterLengthDivisors)):
-                            # Overwrite the earlier matchTuple with a better result
-                            d_matchTuple = bestMatch(float(ql), (next_divisor,))
-                    # Enforce nonzero duration for non-grace notes
-                    if (d_matchTuple.match == 0
-                            and isinstance(e, note.NotRest)
-                            and not e.duration.isGrace):
-                        e.quarterLength = 1 / max(quarterLengthDivisors)
-                        if hasattr(e, 'editorial'):
-                            e.editorial.quarterLengthQuantizationError = ql - e.quarterLength
-                    elif d_matchTuple.match == 0 and isinstance(e, note.Rest):
+                    zeroAllowed = not isinstance(e, note.NotRest) or e.duration.isGrace
+                    if processOffsets and originallySorted:
+                        next_element, look_ahead_result = (
+                            findNextElementNotCoincident(
+                                useStream=useStream, startIndex=i + 1, startOffset=o))
+                        if next_element is not None and look_ahead_result is not None:
+                            gapToFill = opFrac(look_ahead_result.match - e.offset)
+                            d_matchTuple = bestMatch(
+                                float(ql), quarterLengthDivisors, zeroAllowed, gapToFill)
+                        else:
+                            d_matchTuple = bestMatch(float(ql), quarterLengthDivisors, zeroAllowed)
+                    else:
+                        d_matchTuple = bestMatch(float(ql), quarterLengthDivisors, zeroAllowed)
+                    if d_matchTuple.match == 0 and isinstance(e, note.Rest):
                         rests_lacking_durations.append(e)
                     else:
                         e.duration.quarterLength = d_matchTuple.match
