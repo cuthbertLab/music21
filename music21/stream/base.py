@@ -25,7 +25,6 @@ from collections import deque, namedtuple, OrderedDict
 from collections.abc import Collection, Iterable, Sequence
 import copy
 from fractions import Fraction
-import heapq
 import itertools
 import math
 from math import isclose
