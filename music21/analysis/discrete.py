@@ -35,6 +35,7 @@ from music21 import harmony
 from music21 import interval
 from music21 import note
 from music21 import key
+from music21 import percussion
 from music21 import pitch
 
 if t.TYPE_CHECKING:
@@ -367,11 +368,9 @@ class KeyWeightKeyAnalysis(DiscreteAnalysis):
 
         for n in streamObj.notes:
             length = n.quarterLength
-            if n.isChord:
-                for m in n.pitchClasses:
-                    pcDist[m] += length
-            else:
-                pcDist[n.pitch.pitchClass] += length
+            for p in n.pitches:
+                pcDist[p.pitchClass] += length
+
         return pcDist
 
     # noinspection SpellCheckingInspection
@@ -620,7 +619,7 @@ class KeyWeightKeyAnalysis(DiscreteAnalysis):
         The data list contains a key (as a string), a mode
         (as a string), and a correlation value (degree of certainty)
         '''
-        sStream = sStream.flatten().notesAndRests
+        sStream = sStream.flatten().notesAndRests.getElementsNotOfClass(note.Unpitched)
         # this is the sample distribution used in the paper, for some testing purposes
         # pcDistribution = [7, 0, 5, 0, 7, 16, 0, 16, 0, 15, 6, 0]
 
@@ -1582,6 +1581,19 @@ class Test(unittest.TestCase):
         k = s2.analyze('key')
         # Ensure all pitch classes are present
         self.assertEqual(len(k.alternateInterpretations), 23)
+
+    def testKeyAnalysisIgnoresUnpitched(self):
+        from music21 import stream
+        s = stream.Stream()
+        s.append(note.Unpitched())
+        s.append(percussion.PercussionChord([
+            note.Unpitched(),
+            note.Note('E-4'),
+            note.Note('B-4'),
+        ]))
+
+        k = s.analyze('key')
+        self.assertEqual(k.name, 'E- major')
 
 
 # define presented order in documentation
