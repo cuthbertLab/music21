@@ -9396,9 +9396,9 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         # result from quantization; this may be necessary
 
         def bestMatch(
-            target, 
-            divisors, 
-            zeroAllowed=True, 
+            target,
+            divisors,
+            zeroAllowed=True,
             gapToFill=0.0
         ) -> BestQuantizationMatch:
             found: list[BestQuantizationMatch] = []
