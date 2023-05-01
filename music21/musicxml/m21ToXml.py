@@ -3103,8 +3103,11 @@ class PartExporter(XMLExporterBase):
         mxMidiInstrument = Element('midi-instrument')
         mxMidiInstrument.set('id', str(i.instrumentId))
         if i.midiChannel is None:
-            i.autoAssignMidiChannel()
-            # TODO: allocate channels from a higher level
+            try:
+                i.autoAssignMidiChannel(self.midiChannelList)
+            except exceptions21.InstrumentException:
+                # warning will bubble up.
+                i.midiChannel = 0
         mxMidiChannel = SubElement(mxMidiInstrument, 'midi-channel')
         mxMidiChannel.text = str(i.midiChannel + 1)
         # TODO: midi-name
@@ -3987,7 +3990,6 @@ class MeasureExporter(XMLExporterBase):
         >>> len(MEX.xmlRoot)
         1
 
-
         >>> r = note.Rest()
         >>> r.quarterLength = 1/3
         >>> r.duration.tuplets[0].type = 'start'
@@ -4039,7 +4041,6 @@ class MeasureExporter(XMLExporterBase):
         Try exporting with makeNotation=True or manually running splitAtDurations()
 
         TODO: Test with spanners...
-
         '''
         addChordTag = (noteIndexInChord != 0)
         setb = _setAttributeFromAttribute
@@ -4256,7 +4257,10 @@ class MeasureExporter(XMLExporterBase):
             return
 
         searchingObject: note.NotRest | chord.Chord = chordParent if chordParent else n
-        closest_inst = searchingObject.getInstrument(returnDefault=True)
+        closest_inst_or_none = searchingObject.getInstrument()
+        if closest_inst_or_none is None:
+            return  # no instrument, so no need to add anything
+        closest_inst: instrument.Instrument = closest_inst_or_none
 
         instance_to_use = None
         inst: instrument.Instrument
@@ -4268,7 +4272,7 @@ class MeasureExporter(XMLExporterBase):
         if instance_to_use is None:
             # exempt coverage, because this is only for safety/unreachable
             raise MusicXMLExportException(
-                f'Could not find instrument instance for note {n} in instrumentStream'
+                f'Instrument instance {closest_inst} for note {n} not found in instrumentStream'
             )  # pragma: no cover
         mxInstrument = SubElement(mxNote, 'instrument')
         if instance_to_use.instrumentId is not None:

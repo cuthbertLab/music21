@@ -237,25 +237,16 @@ class Instrument(base.Music21Object):
         self.instrumentId = idNew
         self._instrumentIdIsRandom = True
 
-    # the empty list as default is actually CORRECT!
-    # noinspection PyDefaultArgument
-
-    def autoAssignMidiChannel(self, usedChannels=[]):  # pylint: disable=dangerous-default-value
+    def autoAssignMidiChannel(self, usedChannels: list[int], maxMidi=16):
         '''
         Assign an unused midi channel given a list of
-        used channels.
+        used channels.  Music21 uses 0-indexed MIDI channels.
 
         assigns the number to self.midiChannel and returns
         it as an int.
 
         Note that midi channel 10 (9 in music21) is special, and
         thus is skipped.
-
-        Currently only 16 channels are used.
-
-        Note that the reused "usedChannels=[]" in the
-        signature is NOT a mistake, but necessary for
-        the case where there needs to be a global list.
 
         >>> used = [0, 1, 2, 3, 4, 5, 6, 7, 8, 10, 11]
         >>> i = instrument.Violin()
@@ -280,27 +271,31 @@ class Instrument(base.Music21Object):
         >>> i.midiChannel
         11
 
-        OMIT_FROM_DOCS
+        If all 16 channels are used, an exception is raised:
 
         >>> used2 = range(16)
         >>> i = instrument.Instrument()
         >>> i.autoAssignMidiChannel(used2)
         Traceback (most recent call last):
         music21.exceptions21.InstrumentException: we are out of midi channels! help!
+
+        Get around this by assinging higher channels:
+
+        >>> i.autoAssignMidiChannel(used2, maxMidi=32)
+        >>> i.midiChannel
+        16
+
+        Changed in v.9 -- usedChannelList is required, add maxMidi as an optional parameter.
         '''
         # NOTE: this is used in musicxml output, not in midi output
-        maxMidi = 16
-        channelFilter = []
-        for e in usedChannels:
-            if e is not None:
-                channelFilter.append(e)
+        channelFilter = set(usedChannels)
 
         if not channelFilter:
             self.midiChannel = 0
             return self.midiChannel
         elif len(channelFilter) >= maxMidi:
             raise InstrumentException('we are out of midi channels! help!')
-        elif 'UnpitchedPercussion' in self.classes and 9 not in usedChannels:
+        elif 'UnpitchedPercussion' in self.classes:
             self.midiChannel = 9
             return self.midiChannel
         else:

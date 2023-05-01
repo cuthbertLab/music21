@@ -1275,24 +1275,32 @@ class NotRest(GeneralNote):
     def volume(self, value: None | volume.Volume | int | float):
         self._setVolume(value)
 
-    def _getStoredInstrument(self):
-        return self._storedInstrument
-
-    def _setStoredInstrument(self, newValue):
-        if not (hasattr(newValue, 'instrumentId') or newValue is None):
-            raise TypeError(f'Expected Instrument; got {type(newValue)}')
-        self._storedInstrument = newValue
-
-    storedInstrument = property(_getStoredInstrument,
-                                _setStoredInstrument,
-                                doc='''
-        Get and set the :class:`~music21.instrument.Instrument` that
+    @property
+    def storedInstrument(self) -> instrument.Instrument | None:
+        '''
+        Get or set the :class:`~music21.instrument.Instrument` that
         should be used to play this note, overriding whatever
         Instrument object may be active in the Stream. (See
         :meth:`getInstrument` for a means of retrieving `storedInstrument`
         if available before falling back to a context search to find
         the active instrument.)
-        ''')
+
+        >>> snare = note.Unpitched()
+        >>> snare.storedInstrument = instrument.SnareDrum()
+        >>> snare.storedInstrument
+        <music21.instrument.SnareDrum 'Snare Drum'>
+        >>> snare
+        <music21.note.Unpitched 'Snare Drum'>
+        '''
+        return self._storedInstrument
+
+    @storedInstrument.setter
+    def storedInstrument(self, newValue: instrument.Instrument | None):
+        if (newValue is not None
+                and (not hasattr(newValue, 'classSet')
+                     or 'music21.instrument.Instrument' not in newValue.classSet)):
+            raise TypeError(f'Expected Instrument; got {type(newValue)}')
+        self._storedInstrument = newValue
 
     @overload
     def getInstrument(self,
@@ -1809,9 +1817,30 @@ class Unpitched(NotRest):
     >>> unp.pitch
     Traceback (most recent call last):
     AttributeError: 'Unpitched' object has no attribute 'pitch'
+
+    Unpitched elements generally have an instrument object associated with them:
+
+    >>> unp.storedInstrument = instrument.Woodblock()
+    >>> unp
+    <music21.note.Unpitched 'Woodblock'>
+
+    Two unpitched objects compare the same if their instrument and displayStep and
+    displayOctave are equal (and satisfy all the equality requirements of
+    their base classes):
+
+    >>> unp2 = note.Unpitched()
+    >>> unp == unp2
+    False
+    >>> unp2.displayStep = 'G'
+    >>> unp2.storedInstrument = instrument.Woodblock()
+    >>> unp == unp2
+    True
+    >>> unp2.storedInstrument = instrument.Triangle()
+    >>> unp == unp2
+    False
     '''
 
-    equalityAttributes = ('displayStep', 'displayOctave')
+    equalityAttributes = ('displayStep', 'displayOctave', 'storedInstrument')
 
     def __init__(
         self,
@@ -1828,13 +1857,11 @@ class Unpitched(NotRest):
             self.displayStep = display_pitch.step
             self.displayOctave = display_pitch.implicitOctave
 
-    def _getStoredInstrument(self):
-        return self._storedInstrument
-
-    def _setStoredInstrument(self, newValue):
-        self._storedInstrument = newValue
-
-    storedInstrument = property(_getStoredInstrument, _setStoredInstrument)
+    def _reprInternal(self):
+        if not self.storedInstrument:
+            return ''
+        else:
+            return repr(self.storedInstrument.instrumentName)
 
     def displayPitch(self) -> Pitch:
         '''
