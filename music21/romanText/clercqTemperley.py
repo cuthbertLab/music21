@@ -186,7 +186,6 @@ class CTSong(prebase.ProtoM21Object):
     >>> secondRN.editorial.formalDivision
     []
 
-
     >>> s.title
     'Brown-Eyed Girl'
 
@@ -345,7 +344,7 @@ class CTSong(prebase.ProtoM21Object):
         # Dictionary of all component rules of the type CTRule
         self._rules: dict[str, CTRule] = OrderedDict()
         # keeps a list of all keys in the Score -- avoids duplicates
-        self.ksList: list[key.Key] = []
+        self.keyObjList: list[key.Key] = []
         # same for time signatures
         self.tsList: list[meter.TimeSignature] = []
 
@@ -375,7 +374,28 @@ class CTSong(prebase.ProtoM21Object):
         Called when a CTSong is created by passing a string or filename;
         in the second case, it opens the file
         and removes all blank lines, and adds in new line characters
-        returns pieceString that CTSong can parse.
+        returns pieceString that CTSong can call .expand() on.
+
+        >>> exCT = romanText.clercqTemperley.exampleClercqTemperley
+
+        This calls parse implicitly:
+
+        >>> s = romanText.clercqTemperley.CTSong(exCT)
+
+        >>> print(s.text)
+        % Brown-Eyed Girl
+        VP: I | IV | I | V |
+        In: $VP*2
+        Vr: $VP*4 IV | V | I | vi | IV | V | I | V |       % Second half could be called chorus
+        Ch: V | | $VP*2 I |*4
+        Ch2: V | | $VP*3     % Fadeout
+        S: [G] $In $Vr $Vr $Ch $VP $Vr $Ch2
+
+        >>> s.lines[0]
+        '% Brown-Eyed Girl'
+
+        >>> s.lines[-1]
+        'S: [G] $In $Vr $Vr $Ch $VP $Vr $Ch2'
         '''
         if isinstance(textFile, str) and '|' in textFile and 'S:' in textFile:
             lines = textFile.split('\n')
@@ -482,6 +502,12 @@ class CTSong(prebase.ProtoM21Object):
                     text='Co: R |*4 I |*4'>)
         ('S', <music21.romanText.clercqTemperley.CTRule
                     text='S: [A] $In $Vr $Vr $Br $Vr $Vr $Br $Vr $Vr $Co'>)
+
+        Rules S is where we begin:
+
+        >>> s.rules['S']
+        <music21.romanText.clercqTemperley.CTRule
+            text='S: [A] $In $Vr $Vr $Br $Vr $Vr $Br $Vr $Vr $Co'>
         '''
         if self._rules:
             return self._rules
@@ -511,6 +537,9 @@ class CTSong(prebase.ProtoM21Object):
         >>> change.homeTimeSig.beatSequence
         <music21.meter.core.MeterSequence {{1/8+1/8+1/8}+{1/8+1/8+1/8}+{1/8+1/8+1/8}+{1/8+1/8+1/8}}>
         '''
+        if self._homeTimeSig:
+            return self._homeTimeSig
+
         # look at 'S' Rule and grab the home time Signature
         if self.text and 'S:' in self.text:
             lines = self.text.split('\n')
@@ -537,6 +566,9 @@ class CTSong(prebase.ProtoM21Object):
         >>> s.homeKey
         <music21.key.Key of A major>
         '''
+        if self._homeKey:
+            return self._homeKey
+
         # look at 'S' Rule and grab the home key
         if self.text and 'S:' in self.text:
             lines = self.text.split('\n')
@@ -570,10 +602,11 @@ class CTSong(prebase.ProtoM21Object):
         '''
         self.labelRomanNumerals = labelRomanNumerals
         self.labelSubsectionsOnScore = labelSubsectionsOnScore
-        if self._partObj is not None:
+        if self._partObj[stream.Measure].first():
             return self._partObj
         partObj = stream.Part()
-        measures = self.rules['S'].expand()
+        startRule = self.rules['S']
+        measures = startRule.expand()
         for i, m in enumerate(measures):
             m.number = i + 1
         partObj.append(measures)
@@ -603,6 +636,8 @@ class CTRule(prebase.ProtoM21Object):
     has been called on that object. The usefulness of each CTRule object is that each
     has a :meth:`~music21.romanText.clercqTemperley.CTRUle.streamFromCTSong` attribute,
     which is the stream from the entire score that the rule corresponds to.
+
+    To parse, put the text into the
     '''
     _DOC_ORDER = ['LHS', 'sectionName', 'musicText', 'homeTimeSig', 'homeKey', 'comments']
     _DOC_ATTR: dict[str, str] = {
@@ -613,14 +648,23 @@ class CTRule(prebase.ProtoM21Object):
     SPLITMEASURES = re.compile(r'(\|\*?\d*)')
     REPETITION = re.compile(r'\*(\d+)')
 
-    def __init__(self, text='', parent=None):
+    def __init__(self, text='', parent: CTSong | None = None):
         self._parent = None
         if parent is not None:
             self.parent = parent
 
-        self._musicText = None  # just the text above without the rule string or comments
-        self._LHS = None  # rule name string, such as "In"
-        self.text = text  # FULL TEXT OF CTRULE (includes LHS, chords, and comments
+        self.ts = (self.parent.homeTimeSig if self.parent else None) or meter.TimeSignature('4/4')
+        self.keyObj = (self.parent.homeKey if self.parent else None) or key.Key('C')
+
+        self.text = text  # full text of CTRule input (includes LHS, chords, and comments)
+        self._musicText = ''  # just the text above without the rule string or comments
+        self._LHS = ''  # left hand side: rule name string, such as "In"
+
+        self.measures: list[stream.Measure] = []
+        self.lastRegularAtom: str = ''
+        self.lastChord: chord.Chord | None = None
+        self._lastChordIsInSameMeasure: bool = False
+
 
     def _reprInternal(self):
         return f'text={self.text!r}'
@@ -639,102 +683,35 @@ class CTRule(prebase.ProtoM21Object):
 
     def expand(
         self,
-        ts: meter.TimeSignature | None = None,
-        ks: key.Key | None = None
+        tsContext: meter.TimeSignature | None = None,
+        keyContext: key.Key | None = None,
     ) -> list[stream.Measure]:
         '''
         The meat of it all -- expand one rule completely and return a list of Measure objects.
-        '''
-        if ts is None:
-            ts = meter.TimeSignature('4/4')
-        if ks is None:
-            ks = key.Key('C')
-        measures: list[stream.Measure] = []
 
-        lastRegularAtom: str = ''
-        lastChord: chord.Chord | None = None
+        Parses within the local time signature context and key context.
+        '''
+        saveTs = self.ts
+        saveKey = self.keyObj
+
+        if tsContext:
+            self.ts = tsContext
+        if keyContext:
+            self.keyObj = keyContext
+
+        self.measures.clear()
 
         for content, sep, numReps in self._measureGroups():
-            lastChordIsInSameMeasure = False
             if sep == '$':
-                if content not in self.parent.rules:
-                    raise CTRuleException(f'Cannot expand rule {content} in {self}')
-                rule = self.parent.rules[content]
-                for i in range(numReps):
-                    returnedMeasures = rule.expand(ts, ks)
-                    self.insertKsTs(returnedMeasures[0], ts, ks)
-                    for returnedTs in [m.getElementsByClass(meter.TimeSignature)
-                                        for m in returnedMeasures]:
-                        if returnedTs is not ts:
-                            # the TS changed mid-rule; create a new one for return.
-                            ts = copy.deepcopy(ts)
-
-                    measures.extend(returnedMeasures)
+                self.expandExpansionContent(content, numReps)
             elif sep == '|':
-                m = stream.Measure()
-                atoms = content.split()
-                # key/timeSig pass...
-                regularAtoms = []
-                for atom in atoms:
-                    if atom.startswith('['):
-                        atomContent = atom[1:-1]
-                        if atomContent == '0':
-                            ts = meter.TimeSignature('4/4')
-                            # irregular meter.  Cannot fully represent;
-                            # TODO: replace w/ senza misura when possible.
-
-                        elif '/' in atomContent:  # only one key / ts per measure.
-                            ts = meter.TimeSignature(atomContent)
-                        else:
-                            ks = key.Key(key.convertKeyStringToMusic21KeyString(atomContent))
-
-                    elif atom == '.':
-                        if not lastRegularAtom:
-                            raise CTRuleException(f' . w/o previous atom: {self}')
-                        regularAtoms.append(lastRegularAtom)
-                    elif not atom:
-                        pass
-                    else:
-                        regularAtoms.append(atom)
-                        lastRegularAtom = atom
-                numAtoms = len(regularAtoms)
-                if numAtoms == 0:
-                    continue  # maybe just ts and ks setting
-
-                self.insertKsTs(m, ts, ks)
-
-                atomLength = common.opFrac(ts.barDuration.quarterLength / numAtoms)
-                for atom in regularAtoms:
-                    if atom == 'R':
-                        rest = note.Rest(quarterLength=atomLength)
-                        rest.editorial.formalDivision = []
-                        lastChord = None
-                        lastChordIsInSameMeasure = False
-                        m.append(rest)
-                    else:
-                        atom = self.fixupChordAtom(atom)
-                        rn = roman.RomanNumeral(atom, ks)
-                        rn.editorial.formalDivision = []
-                        if self.isSame(rn, lastChord) and lastChordIsInSameMeasure:
-                            if t.TYPE_CHECKING:
-                                assert lastChord is not None  # isSame asserted this.
-                            lastChord.duration.quarterLength += atomLength
-                            m.coreElementsChanged()
-                        else:
-                            rn.duration.quarterLength = atomLength
-                            self.addOptionalTieAndLyrics(rn, lastChord)
-                            lastChord = rn
-                            lastChordIsInSameMeasure = True
-                            m.append(rn)
-                measures.append(m)
-                for i in range(1, numReps):
-                    measures.append(copy.deepcopy(m))
+                self.expandSimpleContent(content, numReps)
             else:
                 environLocal.warn(
                     f'Rule found without | or $, ignoring: {content!r},{sep!r}: in {self.text!r}')
                 # pass
-        if measures:
-            for m in measures:
+        if self.measures:
+            for m in self.measures:
                 noteIter = m.recurse().notes
                 if (noteIter
                         and (self.parent is None
@@ -746,7 +723,102 @@ class CTRule(prebase.ProtoM21Object):
                     rn.editorial.formalDivision.append(self.LHS)
                     break
 
-        return measures
+        self.ts = saveTs
+        self.keyObj = saveKey
+
+        return self.measures
+
+    def expandExpansionContent(
+        self,
+        content: str,
+        numReps: int,
+    ) -> None:
+        '''
+        Expand a rule that contains an expansion (i.e., a $) in it.
+
+        Requires CTSong parent to be set.
+        '''
+        if not self.parent or content not in self.parent.rules:
+            raise CTRuleException(f'Cannot expand rule {content} in {self}')
+        rule = self.parent.rules[content]
+        for i in range(numReps):
+            returnedMeasures = rule.expand(self.ts, self.keyObj)
+            self.insertKsTs(returnedMeasures[0], self.ts, self.keyObj)
+            for returnedTs in [m.getElementsByClass(meter.TimeSignature)
+                               for m in returnedMeasures]:
+                if returnedTs is not self.ts:
+                    # the TS changed mid-rule; create a new one for return.
+                    self.ts = copy.deepcopy(self.ts)
+
+            self.measures.extend(returnedMeasures)
+
+    def expandSimpleContent(
+        self,
+        content: str,
+        numReps: int,
+    ) -> None:
+        lastChordIsInSameMeasure = False
+
+        m = stream.Measure()
+        atoms = content.split()
+        # key/timeSig pass...
+        regularAtoms: list[str] = []
+        for atom in atoms:
+            if atom.startswith('['):
+                atomContent = atom[1:-1]
+                if atomContent == '0':
+                    self.ts = meter.TimeSignature('4/4')
+                    # irregular meter.  Cannot fully represent;
+                    # TODO: replace w/ senza misura when possible.
+
+                elif '/' in atomContent:  # only one key / ts per measure.
+                    self.ts = meter.TimeSignature(atomContent)
+                else:
+                    self.keyObj = key.Key(key.convertKeyStringToMusic21KeyString(atomContent))
+
+            elif atom == '.':
+                if not self.lastRegularAtom:
+                    raise CTRuleException(f' . w/o previous atom: {self}')
+                regularAtoms.append(self.lastRegularAtom)
+            elif not atom:
+                pass
+            else:
+                regularAtoms.append(atom)
+                self.lastRegularAtom = atom
+        numAtoms = len(regularAtoms)
+        if numAtoms == 0:
+            return  # maybe just ts and keyObj setting
+
+        self.insertKsTs(m, self.ts, self.keyObj)
+
+        atomLength = common.opFrac(self.ts.barDuration.quarterLength / numAtoms)
+        for atom in regularAtoms:
+            if atom == 'R':
+                rest = note.Rest(quarterLength=atomLength)
+                rest.editorial.formalDivision = []
+                self.lastChord = None
+                lastChordIsInSameMeasure = False
+                m.append(rest)
+            else:
+                atom = self.fixupChordAtom(atom)
+                rn = roman.RomanNumeral(atom, self.keyObj)
+                rn.editorial.formalDivision = []
+                if self.isSame(rn, self.lastChord) and lastChordIsInSameMeasure:
+                    if t.TYPE_CHECKING:
+                        assert self.lastChord is not None  # isSame asserted this.
+                    self.lastChord.duration.quarterLength += atomLength
+                    m.coreElementsChanged()
+                else:
+                    rn.duration.quarterLength = atomLength
+                    self.addOptionalTieAndLyrics(rn, self.lastChord)
+                    self.lastChord = rn
+                    lastChordIsInSameMeasure = True
+                    m.append(rn)
+        self.measures.append(m)
+        for i in range(1, numReps):
+            newM = copy.deepcopy(m)
+            newM.removeByClass([meter.TimeSignature, key.Key])
+            self.measures.append(newM)
 
     def _measureGroups(self) -> list[tuple[str, str, int]]:
         '''
@@ -891,7 +963,7 @@ class CTRule(prebase.ProtoM21Object):
     def insertKsTs(self,
                    m: stream.Measure,
                    ts: meter.TimeSignature,
-                   ks: key.Key) -> None:
+                   keyObj: key.Key) -> None:
         '''
         Insert a new time signature or Key into measure m, if it's
         not already in the stream somewhere.
@@ -901,15 +973,15 @@ class CTRule(prebase.ProtoM21Object):
         '''
         if self.parent is None:
             m.timeSignature = ts
-            m.keySignature = ks
+            m.keySignature = keyObj
             return
 
         if ts not in self.parent.tsList:
             m.timeSignature = ts
             self.parent.tsList.append(ts)
-        if ks not in self.parent.ksList:
-            m.keySignature = ks
-            self.parent.tsList.append(ks)
+        if keyObj not in self.parent.keyObjList:
+            m.keySignature = keyObj
+            self.parent.keyObjList.append(keyObj)
 
     def fixupChordAtom(self, atom: str) -> str:
         '''
@@ -937,7 +1009,7 @@ class CTRule(prebase.ProtoM21Object):
         self._musicText = str(value)
 
     def _getMusicText(self):
-        if self._musicText not in (None, ''):
+        if self._musicText:
             return self._musicText
 
         if not self.text:
@@ -977,7 +1049,7 @@ class CTRule(prebase.ProtoM21Object):
         return None
 
     def _getLHS(self) -> str:
-        if self._LHS not in (None, ''):
+        if self._LHS:
             return self._LHS
 
         LHS = ''
