@@ -1400,10 +1400,10 @@ class ConverterClercqTemperley(SubConverter):
     registerFormats = ('cttxt', 'har')
     registerInputExtensions = ('cttxt', 'har')
 
-    def parseData(self, strData, number=None):
+    def parseData(self, strData: str | pathlib.Path, number=None):
         from music21.romanText import clercqTemperley
         ctSong = clercqTemperley.CTSong(strData)
-        self.stream = ctSong.toScore()
+        self.stream = ctSong.toPart()
 
     def parseFile(self,
                   filePath: pathlib.Path | str,
