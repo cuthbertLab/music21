@@ -193,7 +193,7 @@ class CTSong(prebase.ProtoM21Object):
     >>> s.homeTimeSig
     <music21.meter.TimeSignature 4/4>
 
-    >>> s.homeKeySig
+    >>> s.homeKey
     <music21.key.Key of G major>
 
     >>> s.comments
@@ -278,7 +278,7 @@ class CTSong(prebase.ProtoM21Object):
     >>> s.homeTimeSig
     <music21.meter.TimeSignature 4/4>
 
-    >>> s.homeKeySig
+    >>> s.homeKey
     <music21.key.Key of A major>
 
     >>> s.comments
@@ -330,7 +330,7 @@ class CTSong(prebase.ProtoM21Object):
 
 
     """
-    _DOC_ORDER = ['text', 'toPart', 'title', 'homeTimeSig', 'homeKeySig', 'comments', 'rules']
+    _DOC_ORDER = ['text', 'toPart', 'title', 'homeTimeSig', 'homeKey', 'comments', 'rules']
     _DOC_ATTR: dict[str, str] = {
         'year': '''
             The year of the CTSong; not formally defined
@@ -344,16 +344,16 @@ class CTSong(prebase.ProtoM21Object):
         self.lines: list[str] = []
         # Dictionary of all component rules of the type CTRule
         self._rules: dict[str, CTRule] = OrderedDict()
-        # keeps a list of all key signatures in the Score -- avoids duplicates
-        self.ksList: list[key.KeySignature] = []
+        # keeps a list of all keys in the Score -- avoids duplicates
+        self.ksList: list[key.Key] = []
         # same for time signatures
         self.tsList: list[meter.TimeSignature] = []
 
-        self._partObj = None
+        self._partObj = stream.Part()
         self.year = None
 
         self._homeTimeSig = None
-        self._homeKeySig = None
+        self._homeKey = None
 
         self.labelRomanNumerals = True
         self.labelSubsectionsOnScore = True
@@ -528,31 +528,31 @@ class CTSong(prebase.ProtoM21Object):
         return self._homeTimeSig
 
     @property
-    def homeKeySig(self):
+    def homeKey(self):
         '''
-        gets the initial, or 'home', key signature by looking at the music text and locating
+        gets the initial, or 'home', Key by looking at the music text and locating
         the key signature at the start of the S: rule.
 
         >>> s = romanText.clercqTemperley.CTSong(romanText.clercqTemperley.textString)
-        >>> s.homeKeySig
+        >>> s.homeKey
         <music21.key.Key of A major>
         '''
-        # look at 'S' Rule and grab the home key Signature
+        # look at 'S' Rule and grab the home key
         if self.text and 'S:' in self.text:
             lines = self.text.split('\n')
             for line in lines:
                 if line.startswith('S:'):
                     for atom in line.split()[1:3]:
                         if '[' not in atom:
-                            self._homeKeySig = key.Key('C')
-                            return self._homeKeySig
+                            self._homeKey = key.Key('C')
+                            return self._homeKey
                         elif '/' not in atom:
                             m21keyStr = key.convertKeyStringToMusic21KeyString(atom[1:-1])
-                            self._homeKeySig = key.Key(m21keyStr)
-                            return self._homeKeySig
+                            self._homeKey = key.Key(m21keyStr)
+                            return self._homeKey
                         else:
                             pass
-        return self._homeKeySig
+        return self._homeKey
 
     def toPart(self, labelRomanNumerals=True, labelSubsectionsOnScore=True) -> stream.Part:
         # noinspection PyShadowingNames
@@ -604,7 +604,7 @@ class CTRule(prebase.ProtoM21Object):
     has a :meth:`~music21.romanText.clercqTemperley.CTRUle.streamFromCTSong` attribute,
     which is the stream from the entire score that the rule corresponds to.
     '''
-    _DOC_ORDER = ['LHS', 'sectionName', 'musicText', 'homeTimeSig', 'homeKeySig', 'comments']
+    _DOC_ORDER = ['LHS', 'sectionName', 'musicText', 'homeTimeSig', 'homeKey', 'comments']
     _DOC_ATTR: dict[str, str] = {
         'text': '''
             The full text of the CTRule, including the LHS, chords, and comments.''',
@@ -640,7 +640,7 @@ class CTRule(prebase.ProtoM21Object):
     def expand(
         self,
         ts: meter.TimeSignature | None = None,
-        ks: key.KeySignature = None
+        ks: key.Key | None = None
     ) -> list[stream.Measure]:
         '''
         The meat of it all -- expand one rule completely and return a list of Measure objects.
@@ -716,6 +716,8 @@ class CTRule(prebase.ProtoM21Object):
                         rn = roman.RomanNumeral(atom, ks)
                         rn.editorial.formalDivision = []
                         if self.isSame(rn, lastChord) and lastChordIsInSameMeasure:
+                            if t.TYPE_CHECKING:
+                                assert lastChord is not None  # isSame asserted this.
                             lastChord.duration.quarterLength += atomLength
                             m.coreElementsChanged()
                         else:
@@ -805,7 +807,7 @@ class CTRule(prebase.ProtoM21Object):
         # second pass -- filter out expansions.
         for content, sep in measureGroups1:
             contentList = content.split()
-            contentOut = []
+            contentOut: list[str] = []
 
             for atom in contentList:
                 if atom.startswith('$'):  # $BP or $Vr*3, etc.
@@ -889,10 +891,13 @@ class CTRule(prebase.ProtoM21Object):
     def insertKsTs(self,
                    m: stream.Measure,
                    ts: meter.TimeSignature,
-                   ks: key.KeySignature) -> None:
+                   ks: key.Key) -> None:
         '''
-        Insert a new time signature or key signature into measure m, if it's
+        Insert a new time signature or Key into measure m, if it's
         not already in the stream somewhere.
+
+        Note that the name "ks" is slightly misnamed.  It requires a Key,
+        not KeySignature object.
         '''
         if self.parent is None:
             m.timeSignature = ts
@@ -969,8 +974,7 @@ class CTRule(prebase.ProtoM21Object):
         '''
         if '%' in self.text:
             return self.text[self.text.index('%') + 1:].strip()
-        else:
-            return None
+        return None
 
     def _getLHS(self) -> str:
         if self._LHS not in (None, ''):
@@ -983,6 +987,8 @@ class CTRule(prebase.ProtoM21Object):
                     self._LHS = LHS.strip()
                     return self._LHS
                 LHS = LHS + char
+            # no colon found -- will not happen; it's in self.text
+            return ''  # pragma: no cover
         else:
             return ''
 
