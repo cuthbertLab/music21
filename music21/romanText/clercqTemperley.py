@@ -21,6 +21,7 @@ import copy
 import io
 import pathlib
 import re
+import typing as t
 import unittest
 
 from collections import OrderedDict
@@ -36,6 +37,9 @@ from music21 import prebase
 from music21 import roman
 from music21 import stream
 from music21 import tie
+
+if t.TYPE_CHECKING:
+    from music21 import chord
 
 environLocal = environment.Environment('romanText.clercqTemperley')
 
@@ -108,10 +112,24 @@ class CTSong(prebase.ProtoM21Object):
     # noinspection PyShadowingNames
     r"""
     This parser is an object-oriented approach to parsing clercqTemperley text files into music.
+    It is an advanced method.  Most people should just run:
 
-    Create a CTSong object one of two ways:
-    1) by passing in the string, with newline characters (\\n) at the end of each line
-    2) by passing in the text file as a string, and have python open the file and read the text
+    >>> #_DOCS_SHOW p = converter.parse('clercqTemperley/dt/BrownEyedGirl.cttxt')
+
+    or if the file ends in .txt then give the format explicitly as either 'clerqTemperley'
+    or 'cttxt':
+
+    >>> #_DOCS_SHOW p = converter.parse('BrownEyedGirl.txt', format='clercqTemperley')
+
+    Advanced: if you want access to a CTSong object itself (for manipulating the input before
+    converting to a string, etc. then create a CTSong object with one of the following inputs:
+
+    1. by passing in the string, with newline characters (\\n) at the end of each line
+
+    2. by passing in the filename as a string or path, and have Python
+       open the file and read the text
+
+    Given this file, you could create a CTSong object with:
 
     >>> exampleClercqTemperley = '''
     ... % Brown-Eyed Girl
@@ -123,26 +141,51 @@ class CTSong(prebase.ProtoM21Object):
     ... S: [G] $In $Vr $Vr $Ch $VP $Vr $Ch2
     ... '''
 
-    >>> exCT = romanText.clercqTemperley.exampleClercqTemperley
+    >>> exCT = romanText.clercqTemperley.exampleClercqTemperley  #_DOCS_HIDE
     >>> s = romanText.clercqTemperley.CTSong(exCT)  #_DOCS_HIDE
+
+    Or:
+
     >>> #_DOCS_SHOW s = romanText.clercqTemperley.CTSong('C:/Brown-Eyed_Girl.txt')
 
-    When you call the .toScore() method on the newly created CTSong object,
+    When you call the .toPart() method on the newly created CTSong object,
     the code extracts meaningful properties (such as title, text, comments,
     year, rules, home time Signature, and home Key Signature) from the text file
-    and makes these accessible as below.
+    and returns a new Part object.  It also makes these properties available on the
+    CTSong object.
 
-    The toScore() method has two optional labeling parameters, labelRomanNumerals and
+    The toPart() method has two optional labeling parameters, labelRomanNumerals and
     labelSubsectionsOnScore. Both are set to True by default. Thus, the created score
     will have labels (on the chord's lyric) for each roman numeral as well as for each
     section in the song (LHS). In case of a recursive definition (a rule contains a reference
     to another rule), both labels are printed, with the deepest
     reference on the smallest lyric line.
 
-    >>> #_DOCS_SHOW s.toScore().show()
+    >>> p = s.toPart()
+    >>> #_DOCS_SHOW p.show()
 
     .. image:: images/ClercqTemperleyExbrown-eyed_girl.png
        :width: 500
+
+    >>> firstRN = p[roman.RomanNumeral][0]
+    >>> firstRN.lyric
+    'I\nVP\nIn'
+
+    All roman numerals mark which formal division they are in:
+
+    >>> 'formalDivision' in firstRN.editorial
+    True
+    >>> firstRN.editorial.formalDivision
+    ['VP', 'In']
+
+    The second RomanNumeral is at the start of no formal divisions
+
+    >>> secondRN = p[roman.RomanNumeral][1]
+    >>> secondRN.lyric
+    'IV'
+    >>> secondRN.editorial.formalDivision
+    []
+
 
     >>> s.title
     'Brown-Eyed Girl'
@@ -163,7 +206,7 @@ class CTSong(prebase.ProtoM21Object):
     >>> s.year
     1967
 
-    Upon calling toScore(), CTRule objects are also created. CTRule objects are
+    Upon calling toPart(), CTRule objects are also created. CTRule objects are
     the individual rules that make up the song object. For example,
 
     >>> s.rules
@@ -214,8 +257,6 @@ class CTSong(prebase.ProtoM21Object):
     ... S: [A] $In $Vr $Vr $Br $Vr $Vr $Br $Vr $Vr $Co
     ... '''
 
-    OMIT_FROM_DOCS
-
     Another example using a different Clercq-Temperley file
 
     RockClockCT =
@@ -227,8 +268,8 @@ class CTSong(prebase.ProtoM21Object):
     S: [A] $In $Vr $Vr $Vr $Vr $Vr $Vr $Vrf    % 3rd and 6th verses are instrumental
 
     >>> s = romanText.clercqTemperley.CTSong(romanText.clercqTemperley.RockClockCT)
-    >>> score = s.toScore()
-    >>> score.highestTime
+    >>> part = s.toPart()
+    >>> part.highestTime
     376.0
 
     >>> s.title
@@ -268,6 +309,8 @@ class CTSong(prebase.ProtoM21Object):
     >>> rule.sectionName
     'Introduction'
 
+    OMIT_FROM_DOCS
+
     one more example...the bane of this parser's existence...::
 
         % Ring Of Fire
@@ -287,7 +330,7 @@ class CTSong(prebase.ProtoM21Object):
 
 
     """
-    _DOC_ORDER = ['text', 'toScore', 'title', 'homeTimeSig', 'homeKeySig', 'comments', 'rules']
+    _DOC_ORDER = ['text', 'toPart', 'title', 'homeTimeSig', 'homeKeySig', 'comments', 'rules']
     _DOC_ATTR: dict[str, str] = {
         'year': '''
             The year of the CTSong; not formally defined
@@ -664,12 +707,14 @@ class CTRule(prebase.ProtoM21Object):
                 for atom in regularAtoms:
                     if atom == 'R':
                         rest = note.Rest(quarterLength=atomLength)
+                        rest.editorial.formalDivision = []
                         lastChord = None
                         lastChordIsInSameMeasure = False
                         m.append(rest)
                     else:
                         atom = self.fixupChordAtom(atom)
                         rn = roman.RomanNumeral(atom, ks)
+                        rn.editorial.formalDivision = []
                         if self.isSame(rn, lastChord) and lastChordIsInSameMeasure:
                             lastChord.duration.quarterLength += atomLength
                             m.coreElementsChanged()
@@ -696,6 +741,7 @@ class CTRule(prebase.ProtoM21Object):
                     rn = noteIter[0]
                     lyricNum = len(rn.lyrics) + 1
                     rn.lyrics.append(note.Lyric(self.LHS, number=lyricNum))
+                    rn.editorial.formalDivision.append(self.LHS)
                     break
 
         return measures

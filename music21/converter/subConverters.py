@@ -1397,8 +1397,8 @@ class ConverterClercqTemperley(SubConverter):
     Wrapper for parsing harmonic definitions in Trevor de Clercq and
     David Temperley's format.
     '''
-    registerFormats = ('cttxt', 'har')
-    registerInputExtensions = ('cttxt', 'har')
+    registerFormats = ('cttxt', 'har', 'clercqTemperley')
+    registerInputExtensions = ('cttxt', 'har', 'clercqTemperley')
 
     def parseData(self, strData: str | pathlib.Path, number=None):
         from music21.romanText import clercqTemperley
