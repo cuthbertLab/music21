@@ -520,7 +520,8 @@ class GeneralObjectExporter:
         '''
         Runs :meth:`~music21.stream.Score.makeNotation` on the copy.
         '''
-        sc.makeNotation(inPlace=True)
+        if self.makeNotation:
+            sc.makeNotation(inPlace=True)
         if not sc.isWellFormedNotation():
             warnings.warn(f'{sc} is not well-formed; see isWellFormedNotation()',
                 category=MusicXMLWarning)
@@ -532,7 +533,7 @@ class GeneralObjectExporter:
         From a part, put it in a new score.
         '''
         if p.isFlat:
-            p = p.makeMeasures()
+            p.makeMeasures(inPlace=True)
         # p.makeImmutable()  # impossible, we haven't made notation yet.
         s = stream.Score()
         s.insert(0, p)
