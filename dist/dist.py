@@ -58,7 +58,7 @@ the announcement while it's running.
     Don't forget the "v" in the release tag.
     Sanity check that the correct commit was tagged: git log
 
-17. Push tags: git push --tags  (or git push upstream --tags if not on main branch)
+17. Push tags: git push --tags  (or git push origin --tags if not on main branch)
 
 18. Create a new release on GitHub and upload the TWO non-wheel files created here and docs.
     Drag in this order: .tar.gz, documentation, no-corpus.tar.gz
@@ -66,7 +66,7 @@ the announcement while it's running.
     Finish this before doing the next step, even though it looks like it could be done in parallel.
 
 19. Upload the new file to PyPI with "twine upload music21-7.3.5a2.tar.gz", and same for the
-    whl file (but NOT no corpus) [*]
+    whl file "twine upload music21-7.3.5-py3-none-any.whl" (but NOT no corpus) [*]
 
     [*] Requires twine to be installed
 
