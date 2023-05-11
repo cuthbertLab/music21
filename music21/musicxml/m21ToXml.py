@@ -465,7 +465,7 @@ class GeneralObjectExporter:
     def fromGeneralObject(self, obj: prebase.ProtoM21Object):
         '''
         Converts any Music21Object (or a duration or a pitch) to something that
-        can be passed to ScoreExporter()
+        can be passed to :class:`ScoreExporter`.
 
         >>> GEX = musicxml.m21ToXml.GeneralObjectExporter()
         >>> s = GEX.fromGeneralObject(duration.Duration(3.0))
@@ -491,6 +491,8 @@ class GeneralObjectExporter:
         >>> outStr = out.decode('utf-8')  # now is string
         >>> '<note print-object="no" print-spacing="yes">' in outStr
         True
+        >>> len(v[note.Rest])  # original stream unchanged
+        0
         '''
         classes = obj.classes
         outObj = None
