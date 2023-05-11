@@ -6,7 +6,7 @@
 # Authors:      Michael Scott Asato Cuthbert
 #               based on an earlier version by Christopher Reyes
 #
-# Copyright:    Copyright © 2012-14 Michael Scott Asato Cuthbert
+# Copyright:    Copyright © 2012-14, 2023 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
@@ -14,6 +14,7 @@ Convert a music21 object into JSON and send it to the browser for music21j to us
 '''
 from __future__ import annotations
 
+from textwrap import dedent
 import unittest
 
 from music21.exceptions21 import Music21Exception
@@ -35,43 +36,30 @@ def fromObject(thisObject, *, mode='html', local=False):
 
     >>> n = note.Note('C#4')
     >>> #_DOCS_SHOW print(vexflow.toMusic21j.fromObject(n))
-    <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-            "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+    <!DOCTYPE html>
     <html xmlns="http://www.w3.org/1999/xhtml">
     <head>
         <meta http-equiv="content-type" content="text/html; charset=utf-8" />
-        <!-- for MSIE 10 on Windows 8 -->
-        <meta http-equiv="X-UA-Compatible" content="requiresActiveX=true"/>
         <title>Music21 Fragment</title>
         <script data-main='http://web.mit.edu/music21/music21j/src/music21'
-                src='http://web.mit.edu/music21/music21j/ext/require/require.js'></script>
+         src='http://web.mit.edu/music21/music21j/ext/require/require.js'></script>
         <script>
-            require(['music21'], function() {
-                var pickleIn = '{"m21Version": {"py/tuple": [1, 9, 2]}, "stream":
-    {"_mutable": true, "_activeSite": null, "' +
-    '_priority": 0, "_elements": [], "_cache": {}, "definesExplicitPageBreaks":
-    false, "_unlinkedDuration": null, "' +
-    'id": ..., "_duration": null, "py/object": "music21.stream.Stream",
-    "streamStatus": {"py/object": "music' +
-    '21.stream.streamStatus.StreamStatus", "_enharmonics": null,
-    "_dirty": null, "_concertPitch": null, "_accidentals"' +
-    ': null, "_ties": null, "_rests": null, "_ornaments": null,
-    "_client": null, "_beams": null, "_measures": nu' +
-    ...
-    'd": null}, "definesExplicitSystemBreaks": false, ...}}';
-                var jpc = new music21.fromPython.Converter();
-                streamObj = jpc.run(pickleIn);
-                streamObj.renderOptions.events.resize = "reflow";
-                streamObj.appendNewCanvas();
-            });
-        </script>
-    <BLANKLINE>
+    require(['music21'], function(music21) {
+        const pickleIn = '{"stream": {"py/object": "music21.stream.base.Stream", ...
+        '}}}, 0.0]}]}}, "m21Version": {"py/tuple": [...]}}';
+        const jpc = new music21.fromPython.Converter();
+        streamObj = jpc.run(pickleIn);
+        streamObj.renderOptions.events.resize = "reflow";
+    streamObj.appendNewDOM();
+    });
+    </script>
     </head>
     <body>
     </body>
     </html>
 
-    * Changed in v8: mode and useLocal are keyword only.
+    * Changed in v8: mode is keyword only.
+    * Changed in v9: remove useLocal -- just switch the URI to a local file.
     '''
     conv = VexflowPickler()
     conv.mode = mode
@@ -80,45 +68,40 @@ def fromObject(thisObject, *, mode='html', local=False):
 
 
 class VexflowPickler:
-    templateHtml = ('<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" '
-                    + '"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">' + '''
-    <html xmlns="http://www.w3.org/1999/xhtml">
+    templateHtml = '<!DOCTYPE html>' + dedent('''
+    <html>
     <head>
         <meta http-equiv="content-type" content="text/html; charset=utf-8" />
-        <!-- for MSIE 10 on Windows 8 -->
-        <meta http-equiv="X-UA-Compatible" content="requiresActiveX=true"/>
         <title>{title}</title>
         {loadM21Template}
         {jsBodyScript}
     </head>
     <body>
     </body>
-    </html>
-    ''')
-    jsBodyScript = '''<script>\n{jsBody}\n</script>'''
-    jsBody = '''require(['music21'], function() {{
-                var pickleIn = {pickleOutput};
-                var jpc = new music21.fromPython.Converter();
-                streamObj = jpc.run(pickleIn);
-                {callback}
-            }});'''
+    </html>''')
+    jsBodyScript = '''<script>{jsBody}\n</script>'''
+    jsBody = dedent('''
+        require(['music21'], function(music21) {{
+            music21.stream.base = music21.stream;
+            const pickleIn = {pickleOutput};
+            const jpc = new music21.fromPython.Converter();
+            streamObj = jpc.run(pickleIn);
+            {callback}
+        }});''')
     loadM21Template = '''<script data-main='{m21URI}' src='{requireURI}'></script>'''
 
     def __init__(self):
         self.defaults = {
             'pickleOutput': '{"py/object": "hello"}',
-            'm21URI': 'http://web.mit.edu/music21/music21j/src/music21',
-            'requireURI': 'http://web.mit.edu/music21/music21j/ext/require/require.js',
+            'm21URI': 'https://cuthbertlab.github.io/music21j/releases/music21.debug',
+            'requireURI': 'https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js',
             'callback': (
                 'streamObj.renderOptions.events.resize = "reflow";'
-                + '\n\t\t'
-                + 'streamObj.appendNewCanvas();'
+                + '\n'
+                + 'streamObj.appendNewDOM();'
             ),
-            'm21URIlocal': 'file:///Users/Cuthbert/git/music21j/src/music21',
-            'requireURIlocal': 'file:///Users/Cuthbert/git/music21j/ext/require/require.js',
         }
         self.mode = 'html'
-        self.useLocal = False
 
     def fromObject(self, thisObject, mode=None):
         if mode is None:
@@ -152,13 +135,8 @@ class VexflowPickler:
 
         if urls is None:
             urls = self.defaults
-        if self.useLocal is False:
-            loadM21formatted = self.loadM21Template.format(m21URI=urls['m21URI'],
-                                                           requireURI=urls['requireURI'],)
-        else:
-            loadM21formatted = self.loadM21Template.format(m21URI=urls['m21URIlocal'],
-                                                           requireURI=urls['requireURIlocal'],)
-
+        loadM21formatted = self.loadM21Template.format(m21URI=urls['m21URI'],
+                                                       requireURI=urls['requireURI'],)
         return loadM21formatted
 
     def getJSBodyScript(self, dataSplit, defaults=None):
@@ -167,15 +145,15 @@ class VexflowPickler:
 
         >>> vfp = vexflow.toMusic21j.VexflowPickler()
         >>> print(vfp.getJSBodyScript('{"hi": "hello"}'))
-           <script>
-                require(['music21'], function() {
-                    var pickleIn = {"hi": "hello"};
-                    var jpc = new music21.fromPython.Converter();
-                    streamObj = jpc.run(pickleIn);
-                    streamObj.renderOptions.events.resize = "reflow";
-                streamObj.appendNewCanvas();
-                });
-            </script>
+        <script>
+        require(['music21'], function(music21) {
+            const pickleIn = {"hi": "hello"};
+            const jpc = new music21.fromPython.Converter();
+            streamObj = jpc.run(pickleIn);
+            streamObj.renderOptions.events.resize = "reflow";
+            streamObj.appendNewDOM();
+        });
+        </script>
         '''
         if defaults is None:
             defaults = self.defaults
@@ -189,12 +167,12 @@ class VexflowPickler:
 
         >>> vfp = vexflow.toMusic21j.VexflowPickler()
         >>> print(vfp.getJSBody('{"hi": "hello"}'))
-                require(['music21'], function() {
-                    var pickleIn = {"hi": "hello"};
-                    var jpc = new music21.fromPython.Converter();
+                require(['music21'], function(music21) {
+                    const pickleIn = {"hi": "hello"};
+                    const jpc = new music21.fromPython.Converter();
                     streamObj = jpc.run(pickleIn);
                     streamObj.renderOptions.events.resize = "reflow";
-                streamObj.appendNewCanvas();
+                    streamObj.appendNewDOM();
                 });
         '''
         if defaults is None:
@@ -211,29 +189,25 @@ class VexflowPickler:
 
         >>> vfp = vexflow.toMusic21j.VexflowPickler()
         >>> print(vfp.getHTML('{"hi": "hello"}', 'myPiece'))
-           <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-                    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-                <html xmlns="http://www.w3.org/1999/xhtml">
-                <head>
+        <!DOCTYPE html>
+        <html>
+        <head>
             <meta http-equiv="content-type" content="text/html; charset=utf-8" />
-            <!-- for MSIE 10 on Windows 8 -->
-            <meta http-equiv="X-UA-Compatible" content="requiresActiveX=true"/>
             <title>myPiece</title>
-            <script data-main='http://web.mit.edu/music21/music21j/src/music21'
-                    src='http://web.mit.edu/music21/music21j/ext/require/require.js'></script>
+            <script data-main='http://web.mit.edu/music21/music21j/src/music21' src='http://web.mit.edu/music21/music21j/ext/require/require.js'></script>
             <script>
-            require(['music21'], function() {
-                            var pickleIn = {"hi": "hello"};
-                            var jpc = new music21.fromPython.Converter();
-                            streamObj = jpc.run(pickleIn);
-                            streamObj.renderOptions.events.resize = "reflow";
-                        streamObj.appendNewCanvas();
-                        });
-            </script>
-            </head>
-            <body>
-            </body>
-            </html>
+        require(['music21'], function(music21) {
+            const pickleIn = {"hi": "hello"};
+            const jpc = new music21.fromPython.Converter();
+            streamObj = jpc.run(pickleIn);
+            streamObj.renderOptions.events.resize = "reflow";
+            streamObj.appendNewDOM();
+        });
+        </script>
+        </head>
+        <body>
+        </body>
+        </html>
         '''
         if defaults is None:
             d = self.defaults
