@@ -915,11 +915,12 @@ class MidiEvent(prebase.ProtoM21Object):
 
         # SEQUENCE_TRACK_NAME and other MetaEvents are here
         elif byte0 == METAEVENT_MARKER:  # 0xFF
-            if not MetaEvents.hasValue(byte1):
+            if MetaEvents.hasValue(byte1):
+                self.type = MetaEvents(byte1)
+            else:
                 environLocal.printDebug([f'unknown meta event: FF {byte1:02X}'])
                 sys.stdout.flush()
-                raise MidiException(f'Unknown midi event type: FF {byte1:02X}')
-            self.type = MetaEvents(byte1)
+                self.type = MetaEvents.UNKNOWN
             length, midiBytesAfterLength = getVariableLengthNumber(midiBytes[2:])
             self.data = midiBytesAfterLength[:length]
             # return remainder
