@@ -400,6 +400,7 @@ class MetaEvents(_ContainsEnum):
     TIME_SIGNATURE = 0x58
     KEY_SIGNATURE = 0x59
     SEQUENCER_SPECIFIC_META_EVENT = 0x7F
+    UNKNOWN = 0xFF  # Container for any unknown code
 
 
 class SysExEvents(_ContainsEnum):
