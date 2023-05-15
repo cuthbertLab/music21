@@ -1197,7 +1197,48 @@ def makeTies(
     if not common.isIterable(classFilterList):
         classFilterList = [classFilterList]
 
-    # get measures from this stream
+    if isinstance(returnObj, stream.Opus):
+        for subScore in returnObj.scores:
+            subScore.makeTies(meterStream=meterStream,
+                              inPlace=True,
+                              displayTiedAccidentals=displayTiedAccidentals,
+                              classFilterList=classFilterList
+                              )
+        if not inPlace:
+            return returnObj
+        else:
+            return
+
+    if returnObj.hasPartLikeStreams():
+        # part-like does not necessarily mean that the next level down is a stream.Part
+        # object or that this is a stream.Score object, so do not substitute
+        # returnObj.parts for this...
+        for p in returnObj.getElementsByClass(stream.Stream):
+            # already copied if necessary; edit in place
+            p.makeTies(meterStream=meterStream,
+                       inPlace=True,
+                       displayTiedAccidentals=displayTiedAccidentals,
+                       classFilterList=classFilterList
+                       )
+        if not inPlace:
+            return returnObj
+        else:
+            return
+
+    if returnObj.hasVoices():
+        for v in returnObj.voices:
+            # already copied if necessary; edit in place
+            v.makeTies(meterStream=meterStream,
+                       inPlace=True,
+                       displayTiedAccidentals=displayTiedAccidentals,
+                       classFilterList=classFilterList
+                       )
+        if not inPlace:
+            return returnObj
+        else:
+            return  # exit
+
+    # all remaining stream types should contain measures
     if not returnObj.hasMeasures():
         raise stream.StreamException('cannot process a stream without measures')
 
@@ -2365,6 +2406,31 @@ class Test(unittest.TestCase):
         self.assertIs(m.notes[0].pitch.accidental.displayStatus, True)
         self.assertEqual(m.notes[1].nameWithOctave, 'E-2')
         self.assertIs(m.notes[1].pitch.accidental.displayStatus, False)
+
+    def testMakeNotationRecursive(self):
+        from music21 import stream, note, meter, tie
+
+        s = stream.Score(id='mainScore')
+        p0 = stream.Part(id='part0')
+
+        m01 = stream.Measure(number=1)
+        m01.append(meter.TimeSignature('4/4'))
+        d1 = note.Note('D', type='half', dots=1)
+        c1 = note.Note('C', type='quarter')
+        c1.tie = tie.Tie('start')
+        m01.append([d1, c1])
+        m02 = stream.Measure(number=2)
+        c2 = note.Note('C', type='quarter')
+        c2.tie = tie.Tie("stop")
+        c3 = note.Note('D', type='half')
+        m02.append([c2, c3])
+        p0.append([m01, m02])
+
+        s.insert(0, p0)
+        s.stripTies(inPlace=True)
+        s.makeTies(inPlace=True)
+        self.assertEqual(s.flatten().notes[1].tie, tie.Tie('start'))
+        self.assertEqual(s.flatten().notes[2].tie, tie.Tie('stop'))
 
 
 # -----------------------------------------------------------------------------
