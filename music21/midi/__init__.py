@@ -918,8 +918,8 @@ class MidiEvent(prebase.ProtoM21Object):
             if MetaEvents.hasValue(byte1):
                 self.type = MetaEvents(byte1)
             else:
-                environLocal.printDebug([f'unknown meta event: FF {byte1:02X}'])
-                sys.stdout.flush()
+                # environLocal.printDebug([f'unknown meta event: FF {byte1:02X}'])
+                # sys.stdout.flush()
                 self.type = MetaEvents.UNKNOWN
             length, midiBytesAfterLength = getVariableLengthNumber(midiBytes[2:])
             self.data = midiBytesAfterLength[:length]
@@ -1987,6 +1987,13 @@ class Test(unittest.TestCase):
                             if e.type == ChannelVoiceMessages.POLYPHONIC_KEY_PRESSURE][0]
         self.assertEqual(pressureEventRead.parameter1, 60)
         self.assertEqual(pressureEventRead.parameter2, 90)
+
+    def testReadUnknownMetaMessage(self):
+        mt = MidiTrack()
+        mt.processDataToEvents(b'\x00\xff\x08\x06DUMMY\x00\x00\xff\n\x05Myut\x00'
+                               + b'\x00\xffX\x04\x03\x01\x12\x01')
+        self.assertEqual(len(mt.events), 6)
+        self.assertEqual(mt.events[3].type, MetaEvents.UNKNOWN)
 
 
 # ------------------------------------------------------------------------------
