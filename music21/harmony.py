@@ -1713,8 +1713,15 @@ class ChordSymbol(Harmony):
             pitchToAppend = sc.pitchFromDegree(hD.degree, rootPitch)
             if hD.interval and hD.interval.semitones != 0:
                 # added degrees are relative to dominant chords, which have all major degrees
-                # except for the seventh which is minor, thus the transposition down one half step
-                if hD.degree == 7 and self.chordKind is not None and self.chordKind != '':
+                # except for the seventh which is minor, thus the transposition down one half step.
+                # Don't do this for flatted transformations:
+                # C7addb7 is a redundancy, not a double-flatted seventh.
+                if (
+                    hD.degree == 7
+                    and hD.interval.semitones > 0
+                    and self.chordKind is not None
+                    and self.chordKind != ''
+                ):
                     pitchToAppend = pitchToAppend.transpose(-1)
                 pitchToAppend = pitchToAppend.transpose(hD.interval)
             if hD.degree >= 7:
@@ -2826,6 +2833,10 @@ class Test(unittest.TestCase):
         pitches = ('A1', 'C2', 'E2', 'G#3')
         pitches = tuple(pitch.Pitch(p) for p in pitches)
         self.assertEqual(pitches, ChordSymbol('Am#7').pitches)
+
+        pitches = ('C2', 'F2', 'G2', 'B-2')
+        pitches = tuple(pitch.Pitch(p) for p in pitches)
+        self.assertEqual(pitches, ChordSymbol('Csusaddb7').pitches)
 
     def testRootBassParsing(self):
         '''
