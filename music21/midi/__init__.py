@@ -891,8 +891,9 @@ class MidiEvent(prebase.ProtoM21Object):
             midiBytes = rsb + midiBytes
             byte0 = midiBytes[0]
         else:
-            # store last status byte
-            self.lastStatusByte = midiBytes[0]
+            if midiBytes[0] != 0xff:
+                # store last status byte, unless it's a meta message
+                self.lastStatusByte = midiBytes[0]
 
         msgType: int = byte0 & 0xF0  # bitwise and to derive message type w/o channel
 
