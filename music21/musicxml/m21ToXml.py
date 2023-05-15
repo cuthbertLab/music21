@@ -465,7 +465,7 @@ class GeneralObjectExporter:
     def fromGeneralObject(self, obj: prebase.ProtoM21Object):
         '''
         Converts any Music21Object (or a duration or a pitch) to something that
-        can be passed to ScoreExporter()
+        can be passed to :class:`ScoreExporter`.
 
         >>> GEX = musicxml.m21ToXml.GeneralObjectExporter()
         >>> s = GEX.fromGeneralObject(duration.Duration(3.0))
@@ -491,17 +491,20 @@ class GeneralObjectExporter:
         >>> outStr = out.decode('utf-8')  # now is string
         >>> '<note print-object="no" print-spacing="yes">' in outStr
         True
+        >>> len(v[note.Rest])  # original stream unchanged
+        0
         '''
         classes = obj.classes
         outObj = None
 
         if isinstance(obj, stream.Stream) and self.makeNotation:
-            obj.makeRests(refStreamOrTimeRange=[0.0, obj.highestTime],
-                          fillGaps=True,
-                          inPlace=True,
-                          hideRests=True,  # just to fill up MusicXML display
-                          timeRangeFromBarDuration=True,
-                          )
+            # This is where the first (and hopefully only) copy is made.
+            obj = obj.makeRests(refStreamOrTimeRange=[0.0, obj.highestTime],
+                                fillGaps=True,
+                                inPlace=False,
+                                hideRests=True,  # just to fill up MusicXML display
+                                timeRangeFromBarDuration=True,
+                                )
 
         for cM, methName in self.classMapping.items():
             if cM in classes:
@@ -517,21 +520,22 @@ class GeneralObjectExporter:
 
     def fromScore(self, sc):
         '''
-        Copies the input score and runs :meth:`~music21.stream.Score.makeNotation` on the copy.
+        Runs :meth:`~music21.stream.Score.makeNotation` on the copy.
         '''
-        scOut = sc.makeNotation(inPlace=False)
-        if not scOut.isWellFormedNotation():
-            warnings.warn(f'{scOut} is not well-formed; see isWellFormedNotation()',
+        if self.makeNotation:
+            sc.makeNotation(inPlace=True)
+        if not sc.isWellFormedNotation():
+            warnings.warn(f'{sc} is not well-formed; see isWellFormedNotation()',
                 category=MusicXMLWarning)
-        # scOut.makeImmutable()
-        return scOut
+        # sc.makeImmutable()
+        return sc
 
     def fromPart(self, p):
         '''
         From a part, put it in a new score.
         '''
         if p.isFlat:
-            p = p.makeMeasures()
+            p.makeMeasures(inPlace=True)
         # p.makeImmutable()  # impossible, we haven't made notation yet.
         s = stream.Score()
         s.insert(0, p)
@@ -548,20 +552,20 @@ class GeneralObjectExporter:
         solutions in Part or Stream production.
         '''
         m.coreGatherMissingSpanners()
-        mCopy = m.makeNotation()
-        if mCopy.style.measureNumbering is None:
+        m.makeNotation(inPlace=True)
+        if m.style.measureNumbering is None:
             # Provide a default
-            mCopy.style.measureNumbering = 'measure'
+            m.style.measureNumbering = 'measure'
         clef_from_measure_start_or_context = m.getContextByClass(
             clef.Clef,
             getElementMethod=common.enums.ElementSearch.AT_OR_BEFORE_OFFSET
         )
         if clef_from_measure_start_or_context is None:
-            mCopy.clef = clef.bestClef(mCopy, recurse=True)
+            m.clef = clef.bestClef(m, recurse=True)
         else:
-            mCopy.clef = clef_from_measure_start_or_context
+            m.clef = clef_from_measure_start_or_context
         p = stream.Part()
-        p.append(mCopy)
+        p.append(m)
         p.metadata = copy.deepcopy(getMetadataFromContext(m))
         context_part = m.getContextByClass(stream.Part)
         if context_part is not None:
