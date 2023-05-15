@@ -1207,7 +1207,7 @@ def makeTies(
         if not inPlace:
             return returnObj
         else:
-            return
+            return None
 
     if returnObj.hasPartLikeStreams():
         # part-like does not necessarily mean that the next level down is a stream.Part
@@ -1223,7 +1223,7 @@ def makeTies(
         if not inPlace:
             return returnObj
         else:
-            return
+            return None
 
     if returnObj.hasVoices():
         for v in returnObj.voices:
@@ -1236,7 +1236,7 @@ def makeTies(
         if not inPlace:
             return returnObj
         else:
-            return  # exit
+            return None
 
     # all remaining stream types should contain measures
     if not returnObj.hasMeasures():
@@ -2408,7 +2408,7 @@ class Test(unittest.TestCase):
         self.assertIs(m.notes[1].pitch.accidental.displayStatus, False)
 
     def testMakeNotationRecursive(self):
-        from music21 import stream, note, meter, tie
+        from music21 import stream, tie
 
         s = stream.Score(id='mainScore')
         p0 = stream.Part(id='part0')
@@ -2421,7 +2421,7 @@ class Test(unittest.TestCase):
         m01.append([d1, c1])
         m02 = stream.Measure(number=2)
         c2 = note.Note('C', type='quarter')
-        c2.tie = tie.Tie("stop")
+        c2.tie = tie.Tie('stop')
         c3 = note.Note('D', type='half')
         m02.append([c2, c3])
         p0.append([m01, m02])
