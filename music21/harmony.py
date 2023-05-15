@@ -2834,7 +2834,7 @@ class Test(unittest.TestCase):
         pitches = tuple(pitch.Pitch(p) for p in pitches)
         self.assertEqual(pitches, ChordSymbol('Am#7').pitches)
 
-        pitches = ('C2', 'F2', 'G2', 'B-2')
+        pitches = ('C2', 'F2', 'G2', 'B-3')
         pitches = tuple(pitch.Pitch(p) for p in pitches)
         self.assertEqual(pitches, ChordSymbol('Csusaddb7').pitches)
 
