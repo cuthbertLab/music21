@@ -44,6 +44,7 @@ import typing as t
 from enum import IntEnum
 
 from music21 import common
+from music21 import defaults
 from music21 import environment
 from music21 import exceptions21
 from music21 import prebase
@@ -1518,7 +1519,7 @@ class MidiFile(prebase.ProtoM21Object):
     Most midi files store `ticksPerQuarterNote` and not `ticksPerSecond`
 
     >>> mf.ticksPerQuarterNote
-    1024
+    10080
     >>> mf.ticksPerSecond is None
     True
 
@@ -1533,7 +1534,7 @@ class MidiFile(prebase.ProtoM21Object):
         self.file = None
         self.format = 1
         self.tracks = []
-        self.ticksPerQuarterNote = 1024
+        self.ticksPerQuarterNote = defaults.ticksPerQuarter
         self.ticksPerSecond = None
 
     def open(self, filename, attrib='rb'):
