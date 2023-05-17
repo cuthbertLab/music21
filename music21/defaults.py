@@ -82,8 +82,8 @@ divisionsPerQuarter = 32 * 3 * 3 * 5 * 7  # 10080
 # ticks per quarter is used for midi - left separate for flexibility in the future.
 ticksPerQuarter = divisionsPerQuarter
 # how many ticks to pad as a rest at the beginning of a MIDI file.
-# also used to pad the end...
-ticksAtStart = divisionsPerQuarter
+# also used to pad the end..., one quarter note.
+ticksAtStart = ticksPerQuarter
 
 # quantizationQuarterLengthDivisors
 # what to snap MIDI quantization to.  (4, 3) indicates sixteenth notes and triplets.
