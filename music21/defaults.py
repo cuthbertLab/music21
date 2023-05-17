@@ -79,10 +79,8 @@ long and the other half are 917.  But this has not been done yet.
 '''
 divisionsPerQuarter = 32 * 3 * 3 * 5 * 7  # 10080
 
-# ticks per quarter is used for midi
-# while a supposedly 16 bit unsigned value
-# midi.py gives an error with 10080
-ticksPerQuarter = 1024
+# ticks per quarter is used for midi - left separate for flexibility in the future.
+ticksPerQuarter = divisionsPerQuarter
 # how many ticks to pad as a rest at the beginning of a MIDI file.
 # also used to pad the end...
 ticksAtStart = 1024
