@@ -7352,8 +7352,8 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
                     aLast = pLast.accidental
                     aInner = pInner.accidental
                     if aLast != aInner:
-                        aLastIsNeutral = aLast is None or aLast.name == "natural"
-                        aInnerIsNeutral = aInner is None or aInner.name == "natural"
+                        aLastIsNeutral = aLast is None or aLast.name == 'natural'
+                        aInnerIsNeutral = aInner is None or aInner.name == 'natural'
                         if not (aLastIsNeutral and aInnerIsNeutral):
                             return False
                 return True
