@@ -363,7 +363,7 @@ class Test(unittest.TestCase):
         '''
         Import sound tempo marks as MetronomeMarks.
         '''
-        from music21 import corpus, duration
+        from music21 import corpus
         s = corpus.parse('bach/bwv69.6.xml')
         self.assertEqual(len(s.flatten()[tempo.MetronomeMark]), 8)
         for p in s.parts:
