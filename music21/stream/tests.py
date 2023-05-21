@@ -5395,7 +5395,7 @@ class Test(unittest.TestCase):
 
         post = sSrc.parts[0].flatten().sliceAtOffsets([0.25, 1.25, 3.25])
         self.assertEqual([e.offset for e in post],
-                         [0.0, 0.0, 0.0, 0.0, 0.0, 0.25, 0.5, 1.0, 1.25, 2.0, 3.0, 3.25, 4.0,
+                         [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.25, 0.5, 1.0, 1.25, 2.0, 3.0, 3.25, 4.0,
                           5.0, 6.0, 7.0, 8.0, 9.0, 9.0, 9.5, 10.0, 11.0, 12.0, 13.0, 14.0,
                           15.0, 16.0, 17.0, 18.0, 19.0, 20.0, 21.0, 21.0, 22.0, 23.0, 24.0,
                           25.0, 26.0, 27.0, 29.0, 31.0, 32.0, 33.0, 34.0, 34.5, 35.0, 36.0])
@@ -6472,7 +6472,7 @@ class Test(unittest.TestCase):
         rElements = list(s.recurse(includeSelf=True))  # NOTE: list(s.recurse())
         # removes self, while [x for x in s.recurse()] does not.
         self.assertTrue(s in rElements)
-        self.assertEqual(len(rElements), 240)
+        self.assertEqual(len(rElements), 244)
 
         # rElements = list(s.recurse(streamsOnly=True))
         # self.assertEqual(len(rElements), 45)
@@ -7013,7 +7013,7 @@ class Test(unittest.TestCase):
         s = corpus.parse('bwv66.6')
         sFlat = s.flatten()
         # we have not tempo
-        self.assertEqual(len(sFlat.getElementsByClass(tempo.TempoIndication)), 0)
+        self.assertEqual(len(sFlat.getElementsByClass(tempo.TempoIndication)), 4)
         sFlat.insert(0, tempo.MetronomeMark('adagio'))
         self.assertAlmostEqual(sFlat.seconds, 38.57142857)
 
@@ -7776,6 +7776,7 @@ class Test(unittest.TestCase):
                                                                   useMixedNumerals=True),
             '''{0 - 0} <music21.layout.SystemLayout>
 {0 - 0} <music21.clef.TrebleClef>
+{0 - 0} <music21.tempo.MetronomeMark animato Quarter=120.0>
 {0 - 0} <music21.key.Key of B- major>
 {0 - 0} <music21.meter.TimeSignature 4/4>
 {0 - 2/3} <music21.note.Note B->
@@ -7785,6 +7786,7 @@ class Test(unittest.TestCase):
         self.assertMultiLineEqual(
             s.parts[1].getElementsByClass(Measure)[0]._reprText(addEndTimes=True),
             '''{0.0 - 0.0} <music21.clef.BassClef>
+{0.0 - 0.0} <music21.tempo.MetronomeMark animato Quarter=120.0>
 {0.0 - 0.0} <music21.key.Key of B- major>
 {0.0 - 0.0} <music21.meter.TimeSignature 4/4>
 {0.0 - 4.0} <music21.note.Note B->''')
@@ -7793,6 +7795,7 @@ class Test(unittest.TestCase):
         self.assertMultiLineEqual(m1._reprText(addEndTimes=True, useMixedNumerals=True),
                                   '''{0 - 0} <music21.layout.SystemLayout>
 {0 - 0} <music21.clef.TrebleClef>
+{0 - 0} <music21.tempo.MetronomeMark animato Quarter=120.0>
 {0 - 0} <music21.key.Key of B- major>
 {0 - 0} <music21.meter.TimeSignature 4/4>
 {0 - 2/3} <music21.chord.Chord B-2 B-4>

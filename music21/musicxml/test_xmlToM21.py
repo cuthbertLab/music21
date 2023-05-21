@@ -360,13 +360,15 @@ class Test(unittest.TestCase):
         self.assertGreater(len(mms), 3)
 
     def testImportMetronomeMarksB(self):
-        pass
-        # TODO: look for files that only have sound tags and create MetronomeMarks
-        # need to look for bundling of Words text expressions with tempo
-
-        # has only sound tempo=x tag
-        # s = converter.parse(testPrimitive.articulations01)
-        # s.show()
+        '''
+        Import sound tempo marks as MetronomeMarks.
+        '''
+        from music21 import corpus, duration
+        s = corpus.parse('bach/bwv69.6.xml')
+        self.assertEqual(len(s.flatten()[tempo.MetronomeMark]), 8)
+        for p in s.parts:
+            self.assertEqual(p.measure(0)[tempo.MetronomeMark][0].number, 96)
+            self.assertEqual(p.measure(0)[tempo.MetronomeMark][0].referent, duration.Duration(1.0))
 
     def testImportMetronomeMarksC(self):
         '''

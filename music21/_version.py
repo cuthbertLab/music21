@@ -47,7 +47,7 @@ Changing this number invalidates old pickles -- do it if the old pickles create 
 '''
 from __future__ import annotations
 
-__version__ = '9.0.0a12'
+__version__ = '9.0.0a13'
 
 def get_version_tuple(vv):
     v = vv.split('.')

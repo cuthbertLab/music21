@@ -837,7 +837,7 @@ class StreamIterator(prebase.ProtoM21Object, Sequence[M21ObjType]):
         stream did not, in the case of recursion:
 
         >>> bach = corpus.parse('bwv66.6')
-        >>> bn = bach.flatten()[30]
+        >>> bn = bach.flatten()[34]
         >>> bn
         <music21.note.Note E>
 
@@ -1354,6 +1354,7 @@ class StreamIterator(prebase.ProtoM21Object, Sequence[M21ObjType]):
          <music21.instrument.Instrument 'P1: Soprano: Instrument 1'>,
          <music21.stream.Measure 0 offset=0.0>,
          <music21.clef.TrebleClef>,
+         <music21.tempo.MetronomeMark Quarter=96.0>,
          <music21.key.Key of f# minor>,
          <music21.meter.TimeSignature 4/4>,
          <music21.note.Note C#>,
@@ -1903,7 +1904,7 @@ class RecursiveIterator(StreamIterator, Sequence[M21ObjType]):
         >>> i = 0
         >>> for _ in bRecurse:
         ...     i += 1
-        ...     if i > 12:
+        ...     if i > 13:
         ...         break
         >>> bRecurse.iteratorStack()
         [<music21.stream.iterator.RecursiveIterator for Score:0x10475cdd8 @:2>,

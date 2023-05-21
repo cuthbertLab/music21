@@ -694,27 +694,27 @@ class AVLTree(prebase.ProtoM21Object):
         >>> scoreTree = score.asTree(flatten=True)
         >>> node1 = scoreTree.getNodeAfter(0.5)
         >>> node1
-        <ElementNode: Start:1.0 <0.20...> Indices:(l:0 *25* r:61) Payload:<music21.note.Note A>>
+        <ElementNode: Start:1.0 <0.20...> Indices:(l:27 *29* r:33) Payload:<music21.note.Note A>>
         >>> node2 = scoreTree.getNodeAfter(0.6)
         >>> node2 is node1
         True
 
         >>> endNode = scoreTree.getNodeAfter(9999)
         >>> endNode
-        <ElementNode: Start:End <0.-5...> Indices:(l:188 *191* r:195)
+        <ElementNode: Start:End <0.-5...> Indices:(l:191 *195* r:199)
                Payload:<music21.bar.Barline type=final>>
 
         >>> while endNode is not None:
         ...     print(endNode)
         ...     endNodePosition = endNode.position
         ...     endNode = scoreTree.getNodeAfter(endNodePosition)
-        <ElementNode: Start:End <0.-5...> Indices:(l:188 *191* r:195)
+        <ElementNode: Start:End <0.-5...> Indices:(l:191 *195* r:199)
             Payload:<music21.bar.Barline type=final>>
-        <ElementNode: Start:End <0.-5...> Indices:(l:192 *192* r:193)
+        <ElementNode: Start:End <0.-5...> Indices:(l:196 *196* r:197)
             Payload:<music21.bar.Barline type=final>>
-        <ElementNode: Start:End <0.-5...> Indices:(l:192 *193* r:195)
+        <ElementNode: Start:End <0.-5...> Indices:(l:196 *197* r:199)
             Payload:<music21.bar.Barline type=final>>
-        <ElementNode: Start:End <0.-5...> Indices:(l:194 *194* r:195)
+        <ElementNode: Start:End <0.-5...> Indices:(l:198 *198* r:199)
             Payload:<music21.bar.Barline type=final>>
 
         >>> note1 = score.flatten().notes[30]
@@ -726,7 +726,7 @@ class AVLTree(prebase.ProtoM21Object):
         SortTuple(atEnd=0, offset=6.0, priority=0, classSortOrder=20, isNotGrace=1, insertIndex=...)
 
         >>> scoreTree.getNodeAfter(st)
-        <ElementNode: Start:6.5 <0.20...> Indices:(l:51 *52* r:53)
+        <ElementNode: Start:6.5 <0.20...> Indices:(l:55 *56* r:57)
             Payload:<music21.note.Note D>>
         '''
         def recurse(node, innerPosition):
@@ -791,7 +791,7 @@ class AVLTree(prebase.ProtoM21Object):
         100 is beyond the end, so it will get the last node in piece.
 
         >>> scoreTree.getNodeBefore(100)
-        <OffsetNode 36.0 Indices:191,191,195,195 Length:4>
+        <OffsetNode 36.0 Indices:195,195,199,199 Length:4>
 
         >>> scoreTree.getNodeBefore(0) is None
         True
