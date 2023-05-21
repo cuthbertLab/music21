@@ -7342,8 +7342,20 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
                     return False
 
                 for pitchIndex in range(len(nLast.pitches)):
-                    if nLast.pitches[pitchIndex].midi != nInner.pitches[pitchIndex].midi:
+                    pLast = nLast.pitches[pitchIndex]
+                    pInner = nInner.pitches[pitchIndex]
+                    if (pLast.octave != pInner.octave
+                            or pLast.step != pInner.step
+                            or pLast.microtone != pInner.microtone):
                         return False
+                    # Ugly special case: Treat None and "natural" accidentals as equal
+                    aLast = pLast.accidental
+                    aInner = pInner.accidental
+                    if aLast != aInner:
+                        aLastIsNeutral = aLast is None or aLast.name == "natural"
+                        aInnerIsNeutral = aInner is None or aInner.name == "natural"
+                        if not (aLastIsNeutral and aInnerIsNeutral):
+                            return False
                 return True
 
             return False
