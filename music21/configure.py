@@ -288,7 +288,7 @@ class Dialog:
         except KeyboardInterrupt:
             # store as own class so as a subclass of dialog error
             return KeyInterruptError()
-        except Exception:  # pylint: disable=broad-except
+        except Exception:  # pylint: disable=broad-exception-caught
             return DialogError()
 
     def prependPromptHeader(self, msg):

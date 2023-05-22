@@ -44,6 +44,7 @@ import typing as t
 from enum import IntEnum
 
 from music21 import common
+from music21 import defaults
 from music21 import environment
 from music21 import exceptions21
 from music21 import prebase
@@ -400,6 +401,7 @@ class MetaEvents(_ContainsEnum):
     TIME_SIGNATURE = 0x58
     KEY_SIGNATURE = 0x59
     SEQUENCER_SPECIFIC_META_EVENT = 0x7F
+    UNKNOWN = 0xFF  # Container for any unknown code
 
 
 class SysExEvents(_ContainsEnum):
@@ -842,7 +844,7 @@ class MidiEvent(prebase.ProtoM21Object):
             return midiBytes[3:]
         raise TypeError(f'expected ChannelVoiceMessage, got {self.type}')  # pragma: no cover
 
-    def read(self, midiBytes):
+    def read(self, midiBytes: bytes) -> bytes:
         r'''
         Parse the bytes given and take the beginning
         section and convert it into data for this event and return the
@@ -852,7 +854,6 @@ class MidiEvent(prebase.ProtoM21Object):
         >>> noteOnMessage = midi.ChannelVoiceMessages.NOTE_ON | channel
         >>> hex(noteOnMessage)
         '0x92'
-
 
         This is how the system reads note-on messages (0x90-0x9F) and channels
 
@@ -891,8 +892,8 @@ class MidiEvent(prebase.ProtoM21Object):
             # and process as before
             midiBytes = rsb + midiBytes
             byte0 = midiBytes[0]
-        else:
-            # store last status byte
+        elif midiBytes[0] != 0xff:
+            # store last status byte, unless it's a meta message
             self.lastStatusByte = midiBytes[0]
 
         msgType: int = byte0 & 0xF0  # bitwise and to derive message type w/o channel
@@ -915,11 +916,12 @@ class MidiEvent(prebase.ProtoM21Object):
 
         # SEQUENCE_TRACK_NAME and other MetaEvents are here
         elif byte0 == METAEVENT_MARKER:  # 0xFF
-            if not MetaEvents.hasValue(byte1):
-                environLocal.printDebug([f'unknown meta event: FF {byte1:02X}'])
-                sys.stdout.flush()
-                raise MidiException(f'Unknown midi event type: FF {byte1:02X}')
-            self.type = MetaEvents(byte1)
+            if MetaEvents.hasValue(byte1):
+                self.type = MetaEvents(byte1)
+            else:
+                # environLocal.printDebug([f'unknown meta event: FF {byte1:02X}'])
+                # sys.stdout.flush()
+                self.type = MetaEvents.UNKNOWN
             length, midiBytesAfterLength = getVariableLengthNumber(midiBytes[2:])
             self.data = midiBytesAfterLength[:length]
             # return remainder
@@ -1060,7 +1062,6 @@ class MidiEvent(prebase.ProtoM21Object):
         '''
         Return a boolean if this is a DeltaTime subclass.
 
-
         >>> mt = midi.MidiTrack(1)
         >>> dt = midi.DeltaTime(mt)
         >>> dt.isDeltaTime()
@@ -1154,23 +1155,25 @@ class DeltaTime(MidiEvent):
             rep = '(empty) ' + rep
         return rep
 
-    def read(self, oldBytes: bytes) -> tuple[int, bytes]:
+    def readUntilLowByte(self, oldBytes: bytes) -> tuple[int, bytes]:
         r'''
         Read a byte-string until hitting a character below 0x80
         and return the converted number and the rest of the bytes
 
         >>> mt = midi.MidiTrack(1)
         >>> dt = midi.DeltaTime(mt)
-        >>> dt.read(b'\x20')
+        >>> dt.readUntilLowByte(b'\x20')
         (32, b'')
-        >>> dt.read(b'\x20hello')
+        >>> dt.readUntilLowByte(b'\x20hello')
         (32, b'hello')
 
         here the '\x82' is above 0x80 so the 'h' is read
         as part of the continuation.
 
-        >>> dt.read(b'\x82hello')
+        >>> dt.readUntilLowByte(b'\x82hello')
         (360, b'ello')
+
+        Changed in v9: was read() but had an incompatible signature with MidiEvent
         '''
         self.time, newBytes = getVariableLengthNumber(oldBytes)
         return self.time, newBytes
@@ -1274,10 +1277,10 @@ class MidiTrack(prebase.ProtoM21Object):
     def length(self):
         return len(self.data)
 
-    def read(self, midiBytes):
+    def read(self, midiBytes: bytes) -> bytes:
         '''
-        Read as much of the string (representing midi data) as necessary;
-        return the remaining string for reassignment and further processing.
+        Read as much of the bytes object (representing midi data) as necessary;
+        return the remaining bytes object for reassignment and further processing.
 
         The string should begin with `MTrk`, specifying a Midi Track
 
@@ -1299,7 +1302,7 @@ class MidiTrack(prebase.ProtoM21Object):
         self.processDataToEvents(trackData)
         return remainder  # remainder string after extracting track data
 
-    def processDataToEvents(self, trackData: bytes = b''):
+    def processDataToEvents(self, trackData: bytes = b'') -> None:
         '''
         Populate .events with trackData.  Called by .read()
         '''
@@ -1309,7 +1312,7 @@ class MidiTrack(prebase.ProtoM21Object):
             # shave off the time stamp from the event
             delta_t = DeltaTime(track=self)
             # return extracted time, as well as remaining bytes
-            dt, trackDataCandidate = delta_t.read(trackData)
+            dt, trackDataCandidate = delta_t.readUntilLowByte(trackData)
             # this is the offset that this event happens at, in ticks
             timeCandidate = time + dt
 
@@ -1516,7 +1519,7 @@ class MidiFile(prebase.ProtoM21Object):
     Most midi files store `ticksPerQuarterNote` and not `ticksPerSecond`
 
     >>> mf.ticksPerQuarterNote
-    1024
+    10080
     >>> mf.ticksPerSecond is None
     True
 
@@ -1531,7 +1534,7 @@ class MidiFile(prebase.ProtoM21Object):
         self.file = None
         self.format = 1
         self.tracks = []
-        self.ticksPerQuarterNote = 1024
+        self.ticksPerQuarterNote = defaults.ticksPerQuarter
         self.ticksPerSecond = None
 
     def open(self, filename, attrib='rb'):
@@ -1763,10 +1766,10 @@ class Test(unittest.TestCase):
         mf.write()
         mf.close()
 
-#         mf = MidiFile()
-#         mf.open(fp)
-#         mf.read()
-#         mf.close()
+        # mf = MidiFile()
+        # mf.open(fp)
+        # mf.read()
+        # mf.close()
 
     def testInternalDataModel(self):
         dirLib = common.getSourceFilePath() / 'midi' / 'testPrimitive'
@@ -1985,6 +1988,13 @@ class Test(unittest.TestCase):
                             if e.type == ChannelVoiceMessages.POLYPHONIC_KEY_PRESSURE][0]
         self.assertEqual(pressureEventRead.parameter1, 60)
         self.assertEqual(pressureEventRead.parameter2, 90)
+
+    def testReadUnknownMetaMessage(self):
+        mt = MidiTrack()
+        mt.processDataToEvents(b'\x00\xff\x08\x06DUMMY\x00\x00\xff\n\x05Myut\x00'
+                               + b'\x00\xffX\x04\x03\x01\x12\x01')
+        self.assertEqual(len(mt.events), 6)
+        self.assertEqual(mt.events[3].type, MetaEvents.UNKNOWN)
 
 
 # ------------------------------------------------------------------------------

@@ -1,9 +1,9 @@
 -r requirements.txt
-pylint>=2.15.4
-flake8
+pylint>=2.16.0
+flake8<6.0.0
 flake8-quotes
 hatchling
-mypy
+mypy>=0.990
 coveralls
 scipy
 sphinx

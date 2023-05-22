@@ -202,7 +202,7 @@ class FretBoard(prebase.ProtoM21Object):
 
         return None
 
-    def getPitches(self):
+    def getPitches(self) -> list[None | pitch.Pitch]:
         '''
         Returns a list of all the pitches (or None for each) given the FretNote information. This
         requires a tuning to be set.

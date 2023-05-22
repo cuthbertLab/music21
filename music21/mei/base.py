@@ -1893,14 +1893,14 @@ def articFromElement(elem, slurBundle=None):  # pylint: disable=unused-argument
     :attr:`~music21.note.GeneralNote.articulations` attribute.
 
     >>> from xml.etree import ElementTree as ET
-    >>> meiSnippet = """<artic artic="acc" xmlns="http://www.music-encoding.org/ns/mei"/>"""
+    >>> meiSnippet = '<artic artic="acc" xmlns="http://www.music-encoding.org/ns/mei"/>'
     >>> meiSnippet = ET.fromstring(meiSnippet)
     >>> mei.base.articFromElement(meiSnippet)
     [<music21.articulations.Accent>]
 
     A single <artic> element may indicate many :class:`Articulation` objects.
 
-    >>> meiSnippet = """<artic artic="acc ten" xmlns="http://www.music-encoding.org/ns/mei"/>"""
+    >>> meiSnippet = '<artic artic="acc ten" xmlns="http://www.music-encoding.org/ns/mei"/>'
     >>> meiSnippet = ET.fromstring(meiSnippet)
     >>> mei.base.articFromElement(meiSnippet)
     [<music21.articulations.Accent>, <music21.articulations.Tenuto>]
@@ -1952,11 +1952,11 @@ def accidFromElement(elem, slurBundle=None):  # pylint: disable=unused-argument
     a string. Accidentals up to triple-sharp and triple-flat are supported.
 
     >>> from xml.etree import ElementTree as ET
-    >>> meiSnippet = """<accid accid="s" xmlns="http://www.music-encoding.org/ns/mei"/>"""
+    >>> meiSnippet = '<accid accid="s" xmlns="http://www.music-encoding.org/ns/mei"/>'
     >>> meiSnippet = ET.fromstring(meiSnippet)
     >>> mei.base.accidFromElement(meiSnippet)
     '#'
-    >>> meiSnippet = """<accid accid="tf" xmlns="http://www.music-encoding.org/ns/mei"/>"""
+    >>> meiSnippet = '<accid accid="tf" xmlns="http://www.music-encoding.org/ns/mei"/>'
     >>> meiSnippet = ET.fromstring(meiSnippet)
     >>> mei.base.accidFromElement(meiSnippet)
     '---'

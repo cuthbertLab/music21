@@ -19,11 +19,16 @@ from __future__ import annotations
 
 import copy
 from math import inf
+import typing as t
 import unittest
 
+from music21.common.types import OffsetQLIn
 from music21 import environment
 from music21 import exceptions21
 
+if t.TYPE_CHECKING:
+    from music21 import base
+    from music21 import stream
 
 environLocal = environment.Environment('tree.spans')
 # -----------------------------------------------------------------------------
@@ -318,19 +323,18 @@ class ElementTimespan(Timespan):
 
     # INITIALIZER #
 
-    def __init__(self,
-                 element=None,
-                 parentOffset=None,
-                 parentEndTime=None,
-                 parentage=None,
-                 offset=None,
-                 endTime=None,
-                 ):
+    def __init__(
+        self,
+        element: base.Music21Object | None = None,
+        parentOffset: OffsetQLIn | None = None,
+        parentEndTime: OffsetQLIn | None = None,
+        parentage: tuple[stream.Stream, ...] = (),
+        offset: OffsetQLIn | None = None,
+        endTime: OffsetQLIn | None = None,
+    ):
         super().__init__(offset=offset, endTime=endTime)
 
-        self.element = element
-        if parentage is not None:
-            parentage = tuple(parentage)
+        self.element: base.Music21Object | None = element
         self.parentage = parentage
         if parentOffset is not None:
             parentOffset = float(parentOffset)
@@ -494,7 +498,7 @@ class ElementTimespan(Timespan):
         from music21 import stream
         return self.getParentageByClass(classList=(stream.Part,))
 
-    def makeElement(self, makeCopy=True):
+    def makeElement(self, makeCopy: bool = True) -> base.Music21Object | None:
         '''
         Return a copy of the element (or the same one if makeCopy is False)
         with the quarterLength set to the length of the timespan
@@ -504,7 +508,6 @@ class ElementTimespan(Timespan):
             return None
 
         if makeCopy:
-            el: 'music21.base.Music21Object'
             el_old = el
             el = copy.deepcopy(el_old)
             el.derivation.origin = el_old
@@ -526,11 +529,11 @@ class PitchedTimespan(ElementTimespan):
                  endTime=None,
                  ):
         super().__init__(element=element,
-                                              parentOffset=parentOffset,
-                                              parentEndTime=parentEndTime,
-                                              parentage=parentage,
-                                              offset=offset,
-                                              endTime=endTime)
+                         parentOffset=parentOffset,
+                         parentEndTime=parentEndTime,
+                         parentage=parentage,
+                         offset=offset,
+                         endTime=endTime)
 
     @property
     def pitches(self):

@@ -63,7 +63,7 @@ def readPickleGzip(filePath: str | pathlib.Path) -> t.Any:
         try:
             uncompressed = pickledFile.read()
             newMdb = pickle.loads(uncompressed)
-        except Exception as e:  # pylint: disable=broad-except
+        except Exception as e:  # pylint: disable=broad-exception-caught
             # pickle exceptions cannot be caught directly
             # because they might come from pickle or _pickle and the latter cannot
             # be caught.
@@ -117,7 +117,7 @@ def readFileEncodingSafe(filePath, firstGuess='utf-8') -> str:
         import chardet  # type: ignore
         with io.open(filePath, 'rb') as thisFileBinary:
             dataBinary = thisFileBinary.read()
-            encoding = chardet.detect(dataBinary)['encoding']
+            encoding = chardet.detect(dataBinary)['encoding'] or 'ascii'
             return codecs.decode(dataBinary, encoding)
     # might also raise FileNotFoundError, but let that bubble
 

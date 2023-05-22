@@ -75,13 +75,12 @@ def isNum(usrData: t.Any) -> t.TypeGuard[numbers.Rational]:
     '''
     # noinspection PyBroadException
     try:
-        # TODO: this may have unexpected consequences: find
         dummy = usrData + 0
         if usrData is not True and usrData is not False:
             return True
         else:
             return False
-    except Exception:  # pylint: disable=broad-except
+    except Exception:  # pylint: disable=broad-exception-caught
         return False
 
 
@@ -295,7 +294,7 @@ def tempAttribute(obj, attribute: str, new_val=TEMP_ATTRIBUTE_SENTINEL):
         setattr(obj, attribute, tempStorage)
 
 @contextlib.contextmanager
-def saveAttributes(obj, *attributeList):
+def saveAttributes(obj, *attributeList: str) -> t.Generator[None, None, None]:
     '''
     Save a number of attributes in an object and then restore them afterwards.
 

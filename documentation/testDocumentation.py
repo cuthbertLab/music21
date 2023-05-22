@@ -5,7 +5,7 @@
 #
 # Authors:      Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2010-2022 Michael Scott Asato Cuthbert
+# Copyright:    Copyright © 2010-2023 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
@@ -238,7 +238,7 @@ def main(runOne: str | bool = False):
                 print(f'all {testCount} tests ran successfully')
             totalTests += testCount
             totalFailures += failCount
-        except Exception as e:  # pylint: disable=broad-except
+        except Exception as e:  # pylint: disable=broad-exception-caught
             print(f'failed miserably! {e}')
             import traceback
             tb = traceback.format_exc()

@@ -37,8 +37,10 @@ from music21 import bar
 from music21 import clef
 from music21 import chord
 from music21 import common
+from music21.common.types import OffsetQL
 from music21 import defaults
 from music21 import duration
+from music21.common.enums import AppendSpanners
 from music21 import environment
 from music21 import exceptions21
 from music21 import expressions
@@ -72,7 +74,7 @@ if t.TYPE_CHECKING:
 
 # ------------------------------------------------------------------------------
 
-def typeToMusicXMLType(value):
+def typeToMusicXMLType(value: str) -> str:
     '''
     Convert a music21 type to a MusicXML type.
 
@@ -113,7 +115,7 @@ def typeToMusicXMLType(value):
         return value
 
 
-def normalizeColor(color):
+def normalizeColor(color: str) -> str:
     '''
     Normalize a css3 name to hex or leave it alone...
 
@@ -124,15 +126,15 @@ def normalizeColor(color):
     >>> musicxml.m21ToXml.normalizeColor('#00ff00')
     '#00FF00'
     '''
-    if color in (None, ''):
-        return color
+    if not color:
+        return ''
     if '#' not in color:
         return webcolors.name_to_hex(color).upper()
     else:
         return color.upper()
 
 
-def getMetadataFromContext(s):
+def getMetadataFromContext(s: stream.Stream) -> metadata.Metadata | None:
     # noinspection PyShadowingNames
     '''
     Get metadata from site or context, so that a Part
@@ -166,14 +168,14 @@ def getMetadataFromContext(s):
 
 
 def _setTagTextFromAttribute(
-    m21El,
+    m21El: t.Any,
     xmlEl: Element,
     tag: str,
     attributeName: str | None = None,
     *,
-    transform=None,
-    forceEmpty=False
-):
+    transform: t.Callable[[t.Any], t.Any] | None = None,
+    forceEmpty: bool = False
+) -> Element | None:
     '''
     If m21El has an attribute called attributeName, create a new SubElement
     for xmlEl and set its text to the value of the m21El attribute.
@@ -234,7 +236,13 @@ def _setTagTextFromAttribute(
     return subElement
 
 
-def _setAttributeFromAttribute(m21El, xmlEl, xmlAttributeName, attributeName=None, transform=None):
+def _setAttributeFromAttribute(
+    m21El: t.Any,
+    xmlEl: Element,
+    xmlAttributeName: str,
+    attributeName: str | None = None,
+    transform: t.Callable[[t.Any], t.Any] | None = None
+):
     '''
     If m21El has at least one element of tag==tag with some text. If
     it does, set the attribute either with the same name (with "foo-bar" changed to
@@ -356,11 +364,11 @@ class GeneralObjectExporter:
         ('Music21Object', 'fromMusic21Object'),
     ])
 
-    def __init__(self, obj=None):
+    def __init__(self, obj: prebase.ProtoM21Object | None = None):
         self.generalObj = obj
         self.makeNotation: bool = True
 
-    def parse(self, obj=None):
+    def parse(self, obj: prebase.ProtoM21Object | None = None) -> bytes:
         r'''
         Return a bytes object representation of anything from a
         Score to a single pitch.
@@ -402,7 +410,7 @@ class GeneralObjectExporter:
           <!--=========================== Part 1 ===========================-->
           <part id="...">
             <!--========================= Measure 1 ==========================-->
-            <measure number="1">
+            <measure implicit="no" number="1">
               <attributes>
                 <divisions>10080</divisions>
                 <time>
@@ -430,6 +438,9 @@ class GeneralObjectExporter:
         '''
         if obj is None:
             obj = self.generalObj
+        if obj is None:
+            raise MusicXMLExportException('Must have an object to export')
+
         if self.makeNotation:
             outObj = self.fromGeneralObject(obj)
             return self.parseWellformedObject(outObj)
@@ -438,7 +449,7 @@ class GeneralObjectExporter:
                 raise MusicXMLExportException('Can only export Scores with makeNotation=False')
             return self.parseWellformedObject(obj)
 
-    def parseWellformedObject(self, sc) -> bytes:
+    def parseWellformedObject(self, sc: stream.Score) -> bytes:
         '''
         Parse an object that has already gone through the
         `.fromGeneralObject` conversion, which has produced a copy with
@@ -451,10 +462,10 @@ class GeneralObjectExporter:
         scoreExporter.parse()
         return scoreExporter.asBytes()
 
-    def fromGeneralObject(self, obj):
+    def fromGeneralObject(self, obj: prebase.ProtoM21Object):
         '''
         Converts any Music21Object (or a duration or a pitch) to something that
-        can be passed to ScoreExporter()
+        can be passed to :class:`ScoreExporter`.
 
         >>> GEX = musicxml.m21ToXml.GeneralObjectExporter()
         >>> s = GEX.fromGeneralObject(duration.Duration(3.0))
@@ -480,17 +491,20 @@ class GeneralObjectExporter:
         >>> outStr = out.decode('utf-8')  # now is string
         >>> '<note print-object="no" print-spacing="yes">' in outStr
         True
+        >>> len(v[note.Rest])  # original stream unchanged
+        0
         '''
         classes = obj.classes
         outObj = None
 
         if isinstance(obj, stream.Stream) and self.makeNotation:
-            obj.makeRests(refStreamOrTimeRange=[0.0, obj.highestTime],
-                          fillGaps=True,
-                          inPlace=True,
-                          hideRests=True,  # just to fill up MusicXML display
-                          timeRangeFromBarDuration=True,
-                          )
+            # This is where the first (and hopefully only) copy is made.
+            obj = obj.makeRests(refStreamOrTimeRange=[0.0, obj.highestTime],
+                                fillGaps=True,
+                                inPlace=False,
+                                hideRests=True,  # just to fill up MusicXML display
+                                timeRangeFromBarDuration=True,
+                                )
 
         for cM, methName in self.classMapping.items():
             if cM in classes:
@@ -506,21 +520,22 @@ class GeneralObjectExporter:
 
     def fromScore(self, sc):
         '''
-        Copies the input score and runs :meth:`~music21.stream.Score.makeNotation` on the copy.
+        Runs :meth:`~music21.stream.Score.makeNotation` on the copy.
         '''
-        scOut = sc.makeNotation(inPlace=False)
-        if not scOut.isWellFormedNotation():
-            warnings.warn(f'{scOut} is not well-formed; see isWellFormedNotation()',
+        if self.makeNotation:
+            sc.makeNotation(inPlace=True)
+        if not sc.isWellFormedNotation():
+            warnings.warn(f'{sc} is not well-formed; see isWellFormedNotation()',
                 category=MusicXMLWarning)
-        # scOut.makeImmutable()
-        return scOut
+        # sc.makeImmutable()
+        return sc
 
     def fromPart(self, p):
         '''
         From a part, put it in a new score.
         '''
         if p.isFlat:
-            p = p.makeMeasures()
+            p.makeMeasures(inPlace=True)
         # p.makeImmutable()  # impossible, we haven't made notation yet.
         s = stream.Score()
         s.insert(0, p)
@@ -537,20 +552,20 @@ class GeneralObjectExporter:
         solutions in Part or Stream production.
         '''
         m.coreGatherMissingSpanners()
-        mCopy = m.makeNotation()
-        if mCopy.style.measureNumbering is None:
+        m.makeNotation(inPlace=True)
+        if m.style.measureNumbering is None:
             # Provide a default
-            mCopy.style.measureNumbering = 'measure'
+            m.style.measureNumbering = 'measure'
         clef_from_measure_start_or_context = m.getContextByClass(
             clef.Clef,
             getElementMethod=common.enums.ElementSearch.AT_OR_BEFORE_OFFSET
         )
         if clef_from_measure_start_or_context is None:
-            mCopy.clef = clef.bestClef(mCopy, recurse=True)
+            m.clef = clef.bestClef(m, recurse=True)
         else:
-            mCopy.clef = clef_from_measure_start_or_context
+            m.clef = clef_from_measure_start_or_context
         p = stream.Part()
-        p.append(mCopy)
+        p.append(m)
         p.metadata = copy.deepcopy(getMetadataFromContext(m))
         context_part = m.getContextByClass(stream.Part)
         if context_part is not None:
@@ -806,8 +821,8 @@ class XMLExporterBase:
     contains functions that could be called
     at multiple levels of exporting (Score, Part, Measure).
     '''
-    def __init__(self):
-        self.xmlRoot = None
+    def __init__(self) -> None:
+        self.xmlRoot = Element('override-me-in-subclasses')
         self.stream: stream.Stream | None = None
 
     def asBytes(self, noCopy=True) -> bytes:
@@ -1333,10 +1348,9 @@ class XMLExporterBase:
         if mxStaffLayoutIn is None:
             return mxStaffLayout
 
-    def accidentalToMx(self, a):
-        # noinspection PyShadowingNames
+    def accidentalToMx(self, a: pitch.Accidental, *, elName: str = 'accidental') -> Element:
         '''
-        Convert a pitch.Accidental object to a Element of tag accidental
+        Convert a pitch.Accidental object to a Element of tag 'accidental' (or other name)
 
         >>> a = pitch.Accidental()
         >>> a.set('half-sharp')
@@ -1354,8 +1368,8 @@ class XMLExporterBase:
 
 
         >>> a.set('one-and-a-half-sharp')
-        >>> XB.dump(a2m(a))
-        <accidental>three-quarters-sharp</accidental>
+        >>> XB.dump(a2m(a, elName='accidental-mark'))
+        <accidental-mark>three-quarters-sharp</accidental-mark>
 
         >>> a.set('half-flat')
         >>> XB.dump(a2m(a))
@@ -1392,6 +1406,7 @@ class XMLExporterBase:
         >>> XB.dump(a2m(a))
         <accidental>other</accidental>
         '''
+        # noinspection PyShadowingNames
         otherMusicXMLAccidentals = (
             # v. 3.1
             'double-sharp-down', 'double-sharp-up',
@@ -1428,7 +1443,7 @@ class XMLExporterBase:
                     and mxName not in otherMusicXMLAccidentals):
                 mxName = 'other'
 
-        mxAccidental = Element('accidental')
+        mxAccidental = Element(elName)
         # need to remove display in this case and return None
         #         if self.displayStatus == False:
         #             pass
@@ -1440,6 +1455,10 @@ class XMLExporterBase:
 
         self.setPrintStyle(mxAccidental, a)
         return mxAccidental
+
+
+    def accidentalToMxAccidentalMark(self, a: pitch.Accidental) -> Element:
+        return self.accidentalToMx(a, elName='accidental-mark')
 
 
 # ---------
@@ -1459,9 +1478,9 @@ class ScoreExporter(XMLExporterBase, PartStaffExporterMixin):
             self.stream = score
 
         self.xmlRoot = Element('score-partwise', version=defaults.musicxmlVersion)
-        self.mxIdentification = None
+        self.mxIdentification: Element | None = None
 
-        self.scoreMetadata = None
+        self.scoreMetadata: metadata.Metadata | None = None
 
         self.spannerBundle: spanner.SpannerBundle | None = None
         self.meterStream: stream.Stream[meter.TimeSignatureBase] | None = None
@@ -1506,9 +1525,8 @@ class ScoreExporter(XMLExporterBase, PartStaffExporterMixin):
         if not s:
             return self.emptyObject()
 
-        if s.atSoundingPitch is True:
-            # A copy was already made or elected NOT to be made.
-            s.toWrittenPitch(inPlace=True)
+        # A copy was already made or elected NOT to be made.
+        s.toWrittenPitch(inPlace=True, ottavasToSounding=True)
 
         self.scorePreliminaries()
 
@@ -1724,7 +1742,7 @@ class ScoreExporter(XMLExporterBase, PartStaffExporterMixin):
         >>> SX.dump(SX.partExporterList[0].xmlRoot)
         <part id="...">
           <!--========================= Measure 1 ==========================-->
-          <measure number="1">...</measure>
+          <measure implicit="no" number="1">...</measure>
         </part>
         >>> del SX.partExporterList[:]  # for garbage collection
         '''
@@ -1748,7 +1766,7 @@ class ScoreExporter(XMLExporterBase, PartStaffExporterMixin):
 
             partExp.staffGroup = joinableGroup
 
-    def renumberVoicesWithinStaffGroups(self):
+    def renumberVoicesWithinStaffGroups(self) -> None:
         '''
         Renumbers voices (as appropriate) in each StaffGroup, so that
         voices have unique numbers across the entire group.
@@ -1767,8 +1785,12 @@ class ScoreExporter(XMLExporterBase, PartStaffExporterMixin):
 
             # renumber the voices in this StaffGroup
             staffGroupScore = stream.Score(partExp.staffGroup.getSpannedElements())
-            measuresStream = staffGroupScore.recurse().getElementsByClass(stream.Measure).stream()
-            for measureStack in OffsetIterator(measuresStream):
+            measuresStream: stream.Stream[stream.Measure] = (
+                staffGroupScore.recurse().getElementsByClass(stream.Measure).stream()
+            )
+            offsetIterator: OffsetIterator[stream.Measure] = OffsetIterator(measuresStream)
+            measureStack: t.Sequence[stream.Stream[stream.Measure]]
+            for measureStack in offsetIterator:
                 nextVoiceId: int = 1
                 for m in measureStack:
                     for v in m[stream.Voice]:
@@ -2273,7 +2295,7 @@ class ScoreExporter(XMLExporterBase, PartStaffExporterMixin):
         # environLocal.printDebug(['configureMxPartGroupFromStaffGroup: mxPartGroup', mxPartGroup])
         return mxPartGroup
 
-    def setIdentification(self):
+    def setIdentification(self) -> Element:
         # noinspection SpellCheckingInspection, PyShadowingNames
         '''
         Returns an identification object from self.scoreMetadata.  And appends to the score...
@@ -2372,7 +2394,10 @@ class ScoreExporter(XMLExporterBase, PartStaffExporterMixin):
 
         return mxId
 
-    def metadataToMiscellaneous(self, md=None):
+    def metadataToMiscellaneous(
+        self,
+        md: metadata.Metadata | None = None
+    ) -> Element | None:
         # noinspection PyShadowingNames
         '''
         Returns an mxMiscellaneous of information from metadata object md or
@@ -2397,11 +2422,13 @@ class ScoreExporter(XMLExporterBase, PartStaffExporterMixin):
         elif md is None:
             md = self.scoreMetadata
 
+        if t.TYPE_CHECKING:
+            assert md is not None
+
         mxMiscellaneous = Element('miscellaneous')
 
         foundOne = False
-        allItems: list[tuple[str, t.Any]] = []
-
+        allItems: tuple[tuple[str, t.Any], ...]
         allItems = md.all(
             skipContributors=True,  # we don't want the contributors (already handled them)
             returnPrimitives=True,  # we want ValueType values
@@ -2553,13 +2580,16 @@ class ScoreExporter(XMLExporterBase, PartStaffExporterMixin):
 
         return supportsList
 
-    def setTitles(self):
+    def setTitles(self) -> None:
         '''
         puts work (with work-title), movement-number, movement-title into the self.xmlRoot
         '''
         mdObj = self.scoreMetadata
         if self.scoreMetadata is None:
             mdObj = metadata.Metadata()
+        if t.TYPE_CHECKING:
+            assert mdObj is not None
+
         mxScoreHeader = self.xmlRoot
         mxWork = Element('work')
         # TODO: work-number
@@ -2580,7 +2610,7 @@ class ScoreExporter(XMLExporterBase, PartStaffExporterMixin):
 
         # musicxml often defaults to show only movement title
         # if no movementName is found in mdObj, set movement title to
-        # the mdObj's first title instead. Fall back to defaults.title if
+        # first title of the mdObj instead. Fall back to defaults.title if
         # necessary (and if possible).
 
         movement_title: str = ''
@@ -2707,8 +2737,7 @@ class PartExporter(XMLExporterBase):
         # unless makeNotation=False, but the user
         # should have called toWrittenPitch() first
         # and is explicitly asking for no further copies to be made
-        if self.stream.atSoundingPitch is True:
-            self.stream.toWrittenPitch(inPlace=True)
+        self.stream.toWrittenPitch(inPlace=True, ottavasToSounding=True)
 
         # Suppose that everything below this is a measure
         if self.makeNotation:
@@ -3120,7 +3149,6 @@ class MeasureExporter(XMLExporterBase):
             ('RehearsalMark', 'rehearsalMarkToXml'),
         ]
     )
-
     # these need to be wrapped in an attributes tag if not at the beginning of the measure.
     wrapAttributeMethodClasses = OrderedDict(
         [('Clef', 'clefToXml'),
@@ -3143,12 +3171,15 @@ class MeasureExporter(XMLExporterBase):
         self.xmlRoot = Element('measure')
         self.currentDivisions = defaults.divisionsPerQuarter
 
+        # Adding ids to measure in the MusicXML export
+        _synchronizeIds(self.xmlRoot, self.stream)
+
         # TODO: allow for mid-measure transposition changes.
         self.transpositionInterval = None
         self.mxTranspose = None
         self.measureOffsetStart = 0.0
         self.offsetInMeasure = 0.0
-        self.currentVoiceId: int | None = None
+        self.currentVoiceId: int | str | None = None
         self.nextFreeVoiceNumber: int = 1
         self.nextArpeggioNumber: int = 1
         self.arpeggioNumbers: dict[expressions.ArpeggioMarkSpanner, int] = {}
@@ -3207,7 +3238,65 @@ class MeasureExporter(XMLExporterBase):
             # Assumes voices are flat...
             self.parseFlatElements(v, backupAfterwards=backupAfterwards)
 
-    def parseFlatElements(self, m, *, backupAfterwards=False):
+    def moveForward(self, byOffset: OffsetQL):
+        '''
+        Moves self.offsetInMeasure forward by an OffsetQL, appending the appropriate
+        <forward> tag (expressed in divisions) to self.xmlRoot.
+
+        >>> MEX = musicxml.m21ToXml.MeasureExporter()
+        >>> len(MEX.xmlRoot)
+        0
+        >>> MEX.moveForward(1)
+        >>> MEX.dump(MEX.xmlRoot)
+        <measure>
+          <forward>
+            <duration>10080</duration>
+          </forward>
+        </measure>
+        >>> len(MEX.xmlRoot)
+        1
+
+        '''
+        amountToMoveForward: int = int(round(byOffset * self.currentDivisions))
+        if amountToMoveForward:
+            mxForward = Element('forward')
+            mxDuration = SubElement(mxForward, 'duration')
+            mxDuration.text = str(amountToMoveForward)
+            self.xmlRoot.append(mxForward)
+            self.offsetInMeasure += byOffset
+
+    def moveBackward(self, byOffset: OffsetQL):
+        '''
+        Moves self.offsetInMeasure backward by an OffsetQL, appending the appropriate
+        <backup> tag (expressed in divisions) to self.xmlRoot.
+
+        >>> MEX = musicxml.m21ToXml.MeasureExporter()
+        >>> len(MEX.xmlRoot)
+        0
+        >>> MEX.moveBackward(2)
+        >>> MEX.dump(MEX.xmlRoot)
+        <measure>
+          <backup>
+            <duration>20160</duration>
+          </backup>
+        </measure>
+        >>> len(MEX.xmlRoot)
+        1
+        '''
+        amountToBackup: int = int(round(byOffset * self.currentDivisions))
+        if amountToBackup:
+            mxBackup = Element('backup')
+            mxDuration = SubElement(mxBackup, 'duration')
+            mxDuration.text = str(amountToBackup)
+            self.xmlRoot.append(mxBackup)
+            self.offsetInMeasure -= byOffset
+
+    def parseFlatElements(
+        self,
+        m: stream.Measure | stream.Voice,
+        *,
+        backupAfterwards: bool = False
+    ) -> None:
         '''
         Deals with parsing all the elements in .elements, assuming that .elements is flat.
 
@@ -3219,11 +3308,9 @@ class MeasureExporter(XMLExporterBase):
         Note that if the .id is high enough to be an id(x) memory location, then a small
         voice number is used instead.
         '''
-        root = self.xmlRoot
-        divisions = self.currentDivisions
         self.offsetInMeasure = 0.0
+        voiceId: int | str | None
         if isinstance(m, stream.Voice):
-            m: stream.Voice
             if isinstance(m.id, int) and m.id < defaults.minIdNumberToConsiderMemoryLocation:
                 voiceId = m.id
                 self.nextFreeVoiceNumber = voiceId + 1
@@ -3239,112 +3326,199 @@ class MeasureExporter(XMLExporterBase):
 
         self.currentVoiceId = voiceId
 
-        # group all objects by offsets and then do a different order than normal sort.
-        # that way chord symbols and other 0-width objects appear before notes as much as
+        # We order things differently if there are any SpannerAnchors in the flat stream.
+        # If there are SpannerAnchors, we do two passes. The first pass skips all
+        # relatedSpanners processing, and then the second pass goes back to the
+        # beginning and does all the relatedSpanners processing.
+        # If there are no SpannerAnchors, we do one pass, doing any relatedSpanners
+        # processing as we process each element.
+
+        hasSpannerAnchors: bool = bool(m.getElementsByClass(spanner.SpannerAnchor))
+
+        # First (and possibly only) pass:
+        # Group all objects by offsets and then do a different order than normal sort.
+        # That way chord symbols and other 0-width objects appear before notes as much as
         # possible.
-        for objGroup in OffsetIterator(m):
+        objIterator: OffsetIterator[base.Music21Object] = OffsetIterator(m)
+        for objGroup in objIterator:
             groupOffset = m.elementOffset(objGroup[0])
-            amountToMoveForward = int(round(divisions * (groupOffset
-                                                             - self.offsetInMeasure)))
-            if amountToMoveForward > 0 and any(
+            offsetToMoveForward = groupOffset - self.offsetInMeasure
+            if offsetToMoveForward > 0 and any(
                     isinstance(obj, (note.GeneralNote, clef.Clef)) for obj in objGroup):
                 # gap in stream between GeneralNote/Clef objects: create <forward>
-                mxForward = Element('forward')
-                mxDuration = SubElement(mxForward, 'duration')
-                mxDuration.text = str(amountToMoveForward)
-                root.append(mxForward)
-                self.offsetInMeasure = groupOffset
+                self.moveForward(offsetToMoveForward)
 
             notesForLater = []
             for obj in objGroup:
                 # we do all non-note elements (including ChordSymbols not written as chord)
                 # first before note elements, in musicxml
+                if isinstance(obj, spanner.SpannerAnchor):
+                    # nothing to do with this (only relatedSpanners, and
+                    # we will do that below)
+                    continue
+
                 if isinstance(obj, note.GeneralNote) and (
                     not (isHarm := isinstance(obj, harmony.Harmony))
                     or (isHarm and obj.writeAsChord)
                 ):
                     notesForLater.append(obj)
                 else:
-                    self.parseOneElement(obj)
+                    if hasSpannerAnchors:
+                        self.parseOneElement(obj, AppendSpanners.NONE)
+                    else:
+                        self.parseOneElement(obj, AppendSpanners.NORMAL)
 
             for n in notesForLater:
                 if n.isRest and n.style.hideObjectOnPrint and n.duration.type == 'inexpressible':
                     # Prefer a gap in stream, to be filled with a <forward> tag by
                     # fill_gap_with_forward_tag() rather than raising exceptions
                     continue
-                self.parseOneElement(n)
+                if hasSpannerAnchors:
+                    self.parseOneElement(n, AppendSpanners.NONE)
+                else:
+                    self.parseOneElement(n, AppendSpanners.NORMAL)
+
+        # Second pass: If this flat stream (measure/voice) contains any SpannerAnchors, we
+        # will perform a second pass, emitting any pre/postList for any object that is
+        # functioning as a spanner anchor (the SpannerAnchors, as well as any GeneralNotes
+        # that start or end spanners).
+
+        # Before second pass, stash off self.offsetInMeasure in case we need to jump forward
+        # to it after the second pass.
+        firstPassEndOffsetInMeasure: OffsetQL = self.offsetInMeasure
+
+        if hasSpannerAnchors:
+            # return to the beginning of the measure, to emit any SpannerAnchors.
+            if self.offsetInMeasure:
+                self.moveBackward(self.offsetInMeasure)
+
+            objIterator = OffsetIterator(m)
+            for objGroup in objIterator:
+                if not any(self._hasRelatedSpanners(obj) for obj in objGroup):
+                    continue
+                groupOffset = m.elementOffset(objGroup[0])
+                offsetToMoveForward = groupOffset - self.offsetInMeasure
+                if offsetToMoveForward > 0:
+                    # gap in stream before spanner start/stop: create <forward>
+                    self.moveForward(offsetToMoveForward)
+
+                for obj in objGroup:
+                    self.parseOneElement(obj, AppendSpanners.RELATED_ONLY)
 
         if backupAfterwards:
             # return to the beginning of the measure.
-            amountToBackup = round(divisions * self.offsetInMeasure)
-            if amountToBackup:
-                mxBackup = Element('backup')
-                mxDuration = SubElement(mxBackup, 'duration')
-                mxDuration.text = str(amountToBackup)
-                root.append(mxBackup)
+            if self.offsetInMeasure:
+                self.moveBackward(self.offsetInMeasure)
+        else:
+            # if necessary, jump to end of the measure.
+            if self.offsetInMeasure < firstPassEndOffsetInMeasure:
+                self.moveForward(firstPassEndOffsetInMeasure)
 
         self.currentVoiceId = None
 
-    def parseOneElement(self, obj):
+    def parseOneElement(
+        self,
+        obj,
+        appendSpanners: AppendSpanners = AppendSpanners.NORMAL
+    ):
         '''
         parse one element completely and add it to xmlRoot, updating
         offsetInMeasure, etc.
         '''
         root = self.xmlRoot
         self.objectSpannerBundle = self.spannerBundle.getBySpannedElement(obj)
-        preList, postList = self.prePostObjectSpanners(obj)
+        preList, postList = self.relatedSpanners(obj)
 
-        for sp in preList:  # directions that precede the element
-            root.append(sp)
+        # pre-spanners (if appropriate)
+        if appendSpanners != AppendSpanners.NONE:
+            # emit the related spanners that precede the element
+            for sp in preList:
+                root.append(sp)
 
-        classes = obj.classes
-        # Ignore Harmony objects having writeAsChord = False
-        if 'GeneralNote' in classes and getattr(obj, 'writeAsChord', True):
-            self.offsetInMeasure += obj.duration.quarterLength
+        # element itself (if appropriate)
+        if appendSpanners != AppendSpanners.RELATED_ONLY:
+            # emit the object
+            classes = obj.classes
+            # Ignore Harmony objects having writeAsChord = False
+            if 'GeneralNote' in classes and getattr(obj, 'writeAsChord', True):
+                self.offsetInMeasure += obj.duration.quarterLength
 
-        # turn inexpressible durations into complex durations (unless unlinked)
-        if obj.duration.type == 'inexpressible':
-            obj.duration.quarterLength = obj.duration.quarterLength
-            objList = obj.splitAtDurations()
-        # make dotGroups into normal notes
-        elif len(obj.duration.dotGroups) > 1:
-            obj.duration.splitDotGroups(inPlace=True)
-            objList = obj.splitAtDurations()
-        # otherwise, splitAtDurations() was already called by parse(), no need to repeat
-        else:
-            objList = [obj]
+            # turn inexpressible durations into complex durations (unless unlinked)
+            if obj.duration.type == 'inexpressible':
+                obj.duration.quarterLength = obj.duration.quarterLength
+                objList = obj.splitAtDurations()
+            # make dotGroups into normal notes
+            elif len(obj.duration.dotGroups) > 1:
+                obj.duration.splitDotGroups(inPlace=True)
+                objList = obj.splitAtDurations()
+            # otherwise, splitAtDurations() was already called by parse(), no need to repeat
+            else:
+                objList = [obj]
 
-        parsedObject = False
-        for className, methName in self.classesToMethods.items():
-            if className in classes:
-                meth = getattr(self, methName)
-                for o in objList:
-                    meth(o)
-                parsedObject = True
-                break
-
-        # these are classes that need to be wrapped in an attribute tag if
-        # not at the beginning of a measure
-        for className, methName in self.wrapAttributeMethodClasses.items():
-            if className in classes:
-                meth = getattr(self, methName)
-                for o in objList:
-                    self.wrapObjectInAttributes(o, meth)
-                parsedObject = True
-                break
-
-        if parsedObject is False:
-            for className in classes:
-                if className in self.ignoreOnParseClasses:
+            parsedObject = False
+            for className, methName in self.classesToMethods.items():
+                if className in classes:
+                    meth = getattr(self, methName)
+                    for o in objList:
+                        meth(o)
                     parsedObject = True
                     break
+
+            # these are classes that need to be wrapped in an attribute tag if
+            # not at the beginning of a measure
+            for className, methName in self.wrapAttributeMethodClasses.items():
+                if className in classes:
+                    meth = getattr(self, methName)
+                    for o in objList:
+                        self.wrapObjectInAttributes(o, meth)
+                    parsedObject = True
+                    break
+
             if parsedObject is False:
-                environLocal.printDebug(['did not convert object', obj])
+                for className in classes:
+                    if className in self.ignoreOnParseClasses:
+                        parsedObject = True
+                        break
+                if parsedObject is False:
+                    environLocal.printDebug(['did not convert object', obj])
 
-        for sp in postList:  # directions that follow the element
-            root.append(sp)
+        else:  # appendSpanners == AppendSpanners.RELATED_ONLY
+            # skip the element itself, just move forward by element duration
+            if postList and obj.quarterLength > 0:
+                # gap in stream before spanner stop: create <forward>
+                # Ignore Harmony objects having writeAsChord = False
+                if 'GeneralNote' in obj.classes and getattr(obj, 'writeAsChord', True):
+                    self.moveForward(obj.duration.quarterLength)
 
-    def prePostObjectSpanners(self, target):
+        # post-spanners (if appropriate)
+        if appendSpanners != AppendSpanners.NONE:
+            # emit the related spanners that follow the element
+            for sp in postList:
+                root.append(sp)
+
+    def _hasRelatedSpanners(self, obj) -> bool:
+        '''
+        returns True if and only if:
+        (1) there are spanners related to the object that should appear before the object
+        to the <measure> tag, or (2) there are spanners related to the object that should
+        appear after the object in the measure tag.
+        '''
+        spannerBundle = self.spannerBundle.getBySpannedElement(obj)
+        if not spannerBundle:
+            return False
+
+        # this list of spanner classes must match the paramsSet keys in relatedSpanners()
+        for m21spannerClass in ('Ottava', 'DynamicWedge', 'Line'):
+            for thisSpanner in spannerBundle.getByClass(m21spannerClass):
+                if thisSpanner.isFirst(obj) or thisSpanner.isLast(obj):
+                    return True
+
+        return False
+
+    def relatedSpanners(
+        self,
+        target: base.Music21Object
+    ) -> tuple[t.Sequence[Element], t.Sequence[Element]]:
         '''
         return two lists or empty tuples:
         (1) spanners related to the object that should appear before the object
@@ -3369,8 +3543,8 @@ class MeasureExporter(XMLExporterBase):
         if not spannerBundle:
             return (), ()
 
-        preList = []
-        postList = []
+        preList: list[Element] = []
+        postList: list[Element] = []
 
         # number, type is assumed;
         # tuple: first is the elementType,
@@ -3664,6 +3838,80 @@ class MeasureExporter(XMLExporterBase):
             notations.append(mxOrnGroup)
 
         return notations
+
+    def objectAttachedSpannersToTechnicals(self, obj, objectSpannerBundle=None):
+        '''
+        return a list of <technical> from spanners related to the object that should appear
+        in the technical tag of the notations tag (hammer-on, pull-off etc.)
+
+        >>> n0 = note.Note('C')
+        >>> n1 = note.Note('D')
+        >>> n2 = note.Note('F')
+        >>> n3 = note.Note('E')
+        >>> hammerOn01 = articulations.HammerOn([n0, n1])
+        >>> pullOff23 = articulations.PullOff([n2, n3])
+        >>> m = stream.Measure()
+        >>> m.insert(0, hammerOn01)
+        >>> m.insert(0, pullOff23)
+        >>> m.append(n0)
+        >>> m.append(n1)
+        >>> m.append(n2)
+        >>> m.append(n3)
+        >>> mex = musicxml.m21ToXml.MeasureExporter(m)
+        >>> out = mex.objectAttachedSpannersToTechnicals(n0, m.spannerBundle)
+        >>> out
+        [<Element 'hammer-on' at 0x102857f40>]
+        >>> mex.dump(out[0])
+        <hammer-on number="1" type="start">H</hammer-on>
+        >>> out = mex.objectAttachedSpannersToTechnicals(n3, m.spannerBundle)
+        >>> mex.dump(out[0])
+        <pull-off number="1" type="stop" />
+
+        OMIT_FROM_DOCS
+
+        The other permutations of class and first/last:
+
+        >>> out = mex.objectAttachedSpannersToTechnicals(n1, m.spannerBundle)
+        >>> mex.dump(out[0])
+        <hammer-on number="1" type="stop" />
+        >>> out = mex.objectAttachedSpannersToTechnicals(n2, m.spannerBundle)
+        >>> mex.dump(out[0])
+        <pull-off number="1" type="start">P</pull-off>
+        '''
+        technicals = []
+        if objectSpannerBundle is not None:
+            sb = objectSpannerBundle
+        else:
+            sb = self.objectSpannerBundle
+
+        if not sb:
+            return technicals
+
+        for su in sb.getByClass(articulations.HammerOn):
+            mxHammerOn = Element('hammer-on')
+            if su.isFirst(obj):
+                mxHammerOn.set('type', 'start')
+                mxHammerOn.text = 'H'
+            elif su.isLast(obj):
+                mxHammerOn.set('type', 'stop')
+            else:
+                continue
+            mxHammerOn.set('number', '1')
+            technicals.append(mxHammerOn)
+
+        for su in sb.getByClass(articulations.PullOff):
+            mxPullOff = Element('pull-off')
+            if su.isFirst(obj):
+                mxPullOff.set('type', 'start')
+                mxPullOff.text = 'P'
+            elif su.isLast(obj):
+                mxPullOff.set('type', 'stop')
+            else:
+                continue
+            mxPullOff.set('number', '1')
+            technicals.append(mxPullOff)
+
+        return technicals
 
     def appendArpeggioMarkSpannersToNotations(
         self,
@@ -4342,7 +4590,7 @@ class MeasureExporter(XMLExporterBase):
     def unpitchedToXml(self,
                        up: note.Unpitched,
                        noteIndexInChord: int = 0,
-                       chordParent: chord.ChordBase = None) -> Element:
+                       chordParent: chord.ChordBase | None = None) -> Element:
         # noinspection PyShadowingNames
         '''
         Convert an :class:`~music21.note.Unpitched` to a <note>
@@ -4601,7 +4849,7 @@ class MeasureExporter(XMLExporterBase):
         setb(n, mxNotehead, 'parentheses', 'noteheadParenthesis',
              transform=xmlObjects.booleanToYesNo)
         # TODO: font
-        if n.hasStyleInformation and n.style.color not in (None, ''):
+        if n.hasStyleInformation and n.style.color:
             color = normalizeColor(n.style.color)
             mxNotehead.set('color', color)
         return mxNotehead
@@ -4621,6 +4869,39 @@ class MeasureExporter(XMLExporterBase):
             mxExpression = self.expressionToXml(arpeggioMark)
         return mxExpression
 
+    def ornamentToMxAccidentalMarks(self, ornamentObj: expressions.Ornament) -> list[Element]:
+        mxAccidentalMarks: list[Element] = []
+
+        if isinstance(ornamentObj, expressions.Turn):
+            # 0, 1, or 2 accidental marks
+            if (ornamentObj.upperOrnamentalPitch
+                    and ornamentObj.upperOrnamentalPitch.accidental
+                    and ornamentObj.upperOrnamentalPitch.accidental.displayStatus is True):
+                mxAccidentalMarks.append(
+                    self.accidentalToMxAccidentalMark(ornamentObj.upperOrnamentalPitch.accidental)
+                )
+                mxAccidentalMarks[-1].set('placement', 'above')
+            if (ornamentObj.lowerOrnamentalPitch
+                    and ornamentObj.lowerOrnamentalPitch.accidental
+                    and ornamentObj.lowerOrnamentalPitch.accidental.displayStatus is True):
+                mxAccidentalMarks.append(
+                    self.accidentalToMxAccidentalMark(ornamentObj.lowerOrnamentalPitch.accidental)
+                )
+                mxAccidentalMarks[-1].set('placement', 'below')
+        elif isinstance(ornamentObj, (expressions.GeneralMordent, expressions.Trill)):
+            # 0 or 1 accidental marks
+            if (ornamentObj.ornamentalPitch
+                    and ornamentObj.ornamentalPitch.accidental
+                    and ornamentObj.ornamentalPitch.accidental.displayStatus is True):
+                mxAccidentalMarks.append(
+                    self.accidentalToMxAccidentalMark(ornamentObj.ornamentalPitch.accidental)
+                )
+                if ornamentObj.direction == 'down':
+                    mxAccidentalMarks[-1].set('placement', 'below')
+                else:
+                    mxAccidentalMarks[-1].set('placement', 'above')
+
+        return mxAccidentalMarks
 
     def noteToNotations(self, n, noteIndexInChord=0, chordParent=None):
         '''
@@ -4663,11 +4944,18 @@ class MeasureExporter(XMLExporterBase):
                     if mxOrnaments is None:
                         mxOrnaments = Element('ornaments')
                     mxOrnaments.append(mxExpression)
+
+                    mxAccidMarks: list[Element] = (
+                        self.ornamentToMxAccidentalMarks(expObj)
+                    )
+                    for mxAccidMark in mxAccidMarks:
+                        mxOrnaments.append(mxAccidMark)
                     # print(mxExpression)
                 else:
                     notations.append(mxExpression)
 
-        # apply all articulations apart from fingerings and fret/string indication only to first note of chord
+        # apply all articulations apart from fingerings, string/fret and hammer-on/pull-off
+        # only to first note of chord
         applicableArticulations = []
         fingeringNumber = 0
         for a in chordOrNote.articulations:
@@ -4680,7 +4968,14 @@ class MeasureExporter(XMLExporterBase):
             elif isinstance(a, articulations.FretIndication):
                 applicableArticulations.append(a)
             elif isSingleNoteOrFirstInChord:
-                applicableArticulations.append(a)
+                # Ignore hammer-on/pull-off:
+                # are written from their Spanner representation instead.
+                # It's an anti-pattern to find spanners in the articulations
+                # array, and the musicxml importer doesn't put them here,
+                # but it's a potential point of user confusion, so we guard
+                # against it here to avoid writing out superfluous <other-technical>
+                if not isinstance(a, (articulations.HammerOn, articulations.PullOff)):
+                    applicableArticulations.append(a)
 
         for artObj in applicableArticulations:
             if isinstance(artObj, articulations.Pizzicato):
@@ -4690,6 +4985,7 @@ class MeasureExporter(XMLExporterBase):
             if isinstance(artObj, articulations.TechnicalIndication):
                 if mxTechnicalMark is None:
                     mxTechnicalMark = Element('technical')
+
                 mxTechnicalMark.append(self.articulationToXmlTechnical(artObj))
             else:
                 if mxArticulations is None:
@@ -4715,6 +5011,17 @@ class MeasureExporter(XMLExporterBase):
         # TODO: glissando
         # TODO: slide
 
+        if isSingleNoteOrFirstInChord and chordParent is not None:
+            spannerTechnicals = self.objectAttachedSpannersToTechnicals(chordParent)
+        elif chordParent is not None:
+            spannerTechnicals = None
+        else:
+            spannerTechnicals = self.objectAttachedSpannersToTechnicals(n)
+        if spannerTechnicals:
+            if mxTechnicalMark is None:
+                mxTechnicalMark = Element('technical')
+            mxTechnicalMark.extend(spannerTechnicals)
+
         for x in (mxArticulations,
                   mxTechnicalMark,
                   mxOrnaments):
@@ -4722,7 +5029,7 @@ class MeasureExporter(XMLExporterBase):
                 notations.append(x)
 
         # TODO: dynamics in notations
-        # TODO: accidental-mark
+        # TODO: accidental-mark (Notations; we've done Ornaments)
         # TODO: other-notation
         return notations
 
@@ -4958,6 +5265,13 @@ class MeasureExporter(XMLExporterBase):
         >>> MEX.dump(mxExpression)
         <inverted-turn placement="above" />
 
+        >>> invDelayedTurn = expressions.InvertedTurn(delay=1.)
+        >>> invDelayedTurn.placement = 'below'
+        >>> MEX = musicxml.m21ToXml.MeasureExporter()
+        >>> mxExpression = MEX.expressionToXml(invDelayedTurn)
+        >>> MEX.dump(mxExpression)
+        <delayed-inverted-turn placement="below" />
+
         Some special types...
 
         >>> f = expressions.Fermata()
@@ -4993,40 +5307,51 @@ class MeasureExporter(XMLExporterBase):
         >>> MEX.dump(mxExpression)
         <non-arpeggiate />
         '''
-        mapping = OrderedDict([
-            ('Trill', 'trill-mark'),
-            # TODO: delayed-inverted-turn
-            # TODO: vertical-turn
-            # TODO: 'delayed-turn'
-            ('InvertedTurn', 'inverted-turn'),
-            # last as others are subclasses
-            ('Turn', 'turn'),
-            ('InvertedMordent', 'inverted-mordent'),
-            ('Mordent', 'mordent'),
-            ('Shake', 'shake'),
-            ('Schleifer', 'schleifer'),
-            # TODO: 'accidental-mark'
-            ('Tremolo', 'tremolo'),  # non-spanner
-            # non-ornaments...
-            ('Fermata', 'fermata'),
-            # keep last...
-            ('Ornament', 'other-ornament'),
-        ])
         mx = None
         classes = expression.classes
-        for k, v in mapping.items():
-            if k in classes:
-                mx = Element(v)
-                break
-        if mx is None:
-            # ArpeggioMark maps to two different elements
-            if isinstance(expression, expressions.ArpeggioMark):
-                if expression.type == 'non-arpeggio':
-                    mx = Element('non-arpeggiate')
+
+        # ArpeggioMark maps to two different elements
+        if isinstance(expression, expressions.ArpeggioMark):
+            if expression.type == 'non-arpeggio':
+                mx = Element('non-arpeggiate')
+            else:
+                mx = Element('arpeggiate')
+                if expression.type != 'normal':
+                    mx.set('direction', expression.type)
+
+        # InvertedTurn/Turn map to two different elements each
+        if isinstance(expression, expressions.Turn):
+            if isinstance(expression, expressions.InvertedTurn):
+                if expression.isDelayed:
+                    mx = Element('delayed-inverted-turn')
                 else:
-                    mx = Element('arpeggiate')
-                    if expression.type != 'normal':
-                        mx.set('direction', expression.type)
+                    mx = Element('inverted-turn')
+            else:
+                if expression.isDelayed:
+                    mx = Element('delayed-turn')
+                else:
+                    mx = Element('turn')
+
+        if mx is None:
+            mapping = OrderedDict([
+                ('Trill', 'trill-mark'),
+                # TODO: vertical-turn
+                ('InvertedMordent', 'inverted-mordent'),
+                ('Mordent', 'mordent'),
+                ('Shake', 'shake'),
+                ('Schleifer', 'schleifer'),
+                ('Tremolo', 'tremolo'),  # non-spanner
+                # non-ornaments...
+                ('Fermata', 'fermata'),
+                # keep last...
+                ('Ornament', 'other-ornament'),
+            ])
+
+            for k, v in mapping.items():
+                if k in classes:
+                    mx = Element(v)
+                    break
+
         if mx is None:
             environLocal.printDebug(['no musicxml conversion for:', expression])
             return
@@ -5161,14 +5486,6 @@ class MeasureExporter(XMLExporterBase):
         >>> mxOther = MEX.articulationToXmlTechnical(g)
         >>> MEX.dump(mxOther)
         <other-technical>unda maris</other-technical>
-
-        Same with technical marks not yet supported.
-        TODO: support HammerOn, PullOff, Hole, Arrow.
-
-        >>> h = articulations.HammerOn()
-        >>> mxOther = MEX.articulationToXmlTechnical(h)
-        >>> MEX.dump(mxOther)
-        <other-technical />
         '''
         # these technical have extra information
         # TODO: hammer-on
@@ -5184,7 +5501,7 @@ class MeasureExporter(XMLExporterBase):
             musicXMLTechnicalName = 'other-technical'
 
         # TODO: support additional technical marks listed above
-        if musicXMLTechnicalName in ('hammer-on', 'pull-off', 'hole', 'arrow'):
+        if musicXMLTechnicalName in ('hole', 'arrow'):
             musicXMLTechnicalName = 'other-technical'
 
         mxTechnicalMark = Element(musicXMLTechnicalName)
@@ -7029,15 +7346,16 @@ class MeasureExporter(XMLExporterBase):
     def setMxAttributes(self):
         '''
         sets the attributes (x=y) for a measure,
-        that is, number, and layoutWidth
+        that is, number, implicit, and layoutWidth
 
         Does not create the <attributes> tag. That's elsewhere...
-
         '''
         m = self.stream
         if hasattr(m, 'measureNumberWithSuffix'):
             self.xmlRoot.set('number', m.measureNumberWithSuffix())
-        # TODO: attr: implicit
+        _setAttributeFromAttribute(
+            m, self.xmlRoot, 'implicit', 'showNumber',
+            lambda showNum: xmlObjects.booleanToYesNo(showNum is stream.enums.ShowNumber.NEVER))
         # TODO: attr: non-controlling
         if hasattr(m, 'layoutWidth') and m.layoutWidth is not None:
             _setAttributeFromAttribute(m, self.xmlRoot, 'width', 'layoutWidth')

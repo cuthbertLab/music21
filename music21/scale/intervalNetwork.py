@@ -6,7 +6,7 @@
 # Authors:      Christopher Ariza
 #               Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2010-2022 Michael Scott Asato Cuthbert
+# Copyright:    Copyright © 2010-2023 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
@@ -1262,7 +1262,7 @@ class IntervalNetwork:
         <music21.pitch.Pitch B2>
         '''
         if pitchOrigin is None:
-            raise Exception('No pitch origin for calling next on this pitch!')
+            raise TypeError('No pitch origin for calling next on this pitch!')
 
         if isinstance(pitchOrigin, str):
             pitchOriginObj = pitch.Pitch(pitchOrigin)

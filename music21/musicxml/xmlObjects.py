@@ -6,7 +6,7 @@
 # Authors:      Christopher Ariza
 #               Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2009-2022 Michael Scott Asato Cuthbert
+# Copyright:    Copyright © 2009-2023 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 from __future__ import annotations
@@ -67,9 +67,11 @@ TECHNICAL_MARKS = OrderedDict([('up-bow', articulations.UpBow),
                                ('stopped', articulations.Stopped),
                                ('snap-pizzicato', articulations.SnapPizzicato),
                                ('string', articulations.StringIndication),
-                               ('hammer-on', articulations.HammerOn),
-                               ('pull-off', articulations.PullOff),
                                ('bend', articulations.FretBend),
+                               # hammer-on and pull-off not implemented because handled
+                               # in method objectAttachedSpannersToTechnicals of m21ToXml.py
+                               # ('hammer-on', articulations.HammerOn),
+                               # ('pull-off', articulations.PullOff),
                                ('tap', articulations.FretTap),
                                ('fret', articulations.FretIndication),
                                ('heel', articulations.OrganHeel),
@@ -89,9 +91,9 @@ TECHNICAL_MARKS_REV[articulations.Harmonic] = 'harmonic'
 # NON-spanner ornaments that go into Expressions
 ORNAMENT_MARKS = {'trill-mark': expressions.Trill,
                   'turn': expressions.Turn,
-                  # TODO: 'delayed-turn'
+                  'delayed-turn': expressions.Turn,
                   'inverted-turn': expressions.InvertedTurn,
-                  # TODO: 'delayed-inverted-turn'
+                  'delayed-inverted-turn': expressions.InvertedTurn,
                   # TODO: 'vertical-turn'
                   'shake': expressions.Shake,
                   'mordent': expressions.Mordent,
@@ -104,7 +106,7 @@ ORNAMENT_MARKS = {'trill-mark': expressions.Trill,
 # ------------------------------------------------------------------------------
 
 class MusicXMLException(exceptions21.Music21Exception):
-    def __init__(self, message):
+    def __init__(self, message: str):
         super().__init__(message)
         self.measureNumber: str = ''
         self.partName: str = ''

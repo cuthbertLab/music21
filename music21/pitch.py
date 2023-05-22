@@ -105,6 +105,8 @@ accidentalNameToModifier = {
     'one-and-a-half-flat': '-`',
 }
 
+modifierToAccidentalName = {v: k for k, v in accidentalNameToModifier.items()}
+
 unicodeFromModifier = OrderedDict([
     ('####', chr(0x1d12a) + chr(0x1d12a)),
     ('###', '\u266f' + chr(0x1d12a)),
@@ -121,6 +123,33 @@ unicodeFromModifier = OrderedDict([
     ('', '\u266e'),  # natural
 ])
 
+alternateNameToAccidentalName = {
+    'n': 'natural',
+    'is': 'sharp',
+    'isis': 'double-sharp',
+    'isisis': 'triple-sharp',
+    'isisisis': 'quadruple-sharp',
+    'es': 'flat',
+    'b': 'flat',
+    'eses': 'double-flat',
+    'eseses': 'triple-flat',
+    'eseseses': 'quadruple-flat',
+    'quarter-sharp': 'half-sharp',
+    'ih': 'half-sharp',
+    'semisharp': 'half-sharp',
+    'three-quarter-sharp': 'one-and-a-half-sharp',
+    'three-quarters-sharp': 'one-and-a-half-sharp',
+    'isih': 'one-and-a-half-sharp',
+    'sesquisharp': 'one-and-a-half-sharp',
+    'quarter-flat': 'half-flat',
+    'eh': 'half-flat',
+    'semiflat': 'half-flat',
+    'three-quarter-flat': 'one-and-a-half-flat',
+    'three-quarters-flat': 'one-and-a-half-flat',
+    'eseh': 'one-and-a-half-flat',
+    'sesquiflat': 'one-and-a-half-flat',
+}
+
 
 # sort modifiers by length, from longest to shortest
 def _sortModifiers():
@@ -133,6 +162,78 @@ def _sortModifiers():
 
 
 accidentalModifiersSorted = _sortModifiers()
+
+def isValidAccidentalName(name: str) -> bool:
+    '''
+    Check if name is a valid accidental name string that can
+    be used to initialize an Accidental.
+
+    Standard accidental names are valid:
+
+    >>> pitch.isValidAccidentalName('double-flat')
+    True
+
+    Accidental modifiers are valid:
+
+    >>> pitch.isValidAccidentalName('--')
+    True
+
+    Alternate accidental names are valid:
+
+    >>> pitch.isValidAccidentalName('eses')
+    True
+
+    Anything else is not valid:
+
+    >>> pitch.isValidAccidentalName('two flats')
+    False
+    '''
+    # check against official names
+    if name in accidentalNameToModifier:
+        return True
+
+    # check against official modifiers
+    if name in accidentalNameToModifier.values():
+        return True
+
+    # check against alternate supported names
+    if name in alternateNameToAccidentalName:
+        return True
+
+    return False
+
+def standardizeAccidentalName(name: str) -> str:
+    '''
+    Convert a valid accidental name to the standard accidental name.
+    Raises AccidentalException if name is not a valid accidental name.
+
+    >>> pitch.standardizeAccidentalName('double-flat')
+    'double-flat'
+
+    >>> pitch.standardizeAccidentalName('--')
+    'double-flat'
+
+    >>> pitch.standardizeAccidentalName('eses')
+    'double-flat'
+
+    >>> pitch.standardizeAccidentalName('two flats')
+    Traceback (most recent call last):
+    music21.pitch.AccidentalException: 'two flats' is not a supported accidental type
+    '''
+    if name in accidentalNameToModifier:
+        # it is already standardized, just return it
+        return name
+
+    if name in modifierToAccidentalName:
+        # it is a modifier, look up standardized name
+        return modifierToAccidentalName[name]
+
+    if name in alternateNameToAccidentalName:
+        # it is an alternate name, look up standardized name
+        return alternateNameToAccidentalName[name]
+
+    raise AccidentalException(f"'{name}' is not a supported accidental type")
+
 
 
 # ------------------------------------------------------------------------------
@@ -407,7 +508,7 @@ def _convertCentsToAlterAndCents(shift) -> tuple[float, float]:
         alterShift = 1.0
         cents = value - 100
     else:  # pragma: no cover
-        raise Exception(f'value exceeded range: {value}')
+        raise ValueError(f'value exceeded range: {value}')
     return alterShift + alterAdd, float(cents)
 
 
@@ -1252,7 +1353,6 @@ class Accidental(prebase.ProtoM21Object, style.StyleMixin):
         of that object.
 
         This is needed when transposing Pitches: we need to retain accidental display properties.
-
 
         >>> a = pitch.Accidental('double-flat')
         >>> a.displayType = 'always'
@@ -2103,7 +2203,10 @@ class Pitch(prebase.ProtoM21Object):
         elif isinstance(value, str):
             # int version is used in interval.py which cannot import Pitch directly
             self._accidental = Accidental(value)
-        elif isinstance(value, (int, float)):
+        elif isinstance(value, int):
+            self._accidental = Accidental(value)
+            self._microtone = None
+        elif isinstance(value, float):
             # check and add any microtones
             alter, cents = _convertCentsToAlterAndCents(value * 100.0)
             self._accidental = Accidental(alter)
@@ -3937,7 +4040,7 @@ class Pitch(prebase.ProtoM21Object):
 
         >>> p4.getHigherEnharmonic()
         Traceback (most recent call last):
-        music21.pitch.AccidentalException: -5.0 is not a supported accidental type
+        music21.pitch.AccidentalException: -5 is not a supported accidental type
 
         Note that half accidentals (~ = half-sharp, ` = half-flat)
         get converted to microtones:
@@ -4458,6 +4561,18 @@ class Pitch(prebase.ProtoM21Object):
         >>> pc6.transpose(10, inPlace=True)
         >>> pc6.spellingIsInferred
         True
+
+        Test an issue with inPlace not setting microtone.
+
+        >>> flatAndAHalf = pitch.Accidental('one-and-a-half-flat')
+        >>> dFlatAndAHalf = pitch.Pitch('D2')
+        >>> dFlatAndAHalf.accidental = flatAndAHalf
+        >>> dPitch = pitch.Pitch('D2')
+        >>> intv = interval.Interval(dFlatAndAHalf, dPitch)
+        >>> dPitch.transpose(intv, inPlace=True)
+        >>> dPitch
+        <music21.pitch.Pitch D#2(+50c)>
+
         '''
         # environLocal.printDebug(['Pitch.transpose()', value])
         if isinstance(value, interval.IntervalBase):
@@ -4486,6 +4601,9 @@ class Pitch(prebase.ProtoM21Object):
             # set fundamental
             self.fundamental = p.fundamental
             self.spellingIsInferred = p.spellingIsInferred
+            # deepcopy _microtone if present (not thru microtone property to detect None)
+            if p._microtone is not None:
+                self._microtone = copy.deepcopy(p._microtone)
             return None
 
     # --------------------------------------------------------------------------

@@ -847,9 +847,10 @@ class AbstractHarmonicMinorScale(AbstractScale):
     second to a leading tone.
 
     This is the only scale to use the "_alteredDegrees" property.
-    '''
 
-    def __init__(self, mode=None, **keywords):
+    mode is not used
+    '''
+    def __init__(self, mode: str | None = None, **keywords) -> None:
         super().__init__(**keywords)
         self.type = 'Abstract Harmonic Minor'
         self.octaveDuplicating = True
@@ -875,9 +876,10 @@ class AbstractHarmonicMinorScale(AbstractScale):
 class AbstractMelodicMinorScale(AbstractScale):
     '''
     A directional scale.
-    '''
 
-    def __init__(self, mode=None, **keywords):
+    mode is not used.
+    '''
+    def __init__(self, mode: str | None = None, **keywords) -> None:
         super().__init__(**keywords)
         self.type = 'Abstract Melodic Minor'
         self.octaveDuplicating = True
@@ -966,7 +968,7 @@ class AbstractRagAsawari(AbstractScale):
     '''
     A pseudo raga-scale.
     '''
-    def __init__(self, **keywords):
+    def __init__(self, **keywords) -> None:
         super().__init__(**keywords)
         self.type = 'Abstract Rag Asawari'
         self.octaveDuplicating = True
@@ -1054,7 +1056,7 @@ class AbstractRagMarwa(AbstractScale):
     '''
     A pseudo raga-scale.
     '''
-    def __init__(self, **keywords):
+    def __init__(self, **keywords) -> None:
         super().__init__(**keywords)
         self.type = 'Abstract Rag Marwa'
         self.octaveDuplicating = True
@@ -2557,7 +2559,7 @@ class DiatonicScale(ConcreteScale):
     '''
     usePitchDegreeCache = True
 
-    def __init__(self, tonic=None, **keywords):
+    def __init__(self, tonic: str | pitch.Pitch | note.Note | None = None, **keywords):
         super().__init__(tonic=tonic, **keywords)
         self._abstract: AbstractDiatonicScale = AbstractDiatonicScale(**keywords)
         self.type = 'diatonic'

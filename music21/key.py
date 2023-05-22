@@ -168,7 +168,7 @@ modeSharpsAlter = {'major': 0,
 
 
 def pitchToSharps(value: str | pitch.Pitch | note.Note,
-                  mode: str = None) -> int:
+                  mode: str | None = None) -> int:
     '''
     Given a pitch string or :class:`music21.pitch.Pitch` or
     :class:`music21.note.Note` object,

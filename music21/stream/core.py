@@ -6,7 +6,7 @@
 # Authors:      Michael Scott Asato Cuthbert
 #               Christopher Ariza
 #
-# Copyright:    Copyright © 2008-2022 Michael Scott Asato Cuthbert
+# Copyright:    Copyright © 2008-2023 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # -----------------------------------------------------------------------------
 '''
@@ -47,7 +47,7 @@ class StreamCore(Music21Object):
     Core aspects of a Stream's behavior.  Any of these can change at any time.
     Users are encouraged only to create stream.Stream objects.
     '''
-    def __init__(self, **keywords):
+    def __init__(self, **keywords) -> None:
         super().__init__(**keywords)
         # hugely important -- keeps track of where the _elements are
         # the _offsetDict is a dictionary where id(element) is the
@@ -76,7 +76,7 @@ class StreamCore(Music21Object):
         *,
         ignoreSort=False,
         setActiveSite=True
-    ):
+    ) -> bool:
         '''
         N.B. -- a "core" method, not to be used by general users.  Run .insert() instead.
 
@@ -91,7 +91,9 @@ class StreamCore(Music21Object):
 
         Do not mix coreInsert with coreAppend operations.
 
-        Returns boolean if the Stream is now sorted.
+        Returns boolean if the Stream (assuming it was sorted before) is still guaranteed
+        to be sorted.  (False doesn't mean that it's not sorted, just that we can't guarantee it.)
+        If you don't care and plan to sort the stream later, then use `ignoreSort=True`.
         '''
         # environLocal.printDebug(['coreInsert', 'self', self,
         #    'offset', offset, 'element', element])
@@ -135,7 +137,7 @@ class StreamCore(Music21Object):
         element: Music21Object,
         *,
         setActiveSite=True
-    ):
+    ) -> None:
         '''
         N.B. -- a "core" method, not to be used by general users.  Run .append() instead.
 
@@ -170,7 +172,7 @@ class StreamCore(Music21Object):
         *,
         addElement=False,
         setActiveSite=True
-    ):
+    ) -> None:
         '''
         Sets the Offset for an element, very quickly.
         Caller is responsible for calling :meth:`~music21.stream.core.coreElementsChanged`
@@ -191,7 +193,8 @@ class StreamCore(Music21Object):
         # Note: not documenting 'highestTime' is on purpose, since can only be done for
         # elements already stored at end.  Infinite loop.
         try:
-            offset = opFrac(offset)
+            # try first, for the general case of not OffsetSpecial.
+            offset = opFrac(offset)  # type: ignore
         except TypeError:
             if offset not in OffsetSpecial:  # pragma: no cover
                 raise StreamException(f'Cannot set offset to {offset!r} for {element}')
@@ -207,11 +210,11 @@ class StreamCore(Music21Object):
     def coreElementsChanged(
         self,
         *,
-        updateIsFlat=True,
-        clearIsSorted=True,
-        memo=None,
-        keepIndex=False,
-    ):
+        updateIsFlat: bool = True,
+        clearIsSorted: bool = True,
+        memo: list[int] | None = None,
+        keepIndex: bool = False,
+    ) -> None:
         '''
         NB -- a "core" stream method that is not necessary for most users.
 
@@ -239,7 +242,7 @@ class StreamCore(Music21Object):
         False
         '''
         # experimental
-        if not self._mutable:
+        if not getattr(self, '_mutable', True):
             raise ImmutableStreamException(
                 'coreElementsChanged should not be triggered on an immutable stream'
             )
@@ -263,7 +266,8 @@ class StreamCore(Music21Object):
         if self._derivation is not None:
             sdm = self._derivation.method
             if sdm in ('flat', 'semiflat'):
-                origin: Stream = self._derivation.origin
+                origin: 'music21.stream.Stream' = t.cast('music21.stream.Stream',
+                                                         self._derivation.origin)
                 origin.clearCache()
 
         # may not always need to clear cache of all living sites, but may
@@ -565,9 +569,9 @@ class StreamCore(Music21Object):
     def coreGatherMissingSpanners(
         self,
         *,
-        recurse=True,
-        requireAllPresent=True,
-        insert=True,
+        recurse: bool = True,
+        requireAllPresent: bool = True,
+        insert: bool = True,
         constrainingSpannerBundle: spanner.SpannerBundle | None = None
     ) -> list[spanner.Spanner] | None:
         '''

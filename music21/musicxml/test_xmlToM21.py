@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import fractions
+import typing as t
 import unittest
 import xml.etree.ElementTree as ET
 
@@ -164,6 +165,26 @@ class Test(unittest.TestCase):
         lastElement = lastMeasure.last()
         lastOffset = lastMeasure.elementOffset(lastElement, returnSpecial=True)
         self.assertEqual(lastOffset, 'highestTime')
+
+    def testMultipleStavesInPartWithOttava(self):
+        from music21 import converter
+        from music21.musicxml import testPrimitive
+        s = converter.parse(testPrimitive.pianoStaffWithOttava)
+        self.assertEqual(len(s.getElementsByClass(stream.PartStaff)), 2)
+        ps0 = s[stream.PartStaff][0]
+        self.assertEqual(len(ps0.getElementsByClass(spanner.Ottava)), 1)
+        m0 = ps0[stream.Measure][0]
+        self.assertEqual(
+            [p.nameWithOctave for p in m0.pitches],
+            ['E-5', 'E-6', 'D5', 'D6', 'C5', 'C6', 'E-5', 'E-6', 'F5', 'F6', 'E5', 'E6',
+             'D5', 'D6', 'F5', 'F6', 'F#5', 'A5', 'G#5', 'B5']
+        )
+        s.toWrittenPitch(inPlace=True)
+        self.assertEqual(
+            [p.nameWithOctave for p in m0.pitches],
+            ['E-4', 'E-5', 'D4', 'D5', 'C4', 'C5', 'E-4', 'E-5', 'F4', 'F5', 'E4', 'E5',
+             'D4', 'D5', 'F4', 'F5', 'F#4', 'A4', 'G#4', 'B4']
+        )
 
     def testSpannersA(self):
         from music21 import converter
@@ -589,7 +610,7 @@ class Test(unittest.TestCase):
             for e in n.expressions:
                 if 'Turn' in e.classes:
                     count += 1
-        self.assertEqual(count, 4)  # include inverted turn
+        self.assertEqual(count, 5)  # include inverted turn
 
         count = 0
         for n in s.recurse().notes:
@@ -597,6 +618,18 @@ class Test(unittest.TestCase):
                 if 'InvertedTurn' in e.classes:
                     count += 1
         self.assertEqual(count, 1)
+
+        upperCount = 0
+        lowerCount = 0
+        for n in s.recurse().notes:
+            for e in n.expressions:
+                if 'Turn' in e.classes:
+                    if e.upperAccidental is not None:
+                        upperCount += 1
+                    if e.lowerAccidental is not None:
+                        lowerCount += 1
+        self.assertEqual(upperCount, 2)
+        self.assertEqual(lowerCount, 1)
 
         count = 0
         for n in s.recurse().notes:
@@ -1187,16 +1220,16 @@ class Test(unittest.TestCase):
 
                     gnote_index += 1
 
-    def testArpeggioMarkSpanners(self):
+    def testArpeggioMarkSpanners(self) -> None:
         from music21 import converter
         from music21.musicxml import testPrimitive
 
-        s = converter.parse(testPrimitive.multiStaffArpeggios)
+        s = t.cast(stream.Score, converter.parse(testPrimitive.multiStaffArpeggios))
         sb = s.spannerBundle.getByClass(expressions.ArpeggioMarkSpanner)
         self.assertIsNotNone(sb)
         sp = sb[0]
         # go find all the chords and check for spanner vs expressions
-        chords: [chord.Chord] = []
+        chords: list[chord.Chord] = []
         for i, p in enumerate(s.parts):
             # ArpeggioMarkSpanner spans the second chord (index == 1) across both parts
             chords.append(p[chord.Chord][1])
@@ -1457,6 +1490,14 @@ class Test(unittest.TestCase):
             unp = PP.getDefaultInstrument(mxScorePart)
         self.assertIsInstance(unp, instrument.UnpitchedPercussion)
         self.assertEqual(unp.percMapPitch, 69)
+
+    def testImportImplicitMeasureNumber(self):
+        from music21 import converter
+
+        xml_dir = common.getSourceFilePath() / 'musicxml' / 'lilypondTestSuite'
+        s = converter.parse(xml_dir / '46d-PickupMeasure-ImplicitMeasures.xml')
+        m = s[stream.Measure].first()
+        self.assertIs(m.showNumber, stream.enums.ShowNumber.NEVER)
 
 
 if __name__ == '__main__':

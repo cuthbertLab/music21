@@ -7,7 +7,7 @@
 #               Christopher Ariza
 #               Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2010-2022 Michael Scott Asato Cuthbert
+# Copyright:    Copyright © 2010-2023 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
@@ -35,12 +35,11 @@ from music21 import harmony
 from music21 import interval
 from music21 import note
 from music21 import key
+from music21 import percussion
 from music21 import pitch
-
 
 if t.TYPE_CHECKING:
     from music21 import stream
-
 
 environLocal = environment.Environment('analysis.discrete')
 
@@ -369,11 +368,9 @@ class KeyWeightKeyAnalysis(DiscreteAnalysis):
 
         for n in streamObj.notes:
             length = n.quarterLength
-            if n.isChord:
-                for m in n.pitchClasses:
-                    pcDist[m] += length
-            else:
-                pcDist[n.pitch.pitchClass] += length
+            for p in n.pitches:
+                pcDist[p.pitchClass] += length
+
         return pcDist
 
     # noinspection SpellCheckingInspection
@@ -392,7 +389,7 @@ class KeyWeightKeyAnalysis(DiscreteAnalysis):
                 solution[i] += (toneWeights[(j - i) % 12] * pcDistribution[j])
         return solution
 
-    def _getLikelyKeys(self, keyResults, differences):
+    def _getLikelyKeys(self, keyResults, differences) -> list[t.Any] | None:
         ''' Takes in a list of probable key results in points and returns a
             list of keys in letters, sorted from most likely to least likely.
         '''
@@ -410,9 +407,10 @@ class KeyWeightKeyAnalysis(DiscreteAnalysis):
             # environLocal.printDebug(['added likely key', likelyKeys[pc]])
         return likelyKeys
 
-    def _getDifference(self, keyResults, pcDistribution, weightType):
-        ''' Takes in a list of numerical probable key results and returns the
-            difference of the top two keys
+    def _getDifference(self, keyResults, pcDistribution, weightType) -> None | list[int | float]:
+        '''
+        Takes in a list of numerical probable key results and returns the
+        difference of the top two keys.
         '''
         # case of empty analysis
         if keyResults is None:
@@ -621,7 +619,7 @@ class KeyWeightKeyAnalysis(DiscreteAnalysis):
         The data list contains a key (as a string), a mode
         (as a string), and a correlation value (degree of certainty)
         '''
-        sStream = sStream.flatten().notesAndRests
+        sStream = sStream.flatten().notesAndRests.getElementsNotOfClass(note.Unpitched)
         # this is the sample distribution used in the paper, for some testing purposes
         # pcDistribution = [7, 0, 5, 0, 7, 16, 0, 16, 0, 15, 6, 0]
 
@@ -953,14 +951,14 @@ class Ambitus(DiscreteAnalysis):
     # provide possible string matches for this processor
     identifiers = ['ambitus', 'span']
 
-    def __init__(self, referenceStream=None):
+    def __init__(self, referenceStream: stream.Stream | None = None):
         super().__init__(referenceStream=referenceStream)
         # Store the min and max Pitch instances for referenceStream
         # set by getPitchSpan(), which is called by _generateColors()
         self.minPitchObj: pitch.Pitch | None = None
         self.maxPitchObj: pitch.Pitch | None = None
 
-        self._pitchSpanColors = OrderedDict()
+        self._pitchSpanColors: OrderedDict[int, str] = OrderedDict()
         self._generateColors()
 
     def _generateColors(self, numColors=None):
@@ -1583,6 +1581,19 @@ class Test(unittest.TestCase):
         k = s2.analyze('key')
         # Ensure all pitch classes are present
         self.assertEqual(len(k.alternateInterpretations), 23)
+
+    def testKeyAnalysisIgnoresUnpitched(self):
+        from music21 import stream
+        s = stream.Stream()
+        s.append(note.Unpitched())
+        s.append(percussion.PercussionChord([
+            note.Unpitched(),
+            note.Note('E-4'),
+            note.Note('B-4'),
+        ]))
+
+        k = s.analyze('key')
+        self.assertEqual(k.name, 'E- major')
 
 
 # define presented order in documentation

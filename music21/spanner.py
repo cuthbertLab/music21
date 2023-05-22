@@ -27,10 +27,12 @@ import unittest
 
 from music21 import base
 from music21 import common
+from music21.common.types import OffsetQL
 from music21 import defaults
 from music21 import environment
 from music21 import exceptions21
 from music21 import prebase
+from music21 import sites
 from music21 import style
 
 environLocal = environment.Environment('spanner')
@@ -237,10 +239,26 @@ class Spanner(base.Music21Object):
 
         # parameters that spanners need in loading and processing
         # local id is the id for the local area; used by musicxml
-        self.idLocal = None
+        self.idLocal: str | None = None
         # after all spannedElements have been gathered, setting complete
         # will mark that all parts have been gathered.
         self.completeStatus = False
+
+        # data for fill:
+
+        # fillElementTypes is a list of types of object to search for.  This
+        # can be set to something different in the __init__ of a particular
+        # type of Spanner.
+        # Set here to the empty list, so that by default, fill() does nothing.
+        self.fillElementTypes: list[t.Type] = []
+
+        # After a fill operation, filledStatus will be set to True.
+        # Parsers and other clients can also set this to False or
+        # True to mark whether or not a fill operation is needed
+        # (False means fill is needed, True means fill is not
+        # needed, presumably because the fill was done by hand).
+        # Initialized to 'unknown'.
+        self.filledStatus: bool | t.Literal['unknown'] = 'unknown'
 
     def _reprInternal(self):
         msg = []
@@ -528,6 +546,134 @@ class Spanner(base.Music21Object):
         # environLocal.printDebug(['replaceSpannedElement()', 'id(old)', id(old),
         #    'id(new)', id(new)])
 
+    def fill(
+        self,
+        searchStream=None,  # stream.Stream | None, but cannot import stream here
+        *,
+        includeEndBoundary: bool = False,
+        mustFinishInSpan: bool = False,
+        mustBeginInSpan: bool = True,
+        includeElementsThatEndAtStart: bool = False
+    ):
+        '''
+        Fills in the intermediate elements of a spanner, that are found in searchStream between
+        the first element's offset and the last element's offset+duration.  If searchStream
+        is None, the first element's activeSite is used.  If the first element's activeSite
+        is None, a SpannerException is raised.
+
+        Ottava is an example of a Spanner that can be filled. The Ottava does not need
+        to be inserted into the stream in order to be filled.
+
+        >>> m = stream.Measure([note.Note('A'), note.Note('B'), note.Note('C')])
+        >>> ott1 = spanner.Ottava(m.notes[0], m.notes[2])
+        >>> ott1.fill(m)
+        >>> ott1
+        <music21.spanner.Ottava 8va transposing<...Note A><...Note B><...Note C>>
+
+        If the searchStream is not passed in, fill still happens in this case, because
+        the first note's activeSite is used instead.
+
+        >>> ott2 = spanner.Ottava(m.notes[0], m.notes[2])
+        >>> ott2.fill()
+        >>> ott2
+        <music21.spanner.Ottava 8va transposing<...Note A><...Note B><...Note C>>
+
+        If the searchStream is not passed, and the spanner's first element doesn't have
+        an activeSite, a SpannerException is raised.
+
+        >>> ott3 = spanner.Ottava(note.Note('D'), note.Note('E'))
+        >>> ott3.fill()
+        Traceback (most recent call last):
+        music21.spanner.SpannerException: ...requires a searchStream or getFirst().activeSite
+        '''
+
+        if not self.fillElementTypes:
+            # nothing to fill
+            return
+
+        if self.filledStatus is True:
+            # Don't fill twice.  If client wants a refill they can set filledStatus to False.
+            return
+
+        startElement: base.Music21Object | None = self.getFirst()
+        if startElement is None:
+            # no spanned elements?  Nothing to fill.
+            return
+
+        if searchStream is None:
+            searchStream = startElement.activeSite
+            if searchStream is None:
+                raise SpannerException(
+                    'Spanner.fill() requires a searchStream or getFirst().activeSite'
+                )
+
+        if t.TYPE_CHECKING:
+            from music21 import stream
+            assert isinstance(searchStream, stream.Stream)
+
+        endElement: base.Music21Object | None = self.getLast()
+        if endElement is startElement:
+            endElement = None
+
+        if endElement is not None:
+            # Start and end elements are different; we can't just append everything, we need
+            # to save the end element, remove it, add everything, then add the end element
+            # again.  Note that if there are actually more than 2 elements before we start
+            # filling, the new intermediate elements will come after the existing ones,
+            # regardless of offset.  But first and last will still be the same two elements
+            # as before, which is the most important thing.
+            self.spannerStorage.remove(endElement)
+
+        try:
+            startOffsetInHierarchy: OffsetQL = startElement.getOffsetInHierarchy(searchStream)
+        except sites.SitesException:
+            # print('start element not in searchStream')
+            if endElement is not None:
+                self.addSpannedElements(endElement)
+            return
+
+        endOffsetInHierarchy: OffsetQL
+        if endElement is not None:
+            try:
+                endOffsetInHierarchy = (
+                    endElement.getOffsetInHierarchy(searchStream) + endElement.quarterLength
+                )
+            except sites.SitesException:
+                # print('end element not in searchStream')
+                self.addSpannedElements(endElement)
+                return
+        else:
+            endOffsetInHierarchy = (
+                startOffsetInHierarchy + startElement.quarterLength
+            )
+
+        matchIterator = (searchStream
+            .recurse()
+            .getElementsByOffsetInHierarchy(
+                startOffsetInHierarchy,
+                endOffsetInHierarchy,
+                includeEndBoundary=includeEndBoundary,
+                mustFinishInSpan=mustFinishInSpan,
+                mustBeginInSpan=mustBeginInSpan,
+                includeElementsThatEndAtStart=includeElementsThatEndAtStart)
+            .getElementsByClass(self.fillElementTypes)
+        )
+
+        for foundElement in matchIterator:
+            if foundElement is startElement:
+                # it's already in the spanner, skip it
+                continue
+            if foundElement is endElement:
+                # we'll add it below, skip it
+                continue
+            self.addSpannedElements(foundElement)
+
+        if endElement is not None:
+            # add it back in as the end element
+            self.addSpannedElements(endElement)
+
+        self.filledStatus = True
+
     def isFirst(self, spannedElement):
         '''
         Given a spannedElement, is it first?
@@ -609,6 +755,58 @@ class _SpannerRef(t.TypedDict):
     # noinspection PyTypedDict
     spanner: 'Spanner'
     className: str
+
+class SpannerAnchor(base.Music21Object):
+    '''
+    A simple Music21Object that can be used to define the beginning or end
+    of a Spanner, in the place of a GeneralNote.
+
+    This is useful for (e.g.) a Crescendo that ends partway through a
+    note (e.g. in a violin part).  Exporters (like MusicXML) are configured
+    to remove the SpannerAnchor itself on output, exporting only the Spanner
+    start and stop locations.
+
+    Here's an example of a whole note that has a Crescendo for the first
+    half of the note, and a Diminuendo for the second half of the note.
+
+    >>> n = note.Note('C4', quarterLength=4)
+    >>> measure = stream.Measure([n], number=1)
+    >>> part = stream.Part([measure], id='violin')
+    >>> score = stream.Score([part])
+
+    Add a crescendo from the note's start to the first anchor, place in the
+    middle of the note, and then a diminuendo from that first anchor to the
+    second, placed at the end of the note.
+
+    >>> anchor1 = spanner.SpannerAnchor()
+    >>> anchor2 = spanner.SpannerAnchor()
+    >>> measure.insert(2.0, anchor1)
+    >>> measure.insert(4.0, anchor2)
+    >>> cresc = dynamics.Crescendo(n, anchor1)
+    >>> dim = dynamics.Diminuendo(anchor1, anchor2)
+    >>> score.append((cresc, dim))
+    >>> score.show('text')
+    {0.0} <music21.stream.Part violin>
+        {0.0} <music21.stream.Measure 1 offset=0.0>
+            {0.0} <music21.note.Note C>
+            {2.0} <music21.spanner.SpannerAnchor at 2.0>
+            {4.0} <music21.spanner.SpannerAnchor at 4.0>
+    {4.0} <music21.dynamics.Crescendo <music21.note.Note C><...SpannerAnchor at 2.0>>
+    {4.0} <music21.dynamics.Diminuendo <...SpannerAnchor at 2.0><...SpannerAnchor at 4.0>>
+    '''
+    def __init__(self, **keywords):
+        super().__init__(**keywords)
+
+    def _reprInternal(self) -> str:
+        if self.activeSite is None:
+            return 'unanchored'
+
+        ql: OffsetQL = self.duration.quarterLength
+        if ql == 0:
+            return f'at {self.offset}'
+
+        return f'at {self.offset}-{self.offset + ql}'
+
 
 class SpannerBundle(prebase.ProtoM21Object):
     '''
@@ -1131,6 +1329,8 @@ class Slur(Spanner):
         super().__init__(*spannedElements, **keywords)
         self.placement = None  # can above or below, after musicxml
         self.lineType = None  # can be 'dashed' or None
+        # from music21 import note
+        # self.fillElementTypes = [note.NotRest]
 
     # TODO: add property for placement
 
@@ -1167,6 +1367,9 @@ class MultiMeasureRest(Spanner):
 
     def __init__(self, *spannedElements, **keywords):
         super().__init__(*spannedElements, **keywords)
+
+        # from music21 import note
+        # self.fillElementTypes = [note.Rest]
         self._overriddenNumber = None
         self.useSymbols = keywords.get('useSymbols', defaults.multiMeasureRestUseSymbols)
         self.maxSymbols = keywords.get('maxSymbols', defaults.multiMeasureRestMaxSymbols)
@@ -1303,6 +1506,10 @@ class RepeatBracket(Spanner):
                  overrideDisplay: str | None = None,
                  **keywords):
         super().__init__(*spannedElements, **keywords)
+
+        # from music21 import stream
+        # self.fillElementTypes = [stream.Measure]
+
         # store a range, inclusive of the single number assignment
         self.numberRange: list[int] = []
         self.overrideDisplay = overrideDisplay
@@ -1478,7 +1685,9 @@ class Ottava(Spanner):
                  transposing: bool = True,
                  placement: t.Literal['above', 'below'] = 'above',
                  **keywords):
+        from music21 import note
         super().__init__(*spannedElements, **keywords)
+        self.fillElementTypes = [note.NotRest]
         self._type = None  # can be 8va, 8vb, 15ma, 15mb
         self.type = type
 
@@ -1587,8 +1796,10 @@ class Ottava(Spanner):
     def performTransposition(self):
         '''
         On a transposing spanner, switch to non-transposing,
-        set style.hideObjectOnPrint to True, and transpose all notes and chords
-        in the spanner.  Called by :meth:`~music21.stream.Stream.toSoundingPitch` in Stream
+        and transpose all notes and chords in the spanner.
+        The note/chords will all be transposed to their sounding
+        pitch (at least as far as the ottava is concerned;
+        transposing instruments are handled separately).
 
         >>> ottava = spanner.Ottava(type='8va')
         >>> n1 = note.Note('D#4')
@@ -1607,7 +1818,6 @@ class Ottava(Spanner):
         if not self.transposing:
             return
         self.transposing = False
-        self.style.hideObjectOnPrint = True
 
         myInterval = self.interval()
         for n in self.getSpannedElements():
@@ -1619,10 +1829,10 @@ class Ottava(Spanner):
     def undoTransposition(self):
         '''
         Change a non-transposing spanner to a transposing spanner,
-        making sure it is not hidden and transpose back all the notes
-        and chords in the spanner.
-
-        Called by :meth:`~music21.stream.Stream.toWrittenPitch` in Stream
+        and transpose back all the notes and chords in the spanner.
+        The notes/chords will all be transposed to their written
+        pitch (at least as far as the ottava is concerned;
+        transposing instruments are handled separately).
 
         >>> ottava = spanner.Ottava(type='8va')
         >>> n1 = note.Note('D#4')
@@ -1640,7 +1850,6 @@ class Ottava(Spanner):
         if self.transposing:
             return
         self.transposing = True
-        self.style.hideObjectOnPrint = False
 
         myInterval = self.interval(reverse=True)
         for n in self.getSpannedElements():
@@ -1680,6 +1889,8 @@ class Line(Spanner):
         **keywords
     ):
         super().__init__(*spannedElements, **keywords)
+        # from music21 import note
+        # self.fillElementTypes = [note.GeneralNote]
 
         DEFAULT_TICK = 'down'
         self._endTick = DEFAULT_TICK  # can be up/down/arrow/both/None
@@ -1839,6 +2050,8 @@ class Glissando(Spanner):
                  label: str | None = None,
                  **keywords):
         super().__init__(*spannedElements, **keywords)
+        # from music21 import note
+        # self.fillElementTypes = [note.NotRest]
 
         GLISSANDO_DEFAULT_LINE_TYPE = 'wavy'
         self._lineType = GLISSANDO_DEFAULT_LINE_TYPE
@@ -1951,10 +2164,89 @@ class Test(unittest.TestCase):
 
         self.assertEqual(sl1.getSpannerSites(), [sp])
 
+    def testSpannerAnchorRepr(self):
+        from music21 import stream
+        from music21 import spanner
+
+        # SpannerAnchor with no activeSite
+        sa1 = spanner.SpannerAnchor()
+        self.assertEqual(repr(sa1), '<music21.spanner.SpannerAnchor unanchored>')
+
+        # SpannerAnchor with activeSite, but no duration
+        m = stream.Measure()
+        m.insert(0.5, sa1)
+        self.assertEqual(repr(sa1), '<music21.spanner.SpannerAnchor at 0.5>')
+
+        # SpannerAnchor with activeSite and duration
+        sa1.quarterLength = 2.5
+        self.assertEqual(repr(sa1), '<music21.spanner.SpannerAnchor at 0.5-3.0>')
+
     def testSpannerRepr(self):
         from music21 import spanner
         su1 = spanner.Slur()
         self.assertEqual(repr(su1), '<music21.spanner.Slur>')
+
+    def testSpannerFill(self):
+        from music21 import stream
+        from music21 import note
+        from music21 import spanner
+        theNotes = [note.Note('A'), note.Note('B'), note.Note('C'), note.Note('D')]
+        m = stream.Measure(theNotes)
+
+        # Spanner with no fillElementTypes
+        sp = spanner.Spanner(theNotes[0], theNotes[3])
+        sp.fill(m)
+        # should not have done anything
+        noFillElements = [theNotes[0], theNotes[3]]
+        self.assertEqual(len(sp), 2)
+        for i, el in enumerate(sp.getSpannedElements()):
+            self.assertIs(el, noFillElements[i])
+
+        # Ottava with filledStatus == True
+        ott1 = spanner.Ottava(noFillElements)
+        ott1.filledStatus = True  # pretend it has already been filled
+        ott1.fill(m)
+        # should not have done anything
+        self.assertEqual(len(sp), 2)
+        for i, el in enumerate(sp.getSpannedElements()):
+            self.assertIs(el, noFillElements[i])
+
+        # same Ottava but with filledStatus == False
+        ott1.filledStatus = False
+        ott1.fill(m)
+        # ott1 should have been filled
+        self.assertIs(ott1.filledStatus, True)
+        self.assertEqual(len(ott1), 4)
+        for i, el in enumerate(ott1.getSpannedElements()):
+            self.assertIs(el, theNotes[i])
+
+        # Ottava with no elements
+        ott2 = spanner.Ottava()
+        ott2.fill(m)
+        self.assertEqual(len(ott2), 0)
+
+        # Ottava with only element not in searchStream
+        expectedElements = [note.Note('E')]
+        ott3 = spanner.Ottava(expectedElements)
+        ott3.fill(m)
+        self.assertEqual(len(ott3), 1)
+        self.assertIs(ott3.getFirst(), expectedElements[0])
+
+        # Ottava with start element not in searchStream, end element is
+        expectedElements = [note.Note('F'), m.notes[0]]
+        ott4 = spanner.Ottava(expectedElements)
+        ott4.fill(m)
+        self.assertEqual(len(ott4), 2)
+        for i, el in enumerate(ott4.getSpannedElements()):
+            self.assertIs(el, expectedElements[i])
+
+        # Ottava with endElement not in searchStream, startElement is
+        expectedElements = [m.notes[0], note.Note('G')]
+        ott5 = spanner.Ottava(expectedElements)
+        ott5.fill(m)
+        self.assertEqual(len(ott5), 2)
+        for i, el in enumerate(ott5.getSpannedElements()):
+            self.assertIs(el, expectedElements[i])
 
     def testSpannerBundle(self):
         from music21 import spanner
@@ -2743,6 +3035,29 @@ class Test(unittest.TestCase):
         idList = [id(n) for n in [n1, n2, n3, n4, n5]]
         slList = sl.getSpannedElementIds()
         self.assertEqual(idList, slList)
+
+    def testHammerOnPullOff(self):
+        from music21 import converter
+        from music21.musicxml import testPrimitive
+
+        s = converter.parse(testPrimitive.notations32a)
+
+        num_hammer_on = len(s.flatten().getElementsByClass('HammerOn'))
+        num_pull_off = len(s.flatten().getElementsByClass('PullOff'))
+        self.assertEqual(num_hammer_on, 1)
+        self.assertEqual(num_pull_off, 1)
+
+        hammer_on = s.flatten().getElementsByClass('HammerOn')[0]
+        hammer_n0 = hammer_on.getSpannedElements()[0]
+        hammer_n1 = hammer_on.getSpannedElements()[1]
+        self.assertEqual(hammer_n0.getSpannerSites()[0], hammer_on)
+        self.assertEqual(hammer_n1.getSpannerSites()[0], hammer_on)
+
+        pull_off = s.flatten().getElementsByClass('PullOff')[0]
+        pull_n0 = pull_off.getSpannedElements()[0]
+        pull_n1 = pull_off.getSpannedElements()[1]
+        self.assertEqual(pull_n0.getSpannerSites()[0], pull_off)
+        self.assertEqual(pull_n1.getSpannerSites()[0], pull_off)
 
 
 # ------------------------------------------------------------------------------
