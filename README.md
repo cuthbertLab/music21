@@ -1,4 +1,4 @@
-# music21 for TABASCO #
+# music21 for TABASCO 
 
 Modified version of music21 for the TABASCO project, with additional support to tab features.
 
@@ -9,10 +9,11 @@ Modified version of music21 for the TABASCO project, with additional support to 
 - **72**: Add bend articulations to the OrderedDict;
 
 `music21/musicxml/m21ToXml.py`:
+- **noteToNotations**: export fret and string art in chords;
 - **5184, 5209:5212**: Export bend articulations;
 
 `music21/articulations.py`:
-- *87*: import `interval` for `bendAlter`;
+- **87**: import `interval` for `bendAlter`;
 - **578**: add attributes to `FretBend` class;
 - **577**: set `preBend` type;
 - **578**: set `Release` type;
