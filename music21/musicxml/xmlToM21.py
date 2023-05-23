@@ -3881,11 +3881,18 @@ class MeasureParser(XMLParserBase):
             if tag in ('heel', 'toe'):
                 if mxObj.get('substitution') is not None:
                     tech.substitution = xmlObjects.yesNoToBoolean(mxObj.get('substitution'))
+            if tag == 'bend':
+                tech.bendAlter = interval.Interval(int(mxObj.find('bend-alter').text))
+                if mxObj.find('pre-bend') is not None:
+                    tech.preBend = True
+                if mxObj.find('release') is not None:
+                        tech.release = int(mxObj.find('release').get('offset'))
+                    except TypeError:
+                        # offset is not mandatory
+                        tech.release = 0
             # TODO: <bend> attr: accelerate, beats, first-beat, last-beat, shape (4.0)
             # TODO: <bent> sub-elements: bend-alter, pre-bend, with-bar, release
             # TODO: musicxml 4: release sub-element as offset attribute
-
-
             self.setPlacement(mxObj, tech)
             return tech
         else:
