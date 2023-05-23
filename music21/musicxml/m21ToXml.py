@@ -5473,15 +5473,15 @@ class MeasureExporter(XMLExporterBase):
                 assert isinstance(articulationMark, articulations.FretIndication)
             mxTechnicalMark.text = str(articulationMark.number)
         if musicXMLTechnicalName == 'bend':
-            bendAlterSubElement = SubElement(mxTechnicalMark, "bend-alter")
+            bendAlterSubElement = SubElement(mxTechnicalMark, 'bend-alter')
             bendAlterSubElement.text = str(articulationMark.bendAlter.semitones)
             if articulationMark.preBend:
-                preBendSubElement = SubElement(mxTechnicalMark, "pre-bend")
+                preBendSubElement = SubElement(mxTechnicalMark, 'pre-bend')
             if articulationMark.release is not None:
-                releaseSubElement = SubElement(mxTechnicalMark, "release")
-                releaseSubElement.set("offset", str(articulationMark.release))
+                releaseSubElement = SubElement(mxTechnicalMark, 'release')
+                releaseSubElement.set('offset', str(articulationMark.release))
             if articulationMark.withBar is not None:
-                withBarSubElement = SubElement(mxTechnicalMark, "with-bar")
+                withBarSubElement = SubElement(mxTechnicalMark, 'with-bar')
                 withBarSubElement.text = str(articulationMark.withBar)
         # harmonic needs to check for whether it is artificial or natural, and
         # whether it is base-pitch, sounding-pitch, or touching-pitch
