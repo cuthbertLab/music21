@@ -585,8 +585,8 @@ class PullOff(spanner.Spanner, TechnicalIndication):
 class FretBend(FretIndication):
     bendAlter: interval.IntervalBase | None = None
     preBend: bool = False
-    release: float | None = None
-    withBar: bool | None = None
+    release: t.Optional[float]
+    withBar: t.Optional[bool]
 
     def __init__(self, number=0, preBend=False, release=None, withBar=None, **keywords):
         '''
