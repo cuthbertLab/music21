@@ -4918,7 +4918,7 @@ class MeasureExporter(XMLExporterBase):
         notations = []
 
         chordOrNote = n
-        if chordParent is not None and len(chordOrNote.articulations) == 0:
+        if chordParent is not None:
             # get expressions from first note of chord
             chordOrNote = chordParent
 
@@ -4954,7 +4954,7 @@ class MeasureExporter(XMLExporterBase):
                 else:
                     notations.append(mxExpression)
 
-        # apply all articulations apart from fingerings, string/fret and hammer-on/pull-off
+        # apply all articulations apart from fingerings and hammer-on/pull-off
         # only to first note of chord
         applicableArticulations = []
         fingeringNumber = 0
@@ -4963,10 +4963,6 @@ class MeasureExporter(XMLExporterBase):
                 if fingeringNumber == noteIndexInChord:
                     applicableArticulations.append(a)
                 fingeringNumber += 1
-            elif isinstance(a, articulations.StringIndication):
-                applicableArticulations.append(a)
-            elif isinstance(a, articulations.FretIndication):
-                applicableArticulations.append(a)
             elif isSingleNoteOrFirstInChord:
                 # Ignore hammer-on/pull-off:
                 # are written from their Spanner representation instead.
