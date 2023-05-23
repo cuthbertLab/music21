@@ -586,7 +586,7 @@ class FretBend(FretIndication):
     bendAlter: interval.IntervalBase | None = None
     preBend: bool = False
     release: float | None = None
-    withBar: t.Any = None
+    withBar: bool | None = None
 
     def __init__(self, number=0, preBend=False, release=None, withBar=None, **keywords):
         '''
