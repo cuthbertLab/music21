@@ -583,7 +583,7 @@ class PullOff(spanner.Spanner, TechnicalIndication):
     pass
 
 class FretBend(FretIndication):
-    bendAlter: interval.IntervalBase | None = None
+    bendAlter: interval.IntervalBase
     preBend: bool = False
     release: t.Optional[float]
     withBar: t.Optional[bool]
