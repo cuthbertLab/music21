@@ -7110,7 +7110,8 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
     def stripTies(
         self,
         inPlace=False,
-        matchByPitch=True
+        matchByPitch=True,
+        preserveVoices=True
     ):
         # noinspection PyShadowingNames
         '''
@@ -7260,7 +7261,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
             # returnObj.parts for this...
             for p in returnObj.getElementsByClass(Stream):
                 # already copied if necessary; edit in place
-                p.stripTies(inPlace=True, matchByPitch=matchByPitch)
+                p.stripTies(inPlace=True, matchByPitch=matchByPitch, preserveVoices=preseveVoices)
             if not inPlace:
                 return returnObj
             else:
@@ -7269,7 +7270,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         if returnObj.hasVoices():
             for v in returnObj.voices:
                 # already copied if necessary; edit in place
-                v.stripTies(inPlace=True, matchByPitch=matchByPitch)
+                v.stripTies(inPlace=True, matchByPitch=matchByPitch, preserveVoices=preserveVoices)
             if not inPlace:
                 return returnObj
             else:
@@ -7363,115 +7364,169 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
                         return False
             return True
 
-        for i in range(len(notes_and_rests)):
-            endMatch = None  # can be True, False, or None
-            n = notes_and_rests[i]
-            if i > 0:  # get i and n for the previous value
-                iLast = i - 1
-                nLast = notes_and_rests[iLast]
-            else:
-                iLast = None
-                nLast = None
-
-            # See if we have a tie, and it has started.
-            # A start typed tie may not be a true start tie
-            if (hasattr(n, 'tie')
-                    and n.tie is not None
-                    and n.tie.type == 'start'):
-                # find a true start, add to known connected positions
-                if iLast is None or iLast not in posConnected:
-                    posConnected = [i]  # reset list with start
-                # find a continuation: the last note was a tie
-                # start and this note is a tie start (this may happen)
-                elif iLast in posConnected:
-                    posConnected.append(i)
-                # a connection has been started or continued, so no endMatch
-                endMatch = False
-
-            # A "continue" may or may not imply a connection
-            elif (hasattr(n, 'tie')
-                    and n.tie is not None
-                    and n.tie.type == 'continue'):
-                # is this actually a start?
-                if not posConnected:
-                    posConnected.append(i)
-                    endMatch = False
-                elif matchByPitch:
-                    # try to match pitch against nLast
-                    # updateEndMatch() checks for equal cardinality
-                    tempEndMatch = updateEndMatch(n)
-                    if tempEndMatch:
-                        posConnected.append(i)
-                        # ... and keep going.
-                        endMatch = False
-                    else:
-                        # clear list and populate with this element
-                        posConnected = [i]
-                        endMatch = False
-                elif allTiesAreContinue(n):
-                    # uniform-continue suffices if not matchByPitch
-                    # but still need to check cardinality
-                    if isinstance(nLast, note.NotRest) and (len(nLast.pitches) != len(n.pitches)):
-                        # different sizes: clear list and populate with this element
-                        # since allTiesAreContinue, it is okay to treat as ersatz-start
-                        posConnected = [i]
-                    else:
-                        posConnected.append(i)
-                    # either way, this was not a stop
-                    endMatch = False
+        if preserveVoices:
+            for i in range(len(notes_and_rests)):
+                endMatch = None  # can be True, False, or None
+                n = notes_and_rests[i]
+                if i > 0:  # get i and n for the previous value
+                    iLast = i - 1
+                    nLast = notes_and_rests[iLast]
                 else:
-                    # only SOME ties on this chord are "continue": reject
-                    posConnected = []
+                    iLast = None
+                    nLast = None
+
+                # See if we have a tie, and it has started.
+                # A start typed tie may not be a true start tie
+                if (hasattr(n, 'tie')
+                        and n.tie is not None
+                        and n.tie.type == 'start'):
+                    # find a true start, add to known connected positions
+                    if iLast is None or iLast not in posConnected:
+                        posConnected = [i]  # reset list with start
+                    # find a continuation: the last note was a tie
+                    # start and this note is a tie start (this may happen)
+                    elif iLast in posConnected:
+                        posConnected.append(i)
+                    # a connection has been started or continued, so no endMatch
                     endMatch = False
 
-            # establish end condition
-            if endMatch is None:  # not yet set, not a start or continue
-                endMatch = updateEndMatch(n)
+                # A "continue" may or may not imply a connection
+                elif (hasattr(n, 'tie')
+                        and n.tie is not None
+                        and n.tie.type == 'continue'):
+                    # is this actually a start?
+                    if not posConnected:
+                        posConnected.append(i)
+                        endMatch = False
+                    elif matchByPitch:
+                        # try to match pitch against nLast
+                        # updateEndMatch() checks for equal cardinality
+                        tempEndMatch = updateEndMatch(n)
+                        if tempEndMatch:
+                            posConnected.append(i)
+                            # ... and keep going.
+                            endMatch = False
+                        else:
+                            # clear list and populate with this element
+                            posConnected = [i]
+                            endMatch = False
+                    elif allTiesAreContinue(n):
+                        # uniform-continue suffices if not matchByPitch
+                        # but still need to check cardinality
+                        if isinstance(nLast, note.NotRest) and (len(nLast.pitches) != len(n.pitches)):
+                            # different sizes: clear list and populate with this element
+                            # since allTiesAreContinue, it is okay to treat as ersatz-start
+                            posConnected = [i]
+                        else:
+                            posConnected.append(i)
+                        # either way, this was not a stop
+                        endMatch = False
+                    else:
+                        # only SOME ties on this chord are "continue": reject
+                        posConnected = []
+                        endMatch = False
 
-            # process end condition
-            if endMatch:
-                posConnected.append(i)  # add this last position
-                if len(posConnected) < 2:
-                    # an open tie, not connected to anything
-                    # should be an error; presently, just skipping
-                    # raise StreamException('cannot consolidate ties when only one tie is present',
-                    #    notes[posConnected[0]])
-                    # environLocal.printDebug(
-                    #   ['cannot consolidate ties when only one tie is present',
-                    #     notes[posConnected[0]]])
-                    posConnected = []
+                # establish end condition
+                if endMatch is None:  # not yet set, not a start or continue
+                    endMatch = updateEndMatch(n)
+
+                # process end condition
+                if endMatch:
+                    posConnected.append(i)  # add this last position
+                    if len(posConnected) < 2:
+                        # an open tie, not connected to anything
+                        # should be an error; presently, just skipping
+                        # raise StreamException('cannot consolidate ties when only one tie is present',
+                        #    notes[posConnected[0]])
+                        # environLocal.printDebug(
+                        #   ['cannot consolidate ties when only one tie is present',
+                        #     notes[posConnected[0]]])
+                        posConnected = []
+                        continue
+
+                    # get sum of durations for all notes
+                    # do not include first; will add to later; do not delete
+                    durSum = 0
+                    for q in posConnected[1:]:  # all but the first
+                        durSum += notes_and_rests[q].quarterLength
+                        posDelete.append(q)  # store for deleting later
+                    # dur sum should always be greater than zero
+                    if durSum == 0:
+                        raise StreamException('aggregated ties have a zero duration sum')
+                    # change the duration of the first note to be self + sum
+                    # of all others
+                    qLen = notes_and_rests[posConnected[0]].quarterLength
+                    if not notes_and_rests[posConnected[0]].duration.linked:
+                        # obscure bug found from some inexact musicxml files.
+                        notes_and_rests[posConnected[0]].duration.linked = True
+                    notes_and_rests[posConnected[0]].quarterLength = qLen + durSum
+
+                    # set tie to None on first note
+                    notes_and_rests[posConnected[0]].tie = None
+
+                    # replace removed elements in spanners
+                    for sp in f.spanners:
+                        for index in posConnected[1:]:
+                            if notes_and_rests[index] in sp:
+                                sp.replaceSpannedElement(
+                                    notes_and_rests[index],
+                                    notes_and_rests[posConnected[0]])
+
+                    posConnected = []  # reset to empty
+        else:
+            def sum_durations_to_end_tie(n, index: int) -> float:
+                dur = 0
+                for j in range(index + 1, len(notes_and_rests)):
+                    if notes_and_rests[j].isRest:
+                        continue
+                    if notes_and_rests[j].isChord:
+                        current_chord = notes_and_rests[j]
+                        for current_note in current_chord:
+                            if (
+                                n.pitch.midi == current_note.pitch.midi
+                                and current_note.tie is not None
+                            ):
+                                if current_note.tie.type == "continue":
+                                    dur += current_chord.duration.quarterLength
+                                elif current_note.tie.type == "stop":
+                                    dur += current_chord.duration.quarterLength
+                                    return dur
+                    elif (
+                        n.pitch.midi == notes_and_rests[j].pitch.midi
+                        and notes_and_rests[j].tie is not None
+                    ):
+                        current_note = notes_and_rests[j]
+                        if current_note.tie.type == "continue":
+                            dur += current_note.duration.quarterLength
+                        elif current_note.tie.type == "stop":
+                            dur += current_note.duration.quarterLength
+                            return dur
+                warnings.warn("Ties not closed, returning untied duration!")
+                return 0
+
+            for i, n in enumerate(notes_and_rests):
+                if n.isRest:
                     continue
-
-                # get sum of durations for all notes
-                # do not include first; will add to later; do not delete
-                durSum = 0
-                for q in posConnected[1:]:  # all but the first
-                    durSum += notes_and_rests[q].quarterLength
-                    posDelete.append(q)  # store for deleting later
-                # dur sum should always be greater than zero
-                if durSum == 0:
-                    raise StreamException('aggregated ties have a zero duration sum')
-                # change the duration of the first note to be self + sum
-                # of all others
-                qLen = notes_and_rests[posConnected[0]].quarterLength
-                if not notes_and_rests[posConnected[0]].duration.linked:
-                    # obscure bug found from some inexact musicxml files.
-                    notes_and_rests[posConnected[0]].duration.linked = True
-                notes_and_rests[posConnected[0]].quarterLength = qLen + durSum
-
-                # set tie to None on first note
-                notes_and_rests[posConnected[0]].tie = None
-
-                # replace removed elements in spanners
-                for sp in f.spanners:
-                    for index in posConnected[1:]:
-                        if notes_and_rests[index] in sp:
-                            sp.replaceSpannedElement(
-                                notes_and_rests[index],
-                                notes_and_rests[posConnected[0]])
-
-                posConnected = []  # reset to empty
-
+                if n.isChord:
+                    dur = n.duration.quarterLength
+                    for sub_note in n:
+                        if sub_note.tie is not None:
+                            if sub_note.tie.type != "start":
+                                posDelete.append(i)
+                                continue
+                            dur += sum_durations_to_end_tie(sub_note, i)
+                        sub_note.tie = None
+                        sub_note.duration.quarterLength = dur
+                else:
+                    dur = n.duration.quarterLength
+                    if n.tie is not None:
+                        if n.tie.type != "start":
+                            posDelete.append(i)
+                            continue
+                        dur += sum_durations_to_end_tie(n, i)
+                    notes_and_rests[i].tie = None
+                    notes_and_rests[i].duration.quarterLength = dur
+            posDelete = sorted(list(set(posDelete)))
         # all results have been processed
         posDelete.reverse()  # start from highest and go down
 
