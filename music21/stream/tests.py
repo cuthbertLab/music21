@@ -1469,6 +1469,19 @@ class Test(unittest.TestCase):
         self.assertEqual(chordsOut[3].pitches, ch4.pitches)
         self.assertEqual(chordsOut[4].pitches, ch5.pitches)
 
+    def testStripTiesChordsAccidentals(self):
+        '''
+        Make sure chords are matched even if some have 'natural' accidentals and some
+        have None accidentals.
+        '''
+        sch = corpus.parse('schoenberg/opus19', 2)
+        self.assertEqual(len(sch.stripTies().flatten().notes), 46)
+        measure = sch.stripTies().parts[0].getElementsByClass('Measure')[6]
+        self.assertEqual(len(measure.notes), 3)
+        self.assertEqual(measure.notes[0].offset, 0.5)
+        self.assertEqual(measure.notes[1].offset, 2.5)
+        self.assertEqual(measure.notes[2].offset, 3.0)
+
     def testStripTiesComplexTies(self):
         '''
         Make sure tie types of "stop" or "continue" are not taken at face value
