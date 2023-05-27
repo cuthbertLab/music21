@@ -1721,7 +1721,7 @@ class StrongestRhythmicPulseFeature(featuresModule.FeatureExtractor):
     >>> fe = features.jSymbolic.StrongestRhythmicPulseFeature(s)
     >>> f = fe.extract()
     >>> f.vector
-    [120]
+    [96]
     '''
 
     id = 'R1'
@@ -1755,7 +1755,7 @@ class SecondStrongestRhythmicPulseFeature(featuresModule.FeatureExtractor):
     >>> fe = features.jSymbolic.SecondStrongestRhythmicPulseFeature(s)
     >>> f = fe.extract()
     >>> f.vector
-    [60]
+    [192]
 
     '''
     id = 'R2'
@@ -1795,7 +1795,7 @@ class HarmonicityOfTwoStrongestRhythmicPulsesFeature(
     >>> fe = features.jSymbolic.HarmonicityOfTwoStrongestRhythmicPulsesFeature(s)
     >>> f = fe.extract()
     >>> f.vector
-    [2.0]
+    [0.5]
 
     '''
     id = 'R3'
@@ -2136,7 +2136,7 @@ class NoteDensityFeature(featuresModule.FeatureExtractor):
     >>> fe = features.jSymbolic.NoteDensityFeature(s)
     >>> f = fe.extract()
     >>> f.vector
-    [9.055...]
+    [7.244...]
     '''
     id = 'R15'
 
@@ -2170,7 +2170,7 @@ class AverageNoteDurationFeature(featuresModule.FeatureExtractor):
     >>> fe = features.jSymbolic.AverageNoteDurationFeature(s)
     >>> f = fe.extract()
     >>> f.vector
-    [0.441...]
+    [0.552...]
 
     >>> s.insert(0, tempo.MetronomeMark(number=240))
     >>> fe = features.jSymbolic.AverageNoteDurationFeature(s)
@@ -2247,7 +2247,7 @@ class MaximumNoteDurationFeature(featuresModule.FeatureExtractor):
     >>> fe = features.jSymbolic.MaximumNoteDurationFeature(s)
     >>> f = fe.extract()
     >>> f.vector
-    [1.0]
+    [1.25]
     '''
 
     id = 'R19'
@@ -2279,7 +2279,7 @@ class MinimumNoteDurationFeature(featuresModule.FeatureExtractor):
     >>> fe = features.jSymbolic.MinimumNoteDurationFeature(s)
     >>> f = fe.extract()
     >>> f.vector
-    [0.25]
+    [0.3125]
     '''
     id = 'R20'
 
@@ -2388,7 +2388,7 @@ class VariabilityOfTimeBetweenAttacksFeature(featuresModule.FeatureExtractor):
     >>> fe = features.jSymbolic.VariabilityOfTimeBetweenAttacksFeature(s)
     >>> f = fe.extract()
     >>> print(f.vector)
-    [0.15]
+    [0.1875]
     '''
 
     id = 'R23'
@@ -2606,12 +2606,10 @@ class InitialTempoFeature(featuresModule.FeatureExtractor):
     Tempo in beats per minute at the start of the recording.
 
     >>> s = corpus.parse('bwv66.6')
-    >>> for p in s.parts:
-    ...     p.insert(0, tempo.MetronomeMark(number=120))
     >>> fe = features.jSymbolic.InitialTempoFeature(s)
     >>> f = fe.extract()
     >>> f.vector  # a default
-    [120.0]
+    [96.0]
     '''
 
     id = 'R30'

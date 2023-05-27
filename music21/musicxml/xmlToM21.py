@@ -2389,7 +2389,7 @@ class MeasureParser(XMLParserBase):
         'attributes': 'parseAttributesTag',
         'harmony': 'xmlHarmony',
         'figured-bass': None,
-        'sound': None,
+        'sound': 'xmlSound',
         'barline': 'xmlBarline',
         'grouping': None,
         'link': None,
@@ -5212,6 +5212,7 @@ class MeasureParser(XMLParserBase):
         # found in mxSpecificDirectionTag (inside direction-type) but in mxDirection itself.
         staffKey = self.getStaffNumber(mxDirection)
 
+        metronome_added = False
         # editorial (footnote, level, voice) for the whole <direction> tag is parsed in
         # setDirectionInDirectionType.  -- probably a mistake since they
         # should all share the same Editorial object and be manipulated together
@@ -5221,9 +5222,19 @@ class MeasureParser(XMLParserBase):
                                                  mxDirection,
                                                  staffKey,
                                                  totalOffset)
-        # TODO: sound
-        # TODO: musicxml 4:listening
+                if mxSpecificDirectionTag.tag == 'metronome':
+                    metronome_added = True
 
+        # check for sound tag if direction didn't specify a tempo already,
+        # avoiding doubled metronomes.
+        if not metronome_added:
+            for mxSound in mxDirection.findall('sound'):
+                self.setSound(mxSound,
+                              mxDirection,
+                              staffKey,
+                              totalOffset)
+
+        # TODO: musicxml 4:listening
 
     def setDirectionInDirectionType(self, mxDir, mxDirection, staffKey, totalOffset):
         # TODO: pedal
@@ -5312,6 +5323,65 @@ class MeasureParser(XMLParserBase):
                 self.insertCoreAndRef(totalOffset, staffKey, textExpression)
                 self.setEditorial(mxDirection, textExpression)
 
+    def xmlSound(self, mxSound: ET.Element):
+        '''
+        Convert a <sound> tag to a relevant object (presently just MetronomeMark),
+        and add it to the core and staffReference.
+        '''
+        # offset is out of order because we need to know it before direction-type
+        offsetDirection = self.xmlToOffset(mxSound)
+        totalOffset = offsetDirection + self.offsetMeasureNote
+
+        staffKey = self.getStaffNumber(mxSound)
+
+        self.setSound(mxSound,
+                      None,
+                      staffKey,
+                      totalOffset)
+
+    def setSound(
+        self,
+        mxSound: ET.Element,
+        mxDir: ET.Element | None,
+        staffKey: int,
+        totalOffset: float
+    ):
+        '''
+        Takes a <sound> tag and creates objects from it.
+        Presently only handles <sound tempo='x'> events and inserts them as MetronomeMarks.
+        If the <sound> tag is a child of a <direction> tag, the direction information
+        is used to set the placement of the MetronomeMark.
+        '''
+        # TODO: coda
+        # TODO: dacapo
+        # TODO: dalsegno
+        # TODO: damper-pedal
+        # TODO: divisions
+        # TODO: dynamics
+        # TODO: fine
+        # TODO: forward-repeat
+        # TODO: id
+        # TODO: pizzicato
+        # TODO: segno
+        # TODO: soft-pedal
+        # TODO: sostenuto-pedal
+        # TODO: time-only
+        # TODO: tocoda
+        if 'tempo' in mxSound.attrib:
+            qpm = common.numToIntOrFloat(float(mxSound.get('tempo', 0)))
+            if qpm == 0:
+                warnings.warn('0 qpm tempo tag found, skipping.')
+                return
+            mm = tempo.MetronomeMark(number=qpm, referent=note.Note(type='quarter'))
+
+            _synchronizeIds(mxSound, mm)
+            self.setPrintObject(mxSound, mm)
+            self.setPosition(mxSound, mm)
+            if mxDir is not None:
+                _setAttributeFromAttribute(mm, mxDir, 'placement', 'placement')
+                self.setEditorial(mxDir, mm)
+            self.insertCoreAndRef(totalOffset, staffKey, mm)
+
     def xmlToTextExpression(self, mxWords):
         # noinspection PyShadowingNames
         '''
@@ -5362,7 +5432,7 @@ class MeasureParser(XMLParserBase):
         >>> m = EL(r'<metronome><per-minute>125</per-minute>' +
         ...         '<beat-unit>half</beat-unit></metronome>')
         >>> MP.xmlToTempoIndication(m)
-        <music21.tempo.MetronomeMark Half=125.0>
+        <music21.tempo.MetronomeMark Half=125>
 
         Metric modulation:
 
@@ -5395,7 +5465,7 @@ class MeasureParser(XMLParserBase):
                 perMin = mxObj.text
                 if perMin is not None and perMin.strip() != '':
                     try:
-                        numbers.append(float(perMin))
+                        numbers.append(common.numToIntOrFloat(float(perMin)))
                     except ValueError:
                         pass  # TODO: accept text per minute
         # TODO: metronome-relation -- specifies how to relate multiple beat units
