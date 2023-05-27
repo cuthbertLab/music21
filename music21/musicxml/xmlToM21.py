@@ -5236,7 +5236,6 @@ class MeasureParser(XMLParserBase):
 
         # TODO: musicxml 4:listening
 
-
     def setDirectionInDirectionType(self, mxDir, mxDirection, staffKey, totalOffset):
         # TODO: pedal
         # TODO: harp-pedals
@@ -5340,7 +5339,13 @@ class MeasureParser(XMLParserBase):
                       staffKey,
                       totalOffset)
 
-    def setSound(self, mxSound: ET.Element, mxDir: ET.Element | None, staffKey: int, totalOffset: float):
+    def setSound(
+        self,
+        mxSound: ET.Element,
+        mxDir: ET.Element | None,
+        staffKey: int,
+        totalOffset: float
+    ):
         '''
         Takes a <sound> tag and creates objects from it.
         Presently only handles <sound tempo='x'> events and inserts them as MetronomeMarks.
@@ -5363,7 +5368,7 @@ class MeasureParser(XMLParserBase):
         # TODO: time-only
         # TODO: tocoda
         if 'tempo' in mxSound.attrib:
-            qpm = float(mxSound.get('tempo'))
+            qpm = float(mxSound.get('tempo', 0))
             if qpm == 0:
                 warnings.warn('0 qpm tempo tag found, skipping.')
                 return
