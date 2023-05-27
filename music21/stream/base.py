@@ -7111,7 +7111,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         self,
         inPlace=False,
         matchByPitch=True,
-        preserveVoices=True
+        preserveVoices=True,
     ):
         # noinspection PyShadowingNames
         '''
@@ -7261,7 +7261,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
             # returnObj.parts for this...
             for p in returnObj.getElementsByClass(Stream):
                 # already copied if necessary; edit in place
-                p.stripTies(inPlace=True, matchByPitch=matchByPitch, preserveVoices=preseveVoices)
+                p.stripTies(inPlace=True, matchByPitch=matchByPitch, preserveVoices=preserveVoices)
             if not inPlace:
                 return returnObj
             else:
@@ -7287,6 +7287,21 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
 
         posConnected = []  # temporary storage for index of tied notes
         posDelete = []  # store deletions to be processed later
+
+        def pitchesEqual(p1, p2):
+            if (p1.octave != p2.octave
+                or p1.step != p2.step
+                or p1.microtone != p2.microtone):
+                return False
+                # Special case: We have to treat None and "natural" accidentals as equal
+            aLast = p1.accidental
+            aInner = p2.accidental
+            if aLast != aInner:
+                aLastIsNeutral = aLast is None or aLast.name == 'natural'
+                aInnerIsNeutral = aInner is None or aInner.name == 'natural'
+                if not (aLastIsNeutral and aInnerIsNeutral):
+                    return False
+            return True
 
         def updateEndMatch(nInner) -> bool:
             '''
@@ -7343,7 +7358,9 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
                     return False
 
                 for pitchIndex in range(len(nLast.pitches)):
-                    if nLast.pitches[pitchIndex] != nInner.pitches[pitchIndex]:
+                    pLast = nLast.pitches[pitchIndex]
+                    pInner = nInner.pitches[pitchIndex]
+                    if not pitchesEqual(pLast, pInner):
                         return False
                 return True
 
@@ -7474,59 +7491,130 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
 
                     posConnected = []  # reset to empty
         else:
-            def sum_durations_to_end_tie(n, index: int) -> float:
-                dur = 0
-                for j in range(index + 1, len(notes_and_rests)):
-                    if notes_and_rests[j].isRest:
-                        continue
-                    if notes_and_rests[j].isChord:
-                        current_chord = notes_and_rests[j]
-                        for current_note in current_chord:
-                            if (
-                                n.pitch.midi == current_note.pitch.midi
-                                and current_note.tie is not None
-                            ):
-                                if current_note.tie.type == "continue":
-                                    dur += current_chord.duration.quarterLength
-                                elif current_note.tie.type == "stop":
-                                    dur += current_chord.duration.quarterLength
-                                    return dur
-                    elif (
-                        n.pitch.midi == notes_and_rests[j].pitch.midi
-                        and notes_and_rests[j].tie is not None
-                    ):
-                        current_note = notes_and_rests[j]
-                        if current_note.tie.type == "continue":
-                            dur += current_note.duration.quarterLength
-                        elif current_note.tie.type == "stop":
-                            dur += current_note.duration.quarterLength
-                            return dur
-                warnings.warn("Ties not closed, returning untied duration!")
-                return 0
+            # Flatten all chords
+            for c in returnObj.recurse().getElementsByClass('Chord'):
+                for noteObj in c.notes:
+                    noteObj.duration = c.duration
+                    c.activeSite.insert(c.offset, noteObj)
+                c.activeSite.remove(c)
 
+            f = returnObj.flatten()
+            notes_and_rests = f.notes.addFilter(
+                lambda el, _iterator: el.quarterLength > 0
+            ).stream()
+            # there are several valid tie-combinations
+            # start - stop
+            # start - continue - stop
+            # - stop
+            # start -
+            # continue - stop
+            # start - continue
+            # continue
+            matched = set()
+            posDelete = set()
             for i, n in enumerate(notes_and_rests):
-                if n.isRest:
+                if notes_and_rests[i].isRest or i in posDelete:
                     continue
-                if n.isChord:
-                    dur = n.duration.quarterLength
-                    for sub_note in n:
-                        if sub_note.tie is not None:
-                            if sub_note.tie.type != "start":
-                                posDelete.append(i)
-                                continue
-                            dur += sum_durations_to_end_tie(sub_note, i)
-                        sub_note.tie = None
-                        sub_note.duration.quarterLength = dur
-                else:
-                    dur = n.duration.quarterLength
-                    if n.tie is not None:
-                        if n.tie.type != "start":
-                            posDelete.append(i)
-                            continue
-                        dur += sum_durations_to_end_tie(n, i)
-                    notes_and_rests[i].tie = None
-                    notes_and_rests[i].duration.quarterLength = dur
-            posDelete = sorted(list(set(posDelete)))
+                if n.tie is not None:
+                    # If we are here, we know that there is no (relevant) tie before the
+                    # current one
+                    current_duration = n.quarterLength
+                    match n.tie.type:
+                        case "start":
+                            idx_start = i
+                            matched.add(idx_start)
+                            for j in range(i+1, len(notes_and_rests)):
+                                if pitchesEqual(n.pitch, notes_and_rests[j].pitch):
+                                    tied_note = notes_and_rests[j]
+                                    # If the next note with that pitch has a continue tie,
+                                    # we keep going further
+                                    if tied_note.tie is not None and tied_note.tie.type == "continue":
+                                        posDelete.add(j)
+                                        current_duration += tied_note.quarterLength
+                                        continue
+                                    elif tied_note.tie is None or tied_note.tie.type == "stop":
+                                        posDelete.add(j)
+                                        current_duration += tied_note.quarterLength
+                                        break
+                                    if tied_note.offset == n.offset:
+                                        # Allow ties at the same offset, happens frequently
+                                        # in malformed MusicXML
+                                        continue
+                                    else:
+                                        raise ValueError(f"Unexpected start tie ({tied_note.offset}, {tied_note.pitch}) in active tie ({n.offset}, {n.pitch}).")
+                            else:
+                                warnings.warn(f"No end tie found for start tie ({n.offset}, {n.pitch}) -> ?, ignoring.")
+                        case "continue":
+                            # Find the starting note
+                            posDelete.add(i)
+                            for j in reversed(range(i)):
+                                if pitchesEqual(n.pitch, notes_and_rests[j].pitch):
+                                    idx_start = j
+                                    matched.add(idx_start)
+                                    tied_note = notes_and_rests[j]
+                                    # Previous notes can never have a tie that hasnt been dealt with
+                                    assert tied_note.tie is None
+                                    current_duration += tied_note.quarterLength
+                                    for sp in f.spanners:
+                                        if tied_note in sp:
+                                            sp.replaceSpannedElement(
+                                                notes_and_rests[i],
+                                                notes_and_rests[idx_start])
+                                    break
+                            else:
+                                raise ValueError(f"Continue tie misused as start tie ? -> ({n.offset}, {n.pitch})!")
+                            # Find end for this one
+                            for j in range(i+1, len(notes_and_rests)):
+                                if pitchesEqual(n.pitch, notes_and_rests[j].pitch):
+                                    tied_note = notes_and_rests[j]
+                                    posDelete.add(j)
+                                    for sp in f.spanners:
+                                        if tied_note in sp:
+                                            sp.replaceSpannedElement(
+                                                notes_and_rests[j],
+                                                notes_and_rests[idx_start])
+                                    # If the next note with that pitch has a continue tie,
+                                    # we keep going further
+                                    if tied_note.tie is not None and tied_note.tie.type == "continue":
+                                        current_duration += tied_note.quarterLength
+                                        continue
+                                    elif tied_note.tie is None or tied_note.tie.type == "stop":
+                                        current_duration += tied_note.quarterLength
+                                        break
+                                    else:
+                                        raise ValueError(f"Unexpected start tie ({tied_note.offset}, {tied_note.pitch}) in active tie ({n.offset}, {n.pitch}).")
+                            else:
+                                n = notes_and_rests[idx_start]
+                                raise ValueError(f"Tie began but never ended ({n.offset}, {n.pitch}) -> ? ")
+                        case "stop":
+                            # Find the previous note
+                            for j in reversed(range(i)):
+                                if pitchesEqual(n.pitch, notes_and_rests[j].pitch) and j not in matched:
+                                    idx_start = j
+                                    posDelete.add(i)
+                                    matched.add(idx_start)
+                                    tied_note = notes_and_rests[j]
+                                    current_duration += tied_note.quarterLength
+                                    # replace removed elements in spanners
+                                    for sp in f.spanners:
+                                        if tied_note in sp:
+                                            sp.replaceSpannedElement(
+                                                notes_and_rests[i],
+                                                notes_and_rests[idx_start])
+                                    break
+                            else:
+                                warnings.warn(f"Tie ended but never began ? -> ({n.offset}, {n.pitch}), ignoring!")
+
+                    # accumulate the duration into the first note
+                    if not notes_and_rests[idx_start].duration.linked:
+                        # obscure bug found from some inexact musicxml files.
+                        notes_and_rests[idx_start].duration.linked = True
+                    notes_and_rests[idx_start].quarterLength = current_duration
+
+                    # set tie to None on first note
+                    notes_and_rests[idx_start].tie = None
+            posDelete = sorted(list(posDelete))
+
         # all results have been processed
         posDelete.reverse()  # start from highest and go down
 
