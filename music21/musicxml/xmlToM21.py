@@ -5368,7 +5368,7 @@ class MeasureParser(XMLParserBase):
         # TODO: time-only
         # TODO: tocoda
         if 'tempo' in mxSound.attrib:
-            qpm = common.numToIntOrFloat(mxSound.get('tempo', 0))
+            qpm = common.numToIntOrFloat(float(mxSound.get('tempo', 0)))
             if qpm == 0:
                 warnings.warn('0 qpm tempo tag found, skipping.')
                 return
@@ -5465,7 +5465,7 @@ class MeasureParser(XMLParserBase):
                 perMin = mxObj.text
                 if perMin is not None and perMin.strip() != '':
                     try:
-                        numbers.append(common.numToIntOrFloat(perMin))
+                        numbers.append(common.numToIntOrFloat(float(perMin)))
                     except ValueError:
                         pass  # TODO: accept text per minute
         # TODO: metronome-relation -- specifies how to relate multiple beat units

@@ -5816,7 +5816,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         {0.0} <music21.stream.Measure 1 offset=0.0>
             {0.0} <music21.layout.SystemLayout>
             {0.0} <music21.clef.Treble8vbClef>
-            {0.0} <music21.tempo.MetronomeMark animato Quarter=120.0>
+            {0.0} <music21.tempo.MetronomeMark animato Quarter=120>
             {0.0} <music21.key.Key of F major>
             {0.0} <music21.meter.TimeSignature 2/4>
             {0.0} <music21.note.Note C>
@@ -5839,7 +5839,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         {0.0} <music21.stream.Measure 1 offset=0.0>
             {0.0} <music21.layout.SystemLayout>
             {0.0} <music21.clef.Treble8vbClef>
-            {0.0} <music21.tempo.MetronomeMark animato Quarter=120.0>
+            {0.0} <music21.tempo.MetronomeMark animato Quarter=120>
             {0.0} <music21.key.KeySignature of 3 flats>
             {0.0} <music21.meter.TimeSignature 2/4>
             {0.0} <music21.note.Note B->

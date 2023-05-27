@@ -1354,7 +1354,7 @@ class StreamIterator(prebase.ProtoM21Object, Sequence[M21ObjType]):
          <music21.instrument.Instrument 'P1: Soprano: Instrument 1'>,
          <music21.stream.Measure 0 offset=0.0>,
          <music21.clef.TrebleClef>,
-         <music21.tempo.MetronomeMark Quarter=96.0>,
+         <music21.tempo.MetronomeMark Quarter=96>,
          <music21.key.Key of f# minor>,
          <music21.meter.TimeSignature 4/4>,
          <music21.note.Note C#>,
