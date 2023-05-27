@@ -251,7 +251,7 @@ class ElementTimespan(Timespan):
     >>> score = corpus.parse('bwv66.6')
     >>> scoreTree = score.asTimespans()
     >>> scoreTree
-    <TimespanTree {195} (0.0 to 36.0) <music21.stream.Score ...>>
+    <TimespanTree {199} (0.0 to 36.0) <music21.stream.Score ...>>
 
     Then get the verticality from offset 6.5, which is beat two-and-a-half of
     measure 2 (the piece is in 4/4 with a quarter-note pickup)
