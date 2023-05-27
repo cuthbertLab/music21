@@ -5324,10 +5324,10 @@ class MeasureParser(XMLParserBase):
                 self.insertCoreAndRef(totalOffset, staffKey, textExpression)
                 self.setEditorial(mxDirection, textExpression)
 
-    def xmlSound(self, mxSound):
+    def xmlSound(self, mxSound: ET.Element):
         '''
-        convert a <sound> tag to metronome marks.
-        and add them to the core and staffReference.
+        Convert a <sound> tag to a relevant object (presently just MetronomeMark),
+        and add it to the core and staffReference.
         '''
         # offset is out of order because we need to know it before direction-type
         offsetDirection = self.xmlToOffset(mxSound)
@@ -5340,7 +5340,13 @@ class MeasureParser(XMLParserBase):
                       staffKey,
                       totalOffset)
 
-    def setSound(self, mxSound, mxDir, staffKey, totalOffset):
+    def setSound(self, mxSound: ET.Element, mxDir: ET.Element | None, staffKey: int, totalOffset: float):
+        '''
+        Takes a <sound> tag and creates objects from it.
+        Presently only handles <sound tempo='x'> events and inserts them as MetronomeMarks.
+        If the <sound> tag is a child of a <direction> tag, the direction information
+        is used to set the placement of the MetronomeMark.
+        '''
         # TODO: coda
         # TODO: dacapo
         # TODO: dalsegno
