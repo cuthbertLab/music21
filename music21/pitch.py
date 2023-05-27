@@ -1994,43 +1994,60 @@ class Pitch(prebase.ProtoM21Object):
         else:
             return name
 
-    def __eq__(self, other):
+    def __eq__(self, other: object):
         '''
-        Do not accept enharmonic equivalence.
+        Are two pitches equal?
 
-        >>> a = pitch.Pitch('c2')
-        >>> a.octave
+        They must both sound the same and be spelled the same.
+        Enharmonic equivalence is not equality, nor is impliedOctave
+        or is a pitch without an accidental equal to a pitch with a
+        natural accidental.  (See `:meth:`~music21.pitch.Pitch.isEnharmonic` for
+        a method that does not require spelling equivalence, and for an example
+        of how to compare notes without accidentals to notes with natural
+        accidentals.)
+
+        >>> c = pitch.Pitch('C2')
+        >>> c.octave
         2
-        >>> b = pitch.Pitch('c#4')
-        >>> b.octave
+        >>> cs = pitch.Pitch('C#4')
+        >>> cs.octave
         4
-        >>> a == b
+        >>> c == cs
         False
-        >>> a != b
+        >>> c != cs
         True
 
-        >>> c = 7
-        >>> a == c
+        >>> seven = 7
+        >>> c == seven
         False
 
-        >>> a != c
+        >>> c != seven
         True
 
-        >>> d = pitch.Pitch('d-4')
-        >>> b == d
+        >>> df = pitch.Pitch('D-4')
+        >>> cs == df
         False
+
+        Implied octaves do not equal explicit octaves
+
+        >>> c4 = pitch.Pitch('C4')
+        >>> cImplied = pitch.Pitch('C')
+        >>> c4 == cImplied
+        False
+        >>> c4.ps == cImplied.ps
+        True
+
+        Note: currently spellingIsInferred and fundamental
+        are not checked -- this behavior may change in the future.
         '''
-        if other is None:
-            return False
-        elif not isinstance(other, Pitch):
-            return False
-        elif (self.octave == other.octave
-              and self.step == other.step
-              and self.accidental == other.accidental
-              and self.microtone == other.microtone):
+        if not isinstance(other, Pitch):
+            return NotImplemented
+        if (self.octave == other.octave
+                and self.step == other.step
+                and self.accidental == other.accidental
+                and self.microtone == other.microtone):
             return True
-        else:
-            return False
+        return False
 
     # noinspection PyArgumentList
     def __deepcopy__(self, memo):
@@ -3882,8 +3899,7 @@ class Pitch(prebase.ProtoM21Object):
 
     def isEnharmonic(self, other: Pitch) -> bool:
         '''
-        Return True if other is an enharmonic equivalent of self.
-
+        Return True if another Pitch is an enharmonic equivalent of this Pitch.
 
         >>> p1 = pitch.Pitch('C#3')
         >>> p2 = pitch.Pitch('D-3')
@@ -3895,26 +3911,19 @@ class Pitch(prebase.ProtoM21Object):
         >>> p3.isEnharmonic(p1)
         False
 
-        Quarter tone enharmonics work as well:
+        Pitches are enharmonics of themselves:
 
         >>> pC = pitch.Pitch('C4')
-        >>> pC.accidental = pitch.Accidental('one-and-a-half-sharp')
-        >>> pC
-        <music21.pitch.Pitch C#~4>
-        >>> pD = pitch.Pitch('D4')
-        >>> pD.accidental = pitch.Accidental('half-flat')
-        >>> pD
-        <music21.pitch.Pitch D`4>
-        >>> pC.isEnharmonic(pD)
+        >>> pC.isEnharmonic(pC)
         True
 
-        Notes in different ranges are not enharmonics:
+        Notes that sound in different octaves are not enharmonics:
 
         >>> pitch.Pitch('C#4').isEnharmonic( pitch.Pitch('D-5') )
         False
 
-        However, different octaves can be the same range, because octave number
-        is relative to the `step` (natural form) of the pitch.
+        However, different octave numbers can be the same enharmonic,
+        because octave number is relative to the `step` (natural form) of the pitch.
 
         >>> pitch.Pitch('C4').isEnharmonic( pitch.Pitch('B#3') )
         True
@@ -3926,6 +3935,18 @@ class Pitch(prebase.ProtoM21Object):
         >>> pitch.Pitch('C#').isEnharmonic( pitch.Pitch('D-9') )
         True
         >>> pitch.Pitch('C#4').isEnharmonic( pitch.Pitch('D-') )
+        True
+
+        Quarter tone enharmonics work as well:
+
+        >>> pC.accidental = pitch.Accidental('one-and-a-half-sharp')
+        >>> pC
+        <music21.pitch.Pitch C#~4>
+        >>> pD = pitch.Pitch('D4')
+        >>> pD.accidental = pitch.Accidental('half-flat')
+        >>> pD
+        <music21.pitch.Pitch D`4>
+        >>> pC.isEnharmonic(pD)
         True
 
         Microtonally altered pitches do not return True unless the microtones are the same:
@@ -3940,23 +3961,43 @@ class Pitch(prebase.ProtoM21Object):
         >>> pSharp.isEnharmonic(pFlat)
         True
 
-
-        Extreme enharmonics seem to work great.
+        Extreme enharmonics also work:
 
         >>> p4 = pitch.Pitch('B##3')
-        >>> p5 = pitch.Pitch('D-4')
+        >>> p5 = pitch.Pitch('E---4')
         >>> p4.isEnharmonic(p5)
         True
+
+        If either pitch has no octave then the comparison is done without
+        regard to octave:
+
+        >>> pSharp4 = pitch.Pitch('C#4')
+        >>> pFlatNoOctave = pitch.Pitch('D-')
+        >>> pSharp4.isEnharmonic(pFlatNoOctave)
+        True
+        >>> pFlatNoOctave.isEnharmonic(pSharp4)
+        True
+
+        `isEnharmonic` can be combined with a test to see if two pitches have the
+        same step to ensure that they both sound the same and are written
+        the same, without regard to the presence or absence of an accidental
+        (this is used in `:meth:~music21.stream.base.Stream.stripTies`):
+
+        >>> pD4 = pitch.Pitch('D4')
+        >>> pDNatural4 = pitch.Pitch('D4', accidental=pitch.Accidental('natural'))
+        >>> pD4 == pDNatural4
+        False
+        >>> pD4.isEnharmonic(pDNatural4) and pD4.step == pDNatural4.step
+        True
+        >>> pEbb4 = pitch.Pitch('E--4')
+        >>> pD4.isEnharmonic(pEbb4) and pD4.step == pEbb4.step
+        False
         '''
         if other.octave is None or self.octave is None:
-            if (other.ps - self.ps) % 12 == 0:
-                return True
-            return False
-        # if pitch space are equal, these are enharmonics
+            return (other.ps - self.ps) % 12 == 0
         else:
-            if other.ps == self.ps:
-                return True
-            return False
+            # if pitch spaces are equal, these are enharmonics
+            return other.ps == self.ps
 
     # a cache so that interval objects can be reused...
     _transpositionIntervals: dict[t.Literal['d2', '-d2'], interval.Interval] = {}

@@ -1,4 +1,5 @@
 -r requirements.txt
+wheel
 pylint>=2.16.0
 flake8<6.0.0
 flake8-quotes
