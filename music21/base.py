@@ -2320,7 +2320,7 @@ class Music21Object(prebase.ProtoM21Object):
         <music21.note.Note E>
         <music21.meter.TimeSignature 4/4>
         f# minor
-        <music21.tempo.MetronomeMark Quarter=96.0>
+        <music21.tempo.MetronomeMark Quarter=96>
         <music21.clef.TrebleClef>
         <music21.stream.Measure 0 offset=0.0>
         P2: Alto: Instrument 2

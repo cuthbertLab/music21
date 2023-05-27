@@ -5368,7 +5368,7 @@ class MeasureParser(XMLParserBase):
         # TODO: time-only
         # TODO: tocoda
         if 'tempo' in mxSound.attrib:
-            qpm = float(mxSound.get('tempo', 0))
+            qpm = common.numToIntOrFloat(mxSound.get('tempo', 0))
             if qpm == 0:
                 warnings.warn('0 qpm tempo tag found, skipping.')
                 return
@@ -5432,7 +5432,7 @@ class MeasureParser(XMLParserBase):
         >>> m = EL(r'<metronome><per-minute>125</per-minute>' +
         ...         '<beat-unit>half</beat-unit></metronome>')
         >>> MP.xmlToTempoIndication(m)
-        <music21.tempo.MetronomeMark Half=125.0>
+        <music21.tempo.MetronomeMark Half=125>
 
         Metric modulation:
 
@@ -5465,7 +5465,7 @@ class MeasureParser(XMLParserBase):
                 perMin = mxObj.text
                 if perMin is not None and perMin.strip() != '':
                     try:
-                        numbers.append(float(perMin))
+                        numbers.append(common.numToIntOrFloat(perMin))
                     except ValueError:
                         pass  # TODO: accept text per minute
         # TODO: metronome-relation -- specifies how to relate multiple beat units
