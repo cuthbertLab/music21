@@ -37,10 +37,10 @@ from music21 import bar
 from music21 import clef
 from music21 import chord
 from music21 import common
-from music21.common.types import OffsetQL
+from music21.common.enums import AppendSpanners
 from music21 import defaults
 from music21 import duration
-from music21.common.enums import AppendSpanners
+from music21 import dynamics
 from music21 import environment
 from music21 import exceptions21
 from music21 import expressions
@@ -72,7 +72,7 @@ environLocal = environment.Environment('musicxml.m21ToXml')
 
 
 if t.TYPE_CHECKING:
-    from music21 import dynamics
+    from music21.common.types import OffsetQL
     from music21 import roman
     from music21 import tablature
 
@@ -80,7 +80,7 @@ if t.TYPE_CHECKING:
 
 def typeToMusicXMLType(value: str) -> str:
     '''
-    Convert a music21 type to a MusicXML type.
+    Convert a music21 type to a MusicXML type or raise a MusicXMLExportException
 
     >>> musicxml.m21ToXml.typeToMusicXMLType('longa')
     'long'
@@ -144,7 +144,7 @@ def getMetadataFromContext(s: stream.Stream) -> metadata.Metadata | None:
     Get metadata from site or context, so that a Part
     can be shown and have the rich metadata of its Score
 
-    >>> s = stream.Stream()
+    >>> s = stream.Score()
     >>> s2 = s.transpose(4)
     >>> md = metadata.Metadata()
     >>> md.title = 'emptiness'
@@ -190,7 +190,6 @@ def _setTagTextFromAttribute(
     Returns the SubElement
 
     Will not create an empty element unless forceEmpty is True
-
 
     >>> from xml.etree.ElementTree import Element
     >>> e = Element('accidental')
@@ -1691,7 +1690,7 @@ class ScoreExporter(XMLExporterBase, PartStaffExporterMixin):
         >>> SX = musicxml.m21ToXml.ScoreExporter(b)
         >>> SX.setScoreLayouts()
         >>> SX.scoreLayouts
-        <music21.stream.Score 0x...>
+        [<music21.layout.ScoreLayout>]
         >>> len(SX.scoreLayouts)
         1
         >>> SX.firstScoreLayout
@@ -3523,10 +3522,11 @@ class MeasureExporter(XMLExporterBase):
             return False
 
         # this list of spanner classes must match the paramsSet keys in relatedSpanners()
-        for m21spannerClass in ('Ottava', 'DynamicWedge', 'Line'):
-            for thisSpanner in spannerBundle.getByClass(m21spannerClass):
-                if thisSpanner.isFirst(obj) or thisSpanner.isLast(obj):
-                    return True
+        for thisSpanner in spannerBundle.getByClass((spanner.Ottava,
+                                                     dynamics.DynamicWedge,
+                                                     spanner.Line)):
+            if thisSpanner.isFirst(obj) or thisSpanner.isLast(obj):
+                return True
 
         return False
 
