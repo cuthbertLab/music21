@@ -3767,11 +3767,11 @@ class MeasureParser(XMLParserBase):
         for tagSearch in ('arpeggiate', 'non-arpeggiate'):
             # TODO: musicxml 4: arpeggiate 'unbroken' attribute
             for mxObj in mxNotations.findall(tagSearch):
-                arpeggioType: str = ''
+                arpeggioType: str = 'normal'
                 if tagSearch == 'non-arpeggiate':
                     arpeggioType = 'non-arpeggio'
                 else:
-                    arpeggioType = mxObj.get('direction') or ''
+                    arpeggioType = mxObj.get('direction') or 'normal'
                 idFound: str | None = mxObj.get('number')
                 if idFound is None:
                     arpeggio = expressions.ArpeggioMark(arpeggioType)
@@ -3781,9 +3781,9 @@ class MeasureParser(XMLParserBase):
                         expressions.ArpeggioMarkSpanner, idFound, False)
                     if sb:
                         # if we already have a spanner matching
-                        arpeggioSpanner = sb[0]
+                        arpeggioSpanner = t.cast(expressions.ArpeggioMarkSpanner, sb[0])
                     else:
-                        arpeggioSpanner = expressions.ArpeggioMarkSpanner(arpeggioType)
+                        arpeggioSpanner = expressions.ArpeggioMarkSpanner(arpeggioType=arpeggioType)
                         arpeggioSpanner.idLocal = idFound
                         self.spannerBundle.append(arpeggioSpanner)
                     arpeggioSpanner.addSpannedElements(n)
@@ -5205,7 +5205,7 @@ class MeasureParser(XMLParserBase):
         # TODO: musicxml 4: system="yes/no" -- does this apply to whole system?
         # offset is out of order because we need to know it before direction-type
         offsetDirection = self.xmlToOffset(mxDirection)
-        totalOffset = offsetDirection + self.offsetMeasureNote
+        totalOffset = float(offsetDirection + self.offsetMeasureNote)
 
         # out of order: parse <staff> element
         # staffKey is the staff that this direction applies to. not
@@ -5236,7 +5236,13 @@ class MeasureParser(XMLParserBase):
 
         # TODO: musicxml 4:listening
 
-    def setDirectionInDirectionType(self, mxDir, mxDirection, staffKey, totalOffset):
+    def setDirectionInDirectionType(
+        self,
+        mxDir: ET.Element,
+        mxDirection: ET.Element,
+        staffKey: int,
+        totalOffset: float,
+    ):
         # TODO: pedal
         # TODO: harp-pedals
         # TODO: damp
@@ -5253,20 +5259,9 @@ class MeasureParser(XMLParserBase):
         tag = mxDir.tag
         if tag == 'dynamics':  # fp, mf, etc., each as a tag
             # in rare cases there may be more than one dynamic in the same
-            # direction, so we iterate
-            for dyn in mxDir:
-                m21DynamicText = dyn.tag
-                if dyn.tag == 'other-dynamic':
-                    m21DynamicText = dyn.text.strip()
-
-                d = dynamics.Dynamic(m21DynamicText)
-
-                _synchronizeIds(dyn, d)
-                _setAttributeFromAttribute(d, mxDirection, 'placement', 'placement')
-
-                self.insertCoreAndRef(totalOffset, staffKey, d)
-                self.setPosition(mxDir, d)
-                self.setEditorial(mxDirection, d)
+            # direction, so we iterate over them.
+            for mxDyn in mxDir:
+                self.setDynamicsDirection(mxDir, mxDyn, mxDirection, staffKey, totalOffset)
 
         elif tag in ('wedge', 'bracket', 'dashes', 'octave-shift'):
             try:
@@ -5282,6 +5277,7 @@ class MeasureParser(XMLParserBase):
                 self.setEditorial(mxDirection, sp)
 
         elif tag in ('coda', 'segno'):
+            rm: repeat.Segno | repeat.Coda
             if tag == 'segno':
                 rm = repeat.Segno()
             else:
@@ -5322,6 +5318,30 @@ class MeasureParser(XMLParserBase):
             else:
                 self.insertCoreAndRef(totalOffset, staffKey, textExpression)
                 self.setEditorial(mxDirection, textExpression)
+
+    def setDynamicsDirection(
+        self,
+        mxDir: ET.Element,
+        mxDyn: ET.Element,
+        mxDirection: ET.Element,
+        staffKey: int,
+        totalOffset: float,
+    ):
+        '''
+        Add a single dynamic element to the core and staffReference.
+        '''
+        m21DynamicText = mxDyn.tag
+        if m21DynamicText == 'other-dynamic' and mxDyn.text:
+            m21DynamicText = mxDyn.text.strip()
+
+        d = dynamics.Dynamic(m21DynamicText)
+
+        _synchronizeIds(mxDyn, d)
+        _setAttributeFromAttribute(d, mxDirection, 'placement', 'placement')
+
+        self.insertCoreAndRef(totalOffset, staffKey, d)
+        self.setPosition(mxDir, d)
+        self.setEditorial(mxDirection, d)
 
     def xmlSound(self, mxSound: ET.Element):
         '''

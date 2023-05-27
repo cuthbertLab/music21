@@ -7114,11 +7114,30 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         if not inPlace:
             return returnObj
 
+    @overload
     def stripTies(
-        self,
-        inPlace=False,
-        matchByPitch=True
-    ):
+        self: StreamType,
+        *,
+        inPlace: t.Literal[True],
+        matchByPitch: bool = True,
+    ) -> None:
+        return None
+
+    @overload
+    def stripTies(
+        self: StreamType,
+        *,
+        inPlace: t.Literal[False] = False,
+        matchByPitch: bool = True,
+    ) -> StreamType:
+        return self
+
+    def stripTies(
+        self: StreamType,
+        *,
+        inPlace: bool = False,
+        matchByPitch: bool = True,
+    ) -> StreamType | None:
         # noinspection PyShadowingNames
         '''
         Find all notes that are tied; remove all tied notes,
@@ -7271,7 +7290,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
             if not inPlace:
                 return returnObj
             else:
-                return  # exit
+                return None
 
         if returnObj.hasVoices():
             for v in returnObj.voices:
@@ -7280,14 +7299,14 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
             if not inPlace:
                 return returnObj
             else:
-                return  # exit
+                return None
 
         # need to just get .notesAndRests with a nonzero duration,
         # as there may be other objects in the Measure
         # that come before the first Note, such as a SystemLayout object
         # or there could be ChordSymbols with zero (unrealized) durations
         f = returnObj.flatten()
-        notes_and_rests = f.notesAndRests.addFilter(
+        notes_and_rests: StreamType = f.notesAndRests.addFilter(
             lambda el, _iterator: el.quarterLength > 0
         ).stream()
 
@@ -7335,8 +7354,8 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
                     and hasattr(nInner, 'pitch')
                     # before doing pitch comparison, need to
                     # make sure we're not comparing a Note to a Chord
-                    and 'Chord' not in nLast.classes
-                    and 'Chord' not in nInner.classes
+                    and not isinstance(nLast, chord.Chord)
+                    and not isinstance(nInner, chord.Chord)
                     and nLast.pitch == nInner.pitch):
                 return True
             # looking for two chords of equal size
@@ -7349,20 +7368,12 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
                     return False
 
                 for pitchIndex in range(len(nLast.pitches)):
+                    # check to see that each is the same pitch, but
+                    # allow for `accidental is None` == `Accidental('natural')`
                     pLast = nLast.pitches[pitchIndex]
                     pInner = nInner.pitches[pitchIndex]
-                    if (pLast.octave != pInner.octave
-                            or pLast.step != pInner.step
-                            or pLast.microtone != pInner.microtone):
+                    if pLast.step != pInner.step or not pLast.isEnharmonic(pInner):
                         return False
-                    # Ugly special case: Treat None and "natural" accidentals as equal
-                    aLast = pLast.accidental
-                    aInner = pInner.accidental
-                    if aLast != aInner:
-                        aLastIsNeutral = aLast is None or aLast.name == 'natural'
-                        aInnerIsNeutral = aInner is None or aInner.name == 'natural'
-                        if not (aLastIsNeutral and aInnerIsNeutral):
-                            return False
                 return True
 
             return False
