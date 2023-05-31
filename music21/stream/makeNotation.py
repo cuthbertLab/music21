@@ -2138,9 +2138,11 @@ def saveAccidentalDisplayStatus(s) -> t.Generator[None, None, None]:
     should not do this unless you know that the displayStatus values will still
     be valid after the operation.
 
-        classList = (key.KeySignature, note.Note, chord.Chord)
-        with saveAccidentalDisplayStatus(s):
-            m.transpose(intv, inPlace=True, classFilterList=classList)
+    >>> sc = corpus.parse('bwv66.6')
+    >>> intv = interval.Interval('P8')
+    >>> classList = (key.KeySignature, note.Note)
+    >>> with saveAccidentalDisplayStatus(sc):
+    ...     sc.transpose(intv, inPlace=True, classFilterList=classList)
 
     * New in v9.
     '''
