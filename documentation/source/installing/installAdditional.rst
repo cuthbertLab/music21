@@ -4,6 +4,39 @@
 Extending `music21` with Additional Software
 =======================================================
 
+Installing Additional Software Components
+-----------------------------------------------
+
+Additional functionality of `music21` is available with the
+installation of numerous helper applications. While not essential
+for all applications, these tools will aid in working with `music21`.
+
+
+
+MuseScore
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+MuseScore offers a free, full-featured, cross-platform (Windows, Mac OS, Ubuntu,
+Debian, and Fedora) application for viewing and editing music notation.
+MuseScore can import and export MusicXML, and provides an excellent way to view,
+edit, and export musical data for working in `music21`.
+Downloading MuseScore (version 2 or higher)
+is highly recommended for working with `music21`.
+
+https://musescore.org/en
+
+
+
+Lilypond
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Lilypond is a free, open-source music display program that can produce
+beautiful scores.  `Music21` can generate PDF or PNG (like JPG) files
+automatically if Lilypond is installed on your system.  Download it at:
+
+http://lilypond.org/
+
+
 
 Installing Additional Python Modules
 -----------------------------------------------
@@ -18,13 +51,15 @@ additional python libraries, and install them just as you did with
 you can always install them later.
 
 It's best not to install these until you have `music21` working without
-the external modules.
+additional modules.
 
-Note: as of `music21` v.6, some of these additional modules are bundled with `music21`
+Note: as of `music21` v.6, some of these additional modules are bundled
+with `music21`.
 
 
 Matplotlib
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+*(included with music21 by default)*
 
 Graphing and visual displays in Music21 are provided by Matplotlib.
 Matplotlib itself has additional dependencies (such as NumPy).
@@ -42,6 +77,7 @@ and you should be set.  If you are using a version from anaconda
 
 numpy
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+*(included with music21 by default)*
 
 Numeric extensions to Python.  Included with Matplotlib.
 
@@ -90,38 +126,5 @@ On the Mac, run::
 
     pip3 install pygame
 
-
-
-Installing Additional Software Components
------------------------------------------------
-
-Additional functionality of `music21` is available with the
-installation of numerous helper applications. While not essential
-for all applications, these tools will aid in working with `music21`.
-
-
-
-MuseScore
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-MuseScore offers a free, full-featured, cross-platform (Windows, Mac OS, Ubuntu,
-Debian, and Fedora) application for viewing and editing music notation.
-MuseScore can import and export MusicXML, and provides an excellent way to view,
-edit, and export musical data for working in `music21`.
-Downloading MuseScore (version 2 or higher)
-is highly recommended for working with `music21`.
-
-https://musescore.org/en
-
-
-
-Lilypond
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-Lilypond is a free, open-source music display program that can produce
-beautiful scores.  `Music21` can generate PDF or PNG (like JPG) files
-automatically if Lilypond is installed on your system.  Download it at:
-
-http://lilypond.org/
 
 
