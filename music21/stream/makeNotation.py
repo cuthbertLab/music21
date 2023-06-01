@@ -2141,7 +2141,7 @@ def saveAccidentalDisplayStatus(s) -> t.Generator[None, None, None]:
     >>> sc = corpus.parse('bwv66.6')
     >>> intv = interval.Interval('P8')
     >>> classList = (key.KeySignature, note.Note)
-    >>> with saveAccidentalDisplayStatus(sc):
+    >>> with stream.makeNotation.saveAccidentalDisplayStatus(sc):
     ...     sc.transpose(intv, inPlace=True, classFilterList=classList)
 
     * New in v9.
