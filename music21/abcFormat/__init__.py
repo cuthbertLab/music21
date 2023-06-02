@@ -123,7 +123,8 @@ reMetadataTag = re.compile('[A-Zw]:')
 rePitchName = re.compile('[a-gA-Gz]')
 reChordSymbol = re.compile('"[^"]*"')  # non-greedy
 reChord = re.compile('[.*?]')  # non-greedy
-reAbcVersion = re.compile(r'^%abc-((\d+)\.(\d+)\.?(\d+)?)')
+reAbcVersion = re.compile(r'^%abc-(\d+)\.(\d+)\.?(\d+)?')
+reAbcDirectiveVersion = re.compile(r'^%%abc-version\s+(\d+)\.(\d+)\.?(\d+)?')
 reDirective = re.compile(r'^%%([a-z\-]+)\s+(\S+)(.*)')
 
 
@@ -2019,21 +2020,35 @@ class ABCHandler:
         self.isFirstComment = False
         verMats = reAbcVersion.match(commentLine)
         if verMats:
-            abcMajor = int(verMats.group(2))
-            abcMinor = int(verMats.group(3))
-            if verMats.group(4):
-                abcPatch = int(verMats.group(4))
-            else:
-                abcPatch = 0
-            verTuple = (abcMajor, abcMinor, abcPatch)
-            self.abcVersion = verTuple
+            self.abcVersion = self.returnAbcVersionFromMatch(verMats)
+
+    @staticmethod
+    def returnAbcVersionFromMatch(verMats: re.Match) -> tuple(int, int, int):
+        '''
+        Given a match from a regular expression return the parsed ABC version
+
+        >>> import re
+        >>> match = re.match('(\d+).(\d+).(\d+)', '2.3.4')
+        >>> ah = abcFormat.ABCHandler()
+        >>> ah.returnAbcVersionFromMatch(match)
+        (2, 3, 4)
+
+        >>> match = re.match('(\d+).(\d+).?(\d?)', '1.7')
+        >>> ah.returnAbcVersionFromMatch(match)
+        (1, 7, 0)
+        '''
+        abcMajor = int(verMats.group(1))
+        abcMinor = int(verMats.group(2))
+        if verMats.group(3):
+            abcPatch = int(verMats.group(3))
+        else:
+            abcPatch = 0
+        return (abcMajor, abcMinor, abcPatch)
 
     def processComment(self):
         r'''
         Processes the comment at self.pos in self.strSrc, setting self.skipAhead,
         possibly self.abcVersion, and self.abcDirectives for the directiveKey.
-
-        TODO: store the comment in the stream also.
 
         >>> from textwrap import dedent
         >>> ah = abcFormat.ABCHandler()
@@ -2048,7 +2063,33 @@ class ABCHandler:
         19
         >>> len(' this is a comment\n')
         19
+
+        Directives get stored in the handler:
+
+        >>> data = '%%abc-hello world'
+        >>> ah = abcFormat.ABCHandler()
+        >>> ah.strSrc = data
+        >>> ah.pos = 0
+        >>> ah.processComment()
+        >>> ah.abcDirectives
+        {'abc-hello': 'world'}
+        >>> ah.abcDirectives['abc-hello']
+        'world'
+
+        The `abc-version` directive also sets the version:
+
+        >>> data = '%%abc-version 3.9'
+        >>> ah = abcFormat.ABCHandler()
+        >>> ah.strSrc = data
+        >>> ah.pos = 0
+        >>> ah.processComment()
+        >>> ah.abcDirectives['abc-version']
+        '3.9'
+        >>> ah.abcVersion
+        (3, 9, 0)
         '''
+        # TODO: store the comment in the stream also.
+
         self.skipAhead = self._getNextLineBreak(
             self.strSrc, self.pos
         ) - (self.pos + 1)
@@ -2058,6 +2099,10 @@ class ABCHandler:
         if directiveMatches:
             directiveKey = directiveMatches.group(1)
             directiveValue = directiveMatches.group(2)
+            if directiveKey == 'abc-version':
+                self.abcVersion = self.returnAbcVersionFromMatch(
+                    re.match(r'(\d+).(\d+).?(\d+)?', directiveValue)
+                )
             self.abcDirectives[directiveKey] = directiveValue
         # environLocal.printDebug(['got comment:', repr(self.strSrc[i:j + 1])])
 
