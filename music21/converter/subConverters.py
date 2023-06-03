@@ -33,6 +33,7 @@ from music21 import common
 from music21 import defaults
 from music21 import environment
 from music21 import exceptions21
+from music21 import layout
 from music21 import stream
 
 
@@ -427,8 +428,6 @@ class ConverterIPython(SubConverter):
         helperSubConverter = helperConverter.subConverter
 
         if helperFormat in ('musicxml', 'xml', 'lilypond', 'lily'):
-            from music21.ipython21 import objects as ipythonObjects
-
             # hack to make musescore excerpts -- fix with a converter class in MusicXML
             # or make a new keyword to ignoreTitles, etc.
             savedDefaultTitle = defaults.title
@@ -442,17 +441,6 @@ class ConverterIPython(SubConverter):
                 scores = list(obj.scores)
 
             for s in scores:
-                fp = helperSubConverter.write(s,
-                                              helperFormat,
-                                              subformats=helperSubformats,
-                                              **keywords
-                                              )
-
-                if helperSubformats[0] != 'png':
-                    continue
-
-                last_png = ConverterMusicXML.findLastPNGPath(fp)
-
                 if str(environLocal['musescoreDirectPNGPath']).startswith('/skip'):
                     # During documentation testing of the Notebooks, we don't generate
                     # images since they take too long, so we just display the
@@ -464,27 +452,60 @@ class ConverterIPython(SubConverter):
                     pngData = base64.b64decode(pngData64)
                     # noinspection PyTypeChecker
                     display(Image(data=pngData, retina=True))
-                elif fp.name == last_png.name:
-                    # one page PNG -- display normally.
-                    display(Image(data=fp.read_bytes(), retina=True))
                 else:
-                    # multi-page png -- use our widget.
-                    # noinspection PyPackageRequirements
-                    from ipywidgets import interact  # type: ignore
-                    last_number, num_digits = ConverterMusicXML.findPNGRange(fp, last_png)
-                    # return last_number, num_digits
-                    stem = str(fp)[:str(fp).rfind('-')]
+                    # estimate whether multiple pages will be needed.
+                    multiplePages = False
 
-                    @interact(page=(1, last_number))
-                    def page_display(page=1):
-                        page_str = stem + '-' + str(page).zfill(num_digits) + '.png'
-                        page_fp = pathlib.Path(page_str)
-                        if page_fp.exists():
-                            display(Image(data=page_fp.read_bytes(), retina=True))
-                        else:
-                            print(f'No file for page {page}.')
+                    # estimate of the minimum product of number of parts * number
+                    # of measures that indicate multiple pages (or at least a full
+                    # page not to be trimmed)
+                    MULTI_PAGE = 40
+                    NOTES_PER_PAGE = 500
 
-                    return page_display
+                    if isinstance(s, stream.Stream):
+                        if s[layout.PageLayout].addFilter(lambda pl: pl.isNew).first():
+                            multiplePages = True
+                        elif isinstance(s, stream.Score):
+
+                            numParts = len(s.parts)
+                            if numParts and numParts * len(s.parts[0][stream.Measure]) > MULTI_PAGE:
+                                multiplePages = True
+                        elif len(s.recurse().notesAndRests) > NOTES_PER_PAGE:
+                                multiplePages = True
+
+                    fp = helperSubConverter.write(s,
+                                                  helperFormat,
+                                                  subformats=helperSubformats,
+                                                  trimEdges=not multiplePages,
+                                                  **keywords
+                                                  )
+
+                    if helperSubformats[0] != 'png':
+                        continue
+
+                    last_png = ConverterMusicXML.findLastPNGPath(fp)
+
+                    if fp.name == last_png.name:
+                        # one page PNG -- display normally.
+                        display(Image(data=fp.read_bytes(), retina=True))
+                    else:
+                        # multi-page png -- use our widget.
+                        # noinspection PyPackageRequirements
+                        from ipywidgets import interact  # type: ignore
+                        last_number, num_digits = ConverterMusicXML.findPNGRange(fp, last_png)
+                        # return last_number, num_digits
+                        stem = str(fp)[:str(fp).rfind('-')]
+
+                        @interact(page=(1, last_number))
+                        def page_display(page=1):
+                            page_str = stem + '-' + str(page).zfill(num_digits) + '.png'
+                            page_fp = pathlib.Path(page_str)
+                            if page_fp.exists():
+                                display(Image(data=page_fp.read_bytes(), retina=True))
+                            else:
+                                print(f'No file for page {page}.')
+
+                        return page_display
 
             defaults.title = savedDefaultTitle
             defaults.author = savedDefaultAuthor
@@ -1089,10 +1110,17 @@ class ConverterMusicXML(SubConverter):
                             subformats=(),
                             *,
                             dpi: int | None = None,
+                            trimEdges: bool = True,
+                            leaveMargin: int = 0,
                             **keywords) -> pathlib.Path:  # pragma: no cover
         '''
         Take the output of the conversion process and run it through musescore to convert it
         to a png.
+
+        * dpi: specifies the dpi of the output file.  If None, then the default is used.
+        * trimEdges: if True (default) the image is trimmed to the edges of the music.
+        * leaveMargin: if trimEdges is True, then this number of pixels is left around the
+          trimmed image.
         '''
         musescorePath = environLocal['musescoreDirectPNGPath']
         if not musescorePath:
@@ -1114,8 +1142,11 @@ class ConverterMusicXML(SubConverter):
         fpOut = str(fp)[:-1 * len('musicxml')]
         fpOut += subformatExtension
 
-        # -T 0 = trim to zero pixel margin
-        musescoreRun = [str(musescorePath), fp, '-o', fpOut] # , '-T', '0']
+        musescoreRun = [str(musescorePath), fp, '-o', fpOut]
+        if trimEdges:
+            # -T 0 = trim to zero pixel margin
+            musescoreRun.extend(['-T', str(leaveMargin)])
+
         if dpi is not None:
             musescoreRun.extend(['-r', str(dpi)])
 
@@ -1129,8 +1160,8 @@ class ConverterMusicXML(SubConverter):
                     os.environ['QT_QPA_PLATFORM'] = 'offscreen'
                 if prior_xdg is None:
                     os.environ['XDG_RUNTIME_DIR'] = str(environment.Environment().getRootTempDir())
-
-            musescoreRun.extend(['-r', str(defaults.ipythonImageDpi)])
+            if dpi is None:
+                musescoreRun.extend(['-r', str(defaults.ipythonImageDpi)])
 
         run_subprocess_capturing_stderr(musescoreRun)
 
