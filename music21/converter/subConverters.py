@@ -410,7 +410,7 @@ class ConverterIPython(SubConverter):
         # noinspection PyPackageRequirements
         from IPython.display import Image, display, HTML  # type: ignore
         from music21 import converter
-        # from music21.ipython21 import inGoogleColabNotebook
+        from music21.ipython21 import inGoogleColabNotebook
 
         if subformats:
             helperFormat = subformats[0]
@@ -506,11 +506,13 @@ class ConverterIPython(SubConverter):
             s = common.SingletonCounter()
             outputId = 'midiPlayerDiv' + str(s())
 
-            load_require_script = '''
-                <script
-                src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js"
-                ></script>
-            '''
+            load_require_script = ''
+            if inGoogleColabNotebook():
+                load_require_script = '''
+                    <script
+                    src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js"
+                    ></script>
+                '''
 
             utf_binary = binaryBase64.decode('utf-8')
             # noinspection PyTypeChecker
