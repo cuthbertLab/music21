@@ -69,6 +69,7 @@ import typing as t
 import unittest
 
 from music21 import common
+from music21 import defaults
 from music21 import environment
 from music21 import exceptions21
 from music21 import prebase
@@ -124,8 +125,7 @@ reMetadataTag = re.compile('[A-Zw]:')
 rePitchName = re.compile('[a-gA-Gz]')
 reChordSymbol = re.compile('"[^"]*"')  # non-greedy
 reChord = re.compile('[.*?]')  # non-greedy
-reAbcVersion = re.compile(r'^%abc-(\d+)\.(\d+)\.?(\d+)?')
-reAbcDirectiveVersion = re.compile(r'^%%abc-version\s+(\d+)\.(\d+)\.?(\d+)?')
+reAbcVersion = re.compile(r'%abc-(\d+)\.(\d+)\.?(\d+)?')
 reDirective = re.compile(r'^%%([a-z\-]+)\s+(\S+)(.*)')
 
 
@@ -1639,11 +1639,11 @@ class ABCNote(ABCToken):
             raise ABCTokenException(
                 'cannot calculate quarter length without a default quarter length')
 
-        numStr = []
+        numStrList: list[str] = []
         for c in strSrc:
             if c.isdigit() or c == '/':
-                numStr.append(c)
-        numStr = ''.join(numStr)
+                numStrList.append(c)
+        numStr = ''.join(numStrList)
         numStr = numStr.strip()
 
         # environLocal.printDebug(['numStr', numStr])
@@ -1847,7 +1847,7 @@ class ABCHandler:
     * New in v6.3: lineBreaksDefinePhrases -- does not yet do anything
     '''
     def __init__(self,
-                 abcVersion: tuple[int, ...] = (1, 3, 0),
+                 abcVersion: tuple[int, ...] = defaults.abcVersionDefault,
                  lineBreaksDefinePhrases=False):
         # tokens are ABC objects import n a linear stream
         self.abcVersion: tuple[int, ...] = abcVersion
@@ -1858,7 +1858,6 @@ class ABCHandler:
         self.lineBreaksDefinePhrases: bool = lineBreaksDefinePhrases
         self.pos = -1
         self.skipAhead = 0
-        self.isFirstComment = True
         self.strSrc = ''
         self.srcLen: int = len(self.strSrc)  # just documenting this.
         self.currentCollectStr = ''
@@ -2014,42 +2013,26 @@ class ABCHandler:
             return self.abcDirectives['propagate-accidentals']
         return 'pitch'  # Default per abc 2.1 standard
 
-    def parseCommentForVersionInformation(self, commentLine: str) -> None:
+    def parseHeaderForVersionInformation(self, inputSearch: str) -> None:
         '''
-        If this is the first comment then searches for a version
-        match and set it as .abcVersion
-
-        If not isFirstComment then does nothing:
+        Search a line of text for a comment abc version number
 
         >>> ah = abcFormat.ABCHandler()
         >>> ah.abcVersion
         (1, 3, 0)
-        >>> ah.isFirstComment
-        True
 
-        >>> ah.parseCommentForVersionInformation('%abc-2.3.2')
-        >>> ah.abcVersion
-        (2, 3, 2)
-        >>> ah.isFirstComment
-        False
-
-        Now will do nothing since isFirstComment is False
-
-        >>> ah.parseCommentForVersionInformation('%abc-4.9.7')
+        >>> ah.parseHeaderForVersionInformation('%abc-2.3.2')
         >>> ah.abcVersion
         (2, 3, 2)
 
         Changed in v9: abcVersion defaults to (1, 3, 0) as documented.
         '''
-        if not self.isFirstComment:
-            return None
-        self.isFirstComment = False
-        verMats = reAbcVersion.match(commentLine)
+        verMats = reAbcVersion.search(inputSearch)
         if verMats:
             self.abcVersion = self.returnAbcVersionFromMatch(verMats)
 
     @staticmethod
-    def returnAbcVersionFromMatch(verMats: re.Match) -> tuple(int, int, int):
+    def returnAbcVersionFromMatch(verMats: re.Match) -> tuple[int, int, int]:
         '''
         Given a match from a regular expression return the parsed ABC version
 
@@ -2073,8 +2056,8 @@ class ABCHandler:
 
     def processComment(self):
         r'''
-        Processes the comment at self.pos in self.strSrc, setting self.skipAhead,
-        possibly self.abcVersion, and self.abcDirectives for the directiveKey.
+        Processes the comment at self.pos in self.strSrc, setting self.skipAhead
+        and self.abcDirectives for the directiveKey.
 
         >>> from textwrap import dedent
         >>> ah = abcFormat.ABCHandler()
@@ -2101,6 +2084,8 @@ class ABCHandler:
         {'abc-hello': 'world'}
         >>> ah.abcDirectives['abc-hello']
         'world'
+
+        * Changed in v9: version is not parsed by this method.
         '''
         # TODO: store the comment in the stream also.
 
@@ -2108,15 +2093,10 @@ class ABCHandler:
             self.strSrc, self.pos
         ) - (self.pos + 1)
         commentLine = self.strSrc[self.pos:self.pos + self.skipAhead + 1]
-        self.parseCommentForVersionInformation(commentLine)
         directiveMatches = reDirective.match(commentLine)
         if directiveMatches:
             directiveKey = directiveMatches.group(1)
             directiveValue = directiveMatches.group(2)
-            if directiveKey == 'abc-version':
-                self.abcVersion = self.returnAbcVersionFromMatch(
-                    re.match(r'(\d+).(\d+).?(\d+)?', directiveValue)
-                )
             self.abcDirectives[directiveKey] = directiveValue
         # environLocal.printDebug(['got comment:', repr(self.strSrc[i:j + 1])])
 
@@ -2749,6 +2729,7 @@ class ABCHandler:
             token.parse()
 
     def process(self, strSrc: str) -> None:
+        self.parseHeaderForVersionInformation(strSrc[:100])
         self.tokens = []
         self.tokenize(strSrc)
         self.tokenProcess()
@@ -2873,6 +2854,7 @@ class ABCHandler:
         ...    B=3 B3 | G6 | B3 A3 | G6 ||
         ...    """)
         >>> abcStrWHeader = '%abc-2.1\nO: Irish\n' + abcEarly + abcStr
+
         >>> ah = abcFormat.ABCHandler()
         >>> junk = ah.process(abcStrWHeader)
         >>> len(ah)
@@ -2886,7 +2868,15 @@ class ABCHandler:
         >>> ahDict[6].tokens[0]
         <music21.abcFormat.ABCMetadata 'O: Irish'>
 
-        Did we get the abcVersion for score 4 and did it revert for score 5?
+        Before parsing all the tokens should have the 2.1 version:
+
+        >>> ahDict[4].abcVersion
+        (2, 1, 0)
+        >>> ahDict[5].abcVersion
+        (2, 1, 0)
+
+        After parsing, the abcVersion should be set for score 4 and
+        revert for score 5.
 
         >>> for f in ahDict:
         ...    _ = abcFormat.translate.abcToStreamScore(ahDict[f])
@@ -2898,7 +2888,7 @@ class ABCHandler:
         if not self.tokens:
             raise ABCHandlerException('must process tokens before calling split')
 
-        ahDict = {}
+        ahDict: dict[int | None, ABCHandler] = {}
 
         # tokens in this list are prepended to all tunes:
         prependToAllList = []
@@ -2910,7 +2900,7 @@ class ABCHandler:
                 if currentABCHandler is not None:
                     currentABCHandler.tokens = activeTokens
                     activeTokens = []
-                currentABCHandler = ABCHandler()
+                currentABCHandler = ABCHandler(abcVersion=self.abcVersion)
                 referenceNumber = int(token.data)
                 ahDict[referenceNumber] = currentABCHandler
 
@@ -2923,7 +2913,7 @@ class ABCHandler:
             currentABCHandler.tokens = activeTokens
 
         if not ahDict:
-            ahDict[None] = ABCHandler()
+            ahDict[None] = ABCHandler(abcVersion=self.abcVersion)
 
         for thisABCHandler in ahDict.values():
             thisABCHandler.tokens = prependToAllList[:] + thisABCHandler.tokens
@@ -3411,10 +3401,10 @@ class ABCFile(prebase.ProtoM21Object):
 
     If not set, default ABC 1.3 parsing is performed.
     '''
-    def __init__(self, abcVersion: tuple[int, int, int] =(1, 3, 0)):
+    def __init__(self, abcVersion: tuple[int, int, int] = defaults.abcVersionDefault):
         self.abcVersion: tuple[int, int, int] = abcVersion
-        self.file: io.IO | None = None
-        self.filename: str | pathlib.Path = None
+        self.file: t.IO | None = None
+        self.filename: str | pathlib.Path = ''
 
     def open(self, filename: str | pathlib.Path):
         '''
@@ -3529,6 +3519,9 @@ class ABCFile(prebase.ProtoM21Object):
             strSrc = self.extractReferenceNumber(strSrc, number)
 
         handler = ABCHandler(abcVersion=self.abcVersion)
+        if self.abcVersion == defaults.abcVersionDefault:
+            handler.parseHeaderForVersionInformation(strSrc[:100])
+
         # return the handler instance
         handler.process(strSrc)
         return handler

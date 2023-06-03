@@ -24,6 +24,7 @@ from __future__ import annotations
 import copy
 import unittest
 import re
+import typing  # cannot import as t because of use of t as token throughout
 
 from music21 import articulations
 from music21 import bar
@@ -40,6 +41,9 @@ from music21 import stream
 from music21 import tempo
 from music21 import tie
 
+if typing.TYPE_CHECKING:
+    from music21 import abcFormat
+
 
 environLocal = environment.Environment('abcFormat.translate')
 
@@ -54,7 +58,7 @@ _abcArticulationsToM21 = {
 
 
 def abcToStreamPart(
-    abcHandler: abc.ABCHandler,
+    abcHandler: abcFormat.ABCHandler,
     inputM21: stream.Part | None = None,
     spannerBundle: spanner.SpannerBundle | None = None
 ) -> stream.Part:
@@ -78,6 +82,9 @@ def abcToStreamPart(
 
     clefSet = None
     postTransposition = 0
+    dst: stream.Part | stream.Measure
+
+    mergedHandlers: list[abcFormat.ABCHandler] = []
 
     # need to call on entire handlers, as looks for special criteria,
     # like that at least 2 regular bars are used, not just double bars
@@ -87,7 +94,8 @@ def abcToStreamPart(
         barHandlers = abcHandler.splitByMeasure()
         # environLocal.printDebug(['barHandlers', len(barHandlers)])
         # merge loading metadata with each bar that precedes it
-        mergedHandlers = abcFormat.mergeLeadingMetaData(barHandlers)
+        mergedHandlers = typing.cast(list[abcFormat.ABCHandler],
+                                     abcFormat.mergeLeadingMetaData(barHandlers))
         # environLocal.printDebug(['mergedHandlers', len(mergedHandlers)])
     else:  # simply stick in a single list
         mergedHandlers = [abcHandler]
@@ -106,6 +114,8 @@ def abcToStreamPart(
     # merged handler are ABCHandlerBar objects, defining attributes for barlines
 
     for mh in mergedHandlers:
+        if typing.TYPE_CHECKING:
+            assert isinstance(mh, abcFormat.ABCHandlerBar)
         # if "use measures" is True and the handler has notes; otherwise add to part
         # environLocal.printDebug(['abcToStreamPart', 'handler', 'left:', mh.leftBarToken,
         #    'right:', mh.rightBarToken, 'len(mh)', len(mh)])
@@ -138,7 +148,7 @@ def abcToStreamPart(
                         # only append if created; otherwise, already stored
                         spannerBundle.append(rb)
                     else:  # close it here
-                        rb = rbSpanners[0]  # get RepeatBracket
+                        rb = typing.cast(spanner.RepeatBracket, rbSpanners[0])  # get RepeatBracket
                         rb.addSpannedElements(dst)
                         rb.completeStatus = True
                         # this returns 1 or 2 depending on the repeat
@@ -161,7 +171,7 @@ def abcToStreamPart(
                     rbSpanners = spannerBundle.getByClass(
                         spanner.RepeatBracket).getByCompleteStatus(False)
                     if any(rbSpanners):
-                        rb = rbSpanners[0]  # get RepeatBracket
+                        rb = typing.cast(spanner.RepeatBracket, rbSpanners[0])
                         rb.addSpannedElements(dst)
                         rb.completeStatus = True
                         # this returns 1 or 2 depending on the repeat
@@ -205,7 +215,10 @@ def abcToStreamPart(
     # following the metadata, or in the open stream
     if not clefSet and not p[clef.Clef]:
         if useMeasures:  # assume at start of measures
-            p.getElementsByClass(stream.Measure).first().clef = clef.bestClef(p, recurse=True)
+            m = p.getElementsByClass(stream.Measure).first()
+            if typing.TYPE_CHECKING:
+                assert m is not None
+            m.clef = clef.bestClef(p, recurse=True)
         else:
             p.insert(0, clef.bestClef(p, recurse=True))
 
@@ -239,7 +252,7 @@ def abcToStreamPart(
 
 
 def parseTokens(
-    mh: abc.ABCHandler,
+    mh: abcFormat.ABCHandler,
     dst: stream.Measure | stream.Part,
     p: stream.Part,
     useMeasures: bool
@@ -249,6 +262,9 @@ def parseTokens(
     '''
     # in case need to transpose due to clef indication
     from music21 import abcFormat
+
+    n: note.GeneralNote
+    cs: harmony.ChordSymbol | harmony.NoChord
 
     postTransposition = 0
     clefSet = False
@@ -264,13 +280,15 @@ def parseTokens(
                         dst.coreAppend(ts)
             elif t.isKey():
                 ks = t.getKeySignatureObject()
-                if useMeasures:  # assume at start of measures
-                    dst.keySignature = ks
-                else:
-                    dst.coreAppend(ks)
+                if ks is not None:
+                    if useMeasures:  # assume at start of measures
+                        dst.keySignature = ks
+                    else:
+                        dst.coreAppend(ks)
                 # check for clef information sometimes stored in key
                 clefObj, transposition = t.getClefObject()
-                if clefObj is not None:
+                if clefObj is not None and transposition is not None:
+                    # "and transposition is not None" for type checking.
                     clefSet = False
                     # environLocal.printDebug(['found clef in key token:', t,
                     #     clefObj, transposition])
@@ -281,6 +299,8 @@ def parseTokens(
                     postTransposition = transposition
             elif t.isTempo():
                 mmObj = t.getMetronomeMarkObject()
+                if typing.TYPE_CHECKING:
+                    assert mmObj is not None
                 dst.coreAppend(mmObj)
 
         elif isinstance(t, abcFormat.ABCNote):
@@ -309,12 +329,15 @@ def parseTokens(
                     continue
 
                 # may have more than notes?
-                pitchNameList = []
+                pitchNameList: list[str] = []
                 accStatusList = []  # accidental display status list
                 for tSub in t.subTokens:
                     # notes are contained as subTokens are already parsed
                     if isinstance(tSub, abcFormat.ABCNote):
-                        pitchNameList.append(tSub.pitchName)
+                        pn = tSub.pitchName
+                        if typing.TYPE_CHECKING:
+                            assert pn is not None
+                        pitchNameList.append(pn)
                         accStatusList.append(tSub.accidentalDisplayStatus)
                 c = chord.Chord(pitchNameList)
                 c.duration.quarterLength = t.quarterLength
@@ -325,9 +348,9 @@ def parseTokens(
                     c.duration.appendTuplet(thisTuplet)
                 # adjust accidental display for each contained pitch
                 for pIndex in range(len(c.pitches)):
-                    if c.pitches[pIndex].accidental is None:
-                        continue
-                    c.pitches[pIndex].accidental.displayStatus = accStatusList[pIndex]
+                    acc = c.pitches[pIndex].accidental
+                    if acc is not None:
+                        acc.displayStatus = accStatusList[pIndex]
                 dst.coreAppend(c)
 
                 # ql += t.quarterLength
@@ -374,10 +397,16 @@ def parseTokens(
                 dst.coreAppend(n, setActiveSite=False)
 
         elif isinstance(t, abcFormat.ABCSlurStart):
+            if typing.TYPE_CHECKING:
+                assert t.slurObj is not None
             p.coreAppend(t.slurObj)
         elif isinstance(t, abcFormat.ABCCrescStart):
+            if typing.TYPE_CHECKING:
+                assert t.crescObj is not None
             p.coreAppend(t.crescObj)
         elif isinstance(t, abcFormat.ABCDimStart):
+            if typing.TYPE_CHECKING:
+                assert t.dimObj is not None
             p.coreAppend(t.dimObj)
     dst.coreElementsChanged()
     return postTransposition, clefSet

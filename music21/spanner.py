@@ -242,7 +242,7 @@ class Spanner(base.Music21Object):
         self.idLocal: str | None = None
         # after all spannedElements have been gathered, setting complete
         # will mark that all parts have been gathered.
-        self.completeStatus = False
+        self.completeStatus: bool = False
 
         # data for fill:
 
