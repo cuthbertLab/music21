@@ -76,6 +76,7 @@ from music21 import prebase
 from music21.abcFormat import translate
 
 if t.TYPE_CHECKING:
+    import pathlib
     from music21 import bar
     from music21 import clef
     from music21 import duration
@@ -285,6 +286,29 @@ class ABCMetadata(ABCToken):
         True
         '''
         if self.tag == 'X':
+            return True
+        return False
+
+    def isVersion(self) -> bool:
+        '''
+        Returns True if the tag is "I" for "Information" and
+        the data is "abc-version", False otherwise.
+
+        >>> x = abcFormat.ABCMetadata('I:abc-version 2.1')
+        >>> x.preParse()
+        >>> x.tag
+        'I'
+        >>> x.isVersion()
+        True
+
+        >>> deer = abcFormat.ABCMetadata('I:abc-venison yummy')
+        >>> deer.preParse()
+        >>> deer.tag
+        'I'
+        >>> deer.isVersion()
+        False
+        '''
+        if self.tag == 'I' and self.data.startswith('abc-version '):
             return True
         return False
 
@@ -1823,10 +1847,10 @@ class ABCHandler:
     * New in v6.3: lineBreaksDefinePhrases -- does not yet do anything
     '''
     def __init__(self,
-                 abcVersion: tuple[int, ...] | None = None,
+                 abcVersion: tuple[int, ...] = (1, 3, 0),
                  lineBreaksDefinePhrases=False):
         # tokens are ABC objects import n a linear stream
-        self.abcVersion: tuple[int, ...] | None = abcVersion
+        self.abcVersion: tuple[int, ...] = abcVersion
         self.abcDirectives: dict[str, str] = {}
         self.tokens: list[ABCToken] = []
         self.activeParens: list[str] = []  # e.g. ['Crescendo', 'Slur']
@@ -1984,7 +2008,7 @@ class ABCHandler:
         'pitch'
         '''
         minVersion = (2, 0, 0)
-        if not self.abcVersion or self.abcVersion < minVersion:
+        if self.abcVersion < minVersion:
             return 'not'
         if 'propagate-accidentals' in self.abcDirectives:
             return self.abcDirectives['propagate-accidentals']
@@ -1998,8 +2022,8 @@ class ABCHandler:
         If not isFirstComment then does nothing:
 
         >>> ah = abcFormat.ABCHandler()
-        >>> ah.abcVersion is None
-        True
+        >>> ah.abcVersion
+        (1, 3, 0)
         >>> ah.isFirstComment
         True
 
@@ -2014,6 +2038,8 @@ class ABCHandler:
         >>> ah.parseCommentForVersionInformation('%abc-4.9.7')
         >>> ah.abcVersion
         (2, 3, 2)
+
+        Changed in v9: abcVersion defaults to (1, 3, 0) as documented.
         '''
         if not self.isFirstComment:
             return None
@@ -2075,18 +2101,6 @@ class ABCHandler:
         {'abc-hello': 'world'}
         >>> ah.abcDirectives['abc-hello']
         'world'
-
-        The `abc-version` directive also sets the version:
-
-        >>> data = '%%abc-version 3.9'
-        >>> ah = abcFormat.ABCHandler()
-        >>> ah.strSrc = data
-        >>> ah.pos = 0
-        >>> ah.processComment()
-        >>> ah.abcDirectives['abc-version']
-        '3.9'
-        >>> ah.abcVersion
-        (3, 9, 0)
         '''
         # TODO: store the comment in the stream also.
 
@@ -2818,7 +2832,7 @@ class ABCHandler:
                         return True
         return False
 
-    def splitByReferenceNumber(self):
+    def splitByReferenceNumber(self) -> dict[int | None, ABCHandler]:
         # noinspection PyShadowingNames
         r'''
         Split tokens by reference numbers.
@@ -2826,7 +2840,6 @@ class ABCHandler:
         Returns a dictionary of ABCHandler instances, where the reference number
         is used to access the music. If no reference numbers are defined,
         the tune is available under the dictionary entry None.
-
 
         >>> abcStr = 'X:5\nM:6/8\nL:1/8\nK:G\nB3 A3 | G6 | B3 A3 | G6 ||'
         >>> abcStr += 'X:6\nM:6/8\nL:1/8\nK:G\nB3 A3 | G6 | B3 A3 | G6 ||'
@@ -2851,18 +2864,20 @@ class ABCHandler:
 
         Header information (except for comments) should be appended to all pieces.
 
-        >>> abcStrWHeader = '%abc-2.1\nO: Irish\n' + abcStr
+        >>> from textwrap import dedent
+        >>> abcEarly = dedent("""X:4
+        ...    M:6/8
+        ...    L:1/8
+        ...    K:F
+        ...    I:abc-version 1.6
+        ...    B=3 B3 | G6 | B3 A3 | G6 ||
+        ...    """)
+        >>> abcStrWHeader = '%abc-2.1\nO: Irish\n' + abcEarly + abcStr
         >>> ah = abcFormat.ABCHandler()
         >>> junk = ah.process(abcStrWHeader)
         >>> len(ah)
-        29
+        44
         >>> ahDict = ah.splitByReferenceNumber()
-        >>> 5 in ahDict
-        True
-        >>> 6 in ahDict
-        True
-        >>> 7 in ahDict
-        False
 
         Did we get the origin header in each score?
 
@@ -2870,6 +2885,15 @@ class ABCHandler:
         <music21.abcFormat.ABCMetadata 'O: Irish'>
         >>> ahDict[6].tokens[0]
         <music21.abcFormat.ABCMetadata 'O: Irish'>
+
+        Did we get the abcVersion for score 4 and did it revert for score 5?
+
+        >>> for f in ahDict:
+        ...    _ = abcFormat.translate.abcToStreamScore(ahDict[f])
+        >>> ahDict[4].abcVersion
+        (1, 6, 0)
+        >>> ahDict[5].abcVersion
+        (2, 1, 0)
         '''
         if not self.tokens:
             raise ABCHandlerException('must process tokens before calling split')
@@ -3383,15 +3407,16 @@ class ABCFile(prebase.ProtoM21Object):
     ABC File or String access
 
     The abcVersion attribution optionally specifies the (major, minor, patch)
-    version of ABC to process-- e.g., (1.2.0).
+    version of ABC to process-- e.g., (2, 1, 0).
+
     If not set, default ABC 1.3 parsing is performed.
     '''
-    def __init__(self, abcVersion=None):
-        self.abcVersion = abcVersion
-        self.file = None
-        self.filename = None
+    def __init__(self, abcVersion: tuple[int, int, int] =(1, 3, 0)):
+        self.abcVersion: tuple[int, int, int] = abcVersion
+        self.file: io.IO | None = None
+        self.filename: str | pathlib.Path = None
 
-    def open(self, filename):
+    def open(self, filename: str | pathlib.Path):
         '''
         Open a file for reading
         '''

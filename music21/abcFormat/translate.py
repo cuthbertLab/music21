@@ -53,7 +53,11 @@ _abcArticulationsToM21 = {
 }
 
 
-def abcToStreamPart(abcHandler, inputM21=None, spannerBundle=None):
+def abcToStreamPart(
+    abcHandler: abc.ABCHandler,
+    inputM21: stream.Part | None = None,
+    spannerBundle: spanner.SpannerBundle | None = None
+) -> stream.Part:
     '''
     Handler conversion of a single Part of a Score with multiple Parts.
     Results are added into the provided inputM21 object
@@ -234,7 +238,12 @@ def abcToStreamPart(abcHandler, inputM21=None, spannerBundle=None):
     return p
 
 
-def parseTokens(mh, dst, p, useMeasures):
+def parseTokens(
+    mh: abc.ABCHandler,
+    dst: stream.Measure | stream.Part,
+    p: stream.Part,
+    useMeasures: bool
+) -> tuple[int, bool]:
     '''
     parses all the tokens in a measure or part.
     '''
@@ -401,7 +410,16 @@ def abcToStreamScore(abcHandler, inputM21=None):
     titleCount = 0
     for t in abcHandler.tokens:
         if isinstance(t, abcFormat.ABCMetadata):
-            if t.isTitle():
+            if t.isVersion():
+                v = t.data.replace('abc-version', '').strip()
+                try:
+                    abcHandler.abcVersion = abcHandler.returnAbcVersionFromMatch(
+                        re.match(r'(\d+).(\d+).?(\d+)?', v)
+                    )
+                except AttributeError:
+                    pass
+
+            elif t.isTitle():
                 if titleCount == 0:  # first
                     md.add('title', t.data)
                     # environLocal.printDebug(['got metadata title', t.data])
