@@ -14,6 +14,7 @@
 from __future__ import annotations
 
 from collections.abc import Iterable, Generator
+import contextlib
 import copy
 import typing as t
 import unittest
@@ -25,6 +26,7 @@ from music21 import chord
 from music21 import defaults
 from music21 import duration
 from music21 import environment
+from music21 import expressions
 from music21 import key
 from music21 import meter
 from music21 import note
@@ -1663,14 +1665,17 @@ def makeAccidentalsInMeasureStream(
         # unless this measure has a key signature object
         if i > 0:
             if m.keySignature is None:
-                pitchPastMeasure = measuresOnly[i - 1].pitches
+                pitchPastMeasure = (
+                    measuresOnly[i - 1].pitches + ornamentalPitches(measuresOnly[i - 1])
+                )
             elif ksLast:
                 # If there is any key signature object to the left,
                 # just get the chromatic pitches from previous measure
                 # G-naturals in C major following G-flats in F major need cautionary
                 # G-naturals in C major following G-flats in Db major don't
-                pitchPastMeasure = [p for p in measuresOnly[i - 1].pitches
-                                    if p.name not in ksLastDiatonic]
+                pitchPastMeasure = [p for p in
+                    measuresOnly[i - 1].pitches + ornamentalPitches(measuresOnly[i - 1])
+                    if p.name not in ksLastDiatonic]
             # Get tiePitchSet from previous measure
             try:
                 previousNoteOrChord = measuresOnly[i - 1][note.NotRest][-1]
@@ -1703,6 +1708,68 @@ def makeAccidentalsInMeasureStream(
         )
     if isinstance(s, Stream):
         s.streamStatus.accidentals = True
+
+def ornamentalPitches(s: StreamType) -> list[pitch.Pitch]:
+    '''
+    Returns all ornamental :class:`~music21.pitch.Pitch` objects found in any
+    ornaments in notes/chords in the stream (and substreams) as a Python list.
+
+    Very much like the pitches property, except that instead of returning all
+    the pitches found in notes and chords, it returns the ornamental pitches
+    found in the ornaments on the notes and chords.
+
+    If you want a list of _all_ the pitches in a stream, including the ornamental
+    pitches, you can call s.pitches and makeNotation.ornamentalPitches(s),
+    and then combine the two resulting lists into one big list.
+    '''
+    from music21.stream import Stream
+    post = []
+    for e in s.elements:
+        if isinstance(e, Stream):
+            # recurse
+            post.extend(ornamentalPitches(e))
+        elif hasattr(e, 'expressions'):
+            for orn in e.expressions:
+                if isinstance(orn, expressions.Ornament):
+                    post.extend(orn.ornamentalPitches)
+    return post
+
+def makeOrnamentalAccidentals(
+    noteOrChord: note.Note | chord.Chord,
+    *,
+    pitchPast: list[pitch.Pitch] | None = None,
+    pitchPastMeasure: list[pitch.Pitch] | None = None,
+    otherSimultaneousPitches: list[pitch.Pitch] | None = None,
+    alteredPitches: list[pitch.Pitch] | None = None,
+    cautionaryPitchClass: bool = True,
+    cautionaryAll: bool = False,
+    overrideStatus: bool = False,
+    cautionaryNotImmediateRepeat: bool = True,
+):
+    '''
+        Makes accidentals for the ornamental pitches for any Ornaments on noteOrChord.
+        This is very similar to the processing in pitch.updateAccidentalDisplay, except
+        that there is no tie processing, since ornamental pitches cannot be tied.
+    '''
+    for orn in noteOrChord.expressions:
+        if not isinstance(orn, expressions.Ornament):
+            continue
+
+        orn.resolveOrnamentalPitches(noteOrChord)
+        if not orn.ornamentalPitches:
+            continue
+
+        orn.updateAccidentalDisplay(
+            pitchPast=pitchPast,
+            pitchPastMeasure=pitchPastMeasure,
+            alteredPitches=alteredPitches,
+            cautionaryPitchClass=cautionaryPitchClass,
+            cautionaryAll=cautionaryAll,
+            overrideStatus=overrideStatus,
+            cautionaryNotImmediateRepeat=cautionaryNotImmediateRepeat)
+
+        if pitchPast is not None:
+            pitchPast += orn.ornamentalPitches
 
 def iterateBeamGroups(
     s: StreamType,
@@ -2063,6 +2130,40 @@ def consolidateCompletedTuplets(
                     last_tuplet = None
                     completion_target = None
 
+@contextlib.contextmanager
+def saveAccidentalDisplayStatus(s) -> t.Generator[None, None, None]:
+    '''
+    Restore accidental displayStatus on a Stream after an (inPlace) operation
+    that sets accidental displayStatus (e.g. a transposition).  Note that you
+    should not do this unless you know that the displayStatus values will still
+    be valid after the operation.
+
+    >>> sc = corpus.parse('bwv66.6')
+    >>> intv = interval.Interval('P8')
+    >>> classList = (key.KeySignature, note.Note)
+    >>> with stream.makeNotation.saveAccidentalDisplayStatus(sc):
+    ...     sc.transpose(intv, inPlace=True, classFilterList=classList)
+
+    * New in v9.
+    '''
+    displayStatuses: dict[int, bool | None] = {}
+    for p in s.pitches:
+        if p.accidental is not None:
+            displayStatuses[id(p)] = p.accidental.displayStatus
+            continue
+        displayStatuses[id(p)] = False
+
+    try:
+        yield
+    finally:
+        for p in s.pitches:
+            if p.accidental is not None:
+                p.accidental.displayStatus = displayStatuses.get(id(p), None)
+                continue
+            if displayStatuses.get(id(p), False) is True:
+                p.accidental = pitch.Accidental(0)
+                p.accidental.displayStatus = True
+
 
 # -----------------------------------------------------------------------------
 
@@ -2244,6 +2345,28 @@ class Test(unittest.TestCase):
         self.assertEqual(pp[stream.Measure][1].notes.first().duration.quarterLength, 24.0)
         self.assertEqual(len(pp[stream.Measure][2].notes), 1)
         self.assertEqual(pp[stream.Measure][2].notes.first().duration.quarterLength, 24.0)
+
+    def testSaveAccidentalDisplayStatus(self):
+        from music21 import interval
+        from music21 import stream
+        m = stream.Measure([key.Key('C'), note.Note('C2'), note.Note('D2')])
+        m.notes[0].pitch.accidental = 0
+        m.notes[0].pitch.accidental.displayStatus = True
+        m.notes[1].pitch.accidental = 0
+        m.notes[1].pitch.accidental.displayStatus = False
+        classList = (note.Note, chord.Chord, key.KeySignature)
+        with saveAccidentalDisplayStatus(m):
+            m.transpose(interval.Interval('m2'), inPlace=True, classFilterList=classList)
+            self.assertEqual(m.notes[0].nameWithOctave, 'D-2')
+            self.assertIsNone(m.notes[0].pitch.accidental.displayStatus)
+            self.assertEqual(m.notes[1].nameWithOctave, 'E-2')
+            self.assertIsNone(m.notes[1].pitch.accidental.displayStatus)
+
+        # After exiting the with statement, accidental displayStatus will have been restored
+        self.assertEqual(m.notes[0].nameWithOctave, 'D-2')
+        self.assertIs(m.notes[0].pitch.accidental.displayStatus, True)
+        self.assertEqual(m.notes[1].nameWithOctave, 'E-2')
+        self.assertIs(m.notes[1].pitch.accidental.displayStatus, False)
 
 
 # -----------------------------------------------------------------------------

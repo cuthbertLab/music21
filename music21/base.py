@@ -27,7 +27,7 @@ available after importing `music21`.
 <class 'music21.base.Music21Object'>
 
 >>> music21.VERSION_STR
-'9.0.0a6'
+'9.0.0a13'
 
 Alternatively, after doing a complete import, these classes are available
 under the module "base":
@@ -2323,6 +2323,7 @@ class Music21Object(prebase.ProtoM21Object):
         <music21.note.Note E>
         <music21.meter.TimeSignature 4/4>
         f# minor
+        <music21.tempo.MetronomeMark Quarter=96>
         <music21.clef.TrebleClef>
         <music21.stream.Measure 0 offset=0.0>
         P2: Alto: Instrument 2
@@ -2428,7 +2429,7 @@ class Music21Object(prebase.ProtoM21Object):
         A reference to the most-recent object used to
         contain this object. In most cases, this will be a
         Stream or Stream sub-class. In most cases, an object's
-        activeSite attribute is automatically set when an the
+        activeSite attribute is automatically set when the
         object is attached to a Stream.
 
 
@@ -2771,7 +2772,7 @@ class Music21Object(prebase.ProtoM21Object):
 
         except AttributeError as ae:
             # need to permit Duration object assignment here
-            raise Exception(
+            raise TypeError(
                 f'this must be a Duration object, not {durationObj}'
             ) from ae
 

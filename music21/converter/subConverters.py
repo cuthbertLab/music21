@@ -511,26 +511,28 @@ class ConverterIPython(SubConverter):
             load_require_script = ''
             if inGoogleColabNotebook():
                 load_require_script = '''
-                    <script src="//cuthbertLab.github.io/music21j/ext/require/require.js"
+                    <script
+                    src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js"
                     ></script>
                 '''
 
+            utf_binary = binaryBase64.decode('utf-8')
             # noinspection PyTypeChecker
             display(HTML('''
                 <div id="''' + outputId + '''"></div>
-                <link rel="stylesheet" href="//cuthbertLab.github.io/music21j/css/m21.css"
-                    type="text/css" />
+                <link rel="stylesheet" href="https://cuthbertLab.github.io/music21j/css/m21.css">
                 ''' + load_require_script + '''
                 <script>
                 require.config({
-                    paths: {'music21': '//cuthbertLab.github.io/music21j/src/music21'}
+                    paths: {
+                        'music21': 'https://cuthbertLab.github.io/music21j/releases/music21.debug',
+                    }
                 });
-                require(['music21'], function() {
-                               mp = new music21.miditools.MidiPlayer();
-                               mp.addPlayer("#''' + outputId + '''");
-                               mp.base64Load("data:audio/midi;base64,'''
-                                + binaryBase64.decode('utf-8') + '''");
-                        });
+                require(['music21'], function(music21) {
+                    mp = new music21.miditools.MidiPlayer();
+                    mp.addPlayer("#''' + outputId + '''");
+                    mp.base64Load("data:audio/midi;base64,''' + utf_binary + '''");
+                });
                 </script>'''))
 
 
@@ -1460,13 +1462,13 @@ class ConverterClercqTemperley(SubConverter):
     Wrapper for parsing harmonic definitions in Trevor de Clercq and
     David Temperley's format.
     '''
-    registerFormats = ('cttxt', 'har')
-    registerInputExtensions = ('cttxt', 'har')
+    registerFormats = ('cttxt', 'har', 'clercqTemperley')
+    registerInputExtensions = ('cttxt', 'har', 'clercqTemperley')
 
-    def parseData(self, strData, number=None):
+    def parseData(self, strData: str | pathlib.Path, number=None):
         from music21.romanText import clercqTemperley
         ctSong = clercqTemperley.CTSong(strData)
-        self.stream = ctSong.toScore()
+        self.stream = ctSong.toPart()
 
     def parseFile(self,
                   filePath: pathlib.Path | str,

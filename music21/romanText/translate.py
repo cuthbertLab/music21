@@ -381,7 +381,7 @@ class PartTranslator:
         for token in tokens:
             try:
                 self.translateOneLineToken(token)
-            except Exception:  # pylint: disable=broad-except
+            except Exception:  # pylint: disable=broad-exception-caught
                 tracebackMessage = traceback.format_exc()
                 raise RomanTextTranslateException(
                     f'At line {token.lineNumber} for token {token}, '
@@ -1157,11 +1157,16 @@ def fixPickupMeasure(partObject):
         curLastLength = mLast.duration.quarterLength
         lastRN.duration.quarterLength -= curLastLength - leftPadding
         mLast.paddingRight = curLastLength - leftPadding
-        i = -1
-        while partObject[i] is not mLast:
-            # unprocessed metadata after last object
-            partObject[i].setOffsetBySite(partObject, partObject[i].offset - mLast.paddingRight)
-            i -= 1
+
+        with common.classTools.tempAttribute(partObject, 'autoSort', False):
+            # cast as list for speed and also temporarily disable sorting until all done.
+            partElements = list(partObject)
+            i = -1
+            while partElements[i] is not mLast:
+                # unprocessed metadata after last object
+                partElements[i].setOffsetBySite(partObject,
+                                                partElements[i].offset - mLast.paddingRight)
+                i -= 1
 
 
 def romanTextToStreamOpus(rtHandler, inputM21=None):
@@ -1523,7 +1528,7 @@ m3 NC b3 G: V
         self.assertIn(roman.RomanNumeral, rn1.classSet)
         # s.show()
 
-    def testUnProcessed(self):
+    def testUnprocessed(self):
         from music21 import converter
         from music21.romanText import translate
         src = '''Note: Hello
@@ -1542,6 +1547,29 @@ Note: Hi
         self.assertEqual(note2.data, 'Hi')
         self.assertFalse(var1.tag)
         self.assertIn(' I', var1.data)
+
+    def testUnprocessedWithAnacrusis(self):
+        from music21.romanText import translate
+        src = '''
+        Time Signature: 4/4
+        m0 b4 f: i
+        Note: Internal Note field after anacrusis.
+        m1 V
+        '''
+        s = translate.romanTextToStreamScore(src)
+        p = s.parts[0]
+        self.assertEqual(len(p), 3)
+        self.assertIsInstance(p[0], stream.Measure)
+        self.assertEqual(p[0].paddingLeft, 3.0)
+        self.assertIsInstance(p[1], translate.RomanTextUnprocessedMetadata)
+        self.assertEqual(p[1].offset, 0.0)
+        self.assertEqual(p[1].data, 'Internal Note field after anacrusis.')
+        self.assertIsInstance(p[2], stream.Measure)
+        self.assertEqual(p[2].offset, 1.0)
+        self.assertIsInstance(p[2][0], roman.RomanNumeral)
+        self.assertEqual(p[2].paddingRight, 1.0)
+        self.assertEqual(p[2].duration.quarterLength, 3.0)
+
 
     def testSixthMinorParse(self):
         from music21 import converter

@@ -851,7 +851,7 @@ class GraphColorGridLegend(Graph):
         >>> fig = matplotlib.pyplot.figure()
         >>> subplot = colorLegend.makeOneRowOfGraph(fig, 0, 'Scriabin Mapping', rowData)
         >>> subplot
-        <AxesSubplot: >
+        <Axes: >
         '''
         # environLocal.printDebug(['rowLabel', rowLabel, i])
 

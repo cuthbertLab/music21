@@ -30,6 +30,7 @@ from music21 import common
 from music21 import defaults
 from music21 import duration
 from music21 import dynamics
+from music21.common.enums import OrnamentDelay
 from music21 import editorial
 from music21 import environment
 from music21 import exceptions21
@@ -1559,7 +1560,7 @@ class PartParser(XMLParserBase):
         self.appendToScoreAfterParse = True
         self.lastMeasureParser: MeasureParser | None = None
 
-    def parse(self):
+    def parse(self) -> None:
         '''
         Run the parser on a single part
         '''
@@ -1571,22 +1572,66 @@ class PartParser(XMLParserBase):
         # will be copied into the Score
 
         # copy spanners that are complete into the part, as this is the
-        # highest level container that needs them
-        rm = []
+        # highest level container that needs them. Ottavas are the exception,
+        # they should be put in the PartStaff that contains the first note
+        # in the Ottava.
+        completedSpanners: list[spanner.Spanner] = []
         for sp in self.spannerBundle.getByCompleteStatus(True):
-            self.stream.coreInsert(0, sp)
-            rm.append(sp)
+            if not isinstance(sp, spanner.Ottava):
+                # don't insert Ottavas, we'll do that after separateOutPartStaves().
+                self.stream.coreInsert(0, sp)
+            completedSpanners.append(sp)
         # remove from original spanner bundle
-        for sp in rm:
+        for sp in completedSpanners:
             self.spannerBundle.remove(sp)
         # s is the score; adding the part to the score
         self.stream.coreElementsChanged()
 
+        partStaves: list[stream.PartStaff] = []
         if self.maxStaves > 1:
-            self.separateOutPartStaves()
-        else:
+            partStaves = self.separateOutPartStaves()
+        elif self.partId is not None:
             self.stream.addGroupForElements(self.partId)  # set group for components (recurse?)
             self.stream.groups.append(self.partId)  # set group for stream itself
+
+        self._fillAndInsertOttavasInPartStaff(completedSpanners, partStaves)
+
+    def _fillAndInsertOttavasInPartStaff(
+        self,
+        spanners: list[spanner.Spanner],
+        partStaves: list[stream.PartStaff]
+    ):
+        # Ottavas should be filled, so that later transpositions can find all the notes that
+        # should be octave-shifted.  Ottavas should also be inserted into the partStaff that
+        # contains the Ottava's first note.
+        for sp in spanners:
+            if not isinstance(sp, spanner.Ottava):
+                continue
+            spannerPart: stream.Part | None = None
+            if partStaves:
+                spannerPart = self._findFirstPartStaffContaining(sp.getFirst(), partStaves)
+            else:
+                spannerPart = self.stream
+
+            if spannerPart is not None:
+                spannerPart.coreInsert(0, sp)
+                spannerPart.coreElementsChanged()
+                sp.fill(spannerPart)
+
+    def _findFirstPartStaffContaining(
+        self,
+        obj: base.Music21Object | None,
+        partStaves: list[stream.PartStaff]
+    ) -> stream.PartStaff | None:
+        if obj is None:
+            return None
+
+        for partStaff in partStaves:
+            if partStaff.containerInHierarchy(obj, setActiveSite=False) is not None:
+                # obj is somewhere in the hierarchy of this partStaff
+                return partStaff
+
+        return None
 
     def parseXmlScorePart(self):
         '''
@@ -1812,7 +1857,7 @@ class PartParser(XMLParserBase):
         if lmp.stream.recurse().notesAndRests.last() is endedForwardRest:
             lmp.stream.remove(endedForwardRest, recurse=True)
 
-    def separateOutPartStaves(self) -> None:
+    def separateOutPartStaves(self) -> list[stream.PartStaff]:
         '''
         Take a `Part` with multiple staves and make them a set of `PartStaff` objects.
 
@@ -1832,7 +1877,7 @@ class PartParser(XMLParserBase):
         ]
 
         uniqueStaffKeys: list[int] = self._getUniqueStaffKeys()
-        partStaffs: list[stream.PartStaff] = []
+        partStaves: list[stream.PartStaff] = []
         appendedElementIds: set[int] = set()  # id is id(el) not el.id
 
         def copy_into_partStaff(source: stream.Stream,
@@ -1868,7 +1913,7 @@ class PartParser(XMLParserBase):
             # set group for components (recurse?)
             newPartStaff.addGroupForElements(partStaffId, setActiveSite=False)
             newPartStaff.groups.append(partStaffId)
-            partStaffs.append(newPartStaff)
+            partStaves.append(newPartStaff)
             self.parent.m21PartObjectsById[partStaffId] = newPartStaff
             elementsIdsNotToGoInThisStaff: set[int] = set()
             for staffReference in self.staffReferenceList:
@@ -1889,11 +1934,11 @@ class PartParser(XMLParserBase):
                 copyMeasure.flattenUnnecessaryVoices(force=False, inPlace=True)
 
         score = self.parent.stream
-        staffGroup = layout.StaffGroup(partStaffs, name=self.stream.partName, symbol='brace')
+        staffGroup = layout.StaffGroup(partStaves, name=self.stream.partName, symbol='brace')
         staffGroup.style.hideObjectOnPrint = True  # in truth, hide the name, not the brace
         score.coreInsert(0, staffGroup)
 
-        for partStaff in partStaffs:
+        for partStaff in partStaves:
             score.coreInsert(0, partStaff)
         score.coreElementsChanged()
 
@@ -1901,6 +1946,7 @@ class PartParser(XMLParserBase):
         # and thus that these next two lines are not needed:
         # score.remove(originalPartStaff)
         # del self.parent.m21PartObjectsById[originalPartStaff.id]
+        return partStaves
 
     def _getStaffExclude(
         self,
@@ -1980,7 +2026,7 @@ class PartParser(XMLParserBase):
             e.measureNumber = str(measureParser.measureNumber)
             e.partName = self.stream.partName
             raise e
-        except Exception as e:  # pylint: disable=broad-except
+        except Exception as e:  # pylint: disable=broad-exception-caught
             warnings.warn(
                 f'The following exception took place in m. {measureParser.measureNumber} in '
                 + f'part {self.stream.partName}.',
@@ -2343,7 +2389,7 @@ class MeasureParser(XMLParserBase):
         'attributes': 'parseAttributesTag',
         'harmony': 'xmlHarmony',
         'figured-bass': None,
-        'sound': None,
+        'sound': 'xmlSound',
         'barline': 'xmlBarline',
         'grouping': None,
         'link': None,
@@ -3721,11 +3767,11 @@ class MeasureParser(XMLParserBase):
         for tagSearch in ('arpeggiate', 'non-arpeggiate'):
             # TODO: musicxml 4: arpeggiate 'unbroken' attribute
             for mxObj in mxNotations.findall(tagSearch):
-                arpeggioType: str = ''
+                arpeggioType: str = 'normal'
                 if tagSearch == 'non-arpeggiate':
                     arpeggioType = 'non-arpeggio'
                 else:
-                    arpeggioType = mxObj.get('direction') or ''
+                    arpeggioType = mxObj.get('direction') or 'normal'
                 idFound: str | None = mxObj.get('number')
                 if idFound is None:
                     arpeggio = expressions.ArpeggioMark(arpeggioType)
@@ -3735,19 +3781,26 @@ class MeasureParser(XMLParserBase):
                         expressions.ArpeggioMarkSpanner, idFound, False)
                     if sb:
                         # if we already have a spanner matching
-                        arpeggioSpanner = sb[0]
+                        arpeggioSpanner = t.cast(expressions.ArpeggioMarkSpanner, sb[0])
                     else:
-                        arpeggioSpanner = expressions.ArpeggioMarkSpanner(arpeggioType)
+                        arpeggioSpanner = expressions.ArpeggioMarkSpanner(arpeggioType=arpeggioType)
                         arpeggioSpanner.idLocal = idFound
                         self.spannerBundle.append(arpeggioSpanner)
                     arpeggioSpanner.addSpannedElements(n)
 
+        mostRecentOrnament: expressions.Ornament | None = None
         for mxObj in flatten(mxNotations, 'ornaments'):
-            if mxObj.tag in xmlObjects.ORNAMENT_MARKS:
-                post = self.xmlOrnamentToExpression(mxObj)
+            if mxObj.tag in xmlObjects.ORNAMENT_MARKS or mxObj.tag == 'accidental-mark':
+                post = self.xmlOrnamentToExpression(
+                    mxObj, mostRecentOrnament=mostRecentOrnament
+                )
+                if mostRecentOrnament is not None and mxObj.tag == 'accidental-mark':
+                    # Resolve any ornamental pitch for that accidental-mark.
+                    mostRecentOrnament.resolveOrnamentalPitches(n)
                 optionalHideObject(post)
                 self.setEditorial(mxNotations, post)
                 if post is not None:
+                    mostRecentOrnament = post
                     n.expressions.append(post)
                 # environLocal.printDebug(['adding to expressions', post])
             elif mxObj.tag == 'wavy-line':
@@ -3940,14 +3993,21 @@ class MeasureParser(XMLParserBase):
             environLocal.printDebug(f'Cannot translate {tag} in {mxObj}.')
             return None
 
-    def xmlOrnamentToExpression(self, mxObj):
+    def xmlOrnamentToExpression(
+        self,
+        mxObj,
+        *,
+        mostRecentOrnament: expressions.Ornament | None = None
+    ):
         '''
         Convert mxOrnament into a music21 ornament.
 
         This only processes non-spanner ornaments.
         Many mxOrnaments are spanners: these are handled elsewhere.
 
-        Returns None if it cannot be converted or is not defined.
+        Returns None if it cannot be converted or is not defined, or if the
+        mxObj is an accidental-mark (in which case the accidental is placed
+        in the mostRecentOrnament instead).
 
         Return an articulation from an mxObj, setting placement
 
@@ -3970,12 +4030,51 @@ class MeasureParser(XMLParserBase):
         >>> a is None
         True
 
-        Not supported currently: 'accidental-mark', 'vertical-turn',
-        'delayed-turn', 'delayed-inverted-turn'
+        If it is 'accidental-mark', add to mostRecentOrnament, and return None
+
+        >>> turn = expressions.Turn()
+        >>> turn.lowerAccidental is None
+        True
+        >>> turn.upperAccidental is None
+        True
+        >>> mxOrn = EL('<accidental-mark placement="below">flat</accidental-mark>')
+        >>> a = MP.xmlOrnamentToExpression(mxOrn, mostRecentOrnament=turn)
+        >>> a is None
+        True
+        >>> turn.lowerAccidental
+        <music21.pitch.Accidental flat>
+        >>> turn.upperAccidental is None
+        True
+
+        Not supported currently: 'vertical-turn'
         '''
         tag = mxObj.tag
+        if tag == 'accidental-mark':
+            if mostRecentOrnament is None:
+                return None
+
+            accid: pitch.Accidental = self.xmlToAccidental(mxObj)
+            accid.displayStatus = True
+
+            if isinstance(mostRecentOrnament, expressions.Turn):
+                # upperAccidentalName or lowerAccidentalName?
+                # Look at placement (default to 'above').
+                placement: str = mxObj.get('placement', 'above')
+                if placement == 'below':
+                    mostRecentOrnament.lowerAccidental = accid
+                else:
+                    mostRecentOrnament.upperAccidental = accid
+            elif isinstance(mostRecentOrnament, (expressions.GeneralMordent, expressions.Trill)):
+                mostRecentOrnament.accidental = accid
+            return None
+
         try:
-            orn = xmlObjects.ORNAMENT_MARKS[tag]()
+            if tag in ('delayed-turn', 'delayed-inverted-turn'):
+                orn = xmlObjects.ORNAMENT_MARKS[tag](delay=OrnamentDelay.DEFAULT_DELAY)
+            elif tag in ('turn', 'inverted-turn'):
+                orn = xmlObjects.ORNAMENT_MARKS[tag](delay=OrnamentDelay.NO_DELAY)
+            else:
+                orn = xmlObjects.ORNAMENT_MARKS[tag]()
         except KeyError:  # should already be checked...
             return None
         self.setPrintStyle(mxObj, orn)
@@ -4158,6 +4257,12 @@ class MeasureParser(XMLParserBase):
                                      'bezier-x2', 'bezier-y2')
                                     )
             self.setColor(mxObj, slur)
+
+        for mxObj in mxNotations.findall('technical/hammer-on'):
+            self.xmlOneSpanner(mxObj, n, articulations.HammerOn)
+
+        for mxObj in mxNotations.findall('technical/pull-off'):
+            self.xmlOneSpanner(mxObj, n, articulations.PullOff)
 
         for tagSearch in ('glissando', 'slide'):
             for mxObj in mxNotations.findall(tagSearch):
@@ -5100,13 +5205,14 @@ class MeasureParser(XMLParserBase):
         # TODO: musicxml 4: system="yes/no" -- does this apply to whole system?
         # offset is out of order because we need to know it before direction-type
         offsetDirection = self.xmlToOffset(mxDirection)
-        totalOffset = offsetDirection + self.offsetMeasureNote
+        totalOffset = float(offsetDirection + self.offsetMeasureNote)
 
         # out of order: parse <staff> element
         # staffKey is the staff that this direction applies to. not
         # found in mxSpecificDirectionTag (inside direction-type) but in mxDirection itself.
         staffKey = self.getStaffNumber(mxDirection)
 
+        metronome_added = False
         # editorial (footnote, level, voice) for the whole <direction> tag is parsed in
         # setDirectionInDirectionType.  -- probably a mistake since they
         # should all share the same Editorial object and be manipulated together
@@ -5116,11 +5222,27 @@ class MeasureParser(XMLParserBase):
                                                  mxDirection,
                                                  staffKey,
                                                  totalOffset)
-        # TODO: sound
+                if mxSpecificDirectionTag.tag == 'metronome':
+                    metronome_added = True
+
+        # check for sound tag if direction didn't specify a tempo already,
+        # avoiding doubled metronomes.
+        if not metronome_added:
+            for mxSound in mxDirection.findall('sound'):
+                self.setSound(mxSound,
+                              mxDirection,
+                              staffKey,
+                              totalOffset)
+
         # TODO: musicxml 4:listening
 
-
-    def setDirectionInDirectionType(self, mxDir, mxDirection, staffKey, totalOffset):
+    def setDirectionInDirectionType(
+        self,
+        mxDir: ET.Element,
+        mxDirection: ET.Element,
+        staffKey: int,
+        totalOffset: float,
+    ):
         # TODO: pedal
         # TODO: harp-pedals
         # TODO: damp
@@ -5137,20 +5259,9 @@ class MeasureParser(XMLParserBase):
         tag = mxDir.tag
         if tag == 'dynamics':  # fp, mf, etc., each as a tag
             # in rare cases there may be more than one dynamic in the same
-            # direction, so we iterate
-            for dyn in mxDir:
-                m21DynamicText = dyn.tag
-                if dyn.tag == 'other-dynamic':
-                    m21DynamicText = dyn.text.strip()
-
-                d = dynamics.Dynamic(m21DynamicText)
-
-                _synchronizeIds(dyn, d)
-                _setAttributeFromAttribute(d, mxDirection, 'placement', 'placement')
-
-                self.insertCoreAndRef(totalOffset, staffKey, d)
-                self.setPosition(mxDir, d)
-                self.setEditorial(mxDirection, d)
+            # direction, so we iterate over them.
+            for mxDyn in mxDir:
+                self.setDynamicsDirection(mxDir, mxDyn, mxDirection, staffKey, totalOffset)
 
         elif tag in ('wedge', 'bracket', 'dashes', 'octave-shift'):
             try:
@@ -5166,6 +5277,7 @@ class MeasureParser(XMLParserBase):
                 self.setEditorial(mxDirection, sp)
 
         elif tag in ('coda', 'segno'):
+            rm: repeat.Segno | repeat.Coda
             if tag == 'segno':
                 rm = repeat.Segno()
             else:
@@ -5206,6 +5318,89 @@ class MeasureParser(XMLParserBase):
             else:
                 self.insertCoreAndRef(totalOffset, staffKey, textExpression)
                 self.setEditorial(mxDirection, textExpression)
+
+    def setDynamicsDirection(
+        self,
+        mxDir: ET.Element,
+        mxDyn: ET.Element,
+        mxDirection: ET.Element,
+        staffKey: int,
+        totalOffset: float,
+    ):
+        '''
+        Add a single dynamic element to the core and staffReference.
+        '''
+        m21DynamicText = mxDyn.tag
+        if m21DynamicText == 'other-dynamic' and mxDyn.text:
+            m21DynamicText = mxDyn.text.strip()
+
+        d = dynamics.Dynamic(m21DynamicText)
+
+        _synchronizeIds(mxDyn, d)
+        _setAttributeFromAttribute(d, mxDirection, 'placement', 'placement')
+
+        self.insertCoreAndRef(totalOffset, staffKey, d)
+        self.setPosition(mxDir, d)
+        self.setEditorial(mxDirection, d)
+
+    def xmlSound(self, mxSound: ET.Element):
+        '''
+        Convert a <sound> tag to a relevant object (presently just MetronomeMark),
+        and add it to the core and staffReference.
+        '''
+        # offset is out of order because we need to know it before direction-type
+        offsetDirection = self.xmlToOffset(mxSound)
+        totalOffset = offsetDirection + self.offsetMeasureNote
+
+        staffKey = self.getStaffNumber(mxSound)
+
+        self.setSound(mxSound,
+                      None,
+                      staffKey,
+                      totalOffset)
+
+    def setSound(
+        self,
+        mxSound: ET.Element,
+        mxDir: ET.Element | None,
+        staffKey: int,
+        totalOffset: float
+    ):
+        '''
+        Takes a <sound> tag and creates objects from it.
+        Presently only handles <sound tempo='x'> events and inserts them as MetronomeMarks.
+        If the <sound> tag is a child of a <direction> tag, the direction information
+        is used to set the placement of the MetronomeMark.
+        '''
+        # TODO: coda
+        # TODO: dacapo
+        # TODO: dalsegno
+        # TODO: damper-pedal
+        # TODO: divisions
+        # TODO: dynamics
+        # TODO: fine
+        # TODO: forward-repeat
+        # TODO: id
+        # TODO: pizzicato
+        # TODO: segno
+        # TODO: soft-pedal
+        # TODO: sostenuto-pedal
+        # TODO: time-only
+        # TODO: tocoda
+        if 'tempo' in mxSound.attrib:
+            qpm = common.numToIntOrFloat(float(mxSound.get('tempo', 0)))
+            if qpm == 0:
+                warnings.warn('0 qpm tempo tag found, skipping.')
+                return
+            mm = tempo.MetronomeMark(number=qpm, referent=note.Note(type='quarter'))
+
+            _synchronizeIds(mxSound, mm)
+            self.setPrintObject(mxSound, mm)
+            self.setPosition(mxSound, mm)
+            if mxDir is not None:
+                _setAttributeFromAttribute(mm, mxDir, 'placement', 'placement')
+                self.setEditorial(mxDir, mm)
+            self.insertCoreAndRef(totalOffset, staffKey, mm)
 
     def xmlToTextExpression(self, mxWords):
         # noinspection PyShadowingNames
@@ -5257,7 +5452,7 @@ class MeasureParser(XMLParserBase):
         >>> m = EL(r'<metronome><per-minute>125</per-minute>' +
         ...         '<beat-unit>half</beat-unit></metronome>')
         >>> MP.xmlToTempoIndication(m)
-        <music21.tempo.MetronomeMark Half=125.0>
+        <music21.tempo.MetronomeMark Half=125>
 
         Metric modulation:
 
@@ -5290,7 +5485,7 @@ class MeasureParser(XMLParserBase):
                 perMin = mxObj.text
                 if perMin is not None and perMin.strip() != '':
                     try:
-                        numbers.append(float(perMin))
+                        numbers.append(common.numToIntOrFloat(float(perMin)))
                     except ValueError:
                         pass  # TODO: accept text per minute
         # TODO: metronome-relation -- specifies how to relate multiple beat units

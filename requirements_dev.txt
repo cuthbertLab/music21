@@ -1,5 +1,6 @@
 -r requirements.txt
-pylint>=2.15.4
+wheel
+pylint>=2.16.0
 flake8<6.0.0
 flake8-quotes
 hatchling

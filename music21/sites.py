@@ -955,7 +955,7 @@ class Sites(common.SlottedObjectMixin):
             del self.siteDict[siteId]
             # environLocal.printDebug(['removed site w/o exception:', siteId,
             #    'self.siteDict.keys()', self.siteDict.keys()])
-        except Exception as e:  # pylint: disable=broad-except
+        except Exception as e:  # pylint: disable=broad-exception-caught
             raise SitesException(
                 'an entry for this object '
                 + f'({site}) is not stored in this Sites object'

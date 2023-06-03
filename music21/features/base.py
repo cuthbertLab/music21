@@ -685,7 +685,7 @@ class DataInstance:
 
         >>> di = features.DataInstance('bach/bwv66.6')
         >>> len(di['flat'])
-        193
+        197
         >>> len(di['flat.pitches'])
         163
         >>> len(di['flat.notes'])
@@ -981,7 +981,7 @@ class DataSet:
                 # in some cases there might be problem; to not fail
                 try:
                     fReturned = fe.extract()
-                except Exception as e:  # pylint: disable=broad-except
+                except Exception as e:  # pylint: disable=broad-exception-caught
                     # for now take any error
                     fList = ['failed feature extractor:', fe, str(e)]
                     if self.quiet is True:
@@ -1100,7 +1100,7 @@ def _dataSetParallelSubprocess(dataInstance, failFast):
         # in some cases there might be problem; to not fail
         try:
             fReturned = fe.extract()
-        except Exception as e:  # pylint: disable=broad-except
+        except Exception as e:  # pylint: disable=broad-exception-caught
             # for now take any error
             errors.append('failed feature extractor:' + str(fe) + ': ' + str(e))
             if failFast:
@@ -1284,7 +1284,7 @@ class Test(unittest.TestCase):
         s = corpus.parse('corelli/opus3no1/1grave')
         # s.chordify().show()
         di = features.DataInstance(s)
-        self.assertEqual(len(di['flat']), 291)
+        self.assertEqual(len(di['flat']), 292)
         self.assertEqual(len(di['flat.notes']), 238)
 
         # di['chordify'].show('t')
