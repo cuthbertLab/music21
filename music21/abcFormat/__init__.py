@@ -2033,7 +2033,7 @@ class ABCHandler:
 
     @staticmethod
     def returnAbcVersionFromMatch(verMats: re.Match) -> tuple[int, int, int]:
-        '''
+        r'''
         Given a match from a regular expression return the parsed ABC version
 
         >>> import re
@@ -2198,7 +2198,6 @@ class ABCHandler:
         accidentalized: dict[str, str] = {}
         accidental: str = ''
         abcPitch: str = ''  # ABC substring defining any pitch within the current token
-        self.isFirstComment = True
 
         while self.pos < self.srcLen - 1:
             self.pos += 1

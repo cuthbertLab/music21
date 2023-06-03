@@ -280,11 +280,11 @@ def parseTokens(
                         dst.coreAppend(ts)
             elif t.isKey():
                 ks = t.getKeySignatureObject()
-                if ks is not None:
-                    if useMeasures:  # assume at start of measures
-                        dst.keySignature = ks
-                    else:
-                        dst.coreAppend(ks)
+                if ks is not None and useMeasures:
+                    # assume at start of measures
+                    dst.keySignature = ks
+                elif ks is not None:
+                    dst.coreAppend(ks)
                 # check for clef information sometimes stored in key
                 clefObj, transposition = t.getClefObject()
                 if clefObj is not None and transposition is not None:
