@@ -1,15 +1,15 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 # Name:         ipython21/__init__.py
-# Purpose:      music21 IPython Notebook support
+# Purpose:      music21 Jupyter Notebook support
 #
 # Authors:      Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2013-22 Michael Scott Asato Cuthbert
+# Copyright:    Copyright © 2013-23 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
-IPython extension to music21.  In Jupyter Notebook call:
+IPython/Jupyter extension to music21.  In Jupyter Notebook call:
 
    %load_ext music21.ipython21
 
@@ -21,10 +21,12 @@ now just calls matplotlib inline)
 '''
 from __future__ import annotations
 
-__all__ = ['ipExtension', 'objects', 'loadNoMagic', 'load_ipython_extension']
+__all__ = ['converters', 'ipExtension', 'objects',
+           'loadNoMagic', 'load_ipython_extension']
 
 from music21 import common
 
+from music21.ipython21 import converters
 from music21.ipython21 import ipExtension
 from music21.ipython21 import objects
 from music21.ipython21.ipExtension import load_ipython_extension
@@ -40,29 +42,6 @@ def loadNoMagic():
         if InteractiveShell.initialized():
             localIP = InteractiveShell.instance()
             load_ipython_extension(localIP)
-
-
-def inGoogleColabNotebook():
-    if not common.runningUnderIPython():
-        return False
-    try:
-        # get_ipython is loaded into global scope in IPython and Google Colab
-        # because we already returned False above, the NameError should never
-        # be triggered, but better safe than sorry.  And helps type checkers.
-        return get_ipython().__class__.__module__ == 'google.colab._shell'
-    except NameError:
-        return False
-
-def notebookVersion():
-    try:
-        # noinspection PyPackageRequirements
-        import notebook
-        return notebook._version.version_info
-    except (ImportError, AttributeError):
-        return (0, 0, 0)
-
-def needsToLoadRequireJS():
-    return inGoogleColabNotebook() or notebookVersion() >= (7, 0, 0)
 
 
 # if we are imported in an IPython environment, then load magic after two seconds

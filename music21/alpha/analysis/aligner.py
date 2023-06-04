@@ -867,7 +867,7 @@ class StreamAligner:
     def showChanges(self, show=False):
         '''
         Visual and debugging feature to display which notes are changed.
-        Will open in musescore, unless show is set to False
+        Will open in MuseScore, unless show is set to False
         '''
         for (idx, (midiNoteRef, omrNoteRef, change)) in enumerate(self.changes):
             if change == ChangeOps.NoChange:
