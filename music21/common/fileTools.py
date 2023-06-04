@@ -168,8 +168,7 @@ def runSubprocessCapturingStderr(subprocessCommand):
         except UnicodeDecodeError:
             # not really a str, but best we can do.
             stderr_str = stderr_bytes.decode('ascii', errors='ignore')
-        raise SubConverterFileIOException(stderr_str)
-
+        raise IOError(stderr_str)
 
 
 # -----------------------------------------------------------------------------

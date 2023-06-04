@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 from __future__ import annotations
 
-_DOC_IGNORE_MODULE_OR_PACKAGE = True
-
 from music21 import common
+
+_DOC_IGNORE_MODULE_OR_PACKAGE = True
 
 # See converter/subConverters/ConverterIPython for more info.
 

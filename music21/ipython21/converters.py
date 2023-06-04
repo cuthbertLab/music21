@@ -19,7 +19,6 @@ import pathlib
 import typing as t
 
 from music21 import common
-from music21.common.fileTools import runSubprocessCapturingStderr
 from music21.converter import museScore
 from music21 import defaults
 from music21 import environment

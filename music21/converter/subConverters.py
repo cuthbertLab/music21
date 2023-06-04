@@ -21,7 +21,6 @@ from __future__ import annotations
 # Converters are associated classes; they are not subclasses,
 # but most define a parseData() method,
 # a parseFile() method, and a .stream attribute or property.
-import base64
 from io import IOBase
 import os
 import pathlib
@@ -32,7 +31,6 @@ import unittest
 from music21 import common
 from music21 import defaults
 from music21 import environment
-from music21 import exceptions21
 from music21.exceptions21 import SubConverterException
 from music21 import stream
 
