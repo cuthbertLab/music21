@@ -83,7 +83,7 @@ def getCorpusContentDirs() -> list[str]:
     ['airdsAirs', 'bach', 'beach', 'beethoven', 'chopin',
      'ciconia', 'corelli', 'cpebach',
      'demos', 'essenFolksong', 'handel', 'haydn', 'johnson_j_r', 'joplin', 'josquin',
-     'leadSheet', 'luca', 'liliuokalani',
+     'leadSheet', 'liliuokalani', 'luca', 'lusitano',
      'miscFolk', 'monteverdi', 'mozart',
      'nottingham-dataset',
      'oneills1850', 'palestrina',

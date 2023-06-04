@@ -553,6 +553,7 @@ class CoreCorpus(Corpus):
         ('leadSheet', 'Leadsheet demos', False),
         ('liliuokalani', 'Queen Liliʻuokalani', True),
         ('luca', 'D. Luca', True),
+        ('lusitano', 'Vicente Lusitano', True),
         ('miscFolk', 'Miscellaneous Folk', False),
         ('monteverdi', 'Claudio Monteverdi', True),
         ('mozart', 'Wolfgang Amadeus Mozart', True),

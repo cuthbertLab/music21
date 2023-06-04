@@ -2001,7 +2001,7 @@ class PartParser(XMLParserBase):
 
         m = measureParser.stream
         self.setLastMeasureInfo(m)
-        warnings.warn(f'{m} {m.highestTime} {self}', MusicXMLWarning)
+        # warnings.warn(f'{m} {m.highestTime} {self}', MusicXMLWarning)
 
         # NB: not coreInsert, because barDurationProportion()
         # is called in adjustTimeAttributesFromMeasure()
