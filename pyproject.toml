@@ -52,7 +52,7 @@ dependencies = [
 
 [[project.authors]]
 name = "Michael Scott Asato Cuthbert"
-email = "cuthbert@mit.edu"
+email = "michael.asato.cuthbert@gmail.com"
 
 [project.urls]
 Download = "https://github.com/cuthbertLab/music21/releases/"
