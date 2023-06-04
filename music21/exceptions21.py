@@ -54,7 +54,11 @@ class InstrumentException(Music21Exception):
 class CorpusException(Music21Exception):
     pass
 
-# should be renamed because what does Group mean here? and it's "base.Groups" not "base.Group".
+class SubConverterException(Music21Exception):
+    pass
+
+# TODO: should be renamed because what does Group mean here?
+#  and it's "base.Groups" not "base.Group".
 class GroupException(Music21Exception):
     pass
 

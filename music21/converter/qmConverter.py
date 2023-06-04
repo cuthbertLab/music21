@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 # Name:         converter/qmConverter.py
-# Purpose:      Example of subclassing Subconverter to parse a new format
+# Purpose:      Example of subclassing SubConverter to parse a new format
 #
 # Authors:      Michael Scott Asato Cuthbert
 #
@@ -19,7 +19,7 @@ by spaces:
 and turns each of them into a quarter note in octave 4 in 4/4.
 
 Consult the code to see how it works.  To use, call
-`converter.registerSubconverter(converter.qmConverter.QMConverter)`
+`converter.registerSubConverter(converter.qmConverter.QMConverter)`
 then `myStream = converter.parse('quarterMusic: C E G D F')`
 '''
 from __future__ import annotations
@@ -120,7 +120,7 @@ if __name__ == '__main__':
     music21.mainTest()
 #     from music21 import common
 #
-#     converter.registerSubconverter(QMConverter)
+#     converter.registerSubConverter(QMConverter)
 #
 #     print('\nFILE')
 #     print('+++++++++++++++++++++++++')

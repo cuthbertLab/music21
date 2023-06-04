@@ -116,7 +116,7 @@ class Tie(prebase.ProtoM21Object, SlottedObjectMixin):
         # this is not the correct way we want to do this, I don't think...
         self.id = id(self)
         self.type = type
-        self.style = 'normal'
+        self.style = 'normal'  # or dashed
         self.placement = None  # = unknown, can be 'above' or 'below'
 
     # SPECIAL METHODS #
@@ -148,7 +148,6 @@ class Tie(prebase.ProtoM21Object, SlottedObjectMixin):
 
     def _reprInternal(self):
         return self.type
-
 
 class Test(unittest.TestCase):
     def testCopyAndDeepcopy(self):

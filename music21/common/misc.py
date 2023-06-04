@@ -265,7 +265,7 @@ def defaultDeepcopy(obj: t.Any, memo=None, *, ignoreAttributes: Iterable[str] = 
     Does a deepcopy of the state returned by `__reduce_ex__` for protocol 4.
 
     * Changed in v9: callInit is removed, replaced with ignoreAttributes.
-      uses `__reduce_ex__` and `copy._reconstruct` internally.
+      uses `__reduce_ex__` internally.
     '''
     if memo is None:
         memo = {}

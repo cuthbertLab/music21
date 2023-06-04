@@ -53,6 +53,7 @@ import zipfile
 import requests
 
 from music21.converter import subConverters
+from music21.converter import museScore
 
 from music21 import _version
 from music21 import common
@@ -69,10 +70,11 @@ if t.TYPE_CHECKING:
 
 
 __all__ = [
-    'subConverters', 'ArchiveManagerException', 'PickleFilterException',
+    'subConverters', 'museScore',
+    'ArchiveManagerException', 'PickleFilterException',
     'ConverterException', 'ConverterFileException',
-    'ArchiveManager', 'PickleFilter', 'resetSubconverters',
-    'registerSubconverter', 'unregisterSubconverter',
+    'ArchiveManager', 'PickleFilter', 'resetSubConverters',
+    'registerSubConverter', 'unregisterSubConverter',
     'Converter', 'parseFile', 'parseData', 'parseURL',
     'parse', 'freeze', 'thaw', 'freezeStr', 'thawStr',
 
@@ -379,26 +381,26 @@ class PickleFilter:
 
 
 # ------------------------------------------------------------------------------
-# a deque of additional subconverters to use (in addition to the default ones)
-_registeredSubconverters: deque[type[subConverters.SubConverter]] = deque()
+# a deque of additional subConverters to use (in addition to the default ones)
+_registeredSubConverters: deque[type[subConverters.SubConverter]] = deque()
 
-# default subconverters to skip
-_deregisteredSubconverters: deque[
+# default subConverters to skip
+_deregisteredSubConverters: deque[
     type[subConverters.SubConverter] | t.Literal['all']
 ] = deque()
 
 
-def resetSubconverters():
+def resetSubConverters():
     '''
-    Reset state to default (removing all registered and deregistered subconverters).
+    Reset state to default (removing all registered and deregistered subConverters).
     '''
-    _registeredSubconverters.clear()
-    _deregisteredSubconverters.clear()
+    _registeredSubConverters.clear()
+    _deregisteredSubConverters.clear()
 
 
-def registerSubconverter(newSubConverter: type[subConverters.SubConverter]) -> None:
+def registerSubConverter(newSubConverter: type[subConverters.SubConverter]) -> None:
     '''
-    Add a Subconverter to the list of registered subconverters.
+    Add a SubConverter to the list of registered subConverters.
 
     Example, register a converter for the obsolete Amiga composition software Sonix (so fun...)
 
@@ -406,7 +408,7 @@ def registerSubconverter(newSubConverter: type[subConverters.SubConverter]) -> N
     ...    registerFormats = ('sonix',)
     ...    registerInputExtensions = ('mus',)
 
-    >>> converter.registerSubconverter(ConverterSonix)
+    >>> converter.registerSubConverter(ConverterSonix)
     >>> scf = converter.Converter().getSubConverterFormats()
     >>> for x in sorted(scf):
     ...     x, scf[x]
@@ -415,67 +417,73 @@ def registerSubconverter(newSubConverter: type[subConverters.SubConverter]) -> N
     ('sonix', <class 'music21.ConverterSonix'>)
     ...
 
-    See `converter.qmConverter` for an example of an extended subconverter.
+    See `converter.qmConverter` for an example of an extended subConverter.
 
-    >>> converter.resetSubconverters() #_DOCS_HIDE
+    >>> converter.resetSubConverters() #_DOCS_HIDE
 
-    Changed in v.9 -- custom subconverters are registered above default subconverters.
+    Changed in v.9 -- custom subConverters are registered above default subConverters.
     '''
-    _registeredSubconverters.appendleft(newSubConverter)
+    _registeredSubConverters.appendleft(newSubConverter)
 
+@common.deprecated
+def registerSubconverter(newSubConverter: type[subConverters.SubConverter]) -> None:
+    '''
+    Deprecated: use registerSubConverter w/ capital "C" instead.
+    '''
+    registerSubConverter(newSubConverter)
 
-def unregisterSubconverter(
-    removeSubconverter: t.Literal['all'] | type[subConverters.SubConverter]
+def unregisterSubConverter(
+    removeSubConverter: t.Literal['all'] | type[subConverters.SubConverter]
 ) -> None:
     # noinspection PyShadowingNames
     '''
-    Remove a Subconverter from the list of registered subconverters.
+    Remove a SubConverter from the list of registered subConverters.
 
-    >>> converter.resetSubconverters() #_DOCS_HIDE
+    >>> converter.resetSubConverters() #_DOCS_HIDE
     >>> mxlConverter = converter.subConverters.ConverterMusicXML
 
     >>> c = converter.Converter()
-    >>> mxlConverter in c.subconvertersList()
+    >>> mxlConverter in c.subConvertersList()
     True
-    >>> converter.unregisterSubconverter(mxlConverter)
-    >>> mxlConverter in c.subconvertersList()
+    >>> converter.unregisterSubConverter(mxlConverter)
+    >>> mxlConverter in c.subConvertersList()
     False
 
-    If there is no such subConverter registered, and it is not a default subconverter,
+    If there is no such subConverter registered, and it is not a default subConverter,
     then a converter.ConverterException is raised:
 
     >>> class ConverterSonix(converter.subConverters.SubConverter):
     ...    registerFormats = ('sonix',)
     ...    registerInputExtensions = ('mus',)
-    >>> converter.unregisterSubconverter(ConverterSonix)
+    >>> converter.unregisterSubConverter(ConverterSonix)
     Traceback (most recent call last):
     music21.converter.ConverterException: Could not remove <class 'music21.ConverterSonix'> from
-                registered subconverters
+                registered subConverters
 
     The special command "all" removes everything including the default converters:
 
-    >>> converter.unregisterSubconverter('all')
-    >>> c.subconvertersList()
+    >>> converter.unregisterSubConverter('all')
+    >>> c.subConvertersList()
     []
 
-    >>> converter.resetSubconverters() #_DOCS_HIDE
+    >>> converter.resetSubConverters() #_DOCS_HIDE
     '''
-    if removeSubconverter == 'all':
-        _registeredSubconverters.clear()
-        _deregisteredSubconverters.clear()
-        _deregisteredSubconverters.append('all')
+    if removeSubConverter == 'all':
+        _registeredSubConverters.clear()
+        _deregisteredSubConverters.clear()
+        _deregisteredSubConverters.append('all')
         return
 
     try:
-        _registeredSubconverters.remove(removeSubconverter)
+        _registeredSubConverters.remove(removeSubConverter)
     except ValueError:
         c = Converter()
-        dsc = c.defaultSubconverters()
-        if removeSubconverter in dsc:
-            _deregisteredSubconverters.append(removeSubconverter)
+        dsc = c.defaultSubConverters()
+        if removeSubConverter in dsc:
+            _deregisteredSubConverters.append(removeSubConverter)
         else:
             raise ConverterException(
-                f'Could not remove {removeSubconverter!r} from registered subconverters')
+                f'Could not remove {removeSubConverter!r} from registered subConverters')
 
 
 # ------------------------------------------------------------------------------
@@ -539,7 +547,7 @@ class Converter:
 
         if useFormat is None:
             useFormat = self.getFormatFromFileExtension(fpPathlib)
-        self.setSubconverterFromFormat(useFormat)
+        self.setSubConverterFromFormat(useFormat)
         if t.TYPE_CHECKING:
             assert isinstance(self.subConverter, subConverters.SubConverter)
 
@@ -696,7 +704,7 @@ class Converter:
                 raise ConverterException('File not found or no such format found for: %s' %
                                          dataStrMakeStr)
 
-        self.setSubconverterFromFormat(useFormat)
+        self.setSubConverterFromFormat(useFormat)
         if t.TYPE_CHECKING:
             assert isinstance(self.subConverter, subConverters.SubConverter)
         self.subConverter.keywords = keywords
@@ -771,7 +779,7 @@ class Converter:
         if useFormat is None:
             raise ConverterException(f'Cannot automatically find a format for {fp!r}')
 
-        self.setSubconverterFromFormat(useFormat)
+        self.setSubConverterFromFormat(useFormat)
         if t.TYPE_CHECKING:
             assert isinstance(self.subConverter, subConverters.SubConverter)
 
@@ -786,28 +794,28 @@ class Converter:
 
 
     # -----------------------------------------------------------------------#
-    # Subconverters
-    def subconvertersList(
-        self,
+    # SubConverters
+    @staticmethod
+    def subConvertersList(
         converterType: t.Literal['any', 'input', 'output'] = 'any'
     ) -> list[type[subConverters.SubConverter]]:
         # noinspection PyAttributeOutsideInit
         '''
-        Gives a list of all the subconverter classes that are registered.
+        Gives a list of all the subConverter classes that are registered.
 
         If converterType is 'any' (true), then input or output
-        subconverters are listed.
+        subConverters are listed.
 
         Otherwise, 'input', or 'output' can be used to filter.
 
-        >>> converter.resetSubconverters() #_DOCS_HIDE
+        >>> converter.resetSubConverters() #_DOCS_HIDE
         >>> c = converter.Converter()
-        >>> scl = c.subconvertersList()
-        >>> defaultScl = c.defaultSubconverters()
+        >>> scl = c.subConvertersList()
+        >>> defaultScl = c.defaultSubConverters()
         >>> tuple(scl) == tuple(defaultScl)
         True
 
-        >>> sclInput = c.subconvertersList('input')
+        >>> sclInput = c.subConvertersList('input')
         >>> sclInput
         [<class 'music21.converter.subConverters.ConverterABC'>,
          <class 'music21.converter.subConverters.ConverterCapella'>,
@@ -824,7 +832,10 @@ class Converter:
          <class 'music21.converter.subConverters.ConverterTinyNotation'>,
          <class 'music21.converter.subConverters.ConverterVolpiano'>]
 
-        >>> sclOutput = c.subconvertersList('output')
+        Get those that can output (note that this is also a static method
+        on converter)
+
+        >>> sclOutput = converter.Converter.subConvertersList('output')
         >>> sclOutput
         [<class 'music21.converter.subConverters.ConverterBraille'>,
          <class 'music21.converter.subConverters.ConverterLilypond'>,
@@ -840,12 +851,12 @@ class Converter:
         >>> class ConverterSonix(converter.subConverters.SubConverter):
         ...    registerFormats = ('sonix',)
         ...    registerInputExtensions = ('mus',)
-        >>> converter.registerSubconverter(ConverterSonix)
-        >>> ConverterSonix in c.subconvertersList()
+        >>> converter.registerSubConverter(ConverterSonix)
+        >>> ConverterSonix in c.subConvertersList()
         True
 
-        Newly registered subconveters appear first, so they will be used instead
-        of any default subconverters that work on the same format or extension.
+        Newly registered subConveters appear first, so they will be used instead
+        of any default subConverters that work on the same format or extension.
 
         >>> class BadMusicXMLConverter(converter.subConverters.SubConverter):
         ...    registerFormats = ('musicxml',)
@@ -853,8 +864,8 @@ class Converter:
         ...    def parseData(self, strData, number=None):
         ...        self.stream = stream.Score(id='empty')
 
-        >>> converter.registerSubconverter(BadMusicXMLConverter)
-        >>> c.subconvertersList()
+        >>> converter.registerSubConverter(BadMusicXMLConverter)
+        >>> c.subConvertersList()
         [<class 'music21.BadMusicXMLConverter'>,
          ...
          <class 'music21.converter.subConverters.ConverterMusicXML'>,
@@ -870,11 +881,11 @@ class Converter:
         >>> len(s.parts)
         0
 
-        Note that if the file has already been parsed by another subconverter format
+        Note that if the file has already been parsed by another subConverter format
         the parameter `forceSource` is required to force the file to be parsed by the
-        newly registered subconverter:
+        newly registered subConverter:
 
-        >>> converter.unregisterSubconverter(BadMusicXMLConverter)
+        >>> converter.unregisterSubConverter(BadMusicXMLConverter)
         >>> #_DOCS_HIDE -- the forceSource will not have created a pickle.
         >>> #_DOCS_SHOW s = corpus.parse('beach/prayer_of_a_tired_child')
         >>> s.id
@@ -883,18 +894,18 @@ class Converter:
         >>> len(s.parts)
         6
 
-        >>> converter.resetSubconverters() #_DOCS_HIDE
+        >>> converter.resetSubConverters() #_DOCS_HIDE
         '''
         subConverterList = []
-        for reg in _registeredSubconverters:
+        for reg in _registeredSubConverters:
             # print(reg)
             subConverterList.append(reg)
 
-        if _deregisteredSubconverters and _deregisteredSubconverters[0] == 'all':
+        if _deregisteredSubConverters and _deregisteredSubConverters[0] == 'all':
             pass
         else:
-            subConverterList.extend(self.defaultSubconverters())
-            for unregistered in _deregisteredSubconverters:
+            subConverterList.extend(Converter.defaultSubConverters())
+            for unregistered in _deregisteredSubConverters:
                 if unregistered == 'all':
                     continue
                 try:
@@ -915,15 +926,16 @@ class Converter:
 
         return filteredSubConvertersList
 
-    def defaultSubconverters(self) -> list[type[subConverters.SubConverter]]:
+    @staticmethod
+    def defaultSubConverters() -> list[type[subConverters.SubConverter]]:
         '''
-        return an alphabetical list of the default subconverters: those in converter.subConverters
-        with the class Subconverter.
+        return an alphabetical list of the default subConverters: those in converter.subConverters
+        with the class SubConverter.
 
-        Do not use generally.  Use Converter.subconvertersList()
+        Do not use generally.  Use Converter.subConvertersList()
 
         >>> c = converter.Converter()
-        >>> for sc in c.defaultSubconverters():
+        >>> for sc in c.defaultSubConverters():
         ...     print(sc)
         <class 'music21.converter.subConverters.ConverterABC'>
         <class 'music21.converter.subConverters.ConverterBraille'>
@@ -947,7 +959,7 @@ class Converter:
         <class 'music21.converter.subConverters.ConverterVolpiano'>
         <class 'music21.converter.subConverters.SubConverter'>
         '''
-        defaultSubconverters: list[type[subConverters.SubConverter]] = []
+        defaultSubConverters: list[type[subConverters.SubConverter]] = []
         for i in sorted(subConverters.__dict__):
             possibleSubConverter = getattr(subConverters, i)
             # noinspection PyTypeChecker
@@ -955,14 +967,17 @@ class Converter:
                     and not isinstance(possibleSubConverter, types.FunctionType)
                     and hasattr(possibleSubConverter, '__mro__')
                     and issubclass(possibleSubConverter, subConverters.SubConverter)):
-                defaultSubconverters.append(possibleSubConverter)
-        return defaultSubconverters
+                defaultSubConverters.append(possibleSubConverter)
+        return defaultSubConverters
 
-    def getSubConverterFormats(self):
+    @staticmethod
+    def getSubConverterFormats() -> dict[str, type[subConverters.SubConverter]]:
         '''
         Get a dictionary of subConverters for various formats.
 
-        >>> scf = converter.Converter().getSubConverterFormats()
+        (staticmethod: call on an instance or the class itself)
+
+        >>> scf = converter.Converter.getSubConverterFormats()
         >>> scf['abc']
         <class 'music21.converter.subConverters.ConverterABC'>
         >>> for x in sorted(scf):
@@ -996,7 +1011,7 @@ class Converter:
         ('xml', <class 'music21.converter.subConverters.ConverterMusicXML'>)
         '''
         converterFormats = {}
-        for name in self.subconvertersList():
+        for name in Converter.subConvertersList():
             if hasattr(name, 'registerFormats'):
                 formatsTuple = name.registerFormats
                 for f in formatsTuple:
@@ -1005,23 +1020,38 @@ class Converter:
                         converterFormats[f] = name
         return converterFormats
 
-    def setSubconverterFromFormat(self, converterFormat: str):
+    @staticmethod
+    def getSubConverterFromFormat(
+        converterFormat: str
+    ) -> subConverters.SubConverter:
         '''
-        sets the .subConverter according to the format of `converterFormat`:
+        Return a particular subConverter class based on the format
+        of the converterFormat string.
 
-        >>> convObj = converter.Converter()
-        >>> convObj.setSubconverterFromFormat('humdrum')
-        >>> convObj.subConverter
-        <music21.converter.subConverters.ConverterHumdrum object at 0x...>
+        Static method: call on the class itself or an instance:
+
+        >>> converter.Converter.getSubConverterFromFormat('musicxml')
+        <music21.converter.subConverters.ConverterMusicXML object at 0x...>
         '''
         if converterFormat is None:
             raise ConverterException('Did not find a format from the source file')
         converterFormat = converterFormat.lower()
-        scf = self.getSubConverterFormats()
+        scf = Converter.getSubConverterFormats()
         if converterFormat not in scf:
             raise ConverterException(f'no converter available for format: {converterFormat}')
         subConverterClass = scf[converterFormat]
-        self.subConverter = subConverterClass()
+        return subConverterClass()
+
+    def setSubConverterFromFormat(self, converterFormat: str):
+        '''
+        sets the .subConverter according to the format of `converterFormat`:
+
+        >>> convObj = converter.Converter()
+        >>> convObj.setSubConverterFromFormat('humdrum')
+        >>> convObj.subConverter
+        <music21.converter.subConverters.ConverterHumdrum object at 0x...>
+        '''
+        self.subConverter = Converter.getSubConverterFromFormat(converterFormat)
 
     def formatFromHeader(
         self,
@@ -1058,10 +1088,10 @@ class Converter:
         >>> class ConverterSonix(converter.subConverters.SubConverter):
         ...    registerFormats = ('sonix',)
         ...    registerInputExtensions = ('mus',)
-        >>> converter.registerSubconverter(ConverterSonix)
+        >>> converter.registerSubConverter(ConverterSonix)
         >>> c.formatFromHeader('sonix: AIFF data')
         ('sonix', 'AIFF data')
-        >>> converter.resetSubconverters() #_DOCS_HIDE
+        >>> converter.resetSubConverters() #_DOCS_HIDE
 
         If bytes are passed in, the data is returned as bytes, but the
         header format is still converted to a string:
@@ -1084,8 +1114,8 @@ class Converter:
             raise ValueError(f'Cannot parse a format from {type(dataStr)}.')
 
         foundFormat = None
-        subconverterList = self.subconvertersList()
-        for sc in subconverterList:
+        subConverterList = self.subConvertersList()
+        for sc in subConverterList:
             for possibleFormat in sc.registerFormats:
                 if dataStrStartLower.startswith(possibleFormat.lower() + ':'):
                     foundFormat = possibleFormat
@@ -1129,7 +1159,7 @@ class Converter:
             unused_subformats = formatList[1:]
         else:
             unused_subformats = []
-        scl = self.subconvertersList()
+        scl = self.subConvertersList()
 
         for sc in scl:
             formats = sc.registerFormats
@@ -1366,7 +1396,7 @@ def toData(obj: base.Music21Object, fmt: str, **keywords) -> str | bytes:
     '''
     Convert `obj` to the given format `fmt` and return the information retrieved.
 
-    Currently, this is somewhat inefficient: it calls Subconverter.toData which
+    Currently, this is somewhat inefficient: it calls SubConverter.toData which
     calls `write()` on the object and reads back the value of the file.
 
     >>> tiny = converter.parse('tinyNotation: 4/4 C4 D E F G1')
@@ -2198,7 +2228,7 @@ class Test(unittest.TestCase):
 # ------------------------------------------------------------------------------
 # define presented order in documentation
 _DOC_ORDER = [parse, parseFile, parseData, parseURL, freeze, thaw, freezeStr, thawStr,
-              Converter, registerSubconverter, unregisterSubconverter]
+              Converter, registerSubConverter, unregisterSubConverter]
 
 
 if __name__ == '__main__':

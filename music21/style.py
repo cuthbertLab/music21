@@ -99,6 +99,9 @@ class Style(ProtoM21Object):
         self.units: str = 'tenths'
         self.hideObjectOnPrint: bool = False
 
+        self.dashLength: float | int | None = None
+        self.spaceLength: float | int | None = None
+
     def _getEnclosure(self) -> Enclosure | None:
         return self._enclosure
 
