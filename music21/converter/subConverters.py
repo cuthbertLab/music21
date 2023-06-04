@@ -33,7 +33,6 @@ from music21 import common
 from music21 import defaults
 from music21 import environment
 from music21 import exceptions21
-from music21 import layout
 from music21 import stream
 
 
@@ -404,14 +403,21 @@ class ConverterIPython(SubConverter):
     #     '''
     #     return HTML(htmlBlock + js)
 
-    def show(self, obj, fmt, app=None, subformats=(), **keywords):  # pragma: no cover
+    def show(self, obj, fmt, app=None, subformats=(),
+             multipageWidget: bool = False,
+             **keywords):  # pragma: no cover
         '''
-        show using the appropriate subformat.
+        show a specialized for Jupyter Notebook using the appropriate subformat.
+
+        For MusicXML runs it through MuseScore and returns the PNG data.
+        (use multipageWidget to get an experimental interactive page display).
+
+        For MIDI: loads a music21j-powered MIDI player in to the Notebook.
         '''
         # noinspection PyPackageRequirements
         from IPython.display import Image, display, HTML  # type: ignore
         from music21 import converter
-        from music21.ipython21 import inGoogleColabNotebook
+        from music21.ipython21 import needsToLoadRequireJS
 
         if subformats:
             helperFormat = subformats[0]
@@ -453,30 +459,10 @@ class ConverterIPython(SubConverter):
                     # noinspection PyTypeChecker
                     display(Image(data=pngData, retina=True))
                 else:
-                    # estimate whether multiple pages will be needed.
-                    multiplePages = False
-
-                    # estimate of the minimum product of number of parts * number
-                    # of measures that indicate multiple pages (or at least a full
-                    # page not to be trimmed)
-                    MULTI_PAGE = 40
-                    NOTES_PER_PAGE = 500
-
-                    if isinstance(s, stream.Stream):
-                        if s[layout.PageLayout].addFilter(lambda pl: pl.isNew).first():
-                            multiplePages = True
-                        elif isinstance(s, stream.Score):
-
-                            numParts = len(s.parts)
-                            if numParts and numParts * len(s.parts[0][stream.Measure]) > MULTI_PAGE:
-                                multiplePages = True
-                        elif len(s.recurse().notesAndRests) > NOTES_PER_PAGE:
-                                multiplePages = True
-
                     fp = helperSubConverter.write(s,
                                                   helperFormat,
                                                   subformats=helperSubformats,
-                                                  trimEdges=not multiplePages,
+                                                  trimEdges=not multipageWidget,
                                                   **keywords
                                                   )
 
@@ -484,24 +470,33 @@ class ConverterIPython(SubConverter):
                         continue
 
                     last_png = ConverterMusicXML.findLastPNGPath(fp)
+                    last_number, num_digits = ConverterMusicXML.findPNGRange(fp, last_png)
+                    pages = {}
+                    stem = str(fp)[:str(fp).rfind('-')]
+                    for pg in range(1, last_number + 1):
+                        page_str = stem + '-' + str(pg).zfill(num_digits) + '.png'
+                        page_fp = pathlib.Path(page_str)
+                        pages[pg] = page_fp
 
-                    if fp.name == last_png.name:
+                    if last_number == 1:
                         # one page PNG -- display normally.
                         display(Image(data=fp.read_bytes(), retina=True))
+                    elif not multipageWidget:
+                        for pg in range(1, last_number + 1):
+                            if pages[pg].exists():
+                                display(Image(data=pages[pg].read_bytes(), retina=True))
+                                if pg < last_number:
+                                    display(HTML('<p style="padding-top: 20px">&nbsp;</p>'))
                     else:
                         # multi-page png -- use our widget.
                         # noinspection PyPackageRequirements
                         from ipywidgets import interact  # type: ignore
-                        last_number, num_digits = ConverterMusicXML.findPNGRange(fp, last_png)
-                        # return last_number, num_digits
-                        stem = str(fp)[:str(fp).rfind('-')]
 
                         @interact(page=(1, last_number))
                         def page_display(page=1):
-                            page_str = stem + '-' + str(page).zfill(num_digits) + '.png'
-                            page_fp = pathlib.Path(page_str)
-                            if page_fp.exists():
-                                display(Image(data=page_fp.read_bytes(), retina=True))
+                            inner_page_fp = pages[page]
+                            if inner_page_fp.exists():
+                                display(Image(data=inner_page_fp.read_bytes(), retina=True))
                             else:
                                 print(f'No file for page {page}.')
 
@@ -528,7 +523,7 @@ class ConverterIPython(SubConverter):
             outputId = 'midiPlayerDiv' + str(s())
 
             load_require_script = ''
-            if inGoogleColabNotebook():
+            if needsToLoadRequireJS():
                 load_require_script = '''
                     <script
                     src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js"
@@ -542,16 +537,23 @@ class ConverterIPython(SubConverter):
                 <link rel="stylesheet" href="https://cuthbertLab.github.io/music21j/css/m21.css">
                 ''' + load_require_script + '''
                 <script>
-                require.config({
-                    paths: {
-                        'music21': 'https://cuthbertLab.github.io/music21j/releases/music21.debug',
-                    }
-                });
-                require(['music21'], function(music21) {
-                    mp = new music21.miditools.MidiPlayer();
-                    mp.addPlayer("#''' + outputId + '''");
-                    mp.base64Load("data:audio/midi;base64,''' + utf_binary + '''");
-                });
+                function ''' + outputId + '''_play() {
+                    const rq = require.config({
+                        paths: {
+                            'music21': 'https://cuthbertLab.github.io/music21j/releases/music21.debug',
+                        }
+                    });
+                    rq(['music21'], function(music21) {
+                        mp = new music21.miditools.MidiPlayer();
+                        mp.addPlayer("#''' + outputId + '''");
+                        mp.base64Load("data:audio/midi;base64,''' + utf_binary + '''");
+                    });
+                }
+                if (typeof require === 'undefined') {
+                    setTimeout(''' + outputId + '''_play, 2000);
+                } else {
+                    ''' + outputId + '''_play();
+                }
                 </script>'''))
 
 
@@ -729,9 +731,8 @@ class ConverterVolpiano(SubConverter):
     registerInputExtensions = ('volpiano', 'vp')
     registerOutputExtensions = ('txt', 'vp')
 
-    def parseData(self, dataString, **keywords):
+    def parseData(self, dataString, *, breaksToLayout: bool = False, **keywords):
         from music21 import volpiano
-        breaksToLayout = keywords.get('breaksToLayout', False)
         self.stream = volpiano.toPart(dataString, breaksToLayout=breaksToLayout)
 
     def getDataStr(self, obj, **keywords):

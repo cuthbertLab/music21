@@ -53,6 +53,17 @@ def inGoogleColabNotebook():
     except NameError:
         return False
 
+def notebookVersion():
+    try:
+        # noinspection PyPackageRequirements
+        import notebook
+        return notebook._version.version_info
+    except (ImportError, AttributeError):
+        return (0, 0, 0)
+
+def needsToLoadRequireJS():
+    return inGoogleColabNotebook() or notebookVersion() >= (7, 0, 0)
+
 
 # if we are imported in an IPython environment, then load magic after two seconds
 # so that everything can settle.
