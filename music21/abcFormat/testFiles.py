@@ -757,7 +757,9 @@ class Test(unittest.TestCase):
         from music21.abcFormat import translate
 
         af = abcFormat.ABCFile()
+        self.assertEqual(af.abcVersion, (1, 3, 0))
         ah = af.readstr(directiveCarryOctave)
+        self.assertEqual(ah.abcVersion, (2, 1, 0))
         s = translate.abcToStreamScore(ah)
         notes = s.flatten().getElementsByClass(note.Note)
         gSharp = notes[1]

@@ -108,6 +108,10 @@ multiMeasureRestMaxSymbols = 11
 # and rewritten on thaw, etc.
 minIdNumberToConsiderMemoryLocation = 100_000_001
 
+
+# abc files without any version information parse as this version
+abcVersionDefault = (1, 3, 0)
+
 # ----------------------------------------------------------------||||||||||||--
 
 

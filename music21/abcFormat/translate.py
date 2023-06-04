@@ -24,6 +24,7 @@ from __future__ import annotations
 import copy
 import unittest
 import re
+import typing  # cannot import as t because of use of t as token throughout
 
 from music21 import articulations
 from music21 import bar
@@ -40,6 +41,9 @@ from music21 import stream
 from music21 import tempo
 from music21 import tie
 
+if typing.TYPE_CHECKING:
+    from music21 import abcFormat
+
 
 environLocal = environment.Environment('abcFormat.translate')
 
@@ -53,7 +57,11 @@ _abcArticulationsToM21 = {
 }
 
 
-def abcToStreamPart(abcHandler, inputM21=None, spannerBundle=None):
+def abcToStreamPart(
+    abcHandler: abcFormat.ABCHandler,
+    inputM21: stream.Part | None = None,
+    spannerBundle: spanner.SpannerBundle | None = None
+) -> stream.Part:
     '''
     Handler conversion of a single Part of a Score with multiple Parts.
     Results are added into the provided inputM21 object
@@ -74,6 +82,9 @@ def abcToStreamPart(abcHandler, inputM21=None, spannerBundle=None):
 
     clefSet = None
     postTransposition = 0
+    dst: stream.Part | stream.Measure
+
+    mergedHandlers: list[abcFormat.ABCHandler] = []
 
     # need to call on entire handlers, as looks for special criteria,
     # like that at least 2 regular bars are used, not just double bars
@@ -83,7 +94,8 @@ def abcToStreamPart(abcHandler, inputM21=None, spannerBundle=None):
         barHandlers = abcHandler.splitByMeasure()
         # environLocal.printDebug(['barHandlers', len(barHandlers)])
         # merge loading metadata with each bar that precedes it
-        mergedHandlers = abcFormat.mergeLeadingMetaData(barHandlers)
+        mergedHandlers = typing.cast(list[abcFormat.ABCHandler],
+                                     abcFormat.mergeLeadingMetaData(barHandlers))
         # environLocal.printDebug(['mergedHandlers', len(mergedHandlers)])
     else:  # simply stick in a single list
         mergedHandlers = [abcHandler]
@@ -102,6 +114,8 @@ def abcToStreamPart(abcHandler, inputM21=None, spannerBundle=None):
     # merged handler are ABCHandlerBar objects, defining attributes for barlines
 
     for mh in mergedHandlers:
+        if typing.TYPE_CHECKING:
+            assert isinstance(mh, abcFormat.ABCHandlerBar)
         # if "use measures" is True and the handler has notes; otherwise add to part
         # environLocal.printDebug(['abcToStreamPart', 'handler', 'left:', mh.leftBarToken,
         #    'right:', mh.rightBarToken, 'len(mh)', len(mh)])
@@ -134,7 +148,7 @@ def abcToStreamPart(abcHandler, inputM21=None, spannerBundle=None):
                         # only append if created; otherwise, already stored
                         spannerBundle.append(rb)
                     else:  # close it here
-                        rb = rbSpanners[0]  # get RepeatBracket
+                        rb = typing.cast(spanner.RepeatBracket, rbSpanners[0])  # get RepeatBracket
                         rb.addSpannedElements(dst)
                         rb.completeStatus = True
                         # this returns 1 or 2 depending on the repeat
@@ -157,7 +171,7 @@ def abcToStreamPart(abcHandler, inputM21=None, spannerBundle=None):
                     rbSpanners = spannerBundle.getByClass(
                         spanner.RepeatBracket).getByCompleteStatus(False)
                     if any(rbSpanners):
-                        rb = rbSpanners[0]  # get RepeatBracket
+                        rb = typing.cast(spanner.RepeatBracket, rbSpanners[0])
                         rb.addSpannedElements(dst)
                         rb.completeStatus = True
                         # this returns 1 or 2 depending on the repeat
@@ -201,7 +215,10 @@ def abcToStreamPart(abcHandler, inputM21=None, spannerBundle=None):
     # following the metadata, or in the open stream
     if not clefSet and not p[clef.Clef]:
         if useMeasures:  # assume at start of measures
-            p.getElementsByClass(stream.Measure).first().clef = clef.bestClef(p, recurse=True)
+            m = p.getElementsByClass(stream.Measure).first()
+            if typing.TYPE_CHECKING:
+                assert m is not None
+            m.clef = clef.bestClef(p, recurse=True)
         else:
             p.insert(0, clef.bestClef(p, recurse=True))
 
@@ -234,7 +251,12 @@ def abcToStreamPart(abcHandler, inputM21=None, spannerBundle=None):
     return p
 
 
-def parseTokens(mh, dst, p, useMeasures):
+def parseTokens(
+    mh: abcFormat.ABCHandler,
+    dst: stream.Measure | stream.Part,
+    p: stream.Part,
+    useMeasures: bool
+) -> tuple[int, bool]:
     '''
     parses all the tokens in a measure or part.
     '''
@@ -245,132 +267,181 @@ def parseTokens(mh, dst, p, useMeasures):
     clefSet = False
     for t in mh.tokens:
         if isinstance(t, abcFormat.ABCMetadata):
-            if t.isMeter():
-                ts = t.getTimeSignatureObject()
-                if ts is not None:  # can be None
-                    # should append at the right position
-                    if useMeasures:  # assume at start of measures
-                        dst.timeSignature = ts
-                    else:
-                        dst.coreAppend(ts)
-            elif t.isKey():
-                ks = t.getKeySignatureObject()
-                if useMeasures:  # assume at start of measures
-                    dst.keySignature = ks
-                else:
-                    dst.coreAppend(ks)
-                # check for clef information sometimes stored in key
-                clefObj, transposition = t.getClefObject()
-                if clefObj is not None:
-                    clefSet = False
-                    # environLocal.printDebug(['found clef in key token:', t,
-                    #     clefObj, transposition])
-                    if useMeasures:  # assume at start of measures
-                        dst.clef = clefObj
-                    else:
-                        dst.coreAppend(clefObj)
-                    postTransposition = transposition
-            elif t.isTempo():
-                mmObj = t.getMetronomeMarkObject()
-                dst.coreAppend(mmObj)
-
+            postTransposition, clefSet = metadataToM21Object(
+                t, dst, postTransposition, clefSet, useMeasures
+            )
         elif isinstance(t, abcFormat.ABCNote):
-            # add the attached chord symbol
-            if t.chordSymbols:
-                cs_name = t.chordSymbols[0]
-                cs_name = re.sub('"', '', cs_name).lstrip().rstrip()
-                cs_name = re.sub('[()]', '', cs_name)
-                cs_name = common.cleanedFlatNotation(cs_name)
-                try:
-                    if cs_name in ('NC', 'N.C.', 'No Chord', 'None'):
-                        cs = harmony.NoChord(cs_name)
-                    elif cs_name.startswith('>'):
-                        continue  # fingering diagram?  Appears in some pieces, ryans-Neumedia
-                    else:
-                        cs = harmony.ChordSymbol(cs_name)
-                    dst.coreAppend(cs, setActiveSite=False)
-                    dst.coreElementsChanged()
-                except ValueError:
-                    pass  # Exclude malformed chord
-
-            # as ABCChord is subclass of ABCNote, handle first
-            if isinstance(t, abcFormat.ABCChord):
-                # Skip an empty chord
-                if not t.subTokens:
-                    continue
-
-                # may have more than notes?
-                pitchNameList = []
-                accStatusList = []  # accidental display status list
-                for tSub in t.subTokens:
-                    # notes are contained as subTokens are already parsed
-                    if isinstance(tSub, abcFormat.ABCNote):
-                        pitchNameList.append(tSub.pitchName)
-                        accStatusList.append(tSub.accidentalDisplayStatus)
-                c = chord.Chord(pitchNameList)
-                c.duration.quarterLength = t.quarterLength
-                if t.activeTuplet:
-                    thisTuplet = copy.deepcopy(t.activeTuplet)
-                    if thisTuplet.durationNormal is None:
-                        thisTuplet.setDurationType(c.duration.type, c.duration.dots)
-                    c.duration.appendTuplet(thisTuplet)
-                # adjust accidental display for each contained pitch
-                for pIndex in range(len(c.pitches)):
-                    if c.pitches[pIndex].accidental is None:
-                        continue
-                    c.pitches[pIndex].accidental.displayStatus = accStatusList[pIndex]
-                dst.coreAppend(c)
-
-                # ql += t.quarterLength
-            else:
-                if t.isRest:
-                    n = note.Rest()
-                else:
-                    n = note.Note(t.pitchName)
-                    if n.pitch.accidental is not None:
-                        n.pitch.accidental.displayStatus = t.accidentalDisplayStatus
-
-                n.duration.quarterLength = t.quarterLength
-                if t.activeTuplet:
-                    thisTuplet = copy.deepcopy(t.activeTuplet)
-                    if thisTuplet.durationNormal is None:
-                        thisTuplet.setDurationType(n.duration.type, n.duration.dots)
-                    n.duration.appendTuplet(thisTuplet)
-
-                # start or end a tie at note n
-                if t.tie is not None:
-                    if t.tie in ('start', 'continue'):
-                        n.tie = tie.Tie(t.tie)
-                        n.tie.style = 'normal'
-                    elif t.tie == 'stop':
-                        n.tie = tie.Tie(t.tie)
-                # Was: Extremely Slow for large Opus files... why?
-                # Answer: some pieces didn't close all their spanners, so
-                # everything was in a Slur/Diminuendo, etc.
-                for span in t.applicableSpanners:
-                    span.addSpannedElements(n)
-
-                if t.inGrace:
-                    n = n.getGrace()
-
-                n.articulations = []
-                while any(t.articulations):
-                    tokenArticulationStr = t.articulations.pop()
-                    if tokenArticulationStr not in _abcArticulationsToM21:
-                        continue
-                    m21ArticulationClass = _abcArticulationsToM21[tokenArticulationStr]
-                    m21ArticulationObj = m21ArticulationClass()
-                    n.articulations.append(m21ArticulationObj)
-
-                dst.coreAppend(n, setActiveSite=False)
-
+            parseABCNote(t, dst)
         elif isinstance(t, abcFormat.ABCSlurStart):
+            if typing.TYPE_CHECKING:
+                assert t.slurObj is not None
             p.coreAppend(t.slurObj)
         elif isinstance(t, abcFormat.ABCCrescStart):
+            if typing.TYPE_CHECKING:
+                assert t.crescObj is not None
             p.coreAppend(t.crescObj)
         elif isinstance(t, abcFormat.ABCDimStart):
+            if typing.TYPE_CHECKING:
+                assert t.dimObj is not None
             p.coreAppend(t.dimObj)
     dst.coreElementsChanged()
+    return postTransposition, clefSet
+
+def parseABCNote(
+    t: abcFormat.ABCNote,
+    dst: stream.Measure | stream.Part,
+) -> None:
+    '''
+    Parse an ABCNote object and add it to the destination stream.
+    '''
+    from music21 import abcFormat
+
+    n: note.GeneralNote
+    cs: harmony.ChordSymbol | harmony.NoChord
+
+    # add the attached chord symbol
+    if t.chordSymbols:
+        cs_name = t.chordSymbols[0]
+        cs_name = re.sub('"', '', cs_name).lstrip().rstrip()
+        cs_name = re.sub('[()]', '', cs_name)
+        cs_name = common.cleanedFlatNotation(cs_name)
+        try:
+            if cs_name in ('NC', 'N.C.', 'No Chord', 'None'):
+                cs = harmony.NoChord(cs_name)
+            elif cs_name.startswith('>'):
+                return  # fingering diagram?  Appears in some pieces, ryans-Neumedia
+            else:
+                cs = harmony.ChordSymbol(cs_name)
+            dst.coreAppend(cs, setActiveSite=False)
+            dst.coreElementsChanged()
+        except ValueError:
+            pass  # Exclude malformed chord
+
+    # as ABCChord is subclass of ABCNote, handle first
+    if isinstance(t, abcFormat.ABCChord):
+        # Skip an empty chord
+        if not t.subTokens:
+            return
+
+        # may have more than notes?
+        pitchNameList: list[str] = []
+        accStatusList = []  # accidental display status list
+        for tSub in t.subTokens:
+            # notes are contained as subTokens are already parsed
+            if isinstance(tSub, abcFormat.ABCNote):
+                pn = tSub.pitchName
+                if typing.TYPE_CHECKING:
+                    assert pn is not None
+                pitchNameList.append(pn)
+                accStatusList.append(tSub.accidentalDisplayStatus)
+        c = chord.Chord(pitchNameList)
+        c.duration.quarterLength = t.quarterLength
+        if t.activeTuplet:
+            thisTuplet = copy.deepcopy(t.activeTuplet)
+            if thisTuplet.durationNormal is None:
+                thisTuplet.setDurationType(c.duration.type, c.duration.dots)
+            c.duration.appendTuplet(thisTuplet)
+        # adjust accidental display for each contained pitch
+        for pIndex in range(len(c.pitches)):
+            acc = c.pitches[pIndex].accidental
+            if acc is not None:
+                acc.displayStatus = accStatusList[pIndex]
+        dst.coreAppend(c)
+
+        # ql += t.quarterLength
+    else:
+        if t.isRest:
+            n = note.Rest()
+        else:
+            n = note.Note(t.pitchName)
+            if n.pitch.accidental is not None:
+                n.pitch.accidental.displayStatus = t.accidentalDisplayStatus
+
+        n.duration.quarterLength = t.quarterLength
+        if t.activeTuplet:
+            thisTuplet = copy.deepcopy(t.activeTuplet)
+            if thisTuplet.durationNormal is None:
+                thisTuplet.setDurationType(n.duration.type, n.duration.dots)
+            n.duration.appendTuplet(thisTuplet)
+
+        # start or end a tie at note n
+        if t.tie is not None:
+            if t.tie in ('start', 'continue'):
+                n.tie = tie.Tie(t.tie)
+                n.tie.style = 'normal'
+            elif t.tie == 'stop':
+                n.tie = tie.Tie(t.tie)
+        # Was: Extremely Slow for large Opus files... why?
+        # Answer: some pieces didn't close all their spanners, so
+        # everything was in a Slur/Diminuendo, etc.
+        for span in t.applicableSpanners:
+            span.addSpannedElements(n)
+
+        if t.inGrace:
+            n = n.getGrace()
+
+        n.articulations = []
+        while any(t.articulations):
+            tokenArticulationStr = t.articulations.pop()
+            if tokenArticulationStr not in _abcArticulationsToM21:
+                continue
+            m21ArticulationClass = _abcArticulationsToM21[tokenArticulationStr]
+            m21ArticulationObj = m21ArticulationClass()
+            n.articulations.append(m21ArticulationObj)
+
+        dst.coreAppend(n, setActiveSite=False)
+
+
+def metadataToM21Object(
+    t: abcFormat.ABCMetadata,
+    dst: stream.Measure | stream.Part,
+    postTransposition: int,
+    clefSet: bool,
+    useMeasures: bool,
+) -> tuple[int, bool]:
+    '''
+    Parse a single ABCMetadata token, that does not represent what
+    music21 considers metadata, such as a time signature, key signature,
+    clef, or tempo, and put it in dst.
+
+    This function uses coreAppend operations, so if called separately,
+    dst.coreElementsChanged() should be called before accessing the stream.
+
+    Returns the changed transposition and whether clef was set.
+    '''
+    if t.isMeter():
+        ts = t.getTimeSignatureObject()
+        if ts is not None:  # can be None
+            # should append at the right position
+            if useMeasures:  # assume at start of measures
+                dst.timeSignature = ts
+            else:
+                dst.coreAppend(ts)
+    elif t.isKey():
+        ks = t.getKeySignatureObject()
+        if ks is not None and useMeasures:
+            # assume at start of measures
+            dst.keySignature = ks
+        elif ks is not None:
+            dst.coreAppend(ks)
+        # check for clef information sometimes stored in key
+        clefObj, transposition = t.getClefObject()
+        if clefObj is not None and transposition is not None:
+            # "and transposition is not None" for type checking.
+            clefSet = False
+            # environLocal.printDebug(['found clef in key token:', t,
+            #     clefObj, transposition])
+            if useMeasures:  # assume at start of measures
+                dst.clef = clefObj
+            else:
+                dst.coreAppend(clefObj)
+            postTransposition = transposition
+    elif t.isTempo():
+        mmObj = t.getMetronomeMarkObject()
+        if typing.TYPE_CHECKING:
+            assert mmObj is not None
+        dst.coreAppend(mmObj)
+
     return postTransposition, clefSet
 
 
@@ -401,7 +472,16 @@ def abcToStreamScore(abcHandler, inputM21=None):
     titleCount = 0
     for t in abcHandler.tokens:
         if isinstance(t, abcFormat.ABCMetadata):
-            if t.isTitle():
+            if t.isVersion():
+                v = t.data.replace('abc-version', '').strip()
+                try:
+                    abcHandler.abcVersion = abcHandler.returnAbcVersionFromMatch(
+                        re.match(r'(\d+).(\d+).?(\d+)?', v)
+                    )
+                except AttributeError:
+                    pass
+
+            elif t.isTitle():
                 if titleCount == 0:  # first
                     md.add('title', t.data)
                     # environLocal.printDebug(['got metadata title', t.data])
