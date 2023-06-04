@@ -1767,6 +1767,11 @@ class Chord(ChordBase):
 
         stepNumsToPitches: dict[int, pitch.Pitch] = {pitch.STEP_TO_DNN_OFFSET[p.step]: p
                                                      for p in nonDuplicatingPitches}
+
+        # TODO: duplicate the steps array [1,0,1,0,1,0,0] so it's [1,0,1,0,1,0,0,1,0,1,0,1,0,0]
+        #    and then for each cardinality, use a template like [1, 0, 1, 0, 1] to slide along
+        #    and see if it fits -- this will allow this routine to work for any number of
+        #    steps from 3-6.
         stepNums = sorted(stepNumsToPitches)
         for startIndex in range(lenPitches):
             all_are_thirds = True

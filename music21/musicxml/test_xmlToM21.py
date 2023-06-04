@@ -166,6 +166,26 @@ class Test(unittest.TestCase):
         lastOffset = lastMeasure.elementOffset(lastElement, returnSpecial=True)
         self.assertEqual(lastOffset, 'highestTime')
 
+    def testMultipleStavesInPartWithOttava(self):
+        from music21 import converter
+        from music21.musicxml import testPrimitive
+        s = converter.parse(testPrimitive.pianoStaffWithOttava)
+        self.assertEqual(len(s.getElementsByClass(stream.PartStaff)), 2)
+        ps0 = s[stream.PartStaff][0]
+        self.assertEqual(len(ps0.getElementsByClass(spanner.Ottava)), 1)
+        m0 = ps0[stream.Measure][0]
+        self.assertEqual(
+            [p.nameWithOctave for p in m0.pitches],
+            ['E-5', 'E-6', 'D5', 'D6', 'C5', 'C6', 'E-5', 'E-6', 'F5', 'F6', 'E5', 'E6',
+             'D5', 'D6', 'F5', 'F6', 'F#5', 'A5', 'G#5', 'B5']
+        )
+        s.toWrittenPitch(inPlace=True)
+        self.assertEqual(
+            [p.nameWithOctave for p in m0.pitches],
+            ['E-4', 'E-5', 'D4', 'D5', 'C4', 'C5', 'E-4', 'E-5', 'F4', 'F5', 'E4', 'E5',
+             'D4', 'D5', 'F4', 'F5', 'F#4', 'A4', 'G#4', 'B4']
+        )
+
     def testSpannersA(self):
         from music21 import converter
         from music21.musicxml import testPrimitive
@@ -340,13 +360,15 @@ class Test(unittest.TestCase):
         self.assertGreater(len(mms), 3)
 
     def testImportMetronomeMarksB(self):
-        pass
-        # TODO: look for files that only have sound tags and create MetronomeMarks
-        # need to look for bundling of Words text expressions with tempo
-
-        # has only sound tempo=x tag
-        # s = converter.parse(testPrimitive.articulations01)
-        # s.show()
+        '''
+        Import sound tempo marks as MetronomeMarks.
+        '''
+        from music21 import corpus
+        s = corpus.parse('bach/bwv69.6.xml')
+        self.assertEqual(len(s.flatten()[tempo.MetronomeMark]), 8)
+        for p in s.parts:
+            self.assertEqual(p.measure(0)[tempo.MetronomeMark][0].number, 96)
+            self.assertEqual(p.measure(0)[tempo.MetronomeMark][0].referent, duration.Duration(1.0))
 
     def testImportMetronomeMarksC(self):
         '''
@@ -590,7 +612,7 @@ class Test(unittest.TestCase):
             for e in n.expressions:
                 if 'Turn' in e.classes:
                     count += 1
-        self.assertEqual(count, 4)  # include inverted turn
+        self.assertEqual(count, 5)  # include inverted turn
 
         count = 0
         for n in s.recurse().notes:
@@ -598,6 +620,18 @@ class Test(unittest.TestCase):
                 if 'InvertedTurn' in e.classes:
                     count += 1
         self.assertEqual(count, 1)
+
+        upperCount = 0
+        lowerCount = 0
+        for n in s.recurse().notes:
+            for e in n.expressions:
+                if 'Turn' in e.classes:
+                    if e.upperAccidental is not None:
+                        upperCount += 1
+                    if e.lowerAccidental is not None:
+                        lowerCount += 1
+        self.assertEqual(upperCount, 2)
+        self.assertEqual(lowerCount, 1)
 
         count = 0
         for n in s.recurse().notes:

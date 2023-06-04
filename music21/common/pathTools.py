@@ -41,7 +41,7 @@ def getSourceFilePath() -> pathlib.Path:
     fpMusic21 = fpThis.parent.parent  # common is two levels deep
     # use stream as a test case
     if 'stream' not in [x.name for x in fpMusic21.iterdir()]:
-        raise Exception(
+        raise FileNotFoundError(
             f'cannot find expected music21 directory: {fpMusic21}'
         )  # pragma: no cover
     return fpMusic21

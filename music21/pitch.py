@@ -105,6 +105,8 @@ accidentalNameToModifier = {
     'one-and-a-half-flat': '-`',
 }
 
+modifierToAccidentalName = {v: k for k, v in accidentalNameToModifier.items()}
+
 unicodeFromModifier = OrderedDict([
     ('####', chr(0x1d12a) + chr(0x1d12a)),
     ('###', '\u266f' + chr(0x1d12a)),
@@ -121,6 +123,33 @@ unicodeFromModifier = OrderedDict([
     ('', '\u266e'),  # natural
 ])
 
+alternateNameToAccidentalName = {
+    'n': 'natural',
+    'is': 'sharp',
+    'isis': 'double-sharp',
+    'isisis': 'triple-sharp',
+    'isisisis': 'quadruple-sharp',
+    'es': 'flat',
+    'b': 'flat',
+    'eses': 'double-flat',
+    'eseses': 'triple-flat',
+    'eseseses': 'quadruple-flat',
+    'quarter-sharp': 'half-sharp',
+    'ih': 'half-sharp',
+    'semisharp': 'half-sharp',
+    'three-quarter-sharp': 'one-and-a-half-sharp',
+    'three-quarters-sharp': 'one-and-a-half-sharp',
+    'isih': 'one-and-a-half-sharp',
+    'sesquisharp': 'one-and-a-half-sharp',
+    'quarter-flat': 'half-flat',
+    'eh': 'half-flat',
+    'semiflat': 'half-flat',
+    'three-quarter-flat': 'one-and-a-half-flat',
+    'three-quarters-flat': 'one-and-a-half-flat',
+    'eseh': 'one-and-a-half-flat',
+    'sesquiflat': 'one-and-a-half-flat',
+}
+
 
 # sort modifiers by length, from longest to shortest
 def _sortModifiers():
@@ -133,6 +162,78 @@ def _sortModifiers():
 
 
 accidentalModifiersSorted = _sortModifiers()
+
+def isValidAccidentalName(name: str) -> bool:
+    '''
+    Check if name is a valid accidental name string that can
+    be used to initialize an Accidental.
+
+    Standard accidental names are valid:
+
+    >>> pitch.isValidAccidentalName('double-flat')
+    True
+
+    Accidental modifiers are valid:
+
+    >>> pitch.isValidAccidentalName('--')
+    True
+
+    Alternate accidental names are valid:
+
+    >>> pitch.isValidAccidentalName('eses')
+    True
+
+    Anything else is not valid:
+
+    >>> pitch.isValidAccidentalName('two flats')
+    False
+    '''
+    # check against official names
+    if name in accidentalNameToModifier:
+        return True
+
+    # check against official modifiers
+    if name in accidentalNameToModifier.values():
+        return True
+
+    # check against alternate supported names
+    if name in alternateNameToAccidentalName:
+        return True
+
+    return False
+
+def standardizeAccidentalName(name: str) -> str:
+    '''
+    Convert a valid accidental name to the standard accidental name.
+    Raises AccidentalException if name is not a valid accidental name.
+
+    >>> pitch.standardizeAccidentalName('double-flat')
+    'double-flat'
+
+    >>> pitch.standardizeAccidentalName('--')
+    'double-flat'
+
+    >>> pitch.standardizeAccidentalName('eses')
+    'double-flat'
+
+    >>> pitch.standardizeAccidentalName('two flats')
+    Traceback (most recent call last):
+    music21.pitch.AccidentalException: 'two flats' is not a supported accidental type
+    '''
+    if name in accidentalNameToModifier:
+        # it is already standardized, just return it
+        return name
+
+    if name in modifierToAccidentalName:
+        # it is a modifier, look up standardized name
+        return modifierToAccidentalName[name]
+
+    if name in alternateNameToAccidentalName:
+        # it is an alternate name, look up standardized name
+        return alternateNameToAccidentalName[name]
+
+    raise AccidentalException(f"'{name}' is not a supported accidental type")
+
 
 
 # ------------------------------------------------------------------------------
@@ -407,7 +508,7 @@ def _convertCentsToAlterAndCents(shift) -> tuple[float, float]:
         alterShift = 1.0
         cents = value - 100
     else:  # pragma: no cover
-        raise Exception(f'value exceeded range: {value}')
+        raise ValueError(f'value exceeded range: {value}')
     return alterShift + alterAdd, float(cents)
 
 
@@ -1253,7 +1354,6 @@ class Accidental(prebase.ProtoM21Object, style.StyleMixin):
 
         This is needed when transposing Pitches: we need to retain accidental display properties.
 
-
         >>> a = pitch.Accidental('double-flat')
         >>> a.displayType = 'always'
         >>> b = pitch.Accidental('sharp')
@@ -1894,43 +1994,60 @@ class Pitch(prebase.ProtoM21Object):
         else:
             return name
 
-    def __eq__(self, other):
+    def __eq__(self, other: object):
         '''
-        Do not accept enharmonic equivalence.
+        Are two pitches equal?
 
-        >>> a = pitch.Pitch('c2')
-        >>> a.octave
+        They must both sound the same and be spelled the same.
+        Enharmonic equivalence is not equality, nor is impliedOctave
+        or is a pitch without an accidental equal to a pitch with a
+        natural accidental.  (See `:meth:`~music21.pitch.Pitch.isEnharmonic` for
+        a method that does not require spelling equivalence, and for an example
+        of how to compare notes without accidentals to notes with natural
+        accidentals.)
+
+        >>> c = pitch.Pitch('C2')
+        >>> c.octave
         2
-        >>> b = pitch.Pitch('c#4')
-        >>> b.octave
+        >>> cs = pitch.Pitch('C#4')
+        >>> cs.octave
         4
-        >>> a == b
+        >>> c == cs
         False
-        >>> a != b
+        >>> c != cs
         True
 
-        >>> c = 7
-        >>> a == c
+        >>> seven = 7
+        >>> c == seven
         False
 
-        >>> a != c
+        >>> c != seven
         True
 
-        >>> d = pitch.Pitch('d-4')
-        >>> b == d
+        >>> df = pitch.Pitch('D-4')
+        >>> cs == df
         False
+
+        Implied octaves do not equal explicit octaves
+
+        >>> c4 = pitch.Pitch('C4')
+        >>> cImplied = pitch.Pitch('C')
+        >>> c4 == cImplied
+        False
+        >>> c4.ps == cImplied.ps
+        True
+
+        Note: currently spellingIsInferred and fundamental
+        are not checked -- this behavior may change in the future.
         '''
-        if other is None:
-            return False
-        elif not isinstance(other, Pitch):
-            return False
-        elif (self.octave == other.octave
-              and self.step == other.step
-              and self.accidental == other.accidental
-              and self.microtone == other.microtone):
+        if not isinstance(other, Pitch):
+            return NotImplemented
+        if (self.octave == other.octave
+                and self.step == other.step
+                and self.accidental == other.accidental
+                and self.microtone == other.microtone):
             return True
-        else:
-            return False
+        return False
 
     # noinspection PyArgumentList
     def __deepcopy__(self, memo):
@@ -2103,7 +2220,10 @@ class Pitch(prebase.ProtoM21Object):
         elif isinstance(value, str):
             # int version is used in interval.py which cannot import Pitch directly
             self._accidental = Accidental(value)
-        elif isinstance(value, (int, float)):
+        elif isinstance(value, int):
+            self._accidental = Accidental(value)
+            self._microtone = None
+        elif isinstance(value, float):
             # check and add any microtones
             alter, cents = _convertCentsToAlterAndCents(value * 100.0)
             self._accidental = Accidental(alter)
@@ -3779,8 +3899,7 @@ class Pitch(prebase.ProtoM21Object):
 
     def isEnharmonic(self, other: Pitch) -> bool:
         '''
-        Return True if other is an enharmonic equivalent of self.
-
+        Return True if another Pitch is an enharmonic equivalent of this Pitch.
 
         >>> p1 = pitch.Pitch('C#3')
         >>> p2 = pitch.Pitch('D-3')
@@ -3792,26 +3911,19 @@ class Pitch(prebase.ProtoM21Object):
         >>> p3.isEnharmonic(p1)
         False
 
-        Quarter tone enharmonics work as well:
+        Pitches are enharmonics of themselves:
 
         >>> pC = pitch.Pitch('C4')
-        >>> pC.accidental = pitch.Accidental('one-and-a-half-sharp')
-        >>> pC
-        <music21.pitch.Pitch C#~4>
-        >>> pD = pitch.Pitch('D4')
-        >>> pD.accidental = pitch.Accidental('half-flat')
-        >>> pD
-        <music21.pitch.Pitch D`4>
-        >>> pC.isEnharmonic(pD)
+        >>> pC.isEnharmonic(pC)
         True
 
-        Notes in different ranges are not enharmonics:
+        Notes that sound in different octaves are not enharmonics:
 
         >>> pitch.Pitch('C#4').isEnharmonic( pitch.Pitch('D-5') )
         False
 
-        However, different octaves can be the same range, because octave number
-        is relative to the `step` (natural form) of the pitch.
+        However, different octave numbers can be the same enharmonic,
+        because octave number is relative to the `step` (natural form) of the pitch.
 
         >>> pitch.Pitch('C4').isEnharmonic( pitch.Pitch('B#3') )
         True
@@ -3823,6 +3935,18 @@ class Pitch(prebase.ProtoM21Object):
         >>> pitch.Pitch('C#').isEnharmonic( pitch.Pitch('D-9') )
         True
         >>> pitch.Pitch('C#4').isEnharmonic( pitch.Pitch('D-') )
+        True
+
+        Quarter tone enharmonics work as well:
+
+        >>> pC.accidental = pitch.Accidental('one-and-a-half-sharp')
+        >>> pC
+        <music21.pitch.Pitch C#~4>
+        >>> pD = pitch.Pitch('D4')
+        >>> pD.accidental = pitch.Accidental('half-flat')
+        >>> pD
+        <music21.pitch.Pitch D`4>
+        >>> pC.isEnharmonic(pD)
         True
 
         Microtonally altered pitches do not return True unless the microtones are the same:
@@ -3837,23 +3961,43 @@ class Pitch(prebase.ProtoM21Object):
         >>> pSharp.isEnharmonic(pFlat)
         True
 
-
-        Extreme enharmonics seem to work great.
+        Extreme enharmonics also work:
 
         >>> p4 = pitch.Pitch('B##3')
-        >>> p5 = pitch.Pitch('D-4')
+        >>> p5 = pitch.Pitch('E---4')
         >>> p4.isEnharmonic(p5)
         True
+
+        If either pitch has no octave then the comparison is done without
+        regard to octave:
+
+        >>> pSharp4 = pitch.Pitch('C#4')
+        >>> pFlatNoOctave = pitch.Pitch('D-')
+        >>> pSharp4.isEnharmonic(pFlatNoOctave)
+        True
+        >>> pFlatNoOctave.isEnharmonic(pSharp4)
+        True
+
+        `isEnharmonic` can be combined with a test to see if two pitches have the
+        same step to ensure that they both sound the same and are written
+        the same, without regard to the presence or absence of an accidental
+        (this is used in `:meth:~music21.stream.base.Stream.stripTies`):
+
+        >>> pD4 = pitch.Pitch('D4')
+        >>> pDNatural4 = pitch.Pitch('D4', accidental=pitch.Accidental('natural'))
+        >>> pD4 == pDNatural4
+        False
+        >>> pD4.isEnharmonic(pDNatural4) and pD4.step == pDNatural4.step
+        True
+        >>> pEbb4 = pitch.Pitch('E--4')
+        >>> pD4.isEnharmonic(pEbb4) and pD4.step == pEbb4.step
+        False
         '''
         if other.octave is None or self.octave is None:
-            if (other.ps - self.ps) % 12 == 0:
-                return True
-            return False
-        # if pitch space are equal, these are enharmonics
+            return (other.ps - self.ps) % 12 == 0
         else:
-            if other.ps == self.ps:
-                return True
-            return False
+            # if pitch spaces are equal, these are enharmonics
+            return other.ps == self.ps
 
     # a cache so that interval objects can be reused...
     _transpositionIntervals: dict[t.Literal['d2', '-d2'], interval.Interval] = {}
@@ -3937,7 +4081,7 @@ class Pitch(prebase.ProtoM21Object):
 
         >>> p4.getHigherEnharmonic()
         Traceback (most recent call last):
-        music21.pitch.AccidentalException: -5.0 is not a supported accidental type
+        music21.pitch.AccidentalException: -5 is not a supported accidental type
 
         Note that half accidentals (~ = half-sharp, ` = half-flat)
         get converted to microtones:
@@ -4458,6 +4602,18 @@ class Pitch(prebase.ProtoM21Object):
         >>> pc6.transpose(10, inPlace=True)
         >>> pc6.spellingIsInferred
         True
+
+        Test an issue with inPlace not setting microtone.
+
+        >>> flatAndAHalf = pitch.Accidental('one-and-a-half-flat')
+        >>> dFlatAndAHalf = pitch.Pitch('D2')
+        >>> dFlatAndAHalf.accidental = flatAndAHalf
+        >>> dPitch = pitch.Pitch('D2')
+        >>> intv = interval.Interval(dFlatAndAHalf, dPitch)
+        >>> dPitch.transpose(intv, inPlace=True)
+        >>> dPitch
+        <music21.pitch.Pitch D#2(+50c)>
+
         '''
         # environLocal.printDebug(['Pitch.transpose()', value])
         if isinstance(value, interval.IntervalBase):
@@ -4486,6 +4642,9 @@ class Pitch(prebase.ProtoM21Object):
             # set fundamental
             self.fundamental = p.fundamental
             self.spellingIsInferred = p.spellingIsInferred
+            # deepcopy _microtone if present (not thru microtone property to detect None)
+            if p._microtone is not None:
+                self._microtone = copy.deepcopy(p._microtone)
             return None
 
     # --------------------------------------------------------------------------

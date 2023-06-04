@@ -44,6 +44,7 @@ import typing as t
 from enum import IntEnum
 
 from music21 import common
+from music21 import defaults
 from music21 import environment
 from music21 import exceptions21
 from music21 import prebase
@@ -400,6 +401,7 @@ class MetaEvents(_ContainsEnum):
     TIME_SIGNATURE = 0x58
     KEY_SIGNATURE = 0x59
     SEQUENCER_SPECIFIC_META_EVENT = 0x7F
+    UNKNOWN = 0xFF  # Container for any unknown code
 
 
 class SysExEvents(_ContainsEnum):
@@ -890,8 +892,8 @@ class MidiEvent(prebase.ProtoM21Object):
             # and process as before
             midiBytes = rsb + midiBytes
             byte0 = midiBytes[0]
-        else:
-            # store last status byte
+        elif midiBytes[0] != 0xff:
+            # store last status byte, unless it's a meta message
             self.lastStatusByte = midiBytes[0]
 
         msgType: int = byte0 & 0xF0  # bitwise and to derive message type w/o channel
@@ -914,11 +916,12 @@ class MidiEvent(prebase.ProtoM21Object):
 
         # SEQUENCE_TRACK_NAME and other MetaEvents are here
         elif byte0 == METAEVENT_MARKER:  # 0xFF
-            if not MetaEvents.hasValue(byte1):
-                environLocal.printDebug([f'unknown meta event: FF {byte1:02X}'])
-                sys.stdout.flush()
-                raise MidiException(f'Unknown midi event type: FF {byte1:02X}')
-            self.type = MetaEvents(byte1)
+            if MetaEvents.hasValue(byte1):
+                self.type = MetaEvents(byte1)
+            else:
+                # environLocal.printDebug([f'unknown meta event: FF {byte1:02X}'])
+                # sys.stdout.flush()
+                self.type = MetaEvents.UNKNOWN
             length, midiBytesAfterLength = getVariableLengthNumber(midiBytes[2:])
             self.data = midiBytesAfterLength[:length]
             # return remainder
@@ -1516,7 +1519,7 @@ class MidiFile(prebase.ProtoM21Object):
     Most midi files store `ticksPerQuarterNote` and not `ticksPerSecond`
 
     >>> mf.ticksPerQuarterNote
-    1024
+    10080
     >>> mf.ticksPerSecond is None
     True
 
@@ -1531,7 +1534,7 @@ class MidiFile(prebase.ProtoM21Object):
         self.file = None
         self.format = 1
         self.tracks = []
-        self.ticksPerQuarterNote = 1024
+        self.ticksPerQuarterNote = defaults.ticksPerQuarter
         self.ticksPerSecond = None
 
     def open(self, filename, attrib='rb'):
@@ -1985,6 +1988,13 @@ class Test(unittest.TestCase):
                             if e.type == ChannelVoiceMessages.POLYPHONIC_KEY_PRESSURE][0]
         self.assertEqual(pressureEventRead.parameter1, 60)
         self.assertEqual(pressureEventRead.parameter2, 90)
+
+    def testReadUnknownMetaMessage(self):
+        mt = MidiTrack()
+        mt.processDataToEvents(b'\x00\xff\x08\x06DUMMY\x00\x00\xff\n\x05Myut\x00'
+                               + b'\x00\xffX\x04\x03\x01\x12\x01')
+        self.assertEqual(len(mt.events), 6)
+        self.assertEqual(mt.events[3].type, MetaEvents.UNKNOWN)
 
 
 # ------------------------------------------------------------------------------

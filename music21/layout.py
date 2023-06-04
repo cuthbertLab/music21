@@ -58,8 +58,8 @@ needs to easily iterate around the systems and pages defined through the layout 
 just described, or to get the exact position on a page (or a graphical representation
 of a page) for a particular measure or system.  (Individual notes coming soon).  Normal
 Score streams can be changed into LayoutStreams by calling `divideByPages(s)` on them.
-A Score that was organized: Score->Parts->Measures would then become:
-LayoutScore->Pages->Systems->Parts->Measures.
+A Score that was organized: Score->Part->Measure would then become:
+LayoutScore->Page->System->Staff->Measure.
 
 The new LayoutScore has methods that enable querying what page or system a measure is in, and
 specifically where on a page a measure is (or the dimensions

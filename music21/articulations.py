@@ -84,6 +84,7 @@ from music21 import common
 from music21.common.classTools import tempAttribute
 from music21 import environment
 from music21 import style
+from music21 import spanner
 
 if t.TYPE_CHECKING:
     from music21 import interval
@@ -568,10 +569,16 @@ class FrettedPluck(FretIndication, Fingering):
     '''
     pass
 
-class HammerOn(FretIndication):
+class HammerOn(spanner.Spanner, TechnicalIndication):
+    '''
+    A hammer-on represented as a spanner between two Notes.
+    '''
     pass
 
-class PullOff(FretIndication):
+class PullOff(spanner.Spanner, TechnicalIndication):
+    '''
+    A pull-off represented as a spanner between two Notes.
+    '''
     pass
 
 class FretBend(FretIndication):
@@ -681,4 +688,3 @@ _DOC_ORDER = [Articulation]
 if __name__ == '__main__':
     import music21
     music21.mainTest(Test)
-

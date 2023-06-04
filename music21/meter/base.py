@@ -40,6 +40,7 @@ from music21.meter.core import MeterSequence
 environLocal = environment.Environment('meter')
 
 if t.TYPE_CHECKING:
+    from music21.common.types import OffsetQL
     from music21 import stream
 
 # this is just a placeholder so that .beamSequence, etc. do not need to
@@ -447,9 +448,66 @@ class TimeSignature(TimeSignatureBase):
     '2/4+3/16' or '11/16 (2/4+3/16)'.  Or you might want the written
     TimeSignature to contradict what the notes imply.  All this can be done
     with .displaySequence.
+
+    **Equality**
+
+    For two time signatures to be considered equal,
+    they have the same name and internal structure.
+
+    The name is tested by the :attr:`~music21.meter.TimeSignature.symbol`.
+    This helps distinguish between 'Cut' and '2/2', for example.
+
+    >>> tsCut = meter.TimeSignature('Cut')
+    >>> ts22 = meter.TimeSignature('2/2')
+    >>> tsCut == ts22
+    False
+
+    The internal structure is currently tested simply by the
+    :attr:`~music21.meter.TimeSignature.beatCount` and
+    :attr:`~music21.meter.TimeSignature.ratioString` attributes.
+
+    The check of :attr:`~music21.meter.TimeSignature.beatCount`
+    helps to distinguish the 'fast' (2-beat) from 'slow' (6-beat)
+    versions of 6/8, for example.
+
+    >>> fast68 = meter.TimeSignature('fast 6/8')
+    >>> slow68 = meter.TimeSignature('slow 6/8')
+    >>> fast68 == slow68
+    False
+
+    Complementing this,
+    :attr:`~music21.meter.TimeSignature.ratioString`
+    provides a check of the internal divsions such that
+    '2/8+3/8' is different from '3/8+2/8', for example,
+    despite the fact that they could both be written as '5/8'.
+
+    >>> ts2n3 = meter.TimeSignature('2/8+3/8')
+    >>> ts3n2 = meter.TimeSignature('3/8+2/8')
+    >>> ts2n3 == ts3n2
+    False
+
+    For a less restrictive test of this, see
+    :meth:`~music21.meter.TimeSignature.ratioEqual`
+    which returns True for all cases of '5/8'.
+
+    >>> ts2n3.ratioEqual(ts3n2)
+    True
+
+    Yes, equality is ever True:
+
+    >>> one44 = meter.TimeSignature('4/4')
+    >>> another44 = meter.TimeSignature()  # '4/4' by default
+    >>> one44 == another44
+    True
+
     '''
     _styleClass = style.TextStyle
     classSortOrder = 4
+
+    equalityAttributes = ('symbol',  # '2/2' != 'Cut'
+                          'ratioString',  # '2+3' != '3+2'
+                          'beatCount'  # 'slow 6/8' != 'fast 6/8'
+                          )
 
     _DOC_ATTR: dict[str, str] = {
         'beatSequence': 'A :class:`~music21.meter.MeterSequence` governing beat partitioning.',
@@ -1538,7 +1596,7 @@ class TimeSignature(TimeSignatureBase):
             # create a new object; it will not be linked
             self.displaySequence = MeterSequence(value, partitionRequest)
 
-    def getAccent(self, qLenPos: float) -> bool:
+    def getAccent(self, qLenPos: OffsetQL) -> bool:
         '''
         Return True or False if the qLenPos is at the start of an accent
         division.

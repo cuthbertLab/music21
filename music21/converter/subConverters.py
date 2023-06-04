@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 # Name:         converter/__init__.py
-# Purpose:      Specific subconverters for formats music21 should handle
+# Purpose:      Specific subConverters for formats music21 should handle
 #
 # Authors:      Michael Scott Asato Cuthbert
 #               Christopher Ariza
@@ -10,9 +10,9 @@
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
-Subconverters parse or display a single format.
+SubConverters parse or display a single format.
 
-Each subconverter should inherit from the base SubConverter object and have at least a
+Each subConverter should inherit from the base SubConverter object and have at least a
 parseData method that sets self.stream.
 '''
 from __future__ import annotations
@@ -21,7 +21,6 @@ from __future__ import annotations
 # Converters are associated classes; they are not subclasses,
 # but most define a parseData() method,
 # a parseFile() method, and a .stream attribute or property.
-import base64
 from io import IOBase
 import os
 import pathlib
@@ -32,7 +31,7 @@ import unittest
 from music21 import common
 from music21 import defaults
 from music21 import environment
-from music21 import exceptions21
+from music21.exceptions21 import SubConverterException
 from music21 import stream
 
 
@@ -43,15 +42,6 @@ environLocal = environment.Environment('converter.subConverters')
 
 # pylint complains when abstract methods are not overwritten, but that's okay.
 # pylint: disable=abstract-method
-
-
-class SubConverterException(exceptions21.Music21Exception):
-    pass
-
-
-class SubConverterFileIOException(SubConverterException):
-    pass
-
 
 class SubConverter:
     '''
@@ -131,7 +121,7 @@ class SubConverter:
         self._stream = newStream
 
     stream = property(_getStream, _setStream, doc='''
-        Returns or sets the stream in the converter.  Must be defined for subconverter to work.
+        Returns or sets the stream in the converter.  Must be defined for subConverter to work.
         ''')
 
     def checkShowAbility(self, **keywords) -> bool:
@@ -248,7 +238,7 @@ class SubConverter:
         extensions = self.registerOutputExtensions
         if not extensions:
             raise SubConverterException(
-                'This subconverter cannot show or write: '
+                'This subConverter cannot show or write: '
                 + 'no output extensions are registered for it')
         # start by trying the first one.
         ext = extensions[0]
@@ -356,7 +346,7 @@ class SubConverter:
 
 class ConverterIPython(SubConverter):
     '''
-    Meta-subconverter for displaying image data in a Notebook
+    Meta-subConverter for displaying image data in a Notebook
     using either png (via MuseScore or LilyPond) or directly via
     Vexflow/music21j, or MIDI using music21j.
     '''
@@ -364,46 +354,19 @@ class ConverterIPython(SubConverter):
     registerOutputExtensions = ()
     registerOutputSubformatExtensions = {'lilypond': 'ly'}
 
-    # def vfshow(self, s):
-    #     '''
-    #     pickle this object and send it to Vexflow
-    #
-    #     Alpha -- does not work too well.
-    #     '''
-    #     import random
-    #     from music21.vexflow import toMusic21j
-    #     from IPython.display import HTML
-    #     vfp = toMusic21j.VexflowPickler()
-    #     vfp.mode = 'jsonSplit'
-    #     outputCode = vfp.fromObject(s)
-    #     idName = 'canvasDiv' + str(random.randint(0, 10000))
-    #     htmlBlock = '<div id="' + idName + '"><canvas/></div>'
-    #     js = '''
-    #     <script>
-    #          data = ''' + outputCode + ''';
-    #          var jpc = new music21.jsonPickle.Converter();
-    #          var streamObj = jpc.run(data);
-    #          streamObj.replaceCanvas("#''' + idName + '''");
-    #     </script>
-    #     '''
-    #     return HTML(htmlBlock + js)
-
-    def show(self, obj, fmt, app=None, subformats=(), **keywords):  # pragma: no cover
+    def show(self, obj, fmt, app=None, subformats=(),
+             **keywords):  # pragma: no cover
         '''
-        show using the appropriate subformat.
+        show a specialized for Jupyter Notebook using the appropriate subformat.
+
+        For MusicXML runs it through MuseScore and returns the PNG data.
+        (use multipageWidget to get an experimental interactive page display).
+
+        For MIDI: loads a music21j-powered MIDI player in to the Notebook.
         '''
-        # noinspection PyPackageRequirements
-        from IPython.display import Image, display, HTML  # type: ignore
-        from music21 import converter
-        from music21.ipython21 import inGoogleColabNotebook
+        from music21.converter import Converter
+        from music21.ipython21 import converters as ip21_converters
 
-        if subformats is None:
-            subformats = ['vexflow']
-
-        if subformats and subformats[0] == 'vexflow':
-            raise NotImplementedError
-            # return self.vfshow(obj)
-            # subformats = ['lilypond', 'png']
         if subformats:
             helperFormat = subformats[0]
             helperSubformats = subformats[1:]
@@ -414,96 +377,34 @@ class ConverterIPython(SubConverter):
         if not helperSubformats:
             helperSubformats = ['png']
 
-        helperConverter = converter.Converter()
-        helperConverter.setSubconverterFromFormat(helperFormat)
-        helperSubConverter = helperConverter.subConverter
+        helperSubConverter = Converter.getSubConverterFromFormat(helperFormat)
 
         if helperFormat in ('musicxml', 'xml', 'lilypond', 'lily'):
-            # hack to make musescore excerpts -- fix with a converter class in MusicXML
-            from music21.ipython21 import objects as ipythonObjects
-
-            savedDefaultTitle = defaults.title
-            savedDefaultAuthor = defaults.author
-            defaults.title = ''
-            defaults.author = ''
-
-            if 'Opus' not in obj.classes:
-                scores = [obj]
-            else:
-                scores = list(obj.scores)
-
-            for s in scores:
-                fp = helperSubConverter.write(s,
-                                              helperFormat,
-                                              subformats=helperSubformats,
-                                              **keywords
-                                              )
-
-                if helperSubformats[0] == 'png':
-                    if not str(environLocal['musescoreDirectPNGPath']).startswith('/skip'):
-                        ipo = ipythonObjects.IPythonPNGObject(fp)
-                        # noinspection PyTypeChecker
-                        display(Image(data=ipo.getData(), retina=True))
-                    else:
-                        # smallest transparent pixel
-                        # noinspection SpellCheckingInspection
-                        pngData64 = (b'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAAAAAA'
-                                     + b'6fptVAAAACklEQVQYV2P4DwABAQEAWk1v8QAAAABJRU5ErkJggg==')
-                        pngData = base64.b64decode(pngData64)
-                        # noinspection PyTypeChecker
-                        display(Image(data=pngData, retina=True))
-
-            defaults.title = savedDefaultTitle
-            defaults.author = savedDefaultAuthor
-            return None
-
-        elif helperFormat == 'midi':
-            assert isinstance(helperSubConverter, ConverterMidi)
-
-            fp = helperSubConverter.write(
+            ip21_converters.showImageThroughMuseScore(
                 obj,
-                helperFormat,
+                subConverter=helperSubConverter,
+                fmt=helperFormat,
                 subformats=helperSubformats,
-                addStartDelay=True,
+                **keywords,
             )
-            with open(fp, 'rb') as f:
-                binaryMidiData = f.read()
-
-            binaryBase64 = base64.b64encode(binaryMidiData)
-            s = common.SingletonCounter()
-            outputId = 'midiPlayerDiv' + str(s())
-
-            # note that require is automatically loaded in Jupyter Notebook
-            # but not in Google Colab.
-            load_require_script = ''
-            if inGoogleColabNotebook():
-                load_require_script = '''
-                    <script src="//cuthbertLab.github.io/music21j/ext/require/require.js"
-                    ></script>
-                '''
-
-            # noinspection PyTypeChecker
-            display(HTML('''
-                <div id="''' + outputId + '''"></div>
-                <link rel="stylesheet" href="//cuthbertLab.github.io/music21j/css/m21.css"
-                    type="text/css" />
-                ''' + load_require_script + '''
-                <script>
-                require.config({
-                    paths: {'music21': '//cuthbertLab.github.io/music21j/src/music21'}
-                });
-                require(['music21'], function() {
-                               mp = new music21.miditools.MidiPlayer();
-                               mp.addPlayer("#''' + outputId + '''");
-                               mp.base64Load("data:audio/midi;base64,'''
-                                + binaryBase64.decode('utf-8') + '''");
-                        });
-                </script>'''))
+        elif helperFormat == 'midi':
+            if t.TYPE_CHECKING:
+                assert isinstance(helperSubConverter, ConverterMidi)
+            ip21_converters.displayMusic21jMIDI(
+                obj,
+                subConverter=helperSubConverter,
+                fmt=helperFormat,
+                subformats=helperSubformats,
+                **keywords,
+            )
 
 
 class ConverterLilypond(SubConverter):
     '''
     Convert to Lilypond and from there usually to png, pdf, or svg.
+
+    Note: that the proper format for displaying Lilypond in Jupyter
+    notebook in v9 is ipython.lily.png and not lily.ipython.png
     '''
     registerFormats = ('lilypond', 'lily')
     registerOutputExtensions = ('ly', 'png', 'pdf', 'svg')
@@ -523,31 +424,17 @@ class ConverterLilypond(SubConverter):
         from music21 import lily
         conv = lily.translate.LilypondConverter()
         conv.coloredVariants = coloredVariants
+        conv.loadFromMusic21Object(obj)
 
-        if subformats is not None and 'pdf' in subformats:
-            conv.loadFromMusic21Object(obj)
+        if 'pdf' in subformats:
             convertedFilePath = conv.createPDF(fp)
-            return convertedFilePath
-
-        elif subformats is not None and 'png' in subformats:
-            conv.loadFromMusic21Object(obj)
+        elif 'png' in subformats:
             convertedFilePath = conv.createPNG(fp)
-            if 'ipython' in subformats:
-                from music21.ipython21 import objects as ipythonObjects
-                ipo = ipythonObjects.IPythonPNGObject(convertedFilePath)
-                return ipo
-            else:
-                return convertedFilePath
-
-        elif subformats is not None and 'svg' in subformats:
-            conv.loadFromMusic21Object(obj)
+        elif 'svg' in subformats:
             convertedFilePath = conv.createSVG(fp)
-            return convertedFilePath
-
         else:
-            conv.loadFromMusic21Object(obj)
             convertedFilePath = conv.writeLyFile(ext='.ly', fp=fp)
-            return convertedFilePath
+        return convertedFilePath
 
     def show(self, obj, fmt, app=None, subformats=(), **keywords):  # pragma: no cover
         '''
@@ -563,6 +450,7 @@ class ConverterLilypond(SubConverter):
         else:
             outFormat = 'png'
 
+        # TODO: replace with run_subprocess_capturing_stderr.
         launchKey = environLocal.formatToKey(outFormat)
         self.launch(returnedFilePath, fmt=outFormat, app=app, launchKey=launchKey)
 
@@ -685,9 +573,15 @@ class ConverterVolpiano(SubConverter):
     registerInputExtensions = ('volpiano', 'vp')
     registerOutputExtensions = ('txt', 'vp')
 
-    def parseData(self, dataString, **keywords):
+    def parseData(
+        self,
+        dataString,
+        number: int | None = None,
+        *,
+        breaksToLayout: bool = False,
+        **keywords,
+    ):
         from music21 import volpiano
-        breaksToLayout = keywords.get('breaksToLayout', False)
         self.stream = volpiano.toPart(dataString, breaksToLayout=breaksToLayout)
 
     def getDataStr(self, obj, **keywords):
@@ -941,30 +835,6 @@ class ConverterMusicXML(SubConverter):
                                          'pdf': 'pdf',
                                          }
 
-    @staticmethod
-    def findNumberedPNGPath(inputFp: str | pathlib.Path) -> pathlib.Path:
-        '''
-        Find the first numbered file path corresponding to the provided unnumbered file path
-        ending in ".png". Raises an exception if no file can be found.
-
-        Renamed in v7.  Returns a pathlib.Path
-        '''
-        inputFp = str(inputFp)  # not pathlib.
-        if not inputFp.endswith('.png'):
-            raise SubConverterException(f'inputFp must end with ".png"; got {inputFp}')
-
-        path_without_extension = inputFp[:-1 * len('.png')]
-
-        for search_extension in ('1', '01', '001', '0001', '00001'):
-            search_path = pathlib.Path(path_without_extension + '-' + search_extension + '.png')
-            if search_path.exists():
-                return search_path
-
-        raise SubConverterFileIOException(
-            f'No png file for {inputFp} (such as {path_without_extension}-1.png) was found.  '
-            + 'The conversion to png failed'
-        )
-
     def parseData(self, xmlString: str, number=None):
         '''
         Open MusicXML data from a string.
@@ -1008,79 +878,6 @@ class ConverterMusicXML(SubConverter):
             junk, fn = os.path.split(filePath)
             c.stream.metadata.movementName = fn  # this should become a Path
         self.stream = c.stream
-
-    def runThroughMusescore(self,
-                            fp,
-                            subformats=(),
-                            *,
-                            dpi: int | None = None,
-                            **keywords) -> pathlib.Path:  # pragma: no cover
-        '''
-        Take the output of the conversion process and run it through musescore to convert it
-        to a png.
-        '''
-        musescorePath = environLocal['musescoreDirectPNGPath']
-        if not musescorePath:
-            raise SubConverterException(
-                'To create PNG files directly from MusicXML you need to download MuseScore and '
-                + 'put a link to it in your .music21rc via Environment.')
-        if not musescorePath.exists():
-            raise SubConverterException(
-                "Cannot find a path to the 'mscore' file at "
-                + f'{musescorePath} -- download MuseScore')
-
-        if subformats is None:
-            subformatExtension = 'png'
-        else:
-            subformatExtension = subformats[0]
-
-        if not str(fp).endswith('.musicxml'):
-            raise ValueError('fp must end with the extension .musicxml')
-        fpOut = str(fp)[:-1 * len('musicxml')]
-        fpOut += subformatExtension
-
-        musescoreRun = [str(musescorePath), fp, '-o', fpOut, '-T', '0']
-        if dpi is not None:
-            musescoreRun.extend(['-r', str(dpi)])
-
-        prior_qt = os.getenv('QT_QPA_PLATFORM')
-        prior_xdg = os.getenv('XDG_RUNTIME_DIR')
-        if common.runningUnderIPython():
-            if common.getPlatform() == 'nix':
-                # provide defaults to support headless MuseScore in Google Colab
-                # https://github.com/cuthbertLab/music21/issues/260
-                if prior_qt is None:
-                    os.environ['QT_QPA_PLATFORM'] = 'offscreen'
-                if prior_xdg is None:
-                    os.environ['XDG_RUNTIME_DIR'] = str(environment.Environment().getRootTempDir())
-
-            musescoreRun.extend(['-r', str(defaults.ipythonImageDpi)])
-
-        completed_process = subprocess.run(musescoreRun, capture_output=True, check=False)
-        if completed_process.returncode != 0:
-            # Raise same exception class as findNumberedPNGPath()
-            # for backward compatibility
-            stderr_bytes = completed_process.stderr
-            try:
-                import locale
-                stderr_str = stderr_bytes.decode(locale.getpreferredencoding(do_setlocale=False))
-            except UnicodeDecodeError:
-                # not really a str, but best we can do.
-                stderr_str = stderr_bytes.decode('ascii', errors='ignore')
-            raise SubConverterFileIOException(stderr_str)
-
-        if common.runningUnderIPython() and common.getPlatform() == 'nix':
-            # Leave environment in original state
-            if prior_qt is None:
-                os.environ.pop('QT_QPA_PLATFORM')
-            if prior_xdg is None:
-                os.environ.pop('XDG_RUNTIME_DIR')
-
-        if subformatExtension == 'png':
-            return ConverterMusicXML.findNumberedPNGPath(fpOut)
-        else:
-            return pathlib.Path(fpOut)
-        # common.cropImageFromPath(fp)
 
     def writeDataStream(self,
                         fp,
@@ -1165,8 +962,8 @@ class ConverterMusicXML(SubConverter):
             else:
                 compress = False
 
-        # hack to make musescore excerpts -- fix with a converter class in MusicXML
-        if subformats is not None and 'png' in subformats:
+        # hack to make MuseScore excerpts -- fix with a converter class in MusicXML
+        if 'png' in subformats:
             # do not print a title or author -- to make the PNG smaller.
             defaults.title = ''
             defaults.author = ''
@@ -1184,14 +981,14 @@ class ConverterMusicXML(SubConverter):
 
         xmlFp: pathlib.Path = self.writeDataStream(writeDataStreamFp, dataBytes)
 
-        if subformats is not None and 'png' in subformats:
+        if 'png' in subformats:
             defaults.title = savedDefaultTitle
             defaults.author = savedDefaultAuthor
 
-        if (subformats is not None
-                and ('png' in subformats or 'pdf' in subformats)
+        if (('png' in subformats or 'pdf' in subformats)
                 and not str(environLocal['musescoreDirectPNGPath']).startswith('/skip')):
-            outFp = self.runThroughMusescore(xmlFp, subformats, **keywords)
+            from music21.converter.museScore import runThroughMuseScore
+            outFp = runThroughMuseScore(xmlFp, subformats, **keywords)
         elif compress:
             archiveTools.compressXML(xmlFp,
                                      deleteOriginal=True,
@@ -1209,11 +1006,10 @@ class ConverterMusicXML(SubConverter):
         Override to do something with png...
         '''
         returnedFilePath = self.write(obj, fmt, subformats=subformats, **keywords)
-        if subformats is not None:
-            if 'png' in subformats:
-                fmt = 'png'
-            elif 'pdf' in subformats:
-                fmt = 'pdf'
+        if 'png' in subformats:
+            fmt = 'png'
+        elif 'pdf' in subformats:
+            fmt = 'pdf'
         self.launch(returnedFilePath, fmt=fmt, app=app)
 
 
@@ -1397,13 +1193,13 @@ class ConverterClercqTemperley(SubConverter):
     Wrapper for parsing harmonic definitions in Trevor de Clercq and
     David Temperley's format.
     '''
-    registerFormats = ('cttxt', 'har')
-    registerInputExtensions = ('cttxt', 'har')
+    registerFormats = ('cttxt', 'har', 'clercqTemperley')
+    registerInputExtensions = ('cttxt', 'har', 'clercqTemperley')
 
-    def parseData(self, strData, number=None):
+    def parseData(self, strData: str | pathlib.Path, number=None):
         from music21.romanText import clercqTemperley
         ctSong = clercqTemperley.CTSong(strData)
-        self.stream = ctSong.toScore()
+        self.stream = ctSong.toPart()
 
     def parseFile(self,
                   filePath: pathlib.Path | str,
@@ -1649,30 +1445,6 @@ class Test(unittest.TestCase):
             testConverter.parseFile(testPath)
             self.assertEqual(1, mockConv.call_count)
 
-    def testXMLtoPNG(self):
-        '''
-        Testing findNumberedPNGPath() with files of lengths
-        that create .png files with -1, -01, -001, and -0001 in the fp
-        '''
-        env = environment.Environment()
-        for ext_base in '1', '01', '001', '0001':
-            png_ext = '-' + ext_base + '.png'
-
-            tmp = env.getTempFile(suffix='.png', returnPathlib=False)
-            tmpNumbered = tmp.replace('.png', png_ext)
-            os.rename(tmp, tmpNumbered)
-            pngFp1 = ConverterMusicXML.findNumberedPNGPath(tmp)
-            self.assertEqual(str(pngFp1), tmpNumbered)
-            os.remove(tmpNumbered)
-
-        # Now with a very long path.
-        tmp = env.getTempFile(suffix='.png', returnPathlib=False)
-        tmpNumbered = tmp.replace('.png', '-0000001.png')
-        os.rename(tmp, tmpNumbered)
-        with self.assertRaises(SubConverterFileIOException):
-            ConverterMusicXML.findNumberedPNGPath(tmpNumbered)
-        os.remove(tmpNumbered)
-
     def testWriteMXL(self):
         from music21 import converter
         from music21.musicxml import testPrimitive
@@ -1813,5 +1585,5 @@ class TestExternal(unittest.TestCase):
 if __name__ == '__main__':
     import music21
     music21.mainTest(Test)
-    # run command below to test commands that open musescore, etc.
+    # run command below to test commands that open museScore, etc.
     # music21.mainTest(TestExternal)

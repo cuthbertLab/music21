@@ -882,7 +882,6 @@ class MetadataBundle(prebase.ProtoM21Object):
         if self.filePath is not None:
             if self.filePath.exists():
                 self.filePath.unlink()
-        return None
 
     def difference(self, metadataBundle):
         r'''
