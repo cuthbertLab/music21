@@ -295,7 +295,7 @@ def parseABCNote(
     Parse an ABCNote object and add it to the destination stream.
     '''
     from music21 import abcFormat
-    
+
     n: note.GeneralNote
     cs: harmony.ChordSymbol | harmony.NoChord
 
