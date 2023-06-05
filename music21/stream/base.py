@@ -9472,13 +9472,13 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         if recurse is True:
             useStreams = list(returnStream.recurse(streamsOnly=True, includeSelf=True))
 
-        rests_lacking_durations: list[note.Rest] = []
         for useStream in useStreams:
             # coreSetElementOffset() will immediately set isSorted = False,
             # but we need to know if the stream was originally sorted to know
             # if it's worth "looking ahead" to the next offset. If a stream
             # is unsorted originally, this "looking ahead" could become O(n^2).
             originallySorted = useStream.isSorted
+            rests_lacking_durations: list[note.Rest] = []
             for i, e in enumerate(useStream._elements):
                 if processOffsets:
                     o = useStream.elementOffset(e)
@@ -9518,8 +9518,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
             # ran coreSetElementOffset
             useStream.coreElementsChanged(updateIsFlat=False)
 
-            for rest_to_remove in rests_lacking_durations:
-                useStream.remove(rest_to_remove)
+            useStream.remove(rests_lacking_durations)
 
         if inPlace is False:
             return returnStream
