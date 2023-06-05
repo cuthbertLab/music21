@@ -1030,6 +1030,7 @@ class Test(unittest.TestCase):
     def test34MeasureRestWithoutTag(self):
         from xml.etree.ElementTree import fromstring as EL
 
+        # 40320 = 4 quarter notes
         scoreMeasure = '<measure><note><rest/><duration>40320</duration></note></measure>'
         mxMeasure = EL(scoreMeasure)
         pp = PartParser()

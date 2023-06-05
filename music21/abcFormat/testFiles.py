@@ -655,7 +655,6 @@ def get(contentRequest):
 
 # ------------------------------------------------------------------------------
 class Test(unittest.TestCase):
-
     def testBasic(self):
         from music21 import abcFormat
         from music21.abcFormat import translate
