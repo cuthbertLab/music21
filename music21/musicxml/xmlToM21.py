@@ -1994,7 +1994,8 @@ class PartParser(XMLParserBase):
 
         >>> from xml.etree.ElementTree import fromstring as EL
 
-        Testing full measure rest parsing:
+        Full-measure rests get auto-assigned to match the time signature if they
+        do not have a type, or have a type of "whole".
 
         Here is a measure with a rest that lasts 4 beats, but we will put it in a 3/4 context.
 
@@ -2047,7 +2048,28 @@ class PartParser(XMLParserBase):
 
         m = measureParser.stream
         self.setLastMeasureInfo(m)
-        # warnings.warn(f'{m} {m.highestTime} {self}', MusicXMLWarning)
+        # TODO: move this into the measure parsing,
+        #     because it should happen on a voice level.
+        if measureParser.fullMeasureRest is True:
+            # recurse is necessary because it could be in voices...
+            r1 = m[note.Rest].first()
+
+            if t.TYPE_CHECKING:
+                # fullMeasureRest is True, means Rest will be found
+                assert r1 is not None
+
+            if self.lastTimeSignature is not None:
+                lastTSQl = self.lastTimeSignature.barDuration.quarterLength
+            else:
+                lastTSQl = 4.0  # sensible default.
+
+            if (r1.fullMeasure is True  # set by xml measure='yes'
+                or (r1.duration.quarterLength != lastTSQl
+                    and r1.duration.type in ('whole', 'breve')
+                    and r1.duration.dots == 0
+                    and not r1.duration.tuplets)):
+                r1.duration.quarterLength = lastTSQl
+                r1.fullMeasure = True
 
         # NB: not coreInsert, because barDurationProportion()
         # is called in adjustTimeAttributesFromMeasure()
@@ -2351,7 +2373,7 @@ class MeasureParser(XMLParserBase):
     >>> mp.restAndNoteCount['note']
     0
 
-    fullMeasureRest is now just a counting/debug tool.
+    fullMeasureRest indicates that a rest lasts the full measure of the current time signature.
 
     >>> mp.fullMeasureRest
     True
@@ -2424,7 +2446,7 @@ class MeasureParser(XMLParserBase):
         # we store whatever we find
         self.lastVoice: str | int | None = None
 
-        # fullMeasureRest is now just a counting/debug tool.  Because pickup measures
+        # fullMeasureRest is unreliable because pickup measures
         # in Finale set <rest measure="yes"> but then define a type like "quarter",
         # this cannot be trusted to give a whole rest.
         self.fullMeasureRest = False
@@ -3352,8 +3374,9 @@ class MeasureParser(XMLParserBase):
 
         >>> from xml.etree.ElementTree import fromstring as EL
         >>> MP = musicxml.xmlToM21.MeasureParser()
+        >>> MP.divisions = 10
 
-        >>> mxr = EL('<note><rest/><duration>5040</duration><type>eighth</type></note>')
+        >>> mxr = EL('<note><rest/><duration>5</duration><type>eighth</type></note>')
         >>> r = MP.xmlToRest(mxr)
         >>> r
         <music21.note.Rest eighth>
@@ -3362,7 +3385,7 @@ class MeasureParser(XMLParserBase):
 
         >>> mxr = EL('<note><rest><display-step>G</display-step>' +
         ...              '<display-octave>4</display-octave>' +
-        ...              '</rest><duration>5040</duration><type>eighth</type></note>')
+        ...              '</rest><duration>5</duration><type>eighth</type></note>')
         >>> r = MP.xmlToRest(mxr)
         >>> r
         <music21.note.Rest eighth>
@@ -3383,17 +3406,41 @@ class MeasureParser(XMLParserBase):
         >>> r.stepShift
         10
 
-        Test full measure rest.
+        Test full measure rest defined with measure="yes" and a duration indicating
+        four quarter notes:
 
-        >>> mxr = EL('<note><rest measure="yes"/><duration>40320</duration></note>')
+        >>> mxr = EL('<note><rest measure="yes"/><duration>40</duration></note>')
         >>> r = MP.xmlToRest(mxr)
         >>> MP.fullMeasureRest
         True
 
-        Note that we do NOT set `r`'s `.fullMeasure` to True or always, but keep it as
-        "auto" so that changes in time signature, etc. will affect output.  Also
-        because pickup measures often use measure="yes" in Finale, but display
-        as quarter rests.  See https://github.com/w3c/musicxml/issues/478
+        Note that here set `r`'s `.fullMeasure` to True or always because it has no type.
+
+        >>> r.fullMeasure
+        True
+
+        Same goes for rests which define type of whole (or breve), regardless of duration:
+
+        >>> mxr = EL('<note><rest measure="yes"/><duration>40</duration><type>whole</type></note>')
+        >>> r = MP.xmlToRest(mxr)
+        >>> MP.fullMeasureRest
+        True
+        >>> r.fullMeasure
+        True
+
+        But a rest that defines `measure="yes"` but has a type other than whole or breve
+        will set MeasureParser to fullMeasureRest but not set fullMeasure = True
+        on the music21 Rest object itself because pickup measures often use
+        measure="yes" in Finale, but display as quarter rests, etc.
+        See https://github.com/w3c/musicxml/issues/478
+
+        >>> mxr = EL('<note><rest measure="yes"/><duration>10</duration>'
+        ...          + '<type>quarter</type></note>')
+        >>> r = MP.xmlToRest(mxr)
+        >>> MP.fullMeasureRest
+        True
+        >>> r.fullMeasure
+        'auto'
         '''
         d = self.xmlToDuration(mxRest)
         r = note.Rest(duration=d)
@@ -3404,8 +3451,10 @@ class MeasureParser(XMLParserBase):
         isFullMeasure = mxRestTag.get('measure')
         if isFullMeasure == 'yes':
             # fullMeasureRest is now just a counting/debug tool.
-            self.fullMeasureRest = True  # force full measure rest...
-            r.fullMeasure = True
+            if not (restType := strippedText(mxRest.find('type'))) or restType in ('whole', 'breve'):
+                # force full measure rest...
+                self.fullMeasureRest = True
+                r.fullMeasure = True
             # this attribute is not 100% necessary to get a multi-measure rest spanner
 
         if self.parent:  # will apply if active
