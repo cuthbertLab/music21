@@ -3451,7 +3451,7 @@ class MeasureParser(XMLParserBase):
         isFullMeasure = mxRestTag.get('measure')
         if isFullMeasure == 'yes':
             # fullMeasureRest is now just a counting/debug tool.
-            if not (restType := strippedText(mxRest.find('type'))) or restType in ('whole', 'breve'):
+            if not (rType := strippedText(mxRest.find('type'))) or rType in ('whole', 'breve'):
                 # force full measure rest...
                 self.fullMeasureRest = True
                 r.fullMeasure = True
