@@ -26,10 +26,11 @@ from more_itertools import windowed
 
 from music21 import base as m21Base
 from music21 import exceptions21
+from music21 import chord
 from music21 import duration
 from music21 import note
 from music21.stream import Measure, Stream
-from music21.stream import filters
+from music21.stream import filters, iterator
 
 __all__ = [
     'Wildcard', 'WildcardDuration', 'SearchMatch', 'StreamSearcher',
@@ -195,21 +196,22 @@ class StreamSearcher:
     '''
 
     def __init__(self, streamSearch: Stream, searchList: list[m21Base.Music21Object]):
-        self.streamSearch = streamSearch
-        self.searchList = searchList
-        self.recurse = False
-        self.filterNotes = False
-        self.filterNotesAndRests = False
+        self.streamSearch: Stream | iterator.StreamIterator = streamSearch
+        self.searchList: list[m21Base.Music21Object] = searchList
+        self.recurse: bool = False
+        self.filterNotes: bool = False
+        self.filterNotesAndRests: bool = False
 
         self.algorithms: list[
-            Callable[[StreamSearcher, Stream, m21Base.Music21Object],
+            Callable[[StreamSearcher, m21Base.Music21Object, m21Base.Music21Object],
                      bool | None]
         ] = [StreamSearcher.wildcardAlgorithm]
 
-        self.activeIterator = None
+        self.activeIterator: iterator.StreamIterator | None = None
 
-    def run(self):
-        if 'StreamIterator' in self.streamSearch.classes:
+    def run(self) -> list[SearchMatch]:
+        thisStreamIterator: iterator.StreamIterator
+        if isinstance(self.streamSearch, iterator.StreamIterator):
             thisStreamIterator = self.streamSearch
         else:
             if self.recurse:
@@ -219,30 +221,37 @@ class StreamSearcher:
 
             if self.filterNotesAndRests:
                 thisStreamIterator = thisStreamIterator.addFilter(
-                    filters.ClassFilter('GeneralNote')
+                    filters.ClassFilter(note.GeneralNote)
                 )
             elif self.filterNotes:
                 thisStreamIterator = thisStreamIterator.addFilter(
-                    filters.ClassFilter(['Note', 'Chord'])
+                    filters.ClassFilter([note.Note, chord.Chord])
                 )
 
         self.activeIterator = thisStreamIterator
 
-        streamIteratorEls = list(thisStreamIterator)
+        streamIteratorEls: list[m21Base.Music21Object] = list(thisStreamIterator)
         streamLength = len(streamIteratorEls)
         searchLength = len(self.searchList)
 
         if searchLength == 0:
             raise SearchException('the search Stream or list cannot be empty')
 
-        foundEls = []
+        foundEls: list[SearchMatch] = []
         if searchLength > streamLength:
             return foundEls
 
         for startPosition, streamEls in enumerate(windowed(streamIteratorEls, searchLength)):
             result = None
             for j in range(searchLength):
+                # TODO: implement longest prefix that is also a suffix algorithm
                 streamEl = streamEls[j]
+                if streamEl is None:  # pragma: no cover
+                    # I don't think this should ever happen, but mypy is convinced
+                    # streamEl is Optional[Music21Object]
+                    result = False
+                    break
+
                 searchEl = self.searchList[j]
                 for thisAlgorithm in self.algorithms:
                     result = thisAlgorithm(self, streamEl, searchEl)
@@ -259,7 +268,7 @@ class StreamSearcher:
 
         return foundEls
 
-    def wildcardAlgorithm(self, streamEl: Stream, searchEl: m21Base.Music21Object):
+    def wildcardAlgorithm(self, streamEl: m21Base.Music21Object, searchEl: m21Base.Music21Object):
         '''
         An algorithm that supports Wildcards -- added by default to the search function.
         '''
@@ -268,14 +277,14 @@ class StreamSearcher:
         else:
             return None
 
-    def rhythmAlgorithm(self, streamEl: Stream, searchEl: m21Base.Music21Object):
+    def rhythmAlgorithm(self, streamEl: m21Base.Music21Object, searchEl: m21Base.Music21Object):
         if isinstance(searchEl.duration, WildcardDuration):
             return True
         if searchEl.duration.quarterLength != streamEl.duration.quarterLength:
             return False
         return None
 
-    def noteNameAlgorithm(self, streamEl: Stream, searchEl: m21Base.Music21Object):
+    def noteNameAlgorithm(self, streamEl: m21Base.Music21Object, searchEl: m21Base.Music21Object):
         if not hasattr(searchEl, 'name'):
             return False
         if not hasattr(streamEl, 'name'):
@@ -290,8 +299,6 @@ def streamSearchBase(thisStreamOrIterator, searchList, algorithm=None):
     A basic search function that is used by other search mechanisms,
     which takes in a stream or StreamIterator and a searchList or stream
     and an algorithm to run on each pair of elements to determine if they match.
-
-
     '''
     if algorithm is None:
         raise SearchException('algorithm must be a function not None')
@@ -665,6 +672,15 @@ def translateStreamToString(inputStreamOrIterator, returnMeasures=False):
     <P>F<)KQFF_
     >>> len(streamString)
     12
+
+    Chords give the pitch only of the first note and Unpitched objects are
+    treated as rests:
+
+    >>> s = stream.Stream([note.Note('C4'), note.Rest(),
+    ...                    chord.Chord(['C4', 'E4']), note.Unpitched()])
+    >>> streamString = search.translateStreamToString(s)
+    >>> list(streamString.encode('utf-8'))
+    [60, 80, 127, 80, 60, 80, 127, 80]
     '''
     b = ''
     measures = []
@@ -902,12 +918,13 @@ def translateStreamToStringOnlyRhythm(inputStream, returnMeasures=False):
         return b
 
 
-def translateNoteToByte(n):
+def translateNoteToByte(n: note.GeneralNote):
     # noinspection PyShadowingNames
     '''
     takes a note.Note object and translates it to a single byte representation.
 
     currently returns the chr() for the note's midi number. or chr(127) for rests
+    and unpitched.
 
     >>> n = note.Note('C4')
     >>> b = search.translateNoteToByte(n)
@@ -920,18 +937,17 @@ def translateNoteToByte(n):
 
     Chords are currently just searched on the first Note (or treated as a Rest if None)
     '''
-    if n.isRest:
-        return chr(127)
-    elif n.isChord:
+    if isinstance(n, note.Note):
+        return chr(n.pitch.midi)
+    elif isinstance(n, chord.Chord):
         if n.pitches:
             return chr(n.pitches[0].midi)
         else:
             return chr(127)
     else:
-        return chr(n.pitch.midi)
+        return chr(127)
 
-
-def translateNoteWithDurationToBytes(n, includeTieByte=True):
+def translateNoteWithDurationToBytes(n: note.GeneralNote, includeTieByte=True):
     # noinspection PyShadowingNames
     '''
     takes a note.Note object and translates it to a three-byte representation.
@@ -967,7 +983,7 @@ def translateNoteWithDurationToBytes(n, includeTieByte=True):
         return firstByte + secondByte
 
 
-def translateNoteTieToByte(n):
+def translateNoteTieToByte(n: note.GeneralNote):
     # noinspection PyShadowingNames
     '''
     takes a note.Note object and returns a one-byte representation
@@ -1002,7 +1018,7 @@ def translateNoteTieToByte(n):
         return ''
 
 
-def translateDurationToBytes(n):
+def translateDurationToBytes(n: note.GeneralNote):
     # noinspection PyShadowingNames
     '''
     takes a note.Note object and translates it to a two-byte representation
