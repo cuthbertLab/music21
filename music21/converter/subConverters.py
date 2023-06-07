@@ -350,7 +350,7 @@ class ConverterIPython(SubConverter):
     using either png (via MuseScore or LilyPond) or directly via
     Vexflow/music21j, or MIDI using music21j.
     '''
-    registerFormats = ('ipython',)
+    registerFormats = ('ipython', 'jupyter')
     registerOutputExtensions = ()
     registerOutputSubformatExtensions = {'lilypond': 'ly'}
 
@@ -468,7 +468,7 @@ class ConverterBraille(SubConverter):
         subformats=(),
         **keywords
     ):  # pragma: no cover
-        if not common.runningUnderIPython():
+        if not common.runningInNotebook():
             super().show(obj, fmt, app=None, subformats=subformats, **keywords)
         else:
             from music21 import braille

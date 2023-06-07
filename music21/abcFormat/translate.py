@@ -1061,21 +1061,21 @@ class Test(unittest.TestCase):
         s = converter.parse(testFiles.fullRiggedShip)
         mmStream = s.flatten().getElementsByClass(tempo.TempoIndication)
         self.assertEqual(len(mmStream), 1)
-        self.assertEqual(str(mmStream[0]), '<music21.tempo.MetronomeMark Quarter=100.0>')
+        self.assertEqual(str(mmStream[0]), '<music21.tempo.MetronomeMark Quarter=100>')
 
         s = converter.parse(testFiles.aleIsDear)
         mmStream = s.flatten().getElementsByClass(tempo.TempoIndication)
         # this is a two-part pieces, and this is being added for each part
         # not sure if this is a problem
         self.assertEqual(len(mmStream), 2)
-        self.assertEqual(str(mmStream[0]), '<music21.tempo.MetronomeMark Quarter=211.0>')
+        self.assertEqual(str(mmStream[0]), '<music21.tempo.MetronomeMark Quarter=211>')
 
         s = converter.parse(testFiles.theBeggerBoy)
         mmStream = s[tempo.TempoIndication]
         # this is a two-part pieces, and this is being added for each part
         # not sure if this is a problem
         self.assertEqual(len(mmStream), 1)
-        self.assertEqual(str(mmStream[0]), '<music21.tempo.MetronomeMark maestoso Quarter=90.0>')
+        self.assertEqual(str(mmStream[0]), '<music21.tempo.MetronomeMark maestoso Quarter=90>')
 
         # s.show()
 

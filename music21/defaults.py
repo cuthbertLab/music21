@@ -97,7 +97,7 @@ scalingMillimeters = 7
 scalingTenths = 40
 
 
-ipythonImageDpi = 200  # retina...
+jupyterImageDpi = 200  # retina...
 
 
 # multi-measure rests

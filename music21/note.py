@@ -17,7 +17,6 @@ and used to configure, :class:`~music21.note.Note` objects.
 '''
 from __future__ import annotations
 
-from collections.abc import Iterable, Sequence
 import copy
 import typing as t
 from typing import overload  # PyCharm bug
@@ -26,7 +25,6 @@ import unittest
 from music21 import base
 from music21 import beam
 from music21 import common
-from music21.common.types import StepName, OffsetQLIn
 from music21.duration import Duration
 from music21 import environment
 from music21 import exceptions21
@@ -39,6 +37,8 @@ from music21 import tie
 from music21 import volume
 
 if t.TYPE_CHECKING:
+    from collections.abc import Iterable, Sequence
+    from music21.common.types import StepName, OffsetQLIn
     from music21 import articulations
     from music21 import chord
     from music21 import instrument
@@ -89,9 +89,29 @@ stemDirectionNames = (
 def __dir__():
     out = [n for n in globals() if not n.startswith('__') and not n.startswith('Test')]
     out.remove('t')
+
+    out.remove('annotations')
     out.remove('unittest')
+    out.remove('overload')
+    out.remove('environLocal')
     out.remove('copy')
     out.remove('_DOC_ORDER')
+
+    out.remove('Duration')
+    out.remove('Pitch')
+    out.remove('base')
+    out.remove('beam')
+    out.remove('common')
+    out.remove('environment')
+    out.remove('exceptions21')
+    out.remove('expressions')
+    out.remove('interval')
+    out.remove('prebase')
+    out.remove('style')
+    out.remove('tie')
+    out.remove('volume')
+
+    out.remove('SyllabicChoices')
     return out
 
 # -----------------------------------------------------------------------------
@@ -281,8 +301,9 @@ class Lyric(prebase.ProtoM21Object, style.StyleMixin):
         if not self.isComposite:
             return self._text
         else:
-            assert isinstance(self.components, Sequence), \
-                'Programming error: isComposite implies that components exists'  # mypy
+            if t.TYPE_CHECKING:
+                assert isinstance(self.components, Sequence), \
+                    'Programming error: isComposite implies that components exists'  # mypy
             text_out = self.components[0].text
             if text_out is None:
                 text_out = ''
@@ -414,8 +435,9 @@ class Lyric(prebase.ProtoM21Object, style.StyleMixin):
             else:
                 return text
         else:
-            assert isinstance(self.components, Sequence), \
-                'Programming error: isComposite should assert components exists'  # for mypy
+            if t.TYPE_CHECKING:
+                assert isinstance(self.components, Sequence), \
+                    'Programming error: isComposite should assert components exists'  # for mypy
             firstSyllabic = self.components[0].syllabic
             lastSyllabic = self.components[-1].syllabic
             if firstSyllabic in ['middle', 'end']:

@@ -16,7 +16,7 @@ use these.  Simply call `.show('braille')` or `.show('braille.ascii')`
 >>> soprano = corpus.parse('bwv66.6').parts[0]
 >>> #_DOCS_SHOW soprano.show('braille.ascii')
 >>> print(converter.toData(soprano, 'braille.ascii'))  # _DOCS_HIDE
-               ?7#IF %%%.C
+                     %%%.C
     #J .DJ [W?<L$ ?W[<L? IJ\]<L[ WW]$ [W?<L?
       "[W?[ \]R<L Q]]@C ]G%F]<L<K
 
@@ -26,7 +26,7 @@ Normally this would open up in a new window.  But to store the data, use
 
 >>> data = converter.toData(soprano, 'braille')
 >>> print(data)
-    ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠹⠶⠼⠊⠋⠀⠩⠩⠩⠨⠉⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+    ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠩⠩⠩⠨⠉⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
     ⠼⠚⠀⠨⠙⠚⠀⠪⠺⠹⠣⠇⠫⠀⠹⠺⠪⠣⠇⠹⠀⠊⠚⠳⠻⠣⠇⠪⠀⠺⠺⠻⠫⠀⠪⠺⠹⠣⠇⠹
     ⠀⠀⠐⠪⠺⠹⠪⠀⠳⠻⠗⠣⠇⠀⠟⠻⠻⠈⠉⠀⠻⠛⠩⠋⠻⠣⠇⠣⠅
 
@@ -517,7 +517,14 @@ def metronomeMarkToBraille(music21MetronomeMark):
     >>> mm2 = tempo.MetronomeMark(number=135, referent=note.Note(quarterLength=0.5))
     >>> print(metronomeMarkToBraille(mm2))
     ⠙⠶⠼⠁⠉⠑
+
+    >>> mm3 = tempo.MetronomeMark(numberSounding=80)
+    >>> metronomeMarkToBraille(mm3)
+    ''
     '''
+    if music21MetronomeMark.number is None:
+        return ''
+
     music21MetronomeMark.editorial.brailleEnglish = []
     try:
         metroTrans = []

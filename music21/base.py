@@ -27,7 +27,7 @@ available after importing `music21`.
 <class 'music21.base.Music21Object'>
 
 >>> music21.VERSION_STR
-'9.0.0a13'
+'9.0.0b1'
 
 Alternatively, after doing a complete import, these classes are available
 under the module "base":
@@ -2323,7 +2323,7 @@ class Music21Object(prebase.ProtoM21Object):
         <music21.note.Note E>
         <music21.meter.TimeSignature 4/4>
         f# minor
-        <music21.tempo.MetronomeMark Quarter=96>
+        <music21.tempo.MetronomeMark Quarter=96 (playback only)>
         <music21.clef.TrebleClef>
         <music21.stream.Measure 0 offset=0.0>
         P2: Alto: Instrument 2
@@ -2935,7 +2935,7 @@ class Music21Object(prebase.ProtoM21Object):
         # note that all formats here must be defined in
         # common.VALID_SHOW_FORMATS
         if fmt is None:  # get setting in environment
-            if common.runningUnderIPython():
+            if common.runningInNotebook():
                 try:
                     fmt = environLocal['ipythonShowFormat']
                 except (environment.EnvironmentException, KeyError):
@@ -2944,7 +2944,7 @@ class Music21Object(prebase.ProtoM21Object):
                 fmt = environLocal['showFormat']
         elif fmt.startswith('.'):
             fmt = fmt[1:]
-        elif common.runningUnderIPython() and fmt.startswith('midi'):
+        elif common.runningInNotebook() and fmt.startswith('midi'):
             fmt = 'ipython.' + fmt
 
         regularizedConverterFormat, unused_ext = common.findFormat(fmt)

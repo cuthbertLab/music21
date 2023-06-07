@@ -2678,8 +2678,8 @@ class RichMetadata(Metadata):
          ('composer', 'Arcangelo Corelli'),
          ...
          ('sourcePath', 'corelli/opus3no1/1grave.xml'),
-         ('tempoFirst', '<music21.tempo.MetronomeMark larghetto Quarter=60>'),
-         ('tempos', ['<music21.tempo.MetronomeMark larghetto Quarter=60>']),
+         ('tempoFirst', '<music21.tempo.MetronomeMark Quarter=60 (playback only)>'),
+         ('tempos', ['<music21.tempo.MetronomeMark Quarter=60 (playback only)>']),
          ('timeSignatureFirst', '4/4'),
          ('timeSignatures', ['4/4']))
 

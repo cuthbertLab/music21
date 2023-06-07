@@ -6388,7 +6388,7 @@ class MeasureExporter(XMLExporterBase):
         hideNumericalMetro = False  # if numbers implicit, hide metronome numbers
         hideNumber = []  # hide the number after equal, e.g., quarter=120, hide 120
         # store the last value necessary as a sounding tag in bpm
-        soundingQuarterBPM = False
+        soundingQuarterBPM = 0.0  # use 0.0 as False/None/etc. since unplayable.
 
         # handle TempoText simply by exporting its textExpression.
         if isinstance(ti, tempo.TempoText):
@@ -6407,7 +6407,7 @@ class MeasureExporter(XMLExporterBase):
                 hideNumber.append(False)
             # determine number sounding; first, get from numberSounding, then
             # number (if implicit, that is fine); get in terms of quarter bpm
-            soundingQuarterBPM = ti.getQuarterBPM()
+            soundingQuarterBPM = ti.getQuarterBPM() or 0.0
 
         elif isinstance(ti, tempo.MetricModulation):
             # may need to reverse order if classical style or otherwise
@@ -6418,7 +6418,7 @@ class MeasureExporter(XMLExporterBase):
                 durs.append(sub.referent)
                 numbers.append(sub.number)
             # soundingQuarterBPM should be obtained from the last MetronomeMark
-            soundingQuarterBPM = ti.newMetronome.getQuarterBPM()
+            soundingQuarterBPM = ti.newMetronome.getQuarterBPM() or 0.0
 
             # environLocal.printDebug(['found metric modulation', ti, durs, numbers])
 
@@ -6451,7 +6451,7 @@ class MeasureExporter(XMLExporterBase):
 
             mxDirection = self.placeInDirection(mxWords, ti)
 
-        if soundingQuarterBPM is not None:
+        if soundingQuarterBPM:
             mxSound = SubElement(mxDirection, 'sound')
             mxSound.set('tempo', str(common.numToIntOrFloat(soundingQuarterBPM)))
 
@@ -6500,6 +6500,7 @@ class MeasureExporter(XMLExporterBase):
         Convert a TextExpression or RepeatExpression to a MusicXML mxDirection type.
         returns a musicxml.mxObjects.Direction object
         '''
+        # TODO: if expression is empty do not set an empty <words/> tag.
         mxWords = Element('words')
         te: expressions.TextExpression
         if isinstance(teOrRe, expressions.TextExpression):  # TextExpression

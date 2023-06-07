@@ -73,7 +73,7 @@ def runThroughMuseScore(
 
     prior_qt = os.getenv('QT_QPA_PLATFORM')
     prior_xdg = os.getenv('XDG_RUNTIME_DIR')
-    if common.runningUnderIPython():
+    if common.runningInNotebook():
         if common.getPlatform() == 'nix':
             # provide defaults to support headless MuseScore in Google Colab
             # https://github.com/cuthbertLab/music21/issues/260
@@ -82,11 +82,11 @@ def runThroughMuseScore(
             if prior_xdg is None:
                 os.environ['XDG_RUNTIME_DIR'] = str(environment.Environment().getRootTempDir())
         if dpi is None:
-            museScoreRun.extend(['-r', str(defaults.ipythonImageDpi)])
+            museScoreRun.extend(['-r', str(defaults.jupyterImageDpi)])
 
     common.fileTools.runSubprocessCapturingStderr(museScoreRun)
 
-    if common.runningUnderIPython() and common.getPlatform() == 'nix':
+    if common.runningInNotebook() and common.getPlatform() == 'nix':
         # Leave environment in original state
         if prior_qt is None:
             os.environ.pop('QT_QPA_PLATFORM')

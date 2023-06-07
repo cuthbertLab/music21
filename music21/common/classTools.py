@@ -16,6 +16,10 @@ import contextlib
 import numbers
 import typing as t
 
+if t.TYPE_CHECKING:
+    from fractions import Fraction
+
+
 __all__ = [
     'holdsType',
     'isNum', 'isInt', 'isListLike', 'isIterable', 'classToClassStr', 'getClassSet',
@@ -40,12 +44,13 @@ def isInt(usrData: t.Any) -> t.TypeGuard[int]:
     return isinstance(usrData, int) and usrData is not True and usrData is not False
 
 
-def isNum(usrData: t.Any) -> t.TypeGuard[numbers.Rational]:
+def isNum(usrData: t.Any) -> t.TypeGuard[t.Union[float, int, Fraction]]:
     '''
-    check if usrData is a number (float, int, long, Decimal),
+    check if usrData is a music21 number (float, int, Fraction),
     return boolean and if True casts the value as a Rational number
 
-    unlike `isinstance(usrData, Rational)` does not return True for `True, False`.
+    Differs from `isinstance(usrData, Rational)` which
+    does not return True for `True, False`, and does not support Decimal
 
     Does not use `isinstance(usrData, Rational)` which is 2-6 times slower
     than calling this function (except in the case of Fraction, when

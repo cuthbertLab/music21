@@ -573,7 +573,7 @@ class Graph(prebase.ProtoM21Object):
                             # edgecolor=getColor(self.colorBackgroundFigure),
                             dpi=dpi)
 
-        if common.runningUnderIPython() is not True:
+        if common.runningInNotebook() is not True:
             SubConverter().launch(fp, fmt='png')
         else:
             return self.figure

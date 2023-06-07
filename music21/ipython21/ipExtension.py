@@ -35,7 +35,7 @@ def load_ipython_extension(ip):
 
 
 def inGoogleColabNotebook():
-    if not common.runningUnderIPython():
+    if not common.runningInNotebook():
         return False
     try:
         # get_ipython is loaded into global scope in IPython and Google Colab
