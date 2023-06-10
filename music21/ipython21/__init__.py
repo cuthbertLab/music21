@@ -44,9 +44,9 @@ def loadNoMagic():
             load_ipython_extension(localIP)
 
 
-# if we are imported in an IPython environment, then load magic after two seconds
+# if we are imported in a Jupyter environment, then load magic after a second
 # so that everything can settle.
 if common.runningInNotebook():
     from threading import Timer
-    t = Timer(2, loadNoMagic)
+    t = Timer(1, loadNoMagic)
     t.start()

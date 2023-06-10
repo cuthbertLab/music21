@@ -3449,7 +3449,8 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         )
         if returnInNotebook or not common.runningInNotebook():
             return out
-        return out
+        out.run()
+        return None
 
 
     def analyze(self, method: str, **keywords):
