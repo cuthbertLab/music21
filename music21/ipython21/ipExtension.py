@@ -26,10 +26,11 @@ def load_ipython_extension(ip):
 
     # we still configure matplotlib to be inline by default.
     try:
-        from matplotlib import pyplot as plt  # type: ignore
-        plt.ion()  # enable interactive mode
+        pass
+        # from matplotlib import pyplot as plt  # type: ignore
+        # plt.ion()  # enable interactive mode
         # get retina figures in matplotlib
-        ip.run_line_magic('config', "InlineBackend.figure_format = 'retina'")
+        # ip.run_line_magic('config', "InlineBackend.figure_format = 'retina'")
     except ImportError:
         pass
 
