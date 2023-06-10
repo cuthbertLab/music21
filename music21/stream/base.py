@@ -3409,6 +3409,8 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
              xValue: str | None = None,
              yValue: str | None = None,
              zValue: str | None = None,
+             *,
+             returnInNotebook: bool = False,
              **keywords):
         '''
         Given a method and keyword configuration arguments, create and display a plot.
@@ -3426,16 +3428,29 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         .. image:: images/HorizontalBarPitchSpaceOffset.*
             :width: 600
 
+        By default, a plot is returned in normal Python environments, but not
+        in Jupyter notebook/JupyterLab/Google Colab.  The
+        keyword `returnInNotebook` if True returns a plot no matter what.
+
+        Changed in v9: Changed default for return in notebook, and added
+          `returnInNotebook` keyword based on changes to recent Jupyter and
+          similar releases.
         '''
         # import is here to avoid import of matplotlib problems
         from music21 import graph
         # first ordered arg can be method type
-        return graph.plotStream(self,
-                                plotFormat,
-                                xValue=xValue,
-                                yValue=yValue,
-                                zValue=zValue,
-                                **keywords)
+        out = graph.plotStream(
+            self,
+            plotFormat,
+            xValue=xValue,
+            yValue=yValue,
+            zValue=zValue,
+            **keywords
+        )
+        if returnInNotebook or not common.runningInNotebook():
+            return out
+        return out
+
 
     def analyze(self, method: str, **keywords):
         '''
@@ -3615,7 +3630,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         ...     a.insert(n)
         >>> found = a.getElementsByClass(note.Note)
         >>> found
-        <music21.stream.iterator.StreamIterator for Score:0x104f2f400 @:0>
+        <music21.stream.iterator.StreamIterator for Score:0x118d20710 @:0>
 
         >>> len(found)
         4
@@ -13832,7 +13847,7 @@ class Score(Stream):
 
         >>> s = corpus.parse('bach/bwv66.6')
         >>> s.parts
-        <music21.stream.iterator.StreamIterator for Score:0x104af3a58 @:0>
+        <music21.stream.iterator.StreamIterator for Score:bach/bwv66.6.mxl @:0>
         >>> len(s.parts)
         4
         '''
@@ -13906,7 +13921,7 @@ class Score(Stream):
         >>> bachIn = corpus.parse('bach/bwv324.xml')
         >>> excerpt = bachIn.measure(2)
         >>> excerpt
-        <music21.stream.Score 0x10322b5f8>
+        <music21.stream.Score bach/bwv324.mxl>
         >>> len(excerpt.parts)
         4
         >>> excerpt.parts[0].show('text')

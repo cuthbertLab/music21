@@ -218,9 +218,6 @@ def runningInNotebook() -> bool:
     https://stackoverflow.com/questions/15411967/how-can-i-check-if-code-is-executed-in-the-ipython-notebook
 
     (No tests provided here, since results will differ depending on environment)
-
-    May be moved in v8 or later to the ipython21 module.  Implementation may
-    change.
     '''
     if sys.stderr.__class__.__name__ == 'OutStream':
         return True

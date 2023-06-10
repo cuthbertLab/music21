@@ -1670,7 +1670,7 @@ class ScoreExporter(XMLExporterBase, PartStaffExporterMixin):
         >>> SX = musicxml.m21ToXml.ScoreExporter(b)
         >>> SX.setMeterStream()
         >>> SX.meterStream
-        <music21.stream.Score 0x...>
+        <music21.stream.Score bach/bwv66.6.mxl>
         >>> len(SX.meterStream)
         4
         >>> SX.meterStream[0]

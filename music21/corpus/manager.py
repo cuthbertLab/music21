@@ -202,13 +202,13 @@ def parse(
         number=number,
         format=format
     )
-    _addCorpusFilepathToStreamObject(streamObject, filePath)
+    _addCorpusFilePathToStreamObject(streamObject, filePath)
     return streamObject
 
 
-def _addCorpusFilepathToStreamObject(streamObj, filePath):
+def _addCorpusFilePathToStreamObject(streamObj, filePath):
     '''
-    Adds an entry 'corpusFilepath' to the Stream object.
+    Adds an entry 'corpusFilePpath' to the Stream object.
 
     TODO: this should work for non-core-corpora
     TODO: this should be in the metadata object
@@ -227,9 +227,12 @@ def _addCorpusFilepathToStreamObject(streamObj, filePath):
         # corpus fix for windows
         dirsEtc = fp2.split(os.sep)
         fp3 = '/'.join(dirsEtc)
-        streamObj.corpusFilepath = fp3
+        streamObj.metadata.corpusFilePath = fp3
     else:
-        streamObj.corpusFilepath = filePath
+        streamObj.metadata.corpusFilePath = filePath
+
+    if isinstance(streamObj.id, int):
+        streamObj.id = streamObj.metadata.corpusFilePath
 
 
 def search(

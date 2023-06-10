@@ -2330,7 +2330,7 @@ class Music21Object(prebase.ProtoM21Object):
         <music21.stream.Part Alto>
         <music21.stream.Part Soprano>
         <music21.metadata.Metadata object at 0x11116d080>
-        <music21.stream.Score 0x10513af98>
+        <music21.stream.Score bach/bwv66.6.mxl>
 
         * Changed in v6: added activeSiteOnly -- see description in `.contextSites()`
         '''
@@ -2986,7 +2986,7 @@ class Music21Object(prebase.ProtoM21Object):
         >>> [e for e in noteE.containerHierarchy()]
         [<music21.stream.Measure 1 offset=1.0>,
          <music21.stream.Part Soprano>,
-         <music21.stream.Score 0x1049a5668>]
+         <music21.stream.Score bach/bwv66.6.mxl>]
 
 
         Note that derived objects also can follow the container hierarchy:
@@ -2996,7 +2996,7 @@ class Music21Object(prebase.ProtoM21Object):
         >>> [e for e in n2.containerHierarchy()]
         [<music21.stream.Measure 1 offset=1.0>,
          <music21.stream.Part Soprano>,
-         <music21.stream.Score 0x1049a5668>]
+         <music21.stream.Score bach/bwv66.6.mxl>]
 
         Unless followDerivation is False:
 
@@ -3011,7 +3011,7 @@ class Music21Object(prebase.ProtoM21Object):
         [<music21.note.Note E>,
          <music21.stream.Measure 1 offset=1.0>,
          <music21.stream.Part Soprano>,
-         <music21.stream.Score 0x1049a5668>]
+         <music21.stream.Score bach/bwv66.6.mxl>]
 
 
         The method follows activeSites, so set the activeSite as necessary.

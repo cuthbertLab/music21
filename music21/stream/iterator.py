@@ -1726,7 +1726,7 @@ class RecursiveIterator(StreamIterator, Sequence[M21ObjType]):
 
     >>> for x in b.recurse(streamsOnly=True, includeSelf=True):
     ...     print(x)
-    <music21.stream.Score 0x10484fd68>
+    <music21.stream.Score bach/bwv66.6.mxl>
     <music21.stream.Part Soprano>
     <music21.stream.Measure 0 offset=0.0>
     <music21.stream.Measure 1 offset=1.0>
@@ -1744,7 +1744,7 @@ class RecursiveIterator(StreamIterator, Sequence[M21ObjType]):
     ...       and el.expressions) else False
     >>> expressive = b.recurse().addFilter(hasExpressions)
     >>> expressive
-    <music21.stream.iterator.RecursiveIterator for Score:0x10487f550 @:0>
+    <music21.stream.iterator.RecursiveIterator for Score:bach/bwv66.6.mxl @:0>
 
     >>> for el in expressive:
     ...     print(el, el.expressions)
@@ -1907,7 +1907,7 @@ class RecursiveIterator(StreamIterator, Sequence[M21ObjType]):
         ...     if i > 13:
         ...         break
         >>> bRecurse.iteratorStack()
-        [<music21.stream.iterator.RecursiveIterator for Score:0x10475cdd8 @:2>,
+        [<music21.stream.iterator.RecursiveIterator for Score:bach/bwv66.6.mxl @:2>,
          <music21.stream.iterator.RecursiveIterator for Part:Soprano @:3>,
          <music21.stream.iterator.RecursiveIterator for Measure:m.1 @:3>]
         '''
@@ -1932,7 +1932,7 @@ class RecursiveIterator(StreamIterator, Sequence[M21ObjType]):
         ...     if i > 12:
         ...         break
         >>> bRecurse.streamStack()
-        [<music21.stream.Score 0x1049a0710>,
+        [<music21.stream.Score bach/bwv66.6.mxl>,
          <music21.stream.Part Soprano>,
          <music21.stream.Measure 1 offset=1.0>]
         '''
