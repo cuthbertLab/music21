@@ -141,6 +141,10 @@ class PlotStreamMixin(prebase.ProtoM21Object):
         main routine to extract data, set axis labels, run process() on the underlying
         Graph object, and if self.doneAction is not None, either write or show the graph.
         '''
+        if t.TYPE_CHECKING:
+            from music21.graph.primitives import Graph
+            assert isinstance(self, Graph) and isinstance(self, PlotStreamMixin)
+
         self.setAxisKeywords()
         self.extractData()
         if hasattr(self, 'axisY') and self.axisY:
@@ -575,6 +579,9 @@ class Histogram(primitives.GraphHistogram, PlotStreamMixin):
         '''
         Override run method to remap X data into individual bins.
         '''
+        if t.TYPE_CHECKING:
+            assert hasattr(self, 'axisX') and hasattr(self, 'axisY')
+
         self.setAxisKeywords()
         self.extractData()
         self.setTicks('y', self.axisY.ticks())

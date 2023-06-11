@@ -231,7 +231,7 @@ class JupyterNotebookReSTWriter(ReSTWriter):
     This class wraps the 3rd-party ``nbconvert`` Python script.
     '''
     def __init__(self):
-        from .iterators import JupterNotebookIterator
+        from .iterators import JupyterNotebookIterator
         super().__init__()
         self.jupyterNotebookFilePaths = list(JupyterNotebookIterator())
         # Do not run self.setupOutputDirectory()
@@ -462,7 +462,7 @@ class JupyterNotebookReSTWriter(ReSTWriter):
 
 
 if __name__ == '__main__':
-    i = IPythonNotebookReSTWriter()
+    i = JupyterNotebookReSTWriter()
     p5 = i.jupyterNotebookFilePaths[5]
     i.convertOneNotebook(p5)
     import music21

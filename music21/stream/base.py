@@ -7322,7 +7322,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         # that come before the first Note, such as a SystemLayout object
         # or there could be ChordSymbols with zero (unrealized) durations
         f = returnObj.flatten()
-        notes_and_rests: StreamType[note.GeneralNote] = f.notesAndRests.addFilter(
+        notes_and_rests: StreamType = f.notesAndRests.addFilter(
             lambda el, _iterator: el.quarterLength > 0
         ).stream()
 
@@ -7499,7 +7499,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
                     raise StreamException('aggregated ties have a zero duration sum')
                 # change the duration of the first note to be self + sum
                 # of all others
-                changing_note: note.GeneralNote = notes_and_rests[posConnected[0]]
+                changing_note = t.cast(note.GeneralNote, notes_and_rests[posConnected[0]])
 
                 qLen = changing_note.quarterLength
                 if not changing_note.duration.linked:
