@@ -81,7 +81,11 @@ environLocal = environment.Environment('corpus')
 # -----------------------------------------------------------------------------
 
 
-def getCorePaths(*, fileExtensions: Iterable[str] = (), expandExtensions=True):
+def getCorePaths(
+    *,
+    fileExtensions: Iterable[str] = (),
+    expandExtensions=True
+) -> list[pathlib.Path]:
     '''
     Get all paths in the corpus that match a known extension, or an extenion
     provided by an argument.
@@ -131,7 +135,7 @@ def getLocalPaths(
     *,
     fileExtensions: Iterable[str] = (),
     expandExtensions: bool = True,
-):
+)  -> list[pathlib.Path]:
     '''
     Access files in additional directories supplied by the user and defined in
     environment settings in the 'localCorpusSettings' list.

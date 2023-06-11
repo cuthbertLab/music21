@@ -240,7 +240,7 @@ def search(
     field: str | None = None,
     *,
     corpusNames=None,
-    fileExtensions: Iterable[str] = (),
+    fileExtensions: Iterable[str] | str = (),
     **keywords
 ):
     '''
@@ -289,6 +289,13 @@ def search(
     ...     )
     <music21.metadata.bundles.MetadataBundle {564 entries}>
 
+    >>> corpus.manager.search(
+    ...     'bach',
+    ...     corpusNames=('core',),
+    ...     fileExtensions=('xml',),
+    ...     )
+    <music21.metadata.bundles.MetadataBundle {412 entries}>
+
     If ``corpusNames`` is None, all corpora known to music21 will be searched.
 
     See usersGuide (chapter 11) for more information on searching
@@ -296,6 +303,8 @@ def search(
     '''
     # >>> corpus.search('coltrane', corpusNames=('virtual',))
     # <music21.metadata.bundles.MetadataBundle {1 entry}>
+    if isinstance(fileExtensions, str):
+        fileExtensions = (fileExtensions,)
 
     readAllMetadataBundlesFromDisk()
     allSearchResults = metadata.bundles.MetadataBundle()
@@ -316,7 +325,7 @@ def search(
     return allSearchResults
 
 
-def getMetadataBundleByCorpus(corpusObject):
+def getMetadataBundleByCorpus(corpusObject: corpora.Corpus) -> bundles.MetadataBundle:
     '''
     Return the metadata bundle for a single Corpus object
 
@@ -349,7 +358,7 @@ def getMetadataBundleByCorpus(corpusObject):
             corpusObject, corpusName))
 
 
-def cacheMetadataBundleFromDisk(corpusObject):
+def cacheMetadataBundleFromDisk(corpusObject: corpora.Corpus) -> None:
     r'''
     Update a corpus' metadata bundle from its stored JSON file on disk.
     '''
