@@ -135,7 +135,7 @@ def getLocalPaths(
     *,
     fileExtensions: Iterable[str] = (),
     expandExtensions: bool = True,
-)  -> list[pathlib.Path]:
+) -> list[pathlib.Path]:
     '''
     Access files in additional directories supplied by the user and defined in
     environment settings in the 'localCorpusSettings' list.

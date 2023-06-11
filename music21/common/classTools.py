@@ -13,7 +13,6 @@ from __future__ import annotations
 
 from collections.abc import Iterable, Collection
 import contextlib
-import numbers
 import typing as t
 
 if t.TYPE_CHECKING:

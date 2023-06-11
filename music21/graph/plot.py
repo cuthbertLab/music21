@@ -136,7 +136,7 @@ class PlotStreamMixin(prebase.ProtoM21Object):
                 allAxesList.append(getattr(self, axisName))
         return allAxesList
 
-    def run(self):
+    def run(self, *, callProcess: bool = True, **keywords):
         '''
         main routine to extract data, set axis labels, run process() on the underlying
         Graph object, and if self.doneAction is not None, either write or show the graph.
@@ -150,7 +150,8 @@ class PlotStreamMixin(prebase.ProtoM21Object):
             self.setTicks('x', self.axisX.ticks())
             self.setAxisLabel('x', self.axisX.label)
 
-        self.process()
+        if callProcess:
+            self.process()
 
     # --------------------------------------------------------------------------
     def setAxisKeywords(self):
@@ -570,7 +571,7 @@ class Histogram(primitives.GraphHistogram, PlotStreamMixin):
         if 'alpha' not in keywords:
             self.alpha = 1.0
 
-    def run(self):
+    def run(self, *, callProcess: bool = True, **keywords):
         '''
         Override run method to remap X data into individual bins.
         '''
@@ -582,7 +583,8 @@ class Histogram(primitives.GraphHistogram, PlotStreamMixin):
         self.setAxisLabel('y', self.axisY.label)
         self.setAxisLabel('x', self.axisX.label)
 
-        self.process()
+        if callProcess:
+            self.process()
 
     def remapXTicksData(self):
         '''
@@ -885,7 +887,7 @@ class WindowedAnalysis(primitives.GraphColorGrid, PlotStreamMixin):
             self._processor = self.processorClass(self.streamObj)  # pylint: disable=not-callable
         return self._processor
 
-    def run(self, **keywords):
+    def run(self, *, callProcess: bool = True, **keywords):
         '''
         actually create the graph...
         '''
@@ -908,7 +910,8 @@ class WindowedAnalysis(primitives.GraphColorGrid, PlotStreamMixin):
         self.setAxisLabel('x', f'Windows ({self.axisX.label} Span)')
 
         self.graphLegend = self._getLegend()
-        self.process()
+        if callProcess:
+            self.process()
 
         # uses self.processor
 
@@ -1056,13 +1059,13 @@ class HorizontalBar(primitives.GraphHorizontalBar, PlotStreamMixin):
 
         self.axisY.hideUnused = False
 
-    def run(self):
+    def run(self, *, callProcess: bool = True, **keywords):
         '''
         Optionally assign colors to Part objects and then do the normal run.
         '''
         if self.colorByPart:
             self.assignColorsToParts()
-        super().run()
+        super().run(callProcess=callProcess, **keywords)
 
     def assignColorsToParts(self) -> dict[stream.Part, str]:
         '''
@@ -1502,7 +1505,7 @@ class Features(MultiStream):
         if 'title' not in keywords:
             self.title = None
 
-    def run(self):
+    def run(self, *, callProcess: bool = True, **keywords):
         # will use self.fx and self.fxTick to extract data
         self.setAxisKeywords()
 
@@ -1512,7 +1515,9 @@ class Features(MultiStream):
 
         self.setTicks('x', xTicks)
         self.setTicks('y', yTicks)
-        self.process()
+
+        if callProcess:
+            self.process()
 
     def extractData(self):
         if len(self.labelList) != len(self.streamList):

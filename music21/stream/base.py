@@ -7322,7 +7322,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         # that come before the first Note, such as a SystemLayout object
         # or there could be ChordSymbols with zero (unrealized) durations
         f = returnObj.flatten()
-        notes_and_rests: StreamType = f.notesAndRests.addFilter(
+        notes_and_rests: StreamType[note.GeneralNote] = f.notesAndRests.addFilter(
             lambda el, _iterator: el.quarterLength > 0
         ).stream()
 
@@ -7499,14 +7499,19 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
                     raise StreamException('aggregated ties have a zero duration sum')
                 # change the duration of the first note to be self + sum
                 # of all others
-                qLen = notes_and_rests[posConnected[0]].quarterLength
-                if not notes_and_rests[posConnected[0]].duration.linked:
+                changing_note: note.GeneralNote = notes_and_rests[posConnected[0]]
+
+                qLen = changing_note.quarterLength
+                if not changing_note.duration.linked:
                     # obscure bug found from some inexact musicxml files.
-                    notes_and_rests[posConnected[0]].duration.linked = True
-                notes_and_rests[posConnected[0]].quarterLength = qLen + durSum
+                    changing_note.duration.linked = True
+                changing_note.quarterLength = opFrac(qLen + durSum)
 
                 # set tie to None on first note
-                notes_and_rests[posConnected[0]].tie = None
+                changing_note.tie = None
+
+                # let the site know that we've changed duration.
+                changing_note.informSites()
 
                 # replace removed elements in spanners
                 for sp in f.spanners:
@@ -7514,7 +7519,8 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
                         if notes_and_rests[index] in sp:
                             sp.replaceSpannedElement(
                                 notes_and_rests[index],
-                                notes_and_rests[posConnected[0]])
+                                changing_note
+                            )
 
                 posConnected = []  # reset to empty
 
