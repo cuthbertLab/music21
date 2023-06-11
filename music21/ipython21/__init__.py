@@ -36,7 +36,7 @@ def loadNoMagic():
     Load the magic functions of load_ipython_extension when running IPython
     without needing to call a %magic function
     '''
-    if common.runningUnderIPython():
+    if common.runningInNotebook():
         # noinspection PyPackageRequirements
         from IPython.core.interactiveshell import InteractiveShell  # type: ignore
         if InteractiveShell.initialized():
@@ -44,9 +44,9 @@ def loadNoMagic():
             load_ipython_extension(localIP)
 
 
-# if we are imported in an IPython environment, then load magic after two seconds
+# if we are imported in a Jupyter environment, then load magic after a second
 # so that everything can settle.
-if common.runningUnderIPython():
+if common.runningInNotebook():
     from threading import Timer
-    t = Timer(2, loadNoMagic)
+    t = Timer(1, loadNoMagic)
     t.start()

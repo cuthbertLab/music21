@@ -1168,16 +1168,22 @@ def tempoToMidiEvents(
     we create a text name if there's an appropriate one:
 
     >>> midi.translate.midiEventsToTempo(events)
-    <music21.tempo.MetronomeMark maestoso Quarter=90.0>
+    <music21.tempo.MetronomeMark maestoso Quarter=90>
 
     `None` is returned if the MetronomeMark lacks a number, which can
     happen with metric modulation marks.
 
     >>> midi.translate.tempoToMidiEvents(tempo.MetronomeMark(number=None)) is None
     True
+
+    Sounding numbers also translate even if number is None
+
+    >>> mm = tempo.MetronomeMark(numberSounding=80)
+    >>> midi.translate.tempoToMidiEvents(mm)
+    [<music21.midi.DeltaTime ...>, <music21.midi.MidiEvent SET_TEMPO...>]
     '''
     from music21 import midi as midiModule
-    if not hasattr(tempoIndication, 'number') or tempoIndication.number is None:
+    if tempoIndication.number is None and tempoIndication.numberSounding is None:
         return None
     mt = None  # use a midi track set to None
     eventList: list[midi.DeltaTime | midi.MidiEvent] = []

@@ -361,14 +361,16 @@ class Test(unittest.TestCase):
 
     def testImportMetronomeMarksB(self):
         '''
-        Import sound tempo marks as MetronomeMarks.
+        Import sound tempo marks as MetronomeMarks but only set numberSounding
         '''
         from music21 import corpus
         s = corpus.parse('bach/bwv69.6.xml')
         self.assertEqual(len(s.flatten()[tempo.MetronomeMark]), 8)
         for p in s.parts:
-            self.assertEqual(p.measure(0)[tempo.MetronomeMark][0].number, 96)
-            self.assertEqual(p.measure(0)[tempo.MetronomeMark][0].referent, duration.Duration(1.0))
+            mm = p.measure(0)[tempo.MetronomeMark].first()
+            self.assertIsNone(mm.number)
+            self.assertEqual(mm.numberSounding, 96)
+            self.assertEqual(mm.referent, duration.Duration(1.0))
 
     def testImportMetronomeMarksC(self):
         '''

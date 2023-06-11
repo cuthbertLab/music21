@@ -1165,7 +1165,10 @@ class MetadataBundle(prebase.ProtoM21Object):
         >>> metadataBundle.search(composer='cicon')
         <music21.metadata.bundles.MetadataBundle {1 entry}>
         '''
-        acceptable_extensions: set[str] = set(fileExtensions)
+        # TODO: this is spaghetti code -- put all the fileExtensions
+        #    logic in common.formats
+        from music21.corpus.corpora import Corpus
+        acceptable_extensions: set[str] = set(Corpus.translateExtensions(fileExtensions))
 
         newMetadataBundle = MetadataBundle()
         if query is None and field is None:

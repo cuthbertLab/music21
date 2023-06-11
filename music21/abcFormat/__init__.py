@@ -661,27 +661,27 @@ class ABCMetadata(ABCToken):
         >>> am = abcFormat.ABCMetadata('Q: "Allegro" 1/4=120')
         >>> am.preParse()
         >>> am.getMetronomeMarkObject()
-        <music21.tempo.MetronomeMark Allegro Quarter=120.0>
+        <music21.tempo.MetronomeMark Allegro Quarter=120>
 
         >>> am = abcFormat.ABCMetadata('Q: 3/8=50 "Slowly"')
         >>> am.preParse()
         >>> am.getMetronomeMarkObject()
-        <music21.tempo.MetronomeMark Slowly Dotted Quarter=50.0>
+        <music21.tempo.MetronomeMark Slowly Dotted Quarter=50>
 
         >>> am = abcFormat.ABCMetadata('Q:1/2=120')
         >>> am.preParse()
         >>> am.getMetronomeMarkObject()
-        <music21.tempo.MetronomeMark animato Half=120.0>
+        <music21.tempo.MetronomeMark animato Half=120>
 
         >>> am = abcFormat.ABCMetadata('Q:1/4 3/8 1/4 3/8=40')
         >>> am.preParse()
         >>> am.getMetronomeMarkObject()
-        <music21.tempo.MetronomeMark grave Whole tied to Quarter (5 total QL)=40.0>
+        <music21.tempo.MetronomeMark grave Whole tied to Quarter (5 total QL)=40>
 
         >>> am = abcFormat.ABCMetadata('Q:90')
         >>> am.preParse()
         >>> am.getMetronomeMarkObject()
-        <music21.tempo.MetronomeMark maestoso Quarter=90.0>
+        <music21.tempo.MetronomeMark maestoso Quarter=90>
         '''
         if not self.isTempo():
             raise ABCTokenException('no tempo associated with this metadata')

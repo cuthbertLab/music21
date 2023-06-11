@@ -152,8 +152,7 @@ def plotStream(
                 setattr(obj, attrName, axisClass(obj, axisName))
         obj.run()
 
-    if obj:
-        return obj  # just first one...
+    return obj  # just last one...
 
 # ------------------------------------------------------------------------------
 class TestExternal(unittest.TestCase):

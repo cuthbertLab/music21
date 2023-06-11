@@ -26,6 +26,8 @@ import types
 import typing as t
 import weakref
 
+from music21.common.decorators import deprecated
+
 __all__ = [
     'flattenList',
     'getMissingImportStr',
@@ -34,7 +36,7 @@ __all__ = [
     'sortModules',
     'pitchList',
     'unique',
-    'runningUnderIPython',
+    'runningInNotebook',
     'defaultDeepcopy',
     'cleanedFlatNotation',
 ]
@@ -206,9 +208,9 @@ def pitchList(pitchL):
     return '[' + ', '.join([x.nameWithOctave for x in pitchL]) + ']'
 
 
-def runningUnderIPython() -> bool:
+def runningInNotebook() -> bool:
     '''
-    return bool if we are running under IPython Notebook (not IPython terminal)
+    return bool if we are running under Jupyter Notebook (not IPython terminal)
     or Google Colabatory (colab).
 
     Methods based on:
@@ -216,14 +218,19 @@ def runningUnderIPython() -> bool:
     https://stackoverflow.com/questions/15411967/how-can-i-check-if-code-is-executed-in-the-ipython-notebook
 
     (No tests provided here, since results will differ depending on environment)
-
-    May be moved in v8 or later to the ipython21 module.  Implementation may
-    change.
     '''
     if sys.stderr.__class__.__name__ == 'OutStream':
         return True
     else:
         return False
+
+
+@deprecated
+def runningUnderIPython() -> bool:  # pragma: no cover
+    '''
+    DEPRECATED in v9: use runningInNotebook() instead
+    '''
+    return runningInNotebook()
 
 
 # ----------------------------

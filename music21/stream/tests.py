@@ -7789,7 +7789,7 @@ class Test(unittest.TestCase):
                                                                   useMixedNumerals=True),
             '''{0 - 0} <music21.layout.SystemLayout>
 {0 - 0} <music21.clef.TrebleClef>
-{0 - 0} <music21.tempo.MetronomeMark animato Quarter=120>
+{0 - 0} <music21.tempo.MetronomeMark Quarter=120 (playback only)>
 {0 - 0} <music21.key.Key of B- major>
 {0 - 0} <music21.meter.TimeSignature 4/4>
 {0 - 2/3} <music21.note.Note B->
@@ -7799,7 +7799,7 @@ class Test(unittest.TestCase):
         self.assertMultiLineEqual(
             s.parts[1].getElementsByClass(Measure)[0]._reprText(addEndTimes=True),
             '''{0.0 - 0.0} <music21.clef.BassClef>
-{0.0 - 0.0} <music21.tempo.MetronomeMark animato Quarter=120>
+{0.0 - 0.0} <music21.tempo.MetronomeMark Quarter=120 (playback only)>
 {0.0 - 0.0} <music21.key.Key of B- major>
 {0.0 - 0.0} <music21.meter.TimeSignature 4/4>
 {0.0 - 4.0} <music21.note.Note B->''')
@@ -7808,7 +7808,7 @@ class Test(unittest.TestCase):
         self.assertMultiLineEqual(m1._reprText(addEndTimes=True, useMixedNumerals=True),
                                   '''{0 - 0} <music21.layout.SystemLayout>
 {0 - 0} <music21.clef.TrebleClef>
-{0 - 0} <music21.tempo.MetronomeMark animato Quarter=120>
+{0 - 0} <music21.tempo.MetronomeMark Quarter=120 (playback only)>
 {0 - 0} <music21.key.Key of B- major>
 {0 - 0} <music21.meter.TimeSignature 4/4>
 {0 - 2/3} <music21.chord.Chord B-2 B-4>

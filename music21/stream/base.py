@@ -3409,6 +3409,8 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
              xValue: str | None = None,
              yValue: str | None = None,
              zValue: str | None = None,
+             *,
+             returnInNotebook: bool = False,
              **keywords):
         '''
         Given a method and keyword configuration arguments, create and display a plot.
@@ -3426,16 +3428,30 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         .. image:: images/HorizontalBarPitchSpaceOffset.*
             :width: 600
 
+        By default, a plot is returned in normal Python environments, but not
+        in Jupyter notebook/JupyterLab/Google Colab.  The
+        keyword `returnInNotebook` if True returns a plot no matter what.
+
+        Changed in v9: Changed default for return in notebook, and added
+          `returnInNotebook` keyword based on changes to recent Jupyter and
+          similar releases.
         '''
         # import is here to avoid import of matplotlib problems
         from music21 import graph
         # first ordered arg can be method type
-        return graph.plotStream(self,
-                                plotFormat,
-                                xValue=xValue,
-                                yValue=yValue,
-                                zValue=zValue,
-                                **keywords)
+        out = graph.plotStream(
+            self,
+            plotFormat,
+            xValue=xValue,
+            yValue=yValue,
+            zValue=zValue,
+            **keywords
+        )
+        if returnInNotebook or not common.runningInNotebook():
+            return out
+        out.run()
+        return None
+
 
     def analyze(self, method: str, **keywords):
         '''
@@ -3615,7 +3631,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         ...     a.insert(n)
         >>> found = a.getElementsByClass(note.Note)
         >>> found
-        <music21.stream.iterator.StreamIterator for Score:0x104f2f400 @:0>
+        <music21.stream.iterator.StreamIterator for Score:0x118d20710 @:0>
 
         >>> len(found)
         4
@@ -4722,7 +4738,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         {0.0} <music21.instrument.Instrument 'P1: Soprano: Instrument 1'>
         {0.0} <music21.stream.Measure 0 offset=0.0>
             {0.0} <music21.clef.TrebleClef>
-            {0.0} <music21.tempo.MetronomeMark Quarter=96>
+            {0.0} <music21.tempo.MetronomeMark Quarter=96 (playback only)>
             {0.0} <music21.key.Key of f# minor>
             {0.0} <music21.meter.TimeSignature 4/4>
             {0.0} <music21.note.Rest quarter>
@@ -4745,7 +4761,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         {0.0} <music21.instrument.Instrument 'P2: Alto: Instrument 2'>
         {0.0} <music21.stream.Measure 0 offset=0.0>
             {0.0} <music21.clef.TrebleClef>
-            {0.0} <music21.tempo.MetronomeMark Quarter=96>
+            {0.0} <music21.tempo.MetronomeMark Quarter=96 (playback only)>
             {0.0} <music21.key.Key of f# minor>
             {0.0} <music21.meter.TimeSignature 4/4>
         {1.0} <music21.stream.Measure 1 offset=1.0>
@@ -4765,7 +4781,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         ...       removeClasses=['Clef', 'KeySignature', 'TimeSignature', 'Instrument'])
         >>> tenorNoClefsSignatures.show('text')
         {0.0} <music21.stream.Measure 0 offset=0.0>
-            {0.0} <music21.tempo.MetronomeMark Quarter=96>
+            {0.0} <music21.tempo.MetronomeMark Quarter=96 (playback only)>
             {0.0} <music21.note.Note A>
             {0.5} <music21.note.Note B>
         {1.0} <music21.stream.Measure 1 offset=1.0>
@@ -4801,7 +4817,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
             {0.0} <music21.instrument.Instrument 'P1: Soprano: Instrument 1'>
             {0.0} <music21.stream.Measure 0 offset=0.0>
                 {0.0} <music21.clef.TrebleClef>
-                {0.0} <music21.tempo.MetronomeMark Quarter=96>
+                {0.0} <music21.tempo.MetronomeMark Quarter=96 (playback only)>
                 {0.0} <music21.key.Key of f# minor>
                 {0.0} <music21.meter.TimeSignature 4/4>
                 {0.0} <music21.note.Rest quarter>
@@ -4815,7 +4831,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
             {0.0} <music21.instrument.Instrument 'P2: Alto: Instrument 2'>
             {0.0} <music21.stream.Measure 0 offset=0.0>
                 {0.0} <music21.clef.TrebleClef>
-                {0.0} <music21.tempo.MetronomeMark Quarter=96>
+                {0.0} <music21.tempo.MetronomeMark Quarter=96 (playback only)>
                 {0.0} <music21.key.Key of f# minor>
                 {0.0} <music21.meter.TimeSignature 4/4>
                 {0.0} <music21.note.Rest quarter>
@@ -5816,7 +5832,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         {0.0} <music21.stream.Measure 1 offset=0.0>
             {0.0} <music21.layout.SystemLayout>
             {0.0} <music21.clef.Treble8vbClef>
-            {0.0} <music21.tempo.MetronomeMark animato Quarter=120>
+            {0.0} <music21.tempo.MetronomeMark Quarter=120 (playback only)>
             {0.0} <music21.key.Key of F major>
             {0.0} <music21.meter.TimeSignature 2/4>
             {0.0} <music21.note.Note C>
@@ -5839,7 +5855,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         {0.0} <music21.stream.Measure 1 offset=0.0>
             {0.0} <music21.layout.SystemLayout>
             {0.0} <music21.clef.Treble8vbClef>
-            {0.0} <music21.tempo.MetronomeMark animato Quarter=120>
+            {0.0} <music21.tempo.MetronomeMark Quarter=120 (playback only)>
             {0.0} <music21.key.KeySignature of 3 flats>
             {0.0} <music21.meter.TimeSignature 2/4>
             {0.0} <music21.note.Note B->
@@ -7483,14 +7499,19 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
                     raise StreamException('aggregated ties have a zero duration sum')
                 # change the duration of the first note to be self + sum
                 # of all others
-                qLen = notes_and_rests[posConnected[0]].quarterLength
-                if not notes_and_rests[posConnected[0]].duration.linked:
+                changing_note = t.cast(note.GeneralNote, notes_and_rests[posConnected[0]])
+
+                qLen = changing_note.quarterLength
+                if not changing_note.duration.linked:
                     # obscure bug found from some inexact musicxml files.
-                    notes_and_rests[posConnected[0]].duration.linked = True
-                notes_and_rests[posConnected[0]].quarterLength = qLen + durSum
+                    changing_note.duration.linked = True
+                changing_note.quarterLength = opFrac(qLen + durSum)
 
                 # set tie to None on first note
-                notes_and_rests[posConnected[0]].tie = None
+                changing_note.tie = None
+
+                # let the site know that we've changed duration.
+                changing_note.informSites()
 
                 # replace removed elements in spanners
                 for sp in f.spanners:
@@ -7498,7 +7519,8 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
                         if notes_and_rests[index] in sp:
                             sp.replaceSpannedElement(
                                 notes_and_rests[index],
-                                notes_and_rests[posConnected[0]])
+                                changing_note
+                            )
 
                 posConnected = []  # reset to empty
 
@@ -13832,7 +13854,7 @@ class Score(Stream):
 
         >>> s = corpus.parse('bach/bwv66.6')
         >>> s.parts
-        <music21.stream.iterator.StreamIterator for Score:0x104af3a58 @:0>
+        <music21.stream.iterator.StreamIterator for Score:bach/bwv66.6.mxl @:0>
         >>> len(s.parts)
         4
         '''
@@ -13906,7 +13928,7 @@ class Score(Stream):
         >>> bachIn = corpus.parse('bach/bwv324.xml')
         >>> excerpt = bachIn.measure(2)
         >>> excerpt
-        <music21.stream.Score 0x10322b5f8>
+        <music21.stream.Score bach/bwv324.mxl>
         >>> len(excerpt.parts)
         4
         >>> excerpt.parts[0].show('text')
@@ -14478,7 +14500,7 @@ class Opus(Stream):
 
         if fmt is not None and 'lily' in fmt:
             return Stream.write(self, fmt, fp, **keywords)
-        elif common.runningUnderIPython():
+        elif common.runningInNotebook():
             return Stream.write(self, fmt, fp, **keywords)
 
         delete = False
@@ -14521,11 +14543,11 @@ class Opus(Stream):
 
         This method overrides the behavior specified in
         :class:`~music21.base.Music21Object` for all
-        formats besides explicit lily.x calls. or when running under IPython notebook.
+        formats besides explicit lily.x calls. or when running under Jupyter notebook.
         '''
         if fmt is not None and 'lily' in fmt:
             return Stream.show(self, fmt, app, **keywords)
-        elif common.runningUnderIPython():
+        elif common.runningInNotebook():
             return Stream.show(self, fmt, app, **keywords)
         else:
             for s in self.scores:

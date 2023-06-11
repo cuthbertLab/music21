@@ -24,7 +24,7 @@ from music21 import defaults
 from music21 import environment
 from music21 import stream
 
-from music21.ipython21.ipExtension import needsToLoadRequireJS
+# from music21.ipython21.ipExtension import needsToLoadRequireJS
 
 if t.TYPE_CHECKING:
     from music21 import base
@@ -149,13 +149,11 @@ def displayMusic21jMIDI(
     s = common.SingletonCounter()
     outputId = 'midiPlayerDiv' + str(s())
 
-    load_require_script = ''
-    if needsToLoadRequireJS():
-        load_require_script = '''
-            <script
-            src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js"
-            ></script>
-        '''
+    load_require_script = '''
+        <script
+        src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js"
+        ></script>
+    '''
 
     utf_binary = binaryBase64.decode('utf-8')
     # noinspection PyTypeChecker

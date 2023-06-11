@@ -78,9 +78,9 @@ class DocBuilder:
         print('WRITING DOCUMENTATION FILES')
         writers.StaticFileCopier().run()
         try:
-            writers.IPythonNotebookReSTWriter().run()
+            writers.JupyterNotebookReSTWriter().run()
         except OSError:
-            raise ImportError('IPythonNotebookReSTWriter crashed; most likely cause: '
+            raise ImportError('JupyterNotebookReSTWriter crashed; most likely cause: '
                               + 'no pandoc installed: https://github.com/jgm/pandoc/releases')
 
         writers.ModuleReferenceReSTWriter().run()

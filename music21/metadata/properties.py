@@ -1139,6 +1139,12 @@ STANDARD_PROPERTY_DESCRIPTIONS: tuple[PropertyDescription, ...] = (
         namespace='m21FileInfo',
         isContributor=False),
 
+    # corpusFilePath: The path withing the corpus that the file was found at
+    PropertyDescription(
+        name='corpusFilePath',
+        namespace='m21FileInfo',
+        isContributor=False),
+
     # fileNumber: The number of the file (within a group of files) that was parsed
     #   to produce this metadata.
     PropertyDescription(

@@ -35,7 +35,7 @@ the announcement while it's running.
 8. run documentation/make.py linkcheck  [*]
 9. run documentation/make.py   [*]
 
-[*] you will need sphinx, IPython (pip or easy_install), markdown, and pandoc (.dmg) installed
+[*] you will need sphinx, Jupyter (pip or easy_install), markdown, and pandoc (.dmg) installed
 
 10. ssh to athena.dialup.mit.edu (yes, dialup!), cd music21/doc and rm -rf *  (skip on minor version changes)
 

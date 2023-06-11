@@ -525,7 +525,7 @@ class ElementTree(core.AVLTree):
         <ElementNode: Start:5.5 <0.20...>  Indices:(l:0 *49* r:99) Payload:<music21.note.Note A>>
         <ElementNode: Start:0.0 <0.20...>  Indices:(l:0 *24* r:49) Payload:<music21.note.Note A>>
         <ElementNode: Start:0.0 <0.1...>   Indices:(l:0 *12* r:24)
-            Payload:<music21.tempo.MetronomeMark Quarter=96>>
+            Payload:<music21.tempo.MetronomeMark Quarter=96 (playback only)>>
         <ElementNode: Start:0.0 <0.0...>   Indices:(l:0 *6* r:12) Payload:<music21.clef.TrebleClef>>
         <ElementNode: Start:0.0 <0.-25...> Indices:(l:0 *3* r:6)
             Payload:<music21.instrument.Instrument 'P3: Tenor: Instrument 3'>>

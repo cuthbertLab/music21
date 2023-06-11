@@ -1686,6 +1686,8 @@ class PartParser(XMLParserBase):
     def getDefaultInstrument(self, mxScorePart: ET.Element | None = None) -> instrument.Instrument:
         # noinspection PyShadowingNames
         r'''
+        Get a default instrument from the mxScorePart tag.
+
         >>> scorePart = ('<score-part id="P4"><part-name>Bass</part-name>'
         ...     + '<part-abbreviation>B.</part-abbreviation>'
         ...     + '<score-instrument id="P4-I4">'
@@ -1701,6 +1703,8 @@ class PartParser(XMLParserBase):
 
         >>> mxScorePart = EL(scorePart)
         >>> i = PP.getDefaultInstrument(mxScorePart)
+        >>> i
+        <music21.instrument.Instrument ': Instrument 4'>
         >>> i.instrumentName
         'Instrument 4'
 
@@ -5410,6 +5414,8 @@ class MeasureParser(XMLParserBase):
         If the <sound> tag is a child of a <direction> tag, the direction information
         is used to set the placement of the MetronomeMark.
         '''
+        # TODO: move to xmlSoundParser.py where is should have been.
+
         # TODO: coda
         # TODO: dacapo
         # TODO: dalsegno
@@ -5430,8 +5436,10 @@ class MeasureParser(XMLParserBase):
             if qpm == 0:
                 warnings.warn('0 qpm tempo tag found, skipping.')
                 return
-            mm = tempo.MetronomeMark(number=qpm, referent=note.Note(type='quarter'))
-
+            mm = tempo.MetronomeMark(referent=duration.Duration(type='quarter'),
+                                     number=None,
+                                     numberSounding=qpm,
+                                     )
             _synchronizeIds(mxSound, mm)
             self.setPrintObject(mxSound, mm)
             self.setPosition(mxSound, mm)
