@@ -2409,9 +2409,12 @@ class MeasureParser(XMLParserBase):
         'attributes': 'parseAttributesTag',
         'harmony': 'xmlHarmony',
 <<<<<<< HEAD
+<<<<<<< HEAD
         'figured-bass': None,
         'sound': 'xmlSound',
 =======
+=======
+>>>>>>> 695a1e971a44bd4e8688984cf895c2ce7ff9d30d
         'figured-bass': 'xmlToFiguredBass',
         'sound': None,
 >>>>>>> 82995d732 (xml import and export fixed problems with more than two figures per note)
