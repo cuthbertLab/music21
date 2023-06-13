@@ -2506,6 +2506,22 @@ def chordFromElement(elem, slurBundle=None):
     return theChord
 
 def harmFromElement(elem, slurBundle=None) -> tuple:
+    '''
+    The MEI <harm> tag is used for several types of indications. In the MEI v4 guidelines it says:
+
+    An indication of harmony, e.g., chord names, tablature grids, harmonic analysis, figured bass.
+    (In MEI v4 guidelines: https://music-encoding.org/guidelines/v4/elements/harm.html)
+
+    **Attributes/Elements Implemented:**
+
+    - @xml:id (or id), an XML id (submitted as the Music21Object "id")
+    - <fb> tags that contain figured bass information
+
+    **Attributes/Elements in Testing:** none
+
+    **Attributes not Implemented:** a lot
+    '''
+
     # other tags than <fb> to be added…
     tagToFunction = {f'{MEI_NS}fb': figuredbassFromElement}
 
@@ -2513,7 +2529,6 @@ def harmFromElement(elem, slurBundle=None) -> tuple:
 
     # Collect all elements in a measure and go throug extenders
     # tstamp has to be used as a duration marker between two elements
-
     for subElement in _processEmbeddedElements(elem.findall('*'),
                                                tagToFunction,
                                                elem.tag, slurBundle):
@@ -2524,25 +2539,49 @@ def harmFromElement(elem, slurBundle=None) -> tuple:
     return fb_harmony_tag
 
 def figuredbassFromElement(elem, slurBundle=None) -> harmony.FiguredBassIndication:
+    '''
+    This function handles basically the MEI <f> tag which is contained in the <fb> tag.
+    At the end a harmony.FiguredBassIndication object is returned.
+
+    **Attributes/Elements Implemented:**
+
+    - @xml:id (or id), an XML id (submitted as the Music21Object "id")
+    - @dur.metrical, duration of the figure
+    - @extender, contains information if a figure is prolonged over the duration of the figure
+
+    **Attributes/Elements in Testing:** none
+
+    **Attributes not Implemented:** a lot
+    '''
+
     if elem.get(_XMLID):
         fb_id = elem.get(_XMLID)
     fb_notation: str = ''
     fb_notation_list: list[str] = []
+    fb_extenders: list[bool] = []
     dauer: float = 0
+
     # loop through all child elements and collect <f> tags
     for subElement in elem.findall('*'):
         if subElement.tag == f'{MEI_NS}f':
             if subElement.text is not None:
-                fb_notation_list.append(subElement.text)
+                # remove Parentheses around figure numbers
+                fb_fig = subElement.text.strip('()')
+                fb_notation_list.append(fb_fig)
+            if 'extender' in subElement.attrib.keys():
+                #if subElement.attrib['extender'] == 'true':
+                #fb_notation_list.append('_')
+                print('extender: ', (subElement.attrib['extender'] == 'true'))
+                fb_extenders.append((subElement.attrib['extender'] == 'true'))
             else:
-                if 'extender' in subElement.attrib.keys():
-                    fb_notation_list.append('_')
+                fb_extenders.append(False)
+
             if 'dur.metrical' in subElement.attrib.keys():
                 dauer = float(subElement.attrib['dur.metrical'])
 
     # Generate a FiguredBassIndication object and set the collected information
     fb_notation = ','.join(fb_notation_list)
-    theFbNotation = harmony.FiguredBassIndication(fb_notation)
+    theFbNotation = harmony.FiguredBassIndication(fb_notation, extenders=fb_extenders)
     theFbNotation.id = fb_id
     theFbNotation.duration = duration.Duration(quarterLength=dauer)
 

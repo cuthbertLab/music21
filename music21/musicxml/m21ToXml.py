@@ -4638,6 +4638,30 @@ class MeasureExporter(XMLExporterBase):
         return mxNoteList
 
     def figuredBassToXml(self, f: harmony.FiguredBassIndication):
+        '''
+        Converts a FigurdBassIndication object to a musicxml <figured-bass> tag.
+        If there are multiple indications for one note they will be observed.
+
+        >>> fbi = harmony.FiguredBassIndication()
+        >>> fbi.quarterLength = 2
+        >>> fbi.fig_noation = '#,6b'
+
+        >>> MEX = musicxml.m21ToXml.MeasureExporter()
+        
+        >>> mxFigures = MEX.figuredBassToXml(fbi)
+        >>> MEX.dump(mxFigures)
+        <figured-bass>
+          <figure>
+            <figure-number />
+            <prefix>sharp</prefix>
+          </figure>
+          <figure>
+            <figure-number>6</figure-number>
+            <prefix>flat</prefix>
+          </figure>
+        </figured-bass>
+        '''
+
         # For FiguredBassElements we need to check whether there are
         # multiple figures for one note.
         # Therefore we compare offset of the figure and the current offsetInMeasure variable
