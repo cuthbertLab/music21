@@ -842,7 +842,7 @@ class MusicXMLImporter(XMLParserBase):
         self.m21PartObjectsById = {}
         self.partGroupList = []
         self.parts = []
-        self.fbis: list[harmony.FiguredBassIndication] | None = None
+        # self.fbis: list[harmony.FiguredBassIndication] | None = None
 
         self.musicXmlVersion = defaults.musicxmlVersion
 
@@ -927,9 +927,9 @@ class MusicXMLImporter(XMLParserBase):
                 s.coreInsert(0.0, part)
                 self.m21PartObjectsById[partId] = part
 
-        if self.fbis:
-            for fbi in self.fbis:
-                s.insert(fbi[0], fbi[1])
+        #if self.fbis:
+        #    for fbi in self.fbis:
+        #        s.insert(fbi[0], fbi[1])
 
         self.partGroups()
 
@@ -2364,12 +2364,12 @@ class PartParser(XMLParserBase):
             self.stream.insert(0, self.activeMultiMeasureRestSpanner)
             self.activeMultiMeasureRestSpanner = None
 
-    def appendFbis(self, fbi, measureOffset):
-        absOffset = self.lastMeasureOffset + measureOffset
-        if self.parent.fbis:
-            self.parent.fbis.append((absOffset, fbi))
-        else:
-            self.parent.fbis = [(absOffset, fbi)]
+    #def appendFbis(self, fbi, measureOffset):
+    #    absOffset = self.lastMeasureOffset + measureOffset
+    #    if self.parent.fbis:
+    #        self.parent.fbis.append((absOffset, fbi))
+    #    else:
+    #        self.parent.fbis = [(absOffset, fbi)]
 
 # -----------------------------------------------------------------------------
 class MeasureParser(XMLParserBase):
@@ -2408,16 +2408,8 @@ class MeasureParser(XMLParserBase):
         'direction': 'xmlDirection',
         'attributes': 'parseAttributesTag',
         'harmony': 'xmlHarmony',
-<<<<<<< HEAD
-<<<<<<< HEAD
-        'figured-bass': None,
-        'sound': 'xmlSound',
-=======
-=======
->>>>>>> 695a1e971a44bd4e8688984cf895c2ce7ff9d30d
         'figured-bass': 'xmlToFiguredBass',
-        'sound': None,
->>>>>>> 82995d732 (xml import and export fixed problems with more than two figures per note)
+        'sound': 'xmlSound',
         'barline': 'xmlBarline',
         'grouping': None,
         'link': None,
@@ -5271,37 +5263,78 @@ class MeasureParser(XMLParserBase):
 
         return cs
 
-    def xmlToFiguredBass(self, mxFiguredBass):
+    def xmlToFiguredBass(self, mxFiguredBass) -> harmony.FiguredBassIndication:
+        # noinspection PyShadowingNames
+        '''
+        Converts a figured bass tag in musicxml to a harmony.FiguredBassIndication object:
+
+        >>> from xml.etree.ElementTree import fromstring as EL
+        >>> MP = musicxml.xmlToM21.MeasureParser()
+
+        >>> fbStr = """
+                    <figured-bass>
+                      <figure>
+                        <figure-number>5</figure-number>
+                      </figure>
+                      <figure>
+                        <figure-number>4</figure-number>
+                      </figure>
+                    </figured-bass>
+                    """
+        >>> mxFigures = EL(fbStr)
+        >>> fbi = MP.xmlToFiguredBass(mxFigures)
+        >>> fbi
+        <FiguredBassIndication figures: 5,4>
+        '''
+
         fb_strings: list[str] = []
-        sep = ','
+        fb_extenders: list[bool] = []
+        sep: str = ','
         d: duration.Duration | None = None
         offsetFbi = self.offsetMeasureNote
 
-        for figure in mxFiguredBass.findall('*'):
-            # TODO: suffixes are ignored at the moment
-            for el in figure.findall('*'):
-                fb_number: str = ''
-                fb_prefix: str = ''
-                if el.tag == 'figure-number':
-                    if el.text:
-                        fb_number = el.text
-                    # Get prefix and/or suffix.
-                    # The function returns an empty string if nothing is found.
-                    fb_prefix = self._getFigurePrefixOrSuffix(figure, 'prefix')
-                    fb_suffix = self._getFigurePrefixOrSuffix(figure, 'suffix')
+        # parentheses is not used at the moment
+        hasParentheses: bool = False
 
-                    # put prefix/suffix and number together
-                    if fb_prefix + fb_number + fb_suffix != '':
-                        fb_strings.append(fb_prefix + fb_number + fb_suffix)
+        if 'parentheses' in mxFiguredBass.attrib.keys():
+            if mxFiguredBass.attrib['parentheses'] == 'yes':
+                hasParentheses = True
+                warnings.warn('Parentheses are ignored and removed at the moment.',
+                              MusicXMLWarning)
 
-                if el.tag == 'extend':
-                    if 'type' in el.attrib.keys():
-                        if el.attrib['type'] == 'continue':
-                            fb_strings.append('_')
+        for subElement in mxFiguredBass.findall('*'):
+            fb_number: str = ''
+            fb_prefix: str = ''
+            fb_suffix: str = ''
+            fb_extender: str = ''
+            if subElement.tag == 'figure':
+                for el in subElement.findall('*'):
+                    if el.tag == 'figure-number':
+                        if el.text:
+                            fb_number = el.text
+                        # Get prefix and/or suffix.
+                        # The function returns an empty string if nothing is found.
+                        fb_prefix = self._getFigurePrefixOrSuffix(subElement, 'prefix')
+                        fb_suffix = self._getFigurePrefixOrSuffix(subElement, 'suffix')
 
-            # If a <duration> is given, this usually means that there are multiple figures
-            # for a single note. We have to look for offsets here.
-            if figure.tag == 'duration':
+                    # collect information on extenders
+                    if el.tag == 'extend':
+                        if 'type' in el.attrib.keys():
+                            print((el.attrib['type'] in ['stop', 'continue', 'start']))
+                            fb_extenders.append((el.attrib['type'] in ['stop', 'continue', 'start']))
+                if not subElement.findall('extend'):
+                    fb_extenders.append(False)
+
+                # put prefix/suffix, extender and number together
+                if fb_prefix + fb_number + fb_extender + fb_suffix != '':
+                    fb_strings.append(fb_prefix + fb_number + fb_suffix)
+                else:
+                    # Warning because an empty figured-bass tag is not valid musixml.
+                    warnings.warn('There was an empty <figured-bass> tag.', MusicXMLWarning)
+
+                # If a <duration> is given, this usually means that there are multiple figures
+                # for a single note. We have to look for offsets here.
+            if subElement.tag == 'duration':
                 d = self.xmlToDuration(mxFiguredBass)
                 if self.lastFigureDuration > 0:
                     offsetFbi = self.offsetMeasureNote + self.lastFigureDuration
@@ -5311,18 +5344,24 @@ class MeasureParser(XMLParserBase):
                     self.lastFigureDuration = d.quarterLength
 
         fb_string = sep.join(fb_strings)
-        fbi = harmony.FiguredBassIndication(fb_string)
+        fbi = harmony.FiguredBassIndication(fb_string, extenders=fb_extenders)
+        
         # If a duration is provided, set length of the FigureBassIndication
         if d:
             fbi.quarterLength = d.quarterLength
-        # call function in parent to add found objects.
-        self.parent.appendFbis(fbi, offsetFbi)
+
+        self.stream.insert(offsetFbi, fbi)
+        return fbi
 
     def _getFigurePrefixOrSuffix(self, figure, presuf: str = 'prefix') -> str:
+        '''
+        A helper function for prefixes and suffixes of figure numbers.
+        Called two times from xmlToFiguredBass().
+        '''
+
         if figure.findall(presuf):
             for fix in figure.findall(presuf):
                 if fix.text:
-                    print(fix.text)
                     return modifiersDictXmlToM21[fix.text]
         return ''
 
