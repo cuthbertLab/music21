@@ -2506,6 +2506,22 @@ def chordFromElement(elem, slurBundle=None):
     return theChord
 
 def harmFromElement(elem, slurBundle=None) -> tuple:
+    '''
+    The MEI <harm> tag is used for several types of indications. In the MEI v4 guidelines it says:
+
+    An indication of harmony, e.g., chord names, tablature grids, harmonic analysis, figured bass.
+    (In MEI v4 guidelines: https://music-encoding.org/guidelines/v4/elements/harm.html)
+
+    **Attributes/Elements Implemented:**
+
+    - @xml:id (or id), an XML id (submitted as the Music21Object "id")
+    - <fb> tags that contain figured bass information
+
+    **Attributes/Elements in Testing:** none
+
+    **Attributes not Implemented:** a lot
+    '''
+
     # other tags than <fb> to be added…
     tagToFunction = {f'{MEI_NS}fb': figuredbassFromElement}
 
@@ -2513,7 +2529,6 @@ def harmFromElement(elem, slurBundle=None) -> tuple:
 
     # Collect all elements in a measure and go throug extenders
     # tstamp has to be used as a duration marker between two elements
-
     for subElement in _processEmbeddedElements(elem.findall('*'),
                                                tagToFunction,
                                                elem.tag, slurBundle):
@@ -2524,6 +2539,21 @@ def harmFromElement(elem, slurBundle=None) -> tuple:
     return fb_harmony_tag
 
 def figuredbassFromElement(elem, slurBundle=None) -> harmony.FiguredBassIndication:
+    '''
+    This function handles basically the MEI <f> tag which is contained in the <fb> tag.
+    At the end a harmony.FiguredBassIndication object is returned.
+
+    **Attributes/Elements Implemented:**
+
+    - @xml:id (or id), an XML id (submitted as the Music21Object "id")
+    - @dur.metrical, duration of the figure
+    - @extender, contains information if a figure is prolonged over the duration of the figure
+
+    **Attributes/Elements in Testing:** none
+
+    **Attributes not Implemented:** a lot
+    '''
+
     if elem.get(_XMLID):
         fb_id = elem.get(_XMLID)
     fb_notation: str = ''
