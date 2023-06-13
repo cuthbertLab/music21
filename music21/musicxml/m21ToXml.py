@@ -1706,22 +1706,6 @@ class ScoreExporter(XMLExporterBase, PartStaffExporterMixin):
         self.firstScoreLayout = scoreLayouts.first()
         self.scoreLayouts = list(scoreLayouts)
 
-<<<<<<< HEAD
-    def _populatePartExporterList(self) -> None:
-=======
-    def getFiguredBassIndications(self):
-        '''
-        Collect all harmony.FiguredBassIndications found in the score and store them
-        in a dict. The dict is later passed to the PartExporter specified
-        (standard value -1 for the lowest part/staff). With in the MeasureExporter the objeccts are
-        inserted locally in the measure and finally parsed to the converter.
-        '''
-        for fbi in self.stream.getElementsByClass(harmony.FiguredBassIndication):
-            if fbi.offset not in self.fbis_dict.keys():
-                self.fbis_dict[fbi.offset] = [fbi]
-            else:
-                self.fbis_dict[fbi.offset].append([fbi])
-
     def getFiguredBassIndications(self):
         '''
         Collect all harmony.FiguredBassIndications found in the score and store them
@@ -1736,7 +1720,6 @@ class ScoreExporter(XMLExporterBase, PartStaffExporterMixin):
                 self.fbis_dict[fbi.offset].append([fbi])
 
     def _populatePartExporterList(self):
->>>>>>> 7ca383457 (first working musicxml output for FiguredBassIndication Objects)
         count = 0
         sp = list(self.parts)
         for innerStream in sp:
