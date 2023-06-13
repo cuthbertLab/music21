@@ -2560,6 +2560,7 @@ def figuredbassFromElement(elem, slurBundle=None) -> harmony.FiguredBassIndicati
     fb_notation_list: list[str] = []
     fb_extenders: list[bool] = []
     dauer: float = 0
+
     # loop through all child elements and collect <f> tags
     for subElement in elem.findall('*'):
         if subElement.tag == f'{MEI_NS}f':
