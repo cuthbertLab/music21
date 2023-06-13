@@ -2724,7 +2724,7 @@ notations32a = '''<?xml version="1.0" encoding="UTF-8"?>
           <ornaments>
             <turn/>
             <accidental-mark placement="above">sharp</accidental-mark>
-            <accidental-mark placement="above">three-quarters-flat</accidental-mark>
+            <accidental-mark placement="below">three-quarters-flat</accidental-mark>
           </ornaments>
         </notations>
         <lyric number="1"><text>turn+acc.(ab.+bel./rel to turn)</text></lyric>
@@ -20048,7 +20048,7 @@ ALL = [
 ]
 
 
-def get(contentRequest):
+def get(contentRequest: str) -> str:
     '''
     Get test material by type of content
 
@@ -20064,6 +20064,8 @@ def get(contentRequest):
         return beams02
     elif contentRequest in ['tremolos']:
         return tremoloTest
+    else:
+        raise ValueError(f'cannot find contentRequest: {contentRequest}')
 
 
 # ------------------------------------------------------------------------------

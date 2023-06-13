@@ -40,6 +40,7 @@ from music21.meter.core import MeterSequence
 environLocal = environment.Environment('meter')
 
 if t.TYPE_CHECKING:
+    from music21.common.types import OffsetQL
     from music21 import stream
 
 # this is just a placeholder so that .beamSequence, etc. do not need to
@@ -1595,7 +1596,7 @@ class TimeSignature(TimeSignatureBase):
             # create a new object; it will not be linked
             self.displaySequence = MeterSequence(value, partitionRequest)
 
-    def getAccent(self, qLenPos: float) -> bool:
+    def getAccent(self, qLenPos: OffsetQL) -> bool:
         '''
         Return True or False if the qLenPos is at the start of an accent
         division.

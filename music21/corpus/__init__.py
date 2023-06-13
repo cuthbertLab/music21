@@ -24,7 +24,7 @@ Use `corpus.parse` if you know the name of a file in the corpus:
 
 >>> b = corpus.parse('bwv66.6')
 >>> b
-<music21.stream.Score 0x1050ce920>
+<music21.stream.Score bach/bwv66.6.mxl>
 
 And use `corpus.search` if you do not:
 
@@ -34,7 +34,7 @@ And use `corpus.search` if you do not:
 >>> cb[0]
 <music21.metadata.bundles.MetadataEntry 'airdsAirs_book1_abc_191'>
 >>> cb[0].parse()
-<music21.stream.Score 0x1050ce940>
+<music21.stream.Score airdsAirs/book1.abc>
 '''
 from __future__ import annotations
 from collections.abc import Iterable
@@ -81,7 +81,11 @@ environLocal = environment.Environment('corpus')
 # -----------------------------------------------------------------------------
 
 
-def getCorePaths(*, fileExtensions: Iterable[str] = (), expandExtensions=True):
+def getCorePaths(
+    *,
+    fileExtensions: Iterable[str] = (),
+    expandExtensions=True
+) -> list[pathlib.Path]:
     '''
     Get all paths in the corpus that match a known extension, or an extenion
     provided by an argument.
@@ -131,7 +135,7 @@ def getLocalPaths(
     *,
     fileExtensions: Iterable[str] = (),
     expandExtensions: bool = True,
-):
+) -> list[pathlib.Path]:
     '''
     Access files in additional directories supplied by the user and defined in
     environment settings in the 'localCorpusSettings' list.
@@ -354,10 +358,12 @@ def parse(
     4
 
     After parsing, the file path within the corpus is stored as
-    `.corpusFilePath`
+    `.metadata.corpusFilePath`
 
-    >>> bachChorale.corpusFilepath
+    >>> bachChorale.metadata.corpusFilePath
     'bach/bwv66.6.mxl'
+
+    Changed in v9: corpusFilePath is stored in metadata and now has a capital 'P'
     '''
     return manager.parse(
         workName=workName,

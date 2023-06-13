@@ -1566,7 +1566,7 @@ class PartParser(XMLParserBase):
         self.appendToScoreAfterParse = True
         self.lastMeasureParser: MeasureParser | None = None
 
-    def parse(self):
+    def parse(self) -> None:
         '''
         Run the parser on a single part
         '''
@@ -1596,7 +1596,7 @@ class PartParser(XMLParserBase):
         partStaves: list[stream.PartStaff] = []
         if self.maxStaves > 1:
             partStaves = self.separateOutPartStaves()
-        else:
+        elif self.partId is not None:
             self.stream.addGroupForElements(self.partId)  # set group for components (recurse?)
             self.stream.groups.append(self.partId)  # set group for stream itself
 
@@ -1692,6 +1692,8 @@ class PartParser(XMLParserBase):
     def getDefaultInstrument(self, mxScorePart: ET.Element | None = None) -> instrument.Instrument:
         # noinspection PyShadowingNames
         r'''
+        Get a default instrument from the mxScorePart tag.
+
         >>> scorePart = ('<score-part id="P4"><part-name>Bass</part-name>'
         ...     + '<part-abbreviation>B.</part-abbreviation>'
         ...     + '<score-instrument id="P4-I4">'
@@ -1707,6 +1709,8 @@ class PartParser(XMLParserBase):
 
         >>> mxScorePart = EL(scorePart)
         >>> i = PP.getDefaultInstrument(mxScorePart)
+        >>> i
+        <music21.instrument.Instrument ': Instrument 4'>
         >>> i.instrumentName
         'Instrument 4'
 
@@ -2000,7 +2004,8 @@ class PartParser(XMLParserBase):
 
         >>> from xml.etree.ElementTree import fromstring as EL
 
-        Testing full measure rest parsing:
+        Full-measure rests get auto-assigned to match the time signature if they
+        do not have a type, or have a type of "whole".
 
         Here is a measure with a rest that lasts 4 beats, but we will put it in a 3/4 context.
 
@@ -2069,10 +2074,10 @@ class PartParser(XMLParserBase):
                 lastTSQl = 4.0  # sensible default.
 
             if (r1.fullMeasure is True  # set by xml measure='yes'
-                                    or (r1.duration.quarterLength != lastTSQl
-                                        and r1.duration.type in ('whole', 'breve')
-                                        and r1.duration.dots == 0
-                                        and not r1.duration.tuplets)):
+                or (r1.duration.quarterLength != lastTSQl
+                    and r1.duration.type in ('whole', 'breve')
+                    and r1.duration.dots == 0
+                    and not r1.duration.tuplets)):
                 r1.duration.quarterLength = lastTSQl
                 r1.fullMeasure = True
 
@@ -2257,6 +2262,7 @@ class PartParser(XMLParserBase):
         # use this as the next offset
 
         mHighestTime = m.highestTime
+        # warnings.warn(f'{m} {mHighestTime} {self}', MusicXMLWarning)
         # warnings.warn([self.lastTimeSignature], MusicXMLWarning)
         # warnings.warn([self.lastTimeSignature.barDuration], MusicXMLWarning)
 
@@ -2383,6 +2389,8 @@ class MeasureParser(XMLParserBase):
     >>> mp.restAndNoteCount['note']
     0
 
+    fullMeasureRest indicates that a rest lasts the full measure of the current time signature.
+
     >>> mp.fullMeasureRest
     True
     '''
@@ -2401,7 +2409,7 @@ class MeasureParser(XMLParserBase):
         'attributes': 'parseAttributesTag',
         'harmony': 'xmlHarmony',
         'figured-bass': 'xmlToFiguredBass',
-        'sound': None,
+        'sound': 'xmlSound',
         'barline': 'xmlBarline',
         'grouping': None,
         'link': None,
@@ -2453,6 +2461,10 @@ class MeasureParser(XMLParserBase):
         # there is an effort to translate the voice text to an int, but if that fails (unlikely)
         # we store whatever we find
         self.lastVoice: str | int | None = None
+
+        # fullMeasureRest is unreliable because pickup measures
+        # in Finale set <rest measure="yes"> but then define a type like "quarter",
+        # this cannot be trusted to give a whole rest.
         self.fullMeasureRest = False
 
         # for keeping track of full-measureRests.
@@ -3390,8 +3402,9 @@ class MeasureParser(XMLParserBase):
 
         >>> from xml.etree.ElementTree import fromstring as EL
         >>> MP = musicxml.xmlToM21.MeasureParser()
+        >>> MP.divisions = 10
 
-        >>> mxr = EL('<note><rest/><duration>5040</duration><type>eighth</type></note>')
+        >>> mxr = EL('<note><rest/><duration>5</duration><type>eighth</type></note>')
         >>> r = MP.xmlToRest(mxr)
         >>> r
         <music21.note.Rest eighth>
@@ -3400,7 +3413,7 @@ class MeasureParser(XMLParserBase):
 
         >>> mxr = EL('<note><rest><display-step>G</display-step>' +
         ...              '<display-octave>4</display-octave>' +
-        ...              '</rest><duration>5040</duration><type>eighth</type></note>')
+        ...              '</rest><duration>5</duration><type>eighth</type></note>')
         >>> r = MP.xmlToRest(mxr)
         >>> r
         <music21.note.Rest eighth>
@@ -3421,15 +3434,41 @@ class MeasureParser(XMLParserBase):
         >>> r.stepShift
         10
 
-        Test full measure rest.
+        Test full measure rest defined with measure="yes" and a duration indicating
+        four quarter notes:
 
-        >>> mxr = EL('<note><rest measure="yes"/><duration>40320</duration></note>')
+        >>> mxr = EL('<note><rest measure="yes"/><duration>40</duration></note>')
         >>> r = MP.xmlToRest(mxr)
         >>> MP.fullMeasureRest
         True
 
-        Note that we do NOT set `r`'s `.fullMeasure` to True or always, but keep it as
-        "auto" so that changes in time signature, etc. will affect output.
+        Note that here set `r`'s `.fullMeasure` to True or always because it has no type.
+
+        >>> r.fullMeasure
+        True
+
+        Same goes for rests which define type of whole (or breve), regardless of duration:
+
+        >>> mxr = EL('<note><rest measure="yes"/><duration>40</duration><type>whole</type></note>')
+        >>> r = MP.xmlToRest(mxr)
+        >>> MP.fullMeasureRest
+        True
+        >>> r.fullMeasure
+        True
+
+        But a rest that defines `measure="yes"` but has a type other than whole or breve
+        will set MeasureParser to fullMeasureRest but not set fullMeasure = True
+        on the music21 Rest object itself because pickup measures often use
+        measure="yes" in Finale, but display as quarter rests, etc.
+        See https://github.com/w3c/musicxml/issues/478
+
+        >>> mxr = EL('<note><rest measure="yes"/><duration>10</duration>'
+        ...          + '<type>quarter</type></note>')
+        >>> r = MP.xmlToRest(mxr)
+        >>> MP.fullMeasureRest
+        True
+        >>> r.fullMeasure
+        'auto'
         '''
         d = self.xmlToDuration(mxRest)
         r = note.Rest(duration=d)
@@ -3439,8 +3478,11 @@ class MeasureParser(XMLParserBase):
                                           + 'contains a rest tag.')
         isFullMeasure = mxRestTag.get('measure')
         if isFullMeasure == 'yes':
-            self.fullMeasureRest = True  # force full measure rest...
-            r.fullMeasure = True
+            # fullMeasureRest is now just a counting/debug tool.
+            if not (rType := strippedText(mxRest.find('type'))) or rType in ('whole', 'breve'):
+                # force full measure rest...
+                self.fullMeasureRest = True
+                r.fullMeasure = True
             # this attribute is not 100% necessary to get a multi-measure rest spanner
 
         if self.parent:  # will apply if active
@@ -3791,11 +3833,11 @@ class MeasureParser(XMLParserBase):
         for tagSearch in ('arpeggiate', 'non-arpeggiate'):
             # TODO: musicxml 4: arpeggiate 'unbroken' attribute
             for mxObj in mxNotations.findall(tagSearch):
-                arpeggioType: str = ''
+                arpeggioType: str = 'normal'
                 if tagSearch == 'non-arpeggiate':
                     arpeggioType = 'non-arpeggio'
                 else:
-                    arpeggioType = mxObj.get('direction') or ''
+                    arpeggioType = mxObj.get('direction') or 'normal'
                 idFound: str | None = mxObj.get('number')
                 if idFound is None:
                     arpeggio = expressions.ArpeggioMark(arpeggioType)
@@ -3805,19 +3847,26 @@ class MeasureParser(XMLParserBase):
                         expressions.ArpeggioMarkSpanner, idFound, False)
                     if sb:
                         # if we already have a spanner matching
-                        arpeggioSpanner = sb[0]
+                        arpeggioSpanner = t.cast(expressions.ArpeggioMarkSpanner, sb[0])
                     else:
-                        arpeggioSpanner = expressions.ArpeggioMarkSpanner(arpeggioType)
+                        arpeggioSpanner = expressions.ArpeggioMarkSpanner(arpeggioType=arpeggioType)
                         arpeggioSpanner.idLocal = idFound
                         self.spannerBundle.append(arpeggioSpanner)
                     arpeggioSpanner.addSpannedElements(n)
 
+        mostRecentOrnament: expressions.Ornament | None = None
         for mxObj in flatten(mxNotations, 'ornaments'):
-            if mxObj.tag in xmlObjects.ORNAMENT_MARKS:
-                post = self.xmlOrnamentToExpression(mxObj)
+            if mxObj.tag in xmlObjects.ORNAMENT_MARKS or mxObj.tag == 'accidental-mark':
+                post = self.xmlOrnamentToExpression(
+                    mxObj, mostRecentOrnament=mostRecentOrnament
+                )
+                if mostRecentOrnament is not None and mxObj.tag == 'accidental-mark':
+                    # Resolve any ornamental pitch for that accidental-mark.
+                    mostRecentOrnament.resolveOrnamentalPitches(n)
                 optionalHideObject(post)
                 self.setEditorial(mxNotations, post)
                 if post is not None:
+                    mostRecentOrnament = post
                     n.expressions.append(post)
                 # environLocal.printDebug(['adding to expressions', post])
             elif mxObj.tag == 'wavy-line':
@@ -4010,14 +4059,21 @@ class MeasureParser(XMLParserBase):
             environLocal.printDebug(f'Cannot translate {tag} in {mxObj}.')
             return None
 
-    def xmlOrnamentToExpression(self, mxObj):
+    def xmlOrnamentToExpression(
+        self,
+        mxObj,
+        *,
+        mostRecentOrnament: expressions.Ornament | None = None
+    ):
         '''
         Convert mxOrnament into a music21 ornament.
 
         This only processes non-spanner ornaments.
         Many mxOrnaments are spanners: these are handled elsewhere.
 
-        Returns None if it cannot be converted or is not defined.
+        Returns None if it cannot be converted or is not defined, or if the
+        mxObj is an accidental-mark (in which case the accidental is placed
+        in the mostRecentOrnament instead).
 
         Return an articulation from an mxObj, setting placement
 
@@ -4040,9 +4096,44 @@ class MeasureParser(XMLParserBase):
         >>> a is None
         True
 
-        Not supported currently: 'accidental-mark', 'vertical-turn'
+        If it is 'accidental-mark', add to mostRecentOrnament, and return None
+
+        >>> turn = expressions.Turn()
+        >>> turn.lowerAccidental is None
+        True
+        >>> turn.upperAccidental is None
+        True
+        >>> mxOrn = EL('<accidental-mark placement="below">flat</accidental-mark>')
+        >>> a = MP.xmlOrnamentToExpression(mxOrn, mostRecentOrnament=turn)
+        >>> a is None
+        True
+        >>> turn.lowerAccidental
+        <music21.pitch.Accidental flat>
+        >>> turn.upperAccidental is None
+        True
+
+        Not supported currently: 'vertical-turn'
         '''
         tag = mxObj.tag
+        if tag == 'accidental-mark':
+            if mostRecentOrnament is None:
+                return None
+
+            accid: pitch.Accidental = self.xmlToAccidental(mxObj)
+            accid.displayStatus = True
+
+            if isinstance(mostRecentOrnament, expressions.Turn):
+                # upperAccidentalName or lowerAccidentalName?
+                # Look at placement (default to 'above').
+                placement: str = mxObj.get('placement', 'above')
+                if placement == 'below':
+                    mostRecentOrnament.lowerAccidental = accid
+                else:
+                    mostRecentOrnament.upperAccidental = accid
+            elif isinstance(mostRecentOrnament, (expressions.GeneralMordent, expressions.Trill)):
+                mostRecentOrnament.accidental = accid
+            return None
+
         try:
             if tag in ('delayed-turn', 'delayed-inverted-turn'):
                 orn = xmlObjects.ORNAMENT_MARKS[tag](delay=OrnamentDelay.DEFAULT_DELAY)
@@ -5282,13 +5373,14 @@ class MeasureParser(XMLParserBase):
         # TODO: musicxml 4: system="yes/no" -- does this apply to whole system?
         # offset is out of order because we need to know it before direction-type
         offsetDirection = self.xmlToOffset(mxDirection)
-        totalOffset = offsetDirection + self.offsetMeasureNote
+        totalOffset = float(offsetDirection + self.offsetMeasureNote)
 
         # out of order: parse <staff> element
         # staffKey is the staff that this direction applies to. not
         # found in mxSpecificDirectionTag (inside direction-type) but in mxDirection itself.
         staffKey = self.getStaffNumber(mxDirection)
 
+        metronome_added = False
         # editorial (footnote, level, voice) for the whole <direction> tag is parsed in
         # setDirectionInDirectionType.  -- probably a mistake since they
         # should all share the same Editorial object and be manipulated together
@@ -5298,11 +5390,27 @@ class MeasureParser(XMLParserBase):
                                                  mxDirection,
                                                  staffKey,
                                                  totalOffset)
-        # TODO: sound
+                if mxSpecificDirectionTag.tag == 'metronome':
+                    metronome_added = True
+
+        # check for sound tag if direction didn't specify a tempo already,
+        # avoiding doubled metronomes.
+        if not metronome_added:
+            for mxSound in mxDirection.findall('sound'):
+                self.setSound(mxSound,
+                              mxDirection,
+                              staffKey,
+                              totalOffset)
+
         # TODO: musicxml 4:listening
 
-
-    def setDirectionInDirectionType(self, mxDir, mxDirection, staffKey, totalOffset):
+    def setDirectionInDirectionType(
+        self,
+        mxDir: ET.Element,
+        mxDirection: ET.Element,
+        staffKey: int,
+        totalOffset: float,
+    ):
         # TODO: pedal
         # TODO: harp-pedals
         # TODO: damp
@@ -5319,20 +5427,9 @@ class MeasureParser(XMLParserBase):
         tag = mxDir.tag
         if tag == 'dynamics':  # fp, mf, etc., each as a tag
             # in rare cases there may be more than one dynamic in the same
-            # direction, so we iterate
-            for dyn in mxDir:
-                m21DynamicText = dyn.tag
-                if dyn.tag == 'other-dynamic':
-                    m21DynamicText = dyn.text.strip()
-
-                d = dynamics.Dynamic(m21DynamicText)
-
-                _synchronizeIds(dyn, d)
-                _setAttributeFromAttribute(d, mxDirection, 'placement', 'placement')
-
-                self.insertCoreAndRef(totalOffset, staffKey, d)
-                self.setPosition(mxDir, d)
-                self.setEditorial(mxDirection, d)
+            # direction, so we iterate over them.
+            for mxDyn in mxDir:
+                self.setDynamicsDirection(mxDir, mxDyn, mxDirection, staffKey, totalOffset)
 
         elif tag in ('wedge', 'bracket', 'dashes', 'octave-shift'):
             try:
@@ -5348,6 +5445,7 @@ class MeasureParser(XMLParserBase):
                 self.setEditorial(mxDirection, sp)
 
         elif tag in ('coda', 'segno'):
+            rm: repeat.Segno | repeat.Coda
             if tag == 'segno':
                 rm = repeat.Segno()
             else:
@@ -5388,6 +5486,93 @@ class MeasureParser(XMLParserBase):
             else:
                 self.insertCoreAndRef(totalOffset, staffKey, textExpression)
                 self.setEditorial(mxDirection, textExpression)
+
+    def setDynamicsDirection(
+        self,
+        mxDir: ET.Element,
+        mxDyn: ET.Element,
+        mxDirection: ET.Element,
+        staffKey: int,
+        totalOffset: float,
+    ):
+        '''
+        Add a single dynamic element to the core and staffReference.
+        '''
+        m21DynamicText = mxDyn.tag
+        if m21DynamicText == 'other-dynamic' and mxDyn.text:
+            m21DynamicText = mxDyn.text.strip()
+
+        d = dynamics.Dynamic(m21DynamicText)
+
+        _synchronizeIds(mxDyn, d)
+        _setAttributeFromAttribute(d, mxDirection, 'placement', 'placement')
+
+        self.insertCoreAndRef(totalOffset, staffKey, d)
+        self.setPosition(mxDir, d)
+        self.setEditorial(mxDirection, d)
+
+    def xmlSound(self, mxSound: ET.Element):
+        '''
+        Convert a <sound> tag to a relevant object (presently just MetronomeMark),
+        and add it to the core and staffReference.
+        '''
+        # offset is out of order because we need to know it before direction-type
+        offsetDirection = self.xmlToOffset(mxSound)
+        totalOffset = offsetDirection + self.offsetMeasureNote
+
+        staffKey = self.getStaffNumber(mxSound)
+
+        self.setSound(mxSound,
+                      None,
+                      staffKey,
+                      totalOffset)
+
+    def setSound(
+        self,
+        mxSound: ET.Element,
+        mxDir: ET.Element | None,
+        staffKey: int,
+        totalOffset: float
+    ):
+        '''
+        Takes a <sound> tag and creates objects from it.
+        Presently only handles <sound tempo='x'> events and inserts them as MetronomeMarks.
+        If the <sound> tag is a child of a <direction> tag, the direction information
+        is used to set the placement of the MetronomeMark.
+        '''
+        # TODO: move to xmlSoundParser.py where is should have been.
+
+        # TODO: coda
+        # TODO: dacapo
+        # TODO: dalsegno
+        # TODO: damper-pedal
+        # TODO: divisions
+        # TODO: dynamics
+        # TODO: fine
+        # TODO: forward-repeat
+        # TODO: id
+        # TODO: pizzicato
+        # TODO: segno
+        # TODO: soft-pedal
+        # TODO: sostenuto-pedal
+        # TODO: time-only
+        # TODO: tocoda
+        if 'tempo' in mxSound.attrib:
+            qpm = common.numToIntOrFloat(float(mxSound.get('tempo', 0)))
+            if qpm == 0:
+                warnings.warn('0 qpm tempo tag found, skipping.')
+                return
+            mm = tempo.MetronomeMark(referent=duration.Duration(type='quarter'),
+                                     number=None,
+                                     numberSounding=qpm,
+                                     )
+            _synchronizeIds(mxSound, mm)
+            self.setPrintObject(mxSound, mm)
+            self.setPosition(mxSound, mm)
+            if mxDir is not None:
+                _setAttributeFromAttribute(mm, mxDir, 'placement', 'placement')
+                self.setEditorial(mxDir, mm)
+            self.insertCoreAndRef(totalOffset, staffKey, mm)
 
     def xmlToTextExpression(self, mxWords):
         # noinspection PyShadowingNames
@@ -5439,7 +5624,7 @@ class MeasureParser(XMLParserBase):
         >>> m = EL(r'<metronome><per-minute>125</per-minute>' +
         ...         '<beat-unit>half</beat-unit></metronome>')
         >>> MP.xmlToTempoIndication(m)
-        <music21.tempo.MetronomeMark Half=125.0>
+        <music21.tempo.MetronomeMark Half=125>
 
         Metric modulation:
 
@@ -5472,7 +5657,7 @@ class MeasureParser(XMLParserBase):
                 perMin = mxObj.text
                 if perMin is not None and perMin.strip() != '':
                     try:
-                        numbers.append(float(perMin))
+                        numbers.append(common.numToIntOrFloat(float(perMin)))
                     except ValueError:
                         pass  # TODO: accept text per minute
         # TODO: metronome-relation -- specifies how to relate multiple beat units

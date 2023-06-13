@@ -76,7 +76,7 @@ class StreamCore(Music21Object):
         *,
         ignoreSort=False,
         setActiveSite=True
-    ):
+    ) -> bool:
         '''
         N.B. -- a "core" method, not to be used by general users.  Run .insert() instead.
 
@@ -91,7 +91,9 @@ class StreamCore(Music21Object):
 
         Do not mix coreInsert with coreAppend operations.
 
-        Returns boolean if the Stream is now sorted.
+        Returns boolean if the Stream (assuming it was sorted before) is still guaranteed
+        to be sorted.  (False doesn't mean that it's not sorted, just that we can't guarantee it.)
+        If you don't care and plan to sort the stream later, then use `ignoreSort=True`.
         '''
         # environLocal.printDebug(['coreInsert', 'self', self,
         #    'offset', offset, 'element', element])
@@ -135,7 +137,7 @@ class StreamCore(Music21Object):
         element: Music21Object,
         *,
         setActiveSite=True
-    ):
+    ) -> None:
         '''
         N.B. -- a "core" method, not to be used by general users.  Run .append() instead.
 
@@ -170,7 +172,7 @@ class StreamCore(Music21Object):
         *,
         addElement=False,
         setActiveSite=True
-    ):
+    ) -> None:
         '''
         Sets the Offset for an element, very quickly.
         Caller is responsible for calling :meth:`~music21.stream.core.coreElementsChanged`

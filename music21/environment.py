@@ -1162,7 +1162,7 @@ class Environment:
         >>> a['musicxmlPath'] = original  #_DOCS_HIDE
         '''
         xp = self['musicxmlPath']
-        if common.runningUnderIPython():
+        if common.runningInNotebook():
             xp = self['musescoreDirectPNGPath']
 
         if not xp:

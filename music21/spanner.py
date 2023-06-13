@@ -242,7 +242,7 @@ class Spanner(base.Music21Object):
         self.idLocal: str | None = None
         # after all spannedElements have been gathered, setting complete
         # will mark that all parts have been gathered.
-        self.completeStatus = False
+        self.completeStatus: bool = False
 
         # data for fill:
 
@@ -829,14 +829,13 @@ class SpannerBundle(prebase.ProtoM21Object):
     * Changed in v7: only argument must be a List of spanners.
       Creators of SpannerBundles are required to check that this constraint is True
     '''
+    # TODO: make SpannerBundle a Generic type
     def __init__(self, spanners: list[Spanner] | None = None):
         self._cache: dict[str, t.Any] = {}  # cache is defined on Music21Object not ProtoM21Object
 
-        self._storage: list[Spanner]
+        self._storage: list[Spanner] = []
         if spanners:
             self._storage = spanners[:]  # a simple List, not a Stream
-        else:
-            self._storage = []
 
         # special spanners, stored in storage, can be identified in the
         # SpannerBundle as missing a spannedElement; the next obj that meets
@@ -844,14 +843,13 @@ class SpannerBundle(prebase.ProtoM21Object):
         # cleared
         self._pendingSpannedElementAssignment: list[_SpannerRef] = []
 
-    def append(self, other):
+    def append(self, other: Spanner):
         '''
         adds a Spanner to the bundle. Will be done automatically when adding a Spanner
         to a Stream.
         '''
         self._storage.append(other)
-        if self._cache:
-            self._cache = {}
+        self._cache.clear()
 
     def __len__(self):
         return len(self._storage)
@@ -859,10 +857,10 @@ class SpannerBundle(prebase.ProtoM21Object):
     def __iter__(self):
         return self._storage.__iter__()
 
-    def __getitem__(self, key):
+    def __getitem__(self, key) -> Spanner:
         return self._storage[key]
 
-    def remove(self, item):
+    def remove(self, item: Spanner):
         '''
         Remove a stored Spanner from the bundle with an instance.
         Each reference must have a matching id() value.
@@ -887,51 +885,57 @@ class SpannerBundle(prebase.ProtoM21Object):
             self._storage.remove(item)
         else:
             raise SpannerBundleException(f'cannot match object for removal: {item}')
-        if self._cache:
-            self._cache = {}
+        self._cache.clear()
 
     def _reprInternal(self):
         return f'of size {len(self)}'
 
-    def getSpannerStorageIds(self):
+    def getSpannerStorageIds(self) -> list[int]:
         '''
         Return all SpannerStorage ids from all contained Spanners
         '''
-        post = []
+        post: list[int] = []
         for x in self._storage:
             post.append(id(x.spannerStorage))
         return post
 
-    def getByIdLocal(self, idLocal=None):
+    def getByIdLocal(self, idLocal: int | None = None) -> SpannerBundle:
         '''
         Get spanners by `idLocal`.
 
         Returns a new SpannerBundle object
 
-        >>> su1 = spanner.Slur()
-        >>> su1.idLocal = 1
-        >>> su2 = spanner.Slur()
-        >>> su2.idLocal = 2
+        >>> su = spanner.Slur()
+        >>> su.idLocal = 1
+        >>> rb = spanner.RepeatBracket()
+        >>> rb.idLocal = 2
         >>> sb = spanner.SpannerBundle()
-        >>> sb.append(su1)
-        >>> sb.append(su2)
+        >>> sb.append(su)
+        >>> sb.append(rb)
         >>> len(sb)
         2
+
+        >>> sb.getByIdLocal(2)
+        <music21.spanner.SpannerBundle of size 1>
+        >>> sb.getByIdLocal(2)[0]
+        <music21.spanner.RepeatBracket >
+
         >>> len(sb.getByIdLocal(1))
         1
-        >>> len(sb.getByIdLocal(2))
-        1
+
+        >>> sb.getByIdLocal(3)
+        <music21.spanner.SpannerBundle of size 0>
         '''
         cacheKey = f'idLocal-{idLocal}'
         if cacheKey not in self._cache or self._cache[cacheKey] is None:
-            post = self.__class__()
+            out: list[Spanner] = []
             for sp in self._storage:
                 if sp.idLocal == idLocal:
-                    post.append(sp)
-            self._cache[cacheKey] = post
+                    out.append(sp)
+            self._cache[cacheKey] = self.__class__(out)
         return self._cache[cacheKey]
 
-    def getByCompleteStatus(self, completeStatus):
+    def getByCompleteStatus(self, completeStatus: bool) -> SpannerBundle:
         '''
         Get spanners by matching status of `completeStatus` to the same attribute
 
@@ -951,16 +955,17 @@ class SpannerBundle(prebase.ProtoM21Object):
         True
         '''
         # cannot cache, as complete status may change internally
-        post = self.__class__()
+        post: list[Spanner] = []
         for sp in self._storage:
             if sp.completeStatus == completeStatus:
                 post.append(sp)
-        return post
+        return self.__class__(post)
 
-    def getBySpannedElement(self, spannedElement):
+    def getBySpannedElement(self, spannedElement: Spanner) -> SpannerBundle:
         '''
         Given a spanner spannedElement (an object),
-        return a new SpannerBundle of all Spanner objects that have this object as a spannedElement.
+        return a new SpannerBundle of all Spanner objects that
+        have this object as a spannedElement.
 
         >>> n1 = note.Note()
         >>> n2 = note.Note()
@@ -989,13 +994,13 @@ class SpannerBundle(prebase.ProtoM21Object):
         idTarget = id(spannedElement)
         cacheKey = f'getBySpannedElement-{idTarget}'
         if cacheKey not in self._cache or self._cache[cacheKey] is None:
-            post = self.__class__()
+            out: list[Spanner] = []
             for sp in self._storage:  # storage is a list of spanners
                 # __contains__() will test for identity, not equality
                 # see Spanner.hasSpannedElement(), which just calls __contains__()
                 if spannedElement in sp:
-                    post.append(sp)
-            self._cache[cacheKey] = post
+                    out.append(sp)
+            self._cache[cacheKey] = self.__class__(out)
         return self._cache[cacheKey]
 
     def replaceSpannedElement(
@@ -1047,10 +1052,9 @@ class SpannerBundle(prebase.ProtoM21Object):
         if isinstance(old, int):
             raise TypeError('send elements to replaceSpannedElement(), not ids.')
 
-        replacedSpanners = []
+        replacedSpanners: list[Spanner] = []
         # post = self.__class__()  # return a bundle of spanners that had changes
-        if self._cache:
-            self._cache = {}
+        self._cache.clear()
 
         for sp in self._storage:  # Spanners in a list
             # environLocal.printDebug(['looking at spanner', sp, sp.getSpannedElementIds()])
@@ -1064,12 +1068,11 @@ class SpannerBundle(prebase.ProtoM21Object):
                 # environLocal.printDebug(['replaceSpannedElement()', sp, 'old', old,
                 #    'id(old)', id(old), 'new', new, 'id(new)', id(new)])
 
-        if self._cache:
-            self._cache = {}
+        self._cache.clear()
 
         return replacedSpanners
 
-    def getByClass(self, className: str | type) -> 'SpannerBundle':
+    def getByClass(self, searchClass: str | type | tuple[type, ...]) -> 'SpannerBundle':
         '''
         Given a spanner class, return a new SpannerBundle of all Spanners of the desired class.
 
@@ -1081,31 +1084,43 @@ class SpannerBundle(prebase.ProtoM21Object):
         >>> sb.append(su2)
         >>> sb.append(su3)
 
-        Classes can be strings (short class) or classes.
+        `searchClass` should be a Class.
 
         >>> slurs = sb.getByClass(spanner.Slur)
         >>> slurs
         <music21.spanner.SpannerBundle of size 1>
         >>> list(slurs) == [su1]
         True
-        >>> list(sb.getByClass('Slur')) == [su1]
+        >>> list(sb.getByClass(spanner.Slur)) == [su1]
         True
-        >>> list(sb.getByClass('StaffGroup')) == [su2, su3]
+        >>> list(sb.getByClass(layout.StaffGroup)) == [su2, su3]
         True
-        '''
-        # NOTE: this is called very frequently: optimize
 
-        cacheKey = f'getByClass-{className}'
+        A tuple of classes can also be given:
+
+        >>> len(sb.getByClass((spanner.Slur, layout.StaffGroup)))
+        3
+
+        Note that the ability to search via a string will be removed in
+        version 10.
+        '''
+        # NOTE: this is called very frequently and is optimized.
+
+        cacheKey = f'getByClass-{searchClass}'
+        searchStr = searchClass if isinstance(searchClass, str) else ''
+        searchClasses = () if isinstance(searchClass, str) else searchClass
+
         if cacheKey not in self._cache or self._cache[cacheKey] is None:
-            post = self.__class__()
+            out: list[Spanner] = []
             for sp in self._storage:
-                if isinstance(className, str):
-                    if className in sp.classes:
-                        post.append(sp)
+                if searchStr and searchStr in sp.classes:
+                    out.append(sp)
                 else:
-                    if isinstance(sp, className):
-                        post.append(sp)
-            self._cache[cacheKey] = post
+                    if isinstance(sp, searchClasses):
+                        # PyCharm thinks this is a type, not a Spanner
+                        # noinspection PyTypeChecker
+                        out.append(sp)
+            self._cache[cacheKey] = self.__class__(out)
         return self._cache[cacheKey]
 
     def setIdLocalByClass(self, className, maxId=6):
@@ -1138,10 +1153,10 @@ class SpannerBundle(prebase.ProtoM21Object):
         >>> sb.append(su1)
         >>> sb.append(su2)
         >>> sb.append(su3)
-        >>> [sp.idLocal for sp in sb.getByClass('Slur')]
+        >>> [sp.idLocal for sp in sb.getByClass(spanner.Slur)]
         [None, None]
         >>> sb.setIdLocalByClass('Slur')
-        >>> [sp.idLocal for sp in sb.getByClass('Slur')]
+        >>> [sp.idLocal for sp in sb.getByClass(spanner.Slur)]
         [1, 2]
         '''
         # note that this overrides previous values
@@ -1222,12 +1237,14 @@ class SpannerBundle(prebase.ProtoM21Object):
         >>> sb = spanner.SpannerBundle()
         >>> sb.append(su1)
         >>> sb.append(su2)
-        >>> list(sb.getByClassIdLocalComplete('StaffGroup', 3, False)) == [su2]
+        >>> list(sb.getByClassIdLocalComplete(layout.StaffGroup, 3, False)) == [su2]
         True
         >>> su2.completeStatus = True
-        >>> list(sb.getByClassIdLocalComplete('StaffGroup', 3, False)) == []
+        >>> list(sb.getByClassIdLocalComplete(layout.StaffGroup, 3, False)) == []
         True
         '''
+        # TODO: write utility classes that just modify lists and cast to a spannerBundle
+        #    at the end.
         return self.getByClass(className).getByIdLocal(
             idLocal).getByCompleteStatus(completeStatus)
 

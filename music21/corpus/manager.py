@@ -202,13 +202,13 @@ def parse(
         number=number,
         format=format
     )
-    _addCorpusFilepathToStreamObject(streamObject, filePath)
+    _addCorpusFilePathToStreamObject(streamObject, filePath)
     return streamObject
 
 
-def _addCorpusFilepathToStreamObject(streamObj, filePath):
+def _addCorpusFilePathToStreamObject(streamObj, filePath):
     '''
-    Adds an entry 'corpusFilepath' to the Stream object.
+    Adds an entry 'corpusFilePpath' to the Stream object.
 
     TODO: this should work for non-core-corpora
     TODO: this should be in the metadata object
@@ -227,9 +227,12 @@ def _addCorpusFilepathToStreamObject(streamObj, filePath):
         # corpus fix for windows
         dirsEtc = fp2.split(os.sep)
         fp3 = '/'.join(dirsEtc)
-        streamObj.corpusFilepath = fp3
+        streamObj.metadata.corpusFilePath = fp3
     else:
-        streamObj.corpusFilepath = filePath
+        streamObj.metadata.corpusFilePath = filePath
+
+    if isinstance(streamObj.id, int):
+        streamObj.id = streamObj.metadata.corpusFilePath
 
 
 def search(
@@ -237,7 +240,7 @@ def search(
     field: str | None = None,
     *,
     corpusNames=None,
-    fileExtensions: Iterable[str] = (),
+    fileExtensions: Iterable[str] | str = (),
     **keywords
 ):
     '''
@@ -286,6 +289,13 @@ def search(
     ...     )
     <music21.metadata.bundles.MetadataBundle {564 entries}>
 
+    >>> corpus.manager.search(
+    ...     'bach',
+    ...     corpusNames=('core',),
+    ...     fileExtensions=('xml',),
+    ...     )
+    <music21.metadata.bundles.MetadataBundle {412 entries}>
+
     If ``corpusNames`` is None, all corpora known to music21 will be searched.
 
     See usersGuide (chapter 11) for more information on searching
@@ -293,6 +303,8 @@ def search(
     '''
     # >>> corpus.search('coltrane', corpusNames=('virtual',))
     # <music21.metadata.bundles.MetadataBundle {1 entry}>
+    if isinstance(fileExtensions, str):
+        fileExtensions = (fileExtensions,)
 
     readAllMetadataBundlesFromDisk()
     allSearchResults = metadata.bundles.MetadataBundle()
@@ -313,7 +325,7 @@ def search(
     return allSearchResults
 
 
-def getMetadataBundleByCorpus(corpusObject):
+def getMetadataBundleByCorpus(corpusObject: corpora.Corpus) -> bundles.MetadataBundle:
     '''
     Return the metadata bundle for a single Corpus object
 
@@ -335,18 +347,20 @@ def getMetadataBundleByCorpus(corpusObject):
     >>> mdb1 = corpus.manager.getMetadataBundleByCorpus(lc)
     >>> mdb1
     <music21.metadata.bundles.MetadataBundle 'junk': {0 entries}>
-
     '''
     cacheMetadataBundleFromDisk(corpusObject)
     corpusName = corpusObject.name
     if corpusName in _metadataBundles:
-        return _metadataBundles[corpusName]
+        mdb = _metadataBundles[corpusName]
+        if t.TYPE_CHECKING:
+            assert mdb is not None  # cacheMetadataBundleFromDisk makes None impossible
+        return mdb
     else:  # pragma: no cover
         raise CorpusException('No metadata bundle found for corpus {0} with name {1}'.format(
             corpusObject, corpusName))
 
 
-def cacheMetadataBundleFromDisk(corpusObject):
+def cacheMetadataBundleFromDisk(corpusObject: corpora.Corpus) -> None:
     r'''
     Update a corpus' metadata bundle from its stored JSON file on disk.
     '''

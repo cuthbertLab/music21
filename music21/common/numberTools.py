@@ -11,19 +11,23 @@
 # ------------------------------------------------------------------------------
 from __future__ import annotations
 
-from collections.abc import Iterable, Sequence, Collection
 from fractions import Fraction
 from functools import cache
 import math
 from math import isclose, gcd
 import numbers
 import random
-from typing import overload
+from typing import overload, TYPE_CHECKING
 import unittest
 
 from music21 import defaults
 from music21.common import deprecated
 from music21.common.types import OffsetQLIn, OffsetQL
+
+if TYPE_CHECKING:
+    from decimal import Decimal
+    from collections.abc import Iterable, Sequence, Collection
+
 
 __all__ = [
     'ordinals', 'musicOrdinals', 'ordinalsToNumbers',
@@ -66,7 +70,7 @@ musicOrdinals[22] = 'Triple-octave'
 # Number methods...
 
 
-def numToIntOrFloat(value: int | float) -> int | float:
+def numToIntOrFloat(value: OffsetQLIn) -> int | float:
     '''
     Given a number, return an integer if it is very close to an integer,
     otherwise, return a float.
@@ -82,6 +86,10 @@ def numToIntOrFloat(value: int | float) -> int | float:
     1.00003
     >>> common.numToIntOrFloat(1.5)
     1.5
+    >>> common.numToIntOrFloat(2)
+    2
+    >>> common.numToIntOrFloat(-5)
+    -5
     >>> common.numToIntOrFloat(1.0000000005)
     1
     >>> common.numToIntOrFloat(0.999999999)
@@ -102,6 +110,23 @@ def numToIntOrFloat(value: int | float) -> int | float:
     1
     >>> common.numToIntOrFloat('1.25')
     1.25
+
+    Others raise a ValueError
+
+    >>> common.numToIntOrFloat('one')
+    Traceback (most recent call last):
+    ValueError: could not convert string to float: 'one'
+
+
+    Fractions also become ints or floats
+
+    >>> from fractions import Fraction
+    >>> common.numToIntOrFloat(Fraction(1, 2))
+    0.5
+    >>> common.numToIntOrFloat(Fraction(4, 3))
+    1.333333333...
+
+    Note: Decimal objects are not supported.
     '''
     try:
         intVal = round(value)
@@ -111,8 +136,8 @@ def numToIntOrFloat(value: int | float) -> int | float:
 
     if isclose(intVal, value, abs_tol=1e-6):
         return intVal
-    else:  # source
-        return value
+
+    return value + 0.0  # fast opp for cast to float for fractions.Fraction
 
 
 DENOM_LIMIT = defaults.limitOffsetDenominator
@@ -145,14 +170,17 @@ def _preFracLimitDenominator(n: int, d: int) -> tuple[int, int]:
     t is timeit.timeit
 
     t('Fraction(*common.numberTools._preFracLimitDenominator(*x.as_integer_ratio()))',
-       setup='x = 1000001/3000001.; from music21 import common;from fractions import Fraction',
+       setup='x = 1000001/3000001; from music21 import common;from fractions import Fraction',
        number=100000)
     1.0814228057861328
 
     t('Fraction(x).limit_denominator(65535)',
-       setup='x = 1000001/3000001.; from fractions import Fraction',
+       setup='x = 1000001/3000001; from fractions import Fraction',
        number=100000)
     7.941488981246948
+
+    Nothing changed in 2023, in fact, it's faster now with the cache, and even
+    without the cache, it's still 4x faster.
 
     Proof of working...
 
@@ -241,7 +269,7 @@ def opFrac(num: OffsetQLIn | None) -> OffsetQL | None:
     Code Completion easily. That is to say, this function has been set up to be used, so please
     use it.
 
-    This is a performance critical operation. Do not alter it in any way without running
+    This is a performance-critical operation. Do not alter it in any way without running
     many timing tests.
 
     >>> from fractions import Fraction
@@ -256,8 +284,12 @@ def opFrac(num: OffsetQLIn | None) -> OffsetQL | None:
     >>> f = Fraction(1, 3)
     >>> common.opFrac(f + f + f)
     1.0
+    >>> common.opFrac(0.99999999842)
+    1.0
     >>> common.opFrac(0.123456789)
     Fraction(10, 81)
+    >>> common.opFrac(0.000001)
+    0.0
     >>> common.opFrac(None) is None
     True
     '''
@@ -285,7 +317,14 @@ def opFrac(num: OffsetQLIn | None) -> OffsetQL | None:
         ir = num.as_integer_ratio()  # type: ignore
         if ir[1] > DENOM_LIMIT:  # slightly faster[SIC!] than hard coding 65535!
             # _preFracLimitDenominator uses a cache
-            return Fraction(*_preFracLimitDenominator(*ir))  # way faster!
+            f_out = Fraction(*_preFracLimitDenominator(*ir))  # way faster!
+            # now, reduce denominator as Fraction -- just as below under numType == Fraction
+            d = f_out._denominator  # type: ignore
+            if (d & (d - 1)) == 0:  # power of two...
+                # 50% faster than float(num)
+                return f_out._numerator / (d + 0.0)  # type: ignore
+            else:
+                return f_out  # leave non-power of two fractions alone
             # return Fraction(*ir).limit_denominator(DENOM_LIMIT) # *ir instead of float--can happen
             # internally in Fraction constructor, but is twice as fast...
         else:
@@ -308,12 +347,7 @@ def opFrac(num: OffsetQLIn | None) -> OffsetQL | None:
     elif isinstance(num, int):
         return num + 0.0
     elif isinstance(num, float):
-        ir = num.as_integer_ratio()
-        if ir[1] > DENOM_LIMIT:  # slightly faster than hard coding 65535!
-            return Fraction(*_preFracLimitDenominator(*ir))  # way faster!
-        else:
-            return num
-
+        return opFrac(float(num))  # slower for inherited floats, but simpler than duplicating
     elif isinstance(num, Fraction):
         d = num.denominator  # Use properties since it is a subclass
         if (d & (d - 1)) == 0:  # power of two...
