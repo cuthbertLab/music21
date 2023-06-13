@@ -732,10 +732,6 @@ class Expander(t.Generic[StreamType]):
         self._srcMeasureStream: stream.Stream[stream.Measure] = self._src.getElementsByClass(
             stream.Measure
         ).stream()
-        # store all top-level non Measure elements for later insertion
-        self._srcNotMeasureStream: stream.Stream = self._src.getElementsNotOfClass(
-            stream.Measure
-        ).stream()
 
         # see if there are any repeat brackets
         self._repeatBrackets: stream.Stream[spanner.RepeatBracket] = (

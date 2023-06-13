@@ -685,7 +685,7 @@ class DataInstance:
 
         >>> di = features.DataInstance('bach/bwv66.6')
         >>> len(di['flat'])
-        193
+        197
         >>> len(di['flat.pitches'])
         163
         >>> len(di['flat.notes'])
@@ -1284,7 +1284,7 @@ class Test(unittest.TestCase):
         s = corpus.parse('corelli/opus3no1/1grave')
         # s.chordify().show()
         di = features.DataInstance(s)
-        self.assertEqual(len(di['flat']), 291)
+        self.assertEqual(len(di['flat']), 292)
         self.assertEqual(len(di['flat.notes']), 238)
 
         # di['chordify'].show('t')

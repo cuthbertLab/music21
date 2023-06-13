@@ -662,6 +662,7 @@ class Metadata(base.Music21Object):
         (('arranger', 'Michael Scott Cuthbert'),
          ('composer', 'Arcangelo Corelli'),
          ('copyright', '© 2014, Creative Commons License (CC-BY)'),
+         ('corpusFilePath', 'corelli/opus3no1/1grave.xml'),
          ('fileFormat', 'musicxml'),
          ('filePath', '...corpus/corelli/opus3no1/1grave.xml'),
          ('movementName', 'Sonata da Chiesa, No. I (opus 3, no. 1)'),
@@ -673,6 +674,7 @@ class Metadata(base.Music21Object):
         >>> c.metadata.localeOfComposition = 'Rome'
         >>> c.metadata.all(skipContributors=True)
         (('copyright', '© 2014, Creative Commons License (CC-BY)'),
+         ('corpusFilePath', 'corelli/opus3no1/1grave.xml'),
          ('dateCreated', '1689/--/-- or earlier'),
          ('fileFormat', 'musicxml'),
          ('filePath', '...corpus/corelli/opus3no1/1grave.xml'),
@@ -1407,6 +1409,20 @@ class Metadata(base.Music21Object):
         setattr(self, 'filePath', value)
 
     @property
+    def corpusFilePath(self) -> str | None:
+        '''
+        Get or set the path within the corpus that was parsed.
+        '''
+        return self._getSingularAttribute('corpusFilePath')
+
+    @corpusFilePath.setter
+    def corpusFilePath(self, value: str) -> None:
+        '''
+        For type checking only. Does not run.
+        '''
+        setattr(self, 'corpusFilePath', value)
+
+    @property
     def fileNumber(self) -> str | None:
         '''
         Get or set the file number that was parsed.
@@ -1896,7 +1912,7 @@ class Metadata(base.Music21Object):
 
         >>> md._getSingularAttribute('humdrum:ODE')
         Traceback (most recent call last):
-        AttributeError: object has no attribute: humdrum:ODE
+        AttributeError: 'Metadata' object has no attribute: 'humdrum:ODE'
         '''
         if attributeName in properties.UNIQUE_NAME_TO_NAMESPACE_NAME:
             return self._getStringValueByNamespaceName(
@@ -1915,7 +1931,9 @@ class Metadata(base.Music21Object):
                 properties.MUSIC21_ABBREVIATION_TO_NAMESPACE_NAME[attributeName]
             )
 
-        raise AttributeError(f'object has no attribute: {attributeName}')
+        raise AttributeError(
+            f'{self.__class__.__name__!r} object has no attribute: {attributeName!r}'
+        )
 
     def _isStandardUniqueName(self, uniqueName: str) -> bool:
         '''
@@ -2527,7 +2545,7 @@ class RichMetadata(Metadata):
                 except AttributeError:
                     pass
 
-    def getSourcePath(self, streamObj):
+    def getSourcePath(self, streamObj) -> str:
         '''
         Get a string of the path after the corpus for the piece...useful for
         searching on corpus items without proper composer data...
@@ -2537,10 +2555,18 @@ class RichMetadata(Metadata):
         >>> rmd.getSourcePath(b)
         'bach/bwv66.6.mxl'
         '''
-        if not streamObj.metadata or not streamObj.metadata.filePath:
+        if not streamObj.metadata:
             return ''
 
-        streamFp = streamObj.metadata.filePath
+        md = streamObj.metadata
+
+        if md.corpusFilePath:
+            return md.corpusFilePath
+
+        streamFp = md.filePath
+        if not streamFp:
+            return ''
+
         if not isinstance(streamFp, pathlib.Path):
             streamFp = pathlib.Path(streamFp)
 
@@ -2678,7 +2704,8 @@ class RichMetadata(Metadata):
          ('composer', 'Arcangelo Corelli'),
          ...
          ('sourcePath', 'corelli/opus3no1/1grave.xml'),
-         ('tempoFirst', None), ('tempos', []),
+         ('tempoFirst', '<music21.tempo.MetronomeMark Quarter=60 (playback only)>'),
+         ('tempos', ['<music21.tempo.MetronomeMark Quarter=60 (playback only)>']),
          ('timeSignatureFirst', '4/4'),
          ('timeSignatures', ['4/4']))
 
@@ -2688,6 +2715,7 @@ class RichMetadata(Metadata):
         (('ambitus',
             AmbitusShort(semitones=48, diatonic='P1', pitchLowest='C2', pitchHighest='C6')),
          ('copyright', '© 2014, Creative Commons License (CC-BY)'),
+         ('corpusFilePath', 'corelli/opus3no1/1grave.xml'),
          ('dateCreated', '1689/--/-- or earlier'),
          ('fileFormat', 'musicxml'),
          ...

@@ -517,7 +517,14 @@ def metronomeMarkToBraille(music21MetronomeMark):
     >>> mm2 = tempo.MetronomeMark(number=135, referent=note.Note(quarterLength=0.5))
     >>> print(metronomeMarkToBraille(mm2))
     ⠙⠶⠼⠁⠉⠑
+
+    >>> mm3 = tempo.MetronomeMark(numberSounding=80)
+    >>> metronomeMarkToBraille(mm3)
+    ''
     '''
+    if music21MetronomeMark.number is None:
+        return ''
+
     music21MetronomeMark.editorial.brailleEnglish = []
     try:
         metroTrans = []

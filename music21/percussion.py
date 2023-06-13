@@ -13,11 +13,16 @@
 from __future__ import annotations
 
 from collections.abc import Iterable
+import typing as t
 import unittest
 
 from music21 import common
 from music21 import chord
 from music21 import note
+
+
+if t.TYPE_CHECKING:
+    from music21 import pitch
 
 
 class PercussionChord(chord.ChordBase):
@@ -26,7 +31,7 @@ class PercussionChord(chord.ChordBase):
     a :class:`~music21.chord.Chord` because one or more notes is an :class:`~music21.note.Unpitched`
     object.
 
-    >>> pChord = percussion.PercussionChord([note.Unpitched('D4'), note.Note('E5')])
+    >>> pChord = percussion.PercussionChord([note.Unpitched(displayName='D4'), note.Note('E5')])
     >>> pChord.isChord
     False
 
@@ -123,6 +128,38 @@ class PercussionChord(chord.ChordBase):
                     allNotes.append(f'unpitched[{thisNote.displayName}]')
 
         return '[' + ' '.join(allNotes) + ']'
+
+
+    @property
+    def pitches(self) -> tuple[pitch.Pitch, ...]:
+        '''
+        Get or set a list or tuple of all Pitch objects in this PercussionChord.
+
+        Unpitched members (that at most have only display pitches) are ignored.
+
+        >>> pChord = percussion.PercussionChord([note.Unpitched(displayName='D4'), note.Note('E5')])
+        >>> pChord.pitches
+        (<music21.pitch.Pitch E5>,)
+
+        >>> pChord.pitches = [60]
+        >>> pChord.pitches
+        (<music21.pitch.Pitch C4>,)
+
+        Notice that setting pitches has now just cleared any existing notes, pitched or unpitched:
+        >>> pChord.notes
+        (<music21.note.Note C>,)
+        '''
+        pitches: tuple[pitch.Pitch, ...] = tuple(
+            component.pitch for component in self._notes if isinstance(component, note.Note))
+        return pitches
+
+    @pitches.setter
+    def pitches(self, value: t.Sequence[str | pitch.Pitch | int]):
+        self._notes = []
+        # TODO: individual ties are not being retained here
+        for p in value:
+            # assumes value is an iterable of pitches or something to pass to Note __init__
+            self._notes.append(note.Note(p))
 
 
 class Test(unittest.TestCase):

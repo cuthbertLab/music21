@@ -38,7 +38,7 @@ if t.TYPE_CHECKING:
 
 
 # used for checking preferences, and for setting environment variables
-# TODO: only check top-level.  Let subconverters check sub formats.
+# TODO: only check top-level.  Let subConverters check sub formats.
 VALID_SHOW_FORMATS = ['musicxml', 'lilypond', 'text', 'textline', 'midi',
                       'png', 'pdf', 'svg',
                       'lily.pdf', 'lily.png', 'lily.svg', 'braille',
@@ -72,7 +72,7 @@ def findSubConverterForFormat(fmt: str) -> type[SubConverter] | None:
     >>> common.findSubConverterForFormat('romantext')
     <class 'music21.converter.subConverters.ConverterRomanText'>
 
-    Some subconverters have format aliases
+    Some subConverters have format aliases
 
     >>> common.findSubConverterForFormat('t')
     <class 'music21.converter.subConverters.ConverterText'>
@@ -80,7 +80,7 @@ def findSubConverterForFormat(fmt: str) -> type[SubConverter] | None:
     '''
     fmt = fmt.lower().strip()
     from music21 import converter
-    scl = converter.Converter().subconvertersList()
+    scl = converter.Converter().subConvertersList()
     for sc in scl:
         formats = sc.registerFormats
         if fmt in formats:
@@ -99,7 +99,7 @@ def findFormat(fmt):
 
 
     All but the first element of the tuple are deprecated for use, since
-    the extension can vary by subconverter (e.g., lily.png)
+    the extension can vary by subConverter (e.g., lily.png)
 
     >>> common.findFormat('.mxl')
     ('musicxml', '.musicxml')
@@ -212,7 +212,7 @@ def findInputExtension(fmt: str) -> tuple[str, ...]:
     if sc is None:
         # file extension
         post: list[str] = []
-        for sc in converter.Converter().subconvertersList():
+        for sc in converter.Converter().subConvertersList():
             if fmt not in sc.registerInputExtensions:
                 continue
             for ext in sc.registerInputExtensions:
@@ -333,7 +333,7 @@ def findFormatExtURL(url):
     elif 'format=stage2' in url or 'format=stage1' in url:
         ext = '.md'
     else:  # check for file that ends in all known input extensions
-        for sc in converter.Converter().subconvertersList():
+        for sc in converter.Converter().subConvertersList():
             inputTypes = sc.registerInputExtensions
             for extSample in inputTypes:
                 if url.endswith('.' + extSample):

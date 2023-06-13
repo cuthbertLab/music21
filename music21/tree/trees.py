@@ -505,7 +505,7 @@ class ElementTree(core.AVLTree):
         True
 
         >>> listOfTuples = [(e.sortTuple(bFlat), e) for e in bFlat]
-        >>> listOfTuples[10]
+        >>> listOfTuples[14]
         (SortTuple(atEnd=0, offset=0.0, priority=0, ...),
          <music21.key.Key of f# minor>)
 
@@ -514,18 +514,18 @@ class ElementTree(core.AVLTree):
         True
         >>> et.populateFromSortedList(listOfTuples)
         >>> et.rootNode
-        <ElementNode: Start:15.0 <0.20...> Indices:(l:0 *97* r:195)
-            Payload:<music21.note.Note D#>>
+        <ElementNode: Start:14.5 <0.20...> Indices:(l:0 *99* r:199)
+            Payload:<music21.note.Note A>>
 
         >>> n = et.rootNode
         >>> while n is not None:
         ...    print(n)
         ...    n = n.leftChild
-        <ElementNode: Start:15.0 <0.20...> Indices:(l:0 *97* r:195) Payload:<music21.note.Note D#>>
-        <ElementNode: Start:6.0 <0.20...>  Indices:(l:0 *48* r:97) Payload:<music21.note.Note B>>
-        <ElementNode: Start:0.5 <0.20...>  Indices:(l:0 *24* r:48) Payload:<music21.note.Note G#>>
-        <ElementNode: Start:0.0 <0.2...>   Indices:(l:0 *12* r:24)
-            Payload:<music21.key.Key of f# minor>>
+        <ElementNode: Start:14.5 <0.20...> Indices:(l:0 *99* r:199) Payload:<music21.note.Note A>>
+        <ElementNode: Start:5.5 <0.20...>  Indices:(l:0 *49* r:99) Payload:<music21.note.Note A>>
+        <ElementNode: Start:0.0 <0.20...>  Indices:(l:0 *24* r:49) Payload:<music21.note.Note A>>
+        <ElementNode: Start:0.0 <0.1...>   Indices:(l:0 *12* r:24)
+            Payload:<music21.tempo.MetronomeMark Quarter=96 (playback only)>>
         <ElementNode: Start:0.0 <0.0...>   Indices:(l:0 *6* r:12) Payload:<music21.clef.TrebleClef>>
         <ElementNode: Start:0.0 <0.-25...> Indices:(l:0 *3* r:6)
             Payload:<music21.instrument.Instrument 'P3: Tenor: Instrument 3'>>
@@ -538,19 +538,19 @@ class ElementTree(core.AVLTree):
         >>> while n is not None:
         ...    print(n)
         ...    n = n.rightChild
-        <ElementNode: Start:15.0 <0.20...> Indices:(l:0 *97* r:195)
-            Payload:<music21.note.Note D#>>
-        <ElementNode: Start:25.0 <0.20...> Indices:(l:98 *146* r:195)
-            Payload:<music21.note.Note F#>>
-        <ElementNode: Start:32.0 <0.20...> Indices:(l:147 *171* r:195)
-            Payload:<music21.note.Note F#>>
-        <ElementNode: Start:34.0 <0.20...> Indices:(l:172 *183* r:195)
+        <ElementNode: Start:14.5 <0.20...> Indices:(l:0 *99* r:199)
+            Payload:<music21.note.Note A>>
+        <ElementNode: Start:25.0 <0.20...> Indices:(l:100 *149* r:199)
+            Payload:<music21.note.Note G#>>
+        <ElementNode: Start:31.0 <0.20...> Indices:(l:150 *174* r:199)
+            Payload:<music21.note.Note B>>
+        <ElementNode: Start:34.0 <0.20...> Indices:(l:175 *187* r:199)
             Payload:<music21.note.Note D>>
-        <ElementNode: Start:35.0 <0.20...> Indices:(l:184 *189* r:195)
+        <ElementNode: Start:35.0 <0.20...> Indices:(l:188 *193* r:199)
             Payload:<music21.note.Note A#>>
-        <ElementNode: Start:36.0 <0.-5...> Indices:(l:190 *192* r:195)
+        <ElementNode: Start:36.0 <0.-5...> Indices:(l:194 *196* r:199)
             Payload:<music21.bar.Barline type=final>>
-        <ElementNode: Start:36.0 <0.-5...> Indices:(l:193 *194* r:195)
+        <ElementNode: Start:36.0 <0.-5...> Indices:(l:197 *198* r:199)
             Payload:<music21.bar.Barline type=final>>
         '''
         def recurse(subListOfTuples, globalStartOffset) -> core.AVLNode | None:
