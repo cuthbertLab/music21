@@ -2494,8 +2494,7 @@ class NoChord(ChordSymbol):
 # ------------------------------------------------------------------------------
 
 class FiguredBassIndication(Harmony):
-    isFigure = True
-    tstamp = 1
+    isFigure: bool = True
     def __init__(self, figs: str | list | None = None, extenders: list[bool] | None = None , **keywords):
         super().__init__(**keywords)
         if figs:

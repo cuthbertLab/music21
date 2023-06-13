@@ -5173,10 +5173,32 @@ class MeasureParser(XMLParserBase):
         return cs
 
     def xmlToFiguredBass(self, mxFiguredBass) -> harmony.FiguredBassIndication:
-        # print('Hello from xmlToFiguredBass', mxFiguredBass.findall('*'))
+        # noinspection PyShadowingNames
+        '''
+        Converts a figured bass tag in musicxml to a harmony.FiguredBassIndication object:
+
+        >>> from xml.etree.ElementTree import fromstring as EL
+        >>> MP = musicxml.xmlToM21.MeasureParser()
+
+        >>> fbStr = """
+                    <figured-bass>
+                      <figure>
+                        <figure-number>5</figure-number>
+                      </figure>
+                      <figure>
+                        <figure-number>4</figure-number>
+                      </figure>
+                    </figured-bass>
+                    """
+        >>> mxFigures = EL(fbStr)
+        >>> fbi = MP.xmlToFiguredBass(mxFigures)
+        >>> fbi
+        <FiguredBassIndication figures: 5,4>
+        '''
+
         fb_strings: list[str] = []
         fb_extenders: list[bool] = []
-        sep = ','
+        sep: str = ','
         d: duration.Duration | None = None
         offsetFbi = self.offsetMeasureNote
 
@@ -5231,18 +5253,21 @@ class MeasureParser(XMLParserBase):
                     self.lastFigureDuration = d.quarterLength
 
         fb_string = sep.join(fb_strings)
-        print('Ergebnis:', fb_string, fb_extenders)
         fbi = harmony.FiguredBassIndication(fb_string, extenders=fb_extenders)
+        
         # If a duration is provided, set length of the FigureBassIndication
         if d:
             fbi.quarterLength = d.quarterLength
-        # call function in parent to add found objects.
-        #self.parent.appendFbis(fbi, offsetFbi)
+
         self.stream.insert(offsetFbi, fbi)
         return fbi
 
     def _getFigurePrefixOrSuffix(self, figure, presuf: str = 'prefix') -> str:
-        # helper function for prefixes and suffixes of figure numbers.
+        '''
+        A helper function for prefixes and suffixes of figure numbers.
+        Called two times from xmlToFiguredBass().
+        '''
+
         if figure.findall(presuf):
             for fix in figure.findall(presuf):
                 if fix.text:

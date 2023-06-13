@@ -311,7 +311,7 @@ class Notation(prebase.ProtoM21Object):
             self.extenders = [False for i in range(len(modifierStrings))]
         else:
             extenders = tuple(self.extenders)
-        print('angekommen', numbers, modifierStrings, extenders)
+        #print('angekommen', numbers, modifierStrings, extenders)
 
         self.origNumbers = numbers  # Keep original numbers
         self.numbers = numbers  # Will be converted to longhand
