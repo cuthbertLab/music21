@@ -43,13 +43,13 @@ class DocBuilder:
         self.getPaths()
 
 
-    def run(self):
+    def run(self, runSphinx=True):
         if self.command == 'clean':
             self.runClean()
         elif self.command == 'help':
             self.print_usage()
         else:
-            self.runBuild()
+            self.runBuild(runSphinx=runSphinx)
             self.postBuild()
 
     def runClean(self):

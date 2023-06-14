@@ -426,7 +426,9 @@ def registerSubConverter(newSubConverter: type[subConverters.SubConverter]) -> N
     _registeredSubConverters.appendleft(newSubConverter)
 
 @common.deprecated
-def registerSubconverter(newSubConverter: type[subConverters.SubConverter]) -> None:
+def registerSubconverter(
+    newSubConverter: type[subConverters.SubConverter]
+) -> None:  # pragma: no cover
     '''
     Deprecated: use registerSubConverter w/ capital "C" instead.
     '''
@@ -484,6 +486,16 @@ def unregisterSubConverter(
         else:
             raise ConverterException(
                 f'Could not remove {removeSubConverter!r} from registered subConverters')
+
+
+@common.deprecated
+def unregisterSubconverter(
+    newSubConverter: type[subConverters.SubConverter]
+) -> None:  # pragma: no cover
+    '''
+    Deprecated: use unregisterSubConverter w/ capital "C" instead.
+    '''
+    unregisterSubConverter(newSubConverter)
 
 
 # ------------------------------------------------------------------------------
