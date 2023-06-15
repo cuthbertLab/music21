@@ -1054,7 +1054,7 @@ class LocalCorpus(Corpus):
 #
 #         >>> virtualCorpus = corpus.corpora.VirtualCorpus()
 #         >>> virtualCorpus.getWorkList('bach/bwv1007/prelude')
-#         ['http://kern.ccarh.org/cgi-bin/ksdata?l=cc/bach/cello&file=bwv1007-01.krn&f=xml']
+#         ['https://kern.ccarh.org/cgi-bin/ksdata?l=cc/bach/cello&file=bwv1007-01.krn&f=xml']
 #
 #         >>> virtualCorpus.getWorkList('junk')
 #         []

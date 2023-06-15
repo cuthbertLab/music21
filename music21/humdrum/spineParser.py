@@ -2130,7 +2130,7 @@ def hdStringToNote(contents):
 
     New rhythmic extensions formerly defined in
     `wiki.humdrum.org/index.php/Rational_rhythms`
-    and now at http://extras.humdrum.org/man/rscale/
+    and now at https://extras.humdrum.org/man/rscale/
     are fully implemented:
 
 
@@ -2159,7 +2159,7 @@ def hdStringToNote(contents):
     double-dotted quarter not a double-dotted quarter-note triplet.
 
     I believe that the latter definition, though used in
-    http://kern.ccarh.org/cgi-bin/ksdata?l=musedata/mozart/quartet&file=k421-01.krn&f=kern
+    https://kern.ccarh.org/cgi-bin/ksdata?l=musedata/mozart/quartet&file=k421-01.krn&f=kern
     and the Josquin Research Project [JRP] is incorrect, seeing as it
     contradicts the specification in
     https://web.archive.org/web/20100203144730/http://www.music-cog.ohio-state.edu/Humdrum/representations/kern.html#N-Tuplets
@@ -2337,12 +2337,12 @@ def hdStringToNote(contents):
         if durationType == 0:
             durationString = foundNumber.group(1)
             if durationString == '000':
-                # for larger values, see http://extras.humdrum.org/man/rscale/
+                # for larger values, see https://extras.humdrum.org/man/rscale/
                 thisObject.duration.type = 'maxima'
                 if contents.count('.'):
                     thisObject.duration.dots = contents.count('.')
             elif durationString == '00':
-                # for larger values, see http://extras.humdrum.org/man/rscale/
+                # for larger values, see https://extras.humdrum.org/man/rscale/
                 thisObject.duration.type = 'longa'
                 if contents.count('.'):
                     thisObject.duration.dots = contents.count('.')

@@ -81,7 +81,7 @@ class BachBWV1007Prelude(VirtualWork):
 
     >>> a = corpus.virtual.BachBWV1007Prelude()
     >>> a.getUrlByExt('.xml')
-    ['http://kern.ccarh.org/cgi-bin/ksdata?l=cc/bach/cello&file=bwv1007-01.krn&f=xml']
+    ['https://kern.ccarh.org/cgi-bin/ksdata?l=cc/bach/cello&file=bwv1007-01.krn&f=xml']
     '''
 
     def __init__(self):
@@ -90,7 +90,7 @@ class BachBWV1007Prelude(VirtualWork):
         self.composer = 'Johann Sebastian Bach'
         self.title = 'Prelude from Cello Suite No. 1 in G Major, BWV 1007'
         self.corpusPath = 'bach/bwv1007/prelude'
-        cello = 'http://kern.ccarh.org/cgi-bin/ksdata?l=cc/bach/cello'
+        cello = 'https://kern.ccarh.org/cgi-bin/ksdata?l=cc/bach/cello'
         self.urlList.append(cello + '&file=bwv1007-01.krn&f=xml')
         self.urlList.append(cello + '&file=bwv1007-01.krn&f=kern')
 
@@ -102,7 +102,7 @@ class BachBWV772(VirtualWork):
         self.composer = 'Johann Sebastian Bach'
         self.title = 'Invention No. 1 in C Major, BWV 772'
         self.corpusPath = 'bach/bwv772'
-        invention = 'http://kern.ccarh.org/cgi-bin/ksdata?l=osu/classical/bach/inventions'
+        invention = 'https://kern.ccarh.org/cgi-bin/ksdata?l=osu/classical/bach/inventions'
         self.urlList.append(invention + '&file=inven01.krn&f=xml')
 
 
@@ -113,7 +113,7 @@ class BachBWV773(VirtualWork):
         self.composer = 'Johann Sebastian Bach'
         self.title = 'Invention No. 2 in C Minor, BWV 773'
         self.corpusPath = 'bach/bwv773'
-        invention = 'http://kern.ccarh.org/cgi-bin/ksdata?l=osu/classical/bach/inventions'
+        invention = 'https://kern.ccarh.org/cgi-bin/ksdata?l=osu/classical/bach/inventions'
         self.urlList.append(invention + '&file=inven02.krn&f=xml')
         self.urlList.append(invention + '&file=inven02.krn&f=kern')
 
@@ -137,7 +137,7 @@ class SchubertD576(VirtualWork):
         self.composer = 'Franz Schubert'
         self.title = '13 Variations on a Theme by Anselm Hüttenbrenner'
         self.corpusPath = 'schubert/d576-1'
-        self.urlList.append('http://kern.ccarh.org/cgi-bin/ksdata?l=cc/schubert/piano/'
+        self.urlList.append('https://kern.ccarh.org/cgi-bin/ksdata?l=cc/schubert/piano/'
                             'd0576&file=d0576-06.krn&f=xml')
 
 
@@ -148,7 +148,7 @@ class SchubertD5762(VirtualWork):
         self.composer = 'Franz Schubert'
         self.title = '13 Variations on a Theme by Anselm Hüttenbrenner'
         self.corpusPath = 'schubert/d576-2'
-        self.urlList.append('http://kern.ccarh.org/cgi-bin/ksdata?l=users/'
+        self.urlList.append('https://kern.ccarh.org/cgi-bin/ksdata?l=users/'
                             'craig/classical/schubert/piano/d0576&file=d0576-02.krn&f=xml')
 
 
@@ -159,7 +159,7 @@ class SchubertD5763(VirtualWork):
         self.composer = 'Franz Schubert'
         self.title = '13 Variations on a Theme by Anselm Hüttenbrenner'
         self.corpusPath = 'schubert/d576-3'
-        self.urlList.append('http://kern.ccarh.org/cgi-bin/ksdata?l=users/craig/classical/'
+        self.urlList.append('https://kern.ccarh.org/cgi-bin/ksdata?l=users/craig/classical/'
                             'schubert/piano/d0576&file=d0576-03.krn&f=xml')
 
 
@@ -170,7 +170,7 @@ class SchubertD5764(VirtualWork):
         self.composer = 'Franz Schubert'
         self.title = '13 Variations on a Theme by Anselm Hüttenbrenner'
         self.corpusPath = 'schubert/d576-4'
-        self.urlList.append('http://kern.ccarh.org/cgi-bin/ksdata?l=users/craig/classical/'
+        self.urlList.append('https://kern.ccarh.org/cgi-bin/ksdata?l=users/craig/classical/'
                             'schubert/piano/d0576&file=d0576-04.krn&f=xml')
 
 
@@ -181,7 +181,7 @@ class PachelbelCanonD(VirtualWork):
         self.composer = 'Johann Pachelbel'
         self.title = 'Canon in D Major'
         self.corpusPath = 'pachelbel/canon'
-        self.urlList.append('http://kern.ccarh.org/cgi-bin/ksdata?l=cc/'
+        self.urlList.append('https://kern.ccarh.org/cgi-bin/ksdata?l=cc/'
                             'pachelbel&file=canon.krn&f=xml')
 
 
