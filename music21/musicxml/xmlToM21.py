@@ -5362,7 +5362,12 @@ class MeasureParser(XMLParserBase):
         if figure.findall(presuf):
             for fix in figure.findall(presuf):
                 if fix.text:
-                    return modifiersDictXmlToM21[fix.text]
+                    mod: str | None = modifiersDictXmlToM21.get(fix.text)
+                    if mod:
+                        return mod
+                    else:
+                        warnings.warn(f'''{fix.text} is currently not supported. Please look into 
+                                      the modifiersDictXmlToM21 for changes, that fit your needs.''')
         return ''
 
     def xmlDirection(self, mxDirection):
