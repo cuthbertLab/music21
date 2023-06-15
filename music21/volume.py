@@ -5,30 +5,32 @@
 #               parameters
 #
 # Authors:      Christopher Ariza
+#               Michael Scott Asato Cuthbert
 #
 # Copyright:    Copyright © 2011-2012, 2015, 2017
-#               Michael Scott Cuthbert and the music21 Project
+#               Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
 This module defines the object model of Volume, covering all representation of
 amplitude, volume, velocity, and related parameters.
 '''
-from typing import Iterable, List, Union
-import unittest
+from __future__ import annotations
 
+from collections.abc import Iterable
+import typing as t
+import unittest
 
 from music21 import articulations
 from music21 import exceptions21
 from music21 import common
 from music21.common.objects import SlottedObjectMixin
 from music21 import dynamics
+from music21 import environment
 from music21 import prebase
 from music21 import note  # circular but acceptable, because not used at highest level.
 
-from music21 import environment
-_MOD = 'volume'
-environLocal = environment.Environment(_MOD)
+environLocal = environment.Environment('volume')
 
 
 # ------------------------------------------------------------------------------
@@ -51,10 +53,16 @@ class Volume(prebase.ProtoM21Object, SlottedObjectMixin):
     <music21.volume.Volume realized=0.71>
     >>> v.velocity
     90
+
+    >>> n = note.Note('C5')
+    >>> v = n.volume
+    >>> v.velocity = 20
+    >>> v.client is n
+    True
     '''
     # CLASS VARIABLES #
     __slots__ = (
-        '_client',
+        'client',
         '_velocityScalar',
         '_cachedRealized',
         'velocityIsRelative',
@@ -62,14 +70,13 @@ class Volume(prebase.ProtoM21Object, SlottedObjectMixin):
 
     def __init__(
         self,
-        client=None,
+        client: note.NotRest | None = None,
         velocity=None,
         velocityScalar=None,
         velocityIsRelative=True,
     ):
         # store a reference to the client, as we use this to do context
         # will use property; if None will leave as None
-        self._client = None
         self.client = client
         self._velocityScalar = None
         if velocity is not None:
@@ -82,25 +89,14 @@ class Volume(prebase.ProtoM21Object, SlottedObjectMixin):
     # SPECIAL METHODS #
     def __deepcopy__(self, memo=None):
         '''
-        Need to manage copying of weak ref; when copying, do not copy weak ref,
-        but keep as a reference to the same object.
+        Don't copy the client; set to current
         '''
-        new = self.__class__()
-        new.mergeAttributes(self)  # will get all numerical values
-        # keep same weak ref object
-        new._client = self._client
+        new = common.defaultDeepcopy(self, memo, ignoreAttributes={'client'})
+        new.client = self.client
         return new
 
     def _reprInternal(self):
         return f'realized={round(self.realized, 2)}'
-
-    def __getstate__(self):
-        self._client = common.unwrapWeakref(self._client)
-        return SlottedObjectMixin.__getstate__(self)
-
-    def __setstate__(self, state):
-        SlottedObjectMixin.__setstate__(self, state)
-        self._client = common.wrapWeakref(self._client)
 
     # PUBLIC METHODS #
     def getDynamicContext(self):
@@ -133,16 +129,16 @@ class Volume(prebase.ProtoM21Object, SlottedObjectMixin):
             self.velocityIsRelative = other.velocityIsRelative
 
     def getRealizedStr(self,
-                       useDynamicContext: Union[dynamics.Dynamic, bool] = True,
+                       useDynamicContext: dynamics.Dynamic | bool = True,
                        useVelocity=True,
-                       useArticulations: Union[bool,
-                                               articulations.Articulation,
-                                               Iterable[articulations.Articulation]
-                                               ] = True,
+                       useArticulations: t.Union[bool,
+                                                 articulations.Articulation,
+                                                 Iterable[articulations.Articulation]
+                                                 ] = True,
                        baseLevel=0.5,
                        clip=True):
-        '''Return the realized as rounded and formatted string value. Useful for testing.
-
+        '''
+        Return the realized as rounded and formatted string value. Useful for testing.
 
         >>> v = volume.Volume(velocity=64)
         >>> v.getRealizedStr()
@@ -157,9 +153,9 @@ class Volume(prebase.ProtoM21Object, SlottedObjectMixin):
 
     def getRealized(
         self,
-        useDynamicContext: Union[bool, dynamics.Dynamic] = True,
+        useDynamicContext: bool | dynamics.Dynamic = True,
         useVelocity=True,
-        useArticulations: Union[
+        useArticulations: t.Union[
             bool, articulations.Articulation, Iterable[articulations.Articulation]
         ] = True,
         baseLevel=0.5,
@@ -190,7 +186,7 @@ class Volume(prebase.ProtoM21Object, SlottedObjectMixin):
         that will be used instead of that available on a client.
 
         The `velocityIsRelative` tag determines if the velocity value includes
-        contextual values, such as dynamics and and accents, or not.
+        contextual values, such as dynamics and accents, or not.
 
         >>> s = stream.Stream()
         >>> s.repeatAppend(note.Note('d3', quarterLength=0.5), 8)
@@ -236,7 +232,7 @@ class Volume(prebase.ProtoM21Object, SlottedObjectMixin):
             if self._velocityScalar is not None:
                 if not self.velocityIsRelative:
                     # if velocity is not relative
-                    # it should fully determines output independent of anything
+                    # it should fully determine output independent of anything
                     # else
                     val = self._velocityScalar
                 else:
@@ -312,28 +308,6 @@ class Volume(prebase.ProtoM21Object, SlottedObjectMixin):
         '1.0'
         '''
         return str(round(self.cachedRealized, 2))
-
-    @property
-    def client(self):
-        '''
-        Get or set the client, which must be a note.NotRest subclass. The
-        client is wrapped in a weak reference.
-        '''
-        if self._client is None:
-            return None
-        post = common.unwrapWeakref(self._client)
-        if post is None:
-            # set attribute for speed
-            self._client = None
-        return post
-
-    @client.setter
-    def client(self, client):
-        if client is not None:
-            if isinstance(client, note.NotRest):
-                self._client = common.wrapWeakref(client)
-        else:
-            self._client = None
 
     @property
     def realized(self):
@@ -487,7 +461,7 @@ def realizeVolume(srcStream,
                 for k in range(lastRelevantKeyIndex, len(bKeys)):
                     start, end = bKeys[k]
                     if end > eStart >= start:
-                        # store so as to start in the same position
+                        # store to start in the same position
                         # for next element
                         lastRelevantKeyIndex = k
                         dm = boundaries[bKeys[k]]
@@ -512,13 +486,13 @@ class Test(unittest.TestCase):
         import gc
         from music21 import volume
 
-        n1 = note.Note()
+        n1 = note.Note('G#4')
         v = volume.Volume(client=n1)
         self.assertEqual(v.client, n1)
         del n1
         gc.collect()
-        # weak ref does not exist
-        self.assertEqual(v.client, None)
+        # Now client is still there -- no longer weakref
+        self.assertEqual(v.client, note.Note('G#4'))
 
 
     def testGetContextSearchA(self):
@@ -677,6 +651,8 @@ class Test(unittest.TestCase):
 
     def testRealizeVolumeB(self):
         from music21 import corpus
+        from music21 import stream
+
         s = corpus.parse('bwv66.6')
 
         durUnit = s.highestTime // 8  # let floor
@@ -688,7 +664,7 @@ class Test(unittest.TestCase):
                 # placing dynamics in Measure requires extra handling
                 m = p.getElementsByOffset(oTarget,
                                           mustBeginInSpan=False,
-                                          ).getElementsByClass('Measure').first()
+                                          ).getElementsByClass(stream.Measure).first()
                 oInsert = oTarget - m.getOffsetBySite(p)
                 m.insert(oInsert, dynamics.Dynamic(d))
             # shift 2 places each time
@@ -750,7 +726,7 @@ class Test(unittest.TestCase):
 
 # ------------------------------------------------------------------------------
 # define presented order in documentation
-_DOC_ORDER: List[type] = []
+_DOC_ORDER: list[type] = []
 
 
 if __name__ == '__main__':

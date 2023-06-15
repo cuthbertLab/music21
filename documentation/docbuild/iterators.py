@@ -1,14 +1,16 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 # Name:         docbuild/iterators.py
-# Purpose:      music21 documentation iterators, including IPython notebook to ReST converter
+# Purpose:      music21 documentation iterators, including Jupyter notebook to ReST converter
 #
 # Authors:      Josiah Wolf Oberholtzer
-#               Michael Scott Cuthbert
+#               Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2013, 17 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2013, 17 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
+from __future__ import annotations
+
 import abc  # for @abc.abstractmethod decorator: requires a function to be defined in subclasses
 import os
 import types
@@ -32,13 +34,13 @@ class Iterator:
         raise NotImplementedError
 
 
-class IPythonNotebookIterator(Iterator):
+class JupyterNotebookIterator(Iterator):
     '''
     Iterates over music21's documentation directory, yielding .ipynb files.
 
     >>> import os
     >>> sp = common.getRootFilePath()
-    >>> ipnbi = IPythonNotebookIterator()
+    >>> ipnbi = JupyterNotebookIterator()
     >>> for i, nb in enumerate(ipnbi):
     ...     if i >= 3:
     ...         break
@@ -157,7 +159,6 @@ class CodebaseIterator(Iterator):
     ...     print(x)
     <class 'music21.articulations.Accent'>
     <class 'music21.articulations.Articulation'>
-    <class 'music21.articulations.ArticulationException'>
     <class 'music21.articulations.Bowing'>
     <class 'music21.articulations.BrassIndication'>
     <class 'music21.articulations.BreathMark'>

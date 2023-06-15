@@ -3,12 +3,14 @@
 # Name:         common/pathTools.py
 # Purpose:      Utilities for paths
 #
-# Authors:      Michael Scott Cuthbert
+# Authors:      Michael Scott Asato Cuthbert
 #               Christopher Ariza
 #
-# Copyright:    Copyright © 2009-2015 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2009-2015 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
+from __future__ import annotations
+
 __all__ = [
     'getRootFilePath',
     'getSourceFilePath',
@@ -19,18 +21,19 @@ __all__ = [
     'cleanpath',
 ]
 
-from typing import List, Union, Optional
+import typing as t
+from typing import overload
 import inspect
 import os
 import pathlib
 import unittest
 
+StrOrPath = t.TypeVar('StrOrPath', bound=str | pathlib.Path)
+
 # ------------------------------------------------------------------------------
-
-
 def getSourceFilePath() -> pathlib.Path:
     '''
-    Get the music21 directory that contains source files such as note.py, etc..
+    Get the music21 directory that contains source files such as note.py, etc.
     This is not the same as the
     outermost package development directory.
     '''
@@ -38,7 +41,7 @@ def getSourceFilePath() -> pathlib.Path:
     fpMusic21 = fpThis.parent.parent  # common is two levels deep
     # use stream as a test case
     if 'stream' not in [x.name for x in fpMusic21.iterdir()]:
-        raise Exception(
+        raise FileNotFoundError(
             f'cannot find expected music21 directory: {fpMusic21}'
         )  # pragma: no cover
     return fpMusic21
@@ -56,7 +59,8 @@ def getMetadataCacheFilePath() -> pathlib.Path:
 
 
 def getCorpusFilePath() -> pathlib.Path:
-    r'''Get the stored music21 directory that contains the corpus metadata cache.
+    r'''
+    Get the stored music21 directory that contains the corpus metadata cache.
 
     >>> fp = common.getCorpusFilePath()
     >>> fp.name == 'corpus' and fp.parent.name == 'music21'
@@ -69,7 +73,7 @@ def getCorpusFilePath() -> pathlib.Path:
     return pathlib.Path(coreCorpus.manualCoreCorpusPath)
 
 
-def getCorpusContentDirs() -> List[str]:
+def getCorpusContentDirs() -> list[str]:
     '''
     Get all dirs that are found in the CoreCorpus that contain content;
     that is, exclude dirs that have code or other resources.
@@ -78,10 +82,12 @@ def getCorpusContentDirs() -> List[str]:
     >>> fp  # this list will be fragile, depending on composition of dirs
     ['airdsAirs', 'bach', 'beach', 'beethoven', 'chopin',
      'ciconia', 'corelli', 'cpebach',
-     'demos', 'essenFolksong', 'handel', 'haydn', 'joplin', 'josquin',
-     'leadSheet', 'luca', 'miscFolk', 'monteverdi', 'mozart', 'nottingham-dataset',
+     'demos', 'essenFolksong', 'handel', 'haydn', 'johnson_j_r', 'joplin', 'josquin',
+     'leadSheet', 'liliuokalani', 'luca', 'lusitano',
+     'miscFolk', 'monteverdi', 'mozart',
+     'nottingham-dataset',
      'oneills1850', 'palestrina',
-     'ryansMammoth', 'schoenberg', 'schubert', 'schumann', 'schumann_clara',
+     'ryansMammoth', 'schoenberg', 'schubert', 'schumann_clara', 'schumann_robert',
      'theoryExercises', 'trecento', 'verdi', 'weber']
 
     Make sure that all corpus data has a directoryInformation tag in
@@ -104,6 +110,7 @@ def getCorpusContentDirs() -> List[str]:
         '_metadataCache',
         '__pycache__',
     )
+    filename: str
     for filename in sorted(os.listdir(directoryName)):
         if filename.endswith(('.py', '.pyc')):
             continue
@@ -117,7 +124,7 @@ def getCorpusContentDirs() -> List[str]:
 
 def getRootFilePath() -> pathlib.Path:
     '''
-    Return the root directory for music21 -- outside of the music21 namespace
+    Return the root directory for music21 -- outside the music21 namespace
     which has directories such as "dist", "documentation", "music21"
 
     >>> fp = common.getRootFilePath()
@@ -130,7 +137,7 @@ def getRootFilePath() -> pathlib.Path:
     return fpParent
 
 
-def relativepath(path: str, start: Optional[str] = None) -> str:
+def relativepath(path: StrOrPath, start: str | None = None) -> StrOrPath | str:
     '''
     A cross-platform wrapper for `os.path.relpath()`, which returns `path` if
     under Windows, otherwise returns the relative path of `path`.
@@ -144,12 +151,33 @@ def relativepath(path: str, start: Optional[str] = None) -> str:
     return os.path.relpath(path, start)
 
 
-def cleanpath(path: Union[str, pathlib.Path], *, returnPathlib=None) -> Union[str, pathlib.Path]:
+@overload
+def cleanpath(path: pathlib.Path, *,
+              returnPathlib: t.Literal[None] = None) -> pathlib.Path:
+    return pathlib.Path('/')  # dummy until Astroid #1015 is fixed.
+
+@overload
+def cleanpath(path: str, *,
+              returnPathlib: t.Literal[None] = None) -> str:
+    return '/'  # dummy until Astroid #1015 is fixed.
+
+@overload
+def cleanpath(path: str | pathlib.Path, *,
+              returnPathlib: t.Literal[True]) -> pathlib.Path:
+    return pathlib.Path('/')  # dummy until Astroid #1015 is fixed.
+
+@overload
+def cleanpath(path: str | pathlib.Path, *,
+              returnPathlib: t.Literal[False]) -> str:
+    return '/'  # dummy until Astroid #1015 is fixed.
+
+def cleanpath(path: str | pathlib.Path, *,
+              returnPathlib: bool | None = None) -> str | pathlib.Path:
     '''
     Normalizes the path by expanding ~user on Unix, ${var} environmental vars
-    (is this a good idea?), expanding %name% on Windows, normalizing path names (Windows
-    turns backslashes to forward slashes, and finally if that file is not an absolute path,
-    turns it from a relative path to an absolute path.
+    (is this a good idea?), expanding %name% on Windows, normalizing path names
+    (Windows turns backslashes to forward slashes), and finally if that file
+    is not an absolute path, turns it from a relative path to an absolute path.
 
     v5 -- returnPathlib -- None (default) does not convert. False, returns a string,
     True, returns a pathlib.Path.

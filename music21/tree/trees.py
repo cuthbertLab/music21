@@ -4,9 +4,9 @@
 # Purpose:      Subclasses of tree.core.AVLTree for different purposes
 #
 # Authors:      Josiah Wolf Oberholtzer
-#               Michael Scott Cuthbert
+#               Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2013-16 Michael Scott Cuthbert and the music21
+# Copyright:    Copyright © 2013-16 Michael Scott Asato Cuthbert and the music21
 #               Project
 # License:      BSD, see license.txt
 # -----------------------------------------------------------------------------
@@ -15,20 +15,20 @@ Tools for grouping elements, timespans, and especially
 pitched elements into kinds of searchable tree organized by start and stop offsets
 and other positions.
 '''
+from __future__ import annotations
+
+from math import inf
+import typing as t
 import unittest
 import weakref
-from math import inf
-from typing import Optional
 
 from music21 import common
+from music21 import environment
 from music21 import exceptions21
-
 from music21.sorting import SortTuple
 
 from music21.tree import core
 from music21.tree import node as nodeModule
-
-from music21 import environment
 
 environLocal = environment.Environment('tree.trees')
 
@@ -96,7 +96,7 @@ class ElementTree(core.AVLTree):
     6.0
     '''
     # TYPING #
-    rootNode: Optional[nodeModule.ElementNode]
+    rootNode: nodeModule.ElementNode | None
 
     # CLASS VARIABLES #
     nodeClass = nodeModule.ElementNode
@@ -442,9 +442,12 @@ class ElementTree(core.AVLTree):
             visitedParents.add(parent)
             parentPosition = parent.offset
             parent._removeElementAtPosition(self, oldPosition)
-            parent._insertCore(self.offset, self)
-
-            parent._updateNodes(parentPosition, visitedParents=visitedParents)
+            # Trees don't have offsets currently
+            raise NotImplementedError
+            # # pylint: disable=all
+            # parent._insertCore(self.offset, self)
+            #
+            # parent._updateNodes(parentPosition, visitedParents=visitedParents)
 
     def _removeElementAtPosition(self, element, position):
         '''
@@ -491,7 +494,7 @@ class ElementTree(core.AVLTree):
 
         This is about an order of magnitude faster (3ms vs 21ms for 1000 items; 31 vs. 30ms for
         10,000 items) than running createNodeAtPosition() for each element in a list if it is
-        already sorted.  Thus it should be used when converting a
+        already sorted.  Thus, it should be used when converting a
         Stream where .isSorted is True into a tree.
 
         If any of the conditions is not true, expect to get a dangerously
@@ -502,27 +505,27 @@ class ElementTree(core.AVLTree):
         True
 
         >>> listOfTuples = [(e.sortTuple(bFlat), e) for e in bFlat]
-        >>> listOfTuples[10]
+        >>> listOfTuples[14]
         (SortTuple(atEnd=0, offset=0.0, priority=0, ...),
          <music21.key.Key of f# minor>)
 
-        >>> t = tree.trees.ElementTree()
-        >>> t.rootNode is None
+        >>> et = tree.trees.ElementTree()
+        >>> et.rootNode is None
         True
-        >>> t.populateFromSortedList(listOfTuples)
-        >>> t.rootNode
-        <ElementNode: Start:15.0 <0.20...> Indices:(l:0 *97* r:195)
-            Payload:<music21.note.Note D#>>
+        >>> et.populateFromSortedList(listOfTuples)
+        >>> et.rootNode
+        <ElementNode: Start:14.5 <0.20...> Indices:(l:0 *99* r:199)
+            Payload:<music21.note.Note A>>
 
-        >>> n = t.rootNode
+        >>> n = et.rootNode
         >>> while n is not None:
         ...    print(n)
         ...    n = n.leftChild
-        <ElementNode: Start:15.0 <0.20...> Indices:(l:0 *97* r:195) Payload:<music21.note.Note D#>>
-        <ElementNode: Start:6.0 <0.20...>  Indices:(l:0 *48* r:97) Payload:<music21.note.Note B>>
-        <ElementNode: Start:0.5 <0.20...>  Indices:(l:0 *24* r:48) Payload:<music21.note.Note G#>>
-        <ElementNode: Start:0.0 <0.2...>   Indices:(l:0 *12* r:24)
-            Payload:<music21.key.Key of f# minor>>
+        <ElementNode: Start:14.5 <0.20...> Indices:(l:0 *99* r:199) Payload:<music21.note.Note A>>
+        <ElementNode: Start:5.5 <0.20...>  Indices:(l:0 *49* r:99) Payload:<music21.note.Note A>>
+        <ElementNode: Start:0.0 <0.20...>  Indices:(l:0 *24* r:49) Payload:<music21.note.Note A>>
+        <ElementNode: Start:0.0 <0.1...>   Indices:(l:0 *12* r:24)
+            Payload:<music21.tempo.MetronomeMark Quarter=96 (playback only)>>
         <ElementNode: Start:0.0 <0.0...>   Indices:(l:0 *6* r:12) Payload:<music21.clef.TrebleClef>>
         <ElementNode: Start:0.0 <0.-25...> Indices:(l:0 *3* r:6)
             Payload:<music21.instrument.Instrument 'P3: Tenor: Instrument 3'>>
@@ -531,26 +534,26 @@ class ElementTree(core.AVLTree):
         <ElementNode: Start:0.0 <0.-30...> Indices:(l:0 *0* r:1)
             Payload:<music21.metadata.Metadata object at 0x104adbdd8>>
 
-        >>> n = t.rootNode
+        >>> n = et.rootNode
         >>> while n is not None:
         ...    print(n)
         ...    n = n.rightChild
-        <ElementNode: Start:15.0 <0.20...> Indices:(l:0 *97* r:195)
-            Payload:<music21.note.Note D#>>
-        <ElementNode: Start:25.0 <0.20...> Indices:(l:98 *146* r:195)
-            Payload:<music21.note.Note F#>>
-        <ElementNode: Start:32.0 <0.20...> Indices:(l:147 *171* r:195)
-            Payload:<music21.note.Note F#>>
-        <ElementNode: Start:34.0 <0.20...> Indices:(l:172 *183* r:195)
+        <ElementNode: Start:14.5 <0.20...> Indices:(l:0 *99* r:199)
+            Payload:<music21.note.Note A>>
+        <ElementNode: Start:25.0 <0.20...> Indices:(l:100 *149* r:199)
+            Payload:<music21.note.Note G#>>
+        <ElementNode: Start:31.0 <0.20...> Indices:(l:150 *174* r:199)
+            Payload:<music21.note.Note B>>
+        <ElementNode: Start:34.0 <0.20...> Indices:(l:175 *187* r:199)
             Payload:<music21.note.Note D>>
-        <ElementNode: Start:35.0 <0.20...> Indices:(l:184 *189* r:195)
+        <ElementNode: Start:35.0 <0.20...> Indices:(l:188 *193* r:199)
             Payload:<music21.note.Note A#>>
-        <ElementNode: Start:36.0 <0.-5...> Indices:(l:190 *192* r:195)
+        <ElementNode: Start:36.0 <0.-5...> Indices:(l:194 *196* r:199)
             Payload:<music21.bar.Barline type=final>>
-        <ElementNode: Start:36.0 <0.-5...> Indices:(l:193 *194* r:195)
+        <ElementNode: Start:36.0 <0.-5...> Indices:(l:197 *198* r:199)
             Payload:<music21.bar.Barline type=final>>
         '''
-        def recurse(subListOfTuples, globalStartOffset) -> Optional[core.AVLNode]:
+        def recurse(subListOfTuples, globalStartOffset) -> core.AVLNode | None:
             '''
             Divide and conquer.
             '''
@@ -895,7 +898,7 @@ class OffsetTree(ElementTree):
     __slots__ = ()
 
     # TYPING #
-    rootNode: Optional[nodeModule.OffsetNode]
+    rootNode: nodeModule.OffsetNode | None
 
     nodeClass = nodeModule.OffsetNode
 
@@ -967,7 +970,7 @@ class OffsetTree(ElementTree):
             elif node.rightChild and node.payloadElementsStopIndex <= index:
                 return recurseByIndex(node.rightChild, index)
 
-        def recurseBySlice(node: nodeModule.ElementNode, start, stop):
+        def recurseBySlice(node: nodeModule.OffsetNode, start, stop):
             '''
             Return a slice of the payload elements (plural) where start <= index < stop.
             '''
@@ -1002,57 +1005,59 @@ class OffsetTree(ElementTree):
         else:
             raise TypeError(f'Indices must be integers or slices, got {i}')
 
-    def __setitem__(self, i, new):
-        r'''
-        Sets elements or timespans at index `i` to `new`.
+    # def __setitem__(self, i, new):
+    #     r'''
+    #     Sets elements or timespans at index `i` to `new`.
 
-        TODO: this should be a bit different for OffsetTrees, probably more like ElementTrees
-
-
-        >>> tss = [
-        ...     tree.spans.Timespan(0, 2),
-        ...     tree.spans.Timespan(0, 9),
-        ...     tree.spans.Timespan(1, 1),
-        ...     ]
-        >>> tsTree = tree.timespanTree.TimespanTree()
-        >>> tsTree.insert(tss)
-        >>> tsTree[0] = tree.spans.Timespan(-1, 6)
-        >>> for x in tsTree:
-        ...     x
-        <Timespan -1.0 6.0>
-        <Timespan 0.0 9.0>
-        <Timespan 1.0 1.0>
-
-        Note however, that calling __getitem__ after __setitem__ will not return
-        what you just set if the timing is wrong.  This is different from the
-        behavior on ElementTree which assumes that the new element wants to be
-        at the old element's offset.
-
-        >>> tsTree[2] = tree.spans.Timespan(-0.5, 4)
-        >>> tsTree[2]
-        <Timespan 0.0 9.0>
-        >>> for x in tsTree:
-        ...     x
-        <Timespan -1.0 6.0>
-        <Timespan -0.5 4.0>
-        <Timespan 0.0 9.0>
+    #     TODO: this should be a bit different for OffsetTrees, probably more like ElementTrees
 
 
-        Works with slices too.
+    #     >>> tss = [
+    #     ...     tree.spans.Timespan(0, 2),
+    #     ...     tree.spans.Timespan(0, 9),
+    #     ...     tree.spans.Timespan(1, 1),
+    #     ...     ]
+    #     >>> tsTree = tree.timespanTree.TimespanTree()
+    #     >>> tsTree.insert(tss)
+    #     >>> tsTree[0] = tree.spans.Timespan(-1, 6)
+    #     >>> for x in tsTree:
+    #     ...     x
+    #     <Timespan -1.0 6.0>
+    #     <Timespan 0.0 9.0>
+    #     <Timespan 1.0 1.0>
 
-        >>> tsTree[1:] = [tree.spans.Timespan(10, 20)]
-        >>> for x in tsTree:
-        ...     x
-        <Timespan -1.0 6.0>
-        <Timespan 10.0 20.0>
-        '''
-        if isinstance(i, (int, slice)):
-            old = self[i]
-            self.removeTimespan(old)
-            self.insert(new)
-        else:
-            message = f'Indices must be ints or slices, got {i}'
-            raise TypeError(message)
+    #     Note however, that calling __getitem__ after __setitem__ will not return
+    #     what you just set if the timing is wrong.  This is different from the
+    #     behavior on ElementTree which assumes that the new element wants to be
+    #     at the old element's offset.
+
+    #     >>> tsTree[2] = tree.spans.Timespan(-0.5, 4)
+    #     >>> tsTree[2]
+    #     <Timespan 0.0 9.0>
+    #     >>> for x in tsTree:
+    #     ...     x
+    #     <Timespan -1.0 6.0>
+    #     <Timespan -0.5 4.0>
+    #     <Timespan 0.0 9.0>
+
+
+    #     Works with slices too.
+
+    #     >>> tsTree[1:] = [tree.spans.Timespan(10, 20)]
+    #     >>> for x in tsTree:
+    #     ...     x
+    #     <Timespan -1.0 6.0>
+    #     <Timespan 10.0 20.0>
+    #     '''
+    #     raise NotImplementedError
+    #     # pylint: disable=all
+    #     if isinstance(i, (int, slice)):
+    #         old = self[i]
+    #         self.removeTimespan(old)
+    #         self.insert(new)
+    #     else:
+    #         message = f'Indices must be ints or slices, got {i}'
+    #         raise TypeError(message)
 
     def __iter__(self):
         r'''
@@ -1267,11 +1272,11 @@ class OffsetTree(ElementTree):
         Removes `elements` which can be Music21Objects or Timespans
         (a single one or a list) from this Tree.
 
-        Much safer (for non-timespans) if a list of offsets is used but it is optional
+        Much safer (for non-timespans) if a list of offsets is used, but it is optional.
 
         If runUpdate is False then the tree will be left with incorrect indices and
         endTimes; but it can speed up operations where an element is going to be removed
-        and then immediately replaced: i.e., where the position of an element has changed
+        and then immediately replaced: i.e., where the position of an element has changed.
         '''
         initialPosition = self.lowestPosition()
         initialEndTime = self.endTime
@@ -1363,7 +1368,7 @@ class OffsetTree(ElementTree):
 
     def overlapTimePoints(self, includeStopPoints=False, returnVerticality=False):
         '''
-        Gets all time points where some element is starting
+        Gets all time-points where some element is starting
         (or if includeStopPoints is True, where some element is starting or stopping)
         while some other element is still continuing onward.
 

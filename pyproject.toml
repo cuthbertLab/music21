@@ -1,0 +1,68 @@
+[build-system]
+requires = [
+    "hatchling>=1.8.1",
+]
+build-backend = "hatchling.build"
+
+[project]
+name = "music21"
+dynamic = [
+    "version",
+]
+description = "A Toolkit for Computer-Aided Musical Analysis and Computational Musicology."
+readme = "README.md"
+license = "BSD-3-Clause"
+requires-python = ">=3.10"
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Environment :: Console",
+    "Environment :: Web Environment",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Education",
+    "Intended Audience :: End Users/Desktop",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: BSD License",
+    "Natural Language :: English",
+    "Operating System :: MacOS",
+    "Operating System :: Microsoft :: Windows",
+    "Operating System :: OS Independent",
+    "Operating System :: POSIX",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Topic :: Artistic Software",
+    "Topic :: Multimedia :: Sound/Audio",
+    "Topic :: Multimedia :: Sound/Audio :: Conversion",
+    "Topic :: Multimedia :: Sound/Audio :: MIDI",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+]
+
+# when hatch-requirements-txt is stable, replace with that
+dependencies = [
+    "chardet",
+    "joblib",
+    "jsonpickle",
+    "matplotlib",
+    "more_itertools",
+    "numpy",
+    "requests",
+    "webcolors>=1.5",
+]
+
+[[project.authors]]
+name = "Michael Scott Asato Cuthbert"
+email = "michael.asato.cuthbert@gmail.com"
+
+[project.urls]
+Download = "https://github.com/cuthbertLab/music21/releases/"
+Homepage = "https://github.com/cuthbertLab/music21"
+
+[tool.hatch.version]
+path = "music21/_version.py"
+
+[tool.hatch.build.targets.sdist]
+include = [
+    "music21",
+    "py.typed",  # indicates source is typed.
+]

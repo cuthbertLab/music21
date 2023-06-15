@@ -1,4 +1,0 @@
-chardet
-joblib
-more-itertools
-webcolors>=1.5

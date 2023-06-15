@@ -5,24 +5,25 @@
 #
 # Authors:      Christopher Ariza
 #
-# Copyright:    Copyright © 2009-2010 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2009-2010 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
 Various tools and utilities to find correlations between disparate objects in a Stream.
 '''
-import unittest
+from __future__ import annotations
+
 from collections import OrderedDict
+import unittest
 
 from music21 import exceptions21
 
 from music21 import note
 from music21 import chord
 from music21 import dynamics
-
 from music21 import environment
-_MOD = 'analysis.correlate'
-environLocal = environment.Environment(_MOD)
+
+environLocal = environment.Environment('analysis.correlate')
 
 
 # ------------------------------------------------------------------------------
@@ -32,7 +33,8 @@ class CorrelateException(exceptions21.Music21Exception):
 
 # ------------------------------------------------------------------------------
 class ActivityMatch:
-    '''Given a Stream, find if one object is active while another is also active.
+    '''
+    Given a Stream, find if one object is active while another is also active.
 
     Plotting routines to graph the output of dedicated methods in this class are available.
 
@@ -47,15 +49,15 @@ class ActivityMatch:
 
     '''
     def __init__(self, streamObj):
-        if not hasattr(streamObj, "classes") or "Stream" not in streamObj.classes:
+        if not hasattr(streamObj, 'classes') or 'Stream' not in streamObj.classes:
             raise CorrelateException('non-stream provided as argument')
         self.streamObj = streamObj
         self.data = None
 
 
     def _findActive(self, objNameSrc=None, objNameDst=None):
-        '''D
-        o the analysis, finding correlations of src with dst
+        '''
+        Do the analysis, finding correlations of src with dst
         returns an ordered list of dictionaries, in the form
         {'src': obj, 'dst': [objs]}
 
@@ -82,7 +84,6 @@ class ActivityMatch:
         # dst object is within the source objects boundaries
         # if so, append it to the source object's dictionary
         for element in streamFlat.getElementsByClass(objNameDst):
-            # print(_MOD, 'dst', element)
             dstStart = element.offset
             dstEnd = dstStart + element.duration.quarterLength
 
@@ -145,7 +146,6 @@ class ActivityMatch:
             entrySrc = entry['src']
             # there may be multiple dst:
 
-            # if hasattr(entrySrc, 'pitches'):  # a chord
             if entrySrc.isChord:
                 sub = list(entrySrc)
             else:
@@ -185,32 +185,8 @@ class ActivityMatch:
 class Test(unittest.TestCase):
 
     def testCopyAndDeepcopy(self):
-        '''
-        Test copying all objects defined in this module
-        '''
-        import copy
-        import sys
-        import types
-
-        for part in sys.modules[self.__module__].__dict__:
-            match = False
-            for skip in ['_', '__', 'Test', 'Exception']:
-                if part.startswith(skip) or part.endswith(skip):
-                    match = True
-            if match:
-                continue
-            name = getattr(sys.modules[self.__module__], part)
-
-            # noinspection PyTypeChecker
-            if callable(name) and not isinstance(name, types.FunctionType):
-                try:  # see if obj can be made w/ args
-                    obj = name()
-                except TypeError:
-                    continue
-                dummy_a = copy.copy(obj)
-                dummy_b = copy.deepcopy(obj)
-
-
+        from music21.test.commonTest import testCopyAll
+        testCopyAll(self, globals())
 
     def testActivityMatchPitchToDynamic(self):
         from music21 import corpus

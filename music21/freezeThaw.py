@@ -4,10 +4,10 @@
 # Purpose:      Methods for storing any music21 object on disk.
 #               Uses pickle and json
 #
-# Authors:      Michael Scott Cuthbert
+# Authors:      Michael Scott Asato Cuthbert
 #               Christopher Ariza
 #
-# Copyright:    Copyright © 2011-2012 Michael Scott Cuthbert and the music21
+# Copyright:    Copyright © 2011-2012 Michael Scott Asato Cuthbert and the music21
 #               Project
 # License:      BSD, see license.txt
 # -----------------------------------------------------------------------------
@@ -50,9 +50,9 @@ because we weren't sure and are still not sure which will be best in the long-ru
 the first approach
 uses explicit lists of attributes that need to be stored and just saves those. This uses a
 homemade set of methods that are specifically tailored for music21; but it misses some things that
-may be important to you.  The second approach uses the the freely distributable
+may be important to you.  The second approach uses the freely distributable
 `jsonpickle` module. This approach probably stores more data than
-someone not using music21 or python is likely to want, but can be used to get back an entire
+a person not using music21 or python is likely to want, but can be used to get back an entire
 music21 Stream with no conversion.
 
 Both JSON and Pickle files can be huge, but `freezeThaw` can compress them with
@@ -66,6 +66,8 @@ like the idea of thawing something that's frozen; "unpickling" just doesn't
 seem possible.  In any event, I needed a name that wouldn't already
 exist in the Python namespace.
 '''
+from __future__ import annotations
+
 import copy
 import io
 import os
@@ -75,20 +77,15 @@ import time
 import unittest
 import zlib
 
-from typing import Union, List
-
 from music21 import base
 from music21 import common
-from music21 import defaults
 from music21 import derivation
+from music21 import environment
 from music21 import exceptions21
 from music21 import spanner
 from music21 import variant
-# from music21.tree.trees import ElementTree
 
-from music21 import environment
-_MOD = 'freezeThaw'
-environLocal = environment.Environment(_MOD)
+environLocal = environment.Environment('freezeThaw')
 
 # -----------------------------------------------------------------------------
 
@@ -108,7 +105,7 @@ class StreamFreezeThawBase:
     def __init__(self):
         self.stream = None
 
-    def getPickleFp(self, directory: Union[str, pathlib.Path]) -> pathlib.Path:
+    def getPickleFp(self, directory: str | pathlib.Path) -> pathlib.Path:
         if not isinstance(directory, pathlib.Path):
             directory = pathlib.Path(directory)
 
@@ -116,7 +113,7 @@ class StreamFreezeThawBase:
         streamStr = str(time.time())
         return directory / ('m21-' + common.getMd5(streamStr) + '.p')
 
-    def getJsonFp(self, directory: Union[str, pathlib.Path]) -> pathlib.Path:
+    def getJsonFp(self, directory: str | pathlib.Path) -> pathlib.Path:
         return self.getPickleFp(directory).with_suffix('.p.json')
 
 
@@ -238,7 +235,7 @@ class StreamFreezer(StreamFreezeThawBase):
         {'m21Version': (...), 'stream': <music21.stream.Stream 0x1289212>}
 
         '''
-        # do all things necessary to setup the stream
+        # do all things necessary to set up the stream
         if streamObj is None:
             streamObj = self.stream
         self.setupSerializationScaffold(streamObj)
@@ -316,7 +313,7 @@ class StreamFreezer(StreamFreezeThawBase):
         streamObj (not recursive).  Called by setupSerializationScaffold.
         '''
         if hasattr(streamObj, 'streamStatus'):
-            streamObj.streamStatus._client = None
+            streamObj.streamStatus.client = None
 
     def recursiveClearSites(self, startObj):
         '''
@@ -335,15 +332,15 @@ class StreamFreezer(StreamFreezeThawBase):
         >>> s.insert(10, n)
         >>> len(n.sites)
         2
-        >>> t = stream.Stream()
-        >>> t.insert(20, n)
-        >>> t.id = 'stream t'
+        >>> s2 = stream.Stream()
+        >>> s2.insert(20, n)
+        >>> s2.id = 'stream s2'
         >>> len(n.sites)
         3
 
         >>> n.getOffsetBySite(s)
         10.0
-        >>> n.getOffsetBySite(t)
+        >>> n.getOffsetBySite(s2)
         20.0
 
         >>> sf = freezeThaw.StreamFreezer()
@@ -357,9 +354,8 @@ class StreamFreezer(StreamFreezeThawBase):
         Traceback (most recent call last):
         music21.sites.SitesException: an entry for this object <music21.note.Note D#>
                is not stored in stream <music21.stream.Stream stream s>
-        >>> n.getOffsetBySite(t)
+        >>> n.getOffsetBySite(s2)
         20.0
-
 
         After recursiveClearSites n will be not know its location anywhere...
 
@@ -367,15 +363,13 @@ class StreamFreezer(StreamFreezeThawBase):
         >>> len(n.sites)  # just the None site
         1
 
-        This leaves n and t in strange positions, because n is in t.elements still....
+        This leaves n and s2 in strange positions, because n is in s2.elements still....
 
-        >>> n in t.elements
+        >>> n in s2.elements
         True
 
         This predicament is why when the standard freezeThaw call is made, what is frozen is a
         deepcopy of the Stream so that nothing is left in an unusable position
-
-
         '''
         if hasattr(startObj, '_storedElementOffsetTuples'):
             storedElementOffsetTuples = startObj._storedElementOffsetTuples
@@ -491,7 +485,7 @@ class StreamFreezer(StreamFreezeThawBase):
         hierarchyObject=None,
         getSpanners=True,
         getVariants=True
-    ) -> List[int]:
+    ) -> list[int]:
         '''
         Return a list of all Stream ids anywhere in the hierarchy.  By id,
         we mean `id(s)` not `s.id` -- so they are memory locations and unique.
@@ -519,10 +513,10 @@ class StreamFreezer(StreamFreezeThawBase):
         >>> foundIds = sf.findActiveStreamIdsInHierarchy()
         >>> for thisId in shouldFindIds:
         ...     if thisId not in foundIds:
-        ...         raise Exception('Missing Id')
+        ...         raise ValueError('Missing Id')
         >>> for thisId in foundIds:
         ...     if thisId not in shouldFindIds:
-        ...         raise Exception('Additional Id Found')
+        ...         raise ValueError('Additional Id Found')
 
         Spanners are included unless getSpanners is False
 
@@ -593,7 +587,7 @@ class StreamFreezer(StreamFreezeThawBase):
             streamIds += spannerBundle.getSpannerStorageIds()
 
         if getVariants is True:
-            for el in streamObj.recurse(includeSelf=True).getElementsByClass('Variant'):
+            for el in streamObj.recurse(includeSelf=True).getElementsByClass(variant.Variant):
                 streamIds += self.findActiveStreamIdsInHierarchy(el._stream)
 
         # should not happen that there are duplicates, but possible with spanners...
@@ -657,7 +651,7 @@ class StreamFreezer(StreamFreezeThawBase):
             if isinstance(fp, str):
                 fp = pathlib.Path(fp)
 
-            if isinstance(fp, pathlib.Path) and not fp.is_absolute():  # assume its a complete path
+            if isinstance(fp, pathlib.Path) and not fp.is_absolute():  # assume it's a complete path
                 fp = environLocal.getRootTempDir() / fp
 
         storage = self.packStream(self.stream)
@@ -764,12 +758,6 @@ class StreamThawer(StreamFreezeThawBase):
         >>> st = freezeThaw.StreamThawer()
         >>> st.teardownSerializationScaffold(a)
         '''
-        def _fixId(innerEl):
-            if (innerEl.id is not None
-                    and common.isNum(innerEl.id)
-                    and innerEl.id > defaults.minIdNumberToConsiderMemoryLocation):
-                innerEl.id = id(innerEl)
-
         if streamObj is None:  # pragma: no cover
             streamObj = self.stream
             if streamObj is None:
@@ -801,12 +789,10 @@ class StreamThawer(StreamFreezeThawBase):
                 self.restoreStreamStatusClient(e)
                 # removing seems to create problems for jsonPickle with Spanners
 
-            _fixId(e)
             # e.wrapWeakref()
 
         # restore to whatever it was
         streamObj.autoSort = storedAutoSort
-        _fixId(streamObj)
 
     def restoreElementsFromTuples(self, streamObj):
         '''
@@ -940,7 +926,7 @@ class StreamThawer(StreamFreezeThawBase):
                     try:
                         storage = pickle.loads(uncompressed)
                     except AttributeError as e:
-                        common.restoreWindowsAfterUnpickling()
+                        common.restorePathClassesAfterUnpickling()
                         raise FreezeThawException(
                             f'Problem in decoding: {e}'
                         ) from e
@@ -1171,7 +1157,7 @@ class Test(unittest.TestCase):
                            variantName='rhythmic_switch', replacementDuration=3.0)
 
         # test Variant is in stream
-        unused_v1 = c.parts.first().getElementsByClass('Variant').first()
+        unused_v1 = c.parts.first().getElementsByClass(variant.Variant).first()
 
         sf = freezeThaw.StreamFreezer(c, fastButUnsafe=True)
         # sf.v = v
@@ -1185,7 +1171,7 @@ class Test(unittest.TestCase):
         s = st.stream
         # s.show('lily.pdf')
         p0 = s.parts[0]
-        variants = p0.getElementsByClass('Variant')
+        variants = p0.getElementsByClass(variant.Variant)
         v2 = variants[0]
         self.assertEqual(v2._stream[0][1].offset, 0.5)
         # v2.show('t')
@@ -1227,6 +1213,8 @@ class Test(unittest.TestCase):
 
     def testPickleMidi(self):
         from music21 import converter
+        from music21 import note
+
         a = str(common.getSourceFilePath()
                          / 'midi'
                          / 'testPrimitive'
@@ -1236,8 +1224,9 @@ class Test(unittest.TestCase):
         c = converter.parse(a)
         f = converter.freezeStr(c)
         d = converter.thawStr(f)
-        self.assertEqual(d.parts[1].flatten().notes[20].volume._client.__class__.__name__,
-                         'weakref')
+        self.assertIsInstance(
+            d.parts[1].flatten().notes[20].volume.client,
+            note.NotRest)
 
 
 # -----------------------------------------------------------------------------

@@ -1,0 +1,7 @@
+"chord"	"altchord"	"measure"	"beat"	"totbeat"	"timesig"	"op"	"no"	"mov"	"length"	"global_key"	"local_key"	"pedal"	"numeral"	"form"	"figbass"	"changes"	"relativeroot"	"phraseend"
+".C.I6"	""	"1"	"1.0"	"1.0"	"2/4"	"1"	"2"	"3"	2.0	"C"	"I"	""	"I"	""	""	""	""	false
+"#viio6/ii"	""	"2"	"2.0"	"4.0"	"2/4"	"1"	"2"	"3"	2.0	"C"	"I"	""	"#vii"	"o"	"6"	""	"ii"	false
+"ii"	""	"3"	"1.0"	"5.0"	"2/4"	"1"	"2"	"3"	2.0	"C"	"I"	""	"ii"	""	""	""	""	false
+"V"	""	"4"	"1.0"	"7.0"	"3/4"	"1"	"2"	"3"	2.0	"C"	"I"	""	"V"	""	""	""	""	false
+"@none"	""	"5"	"1.0"	"10.0"	"3/4"	"1"	"2"	"3"	2.0	"C"	"I"	""	"V"	""	""	""	""	false
+"I"	""	"6"	"1.0"	"13.0"	"2/4"	"1"	"2"	"3"	2.0	"C"	"I"	""	"I"	""	""	""	""	false

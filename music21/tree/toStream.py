@@ -4,9 +4,9 @@
 # Purpose:      Tools for recreating streams from trees
 #
 # Authors:      Josiah Wolf Oberholtzer
-#               Michael Scott Cuthbert
+#               Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2013-15 Michael Scott Cuthbert and the music21
+# Copyright:    Copyright © 2013-15 Michael Scott Asato Cuthbert and the music21
 #               Project
 # License:      BSD, see license.txt
 # -----------------------------------------------------------------------------
@@ -15,6 +15,8 @@ Tools for generating new Streams from trees (fast, manipulable objects)
 
 None of these things work acceptably yet.  This is super beta.
 '''
+from __future__ import annotations
+
 from music21 import common
 from music21.exceptions21 import TreeException
 from music21.tree import timespanTree
@@ -83,7 +85,7 @@ def chordified(timespans, templateStream=None):  # pragma: no cover
         allTimePoints = timespans.allTimePoints() + tuple(templateOffsets)
         allTimePoints = sorted(set(allTimePoints))
 
-        measureList = list(outputStream.getElementsByClass('Measure'))
+        measureList = list(outputStream.getElementsByClass(stream.Measure))
 
         for offset, endTime in zip(allTimePoints, allTimePoints[1:]):
             while templateOffsets[1] <= offset:
@@ -117,7 +119,8 @@ def chordified(timespans, templateStream=None):  # pragma: no cover
         return outputStream
 
 @common.deprecated('v7', 'v8', 'use chordify() instead')
-def partwise(tsTree, templateStream=None):  # pragma: no cover
+def partwise(tsTree: 'music21.tree.timespanTree.TimespanTree',
+             templateStream: 'music21.stream.Score'):  # pragma: no cover
     '''
     DEPRECATED in v7 -- use chordify()
     '''

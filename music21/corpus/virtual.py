@@ -1,11 +1,11 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 # Name:         corpus/virtual.py
 # Purpose:      Access to the Virtual corpus collection
 #
 # Authors:      Christopher Ariza
 #
-# Copyright:    Copyright © 2010, 2012 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2010, 2012 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
@@ -19,14 +19,14 @@ TURNED OFF in 2017 -- to be recreated with a bigger test set.
 
 TODO: Demonstrate with JRP.
 '''
+from __future__ import annotations
 
-from typing import List
 import unittest
 
 from music21 import common
 from music21 import environment
-_MOD = 'converter.virtual'
-environLocal = environment.Environment(_MOD)
+
+environLocal = environment.Environment('corpus.virtual')
 
 
 class VirtualWork:
@@ -38,22 +38,24 @@ class VirtualWork:
         # this path must be unique for each work
         self.corpusPath = None
 
-        # a list of URLs in order of best usage
+        # a list of URLs in order of their best usage
         # these probably should all be the same format
         self.urlList = []
 
-#     def _getDstFp(self, dir):
-#         '''Given a directory (usually the users scratch directory) create
-#         a file path based on the md5 of the works title. This means that all
-#         works must have unique titles in the virtual corpus.
-#         '''
-#         dir = pathlib.Path(dir)
-#         if dir is None:
-#             raise ValueError
-#         return dir / ('m21-' + common.getMd5(self.title) + '.p')
+    # def _getDstFp(self, dir):
+    #     '''
+    #     Given a directory (usually the users scratch directory) create
+    #     a file path based on the md5 of the works title. This means that all
+    #     works must have unique titles in the virtual corpus.
+    #     '''
+    #     dir = pathlib.Path(dir)
+    #     if dir is None:
+    #         raise ValueError
+    #     return dir / ('m21-' + common.getMd5(self.title) + '.p')
 
     def getUrlByExt(self, extList=None):
-        '''Given a request for an extension, find a best match for a URL from
+        '''
+        Given a request for an extension, find the best match for a URL from
         the list of known URLs. If ext is None, return the first URL.
         '''
         if not common.isListLike(extList):
@@ -117,7 +119,7 @@ class BachBWV773(VirtualWork):
 
 
 class ColtraneGiantSteps(VirtualWork):
-    # post operation: needs make accidentals
+    # post operation: needs to make accidentals
     def __init__(self):
         super().__init__()
 
@@ -192,7 +194,8 @@ class TestExternal(unittest.TestCase):
 class Test(unittest.TestCase):
 
     def testBasic(self):
-        '''Test copying all objects defined in the virtual corpus module
+        '''
+        Test instantiating all objects defined in the virtual corpus module
         '''
         a = BachBWV1007Prelude()
         self.assertNotEqual(a.getUrlByExt(['.xml']), [])
@@ -209,7 +212,7 @@ class Test(unittest.TestCase):
 
 # ------------------------------------------------------------------------------
 # define presented order in documentation
-_DOC_ORDER: List[type] = []
+_DOC_ORDER: list[type] = []
 
 if __name__ == '__main__':
     import music21

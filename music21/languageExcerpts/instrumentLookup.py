@@ -5,9 +5,10 @@
 # Authors:      Jose Cabal-Ugaz
 #               Mark Gotham
 #
-# Copyright:    Copyright © 2012, 20 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2012-2020 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
+from __future__ import annotations
 
 import unittest
 
@@ -227,6 +228,7 @@ englishToClassName = {
     'hi-hat': 'HiHatCymbal',
     'hi-hat cymbal': 'HiHatCymbal',
     'horn': 'Horn',
+    'horns': 'Horn',
     'jingle bells': 'SleighBells',
     'kalimba': 'Kalimba',
     'kettle drums': 'Timpani',
@@ -1310,7 +1312,7 @@ class Test(unittest.TestCase):
 
     def testAllToClassNamePopulated(self):
         '''
-        Test that the allToClassName dict includes all of the keys from the constituent dicts.
+        Test that the allToClassName dict includes all the keys from the constituent dicts.
 
         Note: No length test due to duplicate entries
         (i.e. allToClassName is smaller than the sum of its parts).

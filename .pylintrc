@@ -7,9 +7,6 @@
 # pygtk.require().
 # init-hook=
 
-# Profiled execution.
-profile=no
-
 # Add files or directories to the blacklist. They should be base names, not
 # paths.
 ignore=CVS
@@ -65,22 +62,18 @@ disable=
     fixme,  # obviously known
     superfluous-parens,  # nope -- if they make things clearer...
     too-many-statements,  # someday
-    no-member,  # important, but too many false positives
     too-many-arguments,  # definitely! but takes too long to get a fix now...
     too-many-public-methods,  # maybe...
     too-many-branches,  # yes, someday
     too-many-locals,  # no
     too-many-lines,  # yes, someday
-    bad-whitespace,  # maybe later, but "bad" isn't something I necessarily agree with
-    bad-continuation,  # never remove -- this is a good thing many times.
     too-many-return-statements,  # we'll see
     too-many-instance-attributes,  # maybe later
+    # no-self-use,  # moved to optional extension.
     invalid-name,  # these are good music21 names; fix the regexp instead...
-    no-self-use,  # maybe later
     too-few-public-methods,  # never remove or set to 1
     trailing-whitespace,  # should ignore blank lines with tabs
     missing-docstring,  # gets too many well-documented properties
-    star-args,  # no problem with them...
     protected-access,  # this is an important one, but see below...
     unused-argument,
     import-self,  # fix is either to get rid of it or move away many tests...
@@ -105,6 +98,8 @@ disable=
     not-callable,  # false positives, for instance on x.next()
     raise-missing-from,  # want to do this eventually, but adding 1000 msgs not helpful
     consider-using-f-string,  # future?
+    unnecessary-lambda-assignment,  # opinionated
+    consider-using-generator,  # generators are less performant for small container sizes, like most of ours
 
 #       'protected-access', # this is an important one, but for now we do a lot of
 #                           # x = copy.deepcopy(self); x._volume = ... which is not a problem...
@@ -117,11 +112,6 @@ disable=
 # mypackage.mymodule.MyReporterClass.
 output-format=text
 msg-template="{path}:{line}: [{msg_id}({symbol}), {obj}] {msg}"
-
-# Put messages in a separate file for each module / package specified on the
-# command line instead of printing them on stdout. Reports (if any) will be
-# written in a file name "pylint_global.[txt|html]".
-files-output=no
 
 # Tells whether to display a full report or only the messages
 reports=no
@@ -147,9 +137,6 @@ evaluation=10.0 - ((float(5 * error + warning + refactor + convention) / stateme
 # Required attributes for module, separated by a comma
 # required-attributes=
 
-# List of builtins function names that should not be used, separated by a comma
-bad-functions=map,filter,input
-
 # Good variable names which should always be accepted, separated by a comma
 good-names=i,j,k,ex,Run,_
 
@@ -166,62 +153,32 @@ include-naming-hint=no
 # Regular expression matching correct function names
 function-rgx=[a-z_][A-Za-z0-9_]{2,30}$
 
-# Naming hint for function names
-function-name-hint=[a-z_][A-Za-z0-9_]{2,30}$
-
 # Regular expression matching correct variable names
 variable-rgx=[a-z_][A-Za-z0-9_]{2,30}$
-
-# Naming hint for variable names
-variable-name-hint=[a-z_][A-Za-z0-9_]{2,30}$
 
 # Regular expression matching correct constant names
 const-rgx=(([A-Z_][A-Z0-9_]*)|(__.*__))$
 
-# Naming hint for constant names
-const-name-hint=(([A-Z_][A-Z0-9_]*)|(__.*__))$
-
 # Regular expression matching correct attribute names
 attr-rgx=[a-z_][A-Za-z0-9_]{2,30}$
-
-# Naming hint for attribute names
-attr-name-hint=[a-z_][A-Za-z0-9_]{2,30}$
 
 # Regular expression matching correct argument names
 argument-rgx=[a-z_][A-Za-z0-9_]{2,30}$
 
-# Naming hint for argument names
-argument-name-hint=[a-z_][A-Za-z0-9_]{2,30}$
-
 # Regular expression matching correct class attribute names
 class-attribute-rgx=([A-Za-z_][A-Za-z0-9_]{2,30}|(__.*__))$
-
-# Naming hint for class attribute names
-class-attribute-name-hint=([A-Za-z_][A-Za-z0-9_]{2,30}|(__.*__))$
 
 # Regular expression matching correct inline iteration names
 inlinevar-rgx=[A-Za-z_][A-Za-z0-9_]*$
 
-# Naming hint for inline iteration names
-inlinevar-name-hint=[A-Za-z_][A-Za-z0-9_]*$
-
 # Regular expression matching correct class names
 class-rgx=[A-Z_][a-zA-Z0-9]+$
-
-# Naming hint for class names
-class-name-hint=[A-Z_][a-zA-Z0-9]+$
 
 # Regular expression matching correct module names
 module-rgx=(([a-z_][a-zA-Z0-9_]*)|([A-Z][a-zA-Z0-9]+))$
 
-# Naming hint for module names
-module-name-hint=(([a-z_][a-zA-Z0-9_]*)|([A-Z][a-zA-Z0-9]+))$
-
 # Regular expression matching correct method names
 method-rgx=[a-z_][a-zA-Z0-9_]{2,30}$
-
-# Naming hint for method names
-method-name-hint=[a-z_][a-zA-Z0-9_]{2,30}$
 
 # Regular expression which should only match function or class names that do
 # not require a docstring.
@@ -243,9 +200,6 @@ ignore-long-lines=^\s*(# )?<?https?://\S+>?$|converter\.parse
 # Allow the body of an if to be on the same line as the test if there is no
 # else.
 single-line-if-stmt=no
-
-# List of optional constructs for which whitespace checking is disabled
-no-space-check=trailing-comma,dict-separator
 
 # Maximum number of lines in a module
 max-module-lines=1000
@@ -319,11 +273,7 @@ ignored-modules=
 
 # List of classes names for which member attributes should not be checked
 # (useful for classes with attributes dynamically set).
-ignored-classes=SQLObject
-
-# When zope mode is activated, add a predefined set of Zope acquired attributes
-# to generated-members.
-# zope=no
+ignored-classes=StreamCore
 
 # List of members which are set dynamically and missed by pylint inference
 # system, and so shouldn't trigger E0201 when accessed. Python regular
@@ -428,4 +378,4 @@ int-import-graph=
 
 # Exceptions that will emit a warning when being caught. Defaults to
 # "Exception"
-overgeneral-exceptions=Exception
+# overgeneral-exceptions=Exception

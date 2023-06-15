@@ -5,11 +5,12 @@
 #
 # Authors:      Josiah Wolf Oberholtzer
 #               Christopher Ariza
-#               Michael Scott Cuthbert
+#               Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2013-17 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2013-17 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
+from __future__ import annotations
 
 import os
 import shutil
@@ -30,7 +31,8 @@ class DocBuilder:
         self.cpus_to_use = common.cpus()
         if self.cpus_to_use == 1:
             self.useMultiprocessing = False
-        self.useMultiprocessing = False  # too unstable still
+        else:
+            self.useMultiprocessing = True  # now stable enough
         self.documentationDirectoryPath = None
         self.autogenDirectoryPath = None
         self.buildDirectoryPath = None
@@ -41,13 +43,13 @@ class DocBuilder:
         self.getPaths()
 
 
-    def run(self):
+    def run(self, runSphinx=True):
         if self.command == 'clean':
             self.runClean()
         elif self.command == 'help':
             self.print_usage()
         else:
-            self.runBuild()
+            self.runBuild(runSphinx=runSphinx)
             self.postBuild()
 
     def runClean(self):
@@ -76,9 +78,9 @@ class DocBuilder:
         print('WRITING DOCUMENTATION FILES')
         writers.StaticFileCopier().run()
         try:
-            writers.IPythonNotebookReSTWriter().run()
+            writers.JupyterNotebookReSTWriter().run()
         except OSError:
-            raise ImportError('IPythonNotebookReSTWriter crashed; most likely cause: '
+            raise ImportError('JupyterNotebookReSTWriter crashed; most likely cause: '
                               + 'no pandoc installed: https://github.com/jgm/pandoc/releases')
 
         writers.ModuleReferenceReSTWriter().run()
@@ -89,6 +91,7 @@ class DocBuilder:
 
     def runSphinx(self):
         try:
+            # noinspection PyPackageRequirements
             import sphinx
         except ImportError:
             message = 'Sphinx is required to build documentation; '
@@ -102,6 +105,8 @@ class DocBuilder:
 
         # sphinx changed their main processing in v. 1.7; see
         # https://github.com/sphinx-doc/sphinx/pull/3668
+        # before 1.7 it ignored the first option thinking it was
+        # always 'sphinx'.
         sphinx_version = tuple(sphinx.__version__.split('.'))
         sphinx_new = False
         if tuple(int(x) for x in sphinx_version[0:2]) < (1, 7):
@@ -126,7 +131,7 @@ class DocBuilder:
             import sphinx.cmd.build  # pylint: disable=import-error
             sphinx_main_command = sphinx.cmd.build.main
         else:
-            sphinx_main_command = sphinx.main
+            sphinx_main_command = sphinx.main  # pylint: disable=no-member
 
         try:  # pylint: disable=assignment-from-no-return
             returnCode = sphinx_main_command(sphinxOptions)

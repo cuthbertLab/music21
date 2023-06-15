@@ -21,6 +21,7 @@ __pycache__/
 
 # OSX
 .DS_Store
+**/.DS_Store
 
 # C extensions
 *.so
@@ -40,6 +41,8 @@ develop-eggs
 lib
 lib64
 __pycache__
+**/__pycache__
+venv
 
 # Installer logs
 pip-log.txt
@@ -93,3 +96,5 @@ music21/monkeytype.sqlite3
 .pytest_cache/v/cache/nodeids
 .pytest_cache/v/cache/lastfailed
 .pytest_cache/v/cache/nodeids
+.dmypy.json
+*.txt~

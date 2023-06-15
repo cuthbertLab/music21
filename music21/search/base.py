@@ -3,9 +3,9 @@
 # Name:         search/base.py
 # Purpose:      music21 classes for searching within files
 #
-# Authors:      Michael Scott Cuthbert
+# Authors:      Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2011-2013, 2017 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2011-2013, 2017 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
@@ -13,20 +13,24 @@ base classes for searching scores.
 
 See User's Guide, Chapter 43: Searching in and Among Scores for details.
 '''
+from __future__ import annotations
+
+from collections import namedtuple
+from collections.abc import Callable
 import copy
 import difflib
 import math
 import unittest
-from collections import namedtuple
 
 from more_itertools import windowed
 
 from music21 import base as m21Base
 from music21 import exceptions21
+from music21 import chord
 from music21 import duration
 from music21 import note
-from music21.stream import Measure
-from music21.stream import filters
+from music21.stream import Measure, Stream
+from music21.stream import filters, iterator
 
 __all__ = [
     'Wildcard', 'WildcardDuration', 'SearchMatch', 'StreamSearcher',
@@ -62,29 +66,28 @@ class Wildcard(m21Base.Music21Object):
     matches a single object in a music21 stream.  Equivalent to the
     regular expression "."
 
-
     >>> wc1 = search.Wildcard()
     >>> wc1.pitch = pitch.Pitch('C')
     >>> st1 = stream.Stream()
     >>> st1.append(note.Note('D', type='half'))
     >>> st1.append(wc1)
     '''
-
-    def __init__(self):
-        super().__init__()
+    def __init__(self, **keywords):
+        super().__init__(**keywords)
         self.duration = WildcardDuration()
 
 
-class SearchMatch(namedtuple('SearchMatch', 'elStart els index iterator')):
+class SearchMatch(namedtuple('SearchMatch', ['elStart', 'els', 'index', 'iterator'])):
     '''
     A lightweight object representing the match (if any) for a search.  Derived from namedtuple
     '''
     __slots__ = ()
-    _DOC_ATTR = {'elStart': '''The first element that matches the list.''',
-                 'els': '''A tuple of all the matching elements.''',
-                 'index': '''The index in the iterator at which the first element can be found''',
-                 'iterator': '''The iterator which produced these elements.''',
-                 }
+    _DOC_ATTR: dict[str, str] = {
+        'elStart': '''The first element that matches the list.''',
+        'els': '''A tuple of all the matching elements.''',
+        'index': '''The index in the iterator at which the first element can be found''',
+        'iterator': '''The iterator which produced these elements.''',
+    }
 
     def __repr__(self):
         return 'SearchMatch(elStart={0}, els=len({1}), index={2}, iterator=[...])'.format(
@@ -192,19 +195,23 @@ class StreamSearcher:
     why doesn't this work?  thisStream[found].expressions.append(expressions.TextExpression('*'))
     '''
 
-    def __init__(self, streamSearch=None, searchList=None):
-        self.streamSearch = streamSearch
-        self.searchList = searchList
-        self.recurse = False
-        self.filterNotes = False
-        self.filterNotesAndRests = False
+    def __init__(self, streamSearch: Stream, searchList: list[m21Base.Music21Object]):
+        self.streamSearch: Stream | iterator.StreamIterator = streamSearch
+        self.searchList: list[m21Base.Music21Object] = searchList
+        self.recurse: bool = False
+        self.filterNotes: bool = False
+        self.filterNotesAndRests: bool = False
 
-        self.algorithms = [StreamSearcher.wildcardAlgorithm]
+        self.algorithms: list[
+            Callable[[StreamSearcher, m21Base.Music21Object, m21Base.Music21Object],
+                     bool | None]
+        ] = [StreamSearcher.wildcardAlgorithm]
 
-        self.activeIterator = None
+        self.activeIterator: iterator.StreamIterator | None = None
 
-    def run(self):
-        if 'StreamIterator' in self.streamSearch.classes:
+    def run(self) -> list[SearchMatch]:
+        thisStreamIterator: iterator.StreamIterator
+        if isinstance(self.streamSearch, iterator.StreamIterator):
             thisStreamIterator = self.streamSearch
         else:
             if self.recurse:
@@ -214,30 +221,37 @@ class StreamSearcher:
 
             if self.filterNotesAndRests:
                 thisStreamIterator = thisStreamIterator.addFilter(
-                    filters.ClassFilter('GeneralNote')
+                    filters.ClassFilter(note.GeneralNote)
                 )
             elif self.filterNotes:
                 thisStreamIterator = thisStreamIterator.addFilter(
-                    filters.ClassFilter(['Note', 'Chord'])
+                    filters.ClassFilter([note.Note, chord.Chord])
                 )
 
         self.activeIterator = thisStreamIterator
 
-        streamIteratorEls = list(thisStreamIterator)
+        streamIteratorEls: list[m21Base.Music21Object] = list(thisStreamIterator)
         streamLength = len(streamIteratorEls)
         searchLength = len(self.searchList)
 
         if searchLength == 0:
             raise SearchException('the search Stream or list cannot be empty')
 
-        foundEls = []
+        foundEls: list[SearchMatch] = []
         if searchLength > streamLength:
             return foundEls
 
         for startPosition, streamEls in enumerate(windowed(streamIteratorEls, searchLength)):
             result = None
             for j in range(searchLength):
+                # TODO: implement longest prefix that is also a suffix algorithm
                 streamEl = streamEls[j]
+                if streamEl is None:  # pragma: no cover
+                    # I don't think this should ever happen, but mypy is convinced
+                    # streamEl is Optional[Music21Object]
+                    result = False
+                    break
+
                 searchEl = self.searchList[j]
                 for thisAlgorithm in self.algorithms:
                     result = thisAlgorithm(self, streamEl, searchEl)
@@ -254,23 +268,23 @@ class StreamSearcher:
 
         return foundEls
 
-    def wildcardAlgorithm(self, streamEl, searchEl):
+    def wildcardAlgorithm(self, streamEl: m21Base.Music21Object, searchEl: m21Base.Music21Object):
         '''
         An algorithm that supports Wildcards -- added by default to the search function.
         '''
-        if Wildcard in searchEl.classSet:
+        if isinstance(searchEl, Wildcard):
             return True
         else:
             return None
 
-    def rhythmAlgorithm(self, streamEl, searchEl):
-        if 'WildcardDuration' in searchEl.duration.classes:
+    def rhythmAlgorithm(self, streamEl: m21Base.Music21Object, searchEl: m21Base.Music21Object):
+        if isinstance(searchEl.duration, WildcardDuration):
             return True
         if searchEl.duration.quarterLength != streamEl.duration.quarterLength:
             return False
         return None
 
-    def noteNameAlgorithm(self, streamEl, searchEl):
+    def noteNameAlgorithm(self, streamEl: m21Base.Music21Object, searchEl: m21Base.Music21Object):
         if not hasattr(searchEl, 'name'):
             return False
         if not hasattr(streamEl, 'name'):
@@ -285,8 +299,6 @@ def streamSearchBase(thisStreamOrIterator, searchList, algorithm=None):
     A basic search function that is used by other search mechanisms,
     which takes in a stream or StreamIterator and a searchList or stream
     and an algorithm to run on each pair of elements to determine if they match.
-
-
     '''
     if algorithm is None:
         raise SearchException('algorithm must be a function not None')
@@ -326,7 +338,7 @@ def rhythmicSearch(thisStreamOrIterator, searchList):
     of indices which begin a successful search.
 
     searches are made based on quarterLength.
-    thus an dotted sixteenth-note and a quadruplet (4:3) eighth
+    thus a dotted sixteenth-note and a quadruplet (4:3) eighth
     will match each other.
 
     Example 1: First we will set up a simple stream for searching:
@@ -424,6 +436,7 @@ def rhythmicSearch(thisStreamOrIterator, searchList):
 
 
 def noteNameSearch(thisStreamOrIterator, searchList):
+    # noinspection PyShadowingNames
     '''
     >>> thisStream = converter.parse('tinynotation: 3/4 c4 d8 e c d e f c D E c c4 d# e')
     >>> searchList = [note.Note('C'), note.Note('D'), note.Note('E')]
@@ -524,6 +537,7 @@ def approximateNoteSearch(thisStream, otherStreams):
 
 
 def approximateNoteSearchNoRhythm(thisStream, otherStreams):
+    # noinspection PyShadowingNames
     '''
     searches the list of otherStreams and returns an ordered list of matches
     (each stream will have a new property of matchProbability to show how
@@ -658,6 +672,15 @@ def translateStreamToString(inputStreamOrIterator, returnMeasures=False):
     <P>F<)KQFF_
     >>> len(streamString)
     12
+
+    Chords give the pitch only of the first note and Unpitched objects are
+    treated as rests:
+
+    >>> s = stream.Stream([note.Note('C4'), note.Rest(),
+    ...                    chord.Chord(['C4', 'E4']), note.Unpitched()])
+    >>> streamString = search.translateStreamToString(s)
+    >>> list(streamString.encode('utf-8'))
+    [60, 80, 127, 80, 60, 80, 127, 80]
     '''
     b = ''
     measures = []
@@ -895,12 +918,13 @@ def translateStreamToStringOnlyRhythm(inputStream, returnMeasures=False):
         return b
 
 
-def translateNoteToByte(n):
+def translateNoteToByte(n: note.GeneralNote):
+    # noinspection PyShadowingNames
     '''
     takes a note.Note object and translates it to a single byte representation.
 
     currently returns the chr() for the note's midi number. or chr(127) for rests
-
+    and unpitched.
 
     >>> n = note.Note('C4')
     >>> b = search.translateNoteToByte(n)
@@ -913,18 +937,17 @@ def translateNoteToByte(n):
 
     Chords are currently just searched on the first Note (or treated as a Rest if None)
     '''
-    if n.isRest:
-        return chr(127)
-    elif n.isChord:
+    if isinstance(n, note.Note):
+        return chr(n.pitch.midi)
+    elif isinstance(n, chord.Chord):
         if n.pitches:
             return chr(n.pitches[0].midi)
         else:
             return chr(127)
     else:
-        return chr(n.pitch.midi)
+        return chr(127)
 
-
-def translateNoteWithDurationToBytes(n, includeTieByte=True):
+def translateNoteWithDurationToBytes(n: note.GeneralNote, includeTieByte=True):
     # noinspection PyShadowingNames
     '''
     takes a note.Note object and translates it to a three-byte representation.
@@ -960,12 +983,12 @@ def translateNoteWithDurationToBytes(n, includeTieByte=True):
         return firstByte + secondByte
 
 
-def translateNoteTieToByte(n):
+def translateNoteTieToByte(n: note.GeneralNote):
+    # noinspection PyShadowingNames
     '''
     takes a note.Note object and returns a one-byte representation
     of its tie status.
     's' if start tie, 'e' if stop tie, 'c' if continue tie, and '' if no tie
-
 
     >>> n = note.Note('E')
     >>> search.translateNoteTieToByte(n)
@@ -995,7 +1018,8 @@ def translateNoteTieToByte(n):
         return ''
 
 
-def translateDurationToBytes(n):
+def translateDurationToBytes(n: note.GeneralNote):
+    # noinspection PyShadowingNames
     '''
     takes a note.Note object and translates it to a two-byte representation
 
@@ -1061,7 +1085,7 @@ def mostCommonMeasureRhythms(streamIn, transposeDiatonic=False):
     {3.0} <music21.note.Note B->
     -----
 
-    Changed in v7 -- bars are ordered first by number then by part.
+    * Changed in v7: bars are ordered first by number, then by part.
     '''
     returnDicts = []
     distanceToTranspose = 0
@@ -1109,23 +1133,8 @@ class SearchException(exceptions21.Music21Exception):
 class Test(unittest.TestCase):
 
     def testCopyAndDeepcopy(self):
-        '''
-        Test copying all objects defined in this module
-        '''
-        import sys
-        import types
-        for part in sys.modules[self.__module__].__dict__:
-            match = False
-            for skip in ['_', '__', 'Test', 'Exception']:
-                if part.startswith(skip) or part.endswith(skip):
-                    match = True
-            if match:
-                continue
-            obj = getattr(sys.modules[self.__module__], part)
-            # noinspection PyTypeChecker
-            if callable(obj) and not isinstance(obj, types.FunctionType):
-                i = copy.copy(obj)
-                j = copy.deepcopy(obj)
+        from music21.test.commonTest import testCopyAll
+        testCopyAll(self, globals())
 
 
 # ------------------------------------------------------------------------------

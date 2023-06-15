@@ -4,9 +4,8 @@
 # Purpose:      ABC test files
 #
 # Authors:      Christopher Ariza
-#
-# License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
+from __future__ import annotations
 
 import unittest
 
@@ -16,8 +15,8 @@ import unittest
 
 # abc standard
 # http://abcnotation.com/abc2mtex/abc.txt
-
 from music21 import environment
+
 environLocal = environment.Environment('abcFormat.testFiles')
 
 _DOC_IGNORE_MODULE_OR_PACKAGE = True
@@ -131,9 +130,7 @@ B,,z [FDB,]z B,,z [FDB,]z| \
 A,,z [ECA,]z A,,z [ECA,]z| \
 B,,z [FDB,]z A,,z [ECA,]z| \
 B,,z [ECA,]z B,,z [FDB,]
-
 '''
-
 # http://abcnotation.com/tunePage?a=abc.sourceforge.net/NMD/nmd/reelsh-l.txt/0056
 # noinspection SpellCheckingInspection
 kitchGirl = '''X: 57
@@ -525,10 +522,8 @@ T:Test Tuplet Primitive
 (3.c2=c2^c2 (3.c2=c2^c2
 
 (6c/c/c/c/c/=f/ (6B/c/c/^^c/c/^f/ z4
-
 '''
 # (9Bc^C ^c=cc =Cc=f
-
 
 # abc-2.1 code + allowing shared header information.
 # noinspection SpellCheckingInspection
@@ -550,7 +545,7 @@ X:2
 T:Kitchen Girl
 C:Trad.
 K:D
-[c4a4] [B4g4]|efed c2cd|e2f2 gaba|g2e2 e2fg|
+[c4a4] [B4g4] | efed c2cd|e2f2 gaba|g2e2 e2fg|
 a4 g4|efed cdef|g2d2 efed|c2A2 A4:|
 K:G
 ABcA BAGB|ABAG EDEG|A2AB c2d2|e3f edcB|ABcA BAGB|
@@ -638,12 +633,10 @@ K:G
 V:1 treble
 V:1
 g^G_ag a=ffF|=F2^c2 FB =ca|]
-
 '''
 
 
 # ------------------------------------------------------------------------------
-
 ALL = [fyrareprisarn, mysteryReel, fullRiggedShip, aleIsDear, kitchGirl,
         williamAndNancy, morrisonsJig, hectorTheHero, kingOfTheFairies,
         sicutRosa, theAleWifesDaughter, theBeggerBoy, theBattleOfTheSnaBas,
@@ -662,7 +655,6 @@ def get(contentRequest):
 
 # ------------------------------------------------------------------------------
 class Test(unittest.TestCase):
-
     def testBasic(self):
         from music21 import abcFormat
         from music21.abcFormat import translate
@@ -764,7 +756,9 @@ class Test(unittest.TestCase):
         from music21.abcFormat import translate
 
         af = abcFormat.ABCFile()
+        self.assertEqual(af.abcVersion, (1, 3, 0))
         ah = af.readstr(directiveCarryOctave)
+        self.assertEqual(ah.abcVersion, (2, 1, 0))
         s = translate.abcToStreamScore(ah)
         notes = s.flatten().getElementsByClass(note.Note)
         gSharp = notes[1]
@@ -911,11 +905,11 @@ class Test(unittest.TestCase):
             ('c<<g', 0.25, 1.75),
             ('c>>>g', 1.875, 0.125),
             ('c<<<_g', 0.125, 1.875),
-            ("[ceg]>^f", 1.5, 0.5),
+            ('[ceg]>^f', 1.5, 0.5),
             ('[ce^g]>>f', 1.75, 0.25),
-            ("[ceg]<<f", 0.25, 1.75),
+            ('[ceg]<<f', 0.25, 1.75),
             ('[ceg]>>>f', 1.875, 0.125),
-            ("[ceg]<<<f", 0.125, 1.875),
+            ('[ceg]<<<f', 0.125, 1.875),
             ('f>[ceg]', 1.5, 0.5),
             ('f>>[_ceg]', 1.75, 0.25),
             ("f'<<[ceg]", 0.25, 1.75),

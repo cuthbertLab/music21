@@ -1,0 +1,5 @@
+chardet
+joblib
+more-itertools
+requests
+webcolors>=1.5

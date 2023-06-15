@@ -3,9 +3,9 @@
 # Name:         sorting.py
 # Purpose:      Music21 class for sorting
 #
-# Authors:      Michael Scott Cuthbert
+# Authors:      Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2014-2015 Michael Scott Cuthbert and the music21
+# Copyright:    Copyright © 2014-2015 Michael Scott Asato Cuthbert and the music21
 #               Project
 # License:      BSD, see license.txt
 # -----------------------------------------------------------------------------
@@ -27,6 +27,8 @@ SortTuple(atEnd=0, offset=0.0, priority=-inf, classSortOrder=0, isNotGrace=1, in
 >>> sorting.ZeroSortTupleHigh
 SortTuple(atEnd=0, offset=0.0, priority=inf, classSortOrder=0, isNotGrace=1, insertIndex=0)
 '''
+from __future__ import annotations
+
 from collections import namedtuple
 from math import inf as INFINITY
 from music21 import exceptions21
@@ -68,8 +70,8 @@ class SortTuple(namedtuple('SortTuple', (
     True
 
     >>> ts = bar.Barline('double')
-    >>> t = stream.Stream()
-    >>> t.storeAtEnd(ts)
+    >>> s2 = stream.Stream()
+    >>> s2.storeAtEnd(ts)
     >>> ts_st = ts.sortTuple()
     >>> ts_st
     SortTuple(atEnd=1, offset=0.0, priority=0, classSortOrder=-5, isNotGrace=1, insertIndex=...)
@@ -95,9 +97,9 @@ class SortTuple(namedtuple('SortTuple', (
     '1.0 <0.20.323>'
 
     '''
-    def __new__(cls, *tupEls, **kw):
+    def __new__(cls, *tupEls, **keywords):
         # noinspection PyTypeChecker
-        return super(SortTuple, cls).__new__(cls, *tupEls, **kw)
+        return super(SortTuple, cls).__new__(cls, *tupEls, **keywords)
 
     def __eq__(self, other):
         if isinstance(other, tuple):
@@ -176,7 +178,7 @@ class SortTuple(namedtuple('SortTuple', (
         reprParts.append('>')
         return ''.join(reprParts)
 
-    def modify(self, **kw):
+    def modify(self, **keywords):
         '''
         return a new SortTuple identical to the previous, except with
         the given keyword modified.  Works only with keywords.
@@ -201,7 +203,7 @@ class SortTuple(namedtuple('SortTuple', (
         Changing offset, but nothing else, helps in creating .flatten() positions.
         '''
         # _fields are the namedtuple attributes
-        outList = [kw.get(attr, getattr(self, attr)) for attr in self._fields]
+        outList = [keywords.get(attr, getattr(self, attr)) for attr in self._fields]
         return self.__class__(*outList)
 
     def add(self, other):

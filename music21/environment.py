@@ -4,9 +4,9 @@
 # Purpose:      Storage for user environment settings and defaults
 #
 # Authors:      Christopher Ariza
-#               Michael Scott Cuthbert
+#               Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2009-2017 Michael Scott Cuthbert and the music21
+# Copyright:    Copyright © 2009-2017 Michael Scott Asato Cuthbert and the music21
 #               Project
 # License:      BSD, see license.txt
 # -----------------------------------------------------------------------------
@@ -22,6 +22,8 @@ Additional documentation for and examples of using this module are found in
 
 # TODO: Update to user's guide -- showing each function
 '''
+from __future__ import annotations
+
 import io
 import os
 import pathlib
@@ -29,8 +31,8 @@ import sys
 import tempfile
 import unittest
 
-from typing import Union
-from typing import Optional
+import typing as t
+from typing import overload
 
 import xml.etree.ElementTree as ET
 from xml.sax import saxutils
@@ -38,6 +40,7 @@ from xml.sax import saxutils
 from music21 import exceptions21
 from music21 import common
 
+# used below
 _MOD = 'environment'
 
 
@@ -142,7 +145,7 @@ class _EnvironmentCore:
     _EnvironmentCore instance that is stored in this module.
 
     The only case in which a new _EnvironmentCore is created is if the
-    forcePlatform argument is passed and is different than the stored
+    forcePlatform argument is passed and is different from the stored
     forcePlatform argument. This is only used in testing--it allows authors to
     test what the settings on a different platform (win, Mac, etc.) would be.
 
@@ -397,13 +400,13 @@ class _EnvironmentCore:
             for name, value in [
                 ('lilypondPath', 'lilypond'),
                 ('musicxmlPath',
-                 common.cleanpath(r'%PROGRAMFILES%\MuseScore 3\MuseScore.exe')
+                 common.cleanpath(r'%PROGRAMFILES%\MuseScore 3\bin\MuseScore3.exe')
                  ),
                 ('musescoreDirectPNGPath',
-                 common.cleanpath(r'%PROGRAMFILES%\MuseScore 3\MuseScore.exe')
+                 common.cleanpath(r'%PROGRAMFILES%\MuseScore 3\bin\MuseScore3.exe')
                  ),
             ]:
-                self.__setitem__(name, value)  # use for key checking
+                self[name] = value  # use for key checking
         elif platform == 'nix':
             for name, value in [
                 ('lilypondPath', '/usr/bin/lilypond'),
@@ -412,7 +415,7 @@ class _EnvironmentCore:
                 ('graphicsPath', '/usr/bin/xdg-open'),
                 ('pdfPath', '/usr/bin/xdg-open')
             ]:
-                self.__setitem__(name, value)  # use for key checking
+                self[name] = value  # use for key checking
         elif platform == 'darwin':
             versionTuple = common.macOSVersion()
             if versionTuple[0] >= 11 or (versionTuple[0] == 10 and versionTuple[1] >= 15):
@@ -432,9 +435,9 @@ class _EnvironmentCore:
                 ('musescoreDirectPNGPath',
                  '/Applications/MuseScore 3.app/Contents/MacOS/mscore'),
             ]:
-                self.__setitem__(name, value)  # use for key checking
+                self[name] = value  # use for key checking
 
-    def _checkAccessibility(self, path: Optional[Union[str, pathlib.Path]]) -> bool:
+    def _checkAccessibility(self, path: str | pathlib.Path | None) -> bool:
         '''
         Return True if the path exists, is readable and writable.
         '''
@@ -442,7 +445,7 @@ class _EnvironmentCore:
             exists = os.path.exists(path)
             readable = os.access(path, os.R_OK)
             writable = os.access(path, os.W_OK)
-            return (exists and readable and writable)
+            return exists and readable and writable
         else:
             return False
 
@@ -510,13 +513,13 @@ class _EnvironmentCore:
 
         >>> import tempfile
         >>> import pathlib
-        >>> t = tempfile.gettempdir()
-        >>> #_DOCS_SHOW t
+        >>> tempFile = tempfile.gettempdir()
+        >>> #_DOCS_SHOW tempFile
         '/var/folders/x5/rymq2tx16lqbpytwb1n_cc4c0000gn/T'
 
         >>> import os
         >>> e = environment.Environment()
-        >>> e.getDefaultRootTempDir() == pathlib.Path(t) / 'music21'
+        >>> e.getDefaultRootTempDir() == pathlib.Path(tempFile) / 'music21'
         True
 
         If failed to create the subdirectory (OSError is raised), this function
@@ -548,7 +551,7 @@ class _EnvironmentCore:
                     uid = os.getuid()
                     dir_path = pathlib.Path(tempfile.gettempdir()) / f'music21-userid-{uid}'
                 else:
-                    dir_path = pathlib.Path(tempfile.mkdtemp(prefix="music21-"))
+                    dir_path = pathlib.Path(tempfile.mkdtemp(prefix='music21-'))
 
                 if self._checkAccessibility(dir_path):
                     self.defaultRootTempDir = dir_path
@@ -647,7 +650,7 @@ class _EnvironmentCore:
         # darwin specific option
         # os.path.join(os.environ['HOME'], 'Library',)
 
-    def getTempFile(self, suffix='', returnPathlib=True) -> Union[str, pathlib.Path]:
+    def getTempFile(self, suffix='', returnPathlib=True) -> str | pathlib.Path:
         '''
         Gets a temporary file with a suffix that will work for a bit.
 
@@ -820,7 +823,7 @@ class Environment:
     efficient operation since the Environment module caches most information
     from module to module)
 
-    For more a user-friendly interface for creating and editing settings, see
+    For a more user-friendly interface for creating and editing settings, see
     the :class:`~music21.environment.UserSettings` object.
 
     >>> env = environment.Environment(forcePlatform='darwin')
@@ -829,11 +832,11 @@ class Environment:
     PosixPath('/Applications/Finale Reader.app')
     '''
 
-    # define order to present names in documentation; use strings
+    # Defines the order of presenting names in the documentation; use strings
     _DOC_ORDER = ['read', 'write', 'getSettingsPath']
 
     # documentation for all attributes (not properties or methods)
-    _DOC_ATTR = {
+    _DOC_ATTR: dict[str, str] = {
         'modNameParent': '''
             A string representation of the module that contains this
             Environment instance.
@@ -929,7 +932,8 @@ class Environment:
         return dstDir
 
     def getKeysToPaths(self):
-        ''' Get the keys that refer to file paths.
+        '''
+        Get the keys that refer to file paths.
 
         >>> a = environment.Environment()
         >>> for x in sorted(a.getKeysToPaths()):
@@ -953,7 +957,7 @@ class Environment:
         '''
         Get the raw keys stored in the internal reference dictionary.
 
-        These are different than the keys() method in that the
+        These are different from the keys() method in that the
         'localCorpusPath' entry is not included.
 
         >>> a = environment.Environment()
@@ -999,7 +1003,15 @@ class Environment:
         '''
         return envSingleton().getSettingsPath()
 
-    def getTempFile(self, suffix='', returnPathlib=True) -> Union[str, pathlib.Path]:
+    @overload
+    def getTempFile(self, suffix: str, returnPathlib: t.Literal[False]) -> str:
+        return '/'  # astroid #1015
+
+    @overload
+    def getTempFile(self, suffix: str = '', returnPathlib: t.Literal[True] = True) -> pathlib.Path:
+        return pathlib.Path('/')  # astroid #1015
+
+    def getTempFile(self, suffix: str = '', returnPathlib=True) -> str | pathlib.Path:
         '''
         Return a file path to a temporary file with the specified suffix (file
         extension).
@@ -1050,19 +1062,19 @@ class Environment:
     def formatToKey(self, m21Format):
         return envSingleton().formatToKey(m21Format)
 
-    def printDebug(self, msg, statusLevel=common.DEBUG_USER, debugFormat=None):
+    def printDebug(self, msg, statusLevel=common.DEBUG_USER):
         '''
         Format one or more data elements into string, and print it to stderr.
         The first arg can be a list of strings or a string; lists are
         concatenated with common.formatStr().
         '''
-        if envSingleton().__getitem__('debug') >= statusLevel:
+        if envSingleton()['debug'] >= statusLevel:
             if isinstance(msg, str):
                 msg = [msg]  # make into a list
             if msg[0] != self.modNameParent and self.modNameParent is not None:
                 msg = [self.modNameParent + ':'] + msg
             # pass list to common.formatStr
-            msg = common.formatStr(*msg, format=debugFormat)
+            msg = common.formatStr(*msg)
             sys.stderr.write(msg)
 
     def read(self, filePath=None):
@@ -1150,7 +1162,7 @@ class Environment:
         >>> a['musicxmlPath'] = original  #_DOCS_HIDE
         '''
         xp = self['musicxmlPath']
-        if common.runningUnderIPython():
+        if common.runningInNotebook():
             xp = self['musescoreDirectPNGPath']
 
         if not xp:
@@ -1318,7 +1330,7 @@ class UserSettings:
 
     def create(self):
         '''
-        If a environment configuration file does not exist, create one based on
+        If an environment configuration file does not exist, create one based on
         the default settings.
         '''
         if not self._environment.getSettingsPath().exists():
@@ -1624,7 +1636,7 @@ class Test(unittest.TestCase):
                 # situation, we check newTempDir first, making sure that newTempDir is an empty
                 # directory which means (1) it's a directory we create in this test or (2) we won't
                 # destroy anything if we delete it, and then delete it with os.rmdir, which could
-                # only delete a empty directory. We don't set an exception-catching block here
+                # only delete an empty directory. We don't set an exception-catching block here
                 # because we have checked this directory is empty.
                 tmp = newTempDir.samefile(tempfile.gettempdir())
                 empty = len(os.listdir(newTempDir)) == 0

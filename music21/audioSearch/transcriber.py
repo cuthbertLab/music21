@@ -5,20 +5,19 @@
 #               wave file and output them as a score
 #
 # Authors:      Jordi Bartolome
-#               Michael Scott Cuthbert
+#               Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2011 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2011 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
+from __future__ import annotations
 
 import unittest
 
-# from time import time
-
-from music21 import scale
 from music21 import environment
-_MOD = 'audioSearch.transcriber'
-environLocal = environment.Environment(_MOD)
+from music21 import scale
+
+environLocal = environment.Environment('audioSearch.transcriber')
 
 
 def runTranscribe(show=True, plot=True, useMic=True,
@@ -38,7 +37,7 @@ def runTranscribe(show=True, plot=True, useMic=True,
     See :ref:`moduleScale` for a list of allowable scales. (or a custom one can be given).
     Microtonal scales are totally accepted, as are retuned scales where A != 440hz.
 
-    if `saveFile` is False then then the recorded audio is saved to disk.  If
+    if `saveFile` is False then the recorded audio is saved to disk.  If
     set to `True` then `environLocal.getRootTempDir() / 'ex.wav'` is
     used as the filename.  If set to anything else then it will use that as the
     filename.
@@ -80,7 +79,8 @@ def runTranscribe(show=True, plot=True, useMic=True,
 
     if plot:
         try:
-            import matplotlib.pyplot  # for find
+            # for finding
+            import matplotlib.pyplot  # type: ignore
         except ImportError:
             raise audioSearchBase.AudioSearchException(
                 'Cannot plot without matplotlib installed.')

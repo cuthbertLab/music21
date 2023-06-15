@@ -1,34 +1,42 @@
 #! /usr/bin/env python
 
+import enum
 import inspect
+import pathlib
+import sys
 import types
-from music21.documentation.iterators import CodebaseIterator
 
+sys.path.insert(0, str(pathlib.Path(__file__).parent.parent))
+
+from docbuild.iterators import CodebaseIterator
 
 def main():
-    print 'Inspecting docstrings...'
-    print 
+    print('Inspecting docstrings...\n')
     count = 0
-    for x in CodebaseIterator():
+    for x in CodebaseIterator(verbose=False):
+        if isinstance(x, type) and issubclass(x, (tuple, enum.Enum)):  # named tuple
+            continue
         address = '.'.join((x.__module__, x.__name__))
         docstring = x.__doc__
-        if docstring is not None and not docstring.startswith('\n'):
-            print address
+        if docstring and not docstring.startswith('\n'):
+            print(address)
             count += 1
         if isinstance(x, type):
             for attr in inspect.classify_class_attrs(x):
                 if attr.defining_class is not x or attr.name.startswith('_'):
                     continue
+                if attr.kind == 'data':
+                    continue
                 attrAddress = ':'.join((address, attr.name)) 
                 docstring = attr.object.__doc__
-                if docstring is not None and not docstring.startswith('\n'):
-                    print attrAddress
+                if docstring and not docstring.startswith('\n'):
+                    print(attrAddress)
                     count += 1
     if count:
-        print
-        print 'Found {} docstring(s) without leading newlines.'.format(count)
+        print()
+        print(f'Found {count} docstring(s) without leading newlines.')
     else:
-        print 'Found no docstrings without leading newlines.'
+        print('Found no docstrings without leading newlines.')
 
 
 if __name__ == '__main__':

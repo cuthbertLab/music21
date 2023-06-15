@@ -3,15 +3,17 @@
 # Name:         common/stringTools.py
 # Purpose:      Utilities for strings
 #
-# Authors:      Michael Scott Cuthbert
+# Authors:      Michael Scott Asato Cuthbert
 #               Christopher Ariza
 #
-# Copyright:    Copyright © 2009-2015 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2009-2015 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
 Tools for working with strings
 '''
+from __future__ import annotations
+
 __all__ = [
     'whitespaceEqual',
     'getNumFromStr',
@@ -32,8 +34,6 @@ import time
 import string
 import unicodedata
 
-from typing import List, Tuple
-
 # ------------------------------------------------------------------------------
 WHITESPACE = re.compile(r'\s+')
 LINEFEED = re.compile('\n+')
@@ -44,9 +44,9 @@ def whitespaceEqual(a: str, b: str) -> bool:
     r'''
     returns True if a and b are equal except for whitespace differences
 
-    >>> a = "    hello \n there "
-    >>> b = "hello there"
-    >>> c = " bye there "
+    >>> a = '    hello \n there '
+    >>> b = 'hello there'
+    >>> c = ' bye there '
     >>> common.whitespaceEqual(a, b)
     True
     >>> common.whitespaceEqual(a, c)
@@ -62,7 +62,7 @@ def whitespaceEqual(a: str, b: str) -> bool:
         return False
 
 
-def getNumFromStr(usrStr: str, numbers: str = '0123456789') -> Tuple[str, str]:
+def getNumFromStr(usrStr: str, numbers: str = '0123456789') -> tuple[str, str]:
     '''
     Given a string, extract any numbers.
     Return two strings, the numbers (as strings) and the remaining characters.
@@ -81,7 +81,7 @@ def getNumFromStr(usrStr: str, numbers: str = '0123456789') -> Tuple[str, str]:
             found.append(char)
         else:
             remain.append(char)
-    # returns numbers, and then characters
+    # returns numbers and then characters
     return ''.join(found), ''.join(remain)
 
 
@@ -195,7 +195,7 @@ def spaceCamelCase(usrStr: str, replaceUnderscore=True, fixMeList=None) -> str:
     firstChar = False
     isNumber = False
     lastIsNum = False
-    post: List[str] = []
+    post: list[str] = []
 
     # do not split these...
     if fixMeList is None:
@@ -261,8 +261,12 @@ def getMd5(value=None) -> str:
     return m.hexdigest()
 
 
-def formatStr(msg, *arguments, **keywords) -> str:
+def formatStr(msg,
+              *rest_of_message,
+              **keywords) -> str:
     '''
+    DEPRECATED: do not use.  May be removed at any time.
+
     Format one or more data elements into string suitable for printing
     straight to stderr or other outputs
 
@@ -271,12 +275,7 @@ def formatStr(msg, *arguments, **keywords) -> str:
     test 1 2 3
     <BLANKLINE>
     '''
-    if 'format' in keywords:
-        formatType = keywords['format']
-    else:
-        formatType = None
-
-    msg = [msg] + list(arguments)
+    msg = [msg, *rest_of_message]
     for i in range(len(msg)):
         x = msg[i]
         if isinstance(x, bytes):
@@ -288,11 +287,8 @@ def formatStr(msg, *arguments, **keywords) -> str:
                 try:
                     msg[i] = x.decode('utf-8')
                 except AttributeError:
-                    msg[i] = ""
-    if formatType == 'block':
-        return '\n*** '.join(msg) + '\n'
-    else:  # catch all others
-        return ' '.join(msg) + '\n'
+                    msg[i] = ''
+    return ' '.join(msg) + '\n'
 
 
 def stripAccents(inputString: str) -> str:
@@ -304,9 +300,14 @@ def stripAccents(inputString: str) -> str:
     True
     >>> common.stripAccents(s)
     'tres vite'
+
+    Also handles the German Eszett
+
+    >>> common.stripAccents('Muß')
+    'Muss'
     '''
-    nfkd_form = unicodedata.normalize('NFKD', inputString)
-    return "".join([c for c in nfkd_form if not unicodedata.combining(c)])
+    nfkd_form = unicodedata.normalize('NFKD', inputString).replace('ß', 'ss')
+    return ''.join([c for c in nfkd_form if not unicodedata.combining(c)])
 
 
 def normalizeFilename(name: str) -> str:

@@ -3,21 +3,24 @@
 # Name:         common/weakrefTools.py
 # Purpose:      Utilities for weak references
 #
-# Authors:      Michael Scott Cuthbert
+# Authors:      Michael Scott Asato Cuthbert
 #               Christopher Ariza
 #
-# Copyright:    Copyright © 2009-2015 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2009-2015 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
+from __future__ import annotations
 
 __all__ = ['wrapWeakref', 'unwrapWeakref']
 
+import typing as t
 import weakref
 
+_T = t.TypeVar('_T')
 # ------------------------------------------------------------------------------
 
 
-def wrapWeakref(referent):
+def wrapWeakref(referent: _T) -> weakref.ReferenceType | _T:
     '''
     utility function that wraps objects as weakrefs but does not wrap
     already wrapped objects; also prevents wrapping the unwrappable "None" type, etc.
@@ -36,9 +39,8 @@ def wrapWeakref(referent):
     >>> ref3
     5
     '''
-    # if type(referent) is weakref.ref:
-#     if isinstance(referent, weakref.ref):
-#         return referent
+    # if isinstance(referent, weakref.ReferenceType):
+    #     return referent
     try:
         return weakref.ref(referent)
     # if referent is None, will raise a TypeError
@@ -49,12 +51,11 @@ def wrapWeakref(referent):
         return referent
 
 
-def unwrapWeakref(referent):
+def unwrapWeakref(referent: weakref.ReferenceType | t.Any) -> t.Any:
     '''
     Utility function that gets an object that might be an object itself
     or a weak reference to an object.  It returns obj() if it's a weakref.
     and obj if it's not.
-
 
     >>> class Mock:
     ...     pass
@@ -69,8 +70,7 @@ def unwrapWeakref(referent):
     >>> common.unwrapWeakref(a2.strong) is common.unwrapWeakref(a2.weak)
     True
     '''
-    # faster than type checking if referent will usually be a weakref.ref.
-    if isinstance(referent, weakref.ref):
+    if isinstance(referent, weakref.ReferenceType):
         return referent()
     else:
         return referent

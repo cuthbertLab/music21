@@ -4,41 +4,31 @@
 # Purpose:      music21 classes for representing score and work metadata
 #
 # Authors:      Christopher Ariza
-#               Michael Scott Cuthbert
+#               Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2010, 2012 Michael Scott Cuthbert and the music21
+# Copyright:    Copyright © 2010, 2012 Michael Scott Asato Cuthbert and the music21
 #               Project
 # License:      BSD, see license.txt
 # -----------------------------------------------------------------------------
-import multiprocessing
-import os
-import pathlib
-import pickle
-import traceback
-from typing import List
-import unittest
+from __future__ import annotations
 
-from music21 import common
-from music21 import exceptions21
-
-# -----------------------------------------------------------------------------
 __all__ = [
     'JobProcessor',
     'MetadataCachingJob',
     'cacheMetadata',
-    'MetadataCacheException',
     'WorkerProcess',
 ]
 
+import multiprocessing
+import pathlib
+import pickle
+import traceback
+import unittest
 
+from music21 import common
 from music21 import environment
-environLocal = environment.Environment(os.path.basename(__file__))
-# -----------------------------------------------------------------------------
 
-
-class MetadataCacheException(exceptions21.Music21Exception):
-    pass
-# -----------------------------------------------------------------------------
+environLocal = environment.Environment('metadata.caching')
 
 
 def cacheMetadata(corpusNames=None,
@@ -92,7 +82,6 @@ class MetadataCachingJob:
     '''
     Parses one corpus path, and attempts to extract metadata from it:
 
-    >>> from music21 import metadata
     >>> job = metadata.caching.MetadataCachingJob(
     ...     'bach/bwv66.6',
     ...     parseUsingCorpus=True,
@@ -143,7 +132,7 @@ class MetadataCachingJob:
                 parsedObject = converter.parse(self.filePath, forceSource=True)
             else:
                 parsedObject = corpus.parse(str(self.filePath), forceSource=True)
-        except Exception as e:  # wide catch is fine. pylint: disable=broad-except
+        except Exception as e:  # wide catch is fine. pylint: disable=broad-exception-caught
             environLocal.printDebug(f'parse failed: {self.filePath}, {e}')
             environLocal.printDebug(traceback.format_exc())
             self.filePathErrors.append(self.filePath)
@@ -171,14 +160,14 @@ class MetadataCachingJob:
                 environLocal.printDebug(
                     'addFromPaths: got stream without metadata, '
                     'creating stub: {0}'.format(
-                        common.relativepath(self.cleanFilePath)))
+                        common.relativepath(str(self.cleanFilePath))))
                 metadataEntry = metadata.bundles.MetadataEntry(
                     sourcePath=self.cleanFilePath,
                     metadataPayload=None,
                     corpusName=self.corpusName,
                 )
                 self.results.append(metadataEntry)
-        except Exception:  # wide catch is fine. pylint: disable=broad-except
+        except Exception:  # wide catch is fine. pylint: disable=broad-exception-caught
             environLocal.warn('Had a problem with extracting metadata '
                               'for {0}, piece ignored'.format(self.filePath))
             environLocal.warn(traceback.format_exc())
@@ -193,7 +182,7 @@ class MetadataCachingJob:
             for scoreNumber, score in enumerate(parsedObject.scores):
                 self.parseScoreInsideOpus(score, scoreNumber)
                 del score  # for memory conservation
-        except Exception as exception:  # wide catch is fine. pylint: disable=broad-except
+        except Exception as exception:  # wide catch is fine. pylint: disable=broad-exception-caught
             environLocal.warn(
                 'Had a problem with extracting metadata for score {0} '
                 'in {1}, whole opus ignored: {2}'.format(
@@ -237,7 +226,7 @@ class MetadataCachingJob:
                     metadataPayload=richMetadata,
                 )
                 self.results.append(metadataEntry)
-        except Exception as exception:  # pylint: disable=broad-except
+        except Exception as exception:  # pylint: disable=broad-exception-caught
             environLocal.warn(
                 'Had a problem with extracting metadata '
                 'for score {0} in {1}, whole opus ignored: '
@@ -388,9 +377,9 @@ class JobProcessor:
 # -----------------------------------------------------------------------------
 
 
-class WorkerProcess(multiprocessing.Process):  # @UndefinedVariable pylint: disable=inherit-non-class
+class WorkerProcess(multiprocessing.Process):  # pylint: disable=inherit-non-class
     '''
-    A worker process for use by the multi-threaded metadata-caching job
+    A worker process for use by the multithreaded metadata-caching job
     processor.
     '''
 
@@ -424,7 +413,7 @@ class Test(unittest.TestCase):
 
 
 # -----------------------------------------------------------------------------
-_DOC_ORDER: List[type] = []
+_DOC_ORDER: list[type] = []
 
 if __name__ == '__main__':
     import music21

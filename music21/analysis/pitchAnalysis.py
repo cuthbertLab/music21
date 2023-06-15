@@ -3,21 +3,21 @@
 # Name:         analysis/pitchAnalysis.py
 # Purpose:      Tools for analyzing pitches
 #
-# Authors:      Michael Scott Cuthbert
+# Authors:      Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2017 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2017 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
-import collections
+from __future__ import annotations
 
-_MOD = 'analysis.pitchAnalysis'
+import collections
 
 def pitchAttributeCount(s, pitchAttr='name'):
     '''
     Return a collections.Counter of pitch class usage (count)
     by selecting an attribute of the Pitch object.
 
-    Changed in 4.0: Returns a collections.Counter object.
+    * Changed in v4: Returns a collections.Counter object.
 
     >>> bach = corpus.parse('bach/bwv324.xml')
     >>> pcCount = analysis.pitchAnalysis.pitchAttributeCount(bach, 'pitchClass')

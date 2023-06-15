@@ -4,12 +4,13 @@
 # Purpose:      Tests of meter
 #
 # Authors:      Christopher Ariza
-#               Michael Scott Cuthbert
+#               Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2009-2012, 2015, 2021 Michael Scott Cuthbert
-#               and the music21 Project
+# Copyright:    Copyright © 2009-2023 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # -----------------------------------------------------------------------------
+from __future__ import annotations
+
 import copy
 import random
 import unittest
@@ -25,7 +26,8 @@ class TestExternal(unittest.TestCase):
     show = True
 
     def testSingle(self):
-        '''Need to test direct meter creation w/o stream
+        '''
+        Need to test direct meter creation w/o stream
         '''
         a = TimeSignature('3/16')
         if self.show:
@@ -73,28 +75,6 @@ class TestExternal(unittest.TestCase):
 
 
 class Test(unittest.TestCase):
-    def testCopyAndDeepcopy(self):
-        '''Test copying all objects defined in this module
-        '''
-        import sys
-        import types
-        for part in sys.modules[self.__module__].__dict__:
-            match = False
-            for skip in ['_', '__', 'Test', 'Exception']:
-                if part.startswith(skip) or part.endswith(skip):
-                    match = True
-            if match:
-                continue
-            name = getattr(sys.modules[self.__module__], part)
-            # noinspection PyTypeChecker
-            if callable(name) and not isinstance(name, types.FunctionType):
-                try:  # see if obj can be made w/ args
-                    obj = name()
-                except TypeError:
-                    continue
-                i = copy.copy(obj)
-                j = copy.deepcopy(obj)
-
     def testMeterSubdivision(self):
         a = MeterSequence()
         a.load('4/4', 4)
@@ -106,15 +86,23 @@ class Test(unittest.TestCase):
         a[3] = a[3].subdivide(4)
         self.assertEqual(str(a), '{{1/8+1/8}+1/4+1/4+{1/16+1/16+1/16+1/16}}')
 
-    def testMeterDeepcopy(self):
+    def testMeterSequenceDeepcopy(self):
         a = MeterSequence()
         a.load('4/4', 4)
         b = copy.deepcopy(a)
-        self.assertNotEqual(a, b)
+        self.assertIsNot(a, b)
+        # TODO: equity of meter sequences not yet defined.
+        # self.assertEqual(a, b)
 
+    def testTimeSignatureDeepcopy(self):
         c = TimeSignature('4/4')
         d = copy.deepcopy(c)
-        self.assertNotEqual(c, d)
+        self.assertIsNot(c, d)
+        self.assertEqual(c, d)
+
+        e = TimeSignature('slow 6/8')
+        f = TimeSignature('fast 6/8')
+        self.assertNotEqual(e, f)
 
     def testGetBeams(self):
         ts = TimeSignature('6/8')
@@ -546,11 +534,11 @@ class Test(unittest.TestCase):
         '''
         from music21 import corpus
         faulty = corpus.parse('demos/incorrect_time_signature_pv')
-        for m in faulty.recurse().getElementsByClass('Measure'):
+        for m in faulty.recurse().getElementsByClass(stream.Measure):
             m.timeSignature = m.bestTimeSignature()
         p1 = faulty.parts[1]
         tsReps = []
-        for m in p1.getElementsByClass('Measure'):
+        for m in p1.getElementsByClass(stream.Measure):
             tsReps.append(repr(m.timeSignature))
         self.assertEqual(tsReps, ['<music21.meter.TimeSignature 12/4>',
                                   '<music21.meter.TimeSignature 23/8>',
@@ -630,6 +618,47 @@ class Test(unittest.TestCase):
         beatSeq = ts328.beamSequence
         self.assertEqual(str(beatSeq), '{3/8+2/8}')
 
+    def testEquality(self):
+        '''
+        Additional tests of TimeSignature object equality.
+        Apart from this and the doc tests,
+        see also testTimeSignatureDeepcopy for a test of
+        time signatures with different structure with same ratioString
+        (fast vs slow 6/8).
+        '''
+
+        # 5/8: but different internal structure
+
+        oneKindOf5 = TimeSignature('2+3/8')
+        sameKindOf5 = TimeSignature('2+3/8')
+        self.assertEqual(oneKindOf5.ratioString, '2/8+3/8')
+        self.assertEqual(str(oneKindOf5.beatSequence), '{{1/8+1/8}+{1/8+1/8+1/8}}')
+        self.assertEqual(sameKindOf5.ratioString, '2/8+3/8')
+        self.assertEqual(str(sameKindOf5.beatSequence), '{{1/8+1/8}+{1/8+1/8+1/8}}')
+        self.assertEqual(oneKindOf5, sameKindOf5)
+
+        otherKindOf5 = TimeSignature('3+2/8')
+        self.assertEqual(otherKindOf5.ratioString, '3/8+2/8')
+        self.assertEqual(str(otherKindOf5.beatSequence), '{{1/8+1/8+1/8}+{1/8+1/8}}')
+        self.assertNotEqual(oneKindOf5, otherKindOf5)
+
+        # 4/4: same internal structure, different written time signature.
+
+        oneKindOf44 = TimeSignature('4/4')
+        sameKindOf44 = TimeSignature()
+        self.assertEqual(oneKindOf44, sameKindOf44)
+
+        otherKindOf44 = TimeSignature('Cut')
+        self.assertEqual(otherKindOf44.ratioString, '2/2')
+        self.assertNotEqual(oneKindOf5, otherKindOf44)
+        # Likewise, Different 'symbol'
+        self.assertNotEqual(TimeSignature('Cut'), TimeSignature('2/2'))
+
+        # Completely different class (either way round)
+
+        self.assertNotEqual(TimeSignature(), note.Note())
+        self.assertNotEqual(note.Note(), TimeSignature())
+        # NB: not self.assertRaises(AttributeError). Do we want that instead?
 
 
 if __name__ == '__main__':

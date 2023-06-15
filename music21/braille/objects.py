@@ -2,11 +2,13 @@
 # ------------------------------------------------------------------------------
 # Name:         object.py
 # Purpose:      music21 classes for indicating Braille formatting, etc.
-# Authors:      Michael Scott Cuthbert
+# Authors:      Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2016 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2016 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
+from __future__ import annotations
+
 import unittest
 
 from music21.base import Music21Object
@@ -77,7 +79,9 @@ class BrailleExplicitNoteExtraSmaller(BrailleExplicitNoteLength):
 
 # ------------------------------------------------------------------------------
 class Test(unittest.TestCase):
-    pass
+    def testCopyAndDeepcopy(self):
+        from music21.test.commonTest import testCopyAll
+        testCopyAll(self, globals())
 
 
 if __name__ == '__main__':

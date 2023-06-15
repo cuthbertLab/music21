@@ -1,31 +1,33 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
-# Name:          chord.tables.py
-# Purpose:       data and tables for chord and set class processing.
+# Name:         chord.tables.py
+# Purpose:      data and tables for chord and set class processing.
 #
-# Authors:       Christopher Ariza
+# Authors:      Christopher Ariza
+#               Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2001-2011 Christopher Ariza
-# Copyright:    Copyright © 2011 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2001-11 Christopher Ariza
+# Copyright:    Copyright © 2011-22 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
-
 '''
 This module stores numerous data lists used in deriving set-class values and other post-tonal
 chord representations. All features of this module are made available through
 :class:`~music21.chord.Chord` objects. Use of this module directly is thus not necessary.
 '''
+
+from __future__ import annotations
+
 from collections import namedtuple
 import unittest
 
+from music21 import environment
 from music21 import exceptions21
 
-from music21 import environment
-_MOD = 'chord.tables'
-environLocal = environment.Environment(_MOD)
+environLocal = environment.Environment('chord.tables')
 
-
-ChordTableAddress = namedtuple('ChordTableAddress', 'cardinality forteClass inversion pcOriginal')
+ChordTableAddress = namedtuple('ChordTableAddress',
+                               ['cardinality', 'forteClass', 'inversion', 'pcOriginal'])
 
 
 # ------------------------------------------------------------------------------
@@ -50,6 +52,68 @@ class ChordTablesException(exceptions21.Music21Exception):
 # under Tn, TnI (inversion required), TnM, and TnMI respectively
 # For index 2 (python [1]), a value of 1 or higher
 # is symmetrical under inversion.
+
+TNIStructure = tuple[
+    tuple[int, ...],
+    tuple[int, int, int, int, int, int],
+    tuple[int, int, int, int, int, int, int, int],
+    int,
+]
+
+# noinspection DuplicatedCode
+t1: TNIStructure
+t2: TNIStructure
+t3: TNIStructure
+t4: TNIStructure
+t5: TNIStructure
+t6: TNIStructure
+t7: TNIStructure
+t8: TNIStructure
+t9: TNIStructure
+t10: TNIStructure
+t11: TNIStructure
+t12: TNIStructure
+t13: TNIStructure
+t14: TNIStructure
+t15: TNIStructure
+t16: TNIStructure
+t17: TNIStructure
+t18: TNIStructure
+t19: TNIStructure
+t20: TNIStructure
+t21: TNIStructure
+t22: TNIStructure
+t23: TNIStructure
+t24: TNIStructure
+t25: TNIStructure
+# noinspection DuplicatedCode
+t26: TNIStructure
+t27: TNIStructure
+t28: TNIStructure
+t29: TNIStructure
+t30: TNIStructure
+t31: TNIStructure
+t32: TNIStructure
+t33: TNIStructure
+t34: TNIStructure
+t35: TNIStructure
+t36: TNIStructure
+t37: TNIStructure
+t38: TNIStructure
+t39: TNIStructure
+t40: TNIStructure
+t41: TNIStructure
+t42: TNIStructure
+t43: TNIStructure
+t44: TNIStructure
+t45: TNIStructure
+t46: TNIStructure
+t47: TNIStructure
+t48: TNIStructure
+t49: TNIStructure
+t50: TNIStructure
+
+
 t1   = ((0,), (0,0,0,0,0,0), (1,1,1,1,11,11,11,11), 0)  # 1-1
 monad = (None, t1)
 
@@ -58,7 +122,7 @@ t2  = ((0,2), (0,1,0,0,0,0), (1,1,1,1,9,9,9,9),  0)  # 2-2
 t3  = ((0,3), (0,0,1,0,0,0), (1,1,1,1,9,9,9,9),  0)  # 2-3
 t4  = ((0,4), (0,0,0,1,0,0), (1,1,1,1,9,9,9,9),  0)  # 2-4
 t5  = ((0,5), (0,0,0,0,1,0), (1,1,0,0,9,9,8,8),  0)  # 2-5
-t6  = ((0,6), (0,0,0,0,0,1), (2,2,2,2,10,10,10), 0)  # 2-6
+t6  = ((0,6), (0,0,0,0,0,1), (2,2,2,2,10,10,10,10), 0)  # 2-6
 diad = (None, t1, t2, t3, t4, t5, t6)
 
 t1  = ((0,1,2), (2,1,0,0,0,0), (1,1,0,0,7,7,4,4), 0)  # 3-1
@@ -109,7 +173,6 @@ tetrachord = (
     t10, t11, t12, t13, t14, t15, t16, t17, t18, t19,
     t20, t21, t22, t23, t24, t25, t26, t27, t28, t29
 )
-
 
 t1  = ((0,1,2,3,4), (4,3,2,1,0,0), (1,1,0,0,3,3,0,0),  0)  # 5-1
 t2  = ((0,1,2,3,5), (3,3,2,1,1,0), (1,0,0,0,1,2,1,1),  0)  # 5-2
@@ -335,11 +398,11 @@ FORTE = (None, monad, diad, trichord, tetrachord, pentachord,
          hexachord, septachord, octachord,
          nonachord, decachord, undecachord, dodecachord)
 
-# this defines the pitch classes to return for the inversion of a given
+# This dictionary defines the pitch classes to return for the inversion of a given
 # forte number.  For instance (3, 11): (0, 4, 7) indicates that for the
 # inverted form of Forte class 3-11 (minor/major triad) return 0, 2, 3
-# (the zero could be assumed, but it makes my brain easier to have it there.
-# faster to store this than recompute every time.
+# (the zero could be assumed, but it makes my brain easier to have it there).
+# It is faster to store this than to recompute it every time.
 inversionDefaultPitchClasses = {
     (3, 2): (0, 2, 3),
     (3, 3): (0, 3, 4),
@@ -913,13 +976,14 @@ forteNumberWithInversionToTnIndex = {
 # some changes:
 # unison preferred to monad
 # v7.3 -- Roma preferred.  Gypsy only in parentheses.
-#      TODO: more removing and/or deemphasizing of ethnic-stereotype names.
+#      TODO: more removing and/or de-emphasizing of ethnic-stereotype names.
 
 tnIndexToChordInfo = {
+    # Cardinality 1
     (1,  1,  0): {'name': ('unison',
                            'monad',
                            'singleton')},
-
+    # Cardinality 2
     (2,  1,  0): {'name': ('interval class 1',
                            'minor second',
                            'm2',
@@ -943,6 +1007,7 @@ tnIndexToChordInfo = {
                            'diminished fifth',
                            'augmented fourth')},
 
+    # Cardinality 3
     (3,  1,  0): {'name': ('chromatic trimirror',)},
     (3,  2,  1): {'name': ('phrygian trichord',)},
     (3,  2, -1): {'name': ('minor trichord',)},
@@ -965,6 +1030,7 @@ tnIndexToChordInfo = {
     (3, 12,  0): {'name': ('augmented triad',
                            'equal 3-part octave division')},
 
+    # Cardinality 4
     (4,  1,  0): {'name': ('chromatic tetramirror',
                            'BACH')},
     (4,  2,  1): {'name': ('major-second tetracluster', )},
@@ -1015,6 +1081,7 @@ tnIndexToChordInfo = {
     (4, 29,  1): {'name': ('all-interval tetrachord',)},
     (4, 29, -1): {'name': ('all-interval tetrachord',)},
 
+    # Cardinality 5
     (5,  1,  0): {'name': ('chromatic pentamirror',)},
     (5,  2,  1): {'name': ('major-second pentacluster',)},
     (5,  2, -1): {'name': ('major-second pentacluster',)},
@@ -1104,6 +1171,7 @@ tnIndexToChordInfo = {
     (5, 38,  1): {'name': ('diminished pentacluster',)},
     (5, 38, -1): {'name': ('diminished pentacluster',)},
 
+    # Cardinality 6
     (6,  1,  0): {'name': ('A all combinatorial (P6, I11, RI5, RI11)',
                            'chromatic hexamirror',
                            'first-order all-combinatorial')},
@@ -1175,9 +1243,8 @@ tnIndexToChordInfo = {
                            'combinatorial I (I1, I7)')},
     (6, 31,  1): {'name': ('combinatorial I (I7)',)},
     (6, 31, -1): {'name': ('combinatorial I (I11)',)},
-    (6, 32,  0): {'name': ('C all combinatorial (P6, I3, RI9)',
-                           'Guidon/Arezzo',
-                           'Arezzo major diatonic',
+    (6, 32,  0): {'name': ('Guidonian hexachord',
+                           'C all combinatorial (P6, I3, RI9)',
                            'major hexamirror',
                            'quartal hexamirror',
                            'first-order all combinatorial')},
@@ -1222,6 +1289,7 @@ tnIndexToChordInfo = {
     (6, 49,  0): {'name': ('combinatorial RI (RI4)', 'Prometheus Neapolitan mode')},
     (6, 50,  0): {'name': ('combinatorial RI (RI1)',)},
 
+    # Cardinality 7
     (7,  1,  0): {'name': ('chromatic heptamirror',)},
     (7,  2,  1): {},
     (7,  2, -1): {},
@@ -1264,11 +1332,9 @@ tnIndexToChordInfo = {
     (7, 21,  1): {},
     (7, 21, -1): {'name': ('Roma (Gypsy) hepatonic',)},
     (7, 22,  0): {'name': ('double harmonic scale',
-                           'Persian',
                            'major Roma (Gypsy)',
                            'Hungarian minor',
                            'double harmonic scale',
-                           'Asian',
                            'quasi raga Mayamdavagaula')},
     (7, 23,  1): {},
     (7, 23, -1): {'name': ('tritone major heptachord',)},
@@ -1292,10 +1358,11 @@ tnIndexToChordInfo = {
     (7, 31, -1): {'name': ('diminished scale',
                            'alternating heptachord')},
     (7, 32,  1): {'name': ('harmonic minor scale',
+                           'harmonic minor collection',
                            'Spanish Roma (Gypsy)',
                            'mela Kiravani')},
-    (7, 32, -1): {'name': ('harmonic major scale',
-                           'harmonic minor inverse',
+    (7, 32, -1): {'name': ('harmonic major scale (inverted)',
+                           'harmonic minor collection (inverted)',
                            'mela Cakravana',
                            'quasi raga Ahir Bhairav')},
     (7, 33,  0): {'name': ('Neapolitan-major mode',
@@ -1317,6 +1384,7 @@ tnIndexToChordInfo = {
     (7, 38,  1): {},
     (7, 38, -1): {},
 
+    # Cardinality 8
     (8,  1,  0): {'name': ('chromatic octamirror',)},
     (8,  2,  1): {},
     (8,  2, -1): {},
@@ -1352,13 +1420,12 @@ tnIndexToChordInfo = {
     (8, 22,  1): {},
     (8, 22, -1): {'name': ('Spanish octatonic scale',)},
     (8, 23,  0): {'name': ('Greek',
-                           'blues',
                            'quartal octachord',
-                           'diatonic octad')},
+                           'diatonic octad',)},
     (8, 24,  0): {},
     (8, 25,  0): {'name': ("Messiaen's mode 6",)},
-    (8, 26,  0): {'name': ('blues',
-                           'Spanish phrygian',)},
+    (8, 26,  0): {'name': ('Spanish phrygian',
+                           'blues',)},
     (8, 27,  1): {},
     (8, 27, -1): {},
     (8, 28,  0): {'name': ('octatonic scale',
@@ -1368,6 +1435,7 @@ tnIndexToChordInfo = {
     (8, 29,  1): {},
     (8, 29, -1): {},
 
+    # Cardinality 9
     (9,  1,  0): {'name': ('chromatic nonamirror',)},
     (9,  2,  1): {},
     (9,  2, -1): {},
@@ -1389,6 +1457,7 @@ tnIndexToChordInfo = {
     (9, 12,  0): {'name': ("Messiaen's mode 3",
                            'Tsjerepnin')},
 
+    # Cardinality 10
     (10, 1,  0): {'name': ('chromatic decamirror',)},
     (10, 2,  0): {},
     (10, 3,  0): {},
@@ -1396,14 +1465,15 @@ tnIndexToChordInfo = {
     (10, 5,  0): {'name': ('major-minor mixed',)},
     (10, 6,  0): {'name': ("Messiaen's mode 7",)},
 
+    # Cardinality 11
     (11, 1,  0): {'name': ('chromatic undecamirror',)},
 
+    # Cardinality 12
     (12, 1,  0): {'name': ('aggregate',
                            'dodecachord',
                            'twelve-tone chromatic',
                            'chromatic scale',
-                           'dodecamirror')},
-}
+                           'dodecamirror')},}
 
 # ------------------------------------------------------------------------------
 # function to access data
@@ -1560,7 +1630,7 @@ def addressToIntervalVector(address):
     (0, 0, 1, 1, 1, 0)
 
     Inversion can be omitted or None without causing an error (or, of course,
-    changing the output
+    changing the output)
 
     >>> chord.tables.addressToIntervalVector((4, 29))
     (1, 1, 1, 1, 1, 1)
@@ -1614,7 +1684,7 @@ def intervalVectorToAddress(vector):
         for num, sc in enumerate(FORTE[card]):
             if sc is None:
                 continue  # first, used for spacing
-            # index 1 is vector
+            # index 1 is the vector
             if sc[1] == vector:
                 post.append(ChordTableAddress(card, num, None, None))
     return post
@@ -1666,7 +1736,7 @@ def addressToCommonNames(address):
     non-post-tonal spellings.
 
     Note that names referring to ethnic stereotypes that are not in
-    common usage will be removed in music21 v.8 or at any time
+    common usage will be removed in music21 v8 or at any time
     thereafter without a deprecation cycle.
     Those matching this description that are still in common use will be demoted
     to the end of the list of names and may still be removed in the future.
@@ -1680,7 +1750,7 @@ def addressToCommonNames(address):
 
 def addressToForteName(address, classification='tn'):
     '''
-    Given an address, return the set-class name as a string.  By default
+    Given an address, return the set-class name as a string.  By default,
     A and B are appended to chords without inversional equivalence:
 
     >>> octachord_address = chord.tables.ChordTableAddress(8, 15, -1, 10)
@@ -1689,7 +1759,7 @@ def addressToForteName(address, classification='tn'):
     >>> chord.tables.addressToForteName((8, 15))
     '8-15A'
 
-    The augmented triad is invariant under inversion so it gets no designation:
+    The augmented triad is invariant under inversion, so it gets no designation:
 
     >>> chord.tables.addressToForteName((3, 12))
     '3-12'
@@ -1723,7 +1793,7 @@ def seekChordTablesAddress(c):
 
     Table addresses are a ChordTableAddress named-tuple giving
     the cardinality, the Forte-index-number, the inversion, and the original
-    pitch class that matched (may be arbitrary for a symmetrical chord like
+    pitch class that matched (it may be arbitrary for a symmetrical chord like
     the diminished seventh chord).
 
     Inversion is either 0 (for symmetrical under inversion) or -1, 1
@@ -1768,7 +1838,7 @@ def seekChordTablesAddress(c):
     music21.chord.tables.ChordTablesException: cannot access chord tables address
         for Chord with 0 pitches
 
-    NOTE: this was once a time consuming operation, though it is
+    NOTE: this was once a time-consuming operation, though it is
     now quite a bit faster than before (order of 100 microseconds).  Nonetheless
     should only be run when necessary.  Methods that call this should
     try (as chord.Chord does) to cache the result.
@@ -1793,7 +1863,7 @@ def seekChordTablesAddress(c):
     card = len(pcSet)
     if card == 1:  # it is a singleton: return it
         return ChordTableAddress(1, 1, 0, pcSet[0])
-    elif card == 12:  # its the aggregate
+    elif card == 12:  # it is the aggregate
         return ChordTableAddress(12, 1, 0, 0)
 
     # go through each rotation of pcSet
@@ -1897,7 +1967,7 @@ class Test(unittest.TestCase):
 
 # ------------------------------------------------------------------------------
 # define presented order in documentation
-_DOC_ORDER = [addressToForteName, addressToPrimeForm, addressToForteName, seekChordTablesAddress]
+_DOC_ORDER = [addressToForteName, addressToPrimeForm, seekChordTablesAddress]
 
 
 if __name__ == '__main__':

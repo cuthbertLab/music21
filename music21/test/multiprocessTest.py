@@ -3,14 +3,14 @@
 # Name:         multiprocesssTest.py
 # Purpose:      Controller for all tests in music21 run concurrently.
 #
-# Authors:      Michael Scott Cuthbert
+# Authors:      Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2012-15 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2012-15 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
 Multiprocess testing.  Tests all doctests and Test unittest objects in all
-modules that are imported when running "import music21".  Runs threads on
+modules that are imported when running "import music21".  Runs a thread on
 each core of a multicore system unless there are more than 2 cores, in which
 case it runs on n-1 cores.
 
@@ -21,33 +21,34 @@ building a new release.
 
 Run test/testDocumentation after this.
 '''
+from __future__ import annotations
+
 import dataclasses
 import multiprocessing
 import os
 import sys
 import time
 import unittest
-from typing import Optional, Any
+import typing as t
 
 from music21 import environment
 from music21 import common
 from music21.test import testRunner
 from music21.test import commonTest
 
-_MOD = 'test.multiprocessTest'
-environLocal = environment.Environment(_MOD)
+environLocal = environment.Environment('test.multiprocessTest')
 
 @dataclasses.dataclass
 class ModuleResponse:
-    returnCode: Optional[str] = None
-    fp: Any = None
-    moduleName: Optional[str] = None
-    success: Any = None
-    testRunner: Any = None
-    errors: Any = None
-    failures: Any = None
-    testsRun: Any = None
-    runTime: Any = None
+    returnCode: str | None = None
+    fp: t.Any = None
+    moduleName: str | None = None
+    success: t.Any = None
+    testRunner: t.Any = None
+    errors: t.Any = None
+    failures: t.Any = None
+    testsRun: t.Any = None
+    runTime: t.Any = None
 
 
 # ------------------------------------------------------------------------------
@@ -60,7 +61,7 @@ def runOneModuleWithoutImp(args):
 
     moduleObject = modGath.getModuleWithoutImp(fp)
 
-    environLocal.printDebug(f'running {fp} \n')
+    environLocal.printDebug(f'running {fp=} {moduleObject=}\n')
     namePeriod = modGath._getNamePeriod(fp)
     if moduleObject == 'skip':
         success = f'{fp} is skipped \n'
@@ -74,7 +75,7 @@ def runOneModuleWithoutImp(args):
         return ModuleResponse(returnCode='NotInTree', fp=fp, success=success)
 
     try:
-        moduleName = modGath._getName(fp)
+        moduleName = modGath._getNamePeriod(fp, addM21=False)
 
         s1 = commonTest.defaultDoctestSuite()
 
@@ -116,7 +117,7 @@ def runOneModuleWithoutImp(args):
                                   failures=failures,
                                   testsRun=testResult.testsRun,
                                   runTime=runTime)
-        except Exception as excp:  # pylint: disable=broad-except
+        except Exception as excp:  # pylint: disable=broad-exception-caught
             environLocal.printDebug(f'*** Exception in running {moduleName}: {excp}...\n')
             return ModuleResponse(returnCode='TrappedException',
                                   fp=fp,
@@ -124,7 +125,7 @@ def runOneModuleWithoutImp(args):
                                   success=None,
                                   testRunner=str(excp)
                                   )
-    except Exception as excp:  # pylint: disable=broad-except
+    except Exception as excp:  # pylint: disable=broad-exception-caught
         environLocal.printDebug(f'*** Large Exception in running {fp}: {excp}...\n')
         return ModuleResponse(returnCode='LargeException',
                               fp=fp,
@@ -133,7 +134,7 @@ def runOneModuleWithoutImp(args):
 
 def mainPoolRunner(testGroup=('test',), restoreEnvironmentDefaults=False, leaveOut=1):
     '''
-    Run all tests. Group can be test and/or external
+    Run all tests. Group can be "test" and/or "external"
     '''
     commonTest.testImports()
 
@@ -146,8 +147,9 @@ def mainPoolRunner(testGroup=('test',), restoreEnvironmentDefaults=False, leaveO
 
     modGather = commonTest.ModuleGather(useExtended=True)
 
-    maxTimeout = 200
+    maxTimeout = 100
     pathsToRun = modGather.modulePaths  # [30:60]
+    # print(pathsToRun)
 
     # pylint: disable=not-callable
     with multiprocessing.Pool(processes=poolSize) as pool:
@@ -174,7 +176,6 @@ def mainPoolRunner(testGroup=('test',), restoreEnvironmentDefaults=False, leaveO
                     if newResult.moduleName is not None:
                         mn = newResult.moduleName
                         mn = mn.replace('___init__', '')
-                        mn = mn.replace('_', '.')
                     else:
                         mn = ''
                     rt = newResult.runTime
@@ -209,7 +210,7 @@ def mainPoolRunner(testGroup=('test',), restoreEnvironmentDefaults=False, leaveO
                 continueIt = False
                 pool.close()
                 pool.join()
-            except Exception as excp:  # pylint: disable=broad-except
+            except Exception as excp:  # pylint: disable=broad-exception-caught
                 eventsProcessed += 1
                 exceptionLog = ModuleResponse(
                     returnCode='UntrappedException',

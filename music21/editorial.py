@@ -3,10 +3,10 @@
 # Name:         editorial.py
 # Purpose:      music21 classes for representing editorial information
 #
-# Authors:      Michael Scott Cuthbert
+# Authors:      Michael Scott Asato Cuthbert
 #               Christopher Ariza
 #
-# Copyright:    Copyright © 2008-2015 Michael Scott Cuthbert and the music21
+# Copyright:    Copyright © 2008-2015 Michael Scott Asato Cuthbert and the music21
 #               Project
 # License:      BSD, see license.txt
 # -----------------------------------------------------------------------------
@@ -14,8 +14,8 @@
 Editorial objects store comments and other metadata associated with specific
 :class:`~music21.base.Music21Object` elements such as Notes.
 
-Some of the aspects of :class:`~music21.editorial.Editorial` objects
-represent very early (pre-v0.1) versions of music21.  Thus some of the
+Some aspects of :class:`~music21.editorial.Editorial` objects
+represent very early (pre-v0.1) versions of music21.  Thus, some
 pre-defined aspects might be removed from documentation in the future.
 
 Access an editorial object by calling `.editorial` on any music21 object:
@@ -37,21 +37,12 @@ False
 >>> n.hasEditorialInformation
 True
 '''
+from __future__ import annotations
+
 import unittest
-from music21 import exceptions21
+
 from music21 import prebase
 from music21 import style
-
-# -----------------------------------------------------------------------------
-
-
-class EditorialException(exceptions21.Music21Exception):
-    pass
-
-
-class CommentException(exceptions21.Music21Exception):
-    pass
-
 
 # -----------------------------------------------------------------------------
 class Editorial(prebase.ProtoM21Object, dict):
@@ -85,7 +76,7 @@ class Editorial(prebase.ProtoM21Object, dict):
         :width: 103
 
     '''
-    _DOC_ATTR = {
+    _DOC_ATTR: dict[str, str] = {
         'comments': '''
             a list of :class:`~music21.editorial.Comment` objects that represent any comments
             about the object.
@@ -131,7 +122,7 @@ class Editorial(prebase.ProtoM21Object, dict):
         if name in self:
             del self[name]
         else:
-            raise AttributeError("No such attribute: " + name)
+            raise AttributeError('No such attribute: ' + name)
 
 
 # -----------------------------------------------------------------------------
@@ -176,31 +167,8 @@ class Comment(prebase.ProtoM21Object, style.StyleMixin):  # type: ignore
 class Test(unittest.TestCase):
 
     def testCopyAndDeepcopy(self):
-        '''
-        Test copying all objects defined in this module
-        '''
-        import copy
-        import sys
-        import types
-        for part in sys.modules[self.__module__].__dict__:
-            match = False
-            for skip in ['_', '__', 'Test', 'Exception']:
-                if part.startswith(skip) or part.endswith(skip):
-                    match = True
-            if match:
-                continue
-            name = getattr(sys.modules[self.__module__], part)
-            # noinspection PyTypeChecker
-            if callable(name) and not isinstance(name, types.FunctionType):
-                try:  # see if obj can be made w/ args
-                    obj = name()
-                except TypeError:
-                    continue
-                a = copy.copy(obj)
-                b = copy.deepcopy(obj)
-                self.assertIsNot(a, None)
-                self.assertIsNot(b, None)
-
+        from music21.test.commonTest import testCopyAll
+        testCopyAll(self, globals())
 
 # -----------------------------------------------------------------------------
 

@@ -3,9 +3,9 @@
 # Name:         search/segment.py
 # Purpose:      music21 classes for searching via segment matching
 #
-# Authors:      Michael Scott Cuthbert
+# Authors:      Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2011-2018 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2011-2018 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
@@ -22,30 +22,30 @@ Speed notes:
    python-Levenshtein can be installed via **pip install python-Levenshtein**.
    The ratios are very slightly different, but the speedup is between 10 and 100x!
    (But then PyPy probably won't work.)
-
 '''
-import copy
+
+from __future__ import annotations
+
+from collections import OrderedDict
 import difflib
+from functools import partial
 import json
 import math
 import pathlib
 import random
-
-from collections import OrderedDict
-from functools import partial
 
 from music21 import common
 from music21 import converter
 from music21 import corpus
 from music21 import environment
 
-_MOD = 'search.segment'
-environLocal = environment.Environment(_MOD)
+environLocal = environment.Environment('search.segment')
 
 
 # noinspection SpellCheckingInspection
 def translateMonophonicPartToSegments(
     inputStream,
+    *,
     segmentLengths=30,
     overlap=12,
     algorithm=None,
@@ -61,7 +61,6 @@ def translateMonophonicPartToSegments(
     If algorithm is None then a default algorithm of music21.search.translateStreamToStringNoRhythm
     is used
 
-    >>> from music21 import *
     >>> luca = corpus.parse('luca/gloria')
     >>> lucaCantus = luca.parts[0]
     >>> segments, measureLists = search.segment.translateMonophonicPartToSegments(lucaCantus)
@@ -114,7 +113,7 @@ def translateMonophonicPartToSegments(
 
 
 # noinspection SpellCheckingInspection
-def indexScoreParts(scoreFile, *args, **keywords):
+def indexScoreParts(scoreFile, **keywords):
     r'''
     Creates segment and measure lists for each part of a score
     Returns list of dictionaries of segment and measure lists
@@ -130,7 +129,7 @@ def indexScoreParts(scoreFile, *args, **keywords):
     indexedList = []
     for part in scoreFileParts:
         segmentList, measureList = translateMonophonicPartToSegments(
-            part, *args, **keywords)
+            part, **keywords)
         indexedList.append({
             'segmentList': segmentList,
             'measureList': measureList,
@@ -138,28 +137,24 @@ def indexScoreParts(scoreFile, *args, **keywords):
     return indexedList
 
 
-def _indexSingleMulticore(filePath, *args, **keywords):
+def _indexSingleMulticore(filePath, failFast=False, **keywords):
     '''
     Index one path in the context of multicore.
     '''
-    keywords2 = copy.copy(keywords)
-    if 'failFast' in keywords2:
-        del(keywords2['failFast'])
-
     if not isinstance(filePath, pathlib.Path):
         filePath = pathlib.Path(filePath)
 
     shortFp = filePath.name
 
     try:
-        indexOutput = indexOnePath(filePath, *args, **keywords2)
-    except Exception as e:  # pylint: disable=broad-except
-        if 'failFast' not in keywords or keywords['failFast'] is False:
+        indexOutput = indexOnePath(filePath, **keywords)
+    except Exception as e:  # pylint: disable=broad-exception-caught
+        if not failFast:
             print(f'Failed on parse/index for, {filePath}: {e}')
             indexOutput = ''
         else:
             raise e
-    return(shortFp, indexOutput, filePath)
+    return (shortFp, indexOutput, filePath)
 
 
 def _giveUpdatesMulticore(numRun, totalRun, latestOutput):
@@ -168,10 +163,11 @@ def _giveUpdatesMulticore(numRun, totalRun, latestOutput):
 
 # noinspection SpellCheckingInspection
 def indexScoreFilePaths(scoreFilePaths,
+                        *,
                         giveUpdates=False,
-                        *args,
                         runMulticore=True,
                         **keywords):
+    # noinspection PyShadowingNames
     '''
     Returns a dictionary of the lists from indexScoreParts for each score in
     scoreFilePaths
@@ -197,7 +193,7 @@ def indexScoreFilePaths(scoreFilePaths,
     else:
         updateFunction = None
 
-    indexFunc = partial(_indexSingleMulticore, *args, **keywords)
+    indexFunc = partial(_indexSingleMulticore, **keywords)
 
     for i in range(len(scoreFilePaths)):
         if not isinstance(scoreFilePaths[i], pathlib.Path):
@@ -228,7 +224,7 @@ def indexScoreFilePaths(scoreFilePaths,
     return scoreDict
 
 
-def indexOnePath(filePath, *args, **keywords):
+def indexOnePath(filePath, **keywords):
     '''
     Index a single path.  Returns a scoreDictEntry
     '''
@@ -240,7 +236,7 @@ def indexOnePath(filePath, *args, **keywords):
     else:
         scoreObj = converter.parse(filePath)
 
-    scoreDictEntry = indexScoreParts(scoreObj, *args, **keywords)
+    scoreDictEntry = indexScoreParts(scoreObj, **keywords)
     return scoreDictEntry
 
 
@@ -270,7 +266,7 @@ def loadScoreDict(filePath):
     if not isinstance(filePath, pathlib.Path):
         filePath = pathlib.Path(filePath)
 
-    with filePath.open('b') as f:
+    with filePath.open('rb') as f:
         scoreDict = json.load(f)
     return scoreDict
 
@@ -290,7 +286,8 @@ def getDifflibOrPyLev(
         smObject = difflib.SequenceMatcher(junk, '', seq2)
     else:
         try:
-            from Levenshtein import StringMatcher as pyLevenshtein
+            # noinspection PyPackageRequirements
+            from Levenshtein import StringMatcher as pyLevenshtein  # type: ignore
             smObject = pyLevenshtein.StringMatcher(junk, '', seq2)
         except ImportError:
             smObject = difflib.SequenceMatcher(junk, '', seq2)
@@ -304,6 +301,7 @@ def scoreSimilarity(
     includeReverse=False,
     forceDifflib=False,
 ):
+    # noinspection PyShadowingNames
     r'''
     Find the level of similarity between each pair of segments in a scoreDict.
 
@@ -400,10 +398,9 @@ def scoreSimilarity(
 
 # ------------------------------------------------------------------------------
 # define presented order in documentation
-_DOC_ORDER = []
+_DOC_ORDER: list[type] = []
 
 
 if __name__ == '__main__':
     import music21
     music21.mainTest()
-

@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from __future__ import annotations
 
 # pylint: disable=line-too-long
 
@@ -6,7 +7,7 @@ import re
 _DOC_IGNORE_MODULE_OR_PACKAGE = True
 
 
-splitLots = re.sub(r"\s\s\s\s+", "\t",
+splitLots = re.sub(r'\s\s\s\s+', '\t',
                    r'''
 **kern        **kern
 *staff2       *staff1
@@ -28,7 +29,7 @@ splitLots = re.sub(r"\s\s\s\s+", "\t",
 ''')
 
 
-fakeTest = re.sub(r"\s\s\s\s+", "\t",
+fakeTest = re.sub(r'\s\s\s\s+', '\t',
                   r'''
 !! Global Comment
 !!!COM: Fake, Composer
@@ -59,7 +60,7 @@ fakeTest = re.sub(r"\s\s\s\s+", "\t",
 '''
                   )
 
-strangeWTCOpening = re.sub(r"\s\s\s\s+", "\t",
+strangeWTCOpening = re.sub(r'\s\s\s\s+', '\t',
                            r'''
 **kern
 *k[]
@@ -92,7 +93,7 @@ strangeWTCOpening = re.sub(r"\s\s\s\s+", "\t",
 '''
                            )
 
-ojibway = re.sub(r"\s\s\s\s+", "\t",
+ojibway = re.sub(r'\s\s\s\s+', '\t',
                   r'''
 !! Ojibway Indian Song
 !! Transcribed by Frances Densmore
@@ -134,8 +135,8 @@ dottedTuplet = re.sub(r'\s\s\s\s+', '\t',
 *-
 ''')
 
-splitSpines = re.sub(r"\s\s\s\s+", "\t",
-                      r'''
+splitSpines = re.sub(r'\s\s\s\s+', '\t',
+                     r'''
 **kern
 *staff1
 *clefG2
@@ -149,11 +150,10 @@ splitSpines = re.sub(r"\s\s\s\s+", "\t",
 4c    4a
 ==    ==
 *-    *-
-'''
-                     )
+''')
 
-splitSpines2 = re.sub(r"\s\s\s\s+", "\t",
-                       r'''
+splitSpines2 = re.sub(r'\s\s\s\s+', '\t',
+                      r'''
 **kern
 *staff1
 *clefG2
@@ -177,11 +177,10 @@ splitSpines2 = re.sub(r"\s\s\s\s+", "\t",
 2d
 ==
 *-
-'''
-                      )
+''')
 
 
-schubert = re.sub(r"\s\s\s\s", "\t",
+schubert = re.sub(r'\s\s\s\s+', '\t',
                   r'''
 !!!COM: Schubert, Franz Peter
 !!!CDT: 1797-1828
@@ -444,11 +443,10 @@ schubert = re.sub(r"\s\s\s\s", "\t",
 !!!EMD:  (3) changed final barline from quadruple (====) to double (==)
 !!!EMD:  (4) added key signatures, key designations, and tempi
 !!!EEV: Version 2.0
-'''
-                  )
+''')
 
 
-mazurka6 = re.sub(r"\s\s\s\s", "\t",
+mazurka6 = re.sub(r'\s\s\s\s+', '\t',
                   r'''
 !!!COM: Chopin, Frederic
 !!!CDT: 1810///-1849///
@@ -944,10 +942,9 @@ mazurka6 = re.sub(r"\s\s\s\s", "\t",
 !!!END: 2005/01/05/
 !!!URL: http://www.chopinsociety.org/maz_rf.htm#maz62 (short description by David Dubal)
 !!!URL: http://chopin.lib.uchicago.edu/gsdl/cgi-bin/library?e=d-000-00---0chopin--00-0-0-0prompt-10---4---Document-dtt--0-1l--1-en-Zz-1---50-home-mazurka--001-001-0-0utfZz-8-0&a=d&c=chopin&cl=CL3.10.5 (Early editions of op. 6 at the University of Chicago)
-'''
-                  )
+''')
 
-ivesSpring = re.sub(r"\s\s\s\s", "\t",
+ivesSpring = re.sub(r'\s\s\s\s', '\t',
                     r'''
 !!!COM: Ives, Charles
 !!!CDT: 1874/10/20/-1954/05/19/
@@ -1137,7 +1134,7 @@ ivesSpring = re.sub(r"\s\s\s\s", "\t",
 '''
                     )
 
-sousaStars = re.sub(r"\s\s\s\s", "\t",
+sousaStars = re.sub(r'\s\s\s\s', '\t',
                     r'''
 !!!COM: Sousa, John Phillip
 !!!CDT: 1854/11/05/-1932/04/08/
@@ -1853,10 +1850,9 @@ sousaStars = re.sub(r"\s\s\s\s", "\t",
 *-    *-    *-
 !!!ENC: Craig Stuart Sapp
 !!!END: 2006/06/17/
-'''
-                    )
+''')
 
-multipartSanctus = re.sub(r"\s\s\s\s", "\t",
+multipartSanctus = re.sub(r'\s\s\s\s', '\t',
                           r'''!!!COM: Palestrina, Giovanni Perluigi da
 **kern    **kern    **kern    **kern
 *Ibass    *Itenor    *Icalto    *Icant
@@ -1897,7 +1893,7 @@ multipartSanctus = re.sub(r"\s\s\s\s", "\t",
 *-    *-    *-    *-
 ''')
 
-harmScaleDegrees = re.sub(r"\s\s\s\s", "\t",
+harmScaleDegrees = re.sub(r'\s\s\s\s', '\t',
                           r'''!!!COM: Nestor Napoles Lopez
 **kern	**kern	**harm
 *staff2	*staff1	*staff1/2
@@ -1952,7 +1948,7 @@ harmScaleDegrees = re.sub(r"\s\s\s\s", "\t",
 !!!system-decoration: {(s1,s2)}
 ''')
 
-harmSevenths = re.sub(r"\s\s\s\s", "\t",
+harmSevenths = re.sub(r'\s\s\s\s', '\t',
                       r'''!!!COM: Nestor Napoles Lopez
 **kern	**kern	**harm
 *part1	*part1	*

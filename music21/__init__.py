@@ -1,13 +1,9 @@
 # -*- coding: utf-8 -*-
 '''
-The music21 Framework is Copyright © 2006-2021 Michael Scott Cuthbert
-and the music21 Project
-
-(Michael Scott Cuthbert, principal investigator; cuthbert@mit.edu)
+The music21 Framework is Copyright © 2006-2023 Michael Scott Asato Cuthbert.
 
 Some Rights Reserved
-Released under the BSD (3-clause) license.  For historical reasons, music21
-can also be used under an LGPL license.
+Released under the BSD (3-clause) license.  See license.txt.
 
 See license.txt file for the full license which represents your legal
 obligations in using, modifying, or distributing music21.
@@ -30,24 +26,28 @@ and Social Sciences.  Portions of music21 were originally part of
 the PMusic (Perl) library, developed by Cuthbert prior to arriving at MIT.
 
 music21 outputs a subset of XML data defined by the MusicXML 4.0
-standard, Copyright © 2004-2021 the Contributors to the MusicXML Specification.
+standard, Copyright © 2004-2022 W3C, open source.
 
 The corpus files have copyrights retained by their
 owners who have allowed them to be included with music21.
 '''
+from __future__ import annotations
+
 import sys
 
-minPythonVersion = (3, 7)
+minPythonVersion = (3, 10)
 minPythonVersionStr = '.'.join([str(x) for x in minPythonVersion])
 if sys.version_info < minPythonVersion:
     # DO NOT CHANGE THIS TO AN f-String -- it needs to run on old python.
     raise ImportError('''
-    Music21 v.7.0+ is a Python {}+ only library.
+    Music21 v9.0+ is a Python {}+ only library.
     Use music21 v1 to run on Python 2.1-2.6.
     Use music21 v4 to run on Python 2.7.
     Use music21 v5.1 to run on Python 3.4.
     Use music21 v5.7 to run on Python 3.5.
     Use music21 v6.7 to run on Python 3.6.
+    Use music21 v7.3 to run on Python 3.7
+    Use music21 v8.1 to run on Python 3.8/3.9
 
     If you have the wrong version there are several options for getting
     the right one.
@@ -62,7 +62,8 @@ if sys.version_info < minPythonVersion:
          Try running "python3" instead of "python"
 
     - 2. Upgrade pip and setuptools to the latest version
-         and then "upgrade" music21 to pre-version 5.
+         and then "upgrade" music21 to an earlier version.
+         For instance to install version 4 you'd run:
 
          $ pip install --upgrade pip setuptools
          $ pip install 'music21<5.0'
@@ -78,6 +79,9 @@ del minPythonVersionStr
 
 
 __all__ = [
+    # testing routines
+    'mainTest',
+
     'prebase',  # before all
     'base',  # top...
     'sites',  # important
@@ -173,7 +177,7 @@ from music21 import base  # noqa: E402
 from music21 import prebase  # noqa: E402
 from music21 import sites  # noqa: E402
 
-# should this simply be from music21.base import * since __all__ is well defined?
+# should this simply be from music21.base import * since __all__ is well-defined?
 from music21.base import Music21Exception  # noqa: E402
 from music21.base import SitesException  # noqa: E402
 from music21.base import Music21ObjectException  # noqa: E402
@@ -188,11 +192,10 @@ from music21.base import VERSION_STR  # noqa: E402
 
 __version__ = VERSION_STR
 
-# legacy reason why it's here...
 from music21.test.testRunner import mainTest  # noqa: E402
 
 # -----------------------------------------------------------------------------
-# now import all modules so they are accessible from "import music21"
+# now import all modules to make them accessible from "import music21"
 from music21 import abcFormat  # noqa: E402
 from music21 import alpha  # noqa: E402
 from music21 import analysis  # noqa: E402

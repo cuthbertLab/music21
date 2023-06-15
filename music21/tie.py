@@ -3,31 +3,34 @@
 # Name:         tie.py
 # Purpose:      music21 classes for representing ties (visual and conceptual)
 #
-# Authors:      Michael Scott Cuthbert
+# Authors:      Michael Scott Asato Cuthbert
 #               Christopher Ariza
 #
-# Copyright:    Copyright © 2009-2010, 2012, 2015 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2009-2023 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
-
 '''
 The `tie` module contains a single class, `Tie` that represents the visual and
 conceptual idea of tied notes.  They can be start or stop ties.
 '''
+from __future__ import annotations
 
 import unittest
+
 from music21 import exceptions21
 from music21.common.objects import SlottedObjectMixin
 from music21 import prebase
 
-class TieException(exceptions21.Music21Exception):
+# Delete in v10.  Raise ValueError instead.
+class TieException(ValueError, exceptions21.Music21Exception):
     pass
 
 
 # ------------------------------------------------------------------------------
 class Tie(prebase.ProtoM21Object, SlottedObjectMixin):
+    # pylint: disable=line-too-long
     '''
-    Object added to notes that are tied to other notes. The `type` value is one
+    An object added to Notes that are tied to other notes. The `type` value is one
     of start, stop, or continue.
 
     >>> note1 = note.Note()
@@ -40,10 +43,11 @@ class Tie(prebase.ProtoM21Object, SlottedObjectMixin):
     <music21.tie.Tie start>
 
     Generally Ties have a placement of None, but if they are defined
-    as 'above' or 'below' this will be retained.  (see:
-    https://forums.makemusic.com/viewtopic.php?f=12&t=2179&start=0
+    as 'above' or 'below' this will be retained.  (see: `this discussion`_
     for how orientation and placement in musicxml are essentially the same
     content).
+
+    .. _this discussion: https://web.archive.org/web/20210302051136/https://forums.makemusic.com/viewtopic.php?f=12&t=2179&start=0
 
     >>> note1.tie.placement is None
     True
@@ -57,7 +61,7 @@ class Tie(prebase.ProtoM21Object, SlottedObjectMixin):
 
     *  one tie with "continue" implies tied from and tied to.
 
-    The tie.style only applies to ties of type 'start' or 'continue' (and then
+    The tie.style only applies to Tie objects of type 'start' or 'continue' (and then
     only to the next part of the tie).  For instance, if there are two
     tied notes, and the first note has a 'dotted'-start tie, and the
     second note has a 'dashed'-stop tie, the graphical tie itself will be dotted.
@@ -70,7 +74,7 @@ class Tie(prebase.ProtoM21Object, SlottedObjectMixin):
     ('start', 'stop', 'continue', 'let-ring', 'continue-let-ring'), not hello
 
     OMIT_FROM_DOCS
-       optional (to know what notes are next:)
+       optional (to know what notes are next):
           .to = note()   # not implemented yet, b/c of garbage coll.
           .from = note()
 
@@ -86,7 +90,7 @@ class Tie(prebase.ProtoM21Object, SlottedObjectMixin):
         'type',
     )
 
-    _DOC_ATTR = {
+    _DOC_ATTR: dict[str, str] = {
         'type': '''
             The tie type, can be 'start', 'stop', 'continue', 'let-ring', or 'continue-let-ring'.
             ''',
@@ -102,16 +106,17 @@ class Tie(prebase.ProtoM21Object, SlottedObjectMixin):
     VALID_TIE_TYPES = ('start', 'stop', 'continue', 'let-ring', 'continue-let-ring')
 
     # pylint: disable=redefined-builtin
-    def __init__(self, type='start'):  # @ReservedAssignment
+    def __init__(self, type='start'):
         # super().__init__()  # no need for ProtoM21Object or SlottedObjectMixin
         if type not in self.VALID_TIE_TYPES:
             raise TieException(
                 f'Type must be one of {self.VALID_TIE_TYPES}, not {type}')
         # naming this 'type' was a mistake, because cannot create a property of this name.
 
+        # this is not the correct way we want to do this, I don't think...
         self.id = id(self)
         self.type = type
-        self.style = 'normal'
+        self.style = 'normal'  # or dashed
         self.placement = None  # = unknown, can be 'above' or 'below'
 
     # SPECIAL METHODS #
@@ -132,22 +137,25 @@ class Tie(prebase.ProtoM21Object, SlottedObjectMixin):
         >>> t2 == None
         False
         '''
-        if other is None or not isinstance(other, Tie):
+        if not isinstance(other, type(self)):
             return False
         elif self.type == other.type:
             return True
         return False
 
+    def __hash__(self):
+        return id(self) >> 4
+
     def _reprInternal(self):
         return self.type
 
-
 class Test(unittest.TestCase):
-    pass
+    def testCopyAndDeepcopy(self):
+        from music21.test.commonTest import testCopyAll
+        testCopyAll(self, globals())
 
 
 # ------------------------------------------------------------------------------
-
 if __name__ == '__main__':
     import music21
     music21.mainTest(Test)

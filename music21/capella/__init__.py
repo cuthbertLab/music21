@@ -3,11 +3,13 @@
 # Name:         capella/__init__.py
 # Purpose:      parses Capella music Notation
 #
-# Authors:      Michael Scott Cuthbert
+# Authors:      Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2012 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2012 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
+from __future__ import annotations
+
 __all__ = ['fromCapellaXML']
 
 from music21.capella import fromCapellaXML

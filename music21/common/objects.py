@@ -3,27 +3,28 @@
 # Name:         common/objects.py
 # Purpose:      Commonly used Objects and Mixins
 #
-# Authors:      Michael Scott Cuthbert
+# Authors:      Michael Scott Asato Cuthbert
 #               Christopher Ariza
 #
-# Copyright:    Copyright © 2009-2015 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2009-2015 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
+from __future__ import annotations
+
 __all__ = [
     'defaultlist',
     'SingletonCounter',
     'RelativeCounter',
     'SlottedObjectMixin',
     'EqualSlottedObjectMixin',
-    'Iterator',
+    'FrozenObject',
     'Timer',
 ]
 
 import collections
+import inspect
 import time
-from typing import Tuple
 import weakref
-from music21.common.decorators import deprecated
 
 
 class RelativeCounter(collections.Counter):
@@ -165,9 +166,9 @@ class SlottedObjectMixin:
     >>> s.time = 0.125
     >>> s.frequency = 440.0
     >>> #_DOCS_SHOW out = pickle.dumps(s)
-    >>> #_DOCS_SHOW t = pickle.loads(out)
-    >>> t = s #_DOCS_HIDE -- cannot define classes for pickling in doctests
-    >>> t.time, t.frequency
+    >>> #_DOCS_SHOW pickleLoad = pickle.loads(out)
+    >>> pickleLoad = s #_DOCS_HIDE -- cannot define classes for pickling in doctests
+    >>> pickleLoad.time, pickleLoad.frequency
     (0.125, 440.0)
 
     OMIT_FROM_DOCS
@@ -178,15 +179,17 @@ class SlottedObjectMixin:
     >>> bsc = BadSubclass()
     >>> bsc.amplitude = 2
     >>> #_DOCS_SHOW out = pickle.dumps(bsc)
-    >>> #_DOCS_SHOW t = pickle.loads(out)
-    >>> t = bsc #_DOCS_HIDE -- cannot define classes for pickling in doctests
-    >>> t.amplitude
+    >>> #_DOCS_SHOW outLoad = pickle.loads(out)
+    >>> outLoad = bsc #_DOCS_HIDE -- cannot define classes for pickling in doctests
+    >>> outLoad.amplitude
     2
+
+    This is in OMIT
     '''
 
     # CLASS VARIABLES #
 
-    __slots__: Tuple[str, ...] = ()
+    __slots__: tuple[str, ...] = ()
 
     # SPECIAL METHODS #
 
@@ -198,7 +201,7 @@ class SlottedObjectMixin:
         slots = self._getSlotsRecursive()
         for slot in slots:
             sValue = getattr(self, slot, None)
-            if isinstance(sValue, weakref.ref):
+            if isinstance(sValue, weakref.ReferenceType):
                 sValue = sValue()
                 print(f'Warning: uncaught weakref found in {self!r} - {slot}, '
                       + 'will not be wrapped again')
@@ -219,7 +222,7 @@ class SlottedObjectMixin:
         >>> b = beam.Beam()
         >>> sSet = b._getSlotsRecursive()
 
-        sSet is a set -- independent order.  Thus for the doctest
+        sSet is a set -- independent order.  Thus, for the doctest
         we need to preserve the order:
 
         >>> sorted(list(sSet))
@@ -248,8 +251,10 @@ class EqualSlottedObjectMixin(SlottedObjectMixin):
 
     Slots are the only things compared, so do not mix with a __dict__ based object.
 
-    Ignores differences in .id
+    The equal comparison ignores differences in .id
     '''
+    __slots__: tuple[str, ...] = ()
+
     def __eq__(self, other):
         if type(self) is not type(other):
             return False
@@ -267,52 +272,69 @@ class EqualSlottedObjectMixin(SlottedObjectMixin):
         return not (self == other)
 
 
+# my own version which Ned Batchelder (as usual) already anticipated:
+# https://stackoverflow.com/questions/4828080/how-to-make-an-immutable-object-in-python
+class FrozenObject(EqualSlottedObjectMixin):
+    __slots__: tuple[str, ...] = ()
+
+    def _check_init(self, key=None) -> bool:
+        if key == '__class__':
+            return True
+        if not getattr(self, 'frozen', True):
+            return True
+
+        for st in inspect.stack():
+            if (st.frame.f_code.co_name in ('__init__', '__new__', '__setstate__')
+                    and 'self' in st.frame.f_locals
+                    and st.frame.f_locals['self'].__class__ == self.__class__):
+                return True
+        raise TypeError(f'This {self.__class__.__name__} instance is immutable.')
+
+    def __setattr__(self, key: str, value):
+        self._check_init(key)
+        super().__setattr__(key, value)
+
+    def __delattr__(self, key: str):
+        self._check_init(key)
+        super().__delattr__(key)
+
+    def __setitem__(self, key, value):
+        if hasattr(super(), '__setitem__'):
+            self._check_init()
+            super().__setitem__(key, value)
+        raise TypeError(f'{self.__class__} object is not subscriptable')
+
+    def __delitem__(self, key):
+        if hasattr(super(), '__delitem__'):
+            self._check_init()
+            super().__delitem__(key)
+        raise TypeError(f'{self.__class__} object is not subscriptable')
+
+    def __hash__(self) -> int:
+        out = []
+        for s in self._getSlotsRecursive():
+            out.append((s, getattr(self, s)))
+        return hash(tuple(out))
+
+
 # ------------------------------------------------------------------------------
-class Iterator(collections.abc.Iterator):  # pragma: no cover
-    '''
-    A simple Iterator object used to handle iteration of Streams and other
-    list-like objects.
-
-    Deprecated in v7 -- not needed since Python 2.6 became music21 minimum!
-    '''
-    # TODO: remove in v.8
-    def __init__(self, data):
-        self.data = data
-        self.index = 0
-
-    @deprecated('2021 Jan v7', '2022 Jan',
-                'common.Iterator is deprecated.  use `iter(X)` instead.')
-    def __iter__(self):
-        self.index = 0
-        return self
-
-    def __next__(self):
-        if self.index >= len(self.data):
-            raise StopIteration
-        post = self.data[self.index]
-        self.index += 1
-        return post
-
-# ------------------------------------------------------------------------------
-
-
 class Timer:
     '''
     An object for timing. Call it to get the current time since starting.
 
-    >>> t = common.Timer()
-    >>> now = t()
+    >>> timer = common.Timer()
+    >>> now = timer()
     >>> import time  #_DOCS_HIDE
     >>> time.sleep(0.01)  #_DOCS_HIDE  -- some systems are extremely fast or have wide deltas
-    >>> nowNow = t()
+    >>> nowNow = timer()
     >>> nowNow > now
     True
 
     Call `stop` to stop it. Calling `start` again will reset the number
 
-    >>> t.stop()
-    >>> stopTime = t()
-    >>> stopNow = t()
+    >>> timer.stop()
+    >>> stopTime = timer()
+    >>> stopNow = timer()
     >>> stopTime == stopNow
     True
 
@@ -352,17 +374,17 @@ class Timer:
         '''
         # if stopped, gets _tDif; if not stopped, gets current time
         if self._tStop is None:  # if not stopped yet
-            t = time.time() - self._tStart
+            timeDifference = time.time() - self._tStart
         else:
-            t = self._tDif
-        return t
+            timeDifference = self._tDif
+        return timeDifference
 
     def __str__(self):
         if self._tStop is None:  # if not stopped yet
-            t = time.time() - self._tStart
+            timeDifference = time.time() - self._tStart
         else:
-            t = self._tDif
-        return str(round(t, 3))
+            timeDifference = self._tDif
+        return str(round(timeDifference, 3))
 
 
 if __name__ == '__main__':

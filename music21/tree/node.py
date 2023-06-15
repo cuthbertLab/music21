@@ -4,9 +4,9 @@
 # Purpose:      Internal data structures for timespan collections
 #
 # Authors:      Josiah Wolf Oberholtzer
-#               Michael Scott Cuthbert
+#               Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2013-16 Michael Scott Cuthbert and the music21
+# Copyright:    Copyright © 2013-16 Michael Scott Asato Cuthbert and the music21
 #               Project
 # License:      BSD, see license.txt
 # -----------------------------------------------------------------------------
@@ -16,8 +16,10 @@ Internal data structures for timespan collections.
 This is an implementation detail of the TimespanTree class.  Most music21 users
 can happily ignore this module.
 '''
+from __future__ import annotations
 
 import unittest
+
 from music21.tree import core
 from music21.base import Music21Object
 from music21.sorting import SortTuple
@@ -30,7 +32,7 @@ class ElementNode(core.AVLNode):
     endTime and index within a stream, as well as the endTimes and indices of the
     elements to the left and right of it.
 
-    Here's an element node that is at first is no different than an AVL node, except in
+    Here's an element node that is at first is no different from an AVL node, except in
     representation:
 
     >>> n = note.Note('C4')
@@ -143,7 +145,7 @@ class ElementNode(core.AVLNode):
         'subtreeElementsStopIndex',
     )
 
-    _DOC_ATTR = {
+    _DOC_ATTR: dict[str, str] = {
         'payloadElementIndex': r'''
             The index in a stream of the element stored in the payload of this node.
             ''',
@@ -399,7 +401,7 @@ class OffsetNode(ElementNode):
         'payloadElementsStopIndex',
     )
 
-    _DOC_ATTR = {
+    _DOC_ATTR: dict[str, str] = {
         'payload': r'''
             The contents of the node at this point.  Usually a list of ElementTimespans
             or PitchedTimespans.

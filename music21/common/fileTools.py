@@ -3,15 +3,16 @@
 # Name:         common/fileTools.py
 # Purpose:      Utilities for files
 #
-# Authors:      Michael Scott Cuthbert
+# Authors:      Michael Scott Asato Cuthbert
 #               Christopher Ariza
 #
-# Copyright:    Copyright © 2009-2015 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2009-2015 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
 Tools for working with files
 '''
+from __future__ import annotations
 
 import codecs
 import contextlib  # for with statements
@@ -20,7 +21,8 @@ import io
 import pathlib
 import pickle
 import os
-from typing import Union, Any
+import subprocess
+import typing as t
 
 from music21.exceptions21 import Music21Exception
 
@@ -30,6 +32,7 @@ __all__ = [
     'cd',
     'preparePathClassesForUnpickling',
     'restorePathClassesAfterUnpickling',
+    'runSubprocessCapturingStderr',
 ]
 
 
@@ -52,7 +55,7 @@ def cd(targetDir):
         os.chdir(cwd)
 
 
-def readPickleGzip(filePath: Union[str, pathlib.Path]) -> Any:
+def readPickleGzip(filePath: str | pathlib.Path) -> t.Any:
     '''
     Read a gzip-compressed pickle file, uncompress it, unpickle it, and
     return the contents.
@@ -62,7 +65,7 @@ def readPickleGzip(filePath: Union[str, pathlib.Path]) -> Any:
         try:
             uncompressed = pickledFile.read()
             newMdb = pickle.loads(uncompressed)
-        except Exception as e:  # pylint: disable=broad-except
+        except Exception as e:  # pylint: disable=broad-exception-caught
             # pickle exceptions cannot be caught directly
             # because they might come from pickle or _pickle and the latter cannot
             # be caught.
@@ -78,7 +81,7 @@ def readFileEncodingSafe(filePath, firstGuess='utf-8') -> str:
     Slow, but will read a file of unknown encoding as safely as possible using
     the chardet package.
 
-    Let's try to load this file as ascii -- it has a copyright symbol at the top
+    Let's try to load this file as ascii -- it has a copyright symbol at the top,
     so it won't load in Python3:
 
     >>> import os
@@ -96,7 +99,7 @@ def readFileEncodingSafe(filePath, firstGuess='utf-8') -> str:
     >>> data[0:30]
     '# -*- coding: utf-8 -*-\n# ----'
 
-    Well, that's nothing, since the first guess here is utf-8 and it's right. So let's
+    Well, that's nothing, since the first guess here is utf-8, and it's right. So let's
     give a worse first guess:
 
     >>> data = common.readFileEncodingSafe(c, firstGuess='SHIFT_JIS')  # old Japanese standard
@@ -116,7 +119,7 @@ def readFileEncodingSafe(filePath, firstGuess='utf-8') -> str:
         import chardet  # type: ignore
         with io.open(filePath, 'rb') as thisFileBinary:
             dataBinary = thisFileBinary.read()
-            encoding = chardet.detect(dataBinary)['encoding']
+            encoding = chardet.detect(dataBinary)['encoding'] or 'ascii'
             return codecs.decode(dataBinary, encoding)
     # might also raise FileNotFoundError, but let that bubble
 
@@ -147,6 +150,25 @@ def restorePathClassesAfterUnpickling():
         pathlib.PosixPath = _storedPathlibClasses['posixPath']
     else:
         pathlib.WindowsPath = _storedPathlibClasses['windowsPath']
+
+
+def runSubprocessCapturingStderr(subprocessCommand):
+    '''
+    Run a subprocess command, capturing stderr and
+    only show the error if an exception is raised.
+    '''
+    completed_process = subprocess.run(subprocessCommand, capture_output=True, check=False)
+    if completed_process.returncode != 0:
+        # Raise same exception class as findNumberedPNGPath()
+        # for backward compatibility
+        stderr_bytes = completed_process.stderr
+        try:
+            import locale
+            stderr_str = stderr_bytes.decode(locale.getpreferredencoding(do_setlocale=False))
+        except UnicodeDecodeError:
+            # not really a str, but best we can do.
+            stderr_str = stderr_bytes.decode('ascii', errors='ignore')
+        raise IOError(stderr_str)
 
 
 # -----------------------------------------------------------------------------

@@ -4,16 +4,16 @@
 # Purpose:      music21 module for evaluating correcting of output from OMR software
 #
 # Authors:      Maura Church
-#               Michael Scott Cuthbert
+#               Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2014 Maura Church, Michael Scott Cuthbert,
-#               and the music21 Project
+# Copyright:    Copyright © 2014 Maura Church, Michael Scott Asato Cuthbert,
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
 This module takes two XML files and displays the number of measures that
 differ between the two before and after running the combined correction models
 '''
+from __future__ import annotations
 
 from music21.omr import correctors
 from music21 import converter
@@ -125,25 +125,24 @@ class OmrGroundTruthPair:
             self.groundM21Score = converter.parse(self.groundPath)
 
         return correctors.ScoreCorrector(self.groundM21Score)
-#
-#        UNUSED
-#     def getDifferencesBetweenAlignedScores(self):
-#         '''
-#         Returns the number of differences (int) between
-#         two scores with aligned indices
-#         '''
-#         self.numberOfDifferences = 0
-#         aList = self.omrScore.getAllHashes()
-#         bList = self.groundScore.getAllHashes()
-#         for i in range(len(aList)):
-#             for j in range(min(len(aList[i]), len(bList[i]))):
-#                 a = aList[i][j]
-#                 b = bList[i][j]
-#                 s = difflib.SequenceMatcher(None, a, b)
-#                 ratio = s.ratio()
-#                 measureErrors = (1-ratio) * len(a)
-#                 self.numberOfDifferences += measureErrors
-#         return self.numberOfDifferences
+
+    # def getDifferencesBetweenAlignedScores(self):
+    #     '''
+    #     Returns the number of differences (int) between
+    #     two scores with aligned indices
+    #     '''
+    #     self.numberOfDifferences = 0
+    #     aList = self.omrScore.getAllHashes()
+    #     bList = self.groundScore.getAllHashes()
+    #     for i in range(len(aList)):
+    #         for j in range(min(len(aList[i]), len(bList[i]))):
+    #             a = aList[i][j]
+    #             b = bList[i][j]
+    #             s = difflib.SequenceMatcher(None, a, b)
+    #             ratio = s.ratio()
+    #             measureErrors = (1-ratio) * len(a)
+    #             self.numberOfDifferences += measureErrors
+    #     return self.numberOfDifferences
 
     def substCost(self, x, y):
         '''
@@ -156,13 +155,13 @@ class OmrGroundTruthPair:
 
     def insertCost(self, x):
         '''
-        define the insert cost for x and y (1)
+        define the insertion cost for x and y (1)
         '''
         return 1
 
     def deleteCost(self, x):
         '''
-        define the delete cost for x and y (1)
+        define the deletion cost for x and y (1)
         '''
         return 1
 
@@ -216,6 +215,7 @@ class OmrGroundTruthPair:
 
 def evaluateCorrectingModel(omrPath, groundTruthPath, debug=None,
                             originalDifferences=None, runOnePart=False):
+    # noinspection PyShadowingNames
     '''
     Get a dictionary showing the efficacy of the omr.correctors.ScoreCorrector on an OMR Score
     by comparing it to the GroundTruth.

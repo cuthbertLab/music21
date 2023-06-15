@@ -4,23 +4,24 @@
 # Purpose:      music21 classes for serial searching
 #
 # Authors:      Carl Lian
-#               Michael Scott Cuthbert
+#               Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2009-2012, 2016 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2009-2012, 2016 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # -------------------------------------------------
-import copy
-import unittest
+from __future__ import annotations
 
 from collections import Counter
+import copy
 from operator import attrgetter
+import unittest
 
 from music21 import base
 from music21 import common
 from music21 import environment
+from music21.serial import pcToToneRow, ToneRow
 from music21 import spanner
 from music21 import stream
-from music21.serial import pcToToneRow, ToneRow
 
 environLocal = environment.Environment()
 
@@ -45,9 +46,8 @@ class ContiguousSegmentOfNotes(base.Music21Object):
     >>> cdContiguousSegment = search.serial.ContiguousSegmentOfNotes([n1, n2], s, 0)
     >>> cdContiguousSegment
     <music21.search.serial.ContiguousSegmentOfNotes ['C4', 'D4']>
-
     '''
-    _DOC_ATTR = {
+    _DOC_ATTR: dict[str, str] = {
         'segment': 'The list of notes and chords in the contiguous segment.',
         'containerStream': '''
             The stream containing the contiguous segment -
@@ -60,7 +60,7 @@ class ContiguousSegmentOfNotes(base.Music21Object):
             A list of pitch classes representing the way the contiguous
             segment of notes is being read as a sequence of single pitches. Set to None
             unless the container stream is being searched for segments or multisets
-            (for example, using :func:`~music21.search.serial.findSegments`), in which case
+            (for example, using :meth:`~music21.search.serial.SegmentMatcher.find`), in which case
             the representation depends on the segments or multisets being searched for.
             If there are no chords in the segment, this attribute will simply give the
             pitch classes of the notes in the segment.''',
@@ -75,11 +75,12 @@ class ContiguousSegmentOfNotes(base.Music21Object):
     _DOC_ORDER = ['startMeasureNumber', 'startOffset', 'zeroCenteredTransformationsFromMatched',
                   'originalCenteredTransformationsFromMatched']
 
-    def __init__(self, segment=None, containerStream=None, partNumber=0):
-        super().__init__()
+    def __init__(self, segment=None, containerStream=None, partNumber=0, **keywords):
+        super().__init__(**keywords)
         self.segment = segment
         self.containerStream = containerStream
         self.partNumber = partNumber
+        self.activeSegment = []
         self.matchedSegment = None
 
     def _reprInternal(self):
@@ -91,7 +92,9 @@ class ContiguousSegmentOfNotes(base.Music21Object):
 
     @property
     def startMeasureNumber(self):
-        '''The measure number on which the contiguous segment begins.'''
+        '''
+        The measure number on which the contiguous segment begins.
+        '''
         if self.segment:
             return self.segment[0].measureNumber
         else:
@@ -122,7 +125,7 @@ class ContiguousSegmentOfNotes(base.Music21Object):
             matchedRow = self.matchedSegment
         else:
             matchedRow = pcToToneRow(self.matchedSegment)
-        return(activeRow, matchedRow)
+        return (activeRow, matchedRow)
 
     @property
     def zeroCenteredTransformationsFromMatched(self):
@@ -138,7 +141,8 @@ class ContiguousSegmentOfNotes(base.Music21Object):
 
     @property
     def originalCenteredTransformationsFromMatched(self):
-        '''The list of original-centered transformations taking a segment being
+        '''
+        The list of original-centered transformations taking a segment being
         searched for to a found segment, for example, in
         :func:`~music21.search.serial.findTransformedSegments`.
         For an explanation of the
@@ -225,9 +229,9 @@ class ContiguousSegmentSearcher:
 
     The main subtleties of this function lie in how each reps setting works in
     conjunction with chords when
-    includeChords is set to True, and how the lengths of the segments are measured.
+    `includeChords` is set to `True`, and how the lengths of the segments are measured.
     However, let us first examine what happens when includeChords
-    is set to False, to get an idea of how the function works.
+    is set to `False`, to get an idea of how the function works.
 
     To begin, we create a stream on which we will apply the function.
 
@@ -410,7 +414,7 @@ class ContiguousSegmentSearcher:
     was set to 'skipConsecutive', the second
     B major chord (bMaj2) is never considered, as the chord right
     before it is the same. As was mentioned before,
-    not all of the segments found have exactly 4 notes total.
+    not all the segments found have exactly 4 notes total.
     This is because, for each segment, only a subset
     of the notes contained in the first and last elements are read. Given one of the
     found segments, it will always
@@ -596,7 +600,7 @@ class ContiguousSegmentSearcher:
         self.searchLength = length
         self.listOfContiguousSegments = []
         hasParts = True
-        partList = self.stream.recurse().getElementsByClass('Part')
+        partList = self.stream[stream.Part]
         if not partList:
             partList = [self.stream]
             hasParts = False
@@ -668,7 +672,7 @@ class ContiguousSegmentSearcher:
                 self.activeChordList = activeChordList
                 self.addActiveChords(partNumber)
                 numCSNAdded += 1
-            elif (lengthOfActive >= self.searchLength):
+            elif lengthOfActive >= self.searchLength:
                 numChordsToDelete += 1
             else:
                 break
@@ -812,7 +816,7 @@ class ContiguousSegmentSearcher:
                     # thus remove from listOfContiguousSegments
                     self.listOfContiguousSegments.pop()
 
-            elif (lengthOfActive >= self.searchLength):
+            elif lengthOfActive >= self.searchLength:
                 numChordsToDelete += 1
             else:
                 break
@@ -1168,7 +1172,7 @@ class SegmentMatcher:
     @staticmethod
     def normalize(segment):
         '''
-        Normalize an input segment for searching. For this class just changes
+        Normalize an input segment for searching. This class just changes
         letters to numbers, etc.
 
         Staticmethod:
@@ -1184,7 +1188,7 @@ class SegmentMatcher:
         '''
         Returns True if these are equal in some way.
 
-        Here's it's simple -- are they equal, but will be harder for other classes.
+        Here's it is simple -- are they equal? But it will be harder for other classes.
         '''
         return bool(searchSegment == subsetToCheck)
 

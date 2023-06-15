@@ -5,15 +5,13 @@
 #
 # Authors:      Emily Zhang
 #
-# Copyright:    Copyright © 2016 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2016 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
-import unittest
-from copy import deepcopy
-from typing import Optional, TypeVar
+from __future__ import annotations
 
-from music21.alpha.analysis import aligner
-from music21.alpha.analysis import ornamentRecognizer
+from copy import deepcopy
+import unittest
 
 from music21 import duration
 from music21 import expressions
@@ -22,9 +20,8 @@ from music21 import note
 from music21 import pitch
 from music21 import stream
 
-# noinspection PyShadowingBuiltins
-_T = TypeVar('_T')
-
+from music21.alpha.analysis import aligner
+from music21.alpha.analysis import ornamentRecognizer
 
 class OMRMidiFixer:
     '''
@@ -63,7 +60,7 @@ class DeleteFixer(OMRMidiFixer):
         for (midiRef, omrRef, op) in self.changes:
             if self.checkIfNoteInstance(midiRef, omrRef) is False:
                 continue
-            # if the are the same, don't bother to try changing it
+            # if they are the same, don't bother to try changing it
             # 3 is the number of noChange Ops
             if isinstance(op, aligner.ChangeOps) and op == aligner.ChangeOps.NoChange:
                 continue
@@ -240,13 +237,16 @@ class EnharmonicFixer(OMRMidiFixer):
     <music21.pitch.Accidental sharp>
     '''
     def fix(self):
+        '''
+        Fixes the enharmonic errors in the OMR by changing the pitch of the note.
+        '''
         super().fix()
         for (midiRef, omrRef, op) in self.changes:
             omrRef.style.color = 'black'
             # if they're not notes, don't bother with rest
             if self.checkIfNoteInstance(midiRef, omrRef) is False:
                 continue
-            # if the are the same, don't bother to try changing it
+            # if they are the same, don't bother to try changing it
             # 3 is the number of noChange Ops
             if isinstance(op, aligner.ChangeOps) and op == aligner.ChangeOps.NoChange:
                 continue
@@ -310,24 +310,47 @@ class EnharmonicFixer(OMRMidiFixer):
 
 
     def isEnharmonic(self, midiRef, omrRef):
+        '''
+        Returns True if the omrRef is enharmonic to the midiRef, False otherwise
+        '''
         return midiRef.pitch.isEnharmonic(omrRef.pitch)
 
     def hasAcc(self, omrRef):
+        '''
+        Returns True if the omrRef has an accidental, False otherwise
+        '''
         return omrRef.pitch.accidental is not None
 
     def hasNatAcc(self, omrRef):
+        '''
+        Returns True if the omrRef has a natural accidental, False otherwise
+        '''
         return self.hasAcc(omrRef) and omrRef.pitch.accidental.name == 'natural'
 
     def hasSharpFlatAcc(self, omrRef):
+        '''
+        Returns True if the omrRef has a sharp or flat accidental, False otherwise
+        '''
         return self.hasAcc(omrRef) and omrRef.pitch.accidental.name != 'natural'
 
     def stepEq(self, midiRef, omrRef):
+        '''
+        Returns True if the steps are equal, False otherwise
+        '''
         return midiRef.step == omrRef.step
 
     def stepNotEq(self, midiRef, omrRef):
+        '''
+        Returns True if the steps are not equal, False otherwise
+        '''
         return midiRef.step != omrRef.step
 
     def intervalTooBig(self, midiRef, omrRef, setInt=5):
+        '''
+        Returns True if the intervalClass between the two notes is greater than setInt.
+
+        Note that intervalClass and not actual interval size is used.
+        '''
         if interval.notesToChromatic(midiRef, omrRef).intervalClass > setInt:
             return True
         return False
@@ -353,7 +376,7 @@ class OrnamentFixer(OMRMidiFixer):
             self.recognizers = recognizers
         self.markChangeColor = markChangeColor
 
-    def findOrnament(self, busyNotes, simpleNotes) -> Optional[expressions.Ornament]:
+    def findOrnament(self, busyNotes, simpleNotes) -> expressions.Ornament | None:
         '''
         Finds an ornament in busyNotes based from simpleNote
         using provided recognizers.
@@ -371,8 +394,8 @@ class OrnamentFixer(OMRMidiFixer):
         return None
 
     def addOrnament(self,
-                    selectedNote: 'music21.note.Note',
-                    ornament: 'music21.expressions.Ornament',
+                    selectedNote: note.Note,
+                    ornament: expressions.Ornament,
                     *,
                     show=False) -> bool:
         '''
@@ -392,15 +415,15 @@ class OrnamentFixer(OMRMidiFixer):
             return True
         return False
 
-    def fix(self: _T, *, show=False, inPlace=True) -> Optional[_T]:
+    def fix(self, *, show=False, inPlace=True) -> OMRMidiFixer | None:
         '''
-        Corrects missed ornaments in omr stream according to mid stream
+        Corrects missed ornaments in omrStream according to midiStream
         :param show: Whether to show results
         :param inPlace: Whether to make changes to own omr stream or
         return a new OrnamentFixer with changes
         '''
         changes = self.changes
-        sa = None
+        sa: aligner.StreamAligner | None = None
         omrNotesLabeledOrnament = []
         midiNotesAlreadyFixedForOrnament = []
 
@@ -441,8 +464,11 @@ class OrnamentFixer(OMRMidiFixer):
             self.omrStream.show()
             self.midiStream.show()
 
-        if not inPlace:
+        if not inPlace and sa is not None:
+            # the "and sa is not None" is just for mypy/typing.
             return TrillFixer(sa.changes, sa.targetStream, sa.sourceStream)
+        else:
+            return None
 
 def getNotesWithinDuration(startingGeneralNote, totalDuration, referenceStream=None):
     '''
@@ -504,11 +530,17 @@ class TurnFixer(OrnamentFixer):
         super().__init__(changes, midiStream, omrStream, recognizer)
 
 class Test(unittest.TestCase):
+    def testCopyAndDeepcopy(self):
+        from music21.test.commonTest import testCopyAll
+        testCopyAll(self, globals())
+
     def measuresEqual(self, m1, m2):
         '''
-        Returns a tuple of (True/False, reason)
+        Returns a tuple of (bool, reason) where the first element is
+        whether the measures are equal and the second (`reason`) is a string
+        explaining why they are unequal.
 
-        Reason is '' if True
+        Reason is an empty string if the measures are equal.
         '''
         if len(m1) != len(m2):
             msg = 'not equal length'
