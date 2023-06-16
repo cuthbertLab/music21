@@ -5349,7 +5349,7 @@ class MeasureParser(XMLParserBase):
         # If a duration is provided, set length of the FigureBassIndication
         if d:
             fbi.quarterLength = d.quarterLength
-
+        print(fbi)
         self.stream.insert(offsetFbi, fbi)
         return fbi
 
@@ -5358,7 +5358,6 @@ class MeasureParser(XMLParserBase):
         A helper function for prefixes and suffixes of figure numbers.
         Called two times from xmlToFiguredBass().
         '''
-
         if figure.findall(presuf):
             for fix in figure.findall(presuf):
                 if fix.text:
@@ -5366,8 +5365,9 @@ class MeasureParser(XMLParserBase):
                     if mod:
                         return mod
                     else:
-                        warnings.warn(f'''{fix.text} is currently not supported. Please look into 
-                                      the modifiersDictXmlToM21 for changes, that fit your needs.''')
+                        warnings.warn(f'''{fix.text} is currently not supported. Please look into
+                                      the modifiersDictXmlToM21 and make your changes, that will
+                                      fit your needs.''')
         return ''
 
     def xmlDirection(self, mxDirection):
