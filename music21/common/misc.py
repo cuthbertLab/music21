@@ -225,7 +225,7 @@ def runningInNotebook() -> bool:
         return False
 
 
-@deprecated
+@deprecated('v9', 'v10', 'use runningInNotebook() instead')
 def runningUnderIPython() -> bool:  # pragma: no cover
     '''
     DEPRECATED in v9: use runningInNotebook() instead

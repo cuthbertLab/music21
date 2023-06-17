@@ -425,8 +425,10 @@ def registerSubConverter(newSubConverter: type[subConverters.SubConverter]) -> N
     '''
     _registeredSubConverters.appendleft(newSubConverter)
 
-@common.deprecated
-def registerSubconverter(newSubConverter: type[subConverters.SubConverter]) -> None:
+@common.deprecated('v9', 'v10', 'use unregisterSubconverter with capital C')
+def registerSubconverter(
+    newSubConverter: type[subConverters.SubConverter]
+) -> None:  # pragma: no cover
     '''
     Deprecated: use registerSubConverter w/ capital "C" instead.
     '''
@@ -484,6 +486,16 @@ def unregisterSubConverter(
         else:
             raise ConverterException(
                 f'Could not remove {removeSubConverter!r} from registered subConverters')
+
+
+@common.deprecated('v9', 'v10', 'use unregisterSubConverter with capital C')
+def unregisterSubconverter(
+    newSubConverter: type[subConverters.SubConverter]
+) -> None:  # pragma: no cover
+    '''
+    Deprecated: use unregisterSubConverter w/ capital "C" instead.
+    '''
+    unregisterSubConverter(newSubConverter)
 
 
 # ------------------------------------------------------------------------------
@@ -795,6 +807,13 @@ class Converter:
 
     # -----------------------------------------------------------------------#
     # SubConverters
+    @common.deprecated('v9', 'v10', 'use subConvertersList with capital C')
+    def subconvertersList(
+        self,
+        converterType: t.Literal['any', 'input', 'output'] = 'any'
+    ) -> list[type[subConverters.SubConverter]]:  # pragma: no cover
+        return self.subConvertersList(converterType)
+
     @staticmethod
     def subConvertersList(
         converterType: t.Literal['any', 'input', 'output'] = 'any'
@@ -926,6 +945,10 @@ class Converter:
 
         return filteredSubConvertersList
 
+    @common.deprecated('v9', 'v10', 'use defaultSubConverters with capital C')
+    def defaultSubconverters(self) -> list[type[subConverters.SubConverter]]:  # pragma: no cover
+        return self.defaultSubConverters()
+
     @staticmethod
     def defaultSubConverters() -> list[type[subConverters.SubConverter]]:
         '''
@@ -969,6 +992,12 @@ class Converter:
                     and issubclass(possibleSubConverter, subConverters.SubConverter)):
                 defaultSubConverters.append(possibleSubConverter)
         return defaultSubConverters
+
+    @common.deprecated('v9', 'v10', 'use getSubConverterFormats with capital C')
+    def getSubconverterFormats(
+        self
+    ) -> dict[str, type[subConverters.SubConverter]]:  # pragma: no cover
+        return self.getSubConverterFormats()
 
     @staticmethod
     def getSubConverterFormats() -> dict[str, type[subConverters.SubConverter]]:
@@ -1042,6 +1071,10 @@ class Converter:
             raise ConverterException(f'no converter available for format: {converterFormat}')
         subConverterClass = scf[converterFormat]
         return subConverterClass()
+
+    @common.deprecated('v9', 'v10', 'use setSubConverterFromFormat with capital C')
+    def setSubconverterFromFormat(self, converterFormat: str):  # pragma: no cover
+        self.setSubConverterFromFormat(converterFormat)
 
     def setSubConverterFromFormat(self, converterFormat: str):
         '''

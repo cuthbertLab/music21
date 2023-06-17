@@ -206,6 +206,6 @@ And this Humdrum about which you speak?
     Information on Humdrum can be found here at the following links:
 
     * https://www.humdrum.org
-    * http://kern.humdrum.org
+    * https://kern.humdrum.org
 
 
