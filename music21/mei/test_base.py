@@ -4143,7 +4143,7 @@ class Test(unittest.TestCase):
             self.assertEqual(1, len(actual[eachN][0]))
             self.assertIsInstance(actual[eachN][0][0], note.Rest)
             self.assertEqual(activeMeter.barDuration.quarterLength,
-                            actual['4'][0][0].duration.quarterLength)
+                             actual['4'][0][0].duration.quarterLength)
             self.assertIsInstance(actual[eachN].rightBarline, bar.Repeat)
             self.assertEqual('final', actual[eachN].rightBarline.type)
 
@@ -4189,6 +4189,7 @@ class Test(unittest.TestCase):
         expected = {'1': mockMeasure.return_value}
 
         actual = base.measureFromElement(elem, backupNum, expectedNs, slurBundle, activeMeter)
+
         self.assertDictEqual(expected, actual)
         # ensure staffFromElement() was called properly
         mockStaffFE.assert_called_once_with(staffElem, slurBundle=slurBundle)
@@ -4237,10 +4238,9 @@ class Test(unittest.TestCase):
         # prepare mock of staffFromElement(), which just needs to return several unique things
         mockStaffFE.return_value = 'staffFromElement() return value'
         # prepare the expected return value
-        expected = {'1': mockMeasure.return_value, 'fb': {'fb': []}}
+        expected = {'1': mockMeasure.return_value}
 
         actual = base.measureFromElement(elem, backupNum, expectedNs, slurBundle, activeMeter)
-        actual['fb'] = {'fb': []}
 
         self.assertDictEqual(expected, actual)
         # ensure staffFromElement() was called properly

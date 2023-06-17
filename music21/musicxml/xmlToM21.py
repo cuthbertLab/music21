@@ -842,7 +842,6 @@ class MusicXMLImporter(XMLParserBase):
         self.m21PartObjectsById = {}
         self.partGroupList = []
         self.parts = []
-        # self.fbis: list[harmony.FiguredBassIndication] | None = None
 
         self.musicXmlVersion = defaults.musicxmlVersion
 
@@ -926,10 +925,6 @@ class MusicXMLImporter(XMLParserBase):
             if part is not None:  # for instance, in partStreams
                 s.coreInsert(0.0, part)
                 self.m21PartObjectsById[partId] = part
-
-        #if self.fbis:
-        #    for fbi in self.fbis:
-        #        s.insert(fbi[0], fbi[1])
 
         self.partGroups()
 
@@ -2364,12 +2359,6 @@ class PartParser(XMLParserBase):
             self.stream.insert(0, self.activeMultiMeasureRestSpanner)
             self.activeMultiMeasureRestSpanner = None
 
-    #def appendFbis(self, fbi, measureOffset):
-    #    absOffset = self.lastMeasureOffset + measureOffset
-    #    if self.parent.fbis:
-    #        self.parent.fbis.append((absOffset, fbi))
-    #    else:
-    #        self.parent.fbis = [(absOffset, fbi)]
 
 # -----------------------------------------------------------------------------
 class MeasureParser(XMLParserBase):
