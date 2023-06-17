@@ -471,10 +471,9 @@ def allPartsPresent(scoreElem) -> tuple[str, ...]:
     # Get information of possible <harm> tags in the score. If there are tags prepare a list to
     # store them and process them later.
     # TODO: Maybe to be put in a separate function e.g. like allPartsPresent
-    figuredBassQuery = f'.//{MEI_NS}fb'
-    if scoreElem.findall(figuredBassQuery):
-        environLocal.printDebug('harm tag found!')
-        partNs.append('fb')
+    #figuredBassQuery = f'.//{MEI_NS}fb'
+    #if scoreElem.findall(figuredBassQuery):
+    #    environLocal.printDebug('harm tag found!')
     # here other <harm> elements (e.g. chordsymbols) can be added.
     # … 'if …'
 
@@ -3618,10 +3617,11 @@ def scoreFromElement(elem, slurBundle):
     # TODO: Replace this with a better solution.
     # Extract collected <harm> information stored in the dict unter the 'fb' key
     harms: list[dict] | None = None
-    if 'fb' in parsed.keys():
-        harms = parsed['fb'][0]
-        del parsed['fb']
-        allPartNs = allPartNs[0:-1]
+    print('fb' in parsed.keys())
+    #if 'fb' in parsed.keys():
+    #    harms = parsed['fb'][0]
+    #    del parsed['fb']
+    #    allPartNs = allPartNs[0:-1]
 
     theScore = [stream.Part() for _ in range(len(allPartNs))]
     for i, eachN in enumerate(allPartNs):
@@ -3632,11 +3632,11 @@ def scoreFromElement(elem, slurBundle):
     theScore = stream.Score(theScore)
 
     # loop through measures to insert harm elements from harms list at the right offsets
-    if harms:
-        for index, measureOffset in enumerate(theScore.measureOffsetMap().keys()):
-            hms = harms[index]['fb']
-            for h in hms:
-                theScore.insert(measureOffset + h[0], h[1])
+    #if harms:
+    #    for index, measureOffset in enumerate(theScore.measureOffsetMap().keys()):
+    #        hms = harms[index]['fb']
+    #        for h in hms:
+    #            theScore.insert(measureOffset + h[0], h[1])
 
     # put slurs in the Score
     theScore.append(list(slurBundle))
