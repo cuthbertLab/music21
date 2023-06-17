@@ -4644,7 +4644,7 @@ class MeasureExporter(XMLExporterBase):
 
         >>> fbi = harmony.FiguredBassIndication()
         >>> fbi.quarterLength = 2
-        >>> fbi.fig_noation = '#,6b'
+        >>> fbi.fig_notation = '#,6b'
 
         >>> MEX = musicxml.m21ToXml.MeasureExporter()
         

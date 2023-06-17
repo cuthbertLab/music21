@@ -2509,9 +2509,9 @@ class FiguredBassIndication(Harmony):
     The FiguredBassIndication object derives from the Harmony object and can be used
     in the following way:
 
-    >>> fbi = harmony.FiguredBassIndication('#,6#')
+    >>> fbi = harmony.FiguredBassIndication('#,6#', part='1')
     >>> fbi
-    <FiguredBassIndication figures: #,6#>
+    <FiguredBassIndication figures: #,6# part: 1>
 
     The single figures are stored as figuredBass.notation.Figure objects:
     >>> fbi.fig_notation.figures
@@ -2520,7 +2520,9 @@ class FiguredBassIndication(Harmony):
     '''
 
     isFigure: bool = True
-    part: str | None = None 
+    part: str | None = None
+    _figs: str = ''
+
     def __init__(self, figs: str | list | None = None, extenders: list[bool] | None = None , 
                  part: str | None=None, **keywords):
         super().__init__(**keywords)

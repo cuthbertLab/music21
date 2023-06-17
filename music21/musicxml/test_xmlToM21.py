@@ -1515,7 +1515,8 @@ class Test(unittest.TestCase):
         self.assertIs(len(s.flatten().getElementsByClass(harmony.FiguredBassIndication)), 12)
 
         s = converter.parse(xml_dir / 'piece01-bwv-1023-1-beginning.musicxml')
-        self.assertEqual(s.flatten().getElementsByClass(harmony.FiguredBassIndication)[12], '<FiguredBassIndication figures: 6,5♮>')
+        self.assertEqual(s.flatten().getElementsByClass(harmony.FiguredBassIndication)[12],
+                         '<FiguredBassIndication figures: 6,5♮ part: P2>')
 
 
 if __name__ == '__main__':

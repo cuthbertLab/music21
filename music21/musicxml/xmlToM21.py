@@ -5265,27 +5265,25 @@ class MeasureParser(XMLParserBase):
 
     def xmlToFiguredBass(self, mxFiguredBass) -> harmony.FiguredBassIndication:
         # noinspection PyShadowingNames
-        '''
+        """
         Converts a figured bass tag in musicxml to a harmony.FiguredBassIndication object:
 
         >>> from xml.etree.ElementTree import fromstring as EL
         >>> MP = musicxml.xmlToM21.MeasureParser()
 
-        >>> fbStr = """
-                    <figured-bass>
-                      <figure>
-                        <figure-number>5</figure-number>
-                      </figure>
-                      <figure>
-                        <figure-number>4</figure-number>
-                      </figure>
-                    </figured-bass>
-                    """
+        >>> fbStr = '''<figured-bass>
+        ...           <figure>
+        ...             <figure-number>5</figure-number>
+        ...           </figure>
+        ...           <figure>
+        ...             <figure-number>4</figure-number>
+        ...           </figure>
+        ...         </figured-bass>'''
         >>> mxFigures = EL(fbStr)
         >>> fbi = MP.xmlToFiguredBass(mxFigures)
         >>> fbi
-        <FiguredBassIndication figures: 5,4>
-        '''
+        <FiguredBassIndication figures: 5,4 part: >
+        """
 
         fb_strings: list[str] = []
         fb_extenders: list[bool] = []
@@ -5320,7 +5318,6 @@ class MeasureParser(XMLParserBase):
                     # collect information on extenders
                     if el.tag == 'extend':
                         if 'type' in el.attrib.keys():
-                            print((el.attrib['type'] in ['stop', 'continue', 'start']))
                             fb_extenders.append((el.attrib['type'] in ['stop', 'continue', 'start']))
                 if not subElement.findall('extend'):
                     fb_extenders.append(False)

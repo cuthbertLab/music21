@@ -199,7 +199,7 @@ class Test(unittest.TestCase):
         staffDefs[0].get = mock.MagicMock(return_value='1')
         elem = mock.MagicMock(spec_set=ETree.Element)
         elem.findall = mock.MagicMock(return_value=staffDefs)
-        expected = ['1', 'fb']
+        expected = ['1']
         actual = base.allPartsPresent(elem)
         self.assertSequenceEqual(expected, actual)
 
@@ -212,7 +212,7 @@ class Test(unittest.TestCase):
             staffDefs[i].get = mock.MagicMock(return_value=str(i + 1))
         elem = mock.MagicMock(spec_set=ETree.Element)
         elem.findall = mock.MagicMock(return_value=staffDefs)
-        expected = ['1', '2', '3', '4', 'fb']
+        expected = ['1', '2', '3', '4']
         actual = base.allPartsPresent(elem)
         self.assertSequenceEqual(expected, actual)
 
@@ -225,7 +225,7 @@ class Test(unittest.TestCase):
             staffDefs[i].get = mock.MagicMock(return_value=str((i % 4) + 1))
         elem = mock.MagicMock(spec_set=ETree.Element)
         elem.findall = mock.MagicMock(return_value=staffDefs)
-        expected = ['1', '2', '3', '4', 'fb']
+        expected = ['1', '2', '3', '4']
         actual = base.allPartsPresent(elem)
         self.assertSequenceEqual(expected, actual)
 
@@ -3929,7 +3929,7 @@ class Test(unittest.TestCase):
             elem.append(eachStaff)
         # @n="4" is in "expectedNs" but we're leaving it out as part of the test
         backupNum = 900  # should be ignored by measureFromElement()
-        expectedNs = ['1', '2', '3', '4', 'fb']
+        expectedNs = ['1', '2', '3', '4']
         slurBundle = mock.MagicMock(name='slurBundle')
         activeMeter = mock.MagicMock(name='activeMeter')
         activeMeter.barDuration = duration.Duration(4.0)
@@ -3963,7 +3963,7 @@ class Test(unittest.TestCase):
         for eachStaff in innerStaffs:
             mockStaffFE.assert_any_call(eachStaff, slurBundle=slurBundle)
         # ensure Measure.__init__() was called properly
-        self.assertEqual(len(expected) - 1, mockMeasure.call_count)
+        self.assertEqual(len(expected), mockMeasure.call_count)
         for i in range(len(innerStaffs)):
             mockMeasure.assert_any_call(i, number=int(elem.get('n')))
         mockMeasure.assert_any_call([mockVoice.return_value], number=int(elem.get('n')))
@@ -3999,14 +3999,14 @@ class Test(unittest.TestCase):
             elem.append(eachStaff)
         # @n="4" is in "expectedNs" but we're leaving it out as part of the test
         backupNum = 900  # should be ignored by measureFromElement()
-        expectedNs = ['1', '2', '3', '4', 'fb']
+        expectedNs = ['1', '2', '3', '4']
         slurBundle = spanner.SpannerBundle()
         activeMeter = meter.TimeSignature('8/8')  # bet you thought this would be 4/4, eh?
 
         actual = base.measureFromElement(elem, backupNum, expectedNs, slurBundle, activeMeter)
 
         # ensure the right number and @n of parts
-        self.assertEqual(5, len(actual.keys()))
+        self.assertEqual(4, len(actual.keys()))
         for eachN in expectedNs:
             self.assertTrue(eachN in actual)
         # ensure the measure number is set properly,
@@ -4055,7 +4055,7 @@ class Test(unittest.TestCase):
             elem.append(eachStaff)
         # @n="4" is in "expectedNs" but we're leaving it out as part of the test
         backupNum = 900  # should be used by measureFromElement()
-        expectedNs = ['1', '2', '3', '4', 'fb']
+        expectedNs = ['1', '2', '3', '4']
         slurBundle = mock.MagicMock(name='slurBundle')
         activeMeter = mock.MagicMock(name='activeMeter')
         # this must be longer than Measure.duration.quarterLength
@@ -4089,7 +4089,7 @@ class Test(unittest.TestCase):
         for eachStaff in innerStaffs:
             mockStaffFE.assert_any_call(eachStaff, slurBundle=slurBundle)
         # ensure Measure.__init__() was called properly
-        self.assertEqual(len(expected) - 1, mockMeasure.call_count)
+        self.assertEqual(len(expected), mockMeasure.call_count)
         for i in range(len(innerStaffs)):
             mockMeasure.assert_any_call(i, number=backupNum)
         mockMeasure.assert_any_call([mockVoice.return_value], number=backupNum)
@@ -4123,14 +4123,14 @@ class Test(unittest.TestCase):
             elem.append(eachStaff)
         # @n="4" is in "expectedNs" but we're leaving it out as part of the test
         backupNum = 900  # should be used by measureFromElement()
-        expectedNs = ['1', '2', '3', '4', 'fb']
+        expectedNs = ['1', '2', '3', '4']
         slurBundle = spanner.SpannerBundle()
         activeMeter = meter.TimeSignature('8/8')  # bet you thought this would be 4/4, eh?
 
         actual = base.measureFromElement(elem, backupNum, expectedNs, slurBundle, activeMeter)
 
         # ensure the right number and @n of parts (we expect one additional key, for the "rptboth")
-        self.assertEqual(6, len(actual.keys()))
+        self.assertEqual(5, len(actual.keys()))
         for eachN in expectedNs:
             self.assertTrue(eachN in actual)
         self.assertTrue('next @left' in actual)
@@ -4151,7 +4151,7 @@ class Test(unittest.TestCase):
                 self.assertIsInstance(actual[eachN].rightBarline, bar.Repeat)
                 self.assertEqual('final', actual[eachN].rightBarline.type)
             else:
-                self.assertEqual([], actual[eachN]['fb'])
+                self.assertEqual([], actual[eachN])
 
     @mock.patch('music21.mei.base.staffFromElement')
     @mock.patch('music21.mei.base._correctMRestDurs')
@@ -4176,7 +4176,7 @@ class Test(unittest.TestCase):
         staffElem = ETree.Element(staffTag, attrib={'n': '1'})
         elem.append(staffElem)
         backupNum = 900  # should be ignored by measureFromElement()
-        expectedNs = ['1', 'fb']
+        expectedNs = ['1']
         slurBundle = mock.MagicMock(name='slurBundle')
         activeMeter = mock.MagicMock(name='activeMeter')
         # this must match Measure.duration.quarterLength
@@ -4230,7 +4230,7 @@ class Test(unittest.TestCase):
         staffElem = ETree.Element(staffTag, attrib={'n': '1'})
         elem.append(staffElem)
         backupNum = 900  # should be ignored by measureFromElement()
-        expectedNs = ['1', 'fb']
+        expectedNs = ['1']
         slurBundle = mock.MagicMock(name='slurBundle')
         activeMeter = mock.MagicMock(name='activeMeter')
         # this must match Measure.duration.quarterLength
@@ -4290,7 +4290,7 @@ class Test(unittest.TestCase):
         actual = base.measureFromElement(elem, backupNum, expectedNs, slurBundle, activeMeter)
 
         # ensure the right number and @n of parts
-        self.assertEqual(['1', 'fb'], list(actual.keys()))
+        self.assertEqual(['1'], list(actual.keys()))
         # ensure the Measure has its expected Voice, BassClef, and Instrument
         self.assertEqual(backupNum, actual['1'].number)
         self.assertEqual(2, len(actual['1']))

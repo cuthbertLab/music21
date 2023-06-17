@@ -3235,15 +3235,12 @@ def measureFromElement(elem, backupNum, expectedNs, slurBundle=None, activeMeter
     # track the bar's duration
     maxBarDuration = None
 
-    print('=== EL', elem, '===')
-
     # iterate all immediate children
     for eachElem in elem.iterfind('*'):
         # first get all information stored in <harm> tags.
         # They are stored on the same level as <staff>.
         if harmTag == eachElem.tag:
             harmElements['fb'].append(harmFromElement(eachElem))
-            #print('  harms', harmElements, eachElem.get('n'))
         elif staffTag == eachElem.tag:
             staves[eachElem.get('n')] = stream.Measure(staffFromElement(eachElem,
                                                                         slurBundle=slurBundle),
@@ -3614,14 +3611,6 @@ def scoreFromElement(elem, slurBundle):
     # document. Iterating the keys in "parsed" would not preserve the order.
     environLocal.printDebug('*** making the Score')
 
-    # TODO: Replace this with a better solution.
-    # Extract collected <harm> information stored in the dict unter the 'fb' key
-    harms: list[dict] | None = None
-    print('fb' in parsed.keys())
-    #if 'fb' in parsed.keys():
-    #    harms = parsed['fb'][0]
-    #    del parsed['fb']
-    #    allPartNs = allPartNs[0:-1]
 
     theScore = [stream.Part() for _ in range(len(allPartNs))]
     for i, eachN in enumerate(allPartNs):
@@ -3630,13 +3619,6 @@ def scoreFromElement(elem, slurBundle):
         for eachObj in parsed[eachN]:
             theScore[i].append(eachObj)
     theScore = stream.Score(theScore)
-
-    # loop through measures to insert harm elements from harms list at the right offsets
-    #if harms:
-    #    for index, measureOffset in enumerate(theScore.measureOffsetMap().keys()):
-    #        hms = harms[index]['fb']
-    #        for h in hms:
-    #            theScore.insert(measureOffset + h[0], h[1])
 
     # put slurs in the Score
     theScore.append(list(slurBundle))
