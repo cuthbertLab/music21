@@ -212,7 +212,7 @@ class Test(unittest.TestCase):
             staffDefs[i].get = mock.MagicMock(return_value=str(i + 1))
         elem = mock.MagicMock(spec_set=ETree.Element)
         elem.findall = mock.MagicMock(return_value=staffDefs)
-        expected = ['1', '2', '3', '4']
+        expected = list('1234')
         actual = base.allPartsPresent(elem)
         self.assertSequenceEqual(expected, actual)
 
@@ -225,7 +225,7 @@ class Test(unittest.TestCase):
             staffDefs[i].get = mock.MagicMock(return_value=str((i % 4) + 1))
         elem = mock.MagicMock(spec_set=ETree.Element)
         elem.findall = mock.MagicMock(return_value=staffDefs)
-        expected = ['1', '2', '3', '4']
+        expected = list('1234')
         actual = base.allPartsPresent(elem)
         self.assertSequenceEqual(expected, actual)
 
@@ -3936,12 +3936,10 @@ class Test(unittest.TestCase):
         # this must match Measure.duration.quarterLength
         # prepare the mock Measure objects returned by mockMeasure
         mockMeasRets = [mock.MagicMock(name=f'Measure {i + 1}') for i in range(4)]
+        expected = mockMeasRets  # finish preparing "expected" below...
         for meas in mockMeasRets:
             meas.duration = mock.MagicMock(spec_set=duration.Duration)
             meas.duration.quarterLength = 4.0  # must match activeMeter.barDuration.quarterLength
-        # append figured bass stuff
-        mockMeasRets.append({'fb': []})
-        expected = mockMeasRets  # finish preparing "expected" below...
         mockMeasure.side_effect = lambda *x, **y: mockMeasRets.pop(0)
         # prepare mock of _makeBarlines() which returns "staves"
         mockMakeBarlines.side_effect = lambda elem, staves: staves
@@ -4067,7 +4065,6 @@ class Test(unittest.TestCase):
         for meas in mockMeasRets:
             meas.duration = mock.MagicMock(spec_set=duration.Duration)
             meas.duration.quarterLength = base._DUR_ATTR_DICT[None]  # must be _DUR_ATTR_DICT[None]
-        mockMeasRets.append({'fb': []})
         mockMeasure.side_effect = lambda *x, **y: mockMeasRets.pop(0)
         # prepare mock of _makeBarlines() which returns "staves"
         mockMakeBarlines.side_effect = lambda elem, staves: staves
@@ -4140,18 +4137,15 @@ class Test(unittest.TestCase):
         # (Note we can test all four parts together this time---
         #     the fourth should be indistinguishable)
         for eachN in expectedNs:
-            if isinstance(actual[eachN], stream.Measure):
-                self.assertEqual(backupNum, actual[eachN].number)
-                self.assertEqual(2, len(actual[eachN]))  # first the Note, then the Barline
-                self.assertIsInstance(actual[eachN][0], stream.Voice)
-                self.assertEqual(1, len(actual[eachN][0]))
-                self.assertIsInstance(actual[eachN][0][0], note.Rest)
-                self.assertEqual(activeMeter.barDuration.quarterLength,
-                             actual['4'][0][0].duration.quarterLength)
-                self.assertIsInstance(actual[eachN].rightBarline, bar.Repeat)
-                self.assertEqual('final', actual[eachN].rightBarline.type)
-            else:
-                self.assertEqual([], actual[eachN])
+            self.assertEqual(backupNum, actual[eachN].number)
+            self.assertEqual(2, len(actual[eachN]))  # first the Note, then the Barline
+            self.assertIsInstance(actual[eachN][0], stream.Voice)
+            self.assertEqual(1, len(actual[eachN][0]))
+            self.assertIsInstance(actual[eachN][0][0], note.Rest)
+            self.assertEqual(activeMeter.barDuration.quarterLength,
+                            actual['4'][0][0].duration.quarterLength)
+            self.assertIsInstance(actual[eachN].rightBarline, bar.Repeat)
+            self.assertEqual('final', actual[eachN].rightBarline.type)
 
     @mock.patch('music21.mei.base.staffFromElement')
     @mock.patch('music21.mei.base._correctMRestDurs')
@@ -4192,10 +4186,9 @@ class Test(unittest.TestCase):
         # prepare mock of staffDefFromElement()
         mockStaffDefFE.return_value = {'clef': mock.MagicMock(name='SomeClef')}
         # prepare the expected return value
-        expected = {'1': mockMeasure.return_value, 'fb': {'fb': []}}
+        expected = {'1': mockMeasure.return_value}
 
         actual = base.measureFromElement(elem, backupNum, expectedNs, slurBundle, activeMeter)
-        actual['fb'] = {'fb': []}
         self.assertDictEqual(expected, actual)
         # ensure staffFromElement() was called properly
         mockStaffFE.assert_called_once_with(staffElem, slurBundle=slurBundle)

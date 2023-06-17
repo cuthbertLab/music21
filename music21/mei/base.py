@@ -467,16 +467,6 @@ def allPartsPresent(scoreElem) -> tuple[str, ...]:
             partNs.append(staffDef.get('n'))
     if not partNs:
         raise MeiValidityError(_SEEMINGLY_NO_PARTS)
-
-    # Get information of possible <harm> tags in the score. If there are tags prepare a list to
-    # store them and process them later.
-    # TODO: Maybe to be put in a separate function e.g. like allPartsPresent
-    #figuredBassQuery = f'.//{MEI_NS}fb'
-    #if scoreElem.findall(figuredBassQuery):
-    #    environLocal.printDebug('harm tag found!')
-    # here other <harm> elements (e.g. chordsymbols) can be added.
-    # … 'if …'
-
     return tuple(partNs)
 
 
@@ -3237,11 +3227,7 @@ def measureFromElement(elem, backupNum, expectedNs, slurBundle=None, activeMeter
 
     # iterate all immediate children
     for eachElem in elem.iterfind('*'):
-        # first get all information stored in <harm> tags.
-        # They are stored on the same level as <staff>.
-        if harmTag == eachElem.tag:
-            harmElements['fb'].append(harmFromElement(eachElem))
-        elif staffTag == eachElem.tag:
+        if staffTag == eachElem.tag:
             staves[eachElem.get('n')] = stream.Measure(staffFromElement(eachElem,
                                                                         slurBundle=slurBundle),
                                                        number=int(elem.get('n', backupNum)))
@@ -3254,6 +3240,11 @@ def measureFromElement(elem, backupNum, expectedNs, slurBundle=None, activeMeter
                 environLocal.warn(_UNIMPLEMENTED_IMPORT.format('<staffDef>', '@n'))
             else:
                 stavesWaiting[whichN] = staffDefFromElement(eachElem, slurBundle)
+        
+        # Get all information stored in <harm> tags.
+        # They are stored on the same level as <staff>.
+        elif harmTag == eachElem.tag:
+            harmElements['fb'].append(harmFromElement(eachElem))
 
         elif eachElem.tag not in _IGNORE_UNPROCESSED:
             environLocal.printDebug(_UNPROCESSED_SUBELEMENT.format(eachElem.tag, elem.tag))
@@ -3266,9 +3257,6 @@ def measureFromElement(elem, backupNum, expectedNs, slurBundle=None, activeMeter
             # We must insert() these objects because a <staffDef> signals its changes for the
             # *start* of the <measure> in which it appears.
             staves[whichN].insert(0, eachObj)
-
-    # Add <harm> objects to the staves dict
-    #staves['fb'] = harmElements
 
     # Add <harm> objects to the corrresponding staff within the Measure
     for fb in harmElements['fb']:
@@ -3598,9 +3586,6 @@ def scoreFromElement(elem, slurBundle):
 
     # Get a tuple of all the @n attributes for the <staff> tags in this score. Each <staff> tag
     # corresponds to what will be a music21 Part.
-
-    # UPDATE: If <harm> tags are found, they will also be collected as a separate 'part'
-    # to process them later.
     allPartNs = allPartsPresent(elem)
 
     # This is the actual processing.
@@ -3610,8 +3595,6 @@ def scoreFromElement(elem, slurBundle):
     # We must iterate here over "allPartNs," which preserves the part-order found in the MEI
     # document. Iterating the keys in "parsed" would not preserve the order.
     environLocal.printDebug('*** making the Score')
-
-
     theScore = [stream.Part() for _ in range(len(allPartNs))]
     for i, eachN in enumerate(allPartNs):
         # set "atSoundingPitch" so transposition works
