@@ -39,7 +39,8 @@ modifiersDictXmlToM21 = {'sharp': '#',
                  'double-sharp': '##',
                  'flat-flat': 'bb',
                  'backslash': '\\',
-                 'slash': '/'}
+                 'slash': '/',
+                 'cross': '+'}
 
 modifiersDictM21ToXml = {'#': 'sharp',
                      'b': 'flat',

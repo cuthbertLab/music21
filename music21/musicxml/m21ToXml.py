@@ -3425,7 +3425,7 @@ class MeasureExporter(XMLExporterBase):
                     if hasSpannerAnchors:
                         self.parseOneElement(obj, AppendSpanners.NONE)
                     else:
-                        # ENTRY FOR Figured Bass Indications
+                        # ENTRY for other elements e.g. ChordSymbols,FiguredBassIndications
                         self.parseOneElement(obj, AppendSpanners.NORMAL)
 
             for n in notesForLater:
@@ -4644,7 +4644,7 @@ class MeasureExporter(XMLExporterBase):
 
         >>> fbi = harmony.FiguredBassIndication()
         >>> fbi.quarterLength = 2
-        >>> fbi.fig_noation = '#,6b'
+        >>> fbi.fig_notation = '#,6b'
 
         >>> MEX = musicxml.m21ToXml.MeasureExporter()
         
