@@ -5306,7 +5306,7 @@ class MeasureParser(XMLParserBase):
             fb_number: str = ''
             fb_prefix: str = ''
             fb_suffix: str = ''
-            fb_extender: str = ''
+
             if subElement.tag == 'figure':
                 for el in subElement.findall('*'):
                     if el.tag == 'figure-number':
@@ -5314,8 +5314,8 @@ class MeasureParser(XMLParserBase):
                             fb_number = el.text
                         # Get prefix and/or suffix.
                         # The function returns an empty string if nothing is found.
-                        fb_prefix = self._getFigurePrefixOrSuffix(subElement, 'prefix')
-                        fb_suffix = self._getFigurePrefixOrSuffix(subElement, 'suffix')
+                    fb_prefix = self._getFigurePrefixOrSuffix(subElement, 'prefix')
+                    fb_suffix = self._getFigurePrefixOrSuffix(subElement, 'suffix')
 
                     # collect information on extenders
                     if el.tag == 'extend':
@@ -5325,8 +5325,8 @@ class MeasureParser(XMLParserBase):
                 if not subElement.findall('extend'):
                     fb_extenders.append(False)
 
-                # put prefix/suffix, extender and number together
-                if fb_prefix + fb_number + fb_extender + fb_suffix != '':
+                # put prefix/suffix, number and extenders together
+                if fb_prefix + fb_number + fb_suffix != '' or len(fb_extenders) != 0 :
                     fb_strings.append(fb_prefix + fb_number + fb_suffix)
                 else:
                     # Warning because an empty figured-bass tag is not valid musixml.
@@ -5344,12 +5344,11 @@ class MeasureParser(XMLParserBase):
                     self.lastFigureDuration = d.quarterLength
 
         fb_string = sep.join(fb_strings)
-        fbi = harmony.FiguredBassIndication(fb_string, extenders=fb_extenders)
+        fbi = harmony.FiguredBassIndication(fb_string, extenders=fb_extenders, part=self.parent.partId)
         
         # If a duration is provided, set length of the FigureBassIndication
         if d:
             fbi.quarterLength = d.quarterLength
-        print(fbi)
         self.stream.insert(offsetFbi, fbi)
         return fbi
 

@@ -2527,13 +2527,14 @@ def harmFromElement(elem, slurBundle=None) -> tuple:
 
     fb_harmony_tag: tuple = ()
 
-    # Collect all elements in a measure and go throug extenders
+    # Collect all elements in a measure and go through extenders
     # tstamp has to be used as a duration marker between two elements
     for subElement in _processEmbeddedElements(elem.findall('*'),
                                                tagToFunction,
                                                elem.tag, slurBundle):
         subElement.tstamp = float(elem.get('tstamp'))
         subElement.offset = subElement.tstamp - 1
+        subElement.part = elem.get('staff')
         fb_harmony_tag = (subElement.tstamp - 1, subElement)
 
     return fb_harmony_tag
@@ -2581,7 +2582,8 @@ def figuredbassFromElement(elem, slurBundle=None) -> harmony.FiguredBassIndicati
 
     # Generate a FiguredBassIndication object and set the collected information
     fb_notation = ','.join(fb_notation_list)
-    theFbNotation = harmony.FiguredBassIndication(fb_notation, extenders=fb_extenders)
+    theFbNotation = harmony.FiguredBassIndication(fb_notation, extenders=fb_extenders,
+                                                   part=elem.get('n'))
     theFbNotation.id = fb_id
     theFbNotation.duration = duration.Duration(quarterLength=dauer)
 
@@ -3234,9 +3236,16 @@ def measureFromElement(elem, backupNum, expectedNs, slurBundle=None, activeMeter
     # track the bar's duration
     maxBarDuration = None
 
+    print('=== EL', elem, '===')
+
     # iterate all immediate children
     for eachElem in elem.iterfind('*'):
-        if staffTag == eachElem.tag:
+        # first get all information stored in <harm> tags.
+        # They are stored on the same level as <staff>.
+        if harmTag == eachElem.tag:
+            harmElements['fb'].append(harmFromElement(eachElem))
+            #print('  harms', harmElements, eachElem.get('n'))
+        elif staffTag == eachElem.tag:
             staves[eachElem.get('n')] = stream.Measure(staffFromElement(eachElem,
                                                                         slurBundle=slurBundle),
                                                        number=int(elem.get('n', backupNum)))
@@ -3249,9 +3258,6 @@ def measureFromElement(elem, backupNum, expectedNs, slurBundle=None, activeMeter
                 environLocal.warn(_UNIMPLEMENTED_IMPORT.format('<staffDef>', '@n'))
             else:
                 stavesWaiting[whichN] = staffDefFromElement(eachElem, slurBundle)
-        elif harmTag == eachElem.tag:
-            # get all information stored in <harm> tags
-            harmElements['fb'].append(harmFromElement(eachElem))
 
         elif eachElem.tag not in _IGNORE_UNPROCESSED:
             environLocal.printDebug(_UNPROCESSED_SUBELEMENT.format(eachElem.tag, elem.tag))
@@ -3266,7 +3272,15 @@ def measureFromElement(elem, backupNum, expectedNs, slurBundle=None, activeMeter
             staves[whichN].insert(0, eachObj)
 
     # Add <harm> objects to the staves dict
-    staves['fb'] = harmElements
+    #staves['fb'] = harmElements
+
+    # Add <harm> objects to the corrresponding staff within the Measure
+    for fb in harmElements['fb']:
+        offset = fb[0]
+        fbi = fb[1]
+        m = staves.get(fbi.part)
+        m.insert(offset, fbi)
+
     # other childs of <harm> tags can be added here…
 
     # create rest-filled measures for expected parts that had no <staff> tag in this <measure>
@@ -3601,6 +3615,7 @@ def scoreFromElement(elem, slurBundle):
     # document. Iterating the keys in "parsed" would not preserve the order.
     environLocal.printDebug('*** making the Score')
 
+    # TODO: Replace this with a better solution.
     # Extract collected <harm> information stored in the dict unter the 'fb' key
     harms: list[dict] | None = None
     if 'fb' in parsed.keys():

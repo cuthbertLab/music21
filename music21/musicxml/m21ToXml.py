@@ -3425,7 +3425,7 @@ class MeasureExporter(XMLExporterBase):
                     if hasSpannerAnchors:
                         self.parseOneElement(obj, AppendSpanners.NONE)
                     else:
-                        # ENTRY FOR Figured Bass Indications
+                        # ENTRY for other elements e.g. ChordSymbols,FiguredBassIndications
                         self.parseOneElement(obj, AppendSpanners.NORMAL)
 
             for n in notesForLater:

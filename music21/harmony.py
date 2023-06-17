@@ -2501,8 +2501,28 @@ class NoChord(ChordSymbol):
 # ------------------------------------------------------------------------------
 
 class FiguredBassIndication(Harmony):
+    '''
+    The FiguredBassIndication objects store information about thorough bass figures.
+
+    It is created as a representation for <fb> tags in MEI and <figured-bass> tags in MusicXML.
+
+    The FiguredBassIndication object derives from the Harmony object and can be used
+    in the following way:
+
+    >>> fbi = harmony.FiguredBassIndication('#,6#')
+    >>> fbi
+    <FiguredBassIndication figures: #,6#>
+
+    The single figures are stored as figuredBass.notation.Figure objects:
+    >>> fbi.fig_notation.figures
+    [<music21.figuredBass.notation.Figure 3 Mods: <Modifier # sharp> hasExt: False>,
+     <music21.figuredBass.notation.Figure 6 Mods: <Modifier # sharp> hasExt: False>]
+    '''
+
     isFigure: bool = True
-    def __init__(self, figs: str | list | None = None, extenders: list[bool] | None = None , **keywords):
+    part: str | None = None 
+    def __init__(self, figs: str | list | None = None, extenders: list[bool] | None = None , 
+                 part: str | None=None, **keywords):
         super().__init__(**keywords)
         if figs:
             if isinstance(figs, list):
@@ -2515,6 +2535,7 @@ class FiguredBassIndication(Harmony):
         else:
             _figs = ''
         self._fig_notation = notation.Notation(_figs, extenders)
+        self.part = part
 
     @property
     def fig_notation(self) -> notation.Notation:
@@ -2525,7 +2546,7 @@ class FiguredBassIndication(Harmony):
         self._fig_notation = notation.Notation(figs, extenders)
 
     def __repr__(self):
-        return f'<{self.__class__.__name__} figures: {self.fig_notation.notationColumn}>'
+        return f'<{self.__class__.__name__} figures: {self.fig_notation.notationColumn} part: {self.part}>'
 
 def realizeChordSymbolDurations(piece):
     '''

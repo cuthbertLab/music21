@@ -1504,6 +1504,19 @@ class Test(unittest.TestCase):
         m = s[stream.Measure].first()
         self.assertIs(m.showNumber, stream.enums.ShowNumber.NEVER)
 
+    def testImportFiguredBassIndications(self):
+        from music21 import converter
+
+        xml_dir = common.getSourceFilePath() / 'musicxml' / 'lilypondTestSuite'
+        s = converter.parse(xml_dir / '74a-FiguredBass.xml')
+        self.assertIs(len(s.flatten().getElementsByClass(harmony.FiguredBassIndication)), 5)
+        
+        s = converter.parse(xml_dir / '74b-FiguredBass.xml')
+        self.assertIs(len(s.flatten().getElementsByClass(harmony.FiguredBassIndication)), 12)
+
+        s = converter.parse(xml_dir / 'piece01-bwv-1023-1-beginning.musicxml')
+        self.assertEqual(s.flatten().getElementsByClass(harmony.FiguredBassIndication)[12], '<FiguredBassIndication figures: 6,5♮>')
+
 
 if __name__ == '__main__':
     import music21
