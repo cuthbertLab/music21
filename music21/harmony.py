@@ -2515,13 +2515,17 @@ class FiguredBass(Harmony):
     <music21.figuredBass.notation.Figure 3 <Modifier # sharp>>
     '''
 
-    isFigure: bool = True
-    corresPart: str | None = None
-    _figs: str = ''
 
-    def __init__(self, figureString: str | list[str] | None = None,
-                 correspondingPart: str | None=None, **keywords):
+    def __init__(self,
+                 figureString: str | list[str] | None = None,
+                 correspondingPart: str | None=None,
+                 **keywords):
         super().__init__(**keywords)
+
+        self.isFigure: bool = True
+        self.corresPart: str | None = None
+        self._figs: str = ''
+
         if figureString:
             if isinstance(figureString, list):
                 self._figs = ','.join(figureString)
