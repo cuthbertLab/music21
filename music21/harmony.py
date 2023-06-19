@@ -31,6 +31,7 @@ from music21 import duration
 from music21 import environment
 from music21 import exceptions21
 from music21.figuredBass import realizerScale
+from music21.figuredBass import notation
 from music21 import interval
 from music21 import key
 from music21 import pitch
@@ -2499,6 +2500,53 @@ class NoChord(ChordSymbol):
 
 # ------------------------------------------------------------------------------
 
+class FiguredBass(Harmony):
+    '''
+    The FiguredBassIndication objects store information about thorough bass figures.
+    It is created as a representation for <fb> tags in MEI and <figured-bass> tags in MusicXML.
+    The FiguredBassIndication object derives from the Harmony object and can be used
+    in the following way:
+    >>> fb = harmony.FiguredBass('#,6#', correspondingPart='P1')
+    >>> fb
+    <FiguredBass figures: #,6# correspondingPart: P1>
+
+    The single figures are stored as figuredBass.notation.Figure objects:
+    >>> fb.figNotation.figures[0]
+    <music21.figuredBass.notation.Figure 3 <Modifier # sharp>>
+    '''
+
+    isFigure: bool = True
+    corresPart: str | None = None
+    _figs: str = ''
+
+    def __init__(self, figureString: str | list[str] | None = None,
+                 correspondingPart: str | None=None, **keywords):
+        super().__init__(**keywords)
+        if figureString:
+            if isinstance(figureString, list):
+                self._figs = ','.join(figureString)
+            elif isinstance(figureString, str):
+                if ',' in figureString:
+                    self._figs = figureString
+                else:
+                    self._figs = ','.join(figureString)
+        else:
+            self._figs = ''
+        self._figNotation = notation.Notation(self._figs)
+        self.corresPart = correspondingPart
+
+    @property
+    def figNotation(self) -> notation.Notation:
+        return self._figNotation
+
+    @figNotation.setter
+    def figNotation(self, figs: str | list[str] | None):
+        self._figNotation = notation.Notation(figs)
+
+    def __repr__(self):
+        return f'<{self.__class__.__name__} figures: {self.figNotation.notationColumn} correspondingPart: {self.corresPart}>'
+
+# ------------------------------------------------------------------------------
 
 def realizeChordSymbolDurations(piece):
     '''
