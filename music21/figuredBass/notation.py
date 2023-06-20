@@ -33,30 +33,33 @@ shorthandNotation = {(None,): (5, 3),
 prefixes = ['+', '#', '++', '##']
 suffixes = ['\\']
 
-modifiersDictXmlToM21 = {'sharp': '#',
-                 'flat': 'b',
-                 'natural': '\u266e',
-                 'double-sharp': '##',
-                 'flat-flat': 'bb',
-                 'backslash': '\\',
-                 'slash': '/',
-                 'cross': '+'}
+modifiersDictXmlToM21 = {
+    'sharp': '#',
+    'flat': 'b',
+    'natural': '\u266e',
+    'double-sharp': '##',
+    'flat-flat': 'bb',
+    'backslash': '\\',
+    'slash': '/',
+    'cross': '+'
+}
 
-modifiersDictM21ToXml = {'#': 'sharp',
-                     'b': 'flat',
-                     '##': 'double-sharp',
-                     'bb': 'flat-flat',
-                     '\\': 'backslash',
-                     '/': 'slash',
-                     '+': 'sharp',
-                     '\u266f': 'sharp',
-                     '\u266e': 'natural',
-                     '\u266d': 'flat',
-                     '\u20e5': 'sharp',
-                     '\u0338': 'slash',
-                     '\U0001D12A': 'double-sharp',
-                     '\U0001D12B': 'flat-flat',
-                     }
+modifiersDictM21ToXml = {
+    '#': 'sharp',
+    'b': 'flat',
+    '##': 'double-sharp',
+    'bb': 'flat-flat',
+    '\\': 'backslash',
+    '/': 'slash',
+    '+': 'sharp',
+    '\u266f': 'sharp',
+    '\u266e': 'natural',
+    '\u266d': 'flat',
+    '\u20e5': 'sharp',
+    '\u0338': 'slash',
+    '\U0001D12A': 'double-sharp',
+    '\U0001D12B': 'flat-flat',
+}
 
 class Notation(prebase.ProtoM21Object):
     '''
@@ -234,7 +237,7 @@ class Notation(prebase.ProtoM21Object):
         self.origModStrings = None
         self.numbers = None
         self.modifierStrings = None
-        self.extenders:list[bool] = []
+        self.extenders: list[bool] = []
         self.hasExtenders: bool = False
         self._parseNotationColumn()
         self._translateToLonghand()
@@ -242,7 +245,7 @@ class Notation(prebase.ProtoM21Object):
         # Convert to convenient notation
         self.modifiers = None
         self.figures = None
-        self.figuresFromNotationColumn: list(Figure) = []
+        self.figuresFromNotationColumn: list[Figure] = []
         self._getModifiers()
         self._getFigures()
 
@@ -328,10 +331,9 @@ class Notation(prebase.ProtoM21Object):
         numbers = tuple(numbers)
         modifierStrings = tuple(modifierStrings)
 
-        # extenders come from the optional argument when instantionting the object.
+        # extenders come from the optional argument when instantiating the object.
         # If nothing is provided, no extenders will be set.
         # Otherwise we have to look if amount of extenders and figure numbers match
-        # 
         if not self.extenders:
             self.extenders = [False for i in range(len(modifierStrings))]
         else:
@@ -491,15 +493,15 @@ class Figure(prebase.ProtoM21Object):
     <music21.figuredBass.notation.Modifier + sharp>
     >>> f1.hasExtender
     False
-    >>> f1.isExtender
+    >>> f1.isPureExtender
     False
     >>> f2 = notation.Figure(6, '#', extender=True)
     >>> f2.hasExtender
     True
-    >>> f2.isExtender
+    >>> f2.isPureExtender
     False
     >>> f3 = notation.Figure(extender=True)
-    >>> f3.isExtender
+    >>> f3.isPureExtender
     True
     >>> f3.hasExtender
     True
@@ -522,52 +524,66 @@ class Figure(prebase.ProtoM21Object):
             A bool value that indicates whether an extender is part of the figure.
             It is set by a keyword argument.
             ''',
-        'isExtender': '''
-            A bool value that returns true if an extender is part of the figure but no
-            number is given. Pure extender if you will.
-            It is set by evaluating the number and extender arguments.
+        'isPureExtender': '''
+            A bool value that returns true if an extender is part of the figure but no number
+            is given. It is set on the fly by evaluating the number and extender arguments.
             '''
     }
 
-    isExtender: bool
-
-    def __init__(self, number=1, modifierString=None, extender=False):
+    def __init__(self, number=1, modifierString=None, extender: bool = False):
         self.number = number
         self.modifierString = modifierString
         self.modifier = Modifier(modifierString)
         # look for extender's underscore
         self.hasExtender: bool = extender
-        self._updateIsExtenderProperty()
-        
-    def _updateIsExtenderProperty(self):
-        self.isExtender = (self.number == 1 and self.hasExtender)
+
+    @property
+    def isPureExtender(self) -> bool:
+        '''
+        Read-only boolean property that returns True if an extender is part of the figure
+        but no number is given (a number of 1 means no-number). It is a pure extender.
+
+        >>> n = notation.Figure(1, '#', extender=True)
+        >>> n.isPureExtender
+        True
+        >>> n.number = 2
+        >>> n.isPureExtender
+        False
+        '''
+
+        return self.number == 1 and self.hasExtender
+
 
     def _reprInternal(self):
+        if self.isPureExtender:
+            return '<Figure is a pure extender>'
         mod = repr(self.modifier).replace('music21.figuredBass.notation.', '')
-        if self.isExtender or self.hasExtender:
-            return f'{self.number} {mod} extender: {True}'
+        ext = 'extender: __' if self.hasExtender else ''
+        if self.hasExtender:
+            return f'{self.number} {mod} {ext}'
         return f'{self.number} {mod}'
 
 
 # ------------------------------------------------------------------------------
-specialModifiers = {'+': '#',
-                    '/': '-',
-                    '\\': '#',
-                    'b': '-',
-                    'bb': '--',
-                    'bbb': '---',
-                    'bbbb': '-----',
-                    '++': '##',
-                    '+++': '###',
-                    '++++': '####',
-                    '\u266f': '#',
-                    '\u266e': 'n',
-                    '\u266d': 'b',
-                    '\u20e5': '#',
-                    '\u0338': '#',
-                    '\U0001d12a': '##',
-                    '\U0001d12b': '--'
-                    }
+specialModifiers = {
+    '+': '#',
+    '/': '-',
+    '\\': '#',
+    'b': '-',
+    'bb': '--',
+    'bbb': '---',
+    'bbbb': '-----',
+    '++': '##',
+    '+++': '###',
+    '++++': '####',
+    '\u266f': '#',
+    '\u266e': 'n',
+    '\u266d': 'b',
+    '\u20e5': '#',
+    '\u0338': '#',
+    '\U0001d12a': '##',
+    '\U0001d12b': '--'
+}
 
 
 class Modifier(prebase.ProtoM21Object):

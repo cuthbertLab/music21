@@ -2506,19 +2506,26 @@ class FiguredBass(Harmony):
     It is created as a representation for <fb> tags in MEI and <figured-bass> tags in MusicXML.
     The FiguredBassIndication object derives from the Harmony object and can be used
     in the following way:
-    >>> fb = harmony.FiguredBass('#,6#', correspondingPart='P1')
+
+    >>> fb = harmony.FiguredBass('#,6#', partRef='P1')
     >>> fb
-    <FiguredBass figures: #,6# correspondingPart: P1>
+    <FiguredBass figures: #,6# partRef: P1>
 
     The single figures are stored as figuredBass.notation.Figure objects:
     >>> fb.figNotation.figures[0]
     <music21.figuredBass.notation.Figure 3 <Modifier # sharp>>
+    >>> fb2 = harmony.FiguredBass(figureStrings=['#_','6#'], partRef='P2')
+    >>> fb2
+    <FiguredBass figures: #_,6# partRef: P2>
+    >>> fb2.figNotation.hasExtenders
+    True
     '''
 
 
     def __init__(self,
-                 figureString: str | list[str] | None = None,
-                 correspondingPart: str | None=None,
+                 figureString: str = '',
+                 figureStrings: list[str] = [],
+                 partRef: str | None = None,
                  **keywords):
         super().__init__(**keywords)
 
@@ -2526,18 +2533,17 @@ class FiguredBass(Harmony):
         self.corresPart: str | None = None
         self._figs: str = ''
 
-        if figureString:
-            if isinstance(figureString, list):
+        if isinstance(figureString, str) and figureString != '':
+            if ',' in figureString:
+                self._figs = figureString
+            else:
                 self._figs = ','.join(figureString)
-            elif isinstance(figureString, str):
-                if ',' in figureString:
-                    self._figs = figureString
-                else:
-                    self._figs = ','.join(figureString)
+        elif figureStrings != []:
+            self._figs = ','.join(figureStrings)
         else:
             self._figs = ''
-        self._figNotation = notation.Notation(self._figs)
-        self.corresPart = correspondingPart
+        self._figNotation: notation.Notation = notation.Notation(self._figs)
+        self.partRef = partRef
 
     @property
     def figNotation(self) -> notation.Notation:
@@ -2548,7 +2554,7 @@ class FiguredBass(Harmony):
         self._figNotation = notation.Notation(figs)
 
     def __repr__(self):
-        return f'<{self.__class__.__name__} figures: {self.figNotation.notationColumn} correspondingPart: {self.corresPart}>'
+        return f'<{self.__class__.__name__} figures: {self.figNotation.notationColumn} partRef: {self.partRef}>'
 
 # ------------------------------------------------------------------------------
 
