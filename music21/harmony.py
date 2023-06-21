@@ -2507,17 +2507,17 @@ class FiguredBass(Harmony):
     The FiguredBassIndication object derives from the Harmony object and can be used
     in the following way:
 
-    >>> fb = harmony.FiguredBass('#,6#', partRef='P1')
+    >>> fb = harmony.FiguredBass('#,6#')
     >>> fb
-    <FiguredBass figures: #,6# partRef: P1>
+    <music21.harmony.FiguredBass figures: #,6#>
 
     The single figures are stored as figuredBass.notation.Figure objects:
-    >>> fb.figNotation.figures[0]
+    >>> fb.notation.figures[0]
     <music21.figuredBass.notation.Figure 3 <Modifier # sharp>>
-    >>> fb2 = harmony.FiguredBass(figureStrings=['#_','6#'], partRef='P2')
+    >>> fb2 = harmony.FiguredBass(figureStrings=['#_','6#'])
     >>> fb2
-    <FiguredBass figures: #_,6# partRef: P2>
-    >>> fb2.figNotation.hasExtenders
+    <music21.harmony.FiguredBass figures: #_,6#>
+    >>> fb2.notation.hasExtenders
     True
     '''
 
@@ -2525,36 +2525,75 @@ class FiguredBass(Harmony):
     def __init__(self,
                  figureString: str = '',
                  figureStrings: list[str] = [],
-                 partRef: str | None = None,
                  **keywords):
         super().__init__(**keywords)
 
-        self.isFigure: bool = True
-        self.corresPart: str | None = None
         self._figs: str = ''
+
+        if figureString != '':
+            self.figureString = figureString
+        elif figureStrings != []:
+            self.figureString = ','.join(figureStrings)
+        else:
+            self.figureString = ''
+
+        self._figNotation: notation.Notation = notation.Notation(self._figs)
+
+    @property
+    def notation(self) -> notation.Notation:
+        return self._figNotation
+
+    @notation.setter
+    def notation(self, figureNotation: notation.Notation):
+        '''
+        Sets the notation property of the FiguresBass object and updates the
+        figureString property if needed.
+
+        >>> from music21 import harmony, figuredBass
+        >>> fb = harmony.FiguredBass('6,#')
+        >>> fb.figureString, fb.notation
+        ('6,#', <music21.figuredBass.notation.Notation 6,#>)
+
+        >>> fb.notation = figuredBass.notation.Notation('7b,b')
+        >>> fb.figureString, fb.notation
+        ('7b,b', <music21.figuredBass.notation.Notation 7b,b>)
+        '''
+
+        self._figNotation = figureNotation
+        if figureNotation.notationColumn != self._figs:
+            self.figureString = figureNotation.notationColumn
+
+    @property
+    def figureString(self) -> str:
+        return self._figs
+
+    @figureString.setter
+    def figureString(self, figureString: str):
+        '''
+        Sets the figureString property of the FiguresBass object and updates the
+        notation property if needed.
+
+        >>> from music21 import harmony
+        >>> fb = harmony.FiguredBass('6,#')
+        >>> fb.figureString, fb.notation
+        ('6,#', <music21.figuredBass.notation.Notation 6,#>)
+
+        >>> fb.figureString = '5,b'
+        >>> fb.figureString, fb.notation
+        ('5,b', <music21.figuredBass.notation.Notation 5,b>)
+        '''
 
         if isinstance(figureString, str) and figureString != '':
             if ',' in figureString:
                 self._figs = figureString
             else:
                 self._figs = ','.join(figureString)
-        elif figureStrings != []:
-            self._figs = ','.join(figureStrings)
-        else:
-            self._figs = ''
-        self._figNotation: notation.Notation = notation.Notation(self._figs)
-        self.partRef = partRef
 
-    @property
-    def figNotation(self) -> notation.Notation:
-        return self._figNotation
+            self.notation = notation.Notation(self._figs)
 
-    @figNotation.setter
-    def figNotation(self, figs: str | list[str] | None):
-        self._figNotation = notation.Notation(figs)
 
-    def __repr__(self):
-        return f'<{self.__class__.__name__} figures: {self.figNotation.notationColumn} partRef: {self.partRef}>'
+    def _reprInternal(self):
+        return f'figures: {self.notation.notationColumn}'
 
 # ------------------------------------------------------------------------------
 

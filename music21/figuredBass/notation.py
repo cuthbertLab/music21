@@ -543,6 +543,7 @@ class Figure(prebase.ProtoM21Object):
         Read-only boolean property that returns True if an extender is part of the figure
         but no number is given (a number of 1 means no-number). It is a pure extender.
 
+        >>> from music21.figuredBass import notation
         >>> n = notation.Figure(1, '#', extender=True)
         >>> n.isPureExtender
         True
