@@ -742,7 +742,7 @@ class LocalCorpus(Corpus):
             self._name = None
         elif name in ('core', 'virtual'):
             raise CorpusException(f'The name {name!r} is reserved.')
-        else:  # pylint: disable=no-else-raise  # false positive.
+        else:
             self._name = name
 
     # SPECIAL METHODS #

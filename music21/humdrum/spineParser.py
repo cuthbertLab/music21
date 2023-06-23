@@ -1277,7 +1277,6 @@ class HumdrumSpine(prebase.ProtoM21Object):
             elif eventC.startswith('!'):
                 thisObject = SpineComment(eventC)
             else:
-                # pylint: disable=attribute-defined-outside-init
                 thisObject = base.ElementWrapper(event)
                 thisObject.humdrumPosition = event.position
 
@@ -1335,7 +1334,6 @@ class KernSpine(HumdrumSpine):
                     thisObject = self.processNoteEvent(eventC)
 
                 if thisObject is not None:
-                    # pylint: disable=attribute-defined-outside-init
                     thisObject.humdrumPosition = event.position
                     thisObject.priority = event.position
                     self.stream.coreAppend(thisObject)

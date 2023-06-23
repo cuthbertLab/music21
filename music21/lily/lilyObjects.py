@@ -8,8 +8,6 @@
 # Copyright:    Copyright © 2007-2012 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
-# pylint: disable=too-many-function-args
-# unfortunately the way this was originally set up the previous line is needed
 '''
 music21 translates to Lilypond format and if Lilypond is installed on the
 local computer, can automatically generate .pdf, .png, and .svg versions
@@ -2265,7 +2263,6 @@ class Test(unittest.TestCase):
 
 
 if __name__ == '__main__':
-    # pylint: disable=ungrouped-imports
     import music21
     music21.mainTest(Test)
 

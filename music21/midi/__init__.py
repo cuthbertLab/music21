@@ -352,8 +352,7 @@ class _ContainsEnum(IntEnum):
 
     @classmethod
     def hasValue(cls, val):
-        # https://github.com/PyCQA/pylint/issues/3941
-        return val in cls._value2member_map_  # pylint: disable=no-member
+        return val in cls._value2member_map_
 
 
 class ChannelVoiceMessages(_ContainsEnum):

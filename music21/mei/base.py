@@ -309,7 +309,7 @@ class MeiToM21Converter:
             if isinstance(self.documentRoot, ElementTree):
                 # pylint warns that :class:`Element` doesn't have a getroot() method, which is
                 # true enough, but...
-                self.documentRoot = self.documentRoot.getroot()  # pylint: disable=maybe-no-member
+                self.documentRoot = self.documentRoot.getroot()
 
             if f'{MEI_NS}mei' != self.documentRoot.tag:
                 raise MeiElementError(_WRONG_ROOT_ELEMENT.format(self.documentRoot.tag))
@@ -419,7 +419,7 @@ def makeDuration(
     0.5
     '''
     returnDuration = duration.Duration(base)
-    returnDuration.dots = dots  # pylint: disable=assigning-non-slot
+    returnDuration.dots = dots
     return returnDuration
 
 
@@ -1521,7 +1521,7 @@ def _guessTuplets(theLayer):
 
 # Element-Based Converter Functions
 # -----------------------------------------------------------------------------
-def scoreDefFromElement(elem, slurBundle=None):  # pylint: disable=unused-argument
+def scoreDefFromElement(elem, slurBundle=None):
     '''
     <scoreDef> Container for score meta-information.
 
@@ -1694,7 +1694,7 @@ def staffGrpFromElement(elem, slurBundle=None, staffDefDict=None):
     return staffDefDict
 
 
-def staffDefFromElement(elem, slurBundle=None):  # pylint: disable=unused-argument
+def staffDefFromElement(elem, slurBundle=None):
     '''
     <staffDef> Container for staff meta-information.
 

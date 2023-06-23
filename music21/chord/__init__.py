@@ -177,7 +177,7 @@ class ChordBase(note.NotRest):
         # after copying, if a Volume exists, it is linked to the old object
         # look at _volume so as not to create object if not already there
         # noinspection PyProtectedMember
-        for n in new._notes:  # pylint: disable=no-member
+        for n in new._notes:
             n._chordAttached = new
             # if .volume is called, a new Volume obj will be created
             if n.hasVolumeInformation():

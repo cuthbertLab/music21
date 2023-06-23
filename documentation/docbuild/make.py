@@ -128,12 +128,12 @@ class DocBuilder:
 
         if sphinx_new:
             # noinspection PyPackageRequirements
-            import sphinx.cmd.build  # pylint: disable=import-error
+            import sphinx.cmd.build
             sphinx_main_command = sphinx.cmd.build.main
         else:
             sphinx_main_command = sphinx.main  # pylint: disable=no-member
 
-        try:  # pylint: disable=assignment-from-no-return
+        try:
             returnCode = sphinx_main_command(sphinxOptions)
         except SystemExit:
             returnCode = 0

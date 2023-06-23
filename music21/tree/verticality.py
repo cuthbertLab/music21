@@ -870,7 +870,7 @@ class Verticality(prebase.ProtoM21Object):
                 continue
             el = timeSpan.element
             if isinstance(el, chord.Chord):
-                if len(el) == 0:  # pylint: disable=len-as-condition
+                if len(el) == 0:
                     continue
 
                 if el.articulations or el.expressions:
@@ -894,7 +894,6 @@ class Verticality(prebase.ProtoM21Object):
         seenArticulations = set()
         seenExpressions = set()
 
-        # pylint: disable=unidiomatic-typecheck
         for n in sorted(notesToAdd.values(), key=lambda x: x.pitch.ps):
             c.add(n)
             if gatherArticulations:
