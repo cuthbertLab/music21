@@ -1,8 +1,8 @@
 -r requirements.txt
 wheel
 pylint>=2.16.0
-flake8<6.0.0
-flake8-quotes
+flake8<7.0.0
+flake8-quotes>=3.3.2
 hatchling
 mypy>=1.4.0
 coveralls
