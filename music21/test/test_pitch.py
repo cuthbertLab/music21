@@ -44,7 +44,7 @@ class Test(unittest.TestCase):
 
     def testNameSetting(self):
         with self.assertRaisesRegex(ValueError,
-                                    "Cannot have octave given before pitch name in '8D-4'\."):
+                                    r"Cannot have octave given before pitch name in '8D-4'\."):
             p = Pitch('8D-4')
         with self.assertRaises(ValueError):
             p = Pitch('23')

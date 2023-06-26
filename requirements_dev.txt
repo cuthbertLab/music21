@@ -4,7 +4,7 @@ pylint>=2.16.0
 flake8<6.0.0
 flake8-quotes
 hatchling
-mypy>=0.990
+mypy>=1.4.0
 coveralls
 scipy
 sphinx
