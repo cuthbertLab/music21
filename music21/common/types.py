@@ -17,7 +17,7 @@ import typing as t
 from music21.common.enums import OffsetSpecial
 
 if t.TYPE_CHECKING:
-    import music21  # pylint: disable=unused-import
+    import music21
 
 DocOrder = list[str | Callable]
 OffsetQL = float | Fraction

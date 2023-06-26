@@ -191,7 +191,7 @@ class VoiceLeadingQuartet(base.Music21Object):
         if isinstance(keyValue, str):
             try:
                 keyValue = key.Key(key.convertKeyStringToMusic21KeyString(keyValue))
-            except Exception as e:  # pragma: no cover  # pylint: disable=broad-exception-caught
+            except Exception as e:  # pragma: no cover
                 raise VoiceLeadingQuartetException(
                     f'got a key signature string that is not supported: {keyValue}'
                 ) from e
@@ -200,7 +200,7 @@ class VoiceLeadingQuartet(base.Music21Object):
                 isKey = (isinstance(keyValue, key.Key))
                 if isKey is False:
                     raise AttributeError
-            except AttributeError:  # pragma: no cover  # pylint: disable=raise-missing-from
+            except AttributeError:  # pragma: no cover
                 raise VoiceLeadingQuartetException(
                     'got a key signature that is not a string or music21 Key '
                     + f'object: {keyValue}'
@@ -225,7 +225,7 @@ class VoiceLeadingQuartet(base.Music21Object):
                     n.duration.quarterLength = 0.0
                     n.pitch = value
                     setattr(self, which, n)
-            except Exception as e:  # pragma: no cover  # pylint: disable=broad-exception-caught
+            except Exception as e:  # pragma: no cover
                 raise VoiceLeadingQuartetException(
                     f'not a valid note specification: {value!r}'
                 ) from e

@@ -9,10 +9,6 @@ from __future__ import annotations
 
 import unittest
 
-# some lines must be this long, because of sources.
-# pylint: disable=line-too-long
-
-
 # abc standard
 # http://abcnotation.com/abc2mtex/abc.txt
 from music21 import environment

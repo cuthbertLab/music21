@@ -40,7 +40,6 @@ __all__ = [
 
 from music21 import defaults
 from music21 import exceptions21
-# pylint: disable=wildcard-import
 from music21.common.classTools import *  # including isNum, isListLike
 from music21.common.decorators import *  # gives the deprecated decorator
 from music21.common.enums import *

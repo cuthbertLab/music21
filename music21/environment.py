@@ -49,7 +49,7 @@ def etIndent(elem, level=0, spaces=2):
     indent an elementTree element for printing
     '''
     i = '\n' + level * spaces * ' '
-    if len(elem):  # pylint: disable=len-as-condition
+    if len(elem):
         if not elem.text or not elem.text.strip():
             elem.text = i + spaces * ' '
         if not elem.tail or not elem.tail.strip():

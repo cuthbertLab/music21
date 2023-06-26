@@ -61,7 +61,7 @@ from music21 import environment
 from music21 import exceptions21
 from music21 import prebase
 from music21.sites import Sites, SitesException, WEAKREF_ACTIVE
-from music21.style import Style  # pylint: disable=unused-import
+from music21.style import Style
 from music21.sorting import SortTuple, ZeroSortTupleLow, ZeroSortTupleHigh
 # needed for temporal manipulations; not music21 objects
 from music21 import tie
@@ -165,7 +165,7 @@ class _SplitTuple(tuple):
         # noinspection PyTypeChecker
         return super(_SplitTuple, cls).__new__(cls, tuple(tupEls))
 
-    def __init__(self, tupEls):  # pylint: disable=super-init-not-called
+    def __init__(self, tupEls):
         self.spannerList = []
 
 # -----------------------------------------------------------------------------
@@ -673,7 +673,7 @@ class Music21Object(prebase.ProtoM21Object):
 
     def __setstate__(self, state: dict[str, t.Any]):
         # defining self.__dict__ upon initialization currently breaks everything
-        object.__setattr__(self, '__dict__', state)  # pylint: disable=attribute-defined-outside-init
+        object.__setattr__(self, '__dict__', state)
 
     def _reprInternal(self) -> str:
         '''
@@ -3200,7 +3200,7 @@ class Music21Object(prebase.ProtoM21Object):
         for listType in ('expressions', 'articulations'):
             if hasattr(e, listType):
                 temp = getattr(e, listType)
-                setattr(e, listType, [])  # pylint: disable=attribute-defined-outside-init
+                setattr(e, listType, [])
                 setattr(eRemain, listType, [])
                 for thisExpression in temp:  # using thisExpression as a shortcut for expr or art.
                     if hasattr(thisExpression, 'splitClient'):  # special method (see Trill)

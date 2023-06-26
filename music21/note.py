@@ -1590,7 +1590,7 @@ class Note(NotRest):
         '''
         new = self._deepcopySubclassable(memo)
         # noinspection PyProtectedMember
-        new.pitch._client = new  # pylint: disable=no-member
+        new.pitch._client = new
         return new
 
     # --------------------------------------------------------------------------

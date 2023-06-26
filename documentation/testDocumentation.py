@@ -23,9 +23,9 @@ import sys
 import time
 
 # noinspection PyPackageRequirements
-from docutils.core import publish_doctree  # pylint: disable=import-error
+from docutils.core import publish_doctree
 # noinspection PyPackageRequirements
-import docutils.nodes  # pylint: disable=import-error
+import docutils.nodes
 
 
 import nbvalNotebook  # TODO: make into a package and import with .nbvalNotebook
