@@ -4144,22 +4144,18 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
             #   'e.offset', e.offset, 'self.elementOffset(e)', self.elementOffset(e), 'e', e])
             if span < 0:
                 continue
-            elif span == 0:
+            elif span == nearestTrailSpan:
                 candidates.append((span, e))
+            elif span < nearestTrailSpan:
+                candidates = [(span, e)]
                 nearestTrailSpan = span
-            else:
-                # do this comparison because may be out of order
-                if span <= nearestTrailSpan:
-                    candidates.append((span, e))
-                    nearestTrailSpan = span
         # environLocal.printDebug(['getElementAtOrBefore(), e candidates', candidates])
         if candidates:
-            candidates.sort(key=lambda x: (-1 * x[0], x[1].sortTuple()))
-            # TODO: this sort has side effects -- see ICMC2011 -- sorting clef vs. note, etc.
-            self.coreSelfActiveSite(candidates[-1][1])
-            return candidates[-1][1]
-        else:
-            return None
+            # TODO: this max may have side effects -- see ICMC2011 -- sorting clef vs. note, etc.
+            element = max(candidates, key=lambda x: (-1 * x[0], x[1].sortTuple()))
+            self.coreSelfActiveSite(element[1])
+            return element[1]
+        return None
 
     def getElementBeforeOffset(self, offset, classList=None) -> base.Music21Object | None:
         '''
