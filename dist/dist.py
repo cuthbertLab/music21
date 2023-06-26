@@ -28,6 +28,10 @@ so allocate time.  Start working on the announcement while it's running.
 
 
 4. run test/warningMultiprocessTest.py for lowest and highest Py version -- fix all warnings!
+4b. run `from music21.test import treeYield
+    and then run `treeYield.find_all_non_hashable_m21objects()` and check that the set returned is
+    empty.  Note -- it will print a bunch of module names, but only the final set matters.
+    Then do the same for `treeYield.find_all_non_default_instantiation_m21objects()`.
 5. commit and wait for results on GitHub Actions
      (normally not necessary, because it's slower and mostly duplicates multiprocessTest,
      but should be done before making a release).
@@ -64,10 +68,10 @@ so allocate time.  Start working on the announcement while it's running.
 18. Push tags: git push --tags  (or git push upstream --tags if not on main branch)
 
 19. Create a new release on GitHub and upload the TWO non-wheel files created here and docs.
-    Drag in this order: .tar.gz, documentation, no-corpus.tar.gz
+    Drag in this order: .tar.gz, -docs.zip, no-corpus.tar.gz
 
     Finish this before doing the next step, even though it looks like it could be done in parallel.
-
+    
 20. Upload the new file to PyPI with "twine upload music21-7.3.5a2.tar.gz", and same for the
     whl file (but NOT no corpus) [*]
 
