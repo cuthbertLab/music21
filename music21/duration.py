@@ -1807,7 +1807,7 @@ class Duration(prebase.ProtoM21Object, SlottedObjectMixin):
         Don't copy client when creating
         '''
         if self._componentsNeedUpdating:
-            self._updateComponents()
+            return common.defaultDeepcopy(self, memo, ignoreAttributes={'client'})
 
         if (len(self._components) == 1
                 and self._dotGroups == (0,)
