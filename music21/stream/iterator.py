@@ -82,7 +82,7 @@ class StreamIterator(prebase.ProtoM21Object, Sequence[M21ObjType]):
     * StreamIterator.srcStreamElements -- srcStream._elements
     * StreamIterator.cleanupOnStop -- should the StreamIterator delete the
       reference to srcStream and srcStreamElements when stopping? default
-      False
+      False -- DEPRECATED: to be removed in v10.
     * StreamIterator.activeInformation -- a dict that contains information
       about where we are in the parse.  Especially useful for recursive
       streams:
@@ -114,6 +114,7 @@ class StreamIterator(prebase.ProtoM21Object, Sequence[M21ObjType]):
       - filterList must be a list or None, not a single filter.
       - StreamIterator inherits from typing.Sequence, hence index
       was moved to elementIndex.
+    * Changed in v9: cleanupOnStop is deprecated.  Was not working properly before: noone noticed.
 
     OMIT_FROM_DOCS
 
@@ -167,7 +168,7 @@ class StreamIterator(prebase.ProtoM21Object, Sequence[M21ObjType]):
         # whether it should be yielded.
         self.filters: list[FilterType] = filterList
         self._len: int | None = None
-        self._matchingElements: list[M21ObjType] | None = None
+        self._matchingElements: dict(bool | None, list[M21ObjType]) = {}
         # keep track of where we are in the parse.
         # esp important for recursive streams...
         if activeInformation is not None:
@@ -387,15 +388,15 @@ class StreamIterator(prebase.ProtoM21Object, Sequence[M21ObjType]):
         >>> s.iter().notes[0]
         <music21.note.Note F#>
 
-        Demo of cleanupOnStop = True
+        Demo of cleanupOnStop = True; the sI[0] call counts as another iteration, so
+        after it is called there is nothing more to iterate over!  Note that cleanupOnStop
+        will be removed in music21 v10.
 
         >>> sI.cleanupOnStop = True
         >>> for n in sI:
         ...    printer = (repr(n), repr(sI[0]))
         ...    print(printer)
         ('<music21.note.Note F#>', '<music21.note.Note F#>')
-        ('<music21.note.Note C>', '<music21.note.Note F#>')
-        ('<music21.note.Note C>', '<music21.note.Note F#>')
         >>> sI.srcStream is s  # set to an empty stream
         False
         >>> for n in sI:
@@ -648,7 +649,7 @@ class StreamIterator(prebase.ProtoM21Object, Sequence[M21ObjType]):
         the filter changes.
         '''
         self._len = None
-        self._matchingElements = None
+        self._matchingElements = {}
 
     def cleanup(self) -> None:
         '''
@@ -673,7 +674,7 @@ class StreamIterator(prebase.ProtoM21Object, Sequence[M21ObjType]):
     def matchingElements(
         self,
         *,
-        restoreActiveSites: bool = True
+        restoreActiveSites: bool|None = None
     ) -> list[M21ObjType]:
         '''
         Returns a list of elements that match the filter.
@@ -722,12 +723,33 @@ class StreamIterator(prebase.ProtoM21Object, Sequence[M21ObjType]):
 
         If restoreActiveSites is False then the elements will not have
         their activeSites changed (callers should use it when they do not plan to actually
-        expose the elements to users, such as in `__len__`).
+        expose the elements to users, such as in `__len__`).  By default, it is `None`
+        which means to take from the iterator's `restoreActiveSites` attribute.
+
+        A demonstration of restoreActiveSites = False.  First we create a second stream
+        from the first, so that all elements are in two streams, then we'll check the
+        id of iterating through the second stream normally, and then the first stream
+        with restoreActiveSites=False, and then the first stream without the restoreActiveSites:
+
+        >>> s2 = stream.Part()
+        >>> s2.id = 'second'
+        >>> s2.elements = s
+        >>> {e.activeSite.id for e in s2.iter().notes.matchingElements()}
+        {'second'}
+        >>> {e.activeSite.id for e in sI_notes.matchingElements(restoreActiveSites=False)}
+        {'second'}
+        >>> {e.activeSite.id for e in sI_notes.matchingElements()}
+        {'tn3/4'}
 
         * New in v7: restoreActiveSites
+        * Changed in v9.3: restoreActiveSites allows `None` which takes from the iterator's
+          `restoreActiveSites` attribute.
         '''
-        if self._matchingElements is not None:
-            return self._matchingElements
+        if restoreActiveSites in self._matchingElements:
+            return self._matchingElements[restoreActiveSites]
+
+        if restoreActiveSites is None:
+            restoreActiveSites = self.restoreActiveSites
 
         with saveAttributes(self, 'restoreActiveSites', 'elementIndex'):
             self.restoreActiveSites = restoreActiveSites
@@ -735,9 +757,8 @@ class StreamIterator(prebase.ProtoM21Object, Sequence[M21ObjType]):
             me = [x for x in self]  # pylint: disable=unnecessary-comprehension
             self.reset()
 
-        if restoreActiveSites == self.restoreActiveSites:
-            # cache, if we are using the iterator default.
-            self._matchingElements = me
+        # cache, by restoreActiveSites parameter
+        self._matchingElements[restoreActiveSites] = me
 
         return me
 
