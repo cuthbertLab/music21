@@ -28,6 +28,8 @@ StreamType = t.TypeVar('StreamType', bound='music21.stream.Stream')
 StreamType2 = t.TypeVar('StreamType2', bound='music21.stream.Stream')
 M21ObjType = t.TypeVar('M21ObjType', bound='music21.base.Music21Object')
 M21ObjType2 = t.TypeVar('M21ObjType2', bound='music21.base.Music21Object')  # when you need another
+# to be explicit that a type is changing
+ChangedM21ObjType = t.TypeVar('ChangedM21ObjType', bound='music21.base.Music21Object')
 
 # does not seem to like the | way of spelling
 ClassListType = t.Union[str, Iterable[str], type[M21ObjType], Iterable[type[M21ObjType]]]
