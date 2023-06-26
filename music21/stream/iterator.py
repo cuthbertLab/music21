@@ -26,7 +26,7 @@ import warnings
 from music21 import common
 from music21.common.classTools import tempAttribute, saveAttributes
 from music21.common.enums import OffsetSpecial
-from music21.common.types import M21ObjType, StreamType
+from music21.common.types import M21ObjType, StreamType, ChangedM21ObjType
 from music21 import note
 from music21.stream import filters
 from music21 import prebase
@@ -39,7 +39,6 @@ if t.TYPE_CHECKING:
 
 T = t.TypeVar('T')
 S = t.TypeVar('S')
-ChangedM21ObjType = t.TypeVar('ChangedM21ObjType', bound=base.Music21Object)
 StreamIteratorType = t.TypeVar('StreamIteratorType', bound='StreamIterator')
 
 # pipe | version not passing mypy.
@@ -168,7 +167,7 @@ class StreamIterator(prebase.ProtoM21Object, Sequence[M21ObjType]):
         # whether it should be yielded.
         self.filters: list[FilterType] = filterList
         self._len: int | None = None
-        self._matchingElements: dict(bool | None, list[M21ObjType]) = {}
+        self._matchingElements: dict[bool | None, list[M21ObjType]] = {}
         # keep track of where we are in the parse.
         # esp important for recursive streams...
         if activeInformation is not None:
@@ -674,7 +673,7 @@ class StreamIterator(prebase.ProtoM21Object, Sequence[M21ObjType]):
     def matchingElements(
         self,
         *,
-        restoreActiveSites: bool|None = None
+        restoreActiveSites: bool | None = None
     ) -> list[M21ObjType]:
         '''
         Returns a list of elements that match the filter.

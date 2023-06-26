@@ -41,7 +41,9 @@ from music21 import bar
 from music21 import common
 from music21.common.enums import GatherSpanners, OffsetSpecial
 from music21.common.numberTools import opFrac
-from music21.common.types import StreamType, M21ObjType, OffsetQL, OffsetQLSpecial
+from music21.common.types import (
+    StreamType, M21ObjType, ChangedM21ObjType, OffsetQL, OffsetQLSpecial
+)
 from music21 import clef
 from music21 import chord
 from music21 import defaults
@@ -80,8 +82,6 @@ StreamException = exceptions21.StreamException
 ImmutableStreamException = exceptions21.ImmutableStreamException
 
 T = t.TypeVar('T')
-# we sometimes need to return a different type.
-ChangedM21ObjType = t.TypeVar('ChangedM21ObjType', bound=base.Music21Object)
 RecursiveLyricList = note.Lyric | None | list['RecursiveLyricList']
 
 BestQuantizationMatch = namedtuple(
@@ -4047,11 +4047,11 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         classList: t.Union[
             str,
             Iterable[str],
-            type[ChangedM21ObjType],
-            Iterable[type[ChangedM21ObjType]],
+            type[M21ObjType],
+            type,
             Iterable[type],
             None,
-        ]=None,
+        ] = None,
         *,
         _beforeNotAt: bool = False,
     ) -> base.Music21Object | None:
@@ -4181,8 +4181,8 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         classList: t.Union[
             str,
             Iterable[str],
-            type[ChangedM21ObjType],
-            Iterable[type[ChangedM21ObjType]],
+            type[M21ObjType],
+            type,
             Iterable[type],
             None,
         ] = None,
