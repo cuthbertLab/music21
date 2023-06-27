@@ -435,7 +435,7 @@ def parenthesesMatch(
 
     * New in v9.3.
     '''
-    if not len(open) or not len(close):
+    if not open or not close:
         raise ValueError('Neither open nor close can be empty.')
 
     mainMatch = ParenthesesMatch(-1, -1, '', [])
@@ -446,13 +446,13 @@ def parenthesesMatch(
     i = 0
     while i < len(s):
         if (not lastCharWasBackslash
-                and s[i:i+len(open)] == open):
+                and s[i:i + len(open)] == open):
             curPM = ParenthesesMatch(i + len(open), -1, '', [])
             stack.append(curPM)
             i += len(open)
             continue
         elif (not lastCharWasBackslash
-              and s[i:i+len(close)] == close):
+              and s[i:i + len(close)] == close):
             if len(stack) <= 1:
                 raise ValueError(f'Closing {close!r} without {open!r} at index {i}.')
             curPM = stack.pop()
@@ -473,8 +473,8 @@ def parenthesesMatch(
 
     return mainMatch.nested
 
-# -----------------------------------------------------------------------------
 
+# -----------------------------------------------------------------------------
 if __name__ == '__main__':
     import music21
     music21.mainTest()
