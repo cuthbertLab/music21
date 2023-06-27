@@ -2725,10 +2725,8 @@ class Music21Object(prebase.ProtoM21Object):
             offset = t.cast(OffsetQL, foundOffset)
             atEnd = 0
 
-        if self.duration.isGrace:
-            isNotGrace = 0
-        else:
-            isNotGrace = 1
+        # avoids expensive duration computation for streams, which can never be grace notes
+        isNotGrace = 1 if self.isStream or not self.duration.isGrace else 0
 
         if self.sites.hasSiteId(id(useSite)):
             insertIndex = self.sites.siteDict[id(useSite)].globalSiteIndex
