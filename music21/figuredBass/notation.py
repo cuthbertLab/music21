@@ -68,47 +68,26 @@ class Notation(prebase.ProtoM21Object):
     and an optional modifier. The figures are delimited using commas.
     Examples include '7,5,#3', '6,4', and '6,4+,2'.
 
-
     Valid modifiers include those accepted by :class:`~music21.pitch.Accidental`,
     such as #, -, and n, as well as those which can correspond to one, such as +,
     /, and b.
 
-
     .. note:: If a figure has a modifier but no number, the number is
         assumed to be 3.
-
 
     Notation also translates many forms of shorthand notation into longhand. It understands
     all the forms of shorthand notation listed below. This is true even if a number is accompanied
     by a modifier, or if a stand-alone modifier implies a 3.
 
-
     * None, '' or '5' -> '5,3'
-
-
     * '6' -> '6,3'
-
-
     * '7' -> '7,5,3'
-
-
     * '6,5' -> '6,5,3'
-
-
     * '4,3' -> '6,4,3'
-
-
     * '4,2' or '2' -> '6,4,2'
-
-
     * '9' -> '9,7,5,3'
-
-
     * '11' -> '11,9,7,5,3'
-
-
     * '13' -> '13,11,9,7,5,3'
-
     * '_' -> treated as an extender
 
     Figures are saved in order from left to right as found in the notationColumn.
@@ -141,9 +120,7 @@ class Notation(prebase.ProtoM21Object):
     >>> n1.figures[2]
     <music21.figuredBass.notation.Figure 2 <Modifier None None>>
 
-
     Here, a stand-alone '#' is being passed to Notation.
-
 
     >>> n2 = notation.Notation('#')
     >>> n2.numbers
@@ -156,9 +133,7 @@ class Notation(prebase.ProtoM21Object):
     >>> n2.figures[1]
     <music21.figuredBass.notation.Figure 3 <Modifier # sharp>>
 
-
     Now, a stand-alone b is being passed to Notation as part of a larger notationColumn.
-
 
     >>> n3 = notation.Notation('b6,b')
     >>> n3.numbers
@@ -174,10 +149,13 @@ class Notation(prebase.ProtoM21Object):
     [False, False]
     >>> n3.hasExtenders
     False
-    >>> n4 = notation.Notation('b6,\U0001D12B_,#')
+
+    Here we will use the unicode symbol for double-flat for the extender:
+
+    >>> n4 = notation.Notation('b6, \U0001D12B_, #')
     >>> n4.figures
     [<music21.figuredBass.notation.Figure 6 <Modifier b flat>>,
-     <music21.figuredBass.notation.Figure _ <Modifier 𝄫 double-flat>>,
+     <music21.figuredBass.notation.Figure _(extender) <Modifier 𝄫 double-flat>>,
      <music21.figuredBass.notation.Figure 3 <Modifier # sharp>>]
     >>> n4.figuresFromNotationColumn
     [<music21.figuredBass.notation.Figure 6 <Modifier b flat>>,
@@ -227,10 +205,8 @@ class Notation(prebase.ProtoM21Object):
             ''',
     }
 
-    def __init__(self, notationColumn=None):
+    def __init__(self, notationColumn: str = '') -> None:
         # Parse notation string
-        if notationColumn is None:
-            notationColumn = ''
         self.notationColumn = notationColumn
         self.figureStrings = None
         self.origNumbers = None
@@ -259,16 +235,32 @@ class Notation(prebase.ProtoM21Object):
         bass and (if necessary) how to modify the corresponding pitches
         accordingly.
 
+        `_parseNotationColumn` is called from `__init__` and thus
+        is not explicitly demonstrated below.
 
         >>> from music21.figuredBass import notation as n
-        >>> notation1 = n.Notation('#6,5')  #__init__ method calls _parseNotationColumn()
+        >>> notation1 = n.Notation('#6, 5')
+
+        The figureStrings are left alone:
+
         >>> notation1.figureStrings
         ['#6', '5']
+
+        And in this case the original numbers (`origNumbers`) are
+        the same:
+
         >>> notation1.origNumbers
         (6, 5)
+
+        Since 6 has a sharp on it, it has something in the original modifier
+        strings (`origModStrings`)
+
         >>> notation1.origModStrings
         ('#', None)
-        >>> notation2 = n.Notation('-6,-')
+
+        A second example of flat 6 and flat 3:
+
+        >>> notation2 = n.Notation('-6, -')
         >>> notation2.figureStrings
         ['-6', '-']
         >>> notation2.origNumbers
@@ -276,13 +268,17 @@ class Notation(prebase.ProtoM21Object):
         >>> notation2.origModStrings
         ('-', '-')
 
-        hasExtenders is set True if an underscore is parsed within a notation string
-        >>> notation2.hasExtenders
-        False
+
+        An example of a seventh chord with extender:
 
         >>> notation3 = n.Notation('7_')
+
+        `hasExtenders` is set True if an underscore is parsed within a notation string
+
         >>> notation3.hasExtenders
         True
+        >>> notation2.hasExtenders
+        False
         '''
         delimiter = '[,]'
         figures = re.split(delimiter, self.notationColumn)
@@ -333,11 +329,9 @@ class Notation(prebase.ProtoM21Object):
 
         # extenders come from the optional argument when instantiating the object.
         # If nothing is provided, no extenders will be set.
-        # Otherwise we have to look if amount of extenders and figure numbers match
+        # Otherwise, we have to look if amount of extenders and figure numbers match
         if not self.extenders:
             self.extenders = [False for i in range(len(modifierStrings))]
-        else:
-            extenders = tuple(self.extenders)
 
         self.origNumbers = numbers  # Keep original numbers
         self.numbers = numbers  # Will be converted to longhand
@@ -349,7 +343,6 @@ class Notation(prebase.ProtoM21Object):
         '''
         Provided the numbers and modifierStrings of a parsed notation column,
         translates it to longhand.
-
 
         >>> from music21.figuredBass import notation as n
         >>> notation1 = n.Notation('#6,5')  # __init__ method calls _parseNotationColumn()
@@ -447,13 +440,10 @@ class Notation(prebase.ProtoM21Object):
         for i in range(len(self.numbers)):
             number = self.numbers[i]
             modifierString = self.modifierStrings[i]
-            if self.extenders:
-                if i < len(self.extenders):
-                    extender = self.extenders[i]
-            else:
-                extender = False
-            figure = Figure(number, modifierString, extender)
-            figure = Figure(number, modifierString)
+            extender = False
+            if self.extenders and i < len(self.extenders):
+                extender = self.extenders[i]
+            figure = Figure(number, modifierString, extender=extender)
             figures.append(figure)
 
         self.figures = figures
@@ -530,7 +520,7 @@ class Figure(prebase.ProtoM21Object):
             '''
     }
 
-    def __init__(self, number=1, modifierString=None, extender: bool = False):
+    def __init__(self, number=1, modifierString: str = '', *, extender: bool = False):
         self.number = number
         self.modifierString = modifierString
         self.modifier = Modifier(modifierString)
@@ -551,18 +541,14 @@ class Figure(prebase.ProtoM21Object):
         >>> n.isPureExtender
         False
         '''
-
         return self.number == 1 and self.hasExtender
-
 
     def _reprInternal(self):
         if self.isPureExtender:
             return '<Figure is a pure extender>'
         mod = repr(self.modifier).replace('music21.figuredBass.notation.', '')
-        ext = 'extender: __' if self.hasExtender else ''
-        if self.hasExtender:
-            return f'{self.number} {mod} {ext}'
-        return f'{self.number} {mod}'
+        ext = '(extender)' if self.hasExtender else ''
+        return f'{self.number}{ext} {mod}'
 
 
 # ------------------------------------------------------------------------------

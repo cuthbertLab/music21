@@ -1936,7 +1936,7 @@ class ChordSymbol(Harmony):
         kindStr.
         '''
         if self.figure == 'Chord Symbol Cannot Be Identified':
-            return self.figure
+            return
         # remove spaces from prelim Figure...
         prelimFigure = self.figure
         prelimFigure = re.sub(r'\s', '', prelimFigure)
@@ -2502,29 +2502,42 @@ class NoChord(ChordSymbol):
 
 class FiguredBass(Harmony):
     '''
-    The FiguredBassIndication objects store information about thorough bass figures.
+    *BETA*: FiguredBass objects are currently in beta and may change without warning.
+
+    The FiguredBass objects store information about thorough bass figures.
     It is created as a representation for <fb> tags in MEI and <figured-bass> tags in MusicXML.
     The FiguredBassIndication object derives from the Harmony object and can be used
     in the following way:
 
     >>> fb = harmony.FiguredBass('#,6#')
     >>> fb
-    <music21.harmony.FiguredBass figures: #,6#>
+    <music21.harmony.FiguredBass #,6#>
 
     The single figures are stored as figuredBass.notation.Figure objects:
+
     >>> fb.notation.figures[0]
     <music21.figuredBass.notation.Figure 3 <Modifier # sharp>>
-    >>> fb2 = harmony.FiguredBass(figureStrings=['#_','6#'])
+
+    The figures can be accessed and manipulated individually by passing in `figureStrings`
+    (plural), and extenders are allowed as with `_`:
+
+    >>> fb2 = harmony.FiguredBass(figureStrings=['#_', '6#'])
     >>> fb2
-    <music21.harmony.FiguredBass figures: #_,6#>
+    <music21.harmony.FiguredBass #_,6#>
     >>> fb2.notation.hasExtenders
     True
+
+    Currently, figured bass objects do not have associated pitches.  This will change.
+
+    >>> fb.pitches
+    ()
+
+    * new in v9.3
     '''
-
-
     def __init__(self,
                  figureString: str = '',
-                 figureStrings: list[str] = [],
+                 *,
+                 figureStrings: Iterable[str] = (),
                  **keywords):
         super().__init__(**keywords)
 
@@ -2532,7 +2545,7 @@ class FiguredBass(Harmony):
 
         if figureString != '':
             self.figureString = figureString
-        elif figureStrings != []:
+        elif figureStrings:
             self.figureString = ','.join(figureStrings)
         else:
             self.figureString = ''
@@ -2593,7 +2606,7 @@ class FiguredBass(Harmony):
 
 
     def _reprInternal(self):
-        return f'figures: {self.notation.notationColumn}'
+        return self.notation.notationColumn
 
 # ------------------------------------------------------------------------------
 
