@@ -1434,7 +1434,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
             if hasattr(other, attr):
                 setattr(self, attr, getattr(other, attr))
 
-    def hasElement(self, obj):
+    def hasElement(self, obj: base.Music21Object) -> bool:
         '''
         Return True if an element, provided as an argument, is contained in
         this Stream.
@@ -1449,8 +1449,16 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         >>> s.hasElement(n1)
         True
         '''
-        objId = id(obj)
-        return self.coreHasElementByMemoryLocation(objId)
+        if id(obj) in self._offsetDict:
+            return True
+
+        for e in self._elements:
+            if e is obj:  # pragma: no cover
+                return True
+        for e in self._endElements:
+            if e is obj:  # pragma: no cover
+                return True
+        return False
 
     def hasElementOfClass(self, className, forceFlat=False):
         '''
