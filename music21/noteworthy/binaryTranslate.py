@@ -28,9 +28,9 @@ This is very beta.  Much better would be to convert the file into .xml or .nwctx
 
 ::
 
-    >>> #_DOCS_SHOW c = converter.parse('/Users/cuthbert/desktop/cuthbert_test1.nwc')
+    >>> #_DOCS_SHOW c = converter.parse('/Users/Hildegard/Desktop/test1.nwc')
     >>> p = common.getSourceFilePath() / 'noteworthy' / 'cuthbert_test1_v175.nwc' #_DOCS_HIDE
-    >>> c = converter.parse(str(p)) #_DOCS_HIDE
+    >>> c = converter.parse(p) #_DOCS_HIDE
     >>> c.show('text')
     {0.0} <music21.metadata.Metadata object at ...>
     {0.0} <music21.stream.Part ...>
@@ -79,8 +79,9 @@ This is very beta.  Much better would be to convert the file into .xml or .nwctx
         {4.0} <music21.stream.Measure 0 offset=4.0>
             {0.0} <music21.note.Note C>
 
+    >>> #_DOCS_SHOW c = converter.parse('/Users/Hildegard/Desktop/jingle1.nwc')
     >>> p = common.getSourceFilePath() / 'noteworthy' / 'jingle_v175.nwc' #_DOCS_HIDE
-    >>> c = converter.parse(str(p)) #_DOCS_HIDE
+    >>> c = converter.parse(p) #_DOCS_HIDE
     >>> c.show('text')
     {0.0} <music21.metadata.Metadata object at 0x7fe8c0a5ffa0>
     {0.0} <music21.stream.Part 0x7fe8c0920100>
@@ -193,6 +194,8 @@ from __future__ import annotations
 
 import pathlib
 import struct
+import typing as t
+from typing import TypedDict
 
 from music21 import environment
 from music21 import exceptions21
@@ -200,6 +203,13 @@ from music21 import exceptions21
 from music21.noteworthy import constants
 
 environLocal = environment.Environment('noteworthy.translate')
+
+
+class FontDict(TypedDict):
+    name: bytes
+    size: int
+    style: int
+    charset: int
 
 
 class NoteworthyBinaryTranslateException(exceptions21.Music21Exception):
@@ -213,8 +223,8 @@ class NWCConverter:
     >>> nwcc = noteworthy.binaryTranslate.NWCConverter()
     >>> nwcc
     <music21.noteworthy.binaryTranslate.NWCConverter object at 0x...>
-    >>> nwcc.fileContents is None
-    True
+    >>> nwcc.fileContents
+    b''
     >>> nwcc.parsePosition
     0
     >>> nwcc.version  # version of nwc file to be parsed
@@ -224,35 +234,35 @@ class NWCConverter:
     >>> nwcc.staves
     []
     '''
-    def __init__(self, **keywords):
-        self.fileContents = None
+    def __init__(self, **keywords) -> None:
+        self.fileContents: bytes = b''
         self.parsePosition = 0
         self.version = 200
         self.numberOfStaves = 0
         self.titlePageInfo = 0
         self.pageNumberStart = 0
-        self.staves = []
-        self.comment = None
-        self.fonts = []
-        self.lyricist = None
-        self.groupVisibility = None
-        self.allowLayering = None
-        self.margins = None
-        self.notationTypeface = None
+        self.staves: list[NWCStaff] = []
+        self.comment: bytes = b''
+        self.fonts: list[FontDict] = []
+        self.lyricist: bytes = b''
+        self.groupVisibility: bytes = b''
+        self.allowLayering: int = 1
+        self.margins: bytes = b''
+        self.notationTypeface: bytes = b'Maestro'
         self.extendLastSystem = None
-        self.copyright1 = None
-        self.copyright2 = None
+        self.copyright1: bytes = b''
+        self.copyright2: bytes = b''
         self.increaseNoteSpacing = None
-        self.author = None
-        self.title = None
+        self.author: bytes = b''
+        self.title: bytes = b''
         self.measureStart = None
         self.measureNumbers = None
         self.mirrorMargins = None
         self.staffLabels = None
         self.sins = None
-        self.user = None
+        self.user: bytes = b''
         self.staffHeight = 0
-        self.currentAlterations = {}
+        self.currentAlterations: dict[int, str] = {}
 
     # noinspection SpellCheckingInspection
     def parseFile(self, fp: pathlib.Path | str):
@@ -263,8 +273,8 @@ class NWCConverter:
         >>> #_DOCS_SHOW fp = '/Users/cuthbert/desktop/cuthbert_test1.nwc'
         >>> fp = str(common.getSourceFilePath()/'noteworthy'/'cuthbert_test1.nwc') #_DOCS_HIDE
         >>> nwcc = noteworthy.binaryTranslate.NWCConverter()
-        >>> nwcc.fileContents is None
-        True
+        >>> nwcc.fileContents
+        b''
         >>> streamObj = nwcc.parseFile(fp)
         >>> len(nwcc.fileContents)  # binary
         1139
@@ -279,7 +289,7 @@ class NWCConverter:
         self.parse()
         return self.toStream()
 
-    def parseString(self, bytesIn=None):
+    def parseString(self, bytesIn: bytes = b''):
         '''
         same as parseFile but takes a string (in Py3, bytes) of binary data instead.
         '''
@@ -344,7 +354,7 @@ class NWCConverter:
             val = val - 256
         return val
 
-    def readBytes(self, bytesToRead=1, updateParsePosition=True):
+    def readBytes(self, bytesToRead=1, updateParsePosition=True) -> bytes:
         '''
         reads the next bytesToRead bytes and then (optionally) updates self.parsePosition
         '''
@@ -355,7 +365,7 @@ class NWCConverter:
             self.parsePosition = pp + bytesToRead
         return value
 
-    def readToNUL(self, updateParsePosition=True):
+    def readToNUL(self, updateParsePosition=True) -> bytes:
         r'''
         reads self.fileContents up to, but not including, the next position of \x00.
 
@@ -369,7 +379,7 @@ class NWCConverter:
             # raise NoteworthyBinaryTranslateException(fc[self.parsePosition:],
             #             self.parsePosition)
         # print(self.parsePosition, nulPosition)
-        ret = None
+        ret: bytes
         if nulPosition == -1:
             ret = fc[self.parsePosition:]
         else:
@@ -421,7 +431,7 @@ class NWCConverter:
     def skipBytes(self, numBytes=1):
         self.parsePosition += numBytes
 
-    def advanceToNotNUL(self, nul=b'\x00'):
+    def advanceToNotNUL(self, nul: bytes = b'\x00'):
         pp = self.parsePosition
         fc = self.fileContents
         # the slice Notation [pp:pp + 1] is needed to avoid Py3 conversion to bytes
@@ -448,7 +458,7 @@ class NWCConverter:
             thisStaff.parse()
             self.staves.append(thisStaff)
 
-    def parseHeader(self):
+    def parseHeader(self) -> None:
         '''
         Sets a ton of information from the header, and advances the parse position.
         '''
@@ -465,18 +475,12 @@ class NWCConverter:
         # print(unused_unknown)
         self.skipBytes(10)
         self.title = self.readToNUL()
-        # print(self.title)
         self.author = self.readToNUL()
-        # print(self.author)
         if self.version >= 200:
             self.lyricist = self.readToNUL()
-            # print(self.lyricist)
-        else:
-            self.lyricist = None
         self.copyright1 = self.readToNUL()
         self.copyright2 = self.readToNUL()
         self.comment = self.readToNUL()
-        # print(self.comment)
 
         self.extendLastSystem = self.byteToInt()
         self.increaseNoteSpacing = self.byteToInt()
@@ -488,21 +492,16 @@ class NWCConverter:
         if self.version >= 130:
             self.margins = self.readToNUL()
         else:
-            self.margins = '0.0 0.0 0.0 0.0'
+            self.margins = b'0.0 0.0 0.0 0.0'
 
         unused = self.byteToInt()
         unused = self.readBytes(2)
         if self.version >= 130:
             self.groupVisibility = self.readBytes(32)
             self.allowLayering = self.byteToInt()
-        else:
-            self.groupVisibility = True
-            self.allowLayering = True
 
         if self.version >= 200:
             self.notationTypeface = self.readToNUL()
-        else:
-            self.notationTypeface = 'Maestro'
         self.staffHeight = self.readLEShort()
 
         if self.version > 170:
@@ -515,17 +514,16 @@ class NWCConverter:
         self.skipBytes(2)
         self.fonts = []
         for i in range(fontCount):
-            fontDict = {
+            fontDict: FontDict = {
                 'name': self.readToNUL(),
-                'style': self.byteToInt(),
+                'style': self.byteToInt(),  # regular; 1 = bold; 2 = italic; 3 = bold italic???
                 'size': self.byteToInt(),
+                'charset': 0,
             }
             unused = self.byteToInt()
             fontDict['charset'] = self.byteToInt()
             if fontDict['name'] == b'':
                 fontDict['name'] = b'Times New Roman'
-            if fontDict['style'] == 0:
-                fontDict['style'] = 0  # regular; 1 = bold; 2 = italic; 3 = bold italic???
             if fontDict['size'] == 0:
                 fontDict['size'] = 12
             self.fonts.append(fontDict)
@@ -566,15 +564,15 @@ class NWCConverter:
 class NWCStaff:
     '''
     A NWCStaff is a list of NWCObjects (see :meth:`parseObjects`) associated to metadata
-    (see :meth:`parseHeader`). It may also contains some lyrics (see :meth:`parseLyrics`).
+    (see :meth:`parseHeader`). It may also contain some lyrics (see :meth:`parseLyrics`).
     It defines a :meth:`dump` method that return a list of string containing the
     nwctxt-formatted content of each object of the staff.
     '''
-    def __init__(self, parent=None):
+    def __init__(self, parent: NWCConverter) -> None:
         self.parent: NWCConverter = parent
-        self.lyrics = []
+        self.lyrics: list[list[bytes]] = []
         self.objects: list[NWCObject] = []
-        self.instrumentName = None
+        self.instrumentName: bytes = b''
         self.group = None
         self.layerWithNextStaff = None
         self.transposition = None
@@ -587,7 +585,7 @@ class NWCStaff:
         self.lines = 0
         self.name = None
         self.staffOffset = 0
-        self.label = None
+        self.label: bytes = b''
         self.lyricAlignment = 0
 
     def parse(self):
@@ -603,8 +601,8 @@ class NWCStaff:
         dumpObjects = []
 
         # default to first midi instrument
-        instruName = self.instrumentName if self.instrumentName else 'Acoustic Grand Piano'
-        label = self.label.decode('utf-8') if self.label else instruName
+        instruName = self.instrumentName.decode('latin_1') if self.instrumentName else 'Acoustic Grand Piano'
+        label = self.label.decode('latin_1') if self.label else instruName
 
         staffString = '|AddStaff|Name:' + label
         dumpObjects.append(staffString)
@@ -636,9 +634,6 @@ class NWCStaff:
             # print('label:', self.label)
             self.instrumentName = p.readToNUL()
             # print('instrument name:', self.instrumentName)
-        else:
-            self.label = ''
-            self.instrumentName = ''
         self.group = p.readToNUL()
         # print('group: ', self.group)
 
@@ -675,7 +670,7 @@ class NWCStaff:
             p.skipBytes(11)
             instruPatch = p.byteToInt()
             index = instruPatch - 1 if 0 < instruPatch < len(constants.MidiInstruments) else 0
-            self.instrumentName = constants.MidiInstruments[index]
+            self.instrumentName = constants.MidiInstruments[index].encode('latin_1')
             p.skipBytes(10)
             self.transposition = p.byteToSignedInt()
             p.skipBytes(6)
@@ -751,7 +746,7 @@ class NWCStaff:
 
 class NWCObject:
     '''
-    NWCObject class is an union that can be used for each type of object contained in a staff.
+    NWCObject class is a union that can be used for each type of object contained in a staff.
 
     An object binary blob starts with its type.
     The parse() method calls the appropriate method depending on the object type.
@@ -898,8 +893,8 @@ class NWCObject:
 
         def dump(inner_self):
             build = '|Bar|'
-            # dont care about Single, it is the default
-            if inner_self.style > 0 and inner_self.style < len(constants.BarStyles):
+            # we don't care about 'Single', as it is the default
+            if 0 < inner_self.style < len(constants.BarStyles):
                 styleString = constants.BarStyles[inner_self.style]
                 build += '|Style:' + styleString
             return build
@@ -1130,7 +1125,6 @@ class NWCObject:
         Chord member
         8 bytes + n Note objects
         '''
-
         p = self.parserParent
         self.type = 'NoteChordMember'
         numberOfNotes = 0
@@ -1152,6 +1146,8 @@ class NWCObject:
             self.stemLength = 7
 
         self.data2 = []
+        if t.TYPE_CHECKING:
+            assert isinstance(self, NWCStaff)
         for i in range(numberOfNotes):
             chordNote = NWCObject(staffParent=self, parserParent=p)
             chordNote.parse()
@@ -1296,6 +1292,8 @@ class NWCObject:
         '''
         self.noteChordMember()
         self.type = 'RestChordMember'
+        if t.TYPE_CHECKING:
+            assert isinstance(self, NWCStaff)
         rest = NWCObject(staffParent=self, parserParent=self.parserParent)
         rest.duration = self.data1[0]
         rest.data2 = self.data1
