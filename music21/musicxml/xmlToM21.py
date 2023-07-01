@@ -54,6 +54,7 @@ from music21 import tablature
 from music21 import tempo
 from music21 import text  # for text boxes
 from music21 import tie
+from music21.figuredBass.notation import modifiersDictXmlToM21
 
 from music21.musicxml import xmlObjects
 from music21.musicxml.xmlObjects import MusicXMLImportException, MusicXMLWarning
@@ -2394,7 +2395,7 @@ class MeasureParser(XMLParserBase):
         'direction': 'xmlDirection',
         'attributes': 'parseAttributesTag',
         'harmony': 'xmlHarmony',
-        'figured-bass': None,
+        'figured-bass': 'xmlToFiguredBass',
         'sound': 'xmlSound',
         'barline': 'xmlBarline',
         'grouping': None,
@@ -2461,6 +2462,9 @@ class MeasureParser(XMLParserBase):
 
         # what is the offset in the measure of the current note position?
         self.offsetMeasureNote: OffsetQL = 0.0
+
+        # Offset Calc if more than one figure is set under a single note
+        self.lastFigureDuration = 0
 
         # keep track of the last rest that was added with a forward tag.
         # there are many pieces that end with incomplete measures that
@@ -2859,6 +2863,15 @@ class MeasureParser(XMLParserBase):
         # only increment Chords after completion
         self.offsetMeasureNote += offsetIncrement
         self.endedWithForwardTag = None
+
+        # reset offset for figures. This is needed to put in
+        # multiple FiguredBassIndications at one note at the right offset.
+        # Musicxml puts <figured-bass> tags immediately before a <note> tag,
+        # which means that we have to reset a given offset duration of some
+        # <figured-bass> tags after inserting the coressponding note and
+        # before going to a new note.
+        self.lastFigureDuration = 0
+
 
     def xmlToChord(self, mxNoteList: list[ET.Element]) -> chord.ChordBase:
         # noinspection PyShadowingNames
@@ -5236,6 +5249,109 @@ class MeasureParser(XMLParserBase):
             # self.xmlFrameToFretBoard(mxFrame, cs)
 
         return cs
+
+    def xmlToFiguredBass(self, mxFiguredBass) -> harmony.FiguredBassIndication:
+        # noinspection PyShadowingNames
+        """
+        Converts a figured bass tag in musicxml to a harmony.FiguredBassIndication object:
+
+        >>> from xml.etree.ElementTree import fromstring as EL
+        >>> MP = musicxml.xmlToM21.MeasureParser()
+
+        >>> fbStr = '''<figured-bass>
+        ...           <figure>
+        ...             <figure-number>5</figure-number>
+        ...           </figure>
+        ...           <figure>
+        ...             <figure-number>4</figure-number>
+        ...           </figure>
+        ...         </figured-bass>'''
+        >>> mxFigures = EL(fbStr)
+        >>> fbi = MP.xmlToFiguredBass(mxFigures)
+        >>> fbi
+        <FiguredBassIndication figures: 5,4 part: >
+        """
+
+        fb_strings: list[str] = []
+        fb_extenders: list[bool] = []
+        sep: str = ','
+        d: duration.Duration | None = None
+        offsetFbi = self.offsetMeasureNote
+
+        # parentheses is not used at the moment
+        hasParentheses: bool = False
+
+        if 'parentheses' in mxFiguredBass.attrib.keys():
+            if mxFiguredBass.attrib['parentheses'] == 'yes':
+                hasParentheses = True
+                warnings.warn('Parentheses are ignored and removed at the moment.',
+                              MusicXMLWarning)
+
+        for subElement in mxFiguredBass.findall('*'):
+            fb_number: str = ''
+            fb_prefix: str = ''
+            fb_suffix: str = ''
+
+            if subElement.tag == 'figure':
+                for el in subElement.findall('*'):
+                    if el.tag == 'figure-number':
+                        if el.text:
+                            fb_number = el.text
+                        # Get prefix and/or suffix.
+                        # The function returns an empty string if nothing is found.
+                    fb_prefix = self._getFigurePrefixOrSuffix(subElement, 'prefix')
+                    fb_suffix = self._getFigurePrefixOrSuffix(subElement, 'suffix')
+
+                    # collect information on extenders
+                    if el.tag == 'extend':
+                        if 'type' in el.attrib.keys():
+                            fb_extenders.append((el.attrib['type'] in ['stop', 'continue', 'start']))
+                if not subElement.findall('extend'):
+                    fb_extenders.append(False)
+
+                # put prefix/suffix, number and extenders together
+                if fb_prefix + fb_number + fb_suffix != '' or len(fb_extenders) != 0 :
+                    fb_strings.append(fb_prefix + fb_number + fb_suffix)
+                else:
+                    # Warning because an empty figured-bass tag is not valid musixml.
+                    warnings.warn('There was an empty <figured-bass> tag.', MusicXMLWarning)
+
+                # If a <duration> is given, this usually means that there are multiple figures
+                # for a single note. We have to look for offsets here.
+            if subElement.tag == 'duration':
+                d = self.xmlToDuration(mxFiguredBass)
+                if self.lastFigureDuration > 0:
+                    offsetFbi = self.offsetMeasureNote + self.lastFigureDuration
+                    self.lastFigureDuration += d.quarterLength
+                else:
+                    offsetFbi = self.offsetMeasureNote
+                    self.lastFigureDuration = d.quarterLength
+
+        fb_string = sep.join(fb_strings)
+        fbi = harmony.FiguredBassIndication(fb_string, extenders=fb_extenders, part=self.parent.partId)
+        
+        # If a duration is provided, set length of the FigureBassIndication
+        if d:
+            fbi.quarterLength = d.quarterLength
+        self.stream.insert(offsetFbi, fbi)
+        return fbi
+
+    def _getFigurePrefixOrSuffix(self, figure, presuf: str = 'prefix') -> str:
+        '''
+        A helper function for prefixes and suffixes of figure numbers.
+        Called two times from xmlToFiguredBass().
+        '''
+        if figure.findall(presuf):
+            for fix in figure.findall(presuf):
+                if fix.text:
+                    mod: str | None = modifiersDictXmlToM21.get(fix.text)
+                    if mod:
+                        return mod
+                    else:
+                        warnings.warn(f'''{fix.text} is currently not supported. Please look into
+                                      the modifiersDictXmlToM21 and make your changes, that will
+                                      fit your needs.''')
+        return ''
 
     def xmlDirection(self, mxDirection):
         '''

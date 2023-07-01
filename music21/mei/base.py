@@ -199,6 +199,7 @@ from music21 import pitch
 from music21 import stream
 from music21 import spanner
 from music21 import tie
+from music21 import harmony
 
 
 if t.TYPE_CHECKING:
@@ -2493,6 +2494,89 @@ def chordFromElement(elem, slurBundle=None):
 
     return theChord
 
+def harmFromElement(elem, slurBundle=None) -> tuple:
+    '''
+    The MEI <harm> tag is used for several types of indications. In the MEI v4 guidelines it says:
+
+    An indication of harmony, e.g., chord names, tablature grids, harmonic analysis, figured bass.
+    (In MEI v4 guidelines: https://music-encoding.org/guidelines/v4/elements/harm.html)
+
+    **Attributes/Elements Implemented:**
+
+    - @xml:id (or id), an XML id (submitted as the Music21Object "id")
+    - <fb> tags that contain figured bass information
+
+    **Attributes/Elements in Testing:** none
+
+    **Attributes not Implemented:** a lot
+    '''
+
+    # other tags than <fb> to be added…
+    tagToFunction = {f'{MEI_NS}fb': figuredbassFromElement}
+
+    fb_harmony_tag: tuple = ()
+
+    # Collect all elements in a measure and go through extenders
+    # tstamp has to be used as a duration marker between two elements
+    for subElement in _processEmbeddedElements(elem.findall('*'),
+                                               tagToFunction,
+                                               elem.tag, slurBundle):
+        subElement.tstamp = float(elem.get('tstamp'))
+        subElement.offset = subElement.tstamp - 1
+        subElement.part = elem.get('staff')
+        fb_harmony_tag = (subElement.tstamp - 1, subElement)
+
+    return fb_harmony_tag
+
+def figuredbassFromElement(elem, slurBundle=None) -> harmony.FiguredBassIndication:
+    '''
+    This function handles basically the MEI <f> tag which is contained in the <fb> tag.
+    At the end a harmony.FiguredBassIndication object is returned.
+
+    **Attributes/Elements Implemented:**
+
+    - @xml:id (or id), an XML id (submitted as the Music21Object "id")
+    - @dur.metrical, duration of the figure
+    - @extender, contains information if a figure is prolonged over the duration of the figure
+
+    **Attributes/Elements in Testing:** none
+
+    **Attributes not Implemented:** a lot
+    '''
+
+    if elem.get(_XMLID):
+        fb_id = elem.get(_XMLID)
+    fb_notation: str = ''
+    fb_notation_list: list[str] = []
+    fb_extenders: list[bool] = []
+    dauer: float = 0
+
+    # loop through all child elements and collect <f> tags
+    for subElement in elem.findall('*'):
+        if subElement.tag == f'{MEI_NS}f':
+            if subElement.text is not None:
+                # remove Parentheses around figure numbers
+                fb_fig = subElement.text.strip('()')
+                fb_notation_list.append(fb_fig)
+            if 'extender' in subElement.attrib.keys():
+                #if subElement.attrib['extender'] == 'true':
+                #fb_notation_list.append('_')
+                print('extender: ', (subElement.attrib['extender'] == 'true'))
+                fb_extenders.append((subElement.attrib['extender'] == 'true'))
+            else:
+                fb_extenders.append(False)
+
+            if 'dur.metrical' in subElement.attrib.keys():
+                dauer = float(subElement.attrib['dur.metrical'])
+
+    # Generate a FiguredBassIndication object and set the collected information
+    fb_notation = ','.join(fb_notation_list)
+    theFbNotation = harmony.FiguredBassIndication(fb_notation, extenders=fb_extenders,
+                                                   part=elem.get('n'))
+    theFbNotation.id = fb_id
+    theFbNotation.duration = duration.Duration(quarterLength=dauer)
+
+    return theFbNotation
 
 def clefFromElement(elem, slurBundle=None):  # pylint: disable=unused-argument
     '''
@@ -3131,10 +3215,12 @@ def measureFromElement(elem, backupNum, expectedNs, slurBundle=None, activeMeter
     '''
     staves = {}
     stavesWaiting = {}  # for staff-specific objects processed before the corresponding staff
+    harmElements: dict = {'fb': []}
 
     # mapping from tag name to our converter function
     staffTag = f'{MEI_NS}staff'
     staffDefTag = f'{MEI_NS}staffDef'
+    harmTag = f'{MEI_NS}harm'
 
     # track the bar's duration
     maxBarDuration = None
@@ -3154,6 +3240,12 @@ def measureFromElement(elem, backupNum, expectedNs, slurBundle=None, activeMeter
                 environLocal.warn(_UNIMPLEMENTED_IMPORT.format('<staffDef>', '@n'))
             else:
                 stavesWaiting[whichN] = staffDefFromElement(eachElem, slurBundle)
+        
+        # Get all information stored in <harm> tags.
+        # They are stored on the same level as <staff>.
+        elif harmTag == eachElem.tag:
+            harmElements['fb'].append(harmFromElement(eachElem))
+
         elif eachElem.tag not in _IGNORE_UNPROCESSED:
             environLocal.printDebug(_UNPROCESSED_SUBELEMENT.format(eachElem.tag, elem.tag))
 
@@ -3165,6 +3257,15 @@ def measureFromElement(elem, backupNum, expectedNs, slurBundle=None, activeMeter
             # We must insert() these objects because a <staffDef> signals its changes for the
             # *start* of the <measure> in which it appears.
             staves[whichN].insert(0, eachObj)
+
+    # Add <harm> objects to the corrresponding staff within the Measure
+    for fb in harmElements['fb']:
+        offset = fb[0]
+        fbi = fb[1]
+        m = staves.get(fbi.part)
+        m.insert(offset, fbi)
+
+    # other childs of <harm> tags can be added here…
 
     # create rest-filled measures for expected parts that had no <staff> tag in this <measure>
     for eachN in expectedNs:
