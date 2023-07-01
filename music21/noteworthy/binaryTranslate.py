@@ -601,7 +601,9 @@ class NWCStaff:
         dumpObjects = []
 
         # default to first midi instrument
-        instruName = self.instrumentName.decode('latin_1') if self.instrumentName else 'Acoustic Grand Piano'
+        instruName = (self.instrumentName.decode('latin_1')
+                      if self.instrumentName
+                      else 'Acoustic Grand Piano')
         label = self.label.decode('latin_1') if self.label else instruName
 
         staffString = '|AddStaff|Name:' + label
