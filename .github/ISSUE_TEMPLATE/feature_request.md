@@ -6,6 +6,13 @@ labels: 'enhancement'
 assignees: ''
 
 ---
+<!-- Please note that Michael Cuthbert, creator of music21, is taking a sabbatical from
+     the project (after 17 years of continuous development, until at least January 2024. 
+     The issues you raise here are unlikely to be addressed until then (unless you choose
+     paid support options).  Please see the music21list Google group for mure information
+     and assistance options.-->
+
+
 **Motivation**
 <!-- E.g. does this fill a gap? build on music21's strengths? improve usability? -->
 
