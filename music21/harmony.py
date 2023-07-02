@@ -30,8 +30,6 @@ from music21 import common
 from music21 import duration
 from music21 import environment
 from music21 import exceptions21
-from music21.figuredBass import realizerScale
-from music21.figuredBass import notation
 from music21 import interval
 from music21 import key
 from music21 import pitch
@@ -42,6 +40,9 @@ environLocal = environment.Environment('harmony')
 
 T = t.TypeVar('T', bound='ChordSymbol')
 NCT = t.TypeVar('NCT', bound='NoChord')
+
+if t.TYPE_CHECKING:
+    from music21.figuredBass import realizerScale
 
 # --------------------------------------------------------------------------
 
@@ -2111,6 +2112,8 @@ class ChordSymbol(Harmony):
         if 'root' not in self._overrides or 'bass' not in self._overrides or self.chordKind is None:
             return
 
+        from music21.figuredBass import realizerScale
+
         # create figured bass scale with root as scale
         scaleInitTuple = (self._overrides['root'].name, 'major')
         if scaleInitTuple in realizerScaleCache:
@@ -2497,116 +2500,6 @@ class NoChord(ChordSymbol):
         else:
             return None
 
-
-# ------------------------------------------------------------------------------
-
-class FiguredBass(Harmony):
-    '''
-    *BETA*: FiguredBass objects are currently in beta and may change without warning.
-
-    The FiguredBass objects store information about thorough bass figures.
-    It is created as a representation for <fb> tags in MEI and <figured-bass> tags in MusicXML.
-    The FiguredBassIndication object derives from the Harmony object and can be used
-    in the following way:
-
-    >>> fb = harmony.FiguredBass('#,6#')
-    >>> fb
-    <music21.harmony.FiguredBass #,6#>
-
-    The single figures are stored as figuredBass.notation.Figure objects:
-
-    >>> fb.notation.figures[0]
-    <music21.figuredBass.notation.Figure 3 <Modifier # sharp>>
-
-    The figures can be accessed and manipulated individually by passing in `figureStrings`
-    (plural), and extenders are allowed as with `_`:
-
-    >>> fb2 = harmony.FiguredBass(figureStrings=['#_', '6#'])
-    >>> fb2
-    <music21.harmony.FiguredBass #_,6#>
-    >>> fb2.notation.hasExtenders
-    True
-
-    Currently, figured bass objects do not have associated pitches.  This will change.
-
-    >>> fb.pitches
-    ()
-
-    * new in v9.3
-    '''
-    def __init__(self,
-                 figureString: str = '',
-                 *,
-                 figureStrings: Iterable[str] = (),
-                 **keywords):
-        super().__init__(**keywords)
-
-        self._figs: str = ''
-
-        if figureString != '':
-            self.figureString = figureString
-        elif figureStrings:
-            self.figureString = ','.join(figureStrings)
-        else:
-            self.figureString = ''
-
-        self._figNotation: notation.Notation = notation.Notation(self._figs)
-
-    @property
-    def notation(self) -> notation.Notation:
-        return self._figNotation
-
-    @notation.setter
-    def notation(self, figureNotation: notation.Notation):
-        '''
-        Sets the notation property of the FiguresBass object and updates the
-        figureString property if needed.
-
-        >>> from music21 import harmony, figuredBass
-        >>> fb = harmony.FiguredBass('6,#')
-        >>> fb.figureString, fb.notation
-        ('6,#', <music21.figuredBass.notation.Notation 6,#>)
-
-        >>> fb.notation = figuredBass.notation.Notation('7b,b')
-        >>> fb.figureString, fb.notation
-        ('7b,b', <music21.figuredBass.notation.Notation 7b,b>)
-        '''
-
-        self._figNotation = figureNotation
-        if figureNotation.notationColumn != self._figs:
-            self.figureString = figureNotation.notationColumn
-
-    @property
-    def figureString(self) -> str:
-        return self._figs
-
-    @figureString.setter
-    def figureString(self, figureString: str):
-        '''
-        Sets the figureString property of the FiguresBass object and updates the
-        notation property if needed.
-
-        >>> from music21 import harmony
-        >>> fb = harmony.FiguredBass('6,#')
-        >>> fb.figureString, fb.notation
-        ('6,#', <music21.figuredBass.notation.Notation 6,#>)
-
-        >>> fb.figureString = '5,b'
-        >>> fb.figureString, fb.notation
-        ('5,b', <music21.figuredBass.notation.Notation 5,b>)
-        '''
-
-        if isinstance(figureString, str) and figureString != '':
-            if ',' in figureString:
-                self._figs = figureString
-            else:
-                self._figs = ','.join(figureString)
-
-            self.notation = notation.Notation(self._figs)
-
-
-    def _reprInternal(self):
-        return self.notation.notationColumn
 
 # ------------------------------------------------------------------------------
 
