@@ -327,12 +327,6 @@ class Notation(prebase.ProtoM21Object):
         numbers = tuple(numbers)
         modifierStrings = tuple(modifierStrings)
 
-        # extenders come from the optional argument when instantiating the object.
-        # If nothing is provided, no extenders will be set.
-        # Otherwise, we have to look if amount of extenders and figure numbers match
-        if not self.extenders:
-            self.extenders = [False for i in range(len(modifierStrings))]
-
         self.origNumbers = numbers  # Keep original numbers
         self.numbers = numbers  # Will be converted to longhand
         self.origModStrings = modifierStrings  # Keep original modifier strings
@@ -544,18 +538,26 @@ class Figure(prebase.ProtoM21Object):
         >>> n = notation.Figure(1, '#', extender=True)
         >>> n.isPureExtender
         True
+        >>> n
+        <music21.figuredBass.notation.Figure pure-extender <Modifier # sharp>>
+
         >>> n.number = 2
         >>> n.isPureExtender
         False
+        >>> n
+        <music21.figuredBass.notation.Figure 2(extender) <Modifier # sharp>>
         '''
         return self.number == 1 and self.hasExtender
 
     def _reprInternal(self):
         if self.isPureExtender:
-            return '<Figure is a pure extender>'
+            num = 'pure-extender'
+            ext = ''
+        else:
+            num = str(self.number)
+            ext = '(extender)' if self.hasExtender else ''
         mod = repr(self.modifier).replace('music21.figuredBass.notation.', '')
-        ext = '(extender)' if self.hasExtender else ''
-        return f'{self.number}{ext} {mod}'
+        return f'{num}{ext} {mod}'
 
 
 # ------------------------------------------------------------------------------

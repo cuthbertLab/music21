@@ -75,61 +75,83 @@ class FiguredBass(Harmony):
             self.figureString = figureString
         elif figureStrings:
             self.figureString = ','.join(figureStrings)
-        else:
-            self.figureString = ''
 
         self._figNotation: notation.Notation = notation.Notation(self._figs)
 
     @property
     def notation(self) -> notation.Notation:
+        '''
+        Gets or sets the notation property of the FiguresBass object
+
+        >>> fb = figuredBass.FiguredBass('6,#')
+        >>> fb.figureString
+        '6,#'
+        >>> fb.notation
+        <music21.figuredBass.notation.Notation 6,#>
+
+        When setting, this updates the figureString property as well.
+
+        >>> fb.notation = figuredBass.notation.Notation('7b,b')
+        >>> fb.notation
+        <music21.figuredBass.notation.Notation 7b,b>
+        >>> fb.figureString
+        '7b,b'
+        '''
         return self._figNotation
 
     @notation.setter
     def notation(self, figureNotation: notation.Notation):
-        '''
-        Sets the notation property of the FiguresBass object and updates the
-        figureString property if needed.
-
-        >>> fb = figuredBass.FiguredBass('6,#')
-        >>> fb.figureString, fb.notation
-        ('6,#', <music21.figuredBass.notation.Notation 6,#>)
-
-        >>> fb.notation = figuredBass.notation.Notation('7b,b')
-        >>> fb.figureString, fb.notation
-        ('7b,b', <music21.figuredBass.notation.Notation 7b,b>)
-        '''
-
         self._figNotation = figureNotation
-        if figureNotation.notationColumn != self._figs:
-            self.figureString = figureNotation.notationColumn
+        self._figs = figureNotation.notationColumn
 
     @property
     def figureString(self) -> str:
+        '''
+        Get the figures as strings of the FiguresBass object.
+
+        >>> fb = figuredBass.FiguredBass('6,#')
+        >>> fb.figureString
+        '6,#'
+        >>> fb.notation
+        <music21.figuredBass.notation.Notation 6,#>
+
+        When setting the figureString the notation property is updated as well:
+
+        >>> fb.figureString = '5,b'
+        >>> fb.figureString
+        '5,b'
+        >>> fb.notation
+        <music21.figuredBass.notation.Notation 5,b>
+        '''
         return self._figs
 
     @figureString.setter
     def figureString(self, figureString: str):
+        self._figs = figureString
+        self.notation = notation.Notation(self._figs)
+
+    @property
+    def figureStrings(self) -> list[str]:
         '''
-        Sets the figureString property of the FiguresBass object and updates the
-        notation property if needed.
+        Does the same as figureStrings but returns a list:
 
         >>> fb = figuredBass.FiguredBass('6,#')
-        >>> fb.figureString, fb.notation
-        ('6,#', <music21.figuredBass.notation.Notation 6,#>)
+        >>> fb.figureStrings
+        ['6', '#']
 
-        >>> fb.figureString = '5,b'
-        >>> fb.figureString, fb.notation
-        ('5,b', <music21.figuredBass.notation.Notation 5,b>)
+        Like figureString, figureStrings can be set as well and updates the notation property:
+
+        >>> fb.figureStrings = ['5', 'b']
+        >>> fb.figureStrings
+        ['5', 'b']
+        >>> fb.notation
+        <music21.figuredBass.notation.Notation 5,b>
         '''
+        return self._figs.split(',')
 
-        if isinstance(figureString, str) and figureString != '':
-            if ',' in figureString:
-                self._figs = figureString
-            else:
-                self._figs = ','.join(figureString)
-
-            self.notation = notation.Notation(self._figs)
-
+    @figureStrings.setter
+    def figureStrings(self, figureStrings: Iterable[str]) -> None:
+        self._figs = ','.join(figureStrings)
 
     def _reprInternal(self):
         return self.notation.notationColumn
