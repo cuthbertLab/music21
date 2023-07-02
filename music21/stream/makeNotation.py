@@ -1187,6 +1187,7 @@ def makeTies(
 
     # environLocal.printDebug(['calling Stream.makeTies()'])
 
+    returnObj: StreamType
     if not inPlace:  # make a copy
         returnObj = s.coreCopyAsDerivation('makeTies')
     else:
@@ -1205,7 +1206,8 @@ def makeTies(
                               classFilterList=classFilterList
                               )
         if not inPlace:
-            return returnObj
+            # mypy bug thinks returnObj is not a StreamType.
+            return t.cast(StreamType, returnObj)
         else:
             return None
 
@@ -1216,19 +1218,6 @@ def makeTies(
         for p in returnObj.getElementsByClass(stream.Stream):
             # already copied if necessary; edit in place
             p.makeTies(meterStream=meterStream,
-                       inPlace=True,
-                       displayTiedAccidentals=displayTiedAccidentals,
-                       classFilterList=classFilterList
-                       )
-        if not inPlace:
-            return returnObj
-        else:
-            return None
-
-    if returnObj.hasVoices():
-        for v in returnObj.voices:
-            # already copied if necessary; edit in place
-            v.makeTies(meterStream=meterStream,
                        inPlace=True,
                        displayTiedAccidentals=displayTiedAccidentals,
                        classFilterList=classFilterList
@@ -2412,28 +2401,50 @@ class Test(unittest.TestCase):
     def testMakeNotationRecursive(self):
         from music21 import stream, tie
 
-        s = stream.Score(id='mainScore')
-        p0 = stream.Part(id='part0')
+        def getScore():
+            sc = stream.Score(id='mainScore')
+            p0 = stream.Part(id='part0')
 
-        m01 = stream.Measure(number=1)
-        m01.append(meter.TimeSignature('4/4'))
-        d1 = note.Note('D', type='half', dots=1)
-        c1 = note.Note('C', type='quarter')
-        c1.tie = tie.Tie('start')
-        m01.append([d1, c1])
-        m02 = stream.Measure(number=2)
-        c2 = note.Note('C', type='quarter')
-        c2.tie = tie.Tie('stop')
-        c3 = note.Note('D', type='half')
-        m02.append([c2, c3])
-        p0.append([m01, m02])
+            m01 = stream.Measure(number=1)
+            m01.append(meter.TimeSignature('4/4'))
+            d1 = note.Note('D', type='half', dots=1)
+            c1 = note.Note('C', type='quarter')
+            c1.tie = tie.Tie('start')
+            m01.append([d1, c1])
+            m02 = stream.Measure(number=2)
+            c2 = note.Note('C', type='quarter')
+            c2.tie = tie.Tie('stop')
+            c3 = note.Note('D', type='half')
+            m02.append([c2, c3])
+            p0.append([m01, m02])
 
-        s.insert(0, p0)
+            sc.insert(0, p0)
+            return sc
+
+        s = getScore()
         s.stripTies(inPlace=True)
+        ss = s.makeTies()
+        self.assertEqual(ss.flatten().notes[1].tie, tie.Tie('start'))
+        self.assertEqual(ss.flatten().notes[2].tie, tie.Tie('stop'))
+        self.assertIsNone(s.flatten().notes[1].tie)
+
         s.makeTies(inPlace=True)
         self.assertEqual(s.flatten().notes[1].tie, tie.Tie('start'))
         self.assertEqual(s.flatten().notes[2].tie, tie.Tie('stop'))
 
+        op = stream.Opus()
+        s1 = getScore()
+        s1.id = 'score1'
+        s2 = getScore()
+        s2.id = 'score2'
+        op.insert(0, s1)
+        op.append(s2)
+        op.stripTies(inPlace=True)
+        opp = op.makeTies()
+        self.assertEqual(opp.scores.first()[note.Note][1].tie, tie.Tie('start'))
+        self.assertIsNone(op.scores.first()[note.Note][1].tie)
+        op.makeTies(inPlace=True)
+        self.assertEqual(op.scores[1][note.Note][2].tie, tie.Tie('stop'))
 
 # -----------------------------------------------------------------------------
 
