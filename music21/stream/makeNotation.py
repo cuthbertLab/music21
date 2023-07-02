@@ -2446,8 +2446,8 @@ class Test(unittest.TestCase):
         op.makeTies(inPlace=True)
         self.assertEqual(op.scores[1][note.Note][2].tie, tie.Tie('stop'))
 
-# -----------------------------------------------------------------------------
 
+# -----------------------------------------------------------------------------
 if __name__ == '__main__':
     import music21
     music21.mainTest(Test)
