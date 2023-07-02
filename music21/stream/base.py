@@ -41,7 +41,9 @@ from music21 import bar
 from music21 import common
 from music21.common.enums import GatherSpanners, OffsetSpecial
 from music21.common.numberTools import opFrac
-from music21.common.types import StreamType, M21ObjType, OffsetQL, OffsetQLSpecial
+from music21.common.types import (
+    StreamType, M21ObjType, ChangedM21ObjType, OffsetQL, OffsetQLSpecial
+)
 from music21 import clef
 from music21 import chord
 from music21 import defaults
@@ -80,8 +82,6 @@ StreamException = exceptions21.StreamException
 ImmutableStreamException = exceptions21.ImmutableStreamException
 
 T = t.TypeVar('T')
-# we sometimes need to return a different type.
-ChangedM21ObjType = t.TypeVar('ChangedM21ObjType', bound=base.Music21Object)
 RecursiveLyricList = note.Lyric | None | list['RecursiveLyricList']
 
 BestQuantizationMatch = namedtuple(
@@ -1434,7 +1434,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
             if hasattr(other, attr):
                 setattr(self, attr, getattr(other, attr))
 
-    def hasElement(self, obj):
+    def hasElement(self, obj: base.Music21Object) -> bool:
         '''
         Return True if an element, provided as an argument, is contained in
         this Stream.
@@ -1449,8 +1449,16 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         >>> s.hasElement(n1)
         True
         '''
-        objId = id(obj)
-        return self.coreHasElementByMemoryLocation(objId)
+        if id(obj) in self._offsetDict:
+            return True
+
+        for e in self._elements:
+            if e is obj:  # pragma: no cover
+                return True
+        for e in self._endElements:
+            if e is obj:  # pragma: no cover
+                return True
+        return False
 
     def hasElementOfClass(self, className, forceFlat=False):
         '''
@@ -4041,7 +4049,20 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
             sIterator = sIterator.getElementsByClass(classList)
         return sIterator
 
-    def getElementAtOrBefore(self, offset, classList=None) -> base.Music21Object | None:
+    def getElementAtOrBefore(
+        self,
+        offset: OffsetQL,
+        classList: t.Union[
+            str,
+            Iterable[str],
+            type[M21ObjType],
+            type,
+            Iterable[type],
+            None,
+        ] = None,
+        *,
+        _beforeNotAt: bool = False,
+    ) -> base.Music21Object | None:
         # noinspection PyShadowingNames
         '''
         Given an offset, find the element at this offset,
@@ -4105,7 +4126,6 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         >>> x.offset
         20.0
 
-
         If no element is before the offset, returns None
 
         >>> s = stream.Stream()
@@ -4128,7 +4148,9 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         '''
         # NOTE: this is a performance critical method
 
-        # TODO: switch to trees
+        # TODO: switch to trees if more than a certain number of elements.
+        # TODO: allow sortTuple as a parameter (in all getElement...)
+
         candidates = []
         offset = opFrac(offset)
         nearestTrailSpan = offset  # start with max time
@@ -4136,32 +4158,43 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         sIterator = self.iter()
         if classList:
             sIterator = sIterator.getElementsByClass(classList)
+        sIterator.restoreActiveSites = False  # do not change other elements + speed.
 
         # need both _elements and _endElements
         for e in sIterator:
             span = opFrac(offset - self.elementOffset(e))
             # environLocal.printDebug(['e span check', span, 'offset', offset,
             #   'e.offset', e.offset, 'self.elementOffset(e)', self.elementOffset(e), 'e', e])
-            if span < 0:
-                continue
-            elif span == 0:
+            if span < 0 or (span == 0 and _beforeNotAt):
+                if self.isSorted:
+                    break
+                else:
+                    continue
+            elif span == nearestTrailSpan:
                 candidates.append((span, e))
+            elif span < nearestTrailSpan:
+                candidates = [(span, e)]
                 nearestTrailSpan = span
-            else:
-                # do this comparison because may be out of order
-                if span <= nearestTrailSpan:
-                    candidates.append((span, e))
-                    nearestTrailSpan = span
         # environLocal.printDebug(['getElementAtOrBefore(), e candidates', candidates])
         if candidates:
-            candidates.sort(key=lambda x: (-1 * x[0], x[1].sortTuple()))
-            # TODO: this sort has side effects -- see ICMC2011 -- sorting clef vs. note, etc.
-            self.coreSelfActiveSite(candidates[-1][1])
-            return candidates[-1][1]
-        else:
-            return None
+            # TODO: this max may have side effects -- see ICMC2011 -- sorting clef vs. note, etc.
+            element = max(candidates, key=lambda x: (-1 * x[0], x[1].sortTuple(self)))
+            self.coreSelfActiveSite(element[1])
+            return element[1]
+        return None
 
-    def getElementBeforeOffset(self, offset, classList=None) -> base.Music21Object | None:
+    def getElementBeforeOffset(
+        self,
+        offset: OffsetQL,
+        classList: t.Union[
+            str,
+            Iterable[str],
+            type[M21ObjType],
+            type,
+            Iterable[type],
+            None,
+        ] = None,
+    ) -> base.Music21Object | None:
         '''
         Get element before (and not at) a provided offset.
 
@@ -4216,33 +4249,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         >>> b.offset, b.id
         (0.0, 'z')
         '''
-        # NOTE: this is a performance critical method
-        candidates = []
-        offset = opFrac(offset)
-        nearestTrailSpan = offset  # start with max time
-
-        sIterator = self.iter()
-        if classList:
-            sIterator = sIterator.getElementsByClass(classList)
-
-        for e in sIterator:
-            span = opFrac(offset - self.elementOffset(e))
-            # environLocal.printDebug(['e span check', span, 'offset', offset,
-            #     'e.offset', e.offset, 'self.elementOffset(e)', self.elementOffset(e), 'e', e])
-            # by forcing <= here, we are sure to get offsets not at zero
-            if span <= 0:  # the e is after this offset
-                continue
-            else:  # do this comparison because may be out of order
-                if span <= nearestTrailSpan:
-                    candidates.append((span, e))
-                    nearestTrailSpan = span
-        # environLocal.printDebug(['getElementBeforeOffset(), e candidates', candidates])
-        if candidates:
-            candidates.sort(key=lambda x: (-1 * x[0], x[1].sortTuple()))
-            self.coreSelfActiveSite(candidates[-1][1])
-            return candidates[-1][1]
-        else:
-            return None
+        return self.getElementAtOrBefore(offset, classList, _beforeNotAt=True)
 
     # def getElementAfterOffset(self, offset, classList=None):
     #    '''

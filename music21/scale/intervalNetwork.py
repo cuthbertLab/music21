@@ -920,7 +920,7 @@ class IntervalNetwork:
 
         If `equateTermini` is True, the terminals will be given the same degree.
         '''
-        post = OrderedDict()
+        post: OrderedDict[Terminus | int, int] = OrderedDict()
         for nId, n in self.nodes.items():
             if equateTermini:
                 if nId == Terminus.HIGH:
@@ -2338,7 +2338,7 @@ class IntervalNetwork:
             n = self.nodes[nId]
             if n.degree not in degreeCount:
                 degreeCount[n.degree] = 0
-            g.node[nId]['pos'] = (degreeCount[n.degree], n.degree)  # pylint: disable=no-member
+            g.node[nId]['pos'] = (degreeCount[n.degree], n.degree)
             degreeCount[n.degree] += 1
         environLocal.printDebug(['got degree count', degreeCount])
         return g

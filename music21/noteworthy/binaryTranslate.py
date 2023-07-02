@@ -22,20 +22,22 @@ there to music21.
 
 BETA -- does not work for many file elements and is untested.
 
-Demo, showing the extent of problems.  The measure numbers are not set.  Lyrics are missing
-and the triplet in the AltoClef part is omitted.  This is very beta.  Much better would be to
-convert the file into .xml or .nwctxt first.
+Demo, showing the extent of problems.  The measure numbers are not set.  Lyrics are missing.
+Drum is still poorly handled.
+This is very beta.  Much better would be to convert the file into .xml or .nwctxt first.
 
 ::
 
-    >>> #_DOCS_SHOW c = converter.parse('/Users/cuthbert/desktop/cuthbert_test1.nwc')
-    >>> p = common.getSourceFilePath() / 'noteworthy' / 'cuthbert_test1.nwc' #_DOCS_HIDE
-    >>> c = converter.parse(str(p)) #_DOCS_HIDE
+    >>> #_DOCS_SHOW c = converter.parse('/Users/Hildegard/Desktop/test1.nwc')
+    >>> p = common.getSourceFilePath() / 'noteworthy' / 'cuthbert_test1_v175.nwc' #_DOCS_HIDE
+    >>> c = converter.parse(p) #_DOCS_HIDE
     >>> c.show('text')
     {0.0} <music21.metadata.Metadata object at ...>
     {0.0} <music21.stream.Part ...>
+        {0.0} <music21.instrument.Violin 'Violin'>
         {0.0} <music21.stream.Measure 0 offset=0.0>
             {0.0} <music21.clef.TrebleClef>
+            {0.0} <music21.tempo.MetronomeMark animato Quarter=120>
             {0.0} <music21.meter.TimeSignature 4/4>
             {0.0} <music21.note.Note G>
             {1.0} <music21.note.Note C>
@@ -44,6 +46,7 @@ convert the file into .xml or .nwctxt first.
         {4.0} <music21.stream.Measure 0 offset=4.0>
             {0.0} <music21.note.Note C>
     {0.0} <music21.stream.Part ...>
+        {0.0} <music21.instrument.Violin 'Violin'>
         {0.0} <music21.stream.Measure 0 offset=0.0>
             {0.0} <music21.clef.TrebleClef>
             {0.0} <music21.meter.TimeSignature 4/4>
@@ -54,16 +57,18 @@ convert the file into .xml or .nwctxt first.
         {4.0} <music21.stream.Measure 0 offset=4.0>
             {0.0} <music21.note.Note G>
     {0.0} <music21.stream.Part ...>
+        {0.0} <music21.instrument.Viola 'Viola'>
         {0.0} <music21.stream.Measure 0 offset=0.0>
             {0.0} <music21.clef.AltoClef>
             {0.0} <music21.meter.TimeSignature 4/4>
             {0.0} <music21.note.Note D>
             {2.0} <music21.note.Note C#>
-            {3.0} <music21.note.Note D>
-            {4.0} <music21.note.Note E>
-        {5.0} <music21.stream.Measure 0 offset=5.0>
+            {2.6667} <music21.note.Note D>
+            {3.3333} <music21.note.Note E>
+        {4.0} <music21.stream.Measure 0 offset=4.0>
             {0.0} <music21.note.Note E>
     {0.0} <music21.stream.Part ...>
+        {0.0} <music21.instrument.Violoncello 'Violoncello'>
         {0.0} <music21.stream.Measure 0 offset=0.0>
             {0.0} <music21.clef.BassClef>
             {0.0} <music21.meter.TimeSignature 4/4>
@@ -73,16 +78,138 @@ convert the file into .xml or .nwctxt first.
             {3.0} <music21.note.Note G>
         {4.0} <music21.stream.Measure 0 offset=4.0>
             {0.0} <music21.note.Note C>
+
+    >>> #_DOCS_SHOW c = converter.parse('/Users/Hildegard/Desktop/jingle1.nwc')
+    >>> p = common.getSourceFilePath() / 'noteworthy' / 'jingle_v175.nwc' #_DOCS_HIDE
+    >>> c = converter.parse(p) #_DOCS_HIDE
+    >>> c.show('text')
+    {0.0} <music21.metadata.Metadata object at 0x7fe8c0a5ffa0>
+    {0.0} <music21.stream.Part 0x7fe8c0920100>
+        {0.0} <music21.instrument.Piano 'Piano'>
+        {0.0} <music21.stream.Measure 0 offset=0.0>
+            {0.0} <music21.expressions.TextExpression 'Lively'>
+            {0.0} <music21.expressions.TextExpression 'F'>
+            {0.0} <music21.clef.TrebleClef>
+            {0.0} <music21.tempo.MetronomeMark animato Quarter=120>
+            {0.0} <music21.key.KeySignature of 1 flat>
+            {0.0} <music21.meter.TimeSignature 4/4>
+            {0.0} <music21.note.Note A>
+            {1.0} <music21.note.Note A>
+            {2.0} <music21.note.Note A>
+            {3.0} <music21.note.Rest quarter>
+        {4.0} <music21.stream.Measure 0 offset=4.0>
+            {0.0} <music21.note.Note A>
+            {1.0} <music21.note.Note A>
+            {2.0} <music21.note.Note A>
+            {3.0} <music21.note.Rest quarter>
+        {8.0} <music21.stream.Measure 1 offset=8.0>
+            {0.0} <music21.note.Note A>
+            {1.0} <music21.note.Note C>
+            {2.0} <music21.note.Note F>
+            {3.5} <music21.note.Note G>
+        {12.0} <music21.stream.Measure 2 offset=12.0>
+            {0.0} <music21.note.Note A>
+            {3.0} <music21.note.Rest quarter>
+        {16.0} <music21.stream.Measure 3 offset=16.0>
+            {0.0} <music21.expressions.TextExpression 'Bb'>
+            {0.0} <music21.note.Note B->
+            {1.0} <music21.note.Note B->
+            {2.0} <music21.note.Note B->
+            {3.5} <music21.note.Note B->
+        {20.0} <music21.stream.Measure 4 offset=20.0>
+            {0.0} <music21.expressions.TextExpression 'F'>
+            {0.0} <music21.note.Note B->
+            {1.0} <music21.note.Note A>
+            {2.0} <music21.note.Note A>
+            {3.0} <music21.note.Note A>
+            {3.5} <music21.note.Note A>
+        {24.0} <music21.stream.Measure 5 offset=24.0>
+            {0.0} <music21.expressions.TextExpression 'G'>
+            {0.0} <music21.bar.Barline type=regular>
+            {0.0} <music21.note.Note A>
+            {1.0} <music21.note.Note G>
+            {2.0} <music21.note.Note G>
+            {3.0} <music21.note.Note A>
+        {28.0} <music21.stream.Measure 6 offset=28.0>
+            {0.0} <music21.expressions.TextExpression 'C7'>
+            {0.0} <music21.note.Note G>
+            {2.0} <music21.note.Note C>
+            {4.0} <music21.bar.Repeat direction=end>
+        {28.0} <music21.spanner.RepeatBracket 1
+                <music21.stream.Measure 5 offset=24.0><music21.stream.Measure 6 offset=28.0>>
+        {32.0} <music21.stream.Measure 7 offset=32.0>
+            {0.0} <music21.expressions.TextExpression 'C7'>
+            {0.0} <music21.bar.Barline type=regular>
+            {0.0} <music21.note.Note C>
+            {1.0} <music21.note.Note C>
+            {2.0} <music21.note.Note B->
+            {3.0} <music21.note.Note G>
+        {36.0} <music21.stream.Measure 8 offset=36.0>
+            {0.0} <music21.expressions.TextExpression 'F'>
+            {0.0} <music21.note.Note F>
+            {3.0} <music21.note.Rest quarter>
+    {0.0} <music21.stream.Part 0x7fe8c0921660>
+        {0.0} <music21.instrument.Piano 'Piano'>
+        {0.0} <music21.stream.Measure 0 offset=0.0>
+            {0.0} <music21.clef.BassClef>
+            {0.0} <music21.key.KeySignature of 1 flat>
+            {0.0} <music21.meter.TimeSignature 4/4>
+            {0.0} <music21.chord.Chord F3 A3 C4>
+        {4.0} <music21.stream.Measure 0 offset=4.0>
+            {0.0} <music21.chord.Chord F3 A3 C4>
+        {8.0} <music21.stream.Measure 1 offset=8.0>
+            {0.0} <music21.chord.Chord F3 A3 C4>
+        {12.0} <music21.stream.Measure 2 offset=12.0>
+            {0.0} <music21.chord.Chord F3 A3 C4>
+            {1.0} <music21.note.Rest quarter>
+            {2.0} <music21.chord.Chord F3 A3 C4>
+            {3.0} <music21.note.Rest quarter>
+        {16.0} <music21.stream.Measure 3 offset=16.0>
+            {0.0} <music21.chord.Chord F3 B-3 D4>
+        {20.0} <music21.stream.Measure 4 offset=20.0>
+            {0.0} <music21.chord.Chord F3 A3 C4>
+            {1.0} <music21.note.Rest quarter>
+            {2.0} <music21.note.Rest half>
+        {24.0} <music21.stream.Measure 5 offset=24.0>
+            {0.0} <music21.bar.Barline type=regular>
+            {0.0} <music21.chord.Chord G3 B3>
+            {2.0} <music21.note.Rest half>
+        {28.0} <music21.stream.Measure 6 offset=28.0>
+            {0.0} <music21.chord.Chord E3 B-3 C4>
+            {4.0} <music21.bar.Repeat direction=end>
+        {28.0} <music21.spanner.RepeatBracket 1
+                 <music21.stream.Measure 5 offset=24.0><music21.stream.Measure 6 offset=28.0>>
+        {32.0} <music21.stream.Measure 7 offset=32.0>
+            {0.0} <music21.bar.Barline type=regular>
+            {0.0} <music21.chord.Chord E3 B-3 C4>
+            {1.0} <music21.note.Rest quarter>
+            {2.0} <music21.note.Rest half>
+        {36.0} <music21.stream.Measure 8 offset=36.0>
+            {0.0} <music21.chord.Chord F3 A3 C4>
+            {3.0} <music21.note.Rest quarter>
+
+
 '''
 from __future__ import annotations
 
 import pathlib
 import struct
+import typing as t
+from typing import TypedDict
 
 from music21 import environment
 from music21 import exceptions21
 
+from music21.noteworthy import constants
+
 environLocal = environment.Environment('noteworthy.translate')
+
+
+class FontDict(TypedDict):
+    name: bytes
+    size: int
+    style: int
+    charset: int
 
 
 class NoteworthyBinaryTranslateException(exceptions21.Music21Exception):
@@ -96,8 +223,8 @@ class NWCConverter:
     >>> nwcc = noteworthy.binaryTranslate.NWCConverter()
     >>> nwcc
     <music21.noteworthy.binaryTranslate.NWCConverter object at 0x...>
-    >>> nwcc.fileContents is None
-    True
+    >>> nwcc.fileContents
+    b''
     >>> nwcc.parsePosition
     0
     >>> nwcc.version  # version of nwc file to be parsed
@@ -107,34 +234,35 @@ class NWCConverter:
     >>> nwcc.staves
     []
     '''
-    def __init__(self, **keywords):
-        self.fileContents = None
+    def __init__(self, **keywords) -> None:
+        self.fileContents: bytes = b''
         self.parsePosition = 0
         self.version = 200
         self.numberOfStaves = 0
         self.titlePageInfo = 0
         self.pageNumberStart = 0
-        self.staves = []
-        self.comment = None
-        self.fonts = []
-        self.lyricist = None
-        self.groupVisibility = None
-        self.allowLayering = None
-        self.margins = None
-        self.notationTypeface = None
+        self.staves: list[NWCStaff] = []
+        self.comment: bytes = b''
+        self.fonts: list[FontDict] = []
+        self.lyricist: bytes = b''
+        self.groupVisibility: bytes = b''
+        self.allowLayering: int = 1
+        self.margins: bytes = b''
+        self.notationTypeface: bytes = b'Maestro'
         self.extendLastSystem = None
-        self.copyright1 = None
-        self.copyright2 = None
+        self.copyright1: bytes = b''
+        self.copyright2: bytes = b''
         self.increaseNoteSpacing = None
-        self.author = None
-        self.title = None
+        self.author: bytes = b''
+        self.title: bytes = b''
         self.measureStart = None
         self.measureNumbers = None
         self.mirrorMargins = None
         self.staffLabels = None
         self.sins = None
-        self.user = None
+        self.user: bytes = b''
         self.staffHeight = 0
+        self.currentAlterations: dict[int, str] = {}
 
     # noinspection SpellCheckingInspection
     def parseFile(self, fp: pathlib.Path | str):
@@ -145,8 +273,8 @@ class NWCConverter:
         >>> #_DOCS_SHOW fp = '/Users/cuthbert/desktop/cuthbert_test1.nwc'
         >>> fp = str(common.getSourceFilePath()/'noteworthy'/'cuthbert_test1.nwc') #_DOCS_HIDE
         >>> nwcc = noteworthy.binaryTranslate.NWCConverter()
-        >>> nwcc.fileContents is None
-        True
+        >>> nwcc.fileContents
+        b''
         >>> streamObj = nwcc.parseFile(fp)
         >>> len(nwcc.fileContents)  # binary
         1139
@@ -161,7 +289,7 @@ class NWCConverter:
         self.parse()
         return self.toStream()
 
-    def parseString(self, bytesIn=None):
+    def parseString(self, bytesIn: bytes = b''):
         '''
         same as parseFile but takes a string (in Py3, bytes) of binary data instead.
         '''
@@ -226,7 +354,7 @@ class NWCConverter:
             val = val - 256
         return val
 
-    def readBytes(self, bytesToRead=1, updateParsePosition=True):
+    def readBytes(self, bytesToRead=1, updateParsePosition=True) -> bytes:
         '''
         reads the next bytesToRead bytes and then (optionally) updates self.parsePosition
         '''
@@ -237,7 +365,7 @@ class NWCConverter:
             self.parsePosition = pp + bytesToRead
         return value
 
-    def readToNUL(self, updateParsePosition=True):
+    def readToNUL(self, updateParsePosition=True) -> bytes:
         r'''
         reads self.fileContents up to, but not including, the next position of \x00.
 
@@ -251,7 +379,7 @@ class NWCConverter:
             # raise NoteworthyBinaryTranslateException(fc[self.parsePosition:],
             #             self.parsePosition)
         # print(self.parsePosition, nulPosition)
-        ret = None
+        ret: bytes
         if nulPosition == -1:
             ret = fc[self.parsePosition:]
         else:
@@ -260,7 +388,7 @@ class NWCConverter:
             self.parsePosition = nulPosition + 1
         return ret
 
-    def isValidNWCFile(self, updateParsePosition=True):
+    def isValidNWCFile(self, updateParsePosition=True) -> bool:
         storedPP = self.parsePosition
         self.parsePosition = 0
         header1 = self.readToNUL()
@@ -303,7 +431,7 @@ class NWCConverter:
     def skipBytes(self, numBytes=1):
         self.parsePosition += numBytes
 
-    def advanceToNotNUL(self, nul=b'\x00'):
+    def advanceToNotNUL(self, nul: bytes = b'\x00'):
         pp = self.parsePosition
         fc = self.fileContents
         # the slice Notation [pp:pp + 1] is needed to avoid Py3 conversion to bytes
@@ -330,7 +458,7 @@ class NWCConverter:
             thisStaff.parse()
             self.staves.append(thisStaff)
 
-    def parseHeader(self):
+    def parseHeader(self) -> None:
         '''
         Sets a ton of information from the header, and advances the parse position.
         '''
@@ -347,42 +475,33 @@ class NWCConverter:
         # print(unused_unknown)
         self.skipBytes(10)
         self.title = self.readToNUL()
-        # print(self.title)
         self.author = self.readToNUL()
-        # print(self.author)
         if self.version >= 200:
             self.lyricist = self.readToNUL()
-            # print(self.lyricist)
-        else:
-            self.lyricist = None
         self.copyright1 = self.readToNUL()
         self.copyright2 = self.readToNUL()
         self.comment = self.readToNUL()
-        # print(self.comment)
-        self.extendLastSystem = self.readToNUL()
-        self.increaseNoteSpacing = self.readToNUL()
-        unused = self.readToNUL()
-        self.measureNumbers = self.readToNUL()
 
-        unused = self.readToNUL()
+        self.extendLastSystem = self.byteToInt()
+        self.increaseNoteSpacing = self.byteToInt()
+        unused = self.readBytes(5)
+        self.measureNumbers = self.byteToInt()
+
+        unused = self.readBytes(1)
         self.measureStart = self.readLEShort()
         if self.version >= 130:
             self.margins = self.readToNUL()
-            # split by space
         else:
-            self.margins = '0.0 0.0 0.0 0.0'
-        self.sins = self.readToNUL()
-        unused = self.readToNUL()
+            self.margins = b'0.0 0.0 0.0 0.0'
+
+        unused = self.byteToInt()
+        unused = self.readBytes(2)
         if self.version >= 130:
-            self.groupVisibility = self.readToNUL()
-            self.allowLayering = self.readToNUL()
-        else:
-            self.groupVisibility = True
-            self.allowLayering = True
+            self.groupVisibility = self.readBytes(32)
+            self.allowLayering = self.byteToInt()
+
         if self.version >= 200:
             self.notationTypeface = self.readToNUL()
-        else:
-            self.notationTypeface = 'Maestro'
         self.staffHeight = self.readLEShort()
 
         if self.version > 170:
@@ -395,17 +514,16 @@ class NWCConverter:
         self.skipBytes(2)
         self.fonts = []
         for i in range(fontCount):
-            fontDict = {
+            fontDict: FontDict = {
                 'name': self.readToNUL(),
-                'style': self.byteToInt(),
+                'style': self.byteToInt(),  # regular; 1 = bold; 2 = italic; 3 = bold italic???
                 'size': self.byteToInt(),
+                'charset': 0,
             }
             unused = self.byteToInt()
             fontDict['charset'] = self.byteToInt()
             if fontDict['name'] == b'':
                 fontDict['name'] = b'Times New Roman'
-            if fontDict['style'] == 0:
-                fontDict['style'] = 0  # regular; 1 = bold; 2 = italic; 3 = bold italic???
             if fontDict['size'] == 0:
                 fontDict['size'] = 12
             self.fonts.append(fontDict)
@@ -422,8 +540,13 @@ class NWCConverter:
         # print('StaffCount', self.numberOfStaves)
         self.skipBytes(1)
 
-    def dumpToNWCText(self):
-        dumpObjects = []
+    def dumpToNWCText(self) -> list[str]:
+        infos = ''
+        if self.title:
+            infos += '|SongInfo|Title:' + self.title.decode('latin_1')
+        if self.author:
+            infos += '|Author:' + self.author.decode('latin_1')
+        dumpObjects = [infos]
         for s in self.staves:
             staffDumpObjects = s.dump()
             for sdo in staffDumpObjects:
@@ -439,11 +562,17 @@ class NWCConverter:
 
 
 class NWCStaff:
-    def __init__(self, parent=None):
-        self.parent = parent
-        self.lyrics = []
-        self.objects = []
-        self.instrumentName = None
+    '''
+    A NWCStaff is a list of NWCObjects (see :meth:`parseObjects`) associated to metadata
+    (see :meth:`parseHeader`). It may also contain some lyrics (see :meth:`parseLyrics`).
+    It defines a :meth:`dump` method that return a list of string containing the
+    nwctxt-formatted content of each object of the staff.
+    '''
+    def __init__(self, parent: NWCConverter) -> None:
+        self.parent: NWCConverter = parent
+        self.lyrics: list[list[bytes]] = []
+        self.objects: list[NWCObject] = []
+        self.instrumentName: bytes = b''
         self.group = None
         self.layerWithNextStaff = None
         self.transposition = None
@@ -456,7 +585,7 @@ class NWCStaff:
         self.lines = 0
         self.name = None
         self.staffOffset = 0
-        self.label = None
+        self.label: bytes = b''
         self.lyricAlignment = 0
 
     def parse(self):
@@ -468,14 +597,33 @@ class NWCStaff:
         self.parseObjects()
         # environLocal.warn([self.parent.parsePosition, self.objects])
 
-    def dump(self):
+    def dump(self) -> list[str]:
         dumpObjects = []
-        dumpObjects.append('|AddStaff|')
+
+        # default to first midi instrument
+        instruName = (self.instrumentName.decode('latin_1')
+                      if self.instrumentName
+                      else 'Acoustic Grand Piano')
+        label = self.label.decode('latin_1') if self.label else instruName
+
+        staffString = '|AddStaff|Name:' + label
+        dumpObjects.append(staffString)
+
+        staffInstruString = '|StaffInstrument|Name:' + instruName
+        if instruName in constants.MidiInstruments:
+            staffInstruString += '|Patch:'
+            staffInstruString += str(constants.MidiInstruments.index(instruName))
+
+        staffInstruString += '|Trans:' + str(self.transposition)
+
+        dumpObjects.append(staffInstruString)
+
         for o in self.objects:
             dm = o.dumpMethod
             d = dm(o)
             if d != '':
                 dumpObjects.append(d)
+
         return dumpObjects
 
     def parseHeader(self):
@@ -488,40 +636,48 @@ class NWCStaff:
             # print('label:', self.label)
             self.instrumentName = p.readToNUL()
             # print('instrument name:', self.instrumentName)
-        else:
-            self.label = None
-            self.instrumentName = None
         self.group = p.readToNUL()
         # print('group: ', self.group)
-        # assuming version 200 or greater for now...
 
-        # self.endingBar = p.byteToInt()
-        # self.muted = p.byteToInt()
-        # junk = p.byteToInt()
-        # self.channel = p.byteToInt()
-        # junk = p.byteToInt()
-        # self.playbackDevice = p.byteToInt()
-        # junk = p.byteToInt()
-        # self.patchBank = p.byteToInt()
-        # junk = p.byteToInt()
-        # self.patchName = p.byteToInt()
-        # junk = p.byteToInt()
-        # self.defaultVelocity = p.byteToInt()
-        # self.style = p.readLEShort()
-        # self.verticalSizeUpper = p.readLEShort()
-        # self.verticalSizeLower = p.readLEShort()
+        if p.version >= 200:
+            # self.endingBar = p.byteToInt()
+            # self.muted = p.byteToInt()
+            # junk = p.byteToInt()
+            # self.channel = p.byteToInt()
+            # junk = p.byteToInt()
+            # self.playbackDevice = p.byteToInt()
+            # junk = p.byteToInt()
+            # self.patchBank = p.byteToInt()
+            # junk = p.byteToInt()
+            # self.patchName = p.byteToInt()
+            # junk = p.byteToInt()
+            # self.defaultVelocity = p.byteToInt()
+            # self.style = p.readLEShort()
+            # self.verticalSizeUpper = p.readLEShort()
+            # self.verticalSizeLower = p.readLEShort()
 
-        p.skipBytes(27)
-        self.lines = p.byteToInt()
-        # print('lines:', self.lines)
-        # print('position:', p.parsePosition)
-        self.layerWithNextStaff = p.readLEShort()
-        self.transposition = p.readLEShort()
-        self.partVolume = p.readLEShort()
-        self.stereoPan = p.readLEShort()
-        self.color = p.byteToInt()
-        self.alignSyllable = p.readLEShort()
-        self.numberOfLyrics = p.readLEShort()
+            p.skipBytes(27)
+            self.lines = p.byteToInt()
+            # print('lines:', self.lines)
+            # print('position:', p.parsePosition)
+            self.layerWithNextStaff = p.readLEShort()
+            self.transposition = p.readLEShort()
+            self.partVolume = p.readLEShort()
+            self.stereoPan = p.readLEShort()
+            self.color = p.byteToInt()
+            self.alignSyllable = p.readLEShort()
+            self.numberOfLyrics = p.readLEShort()
+
+        elif p.version == 175:
+            p.skipBytes(11)
+            instruPatch = p.byteToInt()
+            index = instruPatch - 1 if 0 < instruPatch < len(constants.MidiInstruments) else 0
+            self.instrumentName = constants.MidiInstruments[index].encode('latin_1')
+            p.skipBytes(10)
+            self.transposition = p.byteToSignedInt()
+            p.skipBytes(6)
+            self.alignSyllable = p.readLEShort()
+            self.numberOfLyrics = p.readLEShort()
 
         if self.numberOfLyrics > 0:
             self.lyricAlignment = p.readLEShort()
@@ -591,9 +747,17 @@ class NWCStaff:
 
 
 class NWCObject:
-    def __init__(self, staffParent=None, parserParent=None):
-        self.staffParent = staffParent
-        self.parserParent = parserParent
+    '''
+    NWCObject class is a union that can be used for each type of object contained in a staff.
+
+    An object binary blob starts with its type.
+    The parse() method calls the appropriate method depending on the object type.
+    Each parsing method should set up the 'dumpMethod' method that return the nwctxt version
+    of the object.
+    '''
+    def __init__(self, staffParent: NWCStaff, parserParent: NWCConverter):
+        self.staffParent: NWCStaff = staffParent
+        self.parserParent: NWCConverter = parserParent
         self.type = None
         self.placement = 0
         self.pos = 0
@@ -634,7 +798,7 @@ class NWCObject:
         self.dotAttribute = None
         self.text = None
 
-        def genericDumpMethod(inner_self):
+        def genericDumpMethod(inner_self) -> str:
             return ''
 
         self.dumpMethod = genericDumpMethod
@@ -645,7 +809,7 @@ class NWCObject:
         '''
         p = self.parserParent
         objectType = p.readLEShort()  # a number -- an index in the objMethods list
-        if objectType >= len(self.objMethods):
+        if objectType >= len(self.objMethods) or objectType < 0:
             raise NoteworthyBinaryTranslateException(
                 f'Cannot translate objectType: {objectType}; max is {len(self.objMethods)}')
         if p.version >= 170:
@@ -657,19 +821,24 @@ class NWCObject:
 
         objectMethod(self)
 
+    # Start parsing specific objects
+    # =================================
+
     def clef(self):
+        '''
+        clef info,
+        4 bytes
+        '''
         p = self.parserParent
         # print('Clef at: ', p.parsePosition)
         self.type = 'Clef'
         self.clefType = p.readLEShort()
         self.octaveShift = p.readLEShort()
 
-        clefNames = ['Treble', 'Bass', 'Alto', 'Tenor']
-        if self.clefType < len(clefNames):
-            self.clefName = clefNames[self.clefType]
-        octaveShiftNames = [None, 'Octave Up', 'Octave Down']
-        if self.octaveShift < len(octaveShiftNames):
-            self.octaveShiftName = octaveShiftNames[self.octaveShift]
+        if self.clefType < len(constants.ClefNames):
+            self.clefName = constants.ClefNames[self.clefType]
+        if self.octaveShift < len(constants.OctaveShiftNames):
+            self.octaveShiftName = constants.OctaveShiftNames[self.octaveShift]
 
         # print('now at: ', p.parsePosition)
         def dump(inner_self):
@@ -683,6 +852,10 @@ class NWCObject:
         self.dumpMethod = dump
 
     def keySig(self):
+        '''
+        Key signature
+        10 bytes
+        '''
         p = self.parserParent
         self.type = 'KeySig'
         self.flats = p.byteToInt()
@@ -695,27 +868,10 @@ class NWCObject:
         #     bitshift = ord(letter) - ord('A')
         #     letterMask = 1 << bitshift
 
-        flatMask = {0x00: '',
-                    0x02: 'Bb',
-                    0x12: 'Bb,Eb',
-                    0x13: 'Bb,Eb,Ab',
-                    0x1B: 'Bb,Eb,Ab,Db',
-                    0x5B: 'Bb,Eb,Ab,Db,Gb',
-                    0x5F: 'Bb,Eb,Ab,Db,Gb,Cb',
-                    0x7F: 'Bb,Eb,Ab,Db,Gb,Cb,Fb'}
-        sharpMask = {0x00: '',
-                     0x20: 'F#',
-                     0x24: 'F#,C#',
-                     0x64: 'F#,C#,G#',
-                     0x6C: 'F#,C#,G#,D#',
-                     0x6D: 'F#,C#,G#,D#,A#',
-                     0x7D: 'F#,C#,G#,D#,A#,E#',
-                     0x7F: 'F#,C#,G#,D#,A#,E#,B#'}
-
-        if self.flats > 0 and self.flats in flatMask:
-            self.keyString = flatMask[self.flats]
-        elif self.sharps > 0 and self.sharps in sharpMask:
-            self.keyString = sharpMask[self.sharps]
+        if self.flats > 0 and self.flats in constants.FlatMask:
+            self.keyString = constants.FlatMask[self.flats]
+        elif self.sharps > 0 and self.sharps in constants.SharpMask:
+            self.keyString = constants.SharpMask[self.sharps]
         else:
             self.keyString = ''  # no unusual key signatures
 
@@ -726,34 +882,60 @@ class NWCObject:
         self.dumpMethod = dump
 
     def barline(self):
+        '''
+        Bar line
+        2 bytes
+        '''
         p = self.parserParent
         self.type = 'Barline'
         self.style = p.byteToInt()
         self.localRepeatCount = p.byteToInt()
 
+        self.parserParent.currentAlterations = {}
+
         def dump(inner_self):
             build = '|Bar|'
+            # we don't care about 'Single', as it is the default
+            if 0 < inner_self.style < len(constants.BarStyles):
+                styleString = constants.BarStyles[inner_self.style]
+                build += '|Style:' + styleString
             return build
 
         self.dumpMethod = dump
 
     def ending(self):
+        '''
+        Endings
+        2 bytes
+        '''
         p = self.parserParent
         self.type = 'Ending'
         self.style = p.byteToInt()
         p.skipBytes(1)
 
+        def dump(inner_self):
+            return '|Ending|Endings:' + str(inner_self.style)
+
+        self.dumpMethod = dump
+
     def instrument(self):
+        '''
+        Instrument
+        8 bytes
+        '''
         p = self.parserParent
         self.type = 'Instrument'
-        p.skipBytes(8)
-        self.name = p.readToNUL()
-        p.skipBytes(1)
+        # self.name = p.readToNUL()
+        # p.skipBytes(1)
         p.skipBytes(8)  # velocity
 
     def timeSig(self):
+        '''
+        Time signature
+        6 bytes
+        '''
         p = self.parserParent
-        self.type = 'TimeSignature'
+        self.type = 'TimeSig'
         self.numerator = p.readLEShort()
         self.bits = p.readLEShort()
         self.denominator = 1 << self.bits
@@ -766,6 +948,10 @@ class NWCObject:
         self.dumpMethod = dump
 
     def tempo(self):
+        '''
+        Tempo indications
+        5 bytes + null terminated string
+        '''
         p = self.parserParent
         self.type = 'Tempo'
         self.pos = p.byteToInt()
@@ -776,7 +962,17 @@ class NWCObject:
             junk = p.readLEShort()
         self.text = p.readToNUL()
 
+        def dump(inner_self):
+            return f'|Tempo|Tempo:{inner_self.value}'
+
+        self.dumpMethod = dump
+
+
     def dynamic(self):
+        '''
+        dynamics
+        7 bytes
+        '''
         p = self.parserParent
         self.type = 'Dynamic'
         if p.version < 170:
@@ -792,10 +988,19 @@ class NWCObject:
         '''
         get duration string for note or rest
         '''
+
+        durStr = constants.DurationValues[self.duration]
+
+        grace = 0
+        triplet = False
         if self.type == 'Note':
             self.dotAttribute = self.attribute1[0]
+            grace = self.attribute1[1] & 0x20
         else:
             self.dotAttribute = self.data2[3]
+
+        # start 0101, middle 1010, end 1111
+        triplet = self.data2[1] & 0x0c
 
         ordDot = self.dotAttribute
 
@@ -806,16 +1011,24 @@ class NWCObject:
         else:
             self.dots = 0
 
-        durationValues = ['Whole', 'Half', '4th', '8th', '16th', '32nd', '64th']
-        durStr = durationValues[self.duration]
         if self.dots == 1:
             durStr += ',Dotted'
         elif self.dots == 2:
             durStr += ',DblDotted'
 
+        if grace > 0:
+            durStr += ',Grace'
+
+        if triplet:
+            durStr += ',Triplet'
+
         return durStr
 
     def note(self):
+        '''
+        Note
+        8 bytes
+        '''
         p = self.parserParent
         self.type = 'Note'
         # print('Note at parse position: ', p.parsePosition)
@@ -857,12 +1070,19 @@ class NWCObject:
 
         self.durationStr = self.setDurationForObject()
 
-        alterationTexts = ['#', 'b', 'n', '##', 'bb', '']
         alterationIndex = self.attribute2 & 0x07
-        if alterationIndex < len(alterationTexts):
-            self.alterationStr = alterationTexts[alterationIndex]
+        if alterationIndex < len(constants.AlterationTexts):
+            self.alterationStr = constants.AlterationTexts[alterationIndex]
         else:
             self.alterationStr = ''
+
+
+        # in NWC, alteration is not specified for other octave
+        if self.alterationStr == '':
+            self.alterationStr = self.parserParent.currentAlterations.get(self.pos % 7, '')
+        if self.alterationStr is None:
+            self.alterationStr = ''
+        self.parserParent.currentAlterations[self.pos % 7] = self.alterationStr
 
         self.tieInfo = ''
         ordAtt1 = self.attribute1[0]
@@ -871,6 +1091,7 @@ class NWCObject:
 
         def dump(inner_self):
             build = '|Note|Dur:' + inner_self.durationStr + '|'
+
             build += ('Pos:'
                       + inner_self.alterationStr
                       + str(inner_self.pos)
@@ -880,6 +1101,10 @@ class NWCObject:
         self.dumpMethod = dump
 
     def rest(self):
+        '''
+        Rest
+        8 bytes
+        '''
         p = self.parserParent
         self.type = 'Rest'
         if p.version <= 150:
@@ -898,10 +1123,18 @@ class NWCObject:
         self.dumpMethod = dump
 
     def noteChordMember(self):
+        '''
+        Chord member
+        8 bytes + n Note objects
+        '''
         p = self.parserParent
         self.type = 'NoteChordMember'
+        numberOfNotes = 0
         if p.version <= 170:
             self.data1 = p.readBytes(12)
+        elif p.version == 175:
+            self.data1 = p.readBytes(10)
+            numberOfNotes = self.data1[8]
         else:
             self.data1 = p.readBytes(8)
         if p.version >= 200:
@@ -914,7 +1147,37 @@ class NWCObject:
         else:
             self.stemLength = 7
 
+        self.data2 = []
+        if t.TYPE_CHECKING:
+            assert isinstance(self, NWCStaff)
+        for i in range(numberOfNotes):
+            chordNote = NWCObject(staffParent=self, parserParent=p)
+            chordNote.parse()
+            self.data2.append(chordNote)
+
+        def dump(inner_self):
+            build = '|Chord'
+            notes = {}
+            for d in inner_self.data2:
+                if notes.get(d.durationStr) is None:
+                    notes[d.durationStr] = []
+
+                notes[d.durationStr].append(d.alterationStr + str(d.pos) + d.tieInfo)
+
+            for n in notes:
+                build += '|Dur:' + n + '|Pos:' + ','.join(notes[n])
+
+            return build
+
+        self.dumpMethod = dump
+
+
+
     def pedal(self):
+        '''
+        Pedal
+        3 bytes
+        '''
         p = self.parserParent
         self.type = 'Pedal'
         if p.version < 170:
@@ -925,6 +1188,10 @@ class NWCObject:
             self.style = p.byteToInt()
 
     def flowDir(self):
+        '''
+        Flow
+        4 bytes
+        '''
         p = self.parserParent
         self.type = 'FlowDir'
         if p.version >= 170:
@@ -938,18 +1205,25 @@ class NWCObject:
 
     def mpc(self):
         '''
-        what is this?
+        Midi Instructions
+        34 bytes
         '''
         p = self.parserParent
         self.type = 'MPC'
         self.pos = p.byteToInt()
         self.placement = p.byteToInt()
-        if p.version > 155:
+        if p.version == 175:
+            self.data1 = p.readBytes(32)
+        elif p.version > 155:
             self.data1 = p.readBytes(31)
         else:
             self.data1 = p.readBytes(32)
 
     def tempoVariation(self):
+        '''
+        Tempo variation
+        4 bytes
+        '''
         p = self.parserParent
         self.type = 'TempoVariation'
         if p.version >= 170:
@@ -965,6 +1239,10 @@ class NWCObject:
             self.delay = p.byteToInt()
 
     def dynamicVariation(self):
+        '''
+        Dynamic variation
+        3 bytes
+        '''
         p = self.parserParent
         self.type = 'DynamicVariation'
         self.pos = p.byteToInt()
@@ -975,6 +1253,10 @@ class NWCObject:
         self.style = p.byteToInt()
 
     def performance(self):
+        '''
+        Performance
+        3 bytes
+        '''
         p = self.parserParent
         self.type = 'Performance'
         self.pos = p.byteToInt()
@@ -985,22 +1267,85 @@ class NWCObject:
         self.style = p.byteToInt()
 
     def textObj(self):
+        '''
+        Text
+        3 bytes + null terminated string
+        '''
         p = self.parserParent
         self.type = 'Text'
-        self.pos = p.byteToInt()
+        self.pos = p.byteToSignedInt()
         self.data = p.byteToInt()
+        # role of the text (lyric, staff info ...)
         self.font = p.byteToInt()
         self.text = p.readToNUL()
-        # print('Text: ', self.text)
+
+        def dump(inner_self):
+            build = '|Text|Text:' + inner_self.text.decode('latin_1') + '|Pos:' + str(self.pos)
+            return build
+
+        if self.text is not None:
+            self.dumpMethod = dump
+
 
     def restChordMember(self):
-        p = self.parserParent
+        '''
+        Rest chord
+        10 bytes
+        '''
+        self.noteChordMember()
         self.type = 'RestChordMember'
-        self.count = p.readLEShort()
+        if t.TYPE_CHECKING:
+            assert isinstance(self, NWCStaff)
+        rest = NWCObject(staffParent=self, parserParent=self.parserParent)
+        rest.duration = self.data1[0]
+        rest.data2 = self.data1
+        rest.durationStr = rest.setDurationForObject()
+        self.data2.append(rest)
 
-    objMethods = [clef, keySig, barline, ending, instrument, timeSig, tempo,
-                  dynamic, note, rest, noteChordMember, pedal, flowDir, mpc,
-                  tempoVariation, dynamicVariation, performance, textObj, restChordMember]
+        def dump(inner_self):
+            build = '|Chord'
+            notes = {}
+            for d in inner_self.data2:
+                if notes.get(d.durationStr) is None:
+                    notes[d.durationStr] = []
+
+                notes[d.durationStr].append(d.alterationStr + str(d.pos) + d.tieInfo)
+
+            i = 0
+            for n in notes:
+                if i == len(notes) - 1:
+                    build += '|Dur2:' + n + '|Pos2:' + ','.join(notes[n])
+                else:
+                    build += '|Dur:' + n + '|Pos:' + ','.join(notes[n])
+                i += 1
+
+            return build
+
+        self.dumpMethod = dump
+
+    # list of methods to parse specific object. The index in the list
+    # is the ID of the object to parse.
+    # see NWCObject.parse
+    objMethods = [clef,              # 0
+                  keySig,            # 1
+                  barline,           # 2
+                  ending,            # 3
+                  instrument,        # 4
+                  timeSig,           # 5
+                  tempo,             # 6
+                  dynamic,           # 7
+                  note,              # 8
+                  rest,              # 9
+                  noteChordMember,   # 10
+                  pedal,             # 11
+                  flowDir,           # 12
+                  mpc,               # 13
+                  tempoVariation,    # 14
+                  dynamicVariation,  # 15
+                  performance,       # 16
+                  textObj,           # 17
+                  restChordMember    # 18
+                  ]
 
 
 if __name__ == '__main__':

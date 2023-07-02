@@ -2420,7 +2420,6 @@ class Metadata(base.Music21Object):
 
         if valueType is int:
             # noinspection PyBroadException
-            # pylint: disable=bare-except
             try:
                 return int(value)
             except:

@@ -42,6 +42,22 @@ class Test(unittest.TestCase):
         b = Pitch('B#3')
         self.assertEqual(b.octave, 3)
 
+    def testNameSetting(self):
+        with self.assertRaisesRegex(ValueError,
+                                    r"Cannot have octave given before pitch name in '8D-4'\."):
+            p = Pitch('8D-4')
+        with self.assertRaises(ValueError):
+            p = Pitch('23')
+        p = Pitch(23)
+        self.assertEqual(p.midi, 23)
+        with self.assertRaisesRegex(
+            ValueError,
+            "Argument to name, 32, must be a string, not <class 'int'>."
+        ):
+            p.name = 32
+
+
+
     def testAccidentalImport(self):
         '''
         Test that we are getting the properly set accidentals

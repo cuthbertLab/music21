@@ -3676,7 +3676,7 @@ class Interval(IntervalBase):
         if p and p._client:
             return p._client
         elif p:
-            from music21 import note  # pylint: disable=redefined-outer-name
+            from music21 import note
             return note.Note(pitch=p)
 
     @noteStart.setter
@@ -3696,7 +3696,7 @@ class Interval(IntervalBase):
         if p and p._client:
             return p._client
         elif p:
-            from music21 import note  # pylint: disable=redefined-outer-name
+            from music21 import note
             return note.Note(pitch=p)
 
     @noteEnd.setter

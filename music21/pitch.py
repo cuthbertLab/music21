@@ -2781,15 +2781,23 @@ class Pitch(prebase.ProtoM21Object):
         Set name, which may be provided with or without octave values. C4 or D-3
         are both accepted.
         '''
-        usrStr = usrStr.strip()
+        try:
+            usrStr = usrStr.strip()
+        except AttributeError:
+            raise ValueError(f'Argument to name, {usrStr!r}, must be a string, not {type(usrStr)}.')
+
         # extract any numbers that may be octave designations
         octFound: list[str] = []
         octNot: list[str] = []
 
+        foundNonOctave = False
         for char in usrStr:
             if char in '0123456789':
+                if not foundNonOctave:
+                    raise ValueError(f'Cannot have octave given before pitch name in {usrStr!r}.')
                 octFound.append(char)
             else:
+                foundNonOctave = True
                 octNot.append(char)
         usrStr = ''.join(octNot)
         octFoundStr = ''.join(octFound)

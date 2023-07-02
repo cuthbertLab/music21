@@ -56,7 +56,12 @@ from music21 import text  # for text boxes
 from music21 import tie
 
 from music21.musicxml import xmlObjects
+from music21.musicxml import helpers
+from music21.musicxml.xmlSoundParser import SoundTagMixin
 from music21.musicxml.xmlObjects import MusicXMLImportException, MusicXMLWarning
+
+synchronizeIds = helpers.synchronizeIdsToM21
+setAttributeFromAttribute = helpers.setM21AttributeFromAttribute
 
 if t.TYPE_CHECKING:
     from music21 import base
@@ -183,54 +188,6 @@ def _floatOrIntStr(strObj):
         return strObj
 
 
-def _setAttributeFromAttribute(m21El, xmlEl, xmlAttributeName,
-                               attributeName=None, transform=None):
-    '''
-    If xmlEl has at least one element of tag==tag with some text. If
-    it does, set the attribute either with the same name (with "foo-bar" changed to
-    "fooBar") or with attributeName to the text contents.
-
-    Pass a function or lambda function as transform to transform the value before setting it
-
-    >>> from xml.etree.ElementTree import fromstring as El
-    >>> e = El('<page-layout new-page="yes" page-number="4" />')
-
-    >>> setb = musicxml.xmlToM21._setAttributeFromAttribute
-    >>> pl = layout.PageLayout()
-    >>> setb(pl, e, 'page-number')
-    >>> pl.pageNumber
-    '4'
-
-    >>> setb(pl, e, 'new-page', 'isNew')
-    >>> pl.isNew
-    'yes'
-
-
-    Transform the pageNumber value to an int.
-
-    >>> setb(pl, e, 'page-number', transform=int)
-    >>> pl.pageNumber
-    4
-
-    More complex...
-
-    >>> convBool = musicxml.xmlObjects.yesNoToBoolean
-    >>> setb(pl, e, 'new-page', 'isNew', transform=convBool)
-    >>> pl.isNew
-    True
-    '''
-    value = xmlEl.get(xmlAttributeName)  # find first
-    if value is None:
-        return
-
-    if transform is not None:
-        value = transform(value)
-
-    if attributeName is None:
-        attributeName = common.hyphenToCamelCase(xmlAttributeName)
-    setattr(m21El, attributeName, value)
-
-
 def _setAttributeFromTagText(m21El, xmlEl, tag, attributeName=None, *, transform=None):
     '''
     If xmlEl has at least one element of tag==tag with some text. If
@@ -296,36 +253,6 @@ def _addMetadataItemFromTagText(m21md: metadata.Metadata, xmlEl, tag, mdUniqueNa
         return
 
     m21md.add(mdUniqueName, value)
-
-def _synchronizeIds(element, m21Object):
-    '''
-    MusicXML 3.1 defines the id attribute
-    (%optional-unique-id)
-    on many elements which is perfect for setting as .id on
-    a music21 element.
-
-    <fermata id="hello"><id>bye</id></fermata>
-
-    >>> from xml.etree.ElementTree import fromstring as El
-    >>> e = El('<fermata id="fermata1"/>')
-    >>> f = expressions.Fermata()
-    >>> musicxml.xmlToM21._synchronizeIds(e, f)
-    >>> f.id
-    'fermata1'
-
-    Does not change the id if the id is not specified:
-
-    >>> e = El('<fermata />')
-    >>> f = expressions.Fermata()
-    >>> f.id = 'doNotOverwrite'
-    >>> musicxml.xmlToM21._synchronizeIds(e, f)
-    >>> f.id
-    'doNotOverwrite'
-    '''
-    newId = element.get('id', None)
-    if not newId:
-        return
-    m21Object.id = newId
 
 
 # ------------------------------------------------------------------------------
@@ -656,7 +583,7 @@ class XMLParserBase:
         else:
             pageLayout = inputM21
 
-        setb = _setAttributeFromAttribute
+        setb = setAttributeFromAttribute
         setb(pageLayout, mxPrint, 'new-page', 'isNew', transform=xmlObjects.yesNoToBoolean)
         setb(pageLayout, mxPrint, 'page-number', transform=int)
 
@@ -723,7 +650,7 @@ class XMLParserBase:
         else:
             systemLayout = inputM21
 
-        setb = _setAttributeFromAttribute
+        setb = setAttributeFromAttribute
         setb(systemLayout, mxPrint, 'new-system', 'isNew', xmlObjects.yesNoToBoolean)
 
         # mxSystemLayout = mxPrint.get('systemLayout')
@@ -788,7 +715,6 @@ class XMLParserBase:
             staffLayout.staffNumber = staffNumber
 
         if hasattr(self, 'staffLayoutObjects') and hasattr(self, 'offsetMeasureNote'):
-            # pylint: disable=no-member
             staffLayoutKey = ((staffNumber or 1), self.offsetMeasureNote)
             self.staffLayoutObjects[staffLayoutKey] = staffLayout
 
@@ -863,7 +789,6 @@ class MusicXMLImporter(XMLParserBase):
         self.xmlRootToScore(self.xmlRoot, self.stream)
 
     def parseXMLText(self):
-        # pylint: disable=undefined-variable
         if isinstance(self.xmlText, bytes):
             self.xmlText = self.xmlText.decode('utf-8')
         sio = io.StringIO(self.xmlText)
@@ -2031,7 +1956,7 @@ class PartParser(XMLParserBase):
             e.measureNumber = str(measureParser.measureNumber)
             e.partName = self.stream.partName
             raise e
-        except Exception as e:  # pylint: disable=broad-exception-caught
+        except Exception as e:
             warnings.warn(
                 f'The following exception took place in m. {measureParser.measureNumber} in '
                 + f'part {self.stream.partName}.',
@@ -2360,7 +2285,7 @@ class PartParser(XMLParserBase):
 
 
 # -----------------------------------------------------------------------------
-class MeasureParser(XMLParserBase):
+class MeasureParser(SoundTagMixin, XMLParserBase):
     '''
     parser to work with a single <measure> tag.
 
@@ -2403,6 +2328,7 @@ class MeasureParser(XMLParserBase):
         'link': None,
         'bookmark': None,
         # Note: <print> is handled separately...
+        # <sound> and xmlSound are found in xmlSoundParser.py
     }
     def __init__(self,
                  mxMeasure: ET.Element | None = None,
@@ -2865,7 +2791,7 @@ class MeasureParser(XMLParserBase):
     def xmlToChord(self, mxNoteList: list[ET.Element]) -> chord.ChordBase:
         # noinspection PyShadowingNames
         '''
-        Given an a list of mxNotes, fill the necessary parameters
+        Given a list of mxNotes, fill the necessary parameters
 
         >>> from xml.etree.ElementTree import fromstring as EL
         >>> MP = musicxml.xmlToM21.MeasureParser()
@@ -2933,13 +2859,13 @@ class MeasureParser(XMLParserBase):
             for sp in ss:
                 sp.replaceSpannedElement(n, c)
             for art in n.articulations:
-                if type(art) in seenArticulations:  # pylint: disable=unidiomatic-typecheck
+                if type(art) in seenArticulations:
                     continue
                 c.articulations.append(art)
                 if not isinstance(art, articulations.Fingering):
                     seenArticulations.add(type(art))
             for exp in n.expressions:
-                if type(exp) in seenExpressions:  # pylint: disable=unidiomatic-typecheck
+                if type(exp) in seenExpressions:
                     continue
                 c.expressions.append(exp)
                 seenExpressions.add(type(exp))
@@ -3903,7 +3829,7 @@ class MeasureParser(XMLParserBase):
         tag = mxObj.tag
         if tag in xmlObjects.TECHNICAL_MARKS:
             tech = xmlObjects.TECHNICAL_MARKS[tag]()
-            _synchronizeIds(mxObj, tech)
+            synchronizeIds(mxObj, tech)
             if tag == 'fingering':
                 self.handleFingering(tech, mxObj)
             if tag in ('handbell', 'other-technical') and strippedText(mxObj):
@@ -4013,7 +3939,7 @@ class MeasureParser(XMLParserBase):
         tag = mxObj.tag
         if tag in xmlObjects.ARTICULATION_MARKS:
             articulationObj = xmlObjects.ARTICULATION_MARKS[tag]()
-            _synchronizeIds(mxObj, articulationObj)
+            synchronizeIds(mxObj, articulationObj)
 
             self.setPrintStyle(mxObj, articulationObj)
             self.setPlacement(mxObj, articulationObj)
@@ -4248,7 +4174,7 @@ class MeasureParser(XMLParserBase):
             idFound = mxObj.get('number')
             if mxType in ('up', 'down'):
                 sp = spanner.Ottava()
-                # MusicXML pitches are encoded at sounding octaves
+                # MusicXML's pitches are encoded at sounding octaves
                 # Thus, set non-transposing
                 sp.transposing = False
                 if mxType == 'up':
@@ -4318,7 +4244,7 @@ class MeasureParser(XMLParserBase):
 
                 # TODO: attr bend-sound on <slide> only
                 self.setPrintStyle(mxObj, gliss)
-                _synchronizeIds(mxObj, gliss)
+                synchronizeIds(mxObj, gliss)
 
     def xmlToTremolo(self, mxTremolo, n):
         '''
@@ -4380,7 +4306,7 @@ class MeasureParser(XMLParserBase):
             su.completeStatus = True
             # only add after complete
         elif mxObj.get('type') == 'start':
-            _synchronizeIds(mxObj, su)
+            synchronizeIds(mxObj, su)
 
         return su
 
@@ -4448,7 +4374,7 @@ class MeasureParser(XMLParserBase):
             mxTiedList = mxNotations.findall('tied')
             if mxTiedList:
                 firstTied = mxTiedList[0]
-                _synchronizeIds(firstTied, tieObj)
+                synchronizeIds(firstTied, tieObj)
 
                 tieStyle = firstTied.get('line-type')
                 if tieStyle is not None and tieStyle != 'wavy':  # do not support wavy...
@@ -5271,10 +5197,14 @@ class MeasureParser(XMLParserBase):
         # avoiding doubled metronomes.
         if not metronome_added:
             for mxSound in mxDirection.findall('sound'):
+                if 'tempo' not in mxSound.attrib:
+                    continue
+                # setSoundTempo is defined in xmlSoundParser.py
                 self.setSound(mxSound,
                               mxDirection,
                               staffKey,
                               totalOffset)
+                break
 
         # TODO: musicxml 4:listening
 
@@ -5325,7 +5255,7 @@ class MeasureParser(XMLParserBase):
             else:
                 rm = repeat.Coda()
 
-            _synchronizeIds(mxDir, rm)
+            synchronizeIds(mxDir, rm)
             self.setPosition(mxDir, rm)
             self.insertCoreAndRef(totalOffset, staffKey, rm)
             self.setEditorial(mxDirection, rm)
@@ -5333,22 +5263,22 @@ class MeasureParser(XMLParserBase):
         elif tag == 'metronome':
             mm = self.xmlToTempoIndication(mxDir)
             # SAX was offsetMeasureNote; bug? should be totalOffset???
-            _setAttributeFromAttribute(mm, mxDirection, 'placement', 'placement')
+            setAttributeFromAttribute(mm, mxDirection, 'placement', 'placement')
             self.insertCoreAndRef(totalOffset, staffKey, mm)
             self.setEditorial(mxDirection, mm)
 
         elif tag == 'rehearsal':
-            rm = self.xmlToRehearsalMark(mxDir)
-            self.setStyleAttributes(mxDirection, rm, 'placement')
-            self.insertCoreAndRef(totalOffset, staffKey, rm)
-            self.setEditorial(mxDirection, rm)
+            rm_gen = self.xmlToRehearsalMark(mxDir)
+            self.setStyleAttributes(mxDirection, rm_gen, 'placement')
+            self.insertCoreAndRef(totalOffset, staffKey, rm_gen)
+            self.setEditorial(mxDirection, rm_gen)
 
         elif tag == 'words':
             textExpression = self.xmlToTextExpression(mxDir)
             # environLocal.printDebug(['got TextExpression object', repr(te)])
             # offset here is a combination of the current position
             # (offsetMeasureNote) and the direction's offset
-            _setAttributeFromAttribute(textExpression, mxDirection, 'placement', 'placement')
+            setAttributeFromAttribute(textExpression, mxDirection, 'placement', 'placement')
 
             repeatExpression = textExpression.getRepeatExpression()
             if repeatExpression is not None:
@@ -5378,75 +5308,12 @@ class MeasureParser(XMLParserBase):
 
         d = dynamics.Dynamic(m21DynamicText)
 
-        _synchronizeIds(mxDyn, d)
-        _setAttributeFromAttribute(d, mxDirection, 'placement', 'placement')
+        synchronizeIds(mxDyn, d)
+        setAttributeFromAttribute(d, mxDirection, 'placement', 'placement')
 
         self.insertCoreAndRef(totalOffset, staffKey, d)
         self.setPosition(mxDir, d)
         self.setEditorial(mxDirection, d)
-
-    def xmlSound(self, mxSound: ET.Element):
-        '''
-        Convert a <sound> tag to a relevant object (presently just MetronomeMark),
-        and add it to the core and staffReference.
-        '''
-        # offset is out of order because we need to know it before direction-type
-        offsetDirection = self.xmlToOffset(mxSound)
-        totalOffset = offsetDirection + self.offsetMeasureNote
-
-        staffKey = self.getStaffNumber(mxSound)
-
-        self.setSound(mxSound,
-                      None,
-                      staffKey,
-                      totalOffset)
-
-    def setSound(
-        self,
-        mxSound: ET.Element,
-        mxDir: ET.Element | None,
-        staffKey: int,
-        totalOffset: float
-    ):
-        '''
-        Takes a <sound> tag and creates objects from it.
-        Presently only handles <sound tempo='x'> events and inserts them as MetronomeMarks.
-        If the <sound> tag is a child of a <direction> tag, the direction information
-        is used to set the placement of the MetronomeMark.
-        '''
-        # TODO: move to xmlSoundParser.py where is should have been.
-
-        # TODO: coda
-        # TODO: dacapo
-        # TODO: dalsegno
-        # TODO: damper-pedal
-        # TODO: divisions
-        # TODO: dynamics
-        # TODO: fine
-        # TODO: forward-repeat
-        # TODO: id
-        # TODO: pizzicato
-        # TODO: segno
-        # TODO: soft-pedal
-        # TODO: sostenuto-pedal
-        # TODO: time-only
-        # TODO: tocoda
-        if 'tempo' in mxSound.attrib:
-            qpm = common.numToIntOrFloat(float(mxSound.get('tempo', 0)))
-            if qpm == 0:
-                warnings.warn('0 qpm tempo tag found, skipping.')
-                return
-            mm = tempo.MetronomeMark(referent=duration.Duration(type='quarter'),
-                                     number=None,
-                                     numberSounding=qpm,
-                                     )
-            _synchronizeIds(mxSound, mm)
-            self.setPrintObject(mxSound, mm)
-            self.setPosition(mxSound, mm)
-            if mxDir is not None:
-                _setAttributeFromAttribute(mm, mxDir, 'placement', 'placement')
-                self.setEditorial(mxDir, mm)
-            self.insertCoreAndRef(totalOffset, staffKey, mm)
 
     def xmlToTextExpression(self, mxWords):
         # noinspection PyShadowingNames
@@ -5563,7 +5430,7 @@ class MeasureParser(XMLParserBase):
             if paren == 'yes':
                 mm.parentheses = True
 
-        _synchronizeIds(mxMetronome, mm)
+        synchronizeIds(mxMetronome, mm)
 
         self.setPrintObject(mxMetronome, mm)  # new in 4.0 -- do not output until we output 4.0
         self.setPosition(mxMetronome, mm)
@@ -5743,7 +5610,7 @@ class MeasureParser(XMLParserBase):
         else:
             post = interval.Interval('P1')  # guaranteed to return an interval object.
 
-        _synchronizeIds(mxTranspose, post)
+        synchronizeIds(mxTranspose, post)
 
         return post
 
@@ -6212,9 +6079,6 @@ class MeasureParser(XMLParserBase):
         if mxStaffType is not None:
             try:
                 xmlText: str = mxStaffType.text.strip()
-                # inspection bug: https://youtrack.jetbrains.com/issue/PY-42287
-                # remove "no inspection..." when issue is closed
-                # noinspection PyArgumentList
                 stl.staffType = stream.enums.StaffType(xmlText)
             except ValueError:
                 warnings.warn(

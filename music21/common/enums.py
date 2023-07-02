@@ -74,8 +74,6 @@ class BooleanEnum(Enum):
         else:
             return False
 
-    # pylint having Enum problems with classes as usual.
-    # pylint: disable=comparison-with-callable
     def __eq__(self, other):
         if isinstance(other, self.__class__):
             return super().__eq__(other)

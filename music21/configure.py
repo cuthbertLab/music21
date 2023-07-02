@@ -546,10 +546,10 @@ class Dialog:
         else:
             try:
                 self._performAction(simulate=simulate)
-            except DialogException:  # pylint: disable=catching-non-exception
+            except DialogException:
                 # in some cases, the action selected requires exciting the
                 # configuration assistant
-                # pylint: disable=raising-non-exception,raise-missing-from
+                # pylint: disable=raise-missing-from
                 raise DialogException('perform action raised a dialog exception')
 
 

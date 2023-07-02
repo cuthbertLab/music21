@@ -399,7 +399,6 @@ class Date(prebase.ProtoM21Object):
         Traceback (most recent call last):
         TypeError: ...argument 'day' (pos 3)...
         '''
-        # pylint: disable=no-value-for-parameter
         post = []
         # order here is order for datetime
         # TODO: need defaults for incomplete times.
