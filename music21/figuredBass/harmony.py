@@ -18,6 +18,8 @@ Based on work by Jose Cabal-Ugaz.
 '''
 from __future__ import annotations
 
+from collections.abc import Iterable
+
 from music21.harmony import Harmony
 
 from music21.figuredBass import notation

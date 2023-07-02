@@ -170,7 +170,7 @@ class Notation(prebase.ProtoM21Object):
                   'figures', 'origNumbers', 'origModStrings', 'modifierStrings']
     _DOC_ATTR: dict[str, str] = {
         'modifiers': '''
-            A list of :class:`~music21.figuredBass.notation.Modifier`
+            A tuple of :class:`~music21.figuredBass.notation.Modifier`
             objects associated with the expanded
             :attr:`~music21.figuredBass.notation.Notation.notationColumn`.
             ''',
@@ -207,20 +207,20 @@ class Notation(prebase.ProtoM21Object):
 
     def __init__(self, notationColumn: str = '') -> None:
         # Parse notation string
-        self.notationColumn = notationColumn
-        self.figureStrings = None
-        self.origNumbers = None
-        self.origModStrings = None
-        self.numbers = None
-        self.modifierStrings = None
+        self.notationColumn: str = notationColumn or ''
+        self.figureStrings: list[str] = []
+        self.origNumbers: tuple[int | None, ...] = ()
+        self.origModStrings: tuple[str | None, ...] = ()
+        self.numbers: list[int] = []
+        self.modifierStrings: tuple[str | None, ...] = ()
         self.extenders: list[bool] = []
         self.hasExtenders: bool = False
         self._parseNotationColumn()
         self._translateToLonghand()
 
         # Convert to convenient notation
-        self.modifiers = None
-        self.figures = None
+        self.modifiers: tuple[Modifier, ...] = ()
+        self.figures: list[Figure] = []
         self.figuresFromNotationColumn: list[Figure] = []
         self._getModifiers()
         self._getFigures()
@@ -403,9 +403,10 @@ class Notation(prebase.ProtoM21Object):
         A modifier object keeps track of both the modifier string
         and its corresponding pitch Accidental.
 
+        The `__init__` method calls `_getModifiers()` so it is not called below.
 
         >>> from music21.figuredBass import notation as n
-        >>> notation1 = n.Notation('#4,2+')  #__init__ method calls _getModifiers()
+        >>> notation1 = n.Notation('#4,2+')
         >>> notation1.modifiers[0]
         <music21.figuredBass.notation.Modifier None None>
         >>> notation1.modifiers[1]
@@ -422,7 +423,7 @@ class Notation(prebase.ProtoM21Object):
 
         self.modifiers = tuple(modifiers)
 
-    def _getFigures(self):
+    def _getFigures(self) -> None:
         '''
         Turns the numbers and Modifier objects into Figure objects, each corresponding
         to a number with its Modifier.
@@ -435,7 +436,7 @@ class Notation(prebase.ProtoM21Object):
         >>> notation2.figures[1]
         <music21.figuredBass.notation.Figure 3 <Modifier - flat>>
         '''
-        figures = []
+        figures: list[Figure] = []
 
         for i in range(len(self.numbers)):
             number = self.numbers[i]
@@ -450,9 +451,9 @@ class Notation(prebase.ProtoM21Object):
 
         figuresFromNotaCol = []
 
-        for i, number in enumerate(self.origNumbers):
+        for i, origNumber in enumerate(self.origNumbers):
             modifierString = self.origModStrings[i]
-            figure = Figure(number, modifierString)
+            figure = Figure(origNumber, modifierString)
             figuresFromNotaCol.append(figure)
 
         self.figuresFromNotationColumn = figuresFromNotaCol
@@ -520,10 +521,16 @@ class Figure(prebase.ProtoM21Object):
             '''
     }
 
-    def __init__(self, number=1, modifierString: str = '', *, extender: bool = False):
-        self.number = number
-        self.modifierString = modifierString
-        self.modifier = Modifier(modifierString)
+    def __init__(
+        self,
+        number: int | None = 1,
+        modifierString: str | None = '',
+        *,
+        extender: bool = False
+    ):
+        self.number: int | None = number
+        self.modifierString: str | None = modifierString
+        self.modifier: Modifier = Modifier(modifierString)
         # look for extender's underscore
         self.hasExtender: bool = extender
 
