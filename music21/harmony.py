@@ -30,7 +30,6 @@ from music21 import common
 from music21 import duration
 from music21 import environment
 from music21 import exceptions21
-from music21.figuredBass import realizerScale
 from music21 import interval
 from music21 import key
 from music21 import pitch
@@ -41,6 +40,9 @@ environLocal = environment.Environment('harmony')
 
 T = t.TypeVar('T', bound='ChordSymbol')
 NCT = t.TypeVar('NCT', bound='NoChord')
+
+if t.TYPE_CHECKING:
+    from music21.figuredBass import realizerScale
 
 # --------------------------------------------------------------------------
 
@@ -1935,7 +1937,7 @@ class ChordSymbol(Harmony):
         kindStr.
         '''
         if self.figure == 'Chord Symbol Cannot Be Identified':
-            return self.figure
+            return
         # remove spaces from prelim Figure...
         prelimFigure = self.figure
         prelimFigure = re.sub(r'\s', '', prelimFigure)
@@ -2109,6 +2111,8 @@ class ChordSymbol(Harmony):
         '''
         if 'root' not in self._overrides or 'bass' not in self._overrides or self.chordKind is None:
             return
+
+        from music21.figuredBass import realizerScale
 
         # create figured bass scale with root as scale
         scaleInitTuple = (self._overrides['root'].name, 'major')
@@ -2498,7 +2502,6 @@ class NoChord(ChordSymbol):
 
 
 # ------------------------------------------------------------------------------
-
 
 def realizeChordSymbolDurations(piece):
     '''
