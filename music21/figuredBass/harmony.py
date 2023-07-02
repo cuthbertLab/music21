@@ -147,11 +147,11 @@ class FiguredBass(Harmony):
         >>> fb.notation
         <music21.figuredBass.notation.Notation 5,b>
         '''
-        return self._figs.split(',')
+        return self.figureString.split(',')
 
     @figureStrings.setter
     def figureStrings(self, figureStrings: Iterable[str]) -> None:
-        self._figs = ','.join(figureStrings)
+        self.figureString = ','.join(figureStrings)
 
     def _reprInternal(self):
         return self.notation.notationColumn
