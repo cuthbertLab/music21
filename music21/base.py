@@ -27,7 +27,7 @@ available after importing `music21`.
 <class 'music21.base.Music21Object'>
 
 >>> music21.VERSION_STR
-'9.0.0a12'
+'9.2.0b1'
 
 Alternatively, after doing a complete import, these classes are available
 under the module "base":
@@ -61,7 +61,7 @@ from music21 import environment
 from music21 import exceptions21
 from music21 import prebase
 from music21.sites import Sites, SitesException, WEAKREF_ACTIVE
-from music21.style import Style  # pylint: disable=unused-import
+from music21.style import Style
 from music21.sorting import SortTuple, ZeroSortTupleLow, ZeroSortTupleHigh
 # needed for temporal manipulations; not music21 objects
 from music21 import tie
@@ -165,7 +165,7 @@ class _SplitTuple(tuple):
         # noinspection PyTypeChecker
         return super(_SplitTuple, cls).__new__(cls, tuple(tupEls))
 
-    def __init__(self, tupEls):  # pylint: disable=super-init-not-called
+    def __init__(self, tupEls):
         self.spannerList = []
 
 # -----------------------------------------------------------------------------
@@ -208,7 +208,7 @@ class Groups(list):  # no need to inherit from slotted object
     # this speeds up creation slightly...
     __slots__ = ()
 
-    def _validName(self, value: str):
+    def _validName(self, value: str) -> None:
         if not isinstance(value, str):
             raise exceptions21.GroupException('Only strings can be used as group names, '
                                               + f'not {value!r}')
@@ -267,6 +267,9 @@ class Groups(list):  # no need to inherit from slotted object
 
 
 # -----------------------------------------------------------------------------
+# these are two sentinel objects that are returned when getattr(self, attr) or
+# getattr(other, attr) fail, that ensure that the two failed attributes will
+# never equal each other.
 _EQUALITY_SENTINEL_SELF = object()
 _EQUALITY_SENTINEL_OTHER = object()
 
@@ -670,7 +673,7 @@ class Music21Object(prebase.ProtoM21Object):
 
     def __setstate__(self, state: dict[str, t.Any]):
         # defining self.__dict__ upon initialization currently breaks everything
-        object.__setattr__(self, '__dict__', state)  # pylint: disable=attribute-defined-outside-init
+        object.__setattr__(self, '__dict__', state)
 
     def _reprInternal(self) -> str:
         '''
@@ -2320,13 +2323,14 @@ class Music21Object(prebase.ProtoM21Object):
         <music21.note.Note E>
         <music21.meter.TimeSignature 4/4>
         f# minor
+        <music21.tempo.MetronomeMark Quarter=96 (playback only)>
         <music21.clef.TrebleClef>
         <music21.stream.Measure 0 offset=0.0>
         P2: Alto: Instrument 2
         <music21.stream.Part Alto>
         <music21.stream.Part Soprano>
         <music21.metadata.Metadata object at 0x11116d080>
-        <music21.stream.Score 0x10513af98>
+        <music21.stream.Score bach/bwv66.6.mxl>
 
         * Changed in v6: added activeSiteOnly -- see description in `.contextSites()`
         '''
@@ -2721,10 +2725,8 @@ class Music21Object(prebase.ProtoM21Object):
             offset = t.cast(OffsetQL, foundOffset)
             atEnd = 0
 
-        if self.duration.isGrace:
-            isNotGrace = 0
-        else:
-            isNotGrace = 1
+        # avoids expensive duration computation for streams, which can never be grace notes
+        isNotGrace = 1 if self.isStream or not self.duration.isGrace else 0
 
         if self.sites.hasSiteId(id(useSite)):
             insertIndex = self.sites.siteDict[id(useSite)].globalSiteIndex
@@ -2931,7 +2933,7 @@ class Music21Object(prebase.ProtoM21Object):
         # note that all formats here must be defined in
         # common.VALID_SHOW_FORMATS
         if fmt is None:  # get setting in environment
-            if common.runningUnderIPython():
+            if common.runningInNotebook():
                 try:
                     fmt = environLocal['ipythonShowFormat']
                 except (environment.EnvironmentException, KeyError):
@@ -2940,7 +2942,7 @@ class Music21Object(prebase.ProtoM21Object):
                 fmt = environLocal['showFormat']
         elif fmt.startswith('.'):
             fmt = fmt[1:]
-        elif common.runningUnderIPython() and fmt.startswith('midi'):
+        elif common.runningInNotebook() and fmt.startswith('midi'):
             fmt = 'ipython.' + fmt
 
         regularizedConverterFormat, unused_ext = common.findFormat(fmt)
@@ -2982,7 +2984,7 @@ class Music21Object(prebase.ProtoM21Object):
         >>> [e for e in noteE.containerHierarchy()]
         [<music21.stream.Measure 1 offset=1.0>,
          <music21.stream.Part Soprano>,
-         <music21.stream.Score 0x1049a5668>]
+         <music21.stream.Score bach/bwv66.6.mxl>]
 
 
         Note that derived objects also can follow the container hierarchy:
@@ -2992,7 +2994,7 @@ class Music21Object(prebase.ProtoM21Object):
         >>> [e for e in n2.containerHierarchy()]
         [<music21.stream.Measure 1 offset=1.0>,
          <music21.stream.Part Soprano>,
-         <music21.stream.Score 0x1049a5668>]
+         <music21.stream.Score bach/bwv66.6.mxl>]
 
         Unless followDerivation is False:
 
@@ -3007,7 +3009,7 @@ class Music21Object(prebase.ProtoM21Object):
         [<music21.note.Note E>,
          <music21.stream.Measure 1 offset=1.0>,
          <music21.stream.Part Soprano>,
-         <music21.stream.Score 0x1049a5668>]
+         <music21.stream.Score bach/bwv66.6.mxl>]
 
 
         The method follows activeSites, so set the activeSite as necessary.
@@ -3196,7 +3198,7 @@ class Music21Object(prebase.ProtoM21Object):
         for listType in ('expressions', 'articulations'):
             if hasattr(e, listType):
                 temp = getattr(e, listType)
-                setattr(e, listType, [])  # pylint: disable=attribute-defined-outside-init
+                setattr(e, listType, [])
                 setattr(eRemain, listType, [])
                 for thisExpression in temp:  # using thisExpression as a shortcut for expr or art.
                     if hasattr(thisExpression, 'splitClient'):  # special method (see Trill)

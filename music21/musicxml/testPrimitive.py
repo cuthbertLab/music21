@@ -20048,7 +20048,7 @@ ALL = [
 ]
 
 
-def get(contentRequest):
+def get(contentRequest: str) -> str:
     '''
     Get test material by type of content
 
@@ -20064,6 +20064,8 @@ def get(contentRequest):
         return beams02
     elif contentRequest in ['tremolos']:
         return tremoloTest
+    else:
+        raise ValueError(f'cannot find contentRequest: {contentRequest}')
 
 
 # ------------------------------------------------------------------------------

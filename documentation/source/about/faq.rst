@@ -162,7 +162,7 @@ Feature requests and Consulting
 No, you don't understand, I **really** need this feature!
 
     If you really need something done in `music21`, we offer paid support
-    by the hour at standard consulting rates. Contact `cuthbert@mit.edu`
+    by the hour at standard consulting rates. Contact `michael.asato.cuthbert@gmail.com`
     for details and rates.
     
 Is this also what I should do if I need help using `music21` for my own project?
@@ -206,6 +206,6 @@ And this Humdrum about which you speak?
     Information on Humdrum can be found here at the following links:
 
     * https://www.humdrum.org
-    * http://kern.humdrum.org
+    * https://kern.humdrum.org
 
 

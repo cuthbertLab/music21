@@ -50,13 +50,13 @@ Ariza, C. and Michael Scott Cuthbert. 2011. "The `music21` Stream: A New Object
 Model for Representing, Filtering, and Transforming Symbolic Musical
 Structures." In *Proceedings of the International Computer Music Conference*.
 San Francisco: International Computer Music Association, pp. 61-68.
-Available online at http://www.flexatone.org/static/docs/music21Stream.pdf
+Available online at https://www.flexatone.net/static/docs/music21Stream.pdf
 
 Ariza, C. and Michael Scott Cuthbert. 2011. "Analytical and Compositional
 Applications of a Network-Based Scale Model in `music21`." In *Proceedings of the
 International Computer Music Conference*. San Francisco: International Computer
 Music Association, pp. 701-708. Available online at
-http://www.flexatone.org/static/docs/scaleNetwork.pdf
+https://www.flexatone.net/static/docs/scaleNetwork.pdf
 
 Ariza, C. and Michael Scott Cuthbert. 2010. "Modeling Beats, Accents, Beams, and
 Time Signatures Hierarchically with `music21` Meter Objects." In *Proceedings of the

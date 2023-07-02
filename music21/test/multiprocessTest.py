@@ -151,7 +151,6 @@ def mainPoolRunner(testGroup=('test',), restoreEnvironmentDefaults=False, leaveO
     pathsToRun = modGather.modulePaths  # [30:60]
     # print(pathsToRun)
 
-    # pylint: disable=not-callable
     with multiprocessing.Pool(processes=poolSize) as pool:
 
         # imap returns the results as they are completed.

@@ -191,7 +191,7 @@ class VoiceLeadingQuartet(base.Music21Object):
         if isinstance(keyValue, str):
             try:
                 keyValue = key.Key(key.convertKeyStringToMusic21KeyString(keyValue))
-            except Exception as e:  # pragma: no cover  # pylint: disable=broad-exception-caught
+            except Exception as e:  # pragma: no cover
                 raise VoiceLeadingQuartetException(
                     f'got a key signature string that is not supported: {keyValue}'
                 ) from e
@@ -200,7 +200,7 @@ class VoiceLeadingQuartet(base.Music21Object):
                 isKey = (isinstance(keyValue, key.Key))
                 if isKey is False:
                     raise AttributeError
-            except AttributeError:  # pragma: no cover  # pylint: disable=raise-missing-from
+            except AttributeError:  # pragma: no cover
                 raise VoiceLeadingQuartetException(
                     'got a key signature that is not a string or music21 Key '
                     + f'object: {keyValue}'
@@ -225,7 +225,7 @@ class VoiceLeadingQuartet(base.Music21Object):
                     n.duration.quarterLength = 0.0
                     n.pitch = value
                     setattr(self, which, n)
-            except Exception as e:  # pragma: no cover  # pylint: disable=broad-exception-caught
+            except Exception as e:  # pragma: no cover
                 raise VoiceLeadingQuartetException(
                     f'not a valid note specification: {value!r}'
                 ) from e
@@ -1357,21 +1357,25 @@ def getVerticalityFromObject(music21Obj, scoreObjectIsFrom, classFilterList=None
     <music21.voiceLeading.Verticality
         contentDict={0: [<music21.instrument.Instrument 'P1: Soprano: Instrument 1'>,
                          <music21.clef.TrebleClef>,
+                         <music21.tempo.MetronomeMark Quarter=96 (playback only)>,
                          <music21.key.Key of f# minor>,
                          <music21.meter.TimeSignature 4/4>,
                          <music21.note.Note C#>],
               1: [<music21.instrument.Instrument 'P2: Alto: Instrument 2'>,
                   <music21.clef.TrebleClef>,
+                  <music21.tempo.MetronomeMark Quarter=96 (playback only)>,
                   <music21.key.Key of f# minor>,
                   <music21.meter.TimeSignature 4/4>,
                   <music21.note.Note E>],
               2: [<music21.instrument.Instrument 'P3: Tenor: Instrument 3'>,
                   <music21.clef.BassClef>,
+                  <music21.tempo.MetronomeMark Quarter=96 (playback only)>,
                   <music21.key.Key of f# minor>,
                   <music21.meter.TimeSignature 4/4>,
                   <music21.note.Note A>],
               3: [<music21.instrument.Instrument 'P4: Bass: Instrument 4'>,
                   <music21.clef.BassClef>,
+                  <music21.tempo.MetronomeMark Quarter=96 (playback only)>,
                   <music21.key.Key of f# minor>,
                   <music21.meter.TimeSignature 4/4>,
                   <music21.note.Note A>]}>

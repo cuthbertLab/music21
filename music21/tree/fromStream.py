@@ -241,9 +241,8 @@ def asTree(
             if classList and element.classSet.isdisjoint(classList):
                 continue
 
-            endTime = flatOffset + element.duration.quarterLength
-
             if useTimespans:
+                endTime = flatOffset + element.duration.quarterLength
                 pitchedTimespan = spans.PitchedTimespan(
                     element=element,
                     parentage=tuple(reversed(currentParentage)),

@@ -360,13 +360,17 @@ class Test(unittest.TestCase):
         self.assertGreater(len(mms), 3)
 
     def testImportMetronomeMarksB(self):
-        pass
-        # TODO: look for files that only have sound tags and create MetronomeMarks
-        # need to look for bundling of Words text expressions with tempo
-
-        # has only sound tempo=x tag
-        # s = converter.parse(testPrimitive.articulations01)
-        # s.show()
+        '''
+        Import sound tempo marks as MetronomeMarks but only set numberSounding
+        '''
+        from music21 import corpus
+        s = corpus.parse('bach/bwv69.6.xml')
+        self.assertEqual(len(s.flatten()[tempo.MetronomeMark]), 8)
+        for p in s.parts:
+            mm = p.measure(0)[tempo.MetronomeMark].first()
+            self.assertIsNone(mm.number)
+            self.assertEqual(mm.numberSounding, 96)
+            self.assertEqual(mm.referent, duration.Duration(1.0))
 
     def testImportMetronomeMarksC(self):
         '''
@@ -1028,6 +1032,7 @@ class Test(unittest.TestCase):
     def test34MeasureRestWithoutTag(self):
         from xml.etree.ElementTree import fromstring as EL
 
+        # 40320 = 4 quarter notes
         scoreMeasure = '<measure><note><rest/><duration>40320</duration></note></measure>'
         mxMeasure = EL(scoreMeasure)
         pp = PartParser()
