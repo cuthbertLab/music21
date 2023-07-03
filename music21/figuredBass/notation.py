@@ -509,10 +509,6 @@ class Figure(prebase.ProtoM21Object):
             A bool value that indicates whether an extender is part of the figure.
             It is set by a keyword argument.
             ''',
-        'isPureExtender': '''
-            A bool value that returns true if an extender is part of the figure but no number
-            is given. It is set on the fly by evaluating the number and extender arguments.
-            '''
     }
 
     def __init__(
