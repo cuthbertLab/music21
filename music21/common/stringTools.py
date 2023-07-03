@@ -419,6 +419,7 @@ def parenthesesMatch(
     ValueError: Closing '")' without 'Pitch("' at index 59.
 
     So to do something like this, you might need to get creative:
+
     >>> out = common.stringTools.parenthesesMatch(st, open='("', close='")')
     >>> out
     [ParenthesesMatch(start=8, end=10, text='C4', nested=[]),
