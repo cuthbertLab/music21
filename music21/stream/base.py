@@ -1436,8 +1436,9 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
                      'definesExplicitPageBreaks', '_atSoundingPitch', '_mutable'):
             if hasattr(other, attr):
                 setattr(self, attr, getattr(other, attr))
-                
-    @deprecated('v10', 'v11', 'use `obj in stream` instead')
+
+    @common.deprecated('v10', 'v11', 'Use `el in stream` instead of '
+                       '`stream.hasElement(el)`')
     def hasElement(self, obj: base.Music21Object) -> bool:
         '''
         Return True if an element, provided as an argument, is contained in
@@ -2008,7 +2009,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         # must manually add elements to new Stream
         for e in self._elements:
             # environLocal.printDebug(['deepcopy()', e, 'old', old, 'id(old)', id(old),
-            #     'new', new, 'id(new)', id(new), 'old.hasElement(e)', old.hasElement(e),
+            #     'new', new, 'id(new)', id(new), 'e in old', e in old,
             #     'e.activeSite', e.activeSite, 'e.getSites()', e.getSites(), 'e.getSiteIds()',
             #     e.getSiteIds()], format='block')
             #
