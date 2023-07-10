@@ -501,13 +501,7 @@ class Metadata(base.Music21Object):
         >>> md.isStandardName('soundtracker:SampleName')
         False
         '''
-        if self._isStandardNamespaceName(name):
-            return True
-
-        if self._isStandardUniqueName(name):
-            return True
-
-        return False
+        return self._isStandardNamespaceName(name) or self._isStandardUniqueName(name)
 
 # -----------------------------------------------------------------------------
 #   Public APIs
@@ -1137,7 +1131,7 @@ class Metadata(base.Music21Object):
 
                     # environLocal.printDebug(['comparing fields:', f, field])
                     # look for partial match in all fields
-                    if field.lower() in uniqueName.lower():
+                    if field in uniqueName.lower():
                         valueFieldPairs.append((value, uniqueName))
                         match = True
                         break
@@ -1148,21 +1142,20 @@ class Metadata(base.Music21Object):
                         uniqueName, None
                     )
 
-                    if not workId:
+                    if workId is None:
                         # there is no associated grandfathered workId, don't search it
                         continue
 
                     # look for partial match in all fields
-                    if field.lower() in workId.lower():
+                    if field in workId.lower():
                         valueFieldPairs.append((value, workId))
                         match = True
                         break
         else:  # get all fields
             for uniqueName, value in self.all(skipContributors=True):
-                if not self._isStandardUniqueName(uniqueName):
-                    # custom metadata, don't search it
-                    continue
-                valueFieldPairs.append((value, uniqueName))
+                # only search standard metadata
+                if self._isStandardUniqueName(uniqueName):
+                    valueFieldPairs.append((value, uniqueName))
 
         # now get all (or field-matched) contributor names, using contrib.role
         # as field name, so clients can search by custom contributor role.
@@ -1969,13 +1962,7 @@ class Metadata(base.Music21Object):
         False
 
         '''
-        prop: PropertyDescription | None = (
-            properties.UNIQUE_NAME_TO_PROPERTY_DESCRIPTION.get(uniqueName, None)
-        )
-        if prop is None:
-            return False
-
-        return True
+        return uniqueName in properties.UNIQUE_NAME_TO_PROPERTY_DESCRIPTION
 
     @staticmethod
     def _isStandardNamespaceName(namespaceName: str) -> bool:
@@ -2789,11 +2776,8 @@ class RichMetadata(Metadata):
         >>> rmd._isStandardUniqueName('average duration')
         False
         '''
-        if super()._isStandardUniqueName(uniqueName):
-            return True
-        if uniqueName in self.additionalRichMetadataAttributes:
-            return True
-        return False
+        return (super()._isStandardUniqueName(uniqueName)
+                or uniqueName in self.additionalRichMetadataAttributes)
 
 
 # -----------------------------------------------------------------------------

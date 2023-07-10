@@ -328,18 +328,10 @@ class Beams(prebase.ProtoM21Object, EqualSlottedObjectMixin):
          None,
          None]
         '''
-        beamLast = None
-        for i in range(len(beamsList)):
-            if i != len(beamsList) - 1:
-                beamNext = beamsList[i + 1]
-            else:
-                beamNext = None
-
-            if beamLast is None and beamNext is None:
+        for i in range(0, len(beamsList)):
+            if ((i == 0 or beamsList[i - 1] is None)
+                and (i + 1 == len(beamsList) or beamsList[i + 1] is None)):
                 beamsList[i] = None
-
-            beamLast = beamsList[i]
-
         return beamsList
 
     @staticmethod
@@ -350,9 +342,7 @@ class Beams(prebase.ProtoM21Object, EqualSlottedObjectMixin):
         16ths are not beamed by default.
         '''
         # sanitize two partials in a row:
-        for i in range(len(beamsList) - 1):
-            bThis = beamsList[i]
-            bNext = beamsList[i + 1]
+        for bThis, bNext in zip(beamsList[:-1], beamsList[1:]):
             if not bThis or not bNext:
                 continue
 
@@ -387,9 +377,7 @@ class Beams(prebase.ProtoM21Object, EqualSlottedObjectMixin):
                 nextBeam.direction = None
 
         # now fix partial-lefts that follow stops:
-        for i in range(1, len(beamsList)):
-            bThis = beamsList[i]
-            bPrev = beamsList[i - 1]
+        for bThis, bPrev in zip(beamsList[1:], beamsList[:-1]):
             if not bThis or not bPrev:
                 continue
 
@@ -416,17 +404,17 @@ class Beams(prebase.ProtoM21Object, EqualSlottedObjectMixin):
         return beamsList
 
     @staticmethod
-    def sanitizePartialBeams(beamsList):
+    def sanitizePartialBeams(beamsList: list[Beams | None]) -> list[Beams | None]:
         '''
         It is possible at a late stage to have beams that only consist of partials
         or beams with a 'start' followed by 'partial/left' or possibly 'stop' followed
         by 'partial/right'; beams entirely consisting of partials are removed
         and the direction of irrational partials is fixed.
         '''
-        for i in range(len(beamsList)):
-            if beamsList[i] is None:
+        for i, beamsObj in enumerate(beamsList):
+            if beamsObj is None:
                 continue
-            allTypes = beamsList[i].getTypes()
+            allTypes = beamsObj.getTypes()
             # clear elements that have partial beams with no full beams:
             if 'start' not in allTypes and 'stop' not in allTypes and 'continue' not in allTypes:
                 # nothing but partials
@@ -436,7 +424,8 @@ class Beams(prebase.ProtoM21Object, EqualSlottedObjectMixin):
             # follow a stop
             hasStart = False
             hasStop = False
-            for b in beamsList[i].beamsList:
+            b: Beam
+            for b in beamsObj.beamsList:
                 if b.type == 'start':
                     hasStart = True
                     continue
@@ -583,9 +572,9 @@ class Beams(prebase.ProtoM21Object, EqualSlottedObjectMixin):
         '''
         if number not in self.getNumbers():
             raise IndexError(f'beam number {number} cannot be accessed')
-        for i in range(len(self)):
-            if self.beamsList[i].number == number:
-                return self.beamsList[i]
+        for beam in self.beamsList:
+            if beam.number == number:
+                return beam
 
     def getNumbers(self):
         '''
@@ -695,10 +684,10 @@ class Beams(prebase.ProtoM21Object, EqualSlottedObjectMixin):
             raise BeamException(f'beam type cannot be {type}')
         if number not in self.getNumbers():
             raise IndexError(f'beam number {number} cannot be accessed')
-        for i in range(len(self)):
-            if self.beamsList[i].number == number:
-                self.beamsList[i].type = type
-                self.beamsList[i].direction = direction
+        for beam in self.beamsList:
+            if beam.number == number:
+                beam.type = type
+                beam.direction = direction
 
 
 # -----------------------------------------------------------------------------

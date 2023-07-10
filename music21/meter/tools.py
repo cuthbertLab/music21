@@ -159,25 +159,19 @@ def slashMixedToFraction(valueSrc: str) -> tuple[NumDenomTuple, bool]:
 
     # when encountering a missing denominator, find the first defined
     # and apply to all previous
-    for i in range(len(pre)):
-        if pre[i][1] is not None:  # there is a denominator
-            intNum = pre[i][0]  # this is all for type checking
-            intDenom = pre[i][1]
+    for i, (intNum, intDenom) in enumerate(pre):
+        if intDenom is not None:  # there is a denominator
             if t.TYPE_CHECKING:
                 assert isinstance(intNum, int) and isinstance(intDenom, int)
             post.append((intNum, intDenom))
         else:  # search ahead for next defined denominator
             summedNumerator = True
-            match: int | None = None
             for j in range(i, len(pre)):  # this O(n^2) operation is easily simplified to O(n)
                 if pre[j][1] is not None:
-                    match = pre[j][1]
+                    post.append((intNum, pre[j][1]))
                     break
-            if match is None:
+            else:
                 raise MeterException(f'cannot match denominator to numerator in: {valueSrc}')
-
-            preBothAreInts = (pre[i][0], match)
-            post.append(preBothAreInts)
 
     return tuple(post), summedNumerator
 
@@ -195,26 +189,14 @@ def fractionToSlashMixed(fList: NumDenomTuple) -> tuple[tuple[str, int], ...]:
     * Changed in v7: new location and returns a tuple.
     '''
     pre: list[tuple[list[int], int]] = []
-    for i in range(len(fList)):
-        n: int
-        d: int
-        n, d = fList[i]
+    for n, d in fList:
         # look at previous fraction and determine if denominator is the same
+        if pre and pre[-1][1] == d:
+            pre[-1][0].append(n)
 
-        match = None
-        search = list(range(len(pre)))
-        search.reverse()  # go backwards
-        for j in search:
-            if pre[j][1] == d:
-                match = j  # index to add numerator
-                break
-            else:
-                break  # if not found in one less
-
-        if match is None:
+        else:
+            # if not found in one less
             pre.append(([n], d))
-        else:  # append numerator
-            pre[match][0].append(n)
 
     # create string representation
     post: list[tuple[str, int]] = []
@@ -263,21 +245,16 @@ def fractionSum(numDenomTuple: NumDenomTuple) -> NumDenom:
 
     if len(dListUnique) == 1:
         n = sum(nList)
-        d = next(iter(dListUnique))
+        d = dList[0]
         # Does not reduce to lowest terms...
         return (n, d)
     else:  # there might be a better way to do this
-        d = 1
-        d = math.lcm(*dListUnique)
+        dRed = math.lcm(*dListUnique)
         # after finding d, multiply each numerator
-        nShift = []
-        for i in range(len(nList)):
-            nSrc = nList[i]
-            dSrc = dList[i]
-            scalar = d // dSrc
-            nShift.append(nSrc * scalar)
-        return (sum(nShift), d)
-
+        nRed = 0
+        for nSrc, dSrc in zip(nList, dList):
+            nRed += nSrc * (dRed // dSrc)
+        return (nRed, dRed)
 
 
 @lru_cache(512)
@@ -329,12 +306,10 @@ def divisionOptionsFractionsUpward(n, d) -> tuple[str, ...]:
     if d < validDenominators[-1]:
         nMod = n * 2
         dMod = d * 2
-        while True:
-            if dMod > validDenominators[-1]:
-                break
+        while dMod <= validDenominators[-1]:
             opts.append(f'{nMod}/{dMod}')
-            dMod = dMod * 2
-            nMod = nMod * 2
+            dMod *= 2
+            nMod *= 2
     return tuple(opts)
 
 
@@ -353,9 +328,7 @@ def divisionOptionsFractionsDownward(n, d) -> tuple[str, ...]:
     if d > validDenominators[0] and n % 2 == 0:
         nMod = n // 2
         dMod = d // 2
-        while True:
-            if dMod < validDenominators[0]:
-                break
+        while dMod >= validDenominators[0]:
             opts.append(f'{nMod}/{dMod}')
             if nMod % 2 != 0:  # no longer even
                 break
@@ -375,13 +348,8 @@ def divisionOptionsAdditiveMultiplesDownward(n, d) -> MeterOptions:
     if d < validDenominators[-1] and n == 1:
         i = 2
         dMod = d * 2
-        while True:
-            if dMod > validDenominators[-1]:
-                break
-            seq = []
-            for j in range(i):
-                seq.append(f'{n}/{dMod}')
-            opts.append(tuple(seq))
+        while dMod <= validDenominators[-1]:
+            opts.append(tuple([f'{n}/{dMod}'] * i))
             dMod = dMod * 2
             i *= 2
     return tuple(opts)
@@ -401,13 +369,8 @@ def divisionOptionsAdditiveMultiples(n, d) -> MeterOptions:
         div = 2
         i = div
         nMod = n // div
-        while True:
-            if nMod <= 1:
-                break
-            seq = []
-            for j in range(i):
-                seq.append(f'{nMod}/{d}')
-            seq = tuple(seq)
+        while nMod > 1:
+            seq = tuple([f'{nMod}/{d}'] * i)
             if seq not in opts:  # may be cases defined elsewhere
                 opts.append(seq)
             nMod = nMod // div
@@ -430,13 +393,8 @@ def divisionOptionsAdditiveMultiplesEvenDivision(n, d):
     if n % 2 == 0 and d // 2 >= 1:
         nMod = n // 2
         dMod = d // 2
-        while True:
-            if dMod < 1 or nMod <= 1:
-                break
-            seq = []
-            for j in range(int(nMod)):
-                seq.append(f'{1}/{dMod}')
-            opts.append(tuple(seq))
+        while dMod >= 1 and nMod > 1:
+            opts.append(tuple([f'{1}/{dMod}'] * int(nMod)))
             if nMod % 2 != 0:  # if no longer even must stop
                 break
             dMod = dMod // 2

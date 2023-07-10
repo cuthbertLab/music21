@@ -1210,7 +1210,7 @@ class Expander(t.Generic[StreamType]):
                         return False
         return True
 
-    def _hasRepeat(self, streamObj):
+    def _hasRepeat(self, streamObj: stream.Stream) -> bool:
         '''
         Return True if this Stream of Measures has a repeat
         pair still to process.
@@ -2141,8 +2141,8 @@ class RepeatFinder:
             mLists = [p.getElementsByClass(stream.Measure) for p in s.parts]
 
         # Check for unequal lengths
-        for i in range(len(mLists) - 1):
-            if len(mLists[i]) != len(mLists[i + 1]):
+        for mThis, mNext in zip(mLists, mLists[1:]):
+            if len(mThis) != len(mNext):
                 raise UnequalPartsLengthException(
                     'Parts must each have the same number of measures.')
 
@@ -2164,11 +2164,9 @@ class RepeatFinder:
 
         tempDict = {}
         # maps the measure-hashes to the lowest examined measure number with that hash.
-        res = []
 
         # initialize res
-        for i in range(len(mLists)):
-            res.append([])
+        res = [[] for _ in range(len(mLists))]
 
         for i in range(len(mLists) - 1, -1, -1):
             # mHash is the concatenation of the measure i for each part.
@@ -2179,10 +2177,8 @@ class RepeatFinder:
                 res[i].append(tempDict[mHash])
                 res[i].extend(res[tempDict[mHash]])
 
-                # tempDict now stores the earliest known measure with mHash.
-                tempDict[mHash] = i
-            else:
-                tempDict[mHash] = i
+            # tempDict now stores the earliest known measure with mHash.
+            tempDict[mHash] = i
 
         self._mList = res
         return res
@@ -2615,4 +2611,3 @@ _DOC_ORDER = [RepeatExpression, RepeatExpressionMarker, Coda, Segno, Fine,
 if __name__ == '__main__':
     import music21
     music21.mainTest()
-

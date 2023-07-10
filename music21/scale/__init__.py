@@ -326,8 +326,8 @@ class AbstractScale(Scale):
         if not common.isListLike(pitchList) or not pitchList:
             raise ScaleException(f'Cannot build a network from this pitch list: {pitchList}')
         intervalList = []
-        for i in range(len(pitchList) - 1):
-            intervalList.append(interval.Interval(pitchList[i], pitchList[i + 1]))
+        for currentPitch, nextPitch in zip(pitchList, pitchList[1:]):
+            intervalList.append(interval.Interval(currentPitch, nextPitch))
         if pitchList[-1].name == pitchList[0].name:  # the completion of the scale has been given.
             # print('hi %s ' % pitchList)
             # this scale is only octave duplicating if the top note is exactly

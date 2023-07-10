@@ -103,10 +103,9 @@ class Test(unittest.TestCase):
                 p.updateAccidentalDisplay(pitchPast=past)
                 past.append(p)
 
-        def compare(past, _result):
+        def compare(_past, _result):
             # environLocal.printDebug(['accidental compare'])
-            for i in range(len(_result)):
-                p = past[i]
+            for i, (p, _resultItem) in enumerate(zip(_past, _result)):
                 if p.accidental is None:
                     pName = None
                     pDisplayStatus = None
@@ -114,8 +113,7 @@ class Test(unittest.TestCase):
                     pName = p.accidental.name
                     pDisplayStatus = p.accidental.displayStatus
 
-                targetName = _result[i][0]
-                targetDisplayStatus = _result[i][1]
+                targetName, targetDisplayStatus = _resultItem
 
                 self.assertEqual(pName, targetName,
                                  f'name error for {i}: {pName} instead of desired {targetName}')
@@ -209,10 +207,9 @@ class Test(unittest.TestCase):
                 p.updateAccidentalDisplay(pitchPast=past, alteredPitches=alteredPitches)
                 past.append(p)
 
-        def compare(past, _result):
+        def compare(_past, _result):
             # environLocal.printDebug(['accidental compare'])
-            for i in range(len(_result)):
-                p = past[i]
+            for i, (p, _resultItem) in enumerate(zip(_past, _result)):
                 if p.accidental is None:
                     pName = None
                     pDisplayStatus = None
@@ -220,12 +217,10 @@ class Test(unittest.TestCase):
                     pName = p.accidental.name
                     pDisplayStatus = p.accidental.displayStatus
 
-                targetName = _result[i][0]
-                targetDisplayStatus = _result[i][1]
+                targetName, targetDisplayStatus = _resultItem
 
-                # environLocal.printDebug(['accidental test:', p, pName,
-                #         pDisplayStatus, 'target:', targetName, targetDisplayStatus])
-                self.assertEqual(pName, targetName)
+                self.assertEqual(pName, targetName,
+                                 f'name error for {i}: {pName} instead of desired {targetName}')
                 self.assertEqual(
                     pDisplayStatus,
                     targetDisplayStatus,
@@ -333,8 +328,7 @@ class Test(unittest.TestCase):
 
         def compare(_past, _result):
             # environLocal.printDebug(['accidental compare'])
-            for i in range(len(_result)):
-                p = _past[i]
+            for i, (p, _resultItem) in enumerate(zip(_past, _result)):
                 if p.accidental is None:
                     pName = None
                     pDisplayStatus = None
@@ -342,10 +336,10 @@ class Test(unittest.TestCase):
                     pName = p.accidental.name
                     pDisplayStatus = p.accidental.displayStatus
 
-                targetName = _result[i][0]
-                targetDisplayStatus = _result[i][1]
+                targetName, targetDisplayStatus = _resultItem
 
-                self.assertEqual(pName, targetName)
+                self.assertEqual(pName, targetName,
+                                 f'name error for {i}: {pName} instead of desired {targetName}')
                 self.assertEqual(
                     pDisplayStatus,
                     targetDisplayStatus,

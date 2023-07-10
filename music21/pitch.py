@@ -573,25 +573,26 @@ def _dissonanceScore(pitches, smallPythagoreanRatio=True, accidentalPenalty=True
         accidentals = [abs(p.alter) for p in pitches]
         score_accidentals = sum(a if a > 1 else 0 for a in accidentals) / len(pitches)
 
+    if smallPythagoreanRatio or triadAward:
+        try:
+            intervals = [interval.Interval(noteStart=p1, noteEnd=p2)
+                        for p1, p2 in itertools.combinations(pitches, 2)]
+        except interval.IntervalException:
+            return math.inf
     if smallPythagoreanRatio:
         # score_ratio = Pythagorean ratio complexity per pitch
-        for p1, p2 in itertools.combinations(pitches, 2):
+        for this_interval in intervals:
             # does not accept weird intervals, e.g. with semitones
-            try:
-                this_interval = interval.Interval(noteStart=p1, noteEnd=p2)
-                ratio = interval.intervalToPythagoreanRatio(this_interval)
-                penalty = (math.log(ratio.numerator * ratio.denominator / ratio)
-                                        / 26.366694928034633)  # d2 is 1.0
-                score_ratio += penalty
-            except interval.IntervalException:
-                return math.inf
+            ratio = interval.intervalToPythagoreanRatio(this_interval)
+            penalty = (math.log(ratio.numerator * ratio.denominator / ratio)
+                                    / 26.366694928034633)  # d2 is 1.0
+            score_ratio += penalty
 
-        score_ratio = score_ratio / len(pitches)
+        score_ratio /= len(pitches)
 
     if triadAward:
         # score_triad = number of thirds per pitch (avoid double-base-thirds)
-        for p1, p2 in itertools.combinations(pitches, 2):
-            this_interval = interval.Interval(noteStart=p1, noteEnd=p2)
+        for this_interval in intervals:
             simple_directed = this_interval.generic.simpleDirected
             interval_semitones = this_interval.chromatic.semitones % 12
             if simple_directed == 3 and interval_semitones in (3, 4):
@@ -5084,9 +5085,8 @@ class Pitch(prebase.ProtoM21Object):
         # first search if the last pitch in our measure
         # with the same step and at this octave contradicts this pitch.
         # if so, then no matter what we need an accidental.
-        for i in range(len(pitchPast) - 1, -1, -1):
+        for thisPPast in reversed(pitchPast):
             # check previous in measure.
-            thisPPast = pitchPast[i]
             if thisPPast.step == self.step and thisPPast.octave == self.octave:
                 # conflicting alters, need accidental and return
                 if thisPPast.name != self.name:

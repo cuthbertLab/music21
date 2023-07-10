@@ -396,9 +396,9 @@ class Test(unittest.TestCase):
         sf.isSorted = False
         sf._cache = {}
         sfTreeSlow = sf.asTree()
-        for i in range(len(sf)):
-            fastI = sfTree[i]
-            slowI = sfTreeSlow[i]
+        self.assertEqual(len(sf), len(sfTreeSlow))
+        self.assertEqual(len(sf), len(sfTree))
+        for fastI, slowI in zip(sfTree, sfTreeSlow):
             self.assertIs(fastI, slowI)
 
     def testAutoSortExample(self):

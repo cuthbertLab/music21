@@ -1426,14 +1426,9 @@ def makeTupletBrackets(s: StreamType, *, inPlace=False) -> StreamType | None:
     # have a list of tuplet, Duration pairs
     completionCount: OffsetQL = 0.0  # qLen currently filled
     completionTarget: OffsetQL | None = None  # qLen necessary to fill tuplet
-    for i in range(len(tupletMap)):
-        tupletObj, dur = tupletMap[i]
+    tupletPrevious: duration.Tuplet | None = None
 
-        if i > 0:
-            tupletPrevious = tupletMap[i - 1][0]
-        else:
-            tupletPrevious = None
-
+    for i, (tupletObj, dur) in enumerate(tupletMap):
         if i < len(tupletMap) - 1:
             tupletNext = tupletMap[i + 1][0]
             # if tupletNext != None:
@@ -1484,6 +1479,8 @@ def makeTupletBrackets(s: StreamType, *, inPlace=False) -> StreamType | None:
             elif tupletPrevious is not None and tupletNext is not None:
                 # clear any previous type from prior calls
                 tupletObj.type = None
+
+        tupletPrevious = tupletObj
 
     returnObj.streamStatus.tuplets = True
 
@@ -2227,8 +2224,8 @@ class Test(unittest.TestCase):
 
         def testDirections(group, expected):
             self.assertEqual(len(group), len(expected))
-            for j in range(len(group)):
-                self.assertEqual(group[j].stemDirection, expected[j])
+            for note, expectedStemDirection in zip(group, expected):
+                self.assertEqual(note.stemDirection, expectedStemDirection)
 
         testDirections(a, ['unspecified'] * 4)
         setStemDirectionOneGroup(a, setNewStems=False)
