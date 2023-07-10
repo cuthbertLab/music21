@@ -16,7 +16,6 @@ import fractions
 from functools import lru_cache
 import math
 import re
-import typing as t
 
 from music21 import common
 from music21.common.enums import MeterDivision
@@ -134,7 +133,6 @@ def slashMixedToFraction(valueSrc: str) -> tuple[NumDenomTuple, bool]:
     * Changed in v7: new location and returns a tuple as first value.
     '''
     pre: list[NumDenom | tuple[int, None]] = []
-    post: list[NumDenom] = []
     summedNumerator = False
     value = valueSrc.strip()  # rem whitespace
     value = value.split('+')
@@ -149,6 +147,7 @@ def slashMixedToFraction(valueSrc: str) -> tuple[NumDenomTuple, bool]:
         else:  # its just a numerator
             try:
                 pre.append((int(part), None))
+                summedNumerator = True
             except ValueError:
                 raise Music21Exception(
                     'Cannot parse this file -- this error often comes '
@@ -157,21 +156,19 @@ def slashMixedToFraction(valueSrc: str) -> tuple[NumDenomTuple, bool]:
                     + 'Clear your temp directory of .p and .p.gz files and try again...; '
                     + f'Time Signature: {valueSrc} ')
 
+    post: list[NumDenom] = []
     # when encountering a missing denominator, find the first defined
     # and apply to all previous
     for i, (intNum, intDenom) in enumerate(pre):
-        if intDenom is not None:  # there is a denominator
-            if t.TYPE_CHECKING:
-                assert isinstance(intNum, int) and isinstance(intDenom, int)
-            post.append((intNum, intDenom))
-        else:  # search ahead for next defined denominator
-            summedNumerator = True
-            for j in range(i, len(pre)):  # this O(n^2) operation is easily simplified to O(n)
-                if pre[j][1] is not None:
-                    post.append((intNum, pre[j][1]))
+        if not isinstance(intDenom, int):  # search for next denominator
+            # this O(n^2) operation is easily simplified to O(n)
+            for (_, nextDenom) in pre[i + 1:]:
+                if isinstance(nextDenom, int):
+                    intDenom = nextDenom
                     break
             else:
                 raise MeterException(f'cannot match denominator to numerator in: {valueSrc}')
+        post.append((intNum, intDenom))
 
     return tuple(post), summedNumerator
 

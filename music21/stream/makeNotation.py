@@ -2224,8 +2224,8 @@ class Test(unittest.TestCase):
 
         def testDirections(group, expected):
             self.assertEqual(len(group), len(expected))
-            for note, expectedStemDirection in zip(group, expected):
-                self.assertEqual(note.stemDirection, expectedStemDirection)
+            for groupNote, expectedStemDirection in zip(group, expected):
+                self.assertEqual(groupNote.stemDirection, expectedStemDirection)
 
         testDirections(a, ['unspecified'] * 4)
         setStemDirectionOneGroup(a, setNewStems=False)

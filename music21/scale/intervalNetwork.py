@@ -2452,7 +2452,7 @@ class IntervalNetwork:
 
             # comparison of attributes, not object
             if (getattr(pitchTargetObj, comparisonAttribute)
-                == getattr(realizedPitch, comparisonAttribute)):
+                    == getattr(realizedPitch, comparisonAttribute)):
                 if realizedNode not in post:  # may be more than one match
                     post.append(realizedNode)
 

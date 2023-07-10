@@ -5623,9 +5623,10 @@ class MeasureParser(SoundTagMixin, XMLParserBase):
         if ts is not None:
             self.insertCoreAndRef(self.offsetMeasureNote, mxTime, ts)
 
-    def xmlToTimeSignature(self,
-                           mxTime: ET.Element
-        ) -> meter.TimeSignature | meter.SenzaMisuraTimeSignature:
+    def xmlToTimeSignature(
+        self,
+        mxTime: ET.Element
+    ) -> meter.TimeSignature | meter.SenzaMisuraTimeSignature:
         # noinspection PyShadowingNames
         '''
         Returns a TimeSignature or SenzaMisuraTimeSignature (for senza-misura)
@@ -5683,11 +5684,11 @@ class MeasureParser(SoundTagMixin, XMLParserBase):
         numerators = []
         denominators = []
         for beatOrType in mxTime:
-            text = beatOrType.text.strip()  # type: ignore
+            beatOrTypeText = beatOrType.text.strip()  # type: ignore
             if beatOrType.tag == 'beats':
-                numerators.append(text)  # may be 3+2
+                numerators.append(beatOrTypeText)  # may be 3+2
             elif beatOrType.tag == 'beat-type':
-                denominators.append(text)
+                denominators.append(beatOrTypeText)
             elif beatOrType.tag == 'interchangeable':
                 break  # interchangeable comes after all beat/beat-type sequences
 

@@ -2844,10 +2844,10 @@ class Test(unittest.TestCase):
         allNotes = bm.flatten().notes
         #      0C#  1B-~  | 2B-  3C#~  4C#    6B-     7C#    8B-~   9B-~   10B-
         ds = [True, True, False, True, False, True, False, False, False, False]
-        for i, (dsi, note) in enumerate(zip(ds, allNotes)):
-            self.assertEqual(note.pitch.accidental.displayStatus,
+        for i, (dsi, thisNote) in enumerate(zip(ds, allNotes)):
+            self.assertEqual(thisNote.pitch.accidental.displayStatus,
                              dsi,
-                             f'{i} failed, {note.pitch.accidental.displayStatus} != {dsi}')
+                             f'{i} failed, {thisNote.pitch.accidental.displayStatus} != {dsi}')
 
         # add another B-flat just after the tied one...
         bm = converter.parse(
@@ -2857,10 +2857,10 @@ class Test(unittest.TestCase):
         allNotes = bm.flatten().notes
         #      0C#  1B-~  | 2B-   3B-  4C#~  5C#    6B-     7C#    8B-~   9B-~  | 10B-
         ds = [True, True, False, True, True, False, False, False, False, False, False]
-        for i, (dsi, note) in enumerate(zip(ds, allNotes)):
-            self.assertEqual(note.pitch.accidental.displayStatus,
+        for i, (dsi, thisNote) in enumerate(zip(ds, allNotes)):
+            self.assertEqual(thisNote.pitch.accidental.displayStatus,
                              dsi,
-                             f'{i} failed, {note.pitch.accidental.displayStatus} != {dsi}')
+                             f'{i} failed, {thisNote.pitch.accidental.displayStatus} != {dsi}')
 
     def testMakeAccidentalsRespectsDisplayType(self):
         n = note.Note('D#')
@@ -4034,10 +4034,10 @@ class Test(unittest.TestCase):
 
         def procCompare(srcOffset, srcDur, dstOffset, dstDur, divList):
             s = Stream()
-            for offset, duration in zip(srcOffset, srcDur):
+            for nOffset, nDuration in zip(srcOffset, srcDur):
                 n = note.Note()
-                n.quarterLength = duration
-                s.insert(offset, n)
+                n.quarterLength = nDuration
+                s.insert(nOffset, n)
             # Must be sorted for quantizing to work optimally.
             s.sort()
 
@@ -4761,10 +4761,10 @@ class Test(unittest.TestCase):
             for sEval in [s, sMod]:
                 self.assertEqual(len(sEval.getElementsByClass(chord.Chord)), 3)
                 # make sure we have all the original pitches
-                for i, pitch in enumerate(pitchCol):
+                for i, pitchEl in enumerate(pitchCol):
                     match = [p.nameWithOctave for p in
                              sEval.getElementsByClass(chord.Chord)[i].pitches]
-                    self.assertEqual(match, list(pitch))
+                    self.assertEqual(match, list(pitchEl))
         # print('post chordify')
         # s.show('t')
         # sMod.show('t')

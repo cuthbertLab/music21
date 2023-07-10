@@ -330,7 +330,7 @@ class Beams(prebase.ProtoM21Object, EqualSlottedObjectMixin):
         '''
         for i in range(0, len(beamsList)):
             if ((i == 0 or beamsList[i - 1] is None)
-                and (i + 1 == len(beamsList) or beamsList[i + 1] is None)):
+                    and (i + 1 == len(beamsList) or beamsList[i + 1] is None)):
                 beamsList[i] = None
         return beamsList
 
@@ -350,7 +350,7 @@ class Beams(prebase.ProtoM21Object, EqualSlottedObjectMixin):
             if not bThisNum:
                 continue
 
-            for thisNum in bThisNum:
+            for i, thisNum in enumerate(bThisNum):
                 thisBeam = bThis.getByNumber(thisNum)
                 if thisBeam.type != 'partial' or thisBeam.direction != 'right':
                     continue
