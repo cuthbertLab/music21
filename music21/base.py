@@ -1256,7 +1256,7 @@ class Music21Object(prebase.ProtoM21Object):
             # of the site does not actually have this Music21Object in
             # its elements list, it is an orphan and should be removed
             # note: this permits non-site context Streams to continue
-            if s.isStream and not s.hasElement(self):
+            if s.isStream and not self in s:
                 if excludeStorageStreams:
                     # only get those that are not Storage Streams
                     if ('SpannerStorage' not in s.classes
