@@ -260,8 +260,15 @@ class TabChordBase(abc.ABC):
                     self.extra.get('chord_type', '') == 'Mm7'
                     and self.numeral != 'V'
                 ):
-                    # we need to make sure not to match [add4] and the like
-                    self.chord = re.sub(r'(\d+)(?!])', r'd\1', self.chord)
+                    # we need to make sure not to match [add13] and the like
+                    self.chord = re.sub(
+                        r'''
+                            (\d+)  # match one or more digits
+                            (?![\]\d])  # without a digit or a ']' to the right
+                        ''',
+                        r'd\1', 
+                        self.chord, 
+                        flags=re.VERBOSE)
 
         # Local - relative and figure
         if isMinor(self.local_key):
