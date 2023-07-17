@@ -2415,7 +2415,7 @@ class RomanNumeral(harmony.Harmony):
 
         # immediately fix low-preference figures
         if isinstance(figure, str):
-            figure = figure.replace('0', 'o')  # viio7
+            figure = re.sub(r'(?<!\d)0', 'o', figure)  # viio7 (but don't alter 10.)
             figure = figure.replace('º', 'o')
             figure = figure.replace('°', 'o')
             # /o is just a shorthand for ø -- so it should not be stored.
