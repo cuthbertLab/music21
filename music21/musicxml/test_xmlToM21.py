@@ -1504,6 +1504,34 @@ class Test(unittest.TestCase):
         m = s[stream.Measure].first()
         self.assertIs(m.showNumber, stream.enums.ShowNumber.NEVER)
 
+     def testAdjustTimeAttributesFromMeasure(self):
+        # Ignore import artifacts:
+        d = duration.Duration(3 + 3/480)
+        m = stream.Measure([meter.TimeSignature('6/8'), note.Note(duration=d)])
+        PP = PartParser()
+        PP.lastMeasureOffset = 21.0
+        PP.setLastMeasureInfo(m)
+        with self.assertWarns(MusicXMLWarning):
+            PP.adjustTimeAttributesFromMeasure(m)
+        self.assertEqual(PP.lastMeasureOffset, 24.0)
+
+        # Keep 'round' overful measures and extremely overful measures, as they were
+        # likely intentional.
+        d = duration.Duration(3.125)
+        m = stream.Measure([meter.TimeSignature('6/8'), note.Note(duration=d)])
+        PP = PartParser()
+        PP.lastMeasureOffset = 21.0
+        PP.setLastMeasureInfo(m)
+        PP.adjustTimeAttributesFromMeasure(m)
+        self.assertEqual(PP.lastMeasureOffset, 24.125)
+
+        d = duration.Duration(4.0)
+        m = stream.Measure([meter.TimeSignature('6/8'), note.Note(duration=d)])
+        PP = PartParser()
+        PP.lastMeasureOffset = 21.0
+        PP.setLastMeasureInfo(m)
+        PP.adjustTimeAttributesFromMeasure(m)
+        self.assertEqual(PP.lastMeasureOffset, 25.0)
 
 if __name__ == '__main__':
     import music21
