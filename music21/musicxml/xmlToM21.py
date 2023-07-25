@@ -2198,15 +2198,17 @@ class PartParser(XMLParserBase):
             tol = 1e-6
             # If the measure is overfull by a "round" amount, assume that it was intended
             # otherwise it was likely the result of malformed MusicXML.
-            if (diff > 0.5 
-                  or nearestMultiple(diff, 0.0625)[1] < tol 
-                  or nearestMultiple(diff, opFrac(1/12))[1] < tol):
+            if (diff > 0.5
+                  or nearestMultiple(diff, 0.0625)[1] < tol
+                  or nearestMultiple(diff, opFrac(1 / 12))[1] < tol):
                 mOffsetShift = mHighestTime
             else:
                 mOffsetShift = lastTimeSignatureQuarterLength
-                warnings.warn(f"""Warning: measure {m.number} in part {self.stream.partName}
-                    is overfull: {mHighestTime} > {lastTimeSignatureQuarterLength}, 
-                    assuming {mOffsetShift} is correct.""")
+                warnings.warn(
+                    f"Warning: measure {m.number} in part {self.stream.partName}"
+                    f"is overfull: {mHighestTime} > {lastTimeSignatureQuarterLength},"
+                    f"assuming {mOffsetShift} is correct."
+                )
         elif (mHighestTime == 0.0
               and not m.recurse().notesAndRests.getElementsNotOfClass('Harmony')
               ):
