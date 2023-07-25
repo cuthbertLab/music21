@@ -2200,14 +2200,15 @@ class PartParser(XMLParserBase):
             # otherwise it was likely the result of malformed MusicXML.
             if (diff > 0.5
                   or nearestMultiple(diff, 0.0625)[1] < tol
-                  or nearestMultiple(diff, opFrac(1 / 12))[1] < tol):
+                  or nearestMultiple(diff, 1 / 12)[1] < tol):
                 mOffsetShift = mHighestTime
             else:
                 mOffsetShift = lastTimeSignatureQuarterLength
                 warnings.warn(
-                    f"Warning: measure {m.number} in part {self.stream.partName}"
-                    f"is overfull: {mHighestTime} > {lastTimeSignatureQuarterLength},"
-                    f"assuming {mOffsetShift} is correct."
+                    f'Warning: measure {m.number} in part {self.stream.partName}'
+                    f'is overfull: {mHighestTime} > {lastTimeSignatureQuarterLength},'
+                    f'assuming {mOffsetShift} is correct.',
+                    MusicXMLWarning
                 )
         elif (mHighestTime == 0.0
               and not m.recurse().notesAndRests.getElementsNotOfClass('Harmony')
