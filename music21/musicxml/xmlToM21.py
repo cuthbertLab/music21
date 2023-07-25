@@ -31,6 +31,7 @@ from music21 import defaults
 from music21 import duration
 from music21 import dynamics
 from music21.common.enums import OrnamentDelay
+from music21.common.numberTools import opFrac, nearestMultiple
 from music21 import editorial
 from music21 import environment
 from music21 import exceptions21
@@ -2190,9 +2191,22 @@ class PartParser(XMLParserBase):
         else:
             lastTimeSignatureQuarterLength = 4.0  # sensible default.
 
-        if mHighestTime >= lastTimeSignatureQuarterLength:
+        if mHighestTime == lastTimeSignatureQuarterLength:
             mOffsetShift = mHighestTime
-
+        elif mHighestTime > lastTimeSignatureQuarterLength:
+            diff = mHighestTime - lastTimeSignatureQuarterLength
+            tol = 1e-6
+            # If the measure is overfull by a "round" amount, assume that it was intended
+            # otherwise it was likely the result of malformed MusicXML.
+            if (diff > 0.5 
+                  or nearestMultiple(diff, 0.0625)[1] < tol 
+                  or nearestMultiple(diff, opFrac(1/12))[1] < tol):
+                mOffsetShift = mHighestTime
+            else:
+                mOffsetShift = lastTimeSignatureQuarterLength
+                warnings.warn(f"""Warning: measure {m.number} in part {self.stream.partName}
+                    is overfull: {mHighestTime} > {lastTimeSignatureQuarterLength}, 
+                    assuming {mOffsetShift} is correct.""")
         elif (mHighestTime == 0.0
               and not m.recurse().notesAndRests.getElementsNotOfClass('Harmony')
               ):
@@ -2204,7 +2218,6 @@ class PartParser(XMLParserBase):
             m.insert(0.0, r)
             mOffsetShift = lastTimeSignatureQuarterLength
             self.lastMeasureWasShort = False
-
         else:  # use time signature
             # for the first measure, this may be a pickup
             # must detect this when writing, as next measures offsets will be
@@ -2216,7 +2229,6 @@ class PartParser(XMLParserBase):
                     # environLocal.printDebug(['incompletely filled Measure found on musicxml
                     #    import; interpreting as an anacrusis:', 'paddingLeft:', m.paddingLeft])
                 mOffsetShift = mHighestTime
-
             else:
                 mOffsetShift = mHighestTime  # lastTimeSignatureQuarterLength
                 if self.lastMeasureWasShort is True:
@@ -2596,9 +2608,7 @@ class MeasureParser(SoundTagMixin, XMLParserBase):
         '''
         mxDuration = mxObj.find('duration')
         if durationText := strippedText(mxDuration):
-            change = common.numberTools.opFrac(
-                float(durationText) / self.divisions
-            )
+            change = opFrac(float(durationText) / self.divisions)
             self.offsetMeasureNote -= change
             # check for negative offsets produced by
             # musicxml durations with float rounding issues
@@ -2611,9 +2621,7 @@ class MeasureParser(SoundTagMixin, XMLParserBase):
         '''
         mxDuration = mxObj.find('duration')
         if durationText := strippedText(mxDuration):
-            change = common.numberTools.opFrac(
-                float(durationText) / self.divisions
-            )
+            change = opFrac(float(durationText) / self.divisions)
 
             # Create hidden rest (in other words, a spacer)
             # old Finale documents close incomplete final measures with <forward>
@@ -3578,7 +3586,7 @@ class MeasureParser(SoundTagMixin, XMLParserBase):
         mxDuration = mxNote.find('duration')
         if mxDuration is not None:
             noteDivisions = float(mxDuration.text.strip())
-            qLen = common.numberTools.opFrac(noteDivisions / divisions)
+            qLen = opFrac(noteDivisions / divisions)
         else:
             qLen = 0.0
 
@@ -5510,7 +5518,7 @@ class MeasureParser(SoundTagMixin, XMLParserBase):
                 meth(mxSub)
             # NOT to be done: directive -- deprecated since v2.
             elif tag == 'divisions':
-                self.divisions = common.opFrac(float(mxSub.text))
+                self.divisions = opFrac(float(mxSub.text))
             # TODO: musicxml4: for-part including part-clef
             # TODO: instruments -- int if more than one instrument plays most of the time
             # TODO: part-symbol
