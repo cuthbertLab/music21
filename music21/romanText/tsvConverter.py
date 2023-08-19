@@ -256,18 +256,20 @@ class TabChordBase(abc.ABC):
             if self.dcml_version == 2:
                 self.chord = self.chord.replace('%', 'ø')
                 self.chord = handleAddedTones(self.chord)
+                # prefix figures for Mm7 chords on degrees other than 'V' with 'd'
                 if (
                     self.extra.get('chord_type', '') == 'Mm7'
                     and self.numeral != 'V'
                 ):
-                    # we need to make sure not to match [add13] and the like
+                    # However, we need to make sure not to match [add13] and 
+                    # the like, otherwise we will end up with [addd13]
                     self.chord = re.sub(
                         r'''
                             (\d+)  # match one or more digits
                             (?![\]\d])  # without a digit or a ']' to the right
                         ''',
-                        r'd\1', 
-                        self.chord, 
+                        r'd\1',
+                        self.chord,
                         flags=re.VERBOSE)
 
         # Local - relative and figure
