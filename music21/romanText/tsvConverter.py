@@ -261,7 +261,7 @@ class TabChordBase(abc.ABC):
                     self.extra.get('chord_type', '') == 'Mm7'
                     and self.numeral != 'V'
                 ):
-                    # However, we need to make sure not to match [add13] and 
+                    # However, we need to make sure not to match [add13] and
                     # the like, otherwise we will end up with [addd13]
                     self.chord = re.sub(
                         r'''
@@ -881,7 +881,7 @@ class M21toTSV:
                 # We replace the "d" annotation for Mm7 chords on degrees other than
                 #   V because it is not used by the DCML standard
                 # NB: slightly different from DCML: no key.
-                thisEntry.chord = thisRN.figure.replace('d', '', 1)  
+                thisEntry.chord = thisRN.figure.replace('d', '', 1)
                 thisEntry.pedal = None
                 thisEntry.numeral = thisRN.romanNumeral
                 thisEntry.form = getForm(thisRN)
