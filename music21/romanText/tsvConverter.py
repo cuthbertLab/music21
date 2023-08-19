@@ -878,7 +878,10 @@ class M21toTSV:
                     relativeroot = characterSwaps(
                         relativeroot, isMinor(local_key), direction='m21-DCML'
                     )
-                thisEntry.chord = thisRN.figure  # NB: slightly different from DCML: no key.
+                # We replace the "d" annotation for Mm7 chords on degrees other than
+                #   V because it is not used by the DCML standard
+                # NB: slightly different from DCML: no key.
+                thisEntry.chord = thisRN.figure.replace('d', '', 1)  
                 thisEntry.pedal = None
                 thisEntry.numeral = thisRN.romanNumeral
                 thisEntry.form = getForm(thisRN)
