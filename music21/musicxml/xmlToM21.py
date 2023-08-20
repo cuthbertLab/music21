@@ -2524,7 +2524,7 @@ class MeasureParser(SoundTagMixin, XMLParserBase):
                     meth = getattr(self, methName)
                     meth(mxObj)
 
-        if self.useVoices is True:
+        if self.useVoices:
             for v in self.stream.iter().voices:
                 if v:  # do not bother with empty voices
                     # the musicDataMethods use insertCore, thus the voices need to run
@@ -2536,6 +2536,21 @@ class MeasureParser(SoundTagMixin, XMLParserBase):
                                 fillGaps=True,
                                 inPlace=True,
                                 hideRests=True)
+                    # Remove rests incorrectly added to a staff where it's not required
+                    # https://github.com/cuthbertLab/music21/issues/991
+                    for e in v.elements:
+                        if e in elementsBefore:
+                            continue
+                        next_element = e.next()
+                        for k, listOfEls in self.staffReference.items():
+                            if next_element in listOfEls:
+                                staffKey = k
+                                if next_element.offset < e.offset:
+                                    staffKey -= 1
+                                if staffKey >= 0:
+                                    self.staffReference.setdefault(staffKey, []).append(e)
+                                break
+                                
         self.stream.coreElementsChanged()
 
         if (self.restAndNoteCount['rest'] == 1
