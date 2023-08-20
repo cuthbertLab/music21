@@ -31,6 +31,7 @@ from music21 import defaults
 from music21 import duration
 from music21 import dynamics
 from music21.common.enums import OrnamentDelay
+from music21.common.numberTools import opFrac
 from music21 import editorial
 from music21 import environment
 from music21 import exceptions21
@@ -1760,31 +1761,7 @@ class PartParser(XMLParserBase):
         for mxMeasure in self.mxPart.iterfind('measure'):
             self.xmlMeasureToMeasure(mxMeasure)
 
-        self.removeEndForwardRest()
         part.coreElementsChanged()
-
-    def removeEndForwardRest(self):
-        '''
-        If the last measure ended with a forward tag, as happens
-        in some pieces that end with incomplete measures,
-        and voices are not involved,
-        remove the rest there (for backwards compatibility, esp.
-        since bwv66.6 uses it)
-
-        * New in v7.
-        '''
-        if self.lastMeasureParser is None:  # pragma: no cover
-            return  # should not happen
-        lmp = self.lastMeasureParser
-        self.lastMeasureParser = None  # clean memory
-
-        if lmp.endedWithForwardTag is None:
-            return
-        if lmp.useVoices is True:
-            return
-        endedForwardRest = lmp.endedWithForwardTag
-        if lmp.stream.recurse().notesAndRests.last() is endedForwardRest:
-            lmp.stream.remove(endedForwardRest, recurse=True)
 
     def separateOutPartStaves(self) -> list[stream.PartStaff]:
         '''
@@ -2233,7 +2210,7 @@ class PartParser(XMLParserBase):
                     else:
                         self.lastMeasureWasShort = False
 
-        self.lastMeasureOffset += mOffsetShift
+        self.lastMeasureOffset = opFrac(self.lastMeasureOffset + mOffsetShift)
 
     def applyMultiMeasureRest(self, r: note.Rest):
         '''
@@ -2389,13 +2366,6 @@ class MeasureParser(SoundTagMixin, XMLParserBase):
 
         # what is the offset in the measure of the current note position?
         self.offsetMeasureNote: OffsetQL = 0.0
-
-        # keep track of the last rest that was added with a forward tag.
-        # there are many pieces that end with incomplete measures that
-        # older versions of Finale put a forward tag at the end, but this
-        # disguises the incomplete last measure.  The PartParser will
-        # pick this up from the last measure.
-        self.endedWithForwardTag: note.Rest | None = None
 
     @staticmethod
     def getStaffNumber(mxObjectOrNumber) -> int:
@@ -2596,10 +2566,8 @@ class MeasureParser(SoundTagMixin, XMLParserBase):
         '''
         mxDuration = mxObj.find('duration')
         if durationText := strippedText(mxDuration):
-            change = common.numberTools.opFrac(
-                float(durationText) / self.divisions
-            )
-            self.offsetMeasureNote -= change
+            change = opFrac(float(durationText) / self.divisions)
+            self.offsetMeasureNote = opFrac(self.offsetMeasureNote - change)
             # check for negative offsets produced by
             # musicxml durations with float rounding issues
             # https://github.com/cuthbertLab/music21/issues/971
@@ -2611,22 +2579,9 @@ class MeasureParser(SoundTagMixin, XMLParserBase):
         '''
         mxDuration = mxObj.find('duration')
         if durationText := strippedText(mxDuration):
-            change = common.numberTools.opFrac(
-                float(durationText) / self.divisions
-            )
-
-            # Create hidden rest (in other words, a spacer)
-            # old Finale documents close incomplete final measures with <forward>
-            # this will be removed afterward by removeEndForwardRest()
-            r = note.Rest(quarterLength=change)
-            r.style.hideObjectOnPrint = True
-            self.addToStaffReference(mxObj, r)
-            self.insertInMeasureOrVoice(mxObj, r)
-
+            change = opFrac(float(durationText) / self.divisions)
             # Allow overfilled measures for now -- TODO(someday): warn?
-            self.offsetMeasureNote += change
-            # xmlToNote() sets None
-            self.endedWithForwardTag = r
+            self.offsetMeasureNote = opFrac(self.offsetMeasureNote + change)
 
     def xmlPrint(self, mxPrint: ET.Element):
         '''
@@ -2785,8 +2740,7 @@ class MeasureParser(SoundTagMixin, XMLParserBase):
             self.nLast = c  # update
 
         # only increment Chords after completion
-        self.offsetMeasureNote += offsetIncrement
-        self.endedWithForwardTag = None
+        self.offsetMeasureNote = opFrac(self.offsetMeasureNote + offsetIncrement)
 
     def xmlToChord(self, mxNoteList: list[ET.Element]) -> chord.ChordBase:
         # noinspection PyShadowingNames
@@ -3578,7 +3532,7 @@ class MeasureParser(SoundTagMixin, XMLParserBase):
         mxDuration = mxNote.find('duration')
         if mxDuration is not None:
             noteDivisions = float(mxDuration.text.strip())
-            qLen = common.numberTools.opFrac(noteDivisions / divisions)
+            qLen = opFrac(noteDivisions / divisions)
         else:
             qLen = 0.0
 
@@ -5510,7 +5464,7 @@ class MeasureParser(SoundTagMixin, XMLParserBase):
                 meth(mxSub)
             # NOT to be done: directive -- deprecated since v2.
             elif tag == 'divisions':
-                self.divisions = common.opFrac(float(mxSub.text))
+                self.divisions = opFrac(float(mxSub.text))
             # TODO: musicxml4: for-part including part-clef
             # TODO: instruments -- int if more than one instrument plays most of the time
             # TODO: part-symbol
