@@ -2532,13 +2532,15 @@ class MeasureParser(SoundTagMixin, XMLParserBase):
                     v.coreElementsChanged()
                     # Fill mid-measure gaps, and find end of measure gaps by ref to measure stream
                     # https://github.com/cuthbertlab/music21/issues/444
+                    elementsBefore = v.elements
+
                     v.makeRests(refStreamOrTimeRange=self.stream,
                                 fillGaps=True,
                                 inPlace=True,
                                 hideRests=True)
                     # Remove rests incorrectly added to a staff where it's not required
                     # https://github.com/cuthbertLab/music21/issues/991
-                    for e in v.elements:
+                    for e in v.elements:  # pylint: disable=too-many-nested-blocks
                         if e in elementsBefore:
                             continue
                         next_element = e.next()
@@ -2550,7 +2552,6 @@ class MeasureParser(SoundTagMixin, XMLParserBase):
                                 if staffKey >= 0:
                                     self.staffReference.setdefault(staffKey, []).append(e)
                                 break
-                                
         self.stream.coreElementsChanged()
 
         if (self.restAndNoteCount['rest'] == 1
