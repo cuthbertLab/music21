@@ -867,6 +867,19 @@ class MusicXMLImporter(XMLParserBase):
             self.spannerBundle.remove(sp)
 
         s.coreElementsChanged()
+        # Fill gaps with rests where needed
+        for m in s[stream.Measure]:
+            for v in m.voices:
+                if v:  # do not bother with empty voices
+                    # the musicDataMethods use insertCore, thus the voices need to run
+                    # coreElementsChanged
+                    v.coreElementsChanged()
+                    # Fill mid-measure gaps, and find end of measure gaps by ref to measure stream
+                    # https://github.com/cuthbertlab/music21/issues/444
+                    v.makeRests(refStreamOrTimeRange=m,
+                                fillGaps=True,
+                                inPlace=True,
+                                hideRests=True)
         s.definesExplicitSystemBreaks = self.definesExplicitSystemBreaks
         s.definesExplicitPageBreaks = self.definesExplicitPageBreaks
         for p in s.parts:
@@ -2523,35 +2536,8 @@ class MeasureParser(SoundTagMixin, XMLParserBase):
                 if methName is not None:
                     meth = getattr(self, methName)
                     meth(mxObj)
-
-        if self.useVoices:
-            for v in self.stream.iter().voices:
-                if v:  # do not bother with empty voices
-                    # the musicDataMethods use insertCore, thus the voices need to run
-                    # coreElementsChanged
-                    v.coreElementsChanged()
-                    # Fill mid-measure gaps, and find end of measure gaps by ref to measure stream
-                    # https://github.com/cuthbertlab/music21/issues/444
-                    elementsBefore = v.elements
-
-                    v.makeRests(refStreamOrTimeRange=self.stream,
-                                fillGaps=True,
-                                inPlace=True,
-                                hideRests=True)
-                    # Remove rests incorrectly added to a staff where it's not required
-                    # https://github.com/cuthbertLab/music21/issues/991
-                    for e in v.elements:  # pylint: disable=too-many-nested-blocks
-                        if e in elementsBefore:
-                            continue
-                        next_element = e.next()
-                        for k, listOfEls in self.staffReference.items():
-                            if next_element in listOfEls:
-                                staffKey = k
-                                if next_element.offset < e.offset:
-                                    staffKey -= 1
-                                if staffKey >= 0:
-                                    self.staffReference.setdefault(staffKey, []).append(e)
-                                break
+        for v in self.stream[stream.Voice]:
+            v.coreElementsChanged()
         self.stream.coreElementsChanged()
 
         if (self.restAndNoteCount['rest'] == 1
@@ -2574,7 +2560,7 @@ class MeasureParser(SoundTagMixin, XMLParserBase):
         >>> mxBackup = EL('<backup><duration>100</duration></backup>')
         >>> MP.xmlBackup(mxBackup)
         >>> MP.offsetMeasureNote
-        0.9979
+        Fraction(9979, 10000)
 
         >>> MP.xmlBackup(mxBackup)
         >>> MP.offsetMeasureNote
