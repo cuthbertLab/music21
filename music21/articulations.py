@@ -605,6 +605,12 @@ class FretBend(FretIndication):
         self.release = release
         self.withBar = withBar
 
+class Mute(StringIndication):
+    '''
+    muted note for string instruments.
+    '''
+    pass
+
 class FretTap(FretIndication):
     pass
 
