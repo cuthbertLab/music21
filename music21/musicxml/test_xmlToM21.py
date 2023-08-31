@@ -1290,7 +1290,7 @@ class Test(unittest.TestCase):
 
         self.assertEqual(len(MP.stream.voices), 2)
         self.assertEqual(len(MP.stream.voices[0].elements), 1)
-        self.assertEqual(len(MP.stream.voices[1].elements), 2)
+        self.assertEqual(len(MP.stream.voices[1].elements), 1)
         self.assertEqual(MP.stream.voices[1].id, 'non-integer-value')
 
     def testMultiDigitEnding(self):
