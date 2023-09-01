@@ -5684,11 +5684,10 @@ class MeasureParser(SoundTagMixin, XMLParserBase):
         numerators = []
         denominators = []
         for beatOrType in mxTime:
-            beatOrTypeText = beatOrType.text.strip()  # type: ignore
             if beatOrType.tag == 'beats':
-                numerators.append(beatOrTypeText)  # may be 3+2
+                numerators.append(beatOrType.text.strip())  # may be 3+2
             elif beatOrType.tag == 'beat-type':
-                denominators.append(beatOrTypeText)
+                denominators.append(beatOrType.text.strip())
             elif beatOrType.tag == 'interchangeable':
                 break  # interchangeable comes after all beat/beat-type sequences
 
@@ -5714,7 +5713,9 @@ class MeasureParser(SoundTagMixin, XMLParserBase):
 
         # attr: symbol
         symbol = mxTime.get('symbol')
-        if symbol in ('common', 'cut', 'single-number', 'normal'):
+        if symbol is None:
+            pass
+        elif symbol in ('common', 'cut', 'single-number', 'normal'):
             ts.symbol = symbol
         elif symbol == 'note':
             ts.symbolizeDenominator = True
@@ -5722,7 +5723,6 @@ class MeasureParser(SoundTagMixin, XMLParserBase):
             pass
             # TODO: support, but not as musicxml style -- reduces by 1/3 the numerator...
             # this should be done by changing the displaySequence directly.
-
         return ts
 
     def handleClef(self, mxClef):

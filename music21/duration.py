@@ -2136,7 +2136,7 @@ class Duration(prebase.ProtoM21Object, SlottedObjectMixin):
             if currentPosition > quarterPosition:
                 return i
         raise DurationException(
-            'Could not match quarter length within an index.')
+            'Could not match quarterLength within an index.')
 
     def componentStartTime(self, componentIndex: int) -> float:
         '''
@@ -2164,13 +2164,12 @@ class Duration(prebase.ProtoM21Object, SlottedObjectMixin):
         IndexError: invalid component index value 3 submitted;
                     value must be an integer between 0 and 2
         '''
-        if 0 <= componentIndex < len(self.components):
-            components = self.components[:componentIndex]
-            return float(sum([c.quarterLength for c in components]))
-
-        raise IndexError(
-            f'invalid component index value {componentIndex} '
-            + f'submitted; value must be an integer between 0 and {len(self.components) - 1}')
+        if not (0 <= componentIndex < len(self.components)):
+            raise IndexError(
+                f'invalid component index value {componentIndex} '
+                + f'submitted; value must be an integer between 0 and {len(self.components) - 1}')
+        components = self.components[:componentIndex]
+        return float(sum([c.quarterLength for c in components]))
 
 
     def consolidate(self):
@@ -2615,10 +2614,10 @@ class Duration(prebase.ProtoM21Object, SlottedObjectMixin):
         if not isinstance(value, tuple):
             raise TypeError('only tuple dotGroups values can be used with this method.')
         # removes dots from all components...
-        self._components = tuple(
-            durationTupleFromTypeDots(component.type, 0)
-            for component in self._components
+        componentsGenerator = (
+            durationTupleFromTypeDots(component.type, 0) for component in self._components
         )
+        self._components = tuple(componentsGenerator)
 
         self._dotGroups = value
         self._quarterLengthNeedsUpdating = True

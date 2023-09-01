@@ -2436,11 +2436,11 @@ class IntervalNetwork:
         maxPitch = pitchTargetObj.transpose(12, inPlace=False)
 
         realizedPitches, realizedNodes = self.realize(pitchReference,
-                                                   nodeObj,
-                                                   minPitch=minPitch,
-                                                   maxPitch=maxPitch,
-                                                   direction=direction,
-                                                   alteredDegrees=alteredDegrees)
+                                                      nodeObj,
+                                                      minPitch=minPitch,
+                                                      maxPitch=maxPitch,
+                                                      direction=direction,
+                                                      alteredDegrees=alteredDegrees)
 
         # environLocal.printDebug(['getRelativeNodeId()', 'nodeObj', nodeObj,
         #    'realizedPitch', realizedPitch, 'realizedNode', realizedNode])
@@ -2511,11 +2511,11 @@ class IntervalNetwork:
         maxPitch = pitchTargetObj.transpose(12, inPlace=False)
 
         realizedPitches, realizedNodes = self.realize(pitchReference,
-                                                   nodeId,
-                                                   minPitch=minPitch,
-                                                   maxPitch=maxPitch,
-                                                   direction=direction,
-                                                   alteredDegrees=alteredDegrees)
+                                                      nodeId,
+                                                      minPitch=minPitch,
+                                                      maxPitch=maxPitch,
+                                                      direction=direction,
+                                                      alteredDegrees=alteredDegrees)
 
         lowNeighbor = None
         highNeighbor = None

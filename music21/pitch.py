@@ -584,8 +584,8 @@ def _dissonanceScore(pitches, smallPythagoreanRatio=True, accidentalPenalty=True
         for this_interval in intervals:
             # does not accept weird intervals, e.g. with semitones
             ratio = interval.intervalToPythagoreanRatio(this_interval)
-            penalty = (math.log(ratio.numerator * ratio.denominator / ratio)
-                                    / 26.366694928034633)  # d2 is 1.0
+            # d2 is 1.0
+            penalty = math.log(ratio.numerator * ratio.denominator / ratio) * 0.03792663444
             score_ratio += penalty
 
         score_ratio /= len(pitches)

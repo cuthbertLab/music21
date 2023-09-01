@@ -329,8 +329,9 @@ class Beams(prebase.ProtoM21Object, EqualSlottedObjectMixin):
          None]
         '''
         for i in range(0, len(beamsList)):
-            if ((i == 0 or beamsList[i - 1] is None)
-                    and (i + 1 == len(beamsList) or beamsList[i + 1] is None)):
+            previousBeamIsNone = (i == 0 or beamsList[i - 1] is None)
+            nextBeamIsNone = (i + 1 == len(beamsList) or beamsList[i + 1] is None)
+            if previousBeamIsNone and nextBeamIsNone:
                 beamsList[i] = None
         return beamsList
 
@@ -342,7 +343,7 @@ class Beams(prebase.ProtoM21Object, EqualSlottedObjectMixin):
         16ths are not beamed by default.
         '''
         # sanitize two partials in a row:
-        for bThis, bNext in zip(beamsList[:-1], beamsList[1:]):
+        for i, (bThis, bNext) in enumerate(zip(beamsList[:-1], beamsList[1:])):
             if not bThis or not bNext:
                 continue
 
@@ -350,7 +351,7 @@ class Beams(prebase.ProtoM21Object, EqualSlottedObjectMixin):
             if not bThisNum:
                 continue
 
-            for i, thisNum in enumerate(bThisNum):
+            for thisNum in bThisNum:
                 thisBeam = bThis.getByNumber(thisNum)
                 if thisBeam.type != 'partial' or thisBeam.direction != 'right':
                     continue

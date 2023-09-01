@@ -501,7 +501,13 @@ class Metadata(base.Music21Object):
         >>> md.isStandardName('soundtracker:SampleName')
         False
         '''
-        return self._isStandardNamespaceName(name) or self._isStandardUniqueName(name)
+        if self._isStandardNamespaceName(name):
+            return True
+
+        if self._isStandardUniqueName(name):
+            return True
+
+        return False
 
 # -----------------------------------------------------------------------------
 #   Public APIs

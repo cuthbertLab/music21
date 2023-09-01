@@ -160,10 +160,10 @@ def slashMixedToFraction(valueSrc: str) -> tuple[NumDenomTuple, bool]:
     # when encountering a missing denominator, find the first defined
     # and apply to all previous
     for i, (intNum, intDenom) in enumerate(pre):
-        if not isinstance(intDenom, int):  # search for next denominator
+        if intDenom is None:  # search for next denominator
             # this O(n^2) operation is easily simplified to O(n)
             for (_, nextDenom) in pre[i + 1:]:
-                if isinstance(nextDenom, int):
+                if nextDenom is not None:
                     intDenom = nextDenom
                     break
             else:
