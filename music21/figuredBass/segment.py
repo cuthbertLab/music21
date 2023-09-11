@@ -34,6 +34,44 @@ _defaultRealizerScale: dict[str, realizerScale.FiguredBassScale | None] = {
 
 
 class Segment:
+    '''
+    A Segment corresponds to a 1:1 realization of a bassNote and notationString
+    of a :class:`~music21.figuredBass.realizer.FiguredBassLine`.
+    It is created by passing six arguments: a
+    :class:`~music21.figuredBass.realizerScale.FiguredBassScale`, a bassNote, a notationString,
+    a :class:`~music21.figuredBass.rules.Rules` object, a number of parts and a maximum pitch.
+    Realizations of a Segment are represented
+    as possibility tuples (see :mod:`~music21.figuredBass.possibility` for more details).
+
+    Methods in Python's `itertools`
+    module are used extensively. Methods
+    which generate possibilities or possibility progressions return iterators,
+    which are turned into lists in the examples
+    for display purposes only.
+
+    if fbScale is None, a realizerScale.FiguredBassScale() is created
+
+    if fbRules is None, a rules.Rules() instance is created.  Each Segment gets
+    its own deepcopy of the one given.
+
+
+    Here, a Segment is created using the default values: a FiguredBassScale in C,
+    a bassNote of C3, an empty notationString, and a default
+    Rules object.
+
+    >>> from music21.figuredBass import segment
+    >>> s1 = segment.Segment()
+    >>> s1.bassNote
+    <music21.note.Note C>
+    >>> s1.numParts
+    4
+    >>> s1.pitchNamesInChord
+    ['C', 'E', 'G']
+    >>> [str(p) for p in s1.allPitchesAboveBass]
+    ['C3', 'E3', 'G3', 'C4', 'E4', 'G4', 'C5', 'E5', 'G5']
+    >>> s1.segmentChord
+    <music21.chord.Chord C3 E3 G3 C4 E4 G4 C5 E5 G5>
+    '''
     _DOC_ORDER = ['allSinglePossibilities',
                   'singlePossibilityRules',
                   'allCorrectSinglePossibilities',
@@ -72,44 +110,6 @@ class Segment:
                  numParts=4,
                  maxPitch: str | pitch.Pitch = 'B5',
                  listOfPitches=None):
-        '''
-        A Segment corresponds to a 1:1 realization of a bassNote and notationString
-        of a :class:`~music21.figuredBass.realizer.FiguredBassLine`.
-        It is created by passing six arguments: a
-        :class:`~music21.figuredBass.realizerScale.FiguredBassScale`, a bassNote, a notationString,
-        a :class:`~music21.figuredBass.rules.Rules` object, a number of parts and a maximum pitch.
-        Realizations of a Segment are represented
-        as possibility tuples (see :mod:`~music21.figuredBass.possibility` for more details).
-
-        Methods in Python's `itertools`
-        module are used extensively. Methods
-        which generate possibilities or possibility progressions return iterators,
-        which are turned into lists in the examples
-        for display purposes only.
-
-        if fbScale is None, a realizerScale.FiguredBassScale() is created
-
-        if fbRules is None, a rules.Rules() instance is created.  Each Segment gets
-        its own deepcopy of the one given.
-
-
-        Here, a Segment is created using the default values: a FiguredBassScale in C,
-        a bassNote of C3, an empty notationString, and a default
-        Rules object.
-
-        >>> from music21.figuredBass import segment
-        >>> s1 = segment.Segment()
-        >>> s1.bassNote
-        <music21.note.Note C>
-        >>> s1.numParts
-        4
-        >>> s1.pitchNamesInChord
-        ['C', 'E', 'G']
-        >>> [str(p) for p in s1.allPitchesAboveBass]
-        ['C3', 'E3', 'G3', 'C4', 'E4', 'G4', 'C5', 'E5', 'G5']
-        >>> s1.segmentChord
-        <music21.chord.Chord C3 E3 G3 C4 E4 G4 C5 E5 G5>
-        '''
         if isinstance(bassNote, str):
             bassNote = note.Note(bassNote)
         if isinstance(maxPitch, str):
@@ -193,16 +193,16 @@ class Segment:
 
         singlePossibRules = [
             (fbRules.forbidIncompletePossibilities,
-                 possibility.isIncomplete,
-                 False,
-                 [self.pitchNamesInChord]),
+             possibility.isIncomplete,
+             False,
+             [self.pitchNamesInChord]),
             (True,
-                 possibility.upperPartsWithinLimit,
-                 True,
-                 [fbRules.upperPartsMaxSemitoneSeparation]),
+             possibility.upperPartsWithinLimit,
+             True,
+             [fbRules.upperPartsMaxSemitoneSeparation]),
             (fbRules.forbidVoiceCrossing,
-                 possibility.voiceCrossing,
-                 False)
+             possibility.voiceCrossing,
+             False)
         ]
 
         return singlePossibRules
@@ -282,9 +282,9 @@ class Segment:
             (fbRules.forbidHiddenFifths, possibility.hiddenFifth, False),
             (fbRules.forbidHiddenOctaves, possibility.hiddenOctave, False),
             (fbRules.resolveAugmentedSixthProperly and isItalianAugmentedSixth,
-                possibility.couldBeItalianA6Resolution,
-                True,
-                [_unpackTriad(self.segmentChord), fbRules.restrictDoublingsInItalianA6Resolution])
+             possibility.couldBeItalianA6Resolution,
+             True,
+             [_unpackTriad(self.segmentChord), fbRules.restrictDoublingsInItalianA6Resolution])
         ]
 
         return consecutivePossibRules
@@ -362,10 +362,10 @@ class Segment:
             (fbRules.resolveDominantSeventhProperly and isDominantSeventh,
              self.resolveDominantSeventhSegment),
             (fbRules.resolveDiminishedSeventhProperly and isDiminishedSeventh,
-                self.resolveDiminishedSeventhSegment,
-                [fbRules.doubledRootInDim7]),
+             self.resolveDiminishedSeventhSegment,
+             [fbRules.doubledRootInDim7]),
             (fbRules.resolveAugmentedSixthProperly and isAugmentedSixth,
-                self.resolveAugmentedSixthSegment)
+             self.resolveAugmentedSixthSegment)
         ]
 
         return specialResRules
@@ -427,8 +427,8 @@ class Segment:
         resolveV43toI6 = domInversion and resInversion == 1
 
         if (domChord.inversion() == 0
-                and resChord.root().name == tonic.name
-                and (resChord.isMajorTriad() or resChord.isMinorTriad())):
+            and resChord.root().name == tonic.name
+            and (resChord.isMajorTriad() or resChord.isMinorTriad())):
             # "V7 to I" resolutions are always incomplete, with a missing fifth.
             segmentB.fbRules.forbidIncompletePossibilities = False
 
@@ -437,28 +437,28 @@ class Segment:
              resolution.dominantSeventhToMajorTonic,
              [resolveV43toI6, domChordInfo]),
             (resChord.root().name == tonic.name and resChord.isMinorTriad(),
-                resolution.dominantSeventhToMinorTonic,
-                [resolveV43toI6, domChordInfo]),
+             resolution.dominantSeventhToMinorTonic,
+             [resolveV43toI6, domChordInfo]),
             ((resChord.root().name == majSubmediant.name
               and resChord.isMinorTriad()
               and domInversion == 0),
-                resolution.dominantSeventhToMinorSubmediant,
-                [domChordInfo]),
+             resolution.dominantSeventhToMinorSubmediant,
+             [domChordInfo]),
             ((resChord.root().name == minSubmediant.name
-                and resChord.isMajorTriad()
-                and domInversion == 0),
-                resolution.dominantSeventhToMajorSubmediant,
-                [domChordInfo]),
+              and resChord.isMajorTriad()
+              and domInversion == 0),
+             resolution.dominantSeventhToMajorSubmediant,
+             [domChordInfo]),
             ((resChord.root().name == subdominant.name
-                and resChord.isMajorTriad()
-                and domInversion == 0),
-                resolution.dominantSeventhToMajorSubdominant,
-                [domChordInfo]),
+              and resChord.isMajorTriad()
+              and domInversion == 0),
+             resolution.dominantSeventhToMajorSubdominant,
+             [domChordInfo]),
             ((resChord.root().name == subdominant.name
-                and resChord.isMinorTriad()
-                and domInversion == 0),
-                resolution.dominantSeventhToMinorSubdominant,
-                [domChordInfo])
+              and resChord.isMinorTriad()
+              and domInversion == 0),
+             resolution.dominantSeventhToMinorSubdominant,
+             [domChordInfo])
         ]
 
         try:
@@ -522,14 +522,14 @@ class Segment:
              resolution.diminishedSeventhToMajorTonic,
              [doubledRoot, dimChordInfo]),
             (resChord.root().name == tonic.name and resChord.isMinorTriad(),
-                resolution.diminishedSeventhToMinorTonic,
-                [doubledRoot, dimChordInfo]),
+             resolution.diminishedSeventhToMinorTonic,
+             [doubledRoot, dimChordInfo]),
             (resChord.root().name == subdominant.name and resChord.isMajorTriad(),
-                resolution.diminishedSeventhToMajorSubdominant,
-                [dimChordInfo]),
+             resolution.diminishedSeventhToMajorSubdominant,
+             [dimChordInfo]),
             (resChord.root().name == subdominant.name and resChord.isMinorTriad(),
-                resolution.diminishedSeventhToMinorSubdominant,
-                [dimChordInfo])
+             resolution.diminishedSeventhToMinorSubdominant,
+             [dimChordInfo])
         ]
 
         try:
@@ -604,18 +604,18 @@ class Segment:
 
         augmentedSixthResolutionMethods = [
             ((resChord.inversion() == 2
-                and resChord.root().name == tonic.name
-                and resChord.isMajorTriad()),
+              and resChord.root().name == tonic.name
+              and resChord.isMajorTriad()),
              resolution.augmentedSixthToMajorTonic, [augSixthType, augSixthChordInfo]),
             ((resChord.inversion() == 2
-                and resChord.root().name == tonic.name
-                and resChord.isMinorTriad()),
-                resolution.augmentedSixthToMinorTonic,
-                [augSixthType, augSixthChordInfo]),
+              and resChord.root().name == tonic.name
+              and resChord.isMinorTriad()),
+             resolution.augmentedSixthToMinorTonic,
+             [augSixthType, augSixthChordInfo]),
             ((majorScale.pitchFromDegree(5).name == resChord.bass().name
-                and resChord.isMajorTriad()),
-                resolution.augmentedSixthToDominant,
-                [augSixthType, augSixthChordInfo])
+              and resChord.isMajorTriad()),
+             resolution.augmentedSixthToDominant,
+             [augSixthType, augSixthChordInfo])
         ]
 
         try:
@@ -815,8 +815,8 @@ class Segment:
         correctB = segmentB.allCorrectSinglePossibilities()
         correctAB = itertools.product(correctA, correctB)
         return filter(lambda possibAB: self._isCorrectConsecutivePossibility(possibA=possibAB[0],
-                                                                              possibB=possibAB[1]),
-                       correctAB)
+                                                                             possibB=possibAB[1]),
+                      correctAB)
 
     def _resolveSpecialSegment(self, segmentB, specialResolutionMethods):
         resolutionMethodExecutor = _compileRules(specialResolutionMethods, 3)
@@ -829,18 +829,18 @@ class Segment:
             correctAB = filter(lambda possibAB: possibility.pitchesWithinLimit(
                 possibA=possibAB[1],
                 maxPitch=segmentB._maxPitch),
-                correctAB)
+                               correctAB)
             if self.fbRules.applyConsecutivePossibRulesToResolution:
                 correctAB = filter(lambda possibAB: self._isCorrectConsecutivePossibility(
                     possibA=possibAB[0],
                     possibB=possibAB[1]),
-                    correctAB)
+                                   correctAB)
             if self.fbRules.applySinglePossibRulesToResolution:
                 segmentB._singlePossibilityRuleChecking = _compileRules(
                     segmentB.singlePossibilityRules(segmentB.fbRules))
                 correctAB = filter(lambda possibAB: segmentB._isCorrectSinglePossibility(
                     possibA=possibAB[1]),
-                    correctAB)
+                                   correctAB)
             return correctAB
 
         raise SegmentException('No standard resolution available.')
@@ -994,6 +994,7 @@ def printRules(rulesList, maxLength=4):
 class SegmentException(exceptions21.Music21Exception):
     pass
 
+
 # ------------------------------------------------------------------------------
 
 
@@ -1003,5 +1004,5 @@ class Test(unittest.TestCase):
 
 if __name__ == '__main__':
     import music21
-    music21.mainTest(Test)
 
+    music21.mainTest(Test)
