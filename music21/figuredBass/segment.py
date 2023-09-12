@@ -34,6 +34,44 @@ _defaultRealizerScale: dict[str, realizerScale.FiguredBassScale | None] = {
 
 
 class Segment:
+    '''
+    A Segment corresponds to a 1:1 realization of a bassNote and notationString
+    of a :class:`~music21.figuredBass.realizer.FiguredBassLine`.
+    It is created by passing six arguments: a
+    :class:`~music21.figuredBass.realizerScale.FiguredBassScale`, a bassNote, a notationString,
+    a :class:`~music21.figuredBass.rules.Rules` object, a number of parts and a maximum pitch.
+    Realizations of a Segment are represented
+    as possibility tuples (see :mod:`~music21.figuredBass.possibility` for more details).
+
+    Methods in Python's `itertools`
+    module are used extensively. Methods
+    which generate possibilities or possibility progressions return iterators,
+    which are turned into lists in the examples
+    for display purposes only.
+
+    if fbScale is None, a realizerScale.FiguredBassScale() is created
+
+    if fbRules is None, a rules.Rules() instance is created.  Each Segment gets
+    its own deepcopy of the one given.
+
+
+    Here, a Segment is created using the default values: a FiguredBassScale in C,
+    a bassNote of C3, an empty notationString, and a default
+    Rules object.
+
+    >>> from music21.figuredBass import segment
+    >>> s1 = segment.Segment()
+    >>> s1.bassNote
+    <music21.note.Note C>
+    >>> s1.numParts
+    4
+    >>> s1.pitchNamesInChord
+    ['C', 'E', 'G']
+    >>> [str(p) for p in s1.allPitchesAboveBass]
+    ['C3', 'E3', 'G3', 'C4', 'E4', 'G4', 'C5', 'E5', 'G5']
+    >>> s1.segmentChord
+    <music21.chord.Chord C3 E3 G3 C4 E4 G4 C5 E5 G5>
+    '''
     _DOC_ORDER = ['allSinglePossibilities',
                   'singlePossibilityRules',
                   'allCorrectSinglePossibilities',
@@ -72,44 +110,6 @@ class Segment:
                  numParts=4,
                  maxPitch: str | pitch.Pitch = 'B5',
                  listOfPitches=None):
-        '''
-        A Segment corresponds to a 1:1 realization of a bassNote and notationString
-        of a :class:`~music21.figuredBass.realizer.FiguredBassLine`.
-        It is created by passing six arguments: a
-        :class:`~music21.figuredBass.realizerScale.FiguredBassScale`, a bassNote, a notationString,
-        a :class:`~music21.figuredBass.rules.Rules` object, a number of parts and a maximum pitch.
-        Realizations of a Segment are represented
-        as possibility tuples (see :mod:`~music21.figuredBass.possibility` for more details).
-
-        Methods in Python's `itertools`
-        module are used extensively. Methods
-        which generate possibilities or possibility progressions return iterators,
-        which are turned into lists in the examples
-        for display purposes only.
-
-        if fbScale is None, a realizerScale.FiguredBassScale() is created
-
-        if fbRules is None, a rules.Rules() instance is created.  Each Segment gets
-        its own deepcopy of the one given.
-
-
-        Here, a Segment is created using the default values: a FiguredBassScale in C,
-        a bassNote of C3, an empty notationString, and a default
-        Rules object.
-
-        >>> from music21.figuredBass import segment
-        >>> s1 = segment.Segment()
-        >>> s1.bassNote
-        <music21.note.Note C>
-        >>> s1.numParts
-        4
-        >>> s1.pitchNamesInChord
-        ['C', 'E', 'G']
-        >>> [str(p) for p in s1.allPitchesAboveBass]
-        ['C3', 'E3', 'G3', 'C4', 'E4', 'G4', 'C5', 'E5', 'G5']
-        >>> s1.segmentChord
-        <music21.chord.Chord C3 E3 G3 C4 E4 G4 C5 E5 G5>
-        '''
         if isinstance(bassNote, str):
             bassNote = note.Note(bassNote)
         if isinstance(maxPitch, str):
