@@ -814,8 +814,11 @@ class Verticality(prebase.ProtoM21Object):
             from music21 import stream
 
             nonlocal pitchBust  # love Py3!!!
-            p = n.pitch
-            pitchKey = p.nameWithOctave
+            try:
+                p = n.pitch
+                pitchKey = p.nameWithOctave
+            except AttributeError:
+                return
 
             pitchGroup = None
             if addPartIdAsGroup:
