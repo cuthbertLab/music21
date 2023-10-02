@@ -2728,11 +2728,14 @@ class Music21Object(prebase.ProtoM21Object):
         # avoids expensive duration computation for streams, which can never be grace notes
         isNotGrace = 1 if self.isStream or not self.duration.isGrace else 0
 
-        if self.sites.hasSiteId(id(useSite)):
-            insertIndex = self.sites.siteDict[id(useSite)].globalSiteIndex
-        elif self.activeSite is not None:
-            insertIndex = self.sites.siteDict[id(self.activeSite)].globalSiteIndex
-        else:  # for None, use this instead of default of -2.
+        try:
+            if self.sites.hasSiteId(id(useSite)):
+                insertIndex = self.sites.siteDict[id(useSite)].globalSiteIndex
+            elif self.activeSite is not None:
+                insertIndex = self.sites.siteDict[id(self.activeSite)].globalSiteIndex
+            else:  # for None, use this instead of default of -2.
+                insertIndex = 0
+        except KeyError:
             insertIndex = 0
 
         return SortTuple(atEnd, offset, self.priority,
