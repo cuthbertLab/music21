@@ -1625,10 +1625,10 @@ class PartParser(XMLParserBase):
         ...     + '</midi-instrument>'
         ...     + '</score-part>')
         >>> from xml.etree.ElementTree import fromstring as EL
-        >>> PP = musicxml.xmlToM21.PartParser()
+        >>> pp = musicxml.xmlToM21.PartParser()
 
         >>> mxScorePart = EL(scorePart)
-        >>> i = PP.getDefaultInstrument(mxScorePart)
+        >>> i = pp.getDefaultInstrument(mxScorePart)
         >>> i
         <music21.instrument.Instrument ': Instrument 4'>
         >>> i.instrumentName
@@ -1647,10 +1647,10 @@ class PartParser(XMLParserBase):
         ...     + '</midi-instrument>'
         ...     + '</score-part>')
         >>> from xml.etree.ElementTree import fromstring as EL
-        >>> PP = musicxml.xmlToM21.PartParser()
+        >>> pp = musicxml.xmlToM21.PartParser()
 
         >>> mxScorePart = EL(scorePart)
-        >>> i = PP.getDefaultInstrument(mxScorePart)
+        >>> i = pp.getDefaultInstrument(mxScorePart)
         >>> i
         <music21.instrument.Trumpet ': C Trumpet'>
         >>> i.instrumentName
@@ -2067,15 +2067,15 @@ class PartParser(XMLParserBase):
         Also sets self.lastTimeSignature from the timeSignature found in
         the measure, if any.
 
-        >>> PP = musicxml.xmlToM21.PartParser()
+        >>> pp = musicxml.xmlToM21.PartParser()
 
         Here are the defaults:
 
-        >>> PP.lastMeasureNumber
+        >>> pp.lastMeasureNumber
         0
-        >>> PP.lastNumberSuffix is None
+        >>> pp.lastNumberSuffix is None
         True
-        >>> PP.lastTimeSignature is None
+        >>> pp.lastTimeSignature is None
         True
 
         After setLastMeasureInfo:
@@ -2084,15 +2084,15 @@ class PartParser(XMLParserBase):
         >>> m.numberSuffix = 'b'
         >>> ts38 = meter.TimeSignature('3/8')
         >>> m.timeSignature = ts38
-        >>> PP.setLastMeasureInfo(m)
+        >>> pp.setLastMeasureInfo(m)
 
-        >>> PP.lastMeasureNumber
+        >>> pp.lastMeasureNumber
         4
-        >>> PP.lastNumberSuffix
+        >>> pp.lastNumberSuffix
         'b'
-        >>> PP.lastTimeSignature
+        >>> pp.lastTimeSignature
         <music21.meter.TimeSignature 3/8>
-        >>> PP.lastTimeSignature is ts38
+        >>> pp.lastTimeSignature is ts38
         True
 
         Note that if there was no timeSignature defined in m,
@@ -2101,10 +2101,10 @@ class PartParser(XMLParserBase):
         after the first measure there's going to be routines
         that need some sort of time signature:
 
-        >>> PP2 = musicxml.xmlToM21.PartParser()
+        >>> pp2 = musicxml.xmlToM21.PartParser()
         >>> m2 = stream.Measure(number=2)
-        >>> PP2.setLastMeasureInfo(m2)
-        >>> PP2.lastTimeSignature
+        >>> pp2.setLastMeasureInfo(m2)
+        >>> pp2.lastTimeSignature
         <music21.meter.TimeSignature 4/4>
 
 
@@ -2112,14 +2112,14 @@ class PartParser(XMLParserBase):
         to unnumbered measures, if a measure has the same number
         as the lastMeasureNumber, the lastNumberSuffix is not updated:
 
-        >>> PP3 = musicxml.xmlToM21.PartParser()
-        >>> PP3.lastMeasureNumber = 10
-        >>> PP3.lastNumberSuffix = 'X1'
+        >>> pp3 = musicxml.xmlToM21.PartParser()
+        >>> pp3.lastMeasureNumber = 10
+        >>> pp3.lastNumberSuffix = 'X1'
 
         >>> m10 = stream.Measure(number=10)
         >>> m10.numberSuffix = 'X2'
-        >>> PP3.setLastMeasureInfo(m10)
-        >>> PP3.lastNumberSuffix
+        >>> pp3.setLastMeasureInfo(m10)
+        >>> pp3.lastNumberSuffix
         'X1'
         '''
         if m.number == self.lastMeasureNumber:
@@ -2157,22 +2157,22 @@ class PartParser(XMLParserBase):
         >>> m = stream.Measure([meter.TimeSignature('4/4'), harmony.ChordSymbol('C7')])
         >>> m.highestTime
         0.0
-        >>> PP = musicxml.xmlToM21.PartParser()
-        >>> PP.setLastMeasureInfo(m)
-        >>> PP.adjustTimeAttributesFromMeasure(m)
+        >>> pp = musicxml.xmlToM21.PartParser()
+        >>> pp.setLastMeasureInfo(m)
+        >>> pp.adjustTimeAttributesFromMeasure(m)
         >>> m.highestTime
         4.0
-        >>> PP.lastMeasureWasShort
+        >>> pp.lastMeasureWasShort
         False
 
         Incomplete final measure:
 
         >>> m = stream.Measure([meter.TimeSignature('6/8'), note.Note(), note.Note()])
         >>> m.offset = 24.0
-        >>> PP = musicxml.xmlToM21.PartParser()
-        >>> PP.lastMeasureOffset = 21.0
-        >>> PP.setLastMeasureInfo(m)
-        >>> PP.adjustTimeAttributesFromMeasure(m)
+        >>> pp = musicxml.xmlToM21.PartParser()
+        >>> pp.lastMeasureOffset = 21.0
+        >>> pp.setLastMeasureInfo(m)
+        >>> pp.adjustTimeAttributesFromMeasure(m)
         >>> m.paddingRight
         1.0
         '''
@@ -2254,39 +2254,39 @@ class PartParser(XMLParserBase):
         '''
         If there is an active MultiMeasureRestSpanner, add the Rest, r, to it:
 
-        >>> PP = musicxml.xmlToM21.PartParser()
+        >>> pp = musicxml.xmlToM21.PartParser()
         >>> mmrSpanner = spanner.MultiMeasureRest()
         >>> mmrSpanner
         <music21.spanner.MultiMeasureRest 0 measures>
 
-        >>> PP.activeMultiMeasureRestSpanner = mmrSpanner
-        >>> PP.multiMeasureRestsToCapture = 2
+        >>> pp.activeMultiMeasureRestSpanner = mmrSpanner
+        >>> pp.multiMeasureRestsToCapture = 2
         >>> r1 = note.Rest(type='whole', id='r1')
-        >>> PP.applyMultiMeasureRest(r1)
-        >>> PP.multiMeasureRestsToCapture
+        >>> pp.applyMultiMeasureRest(r1)
+        >>> pp.multiMeasureRestsToCapture
         1
-        >>> PP.activeMultiMeasureRestSpanner
+        >>> pp.activeMultiMeasureRestSpanner
         <music21.spanner.MultiMeasureRest 1 measure>
 
-        >>> PP.activeMultiMeasureRestSpanner is mmrSpanner
+        >>> pp.activeMultiMeasureRestSpanner is mmrSpanner
         True
-        >>> PP.stream.show('text')  # Nothing...
+        >>> pp.stream.show('text')  # Nothing...
 
         >>> r2 = note.Rest(type='whole', id='r2')
-        >>> PP.applyMultiMeasureRest(r2)
-        >>> PP.multiMeasureRestsToCapture
+        >>> pp.applyMultiMeasureRest(r2)
+        >>> pp.multiMeasureRestsToCapture
         0
-        >>> PP.activeMultiMeasureRestSpanner is None
+        >>> pp.activeMultiMeasureRestSpanner is None
         True
 
         # spanner added to stream
 
-        >>> PP.stream.show('text')
+        >>> pp.stream.show('text')
         {0.0} <music21.spanner.MultiMeasureRest 2 measures>
 
         >>> r3 = note.Rest(type='whole', id='r3')
-        >>> PP.applyMultiMeasureRest(r3)
-        >>> PP.stream.show('text')
+        >>> pp.applyMultiMeasureRest(r3)
+        >>> pp.stream.show('text')
         {0.0} <music21.spanner.MultiMeasureRest 2 measures>
 
         '''

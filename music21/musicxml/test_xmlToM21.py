@@ -56,12 +56,12 @@ class Test(unittest.TestCase):
         mxScorePart = self.EL('<score-part><part-name>Elec.</part-name></score-part>')
         mxPart = self.EL('<part><measure><note><type>thirty-tooth</type></note></measure></part>')
 
-        PP = PartParser(mxPart=mxPart, mxScorePart=mxScorePart)
-        PP.partId = '1'
+        pp = PartParser(mxPart=mxPart, mxScorePart=mxScorePart)
+        pp.partId = '1'
 
         msg = 'In part (Elec.), measure (0): found unknown MusicXML type: thirty-tooth'
         with self.assertRaises(MusicXMLImportException) as error:
-            PP.parse()
+            pp.parse()
         self.assertEqual(str(error.exception), msg)
 
     def testBarRepeatConversion(self):
@@ -1478,9 +1478,9 @@ class Test(unittest.TestCase):
         </score-part>
         '''
 
-        PP = PartParser()
+        pp = PartParser()
         mxScorePart = EL(scorePart)
-        tmb = PP.getDefaultInstrument(mxScorePart)
+        tmb = pp.getDefaultInstrument(mxScorePart)
         self.assertIsInstance(tmb, instrument.Tambourine)
         self.assertEqual(tmb.percMapPitch, 54)  # 1-indexed
 
@@ -1488,11 +1488,11 @@ class Test(unittest.TestCase):
         scorePart = scorePart.replace('Tambourine', 'Cabasa')
         scorePart = scorePart.replace('Tamb.', 'Cab.')
         scorePart = scorePart.replace('55', '70')  # 1-indexed
-        PP = PartParser()
+        pp = PartParser()
         mxScorePart = EL(scorePart)
         msg = '69 does not map to a valid instrument!'
         with self.assertWarnsRegex(MusicXMLWarning, msg):
-            unp = PP.getDefaultInstrument(mxScorePart)
+            unp = pp.getDefaultInstrument(mxScorePart)
         self.assertIsInstance(unp, instrument.UnpitchedPercussion)
         self.assertEqual(unp.percMapPitch, 69)
 
@@ -1508,30 +1508,30 @@ class Test(unittest.TestCase):
         # Ignore import artifacts:
         d = duration.Duration(3 + 3 / 480)
         m = stream.Measure([meter.TimeSignature('6/8'), note.Note(duration=d)])
-        PP = PartParser()
-        PP.lastMeasureOffset = 21.0
-        PP.setLastMeasureInfo(m)
+        pp = PartParser()
+        pp.lastMeasureOffset = 21.0
+        pp.setLastMeasureInfo(m)
         with self.assertWarns(MusicXMLWarning):
-            PP.adjustTimeAttributesFromMeasure(m)
-        self.assertEqual(PP.lastMeasureOffset, 24.0)
+            pp.adjustTimeAttributesFromMeasure(m)
+        self.assertEqual(pp.lastMeasureOffset, 24.0)
 
         # Keep 'round' overful measures and extremely overful measures, as they were
         # likely intentional.
         d = duration.Duration(3.125)
         m = stream.Measure([meter.TimeSignature('6/8'), note.Note(duration=d)])
-        PP = PartParser()
-        PP.lastMeasureOffset = 21.0
-        PP.setLastMeasureInfo(m)
-        PP.adjustTimeAttributesFromMeasure(m)
-        self.assertEqual(PP.lastMeasureOffset, 24.125)
+        pp = PartParser()
+        pp.lastMeasureOffset = 21.0
+        pp.setLastMeasureInfo(m)
+        pp.adjustTimeAttributesFromMeasure(m)
+        self.assertEqual(pp.lastMeasureOffset, 24.125)
 
         d = duration.Duration(4.0)
         m = stream.Measure([meter.TimeSignature('6/8'), note.Note(duration=d)])
-        PP = PartParser()
-        PP.lastMeasureOffset = 21.0
-        PP.setLastMeasureInfo(m)
-        PP.adjustTimeAttributesFromMeasure(m)
-        self.assertEqual(PP.lastMeasureOffset, 25.0)
+        pp = PartParser()
+        pp.lastMeasureOffset = 21.0
+        pp.setLastMeasureInfo(m)
+        pp.adjustTimeAttributesFromMeasure(m)
+        self.assertEqual(pp.lastMeasureOffset, 25.0)
 
 
 if __name__ == '__main__':
