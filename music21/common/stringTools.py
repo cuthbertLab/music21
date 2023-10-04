@@ -470,7 +470,7 @@ def parenthesesMatch(
         i += 1
 
     if len(stack) > 1:
-        raise ValueError(f'Opening {open!r} at index {stack[1].start-1} was never closed')
+        raise ValueError(f'Opening {open!r} at index {stack[1].start - 1} was never closed')
 
     return mainMatch.nested
 
