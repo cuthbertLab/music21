@@ -408,7 +408,7 @@ class Date(prebase.ProtoM21Object):
             if value is None:
                 break
             post.append(int(value))
-        return datetime.datetime(*post)
+        return datetime.datetime(*post)  # pylint: disable=no-value-for-parameter
 
     @property
     def hasTime(self):
@@ -824,7 +824,7 @@ class DateSelection(DatePrimitive):
 
 
 # This was enhanced in music21 v8 to add an optional encoding scheme (e.g. URI, DCMIPoint,
-# etc) as well as whether the text is translated, or in the original language.
+# etc.) as well as whether the text is translated, or in the original language.
 class Text(prebase.ProtoM21Object):
     r'''
     One unit of text data: a title, a name, or some other text data. Store the

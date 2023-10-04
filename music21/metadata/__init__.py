@@ -56,7 +56,7 @@ In the v8 implementation, contributor roles are treated the same as other
 non-contributor metadata.  Music21 includes a list of supported property terms,
 which are pulled from Dublin Core (namespace = 'dcterms'), MARC Relator codes
 (namespace = 'marcrel'), and Humdrum (namespace = 'humdrum').  Each property
-term is assigned a unique name (e.g. 'composer', 'alternativeTitle', etc).
+term is assigned a unique name (e.g. 'composer', 'alternativeTitle', etc.).
 
 Each metadata property can be specified by 'uniqueName' or by 'namespace:name'.
 For example: `md['composer']` and `md['marcrel:CMP']` are equivalent, as are
@@ -649,7 +649,7 @@ class Metadata(base.Music21Object):
         skipNonContributors is True, only contributor metadata will be returned.  If both
         of these are True, the returned Tuple will be empty. If returnPrimitives is False
         (default), values are all converted to str.  If returnPrimitives is True, the values
-        will retain their original ValueType (e.g. Text, Contributor, Copyright, etc).  If
+        will retain their original ValueType (e.g. Text, Contributor, Copyright, etc.).  If
         returnSorted is False, the returned Tuple will not be sorted by uniqueName (the
         default behavior is to sort).
 
@@ -1770,7 +1770,7 @@ class Metadata(base.Music21Object):
                 return str(values[0])
             if len(values) == 2:
                 return str(values[0]) + ' and ' + str(values[1])
-            return str(values[0]) + f' and {len(values)-1} others'
+            return str(values[0]) + f' and {len(values) - 1} others'
 
         if self._namespaceNameNeedsArticleNormalization(namespaceName):
             output: str = ''
