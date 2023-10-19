@@ -4892,8 +4892,11 @@ class Chord(ChordBase):
         >>> chord.Chord('C E G C-').commonName
         'enharmonic equivalent to major seventh chord'
 
-        >>> chord.Chord('C4 E4 G4 B--4').commonName
+        >>> chord.Chord('C E G B--').commonName
         'enharmonic equivalent to minor seventh chord'
+
+        >>> chord.Chord('C E G A').commonName
+        'minor seventh chord'
         '''
         if any(not p.isTwelveTone() for p in self.pitches):
             return 'microtonal chord'
