@@ -4891,6 +4891,9 @@ class Chord(ChordBase):
 
         >>> chord.Chord('C E G C-').commonName
         'enharmonic equivalent to major seventh chord'
+
+        >>> chord.Chord('C4 E4 G4 B--4').commonName
+        'enharmonic equivalent to minor seventh chord'
         '''
         if any(not p.isTwelveTone() for p in self.pitches):
             return 'microtonal chord'
@@ -4948,14 +4951,19 @@ class Chord(ChordBase):
         forteClass = self.forteClass
         # forteClassTn = self.forteClassTn
 
-        def _isSeventhWithPerfectFifthAboveRoot(c: Chord) -> bool:
+        def _isSeventhWithPerfectFifthsAboveRootAndThird(c: Chord) -> bool:
             '''
             For testing minor-minor sevenths and major-major sevenths
             '''
             if not c.isSeventh():
                 return False
             hypothetical_fifth = c.root().transpose('P5')
-            return hypothetical_fifth.name in c.pitchNames
+            if hypothetical_fifth.name not in c.pitchNames:
+                return False
+            hypothetical_seventh = c.third.transpose('P5')
+            if hypothetical_seventh.name not in c.pitchNames:
+                return False
+            return True
 
         enharmonicTests = {
             '3-11A': self.isMinorTriad,
@@ -5002,7 +5010,7 @@ class Chord(ChordBase):
             # minor seventh or major seventh chords,
             # but cannot just test isSeventh, as
             # that would permit C E G A## (A## as root)
-            if _isSeventhWithPerfectFifthAboveRoot(self):
+            if _isSeventhWithPerfectFifthsAboveRootAndThird(self):
                 return ctn[0]
             else:
                 return 'enharmonic equivalent to ' + ctn[0]
