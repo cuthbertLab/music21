@@ -642,7 +642,7 @@ class _EnvironmentCore:
             return directory / 'music21-settings.xml'
         elif platform in ['nix', 'darwin']:
             # might not exist if running as nobody in a webserver...
-            if 'HOME' in os.environ:
+            if 'HOME' in os.environ and os.access(os.environ['HOME'], os.W_OK):
                 directory = pathlib.Path(os.environ['HOME'])
             else:
                 directory = pathlib.Path('/tmp/')
