@@ -5447,6 +5447,9 @@ class Chord(ChordBase):
         >>> chord.Chord('E#3 A3 C#4').normalOrder
         [1, 5, 9]
 
+        >>> chord.Chord('B5 G4 D5 E-5 D6').normalOrder
+        [11, 2, 3, 7]
+
         >>> chord.Chord().normalOrder
         []
         '''
