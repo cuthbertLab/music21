@@ -403,7 +403,7 @@ FORTE = (None, monad, diad, trichord, tetrachord, pentachord,
 # inverted form of Forte class 3-11 (minor/major triad) return 0, 2, 3
 # (the zero could be assumed, but it makes my brain easier to have it there).
 # It is faster to store this than to recompute it every time.
-# Data cross-checked with 
+# Data cross-checked with
 # https://web.archive.org/web/20130118035710/http://solomonsmusic.net/pcsets.htm
 inversionDefaultPitchClasses = {
     (3, 2): (0, 2, 3),
