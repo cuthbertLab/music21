@@ -36,7 +36,6 @@ the temp folder on the disk.
 from __future__ import annotations
 
 from collections import deque
-import collections.abc
 import copy
 from http.client import responses
 import io
@@ -1303,7 +1302,7 @@ def parseURL(url,
     return v.stream
 
 
-def parse(value: bundles.MetadataEntry | bytes | str | pathlib.Path,
+def parse(value: bundles.MetadataEntry | bytes | str | pathlib.Path | list | tuple,
           *,
           forceSource: bool = False,
           number: int | None = None,
@@ -1316,7 +1315,9 @@ def parse(value: bundles.MetadataEntry | bytes | str | pathlib.Path,
     preference to "allow".
 
     Keywords can include `number` which specifies a piece number in a file of
-    multi-piece file.
+    multi-piece file. (Otherwise, a particular score from an
+    :class:`~music21.stream.Opus` can also be extracted by providing a
+    two-element list or tuple of the form (path, number) to the `value` argument.)
 
     `format` specifies the format to parse the line of text or the file as.
 
@@ -1375,16 +1376,13 @@ def parse(value: bundles.MetadataEntry | bytes | str | pathlib.Path,
         valueStr = ''
 
     if (common.isListLike(value)
-            and isinstance(value, collections.abc.Sequence)
             and len(value) == 2
             and value[1] is None
             and _osCanLoad(str(value[0]))):
         # comes from corpus.search
         return parseFile(value[0], format=format, **keywords)
     elif (common.isListLike(value)
-          and isinstance(value, collections.abc.Sequence)
           and len(value) == 2
-          and isinstance(value[1], int)
           and _osCanLoad(str(value[0]))):
         # corpus or other file with movement number
         if not isinstance(value[0], str):
@@ -2071,6 +2069,21 @@ class Test(unittest.TestCase):
             str(s.parts[0].recurse().notesAndRests[4].beams),
             '<music21.beam.Beams <music21.beam.Beam 1/start>/<music21.beam.Beam 2/start>>')
         # s.show()
+
+    def testConversionABCWorkFromOpusWithoutKeyword(self):
+        fp = common.getSourceFilePath() / 'corpus' / 'essenFolksong' / 'testd.abc'
+
+        s = parse((str(fp), None))
+        self.assertIsInstance(s, stream.Opus)
+
+        with self.assertRaises(ConverterException):
+            parse((fp, 8))
+
+        with self.assertRaises(ConverterException):
+            parse((str(fp), (8,)))
+
+        s = parse((str(fp), 8))
+        self.assertIsInstance(s, stream.Score)
 
     def testConversionMusedata(self):
         fp = common.getSourceFilePath() / 'musedata' / 'testPrimitive' / 'test01'
