@@ -575,10 +575,9 @@ class PartStaffExporterMixin:
             # Initial PartStaff in group: find earliest mxAttributes, set clef #1 and <staves>
             if initialPartStaffRoot is None:
                 initialPartStaffRoot = self.getRootForPartStaff(ps)
-                mxAttributes = initialPartStaffRoot.find('measure/attributes')
-                clef1: Element | None = mxAttributes.find('clef') if mxAttributes else None
-                if clef1 is not None:
-                    clef1.set('number', '1')
+                if (mxAttributes := initialPartStaffRoot.find('measure/attributes')) is not None:
+                    if (clef1 := mxAttributes.find('clef')) is not None:
+                        clef1.set('number', '1')
 
                 mxStaves = Element('staves')
                 mxStaves.text = str(len(group))
@@ -591,11 +590,11 @@ class PartStaffExporterMixin:
 
                 if multiKey and mxAttributes is not None:
                     key1 = mxAttributes.find('key')
-                    if key1:
+                    if key1 is not None:
                         key1.set('number', '1')
                 if multiMeter and mxAttributes is not None:
                     meter1 = mxAttributes.find('time')
-                    if meter1:
+                    if meter1 is not None:
                         meter1.set('number', '1')
 
             # Subsequent PartStaffs in group: set additional clefs on mxAttributes
@@ -631,10 +630,7 @@ class PartStaffExporterMixin:
                     )
 
                 if multiMeter:
-                    oldMeter: Element | None = thisPartStaffRoot.find(
-                        'measure/attributes/time'
-                    )
-                    if oldMeter:
+                    if (oldMeter := thisPartStaffRoot.find('measure/attributes/time')) is not None:
                         oldMeter.set('number', str(staffNumber))
                         helpers.insertBeforeElements(
                             mxAttributes,
@@ -642,8 +638,7 @@ class PartStaffExporterMixin:
                             tagList=['staves']
                         )
                 if multiKey:
-                    oldKey: Element | None = thisPartStaffRoot.find('measure/attributes/key')
-                    if oldKey:
+                    if (oldKey := thisPartStaffRoot.find('measure/attributes/key')) is not None:
                         oldKey.set('number', str(staffNumber))
                         helpers.insertBeforeElements(
                             mxAttributes,
