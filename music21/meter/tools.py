@@ -228,7 +228,7 @@ def fractionToSlashMixed(fList: NumDenomTuple) -> tuple[tuple[str, int], ...]:
 
 
 @lru_cache(512)
-def fractionSum(numDenomTuple: NumDenomTuple) -> NumDenom:
+def fractionSum(numDenomTuple):
     '''
     Given a tuple of tuples of numerator and denominator,
     find the sum; does NOT reduce to its lowest terms.
@@ -245,39 +245,27 @@ def fractionSum(numDenomTuple: NumDenomTuple) -> NumDenom:
     >>> fractionSum(())
     (0, 1)
 
-    This method might seem like an easy place to optimize and simplify
-    by just doing a fractions.Fraction() sum (I tried!), but not reducing to
-    its lowest terms is a feature of this method. 3/8 + 3/8 = 6/8, not 3/4:
+    Not reducing to the lowest terms is a feature of this method. 
+    i.e. 3/8 + 3/8 = 6/8, not 3/4:
 
     >>> fractionSum(((3, 8), (3, 8)))
     (6, 8)
     '''
-    nList = []
-    dList = []
-    dListUnique = set()
-
+    dUnique = set()
+    total = 0
     for n, d in numDenomTuple:
-        nList.append(n)
-        dList.append(d)
-        dListUnique.add(d)
+        dUnique.add(d)
+        total += n / d
 
     if len(dListUnique) == 1:
-        n = sum(nList)
-        d = next(iter(dListUnique))
-        # Does not reduce to lowest terms...
-        return (n, d)
-    else:  # there might be a better way to do this
-        d = 1
-        d = math.lcm(*dListUnique)
-        # after finding d, multiply each numerator
-        nShift = []
-        for i in range(len(nList)):
-            nSrc = nList[i]
-            dSrc = dList[i]
-            scalar = d // dSrc
-            nShift.append(nSrc * scalar)
-        return (sum(nShift), d)
+        # This intentionally doesn't reduce to lowest terms...
+        d = dUnique.pop()
+    else:
+        d = math.lcm(*dUnique)
 
+    # put total in terms of denominator
+    n = round(total * d)
+    return (n, d)
 
 
 @lru_cache(512)
