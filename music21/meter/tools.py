@@ -257,7 +257,7 @@ def fractionSum(numDenomTuple):
         dUnique.add(d)
         total += n / d
 
-    if len(dListUnique) == 1:
+    if len(dUnique) == 1:
         # This intentionally doesn't reduce to lowest terms...
         d = dUnique.pop()
     else:

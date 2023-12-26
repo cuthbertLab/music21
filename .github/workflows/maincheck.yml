@@ -4,6 +4,7 @@ on:
     push:
         branches:
         - master
+        - fix-mypy-error
         - '*CI*'
     pull_request:
         branches:
