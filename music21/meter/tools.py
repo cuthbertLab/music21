@@ -245,7 +245,7 @@ def fractionSum(numDenomTuple):
     >>> fractionSum(())
     (0, 1)
 
-    Not reducing to the lowest terms is a feature of this method. 
+    Not reducing to the lowest terms is a feature of this method.
     i.e. 3/8 + 3/8 = 6/8, not 3/4:
 
     >>> fractionSum(((3, 8), (3, 8)))
