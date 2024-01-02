@@ -5966,7 +5966,10 @@ class MeasureParser(SoundTagMixin, XMLParserBase):
         for step, alter, accidental in zip(steps, alters, accidentals):
             p = pitch.Pitch(step)
             if accidental is not None:
-                accidentalName = self.mxAccidentalNameToM21.get(accidental, accidental)
+                if accidental in self.mxAccidentalNameToM21:
+                    accidentalName = self.mxAccidentalNameToM21[accidental]
+                else:
+                    accidentalName = accidental
                 p.accidental = pitch.Accidental(accidentalName)
                 p.accidental.alter = alter
             else:

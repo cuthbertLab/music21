@@ -2782,9 +2782,11 @@ class RichMetadata(Metadata):
         >>> rmd._isStandardUniqueName('average duration')
         False
         '''
-        return (super()._isStandardUniqueName(uniqueName)
-                or uniqueName in self.additionalRichMetadataAttributes)
-
+        if super()._isStandardUniqueName(uniqueName):
+            return True
+        if uniqueName in self.additionalRichMetadataAttributes:
+            return True
+        return False
 
 # -----------------------------------------------------------------------------
 # tests are in test/test_metadata
