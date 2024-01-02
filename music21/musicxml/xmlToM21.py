@@ -5696,9 +5696,9 @@ class MeasureParser(SoundTagMixin, XMLParserBase):
         denominators = []
         for beatOrType in mxTime:
             if beatOrType.tag == 'beats':
-                numerators.append(beatOrType.text.strip())  # may be 3+2
+                numerators.append(strippedText(beatOrType))  # may be 3+2
             elif beatOrType.tag == 'beat-type':
-                denominators.append(beatOrType.text.strip())
+                denominators.append(strippedText(beatOrType))
             elif beatOrType.tag == 'interchangeable':
                 break  # interchangeable comes after all beat/beat-type sequences
 
