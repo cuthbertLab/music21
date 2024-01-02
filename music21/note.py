@@ -1053,7 +1053,7 @@ class NotRest(GeneralNote):
 
         >>> import copy
         >>> n = note.NotRest()
-        >>> n.volume = volume.Volume(50)
+        >>> n.volume = volume.Volume(velocity=50)
         >>> m = copy.deepcopy(n)
         >>> m.volume.client is m
         True
@@ -1485,7 +1485,7 @@ class Note(NotRest):
     >>> highE <= otherHighE
     True
 
-    Notice you cannot compare Notes w/ ints or anything that does not a have a
+    Notice you cannot compare Notes w/ ints or anything that does not have a
     `.pitch` attribute.
 
     >>> highE < 50
@@ -1830,8 +1830,10 @@ class Unpitched(NotRest):
     >>> unp.displayStep = 'G'
     >>> unp.pitch
     Traceback (most recent call last):
-    AttributeError: 'Unpitched' object has no attribute 'pitch'
+    AttributeError: 'Unpitched' object has no attribute 'pitch...
     '''
+    # TODO: when Python 3.12 is minimum version.  Change AttributeError to read:
+    #        AttributeError: 'Unpitched' object has no attribute 'pitch'. Did you mean: 'pitches'?
 
     equalityAttributes = ('displayStep', 'displayOctave')
 

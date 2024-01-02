@@ -88,7 +88,7 @@ def getCorpusContentDirs() -> list[str]:
      'nottingham-dataset',
      'oneills1850', 'palestrina',
      'ryansMammoth', 'schoenberg', 'schubert', 'schumann_clara', 'schumann_robert',
-     'theoryExercises', 'trecento', 'verdi', 'weber']
+     'theoryExercises', 'trecento', 'verdi', 'weber', 'webern']
 
     Make sure that all corpus data has a directoryInformation tag in
     CoreCorpus.

@@ -783,7 +783,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         except IndexError:
             return None
 
-    def __contains__(self, el):
+    def __contains__(self, el: base.Music21Object) -> bool:
         '''
         Returns True if `el` is in the stream (compared with Identity) and False otherwise.
 
@@ -811,8 +811,11 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         >>> nC2 in s.elements
         True
         '''
-        return (any(sEl is el for sEl in self._elements)
-                or any(sEl is el for sEl in self._endElements))
+        # Should be the fastest implementation of this naive check, compare with
+        # https://stackoverflow.com/questions/44802682/python-any-unexpected-performance
+        return (id(el) in self._offsetDict
+                or any(True for sEl in self._elements if sEl is el)
+                or any(True for sEl in self._endElements if sEl is el))
 
     @property
     def elements(self) -> tuple[M21ObjType, ...]:
@@ -1434,6 +1437,8 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
             if hasattr(other, attr):
                 setattr(self, attr, getattr(other, attr))
 
+    @common.deprecated('v10', 'v11', 'Use `el in stream` instead of '
+                       '`stream.hasElement(el)`')
     def hasElement(self, obj: base.Music21Object) -> bool:
         '''
         Return True if an element, provided as an argument, is contained in
@@ -1449,16 +1454,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         >>> s.hasElement(n1)
         True
         '''
-        if id(obj) in self._offsetDict:
-            return True
-
-        for e in self._elements:
-            if e is obj:  # pragma: no cover
-                return True
-        for e in self._endElements:
-            if e is obj:  # pragma: no cover
-                return True
-        return False
+        return obj in self
 
     def hasElementOfClass(self, className, forceFlat=False):
         '''
@@ -2013,7 +2009,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         # must manually add elements to new Stream
         for e in self._elements:
             # environLocal.printDebug(['deepcopy()', e, 'old', old, 'id(old)', id(old),
-            #     'new', new, 'id(new)', id(new), 'old.hasElement(e)', old.hasElement(e),
+            #     'new', new, 'id(new)', id(new), 'e in old', e in old,
             #     'e.activeSite', e.activeSite, 'e.getSites()', e.getSites(), 'e.getSiteIds()',
             #     e.getSiteIds()], format='block')
             #

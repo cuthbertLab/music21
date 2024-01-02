@@ -2037,12 +2037,12 @@ class ABCHandler:
         Given a match from a regular expression return the parsed ABC version
 
         >>> import re
-        >>> match = re.match('(\d+).(\d+).(\d+)', '2.3.4')
+        >>> match = re.match(r'(\d+).(\d+).(\d+)', '2.3.4')
         >>> ah = abcFormat.ABCHandler()
         >>> ah.returnAbcVersionFromMatch(match)
         (2, 3, 4)
 
-        >>> match = re.match('(\d+).(\d+).?(\d?)', '1.7')
+        >>> match = re.match(r'(\d+).(\d+).?(\d?)', '1.7')
         >>> ah.returnAbcVersionFromMatch(match)
         (1, 7, 0)
         '''

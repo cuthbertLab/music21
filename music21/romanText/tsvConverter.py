@@ -256,12 +256,21 @@ class TabChordBase(abc.ABC):
             if self.dcml_version == 2:
                 self.chord = self.chord.replace('%', 'ø')
                 self.chord = handleAddedTones(self.chord)
+                # prefix figures for Mm7 chords on degrees other than 'V' with 'd'
                 if (
                     self.extra.get('chord_type', '') == 'Mm7'
                     and self.numeral != 'V'
                 ):
-                    # we need to make sure not to match [add4] and the like
-                    self.chord = re.sub(r'(\d+)(?!])', r'd\1', self.chord)
+                    # However, we need to make sure not to match [add13] and
+                    # the like, otherwise we will end up with [addd13]
+                    self.chord = re.sub(
+                        r'''
+                            (\d+)  # match one or more digits
+                            (?![\]\d])  # without a digit or a ']' to the right
+                        ''',
+                        r'd\1',
+                        self.chord,
+                        flags=re.VERBOSE)
 
         # Local - relative and figure
         if isMinor(self.local_key):
@@ -869,7 +878,10 @@ class M21toTSV:
                     relativeroot = characterSwaps(
                         relativeroot, isMinor(local_key), direction='m21-DCML'
                     )
-                thisEntry.chord = thisRN.figure  # NB: slightly different from DCML: no key.
+                # We replace the "d" annotation for Mm7 chords on degrees other than
+                #   V because it is not used by the DCML standard
+                # NB: slightly different from DCML: no key.
+                thisEntry.chord = thisRN.figure.replace('d', '', 1)
                 thisEntry.pedal = None
                 thisEntry.numeral = thisRN.romanNumeral
                 thisEntry.form = getForm(thisRN)

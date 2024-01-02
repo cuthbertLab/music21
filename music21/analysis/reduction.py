@@ -286,12 +286,12 @@ class ScoreReduction:
             return
 
         removalIndices = []
-        if m.hasElement(n):
+        if n in m:
             offset = n.getOffsetBySite(m)
         else:  # it is in a Voice
             offset = 0.0
             for v in m.voices:
-                if v.hasElement(n):
+                if n in v:
                     offset = n.getOffsetBySite(v)
 
 

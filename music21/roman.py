@@ -2415,7 +2415,7 @@ class RomanNumeral(harmony.Harmony):
 
         # immediately fix low-preference figures
         if isinstance(figure, str):
-            figure = figure.replace('0', 'o')  # viio7
+            figure = re.sub(r'(?<!\d)0', 'o', figure)  # viio7 (but don't alter 10.)
             figure = figure.replace('º', 'o')
             figure = figure.replace('°', 'o')
             # /o is just a shorthand for ø -- so it should not be stored.
@@ -4347,6 +4347,10 @@ class Test(unittest.TestCase):
         self.assertEqual([p.name for p in rn.pitches], ['B', 'D', 'F', 'A-'])
         rn = roman.RomanNumeral('vii/07', 'c')
         self.assertEqual([p.name for p in rn.pitches], ['B', 'D', 'F', 'A'])
+        # However, when there is a '10' somewhere in the figure, don't replace
+        #   the 0 (this occurs in DCML corpora)
+        rn = roman.RomanNumeral('V7[add10]', 'c')
+        self.assertEqual([p.name for p in rn.pitches], ['G', 'B-', 'B', 'D', 'F'])
 
     def testIII7(self):
         c = chord.Chord(['E4', 'G4', 'B4', 'D5'])

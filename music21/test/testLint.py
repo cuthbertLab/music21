@@ -22,7 +22,7 @@ try:
     # noinspection PyPackageRequirements
     from pylint.lint import Run as pylintRun  # type: ignore
 except ImportError:
-    pylintRun = None
+    pylintRun = None  # type: ignore
 
 
 # see feature list here:
