@@ -581,6 +581,7 @@ class CoreCorpus(Corpus):
         ('trecento', 'Fourteenth-Century Italian Music', False),
         ('verdi', 'Giuseppe Verdi', True),
         ('weber', 'Carl Maria von Weber', True),
+        ('webern', 'Anton Webern', True),
     )
 
     _noCorpus = False
