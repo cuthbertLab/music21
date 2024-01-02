@@ -1258,18 +1258,18 @@ def getIndex(featureString, extractorType=None):
     from music21.features import jSymbolic, native
 
     if extractorType is None or extractorType == 'jsymbolic':
-        indexCnt = 0
+        indexCount = 0
         for feature in jSymbolic.featureExtractors:
 
             if feature().name == featureString:
-                return (indexCnt, 'jsymbolic')
-            indexCnt += 1
+                return (indexCount, 'jsymbolic')
+            indexCount += 1
     if extractorType is None or extractorType == 'native':
-        indexCnt = 0
+        indexCount = 0
         for feature in native.featureExtractors:
             if feature().name == featureString:
-                return (indexCnt, 'native')
-            indexCnt += 1
+                return (indexCount, 'native')
+            indexCount += 1
 
         return None
 

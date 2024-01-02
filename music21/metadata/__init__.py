@@ -154,6 +154,7 @@ from music21.common import deprecated
 from music21 import defaults
 from music21 import environment
 from music21 import exceptions21
+from music21 import interval
 
 from music21.metadata import properties
 from music21.metadata.properties import PropertyDescription
@@ -2262,6 +2263,7 @@ class Metadata(base.Music21Object):
             # add the convertedValues list to the existing list
             self._contents[name] = prevValues + convertedValues
 
+    # noinspection GrazieInspection
     def _set(self, name: str, value: t.Any | Iterable[t.Any], isCustom: bool):
         '''
         Sets a single item or multiple items with this name, replacing any
@@ -2352,7 +2354,7 @@ class Metadata(base.Music21Object):
         >>> metadata.Metadata._convertValue('dateCreated', metadata.Text('1938'))
         <music21.metadata.primitives.DateSingle 1938/--/-->
         >>> metadata.Metadata._convertValue('dateCreated',
-        ...     metadata.DateBetween(['1938','1939']))
+        ...     metadata.DateBetween(['1938', '1939']))
         <music21.metadata.primitives.DateBetween 1938/--/-- to 1939/--/-->
         '''
         valueType: type[ValueType] | None = properties.UNIQUE_NAME_TO_VALUE_TYPE.get(
@@ -2673,6 +2675,9 @@ class RichMetadata(Metadata):
             self.pitchLowest = analysisObject.minPitchObj.nameWithOctave
             self.pitchHighest = analysisObject.maxPitchObj.nameWithOctave
         ambitusInterval = analysisObject.getSolution(streamObj)
+        if ambitusInterval is None:
+            ambitusInterval = interval.Interval('P1')
+
         self.ambitus = AmbitusShort(semitones=ambitusInterval.semitones,
                                     diatonic=ambitusInterval.diatonic.simpleName,
                                     pitchLowest=self.pitchLowest,
