@@ -7,7 +7,7 @@
 # Authors:      Michael Scott Asato Cuthbert
 #               Christopher Ariza
 #
-# Copyright:    Copyright © 2009-2015 Michael Scott Asato Cuthbert
+# Copyright:    Copyright © 2009-2024 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
@@ -475,6 +475,7 @@ def unregisterSubConverter(
         _deregisteredSubConverters.append('all')
         return
 
+    removeSubConverter = cast(Type[SubConverter], removeSubConverter)
     try:
         _registeredSubConverters.remove(removeSubConverter)
     except ValueError:
@@ -927,6 +928,7 @@ class Converter:
                 if unregistered == 'all':
                     continue
                 try:
+                    unregistered = cast(Type[SubConverter], unregistered)
                     subConverterList.remove(unregistered)
                 except ValueError:
                     pass
