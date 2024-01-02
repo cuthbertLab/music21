@@ -475,7 +475,7 @@ def unregisterSubConverter(
         _deregisteredSubConverters.append('all')
         return
 
-    removeSubConverter = cast(Type[SubConverter], removeSubConverter)
+    removeSubConverter = t.cast(Type[SubConverter], removeSubConverter)
     try:
         _registeredSubConverters.remove(removeSubConverter)
     except ValueError:
@@ -928,7 +928,7 @@ class Converter:
                 if unregistered == 'all':
                     continue
                 try:
-                    unregistered = cast(Type[SubConverter], unregistered)
+                    unregistered = t.cast(Type[SubConverter], unregistered)
                     subConverterList.remove(unregistered)
                 except ValueError:
                     pass
