@@ -1077,7 +1077,7 @@ class XMLExporterBase:
         setb(pageLayout, mxPrint, 'page-number')
 
         mxPageLayout = self.pageLayoutToXmlPageLayout(pageLayout)
-        if mxPageLayout:
+        if len(mxPageLayout):
             mxPrint.append(mxPageLayout)
 
         if mxPrintIn is None:
@@ -1104,7 +1104,7 @@ class XMLExporterBase:
         mxPageMargins = Element('page-margins')
         for direction in ('left', 'right', 'top', 'bottom'):
             seta(pageLayout, mxPageMargins, direction + '-margin')
-        if mxPageMargins:
+        if len(mxPageMargins):
             mxPageLayout.append(mxPageMargins)
 
         if mxPageLayoutIn is None:
@@ -1158,7 +1158,7 @@ class XMLExporterBase:
 
         mxSystemLayout = Element('system-layout')
         self.systemLayoutToXmlSystemLayout(systemLayout, mxSystemLayout)
-        if mxSystemLayout:
+        if len(mxSystemLayout):
             mxPrint.append(mxSystemLayout)
 
         if mxPrintIn is None:
@@ -1204,7 +1204,7 @@ class XMLExporterBase:
         for direction in ('top', 'bottom', 'left', 'right'):
             seta(systemLayout, mxSystemMargins, direction + '-margin')
 
-        if mxSystemMargins:
+        if len(mxSystemMargins):
             mxSystemLayout.append(mxSystemMargins)
 
         seta(systemLayout, mxSystemLayout, 'system-distance', 'distance')
@@ -2505,7 +2505,7 @@ class ScoreExporter(XMLExporterBase, PartStaffExporterMixin):
                 firstTitleFound = titles[0]
             mxWorkTitle = SubElement(mxWork, 'work-title')
             mxWorkTitle.text = str(titles[0])
-        if mxWork:
+        if len(mxWork):
             mxScoreHeader.append(mxWork)
 
         movementNumbers: tuple[metadata.Text, ...] = mdObj['movementNumber']
@@ -4942,7 +4942,7 @@ class MeasureExporter(XMLExporterBase):
         for x in (mxArticulations,
                   mxTechnicalMark,
                   mxOrnaments):
-            if x:
+            if x is not None:
                 notations.append(x)
 
         # TODO: dynamics in notations
