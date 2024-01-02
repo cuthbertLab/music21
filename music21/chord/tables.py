@@ -400,7 +400,7 @@ FORTE = (None, monad, diad, trichord, tetrachord, pentachord,
 
 # This dictionary defines the pitch classes to return for the inversion of a given
 # forte number.  For instance (3, 11): (0, 4, 7) indicates that for the
-# inverted form of Forte class 3-11 (minor/major triad) return 0, 2, 3
+# inverted form of Forte class 3-11 (minor/major triad) return 0, 4, 7
 # (the zero could be assumed, but it makes my brain easier to have it there).
 # It is faster to store this than to recompute it every time.
 inversionDefaultPitchClasses = {
@@ -1786,6 +1786,7 @@ def addressToForteName(address, classification='tn'):
     return f'{card}-{index}{iStr}'
 
 
+# noinspection GrazieInspection
 def seekChordTablesAddress(c):
     '''
     Utility method to return the address to the chord table; used by
@@ -1839,7 +1840,7 @@ def seekChordTablesAddress(c):
         for Chord with 0 pitches
 
     NOTE: this was once a time-consuming operation, though it is
-    now quite a bit faster than before (order of 100 microseconds).  Nonetheless
+    now quite a bit faster than before (order of 100 microseconds).  Nonetheless, it
     should only be run when necessary.  Methods that call this should
     try (as chord.Chord does) to cache the result.
 
