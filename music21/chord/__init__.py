@@ -424,7 +424,7 @@ class ChordBase(note.NotRest):
             # d['tie'] = value
 
     @property
-    def volume(self) -> 'music21.volume.Volume':  # do NOT change to volume.Volume
+    def volume(self) -> 'music21.volume.Volume':  # do NOT change to volume.Volume, see setter...
         '''
         Get or set the :class:`~music21.volume.Volume` object for this
         Chord.
@@ -443,6 +443,8 @@ class ChordBase(note.NotRest):
 
         * Changed in v8: setting volume to a list of volumes is no longer supported.
           See :meth:`~music21.chord.ChordBase.setVolumes` instead
+        * Improved in v9: if hasComponentVolumes is True, then the velocity object
+          returned here will be regenerated with each call, and updates live.
 
         OMIT_FROM_DOCS
 
@@ -457,28 +459,27 @@ class ChordBase(note.NotRest):
 
         if not self.hasComponentVolumes():
             # create a single new Volume object for the chord
-            self._volume = note.NotRest._getVolume(self, forceClient=self)
+            self._volume = volume.Volume(client=self)
             return self._volume
 
         # if we have components and _volume is None, create a volume from
         # components
         velocities = []
-        for d in self._notes:
-            velocities.append(d.volume.velocity)
+        for inner_n in self._notes:
+            if inner_n.volume.velocity is not None:
+                velocities.append(inner_n.volume.velocity)
         # create new local object
-        self._volume = volume.Volume(client=self)
+        out_volume = volume.Volume(client=self)
         if velocities:  # avoid division by zero error
-            self._volume.velocity = int(round(sum(velocities) / len(velocities)))
+            out_volume.velocity = int(round(sum(velocities) / len(velocities)))
 
-        if t.TYPE_CHECKING:
-            assert self._volume is not None
-        return self._volume
+        return out_volume
 
 
     @volume.setter
     def volume(self, expr: None|'music21.volume.Volume'|int|float):
-        # Do NOT change typing to volume.Volume because it will take the property as
-        # its name
+        # Do NOT change typing to volume.Volume  w/o quotes because it will take the property as
+        # its name and be really confused.
         if isinstance(expr, volume.Volume):
             expr.client = self
             # remove any component volumes
@@ -525,7 +526,6 @@ class ChordBase(note.NotRest):
 
         >>> c4.hasComponentVolumes()
         False
-
         '''
         count = 0
         for c in self._notes:

@@ -7,7 +7,7 @@
 # Authors:      Christopher Ariza
 #               Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2011-2012, 2015, 2017
+# Copyright:    Copyright © 2011-2012, 2015, 2017, 2024
 #               Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
@@ -34,15 +34,11 @@ environLocal = environment.Environment('volume')
 
 
 # ------------------------------------------------------------------------------
-
-
 class VolumeException(exceptions21.Music21Exception):
     pass
 
 
 # ------------------------------------------------------------------------------
-
-
 class Volume(prebase.ProtoM21Object, SlottedObjectMixin):
     '''
     The Volume object lives on NotRest objects and subclasses. It is not a
@@ -81,8 +77,8 @@ class Volume(prebase.ProtoM21Object, SlottedObjectMixin):
         self,
         *,
         client: note.NotRest|None = None,
-        velocity: int|float|None = None,
-        velocityScalar: int|float|None = None,
+        velocity: int|None = None,
+        velocityScalar: float|None = None,
         velocityIsRelative: bool = True,
     ):
         # store a reference to the client, as we use this to do context
@@ -90,7 +86,7 @@ class Volume(prebase.ProtoM21Object, SlottedObjectMixin):
         self.client = client
         self._velocityScalar: float|None = None
         if velocity is not None:
-            self.velocity = velocity
+            self.velocity = int(velocity)
         elif velocityScalar is not None:
             self.velocityScalar = float(velocityScalar)
         self._cachedRealized = None
