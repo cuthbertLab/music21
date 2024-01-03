@@ -778,9 +778,14 @@ class Verticality(prebase.ProtoM21Object):
 
             offsetDifference = common.opFrac(self.offset - ts.offset)
             endTimeDifference = common.opFrac(ts.endTime - (self.offset + quarterLength))
+            if t.TYPE_CHECKING:
+                assert endTimeDifference is not None
+
+            # noinspection PyTypeChecker
             if offsetDifference == 0 and endTimeDifference <= 0:
                 addTie = None
             elif offsetDifference > 0:
+                # noinspection PyTypeChecker
                 if endTimeDifference > 0:
                     addTie = 'continue'
                 else:
@@ -869,26 +874,32 @@ class Verticality(prebase.ProtoM21Object):
             if not isinstance(timeSpan, spans.PitchedTimespan):
                 continue
             el = timeSpan.element
-            if isinstance(el, chord.Chord):
-                if len(el) == 0:
+            if isinstance(el, chord.ChordBase):
+                firstNoteElement: note.Note|None = None
+                for subEl in el:
+                    if isinstance(subEl, note.Note):
+                        firstNoteElement = subEl
+                        break
+
+                if firstNoteElement is None:
                     continue
 
                 if el.articulations or el.expressions:
-                    firstSubEl = copy.deepcopy(el[0])  # this makes an additional deepcopy
-                    firstSubEl.articulations += el.articulations
-                    firstSubEl.expressions += el.expressions
+                    # make a deepcopy of the first note element
+                    # adding all articulations and expressions from the Chord to it.
+                    originalPitch = firstNoteElement.pitch
+                    firstNoteElement = copy.deepcopy(firstNoteElement)
+                    firstNoteElement.articulations += el.articulations
+                    firstNoteElement.expressions += el.expressions
                     if not copyPitches:
-                        firstSubEl.pitch = el[0].pitch
-                else:
-                    firstSubEl = el[0]
-                conditionalAdd(timeSpan, firstSubEl)
+                        firstNoteElement.pitch = originalPitch
+                conditionalAdd(timeSpan, firstNoteElement)
 
                 if len(el) > 1:
                     for subEl in list(el)[1:]:
-                        conditionalAdd(timeSpan, subEl)
-            else:
-                if t.TYPE_CHECKING:
-                    assert isinstance(el, note.Note)
+                        if isinstance(subEl, note.Note):
+                            conditionalAdd(timeSpan, subEl)
+            elif isinstance(el, note.Note):
                 conditionalAdd(timeSpan, el)
 
         seenArticulations = set()
