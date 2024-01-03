@@ -6,7 +6,7 @@
 # Authors:      Christopher Ariza
 #               Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2010-2023 Michael Scott Asato Cuthbert
+# Copyright:    Copyright © 2010-2024 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
@@ -369,7 +369,7 @@ def midiEventsToNote(
     >>> me1.channel = 10
     >>> unp = midi.translate.midiEventsToNote(((dt1.time, me1), (dt2.time, me2)))
     >>> unp
-    <music21.note.Unpitched object at 0x...>
+    <music21.note.Unpitched 'Tom-Tom'>
 
     Access the `storedInstrument`:
 
