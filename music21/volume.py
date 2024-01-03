@@ -406,13 +406,17 @@ class Volume(prebase.ProtoM21Object, SlottedObjectMixin):
         if not common.isNum(value):
             raise VolumeException('value provided for velocityScalar must be a number, '
                                   + f'not {value}')
+
+        scalar: float
         if value < 0:
-            scalar = 0
+            scalar = 0.0
         elif value > 1:
-            scalar = 1
+            scalar = 1.0
         else:
-            scalar = value
-        self._velocityScalar = float(scalar)
+            if t.TYPE_CHECKING:
+                assert value is not None
+            scalar = float(value)
+        self._velocityScalar = scalar
 
 
 # ------------------------------------------------------------------------------

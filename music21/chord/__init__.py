@@ -443,8 +443,6 @@ class ChordBase(note.NotRest):
 
         * Changed in v8: setting volume to a list of volumes is no longer supported.
           See :meth:`~music21.chord.ChordBase.setVolumes` instead
-        * Improved in v9: if hasComponentVolumes is True, then the velocity object
-          returned here will be regenerated with each call, and updates live.
 
         OMIT_FROM_DOCS
 
@@ -473,6 +471,7 @@ class ChordBase(note.NotRest):
         if velocities:  # avoid division by zero error
             out_volume.velocity = int(round(sum(velocities) / len(velocities)))
 
+        self._volume = out_volume
         return out_volume
 
 
@@ -582,9 +581,9 @@ class ChordBase(note.NotRest):
                 v = v_entry
             else:  # create a new Volume
                 if v_entry < 1:  # assume a scalar
-                    v = volume.Volume(velocityScalar=v_entry)
+                    v = volume.Volume(velocityScalar=float(v_entry))
                 else:  # assume velocity
-                    v = volume.Volume(velocity=v_entry)
+                    v = volume.Volume(velocity=int(v_entry))
             v.client = self
             c._setVolume(v, setClient=False)
 
