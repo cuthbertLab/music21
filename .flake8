@@ -4,6 +4,8 @@ ignore=
   E127,
   # under indented
   E128,
+  # space around | -- nice to omit in  int|str
+  E227,
   # 0 blank lines -- good test but something going wrong in new algorithm
   E301,
   # blank lines

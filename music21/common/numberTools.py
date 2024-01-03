@@ -11,19 +11,23 @@
 # ------------------------------------------------------------------------------
 from __future__ import annotations
 
-from collections.abc import Iterable, Sequence, Collection
 from fractions import Fraction
 from functools import cache
 import math
 from math import isclose, gcd
 import numbers
 import random
-from typing import overload
+from typing import overload, TYPE_CHECKING
 import unittest
 
 from music21 import defaults
 from music21.common import deprecated
 from music21.common.types import OffsetQLIn, OffsetQL
+
+if TYPE_CHECKING:
+    from decimal import Decimal
+    from collections.abc import Iterable, Sequence, Collection
+
 
 __all__ = [
     'ordinals', 'musicOrdinals', 'ordinalsToNumbers',
@@ -66,7 +70,7 @@ musicOrdinals[22] = 'Triple-octave'
 # Number methods...
 
 
-def numToIntOrFloat(value: int | float) -> int | float:
+def numToIntOrFloat(value: OffsetQLIn) -> int|float:
     '''
     Given a number, return an integer if it is very close to an integer,
     otherwise, return a float.
@@ -82,6 +86,10 @@ def numToIntOrFloat(value: int | float) -> int | float:
     1.00003
     >>> common.numToIntOrFloat(1.5)
     1.5
+    >>> common.numToIntOrFloat(2)
+    2
+    >>> common.numToIntOrFloat(-5)
+    -5
     >>> common.numToIntOrFloat(1.0000000005)
     1
     >>> common.numToIntOrFloat(0.999999999)
@@ -102,6 +110,23 @@ def numToIntOrFloat(value: int | float) -> int | float:
     1
     >>> common.numToIntOrFloat('1.25')
     1.25
+
+    Others raise a ValueError
+
+    >>> common.numToIntOrFloat('one')
+    Traceback (most recent call last):
+    ValueError: could not convert string to float: 'one'
+
+
+    Fractions also become ints or floats
+
+    >>> from fractions import Fraction
+    >>> common.numToIntOrFloat(Fraction(1, 2))
+    0.5
+    >>> common.numToIntOrFloat(Fraction(4, 3))
+    1.333333333...
+
+    Note: Decimal objects are not supported.
     '''
     try:
         intVal = round(value)
@@ -111,8 +136,8 @@ def numToIntOrFloat(value: int | float) -> int | float:
 
     if isclose(intVal, value, abs_tol=1e-6):
         return intVal
-    else:  # source
-        return value
+
+    return value + 0.0  # fast opp for cast to float for fractions.Fraction
 
 
 DENOM_LIMIT = defaults.limitOffsetDenominator
@@ -220,11 +245,11 @@ def opFrac(num: int) -> float:
     pass
 
 @overload
-def opFrac(num: float | Fraction) -> float | Fraction:
+def opFrac(num: float|Fraction) -> float|Fraction:
     pass
 
 # no type checking due to accessing protected attributes (for speed)
-def opFrac(num: OffsetQLIn | None) -> OffsetQL | None:
+def opFrac(num: OffsetQLIn|None) -> OffsetQL|None:
     '''
     opFrac -> optionally convert a number to a fraction or back.
 
@@ -399,7 +424,7 @@ def mixedNumeral(expr: numbers.Real,
     return str(0)
 
 
-def roundToHalfInteger(num: float | int) -> float | int:
+def roundToHalfInteger(num: float|int) -> float|int:
     '''
     Given a floating-point number, round to the nearest half-integer. Returns int or float
 
@@ -447,7 +472,7 @@ def roundToHalfInteger(num: float | int) -> float | int:
     return intVal + floatVal
 
 
-def addFloatPrecision(x, grain=1e-2) -> float | Fraction:
+def addFloatPrecision(x, grain=1e-2) -> float|Fraction:
     '''
     Given a value that suggests a floating point fraction, like 0.33,
     return a Fraction or float that provides greater specification, such as Fraction(1, 3)
@@ -667,7 +692,7 @@ def decimalToTuplet(decNum: float) -> tuple[int, int]:
         return (int(iy), int(jy))
 
 
-def unitNormalizeProportion(values: Sequence[int | float]) -> list[float]:
+def unitNormalizeProportion(values: Sequence[int|float]) -> list[float]:
     '''
     Normalize values within the unit interval, where max is determined by the sum of the series.
 
@@ -706,8 +731,8 @@ def unitNormalizeProportion(values: Sequence[int | float]) -> list[float]:
 
 
 def unitBoundaryProportion(
-    series: Sequence[int | float]
-) -> list[tuple[int | float, float]]:
+    series: Sequence[int|float]
+) -> list[tuple[int|float, float]]:
     '''
     Take a series of parts with an implied sum, and create
     unit-interval boundaries proportional to the series components.
@@ -730,7 +755,7 @@ def unitBoundaryProportion(
 
 
 def weightedSelection(values: list[int],
-                      weights: list[int | float],
+                      weights: list[int|float],
                       randomGenerator=None) -> int:
     '''
     Given a list of values and an equal-sized list of weights,
@@ -758,7 +783,7 @@ def weightedSelection(values: list[int],
     return values[index]
 
 
-def approximateGCD(values: Collection[int | float | Fraction], grain: float = 1e-4) -> float:
+def approximateGCD(values: Collection[int|float|Fraction], grain: float = 1e-4) -> float:
     '''
     Given a list of values, find the lowest common divisor of floating point values.
 

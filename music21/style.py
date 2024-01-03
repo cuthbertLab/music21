@@ -81,28 +81,31 @@ class Style(ProtoM21Object):
     def __init__(self) -> None:
         self.size = None
 
-        self.relativeX: float | int | None = None
-        self.relativeY: float | int | None = None
-        self.absoluteX: float | int | None = None
+        self.relativeX: float|int|None = None
+        self.relativeY: float|int|None = None
+        self.absoluteX: float|int|None = None
 
         # managed by property below.
-        self._absoluteY: float | int | None = None
+        self._absoluteY: float|int|None = None
 
-        self._enclosure: Enclosure | None = None
+        self._enclosure: Enclosure|None = None
 
         # how should this symbol be represented in the font?
         # SMuFL characters are allowed.
         self.fontRepresentation = None
 
-        self.color: str | None = None
+        self.color: str|None = None
 
         self.units: str = 'tenths'
         self.hideObjectOnPrint: bool = False
 
-    def _getEnclosure(self) -> Enclosure | None:
+        self.dashLength: float|int|None = None
+        self.spaceLength: float|int|None = None
+
+    def _getEnclosure(self) -> Enclosure|None:
         return self._enclosure
 
-    def _setEnclosure(self, value: Enclosure | None):
+    def _setEnclosure(self, value: Enclosure|None):
         if value is None:
             self._enclosure = value
         elif value == Enclosure.NONE:
@@ -269,9 +272,9 @@ class NoteStyle(Style):
 
     def __init__(self) -> None:
         super().__init__()
-        self.stemStyle: Style | None = None
-        self.accidentalStyle: Style | None = None
-        self.noteSize: str | None = None  # can be 'cue' etc.
+        self.stemStyle: Style|None = None
+        self.accidentalStyle: Style|None = None
+        self.noteSize: str|None = None  # can be 'cue' etc.
 
 
 class TextStyle(Style):
@@ -359,20 +362,10 @@ class TextStyle(Style):
             Invalid horizontal align: 'hello'
         ''')
 
-    def _getJustify(self):
-        return self._justify
 
-    def _setJustify(self, value):
-        if value is None:
-            self._justify = None
-        else:
-            if value.lower() not in ('left', 'center', 'right', 'full'):
-                raise TextFormatException(f'Not a supported justification: {value!r}')
-            self._justify = value.lower()
-
-    justify = property(_getJustify,
-                       _setJustify,
-                       doc='''
+    @property
+    def justify(self) -> str|None:
+        '''
         Get or set the justification.  Valid values are left,
         center, right, full (not supported by MusicXML), and None
 
@@ -387,23 +380,23 @@ class TextStyle(Style):
         Traceback (most recent call last):
         music21.style.TextFormatException:
             Not a supported justification: 'hello'
-        ''')
+        '''
+        return self._justify
 
-    def _getStyle(self):
-        return self._fontStyle
-
-    def _setStyle(self, value):
+    @justify.setter
+    def justify(self, value: str|None):
         if value is None:
-            self._fontStyle = None
+            self._justify = None
         else:
-            if value.lower() not in ('italic', 'normal', 'bold', 'bolditalic'):
-                raise TextFormatException(f'Not a supported fontStyle: {value!r}')
-            self._fontStyle = value.lower()
+            if value.lower() not in ('left', 'center', 'right', 'full'):
+                raise TextFormatException(f'Not a supported justification: {value!r}')
+            self._justify = value.lower()
 
-    fontStyle = property(_getStyle,
-                         _setStyle,
-                         doc='''
+    @property
+    def fontStyle(self) -> str|None:
+        '''
         Get or set the style, as normal, italic, bold, and bolditalic.
+        None is currently an acceptable value which should be "normal".
 
         >>> tst = style.TextStyle()
         >>> tst.fontStyle = 'bold'
@@ -416,7 +409,17 @@ class TextStyle(Style):
         Traceback (most recent call last):
         music21.style.TextFormatException:
             Not a supported fontStyle: 'hello'
-        ''')
+        '''
+        return self._fontStyle
+
+    @fontStyle.setter
+    def fontStyle(self, value: str|None) -> None:
+        if value is None:
+            self._fontStyle = None
+        else:
+            if value.lower() not in ('italic', 'normal', 'bold', 'bolditalic'):
+                raise TextFormatException(f'Not a supported fontStyle: {value!r}')
+            self._fontStyle = value.lower()
 
     def _getWeight(self):
         return self._fontWeight
@@ -625,8 +628,8 @@ class StyleMixin(common.SlottedObjectMixin):
     def __init__(self) -> None:
         # no need to call super().__init__() on SlottedObjectMixin
         # This might be dangerous though
-        self._style: Style | None = None
-        self._editorial: editorial.Editorial | None = None
+        self._style: Style|None = None
+        self._editorial: editorial.Editorial|None = None
 
     @property
     def hasStyleInformation(self) -> bool:

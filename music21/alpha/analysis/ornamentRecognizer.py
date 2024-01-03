@@ -48,7 +48,7 @@ class OrnamentRecognizer:
     def calculateOrnamentTotalQl(
         self,
         busyNotes: list[note.GeneralNote],
-        simpleNotes: list[note.GeneralNote] | None = None
+        simpleNotes: list[note.GeneralNote]|None = None
     ) -> OffsetQL:
         '''
         Returns total length of trill assuming busy notes are all an expanded trill.
@@ -77,7 +77,7 @@ class TrillRecognizer(OrnamentRecognizer):
         self.acceptableInterval = 3
         self.minimumLengthForNachschlag = 5
 
-    def recognize(self, busyNotes, simpleNotes=None) -> bool | expressions.Trill:
+    def recognize(self, busyNotes, simpleNotes=None) -> bool|expressions.Trill:
         '''
         Tries to identify the busy notes as a trill.
 
@@ -193,7 +193,7 @@ class TurnRecognizer(OrnamentRecognizer):
         self,
         busyNotes,
         simpleNotes=None,
-    ) -> bool | expressions.Turn | expressions.InvertedTurn:
+    ) -> bool|expressions.Turn|expressions.InvertedTurn:
         '''
         Tries to identify the busy notes as a turn or inverted turn.
 

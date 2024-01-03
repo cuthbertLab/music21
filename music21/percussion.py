@@ -102,7 +102,7 @@ class PercussionChord(chord.ChordBase):
         return tuple(self._notes)
 
     @notes.setter
-    def notes(self, newNotes: Iterable[note.Unpitched | note.Note]) -> None:
+    def notes(self, newNotes: Iterable[note.Unpitched|note.Note]) -> None:
         '''
         Sets notes to an iterable of Note or Unpitched objects
         '''
@@ -154,7 +154,7 @@ class PercussionChord(chord.ChordBase):
         return pitches
 
     @pitches.setter
-    def pitches(self, value: t.Sequence[str | pitch.Pitch | int]):
+    def pitches(self, value: t.Sequence[str|pitch.Pitch|int]):
         self._notes = []
         # TODO: individual ties are not being retained here
         for p in value:

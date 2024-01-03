@@ -60,7 +60,6 @@ Module to translate Noteworthy Composer's NWCTXT format to music21.
 from __future__ import annotations
 
 import unittest
-import warnings
 
 from music21 import bar
 from music21 import chord
@@ -69,14 +68,19 @@ from music21 import common
 from music21 import duration
 from music21 import dynamics
 from music21 import environment
+from music21 import expressions
 from music21.exceptions21 import Music21Exception
+from music21 import instrument
+from music21 import interval
 from music21 import key
+from music21 import metadata
 from music21 import meter
 from music21 import note
 from music21 import pitch
 from music21 import repeat
 from music21 import spanner
 from music21 import stream
+from music21 import tempo
 from music21 import tie
 
 environLocal = environment.Environment('noteworthy.translate')
@@ -95,6 +99,9 @@ class NoteworthyTranslator:
     def __init__(self):
         self.currentPart = None
         self.currentMeasure = None
+        self.measureNumber = 0
+        self.currentEnding = 1
+        self.repeatedMeasures = []
         self.score = stream.Score()
 
         self.currentClef = 'TREBLE'
@@ -158,7 +165,13 @@ class NoteworthyTranslator:
             for attribute in sections[2:]:
                 try:
                     (name, value) = attribute.split(':', 1)
-                    attributes[name] = value
+                    if command == 'Chord' and (name in ('Dur', 'Pos')):
+                        if attributes.get(name) is None:
+                            attributes[name] = [value]
+                        else:
+                            attributes[name].append(value)
+                    else:
+                        attributes[name] = value
                 except ValueError:
                     if attribute.strip() == '':
                         pass
@@ -166,38 +179,48 @@ class NoteworthyTranslator:
                         raise NoteworthyTranslateException(
                             f'Cannot unpack value from {attribute} in {pi}')
 
-            if command == 'Note':
-                self.translateNote(attributes)
-                self.lyricPosition += 1
-            elif command == 'Clef':
-                self.createClef(attributes)
-            elif command == 'Rest':
-                self.translateRest(attributes)
-            elif command == 'Key':
-                self.createKey(attributes)
-            elif command == 'TimeSig':
-                self.createTimeSignature(attributes)
-            elif command == 'Chord':
-                self.translateChord(attributes)
-                self.lyricPosition += 1
-            elif command == 'AddStaff':
-                self.createPart()
-                self.currentKey = key.KeySignature(0)
-                self.activeAccidentals = {}
-                self.lyrics = []
-                self.lyricPosition = 0
-            elif command == 'Lyric1':
-                self.lyrics = self.createLyrics(attributes)
-            elif command == 'Bar':
-                self.createBarlines(attributes)
-            elif command == 'Flow':
-                self.createOtherRepetitions(attributes)
-            elif command == 'DynamicVariance':
-                self.createDynamicVariance(attributes)
-            elif command == 'Dynamic':
-                self.createDynamics(attributes)
+            try:
+                if command == 'AddStaff':
+                    self.createStaff(attributes)
+                elif command == 'Bar':
+                    self.createBarlines(attributes)
+                elif command == 'Chord':
+                    self.translateChord(attributes)
+                    self.lyricPosition += 1
+                elif command == 'Clef':
+                    self.createClef(attributes)
+                elif command == 'Dynamic':
+                    self.createDynamics(attributes)
+                elif command == 'DynamicVariance':
+                    self.createDynamicVariance(attributes)
+                elif command == 'Ending':
+                    self.createEnding(attributes)
+                elif command == 'Flow':
+                    self.createOtherRepetitions(attributes)
+                elif command == 'Key':
+                    self.createKey(attributes)
+                elif command == 'Lyric1':
+                    self.lyrics = self.createLyrics(attributes)
+                elif command == 'Note':
+                    self.translateNote(attributes)
+                    self.lyricPosition += 1
+                elif command == 'Rest':
+                    self.translateRest(attributes)
+                elif command == 'SongInfo':
+                    self.createSongInfo(attributes)
+                elif command == 'StaffInstrument':
+                    self.createStaffInstrument(attributes)
+                elif command == 'Tempo':
+                    self.createTempo(attributes)
+                elif command == 'Text':
+                    self.createText(attributes)
+                elif command == 'TimeSig':
+                    self.createTimeSignature(attributes)
+            except Exception as e:
+                print('Cannot create object from "%s"' % (attributes))
+                raise NoteworthyTranslateException from e
 
-        # Add the last Stuff
+                # Add the last Stuff
         if self.currentMeasure:
             self.currentPart.append(self.currentMeasure)
 
@@ -216,6 +239,12 @@ class NoteworthyTranslator:
 
             Whole,Dotted,Slur
 
+        >>> nwt = noteworthy.translate.NoteworthyTranslator()
+        >>> n = note.Note()
+        >>> nwt.setDurationForObject(n, 'Half')
+        >>> n.duration
+        <music21.duration.Duration 2.0>
+
         '''
         from music21 import noteworthy
         dictionaries = noteworthy.dictionaries
@@ -227,9 +256,7 @@ class NoteworthyTranslator:
 
         for kk in parts:
             if kk == 'Grace':
-                # Now it doesn't work, the function for grace notes have to be added here
-                warnings.warn('skipping grace note')
-                return
+                durationObject = durationObject.getGraceDuration()
             elif kk == 'Slur':
                 if self.withinSlur is False:
                     self.beginningSlurNote = generalNote
@@ -268,11 +295,22 @@ class NoteworthyTranslator:
             thisNoteIsTied = True
             self.withinTie = True
 
+        achord = noteOrChord if isinstance(noteOrChord, chord.Chord) else None
+
         # if Tied
         if thisNoteBeginsATie:
-            noteOrChord.tie = tie.Tie('start')
+            if achord is not None:
+                for p in achord.pitches:
+                    achord.setTie(tie.Tie('start'), p)
+            else:
+                noteOrChord.tie = tie.Tie('start')
+
         if self.withinTie is True and thisNoteIsTied is False:
-            noteOrChord.tie = tie.Tie('stop')
+            if achord is not None:
+                for p in achord.pitches:
+                    achord.setTie(tie.Tie('stop'), p)
+            else:
+                noteOrChord.tie = tie.Tie('stop')
             self.withinTie = False
 
     def getPitchFromPositionInfo(self, posInfo):
@@ -309,17 +347,10 @@ class NoteworthyTranslator:
         >>> pList
         [<music21.pitch.Pitch E3>, <music21.pitch.Pitch G-3>, <music21.pitch.Pitch B3>]
         '''
-        # from music21 import noteworthy
-        # dictionaries = noteworthy.dictionaries
-        pos = posInfo.rstrip('^')  # remove any tie
-        # What does this do???
-        pos = pos.rstrip('x')
-        pos = pos.rstrip('X')
-        pos = pos.rstrip('z')
         pitchList = []
 
-        for thisPos in pos.split(','):
-            p = self.getOnePitchFromPosition(thisPos)
+        for thisPos in posInfo.split(','):
+            p = self.getPitchFromPositionInfo(thisPos)
             pitchList.append(p)
         return pitchList
 
@@ -395,7 +426,7 @@ class NoteworthyTranslator:
             octave = 6
             minPosition = 1
             dictionary = 'dictionaryTreble'
-        elif currentClef == 'BASS':
+        elif currentClef in ('BASS', 'PERCUSSION'):
             octave = 3
             minPosition = -1
             dictionary = 'dictionaryBass'
@@ -455,20 +486,39 @@ class NoteworthyTranslator:
         durationInfo = attributes['Dur']
         pitchInfo = attributes['Pos']
 
-        n = note.Note()   # note!
+        p = self.getPitchFromPositionInfo(pitchInfo)
+
+        if self.currentClef == 'PERCUSSION':
+            n = note.Unpitched()
+            n.displayStep = p.step
+            n.displayOctave = p.octave
+        else:
+            n = note.Note(p)   # note!
 
         # durationInfo
         self.setDurationForObject(n, durationInfo)
 
         # pitchInfo
         self.setTieFromPitchInfo(n, pitchInfo)
-        n.pitch = self.getPitchFromPositionInfo(pitchInfo)
 
         # if Lyrics
         if self.lyrics and self.lyricPosition < len(self.lyrics):
             n.addLyric(self.lyrics[self.lyricPosition])
 
-        self.currentMeasure.append(n)
+        self.getShortestStream().append(n)
+
+    # Returns the shortest stream. It can be the shortest Voice
+    # or current measure if no voice.
+    def getShortestStream(self):
+        if self.currentMeasure.isFlat:
+            # O(1) in most cases.
+            return self.currentMeasure
+
+        # O(n) only if voices already exist.
+        return min(
+            self.currentMeasure.getElementsByClass(stream.Voice),
+            key=lambda v: v.quarterLength
+        )
 
     def translateChord(self, attributes):
         r'''
@@ -478,33 +528,86 @@ class NoteworthyTranslator:
 
         >>> nwt = noteworthy.translate.NoteworthyTranslator()
         >>> nwt.currentMeasure = measure
-        >>> nwt.translateChord({'Dur': 'Half', 'Pos': '1,3,#5'})
+        >>> nwt.translateChord({'Dur': ['Half'], 'Pos': ['1,3,#5']})
         >>> measure[0]
         <music21.chord.Chord C5 E5 G#5>
 
         Chords also inherit accidentals:
-        >>> nwt.translateChord({'Dur': 'Half', 'Pos': '1,3,5'})
+        >>> nwt.translateChord({'Dur': ['Half'], 'Pos': ['1,3,5']})
         >>> measure[1]
         <music21.chord.Chord C5 E5 G#5>
 
         '''
-        durationInfo = attributes['Dur']
-        pitchInfo = attributes['Pos']
+        durationInfos = attributes['Dur']
+        pitchInfos = attributes['Pos']
+        currentDuration = self.getShortestStream().duration
+        isRestChord = 'Dur2' in attributes
+        i = 0
 
-        c = chord.Chord()   # note!
+        def getVoiceAtDuration(inner_self, voiceId, dur):
+            # first check if voice already exists in measure
+            voice = None
+            voices = inner_self.currentMeasure.getElementsByClass(stream.Voice)
+            voice = voices.getElementById(voiceId)
 
-        # durationInfo
-        self.setDurationForObject(c, durationInfo)
+            # otherwise create it
+            if voice is None:
+                voice = stream.Voice()
+                voice.id = voiceId
+                # if creating the first voice, add current measure contents to it
+                if len(voices) == 0:
+                    notes = []
+                    for item in inner_self.currentMeasure:
+                        if isinstance(item, note.GeneralNote):
+                            notes.append(item)
+                    if notes:
+                        voice.append(notes)
+                        inner_self.currentMeasure.remove(notes)
 
-        # pitchInfo
-        self.setTieFromPitchInfo(c, pitchInfo)
-        c.pitches = self.getMultiplePitchesFromPositionInfo(pitchInfo)
+                inner_self.currentMeasure.append(voice)
 
-        # if Lyrics
-        if self.lyrics and self.lyricPosition < len(self.lyrics):
-            c.addLyric(self.lyrics[self.lyricPosition])
 
-        self.currentMeasure.append(c)
+            cd = dur.quarterLength
+            vd = voice.quarterLength
+            # if current voice is late, add rest
+            if cd - vd > 0:
+                rest = note.Rest()
+                rest.quarterLength = cd - vd
+                rest.stepShift = 3
+                voice.append(rest)
+
+            return voice
+
+
+        for d in durationInfos:
+            c = chord.Chord()   # note!
+            # durationInfo
+            self.setDurationForObject(c, d)
+
+            # pitchInfo
+            p = pitchInfos[durationInfos.index(d)]
+            c.pitches = self.getMultiplePitchesFromPositionInfo(p)
+            self.setTieFromPitchInfo(c, p)
+
+            # if Lyrics
+            if self.lyrics and self.lyricPosition < len(self.lyrics):
+                c.addLyric(self.lyrics[self.lyricPosition])
+
+            if len(durationInfos) == 1 and isRestChord is not None:
+                self.getShortestStream().append(c)
+            else:
+                v = getVoiceAtDuration(self, i, currentDuration)
+                v.append(c)
+
+            i += 1
+
+        if isRestChord:
+            restDurInfo = attributes['Dur2']
+            r = note.Rest()
+            r.stepShift = 3
+            self.setDurationForObject(r, restDurInfo)
+            v = getVoiceAtDuration(self, i, currentDuration)
+            v.append(r)
 
     def translateRest(self, attributes):
         r'''
@@ -529,7 +632,8 @@ class NoteworthyTranslator:
 
         r = note.Rest()
         self.setDurationForObject(r, durationInfo)
-        self.currentMeasure.append(r)
+
+        self.getShortestStream().append(r)
 
     def createClef(self, attributes):
         r'''
@@ -552,7 +656,11 @@ class NoteworthyTranslator:
         >>> nwt.currentMeasure.show('text')
         {0.0} <music21.clef.TrebleClef>
         {0.0} <music21.clef.Bass8vbClef>
-
+        >>> nwt.createClef({'Type' : 'Percussion'})
+        >>> nwt.currentMeasure.show('text')
+        {0.0} <music21.clef.TrebleClef>
+        {0.0} <music21.clef.Bass8vbClef>
+        {0.0} <music21.clef.PercussionClef>
 
 
 
@@ -610,6 +718,12 @@ class NoteworthyTranslator:
                 raise NoteworthyTranslateException('cannot shift octaves on a tenor clef')
             self.currentMeasure.append(clef.TenorClef())
             currentClef = 'TENOR'
+        elif cl == 'Percussion':
+            c = clef.PercussionClef()
+            c.line = 2
+            self.currentMeasure.append(c)
+            currentClef = 'PERCUSSION'
+
         if currentClef is None:
             raise NoteworthyTranslateException(f'Did not find a proper clef in type, {cl}')
         self.currentClef = currentClef
@@ -618,8 +732,6 @@ class NoteworthyTranslator:
         r'''
         Adds a new key signature to the given measure.
         Returns the number of sharps (negative for flats)
-
-
 
         >>> measureIn = stream.Measure()
         >>> measureIn.append(note.Rest(quarterLength=3.0))
@@ -633,13 +745,13 @@ class NoteworthyTranslator:
         {0.0} <music21.note.Rest dotted-half>
         {3.0} <music21.key.KeySignature of 4 sharps>
         '''
-        ke = attributes['Signature']
+
         currentSharps = 0
-        for a in range(len(ke)):
-            if ke[a] == '#':
-                currentSharps = currentSharps + 1
-            if ke[a] == 'b':
-                currentSharps = currentSharps - 1
+        for attribute in attributes['Signature']:
+            if attribute == '#':
+                currentSharps += 1
+            elif attribute == 'b':
+                currentSharps -= 1
         currentKey = key.KeySignature(currentSharps)
         self.currentMeasure.append(currentKey)
         self.currentKey = currentKey
@@ -662,20 +774,20 @@ class NoteworthyTranslator:
         elif times == 'Common':
             times = '4/4'
 
-        self.currentMeasure.append(meter.TimeSignature(times))
+        m = meter.TimeSignature(times)
+        self.currentMeasure.append(m)
 
     def createPart(self):
         '''
         Add a new part to the score.
         '''
-        if self.currentPart is None:
-            self.currentPart = stream.Part()
-            self.currentMeasure = stream.Measure()
-        else:
+        if self.currentPart is not None:
             self.currentPart.append(self.currentMeasure)
             self.score.insert(0, self.currentPart)
-            self.currentPart = stream.Part()
-            self.currentMeasure = stream.Measure()
+
+        self.currentPart = stream.Part()
+        self.currentMeasure = stream.Measure()
+        self.measureNumber = 0
 
     def createBarlines(self, attributes):
         r'''
@@ -699,8 +811,17 @@ class NoteworthyTranslator:
         if 'Style' not in attributes:
             # pure barline
             self.currentPart.append(self.currentMeasure)
-            self.currentMeasure = stream.Measure()
+            self.currentMeasure = stream.Measure(number=self.measureNumber)
+            if len(self.repeatedMeasures) > 0:
+                self.repeatedMeasures.append(self.currentMeasure)
+            self.measureNumber += 1
             return
+
+        if len(self.repeatedMeasures) > 0:
+            rbSpanner = spanner.RepeatBracket(self.repeatedMeasures, number=self.currentEnding)
+            self.currentPart.append(rbSpanner)
+
+            self.repeatedMeasures = []
 
         style = attributes['Style']
 
@@ -740,6 +861,9 @@ class NoteworthyTranslator:
         else:
             raise NoteworthyTranslateException(f'cannot find a style {style} in our list')
 
+        self.currentMeasure.number = self.measureNumber
+        self.measureNumber += 1
+
     def createOtherRepetitions(self, attributes):
         r'''
         Repetitions like 'Coda', 'Segno' and some others.
@@ -749,7 +873,7 @@ class NoteworthyTranslator:
         >>> nwt.currentMeasure = stream.Measure()
         >>> nwt.createOtherRepetitions({'Style' : 'ToCoda', 'Pos': '8',
         ...                             'Wide':'Y', 'Placement': 'BestFitForward'})
-        >>> 'Coda' in nwt.currentMeasure[0].classes
+        >>> isinstance(nwt.currentMeasure[0], repeat.Coda)
         True
         '''
         # DaCapoAlFine - Coda - Segno - ToCoda
@@ -843,6 +967,53 @@ class NoteworthyTranslator:
                     lyrics.append(ll)
         return lyrics
 
+    def createStaff(self, attributes):
+        self.createPart()
+        self.currentKey = key.KeySignature(0)
+        self.activeAccidentals = {}
+        self.lyrics = []
+        self.lyricPosition = 0
+        self.currentPart.partName = attributes.get('Name')
+        self.currentPart.partAbbreviation = attributes.get('Name')
+
+    def createStaffInstrument(self, attributes):
+        patch = int(attributes.get('Patch', 0))
+
+        staffInstru = instrument.instrumentFromMidiProgram(patch)
+        readTranspo = int(attributes.get('Trans', 0))
+        staffInstru.transposition = interval.Interval(readTranspo)
+        self.currentPart.append(staffInstru)
+
+    def createText(self, attributes):
+        text = attributes['Text']
+        # Rehearsal is associated to the score while TextExpression is staff-associated.
+        expr = expressions.TextExpression(text)
+        expr.placement = 'above' if int(attributes.get('Pos')) < 0 else 'below'
+        expr.style.relativeY = attributes.get('Pos')
+        self.currentMeasure.append(expr)
+
+    def createSongInfo(self, attributes):
+        title = attributes.get('Title')
+        author = attributes.get('Author')
+        md = metadata.Metadata()
+        md.title = title
+        md.author = author
+        self.score.append(md)
+
+    def createEnding(self, attributes):
+        end = attributes['Endings']
+        if self.currentMeasure.leftBarline is None:
+            self.currentMeasure.leftBarline = bar.Barline()
+        self.repeatedMeasures = [self.currentMeasure]
+        endingType = end.split(',')[0]
+        self.currentEnding = int(endingType)
+
+    def createTempo(self, attributes):
+        tempo_value = attributes['Tempo']
+        mm = tempo.MetronomeMark(number=int(tempo_value))
+        self.currentMeasure.insert(0, mm)
+
+
 
 class NoteworthyTranslateException(Music21Exception):
     pass
@@ -905,9 +1076,7 @@ class TestExternal(unittest.TestCase):
         complete = nwcTranslatePath / 'NWCTEXT_Really_complete_example_file.nwctxt'
         # 'Part_OWeisheit.nwctxt' #
 
-        with warnings.catch_warnings():
-            warnings.simplefilter('ignore', Warning)
-            myScore = NoteworthyTranslator().parseFile(complete)
+        myScore = NoteworthyTranslator().parseFile(complete)
         if self.show:
             myScore.show()
 

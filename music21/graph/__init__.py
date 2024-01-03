@@ -66,7 +66,7 @@ environLocal = environment.Environment('graph')
 
 def plotStream(
     streamObj: stream.Stream,
-    graphFormat: str | None = None,
+    graphFormat: str|None = None,
     xValue=None,
     yValue=None,
     zValue=None,
@@ -152,8 +152,7 @@ def plotStream(
                 setattr(obj, attrName, axisClass(obj, axisName))
         obj.run()
 
-    if obj:
-        return obj  # just first one...
+    return obj  # just last one...
 
 # ------------------------------------------------------------------------------
 class TestExternal(unittest.TestCase):

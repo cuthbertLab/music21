@@ -356,12 +356,11 @@ class JobProcessor:
         # end generator
 
     @staticmethod
-    def process_serial(jobs):
+    def process_serial(jobs: list[MetadataCachingJob]):
         '''
         Process jobs serially.
         '''
         remainingJobs = len(jobs)
-        results = []
         for job in jobs:
             results, errors = job.run()
             remainingJobs -= 1
@@ -377,7 +376,7 @@ class JobProcessor:
 # -----------------------------------------------------------------------------
 
 
-class WorkerProcess(multiprocessing.Process):  # pylint: disable=inherit-non-class
+class WorkerProcess(multiprocessing.Process):
     '''
     A worker process for use by the multithreaded metadata-caching job
     processor.

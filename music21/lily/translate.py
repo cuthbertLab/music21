@@ -1527,7 +1527,7 @@ class LilypondConverter:
 
     def lyMultipliedDurationFromDuration(
         self,
-        durationObj: duration.Duration | duration.DurationTuple,
+        durationObj: duration.Duration|duration.DurationTuple,
     ):
         r'''
         take a simple Duration (that is, one with one DurationTuple)
@@ -1567,7 +1567,7 @@ class LilypondConverter:
         >>> [str(lpc.lyMultipliedDurationFromDuration(c)) for c in components]
         ['1 ', '4 ']
         '''
-        number_type: float | int | str
+        number_type: float|int|str
         try:
             number_type = duration.convertTypeToNumber(durationObj.type)  # module call
         except duration.DurationException as de:
@@ -2667,7 +2667,6 @@ class TestExternal(unittest.TestCase):
 
 # ------------------------------------------------------------------------------
 if __name__ == '__main__':
-    # pylint: disable=ungrouped-imports
     import music21
     music21.mainTest(Test)  # , TestExternal)
     # music21.mainTest(TestExternal, 'noDocTest')

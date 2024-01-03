@@ -546,10 +546,10 @@ class Dialog:
         else:
             try:
                 self._performAction(simulate=simulate)
-            except DialogException:  # pylint: disable=catching-non-exception
+            except DialogException:
                 # in some cases, the action selected requires exciting the
                 # configuration assistant
-                # pylint: disable=raising-non-exception,raise-missing-from
+                # pylint: disable=raise-missing-from
                 raise DialogException('perform action raised a dialog exception')
 
 
@@ -990,7 +990,7 @@ class AskAutoDownload(SelectFromList):
                 'non-commercial use. These works, along with any works linked to in the virtual '
                 'corpus, may or may not be free in your jurisdiction. If you believe this message '
                 'to be in error regarding one or more works please contact '
-                'Michael Cuthbert at cuthbert@mit.edu.',
+                'Michael Cuthbert at michael.asato.cuthbert@gmail.com',
                 ' ',
                 'Would you like to:'
                 ]

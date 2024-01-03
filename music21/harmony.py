@@ -30,7 +30,6 @@ from music21 import common
 from music21 import duration
 from music21 import environment
 from music21 import exceptions21
-from music21.figuredBass import realizerScale
 from music21 import interval
 from music21 import key
 from music21 import pitch
@@ -41,6 +40,9 @@ environLocal = environment.Environment('harmony')
 
 T = t.TypeVar('T', bound='ChordSymbol')
 NCT = t.TypeVar('NCT', bound='NoChord')
+
+if t.TYPE_CHECKING:
+    from music21.figuredBass import realizerScale
 
 # --------------------------------------------------------------------------
 
@@ -208,10 +210,10 @@ class Harmony(chord.Chord):
     # INITIALIZER #
 
     def __init__(self,
-                 figure: str | None = None,
-                 root: str | pitch.Pitch | None = None,
-                 bass: str | pitch.Pitch | None = None,
-                 inversion: int | None = None,
+                 figure: str|None = None,
+                 root: str|pitch.Pitch|None = None,
+                 bass: str|pitch.Pitch|None = None,
+                 inversion: int|None = None,
                  updatePitches: bool = True,
                  **keywords
                  ):
@@ -274,7 +276,7 @@ class Harmony(chord.Chord):
         '''
         return
 
-    def _updateFromParameters(self, root, bass, inversion: int | None = None):
+    def _updateFromParameters(self, root, bass, inversion: int|None = None):
         '''
         This method must be called twice, once before the pitches
         are rendered, and once after. This is because after the pitches
@@ -600,9 +602,9 @@ class ChordStepModification(prebase.ProtoM21Object):
     # INITIALIZER #
 
     def __init__(self, modType=None, degree=None, intervalObj=None) -> None:
-        self._modType: str | None = None  # add, alter, subtract
+        self._modType: str|None = None  # add, alter, subtract
         self._interval: interval.Interval  # alteration of degree, alter ints in mxl
-        self._degree: int | None = None  # the degree number, where 3 is the third
+        self._degree: int|None = None  # the degree number, where 3 is the third
         # use properties if defined: runs certain type conversions
         if modType is not None:
             self.modType = modType
@@ -1606,9 +1608,9 @@ class ChordSymbol(Harmony):
 
     def __init__(self,
                  figure=None,
-                 root: pitch.Pitch | str | None = None,
-                 bass: pitch.Pitch | str | None = None,
-                 inversion: int | None = None,
+                 root: pitch.Pitch|str|None = None,
+                 bass: pitch.Pitch|str|None = None,
+                 inversion: int|None = None,
                  kind='',
                  kindStr='',
                  **keywords
@@ -1713,8 +1715,15 @@ class ChordSymbol(Harmony):
             pitchToAppend = sc.pitchFromDegree(hD.degree, rootPitch)
             if hD.interval and hD.interval.semitones != 0:
                 # added degrees are relative to dominant chords, which have all major degrees
-                # except for the seventh which is minor, thus the transposition down one half step
-                if hD.degree == 7 and self.chordKind is not None and self.chordKind != '':
+                # except for the seventh which is minor, thus the transposition down one half step.
+                # Don't do this for flatted transformations:
+                # C7addb7 is a redundancy, not a double-flatted seventh.
+                if (
+                    hD.degree == 7
+                    and hD.interval.semitones > 0
+                    and self.chordKind is not None
+                    and self.chordKind != ''
+                ):
                     pitchToAppend = pitchToAppend.transpose(-1)
                 pitchToAppend = pitchToAppend.transpose(hD.interval)
             if hD.degree >= 7:
@@ -1928,7 +1937,7 @@ class ChordSymbol(Harmony):
         kindStr.
         '''
         if self.figure == 'Chord Symbol Cannot Be Identified':
-            return self.figure
+            return
         # remove spaces from prelim Figure...
         prelimFigure = self.figure
         prelimFigure = re.sub(r'\s', '', prelimFigure)
@@ -2102,6 +2111,8 @@ class ChordSymbol(Harmony):
         '''
         if 'root' not in self._overrides or 'bass' not in self._overrides or self.chordKind is None:
             return
+
+        from music21.figuredBass import realizerScale
 
         # create figured bass scale with root as scale
         scaleInitTuple = (self._overrides['root'].name, 'major')
@@ -2367,7 +2378,7 @@ class ChordSymbol(Harmony):
         else:
             return False
 
-    def transpose(self: T, value, *, inPlace=False) -> T | None:
+    def transpose(self: T, value, *, inPlace=False) -> T|None:
         '''
         Overrides :meth:`~music21.chord.Chord.transpose` so that this ChordSymbol's
         `figure` is appropriately cleared afterward.
@@ -2473,7 +2484,7 @@ class NoChord(ChordSymbol):
         # do nothing, everything is already set.
         return
 
-    def transpose(self: NCT, _value, *, inPlace=False) -> NCT | None:
+    def transpose(self: NCT, _value, *, inPlace=False) -> NCT|None:
         '''
         Overrides :meth:`~music21.chord.Chord.transpose` to do nothing.
 
@@ -2491,7 +2502,6 @@ class NoChord(ChordSymbol):
 
 
 # ------------------------------------------------------------------------------
-
 
 def realizeChordSymbolDurations(piece):
     '''
@@ -2826,6 +2836,10 @@ class Test(unittest.TestCase):
         pitches = ('A1', 'C2', 'E2', 'G#3')
         pitches = tuple(pitch.Pitch(p) for p in pitches)
         self.assertEqual(pitches, ChordSymbol('Am#7').pitches)
+
+        pitches = ('C2', 'F2', 'G2', 'B-3')
+        pitches = tuple(pitch.Pitch(p) for p in pitches)
+        self.assertEqual(pitches, ChordSymbol('Csusaddb7').pitches)
 
     def testRootBassParsing(self):
         '''
