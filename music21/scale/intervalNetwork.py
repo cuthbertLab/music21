@@ -2435,29 +2435,26 @@ class IntervalNetwork:
         minPitch = pitchTargetObj.transpose(-12, inPlace=False)
         maxPitch = pitchTargetObj.transpose(12, inPlace=False)
 
-        realizedPitch, realizedNode = self.realize(pitchReference,
-                                                   nodeObj,
-                                                   minPitch=minPitch,
-                                                   maxPitch=maxPitch,
-                                                   direction=direction,
-                                                   alteredDegrees=alteredDegrees)
+        realizedPitches, realizedNodes = self.realize(pitchReference,
+                                                      nodeObj,
+                                                      minPitch=minPitch,
+                                                      maxPitch=maxPitch,
+                                                      direction=direction,
+                                                      alteredDegrees=alteredDegrees)
 
         # environLocal.printDebug(['getRelativeNodeId()', 'nodeObj', nodeObj,
         #    'realizedPitch', realizedPitch, 'realizedNode', realizedNode])
 
         post = []  # collect more than one
-        for i in range(len(realizedPitch)):
+        for realizedPitch, realizedNode in zip(realizedPitches, realizedNodes):
             # environLocal.printDebug(['getRelativeNodeId', 'comparing',
             #   realizedPitch[i], realizedNode[i]])
 
             # comparison of attributes, not object
-            match = False
             if (getattr(pitchTargetObj, comparisonAttribute)
-                    == getattr(realizedPitch[i], comparisonAttribute)):
-                match = True
-            if match:
-                if realizedNode[i] not in post:  # may be more than one match
-                    post.append(realizedNode[i])
+                    == getattr(realizedPitch, comparisonAttribute)):
+                if realizedNode not in post:  # may be more than one match
+                    post.append(realizedNode)
 
         if saveOctave is None:
             pitchTargetObj.octave = None
@@ -2513,21 +2510,21 @@ class IntervalNetwork:
         minPitch = pitchTargetObj.transpose(-12, inPlace=False)
         maxPitch = pitchTargetObj.transpose(12, inPlace=False)
 
-        realizedPitch, realizedNode = self.realize(pitchReference,
-                                                   nodeId,
-                                                   minPitch=minPitch,
-                                                   maxPitch=maxPitch,
-                                                   direction=direction,
-                                                   alteredDegrees=alteredDegrees)
+        realizedPitches, realizedNodes = self.realize(pitchReference,
+                                                      nodeId,
+                                                      minPitch=minPitch,
+                                                      maxPitch=maxPitch,
+                                                      direction=direction,
+                                                      alteredDegrees=alteredDegrees)
 
         lowNeighbor = None
         highNeighbor = None
-        for i in range(len(realizedPitch)):
-            if pitchTargetObj.ps < realizedPitch[i].ps:
-                highNeighbor = realizedNode[i]
+        for realizedPitch, realizedNode in zip(realizedPitches, realizedNodes):
+            if pitchTargetObj.ps < realizedPitch.ps:
+                highNeighbor = realizedNode
                 # low neighbor may be a previously-encountered pitch
                 return lowNeighbor, highNeighbor
-            lowNeighbor = realizedNode[i]
+            lowNeighbor = realizedNode
 
         if savedOctave is None:
             pitchTargetObj.octave = savedOctave
@@ -2815,7 +2812,7 @@ class IntervalNetwork:
             raise ValueError('There must be at least one pitch given.')
 
         # automatically derive a min and max from the supplied pitch
-        sortList = [(pitchList[i].ps, i) for i in range(len(pitchList))]
+        sortList = [(pitch.ps, i) for i, pitch in enumerate(pitchList)]
         sortList.sort()
         minPitch = pitchList[sortList[0][1]]  # first index
         maxPitch = pitchList[sortList[-1][1]]  # last index

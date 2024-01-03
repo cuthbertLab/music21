@@ -1359,10 +1359,10 @@ def streamToPackets(
         # strip delta times
         elementPackets = []
         firstNotePlayed = False
-        for i in range(len(midiEventList)):
+        for midiEvent in midiEventList:
             # store offset, midi event, object
             # add channel and pitch change also
-            midiEvent = midiEventList[i]
+
             if (midiEvent.type == midiModule.ChannelVoiceMessages.NOTE_ON
                     and firstNotePlayed is False):
                 firstNotePlayed = True

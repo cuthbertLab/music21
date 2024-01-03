@@ -862,10 +862,10 @@ class Text(prebase.ProtoM21Object):
     def __str__(self):
         if isinstance(self._data, bytes):
             return self._data.decode('UTF-8')
-        elif not isinstance(self._data, str):
-            return str(self._data)
-        else:
+        elif isinstance(self._data, str):
             return self._data
+        else:
+            return str(self._data)
 
     def _reprInternal(self):
         return str(self)

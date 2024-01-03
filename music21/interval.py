@@ -2560,23 +2560,24 @@ def _stringToDiatonicChromatic(
         dirScale = -1
     else:
         dirScale = 1
+    value_lower = value.lower()
 
-    if 'descending' in value.lower():
+    if 'descending' in value_lower:
         value = re.sub(r'descending\s*', '', value, flags=re.RegexFlag.IGNORECASE)
         dirScale = -1
-    elif 'ascending' in value.lower():
+    elif 'ascending' in value_lower:
         value = re.sub(r'ascending\\s*', '', value, flags=re.RegexFlag.IGNORECASE)
 
     # permit whole and half abbreviations
-    if value.lower() in ('w', 'whole', 'tone'):
+    if value_lower in ('w', 'whole', 'tone'):
         value = 'M2'
         inferred = True
-    elif value.lower() in ('h', 'half', 'semitone'):
+    elif value_lower in ('h', 'half', 'semitone'):
         value = 'm2'
         inferred = True
 
     for i, ordinal in enumerate(common.musicOrdinals):
-        if ordinal.lower() in value.lower():
+        if ordinal.lower() in value_lower:
             value = re.sub(fr'\s*{ordinal}\s*',
                            str(i),
                            value,

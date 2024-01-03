@@ -2844,11 +2844,10 @@ class Test(unittest.TestCase):
         allNotes = bm.flatten().notes
         #      0C#  1B-~  | 2B-  3C#~  4C#    6B-     7C#    8B-~   9B-~   10B-
         ds = [True, True, False, True, False, True, False, False, False, False]
-        for i in range(len(allNotes)):
-            self.assertEqual(allNotes[i].pitch.accidental.displayStatus,
-                             ds[i],
-                             '%s failed, %s != %s' %
-                                (i, allNotes[i].pitch.accidental.displayStatus, ds[i]))
+        for i, (dsi, thisNote) in enumerate(zip(ds, allNotes)):
+            self.assertEqual(thisNote.pitch.accidental.displayStatus,
+                             dsi,
+                             f'{i} failed, {thisNote.pitch.accidental.displayStatus} != {dsi}')
 
         # add another B-flat just after the tied one...
         bm = converter.parse(
@@ -2858,11 +2857,10 @@ class Test(unittest.TestCase):
         allNotes = bm.flatten().notes
         #      0C#  1B-~  | 2B-   3B-  4C#~  5C#    6B-     7C#    8B-~   9B-~  | 10B-
         ds = [True, True, False, True, True, False, False, False, False, False, False]
-        for i in range(len(allNotes)):
-            self.assertEqual(allNotes[i].pitch.accidental.displayStatus,
-                             ds[i],
-                             '%s failed, %s != %s' %
-                                (i, allNotes[i].pitch.accidental.displayStatus, ds[i]))
+        for i, (dsi, thisNote) in enumerate(zip(ds, allNotes)):
+            self.assertEqual(thisNote.pitch.accidental.displayStatus,
+                             dsi,
+                             f'{i} failed, {thisNote.pitch.accidental.displayStatus} != {dsi}')
 
     def testMakeAccidentalsRespectsDisplayType(self):
         n = note.Note('D#')
@@ -4036,10 +4034,10 @@ class Test(unittest.TestCase):
 
         def procCompare(srcOffset, srcDur, dstOffset, dstDur, divList):
             s = Stream()
-            for i in range(len(srcDur)):
+            for nOffset, nDuration in zip(srcOffset, srcDur):
                 n = note.Note()
-                n.quarterLength = srcDur[i]
-                s.insert(srcOffset[i], n)
+                n.quarterLength = nDuration
+                s.insert(nOffset, n)
             # Must be sorted for quantizing to work optimally.
             s.sort()
 
@@ -4130,17 +4128,11 @@ class Test(unittest.TestCase):
                         interval.Interval(26),
                         interval.Interval(10)]
 
-        for i in range(len(sub)):
-            sTest = sub[i]
-            post = sTest.analyze('ambitus')
-            self.assertEqual(str(post), str(matchAmbitus[i]))
-
         # match values for different analysis strings
         for idStr in ['range', 'ambitus', 'span']:
-            for i in range(len(sub)):
-                sTest = sub[i]
+            for sTest, matchAmbitusTest in zip(sub, matchAmbitus):
                 post = sTest.analyze(idStr)
-                self.assertEqual(str(post), str(matchAmbitus[i]))
+                self.assertEqual(str(post), str(matchAmbitusTest))
 
         # only match first two values
         matchKrumhansl = [(pitch.Pitch('F#'), 'minor'),
@@ -4148,33 +4140,24 @@ class Test(unittest.TestCase):
                           (pitch.Pitch('E'), 'major'),
                           (pitch.Pitch('E'), 'major')]
 
-        for i in range(len(sub)):
-            sTest = sub[i]
-            post = sTest.analyze('KrumhanslSchmuckler')
-            # returns three values; match 2
-            self.assertEqual(post.tonic.name, matchKrumhansl[i][0].name)
-            self.assertEqual(post.mode, matchKrumhansl[i][1])
-
         # match values under different strings provided to analyze
-        for idStr in ['krumhansl']:
-            for i in range(len(sub)):
-                sTest = sub[i]
+        for idStr in ['KrumhanslSchmuckler', 'krumhansl']:
+            for sTest, sMatch in zip(sub, matchKrumhansl):
                 post = sTest.analyze(idStr)
                 # returns three values; match 2
-                self.assertEqual(post.tonic.name, matchKrumhansl[i][0].name)
-                self.assertEqual(post.mode, matchKrumhansl[i][1])
+                self.assertEqual(post.tonic.name, sMatch[0].name)
+                self.assertEqual(post.mode, sMatch[1])
 
         matchArden = [(pitch.Pitch('F#'), 'minor'),
-                          (pitch.Pitch('C#'), 'minor'),
-                          (pitch.Pitch('F#'), 'minor'),
-                          (pitch.Pitch('E'), 'major')]
+                      (pitch.Pitch('C#'), 'minor'),
+                      (pitch.Pitch('F#'), 'minor'),
+                      (pitch.Pitch('E'), 'major')]
         for idStr in ['arden']:
-            for i in range(len(sub)):
-                sTest = sub[i]
+            for sTest, sMatch in zip(sub, matchArden):
                 post = sTest.analyze(idStr)
                 # returns three values; match 2
-                self.assertEqual(post.tonic.name, matchArden[i][0].name)
-                self.assertEqual(post.mode, matchArden[i][1])
+                self.assertEqual(post.tonic.name, sMatch[0].name)
+                self.assertEqual(post.mode, sMatch[1])
 
     def testMakeTupletBracketsA(self):
         '''
@@ -4763,9 +4746,8 @@ class Test(unittest.TestCase):
         for durCol in [[1, 1, 1], [0.5, 2, 3], [0.25, 0.25, 0.5], [6, 6, 8]]:
             s = Stream()
             o = 0
-            for i in range(len(pitchCol)):
-                ql = durCol[i]
-                for pStr in pitchCol[i]:
+            for ql, pitches in zip(durCol, pitchCol):
+                for pStr in pitches:
                     n = note.Note(pStr)
                     n.quarterLength = ql
                     s.insert(o, n)
@@ -4779,10 +4761,10 @@ class Test(unittest.TestCase):
             for sEval in [s, sMod]:
                 self.assertEqual(len(sEval.getElementsByClass(chord.Chord)), 3)
                 # make sure we have all the original pitches
-                for i in range(len(pitchCol)):
+                for i, pitchEl in enumerate(pitchCol):
                     match = [p.nameWithOctave for p in
                              sEval.getElementsByClass(chord.Chord)[i].pitches]
-                    self.assertEqual(match, list(pitchCol[i]))
+                    self.assertEqual(match, list(pitchEl))
         # print('post chordify')
         # s.show('t')
         # sMod.show('t')

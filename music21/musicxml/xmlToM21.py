@@ -5634,7 +5634,10 @@ class MeasureParser(SoundTagMixin, XMLParserBase):
         if ts is not None:
             self.insertCoreAndRef(self.offsetMeasureNote, mxTime, ts)
 
-    def xmlToTimeSignature(self, mxTime):
+    def xmlToTimeSignature(
+        self,
+        mxTime: ET.Element
+    ) -> meter.TimeSignature | meter.SenzaMisuraTimeSignature:
         # noinspection PyShadowingNames
         '''
         Returns a TimeSignature or SenzaMisuraTimeSignature (for senza-misura)
@@ -5693,16 +5696,14 @@ class MeasureParser(SoundTagMixin, XMLParserBase):
         denominators = []
         for beatOrType in mxTime:
             if beatOrType.tag == 'beats':
-                numerators.append(beatOrType.text.strip())  # may be 3+2
+                numerators.append(strippedText(beatOrType))  # may be 3+2
             elif beatOrType.tag == 'beat-type':
-                denominators.append(beatOrType.text.strip())
+                denominators.append(strippedText(beatOrType))
             elif beatOrType.tag == 'interchangeable':
                 break  # interchangeable comes after all beat/beat-type sequences
 
         # convert into a string
-        msg = []
-        for i in range(len(numerators)):
-            msg.append(f'{numerators[i]}/{denominators[i]}')
+        msg = [f'{num}/{denom}' for num, denom in zip(numerators, denominators)]
 
         # warnings.warn(f"loading meter string: {'+'.join(msg)}", MusicXMLWarning)
         if len(msg) == 1:  # normal
@@ -5723,16 +5724,16 @@ class MeasureParser(SoundTagMixin, XMLParserBase):
 
         # attr: symbol
         symbol = mxTime.get('symbol')
-        if symbol:
-            if symbol in ('common', 'cut', 'single-number', 'normal'):
-                ts.symbol = symbol
-            elif symbol == 'note':
-                ts.symbolizeDenominator = True
-            elif symbol == 'dotted-note':
-                pass
-                # TODO: support, but not as musicxml style -- reduces by 1/3 the numerator...
-                # this should be done by changing the displaySequence directly.
-
+        if symbol is None:
+            pass
+        elif symbol in ('common', 'cut', 'single-number', 'normal'):
+            ts.symbol = symbol
+        elif symbol == 'note':
+            ts.symbolizeDenominator = True
+        elif symbol == 'dotted-note':
+            pass
+            # TODO: support, but not as musicxml style -- reduces by 1/3 the numerator...
+            # this should be done by changing the displaySequence directly.
         return ts
 
     def handleClef(self, mxClef):
@@ -5945,49 +5946,45 @@ class MeasureParser(SoundTagMixin, XMLParserBase):
         >>> MP.nonTraditionalKeySignature(mxKey)
         <music21.key.KeySignature of pitches: [G#]>
         '''
-        allChildren = list(mxKey)
+        children = list(mxKey)
 
         lastTag = None
-        allSteps = []
-        allAlters = []
-        allAccidentals = []
+        steps = []
+        alters = []
+        accidentals = []
 
-        for c in allChildren:
+        for c in children:
             tag = c.tag
             if lastTag == 'key-alter' and tag == 'key-step':
-                allAccidentals.append(None)
-
+                accidentals.append(None)
             if tag == 'key-step':
-                allSteps.append(c.text)
+                steps.append(c.text)
             elif tag == 'key-alter':
-                allAlters.append(float(c.text))
+                alters.append(float(c.text))
             elif tag == 'key-accidental':
-                allAccidentals.append(c.text)
+                accidentals.append(c.text)
             lastTag = tag
 
-        if len(allAccidentals) < len(allAlters):
-            allAccidentals.append(None)
-        if len(allSteps) != len(allAlters):
+        if len(accidentals) < len(alters):
+            accidentals.append(None)
+        if len(steps) != len(alters):
             raise MusicXMLImportException(
                 'For non traditional signatures each step must have an alter')
 
         ks = key.KeySignature(sharps=None)
 
         alteredPitches = []
-        for i in range(len(allSteps)):
-            thisStep = allSteps[i]
-            thisAlter = allAlters[i]
-            thisAccidental = allAccidentals[i]
-            p = pitch.Pitch(thisStep)
-            if thisAccidental is not None:
-                if thisAccidental in self.mxAccidentalNameToM21:
-                    accidentalName = self.mxAccidentalNameToM21[thisAccidental]
+        for step, alter, accidental in zip(steps, alters, accidentals):
+            p = pitch.Pitch(step)
+            if accidental is not None:
+                if accidental in self.mxAccidentalNameToM21:
+                    accidentalName = self.mxAccidentalNameToM21[accidental]
                 else:
-                    accidentalName = thisAccidental
+                    accidentalName = accidental
                 p.accidental = pitch.Accidental(accidentalName)
-                p.accidental.alter = thisAlter
+                p.accidental.alter = alter
             else:
-                p.accidental = pitch.Accidental(thisAlter)
+                p.accidental = pitch.Accidental(alter)
 
             alteredPitches.append(p)
 

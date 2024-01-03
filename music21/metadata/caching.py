@@ -356,12 +356,11 @@ class JobProcessor:
         # end generator
 
     @staticmethod
-    def process_serial(jobs):
+    def process_serial(jobs: list[MetadataCachingJob]):
         '''
         Process jobs serially.
         '''
         remainingJobs = len(jobs)
-        results = []
         for job in jobs:
             results, errors = job.run()
             remainingJobs -= 1

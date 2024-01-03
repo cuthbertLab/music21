@@ -733,8 +733,6 @@ class NoteworthyTranslator:
         Adds a new key signature to the given measure.
         Returns the number of sharps (negative for flats)
 
-
-
         >>> measureIn = stream.Measure()
         >>> measureIn.append(note.Rest(quarterLength=3.0))
 
@@ -747,13 +745,13 @@ class NoteworthyTranslator:
         {0.0} <music21.note.Rest dotted-half>
         {3.0} <music21.key.KeySignature of 4 sharps>
         '''
-        ke = attributes['Signature']
+
         currentSharps = 0
-        for a in range(len(ke)):
-            if ke[a] == '#':
-                currentSharps = currentSharps + 1
-            if ke[a] == 'b':
-                currentSharps = currentSharps - 1
+        for attribute in attributes['Signature']:
+            if attribute == '#':
+                currentSharps += 1
+            elif attribute == 'b':
+                currentSharps -= 1
         currentKey = key.KeySignature(currentSharps)
         self.currentMeasure.append(currentKey)
         self.currentKey = currentKey

@@ -2701,11 +2701,9 @@ class RomanNumeral(harmony.Harmony):
         chordStepsToExamine = (3, 5, 7)
         # newPitches = []
 
-        for i in range(len(correctSemitones)):  # 3, 5, possibly 7
-            thisChordStep = chordStepsToExamine[i]
+        for thisChordStep, thisCorrect in zip(chordStepsToExamine, correctSemitones):
             if shouldSkipThisChordStep(thisChordStep):
                 continue
-            thisCorrect = correctSemitones[i]
             thisSemis = self.semitonesFromChordStep(thisChordStep)
             if thisSemis is None:  # no chord step
                 continue

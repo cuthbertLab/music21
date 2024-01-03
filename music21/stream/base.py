@@ -6123,17 +6123,11 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         found = None
         foundOffset = 0
         foundEnd = 0
-        elements = self.elements
-        for i in range(len(elements)):
-            b = elements[i]
-            if b.id == searchElement.id:
+        for i, b in enumerate(self.elements):
+            if b is searchElement or b.id == searchElement.id:
                 found = i
-                foundOffset = self.elementOffset(elements[i])
-                foundEnd = foundOffset + elements[i].duration.quarterLength
-            elif b is searchElement:
-                found = i
-                foundOffset = self.elementOffset(elements[i])
-                foundEnd = foundOffset + elements[i].duration.quarterLength
+                foundOffset = self.elementOffset(b)
+                foundEnd = foundOffset + b.duration.quarterLength
         if found is None:
             raise StreamException('Could not find the element in the stream')
 
@@ -7122,9 +7116,9 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         qLenTotal = returnObj.duration.quarterLength
         elements = list(returnObj.getElementsByClass(objClass))
 
-        for i in range(len(elements) - 1):
-            span = returnObj.elementOffset(elements[i + 1]) - returnObj.elementOffset(elements[i])
-            elements[i].duration.quarterLength = span
+        for element, nextElement in zip(elements, elements[1:]):
+            span = returnObj.elementOffset(nextElement) - returnObj.elementOffset(element)
+            element.duration.quarterLength = span
 
         # handle last element
         if elements:
@@ -7386,11 +7380,9 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
                 if len(nLast.pitches) != len(nInner.pitches):
                     return False
 
-                for pitchIndex in range(len(nLast.pitches)):
+                for pLast, pInner in zip(nLast.pitches, nInner.pitches):
                     # check to see that each is the same pitch, but
                     # allow for `accidental is None` == `Accidental('natural')`
-                    pLast = nLast.pitches[pitchIndex]
-                    pInner = nInner.pitches[pitchIndex]
                     if pLast.step != pInner.step or not pLast.isEnharmonic(pInner):
                         return False
                 return True
@@ -10497,28 +10489,26 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
             return self.cloneEmpty(derivationMethod='melodicIntervals')
 
         returnStream = self.cloneEmpty(derivationMethod='melodicIntervals')
-        for i in range(len(returnList) - 1):
-            firstNote = returnList[i]
-            secondNote = returnList[i + 1]
+        for thisNote, nextNote in zip(returnList, returnList[1:]):
             # returnList could contain None to represent a rest
-            if firstNote is None or secondNote is None:
+            if thisNote is None or nextNote is None:
                 continue
             # Protect against empty chords
-            if not (firstNote.pitches and secondNote.pitches):
+            if not (thisNote.pitches and nextNote.pitches):
                 continue
-            if chord.Chord in firstNote.classSet:
-                noteStart = firstNote.notes[0]
+            if chord.Chord in thisNote.classSet:
+                noteStart = thisNote.notes[0]
             else:
-                noteStart = firstNote
-            if chord.Chord in secondNote.classSet:
-                noteEnd = secondNote.notes[0]
+                noteStart = thisNote
+            if chord.Chord in nextNote.classSet:
+                noteEnd = nextNote.notes[0]
             else:
-                noteEnd = secondNote
+                noteEnd = nextNote
             # Prefer Note objects over Pitch objects so that noteStart is set correctly
             returnInterval = interval.Interval(noteStart, noteEnd)
-            returnInterval.offset = opFrac(firstNote.offset + firstNote.quarterLength)
+            returnInterval.offset = opFrac(thisNote.offset + thisNote.quarterLength)
             returnInterval.duration = duration.Duration(opFrac(
-                secondNote.offset - returnInterval.offset))
+                nextNote.offset - returnInterval.offset))
             returnStream.insert(returnInterval)
 
         return returnStream
@@ -10607,10 +10597,9 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
 
         # create a list with an entry for each element
         # in each entry, provide indices of all other elements that overlap
-        overlapMap: list[list[int]] = [[] for dummy in range(len(durSpanSorted))]
+        overlapMap: list[list[int]] = [[] for _ in range(len(durSpanSorted))]
 
-        for i in range(len(durSpanSortedIndex)):
-            src = durSpanSortedIndex[i]
+        for i, src in enumerate(durSpanSortedIndex):
             for j in range(i + 1, len(durSpanSortedIndex)):
                 dst = durSpanSortedIndex[j]
                 if self._durSpanOverlap(src[1], dst[1]):
@@ -10639,12 +10628,10 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
             raise StreamException('layeringMap must be the same length as flatStream')
 
         post = {}
-        for i in range(len(layeringMap)):
-            indices = layeringMap[i]
+        for indices, srcElementObj in zip(layeringMap, flatStream):
             if not indices:
                 continue
 
-            srcElementObj = flatStream[i]
             srcOffset = srcElementObj.offset
             dstOffset = None
             # check indices
@@ -10657,7 +10644,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
                 for k in post:
                     # this comparison needs to be based on object id, not
                     # matching equality
-                    if id(elementObj) in [id(e) for e in post[k]]:
+                    if any(True for e in post[k] if e is elementObj):
                         # if elementObj in post[key]:
                         store = False
                         dstOffset = k
@@ -10670,14 +10657,12 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
                     post[dstOffset].append(elementObj)
 
             # check if this object has been stored anywhere yet
-            store = True
             for k in post:
-                if id(srcElementObj) in [id(e) for e in post[k]]:
+                if any(True for e in post[k] if e is srcElementObj):
                     # if srcElementObj in post[key]:
-                    store = False
                     break
-            # dst offset may have been set when looking at indices
-            if store:
+            else:
+                # dst offset may have been set when looking at indices
                 if dstOffset is None:
                     dstOffset = srcOffset
                 if dstOffset not in post:

@@ -4845,7 +4845,6 @@ class MeasureExporter(XMLExporterBase):
 
         # apply all expressions apart from arpeggios only to the first note of a chord.
         for expObj in chordOrNote.expressions:
-            mxExpression = None
             if isinstance(expObj, expressions.ArpeggioMark):
                 mxExpression = self.arpeggioMarkToMxExpression(
                     expObj, chordOrNote, noteIndexInChord
@@ -4879,10 +4878,10 @@ class MeasureExporter(XMLExporterBase):
         # only to first note of chord
         applicableArticulations: list[articulations.Articulation] = []
         fingeringNumber = 0
-        for a in chordOrNote.articulations:
-            if isinstance(a, articulations.Fingering):
+        for aObj in chordOrNote.articulations:
+            if isinstance(aObj, articulations.Fingering):
                 if fingeringNumber == noteIndexInChord:
-                    applicableArticulations.append(a)
+                    applicableArticulations.append(aObj)
                 fingeringNumber += 1
             elif isSingleNoteOrFirstInChord:
                 # Ignore hammer-on/pull-off:
@@ -4891,23 +4890,23 @@ class MeasureExporter(XMLExporterBase):
                 # array, and the musicxml importer doesn't put them here,
                 # but it's a potential point of user confusion, so we guard
                 # against it here to avoid writing out superfluous <other-technical>
-                if not isinstance(a, (articulations.HammerOn, articulations.PullOff)):
-                    applicableArticulations.append(a)
+                if not isinstance(aObj, (articulations.HammerOn, articulations.PullOff)):
+                    applicableArticulations.append(aObj)
 
-        for artObj in applicableArticulations:
-            if isinstance(artObj, articulations.Pizzicato):
+        for aObj in applicableArticulations:
+            if isinstance(aObj, articulations.Pizzicato):
                 continue
-            if isinstance(artObj, articulations.StringIndication) and artObj.number < 1:
+            if isinstance(aObj, articulations.StringIndication) and aObj.number < 1:
                 continue
-            if isinstance(artObj, articulations.TechnicalIndication):
+            if isinstance(aObj, articulations.TechnicalIndication):
                 if mxTechnicalMark is None:
                     mxTechnicalMark = Element('technical')
 
-                mxTechnicalMark.append(self.articulationToXmlTechnical(artObj))
+                mxTechnicalMark.append(self.articulationToXmlTechnical(aObj))
             else:
                 if mxArticulations is None:
                     mxArticulations = Element('articulations')
-                mxArticulations.append(self.articulationToXmlArticulation(artObj))
+                mxArticulations.append(self.articulationToXmlArticulation(aObj))
 
         # TODO: attrGroup: print-object (for individual notations)
         # TODO: editorial (hard! -- requires parsing again in order...)

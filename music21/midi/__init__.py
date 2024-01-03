@@ -220,11 +220,11 @@ def getNumbersAsList(midiBytes):
     [0, 0, 0, 3]
     '''
     post = []
-    for i in range(len(midiBytes)):
-        if common.isNum(midiBytes[i]):
-            post.append(midiBytes[i])
+    for midiByte in midiBytes:
+        if common.isNum(midiByte):
+            post.append(midiByte)
         else:
-            post.append(ord(midiBytes[i]))
+            post.append(ord(midiByte))
     return post
 
 

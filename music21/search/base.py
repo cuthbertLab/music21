@@ -1105,18 +1105,15 @@ def mostCommonMeasureRhythms(streamIn, transposeDiatonic=False):
                 'rhythmString': rhythmString,
             }
             measureNotes = thisMeasure.notes
-            foundNote = False
-            for i in range(len(measureNotes)):
-                if isinstance(measureNotes[i], note.Note):
+            for measureNote in measureNotes:
+                if isinstance(measureNote, note.Note):
                     distanceToTranspose = 72 - measureNotes[0].pitch.ps
-                    foundNote = True
+                    thisMeasureCopy = copy.deepcopy(thisMeasure)
+                    for n in thisMeasureCopy.notes:
+                        # TODO: Transpose Diatonic
+                        n.transpose(distanceToTranspose, inPlace=True)
+                    newDict['rhythm'] = thisMeasureCopy
                     break
-            if foundNote:
-                thisMeasureCopy = copy.deepcopy(thisMeasure)
-                for n in thisMeasureCopy.notes:
-                    # TODO: Transpose Diatonic
-                    n.transpose(distanceToTranspose, inPlace=True)
-                newDict['rhythm'] = thisMeasureCopy
             else:
                 newDict['rhythm'] = thisMeasure
             newDict['measures'] = [thisMeasure]
