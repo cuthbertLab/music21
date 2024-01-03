@@ -1437,22 +1437,14 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
             if hasattr(other, attr):
                 setattr(self, attr, getattr(other, attr))
 
-    @common.deprecated('v10', 'v11', 'Use `el in stream` instead of '
+    @common.deprecated('v9.3', 'v11', 'Use `el in stream` instead of '
                        '`stream.hasElement(el)`')
     def hasElement(self, obj: base.Music21Object) -> bool:
         '''
+        DEPRECATED: just use `el in stream` instead of `stream.hasElement(el)`
+
         Return True if an element, provided as an argument, is contained in
         this Stream.
-
-        This method is based on object equivalence, not parameter equivalence
-        of different objects.
-
-        >>> s = stream.Stream()
-        >>> n1 = note.Note('g')
-        >>> n2 = note.Note('g#')
-        >>> s.append(n1)
-        >>> s.hasElement(n1)
-        True
         '''
         return obj in self
 
@@ -1473,7 +1465,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         >>> s.hasElementOfClass('Measure')
         False
 
-        To be deprecated in v8 -- to be removed in v9, use:
+        To be deprecated in v10 -- to be removed in v11, use:
 
         >>> bool(s.getElementsByClass(meter.TimeSignature))
         True
@@ -1499,7 +1491,6 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         This method provides functionality like a shallow copy,
         but manages locations properly, only copies elements,
         and permits filtering by class type.
-
 
         >>> s1 = stream.Stream()
         >>> s2 = stream.Stream()
@@ -1567,8 +1558,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         Return the first matched index for
         the specified object.
 
-        Raises a StreamException if the object cannot
-        be found.
+        Raises a StreamException if the object cannot be found.
 
         >>> s = stream.Stream()
         >>> n1 = note.Note('G')

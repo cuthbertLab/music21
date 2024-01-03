@@ -10,7 +10,7 @@
 #               Ben Houge
 #               Mark Gotham
 #
-# Copyright:    Copyright © 2009-2023 Michael Scott Asato Cuthbert
+# Copyright:    Copyright © 2009-2024 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
@@ -62,9 +62,9 @@ def unbundleInstruments(streamIn: stream.Stream,
     >>> s2 = instrument.unbundleInstruments(s)
     >>> s2.show('text')
     {0.0} <music21.instrument.BassDrum 'Bass Drum'>
-    {0.0} <music21.note.Unpitched object at 0x...>
+    {0.0} <music21.note.Unpitched 'Bass Drum'>
     {1.0} <music21.instrument.Cowbell 'Cowbell'>
-    {1.0} <music21.note.Unpitched object at 0x...>
+    {1.0} <music21.note.Unpitched 'Cowbell'>
     '''
     if inPlace is True:
         s = streamIn
@@ -245,8 +245,8 @@ class Instrument(base.Music21Object):
         assigns the number to self.midiChannel and returns
         it as an int.
 
-        Note that midi channel 10 (9 in music21) is special, and
-        thus is skipped.
+        Note that the Percussion MIDI channel (9 in music21, 10 in 1-16 numbering) is special,
+        and thus is skipped.
 
         >>> used = [0, 1, 2, 3, 4, 5, 6, 7, 8, 10, 11]
         >>> i = instrument.Violin()
@@ -254,6 +254,13 @@ class Instrument(base.Music21Object):
         12
         >>> i.midiChannel
         12
+
+        Note that used is unchanged after calling this and would need to be updated manually
+
+        >>> used
+        [0, 1, 2, 3, 4, 5, 6, 7, 8, 10, 11]
+
+
 
         Unpitched percussion will be set to 9, so long as it's not in the filter list:
 
@@ -282,22 +289,25 @@ class Instrument(base.Music21Object):
         Get around this by assinging higher channels:
 
         >>> i.autoAssignMidiChannel(used2, maxMidi=32)
+        16
         >>> i.midiChannel
         16
 
-        Changed in v.9 -- usedChannelList is required, add maxMidi as an optional parameter.
+        * Changed in v.9 -- usedChannelList is required, add maxMidi as an optional parameter.
+            various small tweaks for corner cases.
         '''
         # NOTE: this is used in musicxml output, not in midi output
-        channelFilter = set(usedChannels)
+        channelFilter = frozenset(usedChannels)
 
-        if not channelFilter:
-            self.midiChannel = 0
-            return self.midiChannel
-        elif len(channelFilter) >= maxMidi:
-            raise InstrumentException('we are out of midi channels! help!')
-        elif 'UnpitchedPercussion' in self.classes:
+        if 'UnpitchedPercussion' in self.classes and 9 not in channelFilter:
             self.midiChannel = 9
             return self.midiChannel
+        elif not channelFilter:
+            self.midiChannel = 0
+            return self.midiChannel
+        elif len(channelFilter) >= maxMidi - 1:
+            # subtract one, since we are not using percussion channel (=9)
+            raise InstrumentException('we are out of midi channels! help!')
         else:
             for ch in range(maxMidi):
                 if ch in channelFilter:
