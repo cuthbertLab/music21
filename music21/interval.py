@@ -639,7 +639,7 @@ def convertSemitoneToSpecifierGeneric(count: int|float) -> tuple[Specifier, int]
     (<Specifier.MINOR>, 2)
     '''
     # strip off microtone
-    specifier, semitones, _cent_offset = convertSemitoneToSpecifierGenericMicrotone(count)
+    specifier, semitones, unused_cent_offset = convertSemitoneToSpecifierGenericMicrotone(count)
     return (specifier, semitones)
 
 
