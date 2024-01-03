@@ -40,9 +40,9 @@ environLocal = environment.Environment('test.multiprocessTest')
 
 @dataclasses.dataclass
 class ModuleResponse:
-    returnCode: str | None = None
+    returnCode: str|None = None
     fp: t.Any = None
-    moduleName: str | None = None
+    moduleName: str|None = None
     success: t.Any = None
     testRunner: t.Any = None
     errors: t.Any = None
@@ -151,7 +151,6 @@ def mainPoolRunner(testGroup=('test',), restoreEnvironmentDefaults=False, leaveO
     pathsToRun = modGather.modulePaths  # [30:60]
     # print(pathsToRun)
 
-    # pylint: disable=not-callable
     with multiprocessing.Pool(processes=poolSize) as pool:
 
         # imap returns the results as they are completed.

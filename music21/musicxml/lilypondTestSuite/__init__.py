@@ -6,7 +6,7 @@ and is a fork of
 http://lilypond.org/doc/v2.18/input/regression/musicxml/collated-files
 
 The test suite is licensed under the MIT license
-(https://opensource.org/licenses/mit-license.php)
+(https://opensource.org/license/mit/)
 and copyrighted by the Lilypond project.
 '''
 import unittest

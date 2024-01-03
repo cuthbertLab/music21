@@ -14,7 +14,7 @@ jobs:
         runs-on: ubuntu-latest
         strategy:
             matrix:
-                python-version: ["3.10.6", "3.10", "3.11"]  # "3.10" must be in quotes to not have it eval to 3.1
+                python-version: ["3.10", "3.11", "3.12"]  # "3.10" must be in quotes to not have it eval to 3.1
         steps:
         - uses: actions/setup-python@v4
           with:
@@ -27,7 +27,7 @@ jobs:
         - name: Run Main Test script
           run: python -c 'from music21.test.testSingleCoreAll import ciMain as ci; ci()'
         - name: Coveralls
-          if: ${{ matrix.python-version == '3.10.6' }}
+          if: ${{ matrix.python-version == '3.11' }}
           env:
               GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
               COVERALLS_SERVICE_NAME: github
@@ -40,7 +40,7 @@ jobs:
             - name: Set up Python
               uses: actions/setup-python@v4
               with:
-                  python-version: '3.10'
+                  python-version: '3.11'
                   cache: 'pip'
             - name: Install dependencies
               run: |
@@ -63,7 +63,7 @@ jobs:
             - name: Set up Python
               uses: actions/setup-python@v4
               with:
-                  python-version: '3.10'
+                  python-version: '3.11'
                   cache: 'pip'
             - name: Install dependencies
               run: |
@@ -83,7 +83,7 @@ jobs:
             - name: Set up Python
               uses: actions/setup-python@v4
               with:
-                  python-version: '3.10'
+                  python-version: '3.11'
                   cache: 'pip'
             - name: Install dependencies
               run: |

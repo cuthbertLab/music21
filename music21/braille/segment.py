@@ -120,8 +120,8 @@ excludeFromBrailleElements: list[type[base.Music21Object]] = [
 ]
 
 class GroupingGlobals(t.TypedDict):
-    keySignature: key.KeySignature | None
-    timeSignature: meter.TimeSignature | None
+    keySignature: key.KeySignature|None
+    timeSignature: meter.TimeSignature|None
 
 
 GROUPING_GLOBALS: GroupingGlobals = {
@@ -361,9 +361,9 @@ class BrailleSegment(text.BrailleText):
         self._groupingDict: dict[SegmentKey, BrailleElementGrouping] = {}
 
         self.groupingKeysToProcess: deque[SegmentKey] = deque()
-        self.currentGroupingKey: SegmentKey | None = None
-        self.previousGroupingKey: SegmentKey | None = None
-        self.lastNote: note.Note | None = None
+        self.currentGroupingKey: SegmentKey|None = None
+        self.previousGroupingKey: SegmentKey|None = None
+        self.lastNote: note.Note|None = None
 
         self.showClefSigns: bool = False
         self.upperFirstInNoteFingering: bool = True
@@ -597,7 +597,7 @@ class BrailleSegment(text.BrailleText):
         if self.currentGroupingKey is None:
             raise ValueError('currentGroupingKey must not be None to call extractInaccordGrouping')
         inaccords = self._groupingDict[self.currentGroupingKey]
-        last_clef: clef.Clef | None = None
+        last_clef: clef.Clef|None = None
         seen_voice: bool = False
         for music21VoiceOrClef in inaccords:
             if isinstance(music21VoiceOrClef, clef.Clef):
@@ -1098,8 +1098,8 @@ class BrailleGrandSegment(BrailleSegment, text.BrailleKeyboard):
     def __init__(self, lineLength: int = 40):
         BrailleSegment.__init__(self, lineLength=lineLength)
         text.BrailleKeyboard.__init__(self, lineLength=lineLength)
-        self.allKeyPairs: deque[tuple[SegmentKey | None,
-                                      SegmentKey | None]] = deque()
+        self.allKeyPairs: deque[tuple[SegmentKey|None,
+                                      SegmentKey|None]] = deque()
         self.previousGroupingPair = None
         self.currentGroupingPair = None
 
@@ -1409,7 +1409,7 @@ def findSegments(music21Part,
                  showFirstMeasureNumber=True,
                  showHand=None,
                  showHeading=True,
-                 showLongSlursAndTiesTogether: bool | None = None,
+                 showLongSlursAndTiesTogether: bool|None = None,
                  showShortSlursAndTiesTogether=False,
                  slurLongPhraseWithBrackets=True,
                  suppressOctaveMarks=False,
@@ -1585,7 +1585,7 @@ def prepareSlurredNotes(music21Part,
                         *,
                         slurLongPhraseWithBrackets=True,
                         showShortSlursAndTiesTogether=False,
-                        showLongSlursAndTiesTogether: bool | None = None,
+                        showLongSlursAndTiesTogether: bool|None = None,
                         ):
     '''
     Takes in a :class:`~music21.stream.Part` and three keywords:
@@ -1987,7 +1987,7 @@ def getRawSegments(music21Part,
 
 
 def extractBrailleElements(
-    music21MeasureOrVoice: stream.Measure | stream.Voice
+    music21MeasureOrVoice: stream.Measure|stream.Voice
 ) -> BrailleElementGrouping:
     '''
     Takes in a :class:`~music21.stream.Measure` or :class:`~music21.stream.Voice`
@@ -2032,7 +2032,7 @@ def extractBrailleElements(
     <music21.bar.Barline type=final>
     '''
     allElements = BrailleElementGrouping()
-    last_clef: clef.Clef | None = None
+    last_clef: clef.Clef|None = None
     for music21Object in music21MeasureOrVoice:
         # Hold the clef in memory in case the next object is a voice
         if isinstance(music21Object, clef.Clef):

@@ -9,7 +9,7 @@ _DOC_IGNORE_MODULE_OR_PACKAGE = True
 # from music21 import common
 # from music21 import *  # doing this because it will simplify the examples
 
-# note: this are temporarily commented out until they work
+# note: these are temporarily commented out until they work
 # add optional show argument to mask output for automated testing
 
 
@@ -218,16 +218,16 @@ class Test(unittest.TestCase):
     #     else:
     #         return 'dips win'
 
-    def xtest009(self):
-        '''
-        Are lower pitches likely to be shorter and higher pitches likely to be longer?
-        '''
-        partStream = music21.converter.parse('dichterliebe1.xml')
-        unused_noteStream = partStream['notes']
-        # unused_table = analysis.correlate(noteStream, 'pitchSpace', 'duration')
-
-        # we must examine and interpolate the table in order to distinguish
-        # trends
+    # def xtest009(self):
+    #     '''
+    #     Are lower pitches likely to be shorter and higher pitches likely to be longer?
+    #     '''
+    #     partStream = music21.converter.parse('dichterliebe1.xml')
+    #     unused_noteStream = partStream['notes']
+    #     # unused_table = analysis.correlate(noteStream, 'pitchSpace', 'duration')
+    #
+    #     # we must examine and interpolate the table in order to distinguish
+    #     # trends
 
     # def xtest010(self):
     #     '''
@@ -271,22 +271,22 @@ class Test(unittest.TestCase):
     #     '''
     #     pass
 
-    def xtest015(self):
-        '''
-        Calculate harmonic intervals ignoring unisons.
-        '''
-        from collections import defaultdict
-        score1 = music21.converter.parse('dichterliebe1.xml')
-        monoScore = score1.chordsToNotes()    # returns a new Stream
-        unused_notePairs = monoScore.getAllSimultaneousNotes()
-        # returns a list of Tuples intervals = interval.generateFromNotePairs(notePairs)
-        intervals2 = defaultdict(lambda: 0)
-        for thisInt in intervals2:
-            if thisInt.name != 'P1':
-                intervals2[thisInt.name] += 1
-
-        for key in intervals2.keys().sort(key='simpleName'):
-            print(key, intervals2[key])
+    # def xtest015(self):
+    #     '''
+    #     Calculate harmonic intervals ignoring unisons.
+    #     '''
+    #     from collections import defaultdict
+    #     score1 = music21.converter.parse('dichterliebe1.xml')
+    #     monoScore = score1.chordsToNotes()    # returns a new Stream
+    #     unused_notePairs = monoScore.getAllSimultaneousNotes()
+    #     # returns a list of Tuples intervals = interval.generateFromNotePairs(notePairs)
+    #     intervals2 = defaultdict(lambda: 0)
+    #     for thisInt in intervals2:
+    #         if thisInt.name != 'P1':
+    #             intervals2[thisInt.name] += 1
+    #
+    #     for key in intervals2.keys().sort(key='simpleName'):
+    #         print(key, intervals2[key])
 
     def test016(self):
         '''

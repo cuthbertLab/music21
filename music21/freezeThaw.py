@@ -105,7 +105,7 @@ class StreamFreezeThawBase:
     def __init__(self):
         self.stream = None
 
-    def getPickleFp(self, directory: str | pathlib.Path) -> pathlib.Path:
+    def getPickleFp(self, directory: str|pathlib.Path) -> pathlib.Path:
         if not isinstance(directory, pathlib.Path):
             directory = pathlib.Path(directory)
 
@@ -113,7 +113,7 @@ class StreamFreezeThawBase:
         streamStr = str(time.time())
         return directory / ('m21-' + common.getMd5(streamStr) + '.p')
 
-    def getJsonFp(self, directory: str | pathlib.Path) -> pathlib.Path:
+    def getJsonFp(self, directory: str|pathlib.Path) -> pathlib.Path:
         return self.getPickleFp(directory).with_suffix('.p.json')
 
 
@@ -1193,8 +1193,8 @@ class Test(unittest.TestCase):
         sf.setupSerializationScaffold()
 
         # test safety
-        self.assertTrue(s2.hasElement(n1))
-        self.assertTrue(s1.hasElement(n1))
+        self.assertTrue(n1 in s2)
+        self.assertTrue(n1 in s1)
 
     def testJSONPickleSpanner(self):
         from music21 import converter

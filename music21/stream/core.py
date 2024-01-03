@@ -168,7 +168,7 @@ class StreamCore(Music21Object):
     def coreSetElementOffset(
         self,
         element: Music21Object,
-        offset: int | float | Fraction | OffsetSpecial,
+        offset: int|float|Fraction|OffsetSpecial,
         *,
         addElement=False,
         setActiveSite=True
@@ -212,7 +212,7 @@ class StreamCore(Music21Object):
         *,
         updateIsFlat: bool = True,
         clearIsSorted: bool = True,
-        memo: list[int] | None = None,
+        memo: list[int]|None = None,
         keepIndex: bool = False,
     ) -> None:
         '''
@@ -334,32 +334,6 @@ class StreamCore(Music21Object):
         if recurse and deep and isinstance(post, stream.Stream):
             post.setDerivationMethod(methodName, recurse=True)
         return post
-
-    def coreHasElementByMemoryLocation(self, objId: int) -> bool:
-        '''
-        NB -- a "core" stream method that is not necessary for most users. use hasElement(obj)
-
-        Return True if an element object id, provided as an argument, is contained in this Stream.
-
-        >>> s = stream.Stream()
-        >>> n1 = note.Note('g')
-        >>> n2 = note.Note('g#')
-        >>> s.append(n1)
-        >>> s.coreHasElementByMemoryLocation(id(n1))
-        True
-        >>> s.coreHasElementByMemoryLocation(id(n2))
-        False
-        '''
-        if objId in self._offsetDict:
-            return True
-
-        for e in self._elements:
-            if id(e) == objId:  # pragma: no cover
-                return True
-        for e in self._endElements:
-            if id(e) == objId:  # pragma: no cover
-                return True
-        return False
 
     def coreGetElementByMemoryLocation(self, objId):
         '''
@@ -572,8 +546,8 @@ class StreamCore(Music21Object):
         recurse: bool = True,
         requireAllPresent: bool = True,
         insert: bool = True,
-        constrainingSpannerBundle: spanner.SpannerBundle | None = None
-    ) -> list[spanner.Spanner] | None:
+        constrainingSpannerBundle: spanner.SpannerBundle|None = None
+    ) -> list[spanner.Spanner]|None:
         '''
         find all spanners that are referenced by elements in the
         (recursed if recurse=True) stream and either inserts them in the Stream
@@ -718,7 +692,7 @@ class StreamCore(Music21Object):
         {1.0} <music21.note.Note D>
         '''
         sb = self.spannerBundle
-        sIter: StreamIterator | RecursiveIterator
+        sIter: StreamIterator|RecursiveIterator
         if recurse is True:
             sIter = self.recurse()  # type: ignore
         else:

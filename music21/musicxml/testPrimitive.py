@@ -2328,10 +2328,10 @@ notations32a = '''<?xml version="1.0" encoding="UTF-8"?>
     </measure>
 
     <!-- Articulations:
-            accent | strong-accent | staccato | tenuto |
+            accent|strong-accent | staccato | tenuto |
             detached-legato | staccatissimo | spiccato |
             scoop | plop | doit | falloff | breath-mark |
-            caesura | stress | unstress | other-articulation -->
+            caesura|stress | unstress | other-articulation -->
     <measure number="3">
       <note>
         <pitch>
@@ -20048,7 +20048,7 @@ ALL = [
 ]
 
 
-def get(contentRequest):
+def get(contentRequest: str) -> str:
     '''
     Get test material by type of content
 
@@ -20064,6 +20064,8 @@ def get(contentRequest):
         return beams02
     elif contentRequest in ['tremolos']:
         return tremoloTest
+    else:
+        raise ValueError(f'cannot find contentRequest: {contentRequest}')
 
 
 # ------------------------------------------------------------------------------

@@ -40,12 +40,12 @@ def getCoverage(overrideVersion=False):
     # (The odds of a failure on the middle version are low if
     # the newest and oldest are passing)
     #
-    # Note the .minor == 10 -- that makes it only run on 3.10.6
+    # Note the .minor == 11 -- that makes it only run on 3.11
     #
     # When changing the version, be sure also to change
     # .github/maincheck.yml's line:
-    #           if: ${{ matrix.python-version == '3.10' }}
-    if overrideVersion or (sys.version_info.minor == 10 and sys.version_info.micro == 6):
+    #           if: ${{ matrix.python-version == '3.11' }}
+    if overrideVersion or sys.version_info.minor == 11:
         try:
             # noinspection PyPackageRequirements
             import coverage  # type: ignore

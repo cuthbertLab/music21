@@ -46,7 +46,7 @@ environLocal = environment.Environment('instrument')
 
 def unbundleInstruments(streamIn: stream.Stream,
                         *,
-                        inPlace=False) -> stream.Stream | None:
+                        inPlace=False) -> stream.Stream|None:
     # noinspection PyShadowingNames
     '''
     takes a :class:`~music21.stream.Stream` that has :class:`~music21.note.NotRest` objects
@@ -85,7 +85,7 @@ def unbundleInstruments(streamIn: stream.Stream,
 
 def bundleInstruments(streamIn: stream.Stream,
                       *,
-                      inPlace=False) -> stream.Stream | None:
+                      inPlace=False) -> stream.Stream|None:
     # noinspection PyShadowingNames
     '''
     >>> up1 = note.Unpitched()
@@ -150,32 +150,32 @@ class Instrument(base.Music21Object):
     '''
     classSortOrder = -25
 
-    def __init__(self, instrumentName: str | None = None, **keywords):
+    def __init__(self, instrumentName: str|None = None, **keywords):
         super().__init__(**keywords)
 
-        self.partId: str | None = None
+        self.partId: str|None = None
         self._partIdIsRandom = False
 
-        self.partName: str | None = None
-        self.partAbbreviation: str | None = None
+        self.partName: str|None = None
+        self.partAbbreviation: str|None = None
 
-        self.printPartName: bool | None = None  # True = yes, False = no, None = let others decide
-        self.printPartAbbreviation: bool | None = None
+        self.printPartName: bool|None = None  # True = yes, False = no, None = let others decide
+        self.printPartAbbreviation: bool|None = None
 
-        self.instrumentId: str | None = None  # apply to midi and instrument
+        self.instrumentId: str|None = None  # apply to midi and instrument
         self._instrumentIdIsRandom = False
 
-        self.instrumentName: str | None = instrumentName
-        self.instrumentAbbreviation: str | None = None
-        self.midiProgram: int | None = None  # 0-indexed
-        self.midiChannel: int | None = None  # 0-indexed
-        self.instrumentSound: str | None = None
+        self.instrumentName: str|None = instrumentName
+        self.instrumentAbbreviation: str|None = None
+        self.midiProgram: int|None = None  # 0-indexed
+        self.midiChannel: int|None = None  # 0-indexed
+        self.instrumentSound: str|None = None
 
-        self.lowestNote: pitch.Pitch | None = None
-        self.highestNote: pitch.Pitch | None = None
+        self.lowestNote: pitch.Pitch|None = None
+        self.highestNote: pitch.Pitch|None = None
 
         # define interval to go from written to sounding
-        self.transposition: interval.Interval | None = None
+        self.transposition: interval.Interval|None = None
 
         self.inGMPercMap = False
         self.soundfontFn = None  # if defined...

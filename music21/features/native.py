@@ -114,7 +114,7 @@ class QualityFeature(featuresModule.FeatureExtractor):
             raise ValueError('Cannot process without a data instance or feature.')
 
         allKeys = self.data['flat.getElementsByClass(Key)']
-        keyFeature: int | None = None
+        keyFeature: int|None = None
         if len(allKeys) == 1:
             k0 = allKeys[0]
             if k0.mode == 'major':
@@ -480,7 +480,7 @@ class MostCommonSetClassSimultaneityPrevalence(featuresModule.FeatureExtractor):
     >>> s2 = corpus.parse('schoenberg/opus19', 6)
     >>> fe2 = features.native.MostCommonSetClassSimultaneityPrevalence(s2)
     >>> fe2.extract().vector
-    [0.228...]
+    [0.235...]
     '''
     id = 'CS4'
 
@@ -663,7 +663,7 @@ class TriadSimultaneityPrevalence(featuresModule.FeatureExtractor):
     >>> s2 = corpus.parse('schoenberg/opus19', 2)
     >>> fe2 = features.native.TriadSimultaneityPrevalence(s2)
     >>> fe2.extract().vector
-    [0.021739...]
+    [0.02272727...]
     '''
     id = 'CS9'
 

@@ -44,6 +44,7 @@ import typing as t
 from enum import IntEnum
 
 from music21 import common
+from music21 import defaults
 from music21 import environment
 from music21 import exceptions21
 from music21 import prebase
@@ -219,11 +220,11 @@ def getNumbersAsList(midiBytes):
     [0, 0, 0, 3]
     '''
     post = []
-    for i in range(len(midiBytes)):
-        if common.isNum(midiBytes[i]):
-            post.append(midiBytes[i])
+    for midiByte in midiBytes:
+        if common.isNum(midiByte):
+            post.append(midiByte)
         else:
-            post.append(ord(midiBytes[i]))
+            post.append(ord(midiByte))
     return post
 
 
@@ -351,8 +352,7 @@ class _ContainsEnum(IntEnum):
 
     @classmethod
     def hasValue(cls, val):
-        # https://github.com/PyCQA/pylint/issues/3941
-        return val in cls._value2member_map_  # pylint: disable=no-member
+        return val in cls._value2member_map_
 
 
 class ChannelVoiceMessages(_ContainsEnum):
@@ -400,6 +400,7 @@ class MetaEvents(_ContainsEnum):
     TIME_SIGNATURE = 0x58
     KEY_SIGNATURE = 0x59
     SEQUENCER_SPECIFIC_META_EVENT = 0x7F
+    UNKNOWN = 0xFF  # Container for any unknown code
 
 
 class SysExEvents(_ContainsEnum):
@@ -466,31 +467,31 @@ class MidiEvent(prebase.ProtoM21Object):
     '''
     # pylint: disable=redefined-builtin
     def __init__(self,
-                 track: MidiTrack | None = None,
+                 track: MidiTrack|None = None,
                  type=None,
                  time: int = 0,
-                 channel: int | None = None):
-        self.track: MidiTrack | None = track  # a MidiTrack object
+                 channel: int|None = None):
+        self.track: MidiTrack|None = track  # a MidiTrack object
         self.type = type
         self.time: int = time
-        self.channel: int | None = channel
+        self.channel: int|None = channel
 
-        self.parameter1: int | bytes | None = None  # pitch or first data value
-        self.parameter2: int | bytes | None = None  # velocity or second data value
+        self.parameter1: int|bytes|None = None  # pitch or first data value
+        self.parameter2: int|bytes|None = None  # velocity or second data value
 
         # data is a property...
 
         # if this is a Note on/off, need to store original
         # pitch space value in order to determine if this has a microtone
-        self.centShift: int | None = None
+        self.centShift: int|None = None
 
         # store a reference to a corresponding event
         # if a noteOn, store the note off, and vice versa
         # circular ref -- but modern Python will garbage collect it.
-        self.correspondingEvent: MidiEvent | None = None
+        self.correspondingEvent: MidiEvent|None = None
 
         # store and pass on a running status if found
-        self.lastStatusByte: int | None = None
+        self.lastStatusByte: int|None = None
 
     @property
     def sortOrder(self) -> int:
@@ -890,8 +891,8 @@ class MidiEvent(prebase.ProtoM21Object):
             # and process as before
             midiBytes = rsb + midiBytes
             byte0 = midiBytes[0]
-        else:
-            # store last status byte
+        elif midiBytes[0] != 0xff:
+            # store last status byte, unless it's a meta message
             self.lastStatusByte = midiBytes[0]
 
         msgType: int = byte0 & 0xF0  # bitwise and to derive message type w/o channel
@@ -914,11 +915,12 @@ class MidiEvent(prebase.ProtoM21Object):
 
         # SEQUENCE_TRACK_NAME and other MetaEvents are here
         elif byte0 == METAEVENT_MARKER:  # 0xFF
-            if not MetaEvents.hasValue(byte1):
-                environLocal.printDebug([f'unknown meta event: FF {byte1:02X}'])
-                sys.stdout.flush()
-                raise MidiException(f'Unknown midi event type: FF {byte1:02X}')
-            self.type = MetaEvents(byte1)
+            if MetaEvents.hasValue(byte1):
+                self.type = MetaEvents(byte1)
+            else:
+                # environLocal.printDebug([f'unknown meta event: FF {byte1:02X}'])
+                # sys.stdout.flush()
+                self.type = MetaEvents.UNKNOWN
             length, midiBytesAfterLength = getVariableLengthNumber(midiBytes[2:])
             self.data = midiBytesAfterLength[:length]
             # return remainder
@@ -1516,7 +1518,7 @@ class MidiFile(prebase.ProtoM21Object):
     Most midi files store `ticksPerQuarterNote` and not `ticksPerSecond`
 
     >>> mf.ticksPerQuarterNote
-    1024
+    10080
     >>> mf.ticksPerSecond is None
     True
 
@@ -1531,7 +1533,7 @@ class MidiFile(prebase.ProtoM21Object):
         self.file = None
         self.format = 1
         self.tracks = []
-        self.ticksPerQuarterNote = 1024
+        self.ticksPerQuarterNote = defaults.ticksPerQuarter
         self.ticksPerSecond = None
 
     def open(self, filename, attrib='rb'):
@@ -1985,6 +1987,13 @@ class Test(unittest.TestCase):
                             if e.type == ChannelVoiceMessages.POLYPHONIC_KEY_PRESSURE][0]
         self.assertEqual(pressureEventRead.parameter1, 60)
         self.assertEqual(pressureEventRead.parameter2, 90)
+
+    def testReadUnknownMetaMessage(self):
+        mt = MidiTrack()
+        mt.processDataToEvents(b'\x00\xff\x08\x06DUMMY\x00\x00\xff\n\x05Myut\x00'
+                               + b'\x00\xffX\x04\x03\x01\x12\x01')
+        self.assertEqual(len(mt.events), 6)
+        self.assertEqual(mt.events[3].type, MetaEvents.UNKNOWN)
 
 
 # ------------------------------------------------------------------------------

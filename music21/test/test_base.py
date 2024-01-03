@@ -570,14 +570,14 @@ class Test(unittest.TestCase):
         n2 = copy.deepcopy(n1)
         self.assertEqual(id(n2.derivation.origin), id(n1))
 
-    def testHasElement(self):
+    def testContains(self):
         n1 = note.Note()
         s1 = stream.Stream()
         s1.append(n1)
         s2 = copy.deepcopy(s1)
         n2 = s2[0]  # this is a new instance; not the same as n1
-        self.assertFalse(s2.hasElement(n1))
-        self.assertTrue(s2.hasElement(n2))
+        self.assertFalse(n1 in s2)
+        self.assertTrue(n2 in s2)
 
         self.assertFalse(s1 in n2.sites)
         self.assertTrue(s2 in n2.sites)
@@ -622,7 +622,7 @@ class Test(unittest.TestCase):
             s.insert(i, el)
 
         for ew in storage:
-            self.assertTrue(s.hasElement(ew))
+            self.assertTrue(ew in s)
 
         match = [e.getOffsetBySite(s) for e in storage]
         self.assertEqual(match, [0.0, 1.0])
@@ -648,7 +648,7 @@ class Test(unittest.TestCase):
             s.insert(i, el)
 
         for ew in storage:
-            self.assertTrue(s.hasElement(ew))
+            self.assertTrue(ew in s)
 
         matchOffset = []
         matchBeatStrength = []

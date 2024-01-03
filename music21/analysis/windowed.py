@@ -244,9 +244,9 @@ class WindowedAnalysis:
 
 
     def process(self,
-                minWindow: int | None = 1,
-                maxWindow: int | None = 1,
-                windowStepSize: int | str = 1,
+                minWindow: int|None = 1,
+                maxWindow: int|None = 1,
+                windowStepSize: int|str = 1,
                 windowType='overlap',
                 includeTotalWindow=True):
         # noinspection PyShadowingNames

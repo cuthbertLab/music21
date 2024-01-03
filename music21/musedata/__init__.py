@@ -789,8 +789,8 @@ class MuseDataPart(prebase.ProtoM21Object):
         attributes record starting with a $; if not found, it is stage 1. if it is found
         it is stage 2.
         '''
-        for i in range(len(self.src)):
-            if self.src[i].startswith('$'):
+        for attribute in self.src:
+            if attribute.startswith('$'):
                 return 2
         return 1
 

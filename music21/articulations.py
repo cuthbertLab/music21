@@ -148,7 +148,7 @@ class Articulation(base.Music21Object):
         self._volumeShift: float = 0.0
         self.lengthShift: float = 1.0
         self.tieAttach: str = 'first'  # attach to first or last or all notes after split
-        self.displayText: str | None = None
+        self.displayText: str|None = None
 
     def _reprInternal(self):
         return ''
@@ -582,7 +582,7 @@ class PullOff(spanner.Spanner, TechnicalIndication):
     pass
 
 class FretBend(FretIndication):
-    bendAlter: interval.IntervalBase | None = None
+    bendAlter: interval.IntervalBase|None = None
     preBend: t.Any = None
     release: t.Any = None
     withBar: t.Any = None

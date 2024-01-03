@@ -260,14 +260,13 @@ class ElementNode(core.AVLNode):
 
         Returns None.
         '''
-        pos = self.position
-        if isinstance(pos, SortTuple):
-            pos = pos.offset
-
         try:
             endTimeLow = self.payload.endTime
             endTimeHigh = endTimeLow
         except AttributeError:  # elements do not have endTimes. do NOT mix elements and timespans.
+            pos = self.position
+            if isinstance(pos, SortTuple):
+                pos = pos.offset
             endTimeLow = pos + self.payload.duration.quarterLength
             endTimeHigh = endTimeLow
 
