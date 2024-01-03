@@ -140,7 +140,7 @@ class FeatureExtractor:
                  **keywords
                  ) -> None:
         self.stream = None  # the original Stream, or None
-        self.data: DataInstance | None = None  # a DataInstance object: use to get data
+        self.data: DataInstance|None = None  # a DataInstance object: use to get data
         self.setData(dataOrStream)
 
         self.feature = None  # Feature object that results from processing

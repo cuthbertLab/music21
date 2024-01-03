@@ -19,10 +19,10 @@ from music21.common.enums import OffsetSpecial
 if t.TYPE_CHECKING:
     import music21
 
-DocOrder = list[str | Callable]
-OffsetQL = float | Fraction
-OffsetQLSpecial = float | Fraction | OffsetSpecial
-OffsetQLIn = int | float | Fraction
+DocOrder = list[str|Callable]
+OffsetQL = float|Fraction
+OffsetQLSpecial = float|Fraction|OffsetSpecial
+OffsetQLIn = int|float|Fraction
 
 StreamType = t.TypeVar('StreamType', bound='music21.stream.Stream')
 StreamType2 = t.TypeVar('StreamType2', bound='music21.stream.Stream')

@@ -1051,7 +1051,7 @@ class HorizontalBar(primitives.GraphHorizontalBar, PlotStreamMixin):
 
     def __init__(
         self,
-        streamObj: stream.Stream | None = None,
+        streamObj: stream.Stream|None = None,
         *,
         colorByPart=False,
         **keywords

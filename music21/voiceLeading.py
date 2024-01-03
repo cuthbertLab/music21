@@ -98,11 +98,11 @@ class VoiceLeadingQuartet(base.Music21Object):
 
     def __init__(
         self,
-        v1n1: None | str | note.Note | pitch.Pitch = None,
-        v1n2: None | str | note.Note | pitch.Pitch = None,
-        v2n1: None | str | note.Note | pitch.Pitch = None,
-        v2n2: None | str | note.Note | pitch.Pitch = None,
-        analyticKey: key.Key | None = None,
+        v1n1: None|str|note.Note|pitch.Pitch = None,
+        v1n2: None|str|note.Note|pitch.Pitch = None,
+        v2n1: None|str|note.Note|pitch.Pitch = None,
+        v2n2: None|str|note.Note|pitch.Pitch = None,
+        analyticKey: key.Key|None = None,
         **keywords
     ):
         super().__init__(**keywords)
@@ -209,7 +209,7 @@ class VoiceLeadingQuartet(base.Music21Object):
 
     def _setVoiceNote(
         self,
-        value: None | str | note.Note | pitch.Pitch,
+        value: None|str|note.Note|pitch.Pitch,
         which: t.Literal['_v1n1', '_v1n2', '_v2n1', '_v2n2']
     ):
         if value is None:
@@ -230,10 +230,10 @@ class VoiceLeadingQuartet(base.Music21Object):
                     f'not a valid note specification: {value!r}'
                 ) from e
 
-    def _getV1n1(self) -> None | note.Note:
+    def _getV1n1(self) -> None|note.Note:
         return self._v1n1
 
-    def _setV1n1(self, value: None | str | note.Note | pitch.Pitch):
+    def _setV1n1(self, value: None|str|note.Note|pitch.Pitch):
         self._setVoiceNote(value, '_v1n1')
 
     v1n1 = property(_getV1n1, _setV1n1, doc='''
@@ -244,10 +244,10 @@ class VoiceLeadingQuartet(base.Music21Object):
         <music21.note.Note C>
         ''')
 
-    def _getV1n2(self) -> None | note.Note:
+    def _getV1n2(self) -> None|note.Note:
         return self._v1n2
 
-    def _setV1n2(self, value: None | str | note.Note | pitch.Pitch):
+    def _setV1n2(self, value: None|str|note.Note|pitch.Pitch):
         self._setVoiceNote(value, '_v1n2')
 
     v1n2 = property(_getV1n2, _setV1n2, doc='''
@@ -258,10 +258,10 @@ class VoiceLeadingQuartet(base.Music21Object):
         <music21.note.Note D>
         ''')
 
-    def _getV2n1(self) -> None | note.Note:
+    def _getV2n1(self) -> None|note.Note:
         return self._v2n1
 
-    def _setV2n1(self, value: None | str | note.Note | pitch.Pitch):
+    def _setV2n1(self, value: None|str|note.Note|pitch.Pitch):
         self._setVoiceNote(value, '_v2n1')
 
     v2n1 = property(_getV2n1, _setV2n1, doc='''
@@ -272,10 +272,10 @@ class VoiceLeadingQuartet(base.Music21Object):
         <music21.note.Note E>
         ''')
 
-    def _getV2n2(self) -> None | note.Note:
+    def _getV2n2(self) -> None|note.Note:
         return self._v2n2
 
-    def _setV2n2(self, value: None | str | note.Note | pitch.Pitch):
+    def _setV2n2(self, value: None|str|note.Note|pitch.Pitch):
         self._setVoiceNote(value, '_v2n2')
 
     v2n2 = property(_getV2n2, _setV2n2, doc='''
@@ -1441,7 +1441,7 @@ class Verticality(base.Music21Object):
             in a single part)''',
     }
 
-    def __init__(self, contentDict: dict | None = None, **keywords):
+    def __init__(self, contentDict: dict|None = None, **keywords):
         super().__init__(**keywords)
         if contentDict is None:
             contentDict = {}

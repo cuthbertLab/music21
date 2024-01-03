@@ -57,7 +57,7 @@ VALID_AUTO_DOWNLOAD = ['ask', 'deny', 'allow']
 # ------------------------------------------------------------------------------
 
 
-def findSubConverterForFormat(fmt: str) -> type[SubConverter] | None:
+def findSubConverterForFormat(fmt: str) -> type[SubConverter]|None:
     '''
     return a converter.subConverter.SubConverter subclass
     for a given format -- this is a music21 format name,

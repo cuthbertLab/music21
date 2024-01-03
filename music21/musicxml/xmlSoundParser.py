@@ -59,7 +59,7 @@ class SoundTagMixin:
     def setSound(
         self,
         mxSound: ET.Element,
-        mxDir: ET.Element | None,
+        mxDir: ET.Element|None,
         staffKey: int,
         totalOffset: float
     ) -> None:
@@ -96,7 +96,7 @@ class SoundTagMixin:
     def setSoundTempo(
         self,
         mxSound: ET.Element,
-        mxDir: ET.Element | None,
+        mxDir: ET.Element|None,
         staffKey: int,
         totalOffset: float
     ) -> None:

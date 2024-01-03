@@ -2328,10 +2328,10 @@ notations32a = '''<?xml version="1.0" encoding="UTF-8"?>
     </measure>
 
     <!-- Articulations:
-            accent | strong-accent | staccato | tenuto |
+            accent|strong-accent | staccato | tenuto |
             detached-legato | staccatissimo | spiccato |
             scoop | plop | doit | falloff | breath-mark |
-            caesura | stress | unstress | other-articulation -->
+            caesura|stress | unstress | other-articulation -->
     <measure number="3">
       <note>
         <pitch>

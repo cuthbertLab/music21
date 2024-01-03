@@ -1739,7 +1739,7 @@ class Expander(t.Generic[StreamType]):
             return post
         return None
 
-    def isExpandable(self) -> bool | None:
+    def isExpandable(self) -> bool|None:
         '''
         Return True or False if this Stream is expandable, that is,
         if it has balanced repeats or sensible Da Capo or Dal Segno

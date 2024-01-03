@@ -38,7 +38,7 @@ if t.TYPE_CHECKING:
     from music21 import stream
 
 
-_metadataBundles: dict[str, bundles.MetadataBundle | None] = {
+_metadataBundles: dict[str, bundles.MetadataBundle|None] = {
     'core': None,
     'local': None,
     # 'virtual': None,
@@ -123,11 +123,11 @@ def iterateCorpora(returnObjects=True):
 
 
 def getWork(
-    workName: str | pathlib.Path,
-    movementNumber: int | None = None,
+    workName: str|pathlib.Path,
+    movementNumber: int|None = None,
     *,
     fileExtensions: Iterable[str] = (),
-) -> pathlib.Path | list[pathlib.Path]:
+) -> pathlib.Path|list[pathlib.Path]:
     '''
     this parse function is called from `corpus.parse()` and does nothing differently from it.
 
@@ -178,14 +178,14 @@ def getWork(
 # pylint: disable=redefined-builtin
 # noinspection PyShadowingBuiltins
 def parse(
-    workName: str | pathlib.Path,
+    workName: str|pathlib.Path,
     *,
-    movementNumber: int | None = None,
-    number: int | None = None,
+    movementNumber: int|None = None,
+    number: int|None = None,
     fileExtensions: Iterable[str] = (),
     forceSource: bool = False,
-    format: str | None = None,
-) -> stream.Score | stream.Part | stream.Opus:
+    format: str|None = None,
+) -> stream.Score|stream.Part|stream.Opus:
     filePaths = getWork(
         workName=workName,
         movementNumber=movementNumber,
@@ -236,11 +236,11 @@ def _addCorpusFilePathToStreamObject(streamObj, filePath):
 
 
 def search(
-    query: str | None = None,
-    field: str | None = None,
+    query: str|None = None,
+    field: str|None = None,
     *,
     corpusNames=None,
-    fileExtensions: Iterable[str] | str = (),
+    fileExtensions: Iterable[str]|str = (),
     **keywords
 ):
     '''

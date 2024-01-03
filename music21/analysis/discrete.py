@@ -79,7 +79,7 @@ class DiscreteAnalysis:
         # store alternative solutions, which may be sorted or not
         self.alternativeSolutions = []
 
-    def _rgbToHex(self, rgb: Sequence[float | int]) -> str:
+    def _rgbToHex(self, rgb: Sequence[float|int]) -> str:
         '''
         Utility conversion method
 
@@ -389,7 +389,7 @@ class KeyWeightKeyAnalysis(DiscreteAnalysis):
                 solution[i] += (toneWeights[(j - i) % 12] * pcDistribution[j])
         return solution
 
-    def _getLikelyKeys(self, keyResults, differences) -> list[t.Any] | None:
+    def _getLikelyKeys(self, keyResults, differences) -> list[t.Any]|None:
         ''' Takes in a list of probable key results in points and returns a
             list of keys in letters, sorted from most likely to least likely.
         '''
@@ -407,7 +407,7 @@ class KeyWeightKeyAnalysis(DiscreteAnalysis):
             # environLocal.printDebug(['added likely key', likelyKeys[pc]])
         return likelyKeys
 
-    def _getDifference(self, keyResults, pcDistribution, weightType) -> None | list[int | float]:
+    def _getDifference(self, keyResults, pcDistribution, weightType) -> None|list[int|float]:
         '''
         Takes in a list of numerical probable key results and returns the
         difference of the top two keys.
@@ -416,7 +416,7 @@ class KeyWeightKeyAnalysis(DiscreteAnalysis):
         if keyResults is None:
             return None
 
-        solution: list[int | float] = [0.0] * 12
+        solution: list[int|float] = [0.0] * 12
         top = [0.0] * 12
         bottomRight = [0.0] * 12
         bottomLeft = [0.0] * 12
@@ -951,12 +951,12 @@ class Ambitus(DiscreteAnalysis):
     # provide possible string matches for this processor
     identifiers = ['ambitus', 'span']
 
-    def __init__(self, referenceStream: stream.Stream | None = None):
+    def __init__(self, referenceStream: stream.Stream|None = None):
         super().__init__(referenceStream=referenceStream)
         # Store the min and max Pitch instances for referenceStream
         # set by getPitchSpan(), which is called by _generateColors()
-        self.minPitchObj: pitch.Pitch | None = None
-        self.maxPitchObj: pitch.Pitch | None = None
+        self.minPitchObj: pitch.Pitch|None = None
+        self.maxPitchObj: pitch.Pitch|None = None
 
         self._pitchSpanColors: OrderedDict[int, str] = OrderedDict()
         self._generateColors()
@@ -1004,7 +1004,7 @@ class Ambitus(DiscreteAnalysis):
 
         # environLocal.printDebug([self._pitchSpanColors])
 
-    def getPitchSpan(self, subStream) -> tuple[pitch.Pitch, pitch.Pitch] | None:
+    def getPitchSpan(self, subStream) -> tuple[pitch.Pitch, pitch.Pitch]|None:
         '''
         For a given subStream, return a tuple consisting of the two pitches
         with the minimum and maximum pitch space value.
@@ -1337,7 +1337,7 @@ def analyzeStream(
         # this synonym is being added for compatibility
         method = 'span'
 
-    analysisClassName: type[DiscreteAnalysis] | None = analysisClassFromMethodName(method)
+    analysisClassName: type[DiscreteAnalysis]|None = analysisClassFromMethodName(method)
 
     if analysisClassName is not None:
         obj = analysisClassName()
@@ -1349,7 +1349,7 @@ def analyzeStream(
 
 
 # noinspection SpellCheckingInspection
-def analysisClassFromMethodName(method: str) -> type[DiscreteAnalysis] | None:
+def analysisClassFromMethodName(method: str) -> type[DiscreteAnalysis]|None:
     '''
     Returns an analysis class given a method name, or None if none can be found
 
@@ -1378,7 +1378,7 @@ def analysisClassFromMethodName(method: str) -> type[DiscreteAnalysis] | None:
         BellmanBudge,
         TemperleyKostkaPayne,
     ]
-    match: type[DiscreteAnalysis] | None = None
+    match: type[DiscreteAnalysis]|None = None
     for analysisClass in analysisClasses:
         # this is a very loose matching, as there are few classes now
         if (method.lower() in analysisClass.__name__.lower()

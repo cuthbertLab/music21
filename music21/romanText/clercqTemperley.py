@@ -337,7 +337,7 @@ class CTSong(prebase.ProtoM21Object):
             ''',
     }
 
-    def __init__(self, textFile: str | pathlib.Path = '', **keywords):
+    def __init__(self, textFile: str|pathlib.Path = '', **keywords):
         self._title = None
         self.text = ''
         self.lines: list[str] = []
@@ -369,7 +369,7 @@ class CTSong(prebase.ProtoM21Object):
         return f'title={self.title!r} year={self.year}'
 
     # --------------------------------------------------------------------------
-    def parse(self, textFile: str | pathlib.Path):
+    def parse(self, textFile: str|pathlib.Path):
         '''
         Called when a CTSong is created by passing a string or filename;
         in the second case, it opens the file
@@ -648,7 +648,7 @@ class CTRule(prebase.ProtoM21Object):
     SPLITMEASURES = re.compile(r'(\|\*?\d*)')
     REPETITION = re.compile(r'\*(\d+)')
 
-    def __init__(self, text='', parent: CTSong | None = None):
+    def __init__(self, text='', parent: CTSong|None = None):
         self._parent = None
         if parent is not None:
             self.parent = parent
@@ -662,7 +662,7 @@ class CTRule(prebase.ProtoM21Object):
 
         self.measures: list[stream.Measure] = []
         self.lastRegularAtom: str = ''
-        self.lastChord: chord.Chord | None = None
+        self.lastChord: chord.Chord|None = None
         self._lastChordIsInSameMeasure: bool = False
 
 
@@ -683,8 +683,8 @@ class CTRule(prebase.ProtoM21Object):
 
     def expand(
         self,
-        tsContext: meter.TimeSignature | None = None,
-        keyContext: key.Key | None = None,
+        tsContext: meter.TimeSignature|None = None,
+        keyContext: key.Key|None = None,
     ) -> list[stream.Measure]:
         '''
         The meat of it all -- expand one rule completely and return a list of Measure objects.
@@ -923,7 +923,7 @@ class CTRule(prebase.ProtoM21Object):
         return measureGroups3
 
     # --------------------------------------------------------------------------
-    def isSame(self, rn: roman.RomanNumeral, lastChord: chord.Chord | None) -> bool:
+    def isSame(self, rn: roman.RomanNumeral, lastChord: chord.Chord|None) -> bool:
         '''
         Returns True if the pitches of the RomanNumeral are the same as the pitches
         of lastChord.  Returns False if lastChord is None.
@@ -942,7 +942,7 @@ class CTRule(prebase.ProtoM21Object):
     def addOptionalTieAndLyrics(
         self,
         rn: roman.RomanNumeral,
-        lastChord: chord.Chord | None
+        lastChord: chord.Chord|None
     ) -> None:
         '''
         Adds ties to chords that are the same.  Adds lyrics to chords that change.
@@ -1035,7 +1035,7 @@ class CTRule(prebase.ProtoM21Object):
         ''')
 
     @property
-    def comment(self) -> str | None:
+    def comment(self) -> str|None:
         '''
         Get the comment of a CTRule object.
 

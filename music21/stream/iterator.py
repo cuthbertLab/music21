@@ -51,11 +51,11 @@ class StreamIteratorInefficientWarning(UserWarning):
 
 
 class ActiveInformation(t.TypedDict, total=False):
-    stream: stream.Stream | None
+    stream: stream.Stream|None
     elementIndex: int
     iterSection: t.Literal['_elements', '_endElements']
     sectionIndex: int
-    lastYielded: base.Music21Object | None
+    lastYielded: base.Music21Object|None
 
 
 
@@ -131,9 +131,9 @@ class StreamIterator(prebase.ProtoM21Object, Sequence[M21ObjType]):
                  srcStream: StreamType,
                  *,
                  # restrictClass: type[M21ObjType] = base.Music21Object,
-                 filterList: list[FilterType] | None = None,
+                 filterList: list[FilterType]|None = None,
                  restoreActiveSites: bool = True,
-                 activeInformation: ActiveInformation | None = None,
+                 activeInformation: ActiveInformation|None = None,
                  ignoreSorting: bool = False):
         if not ignoreSorting and srcStream.isSorted is False and srcStream.autoSort:
             srcStream.sort()
@@ -154,7 +154,7 @@ class StreamIterator(prebase.ProtoM21Object, Sequence[M21ObjType]):
         self.cleanupOnStop: bool = False
         self.restoreActiveSites: bool = restoreActiveSites
 
-        self.overrideDerivation: str | None = None
+        self.overrideDerivation: str|None = None
 
         if filterList is None:
             filterList = []
@@ -166,8 +166,8 @@ class StreamIterator(prebase.ProtoM21Object, Sequence[M21ObjType]):
         # return True or False for an element for
         # whether it should be yielded.
         self.filters: list[FilterType] = filterList
-        self._len: int | None = None
-        self._matchingElements: dict[bool | None, list[M21ObjType]] = {}
+        self._len: int|None = None
+        self._matchingElements: dict[bool|None, list[M21ObjType]] = {}
         # keep track of where we are in the parse.
         # esp important for recursive streams...
         if activeInformation is not None:
@@ -331,10 +331,10 @@ class StreamIterator(prebase.ProtoM21Object, Sequence[M21ObjType]):
         return self.matchingElements()
 
     @overload
-    def __getitem__(self, k: str) -> M21ObjType | None:
+    def __getitem__(self, k: str) -> M21ObjType|None:
         return None
 
-    def __getitem__(self, k: int | slice | str) -> M21ObjType | list[M21ObjType] | None:
+    def __getitem__(self, k: int|slice|str) -> M21ObjType|list[M21ObjType]|None:
         '''
         Iterators can request other items by index or slice.
 
@@ -524,7 +524,7 @@ class StreamIterator(prebase.ProtoM21Object, Sequence[M21ObjType]):
         )
         return out
 
-    def first(self) -> M21ObjType | None:
+    def first(self) -> M21ObjType|None:
         '''
         Efficiently return the first matching element, or None if no
         elements match.
@@ -574,7 +574,7 @@ class StreamIterator(prebase.ProtoM21Object, Sequence[M21ObjType]):
         except StopIteration:
             return None
 
-    def last(self) -> M21ObjType | None:
+    def last(self) -> M21ObjType|None:
         '''
         Returns the last matching element, or None if no elements match.
 
@@ -659,7 +659,7 @@ class StreamIterator(prebase.ProtoM21Object, Sequence[M21ObjType]):
 
             # cleanupOnStop is rarely used, so we put in
             # a dummy stream so that srcStream does not need
-            # to be x | None
+            # to be x|None
             SrcStreamClass = self.srcStream.__class__
 
             del self.srcStream
@@ -673,7 +673,7 @@ class StreamIterator(prebase.ProtoM21Object, Sequence[M21ObjType]):
     def matchingElements(
         self,
         *,
-        restoreActiveSites: bool | None = None
+        restoreActiveSites: bool|None = None
     ) -> list[M21ObjType]:
         '''
         Returns a list of elements that match the filter.
@@ -811,7 +811,7 @@ class StreamIterator(prebase.ProtoM21Object, Sequence[M21ObjType]):
         x: StreamType = self.streamObj
         return x
 
-    def stream(self, returnStreamSubClass=True) -> stream.Stream | StreamType:
+    def stream(self, returnStreamSubClass=True) -> stream.Stream|StreamType:
         '''
         return a new stream from this iterator.
 
@@ -880,7 +880,7 @@ class StreamIterator(prebase.ProtoM21Object, Sequence[M21ObjType]):
 
         # if this stream was sorted, the resultant stream is sorted
         clearIsSorted = False
-        found: stream.Stream | StreamType
+        found: stream.Stream|StreamType
         if returnStreamSubClass is True:
             try:
                 found = ss.__class__()
@@ -985,7 +985,7 @@ class StreamIterator(prebase.ProtoM21Object, Sequence[M21ObjType]):
 
         return out
 
-    def getElementById(self, elementId: str) -> M21ObjType | None:
+    def getElementById(self, elementId: str) -> M21ObjType|None:
         '''
         Returns a single element (or None) that matches elementId.
 
@@ -1810,7 +1810,7 @@ class RecursiveIterator(StreamIterator, Sequence[M21ObjType]):
 
         if streamsOnly is True:
             self.filters.append(filters.ClassFilter('Stream'))
-        self.childRecursiveIterator: RecursiveIterator[t.Any] | None = None
+        self.childRecursiveIterator: RecursiveIterator[t.Any]|None = None
         # not yet used.
         # self.parentIterator = None
 

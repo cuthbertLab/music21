@@ -533,7 +533,7 @@ class TimeSignature(TimeSignatureBase):
         if value is None:
             value = f'{defaults.meterNumerator}/{defaults.meterDenominatorBeatType}'
 
-        self._overriddenBarDuration: duration.Duration | None = None
+        self._overriddenBarDuration: duration.Duration|None = None
         self.symbol: str = ''
         self.displaySequence: MeterSequence = _SENTINEL_METER_SEQUENCE
         self.beatSequence: MeterSequence = _SENTINEL_METER_SEQUENCE
@@ -1246,7 +1246,7 @@ class TimeSignature(TimeSignatureBase):
 
         '''
         # NOTE: this is a performance critical method
-        firstPartitionForm: MeterSequence | int | None
+        firstPartitionForm: MeterSequence|int|None
 
         # create a scratch MeterSequence for structure
         tsStr = f'{self.numerator}/{self.denominator}'
@@ -1305,7 +1305,7 @@ class TimeSignature(TimeSignatureBase):
 
     # --------------------------------------------------------------------------
     # access data for other processing
-    def getBeams(self, srcList, measureStartOffset=0.0) -> list[beam.Beams | None]:
+    def getBeams(self, srcList, measureStartOffset=0.0) -> list[beam.Beams|None]:
         '''
         Given a qLen position and an iterable of Music21Objects, return a list of Beams objects.
 
@@ -1621,7 +1621,7 @@ class TimeSignature(TimeSignatureBase):
         return False
 
     def setAccentWeight(self,
-                        weights: Sequence[float] | float,
+                        weights: Sequence[float]|float,
                         level: int = 0) -> None:
         '''
         Set accent weight, or floating point scalars, for the accent MeterSequence.

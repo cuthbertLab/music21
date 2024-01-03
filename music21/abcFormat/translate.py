@@ -59,8 +59,8 @@ _abcArticulationsToM21 = {
 
 def abcToStreamPart(
     abcHandler: abcFormat.ABCHandler,
-    inputM21: stream.Part | None = None,
-    spannerBundle: spanner.SpannerBundle | None = None
+    inputM21: stream.Part|None = None,
+    spannerBundle: spanner.SpannerBundle|None = None
 ) -> stream.Part:
     '''
     Handler conversion of a single Part of a Score with multiple Parts.
@@ -82,7 +82,7 @@ def abcToStreamPart(
 
     clefSet = None
     postTransposition = 0
-    dst: stream.Part | stream.Measure
+    dst: stream.Part|stream.Measure
 
     mergedHandlers: list[abcFormat.ABCHandler] = []
 
@@ -253,7 +253,7 @@ def abcToStreamPart(
 
 def parseTokens(
     mh: abcFormat.ABCHandler,
-    dst: stream.Measure | stream.Part,
+    dst: stream.Measure|stream.Part,
     p: stream.Part,
     useMeasures: bool
 ) -> tuple[int, bool]:
@@ -289,7 +289,7 @@ def parseTokens(
 
 def parseABCNote(
     t: abcFormat.ABCNote,
-    dst: stream.Measure | stream.Part,
+    dst: stream.Measure|stream.Part,
 ) -> None:
     '''
     Parse an ABCNote object and add it to the destination stream.
@@ -297,7 +297,7 @@ def parseABCNote(
     from music21 import abcFormat
 
     n: note.GeneralNote
-    cs: harmony.ChordSymbol | harmony.NoChord
+    cs: harmony.ChordSymbol|harmony.NoChord
 
     # add the attached chord symbol
     if t.chordSymbols:
@@ -394,7 +394,7 @@ def parseABCNote(
 
 def metadataToM21Object(
     t: abcFormat.ABCMetadata,
-    dst: stream.Measure | stream.Part,
+    dst: stream.Measure|stream.Part,
     postTransposition: int,
     clefSet: bool,
     useMeasures: bool,

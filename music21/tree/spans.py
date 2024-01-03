@@ -325,16 +325,16 @@ class ElementTimespan(Timespan):
 
     def __init__(
         self,
-        element: base.Music21Object | None = None,
-        parentOffset: OffsetQLIn | None = None,
-        parentEndTime: OffsetQLIn | None = None,
+        element: base.Music21Object|None = None,
+        parentOffset: OffsetQLIn|None = None,
+        parentEndTime: OffsetQLIn|None = None,
         parentage: tuple[stream.Stream, ...] = (),
-        offset: OffsetQLIn | None = None,
-        endTime: OffsetQLIn | None = None,
+        offset: OffsetQLIn|None = None,
+        endTime: OffsetQLIn|None = None,
     ):
         super().__init__(offset=offset, endTime=endTime)
 
-        self.element: base.Music21Object | None = element
+        self.element: base.Music21Object|None = element
         self.parentage = parentage
         if parentOffset is not None:
             parentOffset = float(parentOffset)
@@ -498,7 +498,7 @@ class ElementTimespan(Timespan):
         from music21 import stream
         return self.getParentageByClass(classList=(stream.Part,))
 
-    def makeElement(self, makeCopy: bool = True) -> base.Music21Object | None:
+    def makeElement(self, makeCopy: bool = True) -> base.Music21Object|None:
         '''
         Return a copy of the element (or the same one if makeCopy is False)
         with the quarterLength set to the length of the timespan

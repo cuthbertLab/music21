@@ -47,11 +47,11 @@ class PropertyDescription:
         metadata, and is the tuple element type clients will always receive from
         md['uniqueName'] or md['namespace:name'].
     '''
-    uniqueName: str | None = None
+    uniqueName: str|None = None
     name: str = ''
     namespace: str = ''
-    oldMusic21Abbrev: str | None = None
-    oldMusic21WorkId: str | None = None
+    oldMusic21Abbrev: str|None = None
+    oldMusic21WorkId: str|None = None
     valueType: type[ValueType] = Text
     needsArticleNormalization: bool = False
     isContributor: bool = False

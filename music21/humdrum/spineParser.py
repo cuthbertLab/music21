@@ -790,11 +790,11 @@ class HumdrumFile(HumdrumDataCollection):
     as a mandatory argument a filename to be opened and read.
     '''
 
-    def __init__(self, filename: str | pathlib.Path | None = None):
+    def __init__(self, filename: str|pathlib.Path|None = None):
         super().__init__()
         self.filename = filename
 
-    def parseFilename(self, filename: str | pathlib.Path | None = None):
+    def parseFilename(self, filename: str|pathlib.Path|None = None):
         if filename is None:
             filename = self.filename
         if filename is None:
@@ -1066,7 +1066,7 @@ class HumdrumSpine(prebase.ProtoM21Object):
         self._spineCollection = None
         self._spineType = None
 
-        self.isFirstVoice: bool | None = None
+        self.isFirstVoice: bool|None = None
         self.iterIndex = None
 
     def _reprInternal(self):
@@ -1570,7 +1570,7 @@ class SpineEvent(prebase.ProtoM21Object):
         self.contents: str = contents
         self.position: int = position
         self.protoSpineId: int = 0
-        self.spineId: int | None = None
+        self.spineId: int|None = None
 
     def _reprInternal(self):
         return self.contents
@@ -2007,7 +2007,7 @@ class SpineCollection(prebase.ProtoM21Object):
                 if not hasVoices:
                     continue
 
-                voices: list[stream.Voice | None] = [None for i in range(10)]
+                voices: list[stream.Voice|None] = [None for i in range(10)]
                 measureElements = el.elements
                 for mEl in measureElements:
                     mElGroups = mEl.groups

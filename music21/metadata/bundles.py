@@ -274,15 +274,15 @@ class MetadataBundle(prebase.ProtoM21Object):
 
     # INITIALIZER #
 
-    def __init__(self, expr: 'music21.corpus.corpora.Corpus' | str | None = None):
+    def __init__(self, expr: 'music21.corpus.corpora.Corpus'|str|None = None):
         from music21 import corpus
 
         self._metadataEntries: OrderedDict[str, MetadataEntry] = OrderedDict()
         if not isinstance(expr, (str, corpus.corpora.Corpus, type(None))):
             raise MetadataBundleException('Need to take a string, corpus, or None as expression')
 
-        self._corpus: corpus.corpora.Corpus | None = None
-        self._name: str | None
+        self._corpus: corpus.corpora.Corpus|None = None
+        self._name: str|None
 
         if isinstance(expr, corpus.corpora.Corpus):
             self._name = expr.name
@@ -1113,7 +1113,7 @@ class MetadataBundle(prebase.ProtoM21Object):
 
     def search(
         self,
-        query: str | None = None,
+        query: str|None = None,
         field=None,
         *,
         fileExtensions: Iterable[str] = (),

@@ -196,7 +196,7 @@ class StreamSearcher:
     '''
 
     def __init__(self, streamSearch: Stream, searchList: list[m21Base.Music21Object]):
-        self.streamSearch: Stream | iterator.StreamIterator = streamSearch
+        self.streamSearch: Stream|iterator.StreamIterator = streamSearch
         self.searchList: list[m21Base.Music21Object] = searchList
         self.recurse: bool = False
         self.filterNotes: bool = False
@@ -204,10 +204,10 @@ class StreamSearcher:
 
         self.algorithms: list[
             Callable[[StreamSearcher, m21Base.Music21Object, m21Base.Music21Object],
-                     bool | None]
+                     bool|None]
         ] = [StreamSearcher.wildcardAlgorithm]
 
-        self.activeIterator: iterator.StreamIterator | None = None
+        self.activeIterator: iterator.StreamIterator|None = None
 
     def run(self) -> list[SearchMatch]:
         thisStreamIterator: iterator.StreamIterator

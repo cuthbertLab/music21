@@ -409,7 +409,7 @@ class Music21Object(prebase.ProtoM21Object):
     True
     '''
 
-    classSortOrder: int | float = 20  # default classSortOrder
+    classSortOrder: int|float = 20  # default classSortOrder
     # these values permit fast class comparisons for performance critical cases
     isStream = False
 
@@ -465,37 +465,37 @@ class Music21Object(prebase.ProtoM21Object):
     }
 
     def __init__(self,
-                 id: str | int | None = None,  # pylint: disable=redefined-builtin
-                 groups: Groups | None = None,
-                 sites: Sites | None = None,
-                 duration: Duration | None = None,
-                 activeSite: stream.Stream | None = None,
-                 style: Style | None = None,
-                 editorial: Editorial | None = None,
+                 id: str|int|None = None,  # pylint: disable=redefined-builtin
+                 groups: Groups|None = None,
+                 sites: Sites|None = None,
+                 duration: Duration|None = None,
+                 activeSite: stream.Stream|None = None,
+                 style: Style|None = None,
+                 editorial: Editorial|None = None,
                  offset: OffsetQL = 0.0,
-                 quarterLength: OffsetQLIn | None = None,
+                 quarterLength: OffsetQLIn|None = None,
                  **keywords):
         # do not call super().__init__() since it just wastes time
-        self._id: str | int | None = id
+        self._id: str|int|None = id
         # None is stored as the internal location of an obj w/o any sites
-        self._activeSite: stream.Stream | weakref.ReferenceType | None = None
+        self._activeSite: stream.Stream|weakref.ReferenceType|None = None
         # offset when no activeSite is available
         self._naiveOffset: OffsetQL = offset
 
         # offset when activeSite is already garbage collected/dead,
         # as in short-lived sites
         # like .getElementsByClass().stream()
-        self._activeSiteStoredOffset: float | fractions.Fraction | None = None
+        self._activeSiteStoredOffset: float|fractions.Fraction|None = None
 
         # store a derivation object to track derivations from other Streams
         # pass a reference to this object
-        self._derivation: Derivation | None = None
+        self._derivation: Derivation|None = None
 
-        self._style: Style | None = style
-        self._editorial: Editorial | None = None
+        self._style: Style|None = style
+        self._editorial: Editorial|None = None
 
         # private duration storage; managed by property
-        self._duration: Duration | None = duration
+        self._duration: Duration|None = duration
         if duration is not None:
             duration.client = self
         self._priority = 0  # default is zero
@@ -534,7 +534,7 @@ class Music21Object(prebase.ProtoM21Object):
         return id(self) >> 4
 
     @property
-    def id(self) -> int | str:
+    def id(self) -> int|str:
         '''
         A unique identification string or int; not to be confused with Python's
         built-in `id()` method. However, if not set, will return
@@ -550,7 +550,7 @@ class Music21Object(prebase.ProtoM21Object):
         return builtins.id(self)
 
     @id.setter
-    def id(self, new_id: int | str):
+    def id(self, new_id: int|str):
         if isinstance(new_id, int) and new_id > defaults.minIdNumberToConsiderMemoryLocation:
             msg = 'Setting an ID that could be mistaken for a memory location '
             msg += f'is discouraged: got {new_id}'
@@ -578,9 +578,9 @@ class Music21Object(prebase.ProtoM21Object):
         self.groups = copy.deepcopy(other.groups)
 
     def _deepcopySubclassable(self: _M21T,
-                              memo: dict[int, t.Any] | None = None,
+                              memo: dict[int, t.Any]|None = None,
                               *,
-                              ignoreAttributes: set[str] | None = None) -> _M21T:
+                              ignoreAttributes: set[str]|None = None) -> _M21T:
         '''
         Subclassable __deepcopy__ helper so that the same attributes
         do not need to be called for each Music21Object subclass.
@@ -622,7 +622,7 @@ class Music21Object(prebase.ProtoM21Object):
 
         return new
 
-    def __deepcopy__(self: _M21T, memo: dict[int, t.Any] | None = None) -> _M21T:
+    def __deepcopy__(self: _M21T, memo: dict[int, t.Any]|None = None) -> _M21T:
         '''
         Helper method to copy.py's deepcopy function.  Call it from there.
 
@@ -800,7 +800,7 @@ class Music21Object(prebase.ProtoM21Object):
         return self._style
 
     @style.setter
-    def style(self, newStyle: Style | None):
+    def style(self, newStyle: Style|None):
         self._style = newStyle
 
     # convenience.
@@ -857,7 +857,7 @@ class Music21Object(prebase.ProtoM21Object):
         return self._derivation
 
     @derivation.setter
-    def derivation(self, newDerivation: Derivation | None) -> None:
+    def derivation(self, newDerivation: Derivation|None) -> None:
         self._derivation = newDerivation
 
     def clearCache(self, **keywords) -> None:
@@ -885,7 +885,7 @@ class Music21Object(prebase.ProtoM21Object):
     @overload
     def getOffsetBySite(
         self,
-        site: stream.Stream | None,
+        site: stream.Stream|None,
         *,
         returnSpecial: t.Literal[False] = False,
     ) -> OffsetQL:
@@ -894,19 +894,19 @@ class Music21Object(prebase.ProtoM21Object):
     @overload
     def getOffsetBySite(
         self,
-        site: stream.Stream | None,
+        site: stream.Stream|None,
         *,
         returnSpecial: bool = False,
-    ) -> OffsetQL | OffsetSpecial:
+    ) -> OffsetQL|OffsetSpecial:
         return 0.0  # dummy until Astroid #1015 is fixed.  Replace with ...
         # using bool instead of t.Literal[True] because of
 
     def getOffsetBySite(
         self,
-        site: stream.Stream | None,
+        site: stream.Stream|None,
         *,
         returnSpecial: bool = False,
-    ) -> OffsetQL | OffsetSpecial:
+    ) -> OffsetQL|OffsetSpecial:
         '''
         If this class has been registered in a container such as a Stream,
         that container can be provided here, and the offset in that object
@@ -1022,7 +1022,7 @@ class Music21Object(prebase.ProtoM21Object):
             ) from se
 
     def setOffsetBySite(self,
-                        site: stream.Stream | None,
+                        site: stream.Stream|None,
                         value: OffsetQLIn):
         '''
         Change the offset for a site.  These are equivalent:
@@ -1076,7 +1076,7 @@ class Music21Object(prebase.ProtoM21Object):
 
     def getOffsetInHierarchy(
         self,
-        site: stream.Stream | None
+        site: stream.Stream|None
     ) -> OffsetQL:
         '''
         For an element which may not be in site, but might be in a Stream in site (or further
@@ -1148,7 +1148,7 @@ class Music21Object(prebase.ProtoM21Object):
         raise SitesException(f'Element {self} is not in hierarchy of {site}')
 
     def getSpannerSites(self,
-                        spannerClassList: Iterable | None = None
+                        spannerClassList: Iterable|None = None
                         ) -> list[spanner.Spanner]:
         '''
         Return a list of all :class:`~music21.spanner.Spanner` objects
@@ -1290,30 +1290,30 @@ class Music21Object(prebase.ProtoM21Object):
         sortByCreationTime=False,
         followDerivation=True,
         priorityTargetOnly=False,
-    ) -> _M21T | None:
+    ) -> _M21T|None:
         return None  # until Astroid #1015
 
     @overload
     def getContextByClass(
         self,
-        className: str | None,
+        className: str|None,
         *,
         getElementMethod=ElementSearch.AT_OR_BEFORE,
         sortByCreationTime=False,
         followDerivation=True,
         priorityTargetOnly=False,
-    ) -> Music21Object | None:
+    ) -> Music21Object|None:
         return None  # until Astroid #1015
 
     def getContextByClass(
         self,
-        className: type[_M21T] | str | None,
+        className: type[_M21T]|str|None,
         *,
         getElementMethod: ElementSearch = ElementSearch.AT_OR_BEFORE,
         sortByCreationTime=False,
         followDerivation=True,
         priorityTargetOnly=False,
-    ) -> _M21T | Music21Object | None:
+    ) -> _M21T|Music21Object|None:
         # noinspection PyShadowingNames
         '''
         A very powerful method in music21 of fundamental importance: Returns
@@ -1783,7 +1783,7 @@ class Music21Object(prebase.ProtoM21Object):
         callerFirst=None,
         memo=None,
         offsetAppend: OffsetQL = 0.0,
-        sortByCreationTime: t.Literal['reverse'] | bool = False,
+        sortByCreationTime: t.Literal['reverse']|bool = False,
         priorityTarget=None,
         followDerivation=True,
         priorityTargetOnly=False,
@@ -1797,7 +1797,7 @@ class Music21Object(prebase.ProtoM21Object):
         callerFirst=None,
         memo=None,
         offsetAppend: OffsetQL = 0.0,
-        sortByCreationTime: t.Literal['reverse'] | bool = False,
+        sortByCreationTime: t.Literal['reverse']|bool = False,
         priorityTarget=None,
         returnSortTuples: t.Literal[False] = False,
         followDerivation=True,
@@ -1812,12 +1812,12 @@ class Music21Object(prebase.ProtoM21Object):
         callerFirst=None,
         memo=None,
         offsetAppend: OffsetQL = 0.0,
-        sortByCreationTime: t.Literal['reverse'] | bool = False,
+        sortByCreationTime: t.Literal['reverse']|bool = False,
         priorityTarget=None,
         returnSortTuples: bool = False,
         followDerivation=True,
         priorityTargetOnly=False,
-    ) -> Generator[ContextTuple | ContextSortTuple, None, None]:
+    ) -> Generator[ContextTuple|ContextSortTuple, None, None]:
         '''
         A generator that returns a list of namedtuples of sites to search for a context...
 
@@ -2163,7 +2163,7 @@ class Music21Object(prebase.ProtoM21Object):
     # -------------------------------------------------------------------------
 
     def next(self,
-             className: type[Music21Object] | str | None = None,
+             className: type[Music21Object]|str|None = None,
              *,
              activeSiteOnly=False):
         '''
@@ -2283,7 +2283,7 @@ class Music21Object(prebase.ProtoM21Object):
             raise Music21Exception('Maximum recursion!')
 
     def previous(self,
-                 className: type[Music21Object] | str | None = None,
+                 className: type[Music21Object]|str|None = None,
                  *,
                  activeSiteOnly=False):
         '''
@@ -2391,7 +2391,7 @@ class Music21Object(prebase.ProtoM21Object):
         else:  # pragma: no cover
             return self._activeSite
 
-    def _setActiveSite(self, site: stream.Stream | None):
+    def _setActiveSite(self, site: stream.Stream|None):
         # environLocal.printDebug(['_setActiveSite() called:', 'self', self, 'site', site])
 
         # NOTE: this is a performance intensive call
@@ -2590,7 +2590,7 @@ class Music21Object(prebase.ProtoM21Object):
             self._naiveOffset = offset
 
     def sortTuple(self,
-                  useSite: t.Literal[False] | stream.Stream | None = False,
+                  useSite: t.Literal[False]|stream.Stream|None = False,
                   raiseExceptionOnMiss: bool = False
                   ) -> SortTuple:
         '''
@@ -2696,13 +2696,13 @@ class Music21Object(prebase.ProtoM21Object):
         music21.sites.SitesException: an entry for this object 0x... is not stored in
             stream <music21.stream.Stream aloneStream>
         '''
-        useSiteNoFalse: stream.Stream | None
+        useSiteNoFalse: stream.Stream|None
         if useSite is False:  # False or a Site; since None is a valid site, default is False
             useSiteNoFalse = self.activeSite
         else:
             useSiteNoFalse = useSite
 
-        foundOffset: OffsetQL | OffsetSpecial
+        foundOffset: OffsetQL|OffsetSpecial
         if useSiteNoFalse is None:
             foundOffset = self.offset
         else:
@@ -2840,8 +2840,8 @@ class Music21Object(prebase.ProtoM21Object):
 
     def write(
         self,
-        fmt: str | None = None,
-        fp: str | pathlib.Path | IOBase | None = None,
+        fmt: str|None = None,
+        fp: str|pathlib.Path|IOBase|None = None,
         **keywords
     ) -> pathlib.Path:  # pragma: no cover
         '''
@@ -3312,7 +3312,7 @@ class Music21Object(prebase.ProtoM21Object):
 
     def splitByQuarterLengths(
         self,
-        quarterLengthList: list[int | float | fractions.Fraction],
+        quarterLengthList: list[int|float|fractions.Fraction],
         addTies=True,
         displayTiedAccidentals=False
     ) -> _SplitTuple:
@@ -3479,7 +3479,7 @@ class Music21Object(prebase.ProtoM21Object):
     # temporal and beat based positioning
 
     @property
-    def measureNumber(self) -> int | None:
+    def measureNumber(self) -> int|None:
         # noinspection PyShadowingNames
         '''
         Return the measure number of a :class:`~music21.stream.Measure` that contains this
@@ -3552,7 +3552,7 @@ class Music21Object(prebase.ProtoM21Object):
                     mNumber = m.number  # type: ignore
         return mNumber
 
-    def _getMeasureOffset(self, includeMeasurePadding=True) -> float | fractions.Fraction:
+    def _getMeasureOffset(self, includeMeasurePadding=True) -> float|fractions.Fraction:
         # noinspection PyShadowingNames
         '''
         Try to obtain the nearest Measure that contains this object,
@@ -3620,7 +3620,7 @@ class Music21Object(prebase.ProtoM21Object):
         extracted to make sure that all three of the routines use the same one.
         '''
         from music21 import meter
-        ts: meter.TimeSignature | None = self.getContextByClass(
+        ts: meter.TimeSignature|None = self.getContextByClass(
             meter.TimeSignature,
             getElementMethod=ElementSearch.AT_OR_BEFORE_OFFSET
         )
@@ -3629,7 +3629,7 @@ class Music21Object(prebase.ProtoM21Object):
         return ts
 
     @property
-    def beat(self) -> fractions.Fraction | float:
+    def beat(self) -> fractions.Fraction|float:
         # noinspection PyShadowingNames
         '''
         Return the beat of this object as found in the most
@@ -3933,7 +3933,7 @@ class Music21Object(prebase.ProtoM21Object):
         # once we have mm, simply pass in this duration
         return mm.durationToSeconds(self.duration)
 
-    def _setSeconds(self, value: int | float) -> None:
+    def _setSeconds(self, value: int|float) -> None:
         from music21 import tempo
         ti = self.getContextByClass(tempo.TempoIndication)
         if ti is None:

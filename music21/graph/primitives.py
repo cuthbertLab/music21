@@ -98,7 +98,7 @@ class Graph(prebase.ProtoM21Object):
     '''
     graphType = 'genericGraph'
     axisKeys: tuple[str, ...] = ('x', 'y')
-    figureSizeDefault: tuple[int | float, ...] = (6, 6)
+    figureSizeDefault: tuple[int|float, ...] = (6, 6)
 
     keywordConfigurables: tuple[str, ...] = (
         'alpha',
@@ -1004,7 +1004,7 @@ class GraphHorizontalBar(Graph):
 
             if points:
                 uniformFormatPerRow = (len(points[0]) == 2)
-                rowFaceColors: str | list[str]
+                rowFaceColors: str|list[str]
                 if uniformFormatPerRow:
                     rowFaceColors = faceColor
                     positionPoints = points

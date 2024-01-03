@@ -132,7 +132,7 @@ def slashMixedToFraction(valueSrc: str) -> tuple[NumDenomTuple, bool]:
 
     * Changed in v7: new location and returns a tuple as first value.
     '''
-    pre: list[NumDenom | tuple[int, None]] = []
+    pre: list[NumDenom|tuple[int, None]] = []
     summedNumerator = False
     value = valueSrc.strip()  # rem whitespace
     value = value.split('+')

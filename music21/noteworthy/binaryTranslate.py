@@ -265,7 +265,7 @@ class NWCConverter:
         self.currentAlterations: dict[int, str] = {}
 
     # noinspection SpellCheckingInspection
-    def parseFile(self, fp: pathlib.Path | str):
+    def parseFile(self, fp: pathlib.Path|str):
         # noinspection PyShadowingNames
         r'''
         Parse a file (calls .toStream)
