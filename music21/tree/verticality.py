@@ -875,7 +875,7 @@ class Verticality(prebase.ProtoM21Object):
                 continue
             el = timeSpan.element
             if isinstance(el, chord.ChordBase):
-                firstNoteElement: note.Note|None = None
+                firstNoteElement: note.Note | None = None
                 for subEl in el:
                     if isinstance(subEl, note.Note):
                         firstNoteElement = subEl
