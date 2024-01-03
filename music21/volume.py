@@ -88,11 +88,11 @@ class Volume(prebase.ProtoM21Object, SlottedObjectMixin):
         # store a reference to the client, as we use this to do context
         # will use property; if None will leave as None
         self.client = client
-        self._velocityScalar = None
+        self._velocityScalar: float|None = None
         if velocity is not None:
             self.velocity = velocity
         elif velocityScalar is not None:
-            self.velocityScalar = velocityScalar
+            self.velocityScalar = float(velocityScalar)
         self._cachedRealized = None
         self.velocityIsRelative = velocityIsRelative
 
@@ -331,7 +331,7 @@ class Volume(prebase.ProtoM21Object, SlottedObjectMixin):
         return self.getRealized()
 
     @property
-    def velocity(self) -> int:
+    def velocity(self) -> int|None:
         '''
         Get or set the velocity value, a numerical value between 0 and 127 and
         available setting amplitude on each Note or Pitch in chord.
@@ -355,18 +355,20 @@ class Volume(prebase.ProtoM21Object, SlottedObjectMixin):
         return round(v)
 
     @velocity.setter
-    def velocity(self, value: int | float):
-        if not common.isNum(value):
+    def velocity(self, value: int|float|None):
+        if value is None:
+            self._velocityScalar = None
+        elif not common.isNum(value):
             raise VolumeException(f'value provided for velocity must be a number, not {value}')
-        if value < 0:
+        elif value <= 0:
             self._velocityScalar = 0.0
-        elif value > 127:
+        elif value >= 127:
             self._velocityScalar = 1.0
         else:
             self._velocityScalar = value / 127.0
 
     @property
-    def velocityScalar(self):
+    def velocityScalar(self) -> float|None:
         '''
         Get or set the velocityScalar value, a numerical value between 0
         and 1 and available setting amplitude on each Note or Pitch in
@@ -401,7 +403,10 @@ class Volume(prebase.ProtoM21Object, SlottedObjectMixin):
             return v
 
     @velocityScalar.setter
-    def velocityScalar(self, value):
+    def velocityScalar(self, value: int|float|None):
+        if value is None:
+            self._velocityScalar = None
+
         if not common.isNum(value):
             raise VolumeException('value provided for velocityScalar must be a number, '
                                   + f'not {value}')
@@ -411,7 +416,7 @@ class Volume(prebase.ProtoM21Object, SlottedObjectMixin):
             scalar = 1
         else:
             scalar = value
-        self._velocityScalar = scalar
+        self._velocityScalar = float(scalar)
 
 
 # ------------------------------------------------------------------------------

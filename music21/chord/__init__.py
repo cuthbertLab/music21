@@ -487,13 +487,10 @@ class ChordBase(note.NotRest):
             note.NotRest._setVolume(self, expr, setClient=False)
         elif common.isNum(expr):
             vol = self._getVolume()
-            if t.TYPE_CHECKING:
-                assert isinstance(expr, (int, float))
-
             if expr < 1:  # assume a scalar
-                vol.velocityScalar = expr
+                vol.velocityScalar = float(expr)
             else:  # assume velocity
-                vol.velocity = expr
+                vol.velocity = int(expr)
         else:
             raise ChordException(f'unhandled setting expr: {expr}')
 

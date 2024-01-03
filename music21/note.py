@@ -1269,9 +1269,9 @@ class NotRest(GeneralNote):
             # call local getVolume will set client appropriately
             vol = self._getVolume()
             if value < 1:  # assume a scalar
-                vol.velocityScalar = value
+                vol.velocityScalar = float(value)
             else:  # assume velocity
-                vol.velocity = value
+                vol.velocity = int(value)
 
         else:
             raise TypeError(f'this must be a Volume object, not {value}')
