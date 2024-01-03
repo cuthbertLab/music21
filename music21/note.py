@@ -1298,7 +1298,7 @@ class NotRest(GeneralNote):
         self._setVolume(value)
 
     @property
-    def storedInstrument(self) -> instrument.Instrument | None:
+    def storedInstrument(self) -> instrument.Instrument|None:
         '''
         Get or set the :class:`~music21.instrument.Instrument` that
         should be used to play this note, overriding whatever
@@ -1317,7 +1317,7 @@ class NotRest(GeneralNote):
         return self._storedInstrument
 
     @storedInstrument.setter
-    def storedInstrument(self, newValue: instrument.Instrument | None):
+    def storedInstrument(self, newValue: instrument.Instrument|None):
         if (newValue is not None
                 and (not hasattr(newValue, 'classSet')
                      or 'music21.instrument.Instrument' not in newValue.classSet)):
