@@ -996,6 +996,14 @@ class NotRest(GeneralNote):
     Basically, that's a :class:`Note` or :class:`~music21.chord.Chord`
     (or their subclasses such as :class:`~music21.harmony.ChordSymbol`), or
     :class:`Unpitched` object.
+
+    NotRest elements are generally not created on their own.  It is a class
+    that exists to store common functionality used by Note, Unpitched, and Chord objects.
+
+    >>> nr = note.NotRest(storedInstrument=instrument.Ocarina())
+    >>> nr.stemDirection = 'up'
+
+    * Changed in v9: beams is keyword only.  Added storedInstrument keyword.
     '''
     # unspecified means that there may be a stem, but its orientation
     # has not been declared.
@@ -1012,7 +1020,9 @@ class NotRest(GeneralNote):
     )
 
     def __init__(self,
+                 *,
                  beams: beam.Beams|None = None,
+                 storedInstrument: instrument.Instrument|None = None,
                  **keywords):
         super().__init__(**keywords)
         self._notehead: str = 'normal'
@@ -1024,7 +1034,7 @@ class NotRest(GeneralNote):
             self.beams = beams
         else:
             self.beams = beam.Beams()
-        self._storedInstrument: instrument.Instrument|None = None
+        self._storedInstrument: instrument.Instrument|None = storedInstrument
         self._chordAttached: chord.ChordBase|None = None
 
     # ==============================================================================================
