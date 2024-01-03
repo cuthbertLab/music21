@@ -5,7 +5,7 @@
 #
 # Authors:      Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2009-2022 Michael Scott Asato Cuthbert
+# Copyright:    Copyright © 2009-2023 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # -------------------------------------------------------------------------------
 '''
@@ -273,7 +273,7 @@ class State:
     2
     '''
     # expires after N tokens or never.
-    autoExpires: typing.Literal[False] | int = False
+    autoExpires: typing.Literal[False]|int = False
 
     def __init__(self, parent=None, stateInfo=None):
         self.affectedTokens = []
@@ -287,7 +287,7 @@ class State:
         '''
         pass
 
-    def end(self) -> Music21Object | None:
+    def end(self) -> Music21Object|None:
         '''
         called just after removing state
         '''
@@ -470,7 +470,6 @@ class TimeSignatureToken(Token):
     '''
     Represents a single time signature, like 1/4
     '''
-
     def parse(self, parent):
         tsObj = meter.TimeSignature(self.token)
         parent.stateDict['currentTimeSignature'] = tsObj
@@ -481,15 +480,12 @@ class NoteOrRestToken(Token):
     '''
     represents a Note or Rest.  Chords are represented by Note objects
     '''
-
     def __init__(self, token=''):
         super().__init__(token)
         self.durationMap = [
             (r'(\d+)', 'durationType'),
             (r'(\.+)', 'dots'),
         ]  # tie will be dealt with later.
-
-
         self.durationFound = False
 
     def applyDuration(self, n, t, parent):
@@ -549,7 +545,6 @@ class RestToken(NoteOrRestToken):
     '''
     A token starting with 'r', representing a rest.
     '''
-
     def parse(self, parent=None):
         r = note.Rest()
         self.applyDuration(r, self.token, parent)
@@ -577,7 +572,6 @@ class NoteToken(NoteOrRestToken):
     <music21.note.Note B->
     >>> n.nameWithOctave
     'B-6'
-
     '''
     pitchMap = collections.OrderedDict([
         ('lowOctave', r'([A-G]+)'),

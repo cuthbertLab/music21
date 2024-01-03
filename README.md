@@ -3,7 +3,7 @@
 `music21` -- A Toolkit for Computer-Aided Musical Analysis and 
 Computational Musicology
 
-Copyright © 2006-2022, [Michael Scott Asato Cuthbert](http://www.trecento.com)
+Copyright © 2006-2023 [Michael Scott Asato Cuthbert](http://www.trecento.com)
 
 For more information, visit:
 https://web.mit.edu/music21
@@ -58,7 +58,8 @@ contributor’s participation in the community.
 
 The maintainers of `music21` and associated sites will commit themselves to enforcing
 this code of conduct. Users who notice violations, including instances of abuse,
-harassment, or otherwise unacceptable behavior are requested to contact cuthbert@mit.edu.
+harassment, or otherwise unacceptable behavior are requested to contact 
+michael.asato.cuthbert@gmail.com.
 Maintainers will respect confidentiality with regard to reports.
 
 ## Acknowledgements ##

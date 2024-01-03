@@ -118,7 +118,7 @@ def objectToBraille(music21Obj: base.Music21Object,
                     showFirstMeasureNumber=True,
                     showHand=None,
                     showHeading=True,
-                    showLongSlursAndTiesTogether: bool | None = None,
+                    showLongSlursAndTiesTogether: bool|None = None,
                     showShortSlursAndTiesTogether=False,
                     slurLongPhraseWithBrackets=True,
                     suppressOctaveMarks=False,
@@ -221,7 +221,7 @@ def objectToBraille(music21Obj: base.Music21Object,
                                 upperFirstInNoteFingering=upperFirstInNoteFingering,
                                 )
 
-def streamToBraille(music21Stream: stream.Measure | stream.Part | stream.Score | stream.Opus,
+def streamToBraille(music21Stream: stream.Measure|stream.Part|stream.Score|stream.Opus,
                     *,
                     inPlace=False,
                     debug=False,
@@ -234,7 +234,7 @@ def streamToBraille(music21Stream: stream.Measure | stream.Part | stream.Score |
                     showFirstMeasureNumber=True,
                     showHand=None,
                     showHeading=True,
-                    showLongSlursAndTiesTogether: bool | None = None,
+                    showLongSlursAndTiesTogether: bool|None = None,
                     showShortSlursAndTiesTogether=False,
                     slurLongPhraseWithBrackets=True,
                     suppressOctaveMarks=False,
@@ -369,7 +369,7 @@ def scoreToBraille(music21Score,
                    showFirstMeasureNumber=True,
                    showHand=None,
                    showHeading=True,
-                   showLongSlursAndTiesTogether: bool | None = None,
+                   showLongSlursAndTiesTogether: bool|None = None,
                    showShortSlursAndTiesTogether=False,
                    slurLongPhraseWithBrackets=True,
                    suppressOctaveMarks=False,
@@ -382,7 +382,7 @@ def scoreToBraille(music21Score,
     for music21Metadata in music21Score.getElementsByClass(metadata.Metadata):
         allBrailleLines.append(metadataToString(music21Metadata, returnBrailleUnicode=not debug))
 
-    unprocessed_partStaff: stream.PartStaff | None = None
+    unprocessed_partStaff: stream.PartStaff|None = None
 
     def process_unmatched_part_staff_as_single_part():
         nonlocal unprocessed_partStaff
@@ -505,7 +505,7 @@ def metadataToString(music21Metadata: metadata.Metadata, returnBrailleUnicode=Fa
             # we don't put software versions in braille output
             continue
 
-        namespaceName: str | None = music21Metadata.uniqueNameToNamespaceName(uniqueName)
+        namespaceName: str|None = music21Metadata.uniqueNameToNamespaceName(uniqueName)
         if not namespaceName:
             # we don't put custom metadata in braille output
             continue
@@ -538,7 +538,7 @@ def opusToBraille(music21Opus,
                   showFirstMeasureNumber=True,
                   showHand=None,
                   showHeading=True,
-                  showLongSlursAndTiesTogether: bool | None = None,
+                  showLongSlursAndTiesTogether: bool|None = None,
                   showShortSlursAndTiesTogether=False,
                   slurLongPhraseWithBrackets=True,
                   suppressOctaveMarks=False,
@@ -585,7 +585,7 @@ def measureToBraille(music21Measure,
                      showFirstMeasureNumber=False,  # observe False!
                      showHand=None,
                      showHeading=False,  # observe False!
-                     showLongSlursAndTiesTogether: bool | None = None,
+                     showLongSlursAndTiesTogether: bool|None = None,
                      showShortSlursAndTiesTogether=False,
                      slurLongPhraseWithBrackets=True,
                      suppressOctaveMarks=False,
@@ -647,7 +647,7 @@ def partToBraille(music21Part,
                   showFirstMeasureNumber=True,
                   showHand=None,
                   showHeading=True,
-                  showLongSlursAndTiesTogether: bool | None = None,
+                  showLongSlursAndTiesTogether: bool|None = None,
                   showShortSlursAndTiesTogether=False,
                   slurLongPhraseWithBrackets=True,
                   suppressOctaveMarks=False,
@@ -707,7 +707,7 @@ def keyboardPartsToBraille(keyboardScore,
                            showFirstMeasureNumber=True,
                            showHand=None,
                            showHeading=True,
-                           showLongSlursAndTiesTogether: bool | None = None,
+                           showLongSlursAndTiesTogether: bool|None = None,
                            showShortSlursAndTiesTogether=False,
                            slurLongPhraseWithBrackets=True,
                            suppressOctaveMarks=False,

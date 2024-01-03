@@ -286,12 +286,12 @@ class ScoreReduction:
             return
 
         removalIndices = []
-        if m.hasElement(n):
+        if n in m:
             offset = n.getOffsetBySite(m)
         else:  # it is in a Voice
             offset = 0.0
             for v in m.voices:
-                if v.hasElement(n):
+                if n in v:
                     offset = n.getOffsetBySite(v)
 
 
@@ -468,7 +468,7 @@ class PartReduction:
     def __init__(self,
                  srcScore=None,
                  *,
-                 partGroups: list[dict[str, t.Any]] | None = None,
+                 partGroups: list[dict[str, t.Any]]|None = None,
                  fillByMeasure: bool = True,
                  segmentByTarget: bool = True,
                  normalize: bool = True,
@@ -484,7 +484,7 @@ class PartReduction:
         # TODO: typed dict
         self._partBundles: list[dict[str, t.Any]] = []
         # a dictionary of part id to a list of events
-        self._eventSpans: dict[str | int, list[t.Any]] = {}
+        self._eventSpans: dict[str|int, list[t.Any]] = {}
 
         # define how parts are grouped
         # a list of dictionaries, with keys for name, color, and a match list

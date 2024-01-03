@@ -182,7 +182,7 @@ def getPlotClassesFromFormat(graphFormat, checkPlotClasses=None):
     return filteredPlots
 
 
-def getAxisClassFromValue(axisValue: str) -> type[axis.Axis] | None:
+def getAxisClassFromValue(axisValue: str) -> type[axis.Axis]|None:
     '''
     given an axis value return the single best axis for the value, or None
 
@@ -205,7 +205,7 @@ def getAxisClassFromValue(axisValue: str) -> type[axis.Axis] | None:
     return None
 
 
-def axisMatchesValue(axisClass: type[axis.Axis] | axis.Axis,
+def axisMatchesValue(axisClass: type[axis.Axis]|axis.Axis,
                      axisValue: str) -> bool:
     '''
     Returns Bool about whether axisValue.lower() is anywhere in axisClass.quantities
@@ -237,7 +237,7 @@ def axisMatchesValue(axisClass: type[axis.Axis] | axis.Axis,
     return False
 
 
-def getPlotsToMake(graphFormat: str | None = None,
+def getPlotsToMake(graphFormat: str|None = None,
                    xValue=None,
                    yValue=None,
                    zValue=None):

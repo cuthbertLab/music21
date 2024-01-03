@@ -5,7 +5,7 @@
 #
 # Authors:      Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2021-2022 Michael Scott Asato Cuthbert
+# Copyright:    Copyright © 2021-2023 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 from __future__ import annotations
@@ -17,12 +17,12 @@ import typing as t
 from music21.common.enums import OffsetSpecial
 
 if t.TYPE_CHECKING:
-    import music21  # pylint: disable=unused-import
+    import music21
 
-DocOrder = list[str | Callable]
-OffsetQL = float | Fraction
-OffsetQLSpecial = float | Fraction | OffsetSpecial
-OffsetQLIn = int | float | Fraction
+DocOrder = list[str|Callable]
+OffsetQL = float|Fraction
+OffsetQLSpecial = float|Fraction|OffsetSpecial
+OffsetQLIn = int|float|Fraction
 
 StreamType = t.TypeVar('StreamType', bound='music21.stream.Stream', covariant=True)
 StreamType2 = t.TypeVar('StreamType2', bound='music21.stream.Stream', covariant=True)
@@ -30,6 +30,8 @@ M21ObjType = t.TypeVar('M21ObjType', bound='music21.base.Music21Object', covaria
 M21ObjType2 = t.TypeVar('M21ObjType2',
                         bound='music21.base.Music21Object'
                         , covariant=True)  # when you need another
+# to be explicit that a type is changing
+ChangedM21ObjType = t.TypeVar('ChangedM21ObjType', bound='music21.base.Music21Object')
 
 # does not seem to like the | way of spelling
 ClassListType = t.Union[str, Iterable[str], type[M21ObjType], Iterable[type[M21ObjType]]]

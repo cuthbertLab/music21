@@ -10,7 +10,7 @@
 #               Ben Houge
 #               Mark Gotham
 #
-# Copyright:    Copyright © 2009-2022 Michael Scott Asato Cuthbert
+# Copyright:    Copyright © 2009-2024 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
@@ -46,7 +46,7 @@ environLocal = environment.Environment('instrument')
 
 def unbundleInstruments(streamIn: stream.Stream,
                         *,
-                        inPlace=False) -> stream.Stream | None:
+                        inPlace=False) -> stream.Stream|None:
     # noinspection PyShadowingNames
     '''
     takes a :class:`~music21.stream.Stream` that has :class:`~music21.note.NotRest` objects
@@ -62,9 +62,9 @@ def unbundleInstruments(streamIn: stream.Stream,
     >>> s2 = instrument.unbundleInstruments(s)
     >>> s2.show('text')
     {0.0} <music21.instrument.BassDrum 'Bass Drum'>
-    {0.0} <music21.note.Unpitched object at 0x...>
+    {0.0} <music21.note.Unpitched 'Bass Drum'>
     {1.0} <music21.instrument.Cowbell 'Cowbell'>
-    {1.0} <music21.note.Unpitched object at 0x...>
+    {1.0} <music21.note.Unpitched 'Cowbell'>
     '''
     if inPlace is True:
         s = streamIn
@@ -85,7 +85,7 @@ def unbundleInstruments(streamIn: stream.Stream,
 
 def bundleInstruments(streamIn: stream.Stream,
                       *,
-                      inPlace=False) -> stream.Stream | None:
+                      inPlace=False) -> stream.Stream|None:
     # noinspection PyShadowingNames
     '''
     >>> up1 = note.Unpitched()
@@ -150,32 +150,32 @@ class Instrument(base.Music21Object):
     '''
     classSortOrder = -25
 
-    def __init__(self, instrumentName: str | None = None, **keywords):
+    def __init__(self, instrumentName: str|None = None, **keywords):
         super().__init__(**keywords)
 
-        self.partId: str | None = None
+        self.partId: str|None = None
         self._partIdIsRandom = False
 
-        self.partName: str | None = None
-        self.partAbbreviation: str | None = None
+        self.partName: str|None = None
+        self.partAbbreviation: str|None = None
 
-        self.printPartName: bool | None = None  # True = yes, False = no, None = let others decide
-        self.printPartAbbreviation: bool | None = None
+        self.printPartName: bool|None = None  # True = yes, False = no, None = let others decide
+        self.printPartAbbreviation: bool|None = None
 
-        self.instrumentId: str | None = None  # apply to midi and instrument
+        self.instrumentId: str|None = None  # apply to midi and instrument
         self._instrumentIdIsRandom = False
 
-        self.instrumentName: str | None = instrumentName
-        self.instrumentAbbreviation: str | None = None
-        self.midiProgram: int | None = None  # 0-indexed
-        self.midiChannel: int | None = None  # 0-indexed
-        self.instrumentSound: str | None = None
+        self.instrumentName: str|None = instrumentName
+        self.instrumentAbbreviation: str|None = None
+        self.midiProgram: int|None = None  # 0-indexed
+        self.midiChannel: int|None = None  # 0-indexed
+        self.instrumentSound: str|None = None
 
-        self.lowestNote: pitch.Pitch | None = None
-        self.highestNote: pitch.Pitch | None = None
+        self.lowestNote: pitch.Pitch|None = None
+        self.highestNote: pitch.Pitch|None = None
 
         # define interval to go from written to sounding
-        self.transposition: interval.Interval | None = None
+        self.transposition: interval.Interval|None = None
 
         self.inGMPercMap = False
         self.soundfontFn = None  # if defined...
@@ -237,25 +237,16 @@ class Instrument(base.Music21Object):
         self.instrumentId = idNew
         self._instrumentIdIsRandom = True
 
-    # the empty list as default is actually CORRECT!
-    # noinspection PyDefaultArgument
-
-    def autoAssignMidiChannel(self, usedChannels=[]):  # pylint: disable=dangerous-default-value
+    def autoAssignMidiChannel(self, usedChannels: list[int], maxMidi=16):
         '''
         Assign an unused midi channel given a list of
-        used channels.
+        used channels.  Music21 uses 0-indexed MIDI channels.
 
         assigns the number to self.midiChannel and returns
         it as an int.
 
-        Note that midi channel 10 (9 in music21) is special, and
-        thus is skipped.
-
-        Currently only 16 channels are used.
-
-        Note that the reused "usedChannels=[]" in the
-        signature is NOT a mistake, but necessary for
-        the case where there needs to be a global list.
+        Note that the Percussion MIDI channel (9 in music21, 10 in 1-16 numbering) is special,
+        and thus is skipped.
 
         >>> used = [0, 1, 2, 3, 4, 5, 6, 7, 8, 10, 11]
         >>> i = instrument.Violin()
@@ -263,6 +254,13 @@ class Instrument(base.Music21Object):
         12
         >>> i.midiChannel
         12
+
+        Note that used is unchanged after calling this and would need to be updated manually
+
+        >>> used
+        [0, 1, 2, 3, 4, 5, 6, 7, 8, 10, 11]
+
+
 
         Unpitched percussion will be set to 9, so long as it's not in the filter list:
 
@@ -280,29 +278,36 @@ class Instrument(base.Music21Object):
         >>> i.midiChannel
         11
 
-        OMIT_FROM_DOCS
+        If all 16 channels are used, an exception is raised:
 
         >>> used2 = range(16)
         >>> i = instrument.Instrument()
         >>> i.autoAssignMidiChannel(used2)
         Traceback (most recent call last):
         music21.exceptions21.InstrumentException: we are out of midi channels! help!
+
+        Get around this by assinging higher channels:
+
+        >>> i.autoAssignMidiChannel(used2, maxMidi=32)
+        16
+        >>> i.midiChannel
+        16
+
+        * Changed in v.9 -- usedChannelList is required, add maxMidi as an optional parameter.
+            various small tweaks for corner cases.
         '''
         # NOTE: this is used in musicxml output, not in midi output
-        maxMidi = 16
-        channelFilter = []
-        for e in usedChannels:
-            if e is not None:
-                channelFilter.append(e)
+        channelFilter = frozenset(usedChannels)
 
-        if not channelFilter:
-            self.midiChannel = 0
-            return self.midiChannel
-        elif len(channelFilter) >= maxMidi:
-            raise InstrumentException('we are out of midi channels! help!')
-        elif 'UnpitchedPercussion' in self.classes and 9 not in usedChannels:
+        if 'UnpitchedPercussion' in self.classes and 9 not in channelFilter:
             self.midiChannel = 9
             return self.midiChannel
+        elif not channelFilter:
+            self.midiChannel = 0
+            return self.midiChannel
+        elif len(channelFilter) >= maxMidi - 1:
+            # subtract one, since we are not using percussion channel (=9)
+            raise InstrumentException('we are out of midi channels! help!')
         else:
             for ch in range(maxMidi):
                 if ch in channelFilter:

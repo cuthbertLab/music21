@@ -18,6 +18,7 @@ import abc
 import csv
 import fractions
 import re
+import string
 import types
 import typing as t
 import unittest
@@ -30,6 +31,7 @@ from music21 import key
 from music21 import metadata
 from music21 import meter
 from music21 import roman
+from music21 import spanner
 from music21 import stream
 
 environLocal = environment.Environment()
@@ -46,9 +48,6 @@ V1_HEADERS = types.MappingProxyType({
     'beat': float,
     'totbeat': str,
     'timesig': str,
-    # 'op': str,
-    # 'no': str,
-    # 'mov': str,
     'length': float,
     'global_key': str,
     'local_key': str,
@@ -80,6 +79,7 @@ V2_HEADERS = types.MappingProxyType({
     'mn': int,
     'mn_onset': _float_or_frac,
     'timesig': str,
+    'volta': str,
     'globalkey': str,
     'localkey': str,
     'pedal': str,
@@ -164,19 +164,19 @@ class TabChordBase(abc.ABC):
     def __init__(self) -> None:
         super().__init__()
         self.numeral: str = ''
-        self.relativeroot: str | None = None
-        self.representationType: str | None = None  # Added (not in DCML)
+        self.relativeroot: str|None = None
+        self.representationType: str|None = None  # Added (not in DCML)
         self.extra: dict[str, str] = {}
         self.dcml_version = -1
 
         # shared between DCML v1 and v2
         self.chord: str = ''
         self.timesig: str = ''
-        self.pedal: str | None = None
-        self.form: str | None = None
-        self.figbass: str | None = None
-        self.changes: str | None = None
-        self.phraseend: str | None = None
+        self.pedal: str|None = None
+        self.form: str|None = None
+        self.figbass: str|None = None
+        self.changes: str|None = None
+        self.phraseend: str|None = None
 
         # the following attributes are overwritten by properties in TabChordV2
         # because of changed column names in DCML v2
@@ -256,12 +256,21 @@ class TabChordBase(abc.ABC):
             if self.dcml_version == 2:
                 self.chord = self.chord.replace('%', 'ø')
                 self.chord = handleAddedTones(self.chord)
+                # prefix figures for Mm7 chords on degrees other than 'V' with 'd'
                 if (
                     self.extra.get('chord_type', '') == 'Mm7'
                     and self.numeral != 'V'
                 ):
-                    # we need to make sure not to match [add4] and the like
-                    self.chord = re.sub(r'(\d+)(?!])', r'd\1', self.chord)
+                    # However, we need to make sure not to match [add13] and
+                    # the like, otherwise we will end up with [addd13]
+                    self.chord = re.sub(
+                        r'''
+                            (\d+)  # match one or more digits
+                            (?![\]\d])  # without a digit or a ']' to the right
+                        ''',
+                        r'd\1',
+                        self.chord,
+                        flags=re.VERBOSE)
 
         # Local - relative and figure
         if isMinor(self.local_key):
@@ -375,9 +384,6 @@ class TabChordBase(abc.ABC):
         #   similar to the following three lines for every attribute (with
         #   attributes specific to subclasses in their own methods that would
         #   then call __super__()).
-        # if 'chord' in head_indices:
-        #     i, type_to_coerce_to = head_indices['chord']
-        #     self.chord = type_to_coerce_to(row[i])
         for col_name, (i, type_to_coerce_to) in headIndices.items():
             if not hasattr(self, col_name):
                 pass  # would it be appropriate to emit a warning here?
@@ -392,27 +398,28 @@ class TabChord(TabChordBase):
     An intermediate representation format for moving between tabular data in
     DCML v1 and music21 chords.
     '''
-    def __init__(self):
+    def __init__(self) -> None:
         # self.numeral and self.relativeroot defined in super().__init__()
         super().__init__()
-        self.altchord = None
-        self.totbeat = None
-        self.length = None
-        self.dcml_version = 1
+        self.altchord: str|None = None
+        self.totbeat: str|None = None
+        self.length: fractions.Fraction|float|None = None
+        self.dcml_version: int = 1
 
 class TabChordV2(TabChordBase):
     '''
     An intermediate representation format for moving between tabular data in
     DCML v2 and music21 chords.
     '''
-    def __init__(self):
+    def __init__(self) -> None:
         # self.numeral and self.relativeroot defined in super().__init__()
         super().__init__()
-        self.mn = None
-        self.mn_onset = None
-        self.globalkey = None
-        self.localkey = None
-        self.dcml_version = 2
+        self.mn: int = 0
+        self.mn_onset: float = 0.0
+        self.volta: str = ''
+        self.globalkey: str = ''
+        self.localkey: str = ''
+        self.dcml_version: int = 2
 
     @property
     def beat(self) -> float:
@@ -525,8 +532,8 @@ class TsvHandler:
             raise ValueError(f'dcml_version {dcml_version} is not in (1, 2)')
         self.tsvFileName = tsvFile
         self.chordList: list[TabChordBase] = []
-        self.m21stream: stream.Score | None = None
-        self._head_indices: dict[str, tuple[int, type | t.Any]] = {}
+        self.m21stream: stream.Score|None = None
+        self._head_indices: dict[str, tuple[int, type|t.Any]] = {}
         self._extra_indices: dict[int, str] = {}
         self.dcml_version = dcml_version
         self.tsvData = self._importTsv()  # converted to private
@@ -569,13 +576,7 @@ class TsvHandler:
         # this method replaces the previously stand-alone makeTabChord function
         thisEntry = self._tab_chord_cls()
         thisEntry.populateFromRow(row, self._head_indices, self._extra_indices)
-        # for col_name, (i, type_to_coerce_to) in self._head_indices.items():
-        #     # set attributes of thisEntry according to values in row
-        #     setattr(thisEntry, col_name, type_to_coerce_to(row[i]))
-        # thisEntry.extra = {
-        #     col_name: row[i] for i, col_name in self._extra_indices.items() if row[i]
-        # }
-        thisEntry.representationType = 'DCML'  # Addeds
+        thisEntry.representationType = 'DCML'  # Added
 
         return thisEntry
 
@@ -616,7 +617,12 @@ class TsvHandler:
 
         for thisChord in self.chordList:
             offsetInMeasure = thisChord.beat - 1  # beats always measured in quarter notes
-            measureNumber = thisChord.measure
+            if isinstance(thisChord, TabChordV2) and thisChord.volta:
+                measureNumber: str|int = (
+                    f'{thisChord.measure}{string.ascii_lowercase[int(thisChord.volta) - 1]}'
+                )
+            else:
+                measureNumber = thisChord.measure
             m21Measure = p.measure(measureNumber)
             if m21Measure is None:
                 raise ValueError('m21Measure should not be None')
@@ -674,21 +680,47 @@ class TsvHandler:
 
         currentMeasureLength = ts.barDuration.quarterLength
 
-        currentOffset: float | fractions.Fraction = 0.0
+        currentOffset: float|fractions.Fraction = 0.0
 
         previousMeasure: int = self.chordList[0].measure - 1  # Covers pickups
+        previousVolta: str = ''
+        repeatBracket: t.Optional[spanner.RepeatBracket] = None
         for entry in self.chordList:
-            if entry.measure == previousMeasure:
+            if isinstance(entry, TabChordV2) and entry.volta != previousVolta:
+                if entry.volta:
+                    # Should we warn the user that, although we're writing
+                    # repeat brackets, we aren't writing repeat signs since
+                    # the .tsv file doesn't tell us where the forward repeat
+                    # should be?
+                    repeatBracket = spanner.RepeatBracket(number=entry.volta)
+                    # According to the docs at
+                    # https://web.mit.edu/music21/doc/moduleReference/moduleSpanner.html#spanner
+                    #   "the convention is to put the spanner at the beginning
+                    #   of the innermost Stream that contains all the Spanners"
+                    p.insert(0, repeatBracket)
+                else:
+                    repeatBracket = None
+                previousVolta = entry.volta
+            elif entry.measure == previousMeasure:
+                # NB we only want to continue here if the 'volta' (ending) has
+                #   not changed, hence the elif
                 continue
-            elif entry.measure != previousMeasure + 1:  # Not every measure has a chord change.
+            if entry.measure > previousMeasure + 1:  # Not every measure has a chord change.
                 for mNo in range(previousMeasure + 1, entry.measure + 1):
                     m = stream.Measure(number=mNo)
                     m.offset = currentOffset + currentMeasureLength
+
                     p.insert(m)
                     currentOffset = m.offset
                     previousMeasure = mNo
-            else:  # entry.measure = previousMeasure + 1
-                m = stream.Measure(number=entry.measure)
+            else:  # entry.measure <= previousMeasure + 1
+                if isinstance(entry, TabChordV2) and entry.volta:
+                    measureNumber: str|int = (
+                        f'{entry.measure}{string.ascii_lowercase[int(entry.volta) - 1]}'
+                    )
+                else:
+                    measureNumber = entry.measure
+                m = stream.Measure(number=measureNumber)
                 # 'totbeat' column (containing the current offset) has been
                 # removed from v2 so instead we calculate the offset directly
                 # to be portable across versions
@@ -701,6 +733,8 @@ class TsvHandler:
                     currentMeasureLength = newTS.barDuration.quarterLength
 
                 previousMeasure = entry.measure
+            if repeatBracket is not None:
+                repeatBracket.addSpannedElements(m)
 
         s.append(p)
         first_measure = s[stream.Measure].first()
@@ -844,7 +878,10 @@ class M21toTSV:
                     relativeroot = characterSwaps(
                         relativeroot, isMinor(local_key), direction='m21-DCML'
                     )
-                thisEntry.chord = thisRN.figure  # NB: slightly different from DCML: no key.
+                # We replace the "d" annotation for Mm7 chords on degrees other than
+                #   V because it is not used by the DCML standard
+                # NB: slightly different from DCML: no key.
+                thisEntry.chord = thisRN.figure.replace('d', '', 1)
                 thisEntry.pedal = None
                 thisEntry.numeral = thisRN.romanNumeral
                 thisEntry.form = getForm(thisRN)
@@ -1303,6 +1340,29 @@ class Test(unittest.TestCase):
         self.assertIsInstance(veryLocalKey, str)
         self.assertEqual(veryLocalKey, 'b')
 
+    def testRepeats(self):
+        def _test_ending_contents(
+            rb: spanner.RepeatBracket, expectedMeasures: t.List[str]
+        ) -> None:
+            measure_nos = [m.measureNumberWithSuffix() for m in rb[stream.Measure]]
+            self.assertEqual(measure_nos, expectedMeasures)
+
+        path = common.getSourceFilePath() / 'romanText' / 'tsvEg_v2_repeats.tsv'
+
+        # The test file corresponds to the following romanText but is somewhat
+        #   harder to read:
+        # Time Signature: 2/4
+        # m1 C: I
+        # m2a V :||
+        # m2b I
+
+        handler = TsvHandler(path, dcml_version=2)
+        stream1 = handler.toM21Stream()
+        rb_iter = stream1[spanner.RepeatBracket]
+        self.assertEqual(len(rb_iter), 2)
+        first_ending, second_ending = rb_iter
+        _test_ending_contents(first_ending, ['2a'])
+        _test_ending_contents(second_ending, ['2b'])
 
 # ------------------------------------------------------------------------------
 

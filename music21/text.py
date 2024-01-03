@@ -123,7 +123,7 @@ def assembleLyrics(streamIn, lineNumber=1):
                     words.append(''.join(word))
                     word = []
             else:
-                raise Exception(f'no known Text syllabic setting: {lyricObj.syllabic}')
+                raise ValueError(f'no known Text syllabic setting: {lyricObj.syllabic}')
     return ' '.join(words)
 
 
@@ -431,7 +431,7 @@ class LanguageDetector:
         self.text = text
         self.trigrams = _stored_trigrams.copy() or LanguageDetector.readExcerpts()
 
-    def mostLikelyLanguage(self, excerpt: str) -> str | None:
+    def mostLikelyLanguage(self, excerpt: str) -> str|None:
         # noinspection SpellCheckingInspection
         '''
         Returns the code of the most likely language for a passage, works on

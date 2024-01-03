@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 # Name:         docbuild/iterators.py
-# Purpose:      music21 documentation iterators, including IPython notebook to ReST converter
+# Purpose:      music21 documentation iterators, including Jupyter notebook to ReST converter
 #
 # Authors:      Josiah Wolf Oberholtzer
 #               Michael Scott Asato Cuthbert
@@ -34,13 +34,13 @@ class Iterator:
         raise NotImplementedError
 
 
-class IPythonNotebookIterator(Iterator):
+class JupyterNotebookIterator(Iterator):
     '''
     Iterates over music21's documentation directory, yielding .ipynb files.
 
     >>> import os
     >>> sp = common.getRootFilePath()
-    >>> ipnbi = IPythonNotebookIterator()
+    >>> ipnbi = JupyterNotebookIterator()
     >>> for i, nb in enumerate(ipnbi):
     ...     if i >= 3:
     ...         break

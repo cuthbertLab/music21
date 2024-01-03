@@ -1,0 +1,4 @@
+mc	mn	mc_onset	mn_onset	timesig	staff	voice	volta	label	globalkey	localkey	pedal	chord	special	numeral	form	figbass	changes	relativeroot	cadence	phraseend	chord_type	globalkey_is_minor	localkey_is_minor	chord_tones	added_tones	root	bass_note
+1	1	0	0	2/4				.C.I	C	I		I		I						FALSE							
+2	2	0	0	2/4			1	V	C	I		V		V						FALSE							
+3	2	0	0	2/4			2	I	C	I		I		I						FALSE							

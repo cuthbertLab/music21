@@ -115,13 +115,13 @@ def _musedataRecordListToNoteOrChord(records, previousElement=None):
 
     # get accents and expressions; assumes all on first
     # returns an empty list of None
-    dynamicObjs = []  # stored in stream, not Note
 
     for a in records[0].getArticulationObjects():
         post.articulations.append(a)
     for e in records[0].getExpressionObjects():
         post.expressions.append(e)
 
+    dynamicObjs = []  # stored in stream, not Note
     for d in records[0].getDynamicObjects():
         dynamicObjs.append(d)
 
@@ -230,8 +230,7 @@ def musedataPartToStreamPart(museDataPart, inputM21=None):
         pendingRecords = []
 
         # get notes in each record
-        for i in range(len(mdrObjs)):
-            mdr = mdrObjs[i]
+        for mdr in mdrObjs:
             # environLocal.printDebug(['processing:', mdr.src])
 
             if mdr.isBack():

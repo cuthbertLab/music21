@@ -5,11 +5,12 @@
 # Authors:      Christopher Ariza
 #               Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2010-2022 Michael Scott Asato Cuthbert
+# Copyright:    Copyright © 2010-2023 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 from __future__ import annotations
 
+import sys
 import unittest
 
 from music21 import common
@@ -361,13 +362,19 @@ class Test(unittest.TestCase):
 
         net = IntervalNetwork()
         net.fillArbitrary(nodes, edges)
-        self.assertTrue(common.whitespaceEqual(str(net.edges),
-                                               '''
-            OrderedDict([(0, <music21.scale.intervalNetwork.Edge Direction.BI m2
-                                [(Terminus.LOW, 0), (0, Terminus.LOW)]>),
-                         (1, <music21.scale.intervalNetwork.Edge Direction.BI M3
-                                [(0, Terminus.HIGH), (Terminus.HIGH, 0)]>)])'''
-                                               ),
+        match = '''
+            OrderedDict({0: <music21.scale.intervalNetwork.Edge Direction.BI m2
+                                [(Terminus.LOW, 0), (0, Terminus.LOW)]>,
+                         1: <music21.scale.intervalNetwork.Edge Direction.BI M3
+                                [(0, Terminus.HIGH), (Terminus.HIGH, 0)]>})'''
+        if sys.version_info < (3, 12):
+            match = '''
+                OrderedDict([(0, <music21.scale.intervalNetwork.Edge Direction.BI m2
+                                    [(Terminus.LOW, 0), (0, Terminus.LOW)]>),
+                             (1, <music21.scale.intervalNetwork.Edge Direction.BI M3
+                                    [(0, Terminus.HIGH), (Terminus.HIGH, 0)]>)])'''
+
+        self.assertTrue(common.whitespaceEqual(str(net.edges), match),
                         str(net.edges))
 
         self.assertEqual(net.degreeMax, 3)

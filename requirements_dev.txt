@@ -1,9 +1,10 @@
 -r requirements.txt
-pylint>=2.15.4
-flake8<6.0.0
-flake8-quotes
+wheel
+pylint>=2.16.0
+flake8<7.0.0
+flake8-quotes>=3.3.2
 hatchling
-mypy>=0.990
+mypy>=1.4.0
 coveralls
 scipy
 sphinx

@@ -7,7 +7,7 @@
 #               Christopher Ariza
 #               Michael Bodenbach
 #
-# Copyright:    Copyright © 2009-2022 Michael Scott Asato Cuthbert
+# Copyright:    Copyright © 2009-2023 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
@@ -128,9 +128,9 @@ class Clef(base.Music21Object):
 
     def __init__(self, **keywords) -> None:
         super().__init__(**keywords)
-        self.sign: str | None = None
+        self.sign: str|None = None
         # line counts start from the bottom up, the reverse of musedata
-        self.line: int | None = None
+        self.line: int|None = None
         self._octaveChange: int = 0  # set to zero as default
         # musicxml has an attribute for clefOctaveChange,
         # an integer to show transposing clef
@@ -185,7 +185,7 @@ class Clef(base.Music21Object):
 
     def getStemDirectionForPitches(
         self,
-        pitches: pitch.Pitch | Sequence[pitch.Pitch],
+        pitches: pitch.Pitch|Sequence[pitch.Pitch],
         *,
         firstLastOnly: bool = True,
         extremePitchOnly: bool = False,
@@ -399,7 +399,7 @@ class TabClef(PitchClef):
 
     def getStemDirectionForPitches(
         self,
-        pitchList: pitch.Pitch | Iterable[pitch.Pitch],
+        pitchList: pitch.Pitch|Iterable[pitch.Pitch],
         *,
         firstLastOnly: bool = True,
         extremePitchOnly: bool = False,
@@ -730,7 +730,7 @@ class SubBassClef(FClef):
 
 
 # ------------------------------------------------------------------------------
-CLASS_FROM_TYPE: dict[str, list[type[Clef] | None]] = {
+CLASS_FROM_TYPE: dict[str, list[type[Clef]|None]] = {
     'G': [None, FrenchViolinClef, TrebleClef, GSopranoClef, None, None],
     'C': [None, SopranoClef, MezzoSopranoClef, AltoClef, TenorClef, CBaritoneClef],
     'F': [None, None, None, FBaritoneClef, BassClef, SubBassClef],

@@ -6,7 +6,7 @@
 # Authors:      Michael Scott Asato Cuthbert
 #               Christopher Ariza
 #
-# Copyright:    Copyright © 2008-2022 Michael Scott Asato Cuthbert
+# Copyright:    Copyright © 2008-2023 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 from __future__ import annotations
@@ -41,6 +41,22 @@ class Test(unittest.TestCase):
     def testOctave(self):
         b = Pitch('B#3')
         self.assertEqual(b.octave, 3)
+
+    def testNameSetting(self):
+        with self.assertRaisesRegex(ValueError,
+                                    r"Cannot have octave given before pitch name in '8D-4'\."):
+            p = Pitch('8D-4')
+        with self.assertRaises(ValueError):
+            p = Pitch('23')
+        p = Pitch(23)
+        self.assertEqual(p.midi, 23)
+        with self.assertRaisesRegex(
+            ValueError,
+            "Argument to name, 32, must be a string, not <class 'int'>."
+        ):
+            p.name = 32
+
+
 
     def testAccidentalImport(self):
         '''
@@ -87,10 +103,9 @@ class Test(unittest.TestCase):
                 p.updateAccidentalDisplay(pitchPast=past)
                 past.append(p)
 
-        def compare(past, _result):
+        def compare(_past, _result):
             # environLocal.printDebug(['accidental compare'])
-            for i in range(len(_result)):
-                p = past[i]
+            for i, (p, _resultItem) in enumerate(zip(_past, _result)):
                 if p.accidental is None:
                     pName = None
                     pDisplayStatus = None
@@ -98,8 +113,7 @@ class Test(unittest.TestCase):
                     pName = p.accidental.name
                     pDisplayStatus = p.accidental.displayStatus
 
-                targetName = _result[i][0]
-                targetDisplayStatus = _result[i][1]
+                targetName, targetDisplayStatus = _resultItem
 
                 self.assertEqual(pName, targetName,
                                  f'name error for {i}: {pName} instead of desired {targetName}')
@@ -193,10 +207,9 @@ class Test(unittest.TestCase):
                 p.updateAccidentalDisplay(pitchPast=past, alteredPitches=alteredPitches)
                 past.append(p)
 
-        def compare(past, _result):
+        def compare(_past, _result):
             # environLocal.printDebug(['accidental compare'])
-            for i in range(len(_result)):
-                p = past[i]
+            for i, (p, _resultItem) in enumerate(zip(_past, _result)):
                 if p.accidental is None:
                     pName = None
                     pDisplayStatus = None
@@ -204,12 +217,10 @@ class Test(unittest.TestCase):
                     pName = p.accidental.name
                     pDisplayStatus = p.accidental.displayStatus
 
-                targetName = _result[i][0]
-                targetDisplayStatus = _result[i][1]
+                targetName, targetDisplayStatus = _resultItem
 
-                # environLocal.printDebug(['accidental test:', p, pName,
-                #         pDisplayStatus, 'target:', targetName, targetDisplayStatus])
-                self.assertEqual(pName, targetName)
+                self.assertEqual(pName, targetName,
+                                 f'name error for {i}: {pName} instead of desired {targetName}')
                 self.assertEqual(
                     pDisplayStatus,
                     targetDisplayStatus,
@@ -317,8 +328,7 @@ class Test(unittest.TestCase):
 
         def compare(_past, _result):
             # environLocal.printDebug(['accidental compare'])
-            for i in range(len(_result)):
-                p = _past[i]
+            for i, (p, _resultItem) in enumerate(zip(_past, _result)):
                 if p.accidental is None:
                     pName = None
                     pDisplayStatus = None
@@ -326,10 +336,10 @@ class Test(unittest.TestCase):
                     pName = p.accidental.name
                     pDisplayStatus = p.accidental.displayStatus
 
-                targetName = _result[i][0]
-                targetDisplayStatus = _result[i][1]
+                targetName, targetDisplayStatus = _resultItem
 
-                self.assertEqual(pName, targetName)
+                self.assertEqual(pName, targetName,
+                                 f'name error for {i}: {pName} instead of desired {targetName}')
                 self.assertEqual(
                     pDisplayStatus,
                     targetDisplayStatus,
