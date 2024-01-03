@@ -90,7 +90,7 @@ class TreeYielder:  # pragma: no cover
                 # noinspection PyBroadException
                 try:
                     gotValue = object.__getattribute__(obj, x)
-                except Exception:  # pylint: disable=broad-except
+                except Exception:  # pylint: disable=broad-exception-caught
                     continue
                 objTuple = ('getattr', x)
                 self.stackVals.append(objTuple)
@@ -98,7 +98,7 @@ class TreeYielder:  # pragma: no cover
                     for z in self.run(gotValue, memo=memo):
                         yield z
                 except RuntimeError:
-                    raise Exception(f'Maximum recursion on:\n{self.currentLevel()}')
+                    raise ValueError(f'Maximum recursion on:\n{self.currentLevel()}')
                 self.stackVals.pop()
 
         self.currentStack.pop()
@@ -116,7 +116,7 @@ class TreeYielder:  # pragma: no cover
             elif stackType == 'getattr':
                 currentStr += ".__getattribute__('" + stackValue + "')"
             else:
-                raise Exception(f'Cannot get attribute of type {stackType}')
+                raise ValueError(f'Cannot get attribute for stackType {stackType!r}')
         return currentStr
 
 

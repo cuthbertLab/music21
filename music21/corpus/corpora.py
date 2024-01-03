@@ -14,12 +14,16 @@ from __future__ import annotations
 import abc
 from collections.abc import Collection, Sequence, Iterable
 import pathlib
+import typing as t
 
 from music21 import common
 from music21.corpus import work
 from music21 import environment
 from music21.exceptions21 import CorpusException
 from music21 import prebase
+
+if t.TYPE_CHECKING:
+    from music21.metadata import bundles
 
 environLocal = environment.Environment(__file__)
 
@@ -54,7 +58,7 @@ class Corpus(prebase.ProtoM21Object):
 
     _pathsCache: dict[tuple[str, tuple[str, ...]], list[pathlib.Path]] = {}
 
-    _directoryInformation: tuple[()] | Sequence[tuple[str, str, bool]] = ()
+    _directoryInformation: tuple[()]|Sequence[tuple[str, str, bool]] = ()
 
     parseUsingCorpus = True
 
@@ -111,8 +115,9 @@ class Corpus(prebase.ProtoM21Object):
         return matched
 
     @staticmethod
-    def _translateExtensions(
+    def translateExtensions(
         fileExtensions: Iterable[str] = (),
+        *,
         expandExtensions: bool = True,
     ) -> tuple[str, ...]:
         # noinspection PyShadowingNames
@@ -121,7 +126,7 @@ class Corpus(prebase.ProtoM21Object):
         all known formats.
 
         >>> coreCorpus = corpus.corpora.CoreCorpus()
-        >>> for extension in coreCorpus._translateExtensions():
+        >>> for extension in coreCorpus.translateExtensions():
         ...     extension
         ...
         '.abc'
@@ -142,29 +147,36 @@ class Corpus(prebase.ProtoM21Object):
         '.nwctxt'
         '.nwc'
 
-        >>> coreCorpus._translateExtensions(('.mid',), False)
+        >>> coreCorpus.translateExtensions(('.mid',), expandExtensions=False)
         ('.mid',)
 
-        >>> coreCorpus._translateExtensions(('.mid',), True)
+        >>> coreCorpus.translateExtensions(('.mid',), expandExtensions=True)
         ('.mid', '.midi')
 
         It does not matter if you choose a canonical name or not, the output is the same:
 
-        >>> coreCorpus._translateExtensions(('.musicxml',), True)
+        >>> coreCorpus.translateExtensions(('.musicxml',), expandExtensions=True)
         ('.xml', '.mxl', '.musicxml')
 
-        >>> coreCorpus._translateExtensions(('.xml',), True)
+        >>> coreCorpus.translateExtensions(('.xml',), expandExtensions=True)
+        ('.xml', '.mxl', '.musicxml')
+
+        Leading dots don't matter:
+
+        >>> coreCorpus.translateExtensions(('xml',))
         ('.xml', '.mxl', '.musicxml')
 
 
         # With multiple extensions:
 
-        >>> coreCorpus._translateExtensions(('.mid', '.musicxml'), False)
+        >>> coreCorpus.translateExtensions(('.mid', '.musicxml'), expandExtensions=False)
         ('.mid', '.musicxml')
-        >>> coreCorpus._translateExtensions(('.mid', '.musicxml'), True)
+        >>> coreCorpus.translateExtensions(('.mid', '.musicxml'))
         ('.mid', '.midi', '.xml', '.mxl', '.musicxml')
 
         * Changed in v9: returns a tuple, not a list.  first element must be an Iterable of strings
+
+        TODO: unify with tools in common.formats
         '''
         if not fileExtensions:
             return Corpus._allExtensions
@@ -253,8 +265,8 @@ class Corpus(prebase.ProtoM21Object):
 
     def getWorkList(
         self,
-        workName: str | pathlib.Path,
-        movementNumber: int | Collection[int] | None = None,
+        workName: str|pathlib.Path,
+        movementNumber: int|Collection[int]|None = None,
         *,
         fileExtensions: Iterable[str] = (),
     ):
@@ -364,7 +376,7 @@ class Corpus(prebase.ProtoM21Object):
     def search(
         self,
         query: str,
-        field: str | None = None,
+        field: str|None = None,
         *,
         fileExtensions: Iterable[str] = (),
         **keywords
@@ -429,7 +441,7 @@ class Corpus(prebase.ProtoM21Object):
         raise NotImplementedError
 
     @property
-    def metadataBundle(self):
+    def metadataBundle(self) -> bundles.MetadataBundle:
         r'''
         The metadata bundle for a corpus:
 
@@ -447,7 +459,7 @@ class Corpus(prebase.ProtoM21Object):
         mdb.corpus = self
         return mdb
 
-    def all(self):
+    def all(self) -> bundles.MetadataBundle:
         '''
         This is a synonym for the metadataBundle property, but easier to understand
         what it does.
@@ -548,9 +560,12 @@ class CoreCorpus(Corpus):
         ('handel', 'George Frideric Handel', True),
         ('haydn', 'Joseph Haydn', True),
         ('joplin', 'Scott Joplin', True),
+        ('johnson_j_r', 'J. Rosamund Johnson', True),
         ('josquin', 'Josquin des Prez', True),
         ('leadSheet', 'Leadsheet demos', False),
+        ('liliuokalani', 'Queen Liliʻuokalani', True),
         ('luca', 'D. Luca', True),
+        ('lusitano', 'Vicente Lusitano', True),
         ('miscFolk', 'Miscellaneous Folk', False),
         ('monteverdi', 'Claudio Monteverdi', True),
         ('mozart', 'Wolfgang Amadeus Mozart', True),
@@ -566,6 +581,7 @@ class CoreCorpus(Corpus):
         ('trecento', 'Fourteenth-Century Italian Music', False),
         ('verdi', 'Giuseppe Verdi', True),
         ('weber', 'Carl Maria von Weber', True),
+        ('webern', 'Anton Webern', True),
     )
 
     _noCorpus = False
@@ -610,7 +626,7 @@ class CoreCorpus(Corpus):
         >>> len(abcFilePaths) >= 100
         True
         '''
-        fileExtensions_out = self._translateExtensions(
+        fileExtensions_out = self.translateExtensions(
             fileExtensions=fileExtensions,
             expandExtensions=expandExtensions,
         )
@@ -710,14 +726,13 @@ class LocalCorpus(Corpus):
     Traceback (most recent call last):
     music21.exceptions21.CorpusException: The name 'core' is reserved.
     '''
-
     # CLASS VARIABLES #
-    _temporaryLocalPaths: dict[str, set] = {}
+    _temporaryLocalPaths: dict[str, set[pathlib.Path]] = {}
     parseUsingCorpus: bool = False
 
     # INITIALIZER #
 
-    def __init__(self, name: str | None = None):
+    def __init__(self, name: str|None = None):
         if not isinstance(name, (str, type(None))):
             raise CorpusException('Name must be a string or None')
 
@@ -728,7 +743,7 @@ class LocalCorpus(Corpus):
             self._name = None
         elif name in ('core', 'virtual'):
             raise CorpusException(f'The name {name!r} is reserved.')
-        else:  # pylint: disable=no-else-raise  # false positive.
+        else:
             self._name = name
 
     # SPECIAL METHODS #
@@ -844,7 +859,7 @@ class LocalCorpus(Corpus):
         :func:`~music21.corpus.addPath` function, these paths are also returned
         with this method.
         '''
-        fileExtensions_trans: tuple[str, ...] = self._translateExtensions(
+        fileExtensions_trans: tuple[str, ...] = self.translateExtensions(
             fileExtensions=fileExtensions,
             expandExtensions=expandExtensions,
         )
@@ -867,7 +882,7 @@ class LocalCorpus(Corpus):
 
         return Corpus._pathsCache[cacheKey]
 
-    def removePath(self, directoryPath):
+    def removePath(self, directoryPath: str|pathlib.Path) -> None:
         r'''
         Remove a directory path from a local corpus.
 
@@ -885,8 +900,8 @@ class LocalCorpus(Corpus):
         TODO: test for corpus persisted to disk without actually reindexing
         files on user's Desktop.
         '''
-        temporaryPaths = LocalCorpus._temporaryLocalPaths.get(
-            self.name, [])
+        temporaryPaths: set[pathlib.Path] = LocalCorpus._temporaryLocalPaths.get(
+            self.name, set())
         directoryPathObj: pathlib.Path = common.cleanpath(directoryPath, returnPathlib=True)
         if directoryPathObj in temporaryPaths:
             temporaryPaths.remove(directoryPathObj)
@@ -1014,7 +1029,7 @@ class LocalCorpus(Corpus):
 #         True
 #
 #         '''
-#         fileExtensions = self._translateExtensions(
+#         fileExtensions = self.translateExtensions(
 #             fileExtensions=fileExtensions,
 #             expandExtensions=expandExtensions,
 #             )
@@ -1040,7 +1055,7 @@ class LocalCorpus(Corpus):
 #
 #         >>> virtualCorpus = corpus.corpora.VirtualCorpus()
 #         >>> virtualCorpus.getWorkList('bach/bwv1007/prelude')
-#         ['http://kern.ccarh.org/cgi-bin/ksdata?l=cc/bach/cello&file=bwv1007-01.krn&f=xml']
+#         ['https://kern.ccarh.org/cgi-bin/ksdata?l=cc/bach/cello&file=bwv1007-01.krn&f=xml']
 #
 #         >>> virtualCorpus.getWorkList('junk')
 #         []

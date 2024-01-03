@@ -7,7 +7,7 @@
 #               Michael Scott Asato Cuthbert
 #               Evan Lynch
 #
-# Copyright:    Copyright © 2009-2022 Michael Scott Asato Cuthbert,
+# Copyright:    Copyright © 2009-2023 Michael Scott Asato Cuthbert,
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
@@ -98,7 +98,7 @@ class Graph(prebase.ProtoM21Object):
     '''
     graphType = 'genericGraph'
     axisKeys: tuple[str, ...] = ('x', 'y')
-    figureSizeDefault: tuple[int | float, ...] = (6, 6)
+    figureSizeDefault: tuple[int|float, ...] = (6, 6)
 
     keywordConfigurables: tuple[str, ...] = (
         'alpha',
@@ -573,7 +573,7 @@ class Graph(prebase.ProtoM21Object):
                             # edgecolor=getColor(self.colorBackgroundFigure),
                             dpi=dpi)
 
-        if common.runningUnderIPython() is not True:
+        if common.runningInNotebook() is not True:
             SubConverter().launch(fp, fmt='png')
         else:
             return self.figure
@@ -851,7 +851,7 @@ class GraphColorGridLegend(Graph):
         >>> fig = matplotlib.pyplot.figure()
         >>> subplot = colorLegend.makeOneRowOfGraph(fig, 0, 'Scriabin Mapping', rowData)
         >>> subplot
-        <AxesSubplot: >
+        <Axes: >
         '''
         # environLocal.printDebug(['rowLabel', rowLabel, i])
 
@@ -980,7 +980,7 @@ class GraphHorizontalBar(Graph):
     def barHeight(self):
         return self.barSpace - (self.margin * 2)
 
-    def renderSubplot(self, subplot):
+    def renderSubplot(self, subplot) -> None:
         self.figure.subplots_adjust(left=0.15)
 
         yPos = 0
@@ -1004,7 +1004,7 @@ class GraphHorizontalBar(Graph):
 
             if points:
                 uniformFormatPerRow = (len(points[0]) == 2)
-                rowFaceColors: str | list[str]
+                rowFaceColors: str|list[str]
                 if uniformFormatPerRow:
                     rowFaceColors = faceColor
                     positionPoints = points

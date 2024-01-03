@@ -49,7 +49,7 @@ def etIndent(elem, level=0, spaces=2):
     indent an elementTree element for printing
     '''
     i = '\n' + level * spaces * ' '
-    if len(elem):  # pylint: disable=len-as-condition
+    if len(elem):
         if not elem.text or not elem.text.strip():
             elem.text = i + spaces * ' '
         if not elem.tail or not elem.tail.strip():
@@ -400,10 +400,10 @@ class _EnvironmentCore:
             for name, value in [
                 ('lilypondPath', 'lilypond'),
                 ('musicxmlPath',
-                 common.cleanpath(r'%PROGRAMFILES%\MuseScore 3\MuseScore.exe')
+                 common.cleanpath(r'%PROGRAMFILES%\MuseScore 3\bin\MuseScore3.exe')
                  ),
                 ('musescoreDirectPNGPath',
-                 common.cleanpath(r'%PROGRAMFILES%\MuseScore 3\MuseScore.exe')
+                 common.cleanpath(r'%PROGRAMFILES%\MuseScore 3\bin\MuseScore3.exe')
                  ),
             ]:
                 self[name] = value  # use for key checking
@@ -437,7 +437,7 @@ class _EnvironmentCore:
             ]:
                 self[name] = value  # use for key checking
 
-    def _checkAccessibility(self, path: str | pathlib.Path | None) -> bool:
+    def _checkAccessibility(self, path: str|pathlib.Path|None) -> bool:
         '''
         Return True if the path exists, is readable and writable.
         '''
@@ -642,7 +642,7 @@ class _EnvironmentCore:
             return directory / 'music21-settings.xml'
         elif platform in ['nix', 'darwin']:
             # might not exist if running as nobody in a webserver...
-            if 'HOME' in os.environ:
+            if 'HOME' in os.environ and os.access(os.environ['HOME'], os.W_OK):
                 directory = pathlib.Path(os.environ['HOME'])
             else:
                 directory = pathlib.Path('/tmp/')
@@ -650,7 +650,7 @@ class _EnvironmentCore:
         # darwin specific option
         # os.path.join(os.environ['HOME'], 'Library',)
 
-    def getTempFile(self, suffix='', returnPathlib=True) -> str | pathlib.Path:
+    def getTempFile(self, suffix='', returnPathlib=True) -> str|pathlib.Path:
         '''
         Gets a temporary file with a suffix that will work for a bit.
 
@@ -1011,7 +1011,7 @@ class Environment:
     def getTempFile(self, suffix: str = '', returnPathlib: t.Literal[True] = True) -> pathlib.Path:
         return pathlib.Path('/')  # astroid #1015
 
-    def getTempFile(self, suffix: str = '', returnPathlib=True) -> str | pathlib.Path:
+    def getTempFile(self, suffix: str = '', returnPathlib=True) -> str|pathlib.Path:
         '''
         Return a file path to a temporary file with the specified suffix (file
         extension).
@@ -1162,7 +1162,7 @@ class Environment:
         >>> a['musicxmlPath'] = original  #_DOCS_HIDE
         '''
         xp = self['musicxmlPath']
-        if common.runningUnderIPython():
+        if common.runningInNotebook():
             xp = self['musescoreDirectPNGPath']
 
         if not xp:

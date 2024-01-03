@@ -6,24 +6,28 @@
 # Authors:      Michael Scott Asato Cuthbert
 #               Christopher Ariza
 #
-# Copyright:    Copyright © 2009-2022 Michael Scott Asato Cuthbert
+# Copyright:    Copyright © 2009-2023 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 from __future__ import annotations
 
-from collections.abc import Iterable, Sequence, Collection
 from fractions import Fraction
 from functools import cache
 import math
 from math import isclose, gcd
 import numbers
 import random
-import typing as t
+from typing import overload, TYPE_CHECKING
 import unittest
 
 from music21 import defaults
 from music21.common import deprecated
 from music21.common.types import OffsetQLIn, OffsetQL
+
+if TYPE_CHECKING:
+    from decimal import Decimal
+    from collections.abc import Iterable, Sequence, Collection
+
 
 __all__ = [
     'ordinals', 'musicOrdinals', 'ordinalsToNumbers',
@@ -66,7 +70,7 @@ musicOrdinals[22] = 'Triple-octave'
 # Number methods...
 
 
-def numToIntOrFloat(value: int | float) -> int | float:
+def numToIntOrFloat(value: OffsetQLIn) -> int|float:
     '''
     Given a number, return an integer if it is very close to an integer,
     otherwise, return a float.
@@ -82,6 +86,10 @@ def numToIntOrFloat(value: int | float) -> int | float:
     1.00003
     >>> common.numToIntOrFloat(1.5)
     1.5
+    >>> common.numToIntOrFloat(2)
+    2
+    >>> common.numToIntOrFloat(-5)
+    -5
     >>> common.numToIntOrFloat(1.0000000005)
     1
     >>> common.numToIntOrFloat(0.999999999)
@@ -102,6 +110,23 @@ def numToIntOrFloat(value: int | float) -> int | float:
     1
     >>> common.numToIntOrFloat('1.25')
     1.25
+
+    Others raise a ValueError
+
+    >>> common.numToIntOrFloat('one')
+    Traceback (most recent call last):
+    ValueError: could not convert string to float: 'one'
+
+
+    Fractions also become ints or floats
+
+    >>> from fractions import Fraction
+    >>> common.numToIntOrFloat(Fraction(1, 2))
+    0.5
+    >>> common.numToIntOrFloat(Fraction(4, 3))
+    1.333333333...
+
+    Note: Decimal objects are not supported.
     '''
     try:
         intVal = round(value)
@@ -111,8 +136,8 @@ def numToIntOrFloat(value: int | float) -> int | float:
 
     if isclose(intVal, value, abs_tol=1e-6):
         return intVal
-    else:  # source
-        return value
+
+    return value + 0.0  # fast opp for cast to float for fractions.Fraction
 
 
 DENOM_LIMIT = defaults.limitOffsetDenominator
@@ -145,14 +170,17 @@ def _preFracLimitDenominator(n: int, d: int) -> tuple[int, int]:
     t is timeit.timeit
 
     t('Fraction(*common.numberTools._preFracLimitDenominator(*x.as_integer_ratio()))',
-       setup='x = 1000001/3000001.; from music21 import common;from fractions import Fraction',
+       setup='x = 1000001/3000001; from music21 import common;from fractions import Fraction',
        number=100000)
     1.0814228057861328
 
     t('Fraction(x).limit_denominator(65535)',
-       setup='x = 1000001/3000001.; from fractions import Fraction',
+       setup='x = 1000001/3000001; from fractions import Fraction',
        number=100000)
     7.941488981246948
+
+    Nothing changed in 2023, in fact, it's faster now with the cache, and even
+    without the cache, it's still 4x faster.
 
     Proof of working...
 
@@ -208,9 +236,20 @@ _KNOWN_PASSES = frozenset([
     0.25, 0.375, 0.5, 0.75, 1.0, 1.5, 2.0, 3.0, 4.0, 6.0
 ])
 
+@overload
+def opFrac(num: None) -> None:
+    pass
+
+@overload
+def opFrac(num: int) -> float:
+    pass
+
+@overload
+def opFrac(num: float|Fraction) -> float|Fraction:
+    pass
+
 # no type checking due to accessing protected attributes (for speed)
-@t.no_type_check
-def opFrac(num: OffsetQLIn | None) -> OffsetQL | None:
+def opFrac(num: OffsetQLIn|None) -> OffsetQL|None:
     '''
     opFrac -> optionally convert a number to a fraction or back.
 
@@ -230,7 +269,7 @@ def opFrac(num: OffsetQLIn | None) -> OffsetQL | None:
     Code Completion easily. That is to say, this function has been set up to be used, so please
     use it.
 
-    This is a performance critical operation. Do not alter it in any way without running
+    This is a performance-critical operation. Do not alter it in any way without running
     many timing tests.
 
     >>> from fractions import Fraction
@@ -245,8 +284,12 @@ def opFrac(num: OffsetQLIn | None) -> OffsetQL | None:
     >>> f = Fraction(1, 3)
     >>> common.opFrac(f + f + f)
     1.0
+    >>> common.opFrac(0.99999999842)
+    1.0
     >>> common.opFrac(0.123456789)
     Fraction(10, 81)
+    >>> common.opFrac(0.000001)
+    0.0
     >>> common.opFrac(None) is None
     True
     '''
@@ -271,20 +314,30 @@ def opFrac(num: OffsetQLIn | None) -> OffsetQL | None:
         #    (denominator & (denominator-1)) != 0
         # which is a nice test, but denominator here is always a power of two...
         # unused_numerator, denominator = num.as_integer_ratio()  # too slow
-        ir = num.as_integer_ratio()
+        ir = num.as_integer_ratio()  # type: ignore
         if ir[1] > DENOM_LIMIT:  # slightly faster[SIC!] than hard coding 65535!
             # _preFracLimitDenominator uses a cache
-            return Fraction(*_preFracLimitDenominator(*ir))  # way faster!
+            f_out = Fraction(*_preFracLimitDenominator(*ir))  # way faster!
+            # now, reduce denominator as Fraction -- just as below under numType == Fraction
+            d = f_out._denominator  # type: ignore
+            if (d & (d - 1)) == 0:  # power of two...
+                # 50% faster than float(num)
+                return f_out._numerator / (d + 0.0)  # type: ignore
+            else:
+                return f_out  # leave non-power of two fractions alone
             # return Fraction(*ir).limit_denominator(DENOM_LIMIT) # *ir instead of float--can happen
             # internally in Fraction constructor, but is twice as fast...
         else:
             return num
     elif numType is int:  # if vs. elif is negligible time difference.
-        return num + 0.0  # 8x faster than float(num)
+        # 8x faster than float(num)
+        return num + 0.0  # type: ignore
     elif numType is Fraction:
-        d = num._denominator  # private access instead of property: 6x faster; may break later...
+        # private access instead of property: 6x faster; may break later...
+        d = num._denominator  # type: ignore
         if (d & (d - 1)) == 0:  # power of two...
-            return num._numerator / (d + 0.0)  # 50% faster than float(num)
+            # 50% faster than float(num)
+            return num._numerator / (d + 0.0)  # type: ignore
         else:
             return num  # leave non-power of two fractions alone
     elif num is None:
@@ -294,12 +347,7 @@ def opFrac(num: OffsetQLIn | None) -> OffsetQL | None:
     elif isinstance(num, int):
         return num + 0.0
     elif isinstance(num, float):
-        ir = num.as_integer_ratio()
-        if ir[1] > DENOM_LIMIT:  # slightly faster than hard coding 65535!
-            return Fraction(*_preFracLimitDenominator(*ir))  # way faster!
-        else:
-            return num
-
+        return opFrac(float(num))  # slower for inherited floats, but simpler than duplicating
     elif isinstance(num, Fraction):
         d = num.denominator  # Use properties since it is a subclass
         if (d & (d - 1)) == 0:  # power of two...
@@ -376,7 +424,7 @@ def mixedNumeral(expr: numbers.Real,
     return str(0)
 
 
-def roundToHalfInteger(num: float | int) -> float | int:
+def roundToHalfInteger(num: float|int) -> float|int:
     '''
     Given a floating-point number, round to the nearest half-integer. Returns int or float
 
@@ -424,7 +472,7 @@ def roundToHalfInteger(num: float | int) -> float | int:
     return intVal + floatVal
 
 
-def addFloatPrecision(x, grain=1e-2) -> float | Fraction:
+def addFloatPrecision(x, grain=1e-2) -> float|Fraction:
     '''
     Given a value that suggests a floating point fraction, like 0.33,
     return a Fraction or float that provides greater specification, such as Fraction(1, 3)
@@ -545,7 +593,7 @@ def nearestMultiple(n: float, unit: float) -> tuple[float, float, float]:
     # print(['mult, halfUnit, matchLow, matchHigh', mult, halfUnit, matchLow, matchHigh])
 
     if matchLow >= n >= matchHigh:
-        raise Exception(f'cannot place n between multiples: {matchLow}, {matchHigh}')
+        raise ValueError(f'cannot place n between multiples: {matchLow}, {matchHigh}')
 
     if matchLow <= n <= (matchLow + halfUnit):
         return matchLow, round(n - matchLow, 7), round(n - matchLow, 7)
@@ -631,7 +679,7 @@ def decimalToTuplet(decNum: float) -> tuple[int, int]:
     (jy, iy) = findSimpleFraction(working)
 
     if iy == 0:
-        raise Exception('No such luck')
+        raise ValueError('No such luck')
 
     jy *= multiplier
     my_gcd = gcd(int(jy), int(iy))
@@ -644,7 +692,7 @@ def decimalToTuplet(decNum: float) -> tuple[int, int]:
         return (int(iy), int(jy))
 
 
-def unitNormalizeProportion(values: Sequence[int | float]) -> list[float]:
+def unitNormalizeProportion(values: Sequence[int|float]) -> list[float]:
     '''
     Normalize values within the unit interval, where max is determined by the sum of the series.
 
@@ -683,8 +731,8 @@ def unitNormalizeProportion(values: Sequence[int | float]) -> list[float]:
 
 
 def unitBoundaryProportion(
-    series: Sequence[int | float]
-) -> list[tuple[int | float, float]]:
+    series: Sequence[int|float]
+) -> list[tuple[int|float, float]]:
     '''
     Take a series of parts with an implied sum, and create
     unit-interval boundaries proportional to the series components.
@@ -707,7 +755,7 @@ def unitBoundaryProportion(
 
 
 def weightedSelection(values: list[int],
-                      weights: list[int | float],
+                      weights: list[int|float],
                       randomGenerator=None) -> int:
     '''
     Given a list of values and an equal-sized list of weights,
@@ -735,7 +783,7 @@ def weightedSelection(values: list[int],
     return values[index]
 
 
-def approximateGCD(values: Collection[int | float], grain: float = 1e-4) -> float:
+def approximateGCD(values: Collection[int|float|Fraction], grain: float = 1e-4) -> float:
     '''
     Given a list of values, find the lowest common divisor of floating point values.
 
@@ -798,7 +846,7 @@ def approximateGCD(values: Collection[int | float], grain: float = 1e-4) -> floa
         if count == len(divisions):
             commonUniqueDivisions.append(v)
     if not commonUniqueDivisions:
-        raise Exception('cannot find a common divisor')
+        raise ValueError('cannot find a common divisor')
     return max(commonUniqueDivisions)
 
 

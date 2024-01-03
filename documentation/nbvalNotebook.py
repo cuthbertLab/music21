@@ -13,14 +13,14 @@ import sys
 import subprocess
 
 # noinspection PyPackageRequirements
-import pytest  # pylint: disable=unused-import,import-error
+import pytest  # pylint: disable=unused-import
 # noinspection PyPackageRequirements
-import nbval  # pylint: disable=unused-import,import-error
+import nbval  # pylint: disable=unused-import
 
 from music21 import environment
 from music21 import common
 
-# pytest --nbval usersGuide_15_key.ipynb --sanitize-with ../../nbval-sanitize.cfg -q
+# pytest --nbval usersGuide_15_key.ipynb --nbval-sanitize-with ../../nbval-sanitize.cfg -q
 skip = ['installJupyter.ipynb']
 
 def getAllFiles() -> list[pathlib.Path]:
@@ -70,7 +70,7 @@ def runOne(nbFile):
             ['pytest',
              '--disable-pytest-warnings',
              '--nbval', str(nbFile),
-             '--sanitize-with', sanitize_fn,
+             '--nbval-sanitize-with', sanitize_fn,
              '-q'],
             check=False,
         )

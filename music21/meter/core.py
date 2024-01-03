@@ -6,7 +6,7 @@
 # Authors:      Christopher Ariza
 #               Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2009-2022 Michael Scott Asato Cuthbert
+# Copyright:    Copyright © 2009-2023 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # -----------------------------------------------------------------------------
 '''
@@ -1802,7 +1802,7 @@ class MeterSequence(MeterCoreMixin, prebase.ProtoM21Object):
         iMatch = self.offsetToIndex(qLenPos)
         return opFrac(self[iMatch].weight)
 
-    def offsetToDepth(self, qLenPos, align='quantize', index: int | None = None):
+    def offsetToDepth(self, qLenPos, align='quantize', index: int|None = None):
         '''
         Given a qLenPos, return the maximum available depth at this position.
 

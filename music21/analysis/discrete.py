@@ -7,7 +7,7 @@
 #               Christopher Ariza
 #               Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2010-2022 Michael Scott Asato Cuthbert
+# Copyright:    Copyright © 2010-2023 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
@@ -27,7 +27,6 @@ from __future__ import annotations
 from collections import OrderedDict
 from collections.abc import Iterable, Sequence
 import typing as t
-from typing import TYPE_CHECKING  # pylint needs no alias
 import unittest
 
 from music21 import environment
@@ -36,12 +35,11 @@ from music21 import harmony
 from music21 import interval
 from music21 import note
 from music21 import key
+from music21 import percussion
 from music21 import pitch
 
-
-if TYPE_CHECKING:
+if t.TYPE_CHECKING:
     from music21 import stream
-
 
 environLocal = environment.Environment('analysis.discrete')
 
@@ -81,7 +79,7 @@ class DiscreteAnalysis:
         # store alternative solutions, which may be sorted or not
         self.alternativeSolutions = []
 
-    def _rgbToHex(self, rgb: Sequence[float | int]) -> str:
+    def _rgbToHex(self, rgb: Sequence[float|int]) -> str:
         '''
         Utility conversion method
 
@@ -370,11 +368,9 @@ class KeyWeightKeyAnalysis(DiscreteAnalysis):
 
         for n in streamObj.notes:
             length = n.quarterLength
-            if n.isChord:
-                for m in n.pitchClasses:
-                    pcDist[m] += length
-            else:
-                pcDist[n.pitch.pitchClass] += length
+            for p in n.pitches:
+                pcDist[p.pitchClass] += length
+
         return pcDist
 
     # noinspection SpellCheckingInspection
@@ -393,7 +389,7 @@ class KeyWeightKeyAnalysis(DiscreteAnalysis):
                 solution[i] += (toneWeights[(j - i) % 12] * pcDistribution[j])
         return solution
 
-    def _getLikelyKeys(self, keyResults, differences):
+    def _getLikelyKeys(self, keyResults, differences) -> list[t.Any]|None:
         ''' Takes in a list of probable key results in points and returns a
             list of keys in letters, sorted from most likely to least likely.
         '''
@@ -411,15 +407,16 @@ class KeyWeightKeyAnalysis(DiscreteAnalysis):
             # environLocal.printDebug(['added likely key', likelyKeys[pc]])
         return likelyKeys
 
-    def _getDifference(self, keyResults, pcDistribution, weightType):
-        ''' Takes in a list of numerical probable key results and returns the
-            difference of the top two keys
+    def _getDifference(self, keyResults, pcDistribution, weightType) -> None|list[int|float]:
+        '''
+        Takes in a list of numerical probable key results and returns the
+        difference of the top two keys.
         '''
         # case of empty analysis
         if keyResults is None:
             return None
 
-        solution: list[int | float] = [0.0] * 12
+        solution: list[int|float] = [0.0] * 12
         top = [0.0] * 12
         bottomRight = [0.0] * 12
         bottomLeft = [0.0] * 12
@@ -622,7 +619,7 @@ class KeyWeightKeyAnalysis(DiscreteAnalysis):
         The data list contains a key (as a string), a mode
         (as a string), and a correlation value (degree of certainty)
         '''
-        sStream = sStream.flatten().notesAndRests
+        sStream = sStream.flatten().notesAndRests.getElementsNotOfClass(note.Unpitched)
         # this is the sample distribution used in the paper, for some testing purposes
         # pcDistribution = [7, 0, 5, 0, 7, 16, 0, 16, 0, 15, 6, 0]
 
@@ -726,7 +723,7 @@ class KrumhanslSchmuckler(KeyWeightKeyAnalysis):
     Implementation of Krumhansl-Schmuckler/Kessler weightings for
     Krumhansl-Schmuckler key determination algorithm.
 
-    Values from from http://extras.humdrum.org/man/keycor/, which describes these
+    Values from https://extras.humdrum.org/man/keycor/, which describes these
     weightings as "Strong tendency to identify the dominant key as the tonic."
 
     * Changed in v6.3: it used to be that these were different from the
@@ -774,7 +771,7 @@ class AardenEssen(KeyWeightKeyAnalysis):
     '''
     Implementation of Aarden-Essen weightings for Krumhansl-Schmuckler key determination algorithm.
 
-    Values from from http://extras.humdrum.org/man/keycor/, which
+    Values from https://extras.humdrum.org/man/keycor/, which
     describes these weightings as "Weak tendency to identify the subdominant key as the tonic."
 
     (N.B. -- we are not sure exactly where the minor weightings come from, and recommend
@@ -819,7 +816,7 @@ class SimpleWeights(KeyWeightKeyAnalysis):
     Implementation of simple weights by Craig Sapp for Krumhansl-Schmuckler
     key determination algorithm.
 
-    Values from from http://extras.humdrum.org/man/keycor/, which describes
+    Values from https://extras.humdrum.org/man/keycor/, which describes
     these weightings as "Performs most consistently with large regions of music,
     becomes noisier with smaller regions of music."
     '''
@@ -856,7 +853,7 @@ class BellmanBudge(KeyWeightKeyAnalysis):
     '''
     Implementation of Bellman-Budge weightings for Krumhansl-Schmuckler key determination algorithm.
 
-    Values from from http://extras.humdrum.org/man/keycor/, which describes these
+    Values from https://extras.humdrum.org/man/keycor/, which describes these
     weightings as "No particular tendencies for confusions with neighboring keys."
     '''
     _DOC_ALL_INHERITED = False
@@ -896,7 +893,7 @@ class TemperleyKostkaPayne(KeyWeightKeyAnalysis):
     Implementation of Temperley-Kostka-Payne weightings for Krumhansl-Schmuckler
     key determination algorithm.
 
-    Values from from http://extras.humdrum.org/man/keycor/, which describes
+    Values from https://extras.humdrum.org/man/keycor/, which describes
     these weightings as "Strong tendency to identify the relative major as the tonic
     in minor keys. Well-balanced for major keys."
     '''
@@ -954,14 +951,14 @@ class Ambitus(DiscreteAnalysis):
     # provide possible string matches for this processor
     identifiers = ['ambitus', 'span']
 
-    def __init__(self, referenceStream=None):
+    def __init__(self, referenceStream: stream.Stream|None = None):
         super().__init__(referenceStream=referenceStream)
         # Store the min and max Pitch instances for referenceStream
         # set by getPitchSpan(), which is called by _generateColors()
-        self.minPitchObj: pitch.Pitch | None = None
-        self.maxPitchObj: pitch.Pitch | None = None
+        self.minPitchObj: pitch.Pitch|None = None
+        self.maxPitchObj: pitch.Pitch|None = None
 
-        self._pitchSpanColors = OrderedDict()
+        self._pitchSpanColors: OrderedDict[int, str] = OrderedDict()
         self._generateColors()
 
     def _generateColors(self, numColors=None):
@@ -983,7 +980,10 @@ class Ambitus(DiscreteAnalysis):
         if numColors is None:
             if self._referenceStream is not None:
                 # get total range for entire piece
-                self.minPitchObj, self.maxPitchObj = self.getPitchSpan(self._referenceStream)
+                pitchSpanReturn = self.getPitchSpan(self._referenceStream)
+                if pitchSpanReturn is None:
+                    return
+                self.minPitchObj, self.maxPitchObj = pitchSpanReturn
                 maxPitch = int(self.maxPitchObj.ps - self.minPitchObj.ps)
             else:
                 maxPitch = 130  # a large default
@@ -1004,7 +1004,7 @@ class Ambitus(DiscreteAnalysis):
 
         # environLocal.printDebug([self._pitchSpanColors])
 
-    def getPitchSpan(self, subStream) -> tuple[pitch.Pitch, pitch.Pitch] | None:
+    def getPitchSpan(self, subStream) -> tuple[pitch.Pitch, pitch.Pitch]|None:
         '''
         For a given subStream, return a tuple consisting of the two pitches
         with the minimum and maximum pitch space value.
@@ -1337,7 +1337,7 @@ def analyzeStream(
         # this synonym is being added for compatibility
         method = 'span'
 
-    analysisClassName: type[DiscreteAnalysis] | None = analysisClassFromMethodName(method)
+    analysisClassName: type[DiscreteAnalysis]|None = analysisClassFromMethodName(method)
 
     if analysisClassName is not None:
         obj = analysisClassName()
@@ -1349,7 +1349,7 @@ def analyzeStream(
 
 
 # noinspection SpellCheckingInspection
-def analysisClassFromMethodName(method: str) -> type[DiscreteAnalysis] | None:
+def analysisClassFromMethodName(method: str) -> type[DiscreteAnalysis]|None:
     '''
     Returns an analysis class given a method name, or None if none can be found
 
@@ -1378,7 +1378,7 @@ def analysisClassFromMethodName(method: str) -> type[DiscreteAnalysis] | None:
         BellmanBudge,
         TemperleyKostkaPayne,
     ]
-    match: type[DiscreteAnalysis] | None = None
+    match: type[DiscreteAnalysis]|None = None
     for analysisClass in analysisClasses:
         # this is a very loose matching, as there are few classes now
         if (method.lower() in analysisClass.__name__.lower()
@@ -1584,6 +1584,19 @@ class Test(unittest.TestCase):
         k = s2.analyze('key')
         # Ensure all pitch classes are present
         self.assertEqual(len(k.alternateInterpretations), 23)
+
+    def testKeyAnalysisIgnoresUnpitched(self):
+        from music21 import stream
+        s = stream.Stream()
+        s.append(note.Unpitched())
+        s.append(percussion.PercussionChord([
+            note.Unpitched(),
+            note.Note('E-4'),
+            note.Note('B-4'),
+        ]))
+
+        k = s.analyze('key')
+        self.assertEqual(k.name, 'E- major')
 
 
 # define presented order in documentation

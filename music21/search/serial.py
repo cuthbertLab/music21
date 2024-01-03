@@ -655,7 +655,7 @@ class ContiguousSegmentSearcher:
 
         chordList = self.chordList
         chordList.append(n)
-        self.totalLength = self.totalLength + len(n.pitches)
+        self.totalLength += len(n.pitches)
 
         lengthOfActive = self.totalLength
         numChordsToDelete = 0

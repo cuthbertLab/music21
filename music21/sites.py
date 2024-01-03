@@ -18,7 +18,6 @@ import collections
 from collections.abc import Generator, MutableMapping
 import typing as t
 from typing import overload  # for some reason does not work in PyCharm if not directly imported
-from typing import TYPE_CHECKING  # pylint needs no alias
 import unittest
 import weakref
 
@@ -27,7 +26,7 @@ from music21 import exceptions21
 from music21 import prebase
 
 
-if TYPE_CHECKING:
+if t.TYPE_CHECKING:
     from music21 import stream
 
 
@@ -44,7 +43,7 @@ WEAKREF_ACTIVE = True
 # that still exists, then restore it from the dictionary; otherwise, do not
 # sweat it.  Should make pickle deepcopies of music21 objects in Streams still
 # possible without needing to recreate the whole stream.
-GLOBAL_SITE_STATE_DICT: MutableMapping[str, t.Any | None] = weakref.WeakValueDictionary()
+GLOBAL_SITE_STATE_DICT: MutableMapping[str, t.Any|None] = weakref.WeakValueDictionary()
 
 
 class SitesException(exceptions21.Music21Exception):
@@ -405,7 +404,7 @@ class Sites(common.SlottedObjectMixin):
                    excludeNone: bool = False,
                    sortByCreationTime: t.Union[bool, t.Literal['reverse']] = False,
                    priorityTarget=None,
-                   ) -> Generator[stream.Stream | None, None, None]:
+                   ) -> Generator[stream.Stream|None, None, None]:
         yield None
 
     def yieldSites(self,
@@ -413,7 +412,7 @@ class Sites(common.SlottedObjectMixin):
                    excludeNone: bool = False,
                    sortByCreationTime: t.Union[bool, t.Literal['reverse']] = False,
                    priorityTarget=None,
-                   ) -> Generator[stream.Stream | None, None, None]:
+                   ) -> Generator[stream.Stream|None, None, None]:
         # noinspection PyDunderSlots
         '''
         Yield references; order, based on dictionary keys, is from least
@@ -956,7 +955,7 @@ class Sites(common.SlottedObjectMixin):
             del self.siteDict[siteId]
             # environLocal.printDebug(['removed site w/o exception:', siteId,
             #    'self.siteDict.keys()', self.siteDict.keys()])
-        except Exception as e:  # pylint: disable=broad-except
+        except Exception as e:
             raise SitesException(
                 'an entry for this object '
                 + f'({site}) is not stored in this Sites object'

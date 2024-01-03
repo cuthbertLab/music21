@@ -244,8 +244,8 @@ class TestExternal(unittest.TestCase):  # pragma: no cover
             measures.append(b.measure(i))
         sp = StreamPlayer(b)
 
-        for i in range(len(measures)):
-            sp.streamIn = measures[i]
+        for measure in measures:
+            sp.streamIn = measure
             sp.play()
 
     def x_testPlayRealTime(self):

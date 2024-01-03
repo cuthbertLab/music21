@@ -20,8 +20,9 @@ from __future__ import annotations
 
 import copy
 import string
-from typing import TYPE_CHECKING  # pylint needs no alias
+import typing as t
 
+from music21.common.types import StreamType
 from music21 import environment
 from music21 import exceptions21
 from music21 import expressions
@@ -30,7 +31,7 @@ from music21 import spanner
 from music21 import style
 
 
-if TYPE_CHECKING:
+if t.TYPE_CHECKING:
     from music21 import stream
 
 
@@ -649,7 +650,7 @@ class ExpanderException(exceptions21.Music21Exception):
     pass
 
 
-class Expander:
+class Expander(t.Generic[StreamType]):
     '''
     The Expander object can expand a single Part or Part-like Stream with repeats. Nested
     repeats given with :class:`~music21.bar.Repeat` objects, or
@@ -712,45 +713,40 @@ class Expander:
         {0.0} <music21.note.Note F>
         {3.0} <music21.bar.Barline type=final>
 
+    Changed in v9: Expander must be initialized with a Stream object.
+
     OMIT_FROM_DOCS
 
     TODO: Note bug: barline style = double for each!
     Clefs and TimesSignatures should only be in first one!
 
-    Test empty expander:
-
-    >>> e = repeat.Expander()
+    THIS IS IN OMIT
     '''
-    def __init__(self, streamObj=None):
-        self._src = streamObj
-        self._repeatBrackets = None
-        if streamObj is not None:
-            self._setup()
-
-    def _setup(self):
-        '''
-        run several setup routines.
-        '''
+    def __init__(self, streamObj: StreamType):
         from music21 import stream
+
+        self._src: StreamType = streamObj
 
         # get and store the source measure count; this is presumed to
         # be a Stream with Measures
-        self._srcMeasureStream = self._src.getElementsByClass(stream.Measure).stream()
-        # store all top-level non Measure elements for later insertion
-        self._srcNotMeasureStream = self._src.getElementsNotOfClass(stream.Measure).stream()
-
-        # see if there are any repeat brackets
-        self._repeatBrackets = self._src.flatten().getElementsByClass(
-            spanner.RepeatBracket
+        self._srcMeasureStream: stream.Stream[stream.Measure] = self._src.getElementsByClass(
+            stream.Measure
         ).stream()
 
-        self._srcMeasureCount = len(self._srcMeasureStream)
+        # see if there are any repeat brackets
+        self._repeatBrackets: stream.Stream[spanner.RepeatBracket] = (
+            self._src.flatten().getElementsByClass(spanner.RepeatBracket).stream()
+        )
+
+        self._srcMeasureCount: int = len(self._srcMeasureStream)
         if self._srcMeasureCount == 0:
             raise ExpanderException('no measures found in the source stream to be expanded')
 
         # store counts of all non barline elements.
         # doing class matching by string as problems matching in some test cases
-        reStream = self._srcMeasureStream.flatten().getElementsByClass(RepeatExpression).stream()
+        reStream: stream.Stream[RepeatExpression] = (
+            self._srcMeasureStream.flatten().getElementsByClass(RepeatExpression).stream()
+        )
         self._codaCount = len(reStream.getElementsByClass(Coda))
         self._segnoCount = len(reStream.getElementsByClass(Segno))
         self._fineCount = len(reStream.getElementsByClass(Fine))
@@ -764,7 +760,7 @@ class Expander:
         self._dsafCount = len(reStream.getElementsByClass(DalSegnoAlFine))
         self._dsacCount = len(reStream.getElementsByClass(DalSegnoAlCoda))
 
-    def process(self, deepcopy=True):
+    def process(self, deepcopy: bool = True) -> StreamType:
         '''
         This is the main call for Expander
 
@@ -789,7 +785,7 @@ class Expander:
             srcStream = self._srcMeasureStream
 
         if canExpand is None:
-            return srcStream
+            return t.cast(StreamType, srcStream)
 
         # these must be copied, otherwise we have the original still
         self._repeatBrackets = copy.deepcopy(self._repeatBrackets)
@@ -1214,7 +1210,7 @@ class Expander:
                         return False
         return True
 
-    def _hasRepeat(self, streamObj):
+    def _hasRepeat(self, streamObj: stream.Stream) -> bool:
         '''
         Return True if this Stream of Measures has a repeat
         pair still to process.
@@ -1722,11 +1718,10 @@ class Expander:
         stream of measures. This requires the provided stream
         to only have measures.
 
-
         >>> s = converter.parse('tinynotation: 3/4 A2. C4 D E F2.')
         >>> s.makeMeasures(inPlace=True)
         >>> s.measure(3).append(repeat.Segno())
-        >>> e = repeat.Expander()
+        >>> e = repeat.Expander(s)
 
         getRepeatExpressionIndex returns the measureIndex not measure number
 
@@ -1744,7 +1739,7 @@ class Expander:
             return post
         return None
 
-    def isExpandable(self) -> bool | None:
+    def isExpandable(self) -> bool|None:
         '''
         Return True or False if this Stream is expandable, that is,
         if it has balanced repeats or sensible Da Capo or Dal Segno
@@ -2146,8 +2141,8 @@ class RepeatFinder:
             mLists = [p.getElementsByClass(stream.Measure) for p in s.parts]
 
         # Check for unequal lengths
-        for i in range(len(mLists) - 1):
-            if len(mLists[i]) != len(mLists[i + 1]):
+        for mThis, mNext in zip(mLists, mLists[1:]):
+            if len(mThis) != len(mNext):
                 raise UnequalPartsLengthException(
                     'Parts must each have the same number of measures.')
 
@@ -2169,11 +2164,9 @@ class RepeatFinder:
 
         tempDict = {}
         # maps the measure-hashes to the lowest examined measure number with that hash.
-        res = []
 
         # initialize res
-        for i in range(len(mLists)):
-            res.append([])
+        res = [[] for _ in range(len(mLists))]
 
         for i in range(len(mLists) - 1, -1, -1):
             # mHash is the concatenation of the measure i for each part.
@@ -2184,10 +2177,8 @@ class RepeatFinder:
                 res[i].append(tempDict[mHash])
                 res[i].extend(res[tempDict[mHash]])
 
-                # tempDict now stores the earliest known measure with mHash.
-                tempDict[mHash] = i
-            else:
-                tempDict[mHash] = i
+            # tempDict now stores the earliest known measure with mHash.
+            tempDict[mHash] = i
 
         self._mList = res
         return res
@@ -2620,4 +2611,3 @@ _DOC_ORDER = [RepeatExpression, RepeatExpressionMarker, Coda, Segno, Fine,
 if __name__ == '__main__':
     import music21
     music21.mainTest()
-

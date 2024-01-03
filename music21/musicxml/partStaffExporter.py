@@ -297,7 +297,7 @@ class PartStaffExporterMixin:
         >>> root = SX.parse()
         >>> m1 = root.find('part/measure')
         >>> SX.dump(m1)
-        <measure number="1">
+        <measure implicit="no" number="1">
         ...
           <note>
             <pitch>
@@ -324,7 +324,7 @@ class PartStaffExporterMixin:
           </note>
         </measure>
         '''
-        initialPartStaffRoot: Element | None = None
+        initialPartStaffRoot: Element|None = None
         for i, ps in enumerate(group):
             staffNumber: int = i + 1  # 1-indexed
             thisPartStaffRoot: Element = self.getRootForPartStaff(ps)
@@ -389,7 +389,7 @@ class PartStaffExporterMixin:
         DIVIDER_COMMENT = '========================= Measure [NNN] =========================='
         PLACEHOLDER = '[NNN]'
 
-        def makeDivider(inner_sourceNumber: int | str) -> Element:
+        def makeDivider(inner_sourceNumber: int|str) -> Element:
             return Comment(DIVIDER_COMMENT.replace(PLACEHOLDER, str(inner_sourceNumber)))
 
         sourceMeasures = iter(source.findall('measure'))
@@ -479,7 +479,7 @@ class PartStaffExporterMixin:
         >>> root = SX.parse()
         >>> m1 = root.find('part/measure')
         >>> SX.dump(m1)
-        <measure number="1">
+        <measure implicit="no" number="1">
           <attributes>
             <divisions>10080</divisions>
             <key number="1">
@@ -513,7 +513,7 @@ class PartStaffExporterMixin:
         >>> root = SX.parse()
         >>> m1 = root.find('part/measure')
         >>> SX.dump(m1)
-        <measure number="1">
+        <measure implicit="no" number="1">
             <attributes>
             <divisions>10080</divisions>
             <key>
@@ -549,7 +549,7 @@ class PartStaffExporterMixin:
             in this StaffGroup does not compare to the first instance of that class
             in the earliest staff where found (not necessarily the first) using `comparison`.
             '''
-            initialM21Instance: M21ObjType | None = None
+            initialM21Instance: M21ObjType|None = None
             # noinspection PyShadowingNames
             for ps in group:  # ps okay to reuse.
                 if initialM21Instance is None:
@@ -567,18 +567,17 @@ class PartStaffExporterMixin:
         multiKey: bool = isMultiAttribute(KeySignature)
         multiMeter: bool = isMultiAttribute(TimeSignature, comparison='ratioEqual')
 
-        initialPartStaffRoot: Element | None = None
-        mxAttributes: Element | None = None
+        initialPartStaffRoot: Element|None = None
+        mxAttributes: Element|None = None
         for i, ps in enumerate(group):
             staffNumber: int = i + 1  # 1-indexed
 
             # Initial PartStaff in group: find earliest mxAttributes, set clef #1 and <staves>
             if initialPartStaffRoot is None:
                 initialPartStaffRoot = self.getRootForPartStaff(ps)
-                mxAttributes = initialPartStaffRoot.find('measure/attributes')
-                clef1: Element | None = mxAttributes.find('clef') if mxAttributes else None
-                if clef1 is not None:
-                    clef1.set('number', '1')
+                if (mxAttributes := initialPartStaffRoot.find('measure/attributes')) is not None:
+                    if (clef1 := mxAttributes.find('clef')) is not None:
+                        clef1.set('number', '1')
 
                 mxStaves = Element('staves')
                 mxStaves.text = str(len(group))
@@ -591,17 +590,17 @@ class PartStaffExporterMixin:
 
                 if multiKey and mxAttributes is not None:
                     key1 = mxAttributes.find('key')
-                    if key1:
+                    if key1 is not None:
                         key1.set('number', '1')
                 if multiMeter and mxAttributes is not None:
                     meter1 = mxAttributes.find('time')
-                    if meter1:
+                    if meter1 is not None:
                         meter1.set('number', '1')
 
             # Subsequent PartStaffs in group: set additional clefs on mxAttributes
             else:
                 thisPartStaffRoot: Element = self.getRootForPartStaff(ps)
-                oldClef: Element | None = thisPartStaffRoot.find('measure/attributes/clef')
+                oldClef: Element|None = thisPartStaffRoot.find('measure/attributes/clef')
                 if oldClef is not None and mxAttributes is not None:
                     clefsInMxAttributesAlready = mxAttributes.findall('clef')
                     if len(clefsInMxAttributesAlready) >= staffNumber:
@@ -631,10 +630,7 @@ class PartStaffExporterMixin:
                     )
 
                 if multiMeter:
-                    oldMeter: Element | None = thisPartStaffRoot.find(
-                        'measure/attributes/time'
-                    )
-                    if oldMeter:
+                    if (oldMeter := thisPartStaffRoot.find('measure/attributes/time')) is not None:
                         oldMeter.set('number', str(staffNumber))
                         helpers.insertBeforeElements(
                             mxAttributes,
@@ -642,8 +638,7 @@ class PartStaffExporterMixin:
                             tagList=['staves']
                         )
                 if multiKey:
-                    oldKey: Element | None = thisPartStaffRoot.find('measure/attributes/key')
-                    if oldKey:
+                    if (oldKey := thisPartStaffRoot.find('measure/attributes/key')) is not None:
                         oldKey.set('number', str(staffNumber))
                         helpers.insertBeforeElements(
                             mxAttributes,
@@ -829,23 +824,23 @@ class PartStaffExporterMixin:
             <music21.stream.PartStaff unrelated> not found in self.partExporterList
         '''
         for pex in self.partExporterList:
-            if partStaff is pex.stream:
+            if partStaff is pex.stream and pex.xmlRoot is not None:
                 return pex.xmlRoot
 
         # now try derivations:
         for pex in self.partExporterList:
             for derived in pex.stream.derivation.chain():
-                if derived is partStaff:
+                if derived is partStaff and pex.xmlRoot is not None:
                     return pex.xmlRoot
 
         # now just match on id:
         for pex in self.partExporterList:
-            if partStaff.id == pex.stream.id:
+            if partStaff.id == pex.stream.id and pex.xmlRoot is not None:
                 return pex.xmlRoot
 
         for pex in self.partExporterList:
             for derived in pex.stream.derivation.chain():
-                if partStaff.id == derived.id:
+                if partStaff.id == derived.id and pex.xmlRoot is not None:
                     return pex.xmlRoot
 
         raise MusicXMLExportException(

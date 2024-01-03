@@ -31,6 +31,7 @@ classifiers = [
     "Programming Language :: Python :: 3 :: Only",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
     "Topic :: Artistic Software",
     "Topic :: Multimedia :: Sound/Audio",
     "Topic :: Multimedia :: Sound/Audio :: Conversion",
@@ -52,7 +53,7 @@ dependencies = [
 
 [[project.authors]]
 name = "Michael Scott Asato Cuthbert"
-email = "cuthbert@mit.edu"
+email = "michael.asato.cuthbert@gmail.com"
 
 [project.urls]
 Download = "https://github.com/cuthbertLab/music21/releases/"

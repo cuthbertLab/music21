@@ -78,7 +78,7 @@ class ProtoM21Object:
     # it only needs to be made once (11 microseconds per call, can be
     # a big part of iteration; from cache just 1 microsecond)
     _classTupleCacheDict: dict[type, tuple[str, ...]] = {}
-    _classSetCacheDict: dict[type, frozenset[str | type]] = {}
+    _classSetCacheDict: dict[type, frozenset[str|type]] = {}
 
     __slots__: tuple[str, ...] = ()
 
@@ -160,7 +160,7 @@ class ProtoM21Object:
             return classTuple
 
     @property
-    def classSet(self) -> frozenset[str | type]:
+    def classSet(self) -> frozenset[str|type]:
         '''
         Returns a set (that is, unordered, but indexed) of all classes that
         this class belongs to, including
@@ -223,7 +223,7 @@ class ProtoM21Object:
         try:
             return self._classSetCacheDict[self.__class__]
         except KeyError:
-            classList: list[str | type] = list(self.classes)
+            classList: list[str|type] = list(self.classes)
             classList.extend(self.__class__.mro())
             fullyQualifiedStrings = [x.__module__ + '.' + x.__name__ for x in self.__class__.mro()]
             classList.extend(fullyQualifiedStrings)

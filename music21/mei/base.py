@@ -309,7 +309,7 @@ class MeiToM21Converter:
             if isinstance(self.documentRoot, ElementTree):
                 # pylint warns that :class:`Element` doesn't have a getroot() method, which is
                 # true enough, but...
-                self.documentRoot = self.documentRoot.getroot()  # pylint: disable=maybe-no-member
+                self.documentRoot = self.documentRoot.getroot()
 
             if f'{MEI_NS}mei' != self.documentRoot.tag:
                 raise MeiElementError(_WRONG_ROOT_ELEMENT.format(self.documentRoot.tag))
@@ -353,8 +353,8 @@ class MeiToM21Converter:
 # -----------------------------------------------------------------------------
 def safePitch(
     name: str,
-    accidental: str | None = None,
-    octave: str | int = ''
+    accidental: str|None = None,
+    octave: str|int = ''
 ) -> pitch.Pitch:
     '''
     Safely build a :class:`~music21.pitch.Pitch` from a string.
@@ -392,7 +392,7 @@ def safePitch(
 
 
 def makeDuration(
-    base: float | int | Fraction = 0.0,
+    base: float|int|Fraction = 0.0,
     dots: int = 0
 ) -> duration.Duration:
     '''
@@ -419,7 +419,7 @@ def makeDuration(
     0.5
     '''
     returnDuration = duration.Duration(base)
-    returnDuration.dots = dots  # pylint: disable=assigning-non-slot
+    returnDuration.dots = dots
     return returnDuration
 
 
@@ -628,7 +628,7 @@ def _makeArticList(attr):
     return articList
 
 
-def _getOctaveShift(dis: t.Literal['8', '15', '22'] | None,
+def _getOctaveShift(dis: t.Literal['8', '15', '22']|None,
                     disPlace: str) -> int:
     '''
     Use :func:`_getOctaveShift` to calculate the :attr:`octaveShift` attribute for a
@@ -1038,7 +1038,7 @@ def _timeSigFromAttrs(elem):
     return meter.TimeSignature(f"{elem.get('meter.count')!s}/{elem.get('meter.unit')!s}")
 
 
-def _keySigFromAttrs(elem: Element) -> key.Key | key.KeySignature:
+def _keySigFromAttrs(elem: Element) -> key.Key|key.KeySignature:
     '''
     From any tag with (at minimum) either @key.pname or @key.sig attributes, make a
     :class:`KeySignature` or :class:`Key`, as possible.
@@ -1521,7 +1521,7 @@ def _guessTuplets(theLayer):
 
 # Element-Based Converter Functions
 # -----------------------------------------------------------------------------
-def scoreDefFromElement(elem, slurBundle=None):  # pylint: disable=unused-argument
+def scoreDefFromElement(elem, slurBundle=None):
     '''
     <scoreDef> Container for score meta-information.
 
@@ -1694,7 +1694,7 @@ def staffGrpFromElement(elem, slurBundle=None, staffDefDict=None):
     return staffDefDict
 
 
-def staffDefFromElement(elem, slurBundle=None):  # pylint: disable=unused-argument
+def staffDefFromElement(elem, slurBundle=None):
     '''
     <staffDef> Container for staff meta-information.
 
@@ -1893,14 +1893,14 @@ def articFromElement(elem, slurBundle=None):  # pylint: disable=unused-argument
     :attr:`~music21.note.GeneralNote.articulations` attribute.
 
     >>> from xml.etree import ElementTree as ET
-    >>> meiSnippet = """<artic artic="acc" xmlns="http://www.music-encoding.org/ns/mei"/>"""
+    >>> meiSnippet = '<artic artic="acc" xmlns="http://www.music-encoding.org/ns/mei"/>'
     >>> meiSnippet = ET.fromstring(meiSnippet)
     >>> mei.base.articFromElement(meiSnippet)
     [<music21.articulations.Accent>]
 
     A single <artic> element may indicate many :class:`Articulation` objects.
 
-    >>> meiSnippet = """<artic artic="acc ten" xmlns="http://www.music-encoding.org/ns/mei"/>"""
+    >>> meiSnippet = '<artic artic="acc ten" xmlns="http://www.music-encoding.org/ns/mei"/>'
     >>> meiSnippet = ET.fromstring(meiSnippet)
     >>> mei.base.articFromElement(meiSnippet)
     [<music21.articulations.Accent>, <music21.articulations.Tenuto>]
@@ -1952,11 +1952,11 @@ def accidFromElement(elem, slurBundle=None):  # pylint: disable=unused-argument
     a string. Accidentals up to triple-sharp and triple-flat are supported.
 
     >>> from xml.etree import ElementTree as ET
-    >>> meiSnippet = """<accid accid="s" xmlns="http://www.music-encoding.org/ns/mei"/>"""
+    >>> meiSnippet = '<accid accid="s" xmlns="http://www.music-encoding.org/ns/mei"/>'
     >>> meiSnippet = ET.fromstring(meiSnippet)
     >>> mei.base.accidFromElement(meiSnippet)
     '#'
-    >>> meiSnippet = """<accid accid="tf" xmlns="http://www.music-encoding.org/ns/mei"/>"""
+    >>> meiSnippet = '<accid accid="tf" xmlns="http://www.music-encoding.org/ns/mei"/>'
     >>> meiSnippet = ET.fromstring(meiSnippet)
     >>> mei.base.accidFromElement(meiSnippet)
     '---'
