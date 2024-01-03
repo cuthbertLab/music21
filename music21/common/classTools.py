@@ -13,8 +13,11 @@ from __future__ import annotations
 
 from collections.abc import Iterable, Collection
 import contextlib
-import numbers
 import typing as t
+
+if t.TYPE_CHECKING:
+    from fractions import Fraction
+
 
 __all__ = [
     'holdsType',
@@ -40,12 +43,13 @@ def isInt(usrData: t.Any) -> t.TypeGuard[int]:
     return isinstance(usrData, int) and usrData is not True and usrData is not False
 
 
-def isNum(usrData: t.Any) -> t.TypeGuard[numbers.Rational]:
+def isNum(usrData: t.Any) -> t.TypeGuard[t.Union[float, int, Fraction]]:
     '''
-    check if usrData is a number (float, int, long, Decimal),
+    check if usrData is a music21 number (float, int, Fraction),
     return boolean and if True casts the value as a Rational number
 
-    unlike `isinstance(usrData, Rational)` does not return True for `True, False`.
+    Differs from `isinstance(usrData, Rational)` which
+    does not return True for `True, False`, and does not support Decimal
 
     Does not use `isinstance(usrData, Rational)` which is 2-6 times slower
     than calling this function (except in the case of Fraction, when
@@ -75,17 +79,16 @@ def isNum(usrData: t.Any) -> t.TypeGuard[numbers.Rational]:
     '''
     # noinspection PyBroadException
     try:
-        # TODO: this may have unexpected consequences: find
         dummy = usrData + 0
         if usrData is not True and usrData is not False:
             return True
         else:
             return False
-    except Exception:  # pylint: disable=broad-except
+    except Exception:  # pylint: disable=broad-exception-caught
         return False
 
 
-def isListLike(usrData: t.Any) -> t.TypeGuard[list | tuple]:
+def isListLike(usrData: t.Any) -> t.TypeGuard[list|tuple]:
     '''
     Returns True if is a List or Tuple or their subclasses.
 
@@ -295,7 +298,7 @@ def tempAttribute(obj, attribute: str, new_val=TEMP_ATTRIBUTE_SENTINEL):
         setattr(obj, attribute, tempStorage)
 
 @contextlib.contextmanager
-def saveAttributes(obj, *attributeList):
+def saveAttributes(obj, *attributeList: str) -> t.Generator[None, None, None]:
     '''
     Save a number of attributes in an object and then restore them afterwards.
 

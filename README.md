@@ -3,7 +3,7 @@
 `music21` -- A Toolkit for Computer-Aided Musical Analysis and 
 Computational Musicology
 
-Copyright © 2006-2022, [Michael Scott Asato Cuthbert](http://www.trecento.com)
+Copyright © 2006-2023 [Michael Scott Asato Cuthbert](http://www.trecento.com)
 
 For more information, visit:
 https://web.mit.edu/music21
@@ -23,7 +23,6 @@ music encoding in the corpus may have different licenses and/or copyrights.
 A no-corpus version of `music21` is available also on GitHub.
 
 [![Build Status](https://github.com/cuthbertLab/music21/workflows/maincheck/badge.svg)](https://github.com/cuthbertLab/music21)
-[![Lint Status](https://github.com/cuthbertLab/music21/workflows/PyLint/badge.svg)](https://github.com/cuthbertLab/music21)
 [![Coverage Status](https://coveralls.io/repos/github/cuthbertLab/music21/badge.svg?branch=master)](https://coveralls.io/github/cuthbertLab/music21?branch=master)
 
 ## Documentation ##
@@ -59,7 +58,8 @@ contributor’s participation in the community.
 
 The maintainers of `music21` and associated sites will commit themselves to enforcing
 this code of conduct. Users who notice violations, including instances of abuse,
-harassment, or otherwise unacceptable behavior are requested to contact cuthbert@mit.edu.
+harassment, or otherwise unacceptable behavior are requested to contact 
+michael.asato.cuthbert@gmail.com.
 Maintainers will respect confidentiality with regard to reports.
 
 ## Acknowledgements ##

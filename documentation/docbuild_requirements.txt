@@ -1,0 +1,3 @@
+# for readthedocs.io (based on requirements_dev.txt)
+nbconvert
+sphinx

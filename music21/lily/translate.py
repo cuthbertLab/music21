@@ -5,7 +5,7 @@
 #
 # Authors:      Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2007-2022 Michael Scott Asato Cuthbert
+# Copyright:    Copyright © 2007-2023 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
@@ -1087,7 +1087,7 @@ class LilypondConverter:
             currentMusicList.append(lyObject)
             lyObject.setParent(contextObject)
             # except AttributeError as ae:
-            #    raise Exception('Cannot parse %s: %s' % (thisObject, str(ae)))
+            #    raise ValueError('Cannot parse %s: %s' % (thisObject, str(ae)))
         elif 'Note' in c or 'Rest' in c:
             self.appendContextFromNoteOrRest(thisObject)
         elif 'Chord' in c:
@@ -1527,7 +1527,7 @@ class LilypondConverter:
 
     def lyMultipliedDurationFromDuration(
         self,
-        durationObj: duration.Duration | duration.DurationTuple,
+        durationObj: duration.Duration|duration.DurationTuple,
     ):
         r'''
         take a simple Duration (that is, one with one DurationTuple)
@@ -1567,7 +1567,7 @@ class LilypondConverter:
         >>> [str(lpc.lyMultipliedDurationFromDuration(c)) for c in components]
         ['1 ', '4 ']
         '''
-        number_type: float | int | str
+        number_type: float|int|str
         try:
             number_type = duration.convertTypeToNumber(durationObj.type)  # module call
         except duration.DurationException as de:
@@ -2490,7 +2490,7 @@ class LilypondConverter:
         '''
         lF = self.createPDF()
         if not lF.exists():  # pragma: no cover
-            raise Exception('Something went wrong with PDF Creation')
+            raise RuntimeError('Something went wrong with PDF Creation')
 
         if os.name == 'nt':
             command = f'start /wait {str(lF)} && del /f {str(lF)}'
@@ -2517,7 +2517,7 @@ class LilypondConverter:
                 lilyImage = Image.open(str(lilyFile))
                 lilyImage2 = ImageOps.expand(lilyImage, 10, 'white')  # type: ignore
                 lilyImage2.save(str(lilyFile))
-            except Exception:  # pylint: disable=broad-except
+            except Exception:  # pylint: disable=broad-exception-caught
                 pass  # no big deal probably...
         return lilyFile
 
@@ -2667,7 +2667,6 @@ class TestExternal(unittest.TestCase):
 
 # ------------------------------------------------------------------------------
 if __name__ == '__main__':
-    # pylint: disable=ungrouped-imports
     import music21
     music21.mainTest(Test)  # , TestExternal)
     # music21.mainTest(TestExternal, 'noDocTest')

@@ -6,7 +6,7 @@
 # Authors:      Greg Chapman
 #               Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2022 Michael Scott Asato Cuthbert and the music21
+# Copyright:    Copyright © 2023 Michael Scott Asato Cuthbert and the music21
 #               Project
 # License:      BSD, see license.txt
 # -----------------------------------------------------------------------------
@@ -47,11 +47,11 @@ class PropertyDescription:
         metadata, and is the tuple element type clients will always receive from
         md['uniqueName'] or md['namespace:name'].
     '''
-    uniqueName: str | None = None
+    uniqueName: str|None = None
     name: str = ''
     namespace: str = ''
-    oldMusic21Abbrev: str | None = None
-    oldMusic21WorkId: str | None = None
+    oldMusic21Abbrev: str|None = None
+    oldMusic21WorkId: str|None = None
     valueType: type[ValueType] = Text
     needsArticleNormalization: bool = False
     isContributor: bool = False
@@ -1136,6 +1136,12 @@ STANDARD_PROPERTY_DESCRIPTIONS: tuple[PropertyDescription, ...] = (
     # filePath: The path to the file that was parsed to produce this metadata
     PropertyDescription(
         name='filePath',
+        namespace='m21FileInfo',
+        isContributor=False),
+
+    # corpusFilePath: The path withing the corpus that the file was found at
+    PropertyDescription(
+        name='corpusFilePath',
         namespace='m21FileInfo',
         isContributor=False),
 

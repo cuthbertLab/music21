@@ -65,6 +65,9 @@ class Volume(prebase.ProtoM21Object, SlottedObjectMixin):
     <music21.volume.Volume realized=0.71>
     >>> v.velocity
     90
+
+    * Changed in v9: all constructor attributes are keyword only.
+        (client as first attribute was confusing)
     '''
     # CLASS VARIABLES #
     __slots__ = (
@@ -77,9 +80,9 @@ class Volume(prebase.ProtoM21Object, SlottedObjectMixin):
     def __init__(
         self,
         *,
-        client: note.NotRest | None = None,
-        velocity: int | float | None = None,
-        velocityScalar: int | float | None = None,
+        client: note.NotRest|None = None,
+        velocity: int|float|None = None,
+        velocityScalar: int|float|None = None,
         velocityIsRelative: bool = True,
     ):
         # store a reference to the client, as we use this to do context
@@ -141,7 +144,7 @@ class Volume(prebase.ProtoM21Object, SlottedObjectMixin):
             self.velocityIsRelative = other.velocityIsRelative
 
     def getRealizedStr(self,
-                       useDynamicContext: dynamics.Dynamic | bool = True,
+                       useDynamicContext: dynamics.Dynamic|bool = True,
                        useVelocity=True,
                        useArticulations: t.Union[bool,
                                                  articulations.Articulation,
@@ -165,7 +168,7 @@ class Volume(prebase.ProtoM21Object, SlottedObjectMixin):
 
     def getRealized(
         self,
-        useDynamicContext: bool | dynamics.Dynamic = True,
+        useDynamicContext: bool|dynamics.Dynamic = True,
         useVelocity=True,
         useArticulations: t.Union[
             bool, articulations.Articulation, Iterable[articulations.Articulation]

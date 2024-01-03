@@ -1068,15 +1068,15 @@ class Iterator:
                   'titleList', 'numberList', 'returnType', 'iterationType']
 
     def __init__(self,
-                 currentNumber: int | None = None,
-                 highestNumber: int | None = None,
+                 currentNumber: int|None = None,
+                 highestNumber: int|None = None,
                  *,
                  numberingSystem: str = 'riemenschneider',
                  returnType: str = 'stream',
                  iterationType: str = 'number',
                  analysis: bool = False,
-                 numberList: list[int] | None = None,
-                 titleList: list[str] | None = None,
+                 numberList: list[int]|None = None,
+                 titleList: list[str]|None = None,
                  ):
         '''
         By default: numberingSystem = 'riemenschneider', currentNumber = 1,
@@ -1278,7 +1278,7 @@ class Iterator:
                     analysis = corpus.parse(riemenschneiderName)
                     if analysis is not None:
                         chorale.insert(0, analysis.parts[0])
-                except Exception:  # pylint: disable=broad-except
+                except Exception:  # pylint: disable=broad-exception-caught
                     pass  # fail silently
             # Store the correct title in metadata (replacing the chorale number as it is parsed)
             if chorale.metadata is None:
@@ -1290,7 +1290,7 @@ class Iterator:
         elif self._returnType == 'filename':
             return filename
         else:
-            raise Exception(
+            raise ValueError(
                 f'An unexpected returnType {self._returnType} was introduced. '
                 + 'This should not happen.'
             )
@@ -1554,7 +1554,7 @@ class Iterator:
     @currentNumber.setter
     def currentNumber(self, value):
         if self._numberingSystem is None:
-            raise Exception('Numbering System is not set.')
+            raise ValueError('Numbering System is not set.')
         if self._iterationType == 'number':
             if self._numberingSystem == 'title':
                 if not self._titleList:
@@ -1639,7 +1639,7 @@ class Iterator:
     @highestNumber.setter
     def highestNumber(self, value):
         if self._numberingSystem is None:
-            raise Exception('Numbering System is not set.')
+            raise ValueError('Numbering System is not set.')
         if self.iterationType == 'number':
             if self._numberingSystem == 'title':
                 if not self._titleList:

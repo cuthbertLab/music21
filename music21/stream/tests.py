@@ -6,7 +6,7 @@
 # Authors:      Michael Scott Asato Cuthbert
 #               Christopher Ariza
 #
-# Copyright:    Copyright © 2009-2022 Michael Scott Asato Cuthbert
+# Copyright:    Copyright © 2009-2023 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 from __future__ import annotations
@@ -1469,6 +1469,19 @@ class Test(unittest.TestCase):
         self.assertEqual(chordsOut[3].pitches, ch4.pitches)
         self.assertEqual(chordsOut[4].pitches, ch5.pitches)
 
+    def testStripTiesChordsAccidentals(self):
+        '''
+        Make sure chords are matched even if some have 'natural' accidentals and some
+        have None accidentals.
+        '''
+        sch = corpus.parse('schoenberg/opus19', 2)
+        self.assertEqual(len(sch.stripTies().flatten().notes), 46)
+        measure = sch.stripTies().parts[0].getElementsByClass('Measure')[6]
+        self.assertEqual(len(measure.notes), 3)
+        self.assertEqual(measure.notes[0].offset, 0.5)
+        self.assertEqual(measure.notes[1].offset, 2.5)
+        self.assertEqual(measure.notes[2].offset, 3.0)
+
     def testStripTiesComplexTies(self):
         '''
         Make sure tie types of "stop" or "continue" are not taken at face value
@@ -1714,7 +1727,7 @@ class Test(unittest.TestCase):
         a = corpus.parse('bach/bwv324.xml')
         # get notes from one measure
 
-        mOffsetMap = a.parts[0].flatten().measureOffsetMap(note.Note)
+        mOffsetMap = a.parts[0].flatten().measureOffsetMap([note.Note])
         self.assertEqual(sorted(list(mOffsetMap.keys())),
                          [0.0, 4.0, 8.0, 12.0, 16.0, 20.0, 24.0, 34.0, 38.0])
 
@@ -1728,22 +1741,21 @@ class Test(unittest.TestCase):
 
         m1 = a.parts[0].getElementsByClass(Measure)[1]
         # m1.show('text')
-        mOffsetMap = m1.measureOffsetMap(note.Note)
+        mOffsetMap = m1.measureOffsetMap([note.Note])
         # offset here is that of measure that originally contained this note
         # environLocal.printDebug(['m1', m1, 'mOffsetMap', mOffsetMap])
         self.assertEqual(sorted(list(mOffsetMap.keys())), [4.0])
 
         m2 = a.parts[0].getElementsByClass(Measure)[2]
-        mOffsetMap = m2.measureOffsetMap(note.Note)
+        mOffsetMap = m2.measureOffsetMap([note.Note])
         # offset here is that of measure that originally contained this note
         self.assertEqual(sorted(list(mOffsetMap.keys())), [8.0])
 
-        mOffsetMap = a.flatten().measureOffsetMap('Note')
+        mOffsetMap = a.flatten().measureOffsetMap(['Note'])
         self.assertEqual(sorted(mOffsetMap.keys()),
                          [0.0, 4.0, 8.0, 12.0, 16.0, 20.0, 24.0, 34.0, 38.0])
 
     def testMeasureOffsetMapPostTie(self):
-
         a = corpus.parse('bach/bwv4.8')
         # alto line syncopated/tied notes across bars
         # a.show()
@@ -1775,7 +1787,7 @@ class Test(unittest.TestCase):
         self.assertEqual(mNo, 4)
 
         # can we get an offset Measure map by looking for measures
-        post = altoPostTie.measureOffsetMap(Measure)
+        post = altoPostTie.measureOffsetMap([Measure])
         # yes, retainContainers defaults to True
         self.assertEqual(list(post.keys()), correctMeasureOffsetMap)
 
@@ -2832,11 +2844,10 @@ class Test(unittest.TestCase):
         allNotes = bm.flatten().notes
         #      0C#  1B-~  | 2B-  3C#~  4C#    6B-     7C#    8B-~   9B-~   10B-
         ds = [True, True, False, True, False, True, False, False, False, False]
-        for i in range(len(allNotes)):
-            self.assertEqual(allNotes[i].pitch.accidental.displayStatus,
-                             ds[i],
-                             '%s failed, %s != %s' %
-                                (i, allNotes[i].pitch.accidental.displayStatus, ds[i]))
+        for i, (dsi, thisNote) in enumerate(zip(ds, allNotes)):
+            self.assertEqual(thisNote.pitch.accidental.displayStatus,
+                             dsi,
+                             f'{i} failed, {thisNote.pitch.accidental.displayStatus} != {dsi}')
 
         # add another B-flat just after the tied one...
         bm = converter.parse(
@@ -2846,11 +2857,10 @@ class Test(unittest.TestCase):
         allNotes = bm.flatten().notes
         #      0C#  1B-~  | 2B-   3B-  4C#~  5C#    6B-     7C#    8B-~   9B-~  | 10B-
         ds = [True, True, False, True, True, False, False, False, False, False, False]
-        for i in range(len(allNotes)):
-            self.assertEqual(allNotes[i].pitch.accidental.displayStatus,
-                             ds[i],
-                             '%s failed, %s != %s' %
-                                (i, allNotes[i].pitch.accidental.displayStatus, ds[i]))
+        for i, (dsi, thisNote) in enumerate(zip(ds, allNotes)):
+            self.assertEqual(thisNote.pitch.accidental.displayStatus,
+                             dsi,
+                             f'{i} failed, {thisNote.pitch.accidental.displayStatus} != {dsi}')
 
     def testMakeAccidentalsRespectsDisplayType(self):
         n = note.Note('D#')
@@ -3768,18 +3778,18 @@ class Test(unittest.TestCase):
             (0, MetaEvents.SEQUENCE_TRACK_NAME, None),
             (0, ChannelVoiceMessages.PITCH_BEND, None),
             (0, ChannelVoiceMessages.NOTE_ON, 56),
-            (512, ChannelVoiceMessages.NOTE_OFF, 56),
+            (5040, ChannelVoiceMessages.NOTE_OFF, 56),
             (0, ChannelVoiceMessages.NOTE_ON, 56),
-            (512, ChannelVoiceMessages.NOTE_OFF, 56),
+            (5040, ChannelVoiceMessages.NOTE_OFF, 56),
             (0, ChannelVoiceMessages.NOTE_ON, 56),
-            (512, ChannelVoiceMessages.NOTE_OFF, 56),
+            (5040, ChannelVoiceMessages.NOTE_OFF, 56),
             (0, ChannelVoiceMessages.NOTE_ON, 56),
-            (512, ChannelVoiceMessages.NOTE_OFF, 56),
+            (5040, ChannelVoiceMessages.NOTE_OFF, 56),
             (0, ChannelVoiceMessages.NOTE_ON, 56),
-            (512, ChannelVoiceMessages.NOTE_OFF, 56),
+            (5040, ChannelVoiceMessages.NOTE_OFF, 56),
             (0, ChannelVoiceMessages.NOTE_ON, 56),
-            (512, ChannelVoiceMessages.NOTE_OFF, 56),
-            (1024, MetaEvents.END_OF_TRACK, None),
+            (5040, ChannelVoiceMessages.NOTE_OFF, 56),
+            (10080, MetaEvents.END_OF_TRACK, None),
         ]
 
         procCompare(mf, match)
@@ -3794,12 +3804,12 @@ class Test(unittest.TestCase):
             (0, MetaEvents.SEQUENCE_TRACK_NAME, None),
             (0, ChannelVoiceMessages.PITCH_BEND, None),
             (0, ChannelVoiceMessages.NOTE_ON, 56),
-            (1536, ChannelVoiceMessages.NOTE_OFF, 56),
+            (15120, ChannelVoiceMessages.NOTE_OFF, 56),
             (0, ChannelVoiceMessages.NOTE_ON, 56),
-            (1536, ChannelVoiceMessages.NOTE_OFF, 56),
+            (15120, ChannelVoiceMessages.NOTE_OFF, 56),
             (0, ChannelVoiceMessages.NOTE_ON, 56),
-            (1536, ChannelVoiceMessages.NOTE_OFF, 56),
-            (1024, MetaEvents.END_OF_TRACK, None),
+            (15120, ChannelVoiceMessages.NOTE_OFF, 56),
+            (10080, MetaEvents.END_OF_TRACK, None),
         ]
         procCompare(mf, match)
 
@@ -3822,16 +3832,16 @@ class Test(unittest.TestCase):
             (0, MetaEvents.SEQUENCE_TRACK_NAME, None),
             (0, ChannelVoiceMessages.PITCH_BEND, None),
             (0, ChannelVoiceMessages.NOTE_ON, 36),
-            (256, ChannelVoiceMessages.NOTE_OFF, 36),
+            (2520, ChannelVoiceMessages.NOTE_OFF, 36),
             (0, ChannelVoiceMessages.NOTE_ON, 49),
-            (512, ChannelVoiceMessages.NOTE_OFF, 49),
+            (5040, ChannelVoiceMessages.NOTE_OFF, 49),
             (0, ChannelVoiceMessages.NOTE_ON, 56),
-            (1536, ChannelVoiceMessages.NOTE_OFF, 56),
+            (15120, ChannelVoiceMessages.NOTE_OFF, 56),
             (0, ChannelVoiceMessages.NOTE_ON, 46),
-            (1024, ChannelVoiceMessages.NOTE_OFF, 46),
+            (10080, ChannelVoiceMessages.NOTE_OFF, 46),
             (0, ChannelVoiceMessages.NOTE_ON, 69),
-            (2048, ChannelVoiceMessages.NOTE_OFF, 69),
-            (1024, MetaEvents.END_OF_TRACK, None),
+            (20160, ChannelVoiceMessages.NOTE_OFF, 69),
+            (10080, MetaEvents.END_OF_TRACK, None),
         ]
         procCompare(mf, match)
 
@@ -3860,14 +3870,14 @@ class Test(unittest.TestCase):
             (0, MetaEvents.SEQUENCE_TRACK_NAME, None),
             (0, ChannelVoiceMessages.PITCH_BEND, None),
             (0, ChannelVoiceMessages.NOTE_ON, 36),
-            (1024, ChannelVoiceMessages.NOTE_OFF, 36),
-            (512, ChannelVoiceMessages.NOTE_ON, 49),
-            (1024, ChannelVoiceMessages.NOTE_OFF, 49),
-            (512, ChannelVoiceMessages.NOTE_ON, 46),
-            (1024, ChannelVoiceMessages.NOTE_OFF, 46),
-            (512, ChannelVoiceMessages.NOTE_ON, 69),
-            (1024, ChannelVoiceMessages.NOTE_OFF, 69),
-            (1024, MetaEvents.END_OF_TRACK, None),
+            (10080, ChannelVoiceMessages.NOTE_OFF, 36),
+            (5040, ChannelVoiceMessages.NOTE_ON, 49),
+            (10080, ChannelVoiceMessages.NOTE_OFF, 49),
+            (5040, ChannelVoiceMessages.NOTE_ON, 46),
+            (10080, ChannelVoiceMessages.NOTE_OFF, 46),
+            (5040, ChannelVoiceMessages.NOTE_ON, 69),
+            (10080, ChannelVoiceMessages.NOTE_OFF, 69),
+            (10080, MetaEvents.END_OF_TRACK, None),
         ]
         procCompare(mf, match)
 
@@ -3895,14 +3905,14 @@ class Test(unittest.TestCase):
             (0, MetaEvents.SEQUENCE_TRACK_NAME, None),
             (0, ChannelVoiceMessages.PITCH_BEND, None),
             (0, ChannelVoiceMessages.NOTE_ON, 36),
-            (1024, ChannelVoiceMessages.NOTE_OFF, 36),
-            (256, ChannelVoiceMessages.NOTE_ON, 49),
-            (1024, ChannelVoiceMessages.NOTE_OFF, 49),
-            (1536, ChannelVoiceMessages.NOTE_ON, 46),
-            (1024, ChannelVoiceMessages.NOTE_OFF, 46),
-            (2048, ChannelVoiceMessages.NOTE_ON, 69),
-            (1024, ChannelVoiceMessages.NOTE_OFF, 69),
-            (1024, MetaEvents.END_OF_TRACK, None),
+            (10080, ChannelVoiceMessages.NOTE_OFF, 36),
+            (2520, ChannelVoiceMessages.NOTE_ON, 49),
+            (10080, ChannelVoiceMessages.NOTE_OFF, 49),
+            (15120, ChannelVoiceMessages.NOTE_ON, 46),
+            (10080, ChannelVoiceMessages.NOTE_OFF, 46),
+            (20160, ChannelVoiceMessages.NOTE_ON, 69),
+            (10080, ChannelVoiceMessages.NOTE_OFF, 69),
+            (10080, MetaEvents.END_OF_TRACK, None),
         ]
         procCompare(mf, match)
 
@@ -3935,16 +3945,16 @@ class Test(unittest.TestCase):
             (0, MetaEvents.SEQUENCE_TRACK_NAME, None),
             (0, ChannelVoiceMessages.PITCH_BEND, None),
             (0, ChannelVoiceMessages.NOTE_ON, 36),
-            (1024, ChannelVoiceMessages.NOTE_OFF, 36),
-            (2048, ChannelVoiceMessages.NOTE_ON, 49),
-            (1024, ChannelVoiceMessages.NOTE_OFF, 49),
+            (10080, ChannelVoiceMessages.NOTE_OFF, 36),
+            (20160, ChannelVoiceMessages.NOTE_ON, 49),
+            (10080, ChannelVoiceMessages.NOTE_OFF, 49),
             (0, ChannelVoiceMessages.NOTE_ON, 49),
-            (1024, ChannelVoiceMessages.NOTE_OFF, 49),
-            (2048, ChannelVoiceMessages.NOTE_ON, 46),
-            (1024, ChannelVoiceMessages.NOTE_OFF, 46),
-            (2048, ChannelVoiceMessages.NOTE_ON, 69),
-            (1024, ChannelVoiceMessages.NOTE_OFF, 69),
-            (1024, MetaEvents.END_OF_TRACK, None),
+            (10080, ChannelVoiceMessages.NOTE_OFF, 49),
+            (20160, ChannelVoiceMessages.NOTE_ON, 46),
+            (10080, ChannelVoiceMessages.NOTE_OFF, 46),
+            (20160, ChannelVoiceMessages.NOTE_ON, 69),
+            (10080, ChannelVoiceMessages.NOTE_OFF, 69),
+            (10080, MetaEvents.END_OF_TRACK, None),
         ]
         procCompare(mf, match)
 
@@ -3977,32 +3987,32 @@ class Test(unittest.TestCase):
             (0, MetaEvents.SEQUENCE_TRACK_NAME, None),
             (0, ChannelVoiceMessages.PITCH_BEND, None),
             (0, ChannelVoiceMessages.NOTE_ON, 36),
-            (1024, ChannelVoiceMessages.NOTE_OFF, 36),
-            (1024, ChannelVoiceMessages.NOTE_ON, 53),
+            (10080, ChannelVoiceMessages.NOTE_OFF, 36),
+            (10080, ChannelVoiceMessages.NOTE_ON, 53),
             (0, ChannelVoiceMessages.NOTE_ON, 68),
             (0, ChannelVoiceMessages.NOTE_ON, 72),
-            (1024, ChannelVoiceMessages.NOTE_OFF, 53),
+            (10080, ChannelVoiceMessages.NOTE_OFF, 53),
             (0, ChannelVoiceMessages.NOTE_OFF, 68),
             (0, ChannelVoiceMessages.NOTE_OFF, 72),
-            (512, ChannelVoiceMessages.NOTE_ON, 46),
-            (1024, ChannelVoiceMessages.NOTE_OFF, 46),
-            (2048, ChannelVoiceMessages.NOTE_ON, 38),
+            (5040, ChannelVoiceMessages.NOTE_ON, 46),
+            (10080, ChannelVoiceMessages.NOTE_OFF, 46),
+            (20160, ChannelVoiceMessages.NOTE_ON, 38),
             (0, ChannelVoiceMessages.NOTE_ON, 69),
-            (512, ChannelVoiceMessages.NOTE_OFF, 38),
+            (5040, ChannelVoiceMessages.NOTE_OFF, 38),
             (0, ChannelVoiceMessages.NOTE_OFF, 69),
             (0, ChannelVoiceMessages.NOTE_ON, 37),
             (0, ChannelVoiceMessages.NOTE_ON, 58),
             (0, ChannelVoiceMessages.NOTE_ON, 92),
-            (512, ChannelVoiceMessages.NOTE_OFF, 37),
+            (5040, ChannelVoiceMessages.NOTE_OFF, 37),
             (0, ChannelVoiceMessages.NOTE_OFF, 58),
             (0, ChannelVoiceMessages.NOTE_OFF, 92),
-            (1024, ChannelVoiceMessages.NOTE_ON, 54),
+            (10080, ChannelVoiceMessages.NOTE_ON, 54),
             (0, ChannelVoiceMessages.NOTE_ON, 69),
             (0, ChannelVoiceMessages.NOTE_ON, 73),
-            (4096, ChannelVoiceMessages.NOTE_OFF, 54),
+            (40320, ChannelVoiceMessages.NOTE_OFF, 54),
             (0, ChannelVoiceMessages.NOTE_OFF, 69),
             (0, ChannelVoiceMessages.NOTE_OFF, 73),
-            (1024, MetaEvents.END_OF_TRACK, None),
+            (10080, MetaEvents.END_OF_TRACK, None),
         ]
         procCompare(mf, match)
 
@@ -4024,10 +4034,12 @@ class Test(unittest.TestCase):
 
         def procCompare(srcOffset, srcDur, dstOffset, dstDur, divList):
             s = Stream()
-            for i in range(len(srcDur)):
+            for nOffset, nDuration in zip(srcOffset, srcDur):
                 n = note.Note()
-                n.quarterLength = srcDur[i]
-                s.insert(srcOffset[i], n)
+                n.quarterLength = nDuration
+                s.insert(nOffset, n)
+            # Must be sorted for quantizing to work optimally.
+            s.sort()
 
             s.quantize(divList, processOffsets=True, processDurations=True, inPlace=True)
 
@@ -4072,6 +4084,18 @@ class Test(unittest.TestCase):
 
                     [8, 6])  # snap to 0.125 and 0.1666666
 
+        # User-reported example: contains overlap and tiny gaps
+        # Parsing with fewer gaps in v.9, as long as stream is sorted
+        # https://github.com/cuthbertLab/music21/issues/1536
+        procCompare([2.016, 2.026, 2.333, 2.646, 3.0, 3.323, 3.651],
+                    [0.123, 0.656, 0.104, 0.094, 0.146, 0.099, 0.141],
+
+                    [2, 2, F('7/3'), F('8/3'), 3.0, F('10/3'), F('11/3')],
+                    [F('1/3'), F('2/3'), F('1/3'), F('1/3'),
+                     F('1/3'), F('1/3'), 0.25],
+
+                    [4, 3])
+
     def testQuantizeMinimumDuration(self):
         '''
         Notes (not rests!) of nonzero duration should retain a nonzero
@@ -4104,17 +4128,11 @@ class Test(unittest.TestCase):
                         interval.Interval(26),
                         interval.Interval(10)]
 
-        for i in range(len(sub)):
-            sTest = sub[i]
-            post = sTest.analyze('ambitus')
-            self.assertEqual(str(post), str(matchAmbitus[i]))
-
         # match values for different analysis strings
         for idStr in ['range', 'ambitus', 'span']:
-            for i in range(len(sub)):
-                sTest = sub[i]
+            for sTest, matchAmbitusTest in zip(sub, matchAmbitus):
                 post = sTest.analyze(idStr)
-                self.assertEqual(str(post), str(matchAmbitus[i]))
+                self.assertEqual(str(post), str(matchAmbitusTest))
 
         # only match first two values
         matchKrumhansl = [(pitch.Pitch('F#'), 'minor'),
@@ -4122,33 +4140,24 @@ class Test(unittest.TestCase):
                           (pitch.Pitch('E'), 'major'),
                           (pitch.Pitch('E'), 'major')]
 
-        for i in range(len(sub)):
-            sTest = sub[i]
-            post = sTest.analyze('KrumhanslSchmuckler')
-            # returns three values; match 2
-            self.assertEqual(post.tonic.name, matchKrumhansl[i][0].name)
-            self.assertEqual(post.mode, matchKrumhansl[i][1])
-
         # match values under different strings provided to analyze
-        for idStr in ['krumhansl']:
-            for i in range(len(sub)):
-                sTest = sub[i]
+        for idStr in ['KrumhanslSchmuckler', 'krumhansl']:
+            for sTest, sMatch in zip(sub, matchKrumhansl):
                 post = sTest.analyze(idStr)
                 # returns three values; match 2
-                self.assertEqual(post.tonic.name, matchKrumhansl[i][0].name)
-                self.assertEqual(post.mode, matchKrumhansl[i][1])
+                self.assertEqual(post.tonic.name, sMatch[0].name)
+                self.assertEqual(post.mode, sMatch[1])
 
         matchArden = [(pitch.Pitch('F#'), 'minor'),
-                          (pitch.Pitch('C#'), 'minor'),
-                          (pitch.Pitch('F#'), 'minor'),
-                          (pitch.Pitch('E'), 'major')]
+                      (pitch.Pitch('C#'), 'minor'),
+                      (pitch.Pitch('F#'), 'minor'),
+                      (pitch.Pitch('E'), 'major')]
         for idStr in ['arden']:
-            for i in range(len(sub)):
-                sTest = sub[i]
+            for sTest, sMatch in zip(sub, matchArden):
                 post = sTest.analyze(idStr)
                 # returns three values; match 2
-                self.assertEqual(post.tonic.name, matchArden[i][0].name)
-                self.assertEqual(post.mode, matchArden[i][1])
+                self.assertEqual(post.tonic.name, sMatch[0].name)
+                self.assertEqual(post.mode, sMatch[1])
 
     def testMakeTupletBracketsA(self):
         '''
@@ -4571,14 +4580,11 @@ class Test(unittest.TestCase):
                           ('E#', True), ('E#', False), ('F#', False), ('F#', False)]
                          )
 
-        # transposing should reset all transposed accidentals
         mStream.flatten().transpose('p5', inPlace=True)
 
         # mStream.show()
 
-        # after transposition all accidentals are reset
-        # note: last d# is not showing in Finale, but this seems to be a
-        # finale error, as the musicxml is the same in all D# cases
+        self.maxDiff = None
         self.assertEqual(collectAccidentalDisplayStatus(mStream),
                          ['x', ('G#', None), ('G#', None), 'x', 'x', 'x', 'x',
                           ('B#', None), ('B#', None), ('C#', None), ('F#', None), ('G#', None),
@@ -4740,9 +4746,8 @@ class Test(unittest.TestCase):
         for durCol in [[1, 1, 1], [0.5, 2, 3], [0.25, 0.25, 0.5], [6, 6, 8]]:
             s = Stream()
             o = 0
-            for i in range(len(pitchCol)):
-                ql = durCol[i]
-                for pStr in pitchCol[i]:
+            for ql, pitches in zip(durCol, pitchCol):
+                for pStr in pitches:
                     n = note.Note(pStr)
                     n.quarterLength = ql
                     s.insert(o, n)
@@ -4756,10 +4761,10 @@ class Test(unittest.TestCase):
             for sEval in [s, sMod]:
                 self.assertEqual(len(sEval.getElementsByClass(chord.Chord)), 3)
                 # make sure we have all the original pitches
-                for i in range(len(pitchCol)):
+                for i, pitchEl in enumerate(pitchCol):
                     match = [p.nameWithOctave for p in
                              sEval.getElementsByClass(chord.Chord)[i].pitches]
-                    self.assertEqual(match, list(pitchCol[i]))
+                    self.assertEqual(match, list(pitchEl))
         # print('post chordify')
         # s.show('t')
         # sMod.show('t')
@@ -5385,7 +5390,7 @@ class Test(unittest.TestCase):
 
         post = sSrc.parts[0].flatten().sliceAtOffsets([0.25, 1.25, 3.25])
         self.assertEqual([e.offset for e in post],
-                         [0.0, 0.0, 0.0, 0.0, 0.0, 0.25, 0.5, 1.0, 1.25, 2.0, 3.0, 3.25, 4.0,
+                         [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.25, 0.5, 1.0, 1.25, 2.0, 3.0, 3.25, 4.0,
                           5.0, 6.0, 7.0, 8.0, 9.0, 9.0, 9.5, 10.0, 11.0, 12.0, 13.0, 14.0,
                           15.0, 16.0, 17.0, 18.0, 19.0, 20.0, 21.0, 21.0, 22.0, 23.0, 24.0,
                           25.0, 26.0, 27.0, 29.0, 31.0, 32.0, 33.0, 34.0, 34.5, 35.0, 36.0])
@@ -6462,7 +6467,7 @@ class Test(unittest.TestCase):
         rElements = list(s.recurse(includeSelf=True))  # NOTE: list(s.recurse())
         # removes self, while [x for x in s.recurse()] does not.
         self.assertTrue(s in rElements)
-        self.assertEqual(len(rElements), 240)
+        self.assertEqual(len(rElements), 244)
 
         # rElements = list(s.recurse(streamsOnly=True))
         # self.assertEqual(len(rElements), 45)
@@ -7003,7 +7008,7 @@ class Test(unittest.TestCase):
         s = corpus.parse('bwv66.6')
         sFlat = s.flatten()
         # we have not tempo
-        self.assertEqual(len(sFlat.getElementsByClass(tempo.TempoIndication)), 0)
+        self.assertEqual(len(sFlat.getElementsByClass(tempo.TempoIndication)), 4)
         sFlat.insert(0, tempo.MetronomeMark('adagio'))
         self.assertAlmostEqual(sFlat.seconds, 38.57142857)
 
@@ -7412,18 +7417,38 @@ class Test(unittest.TestCase):
         self.assertEqual(str(s.parts[1].getElementsByClass(instrument.Instrument)[0].transposition),
                          '<music21.interval.Interval M-6>')
 
+        # Set each part's first note's natural to be visible, to test that it will remain so
+        # after transposition
+        for p in s.parts:
+            firstPitch = p.pitches[0]
+            self.assertIsNone(firstPitch.accidental)
+            firstPitch.accidental = 0
+            firstPitch.accidental.displayStatus = True
+
         self.assertEqual([str(p) for p in s.parts[0].pitches],
                          ['D4', 'E4', 'F#4', 'G4', 'A4', 'B4', 'C#5', 'D5'])
+        self.assertEqual([None if p.accidental is None else p.accidental.displayStatus
+                            for p in s.parts[0].pitches],
+                         [True, None, False, None, None, None, False, None])
         self.assertEqual([str(p) for p in s.parts[1].pitches],
                          ['A4', 'B4', 'C#5', 'D5', 'E5', 'F#5', 'G#5', 'A5'])
+        self.assertEqual([None if p.accidental is None else p.accidental.displayStatus
+                            for p in s.parts[1].pitches],
+                         [True, None, False, None, None, False, False, None])
 
         self.assertEqual(s.atSoundingPitch, 'unknown')
-        s.toSoundingPitch(inPlace=True)
+        s.toSoundingPitch(inPlace=True, preserveAccidentalDisplay=True)
 
         self.assertEqual([str(p) for p in s.parts[0].pitches],
                          ['C4', 'D4', 'E4', 'F4', 'G4', 'A4', 'B4', 'C5'])
+        self.assertEqual([None if p.accidental is None else p.accidental.displayStatus
+                            for p in s.parts[0].pitches],
+                         [True, None, None, None, None, None, None, None])
         self.assertEqual([str(p) for p in s.parts[1].pitches],
                          ['C4', 'D4', 'E4', 'F4', 'G4', 'A4', 'B4', 'C5'])
+        self.assertEqual([None if p.accidental is None else p.accidental.displayStatus
+                            for p in s.parts[1].pitches],
+                         [True, None, None, None, None, None, None, None])
 
     def testTransposeByPitchC(self):
         p = converter.parse('tinyNotation: c1 d1')
@@ -7746,6 +7771,7 @@ class Test(unittest.TestCase):
                                                                   useMixedNumerals=True),
             '''{0 - 0} <music21.layout.SystemLayout>
 {0 - 0} <music21.clef.TrebleClef>
+{0 - 0} <music21.tempo.MetronomeMark Quarter=120 (playback only)>
 {0 - 0} <music21.key.Key of B- major>
 {0 - 0} <music21.meter.TimeSignature 4/4>
 {0 - 2/3} <music21.note.Note B->
@@ -7755,6 +7781,7 @@ class Test(unittest.TestCase):
         self.assertMultiLineEqual(
             s.parts[1].getElementsByClass(Measure)[0]._reprText(addEndTimes=True),
             '''{0.0 - 0.0} <music21.clef.BassClef>
+{0.0 - 0.0} <music21.tempo.MetronomeMark Quarter=120 (playback only)>
 {0.0 - 0.0} <music21.key.Key of B- major>
 {0.0 - 0.0} <music21.meter.TimeSignature 4/4>
 {0.0 - 4.0} <music21.note.Note B->''')
@@ -7763,6 +7790,7 @@ class Test(unittest.TestCase):
         self.assertMultiLineEqual(m1._reprText(addEndTimes=True, useMixedNumerals=True),
                                   '''{0 - 0} <music21.layout.SystemLayout>
 {0 - 0} <music21.clef.TrebleClef>
+{0 - 0} <music21.tempo.MetronomeMark Quarter=120 (playback only)>
 {0 - 0} <music21.key.Key of B- major>
 {0 - 0} <music21.meter.TimeSignature 4/4>
 {0 - 2/3} <music21.chord.Chord B-2 B-4>

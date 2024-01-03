@@ -7,7 +7,7 @@
 #               Christopher Ariza
 #               Michael Bodenbach
 #
-# Copyright:    Copyright © 2009-2022 Michael Scott Asato Cuthbert
+# Copyright:    Copyright © 2009-2023 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
@@ -19,7 +19,7 @@ within :class:`~music21.stream.Measure` objects.
 from __future__ import annotations
 
 from collections.abc import Iterable, Sequence
-from typing import TYPE_CHECKING  # pylint needs no alias
+import typing as t
 import unittest
 
 from music21 import base
@@ -29,7 +29,7 @@ from music21 import pitch
 from music21 import style
 
 
-if TYPE_CHECKING:
+if t.TYPE_CHECKING:
     from music21 import stream
 
 
@@ -126,11 +126,11 @@ class Clef(base.Music21Object):
     _styleClass = style.TextStyle
     classSortOrder = 0
 
-    def __init__(self, **keywords):
+    def __init__(self, **keywords) -> None:
         super().__init__(**keywords)
-        self.sign: str | None = None
+        self.sign: str|None = None
         # line counts start from the bottom up, the reverse of musedata
-        self.line: int | None = None
+        self.line: int|None = None
         self._octaveChange: int = 0  # set to zero as default
         # musicxml has an attribute for clefOctaveChange,
         # an integer to show transposing clef
@@ -185,7 +185,7 @@ class Clef(base.Music21Object):
 
     def getStemDirectionForPitches(
         self,
-        pitches: pitch.Pitch | Sequence[pitch.Pitch],
+        pitches: pitch.Pitch|Sequence[pitch.Pitch],
         *,
         firstLastOnly: bool = True,
         extremePitchOnly: bool = False,
@@ -283,7 +283,7 @@ class PitchClef(Clef):
             ''',
     }
 
-    def __init__(self, **keywords):
+    def __init__(self, **keywords) -> None:
         super().__init__(**keywords)
         self.lowestLine: int = 31
 
@@ -399,7 +399,7 @@ class TabClef(PitchClef):
 
     def getStemDirectionForPitches(
         self,
-        pitchList: pitch.Pitch | Iterable[pitch.Pitch],
+        pitchList: pitch.Pitch|Iterable[pitch.Pitch],
         *,
         firstLastOnly: bool = True,
         extremePitchOnly: bool = False,
@@ -730,7 +730,7 @@ class SubBassClef(FClef):
 
 
 # ------------------------------------------------------------------------------
-CLASS_FROM_TYPE: dict[str, list[type[Clef] | None]] = {
+CLASS_FROM_TYPE: dict[str, list[type[Clef]|None]] = {
     'G': [None, FrenchViolinClef, TrebleClef, GSopranoClef, None, None],
     'C': [None, SopranoClef, MezzoSopranoClef, AltoClef, TenorClef, CBaritoneClef],
     'F': [None, None, None, FBaritoneClef, BassClef, SubBassClef],
@@ -879,7 +879,7 @@ def clefFromString(clefString, octaveShift=0) -> Clef:
             clefObj.line = lineNum
         else:
             ClefType = line_list[lineNum]
-            if TYPE_CHECKING:
+            if t.TYPE_CHECKING:
                 assert ClefType is not None
                 assert issubclass(ClefType, PitchClef)
             clefObj = ClefType()

@@ -237,6 +237,9 @@ class EnharmonicFixer(OMRMidiFixer):
     <music21.pitch.Accidental sharp>
     '''
     def fix(self):
+        '''
+        Fixes the enharmonic errors in the OMR by changing the pitch of the note.
+        '''
         super().fix()
         for (midiRef, omrRef, op) in self.changes:
             omrRef.style.color = 'black'
@@ -307,24 +310,47 @@ class EnharmonicFixer(OMRMidiFixer):
 
 
     def isEnharmonic(self, midiRef, omrRef):
+        '''
+        Returns True if the omrRef is enharmonic to the midiRef, False otherwise
+        '''
         return midiRef.pitch.isEnharmonic(omrRef.pitch)
 
     def hasAcc(self, omrRef):
+        '''
+        Returns True if the omrRef has an accidental, False otherwise
+        '''
         return omrRef.pitch.accidental is not None
 
     def hasNatAcc(self, omrRef):
+        '''
+        Returns True if the omrRef has a natural accidental, False otherwise
+        '''
         return self.hasAcc(omrRef) and omrRef.pitch.accidental.name == 'natural'
 
     def hasSharpFlatAcc(self, omrRef):
+        '''
+        Returns True if the omrRef has a sharp or flat accidental, False otherwise
+        '''
         return self.hasAcc(omrRef) and omrRef.pitch.accidental.name != 'natural'
 
     def stepEq(self, midiRef, omrRef):
+        '''
+        Returns True if the steps are equal, False otherwise
+        '''
         return midiRef.step == omrRef.step
 
     def stepNotEq(self, midiRef, omrRef):
+        '''
+        Returns True if the steps are not equal, False otherwise
+        '''
         return midiRef.step != omrRef.step
 
     def intervalTooBig(self, midiRef, omrRef, setInt=5):
+        '''
+        Returns True if the intervalClass between the two notes is greater than setInt.
+
+        Note that intervalClass and not actual interval size is used.
+        '''
         if interval.notesToChromatic(midiRef, omrRef).intervalClass > setInt:
             return True
         return False
@@ -350,7 +376,7 @@ class OrnamentFixer(OMRMidiFixer):
             self.recognizers = recognizers
         self.markChangeColor = markChangeColor
 
-    def findOrnament(self, busyNotes, simpleNotes) -> expressions.Ornament | None:
+    def findOrnament(self, busyNotes, simpleNotes) -> expressions.Ornament|None:
         '''
         Finds an ornament in busyNotes based from simpleNote
         using provided recognizers.
@@ -389,7 +415,7 @@ class OrnamentFixer(OMRMidiFixer):
             return True
         return False
 
-    def fix(self, *, show=False, inPlace=True) -> OMRMidiFixer | None:
+    def fix(self, *, show=False, inPlace=True) -> OMRMidiFixer|None:
         '''
         Corrects missed ornaments in omrStream according to midiStream
         :param show: Whether to show results
@@ -397,7 +423,7 @@ class OrnamentFixer(OMRMidiFixer):
         return a new OrnamentFixer with changes
         '''
         changes = self.changes
-        sa: aligner.StreamAligner | None = None
+        sa: aligner.StreamAligner|None = None
         omrNotesLabeledOrnament = []
         midiNotesAlreadyFixedForOrnament = []
 
@@ -510,9 +536,11 @@ class Test(unittest.TestCase):
 
     def measuresEqual(self, m1, m2):
         '''
-        Returns a tuple of (True/False, reason)
+        Returns a tuple of (bool, reason) where the first element is
+        whether the measures are equal and the second (`reason`) is a string
+        explaining why they are unequal.
 
-        Reason is '' if True
+        Reason is an empty string if the measures are equal.
         '''
         if len(m1) != len(m2):
             msg = 'not equal length'

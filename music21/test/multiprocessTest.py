@@ -40,9 +40,9 @@ environLocal = environment.Environment('test.multiprocessTest')
 
 @dataclasses.dataclass
 class ModuleResponse:
-    returnCode: str | None = None
+    returnCode: str|None = None
     fp: t.Any = None
-    moduleName: str | None = None
+    moduleName: str|None = None
     success: t.Any = None
     testRunner: t.Any = None
     errors: t.Any = None
@@ -117,7 +117,7 @@ def runOneModuleWithoutImp(args):
                                   failures=failures,
                                   testsRun=testResult.testsRun,
                                   runTime=runTime)
-        except Exception as excp:  # pylint: disable=broad-except
+        except Exception as excp:  # pylint: disable=broad-exception-caught
             environLocal.printDebug(f'*** Exception in running {moduleName}: {excp}...\n')
             return ModuleResponse(returnCode='TrappedException',
                                   fp=fp,
@@ -125,7 +125,7 @@ def runOneModuleWithoutImp(args):
                                   success=None,
                                   testRunner=str(excp)
                                   )
-    except Exception as excp:  # pylint: disable=broad-except
+    except Exception as excp:  # pylint: disable=broad-exception-caught
         environLocal.printDebug(f'*** Large Exception in running {fp}: {excp}...\n')
         return ModuleResponse(returnCode='LargeException',
                               fp=fp,
@@ -151,7 +151,6 @@ def mainPoolRunner(testGroup=('test',), restoreEnvironmentDefaults=False, leaveO
     pathsToRun = modGather.modulePaths  # [30:60]
     # print(pathsToRun)
 
-    # pylint: disable=not-callable
     with multiprocessing.Pool(processes=poolSize) as pool:
 
         # imap returns the results as they are completed.
@@ -210,7 +209,7 @@ def mainPoolRunner(testGroup=('test',), restoreEnvironmentDefaults=False, leaveO
                 continueIt = False
                 pool.close()
                 pool.join()
-            except Exception as excp:  # pylint: disable=broad-except
+            except Exception as excp:  # pylint: disable=broad-exception-caught
                 eventsProcessed += 1
                 exceptionLog = ModuleResponse(
                     returnCode='UntrappedException',

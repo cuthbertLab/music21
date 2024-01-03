@@ -20,7 +20,7 @@ from __future__ import annotations
 from collections.abc import Generator, Iterable
 import itertools
 import random
-from typing import TYPE_CHECKING
+import typing as t
 import unittest
 
 import more_itertools
@@ -33,7 +33,7 @@ from music21.tree import spans
 from music21.tree import trees
 
 
-if TYPE_CHECKING:
+if t.TYPE_CHECKING:
     from music21.tree.verticality import VerticalitySequence
 
 
@@ -849,9 +849,8 @@ class Test(unittest.TestCase):
                                  max(x.endTime for x in currentTimespansInList))
                 self.assertEqual(tsTree.lowestPosition(), currentPosition)
                 self.assertEqual(tsTree.endTime, currentEndTime)
-                # pylint: disable=consider-using-enumerate
-                for j in range(len(currentTimespansInTree)):
-                    self.assertEqual(currentTimespansInList[j], currentTimespansInTree[j])
+                for inList, inTree in zip(currentTimespansInList, currentTimespansInTree):
+                    self.assertEqual(inList, inTree)
 
             random.shuffle(tss)
             while tss:
@@ -872,9 +871,8 @@ class Test(unittest.TestCase):
                                      max(x.endTime for x in currentTimespansInList))
                     self.assertEqual(tsTree.lowestPosition(), currentPosition)
                     self.assertEqual(tsTree.endTime, currentEndTime)
-                    # pylint: disable=consider-using-enumerate
-                    for i in range(len(currentTimespansInTree)):
-                        self.assertEqual(currentTimespansInList[i], currentTimespansInTree[i])
+                    for inList, inTree in zip(currentTimespansInList, currentTimespansInTree):
+                        self.assertEqual(inList, inTree)
 # -----------------------------------------------------------------------------
 
 

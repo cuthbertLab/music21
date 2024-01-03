@@ -21,6 +21,7 @@ import io
 import pathlib
 import pickle
 import os
+import subprocess
 import typing as t
 
 from music21.exceptions21 import Music21Exception
@@ -31,6 +32,7 @@ __all__ = [
     'cd',
     'preparePathClassesForUnpickling',
     'restorePathClassesAfterUnpickling',
+    'runSubprocessCapturingStderr',
 ]
 
 
@@ -53,7 +55,7 @@ def cd(targetDir):
         os.chdir(cwd)
 
 
-def readPickleGzip(filePath: str | pathlib.Path) -> t.Any:
+def readPickleGzip(filePath: str|pathlib.Path) -> t.Any:
     '''
     Read a gzip-compressed pickle file, uncompress it, unpickle it, and
     return the contents.
@@ -63,7 +65,7 @@ def readPickleGzip(filePath: str | pathlib.Path) -> t.Any:
         try:
             uncompressed = pickledFile.read()
             newMdb = pickle.loads(uncompressed)
-        except Exception as e:  # pylint: disable=broad-except
+        except Exception as e:
             # pickle exceptions cannot be caught directly
             # because they might come from pickle or _pickle and the latter cannot
             # be caught.
@@ -117,7 +119,7 @@ def readFileEncodingSafe(filePath, firstGuess='utf-8') -> str:
         import chardet  # type: ignore
         with io.open(filePath, 'rb') as thisFileBinary:
             dataBinary = thisFileBinary.read()
-            encoding = chardet.detect(dataBinary)['encoding']
+            encoding = chardet.detect(dataBinary)['encoding'] or 'ascii'
             return codecs.decode(dataBinary, encoding)
     # might also raise FileNotFoundError, but let that bubble
 
@@ -148,6 +150,25 @@ def restorePathClassesAfterUnpickling():
         pathlib.PosixPath = _storedPathlibClasses['posixPath']
     else:
         pathlib.WindowsPath = _storedPathlibClasses['windowsPath']
+
+
+def runSubprocessCapturingStderr(subprocessCommand):
+    '''
+    Run a subprocess command, capturing stderr and
+    only show the error if an exception is raised.
+    '''
+    completed_process = subprocess.run(subprocessCommand, capture_output=True, check=False)
+    if completed_process.returncode != 0:
+        # Raise same exception class as findNumberedPNGPath()
+        # for backward compatibility
+        stderr_bytes = completed_process.stderr
+        try:
+            import locale
+            stderr_str = stderr_bytes.decode(locale.getpreferredencoding(do_setlocale=False))
+        except UnicodeDecodeError:
+            # not really a str, but best we can do.
+            stderr_str = stderr_bytes.decode('ascii', errors='ignore')
+        raise IOError(stderr_str)
 
 
 # -----------------------------------------------------------------------------

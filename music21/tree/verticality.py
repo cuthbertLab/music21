@@ -19,6 +19,7 @@ from __future__ import annotations
 from collections.abc import Iterable, Sequence
 import copy
 import itertools
+import typing as t
 import unittest
 
 from music21 import chord
@@ -336,7 +337,7 @@ class Verticality(prebase.ProtoM21Object):
         return self.startTimespans[0].measureNumber
 
     @property
-    def nextStartOffset(self) -> float | None:
+    def nextStartOffset(self) -> float|None:
         r'''
         Gets the next start-offset in the verticality's offset-tree.
 
@@ -535,7 +536,7 @@ class Verticality(prebase.ProtoM21Object):
         return tuple(self.startTimespans[:] + self.overlapTimespans[:])
 
     @property
-    def timeToNextEvent(self) -> OffsetQL | None:
+    def timeToNextEvent(self) -> OffsetQL|None:
         '''
         Returns a float or Fraction of the quarterLength to the next
         event (usually the next Verticality, but also to the end of the piece).
@@ -554,7 +555,7 @@ class Verticality(prebase.ProtoM21Object):
 
     def makeElement(
         self,
-        quarterLength: OffsetQLIn | None = None,
+        quarterLength: OffsetQLIn|None = None,
         *,
         addTies=True,
         addPartIdAsGroup=False,
@@ -562,7 +563,7 @@ class Verticality(prebase.ProtoM21Object):
         gatherArticulations='single',
         gatherExpressions='single',
         copyPitches=True,
-    ) -> note.Rest | chord.Chord:
+    ) -> note.Rest|chord.Chord:
         # noinspection PyDunderSlots, PyShadowingNames
         r'''
         Makes a Chord or Rest from this verticality and quarterLength.
@@ -777,9 +778,14 @@ class Verticality(prebase.ProtoM21Object):
 
             offsetDifference = common.opFrac(self.offset - ts.offset)
             endTimeDifference = common.opFrac(ts.endTime - (self.offset + quarterLength))
+            if t.TYPE_CHECKING:
+                assert endTimeDifference is not None
+
+            # noinspection PyTypeChecker
             if offsetDifference == 0 and endTimeDifference <= 0:
                 addTie = None
             elif offsetDifference > 0:
+                # noinspection PyTypeChecker
                 if endTimeDifference > 0:
                     addTie = 'continue'
                 else:
@@ -868,30 +874,37 @@ class Verticality(prebase.ProtoM21Object):
             if not isinstance(timeSpan, spans.PitchedTimespan):
                 continue
             el = timeSpan.element
-            if isinstance(el, chord.Chord):
-                if len(el) == 0:  # pylint: disable=len-as-condition
+            if isinstance(el, chord.ChordBase):
+                firstNoteElement: note.Note | None = None
+                for subEl in el:
+                    if isinstance(subEl, note.Note):
+                        firstNoteElement = subEl
+                        break
+
+                if firstNoteElement is None:
                     continue
 
                 if el.articulations or el.expressions:
-                    firstSubEl = copy.deepcopy(el[0])  # this makes an additional deepcopy
-                    firstSubEl.articulations += el.articulations
-                    firstSubEl.expressions += el.expressions
+                    # make a deepcopy of the first note element
+                    # adding all articulations and expressions from the Chord to it.
+                    originalPitch = firstNoteElement.pitch
+                    firstNoteElement = copy.deepcopy(firstNoteElement)
+                    firstNoteElement.articulations += el.articulations
+                    firstNoteElement.expressions += el.expressions
                     if not copyPitches:
-                        firstSubEl.pitch = el[0].pitch
-                else:
-                    firstSubEl = el[0]
-                conditionalAdd(timeSpan, firstSubEl)
+                        firstNoteElement.pitch = originalPitch
+                conditionalAdd(timeSpan, firstNoteElement)
 
                 if len(el) > 1:
                     for subEl in list(el)[1:]:
-                        conditionalAdd(timeSpan, subEl)
-            else:
+                        if isinstance(subEl, note.Note):
+                            conditionalAdd(timeSpan, subEl)
+            elif isinstance(el, note.Note):
                 conditionalAdd(timeSpan, el)
 
         seenArticulations = set()
         seenExpressions = set()
 
-        # pylint: disable=unidiomatic-typecheck
         for n in sorted(notesToAdd.values(), key=lambda x: x.pitch.ps):
             c.add(n)
             if gatherArticulations:

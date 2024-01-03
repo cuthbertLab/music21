@@ -6,7 +6,7 @@
 # Authors:      Christopher Ariza
 #               Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2009-2022 Michael Scott Asato Cuthbert,
+# Copyright:    Copyright © 2009-2023 Michael Scott Asato Cuthbert,
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 from __future__ import annotations
@@ -22,7 +22,7 @@ try:
     # noinspection PyPackageRequirements
     from pylint.lint import Run as pylintRun  # type: ignore
 except ImportError:
-    pylintRun = None
+    pylintRun = None  # type: ignore
 
 
 # see feature list here:

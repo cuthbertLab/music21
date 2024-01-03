@@ -24,6 +24,8 @@ import re
 import sys
 import unittest
 
+from music21.common.stringTools import parenthesesMatch, ParenthesesMatch
+
 defaultImports = ['music21']
 
 
@@ -83,14 +85,17 @@ def addDocAttrTestsToSuite(suite,
             suite.addTest(dtc)
 
 
-def fixDoctests(doctestSuite):
+def fixDoctests(doctestSuite: doctest._DocTestSuite) -> None:
     r'''
-    Fix doctests so that addresses are sanitized.
+    Fix doctests so that addresses are sanitized, WindowsPath is okay on windows
+    and OrderedDicts pass on Python 3.12.
 
     In the past this fixed other differences among Python versions.
-    In the future, it might again!
+    In the future, it will again!
     '''
     windows: bool = platform.system() == 'Windows'
+    isPython312 = sys.version_info[1] >= 12
+
     for dtc in doctestSuite:  # Suite to DocTestCase -- undocumented.
         if not hasattr(dtc, '_dt_test'):
             continue
@@ -98,6 +103,8 @@ def fixDoctests(doctestSuite):
         dt = dtc._dt_test  # DocTest
         for example in dt.examples:
             example.want = stripAddresses(example.want, '0x...')
+            if isPython312:
+                example.want = fix312OrderedDict(example.want, '...')
             if windows:
                 example.want = example.want.replace('PosixPath', 'WindowsPath')
 
@@ -121,7 +128,6 @@ def stripAddresses(textString, replacement='ADDRESS') -> str:
     >>> stripA('{0.0} <music21.humdrum.spineParser.MiscTandem *>I>')
     '{0.0} <music21.humdrum.spineParser.MiscTandem *>I>'
 
-
     For doctests, can strip to '...' to make it work fine with doctest.ELLIPSIS
 
     >>> stripA('{0.0} <music21.base.Music21Object object at 0x102a0ff10>', '0x...')
@@ -130,8 +136,40 @@ def stripAddresses(textString, replacement='ADDRESS') -> str:
     return ADDRESS.sub(replacement, textString)
 
 
-# ------------------------------------------------------------------------------
+def fix312OrderedDict(textString, replacement='...') -> str:
+    '''
+    Function that fixes the OrderedDicts to work on Python 3.12 and above.
+    (eventually when 3.12 is the norm, this should be replaced to neuter
+    the doctests for 3.10/3.11 instead.)
 
+    >>> fix312 = test.testRunner.fix312OrderedDict
+    >>> fix312('OrderedDict([(0, 1), (1, 2), (2, 3)])')
+    'OrderedDict({...})'
+
+    while this is left alone:
+
+    >>> fix312('{0: 1, 1: 2, 2: 3}', 'nope!')
+    '{0: 1, 1: 2, 2: 3}'
+    '''
+    if 'OrderedDict([(' not in textString:
+        return textString
+
+    try:
+        matches = parenthesesMatch(textString, open='OrderedDict([(', close=')])')
+        out = []
+        last = 0
+        m: ParenthesesMatch
+        for m in matches:
+            out.append(textString[last:m.start - len('OrderedDict([(')])
+            out.append('OrderedDict({' + replacement + '})')
+            last = m.end + 3  # compensate for ')])'
+        out.append(textString[last:])
+        return ''.join(out)
+    except ValueError:
+        return replacement  # ignore -- too complex to test, hopefully okay on other Python
+
+
+# ------------------------------------------------------------------------------
 def mainTest(*testClasses, **keywords):
     '''
     Takes as its arguments modules (or a string 'noDocTest' or 'verbose')

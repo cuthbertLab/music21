@@ -154,7 +154,7 @@ def autocorrelationFunction(recordedSignal, recordSampleRateIn):
     correlation = correlation[lengthCorrelation:]
     difference = numpy.diff(correlation)  # Calculates the difference between slots
     positiveDifferences = numpy.where(difference > 0)[0]
-    if len(positiveDifferences) == 0:  # pylint: disable=len-as-condition
+    if len(positiveDifferences) == 0:
         finalResult = 10  # Rest
     else:
         beginning = positiveDifferences[0]
@@ -525,11 +525,11 @@ def detectPitchFrequencies(freqFromAQList, useScale=None):
 
 
 def smoothFrequencies(
-    frequencyList: list[int | float],
+    frequencyList: list[int|float],
     *,
     smoothLevels=7,
     inPlace=False
-) -> list[int] | None:
+) -> list[int]|None:
     '''
     Smooths the shape of the signal in order to avoid false detections in the fundamental
     frequency.  Takes in a list of ints or floats.

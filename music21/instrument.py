@@ -10,7 +10,7 @@
 #               Ben Houge
 #               Mark Gotham
 #
-# Copyright:    Copyright © 2009-2022 Michael Scott Asato Cuthbert
+# Copyright:    Copyright © 2009-2023 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
@@ -28,7 +28,6 @@ from collections.abc import Iterable
 import importlib
 import unittest
 import typing as t
-from typing import TYPE_CHECKING  # must be imported separately
 
 from music21 import base
 from music21 import common
@@ -39,7 +38,7 @@ from music21 import note
 from music21 import pitch
 from music21.tree.trees import OffsetTree
 
-if TYPE_CHECKING:
+if t.TYPE_CHECKING:
     from music21 import stream
 
 environLocal = environment.Environment('instrument')
@@ -47,7 +46,7 @@ environLocal = environment.Environment('instrument')
 
 def unbundleInstruments(streamIn: stream.Stream,
                         *,
-                        inPlace=False) -> stream.Stream | None:
+                        inPlace=False) -> stream.Stream|None:
     # noinspection PyShadowingNames
     '''
     takes a :class:`~music21.stream.Stream` that has :class:`~music21.note.NotRest` objects
@@ -86,7 +85,7 @@ def unbundleInstruments(streamIn: stream.Stream,
 
 def bundleInstruments(streamIn: stream.Stream,
                       *,
-                      inPlace=False) -> stream.Stream | None:
+                      inPlace=False) -> stream.Stream|None:
     # noinspection PyShadowingNames
     '''
     >>> up1 = note.Unpitched()
@@ -151,32 +150,32 @@ class Instrument(base.Music21Object):
     '''
     classSortOrder = -25
 
-    def __init__(self, instrumentName=None, **keywords):
+    def __init__(self, instrumentName: str|None = None, **keywords):
         super().__init__(**keywords)
 
-        self.partId = None
+        self.partId: str|None = None
         self._partIdIsRandom = False
 
-        self.partName = None
-        self.partAbbreviation = None
+        self.partName: str|None = None
+        self.partAbbreviation: str|None = None
 
-        self.printPartName = None  # True = yes, False = no, None = let others decide
-        self.printPartAbbreviation = None
+        self.printPartName: bool|None = None  # True = yes, False = no, None = let others decide
+        self.printPartAbbreviation: bool|None = None
 
-        self.instrumentId: str | None = None  # apply to midi and instrument
+        self.instrumentId: str|None = None  # apply to midi and instrument
         self._instrumentIdIsRandom = False
 
-        self.instrumentName: str = instrumentName
-        self.instrumentAbbreviation: str | None = None
-        self.midiProgram: int | None = None  # 0-indexed
-        self.midiChannel: int | None = None  # 0-indexed
-        self.instrumentSound: str | None = None
+        self.instrumentName: str|None = instrumentName
+        self.instrumentAbbreviation: str|None = None
+        self.midiProgram: int|None = None  # 0-indexed
+        self.midiChannel: int|None = None  # 0-indexed
+        self.instrumentSound: str|None = None
 
-        self.lowestNote = None
-        self.highestNote = None
+        self.lowestNote: pitch.Pitch|None = None
+        self.highestNote: pitch.Pitch|None = None
 
         # define interval to go from written to sounding
-        self.transposition: interval.Interval | None = None
+        self.transposition: interval.Interval|None = None
 
         self.inGMPercMap = False
         self.soundfontFn = None  # if defined...
@@ -2246,7 +2245,7 @@ def partitionByInstrument(streamObj: stream.Stream) -> stream.Stream:
     for instrumentObj in instrumentIterator:
         # matching here by instrument name
         if instrumentObj.instrumentName not in names:
-            names[instrumentObj.instrumentName] = {'Instrument': instrumentObj}
+            names[instrumentObj.instrumentName or ''] = {'Instrument': instrumentObj}
             # just store one instance
 
     # create a return object that has a part for each instrument
@@ -2272,7 +2271,7 @@ def partitionByInstrument(streamObj: stream.Stream) -> stream.Stream:
             # duration will have been set with sub.extendDuration above
             end = i.offset + i.duration.quarterLength
             # get destination Part
-            p = names[i.instrumentName]['Part']
+            p = names[i.instrumentName or '']['Part']
 
             coll = subStream.getElementsByOffset(
                 start,
@@ -2553,7 +2552,7 @@ def getAllNamesForInstrument(instrumentClass: Instrument,
     language = language.lower()
     instrumentNameDict = {}
 
-    instrumentClassName = instrumentClass.instrumentName
+    instrumentClassName = instrumentClass.instrumentName or ''
 
     if language == SearchLanguage.ALL:
         for lang in SearchLanguage:

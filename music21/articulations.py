@@ -77,7 +77,6 @@ A longer test showing the utility of the module:
 from __future__ import annotations
 
 import typing as t
-from typing import TYPE_CHECKING  # Pylint bug
 import unittest
 
 from music21 import base
@@ -85,8 +84,9 @@ from music21 import common
 from music21.common.classTools import tempAttribute
 from music21 import environment
 from music21 import style
+from music21 import spanner
 
-if TYPE_CHECKING:
+if t.TYPE_CHECKING:
     from music21 import interval
 
 
@@ -141,14 +141,14 @@ class Articulation(base.Music21Object):
     '''
     _styleClass: type[style.Style] = style.TextStyle
 
-    def __init__(self, **keywords):
+    def __init__(self, **keywords) -> None:
         super().__init__(**keywords)
         self.placement = None
         # declare a unit interval shift for the performance of this articulation
         self._volumeShift: float = 0.0
         self.lengthShift: float = 1.0
         self.tieAttach: str = 'first'  # attach to first or last or all notes after split
-        self.displayText: str | None = None
+        self.displayText: str|None = None
 
     def _reprInternal(self):
         return ''
@@ -569,14 +569,20 @@ class FrettedPluck(FretIndication, Fingering):
     '''
     pass
 
-class HammerOn(FretIndication):
+class HammerOn(spanner.Spanner, TechnicalIndication):
+    '''
+    A hammer-on represented as a spanner between two Notes.
+    '''
     pass
 
-class PullOff(FretIndication):
+class PullOff(spanner.Spanner, TechnicalIndication):
+    '''
+    A pull-off represented as a spanner between two Notes.
+    '''
     pass
 
 class FretBend(FretIndication):
-    bendAlter: interval.IntervalBase | None = None
+    bendAlter: interval.IntervalBase|None = None
     preBend: t.Any = None
     release: t.Any = None
     withBar: t.Any = None
@@ -682,4 +688,3 @@ _DOC_ORDER = [Articulation]
 if __name__ == '__main__':
     import music21
     music21.mainTest(Test)
-

@@ -1,19 +1,35 @@
 [flake8]
 ignore=
-  E127,  # over indented
-  E128,  # under indented
-  E301,  # 0 blank lines -- good test but something going wrong in new algorithm
-  E302,  # blank lines
-  E303,  # blank lines
-  E501,  # let pylint check line length
-  E722,  # let pylint check bare except
-  E731,  # do not assign a lambda
-  F401,  # let pylint check for imported but unused (wildcards and exports trigger)
-  F405,  # __all__ is okay to get from wildcard.
-  F821,  # let pylint check for undefined (del at end of module makes undefined)
-  F841,  # let pylint check for unused
-  W391,  # extra blank lines at end of file
-  W503,  # line break BEFORE binary operator
+  # over indented
+  E127,
+  # under indented
+  E128,
+  # space around | -- nice to omit in  int|str
+  E227,
+  # 0 blank lines -- good test but something going wrong in new algorithm
+  E301,
+  # blank lines
+  E302,
+  # blank lines
+  E303,
+  # let pylint check line length
+  E501,
+  # let pylint check bare except
+  E722,
+  # do not assign a lambda
+  E731,
+  # let pylint check for imported but unused (wildcards and exports trigger)
+  F401,
+  # __all__ is okay to get from wildcard.
+  F405,
+  # let pylint check for undefined (del at end of module makes undefined)
+  F821,
+  # let pylint check for unused
+  F841,
+  # extra blank lines at end of file
+  W391,
+  # line break BEFORE binary operator
+  W503,
 
 exclude=
   .git,

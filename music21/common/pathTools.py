@@ -28,7 +28,7 @@ import os
 import pathlib
 import unittest
 
-StrOrPath = t.TypeVar('StrOrPath', bound=str | pathlib.Path)
+StrOrPath = t.TypeVar('StrOrPath', bound=str|pathlib.Path)
 
 # ------------------------------------------------------------------------------
 def getSourceFilePath() -> pathlib.Path:
@@ -41,7 +41,7 @@ def getSourceFilePath() -> pathlib.Path:
     fpMusic21 = fpThis.parent.parent  # common is two levels deep
     # use stream as a test case
     if 'stream' not in [x.name for x in fpMusic21.iterdir()]:
-        raise Exception(
+        raise FileNotFoundError(
             f'cannot find expected music21 directory: {fpMusic21}'
         )  # pragma: no cover
     return fpMusic21
@@ -82,11 +82,13 @@ def getCorpusContentDirs() -> list[str]:
     >>> fp  # this list will be fragile, depending on composition of dirs
     ['airdsAirs', 'bach', 'beach', 'beethoven', 'chopin',
      'ciconia', 'corelli', 'cpebach',
-     'demos', 'essenFolksong', 'handel', 'haydn', 'joplin', 'josquin',
-     'leadSheet', 'luca', 'miscFolk', 'monteverdi', 'mozart', 'nottingham-dataset',
+     'demos', 'essenFolksong', 'handel', 'haydn', 'johnson_j_r', 'joplin', 'josquin',
+     'leadSheet', 'liliuokalani', 'luca', 'lusitano',
+     'miscFolk', 'monteverdi', 'mozart',
+     'nottingham-dataset',
      'oneills1850', 'palestrina',
      'ryansMammoth', 'schoenberg', 'schubert', 'schumann_clara', 'schumann_robert',
-     'theoryExercises', 'trecento', 'verdi', 'weber']
+     'theoryExercises', 'trecento', 'verdi', 'weber', 'webern']
 
     Make sure that all corpus data has a directoryInformation tag in
     CoreCorpus.
@@ -135,7 +137,7 @@ def getRootFilePath() -> pathlib.Path:
     return fpParent
 
 
-def relativepath(path: StrOrPath, start: str | None = None) -> StrOrPath | str:
+def relativepath(path: StrOrPath, start: str|None = None) -> StrOrPath|str:
     '''
     A cross-platform wrapper for `os.path.relpath()`, which returns `path` if
     under Windows, otherwise returns the relative path of `path`.
@@ -160,17 +162,17 @@ def cleanpath(path: str, *,
     return '/'  # dummy until Astroid #1015 is fixed.
 
 @overload
-def cleanpath(path: str | pathlib.Path, *,
+def cleanpath(path: str|pathlib.Path, *,
               returnPathlib: t.Literal[True]) -> pathlib.Path:
     return pathlib.Path('/')  # dummy until Astroid #1015 is fixed.
 
 @overload
-def cleanpath(path: str | pathlib.Path, *,
+def cleanpath(path: str|pathlib.Path, *,
               returnPathlib: t.Literal[False]) -> str:
     return '/'  # dummy until Astroid #1015 is fixed.
 
-def cleanpath(path: str | pathlib.Path, *,
-              returnPathlib: bool | None = None) -> str | pathlib.Path:
+def cleanpath(path: str|pathlib.Path, *,
+              returnPathlib: bool|None = None) -> str|pathlib.Path:
     '''
     Normalizes the path by expanding ~user on Unix, ${var} environmental vars
     (is this a good idea?), expanding %name% on Windows, normalizing path names

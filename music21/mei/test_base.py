@@ -22,11 +22,6 @@ from __future__ import annotations
 # if we mock many things, this may be triggered
 # pylint: disable=too-many-arguments
 
-# pylint is bad at guessing types in these tests---reasonably so
-# pylint: disable=maybe-no-member
-
-# pylint: disable=ungrouped-imports
-# pylint: disable=import-error
 import unittest
 
 # To have working MagicMock objects, we can't use cElementTree even though it would be faster.
@@ -36,7 +31,7 @@ from xml.etree import ElementTree as ETree
 
 from collections import defaultdict
 from fractions import Fraction
-from unittest import mock  # pylint: disable=no-name-in-module
+from unittest import mock
 
 from music21 import articulations
 from music21 import bar

@@ -20,6 +20,7 @@ Does not handle pickup notes, which are defined simply with an early barline
 from __future__ import annotations
 
 from io import StringIO
+import typing as t
 import unittest
 import xml.etree.ElementTree
 import zipfile
@@ -165,7 +166,7 @@ class CapellaImporter:
         '''
         return xml.etree.ElementTree.fromstring(xmlText)
 
-    def partScoreFromSystemScore(self, systemScore):
+    def partScoreFromSystemScore(self, systemScore: stream.Score) -> stream.Score:
         '''
         Take a :class:`~music21.stream.Score` object which is organized
         by Systems and return a new `Score` object which is organized by
@@ -174,7 +175,7 @@ class CapellaImporter:
         # this line is redundant currently, since all we have in systemScore
         # are Systems, but later there will be other things.
         systemStream = systemScore.getElementsByClass(layout.System)
-        partDictById = {}
+        partDictById: dict[str|int, dict[str, t.Any]] = {}
         for thisSystem in systemStream:
             # this line is redundant currently, since all we have in
             # thisSystem are Parts, but later there will be other things.
@@ -192,7 +193,7 @@ class CapellaImporter:
                 newPart.coreElementsChanged()
         newScore = stream.Score()
         # ORDERED DICT
-        parts: list[stream.Part | None] = [None for i in range(len(partDictById))]
+        parts: list[stream.Part|None] = [None for i in range(len(partDictById))]
         for partId in partDictById:
             partDict = partDictById[partId]
             parts[partDict['number']] = partDict['part']

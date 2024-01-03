@@ -5,7 +5,7 @@
 #
 # Authors:      Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2022 Michael Scott Asato Cuthbert
+# Copyright:    Copyright © 2022-2023 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
@@ -14,10 +14,9 @@ enough to go in the music21 core library.
 '''
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+import typing as t
 
-
-if TYPE_CHECKING:
+if t.TYPE_CHECKING:
     from music21 import chord
     from music21 import pitch
 

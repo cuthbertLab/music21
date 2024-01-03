@@ -8,7 +8,7 @@
 #               Jackie Rogoff
 #               Beth Hadley
 #
-# Copyright:    Copyright © 2009-2022 Michael Scott Asato Cuthbert
+# Copyright:    Copyright © 2009-2023 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
@@ -36,7 +36,7 @@ The list of objects included here are:
 from __future__ import annotations
 
 import enum
-from typing import TYPE_CHECKING  # pylint bug; does not arise here though.
+import typing as t
 import unittest
 
 from music21 import base
@@ -96,7 +96,15 @@ class VoiceLeadingQuartet(base.Music21Object):
             ''',
     }
 
-    def __init__(self, v1n1=None, v1n2=None, v2n1=None, v2n2=None, analyticKey=None, **keywords):
+    def __init__(
+        self,
+        v1n1: None|str|note.Note|pitch.Pitch = None,
+        v1n2: None|str|note.Note|pitch.Pitch = None,
+        v2n1: None|str|note.Note|pitch.Pitch = None,
+        v2n2: None|str|note.Note|pitch.Pitch = None,
+        analyticKey: key.Key|None = None,
+        **keywords
+    ):
         super().__init__(**keywords)
         if not intervalCache:
             # populate interval cache if not done yet
@@ -183,7 +191,7 @@ class VoiceLeadingQuartet(base.Music21Object):
         if isinstance(keyValue, str):
             try:
                 keyValue = key.Key(key.convertKeyStringToMusic21KeyString(keyValue))
-            except Exception as e:  # pragma: no cover  # pylint: disable=broad-except
+            except Exception as e:  # pragma: no cover
                 raise VoiceLeadingQuartetException(
                     f'got a key signature string that is not supported: {keyValue}'
                 ) from e
@@ -192,14 +200,18 @@ class VoiceLeadingQuartet(base.Music21Object):
                 isKey = (isinstance(keyValue, key.Key))
                 if isKey is False:
                     raise AttributeError
-            except AttributeError:  # pragma: no cover  # pylint: disable=raise-missing-from
+            except AttributeError:  # pragma: no cover
                 raise VoiceLeadingQuartetException(
                     'got a key signature that is not a string or music21 Key '
                     + f'object: {keyValue}'
                 )
         self._key = keyValue
 
-    def _setVoiceNote(self, value, which):
+    def _setVoiceNote(
+        self,
+        value: None|str|note.Note|pitch.Pitch,
+        which: t.Literal['_v1n1', '_v1n2', '_v2n1', '_v2n2']
+    ):
         if value is None:
             setattr(self, which, None)
         elif isinstance(value, str):
@@ -213,15 +225,15 @@ class VoiceLeadingQuartet(base.Music21Object):
                     n.duration.quarterLength = 0.0
                     n.pitch = value
                     setattr(self, which, n)
-            except Exception as e:  # pragma: no cover  # pylint: disable=broad-except
+            except Exception as e:  # pragma: no cover
                 raise VoiceLeadingQuartetException(
                     f'not a valid note specification: {value!r}'
                 ) from e
 
-    def _getV1n1(self):
+    def _getV1n1(self) -> None|note.Note:
         return self._v1n1
 
-    def _setV1n1(self, value):
+    def _setV1n1(self, value: None|str|note.Note|pitch.Pitch):
         self._setVoiceNote(value, '_v1n1')
 
     v1n1 = property(_getV1n1, _setV1n1, doc='''
@@ -232,10 +244,10 @@ class VoiceLeadingQuartet(base.Music21Object):
         <music21.note.Note C>
         ''')
 
-    def _getV1n2(self):
+    def _getV1n2(self) -> None|note.Note:
         return self._v1n2
 
-    def _setV1n2(self, value):
+    def _setV1n2(self, value: None|str|note.Note|pitch.Pitch):
         self._setVoiceNote(value, '_v1n2')
 
     v1n2 = property(_getV1n2, _setV1n2, doc='''
@@ -246,10 +258,10 @@ class VoiceLeadingQuartet(base.Music21Object):
         <music21.note.Note D>
         ''')
 
-    def _getV2n1(self):
+    def _getV2n1(self) -> None|note.Note:
         return self._v2n1
 
-    def _setV2n1(self, value):
+    def _setV2n1(self, value: None|str|note.Note|pitch.Pitch):
         self._setVoiceNote(value, '_v2n1')
 
     v2n1 = property(_getV2n1, _setV2n1, doc='''
@@ -260,10 +272,10 @@ class VoiceLeadingQuartet(base.Music21Object):
         <music21.note.Note E>
         ''')
 
-    def _getV2n2(self):
+    def _getV2n2(self) -> None|note.Note:
         return self._v2n2
 
-    def _setV2n2(self, value):
+    def _setV2n2(self, value: None|str|note.Note|pitch.Pitch):
         self._setVoiceNote(value, '_v2n2')
 
     v2n2 = property(_getV2n2, _setV2n2, doc='''
@@ -535,7 +547,7 @@ class VoiceLeadingQuartet(base.Music21Object):
         vInt1 = self.vIntervals[1]
         vInt1_generic = vInt1.generic
 
-        if TYPE_CHECKING:
+        if t.TYPE_CHECKING:
             assert vInt0_generic is not None
             assert vInt1_generic is not None
 
@@ -1134,7 +1146,7 @@ class VoiceLeadingQuartet(base.Music21Object):
 
         firstHarmony = self.vIntervals[0].simpleName
         secondGeneric = self.vIntervals[1].generic
-        if TYPE_CHECKING:
+        if t.TYPE_CHECKING:
             assert secondGeneric is not None
         secondHarmony = secondGeneric.simpleUndirected
 
@@ -1202,7 +1214,7 @@ class VoiceLeadingQuartet(base.Music21Object):
 
         hInt0_generic = self.hIntervals[0].generic
         hInt1_generic = self.hIntervals[1].generic
-        if TYPE_CHECKING:
+        if t.TYPE_CHECKING:
             assert hInt0_generic is not None
             assert hInt1_generic is not None
 
@@ -1263,7 +1275,7 @@ class VoiceLeadingQuartet(base.Music21Object):
         v1ns = v1.noteStart
         v1ne = v1.noteEnd
 
-        if TYPE_CHECKING:
+        if t.TYPE_CHECKING:
             assert v0ns is not None and v0ne is not None
             assert v1ns is not None and v1ne is not None
 
@@ -1318,7 +1330,7 @@ class VoiceLeadingQuartet(base.Music21Object):
 
         vInt0_generic = self.vIntervals[0].generic
         vInt1_generic = self.vIntervals[1].generic
-        if TYPE_CHECKING:
+        if t.TYPE_CHECKING:
             assert vInt0_generic is not None
             assert vInt1_generic is not None
 
@@ -1345,21 +1357,25 @@ def getVerticalityFromObject(music21Obj, scoreObjectIsFrom, classFilterList=None
     <music21.voiceLeading.Verticality
         contentDict={0: [<music21.instrument.Instrument 'P1: Soprano: Instrument 1'>,
                          <music21.clef.TrebleClef>,
+                         <music21.tempo.MetronomeMark Quarter=96 (playback only)>,
                          <music21.key.Key of f# minor>,
                          <music21.meter.TimeSignature 4/4>,
                          <music21.note.Note C#>],
               1: [<music21.instrument.Instrument 'P2: Alto: Instrument 2'>,
                   <music21.clef.TrebleClef>,
+                  <music21.tempo.MetronomeMark Quarter=96 (playback only)>,
                   <music21.key.Key of f# minor>,
                   <music21.meter.TimeSignature 4/4>,
                   <music21.note.Note E>],
               2: [<music21.instrument.Instrument 'P3: Tenor: Instrument 3'>,
                   <music21.clef.BassClef>,
+                  <music21.tempo.MetronomeMark Quarter=96 (playback only)>,
                   <music21.key.Key of f# minor>,
                   <music21.meter.TimeSignature 4/4>,
                   <music21.note.Note A>],
               3: [<music21.instrument.Instrument 'P4: Bass: Instrument 4'>,
                   <music21.clef.BassClef>,
+                  <music21.tempo.MetronomeMark Quarter=96 (playback only)>,
                   <music21.key.Key of f# minor>,
                   <music21.meter.TimeSignature 4/4>,
                   <music21.note.Note A>]}>
@@ -1425,7 +1441,7 @@ class Verticality(base.Music21Object):
             in a single part)''',
     }
 
-    def __init__(self, contentDict: dict | None = None, **keywords):
+    def __init__(self, contentDict: dict|None = None, **keywords):
         super().__init__(**keywords)
         if contentDict is None:
             contentDict = {}
