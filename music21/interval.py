@@ -432,7 +432,7 @@ def parseSpecifier(value: str|int|Specifier) -> Specifier:
     >>> interval.parseSpecifier('a')
     <Specifier.AUGMENTED>
 
-    This is not very useful, but there for completeness:
+    This is not very useful, but they are there for completeness:
 
     >>> interval.parseSpecifier(interval.Specifier.MAJOR)
     <Specifier.MAJOR>
@@ -488,7 +488,7 @@ def parseSpecifier(value: str|int|Specifier) -> Specifier:
 def convertGeneric(value: int|str) -> int:
     '''
     Convert an interval specified in terms of its name (second, third)
-    into an integer. If integers are passed, assume the are correct.
+    into an integer. If integers are passed, assume they are correct.
 
     >>> interval.convertGeneric(3)
     3
@@ -639,7 +639,8 @@ def convertSemitoneToSpecifierGeneric(count: int|float) -> tuple[Specifier, int]
     (<Specifier.MINOR>, 2)
     '''
     # strip off microtone
-    return convertSemitoneToSpecifierGenericMicrotone(count)[:2]
+    specifier, semitones, _cent_offset = convertSemitoneToSpecifierGenericMicrotone(count)
+    return (specifier, semitones)
 
 
 _pythagorean_cache: dict[str, tuple[pitch.Pitch, Fraction]] = {}
@@ -2480,7 +2481,7 @@ class ChromaticInterval(IntervalBase):
         >>> p5.ps
         65.0
 
-        Afterwards, spelling of the new pitch will always be inferred.
+        Afterward, the spelling of the new pitch will always be inferred.
 
         >>> p4.spellingIsInferred
         False
@@ -3537,7 +3538,7 @@ class Interval(IntervalBase):
 
     def reverse(self):
         '''
-        Return an reversed version of this interval.
+        Return a reversed version of this interval.
         If :class:`~music21.pitch.Pitch` objects are stored as
         `pitchStart` and `pitchEnd`, these pitches are reversed.
 
@@ -3827,7 +3828,7 @@ def getAbsoluteLowerNote(note1: note.Note|pitch.Pitch,
 
 def transposePitch(
     pitch1: pitch.Pitch,
-    interval1: str|interval,
+    interval1: str|Interval,
     *,
     inPlace=False
 ) -> pitch.Pitch:
@@ -3880,7 +3881,7 @@ def transposePitch(
 
 def transposeNote(
         note1: note.Note,
-        intervalString: str|interval) -> note.Note:
+        intervalString: str|Interval) -> note.Note:
     '''
     To be deprecated: call `n.transpose(intervalString)` directly.
 
