@@ -2873,7 +2873,9 @@ class MeasureParser(SoundTagMixin, XMLParserBase):
                 if type(art) in seenArticulations:
                     continue
                 c.articulations.append(art)
-                if not isinstance(art, articulations.Fingering):
+                if not isinstance(art, (articulations.Fingering,
+                                        articulations.StringIndication,
+                                        articulations.FretIndication)):
                     seenArticulations.add(type(art))
             for exp in n.expressions:
                 if type(exp) in seenExpressions:
