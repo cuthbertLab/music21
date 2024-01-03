@@ -273,7 +273,7 @@ class State:
     2
     '''
     # expires after N tokens or never.
-    autoExpires: typing.Literal[False] | int = False
+    autoExpires: typing.Literal[False]|int = False
 
     def __init__(self, parent=None, stateInfo=None):
         self.affectedTokens = []
@@ -287,7 +287,7 @@ class State:
         '''
         pass
 
-    def end(self) -> Music21Object | None:
+    def end(self) -> Music21Object|None:
         '''
         called just after removing state
         '''

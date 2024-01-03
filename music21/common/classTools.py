@@ -88,7 +88,7 @@ def isNum(usrData: t.Any) -> t.TypeGuard[t.Union[float, int, Fraction]]:
         return False
 
 
-def isListLike(usrData: t.Any) -> t.TypeGuard[list | tuple]:
+def isListLike(usrData: t.Any) -> t.TypeGuard[list|tuple]:
     '''
     Returns True if is a List or Tuple or their subclasses.
 

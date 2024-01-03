@@ -467,31 +467,31 @@ class MidiEvent(prebase.ProtoM21Object):
     '''
     # pylint: disable=redefined-builtin
     def __init__(self,
-                 track: MidiTrack | None = None,
+                 track: MidiTrack|None = None,
                  type=None,
                  time: int = 0,
-                 channel: int | None = None):
-        self.track: MidiTrack | None = track  # a MidiTrack object
+                 channel: int|None = None):
+        self.track: MidiTrack|None = track  # a MidiTrack object
         self.type = type
         self.time: int = time
-        self.channel: int | None = channel
+        self.channel: int|None = channel
 
-        self.parameter1: int | bytes | None = None  # pitch or first data value
-        self.parameter2: int | bytes | None = None  # velocity or second data value
+        self.parameter1: int|bytes|None = None  # pitch or first data value
+        self.parameter2: int|bytes|None = None  # velocity or second data value
 
         # data is a property...
 
         # if this is a Note on/off, need to store original
         # pitch space value in order to determine if this has a microtone
-        self.centShift: int | None = None
+        self.centShift: int|None = None
 
         # store a reference to a corresponding event
         # if a noteOn, store the note off, and vice versa
         # circular ref -- but modern Python will garbage collect it.
-        self.correspondingEvent: MidiEvent | None = None
+        self.correspondingEvent: MidiEvent|None = None
 
         # store and pass on a running status if found
-        self.lastStatusByte: int | None = None
+        self.lastStatusByte: int|None = None
 
     @property
     def sortOrder(self) -> int:

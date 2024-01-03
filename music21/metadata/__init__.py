@@ -264,7 +264,7 @@ class Metadata(base.Music21Object):
 
     def add(self,
             name: str,
-            value: t.Any | Iterable[t.Any],
+            value: t.Any|Iterable[t.Any],
             ) -> None:
         '''
         Adds a single item or multiple items with this name, leaving any existing
@@ -330,7 +330,7 @@ class Metadata(base.Music21Object):
         '''
         return self._get(name, isCustom=True)
 
-    def addCustom(self, name: str, value: t.Any | Iterable[t.Any]):
+    def addCustom(self, name: str, value: t.Any|Iterable[t.Any]):
         '''
         Adds any custom-named metadata items. The name can be free-form,
         or it can be a custom 'namespace:name'.
@@ -359,7 +359,7 @@ class Metadata(base.Music21Object):
         '''
         self._add(name, value, isCustom=True)
 
-    def setCustom(self, name: str, value: t.Any | Iterable[t.Any]):
+    def setCustom(self, name: str, value: t.Any|Iterable[t.Any]):
         '''
         Sets any custom-named metadata items (deleting any existing such items).
         The name can be free-form, or it can be a custom 'namespace:name'.
@@ -391,7 +391,7 @@ class Metadata(base.Music21Object):
 #   A few utility routines for clients calling public APIs
 
     @staticmethod
-    def uniqueNameToNamespaceName(uniqueName: str) -> str | None:
+    def uniqueNameToNamespaceName(uniqueName: str) -> str|None:
         '''
         Translates a unique name to the associated standard property's
         namespace name (i.e. the property's name in the form 'namespace:name').
@@ -417,7 +417,7 @@ class Metadata(base.Music21Object):
         return properties.UNIQUE_NAME_TO_NAMESPACE_NAME.get(uniqueName, None)
 
     @staticmethod
-    def namespaceNameToUniqueName(namespaceName: str) -> str | None:
+    def namespaceNameToUniqueName(namespaceName: str) -> str|None:
         '''
         Translates a standard property namespace name ('namespace:name') to that
         standard property's uniqueName.
@@ -442,7 +442,7 @@ class Metadata(base.Music21Object):
         return properties.NAMESPACE_NAME_TO_UNIQUE_NAME.get(namespaceName, None)
 
     @staticmethod
-    def isContributorUniqueName(uniqueName: str | None) -> bool:
+    def isContributorUniqueName(uniqueName: str|None) -> bool:
         '''
         Determines if a unique name is associated with a standard contributor
         property.  Returns False if no such associated standard contributor
@@ -471,7 +471,7 @@ class Metadata(base.Music21Object):
         '''
         if not uniqueName:
             return False
-        prop: PropertyDescription | None = (
+        prop: PropertyDescription|None = (
             properties.UNIQUE_NAME_TO_PROPERTY_DESCRIPTION.get(uniqueName, None)
         )
         if prop is None:
@@ -878,7 +878,7 @@ class Metadata(base.Music21Object):
     def __getitem__(self, key: str) -> tuple[Text, ...]:
         pass
 
-    def __getitem__(self, key: str) -> tuple[ValueType, ...] | tuple[Text, ...]:
+    def __getitem__(self, key: str) -> tuple[ValueType, ...]|tuple[Text, ...]:
         '''
         "Dictionary key" access for all standard uniqueNames and
         standard keys of the form 'namespace:name'.
@@ -925,7 +925,7 @@ class Metadata(base.Music21Object):
 
         return self._get(key, isCustom=False)
 
-    def __setitem__(self, key: str, value: t.Any | Iterable[t.Any]):
+    def __setitem__(self, key: str, value: t.Any|Iterable[t.Any]):
         '''
         "Dictionary key" access for all standard uniqueNames and
         standard keys of the form 'namespace:name'.
@@ -996,7 +996,7 @@ class Metadata(base.Music21Object):
         uniqueName: str = self._contributorRoleToUniqueName(c.role)
         self._add(uniqueName, c, isCustom=False)
 
-    def getContributorsByRole(self, role: str | None) -> tuple[Contributor, ...]:
+    def getContributorsByRole(self, role: str|None) -> tuple[Contributor, ...]:
         r'''
         Return a :class:`~music21.metadata.Contributor` if defined for a
         provided role.
@@ -1043,10 +1043,10 @@ class Metadata(base.Music21Object):
 
     def search(
         self,
-        query: str | t.Pattern | t.Callable[[str], bool] | None = None,
-        field: str | None = None,
+        query: str|t.Pattern|t.Callable[[str], bool]|None = None,
+        field: str|None = None,
         **keywords
-    ) -> tuple[bool, str | None]:
+    ) -> tuple[bool, str|None]:
         r'''
         Search one or all fields with a query, given either as a string or a
         regular expression match.
@@ -1112,7 +1112,7 @@ class Metadata(base.Music21Object):
         # TODO: Change to a namedtuple and add as a third element
         #    during a successful search, the full value of the retrieved
         #    field (so that 'Joplin' would return 'Joplin, Scott')
-        reQuery: t.Pattern | None = None
+        reQuery: t.Pattern|None = None
         valueFieldPairs = []
         if query is None and field is None and not keywords:
             return (False, None)
@@ -1145,7 +1145,7 @@ class Metadata(base.Music21Object):
 
                     # see if there is an associated grandfathered workId, and if so,
                     # search for that, too.
-                    workId: str | None = properties.UNIQUE_NAME_TO_MUSIC21_WORK_ID.get(
+                    workId: str|None = properties.UNIQUE_NAME_TO_MUSIC21_WORK_ID.get(
                         uniqueName, None
                     )
 
@@ -1381,7 +1381,7 @@ class Metadata(base.Music21Object):
         setattr(self, 'dateCreated', value)
 
     @property
-    def fileFormat(self) -> str | None:
+    def fileFormat(self) -> str|None:
         '''
         Get or set the file format that was parsed.
         '''
@@ -1395,7 +1395,7 @@ class Metadata(base.Music21Object):
         setattr(self, 'fileFormat', value)
 
     @property
-    def filePath(self) -> str | None:
+    def filePath(self) -> str|None:
         '''
         Get or set the file path that was parsed.
         '''
@@ -1409,7 +1409,7 @@ class Metadata(base.Music21Object):
         setattr(self, 'filePath', value)
 
     @property
-    def corpusFilePath(self) -> str | None:
+    def corpusFilePath(self) -> str|None:
         '''
         Get or set the path within the corpus that was parsed.
         '''
@@ -1423,7 +1423,7 @@ class Metadata(base.Music21Object):
         setattr(self, 'corpusFilePath', value)
 
     @property
-    def fileNumber(self) -> str | None:
+    def fileNumber(self) -> str|None:
         '''
         Get or set the file number that was parsed.
         '''
@@ -1570,7 +1570,7 @@ class Metadata(base.Music21Object):
         setattr(self, 'movementName', value)
 
     @property
-    def movementNumber(self) -> str | None:
+    def movementNumber(self) -> str|None:
         r'''
         Get or set the movement number as a string (or None)
 
@@ -1593,7 +1593,7 @@ class Metadata(base.Music21Object):
         setattr(self, 'movementNumber', value)
 
     @property
-    def number(self) -> str | None:
+    def number(self) -> str|None:
         r'''
         Get or set the number of the work within a collection of pieces,
         as a string. (for instance, the number within a collection of ABC files)
@@ -1623,7 +1623,7 @@ class Metadata(base.Music21Object):
         setattr(self, 'number', value)
 
     @property
-    def opusNumber(self) -> str | None:
+    def opusNumber(self) -> str|None:
         r'''
         Get or set the opus number.
 
@@ -1675,7 +1675,7 @@ class Metadata(base.Music21Object):
         setattr(self, 'title', value)
 
     @property
-    def bestTitle(self) -> str | None:
+    def bestTitle(self) -> str|None:
         r'''
         Get the title of the work, or the next-matched title string
         available from a related parameter fields.
@@ -1717,7 +1717,7 @@ class Metadata(base.Music21Object):
             'movementName',
         )
         for uniqueName in searchId:
-            titleSummary: str | None = self._getStringValueByNamespaceName(
+            titleSummary: str|None = self._getStringValueByNamespaceName(
                 properties.UNIQUE_NAME_TO_NAMESPACE_NAME[uniqueName]
             )
             if titleSummary:
@@ -1728,7 +1728,7 @@ class Metadata(base.Music21Object):
 # -----------------------------------------------------------------------------
 # Internal support routines (many of them static).
 
-    def _getStringValueByNamespaceName(self, namespaceName: str) -> str | None:
+    def _getStringValueByNamespaceName(self, namespaceName: str) -> str|None:
         '''
         Gets a single str value (a summary if necessary) for a supported
         'namespace:name'.
@@ -1882,7 +1882,7 @@ class Metadata(base.Music21Object):
 
         raise AttributeError(f'invalid attributeName: {attributeName}')
 
-    def _getSingularAttribute(self, attributeName: str) -> str | None:
+    def _getSingularAttribute(self, attributeName: str) -> str|None:
         '''
         This returns a single string (perhaps a summary) for supported uniqueNames,
         grandfathered workIds, and grandfathered workId abbrevations.
@@ -2005,7 +2005,7 @@ class Metadata(base.Music21Object):
         >>> metadata.Metadata._isStandardNamespaceName('average duration')
         False
         '''
-        prop: PropertyDescription | None = (
+        prop: PropertyDescription|None = (
             properties.NAMESPACE_NAME_TO_PROPERTY_DESCRIPTION.get(namespaceName, None)
         )
         if prop is None:
@@ -2044,7 +2044,7 @@ class Metadata(base.Music21Object):
         >>> metadata.Metadata._isContributorUniqueName('average duration')
         False
         '''
-        prop: PropertyDescription | None = (
+        prop: PropertyDescription|None = (
             properties.UNIQUE_NAME_TO_PROPERTY_DESCRIPTION.get(uniqueName, None)
         )
         if prop is None:
@@ -2094,7 +2094,7 @@ class Metadata(base.Music21Object):
         >>> metadata.Metadata._isContributorNamespaceName('average duration')
         False
         '''
-        prop: PropertyDescription | None = (
+        prop: PropertyDescription|None = (
             properties.NAMESPACE_NAME_TO_PROPERTY_DESCRIPTION.get(namespaceName, None)
         )
         if prop is None:
@@ -2132,7 +2132,7 @@ class Metadata(base.Music21Object):
         >>> metadata.Metadata._namespaceNameNeedsArticleNormalization('average duration')
         False
         '''
-        prop: PropertyDescription | None = (
+        prop: PropertyDescription|None = (
             properties.NAMESPACE_NAME_TO_PROPERTY_DESCRIPTION.get(namespaceName, None)
         )
         if prop is None:
@@ -2141,7 +2141,7 @@ class Metadata(base.Music21Object):
         return prop.needsArticleNormalization
 
     @staticmethod
-    def _contributorRoleToUniqueName(role: str | None) -> str:
+    def _contributorRoleToUniqueName(role: str|None) -> str:
         '''
         Translates a contributor role to a standard uniqueName that
         should be used to store that contributor.  For standard contributor
@@ -2172,7 +2172,7 @@ class Metadata(base.Music21Object):
         if role is None:
             return 'otherContributor'
 
-        prop: PropertyDescription | None = (
+        prop: PropertyDescription|None = (
             properties.UNIQUE_NAME_TO_PROPERTY_DESCRIPTION.get(role, None)
         )
 
@@ -2207,7 +2207,7 @@ class Metadata(base.Music21Object):
                     ' Call addCustom/setCustom/getCustom for custom names.')
             name = uniqueName
 
-        valueList: list[ValueType] | None = self._contents.get(name, None)
+        valueList: list[ValueType]|None = self._contents.get(name, None)
 
         if not valueList:
             # return empty tuple
@@ -2216,7 +2216,7 @@ class Metadata(base.Music21Object):
         # return a tuple containing contents of list
         return tuple(valueList)
 
-    def _add(self, name: str, value: t.Any | Iterable[t.Any], isCustom: bool):
+    def _add(self, name: str, value: t.Any|Iterable[t.Any], isCustom: bool):
         '''
         Adds a single item or multiple items with this name, leaving any existing
         items with this name in place.
@@ -2247,7 +2247,7 @@ class Metadata(base.Music21Object):
         for v in value:
             convertedValues.append(self._convertValue(name, v))
 
-        prevValues: list[ValueType] | None = self._contents.get(name, None)
+        prevValues: list[ValueType]|None = self._contents.get(name, None)
         if not prevValues:  # None or []
             # set the convertedValues list in there
             # it's always a list, even if there's only one value
@@ -2257,7 +2257,7 @@ class Metadata(base.Music21Object):
             self._contents[name] = prevValues + convertedValues
 
     # noinspection GrazieInspection
-    def _set(self, name: str, value: t.Any | Iterable[t.Any], isCustom: bool):
+    def _set(self, name: str, value: t.Any|Iterable[t.Any], isCustom: bool):
         '''
         Sets a single item or multiple items with this name, replacing any
         existing items with this name.  If isCustom is False, the name must
@@ -2350,7 +2350,7 @@ class Metadata(base.Music21Object):
         ...     metadata.DateBetween(['1938', '1939']))
         <music21.metadata.primitives.DateBetween 1938/--/-- to 1939/--/-->
         '''
-        valueType: type[ValueType] | None = properties.UNIQUE_NAME_TO_VALUE_TYPE.get(
+        valueType: type[ValueType]|None = properties.UNIQUE_NAME_TO_VALUE_TYPE.get(
             uniqueName, None
         )
         originalValue: t.Any = value

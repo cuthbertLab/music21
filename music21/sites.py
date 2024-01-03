@@ -43,7 +43,7 @@ WEAKREF_ACTIVE = True
 # that still exists, then restore it from the dictionary; otherwise, do not
 # sweat it.  Should make pickle deepcopies of music21 objects in Streams still
 # possible without needing to recreate the whole stream.
-GLOBAL_SITE_STATE_DICT: MutableMapping[str, t.Any | None] = weakref.WeakValueDictionary()
+GLOBAL_SITE_STATE_DICT: MutableMapping[str, t.Any|None] = weakref.WeakValueDictionary()
 
 
 class SitesException(exceptions21.Music21Exception):
@@ -404,7 +404,7 @@ class Sites(common.SlottedObjectMixin):
                    excludeNone: bool = False,
                    sortByCreationTime: t.Union[bool, t.Literal['reverse']] = False,
                    priorityTarget=None,
-                   ) -> Generator[stream.Stream | None, None, None]:
+                   ) -> Generator[stream.Stream|None, None, None]:
         yield None
 
     def yieldSites(self,
@@ -412,7 +412,7 @@ class Sites(common.SlottedObjectMixin):
                    excludeNone: bool = False,
                    sortByCreationTime: t.Union[bool, t.Literal['reverse']] = False,
                    priorityTarget=None,
-                   ) -> Generator[stream.Stream | None, None, None]:
+                   ) -> Generator[stream.Stream|None, None, None]:
         # noinspection PyDunderSlots
         '''
         Yield references; order, based on dictionary keys, is from least

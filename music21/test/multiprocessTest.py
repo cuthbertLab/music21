@@ -40,9 +40,9 @@ environLocal = environment.Environment('test.multiprocessTest')
 
 @dataclasses.dataclass
 class ModuleResponse:
-    returnCode: str | None = None
+    returnCode: str|None = None
     fp: t.Any = None
-    moduleName: str | None = None
+    moduleName: str|None = None
     success: t.Any = None
     testRunner: t.Any = None
     errors: t.Any = None

@@ -525,11 +525,11 @@ def detectPitchFrequencies(freqFromAQList, useScale=None):
 
 
 def smoothFrequencies(
-    frequencyList: list[int | float],
+    frequencyList: list[int|float],
     *,
     smoothLevels=7,
     inPlace=False
-) -> list[int] | None:
+) -> list[int]|None:
     '''
     Smooths the shape of the signal in order to avoid false detections in the fundamental
     frequency.  Takes in a list of ints or floats.

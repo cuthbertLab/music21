@@ -324,7 +324,7 @@ class PartStaffExporterMixin:
           </note>
         </measure>
         '''
-        initialPartStaffRoot: Element | None = None
+        initialPartStaffRoot: Element|None = None
         for i, ps in enumerate(group):
             staffNumber: int = i + 1  # 1-indexed
             thisPartStaffRoot: Element = self.getRootForPartStaff(ps)
@@ -389,7 +389,7 @@ class PartStaffExporterMixin:
         DIVIDER_COMMENT = '========================= Measure [NNN] =========================='
         PLACEHOLDER = '[NNN]'
 
-        def makeDivider(inner_sourceNumber: int | str) -> Element:
+        def makeDivider(inner_sourceNumber: int|str) -> Element:
             return Comment(DIVIDER_COMMENT.replace(PLACEHOLDER, str(inner_sourceNumber)))
 
         sourceMeasures = iter(source.findall('measure'))
@@ -549,7 +549,7 @@ class PartStaffExporterMixin:
             in this StaffGroup does not compare to the first instance of that class
             in the earliest staff where found (not necessarily the first) using `comparison`.
             '''
-            initialM21Instance: M21ObjType | None = None
+            initialM21Instance: M21ObjType|None = None
             # noinspection PyShadowingNames
             for ps in group:  # ps okay to reuse.
                 if initialM21Instance is None:
@@ -567,8 +567,8 @@ class PartStaffExporterMixin:
         multiKey: bool = isMultiAttribute(KeySignature)
         multiMeter: bool = isMultiAttribute(TimeSignature, comparison='ratioEqual')
 
-        initialPartStaffRoot: Element | None = None
-        mxAttributes: Element | None = None
+        initialPartStaffRoot: Element|None = None
+        mxAttributes: Element|None = None
         for i, ps in enumerate(group):
             staffNumber: int = i + 1  # 1-indexed
 
@@ -600,7 +600,7 @@ class PartStaffExporterMixin:
             # Subsequent PartStaffs in group: set additional clefs on mxAttributes
             else:
                 thisPartStaffRoot: Element = self.getRootForPartStaff(ps)
-                oldClef: Element | None = thisPartStaffRoot.find('measure/attributes/clef')
+                oldClef: Element|None = thisPartStaffRoot.find('measure/attributes/clef')
                 if oldClef is not None and mxAttributes is not None:
                     clefsInMxAttributesAlready = mxAttributes.findall('clef')
                     if len(clefsInMxAttributesAlready) >= staffNumber:

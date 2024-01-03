@@ -32,7 +32,7 @@ def runThroughMuseScore(
     fp,
     subformats=(),
     *,
-    dpi: int | None = None,
+    dpi: int|None = None,
     trimEdges: bool = True,
     leaveMargin: int = 0,
     **keywords
@@ -101,7 +101,7 @@ def runThroughMuseScore(
 
 
 
-def findNumberedPNGPath(inputFp: str | pathlib.Path) -> pathlib.Path:
+def findNumberedPNGPath(inputFp: str|pathlib.Path) -> pathlib.Path:
     '''
     Find the first numbered file path corresponding to the provided unnumbered file path
     ending in ".png". Raises an exception if no file can be found.
@@ -149,7 +149,7 @@ def findLastPNGPath(inputFp: pathlib.Path) -> pathlib.Path:
 
 def findPNGRange(
     firstFp: pathlib.Path,
-    lastFp: pathlib.Path | None = None
+    lastFp: pathlib.Path|None = None
 ) -> tuple[int, int]:
     '''
     Return a 2-tuple of the maximum PNG number and the number of digits used to

@@ -88,18 +88,18 @@ class Date(prebase.ProtoM21Object):
 
     def __init__(self,
                  *,
-                 year: int | str | None = None,
-                 month: int | str | None = None,
-                 day: int | str | None = None,
-                 hour: int | str | None = None,
-                 minute: int | str | None = None,
-                 second: int | float | str | None = None,
-                 yearError: str | None = None,
-                 monthError: str | None = None,
-                 dayError: str | None = None,
-                 hourError: str | None = None,
-                 minuteError: str | None = None,
-                 secondError: str | None = None):
+                 year: int|str|None = None,
+                 month: int|str|None = None,
+                 day: int|str|None = None,
+                 hour: int|str|None = None,
+                 minute: int|str|None = None,
+                 second: int|float|str|None = None,
+                 yearError: str|None = None,
+                 monthError: str|None = None,
+                 dayError: str|None = None,
+                 hourError: str|None = None,
+                 minuteError: str|None = None,
+                 secondError: str|None = None):
         if year is not None and yearError is None:
             year, yearError = self._stripError(year)
         if month is not None and monthError is None:
@@ -115,21 +115,21 @@ class Date(prebase.ProtoM21Object):
 
         self._sanityCheck(year=year, month=month, day=day, hour=hour, minute=minute, second=second)
 
-        self.year = t.cast(int | None, year)
-        self.month = t.cast(int | None, month)
-        self.day = t.cast(int | None, day)
-        self.hour = t.cast(int | None, hour)
-        self.minute = t.cast(int | None, minute)
-        self.second = t.cast(int | None, second)
+        self.year = t.cast(int|None, year)
+        self.month = t.cast(int|None, month)
+        self.day = t.cast(int|None, day)
+        self.hour = t.cast(int|None, hour)
+        self.minute = t.cast(int|None, minute)
+        self.second = t.cast(int|None, second)
 
         # error: can be 'approximate', 'uncertain' or None.
         # None is assumed to be certain
-        self.yearError: str | None = yearError
-        self.monthError: str | None = monthError
-        self.dayError: str | None = dayError
-        self.hourError: str | None = hourError
-        self.minuteError: str | None = minuteError
-        self.secondError: str | None = secondError
+        self.yearError: str|None = yearError
+        self.monthError: str|None = monthError
+        self.dayError: str|None = dayError
+        self.hourError: str|None = hourError
+        self.minuteError: str|None = minuteError
+        self.secondError: str|None = secondError
         self.attrNames = ('year', 'month', 'day', 'hour', 'minute', 'second')
 
     # SPECIAL METHODS #
@@ -177,8 +177,8 @@ class Date(prebase.ProtoM21Object):
 
     # PRIVATE METHODS #
     def _stripError(self,
-                    value: int | float | str,
-                    ) -> tuple[int, str | None]:
+                    value: int|float|str,
+                    ) -> tuple[int, str|None]:
         r'''
         Strip error symbols from a numerical value. Return cleaned source and
         sym. Only one error symbol is expected per string.
@@ -195,7 +195,7 @@ class Date(prebase.ProtoM21Object):
         >>> d._stripError('4.43')
         (4, None)
         '''
-        uncertainty: str | None = None
+        uncertainty: str|None = None
         if isinstance(value, str):  # if a number, let pass
             sym = self.approximateSymbols + self.uncertainSymbols + self.priorTimeSymbols
             found = None
@@ -357,8 +357,8 @@ class Date(prebase.ProtoM21Object):
         >>> d.minute, d.second
         (50, 32)
         '''
-        post: list[int | None] = []
-        postError: list[str | None] = []
+        post: list[int|None] = []
+        postError: list[str|None] = []
         dateStr = dateStr.replace(':', '/')
         dateStr = dateStr.replace(' ', '')
         for chunk in dateStr.split('/'):
@@ -479,7 +479,7 @@ class DatePrimitive(prebase.ProtoM21Object):
         # store an array of values marking if date data itself
         # is certain, approximate, or uncertain
         # here, dataError is relevance
-        self._dataUncertainty: list[str | None] = []
+        self._dataUncertainty: list[str|None] = []
         self.relevance = relevance  # will use property
 
     # SPECIAL METHODS #
@@ -841,16 +841,16 @@ class Text(prebase.ProtoM21Object):
     # INITIALIZER #
 
     def __init__(self,
-                 data: str | Text = '',
-                 language: str | None = None,
-                 isTranslated: bool | None = None,   # True, False, or None (unknown)
-                 encodingScheme: str | None = None):
+                 data: str|Text = '',
+                 language: str|None = None,
+                 isTranslated: bool|None = None,   # True, False, or None (unknown)
+                 encodingScheme: str|None = None):
         if isinstance(data, Text):
             # accessing private attributes here; not desirable
-            self._data: str | Text = data._data
-            self._language: str | None = data._language
-            self.isTranslated: bool | None = data.isTranslated
-            self.encodingScheme: str | None = data.encodingScheme
+            self._data: str|Text = data._data
+            self._language: str|None = data._language
+            self.isTranslated: bool|None = data.isTranslated
+            self.encodingScheme: str|None = data.encodingScheme
         else:
             self._data = data
             self._language = language
@@ -1000,9 +1000,9 @@ class Copyright(Text):
     '''
 
     def __init__(self,
-                 data: str | Text = '',
-                 language: str | None = None,
-                 isTranslated: bool | None = None,   # True, False, or None (unknown)
+                 data: str|Text = '',
+                 language: str|None = None,
+                 isTranslated: bool|None = None,   # True, False, or None (unknown)
                  *, role=None):
         super().__init__(data, language, isTranslated)
         self.role = role
@@ -1081,11 +1081,11 @@ class Contributor(prebase.ProtoM21Object):
 
     def __init__(self,
                  *,
-                 name: str | Text | None = None,
-                 names: Iterable[str | Text] = (),
-                 role: str | Text | None = None,
-                 birth: None | DateSingle | str = None,
-                 death: None | DateSingle | str = None,
+                 name: str|Text|None = None,
+                 names: Iterable[str|Text] = (),
+                 role: str|Text|None = None,
+                 birth: None|DateSingle|str = None,
+                 death: None|DateSingle|str = None,
                  **keywords):
         self._role = None
         if role:
@@ -1110,8 +1110,8 @@ class Contributor(prebase.ProtoM21Object):
         # store the nationality, if known (not currently used)
         self._nationality: list[Text] = []
 
-        self.birth: DateSingle | None = None
-        self.death: DateSingle | None = None
+        self.birth: DateSingle|None = None
+        self.death: DateSingle|None = None
 
         if birth is not None:
             if not isinstance(birth, DateSingle):
@@ -1211,7 +1211,7 @@ class Contributor(prebase.ProtoM21Object):
 
     # PUBLIC METHODS #
 
-    def age(self) -> datetime.timedelta | None:
+    def age(self) -> datetime.timedelta|None:
         r'''
         Calculate the age at death of the Contributor, returning a
         datetime.timedelta object.
@@ -1606,8 +1606,8 @@ _DOC_ORDER = (
     Copyright,
 )
 
-DateParseType = Date | datetime.datetime | str
-ValueType = DatePrimitive | Text | Contributor | Copyright | int
+DateParseType = Date|datetime.datetime|str
+ValueType = DatePrimitive|Text|Contributor|Copyright|int
 
 
 if __name__ == '__main__':

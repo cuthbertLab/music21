@@ -70,7 +70,7 @@ class Volume(prebase.ProtoM21Object, SlottedObjectMixin):
 
     def __init__(
         self,
-        client: note.NotRest | None = None,
+        client: note.NotRest|None = None,
         velocity=None,
         velocityScalar=None,
         velocityIsRelative=True,
@@ -129,7 +129,7 @@ class Volume(prebase.ProtoM21Object, SlottedObjectMixin):
             self.velocityIsRelative = other.velocityIsRelative
 
     def getRealizedStr(self,
-                       useDynamicContext: dynamics.Dynamic | bool = True,
+                       useDynamicContext: dynamics.Dynamic|bool = True,
                        useVelocity=True,
                        useArticulations: t.Union[bool,
                                                  articulations.Articulation,
@@ -153,7 +153,7 @@ class Volume(prebase.ProtoM21Object, SlottedObjectMixin):
 
     def getRealized(
         self,
-        useDynamicContext: bool | dynamics.Dynamic = True,
+        useDynamicContext: bool|dynamics.Dynamic = True,
         useVelocity=True,
         useArticulations: t.Union[
             bool, articulations.Articulation, Iterable[articulations.Articulation]

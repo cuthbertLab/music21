@@ -60,7 +60,7 @@ def flattenList(originalList: Iterable[Iterable[_T]]) -> list[_T]:
     return [item for sublist in originalList for item in sublist]
 
 
-def unique(originalList: Iterable, *, key: Callable | None = None) -> list:
+def unique(originalList: Iterable, *, key: Callable|None = None) -> list:
     '''
     Return a List of unique items from an iterable, preserving order.
     (unlike casting to a set and back)

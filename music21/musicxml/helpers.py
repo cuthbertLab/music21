@@ -238,7 +238,7 @@ def synchronizeIdsToM21(element: ET.Element, m21Object: Music21Object):
 
 def synchronizeIdsToXML(
     element: ET.Element,
-    m21Object: prebase.ProtoM21Object | None
+    m21Object: prebase.ProtoM21Object|None
 ) -> None:
     # noinspection PyTypeChecker
     '''
@@ -295,8 +295,8 @@ def setM21AttributeFromAttribute(
     m21El: t.Any,
     xmlEl: ET.Element,
     xmlAttributeName: str,
-    attributeName: str | None = None,
-    transform: Callable[[str], t.Any] | None = None,
+    attributeName: str|None = None,
+    transform: Callable[[str], t.Any]|None = None,
 ) -> None:
     '''
     If xmlEl has at least one element of tag==tag with some text. If
@@ -348,8 +348,8 @@ def setXMLAttributeFromAttribute(
     m21El: t.Any,
     xmlEl: ET.Element,
     xmlAttributeName: str,
-    attributeName: str | None = None,
-    transform: Callable[[t.Any], t.Any] | None = None
+    attributeName: str|None = None,
+    transform: Callable[[t.Any], t.Any]|None = None
 ):
     '''
     If m21El has at least one element of tag==tag with some text. If
