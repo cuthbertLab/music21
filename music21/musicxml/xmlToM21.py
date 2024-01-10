@@ -3160,8 +3160,8 @@ class MeasureParser(SoundTagMixin, XMLParserBase):
             if mxPitch is None:  # whoops!!!!
                 return p
 
-        seta(p, mxPitch, 'step')
-        seta(p, mxPitch, 'octave', transform=int)
+        seta(p, mxPitch, 'step', 'step')
+        seta(p, mxPitch, 'octave', 'octave', transform=int)
         mxAlter = mxPitch.find('alter')
         accAlter = None
         if alterText := strippedText(mxAlter):
