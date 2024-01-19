@@ -44,6 +44,7 @@ SpineParsing consists of several steps.
 * Measures are searched for elements with voice groups and Voice objects are created
 '''
 from __future__ import annotations
+from functools import lru_cache
 
 import copy
 import math
@@ -68,6 +69,7 @@ from music21 import note
 from music21 import meter
 from music21 import metadata
 from music21 import roman
+from music21 import pitch
 from music21 import prebase
 from music21 import stream
 from music21 import tempo
@@ -1328,7 +1330,7 @@ class KernSpine(HumdrumSpine):
                     thisObject = SpineComment(eventC)
                     if thisObject.comment == '':
                         thisObject = None
-                elif eventC.count(' '):
+                elif ' ' in eventC:
                     thisObject = self.processChordEvent(eventC)
                 else:  # Note or Rest
                     thisObject = self.processNoteEvent(eventC)
@@ -1373,12 +1375,13 @@ class KernSpine(HumdrumSpine):
         # multipleNotes
         notesToProcess = eventC.split()
         chordNotes = []
-        for noteToProcess in notesToProcess:
-            thisNote = hdStringToNote(noteToProcess)
+        defaultDur = None
+        for i, noteToProcess in enumerate(notesToProcess):
+            thisNote = hdStringToNote(noteToProcess, defaultDur)
+            if i == 0:
+                defaultDur = thisNote.duration
             chordNotes.append(thisNote)
-        eventChord = chord.Chord(chordNotes, beams=chordNotes[-1].beams)
-        eventChord.duration = chordNotes[0].duration
-
+        eventChord = chord.Chord(chordNotes, beams=chordNotes[-1].beams, duration=defaultDur)
         self.setBeamsForNote(eventChord)
         self.setTupletTypeForNote(eventChord)
         self.lastNote = eventChord
@@ -2119,7 +2122,28 @@ class EventCollection:
         return retEvents
 
 
-def hdStringToNote(contents):
+@lru_cache(maxsize=256)
+def _noteMemos(contents):
+    dotCount = contents.count('.')
+    accountedFor = dotCount
+    dur_regex = re.search(r'(\d+)%?(\d+)?', contents)
+    if dur_regex:
+        accountedFor += len(dur_regex.group(0))
+    if 'r' in contents:
+        accountedFor += 1
+        matchedNote = None
+        step = None
+    else:
+        matchedNote = re.search('([a-gA-G]+)([n#-]*)', contents)
+        if not matchedNote:
+            raise HumdrumException(f'Could not parse {contents} for note information')
+        else:
+            accountedFor += len(matchedNote.group(0))
+            step = matchedNote.group(1)[0].lower()
+    return (dur_regex, dotCount, matchedNote, step, accountedFor)
+
+
+def hdStringToNote(contents, defaultDuration=None):
     '''
     returns a :class:`~music21.note.Note` (or Rest or Unpitched, etc.)
     matching the current SpineEvent.
@@ -2199,197 +2223,183 @@ def hdStringToNote(contents):
     >>> humdrum.spineParser.flavors['JRP'] = storedFlavors  #_DOCS_HIDE
 
     '''
+    dur_regex, dotCount, matchedNote, step, accountedFor = _noteMemos(contents)
 
-    # http://www.lib.virginia.edu/artsandmedia/dmmc/Music/Humdrum/kern_hlp.html#kern
+    if dur_regex:
+        foundNumber, foundRational = dur_regex.groups()
+        if foundRational:
+            durationFirst = int(foundNumber)
+            durationSecond = float(foundRational)
+            quarterLength = 4 * durationSecond / durationFirst
+            dur = duration.Duration(quarterLength, dots=dotCount)
+
+        elif foundNumber:
+            durationType = int(foundNumber)
+            if durationType == 0:
+                if foundNumber == '000':
+                    # for larger values, see https://extras.humdrum.org/man/rscale/
+                    _type = 'maxima'
+                elif foundNumber == '00':
+                    # for larger values, see https://extras.humdrum.org/man/rscale/
+                    _type = 'longa'
+                else:
+                    _type = 'breve'
+                dur = duration.Duration(type=_type, dots=dotCount)
+            elif durationType in duration.typeFromNumDict:
+                _type = duration.typeFromNumDict[durationType]
+                dur = duration.Duration(type=_type, dots=dotCount)
+            else:
+                dT = durationType + 0.0
+                (unused_remainder, exponents) = math.modf(math.log2(dT))
+                baseValue = 2 ** exponents
+                baseValueInt = int(baseValue)
+                _type = duration.typeFromNumDict[baseValueInt]
+                dur = duration.Duration(type=_type)
+                newTup = duration.Tuplet()
+                newTup.durationActual = duration.durationTupleFromTypeDots(_type, 0)
+                newTup.durationNormal = duration.durationTupleFromTypeDots(_type, 0)
+
+                gcd = math.gcd(durationType, baseValueInt)
+                newTup.numberNotesActual = int(dT / gcd)
+                newTup.numberNotesNormal = int(baseValue / gcd)
+
+                # The Josquin Research Project uses an incorrect definition of
+                # humdrum tuplets that breaks normal usage.  TODO: Refactor adding a Flavor = 'JRP'
+                # code that uses this other method...
+                JRP = flavors['JRP']
+                if JRP is False and dotCount:
+                    newTup.durationNormal = duration.durationTupleFromTypeDots(
+                        newTup.durationNormal.type, dotCount)
+
+                dur.appendTuplet(newTup)
+                if JRP is True and dotCount:
+                    dur.dots = dotCount
+                # call Duration.TupletFixer after to correct this.
+    elif defaultDuration is not None:
+        dur = defaultDuration
+    else:
+        dur = duration.Duration(4, dots=dotCount)
 
     # 3.2.1 Pitches and 3.3 Rests
 
-    matchedNote = re.search('([a-gA-G]+)', contents)
-    thisObject = None
-
     # Detect rests first, because rests can contain manual positioning information,
     # which is also detected by the `matchedNote` variable above.
-    if contents.count('r'):
-        thisObject = note.Rest()
-
-    elif matchedNote:
+    if not step:
+        thisObject = note.Rest(duration=dur)
+    else:
         kernNoteName = matchedNote.group(1)
-        step = kernNoteName[0].lower()
         if step == kernNoteName[0]:  # middle C or higher
             octave = 3 + len(kernNoteName)
         else:  # below middle C
             octave = 4 - len(kernNoteName)
-        thisObject = note.Note(octave=octave)
-        thisObject.step = step
+        accid = matchedNote.group(2)
+        if accid:
+            _pitch = pitch.Pitch(step, octave=octave, accidental=accid)
+        else:
+            _pitch = pitch.Pitch(step, octave=octave)
+        thisObject = note.Note(_pitch, duration=dur)
 
-    else:
-        raise HumdrumException(f'Could not parse {contents} for note information')
-
-    matchedSharp = re.search(r'(#+)', contents)
-    matchedFlat = re.search(r'(-+)', contents)
-
-    if matchedSharp:
-        thisObject.pitch.accidental = matchedSharp.group(0)
-    elif matchedFlat:
-        thisObject.pitch.accidental = matchedFlat.group(0)
-    elif contents.count('n'):
-        thisObject.pitch.accidental = 'n'
+    # if all the characters in contents are accounted for, you're done
+    if accountedFor == len(contents):
+        return thisObject
 
     # 3.2.2 -- Slurs, Ties, Phrases
     # TODO: add music21 phrase information
-    if contents.count('{'):
-        for i in range(contents.count('{')):
-            pass  # phraseMark start
-    if contents.count('}'):
-        for i in range(contents.count('}')):
-            pass  # phraseMark end
-    if contents.count('('):
-        for i in range(contents.count('(')):
-            pass  # slur start
-    if contents.count(')'):
-        for i in range(contents.count(')')):
-            pass  # slur end
-    if contents.count('['):
+    # if curlyOpenCount := contents.count('{'):
+    #     for i in range(curlyOpenCount):
+    #         pass  # phraseMark start
+    # if curlyCloseCount := contents.count('}'):
+    #     for i in range(curlyCloseCount):
+    #         pass  # phraseMark end
+    # if parenOpenCount := contents.count('('):
+    #     for i in range(parenOpenCount):
+    #         pass  # slur start
+    # if parenCloseCount := contents.count(')'):
+    #     for i in range(parenCloseCount):
+    #         pass  # slur end
+    if '[' in contents:
         thisObject.tie = tie.Tie('start')
-    elif contents.count(']'):
+    elif ']' in contents:
         thisObject.tie = tie.Tie('stop')
-    elif contents.count('_'):
+    elif '_' in contents:
         thisObject.tie = tie.Tie('continue')
 
     # 3.2.3 Ornaments
-    if contents.count('t'):
+    if 't' in contents:
         thisObject.expressions.append(expressions.HalfStepTrill())
-    elif contents.count('T'):
+    elif 'T' in contents:
         thisObject.expressions.append(expressions.WholeStepTrill())
 
-    if contents.count('w'):
+    if 'w' in contents:
         thisObject.expressions.append(expressions.HalfStepInvertedMordent())
-    elif contents.count('W'):
+    elif 'W' in contents:
         thisObject.expressions.append(expressions.WholeStepInvertedMordent())
-    elif contents.count('m'):
+    elif 'm' in contents:
         thisObject.expressions.append(expressions.HalfStepMordent())
-    elif contents.count('M'):
+    elif 'M' in contents:
         thisObject.expressions.append(expressions.WholeStepMordent())
 
-    if contents.count('S'):
+    if 'S' in contents:
         thisObject.expressions.append(expressions.Turn())
-    elif contents.count('$'):
+    elif '$' in contents:
         thisObject.expressions.append(expressions.InvertedTurn())
-    elif contents.count('R'):
+    elif 'R' in contents:
         t1 = expressions.Turn()
         t1.connectedToPrevious = True  # true by default, but explicitly
         thisObject.expressions.append(t1)
 
-    if contents.count(':'):
-        # TODO: deal with arpeggiation -- should have been in a
-        #  chord structure
-        pass
+    # if ':' in contents:
+    #     # TODO: deal with arpeggiation -- should have been in a
+    #     #  chord structure
+    #     pass
 
-    if contents.count('O'):
+    if 'O' in contents:
         thisObject.expressions.append(expressions.Ornament())
         # generic ornament
 
     # 3.2.4 Articulation Marks
-    if contents.count("'"):
+    if "'" in contents:
         thisObject.articulations.append(articulations.Staccato())
-    if contents.count('"'):
+    if '"' in contents:
         thisObject.articulations.append(articulations.Pizzicato())
-    if contents.count('`'):
+    if '`' in contents:
         # called 'attacca' mark but means staccatissimo:
         # http://www.music-cog.ohio-state.edu/Humdrum/representations/kern.rep.html
         thisObject.articulations.append(articulations.Staccatissimo())
-    if contents.count('~'):
+    if '~' in contents:
         thisObject.articulations.append(articulations.Tenuto())
-    if contents.count('^'):
+    if '^' in contents:
         thisObject.articulations.append(articulations.Accent())
-    if contents.count(';'):
+    if ';' in contents:
         thisObject.expressions.append(expressions.Fermata())
 
     # 3.2.5 Up & Down Bows
-    if contents.count('v'):
+    if 'v' in contents:
         thisObject.articulations.append(articulations.UpBow())
-    elif contents.count('u'):
+    elif 'u' in contents:
         thisObject.articulations.append(articulations.DownBow())
 
     # 3.2.6 Stem Directions
-    if contents.count('/'):
+    if '/' in contents:
         thisObject.stemDirection = 'up'
-    elif contents.count('\\'):
+    elif '\\' in contents:
         thisObject.stemDirection = 'down'
 
     # 3.2.7 Duration +
     # 3.2.8 N-Tuplets
 
-    # TODO: SPEEDUP -- only search for rational after foundNumber...
-    foundRational = re.search(r'(\d+)%(\d+)', contents)
-    foundNumber = re.search(r'(\d+)', contents)
-    if foundRational:
-        durationFirst = int(foundRational.group(1))
-        durationSecond = float(foundRational.group(2))
-        thisObject.duration.quarterLength = 4 * durationSecond / durationFirst
-        if contents.count('.'):
-            thisObject.duration.dots = contents.count('.')
-
-    elif foundNumber:
-        durationType = int(foundNumber.group(1))
-        if durationType == 0:
-            durationString = foundNumber.group(1)
-            if durationString == '000':
-                # for larger values, see https://extras.humdrum.org/man/rscale/
-                thisObject.duration.type = 'maxima'
-                if contents.count('.'):
-                    thisObject.duration.dots = contents.count('.')
-            elif durationString == '00':
-                # for larger values, see https://extras.humdrum.org/man/rscale/
-                thisObject.duration.type = 'longa'
-                if contents.count('.'):
-                    thisObject.duration.dots = contents.count('.')
-            else:
-                thisObject.duration.type = 'breve'
-                if contents.count('.'):
-                    thisObject.duration.dots = contents.count('.')
-        elif durationType in duration.typeFromNumDict:
-            thisObject.duration.type = duration.typeFromNumDict[durationType]
-            if contents.count('.'):
-                thisObject.duration.dots = contents.count('.')
-        else:
-            dT = int(durationType) + 0.0
-            (unused_remainder, exponents) = math.modf(math.log2(dT))
-            baseValue = 2 ** exponents
-            thisObject.duration.type = duration.typeFromNumDict[int(baseValue)]
-            newTup = duration.Tuplet()
-            newTup.durationActual = duration.durationTupleFromTypeDots(thisObject.duration.type, 0)
-            newTup.durationNormal = duration.durationTupleFromTypeDots(thisObject.duration.type, 0)
-
-            gcd = math.gcd(int(dT), int(baseValue))
-            newTup.numberNotesActual = int(dT / gcd)
-            newTup.numberNotesNormal = int(float(baseValue) / gcd)
-
-            # The Josquin Research Project uses an incorrect definition of
-            # humdrum tuplets that breaks normal usage.  TODO: Refactor adding a Flavor = 'JRP'
-            # code that uses this other method...
-            JRP = flavors['JRP']
-            if JRP is False and contents.count('.'):
-                newTup.durationNormal = duration.durationTupleFromTypeDots(
-                    newTup.durationNormal.type, contents.count('.'))
-
-            thisObject.duration.appendTuplet(newTup)
-            if JRP is True and contents.count('.'):
-                thisObject.duration.dots = contents.count('.')
-            # call Duration.TupletFixer after to correct this.
-
     # 3.2.9 Grace Notes and Groupettos
-    if contents.count('q'):
+    if qCount := contents.count('q'):
         thisObject = thisObject.getGrace()
-        thisObject.duration.type = 'eighth'
-    elif contents.count('Q'):
+        if qCount == 2:
+            thisObject.duration.slash = False
+    elif 'Q' in contents:
         thisObject = thisObject.getGrace()
         thisObject.duration.slash = False
-        thisObject.duration.type = 'eighth'
-    elif contents.count('P'):
+    elif 'P' in contents:
         thisObject = thisObject.getGrace(appoggiatura=True)
-    elif contents.count('p'):
-        pass  # end appoggiatura duration -- not needed in music21...
+    # elif 'p' in contents:
+    #     pass  # end appoggiatura duration -- not needed in music21...
 
     # 3.2.10 Beaming
     # TODO: Support really complex beams
@@ -2428,53 +2438,53 @@ def hdStringToMeasure(contents, previousMeasure=None):
 
     barline = bar.Barline()
 
-    if contents.count('-'):
+    if '-' in contents:
         barline.type = 'none'
-    elif contents.count("'"):
+    elif "'" in contents:
         barline.type = 'short'
-    elif contents.count('`'):
+    elif '`' in contents:
         barline.type = 'tick'
-    elif contents.count('||'):
+    elif '||' in contents:
         barline.type = 'double'
         if contents.count(':') > 1:
             barline.repeatDots = 'both'
-        elif contents.count(':|'):
+        elif ':|' in contents:
             barline.repeatDots = 'left'
-        elif contents.count('|:'):
+        elif '|:' in contents:
             barline.repeatDots = 'right'
-    elif contents.count('!!'):
+    elif '!!' in contents:
         barline.type = 'heavy-heavy'
         if contents.count(':') > 1:
             barline.repeatDots = 'both'
-        elif contents.count(':!'):
+        elif ':!' in contents:
             barline.repeatDots = 'left'
-        elif contents.count('!:'):
+        elif '!:' in contents:
             barline.repeatDots = 'right'
-    elif contents.count('|!'):
+    elif '|!' in contents:
         barline.type = 'final'
         if contents.count(':') > 1:
             barline.repeatDots = 'both'
-        elif contents.count(':|'):
+        elif ':|' in contents:
             barline.repeatDots = 'left'
-        elif contents.count('!:'):
+        elif '!:' in contents:
             barline.repeatDots = 'right'
-    elif contents.count('!|'):
+    elif '!|' in contents:
         barline.type = 'heavy-light'
         if contents.count(':') > 1:
             barline.repeatDots = 'both'
-        elif contents.count(':!'):
+        elif ':!' in contents:
             barline.repeatDots = 'left'
-        elif contents.count('|:'):
+        elif '|:' in contents:
             barline.repeatDots = 'right'
-    elif contents.count('|'):
+    elif '|' in contents:
         barline.type = 'regular'
         if contents.count(':') > 1:
             barline.repeatDots = 'both'
-        elif contents.count(':|'):
+        elif ':|' in contents:
             barline.repeatDots = 'left'
-        elif contents.count('|:'):
+        elif '|:' in contents:
             barline.repeatDots = 'right'
-    elif contents.count('=='):
+    elif '==' in contents:
         barline.type = 'double'
         if contents.count(':') > 1:
             barline.repeatDots = 'both'
@@ -2484,7 +2494,7 @@ def hdStringToMeasure(contents, previousMeasure=None):
                 'Cannot import a double bar visually rendered as a single bar -- '
                 + 'not sure exactly what that would mean anyhow.')
 
-    if contents.count(';'):
+    if ';' in contents:
         barline.pause = expressions.Fermata()
 
     if previousMeasure is not None:
@@ -2906,6 +2916,33 @@ class Test(unittest.TestCase):
         self.assertEqual(b.pitch.accidental.name, 'double-sharp')
         self.assertEqual(b.duration.dots, 0)
         self.assertEqual(b.duration.tuplets[0].durationNormal.dots, 2)
+
+    def testGraceNote(self):
+        ks = KernSpine()
+        # noinspection SpellCheckingInspection
+        a = ks.processNoteEvent('4Cq')
+        self.assertEqual(a.duration.type, 'quarter')
+        self.assertEqual(a.duration.slash, True)
+
+    def testGraceNote2(self):
+        ks = KernSpine()
+        # noinspection SpellCheckingInspection
+        a = ks.processNoteEvent('16Cqq')
+        self.assertEqual(a.duration.type, '16th')
+        self.assertEqual(a.duration.slash, False)
+
+    def testChord(self):
+        ks = KernSpine()
+        # noinspection SpellCheckingInspection
+        c = ks.processChordEvent('8C 8E')
+        self.assertEqual(len(c.notes), 2)
+        self.assertEqual(c.notes[0].duration, c.duration)
+
+    def testChord2(self):
+        # noinspection SpellCheckingInspection
+        ks = KernSpine()
+        c = ks.processChordEvent('8C E')
+        self.assertEqual(c.notes[0].duration, c.notes[1].duration)
 
     def testMeasureBoundaries(self):
         m0 = stream.Measure()
