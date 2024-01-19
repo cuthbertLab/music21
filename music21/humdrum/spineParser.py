@@ -2137,9 +2137,8 @@ def _noteMemos(contents):
         matchedNote = re.search('([a-gA-G]+)([n#-]*)', contents)
         if not matchedNote:
             raise HumdrumException(f'Could not parse {contents} for note information')
-        else:
-            accountedFor += len(matchedNote.group(0))
-            step = matchedNote.group(1)[0].lower()
+        accountedFor += len(matchedNote.group(0))
+        step = matchedNote.group(1)[0].lower()
     return (dur_regex, dotCount, matchedNote, step, accountedFor)
 
 
@@ -2278,7 +2277,10 @@ def hdStringToNote(contents, defaultDuration=None):
     elif defaultDuration is not None:
         dur = defaultDuration
     else:
-        dur = duration.Duration(4, dots=dotCount)
+        if 'q' in contents:
+            dur = duration.Duration(.5, dots=dotCount)
+        else:
+            dur = duration.Duration(1, dots=dotCount)
 
     # 3.2.1 Pitches and 3.3 Rests
 
