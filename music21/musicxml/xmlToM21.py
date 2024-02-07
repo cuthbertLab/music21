@@ -4825,6 +4825,7 @@ class MeasureParser(SoundTagMixin, XMLParserBase):
         # barline objects also store ending objects, that mark begin
         # and end of repeat bracket designations
         mxEndingObj = mxBarline.find('ending')
+        barline.setNumberedEnding(mxEndingObj)
         if mxEndingObj is not None:
             # TODO: musicxml 4: system="yes/no" -- does this apply to whole system?
 
