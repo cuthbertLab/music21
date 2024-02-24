@@ -1890,7 +1890,7 @@ class ChordSymbol(Harmony):
             for charString in getAbbreviationListGivenChordType(chordKind):
                 if sH == charString:
                     self.chordKind = chordKind
-                    return originalsH.replace(charString, '')
+                    return originalsH[len(sH):]
         return originalsH
 
     def _hasPitchAboveC4(self, pitches):
