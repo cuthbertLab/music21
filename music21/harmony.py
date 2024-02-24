@@ -3162,6 +3162,12 @@ class Test(unittest.TestCase):
 
         self.assertEqual(ch1.pitches, ch2.pitches)
 
+    def testDoubledCharacters(self):
+        ch1 = ChordSymbol('Co omit5')
+        ch2 = ChordSymbol('Cdim omit5')
+
+        self.assertEqual(ch1.pitches, ch2.pitches)
+
     def x_testPower(self):
         '''
         power chords should not have inversions
