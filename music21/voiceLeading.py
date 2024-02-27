@@ -1554,11 +1554,7 @@ class Verticality(base.Music21Object):
         >>> vs1.getShortestDuration()
         1.0
         '''
-        leastQuarterLength = self.objects[0].quarterLength
-        for obj in self.objects:
-            if obj.quarterLength < leastQuarterLength:
-                leastQuarterLength = obj.quarterLength
-        return leastQuarterLength
+        return min([obj.quarterLength for obj in self.objects])
 
     def getLongestDuration(self):
         '''
@@ -1574,11 +1570,7 @@ class Verticality(base.Music21Object):
         >>> vs1.getLongestDuration()
         4.0
         '''
-        longestQuarterLength = self.objects[0].quarterLength
-        for obj in self.objects:
-            if obj.quarterLength > longestQuarterLength:
-                longestQuarterLength = obj.quarterLength
-        return longestQuarterLength
+        return max([obj.quarterLength for obj in self.objects])
 
     def changeDurationOfAllObjects(self, newQuarterLength):
         '''

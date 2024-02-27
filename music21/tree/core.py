@@ -519,12 +519,10 @@ class AVLTree(prebase.ProtoM21Object):
         def recurse(node):
             if node is not None:
                 if node.leftChild is not None:
-                    for n in recurse(node.leftChild):
-                        yield n
+                    yield from recurse(node.leftChild)
                 yield node
                 if node.rightChild is not None:
-                    for n in recurse(node.rightChild):
-                        yield n
+                    yield from recurse(node.rightChild)
         return recurse(self.rootNode)
 
     def populateFromSortedList(self, listOfTuples):

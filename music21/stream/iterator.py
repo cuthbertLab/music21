@@ -508,8 +508,7 @@ class StreamIterator(prebase.ProtoM21Object, Sequence[M21ObjType]):
     def __reversed__(self):
         me = self.matchingElements()
         me.reverse()
-        for item in me:
-            yield item
+        yield from me
 
     def clone(self: StreamIteratorType) -> StreamIteratorType:
         '''

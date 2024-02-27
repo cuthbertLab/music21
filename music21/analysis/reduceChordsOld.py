@@ -79,15 +79,14 @@ class ChordReducer:
         4.0
         '''
         from music21 import note
-        if measureObj.isFlat is False:
+        if not measureObj.isFlat:
             mObj = measureObj.flatten().notes.stream()
         else:
             mObj = measureObj.notes.stream()
 
         chordWeights = self.computeMeasureChordWeights(mObj, weightAlgorithm)
 
-        if numChords > len(chordWeights):
-            numChords = len(chordWeights)
+        numChords = min(numChords, len(chordWeights))
 
         maxNChords = sorted(chordWeights, key=chordWeights.get, reverse=True)[:numChords]
         if not maxNChords:

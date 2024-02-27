@@ -186,10 +186,7 @@ def addLyricsToBassNote(bassNote, notationString=None):
     n = notation.Notation(notationString)
     if not n.figureStrings:
         return
-    maxLength = 0
-    for fs in n.figureStrings:
-        if len(fs) > maxLength:
-            maxLength = len(fs)
+    maxLength = max([len(fs) for fs in n.figureStrings])
     for fs in n.figureStrings:
         spacesInFront = ''
         for i in range(maxLength - len(fs)):
