@@ -401,8 +401,7 @@ class HumdrumDataCollection(prebase.ProtoM21Object):
                 self.eventList.append(GlobalCommentLine(self.parsePositionInStream, line))
             else:
                 thisLine = SpineLine(self.parsePositionInStream, line)
-                if thisLine.numSpines > self.maxSpines:
-                    self.maxSpines = thisLine.numSpines
+                self.maxSpines = max(self.maxSpines, thisLine.numSpines)
                 self.eventList.append(thisLine)
             self.parsePositionInStream += 1
         self.fileLength = self.parsePositionInStream

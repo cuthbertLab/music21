@@ -2828,8 +2828,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
                 o = insertList[i]
                 e = insertList[i + 1]
                 qL = e.duration.quarterLength
-                if o + qL > highestTimeInsert:
-                    highestTimeInsert = o + qL
+                highestTimeInsert = max(highestTimeInsert, o + qL)
                 if lowestOffsetInsert is None or o < lowestOffsetInsert:
                     lowestOffsetInsert = o
                 i += 2
@@ -8425,8 +8424,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
             for e in self._elements:
                 candidateOffset = (self.elementOffset(e)
                                    + e.duration.quarterLength)
-                if candidateOffset > highestTimeSoFar:
-                    highestTimeSoFar = candidateOffset
+                highestTimeSoFar = max(highestTimeSoFar, candidateOffset)
             self._cache['HighestTime'] = opFrac(highestTimeSoFar)
         return self._cache['HighestTime']
 
@@ -11183,10 +11181,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         # environLocal.printDebug(['makeVoices(): olDict', olDict])
         # find the max necessary voices by finding the max number
         # of elements in each group; these may not all be necessary
-        maxVoiceCount = 1
-        for group in olDict.values():
-            if len(group) > maxVoiceCount:
-                maxVoiceCount = len(group)
+        maxVoiceCount = max([len(group) for group in olDict.values()] + [1])
         if maxVoiceCount == 1:  # nothing to do here
             if not inPlace:
                 return returnObj

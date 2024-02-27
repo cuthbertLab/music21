@@ -1967,8 +1967,7 @@ class PartParser(XMLParserBase):
 
         self.lastMeasureParser = measureParser
 
-        if measureParser.staves > self.maxStaves:
-            self.maxStaves = measureParser.staves
+        self.maxStaves = max(self.maxStaves, measureParser.staves)
 
         if measureParser.transposition is not None:
             self.updateTransposition(measureParser.transposition)
