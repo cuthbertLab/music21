@@ -3491,7 +3491,7 @@ class RomanNumeral(harmony.Harmony):
                 # multiple scales with the same name but different pitches.
                 scaleHash = keyOrScale.name
                 if getattr(keyOrScale, 'isConcrete', False):
-                    scaleHash += "_".join(
+                    scaleHash += '_'.join(
                         [p.nameWithOctave for p in keyOrScale.pitches]
                     )
                 if scaleHash in _scaleCache:
