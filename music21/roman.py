@@ -3489,10 +3489,11 @@ class RomanNumeral(harmony.Harmony):
             elif 'Scale' in keyClasses:
                 # Need unique 'hash' for each scale. Names is not enough as there are
                 # multiple scales with the same name but different pitches.
+                scaleHash = keyOrScale.name
                 if getattr(keyOrScale, 'isConcrete', False):
-                    scaleHash = "_".join([p.nameWithOctave for p in keyOrScale.pitches])
-                else:
-                    scaleHash = keyOrScale.name
+                    scaleHash += "_".join(
+                        [p.nameWithOctave for p in keyOrScale.pitches]
+                    )
                 if scaleHash in _scaleCache:
                     keyOrScale = _scaleCache[scaleHash]
                 else:
