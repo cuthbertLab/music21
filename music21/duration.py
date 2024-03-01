@@ -385,7 +385,7 @@ def dottedMatch(qLen: OffsetQLIn,
             durType, match = quarterLengthToClosestType(preDottedLength)
         except DurationException:
             continue
-        if match is True:
+        if match:
             return (dots, durType)
     return (False, False)
 
@@ -441,8 +441,8 @@ def quarterLengthToNonPowerOf2Tuplet(
 
 def quarterLengthToTuplet(
     qLen: OffsetQLIn,
-    maxToReturn=4,
-    tupletNumerators=defaultTupletNumerators
+    maxToReturn: int = 4,
+    tupletNumerators: list[int] = defaultTupletNumerators
 ) -> list[Tuplet]:
     '''
     Returns a list of possible Tuplet objects for a
@@ -738,7 +738,7 @@ def quarterConversion(qLen: OffsetQLIn) -> QuarterLengthConversion:
 
 def convertTypeToQuarterLength(
     dType: str,
-    dots=0,
+    dots: int = 0,
     tuplets: list[Tuplet]|None = None,
     dotGroups=None
 ) -> OffsetQL:

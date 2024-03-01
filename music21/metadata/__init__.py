@@ -2045,7 +2045,7 @@ class Metadata(base.Music21Object):
         False
         '''
         prop: PropertyDescription|None = (
-            properties.UNIQUE_NAME_TO_PROPERTY_DESCRIPTION.get(uniqueName, None)
+            properties.UNIQUE_NAME_TO_PROPERTY_DESCRIPTION.get(uniqueName)
         )
         if prop is None:
             return False
@@ -2095,7 +2095,7 @@ class Metadata(base.Music21Object):
         False
         '''
         prop: PropertyDescription|None = (
-            properties.NAMESPACE_NAME_TO_PROPERTY_DESCRIPTION.get(namespaceName, None)
+            properties.NAMESPACE_NAME_TO_PROPERTY_DESCRIPTION.get(namespaceName)
         )
         if prop is None:
             return False
@@ -2133,7 +2133,7 @@ class Metadata(base.Music21Object):
         False
         '''
         prop: PropertyDescription|None = (
-            properties.NAMESPACE_NAME_TO_PROPERTY_DESCRIPTION.get(namespaceName, None)
+            properties.NAMESPACE_NAME_TO_PROPERTY_DESCRIPTION.get(namespaceName)
         )
         if prop is None:
             return False
@@ -2173,7 +2173,7 @@ class Metadata(base.Music21Object):
             return 'otherContributor'
 
         prop: PropertyDescription|None = (
-            properties.UNIQUE_NAME_TO_PROPERTY_DESCRIPTION.get(role, None)
+            properties.UNIQUE_NAME_TO_PROPERTY_DESCRIPTION.get(role)
         )
 
         if prop is None:
@@ -2207,7 +2207,7 @@ class Metadata(base.Music21Object):
                     ' Call addCustom/setCustom/getCustom for custom names.')
             name = uniqueName
 
-        valueList: list[ValueType]|None = self._contents.get(name, None)
+        valueList: list[ValueType]|None = self._contents.get(name)
 
         if not valueList:
             # return empty tuple

@@ -719,7 +719,7 @@ class ABCMetadata(ABCToken):
                 # there may be more than one dur divided by a space
                 referent = 0.0  # in quarter lengths
                 for dur in durs.split(' '):
-                    if dur.count('/') > 0:
+                    if '/' in dur:
                         n, d = dur.split('/')
                     else:  # this is an error case
                         environLocal.printDebug(['incorrectly encoded / unparsable duration:', dur])

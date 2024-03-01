@@ -409,9 +409,7 @@ class CTSong(prebase.ProtoM21Object):
                 raise CTSongException(
                     f'Invalid File Format; must be string or text file: {textFile}')
 
-        lines = [e for e in lines if len(e) != 0]
-        for i in range(len(lines)):
-            lines[i] = lines[i].strip()
+        lines = [e.strip() for e in lines if len(e) != 0]
         self.lines = lines
         pieceString = '\n'.join(lines)
 
