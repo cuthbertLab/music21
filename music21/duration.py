@@ -442,7 +442,7 @@ def quarterLengthToNonPowerOf2Tuplet(
 def quarterLengthToTuplet(
     qLen: OffsetQLIn,
     maxToReturn: int = 4,
-    tupletNumerators: list[int] = defaultTupletNumerators
+    tupletNumerators=defaultTupletNumerators
 ) -> list[Tuplet]:
     '''
     Returns a list of possible Tuplet objects for a

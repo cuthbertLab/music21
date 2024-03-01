@@ -2371,7 +2371,7 @@ def hdStringToNote(contents):
                 thisObject.duration.dots = contents.count('.')
             # call Duration.TupletFixer after to correct this.
 
-     # 3.2.9 Grace Notes and Groupettos
+    # 3.2.9 Grace Notes and Groupettos
     if 'q' in contents:
         thisObject = thisObject.getGrace()
         thisObject.duration.type = 'eighth'
