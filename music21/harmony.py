@@ -1890,7 +1890,7 @@ class ChordSymbol(Harmony):
             for charString in getAbbreviationListGivenChordType(chordKind):
                 if sH == charString:
                     self.chordKind = chordKind
-                    return originalsH.replace(charString, '')
+                    return originalsH[len(sH):]
         return originalsH
 
     def _hasPitchAboveC4(self, pitches):
@@ -3159,6 +3159,12 @@ class Test(unittest.TestCase):
     def testExpressSusUsingAlterations(self):
         ch1 = ChordSymbol('F7 add 4 subtract 3')
         ch2 = ChordSymbol('F7sus4')
+
+        self.assertEqual(ch1.pitches, ch2.pitches)
+
+    def testDoubledCharacters(self):
+        ch1 = ChordSymbol('Co omit5')
+        ch2 = ChordSymbol('Cdim omit5')
 
         self.assertEqual(ch1.pitches, ch2.pitches)
 
