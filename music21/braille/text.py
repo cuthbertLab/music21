@@ -599,7 +599,10 @@ class BrailleTextLine(prebase.ProtoM21Object):
         '''
         searchLocation = max(self.highestUsedLocation, self.textLocation)
         addSpaceAmount = 1 if addSpace else 0
-        return (searchLocation + len(text) + addSpaceAmount) <= self.lineLength
+        if (searchLocation + len(text) + addSpaceAmount) > self.lineLength:
+            return False
+        else:
+            return True
 
     def canInsert(self, textLocation, text):
         '''

@@ -384,7 +384,7 @@ class ChordReducer:
                             )
                             print(msg)
                             # raise ChordReducerException(msg)
-                        offset = min(offset, previousTimespan.endTime)
+                        offset = max(offset, previousTimespan.endTime)
                     scoreTree.removeTimespan(group[0])
                     subtree.removeTimespan(group[0])
                     newTimespan = group[0].new(offset=offset)
