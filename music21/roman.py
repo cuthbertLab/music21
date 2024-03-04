@@ -2488,10 +2488,10 @@ class RomanNumeral(harmony.Harmony):
         if not isinstance(self._figure, str):  # pragma: no cover
             raise RomanNumeralException(f'got a non-string figure: {self._figure!r}')
 
-        if not self.useImpliedScale:
-            useScale = self._scale
-        else:
+        if self.useImpliedScale:
             useScale = self.impliedScale
+        else:
+            useScale = self._scale
 
         (workingFigure, useScale) = self._correctForSecondaryRomanNumeral(useScale)
 
@@ -3487,10 +3487,17 @@ class RomanNumeral(harmony.Harmony):
                     # store for later
                     _keyCache[keyOrScale.tonicPitchNameWithCase] = keyOrScale
             elif 'Scale' in keyClasses:
-                if keyOrScale.name in _scaleCache:
-                    keyOrScale = _scaleCache[keyOrScale.name]
+                # Need unique 'hash' for each scale. Names is not enough as there are
+                # multiple scales with the same name but different pitches.
+                scaleHash = keyOrScale.name
+                if getattr(keyOrScale, 'isConcrete', False):
+                    scaleHash += '_'.join(
+                        [p.nameWithOctave for p in keyOrScale.pitches]
+                    )
+                if scaleHash in _scaleCache:
+                    keyOrScale = _scaleCache[scaleHash]
                 else:
-                    _scaleCache[keyOrScale.name] = keyOrScale
+                    _scaleCache[scaleHash] = keyOrScale
             else:
                 raise RomanNumeralException(
                     f'Cannot get a key from this object {keyOrScale!r}, send only '
@@ -4552,6 +4559,14 @@ class Test(unittest.TestCase):
         # Major still works
         rn = RomanNumeral(4, 'C')
         self.assertEqual(rn.figure, 'IV')
+
+    def test_scale_caching(self):
+        mcs = scale.ConcreteScale('c', pitches=('C', 'D', 'E', 'F', 'G', 'A', 'B'))
+        rn = mcs.romanNumeral('IV7')
+        self.assertEqual([p.unicodeName for p in rn.pitches], ['F', 'A', 'C', 'E'])
+        mcs = scale.ConcreteScale('c', pitches=('C', 'D', 'E-', 'F', 'G', 'A', 'B'))
+        rn = mcs.romanNumeral('IV7')
+        self.assertEqual([p.unicodeName for p in rn.pitches], ['F', 'A', 'C', 'E♭'])
 
 
 class TestExternal(unittest.TestCase):
