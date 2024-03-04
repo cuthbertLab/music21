@@ -834,12 +834,12 @@ class Chord(ChordBase):
 
         keyErrorStr = f'Cannot access component with: {key!r}'
         if isinstance(key, str):
-            if key.count('.'):
+            if '.' in key:
                 key, attrStr = key.split('.', 1)
-                if not attrStr.count('.'):
-                    attributes = (attrStr,)
-                else:
+                if '.' in attrStr:
                     attributes = tuple(attrStr.split('.'))
+                else:
+                    attributes = (attrStr,)
             else:
                 attributes = ()
 
@@ -931,7 +931,7 @@ class Chord(ChordBase):
         Traceback (most recent call last):
         ValueError: Chord index must be set to a valid note object
         '''
-        if isinstance(key, str) and key.count('.'):
+        if isinstance(key, str) and '.' in key:
             keySplit = key.split('.')
             keyFind = '.'.join(keySplit[0:-1])
             attr = keySplit[-1]

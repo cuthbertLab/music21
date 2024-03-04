@@ -2060,7 +2060,7 @@ def extractBrailleElements(
         except BrailleSegmentException as notSupportedException:  # pragma: no cover
             isExempt = [isinstance(music21Object, music21Class)
                         for music21Class in excludeFromBrailleElements]
-            if isExempt.count(True) == 0:
+            if not any(isExempt):
                 environRules.warn(f'{notSupportedException}')
 
     allElements.sort(key=lambda x: (x.offset, x.classSortOrder))

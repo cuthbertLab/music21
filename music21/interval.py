@@ -1060,11 +1060,9 @@ class GenericInterval(IntervalBase):
         Returns simpleUndirectedSteps and undirectedOctaves.
         '''
         # unisons (even augmented) are neither steps nor skips.
-        steps, octaves = math.modf(self.undirected / 7)
-        steps = int(steps * 7 + 0.001)
-        octaves = int(octaves)
+        octaves, steps = divmod(self.undirected, 7)
         if steps == 0:
-            octaves = octaves - 1
+            octaves -= 1
             steps = 7
         return steps, octaves
 
@@ -1417,7 +1415,7 @@ class GenericInterval(IntervalBase):
             newPitch = copy.deepcopy(p)
 
         newPitch.diatonicNoteNum = pitchDNN + self.staffDistance
-        if useImplicitOctave is True:
+        if useImplicitOctave:
             newPitch.octave = None
 
         if not inPlace:
@@ -1508,7 +1506,7 @@ class GenericInterval(IntervalBase):
         offsetFromKey = pAlter - stepAlter
 
         newPitch = self.transposePitch(p, inPlace=inPlace)
-        if inPlace is True:
+        if inPlace:
             newPitch = p
 
         newAccidentalByStep = k.accidentalByStep(newPitch.step)
@@ -1520,7 +1518,7 @@ class GenericInterval(IntervalBase):
         elif newPitch.accidental is not None:
             newPitch.accidental = None
 
-        if inPlace is False:
+        if not inPlace:
             return newPitch
 
     def getDiatonic(self, specifier: Specifier|str) -> DiatonicInterval:
@@ -3526,7 +3524,7 @@ class Interval(IntervalBase):
                         and oldPitch2Accidental.name == 'natural'):
                     pitch2.accidental = oldPitch2Accidental
 
-        if useImplicitOctave is True:
+        if useImplicitOctave:
             pitch2.octave = None
 
         if not inPlace:

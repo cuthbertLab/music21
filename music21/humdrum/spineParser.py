@@ -1327,7 +1327,7 @@ class KernSpine(HumdrumSpine):
                     thisObject = SpineComment(eventC)
                     if thisObject.comment == '':
                         thisObject = None
-                elif eventC.count(' '):
+                elif ' ' in eventC:
                     thisObject = self.processChordEvent(eventC)
                 else:  # Note or Rest
                     thisObject = self.processNoteEvent(eventC)
@@ -2208,7 +2208,7 @@ def hdStringToNote(contents):
 
     # Detect rests first, because rests can contain manual positioning information,
     # which is also detected by the `matchedNote` variable above.
-    if contents.count('r'):
+    if 'r' in contents:
         thisObject = note.Rest()
 
     elif matchedNote:
@@ -2231,90 +2231,87 @@ def hdStringToNote(contents):
         thisObject.pitch.accidental = matchedSharp.group(0)
     elif matchedFlat:
         thisObject.pitch.accidental = matchedFlat.group(0)
-    elif contents.count('n'):
+    elif 'n' in contents:
         thisObject.pitch.accidental = 'n'
 
     # 3.2.2 -- Slurs, Ties, Phrases
     # TODO: add music21 phrase information
-    if contents.count('{'):
-        for i in range(contents.count('{')):
-            pass  # phraseMark start
-    if contents.count('}'):
-        for i in range(contents.count('}')):
-            pass  # phraseMark end
-    if contents.count('('):
-        for i in range(contents.count('(')):
-            pass  # slur start
-    if contents.count(')'):
-        for i in range(contents.count(')')):
-            pass  # slur end
-    if contents.count('['):
+    for i in range(contents.count('{')):
+        pass  # phraseMark start
+    for i in range(contents.count('}')):
+        pass  # phraseMark end
+    for i in range(contents.count('(')):
+        pass  # slur start
+    for i in range(contents.count(')')):
+        pass  # slur end
+    if '[' in contents:
         thisObject.tie = tie.Tie('start')
-    elif contents.count(']'):
+    elif ']' in contents:
         thisObject.tie = tie.Tie('stop')
-    elif contents.count('_'):
+    elif '_' in contents:
         thisObject.tie = tie.Tie('continue')
 
     # 3.2.3 Ornaments
-    if contents.count('t'):
+    if 't' in contents:
         thisObject.expressions.append(expressions.HalfStepTrill())
-    elif contents.count('T'):
+    elif 'T' in contents:
         thisObject.expressions.append(expressions.WholeStepTrill())
 
-    if contents.count('w'):
+    if 'w' in contents:
         thisObject.expressions.append(expressions.HalfStepInvertedMordent())
-    elif contents.count('W'):
+    elif 'W' in contents:
         thisObject.expressions.append(expressions.WholeStepInvertedMordent())
-    elif contents.count('m'):
+    elif 'm' in contents:
         thisObject.expressions.append(expressions.HalfStepMordent())
-    elif contents.count('M'):
+    elif 'M' in contents:
         thisObject.expressions.append(expressions.WholeStepMordent())
 
-    if contents.count('S'):
+    if 'S' in contents:
         thisObject.expressions.append(expressions.Turn())
-    elif contents.count('$'):
+    elif '$' in contents:
         thisObject.expressions.append(expressions.InvertedTurn())
-    elif contents.count('R'):
+    elif 'R' in contents:
         t1 = expressions.Turn()
         t1.connectedToPrevious = True  # true by default, but explicitly
         thisObject.expressions.append(t1)
 
-    if contents.count(':'):
+    if ':' in contents:
         # TODO: deal with arpeggiation -- should have been in a
         #  chord structure
         pass
 
-    if contents.count('O'):
+    if 'O' in contents:
         thisObject.expressions.append(expressions.Ornament())
         # generic ornament
 
     # 3.2.4 Articulation Marks
-    if contents.count("'"):
+    if "'" in contents:
         thisObject.articulations.append(articulations.Staccato())
-    if contents.count('"'):
+    if '"' in contents:
         thisObject.articulations.append(articulations.Pizzicato())
-    if contents.count('`'):
+    if '`' in contents:
         # called 'attacca' mark but means staccatissimo:
         # http://www.music-cog.ohio-state.edu/Humdrum/representations/kern.rep.html
         thisObject.articulations.append(articulations.Staccatissimo())
-    if contents.count('~'):
+    if '~' in contents:
         thisObject.articulations.append(articulations.Tenuto())
-    if contents.count('^'):
+    if '^' in contents:
         thisObject.articulations.append(articulations.Accent())
-    if contents.count(';'):
+    if ';' in contents:
         thisObject.expressions.append(expressions.Fermata())
 
     # 3.2.5 Up & Down Bows
-    if contents.count('v'):
+    if 'v' in contents:
         thisObject.articulations.append(articulations.UpBow())
-    elif contents.count('u'):
+    elif 'u' in contents:
         thisObject.articulations.append(articulations.DownBow())
 
     # 3.2.6 Stem Directions
-    if contents.count('/'):
+    if '/' in contents:
         thisObject.stemDirection = 'up'
-    elif contents.count('\\'):
+    elif '\\' in contents:
         thisObject.stemDirection = 'down'
+
 
     # 3.2.7 Duration +
     # 3.2.8 N-Tuplets
@@ -2326,7 +2323,7 @@ def hdStringToNote(contents):
         durationFirst = int(foundRational.group(1))
         durationSecond = float(foundRational.group(2))
         thisObject.duration.quarterLength = 4 * durationSecond / durationFirst
-        if contents.count('.'):
+        if '.' in contents:
             thisObject.duration.dots = contents.count('.')
 
     elif foundNumber:
@@ -2336,20 +2333,16 @@ def hdStringToNote(contents):
             if durationString == '000':
                 # for larger values, see https://extras.humdrum.org/man/rscale/
                 thisObject.duration.type = 'maxima'
-                if contents.count('.'):
-                    thisObject.duration.dots = contents.count('.')
             elif durationString == '00':
                 # for larger values, see https://extras.humdrum.org/man/rscale/
                 thisObject.duration.type = 'longa'
-                if contents.count('.'):
-                    thisObject.duration.dots = contents.count('.')
             else:
                 thisObject.duration.type = 'breve'
-                if contents.count('.'):
-                    thisObject.duration.dots = contents.count('.')
+            if '.' in contents:
+                thisObject.duration.dots = contents.count('.')
         elif durationType in duration.typeFromNumDict:
             thisObject.duration.type = duration.typeFromNumDict[durationType]
-            if contents.count('.'):
+            if '.' in contents:
                 thisObject.duration.dots = contents.count('.')
         else:
             dT = int(durationType) + 0.0
@@ -2368,26 +2361,26 @@ def hdStringToNote(contents):
             # humdrum tuplets that breaks normal usage.  TODO: Refactor adding a Flavor = 'JRP'
             # code that uses this other method...
             JRP = flavors['JRP']
-            if JRP is False and contents.count('.'):
+            if JRP is False and '.' in contents:
                 newTup.durationNormal = duration.durationTupleFromTypeDots(
                     newTup.durationNormal.type, contents.count('.'))
 
             thisObject.duration.appendTuplet(newTup)
-            if JRP is True and contents.count('.'):
+            if JRP is True and '.' in contents:
                 thisObject.duration.dots = contents.count('.')
             # call Duration.TupletFixer after to correct this.
 
     # 3.2.9 Grace Notes and Groupettos
-    if contents.count('q'):
+    if 'q' in contents:
         thisObject = thisObject.getGrace()
         thisObject.duration.type = 'eighth'
-    elif contents.count('Q'):
+    elif 'Q' in contents:
         thisObject = thisObject.getGrace()
         thisObject.duration.slash = False
         thisObject.duration.type = 'eighth'
-    elif contents.count('P'):
+    elif 'P' in contents:
         thisObject = thisObject.getGrace(appoggiatura=True)
-    elif contents.count('p'):
+    elif 'p' in contents:
         pass  # end appoggiatura duration -- not needed in music21...
 
     # 3.2.10 Beaming
@@ -2427,53 +2420,53 @@ def hdStringToMeasure(contents, previousMeasure=None):
 
     barline = bar.Barline()
 
-    if contents.count('-'):
+    if '-' in contents:
         barline.type = 'none'
-    elif contents.count("'"):
+    elif "'" in contents:
         barline.type = 'short'
-    elif contents.count('`'):
+    elif '`' in contents:
         barline.type = 'tick'
-    elif contents.count('||'):
+    elif '||' in contents:
         barline.type = 'double'
         if contents.count(':') > 1:
             barline.repeatDots = 'both'
-        elif contents.count(':|'):
+        elif ':|' in contents:
             barline.repeatDots = 'left'
-        elif contents.count('|:'):
+        elif '|:' in contents:
             barline.repeatDots = 'right'
-    elif contents.count('!!'):
+    elif '!!' in contents:
         barline.type = 'heavy-heavy'
         if contents.count(':') > 1:
             barline.repeatDots = 'both'
-        elif contents.count(':!'):
+        elif ':!' in contents:
             barline.repeatDots = 'left'
-        elif contents.count('!:'):
+        elif '!:' in contents:
             barline.repeatDots = 'right'
-    elif contents.count('|!'):
+    elif '|!' in contents:
         barline.type = 'final'
         if contents.count(':') > 1:
             barline.repeatDots = 'both'
-        elif contents.count(':|'):
+        elif ':|' in contents:
             barline.repeatDots = 'left'
-        elif contents.count('!:'):
+        elif '!:' in contents:
             barline.repeatDots = 'right'
-    elif contents.count('!|'):
+    elif '!|' in contents:
         barline.type = 'heavy-light'
         if contents.count(':') > 1:
             barline.repeatDots = 'both'
-        elif contents.count(':!'):
+        elif ':!' in contents:
             barline.repeatDots = 'left'
-        elif contents.count('|:'):
+        elif '|:' in contents:
             barline.repeatDots = 'right'
-    elif contents.count('|'):
+    elif '|' in contents:
         barline.type = 'regular'
         if contents.count(':') > 1:
             barline.repeatDots = 'both'
-        elif contents.count(':|'):
+        elif ':|' in contents:
             barline.repeatDots = 'left'
-        elif contents.count('|:'):
+        elif '|:' in contents:
             barline.repeatDots = 'right'
-    elif contents.count('=='):
+    elif '==' in contents:
         barline.type = 'double'
         if contents.count(':') > 1:
             barline.repeatDots = 'both'
@@ -2483,7 +2476,7 @@ def hdStringToMeasure(contents, previousMeasure=None):
                 'Cannot import a double bar visually rendered as a single bar -- '
                 + 'not sure exactly what that would mean anyhow.')
 
-    if contents.count(';'):
+    if ';' in contents:
         barline.pause = expressions.Fermata()
 
     if previousMeasure is not None:
