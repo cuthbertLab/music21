@@ -66,16 +66,14 @@ class TreeYielder:  # pragma: no cover
                 dictTuple = ('dict', keyX)
                 self.stackVals.append(dictTuple)
                 x = obj[keyX]
-                for z in self.run(x, memo=memo):
-                    yield z
+                yield from self.run(x, memo=memo)
                 self.stackVals.pop()
 
         elif tObj in [list, tuple]:
             for i, x in enumerate(obj):
                 listTuple = ('listLike', i)
                 self.stackVals.append(listTuple)
-                for z in self.run(x, memo=memo):
-                    yield z
+                yield from self.run(x, memo=memo)
                 self.stackVals.pop()
 
         else:  # objects or uncaught types...
@@ -95,8 +93,7 @@ class TreeYielder:  # pragma: no cover
                 objTuple = ('getattr', x)
                 self.stackVals.append(objTuple)
                 try:
-                    for z in self.run(gotValue, memo=memo):
-                        yield z
+                    yield from self.run(gotValue, memo=memo)
                 except RuntimeError:
                     raise ValueError(f'Maximum recursion on:\n{self.currentLevel()}')
                 self.stackVals.pop()

@@ -193,10 +193,8 @@ class WindowedAnalysis:
         elif windowType == 'noOverlap':
             start = 0
             end = start + windowSize
-            i = 0
-            while True:
-                if end >= len(self._windowedStream):
-                    end = len(self._windowedStream)
+            for i in range(windowCount):
+                end = min(end, len(self._windowedStream))
 
                 current = stream.Stream()
                 for j in range(start, end):
@@ -210,9 +208,6 @@ class WindowedAnalysis:
 
                 start = end
                 end = start + windowSize
-                i += 1
-                if i >= windowCount:
-                    break
 
         elif windowType == 'adjacentAverage':
             # first get overlapping windows
