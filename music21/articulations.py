@@ -83,11 +83,9 @@ from music21 import base
 from music21 import common
 from music21.common.classTools import tempAttribute
 from music21 import environment
-from music21 import style
 from music21 import spanner
+from music21 import style
 
-if t.TYPE_CHECKING:
-    from music21 import interval
 
 
 environLocal = environment.Environment('articulations')
@@ -582,10 +580,47 @@ class PullOff(spanner.Spanner, TechnicalIndication):
     pass
 
 class FretBend(FretIndication):
-    bendAlter: interval.IntervalBase|None = None
-    preBend: t.Any = None
-    release: t.Any = None
-    withBar: t.Any = None
+    '''
+    Bend indication for fretted instruments
+
+    Bend in musicxml
+
+    Number is an identifier for the articulation. Defaults to 0.
+
+    BendAlter is the interval of the bend in number of semitones,
+    bend-alter in musicxml. Defaults to None.
+
+    PreBend indicates if the string is bent before
+    the onset of the note. Defaults to False.
+
+    Release is the quarterLength value from the start
+    of the note for releasing the bend, if Any. Defaults to None.
+
+    WithBar indicates if the bend is done using a whammy bar movement. Defaults to False.
+
+    >>> fb = articulations.FretBend(bendAlter=interval.ChromaticInterval(-2), release=0.5)
+    >>> fb
+    <music21.articulations.FretBend 0>
+    >>> fb.preBend
+    False
+    >>> fb.withBar
+    False
+    >>> fb.bendAlter
+    <music21.interval.ChromaticInterval -2>
+    >>> fb.release 
+    0.5
+    '''
+    bendAlter: interval.IntervalBase | None
+    preBend: bool
+    release: float | None
+    withBar: bool 
+
+    def __init__(self, number=0, bendAlter=None, preBend=False, release=None, withBar=False, **keywords):
+        super().__init__(**keywords)
+        self.bendAlter = bendAlter
+        self.preBend = preBend
+        self.release = release
+        self.withBar = withBar
 
 class FretTap(FretIndication):
     pass
