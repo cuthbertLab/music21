@@ -598,6 +598,18 @@ class FretBend(FretIndication):
     of the note for releasing the bend, if Any. Defaults to None.
 
     WithBar indicates if the bend is done using a whammy bar movement. Defaults to False.
+
+    >>> fb = articulations.FretBend(bendAlter=interval.ChromaticInterval(-2), release=0.5)
+    >>> fb
+    <music21.articulations.FretBend 0>
+    >>> fb.preBend
+    False
+    >>> fb.withBar
+    False
+    >>> fb.bendAlter
+    <music21.interval.ChromaticInterval -2>
+    >>> fb.release 
+    0.5
     '''
     bendAlter: interval.IntervalBase | None
     preBend: bool
