@@ -5515,6 +5515,8 @@ class MeasureExporter(XMLExporterBase):
         if bend.preBend:
             SubElement(mxh, 'pre-bend')
         if bend.release is not None:
+            # Specifies where the release starts in terms of 
+            # divisions relative to the current note.
             releaseSubElement = SubElement(mxh, 'release')
             releaseSubElement.set('offset', str(bend.release))
         if bend.withBar is not None:
