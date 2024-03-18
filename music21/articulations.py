@@ -84,6 +84,7 @@ from music21 import common
 from music21.common.classTools import tempAttribute
 from music21 import environment
 from music21 import style
+from music21 import interval
 from music21 import spanner
 from music21 import interval
 
@@ -604,12 +605,6 @@ class FretBend(FretIndication):
         self.preBend = preBend
         self.release = release
         self.withBar = withBar
-
-class Mute(StringIndication):
-    '''
-    muted note for string instruments.
-    '''
-    pass
 
 class FretTap(FretIndication):
     pass
