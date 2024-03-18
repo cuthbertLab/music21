@@ -5518,7 +5518,9 @@ class MeasureExporter(XMLExporterBase):
             # Specifies where the release starts in terms of 
             # divisions relative to the current note.
             releaseSubElement = SubElement(mxh, 'release')
-            releaseSubElement.set('offset', str(bend.release))
+            quarterLengthValue = bend.release
+            divisionsValue = defaults.divisionsPerQuarter * quarterLengthValue
+            releaseSubElement.set('offset', str(divisionsValue))
         if bend.withBar is not None:
             withBarSubElement = SubElement(mxh, 'with-bar')
             withBarSubElement.text = str(bend.withBar)
