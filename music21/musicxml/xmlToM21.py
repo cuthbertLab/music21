@@ -3881,9 +3881,11 @@ class MeasureParser(SoundTagMixin, XMLParserBase):
         if mxh.find('pre-bend') is not None:
             bend.preBend = True
         if mxh.find('release') is not None:
-                bend.release = int(mxh.find('release').get('offset'))
-                # offset is not mandatory
-                bend.release = 0
+            try:
+                divisions = float(mxh.find('release').get('offset'))
+                bend.release = divisions / defaults.divisionsPerQuarter
+            except (ValueError, TypeError) as unused_err:
+                bend.release = 0.0
 
     @staticmethod
     def setHarmonic(mxh, harm):
