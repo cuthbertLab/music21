@@ -5469,16 +5469,7 @@ class MeasureExporter(XMLExporterBase):
                 assert isinstance(articulationMark, articulations.FretIndication)
             mxTechnicalMark.text = str(articulationMark.number)
         if musicXMLTechnicalName == 'bend':
-            bendAlterSubElement = SubElement(mxTechnicalMark, 'bend-alter')
-            bendAlterSubElement.text = str(articulationMark.bendAlter.semitones)
-            if articulationMark.preBend:
-                preBendSubElement = SubElement(mxTechnicalMark, 'pre-bend')
-            if articulationMark.release is not None:
-                releaseSubElement = SubElement(mxTechnicalMark, 'release')
-                releaseSubElement.set('offset', str(articulationMark.release))
-            if articulationMark.withBar is not None:
-                withBarSubElement = SubElement(mxTechnicalMark, 'with-bar')
-                withBarSubElement.text = str(articulationMark.withBar)
+            self.setBend(mxTechnicalMark, articulationMark)
         # harmonic needs to check for whether it is artificial or natural, and
         # whether it is base-pitch, sounding-pitch, or touching-pitch
         if musicXMLTechnicalName == 'harmonic':
@@ -5493,6 +5484,42 @@ class MeasureExporter(XMLExporterBase):
         self.setPrintStyle(mxTechnicalMark, articulationMark)
         # mxArticulations.append(mxArticulationMark)
         return mxTechnicalMark
+
+    @staticmethod
+    def setBend(mxh: Element, bend: articulations.FretBend) -> None:
+        '''
+        Sets the bend-alter SubElement and the pre-bend,
+        release and with-bar SubElements when present.
+
+        Called from articulationToXmlTechnical
+
+        >>> MEXClass = musicxml.m21ToXml.MeasureExporter
+
+        >>> a = articulations.FretBend()
+
+        >>> from xml.etree.ElementTree import Element
+        >>> mxh = Element('bend')
+
+        >>> MEXClass.setBend(mxh, a)
+        >>> MEXClass.dump(mxh)
+        <bend>
+          <bend-alter></bend-alter>
+        </bend>
+        '''
+        bendAlterSubElement = SubElement(mxh, 'bend-alter')
+        alter = bend.bendAlter
+        if alter is not None:
+            # musicxml expects a number of semitones but not sure how to get it
+            # from a GeneralInterval
+            pass
+        if bend.preBend:
+            SubElement(mxh, 'pre-bend')
+        if bend.release is not None:
+            releaseSubElement = SubElement(mxh, 'release')
+            releaseSubElement.set('offset', str(bend.release))
+        if bend.withBar is not None:
+            withBarSubElement = SubElement(mxh, 'with-bar')
+            withBarSubElement.text = str(bend.withBar)
 
     @staticmethod
     def setHarmonic(mxh: Element, harm: articulations.StringHarmonic) -> None:
