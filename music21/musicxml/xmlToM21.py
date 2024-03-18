@@ -3862,14 +3862,7 @@ class MeasureParser(SoundTagMixin, XMLParserBase):
                 if mxObj.get('substitution') is not None:
                     tech.substitution = xmlObjects.yesNoToBoolean(mxObj.get('substitution'))
             if tag == 'bend':
-                tech.bendAlter = interval.Interval(int(mxObj.find('bend-alter').text))
-                if mxObj.find('pre-bend') is not None:
-                    tech.preBend = True
-                if mxObj.find('release') is not None:
-                        tech.release = int(mxObj.find('release').get('offset'))
-                    except TypeError:
-                        # offset is not mandatory
-                        tech.release = 0
+                self.setBend(mxObj, tech)
             # TODO: <bend> attr: accelerate, beats, first-beat, last-beat, shape (4.0)
             # TODO: <bent> sub-elements: bend-alter, pre-bend, with-bar, release
             # TODO: musicxml 4: release sub-element as offset attribute
@@ -3878,6 +3871,19 @@ class MeasureParser(SoundTagMixin, XMLParserBase):
         else:
             environLocal.printDebug(f'Cannot translate {tag} in {mxObj}.')
             return None
+
+    @staticmethod
+    def setBend(mxh, bend):
+        alter = mxh.find('bend-alter')
+        if alter is not None:
+            if alter.text is not None:
+                bend.bendAlter = interval.Interval(int(alter.text))
+        if mxh.find('pre-bend') is not None:
+            bend.preBend = True
+        if mxh.find('release') is not None:
+                bend.release = int(mxh.find('release').get('offset'))
+                # offset is not mandatory
+                bend.release = 0
 
     @staticmethod
     def setHarmonic(mxh, harm):
