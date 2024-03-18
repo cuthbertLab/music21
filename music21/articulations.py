@@ -581,22 +581,30 @@ class PullOff(spanner.Spanner, TechnicalIndication):
     pass
 
 class FretBend(FretIndication):
+    '''
+    Bend indication for fretted instruments
+
+    Bend in musicxml
+
+    Number is an identifier for the articulation. Defaults to 0.
+
+    BendAlter is the interval of the bend in number of semitones,
+    bend-alter in musicxml. Defaults to None.
+
+    PreBend indicates if the string is bent before
+    the onset of the note. Defaults to False.
+
+    Release is the quarterLength value from the start
+    of the note for releasing the bend, if Any. Defaults to None.
+
+    WithBar indicates if the bend is done using a whammy bar movement. Defaults to False.
+    '''
     bendAlter: interval.IntervalBase | None
     preBend: bool
     release: float | None
-    withBar: bool | None
+    withBar: bool 
 
-    def __init__(self, number=0, bendAlter=None, preBend=False, release=None, withBar=None, **keywords):
-        '''
-        bend indication for fretted instruments
-
-        bend in musicxml
-
-        number is the interval of the bend in number of semitones, bend-alter in musicxml
-        preBend indicates wether the note is prebended or not
-        release is the offset value for releasing the bend, if Any
-        withBar indicates if the bend is done using a whammy bar movement
-        '''
+    def __init__(self, number=0, bendAlter=None, preBend=False, release=None, withBar=False, **keywords):
         super().__init__(**keywords)
         self.bendAlter = bendAlter
         self.preBend = preBend
