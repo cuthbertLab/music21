@@ -583,8 +583,8 @@ class PullOff(spanner.Spanner, TechnicalIndication):
     pass
 
 class FretBend(FretIndication):
-    bendAlter: interval.IntervalBase|None = None
-    preBend: t.Any = None
+    bendAlter: interval.IntervalBase | None = None
+    preBend: bool = False
     release: t.Any = None
     withBar: t.Any = None
 

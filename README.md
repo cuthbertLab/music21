@@ -12,8 +12,9 @@ Modified version of music21 for the TABASCO project, with additional support to 
 - **5184, 5209:5212**: Export bend articulations;
 
 `music21/articulations.py`:
-- *87*: import `interval` for `bendAlter`
+- *87*: import `interval` for `bendAlter`;
 - **578**: add attributes to `FretBend` class;
+- **577**: set `preBend` type;
 
 `music21/note.py`:
 - **1787:1828**: add utility properties to music21.note.Note
