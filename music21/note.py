@@ -35,7 +35,6 @@ from music21 import prebase
 from music21 import style
 from music21 import tie
 from music21 import volume
-from music21 import articulations
 
 if t.TYPE_CHECKING:
     from collections.abc import Iterable, Sequence
@@ -1825,49 +1824,6 @@ class Note(NotRest):
         self._cache = {}
         if self._chordAttached is not None:
             self._chordAttached.clearCache()
-
-    @property
-    def string(self):
-        '''
-        Returns articulations.StringIndication if object has one.
-        '''
-        for art in self.articulations:
-            if isinstance(art, articulations.StringIndication):
-                return art
-        return None
-
-
-    @property
-    def fret(self):
-        '''
-        Returns articulations.FretIndication if object has one.
-        '''
-        for art in self.articulations:
-            if isinstance(art, articulations.FretIndication):
-                return art
-        return None
-
-    @property
-    def isBended(self):
-        '''
-        Returns True if the Note has a FretBend articulation. False otherwise.
-        '''
-        for art in self.articulations:
-            if isinstance(art, articulations.FretBend):
-                return True
-        return False
-
-    @property
-    def bend(self):
-        '''
-        Returns the articulations.FretBend object if there is one in self.articulations.
-        Returns None otherwise.
-        '''
-        if not self.isBended:
-            return None
-        for art in self.articulations:
-            if isinstance(art, articulations.FretBend):
-                return art
 
 # ------------------------------------------------------------------------------
 # convenience classes
