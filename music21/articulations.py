@@ -581,12 +581,12 @@ class PullOff(spanner.Spanner, TechnicalIndication):
     pass
 
 class FretBend(FretIndication):
-    bendAlter: interval.IntervalBase
-    preBend: bool = False
-    release: t.Optional[float]
-    withBar: t.Optional[bool]
+    bendAlter: interval.IntervalBase | None
+    preBend: bool
+    release: float | None
+    withBar: bool | None
 
-    def __init__(self, number=0, preBend=False, release=None, withBar=None, **keywords):
+    def __init__(self, number=0, bendAlter=None, preBend=False, release=None, withBar=None, **keywords):
         '''
         bend indication for fretted instruments
 
@@ -598,7 +598,7 @@ class FretBend(FretIndication):
         withBar indicates if the bend is done using a whammy bar movement
         '''
         super().__init__(**keywords)
-        self.bendAlter = interval.ChromaticInterval(number)
+        self.bendAlter = bendAlter
         self.preBend = preBend
         self.release = release
         self.withBar = withBar
