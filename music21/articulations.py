@@ -85,6 +85,7 @@ from music21.common.classTools import tempAttribute
 from music21 import environment
 from music21 import style
 from music21 import spanner
+from music21 import interval
 
 if t.TYPE_CHECKING:
     from music21 import interval
@@ -586,6 +587,23 @@ class FretBend(FretIndication):
     preBend: t.Any = None
     release: t.Any = None
     withBar: t.Any = None
+
+    def __init__(self, number=0, preBend=False, release=None, withBar=None, **keywords):
+        '''
+        bend indication for fretted instruments
+
+        bend in musicxml
+
+        number is the interval of the bend in number of semitones, bend-alter in musicxml
+        preBend indicates wether the note is prebended or not
+        release is the offset value for releasing the bend, if Any
+        withBar indicates if the bend is done using a whammy bar movement
+        '''
+        super().__init__(**keywords)
+        self.bendAlter = interval.ChromaticInterval(number)
+        self.preBend = preBend
+        self.release = release
+        self.withBar = withBar
 
 class FretTap(FretIndication):
     pass
