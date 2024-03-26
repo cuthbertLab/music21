@@ -4247,6 +4247,7 @@ class Chord(ChordBase):
         'diamond'
         'do'
         'fa'
+        'fa up'
         'inverted triangle'
         'la'
         'left triangle'
