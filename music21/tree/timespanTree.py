@@ -34,7 +34,7 @@ from music21.tree import trees
 
 
 if t.TYPE_CHECKING:
-    from music21.tree.verticality import VerticalitySequence
+    from music21.tree.verticality import Verticality, VerticalitySequence
 
 
 environLocal = environment.Environment('tree.timespanTree')
@@ -244,11 +244,15 @@ class TimespanTree(trees.OffsetTree):
         '''
         self.removeElements(elements, offsets, runUpdate)
 
-    def findNextPitchedTimespanInSameStreamByClass(self, pitchedTimespan, classList=None):
+    def findNextPitchedTimespanInSameStreamByClass(
+        self,
+        pitchedTimespan: spans.PitchedTimespan,
+        classList=None
+    ) -> spans.PitchedTimespan | None:
         r'''
         Finds next element timespan in the same stream class as `PitchedTimespan`.
 
-        Default classList is (stream.Part, )
+        Default classList is (stream.Part,)
 
         >>> score = corpus.parse('bwv66.6')
         >>> scoreTree = score.asTimespans(classList=(note.Note,))
@@ -289,7 +293,11 @@ class TimespanTree(trees.OffsetTree):
                         pitchedTimespan.getParentageByClass(classList)):
                     return nextPitchedTimespan
 
-    def findPreviousPitchedTimespanInSameStreamByClass(self, pitchedTimespan, classList=None):
+    def findPreviousPitchedTimespanInSameStreamByClass(
+        self,
+        pitchedTimespan: spans.PitchedTimespan,
+        classList=None
+    ) -> spans.PitchedTimespan | None:
         r'''
         Finds next element timespan in the same Part/Measure, etc. (specify in classList) as
         the `pitchedTimespan`.
@@ -445,8 +453,8 @@ class TimespanTree(trees.OffsetTree):
 
     def iterateVerticalities(
         self,
-        reverse=False,
-    ):
+        reverse: bool = False,
+    ) -> Generator[Verticality, None, None]:
         r'''
         Iterates all vertical moments in this TimespanTree, represented as
         :class:`~music21.tree.verticality.Verticality` objects.

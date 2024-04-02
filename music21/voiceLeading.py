@@ -19,7 +19,7 @@ divide a score up into these segments, returning a list of segments to later ana
 The list of objects included here are:
 
 * :class:`~music21.voiceLeading.VoiceLeadingQuartet` : two by two matrix of notes
-
+* :func:`~music21.voiceLeading.iterateAllVoiceLeadingQuartets` : yields each VLQ in a piece.
 * :class:`~music21.voiceLeading.Verticality` : vertical context in a score,
     composed of any music21 objects
 * :class:`~music21.voiceLeading.VerticalityNTuplet` : group of three
@@ -35,6 +35,7 @@ The list of objects included here are:
 '''
 from __future__ import annotations
 
+from collections.abc import Generator
 import enum
 import typing as t
 import unittest
@@ -51,6 +52,8 @@ from music21 import note
 from music21 import pitch
 from music21 import scale
 
+if t.TYPE_CHECKING:
+    from music21 import stream
 
 # from music21 import harmony can't do this either
 # from music21 import roman Can't import roman because of circular
@@ -2405,6 +2408,40 @@ class TwoChordLinearSegment(NChordLinearSegment):
         '''
         return interval.notesToChromatic(self.chordList[0].bass(), self.chordList[1].bass())
 
+
+def iterateAllVoiceLeadingQuartets(
+    s: stream.Stream,
+    *,
+    includeRests: bool = True,
+    includeOblique: bool = True,
+    includeNoMotion: bool = False,
+    reverse: bool = False,
+) -> Generator[VoiceLeadingQuartet, None, None]:
+    '''
+    Iterate through all VoiceLeading quartets in a Stream (generally a Score),
+    yielding a generator of quartets
+
+    >>> b = corpus.parse('bwv66.6')
+    >>> for vlq in voiceLeading.iterateAllVoiceLeadingQuartets(b):
+    ...     print(vlq.v1n1.measureNumber,
+    ...           vlq.v1n1.getContextByClass(stream.Part).id,
+    ...           vlq.v2n1.getContextByClass(stream.Part).id,
+    ...           vlq)
+    0 Soprano Tenor <music21.voiceLeading.VoiceLeadingQuartet v1n1=B4, v1n2=A4, v2n1=B3, v2n2=C#4>
+    0 Soprano Bass <music21.voiceLeading.VoiceLeadingQuartet v1n1=B4, v1n2=A4, v2n1=G#3, v2n2=F#3>
+    0 Tenor Bass <music21.voiceLeading.VoiceLeadingQuartet v1n1=B3, v1n2=C#4, v2n1=G#3, v2n2=F#3>
+    1 Soprano Alto <music21.voiceLeading.VoiceLeadingQuartet v1n1=A4, v1n2=B4, v2n1=F#4, v2n2=E4>
+    1 Soprano Tenor <music21.voiceLeading.VoiceLeadingQuartet v1n1=A4, v1n2=B4, v2n1=C#4, v2n2=B3>
+    1 Soprano Bass <music21.voiceLeading.VoiceLeadingQuartet v1n1=A4, v1n2=B4, v2n1=F#3, v2n2=G#3>
+    1 Alto Tenor <music21.voiceLeading.VoiceLeadingQuartet v1n1=F#4, v1n2=E4, v2n1=C#4, v2n2=B3>
+    1 Alto Bass <music21.voiceLeading.VoiceLeadingQuartet v1n1=F#4, v1n2=E4, v2n1=F#3, v2n2=G#3>
+    ...
+    '''
+    for v in s.asTimespans().iterateVerticalities(reverse=reverse):
+        for vlq in v.getAllVoiceLeadingQuartets(
+            includeRests=includeRests, includeOblique=includeOblique, includeNoMotion=includeNoMotion
+        ):
+            yield vlq
 
 # ------------------------------------------------------------------------------
 

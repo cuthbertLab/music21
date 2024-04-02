@@ -899,7 +899,7 @@ class Music21Object(prebase.ProtoM21Object):
         returnSpecial: bool = False,
     ) -> OffsetQL|OffsetSpecial:
         return 0.0  # dummy until Astroid #1015 is fixed.  Replace with ...
-        # using bool instead of t.Literal[True] because of
+        # using bool instead of t.Literal[True] because of other errors
 
     def getOffsetBySite(
         self,
