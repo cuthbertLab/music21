@@ -36,6 +36,7 @@ from music21.common.types import OffsetQL, OffsetQLIn
 from music21.tree import spans
 
 if t.TYPE_CHECKING:
+    from music21.tree.trees import OffsetTree
     from music21.voiceLeading import VoiceLeadingQuartet
 
 environLocal = environment.Environment('tree.verticality')
@@ -131,6 +132,7 @@ class Verticality(prebase.ProtoM21Object):
     # CLASS VARIABLES #
 
     __slots__ = (
+        'offsetTree',
         'timespanTree',
         'overlapTimespans',
         'startTimespans',
@@ -139,8 +141,11 @@ class Verticality(prebase.ProtoM21Object):
     )
 
     _DOC_ATTR: dict[str, str] = {
+        'offsetTree': r'''
+            Returns the tree initially set else None
+            ''',
         'timespanTree': r'''
-            Returns the timespanTree initially set.
+            Returns the tree initially set if it was a TimespanTree, else None
             ''',
         'overlapTimespans': r'''
             Gets timespans overlapping the start offset of a verticality.
@@ -211,17 +216,17 @@ class Verticality(prebase.ProtoM21Object):
     def __init__(
         self,
         offset: OffsetQL = 0.0,
-        overlapTimespans: tuple[spans.ElementTimespan, ...] =(),
-        startTimespans: tuple[spans.ElementTimespan, ...] =(),
-        stopTimespans: tuple[spans.ElementTimespan, ...] =(),
+        overlapTimespans: tuple[spans.ElementTimespan, ...] = (),
+        startTimespans: tuple[spans.ElementTimespan, ...] = (),
+        stopTimespans: tuple[spans.ElementTimespan, ...] = (),
         timespanTree=None,
     ):
         from music21.tree.timespanTree import TimespanTree
-        if timespanTree is not None and not isinstance(timespanTree, TimespanTree):
-            raise VerticalityException(
-                f'timespanTree {timespanTree!r} is not a TimespanTree or None')
+        self.offsetTree: OffsetTree | None = timespanTree
+        self.timespanTree: TimespanTree | None = None
+        if isinstance(timespanTree, TimespanTree):
+            self.timespanTree = timespanTree
 
-        self.timespanTree: TimespanTree | None = timespanTree
         self.offset: OffsetQL = offset
 
         if not isinstance(startTimespans, tuple):
@@ -359,7 +364,7 @@ class Verticality(prebase.ProtoM21Object):
 
         If a verticality has no tree attached, then it will return None
         '''
-        tree = self.timespanTree
+        tree = self.offsetTree
         if tree is None:
             return None
         offset = tree.getPositionAfter(self.offset)
@@ -391,7 +396,7 @@ class Verticality(prebase.ProtoM21Object):
         >>> verticality.nextVerticality
         <music21.tree.verticality.Verticality 3.0 {A3 E4 C#5}>
         '''
-        tree = self.timespanTree
+        tree = self.offsetTree
         if tree is None:
             return None
         offset = tree.getPositionAfter(self.offset)
@@ -505,7 +510,7 @@ class Verticality(prebase.ProtoM21Object):
         >>> verticality.previousVerticality
         <music21.tree.verticality.Verticality 0.0 {A3 E4 C#5}>
         '''
-        tree = self.timespanTree
+        tree = self.offsetTree
         if tree is None:
             return None
         offset = tree.getPositionBefore(self.offset)
@@ -753,9 +758,6 @@ class Verticality(prebase.ProtoM21Object):
         else:
             quarterLength = common.opFrac(quarterLength)
 
-        if t.TYPE_CHECKING:
-            assert quarterLength is not None
-
         if not self.pitchSet:
             r = note.Rest()
             r.duration.quarterLength = quarterLength
@@ -789,6 +791,9 @@ class Verticality(prebase.ProtoM21Object):
                 return nNew
 
             offsetDifference = common.opFrac(self.offset - ts.offset)
+            if t.TYPE_CHECKING:
+                assert quarterLength is not None
+
             endTimeDifference = common.opFrac(ts.endTime - (self.offset + quarterLength))
             if t.TYPE_CHECKING:
                 assert endTimeDifference is not None
