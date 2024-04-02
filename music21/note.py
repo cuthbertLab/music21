@@ -871,7 +871,7 @@ class GeneralNote(base.Music21Object):
     @property
     def pitches(self) -> tuple[Pitch, ...]:
         '''
-        Returns an empty tuple.  (Useful for iterating over NotRests since they
+        Returns an empty tuple.  (Useful for iterating over GeneralNotes since they
         include Notes and Chords.)
         '''
         return ()
