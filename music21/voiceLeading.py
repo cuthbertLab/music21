@@ -2419,7 +2419,8 @@ def iterateAllVoiceLeadingQuartets(
 ) -> Generator[VoiceLeadingQuartet, None, None]:
     '''
     Iterate through all VoiceLeading quartets in a Stream (generally a Score),
-    yielding a generator of quartets
+    yielding a generator of VoiceLeadingQuartets.  N.B. does not yet support Streams with
+    Chords in them.
 
     >>> b = corpus.parse('bwv66.6')
     >>> for vlq in voiceLeading.iterateAllVoiceLeadingQuartets(b):
@@ -2438,10 +2439,11 @@ def iterateAllVoiceLeadingQuartets(
     ...
     '''
     for v in s.asTimespans().iterateVerticalities(reverse=reverse):
-        for vlq in v.getAllVoiceLeadingQuartets(
-            includeRests=includeRests, includeOblique=includeOblique, includeNoMotion=includeNoMotion
-        ):
-            yield vlq
+        yield from v.getAllVoiceLeadingQuartets(
+            includeRests=includeRests,
+            includeOblique=includeOblique,
+            includeNoMotion=includeNoMotion
+        )
 
 # ------------------------------------------------------------------------------
 
