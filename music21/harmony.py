@@ -1104,9 +1104,9 @@ def chordSymbolFigureFromChord(inChord: chord.Chord, includeChordType=False):
     >>> harmony.chordSymbolFigureFromChord(c, True)
     ('CGr+6', 'German')
 
-    >>> c = chord.Chord(['C3'])
-    >>> harmony.chordSymbolFigureFromChord(c, True)
-    ('Cpedal', 'pedal')
+    >>> eflat = chord.Chord(['E-3'])
+    >>> harmony.chordSymbolFigureFromChord(eflat, True)
+    ('E-pedal', 'pedal')
 
     >>> c = chord.Chord(['C3', 'G3'])
     >>> harmony.chordSymbolFigureFromChord(c, True)
@@ -1172,9 +1172,9 @@ def chordSymbolFigureFromChord(inChord: chord.Chord, includeChordType=False):
 
     if len(inChord.pitches) == 1:
         if includeChordType:
-            return (inChord.root().name.replace('-', 'b') + 'pedal', 'pedal')
+            return (inChord.root().name + 'pedal', 'pedal')
         else:
-            return inChord.root().name.replace('-', 'b') + 'pedal'
+            return inChord.root().name + 'pedal'
 
     d3 = inChord.semitonesFromChordStep(3)  # 4  triad
     d5 = inChord.semitonesFromChordStep(5)  # 7  triad
