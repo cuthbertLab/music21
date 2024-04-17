@@ -1824,7 +1824,12 @@ class ChordSymbol(Harmony):
             elif chordStepModification.modType == 'subtract':
                 typeSubtract(chordStepModification)
             elif chordStepModification.modType == 'alter':
-                typeAlter(chordStepModification)
+                try:
+                    typeAlter(chordStepModification)
+                except ChordStepModificationException:
+                    # fix it in place
+                    chordStepModification.modType = 'add'
+                    typeAdd(chordStepModification)
 
         return pitches
 
