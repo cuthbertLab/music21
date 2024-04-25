@@ -872,6 +872,7 @@ _stateDictDefault = {
 }
 
 class Converter:
+    # noinspection GrazieInspection
     '''
     Main conversion object for TinyNotation.
 
@@ -1405,7 +1406,7 @@ class Converter:
         '''
         Called after all the tokens have been run.
 
-        Currently runs `.makeMeasures` on `.stream` unless `.makeNotation` is `False`.
+        It currently runs `.makeMeasures()` on `.stream` unless `.makeNotation` is `False`.
         '''
         if self.makeNotation is not False:
             self.stream.makeMeasures(inPlace=True)
