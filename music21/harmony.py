@@ -112,7 +112,7 @@ CHORD_TYPES = collections.OrderedDict([
     ('suspended-second', ['1,2,5', ['sus2']]),  # Y
     ('suspended-fourth', ['1,4,5', ['sus', 'sus4']]),  # Y
     ('suspended-fourth-seventh', ['1,4,5,-7', ['7sus', '7sus4']]),  # Y
-    ('Neapolitan', ['1,2-,3,5-', ['N6']]),  # Y
+    ('Neapolitan', ['1,-2,3,-5', ['N6']]),  # Y
     ('Italian', ['1,#4,-6', ['It+6', 'It']]),  # Y
     ('French', ['1,2,#4,-6', ['Fr+6', 'Fr']]),  # Y
     ('German', ['1,-3,#4,-6', ['Gr+6', 'Ger']]),  # Y
@@ -1106,9 +1106,9 @@ def chordSymbolFigureFromChord(inChord: chord.Chord, includeChordType=False):
     >>> harmony.chordSymbolFigureFromChord(c, True)
     ('CGr+6', 'German')
 
-    >>> c = chord.Chord(['C3'])
-    >>> harmony.chordSymbolFigureFromChord(c, True)
-    ('Cpedal', 'pedal')
+    >>> eflat = chord.Chord(['E-3'])
+    >>> harmony.chordSymbolFigureFromChord(eflat, True)
+    ('E-pedal', 'pedal')
 
     >>> c = chord.Chord(['C3', 'G3'])
     >>> harmony.chordSymbolFigureFromChord(c, True)
@@ -1136,7 +1136,7 @@ def chordSymbolFigureFromChord(inChord: chord.Chord, includeChordType=False):
         still be identified correctly even if it is missing the 5th
     5. the type with the most identical matches is used, and if no type matches,
         "Chord Type Cannot Be Identified" is returned
-    6. the output format for the chord symbol figure is the chord's root (with 'b' instead of '-'),
+    6. the output format for the chord symbol figure is the chord's root,
         the chord type's Abbreviation (saved in CHORD_TYPES dictionary),
         a '/' if the chord is in an inversion, and the chord's bass
 
@@ -1147,7 +1147,7 @@ def chordSymbolFigureFromChord(inChord: chord.Chord, includeChordType=False):
     Thus, by default the returned symbol is the first (element 0) in the CHORD_TYPES list.
     For example (Eb minor eleventh chord, second inversion):
 
-        root + chord-type-str + '/' + bass = 'Ebmin11/Bb'
+        root + chord-type-str + '/' + bass = 'E-min11/B-'
 
     Users who wish to change these defaults can simply change that
     entry in the CHORD_TYPES dictionary.
@@ -1174,9 +1174,9 @@ def chordSymbolFigureFromChord(inChord: chord.Chord, includeChordType=False):
 
     if len(inChord.pitches) == 1:
         if includeChordType:
-            return (inChord.root().name.replace('-', 'b') + 'pedal', 'pedal')
+            return (inChord.root().name + 'pedal', 'pedal')
         else:
-            return inChord.root().name.replace('-', 'b') + 'pedal'
+            return inChord.root().name + 'pedal'
 
     d3 = inChord.semitonesFromChordStep(3)  # 4  triad
     d5 = inChord.semitonesFromChordStep(5)  # 7  triad
@@ -1518,6 +1518,7 @@ class ChordSymbol(Harmony):
 
     You can also create a Chord Symbol by writing out each degree,
     and any alterations to that degree:
+
     You must explicitly indicate EACH degree (a triad is NOT necessarily implied)
 
     >>> [str(p) for p in harmony.ChordSymbol('C35b7b9#11b13').pitches]
@@ -1538,6 +1539,8 @@ class ChordSymbol(Harmony):
 
     >>> [str(p) for p in harmony.ChordSymbol('Db35').pitches]
     ['D3', 'F3', 'A3']
+
+    (Note that this would be much better expressed just as 'Dm'.)
 
     >>> [str(p) for p in harmony.ChordSymbol('D,35b7b9#11b13').pitches]
     ['D2', 'F#2', 'A2', 'E-3', 'G#3', 'B-3', 'C4']
@@ -1826,7 +1829,12 @@ class ChordSymbol(Harmony):
             elif chordStepModification.modType == 'subtract':
                 typeSubtract(chordStepModification)
             elif chordStepModification.modType == 'alter':
-                typeAlter(chordStepModification)
+                try:
+                    typeAlter(chordStepModification)
+                except ChordStepModificationException:
+                    # fix it in place
+                    chordStepModification.modType = 'add'
+                    typeAdd(chordStepModification)
 
         return pitches
 
