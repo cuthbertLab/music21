@@ -86,8 +86,7 @@ class ChordReducer:
 
         chordWeights = self.computeMeasureChordWeights(mObj, weightAlgorithm)
 
-        if numChords > len(chordWeights):
-            numChords = len(chordWeights)
+        numChords = min(numChords, len(chordWeights))
 
         maxNChords = sorted(chordWeights, key=chordWeights.get, reverse=True)[:numChords]
         if not maxNChords:

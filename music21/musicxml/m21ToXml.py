@@ -1551,8 +1551,7 @@ class ScoreExporter(XMLExporterBase, PartStaffExporterMixin):
             else:
                 innerStream.transferOffsetToElements()
                 ht = innerStream.highestTime
-            if ht > self.highestTime:
-                self.highestTime = ht
+            self.highestTime = max(self.highestTime, ht)
         self.refStreamOrTimeRange = [0.0, self.highestTime]
         self.parts = list(s.parts)
 

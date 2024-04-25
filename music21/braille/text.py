@@ -336,8 +336,7 @@ class BrailleText(prebase.ProtoM21Object):
                 if self.allLines[i].isHeading:
                     break
                 lineLength = self.allLines[i].textLocation
-                if lineLength > maxLineLength:
-                    maxLineLength = lineLength
+                maxLineLength = max(maxLineLength, lineLength)
             for j in range(indexStart, indexFinal):
                 brailleTextLine = self.allLines[j]
                 lineStrToCenter = str(brailleTextLine)
@@ -565,12 +564,10 @@ class BrailleTextLine(prebase.ProtoM21Object):
         '''
         if not self.canInsert(textLocation, text):
             raise BrailleTextException('Text cannot be inserted at specified location.')
-        self.textLocation = textLocation
-        for char in list(text):
-            self.allChars[self.textLocation] = char
-            self.textLocation += 1
-        if self.textLocation > self.highestUsedLocation:
-            self.highestUsedLocation = self.textLocation
+        for i, char in enumerate(text, start=textLocation):
+            self.allChars[i] = char
+        self.textLocation = textLocation + len(text)
+        self.highestUsedLocation = max(self.highestUsedLocation, self.textLocation)
 
     def canAppend(self, text, addSpace=True):
         '''
@@ -600,10 +597,7 @@ class BrailleTextLine(prebase.ProtoM21Object):
         >>> btl.canAppend('1234', addSpace=False)
         False
         '''
-        if self.highestUsedLocation > self.textLocation:
-            searchLocation = self.highestUsedLocation
-        else:
-            searchLocation = self.textLocation
+        searchLocation = max(self.highestUsedLocation, self.textLocation)
         addSpaceAmount = 1 if addSpace else 0
         if (searchLocation + len(text) + addSpaceAmount) > self.lineLength:
             return False

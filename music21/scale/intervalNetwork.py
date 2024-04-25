@@ -828,8 +828,8 @@ class IntervalNetwork:
         for n in self.nodes.values():
             if x is None:
                 x = n.degree
-            if n.degree < x:
-                x = n.degree
+            else:
+                x = min(x, n.degree)
         return x
 
     @property
@@ -847,8 +847,8 @@ class IntervalNetwork:
         for n in self.nodes.values():
             if x is None:
                 x = n.degree
-            if n.degree > x:
-                x = n.degree
+            else:
+                x = max(x, n.degree)
         return x
 
     @property
@@ -870,8 +870,8 @@ class IntervalNetwork:
                 continue
             if x is None:
                 x = n.degree
-            if n.degree > x:
-                x = n.degree
+            else:
+                x = max(x, n.degree)
         return x
 
     @property

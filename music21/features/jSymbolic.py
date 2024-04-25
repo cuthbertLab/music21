@@ -3016,8 +3016,7 @@ class MaximumNumberOfIndependentVoicesFeature(featuresModule.FeatureExtractor):
             for p in c.pitches:
                 for gSub in p.groups:
                     g.append(gSub)  # add to temporary group; will act as a set
-            if len(g) > found:
-                found = len(g)
+            found = max(found, len(g))
         self.feature.vector[0] = found
 
 
