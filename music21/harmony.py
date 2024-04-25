@@ -1134,7 +1134,7 @@ def chordSymbolFigureFromChord(inChord: chord.Chord, includeChordType=False):
         still be identified correctly even if it is missing the 5th
     5. the type with the most identical matches is used, and if no type matches,
         "Chord Type Cannot Be Identified" is returned
-    6. the output format for the chord symbol figure is the chord's root (with 'b' instead of '-'),
+    6. the output format for the chord symbol figure is the chord's root,
         the chord type's Abbreviation (saved in CHORD_TYPES dictionary),
         a '/' if the chord is in an inversion, and the chord's bass
 
@@ -1145,7 +1145,7 @@ def chordSymbolFigureFromChord(inChord: chord.Chord, includeChordType=False):
     Thus, by default the returned symbol is the first (element 0) in the CHORD_TYPES list.
     For example (Eb minor eleventh chord, second inversion):
 
-        root + chord-type-str + '/' + bass = 'Ebmin11/Bb'
+        root + chord-type-str + '/' + bass = 'E-min11/B-'
 
     Users who wish to change these defaults can simply change that
     entry in the CHORD_TYPES dictionary.
@@ -1516,6 +1516,7 @@ class ChordSymbol(Harmony):
 
     You can also create a Chord Symbol by writing out each degree,
     and any alterations to that degree:
+    
     You must explicitly indicate EACH degree (a triad is NOT necessarily implied)
 
     >>> [str(p) for p in harmony.ChordSymbol('C35b7b9#11b13').pitches]
@@ -1536,6 +1537,8 @@ class ChordSymbol(Harmony):
 
     >>> [str(p) for p in harmony.ChordSymbol('Db35').pitches]
     ['D3', 'F3', 'A3']
+
+    (Note that this would be much better expressed just as 'Dm'.)
 
     >>> [str(p) for p in harmony.ChordSymbol('D,35b7b9#11b13').pitches]
     ['D2', 'F#2', 'A2', 'E-3', 'G#3', 'B-3', 'C4']
