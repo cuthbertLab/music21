@@ -1516,7 +1516,7 @@ class ChordSymbol(Harmony):
 
     You can also create a Chord Symbol by writing out each degree,
     and any alterations to that degree:
-    
+
     You must explicitly indicate EACH degree (a triad is NOT necessarily implied)
 
     >>> [str(p) for p in harmony.ChordSymbol('C35b7b9#11b13').pitches]
