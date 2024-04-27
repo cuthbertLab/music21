@@ -1321,7 +1321,10 @@ class ConcreteScale(Scale):
         To be concrete, a Scale must have a
         defined tonic. An abstract Scale is not Concrete
         '''
-        return self.tonic is not None
+        if self.tonic is None:
+            return False
+        else:
+            return True
 
     def __eq__(self, other):
         '''
@@ -1355,14 +1358,15 @@ class ConcreteScale(Scale):
         if not self.isConcrete or not other.isConcrete:
             # if tonic is none, then we automatically do an abstract comparison
             return self._abstract == other._abstract
-
-        if (isinstance(other, self.__class__)
-                and isinstance(self, other.__class__)
-                and self._abstract == other._abstract
-                and self.boundRange == other.boundRange
-                and self.tonic == other.tonic):
-            return True
-        return False
+        else:
+            if (isinstance(other, self.__class__)
+                    and isinstance(self, other.__class__)
+                    and self._abstract == other._abstract
+                    and self.boundRange == other.boundRange
+                    and self.tonic == other.tonic):
+                return True
+            else:
+                return False
 
     def __hash__(self):
         return id(self) >> 4
