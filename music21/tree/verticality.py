@@ -776,7 +776,7 @@ class Verticality(prebase.ProtoM21Object):
         pitchBust = 0  # used if removeRedundantPitches is False.
 
         # noinspection PyShadowingNames
-        def newNote(ts, n: note.Note) -> note.Note:
+        def newNote(ts: spans.PitchedTimespan, n: note.Note) -> note.Note:
             '''
             Make a copy of the note and clear some settings
             '''
@@ -826,7 +826,7 @@ class Verticality(prebase.ProtoM21Object):
             return nNew
 
         # noinspection PyShadowingNames
-        def conditionalAdd(ts, n: note.Note) -> None:
+        def conditionalAdd(ts: spans.PitchedTimespan, n: note.Note) -> None:
             '''
             Add an element only if it is not already in the chord.
 
