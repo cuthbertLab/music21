@@ -553,7 +553,10 @@ def _convertHarmonicToCents(value: int|float) -> int:
 # -----------------------------------------------------------------------------
 
 
-def _dissonanceScore(pitches, smallPythagoreanRatio=True, accidentalPenalty=True, triadAward=True):
+def _dissonanceScore(pitches: list[Pitch],
+                     smallPythagoreanRatio: bool = True,
+                     accidentalPenalty: bool = True,
+                     triadAward: bool = True):
     r'''
     Calculates the 'dissonance' of a list of pitches based on three criteria:
     it is considered more consonant if 1. the numerator and denominator of the
@@ -577,8 +580,12 @@ def _dissonanceScore(pitches, smallPythagoreanRatio=True, accidentalPenalty=True
 
     if smallPythagoreanRatio or triadAward:
         try:
-            intervals = [interval.Interval(noteStart=p1, noteEnd=p2)
-                        for p1, p2 in itertools.combinations(pitches, 2)]
+            intervals = []
+            for p1, p2 in itertools.combinations(pitches, 2):
+                p2 = copy.deepcopy(p2)
+                p2.octave = None
+                this_interval = interval.Interval(noteStart=p1, noteEnd=p2)
+                intervals.append(this_interval)
         except interval.IntervalException:
             return math.inf
     if smallPythagoreanRatio:
@@ -586,8 +593,7 @@ def _dissonanceScore(pitches, smallPythagoreanRatio=True, accidentalPenalty=True
         for this_interval in intervals:
             # does not accept weird intervals, e.g. with semitones
             ratio = interval.intervalToPythagoreanRatio(this_interval)
-            # d2 is 1.0
-            penalty = math.log(ratio.numerator * ratio.denominator / ratio) * 0.03792663444
+            penalty = math.log(ratio.denominator) * 0.07585326888
             score_ratio += penalty
 
         score_ratio /= len(pitches)
@@ -607,7 +613,7 @@ def _dissonanceScore(pitches, smallPythagoreanRatio=True, accidentalPenalty=True
                                                                  + accidentalPenalty + triadAward)
 
 
-def _bruteForceEnharmonicsSearch(oldPitches, scoreFunc=_dissonanceScore):
+def _bruteForceEnharmonicsSearch(oldPitches: list[Pitch], scoreFunc=_dissonanceScore):
     '''
     A brute-force way of simplifying -- useful if there are fewer than 5 pitches
     '''
@@ -617,7 +623,7 @@ def _bruteForceEnharmonicsSearch(oldPitches, scoreFunc=_dissonanceScore):
     return oldPitches[:1] + list(newPitches)
 
 
-def _greedyEnharmonicsSearch(oldPitches, scoreFunc=_dissonanceScore):
+def _greedyEnharmonicsSearch(oldPitches: list[Pitch], scoreFunc=_dissonanceScore):
     newPitches = oldPitches[:1]
     for oldPitch in oldPitches[1:]:
         candidates = [oldPitch] + oldPitch.getAllCommonEnharmonics()
