@@ -1363,7 +1363,7 @@ class KernSpine(HumdrumSpine):
         self.lastNote = eventNote
         return eventNote
 
-    def processChordEvent(self, eventC):
+    def processChordEvent(self, eventC: str) -> chord.Chord:
         '''
         Process a single chord event
 
@@ -1372,12 +1372,14 @@ class KernSpine(HumdrumSpine):
         # multipleNotes
         notesToProcess = eventC.split()
         chordNotes = []
-        for noteToProcess in notesToProcess:
-            thisNote = hdStringToNote(noteToProcess)
+        defaultDuration = None  # used for non-first notes without a duration
+        for i, noteToProcess in enumerate(notesToProcess):
+            thisNote = hdStringToNote(noteToProcess, defaultDuration)
+            if i == 0:
+                defaultDuration = thisNote.duration
             chordNotes.append(thisNote)
-        eventChord = chord.Chord(chordNotes, beams=chordNotes[-1].beams)
-        eventChord.duration = chordNotes[0].duration
-
+        eventChord = chord.Chord(chordNotes, beams=chordNotes[-1].beams,
+                                 duration=defaultDuration)
         self.setBeamsForNote(eventChord)
         self.setTupletTypeForNote(eventChord)
         self.lastNote = eventChord
@@ -2118,7 +2120,8 @@ class EventCollection:
         return retEvents
 
 
-def hdStringToNote(contents):
+def hdStringToNote(contents: str,
+            defaultDuration: duration.Duration|None = None) -> note.Note | note.Rest:
     '''
     returns a :class:`~music21.note.Note` (or Rest or Unpitched, etc.)
     matching the current SpineEvent.
@@ -2191,7 +2194,7 @@ def hdStringToNote(contents):
 
     >>> n = humdrum.spineParser.hdStringToNote('gg#q/LL')
     >>> n.duration
-    <music21.duration.GraceDuration unlinked type:eighth quarterLength:0.0>
+    <music21.duration.GraceDuration unlinked type:quarter quarterLength:0.0>
     >>> n.duration.isGrace
     True
 
@@ -2370,16 +2373,19 @@ def hdStringToNote(contents):
                 thisObject.duration.dots = contents.count('.')
             # call Duration.TupletFixer after to correct this.
 
+    elif defaultDuration is not None:
+        thisObject.duration = defaultDuration
+
     # 3.2.9 Grace Notes and Groupettos
-    if 'q' in contents:
-        thisObject = thisObject.getGrace()
-        thisObject.duration.type = 'eighth'
+    if qCount := contents.count('q'):
+        thisObject.getGrace(inPlace=True)
+        if qCount == 2:
+            thisObject.duration.slash = False
     elif 'Q' in contents:
-        thisObject = thisObject.getGrace()
+        thisObject.getGrace(inPlace=True)
         thisObject.duration.slash = False
-        thisObject.duration.type = 'eighth'
     elif 'P' in contents:
-        thisObject = thisObject.getGrace(appoggiatura=True)
+        thisObject.getGrace(appoggiatura=True, inPlace=True)
     elif 'p' in contents:
         pass  # end appoggiatura duration -- not needed in music21...
 
@@ -2898,6 +2904,33 @@ class Test(unittest.TestCase):
         self.assertEqual(b.pitch.accidental.name, 'double-sharp')
         self.assertEqual(b.duration.dots, 0)
         self.assertEqual(b.duration.tuplets[0].durationNormal.dots, 2)
+
+    def testGraceNote(self):
+        ks = KernSpine()
+        # noinspection SpellCheckingInspection
+        a = ks.processNoteEvent('4Cq')
+        self.assertEqual(a.duration.type, 'quarter')
+        self.assertEqual(a.duration.slash, True)
+
+    def testGraceNote2(self):
+        ks = KernSpine()
+        # noinspection SpellCheckingInspection
+        a = ks.processNoteEvent('16Cqq')
+        self.assertEqual(a.duration.type, '16th')
+        self.assertEqual(a.duration.slash, False)
+
+    def testChord(self):
+        ks = KernSpine()
+        # noinspection SpellCheckingInspection
+        c = ks.processChordEvent('8C 8E')
+        self.assertEqual(len(c.notes), 2)
+        self.assertEqual(c.notes[0].duration, c.duration)
+
+    def testChord2(self):
+        # noinspection SpellCheckingInspection
+        ks = KernSpine()
+        c = ks.processChordEvent('8C E')
+        self.assertEqual(c.notes[0].duration, c.notes[1].duration)
 
     def testMeasureBoundaries(self):
         m0 = stream.Measure()
