@@ -68,6 +68,7 @@ from music21 import note
 from music21 import meter
 from music21 import metadata
 from music21 import roman
+from music21 import pitch
 from music21 import prebase
 from music21 import stream
 from music21 import tempo
@@ -2120,6 +2121,83 @@ class EventCollection:
         return retEvents
 
 
+def _hdStringToDuration(contents: str,
+            defaultDuration: duration.Duration|None = None) -> duration.Duration:
+    '''
+    returns a :class:`~music21.duration.Duration` matching the current
+        SpineEvent.
+
+    This is used internally by hdStringToNote to figure out the duration part
+    of a humdrum note or rest in a kern spine.    
+    '''
+    # 3.2.7 Duration +
+    # 3.2.8 N-Tuplets
+    dotCount = contents.count('.')
+    durationRegex = re.search(r'(\d+)%?(\d+)?', contents)
+    if durationRegex:
+        foundNumber, foundRational = durationRegex.groups()
+
+        if foundRational:
+            durationFirst = int(foundNumber)
+            durationSecond = float(foundRational)
+            quarterLength = 4 * durationSecond / durationFirst
+            thisDuration = duration.Duration(quarterLength, dots=dotCount)
+
+        elif foundNumber:
+            durationType = int(foundNumber)
+            if durationType == 0:
+                if foundNumber == '000':
+                    # for larger values, see https://extras.humdrum.org/man/rscale/
+                    _type = 'maxima'
+                elif foundNumber == '00':
+                    # for larger values, see https://extras.humdrum.org/man/rscale/
+                    _type = 'longa'
+                else:
+                    _type = 'breve'
+                thisDuration = duration.Duration(type=_type, dots=dotCount)
+            elif durationType in duration.typeFromNumDict:
+                _type = duration.typeFromNumDict[durationType]
+                thisDuration = duration.Duration(type=_type, dots=dotCount)
+            else:
+                dT = durationType + 0.0
+                (unused_remainder, exponents) = math.modf(math.log2(dT))
+                baseValue = 2 ** exponents
+                baseValueInt = int(baseValue)
+                _type = duration.typeFromNumDict[baseValueInt]
+                thisDuration = duration.Duration(type=_type)
+                newTup = duration.Tuplet()
+                newTup.durationActual = duration.durationTupleFromTypeDots(_type, 0)
+                newTup.durationNormal = duration.durationTupleFromTypeDots(_type, 0)
+
+                gcd = math.gcd(durationType, baseValueInt)
+                newTup.numberNotesActual = int(dT / gcd)
+                newTup.numberNotesNormal = int(baseValue / gcd)
+
+                # The Josquin Research Project uses an incorrect definition of
+                # humdrum tuplets that breaks normal usage.  TODO: Refactor adding a Flavor = 'JRP'
+                # code that uses this other method...
+                JRP = flavors['JRP']
+                if JRP is False and dotCount:
+                    newTup.durationNormal = duration.durationTupleFromTypeDots(
+                        newTup.durationNormal.type, dotCount)  # type: ignore
+
+                thisDuration.appendTuplet(newTup)
+                if JRP is True and dotCount:
+                    thisDuration.dots = dotCount
+                # call Duration.TupletFixer after to correct this.
+
+    elif defaultDuration is not None:
+        thisDuration = defaultDuration
+
+    else:  # no duration string or default duration given
+        if 'q' in contents:
+            thisDuration = duration.Duration(0.5, dots=dotCount)
+        else:
+            thisDuration = duration.Duration(1, dots=dotCount)
+
+    return thisDuration
+
+
 def hdStringToNote(contents: str,
             defaultDuration: duration.Duration|None = None) -> note.Note | note.Rest:
     '''
@@ -2204,35 +2282,31 @@ def hdStringToNote(contents: str,
 
     # http://www.lib.virginia.edu/artsandmedia/dmmc/Music/Humdrum/kern_hlp.html#kern
 
-    # 3.2.1 Pitches and 3.3 Rests
+    # Determine duration part first to avoid making an unused duration
+    thisDuration = _hdStringToDuration(contents, defaultDuration)
 
-    matchedNote = re.search('([a-gA-G]+)', contents)
-    thisObject: t.Optional[t.Union[note.Note, note.Rest]] = None
+    # 3.2.1 Pitches and 3.3 Rests
 
     # Detect rests first, because rests can contain manual positioning information,
     # which is also detected by the `matchedNote` variable above.
     if 'r' in contents:
-        thisObject = note.Rest()
+        thisObject = note.Rest(duration=thisDuration)
 
-    elif matchedNote:
+    elif (matchedNote := re.search('([a-gA-G]+)([n#-]*)', contents)):
         kernNoteName = matchedNote.group(1)
         step = kernNoteName[0].lower()
         if step == kernNoteName[0]:  # middle C or higher
             octave = 3 + len(kernNoteName)
         else:  # below middle C
             octave = 4 - len(kernNoteName)
-        thisObject = note.Note(octave=octave)
-        thisObject.step = step  # type: ignore
 
-        matchedSharp = re.search(r'(#+)', contents)
-        matchedFlat = re.search(r'(-+)', contents)
+        accid = matchedNote.group(2)
+        if accid:
+            _pitch = pitch.Pitch(step, octave=octave, accidental=accid)
+        else:
+            _pitch = pitch.Pitch(step, octave=octave)
 
-        if matchedSharp:
-            thisObject.pitch.accidental = matchedSharp.group(0)  # type: ignore
-        elif matchedFlat:
-            thisObject.pitch.accidental = matchedFlat.group(0)  # type: ignore
-        elif 'n' in contents:
-            thisObject.pitch.accidental = 'n'  # type: ignore
+        thisObject = note.Note(_pitch, duration=thisDuration)
 
         # Handle note-specific attributes
         # 3.2.6 Stem Directions
@@ -2256,14 +2330,14 @@ def hdStringToNote(contents: str,
 
     # 3.2.2 -- Slurs, Ties, Phrases
     # TODO: add music21 phrase information
-    for i in range(contents.count('{')):
-        pass  # phraseMark start
-    for i in range(contents.count('}')):
-        pass  # phraseMark end
-    for i in range(contents.count('(')):
-        pass  # slur start
-    for i in range(contents.count(')')):
-        pass  # slur end
+    # for i in range(contents.count('{')):
+    #     pass  # phraseMark start
+    # for i in range(contents.count('}')):
+    #     pass  # phraseMark end
+    # for i in range(contents.count('(')):
+    #     pass  # slur start
+    # for i in range(contents.count(')')):
+    #     pass  # slur end
     if '[' in contents:
         thisObject.tie = tie.Tie('start')
     elif ']' in contents:
@@ -2295,10 +2369,10 @@ def hdStringToNote(contents: str,
         t1.connectedToPrevious = True  # true by default, but explicitly
         thisObject.expressions.append(t1)
 
-    if ':' in contents:
-        # TODO: deal with arpeggiation -- should have been in a
-        #  chord structure
-        pass
+    # if ':' in contents:
+    #     # TODO: deal with arpeggiation -- should have been in a
+    #     #  chord structure
+    #     pass
 
     if 'O' in contents:
         thisObject.expressions.append(expressions.Ornament())
@@ -2326,68 +2400,8 @@ def hdStringToNote(contents: str,
     elif 'u' in contents:
         thisObject.articulations.append(articulations.DownBow())
 
-    # 3.2.7 Duration +
-    # 3.2.8 N-Tuplets
-
-    # TODO: SPEEDUP -- only search for rational after foundNumber...
-    foundRational = re.search(r'(\d+)%(\d+)', contents)
-    foundNumber = re.search(r'(\d+)', contents)
-    if foundRational:
-        durationFirst = int(foundRational.group(1))
-        durationSecond = float(foundRational.group(2))
-        thisObject.duration.quarterLength = 4 * durationSecond / durationFirst
-        if '.' in contents:
-            thisObject.duration.dots = contents.count('.')
-
-    elif foundNumber:
-        durationType = int(foundNumber.group(1))
-        if durationType == 0:
-            durationString = foundNumber.group(1)
-            if durationString == '000':
-                # for larger values, see https://extras.humdrum.org/man/rscale/
-                thisObject.duration.type = 'maxima'
-            elif durationString == '00':
-                # for larger values, see https://extras.humdrum.org/man/rscale/
-                thisObject.duration.type = 'longa'
-            else:
-                thisObject.duration.type = 'breve'
-            if '.' in contents:
-                thisObject.duration.dots = contents.count('.')
-        elif durationType in duration.typeFromNumDict:
-            thisObject.duration.type = duration.typeFromNumDict[durationType]
-            if '.' in contents:
-                thisObject.duration.dots = contents.count('.')
-        else:
-            dT = int(durationType) + 0.0
-            (unused_remainder, exponents) = math.modf(math.log2(dT))
-            baseValue = 2 ** exponents
-            thisObject.duration.type = duration.typeFromNumDict[int(baseValue)]
-            newTup = duration.Tuplet()
-            newTup.durationActual = duration.durationTupleFromTypeDots(thisObject.duration.type, 0)
-            newTup.durationNormal = duration.durationTupleFromTypeDots(thisObject.duration.type, 0)
-
-            gcd = math.gcd(int(dT), int(baseValue))
-            newTup.numberNotesActual = int(dT / gcd)
-            newTup.numberNotesNormal = int(float(baseValue) / gcd)
-
-            # The Josquin Research Project uses an incorrect definition of
-            # humdrum tuplets that breaks normal usage.  TODO: Refactor adding a Flavor = 'JRP'
-            # code that uses this other method...
-            JRP = flavors['JRP']
-            if JRP is False and '.' in contents:
-                newTup.durationNormal = duration.durationTupleFromTypeDots(
-                    newTup.durationNormal.type, contents.count('.'))  # type: ignore
-
-            thisObject.duration.appendTuplet(newTup)
-            if JRP is True and '.' in contents:
-                thisObject.duration.dots = contents.count('.')
-            # call Duration.TupletFixer after to correct this.
-
-    elif defaultDuration is not None:
-        thisObject.duration = defaultDuration
-
     # 3.2.9 Grace Notes and Groupettos
-    if qCount := contents.count('q'):
+    if (qCount := contents.count('q')):
         thisObject.getGrace(inPlace=True)
         if qCount == 2:
             thisObject.duration.slash = False  # type: ignore
@@ -2396,8 +2410,8 @@ def hdStringToNote(contents: str,
         thisObject.duration.slash = False  # type: ignore
     elif 'P' in contents:
         thisObject.getGrace(appoggiatura=True, inPlace=True)
-    elif 'p' in contents:
-        pass  # end appoggiatura duration -- not needed in music21...
+    # elif 'p' in contents:
+    #     pass  # end appoggiatura duration -- not needed in music21...
 
     return thisObject
 
