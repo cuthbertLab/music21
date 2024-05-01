@@ -2207,7 +2207,7 @@ def hdStringToNote(contents: str,
     # 3.2.1 Pitches and 3.3 Rests
 
     matchedNote = re.search('([a-gA-G]+)', contents)
-    thisObject = None  # type: ignore
+    thisObject: t.Optional[t.Union[note.Note, note.Rest]] = None
 
     # Detect rests first, because rests can contain manual positioning information,
     # which is also detected by the `matchedNote` variable above.
@@ -2233,6 +2233,23 @@ def hdStringToNote(contents: str,
             thisObject.pitch.accidental = matchedFlat.group(0)  # type: ignore
         elif 'n' in contents:
             thisObject.pitch.accidental = 'n'  # type: ignore
+
+        # Handle note-specific attributes
+        # 3.2.6 Stem Directions
+        if '/' in contents:
+            thisObject.stemDirection = 'up'
+        elif '\\' in contents:
+            thisObject.stemDirection = 'down'
+        # 3.2.10 Beaming
+        # TODO: Support really complex beams
+        for i in range(contents.count('L')):
+            thisObject.beams.append('start')
+        for i in range(contents.count('J')):
+            thisObject.beams.append('stop')
+        for i in range(contents.count('k')):
+            thisObject.beams.append('partial', 'right')
+        for i in range(contents.count('K')):
+            thisObject.beams.append('partial', 'right')
 
     else:
         raise HumdrumException(f'Could not parse {contents} for note information')
@@ -2381,24 +2398,6 @@ def hdStringToNote(contents: str,
         thisObject.getGrace(appoggiatura=True, inPlace=True)
     elif 'p' in contents:
         pass  # end appoggiatura duration -- not needed in music21...
-
-    if thisObject.isNote:  # handle note-specific attributes
-        # 3.2.6 Stem Directions
-        if '/' in contents:
-            thisObject.stemDirection = 'up'
-        elif '\\' in contents:
-            thisObject.stemDirection = 'down'
-
-        # 3.2.10 Beaming
-        # TODO: Support really complex beams
-        for i in range(contents.count('L')):
-            thisObject.beams.append('start')
-        for i in range(contents.count('J')):
-            thisObject.beams.append('stop')
-        for i in range(contents.count('k')):
-            thisObject.beams.append('partial', 'right')
-        for i in range(contents.count('K')):
-            thisObject.beams.append('partial', 'right')
 
     return thisObject
 
