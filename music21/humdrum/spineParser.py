@@ -2368,7 +2368,7 @@ def hdStringToNote(contents: str,
 
     >>> n = humdrum.spineParser.hdStringToNote('gg#q/LL')
     >>> n.duration
-    <music21.duration.GraceDuration unlinked type:quarter quarterLength:0.0>
+    <music21.duration.GraceDuration unlinked type:eighth quarterLength:0.0>
     >>> n.duration.isGrace
     True
 
