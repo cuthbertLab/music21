@@ -1426,10 +1426,11 @@ class KernSpine(HumdrumSpine):
         defaultDuration: duration.Duration|None = None  # used for non-first notes without a duration
         for i, noteToProcess in enumerate(notesToProcess):
             thisNote = hdStringToNote(noteToProcess, defaultDuration)
+            if isinstance(thisNote, note.Note):
+                chordNotes.append(thisNote)
             if i == 0:
                 defaultDuration = thisNote.duration
-            chordNotes.append(thisNote)
-        eventChord = chord.Chord(chordNotes, beams=chordNotes[-1].beams,
+        eventChord = chord.Chord(chordNotes, beams=chordNotes[-1].beams,  # type: ignore
                                  duration=defaultDuration)
         self.setBeamsForNote(eventChord)
         self.setTupletTypeForNote(eventChord)
