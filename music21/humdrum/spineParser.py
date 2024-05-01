@@ -1295,7 +1295,7 @@ class KernSpine(HumdrumSpine):
         super().__init__(spineId, eventList, streamClass)
         self.lastContainer = None
         self.inTuplet = None
-        self.lastNote = None
+        self.lastNote: t.Optional[note.Note | note.Rest | chord.Chord] = None
         self.currentBeamNumbers = 0
         self.currentTupletDuration = 0.0
         self.desiredTupletDuration = 0.0
@@ -1378,7 +1378,7 @@ class KernSpine(HumdrumSpine):
             if i == 0:
                 defaultDuration = thisNote.duration
             chordNotes.append(thisNote)
-        eventChord = chord.Chord(chordNotes, beams=chordNotes[-1].beams,
+        eventChord = chord.Chord(chordNotes, beams=chordNotes[-1].beams,  # type: ignore
                                  duration=defaultDuration)
         self.setBeamsForNote(eventChord)
         self.setTupletTypeForNote(eventChord)
@@ -2207,7 +2207,7 @@ def hdStringToNote(contents: str,
     # 3.2.1 Pitches and 3.3 Rests
 
     matchedNote = re.search('([a-gA-G]+)', contents)
-    thisObject = None
+    thisObject: t.Optional[t.Union[note.Note, note.Rest]] = None
 
     # Detect rests first, because rests can contain manual positioning information,
     # which is also detected by the `matchedNote` variable above.
