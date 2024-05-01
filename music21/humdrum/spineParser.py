@@ -2316,23 +2316,21 @@ def hdStringToNote(contents: str,
             octave = 3 + len(kernNoteName)
         else:  # below middle C
             octave = 4 - len(kernNoteName)
-        builtNote = note.Note(octave=octave)
-        builtNote.step = step  # type: ignore[assignment]
-        thisObject = builtNote
+        thisObject = note.Note(octave=octave)
+        thisObject.step = step  # type: ignore[assignment]
 
-    else:
-        raise HumdrumException(f'Could not parse {contents} for note information')
+        matchedSharp = re.search(r'(#+)', contents)
+        matchedFlat = re.search(r'(-+)', contents)
 
-    matchedSharp = re.search(r'(#+)', contents)
-    matchedFlat = re.search(r'(-+)', contents)
-
-    if isinstance(thisObject, note.Note):
         if matchedSharp:
             thisObject.pitch.accidental = matchedSharp.group(0)
         elif matchedFlat:
             thisObject.pitch.accidental = matchedFlat.group(0)
         elif 'n' in contents:
             thisObject.pitch.accidental = 'n'
+
+    else:
+        raise HumdrumException(f'Could not parse {contents} for note information')
 
     # 3.2.2 -- Slurs, Ties, Phrases
     # TODO: add music21 phrase information
@@ -2406,13 +2404,6 @@ def hdStringToNote(contents: str,
     elif 'u' in contents:
         thisObject.articulations.append(articulations.DownBow())
 
-    # 3.2.6 Stem Directions
-    if isinstance(thisObject, note.NotRest):
-        if '/' in contents:
-            thisObject.stemDirection = 'up'
-        elif '\\' in contents:
-            thisObject.stemDirection = 'down'
-
     # 3.2.7 Duration and
     # 3.2.8 N-Tuplets
 
@@ -2463,7 +2454,7 @@ def hdStringToNote(contents: str,
             JRP = flavors['JRP']
             if not JRP and '.' in contents:
                 newTup.durationNormal = duration.durationTupleFromTypeDots(
-                    newTup.durationNormal.type, contents.count('.'))
+                    newTup.durationNormal.type, contents.count('.'))  # type: ignore
 
             thisObject.duration.appendTuplet(newTup)
             if JRP and '.' in contents:
@@ -2477,18 +2468,24 @@ def hdStringToNote(contents: str,
     if qCount := contents.count('q'):
         thisObject.getGrace(inPlace=True)
         if qCount == 2:
-            thisObject.duration.slash = False
+            thisObject.duration.slash = False  # type: ignore
     elif 'Q' in contents:
         thisObject.getGrace(inPlace=True)
-        thisObject.duration.slash = False
+        thisObject.duration.slash = False  # type: ignore
     elif 'P' in contents:
         thisObject.getGrace(appoggiatura=True, inPlace=True)
     elif 'p' in contents:
         pass  # end appoggiatura duration -- not needed in music21...
 
-    # 3.2.10 Beaming
-    # TODO: Support really complex beams
-    if isinstance(thisObject, note.NotRest):
+    if thisObject.isNote:  # handle note-specific attributes
+        # 3.2.6 Stem Directions
+        if '/' in contents:
+            thisObject.stemDirection = 'up'
+        elif '\\' in contents:
+            thisObject.stemDirection = 'down'
+
+        # 3.2.10 Beaming
+        # TODO: Support really complex beams
         for i in range(contents.count('L')):
             thisObject.beams.append('start')
         for i in range(contents.count('J')):
