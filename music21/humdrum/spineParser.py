@@ -2128,7 +2128,7 @@ def _hdStringToDuration(contents: str,
         SpineEvent.
 
     This is used internally by hdStringToNote to figure out the duration part
-    of a humdrum note or rest in a kern spine.    
+    of a humdrum note or rest in a kern spine.
     '''
     # 3.2.7 Duration +
     # 3.2.8 N-Tuplets
@@ -2286,7 +2286,7 @@ def hdStringToNote(contents: str,
     thisDuration = _hdStringToDuration(contents, defaultDuration)
 
     # 3.2.1 Pitches and 3.3 Rests
-
+    thisObject: t.Union[note.Note|note.Rest]
     # Detect rests first, because rests can contain manual positioning information,
     # which is also detected by the `matchedNote` variable above.
     if 'r' in contents:
