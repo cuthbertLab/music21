@@ -2303,6 +2303,11 @@ def hdStringToNote(contents: str,
     # 3.2.1 Pitches and 3.3 Rests
 
     matchedNote = re.search('([a-gA-G]+)', contents)
+<<<<<<< HEAD
+=======
+    thisObject = None  # type: ignore
+
+>>>>>>> 91e2a65b3 (Handle more mypy errors)
     # Detect rests first, because rests can contain manual positioning information,
     # which is also detected by the `matchedNote` variable above.
     thisObject: note.GeneralNote
@@ -2323,11 +2328,11 @@ def hdStringToNote(contents: str,
         matchedFlat = re.search(r'(-+)', contents)
 
         if matchedSharp:
-            thisObject.pitch.accidental = matchedSharp.group(0)
+            thisObject.pitch.accidental = matchedSharp.group(0)  # type: ignore
         elif matchedFlat:
-            thisObject.pitch.accidental = matchedFlat.group(0)
+            thisObject.pitch.accidental = matchedFlat.group(0)  # type: ignore
         elif 'n' in contents:
-            thisObject.pitch.accidental = 'n'
+            thisObject.pitch.accidental = 'n'  # type: ignore
 
     else:
         raise HumdrumException(f'Could not parse {contents} for note information')
