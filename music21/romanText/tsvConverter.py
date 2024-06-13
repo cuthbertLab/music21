@@ -17,6 +17,7 @@ from __future__ import annotations
 import abc
 import csv
 import fractions
+import pathlib
 import re
 import string
 import types
@@ -734,7 +735,7 @@ class TsvHandler:
                     currentMeasureLength = newTS.barDuration.quarterLength
 
                 previousMeasure = entry.measure
-            if repeatBracket is not None:
+            if repeatBracket is not None and m is not None:  # m should always be not None...
                 repeatBracket.addSpannedElements(m)
 
         s.append(p)
