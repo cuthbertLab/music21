@@ -490,7 +490,7 @@ class OffsetHierarchyFilter(OffsetFilter):
         if not hasattr(iterator, 'iteratorStartOffsetInHierarchy'):
             raise FilterException('Can only run OffsetHierarchyFilter on a RecursiveIterator')
 
-        offset = s.elementOffset(e) + iterator.iteratorStartOffsetInHierarchy
+        offset = opFrac(s.elementOffset(e) + iterator.iteratorStartOffsetInHierarchy)
         return self.isElementOffsetInRange(e, offset, stopAfterEnd=False)
 
 

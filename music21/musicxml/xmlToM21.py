@@ -6202,7 +6202,7 @@ class MeasureParser(SoundTagMixin, XMLParserBase):
     def updateVoiceInformation(self):
         # noinspection PyShadowingNames
         '''
-        Finds all the "voice" information in <note> tags and updates the set of
+        Finds all the "voice" information in <note> and <forward> tags and updates the set of
         `.voiceIndices` to be a set of all the voice texts, and if there is
         more than one voice in the measure, sets `.useVoices` to True
         and creates a voice for each.
@@ -6231,14 +6231,27 @@ class MeasureParser(SoundTagMixin, XMLParserBase):
         2
         >>> list(MP.stream.getElementsByClass(stream.Voice))
         [<music21.stream.Voice 1>, <music21.stream.Voice 2>]
+        >>> MP = musicxml.xmlToM21.MeasureParser()
+        >>> MP.mxMeasure = ET.fromstring('<measure><note><voice>1</voice></note>'
+        ...                                     + '<forward><voice>2</voice></forward></measure>')
+        >>> MP.updateVoiceInformation()
+        >>> sorted(list(MP.voiceIndices))
+        ['1', '2']
+        >>> MP.useVoices
+        True
+        >>> len(MP.stream)
+        2
+        >>> list(MP.stream.getElementsByClass(stream.Voice))
+        [<music21.stream.Voice 1>, <music21.stream.Voice 2>]
         '''
         mxm = self.mxMeasure
-        for mxn in mxm.findall('note'):
-            voice = mxn.find('voice')
-            if vIndex := strippedText(voice):
-                self.voiceIndices.add(vIndex)
-                # it is a set, so no need to check if already there
-                # additional time < 1 sec per ten million ops.
+        for tagSearch in ('note', 'forward'):
+            for mxn in mxm.findall(tagSearch):
+                voice = mxn.find('voice')
+                if vIndex := strippedText(voice):
+                    self.voiceIndices.add(vIndex)
+                    # it is a set, so no need to check if already there
+                    # additional time < 1 sec per ten million ops.
 
         if len(self.voiceIndices) > 1:
             for vIndex in sorted(self.voiceIndices):
