@@ -108,8 +108,11 @@ def augmentedSixthToDominant(
     else:
         raise ResolutionException(f'Unknown augSixthType: {augSixthType!r}')
 
-    if any(x is None for x in [bass, root, fifth, other]):
-        raise ResolutionException(f'Chord must have bass, root, fifth, and sixth or seventh')
+    if t.TYPE_CHECKING:
+        assert isinstance(bass, pitch.Pitch)
+        assert isinstance(root, pitch.Pitch)
+        assert isinstance(fifth, pitch.Pitch)
+        assert isinstance(other, pitch.Pitch)
 
     howToResolve = [(lambda p: p.name == bass.name, '-m2'),
                     (lambda p: p.name == root.name, 'm2'),
@@ -190,8 +193,11 @@ def augmentedSixthToMajorTonic(
     else:
         raise ResolutionException(f'Unknown augSixthType: {augSixthType!r}')
 
-    if any(x is None for x in [bass, root, fifth, other]):
-        raise ResolutionException(f'Chord must have bass, root, fifth, and sixth or seventh')
+    if t.TYPE_CHECKING:
+        assert isinstance(bass, pitch.Pitch)
+        assert isinstance(root, pitch.Pitch)
+        assert isinstance(fifth, pitch.Pitch)
+        assert isinstance(other, pitch.Pitch)
 
     howToResolve = [(lambda p: p.name == bass.name, '-m2'),
                     (lambda p: p.name == root.name, 'm2'),
@@ -272,8 +278,11 @@ def augmentedSixthToMinorTonic(
     else:
         raise ResolutionException(f'Unknown augSixthType: {augSixthType!r}')
 
-    if any(x is None for x in [bass, root, fifth, other]):
-        raise ResolutionException(f'Chord must have bass, root, fifth, and sixth or seventh')
+    if t.TYPE_CHECKING:
+        assert isinstance(bass, pitch.Pitch)
+        assert isinstance(root, pitch.Pitch)
+        assert isinstance(fifth, pitch.Pitch)
+        assert isinstance(other, pitch.Pitch)
 
     howToResolve = [(lambda p: p.name == bass.name, '-m2'),
                     (lambda p: p.name == root.name, 'm2'),
