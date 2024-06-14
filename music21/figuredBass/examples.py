@@ -67,7 +67,7 @@ def exampleA():
     >>> fbRealization2 = fbLine.realize(fbRules)
     >>> fbRealization2.keyboardStyleOutput = False
     >>> fbRealization2.getNumSolutions()
-    3713168
+    3564440
     >>> #_DOCS_SHOW fbRealization2.generateRandomRealization().show()
 
     .. image:: images/figuredBass/fbExamples_sol2A.*
@@ -111,7 +111,6 @@ def exampleD():
     figured bass, and fbLine is realized again. Voice overlap can be seen in the fourth
     measure.
 
-
     >>> fbRules.forbidVoiceOverlap = False
     >>> fbRealization2 = fbLine.realize(fbRules)
     >>> fbRealization2.getNumSolutions()
@@ -124,12 +123,11 @@ def exampleD():
     Now, the restriction on voice overlap is reset, but the restriction on the upper parts
     being within a perfect octave of each other is removed. fbLine is realized again.
 
-
     >>> fbRules.forbidVoiceOverlap = True
     >>> fbRules.upperPartsMaxSemitoneSeparation = None
     >>> fbRealization3 = fbLine.realize(fbRules)
     >>> fbRealization3.getNumSolutions()
-    29629539
+    27445876
     >>> fbRealization3.keyboardStyleOutput = False
     >>> #_DOCS_SHOW fbRealization3.generateRandomRealization().show()
 
@@ -177,7 +175,7 @@ def exampleB():
     >>> fbRules.forbidIncompletePossibilities = False
     >>> fbRealization2 = fbLine.realize(fbRules)
     >>> fbRealization2.getNumSolutions()
-    188974
+    159373
     >>> #_DOCS_SHOW fbRealization2.generateRandomRealization().show()
 
     .. image:: images/figuredBass/fbExamples_sol2B.*

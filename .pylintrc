@@ -100,7 +100,8 @@ disable=
     consider-using-f-string,  # future?
     unnecessary-lambda-assignment,  # opinionated
     consider-using-generator,  # generators are less performant for small container sizes, like most of ours
-
+    not-an-iterable,  # false positives on RecursiveIterator in recent pylint versions.
+    unpacking-non-sequence,  # also getting false positives.
 #       'protected-access', # this is an important one, but for now we do a lot of
 #                           # x = copy.deepcopy(self); x._volume = ... which is not a problem...
 

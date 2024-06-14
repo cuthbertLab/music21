@@ -4137,7 +4137,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         # TODO: allow sortTuple as a parameter (in all getElement...)
 
         candidates = []
-        offset = opFrac(offset)
+        offset: OffsetQL = opFrac(offset)
         nearestTrailSpan = offset  # start with max time
 
         sIterator = self.iter()
@@ -4147,7 +4147,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
 
         # need both _elements and _endElements
         for e in sIterator:
-            span = opFrac(offset - self.elementOffset(e))
+            span: OffsetQL = opFrac(offset - self.elementOffset(e))
             # environLocal.printDebug(['e span check', span, 'offset', offset,
             #   'e.offset', e.offset, 'self.elementOffset(e)', self.elementOffset(e), 'e', e])
             if span < 0 or (span == 0 and _beforeNotAt):

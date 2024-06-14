@@ -17,6 +17,7 @@ from __future__ import annotations
 import abc
 import csv
 import fractions
+import pathlib
 import re
 import string
 import types
@@ -266,7 +267,7 @@ class TabChordBase(abc.ABC):
                     self.chord = re.sub(
                         r'''
                             (\d+)  # match one or more digits
-                            (?![\]\d])  # without a digit or a ']' to the right
+                            (?![]\d])  # without a digit or a ']' to the right
                         ''',
                         r'd\1',
                         self.chord,
@@ -521,7 +522,7 @@ class TsvHandler:
     'I'
 
     '''
-    def __init__(self, tsvFile: str, dcml_version: int = 1):
+    def __init__(self, tsvFile: str|pathlib.Path, dcml_version: int = 1):
         if dcml_version == 1:
             self.heading_names = HEADERS[1]
             self._tab_chord_cls: type[TabChordBase] = TabChord
@@ -653,6 +654,7 @@ class TsvHandler:
         '''
         s = stream.Score()
         p = stream.Part()
+        m: stream.Measure|None = None
         if self.dcml_version == 1:
             # This sort of metadata seems to have been removed altogether from the
             # v2 files
@@ -733,7 +735,7 @@ class TsvHandler:
                     currentMeasureLength = newTS.barDuration.quarterLength
 
                 previousMeasure = entry.measure
-            if repeatBracket is not None:
+            if repeatBracket is not None and m is not None:  # m should always be not None...
                 repeatBracket.addSpannedElements(m)
 
         s.append(p)
@@ -762,7 +764,6 @@ class M21toTSV:
     >>> tsvData[1][DCML_V2_HEADERS.index('chord')]
     'I'
     '''
-
     def __init__(self, m21Stream: stream.Score, dcml_version: int = 2):
         self.version = dcml_version
         self.m21Stream = m21Stream
@@ -871,6 +872,8 @@ class M21toTSV:
                 thisEntry.numeral = '@none'
                 thisEntry.chord = '@none'
             else:
+                if t.TYPE_CHECKING:
+                    assert isinstance(thisRN, roman.RomanNumeral)
                 local_key = localKeyAsRn(thisRN.key, global_key_obj)
                 relativeroot = None
                 if thisRN.secondaryRomanNumeral:
@@ -911,7 +914,7 @@ class M21toTSV:
             tsvData.append(thisInfo)
         return tsvData
 
-    def write(self, filePathAndName: str):
+    def write(self, filePathAndName: str|pathlib.Path):
         '''
         Writes a list of lists (e.g. from m21ToTsv()) to a tsv file.
         '''
@@ -974,16 +977,19 @@ def handleAddedTones(dcmlChord: str) -> str:
     'Viio7[no3][no5][addb4]/V'
 
     When in root position, 7 does not replace 8:
+
     >>> romanText.tsvConverter.handleAddedTones('vi(#74)')
     'vi[no3][add#7][add4]'
 
     When not in root position, 7 does replace 8:
+
     >>> romanText.tsvConverter.handleAddedTones('ii6(11#7b6)')
     'ii6[no8][no5][add11][add#7][addb6]'
 
     '0' can be used to indicate root-replacement by 7 in a root-position chord.
     We need to change '0' to '7' because music21 changes the 0 to 'o' (i.e.,
     a diminished chord).
+
     >>> romanText.tsvConverter.handleAddedTones('i(#0)')
     'i[no1][add#7]'
     '''
@@ -1001,8 +1007,8 @@ def handleAddedTones(dcmlChord: str) -> str:
         return 'Cad64' + secondary
     added_tone_tuples: list[tuple[str, str, str, str]] = re.findall(
         r'''
-            (\+|-)?  # indicates whether to add or remove chord factor
-            (\^|v)?  # indicates whether tone replaces chord factor above/below
+            ([+\-])?  # indicates whether to add or remove chord factor
+            ([\^v])?  # indicates whether tone replaces chord factor above/below
             (\#+|b+)?  # alteration
             (1\d|\d)  # figures 0-19, in practice 0-14
         ''',
@@ -1133,7 +1139,6 @@ def getLocalKey(local_key: str, global_key: str, convertDCMLToM21: bool = False)
 
     >>> romanText.tsvConverter.getLocalKey('vii', 'a', convertDCMLToM21=True)
     'g'
-
 
     '''
     if convertDCMLToM21:
