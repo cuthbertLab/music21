@@ -106,7 +106,7 @@ def augmentedSixthToDominant(
     elif augSixthType == 2:
         [bass, root, unused_third, fifth, other] = augSixthChordInfo  # other == seventh
     else:
-        raise ResolutionException(f'Unknown augSixthType: {augSixthType|r}')
+        raise ResolutionException(f'Unknown augSixthType: {augSixthType!r}')
 
     howToResolve = [(lambda p: p.name == bass.name, '-m2'),
                     (lambda p: p.name == root.name, 'm2'),
@@ -185,7 +185,7 @@ def augmentedSixthToMajorTonic(
     elif augSixthType == 2:
         [bass, root, unused_third, fifth, other] = augSixthChordInfo  # other == seventh
     else:
-        raise ResolutionException(f'Unknown augSixthType: {augSixthType|r}')
+        raise ResolutionException(f'Unknown augSixthType: {augSixthType!r}')
 
     howToResolve = [(lambda p: p.name == bass.name, '-m2'),
                     (lambda p: p.name == root.name, 'm2'),
@@ -264,7 +264,7 @@ def augmentedSixthToMinorTonic(
     elif augSixthType == 2:
         [bass, root, unused_third, fifth, other] = augSixthChordInfo  # other == seventh
     else:
-        raise ResolutionException(f'Unknown augSixthType: {augSixthType|r}')
+        raise ResolutionException(f'Unknown augSixthType: {augSixthType!r}')
 
     howToResolve = [(lambda p: p.name == bass.name, '-m2'),
                     (lambda p: p.name == root.name, 'm2'),
