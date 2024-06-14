@@ -37,7 +37,7 @@ from music21 import stream
 def augmentedSixthToDominant(
     augSixthPossib,
     augSixthType: int | None = None,
-    augSixthChordInfo: list[pitch.Pitch, None] | None = None
+    augSixthChordInfo: list[pitch.Pitch | None] | None = None
 ) -> tuple[pitch.Pitch, ...]:
     '''
     Resolves French (augSixthType = 1), German (augSixthType = 2), and Swiss (augSixthType = 3)
@@ -107,6 +107,9 @@ def augmentedSixthToDominant(
         [bass, root, unused_third, fifth, other] = augSixthChordInfo  # other == seventh
     else:
         raise ResolutionException(f'Unknown augSixthType: {augSixthType!r}')
+
+    if any(x is None for x in [bass, root, fifth, other]):
+        raise ResolutionException(f'Chord must have bass, root, fifth, and sixth or seventh')
 
     howToResolve = [(lambda p: p.name == bass.name, '-m2'),
                     (lambda p: p.name == root.name, 'm2'),
@@ -187,6 +190,9 @@ def augmentedSixthToMajorTonic(
     else:
         raise ResolutionException(f'Unknown augSixthType: {augSixthType!r}')
 
+    if any(x is None for x in [bass, root, fifth, other]):
+        raise ResolutionException(f'Chord must have bass, root, fifth, and sixth or seventh')
+
     howToResolve = [(lambda p: p.name == bass.name, '-m2'),
                     (lambda p: p.name == root.name, 'm2'),
                     (lambda p: p.name == fifth.name, 'P1'),
@@ -265,6 +271,9 @@ def augmentedSixthToMinorTonic(
         [bass, root, unused_third, fifth, other] = augSixthChordInfo  # other == seventh
     else:
         raise ResolutionException(f'Unknown augSixthType: {augSixthType!r}')
+
+    if any(x is None for x in [bass, root, fifth, other]):
+        raise ResolutionException(f'Chord must have bass, root, fifth, and sixth or seventh')
 
     howToResolve = [(lambda p: p.name == bass.name, '-m2'),
                     (lambda p: p.name == root.name, 'm2'),
