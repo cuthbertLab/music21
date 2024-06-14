@@ -126,7 +126,7 @@ def augmentedSixthToDominant(
 def augmentedSixthToMajorTonic(
     augSixthPossib,
     augSixthType: int | None = None,
-    augSixthChordInfo: list[pitch.Pitch, None] | None = None
+    augSixthChordInfo: list[pitch.Pitch | None] | None = None
 ) -> tuple[pitch.Pitch, ...]:
     '''
     Resolves French (augSixthType = 1), German (augSixthType = 2), and Swiss (augSixthType = 3)
@@ -212,7 +212,7 @@ def augmentedSixthToMajorTonic(
 def augmentedSixthToMinorTonic(
     augSixthPossib,
     augSixthType: int | None = None,
-    augSixthChordInfo: list[pitch.Pitch, None] | None = None
+    augSixthChordInfo: list[pitch.Pitch | None] | None = None
 ) -> tuple[pitch.Pitch, ...]:
     '''
     Resolves French (augSixthType = 1), German (augSixthType = 2), and Swiss (augSixthType = 3)
