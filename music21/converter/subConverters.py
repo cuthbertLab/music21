@@ -1014,6 +1014,65 @@ class ConverterMusicXML(SubConverter):
 
 
 # ------------------------------------------------------------------------------
+class ConverterFlatio(SubConverter):
+    '''
+    Converter for Flatio. Sends XML to http://flat.io and then opens it in a browser tab.
+
+    You must have a flat.io authentication token, and set it like
+    >>> us = environment.UserSettings()
+    >>> us['flatioAuthToken'] = '[MY FLAT.IO AUTH TOKEN]'
+
+    See https://flat.io/developers/docs/api/authentication.html#personal-access-tokens
+    '''
+    registerFormats = ('flat',)
+    registerOutputExtensions = ('flat',)
+
+    def parseData(self, strData, number=None):
+        '''
+        Not implemented yet.
+        '''
+        # Pull MusicXML from a flat.io url?
+
+    def write(self, obj, fmt, fp=None, subformats=None,
+              compress=False, **keywords):  # pragma: no cover
+        '''
+        Uploads MusicXML to flat.io via their API.
+        '''
+        import requests
+        from music21.musicxml import m21ToXml
+
+        if not environLocal['flatioAuthToken']:
+            raise SubConverterException("Trying to use flat.io subconverter, but no flatioAuthToken is set. See https://flat.io/developers/docs/api/authentication.html#personal-access-tokens to get a token.")
+
+        generalExporter = m21ToXml.GeneralObjectExporter(obj)
+        dataBytes: bytes = generalExporter.parse()
+
+        body = {
+            'title': defaults.title,
+            'privacy': 'private',
+            'data': dataBytes.decode("utf-8")
+        }
+
+        headers = {
+            'Authorization': 'Bearer ' + environLocal['flatioAuthToken'],
+            'Content-Type': 'application/json'
+        }
+        r = requests.post("https://api.flat.io/v2/scores", json=body, headers=headers)
+        if r.status_code != 200:
+            print("Could not upload XML to flat.io")
+            print(r.status_code, r.reason)
+
+        return r.json()['htmlUrl']
+
+    def show(self, obj, fmt, app=None, subformats=None, **keywords):  # pragma: no cover
+        '''
+        Uploads MusixXML to flat.io and opens the result in a browser tab.
+        '''
+        import webbrowser
+        url = self.write(obj, fmt, subformats=subformats, **keywords)
+        webbrowser.open(url, new=2)
+
+# ------------------------------------------------------------------------------
 class ConverterMidi(SubConverter):
     '''
     Simple class wrapper for parsing MIDI and sending MIDI data out.

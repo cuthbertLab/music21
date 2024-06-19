@@ -4,5 +4,6 @@ jsonpickle
 matplotlib
 more_itertools
 numpy
+requests
 webcolors>=1.5
 requests
