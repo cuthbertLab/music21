@@ -1465,7 +1465,9 @@ def makeTupletBrackets(s: StreamType, *, inPlace=False) -> StreamType|None:
 
             # this, below, is optional:
             # if next normal type is not the same as this one, also stop
-            elif tupletNext is None or completionCount >= completionTarget:
+            elif (tupletNext is None
+                   or completionCount == completionTarget
+                   or tupletPrevious.tupletMultiplier() != tupletObj.tupletMultiplier()):
                 tupletObj.type = 'stop'  # should be impossible once frozen...
                 completionTarget = None  # reset
                 completionCount = 0.0  # reset
