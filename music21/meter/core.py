@@ -241,7 +241,7 @@ class MeterTerminal(prebase.ProtoM21Object, SlottedObjectMixin):
 
     def subdivide(
         self,
-        value: Sequence[int | string] | MeterSequence | int
+        value: Sequence[int | str] | MeterSequence | int
     ):
         '''
         Subdivision takes a MeterTerminal and, making it into a collection of MeterTerminals,
@@ -818,7 +818,7 @@ class MeterSequence(MeterTerminal):
 
     def partition(
         self,
-        value: int | Sequence[string | MeterTerminal] | MeterSequence,
+        value: int | Sequence[str | MeterTerminal] | MeterSequence,
         loadDefault=False
     ) -> None:
         '''
@@ -1187,8 +1187,8 @@ class MeterSequence(MeterTerminal):
 
     def load(self,
              value: str | MeterTerminal | Sequence[MeterTerminal | str],
-             partitionRequest: int | Sequence[string | MeterTerminal] | MeterSequence | None = None,
-             autoWeight: boolean = False,
+             partitionRequest: int | Sequence[str | MeterTerminal] | MeterSequence | None = None,
+             autoWeight: bool = False,
              targetWeight=None):
         '''
         This method is called when a MeterSequence is created, or if a MeterSequence is re-set.
