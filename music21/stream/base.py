@@ -7987,7 +7987,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         sNew_derivation.method = method
 
         sNew.derivation = sNew_derivation
-        
+
         # storing .elements in here necessitates
         # create a new, independent cache instance in the flat representation
         sNew._cache = {}

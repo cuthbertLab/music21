@@ -4194,7 +4194,8 @@ class Chord(ChordBase):
         '''
         # assign to base
         if pitchTarget is None and self._notes:
-            self.style.color = value
+            chord_style = self.style
+            chord_style.color = value
             for n in self._notes:
                 n.style.color = value
 

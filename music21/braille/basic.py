@@ -531,7 +531,7 @@ def metronomeMarkToBraille(music21MetronomeMark):
         metroNote = note.Note('C4', quarterLength=music21MetronomeMark.referent.quarterLength)
         brailleNote = noteToBraille(metroNote, showOctave=False)
         metroTrans.append(brailleNote)
-        englishJoined = ' '.join(metroNote.editorial.get(brailleEnglish, []))
+        englishJoined = ' '.join(metroNote.editorial.get('brailleEnglish', []))
         music21MetronomeMark.editorial.brailleEnglish.append(
             f'Metronome Note {englishJoined}'
         )

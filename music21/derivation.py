@@ -240,7 +240,7 @@ class Derivation(SlottedObjectMixin):
         >>> list(s3.derivation.chain()) == [s2, s1]
         True
         '''
-        orig: Music21Object | None = self.origin
+        orig: base.Music21Object | None = self.origin
         while orig is not None:
             yield orig
             orig = orig.derivation.origin

@@ -102,45 +102,25 @@ class Style(ProtoM21Object):
         self.dashLength: float|int|None = None
         self.spaceLength: float|int|None = None
 
-    def _getEnclosure(self) -> Enclosure|None:
-        return self._enclosure
 
-    def _setEnclosure(self, value: Enclosure|None):
-        if value is None:
-            self._enclosure = value
-        elif value == Enclosure.NONE:
-            self._enclosure = None
-        elif isinstance(value, Enclosure):
-            self._enclosure = value
-        elif isinstance(value, str):
-            try:
-                enc_value = Enclosure(value.lower())
-            except ValueError as ve:
-                raise TextFormatException(f'Not a supported enclosure: {value!r}') from ve
-
-            self._enclosure = enc_value
-
-        else:
-            raise TextFormatException(f'Not a supported enclosure: {value!r}')
-
-    enclosure = property(_getEnclosure,
-                         _setEnclosure,
-                         doc='''
+    @property
+    def enclosure(self) -> Enclosure|None:
+        '''
         Get or set the enclosure as a style.Enclosure enum or None.
 
-        Valid names are
-        "rectangle"/style.Enclosure.RECTANGLE,
-        "square"/style.Enclosure.SQUARE,
-        "oval"/style.Enclosure.OVAL,
-        "circle"/style.Enclosure.CIRCLE,
-        "bracket"/style.Enclosure.BRACKET,
-        "inverted-bracket"/style.Enclosure.INVERTED_BRACKET (output in musicxml 4 only)
-        None/"none"/style.Enclosure.NONE (returns Python None object)
+        Valid names are:
+
+        * "rectangle"/style.Enclosure.RECTANGLE,
+        * "square"/style.Enclosure.SQUARE,
+        * "oval"/style.Enclosure.OVAL,
+        * "circle"/style.Enclosure.CIRCLE,
+        * "bracket"/style.Enclosure.BRACKET,
+        * "inverted-bracket"/style.Enclosure.INVERTED_BRACKET (output in musicxml 4 only)
+        * None/"none"/style.Enclosure.NONE (returns Python None object)
 
         or the following other shapes with their ALLCAPS Enclosure equivalents:
 
-        triangle, diamond,
-        pentagon, hexagon, heptagon, octagon,
+        triangle, diamond, pentagon, hexagon, heptagon, octagon,
         nonagon, or decagon.
 
         >>> tst = style.TextStyle()
@@ -172,7 +152,27 @@ class Style(ProtoM21Object):
         Traceback (most recent call last):
         music21.style.TextFormatException:
             Not a supported enclosure: 4
-        ''')
+        '''
+        return self._enclosure
+
+    @enclosure.setter
+    def enclosure(self, value: Enclosure|None):
+        if value is None:
+            self._enclosure = value
+        elif value == Enclosure.NONE:
+            self._enclosure = None
+        elif isinstance(value, Enclosure):
+            self._enclosure = value
+        elif isinstance(value, str):
+            try:
+                enc_value = Enclosure(value.lower())
+            except ValueError as ve:
+                raise TextFormatException(f'Not a supported enclosure: {value!r}') from ve
+
+            self._enclosure = enc_value
+
+        else:
+            raise TextFormatException(f'Not a supported enclosure: {value!r}')
 
     def _getAbsoluteY(self):
         return self._absoluteY

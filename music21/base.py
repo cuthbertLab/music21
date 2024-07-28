@@ -800,7 +800,7 @@ class Music21Object(prebase.ProtoM21Object):
         return self._style
 
     @style.setter
-    def style(self, newStyle: Style|None):
+    def style(self, newStyle: Style):
         self._style = newStyle
 
     # convenience.
