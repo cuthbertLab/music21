@@ -4103,17 +4103,26 @@ class MeasureExporter(XMLExporterBase):
             n = t.cast(note.NotRest, n)
             stemDirection = n.stemDirection
 
-        if stemDirection is not None:
+        if stem_has_style := (chordOrN.hasStyleInformation
+                                and isinstance(chordOrN.style, style.NoteStyle)
+                                and chordOrN.style.stemStyle is not None):
+            note_style = chordOrN.style
+
+        if stemDirection is not None or stem_has_style:
             mxStem = SubElement(mxNote, 'stem')
-            sdText = stemDirection
+            if stemDirection is None:
+                if closest_clef := chordOrN.getContextByClass(clef.Clef):
+                    sdText = closest_clef.getStemDirectionForPitches(chordOrN.pitches)
+                else:
+                    sdText = 'up'
+            else:
+                sdText = stemDirection
             if sdText == 'noStem':
                 sdText = 'none'
             mxStem.text = sdText
-            if (chordOrN.hasStyleInformation
-                    and isinstance(chordOrN.style, style.NoteStyle)
-                    and chordOrN.style.stemStyle is not None):
-                self.setColor(mxStem, chordOrN.style.stemStyle)
-                self.setPosition(mxStem, chordOrN.style.stemStyle)
+            if stem_has_style:
+                self.setColor(mxStem, note_style.stemStyle)
+                self.setPosition(mxStem, note_style.stemStyle)
 
         # end Stem
 
