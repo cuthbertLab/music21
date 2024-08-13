@@ -553,7 +553,10 @@ def _convertHarmonicToCents(value: int|float) -> int:
 # -----------------------------------------------------------------------------
 
 
-def _dissonanceScore(pitches, smallPythagoreanRatio=True, accidentalPenalty=True, triadAward=True):
+def _dissonanceScore(pitches: list[Pitch],
+                     smallPythagoreanRatio: bool = True,
+                     accidentalPenalty: bool = True,
+                     triadAward: bool = True):
     r'''
     Calculates the 'dissonance' of a list of pitches based on three criteria:
     it is considered more consonant if 1. the numerator and denominator of the
@@ -565,6 +568,8 @@ def _dissonanceScore(pitches, smallPythagoreanRatio=True, accidentalPenalty=True
     score_ratio = 0.0
     score_triad = 0.0
 
+    intervals: list[interval.Interval] = []
+
     if not pitches:
         return 0.0
 
@@ -575,8 +580,12 @@ def _dissonanceScore(pitches, smallPythagoreanRatio=True, accidentalPenalty=True
 
     if smallPythagoreanRatio or triadAward:
         try:
-            intervals = [interval.Interval(noteStart=p1, noteEnd=p2)
-                        for p1, p2 in itertools.combinations(pitches, 2)]
+            intervals = []
+            for p1, p2 in itertools.combinations(pitches, 2):
+                p2 = copy.deepcopy(p2)
+                p2.octave = None
+                this_interval = interval.Interval(noteStart=p1, noteEnd=p2)
+                intervals.append(this_interval)
         except interval.IntervalException:
             return math.inf
     if smallPythagoreanRatio:
@@ -584,8 +593,7 @@ def _dissonanceScore(pitches, smallPythagoreanRatio=True, accidentalPenalty=True
         for this_interval in intervals:
             # does not accept weird intervals, e.g. with semitones
             ratio = interval.intervalToPythagoreanRatio(this_interval)
-            # d2 is 1.0
-            penalty = math.log(ratio.numerator * ratio.denominator / ratio) * 0.03792663444
+            penalty = math.log(ratio.denominator) * 0.07585326888
             score_ratio += penalty
 
         score_ratio /= len(pitches)
@@ -605,7 +613,7 @@ def _dissonanceScore(pitches, smallPythagoreanRatio=True, accidentalPenalty=True
                                                                  + accidentalPenalty + triadAward)
 
 
-def _bruteForceEnharmonicsSearch(oldPitches, scoreFunc=_dissonanceScore):
+def _bruteForceEnharmonicsSearch(oldPitches: list[Pitch], scoreFunc=_dissonanceScore):
     '''
     A brute-force way of simplifying -- useful if there are fewer than 5 pitches
     '''
@@ -615,7 +623,7 @@ def _bruteForceEnharmonicsSearch(oldPitches, scoreFunc=_dissonanceScore):
     return oldPitches[:1] + list(newPitches)
 
 
-def _greedyEnharmonicsSearch(oldPitches, scoreFunc=_dissonanceScore):
+def _greedyEnharmonicsSearch(oldPitches: list[Pitch], scoreFunc=_dissonanceScore):
     newPitches = oldPitches[:1]
     for oldPitch in oldPitches[1:]:
         candidates = [oldPitch] + oldPitch.getAllCommonEnharmonics()
@@ -1159,7 +1167,7 @@ class Accidental(prebase.ProtoM21Object, style.StyleMixin):
           'one-and-a-half-flat', 'one-and-a-half-sharp', 'quadruple-flat', 'quadruple-sharp',
           'sharp', 'triple-flat', 'triple-sharp']
         '''
-        return sorted(accidentalNameToModifier.keys(), key=str.lower)
+        return sorted(a.lower() for a in accidentalNameToModifier)
 
     # PUBLIC METHODS #
 
@@ -3209,7 +3217,7 @@ class Pitch(prebase.ProtoM21Object):
         else:
             return self.octave
 
-    # noinspection SpellCheckingInspection
+    # noinspection SpellCheckingInspection,GrazieInspection
     @property
     def german(self) -> str:
         '''
@@ -3274,7 +3282,7 @@ class Pitch(prebase.ProtoM21Object):
     # noinspection SpellCheckingInspection
     @property
     def italian(self) -> str:
-        # noinspection SpellCheckingInspection
+        # noinspection SpellCheckingInspection,GrazieInspection
         '''
         Read-only attribute. Returns the name
         of a Pitch in the Italian system
@@ -3357,7 +3365,7 @@ class Pitch(prebase.ProtoM21Object):
         'G': 'sol',
     }
 
-    # noinspection SpellCheckingInspection
+    # noinspection SpellCheckingInspection,GrazieInspection
     @property
     def spanish(self) -> str:
         '''
@@ -3731,10 +3739,6 @@ class Pitch(prebase.ProtoM21Object):
             #        'target', target])
 
             if distanceLower <= distanceHigher:
-                # pd = 'distanceLower (%s); distanceHigher (%s); distance lower ' +
-                #      'is closer to target: %s'
-                # environLocal.printDebug(['harmonicFromFundamental():',
-                #                         pd  % (candidateLower, candidateHigher, target)])
                 # the lower is closer, thus we need to raise gap
                 match = candidateLower
                 gap = -abs(distanceLower)
@@ -4253,6 +4257,7 @@ class Pitch(prebase.ProtoM21Object):
             return returnObj
 
     def getEnharmonic(self: PitchType, *, inPlace=False) -> PitchType|None:
+        # noinspection GrazieInspection
         '''
         Returns a new Pitch that is the(/an) enharmonic equivalent of this Pitch.
         Can be thought of as flipEnharmonic or something like that.
@@ -5055,7 +5060,7 @@ class Pitch(prebase.ProtoM21Object):
             set_displayStatus(True)
             return
 
-        # no pitches in past...
+        # no pitches in the past list...
         if not pitchPastAll:
             # if we have no past, we show the accidental if this pitch name
             # is not in the alteredPitches list, or for naturals: if the

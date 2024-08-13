@@ -8,10 +8,8 @@
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
-.. note:: The terminology, V43, viio, iv, etc. are explained
-     more fully in *The Music Theory Handbook*
-     by Marjorie Merryman.
-
+.. note:: The terminology, V43, viio, iv, etc. are explained elsewhere,
+     such as *The Music Theory Handbook* by Marjorie Merryman.
 
 This module contains methods which can properly resolve
 `dominant seventh <https://en.wikipedia.org/wiki/Dominant_seventh_chord>`_,
@@ -26,6 +24,7 @@ arguments, the methods only :meth:`~music21.pitch.Pitch.transpose` each
 '''
 from __future__ import annotations
 
+import typing as t
 import unittest
 
 from music21 import exceptions21
@@ -35,11 +34,14 @@ from music21 import pitch
 from music21 import stream
 
 
-def augmentedSixthToDominant(augSixthPossib, augSixthType=None, augSixthChordInfo=None):
+def augmentedSixthToDominant(
+    augSixthPossib,
+    augSixthType: int | None = None,
+    augSixthChordInfo: list[pitch.Pitch | None] | None = None
+) -> tuple[pitch.Pitch, ...]:
     '''
     Resolves French (augSixthType = 1), German (augSixthType = 2), and Swiss (augSixthType = 3)
     augmented sixth chords to the root position dominant triad.
-
 
     Proper Italian augmented sixth resolutions not supported within this method.
 
@@ -97,10 +99,20 @@ def augmentedSixthToDominant(augSixthPossib, augSixthType=None, augSixthChordInf
             elif augSixthChord.isSwissAugmentedSixth():
                 augSixthType = 3
 
+    if t.TYPE_CHECKING:
+        assert augSixthChordInfo is not None
     if augSixthType in (1, 3):
         [bass, other, root, unused_third, fifth] = augSixthChordInfo  # other == sixth
     elif augSixthType == 2:
         [bass, root, unused_third, fifth, other] = augSixthChordInfo  # other == seventh
+    else:
+        raise ResolutionException(f'Unknown augSixthType: {augSixthType!r}')
+
+    if t.TYPE_CHECKING:
+        assert isinstance(bass, pitch.Pitch)
+        assert isinstance(root, pitch.Pitch)
+        assert isinstance(fifth, pitch.Pitch)
+        assert isinstance(other, pitch.Pitch)
 
     howToResolve = [(lambda p: p.name == bass.name, '-m2'),
                     (lambda p: p.name == root.name, 'm2'),
@@ -111,7 +123,11 @@ def augmentedSixthToDominant(augSixthPossib, augSixthType=None, augSixthChordInf
     return _resolvePitches(augSixthPossib, howToResolve)
 
 
-def augmentedSixthToMajorTonic(augSixthPossib, augSixthType=None, augSixthChordInfo=None):
+def augmentedSixthToMajorTonic(
+    augSixthPossib,
+    augSixthType: int | None = None,
+    augSixthChordInfo: list[pitch.Pitch | None] | None = None
+) -> tuple[pitch.Pitch, ...]:
     '''
     Resolves French (augSixthType = 1), German (augSixthType = 2), and Swiss (augSixthType = 3)
     augmented sixth chords to the major tonic 6,4.
@@ -167,10 +183,21 @@ def augmentedSixthToMajorTonic(augSixthPossib, augSixthType=None, augSixthChordI
             elif augSixthChord.isSwissAugmentedSixth():
                 augSixthType = 3
 
+    if t.TYPE_CHECKING:
+        assert augSixthChordInfo is not None
+
     if augSixthType in (1, 3):
         [bass, other, root, unused_third, fifth] = augSixthChordInfo  # other == sixth
     elif augSixthType == 2:
         [bass, root, unused_third, fifth, other] = augSixthChordInfo  # other == seventh
+    else:
+        raise ResolutionException(f'Unknown augSixthType: {augSixthType!r}')
+
+    if t.TYPE_CHECKING:
+        assert isinstance(bass, pitch.Pitch)
+        assert isinstance(root, pitch.Pitch)
+        assert isinstance(fifth, pitch.Pitch)
+        assert isinstance(other, pitch.Pitch)
 
     howToResolve = [(lambda p: p.name == bass.name, '-m2'),
                     (lambda p: p.name == root.name, 'm2'),
@@ -182,11 +209,14 @@ def augmentedSixthToMajorTonic(augSixthPossib, augSixthType=None, augSixthChordI
     return _resolvePitches(augSixthPossib, howToResolve)
 
 
-def augmentedSixthToMinorTonic(augSixthPossib, augSixthType=None, augSixthChordInfo=None):
+def augmentedSixthToMinorTonic(
+    augSixthPossib,
+    augSixthType: int | None = None,
+    augSixthChordInfo: list[pitch.Pitch | None] | None = None
+) -> tuple[pitch.Pitch, ...]:
     '''
     Resolves French (augSixthType = 1), German (augSixthType = 2), and Swiss (augSixthType = 3)
     augmented sixth chords to the minor tonic 6,4.
-
 
     Proper Italian augmented sixth resolutions not supported within this method.
 
@@ -238,10 +268,21 @@ def augmentedSixthToMinorTonic(augSixthPossib, augSixthType=None, augSixthChordI
             elif augSixthChord.isSwissAugmentedSixth():
                 augSixthType = 3
 
+    if t.TYPE_CHECKING:
+        assert augSixthChordInfo is not None
+
     if augSixthType in (1, 3):
         [bass, other, root, unused_third, fifth] = augSixthChordInfo  # other == sixth
     elif augSixthType == 2:
         [bass, root, unused_third, fifth, other] = augSixthChordInfo  # other == seventh
+    else:
+        raise ResolutionException(f'Unknown augSixthType: {augSixthType!r}')
+
+    if t.TYPE_CHECKING:
+        assert isinstance(bass, pitch.Pitch)
+        assert isinstance(root, pitch.Pitch)
+        assert isinstance(fifth, pitch.Pitch)
+        assert isinstance(other, pitch.Pitch)
 
     howToResolve = [(lambda p: p.name == bass.name, '-m2'),
                     (lambda p: p.name == root.name, 'm2'),
@@ -727,14 +768,14 @@ def _transpose(samplePitch, intervalString):
     return samplePitch.transpose(intervalString)
 
 
-def _resolvePitches(possibToResolve, howToResolve):
+def _resolvePitches(possibToResolve, howToResolve) -> tuple[pitch.Pitch, ...]:
     '''
     Takes in a possibility to resolve and a list of (lambda function, intervalString)
     pairs and transposes each pitch by the intervalString corresponding to the lambda
     function that returns True when applied to the pitch.
     '''
     howToResolve.append((lambda p: True, 'P1'))
-    resPitches = []
+    resPitches: list[pitch.Pitch] = []
     for samplePitch in possibToResolve:
         for (expression, intervalString) in howToResolve:
             if expression(samplePitch):
