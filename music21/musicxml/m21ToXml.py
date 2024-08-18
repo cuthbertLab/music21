@@ -5513,8 +5513,6 @@ class MeasureExporter(XMLExporterBase):
         if bend.preBend:
             SubElement(mxh, 'pre-bend')
         if bend.release is not None:
-            # Specifies where the release starts in terms of 
-            # divisions relative to the current note.
             releaseSubElement = SubElement(mxh, 'release')
             quarterLengthValue = bend.release
             divisionsValue = defaults.divisionsPerQuarter * quarterLengthValue
