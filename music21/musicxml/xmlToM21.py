@@ -3876,7 +3876,7 @@ class MeasureParser(SoundTagMixin, XMLParserBase):
         alter = mxh.find('bend-alter')
         if alter is not None:
             if alter.text is not None:
-                bend.bendAlter = interval.Interval(int(alter.text))
+                bend.bendAlter = interval.Interval(float(alter.text))
         if mxh.find('pre-bend') is not None:
             bend.preBend = True
         if mxh.find('release') is not None:
