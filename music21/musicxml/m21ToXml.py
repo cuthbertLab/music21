@@ -5517,7 +5517,7 @@ class MeasureExporter(XMLExporterBase):
             quarterLengthValue = bend.release
             divisionsValue = defaults.divisionsPerQuarter * quarterLengthValue
             releaseSubElement.set('offset', str(divisionsValue))
-        if bend.withBar is not None:
+        if bend.withBar is not None and bend.withBar:
             withBarSubElement = SubElement(mxh, 'with-bar')
             withBarSubElement.text = str(bend.withBar)
 
