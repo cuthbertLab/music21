@@ -3872,8 +3872,7 @@ class MeasureParser(SoundTagMixin, XMLParserBase):
             environLocal.printDebug(f'Cannot translate {tag} in {mxObj}.')
             return None
 
-    @staticmethod
-    def setBend(mxh, bend):
+    def setBend(self, mxh, bend):
         alter = mxh.find('bend-alter')
         if alter is not None:
             if alter.text is not None:
@@ -3883,7 +3882,7 @@ class MeasureParser(SoundTagMixin, XMLParserBase):
         if mxh.find('release') is not None:
             try:
                 divisions = float(mxh.find('release').get('offset'))
-                bend.release = divisions / defaults.divisionsPerQuarter
+                bend.release = opFrac(divisions / self.divisions)
             except (ValueError, TypeError) as unused_err:
                 bend.release = 0.0
 
