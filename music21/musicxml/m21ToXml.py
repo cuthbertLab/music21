@@ -65,7 +65,7 @@ from music21 import tie
 from music21.musicxml import helpers
 from music21.musicxml.partStaffExporter import PartStaffExporterMixin
 from music21.musicxml import xmlObjects
-from music21.musicxml.xmlObjects import MusicXMLExportException, booleanToYesNo
+from music21.musicxml.xmlObjects import MusicXMLExportException
 from music21.musicxml.xmlObjects import MusicXMLWarning
 
 environLocal = environment.Environment('musicxml.m21ToXml')
