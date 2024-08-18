@@ -615,8 +615,16 @@ class FretBend(FretIndication):
     release: float | None
     withBar: bool 
 
-    def __init__(self, number=0, bendAlter=None, preBend=False, release=None,
-                 withBar=False, **keywords):
+    def __init__(
+        self,
+        number: int = 0,
+        *,
+        bendAlter: interval.Interval | interval.ChromaticInterval | None = None,
+        preBend: bool = False,
+        release: OffsetQL | None = None,
+        withBar: bool = False,
+        **keywords
+        ):
         super().__init__(number=number, **keywords)
         self.bendAlter = bendAlter
         self.preBend = preBend
