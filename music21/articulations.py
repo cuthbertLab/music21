@@ -598,9 +598,9 @@ class FretBend(FretIndication):
 
     WithBar indicates if the bend is done using a whammy bar movement. Defaults to False.
 
-    >>> fb = articulations.FretBend(bendAlter=interval.ChromaticInterval(-2), release=0.5)
+    >>> fb = articulations.FretBend(number=1,bendAlter=interval.ChromaticInterval(-2),release=0.5)
     >>> fb
-    <music21.articulations.FretBend 0>
+    <music21.articulations.FretBend 1>
     >>> fb.preBend
     False
     >>> fb.withBar
@@ -615,8 +615,9 @@ class FretBend(FretIndication):
     release: float | None
     withBar: bool 
 
-    def __init__(self, number=0, bendAlter=None, preBend=False, release=None, withBar=False, **keywords):
-        super().__init__(**keywords)
+    def __init__(self, number=0, bendAlter=None, preBend=False, release=None,
+                 withBar=False, **keywords):
+        super().__init__(number=number, **keywords)
         self.bendAlter = bendAlter
         self.preBend = preBend
         self.release = release
