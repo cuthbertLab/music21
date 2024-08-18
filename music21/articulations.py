@@ -612,7 +612,7 @@ class FretBend(FretIndication):
     '''
     bendAlter: interval.Interval | interval.ChromaticInterval | None
     preBend: bool
-    release: float | None
+    release: OffsetQL | None
     withBar: bool 
 
     def __init__(
