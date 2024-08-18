@@ -610,7 +610,7 @@ class FretBend(FretIndication):
     >>> fb.release 
     0.5
     '''
-    bendAlter: interval.IntervalBase | None
+    bendAlter: interval.Interval | interval.ChromaticInterval | None
     preBend: bool
     release: float | None
     withBar: bool 
