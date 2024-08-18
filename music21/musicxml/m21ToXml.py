@@ -5495,7 +5495,7 @@ class MeasureExporter(XMLExporterBase):
 
         >>> MEXClass = musicxml.m21ToXml.MeasureExporter
 
-        >>> a = articulations.FretBend()
+        >>> a = articulations.FretBend(bendAlter=interval.Interval(2))
 
         >>> from xml.etree.ElementTree import Element
         >>> mxh = Element('bend')
@@ -5503,15 +5503,13 @@ class MeasureExporter(XMLExporterBase):
         >>> MEXClass.setBend(mxh, a)
         >>> MEXClass.dump(mxh)
         <bend>
-          <bend-alter></bend-alter>
+          <bend-alter>2</bend-alter>
         </bend>
         '''
         bendAlterSubElement = SubElement(mxh, 'bend-alter')
         alter = bend.bendAlter
         if alter is not None:
-            # musicxml expects a number of semitones but not sure how to get it
-            # from a GeneralInterval
-            pass
+            bendAlterSubElement.text = str(alter.semitones)
         if bend.preBend:
             SubElement(mxh, 'pre-bend')
         if bend.release is not None:
