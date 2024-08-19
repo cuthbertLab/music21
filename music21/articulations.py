@@ -595,7 +595,8 @@ class FretBend(FretIndication):
     Release is the quarterLength value from the start
     of the note for releasing the bend, if Any. Defaults to None.
 
-    WithBar indicates if the bend is done using a whammy bar movement. Defaults to False.
+    WithBar indicates what whammy bar movement is used, if any.
+    MusicXML supports 'scoop' or 'dip'. Defaults to None.
 
     >>> fb = articulations.FretBend(number=1,bendAlter=interval.ChromaticInterval(-2),release=0.5)
     >>> fb
@@ -603,7 +604,7 @@ class FretBend(FretIndication):
     >>> fb.preBend
     False
     >>> fb.withBar
-    False
+    
     >>> fb.bendAlter
     <music21.interval.ChromaticInterval -2>
     >>> fb.release 
@@ -612,7 +613,7 @@ class FretBend(FretIndication):
     bendAlter: interval.Interval | interval.ChromaticInterval | None
     preBend: bool
     release: OffsetQL | None
-    withBar: bool 
+    withBar: str | None
 
     def __init__(
         self,
@@ -621,7 +622,7 @@ class FretBend(FretIndication):
         bendAlter: interval.Interval | interval.ChromaticInterval | None = None,
         preBend: bool = False,
         release: OffsetQL | None = None,
-        withBar: bool = False,
+        withBar: str | None = None,
         **keywords
         ):
         super().__init__(number=number, **keywords)
