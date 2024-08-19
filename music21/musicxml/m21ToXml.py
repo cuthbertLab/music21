@@ -5500,10 +5500,31 @@ class MeasureExporter(XMLExporterBase):
         >>> from xml.etree.ElementTree import Element
         >>> mxh = Element('bend')
 
-        >>> MEXClass.setBend(mxh, a)
-        >>> MEXClass.dump(mxh)
+        >>> MEXclass.setbend(mxh, a)
+        >>> MEXclass.dump(mxh)
         <bend>
           <bend-alter>2</bend-alter>
+        </bend>
+        >>> a.pre-bend = True
+        >>> MEXclass.setbend(mxh, a)
+        >>> MEXclass.dump(mxh)
+        <bend>
+          <bend-alter>2</bend-alter>
+          <pre-bend/>
+        </bend>
+        >>> a = articulations.FretBend(bendAlter=interval.Interval(-2), release=OffsetQL(1, 10080))
+        >>> MEXclass.setbend(mxh, a)
+        >>> MEXclass.dump(mxh)
+        <bend>
+          <bend-alter>-2</bend-alter>
+          <release offset='1'>
+        </bend>
+        >>> a = articulations.FretBend(bendAlter=interval.Interval(-2), withBar='scoop')
+        >>> MEXclass.setbend(mxh, a)
+        >>> MEXclass.dump(mxh)
+        <bend>
+          <bend-alter>1</bend-alter>
+          <with-bar>scoop</with-bar>
         </bend>
         '''
         bendAlterSubElement = SubElement(mxh, 'bend-alter')
@@ -5517,7 +5538,7 @@ class MeasureExporter(XMLExporterBase):
             quarterLengthValue = bend.release
             divisionsValue = int(defaults.divisionsPerQuarter * quarterLengthValue)
             releaseSubElement.set('offset', str(divisionsValue))
-        if bend.withBar is not None and bend.withBar:
+        if bend.withBar is not None:
             withBarSubElement = SubElement(mxh, 'with-bar')
             withBarSubElement.text = str(bend.withBar)
 
