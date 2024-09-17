@@ -42,7 +42,7 @@ from music21.chord import tools
 
 if t.TYPE_CHECKING:
     from music21 import stream
-
+    from music21.style import Style
 
 environLocal = environment.Environment('chord')
 
@@ -4195,9 +4195,12 @@ class Chord(ChordBase):
         # assign to base
         if pitchTarget is None and self._notes:
             chord_style = self.style
+            if t.TYPE_CHECKING:
+                assert isintance(chord_style, Style)
             chord_style.color = value
             for n in self._notes:
-                n.style.color = value
+                n_style = n.style
+                n_style.color = value
 
             return
         elif isinstance(pitchTarget, str):
