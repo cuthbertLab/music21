@@ -27,6 +27,7 @@ from music21 import note
 from music21 import repeat
 from music21 import spanner
 from music21 import stream
+from music21 import style
 from music21 import tempo
 
 from music21.musicxml import helpers
@@ -921,6 +922,13 @@ class Test(unittest.TestCase):
         self.assertIn('<rest', xmlOut)
         self.assertNotIn('<forward>', xmlOut)
 
+    def test_stem_style_without_direction(self):
+        one_note_tune = converter.parse('tinyNotation: 2/4 c2')
+        half_note = one_note_tune.recurse().notes.first()
+        half_note.style.stemStyle = style.Style()
+        half_note.style.stemStyle.color = 'red'
+        xmlOut = GeneralObjectExporter().parse(one_note_tune).decode('utf-8')
+        self.assertIn('<stem color="#FF0000">up</stem>', xmlOut)
 
 
 class TestExternal(unittest.TestCase):
