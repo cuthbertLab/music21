@@ -17,6 +17,7 @@ from __future__ import annotations
 
 from collections.abc import Sequence
 import copy
+import typing as t
 
 from music21 import prebase
 from music21.common.numberTools import opFrac
@@ -324,23 +325,19 @@ class MeterTerminal(prebase.ProtoM21Object, SlottedObjectMixin):
         '''
         # NOTE: this is a performance critical method and should only be
         # called when necessary
-        if self.numerator is None or self.denominator is None:
-            self._duration = None
-        else:
-            self._duration = duration.Duration()
-            try:
-                self._duration.quarterLength = (
-                    (4.0 * self.numerator) / self.denominator
-                )
-            except duration.DurationException:
-                environLocal.printDebug(
-                    ['DurationException encountered',
-                     'numerator/denominator',
-                     self.numerator,
-                     self.denominator
-                     ]
-                )
-                self._duration = None
+        self._duration = duration.Duration()
+        try:
+            self._duration.quarterLength = (
+                (4.0 * self.numerator) / self.denominator
+            )
+        except duration.DurationException:
+            environLocal.printDebug(
+                ['DurationException encountered',
+                 'numerator/denominator',
+                 self.numerator,
+                 self.denominator
+                 ]
+            )
 
     def _getDuration(self):
         '''
@@ -396,11 +393,15 @@ class MeterSequence(MeterTerminal):
 
     # INITIALIZER #
 
-    def __init__(self, value=None, partitionRequest=None):
+    def __init__(
+        self,
+        value: str | MeterTerminal | Sequence[MeterTerminal | str] | None = None,
+        partitionRequest: t.Any|None = None,
+    ):
         super().__init__()
 
-        self._numerator = None  # rationalized
-        self._denominator = None  # lowest common multiple
+        self._numerator: int = 1  # rationalized
+        self._denominator: int = 0  # lowest common multiple
         self._partition: list[MeterTerminal] = []  # a list of terminals or MeterSequences
         self._overriddenDuration = None
         self._levelListCache = {}
@@ -431,7 +432,6 @@ class MeterSequence(MeterTerminal):
 
         Notably, self._levelListCache is not copied,
         which may not be needed in the copy and may be large.
-
 
         >>> from copy import deepcopy
         >>> ms1 = meter.MeterSequence('4/4+3/8')
@@ -745,6 +745,8 @@ class MeterSequence(MeterTerminal):
         if isinstance(numeratorList[0], str):
             # TODO: working with private methods of a created MeterSequence
             test = MeterSequence()
+            if t.TYPE_CHECKING:
+                numeratorList = cast(list[str], numeratorList)
             for mtStr in numeratorList:
                 test._addTerminal(mtStr)
             test._updateRatio()
@@ -754,9 +756,9 @@ class MeterSequence(MeterTerminal):
             else:
                 raise MeterException(f'Cannot set partition by {numeratorList}')
 
-        elif sum(numeratorList) in [self.numerator * x for x in range(1, 9)]:
+        elif sum(t.cast(list[int], numeratorList)) in [self.numerator * x for x in range(1, 9)]:
             for i in range(1, 9):
-                if sum(numeratorList) == self.numerator * i:
+                if sum(t.cast(list[int], numeratorList)) == self.numerator * i:
                     optMatch = []
                     for n in numeratorList:
                         optMatch.append(f'{n}/{self.denominator * i}')

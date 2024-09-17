@@ -52,7 +52,7 @@ def slashToTuple(value: str) -> MeterTerminalTuple:
                                                     numbers='0123456789/.')
     valueNumbers = valueNumbers.strip()  # remove whitespace
     if not valueChars:
-        division = MeterDivision.NONE  #  speed up most common case
+        division = MeterDivision.NONE  # speed up most common case
     else:
         valueChars = valueChars.strip()  # remove whitespace
         if 'slow' in valueChars.lower():
