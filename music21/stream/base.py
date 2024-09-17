@@ -7982,9 +7982,12 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
             newId = str(sOldId) + '_' + method
             sNew.id = newId
 
-        sNew._derivation = derivation.Derivation(sNew)
-        sNew._derivation.origin = self
-        sNew.derivation.method = method
+        sNew_derivation = derivation.Derivation(sNew)
+        sNew_derivation.origin = self
+        sNew_derivation.method = method
+
+        sNew.derivation = sNew_derivation
+
         # storing .elements in here necessitates
         # create a new, independent cache instance in the flat representation
         sNew._cache = {}

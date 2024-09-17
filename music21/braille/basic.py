@@ -189,7 +189,7 @@ def chordToBraille(music21Chord, descending=True, showOctave=True):
         music21Chord.editorial.brailleEnglish.append(f'{music21Chord} None')
         return symbols['basic_exception']
     chordTrans.append(brailleNote)
-    englishJoined = '\n'.join(initNote.editorial.brailleEnglish)
+    englishJoined = '\n'.join(initNote.editorial.get('brailleEnglish', []))
     music21Chord.editorial.brailleEnglish.append(
         f'{direction} Chord:\n{englishJoined}'
     )
@@ -531,7 +531,7 @@ def metronomeMarkToBraille(music21MetronomeMark):
         metroNote = note.Note('C4', quarterLength=music21MetronomeMark.referent.quarterLength)
         brailleNote = noteToBraille(metroNote, showOctave=False)
         metroTrans.append(brailleNote)
-        englishJoined = ' '.join(metroNote.editorial.brailleEnglish)
+        englishJoined = ' '.join(metroNote.editorial.get('brailleEnglish', []))
         music21MetronomeMark.editorial.brailleEnglish.append(
             f'Metronome Note {englishJoined}'
         )

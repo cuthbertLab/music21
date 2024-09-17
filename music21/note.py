@@ -43,6 +43,8 @@ if t.TYPE_CHECKING:
     from music21 import chord
     from music21 import instrument
     from music21 import percussion
+    from music21.style import Style
+
     _NotRestType = t.TypeVar('_NotRestType', bound='NotRest')
 
 environLocal = environment.Environment('note')
@@ -2095,7 +2097,8 @@ class TestExternal(unittest.TestCase):
             b = note.Note()
             b.quarterLength = qLen
             b.name = pitchName
-            b.style.color = '#FF00FF'
+            # Pylint going crazy here
+            b.style.color = '#FF00FF'  # pylint: disable=attribute-defined-outside-init
             a.append(b)
 
         if self.show:
