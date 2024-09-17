@@ -2097,10 +2097,8 @@ class TestExternal(unittest.TestCase):
             b = note.Note()
             b.quarterLength = qLen
             b.name = pitchName
-            b_style = b.style
-            if t.TYPE_CHECKING:
-                assert isinstance(b_style, Style)
-            b_style.color = '#FF00FF'
+            # Pylint going crazy here
+            b.style.color = '#FF00FF'  # pylint: disable=attribute-defined-outside-init
             a.append(b)
 
         if self.show:

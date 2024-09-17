@@ -243,9 +243,7 @@ class Derivation(SlottedObjectMixin):
         orig: base.Music21Object | None = self.origin
         while orig is not None:
             yield orig
-            if t.TYPE_CHECKING:
-                assert orig is not None
-            orig = orig.derivation.origin
+            orig = orig.derivation.origin  # pylint: disable=no-member
 
     @property
     def method(self) -> str|None:

@@ -3684,7 +3684,7 @@ class Chord(ChordBase):
         note name in two different octaves is retained.
 
         If `inPlace` is True, a copy is not made and a list of deleted pitches is returned;
-        otherwise a copy is made and that copy is returned.
+        otherwise make and return a copy.
 
         >>> c1 = chord.Chord(['c2', 'e3', 'g4', 'e3'])
         >>> c1
@@ -4194,14 +4194,10 @@ class Chord(ChordBase):
         '''
         # assign to base
         if pitchTarget is None and self._notes:
-            chord_style = self.style
-            if t.TYPE_CHECKING:
-                assert isintance(chord_style, Style)
-            chord_style.color = value
+            # Pylint going crazy here
+            self.style.color = value  # pylint: disable=attribute-defined-outside-init
             for n in self._notes:
-                n_style = n.style
-                n_style.color = value
-
+                n.style.color = value  # pylint: disable=attribute-defined-outside-init
             return
         elif isinstance(pitchTarget, str):
             pitchTarget = pitch.Pitch(pitchTarget)
@@ -4351,7 +4347,7 @@ class Chord(ChordBase):
         None
         False
 
-        By default assigns to first pitch:
+        By default, assigns to first pitch:
 
         >>> c3 = chord.Chord('C3 F4')
         >>> c3.setNoteheadFill(False, None)
