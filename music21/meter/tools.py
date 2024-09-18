@@ -29,6 +29,7 @@ class MeterTerminalTuple(t.NamedTuple):
     denominator: int
     division: MeterDivision
 
+
 NumDenom = tuple[int, int]
 NumDenomTuple = tuple[NumDenom, ...]
 MeterOptions = tuple[tuple[str, ...], ...]

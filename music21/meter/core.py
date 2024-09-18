@@ -368,7 +368,6 @@ class MeterTerminal(prebase.ProtoM21Object, SlottedObjectMixin):
         >>> d.quarterLength
         1.5
         '''
-
         if self._overriddenDuration:
             return self._overriddenDuration
         else:
@@ -414,9 +413,9 @@ class MeterSequence(MeterTerminal):
 
         self._numerator: int = 1  # rationalized
         self._denominator: int = 0  # lowest common multiple
-        self._partition: list[MeterTerminal] = []  # a list of terminals or MeterSequences
-        self._overriddenDuration = None
-        self._levelListCache = {}
+        self._partition: list[MeterTerminal] = []  # a list of terminals (or MeterSequences?)
+        self._overriddenDuration: Duration|None = None
+        self._levelListCache: dict[tuple[int, bool], list[MeterTerminal]] = {}
 
         # this attribute is only used in MeterTerminals, and note
         # in MeterSequences; a MeterSequence's weight is based solely
@@ -424,11 +423,11 @@ class MeterSequence(MeterTerminal):
         # del self._weight -- no -- screws up pickling -- cannot del a slotted object
 
         # Bool stores whether this meter was provided as a summed numerator
-        self.summedNumerator = False
+        self.summedNumerator: bool = False
 
         # An optional parameter used only in meter display sequences.
         # Needed in cases where a meter component is parenthetical
-        self.parenthesis = False
+        self.parenthesis: bool = False
 
         if value is not None:
             self.load(value, partitionRequest)
@@ -751,16 +750,14 @@ class MeterSequence(MeterTerminal):
         Traceback (most recent call last):
         music21.exceptions21.MeterException: Cannot set partition by ['3/4', '1/8', '5/8']
         '''
-        optMatch = None
+        optMatch: MeterSequence | None | tuple[str, ...] = None
 
         # assume a list of terminal definitions
         if isinstance(numeratorList[0], str):
             # TODO: working with private methods of a created MeterSequence
             test = MeterSequence()
-            if t.TYPE_CHECKING:
-                numeratorList = cast(list[str], numeratorList)
             for mtStr in numeratorList:
-                test._addTerminal(mtStr)
+                test._addTerminal(t.cast(str, mtStr))
             test._updateRatio()
             # if durations are equal, this can be used as a partition
             if self.duration.quarterLength == test.duration.quarterLength:
@@ -771,9 +768,10 @@ class MeterSequence(MeterTerminal):
         elif sum(t.cast(list[int], numeratorList)) in [self.numerator * x for x in range(1, 9)]:
             for i in range(1, 9):
                 if sum(t.cast(list[int], numeratorList)) == self.numerator * i:
-                    optMatch = []
+                    optMatchInner: list[str] = []
                     for n in numeratorList:
-                        optMatch.append(f'{n}/{self.denominator * i}')
+                        optMatchInner.append(f'{n}/{self.denominator * i}')
+                    optMatch = tuple(optMatchINner)
                     break
 
         # last resort: search options
@@ -887,7 +885,7 @@ class MeterSequence(MeterTerminal):
             self.partitionByList(value)
         elif isinstance(value, MeterSequence):
             self.partitionByOtherMeterSequence(value)
-        elif common.isNum(value):
+        elif isinstance(value, int):
             self.partitionByCount(value, loadDefault=loadDefault)
         else:
             raise MeterException(f'cannot process partition argument {value}')
@@ -1203,9 +1201,14 @@ class MeterSequence(MeterTerminal):
 
     def load(self,
              value: str | MeterTerminal | Sequence[MeterTerminal | str],
-             partitionRequest: int | Sequence[str | MeterTerminal] | MeterSequence | None = None,
+             partitionRequest: (int
+                                | Sequence[str]
+                                | Sequence[MeterTerminal]
+                                | Sequence[int]
+                                | MeterSequence
+                                | None) = None,
              autoWeight: bool = False,
-             targetWeight=None):
+             targetWeight: int|None = None):
         '''
         This method is called when a MeterSequence is created, or if a MeterSequence is re-set.
 
@@ -1384,14 +1387,6 @@ class MeterSequence(MeterTerminal):
                 # environLocal.printDebug(['setting weight based on part, total, weight',
                 #    partRatio, totalRatio, mt.weight])
 
-    @property
-    def numerator(self):
-        return self._numerator
-
-    @property
-    def denominator(self):
-        return self._denominator
-
     def _getFlatList(self):
         '''
         Return a flattened version of this
@@ -1400,7 +1395,6 @@ class MeterSequence(MeterTerminal):
         This return a list and not a new MeterSequence b/c MeterSequence objects
         are generally immutable and thus it does not make sense
         to concatenate them.
-
 
         >>> a = meter.MeterSequence('3/4')
         >>> a.partition(3)
@@ -1542,7 +1536,7 @@ class MeterSequence(MeterTerminal):
     # --------------------------------------------------------------------------
     # alternative representations
 
-    def getLevelList(self, levelCount, flat=True):
+    def getLevelList(self, levelCount: int, flat: bool = True) -> list[MeterTerminal]:
         '''
         Recursive utility function that gets everything at a certain level.
 
@@ -1572,7 +1566,7 @@ class MeterSequence(MeterTerminal):
         except KeyError:
             pass
 
-        mtList = []
+        mtList: list[MeterTerminal] = []
         for i in range(len(self._partition)):
             # environLocal.printDebug(['getLevelList weight', i, self[i].weight])
             if not isinstance(self._partition[i], MeterSequence):

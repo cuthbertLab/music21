@@ -1306,7 +1306,11 @@ class TimeSignature(TimeSignatureBase):
 
     # --------------------------------------------------------------------------
     # access data for other processing
-    def getBeams(self, srcList, measureStartOffset=0.0) -> list[beam.Beams|None]:
+    def getBeams(
+        self,
+        srcList: stream.Stream|t.Sequence[base.Music21Object],
+        measureStartOffset: OffsetQL = 0.0,
+    ) -> list[beam.Beams|None]:
         '''
         Given a qLen position and an iterable of Music21Objects, return a list of Beams objects.
 
@@ -1406,10 +1410,17 @@ class TimeSignature(TimeSignatureBase):
         beamsList = beam.Beams.naiveBeams(srcList)  # hold maximum Beams objects, all with type None
         beamsList = beam.Beams.removeSandwichedUnbeamables(beamsList)
 
-        def fixBeamsOneElementDepth(i, el, depth):
+        def fixBeamsOneElementDepth(i: int, el: base.Music21Object, depth: int):
+            '''
+            Note that this can compute the beams for non-Note things like rests
+            they just cannot be applied to the object.
+            '''
             beams = beamsList[i]
             if beams is None:
                 return
+
+            if t.TYPE_CHECKING:
+                assert isinstance(beams, beam.Beams)
 
             beamNumber = depth + 1
             # see if there is a component defined for this beam number
@@ -1422,7 +1433,7 @@ class TimeSignature(TimeSignatureBase):
 
             start = opFrac(pos)
             end = opFrac(pos + dur.quarterLength)
-            startNext: float|Fraction = end
+            startNext: OffsetQL = end
 
             isLast = (i == len(srcList) - 1)
             isFirst = (i == 0)
