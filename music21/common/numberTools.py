@@ -237,10 +237,6 @@ _KNOWN_PASSES = frozenset([
 ])
 
 @overload
-def opFrac(num: None) -> None:
-    pass
-
-@overload
 def opFrac(num: int) -> float:
     pass
 
@@ -249,13 +245,13 @@ def opFrac(num: float|Fraction) -> float|Fraction:
     pass
 
 # no type checking due to accessing protected attributes (for speed)
-def opFrac(num: OffsetQLIn|None) -> OffsetQL|None:
+def opFrac(num: OffsetQLIn) -> OffsetQL:
     '''
     opFrac -> optionally convert a number to a fraction or back.
 
     Important music21 function for working with offsets and quarterLengths
 
-    Takes in a number (or None) and converts it to a Fraction with denominator
+    Takes in a number and converts it to a Fraction with denominator
     less than limitDenominator if it is not binary expressible; otherwise return a float.
     Or if the Fraction can be converted back to a binary expressible
     float then do so.
@@ -290,8 +286,14 @@ def opFrac(num: OffsetQLIn|None) -> OffsetQL|None:
     Fraction(10, 81)
     >>> common.opFrac(0.000001)
     0.0
-    >>> common.opFrac(None) is None
-    True
+
+    Please check against None before calling, but None is changed to 0.0
+
+    >>> common.opFrac(None)
+    0.0
+
+    * Changed in v9.3: opFrac(None) should not be called.  If it is called,
+      it now returns 0.0
     '''
     # This is a performance critical operation, tuned to go as fast as possible.
     # hence redundancy -- first we check for type (no inheritance) and then we
@@ -340,8 +342,8 @@ def opFrac(num: OffsetQLIn|None) -> OffsetQL|None:
             return num._numerator / (d + 0.0)  # type: ignore
         else:
             return num  # leave non-power of two fractions alone
-    elif num is None:
-        return None
+    elif num is None:  # undocumented -- used to be documented to return None.  callers must check.
+        return 0.0
 
     # class inheritance only check AFTER "type is" checks... this is redundant but highly optimized.
     elif isinstance(num, int):
