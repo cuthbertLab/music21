@@ -985,7 +985,8 @@ class TimeSignature(TimeSignatureBase):
             return 1
 
         # need to see if first-level subdivisions are partitioned
-        if not isinstance(self.beatSequence[0], MeterSequence):
+        beat_seq_0 = self.beatSequence[0]
+        if not isinstance(beat_seq_0, MeterSequence):
             return 1
 
         # getting length here gives number of subdivisions
@@ -994,7 +995,7 @@ class TimeSignature(TimeSignatureBase):
 
         # convert this to a set; if length is 1, then all beats are uniform
         if len(set(post)) == 1:
-            return len(self.beatSequence[0])  # all are the same
+            return len(beat_seq_0)  # all are the same
         else:
             return 1
 
@@ -1054,18 +1055,40 @@ class TimeSignature(TimeSignatureBase):
 
         Value returned of non-uniform beat divisions will change at any time
         after v7.1 to avoid raising an exception.
+
+        OMIT_FROM_DOCS
+
+        Previously a time signature with beatSequence containing only
+        MeterTerminals would raise exceptions.
+
+        >>> ts = meter.TimeSignature('2/128')
+        >>> ts.beatSequence[0]
+        <music21.meter.core.MeterTerminal 1/128>
+        >>> ts.beatDivisionDurations
+        [<music21.duration.Duration 0.03125>]
+
+        >>> ts = meter.TimeSignature('1/128')
+        >>> ts.beatSequence[0]
+        <music21.meter.core.MeterTerminal 1/128>
+        >>> ts.beatDivisionDurations
+        [<music21.duration.Duration 0.03125>]
         '''
         post = []
-        if len(self.beatSequence) == 1:
-            raise TimeSignatureException(
-                'cannot determine beat division for a non-partitioned beat')
         for mt in self.beatSequence:
-            for subMt in mt:
-                post.append(subMt.duration.quarterLength)
+            if isinstance(mt, MeterSequence):
+                for subMt in mt:
+                    post.append(subMt.duration.quarterLength)
+            else:
+                post.append(mt.duration.quarterLength)
         if len(set(post)) == 1:  # all the same
             out = []
-            for subMt in self.beatSequence[0]:
-                out.append(subMt.duration)
+            beat_seq_0 = self.beatSequence[0]
+            if isinstance(beat_seq_0, MeterSequence):
+                for subMt in beat_seq_0:
+                    if subMt.duration is not None:  # should not be:
+                        out.append(subMt.duration)
+            elif beat_seq_0.duration is not None:  # MeterTerminal w/ non-empty duration.
+                out.append(beat_seq_0.duration)
             return out
         else:
             raise TimeSignatureException(f'non uniform beat division: {post}')
