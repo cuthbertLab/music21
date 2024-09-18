@@ -65,7 +65,7 @@ Maintainers will respect confidentiality with regard to reports.
 
 ## Acknowledgements ##
 
-The early development of `music21` was been supported by
+The early development of `music21` was supported by
 the generosity of the Seaver Institute and the
 National Endowment for the Humanities, along with MIT's Music and Theater Arts Section
 and the School of Humanities, Arts, and Social Sciences.

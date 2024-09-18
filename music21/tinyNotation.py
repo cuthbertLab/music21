@@ -301,8 +301,8 @@ class State:
 
     def affectTokenAfterParseBeforeModifiers(
         self,
-        m21Obj: base.Music21Object
-    ) -> base.Music21Object:
+        m21Obj: Music21Object
+    ) -> Music21Object:
         '''
         called after the object has been acquired but before modifiers have been applied.
         '''
@@ -310,8 +310,8 @@ class State:
 
     def affectTokenAfterParse(
         self,
-        m21Obj: base.Music21Object
-    ) -> base.Music21Object:
+        m21Obj: Music21Object
+    ) -> Music21Object:
         '''
         called to modify the tokenObj after parsing
 
@@ -324,6 +324,8 @@ class State:
                 self.end()
                 # this is a hack that should be done away with...
                 p = self.parent
+                if p is None:
+                    return m21Obj
 
                 # I thought this was potentially O(n^2) but it's actually
                 # just O(n) on activeStates and on pop() operation.
