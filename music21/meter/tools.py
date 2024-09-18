@@ -11,11 +11,11 @@
 # -----------------------------------------------------------------------------
 from __future__ import annotations
 
-import collections
 import fractions
 from functools import lru_cache
 import math
 import re
+import typing as t
 
 from music21 import common
 from music21.common.enums import MeterDivision
@@ -24,8 +24,11 @@ from music21.exceptions21 import MeterException, Music21Exception, TimeSignature
 
 environLocal = environment.Environment('meter.tools')
 
-MeterTerminalTuple = collections.namedtuple('MeterTerminalTuple',
-                                            ['numerator', 'denominator', 'division'])
+class MeterTerminalTuple(t.NamedTuple):
+    numerator: int
+    denominator: int
+    division: MeterDivision
+
 NumDenom = tuple[int, int]
 NumDenomTuple = tuple[NumDenom, ...]
 MeterOptions = tuple[tuple[str, ...], ...]
@@ -97,6 +100,8 @@ def slashCompoundToFraction(value: str) -> NumDenomTuple:
     return tuple(post)
 
 
+# Pycharm is having trouble with the unmatched parentheses in the docs
+# noinspection GrazieInspection
 @lru_cache(512)
 def slashMixedToFraction(valueSrc: str) -> tuple[NumDenomTuple, bool]:
     '''
@@ -146,7 +151,7 @@ def slashMixedToFraction(valueSrc: str) -> tuple[NumDenomTuple, bool]:
                 raise TimeSignatureException(
                     f'Cannot create time signature from "{valueSrc}"') from me
             pre.append((tup.numerator, tup.denominator))
-        else:  # its just a numerator
+        else:  # it is just a numerator
             try:
                 pre.append((int(part), None))
                 summedNumerator = True

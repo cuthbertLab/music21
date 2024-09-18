@@ -23,7 +23,7 @@ from music21 import prebase
 from music21.common.numberTools import opFrac
 from music21.common.objects import SlottedObjectMixin
 from music21 import common
-from music21 import duration
+from music21.duration import Duration, DurationException
 from music21 import environment
 from music21.exceptions21 import MeterException
 from music21.meter import tools
@@ -58,13 +58,13 @@ class MeterTerminal(prebase.ProtoM21Object, SlottedObjectMixin):
     )
 
     # INITIALIZER #
-    def __init__(self, slashNotation: str|None = None, weight=1):
+    def __init__(self, slashNotation: str|None = None, weight: int = 1):
         # because of how they are copied, MeterTerminals must not have any
         # initialization parameters without defaults
-        self._duration = None
-        self._numerator = 0
-        self._denominator = 1
-        self._weight = None
+        self._duration: Duration|None = None
+        self._numerator: int = 0
+        self._denominator: int = 1
+        self._weight: int = 1
         self._overriddenDuration = None
 
         if slashNotation is not None:
@@ -281,43 +281,54 @@ class MeterTerminal(prebase.ProtoM21Object, SlottedObjectMixin):
     def weight(self, value):
         self._weight = value
 
-    def _getNumerator(self):
-        return self._numerator
-
-    def _setNumerator(self, value):
+    @property
+    def numerator(self) -> int:
         '''
+        Return or set the numerator of the MeterTerminal
+
         >>> a = meter.MeterTerminal('2/4')
+        >>> a.numerator
+        2
         >>> a.duration.quarterLength
         2.0
         >>> a.numerator = 11
         >>> a.duration.quarterLength
         11.0
         '''
+        return self._numerator
+
+    @numerator.setter
+    def numerator(self, value: int):
         self._numerator = value
         self._ratioChanged()
 
-    numerator = property(_getNumerator, _setNumerator)
-
-    def _getDenominator(self):
-        return self._denominator
-
-    def _setDenominator(self, value):
+    @property
+    def denominator(self) -> int:
         '''
+        Get or set the denominator of the meter terminal
 
         >>> a = meter.MeterTerminal('2/4')
+        >>> a.denominator
+        4
         >>> a.duration.quarterLength
         2.0
-        >>> a.numerator = 11
+        >>> a.denominator = 8
         >>> a.duration.quarterLength
-        11.0
+        1.0
+
+        >>> a.denominator = 7
+        Traceback (most recent call last):
+        music21.exceptions21.MeterException: bad denominator value: 7
         '''
+        return self._denominator
+
+    @denominator.setter
+    def denominator(self, value: int):
         # use duration.typeFromNumDict?
         if value not in tools.validDenominatorsSet:
             raise MeterException(f'bad denominator value: {value}')
         self._denominator = value
         self._ratioChanged()
-
-    denominator = property(_getDenominator, _setDenominator)
 
     def _ratioChanged(self):
         '''
@@ -325,12 +336,12 @@ class MeterTerminal(prebase.ProtoM21Object, SlottedObjectMixin):
         '''
         # NOTE: this is a performance critical method and should only be
         # called when necessary
-        self._duration = duration.Duration()
+        self._duration = Duration()
         try:
             self._duration.quarterLength = (
                 (4.0 * self.numerator) / self.denominator
             )
-        except duration.DurationException:
+        except DurationException:
             environLocal.printDebug(
                 ['DurationException encountered',
                  'numerator/denominator',
@@ -339,7 +350,9 @@ class MeterTerminal(prebase.ProtoM21Object, SlottedObjectMixin):
                  ]
             )
 
-    def _getDuration(self):
+
+    @property
+    def duration(self):
         '''
         duration gets or sets a duration value that
         is equal in length of the terminal.
@@ -361,10 +374,9 @@ class MeterTerminal(prebase.ProtoM21Object, SlottedObjectMixin):
         else:
             return self._duration
 
-    def _setDuration(self, value):
+    @duration.setter
+    def duration(self, value: Duration):
         self._overriddenDuration = value
-
-    duration = property(_getDuration, _setDuration)
 
     @property
     def depth(self):
@@ -704,7 +716,7 @@ class MeterSequence(MeterTerminal):
         # clear cache
         self._levelListCache = {}
 
-    def partitionByList(self, numeratorList: Sequence[int | str]) -> None:
+    def partitionByList(self, numeratorList: Sequence[int] | Sequence[str]) -> None:
         '''
         Given a numerator list, partition MeterSequence into a new list
         of MeterTerminals
@@ -820,7 +832,7 @@ class MeterSequence(MeterTerminal):
 
     def partition(
         self,
-        value: int | Sequence[str | MeterTerminal] | MeterSequence,
+        value: int | Sequence[str] | Sequence[MeterTerminal] | Sequence[int] | MeterSequence,
         loadDefault=False
     ) -> None:
         '''
@@ -867,6 +879,9 @@ class MeterSequence(MeterTerminal):
         3
         >>> str(c)
         '{1/128+1/128+1/128}'
+
+        * Changed in v9.3: if given a list it must either be all numbers, all strings,
+          or all MeterTerminals, not a mix (which was undocumented and buggy)
         '''
         if common.isListLike(value):
             self.partitionByList(value)
@@ -897,7 +912,6 @@ class MeterSequence(MeterTerminal):
         >>> len(ms[0])
         Traceback (most recent call last):
         TypeError: object of type 'MeterTerminal' has no len()
-
 
         Divide the Sequence into two parts, so now there are two
         MeterTerminals of 1/4 each:
@@ -1564,7 +1578,7 @@ class MeterSequence(MeterTerminal):
             if not isinstance(self._partition[i], MeterSequence):
                 mt = self[i]  # a meter terminal
                 mtList.append(mt)
-            else:  # its a sequence
+            else:  # it is a sequence
                 if levelCount > 0:  # retain this sequence but get lower level
                     # reduce level by 1 when recursing; do not
                     # change levelCount here
@@ -1577,7 +1591,7 @@ class MeterSequence(MeterTerminal):
                         # set weight to that of the sequence
                         mt.weight = self._partition[i].weight
                         mtList.append(mt)
-                    else:  # its not a terminal, its a meter sequence
+                    else:  # it is not a terminal, it is a meter sequence
                         mtList.append(self._partition[i])
         # store in cache
         self._levelListCache[cacheKey] = mtList
