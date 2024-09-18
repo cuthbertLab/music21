@@ -275,10 +275,10 @@ class State:
     # expires after N tokens or never.
     autoExpires: typing.Literal[False]|int = False
 
-    def __init__(self, parent=None, stateInfo=None):
+    def __init__(self, parent: Converter|None = None, stateInfo: str|None = None):
         self.affectedTokens = []
-        self.parent = parent
-        self.stateInfo = stateInfo
+        self.parent: Converter|None = parent
+        self.stateInfo: str|None = stateInfo
         # print('Adding state', self, parent.activeStates)
 
     def start(self):
@@ -293,19 +293,25 @@ class State:
         '''
         return None
 
-    def affectTokenBeforeParse(self, tokenStr):
+    def affectTokenBeforeParse(self, tokenStr: str) -> str:
         '''
         called to modify the string of a token.
         '''
         return tokenStr
 
-    def affectTokenAfterParseBeforeModifiers(self, m21Obj):
+    def affectTokenAfterParseBeforeModifiers(
+        self,
+        m21Obj: base.Music21Object
+    ) -> base.Music21Object:
         '''
         called after the object has been acquired but before modifiers have been applied.
         '''
         return m21Obj
 
-    def affectTokenAfterParse(self, m21Obj):
+    def affectTokenAfterParse(
+        self,
+        m21Obj: base.Music21Object
+    ) -> base.Music21Object:
         '''
         called to modify the tokenObj after parsing
 
@@ -545,7 +551,7 @@ class RestToken(NoteOrRestToken):
     '''
     A token starting with 'r', representing a rest.
     '''
-    def parse(self, parent=None):
+    def parse(self, parent: Converter|None = None):
         r = note.Rest()
         self.applyDuration(r, self.token, parent)
         return r
@@ -586,7 +592,7 @@ class NoteToken(NoteOrRestToken):
         super().__init__(token)
         self.isEditorial = False
 
-    def parse(self, parent=None):
+    def parse(self, parent: Converter|None = None):
         '''
         Extract the pitch from the note and then returns the Note.
         '''

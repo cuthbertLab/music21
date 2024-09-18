@@ -101,8 +101,6 @@ def slashCompoundToFraction(value: str) -> NumDenomTuple:
     return tuple(post)
 
 
-# Pycharm is having trouble with the unmatched parentheses in the docs
-# noinspection GrazieInspection
 @lru_cache(512)
 def slashMixedToFraction(valueSrc: str) -> tuple[NumDenomTuple, bool]:
     '''
