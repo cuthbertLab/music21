@@ -46,7 +46,6 @@ class MeterTerminal(prebase.ProtoM21Object, SlottedObjectMixin):
     >>> a.duration.quarterLength
     10.0
     '''
-
     # CLASS VARIABLES #
 
     __slots__ = (
@@ -58,14 +57,14 @@ class MeterTerminal(prebase.ProtoM21Object, SlottedObjectMixin):
     )
 
     # INITIALIZER #
-    def __init__(self, slashNotation: str|None = None, weight: int = 1):
+    def __init__(self, slashNotation: str|None = None, weight: int|float = 1):
         # because of how they are copied, MeterTerminals must not have any
         # initialization parameters without defaults
         self._duration: Duration|None = None
         self._numerator: int = 0
         self._denominator: int = 1
-        self._weight: int = 1
-        self._overriddenDuration = None
+        self._weight: int|float = 1  # do not use setter here -- bad override in MeterSequence
+        self._overriddenDuration: Duration|None = None
 
         if slashNotation is not None:
             # assign directly to values, not properties, to avoid
@@ -266,7 +265,7 @@ class MeterTerminal(prebase.ProtoM21Object, SlottedObjectMixin):
     # properties
 
     @property
-    def weight(self):
+    def weight(self) -> float|int:
         '''
         Return or set the weight of a MeterTerminal
 
@@ -278,7 +277,7 @@ class MeterTerminal(prebase.ProtoM21Object, SlottedObjectMixin):
         return self._weight
 
     @weight.setter
-    def weight(self, value):
+    def weight(self, value: float|int):
         self._weight = value
 
     @property
@@ -406,15 +405,14 @@ class MeterSequence(MeterTerminal):
 
     def __init__(
         self,
-        value: str | MeterTerminal | Sequence[MeterTerminal | str] | None = None,
+        value: str | MeterTerminal | Sequence[MeterTerminal] | Sequence[str] | None = None,
         partitionRequest: t.Any|None = None,
     ):
         super().__init__()
 
         self._numerator: int = 1  # rationalized
         self._denominator: int = 0  # lowest common multiple
-        self._partition: list[MeterTerminal] = []  # a list of terminals (or MeterSequences?)
-        self._overriddenDuration: Duration|None = None
+        self._partition: list[MeterTerminal|MeterSequence] = []
         self._levelListCache: dict[tuple[int, bool], list[MeterTerminal]] = {}
 
         # this attribute is only used in MeterTerminals, and note
@@ -466,9 +464,9 @@ class MeterSequence(MeterTerminal):
 
         return new
 
-    def __getitem__(self, key):
+    def __getitem__(self, key: int) -> MeterTerminal:
         '''
-        Get an MeterTerminal from _partition
+        Get an MeterTerminal (or MeterSequence) from _partition
 
         >>> a = meter.MeterSequence('4/4', 4)
         >>> a[3].numerator
@@ -771,7 +769,7 @@ class MeterSequence(MeterTerminal):
                     optMatchInner: list[str] = []
                     for n in numeratorList:
                         optMatchInner.append(f'{n}/{self.denominator * i}')
-                    optMatch = tuple(optMatchINner)
+                    optMatch = tuple(optMatchInner)
                     break
 
         # last resort: search options
@@ -1200,7 +1198,7 @@ class MeterSequence(MeterTerminal):
     # loading is always destructive
 
     def load(self,
-             value: str | MeterTerminal | Sequence[MeterTerminal | str],
+             value: str | MeterTerminal | Sequence[MeterTerminal] | Sequence[str],
              partitionRequest: (int
                                 | Sequence[str]
                                 | Sequence[MeterTerminal]
@@ -1208,7 +1206,7 @@ class MeterSequence(MeterTerminal):
                                 | MeterSequence
                                 | None) = None,
              autoWeight: bool = False,
-             targetWeight: int|None = None):
+             targetWeight: int|float|None = None):
         '''
         This method is called when a MeterSequence is created, or if a MeterSequence is re-set.
 
@@ -1219,13 +1217,16 @@ class MeterSequence(MeterTerminal):
 
         loading is a destructive operation.
 
-
         >>> a = meter.MeterSequence()
         >>> a.load('4/4', 4)
+        >>> a
+        <music21.meter.core.MeterSequence {1/4+1/4+1/4+1/4}>
         >>> str(a)
         '{1/4+1/4+1/4+1/4}'
 
         >>> a.load('4/4', 2)  # request 2 beats
+        >>> a
+        <music21.meter.core.MeterSequence {1/2+1/2}>
         >>> str(a)
         '{1/2+1/2}'
 
@@ -1254,7 +1255,8 @@ class MeterSequence(MeterTerminal):
                 slashNotation = f'{n}/{d}'
                 self._addTerminal(MeterTerminal(slashNotation))
             self._updateRatio()
-            self.weight = targetWeight  # may be None
+            if targetWeight is not None:
+                self.weight = targetWeight
 
         elif isinstance(value, MeterTerminal):
             # if we have a single MeterTerminal and autoWeight is active
@@ -1273,7 +1275,8 @@ class MeterSequence(MeterTerminal):
                 # environLocal.printDebug('creating MeterSequence with %s' % obj)
                 self._addTerminal(obj)
             self._updateRatio()
-            self.weight = targetWeight  # may be None
+            if targetWeight is not None:
+                self.weight = targetWeight
         else:
             raise MeterException(f'cannot create a MeterSequence with a {value!r}')
 
@@ -1362,30 +1365,27 @@ class MeterSequence(MeterTerminal):
         return summation
 
     @weight.setter
-    def weight(self, value: int | float | None) -> None:
+    def weight(self, value: int | float) -> None:
         # environLocal.printDebug(['calling setWeight with value', value])
+        if not common.isNum(value):
+            raise MeterException('weight values must be numbers')
 
-        if value is None:
-            pass  # do nothing
-        else:
-            if not common.isNum(value):
-                raise MeterException('weight values must be numbers')
-            try:
-                totalRatio = self._numerator / self._denominator
-            except TypeError:
-                raise MeterException(
-                    'Something wrong with the type of '
-                    + 'this numerator %s %s or this denominator %s %s' %
-                    (self._numerator, type(self._numerator),
-                                      self._denominator, type(self._denominator)))
+        try:
+            totalRatio = self._numerator / self._denominator
+        except TypeError:
+            raise MeterException(
+                'Something wrong with the type of '
+                + 'this numerator %s %s or this denominator %s %s' %
+                (self._numerator, type(self._numerator),
+                                  self._denominator, type(self._denominator)))
 
-            for mt in self._partition:
-                # for mt in self:
-                partRatio = mt._numerator / mt._denominator
-                mt.weight = value * (partRatio / totalRatio)
-                # mt.weight = (partRatio/totalRatio) #* totalRatio
-                # environLocal.printDebug(['setting weight based on part, total, weight',
-                #    partRatio, totalRatio, mt.weight])
+        for mt in self._partition:
+            # for mt in self:
+            partRatio = mt._numerator / mt._denominator
+            mt.weight = value * (partRatio / totalRatio)
+            # mt.weight = (partRatio/totalRatio) #* totalRatio
+            # environLocal.printDebug(['setting weight based on part, total, weight',
+            #    partRatio, totalRatio, mt.weight])
 
     def _getFlatList(self):
         '''
@@ -1399,17 +1399,29 @@ class MeterSequence(MeterTerminal):
         >>> a = meter.MeterSequence('3/4')
         >>> a.partition(3)
         >>> b = a._getFlatList()
+        >>> b
+        [<music21.meter.core.MeterTerminal 1/4>,
+         <music21.meter.core.MeterTerminal 1/4>,
+         <music21.meter.core.MeterTerminal 1/4>]
         >>> len(b)
         3
 
         >>> a[1] = a[1].subdivide(4)
-        >>> a
-        <music21.meter.core.MeterSequence {1/4+{1/16+1/16+1/16+1/16}+1/4}>
         >>> len(a)
         3
+        >>> a
+        <music21.meter.core.MeterSequence {1/4+{1/16+1/16+1/16+1/16}+1/4}>
+
         >>> b = a._getFlatList()
         >>> len(b)
         6
+        >>> b
+        [<music21.meter.core.MeterTerminal 1/4>,
+         <music21.meter.core.MeterTerminal 1/16>,
+         <music21.meter.core.MeterTerminal 1/16>,
+         <music21.meter.core.MeterTerminal 1/16>,
+         <music21.meter.core.MeterTerminal 1/16>,
+         <music21.meter.core.MeterTerminal 1/4>]
 
         >>> a[1][2] = a[1][2].subdivide(4)
         >>> a
@@ -1418,8 +1430,9 @@ class MeterSequence(MeterTerminal):
         >>> len(b)
         9
         '''
+        # Is this the same as getLevelList(0)?
         mtList = []
-        for obj in self._partition:
+        for obj in self._partition:  # or for obj in self
             if not isinstance(obj, MeterSequence):
                 mtList.append(obj)
             else:  # its a meter sequence
@@ -1437,15 +1450,29 @@ class MeterSequence(MeterTerminal):
         '''
         Return a new MeterSequence composed of the flattened representation.
 
+        Here a sequence is already flattened:
+
         >>> ms = meter.MeterSequence('3/4', 3)
+        >>> ms
+        <music21.meter.core.MeterSequence {1/4+1/4+1/4}>
         >>> b = ms.flatten()
+        >>> b
+        <music21.meter.core.MeterSequence {1/4+1/4+1/4}>
         >>> len(b)
         3
+        >>> b is ms
+        False
+
+        Now take the original MeterSequence and subdivide the second beat into 4 parts:
 
         >>> ms[1] = ms[1].subdivide(4)
+        >>> ms
+        <music21.meter.core.MeterSequence {1/4+{1/16+1/16+1/16+1/16}+1/4}>
         >>> b = ms.flatten()
         >>> len(b)
         6
+        >>> b
+        <music21.meter.core.MeterSequence {1/4+1/16+1/16+1/16+1/16+1/4}>
 
         >>> ms[1][2] = ms[1][2].subdivide(4)
         >>> ms
@@ -1453,6 +1480,8 @@ class MeterSequence(MeterTerminal):
         >>> b = ms.flatten()
         >>> len(b)
         9
+        >>> b
+        <music21.meter.core.MeterSequence {1/4+1/16+1/16+1/64+1/64+1/64+1/64+1/16+1/4}>
         '''
         post = MeterSequence()
         post.load(self._getFlatList())
@@ -1540,17 +1569,65 @@ class MeterSequence(MeterTerminal):
         '''
         Recursive utility function that gets everything at a certain level.
 
+        If flat is True, it guarantees to return a list of MeterTerminals and not
+        MeterSequences.  Otherwise, there may be Sequences in there.
+
+        Example: a Sequence representing something in 4/4 divided as
+        1 quarter, 2 eighth, 1 quarter, ((2-sixteenths) + 1 eighth).
+
         >>> b = meter.MeterSequence('4/4', 4)
         >>> b[1] = b[1].subdivide(2)
         >>> b[3] = b[3].subdivide(2)
         >>> b[3][0] = b[3][0].subdivide(2)
         >>> b
         <music21.meter.core.MeterSequence {1/4+{1/8+1/8}+1/4+{{1/16+1/16}+1/8}}>
+
+        Get the top level of this structure, flattening everything underneath:
+
         >>> b.getLevelList(0)
         [<music21.meter.core.MeterTerminal 1/4>,
          <music21.meter.core.MeterTerminal 1/4>,
          <music21.meter.core.MeterTerminal 1/4>,
          <music21.meter.core.MeterTerminal 1/4>]
+
+        One level down:
+
+        >>> b.getLevelList(1)
+        [<music21.meter.core.MeterTerminal 1/4>,
+         <music21.meter.core.MeterTerminal 1/8>,
+         <music21.meter.core.MeterTerminal 1/8>,
+         <music21.meter.core.MeterTerminal 1/4>,
+         <music21.meter.core.MeterTerminal 1/8>,
+         <music21.meter.core.MeterTerminal 1/8>]
+
+        Without flattening, first two levels:
+
+        >>> b.getLevelList(0, flat=False)
+        [<music21.meter.core.MeterTerminal 1/4>,
+         <music21.meter.core.MeterSequence {1/8+1/8}>,
+         <music21.meter.core.MeterTerminal 1/4>,
+         <music21.meter.core.MeterSequence {{1/16+1/16}+1/8}>]
+
+        (Note that levelList 0, flat=False is essentially the same as iterating
+        over a MeterSequence)
+
+        >>> list(b)
+        [<music21.meter.core.MeterTerminal 1/4>,
+         <music21.meter.core.MeterSequence {1/8+1/8}>,
+         <music21.meter.core.MeterTerminal 1/4>,
+         <music21.meter.core.MeterSequence {{1/16+1/16}+1/8}>]
+
+
+        >>> b.getLevelList(1, flat=False)
+        [<music21.meter.core.MeterTerminal 1/4>,
+         <music21.meter.core.MeterTerminal 1/8>,
+         <music21.meter.core.MeterTerminal 1/8>,
+         <music21.meter.core.MeterTerminal 1/4>,
+         <music21.meter.core.MeterSequence {1/16+1/16}>,
+         <music21.meter.core.MeterTerminal 1/8>]
+
+        Generally, these level lists will be converted back to MeterSequences:
+
         >>> meter.MeterSequence(b.getLevelList(0))
         <music21.meter.core.MeterSequence {1/4+1/4+1/4+1/4}>
         >>> meter.MeterSequence(b.getLevelList(1))
@@ -1559,36 +1636,71 @@ class MeterSequence(MeterTerminal):
         <music21.meter.core.MeterSequence {1/4+1/8+1/8+1/4+1/16+1/16+1/8}>
         >>> meter.MeterSequence(b.getLevelList(3))
         <music21.meter.core.MeterSequence {1/4+1/8+1/8+1/4+1/16+1/16+1/8}>
+
+        OMIT_FROM_DOCS
+
+        Test that cache is used and does not get manipulated
+
+        >>> b = meter.MeterSequence('3/4', 3)
+        >>> (0, True) in b._levelListCache
+        False
+        >>> o = b.getLevelList(0)
+
+        Mess with the list:
+
+        >>> o.append(meter.core.MeterTerminal('1/8'))
+        >>> o
+        [<music21.meter.core.MeterTerminal 1/4>,
+         <music21.meter.core.MeterTerminal 1/4>,
+         <music21.meter.core.MeterTerminal 1/4>,
+         <music21.meter.core.MeterTerminal 1/8>]
+
+        Cache is populated:
+
+        >>> (0, True) in b._levelListCache
+        True
+
+        But a new list is created.
+
+        >>> b.getLevelList(0)
+        [<music21.meter.core.MeterTerminal 1/4>,
+         <music21.meter.core.MeterTerminal 1/4>,
+         <music21.meter.core.MeterTerminal 1/4>]
+
+        >>> b.getLevelList(0)[0] is o[0]
+        True
         '''
         cacheKey = (levelCount, flat)
         try:  # check in cache
-            return self._levelListCache[cacheKey]
+            return list(tuple(self._levelListCache[cacheKey]))
         except KeyError:
             pass
 
         mtList: list[MeterTerminal] = []
         for i in range(len(self._partition)):
             # environLocal.printDebug(['getLevelList weight', i, self[i].weight])
-            if not isinstance(self._partition[i], MeterSequence):
-                mt = self[i]  # a meter terminal
+            partition_i: MeterTerminal|MeterSequence = self._partition[i]
+            if not isinstance(partition_i, MeterSequence):
+                mt = self[i]  # a MeterTerminal
                 mtList.append(mt)
-            else:  # it is a sequence
+            else:  # it is a MeterSequence
                 if levelCount > 0:  # retain this sequence but get lower level
                     # reduce level by 1 when recursing; do not
                     # change levelCount here
-                    mtList += self._partition[i].getLevelList(
+                    mtList += partition_i.getLevelList(
                         levelCount - 1, flat)
                 else:  # level count is at zero
                     if flat:  # make sequence into a terminal
                         mt = MeterTerminal('%s/%s' % (
-                            self._partition[i].numerator, self._partition[i].denominator))
+                            partition_i.numerator, partition_i.denominator))
                         # set weight to that of the sequence
-                        mt.weight = self._partition[i].weight
+                        mt.weight = partition_i.weight
                         mtList.append(mt)
                     else:  # it is not a terminal, it is a meter sequence
-                        mtList.append(self._partition[i])
-        # store in cache
-        self._levelListCache[cacheKey] = mtList
+                        mtList.append(partition_i)
+
+        # store in cache but let this be manipulated
+        self._levelListCache[cacheKey] = list(tuple(mtList))
         return mtList
 
     def getLevel(self, level=0, flat=True):

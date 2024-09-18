@@ -1476,7 +1476,8 @@ class TimeSignature(TimeSignatureBase):
                     beamType = 'partial-right'
 
             # if last in complete measure or not in a measure, always stop
-            elif isLast and (not srcStream.isMeasure or srcStream.paddingRight == 0.0):
+            elif (isLast and (not isinstance(srcStream, stream.Measure)
+                              or srcStream.paddingRight == 0.0)):
                 beamType = 'stop'
                 # get a partial beam if we cannot form a beam
                 if (beamPrevious is None
