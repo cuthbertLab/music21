@@ -276,7 +276,7 @@ class State:
     autoExpires: typing.Literal[False]|int = False
 
     def __init__(self, parent: Converter|None = None, stateInfo: str|None = None):
-        self.affectedTokens = []
+        self.affectedTokens: list[Music21Object] = []
         self.parent: Converter|None = parent
         self.stateInfo: str|None = stateInfo
         # print('Adding state', self, parent.activeStates)
