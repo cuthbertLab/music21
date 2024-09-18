@@ -786,7 +786,7 @@ class Verticality(prebase.ProtoM21Object):
                 nNew.pitch = n.pitch
 
             if nNew.stemDirection != 'noStem':
-                nNew.stemDirection = None
+                nNew.stemDirection = 'unspecified'
             if not addTies:
                 return nNew
 

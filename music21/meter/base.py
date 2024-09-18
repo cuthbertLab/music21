@@ -265,7 +265,6 @@ class TimeSignatureBase(base.Music21Object):
     pass
 
 class TimeSignature(TimeSignatureBase):
-    # noinspection GrazieInspection
     r'''
     The `TimeSignature` object represents time signatures in musical scores
     (4/4, 3/8, 2/4+5/16, Cut, etc.).

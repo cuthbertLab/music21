@@ -680,32 +680,9 @@ class GeneralNote(base.Music21Object):
     def tie(self, value: tie.Tie|None):
         self._tie = value
 
-    def _getLyric(self) -> str|None:
-        if not self.lyrics:
-            return None
-
-        allText = [ly.text for ly in self.lyrics]
-        return '\n'.join([textStr for textStr in allText if textStr is not None])
-
-    def _setLyric(self, value: str|Lyric|None) -> None:
-        self.lyrics = []
-        if value is None:
-            return
-
-        if isinstance(value, Lyric):
-            self.lyrics.append(value)
-            return
-
-        if not isinstance(value, str):
-            value = str(value)
-
-        values = value.split('\n')
-        for i, v in enumerate(values):
-            self.lyrics.append(Lyric(v, number=i + 1))
-
-    lyric = property(_getLyric,
-                     _setLyric,
-                     doc=r'''
+    @property
+    def lyric(self) -> str|None:
+        r'''
         The lyric property can
         be used to get and set a lyric for this
         Note, Chord, or Rest. This is a simplified version of the more general
@@ -749,7 +726,30 @@ class GeneralNote(base.Music21Object):
 
         * Changed in v6.7: added setting to a Lyric object.  Removed undocumented
           setting to False instead of setting to None
-        ''')
+        '''
+        if not self.lyrics:
+            return None
+
+        allText = [ly.text for ly in self.lyrics]
+        return '\n'.join([textStr for textStr in allText if textStr is not None])
+
+    @lyric.setter
+    def lyric(self, value: str|Lyric|None) -> None:
+        self.lyrics = []
+        if value is None:
+            return
+
+        if isinstance(value, Lyric):
+            self.lyrics.append(value)
+            return
+
+        if not isinstance(value, str):
+            value = str(value)
+
+        values = value.split('\n')
+        for i, v in enumerate(values):
+            self.lyrics.append(Lyric(v, number=i + 1))
+
 
     def addLyric(self,
                  text,
@@ -1076,21 +1076,10 @@ class NotRest(GeneralNote):
         # environLocal.printDebug(['calling NotRest.__deepcopy__', self])
         return self._deepcopySubclassable(memo=memo)
 
-    def _getStemDirection(self) -> str:
-        return self._stemDirection
 
-    def _setStemDirection(self, direction):
-        if direction is None:
-            direction = 'unspecified'  # allow setting to None meaning
-        elif direction == 'none':
-            direction = 'noStem'  # allow setting to none or None
-        elif direction not in stemDirectionNames:
-            raise NotRestException(f'not a valid stem direction name: {direction}')
-        self._stemDirection = direction
-
-    stemDirection = property(_getStemDirection,
-                             _setStemDirection,
-                             doc='''
+    @property
+    def stemDirection(self) -> str:
+        r'''
         Get or set the stem direction of this NotRest object.
         Valid stem direction names are found in note.stemDirectionNames (see below).
 
@@ -1124,7 +1113,18 @@ class NotRest(GeneralNote):
         >>> n.stemDirection = None
         >>> n.stemDirection
         'unspecified'
-        ''')
+        '''
+        return self._stemDirection
+
+    @stemDirection.setter
+    def stemDirection(self, direction: None|str):
+        if direction is None:
+            direction = 'unspecified'  # allow setting to None meaning
+        elif direction == 'none':
+            direction = 'noStem'  # allow setting to none or None
+        elif direction not in stemDirectionNames:
+            raise NotRestException(f'not a valid stem direction name: {direction}')
+        self._stemDirection = direction
 
     @property
     def notehead(self) -> str:
@@ -1617,31 +1617,29 @@ class Note(NotRest):
     # --------------------------------------------------------------------------
     # property access
 
-    def _getName(self) -> str:
-        return self.pitch.name
-
-    def _setName(self, value: str):
-        self.pitch.name = value
-
-    name = property(_getName,
-                    _setName,
-                    doc='''
+    @property
+    def name(self) -> str:
+        '''
         Return or set the pitch name from the :class:`~music21.pitch.Pitch` object.
         See `Pitch`'s attribute :attr:`~music21.pitch.Pitch.name`.
-        ''')
+        '''
+        return self.pitch.name
 
-    def _getNameWithOctave(self) -> str:
-        return self.pitch.nameWithOctave
+    @name.setter
+    def name(self, value: str):
+        self.pitch.name = value
 
-    def _setNameWithOctave(self, value: str):
-        self.pitch.nameWithOctave = value
-
-    nameWithOctave = property(_getNameWithOctave,
-                              _setNameWithOctave,
-                              doc='''
+    @property
+    def nameWithOctave(self) -> str:
+        '''
         Return or set the pitch name with octave from the :class:`~music21.pitch.Pitch` object.
         See `Pitch`'s attribute :attr:`~music21.pitch.Pitch.nameWithOctave`.
-        ''')
+        '''
+        return self.pitch.nameWithOctave
+
+    @nameWithOctave.setter
+    def nameWithOctave(self, value: str):
+        self.pitch.nameWithOctave = value
 
     @property
     def step(self) -> StepName:
@@ -1655,18 +1653,17 @@ class Note(NotRest):
     def step(self, value: StepName):
         self.pitch.step = value
 
-    def _getOctave(self) -> int|None:
-        return self.pitch.octave
-
-    def _setOctave(self, value: int|None):
-        self.pitch.octave = value
-
-    octave = property(_getOctave,
-                      _setOctave,
-                      doc='''
+    @property
+    def octave(self) -> int|None:
+        '''
         Return or set the octave value from the :class:`~music21.pitch.Pitch` object.
         See :attr:`~music21.pitch.Pitch.octave`.
-        ''')
+        '''
+        return self.pitch.octave
+
+    @octave.setter
+    def octave(self, value: int|None):
+        self.pitch.octave = value
 
     @property
     def pitches(self) -> tuple[Pitch, ...]:
