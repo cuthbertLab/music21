@@ -2800,6 +2800,9 @@ class PartExporter(XMLExporterBase):
         '''
         Runs makeNotation on a flatStream, such as one lacking measures.
         '''
+        # Do this before makeNotation so that measures are filled correctly
+        self.stream = self.stream.splitAtDurations(recurse=True)[0]
+
         part = self.stream
         part.makeMutable()  # must mutate
         # try to add measures if none defined
@@ -2807,8 +2810,9 @@ class PartExporter(XMLExporterBase):
         part.makeNotation(meterStream=self.meterStream,
                           refStreamOrTimeRange=self.refStreamOrTimeRange,
                           inPlace=True)
-        # environLocal.printDebug(['fixupNotationFlat: post makeNotation, length',
-        #                    len(measureStream)])
+
+        # Do this again, since makeNotation() might create complex rests
+        self.stream = self.stream.splitAtDurations(recurse=True)[0]
 
         # after calling measuresStream, need to update Spanners, as a deepcopy
         # has been made
@@ -2835,6 +2839,9 @@ class PartExporter(XMLExporterBase):
 
         * Changed in v7: no longer accepts `measureStream` argument.
         '''
+        # Split complex durations in place (fast if none found)
+        self.stream = self.stream.splitAtDurations(recurse=True)[0]
+
         part = self.stream
         measures = part.getElementsByClass(stream.Measure)
         first_measure = measures.first()
@@ -2871,9 +2878,9 @@ class PartExporter(XMLExporterBase):
                 # incorrectly flagging MusicXMLWarning as not a Warning
                 # noinspection PyTypeChecker
                 warnings.warn(MusicXMLWarning, str(se))
-        if not part.streamStatus.tuplets:
-            for m in measures:
-                for m_or_v in [m, *m.voices]:
+        for m in measures:
+            for m_or_v in [m, *m.voices]:
+                if not m_or_v.streamStatus.tuplets:
                     stream.makeNotation.makeTupletBrackets(m_or_v, inPlace=True)
 
         if not self.spannerBundle:

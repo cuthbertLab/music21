@@ -600,6 +600,16 @@ class Test(unittest.TestCase):
         mxDirection = tree.find('part/measure/direction')
         self.assertEqual(mxDirection.get('placement'), 'above')
 
+    def testTupletBracketsMadeOnComponents(self):
+        s = stream.Stream()
+        s.insert(0, note.Note(quarterLength=(5 / 6)))
+        # Use GEX to go through wellformed object conversion
+        gex = GeneralObjectExporter(s)
+        tree = et_fromstring(gex.parse().decode('utf-8'))
+        # 3 sixteenth-triplets + 2 sixteenth-triplets
+        # tuplet start, tuplet stop, tuplet start, tuplet stop
+        self.assertEqual(len(tree.findall('.//tuplet')), 4)
+
     def testFullMeasureRest(self):
         s = converter.parse('tinynotation: 9/8 r1')
         r = s[note.Rest].first()
