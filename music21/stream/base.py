@@ -3221,7 +3221,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
                              retainOrigin=True,
                              addTies=True,
                              displayTiedAccidentals=False,
-                             searchContext=True):
+                             searchContext=True) -> base._SplitTuple:
         '''
         This method overrides the method on Music21Object to provide
         similar functionality for Streams.
@@ -3259,7 +3259,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
                 sRight.clef = copy.deepcopy(endClef)
 
         if quarterLength > sLeft.highestTime:  # nothing to do
-            return sLeft, sRight
+            return base._SplitTuple([sLeft, sRight])
 
         # use quarterLength as start time
         targets = sLeft.getElementsByOffset(
@@ -3303,7 +3303,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
             sRight.insert(target.getOffsetBySite(sLeft) - quarterLength, target)
             sLeft.remove(target)
 
-        return sLeft, sRight
+        return base._SplitTuple([sLeft, sRight])
 
     # --------------------------------------------------------------------------
     def recurseRepr(self,
