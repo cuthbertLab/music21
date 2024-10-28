@@ -12,6 +12,8 @@
 from __future__ import annotations
 
 # this requires pylint to be installed and available from the command line
+# Anything changed here also needs to be changed at .pylintrc
+
 import argparse
 import os
 
