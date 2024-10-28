@@ -3230,6 +3230,8 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
 
         * Changed in v7: all but quarterLength are keyword only
         '''
+        keySignatures: list[key.KeySignature] = []
+
         quarterLength = opFrac(quarterLength)
         if retainOrigin:
             sLeft = self
@@ -3247,11 +3249,12 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
             if timeSignatures:
                 sRight.keySignature = copy.deepcopy(timeSignatures[0])
             if searchContext:
-                keySignatures = sLeft.getContextByClass(key.KeySignature)
-                if keySignatures is not None:
-                    keySignatures = [keySignatures]
+                ksContext = sLeft.getContextByClass(key.KeySignature)
+                if ksContext is not None:
+                    keySignatures = [ksContext]
             else:
-                keySignatures = sLeft.getElementsByClass(key.KeySignature)
+                keySignatures = list(sLeft.getElementsByClass(key.KeySignature))
+
             if keySignatures:
                 sRight.keySignature = copy.deepcopy(keySignatures[0])
             endClef = sLeft.getContextByClass(clef.Clef)

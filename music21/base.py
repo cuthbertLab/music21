@@ -188,7 +188,7 @@ class _SplitTuple(tuple):
         # noinspection PyTypeChecker
         return super(_SplitTuple, cls).__new__(cls, tuple(tupEls))
 
-    def __init__(self, tupEls):
+    def __init__(self, tupEls: t.Any) -> None:
         self.spannerList: list[spanner.Spanner] = []
 
     def __eq__(self, other):
