@@ -76,7 +76,7 @@ class SiteRef(common.SlottedObjectMixin, prebase.ProtoM21Object):
     >>> s.site
     <music21.stream.Stream hi>
     >>> s.siteWeakref
-    <weakref at 0x123456; to 'Stream' at 0x111111>
+    <weakref at 0x123456; to ...Stream' at 0x111111>
 
 
     If you turn sites.WEAKREF_ACTIVE to False then .siteWeakref just stores another reference to

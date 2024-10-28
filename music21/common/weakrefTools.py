@@ -31,10 +31,10 @@ def wrapWeakref(referent: _T) -> weakref.ReferenceType|_T:
     >>> a1 = Mock()
     >>> ref1 = common.wrapWeakref(a1)
     >>> ref1
-    <weakref at 0x101f29ae8; to 'Mock' at 0x101e45358>
+    <weakref at 0x101f29ae8; to ...Mock' at 0x101e45358>
     >>> ref2 = common.wrapWeakref(ref1)
     >>> ref2
-    <weakref at 0x101f299af; to 'Mock' at 0x101e45358>
+    <weakref at 0x101f299af; to ...Mock' at 0x101e45358>
     >>> ref3 = common.wrapWeakref(5)
     >>> ref3
     5
