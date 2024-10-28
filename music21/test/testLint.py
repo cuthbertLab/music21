@@ -12,6 +12,8 @@
 from __future__ import annotations
 
 # this requires pylint to be installed and available from the command line
+# Anything changed here also needs to be changed at .pylintrc
+
 import argparse
 import os
 
@@ -48,7 +50,7 @@ except ImportError:
 
 def main(fnAccept=None, strict=False):
     '''
-    `fnAccept` is a list of one or more files to test.  Otherwise runs all.
+    `fnAccept` is a list of one or more files to test.  Otherwise, runs all.
     '''
     poolSize = common.cpus()
 
@@ -75,6 +77,7 @@ def main(fnAccept=None, strict=False):
         'too-many-lines',    # yes, someday.
         'too-many-return-statements',  # we'll see
         'too-many-instance-attributes',  # maybe later
+        'too-many-positional-arguments',  # let's get this at least to max 6.
         'inconsistent-return-statements',  # would be nice
         'protected-access',  # this is an important one, but for now we do a lot of
         # x = copy.deepcopy(self); x._volume = ... which is not a problem...

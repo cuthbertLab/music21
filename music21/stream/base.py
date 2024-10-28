@@ -3221,7 +3221,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
                              retainOrigin=True,
                              addTies=True,
                              displayTiedAccidentals=False,
-                             searchContext=True):
+                             searchContext=True) -> base._SplitTuple:
         '''
         This method overrides the method on Music21Object to provide
         similar functionality for Streams.
@@ -3230,6 +3230,8 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
 
         * Changed in v7: all but quarterLength are keyword only
         '''
+        keySignatures: list[key.KeySignature] = []
+
         quarterLength = opFrac(quarterLength)
         if retainOrigin:
             sLeft = self
@@ -3247,11 +3249,12 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
             if timeSignatures:
                 sRight.keySignature = copy.deepcopy(timeSignatures[0])
             if searchContext:
-                keySignatures = sLeft.getContextByClass(key.KeySignature)
-                if keySignatures is not None:
-                    keySignatures = [keySignatures]
+                ksContext = sLeft.getContextByClass(key.KeySignature)
+                if ksContext is not None:
+                    keySignatures = [ksContext]
             else:
-                keySignatures = sLeft.getElementsByClass(key.KeySignature)
+                keySignatures = list(sLeft.getElementsByClass(key.KeySignature))
+
             if keySignatures:
                 sRight.keySignature = copy.deepcopy(keySignatures[0])
             endClef = sLeft.getContextByClass(clef.Clef)
@@ -3259,7 +3262,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
                 sRight.clef = copy.deepcopy(endClef)
 
         if quarterLength > sLeft.highestTime:  # nothing to do
-            return sLeft, sRight
+            return base._SplitTuple([sLeft, sRight])
 
         # use quarterLength as start time
         targets = sLeft.getElementsByOffset(
@@ -3303,7 +3306,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
             sRight.insert(target.getOffsetBySite(sLeft) - quarterLength, target)
             sLeft.remove(target)
 
-        return sLeft, sRight
+        return base._SplitTuple([sLeft, sRight])
 
     # --------------------------------------------------------------------------
     def recurseRepr(self,

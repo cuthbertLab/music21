@@ -54,6 +54,8 @@ from music21 import text
 from music21 import tie
 from music21 import variant
 
+from music21.base import Music21Exception, _SplitTuple
+
 from music21.musicxml import m21ToXml
 
 from music21.midi import translate as midiTranslate
@@ -7963,6 +7965,37 @@ class Test(unittest.TestCase):
                 str(sRight.parts[i].getElementsByClass(Measure)[0].keySignature))
         # sLeft.show()
         # sRight.show()
+
+    def testSplitByQuarterLengths(self):
+        '''
+        Was not returning splitTuples before
+        '''
+        m = Measure([
+            note.Note(quarterLength=8.0)
+        ])
+
+        with self.assertRaisesRegex(Music21Exception,
+                                    'cannot split by quarter length list whose sum is not equal'):
+            m.splitByQuarterLengths([1.0, 2.0])
+
+        parts = m.splitByQuarterLengths([1.0, 2.0, 5.0])
+        self.assertIsInstance(parts, _SplitTuple)
+        self.assertEqual(len(parts), 3)
+        self.assertIsInstance(parts[0], Measure)
+        self.assertEqual(parts[0].quarterLength, 1.0)
+        self.assertEqual(len(parts[0]), 1)
+        self.assertEqual(parts[0][0].quarterLength, 1.0)
+
+        self.assertEqual(parts[1].quarterLength, 2.0)
+        self.assertEqual(len(parts[1]), 1)
+        self.assertEqual(parts[1][0].quarterLength, 2.0)
+
+        self.assertEqual(parts[2].quarterLength, 5.0)
+        self.assertEqual(len(parts[2]), 1)
+        self.assertEqual(parts[2][0].quarterLength, 5.0)
+        self.assertEqual(parts[2][0].duration.type, 'complex')
+
+
 
     def testGracesInStream(self):
         '''

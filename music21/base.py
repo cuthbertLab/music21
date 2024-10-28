@@ -148,11 +148,11 @@ class ContextSortTuple(t.NamedTuple):
 class _SplitTuple(tuple):
     '''
     >>> st = base._SplitTuple([1, 2])
-    >>> st.spannerList = [3]
+    >>> st.spannerList = [expressions.Trill()]
     >>> st
     (1, 2)
     >>> st.spannerList
-    [3]
+    [<music21.expressions.Trill>]
     >>> a, b = st
     >>> a
     1
@@ -160,13 +160,48 @@ class _SplitTuple(tuple):
     2
     >>> st.__class__
     <class 'music21.base._SplitTuple'>
+
+    OMIT_FROM_DOCS
+
+    Might have been a mistake to make an implicit return make sure that
+    normal tuple comparisons work, but that things do not hash the same.
+
+    st2 has the same (1, 2) value as st1 but no spanners
+
+    >>> st2 = base._SplitTuple([1, 2])
+    >>> st == st2
+    False
+    >>> c = set()
+    >>> c.add(st)
+    >>> st2 in c
+    False
+
+    >>> st3 = base._SplitTuple([1, 2])
+    >>> st2 == st3
+    True
+
+    >>> st_big = base._SplitTuple([1, 3])
+    >>> st2 < st_big
+    True
     '''
     def __new__(cls, tupEls):
         # noinspection PyTypeChecker
         return super(_SplitTuple, cls).__new__(cls, tuple(tupEls))
 
-    def __init__(self, tupEls):
-        self.spannerList = []
+    def __init__(self, tupEls: t.Any) -> None:
+        self.spannerList: list[spanner.Spanner] = []
+
+    def __eq__(self, other):
+        if not isinstance(other, _SplitTuple):
+            return False
+        if self.spannerList != other.spannerList:
+            return False
+        return super().__eq__(other)
+
+    def __hash__(self):
+        h1 = super().__hash__()
+        h2 = id(self.spannerList)
+        return hash((h1, h2))
 
 # -----------------------------------------------------------------------------
 # make subclass of set once that is defined properly
@@ -1368,7 +1403,8 @@ class Music21Object(prebase.ProtoM21Object):
         context for b would be much harder to get without this method, since in
         order to do it, it searches backwards within the measure, finds that
         there's nothing there.  It goes to the previous measure and searches
-        that one backwards until it gets the proper TimeSignature of 2/4:
+        inside that one from the end backwards until it gets the proper
+        TimeSignature of 2/4:
 
         >>> b.getContextByClass(meter.TimeSignature)
         <music21.meter.TimeSignature 2/4>
@@ -1388,7 +1424,7 @@ class Music21Object(prebase.ProtoM21Object):
         part.  This is all you need to know for most uses.  The rest of the
         docs are for advanced uses:
 
-        The method searches both Sites as well as associated objects to find a
+        The method searches Sites and also associated objects to find a
         matching class. Returns `None` if no match is found.
 
         A reference to the caller is required to find the offset of the object
@@ -3064,7 +3100,7 @@ class Music21Object(prebase.ProtoM21Object):
         Split an Element into two Elements at a provided
         `quarterLength` (offset) into the Element.
 
-        Returns a specialized tuple that also has
+        Returns a specialized tuple (_SplitTuple) that also has
         a .spannerList element which is a list of spanners
         that were created during the split, such as by splitting a trill
         note into more than one trill.
@@ -3108,7 +3144,6 @@ class Music21Object(prebase.ProtoM21Object):
 
         >>> st.spannerList
         [<music21.expressions.TrillExtension <music21.note.Note C#><music21.note.Note C#>>]
-
 
 
         Make sure that ties and accidentals remain as they should be:
@@ -3172,6 +3207,9 @@ class Music21Object(prebase.ProtoM21Object):
         '''
         from music21 import chord
         from music21 import note
+
+        st: _SplitTuple
+
         quarterLength = opFrac(quarterLength)
 
         if quarterLength > self.duration.quarterLength:
@@ -3317,10 +3355,14 @@ class Music21Object(prebase.ProtoM21Object):
         displayTiedAccidentals=False
     ) -> _SplitTuple:
         '''
-        Given a list of quarter lengths, return a list of
+        Given a list of quarter lengths, return a "SplitTuple" of
         Music21Object objects, copied from this Music21Object,
         that are partitioned and tied with the specified quarter
         length list durations.
+
+        THe SplitTuple will also have a .spannerList which
+        contains a list of spanner created during the split, such as by splitting a trill
+        note into more than one trill.
 
         TODO: unite into a "split" function -- document obscure uses.
 
@@ -3341,13 +3383,15 @@ class Music21Object(prebase.ProtoM21Object):
         if len(quarterLengthList) == 1:
             # return a copy of self in a list
             return _SplitTuple([copy.deepcopy(self)])
-        elif len(quarterLengthList) <= 1:
+        elif not quarterLengthList:
             raise Music21ObjectException(
                 f'cannot split by this quarter length list: {quarterLengthList}.')
 
-        eList = []
+        eList: list[Music21Object] = []
         spannerList = []  # this does not fully work with trills over multiple splits yet.
         eRemain = copy.deepcopy(self)
+
+        st: _SplitTuple
         for qlSplit in quarterLengthList[:-1]:
             st = eRemain.splitAtQuarterLength(qlSplit,
                                               addTies=addTies,
