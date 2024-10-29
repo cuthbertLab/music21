@@ -593,7 +593,7 @@ class ChordReducer:
         if currentGreedyChord is not None:
             currentGreedyChord.quarterLength = currentGreedyChordNewLength
             currentGreedyChordNewLength = 0.0
-        # even chord lengths...
+        # even chord lengths
         for i in range(1, len(measureObject)):
             c = measureObject[i]
             cOffsetCurrent = c.offset

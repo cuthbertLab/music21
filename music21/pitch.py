@@ -1015,7 +1015,7 @@ class Accidental(prebase.ProtoM21Object, style.StyleMixin):
         self._name = ''
         self._modifier = ''
         self._alter = 0.0     # semitones to alter step
-        # potentially can be a fraction... but not exponent...
+        # potentially can be a fraction, but not exponent
         self.set(specifier)
 
     # SPECIAL METHODS #
@@ -1941,7 +1941,7 @@ class Pitch(prebase.ProtoM21Object):
         # # CA, Q: should this remain an attribute or only refer to value in defaults?
         # # MSC A: no, it's a useful attribute for cases such as scales where if there are
         # #        no octaves we give a defaultOctave higher than the previous
-        # #        MSC 12 years later: maybe Chris was right...
+        # #        MSC 12 years later: maybe Chris was right!
         # self.defaultOctave: int = defaults.pitchOctave
         # # MSC: even later: Chris Ariza was right
         self._octave: int|None = None
@@ -2701,7 +2701,7 @@ class Pitch(prebase.ProtoM21Object):
         >>> a.spellingIsInferred
         True
 
-        More absurd octaves...
+        More absurd octaves:
 
         >>> p = pitch.Pitch('c~4')
         >>> p.octave = -1
@@ -2821,7 +2821,7 @@ class Pitch(prebase.ProtoM21Object):
         else:
             raise PitchException(f'Cannot make a name out of {usrStr!r}')
 
-        if octFoundStr:  # bool('0') == True, so okay...
+        if octFoundStr:  # bool('0') == True, so okay
             octave = int(octFoundStr)
             self.octave = octave
 
@@ -3024,7 +3024,7 @@ class Pitch(prebase.ProtoM21Object):
     def pitchClass(self) -> int:
         '''
         Returns or sets the integer value for the pitch, 0-11, where C=0,
-        C#=1, D=2...B=11. Can be set using integers (0-11) or 'A' or 'B'
+        C#=1, D=2, etc. to B=11. Can be set using integers (0-11) or 'A' or 'B'
         for 10 or 11.
 
         >>> a = pitch.Pitch('a3')
@@ -3242,7 +3242,7 @@ class Pitch(prebase.ProtoM21Object):
         >>> p1.german
         Traceback (most recent call last):
         music21.pitch.PitchException:
-            Es geht nicht "german" zu benutzen mit Microt...nen.  Schade!
+            Es geht nicht "german" zu benutzen mit Microtönen.  Schade!
 
         Note these rarely used pitches:
 
@@ -3273,7 +3273,7 @@ class Pitch(prebase.ProtoM21Object):
         else:  # flats
             if tempStep in ('C', 'D', 'F', 'G', 'H'):
                 firstFlatName = 'es'
-            else:  # A, E.  Bs should never occur...
+            else:  # A, E.  Bs should never occur
                 firstFlatName = 's'
             multipleFlats = abs(tempAlter) - 1
             tempName = tempStep + firstFlatName + (multipleFlats * 'es')
@@ -4012,7 +4012,7 @@ class Pitch(prebase.ProtoM21Object):
             # if pitch spaces are equal, these are enharmonics
             return other.ps == self.ps
 
-    # a cache so that interval objects can be reused...
+    # a cache so that interval objects can be reused
     _transpositionIntervals: dict[t.Literal['d2', '-d2'], interval.Interval] = {}
 
     @overload
@@ -4113,7 +4113,7 @@ class Pitch(prebase.ProtoM21Object):
         >>> print(pHalfSharp)
         E-4(-50c)
         '''
-        # sigh...mypy
+        # sigh: mypy
         if inPlace:
             self._getEnharmonicHelper(inPlace=True, up=True)
             return None
@@ -4155,7 +4155,7 @@ class Pitch(prebase.ProtoM21Object):
         >>> print(p1)
         B##2
         '''
-        # sigh...mypy
+        # sigh: mypy
         if inPlace:
             self._getEnharmonicHelper(inPlace=True, up=False)
             return None
@@ -4390,7 +4390,7 @@ class Pitch(prebase.ProtoM21Object):
         post: list[PitchType] = []
         c = self.simplifyEnharmonic(inPlace=False)
         if c is None:  # pragma: no follow
-            return post  # not going to happen...
+            return post  # not going to happen
 
         if c.name != self.name:
             post.append(c)
@@ -4706,7 +4706,7 @@ class Pitch(prebase.ProtoM21Object):
         <music21.pitch.Pitch G#1>
 
 
-        This does nothing because it is already low enough...
+        This does nothing because it is already low enough:
 
         >>> pitch.Pitch('g#2').transposeBelowTarget(pitch.Pitch('f#8'))
         <music21.pitch.Pitch G#2>
@@ -5060,7 +5060,7 @@ class Pitch(prebase.ProtoM21Object):
             set_displayStatus(True)
             return
 
-        # no pitches in the past list...
+        # no pitches in the past list
         if not pitchPastAll:
             # if we have no past, we show the accidental if this pitch name
             # is not in the alteredPitches list, or for naturals: if the
@@ -5099,7 +5099,7 @@ class Pitch(prebase.ProtoM21Object):
                     return
                 else:  # names are the same, skip this line of questioning
                     break
-        # nope, no conflicting accidentals at this name and octave in the past...
+        # nope, no conflicting accidentals at this name and octave in the past
 
         # here tied and always are treated the same; we assume that
         # making ties sets the displayStatus, and thus we would not be
@@ -5157,7 +5157,7 @@ class Pitch(prebase.ProtoM21Object):
                     # of enormous measure of all same, leading to O(n^2) operation
                     # but fine for the size of n we see.
 
-                    # do we have a continuous stream of the same note leading up to this one...
+                    # do we have a continuous stream of the same note leading up to this one
                     if pitchPastAll[j].nameWithOctave != self.nameWithOctave:
                         continuousRepeatsInMeasure = False
                         break
@@ -5338,7 +5338,7 @@ class Pitch(prebase.ProtoM21Object):
                     setFromPitchPast = True
                     break
                 elif pPast.accidental.displayStatus is False:
-                    # in case of ties...
+                    # in case of ties
                     displayAccidentalIfNoPreviousAccidentals = True
                 else:
                     if not self._nameInKeySignature(alteredPitches):

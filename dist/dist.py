@@ -6,7 +6,7 @@
 # Authors:      Christopher Ariza
 #               Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2010-2023 Michael Scott Asato Cuthbert
+# Copyright:    Copyright © 2010-2024 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
@@ -14,7 +14,7 @@ Builds various kinds of music21 distribution files and uploads them to PyPI and 
 
 To do a release,
 
-1. update the VERSION in _version.py and the single test cases in base.py.
+1. update the VERSION in _version.py and the single test case in base.py.
 2. run `corpus.corpora.CoreCorpus().cacheMetadata()`.
     for a major change that affects parsing run corpus.corpora.CoreCorpus().rebuildMetadataCache()
     (20 min on IntelMacbook Air) -- either of these MAY change a
@@ -57,7 +57,7 @@ so allocate time.  Start working on the announcement while it's running.
 
 15. PR and Commit to GitHub at this point w/ commit comment of the new version,
     then don't change anything until the next step is done.
-    (.gitignore will avoid uploading the large files created here...)
+    (.gitignore will avoid uploading the large files created here.)
 
 16. Switch back to master/main branch
 
@@ -71,7 +71,7 @@ so allocate time.  Start working on the announcement while it's running.
     Drag in this order: .tar.gz, -docs.zip, no-corpus.tar.gz
 
     Finish this before doing the next step, even though it looks like it could be done in parallel.
-    
+
 20. Upload the new file to PyPI with "twine upload music21-7.3.5a2.tar.gz", and same for the
     whl file (but NOT no corpus) [*]
 
@@ -87,7 +87,7 @@ so allocate time.  Start working on the announcement while it's running.
         username:your_username
         password:your_password
 
-21. Delete the two .tar.gz files and .whl file in dist...
+21. Delete the two .tar.gz files and .whl file in dist.
 
 22. For starting a new major release create a GitHub branch for the old one.
 

@@ -7,7 +7,7 @@
 #               Christopher Ariza
 #               Neena Parikh
 #
-# Copyright:    Copyright © 2009-2023 Michael Scott Asato Cuthbert
+# Copyright:    Copyright © 2009-2024 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
@@ -119,7 +119,7 @@ def realizeOrnaments(
                     break
 
         retList = []
-        # TODO: use extend...
+        # TODO: use extend instead of iteration
         for i in preExpandList:
             retList.append(i)
         if srcObject is not None:

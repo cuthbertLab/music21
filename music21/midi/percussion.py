@@ -103,7 +103,7 @@ class PercussionMapper:
         >>> cowbell
         <music21.instrument.Cowbell 'Cowbell'>
 
-        Or it can just take an integer (representing MIDI note) for the pitch instead...
+        Or it can just take an integer (representing MIDI note) for the pitch instead:
 
         >>> moreCowbell = pm.midiPitchToInstrument(56)
         >>> moreCowbell

@@ -138,7 +138,7 @@ def autocorrelationFunction(recordedSignal, recordSampleRateIn):
             + f'numpy installed (scipy recommended).  Missing {base._missingImport}')
     import numpy
     try:
-        with warnings.catch_warnings():  # scipy.signal gives ImportWarning...
+        with warnings.catch_warnings():  # scipy.signal gives ImportWarning
             warnings.simplefilter('ignore', ImportWarning)
             # numpy warns scipy that oldnumeric will be dropped soon.
             warnings.simplefilter('ignore', DeprecationWarning)
@@ -351,7 +351,7 @@ def getFrequenciesFromMicrophone(length=10.0, storeWaveFilename=None):
 
     Returns a list of frequencies detected.
 
-    TODO -- find a way to test... or at least demo
+    TODO -- find a way to test or at least demo
     '''
     if 'numpy' in base._missingImport:
         raise AudioSearchException(
@@ -436,7 +436,7 @@ def getFrequenciesFromPartialAudioFile(waveFilenameOrHandle='temp', length=10.0,
     >>> print(currentSample)  # should be near 44100, but probably not exact
     44032
 
-    Now read the next 1 second...
+    Now read the next 1 second:
 
     >>> fTup = audioSearch.getFrequenciesFromPartialAudioFile(pachelbelFileHandle, length=1.0,
     ...                                                       startSample=currentSample)
@@ -534,7 +534,7 @@ def smoothFrequencies(
     Smooths the shape of the signal in order to avoid false detections in the fundamental
     frequency.  Takes in a list of ints or floats.
 
-    The second pitch below is obviously too low.  It will be smoothed out...
+    The second pitch below is obviously too low.  It will be smoothed out:
 
     >>> inputPitches = [440, 220, 440, 440, 442, 443, 441, 470, 440, 441, 440,
     ...                 442, 440, 440, 440, 397, 440, 440, 440, 442, 443, 441,
@@ -971,11 +971,11 @@ def decisionProcess(
         countdown = countdown + 1
     elif dist > 20 and countdown == 0:
         countdown += 1
-        environLocal.printDebug(f'Excessive distance....? {dist=}')
+        environLocal.printDebug(f'Excessive distance? {dist=}')
 
     elif dist > 30 and countdown == 1:
         countdown += 1
-        environLocal.printDebug(f'Excessive distance....? {dist=}')
+        environLocal.printDebug(f'Excessive distance? {dist=}')
 
     elif ((firstNotePage is not None and lastNotePage is not None)
           and ((positionBeginningData < firstNotePage

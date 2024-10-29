@@ -299,7 +299,7 @@ class BrailleText(prebase.ProtoM21Object):
         Recenter each of the headings so that they exactly align
         with the text beneath them.
 
-        Demonstration with non braille text...
+        Demonstration with non braille text:
 
         >>> heading1 = 'hello'
         >>> body1 = 'anyoneHome?' + braille.lookup.symbols['space'] + 'yup!'

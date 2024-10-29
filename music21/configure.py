@@ -863,7 +863,7 @@ class SelectFromList(Dialog):
             return False
         else:  # must be True or False
             if post not in [True, False]:
-                # this should never happen...
+                # this should never happen
                 raise DialogException(
                     '_askFillEmptyList(): sub-command returned non True/False value')
             return post

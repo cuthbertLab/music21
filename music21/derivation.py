@@ -7,8 +7,7 @@
 #               Josiah Oberholtzer
 #               Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2011-2014 Michael Scott Asato Cuthbert and the music21
-#               Project
+# Copyright:    Copyright © 2011-2014 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ----------------------------------------------------------------------------
 '''
@@ -121,7 +120,7 @@ class Derivation(SlottedObjectMixin):
 
     Deleting the origin stream does not change the Derivation, since origin is held by strong ref:
 
-    >>> import gc  # Garbage collection...
+    >>> import gc  # Garbage collection
     >>> del s2
     >>> unused = gc.collect()  # ensure Garbage collection is run
     >>> d1

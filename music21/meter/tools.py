@@ -6,7 +6,7 @@
 # Authors:      Christopher Ariza
 #               Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2009-2023 Michael Scott Asato Cuthbert
+# Copyright:    Copyright © 2009-2024 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # -----------------------------------------------------------------------------
 from __future__ import annotations
@@ -159,7 +159,7 @@ def slashMixedToFraction(valueSrc: str) -> tuple[NumDenomTuple, bool]:
                     'Cannot parse this file -- this error often comes '
                     + 'up if the musicxml pickled file is out of date after a change '
                     + 'in musicxml/__init__.py . '
-                    + 'Clear your temp directory of .p and .p.gz files and try again...; '
+                    + 'Clear your temp directory of .p and .p.gz files and try again. '
                     + f'Time Signature: {valueSrc} ')
 
     post: list[NumDenom] = []
@@ -249,7 +249,7 @@ def fractionSum(numDenomTuple: NumDenomTuple) -> NumDenom:
     if len(dListUnique) == 1:
         n = sum(nList)
         d = dList[0]
-        # Does not reduce to lowest terms...
+        # Does not reduce to lowest terms
         return (n, d)
     else:  # there might be a better way to do this
         dRed = math.lcm(*dListUnique)

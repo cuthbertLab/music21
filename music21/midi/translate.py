@@ -545,7 +545,7 @@ def midiEventsToChord(
           (time_pitch2_off, pitch2_note_off_event)
           ),
 
-    ...etc...
+    (etc.)
 
     :func:`~music21.midi.translate.midiEventsToNote`.
 
@@ -2305,7 +2305,7 @@ def channelInstrumentData(
             else:
                 substreamList.append(obj)
     else:
-        # should not ever run if prepareStreamForMidi() was run...
+        # should not ever run if prepareStreamForMidi() was run
         substreamList.append(s)  # pragma: no cover
 
     # Music tracks

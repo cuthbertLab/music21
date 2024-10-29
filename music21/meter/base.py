@@ -6,7 +6,7 @@
 # Authors:      Christopher Ariza
 #               Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2009-2023 Michael Scott Asato Cuthbert
+# Copyright:    Copyright © 2009-2024 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # -----------------------------------------------------------------------------
 '''
@@ -644,7 +644,7 @@ class TimeSignature(TimeSignatureBase):
         >>> threeFour.ratioString
         '3/4'
 
-        It can also be set to load a new one, but '.load()' is better...
+        It can also be set to load a new one, but '.load()' is better:
 
         >>> threeFour.ratioString = '5/8'  # now this variable name is dumb!
         >>> threeFour.numerator
@@ -809,7 +809,7 @@ class TimeSignature(TimeSignatureBase):
     @property
     def beatLengthToQuarterLengthRatio(self) -> float:
         '''
-        Returns 4.0 / denominator... seems a bit silly...
+        Returns 4.0 / denominator.  Might seem a bit silly but used often.
 
         >>> a = meter.TimeSignature('3/2')
         >>> a.beatLengthToQuarterLengthRatio
@@ -820,7 +820,7 @@ class TimeSignature(TimeSignatureBase):
     @property
     def quarterLengthToBeatLengthRatio(self) -> float:
         '''
-        Returns denominator/4.0... seems a bit silly...
+        Returns denominator/4.0.
         '''
         return self.denominator / 4.0
 
@@ -1113,7 +1113,7 @@ class TimeSignature(TimeSignatureBase):
         post = []
         src = self.beatDivisionDurations
         for d in src:
-            # this is too slow... TODO: fix, but make sure all durations are unique.
+            # this is too slow. TODO: fix, but make sure all durations are unique.
             post.append(d.augmentOrDiminish(0.5))
             post.append(d.augmentOrDiminish(0.5))
         return post
@@ -1793,14 +1793,14 @@ class TimeSignature(TimeSignatureBase):
         >>> [ts1.getAccentWeight(x) for x in range(3)]
         [1.0, 0.5, 0.5]
 
-        Returns an error...
+        Calling getAccentWeight on durations beyond the score returns an error:
 
         >>> [ts1.getAccentWeight(x) for x in range(6)]
         Traceback (most recent call last):
         music21.exceptions21.MeterException: cannot access from qLenPos 3.0
             where total duration is 3.0
 
-        ...unless permitMeterModulus is employed
+        The error is removed if permitMeterModulus is employed:
 
         >>> [ts1.getAccentWeight(x, permitMeterModulus=True) for x in range(6)]
         [1.0, 0.5, 0.5, 1.0, 0.5, 0.5]
@@ -1834,8 +1834,8 @@ class TimeSignature(TimeSignatureBase):
 
         If you want a fractional number for the beat, see `getBeatProportion`.
 
-        TODO: In v7 -- getBeat will probably do what getBeatProportion does now...
-        but just with 1 added to it.
+        TODO: In a future version -- getBeat will probably do what getBeatProportion does now,
+            but just with 1 added to it.
 
         >>> a = meter.TimeSignature('3/4', 3)
         >>> a.getBeat(0)
@@ -2153,7 +2153,7 @@ class SenzaMisuraTimeSignature(TimeSignatureBase):
             return str(self.text)
 
 
-# TODO: Implement or delete...
+# TODO: Implement or delete
 # class NonPowerOfTwoTimeSignature(TimeSignature):
 #     pass
 # class AutoAdjustTimeSignature(TimeSignature):

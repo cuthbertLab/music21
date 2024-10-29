@@ -7,8 +7,7 @@
 # Authors:      Michael Scott Asato Cuthbert
 #               Christopher Ariza
 #
-# Copyright:    Copyright © 2011-2012 Michael Scott Asato Cuthbert and the music21
-#               Project
+# Copyright:    Copyright © 2011-2012 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # -----------------------------------------------------------------------------
 r'''
@@ -267,7 +266,7 @@ class StreamFreezer(StreamFreezeThawBase):
             streamObj = self.stream
             if streamObj is None:
                 raise FreezeThawException('You need to pass in a stream when creating to work')
-        # might not work when recurse yields...
+        # might not work when recurse yields
         allEls = list(streamObj.recurse(restoreActiveSites=False))
 
         if self.topLevel is True:
@@ -275,7 +274,7 @@ class StreamFreezer(StreamFreezeThawBase):
 
         for el in allEls:
             if isinstance(el, variant.Variant):
-                # works like a whole new hierarchy...  # no need for deepcopy
+                # works like a whole new hierarchy, so no need for deepcopy
                 subSF = StreamFreezer(
                     el._stream,
                     fastButUnsafe=True,
@@ -284,7 +283,7 @@ class StreamFreezer(StreamFreezeThawBase):
                 )
                 subSF.setupSerializationScaffold()
             elif isinstance(el, spanner.Spanner):
-                # works like a whole new hierarchy...  # no need for deepcopy
+                # works like a whole new hierarchy, so no need for deepcopy
                 subSF = StreamFreezer(
                     el.spannerStorage,
                     fastButUnsafe=True,
@@ -345,7 +344,7 @@ class StreamFreezer(StreamFreezeThawBase):
 
         >>> sf = freezeThaw.StreamFreezer()
 
-        This will remove n from s but leave the rest of the sites intact...
+        This will remove n from s but leave the rest of the sites intact:
 
         >>> sf.setupStoredElementOffsetTuples(s)
         >>> len(n.sites)
@@ -357,13 +356,13 @@ class StreamFreezer(StreamFreezeThawBase):
         >>> n.getOffsetBySite(s2)
         20.0
 
-        After recursiveClearSites n will be not know its location anywhere...
+        After recursiveClearSites n will be not know its location anywhere:
 
         >>> sf.recursiveClearSites(s)
         >>> len(n.sites)  # just the None site
         1
 
-        This leaves n and s2 in strange positions, because n is in s2.elements still....
+        This leaves n and s2 in strange positions, because n is in s2.elements still:
 
         >>> n in s2.elements
         True
@@ -561,7 +560,7 @@ class StreamFreezer(StreamFreezeThawBase):
         4
         >>> for streamElement in [s, m, m2, v._stream]:
         ...    if id(streamElement) not in allIds:
-        ...        print('this should not happen...', allIds, id(streamElement))
+        ...        print('this should not happen!', allIds, id(streamElement))
 
         N.B. with variants:
 
@@ -590,8 +589,8 @@ class StreamFreezer(StreamFreezeThawBase):
             for el in streamObj.recurse(includeSelf=True).getElementsByClass(variant.Variant):
                 streamIds += self.findActiveStreamIdsInHierarchy(el._stream)
 
-        # should not happen that there are duplicates, but possible with spanners...
-        # Python's uniq value...
+        # should not happen that there are duplicates, but possible with spanners
+        # Python's uniq value
         streamIds = list(set(streamIds))
 
         self.streamIds = streamIds
@@ -637,7 +636,7 @@ class StreamFreezer(StreamFreezeThawBase):
         No other compression types are currently supported.
         '''
         if zipType not in (None, 'zlib'):  # pragma: no cover
-            raise FreezeThawException('Cannot zip files except zlib...')
+            raise FreezeThawException('Cannot zip files except zlib type')
 
         fmt = self.parseWriteFmt(fmt)
 
@@ -775,7 +774,7 @@ class StreamThawer(StreamFreezeThawBase):
         for e in allEls:
             eClasses = e.classes
             if 'Variant' in eClasses:
-                # works like a whole new hierarchy...  # no need for deepcopy
+                # works like a whole new hierarchy, so no need for deepcopy
                 subSF = StreamThawer()
                 subSF.teardownSerializationScaffold(e._stream)
                 e._cache = {}
@@ -847,7 +846,7 @@ class StreamThawer(StreamFreezeThawBase):
                     try:
                         streamObj.coreInsert(offset, e)
                     except AttributeError:  # pragma: no cover
-                        print('Problem in decoding... some debug info...')
+                        print('Problem in decoding. Here is some debug info:')
                         print(offset, e)
                         print(streamObj)
                         print(streamObj.activeSite)
@@ -868,7 +867,7 @@ class StreamThawer(StreamFreezeThawBase):
         '''
         Restore the streamStatus client to point to the Stream
         (do we do this for derivations?  No: there should not be derivations stored.
-        Other objects?  Unclear...)
+        Other objects?  Unclear at present.)
         '''
         if hasattr(streamObj, 'streamStatus'):
             streamObj.streamStatus.client = streamObj
@@ -1014,7 +1013,7 @@ class Test(unittest.TestCase):
         self.assertIs(s.spanners[0].getFirst(), s.notes[0])
 
         sf = StreamFreezer(s)
-        out = sf.writeStr(fmt='jsonpickle')  # easier to read...
+        out = sf.writeStr(fmt='jsonpickle')  # easier to read
 
         del s
         del sDummy

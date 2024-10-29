@@ -99,7 +99,7 @@ def indent(elem, level=0):
         subElem = None
         for subElem in elem:
             indent(subElem, level + 1)
-        if subElem is not None:  # last el...
+        if subElem is not None:  # last el
             subElem.tail = i
 
         if not elem.tail or not elem.tail.strip():
@@ -325,7 +325,7 @@ def setM21AttributeFromAttribute(
     >>> pl.pageNumber
     4
 
-    More complex...
+    More complex:
 
     >>> convBool = musicxml.xmlObjects.yesNoToBoolean
     >>> setb(pl, e, 'new-page', 'isNew', transform=convBool)

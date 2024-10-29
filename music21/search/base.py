@@ -141,7 +141,7 @@ class StreamSearcher:
     Now let's configure the algorithms:
 
     >>> ss.algorithms
-    [<...StreamSearcher.wildcardAlgorithm...>]
+    [<function StreamSearcher.wildcardAlgorithm at 0x111b6e340>]
 
     Wildcard search is a default algorithm that lets you use wildcards.
     I suggest you leave it in place and add to the algorithms list.  We can add the
@@ -149,8 +149,8 @@ class StreamSearcher:
 
     >>> ss.algorithms.append(search.StreamSearcher.rhythmAlgorithm)
     >>> ss.algorithms
-    [<...StreamSearcher.wildcardAlgorithm...>,
-     <...StreamSearcher.rhythmAlgorithm...>]
+    [<function StreamSearcher.wildcardAlgorithm at 0x111b6e340>,
+     <function StreamSearcher.rhythmAlgorithm at 0x11200000>]
 
 
     Now run it:

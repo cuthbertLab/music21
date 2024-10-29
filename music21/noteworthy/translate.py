@@ -30,14 +30,14 @@ Module to translate Noteworthy Composer's NWCTXT format to music21.
 # |Ending|Endings:1
 # |Ending|Endings:2,D
 #
-# ...as expression
+# As expression
 # |TempoVariance|Style:Fermata|Pause:3|Pos:-4
 #
-# ...as spanner
+# As spanner
 # |TempoVariance|Style:Accelerando|Pos:-6
 #
 #
-# ...beams:
+# Beams:
 # |Note|Dur:8th|Pos:0|Opts:Stem=Down,Beam=First
 # |Note|Dur:8th|Pos:0|Opts:Stem=Down,Beam
 # |Note|Dur:8th|Pos:0|Opts:Stem=Down,Beam
@@ -357,7 +357,7 @@ class NoteworthyTranslator:
     def getOnePitchFromPosition(self, pos):
         # noinspection PyShadowingNames
         '''
-        get one pitch from a position...
+        Get one pitch from a position:
 
         >>> nwt = noteworthy.translate.NoteworthyTranslator()
         >>> nwt.currentClef = 'BASS'

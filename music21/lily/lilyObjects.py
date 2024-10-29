@@ -112,8 +112,8 @@ class LyObject(prebase.ProtoM21Object):
         Returns a dictionary and sets self.lilyAttributes to that dictionary, for a m21Object
         of class classLookup using the mapping of self.m21toLy[classLookup]
 
-
-        >>> class Mock(base.Music21Object): pass
+        >>> class Mock(base.Music21Object):
+        ...     pass
         >>> m = Mock()
         >>> m.mockAttribute = 32
         >>> m.mockAttribute2 = None
@@ -260,11 +260,11 @@ class LyObject(prebase.ProtoM21Object):
         stringNew = stringIn.replace('"', r'\"')
         return '"' + stringNew + '" '
 
-    def comment(self, stringIn):
+    def comment(self, stringIn: str) -> str:
         r'''
         returns a comment that is %{ stringIn.strip() %}
 
-        Don't put %} etc. in comments.  That's just rude...
+        (Don't put %} etc. in comments -- it will break the system.)
         '''
         return ' %{ ' + stringIn.strip() + ' %} '
 
@@ -725,12 +725,11 @@ class LyScoreBlock(LyObject):
 
 class LyScoreBody(LyObject):
     r'''
-    represents the contents of a \score { ...contents... }
+    represents the contents of a \score { contents }
     block
 
     can take one of the following attributes:
     music, scoreIdentifier, scoreBody, lilypondHeader, outputDef, error
-
 
     >>> lsb = lily.lilyObjects.LyScoreBody(scoreIdentifier='score')
     >>> str(lsb)
@@ -793,7 +792,7 @@ class LyLayout(LyObject):
 
 class LyOutputDef(LyObject):
     r'''
-    This is an ugly grammar, since it does not close the curly bracket...
+    This is an ugly grammar, since it does not close the curly bracket.
     '''
 
     def __init__(self, outputDefBody=None):
@@ -1099,7 +1098,7 @@ class LyContextModification(LyObject):
         super().__init__()
         self.contextModList = contextModList
         self.contextModIdentifier = contextModIdentifier  # String?
-        self.displayWith = displayWith  # optional... but not supported without so far...
+        self.displayWith = displayWith  # optional, but not supported without so far
 
     def stringOutput(self):
         if self.contextModList is not None:
@@ -1425,7 +1424,7 @@ class LyReRhythmedMusic(LyObject):
         else:
             outputString = c + ' '
         outputString += self.newLyrics.stringOutput()
-        return outputString  # previously this did not return...
+        return outputString  # previously this did not return
 
 
 class LyContextChange(LyObject):
@@ -2135,7 +2134,7 @@ class LyMarkupBracedListBody(LyObject):
             c += str(m) + ' '
         return c
 
-# skip markup_command_list and arguments for now...
+# skip markup_command_list and arguments for now
 # skip markup_head_1_item
 # skip markup_head_1_list
 

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 '''
-The music21 Framework is Copyright © 2006-2023 Michael Scott Asato Cuthbert.
+The music21 Framework is Copyright © 2006-2024 Michael Scott Asato Cuthbert.
 
 Some Rights Reserved
 Released under the BSD (3-clause) license.  See license.txt.
@@ -83,7 +83,7 @@ __all__ = [
     'mainTest',
 
     'prebase',  # before all
-    'base',  # top...
+    'base',  # top
     'sites',  # important
 
     # sub folders

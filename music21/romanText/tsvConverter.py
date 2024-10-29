@@ -735,7 +735,7 @@ class TsvHandler:
                     currentMeasureLength = newTS.barDuration.quarterLength
 
                 previousMeasure = entry.measure
-            if repeatBracket is not None and m is not None:  # m should always be not None...
+            if repeatBracket is not None and m is not None:  # m should always be not None
                 repeatBracket.addSpannedElements(m)
 
         s.append(p)

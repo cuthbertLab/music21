@@ -5,7 +5,7 @@
 # Authors:      Moritz Heffter
 #               Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2011-2023 Michael Scott Asato Cuthbert
+# Copyright:    Copyright © 2011-2024 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''

@@ -17673,7 +17673,7 @@ octaveShifts33d = '''<?xml version="1.0" encoding="UTF-8"?>
 </score-partwise>
 '''
 
-# Copyright string in the Creator name...
+# Copyright string in the Creator name
 # noinspection SpellCheckingInspection
 unicodeStrWithNonAscii = '''<?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE score-partwise

@@ -218,13 +218,13 @@ class Volume(prebase.ProtoM21Object, SlottedObjectMixin):
         >>> s.notes[7].volume.getRealized()
         0.99212...
 
-        velocity, if set, will be scaled by dynamics
+        velocity, if set, will be scaled by dynamics:
 
         >>> s.notes[7].volume.velocity = 20
         >>> s.notes[7].volume.getRealized()
         0.22047...
 
-        unless we set the velocity to not be relative...
+        Unless we set the velocity to not be relative:
 
         >>> s.notes[7].volume.velocityIsRelative = False
         >>> s.notes[7].volume.getRealized()

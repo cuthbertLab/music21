@@ -6,8 +6,7 @@
 # Authors:      Christopher Ariza
 #               Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2009-2017 Michael Scott Asato Cuthbert and the music21
-#               Project
+# Copyright:    Copyright © 2009-2017 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # -----------------------------------------------------------------------------
 '''
@@ -371,7 +370,7 @@ class _EnvironmentCore:
         # path to a braille viewer
         self._ref['braillePath'] = None
 
-        # path to MuseScore (if not the musicxmlPath...)
+        # path to MuseScore (if not the musicxmlPath)
         # for direct creation of PNG from MusicXML
         self._ref['musescoreDirectPNGPath'] = None
         self._ref['showFormat'] = 'musicxml'
@@ -641,7 +640,7 @@ class _EnvironmentCore:
                 directory = pathlib.Path(os.path.expanduser('~'))
             return directory / 'music21-settings.xml'
         elif platform in ['nix', 'darwin']:
-            # might not exist if running as nobody in a webserver...
+            # might not exist if running as nobody in a webserver
             if 'HOME' in os.environ and os.access(os.environ['HOME'], os.W_OK):
                 directory = pathlib.Path(os.environ['HOME'])
             else:
@@ -708,7 +707,7 @@ class _EnvironmentCore:
         >>> e.formatToKey('braille')
         'braillePath'
 
-        returns None if there is no key for this format (whether the format exists or not...)
+        returns None if there is no key for this format (whether the format exists or not)
 
         >>> e.formatToKey('ipython') is None  # actual format
         True

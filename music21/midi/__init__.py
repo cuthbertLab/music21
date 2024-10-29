@@ -140,7 +140,7 @@ def getNumber(midiStr, length):
             else:
                 summation = (summation << 8) + ord(midiStrOrNum)
         return summation, midiStr[length:]
-    else:  # midiStr is a number...
+    else:  # midiStr is a number
         midNum = midiStr
         summation = midNum - ((midNum >> (8 * length)) << (8 * length))
         bigBytes = midNum - summation
@@ -198,7 +198,7 @@ def getVariableLengthNumber(midiBytes):
     if isinstance(midiBytes, str):
         midiBytes = midiBytes.encode('utf-8')
 
-    while i < 999:  # should return eventually... was while True
+    while i < 999:  # should return eventually (was "while True")
         x = midiBytes[i]
         # environLocal.printDebug(['getVariableLengthNumber: examined char:',
         # charToBinary(midiBytes[i])])
@@ -479,7 +479,7 @@ class MidiEvent(prebase.ProtoM21Object):
         self.parameter1: int|bytes|None = None  # pitch or first data value
         self.parameter2: int|bytes|None = None  # velocity or second data value
 
-        # data is a property...
+        # data is a property
 
         # if this is a Note on/off, need to store original
         # pitch space value in order to determine if this has a microtone
