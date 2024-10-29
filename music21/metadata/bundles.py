@@ -1316,7 +1316,7 @@ class MetadataBundle(prebase.ProtoM21Object):
         if self.filePath is not None:
             filePath = self.filePath
             environLocal.printDebug(['MetadataBundle: writing:', filePath])
-            storedCorpusClient = self._corpus  # no weakrefs allowed...
+            storedCorpusClient = self._corpus  # no weakrefs allowed
             self._corpus = None
             uncompressed = pickle.dumps(self, protocol=3)
             # 3 is a safe protocol for some time to come.

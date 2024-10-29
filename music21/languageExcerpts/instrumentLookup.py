@@ -1263,7 +1263,7 @@ transposition = {
              'd': 'm-7',
              'e': 'm-6',
              'e-': 'M-6',
-             'english': 'P-5',  # this is how it works...
+             'english': 'P-5',  # this is how it works
              'f': 'P-5',
              'g': 'P-4',
              },

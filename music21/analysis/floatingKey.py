@@ -55,7 +55,7 @@ class KeyAnalyzer:
      <music21.key.Key of b minor>, <music21.key.Key of C# major>,
      <music21.key.Key of F# major>, <music21.key.Key of b minor>]
 
-    Major smoothing...
+    Major smoothing:
 
     >>> ka.windowSize = ka.numMeasures // 2
     >>> ka.run()  # only the pickup seems to be in A major by this approach

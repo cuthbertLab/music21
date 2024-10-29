@@ -441,7 +441,7 @@ def parseSpecifier(value: str|int|Specifier) -> Specifier:
     >>> interval.parseSpecifier(3)
     <Specifier.MINOR>
 
-    Why? because...
+    Why? Because of this:
 
     >>> interval.Specifier.MINOR.value
     3
@@ -512,7 +512,7 @@ def convertGeneric(value: int|str) -> int:
     Traceback (most recent call last):
     music21.interval.IntervalException: Cannot get a direction from None.
 
-    Strings are not the same as numbers...
+    Strings are not the same as numbers:
 
     >>> interval.convertGeneric('1')
     Traceback (most recent call last):
@@ -1440,7 +1440,7 @@ class GenericInterval(IntervalBase):
         <music21.pitch.Pitch D5>
 
         But if a key or keySignature (such as one from `.getContextByClass(key.KeySignature)`)
-        is given, then the fun begins...
+        is given, then the fun begins:
 
         >>> fis = pitch.Pitch('F#4')
         >>> e = pitch.Pitch('E')
@@ -1726,7 +1726,7 @@ class DiatonicInterval(IntervalBase):
         elif not hasattr(other, 'specifier'):
             return False
 
-        # untested...
+        # untested
         # if self.direction != other.direction:
         #    return False
         if (self.generic == other.generic
@@ -2658,7 +2658,7 @@ def _getSpecifierFromGenericChromatic(
     '''
     Given a :class:`~music21.interval.GenericInterval` and
     a :class:`~music21.interval.ChromaticInterval` object, return a specifier
-    (i.e. Specifier.MAJOR, Specifier.MINOR, etc...).
+    (i.e. Specifier.MAJOR, Specifier.MINOR, etc.).
 
     >>> aInterval = interval.GenericInterval('seventh')
     >>> bInterval = interval.ChromaticInterval(11)
@@ -2690,7 +2690,7 @@ def _getSpecifierFromGenericChromatic(
         # all normal intervals
         theseSemis = cInt.undirected
     # round out microtones
-    # fix python3 rounding...
+    # fix python3 rounding
     if cInt.undirected > 0:
         roundingError = 0.0001
     else:
@@ -2984,7 +2984,7 @@ class Interval(IntervalBase):
     >>> aInterval.isStep
     True
 
-    This is in OMIT... put changelog above.
+    This is in OMIT_FROM_etc. put changelog above.
     '''
     def __init__(self,
                  arg0: t.Union[str,
@@ -3515,7 +3515,7 @@ class Interval(IntervalBase):
                         pitch2.accidental.displayStatus = False
 
         else:
-            # no halfStepsToFix, so pitch2 is fine as is, but...
+            # no halfStepsToFix, so pitch2 is fine as is, but
             if inheritAccidentalDisplayStatus:
                 # We have set pitch2.accidental to None, so we might have lost some
                 # display options. So we restore oldPitch2Accidental if that makes sense.
@@ -3932,7 +3932,7 @@ def add(intervalList):
     Add a list of intervals and return the composite interval
     Intervals can be Interval objects or just strings.
 
-    (Currently not particularly efficient for large lists...)
+    (Currently not particularly efficient for large lists)
 
     >>> A2 = interval.Interval('A2')
     >>> P5 = interval.Interval('P5')
@@ -3953,7 +3953,7 @@ def add(intervalList):
     if not intervalList:
         raise IntervalException('Cannot add an empty set of intervals')
 
-    p1 = pitch.Pitch('C4')  # need octave to not be implicit...
+    p1 = pitch.Pitch('C4')  # need octave to not be implicit
     p2 = pitch.Pitch('C4')
     for i in intervalList:
         p2 = transposePitch(p2, i)

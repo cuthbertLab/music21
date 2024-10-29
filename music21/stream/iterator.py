@@ -140,7 +140,7 @@ class StreamIterator(prebase.ProtoM21Object, Sequence[M21ObjType]):
         self.srcStream: StreamType = srcStream
         self.elementIndex: int = 0
 
-        # use .elements instead of ._elements/etc. so that it is sorted...
+        # use .elements instead of ._elements/etc. so that it is sorted
         self.srcStreamElements = t.cast(tuple[M21ObjType, ...], srcStream.elements)
         self.streamLength: int = len(self.srcStreamElements)
 
@@ -169,7 +169,7 @@ class StreamIterator(prebase.ProtoM21Object, Sequence[M21ObjType]):
         self._len: int|None = None
         self._matchingElements: dict[bool|None, list[M21ObjType]] = {}
         # keep track of where we are in the parse.
-        # esp important for recursive streams...
+        # esp important for recursive streams
         if activeInformation is not None:
             self.activeInformation: ActiveInformation = activeInformation
         else:
@@ -776,7 +776,7 @@ class StreamIterator(prebase.ProtoM21Object, Sequence[M21ObjType]):
                     if f(e) is False:
                         return False
             except StopIteration:  # pylint: disable=try-except-raise
-                raise  # clearer this way to see that this can happen...
+                raise  # clearer this way to see that this can happen
         return True
 
     def _newBaseStream(self) -> stream.Stream:
@@ -908,9 +908,9 @@ class StreamIterator(prebase.ProtoM21Object, Sequence[M21ObjType]):
                 o = ss.elementOffset(e, returnSpecial=True)
             except SitesException:
                 # this can happen in the case of, s.recurse().notes.stream() -- need to do new
-                # stream...
+                # stream
                 o = e.getOffsetInHierarchy(ss)
-                clearIsSorted = True  # now the stream is probably not sorted...
+                clearIsSorted = True  # now the stream is probably not sorted
 
             if not isinstance(o, str):
                 found.coreInsert(o, e, ignoreSort=True)
@@ -918,7 +918,7 @@ class StreamIterator(prebase.ProtoM21Object, Sequence[M21ObjType]):
                 if o == OffsetSpecial.AT_END:
                     found.coreStoreAtEnd(e)
                 else:
-                    # TODO: something different...
+                    # TODO: something different
                     found.coreStoreAtEnd(e)
 
         if fe:
@@ -1079,7 +1079,7 @@ class StreamIterator(prebase.ProtoM21Object, Sequence[M21ObjType]):
         <music21.note.Rest quarter>
 
 
-        ActiveSite is restored...
+        ActiveSite is restored.
 
         >>> s2 = stream.Stream(id='s2')
         >>> s2.insert(0, r)
@@ -1475,14 +1475,14 @@ class StreamIterator(prebase.ProtoM21Object, Sequence[M21ObjType]):
         )
 
     # ------------------------------------------------------------
-    # properties -- historical...
+    # properties -- historical
 
     @property
     def notes(self):
         '''
         Returns all :class:`~music21.note.NotRest` objects
 
-        (will sometime become simply Note and Chord objects...)
+        (will sometime become simply Note and Chord objects.)
 
         >>> s = stream.Stream()
         >>> s.append(note.Note('C'))
@@ -1512,7 +1512,7 @@ class StreamIterator(prebase.ProtoM21Object, Sequence[M21ObjType]):
         <music21.note.Rest quarter>
         <music21.note.Note D>
 
-        chained filters... (this makes no sense since notes is a subset of notesAndRests)
+        Chained filters (this makes no sense since notes is a subset of notesAndRests):
 
         >>> for el in s.iter().notesAndRests.notes:
         ...     print(el)
@@ -1614,7 +1614,7 @@ class OffsetIterator(StreamIterator, Sequence[list[M21ObjType]]):
             raise StopIteration
 
         retElementList: list[M21ObjType] = []
-        # make sure that cleanup is not called during the loop...
+        # make sure that cleanup is not called during the loop
         try:
             if self.nextToYield:
                 retElementList = self.nextToYield
@@ -1866,7 +1866,7 @@ class RecursiveIterator(StreamIterator, Sequence[M21ObjType]):
                 childRecursiveIterator: RecursiveIterator[M21ObjType] = RecursiveIterator(
                     srcStream=e,
                     restoreActiveSites=self.restoreActiveSites,
-                    filterList=self.filters,  # shared list...
+                    filterList=self.filters,  # shared list
                     activeInformation=self.activeInformation,  # shared dict
                     includeSelf=False,  # always for inner streams
                     ignoreSorting=self.ignoreSorting,
@@ -1895,7 +1895,7 @@ class RecursiveIterator(StreamIterator, Sequence[M21ObjType]):
                 # self.childRecursiveIterator.parentIterator = None
                 self.childRecursiveIterator = None
 
-        self.activeInformation['lastYielded'] = None  # always clean this up, no matter what...
+        self.activeInformation['lastYielded'] = None  # always clean this up, no matter what
         self.cleanup()
         raise StopIteration
 

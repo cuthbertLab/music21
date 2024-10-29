@@ -185,7 +185,9 @@ class ScalaData:
     >>> sf.open(fp)
     >>> sd = sf.read()
 
-    >>> print(sd.description)  # converted to unicode...
+    ScaleFile descriptions are converted to unicode.
+
+    >>> print(sd.description)
     26-note choice system of Shohé Tanaka, Studien i.G.d. reinen Stimmung (1890)
     >>> sd.pitchCount
     26

@@ -51,7 +51,7 @@ class Timespan:
     >>> print(timespan)
     <Timespan -1.5 3.25>
 
-    A timespan has two attributes, its offset and its endTime.  They are immutable...
+    A timespan has two attributes, its offset and its endTime.  They are immutable.
 
     >>> timespan.offset
     -1.5
@@ -468,7 +468,7 @@ class ElementTimespan(Timespan):
         >>> pitchedTimespan.getParentageByClass(classList=(stream.Score,))
         <music21.stream.Score bach>
 
-        The closest parent is returned in case of a multiple list...
+        The closest parent is returned in case of a multiple list:
 
         >>> searchTuple = (stream.Voice, stream.Measure, stream.Part)
         >>> pitchedTimespan.getParentageByClass(classList=searchTuple)

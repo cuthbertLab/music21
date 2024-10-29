@@ -392,7 +392,7 @@ class PartTranslator:
         fixPickupMeasure(p)
         p.makeBeams(inPlace=True)
         p.makeAccidentals(inPlace=True)
-        _addRepeatsFromRepeatEndings(p, self.repeatEndings)  # 1st and second endings...
+        _addRepeatsFromRepeatEndings(p, self.repeatEndings)  # 1st and second endings
         return p
 
     def translateOneLineToken(self, lineToken: rtObjects.RTTagged):
@@ -407,7 +407,7 @@ class PartTranslator:
         md = self.md
         # environLocal.printDebug(['token', t])
 
-        # most common case first...
+        # most common case first
         if lineToken.isMeasure():
             if t.TYPE_CHECKING:
                 assert isinstance(lineToken, rtObjects.RTMeasure)
@@ -846,7 +846,7 @@ class PartTranslator:
             cacheTuple = (aSrc, self.kCurrent.tonicPitchNameWithCase)
             if USE_RN_CACHE and cacheTuple in _rnKeyCache:  # pragma: no cover
                 # print('Got a match: ' + str(cacheTuple))
-                # Problems with Caches not picking up pivot chords...
+                # Problems with Caches not picking up pivot chords
                 #    Not faster, see below.
                 rn = copy.deepcopy(_rnKeyCache[cacheTuple])
             else:
@@ -858,7 +858,7 @@ class PartTranslator:
                                         )
                 rn.writeAsChord = True
                 _rnKeyCache[cacheTuple] = rn
-            # surprisingly, not faster... and more dangerous
+            # surprisingly, not faster, and more dangerous
             # rn = roman.RomanNumeral(aSrc, kCurrent)
             # # SLOWEST!!!
             # rn = roman.RomanNumeral(aSrc, kCurrent.tonicPitchNameWithCase)
@@ -875,7 +875,7 @@ class PartTranslator:
             # ...    'from music21 import roman, key; import copy;
             # ...     k = key.Key("c#")', number=1000)
             # 22.49
-            # # key cache, does not help much...
+            # # key cache, does not help much
             # >>> t('copy.deepcopy(r)', 'from music21 import roman; import copy;
             # ...        r = roman.RomanNumeral("IV", "c#")', number=1000)
             # 19.01
@@ -1066,7 +1066,7 @@ def _consolidateRepeatEndings(repeatEndings):
 
 def _addRepeatsFromRepeatEndings(s, repeatEndings):
     '''
-    given a Stream and the repeatEndings dict, add repeats to the stream...
+    Given a Stream and the repeatEndings dict, add repeats to the stream.
     '''
     consolidatedRepeats = _consolidateRepeatEndings(repeatEndings)
     for repeatEndingTuple in consolidatedRepeats:
@@ -1591,7 +1591,7 @@ m1 C: I'''
         pt.translateTokens(rtHandler.tokens)
         self.assertEqual(pt.romanTextVersion, 2.5)
 
-        # gives warning, not raises...
+        # gives warning, not raises
         #         src = '''RTVersion: XYZ
         # m1 C: I'''
         #         rtf = rtObjects.RTFile()

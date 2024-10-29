@@ -757,7 +757,7 @@ def makeRests(
     >>> a.show('text')
     {20.0} <music21.note.Note C>
 
-    Now make some rests...
+    Now make some rests:
 
     >>> b = a.makeRests(inPlace=False)
     >>> len(b)
@@ -770,7 +770,7 @@ def makeRests(
     >>> b[0].duration.quarterLength
     20.0
 
-    Same thing, but this time, with gaps, and hidden rests...
+    Same thing, but this time, with gaps, and hidden rests:
 
     >>> a = stream.Stream()
     >>> a.insert(20, note.Note('C4'))
@@ -1213,7 +1213,7 @@ def makeTies(
     if returnObj.hasPartLikeStreams():
         # part-like does not necessarily mean that the next level down is a stream.Part
         # object or that this is a stream.Score object, so do not substitute
-        # returnObj.parts for this...
+        # returnObj.parts for this
         for p in returnObj.getElementsByClass(stream.Stream):
             # already copied if necessary; edit in place
             p.makeTies(meterStream=meterStream,
@@ -1393,7 +1393,7 @@ def makeTupletBrackets(s: StreamType, *, inPlace=False) -> StreamType|None:
     '''
     durationList: list[duration.Duration] = []
 
-    # Stream, as it should be...
+    # Stream, as it should be
     if not inPlace:  # make a copy
         returnObj = s.coreCopyAsDerivation('makeTupletBrackets')
     else:
@@ -1466,7 +1466,7 @@ def makeTupletBrackets(s: StreamType, *, inPlace=False) -> StreamType|None:
             # this, below, is optional:
             # if next normal type is not the same as this one, also stop
             elif tupletNext is None or completionCount >= completionTarget:
-                tupletObj.type = 'stop'  # should be impossible once frozen...
+                tupletObj.type = 'stop'  # should be impossible once frozen
                 completionTarget = None  # reset
                 completionCount = 0.0  # reset
                 # environLocal.printDebug(['stopping tuplet type, value:',

@@ -27,7 +27,9 @@ Low level MuseData conversion is facilitated by the objects in this module and
 '''
 from __future__ import annotations
 
+from collections.abc import Sequence
 import os
+import typing as t
 import unittest
 
 from music21 import environment
@@ -161,7 +163,7 @@ class MuseDataRecord(prebase.ProtoM21Object):
         else:
             raise MuseDataException('cannot get pitch parameters from this kind of record')
 
-        pStr = [data[0]]  # first element will be A...G
+        pStr = [data[0]]  # first element will be A–G
         if '#' in data:
             pStr.append('#')
         elif '##' in data:
@@ -936,13 +938,33 @@ class MuseDataPart(prebase.ProtoM21Object):
                 return alphas.strip()
 
     def getSource(self):
-        '''
+        r'''
+        Return the source (original print encoding) for the score.
+
         >>> fp1 = (common.getSourceFilePath() / 'musedata' / 'testPrimitive'
-        ...                    / 'test01' / '01.md')
+        ...                    / 'test01' / '03.md')
         >>> mdw = musedata.MuseDataWork()
         >>> mdw.addFile(fp1)
         >>> mdw.getParts()[0].getSource()
-        'Breitkopf & H...rtel, Vol. 13'
+        'Breitkopf & Härtel, Vol. 13'
+
+        Note that the publisher is Härtel. MuseData predates the standardization
+        of encoding as UTF-8, so many
+        MuseData files are in Windows (ISO-8859-1) encodings.
+        Music21 tries first
+        in utf-8 and if there are errors will try again in ISO-8859-1, and if it
+        fails it will try to read ignoring any errors (leaving "Hrtel").
+        In this case, both UTF-8 and ISO-8859-1 support this character (Latin-1 space
+        in Unicode).
+
+        If you know the encoding you can pass that to MuseDataWork or MuseDataFile.
+        It is not yet a property you can specify in converter.
+
+        >>> mdw = musedata.MuseDataWork()
+        >>> mdw.encoding = 'ISO-8859-1'
+        >>> mdw.addFile(fp1)
+        >>> mdw.getParts()[0].getSource()
+        'Breitkopf & Härtel, Vol. 13'
         '''
         if self.stage == 1:
             # get the header number: not sure what this is for now
@@ -1445,12 +1467,12 @@ class MuseDataFile(prebase.ProtoM21Object):
 
     When read, one or more MuseDataPart objects are created and stored on self.parts.
     '''
-
     def __init__(self):
         self.parts = []  # a lost of MuseDataPart objects
 
         self.filename = None
         self.file = None
+        self.encoding: str = 'utf-8'
 
     def _reprInternal(self):
         return ''
@@ -1465,7 +1487,7 @@ class MuseDataFile(prebase.ProtoM21Object):
         # call readstr with source string from file
         fileContents = self.file.read()
         try:
-            fileContents = fileContents.decode('utf-8')
+            fileContents = fileContents.decode(self.encoding)
         except UnicodeDecodeError:
             fileContents = fileContents.decode('ISO-8859-1', 'ignore')
         return self.readstr(fileContents)
@@ -1528,20 +1550,24 @@ class MuseDataWork(prebase.ProtoM21Object):
     '''
 
     def __init__(self):
-        self.files = []  # a list of one or more MuseDataFile objects
+        self.files: list[MuseDataFile] = []
+        self.encoding: str = 'utf-8'
 
-    def addFile(self, fp):
+    def addFile(self, fp: str | Sequence[str]) -> None:
         '''
         Open and read this file path or list of paths as MuseDataFile objects
         and set self.files
         '''
+        fpList: Sequence[str]
         if not common.isIterable(fp):
-            fpList = [fp]
+            fp_single = t.cast(str, fp)
+            fpList = [fp_single]
         else:
             fpList = fp
 
         for fpInner in fpList:
             mdf = MuseDataFile()
+            mdf.encoding = self.encoding
             # environLocal.printDebug('processing MuseData file: %s' % fp)
             mdf.open(fpInner)
             mdf.read()  # process string and break into parts

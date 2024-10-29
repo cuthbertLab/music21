@@ -641,7 +641,7 @@ def divideByPages(
         for systemStartM, systemEndM in systemMeasureTuples:
             if systemStartM < pageStartM or systemEndM > pageEndM:
                 continue
-            systemNumber += 1  # global, not on this page...
+            systemNumber += 1  # global, not on this page
             pageSystemNumber += 1
             if fastMeasures is True:
                 measureStacks = scoreIn.measures(systemStartM, systemEndM,
@@ -896,7 +896,7 @@ class LayoutScore(stream.Opus):
         dataCache[pageId] = dataTuple
         return dataTuple
 
-    def getPositionForSystem(self, pageId, systemId):
+    def getPositionForSystem(self, pageId: int, systemId: int) -> SystemSize:
         '''
         first systems on a page use a different positioning.
 
@@ -904,8 +904,7 @@ class LayoutScore(stream.Opus):
         relative to the page margins
 
         N.B. right is NOT the width -- it is different.  It is the offset to the right margin.
-        weird, inconsistent, but most useful...bottom is the hard part to compute...
-
+        weird, inconsistent, but most useful.  Bottom, however, is the hard part to compute.
 
         >>> lt = corpus.parse('demos/layoutTestMore.xml')
         >>> ls = layout.divideByPages(lt, fastMeasures = True)
@@ -1147,7 +1146,7 @@ class LayoutScore(stream.Opus):
             positionForStaffCache[cacheKey] = 0.0
             return 0.0
 
-        # nope, not first staff or first visible staff...
+        # nope, not first staff or first visible staff
 
         staffDistanceFromPrevious = 60.0  # sensible default?
 

@@ -271,12 +271,12 @@ class Clef(base.Music21Object):
 
 class PitchClef(Clef):
     '''
-    superclass for all other clef subclasses that use pitches...
+    Superclass for all other clef subclasses that use pitches.
     '''
     _DOC_ATTR: dict[str, str] = {
         'lowestLine': '''
             The diatonicNoteNumber of the lowest line of the clef.
-            (Can be none...)
+            (Can be `None`)
 
             >>> clef.TrebleClef().lowestLine
             31

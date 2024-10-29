@@ -396,7 +396,7 @@ class Test(unittest.TestCase):
         from music21.musicxml import m21ToXml
         from music21 import converter
 
-        # this also tests the EXPORTING of stem directions on notes within chords...
+        # this also tests the EXPORTING of stem directions on notes within chords
         n1 = note.Note('f3')
         n1.notehead = 'diamond'
         n1.stemDirection = 'down'
@@ -434,7 +434,7 @@ class Test(unittest.TestCase):
         self.assertEqual(sg2.symbol, 'brace')
         self.assertTrue(sg2.barTogether)
 
-        # TODO: more tests about which parts are there...
+        # TODO: more tests about which parts are there
 
     def testStaffGroupsPiano(self):
         from music21.musicxml import testPrimitive
@@ -572,7 +572,7 @@ class Test(unittest.TestCase):
     def x_testOrnamentAndTechnical(self):
         from music21 import converter
         beethoven = common.getCorpusFilePath() + '/beethoven/opus133.mxl'
-        # TODO: this is way too long... lots of hidden 32nd notes for trills...
+        # TODO: this is way too long. Lots of hidden 32nd notes for trills.
         s = converter.parse(beethoven, format='musicxml')
         ex = s.parts[0]
         countTrill = 0
@@ -582,8 +582,8 @@ class Test(unittest.TestCase):
                     countTrill += 1
         self.assertEqual(countTrill, 54)
 
-        # TODO: Get a better test... the single harmonic in the viola part,
-        # m. 482 is probably a mistake for an open string.
+        # TODO: Get a better test: the single harmonic in the viola part,
+        #     m. 482 is probably a mistake for an open string.
         countTechnical = 0
         for n in s.parts[2].recurse().notes:
             for a in n.articulations:
@@ -814,7 +814,7 @@ class Test(unittest.TestCase):
 
     def testCountDynamics(self):
         '''
-        good test of both dynamics and a PartStaff...
+        good test of both dynamics and a PartStaff.
         '''
         from music21 import corpus
         c = corpus.parse('schoenberg/opus19/movement2.mxl')
@@ -848,7 +848,7 @@ class Test(unittest.TestCase):
         lots of lines, including overlapping here; testing that
         a line attached to a rest is still there.  Formerly was a problem.
 
-        Many more tests could be done on this piece...
+        Many more tests could be done on this piece.
         '''
         from music21 import corpus
         c = corpus.parse('luca/gloria')
@@ -916,7 +916,7 @@ class Test(unittest.TestCase):
             self.assertEqual(len(tuplets), 1)
             self.assertEqual(tuplets[0].type, tupTypes[i])
 
-        # without number....
+        # without number.
         n0 = getNoteByTupletTypeNumber('start')
         n1 = getNoteByTupletTypeNumber()
         n2 = getNoteByTupletTypeNumber('stop')

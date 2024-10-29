@@ -801,7 +801,7 @@ def noteToBraille(
     # note duration
     # -------------
     if isinstance(music21Note.duration, duration.GraceDuration):
-        # TODO: Short Appoggiatura mark...
+        # TODO: Short Appoggiatura mark
         nameWithDuration = notesInStep['eighth']
         noteTrans.append(nameWithDuration)
         music21Note.editorial.brailleEnglish.append(
@@ -1057,7 +1057,7 @@ def textExpressionToBraille(music21TextExpression, precedeByWordSign=True):
             f'Text Expression {teWords} {simpleReturn}')
         return simpleReturn
 
-    # not in this basic list...
+    # not in this basic list
 
     allExpr = teWords.split()
     textExpressionTrans = []

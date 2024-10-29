@@ -187,7 +187,7 @@ class WindowedAnalysis:
                 try:
                     data[i], color[i] = self.processor.process(current)
                 except DiscreteAnalysisException:
-                    # current might have no notes...all rests?
+                    # current might have no notes: all rests?
                     data[i], color[i] = (None, None, 0), '#ffffff'
 
         elif windowType == 'noOverlap':
@@ -203,7 +203,7 @@ class WindowedAnalysis:
                 try:
                     data[i], color[i] = self.processor.process(current)
                 except DiscreteAnalysisException:
-                    # current might have no notes...all rests?
+                    # current might have no notes: all rests?
                     data[i], color[i] = (None, None, 0), '#ffffff'
 
                 start = end
@@ -232,7 +232,7 @@ class WindowedAnalysis:
                 try:
                     data[i], color[i] = self.processor.process(current)
                 except DiscreteAnalysisException:
-                    # current might have no notes...all rests?
+                    # current might have no notes: all rests?
                     data[i], color[i] = (None, None, 0), '#ffffff'
 
         return data, color

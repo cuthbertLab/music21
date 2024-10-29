@@ -38,7 +38,14 @@ def wrapWeakref(referent: _T) -> weakref.ReferenceType|_T:
     >>> ref3 = common.wrapWeakref(5)
     >>> ref3
     5
+
+    OMIT_FROM_DOCS
+
+    Note that the ...Mock was needed after Python 3.13.
+    When 3.13 is the lowest version, replace ... with the
+    actual output.
     '''
+
     # if isinstance(referent, weakref.ReferenceType):
     #     return referent
     try:

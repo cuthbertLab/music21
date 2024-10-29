@@ -39,7 +39,7 @@ class AVLNode(common.SlottedObjectMixin):
     >>> node
     <AVLNode: Start:1.0 Height:1 L:None R:0>
 
-    Nodes can rebalance themselves, but they work best in a Tree...
+    Nodes can rebalance themselves, but they work best in a Tree.
 
     Please consult the Wikipedia entry on AVL trees
     (https://en.wikipedia.org/wiki/AVL_tree) for a very detailed
@@ -625,7 +625,7 @@ class AVLTree(prebase.ProtoM21Object):
             '''
             if node is None:
                 # if we get to the point where a node does not have a
-                # left or right child, make a new node at this position...
+                # left or right child, make a new node at this position
                 return self.nodeClass(innerPosition)
 
             if innerPosition < node.position:
@@ -717,7 +717,7 @@ class AVLTree(prebase.ProtoM21Object):
 
         >>> note1 = score.flatten().notes[30]
 
-        Works with sortTuple positions as well...
+        Works with sortTuple positions as well:
 
         >>> st = note1.sortTuple()
         >>> st

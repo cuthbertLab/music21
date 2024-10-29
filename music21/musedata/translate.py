@@ -581,7 +581,7 @@ class Test(unittest.TestCase):
     #     # note: this is importing a large work, but this seems to presently
     #     # be the only one with dynamics
     #
-    #     # TODO: Turn back on when a smaller work is found...
+    #     # TODO: Turn back on when a smaller work is found
     #     from music21 import corpus
     #     s = corpus.parse('symphony94', 3)
     #     sFlat = s.flatten()

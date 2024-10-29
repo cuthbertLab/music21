@@ -119,7 +119,7 @@ def realizeOrnaments(
                     break
 
         retList = []
-        # TODO: use extend...
+        # TODO: use extend instead of iteration
         for i in preExpandList:
             retList.append(i)
         if srcObject is not None:

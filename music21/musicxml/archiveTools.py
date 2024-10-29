@@ -138,7 +138,7 @@ def uncompressMXL(filename: str|pathlib.Path,
                         continue
                     myZip.extract(member=storedName, path=extractPath)
                     if not found_one_file:
-                        # only rename one file...hope it is the right one.
+                        # only rename one file: hope it is the right one.
                         extractPath_pathlib = pathlib.Path(extractPath)
                         wrongName = extractPath_pathlib / storedName
                         correctName = extractPath_pathlib / unarchivedName

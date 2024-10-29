@@ -149,13 +149,14 @@ class Lyric(prebase.ProtoM21Object, style.StyleMixin):
     >>> l
     <music21.note.Lyric number=1 syllabic=single text='hello'>
 
-    Music21 processes leading and following hyphens intelligently...
+    Music21 processes leading and following hyphens intelligently by default.
 
     >>> l2 = note.Lyric(text='hel-')
     >>> l2
     <music21.note.Lyric number=1 syllabic=begin text='hel'>
 
-    ...unless applyRaw is set to True
+    If `applyRaw` is set to True then hyphens will be treated as actual text,
+    and the `syllabic` will be set to "single".
 
     >>> l3 = note.Lyric(number=3, text='hel-', applyRaw=True)
     >>> l3
@@ -848,7 +849,7 @@ class GeneralNote(base.Music21Object):
          <music21.note.Lyric number=2 syllabic=single text='newSecond'>,
          <music21.note.Lyric number=3 syllabic=single text='second'>]
 
-        Test number as lyric...
+        Test number as lyric:
 
         >>> n1.insertLyric(0, 3)
         >>> n1.lyrics
@@ -963,7 +964,8 @@ class GeneralNote(base.Music21Object):
         >>> ng.duration.components
         (DurationTuple(type='half', dots=0, quarterLength=0.0),)
 
-        Appoggiaturas are still a work in progress...
+        Appoggiaturas are still a work in progress.
+
         * Changed in v6: corrected spelling of `appoggiatura` keyword.
 
         >>> ng2 = n.getGrace(appoggiatura=True)
@@ -1740,7 +1742,7 @@ class Note(NotRest):
 
 
         If the transposition value is an integer, take the KeySignature or Key context
-        into account...
+        into account
 
         >>> s = stream.Stream()
         >>> s.append(key.Key('D'))

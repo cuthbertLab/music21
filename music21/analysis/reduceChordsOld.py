@@ -53,7 +53,7 @@ class ChordReducer:
         self.positionInMeasure = None
         self.numberOfElementsInMeasure = None
 
-        # for working...
+        # for working
         self._lastPitchedObject = None
         self._lastTs = None
 
@@ -136,7 +136,7 @@ class ChordReducer:
             currentGreedyChord.quarterLength = currentGreedyChordNewLength
             currentGreedyChordNewLength = 0.0
 
-        # even chord lengths...
+        # even chord lengths
         for i in range(1, len(mObj)):
             c = mObj[i]
             cOffsetCurrent = c.offset

@@ -82,7 +82,7 @@ divisionsPerQuarter = 32 * 3 * 3 * 5 * 7  # 10080
 # ticks per quarter is used for midi - left separate for flexibility in the future.
 ticksPerQuarter = divisionsPerQuarter
 # how many ticks to pad as a rest at the beginning of a MIDI file.
-# also used to pad the end..., one quarter note.
+# also used to pad the end, one quarter note.
 ticksAtStart = ticksPerQuarter
 
 # quantizationQuarterLengthDivisors
@@ -97,7 +97,7 @@ scalingMillimeters = 7
 scalingTenths = 40
 
 
-jupyterImageDpi = 200  # retina...
+jupyterImageDpi = 200  # retina quality (can go higher soon?)
 
 
 # multi-measure rests

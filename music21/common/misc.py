@@ -10,7 +10,7 @@
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
-If it doesn't fit anywhere else in the common directory, you'll find it here...
+If it doesn't fit anywhere else in the common directory, you'll find it here!
 '''
 from __future__ import annotations
 
@@ -49,13 +49,17 @@ if t.TYPE_CHECKING:
 
 def flattenList(originalList: Iterable[Iterable[_T]]) -> list[_T]:
     '''
-    Flatten a list of lists into a flat list
-
-    but not a list of lists of lists...
+    Flatten a list of lists into a flat list:
 
     >>> l = [[1, 2, 3], [4, 5], [6]]
     >>> common.flattenList(l)
     [1, 2, 3, 4, 5, 6]
+
+    But not a list of lists-of-lists!
+
+    >>> l2 = [[1, 2, 3], [4, 5], [6, [7, 8]]]
+    >>> common.flattenList(l2)
+    [1, 2, 3, 4, 5, 6, [7, 8]]
     '''
     return [item for sublist in originalList for item in sublist]
 

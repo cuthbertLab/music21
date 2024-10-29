@@ -1033,7 +1033,7 @@ class Key(KeySignature, scale.DiatonicScale):
         in the middle of large datasets.
 
         Note that this uses .sharps as a speedup, so if that has been changed, there
-        will be a problem...
+        will be a problem:
 
         >>> k = key.Key('E-')
         >>> k

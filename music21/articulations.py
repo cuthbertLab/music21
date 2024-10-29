@@ -283,7 +283,7 @@ class Spiccato(Staccato, Accent):
     def __init__(self, **keywords):
         Staccato.__init__(self)
         with tempAttribute(self, 'lengthShift'):
-            Accent.__init__(self)  # order matters...
+            Accent.__init__(self)  # order matters!
 
 
 class Tenuto(LengthArticulation):
@@ -405,7 +405,7 @@ class TechnicalIndication(Articulation):
 
 class Harmonic(TechnicalIndication):
     '''
-    A general harmonic indicator -- StringHarmonic is probably what you want...
+    A general harmonic indicator -- StringHarmonic is probably what you want.
     '''
 
 class Bowing(TechnicalIndication):

@@ -278,7 +278,7 @@ class ChordWithFretBoard(harmony.ChordSymbol, FretBoard):
 
     def __init__(self, figure=None, numStrings=6, fretNotes=None, displayFrets=4, **keywords):
         harmony.ChordSymbol.__init__(self, figure=figure, **keywords)
-        # uncomment when self.getFretNotesFromFigure() works...
+        # uncomment when self.getFretNotesFromFigure() works
         # if fretNotes is None:
         #     fretNotes = self.getFretNotesFromFigure()
 

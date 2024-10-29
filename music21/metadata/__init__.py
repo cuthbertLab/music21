@@ -1070,7 +1070,7 @@ class Metadata(base.Music21Object):
         ...     )
         (True, 'composer')
 
-        These don't work (Richard didn't have the sense of rhythm to write this...)
+        These don't work (Richard didn't have the sense of rhythm to write this!)
 
         >>> md.search(
         ...     'Wagner',
@@ -2541,8 +2541,8 @@ class RichMetadata(Metadata):
 
     def getSourcePath(self, streamObj) -> str:
         '''
-        Get a string of the path after the corpus for the piece...useful for
-        searching on corpus items without proper composer data...
+        Get a string of the path after the corpus for the piece.  Useful for
+        searching on corpus items without proper composer data.
 
         >>> rmd = metadata.RichMetadata()
         >>> b = corpus.parse('bwv66.6')

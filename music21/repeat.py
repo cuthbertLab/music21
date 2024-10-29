@@ -399,7 +399,7 @@ class DalSegnoAlCoda(RepeatExpressionCommand):
 # ------------------------------------------------------------------------------
 # store a list of one each of RepeatExpression objects; these are used for t
 # testing TextExpressions
-# 500 microseconds to run...
+# 500 microseconds to run
 repeatExpressionReference = [
     Coda(), Segno(), Fine(), DaCapo(), DaCapoAlFine(),
     DaCapoAlCoda(), AlSegno(), DalSegno(), DalSegnoAlFine(), DalSegnoAlCoda(),
@@ -1745,7 +1745,7 @@ class Expander(t.Generic[StreamType]):
         if it has balanced repeats or sensible Da Capo or Dal Segno
         indications.
 
-        Return None if there's nothing to expand (a third case...)
+        Return None if there's nothing to expand (a third case).
         '''
         match = self._daCapoOrSegno()
         # if neither repeats nor segno/capo, then not expandable

@@ -322,7 +322,7 @@ class State:
         if self.autoExpires is not False:
             if len(self.affectedTokens) == self.autoExpires:
                 self.end()
-                # this is a hack that should be done away with...
+                # this is a hack that should be done away with
                 p = self.parent
                 if p is None:
                     return m21Obj

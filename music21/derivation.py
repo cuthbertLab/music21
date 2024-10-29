@@ -121,7 +121,7 @@ class Derivation(SlottedObjectMixin):
 
     Deleting the origin stream does not change the Derivation, since origin is held by strong ref:
 
-    >>> import gc  # Garbage collection...
+    >>> import gc  # Garbage collection
     >>> del s2
     >>> unused = gc.collect()  # ensure Garbage collection is run
     >>> d1

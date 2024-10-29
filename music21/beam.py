@@ -103,7 +103,7 @@ beamableDurationTypes = (
     duration.typeFromNumDict[64], duration.typeFromNumDict[128],
     duration.typeFromNumDict[256], duration.typeFromNumDict[512],
     duration.typeFromNumDict[1024], duration.typeFromNumDict[2048],
-)  # be sure to add to .fill if extended...
+)  # be sure to add to .fill if extended
 
 
 class Beam(prebase.ProtoM21Object, EqualSlottedObjectMixin, style.StyleMixin):

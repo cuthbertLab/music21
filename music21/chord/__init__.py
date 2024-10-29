@@ -345,7 +345,7 @@ class ChordBase(note.NotRest):
         Traceback (most recent call last):
         ValueError: Cannot remove 4 from a chord; try a Pitch or Note object
 
-        Like Python's list object does not work on lists...
+        Like Python's list object, the remove method of chord does not take a list of strings.
 
         >>> c = chord.Chord('C4 E4 G4')
         >>> c.remove(['C4', 'E4'])
@@ -416,7 +416,7 @@ class ChordBase(note.NotRest):
             # d['tie'] = value
 
     @property
-    def volume(self) -> 'music21.volume.Volume':  # do NOT change to volume.Volume, see setter...
+    def volume(self) -> 'music21.volume.Volume':  # do NOT change to volume.Volume, see setter
         '''
         Get or set the :class:`~music21.volume.Volume` object for this
         Chord.
@@ -796,7 +796,7 @@ class Chord(ChordBase):
         >>> c['D-4.style.color'] is None
         True
 
-        Getting by note does not do very much...
+        Getting by note does not do very much:
 
         >>> c[cSharp]
         <music21.note.Note C#>
@@ -1183,7 +1183,7 @@ class Chord(ChordBase):
         >>> c4.annotateIntervals(inPlace=True, stripSpecifiers=False, returnList=True)
         ['m3', 'P8', 'P5']
 
-        If sortPitches is false it still gives problems...
+        If sortPitches is false it still gives problems:
 
         >>> c4 = chord.Chord(['G4', 'E4', 'B3', 'E3'])
         >>> c4.annotateIntervals(inPlace=True, stripSpecifiers=False, sortPitches=False)
@@ -1520,7 +1520,7 @@ class Chord(ChordBase):
         >>> chord2
         <music21.chord.Chord C#4 E4 G4>
 
-        Force octave changes the octave of the bass note (and all notes above it...)
+        Force octave changes the octave of the bass note (and all notes above it)
 
         >>> c2 = chord.Chord(['C#4', 'G5', 'E6'])
         >>> c2.closedPosition(forceOctave=2)
@@ -1530,7 +1530,7 @@ class Chord(ChordBase):
         >>> c3.closedPosition(forceOctave=6)
         <music21.chord.Chord C#6 E6 G6>
 
-        Redundant pitches are removed by default, but can be retained...
+        Redundant pitches are removed by default, but can be retained:
 
         >>> c4 = chord.Chord(['C#4', 'C5', 'F7', 'F8'])
         >>> c5 = c4.closedPosition(forceOctave=4, inPlace=False)
@@ -1541,7 +1541,7 @@ class Chord(ChordBase):
         >>> c6
         <music21.chord.Chord C#4 F4 F4 C5>
 
-        Implicit octaves work fine...
+        Implicit octaves work fine:
 
         >>> c7 = chord.Chord(['A4', 'B4', 'A'])
         >>> c7.closedPosition(forceOctave=4, inPlace=True)
@@ -1549,7 +1549,8 @@ class Chord(ChordBase):
         <music21.chord.Chord A4 B4>
 
         OMIT_FROM_DOCS
-        Very specialized fears...
+
+        Very specialized fears:
 
         Duplicate octaves were not working
 
@@ -1568,7 +1569,7 @@ class Chord(ChordBase):
         >>> str(c7c.bass())
         'A4'
 
-        complex chord for semiclosed-position testing...
+        Complex chord for semiclosed-position testing:
 
         >>> c8 = chord.Chord(['C3', 'E5', 'C#6', 'E-7', 'G8', 'C9', 'E#9'])
         >>> c8.closedPosition(inPlace=True)
@@ -1624,7 +1625,7 @@ class Chord(ChordBase):
                 p.octave += 1
 
         if leaveRedundantPitches is not True:
-            returnObj.removeRedundantPitches(inPlace=True)  # here we can always be in place...
+            returnObj.removeRedundantPitches(inPlace=True)  # here we can always be in place
 
         # if not inPlace, creates a second new chord object!
         returnObj.sortAscending(inPlace=True)
@@ -1776,9 +1777,9 @@ class Chord(ChordBase):
                 return stepNumsToPitches[this_step_num]
 
         # FIND ROOT SLOW
-        # no notes (or more than one...) have perfectlyStackedThirds above them.  Return
-        # the highest scoring note...
-        # this is the slowest...
+        # no notes (or more than one) have perfectlyStackedThirds above them.  Return
+        # the highest scoring note
+        # this is the slowest
 
         rootnessFunctionScores = []
         orderedChordSteps = (3, 5, 7, 2, 4, 6)
@@ -1827,7 +1828,7 @@ class Chord(ChordBase):
         >>> [(pc - normalOrderFirst) % 12 for pc in normalOrder]
         [0, 4, 7]
         '''
-        # no need to cache, since only DT uses it...
+        # no need to cache, since only DT uses it
         # Order pitches
         pitchClassList = []
         for i in range(len(self.pitches)):
@@ -1906,7 +1907,7 @@ class Chord(ChordBase):
         Traceback (most recent call last):
         music21.chord.ChordException: Cannot run getChordStep without a root
 
-        (This is in OMIT...)
+        (This is in OMIT_FROM_etc.)
         '''
         if chordStep >= 8:
             chordStep -= 7
@@ -2180,7 +2181,8 @@ class Chord(ChordBase):
             prime = tables.addressToTransposedNormalForm(other)
             return Chord(prime)
         return None
-        # c2.getZRelation()  # returns a list in non-ET12 space...
+
+        # c2.getZRelations()  # needs a plural form returning a list in non-ET12 space
         # <music21.chord.ForteSet at 0x234892>
 
     def hasAnyEnharmonicSpelledPitches(self) -> bool:
@@ -2388,7 +2390,7 @@ class Chord(ChordBase):
 
         >>> gMajRepeats.inversion(3)
         Traceback (most recent call last):
-        music21.chord.ChordException: Could not invert chord...inversion may not exist
+        music21.chord.ChordException: Could not invert chord: inversion may not exist
 
 
         If testRoot is True then that temporary root is used instead of self.root().
@@ -2493,7 +2495,7 @@ class Chord(ChordBase):
             numberOfRunsBeforeCrashing -= 1
 
         if numberOfRunsBeforeCrashing == 0:
-            raise ChordException('Could not invert chord...inversion may not exist')
+            raise ChordException('Could not invert chord: inversion may not exist')
 
         self.sortAscending(inPlace=True)
 
@@ -2528,7 +2530,7 @@ class Chord(ChordBase):
         else:
             inv = -1  # no longer raise an exception if not normal inversion
 
-        # is this cache worth it? or more trouble than it's worth...
+        # is this cache worth it? or more trouble than it's worth
         self._cache['inversion'] = inv
         return inv
 
@@ -2620,7 +2622,7 @@ class Chord(ChordBase):
         >>> c.isAugmentedSixth()
         False
 
-        Italian...
+        Italian:
 
         >>> c = chord.Chord(['A-3', 'C4', 'F#4'])
         >>> c.isAugmentedSixth()
@@ -2958,7 +2960,7 @@ class Chord(ChordBase):
         >>> fr6b.isFrenchAugmentedSixth()
         False
 
-        Inversion matters...
+        Inversion matters:
 
         >>> fr6c = chord.Chord(['C4', 'D4', 'F#4', 'A-4'])
         >>> fr6c.isFrenchAugmentedSixth()
@@ -3003,13 +3005,13 @@ class Chord(ChordBase):
         >>> gr6b.isGermanAugmentedSixth()
         False
 
-        Inversion matters...
+        Inversion matters:
 
         >>> gr6c = chord.Chord(['C4', 'E-4', 'F#4', 'A-4'])
         >>> gr6c.isGermanAugmentedSixth()
         False
 
-        unless `permitAnyInversion` is True
+        unless `permitAnyInversion` is True:
 
         >>> gr6c.isGermanAugmentedSixth(permitAnyInversion=True)
         True
@@ -3083,7 +3085,7 @@ class Chord(ChordBase):
         >>> c2.isIncompleteMajorTriad()
         False
 
-        Remember, MAJOR Triad...
+        Remember, MAJOR Triad:
 
         >>> c3 = chord.Chord(['C4', 'E-3'])
         >>> c3.isIncompleteMajorTriad()
@@ -3228,7 +3230,7 @@ class Chord(ChordBase):
             third = self.third
             fifth = self.fifth
 
-            # only the tonic (that is, fifth) can be doubled...
+            # only the tonic (that is, fifth) can be doubled
             for p in self.pitches:
                 if p.name == fifth.name:
                     continue
@@ -3416,7 +3418,7 @@ class Chord(ChordBase):
         >>> chord.Chord('C E G#').isTranspositionallySymmetrical()
         True
 
-        ...but not the major triad:
+        But the major triad is not transpositionally symmetrical:
 
         >>> chord.Chord('C E G').isTranspositionallySymmetrical()
         False
@@ -3594,7 +3596,7 @@ class Chord(ChordBase):
             return bool(self.getChordStep(2))
         except ChordException:  # pragma: no cover
             # probably not reachable, since self.third would have caught the same
-            # exception and returned False...
+            # exception and returned False
             return False
 
     def isSwissAugmentedSixth(self, *, permitAnyInversion=False):
@@ -3827,12 +3829,12 @@ class Chord(ChordBase):
         >>> cmaj.root()
         <music21.pitch.Pitch C>
 
-        For some chords we make an exception.  For instance, this chord in
+        For some chords we make an exception.  For instance, take this chord in
         B-flat minor:
 
         >>> aDim7no3rd = chord.Chord(['A3', 'E-4', 'G4'])
 
-        ...could be considered a type of E-flat 11 chord with a 3rd, but no 5th,
+        It could be considered a type of E-flat 11 chord with a 3rd, but no 5th,
         7th, or 9th, in 5th inversion.  That doesn't make sense, so we should
         call it an A dim 7th chord
         with no 3rd.
@@ -4182,7 +4184,7 @@ class Chord(ChordBase):
         >>> c.setColor('red', 'C4')
         >>> c['0.style.color']
         'red'
-        >>> c.setColor('blue')  # set for whole chord...
+        >>> c.setColor('blue')  # set for whole chord
         >>> c.style.color
         'blue'
         >>> c['E4.style.color']
@@ -4476,7 +4478,7 @@ class Chord(ChordBase):
         True
 
         Setting a tie with a chord with the same pitch twice requires
-        getting the exact pitch object out to be sure which one...
+        getting the exact pitch object out to be sure which one:
 
         >>> c2 = chord.Chord(['D4', 'D4'])
         >>> secondD4 = c2.pitches[1]
@@ -5418,7 +5420,7 @@ class Chord(ChordBase):
         >>> chord.Chord.formatVectorString(c3.normalOrder)
         '<A25>'
 
-        (this is equivalent...)
+        (this is equivalent:)
 
         >>> c3.formatVectorString(c3.normalOrder)
         '<A25>'
@@ -5823,7 +5825,7 @@ class Chord(ChordBase):
 
         Note these two edge cases:
 
-        >>> chord.Chord('C D E').quality  # NB! Major 9th....
+        >>> chord.Chord('C D E').quality  # NB! Major 9th.
         'major'
         >>> chord.Chord('C E--').quality
         'other'

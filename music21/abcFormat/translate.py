@@ -231,7 +231,7 @@ def abcToStreamPart(
         try:
             p.makeBeams(inPlace=True)
         except (meter.MeterException, stream.StreamException) as e:
-            environLocal.warn(f'Error in beaming...ignoring: {e}')
+            environLocal.warn(f'Error in beaming. Ignoring: {e}')
 
     # copy spanners into topmost container; here, a part
     rm = []
@@ -371,7 +371,7 @@ def parseABCNote(
                 n.tie.style = 'normal'
             elif t.tie == 'stop':
                 n.tie = tie.Tie(t.tie)
-        # Was: Extremely Slow for large Opus files... why?
+        # Was: Extremely Slow for large Opus files. Why?
         # Answer: some pieces didn't close all their spanners, so
         # everything was in a Slur/Diminuendo, etc.
         for span in t.applicableSpanners:
@@ -587,7 +587,7 @@ def reBar(music21Part, *, inPlace=False):
     to the last time signature, in this case 2/4. The default is to reBar in place.
     The measure numbers are updated accordingly.
 
-    (NOTE: reBar is called automatically in abcToStreamPart, hence not demonstrated below...)
+    (NOTE: reBar is called automatically in abcToStreamPart, hence not demonstrated below.)
 
     The key signature and clef are assumed to be the same in the second measure after the
     split, so both are omitted. If the time signature is not the same in the second measure,
@@ -1157,7 +1157,7 @@ class Test(unittest.TestCase):
     def xtestMergeScores(self):
         from music21 import corpus
         unused = corpus.parse('josquin/laDeplorationDeLaMorteDeJohannesOckeghem')
-        # this was getting incorrect Clefs...
+        # this was getting incorrect Clefs
 
 
 if __name__ == '__main__':

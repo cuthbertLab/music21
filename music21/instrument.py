@@ -178,7 +178,7 @@ class Instrument(base.Music21Object):
         self.transposition: interval.Interval|None = None
 
         self.inGMPercMap = False
-        self.soundfontFn = None  # if defined...
+        self.soundfontFn = None  # if defined
 
     def __str__(self):
         msg = []
@@ -1138,7 +1138,7 @@ class UnpitchedPercussion(Percussion):
         if self.inGMPercMap is True and modifier.lower() in self._modifierToPercMapPitch:
             self.percMapPitch = self._modifierToPercMapPitch[modifier.lower()]
 
-            # normalize modifiers...
+            # normalize modifiers
             if self.percMapPitch in self._percMapPitchToModifier:
                 modifier = self._percMapPitchToModifier[self.percMapPitch]
 
@@ -2112,7 +2112,7 @@ def partitionByInstrument(streamObj: stream.Stream) -> stream.Stream:
     >>> p1.getElementsByClass(stream.Measure)[1].insert(3.0, instrument.Piccolo())
 
     >>> p2.getElementsByClass(stream.Measure)[0].insert(0.0, instrument.Trombone())
-    >>> p2.getElementsByClass(stream.Measure)[0].insert(3.0, instrument.Piccolo())  # not likely...
+    >>> p2.getElementsByClass(stream.Measure)[0].insert(3.0, instrument.Piccolo())  # not likely
     >>> p2.getElementsByClass(stream.Measure)[1].insert(1.0, instrument.Trombone())
 
     >>> s = stream.Score()
@@ -2162,11 +2162,12 @@ def partitionByInstrument(streamObj: stream.Stream) -> stream.Stream:
     >>> len(s2.parts)
     3
 
-    # TODO: this step might not be necessary...
+    # TODO: this step might not be necessary:
+
     >>> for p in s2.parts:
     ...     p.makeRests(fillGaps=True, inPlace=True)
 
-    # TODO: this step SHOULD not be necessary (.template())...
+    # TODO: this step SHOULD not be necessary (.template()):
 
     >>> for p in s2.parts:
     ...     p.makeMeasures(inPlace=True)
@@ -2295,7 +2296,7 @@ def partitionByInstrument(streamObj: stream.Stream) -> stream.Stream:
                     pass
                     # it is possible to enter an element twice because the getElementsByOffset
                     # might return something twice if it's at the same offset as the
-                    # instrument switch...
+                    # instrument switch
 
     for inst in post.recurse().getElementsByClass(Instrument):
         inst.duration.quarterLength = 0

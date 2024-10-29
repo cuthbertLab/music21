@@ -851,7 +851,7 @@ STANDARD_PROPERTY_DESCRIPTIONS: tuple[PropertyDescription, ...] = (
         oldMusic21Abbrev='osc',
         isContributor=False),
 
-    # movementNumber: movement number (e.g. '4', or 'mov. 4', or...)
+    # movementNumber: movement number (e.g. '4', or 'mov. 4')
     PropertyDescription(
         uniqueName='movementNumber',
         name='OMV',

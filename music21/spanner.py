@@ -584,7 +584,7 @@ class Spanner(base.Music21Object):
         >>> ott3 = spanner.Ottava(note.Note('D'), note.Note('E'))
         >>> ott3.fill()
         Traceback (most recent call last):
-        music21.spanner.SpannerException: ...requires a searchStream or getFirst().activeSite
+        music21.spanner.SpannerException: Spanner.fill() requires a searchStream or getFirst().activeSite
         '''
 
         if not self.fillElementTypes:

@@ -653,7 +653,7 @@ class HumdrumDataCollection(prebase.ProtoM21Object):
                         # or merge back to other spine's parent:
                         elif mergerActive is not True:  # other spine parent set
                             newSpineList.append(mergerActive)
-                        # or make a new spine...
+                        # or make a new spine:
                         else:
                             s = spineCollection.addSpine(streamClass=stream.Part)
                             s.insertPoint = i
@@ -707,7 +707,7 @@ class HumdrumDataCollection(prebase.ProtoM21Object):
                 for j in range(i + 1, maxEventList):
                     if j in positionDict:
                         insertOffset = positionDict[j][0]
-                        # hopefully not more than 20 events in a row...
+                        # hopefully not more than 20 events in a row!
                         insertPriority = (positionDict[j][1][0].priority
                                           - 40
                                           + numberOfGlobalEventsInARow)
@@ -749,11 +749,11 @@ class HumdrumDataCollection(prebase.ProtoM21Object):
     #     if self.spineCollection is None:
     #         raise HumdrumException('parsing got no spine collections!')
     #     elif self.spineCollection.spines is None:
-    #         raise HumdrumException('not a single spine in your data... um, not my problem! ' +
-    #                                '(well, maybe it is...file a bug report if you ' +
+    #         raise HumdrumException('not a single spine in your data. Is this your problem? ' +
+    #                                '(File a bug report if you ' +
     #                                'have doubled checked your data)')
     #     elif self.spineCollection.spines[0].stream is None:
-    #         raise HumdrumException('okay, you got at least one spine, but it ain\'t got ' +
+    #         raise HumdrumException('okay, you got at least one spine, but it does not have ' +
     #                                'a stream in it; (check your data or file a bug report)')
     #     else:
     #         masterStream = stream.Score()
@@ -991,7 +991,7 @@ class ProtoSpine(prebase.ProtoM21Object):
 
 
 # HUMDRUM SPINES #
-# Ready to be parsed...
+# Ready to be parsed.
 class HumdrumSpine(prebase.ProtoM21Object):
     r'''
     A HumdrumSpine is a representation of a generic HumdrumSpine
@@ -1161,7 +1161,7 @@ class HumdrumSpine(prebase.ProtoM21Object):
         '''
         Takes a parsed stream and moves the elements inside the
         measures.  Works with pickup measures, etc. Does not
-        automatically create ties, etc...
+        automatically create ties, etc.
 
         Why not just use Stream.makeMeasures()? because
         humdrum measures contain extra information about barlines
@@ -1230,7 +1230,7 @@ class HumdrumSpine(prebase.ProtoM21Object):
         if currentMeasure:
             streamOut.append(currentMeasure)
 
-        # move beginning stuff (Clefs, KeySig, etc.) to first measure...
+        # move beginning stuff (Clefs, KeySig, etc.) to first measure.
         measureElements = streamOut.getElementsByClass(stream.Measure)
         if measureElements:
             m1 = measureElements[0]
@@ -1345,10 +1345,10 @@ class KernSpine(HumdrumSpine):
                 )
                 tb = traceback.format_exc()
                 environLocal.printDebug(f'Traceback for the exception: \n{tb}')
-                # traceback... environLocal.printDebug()
+                # traceback: environLocal.printDebug()
 
         self.stream.coreElementsChanged()
-        # still to be done later... move things before first measure to first measure!
+        # still to be done later. Move things before first measure to first measure!
 
     def processNoteEvent(self, eventC):
         '''
@@ -1406,7 +1406,7 @@ class KernSpine(HumdrumSpine):
                         self.currentBeamNumbers += 1
 
     def setTupletTypeForNote(self, n):
-        # nested tuplets not supported by humdrum...
+        # nested tuplets not supported by humdrum.
         nDur = n.duration
         nTuplets = n.duration.tuplets
 
@@ -1951,7 +1951,7 @@ class SpineCollection(prebase.ProtoM21Object):
                             el.activeSite.insert(el.offset,
                                                  prioritiesToSearch[el.priority])
                         except exceptions21.StreamException:
-                            # may appear twice because of voices...
+                            # may appear twice because of voices
                             pass
                             # el.activeSite.insert(el.offset,
                             #    copy.deepcopy(prioritiesToSearch[el.priority]))
@@ -1968,7 +1968,7 @@ class SpineCollection(prebase.ProtoM21Object):
                             el.activeSite.insert(el.offset,
                                                  prioritiesToSearch[el.priority])
                         except exceptions21.StreamException:
-                            # may appear twice because of voices...
+                            # may appear twice because of voices
                             pass
                             # el.activeSite.insert(el.offset,
                             #    copy.deepcopy(prioritiesToSearch[el.priority]))
@@ -2316,7 +2316,7 @@ def hdStringToNote(contents):
     # 3.2.7 Duration +
     # 3.2.8 N-Tuplets
 
-    # TODO: SPEEDUP -- only search for rational after foundNumber...
+    # TODO: SPEEDUP -- only search for rational after foundNumber.
     foundRational = re.search(r'(\d+)%(\d+)', contents)
     foundNumber = re.search(r'(\d+)', contents)
     if foundRational:
@@ -2359,7 +2359,7 @@ def hdStringToNote(contents):
 
             # The Josquin Research Project uses an incorrect definition of
             # humdrum tuplets that breaks normal usage.  TODO: Refactor adding a Flavor = 'JRP'
-            # code that uses this other method...
+            # code that uses this other method.
             JRP = flavors['JRP']
             if JRP is False and '.' in contents:
                 newTup.durationNormal = duration.durationTupleFromTypeDots(
@@ -2515,15 +2515,15 @@ def kernTandemToObject(tandem):
             return clef.PercussionClef()
         elif clefType == 'Gv2':  # undocumented in Humdrum, but appears in Huron's Chorales
             return clef.Treble8vbClef()
-        elif clefType == 'Gv':  # unknown if ever used but better safe...
+        elif clefType == 'Gv':  # unknown if ever used but better safe.
             return clef.Treble8vbClef()
-        elif clefType == 'G^2':  # unknown if ever used but better safe...
+        elif clefType == 'G^2':  # unknown if ever used but better safe.
             return clef.Treble8vaClef()
-        elif clefType == 'G^':  # unknown if ever used but better safe...
+        elif clefType == 'G^':  # unknown if ever used but better safe.
             return clef.Treble8vaClef()
-        elif clefType == 'Fv4':  # unknown if ever used but better safe...
+        elif clefType == 'Fv4':  # unknown if ever used but better safe.
             return clef.Bass8vbClef()
-        elif clefType == 'Fv':  # unknown if ever used but better safe...
+        elif clefType == 'Fv':  # unknown if ever used but better safe.
             return clef.Bass8vbClef()
         else:
             try:
@@ -2764,7 +2764,7 @@ class GlobalReference(base.Music21Object):
         'OPR': 'parentTitle',  # title of parent work
         'OAC': 'actNumber',  # act number (e.g. '2' or 'Act 2')
         'OSC': 'sceneNumber',  # scene number (e.g. '3' or 'Scene 3')
-        'OMV': 'movementNumber',  # movement number (e.g. '4', or 'mov. 4', or...)
+        'OMV': 'movementNumber',  # movement number (e.g. '4', or 'mov. 4')
         'OMD': 'movementName',  # movement name
         'OPS': 'opusNumber',  # opus number (e.g. '23', or 'Opus 23')
         'ONM': 'number',  # number (e.g. number of song within ABC multi-song file)
@@ -2951,7 +2951,7 @@ class Test(unittest.TestCase):
         # masterStream.show('text')
         for n in masterStream.recurse():
             if hasattr(n, 'pitch') and n.pitch.name == 'G#':
-                if n.beat == 2:  # beat doesn't work... :-(
+                if n.beat == 2:  # beat doesn't work :-(
                     gSharpCount += 1
             elif hasattr(n, 'pitches'):
                 for p in n.pitches:

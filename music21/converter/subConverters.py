@@ -1003,7 +1003,7 @@ class ConverterMusicXML(SubConverter):
 
     def show(self, obj, fmt, app=None, subformats=(), **keywords):  # pragma: no cover
         '''
-        Override to do something with png...
+        Override to do something with png
         '''
         returnedFilePath = self.write(obj, fmt, subformats=subformats, **keywords)
         if 'png' in subformats:

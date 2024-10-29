@@ -236,7 +236,7 @@ class PlotStreamMixin(prebase.ProtoM21Object):
         '''
         elementValues: list[list[t.Any]] = [[] for _ in range(len(self.allAxes))]
         formatDict: dict[t.Any, t.Any] = {}
-        # should be two for most things...
+        # should be two for most things
 
         if not isinstance(el, chord.Chord):
             for i, thisAxis in enumerate(self.allAxes):
@@ -896,7 +896,7 @@ class WindowedAnalysis(primitives.GraphColorGrid, PlotStreamMixin):
 
     def run(self, *, callProcess: bool = True, **keywords):
         '''
-        actually create the graph...
+        Actually creates the graph.
         '''
         if self.title == 'Music21 Graph' and self.processor:
             self.title = (self.processor.name
@@ -1437,7 +1437,7 @@ class MultiStream(primitives.GraphGroupedVerticalBar, PlotStreamMixin):
     Approaches to plotting and graphing multiple Streams.
     A base class from which Stream plotting Classes inherit.
 
-    Not yet integrated into the new 2017 system, unfortunately...
+    Not yet integrated into the 2017 system, unfortunately.
 
     Provide a list of Streams as an argument. Optionally
     provide an additional list of labels for each list.

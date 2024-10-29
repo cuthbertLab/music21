@@ -83,7 +83,7 @@ __all__ = [
     'mainTest',
 
     'prebase',  # before all
-    'base',  # top...
+    'base',  # top
     'sites',  # important
 
     # sub folders

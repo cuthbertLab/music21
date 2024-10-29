@@ -257,7 +257,7 @@ class VexflowPickler:
         sf = freezeThaw.StreamFreezer(thisStream)
 
         # recursive data structures will be expanded up to a high depth
-        # -- make sure there are none...
+        # -- make sure there are none
         data = sf.writeStr(fmt='jsonpickle')
         dataSplit = self.splitLongJSON(data)
         if mode == 'json':
@@ -286,7 +286,7 @@ class TestCuthbert(unittest.TestCase):  # pragma: no cover
 
     def testCuthbertLocal(self):
         '''
-        test a local version of this mess...
+        test a local version of this mess
         '''
         from music21 import corpus
         from music21 import environment

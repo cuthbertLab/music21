@@ -862,7 +862,7 @@ class MeterSequence(MeterTerminal):
         >>> str(a)
         '{1/8+1/8+1/8+...+1/8}'
 
-        Demo of loadDefault: if impossible, then do it another way...
+        Demo of loadDefault: if impossible, then do it another way:
 
         >>> c = meter.MeterSequence('3/128')
         >>> c.partition(2)
@@ -939,7 +939,7 @@ class MeterSequence(MeterTerminal):
         >>> ms[1]
         <music21.meter.core.MeterSequence {1/8+1/8}>
 
-        There is not a way (the authors know of...) to get to the next level.
+        There is not a way (the authors know of) to get to the next level.
         You would just need to do them individually.
 
         >>> ms[0].subdividePartitionsEqual(2)
@@ -977,7 +977,7 @@ class MeterSequence(MeterTerminal):
                 elif partitionNumerator in (6, 9, 12, 15, 18, 21, 24, 27):
                     divisionsLocal = partitionNumerator // 3
                 else:
-                    # TODO: get from the smallest primer number...
+                    # TODO: get from the smallest prime number
                     divisionsLocal = partitionNumerator
             else:
                 divisionsLocal = divisions
@@ -1062,7 +1062,7 @@ class MeterSequence(MeterTerminal):
         >>> ms
         <music21.meter.core.MeterSequence {{{{1/8+1/8}+{1/8+1/8}}+{{1/8+1/8}+{1/8+1/8}}}}>
 
-        I think you get the picture...
+        I think you get the picture!
 
         The effects above are not cumulative.  Users can skip directly to
         whatever level of hierarchy they want.
@@ -1184,7 +1184,7 @@ class MeterSequence(MeterTerminal):
         'Single'
         '''
         count = len(self)
-        countName = ('Empty',  # should not happen...
+        countName = ('Empty',  # should not happen
                      'Single',
                      'Duple', 'Triple', 'Quadruple', 'Quintuple',
                      'Sextuple', 'Septuple', 'Octuple')
@@ -2009,8 +2009,8 @@ class MeterSequence(MeterTerminal):
         >>> a.offsetToWeight(1.5)
         Fraction(1, 3)
 
-        ??? Not sure what this does...
         '''
+        # Not sure what this does!
         qLenPos = opFrac(qLenPos)
         if qLenPos >= self.duration.quarterLength or qLenPos < 0:
             raise MeterException(

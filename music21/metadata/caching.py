@@ -319,7 +319,7 @@ class JobProcessor:
         '''
         processCount = processCount or common.cpus()
         processCount = max(processCount, 1)
-        # do not start more processes than jobs...
+        # do not start more processes than jobs
         remainingJobs = len(jobs)
         processCount = min(processCount, remainingJobs)
 

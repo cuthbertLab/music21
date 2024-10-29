@@ -40,7 +40,7 @@ class Corpus(prebase.ProtoM21Object):
 
     __metaclass__ = abc.ABCMeta
 
-    # TODO: this is volatile -- should be elsewhere...
+    # TODO: this is volatile -- should be elsewhere
     _acceptableExtensions: list[str] = [
         'abc', 'capella', 'midi', 'musicxml', 'musedata',
         'humdrum', 'romantext', 'noteworthytext', 'noteworthy'
@@ -108,7 +108,7 @@ class Corpus(prebase.ProtoM21Object):
                     matched.append(filename)
                     break
 
-        # this is actually twice as slow...
+        # this is actually twice as slow
         # for extension in fileExtensions:
         #     for filename in rdp.rglob('*' + extension):
         #           ... etc ...
@@ -278,7 +278,7 @@ class Corpus(prebase.ProtoM21Object):
 
         >>> coreCorpus = corpus.corpora.CoreCorpus()
 
-        This returns 1 even though there is a '.mus' file, which cannot be read...
+        This returns 1 even though there is a '.mus' file, which cannot be read:
 
         >>> len(coreCorpus.getWorkList('cpebach/h186'))
         1
@@ -314,7 +314,7 @@ class Corpus(prebase.ProtoM21Object):
                 results.append(path)
 
         if results:
-            # more than one matched...use more stringent criterion:
+            # more than one matched, so use more stringent criterion:
             # must have a slash before the name
             previousResults = results
             results = []
@@ -983,7 +983,7 @@ class LocalCorpus(Corpus):
 
 # class VirtualCorpus(Corpus):
 #     r'''
-#     A model of the *virtual* corpus. that stays online...
+#     A model of the *virtual* corpus. that stays online.
 #
 #     >>> virtualCorpus = corpus.corpora.VirtualCorpus()
 #

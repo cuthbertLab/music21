@@ -227,7 +227,7 @@ class SlottedObjectMixin:
         >>> sorted(list(sSet))
         ['_editorial', '_style', 'direction', 'id', 'independentAngle', 'number', 'type']
 
-        When a normal Beam won't cut it...
+        When a normal Beam won't cut it:
 
         >>> class FunkyBeam(beam.Beam):
         ...     __slots__ = ('funkiness', 'groovability')

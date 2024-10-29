@@ -231,7 +231,7 @@ def asTree(
 
             if element.isStream and flatten is not False:  # True or 'semiFlat'
                 localParentage = currentParentage + (element,)
-                recurseGetTreeByClass(element,  # put the elements into the current tree...
+                recurseGetTreeByClass(element,  # put the elements into the current tree
                                       currentParentage=localParentage,
                                       initialOffset=flatOffset,
                                       inner_outputTree=inner_outputTree)
@@ -261,7 +261,7 @@ def asTree(
 
         return inner_outputTree
 
-    # first time through...
+    # first time through
     treeClass: type[trees.ElementTree]
 
     if useTimespans:

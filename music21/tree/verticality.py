@@ -763,7 +763,7 @@ class Verticality(prebase.ProtoM21Object):
             r.duration.quarterLength = quarterLength
             return r
 
-        # easy stuff done, time to get to the hard stuff...
+        # easy stuff done, time to get to the hard stuff
 
         c = chord.Chord()
         c.duration.quarterLength = quarterLength
@@ -949,7 +949,7 @@ class Verticality(prebase.ProtoM21Object):
 
         return c
 
-    # Analysis type things...
+    # Analysis type things
     @overload
     def getAllVoiceLeadingQuartets(
         self,
@@ -1175,7 +1175,7 @@ class Verticality(prebase.ProtoM21Object):
             previousTs = self.timespanTree.findPreviousPitchedTimespanInSameStreamByClass(
                 startingTs)
             if previousTs is None or not isinstance(previousTs, spans.PitchedTimespan):
-                continue  # first not in piece in this part...
+                continue  # first not in piece in this part
 
             if includeRests is False:
                 if previousTs not in stopTss:

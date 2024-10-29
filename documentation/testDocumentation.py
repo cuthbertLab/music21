@@ -169,7 +169,7 @@ def getDocumentationFiles(runOne=False):
             fullModulePath = os.path.join(root, module)
             if not module.endswith('.rst'):
                 continue
-            if module.startswith('module'):  # we have this already...
+            if module.startswith('module'):  # we have this already
                 continue
             if module in skipModules:
                 continue

@@ -159,7 +159,7 @@ class ScoreFollower:
         notesList, durationList = audioSearch.joinConsecutiveIdenticalPitches(
             detectedPitchObjects)
         self.silencePeriodDetection(notesList)
-        environLocal.printDebug('made it to here...')
+        environLocal.printDebug('made it to here.')
         excerpt = self.scoreStream[self.lastNotePosition:self.lastNotePosition + len(notesList)]
         scNotes = stream.Part(excerpt)
         # print('1')
@@ -178,12 +178,12 @@ class ScoreFollower:
         )
         # print('3')
         self.processing_time = time() - time_start
-        environLocal.printDebug('and even to here...')
+        environLocal.printDebug('and even to here.')
         if END_OF_SCORE is True:
             exitType = 'endOfScore'  # 'endOfScore'
             return exitType
 
-        # estimate position, or exit if we can't at all...
+        # estimate position, or exit if we can't at all
         exitType = self.updatePosition(prob, totalLengthPeriod, time_start)
 
         if self.useMic is False:  # reading from the disc (only for TESTS)
