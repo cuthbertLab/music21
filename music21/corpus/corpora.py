@@ -5,8 +5,7 @@
 #
 # Authors:      Josiah Wolf Oberholtzer
 #
-# Copyright:    Copyright © 2009-2012, 2014 Michael Scott Asato Cuthbert and the music21
-#               Project
+# Copyright:    Copyright © 2009-2012, 2014 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # -----------------------------------------------------------------------------
 from __future__ import annotations

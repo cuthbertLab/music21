@@ -8,7 +8,7 @@
 #               Jackie Rogoff
 #               Beth Hadley
 #
-# Copyright:    Copyright © 2009-2023 Michael Scott Asato Cuthbert
+# Copyright:    Copyright © 2009-2024 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
@@ -844,9 +844,11 @@ class VoiceLeadingQuartet(base.Music21Object):
         '''
         Returns True if the motion is a parallel Perfect Octave.
 
-        (This is a concept so abhorrent we shudder to illustrate it with an example, but alas, we must:)
+        (This is a concept so abhorrent we shudder to illustrate it
+        with an example, but alas, we must:)
 
         We will make the examples shorter with this abbreviation:
+
         >>> N = note.Note
 
         >>> vlq = voiceLeading.VoiceLeadingQuartet(N('C5'), N('D5'), N('C4'), N('D4'))
@@ -857,13 +859,15 @@ class VoiceLeadingQuartet(base.Music21Object):
         >>> vlq.parallelOctave()
         True
 
-        Or False if the motion is according to the rules of God's own creation:
+        Or False if the motion is according to the rules of God's own creation :-)
 
         >>> vlq = voiceLeading.VoiceLeadingQuartet(N('C4'), N('D4'), N('C4'), N('D4'))
         >>> vlq.parallelOctave()
         False
 
-        (P.S., we were joking about parallel octaves being abhorant or out of God's creation!)
+        (P.S., we were joking about parallel octaves being abhorant or out of God's creation!
+        music21 works just as well with popular music and other styles that do not
+        have problems with parallel octaves.)
         '''
         return self.parallelInterval(self.octave)
 

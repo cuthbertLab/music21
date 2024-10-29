@@ -48,7 +48,7 @@ master_doc = 'index'
 project = 'music21'
 # pylint: disable=redefined-builtin
 # noinspection PyShadowingBuiltins
-copyright = '2006-2023 Michael Scott Asato Cuthbert'
+copyright = '2006-2024 Michael Scott Asato Cuthbert'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the

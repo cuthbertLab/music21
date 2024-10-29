@@ -5,7 +5,7 @@
 #
 # Authors:      Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2007-2023 Michael Scott Asato Cuthbert
+# Copyright:    Copyright © 2007-2024 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''

@@ -8,7 +8,7 @@
 #               Jacob Tyler Walls
 #               Christopher Ariza
 #
-# Copyright:    Copyright © 2011-2023 Michael Scott Asato Cuthbert
+# Copyright:    Copyright © 2011-2024 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
@@ -1001,7 +1001,8 @@ def chordSymbolFigureFromChord(inChord: chord.Chord, includeChordType=False):
     * eleventh chords: third and/or fifth
     * thirteenth chords: fifth, eleventh, ninth
 
-    This chord could be minor 7th with a C4, but because this 5th is not present, it is not identified
+    This chord could be minor 7th with a C4, but because this 5th is not present,
+    it is not identified.
 
     >>> c = chord.Chord(['F3', 'A-3', 'E-4'])
     >>> harmony.chordSymbolFigureFromChord(c)

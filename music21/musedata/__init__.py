@@ -27,7 +27,7 @@ Low level MuseData conversion is facilitated by the objects in this module and
 '''
 from __future__ import annotations
 
-from collections.abc import Sequence
+from collections.abc import Iterable
 import os
 import typing as t
 import unittest
@@ -59,8 +59,11 @@ class MuseDataRecord(prebase.ProtoM21Object):
     Object for extracting data from a Note or other related record, or a
     single line of musedata data.
     '''
-
-    def __init__(self, src='', parent=None):
+    def __init__(
+        self,
+        src: str = '',
+        parent=None
+    ):
         # environLocal.printDebug(['creating MuseDataRecord'])
         self.src = src  # src here is one line of text
         self.parent = parent
@@ -73,7 +76,7 @@ class MuseDataRecord(prebase.ProtoM21Object):
         # store frequently used values
         self._cache = {}
 
-    def isRest(self):
+    def isRest(self) -> bool:
         '''
         Return a boolean if this record is a rest.
 
@@ -83,7 +86,6 @@ class MuseDataRecord(prebase.ProtoM21Object):
         >>> mdr = musedata.MuseDataRecord('measure 1       A')
         >>> mdr.isRest()
         False
-
         '''
         if self.src and self.src[0] == 'r':
             return True
@@ -516,7 +518,6 @@ class MuseDataRecord(prebase.ProtoM21Object):
         >>> mdr = musedata.MuseDataRecord('E4    48        h     u        (pp')
         >>> mdr.getDynamicObjects()
         [<music21.dynamics.Dynamic pp>]
-
         '''
         from music21 import dynamics
         post = []
@@ -524,25 +525,25 @@ class MuseDataRecord(prebase.ProtoM21Object):
         if data is None:
             return post
         # find targets from largest to smallest
-        targets = ['ppp', 'fff',
+        targets = ('ppp', 'fff',
                     'pp', 'ff', 'fp', 'mp', 'mf',
-                    'p', 'f', 'm', 'Z', 'Zp', 'R']
-        for t in targets:
-            pos = data.find(t)
+                    'p', 'f', 'm', 'Z', 'Zp', 'R')
+        for target in targets:
+            pos = data.find(target)
             if pos < 0:
                 continue
             # remove from data to avoid double hits
-            data = data[:pos] + data[pos + len(t):]
-            # those that can be directedly created
-            if t in ['ppp', 'fff', 'pp', 'ff', 'p', 'f', 'mp', 'mf', 'fp']:
-                post.append(dynamics.Dynamic(t))
-            elif t == 'm':
+            data = data[:pos] + data[pos + len(target):]
+            # those that can be directly created
+            if target in ('ppp', 'fff', 'pp', 'ff', 'p', 'f', 'mp', 'mf', 'fp'):
+                post.append(dynamics.Dynamic(target))
+            elif target == 'm':
                 post.append(dynamics.Dynamic('mp'))
-            elif t == 'Z':  # sfz
+            elif target == 'Z':  # sfz
                 post.append(dynamics.Dynamic('sf'))
-            elif t == 'Zp':  # sfp
+            elif target == 'Zp':  # sfp
                 post.append(dynamics.Dynamic('sf'))
-            elif t == 'R':  # rfz
+            elif target == 'R':  # rfz
                 post.append(dynamics.Dynamic('sf'))
         # environLocal.printDebug(['got dynamics', post])
         return post
@@ -1553,12 +1554,12 @@ class MuseDataWork(prebase.ProtoM21Object):
         self.files: list[MuseDataFile] = []
         self.encoding: str = 'utf-8'
 
-    def addFile(self, fp: str | Sequence[str]) -> None:
+    def addFile(self, fp: str | Iterable[str]) -> None:
         '''
         Open and read this file path or list of paths as MuseDataFile objects
         and set self.files
         '''
-        fpList: Sequence[str]
+        fpList: Iterable[str]
         if not common.isIterable(fp):
             fp_single = t.cast(str, fp)
             fpList = [fp_single]

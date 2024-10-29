@@ -7,8 +7,7 @@
 #               Michael Scott Asato Cuthbert
 #               Dylan Nagler
 #
-# Copyright:    Copyright © 2010-2023 Michael Scott Asato Cuthbert and the music21
-#               Project
+# Copyright:    Copyright © 2010-2024 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # -----------------------------------------------------------------------------
 '''

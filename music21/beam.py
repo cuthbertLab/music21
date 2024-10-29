@@ -1,13 +1,12 @@
 # -*- coding: utf-8 -*-
 # -----------------------------------------------------------------------------
 # Name:         beam.py
-# Purpose:      music21 classes for representing notes
+# Purpose:      music21 classes for representing beams and beam groups
 #
 # Authors:      Michael Scott Asato Cuthbert
 #               Christopher Ariza
 #
-# Copyright:    Copyright © 2009-2012, 19 Michael Scott Asato Cuthbert and the music21
-#               Project
+# Copyright:    Copyright © 2009-2012, 2019 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # -----------------------------------------------------------------------------
 '''
