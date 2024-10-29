@@ -48,7 +48,9 @@ so allocate time.  Start working on the announcement while it's running.
 11. zip up documentation/build/html and get ready to upload/delete it.
     Rename to music21.v.7.1.0-docs.zip (skip for Alpha/Beta)
 
-12. Run "hatch build" -- requires hatch to be installed "brew install hatch"
+12. From the music21 main folder (not the sub folder) run "hatch build" --
+    requires hatch to be installed "brew install hatch"
+
     This builds the dist/music21-9.3.0.tar.gz and dist/music21-9.3.0-py3-none-any.whl
     files.  That used to be what *this* script did, but now hatch does it better!
 
@@ -67,15 +69,18 @@ so allocate time.  Start working on the announcement while it's running.
 
 17. Push tags: git push --tags  (or git push upstream --tags if not on main branch)
 
-18. Create a new release on GitHub and upload the TWO non-wheel files created here and docs.
+18. Create a new release on GitHub (using the tag just created) and upload the
+    non-wheel files created here and docs.
+
     Drag in this order: .tar.gz, -docs.zip, no-corpus.tar.gz
 
     Finish this before doing the next step, even though it looks like it could be done in parallel.
 
-19. Upload the new file to PyPI with "twine upload music21-7.3.5a2.tar.gz", and same for the
-    whl file (but NOT no corpus) [*]
+19a. Upload the new file to PyPI with "twine upload music21-9.3.0.tar.gz" [*]
 
-    [*] Requires twine to be installed
+19b. Do the same for the whl file (but not for the no-corpus file) [*]
+
+    [*] Requires twine to be installed and up-to-date (pip install --upgrade twine)
 
     You will need a file called ~/.pypirc with
 
@@ -84,8 +89,13 @@ so allocate time.  Start working on the announcement while it's running.
             pypi
 
         [pypi]
-        username:your_username
-        password:your_password
+        username:__token__
+        password:pypi-the_gibberish_generated_in_create_api_token_at_the_bottom_of_account_settings
+
+    FYI -- PyPI is apparently uninterested in having contributions from smaller projects
+    which haven't been following their internal security discussions for years.  All of this
+    is super mysterious and not well documented.  sigh.  But they did mail out USB sticks to
+    the top 1% of projects in Python!
 
 20. Delete the two .tar.gz files and .whl file in dist.
 
