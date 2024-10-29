@@ -384,7 +384,7 @@ STANDARD_PROPERTY_DESCRIPTIONS: tuple[PropertyDescription, ...] = (
         isContributor=False),
 
     # The following 'marcrel' property terms are MARC Relator terms,
-    # found at:  http://www.loc.gov/loc.terms/relators/
+    # found at: https://id.loc.gov/vocabulary/relators.html
 
     # adapter: a person or organization who 1) reworks a musical composition,
     #   usually for a different medium, or 2) rewrites novels or stories

@@ -43,9 +43,9 @@ reFinaleReaderApp = re.compile(r'Finale Reader\.app', IGNORECASE)
 reMuseScoreApp = re.compile(r'MuseScore.*\.app', IGNORECASE)
 reMuseScoreExe = re.compile(r'Musescore.*\\bin\\MuseScore.*\.exe', IGNORECASE)
 
-urlMusic21 = 'https://web.mit.edu/music21'
-urlMuseScore = 'http://musescore.org'
-urlGettingStarted = 'https://web.mit.edu/music21/doc/'
+urlMusic21 = 'https://www.music21.org/music21docs/'
+urlMuseScore = 'https://www.musescore.org'
+urlGettingStarted = 'https://www.music21.org/music21docs/'
 urlMusic21List = 'https://groups.google.com/g/music21list'
 
 LINE_WIDTH = 78
@@ -707,8 +707,7 @@ class AskOpenInBrowser(YesOrNo):
     '''
     Ask the user if the want to open a URL in a browser.
 
-
-    >>> d = configure.AskOpenInBrowser('http://mit.edu/music21')
+    >>> d = configure.AskOpenInBrowser('https://www.music21.org/')
     '''
 
     def __init__(self, urlTarget, default=True, tryAgain=True,
@@ -1494,7 +1493,7 @@ class TestUserInput(unittest.TestCase):  # pragma: no cover
 
     def testOpenInBrowser(self):
         print()
-        d = AskOpenInBrowser('http://mit.edu/music21')
+        d = AskOpenInBrowser('https://www.music21.org/')
         d.askUser()
         print('getResult():', d.getResult())
         d.performAction()

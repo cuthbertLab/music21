@@ -1243,7 +1243,7 @@ class LilypondConverter:
 
     def lySimpleMusicFromNoteOrRest(self, noteOrRest):
         r'''
-        returns a lilyObjects.LySimpleMusic object for the generalNote containing this hierarchy
+        returns a lilyObjects.LySimpleMusic object for the generalNote containing this hierarchy::
 
             LyEventChord   containing
             LySimpleChordElements containing

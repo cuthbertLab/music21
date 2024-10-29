@@ -27,7 +27,7 @@ class PercussionMapper:
     PercussionMapper provides tools to convert between 0-indexed MIDI pitches
     and music21 instruments, based on the official General MIDI Level 1 Percussion Key Map.
     This mapping is conventionally applied to MIDI channel 10;
-    see https://www.midi.org/specifications/item/gm-level-1-sound-set for more info.
+    see https://midi.org/general-midi-level-1 for more info.
 
     Give me the instrument that corresponds to MIDI note 58!
 
@@ -90,7 +90,10 @@ class PercussionMapper:
                                 81: i.Triangle,  # Open Triangle
                                 }
 
-    # MIDI percussion mappings from https://www.midi.org/specifications/item/gm-level-1-sound-set
+    # MIDI percussion mappings from https://midi.org/general-midi-level-1 download at
+    # https://drive.google.com/file/d/1TTM2HI2JAp_XiTJYEJ8gPNvuJpIjJiTP/view?pli=1
+    # formerly at:
+    # https://www.midi.org/specifications/item/gm-level-1-sound-set
 
     def midiPitchToInstrument(self, midiPitch):
         '''

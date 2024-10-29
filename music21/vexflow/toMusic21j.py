@@ -43,8 +43,8 @@ def fromObject(thisObject, *, mode='html', local=False):
         <!-- for MSIE 10 on Windows 8 -->
         <meta http-equiv="X-UA-Compatible" content="requiresActiveX=true"/>
         <title>Music21 Fragment</title>
-        <script data-main='http://web.mit.edu/music21/music21j/src/music21'
-                src='http://web.mit.edu/music21/music21j/ext/require/require.js'></script>
+        <script data-main='https://www.music21.org/music21j/src/music21'
+                src='https://www.music21.org/music21j/ext/require/require.js'></script>
         <script>
             require(['music21'], function() {
                 var pickleIn = '{"m21Version": {"py/tuple": [1, 9, 2]}, "stream":
@@ -107,8 +107,8 @@ class VexflowPickler:
     def __init__(self):
         self.defaults = {
             'pickleOutput': '{"py/object": "hello"}',
-            'm21URI': 'http://web.mit.edu/music21/music21j/src/music21',
-            'requireURI': 'http://web.mit.edu/music21/music21j/ext/require/require.js',
+            'm21URI': 'https://www.music21.org/music21j/src/music21',
+            'requireURI': 'https://www.music21.org/music21j/ext/require/require.js',
             'callback': (
                 'streamObj.renderOptions.events.resize = "reflow";'
                 + '\n\t\t'
@@ -142,8 +142,8 @@ class VexflowPickler:
 
         >>> vfp = vexflow.toMusic21j.VexflowPickler()
         >>> vfp.getLoadTemplate()
-        "<script data-main='http://web.mit.edu/music21/music21j/src/music21'
-            src='http://web.mit.edu/music21/music21j/ext/require/require.js'></script>"
+        "<script data-main='https://www.music21.org/music21j/src/music21'
+            src='https://www.music21.org/music21j/ext/require/require.js'></script>"
 
         >>> d = {'m21URI': 'file:///tmp/music21', 'requireURI': 'http://requirejs.com/require.js'}
         >>> vfp.getLoadTemplate(d)
@@ -219,8 +219,8 @@ class VexflowPickler:
             <!-- for MSIE 10 on Windows 8 -->
             <meta http-equiv="X-UA-Compatible" content="requiresActiveX=true"/>
             <title>myPiece</title>
-            <script data-main='http://web.mit.edu/music21/music21j/src/music21'
-                    src='http://web.mit.edu/music21/music21j/ext/require/require.js'></script>
+            <script data-main='https://www.music21.org/music21j/src/music21'
+                    src='https://www.music21.org/music21j/ext/require/require.js'></script>
             <script>
             require(['music21'], function() {
                             var pickleIn = {"hi": "hello"};

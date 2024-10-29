@@ -10,7 +10,9 @@ the BSD license (see below).
 About the Authors
 -----------------------
 
-**Michael Cuthbert**, the creator of `music21`, is Associate Professor of Music at M.I.T.
+**Michael Cuthbert**, the creator of `music21`, is co-founder and chief music officer of
+`Artusi`_ and former tenured professor of music at M.I.T. where he created the Mellon-Funded
+Digital Humanities lab and taught computational music theory and musicology.
 He received his A.B. *summa cum laude*, A.M. and Ph.D. degrees from Harvard University.
 Cuthbert spent 2004-05 at the American Academy as a Rome Prize winner in Medieval Studies,
 2009-10 as Fellow at Harvard's Villa I Tatti Center for Italian Renaissance Studies
@@ -18,11 +20,7 @@ in Florence, and 2012-13 at the Radcliffe Institute.
 
 Prior to joining the M.I.T. faculty, Cuthbert was on the faculties of Smith
 and Mount Holyoke Colleges.  He has worked extensively on computer-aided musical analysis,
-fourteenth-century music, and the music of the past forty years.  He has published
-on computer-aided treatment of fragments and palimpsests of the late Middle Ages and
-on set analysis of Sub-Saharan African Rhythm and the music of John Zorn. In addition to
-work on music21, Cuthbert is currently writing a book on sacred music in Italy during the
-age of the Black Death and Great Papal Schism.
+fourteenth-century music, and the music since 1960.
 
 **Christopher Ariza** is Emeritus Lead Programmer of `music21` and was
 Visiting Assistant Professor of Music
@@ -41,6 +39,8 @@ degree from Harvard University and his M.A. and Ph.D. degrees from New York Univ
 Additional contributions by many MIT students and visitors and the
 Open Source software community.
 
+.. _Artusi: https://www.artusimusic.com/
+
 
 Acknowledgements
 ----------------
@@ -52,7 +52,7 @@ Funding
 from the **Seaver Institute** and
 the **National Endowment for the Humanities**/Digging into Data research fund.
 
-In addition, we acknowledge consistent support from `M.I.T.`_, the
+In addition, we acknowledge previous support from `M.I.T.`_, the
 `School of Humanities Arts and Social Sciences`_, and the
 `Music and Theater Arts`_ section.
 
@@ -91,6 +91,10 @@ to this project.  Their contributions and generosity are greatly appreciated.
    support and for their contributions to the open source music notation projects,
    including the Bach Goldberg Variations and the Handel Arias included.
 
+* `Jacob Tylor Walls`_, contributed greatly to the type-safety, speed, and test coverage
+   of `music21`.  If your music21 program "just works" without needing to guess what
+   any argument goes where, Jacob is to thank.
+
 * `Donald Byrd`_, researcher on University of Indiana who created
    a schema for computer-aided musicology (along with the source of all sorts of
    examples of how music notation is difficult).
@@ -119,10 +123,10 @@ to this project.  Their contributions and generosity are greatly appreciated.
 * Walter B. Hewlett and Craig Sapp of Stanford's CCARH for support.
 
 * `Justin London` compiled and maintained the list of Second-Viennese
-   row forms now available in serial.py.
+   row forms that form the original backbone of serial.py.
 
 * `McGill University`_ ELVIS project for including the MEI parser. Special thanks to Julie
-   Cumming, Andrew Hankinson, and especially Christopher Antila for contributing.
+   Cumming, Andrew Hankinson, Ichiro Fujinaga, and especially Christopher Antila for contributing.
 
 * `Manuel Op de Coul`_ has kindly gave permission to use the Scala
    scale archive of nearly 4000 scales in music21.
@@ -138,6 +142,7 @@ to this project.  Their contributions and generosity are greatly appreciated.
   Haydn, and Mozart, in musicxml format which we have been able to include in music21.
 
 .. _Donald Byrd: https://web.archive.org/web/20220610200930/https://homes.luddy.indiana.edu/donbyrd/CMNExtremes.htm
+.. _Jacob Tylor Walls: https://jacobtylerwalls.com/
 .. _Laura E. Conrad: http://www.serpentpublications.org/drupal7/
 .. _MuseScore: https://musescore.com/
 .. _Bryen Travis: http://www.bachcentral.com/

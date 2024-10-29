@@ -14,7 +14,7 @@ Inner classes and functions for transcribing musical segments into braille.
 This module was made in consultation with the manual "Introduction to Braille
 Music Transcription, Second Edition" by Mary Turner De Garmo, 2005. It is
 available from the Library of Congress
-`here <https://www.loc.gov/nls/braille-audio-reading-materials/music-materials/>`_,
+`here <https://www.loc.gov/nls/services-and-resources/music-service-and-materials/>`_,
 and will henceforth be referred to as BMTM.
 '''
 from __future__ import annotations
