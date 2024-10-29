@@ -947,8 +947,8 @@ class OffsetAxis(PositionAxis):
                 #     continue  # skip
                 # if key == sorted(offsetMap.keys())[-1]:
                 #    continue  # skip last
-                # assume we can get the first Measure in the lost if
-                # measurers; this may not always be True
+                # assume we can get the first Measure in the list if
+                # there are measures; this may not always be True
                 mNoToUse.append(key)
         # environLocal.printDebug(['ticksOffset():', 'mNotToUse', mNoToUse])
 
