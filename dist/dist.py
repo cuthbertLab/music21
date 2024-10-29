@@ -49,9 +49,11 @@ so allocate time.  Start working on the announcement while it's running.
     Rename to music21.v.7.1.0-docs.zip (skip for Alpha/Beta)
 
 12. Run "hatch build" -- requires hatch to be installed "brew install hatch"
+    This builds the dist/music21-9.3.0.tar.gz and dist/music21-9.3.0-py3-none-any.whl
+    files.  That used to be what *this* script did, but now hatch does it better!
 
-13. Run this file -- it builds the no-corpus version of music21.
-    DO NOT RUN THIS ON A PC -- the Mac .tar.gz might have an incorrect permission if you do.
+13. Run this file: it builds the no-corpus version of music21.
+    DO NOT RUN THIS ON A PC or the Mac .tar.gz might have an incorrect permission if you do.
 
 14. PR and Commit to GitHub at this point w/ commit comment of the new version,
     then don't change anything until the next step is done.
