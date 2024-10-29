@@ -74,7 +74,7 @@ class MuseDataRecord(prebase.ProtoM21Object):
         else:
             self.stage = None
         # store frequently used values
-        self._cache = {}
+        self._cache: dict[str, str|None] = {}
 
     def isRest(self) -> bool:
         '''
@@ -398,9 +398,9 @@ class MuseDataRecord(prebase.ProtoM21Object):
     # TODO: need to get slurs from this indication:
     # (), {}, []
 
-    def _getAdditionalNotations(self):
+    def _getAdditionalNotations(self) -> str|None:
         '''
-        Return an articulation object or None
+        Return an articulation string or None
 
         >>> mdr = musedata.MuseDataRecord('C4    12        e     u  [      .p')
         >>> mdr._getAdditionalNotations()
@@ -420,16 +420,17 @@ class MuseDataRecord(prebase.ProtoM21Object):
         except KeyError:
             pass
 
+        data: str|None
         if len(self.src) < 31:
             data = None
         else:
             # accumulate chars 32-43, index 31, 42
-            data = []
+            data_list = []
             i = 31
             while i <= 42 and i < len(self.src):
-                data.append(self.src[i])
+                data_list.append(self.src[i])
                 i += 1
-            data = ''.join(data).strip()
+            data = ''.join(data_list).strip()
         self._cache['_getAdditionalNotations'] = data
         return data
 
@@ -578,7 +579,7 @@ class MuseDataRecordIterator:
     '''
 
     def __init__(self, src, parent):
-        self.src = src  # the lost of all record lines
+        self.src = src  # the list of all record lines
         self.index = 0
         self.parent = parent
 
@@ -738,7 +739,7 @@ class MuseDataMeasureIterator:
     '''
 
     def __init__(self, src, boundaries, parent):
-        self.src = src  # the lost of all record lines
+        self.src = src  # the list of all record lines
         self.boundaries = boundaries  # pairs of all boundaries
         self.index = 0
         self.parent = parent
@@ -1468,11 +1469,11 @@ class MuseDataFile(prebase.ProtoM21Object):
 
     When read, one or more MuseDataPart objects are created and stored on self.parts.
     '''
-    def __init__(self):
-        self.parts = []  # a lost of MuseDataPart objects
+    def __init__(self) -> None:
+        self.parts: list[MuseDataPart] = []
 
-        self.filename = None
-        self.file = None
+        self.filename: str|None = None
+        self.file: t.BinaryIO|None = None
         self.encoding: str = 'utf-8'
 
     def _reprInternal(self):
@@ -1550,7 +1551,7 @@ class MuseDataWork(prebase.ProtoM21Object):
     A work might consist of one or more files.
     '''
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.files: list[MuseDataFile] = []
         self.encoding: str = 'utf-8'
 

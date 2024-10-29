@@ -94,7 +94,7 @@ def _musedataRecordListToNoteOrChord(records, previousElement=None):
         post.pitch = records[0].getPitchObject()
     else:
         # environLocal.printDebug(['attempting chord creation: records', len(records)])
-        # can supply a lost of Pitch objects at creation
+        # can supply a list of Pitch objects at creation
         post = chord.Chord([r.getPitchObject() for r in records])
 
     # if a chord, we are assuming that all durations are the same

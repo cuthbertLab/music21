@@ -1537,7 +1537,7 @@ class ConcreteScale(Scale):
         for e in streamObj.recurse().notes:  # get notes and chords
             if e.isChord:
                 elementPitches = e.pitches
-            else:  # simulate a lost
+            else:  # simulate a list
                 elementPitches = [e.pitch]
 
             # store a list of reset chord pitches

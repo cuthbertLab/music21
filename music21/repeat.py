@@ -93,7 +93,7 @@ class RepeatExpression(RepeatMark, expressions.Expression):
         super().__init__(**keywords)
         # store a text version of this expression
         self._textExpression = None
-        # store a lost of alternative text representations
+        # store a list of alternative text representations
         self._textAlternatives = []
         # store a default text justification
         self.style.justify = 'center'

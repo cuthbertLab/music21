@@ -3768,7 +3768,7 @@ class Test(unittest.TestCase):
         n = note.Note('g#3')
         n.quarterLength = 0.5
         s.repeatAppend(n, 6)
-        # post = s.midiTracks  # get a lost
+        # post = s.midiTracks  # a list
         post = midiTranslate.streamHierarchyToMidiTracks(s)
 
         self.assertEqual(len(post[1].events), 30)

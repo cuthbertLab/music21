@@ -14,7 +14,7 @@ Builds various kinds of music21 distribution files and uploads them to PyPI and 
 
 To do a release,
 
-1. update the VERSION in _version.py and the single test cases in base.py.
+1. update the VERSION in _version.py and the single test case in base.py.
 2. run `corpus.corpora.CoreCorpus().cacheMetadata()`.
     for a major change that affects parsing run corpus.corpora.CoreCorpus().rebuildMetadataCache()
     (20 min on IntelMacbook Air) -- either of these MAY change a
