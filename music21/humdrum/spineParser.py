@@ -2156,7 +2156,7 @@ def hdStringToNote(contents):
     double-dotted quarter not a double-dotted quarter-note triplet.
 
     I believe that the latter definition, though used in
-    https://kern.ccarh.org/cgi-bin/ksdata?l=musedata/mozart/quartet&file=k421-01.krn&f=kern
+    https://kern.humdrum.org/cgi-bin/ksdata?l=musedata/mozart/quartet&file=k421-01.krn&f=kern
     and the Josquin Research Project [JRP] is incorrect, seeing as it
     contradicts the specification in
     https://web.archive.org/web/20100203144730/http://www.music-cog.ohio-state.edu/Humdrum/representations/kern.html#N-Tuplets

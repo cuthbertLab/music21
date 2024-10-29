@@ -40,7 +40,7 @@ See: https://groups.google.com/forum/#!forum/music21list
 
 [Contributing Guide](CONTRIBUTING.md)
 
-## Community Code of Conduct ##
+## Community Code of Conduct<a name="community-code-of-conduct"></a> ##
 
 `Music21` encourages contributions, discussions, and usage from all people interested in
 music and computers. This encouragement extends to all people regardless of (among other aspects)

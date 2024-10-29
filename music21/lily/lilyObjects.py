@@ -1560,13 +1560,13 @@ class LyMusicPropertyDef(LyObject):
 
 class LyEventChord(LyObject):
     r'''
-    takes all the parts as a list of up to three elements
+    takes all the parts as a list of up to three elements::
 
         event_chord: simple_chord_elements post_events
-                | CHORD_REPETITION optional_notemode_duration post_events
-                | MULTI_MEASURE_REST optional_notemode_duration post_events
-                | command_element
-               |note_chord_element
+               | CHORD_REPETITION optional_notemode_duration post_events
+               | MULTI_MEASURE_REST optional_notemode_duration post_events
+               | command_element
+               | note_chord_element
 
     simple_chord_elements can be a LySimpleElement object.  Or it can be a
     LyNewChord or LyFigureSpec + Duration

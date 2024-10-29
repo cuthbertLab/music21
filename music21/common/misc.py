@@ -115,12 +115,12 @@ def getMissingImportStr(modNameList):
     >>> print(common.getMissingImportStr(['matplotlib']))
     Certain music21 functions might need the optional package matplotlib;
     if you run into errors, install it by following the instructions at
-    http://mit.edu/music21/doc/installing/installAdditional.html
+    https://www.music21.org/music21docs/installing/installAdditional.html
 
     >>> print(common.getMissingImportStr(['matplotlib', 'numpy']))
     Certain music21 functions might need these optional packages: matplotlib, numpy;
     if you run into errors, install them by following the instructions at
-    http://mit.edu/music21/doc/installing/installAdditional.html
+    https://www.music21.org/music21docs/installing/installAdditional.html
     '''
     if not modNameList:
         return None
@@ -128,13 +128,13 @@ def getMissingImportStr(modNameList):
         m = modNameList[0]
         return textwrap.dedent(f'''Certain music21 functions might need the optional package {m};
                   if you run into errors, install it by following the instructions at
-                  http://mit.edu/music21/doc/installing/installAdditional.html''')
+                  https://www.music21.org/music21docs/installing/installAdditional.html''')
     else:
         m = ', '.join(modNameList)
         return textwrap.dedent(
             f'''Certain music21 functions might need these optional packages: {m};
                    if you run into errors, install them by following the instructions at
-                   http://mit.edu/music21/doc/installing/installAdditional.html''')
+                   https://www.music21.org/music21docs/installing/installAdditional.html''')
 
 
 def getPlatform() -> str:

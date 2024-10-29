@@ -42,7 +42,8 @@ so allocate time.  Start working on the announcement while it's running.
 
 [*] you will need sphinx, Jupyter (pip or easy_install), markdown, and pandoc (.dmg) installed
 
-10. move music21 docs to music21.org via Amazon S3 (contact MSAC for authentication if need be)
+10. move music21 documentation/build/html to music21.org/music21docs/
+    via Amazon S3 (contact MSAC for authentication if need be)
 
 11. zip up documentation/build/html and get ready to upload/delete it.
     Rename to music21.v.7.1.0-docs.zip (skip for Alpha/Beta)
