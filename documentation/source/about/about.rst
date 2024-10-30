@@ -91,7 +91,7 @@ to this project.  Their contributions and generosity are greatly appreciated.
    support and for their contributions to the open source music notation projects,
    including the Bach Goldberg Variations and the Handel Arias included.
 
-* `Jacob Tylor Walls`_, contributed greatly to the type-safety, speed, and test coverage
+* `Jacob Walls`_, contributed greatly to the type-safety, speed, and test coverage
    of `music21`.  If your music21 program "just works" without needing to guess what
    any argument goes where, Jacob is to thank.
 
@@ -142,7 +142,7 @@ to this project.  Their contributions and generosity are greatly appreciated.
   Haydn, and Mozart, in musicxml format which we have been able to include in music21.
 
 .. _Donald Byrd: https://web.archive.org/web/20220610200930/https://homes.luddy.indiana.edu/donbyrd/CMNExtremes.htm
-.. _Jacob Tylor Walls: https://jacobtylerwalls.com/
+.. _Jacob Walls: https://jacobtylerwalls.com/
 .. _Laura E. Conrad: http://www.serpentpublications.org/drupal7/
 .. _MuseScore: https://musescore.com/
 .. _Bryen Travis: http://www.bachcentral.com/
