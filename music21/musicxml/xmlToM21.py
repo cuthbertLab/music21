@@ -876,10 +876,12 @@ class MusicXMLImporter(XMLParserBase):
                     v.coreElementsChanged()
                     # Fill mid-measure gaps, and find end of measure gaps by ref to measure stream
                     # https://github.com/cuthbertlab/music21/issues/444
-                    v.makeRests(refStreamOrTimeRange=m,
-                                fillGaps=True,
-                                inPlace=True,
-                                hideRests=True)
+                    # but only when the score comes from Finale
+                    if any("Finale" in software for software in md.software):
+                        v.makeRests(refStreamOrTimeRange=m,
+                                    fillGaps=True,
+                                    inPlace=True,
+                                    hideRests=True)
         s.definesExplicitSystemBreaks = self.definesExplicitSystemBreaks
         s.definesExplicitPageBreaks = self.definesExplicitPageBreaks
         for p in s.parts:
