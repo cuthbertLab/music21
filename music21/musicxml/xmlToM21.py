@@ -877,7 +877,7 @@ class MusicXMLImporter(XMLParserBase):
                     # Fill mid-measure gaps, and find end of measure gaps by ref to measure stream
                     # https://github.com/cuthbertlab/music21/issues/444
                     # but only when the score comes from Finale
-                    if any("Finale" in software for software in md.software):
+                    if any('Finale' in software for software in md.software):
                         v.makeRests(refStreamOrTimeRange=m,
                                     fillGaps=True,
                                     inPlace=True,
