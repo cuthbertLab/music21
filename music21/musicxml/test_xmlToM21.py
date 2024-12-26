@@ -1255,7 +1255,7 @@ class Test(unittest.TestCase):
         # No rests should have been added
         self.assertFalse(v1.getElementsByClass(note.Rest))
         self.assertFalse(v2.getElementsByClass(note.Rest))
-   
+
         # Finale uses <forward> tags to represent hidden rests,
         # so we want to have rests here
         # Voice 1: Half note, <forward> (quarter), quarter note
