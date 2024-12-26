@@ -18267,6 +18267,11 @@ tremoloTest = '''<?xml version="1.0" encoding="UTF-8" standalone="no"?>
 hiddenRests = '''<?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!DOCTYPE score-partwise PUBLIC "-//Recordare//DTD MusicXML 3.1 Partwise//EN" "http://www.musicxml.org/dtds/partwise.dtd">
 <score-partwise version="3.1">
+  <identification>
+    <encoding>
+      <software>Finale 2014 for Mac</software>
+    </encoding>
+  </identification>
   <part-list>
     <score-part id="P1">
       <part-name print-object="no">MusicXML Part</part-name>
