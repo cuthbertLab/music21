@@ -141,7 +141,7 @@ class StreamSearcher:
     Now let's configure the algorithms:
 
     >>> ss.algorithms
-    [<...StreamSearcher.wildcardAlgorithm...>]
+    [<function StreamSearcher.wildcardAlgorithm at 0x111b6e340>]
 
     Wildcard search is a default algorithm that lets you use wildcards.
     I suggest you leave it in place and add to the algorithms list.  We can add the
@@ -149,8 +149,8 @@ class StreamSearcher:
 
     >>> ss.algorithms.append(search.StreamSearcher.rhythmAlgorithm)
     >>> ss.algorithms
-    [<...StreamSearcher.wildcardAlgorithm...>,
-     <...StreamSearcher.rhythmAlgorithm...>]
+    [<function StreamSearcher.wildcardAlgorithm at 0x111b6e340>,
+     <function StreamSearcher.rhythmAlgorithm at 0x11200000>]
 
 
     Now run it:
@@ -196,7 +196,7 @@ class StreamSearcher:
     '''
 
     def __init__(self, streamSearch: Stream, searchList: list[m21Base.Music21Object]):
-        self.streamSearch: Stream | iterator.StreamIterator = streamSearch
+        self.streamSearch: Stream|iterator.StreamIterator = streamSearch
         self.searchList: list[m21Base.Music21Object] = searchList
         self.recurse: bool = False
         self.filterNotes: bool = False
@@ -204,10 +204,10 @@ class StreamSearcher:
 
         self.algorithms: list[
             Callable[[StreamSearcher, m21Base.Music21Object, m21Base.Music21Object],
-                     bool | None]
+                     bool|None]
         ] = [StreamSearcher.wildcardAlgorithm]
 
-        self.activeIterator: iterator.StreamIterator | None = None
+        self.activeIterator: iterator.StreamIterator|None = None
 
     def run(self) -> list[SearchMatch]:
         thisStreamIterator: iterator.StreamIterator
@@ -1105,18 +1105,15 @@ def mostCommonMeasureRhythms(streamIn, transposeDiatonic=False):
                 'rhythmString': rhythmString,
             }
             measureNotes = thisMeasure.notes
-            foundNote = False
-            for i in range(len(measureNotes)):
-                if isinstance(measureNotes[i], note.Note):
+            for measureNote in measureNotes:
+                if isinstance(measureNote, note.Note):
                     distanceToTranspose = 72 - measureNotes[0].pitch.ps
-                    foundNote = True
+                    thisMeasureCopy = copy.deepcopy(thisMeasure)
+                    for n in thisMeasureCopy.notes:
+                        # TODO: Transpose Diatonic
+                        n.transpose(distanceToTranspose, inPlace=True)
+                    newDict['rhythm'] = thisMeasureCopy
                     break
-            if foundNote:
-                thisMeasureCopy = copy.deepcopy(thisMeasure)
-                for n in thisMeasureCopy.notes:
-                    # TODO: Transpose Diatonic
-                    n.transpose(distanceToTranspose, inPlace=True)
-                newDict['rhythm'] = thisMeasureCopy
             else:
                 newDict['rhythm'] = thisMeasure
             newDict['measures'] = [thisMeasure]

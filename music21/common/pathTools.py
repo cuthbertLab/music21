@@ -28,7 +28,7 @@ import os
 import pathlib
 import unittest
 
-StrOrPath = t.TypeVar('StrOrPath', bound=str | pathlib.Path)
+StrOrPath = t.TypeVar('StrOrPath', bound=str|pathlib.Path)
 
 # ------------------------------------------------------------------------------
 def getSourceFilePath() -> pathlib.Path:
@@ -88,7 +88,7 @@ def getCorpusContentDirs() -> list[str]:
      'nottingham-dataset',
      'oneills1850', 'palestrina',
      'ryansMammoth', 'schoenberg', 'schubert', 'schumann_clara', 'schumann_robert',
-     'theoryExercises', 'trecento', 'verdi', 'weber']
+     'theoryExercises', 'trecento', 'verdi', 'weber', 'webern']
 
     Make sure that all corpus data has a directoryInformation tag in
     CoreCorpus.
@@ -137,7 +137,7 @@ def getRootFilePath() -> pathlib.Path:
     return fpParent
 
 
-def relativepath(path: StrOrPath, start: str | None = None) -> StrOrPath | str:
+def relativepath(path: StrOrPath, start: str|None = None) -> StrOrPath|str:
     '''
     A cross-platform wrapper for `os.path.relpath()`, which returns `path` if
     under Windows, otherwise returns the relative path of `path`.
@@ -162,17 +162,17 @@ def cleanpath(path: str, *,
     return '/'  # dummy until Astroid #1015 is fixed.
 
 @overload
-def cleanpath(path: str | pathlib.Path, *,
+def cleanpath(path: str|pathlib.Path, *,
               returnPathlib: t.Literal[True]) -> pathlib.Path:
     return pathlib.Path('/')  # dummy until Astroid #1015 is fixed.
 
 @overload
-def cleanpath(path: str | pathlib.Path, *,
+def cleanpath(path: str|pathlib.Path, *,
               returnPathlib: t.Literal[False]) -> str:
     return '/'  # dummy until Astroid #1015 is fixed.
 
-def cleanpath(path: str | pathlib.Path, *,
-              returnPathlib: bool | None = None) -> str | pathlib.Path:
+def cleanpath(path: str|pathlib.Path, *,
+              returnPathlib: bool|None = None) -> str|pathlib.Path:
     '''
     Normalizes the path by expanding ~user on Unix, ${var} environmental vars
     (is this a good idea?), expanding %name% on Windows, normalizing path names

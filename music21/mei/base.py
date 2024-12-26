@@ -308,7 +308,7 @@ class MeiToM21Converter:
 
             if isinstance(self.documentRoot, ElementTree):
                 # pylint warns that :class:`Element` doesn't have a getroot() method, which is
-                # true enough, but...
+                # true enough, but it seems to work.
                 self.documentRoot = self.documentRoot.getroot()
 
             if f'{MEI_NS}mei' != self.documentRoot.tag:
@@ -353,8 +353,8 @@ class MeiToM21Converter:
 # -----------------------------------------------------------------------------
 def safePitch(
     name: str,
-    accidental: str | None = None,
-    octave: str | int = ''
+    accidental: str|None = None,
+    octave: str|int = ''
 ) -> pitch.Pitch:
     '''
     Safely build a :class:`~music21.pitch.Pitch` from a string.
@@ -392,7 +392,7 @@ def safePitch(
 
 
 def makeDuration(
-    base: float | int | Fraction = 0.0,
+    base: float|int|Fraction = 0.0,
     dots: int = 0
 ) -> duration.Duration:
     '''
@@ -411,7 +411,7 @@ def makeDuration(
     3.0
     >>> mei.base.makeDuration(base=2, dots=2).quarterLength  # 'base' can be an int or float
     3.5
-    >>> mei.base.makeDuration(2.0, 10).quarterLength  # you want ridiculous dots? Sure...
+    >>> mei.base.makeDuration(2.0, 10).quarterLength  # you want ridiculous dots? Sure!
     3.998046875
     >>> mei.base.makeDuration(0.33333333333333333333, 0).quarterLength  # works with fractions too
     Fraction(1, 3)
@@ -628,7 +628,7 @@ def _makeArticList(attr):
     return articList
 
 
-def _getOctaveShift(dis: t.Literal['8', '15', '22'] | None,
+def _getOctaveShift(dis: t.Literal['8', '15', '22']|None,
                     disPlace: str) -> int:
     '''
     Use :func:`_getOctaveShift` to calculate the :attr:`octaveShift` attribute for a
@@ -1038,7 +1038,7 @@ def _timeSigFromAttrs(elem):
     return meter.TimeSignature(f"{elem.get('meter.count')!s}/{elem.get('meter.unit')!s}")
 
 
-def _keySigFromAttrs(elem: Element) -> key.Key | key.KeySignature:
+def _keySigFromAttrs(elem: Element) -> key.Key|key.KeySignature:
     '''
     From any tag with (at minimum) either @key.pname or @key.sig attributes, make a
     :class:`KeySignature` or :class:`Key`, as possible.
@@ -1083,7 +1083,7 @@ def _transpositionFromAttrs(elem):
     # noinspection PyTypeChecker
     transSemi = int(elem.get('trans.semi', 0))
 
-    # If the difference between transSemi and transDiat is greater than five per octave...
+    # If the difference between transSemi and transDiat is greater than five per octave
     # noinspection SpellCheckingInspection
     if abs(transSemi - transDiat) > 5 * (abs(transSemi) // 12 + 1):
         # ... we need to add octaves to transDiat so it's the proper size. Otherwise,
@@ -1529,7 +1529,7 @@ def scoreDefFromElement(elem, slurBundle=None):
 
     This function returns a dictionary with objects that may relate to the entire score, to all
     parts at a particular moment, or only to a specific part at a particular moment. The dictionary
-    keys determine the object's scope. If the key is...
+    keys determine the object's scope. If the key is:
 
     * ``'whole-score objects'``, it applies to the entire score (e.g., page size);
     * ``'all-part objects'``, it applies to all parts at the moment this <scoreDef> appears;

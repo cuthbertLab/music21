@@ -2328,10 +2328,10 @@ notations32a = '''<?xml version="1.0" encoding="UTF-8"?>
     </measure>
 
     <!-- Articulations:
-            accent | strong-accent | staccato | tenuto |
+            accent|strong-accent | staccato | tenuto |
             detached-legato | staccatissimo | spiccato |
             scoop | plop | doit | falloff | breath-mark |
-            caesura | stress | unstress | other-articulation -->
+            caesura|stress | unstress | other-articulation -->
     <measure number="3">
       <note>
         <pitch>
@@ -17673,7 +17673,7 @@ octaveShifts33d = '''<?xml version="1.0" encoding="UTF-8"?>
 </score-partwise>
 '''
 
-# Copyright string in the Creator name...
+# Copyright string in the Creator name
 # noinspection SpellCheckingInspection
 unicodeStrWithNonAscii = '''<?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE score-partwise

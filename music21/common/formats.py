@@ -57,7 +57,7 @@ VALID_AUTO_DOWNLOAD = ['ask', 'deny', 'allow']
 # ------------------------------------------------------------------------------
 
 
-def findSubConverterForFormat(fmt: str) -> type[SubConverter] | None:
+def findSubConverterForFormat(fmt: str) -> type[SubConverter]|None:
     '''
     return a converter.subConverter.SubConverter subclass
     for a given format -- this is a music21 format name,
@@ -179,7 +179,7 @@ def findFormat(fmt):
 @cache
 def findInputExtension(fmt: str) -> tuple[str, ...]:
     '''
-    Will be fully deprecated when there's an exact equivalent in converter...
+    Will be fully deprecated when there's an exact equivalent in converter.
 
     Given an input format or music21 format, find and return all possible
     input extensions.
@@ -193,7 +193,7 @@ def findInputExtension(fmt: str) -> tuple[str, ...]:
     >>> common.findInputExtension('musedata')
     ('.md', '.musedata', '.zip')
 
-    Leading dots don't matter...
+    Leading dots don't matter:
 
     >>> common.findInputExtension('.mxl')
     ('.xml', '.mxl', '.musicxml')

@@ -1010,7 +1010,7 @@ class Sieve:
     >>> c = sieve.Sieve('(5|2)&4&8')
     '''
 
-    def __init__(self, usrStr: str | list[str], z: list[int] | None = None):
+    def __init__(self, usrStr: str|list[str], z: list[int]|None = None):
         # note: this z should only be used if usrStr is a str, and not a list
         if z is None and isinstance(usrStr, str):
             z = list(range(100))
@@ -1289,7 +1289,7 @@ class Sieve:
         try:
             # assume we have either an int (M), or a tuple (M,N)
             # better to remove the eval, but at least there are no globals or locals this way
-            # waste of two {} dicts -- could be cached, but not worth it for now...
+            # waste of two {} dicts -- could be cached, but not worth it for now
             args = literal_eval(usrStr)
         except (NameError, SyntaxError, TypeError):
             return None
@@ -1629,7 +1629,7 @@ class Sieve:
 
     def segment(
         self,
-        state: t.Literal['cmp'] | t.Literal['exp'] | None = None,
+        state: t.Literal['cmp']|t.Literal['exp']|None = None,
         n=0,
         z=None,
         segmentFormat=None
@@ -1681,7 +1681,7 @@ class Sieve:
         # this may raise an exception if mal-formed
         try:
             # better to remove the eval, but at least there are no globals or locals this way
-            # waste of two {} dicts -- could be cached, but not worth it for now...
+            # waste of two {} dicts -- could be cached, but not worth it for now
             seg = eval(evalStr, {'__builtins__': {'set': set}}, {})  # pylint: disable=eval-used
             # print('---: ' + evalStr)
             # print('xxx: ' + repr(seg))
@@ -1841,10 +1841,10 @@ class PitchSieve:
 
     def __init__(self,
                  sieveString,
-                 pitchLower: str | None = None,
-                 pitchUpper: str | None = None,
-                 pitchOrigin: str | None = None,
-                 eld: int | float = 1):
+                 pitchLower: str|None = None,
+                 pitchUpper: str|None = None,
+                 pitchOrigin: str|None = None,
+                 eld: int|float = 1):
         self.sieveString = sieveString  # logical sieve string
 
         # should be in a try block
@@ -1977,7 +1977,7 @@ class PitchSieve:
         #            self.sieveObject.period())
         p = self.sieveObject.period()
 
-        z: list[int] | None
+        z: list[int]|None
         if p < 999999999:
             z = list(range(p + 1))
         else:  # too big to get z as list of values

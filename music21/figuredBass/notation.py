@@ -209,10 +209,10 @@ class Notation(prebase.ProtoM21Object):
         # Parse notation string
         self.notationColumn: str = notationColumn or ''
         self.figureStrings: list[str] = []
-        self.origNumbers: tuple[int | None, ...] = ()
-        self.origModStrings: tuple[str | None, ...] = ()
+        self.origNumbers: tuple[int|None, ...] = ()
+        self.origModStrings: tuple[str|None, ...] = ()
         self.numbers: list[int] = []
-        self.modifierStrings: tuple[str | None, ...] = ()
+        self.modifierStrings: tuple[str|None, ...] = ()
         self.extenders: list[bool] = []
         self.hasExtenders: bool = False
         self._parseNotationColumn()
@@ -513,13 +513,13 @@ class Figure(prebase.ProtoM21Object):
 
     def __init__(
         self,
-        number: int | None = 1,
-        modifierString: str | None = '',
+        number: int|None = 1,
+        modifierString: str|None = '',
         *,
         extender: bool = False
     ):
-        self.number: int | None = number
-        self.modifierString: str | None = modifierString
+        self.number: int|None = number
+        self.modifierString: str|None = modifierString
         self.modifier: Modifier = Modifier(modifierString)
         # look for extender's underscore
         self.hasExtender: bool = extender

@@ -98,7 +98,7 @@ class Graph(prebase.ProtoM21Object):
     '''
     graphType = 'genericGraph'
     axisKeys: tuple[str, ...] = ('x', 'y')
-    figureSizeDefault: tuple[int | float, ...] = (6, 6)
+    figureSizeDefault: tuple[int|float, ...] = (6, 6)
 
     keywordConfigurables: tuple[str, ...] = (
         'alpha',
@@ -221,7 +221,7 @@ class Graph(prebase.ProtoM21Object):
 
     def nextColor(self):
         '''
-        Utility function that cycles through the colors of self.colors...
+        Utility function that cycles through the colors of self.colors.
 
         >>> g = graph.primitives.Graph()
         >>> g.colors = ['#605c7f', '#5c7f60', '#715c7f']
@@ -250,7 +250,7 @@ class Graph(prebase.ProtoM21Object):
         Pairs are iterables of positions and labels.
 
         N.B. -- both 'x' and 'y' ticks have to be set in
-        order to get matplotlib to display either... (and presumably 'z' for 3D graphs)
+        order to get matplotlib to display either (and presumably 'z' for 3D graphs).
 
         >>> g = graph.primitives.GraphHorizontalBar()
         >>> g.axis['x']['ticks']
@@ -271,7 +271,7 @@ class Graph(prebase.ProtoM21Object):
         >>> g.axis['x']['ticks']
         ([], [])
         '''
-        if pairs is None:  # is okay to send an empty list to clear everything...
+        if pairs is None:  # is okay to send an empty list to clear everything
             return
 
         if axisKey not in self.axis:
@@ -1004,7 +1004,7 @@ class GraphHorizontalBar(Graph):
 
             if points:
                 uniformFormatPerRow = (len(points[0]) == 2)
-                rowFaceColors: str | list[str]
+                rowFaceColors: str|list[str]
                 if uniformFormatPerRow:
                     rowFaceColors = faceColor
                     positionPoints = points

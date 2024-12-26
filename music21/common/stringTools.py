@@ -200,7 +200,7 @@ def spaceCamelCase(usrStr: str, replaceUnderscore=True, fixMeList=None) -> str:
     lastIsNum = False
     post: list[str] = []
 
-    # do not split these...
+    # do not split these
     if fixMeList is None:
         fixupList = ('PMFC',)
     else:
@@ -258,7 +258,7 @@ def getMd5(value=None) -> str:
     m = hashlib.md5()
     try:
         m.update(value)
-    except TypeError:  # unicode...
+    except TypeError:  # unicode
         m.update(value.encode('UTF-8'))
 
     return m.hexdigest()
@@ -470,7 +470,7 @@ def parenthesesMatch(
         i += 1
 
     if len(stack) > 1:
-        raise ValueError(f'Opening {open!r} at index {stack[1].start-1} was never closed')
+        raise ValueError(f'Opening {open!r} at index {stack[1].start - 1} was never closed')
 
     return mainMatch.nested
 

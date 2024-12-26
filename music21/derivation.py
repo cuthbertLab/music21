@@ -7,8 +7,7 @@
 #               Josiah Oberholtzer
 #               Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2011-2014 Michael Scott Asato Cuthbert and the music21
-#               Project
+# Copyright:    Copyright © 2011-2014 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ----------------------------------------------------------------------------
 '''
@@ -121,7 +120,7 @@ class Derivation(SlottedObjectMixin):
 
     Deleting the origin stream does not change the Derivation, since origin is held by strong ref:
 
-    >>> import gc  # Garbage collection...
+    >>> import gc  # Garbage collection
     >>> del s2
     >>> unused = gc.collect()  # ensure Garbage collection is run
     >>> d1
@@ -149,14 +148,14 @@ class Derivation(SlottedObjectMixin):
 
     # INITIALIZER #
 
-    def __init__(self, client: base.Music21Object | None = None):
+    def __init__(self, client: base.Music21Object|None = None):
         # store a reference to the Music21Object that has this Derivation object as a property
-        self._client: weakref.ReferenceType | None = None
-        self._clientId: int | None = None  # store python-id to optimize w/o unwrapping
-        self._method: str | None = None
+        self._client: weakref.ReferenceType|None = None
+        self._clientId: int|None = None  # store python-id to optimize w/o unwrapping
+        self._method: str|None = None
         # origin should be stored as a weak ref -- the place where the client was derived from.
         self._origin = None
-        self._originId: int | None = None  # store id to optimize w/o unwrapping
+        self._originId: int|None = None  # store id to optimize w/o unwrapping
 
         # set client; can handle None
         self.client = client
@@ -195,7 +194,7 @@ class Derivation(SlottedObjectMixin):
     # PUBLIC PROPERTIES #
 
     @property
-    def client(self) -> base.Music21Object | None:
+    def client(self) -> base.Music21Object|None:
         c = common.unwrapWeakref(self._client)
         if c is None and self._clientId is not None:
             self._clientId = None
@@ -205,7 +204,7 @@ class Derivation(SlottedObjectMixin):
         return c
 
     @client.setter
-    def client(self, client: base.Music21Object | None):
+    def client(self, client: base.Music21Object|None):
         # client is the Stream that this derivation lives on
         if client is None:
             self._clientId = None
@@ -240,13 +239,13 @@ class Derivation(SlottedObjectMixin):
         >>> list(s3.derivation.chain()) == [s2, s1]
         True
         '''
-        origin = self.origin
-        while origin is not None:
-            yield origin
-            origin = origin.derivation.origin
+        orig: base.Music21Object | None = self.origin
+        while orig is not None:
+            yield orig
+            orig = orig.derivation.origin  # pylint: disable=no-member
 
     @property
-    def method(self) -> str | None:
+    def method(self) -> str|None:
         '''
         Returns or sets the string of the method that was used to generate this
         Stream.
@@ -286,15 +285,15 @@ class Derivation(SlottedObjectMixin):
         return self._method
 
     @method.setter
-    def method(self, method: str | None):
+    def method(self, method: str|None):
         self._method = method
 
     @property
-    def origin(self) -> base.Music21Object | None:
+    def origin(self) -> base.Music21Object|None:
         return self._origin
 
     @origin.setter
-    def origin(self, origin: base.Music21Object | None):
+    def origin(self, origin: base.Music21Object|None):
         # for now, origin is not a weak ref
         if origin is None:
             self._originId = None
@@ -305,7 +304,7 @@ class Derivation(SlottedObjectMixin):
             # self._origin = common.wrapWeakref(origin)
 
     @property
-    def originId(self) -> int | None:
+    def originId(self) -> int|None:
         '''
         Return the Python id (=memory location) of the origin.
         (Same as id(derivation.origin).  Not the same as derivation.origin.ind)
@@ -313,7 +312,7 @@ class Derivation(SlottedObjectMixin):
         return self._originId
 
     @property
-    def rootDerivation(self) -> base.Music21Object | None:
+    def rootDerivation(self) -> base.Music21Object|None:
         r'''
         Return a reference to the oldest source of this Stream; that is, chain
         calls to :attr:`~music21.stream.Stream.derivesFrom` until we get to a

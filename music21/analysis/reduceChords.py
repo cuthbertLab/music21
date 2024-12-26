@@ -384,8 +384,7 @@ class ChordReducer:
                             )
                             print(msg)
                             # raise ChordReducerException(msg)
-                        if offset < previousTimespan.endTime:
-                            offset = previousTimespan.endTime
+                        offset = max(offset, previousTimespan.endTime)
                     scoreTree.removeTimespan(group[0])
                     subtree.removeTimespan(group[0])
                     newTimespan = group[0].new(offset=offset)
@@ -542,8 +541,7 @@ class ChordReducer:
             measureObject.flatten().notes,
             weightAlgorithm,
         )
-        if maximumNumberOfChords > len(chordWeights):
-            maximumNumberOfChords = len(chordWeights)
+        maximumNumberOfChords = min(maximumNumberOfChords, len(chordWeights))
         sortedChordWeights = sorted(
             chordWeights,
             key=chordWeights.get,
@@ -595,7 +593,7 @@ class ChordReducer:
         if currentGreedyChord is not None:
             currentGreedyChord.quarterLength = currentGreedyChordNewLength
             currentGreedyChordNewLength = 0.0
-        # even chord lengths...
+        # even chord lengths
         for i in range(1, len(measureObject)):
             c = measureObject[i]
             cOffsetCurrent = c.offset

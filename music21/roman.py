@@ -6,7 +6,7 @@
 # Authors:      Michael Scott Asato Cuthbert
 #               Christopher Ariza
 #
-# Copyright:    Copyright © 2011-2023 Michael Scott Asato Cuthbert
+# Copyright:    Copyright © 2011-2024 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # -----------------------------------------------------------------------------
 '''
@@ -123,7 +123,7 @@ figureShorthandsMode: dict[str, dict] = {
 }
 
 
-# this is sort of a crock...  :-)  but it's very helpful.
+# this is sort of a crock :-)  but it's very helpful.
 functionalityScores: dict[str, int] = {
     'I': 100,
     'i': 90,
@@ -321,7 +321,7 @@ def postFigureFromChordAndKey(chordObj, keyObj=None):
     Fails on German Augmented 6th chords in root position.  Calls them
     half-diminished chords.
 
-    (This is in OMIT...)
+    (This is in OMIT_FROM_etc.)
     '''
     if keyObj is None:
         keyObj = key.Key(chordObj.root())
@@ -526,9 +526,9 @@ def figureTupleSolo(
 
 
 def identifyAsTonicOrDominant(
-    inChord: list | tuple | chord.Chord,
+    inChord: list|tuple|chord.Chord,
     inKey: key.Key
-) -> str | t.Literal[False]:
+) -> str|t.Literal[False]:
     '''
     Returns the roman numeral string expression (either tonic or dominant) that
     best matches the inChord. Useful when you know inChord is either tonic or
@@ -607,7 +607,7 @@ def identifyAsTonicOrDominant(
     return rootScaleDeg + romanInversionName(inChord)
 
 
-def romanInversionName(inChord: chord.Chord, inv: int | None = None) -> str:
+def romanInversionName(inChord: chord.Chord, inv: int|None = None) -> str:
     '''
     Extremely similar to Chord's inversionName() method, but returns string
     values and allows incomplete triads.
@@ -738,7 +738,7 @@ def correctRNAlterationForMinor(
 
 def romanNumeralFromChord(
     chordObj: chord.Chord,
-    keyObj: key.Key | str | None = None,
+    keyObj: key.Key|str|None = None,
     preferSecondaryDominants: bool = False,
 ) -> RomanNumeral:
     # noinspection PyShadowingNames
@@ -1057,10 +1057,10 @@ def romanNumeralFromChord(
     # <music21.roman.RomanNumeral IV7 in c minor>
     # <music21.roman.RomanNumeral IV#75#3 in c minor>
 
-    (This is in OMIT...)
+    (This is in OMIT_FROM_etc.)
     '''
 
-    # use these when we know the key...  don't we need to know the mode?
+    # use these when we know the key. (But don't we need to know the mode too?)
     aug6subs = {
         '#ivo6b3': 'It6',
         '#ivob64': 'It64',  # minor only
@@ -1073,7 +1073,7 @@ def romanNumeralFromChord(
         'IIø7b5#3': 'Fr7',  # in major
         'IIø6#42': 'Fr42',  # in minor
         'IIøb6#42': 'Fr42',  # in major
-        'IIø65': 'Fr65',  # in minor seems wrong...
+        'IIø65': 'Fr65',  # in minor seems wrong
         'IIø65b3': 'Fr65',  # in major
 
         '#ii64b3': 'Sw43',
@@ -1109,7 +1109,7 @@ def romanNumeralFromChord(
         'i6b5bb3': 'Sw65',
 
         'io6b5b3': 'Ger65',
-        # Ger7 = iø7 -- is wrong...
+        # Ger7 = iø7 -- is wrong
         'iob64b3': 'Ger43',
         'iob6b42': 'Ger42',
     }
@@ -1191,7 +1191,7 @@ def romanNumeralFromChord(
 
     if (not isMajorThird
             and inversionString in minorSeventhSubs
-            # only do expensive call in case it might be possible...
+            # only do expensive call in case it might be possible
             and chordObj.isSeventhOfType((0, 3, 7, 10))):
         rnString = ft.prefix + stepRoman + minorSeventhSubs[inversionString]
     elif (not isMajorThird
@@ -1485,7 +1485,7 @@ class RomanNumeral(harmony.Harmony):
     >>> [str(p) for p in minorV.pitches]
     ['F#4', 'A4', 'B4', 'D5']
 
-    (We will do this `str(p) for p in...` thing enough that let's make a helper function:)
+    (We will do this `str(p) for p in` thing enough that let's make a helper function:)
 
     >>> def cp(rn_in):  # cp = chord pitches
     ...     return [str(p) for p in rn_in.pitches]
@@ -2380,8 +2380,8 @@ class RomanNumeral(harmony.Harmony):
 
     def __init__(
         self,
-        figure: str | int = '',
-        keyOrScale: key.Key | scale.ConcreteScale | str | None = None,
+        figure: str|int = '',
+        keyOrScale: key.Key|scale.ConcreteScale|str|None = None,
         *,
         caseMatters=True,
         updatePitches=True,
@@ -2390,10 +2390,10 @@ class RomanNumeral(harmony.Harmony):
         **keywords,
     ):
         self.primaryFigure: str = ''
-        self.secondaryRomanNumeral: RomanNumeral | None = None
-        self.secondaryRomanNumeralKey: key.Key | None = None
+        self.secondaryRomanNumeral: RomanNumeral|None = None
+        self.secondaryRomanNumeralKey: key.Key|None = None
 
-        self.pivotChord: RomanNumeral | None = None
+        self.pivotChord: RomanNumeral|None = None
         self.caseMatters: bool = caseMatters
         self.scaleCardinality: int = 7
 
@@ -2415,7 +2415,7 @@ class RomanNumeral(harmony.Harmony):
 
         # immediately fix low-preference figures
         if isinstance(figure, str):
-            figure = figure.replace('0', 'o')  # viio7
+            figure = re.sub(r'(?<!\d)0', 'o', figure)  # viio7 (but don't alter 10.)
             figure = figure.replace('º', 'o')
             figure = figure.replace('°', 'o')
             # /o is just a shorthand for ø -- so it should not be stored.
@@ -2434,8 +2434,8 @@ class RomanNumeral(harmony.Harmony):
         self._scale = None
         self.scaleDegree: int = 0
         self.frontAlterationString: str = ''
-        self.frontAlterationTransposeInterval: interval.Interval | None = None
-        self.frontAlterationAccidental: pitch.Accidental | None = None
+        self.frontAlterationTransposeInterval: interval.Interval|None = None
+        self.frontAlterationAccidental: pitch.Accidental|None = None
         self.romanNumeralAlone: str = ''
         self.figuresWritten: str = ''
         self.figuresNotationObj: fbNotation.Notation = _NOTATION_SINGLETON
@@ -2444,7 +2444,7 @@ class RomanNumeral(harmony.Harmony):
 
         self.impliedQuality: str = ''
 
-        self.impliedScale: scale.ConcreteScale | None = None
+        self.impliedScale: scale.ConcreteScale|None = None
         self.useImpliedScale: bool = False
         self.bracketedAlterations: list[tuple[str, int]] = []
         self.omittedSteps: list[int] = []
@@ -2458,7 +2458,7 @@ class RomanNumeral(harmony.Harmony):
         super().__init__(figure, updatePitches=updatePitches, **keywords)
         self.writeAsChord = True  # override from Harmony/ChordSymbol
         self._parsingComplete = True
-        self._functionalityScore: int | None = None
+        self._functionalityScore: int|None = None
         self.followsKeyChange: bool = False
 
     def __eq__(self, other):
@@ -2488,10 +2488,10 @@ class RomanNumeral(harmony.Harmony):
         if not isinstance(self._figure, str):  # pragma: no cover
             raise RomanNumeralException(f'got a non-string figure: {self._figure!r}')
 
-        if not self.useImpliedScale:
-            useScale = self._scale
-        else:
+        if self.useImpliedScale:
             useScale = self.impliedScale
+        else:
+            useScale = self._scale
 
         (workingFigure, useScale) = self._correctForSecondaryRomanNumeral(useScale)
 
@@ -2611,7 +2611,7 @@ class RomanNumeral(harmony.Harmony):
         >>> r._findSemitoneSizeForQuality('minor-seventh')
         (3, 7, 10)
 
-        (This is in OMIT...)
+        (This is in OMIT_FROM_etc.)
         '''
         correctSemitones: tuple[int, ...]
         if impliedQuality == 'major':
@@ -2701,11 +2701,9 @@ class RomanNumeral(harmony.Harmony):
         chordStepsToExamine = (3, 5, 7)
         # newPitches = []
 
-        for i in range(len(correctSemitones)):  # 3, 5, possibly 7
-            thisChordStep = chordStepsToExamine[i]
+        for thisChordStep, thisCorrect in zip(chordStepsToExamine, correctSemitones):
             if shouldSkipThisChordStep(thisChordStep):
                 continue
-            thisCorrect = correctSemitones[i]
             thisSemis = self.semitonesFromChordStep(thisChordStep)
             if thisSemis is None:  # no chord step
                 continue
@@ -2722,16 +2720,16 @@ class RomanNumeral(harmony.Harmony):
             # special cases for chords whose 7th does not necessarily match the scale.
             if self.impliedQuality == 'minor' and self.semitonesFromChordStep(7) == 11:
                 # i7 or iv7 chord or their inversions, in a major context.
-                # check first that this isn't on purpose...
+                # check first that this isn't on purpose
                 if not shouldSkipThisChordStep(7):
                     correctFaultyPitch(self.seventh, -1)
 
 
     def _correctForSecondaryRomanNumeral(
         self,
-        useScale: key.Key | scale.ConcreteScale,
-        figure: str | None = None
-    ) -> tuple[str, key.Key | scale.ConcreteScale]:
+        useScale: key.Key|scale.ConcreteScale,
+        figure: str|None = None
+    ) -> tuple[str, key.Key|scale.ConcreteScale]:
         '''
         Creates .secondaryRomanNumeral object and .secondaryRomanNumeralKey Key object
         inside the RomanNumeral object (recursively in case of V/V/V/V etc.) and returns
@@ -2743,8 +2741,8 @@ class RomanNumeral(harmony.Harmony):
         If figure is None, uses newFigure.
 
         >>> k = key.Key('C')
-        >>> r = roman.RomanNumeral('I', k)  # will not be used below...
-        >>> r._correctForSecondaryRomanNumeral(k)  # uses 'I'. nothing should change...
+        >>> r = roman.RomanNumeral('I', k)  # will not be used below
+        >>> r._correctForSecondaryRomanNumeral(k)  # uses 'I'. nothing should change
         ('I', <music21.key.Key of C major>)
         >>> r.secondaryRomanNumeral is None
         True
@@ -2764,7 +2762,7 @@ class RomanNumeral(harmony.Harmony):
         >>> r.secondaryRomanNumeralKey
         <music21.key.Key of a minor>
 
-        Recursive...
+        Recursive:
 
         >>> r._correctForSecondaryRomanNumeral(k, 'V7/V/V')
         ('V7', <music21.key.Key of D major>)
@@ -2803,7 +2801,7 @@ class RomanNumeral(harmony.Harmony):
             else:
                 secondaryMode = 'major'
 
-            # TODO: this should use a KeyCache...
+            # TODO: this should use a KeyCache
             # but lower priority since secondaries are relatively rare
             self.secondaryRomanNumeralKey = key.Key(
                 secondaryRomanNumeral.root().name,
@@ -2926,7 +2924,7 @@ class RomanNumeral(harmony.Harmony):
             group = match.group()
             alteration = len(group)
             if group[0] in ('b', '-'):
-                alteration *= -1  # else sharp...
+                alteration *= -1  # else sharp
             frontAlterationTransposeInterval = interval.intervalFromGenericAndChromatic(
                 interval.GenericInterval(1),
                 interval.ChromaticInterval(alteration),
@@ -2943,8 +2941,8 @@ class RomanNumeral(harmony.Harmony):
     def _parseRNAloneAmidstAug6(
         self,
         workingFigure: str,
-        useScale: key.Key | scale.ConcreteScale,
-    ) -> tuple[str, key.Key | scale.ConcreteScale]:
+        useScale: key.Key|scale.ConcreteScale,
+    ) -> tuple[str, key.Key|scale.ConcreteScale]:
         # noinspection PyShadowingNames
         '''
         Sets and removes from workingFigure the roman numeral alone, possibly
@@ -3051,7 +3049,7 @@ class RomanNumeral(harmony.Harmony):
 
     def adjustMinorVIandVIIByQuality(
         self,
-        useScale: key.Key | scale.ConcreteScale
+        useScale: key.Key|scale.ConcreteScale
     ) -> None:
         '''
         Fix minor vi and vii to always be #vi and #vii if `.caseMatters`.
@@ -3083,7 +3081,7 @@ class RomanNumeral(harmony.Harmony):
     def _adjustMinorVIandVIIByQuality(
         self,
         workingFigure: str,
-        useScale: key.Key | scale.ConcreteScale
+        useScale: key.Key|scale.ConcreteScale
     ) -> str:
         '''
         Fix minor vi and vii to always be #vi and #vii if `.caseMatters`.
@@ -3154,7 +3152,7 @@ class RomanNumeral(harmony.Harmony):
         if not self.caseMatters:
             return workingFigure
 
-        # THIS IS WHERE sixthMinor and seventhMinor goes...
+        # THIS IS WHERE sixthMinor and seventhMinor goes
         if self.scaleDegree == 6:
             minorDefault = self.sixthMinor
         else:
@@ -3195,7 +3193,7 @@ class RomanNumeral(harmony.Harmony):
         '''
         Utility function to update the pitches to the new figure etc.
         '''
-        useScale: key.Key | scale.ConcreteScale
+        useScale: key.Key|scale.ConcreteScale
         if self.secondaryRomanNumeralKey is not None:
             useScale = self.secondaryRomanNumeralKey
         elif self.useImpliedScale and self.impliedScale is not None:
@@ -3305,7 +3303,7 @@ class RomanNumeral(harmony.Harmony):
                 f'_updatePitches() was unable to derive pitches from the figure: {self.figure!r}'
             )  # pragma: no cover
 
-    def transpose(self: T, value, *, inPlace=False) -> T | None:
+    def transpose(self: T, value, *, inPlace=False) -> T|None:
         '''
         Overrides :meth:`~music21.harmony.Harmony.transpose` so that `key`
         attribute is transposed as well.
@@ -3358,7 +3356,7 @@ class RomanNumeral(harmony.Harmony):
         Traceback (most recent call last):
         ValueError: Cannot set romanNumeral property of RomanNumeral objects
 
-        (This is in OMIT...)
+        (This is in OMIT_FROM_etc.)
         '''
         if self.romanNumeralAlone in ('Ger', 'Sw', 'It', 'Fr'):
             return self.romanNumeralAlone
@@ -3469,7 +3467,7 @@ class RomanNumeral(harmony.Harmony):
         existing figure.
         '''
         if keyOrScale == self._scale and keyOrScale is not None:
-            return  # skip...
+            return  # skip
 
         # try to get Scale or Key object from cache: this will offer
         # performance boost as Scale stores cached pitch segments
@@ -3484,15 +3482,22 @@ class RomanNumeral(harmony.Harmony):
                     'Cannot call classes on object {0!r}, send only Key '
                     'or Scale Music21Objects'.format(keyOrScale))
             if 'Key' in keyClasses:
-                # good to go...
+                # good to go
                 if keyOrScale.tonicPitchNameWithCase not in _keyCache:
                     # store for later
                     _keyCache[keyOrScale.tonicPitchNameWithCase] = keyOrScale
             elif 'Scale' in keyClasses:
-                if keyOrScale.name in _scaleCache:
-                    keyOrScale = _scaleCache[keyOrScale.name]
+                # Need unique 'hash' for each scale. Names is not enough as there are
+                # multiple scales with the same name but different pitches.
+                scaleHash = keyOrScale.name
+                if getattr(keyOrScale, 'isConcrete', False):
+                    scaleHash += '_'.join(
+                        [p.nameWithOctave for p in keyOrScale.pitches]
+                    )
+                if scaleHash in _scaleCache:
+                    keyOrScale = _scaleCache[scaleHash]
                 else:
-                    _scaleCache[keyOrScale.name] = keyOrScale
+                    _scaleCache[scaleHash] = keyOrScale
             else:
                 raise RomanNumeralException(
                     f'Cannot get a key from this object {keyOrScale!r}, send only '
@@ -3524,7 +3529,7 @@ class RomanNumeral(harmony.Harmony):
             #     ])
 
     @property
-    def scaleDegreeWithAlteration(self) -> tuple[int, pitch.Accidental | None]:
+    def scaleDegreeWithAlteration(self) -> tuple[int, pitch.Accidental|None]:
         '''
         Returns a two element tuple of the scale degree and the
         accidental that alters the scale degree for things such as #ii or
@@ -3548,7 +3553,7 @@ class RomanNumeral(harmony.Harmony):
 
     def bassScaleDegreeFromNotation(
         self,
-        notationObject: fbNotation.Notation | None = None
+        notationObject: fbNotation.Notation|None = None
     ) -> int:
         '''
         Given a notationObject from
@@ -3649,7 +3654,7 @@ class RomanNumeral(harmony.Harmony):
             return self._functionalityScore
 
         if self.secondaryRomanNumeral:
-            figures = self.figure.split('/')  # error for half-diminished in secondary...
+            figures = self.figure.split('/')  # error for half-diminished in secondary
             score = 100.0
             for f in figures:
                 try:
@@ -3872,7 +3877,7 @@ class RomanNumeral(harmony.Harmony):
         >>> roman.RomanNumeral('iv', 'C').key.mode
         'major'
 
-        (This is in OMIT...)
+        (This is in OMIT_FROM_etc.)
         '''
 
         if evaluateSecondaryNumeral and self.secondaryRomanNumeral:
@@ -4315,7 +4320,7 @@ class Test(unittest.TestCase):
         for aug6 in augTests:
             rn = RomanNumeral(aug6, c_minor)
             ch = chord.Chord(rn.pitches)
-            # without key...
+            # without key
             rn_out = romanNumeralFromChord(ch)
             if aug6 not in ('Ger7', 'Fr7'):
                 # TODO(msc): fix these -- currently giving iø7 and Iø7 respectively
@@ -4349,6 +4354,10 @@ class Test(unittest.TestCase):
         self.assertEqual([p.name for p in rn.pitches], ['B', 'D', 'F', 'A-'])
         rn = roman.RomanNumeral('vii/07', 'c')
         self.assertEqual([p.name for p in rn.pitches], ['B', 'D', 'F', 'A'])
+        # However, when there is a '10' somewhere in the figure, don't replace
+        #   the 0 (this occurs in DCML corpora)
+        rn = roman.RomanNumeral('V7[add10]', 'c')
+        self.assertEqual([p.name for p in rn.pitches], ['G', 'B-', 'B', 'D', 'F'])
 
     def testIII7(self):
         c = chord.Chord(['E4', 'G4', 'B4', 'D5'])
@@ -4501,7 +4510,7 @@ class Test(unittest.TestCase):
         rn3 = romanNumeralFromChord(ch3, 'g')
         self.assertEqual(rn3.figure, 'iv43[#7]')
         new_fig_equals_old_figure(rn3, 'g')
-        # except third-inversion...
+        # except third-inversion
         ch4 = chord.Chord('B4 C5 E-5 G5')
         rn4 = romanNumeralFromChord(ch4, 'g')
         self.assertEqual(rn4.figure, 'iv42[#7]')
@@ -4550,6 +4559,14 @@ class Test(unittest.TestCase):
         # Major still works
         rn = RomanNumeral(4, 'C')
         self.assertEqual(rn.figure, 'IV')
+
+    def test_scale_caching(self):
+        mcs = scale.ConcreteScale('c', pitches=('C', 'D', 'E', 'F', 'G', 'A', 'B'))
+        rn = mcs.romanNumeral('IV7')
+        self.assertEqual([p.unicodeName for p in rn.pitches], ['F', 'A', 'C', 'E'])
+        mcs = scale.ConcreteScale('c', pitches=('C', 'D', 'E-', 'F', 'G', 'A', 'B'))
+        rn = mcs.romanNumeral('IV7')
+        self.assertEqual([p.unicodeName for p in rn.pitches], ['F', 'A', 'C', 'E♭'])
 
 
 class TestExternal(unittest.TestCase):

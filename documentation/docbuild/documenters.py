@@ -652,7 +652,7 @@ class ClassDocumenter(ObjectDocumenter):
         '''
         # if one of the _DOC_ATTRs is exactly the same as the previous base class,
         # only show it once.
-        # TODO: do this on an attribute by attribute basis...
+        # TODO: do this on an attribute by attribute basis
         seenBaseClassDocAttrs = []
 
         if self._inheritedDocAttrMapping is None:
@@ -1501,7 +1501,7 @@ class CorpusDocumenter(Documenter):
         result.extend(self.makeHeading(self.headingText, 1))
         result.extend(self.rstEditingWarningFormat)
         result.extend(self.rstCorpusIntroductionFormat)
-        # TODO: use... common.getCorpusContentDirs to make sure nothing is missed.
+        # TODO: use common.getCorpusContentDirs to make sure nothing is missed.
         for directoryInformation in corpus.corpora.CoreCorpus().getWorkReferences():
             result.extend(self.getRstComposerDictFormat(directoryInformation))
         return result

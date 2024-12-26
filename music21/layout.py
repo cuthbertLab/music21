@@ -155,20 +155,20 @@ class ScoreLayout(LayoutBase):
 
     def __init__(self,
                  *,
-                 scalingMillimeters: int | float | None = None,
-                 scalingTenths: int | float | None = None,
-                 musicFont: str | None = None,
-                 wordFont: str | None = None,
-                 pageLayout: PageLayout | None = None,
-                 systemLayout: SystemLayout | None = None,
-                 staffLayoutList: list[StaffLayout] | None = None,
+                 scalingMillimeters: int|float|None = None,
+                 scalingTenths: int|float|None = None,
+                 musicFont: str|None = None,
+                 wordFont: str|None = None,
+                 pageLayout: PageLayout|None = None,
+                 systemLayout: SystemLayout|None = None,
+                 staffLayoutList: list[StaffLayout]|None = None,
                  **keywords):
         super().__init__(**keywords)
 
         self.scalingMillimeters = scalingMillimeters
         self.scalingTenths = scalingTenths
-        self.pageLayout: PageLayout | None = pageLayout
-        self.systemLayout: SystemLayout | None = systemLayout
+        self.pageLayout: PageLayout|None = pageLayout
+        self.systemLayout: SystemLayout|None = systemLayout
         self.staffLayoutList: list[StaffLayout] = []
         self.musicFont = musicFont
         self.wordFont = wordFont
@@ -226,14 +226,14 @@ class PageLayout(LayoutBase):
 
     def __init__(self,
                  *,
-                 pageNumber: int | None = None,
-                 leftMargin: int | float | None = None,
-                 rightMargin: int | float | None = None,
-                 topMargin: int | float | None = None,
-                 bottomMargin: int | float | None = None,
-                 pageHeight: int | float | None = None,
-                 pageWidth: int | float | None = None,
-                 isNew: bool | None = None,
+                 pageNumber: int|None = None,
+                 leftMargin: int|float|None = None,
+                 rightMargin: int|float|None = None,
+                 topMargin: int|float|None = None,
+                 bottomMargin: int|float|None = None,
+                 pageHeight: int|float|None = None,
+                 pageWidth: int|float|None = None,
+                 isNew: bool|None = None,
                  **keywords):
         super().__init__(**keywords)
 
@@ -275,11 +275,11 @@ class SystemLayout(LayoutBase):
     '''
     def __init__(self,
                  *,
-                 leftMargin: int | float | None = None,
-                 rightMargin: int | float | None = None,
-                 distance: int | float | None = None,
-                 topDistance: int | float | None = None,
-                 isNew: bool | None = None,
+                 leftMargin: int|float|None = None,
+                 rightMargin: int|float|None = None,
+                 distance: int|float|None = None,
+                 topDistance: int|float|None = None,
+                 isNew: bool|None = None,
                  **keywords):
         super().__init__(**keywords)
 
@@ -360,11 +360,11 @@ class StaffLayout(LayoutBase):
     }
     def __init__(self,
                  *,
-                 distance: int | float | None = None,
-                 staffNumber: int | float | None = None,
-                 staffSize: int | float | None = None,
-                 staffLines: int | None = None,
-                 hidden: bool | None = None,
+                 distance: int|float|None = None,
+                 staffNumber: int|float|None = None,
+                 staffSize: int|float|None = None,
+                 staffLines: int|None = None,
+                 hidden: bool|None = None,
                  staffType: StaffType = StaffType.REGULAR,
                  **keywords):
         super().__init__(**keywords)
@@ -372,7 +372,7 @@ class StaffLayout(LayoutBase):
         # this is the distance between adjacent staves
         self.distance = distance
         self.staffNumber = staffNumber
-        self.staffSize: float | None = None if staffSize is None else float(staffSize)
+        self.staffSize: float|None = None if staffSize is None else float(staffSize)
         self.staffLines = staffLines
         self.hidden = hidden  # True = hidden; False = shown; None = inherit
         self.staffType: StaffType = staffType
@@ -427,16 +427,16 @@ class StaffGroup(spanner.Spanner):
     '''
     def __init__(self,
                  *spannedElements,
-                 name: str | None = None,
+                 name: str|None = None,
                  barTogether: t.Literal[True, False, None, 'Mensurstrich'] = True,
-                 abbreviation: str | None = None,
-                 symbol: t.Literal['bracket', 'line', 'brace', 'square'] | None = None,
+                 abbreviation: str|None = None,
+                 symbol: t.Literal['bracket', 'line', 'brace', 'square']|None = None,
                  **keywords):
         super().__init__(*spannedElements, **keywords)
 
         self.name = name or abbreviation  # if this group has a name
         self.abbreviation = abbreviation
-        self._symbol: t.Literal['bracket', 'line', 'brace', 'square'] | None = None
+        self._symbol: t.Literal['bracket', 'line', 'brace', 'square']|None = None
         self.symbol = symbol
         # determines if barlines are grouped through; this is group barline
         # in musicxml
@@ -475,10 +475,10 @@ class StaffGroup(spanner.Spanner):
         'Mensurstrich'
         ''')
 
-    def _getSymbol(self) -> t.Literal['bracket', 'line', 'brace', 'square'] | None:
+    def _getSymbol(self) -> t.Literal['bracket', 'line', 'brace', 'square']|None:
         return self._symbol
 
-    def _setSymbol(self, value: t.Literal['bracket', 'line', 'brace', 'square'] | None):
+    def _setSymbol(self, value: t.Literal['bracket', 'line', 'brace', 'square']|None):
         if value is None or str(value).lower() == 'none':
             self._symbol = None
         elif value.lower() in ['brace', 'line', 'bracket', 'square']:
@@ -641,7 +641,7 @@ def divideByPages(
         for systemStartM, systemEndM in systemMeasureTuples:
             if systemStartM < pageStartM or systemEndM > pageEndM:
                 continue
-            systemNumber += 1  # global, not on this page...
+            systemNumber += 1  # global, not on this page
             pageSystemNumber += 1
             if fastMeasures is True:
                 measureStacks = scoreIn.measures(systemStartM, systemEndM,
@@ -896,7 +896,7 @@ class LayoutScore(stream.Opus):
         dataCache[pageId] = dataTuple
         return dataTuple
 
-    def getPositionForSystem(self, pageId, systemId):
+    def getPositionForSystem(self, pageId: int, systemId: int) -> SystemSize:
         '''
         first systems on a page use a different positioning.
 
@@ -904,8 +904,7 @@ class LayoutScore(stream.Opus):
         relative to the page margins
 
         N.B. right is NOT the width -- it is different.  It is the offset to the right margin.
-        weird, inconsistent, but most useful...bottom is the hard part to compute...
-
+        weird, inconsistent, but most useful.  Bottom, however, is the hard part to compute.
 
         >>> lt = corpus.parse('demos/layoutTestMore.xml')
         >>> ls = layout.divideByPages(lt, fastMeasures = True)
@@ -1147,7 +1146,7 @@ class LayoutScore(stream.Opus):
             positionForStaffCache[cacheKey] = 0.0
             return 0.0
 
-        # nope, not first staff or first visible staff...
+        # nope, not first staff or first visible staff
 
         staffDistanceFromPrevious = 60.0  # sensible default?
 
@@ -1294,7 +1293,7 @@ class LayoutScore(stream.Opus):
         self,
         pageId: int,
         systemId: int
-    ) -> tuple[int | None, int]:
+    ) -> tuple[int|None, int]:
         # noinspection PyShadowingNames
         '''
         given a pageId and systemId, get the (pageId, systemId) for the previous system.

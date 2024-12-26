@@ -276,10 +276,10 @@ def noCorpus():
 
 def getWork(
     workName: str,
-    movementNumber: int | None = None,
+    movementNumber: int|None = None,
     *,
     fileExtensions: Iterable[str] = ()
-) -> pathlib.Path | list[pathlib.Path]:
+) -> pathlib.Path|list[pathlib.Path]:
     '''
     Search all Corpora for a work, and return a file path.
     N.B. does not parse the work: but it's suitable for passing
@@ -320,13 +320,13 @@ def getWork(
 # pylint: disable=redefined-builtin
 # noinspection PyShadowingBuiltins
 def parse(
-    workName: str | pathlib.Path,
-    movementNumber: int | None = None,
+    workName: str|pathlib.Path,
+    movementNumber: int|None = None,
     *,
-    number: int | None = None,
+    number: int|None = None,
     fileExtensions: Iterable[str] = (),
     forceSource: bool = False,
-    format: str | None = None
+    format: str|None = None
 ):
     '''
     The most important method call for corpus.

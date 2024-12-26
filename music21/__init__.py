@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 '''
-The music21 Framework is Copyright © 2006-2023 Michael Scott Asato Cuthbert.
+The music21 Framework is Copyright © 2006-2024 Michael Scott Asato Cuthbert.
 
 Some Rights Reserved
 Released under the BSD (3-clause) license.  See license.txt.
@@ -52,7 +52,7 @@ if sys.version_info < minPythonVersion:
     If you have the wrong version there are several options for getting
     the right one.
 
-    - 1. (Best) Upgrade to Python 3, latest (currently 3.10).
+    - 1. (Best) Upgrade to Python 3, latest (currently 3.12).
 
          The great features there will more
          than make up for the headache of downloading
@@ -83,7 +83,7 @@ __all__ = [
     'mainTest',
 
     'prebase',  # before all
-    'base',  # top...
+    'base',  # top
     'sites',  # important
 
     # sub folders

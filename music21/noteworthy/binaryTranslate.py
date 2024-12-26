@@ -265,7 +265,7 @@ class NWCConverter:
         self.currentAlterations: dict[int, str] = {}
 
     # noinspection SpellCheckingInspection
-    def parseFile(self, fp: pathlib.Path | str):
+    def parseFile(self, fp: pathlib.Path|str):
         # noinspection PyShadowingNames
         r'''
         Parse a file (calls .toStream)
@@ -863,7 +863,7 @@ class NWCObject:
         self.sharps = p.byteToInt()
         p.skipBytes(7)
 
-        # too complex...
+        # too complex
         # for letter in ['A', 'B', 'C', 'D', 'E', 'F', 'G']:
         #     bitshift = ord(letter) - ord('A')
         #     letterMask = 1 << bitshift
@@ -1108,7 +1108,7 @@ class NWCObject:
         p = self.parserParent
         self.type = 'Rest'
         if p.version <= 150:
-            print('igg...')
+            print('Does not work under version 1.50')
         else:
             self.duration = p.byteToInt()
             self.data2 = p.readBytes(5)

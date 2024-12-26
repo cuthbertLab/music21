@@ -5,8 +5,7 @@
 #
 # Authors:      Josiah Wolf Oberholtzer
 #
-# Copyright:    Copyright © 2009-2012, 2014 Michael Scott Asato Cuthbert and the music21
-#               Project
+# Copyright:    Copyright © 2009-2012, 2014 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # -----------------------------------------------------------------------------
 from __future__ import annotations
@@ -40,7 +39,7 @@ class Corpus(prebase.ProtoM21Object):
 
     __metaclass__ = abc.ABCMeta
 
-    # TODO: this is volatile -- should be elsewhere...
+    # TODO: this is volatile -- should be elsewhere
     _acceptableExtensions: list[str] = [
         'abc', 'capella', 'midi', 'musicxml', 'musedata',
         'humdrum', 'romantext', 'noteworthytext', 'noteworthy'
@@ -58,7 +57,7 @@ class Corpus(prebase.ProtoM21Object):
 
     _pathsCache: dict[tuple[str, tuple[str, ...]], list[pathlib.Path]] = {}
 
-    _directoryInformation: tuple[()] | Sequence[tuple[str, str, bool]] = ()
+    _directoryInformation: tuple[()]|Sequence[tuple[str, str, bool]] = ()
 
     parseUsingCorpus = True
 
@@ -108,7 +107,7 @@ class Corpus(prebase.ProtoM21Object):
                     matched.append(filename)
                     break
 
-        # this is actually twice as slow...
+        # this is actually twice as slow
         # for extension in fileExtensions:
         #     for filename in rdp.rglob('*' + extension):
         #           ... etc ...
@@ -265,8 +264,8 @@ class Corpus(prebase.ProtoM21Object):
 
     def getWorkList(
         self,
-        workName: str | pathlib.Path,
-        movementNumber: int | Collection[int] | None = None,
+        workName: str|pathlib.Path,
+        movementNumber: int|Collection[int]|None = None,
         *,
         fileExtensions: Iterable[str] = (),
     ):
@@ -278,7 +277,7 @@ class Corpus(prebase.ProtoM21Object):
 
         >>> coreCorpus = corpus.corpora.CoreCorpus()
 
-        This returns 1 even though there is a '.mus' file, which cannot be read...
+        This returns 1 even though there is a '.mus' file, which cannot be read:
 
         >>> len(coreCorpus.getWorkList('cpebach/h186'))
         1
@@ -314,7 +313,7 @@ class Corpus(prebase.ProtoM21Object):
                 results.append(path)
 
         if results:
-            # more than one matched...use more stringent criterion:
+            # more than one matched, so use more stringent criterion:
             # must have a slash before the name
             previousResults = results
             results = []
@@ -376,7 +375,7 @@ class Corpus(prebase.ProtoM21Object):
     def search(
         self,
         query: str,
-        field: str | None = None,
+        field: str|None = None,
         *,
         fileExtensions: Iterable[str] = (),
         **keywords
@@ -581,6 +580,7 @@ class CoreCorpus(Corpus):
         ('trecento', 'Fourteenth-Century Italian Music', False),
         ('verdi', 'Giuseppe Verdi', True),
         ('weber', 'Carl Maria von Weber', True),
+        ('webern', 'Anton Webern', True),
     )
 
     _noCorpus = False
@@ -731,7 +731,7 @@ class LocalCorpus(Corpus):
 
     # INITIALIZER #
 
-    def __init__(self, name: str | None = None):
+    def __init__(self, name: str|None = None):
         if not isinstance(name, (str, type(None))):
             raise CorpusException('Name must be a string or None')
 
@@ -881,7 +881,7 @@ class LocalCorpus(Corpus):
 
         return Corpus._pathsCache[cacheKey]
 
-    def removePath(self, directoryPath: str | pathlib.Path) -> None:
+    def removePath(self, directoryPath: str|pathlib.Path) -> None:
         r'''
         Remove a directory path from a local corpus.
 
@@ -982,7 +982,7 @@ class LocalCorpus(Corpus):
 
 # class VirtualCorpus(Corpus):
 #     r'''
-#     A model of the *virtual* corpus. that stays online...
+#     A model of the *virtual* corpus. that stays online.
 #
 #     >>> virtualCorpus = corpus.corpora.VirtualCorpus()
 #

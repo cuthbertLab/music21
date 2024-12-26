@@ -71,8 +71,8 @@ defaultTempoValues = {
 
 
 def convertTempoByReferent(
-    numberSrc: int | float,
-    quarterLengthBeatSrc: int | float,
+    numberSrc: int|float,
+    quarterLengthBeatSrc: int|float,
     quarterLengthBeatDst=1.0
 ) -> float:
     '''
@@ -407,14 +407,14 @@ class MetronomeMark(TempoIndication):
 
     def __init__(
         self,
-        text: str | int | None = None,
-        number: OffsetQLIn | None = None,
-        referent: OffsetQLIn | str | duration.Duration | base.Music21Object | None = None,
+        text: str|int|None = None,
+        number: OffsetQLIn|None = None,
+        referent: OffsetQLIn|str|duration.Duration|base.Music21Object|None = None,
         *,
         parentheses: bool = False,
         playbackOnly: bool = False,
-        numberSounding: OffsetQLIn | None = None,
-        numberImplicit: bool | None = None,
+        numberSounding: OffsetQLIn|None = None,
+        numberImplicit: bool|None = None,
         **keywords
     ) -> None:
         super().__init__(**keywords)
@@ -423,7 +423,7 @@ class MetronomeMark(TempoIndication):
             number = text
             text = None
 
-        self._number: int | float | None = (
+        self._number: int|float|None = (
             common.numToIntOrFloat(number) if number is not None else None
         )
         self.numberImplicit = None
@@ -549,10 +549,10 @@ class MetronomeMark(TempoIndication):
         medium fast
         ''')
 
-    def _getNumber(self) -> int | float | None:
+    def _getNumber(self) -> int|float|None:
         return self._number  # may be None
 
-    def _setNumber(self, value: int | float | None,
+    def _setNumber(self, value: int|float|None,
                    updateTextFromNumber=True):
         # do not replace with a @property since _setNumber has an
         # optional second attribute.
@@ -604,7 +604,7 @@ class MetronomeMark(TempoIndication):
         ''')
 
     # -------------------------------------------------------------------------
-    def getQuarterBPM(self, useNumberSounding=True) -> float | None:
+    def getQuarterBPM(self, useNumberSounding=True) -> float|None:
         '''
         Get a BPM value where the beat is a quarter; must convert from the
         defined beat to a quarter beat. Will return None if no beat number is defined.
@@ -1180,8 +1180,8 @@ class MetricModulation(TempoIndication):
 
     def setOtherByReferent(
         self,
-        side: str | None = None,
-        referent: str | int | float = 1.0
+        side: str|None = None,
+        referent: str|int|float = 1.0
     ):
         '''
         Set the other side of the metric modulation not based on equality,

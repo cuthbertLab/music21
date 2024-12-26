@@ -1493,7 +1493,7 @@ class PitchClassDistributionFeature(featuresModule.FeatureExtractor):
         '''
         Do processing necessary, storing result in feature.
         '''
-        # Create vector with [C, C#, D...]
+        # Create vector with [C, C#, D, etc.]
         temp = [0] * self.dimensions
         for i, count in enumerate(self.data['pitches.pitchClassHistogram']):
             temp[i] = count
@@ -1509,7 +1509,7 @@ class FifthsPitchHistogramFeature(featuresModule.FeatureExtractor):
     '''
     A feature array with bins corresponding to the values of the 5ths pitch class
     histogram. Instead of the bins being arranged according to semitones --
-    [C, C#, D...] -- they are arranged according to the circle of fifths:
+    [C, C#, D, etc.] -- they are arranged according to the circle of fifths:
     [C, G, D, A, E, B, F#, C#, G#, D#, A#, F]. Viewing such a histogram
     may draw attention to the prevalence of a tonal center, including the
     prevalence of dominant relationships in the piece.
@@ -3016,8 +3016,7 @@ class MaximumNumberOfIndependentVoicesFeature(featuresModule.FeatureExtractor):
             for p in c.pitches:
                 for gSub in p.groups:
                     g.append(gSub)  # add to temporary group; will act as a set
-            if len(g) > found:
-                found = len(g)
+            found = max(found, len(g))
         self.feature.vector[0] = found
 
 

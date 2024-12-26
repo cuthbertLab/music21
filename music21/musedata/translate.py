@@ -94,7 +94,7 @@ def _musedataRecordListToNoteOrChord(records, previousElement=None):
         post.pitch = records[0].getPitchObject()
     else:
         # environLocal.printDebug(['attempting chord creation: records', len(records)])
-        # can supply a lost of Pitch objects at creation
+        # can supply a list of Pitch objects at creation
         post = chord.Chord([r.getPitchObject() for r in records])
 
     # if a chord, we are assuming that all durations are the same
@@ -115,13 +115,13 @@ def _musedataRecordListToNoteOrChord(records, previousElement=None):
 
     # get accents and expressions; assumes all on first
     # returns an empty list of None
-    dynamicObjs = []  # stored in stream, not Note
 
     for a in records[0].getArticulationObjects():
         post.articulations.append(a)
     for e in records[0].getExpressionObjects():
         post.expressions.append(e)
 
+    dynamicObjs = []  # stored in stream, not Note
     for d in records[0].getDynamicObjects():
         dynamicObjs.append(d)
 
@@ -230,8 +230,7 @@ def musedataPartToStreamPart(museDataPart, inputM21=None):
         pendingRecords = []
 
         # get notes in each record
-        for i in range(len(mdrObjs)):
-            mdr = mdrObjs[i]
+        for mdr in mdrObjs:
             # environLocal.printDebug(['processing:', mdr.src])
 
             if mdr.isBack():
@@ -582,7 +581,7 @@ class Test(unittest.TestCase):
     #     # note: this is importing a large work, but this seems to presently
     #     # be the only one with dynamics
     #
-    #     # TODO: Turn back on when a smaller work is found...
+    #     # TODO: Turn back on when a smaller work is found
     #     from music21 import corpus
     #     s = corpus.parse('symphony94', 3)
     #     sFlat = s.flatten()

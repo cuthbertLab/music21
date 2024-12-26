@@ -1068,15 +1068,15 @@ class Iterator:
                   'titleList', 'numberList', 'returnType', 'iterationType']
 
     def __init__(self,
-                 currentNumber: int | None = None,
-                 highestNumber: int | None = None,
+                 currentNumber: int|None = None,
+                 highestNumber: int|None = None,
                  *,
                  numberingSystem: str = 'riemenschneider',
                  returnType: str = 'stream',
                  iterationType: str = 'number',
                  analysis: bool = False,
-                 numberList: list[int] | None = None,
-                 titleList: list[str] | None = None,
+                 numberList: list[int]|None = None,
+                 titleList: list[str]|None = None,
                  ):
         '''
         By default: numberingSystem = 'riemenschneider', currentNumber = 1,
@@ -1111,11 +1111,11 @@ class Iterator:
         self.iterationType = iterationType
 
         if numberList is not None:
-            # TODO: overly complex order of setting...
+            # TODO: overly complex order of setting
             self.numberList = numberList
 
         if titleList is not None:
-            # TODO: overly complex order of setting...
+            # TODO: overly complex order of setting
             self.titleList = titleList
 
         # These assignments must come after .iterationType

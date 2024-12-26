@@ -655,7 +655,7 @@ class ContiguousSegmentSearcher:
 
         chordList = self.chordList
         chordList.append(n)
-        self.totalLength = self.totalLength + len(n.pitches)
+        self.totalLength += len(n.pitches)
 
         lengthOfActive = self.totalLength
         numChordsToDelete = 0
@@ -776,7 +776,7 @@ class ContiguousSegmentSearcher:
         else:
             self.chordList = chordList = [n]
 
-        # all unique....
+        # all unique
         if len(chordList) == self.searchLength:
             self.activeChordList = chordList[:]
             self.addActiveChords(partNumber)
@@ -1804,7 +1804,7 @@ class TransposedMultisetMatcher(SegmentMatcher):
 
     def checkSearchedAlready(self, multiset):
         '''
-        searched already uses counters...
+        searched already uses counters.
         '''
         searchSegmentCounter = {}
         for i in range(12):

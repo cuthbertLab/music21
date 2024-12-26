@@ -175,7 +175,7 @@ class CapellaImporter:
         # this line is redundant currently, since all we have in systemScore
         # are Systems, but later there will be other things.
         systemStream = systemScore.getElementsByClass(layout.System)
-        partDictById: dict[str | int, dict[str, t.Any]] = {}
+        partDictById: dict[str|int, dict[str, t.Any]] = {}
         for thisSystem in systemStream:
             # this line is redundant currently, since all we have in
             # thisSystem are Parts, but later there will be other things.
@@ -188,12 +188,12 @@ class CapellaImporter:
                     partDictById[thisPart.id] = {'part': newPart, 'number': j}
                 else:
                     newPart = partDictById[thisPart.id]['part']
-                for el in thisPart:  # no need for recurse...
+                for el in thisPart:  # no need for recurse
                     newPart.coreInsert(common.opFrac(el.offset + systemOffset), el)
                 newPart.coreElementsChanged()
         newScore = stream.Score()
         # ORDERED DICT
-        parts: list[stream.Part | None] = [None for i in range(len(partDictById))]
+        parts: list[stream.Part|None] = [None for i in range(len(partDictById))]
         for partId in partDictById:
             partDict = partDictById[partId]
             parts[partDict['number']] = partDict['part']
@@ -307,7 +307,7 @@ class CapellaImporter:
                 raise CapellaImportException(
                     'No <voice> tag found in the <voices> tag for the <staff> tag for the '
                     + '<staves> element for this <system> element')
-            if len(voiceList) == 1:  # single voice staff... perfect!
+            if len(voiceList) == 1:  # single voice staff perfect!
                 thisVoiceElement = voiceList[0]
                 noteObjectsList = thisVoiceElement.findall('noteObjects')
                 if not noteObjectsList:
@@ -519,7 +519,7 @@ class CapellaImporter:
         noteNameWithOctave = headElement.attrib['pitch']
         n = note.Note()
         n.nameWithOctave = noteNameWithOctave
-        n.octave = n.octave - 1  # capella octaves are 1 off...
+        n.octave = n.octave - 1  # capella octaves are 1 off
 
         alters = headElement.findall('alter')
         if len(alters) > 1:

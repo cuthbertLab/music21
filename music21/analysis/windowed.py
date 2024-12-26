@@ -187,16 +187,14 @@ class WindowedAnalysis:
                 try:
                     data[i], color[i] = self.processor.process(current)
                 except DiscreteAnalysisException:
-                    # current might have no notes...all rests?
+                    # current might have no notes: all rests?
                     data[i], color[i] = (None, None, 0), '#ffffff'
 
         elif windowType == 'noOverlap':
             start = 0
             end = start + windowSize
-            i = 0
-            while True:
-                if end >= len(self._windowedStream):
-                    end = len(self._windowedStream)
+            for i in range(windowCount):
+                end = min(end, len(self._windowedStream))
 
                 current = stream.Stream()
                 for j in range(start, end):
@@ -205,14 +203,11 @@ class WindowedAnalysis:
                 try:
                     data[i], color[i] = self.processor.process(current)
                 except DiscreteAnalysisException:
-                    # current might have no notes...all rests?
+                    # current might have no notes: all rests?
                     data[i], color[i] = (None, None, 0), '#ffffff'
 
                 start = end
                 end = start + windowSize
-                i += 1
-                if i >= windowCount:
-                    break
 
         elif windowType == 'adjacentAverage':
             # first get overlapping windows
@@ -237,16 +232,16 @@ class WindowedAnalysis:
                 try:
                     data[i], color[i] = self.processor.process(current)
                 except DiscreteAnalysisException:
-                    # current might have no notes...all rests?
+                    # current might have no notes: all rests?
                     data[i], color[i] = (None, None, 0), '#ffffff'
 
         return data, color
 
 
     def process(self,
-                minWindow: int | None = 1,
-                maxWindow: int | None = 1,
-                windowStepSize: int | str = 1,
+                minWindow: int|None = 1,
+                maxWindow: int|None = 1,
+                windowStepSize: int|str = 1,
                 windowType='overlap',
                 includeTotalWindow=True):
         # noinspection PyShadowingNames

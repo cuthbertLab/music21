@@ -6,7 +6,7 @@
 # Authors:      Michael Scott Asato Cuthbert
 #               Christopher Ariza
 #
-# Copyright:    Copyright © 2008-2023 Michael Scott Asato Cuthbert
+# Copyright:    Copyright © 2008-2024 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # -----------------------------------------------------------------------------
 '''
@@ -66,7 +66,7 @@ class StreamCore(Music21Object):
         # should isFlat become readonly?
         self.isFlat = True  # does it have no embedded Streams
 
-        # someday...
+        # someday
         # self._elementTree = tree.trees.ElementTree(source=self)
 
     def coreInsert(
@@ -168,7 +168,7 @@ class StreamCore(Music21Object):
     def coreSetElementOffset(
         self,
         element: Music21Object,
-        offset: int | float | Fraction | OffsetSpecial,
+        offset: int|float|Fraction|OffsetSpecial,
         *,
         addElement=False,
         setActiveSite=True
@@ -212,7 +212,7 @@ class StreamCore(Music21Object):
         *,
         updateIsFlat: bool = True,
         clearIsSorted: bool = True,
-        memo: list[int] | None = None,
+        memo: list[int]|None = None,
         keepIndex: bool = False,
     ) -> None:
         '''
@@ -256,7 +256,7 @@ class StreamCore(Music21Object):
 
         # WHY??? THIS SEEMS OVERKILL, esp. since the first call to .sort() in .flatten() will
         # invalidate it! TODO: Investigate if this is necessary and then remove if not necessary
-        # should not need to do this...
+        # should not need to do this
 
         # if this Stream is a flat representation of something, and its
         # elements have changed, than we must clear the cache of that
@@ -429,7 +429,7 @@ class StreamCore(Music21Object):
                                 f'the object ({element!r}, id()={id(element)} '
                                 + f'is already found in this Stream ({self!r}, id()={id(self)})'
                             )
-                # something was old... delete from _offsetDict
+                # something was old. delete from _offsetDict
                 # environLocal.warn('stale object')
                 del self._offsetDict[idElement]  # pragma: no cover
         # if we do not purge locations here, we may have ids() for
@@ -546,8 +546,8 @@ class StreamCore(Music21Object):
         recurse: bool = True,
         requireAllPresent: bool = True,
         insert: bool = True,
-        constrainingSpannerBundle: spanner.SpannerBundle | None = None
-    ) -> list[spanner.Spanner] | None:
+        constrainingSpannerBundle: spanner.SpannerBundle|None = None
+    ) -> list[spanner.Spanner]|None:
         '''
         find all spanners that are referenced by elements in the
         (recursed if recurse=True) stream and either inserts them in the Stream
@@ -692,7 +692,7 @@ class StreamCore(Music21Object):
         {1.0} <music21.note.Note D>
         '''
         sb = self.spannerBundle
-        sIter: StreamIterator | RecursiveIterator
+        sIter: StreamIterator|RecursiveIterator
         if recurse is True:
             sIter = self.recurse()  # type: ignore
         else:

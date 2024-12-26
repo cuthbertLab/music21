@@ -114,7 +114,7 @@ class QualityFeature(featuresModule.FeatureExtractor):
             raise ValueError('Cannot process without a data instance or feature.')
 
         allKeys = self.data['flat.getElementsByClass(Key)']
-        keyFeature: int | None = None
+        keyFeature: int|None = None
         if len(allKeys) == 1:
             k0 = allKeys[0]
             if k0.mode == 'major':

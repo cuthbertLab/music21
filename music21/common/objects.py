@@ -67,8 +67,7 @@ class RelativeCounter(collections.Counter):
 
     def __iter__(self):
         sortedKeys = sorted(super().__iter__(), key=lambda x: self[x], reverse=True)
-        for k in sortedKeys:
-            yield k
+        yield from sortedKeys
 
     def items(self):
         for k in self:
@@ -228,7 +227,7 @@ class SlottedObjectMixin:
         >>> sorted(list(sSet))
         ['_editorial', '_style', 'direction', 'id', 'independentAngle', 'number', 'type']
 
-        When a normal Beam won't cut it...
+        When a normal Beam won't cut it:
 
         >>> class FunkyBeam(beam.Beam):
         ...     __slots__ = ('funkiness', 'groovability')

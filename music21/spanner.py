@@ -239,7 +239,7 @@ class Spanner(base.Music21Object):
 
         # parameters that spanners need in loading and processing
         # local id is the id for the local area; used by musicxml
-        self.idLocal: str | None = None
+        self.idLocal: str|None = None
         # after all spannedElements have been gathered, setting complete
         # will mark that all parts have been gathered.
         self.completeStatus: bool = False
@@ -258,7 +258,7 @@ class Spanner(base.Music21Object):
         # (False means fill is needed, True means fill is not
         # needed, presumably because the fill was done by hand).
         # Initialized to 'unknown'.
-        self.filledStatus: bool | t.Literal['unknown'] = 'unknown'
+        self.filledStatus: bool|t.Literal['unknown'] = 'unknown'
 
     def _reprInternal(self):
         msg = []
@@ -548,7 +548,7 @@ class Spanner(base.Music21Object):
 
     def fill(
         self,
-        searchStream=None,  # stream.Stream | None, but cannot import stream here
+        searchStream=None,  # stream.Stream|None, but cannot import stream here
         *,
         includeEndBoundary: bool = False,
         mustFinishInSpan: bool = False,
@@ -584,7 +584,8 @@ class Spanner(base.Music21Object):
         >>> ott3 = spanner.Ottava(note.Note('D'), note.Note('E'))
         >>> ott3.fill()
         Traceback (most recent call last):
-        music21.spanner.SpannerException: ...requires a searchStream or getFirst().activeSite
+        music21.spanner.SpannerException: Spanner.fill() requires a searchStream
+            or getFirst().activeSite
         '''
 
         if not self.fillElementTypes:
@@ -595,7 +596,7 @@ class Spanner(base.Music21Object):
             # Don't fill twice.  If client wants a refill they can set filledStatus to False.
             return
 
-        startElement: base.Music21Object | None = self.getFirst()
+        startElement: base.Music21Object|None = self.getFirst()
         if startElement is None:
             # no spanned elements?  Nothing to fill.
             return
@@ -611,7 +612,7 @@ class Spanner(base.Music21Object):
             from music21 import stream
             assert isinstance(searchStream, stream.Stream)
 
-        endElement: base.Music21Object | None = self.getLast()
+        endElement: base.Music21Object|None = self.getLast()
         if endElement is startElement:
             endElement = None
 
@@ -830,7 +831,7 @@ class SpannerBundle(prebase.ProtoM21Object):
       Creators of SpannerBundles are required to check that this constraint is True
     '''
     # TODO: make SpannerBundle a Generic type
-    def __init__(self, spanners: list[Spanner] | None = None):
+    def __init__(self, spanners: list[Spanner]|None = None):
         self._cache: dict[str, t.Any] = {}  # cache is defined on Music21Object not ProtoM21Object
 
         self._storage: list[Spanner] = []
@@ -899,7 +900,7 @@ class SpannerBundle(prebase.ProtoM21Object):
             post.append(id(x.spannerStorage))
         return post
 
-    def getByIdLocal(self, idLocal: int | None = None) -> SpannerBundle:
+    def getByIdLocal(self, idLocal: int|None = None) -> SpannerBundle:
         '''
         Get spanners by `idLocal`.
 
@@ -1072,7 +1073,7 @@ class SpannerBundle(prebase.ProtoM21Object):
 
         return replacedSpanners
 
-    def getByClass(self, searchClass: str | type | tuple[type, ...]) -> 'SpannerBundle':
+    def getByClass(self, searchClass: str|type|tuple[type, ...]) -> 'SpannerBundle':
         '''
         Given a spanner class, return a new SpannerBundle of all Spanners of the desired class.
 
@@ -1519,8 +1520,8 @@ class RepeatBracket(Spanner):
 
     def __init__(self,
                  *spannedElements,
-                 number: int | str | Iterable[int] = 0,
-                 overrideDisplay: str | None = None,
+                 number: int|str|Iterable[int] = 0,
+                 overrideDisplay: str|None = None,
                  **keywords):
         super().__init__(*spannedElements, **keywords)
 
@@ -1564,7 +1565,7 @@ class RepeatBracket(Spanner):
             else:  # range of values
                 return f'{self.numberRange[0]}-{self.numberRange[-1]}'
 
-    def _setNumber(self, value: int | str | Iterable[int]):
+    def _setNumber(self, value: int|str|Iterable[int]):
         '''
         Set the bracket number. There may be range of values provided
         '''
@@ -1901,8 +1902,8 @@ class Line(Spanner):
         tick: str = 'down',
         startTick: str = 'down',
         endTick: str = 'down',
-        startHeight: int | float | None = None,
-        endHeight: int | float | None = None,
+        startHeight: int|float|None = None,
+        endHeight: int|float|None = None,
         **keywords
     ):
         super().__init__(*spannedElements, **keywords)
@@ -2064,7 +2065,7 @@ class Glissando(Spanner):
     def __init__(self,
                  *spannedElements,
                  lineType: str = 'wavy',
-                 label: str | None = None,
+                 label: str|None = None,
                  **keywords):
         super().__init__(*spannedElements, **keywords)
         # from music21 import note

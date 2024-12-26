@@ -127,7 +127,7 @@ class RnWriter(prebase.ProtoM21Object):
         self.analyst = ''
         self.proofreader = ''
         self.combinedList: list[str] = []
-        self.container: stream.Part | stream.Score
+        self.container: stream.Part|stream.Score
 
         if isinstance(obj, stream.Stream):
             if isinstance(obj, stream.Opus):
@@ -180,7 +180,7 @@ class RnWriter(prebase.ProtoM21Object):
         self.prepSequentialListOfLines()
 
     def _makeContainer(self,
-                       obj: stream.Stream | list):
+                       obj: stream.Stream|list):
         '''
         Makes a placeholder container for the unusual cases where this class is called on
         generic- or non-stream object as opposed to
@@ -363,10 +363,10 @@ class RnWriter(prebase.ProtoM21Object):
 
 # ------------------------------------------------------------------------------
 
-def rnString(measureNumber: int | str,
-             beat: str | int | float | fractions.Fraction,
+def rnString(measureNumber: int|str,
+             beat: str|int|float|fractions.Fraction,
              chordString: str,
-             inString: str | None = ''):
+             inString: str|None = ''):
     '''
     Creates or extends a string of RomanText such that the output corresponds to a single
     measure line.
@@ -413,7 +413,7 @@ def rnString(measureNumber: int | str,
     return newString
 
 
-def intBeat(beat: str | int | float | fractions.Fraction,
+def intBeat(beat: str|int|float|fractions.Fraction,
             roundValue: int = 2):
     '''
     Converts beats to integers if possible, and otherwise to rounded decimals.

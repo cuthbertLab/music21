@@ -36,7 +36,6 @@ the temp folder on the disk.
 from __future__ import annotations
 
 from collections import deque
-import collections.abc
 import copy
 from http.client import responses
 import io
@@ -82,7 +81,7 @@ __all__ = [
 
 environLocal = environment.Environment('converter')
 
-_StrOrBytes = t.TypeVar('_StrOrBytes', bound=str | bytes)
+_StrOrBytes = t.TypeVar('_StrOrBytes', bound=str|bytes)
 
 # ------------------------------------------------------------------------------
 class ArchiveManagerException(exceptions21.Music21Exception):
@@ -124,13 +123,13 @@ class ArchiveManager:
     >>> data[0:70]
     '<?xml version="1.0" encoding="UTF-8"?>\r<!DOCTYPE score-partwise PUBLIC'
 
-
-    The only archive type supported now is zip. But .mxl is zip...
+    The only archive type supported now is zip. But .mxl is zip so that covers almost
+    everything.
     '''
     # for info on mxl files, see
     # http://www.recordare.com/xml/compressed-mxl.html
 
-    def __init__(self, fp: str | pathlib.Path, archiveType='zip'):
+    def __init__(self, fp: str|pathlib.Path, archiveType='zip'):
         self.fp: pathlib.Path = common.cleanpath(fp, returnPathlib=True)
         self.archiveType: str = archiveType
 
@@ -213,7 +212,7 @@ class ArchiveManager:
                         defaultEncoding = 'UTF-8'
                     try:
                         post = post.decode(encoding=defaultEncoding)
-                    except UnicodeDecodeError:  # sometimes windows written...
+                    except UnicodeDecodeError:  # sometimes windows written
                         post = post.decode(encoding='utf-16-le')
                         post = re.sub(r"encoding=([\'\"]\S*?[\'\"])",
                                       "encoding='UTF-8'", post)
@@ -269,21 +268,21 @@ class PickleFilter:
     '''
 
     def __init__(self,
-                 fp: str | pathlib.Path,
+                 fp: str|pathlib.Path,
                  forceSource: bool = False,
-                 number: int | None = None,
+                 number: int|None = None,
                  # quantizePost: bool = False,
-                 # quarterLengthDivisors: Iterable[int] | None = None,
+                 # quarterLengthDivisors: Iterable[int]|None = None,
                  **keywords):
         self.fp: pathlib.Path = common.cleanpath(fp, returnPathlib=True)
         self.forceSource: bool = forceSource
-        self.number: int | None = number
+        self.number: int|None = number
         self.keywords: dict[str, t.Any] = keywords
         # environLocal.printDebug(['creating pickle filter'])
 
     def getPickleFp(self,
-                    directory: pathlib.Path | str | None = None,
-                    zipType: str | None = None) -> pathlib.Path:
+                    directory: pathlib.Path|str|None = None,
+                    zipType: str|None = None) -> pathlib.Path:
         '''
         Returns the file path of the pickle file for this file.
 
@@ -329,11 +328,11 @@ class PickleFilter:
         Generally not necessary to call, since we can just overwrite obsolete pickles,
         but useful elsewhere.
         '''
-        pickleFp = self.getPickleFp(zipType='gz')  # pathlib...
+        pickleFp = self.getPickleFp(zipType='gz')  # pathlib
         if pickleFp.exists():
             os.remove(pickleFp)
 
-    def status(self) -> tuple[pathlib.Path, bool, pathlib.Path | None]:
+    def status(self) -> tuple[pathlib.Path, bool, pathlib.Path|None]:
         '''
         Given a file path specified with __init__, look for an up-to-date pickled
         version of this file path. If it exists, return its fp, otherwise return the
@@ -386,7 +385,7 @@ _registeredSubConverters: deque[type[subConverters.SubConverter]] = deque()
 
 # default subConverters to skip
 _deregisteredSubConverters: deque[
-    type[subConverters.SubConverter] | t.Literal['all']
+    type[subConverters.SubConverter]|t.Literal['all']
 ] = deque()
 
 
@@ -402,7 +401,7 @@ def registerSubConverter(newSubConverter: type[subConverters.SubConverter]) -> N
     '''
     Add a SubConverter to the list of registered subConverters.
 
-    Example, register a converter for the obsolete Amiga composition software Sonix (so fun...)
+    Example, register a converter for the obsolete Amiga composition software Sonix (so fun!)
 
     >>> class ConverterSonix(converter.subConverters.SubConverter):
     ...    registerFormats = ('sonix',)
@@ -435,7 +434,7 @@ def registerSubconverter(
     registerSubConverter(newSubConverter)
 
 def unregisterSubConverter(
-    removeSubConverter: t.Literal['all'] | type[subConverters.SubConverter]
+    removeSubConverter: t.Literal['all']|type[subConverters.SubConverter]
 ) -> None:
     # noinspection PyShadowingNames
     '''
@@ -514,13 +513,13 @@ class Converter:
     }
 
     def __init__(self) -> None:
-        self.subConverter: subConverters.SubConverter | None = None
+        self.subConverter: subConverters.SubConverter|None = None
         # a stream object unthawed
-        self._thawedStream: stream.Score | stream.Part | stream.Opus | None = None
+        self._thawedStream: stream.Score|stream.Part|stream.Opus|None = None
 
     def _getDownloadFp(
         self,
-        directory: pathlib.Path | str,
+        directory: pathlib.Path|str,
         ext: str,
         url: str,
     ):
@@ -537,9 +536,9 @@ class Converter:
     # noinspection PyShadowingBuiltins
     def parseFileNoPickle(
         self,
-        fp: pathlib.Path | str,
-        number: int | None = None,
-        format: str | None = None,
+        fp: pathlib.Path|str,
+        number: int|None = None,
+        format: str|None = None,
         forceSource: bool = False,
         **keywords
     ):
@@ -632,7 +631,7 @@ class Converter:
             try:
                 self._thawedStream = thaw(fpPickle, zipType='zlib')
             except freezeThaw.FreezeThawException:
-                environLocal.warn(f'Could not parse pickle, {fpPickle} ...rewriting')
+                environLocal.warn(f'Could not parse pickle, {fpPickle}.  Rewriting')
                 os.remove(fpPickle)
                 self.parseFileNoPickle(fp, number, format, forceSource, **keywords)
 
@@ -645,7 +644,7 @@ class Converter:
             environLocal.printDebug('Loading original version')
             self.parseFileNoPickle(fp, number, format, forceSource, **keywords)
             if writePickle is True and fpPickle is not None and storePickle is True:
-                # save the stream to disk...
+                # save the stream to disk
                 environLocal.printDebug('Freezing Pickle')
                 s = self.stream
                 sf = freezeThaw.StreamFreezer(s, fastButUnsafe=True)
@@ -663,7 +662,7 @@ class Converter:
 
     def parseData(
         self,
-        dataStr: str | bytes,
+        dataStr: str|bytes,
         number=None,
         format=None,
         forceSource=False,
@@ -726,8 +725,8 @@ class Converter:
         self,
         url: str,
         *,
-        format: str | None = None,
-        number: int | None = None,
+        format: str|None = None,
+        number: int|None = None,
         forceSource: bool = False,
         **keywords,
     ) -> None:
@@ -1090,7 +1089,7 @@ class Converter:
     def formatFromHeader(
         self,
         dataStr: _StrOrBytes
-    ) -> tuple[str | None, _StrOrBytes]:
+    ) -> tuple[str|None, _StrOrBytes]:
         '''
         if dataStr begins with a text header such as  "tinyNotation:" then
         return that format plus the dataStr with the head removed.
@@ -1159,7 +1158,7 @@ class Converter:
                     break
         return (foundFormat, dataStr)
 
-    def regularizeFormat(self, fmt: str) -> str | None:
+    def regularizeFormat(self, fmt: str) -> str|None:
         '''
         Take in a string representing a format, a file extension (w/ or without leading dot)
         etc. and find the format string that best represents the format that should be used.
@@ -1231,7 +1230,7 @@ class Converter:
     # --------------------------------------------------------------------------
     # properties
     @property
-    def stream(self) -> stream.Score | stream.Part | stream.Opus | None:
+    def stream(self) -> stream.Score|stream.Part|stream.Opus|None:
         '''
         Returns the .subConverter.stream object.
         '''
@@ -1254,7 +1253,7 @@ def parseFile(fp,
               number=None,
               format=None,
               forceSource=False,
-              **keywords) -> stream.Score | stream.Part | stream.Opus:
+              **keywords) -> stream.Score|stream.Part|stream.Opus:
     '''
     Given a file path, attempt to parse the file into a Stream.
     '''
@@ -1270,7 +1269,7 @@ def parseFile(fp,
 def parseData(dataStr,
               number=None,
               format=None,
-              **keywords) -> stream.Score | stream.Part | stream.Opus:
+              **keywords) -> stream.Score|stream.Part|stream.Opus:
     '''
     Given musical data represented within a Python string, attempt to parse the
     data into a Stream.
@@ -1288,7 +1287,7 @@ def parseURL(url,
              format=None,
              number=None,
              forceSource=False,
-             **keywords) -> stream.Score | stream.Part | stream.Opus:
+             **keywords) -> stream.Score|stream.Part|stream.Opus:
     '''
     Given a URL, attempt to download and parse the file into a Stream. Note:
     URL downloading will not happen automatically unless the user has set their
@@ -1303,12 +1302,12 @@ def parseURL(url,
     return v.stream
 
 
-def parse(value: bundles.MetadataEntry | bytes | str | pathlib.Path,
+def parse(value: bundles.MetadataEntry|bytes|str|pathlib.Path|list|tuple,
           *,
           forceSource: bool = False,
-          number: int | None = None,
-          format: str | None = None,  # pylint: disable=redefined-builtin
-          **keywords) -> stream.Score | stream.Part | stream.Opus:
+          number: int|None = None,
+          format: str|None = None,  # pylint: disable=redefined-builtin
+          **keywords) -> stream.Score|stream.Part|stream.Opus:
     r'''
     Given a file path, encoded data in a Python string, or a URL, attempt to
     parse the item into a Stream.  Note: URL downloading will not happen
@@ -1316,7 +1315,9 @@ def parse(value: bundles.MetadataEntry | bytes | str | pathlib.Path,
     preference to "allow".
 
     Keywords can include `number` which specifies a piece number in a file of
-    multi-piece file.
+    multi-piece file. (Otherwise, a particular score from an
+    :class:`~music21.stream.Opus` can also be extracted by providing a
+    two-element list or tuple of the form (path, number) to the `value` argument.)
 
     `format` specifies the format to parse the line of text or the file as.
 
@@ -1375,16 +1376,13 @@ def parse(value: bundles.MetadataEntry | bytes | str | pathlib.Path,
         valueStr = ''
 
     if (common.isListLike(value)
-            and isinstance(value, collections.abc.Sequence)
             and len(value) == 2
             and value[1] is None
             and _osCanLoad(str(value[0]))):
         # comes from corpus.search
         return parseFile(value[0], format=format, **keywords)
     elif (common.isListLike(value)
-          and isinstance(value, collections.abc.Sequence)
           and len(value) == 2
-          and isinstance(value[1], int)
           and _osCanLoad(str(value[0]))):
         # corpus or other file with movement number
         if not isinstance(value[0], str):
@@ -1426,7 +1424,7 @@ def parse(value: bundles.MetadataEntry | bytes | str | pathlib.Path,
         # all else, including MidiBytes
         return parseData(value, number=number, format=format, **keywords)
 
-def toData(obj: base.Music21Object, fmt: str, **keywords) -> str | bytes:
+def toData(obj: base.Music21Object, fmt: str, **keywords) -> str|bytes:
     '''
     Convert `obj` to the given format `fmt` and return the information retrieved.
 
@@ -2072,6 +2070,21 @@ class Test(unittest.TestCase):
             '<music21.beam.Beams <music21.beam.Beam 1/start>/<music21.beam.Beam 2/start>>')
         # s.show()
 
+    def testConversionABCWorkFromOpusWithoutKeyword(self):
+        fp = common.getSourceFilePath() / 'corpus' / 'essenFolksong' / 'testd.abc'
+
+        s = parse((str(fp), None))
+        self.assertIsInstance(s, stream.Opus)
+
+        with self.assertRaises(ConverterException):
+            parse((fp, 8))
+
+        with self.assertRaises(ConverterException):
+            parse((str(fp), (8,)))
+
+        s = parse((str(fp), 8))
+        self.assertIsInstance(s, stream.Score)
+
     def testConversionMusedata(self):
         fp = common.getSourceFilePath() / 'musedata' / 'testPrimitive' / 'test01'
         s = parse(fp)
@@ -2195,7 +2208,7 @@ class Test(unittest.TestCase):
     def testIncorrectNotCached(self):
         '''
         Here is a filename with an incorrect extension (.txt for .rnText).  Make sure that
-        it is not cached the second time...
+        it is not cached the second time.
         '''
         from music21 import harmony
 

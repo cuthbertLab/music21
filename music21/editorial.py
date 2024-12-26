@@ -6,8 +6,7 @@
 # Authors:      Michael Scott Asato Cuthbert
 #               Christopher Ariza
 #
-# Copyright:    Copyright © 2008-2015 Michael Scott Asato Cuthbert and the music21
-#               Project
+# Copyright:    Copyright © 2008-2024 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # -----------------------------------------------------------------------------
 '''
@@ -131,6 +130,14 @@ class Comment(prebase.ProtoM21Object, style.StyleMixin):  # type: ignore
     A comment or footnote or something else attached to a note.
 
     >>> c = editorial.Comment('presented as C natural in the 1660 print.')
+    >>> c
+    <music21.editorial.Comment 'presented as C na...'>
+
+    Note that the text is truncated in representation, but it is all there in `.text`:
+
+    >>> c.text
+    'presented as C natural in the 1660 print.'
+
     >>> c.isFootnote = True
     >>> c.levelInformation = 'musicological'
 

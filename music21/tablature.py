@@ -202,7 +202,7 @@ class FretBoard(prebase.ProtoM21Object):
 
         return None
 
-    def getPitches(self) -> list[None | pitch.Pitch]:
+    def getPitches(self) -> list[None|pitch.Pitch]:
         '''
         Returns a list of all the pitches (or None for each) given the FretNote information. This
         requires a tuning to be set.
@@ -233,7 +233,7 @@ class FretBoard(prebase.ProtoM21Object):
                     self.numStrings
                 ))
 
-        pitchList: list[pitch.Pitch | None] = [None] * self.numStrings
+        pitchList: list[pitch.Pitch|None] = [None] * self.numStrings
 
         if not self.fretNotes:
             return pitchList
@@ -278,7 +278,7 @@ class ChordWithFretBoard(harmony.ChordSymbol, FretBoard):
 
     def __init__(self, figure=None, numStrings=6, fretNotes=None, displayFrets=4, **keywords):
         harmony.ChordSymbol.__init__(self, figure=figure, **keywords)
-        # uncomment when self.getFretNotesFromFigure() works...
+        # uncomment when self.getFretNotesFromFigure() works
         # if fretNotes is None:
         #     fretNotes = self.getFretNotesFromFigure()
 

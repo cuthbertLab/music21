@@ -136,7 +136,7 @@ class Barline(base.Music21Object):
                  **keywords):
         super().__init__(**keywords)
 
-        self._type = None  # same as style...
+        self._type = None  # same as style
         # this will raise an exception on error from property
         self.type = type
 
@@ -266,7 +266,7 @@ class Repeat(repeat.RepeatMark, Barline):
         {4.0} <music21.bar.Barline type=double>
     '''
     # _repeatDots = None  # not sure what this is for; inherited from old modules
-    def __init__(self, direction: str = 'start', times: int | None = None, **keywords):
+    def __init__(self, direction: str = 'start', times: int|None = None, **keywords):
         repeat.RepeatMark.__init__(self)
         if direction == 'start':
             barType = 'heavy-light'
@@ -274,8 +274,8 @@ class Repeat(repeat.RepeatMark, Barline):
             barType = 'final'
         Barline.__init__(self, type=barType, **keywords)
 
-        self._direction: str | None = None  # either start or end
-        self._times: int | None = None  # if an end, how many repeats
+        self._direction: str|None = None  # either start or end
+        self._times: int|None = None  # if an end, how many repeats
 
         # start is forward, end is backward in musicxml
         self.direction = direction  # start, end
@@ -311,7 +311,7 @@ class Repeat(repeat.RepeatMark, Barline):
             raise BarException(f'cannot set repeat direction to: {value}')
 
     @property
-    def times(self) -> int | None:
+    def times(self) -> int|None:
         '''
         Get or set the "times" property of this barline. This
         defines how many times the repeat happens. A standard repeat

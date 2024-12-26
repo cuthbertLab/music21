@@ -6,7 +6,7 @@
 # Authors:      Christopher Ariza
 #               Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2009, 2017-2023 Michael Scott Asato Cuthbert
+# Copyright:    Copyright © 2009, 2017-2024 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # -----------------------------------------------------------------------------
 '''
@@ -47,7 +47,7 @@ def compressAllXMLFiles(*, deleteOriginal=False):
     )
 
 
-def compressXML(filename: str | pathlib.Path,
+def compressXML(filename: str|pathlib.Path,
                 *,
                 deleteOriginal=False,
                 silent=False,
@@ -99,7 +99,7 @@ def compressXML(filename: str | pathlib.Path,
     return True
 
 
-def uncompressMXL(filename: str | pathlib.Path,
+def uncompressMXL(filename: str|pathlib.Path,
                   *,
                   deleteOriginal=False,
                   strictMxlCheck=True) -> bool:
@@ -138,7 +138,7 @@ def uncompressMXL(filename: str | pathlib.Path,
                         continue
                     myZip.extract(member=storedName, path=extractPath)
                     if not found_one_file:
-                        # only rename one file...hope it is the right one.
+                        # only rename one file: hope it is the right one.
                         extractPath_pathlib = pathlib.Path(extractPath)
                         wrongName = extractPath_pathlib / storedName
                         correctName = extractPath_pathlib / unarchivedName

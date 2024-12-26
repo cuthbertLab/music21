@@ -5,8 +5,7 @@
 #
 # Authors:      Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2016-22 Michael Scott Asato Cuthbert and the music21
-#               Project
+# Copyright:    Copyright © 2016-2022 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # -----------------------------------------------------------------------------
 '''
@@ -81,66 +80,46 @@ class Style(ProtoM21Object):
     def __init__(self) -> None:
         self.size = None
 
-        self.relativeX: float | int | None = None
-        self.relativeY: float | int | None = None
-        self.absoluteX: float | int | None = None
+        self.relativeX: float|int|None = None
+        self.relativeY: float|int|None = None
+        self.absoluteX: float|int|None = None
 
         # managed by property below.
-        self._absoluteY: float | int | None = None
+        self._absoluteY: float|int|None = None
 
-        self._enclosure: Enclosure | None = None
+        self._enclosure: Enclosure|None = None
 
         # how should this symbol be represented in the font?
         # SMuFL characters are allowed.
         self.fontRepresentation = None
 
-        self.color: str | None = None
+        self.color: str|None = None
 
         self.units: str = 'tenths'
         self.hideObjectOnPrint: bool = False
 
-        self.dashLength: float | int | None = None
-        self.spaceLength: float | int | None = None
+        self.dashLength: float|int|None = None
+        self.spaceLength: float|int|None = None
 
-    def _getEnclosure(self) -> Enclosure | None:
-        return self._enclosure
 
-    def _setEnclosure(self, value: Enclosure | None):
-        if value is None:
-            self._enclosure = value
-        elif value == Enclosure.NONE:
-            self._enclosure = None
-        elif isinstance(value, Enclosure):
-            self._enclosure = value
-        elif isinstance(value, str):
-            try:
-                enc_value = Enclosure(value.lower())
-            except ValueError as ve:
-                raise TextFormatException(f'Not a supported enclosure: {value!r}') from ve
-
-            self._enclosure = enc_value
-
-        else:
-            raise TextFormatException(f'Not a supported enclosure: {value!r}')
-
-    enclosure = property(_getEnclosure,
-                         _setEnclosure,
-                         doc='''
+    @property
+    def enclosure(self) -> Enclosure|None:
+        '''
         Get or set the enclosure as a style.Enclosure enum or None.
 
-        Valid names are
-        "rectangle"/style.Enclosure.RECTANGLE,
-        "square"/style.Enclosure.SQUARE,
-        "oval"/style.Enclosure.OVAL,
-        "circle"/style.Enclosure.CIRCLE,
-        "bracket"/style.Enclosure.BRACKET,
-        "inverted-bracket"/style.Enclosure.INVERTED_BRACKET (output in musicxml 4 only)
-        None/"none"/style.Enclosure.NONE (returns Python None object)
+        Valid names are:
+
+        * "rectangle"/style.Enclosure.RECTANGLE,
+        * "square"/style.Enclosure.SQUARE,
+        * "oval"/style.Enclosure.OVAL,
+        * "circle"/style.Enclosure.CIRCLE,
+        * "bracket"/style.Enclosure.BRACKET,
+        * "inverted-bracket"/style.Enclosure.INVERTED_BRACKET (output in musicxml 4 only)
+        * None/"none"/style.Enclosure.NONE (returns Python None object)
 
         or the following other shapes with their ALLCAPS Enclosure equivalents:
 
-        triangle, diamond,
-        pentagon, hexagon, heptagon, octagon,
+        triangle, diamond, pentagon, hexagon, heptagon, octagon,
         nonagon, or decagon.
 
         >>> tst = style.TextStyle()
@@ -172,7 +151,27 @@ class Style(ProtoM21Object):
         Traceback (most recent call last):
         music21.style.TextFormatException:
             Not a supported enclosure: 4
-        ''')
+        '''
+        return self._enclosure
+
+    @enclosure.setter
+    def enclosure(self, value: Enclosure|None):
+        if value is None:
+            self._enclosure = value
+        elif value == Enclosure.NONE:
+            self._enclosure = None
+        elif isinstance(value, Enclosure):
+            self._enclosure = value
+        elif isinstance(value, str):
+            try:
+                enc_value = Enclosure(value.lower())
+            except ValueError as ve:
+                raise TextFormatException(f'Not a supported enclosure: {value!r}') from ve
+
+            self._enclosure = enc_value
+
+        else:
+            raise TextFormatException(f'Not a supported enclosure: {value!r}')
 
     def _getAbsoluteY(self):
         return self._absoluteY
@@ -272,9 +271,9 @@ class NoteStyle(Style):
 
     def __init__(self) -> None:
         super().__init__()
-        self.stemStyle: Style | None = None
-        self.accidentalStyle: Style | None = None
-        self.noteSize: str | None = None  # can be 'cue' etc.
+        self.stemStyle: Style|None = None
+        self.accidentalStyle: Style|None = None
+        self.noteSize: str|None = None  # can be 'cue' etc.
 
 
 class TextStyle(Style):
@@ -364,7 +363,7 @@ class TextStyle(Style):
 
 
     @property
-    def justify(self) -> str | None:
+    def justify(self) -> str|None:
         '''
         Get or set the justification.  Valid values are left,
         center, right, full (not supported by MusicXML), and None
@@ -384,7 +383,7 @@ class TextStyle(Style):
         return self._justify
 
     @justify.setter
-    def justify(self, value: str | None):
+    def justify(self, value: str|None):
         if value is None:
             self._justify = None
         else:
@@ -393,7 +392,7 @@ class TextStyle(Style):
             self._justify = value.lower()
 
     @property
-    def fontStyle(self) -> str | None:
+    def fontStyle(self) -> str|None:
         '''
         Get or set the style, as normal, italic, bold, and bolditalic.
         None is currently an acceptable value which should be "normal".
@@ -413,7 +412,7 @@ class TextStyle(Style):
         return self._fontStyle
 
     @fontStyle.setter
-    def fontStyle(self, value: str | None) -> None:
+    def fontStyle(self, value: str|None) -> None:
         if value is None:
             self._fontStyle = None
         else:
@@ -628,8 +627,8 @@ class StyleMixin(common.SlottedObjectMixin):
     def __init__(self) -> None:
         # no need to call super().__init__() on SlottedObjectMixin
         # This might be dangerous though
-        self._style: Style | None = None
-        self._editorial: editorial.Editorial | None = None
+        self._style: Style|None = None
+        self._editorial: editorial.Editorial|None = None
 
     @property
     def hasStyleInformation(self) -> bool:

@@ -140,7 +140,7 @@ class FeatureExtractor:
                  **keywords
                  ) -> None:
         self.stream = None  # the original Stream, or None
-        self.data: DataInstance | None = None  # a DataInstance object: use to get data
+        self.data: DataInstance|None = None  # a DataInstance object: use to get data
         self.setData(dataOrStream)
 
         self.feature = None  # Feature object that results from processing
@@ -1157,12 +1157,12 @@ def extractorsById(idOrList, library=('jSymbolic', 'native')):
     ['P19', 'P20']
 
 
-    Normalizes case...
+    Normalizes case:
 
     >>> [x.id for x in features.extractorsById(['r31', 'r32', 'r33', 'r34', 'r35', 'p1', 'p2'])]
     ['R31', 'R32', 'R33', 'R34', 'R35', 'P1', 'P2']
 
-    Get all feature extractors from all libraries
+    Get all feature extractors from all libraries:
 
     >>> y = [x.id for x in features.extractorsById('all')]
     >>> y[0:3], y[-3:-1]
@@ -1258,18 +1258,18 @@ def getIndex(featureString, extractorType=None):
     from music21.features import jSymbolic, native
 
     if extractorType is None or extractorType == 'jsymbolic':
-        indexCnt = 0
+        indexCount = 0
         for feature in jSymbolic.featureExtractors:
 
             if feature().name == featureString:
-                return (indexCnt, 'jsymbolic')
-            indexCnt += 1
+                return (indexCount, 'jsymbolic')
+            indexCount += 1
     if extractorType is None or extractorType == 'native':
-        indexCnt = 0
+        indexCount = 0
         for feature in native.featureExtractors:
             if feature().name == featureString:
-                return (indexCnt, 'native')
-            indexCnt += 1
+                return (indexCount, 'native')
+            indexCount += 1
 
         return None
 
@@ -1495,7 +1495,7 @@ class Test(unittest.TestCase):
 
     # def testGetAllExtractorsMethods(self):
     #     '''
-    #     ahh..this test takes a really long time....
+    #     ahh..this test takes a really long time.
     #     '''
     #     from music21 import stream, features, pitch
     #     s = corpus.parse('bwv66.6').measures(1, 5)

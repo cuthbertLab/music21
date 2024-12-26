@@ -6,8 +6,7 @@
 # Authors:      Josiah Wolf Oberholtzer
 #               Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2013-16 Michael Scott Asato Cuthbert and the music21
-#               Project
+# Copyright:    Copyright © 2013-2016 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # -----------------------------------------------------------------------------
 '''
@@ -39,7 +38,7 @@ class AVLNode(common.SlottedObjectMixin):
     >>> node
     <AVLNode: Start:1.0 Height:1 L:None R:0>
 
-    Nodes can rebalance themselves, but they work best in a Tree...
+    Nodes can rebalance themselves, but they work best in a Tree.
 
     Please consult the Wikipedia entry on AVL trees
     (https://en.wikipedia.org/wiki/AVL_tree) for a very detailed
@@ -519,12 +518,10 @@ class AVLTree(prebase.ProtoM21Object):
         def recurse(node):
             if node is not None:
                 if node.leftChild is not None:
-                    for n in recurse(node.leftChild):
-                        yield n
+                    yield from recurse(node.leftChild)
                 yield node
                 if node.rightChild is not None:
-                    for n in recurse(node.rightChild):
-                        yield n
+                    yield from recurse(node.rightChild)
         return recurse(self.rootNode)
 
     def populateFromSortedList(self, listOfTuples):
@@ -572,7 +569,7 @@ class AVLTree(prebase.ProtoM21Object):
         <AVLNode: Start:1 Height:1 L:0 R:0> '1'
         <AVLNode: Start:0 Height:0 L:None R:None> '0'
         '''
-        def recurse(subListOfTuples) -> AVLNode | None:
+        def recurse(subListOfTuples) -> AVLNode|None:
             '''
             Divide and conquer.
             '''
@@ -627,7 +624,7 @@ class AVLTree(prebase.ProtoM21Object):
             '''
             if node is None:
                 # if we get to the point where a node does not have a
-                # left or right child, make a new node at this position...
+                # left or right child, make a new node at this position
                 return self.nodeClass(innerPosition)
 
             if innerPosition < node.position:
@@ -719,7 +716,7 @@ class AVLTree(prebase.ProtoM21Object):
 
         >>> note1 = score.flatten().notes[30]
 
-        Works with sortTuple positions as well...
+        Works with sortTuple positions as well:
 
         >>> st = note1.sortTuple()
         >>> st

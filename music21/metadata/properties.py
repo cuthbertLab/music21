@@ -6,8 +6,7 @@
 # Authors:      Greg Chapman
 #               Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2023 Michael Scott Asato Cuthbert and the music21
-#               Project
+# Copyright:    Copyright © 2023–2024 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # -----------------------------------------------------------------------------
 from __future__ import annotations
@@ -47,11 +46,11 @@ class PropertyDescription:
         metadata, and is the tuple element type clients will always receive from
         md['uniqueName'] or md['namespace:name'].
     '''
-    uniqueName: str | None = None
+    uniqueName: str|None = None
     name: str = ''
     namespace: str = ''
-    oldMusic21Abbrev: str | None = None
-    oldMusic21WorkId: str | None = None
+    oldMusic21Abbrev: str|None = None
+    oldMusic21WorkId: str|None = None
     valueType: type[ValueType] = Text
     needsArticleNormalization: bool = False
     isContributor: bool = False
@@ -385,7 +384,7 @@ STANDARD_PROPERTY_DESCRIPTIONS: tuple[PropertyDescription, ...] = (
         isContributor=False),
 
     # The following 'marcrel' property terms are MARC Relator terms,
-    # found at:  http://www.loc.gov/loc.terms/relators/
+    # found at: https://id.loc.gov/vocabulary/relators.html
 
     # adapter: a person or organization who 1) reworks a musical composition,
     #   usually for a different medium, or 2) rewrites novels or stories
@@ -851,7 +850,7 @@ STANDARD_PROPERTY_DESCRIPTIONS: tuple[PropertyDescription, ...] = (
         oldMusic21Abbrev='osc',
         isContributor=False),
 
-    # movementNumber: movement number (e.g. '4', or 'mov. 4', or...)
+    # movementNumber: movement number (e.g. '4', or 'mov. 4')
     PropertyDescription(
         uniqueName='movementNumber',
         name='OMV',

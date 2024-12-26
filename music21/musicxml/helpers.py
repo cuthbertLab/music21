@@ -99,7 +99,7 @@ def indent(elem, level=0):
         subElem = None
         for subElem in elem:
             indent(subElem, level + 1)
-        if subElem is not None:  # last el...
+        if subElem is not None:  # last el
             subElem.tail = i
 
         if not elem.tail or not elem.tail.strip():
@@ -238,7 +238,7 @@ def synchronizeIdsToM21(element: ET.Element, m21Object: Music21Object):
 
 def synchronizeIdsToXML(
     element: ET.Element,
-    m21Object: prebase.ProtoM21Object | None
+    m21Object: prebase.ProtoM21Object|None
 ) -> None:
     # noinspection PyTypeChecker
     '''
@@ -295,8 +295,8 @@ def setM21AttributeFromAttribute(
     m21El: t.Any,
     xmlEl: ET.Element,
     xmlAttributeName: str,
-    attributeName: str | None = None,
-    transform: Callable[[str], t.Any] | None = None,
+    attributeName: str|None = None,
+    transform: Callable[[str], t.Any]|None = None,
 ) -> None:
     '''
     If xmlEl has at least one element of tag==tag with some text. If
@@ -325,7 +325,7 @@ def setM21AttributeFromAttribute(
     >>> pl.pageNumber
     4
 
-    More complex...
+    More complex:
 
     >>> convBool = musicxml.xmlObjects.yesNoToBoolean
     >>> setb(pl, e, 'new-page', 'isNew', transform=convBool)
@@ -348,8 +348,8 @@ def setXMLAttributeFromAttribute(
     m21El: t.Any,
     xmlEl: ET.Element,
     xmlAttributeName: str,
-    attributeName: str | None = None,
-    transform: Callable[[t.Any], t.Any] | None = None
+    attributeName: str|None = None,
+    transform: Callable[[t.Any], t.Any]|None = None
 ):
     '''
     If m21El has at least one element of tag==tag with some text. If

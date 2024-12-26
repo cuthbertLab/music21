@@ -5,7 +5,7 @@
 #
 # Authors:      Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2010-2023 Michael Scott Asato Cuthbert
+# Copyright:    Copyright © 2010-2024 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
@@ -169,7 +169,7 @@ def getDocumentationFiles(runOne=False):
             fullModulePath = os.path.join(root, module)
             if not module.endswith('.rst'):
                 continue
-            if module.startswith('module'):  # we have this already...
+            if module.startswith('module'):  # we have this already
                 continue
             if module in skipModules:
                 continue
@@ -191,7 +191,7 @@ def getDocumentationFiles(runOne=False):
     return allModules
 
 
-def main(runOne: str | bool = False):
+def main(runOne: str|bool = False):
     if runOne is False:
         nbvalNotebook.runAll()
     elif '.ipynb' in runOne:

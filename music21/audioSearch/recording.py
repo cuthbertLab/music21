@@ -12,7 +12,7 @@
 '''
 modules for audio searching that directly record from the microphone.
 
-Requires PyAudio and portaudio to be installed (http://www.portaudio.com/download.html)
+Requires PyAudio and portaudio to be installed (https://www.portaudio.com/download.html)
 
 To download pyaudio for windows 64-bit go to https://www.lfd.uci.edu/~gohlke/pythonlibs/
 
@@ -37,7 +37,7 @@ environLocal = environment.Environment('audioSearch.recording')
 # to download pyaudio for windows 64-bit go to https://www.lfd.uci.edu/~gohlke/pythonlibs/
 # users of 64-bit windows but 32-bit python should download the win32 port
 # users of 64-bit windows and 64-bit python should download the amd64 port
-# requires portaudio to be installed http://www.portaudio.com/download.html
+# requires portaudio to be installed https://www.portaudio.com/download.html
 
 default_recordChannels = 1
 default_recordSampleRate = 44100
@@ -92,7 +92,7 @@ def samplesFromRecording(seconds=10.0, storeFile=True,
         # write recording to disk
         data = b''.join(storedWaveSampleList)
         try:
-            # wave.open does not take a path-like object as of 3.10
+            # wave.open does not take a path-like object as of 3.12
             wf = wave.open(waveFilename, 'wb')
             wf.setnchannels(recordChannels)
             wf.setsampwidth(p_audio.get_sample_size(recordFormat))

@@ -400,9 +400,11 @@ FORTE = (None, monad, diad, trichord, tetrachord, pentachord,
 
 # This dictionary defines the pitch classes to return for the inversion of a given
 # forte number.  For instance (3, 11): (0, 4, 7) indicates that for the
-# inverted form of Forte class 3-11 (minor/major triad) return 0, 2, 3
+# inverted form of Forte class 3-11 (minor/major triad) return 0, 4, 7
 # (the zero could be assumed, but it makes my brain easier to have it there).
 # It is faster to store this than to recompute it every time.
+# Data cross-checked with
+# https://web.archive.org/web/20130118035710/http://solomonsmusic.net/pcsets.htm
 inversionDefaultPitchClasses = {
     (3, 2): (0, 2, 3),
     (3, 3): (0, 3, 4),
@@ -421,7 +423,7 @@ inversionDefaultPitchClasses = {
     (4,15): (0, 2, 5, 6),
     (4,16): (0, 2, 6, 7),
     (4,18): (0, 3, 6, 7),
-    (4,19): (0, 4, 7, 8),
+    (4,19): (0, 3, 4, 8),
     (4,22): (0, 3, 5, 7),
     (4,27): (0, 3, 6, 8),
     (4,29): (0, 4, 6, 7),
@@ -434,7 +436,7 @@ inversionDefaultPitchClasses = {
     (5, 9): (0, 2, 4, 5, 6),
     (5,10): (0, 2, 3, 5, 6),
     (5,11): (0, 3, 4, 5, 7),
-    (5,13): (0, 4, 6, 7, 8),
+    (5,13): (0, 2, 3, 4, 8),
     (5,14): (0, 2, 5, 6, 7),
     (5,16): (0, 3, 4, 6, 7),
     (5,18): (0, 2, 3, 6, 7),
@@ -449,8 +451,8 @@ inversionDefaultPitchClasses = {
     (5,28): (0, 2, 5, 6, 8),
     (5,29): (0, 2, 5, 7, 8),
     (5,30): (0, 2, 4, 7, 8),
-    (5,31): (0, 3, 6, 8, 9),
-    (5,32): (0, 3, 5, 8, 9),
+    (5,31): (0, 2, 3, 6, 9),
+    (5,32): (0, 1, 4, 7, 9),
     (5,36): (0, 3, 5, 6, 7),
     (5,38): (0, 3, 6, 7, 8),
     (6, 2): (0, 2, 3, 4, 5, 6),
@@ -470,7 +472,7 @@ inversionDefaultPitchClasses = {
     (6,22): (0, 2, 4, 6, 7, 8),
     (6,24): (0, 2, 4, 5, 7, 8),
     (6,25): (0, 2, 3, 5, 7, 8),
-    (6,27): (0, 3, 5, 6, 8, 9),
+    (6,27): (0, 2, 3, 5, 6, 9),
     (6,30): (0, 2, 3, 6, 8, 9),
     (6,31): (0, 1, 4, 6, 8, 9),
     (6,33): (0, 2, 4, 6, 7, 9),
@@ -480,9 +482,9 @@ inversionDefaultPitchClasses = {
     (6,40): (0, 3, 5, 6, 7, 8),
     (6,41): (0, 2, 5, 6, 7, 8),
     (6,43): (0, 2, 3, 6, 7, 8),
-    (6,44): (0, 3, 4, 7, 8, 9),
-    (6,46): (0, 3, 5, 7, 8, 9),
-    (6,47): (0, 2, 5, 7, 8, 9),
+    (6,44): (0, 1, 2, 5, 8, 9),
+    (6,46): (0, 2, 4, 5, 6, 9),
+    (6,47): (0, 2, 3, 4, 7, 9),
     (7, 2): (0, 2, 3, 4, 5, 6, 7),
     (7, 3): (0, 3, 4, 5, 6, 7, 8),
     (7, 4): (0, 1, 3, 4, 5, 6, 7),
@@ -490,15 +492,15 @@ inversionDefaultPitchClasses = {
     (7, 6): (0, 1, 4, 5, 6, 7, 8),
     (7, 7): (0, 1, 2, 5, 6, 7, 8),
     (7, 9): (0, 2, 4, 5, 6, 7, 8),
-    (7,10): (0, 3, 5, 6, 7, 8, 9),
+    (7,10): (0, 2, 3, 4, 5, 6, 9),
     (7,11): (0, 2, 3, 4, 5, 7, 8),
     (7,13): (0, 2, 3, 4, 6, 7, 8),
     (7,14): (0, 1, 3, 5, 6, 7, 8),
-    (7,16): (0, 3, 4, 6, 7, 8, 9),
+    (7,16): (0, 1, 3, 4, 5, 6, 9),
     (7,18): (0, 1, 4, 6, 7, 8, 9),
-    (7,19): (0, 2, 3, 6, 7, 8, 9),
+    (7,19): (0, 1, 2, 3, 6, 8, 9),
     (7,20): (0, 1, 2, 5, 7, 8, 9),
-    (7,21): (0, 1, 4, 5, 7, 8, 9),
+    (7,21): (0, 1, 3, 4, 5, 8, 9),
     (7,23): (0, 2, 4, 5, 6, 7, 9),
     (7,24): (0, 2, 4, 6, 7, 8, 9),
     (7,25): (0, 2, 3, 5, 6, 7, 9),
@@ -522,16 +524,16 @@ inversionDefaultPitchClasses = {
     (8,16): (0, 1, 2, 4, 6, 7, 8, 9),
     (8,18): (0, 1, 3, 4, 6, 7, 8, 9),
     (8,19): (0, 1, 3, 4, 5, 7, 8, 9),
-    (8,22): (0, 2, 4, 5, 7, 8, 9,10),
-    (8,27): (0, 2, 3, 5, 6, 8, 9,10),
+    (8,22): (0, 1, 2, 3, 5, 7, 9,10),
+    (8,27): (0, 1, 2, 4, 6, 7, 9,10),
     (8,29): (0, 2, 3, 4, 6, 7, 8, 9),
     (9, 2): (0, 2, 3, 4, 5, 6, 7, 8, 9),
     (9, 3): (0, 1, 3, 4, 5, 6, 7, 8, 9),
     (9, 4): (0, 1, 2, 4, 5, 6, 7, 8, 9),
     (9, 5): (0, 1, 2, 3, 5, 6, 7, 8, 9),
-    (9, 7): (0, 2, 3, 5, 6, 7, 8, 9,10),
-    (9, 8): (0, 2, 3, 4, 6, 7, 8, 9,10),
-    (9,11): (0, 1, 3, 4, 5, 7, 8, 9,10),
+    (9, 7): (0, 1, 2, 3, 4, 5, 7, 9,10),
+    (9, 8): (0, 1, 2, 3, 4, 6, 8, 9,10),
+    (9,11): (0, 1, 2, 3, 5, 6, 8, 9,10),
 }
 # to access the data for a single form, use:
 # forte   [size(tetra)] = 4
@@ -1786,6 +1788,7 @@ def addressToForteName(address, classification='tn'):
     return f'{card}-{index}{iStr}'
 
 
+# noinspection GrazieInspection
 def seekChordTablesAddress(c):
     '''
     Utility method to return the address to the chord table; used by
@@ -1839,7 +1842,7 @@ def seekChordTablesAddress(c):
         for Chord with 0 pitches
 
     NOTE: this was once a time-consuming operation, though it is
-    now quite a bit faster than before (order of 100 microseconds).  Nonetheless
+    now quite a bit faster than before (order of 100 microseconds).  Nonetheless, it
     should only be run when necessary.  Methods that call this should
     try (as chord.Chord does) to cache the result.
 

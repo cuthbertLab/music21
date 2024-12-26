@@ -56,12 +56,12 @@ class Test(unittest.TestCase):
         mxScorePart = self.EL('<score-part><part-name>Elec.</part-name></score-part>')
         mxPart = self.EL('<part><measure><note><type>thirty-tooth</type></note></measure></part>')
 
-        PP = PartParser(mxPart=mxPart, mxScorePart=mxScorePart)
-        PP.partId = '1'
+        pp = PartParser(mxPart=mxPart, mxScorePart=mxScorePart)
+        pp.partId = '1'
 
         msg = 'In part (Elec.), measure (0): found unknown MusicXML type: thirty-tooth'
         with self.assertRaises(MusicXMLImportException) as error:
-            PP.parse()
+            pp.parse()
         self.assertEqual(str(error.exception), msg)
 
     def testBarRepeatConversion(self):
@@ -396,7 +396,7 @@ class Test(unittest.TestCase):
         from music21.musicxml import m21ToXml
         from music21 import converter
 
-        # this also tests the EXPORTING of stem directions on notes within chords...
+        # this also tests the EXPORTING of stem directions on notes within chords
         n1 = note.Note('f3')
         n1.notehead = 'diamond'
         n1.stemDirection = 'down'
@@ -434,7 +434,7 @@ class Test(unittest.TestCase):
         self.assertEqual(sg2.symbol, 'brace')
         self.assertTrue(sg2.barTogether)
 
-        # TODO: more tests about which parts are there...
+        # TODO: more tests about which parts are there
 
     def testStaffGroupsPiano(self):
         from music21.musicxml import testPrimitive
@@ -572,7 +572,7 @@ class Test(unittest.TestCase):
     def x_testOrnamentAndTechnical(self):
         from music21 import converter
         beethoven = common.getCorpusFilePath() + '/beethoven/opus133.mxl'
-        # TODO: this is way too long... lots of hidden 32nd notes for trills...
+        # TODO: this is way too long. Lots of hidden 32nd notes for trills.
         s = converter.parse(beethoven, format='musicxml')
         ex = s.parts[0]
         countTrill = 0
@@ -582,8 +582,8 @@ class Test(unittest.TestCase):
                     countTrill += 1
         self.assertEqual(countTrill, 54)
 
-        # TODO: Get a better test... the single harmonic in the viola part,
-        # m. 482 is probably a mistake for an open string.
+        # TODO: Get a better test: the single harmonic in the viola part,
+        #     m. 482 is probably a mistake for an open string.
         countTechnical = 0
         for n in s.parts[2].recurse().notes:
             for a in n.articulations:
@@ -814,7 +814,7 @@ class Test(unittest.TestCase):
 
     def testCountDynamics(self):
         '''
-        good test of both dynamics and a PartStaff...
+        good test of both dynamics and a PartStaff.
         '''
         from music21 import corpus
         c = corpus.parse('schoenberg/opus19/movement2.mxl')
@@ -848,7 +848,7 @@ class Test(unittest.TestCase):
         lots of lines, including overlapping here; testing that
         a line attached to a rest is still there.  Formerly was a problem.
 
-        Many more tests could be done on this piece...
+        Many more tests could be done on this piece.
         '''
         from music21 import corpus
         c = corpus.parse('luca/gloria')
@@ -916,7 +916,7 @@ class Test(unittest.TestCase):
             self.assertEqual(len(tuplets), 1)
             self.assertEqual(tuplets[0].type, tupTypes[i])
 
-        # without number....
+        # without number.
         n0 = getNoteByTupletTypeNumber('start')
         n1 = getNoteByTupletTypeNumber()
         n2 = getNoteByTupletTypeNumber('stop')
@@ -941,7 +941,7 @@ class Test(unittest.TestCase):
           <step>D</step>
           <octave>5</octave>
         </pitch>
-        <duration>{defaults.divisionsPerQuarter * 0.5 * (2/3) * (2/3)}</duration>
+        <duration>{defaults.divisionsPerQuarter * 0.5 * (2 / 3) * (2 / 3)}</duration>
         <voice>1</voice>
         <type>eighth</type>
         <time-modification>
@@ -1478,9 +1478,9 @@ class Test(unittest.TestCase):
         </score-part>
         '''
 
-        PP = PartParser()
+        pp = PartParser()
         mxScorePart = EL(scorePart)
-        tmb = PP.getDefaultInstrument(mxScorePart)
+        tmb = pp.getDefaultInstrument(mxScorePart)
         self.assertIsInstance(tmb, instrument.Tambourine)
         self.assertEqual(tmb.percMapPitch, 54)  # 1-indexed
 
@@ -1488,11 +1488,11 @@ class Test(unittest.TestCase):
         scorePart = scorePart.replace('Tambourine', 'Cabasa')
         scorePart = scorePart.replace('Tamb.', 'Cab.')
         scorePart = scorePart.replace('55', '70')  # 1-indexed
-        PP = PartParser()
+        pp = PartParser()
         mxScorePart = EL(scorePart)
         msg = '69 does not map to a valid instrument!'
         with self.assertWarnsRegex(MusicXMLWarning, msg):
-            unp = PP.getDefaultInstrument(mxScorePart)
+            unp = pp.getDefaultInstrument(mxScorePart)
         self.assertIsInstance(unp, instrument.UnpitchedPercussion)
         self.assertEqual(unp.percMapPitch, 69)
 
@@ -1503,6 +1503,35 @@ class Test(unittest.TestCase):
         s = converter.parse(xml_dir / '46d-PickupMeasure-ImplicitMeasures.xml')
         m = s[stream.Measure].first()
         self.assertIs(m.showNumber, stream.enums.ShowNumber.NEVER)
+
+    def testAdjustTimeAttributesFromMeasure(self):
+        # Ignore import artifacts:
+        d = duration.Duration(3 + 3 / 480)
+        m = stream.Measure([meter.TimeSignature('6/8'), note.Note(duration=d)])
+        pp = PartParser()
+        pp.lastMeasureOffset = 21.0
+        pp.setLastMeasureInfo(m)
+        with self.assertWarns(MusicXMLWarning):
+            pp.adjustTimeAttributesFromMeasure(m)
+        self.assertEqual(pp.lastMeasureOffset, 24.0)
+
+        # Keep 'round' overful measures and extremely overful measures, as they were
+        # likely intentional.
+        d = duration.Duration(3.125)
+        m = stream.Measure([meter.TimeSignature('6/8'), note.Note(duration=d)])
+        pp = PartParser()
+        pp.lastMeasureOffset = 21.0
+        pp.setLastMeasureInfo(m)
+        pp.adjustTimeAttributesFromMeasure(m)
+        self.assertEqual(pp.lastMeasureOffset, 24.125)
+
+        d = duration.Duration(4.0)
+        m = stream.Measure([meter.TimeSignature('6/8'), note.Note(duration=d)])
+        pp = PartParser()
+        pp.lastMeasureOffset = 21.0
+        pp.setLastMeasureInfo(m)
+        pp.adjustTimeAttributesFromMeasure(m)
+        self.assertEqual(pp.lastMeasureOffset, 25.0)
 
 
 if __name__ == '__main__':

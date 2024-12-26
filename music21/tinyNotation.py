@@ -5,7 +5,7 @@
 #
 # Authors:      Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2009-2023 Michael Scott Asato Cuthbert
+# Copyright:    Copyright © 2009-2024 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # -------------------------------------------------------------------------------
 '''
@@ -273,12 +273,12 @@ class State:
     2
     '''
     # expires after N tokens or never.
-    autoExpires: typing.Literal[False] | int = False
+    autoExpires: typing.Literal[False]|int = False
 
-    def __init__(self, parent=None, stateInfo=None):
-        self.affectedTokens = []
-        self.parent = parent
-        self.stateInfo = stateInfo
+    def __init__(self, parent: Converter|None = None, stateInfo: str|None = None):
+        self.affectedTokens: list[Music21Object] = []
+        self.parent: Converter|None = parent
+        self.stateInfo: str|None = stateInfo
         # print('Adding state', self, parent.activeStates)
 
     def start(self):
@@ -287,25 +287,31 @@ class State:
         '''
         pass
 
-    def end(self) -> Music21Object | None:
+    def end(self) -> Music21Object|None:
         '''
         called just after removing state
         '''
         return None
 
-    def affectTokenBeforeParse(self, tokenStr):
+    def affectTokenBeforeParse(self, tokenStr: str) -> str:
         '''
         called to modify the string of a token.
         '''
         return tokenStr
 
-    def affectTokenAfterParseBeforeModifiers(self, m21Obj):
+    def affectTokenAfterParseBeforeModifiers(
+        self,
+        m21Obj: Music21Object
+    ) -> Music21Object:
         '''
         called after the object has been acquired but before modifiers have been applied.
         '''
         return m21Obj
 
-    def affectTokenAfterParse(self, m21Obj):
+    def affectTokenAfterParse(
+        self,
+        m21Obj: Music21Object
+    ) -> Music21Object:
         '''
         called to modify the tokenObj after parsing
 
@@ -316,8 +322,10 @@ class State:
         if self.autoExpires is not False:
             if len(self.affectedTokens) == self.autoExpires:
                 self.end()
-                # this is a hack that should be done away with...
+                # this is a hack that should be done away with
                 p = self.parent
+                if p is None:
+                    return m21Obj
 
                 # I thought this was potentially O(n^2) but it's actually
                 # just O(n) on activeStates and on pop() operation.
@@ -545,7 +553,7 @@ class RestToken(NoteOrRestToken):
     '''
     A token starting with 'r', representing a rest.
     '''
-    def parse(self, parent=None):
+    def parse(self, parent: Converter|None = None):
         r = note.Rest()
         self.applyDuration(r, self.token, parent)
         return r
@@ -586,7 +594,7 @@ class NoteToken(NoteOrRestToken):
         super().__init__(token)
         self.isEditorial = False
 
-    def parse(self, parent=None):
+    def parse(self, parent: Converter|None = None):
         '''
         Extract the pitch from the note and then returns the Note.
         '''
@@ -872,6 +880,7 @@ _stateDictDefault = {
 }
 
 class Converter:
+    # noinspection GrazieInspection
     '''
     Main conversion object for TinyNotation.
 
@@ -1405,7 +1414,7 @@ class Converter:
         '''
         Called after all the tokens have been run.
 
-        Currently runs `.makeMeasures` on `.stream` unless `.makeNotation` is `False`.
+        It currently runs `.makeMeasures()` on `.stream` unless `.makeNotation` is `False`.
         '''
         if self.makeNotation is not False:
             self.stream.makeMeasures(inPlace=True)

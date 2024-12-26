@@ -431,7 +431,7 @@ class LanguageDetector:
         self.text = text
         self.trigrams = _stored_trigrams.copy() or LanguageDetector.readExcerpts()
 
-    def mostLikelyLanguage(self, excerpt: str) -> str | None:
+    def mostLikelyLanguage(self, excerpt: str) -> str|None:
         # noinspection SpellCheckingInspection
         '''
         Returns the code of the most likely language for a passage, works on

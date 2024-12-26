@@ -10,6 +10,7 @@
 # ------------------------------------------------------------------------------
 from __future__ import annotations
 
+import sys
 import unittest
 
 from music21 import common
@@ -233,7 +234,7 @@ class Test(unittest.TestCase):
             '[(5, Terminus.HIGH), (Terminus.HIGH, 5)]'
         )
 
-        # in calling get next, get a lost of edges and a lost of nodes that all
+        # in calling get next, get a list of edges and a list of nodes that all
         # describe possible pathways
         self.assertEqual(
             net.getNext(net.nodes[Terminus.LOW], Direction.ASCENDING),
@@ -361,13 +362,19 @@ class Test(unittest.TestCase):
 
         net = IntervalNetwork()
         net.fillArbitrary(nodes, edges)
-        self.assertTrue(common.whitespaceEqual(str(net.edges),
-                                               '''
-            OrderedDict([(0, <music21.scale.intervalNetwork.Edge Direction.BI m2
-                                [(Terminus.LOW, 0), (0, Terminus.LOW)]>),
-                         (1, <music21.scale.intervalNetwork.Edge Direction.BI M3
-                                [(0, Terminus.HIGH), (Terminus.HIGH, 0)]>)])'''
-                                               ),
+        match = '''
+            OrderedDict({0: <music21.scale.intervalNetwork.Edge Direction.BI m2
+                                [(Terminus.LOW, 0), (0, Terminus.LOW)]>,
+                         1: <music21.scale.intervalNetwork.Edge Direction.BI M3
+                                [(0, Terminus.HIGH), (Terminus.HIGH, 0)]>})'''
+        if sys.version_info < (3, 12):
+            match = '''
+                OrderedDict([(0, <music21.scale.intervalNetwork.Edge Direction.BI m2
+                                    [(Terminus.LOW, 0), (0, Terminus.LOW)]>),
+                             (1, <music21.scale.intervalNetwork.Edge Direction.BI M3
+                                    [(0, Terminus.HIGH), (Terminus.HIGH, 0)]>)])'''
+
+        self.assertTrue(common.whitespaceEqual(str(net.edges), match),
                         str(net.edges))
 
         self.assertEqual(net.degreeMax, 3)

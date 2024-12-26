@@ -10,7 +10,7 @@
 # ------------------------------------------------------------------------------
 from __future__ import annotations
 
-import math
+from statistics import mean, stdev
 import unittest
 
 def nPVI(streamForAnalysis):
@@ -98,15 +98,7 @@ def melodicIntervalVariability(streamForAnalysis, **skipKeywords):
                              + 'a std-deviation of intervals (and thus a MIV)')
     # summation = 0
     semitoneList = [myInt.chromatic.undirected for myInt in intervalStream]
-    mean = 0
-    std = 0
-    for a in semitoneList:
-        mean = mean + a
-    mean = mean / totalElements
-    for a in semitoneList:
-        std = std + (a - mean) ** 2
-    std = math.sqrt(std / (totalElements - 1))
-    return 100 * (std / mean)
+    return 100 * (stdev(semitoneList) / mean(semitoneList))
 
 
 class Test(unittest.TestCase):

@@ -69,6 +69,7 @@ disable=
     too-many-lines,  # yes, someday
     too-many-return-statements,  # we'll see
     too-many-instance-attributes,  # maybe later
+    too-many-positional-arguments,  # try to get down to 6 first...
     # no-self-use,  # moved to optional extension.
     invalid-name,  # these are good music21 names; fix the regexp instead...
     too-few-public-methods,  # never remove or set to 1
@@ -100,7 +101,8 @@ disable=
     consider-using-f-string,  # future?
     unnecessary-lambda-assignment,  # opinionated
     consider-using-generator,  # generators are less performant for small container sizes, like most of ours
-
+    not-an-iterable,  # false positives on RecursiveIterator in recent pylint versions.
+    unpacking-non-sequence,  # also getting false positives.
 #       'protected-access', # this is an important one, but for now we do a lot of
 #                           # x = copy.deepcopy(self); x._volume = ... which is not a problem...
 

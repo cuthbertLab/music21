@@ -7,7 +7,7 @@
 #               Christopher Ariza
 #               Neena Parikh
 #
-# Copyright:    Copyright © 2009-2023 Michael Scott Asato Cuthbert
+# Copyright:    Copyright © 2009-2024 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
@@ -54,9 +54,9 @@ def isUnison(intv: interval.IntervalBase) -> bool:
     return False
 
 def realizeOrnaments(
-    srcObj: note.Note | note.Unpitched,
+    srcObj: note.Note|note.Unpitched,
     *,
-    keySig: key.KeySignature | None = None
+    keySig: key.KeySignature|None = None
 ):
     '''
     given a Note or Unpitched with Ornament expressions,
@@ -74,7 +74,7 @@ def realizeOrnaments(
     .. image:: images/expressionsMordentRealize.*
          :width: 218
     '''
-    srcObject: note.Note | note.Unpitched | None = srcObj
+    srcObject: note.Note|note.Unpitched|None = srcObj
     if t.TYPE_CHECKING:
         # it comes in as not None
         assert srcObject is not None
@@ -119,7 +119,7 @@ def realizeOrnaments(
                     break
 
         retList = []
-        # TODO: use extend...
+        # TODO: use extend instead of iteration
         for i in preExpandList:
             retList.append(i)
         if srcObject is not None:
@@ -199,7 +199,7 @@ class RehearsalMark(Expression):
         return repr(self.content)
 
     @staticmethod
-    def _getNumberingFromContent(c) -> str | None:
+    def _getNumberingFromContent(c) -> str|None:
         '''
         if numbering was not set, get it from the content
 
@@ -389,7 +389,7 @@ class TextExpression(Expression):
             return ''
 
     @property
-    def enclosure(self) -> style.Enclosure | None:
+    def enclosure(self) -> style.Enclosure|None:
         '''
         Returns or sets the enclosure on the Style object
         stored on .style.
@@ -415,7 +415,7 @@ class TextExpression(Expression):
         return self.style.enclosure
 
     @enclosure.setter
-    def enclosure(self, value: style.Enclosure | None):
+    def enclosure(self, value: style.Enclosure|None):
         if not self.hasStyleInformation and value is None:
             return
         self.style.enclosure = value
@@ -490,13 +490,13 @@ class Ornament(Expression):
 
     def realize(
         self,
-        srcObj: note.Note | note.Unpitched,
+        srcObj: note.Note|note.Unpitched,
         *,
-        keySig: key.KeySignature | None = None,
+        keySig: key.KeySignature|None = None,
         inPlace: bool = False
-    ) -> tuple[list[note.Note | note.Unpitched],
-                note.Note | note.Unpitched | None,
-                list[note.Note | note.Unpitched]]:
+    ) -> tuple[list[note.Note|note.Unpitched],
+                note.Note|note.Unpitched|None,
+                list[note.Note|note.Unpitched]]:
         '''
         subclassable method call that takes a sourceObject and optional keySig
         and returns a three-element tuple of a list of notes before the
@@ -517,11 +517,11 @@ class Ornament(Expression):
 
     def fillListOfRealizedNotes(
         self,
-        srcObj: note.Note | note.Unpitched,
-        fillObjects: list[note.Note | note.Unpitched],
+        srcObj: note.Note|note.Unpitched,
+        fillObjects: list[note.Note|note.Unpitched],
         transposeInterval: interval.IntervalBase,
         *,
-        useQL: OffsetQL | None = None
+        useQL: OffsetQL|None = None
     ) -> None:
         '''
         Used by trills and mordents to fill out their realization.
@@ -554,7 +554,7 @@ class Ornament(Expression):
         self,
         srcObj: note.GeneralNote,
         *,
-        keySig: key.KeySignature | None = None
+        keySig: key.KeySignature|None = None
     ):
         '''
         Only implemented in Turn, GeneralMordent, and Trill.
@@ -571,10 +571,10 @@ class Ornament(Expression):
     def updateAccidentalDisplay(
         self,
         *,
-        pitchPast: list[pitch.Pitch] | None = None,
-        pitchPastMeasure: list[pitch.Pitch] | None = None,
-        otherSimultaneousPitches: list[pitch.Pitch] | None = None,
-        alteredPitches: list[pitch.Pitch] | None = None,
+        pitchPast: list[pitch.Pitch]|None = None,
+        pitchPastMeasure: list[pitch.Pitch]|None = None,
+        otherSimultaneousPitches: list[pitch.Pitch]|None = None,
+        alteredPitches: list[pitch.Pitch]|None = None,
         cautionaryPitchClass: bool = True,
         cautionaryAll: bool = False,
         overrideStatus: bool = False,
@@ -593,9 +593,9 @@ class GeneralMordent(Ornament):
     '''
     _direction: str = ''  # up or down
 
-    def __init__(self, *, accidental: pitch.Accidental | None = None, **keywords):
+    def __init__(self, *, accidental: pitch.Accidental|None = None, **keywords):
         super().__init__(**keywords)
-        self._accidental: pitch.Accidental | None = accidental
+        self._accidental: pitch.Accidental|None = accidental
         self.quarterLength = 0.125  # 32nd note default
         self.placement = 'above'
 
@@ -624,14 +624,14 @@ class GeneralMordent(Ornament):
         return theName
 
     @property
-    def accidental(self) -> pitch.Accidental | None:
+    def accidental(self) -> pitch.Accidental|None:
         '''
         This is the GeneralMordent's accidental.
         '''
         return self._accidental
 
     @accidental.setter
-    def accidental(self, newAccidental: pitch.Accidental | None):
+    def accidental(self, newAccidental: pitch.Accidental|None):
         self._accidental = newAccidental
 
     @property
@@ -646,7 +646,7 @@ class GeneralMordent(Ornament):
         self,
         srcObj: note.GeneralNote,
         *,
-        keySig: key.KeySignature | None = None,
+        keySig: key.KeySignature|None = None,
     ) -> interval.IntervalBase:
         '''
         Returns the size of the mordent's interval, given a source note and
@@ -695,7 +695,7 @@ class GeneralMordent(Ornament):
         self,
         srcObj: note.GeneralNote,
         *,
-        keySig: key.KeySignature | None = None
+        keySig: key.KeySignature|None = None
     ):
         '''
         Computes and stores the ornamental pitch for a GeneralMordent, given the srcObj
@@ -762,7 +762,7 @@ class GeneralMordent(Ornament):
         self._ornamentalPitches = (ornamentalPitch,)
 
     @property
-    def ornamentalPitch(self) -> pitch.Pitch | None:
+    def ornamentalPitch(self) -> pitch.Pitch|None:
         '''
         Returns the mordent's ornamentalPitch.  If resolveOrnamentalPitches
         has not yet been called, None is returned.
@@ -783,10 +783,10 @@ class GeneralMordent(Ornament):
     def updateAccidentalDisplay(
         self,
         *,
-        pitchPast: list[pitch.Pitch] | None = None,
-        pitchPastMeasure: list[pitch.Pitch] | None = None,
-        otherSimultaneousPitches: list[pitch.Pitch] | None = None,
-        alteredPitches: list[pitch.Pitch] | None = None,
+        pitchPast: list[pitch.Pitch]|None = None,
+        pitchPastMeasure: list[pitch.Pitch]|None = None,
+        otherSimultaneousPitches: list[pitch.Pitch]|None = None,
+        alteredPitches: list[pitch.Pitch]|None = None,
         cautionaryPitchClass: bool = True,
         cautionaryAll: bool = False,
         overrideStatus: bool = False,
@@ -822,13 +822,13 @@ class GeneralMordent(Ornament):
 
     def realize(
         self,
-        srcObj: note.Note | note.Unpitched,
+        srcObj: note.Note|note.Unpitched,
         *,
-        keySig: key.KeySignature | None = None,
+        keySig: key.KeySignature|None = None,
         inPlace: bool = False
-    ) -> tuple[list[note.Note | note.Unpitched],
-                note.Note | note.Unpitched | None,
-                list[note.Note | note.Unpitched]]:
+    ) -> tuple[list[note.Note|note.Unpitched],
+                note.Note|note.Unpitched|None,
+                list[note.Note|note.Unpitched]]:
         '''
         Realize a mordent.
 
@@ -864,7 +864,7 @@ class GeneralMordent(Ornament):
                 raise ExpressionException('The note is not long enough to realize a mordent')
             use_ql = srcObj.duration.quarterLength / 4
 
-        currentKeySig: key.KeySignature | None = keySig
+        currentKeySig: key.KeySignature|None = keySig
         if currentKeySig is None:
             currentKeySig = srcObj.getContextByClass(key.KeySignature)
             if currentKeySig is None:
@@ -872,7 +872,7 @@ class GeneralMordent(Ornament):
 
         remainderQL = srcObj.duration.quarterLength - (2 * use_ql)
         transposeInterval = self.getSize(srcObj, keySig=currentKeySig)
-        mordNotes: list[note.Note | note.Unpitched] = []
+        mordNotes: list[note.Note|note.Unpitched] = []
         self.fillListOfRealizedNotes(srcObj, mordNotes, transposeInterval, useQL=use_ql)
 
         isTransposed: bool = not isUnison(transposeInterval)
@@ -993,16 +993,16 @@ class HalfStepMordent(Mordent):
         self,
         srcObj: note.GeneralNote,
         *,
-        keySig: key.KeySignature | None = None,
+        keySig: key.KeySignature|None = None,
     ) -> interval.IntervalBase:
         return self._minorSecondDown
 
     @property
-    def accidental(self) -> pitch.Accidental | None:
+    def accidental(self) -> pitch.Accidental|None:
         return None
 
     @accidental.setter
-    def accidental(self, newAccidental: pitch.Accidental | None):
+    def accidental(self, newAccidental: pitch.Accidental|None):
         raise ExpressionException('Cannot set accidental of HalfStepMordent')
 
 
@@ -1027,16 +1027,16 @@ class WholeStepMordent(Mordent):
         self,
         srcObj: note.GeneralNote,
         *,
-        keySig: key.KeySignature | None = None,
+        keySig: key.KeySignature|None = None,
     ) -> interval.IntervalBase:
         return self._majorSecondDown
 
     @property
-    def accidental(self) -> pitch.Accidental | None:
+    def accidental(self) -> pitch.Accidental|None:
         return None
 
     @accidental.setter
-    def accidental(self, newAccidental: pitch.Accidental | None):
+    def accidental(self, newAccidental: pitch.Accidental|None):
         raise ExpressionException('Cannot set accidental of WholeStepMordent')
 
 
@@ -1105,16 +1105,16 @@ class HalfStepInvertedMordent(InvertedMordent):
         self,
         srcObj: note.GeneralNote,
         *,
-        keySig: key.KeySignature | None = None,
+        keySig: key.KeySignature|None = None,
     ) -> interval.IntervalBase:
         return self._minorSecondUp
 
     @property
-    def accidental(self) -> pitch.Accidental | None:
+    def accidental(self) -> pitch.Accidental|None:
         return None
 
     @accidental.setter
-    def accidental(self, newAccidental: pitch.Accidental | None):
+    def accidental(self, newAccidental: pitch.Accidental|None):
         raise ExpressionException('Cannot set accidental of HalfStepInvertedMordent')
 
 
@@ -1140,16 +1140,16 @@ class WholeStepInvertedMordent(InvertedMordent):
         self,
         srcObj: note.GeneralNote,
         *,
-        keySig: key.KeySignature | None = None,
+        keySig: key.KeySignature|None = None,
     ) -> interval.IntervalBase:
         return self._majorSecondUp
 
     @property
-    def accidental(self) -> pitch.Accidental | None:
+    def accidental(self) -> pitch.Accidental|None:
         return None
 
     @accidental.setter
-    def accidental(self, newAccidental: pitch.Accidental | None):
+    def accidental(self, newAccidental: pitch.Accidental|None):
         raise ExpressionException('Cannot set accidental of WholeStepInvertedMordent')
 
 
@@ -1191,9 +1191,9 @@ class Trill(Ornament):
     '''
     _direction: str = 'up'
 
-    def __init__(self, *, accidental: pitch.Accidental | None = None, **keywords) -> None:
+    def __init__(self, *, accidental: pitch.Accidental|None = None, **keywords) -> None:
         super().__init__(**keywords)
-        self._accidental: pitch.Accidental | None = accidental
+        self._accidental: pitch.Accidental|None = accidental
         self.placement = 'above'
         self.nachschlag = False  # play little notes at the end of the trill?
         self.tieAttach = 'all'
@@ -1232,7 +1232,7 @@ class Trill(Ornament):
         return self._direction
 
     @property
-    def accidental(self) -> pitch.Accidental | None:
+    def accidental(self) -> pitch.Accidental|None:
         '''
         This is the Trill's accidental.  Whether or not it is visible is dictated by
         the accidental's displayStatus.
@@ -1240,7 +1240,7 @@ class Trill(Ornament):
         return self._accidental
 
     @accidental.setter
-    def accidental(self, newAccidental: pitch.Accidental | None):
+    def accidental(self, newAccidental: pitch.Accidental|None):
         self._accidental = newAccidental
 
     def splitClient(self, noteList):
@@ -1269,7 +1269,7 @@ class Trill(Ornament):
         self,
         srcObj: note.GeneralNote,
         *,
-        keySig: key.KeySignature | None = None,
+        keySig: key.KeySignature|None = None,
     ) -> interval.IntervalBase:
         '''
         Returns the size of the trill's interval, given a source note and
@@ -1317,7 +1317,7 @@ class Trill(Ornament):
         self,
         srcObj: note.GeneralNote,
         *,
-        keySig: key.KeySignature | None = None
+        keySig: key.KeySignature|None = None
     ):
         '''
         Computes and stores the ornamental pitch for a Trill, given the srcObj
@@ -1364,7 +1364,7 @@ class Trill(Ornament):
         self._ornamentalPitches = (ornamentalPitch,)
 
     @property
-    def ornamentalPitch(self) -> pitch.Pitch | None:
+    def ornamentalPitch(self) -> pitch.Pitch|None:
         '''
         Returns the trill's ornamentalPitch.  If resolveOrnamentalPitches
         has not yet been called, None is returned.
@@ -1385,10 +1385,10 @@ class Trill(Ornament):
     def updateAccidentalDisplay(
         self,
         *,
-        pitchPast: list[pitch.Pitch] | None = None,
-        pitchPastMeasure: list[pitch.Pitch] | None = None,
-        otherSimultaneousPitches: list[pitch.Pitch] | None = None,
-        alteredPitches: list[pitch.Pitch] | None = None,
+        pitchPast: list[pitch.Pitch]|None = None,
+        pitchPastMeasure: list[pitch.Pitch]|None = None,
+        otherSimultaneousPitches: list[pitch.Pitch]|None = None,
+        alteredPitches: list[pitch.Pitch]|None = None,
         cautionaryPitchClass: bool = True,
         cautionaryAll: bool = False,
         overrideStatus: bool = False,
@@ -1493,13 +1493,13 @@ class Trill(Ornament):
 
     def realize(
         self,
-        srcObj: note.Note | note.Unpitched,
+        srcObj: note.Note|note.Unpitched,
         *,
-        keySig: key.KeySignature | None = None,
+        keySig: key.KeySignature|None = None,
         inPlace: bool = False
-    ) -> tuple[list[note.Note | note.Unpitched],
-                note.Note | note.Unpitched | None,
-                list[note.Note | note.Unpitched]]:
+    ) -> tuple[list[note.Note|note.Unpitched],
+                note.Note|note.Unpitched|None,
+                list[note.Note|note.Unpitched]]:
         '''
         realize a trill.
 
@@ -1622,7 +1622,7 @@ class Trill(Ornament):
         if self.nachschlag:
             numberOfTrillNotes -= 2
 
-        trillNotes: list[note.Note | note.Unpitched] = []
+        trillNotes: list[note.Note|note.Unpitched] = []
         for unused_counter in range(int(numberOfTrillNotes / 2)):
             self.fillListOfRealizedNotes(srcObj, trillNotes, transposeInterval, useQL=useQL)
 
@@ -1711,16 +1711,16 @@ class HalfStepTrill(Trill):
         self,
         srcObj: note.GeneralNote,
         *,
-        keySig: key.KeySignature | None = None,
+        keySig: key.KeySignature|None = None,
     ) -> interval.IntervalBase:
         return self._minorSecondUp
 
     @property
-    def accidental(self) -> pitch.Accidental | None:
+    def accidental(self) -> pitch.Accidental|None:
         return None
 
     @accidental.setter
-    def accidental(self, newAccidental: pitch.Accidental | None):
+    def accidental(self, newAccidental: pitch.Accidental|None):
         raise ExpressionException('Cannot set accidental of HalfStepTrill')
 
 
@@ -1759,16 +1759,16 @@ class WholeStepTrill(Trill):
         self,
         srcObj: note.GeneralNote,
         *,
-        keySig: key.KeySignature | None = None,
+        keySig: key.KeySignature|None = None,
     ) -> interval.IntervalBase:
         return self._majorSecondUp
 
     @property
-    def accidental(self) -> pitch.Accidental | None:
+    def accidental(self) -> pitch.Accidental|None:
         return None
 
     @accidental.setter
-    def accidental(self, newAccidental: pitch.Accidental | None):
+    def accidental(self, newAccidental: pitch.Accidental|None):
         raise ExpressionException('Cannot set accidental of WholeStepTrill')
 
 
@@ -1819,22 +1819,22 @@ class Turn(Ornament):
     def __init__(
         self,
         *,
-        delay: OrnamentDelay | OffsetQL = OrnamentDelay.NO_DELAY,
-        upperAccidental: pitch.Accidental | None = None,
-        lowerAccidental: pitch.Accidental | None = None,
+        delay: OrnamentDelay|OffsetQL = OrnamentDelay.NO_DELAY,
+        upperAccidental: pitch.Accidental|None = None,
+        lowerAccidental: pitch.Accidental|None = None,
         **keywords
     ):
         super().__init__(**keywords)
-        self._upperAccidental: pitch.Accidental | None = upperAccidental
-        self._lowerAccidental: pitch.Accidental | None = lowerAccidental
+        self._upperAccidental: pitch.Accidental|None = upperAccidental
+        self._lowerAccidental: pitch.Accidental|None = lowerAccidental
         self.placement: str = 'above'
         self.tieAttach: str = 'all'
         self.quarterLength: OffsetQL = 0.25
-        self._delay: OrnamentDelay | OffsetQL = 0.0
+        self._delay: OrnamentDelay|OffsetQL = 0.0
         self.delay = delay  # use property setter
 
     @property
-    def upperAccidental(self) -> pitch.Accidental | None:
+    def upperAccidental(self) -> pitch.Accidental|None:
         '''
         This is the Turn's upperAccidental. Whether or not it is visible is dictated by
         the upperAccidental's displayStatus.
@@ -1842,11 +1842,11 @@ class Turn(Ornament):
         return self._upperAccidental
 
     @upperAccidental.setter
-    def upperAccidental(self, newUpperAccidental: pitch.Accidental | None):
+    def upperAccidental(self, newUpperAccidental: pitch.Accidental|None):
         self._upperAccidental = newUpperAccidental
 
     @property
-    def lowerAccidental(self) -> pitch.Accidental | None:
+    def lowerAccidental(self) -> pitch.Accidental|None:
         '''
         This is the Turn's lowerAccidental. Whether or not it is visible is dictated by
         the upperAccidental's displayStatus.
@@ -1854,11 +1854,11 @@ class Turn(Ornament):
         return self._lowerAccidental
 
     @lowerAccidental.setter
-    def lowerAccidental(self, newLowerAccidental: pitch.Accidental | None):
+    def lowerAccidental(self, newLowerAccidental: pitch.Accidental|None):
         self._lowerAccidental = newLowerAccidental
 
     @property
-    def delay(self) -> OrnamentDelay | OffsetQL:
+    def delay(self) -> OrnamentDelay|OffsetQL:
         '''
         If delay is NO_DELAY, the turn is not delayed.
 
@@ -1870,7 +1870,7 @@ class Turn(Ornament):
         return self._delay
 
     @delay.setter
-    def delay(self, newDelay: OrnamentDelay | OffsetQL):
+    def delay(self, newDelay: OrnamentDelay|OffsetQL):
         # we convert to OrnamentDelay if possible now, to simplify life later
         if isinstance(newDelay, (float, Fraction)) and newDelay <= 0:
             newDelay = OrnamentDelay.NO_DELAY
@@ -1937,7 +1937,7 @@ class Turn(Ornament):
         srcObj: note.GeneralNote,
         which: str,
         *,
-        keySig: key.KeySignature | None = None,
+        keySig: key.KeySignature|None = None,
     ) -> interval.IntervalBase:
         '''
         Returns the size of one of the turn's two intervals (which='upper'
@@ -1972,7 +1972,7 @@ class Turn(Ornament):
         if ornamentalPitch.octave is None:
             ornamentalPitch.octave = ornamentalPitch.implicitOctave
 
-        accidental: pitch.Accidental | None = None
+        accidental: pitch.Accidental|None = None
         if which == 'upper':
             ornamentalPitch.transpose(interval.GenericInterval(2), inPlace=True)
             accidental = self.upperAccidental
@@ -1992,7 +1992,7 @@ class Turn(Ornament):
         self,
         srcObj: note.GeneralNote,
         *,
-        keySig: key.KeySignature | None = None
+        keySig: key.KeySignature|None = None
     ):
         '''
         Computes and stores the ornamental pitches for a Turn, given the srcObj
@@ -2077,7 +2077,7 @@ class Turn(Ornament):
         self._ornamentalPitches = (upperPitch, lowerPitch)
 
     @property
-    def upperOrnamentalPitch(self) -> pitch.Pitch | None:
+    def upperOrnamentalPitch(self) -> pitch.Pitch|None:
         '''
         Returns the turn's upper ornamental pitch.  If resolveOrnamentalPitches
         has not yet been called, None is returned.
@@ -2087,7 +2087,7 @@ class Turn(Ornament):
         return None
 
     @property
-    def lowerOrnamentalPitch(self) -> pitch.Pitch | None:
+    def lowerOrnamentalPitch(self) -> pitch.Pitch|None:
         '''
         Returns the turn's lower ornamental pitch.  If resolveOrnamentalPitches
         has not yet been called, None is returned.
@@ -2108,10 +2108,10 @@ class Turn(Ornament):
     def updateAccidentalDisplay(
         self,
         *,
-        pitchPast: list[pitch.Pitch] | None = None,
-        pitchPastMeasure: list[pitch.Pitch] | None = None,
-        otherSimultaneousPitches: list[pitch.Pitch] | None = None,
-        alteredPitches: list[pitch.Pitch] | None = None,
+        pitchPast: list[pitch.Pitch]|None = None,
+        pitchPastMeasure: list[pitch.Pitch]|None = None,
+        otherSimultaneousPitches: list[pitch.Pitch]|None = None,
+        alteredPitches: list[pitch.Pitch]|None = None,
         cautionaryPitchClass: bool = True,
         cautionaryAll: bool = False,
         overrideStatus: bool = False,
@@ -2150,13 +2150,13 @@ class Turn(Ornament):
 
     def realize(
         self,
-        srcObj: note.Note | note.Unpitched,
+        srcObj: note.Note|note.Unpitched,
         *,
-        keySig: key.KeySignature | None = None,
+        keySig: key.KeySignature|None = None,
         inPlace: bool = False
-    ) -> tuple[list[note.Note | note.Unpitched],
-                note.Note | note.Unpitched | None,
-                list[note.Note | note.Unpitched]]:
+    ) -> tuple[list[note.Note|note.Unpitched],
+                note.Note|note.Unpitched|None,
+                list[note.Note|note.Unpitched]]:
         # noinspection PyShadowingNames
         '''
         realize a turn.
@@ -2278,7 +2278,7 @@ class Turn(Ornament):
             remainderDuration = theDelay
 
         turnDuration = srcObj.duration.quarterLength - remainderDuration
-        fourthNoteQL: OffsetQL | None = None
+        fourthNoteQL: OffsetQL|None = None
         if turnDuration < 4 * self.quarterLength:
             if not self.autoScale:
                 raise ExpressionException('The note is not long enough to realize a turn')
@@ -2298,7 +2298,7 @@ class Turn(Ornament):
 
         # no need to check both intervals, they will both be perfectUnison, or neither will be.
         isTransposed: bool = not isUnison(firstTransposeInterval)
-        turnNotes: list[note.Note | note.Unpitched] = []
+        turnNotes: list[note.Note|note.Unpitched] = []
 
         firstNote = copy.deepcopy(srcObj)
         firstNote.expressions = []
@@ -2375,13 +2375,13 @@ class GeneralAppoggiatura(Ornament):
 
     def realize(
         self,
-        srcObj: note.Note | note.Unpitched,
+        srcObj: note.Note|note.Unpitched,
         *,
-        keySig: key.KeySignature | None = None,
+        keySig: key.KeySignature|None = None,
         inPlace: bool = False
-    ) -> tuple[list[note.Note | note.Unpitched],
-                note.Note | note.Unpitched | None,
-                list[note.Note | note.Unpitched]]:
+    ) -> tuple[list[note.Note|note.Unpitched],
+                note.Note|note.Unpitched|None,
+                list[note.Note|note.Unpitched]]:
         '''
         realize an appoggiatura
 
@@ -2525,13 +2525,13 @@ class Tremolo(Ornament):
 
     def realize(
         self,
-        srcObj: note.Note | note.Unpitched,
+        srcObj: note.Note|note.Unpitched,
         *,
-        keySig: key.KeySignature | None = None,
+        keySig: key.KeySignature|None = None,
         inPlace: bool = False
-    ) -> tuple[list[note.Note | note.Unpitched],
-                note.Note | note.Unpitched | None,
-                list[note.Note | note.Unpitched]]:
+    ) -> tuple[list[note.Note|note.Unpitched],
+                note.Note|note.Unpitched|None,
+                list[note.Note|note.Unpitched]]:
         '''
         Realize the ornament
 
@@ -2737,7 +2737,7 @@ class ArpeggioMark(Expression):
     >>> am.type
     'down'
     '''
-    def __init__(self, arpeggioType: str | None = None, **keywords):
+    def __init__(self, arpeggioType: str|None = None, **keywords):
         super().__init__(**keywords)
         if not arpeggioType:
             arpeggioType = 'normal'
@@ -2787,8 +2787,8 @@ class ArpeggioMarkSpanner(spanner.Spanner):
             )
         self.type = arpeggioType
 
-    def noteExtremes(self) -> tuple[note.Note | None,
-                                    note.Note | None]:
+    def noteExtremes(self) -> tuple[note.Note|None,
+                                    note.Note|None]:
         '''
         Return the lowest and highest note spanned by the element,
         extracting them from Chords if need be.

@@ -31,21 +31,22 @@ class PercussionChord(chord.ChordBase):
     a :class:`~music21.chord.Chord` because one or more notes is an :class:`~music21.note.Unpitched`
     object.
 
-    >>> pChord = percussion.PercussionChord([note.Unpitched(displayName='D4'), note.Note('E5')])
+    >>> vibraslapNote = note.Unpitched(displayName='D4', storedInstrument=instrument.Vibraslap())
+    >>> pChord = percussion.PercussionChord([vibraslapNote, note.Note('E5')])
     >>> pChord.isChord
     False
 
     Has notes, just like any ChordBase:
 
     >>> pChord.notes
-    (<music21.note.Unpitched object at 0x...>, <music21.note.Note E>)
+    (<music21.note.Unpitched 'Vibraslap'>, <music21.note.Note E>)
 
     Assign them to another PercussionChord:
 
     >>> pChord2 = percussion.PercussionChord()
     >>> pChord2.notes = pChord.notes
     >>> pChord2.notes
-    (<music21.note.Unpitched object at 0x...>, <music21.note.Note E>)
+    (<music21.note.Unpitched 'Vibraslap'>, <music21.note.Note E>)
 
     Don't attempt setting anything but Note or Unpitched objects as notes:
 
@@ -102,7 +103,7 @@ class PercussionChord(chord.ChordBase):
         return tuple(self._notes)
 
     @notes.setter
-    def notes(self, newNotes: Iterable[note.Unpitched | note.Note]) -> None:
+    def notes(self, newNotes: Iterable[note.Unpitched|note.Note]) -> None:
         '''
         Sets notes to an iterable of Note or Unpitched objects
         '''
@@ -154,7 +155,7 @@ class PercussionChord(chord.ChordBase):
         return pitches
 
     @pitches.setter
-    def pitches(self, value: t.Sequence[str | pitch.Pitch | int]):
+    def pitches(self, value: t.Sequence[str|pitch.Pitch|int]):
         self._notes = []
         # TODO: individual ties are not being retained here
         for p in value:

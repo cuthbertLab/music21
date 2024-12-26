@@ -47,7 +47,7 @@ if you get a 'ssh_askpass' not found error, create this file in
     eval "${SCRIPT}";
 
 
-Otherwise just contact MSC...
+Otherwise just contact MSAC.
 '''
 from __future__ import annotations
 

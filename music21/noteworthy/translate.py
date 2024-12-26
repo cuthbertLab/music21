@@ -30,14 +30,14 @@ Module to translate Noteworthy Composer's NWCTXT format to music21.
 # |Ending|Endings:1
 # |Ending|Endings:2,D
 #
-# ...as expression
+# As expression
 # |TempoVariance|Style:Fermata|Pause:3|Pos:-4
 #
-# ...as spanner
+# As spanner
 # |TempoVariance|Style:Accelerando|Pos:-6
 #
 #
-# ...beams:
+# Beams:
 # |Note|Dur:8th|Pos:0|Opts:Stem=Down,Beam=First
 # |Note|Dur:8th|Pos:0|Opts:Stem=Down,Beam
 # |Note|Dur:8th|Pos:0|Opts:Stem=Down,Beam
@@ -357,7 +357,7 @@ class NoteworthyTranslator:
     def getOnePitchFromPosition(self, pos):
         # noinspection PyShadowingNames
         '''
-        get one pitch from a position...
+        Get one pitch from a position:
 
         >>> nwt = noteworthy.translate.NoteworthyTranslator()
         >>> nwt.currentClef = 'BASS'
@@ -733,8 +733,6 @@ class NoteworthyTranslator:
         Adds a new key signature to the given measure.
         Returns the number of sharps (negative for flats)
 
-
-
         >>> measureIn = stream.Measure()
         >>> measureIn.append(note.Rest(quarterLength=3.0))
 
@@ -747,13 +745,13 @@ class NoteworthyTranslator:
         {0.0} <music21.note.Rest dotted-half>
         {3.0} <music21.key.KeySignature of 4 sharps>
         '''
-        ke = attributes['Signature']
+
         currentSharps = 0
-        for a in range(len(ke)):
-            if ke[a] == '#':
-                currentSharps = currentSharps + 1
-            if ke[a] == 'b':
-                currentSharps = currentSharps - 1
+        for attribute in attributes['Signature']:
+            if attribute == '#':
+                currentSharps += 1
+            elif attribute == 'b':
+                currentSharps -= 1
         currentKey = key.KeySignature(currentSharps)
         self.currentMeasure.append(currentKey)
         self.currentKey = currentKey

@@ -6,8 +6,7 @@
 # Authors:      Josiah Wolf Oberholtzer
 #               Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2013-22 Michael Scott Asato Cuthbert and the music21
-#               Project
+# Copyright:    Copyright © 2013-2022 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # -----------------------------------------------------------------------------
 '''
@@ -35,11 +34,11 @@ def listOfTreesByClass(
     inputStream: StreamType,
     *,
     classLists: Sequence[Sequence[type[M21ObjType]]] = (),
-    currentParentage: tuple[stream.Stream, ...] | None = None,
+    currentParentage: tuple[stream.Stream, ...]|None = None,
     initialOffset: float = 0.0,
-    flatten: bool | str = False,
+    flatten: bool|str = False,
     useTimespans: bool = False
-) -> list[trees.OffsetTree | timespanTree.TimespanTree]:
+) -> list[trees.OffsetTree|timespanTree.TimespanTree]:
     # noinspection PyShadowingNames
     r'''
     To be DEPRECATED in v8: this is no faster than calling streamToTimespanTree
@@ -159,11 +158,11 @@ def listOfTreesByClass(
 def asTree(
     inputStream: StreamType,
     *,
-    flatten: t.Literal['semiFlat'] | bool = False,
-    classList: Sequence[type] | None = None,
+    flatten: t.Literal['semiFlat']|bool = False,
+    classList: Sequence[type]|None = None,
     useTimespans: bool = False,
     groupOffsets: bool = False
-) -> trees.OffsetTree | trees.ElementTree | timespanTree.TimespanTree:
+) -> trees.OffsetTree|trees.ElementTree|timespanTree.TimespanTree:
     '''
     Converts a Stream and constructs an :class:`~music21.tree.trees.ElementTree` based on this.
 
@@ -231,7 +230,7 @@ def asTree(
 
             if element.isStream and flatten is not False:  # True or 'semiFlat'
                 localParentage = currentParentage + (element,)
-                recurseGetTreeByClass(element,  # put the elements into the current tree...
+                recurseGetTreeByClass(element,  # put the elements into the current tree
                                       currentParentage=localParentage,
                                       initialOffset=flatOffset,
                                       inner_outputTree=inner_outputTree)
@@ -261,7 +260,7 @@ def asTree(
 
         return inner_outputTree
 
-    # first time through...
+    # first time through
     treeClass: type[trees.ElementTree]
 
     if useTimespans:
@@ -280,7 +279,7 @@ def asTree(
     if (inputStream.isSorted
             and groupOffsets is False  # currently we can't populate for an OffsetTree*
             and (inputStream.isFlat or flatten is False)):
-        outputTree: trees.OffsetTree | trees.ElementTree = treeClass(source=inputStream)
+        outputTree: trees.OffsetTree|trees.ElementTree = treeClass(source=inputStream)
         return makeFastShallowTreeFromSortedStream(inputStream,
                                                    outputTree=outputTree,
                                                    classList=classList)
@@ -292,9 +291,9 @@ def asTree(
 def makeFastShallowTreeFromSortedStream(
     inputStream: stream.Stream,
     *,
-    outputTree: trees.OffsetTree | trees.ElementTree,
-    classList: Sequence[type] | None = None,
-) -> trees.OffsetTree | trees.ElementTree:
+    outputTree: trees.OffsetTree|trees.ElementTree,
+    classList: Sequence[type]|None = None,
+) -> trees.OffsetTree|trees.ElementTree:
     '''
     Use populateFromSortedList to quickly make a tree from a stream.
 
@@ -319,8 +318,8 @@ def makeFastShallowTreeFromSortedStream(
 def asTimespans(
     inputStream,
     *,
-    flatten: str | bool = False,
-    classList: Sequence[type[Music21Object]] | None = None
+    flatten: str|bool = False,
+    classList: Sequence[type[Music21Object]]|None = None
 ) -> timespanTree.TimespanTree:
     r'''
     Recurses through a score and constructs a
@@ -396,9 +395,9 @@ class Test(unittest.TestCase):
         sf.isSorted = False
         sf._cache = {}
         sfTreeSlow = sf.asTree()
-        for i in range(len(sf)):
-            fastI = sfTree[i]
-            slowI = sfTreeSlow[i]
+        self.assertEqual(len(sf), len(sfTreeSlow))
+        self.assertEqual(len(sf), len(sfTree))
+        for fastI, slowI in zip(sfTree, sfTreeSlow):
             self.assertIs(fastI, slowI)
 
     def testAutoSortExample(self):

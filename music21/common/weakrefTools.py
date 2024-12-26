@@ -20,7 +20,7 @@ _T = t.TypeVar('_T')
 # ------------------------------------------------------------------------------
 
 
-def wrapWeakref(referent: _T) -> weakref.ReferenceType | _T:
+def wrapWeakref(referent: _T) -> weakref.ReferenceType|_T:
     '''
     utility function that wraps objects as weakrefs but does not wrap
     already wrapped objects; also prevents wrapping the unwrappable "None" type, etc.
@@ -31,14 +31,21 @@ def wrapWeakref(referent: _T) -> weakref.ReferenceType | _T:
     >>> a1 = Mock()
     >>> ref1 = common.wrapWeakref(a1)
     >>> ref1
-    <weakref at 0x101f29ae8; to 'Mock' at 0x101e45358>
+    <weakref at 0x101f29ae8; to ...Mock' at 0x101e45358>
     >>> ref2 = common.wrapWeakref(ref1)
     >>> ref2
-    <weakref at 0x101f299af; to 'Mock' at 0x101e45358>
+    <weakref at 0x101f299af; to ...Mock' at 0x101e45358>
     >>> ref3 = common.wrapWeakref(5)
     >>> ref3
     5
+
+    OMIT_FROM_DOCS
+
+    Note that the ...Mock was needed after Python 3.13.
+    When 3.13 is the lowest version, replace ... with the
+    actual output.
     '''
+
     # if isinstance(referent, weakref.ReferenceType):
     #     return referent
     try:
@@ -51,7 +58,7 @@ def wrapWeakref(referent: _T) -> weakref.ReferenceType | _T:
         return referent
 
 
-def unwrapWeakref(referent: weakref.ReferenceType | t.Any) -> t.Any:
+def unwrapWeakref(referent: weakref.ReferenceType|t.Any) -> t.Any:
     '''
     Utility function that gets an object that might be an object itself
     or a weak reference to an object.  It returns obj() if it's a weakref.

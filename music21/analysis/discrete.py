@@ -79,7 +79,7 @@ class DiscreteAnalysis:
         # store alternative solutions, which may be sorted or not
         self.alternativeSolutions = []
 
-    def _rgbToHex(self, rgb: Sequence[float | int]) -> str:
+    def _rgbToHex(self, rgb: Sequence[float|int]) -> str:
         '''
         Utility conversion method
 
@@ -389,7 +389,7 @@ class KeyWeightKeyAnalysis(DiscreteAnalysis):
                 solution[i] += (toneWeights[(j - i) % 12] * pcDistribution[j])
         return solution
 
-    def _getLikelyKeys(self, keyResults, differences) -> list[t.Any] | None:
+    def _getLikelyKeys(self, keyResults, differences) -> list[t.Any]|None:
         ''' Takes in a list of probable key results in points and returns a
             list of keys in letters, sorted from most likely to least likely.
         '''
@@ -407,7 +407,7 @@ class KeyWeightKeyAnalysis(DiscreteAnalysis):
             # environLocal.printDebug(['added likely key', likelyKeys[pc]])
         return likelyKeys
 
-    def _getDifference(self, keyResults, pcDistribution, weightType) -> None | list[int | float]:
+    def _getDifference(self, keyResults, pcDistribution, weightType) -> None|list[int|float]:
         '''
         Takes in a list of numerical probable key results and returns the
         difference of the top two keys.
@@ -416,7 +416,7 @@ class KeyWeightKeyAnalysis(DiscreteAnalysis):
         if keyResults is None:
             return None
 
-        solution: list[int | float] = [0.0] * 12
+        solution: list[int|float] = [0.0] * 12
         top = [0.0] * 12
         bottomRight = [0.0] * 12
         bottomLeft = [0.0] * 12
@@ -723,7 +723,7 @@ class KrumhanslSchmuckler(KeyWeightKeyAnalysis):
     Implementation of Krumhansl-Schmuckler/Kessler weightings for
     Krumhansl-Schmuckler key determination algorithm.
 
-    Values from from https://extras.humdrum.org/man/keycor/, which describes these
+    Values from https://extras.humdrum.org/man/keycor/, which describes these
     weightings as "Strong tendency to identify the dominant key as the tonic."
 
     * Changed in v6.3: it used to be that these were different from the
@@ -771,7 +771,7 @@ class AardenEssen(KeyWeightKeyAnalysis):
     '''
     Implementation of Aarden-Essen weightings for Krumhansl-Schmuckler key determination algorithm.
 
-    Values from from https://extras.humdrum.org/man/keycor/, which
+    Values from https://extras.humdrum.org/man/keycor/, which
     describes these weightings as "Weak tendency to identify the subdominant key as the tonic."
 
     (N.B. -- we are not sure exactly where the minor weightings come from, and recommend
@@ -816,7 +816,7 @@ class SimpleWeights(KeyWeightKeyAnalysis):
     Implementation of simple weights by Craig Sapp for Krumhansl-Schmuckler
     key determination algorithm.
 
-    Values from from https://extras.humdrum.org/man/keycor/, which describes
+    Values from https://extras.humdrum.org/man/keycor/, which describes
     these weightings as "Performs most consistently with large regions of music,
     becomes noisier with smaller regions of music."
     '''
@@ -853,7 +853,7 @@ class BellmanBudge(KeyWeightKeyAnalysis):
     '''
     Implementation of Bellman-Budge weightings for Krumhansl-Schmuckler key determination algorithm.
 
-    Values from from https://extras.humdrum.org/man/keycor/, which describes these
+    Values from https://extras.humdrum.org/man/keycor/, which describes these
     weightings as "No particular tendencies for confusions with neighboring keys."
     '''
     _DOC_ALL_INHERITED = False
@@ -893,7 +893,7 @@ class TemperleyKostkaPayne(KeyWeightKeyAnalysis):
     Implementation of Temperley-Kostka-Payne weightings for Krumhansl-Schmuckler
     key determination algorithm.
 
-    Values from from https://extras.humdrum.org/man/keycor/, which describes
+    Values from https://extras.humdrum.org/man/keycor/, which describes
     these weightings as "Strong tendency to identify the relative major as the tonic
     in minor keys. Well-balanced for major keys."
     '''
@@ -951,12 +951,12 @@ class Ambitus(DiscreteAnalysis):
     # provide possible string matches for this processor
     identifiers = ['ambitus', 'span']
 
-    def __init__(self, referenceStream: stream.Stream | None = None):
+    def __init__(self, referenceStream: stream.Stream|None = None):
         super().__init__(referenceStream=referenceStream)
         # Store the min and max Pitch instances for referenceStream
         # set by getPitchSpan(), which is called by _generateColors()
-        self.minPitchObj: pitch.Pitch | None = None
-        self.maxPitchObj: pitch.Pitch | None = None
+        self.minPitchObj: pitch.Pitch|None = None
+        self.maxPitchObj: pitch.Pitch|None = None
 
         self._pitchSpanColors: OrderedDict[int, str] = OrderedDict()
         self._generateColors()
@@ -980,7 +980,10 @@ class Ambitus(DiscreteAnalysis):
         if numColors is None:
             if self._referenceStream is not None:
                 # get total range for entire piece
-                self.minPitchObj, self.maxPitchObj = self.getPitchSpan(self._referenceStream)
+                pitchSpanReturn = self.getPitchSpan(self._referenceStream)
+                if pitchSpanReturn is None:
+                    return
+                self.minPitchObj, self.maxPitchObj = pitchSpanReturn
                 maxPitch = int(self.maxPitchObj.ps - self.minPitchObj.ps)
             else:
                 maxPitch = 130  # a large default
@@ -1001,14 +1004,14 @@ class Ambitus(DiscreteAnalysis):
 
         # environLocal.printDebug([self._pitchSpanColors])
 
-    def getPitchSpan(self, subStream) -> tuple[pitch.Pitch, pitch.Pitch] | None:
+    def getPitchSpan(self, subStream) -> tuple[pitch.Pitch, pitch.Pitch]|None:
         '''
         For a given subStream, return a tuple consisting of the two pitches
         with the minimum and maximum pitch space value.
 
-        This public method may be used by other classes.
+        This public method may be used by other classes.  It ignores ChordSymbol objects.
 
-        ignores ChordSymbol objects...
+        Demonstration:
 
         >>> s = corpus.parse('bach/bwv66.6')
         >>> p = analysis.discrete.Ambitus()
@@ -1334,7 +1337,7 @@ def analyzeStream(
         # this synonym is being added for compatibility
         method = 'span'
 
-    analysisClassName: type[DiscreteAnalysis] | None = analysisClassFromMethodName(method)
+    analysisClassName: type[DiscreteAnalysis]|None = analysisClassFromMethodName(method)
 
     if analysisClassName is not None:
         obj = analysisClassName()
@@ -1346,7 +1349,7 @@ def analyzeStream(
 
 
 # noinspection SpellCheckingInspection
-def analysisClassFromMethodName(method: str) -> type[DiscreteAnalysis] | None:
+def analysisClassFromMethodName(method: str) -> type[DiscreteAnalysis]|None:
     '''
     Returns an analysis class given a method name, or None if none can be found
 
@@ -1359,7 +1362,7 @@ def analysisClassFromMethodName(method: str) -> type[DiscreteAnalysis] | None:
     >>> acfmn('span')
     <class 'music21.analysis.discrete.Ambitus'>
 
-    This one is fundamentally important...
+    This one is fundamentally important:
 
     >>> acfmn('key')
     <class 'music21.analysis.discrete.AardenEssen'>
@@ -1375,7 +1378,7 @@ def analysisClassFromMethodName(method: str) -> type[DiscreteAnalysis] | None:
         BellmanBudge,
         TemperleyKostkaPayne,
     ]
-    match: type[DiscreteAnalysis] | None = None
+    match: type[DiscreteAnalysis]|None = None
     for analysisClass in analysisClasses:
         # this is a very loose matching, as there are few classes now
         if (method.lower() in analysisClass.__name__.lower()

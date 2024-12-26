@@ -7,8 +7,7 @@
 # Authors:      Josiah Wolf Oberholtzer
 #               Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2013-15 Michael Scott Asato Cuthbert and the music21
-#               Project
+# Copyright:    Copyright © 2013-2024 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # -----------------------------------------------------------------------------
 '''
@@ -51,7 +50,7 @@ class Timespan:
     >>> print(timespan)
     <Timespan -1.5 3.25>
 
-    A timespan has two attributes, its offset and its endTime.  They are immutable...
+    A timespan has two attributes, its offset and its endTime.  They are immutable.
 
     >>> timespan.offset
     -1.5
@@ -325,16 +324,16 @@ class ElementTimespan(Timespan):
 
     def __init__(
         self,
-        element: base.Music21Object | None = None,
-        parentOffset: OffsetQLIn | None = None,
-        parentEndTime: OffsetQLIn | None = None,
+        element: base.Music21Object|None = None,
+        parentOffset: OffsetQLIn|None = None,
+        parentEndTime: OffsetQLIn|None = None,
         parentage: tuple[stream.Stream, ...] = (),
-        offset: OffsetQLIn | None = None,
-        endTime: OffsetQLIn | None = None,
+        offset: OffsetQLIn|None = None,
+        endTime: OffsetQLIn|None = None,
     ):
         super().__init__(offset=offset, endTime=endTime)
 
-        self.element: base.Music21Object | None = element
+        self.element: base.Music21Object|None = element
         self.parentage = parentage
         if parentOffset is not None:
             parentOffset = float(parentOffset)
@@ -468,7 +467,7 @@ class ElementTimespan(Timespan):
         >>> pitchedTimespan.getParentageByClass(classList=(stream.Score,))
         <music21.stream.Score bach>
 
-        The closest parent is returned in case of a multiple list...
+        The closest parent is returned in case of a multiple list:
 
         >>> searchTuple = (stream.Voice, stream.Measure, stream.Part)
         >>> pitchedTimespan.getParentageByClass(classList=searchTuple)
@@ -498,7 +497,7 @@ class ElementTimespan(Timespan):
         from music21 import stream
         return self.getParentageByClass(classList=(stream.Part,))
 
-    def makeElement(self, makeCopy: bool = True) -> base.Music21Object | None:
+    def makeElement(self, makeCopy: bool = True) -> base.Music21Object|None:
         '''
         Return a copy of the element (or the same one if makeCopy is False)
         with the quarterLength set to the length of the timespan

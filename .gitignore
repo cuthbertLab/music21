@@ -18,6 +18,7 @@ __pycache__/
 .idea/vcs.xml
 .idea/workspace.xml
 .idea/markdown-*.xml
+.idea/copilot
 
 # OSX
 .DS_Store

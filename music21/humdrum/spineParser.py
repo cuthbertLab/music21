@@ -401,8 +401,7 @@ class HumdrumDataCollection(prebase.ProtoM21Object):
                 self.eventList.append(GlobalCommentLine(self.parsePositionInStream, line))
             else:
                 thisLine = SpineLine(self.parsePositionInStream, line)
-                if thisLine.numSpines > self.maxSpines:
-                    self.maxSpines = thisLine.numSpines
+                self.maxSpines = max(self.maxSpines, thisLine.numSpines)
                 self.eventList.append(thisLine)
             self.parsePositionInStream += 1
         self.fileLength = self.parsePositionInStream
@@ -654,7 +653,7 @@ class HumdrumDataCollection(prebase.ProtoM21Object):
                         # or merge back to other spine's parent:
                         elif mergerActive is not True:  # other spine parent set
                             newSpineList.append(mergerActive)
-                        # or make a new spine...
+                        # or make a new spine:
                         else:
                             s = spineCollection.addSpine(streamClass=stream.Part)
                             s.insertPoint = i
@@ -708,7 +707,7 @@ class HumdrumDataCollection(prebase.ProtoM21Object):
                 for j in range(i + 1, maxEventList):
                     if j in positionDict:
                         insertOffset = positionDict[j][0]
-                        # hopefully not more than 20 events in a row...
+                        # hopefully not more than 20 events in a row!
                         insertPriority = (positionDict[j][1][0].priority
                                           - 40
                                           + numberOfGlobalEventsInARow)
@@ -750,11 +749,11 @@ class HumdrumDataCollection(prebase.ProtoM21Object):
     #     if self.spineCollection is None:
     #         raise HumdrumException('parsing got no spine collections!')
     #     elif self.spineCollection.spines is None:
-    #         raise HumdrumException('not a single spine in your data... um, not my problem! ' +
-    #                                '(well, maybe it is...file a bug report if you ' +
+    #         raise HumdrumException('not a single spine in your data. Is this your problem? ' +
+    #                                '(File a bug report if you ' +
     #                                'have doubled checked your data)')
     #     elif self.spineCollection.spines[0].stream is None:
-    #         raise HumdrumException('okay, you got at least one spine, but it ain\'t got ' +
+    #         raise HumdrumException('okay, you got at least one spine, but it does not have ' +
     #                                'a stream in it; (check your data or file a bug report)')
     #     else:
     #         masterStream = stream.Score()
@@ -790,11 +789,11 @@ class HumdrumFile(HumdrumDataCollection):
     as a mandatory argument a filename to be opened and read.
     '''
 
-    def __init__(self, filename: str | pathlib.Path | None = None):
+    def __init__(self, filename: str|pathlib.Path|None = None):
         super().__init__()
         self.filename = filename
 
-    def parseFilename(self, filename: str | pathlib.Path | None = None):
+    def parseFilename(self, filename: str|pathlib.Path|None = None):
         if filename is None:
             filename = self.filename
         if filename is None:
@@ -992,7 +991,7 @@ class ProtoSpine(prebase.ProtoM21Object):
 
 
 # HUMDRUM SPINES #
-# Ready to be parsed...
+# Ready to be parsed.
 class HumdrumSpine(prebase.ProtoM21Object):
     r'''
     A HumdrumSpine is a representation of a generic HumdrumSpine
@@ -1066,7 +1065,7 @@ class HumdrumSpine(prebase.ProtoM21Object):
         self._spineCollection = None
         self._spineType = None
 
-        self.isFirstVoice: bool | None = None
+        self.isFirstVoice: bool|None = None
         self.iterIndex = None
 
     def _reprInternal(self):
@@ -1162,7 +1161,7 @@ class HumdrumSpine(prebase.ProtoM21Object):
         '''
         Takes a parsed stream and moves the elements inside the
         measures.  Works with pickup measures, etc. Does not
-        automatically create ties, etc...
+        automatically create ties, etc.
 
         Why not just use Stream.makeMeasures()? because
         humdrum measures contain extra information about barlines
@@ -1231,7 +1230,7 @@ class HumdrumSpine(prebase.ProtoM21Object):
         if currentMeasure:
             streamOut.append(currentMeasure)
 
-        # move beginning stuff (Clefs, KeySig, etc.) to first measure...
+        # move beginning stuff (Clefs, KeySig, etc.) to first measure.
         measureElements = streamOut.getElementsByClass(stream.Measure)
         if measureElements:
             m1 = measureElements[0]
@@ -1328,7 +1327,7 @@ class KernSpine(HumdrumSpine):
                     thisObject = SpineComment(eventC)
                     if thisObject.comment == '':
                         thisObject = None
-                elif eventC.count(' '):
+                elif ' ' in eventC:
                     thisObject = self.processChordEvent(eventC)
                 else:  # Note or Rest
                     thisObject = self.processNoteEvent(eventC)
@@ -1346,10 +1345,10 @@ class KernSpine(HumdrumSpine):
                 )
                 tb = traceback.format_exc()
                 environLocal.printDebug(f'Traceback for the exception: \n{tb}')
-                # traceback... environLocal.printDebug()
+                # traceback: environLocal.printDebug()
 
         self.stream.coreElementsChanged()
-        # still to be done later... move things before first measure to first measure!
+        # still to be done later. Move things before first measure to first measure!
 
     def processNoteEvent(self, eventC):
         '''
@@ -1407,7 +1406,7 @@ class KernSpine(HumdrumSpine):
                         self.currentBeamNumbers += 1
 
     def setTupletTypeForNote(self, n):
-        # nested tuplets not supported by humdrum...
+        # nested tuplets not supported by humdrum.
         nDur = n.duration
         nTuplets = n.duration.tuplets
 
@@ -1570,7 +1569,7 @@ class SpineEvent(prebase.ProtoM21Object):
         self.contents: str = contents
         self.position: int = position
         self.protoSpineId: int = 0
-        self.spineId: int | None = None
+        self.spineId: int|None = None
 
     def _reprInternal(self):
         return self.contents
@@ -1952,7 +1951,7 @@ class SpineCollection(prebase.ProtoM21Object):
                             el.activeSite.insert(el.offset,
                                                  prioritiesToSearch[el.priority])
                         except exceptions21.StreamException:
-                            # may appear twice because of voices...
+                            # may appear twice because of voices
                             pass
                             # el.activeSite.insert(el.offset,
                             #    copy.deepcopy(prioritiesToSearch[el.priority]))
@@ -1969,7 +1968,7 @@ class SpineCollection(prebase.ProtoM21Object):
                             el.activeSite.insert(el.offset,
                                                  prioritiesToSearch[el.priority])
                         except exceptions21.StreamException:
-                            # may appear twice because of voices...
+                            # may appear twice because of voices
                             pass
                             # el.activeSite.insert(el.offset,
                             #    copy.deepcopy(prioritiesToSearch[el.priority]))
@@ -2007,7 +2006,7 @@ class SpineCollection(prebase.ProtoM21Object):
                 if not hasVoices:
                     continue
 
-                voices: list[stream.Voice | None] = [None for i in range(10)]
+                voices: list[stream.Voice|None] = [None for i in range(10)]
                 measureElements = el.elements
                 for mEl in measureElements:
                     mElGroups = mEl.groups
@@ -2157,7 +2156,7 @@ def hdStringToNote(contents):
     double-dotted quarter not a double-dotted quarter-note triplet.
 
     I believe that the latter definition, though used in
-    https://kern.ccarh.org/cgi-bin/ksdata?l=musedata/mozart/quartet&file=k421-01.krn&f=kern
+    https://kern.humdrum.org/cgi-bin/ksdata?l=musedata/mozart/quartet&file=k421-01.krn&f=kern
     and the Josquin Research Project [JRP] is incorrect, seeing as it
     contradicts the specification in
     https://web.archive.org/web/20100203144730/http://www.music-cog.ohio-state.edu/Humdrum/representations/kern.html#N-Tuplets
@@ -2209,7 +2208,7 @@ def hdStringToNote(contents):
 
     # Detect rests first, because rests can contain manual positioning information,
     # which is also detected by the `matchedNote` variable above.
-    if contents.count('r'):
+    if 'r' in contents:
         thisObject = note.Rest()
 
     elif matchedNote:
@@ -2232,102 +2231,99 @@ def hdStringToNote(contents):
         thisObject.pitch.accidental = matchedSharp.group(0)
     elif matchedFlat:
         thisObject.pitch.accidental = matchedFlat.group(0)
-    elif contents.count('n'):
+    elif 'n' in contents:
         thisObject.pitch.accidental = 'n'
 
     # 3.2.2 -- Slurs, Ties, Phrases
     # TODO: add music21 phrase information
-    if contents.count('{'):
-        for i in range(contents.count('{')):
-            pass  # phraseMark start
-    if contents.count('}'):
-        for i in range(contents.count('}')):
-            pass  # phraseMark end
-    if contents.count('('):
-        for i in range(contents.count('(')):
-            pass  # slur start
-    if contents.count(')'):
-        for i in range(contents.count(')')):
-            pass  # slur end
-    if contents.count('['):
+    for i in range(contents.count('{')):
+        pass  # phraseMark start
+    for i in range(contents.count('}')):
+        pass  # phraseMark end
+    for i in range(contents.count('(')):
+        pass  # slur start
+    for i in range(contents.count(')')):
+        pass  # slur end
+    if '[' in contents:
         thisObject.tie = tie.Tie('start')
-    elif contents.count(']'):
+    elif ']' in contents:
         thisObject.tie = tie.Tie('stop')
-    elif contents.count('_'):
+    elif '_' in contents:
         thisObject.tie = tie.Tie('continue')
 
     # 3.2.3 Ornaments
-    if contents.count('t'):
+    if 't' in contents:
         thisObject.expressions.append(expressions.HalfStepTrill())
-    elif contents.count('T'):
+    elif 'T' in contents:
         thisObject.expressions.append(expressions.WholeStepTrill())
 
-    if contents.count('w'):
+    if 'w' in contents:
         thisObject.expressions.append(expressions.HalfStepInvertedMordent())
-    elif contents.count('W'):
+    elif 'W' in contents:
         thisObject.expressions.append(expressions.WholeStepInvertedMordent())
-    elif contents.count('m'):
+    elif 'm' in contents:
         thisObject.expressions.append(expressions.HalfStepMordent())
-    elif contents.count('M'):
+    elif 'M' in contents:
         thisObject.expressions.append(expressions.WholeStepMordent())
 
-    if contents.count('S'):
+    if 'S' in contents:
         thisObject.expressions.append(expressions.Turn())
-    elif contents.count('$'):
+    elif '$' in contents:
         thisObject.expressions.append(expressions.InvertedTurn())
-    elif contents.count('R'):
+    elif 'R' in contents:
         t1 = expressions.Turn()
         t1.connectedToPrevious = True  # true by default, but explicitly
         thisObject.expressions.append(t1)
 
-    if contents.count(':'):
+    if ':' in contents:
         # TODO: deal with arpeggiation -- should have been in a
         #  chord structure
         pass
 
-    if contents.count('O'):
+    if 'O' in contents:
         thisObject.expressions.append(expressions.Ornament())
         # generic ornament
 
     # 3.2.4 Articulation Marks
-    if contents.count("'"):
+    if "'" in contents:
         thisObject.articulations.append(articulations.Staccato())
-    if contents.count('"'):
+    if '"' in contents:
         thisObject.articulations.append(articulations.Pizzicato())
-    if contents.count('`'):
+    if '`' in contents:
         # called 'attacca' mark but means staccatissimo:
         # http://www.music-cog.ohio-state.edu/Humdrum/representations/kern.rep.html
         thisObject.articulations.append(articulations.Staccatissimo())
-    if contents.count('~'):
+    if '~' in contents:
         thisObject.articulations.append(articulations.Tenuto())
-    if contents.count('^'):
+    if '^' in contents:
         thisObject.articulations.append(articulations.Accent())
-    if contents.count(';'):
+    if ';' in contents:
         thisObject.expressions.append(expressions.Fermata())
 
     # 3.2.5 Up & Down Bows
-    if contents.count('v'):
+    if 'v' in contents:
         thisObject.articulations.append(articulations.UpBow())
-    elif contents.count('u'):
+    elif 'u' in contents:
         thisObject.articulations.append(articulations.DownBow())
 
     # 3.2.6 Stem Directions
-    if contents.count('/'):
+    if '/' in contents:
         thisObject.stemDirection = 'up'
-    elif contents.count('\\'):
+    elif '\\' in contents:
         thisObject.stemDirection = 'down'
+
 
     # 3.2.7 Duration +
     # 3.2.8 N-Tuplets
 
-    # TODO: SPEEDUP -- only search for rational after foundNumber...
+    # TODO: SPEEDUP -- only search for rational after foundNumber.
     foundRational = re.search(r'(\d+)%(\d+)', contents)
     foundNumber = re.search(r'(\d+)', contents)
     if foundRational:
         durationFirst = int(foundRational.group(1))
         durationSecond = float(foundRational.group(2))
         thisObject.duration.quarterLength = 4 * durationSecond / durationFirst
-        if contents.count('.'):
+        if '.' in contents:
             thisObject.duration.dots = contents.count('.')
 
     elif foundNumber:
@@ -2337,20 +2333,16 @@ def hdStringToNote(contents):
             if durationString == '000':
                 # for larger values, see https://extras.humdrum.org/man/rscale/
                 thisObject.duration.type = 'maxima'
-                if contents.count('.'):
-                    thisObject.duration.dots = contents.count('.')
             elif durationString == '00':
                 # for larger values, see https://extras.humdrum.org/man/rscale/
                 thisObject.duration.type = 'longa'
-                if contents.count('.'):
-                    thisObject.duration.dots = contents.count('.')
             else:
                 thisObject.duration.type = 'breve'
-                if contents.count('.'):
-                    thisObject.duration.dots = contents.count('.')
+            if '.' in contents:
+                thisObject.duration.dots = contents.count('.')
         elif durationType in duration.typeFromNumDict:
             thisObject.duration.type = duration.typeFromNumDict[durationType]
-            if contents.count('.'):
+            if '.' in contents:
                 thisObject.duration.dots = contents.count('.')
         else:
             dT = int(durationType) + 0.0
@@ -2367,28 +2359,28 @@ def hdStringToNote(contents):
 
             # The Josquin Research Project uses an incorrect definition of
             # humdrum tuplets that breaks normal usage.  TODO: Refactor adding a Flavor = 'JRP'
-            # code that uses this other method...
+            # code that uses this other method.
             JRP = flavors['JRP']
-            if JRP is False and contents.count('.'):
+            if JRP is False and '.' in contents:
                 newTup.durationNormal = duration.durationTupleFromTypeDots(
                     newTup.durationNormal.type, contents.count('.'))
 
             thisObject.duration.appendTuplet(newTup)
-            if JRP is True and contents.count('.'):
+            if JRP is True and '.' in contents:
                 thisObject.duration.dots = contents.count('.')
             # call Duration.TupletFixer after to correct this.
 
     # 3.2.9 Grace Notes and Groupettos
-    if contents.count('q'):
+    if 'q' in contents:
         thisObject = thisObject.getGrace()
         thisObject.duration.type = 'eighth'
-    elif contents.count('Q'):
+    elif 'Q' in contents:
         thisObject = thisObject.getGrace()
         thisObject.duration.slash = False
         thisObject.duration.type = 'eighth'
-    elif contents.count('P'):
+    elif 'P' in contents:
         thisObject = thisObject.getGrace(appoggiatura=True)
-    elif contents.count('p'):
+    elif 'p' in contents:
         pass  # end appoggiatura duration -- not needed in music21...
 
     # 3.2.10 Beaming
@@ -2428,53 +2420,53 @@ def hdStringToMeasure(contents, previousMeasure=None):
 
     barline = bar.Barline()
 
-    if contents.count('-'):
+    if '-' in contents:
         barline.type = 'none'
-    elif contents.count("'"):
+    elif "'" in contents:
         barline.type = 'short'
-    elif contents.count('`'):
+    elif '`' in contents:
         barline.type = 'tick'
-    elif contents.count('||'):
+    elif '||' in contents:
         barline.type = 'double'
         if contents.count(':') > 1:
             barline.repeatDots = 'both'
-        elif contents.count(':|'):
+        elif ':|' in contents:
             barline.repeatDots = 'left'
-        elif contents.count('|:'):
+        elif '|:' in contents:
             barline.repeatDots = 'right'
-    elif contents.count('!!'):
+    elif '!!' in contents:
         barline.type = 'heavy-heavy'
         if contents.count(':') > 1:
             barline.repeatDots = 'both'
-        elif contents.count(':!'):
+        elif ':!' in contents:
             barline.repeatDots = 'left'
-        elif contents.count('!:'):
+        elif '!:' in contents:
             barline.repeatDots = 'right'
-    elif contents.count('|!'):
+    elif '|!' in contents:
         barline.type = 'final'
         if contents.count(':') > 1:
             barline.repeatDots = 'both'
-        elif contents.count(':|'):
+        elif ':|' in contents:
             barline.repeatDots = 'left'
-        elif contents.count('!:'):
+        elif '!:' in contents:
             barline.repeatDots = 'right'
-    elif contents.count('!|'):
+    elif '!|' in contents:
         barline.type = 'heavy-light'
         if contents.count(':') > 1:
             barline.repeatDots = 'both'
-        elif contents.count(':!'):
+        elif ':!' in contents:
             barline.repeatDots = 'left'
-        elif contents.count('|:'):
+        elif '|:' in contents:
             barline.repeatDots = 'right'
-    elif contents.count('|'):
+    elif '|' in contents:
         barline.type = 'regular'
         if contents.count(':') > 1:
             barline.repeatDots = 'both'
-        elif contents.count(':|'):
+        elif ':|' in contents:
             barline.repeatDots = 'left'
-        elif contents.count('|:'):
+        elif '|:' in contents:
             barline.repeatDots = 'right'
-    elif contents.count('=='):
+    elif '==' in contents:
         barline.type = 'double'
         if contents.count(':') > 1:
             barline.repeatDots = 'both'
@@ -2484,7 +2476,7 @@ def hdStringToMeasure(contents, previousMeasure=None):
                 'Cannot import a double bar visually rendered as a single bar -- '
                 + 'not sure exactly what that would mean anyhow.')
 
-    if contents.count(';'):
+    if ';' in contents:
         barline.pause = expressions.Fermata()
 
     if previousMeasure is not None:
@@ -2523,15 +2515,15 @@ def kernTandemToObject(tandem):
             return clef.PercussionClef()
         elif clefType == 'Gv2':  # undocumented in Humdrum, but appears in Huron's Chorales
             return clef.Treble8vbClef()
-        elif clefType == 'Gv':  # unknown if ever used but better safe...
+        elif clefType == 'Gv':  # unknown if ever used but better safe.
             return clef.Treble8vbClef()
-        elif clefType == 'G^2':  # unknown if ever used but better safe...
+        elif clefType == 'G^2':  # unknown if ever used but better safe.
             return clef.Treble8vaClef()
-        elif clefType == 'G^':  # unknown if ever used but better safe...
+        elif clefType == 'G^':  # unknown if ever used but better safe.
             return clef.Treble8vaClef()
-        elif clefType == 'Fv4':  # unknown if ever used but better safe...
+        elif clefType == 'Fv4':  # unknown if ever used but better safe.
             return clef.Bass8vbClef()
-        elif clefType == 'Fv':  # unknown if ever used but better safe...
+        elif clefType == 'Fv':  # unknown if ever used but better safe.
             return clef.Bass8vbClef()
         else:
             try:
@@ -2772,7 +2764,7 @@ class GlobalReference(base.Music21Object):
         'OPR': 'parentTitle',  # title of parent work
         'OAC': 'actNumber',  # act number (e.g. '2' or 'Act 2')
         'OSC': 'sceneNumber',  # scene number (e.g. '3' or 'Scene 3')
-        'OMV': 'movementNumber',  # movement number (e.g. '4', or 'mov. 4', or...)
+        'OMV': 'movementNumber',  # movement number (e.g. '4', or 'mov. 4')
         'OMD': 'movementName',  # movement name
         'OPS': 'opusNumber',  # opus number (e.g. '23', or 'Opus 23')
         'ONM': 'number',  # number (e.g. number of song within ABC multi-song file)
@@ -2959,7 +2951,7 @@ class Test(unittest.TestCase):
         # masterStream.show('text')
         for n in masterStream.recurse():
             if hasattr(n, 'pitch') and n.pitch.name == 'G#':
-                if n.beat == 2:  # beat doesn't work... :-(
+                if n.beat == 2:  # beat doesn't work :-(
                     gSharpCount += 1
             elif hasattr(n, 'pitches'):
                 for p in n.pitches:

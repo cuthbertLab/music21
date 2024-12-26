@@ -6,8 +6,7 @@
 # Authors:      Josiah Wolf Oberholtzer
 #               Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2013-16 Michael Scott Asato Cuthbert and the music21
-#               Project
+# Copyright:    Copyright © 2013-2016 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # -----------------------------------------------------------------------------
 '''
@@ -273,18 +272,14 @@ class ElementNode(core.AVLNode):
         leftChild = self.leftChild
         if leftChild:
             leftChild.updateEndTimes()
-            if leftChild.endTimeLow < endTimeLow:
-                endTimeLow = leftChild.endTimeLow
-            if endTimeHigh < leftChild.endTimeHigh:
-                endTimeHigh = leftChild.endTimeHigh
+            endTimeLow = min(endTimeLow, leftChild.endTimeLow)
+            endTimeHigh = max(endTimeHigh, leftChild.endTimeHigh)
 
         rightChild = self.rightChild
         if rightChild:
             rightChild.updateEndTimes()
-            if rightChild.endTimeLow < endTimeLow:
-                endTimeLow = rightChild.endTimeLow
-            if endTimeHigh < rightChild.endTimeHigh:
-                endTimeHigh = rightChild.endTimeHigh
+            endTimeLow = min(endTimeLow, rightChild.endTimeLow)
+            endTimeHigh = max(endTimeHigh, rightChild.endTimeHigh)
         self.endTimeLow = endTimeLow
         self.endTimeHigh = endTimeHigh
 
@@ -515,18 +510,14 @@ class OffsetNode(ElementNode):
         leftChild = self.leftChild
         if leftChild:
             leftChild.updateEndTimes()
-            if leftChild.endTimeLow < endTimeLow:
-                endTimeLow = leftChild.endTimeLow
-            if endTimeHigh < leftChild.endTimeHigh:
-                endTimeHigh = leftChild.endTimeHigh
+            endTimeLow = min(endTimeLow, leftChild.endTimeLow)
+            endTimeHigh = max(endTimeHigh, leftChild.endTimeHigh)
 
         rightChild = self.rightChild
         if rightChild:
             rightChild.updateEndTimes()
-            if rightChild.endTimeLow < endTimeLow:
-                endTimeLow = rightChild.endTimeLow
-            if endTimeHigh < rightChild.endTimeHigh:
-                endTimeHigh = rightChild.endTimeHigh
+            endTimeLow = min(endTimeLow, rightChild.endTimeLow)
+            endTimeHigh = max(endTimeHigh, rightChild.endTimeHigh)
         self.endTimeLow = endTimeLow
         self.endTimeHigh = endTimeHigh
 

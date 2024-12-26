@@ -310,7 +310,7 @@ class CTSong(prebase.ProtoM21Object):
 
     OMIT_FROM_DOCS
 
-    one more example...the bane of this parser's existence...::
+    one more example, which is the bane of this parser's existence::
 
         % Ring Of Fire
 
@@ -337,7 +337,7 @@ class CTSong(prebase.ProtoM21Object):
             ''',
     }
 
-    def __init__(self, textFile: str | pathlib.Path = '', **keywords):
+    def __init__(self, textFile: str|pathlib.Path = '', **keywords):
         self._title = None
         self.text = ''
         self.lines: list[str] = []
@@ -369,7 +369,7 @@ class CTSong(prebase.ProtoM21Object):
         return f'title={self.title!r} year={self.year}'
 
     # --------------------------------------------------------------------------
-    def parse(self, textFile: str | pathlib.Path):
+    def parse(self, textFile: str|pathlib.Path):
         '''
         Called when a CTSong is created by passing a string or filename;
         in the second case, it opens the file
@@ -409,9 +409,7 @@ class CTSong(prebase.ProtoM21Object):
                 raise CTSongException(
                     f'Invalid File Format; must be string or text file: {textFile}')
 
-        lines = [e for e in lines if len(e) != 0]
-        for i in range(len(lines)):
-            lines[i] = lines[i].strip()
+        lines = [e.strip() for e in lines if len(e) != 0]
         self.lines = lines
         pieceString = '\n'.join(lines)
 
@@ -589,7 +587,7 @@ class CTSong(prebase.ProtoM21Object):
     def toPart(self, labelRomanNumerals=True, labelSubsectionsOnScore=True) -> stream.Part:
         # noinspection PyShadowingNames
         '''
-        creates a Part object out of a from CTSong...also creates CTRule objects in the process,
+        creates a Part object out of a from CTSong and also creates CTRule objects in the process,
         filling their .streamFromCTSong attribute with the corresponding smaller inner stream.
         Individual attributes of a rule are defined by the entire CTSong, such as
         meter and time signature, so creation of CTRule objects typically occurs
@@ -648,7 +646,7 @@ class CTRule(prebase.ProtoM21Object):
     SPLITMEASURES = re.compile(r'(\|\*?\d*)')
     REPETITION = re.compile(r'\*(\d+)')
 
-    def __init__(self, text='', parent: CTSong | None = None):
+    def __init__(self, text='', parent: CTSong|None = None):
         self._parent = None
         if parent is not None:
             self.parent = parent
@@ -662,7 +660,7 @@ class CTRule(prebase.ProtoM21Object):
 
         self.measures: list[stream.Measure] = []
         self.lastRegularAtom: str = ''
-        self.lastChord: chord.Chord | None = None
+        self.lastChord: chord.Chord|None = None
         self._lastChordIsInSameMeasure: bool = False
 
 
@@ -683,8 +681,8 @@ class CTRule(prebase.ProtoM21Object):
 
     def expand(
         self,
-        tsContext: meter.TimeSignature | None = None,
-        keyContext: key.Key | None = None,
+        tsContext: meter.TimeSignature|None = None,
+        keyContext: key.Key|None = None,
     ) -> list[stream.Measure]:
         '''
         The meat of it all -- expand one rule completely and return a list of Measure objects.
@@ -761,7 +759,7 @@ class CTRule(prebase.ProtoM21Object):
 
         m = stream.Measure()
         atoms = content.split()
-        # key/timeSig pass...
+        # key/timeSig pass
         regularAtoms: list[str] = []
         for atom in atoms:
             if atom.startswith('['):
@@ -923,7 +921,7 @@ class CTRule(prebase.ProtoM21Object):
         return measureGroups3
 
     # --------------------------------------------------------------------------
-    def isSame(self, rn: roman.RomanNumeral, lastChord: chord.Chord | None) -> bool:
+    def isSame(self, rn: roman.RomanNumeral, lastChord: chord.Chord|None) -> bool:
         '''
         Returns True if the pitches of the RomanNumeral are the same as the pitches
         of lastChord.  Returns False if lastChord is None.
@@ -942,7 +940,7 @@ class CTRule(prebase.ProtoM21Object):
     def addOptionalTieAndLyrics(
         self,
         rn: roman.RomanNumeral,
-        lastChord: chord.Chord | None
+        lastChord: chord.Chord|None
     ) -> None:
         '''
         Adds ties to chords that are the same.  Adds lyrics to chords that change.
@@ -1035,7 +1033,7 @@ class CTRule(prebase.ProtoM21Object):
         ''')
 
     @property
-    def comment(self) -> str | None:
+    def comment(self) -> str|None:
         '''
         Get the comment of a CTRule object.
 

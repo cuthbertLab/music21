@@ -404,7 +404,7 @@ class ToneRow(stream.Stream):
             a.append(n)
         return a
 
-    def isSameRow(self, row):
+    def isSameRow(self, other):
         '''
         Convenience function describing if two rows are the same.
 
@@ -418,16 +418,13 @@ class ToneRow(stream.Stream):
         >>> row1.isSameRow(row3)
         False
         '''
-        if len(row) != len(self):
+        if len(self) != len(other):
             return False
-        else:
-            tempSame = True
-            for i in range(len(row)):
-                if tempSame is True:
-                    if self[i].pitch.pitchClass != row[i].pitch.pitchClass:
-                        tempSame = False
 
-        return tempSame
+        for selfTone, otherTone in zip(self, other):
+            if selfTone.pitch.pitchClass != otherTone.pitch.pitchClass:
+                return False
+        return True
 
     def getIntervalsAsString(self):
         '''
@@ -1087,14 +1084,14 @@ class HistoricalTwelveToneRow(TwelveToneRow):
         'title': 'The title of the work, or None.  (String)',
     }
 
-    composer: None | str = None
-    opus: None | str = None
-    title: None | str = None
+    composer: None|str = None
+    opus: None|str = None
+    title: None|str = None
 
     def __init__(self,
-                 composer: None | str = None,
-                 opus: None | str = None,
-                 title: None | str = None,
+                 composer: None|str = None,
+                 opus: None|str = None,
+                 title: None|str = None,
                  row=None,
                  **keywords):
         super().__init__(row, **keywords)

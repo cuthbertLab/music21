@@ -135,12 +135,12 @@ class LyricSearcher:
         found if a work contains multiple voices.
     '''
 
-    def __init__(self, s: StreamType | None = None):
-        self.stream: StreamType | None = s
+    def __init__(self, s: StreamType|None = None):
+        self.stream: StreamType|None = s
         self.includeIntermediateElements = False  # currently does nothing
         self.includeTrailingMelisma = False  # currently does nothing
 
-        self._indexText: str | None = None
+        self._indexText: str|None = None
         self._indexTuples: list[IndexedLyric] = []
 
     @property
@@ -200,10 +200,10 @@ class LyricSearcher:
         else:
             self.stream = s
 
-        indexByIdentifier: OrderedDict[str | int, list[IndexedLyric]] = OrderedDict()
-        iTextByIdentifier: OrderedDict[str | int, str] = OrderedDict()
-        lastSyllabicByIdentifier: OrderedDict[str | int,
-                                                str | None] = OrderedDict()
+        indexByIdentifier: OrderedDict[str|int, list[IndexedLyric]] = OrderedDict()
+        iTextByIdentifier: OrderedDict[str|int, str] = OrderedDict()
+        lastSyllabicByIdentifier: OrderedDict[str|int,
+                                                str|None] = OrderedDict()
 
         for n in s.recurse().notes:
             ls: list[note.Lyric] = n.lyrics

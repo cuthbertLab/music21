@@ -6,12 +6,14 @@
 # Authors:      Christopher Ariza
 #               Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2009-2023 Michael Scott Asato Cuthbert,
+# Copyright:    Copyright © 2009-2024 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 from __future__ import annotations
 
 # this requires pylint to be installed and available from the command line
+# Anything changed here also needs to be changed at .pylintrc
+
 import argparse
 import os
 
@@ -22,7 +24,7 @@ try:
     # noinspection PyPackageRequirements
     from pylint.lint import Run as pylintRun  # type: ignore
 except ImportError:
-    pylintRun = None
+    pylintRun = None  # type: ignore
 
 
 # see feature list here:
@@ -48,7 +50,7 @@ except ImportError:
 
 def main(fnAccept=None, strict=False):
     '''
-    `fnAccept` is a list of one or more files to test.  Otherwise runs all.
+    `fnAccept` is a list of one or more files to test.  Otherwise, runs all.
     '''
     poolSize = common.cpus()
 
@@ -62,22 +64,23 @@ def main(fnAccept=None, strict=False):
         # 'demos/',
         # 'test/timeGraphs.py',
         '/ext/',
-        # 'bar.py',   # used to crash pylint...
-        # 'repeat.py',  # used to hang pylint...
-        # 'spanner.py',  # used to hang pylint...
+        # 'bar.py',   # used to crash pylint
+        # 'repeat.py',  # used to hang pylint
+        # 'spanner.py',  # used to hang pylint
     ]
 
     disable_unless_strict = [
         'too-many-statements',  # someday
-        'too-many-arguments',  # definitely! but takes too long to get a fix now...
+        'too-many-arguments',  # definitely! but takes too long to get a fix now
         'too-many-public-methods',  # maybe, look
         'too-many-branches',  # yes, someday
         'too-many-lines',    # yes, someday.
         'too-many-return-statements',  # we'll see
         'too-many-instance-attributes',  # maybe later
+        'too-many-positional-arguments',  # let's get this at least to max 6.
         'inconsistent-return-statements',  # would be nice
         'protected-access',  # this is an important one, but for now we do a lot of
-        # x = copy.deepcopy(self); x._volume = ... which is not a problem...
+        # x = copy.deepcopy(self); x._volume = ... which is not a problem
         # also, test suites need to be exempt.
         'keyword-arg-before-vararg',  # a good thing to check for new code, but
         # requires rewriting function signatures in old code
@@ -88,28 +91,28 @@ def main(fnAccept=None, strict=False):
         # as initial ones are the same.
         'arguments-renamed',  # not an issue
 
-        'multiple-imports',  # import os, sys -- fine...
+        'multiple-imports',  # import os, sys -- fine
         'redefined-variable-type',  # would be good, but currently
         # lines like: if x: y = note.Note() ; else: y = note.Rest()
         # triggers this, even though y doesn't change.
         'no-else-return',  # these are unnecessary but can help show the flow of thinking.
         'cyclic-import',  # we use these inside functions when there's a deep problem.
-        'unnecessary-pass',  # nice, but not really a problem...
+        'unnecessary-pass',  # nice, but not really a problem
         'locally-disabled',  # test for this later, but hopefully will know what
         # they're doing
         'consider-using-get',  # if it can figure out that the default value is something
         # simple, we will turn back on, but until then, no.
         'chained-comparison',  # sometimes simpler that way
-        # 'duplicate-code',  # needs to ignore strings -- keeps getting doctests...
+        # 'duplicate-code',  # needs to ignore strings -- keeps getting doctests
         'too-many-ancestors',  # -- 8 is okay.
-        'fixme',  # known...
-        'superfluous-parens',  # nope -- if they make things clearer...
+        'fixme',  # known
+        'superfluous-parens',  # nope -- if they make things clearer
         'too-many-locals',   # no
         'bad-whitespace',  # maybe later, but "bad" isn't something I necessarily agree with
         'bad-continuation',  # never remove -- this is a good thing many times.
 
         # AbstractDiatonicScale.__eq__ shows how this
-        # can be fine...
+        # can be fine
         'too-many-boolean-expressions',
 
         'unsubscriptable-object',  # unfortunately, thinks that Streams are unsubscriptable.
@@ -119,7 +122,7 @@ def main(fnAccept=None, strict=False):
         'consider-iterating-dictionary',
         'consider-using-dict-items',  # readability improvement depends on excellent variable names
 
-        'invalid-name',      # these are good music21 names; fix the regexp instead...
+        'invalid-name',      # these are good music21 names; fix the regexp instead
         # 'no-self-use',       # no-self-use was moved to an optional extension
         'too-few-public-methods',  # never remove or set to 1
 
@@ -129,14 +132,14 @@ def main(fnAccept=None, strict=False):
         'trailing-newlines',
 
         'missing-docstring',    # gets too many well-documented properties
-        'star-args',  # no problem with them...
+        'star-args',  # no problem with them
         'unused-argument',
-        'import-self',  # fix is either to get rid of it or move away many tests...
+        'import-self',  # fix is either to get rid of it or move away many tests
 
         'simplifiable-if-statement',  # NO! NO! NO!
         #  if (x or y and z and q): return True, else: return False,
         #      is a GREAT paradigm -- over "return (x or y and z and q)" and
-        #      assuming that it returns a bool...  it is not any slower than
+        #      assuming that it returns a bool  it is not any slower than
         #      the simplification and it's so much clearer.
         'consider-using-enumerate',  # good when i used only once, but
         # x[i] = y[i] is a nice paradigm, even if one can be simplified out.
@@ -170,7 +173,7 @@ def main(fnAccept=None, strict=False):
            '--reports=n',
            '--max-branches=' + str(maxBranches),
            '-j ' + str(poolSize),  # multiprocessing!
-           r'--ignore-long-lines="converter\.parse"',  # some tiny notation...
+           r'--ignore-long-lines="converter\.parse"',  # some tiny notation
            '--max-line-length=100',
            ]
     for gn, gnv in goodNameRx.items():
