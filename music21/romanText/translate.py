@@ -838,7 +838,12 @@ class PartTranslator:
             m.coreInsert(self.currentOffsetInMeasure, rtt)
             # environLocal.warn(f' Got an unknown token: {a}')
 
-    def processRTChord(self, a: rtObjects.RTChord, m: stream.Measure, currentOffset: OffsetQL) -> None:
+    def processRTChord(
+        self,
+        a: rtObjects.RTChord,
+        m: stream.Measure,
+        currentOffset: OffsetQL
+    ) -> None:
         '''
         Process a single RTChord atom.
         '''
@@ -894,7 +899,7 @@ class PartTranslator:
                 rn.followsKeyChange = False
         except roman.RomanNumeralException:  # pragma: no cover
             # environLocal.printDebug(f' cannot create RN from: {a.src}')
-            rn = note.Note()  # create placeholder
+            rn = roman.RomanNumeral()  # create placeholder
 
         if self.pivotChordPossible is False:
             # probably best to find duration
