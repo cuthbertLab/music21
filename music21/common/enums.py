@@ -157,9 +157,9 @@ class OffsetSpecial(StrEnum):
 
     * New in v7.
     '''
-    AT_END: str = 'highestTime'
-    LOWEST_OFFSET: str = 'lowestOffset'
-    HIGHEST_OFFSET: str = 'highestOffset'
+    AT_END = 'highestTime'
+    LOWEST_OFFSET = 'lowestOffset'
+    HIGHEST_OFFSET = 'highestOffset'
 
 
 class GatherSpanners(BooleanEnum):
