@@ -132,6 +132,7 @@ import unittest
 from music21 import bar
 from music21 import base
 from music21 import common
+from music21.common.types import OffsetQL
 from music21 import environment
 from music21 import exceptions21
 from music21 import harmony
@@ -703,7 +704,13 @@ class PartTranslator:
         m.coreElementsChanged()
         return m
 
-    def translateSingleMeasureAtom(self, a, m, *, isLastAtomInMeasure=False):
+    def translateSingleMeasureAtom(
+        self,
+        a: rtObjects.RTAtom,
+        m: stream.Measure,
+        *,
+        isLastAtomInMeasure: bool = False,
+    ) -> None:
         '''
         Translate a single atom in a measure token.
 
@@ -711,7 +718,7 @@ class PartTranslator:
         `m` is a `stream.Measure` object.
 
         Uses coreInsert and coreAppend methods, so must have `m.coreElementsChanged()`
-        called afterwards.
+        called afterward.
         '''
         if (isinstance(a, rtObjects.RTKey)
                 or (self.foundAKeySignatureSoFar is False
@@ -831,7 +838,7 @@ class PartTranslator:
             m.coreInsert(self.currentOffsetInMeasure, rtt)
             # environLocal.warn(f' Got an unknown token: {a}')
 
-    def processRTChord(self, a, m, currentOffset):
+    def processRTChord(self, a: rtObjects.RTChord, m: stream.Measure, currentOffset: OffsetQL) -> None:
         '''
         Process a single RTChord atom.
         '''
