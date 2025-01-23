@@ -4019,13 +4019,13 @@ class Pitch(prebase.ProtoM21Object):
     def _getEnharmonicHelper(self: PitchType,
                              inPlace: t.Literal[True],
                              up: bool) -> None:
-        return None  # astroid 1015
+        ...
 
     @overload
     def _getEnharmonicHelper(self: PitchType,
                              inPlace: t.Literal[False],
                              up: bool) -> PitchType:
-        return self  # astroid 1015
+        ...
 
     def _getEnharmonicHelper(self: PitchType,
                              inPlace: bool,
@@ -4519,7 +4519,7 @@ class Pitch(prebase.ProtoM21Object):
         *,
         inPlace: t.Literal[True]
     ) -> None:
-        return None  # dummy until Astroid 1015
+        ...
 
     @overload
     def transpose(
@@ -4528,7 +4528,7 @@ class Pitch(prebase.ProtoM21Object):
         *,
         inPlace: t.Literal[False] = False
     ) -> PitchType:
-        return self  # dummy until Astroid 1015
+        ...
 
     def transpose(
         self: PitchType,

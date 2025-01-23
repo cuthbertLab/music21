@@ -98,10 +98,17 @@ class BooleanEnum(Enum):
 
 class StrEnum(str, Enum, metaclass=StrEnumMeta):
     '''
-    An enumeration where strings can equal the value.
+    An enumeration where strings can equal the value, and strings
+    can be found "in" the enum.
 
     See :class:`music21.common.enums.OffsetSpecial` for an
-    example of how these work.
+    example of how subclassing this would work.
+
+    * Note: This class predates the equivalent StrEnum in Python 3.11
+      and the changes to Enum `__contains__` in 3.12.  Once
+      Python 3.12 is the minimum version of music21, this class
+      will no longer be used internally and will eventually become
+      deprecated (2027?) and removed (2030?).
     '''
     def __repr__(self):
         return f'<{self.__class__.__name__}.{self.name}>'
@@ -139,8 +146,6 @@ class OffsetSpecial(StrEnum):
 
     The enum `AT_END` is equal to the string 'highestTime'
 
-    In version 9, the string comparisons will be removed.
-
     >>> from music21.common.enums import OffsetSpecial
     >>> OffsetSpecial.AT_END
     <OffsetSpecial.AT_END>
@@ -156,6 +161,13 @@ class OffsetSpecial(StrEnum):
     'highestTime'
 
     * New in v7.
+    * Note -- a previous note said that the 'highestTime' == OffsetSpecial.AT_END
+      would be removed in v9 or an upcoming music21 release.  Since then, Python has
+      changed direction and in 3.11 added StrEnum to the standard library and in 3.12
+      allows for containment checks of strings in StrEnum (such as
+      `'lowestOffset' in OffsetSpecial` returning True).  Therefore there is no
+      reason for music21 to ever remove this valuable and backwards compatible
+      tool.
     '''
     AT_END = 'highestTime'
     LOWEST_OFFSET = 'lowestOffset'

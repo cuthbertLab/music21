@@ -1138,6 +1138,8 @@ class HorizontalBar(primitives.GraphHorizontalBar, PlotStreamMixin):
             # sort these tuples, ignoring unhashable dict.
             v.sort(key=lambda point: (point[0], point[1]))
 
+
+        # seen_numericValues = set()
         for numericValue, label in yTicks:
             # make sure there is an entry for each yTick, regardless
             # of whether we have any data for it or not.
@@ -1147,6 +1149,18 @@ class HorizontalBar(primitives.GraphHorizontalBar, PlotStreamMixin):
                                 dictOfFormatDicts[numericValue]])
             else:
                 newData.append([label, [], {}])
+            # seen_numericValues.add(numericValue)
+
+        # # now find anything in pitchSpanDict that wasn't in the yTicks, for
+        # # instance, microtones!
+        # for numericValue, data_triplet in pitchSpanDict.items():
+        #     if numericValue not in seen_numericValues:
+        #         newData.append([
+        #             '',  # no label
+        #             data_triplet,
+        #             dictOfFormatDicts[numericValue],
+        #         ])
+
         self.data = newData
 
 

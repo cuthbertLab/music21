@@ -1113,7 +1113,7 @@ class Chord(ChordBase):
         sortPitches: bool = True,
         returnList: t.Literal[True]
     ) -> list[str]:
-        pass
+        ...
 
     @overload
     def annotateIntervals(
@@ -1124,7 +1124,7 @@ class Chord(ChordBase):
         sortPitches: bool = True,
         returnList: t.Literal[False] = False
     ) -> None:
-        pass
+        ...
 
     @overload
     def annotateIntervals(
@@ -1135,7 +1135,7 @@ class Chord(ChordBase):
         sortPitches: bool = True,
         returnList: t.Literal[False] = False
     ) -> _ChordType:
-        pass
+        ...
 
     def annotateIntervals(
         self: _ChordType,
@@ -1271,29 +1271,32 @@ class Chord(ChordBase):
         return False
 
     @overload
-    def bass(self,
-             newbass: None = None,
-             *,
-             find: bool|None = None,
-             allow_add: bool = False,
-             ) -> pitch.Pitch:
-        return self.pitches[0]  # dummy until Astroid 1015 is fixed.
+    def bass(
+        self,
+        newbass: None = None,
+        *,
+        find: bool|None = None,
+        allow_add: bool = False,
+    ) -> pitch.Pitch:
+        ...
 
     @overload
-    def bass(self,
-             newbass: str|pitch.Pitch|note.Note,
-             *,
-             find: bool|None = None,
-             allow_add: bool = False,
-             ) -> None:
-        return None
+    def bass(
+        self,
+        newbass: str|pitch.Pitch|note.Note,
+        *,
+        find: bool|None = None,
+        allow_add: bool = False,
+    ) -> None:
+        ...
 
-    def bass(self,
-             newbass: None|str|pitch.Pitch|note.Note = None,
-             *,
-             find: bool|None = None,
-             allow_add: bool = False,
-             ) -> pitch.Pitch|None:
+    def bass(
+        self,
+        newbass: None|str|pitch.Pitch|note.Note = None,
+        *,
+        find: bool|None = None,
+        allow_add: bool = False,
+    ) -> pitch.Pitch|None:
         '''
         Generally used to find and return the bass Pitch:
 
@@ -1481,12 +1484,11 @@ class Chord(ChordBase):
     def closedPosition(
         self: _ChordType,
         *,
-        forceOctave: int|None,
+        forceOctave: int|None = None,
         inPlace: t.Literal[True],
-        leaveRedundantPitches=False
+        leaveRedundantPitches: bool = False
     ) -> None:
-        # astroid 1003
-        return None
+        ...
 
     @overload
     def closedPosition(
@@ -1496,8 +1498,7 @@ class Chord(ChordBase):
         inPlace: t.Literal[False] = False,
         leaveRedundantPitches: bool = False
     ) -> _ChordType:
-        # astroid 1003
-        return self
+        ...
 
     def closedPosition(
         self: _ChordType,
@@ -2298,7 +2299,7 @@ class Chord(ChordBase):
         testRoot: pitch.Pitch|None = None,
         transposeOnSet: bool = True
     ) -> None:
-        return None  # dummy until Astroid 1015 is fixed
+        ...
 
     @overload
     def inversion(
@@ -2309,7 +2310,7 @@ class Chord(ChordBase):
         testRoot: pitch.Pitch|None = None,
         transposeOnSet: bool = True
     ) -> int:
-        return -1  # dummy until Astroid 1015 is fixed
+        ...
 
     def inversion(
         self,
@@ -3799,7 +3800,7 @@ class Chord(ChordBase):
              *,
              find: bool|None = None
              ) -> pitch.Pitch:
-        return self.pitches[0]  # dummy until Astroid 1015 is fixed.
+        ...
 
     @overload
     def root(self,
@@ -3807,7 +3808,7 @@ class Chord(ChordBase):
              *,
              find: bool|None = None
              ) -> None:
-        return None  # dummy until Astroid 1015 is fixed.
+        ...
 
     def root(self,
              newroot: None|str|pitch.Pitch|note.Note = None,

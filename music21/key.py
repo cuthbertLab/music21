@@ -665,14 +665,14 @@ class KeySignature(base.Music21Object):
                   value: TransposeTypes,
                   *,
                   inPlace: t.Literal[False] = False) -> KeySignatureType:
-        return self  # astroid 1015
+        ...
 
     @overload
     def transpose(self: KeySignatureType,
                   value: TransposeTypes,
                   *,
                   inPlace: t.Literal[True]) -> None:
-        return None  # astroid 1015
+        ...
 
     def transpose(self: KeySignatureType,
                   value: TransposeTypes,
@@ -1237,7 +1237,7 @@ class Key(KeySignature, scale.DiatonicScale):
                   *,
                   inPlace: t.Literal[False] = False
                   ) -> KeyType:
-        return self  # astroid 1015
+        ...
 
     @overload
     def transpose(self: KeyType,
@@ -1245,7 +1245,7 @@ class Key(KeySignature, scale.DiatonicScale):
                   *,
                   inPlace: t.Literal[True]
                   ) -> None:
-        return None
+        ...
 
     def transpose(self: KeyType,
                   value: TransposeTypes,

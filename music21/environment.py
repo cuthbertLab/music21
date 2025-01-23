@@ -1004,11 +1004,11 @@ class Environment:
 
     @overload
     def getTempFile(self, suffix: str, returnPathlib: t.Literal[False]) -> str:
-        return '/'  # astroid #1015
+        ...
 
     @overload
     def getTempFile(self, suffix: str = '', returnPathlib: t.Literal[True] = True) -> pathlib.Path:
-        return pathlib.Path('/')  # astroid #1015
+        ...
 
     def getTempFile(self, suffix: str = '', returnPathlib=True) -> str|pathlib.Path:
         '''

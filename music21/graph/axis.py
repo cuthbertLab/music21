@@ -19,6 +19,7 @@ from __future__ import annotations
 import collections
 import math
 import re
+import typing as t
 import unittest
 
 from music21.graph.utilities import accidentalLabelToUnicode, GraphException
@@ -33,6 +34,10 @@ from music21 import stream
 
 from music21.analysis import elements as elementAnalysis
 from music21.analysis import pitchAnalysis
+
+
+if t.TYPE_CHECKING:
+    from music21 import note
 
 
 USE_GRACE_NOTE_SPACING = -1
@@ -180,7 +185,7 @@ class Axis(prebase.ProtoM21Object):
         else:
             return c.streamObj
 
-    def extractOneElement(self, n, formatDict):
+    def extractOneElement(self, n: note.GeneralNote, formatDict: dict[str, t.Any]) -> t.Any:
         '''
         Override in subclasses
         '''
@@ -319,7 +324,7 @@ class PitchAxis(Axis):
         self.hideUnused = True
 
     @staticmethod
-    def makePitchLabelsUnicode(ticks):
+    def makePitchLabelsUnicode(ticks: list[tuple[t.Any, str]]) -> list[tuple[t.Any, str]]:
         # noinspection PyShadowingNames
         '''
         Given a list of ticks, replace all labels with alternative/unicode symbols where necessary.
@@ -452,9 +457,10 @@ class PitchClassAxis(PitchAxis):
         self.minValue = 0
         self.maxValue = 11
 
-    def extractOneElement(self, n, formatDict):
+    def extractOneElement(self, n, formatDict) -> int|None:
         if hasattr(n, 'pitch'):
             return n.pitch.pitchClass
+        return None
 
     def ticks(self):
         '''
