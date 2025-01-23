@@ -867,6 +867,21 @@ class MusicXMLImporter(XMLParserBase):
             self.spannerBundle.remove(sp)
 
         s.coreElementsChanged()
+        # Fill gaps with rests where needed
+        for m in s[stream.Measure]:
+            for v in m.voices:
+                if v:  # do not bother with empty voices
+                    # the musicDataMethods use insertCore, thus the voices need to run
+                    # coreElementsChanged
+                    v.coreElementsChanged()
+                    # Fill mid-measure gaps, and find end of measure gaps by ref to measure stream
+                    # https://github.com/cuthbertlab/music21/issues/444
+                    # but only when the score comes from Finale
+                    if any('Finale' in software for software in md.software):
+                        v.makeRests(refStreamOrTimeRange=m,
+                                    fillGaps=True,
+                                    inPlace=True,
+                                    hideRests=True)
         s.definesExplicitSystemBreaks = self.definesExplicitSystemBreaks
         s.definesExplicitPageBreaks = self.definesExplicitPageBreaks
         for p in s.parts:
@@ -1761,31 +1776,7 @@ class PartParser(XMLParserBase):
         for mxMeasure in self.mxPart.iterfind('measure'):
             self.xmlMeasureToMeasure(mxMeasure)
 
-        self.removeEndForwardRest()
         part.coreElementsChanged()
-
-    def removeEndForwardRest(self):
-        '''
-        If the last measure ended with a forward tag, as happens
-        in some pieces that end with incomplete measures,
-        and voices are not involved,
-        remove the rest there (for backwards compatibility, esp.
-        since bwv66.6 uses it)
-
-        * New in v7.
-        '''
-        if self.lastMeasureParser is None:  # pragma: no cover
-            return  # should not happen
-        lmp = self.lastMeasureParser
-        self.lastMeasureParser = None  # clean memory
-
-        if lmp.endedWithForwardTag is None:
-            return
-        if lmp.useVoices is True:
-            return
-        endedForwardRest = lmp.endedWithForwardTag
-        if lmp.stream.recurse().notesAndRests.last() is endedForwardRest:
-            lmp.stream.remove(endedForwardRest, recurse=True)
 
     def separateOutPartStaves(self) -> list[stream.PartStaff]:
         '''
@@ -2247,7 +2238,7 @@ class PartParser(XMLParserBase):
                     else:
                         self.lastMeasureWasShort = False
 
-        self.lastMeasureOffset += mOffsetShift
+        self.lastMeasureOffset = opFrac(self.lastMeasureOffset + mOffsetShift)
 
     def applyMultiMeasureRest(self, r: note.Rest):
         '''
@@ -2567,19 +2558,8 @@ class MeasureParser(SoundTagMixin, XMLParserBase):
                 if methName is not None:
                     meth = getattr(self, methName)
                     meth(mxObj)
-
-        if self.useVoices is True:
-            for v in self.stream.iter().voices:
-                if v:  # do not bother with empty voices
-                    # the musicDataMethods use insertCore, thus the voices need to run
-                    # coreElementsChanged
-                    v.coreElementsChanged()
-                    # Fill mid-measure gaps, and find end of measure gaps by ref to measure stream
-                    # https://github.com/cuthbertlab/music21/issues/444
-                    v.makeRests(refStreamOrTimeRange=self.stream,
-                                fillGaps=True,
-                                inPlace=True,
-                                hideRests=True)
+        for v in self.stream[stream.Voice]:
+            v.coreElementsChanged()
         self.stream.coreElementsChanged()
 
         if (self.restAndNoteCount['rest'] == 1
@@ -2602,7 +2582,7 @@ class MeasureParser(SoundTagMixin, XMLParserBase):
         >>> mxBackup = EL('<backup><duration>100</duration></backup>')
         >>> MP.xmlBackup(mxBackup)
         >>> MP.offsetMeasureNote
-        0.9979
+        Fraction(9979, 10000)
 
         >>> MP.xmlBackup(mxBackup)
         >>> MP.offsetMeasureNote
@@ -2611,7 +2591,8 @@ class MeasureParser(SoundTagMixin, XMLParserBase):
         mxDuration = mxObj.find('duration')
         if durationText := strippedText(mxDuration):
             change = opFrac(float(durationText) / self.divisions)
-            self.offsetMeasureNote -= change
+            self.offsetMeasureNote = opFrac(self.offsetMeasureNote - change)
+
             # check for negative offsets produced by
             # musicxml durations with float rounding issues
             # https://github.com/cuthbertLab/music21/issues/971
@@ -2624,19 +2605,8 @@ class MeasureParser(SoundTagMixin, XMLParserBase):
         mxDuration = mxObj.find('duration')
         if durationText := strippedText(mxDuration):
             change = opFrac(float(durationText) / self.divisions)
-
-            # Create hidden rest (in other words, a spacer)
-            # old Finale documents close incomplete final measures with <forward>
-            # this will be removed afterward by removeEndForwardRest()
-            r = note.Rest(quarterLength=change)
-            r.style.hideObjectOnPrint = True
-            self.addToStaffReference(mxObj, r)
-            self.insertInMeasureOrVoice(mxObj, r)
-
             # Allow overfilled measures for now -- TODO(someday): warn?
-            self.offsetMeasureNote += change
-            # xmlToNote() sets None
-            self.endedWithForwardTag = r
+            self.offsetMeasureNote = opFrac(self.offsetMeasureNote + change)
 
     def xmlPrint(self, mxPrint: ET.Element):
         '''
@@ -2795,8 +2765,7 @@ class MeasureParser(SoundTagMixin, XMLParserBase):
             self.nLast = c  # update
 
         # only increment Chords after completion
-        self.offsetMeasureNote += offsetIncrement
-        self.endedWithForwardTag = None
+        self.offsetMeasureNote = opFrac(self.offsetMeasureNote + offsetIncrement)
 
     def xmlToChord(self, mxNoteList: list[ET.Element]) -> chord.ChordBase:
         # noinspection PyShadowingNames
