@@ -400,8 +400,7 @@ class Sites(common.SlottedObjectMixin):
                    sortByCreationTime: t.Union[bool, t.Literal['reverse']] = False,
                    priorityTarget=None,
                    ) -> Generator[stream.Stream, None, None]:
-        from music21 import stream
-        yield stream.Stream()
+        ...
 
     @overload
     def yieldSites(self,
@@ -410,7 +409,7 @@ class Sites(common.SlottedObjectMixin):
                    sortByCreationTime: t.Union[bool, t.Literal['reverse']] = False,
                    priorityTarget=None,
                    ) -> Generator[stream.Stream|None, None, None]:
-        yield None
+        ...
 
     def yieldSites(self,
                    *,

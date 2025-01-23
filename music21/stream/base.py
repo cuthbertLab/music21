@@ -476,44 +476,36 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
 
     @overload
     def __getitem__(self, k: str) -> iterator.RecursiveIterator[M21ObjType]:
-        # Remove this code and replace with ... once Astroid #1015 is fixed.
-        x: iterator.RecursiveIterator[M21ObjType] = self.recurse()
-        return x
+        ...
 
     @overload
     def __getitem__(self, k: int) -> M21ObjType:
-        return self[k]  # dummy code
+        ...
 
     @overload
     def __getitem__(self, k: slice) -> list[M21ObjType]:
-        return list(self.elements)  # dummy code
+        ...
 
     @overload
     def __getitem__(
         self,
         k: type[ChangedM21ObjType]
     ) -> iterator.RecursiveIterator[ChangedM21ObjType]:
-        x = t.cast(iterator.RecursiveIterator[ChangedM21ObjType], self.recurse())
-        return x  # dummy code
+        ...
 
     @overload
     def __getitem__(
         self,
         k: type  # getting something that is a subclass of something that is not a m21 object
     ) -> iterator.RecursiveIterator[M21ObjType]:
-        x = t.cast(iterator.RecursiveIterator[M21ObjType], self.recurse())
-        return x  # dummy code
-
+        ...
 
     @overload
     def __getitem__(
         self,
         k: Collection[type]
     ) -> iterator.RecursiveIterator[M21ObjType]:
-        # Remove this code and replace with ... once Astroid #1015 is fixed.
-        x: iterator.RecursiveIterator[M21ObjType] = self.recurse()
-        return x
-
+        ...
 
     def __getitem__(self,
                     k: t.Union[str,
@@ -3585,25 +3577,19 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
     def getElementsByClass(self,
                            classFilterList: str|Iterable[str]
                            ) -> iterator.StreamIterator[M21ObjType]:
-        # Remove all dummy code once Astroid #1015 is fixed
-        x: iterator.StreamIterator[M21ObjType] = self.iter()
-        return x  # dummy code
+        ...
 
     @overload
     def getElementsByClass(self,
                            classFilterList: type[ChangedM21ObjType]
                            ) -> iterator.StreamIterator[ChangedM21ObjType]:
-        x: iterator.StreamIterator[ChangedM21ObjType] = (
-            self.iter().getElementsByClass(classFilterList)
-        )
-        return x  # dummy code
+        ...
 
     @overload
     def getElementsByClass(self,
                            classFilterList: Iterable[type[ChangedM21ObjType]]
                            ) -> iterator.StreamIterator[M21ObjType]:
-        x: iterator.StreamIterator[M21ObjType] = self.iter()
-        return x  # dummy code
+        ...
 
     def getElementsByClass(self,
                            classFilterList: t.Union[

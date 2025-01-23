@@ -1344,15 +1344,14 @@ class NotRest(GeneralNote):
                       *,
                       returnDefault: t.Literal[True] = True
                       ) -> instrument.Instrument:
-        from music21 import instrument
-        return instrument.Instrument()  # astroid #1015
+        ...
 
     @overload
     def getInstrument(self,
                       *,
                       returnDefault: t.Literal[False]
                       ) -> instrument.Instrument|None:
-        return None  # astroid #1015
+        ...
 
     def getInstrument(self,
                       *,

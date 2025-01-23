@@ -930,7 +930,7 @@ class Music21Object(prebase.ProtoM21Object):
         *,
         returnSpecial: t.Literal[False] = False,
     ) -> OffsetQL:
-        return 0.0  # dummy until Astroid #1015 is fixed.  Replace with ...
+        ...
 
     @overload
     def getOffsetBySite(
@@ -939,8 +939,7 @@ class Music21Object(prebase.ProtoM21Object):
         *,
         returnSpecial: bool = False,
     ) -> OffsetQL|OffsetSpecial:
-        return 0.0  # dummy until Astroid #1015 is fixed.  Replace with ...
-        # using bool instead of t.Literal[True] because of other errors
+        ...
 
     def getOffsetBySite(
         self,
@@ -1332,7 +1331,7 @@ class Music21Object(prebase.ProtoM21Object):
         followDerivation=True,
         priorityTargetOnly=False,
     ) -> _M21T|None:
-        return None  # until Astroid #1015
+        ...
 
     @overload
     def getContextByClass(
@@ -1344,7 +1343,7 @@ class Music21Object(prebase.ProtoM21Object):
         followDerivation=True,
         priorityTargetOnly=False,
     ) -> Music21Object|None:
-        return None  # until Astroid #1015
+        ...
 
     def getContextByClass(
         self,
@@ -1830,7 +1829,7 @@ class Music21Object(prebase.ProtoM21Object):
         followDerivation=True,
         priorityTargetOnly=False,
     ) -> Generator[ContextSortTuple, None, None]:
-        pass
+        ...
 
     @overload
     def contextSites(
@@ -1845,8 +1844,7 @@ class Music21Object(prebase.ProtoM21Object):
         followDerivation=True,
         priorityTargetOnly=False,
     ) -> Generator[ContextTuple, None, None]:
-        pass
-
+        ...
 
     def contextSites(
         self,

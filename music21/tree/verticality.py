@@ -959,8 +959,7 @@ class Verticality(prebase.ProtoM21Object):
         returnObjects: t.Literal[False],
         partPairNumbers: list[tuple[int, int]] | None = None
     ) -> list[PitchedTimespanQuartet]:
-        # dummy until Astroid #1015 is fixed.  Replace with ...
-        return []
+        ...
 
     @overload
     def getAllVoiceLeadingQuartets(
@@ -972,9 +971,7 @@ class Verticality(prebase.ProtoM21Object):
         returnObjects: t.Literal[True] = True,
         partPairNumbers: list[tuple[int, int]] | None = None
     ) -> list[VoiceLeadingQuartet]:
-        # dummy until Astroid #1015 is fixed.  Replace with ...
-        return []
-
+        ...
 
     def getAllVoiceLeadingQuartets(
         self,

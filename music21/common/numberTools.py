@@ -238,11 +238,11 @@ _KNOWN_PASSES = frozenset([
 
 @overload
 def opFrac(num: int) -> float:
-    pass
+    ...
 
 @overload
 def opFrac(num: float|Fraction) -> float|Fraction:
-    pass
+    ...
 
 # no type checking due to accessing protected attributes (for speed)
 def opFrac(num: OffsetQLIn) -> OffsetQL:
