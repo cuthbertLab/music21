@@ -1923,9 +1923,6 @@ class Pitch(prebase.ProtoM21Object):
         # No need for super().__init__() on protoM21Object
         self._groups: base.Groups|None = None
 
-        if isinstance(name, type(self)):
-            name = name.nameWithOctave
-
         # this should not be set, as will be updated when needed
         self._step: StepName = defaults.pitchStep  # this is only the pitch step
 
