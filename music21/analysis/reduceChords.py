@@ -168,7 +168,7 @@ class ChordReducer:
     @staticmethod
     def _getIntervalClassSet(pitches):
         result = set()
-        pitches = [pitch.Pitch(x) for x in pitches]
+        pitches = [pitches]
         for i, x in enumerate(pitches):
             for y in pitches[i + 1:]:
                 interval = int(abs(x.ps - y.ps))
