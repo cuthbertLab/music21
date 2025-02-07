@@ -239,7 +239,7 @@ class FretBoard(prebase.ProtoM21Object):
             return pitchList
 
         for thisFretNote in self.fretNotes:
-            pitchListPosition = (thisFretNote.string * -1)
+            pitchListPosition = (thisFretNote.string or 0) * -1
 
             tuningPitch = self.tuning[pitchListPosition]
             tuningPitchAsPs: float = tuningPitch.ps

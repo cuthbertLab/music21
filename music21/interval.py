@@ -26,6 +26,7 @@ import copy
 import enum
 import re
 import typing as t
+from typing import overload
 
 from music21 import base
 from music21 import common
@@ -3768,6 +3769,20 @@ def getAbsoluteHigherNote(note1: note.Note|pitch.Pitch,
         return note1
 
 
+
+@overload
+def getWrittenLowerNote(note1: note.Note,
+                        note2: note.Note|pitch.Pitch
+                        ) -> note.Note:
+    ...
+
+@overload
+def getWrittenLowerNote(note1: pitch.Pitch,
+                        note2: note.Note|pitch.Pitch
+                        ) -> pitch.Pitch:
+    ...
+
+
 def getWrittenLowerNote(note1: note.Note|pitch.Pitch,
                         note2: note.Note|pitch.Pitch
                         ) -> note.Note|pitch.Pitch:
@@ -3778,16 +3793,30 @@ def getWrittenLowerNote(note1: note.Note|pitch.Pitch,
     the same returns the sounding lower element,
     or the first element if sounding pitch is also the same.
 
-    >>> aNote = pitch.Pitch('c#3')
-    >>> bNote = pitch.Pitch('d--3')
+    >>> aNote = pitch.Pitch('C#3')
+    >>> bNote = pitch.Pitch('D--3')
     >>> interval.getWrittenLowerNote(aNote, bNote)
     <music21.pitch.Pitch C#3>
 
-    >>> aNote = pitch.Pitch('c#3')
-    >>> bNote = pitch.Pitch('d-3')
+    >>> aNote = pitch.Pitch('C#3')
+    >>> bNote = pitch.Pitch('D-3')
     >>> interval.getWrittenLowerNote(aNote, bNote)
     <music21.pitch.Pitch C#3>
+
+    Both elements should be pitches or notes -- if note2 is lower and not the same class
+    as note1 raises a ValueError:
+
+    >>> aNote = pitch.Pitch('C#4')
+    >>> bNote = note.Note('C#3')
+    >>> interval.getWrittenLowerNote(aNote, bNote)
+    Traceback (most recent call last):
+    ValueError: note1 <music21.pitch.Pitch C#4>
+        and note2 <music21.note.Note C#> must both be notes or pitches
     '''
+    if ((hasattr(note1, 'pitch') and not hasattr(note2, 'pitch'))
+            or (hasattr(note2, 'pitch') and not hasattr(note1, 'pitch'))):
+        raise ValueError(f'note1 {note1!r} and note2 {note2!r} must both be notes or pitches')
+
     (p1, p2) = (_extractPitch(note1), _extractPitch(note2))
 
     num1 = p1.diatonicNoteNum
