@@ -52,7 +52,7 @@ viewpoints and experiences different from our own. We reject harassment and cont
 (in mail, comments, or code) that belittle individuals or groups of people.
 
 We ask all members of the community to be mindful particularly about assumptions of the
-gender of users (choice of pronouns in comments and code). We recognize that members
+gender of users (including using correct pronouns in comments and code). We recognize that members
 sometimes make mistakes and will, in general, accept sincere regrets for such cases.
 Blatant or repeated violations of the code will result in the removal of the
 contributor’s participation in the community.
