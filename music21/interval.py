@@ -71,6 +71,17 @@ niceSpecNames = ['ERROR', 'Perfect', 'Major', 'Minor', 'Augmented', 'Diminished'
 
 prefixSpecs = ('ERROR', 'P', 'M', 'm', 'A', 'd', 'AA', 'dd', 'AAA', 'ddd', 'AAAA', 'dddd')
 
+
+# helper for comparisons
+def _same_class(note1: note.Note|pitch.Pitch, note2: note.Note|pitch.Pitch) -> None:
+    '''
+    Raise a ValueError if note1 and note2 are not both Notes or both Pitches
+    '''
+    if ((hasattr(note1, 'pitch') and not hasattr(note2, 'pitch'))
+            or (hasattr(note2, 'pitch') and not hasattr(note1, 'pitch'))):
+        raise ValueError(f'note1 {note1!r} and note2 {note2!r} must both be notes or pitches')
+
+
 class Specifier(enum.IntEnum):
     '''
     An enumeration for "specifiers" such as Major, Minor, etc.
@@ -3708,6 +3719,19 @@ class Interval(IntervalBase):
 
 
 # ------------------------------------------------------------------------------
+@overload
+def getWrittenHigherNote(note1: note.Note,
+                         note2: note.Note|pitch.Pitch
+                         ) -> note.Note:
+    ...
+
+@overload
+def getWrittenHigherNote(note1: pitch.Pitch,
+                         note2: note.Note|pitch.Pitch
+                         ) -> pitch.Pitch:
+    ...
+
+
 def getWrittenHigherNote(note1: note.Note|pitch.Pitch,
                          note2: note.Note|pitch.Pitch
                          ) -> note.Note|pitch.Pitch:
@@ -3734,6 +3758,7 @@ def getWrittenHigherNote(note1: note.Note|pitch.Pitch,
     >>> interval.getWrittenHigherNote(aNote, bNote) is aNote
     True
     '''
+    _same_class(note1, note2)
     (p1, p2) = (_extractPitch(note1), _extractPitch(note2))
 
     num1 = p1.diatonicNoteNum
@@ -3745,6 +3770,19 @@ def getWrittenHigherNote(note1: note.Note|pitch.Pitch,
     else:
         return getAbsoluteHigherNote(note1, note2)
 
+
+
+@overload
+def getAbsoluteHigherNote(note1: note.Note,
+                          note2: note.Note|pitch.Pitch
+                          ) -> note.Note:
+    ...
+
+@overload
+def getAbsoluteHigherNote(note1: pitch.Pitch,
+                          note2: note.Note|pitch.Pitch
+                          ) -> pitch.Pitch:
+    ...
 
 def getAbsoluteHigherNote(note1: note.Note|pitch.Pitch,
                           note2: note.Note|pitch.Pitch
@@ -3759,6 +3797,7 @@ def getAbsoluteHigherNote(note1: note.Note|pitch.Pitch,
     >>> interval.getAbsoluteHigherNote(aNote, bNote)
     <music21.note.Note C#>
     '''
+    _same_class(note1, note2)
     chromatic = notesToChromatic(note1, note2)
     semitones = chromatic.semitones
     if semitones > 0:
@@ -3767,7 +3806,6 @@ def getAbsoluteHigherNote(note1: note.Note|pitch.Pitch,
         return note1
     else:
         return note1
-
 
 
 @overload
@@ -3813,10 +3851,7 @@ def getWrittenLowerNote(note1: note.Note|pitch.Pitch,
     ValueError: note1 <music21.pitch.Pitch C#4>
         and note2 <music21.note.Note C#> must both be notes or pitches
     '''
-    if ((hasattr(note1, 'pitch') and not hasattr(note2, 'pitch'))
-            or (hasattr(note2, 'pitch') and not hasattr(note1, 'pitch'))):
-        raise ValueError(f'note1 {note1!r} and note2 {note2!r} must both be notes or pitches')
-
+    _same_class(note1, note2)
     (p1, p2) = (_extractPitch(note1), _extractPitch(note2))
 
     num1 = p1.diatonicNoteNum
@@ -3827,6 +3862,19 @@ def getWrittenLowerNote(note1: note.Note|pitch.Pitch,
         return note2
     else:
         return getAbsoluteLowerNote(note1, note2)
+
+
+@overload
+def getAbsoluteLowerNote(note1: note.Note,
+                         note2: note.Note|pitch.Pitch
+                         ) -> note.Note:
+    ...
+
+@overload
+def getAbsoluteLowerNote(note1: pitch.Pitch,
+                         note2: note.Note|pitch.Pitch
+                         ) -> pitch.Pitch:
+    ...
 
 
 def getAbsoluteLowerNote(note1: note.Note|pitch.Pitch,
@@ -3842,6 +3890,7 @@ def getAbsoluteLowerNote(note1: note.Note|pitch.Pitch,
     >>> interval.getAbsoluteLowerNote(aNote, bNote)
     <music21.pitch.Pitch D--3>
     '''
+    _same_class(note1, note2)
     chromatic = notesToChromatic(note1, note2)
     semitones = chromatic.semitones
     if semitones > 0:
