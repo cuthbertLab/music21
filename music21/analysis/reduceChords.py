@@ -15,6 +15,7 @@ Automatically reduce a MeasureStack to a single chord or group of chords.
 from __future__ import annotations
 
 import collections
+from collections.abc import Sequence
 import itertools
 import unittest
 
@@ -166,16 +167,28 @@ class ChordReducer:
                 )
 
     @staticmethod
-    def _getIntervalClassSet(pitches):
-        result = set()
-        pitches = [p for p in pitches if isinstance(p, pitch.Pitch) else pitch.Pitch(p)]
+    def _getIntervalClassSet(pitches_in: Sequence[pitch.Pitch|str|int]) -> frozenset[int]:
+        '''
+        Return a frozenset of all the interval classes (1-6) in the given
+        Sequence (list, tuple, etc.) of pitches or
+        things like strings/ints that can be passed to the Pitch constructor.
+        '''
+        result: set[int] = set()
+        pitches: list[pitch.Pitch] = []
+        for p in pitches_in:
+            if isinstance(p, pitch.Pitch):
+                pitches.append(p)
+            else:
+                pitches.append(pitch.Pitch(p))
+
+        interval_int: int
         for i, x in enumerate(pitches):
             for y in pitches[i + 1:]:
-                interval = int(abs(x.ps - y.ps))
-                interval %= 12
-                if interval >= 6:
-                    interval = 12 - interval
-                result.add(interval)
+                interval_int = int(abs(x.ps - y.ps))
+                interval_int %= 12
+                if interval_int >= 6:
+                    interval_int = 12 - interval_int
+                result.add(interval_int)
         if 0 in result:
             result.remove(0)
         return frozenset(result)
@@ -262,10 +275,13 @@ class ChordReducer:
                 continue
             elif one.measureNumber != two.measureNumber:
                 continue
+
+            # is this used?
             bothPitches = set()
             bothPitches.update([x.nameWithOctave for x in onePitches])
             bothPitches.update([x.nameWithOctave for x in twoPitches])
             bothPitches = sorted([pitch.Pitch(x) for x in bothPitches])
+
             # if not timespanStream.Verticality.pitchesAreConsonant(bothPitches):
             #    intervalClasses = self._getIntervalClassSet(bothPitches)
             #    if intervalClasses not in (
@@ -275,6 +291,7 @@ class ChordReducer:
             #        frozenset([2, 4, 6]),
             #        ):
             #        continue
+
             horizontalities = scoreTree.unwrapVerticalities(verticalities)
             for unused_part, timespanList in horizontalities.items():
                 if len(timespanList) < 2:
@@ -360,8 +377,8 @@ class ChordReducer:
 
         for unused_part, subtree in partwiseTrees.items():
             timespanList = list(subtree)
-            for bassTimespan, group in itertools.groupby(timespanList, procedure):
-                group = list(group)
+            for bassTimespan, group_generator in itertools.groupby(timespanList, procedure):
+                group = list(group_generator)
 
                 if bassTimespan is None:
                     continue
@@ -424,10 +441,10 @@ class ChordReducer:
         for unused_part, subtree in partwiseTrees.items():
             toRemove = set()
             toInsert = set()
-            for unused_measureNumber, group in itertools.groupby(
+            for unused_measureNumber, group_generator in itertools.groupby(
                 subtree, lambda x: x.measureNumber
             ):
-                group = list(group)
+                group = list(group_generator)
                 for i in range(len(group) - 1):
                     timespanOne, timespanTwo = group[i], group[i + 1]
                     if (timespanOne.pitches == timespanTwo.pitches
@@ -592,7 +609,8 @@ class ChordReducer:
                 measureObject.remove(c)
         if currentGreedyChord is not None:
             currentGreedyChord.quarterLength = currentGreedyChordNewLength
-            currentGreedyChordNewLength = 0.0
+            # not read later - no need to cleanup.
+            # currentGreedyChordNewLength = 0.0
         # even chord lengths
         for i in range(1, len(measureObject)):
             c = measureObject[i]
