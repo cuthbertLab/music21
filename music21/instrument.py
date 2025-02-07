@@ -2456,7 +2456,7 @@ def fromString(instrumentString: str,
     allCombinations = _combinations(instrumentString)
     # First task: Find the best instrument.
     bestInstrument = None
-    bestName = None
+    bestName: str = ''
 
     this_module = importlib.import_module('music21.instrument')
     for substring in allCombinations:
