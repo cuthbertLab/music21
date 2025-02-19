@@ -17,14 +17,14 @@ To do a release,
 1. update the VERSION in _version.py and the single test case in base.py.
 2. run `corpus.corpora.CoreCorpus().cacheMetadata()`.
     for a major change that affects parsing run corpus.corpora.CoreCorpus().rebuildMetadataCache()
-    (20 min on IntelMacbook Air) -- either of these MAY change a
+    (2 min on M4) -- either of these MAY change a
     lot of tests in corpus, metadata, etc. so don't skip the next step!
 3. IMPORTANT: run python documentation/testDocumentation.py and afterwards fix errors [*]
 
 [*] you will need pytest, docutils, nbval installed (along with ipython and jupyter),
 you cannot check to see if fixed tests work while it is running.
 This takes a while and runs single core, and then almost always needs code patches
-so allocate time.  Start working on the announcement while it's running.
+so allocate time (2 min on M4).  Start working on the announcement while it's running.
 
 
 4. run test/warningMultiprocessTest.py for lowest and highest Py version -- fix all warnings!
@@ -36,8 +36,10 @@ so allocate time.  Start working on the announcement while it's running.
      (normally not necessary, because it's slower and mostly duplicates multiprocessTest,
      but should be done before making a release).
 
-7. run documentation/make.py clean  (skip on minor version changes)
-8. run documentation/make.py linkcheck  [*]
+7. run documentation/make.py clean  (skip on minor version changes) -- you may need to make a
+     documentation/build directory first.
+8. run documentation/make.py linkcheck  [*] - missing http://www.musicxml.org/dtds/partwise.dtd
+     and code-of-conduct links are both okay.
 9. run documentation/make.py   [*]
 
 [*] you will need sphinx, Jupyter (pip or easy_install), markdown, and pandoc (.dmg) installed
@@ -46,15 +48,16 @@ so allocate time.  Start working on the announcement while it's running.
     via Amazon S3 (contact MSAC for authentication if need be)
 
 11. zip up documentation/build/html and get ready to upload/delete it.
-    Rename to music21.v.7.1.0-docs.zip (skip for Alpha/Beta)
+    Rename to music21.v.9.5.0-docs.zip (skip for Alpha/Beta)
 
-12. From the music21 main folder (not the sub folder) run "hatch build" --
-    requires hatch to be installed "brew install hatch"
+12. From the music21 main folder (not subfolder) run "hatch build" --
+    requires hatch to be installed "pip install hatch" -- brew version of hatch
+    was giving Environment `default` is incompatible messages recently. (mysql? why relevant?)
 
     This builds the dist/music21-9.3.0.tar.gz and dist/music21-9.3.0-py3-none-any.whl
     files.  That used to be what *this* script did, but now hatch does it better!
 
-13. Run this file: it builds the no-corpus version of music21.
+13. Run this file: it builds the no-corpus version of music21.  (need Python 3.12 or higher)
     DO NOT RUN THIS ON A PC or the Mac .tar.gz might have an incorrect permission if you do.
 
 14. PR and Commit to GitHub at this point w/ commit comment of the new version,
@@ -133,7 +136,7 @@ def removeCorpus():
     fpDstDir = os.path.join(fpDir, fnDstDir)
 
     file = tarfile.open(fp)
-    file.extractall(fpDir)
+    file.extractall(fpDir, filter='data')  # note -- this requires 3.12+ but that's okay
     file.close()
 
     os.rename(fpDstDir.replace('-noCorpus', ''), fpDstDir)
