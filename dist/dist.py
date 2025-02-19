@@ -79,7 +79,7 @@ so allocate time (2 min on M4).  Start working on the announcement while it's ru
 
     Finish this before doing the next step, even though it looks like it could be done in parallel.
 
-19a. Upload the new file to PyPI with "twine upload music21-9.3.0.tar.gz" [*]
+19a. Upload the tar.gz file to PyPI with "twine upload music21-9.3.0.tar.gz" [*]
 
 19b. Do the same for the whl file (but not for the no-corpus file) [*]
 
@@ -94,6 +94,10 @@ so allocate time (2 min on M4).  Start working on the announcement while it's ru
         [pypi]
         username:__token__
         password:pypi-the_gibberish_generated_in_create_api_token_at_the_bottom_of_account_settings
+
+    The "password" is under "Account Settings" -> "API Token" -> "Options" -> "View Unique
+    Identifier" -- the Copy button doesn't work at least on Mac.
+    (or you can use the "password" field in the [pypi] section, but that's not recommended)')
 
     FYI -- PyPI is apparently uninterested in having contributions from smaller projects
     which haven't been following their internal security discussions for years.  All of this
