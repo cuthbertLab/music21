@@ -5593,7 +5593,7 @@ class MeasureParser(SoundTagMixin, XMLParserBase):
         # TODO: musicxml 4: double, attr: above
 
 
-        if diatonicStep and chromaticStep:
+        if diatonicStep is not None and chromaticStep is not None:
             # diatonic step can be used as a generic specifier here if
             # shifted 1 away from zero
             if diatonicStep < 0:
