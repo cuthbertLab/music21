@@ -37,6 +37,7 @@ from music21 import prebase
 
 if t.TYPE_CHECKING:
     from collections.abc import Iterable
+    from music21.metadata import Metadata
 
 
 # -----------------------------------------------------------------------------
@@ -64,7 +65,8 @@ class MetadataEntry(prebase.ProtoM21Object):
     <music21.metadata.bundles.MetadataEntry 'bach_bwv66_6_mxl'>
 
     The sourcePath of the metadata entry refers to the file path at which its
-    score file is found:
+    score file is found, but it is usually a relative path to the top of the corpus
+    directory.  It is a pathlib object.
 
     >>> metadataEntry.sourcePath
     PosixPath('bach/bwv66.6.mxl')
@@ -85,21 +87,28 @@ class MetadataEntry(prebase.ProtoM21Object):
     # INITIALIZER #
 
     def __init__(self,
-                 sourcePath=None,
-                 number=None,
-                 metadataPayload=None,
-                 corpusName=None,
+                 sourcePath: str|pathlib.Path = '',
+                 number: int|None = None,
+                 metadataPayload: Metadata|None = None,
+                 corpusName: str = '',
                  ):
-        self._sourcePath = str(sourcePath)
+        # only store strings internally; sourcePath is s
+        self._sourcePath: str = str(sourcePath)
         self._number = number
         self._metadataPayload = metadataPayload
         self._corpusName = corpusName
 
     # SPECIAL METHODS #
-
     def __getnewargs__(self):
+        '''
+        This is all the information that is needed for pickling.
+        Specifically do not include _corpusName.
+
+        Note do not pickle Pathlib objects, so make sure to do ._sourcePath
+        not .sourcePath
+        '''
         return (
-            self.sourcePath,
+            self._sourcePath,
             self.metadata,
             self.number,
         )
@@ -109,7 +118,8 @@ class MetadataEntry(prebase.ProtoM21Object):
 
     def __fspath__(self):
         '''
-        for Py3.6+ to allow MetadataEntries to be used where file paths are being employed
+        Allows MetadataEntries to be used where file paths are being employed,
+        so it can be used with opening and closing, etc.
 
         Returns self.sourcePath() as a string
 
@@ -138,8 +148,14 @@ class MetadataEntry(prebase.ProtoM21Object):
 
     # PUBLIC PROPERTIES #
 
+    # we seem to be storing everything as a property so that the object
+    # is immutable after creating.
+
     @property
     def corpusPath(self):
+        '''
+        Returns the sourcePath as a string, with _number appended if it is not None.
+        '''
         return MetadataBundle.corpusPathToKey(self.sourcePath, self.number)
 
     @property
@@ -638,7 +654,7 @@ class MetadataBundle(prebase.ProtoM21Object):
         self._corpus = common.wrapWeakref(newCorpus)
 
     @property
-    def filePath(self):
+    def filePath(self) -> pathlib.Path | None:
         r'''
         The filesystem name of the cached metadata bundle, if the metadata
         bundle's name is not None.
@@ -829,7 +845,7 @@ class MetadataBundle(prebase.ProtoM21Object):
         self._metadataEntries.clear()
 
     @staticmethod
-    def corpusPathToKey(filePath, number=None):
+    def corpusPathToKey(filePath: str|pathlib.Path, number: int|None = None):
         r'''
         Given a file path or corpus path, return the metadata key:
 
@@ -840,6 +856,12 @@ class MetadataBundle(prebase.ProtoM21Object):
 
         >>> key = mb.corpusPathToKey('corelli/opus3no1/1grave.xml')
         >>> key.endswith('corelli_opus3no1_1grave_xml')
+        True
+
+        Numbers are appended if given
+
+        >>> key = mb.corpusPathToKey('corelli/opus3no1/1grave.xml', number=3)
+        >>> key.endswith('corelli_opus3no1_1grave_xml_3')
         True
         '''
         if isinstance(filePath, pathlib.Path):
@@ -866,6 +888,7 @@ class MetadataBundle(prebase.ProtoM21Object):
             corpusPath = corpusPath.replace(os.sep, '_')
 
         corpusPath = corpusPath.replace('.', '_')
+
         # append name to metadata path
         if number is not None:
             return f'{corpusPath}_{number}'
@@ -1315,17 +1338,37 @@ class MetadataBundle(prebase.ProtoM21Object):
         filePath = filePath or self.filePath
         if self.filePath is not None:
             filePath = self.filePath
+
             environLocal.printDebug(['MetadataBundle: writing:', filePath])
             storedCorpusClient = self._corpus  # no weakrefs allowed
             self._corpus = None
-            uncompressed = pickle.dumps(self, protocol=3)
-            # 3 is a safe protocol for some time to come.
+
+            # Protocol 5 is Python 3.8 and above.
+            uncompressed = pickle.dumps(self, protocol=5)
+
+            # # uncomment this and SafePickler when we next need to
+            # # figure out where Pathlib objects are sneaking into
+            # # the pickle -- we've had to rediagnose this too many times
+            # # to count.
+            # with open(filePath, 'wb') as f:
+            #     SafePickler(f, protocol=5).dump(self)
+            #
+            # with open(filePath, 'rb') as f:
+            #     uncompressed = f.read()  # ridiculous...
 
             with gzip.open(filePath, 'wb') as outFp:
                 outFp.write(uncompressed)
             self._corpus = storedCorpusClient
 
         return self
+
+# class SafePickler(pickle.Pickler):
+#     def persistent_id(self, obj):
+#         if isinstance(obj, pathlib.Path):
+#             raise TypeError(f'Pickling pathlib.Path objects is not allowed! {obj}')
+#         else:
+#             print(obj)
+#         return None  # Default behavior for other objects
 
 
 _test_bundles: dict[str, MetadataBundle] = {}

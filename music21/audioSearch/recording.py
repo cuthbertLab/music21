@@ -6,7 +6,7 @@
 # Authors:      Jordi Bartolome
 #               Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2011 Michael Scott Asato Cuthbert
+# Copyright:    Copyright © 2011-25 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
@@ -14,11 +14,13 @@ modules for audio searching that directly record from the microphone.
 
 Requires PyAudio and portaudio to be installed (https://www.portaudio.com/download.html)
 
-To download pyaudio for windows 64-bit go to https://www.lfd.uci.edu/~gohlke/pythonlibs/
+Windows users will get pyaudio and portaudio with `pip install pyaudio`
 
-users of 64-bit windows but 32-bit python should download the win32 port
+macOS users should have Homebrew installed and run `brew install portaudio`
+before running `pip install pyaudio`
 
-users of 64-bit windows and 64-bit python should download the amd64 port
+There is no official support for Linux/BSD etc. in music21, but package managers like `apt`
+tend to have libraries like `portaudio19` and `python3-pyaudio`.
 '''
 from __future__ import annotations
 
@@ -31,13 +33,6 @@ from music21 import environment
 from music21 import exceptions21
 
 environLocal = environment.Environment('audioSearch.recording')
-
-
-###
-# to download pyaudio for windows 64-bit go to https://www.lfd.uci.edu/~gohlke/pythonlibs/
-# users of 64-bit windows but 32-bit python should download the win32 port
-# users of 64-bit windows and 64-bit python should download the amd64 port
-# requires portaudio to be installed https://www.portaudio.com/download.html
 
 default_recordChannels = 1
 default_recordSampleRate = 44100

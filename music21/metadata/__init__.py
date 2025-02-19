@@ -1396,7 +1396,8 @@ class Metadata(base.Music21Object):
     @property
     def filePath(self) -> str|None:
         '''
-        Get or set the file path that was parsed.
+        Get or set the file path that was parsed.  This returns a string, not a Path object
+        that is deliberate for caching.
         '''
         return self._getSingularAttribute('filePath')
 
@@ -2481,7 +2482,7 @@ class RichMetadata(Metadata):
         self.pitchHighest = None
         self.pitchLowest = None
         self.quarterLength = None
-        self.sourcePath = ''
+        self.sourcePath: str = ''
         self.tempoFirst = None
         self.tempos = []
         self.timeSignatureFirst = None
