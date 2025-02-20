@@ -93,25 +93,22 @@ so allocate time (2 min on M4).  Start working on the announcement while it's ru
 
         [pypi]
         username:__token__
-        password:pypi-the_gibberish_generated_in_create_api_token_at_the_bottom_of_account_settings
+        password:pypi-API_TOKEN
 
-    The "password" is under "Account Settings" -> "API Token" -> "Options" -> "View Unique
-    Identifier" -- the Copy button doesn't work at least on Mac.
-    (or you can use the "password" field in the [pypi] section, but that's not recommended)')
+    The "password" is the API token you've just created -- if you lose the file you
+    will also lose the API token. and have to create it again.  This is all very
+    poorly documented.  This is Not the "Unique identifier" that you see in the
+    "API Tokens" tab on the "Your Account" page -- super confusing.
 
-    FYI -- PyPI is apparently uninterested in having contributions from smaller projects
-    which haven't been following their internal security discussions for years.  All of this
-    is super mysterious and not well documented.  sigh.  But they did mail out USB sticks to
-    the top 1% of projects in Python!
+20. Delete the two .tar.gz files and .whl file in dist. (and the docs)
 
-20. Delete the two .tar.gz files and .whl file in dist.
-
-21. For starting a new major release create a GitHub branch for the old one.
+21. For starting a new major release create a GitHub branch to preserve the old one
+    for patches, etc. esp. during beta releases.
 
 22. Immediately increment the number in _version.py and run tests on it here
     to prepare for next release.
 
-23. Announce on the blog, to the list, and twitter.
+23. Announce on the blog and to the list.
 '''
 import os
 import shutil
