@@ -1,7 +1,6 @@
 -r requirements.txt
 wheel
-astroid>=3.2.0
-pylint>=2.16.0
+pylint>=3.2.0
 flake8<7.0.0
 flake8-quotes>=3.3.2
 hatchling
@@ -17,3 +16,5 @@ nbval
 pytest
 docutils
 types-requests
+twine
+hatch
