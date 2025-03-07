@@ -10,7 +10,8 @@
 # ------------------------------------------------------------------------------
 from __future__ import annotations
 
-from enum import Enum, EnumMeta
+from enum import Enum, EnumMeta, IntEnum
+import re
 
 
 class StrEnumMeta(EnumMeta):
@@ -24,6 +25,19 @@ class StrEnumMeta(EnumMeta):
             return super().__contains__(item)
         except TypeError:  # pragma: no cover
             return False
+
+
+class ContainsEnum(IntEnum):
+    '''
+    An IntEnum that allows "in" checks against the values of the enum.
+    '''
+    def __repr__(self):
+        val = super().__repr__()
+        return re.sub(r'(\d+)', lambda m: f'0x{int(m.group(1)):X}', val)
+
+    @classmethod
+    def hasValue(cls, val):
+        return val in cls._value2member_map_
 
 
 class BooleanEnum(Enum):

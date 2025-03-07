@@ -2482,7 +2482,7 @@ class RichMetadata(Metadata):
         self.pitchHighest = None
         self.pitchLowest = None
         self.quarterLength = None
-        self.sourcePath: str = ''
+        self.sourcePath = ''
         self.tempoFirst = None
         self.tempos = []
         self.timeSignatureFirst = None
