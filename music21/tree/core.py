@@ -258,7 +258,6 @@ class AVLNode(common.SlottedObjectMixin):
             rcHeight
         )
 
-    # PRIVATE METHODS #
     def moveAttributes(self, other):
         '''
         move attributes from this node to another in case "removal" actually
@@ -367,16 +366,8 @@ class AVLNode(common.SlottedObjectMixin):
         updates the information for this node.
 
         '''
-        if self.leftChild is not None:
-            leftHeight = self.leftChild.height
-        else:
-            leftHeight = -1
-
-        if self.rightChild is not None:
-            rightHeight = self.rightChild.height
-        else:
-            rightHeight = -1
-
+        leftHeight = self.leftChild.height if self.leftChild else -1
+        rightHeight = self.rightChild.height if self.rightChild else -1
         self.height = max(leftHeight, rightHeight) + 1
         self.balance = rightHeight - leftHeight
 
@@ -456,16 +447,18 @@ class AVLNode(common.SlottedObjectMixin):
         Returns the new central node.
         '''
         node = self
-        if node.balance > 1:
-            if node.rightChild.balance >= 0:
-                node = node.rotateRightRight()
+        if self.balance > 1:
+            if self.rightChild.balance >= 0:
+                node = self.rotateRightRight()
             else:
-                node = node.rotateRightLeft()
-        elif node.balance < -1:
-            if node.leftChild.balance <= 0:
-                node = node.rotateLeftLeft()
+                node = self.rotateRightLeft()
+        elif self.balance < -1:
+            if self.leftChild.balance <= 0:
+                node = self.rotateLeftLeft()
             else:
-                node = node.rotateLeftRight()
+                node = self.rotateLeftRight()
+
+        # node is either self or the new central node
         if node.balance < -1 or node.balance > 1:
             raise TreeException(
                 'Somehow Nodes are still not balanced. node.balance %r must be between -1 and 1')

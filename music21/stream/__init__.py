@@ -25,3 +25,26 @@ from music21.stream import iterator
 from music21.stream import makeNotation
 from music21.stream import streamStatus
 from music21.stream import tools
+
+__all__ = [
+    'Stream',
+    'Opus',
+    'Score',
+    'Part',
+    'PartStaff',
+    'Measure',
+    'Voice',
+    'SpannerStorage',
+    'VariantStorage',
+    'System',
+    'StreamType',
+    'core',
+    'enums',
+    'filters',
+    'iterator',
+    'makeNotation',
+    'streamStatus',
+    'tools',
+    'StreamException',
+    'ImmutableStreamException',
+]
