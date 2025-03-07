@@ -752,7 +752,7 @@ class Test(unittest.TestCase):
             s.insert(o, n)
             o = o + step
 
-        streamHierarchyToMidiTracks(s)[0]
+        streamHierarchyToMidiTracks(s)
 
         # s.plot('pianoroll')
         # s.show('midi')
@@ -774,7 +774,7 @@ class Test(unittest.TestCase):
         s.insert(pos, note.Note('e'))
         s.insert(pos, note.Note('b'))
 
-        streamHierarchyToMidiTracks(s)[0]
+        streamHierarchyToMidiTracks(s)
 
         # s.show('midi')
 

@@ -190,7 +190,7 @@ def getStartEvents(
     mt: MidiTrack|None = None,
     channel: int = 1,
     instrumentObj: instrument.Instrument|None = None,
-):
+) -> list[DeltaTime|MidiEvent]:
     '''
     Returns a list of midi.MidiEvent objects found at the beginning of a track.
 
@@ -207,7 +207,7 @@ def getStartEvents(
      <music21.midi.MidiEvent PROGRAM_CHANGE, track=None, channel=2, data=6>]
 
     '''
-    events = []
+    events: list[DeltaTime|MidiEvent] = []
     if isinstance(instrumentObj, Conductor):
         return events
     elif instrumentObj is None or instrumentObj.bestName() is None:
@@ -1815,8 +1815,6 @@ def getNotesFromEvents(
 def getMetaEvents(
     events: list[tuple[int, MidiEvent]]
 ) -> list[tuple[int, base.Music21Object]]:
-    from music21.midi import MetaEvents, ChannelVoiceMessages
-
     metaEvents: list[tuple[int, base.Music21Object]] = []  # store pairs of abs time, m21 object
     last_program: int = -1
     for eventTuple in events:
