@@ -44,326 +44,323 @@ environLocal = environment.Environment('midi.tests')
 
 
 class Test(unittest.TestCase):
+
     # ------------ originally in __init__.py, now base.py --------- #
 
-    # ------------------------------------------------------------------------------
+    def testWriteMThdStr(self):
+        '''
+        Convert bytes of Ascii midi data to binary midi bytes.
+        '''
+        mf = MidiFile()
+        trk = MidiTrack(0)
+        mf.format = 1
+        mf.tracks.append(trk)
+        mf.ticksPerQuarterNote = 960
 
-    class Test(unittest.TestCase):
+        midiBinStr = b''
+        midiBinStr = midiBinStr + mf.writeMThdStr()
 
-        def testWriteMThdStr(self):
-            '''
-            Convert bytes of Ascii midi data to binary midi bytes.
-            '''
-            mf = MidiFile()
-            trk = MidiTrack(0)
-            mf.format = 1
-            mf.tracks.append(trk)
-            mf.ticksPerQuarterNote = 960
+        self.assertEqual(midiBinStr, b'MThd' + a2b_hex(b'000000060001000103c0'))
 
-            midiBinStr = b''
-            midiBinStr = midiBinStr + mf.writeMThdStr()
+    def testBasicImport(self):
+        dirLib = common.getSourceFilePath() / 'midi' / 'testPrimitive'
+        fp = dirLib / 'test01.mid'
+        environLocal.printDebug([fp])
+        mf = MidiFile()
+        mf.open(fp)
+        mf.read()
+        mf.close()
 
-            self.assertEqual(midiBinStr, b'MThd' + a2b_hex(b'000000060001000103c0'))
+        self.assertEqual(len(mf.tracks), 2)
+        self.assertEqual(mf.ticksPerQuarterNote, 960)
+        self.assertEqual(mf.ticksPerSecond, None)
+        # self.assertEqual(mf.writestr(), None)
 
-        def testBasicImport(self):
-            dirLib = common.getSourceFilePath() / 'midi' / 'testPrimitive'
-            fp = dirLib / 'test01.mid'
-            environLocal.printDebug([fp])
-            mf = MidiFile()
-            mf.open(fp)
-            mf.read()
-            mf.close()
+        # try to write contents
+        fileLikeOpen = io.BytesIO()
+        mf.openFileLike(fileLikeOpen)
+        mf.write()
+        mf.close()
 
-            self.assertEqual(len(mf.tracks), 2)
-            self.assertEqual(mf.ticksPerQuarterNote, 960)
-            self.assertEqual(mf.ticksPerSecond, None)
-            # self.assertEqual(mf.writestr(), None)
+        # a simple file created in athenacl
+        fp = dirLib / 'test02.mid'
+        environLocal.printDebug([fp])
+        mf = MidiFile()
+        mf.open(fp)
+        mf.read()
+        mf.close()
 
-            # try to write contents
-            fileLikeOpen = io.BytesIO()
-            mf.openFileLike(fileLikeOpen)
-            mf.write()
-            mf.close()
+        self.assertEqual(len(mf.tracks), 5)
+        self.assertEqual(mf.ticksPerQuarterNote, 1024)
+        self.assertEqual(mf.ticksPerSecond, None)
 
-            # a simple file created in athenacl
-            fp = dirLib / 'test02.mid'
-            environLocal.printDebug([fp])
-            mf = MidiFile()
-            mf.open(fp)
-            mf.read()
-            mf.close()
+        # try to write contents
+        fileLikeOpen = io.BytesIO()
+        mf.openFileLike(fileLikeOpen)
+        mf.write()
+        mf.close()
 
-            self.assertEqual(len(mf.tracks), 5)
-            self.assertEqual(mf.ticksPerQuarterNote, 1024)
-            self.assertEqual(mf.ticksPerSecond, None)
+        # random files from the internet
+        fp = dirLib / 'test03.mid'
 
-            # try to write contents
-            fileLikeOpen = io.BytesIO()
-            mf.openFileLike(fileLikeOpen)
-            mf.write()
-            mf.close()
+        environLocal.printDebug([fp])
+        mf = MidiFile()
+        mf.open(fp)
+        mf.read()
+        mf.close()
 
-            # random files from the internet
-            fp = dirLib / 'test03.mid'
+        self.assertEqual(len(mf.tracks), 4)
+        self.assertEqual(mf.ticksPerQuarterNote, 1024)
+        self.assertEqual(mf.ticksPerSecond, None)
 
-            environLocal.printDebug([fp])
-            mf = MidiFile()
-            mf.open(fp)
-            mf.read()
-            mf.close()
+        # try to write contents
+        fileLikeOpen = io.BytesIO()
+        mf.openFileLike(fileLikeOpen)
+        mf.write()
+        mf.close()
 
-            self.assertEqual(len(mf.tracks), 4)
-            self.assertEqual(mf.ticksPerQuarterNote, 1024)
-            self.assertEqual(mf.ticksPerSecond, None)
+        # random files from the internet
+        fp = dirLib / 'test04.mid'
+        environLocal.printDebug([fp])
+        mf = MidiFile()
+        mf.open(fp)
+        mf.read()
+        mf.close()
 
-            # try to write contents
-            fileLikeOpen = io.BytesIO()
-            mf.openFileLike(fileLikeOpen)
-            mf.write()
-            mf.close()
+        self.assertEqual(len(mf.tracks), 18)
+        self.assertEqual(mf.ticksPerQuarterNote, 480)
+        self.assertEqual(mf.ticksPerSecond, None)
 
-            # random files from the internet
-            fp = dirLib / 'test04.mid'
-            environLocal.printDebug([fp])
-            mf = MidiFile()
-            mf.open(fp)
-            mf.read()
-            mf.close()
+        # try to write contents
+        fileLikeOpen = io.BytesIO()
+        mf.openFileLike(fileLikeOpen)
+        mf.write()
+        mf.close()
 
-            self.assertEqual(len(mf.tracks), 18)
-            self.assertEqual(mf.ticksPerQuarterNote, 480)
-            self.assertEqual(mf.ticksPerSecond, None)
+        # mf = MidiFile()
+        # mf.open(fp)
+        # mf.read()
+        # mf.close()
 
-            # try to write contents
-            fileLikeOpen = io.BytesIO()
-            mf.openFileLike(fileLikeOpen)
-            mf.write()
-            mf.close()
+    def testInternalDataModel(self):
+        dirLib = common.getSourceFilePath() / 'midi' / 'testPrimitive'
+        fp = dirLib / 'test01.mid'
+        # a simple file created in athenacl
+        environLocal.printDebug([fp])
+        mf = MidiFile()
+        mf.open(fp)
+        mf.read()
+        mf.close()
 
-            # mf = MidiFile()
-            # mf.open(fp)
-            # mf.read()
-            # mf.close()
+        track2 = mf.tracks[1]
+        # defines a channel object for each of 16 channels
+        # self.assertEqual(len(track2.channels), 16)
+        # length seems to be the size of midi data in this track
+        self.assertEqual(track2.length, 255)
 
-        def testInternalDataModel(self):
-            dirLib = common.getSourceFilePath() / 'midi' / 'testPrimitive'
-            fp = dirLib / 'test01.mid'
-            # a simple file created in athenacl
-            environLocal.printDebug([fp])
-            mf = MidiFile()
-            mf.open(fp)
-            mf.read()
-            mf.close()
+        # a list of events
+        self.assertEqual(len(track2.events), 116)
 
-            track2 = mf.tracks[1]
-            # defines a channel object for each of 16 channels
-            # self.assertEqual(len(track2.channels), 16)
-            # length seems to be the size of midi data in this track
-            self.assertEqual(track2.length, 255)
+        i = 0
+        while i < len(track2.events) - 1:
+            self.assertIsInstance(track2.events[i], DeltaTime)
+            self.assertIsInstance(track2.events[i + 1], MidiEvent)
 
-            # a list of events
-            self.assertEqual(len(track2.events), 116)
+            # environLocal.printDebug(['sample events: ', track2.events[i]])
+            # environLocal.printDebug(['sample events: ', track2.events[i + 1]])
+            i += 2
 
-            i = 0
-            while i < len(track2.events) - 1:
-                self.assertIsInstance(track2.events[i], DeltaTime)
-                self.assertIsInstance(track2.events[i + 1], MidiEvent)
+        # first object is delta time
+        # all objects are pairs of delta time, event
 
-                # environLocal.printDebug(['sample events: ', track2.events[i]])
-                # environLocal.printDebug(['sample events: ', track2.events[i + 1]])
-                i += 2
-
-            # first object is delta time
-            # all objects are pairs of delta time, event
-
-        def testBasicExport(self):
-            mt = MidiTrack(1)
-            # duration, pitch, velocity
-            data = [[1024, 60, 90],
-                    [1024, 50, 70],
-                    [1024, 51, 120],
-                    [1024, 62, 80]]
-            timeNow = 0
-            tLast = 0
-            for d, p, v in data:
-                dt = DeltaTime(mt)
-                dt.time = timeNow - tLast
-                # add to track events
-                mt.events.append(dt)
-
-                me = MidiEvent(mt)
-                me.type = ChannelVoiceMessages.NOTE_ON
-                me.channel = 1
-                me.pitch = p
-                me.velocity = v
-                mt.events.append(me)
-
-                # add note off / velocity zero message
-                dt = DeltaTime(mt)
-                dt.time = d
-                # add to track events
-                mt.events.append(dt)
-
-                me = MidiEvent(mt)
-                me.type = ChannelVoiceMessages.NOTE_ON
-                me.channel = 1
-                me.pitch = p
-                me.velocity = 0
-                mt.events.append(me)
-
-                tLast = timeNow + d  # have delta to note off
-                timeNow += d  # next time
-
-            # add end of track
+    def testBasicExport(self):
+        mt = MidiTrack(1)
+        # duration, pitch, velocity
+        data = [[1024, 60, 90],
+                [1024, 50, 70],
+                [1024, 51, 120],
+                [1024, 62, 80]]
+        timeNow = 0
+        tLast = 0
+        for d, p, v in data:
             dt = DeltaTime(mt)
+            dt.time = timeNow - tLast
+            # add to track events
             mt.events.append(dt)
 
             me = MidiEvent(mt)
-            me.type = MetaEvents.END_OF_TRACK
+            me.type = ChannelVoiceMessages.NOTE_ON
             me.channel = 1
-            me.data = b''  # must set data to empty bytes
+            me.pitch = p
+            me.velocity = v
             mt.events.append(me)
 
-            # for e in mt.events:
-            #     print(e)
-
-            mf = MidiFile()
-            mf.ticksPerQuarterNote = 1024  # cannot use: 10080
-            mf.tracks.append(mt)
-
-            fileLikeOpen = io.BytesIO()
-            # mf.open('/src/music21/music21/midi/out.mid', 'wb')
-            mf.openFileLike(fileLikeOpen)
-            mf.write()
-            mf.close()
-
-        def testSetPitchBend(self):
-            mt = MidiTrack(1)
-            me = MidiEvent(mt)
-            me.setPitchBend(0)
-            me.setPitchBend(200)  # 200 cents should be max range
-            me.setPitchBend(-200)  # 200 cents should be max range
-
-        def testWritePitchBendA(self):
-            mt = MidiTrack(1)
-
-            # (0 - 16383). The pitch value affects all playing notes on the current channel.
-            # Values below 8192 decrease the pitch, while values above 8192 increase the pitch.
-            # The pitch range may vary from instrument to instrument,
-            # but is usually +/-2 semi-tones.
-            # pbValues = [0, 5, 10, 15, 20, 25, 30, 35, 40, 50]
-            pbValues = [0, 25, 0, 50, 0, 100, 0, 150, 0, 200]
-            pbValues += [-x for x in pbValues]
-
-            # duration, pitch, velocity
-            data = [[1024, 60, 90]] * 20
-            timeNow = 0
-            tLast = 0
-            for i, e in enumerate(data):
-                d, p, v = e
-
-                dt = DeltaTime(mt)
-                dt.time = timeNow - tLast
-                # add to track events
-                mt.events.append(dt)
-
-                me = MidiEvent(mt, type=ChannelVoiceMessages.PITCH_BEND, channel=1)
-                # environLocal.printDebug(['creating event:', me, 'pbValues[i]', pbValues[i]])
-                me.setPitchBend(pbValues[i])  # set values in cents
-                mt.events.append(me)
-
-                dt = DeltaTime(mt)
-                dt.time = timeNow - tLast
-                # add to track events
-                mt.events.append(dt)
-
-                me = MidiEvent(mt, type=ChannelVoiceMessages.NOTE_ON, channel=1)
-                me.pitch = p
-                me.velocity = v
-                mt.events.append(me)
-
-                # add note off / velocity zero message
-                dt = DeltaTime(mt)
-                dt.time = d
-                # add to track events
-                mt.events.append(dt)
-
-                me = MidiEvent(mt, type=ChannelVoiceMessages.NOTE_ON, channel=1)
-                me.pitch = p
-                me.velocity = 0
-                mt.events.append(me)
-
-                tLast = timeNow + d  # have delta to note off
-                timeNow += d  # next time
-
-            # add end of track
+            # add note off / velocity zero message
             dt = DeltaTime(mt)
+            dt.time = d
+            # add to track events
             mt.events.append(dt)
 
             me = MidiEvent(mt)
-            me.type = MetaEvents.END_OF_TRACK
+            me.type = ChannelVoiceMessages.NOTE_ON
             me.channel = 1
-            me.data = b''  # must set data to empty bytes
+            me.pitch = p
+            me.velocity = 0
             mt.events.append(me)
 
-            # try setting different channels
-            mt.setChannel(3)
+            tLast = timeNow + d  # have delta to note off
+            timeNow += d  # next time
 
-            mf = MidiFile()
-            mf.ticksPerQuarterNote = 1024  # cannot use: 10080
-            mf.tracks.append(mt)
+        # add end of track
+        dt = DeltaTime(mt)
+        mt.events.append(dt)
 
-            fileLikeOpen = io.BytesIO()
-            # mf.open('/_scratch/test.mid', 'wb')
-            mf.openFileLike(fileLikeOpen)
-            mf.write()
-            mf.close()
+        me = MidiEvent(mt)
+        me.type = MetaEvents.END_OF_TRACK
+        me.channel = 1
+        me.data = b''  # must set data to empty bytes
+        mt.events.append(me)
 
-        def testImportWithRunningStatus(self):
-            dirLib = common.getSourceFilePath() / 'midi' / 'testPrimitive'
-            fp = dirLib / 'test09.mid'
-            # a simple file created in athenacl
-            # dealing with midi files that use running status compression
-            s = converter.parse(fp)
-            self.assertEqual(len(s.parts), 2)
-            self.assertEqual(len(s.parts[0].recurse().notes), 704)
-            self.assertEqual(len(s.parts[1].recurse().notes), 856)
+        # for e in mt.events:
+        #     print(e)
 
-            # for n in s.parts[0].notes:
-            #    print(n, n.quarterLength)
-            # s.show()
+        mf = MidiFile()
+        mf.ticksPerQuarterNote = 1024  # cannot use: 10080
+        mf.tracks.append(mt)
 
-        def testReadPolyphonicKeyPressure(self):
-            mt = MidiTrack()
-            # Example string from MidiTrack doctest
-            mt.read(b'MTrk\x00\x00\x00\x16\x00\xff\x03\x00\x00'
-                    + b'\xe0\x00@\x00\x90CZ\x88\x00\x80C\x00\x88\x00\xff/\x00')
+        fileLikeOpen = io.BytesIO()
+        # mf.open('/src/music21/music21/midi/out.mid', 'wb')
+        mf.openFileLike(fileLikeOpen)
+        mf.write()
+        mf.close()
 
-            pressure = MidiEvent()
-            pressure.type = ChannelVoiceMessages.POLYPHONIC_KEY_PRESSURE
-            pressure.channel = 1
-            pressure.parameter1 = 60
-            pressure.parameter2 = 90
-            mt.events.insert(len(mt.events) - 2, mt.events[-2])  # copy DeltaTime event
-            mt.events.insert(len(mt.events) - 2, pressure)
+    def testSetPitchBend(self):
+        mt = MidiTrack(1)
+        me = MidiEvent(mt)
+        me.setPitchBend(0)
+        me.setPitchBend(200)  # 200 cents should be max range
+        me.setPitchBend(-200)  # 200 cents should be max range
 
-            writingFile = MidiFile()
-            writingFile.tracks = [mt]
-            byteStr = writingFile.writestr()
-            readingFile = MidiFile()
-            readingFile.readstr(byteStr)
+    def testWritePitchBendA(self):
+        mt = MidiTrack(1)
 
-            pressureEventRead = [e for e in readingFile.tracks[0].events
-                                 if e.type == ChannelVoiceMessages.POLYPHONIC_KEY_PRESSURE][0]
-            self.assertEqual(pressureEventRead.parameter1, 60)
-            self.assertEqual(pressureEventRead.parameter2, 90)
+        # (0 - 16383). The pitch value affects all playing notes on the current channel.
+        # Values below 8192 decrease the pitch, while values above 8192 increase the pitch.
+        # The pitch range may vary from instrument to instrument,
+        # but is usually +/-2 semi-tones.
+        # pbValues = [0, 5, 10, 15, 20, 25, 30, 35, 40, 50]
+        pbValues = [0, 25, 0, 50, 0, 100, 0, 150, 0, 200]
+        pbValues += [-x for x in pbValues]
 
-        def testReadUnknownMetaMessage(self):
-            mt = MidiTrack()
-            mt.processDataToEvents(b'\x00\xff\x08\x06DUMMY\x00\x00\xff\n\x05Myut\x00'
-                                   + b'\x00\xffX\x04\x03\x01\x12\x01')
-            self.assertEqual(len(mt.events), 6)
-            self.assertEqual(mt.events[3].type, MetaEvents.UNKNOWN)
+        # duration, pitch, velocity
+        data = [[1024, 60, 90]] * 20
+        timeNow = 0
+        tLast = 0
+        for i, e in enumerate(data):
+            d, p, v = e
+
+            dt = DeltaTime(mt)
+            dt.time = timeNow - tLast
+            # add to track events
+            mt.events.append(dt)
+
+            me = MidiEvent(mt, type=ChannelVoiceMessages.PITCH_BEND, channel=1)
+            # environLocal.printDebug(['creating event:', me, 'pbValues[i]', pbValues[i]])
+            me.setPitchBend(pbValues[i])  # set values in cents
+            mt.events.append(me)
+
+            dt = DeltaTime(mt)
+            dt.time = timeNow - tLast
+            # add to track events
+            mt.events.append(dt)
+
+            me = MidiEvent(mt, type=ChannelVoiceMessages.NOTE_ON, channel=1)
+            me.pitch = p
+            me.velocity = v
+            mt.events.append(me)
+
+            # add note off / velocity zero message
+            dt = DeltaTime(mt)
+            dt.time = d
+            # add to track events
+            mt.events.append(dt)
+
+            me = MidiEvent(mt, type=ChannelVoiceMessages.NOTE_ON, channel=1)
+            me.pitch = p
+            me.velocity = 0
+            mt.events.append(me)
+
+            tLast = timeNow + d  # have delta to note off
+            timeNow += d  # next time
+
+        # add end of track
+        dt = DeltaTime(mt)
+        mt.events.append(dt)
+
+        me = MidiEvent(mt)
+        me.type = MetaEvents.END_OF_TRACK
+        me.channel = 1
+        me.data = b''  # must set data to empty bytes
+        mt.events.append(me)
+
+        # try setting different channels
+        mt.setChannel(3)
+
+        mf = MidiFile()
+        mf.ticksPerQuarterNote = 1024  # cannot use: 10080
+        mf.tracks.append(mt)
+
+        fileLikeOpen = io.BytesIO()
+        # mf.open('/_scratch/test.mid', 'wb')
+        mf.openFileLike(fileLikeOpen)
+        mf.write()
+        mf.close()
+
+    def testImportWithRunningStatus(self):
+        dirLib = common.getSourceFilePath() / 'midi' / 'testPrimitive'
+        fp = dirLib / 'test09.mid'
+        # a simple file created in athenacl
+        # dealing with midi files that use running status compression
+        s = converter.parse(fp)
+        self.assertEqual(len(s.parts), 2)
+        self.assertEqual(len(s.parts[0].recurse().notes), 704)
+        self.assertEqual(len(s.parts[1].recurse().notes), 856)
+
+        # for n in s.parts[0].notes:
+        #    print(n, n.quarterLength)
+        # s.show()
+
+    def testReadPolyphonicKeyPressure(self):
+        mt = MidiTrack()
+        # Example string from MidiTrack doctest
+        mt.read(b'MTrk\x00\x00\x00\x16\x00\xff\x03\x00\x00'
+                + b'\xe0\x00@\x00\x90CZ\x88\x00\x80C\x00\x88\x00\xff/\x00')
+
+        pressure = MidiEvent()
+        pressure.type = ChannelVoiceMessages.POLYPHONIC_KEY_PRESSURE
+        pressure.channel = 1
+        pressure.parameter1 = 60
+        pressure.parameter2 = 90
+        mt.events.insert(len(mt.events) - 2, mt.events[-2])  # copy DeltaTime event
+        mt.events.insert(len(mt.events) - 2, pressure)
+
+        writingFile = MidiFile()
+        writingFile.tracks = [mt]
+        byteStr = writingFile.writestr()
+        readingFile = MidiFile()
+        readingFile.readstr(byteStr)
+
+        pressureEventRead = [e for e in readingFile.tracks[0].events
+                             if e.type == ChannelVoiceMessages.POLYPHONIC_KEY_PRESSURE][0]
+        self.assertEqual(pressureEventRead.parameter1, 60)
+        self.assertEqual(pressureEventRead.parameter2, 90)
+
+    def testReadUnknownMetaMessage(self):
+        mt = MidiTrack()
+        mt.processDataToEvents(b'\x00\xff\x08\x06DUMMY\x00\x00\xff\n\x05Myut\x00'
+                               + b'\x00\xffX\x04\x03\x01\x12\x01')
+        self.assertEqual(len(mt.events), 6)
+        self.assertEqual(mt.events[3].type, MetaEvents.UNKNOWN)
 
     # ------------ originally in translate.py --------------------- #
 
