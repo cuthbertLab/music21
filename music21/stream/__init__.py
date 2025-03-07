@@ -48,3 +48,4 @@ __all__ = [
     'StreamException',
     'ImmutableStreamException',
 ]
+

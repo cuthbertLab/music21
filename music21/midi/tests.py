@@ -677,7 +677,7 @@ class Test(unittest.TestCase):
         s.insert(0, p2)
         s.insert(0, p3)
 
-        _unused_mts = streamHierarchyToMidiTracks(s)
+        streamHierarchyToMidiTracks(s)
         # p1.show()
         # s.show('midi')
 
@@ -703,7 +703,7 @@ class Test(unittest.TestCase):
             s.append(inst)
             s.append(n)
 
-        _unused_mts = streamHierarchyToMidiTracks(s)
+        streamHierarchyToMidiTracks(s)
 
         # s.show('midi')
 
@@ -752,7 +752,7 @@ class Test(unittest.TestCase):
             s.insert(o, n)
             o = o + step
 
-        _unused_mt = streamHierarchyToMidiTracks(s)[0]
+        streamHierarchyToMidiTracks(s)[0]
 
         # s.plot('pianoroll')
         # s.show('midi')
@@ -774,7 +774,7 @@ class Test(unittest.TestCase):
         s.insert(pos, note.Note('e'))
         s.insert(pos, note.Note('b'))
 
-        _unused_mt = streamHierarchyToMidiTracks(s)[0]
+        streamHierarchyToMidiTracks(s)[0]
 
         # s.show('midi')
 
@@ -802,7 +802,7 @@ class Test(unittest.TestCase):
             s.append(inst)
             s.append(n)
 
-        _unused_mts = streamHierarchyToMidiTracks(s)
+        streamHierarchyToMidiTracks(s)
         # s.show('midi')
 
     def testMicrotonalOutputA(self):
@@ -816,7 +816,7 @@ class Test(unittest.TestCase):
         # mts = streamHierarchyToMidiTracks(s)
 
         s.insert(0, note.Note('g3', quarterLength=10))
-        _unused_mts = streamHierarchyToMidiTracks(s)
+        streamHierarchyToMidiTracks(s)
 
     def testMicrotonalOutputB(self):
         p1 = stream.Part()
