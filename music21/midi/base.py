@@ -69,7 +69,7 @@ def charToBinary(char: str):
     Convert a char into its binary representation. Useful for debugging.
 
     >>> #_DOCS_SHOW midi.charToBinary('a')
-    >>> f'{int(bin(ord('a'))[2:]):08d}'  #_DOCS_HIDE
+    >>> f'{int(bin(ord("a"))[2:]):08d}'  #_DOCS_HIDE
     '01100001'
 
     Note: This function is deprecated and will be removed in v10.  Music21 actually
