@@ -87,6 +87,9 @@ class StreamPlayer:  # pragma: no cover
             # noinspection PyPackageRequirements
             import pygame  # type: ignore
             self.pygame = pygame
+            # noinspection PyPackageRequirements
+            import pygame.exceptions    # type: ignore
+            self.pygame_exceptions = pygame.exceptions  # type: ignore  # pylint: disable=no-member
         except ImportError:
             raise StreamPlayerException('StreamPlayer requires pygame.  Install first')
         if self.mixerInitialized is False or reinitMixer:
@@ -149,9 +152,11 @@ class StreamPlayer:  # pragma: no cover
         pygameClock = self.pygame.time.Clock()
         try:
             self.pygame.mixer.music.load(stringIOFile)
-        except self.pygame.error:
+        except self.pygame_exceptions.PygameError as pge:
             raise StreamPlayerException(
-                f'Could not play music file {stringIOFile} because: {self.pygame.get_error()}')
+                f'Could not play music file {stringIOFile} because: '
+                + f'{self.pygame_exceptions.get_error()}'
+            ) from pge
         self.pygame.mixer.music.play()
         if not blocked:
             return
