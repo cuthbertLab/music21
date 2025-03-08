@@ -40,7 +40,7 @@ from music21 import tempo
 
 from music21.midi.base import (
     MidiTrack, DeltaTime, MidiFile, MidiEvent,
-    ChannelVoiceMessages, MetaEvents, getNumbersAsList, putNumbersAsList, getNumber, putNumber,
+    ChannelVoiceMessages, MetaEvents, putNumbersAsList, getNumber, putNumber,
 )
 from music21.midi.percussion import MIDIPercussionException, PercussionMapper
 
@@ -187,25 +187,35 @@ def ticksToDuration(ticks,
 
 
 def getStartEvents(
-    mt: MidiTrack|None = None,
+    midiTrack: MidiTrack|None = None,
     channel: int = 1,
     instrumentObj: instrument.Instrument|None = None,
+    *,
+    encoding_type: str = 'utf-8',
 ) -> list[DeltaTime|MidiEvent]:
     '''
     Returns a list of midi.MidiEvent objects found at the beginning of a track.
 
     A MidiTrack reference can be provided via the `mt` parameter.
 
-    >>> midi.translate.getStartEvents()
-    [<music21.midi.DeltaTime (empty) track=None, channel=1>,
-     <music21.midi.MidiEvent SEQUENCE_TRACK_NAME, track=None, channel=1, data=b''>]
+    >>> startEvents = midi.translate.getStartEvents()
+    >>> startEvents
+    [<music21.midi.DeltaTime (empty) track=None>,
+     <music21.midi.MidiEvent SEQUENCE_TRACK_NAME, track=None, data=b''>]
 
-    >>> midi.translate.getStartEvents(channel=2, instrumentObj=instrument.Harpsichord())
-    [<music21.midi.DeltaTime (empty) track=None, channel=2>,
-     <music21.midi.MidiEvent SEQUENCE_TRACK_NAME, track=None, channel=2, data=b'Harpsichord'>,
-     <music21.midi.DeltaTime (empty) track=None, channel=2>,
-     <music21.midi.MidiEvent PROGRAM_CHANGE, track=None, channel=2, data=6>]
+    (Music21 DeltaTime events get assigned to the given channel, but this is not written out)
 
+    >>> startEvents[0].channel
+    1
+
+    >>> mt = midi.MidiTrack(3)
+    >>> midi.translate.getStartEvents(mt, channel=2, instrumentObj=instrument.Harpsichord())
+    [<music21.midi.DeltaTime (empty) track=3>,
+     <music21.midi.MidiEvent SEQUENCE_TRACK_NAME, track=3, data=b'Harpsichord'>,
+     <music21.midi.DeltaTime (empty) track=3>,
+     <music21.midi.MidiEvent PROGRAM_CHANGE, track=3, channel=2, data=6>]
+
+    Bug fixed in v9.6 -- the program change and delta time are written to the given track.
     '''
     events: list[DeltaTime|MidiEvent] = []
     if isinstance(instrumentObj, Conductor):
@@ -215,12 +225,12 @@ def getStartEvents(
     else:
         partName = instrumentObj.bestName()
 
-    dt = DeltaTime(mt, channel=channel)
+    dt = DeltaTime(midiTrack, channel=channel)
     events.append(dt)
 
-    me = MidiEvent(mt, channel=channel)
+    me = MidiEvent(midiTrack, channel=channel)
     me.type = MetaEvents.SEQUENCE_TRACK_NAME
-    me.data = partName
+    me.data = partName.encode(encoding_type, 'ignore')
     events.append(me)
 
     # additional allocation of instruments may happen elsewhere
@@ -228,31 +238,41 @@ def getStartEvents(
     # however, this assures that the program change happens before
     # the clearing of the pitch bend data
     if instrumentObj is not None and instrumentObj.midiProgram is not None:
-        sub = instrumentToMidiEvents(instrumentObj, includeDeltaTime=True,
+        sub = instrumentToMidiEvents(instrumentObj,
+                                     includeDeltaTime=True,
+                                     midiTrack=midiTrack,
                                      channel=channel)
         events += sub
 
     return events
 
 
-def getEndEvents(mt=None, channel=1):
+def getEndEvents(
+    midiTrack: MidiTrack|None = None,
+    channel: int = 1
+) -> list[MidiEvent|DeltaTime]:
     '''
     Returns a list of midi.MidiEvent objects found at the end of a track.
 
-    >>> midi.translate.getEndEvents(channel=2)
-    [<music21.midi.DeltaTime t=10080, track=None, channel=2>,
-     <music21.midi.MidiEvent END_OF_TRACK, track=None, channel=2, data=b''>]
-    '''
-    events = []
+    Note that the channel is basically ignored as no end events are channel
+    specific.  (Attribute will be removed in v10)
 
-    dt = DeltaTime(track=mt, channel=channel)
+    >>> midi.translate.getEndEvents()
+    [<music21.midi.DeltaTime t=10080, track=None>,
+     <music21.midi.MidiEvent END_OF_TRACK, track=None, data=b''>]
+    '''
+    events: list[MidiEvent|DeltaTime] = []
+
+    dt = DeltaTime(track=midiTrack, channel=channel)
     dt.time = defaults.ticksAtStart
     events.append(dt)
 
-    me = MidiEvent(track=mt)
-    me.type = MetaEvents.END_OF_TRACK
-    me.channel = channel
-    me.data = ''  # must set data to empty string
+    me = MidiEvent(
+        track=midiTrack,
+        type=MetaEvents.END_OF_TRACK,
+        channel=channel,
+    )
+    me.data = b''  # must set data to empty bytes
     events.append(me)
 
     return events
@@ -262,7 +282,7 @@ def getEndEvents(mt=None, channel=1):
 
 
 def music21ObjectToMidiFile(
-    music21Object,
+    music21Object: base.Music21Object,
     *,
     addStartDelay=False,
 ) -> MidiFile:
@@ -272,12 +292,12 @@ def music21ObjectToMidiFile(
     not to change activeSites, etc.) and calls streamToMidiFile on
     that object.
     '''
-    classes = music21Object.classes
-    if 'Stream' in classes:
+    if isinstance(music21Object, stream.Stream):
         if music21Object.atSoundingPitch is False:
             music21Object = music21Object.toSoundingPitch()
 
-        return streamToMidiFile(music21Object, addStartDelay=addStartDelay)
+        return streamToMidiFile(t.cast(stream.Stream, music21Object),
+                                addStartDelay=addStartDelay)
     else:
         m21ObjectCopy = copy.deepcopy(music21Object)
         s: stream.Stream = stream.Stream()
@@ -455,17 +475,17 @@ def noteToMidiEvents(
     >>> n1 = note.Note('C#4')
     >>> eventList = midi.translate.noteToMidiEvents(n1)
     >>> eventList
-    [<music21.midi.DeltaTime (empty) track=None, channel=1>,
+    [<music21.midi.DeltaTime (empty) track=None>,
      <music21.midi.MidiEvent NOTE_ON, track=None, channel=1, pitch=61, velocity=90>,
-     <music21.midi.DeltaTime t=10080, track=None, channel=1>,
+     <music21.midi.DeltaTime t=10080, track=None>,
      <music21.midi.MidiEvent NOTE_OFF, track=None, channel=1, pitch=61, velocity=0>]
 
     >>> n1.duration.quarterLength = 2.5
     >>> eventList = midi.translate.noteToMidiEvents(n1)
     >>> eventList
-    [<music21.midi.DeltaTime (empty) track=None, channel=1>,
+    [<music21.midi.DeltaTime (empty) track=None>,
      <music21.midi.MidiEvent NOTE_ON, track=None, channel=1, pitch=61, velocity=90>,
-     <music21.midi.DeltaTime t=25200, track=None, channel=1>,
+     <music21.midi.DeltaTime t=25200, track=None>,
      <music21.midi.MidiEvent NOTE_OFF, track=None, channel=1, pitch=61, velocity=0>]
 
     Omitting DeltaTimes:
@@ -686,17 +706,17 @@ def chordToMidiEvents(
     >>> c.volume.velocityIsRelative = False
     >>> eventList = midi.translate.chordToMidiEvents(c)
     >>> eventList
-    [<music21.midi.DeltaTime (empty) track=None, channel=None>,
+    [<music21.midi.DeltaTime (empty) track=None>,
      <music21.midi.MidiEvent NOTE_ON, track=None, channel=1, pitch=48, velocity=90>,
-     <music21.midi.DeltaTime (empty) track=None, channel=None>,
+     <music21.midi.DeltaTime (empty) track=None>,
      <music21.midi.MidiEvent NOTE_ON, track=None, channel=1, pitch=68, velocity=90>,
-     <music21.midi.DeltaTime (empty) track=None, channel=None>,
+     <music21.midi.DeltaTime (empty) track=None>,
      <music21.midi.MidiEvent NOTE_ON, track=None, channel=1, pitch=83, velocity=90>,
-     <music21.midi.DeltaTime t=10080, track=None, channel=None>,
+     <music21.midi.DeltaTime t=10080, track=None>,
      <music21.midi.MidiEvent NOTE_OFF, track=None, channel=1, pitch=48, velocity=0>,
-     <music21.midi.DeltaTime (empty) track=None, channel=None>,
+     <music21.midi.DeltaTime (empty) track=None>,
      <music21.midi.MidiEvent NOTE_OFF, track=None, channel=1, pitch=68, velocity=0>,
-     <music21.midi.DeltaTime (empty) track=None, channel=None>,
+     <music21.midi.DeltaTime (empty) track=None>,
      <music21.midi.MidiEvent NOTE_OFF, track=None, channel=1, pitch=83, velocity=0>]
 
     * Changed in v7: made keyword-only.
@@ -867,14 +887,17 @@ def midiEventsToInstrument(
             decoded = event.data.decode('utf-8').split('\x00')[0]
             decoded = decoded.strip()
             i = instrument.fromString(decoded)
-        elif event.channel == 10:
+        elif event.channel == 10 and isinstance(event.data, int):
             # Can only get correct instruments from reading NOTE_ON
             i = instrument.UnpitchedPercussion()
             i.midiProgram = event.data
-        else:
+        elif isinstance(event.data, int):
             i = instrument.instrumentFromMidiProgram(event.data)
             # Instrument.midiProgram and event.data are both 0-indexed
             i.midiProgram = event.data
+        else:
+            raise instrument.InstrumentException(f'Could not get an instrument from {event}')
+
     except UnicodeDecodeError:
         warnings.warn(
             f'Unable to determine instrument from {event}; getting generic Instrument',
@@ -952,7 +975,7 @@ def midiEventsToTimeSignature(eventList):
         event = eventList[1]
 
     # time signature is 4 byte encoding
-    post = getNumbersAsList(event.data)
+    post = list(event.data)
 
     n = post[0]
     d = pow(2, post[1])
@@ -971,9 +994,9 @@ def timeSignatureToMidiEvents(ts, includeDeltaTime=True):
     >>> ts = meter.TimeSignature('5/4')
     >>> eventList = midi.translate.timeSignatureToMidiEvents(ts)
     >>> eventList[0]
-    <music21.midi.DeltaTime (empty) track=None, channel=None>
+    <music21.midi.DeltaTime (empty) track=None>
     >>> eventList[1]
-    <music21.midi.MidiEvent TIME_SIGNATURE, track=None, channel=1, data=b'\\x05\\x02\\x18\\x08'>
+    <music21.midi.MidiEvent TIME_SIGNATURE, track=None, data=b'\\x05\\x02\\x18\\x08'>
     '''
     mt = None  # use a midi track set to None
     eventList = []
@@ -1018,7 +1041,7 @@ def midiEventsToKey(eventList) -> key.Key:
     >>> me2.data = midi.putNumbersAsList([-2, 1])  # g minor
     >>> me2.data
     b'\xfe\x01'
-    >>> midi.getNumbersAsList(me2.data)
+    >>> list(me2.data)
     [254, 1]
     >>> ks = midi.translate.midiEventsToKey(me2)
     >>> ks
@@ -1037,7 +1060,7 @@ def midiEventsToKey(eventList) -> key.Key:
         event = eventList
     else:  # get the second event; first is delta time
         event = eventList[1]
-    post = getNumbersAsList(event.data)
+    post = list(event.data)
 
     # first value is number of sharp, or neg for number of flat
     if post[0] > 12:
@@ -1074,15 +1097,23 @@ def keySignatureToMidiEvents(
     <music21.key.KeySignature of 2 sharps>
     >>> eventList = midi.translate.keySignatureToMidiEvents(ks)
     >>> eventList
-    [<music21.midi.DeltaTime (empty) track=None, channel=None>,
-     <music21.midi.MidiEvent KEY_SIGNATURE, track=None, channel=1, data=b'\x02\x00'>]
+    [<music21.midi.DeltaTime (empty) track=None>,
+     <music21.midi.MidiEvent KEY_SIGNATURE, track=None, data=b'\x02\x00'>]
+
+    Note that MIDI Key Signatures are connected to tracks but not to channels.
+
+    MIDI Key Signatures store sharps or flats as the first number, and mode (0 = major
+    1 = minor) as the second number.
+
+    Flats are encoded as offsets at 0xff (=1 flat) or below (0xfe = 2 flats ... etc.,
+    through 0xfb = 5 flats, below).
 
     >>> k = key.Key('b-')
     >>> k
     <music21.key.Key of b- minor>
     >>> eventList = midi.translate.keySignatureToMidiEvents(k, includeDeltaTime=False)
     >>> eventList
-    [<music21.midi.MidiEvent KEY_SIGNATURE, track=None, channel=1, data=b'\xfb\x01'>]
+    [<music21.midi.MidiEvent KEY_SIGNATURE, track=None, data=b'\xfb\x01'>]
     '''
     mt = None  # use a midi track set to None
     eventList: list[DeltaTime|MidiEvent] = []
@@ -1091,14 +1122,22 @@ def keySignatureToMidiEvents(
         # leave dt.time set to zero; will be shifted later as necessary
         # add to track events
         eventList.append(dt)
+
+    # negative = flats.
     sharpCount = ks.sharps
+
     if isinstance(ks, key.Key) and ks.mode == 'minor':
         mode = 1
     else:  # major or None; must define one
         mode = 0
-    me = MidiEvent(track=mt)
-    me.type = MetaEvents.KEY_SIGNATURE
-    me.channel = 1
+
+    me = MidiEvent(
+        track=mt,
+        type=MetaEvents.KEY_SIGNATURE,
+    )
+
+    # this is, as far as I'm aware, the one place where we use the
+    # negative number aspect of putNumbersAsList.
     me.data = putNumbersAsList([sharpCount, mode])
     eventList.append(me)
     return eventList
@@ -1117,7 +1156,7 @@ def midiEventsToTempo(eventList):
     # get microseconds per quarter
     mspq = getNumber(event.data, 3)[0]  # first data is number
     bpm = round(60_000_000 / mspq, 2)
-    # post = getNumbersAsList(event.data)
+    # post = list(event.data)
     # environLocal.printDebug(['midiEventsToTempo, got bpm', bpm])
     mm = tempo.MetronomeMark(number=bpm)
     return mm
@@ -1140,11 +1179,11 @@ def tempoToMidiEvents(
     2
 
     >>> events[0]
-    <music21.midi.DeltaTime (empty) track=None, channel=None>
+    <music21.midi.DeltaTime (empty) track=None>
 
     >>> evt1 = events[1]
     >>> evt1
-    <music21.midi.MidiEvent SET_TEMPO, track=None, channel=1, data=b'\n,+'>
+    <music21.midi.MidiEvent SET_TEMPO, track=None, data=b'\n,+'>
     >>> evt1.data
     b'\n,+'
     >>> microSecondsPerQuarterNote = midi.getNumber(evt1.data, len(evt1.data))[0]
@@ -1453,8 +1492,8 @@ def assignPacketsToChannels(
                 if p['centShift']:
                     # do not set channel, as already set
                     me = MidiEvent(p['midiEvent'].track,
-                                              type=ChannelVoiceMessages.PITCH_BEND,
-                                              channel=p['midiEvent'].channel)
+                                   type=ChannelVoiceMessages.PITCH_BEND,
+                                   channel=p['midiEvent'].channel)
                     # note off stores a note on for each pitch; do not invert, simply
                     # set to zero
                     me.setPitchBend(0)
@@ -1551,8 +1590,8 @@ def assignPacketsToChannels(
         if centShift:
             # add pitch bend
             me = MidiEvent(p['midiEvent'].track,
-                                      type=ChannelVoiceMessages.PITCH_BEND,
-                                      channel=ch)
+                           type=ChannelVoiceMessages.PITCH_BEND,
+                           channel=ch)
             me.setPitchBend(centShift)
             pBendStart = getPacketFromMidiEvent(
                 trackId=p['trackId'],
@@ -1599,8 +1638,8 @@ def assignPacketsToChannels(
         ch = initTrackIdToChannelMap[trackId]
         # use None for track; will get updated later
         me = MidiEvent(track=trackId,
-                                  type=ChannelVoiceMessages.PITCH_BEND,
-                                  channel=ch)
+                       type=ChannelVoiceMessages.PITCH_BEND,
+                       channel=ch)
         me.setPitchBend(0)
         pBendEnd = getPacketFromMidiEvent(
             trackId=trackId,
@@ -1834,10 +1873,10 @@ def getMetaEvents(
             if last_program != -1:
                 # Only update if we have had an initial PROGRAM_CHANGE
                 metaObj.midiProgram = last_program
-        elif e.type == ChannelVoiceMessages.PROGRAM_CHANGE:
+        elif e.type == ChannelVoiceMessages.PROGRAM_CHANGE and isinstance(e.parameter1, int):
             # midiEventsToInstrument() WILL set the program on the instance
             metaObj = midiEventsToInstrument(e)
-            last_program = e.data
+            last_program = e.parameter1
         elif e.type == MetaEvents.MIDI_PORT:
             pass
         else:
@@ -2386,7 +2425,7 @@ def packetStorageFromSubstreamList(
          'rawPackets': [{'centShift': None,
                          'duration': 0,
                          'lastInstrument': <music21.instrument.Conductor 'Conductor'>,
-                         'midiEvent': <music21.midi.MidiEvent SET_TEMPO, ... channel=1, ...>,
+                         'midiEvent': <music21.midi.MidiEvent SET_TEMPO, ...>,
                          'obj': <music21.tempo.MetronomeMark Quarter=100>,
                          'offset': 0,
                          'trackId': 0},
