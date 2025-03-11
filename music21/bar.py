@@ -129,6 +129,8 @@ class Barline(base.Music21Object):
     classSortOrder = -5
 
     equalityAttributes = ('type', 'pause', 'location')
+    
+    numberedEnding = None
 
     def __init__(self,
                  type=None,  # pylint: disable=redefined-builtin
@@ -156,6 +158,9 @@ class Barline(base.Music21Object):
 
     def _setType(self, value):
         self._type = standardizeBarType(value)
+
+    def setNumberedEnding(self, value):
+        self.numberedEnding = value
 
     type = property(_getType, _setType,
         doc='''
