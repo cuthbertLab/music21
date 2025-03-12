@@ -3434,8 +3434,8 @@ class MeasureExporter(XMLExporterBase):
         '''
         return two lists or empty tuples:
         (1) spanners related to the object that should appear before the object
-        to the <measure> tag. (2) spanners related to the object that should appear after the
-        object in the measure tag.
+        in the <measure> tag. (2) spanners related to the object that should appear after the
+        object in the <measure> tag.
         '''
         def getProc(su, innerTarget):
             if len(su) == 1:  # have a one element wedge
@@ -3465,8 +3465,9 @@ class MeasureExporter(XMLExporterBase):
                      # TODO: attrGroup: dashed-formatting, print-style
                      'DynamicWedge': ('wedge', ('spread',)),
                      # TODO: niente, attrGroups: line-type, dashed-formatting, position, color
-                     'Line': ('bracket', ('line-end', 'end-length'))
+                     'Line': ('bracket', ('line-end', 'end-length')),
                      # TODO: dashes???
+                     'PedalMark': ('pedal', ('line', 'sign', 'abbreviated'))
                      }
 
         for m21spannerClass, infoTuple in paramsSet.items():
@@ -3513,7 +3514,7 @@ class MeasureExporter(XMLExporterBase):
         return preList, postList
 
     @staticmethod
-    def _spannerStartParameters(spannerClass, sp):
+    def _spannerStartParameters(spannerClass: str, sp: spanner.Spanner) -> dict[str, t.Any]:
         '''
         Return a dict of the parameters for the start of this spanner required by MusicXML output.
 
@@ -3545,14 +3546,20 @@ class MeasureExporter(XMLExporterBase):
         >>> st['spread']
         15
         '''
-        post = {'type': 'start'}
+        post: dict[str, t.Any] = {'type': 'start'}
         if spannerClass == 'Ottava':
+            if t.TYPE_CHECKING:
+                assert isinstance(sp, spanner.Ottava)
             post['size'] = sp.shiftMagnitude()
             post['type'] = sp.shiftDirection(reverse=True)  # up or down
         elif spannerClass == 'Line':
+            if t.TYPE_CHECKING:
+                assert isinstance(sp, spanner.Line)
             post['line-end'] = sp.startTick
             post['end-length'] = sp.startHeight
         elif spannerClass == 'DynamicWedge':
+            if t.TYPE_CHECKING:
+                assert isinstance(sp, dynamics.DynamicWedge)
             post['type'] = sp.type
             if sp.type == 'crescendo':
                 post['spread'] = 0
@@ -3560,11 +3567,28 @@ class MeasureExporter(XMLExporterBase):
                     post['niente'] = 'yes'
             else:
                 post['spread'] = sp.spread
-
+        elif spannerClass == 'PedalMark':
+            if t.TYPE_CHECKING:
+                assert isinstance(sp, expressions.PedalMark)
+            if sp.pedalType == 'sostenuto':
+                post['type'] = 'sostenuto'
+            else:
+                # non-'sostenuto' sp.pedalType might be 'sustain', 'soft', or 'silent'.
+                # But MusicXML only has 'start', which implies 'sustain',
+                # so that's what we do here, assuming there is a text
+                # direction describing which pedal to use.
+                post['type'] = 'start'
+            if sp.pedalForm == 'line':
+                post['line'] = 'yes'
+            else:
+                # 'symbol', 'altsymbol', and 'symline' all start with a sign
+                post['sign'] = 'yes'
+            if sp.abbreviated:
+                post['abbreviated'] = 'yes'
         return post
 
     @staticmethod
-    def _spannerEndParameters(spannerClass, sp):
+    def _spannerEndParameters(spannerClass: str, sp: spanner.Spanner) -> dict[str, t.Any]:
         '''
         Return a dict of the parameters for the end of this spanner required by MusicXML output.
 
@@ -3575,19 +3599,33 @@ class MeasureExporter(XMLExporterBase):
         >>> en['size']
         8
         '''
-        post = {'type': 'stop'}
+        post: dict[str, t.Any] = {'type': 'stop'}
         if spannerClass == 'Ottava':
+            if t.TYPE_CHECKING:
+                assert isinstance(sp, spanner.Ottava)
             post['size'] = sp.shiftMagnitude()
         elif spannerClass == 'Line':
+            if t.TYPE_CHECKING:
+                assert isinstance(sp, spanner.Line)
             post['line-end'] = sp.endTick
             post['end-length'] = sp.endHeight
         elif spannerClass == 'DynamicWedge':
+            if t.TYPE_CHECKING:
+                assert isinstance(sp, dynamics.DynamicWedge)
             if sp.type == 'crescendo':
                 post['spread'] = sp.spread
             else:
                 post['spread'] = 0
                 if sp.niente:
                     post['niente'] = 'yes'
+        elif spannerClass == 'PedalMark':
+            if t.TYPE_CHECKING:
+                assert isinstance(sp, expressions.PedalMark)
+            if sp.pedalForm in ('line', 'symline'):
+                post['line'] = 'yes'
+            else:
+                # 'symbol', 'altsymbol' both end with a sign
+                post['sign'] = 'yes'
 
         return post
 
