@@ -983,13 +983,13 @@ def midiEventsToTimeSignature(eventList):
     return ts
 
 
-def timeSignatureToMidiEvents(ts, includeDeltaTime=True):
+def timeSignatureToMidiEvents(ts, includeDeltaTime=True) -> list[DeltaTime|MidiEvent]:
     # noinspection PyShadowingNames
     '''
     Translate a :class:`~music21.meter.TimeSignature` to a pair of events: a DeltaTime and
     a MidiEvent TIME_SIGNATURE.
 
-    Returns a two-element list
+    Returns a two-element list unless there is an error.
 
     >>> ts = meter.TimeSignature('5/4')
     >>> eventList = midi.translate.timeSignatureToMidiEvents(ts)
@@ -997,6 +997,19 @@ def timeSignatureToMidiEvents(ts, includeDeltaTime=True):
     <music21.midi.DeltaTime (empty) track=None>
     >>> eventList[1]
     <music21.midi.MidiEvent TIME_SIGNATURE, track=None, data=b'\\x05\\x02\\x18\\x08'>
+
+    Note that time signatures with numerators above 255 cannot be stored in MIDI.
+    (A feature?) They will not be stored and an empty list will be returned.
+    A warning will be issued.
+
+    >>> ts = meter.TimeSignature('267/32')  # found on music21 list
+    >>> import warnings  #_DOCS_HIDE
+    >>> with warnings.catch_warnings(): #_DOCS_HIDE
+    ...      warnings.simplefilter('ignore') #_DOCS_HIDE
+    ...      out = midi.translate.timeSignatureToMidiEvents(ts) #_DOCS_HIDE
+    >>> #_DOCS_SHOW out = midi.translate.timeSignatureToMidiEvents(ts)
+    >>> out
+    []
     '''
     mt = None  # use a midi track set to None
     eventList = []
@@ -1007,6 +1020,13 @@ def timeSignatureToMidiEvents(ts, includeDeltaTime=True):
         eventList.append(dt)
 
     n = ts.numerator
+    if n > 255:
+        warnings.warn(
+            f'TimeSignature with numerator > 255 cannot be stored in MIDI. Ignoring {ts}',
+            TranslateWarning
+        )
+        return []
+
     # need log base 2 to solve for exponent of 2
     # 1 is 0, 2 is 1, 4 is 2, 16 is 4, etc
     d = int(math.log2(ts.denominator))
@@ -1856,8 +1876,7 @@ def getMetaEvents(
 ) -> list[tuple[int, base.Music21Object]]:
     metaEvents: list[tuple[int, base.Music21Object]] = []  # store pairs of abs time, m21 object
     last_program: int = -1
-    for eventTuple in events:
-        timeEvent, e = eventTuple
+    for timeEvent, e in events:
         metaObj = None
         if e.type == MetaEvents.TIME_SIGNATURE:
             # time signature should be 4 bytes

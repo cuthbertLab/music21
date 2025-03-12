@@ -13,6 +13,9 @@ from __future__ import annotations
 from enum import Enum, EnumMeta, IntEnum
 import re
 
+# When Python 3.11 is minimum, import EnumType instead of EnumMeta
+
+# when Python 3.12 is minimum, will not need StrEnumMeta at all -- contains will work.
 
 class StrEnumMeta(EnumMeta):
     def __contains__(cls, item):
@@ -27,7 +30,20 @@ class StrEnumMeta(EnumMeta):
             return False
 
 
-class ContainsEnum(IntEnum):
+class ContainsMeta(EnumMeta):
+    '''
+    This is a backport of the Python 3.12 `EnumType` class's contains method.
+    '''
+    def __contains__(cls, item):
+        try:
+            cls(item)
+            return True
+        except ValueError:
+            # Python 3.12 does some more subtle things but not backward compatible.
+            return False
+
+
+class ContainsEnum(IntEnum, metaclass=ContainsMeta):
     '''
     An IntEnum that allows "in" checks against the values of the enum.
     '''
