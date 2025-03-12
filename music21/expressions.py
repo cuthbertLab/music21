@@ -326,6 +326,114 @@ class RehearsalMark(Expression):
 
 
 # ------------------------------------------------------------------------------
+class PedalMark(spanner.Spanner):
+    '''
+        A pedal mark spanner contains a pedaled set of notes.
+        The spanner starts at the moment of down-pedal, and
+        ends at the moment of up-pedal.  There can be any
+        number of pedal "bounces" in the middle of the spanner.
+
+        The visual form of the pedal mark can vary.  The following
+        examples use a pedal mark with one "bounce" in the middle.
+
+        Pedal marks can be lines:            |_______^________|
+        Pedal marks can be normal symbolic:  Ped.    * Ped.   *
+        Pedal marks can be altered symbolic: Ped.    Ped.     *
+        Pedal marks can be symbol and line:  Ped.____^________|
+
+        Pedal marks, whether lines, symbols, or a combination, can
+        represent the sustain pedal (Ped.), the sostenuto pedal
+        (Sost.), the soft (una corda) pedal, or (more rarely) the
+        silent (muting) pedal.
+
+        Pedal marks that are symbolic can be abbreviated: e.g. P. instead
+        of Ped., S. instead of Sost.
+
+        Pedal marks that are lines can have non-printed portions
+        (gaps) in them; these are usually started with "simile",
+        but not necessarily.
+    '''
+    validPedalTypes: tuple[str, ...] = ('sustain', 'sostenuto', 'soft', 'silent')
+    validPedalForms: tuple[str, ...] = ('line', 'symbol', 'altsymbol', 'symline')
+
+    def __init__(
+        self,
+        *spannedElements,
+        startOffset: OffsetQL|None = None,
+        **keywords
+    ):
+        super().__init__(*spannedElements, **keywords)
+        from music21 import note
+        self.fillElementTypes = [note.GeneralNote]
+
+        # startOffset is completely optional.  Can be set by parsers (such
+        # as MusicXML) that might need to get this offset from the spanner
+        # before the start note has been added to the spanner.
+        self.startOffset: OffsetQL|None = startOffset
+
+        self.pedalType = 'sustain'
+        self.pedalForm = 'symbol'
+
+        self.abbreviated = False
+
+    @property
+    def pedalType(self) -> str:
+        return self._pedalType
+
+    @pedalType.setter
+    def pedalType(self, newType: str):
+        if newType not in PedalMark.validPedalTypes:
+            raise ValueError(f'invalid pedalType "{newType}"')
+        self._pedalType = newType
+
+    @property
+    def pedalForm(self) -> str:
+        return self._pedalForm
+
+    @pedalForm.setter
+    def pedalForm(self, newForm: str):
+        if newForm not in PedalMark.validPedalForms:
+            raise ValueError(f'invalid pedalForm "{newForm}"')
+        self._pedalForm = newForm
+
+
+class PedalObject(base.Music21Object):
+    '''
+        Base class of individual objects that mark various transitions
+        in a PedalMark spanner.
+    '''
+    def __init__(self, **keywords):
+        super().__init__(**keywords)
+
+    def _reprInternal(self) -> str:
+        if self.activeSite is None:
+            return 'uninserted'
+        return f'at {self.offset}'
+
+
+class PedalBounce(PedalObject):
+    '''
+        This object, when seen in a PedalMark spanner, represents an up/down bounce
+        of the pedal.
+    '''
+
+
+class PedalGapStart(PedalObject):
+    '''
+        This object, when seen in a PedalMark spanner, represents a disappearance of
+        the pedal line, usually with a TextExpression('simile').  The pedaling should
+        continue (similarly to before), but the line is invisible during this gap.
+    '''
+
+
+class PedalGapEnd(PedalObject):
+    '''
+        This object, when seen in a PedalMark spanner, represents the reappearance of
+        the pedal line.
+    '''
+
+
+# ------------------------------------------------------------------------------
 class TextExpression(Expression):
     '''
     A TextExpression is a word, phrase, or similar

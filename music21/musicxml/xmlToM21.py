@@ -4062,7 +4062,13 @@ class MeasureParser(SoundTagMixin, XMLParserBase):
         self.setPlacement(mxObj, orn)
         return orn
 
-    def xmlDirectionTypeToSpanners(self, mxObj):
+    def xmlDirectionTypeToSpanners(
+        self,
+        mxObj: ET.Element,
+        mxDirection: ET.Element|None = None,
+        staffKey: int|None = None,
+        totalOffset: OffsetQL|None = None
+    ):
         # noinspection PyShadowingNames
         '''
         Some spanners, such as MusicXML wedge, bracket, dashes, and ottava
@@ -4103,10 +4109,13 @@ class MeasureParser(SoundTagMixin, XMLParserBase):
         targetLast = self.nLast
         returnList = []
 
+        if totalOffset is not None:
+            totalOffset = opFrac(totalOffset)
+
         if mxObj.tag == 'wedge':
             mType = mxObj.get('type')
             if mType == 'crescendo':
-                spClass = dynamics.Crescendo
+                spClass: type[dynamics.DynamicWedge] = dynamics.Crescendo
             elif mType == 'diminuendo':
                 spClass = dynamics.Diminuendo
             elif mType == 'stop':
@@ -4218,6 +4227,78 @@ class MeasureParser(SoundTagMixin, XMLParserBase):
                         sp.addSpannedElements(targetLast)
             else:
                 raise MusicXMLImportException(f'unidentified mxType of octave-shift: {mxType}')
+
+        if mxObj.tag == 'pedal':
+            mxType = mxObj.get('type')
+            mxAbbreviated = mxObj.get('abbreviated')
+            mxLine = mxObj.get('line')  # 'yes'/'no'
+            mxSign = mxObj.get('sign')  # 'yes'/'no'
+
+            idFound = mxObj.get('number')
+            if mxType in ('start', 'sostenuto'):
+                sp = expressions.PedalMark(startOffset=totalOffset)
+                sp.idLocal = idFound
+
+                if mxType == 'start':
+                    sp.pedalType = 'sustain'
+                elif mxType == 'sostenuto':
+                    sp.pedalType = 'sostenuto'
+
+                if mxLine == 'yes':
+                    sp.pedalForm = 'line'
+                elif mxLine == 'no' or mxSign == 'yes':
+                    sp.pedalForm = 'symbol'
+
+                if mxAbbreviated == 'yes':
+                    sp.abbreviated = True
+
+                self.spannerBundle.append(sp)
+                returnList.append(sp)
+                self.spannerBundle.setPendingSpannedElementAssignment(sp, 'GeneralNote')
+            elif mxType in ('continue', 'stop', 'discontinue', 'resume', 'change'):
+                spb = self.spannerBundle.getByClassIdLocalComplete(
+                    'PedalMark', idFound, False  # get first
+                )
+                try:
+                    sp = spb[0]
+                except IndexError:
+                    raise MusicXMLImportException('Error in getting PedalMark')
+                if mxType == 'continue':
+                    # pass?  I don't think I need to remember a continue, and if
+                    # someone fills this spanner, we won't know this particular
+                    # GeneralNote is special, anyway.  If continues are truly
+                    # important, they should probably end the spanner and start
+                    # a new one.
+                    pass
+                    # self.spannerBundle.setPendingSpannedElementAssignment(sp, 'GeneralNote')
+                elif mxType == 'discontinue':
+                    # insert a PedalGapStart
+                    pgStart = expressions.PedalGapStart()
+                    self.insertCoreAndRef(totalOffset, staffKey, pgStart)
+                    sp.addSpannedElements(pgStart)
+                elif mxType == 'resume':
+                    # If the current pedalType is 'symbol', and we're still at the start
+                    # offset of the PedalMark, change pedalType to 'symline' (because
+                    # we had a symbol, and now we're starting a line without a downtick;
+                    # that is the definition of 'symline').
+                    if sp.pedalType == 'symbol' and sp.startOffset == totalOffset:
+                        sp.pedalType = 'symline'
+                    else:
+                        # insert a PedalGapEnd
+                        pgEnd = expressions.PedalGapEnd()
+                        self.insertCoreAndRef(totalOffset, staffKey, pgEnd)
+                        sp.addSpannedElements(pgEnd)
+                elif mxType == 'change':
+                    # insert a PedalBounce
+                    pb = expressions.PedalBounce()
+                    self.insertCoreAndRef(totalOffset, staffKey, pb)
+                    sp.addSpannedElements(pb)
+                elif mxType == 'stop':
+                    sp.completeStatus = True
+                    if targetLast is not None:
+                        sp.addSpannedElements(targetLast)
+            else:
+                raise MusicXMLImportException(f'unidentified mxType of pedal: {mxType}')
 
         return returnList
 
@@ -5247,9 +5328,11 @@ class MeasureParser(SoundTagMixin, XMLParserBase):
             for mxDyn in mxDir:
                 self.setDynamicsDirection(mxDir, mxDyn, mxDirection, staffKey, totalOffset)
 
-        elif tag in ('wedge', 'bracket', 'dashes', 'octave-shift'):
+        elif tag in ('wedge', 'bracket', 'dashes', 'octave-shift', 'pedal'):
             try:
-                spannerList = self.xmlDirectionTypeToSpanners(mxDir)
+                spannerList = self.xmlDirectionTypeToSpanners(
+                    mxDir, mxDirection, staffKey, totalOffset
+                )
             except MusicXMLImportException as excep:
                 warnings.warn(f'Could not import {tag}: {excep}', MusicXMLWarning)
                 spannerList = []
