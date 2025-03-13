@@ -1012,7 +1012,7 @@ def timeSignatureToMidiEvents(ts, includeDeltaTime=True) -> list[DeltaTime|MidiE
     []
     '''
     mt = None  # use a midi track set to None
-    eventList = []
+    eventList: list[MidiEvent|DeltaTime] = []
     if includeDeltaTime:
         dt = DeltaTime(track=mt)
         # dt.time set to zero; will be shifted later as necessary

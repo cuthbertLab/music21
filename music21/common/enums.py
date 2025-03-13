@@ -36,7 +36,7 @@ class ContainsMeta(EnumMeta):
     '''
     def __contains__(cls, item):
         try:
-            cls(item)
+            cls(item)  # pylint: disable=no-value-for-parameter
             return True
         except ValueError:
             # Python 3.12 does some more subtle things but not backward compatible.
