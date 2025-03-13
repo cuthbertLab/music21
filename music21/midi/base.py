@@ -36,8 +36,10 @@ __all__ = [
     'METAEVENT_MARKER',
 ]
 
-import struct
+from collections.abc import Iterable
 import unicodedata
+from typing import overload
+import typing as t
 
 from music21 import common
 from music21.common.enums import ContainsEnum
@@ -54,51 +56,61 @@ environLocal = environment.Environment('midi.base')
 class MidiException(exceptions21.Music21Exception):
     pass
 
-
 # ------------------------------------------------------------------------------
-def charToBinary(char):
+@common.deprecated('v9.7', 'v10', 'use bin(ord(char)) instead.')
+def charToBinary(char: str):
     '''
+    DEPRECATED: just use bin(ord(char)) instead.
+
+    Or for the exact prior output (with left-padding)
+    use `f'{int(bin(ord(char))[2:]):08d}'`
+
+
     Convert a char into its binary representation. Useful for debugging.
 
-    >>> midi.charToBinary('a')
+    >>> #_DOCS_SHOW midi.charToBinary('a')
+    >>> f'{int(bin(ord("a"))[2:]):08d}'  #_DOCS_HIDE
     '01100001'
-    '''
-    asciiValue = ord(char)
-    binaryDigits = []
-    while asciiValue:
-        if (asciiValue & 1) == 1:
-            binaryDigits.append('1')
-        else:
-            binaryDigits.append('0')
-        asciiValue = asciiValue >> 1
 
-    binaryDigits.reverse()
-    binary = ''.join(binaryDigits)
+    Note: This function is deprecated and will be removed in v10.  Music21 actually
+    predates the bin() function in Python (added in Python 2.6).
+    '''
+    binary = bin(ord(char))[2:]
     zeroFix = (8 - len(binary)) * '0'
     return zeroFix + binary
 
-
-def intsToHexBytes(intList):
+@common.deprecated('v9.7', 'v10', 'Just use bytes(...) instead')
+def intsToHexBytes(intList: Iterable[int]) -> bytes:
     r'''
+    (Deprecated: just use bytes(...) instead)
+
     Convert a list of integers into hex bytes, suitable for testing MIDI encoding.
 
     Here we take NOTE_ON message, Middle C, 120 velocity and translate it to bytes
 
-    >>> midi.intsToHexBytes([0x90, 60, 120])
+    >>> #_DOCS_SHOW midi.intsToHexBytes([0x90, 60, 120])
+    >>> bytes([0x90, 60, 120])  #_DOCS_HIDE
     b'\x90<x'
+
+    Note: This function is deprecated and will be removed in v10.  This
+    function has not been needed since music21 became Python 3-only in v.5.
     '''
-    # note off are 128 (0x80) to 143 (0x8F)
-    # note on messages are decimal 144 (0x90) to 159 (0x9F)
-    post = b''
-    for i in intList:
-        # B is an unsigned char
-        # this forces values between 0 and 255
-        # the same as chr(int)
-        post += struct.pack('>B', i)
-    return post
+    return bytes(intList)
 
 
-def getNumber(midiStr, length):
+@overload
+def getNumber(midiStr: int, length: int) -> tuple[int, int]:
+    ...
+
+@overload
+def getNumber(midiStr: str, length: int) -> tuple[int, str]:
+    ...
+
+@overload
+def getNumber(midiStr: bytes, length: int) -> tuple[int, bytes]:
+    ...
+
+def getNumber(midiStr: str|bytes|int, length: int) -> tuple[int, str|bytes|int]:
     '''
     Return the value of a string byte or bytes if length > 1
     from an 8-bit string or bytes object
@@ -111,36 +123,59 @@ def getNumber(midiStr, length):
     Note that MIDI uses big-endian for everything.
     This is the inverse of Python's chr() function.
 
-    >>> midi.getNumber('test', 0)
-    (0, 'test')
+    Read first two bytes
 
-    Given bytes, return bytes:
+    >>> midi.getNumber(b'test', 2)
+    (29797, b'st')
+
+    That number comes from:
+
+    >>> ord('t') * 256 + ord('e')
+    29797
+
+    Demonstration of reading the whole length in:
+
+    >>> midi.getNumber(b'test', 4)
+    (1952805748, b'')
+
+    Reading in zero bytes leaves the midiStr unchanged:
 
     >>> midi.getNumber(b'test', 0)
     (0, b'test')
 
+
+    The method can also take in an integer and return an integer and the remainder part.
+    This usage might be deprecated in the future and has already been replaced within
+    music21 internal code.
+
+    >>> midi.getNumber(516, 1)   # = 2*256 + 4
+    (4, 512)
+
+    As of v9.7, this method can also take a string as input and return a string.
+    This usage is deprecated and will be removed in v10.
+
     >>> midi.getNumber('test', 2)
     (29797, 'st')
-    >>> midi.getNumber(b'test', 4)
-    (1952805748, b'')
     '''
     summation = 0
-    if not common.isNum(midiStr):
+    if not isinstance(midiStr, int):
         for i in range(length):
             midiStrOrNum = midiStr[i]
-            if common.isNum(midiStrOrNum):
+            if isinstance(midiStrOrNum, int):
                 summation = (summation << 8) + midiStrOrNum
-            else:
+            else:  # to remove
+                if t.TYPE_CHECKING:
+                    assert isinstance(midiStrOrNum, str)
                 summation = (summation << 8) + ord(midiStrOrNum)
         return summation, midiStr[length:]
-    else:  # midiStr is a number
+    else:  # midiStr is an int
         midNum = midiStr
         summation = midNum - ((midNum >> (8 * length)) << (8 * length))
         bigBytes = midNum - summation
         return summation, bigBytes
 
 
-def getVariableLengthNumber(midiBytes):
+def getVariableLengthNumber(midiBytes: bytes) -> tuple[int, bytes]:
     r'''
     Given a string or bytes of data, strip off the first character, or all high-byte characters
     terminating with one whose ord() function is < 0x80.  Thus, a variable number of bytes
@@ -156,7 +191,7 @@ def getVariableLengthNumber(midiBytes):
     (65, b'-u')
     >>> midi.getVariableLengthNumber(b'-u')
     (45, b'u')
-    >>> midi.getVariableLengthNumber('u')
+    >>> midi.getVariableLengthNumber(b'u')
     (117, b'')
 
     >>> midi.getVariableLengthNumber(b'test')
@@ -167,68 +202,91 @@ def getVariableLengthNumber(midiBytes):
     (64, b'-E')
     >>> midi.getVariableLengthNumber(b'-E')
     (45, b'E')
-    >>> midi.getVariableLengthNumber('E')
+    >>> midi.getVariableLengthNumber(b'E')
     (69, b'')
 
     Test that variable length characters work:
 
     >>> midi.getVariableLengthNumber(b'\xff\x7f')
     (16383, b'')
-    >>> midi.getVariableLengthNumber('中xy')
+    >>> midi.getVariableLengthNumber('中xy'.encode('utf-8'))
     (210638584, b'y')
 
     If no low-byte character is encoded, raises an IndexError
 
-    >>> midi.getVariableLengthNumber('中国')
+    >>> midi.getVariableLengthNumber('中国'.encode('utf-8'))
     Traceback (most recent call last):
     IndexError: index out of range
+
+    Up to v9.7, this method could also take a string as input and return a string.  This usage is
+    now removed.
     '''
     # from http://faydoc.tripod.com/formats/mid.htm
     # This allows the number to be read one byte at a time, and when you see
     # a msb of 0, you know that it was the last (least significant) byte of the number.
     summation = 0
     i = 0
-    if isinstance(midiBytes, str):
-        midiBytes = midiBytes.encode('utf-8')
-
     while i < 999:  # should return eventually (was "while True")
         x = midiBytes[i]
         # environLocal.printDebug(['getVariableLengthNumber: examined char:',
-        # charToBinary(midiBytes[i])])
+        #     bin(ord(midiBytes[i])))
         summation = (summation << 7) + (x & 0x7F)
         i += 1
         if not (x & 0x80):
-            # environLocal.printDebug(['getVariableLengthNumber: depth read into string: %s' % i])
+            # environLocal.printDebug([f' getVariableLengthNumber: depth read into string: {i}'])
             return summation, midiBytes[i:]
     raise MidiException('did not find the end of the number!')
 
 
-def getNumbersAsList(midiBytes):
+@common.deprecated('v9.7', 'v10', 'use list(midiBytes) instead')
+def getNumbersAsList(midiBytes: bytes|Iterable[int]) -> list[int]:
     r'''
+    Deprecated: this method existed in Python 2.6 and for Python 2 (no bytes)
+    compatibility.  Now use `list(midiBytes)` instead.
+
+    Ability to pass in a string will be removed in v10.
+
+    ----
     Translate each char into a number, return in a list.
     Used for reading data messages where each byte encodes
     a different discrete value.
 
-    >>> midi.getNumbersAsList(b'\x00\x00\x00\x03')
+    >>> #_DOCS_SHOW midi.getNumbersAsList(b'\x00\x00\x00\x03')
+    >>> list(b'\x00\x00\x00\x03') #_DOCS_HIDE
+    [0, 0, 0, 3]
+
+    Now just do:
+
+    >>> list(b'\x00\x00\x00\x03')
     [0, 0, 0, 3]
     '''
     post = []
     for midiByte in midiBytes:
-        if common.isNum(midiByte):
-            post.append(midiByte)
-        else:
+        if isinstance(midiByte, str):
             post.append(ord(midiByte))
+        else:
+            post.append(midiByte)
     return post
 
 
-def putNumber(num, length):
+def putNumber(num: int, length: int) -> bytes:
     r'''
-    Put a single number as a hex number at the end of a string `length` bytes long.
+    Put a single number as a hex number at the end of a bytes object `length` bytes long.
 
     >>> midi.putNumber(3, 4)
     b'\x00\x00\x00\x03'
     >>> midi.putNumber(0, 1)
     b'\x00'
+
+    >>> midi.putNumber(258, 2)
+    b'\x01\x02'
+
+    If the number is larger than the length currently only the least significant
+    bytes are returned. This behavior may change in the near future to raise an
+    exception instead.
+
+    >>> midi.putNumber(258, 1)
+    b'\x02'
     '''
     lst = bytearray()
 
@@ -240,19 +298,24 @@ def putNumber(num, length):
     return bytes(lst)
 
 
-def putVariableLengthNumber(x):
+def putVariableLengthNumber(x: int) -> bytes:
     r'''
-    Turn a number into the smallest bytes object that can hold it for MIDI
+    Turn an integer number into the smallest bytes object that can hold it for MIDI
+
+    Numbers < 128 are encoded as single bytes and are the same as bytes([x])
 
     >>> midi.putVariableLengthNumber(4)
     b'\x04'
     >>> midi.putVariableLengthNumber(127)
     b'\x7f'
+    >>> bytes([127])
+    b'\x7f'
     >>> midi.putVariableLengthNumber(0)
     b'\x00'
 
-    Numbers > 7bit but < 255 need two characters, with the first character to 0x80
-    + n // 128
+    Numbers > 7bit but < 16384 need two characters,
+    with the first character set as 0x80 + n // 128
+    and the second character set as n % 128:
 
     >>> midi.putVariableLengthNumber(128)
     b'\x81\x00'
@@ -260,16 +323,49 @@ def putVariableLengthNumber(x):
     b'\x81\x01'
     >>> midi.putVariableLengthNumber(255)
     b'\x81\x7f'
+
+    This differs from the 8-bit representation of
+    `bytes([x])`:
+
+    >>> bytes([128])
+    b'\x80'
+    >>> bytes([255])
+    b'\xff'
+
+
+    This method can also deal with numbers > 255, which `bytes` cannot.
+
     >>> midi.putVariableLengthNumber(256)
     b'\x82\x00'
+    >>> bytes([256])
+    Traceback (most recent call last):
+    ValueError: bytes must be in range(0, 256)
+
+    It also differs from the normal way of representing 256 in Python bytes:
+
+    >>> bytes([1, 0])
+    b'\x01\x00'
+
+    Here are MIDI representation of other numbers that are too large to fit in 8 bits
+    but stored in two bytes in MIDI.
+
     >>> midi.putVariableLengthNumber(1024)
     b'\x88\x00'
+
+    Notice that the least significant byte is second.
+
+    >>> midi.putVariableLengthNumber(8192)
+    b'\xc0\x00'
     >>> midi.putVariableLengthNumber(8193)
     b'\xc0\x01'
+
+    This is the maximum normal MIDI number that can be stored in 2 bytes.
+
     >>> midi.putVariableLengthNumber(16383)
     b'\xff\x7f'
 
-    Numbers > 16383 are not really MIDI numbers, but this is how they work:
+    Numbers >= 16384 are not used in 2-byte classic MIDI,
+    but this routine continues the basic principle from above:
 
     >>> midi.putVariableLengthNumber(16384)
     b'\x81\x80\x00'
@@ -279,6 +375,8 @@ def putVariableLengthNumber(x):
     b'\x82\x80\x00'
     >>> midi.putVariableLengthNumber(16384 ** 2)
     b'\x81\x80\x80\x80\x00'
+
+    Negative numbers raise MidiException
 
     >>> midi.putVariableLengthNumber(-1)
     Traceback (most recent call last):
@@ -301,7 +399,7 @@ def putVariableLengthNumber(x):
     return bytes(lst)
 
 
-def putNumbersAsList(numList):
+def putNumbersAsList(numList: Iterable[int]) -> bytes:
     r'''
     Translate a list of numbers (0-255) into bytes.
     Used for encoding data messages where each byte encodes a different discrete value.
@@ -309,19 +407,29 @@ def putNumbersAsList(numList):
     >>> midi.putNumbersAsList([0, 0, 0, 3])
     b'\x00\x00\x00\x03'
 
-    If a number is < 0 then it wraps around from the top.
+    For positive numbers this method behaves the same as `bytes(numList)` and that
+    method should be used if you are sure all numbers are positive.
+
+    >>> bytes([0, 0, 0, 3])
+    b'\x00\x00\x00\x03'
+
+
+    If a number is < 0 then it wraps around from the top.  This is used in places
+    like MIDI key signatures where flats are represented by `256 - flats`.
 
     >>> midi.putNumbersAsList([0, 0, 0, -3])
     b'\x00\x00\x00\xfd'
     >>> midi.putNumbersAsList([0, 0, 0, -1])
     b'\x00\x00\x00\xff'
 
-    list can be of any length
+    The behavior with negative numbers is different from `bytes(numList)`
+
+    List can be of any length
 
     >>> midi.putNumbersAsList([1, 16, 255])
     b'\x01\x10\xff'
 
-    Any number > 255 raises an exception:
+    Any number > 255 (or less than -255) raises an exception:
 
     >>> midi.putNumbersAsList([256])
     Traceback (most recent call last):
@@ -339,6 +447,10 @@ def putNumbersAsList(numList):
 
 
 class ChannelVoiceMessages(ContainsEnum):
+    '''
+    ChannelVoiceMessages are the main MIDI messages for channel 1-16, such as
+    NOTE_ON, NOTE_OFF, etc.
+    '''
     NOTE_OFF = 0x80
     NOTE_ON = 0x90
     POLYPHONIC_KEY_PRESSURE = 0xA0
@@ -393,6 +505,15 @@ class SysExEvents(ContainsEnum):
 
 METAEVENT_MARKER = 0xFF
 
+
+MidiEventTypes = (
+    ChannelVoiceMessages
+    | ChannelModeMessages
+    | MetaEvents
+    | SysExEvents
+    | t.Literal['DeltaTime']
+)
+
 # ------------------------------------------------------------------------------
 
 
@@ -406,8 +527,9 @@ class MidiEvent(prebase.ProtoM21Object):
 
     The `track` argument must be a :class:`~music21.midi.MidiTrack` object.
 
-    The `type` attribute is an enumeration of a Midi event from the ChannelVoiceMessages
-    or metaEvents enums.
+    The `type` attribute is an enumeration of a Midi event from the ChannelVoiceMessages,
+    ChannelModeMessages, SysExEvents, or MetaEvents enums; if unspecified,
+    defaults to MetaEvents.UNKNOWN.
 
     The `channel` attribute is an integer channel id, from 1 to 16.
 
@@ -446,18 +568,22 @@ class MidiEvent(prebase.ProtoM21Object):
     >>> me2.type = midi.MetaEvents.SEQUENCE_TRACK_NAME
     >>> me2.data = 'guitar'
     >>> me2
-    <music21.midi.MidiEvent SEQUENCE_TRACK_NAME, track=1, channel=None, data=b'guitar'>
+    <music21.midi.MidiEvent SEQUENCE_TRACK_NAME, track=1, data=b'guitar'>
+
+    Changed in v9.7 - None is not a valid type anymore.  Use MetaEvents.UNKNOWN instead.
+        Channel defaults to 1.
     '''
+    # noinspection PyShadowingBuiltins
     # pylint: disable=redefined-builtin
     def __init__(self,
                  track: MidiTrack|None = None,
-                 type=None,
+                 type: MidiEventTypes = MetaEvents.UNKNOWN,
                  time: int = 0,
-                 channel: int|None = None):
+                 channel: int = 1):
         self.track: MidiTrack|None = track  # a MidiTrack object
-        self.type = type
+        self.type: MidiEventTypes = type
         self.time: int = time
-        self.channel: int|None = channel
+        self.channel: int = channel
 
         self.parameter1: int|bytes|None = None  # pitch or first data value
         self.parameter2: int|bytes|None = None  # velocity or second data value
@@ -488,9 +614,9 @@ class MidiEvent(prebase.ProtoM21Object):
         >>> pitchBend = midi.MidiEvent(type=CVM.PITCH_BEND)
 
         >>> sorted([noteOn, noteOff, pitchBend], key=lambda me: me.sortOrder)
-        [<music21.midi.MidiEvent NOTE_OFF, track=None, channel=None>,
-         <music21.midi.MidiEvent PITCH_BEND, track=None, channel=None>,
-         <music21.midi.MidiEvent NOTE_ON, track=None, channel=None>]
+        [<music21.midi.MidiEvent NOTE_OFF, track=None, channel=1>,
+         <music21.midi.MidiEvent PITCH_BEND, track=None, channel=1>,
+         <music21.midi.MidiEvent NOTE_ON, track=None, channel=1>]
         '''
         # update based on type; type may be set after init
         if self.type == ChannelVoiceMessages.NOTE_OFF:  # should come before pitch bend
@@ -500,23 +626,29 @@ class MidiEvent(prebase.ProtoM21Object):
         else:
             return 0
 
-    def _reprInternal(self):
+    def _reprInternal(self) -> str:
+        trackIndex: int|None
         if self.track is None:
             trackIndex = None
-        elif isinstance(self.track, int):
+        elif isinstance(self.track, int):  # should not happen anymore
             trackIndex = self.track
         else:
             trackIndex = self.track.index
 
+        printType: str
         if isinstance(self.type, ContainsEnum):
             printType = self.type.name
-        else:
+        elif self.type is None:
+            printType = 'None'
+        else:  # should not happen anymore
             printType = repr(self.type)
 
         r = f'{printType}, '
         if self.time != 0:
             r += f't={self.time!r}, '
-        r += f'track={trackIndex}, channel={self.channel!r}'
+        r += f'track={trackIndex}'
+        if self.type in ChannelVoiceMessages or self.type in ChannelModeMessages:
+            r += f', channel={self.channel!r}'
         if self.type in (ChannelVoiceMessages.NOTE_ON, ChannelVoiceMessages.NOTE_OFF):
             attrList = ['pitch', 'velocity']
         else:
@@ -531,41 +663,33 @@ class MidiEvent(prebase.ProtoM21Object):
         return r
 
     # provide parameter access to pitch and velocity
-    def _setPitch(self, value):
-        self.parameter1 = value
-
-    def _getPitch(self):
+    @property
+    def pitch(self) -> int|None:
         # only return pitch if this is note on /off
-        if self.type in (ChannelVoiceMessages.NOTE_ON, ChannelVoiceMessages.NOTE_OFF):
-            return self.parameter1
+        if (self.type in (ChannelVoiceMessages.NOTE_ON, ChannelVoiceMessages.NOTE_OFF)
+                and self.parameter1 is not None):
+            return int(self.parameter1)
         else:
             return None
 
-    pitch = property(_getPitch, _setPitch)
-
-    def _setVelocity(self, value):
-        self.parameter2 = value
-
-    def _getVelocity(self):
-        return self.parameter2
-
-    velocity = property(_getVelocity, _setVelocity)
-
-    # store generic data in parameter 1
-
-    def _setData(self, value):
-        if value is not None and not isinstance(value, bytes):
-            if isinstance(value, str):
-                value = value.encode('utf-8')
-            elif isinstance(value, bool):
-                value = bytes([int(value)])
-
+    @pitch.setter
+    def pitch(self, value: int|None):
         self.parameter1 = value
 
-    def _getData(self):
-        return self.parameter1
+    @property
+    def velocity(self) -> int|None:
+        if not isinstance(self.parameter2, int):
+            return None
+        return self.parameter2
 
-    data = property(_getData, _setData, doc=r'''
+    @velocity.setter
+    def velocity(self, value: int|None):
+        self.parameter2 = value
+
+    # store generic data in parameter 1
+    @property
+    def data(self) -> int|bytes|None:
+        r'''
         Read or set the data (`.parameter1`) for the object
 
         Does some automatic conversions:
@@ -574,9 +698,20 @@ class MidiEvent(prebase.ProtoM21Object):
         >>> me.data = True
         >>> me.data
         b'\x01'
-    ''')
+        '''
+        return self.parameter1
 
-    def setPitchBend(self, cents, bendRange=2):
+    @data.setter
+    def data(self, value: int|str|bytes|bool|None):
+        if value is not None and not isinstance(value, bytes):
+            if isinstance(value, str):
+                value = value.encode('utf-8')
+            elif isinstance(value, bool):
+                value = bytes([int(value)])
+        self.parameter1 = value
+
+
+    def setPitchBend(self, cents: int|float, bendRange=2) -> None:
         '''
         Treat this event as a pitch bend value, and set the .parameter1 and
          .parameter2 fields appropriately given a specified bend value in cents.
@@ -585,9 +720,8 @@ class MidiEvent(prebase.ProtoM21Object):
 
         The `bendRange` parameter gives the number of half steps in the bend range.
 
-
         >>> mt = midi.MidiTrack(1)
-        >>> me1 = midi.MidiEvent(mt)
+        >>> me1 = midi.MidiEvent(mt, type=midi.ChannelVoiceMessages.PITCH_BEND)
         >>> me1.setPitchBend(50)
         >>> me1.parameter1, me1.parameter2
         (0, 80)
@@ -608,7 +742,7 @@ class MidiEvent(prebase.ProtoM21Object):
         >>> me1.parameter1, me1.parameter2
         (40, 96)
 
-        Exceeding maximum sets max
+        Exceeding maximum pitch bend sets the max (127, 127)
 
         >>> me1.setPitchBend(200)
         >>> me1.parameter1, me1.parameter2
@@ -647,7 +781,7 @@ class MidiEvent(prebase.ProtoM21Object):
 
         OMIT_FROM_DOCS
 
-        Pitch bends very close to 0 had problems
+        Pitch bends very close to 0 formerly had problems
 
         >>> me1.setPitchBend(-196)
         >>> me1.parameter1, me1.parameter2
@@ -678,19 +812,17 @@ class MidiEvent(prebase.ProtoM21Object):
             shift = 0
         target = center + shift
 
-        # produce a two-char value
+        # produce a 1-2-byte value with most significant byte first.
         charValue = putVariableLengthNumber(target)
-        d1, junk = getNumber(charValue[0], 1)  # d1 = parameter2
+        d1 = charValue[0]  # d1 = parameter2; bytes[i] returns an int
         # need to convert from 8 bit to 7, so using & 0x7F
         d1 = d1 & 0x7F
         if len(charValue) > 1:
-            d2, junk = getNumber(charValue[1], 1)
+            d2 = charValue[1]
             d2 = d2 & 0x7F
         else:
             d2 = d1
             d1 = 0
-
-
 
         # environLocal.printDebug(['got target char value', charValue,
         # 'getVariableLengthNumber(charValue)', getVariableLengthNumber(charValue)[0],
@@ -702,39 +834,46 @@ class MidiEvent(prebase.ProtoM21Object):
     def parseChannelVoiceMessage(self, midiBytes: bytes) -> bytes:
         r'''
         Take a set of bytes that represent a ChannelVoiceMessage and set the
-        appropriate enumeration value and data, returning the remaining bytes.
+        appropriate event type and data, returning the remaining bytes.
 
-        These are started with messages from 0x80 to 0xEF
+        Channel voice messages start with a one-byte message from 0x80 to 0xEF,
+        where the first nibble (8-E) is the message type and the second nibble (0-F)
+        is the channel represented in hex.
 
+        First let's create a MidiEvent that does not know its type.
 
-        Demonstration.  First let's create a helper function and a MidiEvent:
-
-        >>> to_bytes = midi.intsToHexBytes
-        >>> midBytes = to_bytes([0x90, 60, 120])
-        >>> midBytes
-        b'\x90<x'
-        >>> midBytes += b'hello'
         >>> mt = midi.MidiTrack(1)
         >>> me1 = midi.MidiEvent(mt)
         >>> me1
-        <music21.midi.MidiEvent None, track=1, channel=None>
+        <music21.midi.MidiEvent UNKNOWN, track=1>
+
+        Now create two messages -- a note on (at pitch = 60 or C4) at velocity 120
+
+        >>> midBytes = bytes([0x92, 60, 120])
+        >>> midBytes
+        b'\x92<x'
+
+        Add a second hypothetical message (would normally be a delta time)
+
+        >>> midBytes += b'hello'
+        >>> midBytes
+        b'\x92<xhello'
 
 
-        Now show how the midiBytes changes the event:
+        Now see how parsing this ChannelVoiceMessage changes the MidiEvent
 
         >>> remainder = me1.parseChannelVoiceMessage(midBytes)
         >>> me1
-        <music21.midi.MidiEvent NOTE_ON, track=1, channel=1, pitch=60, velocity=120>
+        <music21.midi.MidiEvent NOTE_ON, track=1, channel=3, pitch=60, velocity=120>
 
         The remainder would probably contain a delta time and following
-        events, but here we'll just show that it passes through.
+        events, but here we'll just show that it passes whatever is left through.
 
         >>> remainder
         b'hello'
 
-        We will ignore remainders from now on.
-
-        All attributes are set properly:
+        We will ignore remainders for the rest of this demo.  Note that all
+        attributes are set properly:
 
         >>> me1.type
         <ChannelVoiceMessages.NOTE_ON: 0x90>
@@ -742,30 +881,24 @@ class MidiEvent(prebase.ProtoM21Object):
         60
         >>> me1.velocity
         120
+
+        The channel is 3 because 0x90 is NOTE_ON for channel 1, 0x91 is 2, and 0x92 is 3, etc.
+
         >>> me1.channel
-        1
+        3
 
-
-        Here we send the message for a note on another channel (0x91 = channel 2):
-
-        >>> rem = me1.parseChannelVoiceMessage(to_bytes([0x91, 60, 120]))
-        >>> me1
-        <music21.midi.MidiEvent NOTE_ON, track=1, channel=2, pitch=60, velocity=120>
-        >>> me1.channel
-        2
-
-        Now let's make a program change
+        Now let's make a program change on channel 16:
 
         >>> me2 = midi.MidiEvent(mt)
-        >>> rem = me2.parseChannelVoiceMessage(to_bytes([0xC0, 71]))
+        >>> rem = me2.parseChannelVoiceMessage(bytes([0xCF, 71]))
         >>> me2
-        <music21.midi.MidiEvent PROGRAM_CHANGE, track=1, channel=1, data=71>
+        <music21.midi.MidiEvent PROGRAM_CHANGE, track=1, channel=16, data=71>
         >>> me2.data  # 71 = clarinet (0-127 indexed)
         71
 
-        Program change and channel pressure only go to 127.  More than that is an error:
+        Program changes and channel pressures only go to 127.  More than that signals an error:
 
-        >>> me2.parseChannelVoiceMessage(to_bytes([0xC0, 200]))
+        >>> me2.parseChannelVoiceMessage(bytes([0xCF, 200]))
         Traceback (most recent call last):
         music21.midi.base.MidiException: Cannot have a
             <ChannelVoiceMessages.PROGRAM_CHANGE: 0xC0> followed by a byte > 127: 200
@@ -867,16 +1000,16 @@ class MidiEvent(prebase.ProtoM21Object):
             # 'self.lastStatusByte:', self.lastStatusByte])
 
             if self.lastStatusByte is not None:
-                rsb = bytes([self.lastStatusByte])
+                runningStatusByte = bytes([self.lastStatusByte])
             else:  # provide a default
-                rsb = b'\x90'
+                runningStatusByte = b'\x90'
             # add the running status byte to the front of the string
             # and process as before
-            midiBytes = rsb + midiBytes
+            midiBytes = runningStatusByte + midiBytes
             byte0 = midiBytes[0]
-        elif midiBytes[0] != 0xff:
+        elif byte0 != 0xff:
             # store last status byte, unless it's a meta message
-            self.lastStatusByte = midiBytes[0]
+            self.lastStatusByte = byte0
 
         msgType: int = byte0 & 0xF0  # bitwise and to derive message type w/o channel
 
@@ -901,7 +1034,7 @@ class MidiEvent(prebase.ProtoM21Object):
             if MetaEvents.hasValue(byte1):
                 self.type = MetaEvents(byte1)
             else:
-                # environLocal.printDebug([f'unknown meta event: FF {byte1:02X}'])
+                # environLocal.printDebug([f' unknown meta event: FF {byte1:02X}'])
                 # sys.stdout.flush()
                 self.type = MetaEvents.UNKNOWN
             length, midiBytesAfterLength = getVariableLengthNumber(midiBytes[2:])
@@ -914,54 +1047,89 @@ class MidiEvent(prebase.ProtoM21Object):
                                      'hex(midiBytes[1])', hex(midiBytes[1])])
             raise MidiException(f'Unknown midi event type {hex(byte0)}')
 
-    def getBytes(self):
+    def getBytes(self) -> bytes:
         r'''
-        Return a set of bytes for this MIDI event.
+        Return a set of bytes for this MIDI event (used for translating from music21 to MIDI)
 
         >>> noteOn = midi.MidiEvent(type=midi.ChannelVoiceMessages.NOTE_ON, channel=10)
         >>> noteOn.pitch = 60
         >>> noteOn.velocity = 127
         >>> noteOn.getBytes()
         b'\x99<\x7f'
+
+        Changing the pitch changes the second byte (from less than to greater than):
+
         >>> noteOn.pitch = 62
         >>> noteOn.getBytes()
         b'\x99>\x7f'
+        >>> ord('>')
+        62
+
+        Changing the velocity changes the third byte:
+
+        >>> noteOn.velocity = 64
+        >>> noteOn.getBytes()
+        b'\x99>@'
+
+        The third byte is `\x40` but it is represented by '@'
+
+        >>> ord('@')
+        64
+        >>> hex(64)
+        '0x40'
+
+        And changing the channel changes the first byte:
+
+        >>> noteOn.channel = 11
+        >>> noteOn.getBytes()
+        b'\x9a>@'
         '''
+        if t.TYPE_CHECKING:
+            # no DeltaTime here.
+            assert isinstance(self.type, ContainsEnum)
+
         if self.type in ChannelVoiceMessages:
             # environLocal.printDebug(['writing channelVoiceMessages', self.type])
             bytes0 = bytes([self.channel - 1 + self.type.value])
             # for writing note-on/note-off
             if self.type not in (ChannelVoiceMessages.PROGRAM_CHANGE,
                                  ChannelVoiceMessages.CHANNEL_KEY_PRESSURE):
+                if self.parameter1 is None or self.parameter2 is None:
+                    raise MidiException(
+                        'Cannot write MIDI event without parameter1 and parameter2 set.'
+                    )
+
                 # this results in a two-part string, like '\x00\x00'
-                param1data = b''
+                param1data: bytes
                 if isinstance(self.parameter1, int):
                     param1data = bytes([self.parameter1])
                 else:
                     param1data = self.parameter1
 
-                param2data = b''
+                param2data: bytes
                 if isinstance(self.parameter2, int):
                     param2data = bytes([self.parameter2])
                 else:
                     param2data = self.parameter2
 
                 data = param1data + param2data
-            elif self.type == ChannelVoiceMessages.PROGRAM_CHANGE:
+            elif self.type == ChannelVoiceMessages.PROGRAM_CHANGE and isinstance(self.data, int):
                 data = bytes([self.data])
             else:  # all the other messages
                 try:
                     if isinstance(self.data, int):
                         data = bytes([self.data])
-                    else:
+                    elif isinstance(self.data, bytes):
                         data = self.data
+                    else:
+                        raise TypeError('data must be bytes or int')
                 except (TypeError, ValueError):
                     raise MidiException(
-                        f'Got incorrect data for {self} in .data: {self.data}, '
+                        f'Got incorrect data for {self} in .data: {self.data!r}, '
                         + 'cannot parse Miscellaneous Message')
             return bytes0 + data
 
-        elif self.type in ChannelModeMessages:
+        elif self.type in ChannelModeMessages and self.data is not None:
             channelMode = bytes([0xB0 + self.channel - 1])
             msgValue = bytes([self.type.value])
             if isinstance(self.data, int):
@@ -970,18 +1138,20 @@ class MidiEvent(prebase.ProtoM21Object):
                 data = self.data
             return channelMode + msgValue + data
 
-        elif self.type in SysExEvents:
+        elif self.type in SysExEvents and isinstance(self.data, bytes):
             s = bytes([self.type.value])
             s = s + putVariableLengthNumber(len(self.data))
-            return s + self.data
+            sys_data = t.cast(bytes, self.data)
+            return s + sys_data
 
-        elif self.type in MetaEvents:
+        elif self.type in MetaEvents and isinstance(self.data, (bytes, str)):
             s = bytes([METAEVENT_MARKER])
             s += bytes([self.type.value])
             s += putVariableLengthNumber(len(self.data))
 
             try:
-                return s + self.data
+                sys_data = t.cast(bytes, self.data)
+                return s + sys_data
             except (UnicodeDecodeError, TypeError):
                 # environLocal.printDebug(['cannot decode data', self.data])
 
@@ -989,13 +1159,13 @@ class MidiEvent(prebase.ProtoM21Object):
                 # noinspection PyTypeChecker
                 return s + unicodedata.normalize(
                     'NFKD',
-                    self.data
+                    t.cast(str, self.data)
                 ).encode('ascii', 'ignore')
         else:
             raise MidiException(f'unknown midi event type: {self.type!r}')
 
     # --------------------------------------------------------------------------
-    def isNoteOn(self):
+    def isNoteOn(self) -> bool:
         '''
         Return a boolean if this is a note-on message and velocity is not zero.
 
@@ -1007,16 +1177,31 @@ class MidiEvent(prebase.ProtoM21Object):
         True
         >>> me1.isNoteOff()
         False
+
+        A zero velocity note-on is treated as a note-off:
+
+        >>> me1.velocity = 0
+        >>> me1.isNoteOn()
+        False
+        >>> me1.isNoteOff()
+        True
+
+        A midi event can be neither a note on or a note off.
+
+        >>> me1.type = midi.ChannelVoiceMessages.PROGRAM_CHANGE
+        >>> me1.isNoteOn()
+        False
+        >>> me1.isNoteOff()
+        False
         '''
         if self.type == ChannelVoiceMessages.NOTE_ON and self.velocity != 0:
             return True
         return False
 
-    def isNoteOff(self):
+    def isNoteOff(self) -> bool:
         '''
         Return a boolean if this should be interpreted as a note-off message,
         either as a real note-off or as a note-on with zero velocity.
-
 
         >>> mt = midi.MidiTrack(1)
         >>> me1 = midi.MidiEvent(mt)
@@ -1033,6 +1218,8 @@ class MidiEvent(prebase.ProtoM21Object):
         False
         >>> me2.isNoteOff()
         True
+
+        See :meth:`~music21.midi.MidiEvent.isNoteOn` for more examples.
         '''
         if self.type == ChannelVoiceMessages.NOTE_OFF:
             return True
@@ -1040,7 +1227,7 @@ class MidiEvent(prebase.ProtoM21Object):
             return True
         return False
 
-    def isDeltaTime(self):
+    def isDeltaTime(self) -> bool:
         '''
         Return a boolean if this is a DeltaTime subclass.
 
@@ -1053,13 +1240,12 @@ class MidiEvent(prebase.ProtoM21Object):
             return True
         return False
 
-    def matchedNoteOff(self, other):
+    def matchedNoteOff(self, other: MidiEvent) -> bool:
         '''
         Returns True if `other` is a MIDI event that specifies
         a note-off message for this message.  That is, this event
         is a NOTE_ON message, and the other is a NOTE_OFF message
         for this pitch on this channel.  Otherwise returns False
-
 
         >>> mt = midi.MidiTrack(1)
         >>> me1 = midi.MidiEvent(mt)
@@ -1098,8 +1284,7 @@ class MidiEvent(prebase.ProtoM21Object):
         >>> me1.matchedNoteOff(me2)
         False
         '''
-        if other.isNoteOff():
-            # might check velocity here too?
+        if self.isNoteOn() and other.isNoteOff():
             if self.pitch == other.pitch and self.channel == other.channel:
                 return True
         return False
@@ -1117,20 +1302,27 @@ class DeltaTime(MidiEvent):
     Time values are in integers, representing ticks.
 
     The `channel` attribute, inherited from MidiEvent is not used and set to None
-    unless overridden (don't!).
+    unless overridden (it does not do anything if set and is not written out to MIDI).
 
     >>> mt = midi.MidiTrack(1)
     >>> dt = midi.DeltaTime(mt)
     >>> dt.time = 1
     >>> dt
-    <music21.midi.DeltaTime t=1, track=1, channel=None>
-    '''
+    <music21.midi.DeltaTime t=1, track=1>
 
-    def __init__(self, track, time=0, channel=None):
+    Changed in v9.7 -- DeltaTime repr no longer lists its channel (to de-emphasize it).
+        Channel defaults to 1.
+    '''
+    def __init__(
+        self,
+        track: MidiTrack|None = None,
+        time: int = 0,
+        channel: int = 1,
+    ):
         super().__init__(track, time=time, channel=channel)
         self.type = 'DeltaTime'
 
-    def _reprInternal(self):
+    def _reprInternal(self) -> str:
         rep = super()._reprInternal()
         rep = rep.replace("'DeltaTime', ", '')
         if self.time == 0:
@@ -1140,12 +1332,20 @@ class DeltaTime(MidiEvent):
     def readUntilLowByte(self, oldBytes: bytes) -> tuple[int, bytes]:
         r'''
         Read a byte-string until hitting a character below 0x80
-        and return the converted number and the rest of the bytes
+        and return the converted number and the rest of the bytes.
+
+        The first number is also stored in `self.time`.
 
         >>> mt = midi.MidiTrack(1)
         >>> dt = midi.DeltaTime(mt)
+        >>> dt.time
+        0
+
         >>> dt.readUntilLowByte(b'\x20')
         (32, b'')
+        >>> dt.time
+        32
+
         >>> dt.readUntilLowByte(b'\x20hello')
         (32, b'hello')
 
@@ -1155,7 +1355,7 @@ class DeltaTime(MidiEvent):
         >>> dt.readUntilLowByte(b'\x82hello')
         (360, b'ello')
 
-        Changed in v9: was read() but had an incompatible signature with MidiEvent
+        Changed in v9: had an incompatible signature with MidiEvent
         '''
         self.time, newBytes = getVariableLengthNumber(oldBytes)
         return self.time, newBytes
@@ -1222,22 +1422,28 @@ class MidiTrack(prebase.ProtoM21Object):
 
     >>> mt.length
     22
+
+    New in v9.7: len(mt) returns the same as mt.length, but more Pythonic.
+
+    >>> len(mt)
+    22
+
     >>> mt.data[:8]
     b'\x00\xff\x03\x00\x00\xe0\x00@'
 
     Note that the '\x16' got translated to ascii '@'.
 
     >>> mt.events
-    [<music21.midi.DeltaTime (empty) track=3, channel=None>,
-     <music21.midi.MidiEvent SEQUENCE_TRACK_NAME, track=3, channel=None, data=b''>,
-     <music21.midi.DeltaTime (empty) track=3, channel=None>,
+    [<music21.midi.DeltaTime (empty) track=3>,
+     <music21.midi.MidiEvent SEQUENCE_TRACK_NAME, track=3, data=b''>,
+     <music21.midi.DeltaTime (empty) track=3>,
      <music21.midi.MidiEvent PITCH_BEND, track=3, channel=1, parameter1=0, parameter2=64>,
-     <music21.midi.DeltaTime (empty) track=3, channel=None>,
+     <music21.midi.DeltaTime (empty) track=3>,
      <music21.midi.MidiEvent NOTE_ON, track=3, channel=1, pitch=67, velocity=90>,
-     <music21.midi.DeltaTime t=1024, track=3, channel=None>,
+     <music21.midi.DeltaTime t=1024, track=3>,
      <music21.midi.MidiEvent NOTE_OFF, track=3, channel=1, pitch=67, velocity=0>,
-     <music21.midi.DeltaTime t=1024, track=3, channel=None>,
-     <music21.midi.MidiEvent END_OF_TRACK, track=3, channel=None, data=b''>]
+     <music21.midi.DeltaTime t=1024, track=3>,
+     <music21.midi.MidiEvent END_OF_TRACK, track=3, data=b''>]
 
     >>> mt
     <music21.midi.MidiTrack 3 -- 10 events>
@@ -1250,13 +1456,19 @@ class MidiTrack(prebase.ProtoM21Object):
     '''
     headerId = b'MTrk'
 
-    def __init__(self, index=0):
+    def __init__(self, index: int = 0):
         self.index = index
-        self.events = []
+        self.events: list[MidiEvent] = []  # or DeltaTime subclass
         self.data = b''
 
+    def __len__(self) -> int:
+        '''
+        New in v9.7
+        '''
+        return len(self.data)
+
     @property
-    def length(self):
+    def length(self) -> int:
         return len(self.data)
 
     def read(self, midiBytes: bytes) -> bytes:
@@ -1266,9 +1478,11 @@ class MidiTrack(prebase.ProtoM21Object):
 
         The string should begin with `MTrk`, specifying a Midi Track
 
-        Calls `processDataToEvents` which creates and stores
+        Stores the read data (after the header and length information) in self.data
+
+        Calls `processDataToEvents` which creates
         :class:`~music21.midi.DeltaTime`
-        and :class:`~music21.midi.MidiEvent` objects.
+        and :class:`~music21.midi.MidiEvent` objects and stores them in self.events
         '''
         if not midiBytes[:4] == self.headerId:
             raise MidiException('badly formed midi string: missing leading MTrk')
@@ -1288,8 +1502,13 @@ class MidiTrack(prebase.ProtoM21Object):
         '''
         Populate .events with trackData.  Called by .read()
         '''
-        time = 0  # a running counter of ticks
-        previousMidiEvent = None
+        time: int = 0  # a running counter of ticks
+        previousMidiEvent: MidiEvent|None = None
+
+        dt: int
+        trackDataCandidate: bytes
+        timeCandidate: int
+
         while trackData:
             # shave off the time stamp from the event
             delta_t = DeltaTime(track=self)
@@ -1300,70 +1519,111 @@ class MidiTrack(prebase.ProtoM21Object):
 
             # pass self to event, set this MidiTrack as the track for this event
             midiEvent = MidiEvent(track=self)
-            if previousMidiEvent is not None:  # set the last status byte
+            if previousMidiEvent is not None:  # synchronize the last status byte
                 midiEvent.lastStatusByte = previousMidiEvent.lastStatusByte
+
             # some midi events may raise errors; simply skip for now
             try:
-                trackDataCandidate = midiEvent.read(trackDataCandidate)
+                trackData = midiEvent.read(trackDataCandidate)
+                time = timeCandidate
             except MidiException:
                 # assume that trackData, after delta extraction, is still correct
                 # environLocal.printDebug(['forced to skip event; delta_t:', delta_t])
                 # set to result after taking delta time
                 trackData = trackDataCandidate
                 continue
-            # only set after trying to read, which may raise exception
-            time = timeCandidate
-            trackData = trackDataCandidate  # remainder bytes
+
             # only append if we get this far
             self.events.append(delta_t)
             self.events.append(midiEvent)
             previousMidiEvent = midiEvent
 
-    def getBytes(self):
+    def getBytes(self) -> bytes:
         r'''
-        returns bytes of midi-data from the `.events` in the object.
+        Returns bytes of midi-data from the `.events` in the object.
+        For conversion from music21 to MIDI.
+
+        For example: two events, one note-on and one note-off on C4 which appears as "<"
+        in the data.
 
         >>> mt = midi.MidiTrack(index=2)
-        >>> noteOn = midi.MidiEvent(mt, type=midi.ChannelVoiceMessages.NOTE_ON, channel=1)
+        >>> dt1 = midi.DeltaTime(mt, time=0)
+        >>> noteOn = midi.MidiEvent(mt, type=midi.ChannelVoiceMessages.NOTE_ON, channel=3)
         >>> noteOn.pitch = 60
         >>> noteOn.velocity = 20
-        >>> dt = midi.DeltaTime(mt, time=1024)
-        >>> noteOff = midi.MidiEvent(mt, type=midi.ChannelVoiceMessages.NOTE_OFF, channel=1)
+        >>> dt2 = midi.DeltaTime(mt, time=1030)
+        >>> noteOff = midi.MidiEvent(mt, type=midi.ChannelVoiceMessages.NOTE_OFF, channel=3)
         >>> noteOff.pitch = 60
         >>> noteOff.velocity = 0
 
-        >>> mt.events = [noteOn, dt, noteOff]
-        >>> mt.getBytes()
-        b'MTrk\x00\x00\x00\x08\x90<\x14\x88\x00\x80<\x00'
+        >>> mt.events = [dt1, noteOn, dt2, noteOff]
+        >>> bytes = mt.getBytes()
+        >>> bytes
+        b'MTrk\x00\x00\x00\t\x00\x92<\x14\x88\x06\x82<\x00'
 
-        The b'\x08' indicates that there are 8 bytes to follow.
+        Explanation:
+
+        The first four bytes `MTrk` are the header for any MIDI Track
+
+        >>> bytes[:4]
+        b'MTrk'
+
+        The next four bytes are the length of the data in bytes, the final `b'\t'`
+        indicates there are 9 bytes to follow.
+
+        >>> midi.base.getNumber(bytes[4:8], 4)
+        (9, b'')
+
+        The next byte is an empty delta time event.
+
+        >>> bytes[8]
+        0
+
+        The next three bytes are the note-on event.
+
+        >>> noteOn2 = midi.MidiEvent()
+        >>> _ = noteOn2.parseChannelVoiceMessage(bytes[9:12])
+        >>> noteOn2
+        <music21.midi.MidiEvent NOTE_ON, track=None, channel=3, pitch=60, velocity=20>
+
+        Followed by two bytes for the DeltaTime of 1030 ticks.
+
+        >>> dt3 = midi.DeltaTime()
+        >>> dt3.readUntilLowByte(bytes[12:14])
+        (1030, b'')
+
+        The 1030 is stored as b'\x88\x06' where the first byte is 136 and the second 6,
+        but MIDI stores each continuing digit as the last 7 bits of a 8-bit number with
+        first bit 1, so we remove the first bit by subtracting 128: 136 - 128 = 8.
+        Then we multiply 8 by 128 to get 1024 and add 6 to get 1030.
+
+        Finally, the last three bytes are the note-off event.
+
+        >>> noteOff2 = midi.MidiEvent()
+        >>> _ = noteOff2.parseChannelVoiceMessage(bytes[14:])
+        >>> noteOff2
+        <music21.midi.MidiEvent NOTE_OFF, track=None, channel=3, pitch=60, velocity=0>
         '''
         # set time to the first event
         # time = self.events[0].time
         # build str using MidiEvents
-        midiBytes = b''
+        midiBytes: list[bytes] = []
         for midiEvent in self.events:
             # this writes both delta time and message events
             try:
-                eventBytes = midiEvent.getBytes()
-                intArray = []
-                for x in eventBytes:
-                    if common.isNum(x):
-                        intArray.append(x)
-                    else:
-                        intArray.append(ord(x))
-                eventBytes = bytes(bytearray(intArray))
-                midiBytes = midiBytes + eventBytes
+                midiBytes.append(midiEvent.getBytes())
             except MidiException as ex:
                 environLocal.warn(f'Conversion error for {midiEvent}: {ex}; ignored.')
-        return self.headerId + putNumber(len(midiBytes), 4) + midiBytes
+
+        bytes_out = b''.join(midiBytes)
+        return self.headerId + putNumber(len(bytes_out), 4) + bytes_out
 
     def _reprInternal(self):
         r = f'{self.index} -- {len(self.events)} events'
         return r
 
     # --------------------------------------------------------------------------
-    def updateEvents(self):
+    def updateEvents(self) -> None:
         '''
         We may attach events to this track before setting their `track` parameter.
         This method will move through all events and set their track to this track.
@@ -1385,7 +1645,7 @@ class MidiTrack(prebase.ProtoM21Object):
         for e in self.events:
             e.track = self
 
-    def hasNotes(self):
+    def hasNotes(self) -> bool:
         '''
         Return True/False if this track has any note-ons defined.
 
@@ -1404,9 +1664,9 @@ class MidiTrack(prebase.ProtoM21Object):
                 return True
         return False
 
-    def setChannel(self, value):
+    def setChannel(self, value: int) -> None:
         '''
-        Set the channel of all events in this Track.
+        Set the one-indexed channel of all events in this Track.
 
         >>> mt = midi.MidiTrack(index=2)
         >>> noteOn = midi.MidiEvent(type=midi.ChannelVoiceMessages.NOTE_ON, channel=1)
@@ -1426,7 +1686,7 @@ class MidiTrack(prebase.ProtoM21Object):
         for e in self.events:
             e.channel = value
 
-    def getChannels(self):
+    def getChannels(self) -> list[int]:
         '''
         Get all channels (excluding None) used in this Track (sorted)
 
@@ -1441,13 +1701,13 @@ class MidiTrack(prebase.ProtoM21Object):
         >>> mt.getChannels()
         [5, 14]
         '''
-        post = []
+        post: set[int] = set()
         for e in self.events:
-            if e.channel not in post and e.channel is not None:
-                post.append(e.channel)
+            if e.channel is not None:
+                post.add(e.channel)
         return sorted(post)
 
-    def getProgramChanges(self):
+    def getProgramChanges(self) -> list[int]:
         '''
         Get all unique program changes used in this Track, in order they appear.
 
@@ -1462,11 +1722,12 @@ class MidiTrack(prebase.ProtoM21Object):
         >>> mt.getProgramChanges()
         [14, 1]
         '''
-        post = []
+        post: list[int] = []
         for e in self.events:
-            if e.type == ChannelVoiceMessages.PROGRAM_CHANGE:
-                if e.data not in post:
-                    post.append(e.data)
+            if (e.type == ChannelVoiceMessages.PROGRAM_CHANGE
+                    and isinstance(e.data, int)
+                    and e.data not in post):  # O(127) = O(1), faster than a set lookup + append
+                post.append(e.data)
         return post
 
 
@@ -1512,14 +1773,14 @@ class MidiFile(prebase.ProtoM21Object):
     '''
     headerId = b'MThd'
 
-    def __init__(self):
-        self.file = None
-        self.format = 1
-        self.tracks = []
-        self.ticksPerQuarterNote = defaults.ticksPerQuarter
-        self.ticksPerSecond = None
+    def __init__(self) -> None:
+        self.file: t.BinaryIO|None = None
+        self.format: int = 1
+        self.tracks: list[MidiTrack] = []
+        self.ticksPerQuarterNote: int = defaults.ticksPerQuarter
+        self.ticksPerSecond: int|None = None
 
-    def open(self, filename, attrib='rb'):
+    def open(self, filename, attrib='rb') -> None:
         '''
         Open a MIDI file path for reading or writing.
 
@@ -1528,9 +1789,9 @@ class MidiFile(prebase.ProtoM21Object):
         if attrib not in ['rb', 'wb']:
             raise MidiException('cannot read or write unless in binary mode, not:', attrib)
         # pylint: disable-next=consider-using-with, unspecified-encoding
-        self.file = open(filename, attrib)
+        self.file = t.cast(t.BinaryIO, open(filename, attrib))
 
-    def openFileLike(self, fileLike):
+    def openFileLike(self, fileLike: t.BinaryIO) -> None:
         '''
         Assign a file-like object, such as those provided by BytesIO, as an open file object.
 
@@ -1542,30 +1803,38 @@ class MidiFile(prebase.ProtoM21Object):
         '''
         self.file = fileLike
 
-    def _reprInternal(self):
+    def _reprInternal(self) -> str:
         lenTracks = len(self.tracks)
         plural = 's' if lenTracks != 1 else ''
         return f'{lenTracks} track{plural}'
 
-    def close(self):
+    def close(self) -> None:
         '''
         Close the file.
         '''
+        if not self.file:
+            # nothing to do
+            return
+
         self.file.close()
 
-    def read(self):
+    def read(self) -> None:
         '''
         Read and parse MIDI data stored in a file.
         '''
+        if not self.file:
+            raise TypeError('No file is open.')
+
         self.readstr(self.file.read())
 
-    def readstr(self, midiBytes):
+    def readstr(self, midiBytes: bytes) -> None:
         '''
         Read and parse MIDI data as a bytes, putting the
         data in `.ticksPerQuarterNote` and a list of
         `MidiTrack` objects in the attribute `.tracks`.
 
-        The name readstr is a carryover from Python 2.  It works on bytes objects, not strings
+        The name readstr is a carryover from Python 2.
+        It works on bytes objects, not strings
         '''
         if not midiBytes[:4] == b'MThd':
             raise MidiException(f'badly formatted midi bytes, got: {midiBytes[:20]!r}')
@@ -1605,10 +1874,13 @@ class MidiFile(prebase.ProtoM21Object):
             midiBytes = trk.read(midiBytes)  # pass all the remaining bytes, reassigning
             self.tracks.append(trk)
 
-    def write(self):
+    def write(self) -> None:
         '''
         Write MIDI data as a file to the file opened with `.open()`.
         '''
+        if not self.file:
+            raise TypeError('No file is open.')
+
         ws = self.writestr()
         self.file.write(ws)
 
