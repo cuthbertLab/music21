@@ -371,10 +371,10 @@ class PedalMark(spanner.Spanner):
         # before the start note has been added to the spanner.
         self.startOffset: OffsetQL|None = startOffset
 
-        self.pedalType = 'sustain'
-        self.pedalForm = 'symbol'
-
-        self.abbreviated = False
+        self.pedalType: str = 'sustain'
+        self.pedalForm: str = 'symbol'
+        self.abbreviated: bool = False
+        self.placement: str|None = None
 
     @property
     def pedalType(self) -> str:
