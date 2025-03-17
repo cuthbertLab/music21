@@ -367,8 +367,8 @@ class PedalMark(spanner.Spanner):
         self.fillElementTypes = [note.GeneralNote]
 
         # startOffset is completely optional.  Can be set by parsers (such
-        # as MusicXML) that might need to get this offset from the spanner
-        # before the start note has been added to the spanner.
+        # as MusicXML) that might need to get this offset back from the
+        # spanner before the start note has been added to the spanner.
         self.startOffset: OffsetQL|None = startOffset
 
         self.pedalType: str = 'sustain'
