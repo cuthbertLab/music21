@@ -808,8 +808,6 @@ class XMLExporterBase:
             except AttributeError:
                 continue
 
-            if m21Name in xmlObjects.STYLE_ATTRIBUTES_STR_NONE_TO_NONE and m21Value is None:
-                m21Value = 'none'
             if m21Name in xmlObjects.STYLE_ATTRIBUTES_YES_NO_TO_BOOL:
                 m21Value = xmlObjects.booleanToYesNo(m21Value)
 
