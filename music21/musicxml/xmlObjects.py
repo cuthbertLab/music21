@@ -134,7 +134,6 @@ class MusicXMLWarning(UserWarning):
 # ------------------------------------------------------------------------------
 # helpers
 STYLE_ATTRIBUTES_YES_NO_TO_BOOL = ('hideObjectOnPrint', )
-STYLE_ATTRIBUTES_STR_NONE_TO_NONE = ('enclosure', )
 
 
 def yesNoToBoolean(value):

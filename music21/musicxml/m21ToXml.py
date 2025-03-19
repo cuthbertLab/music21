@@ -808,8 +808,6 @@ class XMLExporterBase:
             except AttributeError:
                 continue
 
-            if m21Name in xmlObjects.STYLE_ATTRIBUTES_STR_NONE_TO_NONE and m21Value is None:
-                m21Value = 'none'
             if m21Name in xmlObjects.STYLE_ATTRIBUTES_YES_NO_TO_BOOL:
                 m21Value = xmlObjects.booleanToYesNo(m21Value)
 
@@ -6197,9 +6195,12 @@ class MeasureExporter(XMLExporterBase):
           </direction-type>
         </direction>
 
-        turn coda.useSymbol to `False` to get a text expression instead
+        turn coda.useSymbol to `False` to get a text expression instead,
+        and set enclosure to NO_ENCLOSURE to explicitly generate
+        enclosure="none".
 
         >>> c.useSymbol = False
+        >>> c.style.enclosure = style.Enclosure.NO_ENCLOSURE
         >>> MEX = musicxml.m21ToXml.MeasureExporter()
         >>> mxCodaText = MEX.codaToXml(c)
         >>> MEX.dump(mxCodaText)
@@ -6251,7 +6252,7 @@ class MeasureExporter(XMLExporterBase):
         >>> MEX.dump(MEX.xmlRoot.findall('direction')[1])
         <direction>
           <direction-type>
-            <words default-y="45" enclosure="none" font-weight="bold"
+            <words default-y="45" font-weight="bold"
                 justify="left">slow</words>
           </direction-type>
         </direction>
@@ -6321,7 +6322,7 @@ class MeasureExporter(XMLExporterBase):
         >>> MEX.dump(mxDirection)
         <direction>
           <direction-type>
-            <words default-y="45" enclosure="none" font-weight="bold">Andante</words>
+            <words default-y="45" font-weight="bold">Andante</words>
           </direction-type>
         </direction>
 
