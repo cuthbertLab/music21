@@ -6157,15 +6157,19 @@ class MeasureExporter(XMLExporterBase):
           </direction-type>
         </direction>
 
-        turn coda.useSymbol to `False` to get a text expression instead
+        turn coda.useSymbol to `False` to get a text expression instead,
+        and set enclosure to NO_ENCLOSURE to explicitly generate
+        enclosure="none".
 
         >>> c.useSymbol = False
+        >>> c.style.enclosure = style.Enclosure.NO_ENCLOSURE
         >>> MEX = musicxml.m21ToXml.MeasureExporter()
         >>> mxCodaText = MEX.codaToXml(c)
         >>> MEX.dump(mxCodaText)
         <direction>
           <direction-type>
-            <words default-y="20" justify="center">Coda</words>
+            <words default-y="20" enclosure="none"
+                justify="center">Coda</words>
           </direction-type>
         </direction>
         '''

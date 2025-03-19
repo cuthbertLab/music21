@@ -119,6 +119,7 @@ class Style(ProtoM21Object):
         * "bracket"/style.Enclosure.BRACKET,
         * "inverted-bracket"/style.Enclosure.INVERTED_BRACKET (output in musicxml 4 only)
         * "none"/style.Enclosure.NO_ENCLOSURE
+        * None (i.e. enclosure is unspecified)
 
         or the following other shapes with their ALLCAPS Enclosure equivalents:
 
@@ -154,11 +155,14 @@ class Style(ProtoM21Object):
         Traceback (most recent call last):
         music21.style.TextFormatException:
             Not a supported enclosure: 4
+
+        * Changed in v9.7: We now differentiate between no enclosure
+          (Enclosure.NO_ENCLOSURE) and unspecified enclosure (None).
         '''
         return self._enclosure
 
     @enclosure.setter
-    def enclosure(self, value: Enclosure|None):
+    def enclosure(self, value: Enclosure|str|None):
         if value is None:
             self._enclosure = value
         elif isinstance(value, Enclosure):
