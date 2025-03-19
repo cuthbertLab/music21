@@ -1064,7 +1064,8 @@ class Test(unittest.TestCase):
         self.assertEqual(len(rmIterator), 4)
         self.assertEqual(rmIterator[0].content, 'A')
         self.assertEqual(rmIterator[1].content, 'B')
-        self.assertEqual(rmIterator[1].style.enclosure, None)
+        self.assertEqual(rmIterator[1].style.enclosure,
+                         style.Enclosure.NO_ENCLOSURE)
         self.assertEqual(rmIterator[2].content, 'Test')
         self.assertEqual(rmIterator[2].style.enclosure, 'square')
 

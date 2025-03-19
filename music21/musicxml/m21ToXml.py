@@ -6165,8 +6165,7 @@ class MeasureExporter(XMLExporterBase):
         >>> MEX.dump(mxCodaText)
         <direction>
           <direction-type>
-            <words default-y="20" enclosure="none"
-                justify="center">Coda</words>
+            <words default-y="20" justify="center">Coda</words>
           </direction-type>
         </direction>
         '''
@@ -6211,7 +6210,7 @@ class MeasureExporter(XMLExporterBase):
         >>> MEX.dump(MEX.xmlRoot.findall('direction')[1])
         <direction>
           <direction-type>
-            <words default-y="45" enclosure="none" font-weight="bold"
+            <words default-y="45" font-weight="bold"
                 justify="left">slow</words>
           </direction-type>
         </direction>
@@ -6281,7 +6280,7 @@ class MeasureExporter(XMLExporterBase):
         >>> MEX.dump(mxDirection)
         <direction>
           <direction-type>
-            <words default-y="45" enclosure="none" font-weight="bold">Andante</words>
+            <words default-y="45" font-weight="bold">Andante</words>
           </direction-type>
         </direction>
 
