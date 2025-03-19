@@ -23,6 +23,7 @@ from music21 import pitch
 from music21 import repeat
 from music21 import spanner
 from music21 import stream
+from music21 import style
 from music21 import tempo
 from music21 import text
 
