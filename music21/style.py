@@ -45,7 +45,7 @@ class Enclosure(common.StrEnum):
     NONAGON = 'nonagon'
     DECAGON = 'decagon'
     INVERTED_BRACKET = 'inverted-bracket'
-    NONE = 'none'  # special -- sets to None.
+    NO_ENCLOSURE = 'none'
 
 
 class Style(ProtoM21Object):
@@ -87,6 +87,8 @@ class Style(ProtoM21Object):
         # managed by property below.
         self._absoluteY: float|int|None = None
 
+        # None means enclosure is left unspecified, NO_ENCLOSURE means
+        # explicitly that there is no enclosure.
         self._enclosure: Enclosure|None = None
 
         # how should this symbol be represented in the font?
@@ -105,7 +107,8 @@ class Style(ProtoM21Object):
     @property
     def enclosure(self) -> Enclosure|None:
         '''
-        Get or set the enclosure as a style.Enclosure enum or None.
+        Get or set the enclosure as a style.Enclosure enum (or
+        None, which means the enclosure is left unspecified).
 
         Valid names are:
 
@@ -115,7 +118,8 @@ class Style(ProtoM21Object):
         * "circle"/style.Enclosure.CIRCLE,
         * "bracket"/style.Enclosure.BRACKET,
         * "inverted-bracket"/style.Enclosure.INVERTED_BRACKET (output in musicxml 4 only)
-        * None/"none"/style.Enclosure.NONE (returns Python None object)
+        * "none"/style.Enclosure.NO_ENCLOSURE
+        * None (i.e. enclosure is unspecified)
 
         or the following other shapes with their ALLCAPS Enclosure equivalents:
 
@@ -151,15 +155,16 @@ class Style(ProtoM21Object):
         Traceback (most recent call last):
         music21.style.TextFormatException:
             Not a supported enclosure: 4
+
+        * Changed in v9.7: We now differentiate between no enclosure
+          (Enclosure.NO_ENCLOSURE) and unspecified enclosure (None).
         '''
         return self._enclosure
 
     @enclosure.setter
-    def enclosure(self, value: Enclosure|None):
+    def enclosure(self, value: Enclosure|str|None):
         if value is None:
             self._enclosure = value
-        elif value == Enclosure.NONE:
-            self._enclosure = None
         elif isinstance(value, Enclosure):
             self._enclosure = value
         elif isinstance(value, str):

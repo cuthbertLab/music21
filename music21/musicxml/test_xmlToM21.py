@@ -23,6 +23,7 @@ from music21 import pitch
 from music21 import repeat
 from music21 import spanner
 from music21 import stream
+from music21 import style
 from music21 import tempo
 from music21 import text
 
@@ -1064,7 +1065,8 @@ class Test(unittest.TestCase):
         self.assertEqual(len(rmIterator), 4)
         self.assertEqual(rmIterator[0].content, 'A')
         self.assertEqual(rmIterator[1].content, 'B')
-        self.assertEqual(rmIterator[1].style.enclosure, None)
+        self.assertEqual(rmIterator[1].style.enclosure,
+                         style.Enclosure.NO_ENCLOSURE)
         self.assertEqual(rmIterator[2].content, 'Test')
         self.assertEqual(rmIterator[2].style.enclosure, 'square')
 
