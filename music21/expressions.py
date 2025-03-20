@@ -404,6 +404,7 @@ class PedalObject(base.Music21Object):
     '''
     def __init__(self, **keywords):
         super().__init__(**keywords)
+        self.placement: str | None = None
 
     def _reprInternal(self) -> str:
         if self.activeSite is None:
