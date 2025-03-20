@@ -3419,7 +3419,8 @@ class MeasureExporter(XMLExporterBase):
         # this list of spanner classes must match the paramsSet keys in relatedSpanners()
         for thisSpanner in spannerBundle.getByClass((spanner.Ottava,
                                                      dynamics.DynamicWedge,
-                                                     spanner.Line)):
+                                                     spanner.Line,
+                                                     expressions.PedalMark)):
             if thisSpanner.isFirst(obj) or thisSpanner.isLast(obj):
                 return True
 
