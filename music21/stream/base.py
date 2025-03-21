@@ -4568,7 +4568,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         >>> len(beachExcerpt.spannerBundle)
         8
         >>> len(beachIn.spannerBundle)
-        93
+        94
 
         * Changed in v7: does not create measures automatically.
         * Changed in v7: If `gatherSpanners` is True or GatherSpanners.ALL (default),
