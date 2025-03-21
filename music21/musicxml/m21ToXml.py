@@ -3515,7 +3515,7 @@ class MeasureExporter(XMLExporterBase):
                         # check to see if we also need to start a line
                         if t.TYPE_CHECKING:
                             assert isinstance(thisSpanner, expressions.PedalMark)
-                        if thisSpanner.pedalForm == 'symline':
+                        if thisSpanner.pedalForm == expressions.PedalForm.SymbolLine:
                             mxPedalLine = (
                                 self.makePedalResumeLineXml(thisSpanner)
                             )
@@ -3580,15 +3580,15 @@ class MeasureExporter(XMLExporterBase):
         elif spannerClass == 'PedalMark':
             if t.TYPE_CHECKING:
                 assert isinstance(sp, expressions.PedalMark)
-            if sp.pedalType == 'sostenuto':
+            if sp.pedalType == expressions.PedalType.Sostenuto:
                 post['type'] = 'sostenuto'
             else:
-                # non-'sostenuto' sp.pedalType might be 'sustain', 'soft', or 'silent'.
-                # But MusicXML only has 'start', which implies 'sustain',
-                # so that's what we do here, assuming there is a text
+                # non-Sostenuto sp.pedalType might be Sustain, Soft, or Silent.
+                # But MusicXML only has 'start', which implies Sustain,
+                # so that's what we do here, hoping there is a text
                 # direction describing which pedal to use.
                 post['type'] = 'start'
-            if sp.pedalForm == 'line':
+            if sp.pedalForm == expressions.PedalForm.Line:
                 post['line'] = 'yes'
             else:
                 # 'symbol', 'altsymbol', and 'symline' all start with a sign
@@ -3631,7 +3631,7 @@ class MeasureExporter(XMLExporterBase):
         elif spannerClass == 'PedalMark':
             if t.TYPE_CHECKING:
                 assert isinstance(sp, expressions.PedalMark)
-            if sp.pedalForm in ('line', 'symline'):
+            if sp.pedalForm in (expressions.PedalForm.Line, expressions.PedalForm.SymbolLine):
                 post['line'] = 'yes'
             else:
                 # 'symbol', 'altsymbol' both end with a sign
@@ -6461,7 +6461,7 @@ class MeasureExporter(XMLExporterBase):
 
         >>> pm = expressions.PedalMark()
         >>> po = expressions.PedalBounce(pm)
-        >>> pm.pedalForm = 'altsymbol'
+        >>> pm.pedalForm = expressions.PedalForm.SymbolAlt
         >>> MEX = musicxml.m21ToXml.MeasureExporter()
         >>> mxPedal = MEX.pedalObjectToXml(po)
         >>> MEX.dump(mxPedal)
@@ -6472,7 +6472,7 @@ class MeasureExporter(XMLExporterBase):
           </direction>
 
         >>> po = expressions.PedalGapStart()
-        >>> po.pedalForm = 'line'
+        >>> po.pedalForm = expressions.PedalForm.Line
         >>> po.placement = 'above'
         >>> MEX = musicxml.m21ToXml.MeasureExporter()
         >>> mxPedal = MEX.pedalObjectToXml(po)
@@ -6484,7 +6484,7 @@ class MeasureExporter(XMLExporterBase):
           </direction>
 
         >>> po = expressions.PedalGapEnd()
-        >>> po.pedalForm = 'line'
+        >>> po.pedalForm = expressions.PedalForm.Line
         >>> po.placement = 'below'
         >>> MEX = musicxml.m21ToXml.MeasureExporter()
         >>> mxPedal = MEX.pedalObjectToXml(po)
@@ -6509,32 +6509,36 @@ class MeasureExporter(XMLExporterBase):
 
         mxPedals: list[Element] = []
         if isinstance(po, expressions.PedalBounce):
-            if pm.pedalForm in ('line', 'symline'):
+            if pm.pedalForm in (expressions.PedalForm.Line, expressions.PedalForm.SymbolLine):
+                # Line or SymbolLine bounce is a quick up-down-tick in the line, so this
+                # is a pedal 'change'.
                 mxPedals = [Element('pedal')]
                 mxPedals[0].set('type', 'change')
-            elif pm.pedalForm == 'altsymbol':
-                # bounce is just "Ped.", so a pedal 'start'
+            elif pm.pedalForm == expressions.PedalForm.SymbolAlt:
+                # SymbolAlt bounce is just "Ped.", so just a pedal 'start'
                 mxPedals = [Element('pedal')]
-                if pm.pedalType == 'sustain':
+                if pm.pedalType == expressions.PedalType.Sustain:
                     mxPedals[0].set('type', 'start')
-                elif pm.pedalType == 'sostenuto':
+                elif pm.pedalType == expressions.PedalType.Sostenuto:
                     mxPedals[0].set('type', 'sostenuto')
                 else:
-                    # not exactly right for 'soft' or 'silent',
-                    # but better than 'sustain'...
+                    # not exactly right for Soft or Silent,
+                    # but better than Sustain...
                     mxPedals[0].set('type', 'sostenuto')
-            elif pm.pedalForm == 'symbol':
-                # bounce is "*Ped.", so a pedal 'stop' followed immediately by pedal 'start'
+            elif pm.pedalForm == expressions.PedalForm.Symbol:
+                # Symbol bounce is "*Ped.", so a pedal 'stop' followed immediately by pedal 'start'
                 mxPedals = [Element('pedal'), Element('pedal')]
                 mxPedals[0].set('type', 'stop')
-                if pm.pedalType == 'sustain':
+                if pm.pedalType == expressions.PedalType.Sustain:
                     mxPedals[1].set('type', 'start')
-                elif pm.pedalType == 'sostenuto':
+                elif pm.pedalType == expressions.PedalType.Sostenuto:
                     mxPedals[1].set('type', 'sostenuto')
                 else:
-                    # not exactly right for 'soft' or 'silent',
-                    # but better than 'sustain'...
-                    mxPedals[1].set('type', 'sostenuto')
+                    # not exactly right for Soft or Silent, but
+                    # we can hope that there is a text direction
+                    # somewhere before this that specifies which
+                    # pedal these "Ped." marks refer to.
+                    mxPedals[1].set('type', 'sustain')
             else:
                 # shouldn't be able to happen
                 return None
@@ -6549,7 +6553,7 @@ class MeasureExporter(XMLExporterBase):
             return None
 
         for mxPedal in mxPedals:
-            if pm.pedalForm in ('line', 'symline'):
+            if pm.pedalForm in (expressions.PedalForm.Line, expressions.PedalForm.SymbolLine):
                 mxPedal.set('line', 'yes')
             else:
                 mxPedal.set('sign', 'yes')

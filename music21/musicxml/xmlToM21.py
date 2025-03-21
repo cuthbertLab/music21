@@ -4234,18 +4234,19 @@ class MeasureParser(SoundTagMixin, XMLParserBase):
 
             idFound = mxObj.get('number')
             if mxType in ('start', 'sostenuto'):
-                sp = expressions.PedalMark(startOffset=totalOffset)
+                sp = expressions.PedalMark()
                 sp.idLocal = idFound
+                sp.startOffset = totalOffset
 
                 if mxType == 'start':
-                    sp.pedalType = 'sustain'
+                    sp.pedalType = expressions.PedalType.Sustain
                 elif mxType == 'sostenuto':
-                    sp.pedalType = 'sostenuto'
+                    sp.pedalType = expressions.PedalType.Sostenuto
 
                 if mxLine == 'yes':
-                    sp.pedalForm = 'line'
+                    sp.pedalForm = expressions.PedalForm.Line
                 elif mxLine == 'no' or mxSign == 'yes':
-                    sp.pedalForm = 'symbol'
+                    sp.pedalForm = expressions.PedalForm.Symbol
 
                 if mxAbbreviated == 'yes':
                     sp.abbreviated = True
@@ -4275,12 +4276,13 @@ class MeasureParser(SoundTagMixin, XMLParserBase):
                     self.insertCoreAndRef(totalOffset, staffKey, pgStart)
                     sp.addSpannedElements(pgStart)
                 elif mxType == 'resume':
-                    # If the current pedalForm is 'symbol', and we're still at the start
-                    # offset of the PedalMark, change pedalForm to 'symline' (because
+                    # If the current pedalForm is Symbol, and we're still at the start
+                    # offset of the PedalMark, change pedalForm to SymbolLine (because
                     # we had a symbol, and now we're starting a line without a downtick;
-                    # that is the definition of 'symline').
-                    if sp.pedalForm == 'symbol' and sp.startOffset == totalOffset:
-                        sp.pedalForm = 'symline'
+                    # that is the definition of SymbolLine).
+                    if (sp.pedalForm == expressions.PedalForm.Symbol
+                            and sp.startOffset == totalOffset):
+                        sp.pedalForm = expressions.PedalForm.SymbolLine
                     else:
                         # insert a PedalGapEnd
                         pgEnd = expressions.PedalGapEnd()
