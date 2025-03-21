@@ -6451,7 +6451,7 @@ class MeasureExporter(XMLExporterBase):
         self.xmlRoot.append(mxDirection)
         return mxDirection
 
-    def pedalObjectToXml(self, po: expressions.PedalObject) -> None:
+    def pedalObjectToXml(self, po: expressions.PedalObject) -> Element|None:
         # noinspection PyShadowingNames
         '''
         Convert a PedalObject object (i.e. PedalBounce, PedalGapStart,
@@ -6460,40 +6460,48 @@ class MeasureExporter(XMLExporterBase):
         PedalMark spanner.
 
         >>> pm = expressions.PedalMark()
-        >>> po = expressions.PedalBounce(pm)
-        >>> pm.pedalForm = expressions.PedalForm.SymbolAlt
+        >>> po = expressions.PedalBounce()
+        >>> pm.addSpannedElements(po)
+        >>> pm.pedalForm = expressions.PedalForm.Line
+        >>> pm.pedalType = expressions.PedalType.Sustain
         >>> MEX = musicxml.m21ToXml.MeasureExporter()
         >>> mxPedal = MEX.pedalObjectToXml(po)
         >>> MEX.dump(mxPedal)
         <direction>
           <direction-type>
-            <pedal type="change" form="altsymbol"/>
-            </direction-type>
-          </direction>
+            <pedal line="yes" type="change" />
+          </direction-type>
+        </direction>
 
+        >>> pm = expressions.PedalMark()
         >>> po = expressions.PedalGapStart()
-        >>> po.pedalForm = expressions.PedalForm.Line
+        >>> pm.addSpannedElements(po)
+        >>> pm.pedalForm = expressions.PedalForm.Line
+        >>> pm.pedalType = expressions.PedalType.Sustain
         >>> po.placement = 'above'
         >>> MEX = musicxml.m21ToXml.MeasureExporter()
         >>> mxPedal = MEX.pedalObjectToXml(po)
         >>> MEX.dump(mxPedal)
         <direction placement="above">
           <direction-type>
-            <pedal type="discontinue" form="line"/>
-            </direction-type>
-          </direction>
+            <pedal line="yes" type="discontinue" />
+          </direction-type>
+        </direction>
 
+        >>> pm = expressions.PedalMark()
         >>> po = expressions.PedalGapEnd()
-        >>> po.pedalForm = expressions.PedalForm.Line
+        >>> pm.addSpannedElements(po)
+        >>> pm.pedalForm = expressions.PedalForm.Line
+        >>> pm.pedalType = expressions.PedalType.Sustain
         >>> po.placement = 'below'
         >>> MEX = musicxml.m21ToXml.MeasureExporter()
         >>> mxPedal = MEX.pedalObjectToXml(po)
         >>> MEX.dump(mxPedal)
         <direction placement="below">
           <direction-type>
-            <pedal type="resume" form="line"/>
-            </direction-type>
-          </direction>
+            <pedal line="yes" type="resume" />
+          </direction-type>
+        </direction>
         '''
         pm: expressions.PedalMark|None = None
         spanners: list[spanner.Spanner] = po.getSpannerSites()
@@ -6564,7 +6572,7 @@ class MeasureExporter(XMLExporterBase):
             self.setStyleAttributes(mxDirection, po, 'placement')
             self.xmlRoot.append(mxDirection)
 
-        return None
+        return mxDirection
 
     def makePedalResumeLineXml(self, pm: expressions.PedalMark) -> Element:
         # does not append to self.xmlRoot (caller will do that)
