@@ -402,7 +402,7 @@ class PedalObject(base.Music21Object):
         Base class of individual objects that mark various transitions
         in a PedalMark spanner.
     '''
-    def __init__(self, **keywords):
+    def __init__(self, **keywords) -> None:
         super().__init__(**keywords)
         self.placement: str | None = None
 

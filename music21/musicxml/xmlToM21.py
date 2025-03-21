@@ -4275,12 +4275,12 @@ class MeasureParser(SoundTagMixin, XMLParserBase):
                     self.insertCoreAndRef(totalOffset, staffKey, pgStart)
                     sp.addSpannedElements(pgStart)
                 elif mxType == 'resume':
-                    # If the current pedalType is 'symbol', and we're still at the start
-                    # offset of the PedalMark, change pedalType to 'symline' (because
+                    # If the current pedalForm is 'symbol', and we're still at the start
+                    # offset of the PedalMark, change pedalForm to 'symline' (because
                     # we had a symbol, and now we're starting a line without a downtick;
                     # that is the definition of 'symline').
-                    if sp.pedalType == 'symbol' and sp.startOffset == totalOffset:
-                        sp.pedalType = 'symline'
+                    if sp.pedalForm == 'symbol' and sp.startOffset == totalOffset:
+                        sp.pedalForm = 'symline'
                     else:
                         # insert a PedalGapEnd
                         pgEnd = expressions.PedalGapEnd()

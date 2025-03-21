@@ -3051,6 +3051,7 @@ class MeasureExporter(XMLExporterBase):
             ('TextExpression', 'textExpressionToXml'),
             ('RepeatExpression', 'textExpressionToXml'),
             ('RehearsalMark', 'rehearsalMarkToXml'),
+            ('PedalObject', 'pedalObjectToXml'),
         ]
     )
     # these need to be wrapped in an attributes tag if not at the beginning of the measure.
@@ -3509,6 +3510,16 @@ class MeasureExporter(XMLExporterBase):
                         preList.append(mxDirection)
                     else:
                         postList.append(mxDirection)
+
+                    if m21spannerClass == 'PedalMark' and posSub == 'first':
+                        # check to see if we also need to start a line
+                        if t.TYPE_CHECKING:
+                            assert isinstance(thisSpanner, expressions.PedalMark)
+                        if thisSpanner.pedalForm == 'symline':
+                            mxPedalLine = (
+                                self.makePedalResumeLineXml(thisSpanner)
+                            )
+                            preList.append(mxPedalLine)
 
         return preList, postList
 
@@ -6438,6 +6449,128 @@ class MeasureExporter(XMLExporterBase):
         self.setStyleAttributes(mxDirection, rm, 'placement')
 
         self.xmlRoot.append(mxDirection)
+        return mxDirection
+
+    def pedalObjectToXml(self, po: expressions.PedalObject) -> None:
+        # noinspection PyShadowingNames
+        '''
+        Convert a PedalObject object (i.e. PedalBounce, PedalGapStart,
+        PedalGapEnds) to a MusicXML <direction> tag with a <pedal> tag
+        inside it.  Attributes like pedalForm are stored in the enclosing
+        PedalMark spanner.
+
+        >>> pm = expressions.PedalMark()
+        >>> po = expressions.PedalBounce(pm)
+        >>> pm.pedalForm = 'altsymbol'
+        >>> MEX = musicxml.m21ToXml.MeasureExporter()
+        >>> mxPedal = MEX.pedalObjectToXml(po)
+        >>> MEX.dump(mxPedal)
+        <direction>
+          <direction-type>
+            <pedal type="change" form="altsymbol"/>
+            </direction-type>
+          </direction>
+
+        >>> po = expressions.PedalGapStart()
+        >>> po.pedalForm = 'line'
+        >>> po.placement = 'above'
+        >>> MEX = musicxml.m21ToXml.MeasureExporter()
+        >>> mxPedal = MEX.pedalObjectToXml(po)
+        >>> MEX.dump(mxPedal)
+        <direction placement="above">
+          <direction-type>
+            <pedal type="discontinue" form="line"/>
+            </direction-type>
+          </direction>
+
+        >>> po = expressions.PedalGapEnd()
+        >>> po.pedalForm = 'line'
+        >>> po.placement = 'below'
+        >>> MEX = musicxml.m21ToXml.MeasureExporter()
+        >>> mxPedal = MEX.pedalObjectToXml(po)
+        >>> MEX.dump(mxPedal)
+        <direction placement="below">
+          <direction-type>
+            <pedal type="resume" form="line"/>
+            </direction-type>
+          </direction>
+        '''
+        pm: expressions.PedalMark|None = None
+        spanners: list[spanner.Spanner] = po.getSpannerSites()
+        for sp in spanners:
+            if isinstance(sp, expressions.PedalMark):
+                pm = sp
+                break
+
+        if pm is None:
+            # A PedalObject that is not in a PedalMark spanner
+            # doesn't make sense.  Ignore it.
+            return None
+
+        mxPedals: list[Element] = []
+        if isinstance(po, expressions.PedalBounce):
+            if pm.pedalForm in ('line', 'symline'):
+                mxPedals = [Element('pedal')]
+                mxPedals[0].set('type', 'change')
+            elif pm.pedalForm == 'altsymbol':
+                # bounce is just "Ped.", so a pedal 'start'
+                mxPedals = [Element('pedal')]
+                if pm.pedalType == 'sustain':
+                    mxPedals[0].set('type', 'start')
+                elif pm.pedalType == 'sostenuto':
+                    mxPedals[0].set('type', 'sostenuto')
+                else:
+                    # not exactly right for 'soft' or 'silent',
+                    # but better than 'sustain'...
+                    mxPedals[0].set('type', 'sostenuto')
+            elif pm.pedalForm == 'symbol':
+                # bounce is "*Ped.", so a pedal 'stop' followed immediately by pedal 'start'
+                mxPedals = [Element('pedal'), Element('pedal')]
+                mxPedals[0].set('type', 'stop')
+                if pm.pedalType == 'sustain':
+                    mxPedals[1].set('type', 'start')
+                elif pm.pedalType == 'sostenuto':
+                    mxPedals[1].set('type', 'sostenuto')
+                else:
+                    # not exactly right for 'soft' or 'silent',
+                    # but better than 'sustain'...
+                    mxPedals[1].set('type', 'sostenuto')
+            else:
+                # shouldn't be able to happen
+                return None
+
+        elif isinstance(po, expressions.PedalGapStart):
+            mxPedals = [Element('pedal')]
+            mxPedals[0].set('type', 'discontinue')
+        elif isinstance(po, expressions.PedalGapEnd):
+            mxPedals = [Element('pedal')]
+            mxPedals[0].set('type', 'resume')
+        else:
+            return None
+
+        for mxPedal in mxPedals:
+            if pm.pedalForm in ('line', 'symline'):
+                mxPedal.set('line', 'yes')
+            else:
+                mxPedal.set('sign', 'yes')
+
+            # wrap in <direction><direction-type>
+            mxDirection = self.placeInDirection(mxPedal, po)
+            # placement goes on <direction>
+            self.setStyleAttributes(mxDirection, po, 'placement')
+            self.xmlRoot.append(mxDirection)
+
+        return None
+
+    def makePedalResumeLineXml(self, pm: expressions.PedalMark) -> Element:
+        # does not append to self.xmlRoot (caller will do that)
+        mxPedal = Element('pedal')
+        mxPedal.set('type', 'resume')
+        mxPedal.set('line', 'yes')
+        # wrap in <direction><direction-type>
+        mxDirection = self.placeInDirection(mxPedal, pm)
+        # placement (from pm spanner) goes on <direction>
+        self.setStyleAttributes(mxDirection, pm, 'placement')
         return mxDirection
 
     def textExpressionToXml(
