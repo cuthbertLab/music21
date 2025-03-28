@@ -685,22 +685,84 @@ class Test(unittest.TestCase):
             defaults.divisionsPerQuarter)
 
     def testPedals(self):
-        expectedResults = (
-            'start',
-            'change',
-            'discontinue',
-            'resume',
-            'change',
-            'stop'
+        expectedResults1 = (
+            {
+                'type': 'start',
+                'line': 'yes',
+                'number': '1',
+            },
+            {
+                'type': 'change',
+                'line': 'yes',
+            },
+            {
+                'type': 'discontinue',
+                'line': 'yes',
+            },
+            {
+                'type': 'resume',
+                'line': 'yes',
+            },
+            {
+                'type': 'change',
+                'line': 'yes',
+            },
+            {
+                'type': 'stop',
+                'line': 'yes',
+                'number': '1',
+            },
         )
-        s = converter.parse(testPrimitive.pedals)
+        s = converter.parse(testPrimitive.pedalLines)
         x = self.getET(s)
         mxPart = x.find('part')
         for i, mxPedal in enumerate(mxPart.findall('.//pedal')):
-            self.assertEqual(mxPedal.get('type', ''), expectedResults[i])
-            self.assertEqual(mxPedal.get('line', ''), 'yes')
-            if i in (0, 5):
-                self.assertEqual(mxPedal.get('number', ''), '1')
+            with self.subTest(pedal_index=i):
+                for k in expectedResults1[i]:
+                    self.assertEqual(mxPedal.get(k, ''), expectedResults1[i][k])
+
+        startIdx = len(expectedResults1)
+
+        expectedResults2 = (
+            {
+                'type': 'start',
+                'sign': 'yes',
+                'number': '1',
+            },
+            {
+                'type': 'resume',
+                'line': 'yes',
+            },
+            {
+                'type': 'change',
+                'line': 'yes',
+            },
+            {
+                'type': 'discontinue',
+                'line': 'yes',
+            },
+            {
+                'type': 'resume',
+                'line': 'yes',
+            },
+            {
+                'type': 'change',
+                'line': 'yes',
+            },
+            {
+                'type': 'stop',
+                'line': 'yes',
+                'number': '1',
+            },
+        )
+
+        s = converter.parse(testPrimitive.pedalSymLines)
+        x = self.getET(s)
+        mxPart = x.find('part')
+        for i, mxPedal in enumerate(mxPart.findall('.//pedal')):
+            with self.subTest(pedal_index=startIdx + i):
+                for k in expectedResults2[i]:
+                    self.assertEqual(mxPedal.get(k, ''), expectedResults2[i][k])
 
     def testArpeggios(self):
         expectedResults = (

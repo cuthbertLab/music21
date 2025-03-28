@@ -6530,9 +6530,11 @@ class MeasureExporter(XMLExporterBase):
                 elif pm.pedalType == expressions.PedalType.Sostenuto:
                     mxPedals[0].set('type', 'sostenuto')
                 else:
-                    # not exactly right for Soft or Silent,
-                    # but better than Sustain...
-                    mxPedals[0].set('type', 'sostenuto')
+                    # not exactly right for Soft or Silent, but
+                    # we can hope that there is a text direction
+                    # somewhere before this that specifies which
+                    # pedal these "Ped." marks refer to.
+                    mxPedals[0].set('type', 'sustain')
             elif pm.pedalForm == expressions.PedalForm.Symbol:
                 # Symbol bounce is "*Ped.", so a pedal 'stop' followed immediately by pedal 'start'
                 mxPedals = [Element('pedal'), Element('pedal')]
