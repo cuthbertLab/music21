@@ -1192,6 +1192,283 @@ pitches01a = """<?xml version="1.0" encoding="UTF-8"?>
 </score-partwise>
 """
 
+pedals = '''<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE score-partwise PUBLIC "-//Recordare//DTD MusicXML 2.0 Partwise//EN"
+                                "http://www.musicxml.org/dtds/partwise.dtd">
+<score-partwise version="2.0">
+  <movement-title>MusicXML pedals</movement-title>
+  <identification>
+    <miscellaneous>
+      <miscellaneous-field name="description">All &lt;pedal&gt; element contents
+          defined in MusicXML. The lyrics for each note describes the pedal
+          element assigned to that note.</miscellaneous-field>
+    </miscellaneous>
+  </identification>
+  <part-list>
+    <score-part id="P1">
+      <part-name print-object="no">MusicXML Part</part-name>
+    </score-part>
+  </part-list>
+  <!--=========================================================-->
+  <part id="P1">
+    <!--=======================================================-->
+    <measure number="1" width="273">
+      <attributes>
+         <divisions>8</divisions>
+         <key>
+            <fifths>0</fifths>
+            <mode>major</mode>
+         </key>
+         <time>
+            <beats>6</beats>
+            <beat-type>8</beat-type>
+         </time>
+         <clef number="1">
+            <sign>F</sign>
+            <line>4</line>
+         </clef>
+      </attributes>
+      <direction>
+         <direction-type>
+            <pedal line="yes" sign="no" type="start" default-y="-79" relative-x="-12"/>
+         </direction-type>
+      </direction>
+      <note default-x="78">
+         <pitch>
+            <step>D</step>
+            <octave>3</octave>
+         </pitch>
+         <duration>4</duration>
+         <voice>1</voice>
+         <type>eighth</type>
+         <stem default-y="-55">down</stem>
+         <beam number="1">begin</beam>
+      </note>
+      <note default-x="110">
+         <pitch>
+            <step>D</step>
+            <octave>3</octave>
+         </pitch>
+         <duration>4</duration>
+         <voice>1</voice>
+         <type>eighth</type>
+         <stem default-y="-55">down</stem>
+         <beam number="1">continue</beam>
+      </note>
+      <note default-x="143">
+         <pitch>
+            <step>D</step>
+            <octave>3</octave>
+         </pitch>
+         <duration>4</duration>
+         <voice>1</voice>
+         <type>eighth</type>
+         <stem default-y="-55">down</stem>
+         <beam number="1">end</beam>
+      </note>
+      <direction>
+         <direction-type>
+            <pedal line="yes" type="change"/>
+         </direction-type>
+      </direction>
+      <note default-x="175">
+         <pitch>
+            <step>D</step>
+            <octave>3</octave>
+         </pitch>
+         <duration>4</duration>
+         <voice>1</voice>
+         <type>eighth</type>
+         <stem default-y="-55">down</stem>
+         <beam number="1">begin</beam>
+      </note>
+      <note default-x="207">
+         <pitch>
+            <step>D</step>
+            <octave>3</octave>
+         </pitch>
+         <duration>4</duration>
+         <voice>1</voice>
+         <type>eighth</type>
+         <stem default-y="-55">down</stem>
+         <beam number="1">continue</beam>
+      </note>
+      <direction>
+         <direction-type>
+            <pedal line="yes" type="discontinue"/>
+         </direction-type>
+         <direction-type>
+            <words default-y="-79" font-size="7.2" font-style="italic">simile</words>
+         </direction-type>
+      </direction>
+      <note default-x="240">
+         <pitch>
+            <step>D</step>
+            <octave>3</octave>
+         </pitch>
+         <duration>4</duration>
+         <voice>1</voice>
+         <type>eighth</type>
+         <stem default-y="-55">down</stem>
+         <beam number="1">end</beam>
+      </note>
+    </measure>
+    <measure number="2" width="208">
+      <note default-x="13">
+         <pitch>
+            <step>D</step>
+            <octave>3</octave>
+         </pitch>
+         <duration>4</duration>
+         <voice>1</voice>
+         <type>eighth</type>
+         <stem default-y="-55">down</stem>
+         <beam number="1">begin</beam>
+      </note>
+      <note default-x="46">
+         <pitch>
+            <step>D</step>
+            <octave>3</octave>
+         </pitch>
+         <duration>4</duration>
+         <voice>1</voice>
+         <type>eighth</type>
+         <stem default-y="-55">down</stem>
+         <beam number="1">continue</beam>
+      </note>
+      <note default-x="78">
+         <pitch>
+            <step>D</step>
+            <octave>3</octave>
+         </pitch>
+         <duration>4</duration>
+         <voice>1</voice>
+         <type>eighth</type>
+         <stem default-y="-55">down</stem>
+         <beam number="1">end</beam>
+      </note>
+      <note default-x="110">
+         <pitch>
+            <step>D</step>
+            <octave>3</octave>
+         </pitch>
+         <duration>4</duration>
+         <voice>1</voice>
+         <type>eighth</type>
+         <stem default-y="-55">down</stem>
+         <beam number="1">begin</beam>
+      </note>
+      <note default-x="143">
+         <pitch>
+            <step>D</step>
+            <octave>3</octave>
+         </pitch>
+         <duration>4</duration>
+         <voice>1</voice>
+         <type>eighth</type>
+         <stem default-y="-55">down</stem>
+         <beam number="1">continue</beam>
+      </note>
+      <note default-x="175">
+         <pitch>
+            <step>D</step>
+            <octave>3</octave>
+         </pitch>
+         <duration>4</duration>
+         <voice>1</voice>
+         <type>eighth</type>
+         <stem default-y="-55">down</stem>
+         <beam number="1">end</beam>
+      </note>
+    </measure>
+    <measure number="3" width="208">
+      <note default-x="13">
+         <pitch>
+            <step>D</step>
+            <octave>3</octave>
+         </pitch>
+         <duration>4</duration>
+         <voice>1</voice>
+         <type>eighth</type>
+         <stem default-y="-55">down</stem>
+         <beam number="1">begin</beam>
+      </note>
+      <note default-x="46">
+         <pitch>
+            <step>D</step>
+            <octave>3</octave>
+         </pitch>
+         <duration>4</duration>
+         <voice>1</voice>
+         <type>eighth</type>
+         <stem default-y="-55">down</stem>
+         <beam number="1">continue</beam>
+      </note>
+      <direction>
+         <direction-type>
+            <pedal line="yes" type="resume" default-y="-79" relative-x="-3"/>
+         </direction-type>
+      </direction>
+      <note default-x="78">
+         <pitch>
+            <step>D</step>
+            <octave>3</octave>
+         </pitch>
+         <duration>4</duration>
+         <voice>1</voice>
+         <type>eighth</type>
+         <stem default-y="-55">down</stem>
+         <beam number="1">end</beam>
+      </note>
+      <direction>
+         <direction-type>
+            <pedal line="yes" type="change"/>
+         </direction-type>
+       </direction>
+      <note default-x="111">
+         <pitch>
+            <step>D</step>
+            <octave>3</octave>
+         </pitch>
+         <duration>4</duration>
+         <voice>1</voice>
+         <type>eighth</type>
+         <stem default-y="-55">down</stem>
+         <beam number="1">begin</beam>
+      </note>
+      <note default-x="142">
+         <pitch>
+            <step>D</step>
+            <octave>3</octave>
+         </pitch>
+         <duration>4</duration>
+         <voice>1</voice>
+         <type>eighth</type>
+         <stem default-y="-55">down</stem>
+         <beam number="1">continue</beam>
+      </note>
+      <direction>
+         <direction-type>
+            <pedal line="yes" type="stop"/>
+         </direction-type>
+      </direction>
+      <note default-x="175">
+         <pitch>
+            <step>D</step>
+            <octave>3</octave>
+         </pitch>
+         <duration>4</duration>
+         <voice>1</voice>
+         <type>eighth</type>
+         <stem default-y="-55">down</stem>
+         <beam number="1">end</beam>
+      </note>
+    </measure>
+  </part>
+  <!--=========================================================-->
+</score-partwise>
+'''
+
 # noinspection SpellCheckingInspection
 directions31a = '''<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE score-partwise PUBLIC "-//Recordare//DTD MusicXML 2.0 Partwise//EN"
@@ -20044,7 +20321,7 @@ ALL = [
     tremoloTest, hiddenRests, multiDigitEnding, tupletsImplied, pianoStaffPolymeter,  # 46
     arpeggio32d, multiStaffArpeggios, multiMeasureEnding,   # 51
     pianoStaffPolymeterWithClefOctaveChange, multipleFingeringsOnChord,  # 54
-    pianoStaffWithOttava  # 56
+    pianoStaffWithOttava, pedals  # 56
 ]
 
 

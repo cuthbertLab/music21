@@ -4079,8 +4079,8 @@ class MeasureParser(SoundTagMixin, XMLParserBase):
         and ottava are encoded as MusicXML directions.
 
         :param mxObj: the specific direction element (e.g. <wedge>).
-        :param staffKey: staff number (for directions that will insert into measure here)
-        :param totalOffset: offset in measure of this direction (similarly for insertion here)
+        :param staffKey: staff number (required for <pedal>)
+        :param totalOffset: offset in measure of this direction (required for <pedal>)
 
         >>> from xml.etree.ElementTree import fromstring as EL
         >>> MP = musicxml.xmlToM21.MeasureParser()
@@ -4115,29 +4115,49 @@ class MeasureParser(SoundTagMixin, XMLParserBase):
         <music21.dynamics.Crescendo <music21.note.Note D>>
 
         >>> mxDirection = EL('<direction place="below"/>')
-        >>> mxDirectionType = EL('<pedal type="sostenuto" number="2"/>')
-        >>> retList = MP.xmlDirectionTypeToSpanners(mxDirectionType)
+        >>> mxDirectionType = EL('<pedal type="sostenuto" sign="yes" number="2"/>')
+        >>> retList = MP.xmlDirectionTypeToSpanners(mxDirectionType, 1, 0.5)
         >>> retList
         [<music21.expressions.PedalMark>]
-        >>> retList[0].pedalType
-        <PedalType.Sostenuto>
         >>> pedalMark = retList[0]
+        >>> pedalMark.pedalType
+        <PedalType.Sostenuto>
+        >>> pedalMark.pedalForm
+        <PedalForm.Symbol>
 
-        >>> mxDirectionType2 = EL('<pedal type="change" number="2"/>')
-        >>> retList = MP.xmlDirectionTypeToSpanners(mxDirectionType2, 1, 1.5)
+        >>> mxDirectionType1a = EL('<pedal type="resume" line="yes" number="2"/>')
+        >>> retList = MP.xmlDirectionTypeToSpanners(mxDirectionType1a, 1, 0.5)
+        >>> retList
+        []
+        >>> pedalMark.pedalForm
+        <PedalForm.SymbolLine>
+
+        >>> mxDirectionType2 = EL('<pedal type="change" line="yes" number="2"/>')
+        >>> retList = MP.xmlDirectionTypeToSpanners(mxDirectionType2, 1, 1.0)
         >>> retList
         []
 
-        >>> mxDirectionType3 = EL('<pedal type="stop" number="2"/>')
-        >>> retList = MP.xmlDirectionTypeToSpanners(mxDirectionType3)
+        >>> mxDirectionType3 = EL('<pedal type="discontinue" line="yes" number="2"/>')
+        >>> retList = MP.xmlDirectionTypeToSpanners(mxDirectionType3, 1, 2.0)
+        >>> retList
+        []
+
+        >>> mxDirectionType4 = EL('<pedal type="resume" line="yes" number="2"/>')
+        >>> retList = MP.xmlDirectionTypeToSpanners(mxDirectionType4, 1, 3.5)
+        >>> retList
+        []
+
+        >>> mxDirectionType5 = EL('<pedal type="stop" line="yes" number="2"/>')
+        >>> retList = MP.xmlDirectionTypeToSpanners(mxDirectionType5, 1, 4.0)
         >>> retList
         []
         >>> pedalMark.getFirst()
-        <music21.expressions.PedalBounce at 1.5>
+        <music21.expressions.PedalBounce at 1.0>
         >>> pedalMark.getLast() is n1
         True
         >>> MP.stream.elements
-        (<music21.expressions.PedalBounce at 1.5>,)
+        (<music21.expressions.PedalBounce at 1.0>, <music21.expressions.PedalGapStart at 2.0>,
+        <music21.expressions.PedalGapEnd at 3.5>)
         '''
         targetLast = self.nLast
         returnList = []

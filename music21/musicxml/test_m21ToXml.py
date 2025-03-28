@@ -684,6 +684,24 @@ class Test(unittest.TestCase):
             int(tree.findall('.//direction/offset')[0].text),
             defaults.divisionsPerQuarter)
 
+    def testPedals(self):
+        expectedResults = (
+            'start',
+            'change',
+            'discontinue',
+            'resume',
+            'change',
+            'stop'
+        )
+        s = converter.parse(testPrimitive.pedals)
+        x = self.getET(s)
+        mxPart = x.find('part')
+        for i, mxPedal in enumerate(mxPart.findall('.//pedal')):
+            self.assertEqual(mxPedal.get('type', ''), expectedResults[i])
+            self.assertEqual(mxPedal.get('line', ''), 'yes')
+            if i in (0, 5):
+                self.assertEqual(mxPedal.get('number', ''), '1')
+
     def testArpeggios(self):
         expectedResults = (
             'arpeggiate',
