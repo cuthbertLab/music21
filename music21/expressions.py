@@ -340,30 +340,30 @@ class PedalForm(common.StrEnum):
 
 class PedalMark(spanner.Spanner):
     '''
-        A pedal mark spanner contains a pedaled set of notes.
-        The spanner starts at the moment of down-pedal, and
-        ends at the moment of up-pedal.  There can be any
-        number of pedal "bounces" in the middle of the spanner.
+    A pedal mark spanner contains a pedaled set of notes.
+    The spanner starts at the moment of down-pedal, and
+    ends at the moment of up-pedal.  There can be any
+    number of pedal "bounces" in the middle of the spanner.
 
-        The visual form of the pedal mark can vary.  The following
-        examples use a pedal mark with one "bounce" in the middle::
+    The visual form of the pedal mark can vary.  The following
+    examples use a pedal mark with one "bounce" in the middle::
 
-            Pedal marks can be lines:            |_______^________|
-            Pedal marks can be normal symbolic:  Ped.    * Ped.   *
-            Pedal marks can be altered symbolic: Ped.    Ped.     *
-            Pedal marks can be symbol and line:  Ped.____^________|
+        Pedal marks can be lines:            |_______^________|
+        Pedal marks can be normal symbolic:  Ped.    * Ped.   *
+        Pedal marks can be altered symbolic: Ped.    Ped.     *
+        Pedal marks can be symbol and line:  Ped.____^________|
 
-        Pedal marks, whether lines, symbols, or a combination, can
-        represent the sustain pedal (Ped.), the sostenuto pedal
-        (Sost.), the soft (una corda) pedal, or (more rarely) the
-        silent (muting) pedal.
+    Pedal marks, whether lines, symbols, or a combination, can
+    represent the sustain pedal (Ped.), the sostenuto pedal
+    (Sost.), the soft (una corda) pedal, or (more rarely) the
+    silent (muting) pedal.
 
-        Pedal marks that are symbolic can be abbreviated: e.g. P. instead
-        of Ped., S. instead of Sost.
+    Pedal marks that are symbolic can be abbreviated: e.g. P. instead
+    of Ped., S. instead of Sost.
 
-        Pedal marks that are lines can have non-printed portions
-        (gaps) in them; these are usually started with "simile",
-        but not necessarily.
+    Pedal marks that are lines can have non-printed portions
+    (gaps) in them; these are usually started with "simile",
+    but not necessarily.
     '''
     def __init__(
         self,
@@ -374,31 +374,10 @@ class PedalMark(spanner.Spanner):
         from music21 import note
         self.fillElementTypes = [note.GeneralNote]
 
-        self._pedalType: PedalType|None = None
-        self._pedalForm: PedalForm|None = None
+        self.pedalType: PedalType|None = None
+        self.pedalForm: PedalForm|None = None
         self.abbreviated: bool = False
         self.placement: str|None = None
-        self.startOffset: OffsetQL|None = None  # only needed temporarily by xmlToM21.py
-
-    @property
-    def pedalType(self) -> PedalType|None:
-        return self._pedalType
-
-    @pedalType.setter
-    def pedalType(self, newType: PedalType|None):
-        if newType is not None and newType not in PedalType:
-            raise ValueError(f'invalid pedalType {newType!r}')
-        self._pedalType = newType
-
-    @property
-    def pedalForm(self) -> PedalForm|None:
-        return self._pedalForm
-
-    @pedalForm.setter
-    def pedalForm(self, newForm: PedalForm|None):
-        if newForm is not None and newForm not in PedalForm:
-            raise ValueError(f'invalid pedalForm {newForm!r}')
-        self._pedalForm = newForm
 
 
 class PedalObject(base.Music21Object):

@@ -15,6 +15,7 @@ from __future__ import annotations
 import copy
 import fractions
 import io
+import weakref
 from math import isclose
 import re
 import typing as t
@@ -2409,6 +2410,12 @@ class MeasureParser(SoundTagMixin, XMLParserBase):
         # pick this up from the last measure.
         self.endedWithForwardTag: note.Rest|None = None
 
+        # Temporary storage of intended start offset of a PedalMark (we sometimes
+        # need to know this before the PedalMark or its first element have been
+        # inserted into a Stream).
+        # key is PedalMark; value is OffsetQL
+        self.pedalToStartOffset: weakref.WeakKeyDictionary = weakref.WeakKeyDictionary()
+
     @staticmethod
     def getStaffNumber(mxObjectOrNumber) -> int:
         '''
@@ -4063,14 +4070,17 @@ class MeasureParser(SoundTagMixin, XMLParserBase):
     def xmlDirectionTypeToSpanners(
         self,
         mxObj: ET.Element,
-        mxDirection: ET.Element|None = None,
         staffKey: int|None = None,
         totalOffset: OffsetQL|None = None
     ):
         # noinspection PyShadowingNames
         '''
-        Some spanners, such as MusicXML wedge, bracket, dashes, and ottava
-        are encoded as MusicXML directions.
+        Some spanners, such as MusicXML wedge, bracket, dashes, pedal,
+        and ottava are encoded as MusicXML directions.
+
+        :param mxObj: the specific direction element (e.g. <wedge>).
+        :param staffKey: staff number (for directions that will insert into measure here)
+        :param totalOffset: offset in measure of this direction (similarly for insertion here)
 
         >>> from xml.etree.ElementTree import fromstring as EL
         >>> MP = musicxml.xmlToM21.MeasureParser()
@@ -4103,6 +4113,31 @@ class MeasureParser(SoundTagMixin, XMLParserBase):
         >>> sp = MP.spannerBundle[0]
         >>> sp
         <music21.dynamics.Crescendo <music21.note.Note D>>
+
+        >>> mxDirection = EL('<direction place="below"/>')
+        >>> mxDirectionType = EL('<pedal type="sostenuto" number="2"/>')
+        >>> retList = MP.xmlDirectionTypeToSpanners(mxDirectionType)
+        >>> retList
+        [<music21.expressions.PedalMark>]
+        >>> retList[0].pedalType
+        <PedalType.Sostenuto>
+        >>> pedalMark = retList[0]
+
+        >>> mxDirectionType2 = EL('<pedal type="change" number="2"/>')
+        >>> retList = MP.xmlDirectionTypeToSpanners(mxDirectionType2, 1, 1.5)
+        >>> retList
+        []
+
+        >>> mxDirectionType3 = EL('<pedal type="stop" number="2"/>')
+        >>> retList = MP.xmlDirectionTypeToSpanners(mxDirectionType3)
+        >>> retList
+        []
+        >>> pedalMark.getFirst()
+        <music21.expressions.PedalBounce at 1.5>
+        >>> pedalMark.getLast() is n1
+        True
+        >>> MP.stream.elements
+        (<music21.expressions.PedalBounce at 1.5>,)
         '''
         targetLast = self.nLast
         returnList = []
@@ -4236,7 +4271,7 @@ class MeasureParser(SoundTagMixin, XMLParserBase):
             if mxType in ('start', 'sostenuto'):
                 sp = expressions.PedalMark()
                 sp.idLocal = idFound
-                sp.startOffset = totalOffset
+                self.pedalToStartOffset[sp] = totalOffset
 
                 if mxType == 'start':
                     sp.pedalType = expressions.PedalType.Sustain
@@ -4280,8 +4315,9 @@ class MeasureParser(SoundTagMixin, XMLParserBase):
                     # offset of the PedalMark, change pedalForm to SymbolLine (because
                     # we had a symbol, and now we're starting a line without a downtick;
                     # that is the definition of SymbolLine).
+                    pedalStartOffset: OffsetQL|None = self.pedalToStartOffset.get(sp, None)
                     if (sp.pedalForm == expressions.PedalForm.Symbol
-                            and sp.startOffset == totalOffset):
+                            and pedalStartOffset == totalOffset):
                         sp.pedalForm = expressions.PedalForm.SymbolLine
                     else:
                         # insert a PedalGapEnd
@@ -5331,7 +5367,7 @@ class MeasureParser(SoundTagMixin, XMLParserBase):
         elif tag in ('wedge', 'bracket', 'dashes', 'octave-shift', 'pedal'):
             try:
                 spannerList = self.xmlDirectionTypeToSpanners(
-                    mxDir, mxDirection, staffKey, totalOffset
+                    mxDir, staffKey, totalOffset
                 )
             except MusicXMLImportException as excep:
                 warnings.warn(f'Could not import {tag}: {excep}', MusicXMLWarning)

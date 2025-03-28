@@ -1070,6 +1070,81 @@ class Test(unittest.TestCase):
         self.assertEqual(rmIterator[2].content, 'Test')
         self.assertEqual(rmIterator[2].style.enclosure, 'square')
 
+    def testPedalMarks(self):
+        from music21 import converter
+        from music21 import corpus
+        from music21.musicxml import testPrimitive
+
+        s = converter.parse(testPrimitive.directions31a)
+        pedals = list(s[expressions.PedalMark])
+        self.assertEqual(len(pedals), 1)
+        pm = pedals[0]
+        pm.fill(s)
+        self.assertIsNone(pm.pedalForm)
+        self.assertEqual(pm.pedalType, expressions.PedalType.Sustain)
+        spElements: list[music21.base.Music21Object] = pm.getSpannedElements()
+        self.assertEqual(len(spElements), 4)
+        expectedOffsets: list[OffsetQL] = [0., 1., 1., 2.]
+        for i, (el, expectedOffset) in enumerate(zip(spElements, expectedOffsets)):
+            if i == 1:
+                self.assertIsInstance(el, expressions.PedalBounce)
+            else:
+                self.assertIsInstance(el, note.Note)
+                self.assertEqual(el.fullName, 'C in octave 4 Quarter Note')
+            self.assertEqual(el.offset, expectedOffset)
+
+        s = converter.parse(testPrimitive.spanners33a)
+        pedals = list(s[expressions.PedalMark])
+        self.assertEqual(len(pedals), 1)
+        pm = pedals[0]
+        pm.fill(s)
+        self.assertIsNone(pm.pedalForm)
+        self.assertEqual(pm.pedalType, expressions.PedalType.Sustain)
+        spElements: list[music21.base.Music21Object] = pm.getSpannedElements()
+        self.assertEqual(len(spElements), 3)
+        expectedOffsets: list[OffsetQL] = [0., 1., 1.]
+        for i, (el, expectedOffset) in enumerate(zip(spElements, expectedOffsets)):
+            if i == 1:
+                self.assertIsInstance(el, expressions.PedalBounce)
+            else:
+                self.assertIsInstance(el, note.Note)
+                self.assertEqual(el.fullName, 'B in octave 4 Quarter Note')
+            self.assertEqual(el.offset, expectedOffset)
+
+        s = corpus.parse('beach')
+        pedals = list(s[expressions.PedalMark])
+        self.assertEqual(len(pedals), 1)
+        pm = pedals[0]
+        pm.fill(s.parts[5])
+        self.assertEqual(pm.pedalForm, expressions.PedalForm.Symbol)
+        self.assertEqual(pm.pedalType, expressions.PedalType.Sustain)
+        spElements: list[music21.base.Music21Object] = pm.getSpannedElements()
+        self.assertEqual(len(spElements), 2)
+        self.assertIsInstance(spElements[0], chord.Chord)
+        self.assertEqual(
+            spElements[0].fullName,
+            'Chord {E-flat in octave 2 | B-flat in octave 2} Whole'
+        )
+        self.assertEqual(spElements[0].offset, 0.)
+        self.assertIsInstance(spElements[1], note.Note)
+        self.assertEqual(spElements[1].fullName, 'E-flat in octave 1 Whole Note')
+        self.assertEqual(spElements[1].offset, 0.)
+
+        s = corpus.parse('dichterliebe_no2')
+        pedals = list(s[expressions.PedalMark])
+        self.assertEqual(len(pedals), 1)
+        pm = pedals[0]
+        pm.fill(s.parts[2])
+        self.assertEqual(pm.pedalForm, expressions.PedalForm.Symbol)
+        self.assertEqual(pm.pedalType, expressions.PedalType.Sustain)
+        spElements: list[music21.base.Music21Object] = pm.getSpannedElements()
+        self.assertEqual(len(spElements), 5)
+        expectedOffsets: list[OffsetQL] = [1.5, 1.75, 0., 0.75, 1.0]
+        for i, (el, expectedOffset) in enumerate(zip(spElements, expectedOffsets)):
+            self.assertIsInstance(el, note.Note)
+            self.assertEqual(el.nameWithOctave, 'A3')
+            self.assertEqual(el.offset, expectedOffset)
+
     def testNoChordImport(self):
         from music21 import converter
 
