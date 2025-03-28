@@ -1082,9 +1082,9 @@ class Test(unittest.TestCase):
         pm.fill(s)
         self.assertIsNone(pm.pedalForm)
         self.assertEqual(pm.pedalType, expressions.PedalType.Sustain)
-        spElements: list[music21.base.Music21Object] = pm.getSpannedElements()
+        spElements = pm.getSpannedElements()
         self.assertEqual(len(spElements), 4)
-        expectedOffsets: list[OffsetQL] = [0., 1., 1., 2.]
+        expectedOffsets = [0., 1., 1., 2.]
         for i, (el, expectedOffset) in enumerate(zip(spElements, expectedOffsets)):
             if i == 1:
                 self.assertIsInstance(el, expressions.PedalBounce)
@@ -1100,9 +1100,9 @@ class Test(unittest.TestCase):
         pm.fill(s)
         self.assertIsNone(pm.pedalForm)
         self.assertEqual(pm.pedalType, expressions.PedalType.Sustain)
-        spElements: list[music21.base.Music21Object] = pm.getSpannedElements()
+        spElements = pm.getSpannedElements()
         self.assertEqual(len(spElements), 3)
-        expectedOffsets: list[OffsetQL] = [0., 1., 1.]
+        expectedOffsets = [0., 1., 1.]
         for i, (el, expectedOffset) in enumerate(zip(spElements, expectedOffsets)):
             if i == 1:
                 self.assertIsInstance(el, expressions.PedalBounce)
@@ -1118,7 +1118,7 @@ class Test(unittest.TestCase):
         pm.fill(s.parts[5])
         self.assertEqual(pm.pedalForm, expressions.PedalForm.Symbol)
         self.assertEqual(pm.pedalType, expressions.PedalType.Sustain)
-        spElements: list[music21.base.Music21Object] = pm.getSpannedElements()
+        spElements = pm.getSpannedElements()
         self.assertEqual(len(spElements), 2)
         self.assertIsInstance(spElements[0], chord.Chord)
         self.assertEqual(
@@ -1137,9 +1137,9 @@ class Test(unittest.TestCase):
         pm.fill(s.parts[2])
         self.assertEqual(pm.pedalForm, expressions.PedalForm.Symbol)
         self.assertEqual(pm.pedalType, expressions.PedalType.Sustain)
-        spElements: list[music21.base.Music21Object] = pm.getSpannedElements()
+        spElements = pm.getSpannedElements()
         self.assertEqual(len(spElements), 5)
-        expectedOffsets: list[OffsetQL] = [1.5, 1.75, 0., 0.75, 1.0]
+        expectedOffsets = [1.5, 1.75, 0., 0.75, 1.0]
         for i, (el, expectedOffset) in enumerate(zip(spElements, expectedOffsets)):
             self.assertIsInstance(el, note.Note)
             self.assertEqual(el.nameWithOctave, 'A3')
