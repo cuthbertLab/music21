@@ -3051,7 +3051,7 @@ class MeasureExporter(XMLExporterBase):
             ('TextExpression', 'textExpressionToXml'),
             ('RepeatExpression', 'textExpressionToXml'),
             ('RehearsalMark', 'rehearsalMarkToXml'),
-            ('PedalObject', 'pedalObjectToXml'),
+            ('PedalTransition', 'pedalTransitionToXml'),
         ]
     )
     # these need to be wrapped in an attributes tag if not at the beginning of the measure.
@@ -3498,6 +3498,7 @@ class MeasureExporter(XMLExporterBase):
 
                     mxDirection = Element('direction')
                     synchronizeIds(mxDirection, thisSpanner)
+                    self.setPosition(mxElement, thisSpanner)
 
                     # Not all spanners have placements
                     if hasattr(thisSpanner, 'placement') and thisSpanner.placement is not None:
@@ -3515,7 +3516,9 @@ class MeasureExporter(XMLExporterBase):
                         # check to see if we also need to start a line
                         if t.TYPE_CHECKING:
                             assert isinstance(thisSpanner, expressions.PedalMark)
-                        if thisSpanner.pedalForm == expressions.PedalForm.SymbolLine:
+                        if (thisSpanner.startForm
+                                in (expressions.PedalForm.PedalName, expressions.PedalForm.Ped)
+                                and thisSpanner.continueLine == expressions.PedalLine.Line):
                             mxPedalLine = (
                                 self.makePedalResumeLineXml(thisSpanner)
                             )
@@ -3588,10 +3591,9 @@ class MeasureExporter(XMLExporterBase):
                 # so that's what we do here, hoping there is a text
                 # direction describing which pedal to use.
                 post['type'] = 'start'
-            if sp.pedalForm == expressions.PedalForm.Line:
+            if sp.startForm == expressions.PedalForm.VerticalLine:
                 post['line'] = 'yes'
             else:
-                # 'symbol', 'altsymbol', and 'symline' all start with a sign
                 post['sign'] = 'yes'
             if sp.abbreviated:
                 post['abbreviated'] = 'yes'
@@ -3631,10 +3633,10 @@ class MeasureExporter(XMLExporterBase):
         elif spannerClass == 'PedalMark':
             if t.TYPE_CHECKING:
                 assert isinstance(sp, expressions.PedalMark)
-            if sp.pedalForm in (expressions.PedalForm.Line, expressions.PedalForm.SymbolLine):
+            if (sp.continueLine == expressions.PedalLine.Line
+                    or sp.endForm == expressions.PedalForm.VerticalLine):
                 post['line'] = 'yes'
             else:
-                # 'symbol', 'altsymbol' both end with a sign
                 post['sign'] = 'yes'
 
         return post
@@ -6451,13 +6453,12 @@ class MeasureExporter(XMLExporterBase):
         self.xmlRoot.append(mxDirection)
         return mxDirection
 
-    def pedalObjectToXml(self, po: expressions.PedalObject) -> Element|None:
+    def pedalTransitionToXml(self, pt: expressions.PedalTransition) -> Element|None:
         # noinspection PyShadowingNames
         '''
-        Convert a PedalObject object (i.e. PedalBounce, PedalGapStart,
-        PedalGapEnds) to a MusicXML <direction> tag with a <pedal> tag
-        inside it.  Attributes like pedalForm are stored in the enclosing
-        PedalMark spanner.
+        Convert a PedalTransition object (i.e. PedalBounce, PedalGapStart,
+        PedalGapEnd) to a MusicXML <direction> tag with a <pedal> tag
+        inside it.
 
         >>> pm = expressions.PedalMark()
         >>> po = expressions.PedalBounce()
@@ -6504,74 +6505,74 @@ class MeasureExporter(XMLExporterBase):
         </direction>
         '''
         pm: expressions.PedalMark|None = None
-        spanners: list[spanner.Spanner] = po.getSpannerSites()
+        spanners: list[spanner.Spanner] = pt.getSpannerSites()
         for sp in spanners:
             if isinstance(sp, expressions.PedalMark):
                 pm = sp
                 break
 
         if pm is None:
-            # A PedalObject that is not in a PedalMark spanner
+            # A PedalTransition that is not in a PedalMark spanner
             # doesn't make sense.  Ignore it.
             return None
 
         mxPedals: list[Element] = []
-        if isinstance(po, expressions.PedalBounce):
-            if pm.pedalForm in (expressions.PedalForm.Line, expressions.PedalForm.SymbolLine):
-                # Line or SymbolLine bounce is a quick up-down-tick in the line, so this
-                # is a pedal 'change'.
+        if isinstance(pt, expressions.PedalBounce):
+            bounceUp: expressions.PedalForm = pt.overrideBounceUp
+            bounceDown: expressions.PedalForm = pt.overrideBounceDown
+            if bounceUp == expressions.PedalForm.Inherit:
+                bounceUp = pm.bounceUp
+            if bounceDown == expressions.PedalForm.Inherit:
+                bounceDown = pm.bounceDown
+
+            if expressions.PedalForm.SlantedLine in (bounceUp, bounceDown):
+                # We assume if one and/or the other is SlantedLine, the
+                # intention is a "caret" bounce.
                 mxPedals = [Element('pedal')]
                 mxPedals[0].set('type', 'change')
-            elif pm.pedalForm == expressions.PedalForm.SymbolAlt:
-                # SymbolAlt bounce is just "Ped.", so just a pedal 'start'
-                mxPedals = [Element('pedal')]
-                if pm.pedalType == expressions.PedalType.Sustain:
-                    mxPedals[0].set('type', 'start')
-                elif pm.pedalType == expressions.PedalType.Sostenuto:
-                    mxPedals[0].set('type', 'sostenuto')
-                else:
-                    # not exactly right for Soft or Silent, but
-                    # we can hope that there is a text direction
-                    # somewhere before this that specifies which
-                    # pedal these "Ped." marks refer to.
-                    mxPedals[0].set('type', 'sustain')
-            elif pm.pedalForm == expressions.PedalForm.Symbol:
-                # Symbol bounce is "*Ped.", so a pedal 'stop' followed immediately by pedal 'start'
-                mxPedals = [Element('pedal'), Element('pedal')]
-                mxPedals[0].set('type', 'stop')
-                if pm.pedalType == expressions.PedalType.Sustain:
-                    mxPedals[1].set('type', 'start')
-                elif pm.pedalType == expressions.PedalType.Sostenuto:
-                    mxPedals[1].set('type', 'sostenuto')
-                else:
-                    # not exactly right for Soft or Silent, but
-                    # we can hope that there is a text direction
-                    # somewhere before this that specifies which
-                    # pedal these "Ped." marks refer to.
-                    mxPedals[1].set('type', 'sustain')
+                mxPedals[0].set('sign', 'yes')
             else:
-                # shouldn't be able to happen
-                return None
+                # We assume that bounceUp is either NoMark or Star.
+                if bounceUp == expressions.PedalForm.NoMark:
+                    # just a bounce down
+                    mxPedals = [Element('pedal')]
+                else:
+                    # bounce up and then down, starting with a Star
+                    mxPedals = [Element('pedal'), Element('pedal')]
+                    mxPedals[0].set('type', 'stop')
+                    mxPedals[0].set('sign', 'yes')
 
-        elif isinstance(po, expressions.PedalGapStart):
+                # We assume that bounceDown is either Ped or PedalName
+                mxPedals[-1].set('sign', 'yes')
+                if bounceDown == expressions.PedalForm.Ped:
+                    mxPedals[-1].set('type', 'start')
+                elif pm.pedalType == expressions.PedalType.Sustain:
+                    mxPedals[-1].set('type', 'start')
+                elif pm.pedalType == expressions.PedalType.Sostenuto:
+                    mxPedals[-1].set('type', 'sostenuto')
+                else:
+                    # not exactly right for Soft or Silent, but
+                    # we can hope that there is a text direction
+                    # somewhere before this that specifies which
+                    # pedal these "Ped." marks refer to.
+                    mxPedals[-1].set('type', 'start')
+
+        elif isinstance(pt, expressions.PedalGapStart):
             mxPedals = [Element('pedal')]
             mxPedals[0].set('type', 'discontinue')
-        elif isinstance(po, expressions.PedalGapEnd):
+            mxPedals[0].set('line', 'yes')
+        elif isinstance(pt, expressions.PedalGapEnd):
             mxPedals = [Element('pedal')]
             mxPedals[0].set('type', 'resume')
+            mxPedals[0].set('line', 'yes')
         else:
             return None
 
         for mxPedal in mxPedals:
-            if pm.pedalForm in (expressions.PedalForm.Line, expressions.PedalForm.SymbolLine):
-                mxPedal.set('line', 'yes')
-            else:
-                mxPedal.set('sign', 'yes')
-
             # wrap in <direction><direction-type>
-            mxDirection = self.placeInDirection(mxPedal, po)
+            mxDirection = self.placeInDirection(mxPedal, pt)
             # placement goes on <direction>
-            self.setStyleAttributes(mxDirection, po, 'placement')
+            self.setStyleAttributes(mxDirection, pt, 'placement')
             self.xmlRoot.append(mxDirection)
 
         return mxDirection
