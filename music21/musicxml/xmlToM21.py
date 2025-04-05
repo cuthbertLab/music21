@@ -5412,7 +5412,6 @@ class MeasureParser(SoundTagMixin, XMLParserBase):
         staffKey: int,
         totalOffset: float,
     ):
-        # TODO: pedal
         # TODO: harp-pedals
         # TODO: damp
         # TODO: damp-all

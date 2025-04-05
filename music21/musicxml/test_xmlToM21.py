@@ -1095,6 +1095,8 @@ class Test(unittest.TestCase):
                 self.assertIsInstance(el, expressions.PedalBounce)
                 self.assertEqual(el.overrideBounceUp, expressions.PedalForm.SlantedLine)
                 self.assertEqual(el.overrideBounceDown, expressions.PedalForm.SlantedLine)
+                self.assertEqual(el.bounceUp, expressions.PedalForm.SlantedLine)
+                self.assertEqual(el.bounceDown, expressions.PedalForm.SlantedLine)
             else:
                 self.assertIsInstance(el, note.Note)
                 self.assertEqual(el.fullName, 'C in octave 4 Quarter Note')
@@ -1120,6 +1122,8 @@ class Test(unittest.TestCase):
                 self.assertIsInstance(el, expressions.PedalBounce)
                 self.assertEqual(el.overrideBounceUp, expressions.PedalForm.SlantedLine)
                 self.assertEqual(el.overrideBounceDown, expressions.PedalForm.SlantedLine)
+                self.assertEqual(el.bounceUp, expressions.PedalForm.SlantedLine)
+                self.assertEqual(el.bounceDown, expressions.PedalForm.SlantedLine)
             else:
                 self.assertIsInstance(el, note.Note)
                 self.assertEqual(el.fullName, 'B in octave 4 Quarter Note')

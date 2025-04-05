@@ -422,6 +422,31 @@ class PedalBounce(PedalTransition):
     '''
     This object, when seen in a PedalMark spanner, represents an up/down bounce
     of the pedal.
+
+    >>> pm = expressions.PedalMark()
+    >>> pm.bounceUp = expressions.PedalForm.Star
+    >>> pm.bounceDown = expressions.PedalForm.Ped
+    >>> pb = expressions.PedalBounce()
+    >>> pm.addSpannedElements(pb)
+
+    By default, PedalBounce objects inherit their bounceUp/bounceDown forms
+    from the enclosing PedalMark spanner.
+
+    >>> pb.bounceUp
+    <PedalForm.Star>
+    >>> pb.bounceDown
+    <PedalForm.Ped>
+
+    But individual PedalBounce objects can override that bounceUp/bounceDown
+    inheritance.
+
+    >>> pb.overrideBounceUp = expressions.PedalForm.SlantedLine
+    >>> pb.overrideBounceDown = expressions.PedalForm.SlantedLine
+    >>> pb.bounceUp
+    <PedalForm.SlantedLine>
+    >>> pb.bounceDown
+    <PedalForm.SlantedLine>
+    >>>
     '''
     def __init__(
         self,
@@ -432,6 +457,28 @@ class PedalBounce(PedalTransition):
         super().__init__(**keywords)
         self.overrideBounceUp = overrideBounceUp
         self.overrideBounceDown = overrideBounceDown
+
+    @property
+    def bounceUp(self) -> PedalForm:
+        if self.overrideBounceUp != PedalForm.Inherit:
+            return self.overrideBounceUp
+        pmList: list[spanner.Spanner] = self.getSpannerSites((PedalMark,))
+        if not pmList:
+            return self.overrideBounceUp
+        if t.TYPE_CHECKING:
+            assert isinstance(pmList[0], PedalMark)
+        return pmList[0].bounceUp
+
+    @property
+    def bounceDown(self) -> PedalForm:
+        if self.overrideBounceDown != PedalForm.Inherit:
+            return self.overrideBounceDown
+        pmList: list[spanner.Spanner] = self.getSpannerSites((PedalMark,))
+        if not pmList:
+            return self.overrideBounceDown
+        if t.TYPE_CHECKING:
+            assert isinstance(pmList[0], PedalMark)
+        return pmList[0].bounceDown
 
 class PedalGapStart(PedalTransition):
     '''

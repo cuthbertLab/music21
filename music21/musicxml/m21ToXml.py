@@ -6515,11 +6515,11 @@ class MeasureExporter(XMLExporterBase):
         </direction>
         '''
         pm: expressions.PedalMark|None = None
-        spanners: list[spanner.Spanner] = pt.getSpannerSites()
-        for sp in spanners:
-            if isinstance(sp, expressions.PedalMark):
-                pm = sp
-                break
+        spanners: list[spanner.Spanner] = pt.getSpannerSites((expressions.PedalMark,))
+        if spanners:
+            if t.TYPE_CHECKING:
+                assert isinstance(spanners[0], expressions.PedalMark)
+            pm = spanners[0]
 
         if pm is None:
             # A PedalTransition that is not in a PedalMark spanner
@@ -6528,12 +6528,8 @@ class MeasureExporter(XMLExporterBase):
 
         mxPedals: list[Element] = []
         if isinstance(pt, expressions.PedalBounce):
-            bounceUp: expressions.PedalForm = pt.overrideBounceUp
-            bounceDown: expressions.PedalForm = pt.overrideBounceDown
-            if bounceUp == expressions.PedalForm.Inherit:
-                bounceUp = pm.bounceUp
-            if bounceDown == expressions.PedalForm.Inherit:
-                bounceDown = pm.bounceDown
+            bounceUp: expressions.PedalForm = pt.bounceUp
+            bounceDown: expressions.PedalForm = pt.bounceDown
 
             if expressions.PedalForm.SlantedLine in (bounceUp, bounceDown):
                 # We assume if one and/or the other is SlantedLine, the
