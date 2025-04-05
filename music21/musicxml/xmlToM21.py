@@ -4122,15 +4122,33 @@ class MeasureParser(SoundTagMixin, XMLParserBase):
         >>> pedalMark = retList[0]
         >>> pedalMark.pedalType
         <PedalType.Sostenuto>
-        >>> pedalMark.pedalForm
-        <PedalForm.Symbol>
+        >>> pedalMark.startForm
+        <PedalForm.PedalName>
+        >>> pedalMark.continueLine
+        <PedalLine.NoLine>
+        >>> pedalMark.bounceUp
+        <PedalForm.Unspecified>
+        >>> pedalMark.bounceDown
+        <PedalForm.PedalName>
+        >>> pedalMark.endForm
+        <PedalForm.Star>
 
         >>> mxDirectionType1a = EL('<pedal type="resume" line="yes" number="2"/>')
         >>> retList = MP.xmlDirectionTypeToSpanners(mxDirectionType1a, 1, 0.5)
         >>> retList
         []
-        >>> pedalMark.pedalForm
-        <PedalForm.SymbolLine>
+        >>> pedalMark.pedalType
+        <PedalType.Sostenuto>
+        >>> pedalMark.startForm
+        <PedalForm.PedalName>
+        >>> pedalMark.continueLine
+        <PedalLine.Line>
+        >>> pedalMark.bounceUp
+        <PedalForm.SlantedLine>
+        >>> pedalMark.bounceDown
+        <PedalForm.SlantedLine>
+        >>> pedalMark.endForm
+        <PedalForm.VerticalLine>
 
         >>> mxDirectionType2 = EL('<pedal type="change" line="yes" number="2"/>')
         >>> retList = MP.xmlDirectionTypeToSpanners(mxDirectionType2, 1, 1.0)
@@ -4309,7 +4327,7 @@ class MeasureParser(SoundTagMixin, XMLParserBase):
                 elif mxLine == 'no' or mxSign == 'yes':
                     sp.startForm = expressions.PedalForm.PedalName
                     sp.continueLine = expressions.PedalLine.NoLine
-                    sp.bounceUp = expressions.PedalForm.Star
+                    sp.bounceUp = expressions.PedalForm.Unspecified
                     sp.bounceDown = expressions.PedalForm.PedalName
                     sp.endForm = expressions.PedalForm.Star
 
@@ -4367,6 +4385,15 @@ class MeasureParser(SoundTagMixin, XMLParserBase):
                         )
                     else:
                         pb = expressions.PedalBounce()
+                    # Here, if sp.startForm/continueLine/endForm are all unspecified,
+                    # we know what it should be, because 'change' only makes sense
+                    # if line="yes".
+                    if (sp.startForm == expressions.PedalForm.Unspecified
+                            and sp.continueLine == expressions.PedalLine.Unspecified
+                            and sp.endForm == expressions.PedalForm.Unspecified):
+                        sp.startForm = expressions.PedalForm.VerticalLine
+                        sp.continueLine = expressions.PedalLine.Line
+                        sp.endForm = expressions.PedalForm.VerticalLine
                     self.insertCoreAndRef(totalOffset, staffKey, pb)
                     sp.addSpannedElements(pb)
                 elif mxType == 'stop':

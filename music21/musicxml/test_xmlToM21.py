@@ -1080,14 +1080,21 @@ class Test(unittest.TestCase):
         self.assertEqual(len(pedals), 1)
         pm = pedals[0]
         pm.fill(s)
-        self.assertIsNone(pm.pedalForm)
         self.assertEqual(pm.pedalType, expressions.PedalType.Sustain)
+        self.assertEqual(pm.startForm, expressions.PedalForm.VerticalLine)
+        self.assertEqual(pm.continueLine, expressions.PedalLine.Line)
+        self.assertEqual(pm.bounceUp, expressions.PedalForm.Unspecified)
+        self.assertEqual(pm.bounceDown, expressions.PedalForm.Unspecified)
+        self.assertEqual(pm.endForm, expressions.PedalForm.VerticalLine)
+        self.assertFalse(pm.abbreviated)
         spElements = pm.getSpannedElements()
         self.assertEqual(len(spElements), 4)
         expectedOffsets = [0., 1., 1., 2.]
         for i, (el, expectedOffset) in enumerate(zip(spElements, expectedOffsets)):
             if i == 1:
                 self.assertIsInstance(el, expressions.PedalBounce)
+                self.assertEqual(el.overrideBounceUp, expressions.PedalForm.SlantedLine)
+                self.assertEqual(el.overrideBounceDown, expressions.PedalForm.SlantedLine)
             else:
                 self.assertIsInstance(el, note.Note)
                 self.assertEqual(el.fullName, 'C in octave 4 Quarter Note')
@@ -1098,26 +1105,38 @@ class Test(unittest.TestCase):
         self.assertEqual(len(pedals), 1)
         pm = pedals[0]
         pm.fill(s)
-        self.assertIsNone(pm.pedalForm)
         self.assertEqual(pm.pedalType, expressions.PedalType.Sustain)
+        self.assertEqual(pm.startForm, expressions.PedalForm.VerticalLine)
+        self.assertEqual(pm.continueLine, expressions.PedalLine.Line)
+        self.assertEqual(pm.bounceUp, expressions.PedalForm.Unspecified)
+        self.assertEqual(pm.bounceDown, expressions.PedalForm.Unspecified)
+        self.assertEqual(pm.endForm, expressions.PedalForm.VerticalLine)
+        self.assertFalse(pm.abbreviated)
         spElements = pm.getSpannedElements()
         self.assertEqual(len(spElements), 3)
         expectedOffsets = [0., 1., 1.]
         for i, (el, expectedOffset) in enumerate(zip(spElements, expectedOffsets)):
             if i == 1:
                 self.assertIsInstance(el, expressions.PedalBounce)
+                self.assertEqual(el.overrideBounceUp, expressions.PedalForm.SlantedLine)
+                self.assertEqual(el.overrideBounceDown, expressions.PedalForm.SlantedLine)
             else:
                 self.assertIsInstance(el, note.Note)
                 self.assertEqual(el.fullName, 'B in octave 4 Quarter Note')
             self.assertEqual(el.offset, expectedOffset)
 
-        s = corpus.parse('beach')
+        s = corpus.parse('beach')  # , forceSource=True)
         pedals = list(s[expressions.PedalMark])
         self.assertEqual(len(pedals), 1)
         pm = pedals[0]
         pm.fill(s.parts[5])
-        self.assertEqual(pm.pedalForm, expressions.PedalForm.Symbol)
         self.assertEqual(pm.pedalType, expressions.PedalType.Sustain)
+        self.assertEqual(pm.startForm, expressions.PedalForm.PedalName)
+        self.assertEqual(pm.continueLine, expressions.PedalLine.NoLine)
+        self.assertEqual(pm.bounceUp, expressions.PedalForm.Unspecified)
+        self.assertEqual(pm.bounceDown, expressions.PedalForm.PedalName)
+        self.assertEqual(pm.endForm, expressions.PedalForm.Star)
+        self.assertFalse(pm.abbreviated)
         spElements = pm.getSpannedElements()
         self.assertEqual(len(spElements), 2)
         self.assertIsInstance(spElements[0], chord.Chord)
@@ -1130,13 +1149,17 @@ class Test(unittest.TestCase):
         self.assertEqual(spElements[1].fullName, 'E-flat in octave 1 Whole Note')
         self.assertEqual(spElements[1].offset, 0.)
 
-        s = corpus.parse('dichterliebe_no2')
+        s = corpus.parse('dichterliebe_no2')  # , forceSource=True)
         pedals = list(s[expressions.PedalMark])
         self.assertEqual(len(pedals), 1)
         pm = pedals[0]
         pm.fill(s.parts[2])
-        self.assertEqual(pm.pedalForm, expressions.PedalForm.Symbol)
         self.assertEqual(pm.pedalType, expressions.PedalType.Sustain)
+        self.assertEqual(pm.startForm, expressions.PedalForm.PedalName)
+        self.assertEqual(pm.continueLine, expressions.PedalLine.NoLine)
+        self.assertEqual(pm.bounceUp, expressions.PedalForm.Unspecified)
+        self.assertEqual(pm.bounceDown, expressions.PedalForm.PedalName)
+        self.assertEqual(pm.endForm, expressions.PedalForm.Star)
         spElements = pm.getSpannedElements()
         self.assertEqual(len(spElements), 5)
         expectedOffsets = [1.5, 1.75, 0., 0.75, 1.0]

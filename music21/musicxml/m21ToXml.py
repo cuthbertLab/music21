@@ -6462,11 +6462,15 @@ class MeasureExporter(XMLExporterBase):
 
         >>> pm = expressions.PedalMark()
         >>> po = expressions.PedalBounce()
+        >>> po.overrideBounceUp = expressions.PedalForm.SlantedLine
+        >>> po.overrideBounceDown = expressions.PedalForm.SlantedLine
         >>> pm.addSpannedElements(po)
-        >>> pm.pedalForm = expressions.PedalForm.Line
         >>> pm.pedalType = expressions.PedalType.Sustain
+        >>> pm.startForm = expressions.PedalForm.VerticalLine
+        >>> pm.continueLine = expressions.PedalLine.Line
+        >>> pm.endForm = expressions.PedalForm.VerticalLine
         >>> MEX = musicxml.m21ToXml.MeasureExporter()
-        >>> mxPedal = MEX.pedalObjectToXml(po)
+        >>> mxPedal = MEX.pedalTransitionToXml(po)
         >>> MEX.dump(mxPedal)
         <direction>
           <direction-type>
@@ -6476,12 +6480,16 @@ class MeasureExporter(XMLExporterBase):
 
         >>> pm = expressions.PedalMark()
         >>> po = expressions.PedalGapStart()
+        >>> po.overrideBounceUp = expressions.PedalForm.SlantedLine
+        >>> po.overrideBounceDown = expressions.PedalForm.SlantedLine
         >>> pm.addSpannedElements(po)
-        >>> pm.pedalForm = expressions.PedalForm.Line
         >>> pm.pedalType = expressions.PedalType.Sustain
+        >>> pm.startForm = expressions.PedalForm.VerticalLine
+        >>> pm.continueLine = expressions.PedalLine.Line
+        >>> pm.endForm = expressions.PedalForm.VerticalLine
         >>> po.placement = 'above'
         >>> MEX = musicxml.m21ToXml.MeasureExporter()
-        >>> mxPedal = MEX.pedalObjectToXml(po)
+        >>> mxPedal = MEX.pedalTransitionToXml(po)
         >>> MEX.dump(mxPedal)
         <direction placement="above">
           <direction-type>
@@ -6492,11 +6500,13 @@ class MeasureExporter(XMLExporterBase):
         >>> pm = expressions.PedalMark()
         >>> po = expressions.PedalGapEnd()
         >>> pm.addSpannedElements(po)
-        >>> pm.pedalForm = expressions.PedalForm.Line
         >>> pm.pedalType = expressions.PedalType.Sustain
+        >>> pm.startForm = expressions.PedalForm.VerticalLine
+        >>> pm.continueLine = expressions.PedalLine.Line
+        >>> pm.endForm = expressions.PedalForm.VerticalLine
         >>> po.placement = 'below'
         >>> MEX = musicxml.m21ToXml.MeasureExporter()
-        >>> mxPedal = MEX.pedalObjectToXml(po)
+        >>> mxPedal = MEX.pedalTransitionToXml(po)
         >>> MEX.dump(mxPedal)
         <direction placement="below">
           <direction-type>
@@ -6530,7 +6540,7 @@ class MeasureExporter(XMLExporterBase):
                 # intention is a "caret" bounce.
                 mxPedals = [Element('pedal')]
                 mxPedals[0].set('type', 'change')
-                mxPedals[0].set('sign', 'yes')
+                mxPedals[0].set('line', 'yes')
             else:
                 # We assume that bounceUp is either NoMark or Star.
                 if bounceUp == expressions.PedalForm.NoMark:
