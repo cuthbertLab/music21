@@ -2704,6 +2704,7 @@ class MeasureParser(SoundTagMixin, XMLParserBase):
             self.offsetMeasureNote += change
             # xmlToNote() sets None
             self.endedWithForwardTag = r
+            self.spannerBundle.freePendingSpannedElementAssignment(r)
 
     def xmlPrint(self, mxPrint: ET.Element):
         '''
