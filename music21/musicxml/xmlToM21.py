@@ -1499,11 +1499,12 @@ class PartParser(XMLParserBase):
         # copy spanners that are complete into the part, as this is the
         # highest level container that needs them. Ottavas are the exception,
         # they should be put in the PartStaff that contains the first note
-        # in the Ottava.
+        # in the Ottava.  PedalMarks are another exception, the should be
+        # put in the last PartStaff
         completedSpanners: list[spanner.Spanner] = []
         for sp in self.spannerBundle.getByCompleteStatus(True):
-            if not isinstance(sp, spanner.Ottava):
-                # don't insert Ottavas, we'll do that after separateOutPartStaves().
+            if not isinstance(sp, (spanner.Ottava, expressions.PedalMark)):
+                # don't insert Ottavas or PedalMarks, we'll do that after separateOutPartStaves().
                 self.stream.coreInsert(0, sp)
             completedSpanners.append(sp)
         # remove from original spanner bundle
@@ -1520,6 +1521,7 @@ class PartParser(XMLParserBase):
             self.stream.groups.append(self.partId)  # set group for stream itself
 
         self._fillAndInsertOttavasInPartStaff(completedSpanners, partStaves)
+        self._combineAndInsertPedalMarksInPartStaff(completedSpanners, partStaves)
 
     def _fillAndInsertOttavasInPartStaff(
         self,
@@ -1542,6 +1544,66 @@ class PartParser(XMLParserBase):
                 spannerPart.coreInsert(0, sp)
                 spannerPart.coreElementsChanged()
                 sp.fill(spannerPart)
+
+    def _combineAndInsertPedalMarksInPartStaff(
+        self,
+        spanners: list[spanner.Spanner],
+        partStaves: list[stream.PartStaff]
+    ):
+        # PedalMarks should be combined.  That means that if the PedalMark end and the next
+        # PedalMark start are at the same offset, the two PedalMarks should be combined, with
+        # a PedalBounce at the boundary.  PedalMarks should also be inserted into the bottom
+        # staff, even if the first note is in the top staff.
+        pedalMarks: list[expressions.PedalMark] = []
+        for sp in spanners:
+            if not isinstance(sp, expressions.PedalMark):
+                continue
+            pedalMarks.append(sp)
+
+#         score: stream.Score = self.parent.stream
+#         pedalMarks.sort(key=lambda sp: sp.getFirst().getOffsetInHierarchy(score))
+
+#       We're not merging pedal marks yet.
+#         # hand-rolled loops because we are deleting during iteration
+#         i: int = 0
+#         while True:
+#             if i >= len(pedalMarks) - 1:
+#                 # we're on (or beyond) the last pedalMark, nothing to look at
+#                 break
+#             pmCurr: expressions.PedalMark = pedalMarks[i]
+#
+#             j = i + 1
+#             while j < len(pedalMarks):
+#                 pmNext: expressions.PedalMark = pedalMarks[j]
+#                 currEndOffset: OffsetQL = (
+#                     pmCurr.getLast().getOffsetInHierarchy(score) + pmCurr.getLast().quarterLength
+#                 )
+#                 nextStartOffset: OffsetQL = pmNext.getFirst().getOffsetInHierarchy(score)
+#                 if (currEndOffset == nextStartOffset):
+#                     # merge them
+#                     lastEl = pmCurr.getSpannedElements()[-1]
+#                     pmCurr.spannerStorage.remove(lastEl)
+#                     pmCurr.addSpannedElements(expressions.PedalBounce())
+#                     pmNextElements = pmNext.getSpannedElements()[1:]
+#                     pmCurr.addSpannedElements(pmNextElements)
+#                     del pedalMarks[j]
+#                     # j now points to the _next_ pm, let's see if we
+#                     # can merge that one, too.
+#                     continue
+#                 break
+#
+#             i += 1
+
+        for pm in pedalMarks:
+            spannerPart: stream.Part|None = None
+            if partStaves:
+                spannerPart = partStaves[-1]
+            else:
+                spannerPart = self.stream
+
+            if spannerPart is not None:
+                spannerPart.coreAppend(pm)
+                spannerPart.coreElementsChanged()
 
     def _findFirstPartStaffContaining(
         self,

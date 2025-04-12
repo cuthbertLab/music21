@@ -402,6 +402,15 @@ class PedalMark(spanner.Spanner):
 
         self.placement: str|None = None
 
+    def hasLine(self) -> bool:
+        if self.startForm == PedalForm.VerticalLine:
+            # it's all lines
+            return True
+        if self.continueLine in (PedalLine.Line, PedalLine.Dashed):
+            # it's Ped followed by a line
+            return True
+        return False
+
 
 class PedalTransition(base.Music21Object):
     '''

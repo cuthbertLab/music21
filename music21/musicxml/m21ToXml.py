@@ -6535,6 +6535,7 @@ class MeasureExporter(XMLExporterBase):
                 # We assume if one and/or the other is SlantedLine, the
                 # intention is a "caret" bounce.
                 mxPedals = [Element('pedal')]
+                mxPedal.set('number', str(pm.idLocal))
                 mxPedals[0].set('type', 'change')
                 mxPedals[0].set('line', 'yes')
             else:
@@ -6542,13 +6543,22 @@ class MeasureExporter(XMLExporterBase):
                 if bounceUp == expressions.PedalForm.NoMark:
                     # just a bounce down
                     mxPedals = [Element('pedal')]
+                    # increment the idLocal for this 'start'
+                    # (room was made in spanner.setIdLocals)
+                    pm.idLocal = (pm.idLocal % 6) + 1
+                    mxPedals[0].set('number', str(pm.idLocal))
                 else:
                     # bounce up and then down, starting with a Star
                     mxPedals = [Element('pedal'), Element('pedal')]
-                    mxPedals[0].set('type', 'stop')
+                    # close out one pedal, then increment idLocal for the next one
+                    # (room was made in spanner.setIdLocals)
+                    mxPedals[0].set('number', str(pm.idLocal))
                     mxPedals[0].set('sign', 'yes')
+                    mxPedals[0].set('type', 'stop')
+                    pm.idLocal = (pm.idLocal % 6) + 1
 
                 # We assume that bounceDown is either Ped or PedalName
+                mxPedals[-1].set('number', str(pm.idLocal))
                 mxPedals[-1].set('sign', 'yes')
                 if bounceDown == expressions.PedalForm.Ped:
                     mxPedals[-1].set('type', 'start')
@@ -6565,10 +6575,12 @@ class MeasureExporter(XMLExporterBase):
 
         elif isinstance(pt, expressions.PedalGapStart):
             mxPedals = [Element('pedal')]
+            mxPedals[0].set('number', str(pm.idLocal))
             mxPedals[0].set('type', 'discontinue')
             mxPedals[0].set('line', 'yes')
         elif isinstance(pt, expressions.PedalGapEnd):
             mxPedals = [Element('pedal')]
+            mxPedals[0].set('number', str(pm.idLocal))
             mxPedals[0].set('type', 'resume')
             mxPedals[0].set('line', 'yes')
         else:
@@ -6586,6 +6598,7 @@ class MeasureExporter(XMLExporterBase):
     def makePedalResumeLineXml(self, pm: expressions.PedalMark) -> Element:
         # does not append to self.xmlRoot (caller will do that)
         mxPedal = Element('pedal')
+        mxPedal.set('number', str(pm.idLocal))
         mxPedal.set('type', 'resume')
         mxPedal.set('line', 'yes')
         # wrap in <direction><direction-type>
