@@ -3300,7 +3300,7 @@ class MeasureExporter(XMLExporterBase):
             if self.offsetInMeasure:
                 self.moveBackward(self.offsetInMeasure)
 
-            objIterator = OffsetIterator(m)
+            objIterator = list(OffsetIterator(m))
             for objGroup in objIterator:
                 # noinspection PyTypeChecker
                 if not any(self._hasRelatedSpanners(obj) for obj in objGroup):
