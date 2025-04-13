@@ -4142,8 +4142,8 @@ class MeasureParser(SoundTagMixin, XMLParserBase):
         and ottava are encoded as MusicXML directions.
 
         :param mxObj: the specific direction element (e.g. <wedge>).
-        :param staffKey: staff number (required for <pedal>)
-        :param totalOffset: offset in measure of this direction (required for <pedal>)
+        :param staffKey: staff number
+        :param totalOffset: offset in measure of this direction
 
         >>> from xml.etree.ElementTree import fromstring as EL
         >>> MP = musicxml.xmlToM21.MeasureParser()
@@ -4240,7 +4240,6 @@ class MeasureParser(SoundTagMixin, XMLParserBase):
         (<music21.expressions.PedalBounce at 1.0>, <music21.expressions.PedalGapStart at 2.0>,
         <music21.expressions.PedalGapEnd at 3.5>)
         '''
-        targetLast = self.nLast
         returnList = []
 
         if totalOffset is not None:
@@ -4259,8 +4258,10 @@ class MeasureParser(SoundTagMixin, XMLParserBase):
 
             if mType != 'stop':
                 sp = self.xmlOneSpanner(mxObj, None, spClass, allowDuplicateIds=True)
+                start = spanner.SpannerAnchor()
+                self.insertCoreAndRef(totalOffset, staffKey, start)
+                sp.addSpannedElements(start)
                 returnList.append(sp)
-                self.spannerBundle.setPendingSpannedElementAssignment(sp, 'GeneralNote')
             else:
                 idFound = mxObj.get('number')
                 spb = self.spannerBundle.getByClassIdLocalComplete(
@@ -4269,12 +4270,12 @@ class MeasureParser(SoundTagMixin, XMLParserBase):
                     sp = spb[0]
                 except IndexError:
                     raise MusicXMLImportException('Error in getting DynamicWedges')
+                stop = spanner.SpannerAnchor()
+                self.insertCoreAndRef(totalOffset, staffKey, stop)
+                sp.addSpannedElements(stop)
                 sp.completeStatus = True
-                # will only have a target if this follows the note
-                if targetLast is not None:
-                    sp.addSpannedElements(targetLast)
 
-        if mxObj.tag in ('bracket', 'dashes'):
+        elif mxObj.tag in ('bracket', 'dashes'):
             mxType = mxObj.get('type')
             idFound = mxObj.get('number')
             if mxType == 'start':
@@ -4290,11 +4291,12 @@ class MeasureParser(SoundTagMixin, XMLParserBase):
                     sp.startTick = mxObj.get('line-end')
                     sp.lineType = mxObj.get('line-type')  # redundant with setLineStyle()
 
+                start = spanner.SpannerAnchor()
+                self.insertCoreAndRef(totalOffset, staffKey, start)
+                sp.addSpannedElements(start)
                 self.spannerBundle.append(sp)
                 returnList.append(sp)
-                # define this spanner as needing component assignment from
-                # the next general note
-                self.spannerBundle.setPendingSpannedElementAssignment(sp, 'GeneralNote')
+
             elif mxType == 'stop':
                 # need to retrieve an existing spanner
                 # try to get base class of both Crescendo and Decrescendo
@@ -4305,7 +4307,6 @@ class MeasureParser(SoundTagMixin, XMLParserBase):
                 except IndexError:
                     warnings.warn('Line <' + mxObj.tag + '> stop without start', MusicXMLWarning)
                     return []
-                sp.completeStatus = True
 
                 if mxObj.tag == 'dashes':
                     sp.endTick = 'none'
@@ -4317,13 +4318,15 @@ class MeasureParser(SoundTagMixin, XMLParserBase):
                         sp.endHeight = float(height)
                     sp.lineType = mxObj.get('line-type')
 
-                # will only have a target if this follows the note
-                if targetLast is not None:
-                    sp.addSpannedElements(targetLast)
+                stop = spanner.SpannerAnchor()
+                self.insertCoreAndRef(totalOffset, staffKey, stop)
+                sp.addSpannedElements(stop)
+                sp.completeStatus = True
+
             else:
                 raise MusicXMLImportException(f'unidentified mxType of mxBracket: {mxType}')
 
-        if mxObj.tag == 'octave-shift':
+        elif mxObj.tag == 'octave-shift':
             mxType = mxObj.get('type')
             mxSize = mxObj.get('size')
             idFound = mxObj.get('number')
@@ -4342,9 +4345,12 @@ class MeasureParser(SoundTagMixin, XMLParserBase):
                     sp.placement = 'above'
                 sp.idLocal = idFound
                 sp.type = (mxSize or 8, m21Type)
+                start = spanner.SpannerAnchor()
+                self.insertCoreAndRef(totalOffset, staffKey, start)
+                sp.addSpannedElements(start)
                 self.spannerBundle.append(sp)
                 returnList.append(sp)
-                self.spannerBundle.setPendingSpannedElementAssignment(sp, 'GeneralNote')
+
             elif mxType in ('continue', 'stop'):
                 spb = self.spannerBundle.getByClassIdLocalComplete(
                     'Ottava', idFound, False  # get first
@@ -4354,15 +4360,20 @@ class MeasureParser(SoundTagMixin, XMLParserBase):
                 except IndexError:
                     raise MusicXMLImportException('Error in getting Ottava')
                 if mxType == 'continue':
-                    self.spannerBundle.setPendingSpannedElementAssignment(sp, 'GeneralNote')
+                    # is this actually necessary?
+                    cont = spanner.SpannerAnchor()
+                    self.insertCoreAndRef(totalOffset, staffKey, cont)
+                    sp.addSpannedElements(cont)
                 else:  # if mxType == 'stop':
+                    stop = spanner.SpannerAnchor()
+                    self.insertCoreAndRef(totalOffset, staffKey, stop)
+                    sp.addSpannedElements(stop)
                     sp.completeStatus = True
-                    if targetLast is not None:
-                        sp.addSpannedElements(targetLast)
+
             else:
                 raise MusicXMLImportException(f'unidentified mxType of octave-shift: {mxType}')
 
-        if mxObj.tag == 'pedal':
+        elif mxObj.tag == 'pedal':
             mxType = mxObj.get('type')
             mxAbbreviated = mxObj.get('abbreviated')
             mxLine = mxObj.get('line')  # 'yes'/'no'
@@ -4397,9 +4408,12 @@ class MeasureParser(SoundTagMixin, XMLParserBase):
                 if mxAbbreviated == 'yes':
                     sp.abbreviated = True
 
+                start = spanner.SpannerAnchor()
+                self.insertCoreAndRef(totalOffset, staffKey, start)
+                sp.addSpannedElements(start)
                 self.spannerBundle.append(sp)
                 returnList.append(sp)
-                self.spannerBundle.setPendingSpannedElementAssignment(sp, 'GeneralNote')
+
             elif mxType in ('continue', 'stop', 'discontinue', 'resume', 'change'):
                 spb = self.spannerBundle.getByClassIdLocalComplete(
                     'PedalMark', idFound, False  # get first
@@ -4415,7 +4429,6 @@ class MeasureParser(SoundTagMixin, XMLParserBase):
                     # important, they should probably end the spanner and start
                     # a new one.
                     pass
-                    # self.spannerBundle.setPendingSpannedElementAssignment(sp, 'GeneralNote')
                 elif mxType == 'discontinue':
                     # insert a PedalGapStart
                     pgStart = expressions.PedalGapStart()
@@ -4461,9 +4474,11 @@ class MeasureParser(SoundTagMixin, XMLParserBase):
                     sp.addSpannedElements(pb)
                 elif mxType == 'stop':
                     # TODO: here we need to see if the 'stop' is actually part of a bounce
+                    stop = spanner.SpannerAnchor()
+                    self.insertCoreAndRef(totalOffset, staffKey, stop)
+                    sp.addSpannedElements(stop)
                     sp.completeStatus = True
-                    if targetLast is not None:
-                        sp.addSpannedElements(targetLast)
+
             else:
                 raise MusicXMLImportException(f'unidentified mxType of pedal: {mxType}')
 
