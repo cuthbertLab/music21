@@ -1167,7 +1167,7 @@ class SpannerBundle(prebase.ProtoM21Object):
             # in the spanner adds 1 to the idLocals consumed by the
             # spanner (because those bounces will get turned into a
             # pedal stop and pedal start in the output MusicXML file).
-            i: int = 0
+            i = 0
             for sp in self.getByClass(className):
                 if t.TYPE_CHECKING:
                     assert isinstance(sp, expressions.PedalMark)
@@ -1177,9 +1177,7 @@ class SpannerBundle(prebase.ProtoM21Object):
                 else:
                     # no lines; PedalBounce will be written as 'stop'/'start' or just 'start'.
                     # either way we need an extra idLocal allocated for the new 'start'.
-                    pbs: list[expressions.PedalBounce] = (
-                        sp.getSpannedElementsByClass(expressions.PedalBounce)
-                    )
+                    pbs = sp.getSpannedElementsByClass(expressions.PedalBounce)
                     if (len(pbs) + 1) % maxId == 0:
                         # we would wrap around to the exact same idLocal, so increment by 2 instead
                         i += len(pbs) + 2

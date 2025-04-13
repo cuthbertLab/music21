@@ -3300,8 +3300,8 @@ class MeasureExporter(XMLExporterBase):
             if self.offsetInMeasure:
                 self.moveBackward(self.offsetInMeasure)
 
-            objIterator = list(OffsetIterator(m))
-            for objGroup in objIterator:
+            objList = list(OffsetIterator(m))
+            for objGroup in objList:
                 # noinspection PyTypeChecker
                 if not any(self._hasRelatedSpanners(obj) for obj in objGroup):
                     continue
@@ -6535,7 +6535,7 @@ class MeasureExporter(XMLExporterBase):
                 # We assume if one and/or the other is SlantedLine, the
                 # intention is a "caret" bounce.
                 mxPedals = [Element('pedal')]
-                mxPedal.set('number', str(pm.idLocal))
+                mxPedals[0].set('number', str(pm.idLocal))
                 mxPedals[0].set('type', 'change')
                 mxPedals[0].set('line', 'yes')
             else:
@@ -6545,6 +6545,8 @@ class MeasureExporter(XMLExporterBase):
                     mxPedals = [Element('pedal')]
                     # increment the idLocal for this 'start'
                     # (room was made in spanner.setIdLocals)
+                    if t.TYPE_CHECKING:
+                        assert isinstance(pm.idLocal, int)
                     pm.idLocal = (pm.idLocal % 6) + 1
                     mxPedals[0].set('number', str(pm.idLocal))
                 else:
@@ -6555,6 +6557,8 @@ class MeasureExporter(XMLExporterBase):
                     mxPedals[0].set('number', str(pm.idLocal))
                     mxPedals[0].set('sign', 'yes')
                     mxPedals[0].set('type', 'stop')
+                    if t.TYPE_CHECKING:
+                        assert isinstance(pm.idLocal, int)
                     pm.idLocal = (pm.idLocal % 6) + 1
 
                 # We assume that bounceDown is either Ped or PedalName
