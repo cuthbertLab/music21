@@ -4070,8 +4070,8 @@ class MeasureParser(SoundTagMixin, XMLParserBase):
     def xmlDirectionTypeToSpanners(
         self,
         mxObj: ET.Element,
-        staffKey: int|None = None,
-        totalOffset: OffsetQL|None = None
+        staffKey: int,
+        totalOffset: OffsetQL
     ):
         # noinspection PyShadowingNames
         '''

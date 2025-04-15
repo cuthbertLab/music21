@@ -801,14 +801,13 @@ class SpannerAnchor(base.Music21Object):
     def _reprInternal(self) -> str:
         offset: OffsetQL = self.offset
         if self.activeSite is None:
-            from music21 import stream
             # find a site that is either a Measure or a Voice
-            sites: list = self.sites.getSitesByClass('Measure')
-            if not sites:
-                sites = self.sites.getSitesByClass('Voice')
-            if not sites:
+            siteList: list = self.sites.getSitesByClass('Measure')
+            if not siteList:
+                siteList = self.sites.getSitesByClass('Voice')
+            if not siteList:
                 return 'unanchored'
-            offset = self.getOffsetInHierarchy(sites[0])
+            offset = self.getOffsetInHierarchy(siteList[0])
 
         ql: OffsetQL = self.duration.quarterLength
         if ql == 0:

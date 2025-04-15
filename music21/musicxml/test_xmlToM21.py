@@ -1206,8 +1206,8 @@ class Test(unittest.TestCase):
         el2 = EL('<bracket type="stop" line-end="down" end-length="12.5" number="1"></bracket>')
 
         mp = MeasureParser()
-        line = mp.xmlDirectionTypeToSpanners(el1)[0]
-        mp.xmlDirectionTypeToSpanners(el2)
+        line = mp.xmlDirectionTypeToSpanners(el1, 1, 0.0)[0]
+        mp.xmlDirectionTypeToSpanners(el2, 1, 1.0)
         self.assertEqual(line.startHeight, 12.5)
         self.assertEqual(line.endHeight, 12.5)
 
