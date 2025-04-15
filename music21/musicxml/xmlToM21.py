@@ -4176,7 +4176,7 @@ class MeasureParser(SoundTagMixin, XMLParserBase):
         1
         >>> sp = MP.spannerBundle[0]
         >>> sp
-        <music21.dynamics.Crescendo <music21.spanner.SpannerAnchor at 0.0><music21.spanner.SpannerAnchor at 1.0>>
+        <music21.dynamics.Crescendo <...SpannerAnchor at 0.0><...SpannerAnchor at 1.0>>
 
         >>> mxDirection = EL('<direction place="below"/>')
         >>> mxDirectionType = EL('<pedal type="sostenuto" sign="yes" number="2"/>')

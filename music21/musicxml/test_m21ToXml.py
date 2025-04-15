@@ -735,7 +735,8 @@ class Test(unittest.TestCase):
                 'type': 'discontinue',
                 'line': 'yes',
             },
-            # This start/resume pair is preceded by a <backup> that puts it first (before the change).
+            # This start/resume pair is preceded by a <backup> that
+            # puts it first (before the change).
             {
                 'type': 'start',
                 'sign': 'yes',
@@ -745,6 +746,7 @@ class Test(unittest.TestCase):
                 'type': 'resume',
                 'line': 'yes',
             },
+            # end of start/resume pair that is out-of-order
             {
                 'type': 'resume',
                 'line': 'yes',
