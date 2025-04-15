@@ -1803,6 +1803,7 @@ class PartParser(XMLParserBase):
             'StaffLayout',
             'TempoIndication',
             'TimeSignature',
+            'SpannerAnchor',
         ]
 
         uniqueStaffKeys: list[int] = self._getUniqueStaffKeys()
