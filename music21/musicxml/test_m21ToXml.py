@@ -192,9 +192,11 @@ class Test(unittest.TestCase):
         s.makeNotation(inPlace=True)
         self.assertEqual(len(s.parts[1].spanners), 0)
 
-        # and written after the backup tag, i.e. on the LH?
+        # and written after the second backup tag, i.e. on the LH?
+        # (This used to be after the first backup tag, but these days most spanners
+        # get an extra backup due to being started with a SpannerAnchor.)
         xmlOut = self.getXml(s)
-        xmlAfterFirstBackup = xmlOut.split('</backup>\n')[1]
+        xmlAfterSecondBackup = xmlOut.split('</backup>\n')[2]
 
         self.assertIn(
             stripInnerSpaces(
@@ -204,7 +206,7 @@ class Test(unittest.TestCase):
                         </direction-type>
                         <staff>2</staff>
                     </direction>'''),
-            stripInnerSpaces(xmlAfterFirstBackup)
+            stripInnerSpaces(xmlAfterSecondBackup)
         )
 
     def testLowVoiceNumbers(self):
@@ -687,17 +689,18 @@ class Test(unittest.TestCase):
     def testPedals(self):
         expectedResults1 = (
             {
-                'type': 'start',
-                'line': 'yes',
-                'number': '1',
-            },
-            {
                 'type': 'change',
                 'line': 'yes',
             },
             {
                 'type': 'discontinue',
                 'line': 'yes',
+            },
+            # This start is preceded by a <backup> that puts it first (before the change).
+            {
+                'type': 'start',
+                'line': 'yes',
+                'number': '1',
             },
             {
                 'type': 'resume',
@@ -725,20 +728,21 @@ class Test(unittest.TestCase):
 
         expectedResults2 = (
             {
+                'type': 'change',
+                'line': 'yes',
+            },
+            {
+                'type': 'discontinue',
+                'line': 'yes',
+            },
+            # This start/resume pair is preceded by a <backup> that puts it first (before the change).
+            {
                 'type': 'start',
                 'sign': 'yes',
                 'number': '1',
             },
             {
                 'type': 'resume',
-                'line': 'yes',
-            },
-            {
-                'type': 'change',
-                'line': 'yes',
-            },
-            {
-                'type': 'discontinue',
                 'line': 'yes',
             },
             {
