@@ -1157,16 +1157,20 @@ class Test(unittest.TestCase):
         self.assertEqual(pm.endForm, expressions.PedalForm.Star)
         self.assertFalse(pm.abbreviated)
         spElements = pm.getSpannedElements()
-        self.assertEqual(len(spElements), 2)
-        self.assertIsInstance(spElements[0], chord.Chord)
+        self.assertEqual(len(spElements), 4)
+        self.assertIsInstance(spElements[0], spanner.SpannerAnchor)
+        self.assertEqual(spElements[0].offset, 0.)
+        self.assertIsInstance(spElements[1], chord.Chord)
         self.assertEqual(
-            spElements[0].fullName,
+            spElements[1].fullName,
             'Chord {E-flat in octave 2 | B-flat in octave 2} Whole'
         )
-        self.assertEqual(spElements[0].offset, 0.)
-        self.assertIsInstance(spElements[1], note.Note)
-        self.assertEqual(spElements[1].fullName, 'E-flat in octave 1 Whole Note')
         self.assertEqual(spElements[1].offset, 0.)
+        self.assertIsInstance(spElements[2], note.Note)
+        self.assertEqual(spElements[2].fullName, 'E-flat in octave 1 Whole Note')
+        self.assertEqual(spElements[2].offset, 0.)
+        self.assertIsInstance(spElements[3], spanner.SpannerAnchor)
+        self.assertEqual(spElements[3].offset, 3.)
 
         s = corpus.parse('dichterliebe_no2')  # , forceSource=True)
         pedals = list(s[expressions.PedalMark])
@@ -1180,11 +1184,22 @@ class Test(unittest.TestCase):
         self.assertEqual(pm.bounceDown, expressions.PedalForm.PedalName)
         self.assertEqual(pm.endForm, expressions.PedalForm.Star)
         spElements = pm.getSpannedElements()
-        self.assertEqual(len(spElements), 5)
-        expectedOffsets = [1.5, 1.75, 0., 0.75, 1.0]
-        for i, (el, expectedOffset) in enumerate(zip(spElements, expectedOffsets)):
-            self.assertIsInstance(el, note.Note)
-            self.assertEqual(el.nameWithOctave, 'A3')
+        self.assertEqual(len(spElements), 7)
+        expectedOffsets = [1.5, 1.5, 1.75, 0., 0.75, 1.0, 1.75]
+        expectedInstances = [
+            spanner.SpannerAnchor,
+            note.Note,
+            note.Note,
+            note.Note,
+            note.Note,
+            note.Note,
+            spanner.SpannerAnchor,
+        ]
+        for i, (el, expectedOffset, expectedInstance) in enumerate(zip(
+                spElements, expectedOffsets, expectedInstances)):
+            self.assertIsInstance(el, expectedInstance)
+            if expectedInstance == note.Note:
+                self.assertEqual(el.nameWithOctave, 'A3')
             self.assertEqual(el.offset, expectedOffset)
 
     def testNoChordImport(self):
