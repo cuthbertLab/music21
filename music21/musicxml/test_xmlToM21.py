@@ -853,10 +853,10 @@ class Test(unittest.TestCase):
         '''
         from music21 import corpus
         c = corpus.parse('luca/gloria')
-        r = c.parts[1].measure(99).getElementsByClass(note.Rest).first()
-        bracketAttachedToRest = r.getSpannerSites()[0]
-        self.assertIn('Line', bracketAttachedToRest.classes)
-        self.assertEqual(bracketAttachedToRest.idLocal, '1')
+        sa = c.parts[1].measure(99).getElementsByClass(spanner.SpannerAnchor).first()
+        bracketAttachedToAnchor = sa.getSpannerSites()[0]
+        self.assertIn('Line', bracketAttachedToAnchor.classes)
+        self.assertEqual(bracketAttachedToAnchor.idLocal, '1')
 
         # c.show()
         # c.parts[1].show('t')
@@ -1088,19 +1088,27 @@ class Test(unittest.TestCase):
         self.assertEqual(pm.endForm, expressions.PedalForm.VerticalLine)
         self.assertFalse(pm.abbreviated)
         spElements = pm.getSpannedElements()
-        self.assertEqual(len(spElements), 4)
-        expectedOffsets = [0., 1., 1., 2.]
-        for i, (el, expectedOffset) in enumerate(zip(spElements, expectedOffsets)):
-            if i == 1:
-                self.assertIsInstance(el, expressions.PedalBounce)
+        self.assertEqual(len(spElements), 6)
+        expectedInstances = [
+            spanner.SpannerAnchor,
+            expressions.PedalBounce,
+            note.Note,
+            note.Note,
+            note.Note,
+            spanner.SpannerAnchor
+        ]
+        expectedOffsets = [0., 1., 0., 1., 2., 3.]
+        for i, (el, expectedOffset, expectedInstance) in enumerate(zip(
+                spElements, expectedOffsets, expectedInstances)):
+            self.assertIsInstance(el, expectedInstance)
+            self.assertEqual(el.offset, expectedOffset)
+            if expectedInstance == note.Note:
+                self.assertEqual(el.fullName, 'C in octave 4 Quarter Note')
+            elif expectedInstance == expressions.PedalBounce:
                 self.assertEqual(el.overrideBounceUp, expressions.PedalForm.SlantedLine)
                 self.assertEqual(el.overrideBounceDown, expressions.PedalForm.SlantedLine)
                 self.assertEqual(el.bounceUp, expressions.PedalForm.SlantedLine)
                 self.assertEqual(el.bounceDown, expressions.PedalForm.SlantedLine)
-            else:
-                self.assertIsInstance(el, note.Note)
-                self.assertEqual(el.fullName, 'C in octave 4 Quarter Note')
-            self.assertEqual(el.offset, expectedOffset)
 
         s = converter.parse(testPrimitive.spanners33a)
         pedals = list(s[expressions.PedalMark])
@@ -1115,19 +1123,26 @@ class Test(unittest.TestCase):
         self.assertEqual(pm.endForm, expressions.PedalForm.VerticalLine)
         self.assertFalse(pm.abbreviated)
         spElements = pm.getSpannedElements()
-        self.assertEqual(len(spElements), 3)
-        expectedOffsets = [0., 1., 1.]
-        for i, (el, expectedOffset) in enumerate(zip(spElements, expectedOffsets)):
-            if i == 1:
-                self.assertIsInstance(el, expressions.PedalBounce)
+        self.assertEqual(len(spElements), 5)
+        expectedInstances = [
+            spanner.SpannerAnchor,
+            expressions.PedalBounce,
+            note.Note,
+            note.Note,
+            spanner.SpannerAnchor
+        ]
+        expectedOffsets = [0., 1., 0., 1., 2.]
+        for i, (el, expectedOffset, expectedInstance) in enumerate(zip(
+                spElements, expectedOffsets, expectedInstances)):
+            self.assertIsInstance(el, expectedInstance)
+            self.assertEqual(el.offset, expectedOffset)
+            if expectedInstance == note.Note:
+                self.assertEqual(el.fullName, 'B in octave 4 Quarter Note')
+            elif expectedInstance == expressions.PedalBounce:
                 self.assertEqual(el.overrideBounceUp, expressions.PedalForm.SlantedLine)
                 self.assertEqual(el.overrideBounceDown, expressions.PedalForm.SlantedLine)
                 self.assertEqual(el.bounceUp, expressions.PedalForm.SlantedLine)
                 self.assertEqual(el.bounceDown, expressions.PedalForm.SlantedLine)
-            else:
-                self.assertIsInstance(el, note.Note)
-                self.assertEqual(el.fullName, 'B in octave 4 Quarter Note')
-            self.assertEqual(el.offset, expectedOffset)
 
         s = corpus.parse('beach')  # , forceSource=True)
         pedals = list(s[expressions.PedalMark])
@@ -1233,8 +1248,8 @@ class Test(unittest.TestCase):
         el2 = EL('<bracket type="stop" line-end="down" end-length="12.5" number="1"></bracket>')
 
         mp = MeasureParser()
-        line = mp.xmlDirectionTypeToSpanners(el1)[0]
-        mp.xmlDirectionTypeToSpanners(el2)
+        line = mp.xmlDirectionTypeToSpanners(el1, 1, 0.0)[0]
+        mp.xmlDirectionTypeToSpanners(el2, 1, 1.0)
         self.assertEqual(line.startHeight, 12.5)
         self.assertEqual(line.endHeight, 12.5)
 
@@ -1547,11 +1562,40 @@ class Test(unittest.TestCase):
             [o.placement for o in ottava_objs],
             ['above', 'below', 'above', 'below']
         )
+        ottavaPitches = []
+        for o in ottava_objs:
+            ottavaPitches.append([])
+            for p in o.getSpannedElements():
+                if hasattr(p, 'nameWithOctave'):
+                    name = p.nameWithOctave
+                else:
+                    name = repr(p)
+                ottavaPitches[-1].append(name)
+
         self.assertEqual(
-            [[p.nameWithOctave for p in o.getSpannedElements()] for o in ottava_objs],
-            # TODO(bug): first element should be ['C7', 'A6']
-            # not reading <offset>-4</offset>
-            [['A6'], ['C3', 'B2'], ['A5', 'A5'], ['B3', 'C4']]
+            ottavaPitches, [
+                [
+                    '<music21.spanner.SpannerAnchor at 0.5>',
+                    'C5',
+                    '<music21.spanner.SpannerAnchor at 1.0>'
+                ],
+                [
+                    '<music21.spanner.SpannerAnchor at 1.5>',
+                    'C3',
+                    '<music21.spanner.SpannerAnchor at 2.0>'
+                ],
+                [
+                    '<music21.spanner.SpannerAnchor at 2.5>',
+                    'A5',
+                    'A5',
+                    '<music21.spanner.SpannerAnchor at 3.125>'
+                ],
+                [
+                    '<music21.spanner.SpannerAnchor at 3.5>',
+                    'B3',
+                    '<music21.spanner.SpannerAnchor at 3.75>'
+                ]
+            ]
         )
 
     def testClearingTuplets(self):

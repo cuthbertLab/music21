@@ -1865,6 +1865,7 @@ class PartParser(XMLParserBase):
             'StaffLayout',
             'TempoIndication',
             'TimeSignature',
+            'SpannerAnchor',
         ]
 
         uniqueStaffKeys: list[int] = self._getUniqueStaffKeys()
@@ -4133,8 +4134,8 @@ class MeasureParser(SoundTagMixin, XMLParserBase):
     def xmlDirectionTypeToSpanners(
         self,
         mxObj: ET.Element,
-        staffKey: int|None = None,
-        totalOffset: OffsetQL|None = None
+        staffKey: int,
+        totalOffset: OffsetQL
     ):
         # noinspection PyShadowingNames
         '''
