@@ -875,7 +875,7 @@ class MusicXMLImporter(XMLParserBase):
                     # Fill mid-measure gaps, and find end of measure gaps by ref to measure stream
                     # https://github.com/cuthbertlab/music21/issues/444
                     # but only when the score comes from Finale
-                    if any("Finale" in software for software in md.software):
+                    if any('Finale' in software for software in md.software):
                         v.makeRests(refStreamOrTimeRange=m,
                                     fillGaps=True,
                                     inPlace=True,
@@ -4108,7 +4108,7 @@ class MeasureParser(SoundTagMixin, XMLParserBase):
         1
         >>> sp = MP.spannerBundle[0]
         >>> sp
-        <music21.dynamics.Crescendo <music21.spanner.SpannerAnchor at 0.0><music21.spanner.SpannerAnchor at 1.0>>
+        <music21.dynamics.Crescendo <...SpannerAnchor at 0.0><...SpannerAnchor at 1.0>>
 
         >>> mxDirection = EL('<direction place="below"/>')
         >>> mxDirectionType = EL('<pedal type="sostenuto" sign="yes" number="2"/>')
