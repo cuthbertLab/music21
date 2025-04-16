@@ -4086,18 +4086,18 @@ class MeasureParser(SoundTagMixin, XMLParserBase):
         >>> len(MP.spannerBundle)
         0
         >>> mxDirectionType = EL('<wedge type="crescendo" number="2"/>')
-        >>> retList = MP.xmlDirectionTypeToSpanners(mxDirectionType)
+        >>> retList = MP.xmlDirectionTypeToSpanners(mxDirectionType, 1, 0.0)
         >>> retList
-        [<music21.dynamics.Crescendo>]
+        [<music21.dynamics.Crescendo <music21.spanner.SpannerAnchor at 0.0>>]
 
         >>> len(MP.spannerBundle)
         1
         >>> sp = MP.spannerBundle[0]
         >>> sp
-        <music21.dynamics.Crescendo>
+        <music21.dynamics.Crescendo <music21.spanner.SpannerAnchor at 0.0>>
 
         >>> mxDirectionType2 = EL('<wedge type="stop" number="2"/>')
-        >>> retList = MP.xmlDirectionTypeToSpanners(mxDirectionType2)
+        >>> retList = MP.xmlDirectionTypeToSpanners(mxDirectionType2, 1, 1.0)
 
         retList is empty because nothing new has been added.
 
@@ -4108,13 +4108,13 @@ class MeasureParser(SoundTagMixin, XMLParserBase):
         1
         >>> sp = MP.spannerBundle[0]
         >>> sp
-        <music21.dynamics.Crescendo <music21.note.Note D>>
+        <music21.dynamics.Crescendo <music21.spanner.SpannerAnchor at 0.0><music21.spanner.SpannerAnchor at 1.0>>
 
         >>> mxDirection = EL('<direction place="below"/>')
         >>> mxDirectionType = EL('<pedal type="sostenuto" sign="yes" number="2"/>')
         >>> retList = MP.xmlDirectionTypeToSpanners(mxDirectionType, 1, 0.5)
         >>> retList
-        [<music21.expressions.PedalMark>]
+        [<music21.expressions.PedalMark <music21.spanner.SpannerAnchor at 0.5>>]
         >>> pedalMark = retList[0]
         >>> pedalMark.pedalType
         <PedalType.Sostenuto>
@@ -4148,12 +4148,14 @@ class MeasureParser(SoundTagMixin, XMLParserBase):
         >>> retList
         []
         >>> pedalMark.getFirst()
-        <music21.expressions.PedalBounce at 1.0>
-        >>> pedalMark.getLast() is n1
-        True
+        <music21.spanner.SpannerAnchor at 0.5>
+        >>> pedalMark.getLast()
+        <music21.spanner.SpannerAnchor at 4.0>
         >>> MP.stream.elements
-        (<music21.expressions.PedalBounce at 1.0>, <music21.expressions.PedalGapStart at 2.0>,
-        <music21.expressions.PedalGapEnd at 3.5>)
+        (<music21.spanner.SpannerAnchor at 0.0>, <music21.spanner.SpannerAnchor at 1.0>,
+        <music21.spanner.SpannerAnchor at 0.5>, <music21.expressions.PedalBounce at 1.0>,
+        <music21.expressions.PedalGapStart at 2.0>, <music21.expressions.PedalGapEnd at 3.5>,
+        <music21.spanner.SpannerAnchor at 4.0>)
         '''
         returnList = []
 
