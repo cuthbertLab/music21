@@ -192,9 +192,10 @@ class Test(unittest.TestCase):
         s.makeNotation(inPlace=True)
         self.assertEqual(len(s.parts[1].spanners), 0)
 
-        # and written after the backup tag, i.e. on the LH?
+        # and written after the second backup tag, i.e. on the LH?
+        # Second backup because the RH took two passes due to SpannerAnchors.
         xmlOut = self.getXml(s)
-        xmlAfterFirstBackup = xmlOut.split('</backup>\n')[1]
+        xmlAfterSecondBackup = xmlOut.split('</backup>\n')[2]
 
         self.assertIn(
             stripInnerSpaces(
@@ -204,7 +205,7 @@ class Test(unittest.TestCase):
                         </direction-type>
                         <staff>2</staff>
                     </direction>'''),
-            stripInnerSpaces(xmlAfterFirstBackup)
+            stripInnerSpaces(xmlAfterSecondBackup)
         )
 
     def testLowVoiceNumbers(self):
@@ -687,17 +688,18 @@ class Test(unittest.TestCase):
     def testPedals(self):
         expectedResults1 = (
             {
-                'type': 'start',
-                'line': 'yes',
-                'number': '1',
-            },
-            {
                 'type': 'change',
                 'line': 'yes',
             },
             {
                 'type': 'discontinue',
                 'line': 'yes',
+            },
+            # start is out of order (m21ToXml.py writes starts/stops later in the document)
+            {
+                'type': 'start',
+                'line': 'yes',
+                'number': '1',
             },
             {
                 'type': 'resume',
@@ -725,20 +727,21 @@ class Test(unittest.TestCase):
 
         expectedResults2 = (
             {
+                'type': 'change',
+                'line': 'yes',
+            },
+            {
+                'type': 'discontinue',
+                'line': 'yes',
+            },
+            # start is out of order (m21ToXml.py writes starts/stops later in the document)
+            {
                 'type': 'start',
                 'sign': 'yes',
                 'number': '1',
             },
             {
                 'type': 'resume',
-                'line': 'yes',
-            },
-            {
-                'type': 'change',
-                'line': 'yes',
-            },
-            {
-                'type': 'discontinue',
                 'line': 'yes',
             },
             {
