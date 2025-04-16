@@ -3322,7 +3322,7 @@ class MeasureExporter(XMLExporterBase):
         else:
             # if necessary, jump to end of the measure.
             if self.offsetInMeasure < firstPassEndOffsetInMeasure:
-                self.moveForward(firstPassEndOffsetInMeasure)
+                self.moveForward(firstPassEndOffsetInMeasure - self.offsetInMeasure)
 
         self.currentVoiceId = None
 
