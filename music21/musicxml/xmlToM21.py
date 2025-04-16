@@ -1793,14 +1793,6 @@ class PartParser(XMLParserBase):
         lmp = self.lastMeasureParser
         self.lastMeasureParser = None  # clean memory
 
-        if lmp.endedWithForwardTag is None:
-            return
-        if lmp.useVoices is True:
-            return
-        endedForwardRest = lmp.endedWithForwardTag
-        if lmp.stream.recurse().notesAndRests.last() is endedForwardRest:
-            lmp.stream.remove(endedForwardRest, recurse=True)
-
     def separateOutPartStaves(self) -> list[stream.PartStaff]:
         '''
         Take a `Part` with multiple staves and make them a set of `PartStaff` objects.
@@ -4276,12 +4268,7 @@ class MeasureParser(SoundTagMixin, XMLParserBase):
                     sp = spb[0]
                 except IndexError:
                     raise MusicXMLImportException('Error in getting Ottava')
-                if mxType == 'continue':
-                    # is this actually necessary?
-                    cont = spanner.SpannerAnchor()
-                    self.insertCoreAndRef(totalOffset, staffKey, cont)
-                    sp.addSpannedElements(cont)
-                else:  # if mxType == 'stop':
+                if mxType == 'stop':
                     stop = spanner.SpannerAnchor()
                     self.insertCoreAndRef(totalOffset, staffKey, stop)
                     sp.addSpannedElements(stop)
