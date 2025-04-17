@@ -1498,7 +1498,6 @@ class PartParser(XMLParserBase):
         self.lastDivisions: int = defaults.divisionsPerQuarter  # give a default value for testing
 
         self.appendToScoreAfterParse = True
-        self.lastMeasureParser: MeasureParser|None = None
 
     def parse(self) -> None:
         '''
@@ -1786,12 +1785,9 @@ class PartParser(XMLParserBase):
         remove the rest there (for backwards compatibility, esp.
         since bwv66.6 uses it)
 
-        * New in v7.
+        * New in v7.  Stubbed out in v9.7.
         '''
-        if self.lastMeasureParser is None:  # pragma: no cover
-            return  # should not happen
-        lmp = self.lastMeasureParser
-        self.lastMeasureParser = None  # clean memory
+        return
 
     def separateOutPartStaves(self) -> list[stream.PartStaff]:
         '''
@@ -1971,8 +1967,6 @@ class PartParser(XMLParserBase):
                 MusicXMLWarning
             )
             raise e
-
-        self.lastMeasureParser = measureParser
 
         self.maxStaves = max(self.maxStaves, measureParser.staves)
 
