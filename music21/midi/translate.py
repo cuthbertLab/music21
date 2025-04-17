@@ -1878,7 +1878,7 @@ def getLyricsFromEvents(
     for time, e in events:
         if e.type == MetaEvents.LYRIC:
             try:
-                lyrics[time] = e.data.decode('utf-8')
+                lyrics[time] = e.data.decode(encoding_type)
             except UnicodeDecodeError:
                 warnings.warn(
                     f'Unable to decode lyrics from {e}',
