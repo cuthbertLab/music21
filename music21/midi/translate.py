@@ -1873,10 +1873,10 @@ def getNotesFromEvents(
 def getLyricsFromEvents(
     events: list[tuple[int, MidiEvent]],
     encoding_type: str = 'utf-8',
-    ) -> dict[int, str]:
+) -> dict[int, str]:
     lyrics: dict[int, str] = {}
     for time, e in events:
-        if e.type == MetaEvents.LYRIC:
+        if e.type == MetaEvents.LYRIC and isinstance(e.data, bytes):
             try:
                 lyrics[time] = e.data.decode(encoding_type)
             except UnicodeDecodeError:
@@ -2110,7 +2110,7 @@ def midiTrackToStream(
                 o = tickStart / ticksPerQuarter
                 c.editorial.midiTickStart = tickStart
                 lyric = lyricsDict.get(tickStart)
-                if(lyric is not None):
+                if (lyric is not None):
                     c.lyric = lyric
                 s.coreInsert(o, c)
                 # iSkip = len(chordSub)  # amount of accumulated chords
@@ -2124,7 +2124,7 @@ def midiTrackToStream(
                 o = tickStart / ticksPerQuarter
                 n.editorial.midiTickStart = tickStart
                 lyric = lyricsDict.get(tickStart)
-                if(lyric is not None):
+                if (lyric is not None):
                     n.lyric = lyric
 
                 s.coreInsert(o, n)
@@ -2140,7 +2140,7 @@ def midiTrackToStream(
         o = tickStart / ticksPerQuarter
         singleN.editorial.midiTickStart = tickStart
         lyric = lyricsDict.get(tickStart)
-        if(lyric is not None):
+        if (lyric is not None):
             singleN.lyric = lyric
         s.coreInsert(o, singleN)
 
