@@ -1870,6 +1870,21 @@ def getNotesFromEvents(
             #    'midiTrackToStream(): cannot find a note off for a note on', e])
     return notes
 
+def getLyricsFromEvents(
+    events: list[tuple[int, MidiEvent]],
+    encoding_type: str = 'utf-8',
+) -> dict[int, str]:
+    lyrics: dict[int, str] = {}
+    for time, e in events:
+        if e.type == MetaEvents.LYRIC and isinstance(e.data, bytes):
+            try:
+                lyrics[time] = e.data.decode(encoding_type)
+            except UnicodeDecodeError:
+                warnings.warn(
+                    f'Unable to decode lyrics from {e}',
+                    TranslateWarning)
+    return lyrics
+
 
 def getMetaEvents(
     events: list[tuple[int, MidiEvent]]
@@ -1936,6 +1951,7 @@ def midiTrackToStream(
     conductorPart: stream.Part|None = None,
     isFirst: bool = False,
     quarterLengthDivisors: Sequence[int] = (),
+    encoding_type: str = 'utf-8',
     **keywords
 ) -> stream.Part:
     # noinspection PyShadowingNames
@@ -2013,6 +2029,7 @@ def midiTrackToStream(
     # need to build chords and notes
     notes = getNotesFromEvents(events)
     metaEvents = getMetaEvents(events)
+    lyricsDict = getLyricsFromEvents(events, encoding_type=encoding_type)
 
     # first create meta events
     for tick, obj in metaEvents:
@@ -2089,9 +2106,12 @@ def midiTrackToStream(
             if chordSub:
                 # composite.append(chordSub)
                 c = midiEventsToChord(chordSub, ticksPerQuarter)
-                o = notes[i][0][0] / ticksPerQuarter
-                c.editorial.midiTickStart = notes[i][0][0]
-
+                tickStart = notes[i][0][0]
+                o = tickStart / ticksPerQuarter
+                c.editorial.midiTickStart = tickStart
+                lyric = lyricsDict.get(tickStart)
+                if (lyric is not None):
+                    c.lyric = lyric
                 s.coreInsert(o, c)
                 # iSkip = len(chordSub)  # amount of accumulated chords
                 chordSub = []
@@ -2100,8 +2120,12 @@ def midiTrackToStream(
                 n: note.NotRest = midiEventsToNote(notes[i], ticksPerQuarter)
                 # the time is the first value in the first pair
                 # need to round, as floating point error is likely
-                o = notes[i][0][0] / ticksPerQuarter
-                n.editorial.midiTickStart = notes[i][0][0]
+                tickStart = notes[i][0][0]
+                o = tickStart / ticksPerQuarter
+                n.editorial.midiTickStart = tickStart
+                lyric = lyricsDict.get(tickStart)
+                if (lyric is not None):
+                    n.lyric = lyric
 
                 s.coreInsert(o, n)
                 # iSkip = 1
@@ -2112,8 +2136,12 @@ def midiTrackToStream(
         singleN: note.NotRest = midiEventsToNote(notes[0], ticksPerQuarter)
         # the time is the first value in the first pair
         # need to round, as floating point error is likely
-        o = notes[0][0][0] / ticksPerQuarter
-        singleN.editorial.midiTickStart = notes[0][0][0]
+        tickStart = notes[i][0][0]
+        o = tickStart / ticksPerQuarter
+        singleN.editorial.midiTickStart = tickStart
+        lyric = lyricsDict.get(tickStart)
+        if (lyric is not None):
+            singleN.lyric = lyric
         s.coreInsert(o, singleN)
 
     s.sort(force=True)  # will also run coreElementsChanged()
