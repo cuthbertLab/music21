@@ -866,6 +866,21 @@ class MusicXMLImporter(XMLParserBase):
             self.spannerBundle.remove(sp)
 
         s.coreElementsChanged()
+        for m in s[stream.Measure]:
+            for v in m.voices:
+                if v:  # do not bother with empty voices
+                    # the musicDataMethods use insertCore, thus the voices need to run
+                    # coreElementsChanged
+                    v.coreElementsChanged()
+                    # Fill mid-measure gaps, and find end of measure gaps by ref to measure stream
+                    # https://github.com/cuthbertlab/music21/issues/444
+                    # but only when the score comes from Finale
+                    if any('Finale' in software for software in md.software):
+                        v.makeRests(refStreamOrTimeRange=m,
+                                    fillGaps=True,
+                                    inPlace=True,
+                                    hideRests=True)
+
         s.definesExplicitSystemBreaks = self.definesExplicitSystemBreaks
         s.definesExplicitPageBreaks = self.definesExplicitPageBreaks
         for p in s.parts:
@@ -1483,7 +1498,6 @@ class PartParser(XMLParserBase):
         self.lastDivisions: int = defaults.divisionsPerQuarter  # give a default value for testing
 
         self.appendToScoreAfterParse = True
-        self.lastMeasureParser: MeasureParser|None = None
 
     def parse(self) -> None:
         '''
@@ -1499,11 +1513,12 @@ class PartParser(XMLParserBase):
         # copy spanners that are complete into the part, as this is the
         # highest level container that needs them. Ottavas are the exception,
         # they should be put in the PartStaff that contains the first note
-        # in the Ottava.
+        # in the Ottava.  PedalMarks are another exception, the should be
+        # put in the last PartStaff
         completedSpanners: list[spanner.Spanner] = []
         for sp in self.spannerBundle.getByCompleteStatus(True):
-            if not isinstance(sp, spanner.Ottava):
-                # don't insert Ottavas, we'll do that after separateOutPartStaves().
+            if not isinstance(sp, (spanner.Ottava, expressions.PedalMark)):
+                # don't insert Ottavas or PedalMarks, we'll do that after separateOutPartStaves().
                 self.stream.coreInsert(0, sp)
             completedSpanners.append(sp)
         # remove from original spanner bundle
@@ -1520,6 +1535,7 @@ class PartParser(XMLParserBase):
             self.stream.groups.append(self.partId)  # set group for stream itself
 
         self._fillAndInsertOttavasInPartStaff(completedSpanners, partStaves)
+        self._combineAndInsertPedalMarksInPartStaff(completedSpanners, partStaves)
 
     def _fillAndInsertOttavasInPartStaff(
         self,
@@ -1542,6 +1558,66 @@ class PartParser(XMLParserBase):
                 spannerPart.coreInsert(0, sp)
                 spannerPart.coreElementsChanged()
                 sp.fill(spannerPart)
+
+    def _combineAndInsertPedalMarksInPartStaff(
+        self,
+        spanners: list[spanner.Spanner],
+        partStaves: list[stream.PartStaff]
+    ):
+        # PedalMarks should be combined.  That means that if the PedalMark end and the next
+        # PedalMark start are at the same offset, the two PedalMarks should be combined, with
+        # a PedalBounce at the boundary.  PedalMarks should also be inserted into the bottom
+        # staff, even if the first note is in the top staff.
+        pedalMarks: list[expressions.PedalMark] = []
+        for sp in spanners:
+            if not isinstance(sp, expressions.PedalMark):
+                continue
+            pedalMarks.append(sp)
+
+#         score: stream.Score = self.parent.stream
+#         pedalMarks.sort(key=lambda sp: sp.getFirst().getOffsetInHierarchy(score))
+
+#       We're not merging pedal marks yet.
+#         # hand-rolled loops because we are deleting during iteration
+#         i: int = 0
+#         while True:
+#             if i >= len(pedalMarks) - 1:
+#                 # we're on (or beyond) the last pedalMark, nothing to look at
+#                 break
+#             pmCurr: expressions.PedalMark = pedalMarks[i]
+#
+#             j = i + 1
+#             while j < len(pedalMarks):
+#                 pmNext: expressions.PedalMark = pedalMarks[j]
+#                 currEndOffset: OffsetQL = (
+#                     pmCurr.getLast().getOffsetInHierarchy(score) + pmCurr.getLast().quarterLength
+#                 )
+#                 nextStartOffset: OffsetQL = pmNext.getFirst().getOffsetInHierarchy(score)
+#                 if (currEndOffset == nextStartOffset):
+#                     # merge them
+#                     lastEl = pmCurr.getSpannedElements()[-1]
+#                     pmCurr.spannerStorage.remove(lastEl)
+#                     pmCurr.addSpannedElements(expressions.PedalBounce())
+#                     pmNextElements = pmNext.getSpannedElements()[1:]
+#                     pmCurr.addSpannedElements(pmNextElements)
+#                     del pedalMarks[j]
+#                     # j now points to the _next_ pm, let's see if we
+#                     # can merge that one, too.
+#                     continue
+#                 break
+#
+#             i += 1
+
+        for pm in pedalMarks:
+            spannerPart: stream.Part|None = None
+            if partStaves:
+                spannerPart = partStaves[-1]
+            else:
+                spannerPart = self.stream
+
+            if spannerPart is not None:
+                spannerPart.coreAppend(pm)
+                spannerPart.coreElementsChanged()
 
     def _findFirstPartStaffContaining(
         self,
@@ -1771,20 +1847,9 @@ class PartParser(XMLParserBase):
         remove the rest there (for backwards compatibility, esp.
         since bwv66.6 uses it)
 
-        * New in v7.
+        * New in v7.  Stubbed out in v9.7.
         '''
-        if self.lastMeasureParser is None:  # pragma: no cover
-            return  # should not happen
-        lmp = self.lastMeasureParser
-        self.lastMeasureParser = None  # clean memory
-
-        if lmp.endedWithForwardTag is None:
-            return
-        if lmp.useVoices is True:
-            return
-        endedForwardRest = lmp.endedWithForwardTag
-        if lmp.stream.recurse().notesAndRests.last() is endedForwardRest:
-            lmp.stream.remove(endedForwardRest, recurse=True)
+        return
 
     def separateOutPartStaves(self) -> list[stream.PartStaff]:
         '''
@@ -1803,6 +1868,7 @@ class PartParser(XMLParserBase):
             'StaffLayout',
             'TempoIndication',
             'TimeSignature',
+            'SpannerAnchor',
         ]
 
         uniqueStaffKeys: list[int] = self._getUniqueStaffKeys()
@@ -1963,8 +2029,6 @@ class PartParser(XMLParserBase):
                 MusicXMLWarning
             )
             raise e
-
-        self.lastMeasureParser = measureParser
 
         self.maxStaves = max(self.maxStaves, measureParser.staves)
 
@@ -2575,16 +2639,7 @@ class MeasureParser(SoundTagMixin, XMLParserBase):
 
         if self.useVoices is True:
             for v in self.stream.iter().voices:
-                if v:  # do not bother with empty voices
-                    # the musicDataMethods use insertCore, thus the voices need to run
-                    # coreElementsChanged
-                    v.coreElementsChanged()
-                    # Fill mid-measure gaps, and find end of measure gaps by ref to measure stream
-                    # https://github.com/cuthbertlab/music21/issues/444
-                    v.makeRests(refStreamOrTimeRange=self.stream,
-                                fillGaps=True,
-                                inPlace=True,
-                                hideRests=True)
+                v.coreElementsChanged()
         self.stream.coreElementsChanged()
 
         if (self.restAndNoteCount['rest'] == 1
@@ -2629,19 +2684,8 @@ class MeasureParser(SoundTagMixin, XMLParserBase):
         mxDuration = mxObj.find('duration')
         if durationText := strippedText(mxDuration):
             change = opFrac(float(durationText) / self.divisions)
-
-            # Create hidden rest (in other words, a spacer)
-            # old Finale documents close incomplete final measures with <forward>
-            # this will be removed afterward by removeEndForwardRest()
-            r = note.Rest(quarterLength=change)
-            r.style.hideObjectOnPrint = True
-            self.addToStaffReference(mxObj, r)
-            self.insertInMeasureOrVoice(mxObj, r)
-
             # Allow overfilled measures for now -- TODO(someday): warn?
-            self.offsetMeasureNote += change
-            # xmlToNote() sets None
-            self.endedWithForwardTag = r
+            self.offsetMeasureNote = opFrac(self.offsetMeasureNote + change)
 
     def xmlPrint(self, mxPrint: ET.Element):
         '''
@@ -4070,8 +4114,8 @@ class MeasureParser(SoundTagMixin, XMLParserBase):
     def xmlDirectionTypeToSpanners(
         self,
         mxObj: ET.Element,
-        staffKey: int|None = None,
-        totalOffset: OffsetQL|None = None
+        staffKey: int,
+        totalOffset: OffsetQL
     ):
         # noinspection PyShadowingNames
         '''
@@ -4079,8 +4123,8 @@ class MeasureParser(SoundTagMixin, XMLParserBase):
         and ottava are encoded as MusicXML directions.
 
         :param mxObj: the specific direction element (e.g. <wedge>).
-        :param staffKey: staff number (required for <pedal>)
-        :param totalOffset: offset in measure of this direction (required for <pedal>)
+        :param staffKey: staff number
+        :param totalOffset: offset in measure of this direction
 
         >>> from xml.etree.ElementTree import fromstring as EL
         >>> MP = musicxml.xmlToM21.MeasureParser()
@@ -4090,18 +4134,18 @@ class MeasureParser(SoundTagMixin, XMLParserBase):
         >>> len(MP.spannerBundle)
         0
         >>> mxDirectionType = EL('<wedge type="crescendo" number="2"/>')
-        >>> retList = MP.xmlDirectionTypeToSpanners(mxDirectionType)
+        >>> retList = MP.xmlDirectionTypeToSpanners(mxDirectionType, 1, 0.)
         >>> retList
-        [<music21.dynamics.Crescendo>]
+        [<music21.dynamics.Crescendo <music21.spanner.SpannerAnchor at 0.0>>]
 
         >>> len(MP.spannerBundle)
         1
         >>> sp = MP.spannerBundle[0]
         >>> sp
-        <music21.dynamics.Crescendo>
+        <music21.dynamics.Crescendo <music21.spanner.SpannerAnchor at 0.0>>
 
         >>> mxDirectionType2 = EL('<wedge type="stop" number="2"/>')
-        >>> retList = MP.xmlDirectionTypeToSpanners(mxDirectionType2)
+        >>> retList = MP.xmlDirectionTypeToSpanners(mxDirectionType2, 1, 1.)
 
         retList is empty because nothing new has been added.
 
@@ -4112,25 +4156,43 @@ class MeasureParser(SoundTagMixin, XMLParserBase):
         1
         >>> sp = MP.spannerBundle[0]
         >>> sp
-        <music21.dynamics.Crescendo <music21.note.Note D>>
+        <music21.dynamics.Crescendo <...SpannerAnchor at 0.0><...SpannerAnchor at 1.0>>
 
         >>> mxDirection = EL('<direction place="below"/>')
         >>> mxDirectionType = EL('<pedal type="sostenuto" sign="yes" number="2"/>')
         >>> retList = MP.xmlDirectionTypeToSpanners(mxDirectionType, 1, 0.5)
         >>> retList
-        [<music21.expressions.PedalMark>]
+        [<music21.expressions.PedalMark <music21.spanner.SpannerAnchor at 0.5>>]
         >>> pedalMark = retList[0]
         >>> pedalMark.pedalType
         <PedalType.Sostenuto>
-        >>> pedalMark.pedalForm
-        <PedalForm.Symbol>
+        >>> pedalMark.startForm
+        <PedalForm.PedalName>
+        >>> pedalMark.continueLine
+        <PedalLine.NoLine>
+        >>> pedalMark.bounceUp
+        <PedalForm.Unspecified>
+        >>> pedalMark.bounceDown
+        <PedalForm.PedalName>
+        >>> pedalMark.endForm
+        <PedalForm.Star>
 
         >>> mxDirectionType1a = EL('<pedal type="resume" line="yes" number="2"/>')
         >>> retList = MP.xmlDirectionTypeToSpanners(mxDirectionType1a, 1, 0.5)
         >>> retList
         []
-        >>> pedalMark.pedalForm
-        <PedalForm.SymbolLine>
+        >>> pedalMark.pedalType
+        <PedalType.Sostenuto>
+        >>> pedalMark.startForm
+        <PedalForm.PedalName>
+        >>> pedalMark.continueLine
+        <PedalLine.Line>
+        >>> pedalMark.bounceUp
+        <PedalForm.SlantedLine>
+        >>> pedalMark.bounceDown
+        <PedalForm.SlantedLine>
+        >>> pedalMark.endForm
+        <PedalForm.VerticalLine>
 
         >>> mxDirectionType2 = EL('<pedal type="change" line="yes" number="2"/>')
         >>> retList = MP.xmlDirectionTypeToSpanners(mxDirectionType2, 1, 1.0)
@@ -4152,14 +4214,15 @@ class MeasureParser(SoundTagMixin, XMLParserBase):
         >>> retList
         []
         >>> pedalMark.getFirst()
-        <music21.expressions.PedalBounce at 1.0>
-        >>> pedalMark.getLast() is n1
-        True
+        <music21.spanner.SpannerAnchor at 0.5>
+        >>> pedalMark.getLast()
+        <music21.spanner.SpannerAnchor at 4.0>
         >>> MP.stream.elements
-        (<music21.expressions.PedalBounce at 1.0>, <music21.expressions.PedalGapStart at 2.0>,
-        <music21.expressions.PedalGapEnd at 3.5>)
+        (<music21.spanner.SpannerAnchor at 0.0>, <music21.spanner.SpannerAnchor at 1.0>,
+         <music21.spanner.SpannerAnchor at 0.5>, <music21.expressions.PedalBounce at 1.0>,
+         <music21.expressions.PedalGapStart at 2.0>, <music21.expressions.PedalGapEnd at 3.5>,
+         <music21.spanner.SpannerAnchor at 4.0>)
         '''
-        targetLast = self.nLast
         returnList = []
 
         if totalOffset is not None:
@@ -4178,8 +4241,10 @@ class MeasureParser(SoundTagMixin, XMLParserBase):
 
             if mType != 'stop':
                 sp = self.xmlOneSpanner(mxObj, None, spClass, allowDuplicateIds=True)
+                start = spanner.SpannerAnchor()
+                self.insertCoreAndRef(totalOffset, staffKey, start)
+                sp.addSpannedElements(start)
                 returnList.append(sp)
-                self.spannerBundle.setPendingSpannedElementAssignment(sp, 'GeneralNote')
             else:
                 idFound = mxObj.get('number')
                 spb = self.spannerBundle.getByClassIdLocalComplete(
@@ -4188,12 +4253,12 @@ class MeasureParser(SoundTagMixin, XMLParserBase):
                     sp = spb[0]
                 except IndexError:
                     raise MusicXMLImportException('Error in getting DynamicWedges')
+                stop = spanner.SpannerAnchor()
+                self.insertCoreAndRef(totalOffset, staffKey, stop)
+                sp.addSpannedElements(stop)
                 sp.completeStatus = True
-                # will only have a target if this follows the note
-                if targetLast is not None:
-                    sp.addSpannedElements(targetLast)
 
-        if mxObj.tag in ('bracket', 'dashes'):
+        elif mxObj.tag in ('bracket', 'dashes'):
             mxType = mxObj.get('type')
             idFound = mxObj.get('number')
             if mxType == 'start':
@@ -4209,11 +4274,12 @@ class MeasureParser(SoundTagMixin, XMLParserBase):
                     sp.startTick = mxObj.get('line-end')
                     sp.lineType = mxObj.get('line-type')  # redundant with setLineStyle()
 
+                start = spanner.SpannerAnchor()
+                self.insertCoreAndRef(totalOffset, staffKey, start)
+                sp.addSpannedElements(start)
                 self.spannerBundle.append(sp)
                 returnList.append(sp)
-                # define this spanner as needing component assignment from
-                # the next general note
-                self.spannerBundle.setPendingSpannedElementAssignment(sp, 'GeneralNote')
+
             elif mxType == 'stop':
                 # need to retrieve an existing spanner
                 # try to get base class of both Crescendo and Decrescendo
@@ -4224,7 +4290,6 @@ class MeasureParser(SoundTagMixin, XMLParserBase):
                 except IndexError:
                     warnings.warn('Line <' + mxObj.tag + '> stop without start', MusicXMLWarning)
                     return []
-                sp.completeStatus = True
 
                 if mxObj.tag == 'dashes':
                     sp.endTick = 'none'
@@ -4236,13 +4301,15 @@ class MeasureParser(SoundTagMixin, XMLParserBase):
                         sp.endHeight = float(height)
                     sp.lineType = mxObj.get('line-type')
 
-                # will only have a target if this follows the note
-                if targetLast is not None:
-                    sp.addSpannedElements(targetLast)
+                stop = spanner.SpannerAnchor()
+                self.insertCoreAndRef(totalOffset, staffKey, stop)
+                sp.addSpannedElements(stop)
+                sp.completeStatus = True
+
             else:
                 raise MusicXMLImportException(f'unidentified mxType of mxBracket: {mxType}')
 
-        if mxObj.tag == 'octave-shift':
+        elif mxObj.tag == 'octave-shift':
             mxType = mxObj.get('type')
             mxSize = mxObj.get('size')
             idFound = mxObj.get('number')
@@ -4261,9 +4328,12 @@ class MeasureParser(SoundTagMixin, XMLParserBase):
                     sp.placement = 'above'
                 sp.idLocal = idFound
                 sp.type = (mxSize or 8, m21Type)
+                start = spanner.SpannerAnchor()
+                self.insertCoreAndRef(totalOffset, staffKey, start)
+                sp.addSpannedElements(start)
                 self.spannerBundle.append(sp)
                 returnList.append(sp)
-                self.spannerBundle.setPendingSpannedElementAssignment(sp, 'GeneralNote')
+
             elif mxType in ('continue', 'stop'):
                 spb = self.spannerBundle.getByClassIdLocalComplete(
                     'Ottava', idFound, False  # get first
@@ -4272,16 +4342,16 @@ class MeasureParser(SoundTagMixin, XMLParserBase):
                     sp = spb[0]
                 except IndexError:
                     raise MusicXMLImportException('Error in getting Ottava')
-                if mxType == 'continue':
-                    self.spannerBundle.setPendingSpannedElementAssignment(sp, 'GeneralNote')
-                else:  # if mxType == 'stop':
+                if mxType == 'stop':
+                    stop = spanner.SpannerAnchor()
+                    self.insertCoreAndRef(totalOffset, staffKey, stop)
+                    sp.addSpannedElements(stop)
                     sp.completeStatus = True
-                    if targetLast is not None:
-                        sp.addSpannedElements(targetLast)
+
             else:
                 raise MusicXMLImportException(f'unidentified mxType of octave-shift: {mxType}')
 
-        if mxObj.tag == 'pedal':
+        elif mxObj.tag == 'pedal':
             mxType = mxObj.get('type')
             mxAbbreviated = mxObj.get('abbreviated')
             mxLine = mxObj.get('line')  # 'yes'/'no'
@@ -4289,6 +4359,8 @@ class MeasureParser(SoundTagMixin, XMLParserBase):
 
             idFound = mxObj.get('number')
             if mxType in ('start', 'sostenuto'):
+                # TODO: here we need to see if the 'start'/'sostenuto' is
+                # TODO: actually part of a bounce
                 sp = expressions.PedalMark()
                 sp.idLocal = idFound
                 self.pedalToStartOffset[sp] = totalOffset
@@ -4299,16 +4371,27 @@ class MeasureParser(SoundTagMixin, XMLParserBase):
                     sp.pedalType = expressions.PedalType.Sostenuto
 
                 if mxLine == 'yes':
-                    sp.pedalForm = expressions.PedalForm.Line
+                    sp.startForm = expressions.PedalForm.VerticalLine
+                    sp.continueLine = expressions.PedalLine.Line
+                    sp.bounceUp = expressions.PedalForm.SlantedLine
+                    sp.bounceDown = expressions.PedalForm.SlantedLine
+                    sp.endForm = expressions.PedalForm.VerticalLine
                 elif mxLine == 'no' or mxSign == 'yes':
-                    sp.pedalForm = expressions.PedalForm.Symbol
+                    sp.startForm = expressions.PedalForm.PedalName
+                    sp.continueLine = expressions.PedalLine.NoLine
+                    sp.bounceUp = expressions.PedalForm.Unspecified
+                    sp.bounceDown = expressions.PedalForm.PedalName
+                    sp.endForm = expressions.PedalForm.Star
 
                 if mxAbbreviated == 'yes':
                     sp.abbreviated = True
 
+                start = spanner.SpannerAnchor()
+                self.insertCoreAndRef(totalOffset, staffKey, start)
+                sp.addSpannedElements(start)
                 self.spannerBundle.append(sp)
                 returnList.append(sp)
-                self.spannerBundle.setPendingSpannedElementAssignment(sp, 'GeneralNote')
+
             elif mxType in ('continue', 'stop', 'discontinue', 'resume', 'change'):
                 spb = self.spannerBundle.getByClassIdLocalComplete(
                     'PedalMark', idFound, False  # get first
@@ -4324,35 +4407,56 @@ class MeasureParser(SoundTagMixin, XMLParserBase):
                     # important, they should probably end the spanner and start
                     # a new one.
                     pass
-                    # self.spannerBundle.setPendingSpannedElementAssignment(sp, 'GeneralNote')
                 elif mxType == 'discontinue':
                     # insert a PedalGapStart
                     pgStart = expressions.PedalGapStart()
                     self.insertCoreAndRef(totalOffset, staffKey, pgStart)
                     sp.addSpannedElements(pgStart)
                 elif mxType == 'resume':
-                    # If the current pedalForm is Symbol, and we're still at the start
-                    # offset of the PedalMark, change pedalForm to SymbolLine (because
-                    # we had a symbol, and now we're starting a line without a downtick;
-                    # that is the definition of SymbolLine).
+                    # If the current startForm is PedalName or Ped, and we're still at the start
+                    # offset of the PedalMark, change to lines for everything _but_ startForm.
                     pedalStartOffset: OffsetQL|None = self.pedalToStartOffset.get(sp, None)
-                    if (sp.pedalForm == expressions.PedalForm.Symbol
+                    if (sp.startForm in (
+                            expressions.PedalForm.PedalName, expressions.PedalForm.Ped)
                             and pedalStartOffset == totalOffset):
-                        sp.pedalForm = expressions.PedalForm.SymbolLine
+                        sp.continueLine = expressions.PedalLine.Line
+                        sp.bounceUp = expressions.PedalForm.SlantedLine
+                        sp.bounceDown = expressions.PedalForm.SlantedLine
+                        sp.endForm = expressions.PedalForm.VerticalLine
                     else:
                         # insert a PedalGapEnd
                         pgEnd = expressions.PedalGapEnd()
                         self.insertCoreAndRef(totalOffset, staffKey, pgEnd)
                         sp.addSpannedElements(pgEnd)
                 elif mxType == 'change':
-                    # insert a PedalBounce
-                    pb = expressions.PedalBounce()
+                    # insert a PedalBounce() with overriding SlantedLines if necessary
+                    # ('change' is only used for line bounces)
+                    if (sp.bounceUp != expressions.PedalForm.SlantedLine
+                            or sp.bounceDown != expressions.PedalForm.SlantedLine):
+                        pb = expressions.PedalBounce(
+                            overrideBounceUp=expressions.PedalForm.SlantedLine,
+                            overrideBounceDown=expressions.PedalForm.SlantedLine
+                        )
+                    else:
+                        pb = expressions.PedalBounce()
+                    # Here, if sp.startForm/continueLine/endForm are all unspecified,
+                    # we know what it should be, because 'change' only makes sense
+                    # if line="yes".
+                    if (sp.startForm == expressions.PedalForm.Unspecified
+                            and sp.continueLine == expressions.PedalLine.Unspecified
+                            and sp.endForm == expressions.PedalForm.Unspecified):
+                        sp.startForm = expressions.PedalForm.VerticalLine
+                        sp.continueLine = expressions.PedalLine.Line
+                        sp.endForm = expressions.PedalForm.VerticalLine
                     self.insertCoreAndRef(totalOffset, staffKey, pb)
                     sp.addSpannedElements(pb)
                 elif mxType == 'stop':
+                    # TODO: here we need to see if the 'stop' is actually part of a bounce
+                    stop = spanner.SpannerAnchor()
+                    self.insertCoreAndRef(totalOffset, staffKey, stop)
+                    sp.addSpannedElements(stop)
                     sp.completeStatus = True
-                    if targetLast is not None:
-                        sp.addSpannedElements(targetLast)
+
             else:
                 raise MusicXMLImportException(f'unidentified mxType of pedal: {mxType}')
 
@@ -5364,7 +5468,6 @@ class MeasureParser(SoundTagMixin, XMLParserBase):
         staffKey: int,
         totalOffset: float,
     ):
-        # TODO: pedal
         # TODO: harp-pedals
         # TODO: damp
         # TODO: damp-all

@@ -7,7 +7,7 @@ import io
 import re
 import unittest
 from xml.etree.ElementTree import (
-    ElementTree, fromstring as et_fromstring
+    ElementTree, fromstring as et_fromstring, tostring as et_tostring
 )
 
 from music21 import articulations
@@ -192,9 +192,11 @@ class Test(unittest.TestCase):
         s.makeNotation(inPlace=True)
         self.assertEqual(len(s.parts[1].spanners), 0)
 
-        # and written after the backup tag, i.e. on the LH?
+        # and written after the second backup tag, i.e. on the LH?
+        # (This used to be after the first backup tag, but these days most spanners
+        # get an extra backup due to being started with a SpannerAnchor.)
         xmlOut = self.getXml(s)
-        xmlAfterFirstBackup = xmlOut.split('</backup>\n')[1]
+        xmlAfterSecondBackup = xmlOut.split('</backup>\n')[2]
 
         self.assertIn(
             stripInnerSpaces(
@@ -204,7 +206,7 @@ class Test(unittest.TestCase):
                         </direction-type>
                         <staff>2</staff>
                     </direction>'''),
-            stripInnerSpaces(xmlAfterFirstBackup)
+            stripInnerSpaces(xmlAfterSecondBackup)
         )
 
     def testLowVoiceNumbers(self):
@@ -687,17 +689,18 @@ class Test(unittest.TestCase):
     def testPedals(self):
         expectedResults1 = (
             {
-                'type': 'start',
-                'line': 'yes',
-                'number': '1',
-            },
-            {
                 'type': 'change',
                 'line': 'yes',
             },
             {
                 'type': 'discontinue',
                 'line': 'yes',
+            },
+            # This start is preceded by a <backup> that puts it first (before the change).
+            {
+                'type': 'start',
+                'line': 'yes',
+                'number': '1',
             },
             {
                 'type': 'resume',
@@ -725,6 +728,16 @@ class Test(unittest.TestCase):
 
         expectedResults2 = (
             {
+                'type': 'change',
+                'line': 'yes',
+            },
+            {
+                'type': 'discontinue',
+                'line': 'yes',
+            },
+            # This start/resume pair is preceded by a <backup> that
+            # puts it first (before the change).
+            {
                 'type': 'start',
                 'sign': 'yes',
                 'number': '1',
@@ -733,14 +746,7 @@ class Test(unittest.TestCase):
                 'type': 'resume',
                 'line': 'yes',
             },
-            {
-                'type': 'change',
-                'line': 'yes',
-            },
-            {
-                'type': 'discontinue',
-                'line': 'yes',
-            },
+            # end of start/resume pair that is out-of-order
             {
                 'type': 'resume',
                 'line': 'yes',
@@ -763,6 +769,59 @@ class Test(unittest.TestCase):
             with self.subTest(pedal_index=startIdx + i):
                 for k in expectedResults2[i]:
                     self.assertEqual(mxPedal.get(k, ''), expectedResults2[i][k])
+
+    def testSpannersWithOffsets(self):
+        def gnfilter(overlaps):
+            removeKeys = []
+            for key, elList in overlaps.items():
+                gnCount = 0
+                for el in elList:
+                    if isinstance(el, note.GeneralNote):
+                        gnCount += 1
+                if gnCount < 2:
+                    removeKeys.append(key)
+            for key in removeKeys:
+                del overlaps[key]
+            return overlaps
+
+        def check(s1, s2, classType):
+            s1Spanners = list(s1[classType])
+            s2Spanners = list(s2[classType])
+            for s1sp, s2sp in zip(s1Spanners, s2Spanners):
+                # check that the spanners start and stop at exactly the same score offset
+                s1StartOffset = s1sp.getFirst().getOffsetInHierarchy(s1)
+                s2StartOffset = s2sp.getFirst().getOffsetInHierarchy(s2)
+                self.assertEqual(s1StartOffset, s2StartOffset)
+                s1EndOffset = s1sp.getLast().getOffsetInHierarchy(s1)
+                s2EndOffset = s2sp.getLast().getOffsetInHierarchy(s2)
+                self.assertEqual(s1EndOffset, s2EndOffset)
+
+                # check that there are no overlapping GeneralNotes in those measures
+                s1StartVoice = s1.containerInHierarchy(s1sp.getFirst())
+                s1EndVoice = s1.containerInHierarchy(s1sp.getLast())
+                s1StartVoiceOverlaps = s1StartVoice.getOverlaps()
+                s1EndVoiceOverlaps = s1EndVoice.getOverlaps()
+                self.assertEqual(gnfilter(s1StartVoiceOverlaps), {})
+                self.assertEqual(gnfilter(s1EndVoiceOverlaps), {})
+
+                s2StartVoice = s2.containerInHierarchy(s2sp.getFirst())
+                s2EndVoice = s2.containerInHierarchy(s2sp.getLast())
+                s2StartVoiceOverlaps = s2StartVoice.getOverlaps()
+                s2EndVoiceOverlaps = s2EndVoice.getOverlaps()
+                self.assertEqual(gnfilter(s2StartVoiceOverlaps), {})
+                self.assertEqual(gnfilter(s2EndVoiceOverlaps), {})
+
+        s1 = converter.parse(testPrimitive.directions31a)
+        x = self.getET(s1)
+        xmlStr = et_tostring(x)
+        s2 = converter.parseData(xmlStr, format='musicxml')
+        check(s1, s2, dynamics.DynamicWedge)
+
+        s1 = converter.parse(testPrimitive.octaveShifts33d)
+        x = self.getET(s1)
+        xmlStr = et_tostring(x)
+        s2 = converter.parseData(xmlStr, format='musicxml')
+        check(s1, s2, spanner.Ottava)
 
     def testArpeggios(self):
         expectedResults = (

@@ -616,6 +616,8 @@ class Spanner(base.Music21Object):
         if endElement is startElement:
             endElement = None
 
+        savedEndElementOffset: OffsetQL | None = None
+        savedEndElementActiveSite: stream.Stream | None = None
         if endElement is not None:
             # Start and end elements are different; we can't just append everything, we need
             # to save the end element, remove it, add everything, then add the end element
@@ -623,6 +625,11 @@ class Spanner(base.Music21Object):
             # filling, the new intermediate elements will come after the existing ones,
             # regardless of offset.  But first and last will still be the same two elements
             # as before, which is the most important thing.
+
+            # But doing this (remove/restore) clears endElement.offset and endElement.activeSite.
+            # That's rude; put 'em back when we're done.
+            savedEndElementOffset = endElement.offset
+            savedEndElementActiveSite = endElement.activeSite
             self.spannerStorage.remove(endElement)
 
         try:
@@ -631,6 +638,10 @@ class Spanner(base.Music21Object):
             # print('start element not in searchStream')
             if endElement is not None:
                 self.addSpannedElements(endElement)
+                if savedEndElementOffset is not None:
+                    endElement.offset = savedEndElementOffset
+                if savedEndElementActiveSite is not None:
+                    endElement.activeSite = savedEndElementActiveSite
             return
 
         endOffsetInHierarchy: OffsetQL
@@ -642,6 +653,10 @@ class Spanner(base.Music21Object):
             except sites.SitesException:
                 # print('end element not in searchStream')
                 self.addSpannedElements(endElement)
+                if savedEndElementOffset is not None:
+                    endElement.offset = savedEndElementOffset
+                if savedEndElementActiveSite is not None:
+                    endElement.activeSite = savedEndElementActiveSite
                 return
         else:
             endOffsetInHierarchy = (
@@ -672,6 +687,10 @@ class Spanner(base.Music21Object):
         if endElement is not None:
             # add it back in as the end element
             self.addSpannedElements(endElement)
+            if savedEndElementOffset is not None:
+                endElement.offset = savedEndElementOffset
+            if savedEndElementActiveSite is not None:
+                endElement.activeSite = savedEndElementActiveSite
 
         self.filledStatus = True
 
@@ -799,14 +818,21 @@ class SpannerAnchor(base.Music21Object):
         super().__init__(**keywords)
 
     def _reprInternal(self) -> str:
+        offset: OffsetQL = self.offset
         if self.activeSite is None:
-            return 'unanchored'
+            # find a site that is either a Measure or a Voice
+            siteList: list = self.sites.getSitesByClass('Measure')
+            if not siteList:
+                siteList = self.sites.getSitesByClass('Voice')
+            if not siteList:
+                return 'unanchored'
+            offset = self.getOffsetInHierarchy(siteList[0])
 
         ql: OffsetQL = self.duration.quarterLength
         if ql == 0:
-            return f'at {self.offset}'
+            return f'at {offset}'
 
-        return f'at {self.offset}-{self.offset + ql}'
+        return f'at {offset}-{offset + ql}'
 
 
 class SpannerBundle(prebase.ProtoM21Object):
@@ -1161,6 +1187,31 @@ class SpannerBundle(prebase.ProtoM21Object):
         [1, 2]
         '''
         # note that this overrides previous values
+        if className == 'PedalMark':
+            from music21 import expressions
+            # PedalMark spanners are special, each non-line PedalBounce
+            # in the spanner adds 1 to the idLocals consumed by the
+            # spanner (because those bounces will get turned into a
+            # pedal stop and pedal start in the output MusicXML file).
+            i = 0
+            for sp in self.getByClass(className):
+                if t.TYPE_CHECKING:
+                    assert isinstance(sp, expressions.PedalMark)
+                sp.idLocal = (i % maxId) + 1
+                if sp.hasLine():
+                    i += 1
+                else:
+                    # no lines; PedalBounce will be written as 'stop'/'start' or just 'start'.
+                    # either way we need an extra idLocal allocated for the new 'start'.
+                    pbs = sp.getSpannedElementsByClass(expressions.PedalBounce)
+                    if (len(pbs) + 1) % maxId == 0:
+                        # we would wrap around to the exact same idLocal, so increment by 2 instead
+                        i += len(pbs) + 2
+                    else:
+                        i += len(pbs) + 1
+            return
+
+        # non-PedalMark is more straightforward
         for i, sp in enumerate(self.getByClass(className)):
             # 6 seems to be limit in musicxml processing
             sp.idLocal = (i % maxId) + 1
