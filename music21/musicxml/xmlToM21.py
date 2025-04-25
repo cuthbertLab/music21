@@ -1774,7 +1774,6 @@ class PartParser(XMLParserBase):
         for mxMeasure in self.mxPart.iterfind('measure'):
             self.xmlMeasureToMeasure(mxMeasure)
 
-        self.removeEndForwardRest()
         part.coreElementsChanged()
 
     def removeEndForwardRest(self):
@@ -1785,7 +1784,7 @@ class PartParser(XMLParserBase):
         remove the rest there (for backwards compatibility, esp.
         since bwv66.6 uses it)
 
-        * New in v7.  Stubbed out in v9.7.
+        * New in v7.  Deprecated in v9.7 (not needed, so does nothing. To be removed in v10.0)
         '''
         return
 
