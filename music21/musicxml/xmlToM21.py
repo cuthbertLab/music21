@@ -2353,6 +2353,7 @@ class MeasureParser(SoundTagMixin, XMLParserBase):
         self.mxMeasureElements: list[ET.Element] = []
 
         self.parent: PartParser = parent if parent is not None else PartParser()
+        self.measureOffsetInScore: OffsetQL = self.parent.lastMeasureOffset
 
         self.transposition = None
         self.spannerBundle = self.parent.spannerBundle
@@ -2416,6 +2417,10 @@ class MeasureParser(SoundTagMixin, XMLParserBase):
         # inserted into a Stream).
         # key is PedalMark; value is OffsetQL
         self.pedalToStartOffset: weakref.WeakKeyDictionary = weakref.WeakKeyDictionary()
+
+        # List of (spanner, offsetInScore, staffKey) for any SpannerAnchors that will need
+        # to be inserted in the measure and added to the mentioned spanner.
+        self.pendingAnchors: list[tuple[spanner.Spanner, OffsetQL, int]] = []
 
     @staticmethod
     def getStaffNumber(mxObjectOrNumber) -> int:
@@ -2573,6 +2578,14 @@ class MeasureParser(SoundTagMixin, XMLParserBase):
                 if methName is not None:
                     meth = getattr(self, methName)
                     meth(mxObj)
+
+        for sp, offsetInScore, staffKey in self.pendingAnchors:
+            # note that pendingAnchors are all start elements, so we can't just
+            # addSpannedElement, we need to addFirstSpannedElement.
+            startAnchor = spanner.SpannerAnchor()
+            sp.addFirstSpannedElement(startAnchor)
+            offsetInMeasure = opFrac(offsetInScore - self.measureOffsetInScore)
+            self.insertCoreAndRef(offsetInMeasure, staffKey, startAnchor)
 
         if self.useVoices is True:
             for v in self.stream.iter().voices:
@@ -2871,7 +2884,17 @@ class MeasureParser(SoundTagMixin, XMLParserBase):
             n.articulations = []
             n.expressions = []
 
-        self.spannerBundle.freePendingSpannedElementAssignment(c)
+        anchorOffsetInScore: OffsetQL
+        anchorStaffKey: int
+        sp, anchorOffsetInScore, anchorStaffKey = (
+            self.spannerBundle.freePendingSpannedElementAssignment(
+                c,
+                opFrac(self.measureOffsetInScore + self.offsetMeasureNote)
+            )
+        )
+        if sp is not None:
+            self.pendingAnchors.append((sp, anchorOffsetInScore, anchorStaffKey))
+
         return c
 
     def xmlToSimpleNote(self, mxNote, freeSpanners=True) -> note.Note|note.Unpitched:
@@ -2956,7 +2979,10 @@ class MeasureParser(SoundTagMixin, XMLParserBase):
             self.xmlNotehead(n, mxNotehead)
 
         # after this, use combined function for notes and rests
-        return self.xmlNoteToGeneralNoteHelper(n, mxNote, freeSpanners=freeSpanners)
+        output = self.xmlNoteToGeneralNoteHelper(n, mxNote, freeSpanners=freeSpanners)
+        if t.TYPE_CHECKING:
+            assert isinstance(output, note.Note|note.Unpitched)
+        return output
 
     # beam and beams
 
@@ -3412,7 +3438,12 @@ class MeasureParser(SoundTagMixin, XMLParserBase):
 
         return self.xmlNoteToGeneralNoteHelper(r, mxRest)
 
-    def xmlNoteToGeneralNoteHelper(self, n, mxNote, freeSpanners=True):
+    def xmlNoteToGeneralNoteHelper(
+        self,
+        n: note.Note|note.Unpitched|note.Rest,
+        mxNote: ET.Element,
+        freeSpanners: bool = True
+    ) -> note.Note|note.Unpitched|note.Rest:
         # noinspection PyShadowingNames
         '''
         Combined function to work on all <note> tags, where n can be
@@ -3428,7 +3459,17 @@ class MeasureParser(SoundTagMixin, XMLParserBase):
         '''
         spannerBundle = self.spannerBundle
         if freeSpanners is True:
-            spannerBundle.freePendingSpannedElementAssignment(n)
+            sp: spanner.Spanner
+            anchorOffsetInScore: OffsetQL
+            anchorStaffKey: int
+            sp, anchorOffsetInScore, anchorStaffKey = (
+                spannerBundle.freePendingSpannedElementAssignment(
+                    n,
+                    opFrac(self.measureOffsetInScore + self.offsetMeasureNote)
+                )
+            )
+            if sp is not None:
+                self.pendingAnchors.append((sp, anchorOffsetInScore, anchorStaffKey))
 
         # ATTRIBUTES, including color and position
         self.setPrintStyle(mxNote, n)
@@ -3440,6 +3481,8 @@ class MeasureParser(SoundTagMixin, XMLParserBase):
         # attr dynamics -- MIDI Note On velocity with 90 = 100, but unbounded on the top
         dynamPercentage = mxNote.get('dynamics')
         if dynamPercentage is not None and not n.isRest:
+            if t.TYPE_CHECKING:
+                assert not isinstance(n, note.Rest)
             dynamFloat = float(dynamPercentage) * (90 / 12700)
             n.volume.velocityScalar = dynamFloat
 
@@ -4066,6 +4109,8 @@ class MeasureParser(SoundTagMixin, XMLParserBase):
         >>> from xml.etree.ElementTree import fromstring as EL
         >>> MP = musicxml.xmlToM21.MeasureParser()
         >>> n1 = note.Note('D4')
+        >>> MP.stream = stream.Measure()
+        >>> MP.stream.insert(1.0, n1)
         >>> MP.nLast = n1
 
         >>> len(MP.spannerBundle)
@@ -4073,13 +4118,13 @@ class MeasureParser(SoundTagMixin, XMLParserBase):
         >>> mxDirectionType = EL('<wedge type="crescendo" number="2"/>')
         >>> retList = MP.xmlDirectionTypeToSpanners(mxDirectionType, 1, 0.0)
         >>> retList
-        [<music21.dynamics.Crescendo <music21.spanner.SpannerAnchor at 0.0>>]
+        [<music21.dynamics.Crescendo>]
 
         >>> len(MP.spannerBundle)
         1
         >>> sp = MP.spannerBundle[0]
         >>> sp
-        <music21.dynamics.Crescendo <music21.spanner.SpannerAnchor at 0.0>>
+        <music21.dynamics.Crescendo>
 
         >>> mxDirectionType2 = EL('<wedge type="stop" number="2"/>')
         >>> retList = MP.xmlDirectionTypeToSpanners(mxDirectionType2, 1, 1.0)
@@ -4093,13 +4138,13 @@ class MeasureParser(SoundTagMixin, XMLParserBase):
         1
         >>> sp = MP.spannerBundle[0]
         >>> sp
-        <music21.dynamics.Crescendo <...SpannerAnchor at 0.0><...SpannerAnchor at 1.0>>
+        <music21.dynamics.Crescendo <music21.spanner.SpannerAnchor at 1.0>>
 
         >>> mxDirection = EL('<direction place="below"/>')
         >>> mxDirectionType = EL('<pedal type="sostenuto" sign="yes" number="2"/>')
         >>> retList = MP.xmlDirectionTypeToSpanners(mxDirectionType, 1, 0.5)
         >>> retList
-        [<music21.expressions.PedalMark <music21.spanner.SpannerAnchor at 0.5>>]
+        [<music21.expressions.PedalMark>]
         >>> pedalMark = retList[0]
         >>> pedalMark.pedalType
         <PedalType.Sostenuto>
@@ -4133,19 +4178,23 @@ class MeasureParser(SoundTagMixin, XMLParserBase):
         >>> retList
         []
         >>> pedalMark.getFirst()
-        <music21.spanner.SpannerAnchor at 0.5>
+        <music21.expressions.PedalBounce at 1.0>
         >>> pedalMark.getLast()
         <music21.spanner.SpannerAnchor at 4.0>
         >>> MP.stream.elements
-        (<music21.spanner.SpannerAnchor at 0.0>, <music21.spanner.SpannerAnchor at 1.0>,
-        <music21.spanner.SpannerAnchor at 0.5>, <music21.expressions.PedalBounce at 1.0>,
-        <music21.expressions.PedalGapStart at 2.0>, <music21.expressions.PedalGapEnd at 3.5>,
-        <music21.spanner.SpannerAnchor at 4.0>)
+        (<music21.note.Note D>, <music21.spanner.SpannerAnchor at 1.0>,
+        <music21.expressions.PedalBounce at 1.0>, <music21.expressions.PedalGapStart at 2.0>,
+        <music21.expressions.PedalGapEnd at 3.5>, <music21.spanner.SpannerAnchor at 4.0>)
         '''
+        targetLast = self.nLast
+        offsetAfterLast: OffsetQL = opFrac(-1)
+        if targetLast is not None:
+            offsetAfterLast = opFrac(
+                targetLast.getOffsetInHierarchy(self.stream) + targetLast.quarterLength
+            )
         returnList = []
 
-        if totalOffset is not None:
-            totalOffset = opFrac(totalOffset)
+        totalOffset = opFrac(totalOffset)
 
         if mxObj.tag == 'wedge':
             mType = mxObj.get('type')
@@ -4160,9 +4209,12 @@ class MeasureParser(SoundTagMixin, XMLParserBase):
 
             if mType != 'stop':
                 sp = self.xmlOneSpanner(mxObj, None, spClass, allowDuplicateIds=True)
-                start = spanner.SpannerAnchor()
-                self.insertCoreAndRef(totalOffset, staffKey, start)
-                sp.addSpannedElements(start)
+                self.spannerBundle.setPendingSpannedElementAssignment(
+                    sp,
+                    'GeneralNote',
+                    opFrac(self.measureOffsetInScore + totalOffset),
+                    staffKey
+                )
                 returnList.append(sp)
             else:
                 idFound = mxObj.get('number')
@@ -4172,9 +4224,12 @@ class MeasureParser(SoundTagMixin, XMLParserBase):
                     sp = spb[0]
                 except IndexError:
                     raise MusicXMLImportException('Error in getting DynamicWedges')
-                stop = spanner.SpannerAnchor()
-                self.insertCoreAndRef(totalOffset, staffKey, stop)
-                sp.addSpannedElements(stop)
+                if targetLast is not None and offsetAfterLast == totalOffset:
+                    sp.addSpannedElements(targetLast)
+                else:
+                    stop = spanner.SpannerAnchor()
+                    self.insertCoreAndRef(totalOffset, staffKey, stop)
+                    sp.addSpannedElements(stop)
                 sp.completeStatus = True
 
         elif mxObj.tag in ('bracket', 'dashes'):
@@ -4193,9 +4248,12 @@ class MeasureParser(SoundTagMixin, XMLParserBase):
                     sp.startTick = mxObj.get('line-end')
                     sp.lineType = mxObj.get('line-type')  # redundant with setLineStyle()
 
-                start = spanner.SpannerAnchor()
-                self.insertCoreAndRef(totalOffset, staffKey, start)
-                sp.addSpannedElements(start)
+                self.spannerBundle.setPendingSpannedElementAssignment(
+                    sp,
+                    'GeneralNote',
+                    opFrac(self.measureOffsetInScore + totalOffset),
+                    staffKey
+                )
                 self.spannerBundle.append(sp)
                 returnList.append(sp)
 
@@ -4220,9 +4278,12 @@ class MeasureParser(SoundTagMixin, XMLParserBase):
                         sp.endHeight = float(height)
                     sp.lineType = mxObj.get('line-type')
 
-                stop = spanner.SpannerAnchor()
-                self.insertCoreAndRef(totalOffset, staffKey, stop)
-                sp.addSpannedElements(stop)
+                if targetLast is not None and offsetAfterLast == totalOffset:
+                    sp.addSpannedElements(targetLast)
+                else:
+                    stop = spanner.SpannerAnchor()
+                    self.insertCoreAndRef(totalOffset, staffKey, stop)
+                    sp.addSpannedElements(stop)
                 sp.completeStatus = True
 
             else:
@@ -4247,9 +4308,12 @@ class MeasureParser(SoundTagMixin, XMLParserBase):
                     sp.placement = 'above'
                 sp.idLocal = idFound
                 sp.type = (mxSize or 8, m21Type)
-                start = spanner.SpannerAnchor()
-                self.insertCoreAndRef(totalOffset, staffKey, start)
-                sp.addSpannedElements(start)
+                self.spannerBundle.setPendingSpannedElementAssignment(
+                    sp,
+                    'GeneralNote',
+                    opFrac(self.measureOffsetInScore + totalOffset),
+                    staffKey
+                )
                 self.spannerBundle.append(sp)
                 returnList.append(sp)
 
@@ -4262,9 +4326,12 @@ class MeasureParser(SoundTagMixin, XMLParserBase):
                 except IndexError:
                     raise MusicXMLImportException('Error in getting Ottava')
                 if mxType == 'stop':
-                    stop = spanner.SpannerAnchor()
-                    self.insertCoreAndRef(totalOffset, staffKey, stop)
-                    sp.addSpannedElements(stop)
+                    if targetLast is not None and offsetAfterLast == totalOffset:
+                        sp.addSpannedElements(targetLast)
+                    else:
+                        stop = spanner.SpannerAnchor()
+                        self.insertCoreAndRef(totalOffset, staffKey, stop)
+                        sp.addSpannedElements(stop)
                     sp.completeStatus = True
 
             else:
@@ -4295,9 +4362,12 @@ class MeasureParser(SoundTagMixin, XMLParserBase):
                 if mxAbbreviated == 'yes':
                     sp.abbreviated = True
 
-                start = spanner.SpannerAnchor()
-                self.insertCoreAndRef(totalOffset, staffKey, start)
-                sp.addSpannedElements(start)
+                self.spannerBundle.setPendingSpannedElementAssignment(
+                    sp,
+                    'GeneralNote',
+                    opFrac(self.measureOffsetInScore + totalOffset),
+                    staffKey
+                )
                 self.spannerBundle.append(sp)
                 returnList.append(sp)
 
@@ -4341,9 +4411,12 @@ class MeasureParser(SoundTagMixin, XMLParserBase):
                     self.insertCoreAndRef(totalOffset, staffKey, pb)
                     sp.addSpannedElements(pb)
                 elif mxType == 'stop':
-                    stop = spanner.SpannerAnchor()
-                    self.insertCoreAndRef(totalOffset, staffKey, stop)
-                    sp.addSpannedElements(stop)
+                    if targetLast is not None and offsetAfterLast == totalOffset:
+                        sp.addSpannedElements(targetLast)
+                    else:
+                        stop = spanner.SpannerAnchor()
+                        self.insertCoreAndRef(totalOffset, staffKey, stop)
+                        sp.addSpannedElements(stop)
                     sp.completeStatus = True
 
             else:

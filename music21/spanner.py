@@ -471,6 +471,46 @@ class Spanner(base.Music21Object):
 
         self.spannerStorage.coreElementsChanged()
 
+    def addFirstSpannedElement(self, firstEl: base.Music21Object):
+        '''
+        Add a single element as the first in the spanner.
+
+        >>> n1 = note.Note('g')
+        >>> n2 = note.Note('f#')
+        >>> n3 = note.Note('e')
+        >>> n4 = note.Note('d-')
+        >>> n5 = note.Note('c')
+
+        >>> sl = spanner.Spanner()
+        >>> sl.addSpannedElements(n2, n3)
+        >>> sl.addSpannedElements([n4, n5])
+        >>> sl.addFirstSpannedElement(n1)
+        >>> sl.getSpannedElementIds() == [id(n) for n in [n1, n2, n3, n4, n5]]
+        True
+        '''
+        from music21 import stream
+        elements: list[base.Music21Object] = self.getSpannedElements()
+        elOffsets: list[OffsetQL] = []
+        elActiveSites: list[stream.Stream] = []
+        for el in elements:
+            elOffsets.append(el.offset)
+            elActiveSites.append(el.activeSite)
+
+        # remove them all
+        for el in elements:
+            self.spannerStorage.remove(el)
+
+        # add firstEl first
+        self.addSpannedElements(firstEl)
+
+        # add all the rest in order
+        self.addSpannedElements(elements)
+
+        # restore all elements' activeSite and offset
+        for el, elOffset, elActiveSite in zip(elements, elOffsets, elActiveSites):
+            el.activeSite = elActiveSite
+            el.offset = elOffset
+
     def hasSpannedElement(self, spannedElement: base.Music21Object) -> bool:
         '''
         Return True if this Spanner has the spannedElement.
@@ -775,6 +815,8 @@ class _SpannerRef(t.TypedDict):
     # noinspection PyTypedDict
     spanner: 'Spanner'
     className: str
+    offsetInScore: OffsetQL
+    staffKey: int
 
 class SpannerAnchor(base.Music21Object):
     '''
@@ -1279,6 +1321,8 @@ class SpannerBundle(prebase.ProtoM21Object):
         self,
         sp: Spanner,
         className: str,
+        offsetInScore: OffsetQL,
+        staffKey: int
     ):
         '''
         A SpannerBundle can be set up so that a particular spanner (sp)
@@ -1331,33 +1375,62 @@ class SpannerBundle(prebase.ProtoM21Object):
         []
 
         '''
-        ref: _SpannerRef = {'spanner': sp, 'className': className}
+        ref: _SpannerRef = {
+            'spanner': sp,
+            'className': className,
+            'offsetInScore': offsetInScore,
+            'staffKey': staffKey
+        }
         self._pendingSpannedElementAssignment.append(ref)
 
-    def freePendingSpannedElementAssignment(self, spannedElementCandidate):
+    def freePendingSpannedElementAssignment(
+        self,
+        spannedElementCandidate,
+        offsetInScore: OffsetQL
+    ) -> tuple[Spanner|None, OffsetQL, int]|None:
         '''
         Assigns and frees up a pendingSpannedElementAssignment if one is
         active and the candidate matches the class.  See
         setPendingSpannedElementAssignment for documentation and tests.
 
+        If the spannedElementCandidate is not at the correct offsetInScore, the pending
+        assignment is still cleared, but the candidate is not added to the spanner.
+
+        Returns None if the candidate was added to the spanner, or if there was no
+        matching pending assignment (i.e. if there is nothing further for the caller
+        to do).
+
+        Returns offsetInScore and staffKey from the matching pending assignment if
+        a matching pending assignment was found, but the candidate is at the wrong
+        offset.  The caller is then responsible for creating a SpannerAnchor at the
+        correct offset/staffKey, and adding that anchor to the spanner.
+
         It is set up via a first-in, first-out priority.
         '''
-
+        output: tuple[Spanner|None, OffsetQL, int] = (None, -1.0, -1)
         if not self._pendingSpannedElementAssignment:
-            return
+            return output
 
         remove = None
         for i, ref in enumerate(self._pendingSpannedElementAssignment):
             # environLocal.printDebug(['calling freePendingSpannedElementAssignment()',
             #    self._pendingSpannedElementAssignment])
             if ref['className'] in spannedElementCandidate.classSet:
-                ref['spanner'].addSpannedElements(spannedElementCandidate)
+                if offsetInScore == ref['offsetInScore']:
+                    ref['spanner'].addSpannedElements(spannedElementCandidate)
+                else:
+                    # return the offsetInScore and staffKey of the matched
+                    # assignment, so the caller can create a SpannerAnchor at
+                    # offsetInScore and add that instead
+                    output = (ref['spanner'], ref['offsetInScore'], ref['staffKey'])
                 remove = i
                 # environLocal.printDebug(['freePendingSpannedElementAssignment()',
                 #    'added spannedElement', ref['spanner']])
                 break
         if remove is not None:
             self._pendingSpannedElementAssignment.pop(remove)
+
+        return output
 
 
 # ------------------------------------------------------------------------------
