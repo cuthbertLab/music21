@@ -484,7 +484,7 @@ class Spanner(base.Music21Object):
         >>> sl = spanner.Spanner()
         >>> sl.addSpannedElements(n2, n3)
         >>> sl.addSpannedElements([n4, n5])
-        >>> sl.addFirstSpannedElement(n1)
+        >>> sl.insertFirstSpannedElement(n1)
         >>> sl.getSpannedElementIds() == [id(n) for n in [n1, n2, n3, n4, n5]]
         True
         '''
@@ -910,7 +910,7 @@ class SpannerBundle(prebase.ProtoM21Object):
         # SpannerBundle as missing a spannedElement; the next obj that meets
         # the class expectation will then be assigned and the spannedElement
         # cleared
-        self._pendingSpannedElementAssignment: list[PendingAssignmentRef] = []
+        self._pendingFirstSpannedElementAssignment: list[PendingAssignmentRef] = []
 
     def append(self, other: Spanner):
         '''
@@ -1317,7 +1317,7 @@ class SpannerBundle(prebase.ProtoM21Object):
         return self.getByClass(className).getByIdLocal(
             idLocal).getByCompleteStatus(completeStatus)
 
-    def setPendingSpannedElementAssignment(
+    def setPendingFirstSpannedElementAssignment(
         self,
         sp: Spanner,
         className: str,
@@ -1345,31 +1345,31 @@ class SpannerBundle(prebase.ProtoM21Object):
 
         Now set up su1 to get the next note assigned to it.
 
-        >>> sb.setPendingSpannedElementAssignment(su1, 'Note')
+        >>> sb.setPendingFirstSpannedElementAssignment(su1, 'Note', 0., 0)
 
-        Call freePendingSpannedElementAssignment to attach.
+        Call freePendingFirstSpannedElementAssignment to attach.
 
         Should not get a rest, because it is not a 'Note'
 
-        >>> sb.freePendingSpannedElementAssignment(r1)
+        >>> sb.freePendingFirstSpannedElementAssignment(r1, 0.)
         >>> su1.getSpannedElements()
         [<music21.note.Note C>]
 
         But will get the next note:
 
-        >>> sb.freePendingSpannedElementAssignment(n2)
+        >>> sb.freePendingFirstSpannedElementAssignment(n2, 0.)
         >>> su1.getSpannedElements()
-        [<music21.note.Note C>, <music21.note.Note D>]
+        [<music21.note.Note D>, <music21.note.Note C>]
 
         >>> n2.getSpannerSites()
-        [<music21.spanner.Slur <music21.note.Note C><music21.note.Note D>>]
+        [<music21.spanner.Slur <music21.note.Note D><music21.note.Note C>>]
 
         And now that the assignment has been made, the pending assignment
         has been cleared, so n3 will not get assigned to the slur:
 
-        >>> sb.freePendingSpannedElementAssignment(n3)
+        >>> sb.freePendingFirstSpannedElementAssignment(n3, 0.)
         >>> su1.getSpannedElements()
-        [<music21.note.Note C>, <music21.note.Note D>]
+        [<music21.note.Note D>, <music21.note.Note C>]
 
         >>> n3.getSpannerSites()
         []
@@ -1381,9 +1381,9 @@ class SpannerBundle(prebase.ProtoM21Object):
             'offsetInScore': offsetInScore,
             'staffKey': staffKey
         }
-        self._pendingSpannedElementAssignment.append(ref)
+        self._pendingFirstSpannedElementAssignment.append(ref)
 
-    def freePendingSpannedElementAssignment(
+    def freePendingFirstSpannedElementAssignment(
         self,
         spannedElementCandidate,
         offsetInScore: OffsetQL
@@ -1395,26 +1395,26 @@ class SpannerBundle(prebase.ProtoM21Object):
 
         It is set up via a first-in, first-out priority.
         '''
-        if not self._pendingSpannedElementAssignment:
+        if not self._pendingFirstSpannedElementAssignment:
             return
 
         remove = None
-        for i, ref in enumerate(self._pendingSpannedElementAssignment):
+        for i, ref in enumerate(self._pendingFirstSpannedElementAssignment):
             # environLocal.printDebug(['calling freePendingSpannedElementAssignment()',
-            #    self._pendingSpannedElementAssignment])
+            #    self._pendingFirstSpannedElementAssignment])
             if ref['className'] in spannedElementCandidate.classSet:
                 if offsetInScore == ref['offsetInScore']:
-                    ref['spanner'].addSpannedElements(spannedElementCandidate)
+                    ref['spanner'].insertFirstSpannedElement(spannedElementCandidate)
                     remove = i
                     # environLocal.printDebug(['freePendingSpannedElementAssignment()',
                     #    'added spannedElement', ref['spanner']])
                     break
         if remove is not None:
-            self._pendingSpannedElementAssignment.pop(remove)
+            self._pendingFirstSpannedElementAssignment.pop(remove)
 
-    def popPendingSpannedElementAssignments(self) -> list[PendingAssignmentRef]:
-        output: list[PendingAssignmentRef] = self._pendingSpannedElementAssignment
-        self._pendingSpannedElementAssignment = []
+    def popPendingFirstSpannedElementAssignments(self) -> list[PendingAssignmentRef]:
+        output: list[PendingAssignmentRef] = self._pendingFirstSpannedElementAssignment
+        self._pendingFirstSpannedElementAssignment = []
         return output
 
 # ------------------------------------------------------------------------------

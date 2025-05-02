@@ -2578,17 +2578,17 @@ class MeasureParser(SoundTagMixin, XMLParserBase):
                     meth = getattr(self, methName)
                     meth(mxObj)
 
-        # Get any pending spanned elements that weren't found immediately following
+        # Get any pending first spanned elements that weren't found immediately following
         # the "start" of a spanner.
-        leftOverPendingSpannedElements: list[spanner.PendingAssignmentRef] = (
-            self.spannerBundle.popPendingSpannedElementAssignments()
+        leftOverPendingFirstSpannedElements: list[spanner.PendingAssignmentRef] = (
+            self.spannerBundle.popPendingFirstSpannedElementAssignments()
         )
-        for par in leftOverPendingSpannedElements:
+        for pfse in leftOverPendingFirstSpannedElements:
             # Note that these are all start elements, so we can't just
             # addSpannedElement, we need to insertFirstSpannedElement.
-            sp: spanner.Spanner = par['spanner']
-            offsetInScore: OffsetQL = par['offsetInScore']
-            staffKey: int = par['staffKey']
+            sp: spanner.Spanner = pfse['spanner']
+            offsetInScore: OffsetQL = pfse['offsetInScore']
+            staffKey: int = pfse['staffKey']
             startAnchor = spanner.SpannerAnchor()
             offsetInMeasure: OffsetQL = opFrac(offsetInScore - self.measureOffsetInScore)
             self.insertCoreAndRef(offsetInMeasure, staffKey, startAnchor)
@@ -2891,7 +2891,7 @@ class MeasureParser(SoundTagMixin, XMLParserBase):
             n.articulations = []
             n.expressions = []
 
-        self.spannerBundle.freePendingSpannedElementAssignment(
+        self.spannerBundle.freePendingFirstSpannedElementAssignment(
             c,
             opFrac(self.measureOffsetInScore + self.offsetMeasureNote)
         )
@@ -3459,7 +3459,7 @@ class MeasureParser(SoundTagMixin, XMLParserBase):
         '''
         spannerBundle = self.spannerBundle
         if freeSpanners is True:
-            spannerBundle.freePendingSpannedElementAssignment(
+            spannerBundle.freePendingFirstSpannedElementAssignment(
                 n,
                 opFrac(self.measureOffsetInScore + self.offsetMeasureNote)
             )
@@ -4202,7 +4202,7 @@ class MeasureParser(SoundTagMixin, XMLParserBase):
 
             if mType != 'stop':
                 sp = self.xmlOneSpanner(mxObj, None, spClass, allowDuplicateIds=True)
-                self.spannerBundle.setPendingSpannedElementAssignment(
+                self.spannerBundle.setPendingFirstSpannedElementAssignment(
                     sp,
                     'GeneralNote',
                     opFrac(self.measureOffsetInScore + totalOffset),
@@ -4241,7 +4241,7 @@ class MeasureParser(SoundTagMixin, XMLParserBase):
                     sp.startTick = mxObj.get('line-end')
                     sp.lineType = mxObj.get('line-type')  # redundant with setLineStyle()
 
-                self.spannerBundle.setPendingSpannedElementAssignment(
+                self.spannerBundle.setPendingFirstSpannedElementAssignment(
                     sp,
                     'GeneralNote',
                     opFrac(self.measureOffsetInScore + totalOffset),
@@ -4301,7 +4301,7 @@ class MeasureParser(SoundTagMixin, XMLParserBase):
                     sp.placement = 'above'
                 sp.idLocal = idFound
                 sp.type = (mxSize or 8, m21Type)
-                self.spannerBundle.setPendingSpannedElementAssignment(
+                self.spannerBundle.setPendingFirstSpannedElementAssignment(
                     sp,
                     'GeneralNote',
                     opFrac(self.measureOffsetInScore + totalOffset),
@@ -4355,7 +4355,7 @@ class MeasureParser(SoundTagMixin, XMLParserBase):
                 if mxAbbreviated == 'yes':
                     sp.abbreviated = True
 
-                self.spannerBundle.setPendingSpannedElementAssignment(
+                self.spannerBundle.setPendingFirstSpannedElementAssignment(
                     sp,
                     'GeneralNote',
                     opFrac(self.measureOffsetInScore + totalOffset),
