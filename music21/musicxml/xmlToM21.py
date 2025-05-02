@@ -2418,10 +2418,6 @@ class MeasureParser(SoundTagMixin, XMLParserBase):
         # key is PedalMark; value is OffsetQL
         self.pedalToStartOffset: weakref.WeakKeyDictionary = weakref.WeakKeyDictionary()
 
-        # List of (spanner, offsetInScore, staffKey) for any SpannerAnchors that will need
-        # to be inserted in the measure and added to the mentioned spanner.
-        self.pendingAnchors: list[tuple[spanner.Spanner, OffsetQL, int]] = []
-
     @staticmethod
     def getStaffNumber(mxObjectOrNumber) -> int:
         '''
@@ -2561,9 +2557,12 @@ class MeasureParser(SoundTagMixin, XMLParserBase):
         self.addToStaffReference(mxObjectOrNumber, m21Object)
         self.stream.coreInsert(offset, m21Object)
 
-    def parse(self):
+    def parse(self) -> None:
         # handle <print> before anything else, because it can affect
         # attributes!
+        if self.mxMeasure is None:
+            return
+
         for mxPrint in self.mxMeasure.findall('print'):
             self.xmlPrint(mxPrint)
 
@@ -2579,13 +2578,21 @@ class MeasureParser(SoundTagMixin, XMLParserBase):
                     meth = getattr(self, methName)
                     meth(mxObj)
 
-        for sp, offsetInScore, staffKey in self.pendingAnchors:
-            # note that pendingAnchors are all start elements, so we can't just
-            # addSpannedElement, we need to addFirstSpannedElement.
+        # Get any pending spanned elements that weren't found immediately following
+        # the "start" of a spanner.
+        leftOverPendingSpannedElements: list[spanner.PendingAssignmentRef] = (
+            self.spannerBundle.popPendingSpannedElementAssignments()
+        )
+        for par in leftOverPendingSpannedElements:
+            # Note that these are all start elements, so we can't just
+            # addSpannedElement, we need to insertFirstSpannedElement.
+            sp: spanner.Spanner = par['spanner']
+            offsetInScore: OffsetQL = par['offsetInScore']
+            staffKey: int = par['staffKey']
             startAnchor = spanner.SpannerAnchor()
-            sp.addFirstSpannedElement(startAnchor)
-            offsetInMeasure = opFrac(offsetInScore - self.measureOffsetInScore)
+            offsetInMeasure: OffsetQL = opFrac(offsetInScore - self.measureOffsetInScore)
             self.insertCoreAndRef(offsetInMeasure, staffKey, startAnchor)
+            sp.insertFirstSpannedElement(startAnchor)
 
         if self.useVoices is True:
             for v in self.stream.iter().voices:
@@ -2884,17 +2891,10 @@ class MeasureParser(SoundTagMixin, XMLParserBase):
             n.articulations = []
             n.expressions = []
 
-        anchorOffsetInScore: OffsetQL
-        anchorStaffKey: int
-        sp, anchorOffsetInScore, anchorStaffKey = (
-            self.spannerBundle.freePendingSpannedElementAssignment(
-                c,
-                opFrac(self.measureOffsetInScore + self.offsetMeasureNote)
-            )
+        self.spannerBundle.freePendingSpannedElementAssignment(
+            c,
+            opFrac(self.measureOffsetInScore + self.offsetMeasureNote)
         )
-        if sp is not None:
-            self.pendingAnchors.append((sp, anchorOffsetInScore, anchorStaffKey))
-
         return c
 
     def xmlToSimpleNote(self, mxNote, freeSpanners=True) -> note.Note|note.Unpitched:
@@ -3459,17 +3459,10 @@ class MeasureParser(SoundTagMixin, XMLParserBase):
         '''
         spannerBundle = self.spannerBundle
         if freeSpanners is True:
-            sp: spanner.Spanner
-            anchorOffsetInScore: OffsetQL
-            anchorStaffKey: int
-            sp, anchorOffsetInScore, anchorStaffKey = (
-                spannerBundle.freePendingSpannedElementAssignment(
-                    n,
-                    opFrac(self.measureOffsetInScore + self.offsetMeasureNote)
-                )
+            spannerBundle.freePendingSpannedElementAssignment(
+                n,
+                opFrac(self.measureOffsetInScore + self.offsetMeasureNote)
             )
-            if sp is not None:
-                self.pendingAnchors.append((sp, anchorOffsetInScore, anchorStaffKey))
 
         # ATTRIBUTES, including color and position
         self.setPrintStyle(mxNote, n)

@@ -471,7 +471,7 @@ class Spanner(base.Music21Object):
 
         self.spannerStorage.coreElementsChanged()
 
-    def addFirstSpannedElement(self, firstEl: base.Music21Object):
+    def insertFirstSpannedElement(self, firstEl: base.Music21Object):
         '''
         Add a single element as the first in the spanner.
 
@@ -811,7 +811,7 @@ class Spanner(base.Music21Object):
 
 
 # ------------------------------------------------------------------------------
-class _SpannerRef(t.TypedDict):
+class PendingAssignmentRef(t.TypedDict):
     # noinspection PyTypedDict
     spanner: 'Spanner'
     className: str
@@ -910,7 +910,7 @@ class SpannerBundle(prebase.ProtoM21Object):
         # SpannerBundle as missing a spannedElement; the next obj that meets
         # the class expectation will then be assigned and the spannedElement
         # cleared
-        self._pendingSpannedElementAssignment: list[_SpannerRef] = []
+        self._pendingSpannedElementAssignment: list[PendingAssignmentRef] = []
 
     def append(self, other: Spanner):
         '''
@@ -1375,7 +1375,7 @@ class SpannerBundle(prebase.ProtoM21Object):
         []
 
         '''
-        ref: _SpannerRef = {
+        ref: PendingAssignmentRef = {
             'spanner': sp,
             'className': className,
             'offsetInScore': offsetInScore,
@@ -1387,29 +1387,16 @@ class SpannerBundle(prebase.ProtoM21Object):
         self,
         spannedElementCandidate,
         offsetInScore: OffsetQL
-    ) -> tuple[Spanner|None, OffsetQL, int]|None:
+    ):
         '''
         Assigns and frees up a pendingSpannedElementAssignment if one is
-        active and the candidate matches the class.  See
+        active and the candidate matches the class and the offsetInScore.  See
         setPendingSpannedElementAssignment for documentation and tests.
-
-        If the spannedElementCandidate is not at the correct offsetInScore, the pending
-        assignment is still cleared, but the candidate is not added to the spanner.
-
-        Returns None if the candidate was added to the spanner, or if there was no
-        matching pending assignment (i.e. if there is nothing further for the caller
-        to do).
-
-        Returns offsetInScore and staffKey from the matching pending assignment if
-        a matching pending assignment was found, but the candidate is at the wrong
-        offset.  The caller is then responsible for creating a SpannerAnchor at the
-        correct offset/staffKey, and adding that anchor to the spanner.
 
         It is set up via a first-in, first-out priority.
         '''
-        output: tuple[Spanner|None, OffsetQL, int] = (None, -1.0, -1)
         if not self._pendingSpannedElementAssignment:
-            return output
+            return
 
         remove = None
         for i, ref in enumerate(self._pendingSpannedElementAssignment):
@@ -1418,20 +1405,17 @@ class SpannerBundle(prebase.ProtoM21Object):
             if ref['className'] in spannedElementCandidate.classSet:
                 if offsetInScore == ref['offsetInScore']:
                     ref['spanner'].addSpannedElements(spannedElementCandidate)
-                else:
-                    # return the offsetInScore and staffKey of the matched
-                    # assignment, so the caller can create a SpannerAnchor at
-                    # offsetInScore and add that instead
-                    output = (ref['spanner'], ref['offsetInScore'], ref['staffKey'])
-                remove = i
-                # environLocal.printDebug(['freePendingSpannedElementAssignment()',
-                #    'added spannedElement', ref['spanner']])
-                break
+                    remove = i
+                    # environLocal.printDebug(['freePendingSpannedElementAssignment()',
+                    #    'added spannedElement', ref['spanner']])
+                    break
         if remove is not None:
             self._pendingSpannedElementAssignment.pop(remove)
 
+    def popPendingSpannedElementAssignments(self) -> list[PendingAssignmentRef]:
+        output: list[PendingAssignmentRef] = self._pendingSpannedElementAssignment
+        self._pendingSpannedElementAssignment = []
         return output
-
 
 # ------------------------------------------------------------------------------
 # connect two or more notes anywhere in the score
