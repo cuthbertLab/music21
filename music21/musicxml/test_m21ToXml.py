@@ -29,6 +29,7 @@ from music21 import spanner
 from music21 import stream
 from music21 import style
 from music21 import tempo
+from music21.common import opFrac
 
 from music21.musicxml import helpers
 from music21.musicxml import testPrimitive
@@ -192,11 +193,9 @@ class Test(unittest.TestCase):
         s.makeNotation(inPlace=True)
         self.assertEqual(len(s.parts[1].spanners), 0)
 
-        # and written after the second backup tag, i.e. on the LH?
-        # (This used to be after the first backup tag, but these days most spanners
-        # get an extra backup due to being started with a SpannerAnchor.)
+        # and written after the backup tag, i.e. on the LH?
         xmlOut = self.getXml(s)
-        xmlAfterSecondBackup = xmlOut.split('</backup>\n')[2]
+        xmlAfterSecondBackup = xmlOut.split('</backup>\n')[1]
 
         self.assertIn(
             stripInnerSpaces(
@@ -689,18 +688,17 @@ class Test(unittest.TestCase):
     def testPedals(self):
         expectedResults1 = (
             {
+                'type': 'start',
+                'line': 'yes',
+                'number': '1',
+            },
+            {
                 'type': 'change',
                 'line': 'yes',
             },
             {
                 'type': 'discontinue',
                 'line': 'yes',
-            },
-            # This start is preceded by a <backup> that puts it first (before the change).
-            {
-                'type': 'start',
-                'line': 'yes',
-                'number': '1',
             },
             {
                 'type': 'resume',
@@ -728,16 +726,6 @@ class Test(unittest.TestCase):
 
         expectedResults2 = (
             {
-                'type': 'change',
-                'line': 'yes',
-            },
-            {
-                'type': 'discontinue',
-                'line': 'yes',
-            },
-            # This start/resume pair is preceded by a <backup> that
-            # puts it first (before the change).
-            {
                 'type': 'start',
                 'sign': 'yes',
                 'number': '1',
@@ -747,6 +735,14 @@ class Test(unittest.TestCase):
                 'line': 'yes',
             },
             # end of start/resume pair that is out-of-order
+            {
+                'type': 'change',
+                'line': 'yes',
+            },
+            {
+                'type': 'discontinue',
+                'line': 'yes',
+            },
             {
                 'type': 'resume',
                 'line': 'yes',
@@ -791,9 +787,15 @@ class Test(unittest.TestCase):
                 # check that the spanners start and stop at exactly the same score offset
                 s1StartOffset = s1sp.getFirst().getOffsetInHierarchy(s1)
                 s2StartOffset = s2sp.getFirst().getOffsetInHierarchy(s2)
+                if s1StartOffset != s2StartOffset:
+                    print('hey')
                 self.assertEqual(s1StartOffset, s2StartOffset)
-                s1EndOffset = s1sp.getLast().getOffsetInHierarchy(s1)
-                s2EndOffset = s2sp.getLast().getOffsetInHierarchy(s2)
+                s1EndOffset = opFrac(
+                    s1sp.getLast().getOffsetInHierarchy(s1) + s1sp.getLast().quarterLength
+                )
+                s2EndOffset = opFrac(
+                    s2sp.getLast().getOffsetInHierarchy(s2) + s2sp.getLast().quarterLength
+                )
                 self.assertEqual(s1EndOffset, s2EndOffset)
 
                 # check that there are no overlapping GeneralNotes in those measures

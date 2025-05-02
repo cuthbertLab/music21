@@ -1088,16 +1088,14 @@ class Test(unittest.TestCase):
         self.assertEqual(pm.endForm, expressions.PedalForm.VerticalLine)
         self.assertFalse(pm.abbreviated)
         spElements = pm.getSpannedElements()
-        self.assertEqual(len(spElements), 6)
+        self.assertEqual(len(spElements), 4)
         expectedInstances = [
-            spanner.SpannerAnchor,
+            note.Note,
             expressions.PedalBounce,
             note.Note,
             note.Note,
-            note.Note,
-            spanner.SpannerAnchor
         ]
-        expectedOffsets = [0., 1., 0., 1., 2., 3.]
+        expectedOffsets = [0., 1., 1., 2.]
         for i, (el, expectedOffset, expectedInstance) in enumerate(zip(
                 spElements, expectedOffsets, expectedInstances)):
             self.assertIsInstance(el, expectedInstance)
@@ -1123,15 +1121,13 @@ class Test(unittest.TestCase):
         self.assertEqual(pm.endForm, expressions.PedalForm.VerticalLine)
         self.assertFalse(pm.abbreviated)
         spElements = pm.getSpannedElements()
-        self.assertEqual(len(spElements), 5)
+        self.assertEqual(len(spElements), 3)
         expectedInstances = [
-            spanner.SpannerAnchor,
+            note.Note,
             expressions.PedalBounce,
             note.Note,
-            note.Note,
-            spanner.SpannerAnchor
         ]
-        expectedOffsets = [0., 1., 0., 1., 2.]
+        expectedOffsets = [0., 1., 1.]
         for i, (el, expectedOffset, expectedInstance) in enumerate(zip(
                 spElements, expectedOffsets, expectedInstances)):
             self.assertIsInstance(el, expectedInstance)
@@ -1157,20 +1153,21 @@ class Test(unittest.TestCase):
         self.assertEqual(pm.endForm, expressions.PedalForm.Star)
         self.assertFalse(pm.abbreviated)
         spElements = pm.getSpannedElements()
-        self.assertEqual(len(spElements), 4)
-        self.assertIsInstance(spElements[0], spanner.SpannerAnchor)
-        self.assertEqual(spElements[0].offset, 0.)
-        self.assertIsInstance(spElements[1], chord.Chord)
+        self.assertEqual(len(spElements), 3)
+        self.assertIsInstance(spElements[0], chord.Chord)
         self.assertEqual(
-            spElements[1].fullName,
+            spElements[0].fullName,
             'Chord {E-flat in octave 2 | B-flat in octave 2} Whole'
         )
+        self.assertEqual(spElements[0].offset, 0.)
+        self.assertIsInstance(spElements[1], note.Note)
+        self.assertEqual(spElements[1].fullName, 'E-flat in octave 1 Whole Note')
         self.assertEqual(spElements[1].offset, 0.)
-        self.assertIsInstance(spElements[2], note.Note)
-        self.assertEqual(spElements[2].fullName, 'E-flat in octave 1 Whole Note')
-        self.assertEqual(spElements[2].offset, 0.)
-        self.assertIsInstance(spElements[3], spanner.SpannerAnchor)
-        self.assertEqual(spElements[3].offset, 3.)
+        self.assertEqual(spElements[1].quarterLength, 4.)
+        # The pedal "stop" happens a quarter-note _before_ the end of the last whole note
+        # (last whole note <duration> is 32, <pedal><offset> is -8)
+        self.assertEqual(spElements[2].offset, 3.)
+        self.assertIsInstance(spElements[2], spanner.SpannerAnchor)
 
         s = corpus.parse('dichterliebe_no2')  # , forceSource=True)
         pedals = list(s[expressions.PedalMark])
@@ -1184,16 +1181,14 @@ class Test(unittest.TestCase):
         self.assertEqual(pm.bounceDown, expressions.PedalForm.PedalName)
         self.assertEqual(pm.endForm, expressions.PedalForm.Star)
         spElements = pm.getSpannedElements()
-        self.assertEqual(len(spElements), 7)
-        expectedOffsets = [1.5, 1.5, 1.75, 0., 0.75, 1.0, 1.75]
+        self.assertEqual(len(spElements), 5)
+        expectedOffsets = [1.5, 1.75, 0., 0.75, 1.0]
         expectedInstances = [
-            spanner.SpannerAnchor,
             note.Note,
             note.Note,
             note.Note,
             note.Note,
             note.Note,
-            spanner.SpannerAnchor,
         ]
         for i, (el, expectedOffset, expectedInstance) in enumerate(zip(
                 spElements, expectedOffsets, expectedInstances)):
@@ -1608,18 +1603,15 @@ class Test(unittest.TestCase):
                     '<music21.spanner.SpannerAnchor at 1.0>'
                 ],
                 [
-                    '<music21.spanner.SpannerAnchor at 1.5>',
                     'C3',
                     '<music21.spanner.SpannerAnchor at 2.0>'
                 ],
                 [
-                    '<music21.spanner.SpannerAnchor at 2.5>',
                     'A5',
                     'A5',
                     '<music21.spanner.SpannerAnchor at 3.125>'
                 ],
                 [
-                    '<music21.spanner.SpannerAnchor at 3.5>',
                     'B3',
                     '<music21.spanner.SpannerAnchor at 3.75>'
                 ]
