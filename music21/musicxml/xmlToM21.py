@@ -1526,6 +1526,15 @@ class PartParser(XMLParserBase):
         # s is the score; adding the part to the score
         self.stream.coreElementsChanged()
 
+        # if there are any uncompleted spanners, the MusicXML file we are parsing must
+        # have contained no "stop" element for this spanner. We don't want to leave this
+        # in the bundle for the next PartParser to be confused by; just remove it.
+        uncompletedSpanners: list[spanner.Spanner] = []
+        for sp in self.spannerBundle:
+            uncompletedSpanners.append(sp)
+        for sp in uncompletedSpanners:
+            self.spannerBundle.remove(sp)
+
         partStaves: list[stream.PartStaff] = []
         if self.maxStaves > 1:
             partStaves = self.separateOutPartStaves()
