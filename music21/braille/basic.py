@@ -189,7 +189,7 @@ def chordToBraille(music21Chord, descending=True, showOctave=True):
         music21Chord.editorial.brailleEnglish.append(f'{music21Chord} None')
         return symbols['basic_exception']
     chordTrans.append(brailleNote)
-    englishJoined = '\n'.join(initNote.editorial.brailleEnglish)
+    englishJoined = '\n'.join(initNote.editorial.get('brailleEnglish', []))
     music21Chord.editorial.brailleEnglish.append(
         f'{direction} Chord:\n{englishJoined}'
     )
@@ -531,7 +531,7 @@ def metronomeMarkToBraille(music21MetronomeMark):
         metroNote = note.Note('C4', quarterLength=music21MetronomeMark.referent.quarterLength)
         brailleNote = noteToBraille(metroNote, showOctave=False)
         metroTrans.append(brailleNote)
-        englishJoined = ' '.join(metroNote.editorial.brailleEnglish)
+        englishJoined = ' '.join(metroNote.editorial.get('brailleEnglish', []))
         music21MetronomeMark.editorial.brailleEnglish.append(
             f'Metronome Note {englishJoined}'
         )
@@ -801,7 +801,7 @@ def noteToBraille(
     # note duration
     # -------------
     if isinstance(music21Note.duration, duration.GraceDuration):
-        # TODO: Short Appoggiatura mark...
+        # TODO: Short Appoggiatura mark
         nameWithDuration = notesInStep['eighth']
         noteTrans.append(nameWithDuration)
         music21Note.editorial.brailleEnglish.append(
@@ -1057,7 +1057,7 @@ def textExpressionToBraille(music21TextExpression, precedeByWordSign=True):
             f'Text Expression {teWords} {simpleReturn}')
         return simpleReturn
 
-    # not in this basic list...
+    # not in this basic list
 
     allExpr = teWords.split()
     textExpressionTrans = []

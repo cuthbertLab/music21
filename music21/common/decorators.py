@@ -35,7 +35,7 @@ def optional_arg_decorator(fn):
             klass = arguments[0]
             arguments = arguments[1:]
 
-        # If no arguments were passed...
+        # If no arguments were passed
         if len(arguments) == 1 and not keywords and callable(arguments[0]):
             if is_bound_method:
                 return fn(klass, arguments[0])
@@ -64,8 +64,7 @@ def deprecated(method, startDate=None, removeDate=None, message=None):
 
     Use without arguments for a simple case:
 
-
-    For demonstrating I need to screw with stderr...
+    For demonstrating I need to screw with stderr:
 
     >>> import sys
     >>> saveStdErr = sys.stderr
@@ -75,7 +74,7 @@ def deprecated(method, startDate=None, removeDate=None, message=None):
     ... def hi(msg):
     ...     print(msg)
 
-    (I'm printing "/" at the beginning because message begins with the filename and that is
+    (I'm printing "/" at the beginning because the message begins with the filepath which is
     different on each system, but you can't use ellipses at the beginning of a doctest)
 
     >>> print('/'); hi('myke')
@@ -92,13 +91,13 @@ def deprecated(method, startDate=None, removeDate=None, message=None):
 
     Now a new function demonstrating the argument form.
 
-    >>> @common.deprecated('February 1972', 'September 2099', 'You should be okay...')
+    >>> @common.deprecated('February 1972', 'September 2099', 'You should be okay.')
     ... def bye(msg):
     ...     print(msg)
 
     >>> print('/'); bye('world')
     /...Music21DeprecationWarning: bye was deprecated on February 1972
-            and will disappear at or after September 2099. You should be okay...
+            and will disappear at or after September 2099. You should be okay.
     ...
     world
 

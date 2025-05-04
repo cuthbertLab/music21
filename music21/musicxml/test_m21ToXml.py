@@ -27,6 +27,7 @@ from music21 import note
 from music21 import repeat
 from music21 import spanner
 from music21 import stream
+from music21 import style
 from music21 import tempo
 
 from music21.musicxml import helpers
@@ -683,6 +684,86 @@ class Test(unittest.TestCase):
             int(tree.findall('.//direction/offset')[0].text),
             defaults.divisionsPerQuarter)
 
+    def testPedals(self):
+        expectedResults1 = (
+            {
+                'type': 'start',
+                'line': 'yes',
+                'number': '1',
+            },
+            {
+                'type': 'change',
+                'line': 'yes',
+            },
+            {
+                'type': 'discontinue',
+                'line': 'yes',
+            },
+            {
+                'type': 'resume',
+                'line': 'yes',
+            },
+            {
+                'type': 'change',
+                'line': 'yes',
+            },
+            {
+                'type': 'stop',
+                'line': 'yes',
+                'number': '1',
+            },
+        )
+        s = converter.parse(testPrimitive.pedalLines)
+        x = self.getET(s)
+        mxPart = x.find('part')
+        for i, mxPedal in enumerate(mxPart.findall('.//pedal')):
+            with self.subTest(pedal_index=i):
+                for k in expectedResults1[i]:
+                    self.assertEqual(mxPedal.get(k, ''), expectedResults1[i][k])
+
+        startIdx = len(expectedResults1)
+
+        expectedResults2 = (
+            {
+                'type': 'start',
+                'sign': 'yes',
+                'number': '1',
+            },
+            {
+                'type': 'resume',
+                'line': 'yes',
+            },
+            {
+                'type': 'change',
+                'line': 'yes',
+            },
+            {
+                'type': 'discontinue',
+                'line': 'yes',
+            },
+            {
+                'type': 'resume',
+                'line': 'yes',
+            },
+            {
+                'type': 'change',
+                'line': 'yes',
+            },
+            {
+                'type': 'stop',
+                'line': 'yes',
+                'number': '1',
+            },
+        )
+
+        s = converter.parse(testPrimitive.pedalSymLines)
+        x = self.getET(s)
+        mxPart = x.find('part')
+        for i, mxPedal in enumerate(mxPart.findall('.//pedal')):
+            with self.subTest(pedal_index=startIdx + i):
+                for k in expectedResults2[i]:
+                    self.assertEqual(mxPedal.get(k, ''), expectedResults2[i][k])
+
     def testArpeggios(self):
         expectedResults = (
             'arpeggiate',
@@ -921,6 +1002,13 @@ class Test(unittest.TestCase):
         self.assertIn('<rest', xmlOut)
         self.assertNotIn('<forward>', xmlOut)
 
+    def test_stem_style_without_direction(self):
+        one_note_tune = converter.parse('tinyNotation: 2/4 c2')
+        half_note = one_note_tune.recurse().notes.first()
+        half_note.style.stemStyle = style.Style()
+        half_note.style.stemStyle.color = 'red'
+        xmlOut = GeneralObjectExporter().parse(one_note_tune).decode('utf-8')
+        self.assertIn('<stem color="#FF0000">up</stem>', xmlOut)
 
 
 class TestExternal(unittest.TestCase):

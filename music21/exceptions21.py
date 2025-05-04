@@ -74,6 +74,6 @@ class TimeSignatureException(MeterException):
 # warnings
 class Music21DeprecationWarning(UserWarning):
     # Do not subclass Deprecation warning, because these
-    # warnings need to be passed to users...
+    # warnings need to be passed to users
     pass
 

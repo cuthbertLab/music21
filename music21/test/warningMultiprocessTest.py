@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 '''
-Runs MultiprocessTest with all warnings including traceback...
+Runs MultiprocessTest with all warnings including traceback
 '''
 #
 # https://stackoverflow.com/questions/22373927/get-traceback-of-warnings

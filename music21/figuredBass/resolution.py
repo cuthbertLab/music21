@@ -114,11 +114,11 @@ def augmentedSixthToDominant(
         assert isinstance(fifth, pitch.Pitch)
         assert isinstance(other, pitch.Pitch)
 
-    howToResolve = [(lambda p: p.name == bass.name, '-m2'),
-                    (lambda p: p.name == root.name, 'm2'),
-                    (lambda p: p.name == fifth.name, '-m2'),
-                    (lambda p: p.name == other.name and augSixthType == 3, 'd1'),
-                    (lambda p: p.name == other.name and augSixthType == 2, '-m2')]
+    howToResolve = [(lambda p: p and bass and p.name == bass.name, '-m2'),
+                    (lambda p: p and root and p.name == root.name, 'm2'),
+                    (lambda p: p and fifth and p.name == fifth.name, '-m2'),
+                    (lambda p: p and other and p.name == other.name and augSixthType == 3, 'd1'),
+                    (lambda p: p and other and p.name == other.name and augSixthType == 2, '-m2')]
 
     return _resolvePitches(augSixthPossib, howToResolve)
 
@@ -199,12 +199,12 @@ def augmentedSixthToMajorTonic(
         assert isinstance(fifth, pitch.Pitch)
         assert isinstance(other, pitch.Pitch)
 
-    howToResolve = [(lambda p: p.name == bass.name, '-m2'),
-                    (lambda p: p.name == root.name, 'm2'),
-                    (lambda p: p.name == fifth.name, 'P1'),
-                    (lambda p: p.name == other.name and augSixthType == 1, 'M2'),
-                    (lambda p: p.name == other.name and augSixthType == 2, 'A1'),
-                    (lambda p: p.name == other.name and augSixthType == 3, 'm2')]
+    howToResolve = [(lambda p: p and bass and p.name == bass.name, '-m2'),
+                    (lambda p: p and root and p.name == root.name, 'm2'),
+                    (lambda p: p and fifth and p.name == fifth.name, 'P1'),
+                    (lambda p: p and other and p.name == other.name and augSixthType == 1, 'M2'),
+                    (lambda p: p and other and p.name == other.name and augSixthType == 2, 'A1'),
+                    (lambda p: p and other and p.name == other.name and augSixthType == 3, 'm2')]
 
     return _resolvePitches(augSixthPossib, howToResolve)
 
@@ -284,11 +284,11 @@ def augmentedSixthToMinorTonic(
         assert isinstance(fifth, pitch.Pitch)
         assert isinstance(other, pitch.Pitch)
 
-    howToResolve = [(lambda p: p.name == bass.name, '-m2'),
-                    (lambda p: p.name == root.name, 'm2'),
-                    (lambda p: p.name == fifth.name, 'P1'),
-                    (lambda p: p.name == other.name and augSixthType == 1, 'm2'),
-                    (lambda p: p.name == other.name and augSixthType == 3, 'd2')]
+    howToResolve = [(lambda p: p and bass and p.name == bass.name, '-m2'),
+                    (lambda p: p and root and p.name == root.name, 'm2'),
+                    (lambda p: p and fifth and p.name == fifth.name, 'P1'),
+                    (lambda p: p and other and p.name == other.name and augSixthType == 1, 'm2'),
+                    (lambda p: p and other and p.name == other.name and augSixthType == 3, 'd2')]
 
     return _resolvePitches(augSixthPossib, howToResolve)
 

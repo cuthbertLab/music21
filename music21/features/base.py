@@ -1157,12 +1157,12 @@ def extractorsById(idOrList, library=('jSymbolic', 'native')):
     ['P19', 'P20']
 
 
-    Normalizes case...
+    Normalizes case:
 
     >>> [x.id for x in features.extractorsById(['r31', 'r32', 'r33', 'r34', 'r35', 'p1', 'p2'])]
     ['R31', 'R32', 'R33', 'R34', 'R35', 'P1', 'P2']
 
-    Get all feature extractors from all libraries
+    Get all feature extractors from all libraries:
 
     >>> y = [x.id for x in features.extractorsById('all')]
     >>> y[0:3], y[-3:-1]
@@ -1495,7 +1495,7 @@ class Test(unittest.TestCase):
 
     # def testGetAllExtractorsMethods(self):
     #     '''
-    #     ahh..this test takes a really long time....
+    #     ahh..this test takes a really long time.
     #     '''
     #     from music21 import stream, features, pitch
     #     s = corpus.parse('bwv66.6').measures(1, 5)

@@ -751,18 +751,17 @@ class RTBeat(RTAtom):
         Fraction(11, 6)
 
 
-        Similarly 0.25 adds 1/4 of 1/DENOM... to get 21/12 or 7/4 or 1.75
+        Similarly 0.25 adds 1/4 of 1/DENOM, to get 21/12 or 7/4 or 1.75:
 
         >>> RTB('b1.66.25').getBeatFloatOrFrac()
         1.75
 
-        And 0.75 adds 3/4 of 1/DENOM to get 23/12
+        And 0.75 adds 3/4 of 1/DENOM to get 23/12:
 
         >>> RTB('b1.66.75').getBeatFloatOrFrac()
         Fraction(23, 12)
 
-
-        A weird way of writing 'b1.5'
+        A weird way of writing 'b1.5':
 
         >>> RTB('b1.33.5').getBeatFloatOrFrac()
         1.5

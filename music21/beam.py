@@ -1,13 +1,12 @@
 # -*- coding: utf-8 -*-
 # -----------------------------------------------------------------------------
 # Name:         beam.py
-# Purpose:      music21 classes for representing notes
+# Purpose:      music21 classes for representing beams and beam groups
 #
 # Authors:      Michael Scott Asato Cuthbert
 #               Christopher Ariza
 #
-# Copyright:    Copyright © 2009-2012, 19 Michael Scott Asato Cuthbert and the music21
-#               Project
+# Copyright:    Copyright © 2009-2012, 2019 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # -----------------------------------------------------------------------------
 '''
@@ -103,7 +102,7 @@ beamableDurationTypes = (
     duration.typeFromNumDict[64], duration.typeFromNumDict[128],
     duration.typeFromNumDict[256], duration.typeFromNumDict[512],
     duration.typeFromNumDict[1024], duration.typeFromNumDict[2048],
-)  # be sure to add to .fill if extended...
+)  # be sure to add to .fill if extended
 
 
 class Beam(prebase.ProtoM21Object, EqualSlottedObjectMixin, style.StyleMixin):

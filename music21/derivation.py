@@ -7,8 +7,7 @@
 #               Josiah Oberholtzer
 #               Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2011-2014 Michael Scott Asato Cuthbert and the music21
-#               Project
+# Copyright:    Copyright © 2011-2014 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ----------------------------------------------------------------------------
 '''
@@ -121,7 +120,7 @@ class Derivation(SlottedObjectMixin):
 
     Deleting the origin stream does not change the Derivation, since origin is held by strong ref:
 
-    >>> import gc  # Garbage collection...
+    >>> import gc  # Garbage collection
     >>> del s2
     >>> unused = gc.collect()  # ensure Garbage collection is run
     >>> d1
@@ -240,10 +239,10 @@ class Derivation(SlottedObjectMixin):
         >>> list(s3.derivation.chain()) == [s2, s1]
         True
         '''
-        origin = self.origin
-        while origin is not None:
-            yield origin
-            origin = origin.derivation.origin
+        orig: base.Music21Object | None = self.origin
+        while orig is not None:
+            yield orig
+            orig = orig.derivation.origin  # pylint: disable=no-member
 
     @property
     def method(self) -> str|None:

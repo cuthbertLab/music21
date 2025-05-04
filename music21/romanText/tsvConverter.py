@@ -696,7 +696,7 @@ class TsvHandler:
                     # should be?
                     repeatBracket = spanner.RepeatBracket(number=entry.volta)
                     # According to the docs at
-                    # https://web.mit.edu/music21/doc/moduleReference/moduleSpanner.html#spanner
+                    # https://www.music21.org/music21docs/moduleReference/moduleSpanner.html#spanner
                     #   "the convention is to put the spanner at the beginning
                     #   of the innermost Stream that contains all the Spanners"
                     p.insert(0, repeatBracket)
@@ -735,7 +735,7 @@ class TsvHandler:
                     currentMeasureLength = newTS.barDuration.quarterLength
 
                 previousMeasure = entry.measure
-            if repeatBracket is not None and m is not None:  # m should always be not None...
+            if repeatBracket is not None and m is not None:  # m should always be not None
                 repeatBracket.addSpannedElements(m)
 
         s.append(p)

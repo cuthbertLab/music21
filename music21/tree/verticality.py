@@ -7,8 +7,7 @@
 # Authors:      Josiah Wolf Oberholtzer
 #               Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2013-16 Michael Scott Asato Cuthbert and the music21
-#               Project
+# Copyright:    Copyright © 2013-2016 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ----------------------------------------------------------------------------
 '''
@@ -763,7 +762,7 @@ class Verticality(prebase.ProtoM21Object):
             r.duration.quarterLength = quarterLength
             return r
 
-        # easy stuff done, time to get to the hard stuff...
+        # easy stuff done, time to get to the hard stuff
 
         c = chord.Chord()
         c.duration.quarterLength = quarterLength
@@ -786,7 +785,7 @@ class Verticality(prebase.ProtoM21Object):
                 nNew.pitch = n.pitch
 
             if nNew.stemDirection != 'noStem':
-                nNew.stemDirection = None
+                nNew.stemDirection = 'unspecified'
             if not addTies:
                 return nNew
 
@@ -949,7 +948,7 @@ class Verticality(prebase.ProtoM21Object):
 
         return c
 
-    # Analysis type things...
+    # Analysis type things
     @overload
     def getAllVoiceLeadingQuartets(
         self,
@@ -960,8 +959,7 @@ class Verticality(prebase.ProtoM21Object):
         returnObjects: t.Literal[False],
         partPairNumbers: list[tuple[int, int]] | None = None
     ) -> list[PitchedTimespanQuartet]:
-        # dummy until Astroid #1015 is fixed.  Replace with ...
-        return []
+        ...
 
     @overload
     def getAllVoiceLeadingQuartets(
@@ -973,9 +971,7 @@ class Verticality(prebase.ProtoM21Object):
         returnObjects: t.Literal[True] = True,
         partPairNumbers: list[tuple[int, int]] | None = None
     ) -> list[VoiceLeadingQuartet]:
-        # dummy until Astroid #1015 is fixed.  Replace with ...
-        return []
-
+        ...
 
     def getAllVoiceLeadingQuartets(
         self,
@@ -1175,7 +1171,7 @@ class Verticality(prebase.ProtoM21Object):
             previousTs = self.timespanTree.findPreviousPitchedTimespanInSameStreamByClass(
                 startingTs)
             if previousTs is None or not isinstance(previousTs, spans.PitchedTimespan):
-                continue  # first not in piece in this part...
+                continue  # first not in piece in this part
 
             if includeRests is False:
                 if previousTs not in stopTss:

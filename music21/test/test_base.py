@@ -6,7 +6,7 @@
 # Authors:      Michael Scott Asato Cuthbert
 #               Christopher Ariza
 #
-# Copyright:    Copyright © 2008-2023 Michael Scott Asato Cuthbert
+# Copyright:    Copyright © 2008-2024 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 from __future__ import annotations
@@ -871,11 +871,11 @@ class Test(unittest.TestCase):
         m0viaPrev = measures[3].previous('Measure').previous('Measure').previous('Measure')
         self.assertEqual(m0viaPrev, measures[0])
 
-        m0viaPrev.activeSite = s.parts[0]  # otherwise there are no instruments...
+        m0viaPrev.activeSite = s.parts[0]  # otherwise there are no instruments
         sopranoInst = m0viaPrev.previous()
         self.assertEqual(str(sopranoInst), 'P1: Soprano: Instrument 1')
 
-        # set active site back to measure stream...
+        # set active site back to measure stream
         self.assertEqual(str(measures[0].previous()), str(p1))
 
     def testActiveSiteCopyingA(self):
@@ -895,9 +895,9 @@ class Test(unittest.TestCase):
         ss = n1.getSpannerSites()
         self.assertEqual(ss, [sp1])
 
-        # test same for inherited classes and multiple sites, in order...
+        # test same for inherited classes and multiple sites, in order
         sp2 = dynamics.Crescendo(n2, n1)
-        # can return in arbitrary order esp. if speed is fast...
+        # can return in arbitrary order esp. if speed is fast
         # TODO: use Ordered Dict.
         self.assertEqual(set(n2.getSpannerSites()), {sp1, sp2})
 
@@ -964,7 +964,7 @@ class Test(unittest.TestCase):
         siteList = []
 
         cParts = c.parts.stream()  # need this otherwise it could possibly be garbage collected.
-        cParts.id = 'partStream'  # to make it easier to see below, will be cached...
+        cParts.id = 'partStream'  # to make it easier to see below, will be cached
         pTemp = cParts[1]
         m3 = pTemp.measure(3)
         self.assertIs(m, m3)
@@ -1051,7 +1051,7 @@ class Test(unittest.TestCase):
                 followDerivation=True
             )
 
-# great isolation test, but no asserts for now...
+# great isolation test, but no asserts for now
 #     def testPreviousA(self):
 #         s = corpus.parse('bwv66.6')
 #         o = s.parts[0].getElementsByClass(stream.Measure)[2][1]
@@ -1111,7 +1111,7 @@ class Test(unittest.TestCase):
         self.assertIs(v[1][0].previous('Note'), e1)
 
         w = v.transpose('M3')  # same as deepcopy,
-        # but more instructive in debugging since pitches change...
+        # but more instructive in debugging since pitches change
         #    w = copy.deepcopy(v)
         eCopy1 = w[0][0]
         self.assertEqual(eCopy1.pitch.name, 'E')

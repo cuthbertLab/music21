@@ -18,7 +18,7 @@ https://joecodeswell.wordpress.com/2012/06/13/how-to-produce-python-controlled-a
 
 https://stackoverflow.com/questions/10983462/how-can-i-produce-real-time-audio-output-from-music-made-with-music21
 
-Requires pygame: http://www.pygame.org/download.shtml
+Requires pygame: pip3 install pygame
 '''
 from __future__ import annotations
 
@@ -87,6 +87,9 @@ class StreamPlayer:  # pragma: no cover
             # noinspection PyPackageRequirements
             import pygame  # type: ignore
             self.pygame = pygame
+            # noinspection PyPackageRequirements
+            import pygame.exceptions    # type: ignore
+            self.pygame_exceptions = pygame.exceptions  # type: ignore  # pylint: disable=no-member
         except ImportError:
             raise StreamPlayerException('StreamPlayer requires pygame.  Install first')
         if self.mixerInitialized is False or reinitMixer:
@@ -149,9 +152,11 @@ class StreamPlayer:  # pragma: no cover
         pygameClock = self.pygame.time.Clock()
         try:
             self.pygame.mixer.music.load(stringIOFile)
-        except self.pygame.error:
+        except self.pygame_exceptions.PygameError as pge:
             raise StreamPlayerException(
-                f'Could not play music file {stringIOFile} because: {self.pygame.get_error()}')
+                f'Could not play music file {stringIOFile} because: '
+                + f'{self.pygame_exceptions.get_error()}'
+            ) from pge
         self.pygame.mixer.music.play()
         if not blocked:
             return

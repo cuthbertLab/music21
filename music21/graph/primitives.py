@@ -221,7 +221,7 @@ class Graph(prebase.ProtoM21Object):
 
     def nextColor(self):
         '''
-        Utility function that cycles through the colors of self.colors...
+        Utility function that cycles through the colors of self.colors.
 
         >>> g = graph.primitives.Graph()
         >>> g.colors = ['#605c7f', '#5c7f60', '#715c7f']
@@ -250,7 +250,7 @@ class Graph(prebase.ProtoM21Object):
         Pairs are iterables of positions and labels.
 
         N.B. -- both 'x' and 'y' ticks have to be set in
-        order to get matplotlib to display either... (and presumably 'z' for 3D graphs)
+        order to get matplotlib to display either (and presumably 'z' for 3D graphs).
 
         >>> g = graph.primitives.GraphHorizontalBar()
         >>> g.axis['x']['ticks']
@@ -271,7 +271,7 @@ class Graph(prebase.ProtoM21Object):
         >>> g.axis['x']['ticks']
         ([], [])
         '''
-        if pairs is None:  # is okay to send an empty list to clear everything...
+        if pairs is None:  # is okay to send an empty list to clear everything
             return
 
         if axisKey not in self.axis:
@@ -984,7 +984,7 @@ class GraphHorizontalBar(Graph):
         self.figure.subplots_adjust(left=0.15)
 
         yPos = 0
-        xPoints = []  # store all to find min/max
+        xPoints: set[int|float] = set()  # store all to find min/max
         yTicks = []  # a list of label, value pairs
         xTicks = []
 
@@ -1028,15 +1028,18 @@ class GraphHorizontalBar(Graph):
                     xEnd = xStart + xLen
                     for x in [xStart, xEnd]:
                         if x not in xPoints:
-                            xPoints.append(x)
+                            xPoints.add(x)
             # ticks are value, label
             yTicks.append([yPos + self.barSpace * 0.5, key])
             # yTicks.append([key, yPos + self.barSpace * 0.5])
             yPos += self.barSpace
             i += 1
 
-        xMin = min(xPoints)
-        xMax = max(xPoints)
+        xMin: int|float = 0.0
+        xMax: int | float = 0.0
+        if xPoints:  # do not crash on empty streams
+            xMin = min(xPoints)
+            xMax = max(xPoints)
         xRange = xMax - xMin
         # environLocal.printDebug(['got xMin, xMax for points', xMin, xMax, ])
 

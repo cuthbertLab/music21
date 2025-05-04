@@ -234,7 +234,7 @@ class Test(unittest.TestCase):
             '[(5, Terminus.HIGH), (Terminus.HIGH, 5)]'
         )
 
-        # in calling get next, get a lost of edges and a lost of nodes that all
+        # in calling get next, get a list of edges and a list of nodes that all
         # describe possible pathways
         self.assertEqual(
             net.getNext(net.nodes[Terminus.LOW], Direction.ASCENDING),

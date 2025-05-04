@@ -123,8 +123,8 @@ class ArchiveManager:
     >>> data[0:70]
     '<?xml version="1.0" encoding="UTF-8"?>\r<!DOCTYPE score-partwise PUBLIC'
 
-
-    The only archive type supported now is zip. But .mxl is zip...
+    The only archive type supported now is zip. But .mxl is zip so that covers almost
+    everything.
     '''
     # for info on mxl files, see
     # http://www.recordare.com/xml/compressed-mxl.html
@@ -212,7 +212,7 @@ class ArchiveManager:
                         defaultEncoding = 'UTF-8'
                     try:
                         post = post.decode(encoding=defaultEncoding)
-                    except UnicodeDecodeError:  # sometimes windows written...
+                    except UnicodeDecodeError:  # sometimes windows written
                         post = post.decode(encoding='utf-16-le')
                         post = re.sub(r"encoding=([\'\"]\S*?[\'\"])",
                                       "encoding='UTF-8'", post)
@@ -328,7 +328,7 @@ class PickleFilter:
         Generally not necessary to call, since we can just overwrite obsolete pickles,
         but useful elsewhere.
         '''
-        pickleFp = self.getPickleFp(zipType='gz')  # pathlib...
+        pickleFp = self.getPickleFp(zipType='gz')  # pathlib
         if pickleFp.exists():
             os.remove(pickleFp)
 
@@ -401,7 +401,7 @@ def registerSubConverter(newSubConverter: type[subConverters.SubConverter]) -> N
     '''
     Add a SubConverter to the list of registered subConverters.
 
-    Example, register a converter for the obsolete Amiga composition software Sonix (so fun...)
+    Example, register a converter for the obsolete Amiga composition software Sonix (so fun!)
 
     >>> class ConverterSonix(converter.subConverters.SubConverter):
     ...    registerFormats = ('sonix',)
@@ -631,7 +631,7 @@ class Converter:
             try:
                 self._thawedStream = thaw(fpPickle, zipType='zlib')
             except freezeThaw.FreezeThawException:
-                environLocal.warn(f'Could not parse pickle, {fpPickle} ...rewriting')
+                environLocal.warn(f'Could not parse pickle, {fpPickle}.  Rewriting')
                 os.remove(fpPickle)
                 self.parseFileNoPickle(fp, number, format, forceSource, **keywords)
 
@@ -644,7 +644,7 @@ class Converter:
             environLocal.printDebug('Loading original version')
             self.parseFileNoPickle(fp, number, format, forceSource, **keywords)
             if writePickle is True and fpPickle is not None and storePickle is True:
-                # save the stream to disk...
+                # save the stream to disk
                 environLocal.printDebug('Freezing Pickle')
                 s = self.stream
                 sf = freezeThaw.StreamFreezer(s, fastButUnsafe=True)
@@ -2208,7 +2208,7 @@ class Test(unittest.TestCase):
     def testIncorrectNotCached(self):
         '''
         Here is a filename with an incorrect extension (.txt for .rnText).  Make sure that
-        it is not cached the second time...
+        it is not cached the second time.
         '''
         from music21 import harmony
 

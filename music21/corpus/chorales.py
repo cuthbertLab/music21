@@ -1111,11 +1111,11 @@ class Iterator:
         self.iterationType = iterationType
 
         if numberList is not None:
-            # TODO: overly complex order of setting...
+            # TODO: overly complex order of setting
             self.numberList = numberList
 
         if titleList is not None:
-            # TODO: overly complex order of setting...
+            # TODO: overly complex order of setting
             self.titleList = titleList
 
         # These assignments must come after .iterationType

@@ -204,7 +204,7 @@ class Test(unittest.TestCase):
 
         if ':' not in namespaceName:
             # It's just the namespace because name == uniqueName,
-            # and I didn't want to spend the time to type it twice...
+            # and I didn't want to spend the time to type it twice
             namespaceName += ':' + uniqueName
 
         if namespaceName.startswith('marcrel'):

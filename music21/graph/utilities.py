@@ -6,7 +6,7 @@
 # Authors:      Christopher Ariza
 #               Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2009-2023 Michael Scott Asato Cuthbert,
+# Copyright:    Copyright © 2009-2023 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
@@ -90,7 +90,7 @@ def accidentalLabelToUnicode(label):
     'B♭4'
 
     Since matplotlib's default fonts do not support double sharps or double flats,
-    etc. these are converted as best we can...
+    etc. these are converted as best we can.
 
     >>> graph.utilities.accidentalLabelToUnicode('B--4')
     'B♭♭4'
@@ -99,7 +99,7 @@ def accidentalLabelToUnicode(label):
         return label
     for modifier, unicodeAcc in pitch.unicodeFromModifier.items():
         if modifier != '' and modifier in label and modifier in ('-', '#'):
-            # ideally eventually matplotlib will do the other accidentals...
+            # ideally eventually matplotlib will do the other accidentals
             label = label.replace(modifier, unicodeAcc)
             break
 
