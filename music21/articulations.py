@@ -598,7 +598,7 @@ class FretBend(FretIndication):
     WithBar indicates what whammy bar movement is used, if any.
     MusicXML supports 'scoop' or 'dip'. Defaults to None.
 
-    >>> fb = articulations.FretBend(number=1,bendAlter=interval.ChromaticInterval(-2),release=0.5)
+    >>> fb = articulations.FretBend(1,bendAlter=interval.ChromaticInterval(-2),release=0.5)
     >>> fb
     <music21.articulations.FretBend 1>
     >>> fb.preBend
