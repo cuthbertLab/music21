@@ -8,7 +8,7 @@
 #               Jacob Tyler Walls
 #               Christopher Ariza
 #
-# Copyright:    Copyright © 2011-2023 Michael Scott Asato Cuthbert
+# Copyright:    Copyright © 2011-2024 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
@@ -226,7 +226,7 @@ class Harmony(chord.Chord):
         #       data inconsistency.
 
         # a romanNumeral numeral object, musicxml stores this within a node
-        # called <function> which might conflict with the Harmony...
+        # called <function> which might conflict with the Harmony
         self._roman = None
         # specify an array of degree alteration objects
         self.chordStepModifications: list[ChordStepModification] = []
@@ -952,7 +952,8 @@ def chordSymbolFigureFromChord(inChord: chord.Chord, includeChordType=False):
     ('E-o11', 'diminished-11th')
 
     THIRTEENTHS
-    these are so tricky...music21 needs to be told what the root is in these cases
+
+    These are so tricky: music21 needs to be told what the root is in these cases
     all tests here are 'C' chords, but any root will work:
 
     >>> c = chord.Chord(['C3', 'E3', 'G3', 'B3', 'D4', 'F4', 'A4'])
@@ -1000,8 +1001,8 @@ def chordSymbolFigureFromChord(inChord: chord.Chord, includeChordType=False):
     * eleventh chords: third and/or fifth
     * thirteenth chords: fifth, eleventh, ninth
 
-
-    This Chord could be minor 7th with a C4, but because this 5th isn't present, not identified
+    This chord could be minor 7th with a C4, but because this 5th is not present,
+    it is not identified.
 
     >>> c = chord.Chord(['F3', 'A-3', 'E-4'])
     >>> harmony.chordSymbolFigureFromChord(c)
@@ -1334,7 +1335,7 @@ def chordSymbolFigureFromChord(inChord: chord.Chord, includeChordType=False):
         perfect = {p.name for p in ChordSymbol(cs).pitches}
         inPitches = {p.name for p in inChord.pitches}
 
-        if not perfect.issuperset(inPitches):  # must be subtraction or deletion....
+        if not perfect.issuperset(inPitches):  # must be subtraction or deletion.
             additions = inPitches.difference(perfect)
             subtractions = perfect.difference(inPitches)
             if additions:
@@ -1527,10 +1528,8 @@ class ChordSymbol(Harmony):
     >>> [str(p) for p in harmony.ChordSymbol('C35911').pitches]
     ['C2', 'E2', 'G2', 'D3', 'F3']
 
-    to prevent ambiguity in notation...
-
-    ...and in accordance with the rest of music21, if a root or bass is flat,
-    the '-' must be used, and NOT 'b'. However, alterations and chord
+    to prevent ambiguity in notation and in accordance with the rest of music21,
+    if a root or bass is flat, the '-' must be used, and NOT 'b'. However, alterations and chord
     abbreviations are specified normally with the 'b' and '#' signs.
 
     >>> dFlat = harmony.ChordSymbol('D-35')
@@ -1633,7 +1632,7 @@ class ChordSymbol(Harmony):
         if not isinstance(pitches, list):
             pitches = list(pitches)
 
-        # do this for all ninth, thirteenth, and eleventh chords...
+        # do this for all ninth, thirteenth, and eleventh chords
         # this must be done to get octave spacing right
         # possibly rewrite figured bass function with this integrated?
         ninths = ['dominant-ninth', 'major-ninth', 'minor-ninth']
@@ -1749,7 +1748,7 @@ class ChordSymbol(Harmony):
                 # if hD.degree == 7 and self.chordKind is not None and self.chordKind != '':
                 #     # don't know why anyone would want
                 #     # to add a seventh to a dominant chord already
-                #     # ...but according to documentation
+                #     # however, according to documentation
                 #     # added degrees are relative to dominant chords, which have all major degrees
                 #     # except for the seventh which is minor, thus the transposition down
                 #     # one half step
@@ -1814,7 +1813,7 @@ class ChordSymbol(Harmony):
                     #     if str(hD.degree) in degreeString:
                     #         self._degreesList = self._degreesList.replace(
                     #                    degreeString, ('A' + str(hD.degree)))
-                    #         # the 'A' stands for altered...
+                    #         # the 'A' stands for altered
                     #         break
                     # # if hD.degree not in string:
                     # # should we throw an exception???? for now yes, but maybe later we should.
@@ -1822,7 +1821,7 @@ class ChordSymbol(Harmony):
                 raise ChordStepModificationException(
                     f'Degree not in specified chord: {hD.degree}')
 
-        # main routines...
+        # main routines
         for chordStepModification in chordStepModifications:
             if chordStepModification.modType == 'add':
                 typeAdd(chordStepModification)
@@ -1946,7 +1945,7 @@ class ChordSymbol(Harmony):
         '''
         if self.figure == 'Chord Symbol Cannot Be Identified':
             return
-        # remove spaces from prelim Figure...
+        # remove spaces from prelim Figure
         prelimFigure = self.figure
         prelimFigure = re.sub(r'\s', '', prelimFigure)
         # Get Root:
@@ -3251,7 +3250,7 @@ class TestExternal(unittest.TestCase):
         # There is a test file under demos called ComprehensiveChordSymbolsTestFile.xml
         # that should contain a complete iteration of tests of chord symbol objects
         # this test makes sure that no error exists, and checks that 57 chords were
-        # created out of that file....feel free to add to file if you find missing
+        # created out of that file.  Feel free to add to file if you find missing
         # tests, and adjust 57 accordingly
         testFile = corpus.parse('demos/ComprehensiveChordSymbolsTestFile.xml')
 

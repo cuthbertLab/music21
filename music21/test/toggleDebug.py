@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 # Name:         test.toggleDebug.py
-# Purpose:      Changes debug on if off, off if on...
+# Purpose:      Changes debug on if off, off if on
 #
 # Authors:      Michael Scott Asato Cuthbert
 #

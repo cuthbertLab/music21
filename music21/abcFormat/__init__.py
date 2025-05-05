@@ -724,7 +724,7 @@ class ABCMetadata(ABCToken):
                     else:  # this is an error case
                         environLocal.printDebug(['incorrectly encoded / unparsable duration:', dur])
                         n, d = '1', '1'
-                    # n and d might be strings...
+                    # n and d might be strings
                     referent += (float(n) / float(d)) * 4
             else:  # assume we just have a quarter definition, e.g., Q:90
                 number = float(nonText)
@@ -2323,7 +2323,7 @@ class ABCHandler:
                             self.skipAhead = j - self.pos  # not + 1
                             break
                     j += 1
-                # not found, continue...
+                # not found, continue
                 continue
 
             # get slurs, ensuring that they're not confused for tuplets
@@ -3013,7 +3013,7 @@ class ABCHandler:
          'D3', 'D3', '|', 'D6', '|',
          'D3', 'D3', '|', 'D6', '||']
 
-        Then later the metadata can be merged at the start of each voice...
+        Then later the metadata can be merged at the start of each voice:
 
         >>> mergedTokens = tokenColls[0] + tokenColls[1]
         >>> mergedTokens

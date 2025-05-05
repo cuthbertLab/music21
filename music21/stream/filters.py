@@ -157,7 +157,7 @@ class IsNotFilter(IsFilter):
     <music21.key.KeySignature of 3 flats>
     <music21.note.Rest quarter>
 
-    test that resetting works...
+    test that resetting works:
 
     >>> for el in s.iter().addFilter(stream.filters.IsNotFilter(n)):
     ...     el
@@ -165,7 +165,7 @@ class IsNotFilter(IsFilter):
     <music21.note.Rest quarter>
 
 
-    multiple...
+    Using multiple filters:
 
     >>> s = stream.Stream()
     >>> s.insert(0, key.KeySignature(-3))
@@ -415,7 +415,7 @@ class OffsetFilter(StreamFilter):
         if offset > self.offsetEnd:  # anything that begins after the span is definitely out
             if stopAfterEnd:
                 # if sorted, optimize by breaking after exceeding offsetEnd
-                # eventually we could do a binary search to speed up...
+                # eventually we could do a binary search to speed up
                 raise StopIteration
             return False
 

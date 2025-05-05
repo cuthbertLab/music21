@@ -10,8 +10,12 @@
 # ------------------------------------------------------------------------------
 from __future__ import annotations
 
-from enum import Enum, EnumMeta
+from enum import Enum, EnumMeta, IntEnum
+import re
 
+# When Python 3.11 is minimum, import EnumType instead of EnumMeta
+
+# when Python 3.12 is minimum, will not need StrEnumMeta at all -- contains will work.
 
 class StrEnumMeta(EnumMeta):
     def __contains__(cls, item):
@@ -24,6 +28,32 @@ class StrEnumMeta(EnumMeta):
             return super().__contains__(item)
         except TypeError:  # pragma: no cover
             return False
+
+
+class ContainsMeta(EnumMeta):
+    '''
+    This is a backport of the Python 3.12 `EnumType` class's contains method.
+    '''
+    def __contains__(cls, item):
+        try:
+            cls(item)  # pylint: disable=no-value-for-parameter
+            return True
+        except ValueError:
+            # Python 3.12 does some more subtle things but not backward compatible.
+            return False
+
+
+class ContainsEnum(IntEnum, metaclass=ContainsMeta):
+    '''
+    An IntEnum that allows "in" checks against the values of the enum.
+    '''
+    def __repr__(self):
+        val = super().__repr__()
+        return re.sub(r'(\d+)', lambda m: f'0x{int(m.group(1)):X}', val)
+
+    @classmethod
+    def hasValue(cls, val):
+        return val in cls._value2member_map_
 
 
 class BooleanEnum(Enum):
@@ -98,10 +128,17 @@ class BooleanEnum(Enum):
 
 class StrEnum(str, Enum, metaclass=StrEnumMeta):
     '''
-    An enumeration where strings can equal the value.
+    An enumeration where strings can equal the value, and strings
+    can be found "in" the enum.
 
     See :class:`music21.common.enums.OffsetSpecial` for an
-    example of how these work.
+    example of how subclassing this would work.
+
+    * Note: This class predates the equivalent StrEnum in Python 3.11
+      and the changes to Enum `__contains__` in 3.12.  Once
+      Python 3.12 is the minimum version of music21, this class
+      will no longer be used internally and will eventually become
+      deprecated (2027?) and removed (2030?).
     '''
     def __repr__(self):
         return f'<{self.__class__.__name__}.{self.name}>'
@@ -139,8 +176,6 @@ class OffsetSpecial(StrEnum):
 
     The enum `AT_END` is equal to the string 'highestTime'
 
-    In version 9, the string comparisons will be removed.
-
     >>> from music21.common.enums import OffsetSpecial
     >>> OffsetSpecial.AT_END
     <OffsetSpecial.AT_END>
@@ -156,10 +191,17 @@ class OffsetSpecial(StrEnum):
     'highestTime'
 
     * New in v7.
+    * Note -- a previous note said that the 'highestTime' == OffsetSpecial.AT_END
+      would be removed in v9 or an upcoming music21 release.  Since then, Python has
+      changed direction and in 3.11 added StrEnum to the standard library and in 3.12
+      allows for containment checks of strings in StrEnum (such as
+      `'lowestOffset' in OffsetSpecial` returning True).  Therefore there is no
+      reason for music21 to ever remove this valuable and backwards compatible
+      tool.
     '''
-    AT_END: str = 'highestTime'
-    LOWEST_OFFSET: str = 'lowestOffset'
-    HIGHEST_OFFSET: str = 'highestOffset'
+    AT_END = 'highestTime'
+    LOWEST_OFFSET = 'lowestOffset'
+    HIGHEST_OFFSET = 'highestOffset'
 
 
 class GatherSpanners(BooleanEnum):

@@ -18,7 +18,7 @@ class Test(unittest.TestCase):
     def xtest001(self):
         pass
 
-    # thoughts on how to do this...
+    # thoughts on how to do this?
     # def xtest001(self):
     #    '''
     #    Above G4 do higher pitches tend to be louder?
@@ -30,7 +30,7 @@ class Test(unittest.TestCase):
     #
     #    partStream = converter.parse('dichterliebe1.xml')
     #
-    #    ## make monophonic or make chords have a single pitch object...
+    #    ## make monophonic or make chords have a single pitch object
     #    notesAbove, notesBelow = analysis.partition(partStream, 'pitch', 'G4')
     #    # notesAbove, notesBelow = analysis.partition(partStream,
     #    #     this.pitch.midiNote > G4.midiNote)
@@ -169,7 +169,7 @@ class Test(unittest.TestCase):
     #     chordSequenceMatch = chord.factory('V64'), chord.factory('I')
     #
     #     partStream = music21.converter.parse('dichterliebe1.xml')
-    #     ## when we have a passing-tone etc. removal program run here...
+    #     ## when we have a passing-tone etc. removal program run here
     #
     #     chordStream = analysis.phraseExtract(partStream, ['simultaneities'])
     #
@@ -189,7 +189,7 @@ class Test(unittest.TestCase):
     #         # are active, not just present
     #         # keys thus do not need a duration
     #
-    #         ### getElementsByOffsetRange....
+    #         ### getElementsByOffsetRange.
     #         key = keyStream.getElementsByOffset(chordThis.offset,
     #                         chordNext.offset, lastActive=True)
     #        if (chordThis.setKey(key) == chordSequenceMatch[0](key) and

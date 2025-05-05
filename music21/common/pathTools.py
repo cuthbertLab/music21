@@ -154,22 +154,22 @@ def relativepath(path: StrOrPath, start: str|None = None) -> StrOrPath|str:
 @overload
 def cleanpath(path: pathlib.Path, *,
               returnPathlib: t.Literal[None] = None) -> pathlib.Path:
-    return pathlib.Path('/')  # dummy until Astroid #1015 is fixed.
+    ...
 
 @overload
 def cleanpath(path: str, *,
               returnPathlib: t.Literal[None] = None) -> str:
-    return '/'  # dummy until Astroid #1015 is fixed.
+    ...
 
 @overload
 def cleanpath(path: str|pathlib.Path, *,
               returnPathlib: t.Literal[True]) -> pathlib.Path:
-    return pathlib.Path('/')  # dummy until Astroid #1015 is fixed.
+    ...
 
 @overload
 def cleanpath(path: str|pathlib.Path, *,
               returnPathlib: t.Literal[False]) -> str:
-    return '/'  # dummy until Astroid #1015 is fixed.
+    ...
 
 def cleanpath(path: str|pathlib.Path, *,
               returnPathlib: bool|None = None) -> str|pathlib.Path:

@@ -1009,9 +1009,9 @@ class Ambitus(DiscreteAnalysis):
         For a given subStream, return a tuple consisting of the two pitches
         with the minimum and maximum pitch space value.
 
-        This public method may be used by other classes.
+        This public method may be used by other classes.  It ignores ChordSymbol objects.
 
-        ignores ChordSymbol objects...
+        Demonstration:
 
         >>> s = corpus.parse('bach/bwv66.6')
         >>> p = analysis.discrete.Ambitus()
@@ -1362,7 +1362,7 @@ def analysisClassFromMethodName(method: str) -> type[DiscreteAnalysis]|None:
     >>> acfmn('span')
     <class 'music21.analysis.discrete.Ambitus'>
 
-    This one is fundamentally important...
+    This one is fundamentally important:
 
     >>> acfmn('key')
     <class 'music21.analysis.discrete.AardenEssen'>

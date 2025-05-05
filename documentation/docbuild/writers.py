@@ -134,7 +134,7 @@ class ReSTWriter(DocumentationWriter):
                 shouldWrite = False
             else:
                 pass
-                # # uncomment for  help in figuring out why a file keeps being different...
+                # # uncomment for  help in figuring out why a file keeps being different
                 # import difflib
                 # print(common.relativepath(filePath))
                 # print('\n'.join(difflib.ndiff(rst.split('\n'), oldRst.split('\n'))))

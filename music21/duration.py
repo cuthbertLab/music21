@@ -6,7 +6,7 @@
 # Authors:      Michael Scott Asato Cuthbert
 #               Christopher Ariza
 #
-# Copyright:    Copyright © 2008-2023 Michael Scott Asato Cuthbert
+# Copyright:    Copyright © 2008-2024 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
@@ -279,12 +279,12 @@ def quarterLengthToClosestType(qLen: OffsetQLIn) -> tuple[str, bool]:
     >>> duration.quarterLengthToClosestType(1.8)
     ('quarter', False)
 
-    Some extremely close types will return True for exact conversion...
+    Some extremely close types will return True for exact conversion:
 
     >>> duration.quarterLengthToClosestType(2.0000000000000001)
     ('half', True)
 
-    Very big durations... are fine:
+    Very long durations are fine:
 
     >>> duration.quarterLengthToClosestType(129.99)
     ('duplex-maxima', False)
@@ -303,7 +303,7 @@ def quarterLengthToClosestType(qLen: OffsetQLIn) -> tuple[str, bool]:
     '''
     noteLengthType: OffsetQL
     if isinstance(qLen, fractions.Fraction):
-        noteLengthType = 4 / qLen  # divides right...
+        noteLengthType = 4 / qLen  # divides right
     else:
         noteLengthType = opFrac(4 / qLen)
 
@@ -398,7 +398,7 @@ def quarterLengthToNonPowerOf2Tuplet(
     power of 2 denominator (such as 7:6) that represents the quarterLength and the
     DurationTuple that should be used to express the note.
 
-    This could be a double-dotted note, but also a tuplet...
+    This could be a double-dotted note, but also a tuplet:
 
     >>> duration.quarterLengthToNonPowerOf2Tuplet(7)
     (<music21.duration.Tuplet 8/7/quarter>, DurationTuple(type='breve', dots=0, quarterLength=8.0))
@@ -409,7 +409,7 @@ def quarterLengthToNonPowerOf2Tuplet(
     >>> duration.quarterLengthToNonPowerOf2Tuplet(7/3)
     (<music21.duration.Tuplet 12/7/16th>, DurationTuple(type='whole', dots=0, quarterLength=4.0))
 
-    And of course...
+    And of course:
 
     >>> duration.quarterLengthToNonPowerOf2Tuplet(1)
     (<music21.duration.Tuplet 1/1/quarter>,
@@ -519,7 +519,7 @@ def quarterConversion(qLen: OffsetQLIn) -> QuarterLengthConversion:
     Returns a 2-element namedtuple of (components, tuplet)
 
     Components is a tuple of DurationTuples (normally one) that
-    add up to the qLen when multiplied by...
+    add up to the qLen when multiplied by the tuplet multiplier.
 
     Tuplet is a single :class:`~music21.duration.Tuplet` that adjusts all components.
 
@@ -621,7 +621,7 @@ def quarterConversion(qLen: OffsetQLIn) -> QuarterLengthConversion:
 
 
     Since tuplets apply to the entire Duration (since v2), expect some odder tuplets for unusual
-    values that should probably be split generally...
+    values that should probably be split generally:
 
     >>> duration.quarterConversion(7/3)
     QuarterLengthConversion(components=(DurationTuple(type='whole', dots=0, quarterLength=4.0),),
@@ -678,9 +678,9 @@ def quarterConversion(qLen: OffsetQLIn) -> QuarterLengthConversion:
         dt = durationTupleFromTypeDots('zero', 0)
         return QuarterLengthConversion((dt,), None)
 
-    # Tuplets...
+    # Tuplets
     qLen = opFrac(qLen)
-    # try match to type, get next lowest for next part...
+    # try match to type, get next lowest for next part
     try:
         closestSmallerType, unused_match = quarterLengthToClosestType(qLen)
         nextLargerType(closestSmallerType)
@@ -1269,12 +1269,12 @@ class Tuplet(prebase.ProtoM21Object):
     def setDurationType(
         self,
         durType: str|int|float|fractions.Fraction,
-        dots=0
-    ):
+        dots: int = 0,
+    ) -> None:
         '''
         Set both durationActual and durationNormal from either a string type or
-        a quarterLength.  optional dots can add dots to a string Type (or I suppose
-        a quarterLength...but why?)
+        a quarterLength.  optional dots can add dots to a string type (or I suppose
+        a quarterLength.)
 
         >>> a = duration.Tuplet()
         >>> a.tupletMultiplier()
@@ -1309,7 +1309,7 @@ class Tuplet(prebase.ProtoM21Object):
         self.durationActual = durationTupleFromTypeDots(durType, dots)
         self.durationNormal = durationTupleFromTypeDots(durType, dots)
 
-    def setRatio(self, actual, normal):
+    def setRatio(self, actual: int, normal: int) -> None:
         '''
         Set the ratio of actual divisions to represented in normal divisions.
         A triplet is 3 actual in the time of 2 normal.
@@ -1418,14 +1418,14 @@ class Tuplet(prebase.ProtoM21Object):
         durationActual is a DurationTuple that represents the notes that are
         actually present and counted in a tuplet.  For instance, in a 7
         dotted-eighth in the place of 2 double-dotted quarter notes tuplet,
-        the duration actual would be...
+        the duration actual would be this:
 
         >>> d = duration.Tuplet(7, 2)
         >>> print(d.durationActual)
         None
         >>> d.durationActual = duration.Duration('eighth', dots=1)
 
-        Notice that the Duration object gets converted to a DurationTuple
+        Notice that the Duration object gets converted to a DurationTuple.
 
         >>> d.durationActual
         DurationTuple(type='eighth', dots=1, quarterLength=0.75)
@@ -1456,14 +1456,14 @@ class Tuplet(prebase.ProtoM21Object):
         durationNormal is a DurationTuple that represents the notes that
         would be present in the space normally (if there were no tuplets).  For instance, in a 7
         dotted-eighth in the place of 2 double-dotted quarter notes tuplet,
-        the durationNormal would be...
+        the durationNormal would be:
 
         >>> d = duration.Tuplet(7, 2)
         >>> print(d.durationNormal)
         None
         >>> d.durationNormal = duration.Duration('quarter', dots=2)
 
-        Notice that the Duration object gets converted to a DurationTuple
+        Notice that the Duration object gets converted to a DurationTuple:
 
         >>> d.durationNormal
         DurationTuple(type='quarter', dots=2, quarterLength=1.75)
@@ -1808,7 +1808,7 @@ class Duration(prebase.ProtoM21Object, SlottedObjectMixin):
         if (len(self._components) == 1
                 and self._dotGroups == (0,)
                 and self._linked is True
-                and not self._tuplets):  # 99% of notes...
+                and not self._tuplets):  # 99% of notes
             # ignore all but components
             return self.__class__(durationTuple=self._components[0])
         elif (not self._components
@@ -2613,7 +2613,7 @@ class Duration(prebase.ProtoM21Object, SlottedObjectMixin):
     def dotGroups(self, value: tuple[int, ...]):
         if not isinstance(value, tuple):
             raise TypeError('only tuple dotGroups values can be used with this method.')
-        # removes dots from all components...
+        # removes dots from all components
         componentsGenerator = (
             durationTupleFromTypeDots(component.type, 0) for component in self._components
         )
@@ -2680,7 +2680,7 @@ class Duration(prebase.ProtoM21Object, SlottedObjectMixin):
         >>> d.quarterLength
         3.998046875
 
-        Infinite dots... (an Easter egg...)
+        Infinite dots gives an Easter egg:
 
         >>> from math import inf
         >>> d.type = 'half'
@@ -2708,7 +2708,7 @@ class Duration(prebase.ProtoM21Object, SlottedObjectMixin):
         if not common.isNum(value):
             raise TypeError('only numeric dot values can be used with this method.')
 
-        # easter egg...
+        # easter egg
         if value == inf:
             self.type = nextLargerType(self.type)
             self.dots = 0
@@ -3003,7 +3003,7 @@ class Duration(prebase.ProtoM21Object, SlottedObjectMixin):
         This method is needed for MusicXML time-modification among other
         places.
 
-        No tuplets...
+        No tuplets:
 
         >>> complexDur = duration.Duration('eighth')
         >>> complexDur.aggregateTupletMultiplier()

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 '''
-The music21 Framework is Copyright © 2006-2023 Michael Scott Asato Cuthbert.
+The music21 Framework is Copyright © 2006-2025 Michael Scott Asato Cuthbert.
 
 Some Rights Reserved
 Released under the BSD (3-clause) license.  See license.txt.
@@ -52,7 +52,7 @@ if sys.version_info < minPythonVersion:
     If you have the wrong version there are several options for getting
     the right one.
 
-    - 1. (Best) Upgrade to Python 3, latest (currently 3.12).
+    - 1. (Best) Upgrade to a recent version of Python 3 (such as 3.13).
 
          The great features there will more
          than make up for the headache of downloading
@@ -62,7 +62,9 @@ if sys.version_info < minPythonVersion:
          Try running "python3" instead of "python"
 
     - 2. Upgrade pip and setuptools to the latest version
-         and then "upgrade" music21 to an earlier version.
+         and then use "upgrade" to downgrade music21 to
+         an earlier version.
+
          For instance to install version 4 you'd run:
 
          $ pip install --upgrade pip setuptools
@@ -83,7 +85,7 @@ __all__ = [
     'mainTest',
 
     'prebase',  # before all
-    'base',  # top...
+    'base',  # top
     'sites',  # important
 
     # sub folders
@@ -122,7 +124,7 @@ __all__ = [
 
     # individual modules
     # KEEP ALPHABETICAL unless necessary for load reasons, if so
-    # put a note.  Keep one letter per line.
+    # put a note.
 
     'articulations',
     'bar',

@@ -136,7 +136,7 @@ class Barline(base.Music21Object):
                  **keywords):
         super().__init__(**keywords)
 
-        self._type = None  # same as style...
+        self._type = None  # same as style
         # this will raise an exception on error from property
         self.type = type
 

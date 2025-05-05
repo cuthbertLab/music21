@@ -16,7 +16,7 @@ The following papers and publications make extensive use of `music21`. Start her
 Cuthbert, Michael Scott Cuthbert and Christopher Ariza. 2010. "`music21`: A
 Toolkit for Computer-Aided Musicology and Symbolic Music Data." In
 *Proceedings of the International Society for Music Information Retrieval*.
-https://www.academia.edu/243058/music21_A_Toolkit_for_Computer-Aided_Musicology_and_Symbolic_Music_Data
+https://www.academia.edu/243058/music21_A_Toolkit_for_Computer_Aided_Musicology_and_Symbolic_Music_Data
 
 
 Then continue with:
@@ -24,7 +24,7 @@ Then continue with:
 Church, Maura and Michael Scott Cuthbert. 2014. "Improving Rhythmic
 Transcriptions via Probability Models Applied Post-OMR." In *Proceedings of the
 International Society for Music Information Retrieval*.
-https://www.academia.edu/7709124/Improving_Rhythmic_Transcriptions_via_Probability_Models_Applied_Post-OMR
+https://www.academia.edu/7709124/Improving_Rhythmic_Transcriptions_via_Probability_Models_Applied_Post_OMR
 
 Cuthbert, Michael Scott, Beth Hadley, Lars Johnson, and Christopher Reyes. 2012.
 "Interoperable Digital Musicology Research via `music21` Web Applications."
@@ -62,8 +62,7 @@ Ariza, C. and Michael Scott Cuthbert. 2010. "Modeling Beats, Accents, Beams, and
 Time Signatures Hierarchically with `music21` Meter Objects." In *Proceedings of the
 International Computer Music Conference*. San Francisco: International Computer Music
 Association. 216-223. Available online at
-https://web.mit.edu/music21/papers/Ariza_Cuthbert_Stream_ICMC_2011.pdf
-
+https://www.academia.edu/243059/Modeling_Beats_Accents_Beams_and_Time_Signatures_Hierarchically_with_music21_Meter_Objects
 
 
 Future Goals and Potential Applications

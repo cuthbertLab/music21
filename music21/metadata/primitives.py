@@ -7,7 +7,7 @@
 #               Michael Scott Asato Cuthbert
 #               Greg Chapman
 #
-# Copyright:    Copyright © 2010-22 Michael Scott Asato Cuthbert and the music21
+# Copyright:    Copyright © 2010-22 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # -----------------------------------------------------------------------------
 from __future__ import annotations
@@ -190,7 +190,7 @@ class Date(prebase.ProtoM21Object):
         >>> d._stripError('63?')
         (63, 'uncertain')
 
-        Milliseconds are not retained -- this is for musicology, not computers...
+        Milliseconds are not retained -- this is for musicology, not computers:
 
         >>> d._stripError('4.43')
         (4, None)
@@ -213,7 +213,7 @@ class Date(prebase.ProtoM21Object):
                 value = value.replace(found, '')
                 uncertainty = 'priority'
 
-        # cannot convert string '4.43' directly to int...
+        # cannot convert string '4.43' directly to int
         value = float(value)
         return int(value), uncertainty
 
@@ -397,7 +397,7 @@ class Date(prebase.ProtoM21Object):
 
         >>> a.datetime
         Traceback (most recent call last):
-        TypeError: ...argument 'day' (pos 3)...
+        TypeError: function missing required argument 'day' (pos 3)
         '''
         post = []
         # order here is order for datetime
@@ -1058,7 +1058,7 @@ class Contributor(prebase.ProtoM21Object):
     # !!!LOR: Orchestrator.
     # !!!TRN: Translator of text.
 
-    # TODO: add editor...
+    # TODO: add editor
 
     roleAbbreviationsDict = {
         'com': 'composer',

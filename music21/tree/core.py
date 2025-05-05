@@ -6,8 +6,7 @@
 # Authors:      Josiah Wolf Oberholtzer
 #               Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2013-16 Michael Scott Asato Cuthbert and the music21
-#               Project
+# Copyright:    Copyright © 2013-2016 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # -----------------------------------------------------------------------------
 '''
@@ -39,7 +38,7 @@ class AVLNode(common.SlottedObjectMixin):
     >>> node
     <AVLNode: Start:1.0 Height:1 L:None R:0>
 
-    Nodes can rebalance themselves, but they work best in a Tree...
+    Nodes can rebalance themselves, but they work best in a Tree.
 
     Please consult the Wikipedia entry on AVL trees
     (https://en.wikipedia.org/wiki/AVL_tree) for a very detailed
@@ -259,7 +258,6 @@ class AVLNode(common.SlottedObjectMixin):
             rcHeight
         )
 
-    # PRIVATE METHODS #
     def moveAttributes(self, other):
         '''
         move attributes from this node to another in case "removal" actually
@@ -368,16 +366,8 @@ class AVLNode(common.SlottedObjectMixin):
         updates the information for this node.
 
         '''
-        if self.leftChild is not None:
-            leftHeight = self.leftChild.height
-        else:
-            leftHeight = -1
-
-        if self.rightChild is not None:
-            rightHeight = self.rightChild.height
-        else:
-            rightHeight = -1
-
+        leftHeight = self.leftChild.height if self.leftChild else -1
+        rightHeight = self.rightChild.height if self.rightChild else -1
         self.height = max(leftHeight, rightHeight) + 1
         self.balance = rightHeight - leftHeight
 
@@ -457,16 +447,18 @@ class AVLNode(common.SlottedObjectMixin):
         Returns the new central node.
         '''
         node = self
-        if node.balance > 1:
-            if node.rightChild.balance >= 0:
-                node = node.rotateRightRight()
+        if self.balance > 1:
+            if self.rightChild.balance >= 0:
+                node = self.rotateRightRight()
             else:
-                node = node.rotateRightLeft()
-        elif node.balance < -1:
-            if node.leftChild.balance <= 0:
-                node = node.rotateLeftLeft()
+                node = self.rotateRightLeft()
+        elif self.balance < -1:
+            if self.leftChild.balance <= 0:
+                node = self.rotateLeftLeft()
             else:
-                node = node.rotateLeftRight()
+                node = self.rotateLeftRight()
+
+        # node is either self or the new central node
         if node.balance < -1 or node.balance > 1:
             raise TreeException(
                 'Somehow Nodes are still not balanced. node.balance %r must be between -1 and 1')
@@ -625,7 +617,7 @@ class AVLTree(prebase.ProtoM21Object):
             '''
             if node is None:
                 # if we get to the point where a node does not have a
-                # left or right child, make a new node at this position...
+                # left or right child, make a new node at this position
                 return self.nodeClass(innerPosition)
 
             if innerPosition < node.position:
@@ -717,7 +709,7 @@ class AVLTree(prebase.ProtoM21Object):
 
         >>> note1 = score.flatten().notes[30]
 
-        Works with sortTuple positions as well...
+        Works with sortTuple positions as well:
 
         >>> st = note1.sortTuple()
         >>> st

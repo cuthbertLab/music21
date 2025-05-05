@@ -6,7 +6,7 @@
 # Authors:      Christopher Ariza
 #               Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2009-2023 Michael Scott Asato Cuthbert
+# Copyright:    Copyright © 2009-2024 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # -----------------------------------------------------------------------------
 '''
@@ -282,7 +282,7 @@ class TimeSignature(TimeSignatureBase):
     >>> ts = meter.TimeSignature('3/4')
     >>> m1.insert(0, ts)
     >>> m1.insert(0, note.Note('C#3', type='half'))
-    >>> n = note.Note('D3', type='quarter')  # we will need this later
+    >>> n = note.Note('D3', type='quarter')
     >>> m1.insert(1.0, n)
     >>> m1.number = 1
     >>> p.insert(0, m1)
@@ -644,7 +644,7 @@ class TimeSignature(TimeSignatureBase):
         >>> threeFour.ratioString
         '3/4'
 
-        It can also be set to load a new one, but '.load()' is better...
+        It can also be set to load a new one, but '.load()' is better:
 
         >>> threeFour.ratioString = '5/8'  # now this variable name is dumb!
         >>> threeFour.numerator
@@ -809,7 +809,7 @@ class TimeSignature(TimeSignatureBase):
     @property
     def beatLengthToQuarterLengthRatio(self) -> float:
         '''
-        Returns 4.0 / denominator... seems a bit silly...
+        Returns 4.0 / denominator.  Might seem a bit silly but used often.
 
         >>> a = meter.TimeSignature('3/2')
         >>> a.beatLengthToQuarterLengthRatio
@@ -820,7 +820,7 @@ class TimeSignature(TimeSignatureBase):
     @property
     def quarterLengthToBeatLengthRatio(self) -> float:
         '''
-        Returns denominator/4.0... seems a bit silly...
+        Returns denominator/4.0.
         '''
         return self.denominator / 4.0
 
@@ -912,7 +912,7 @@ class TimeSignature(TimeSignatureBase):
         Return a :class:`~music21.duration.Duration` object equal to the beat unit
         of this Time Signature, if and only if this TimeSignature has a uniform beat unit.
 
-        Otherwise raises an exception in v7.1 but will change to returning NaN
+        Otherwise, raises an exception in v7.1 but will change to returning NaN
         soon fasterwards.
 
         >>> ts = meter.TimeSignature('3/4')
@@ -984,7 +984,8 @@ class TimeSignature(TimeSignatureBase):
             return 1
 
         # need to see if first-level subdivisions are partitioned
-        if not isinstance(self.beatSequence[0], MeterSequence):
+        beat_seq_0 = self.beatSequence[0]
+        if not isinstance(beat_seq_0, MeterSequence):
             return 1
 
         # getting length here gives number of subdivisions
@@ -993,7 +994,7 @@ class TimeSignature(TimeSignatureBase):
 
         # convert this to a set; if length is 1, then all beats are uniform
         if len(set(post)) == 1:
-            return len(self.beatSequence[0])  # all are the same
+            return len(beat_seq_0)  # all are the same
         else:
             return 1
 
@@ -1053,18 +1054,40 @@ class TimeSignature(TimeSignatureBase):
 
         Value returned of non-uniform beat divisions will change at any time
         after v7.1 to avoid raising an exception.
+
+        OMIT_FROM_DOCS
+
+        Previously a time signature with beatSequence containing only
+        MeterTerminals would raise exceptions.
+
+        >>> ts = meter.TimeSignature('2/128')
+        >>> ts.beatSequence[0]
+        <music21.meter.core.MeterTerminal 1/128>
+        >>> ts.beatDivisionDurations
+        [<music21.duration.Duration 0.03125>]
+
+        >>> ts = meter.TimeSignature('1/128')
+        >>> ts.beatSequence[0]
+        <music21.meter.core.MeterTerminal 1/128>
+        >>> ts.beatDivisionDurations
+        [<music21.duration.Duration 0.03125>]
         '''
         post = []
-        if len(self.beatSequence) == 1:
-            raise TimeSignatureException(
-                'cannot determine beat division for a non-partitioned beat')
         for mt in self.beatSequence:
-            for subMt in mt:
-                post.append(subMt.duration.quarterLength)
+            if isinstance(mt, MeterSequence):
+                for subMt in mt:
+                    post.append(subMt.duration.quarterLength)
+            else:
+                post.append(mt.duration.quarterLength)
         if len(set(post)) == 1:  # all the same
             out = []
-            for subMt in self.beatSequence[0]:
-                out.append(subMt.duration)
+            beat_seq_0 = self.beatSequence[0]
+            if isinstance(beat_seq_0, MeterSequence):
+                for subMt in beat_seq_0:
+                    if subMt.duration is not None:  # should not be:
+                        out.append(subMt.duration)
+            elif beat_seq_0.duration is not None:  # MeterTerminal w/ non-empty duration.
+                out.append(beat_seq_0.duration)
             return out
         else:
             raise TimeSignatureException(f'non uniform beat division: {post}')
@@ -1090,7 +1113,7 @@ class TimeSignature(TimeSignatureBase):
         post = []
         src = self.beatDivisionDurations
         for d in src:
-            # this is too slow... TODO: fix, but make sure all durations are unique.
+            # this is too slow. TODO: fix, but make sure all durations are unique.
             post.append(d.augmentOrDiminish(0.5))
             post.append(d.augmentOrDiminish(0.5))
         return post
@@ -1260,8 +1283,8 @@ class TimeSignature(TimeSignatureBase):
             firstPartitionForm = self.beatSequence
             cacheKey = _meterSequenceAccentArchetypesNoneCache  # cannot cache based on beat form
 
-        # environLocal.printDebug(['_setDefaultAccentWeights(): firstPartitionForm set to',
-        #    firstPartitionForm, 'self.beatSequence: ', self.beatSequence, tsStr])
+        # environLocal.printDebug('_setDefaultAccentWeights(): firstPartitionForm set to',
+        #    firstPartitionForm, 'self.beatSequence: ', self.beatSequence, tsStr)
         # using cacheKey speeds up TS creation from 2300 microseconds to 500microseconds
         try:
             self.accentSequence = copy.deepcopy(
@@ -1305,7 +1328,11 @@ class TimeSignature(TimeSignatureBase):
 
     # --------------------------------------------------------------------------
     # access data for other processing
-    def getBeams(self, srcList, measureStartOffset=0.0) -> list[beam.Beams|None]:
+    def getBeams(
+        self,
+        srcList: stream.Stream|t.Sequence[base.Music21Object],
+        measureStartOffset: OffsetQL = 0.0,
+    ) -> list[beam.Beams|None]:
         '''
         Given a qLen position and an iterable of Music21Objects, return a list of Beams objects.
 
@@ -1405,10 +1432,17 @@ class TimeSignature(TimeSignatureBase):
         beamsList = beam.Beams.naiveBeams(srcList)  # hold maximum Beams objects, all with type None
         beamsList = beam.Beams.removeSandwichedUnbeamables(beamsList)
 
-        def fixBeamsOneElementDepth(i, el, depth):
+        def fixBeamsOneElementDepth(i: int, el: base.Music21Object, depth: int):
+            '''
+            Note that this can compute the beams for non-Note things like rests
+            they just cannot be applied to the object.
+            '''
             beams = beamsList[i]
             if beams is None:
                 return
+
+            if t.TYPE_CHECKING:
+                assert isinstance(beams, beam.Beams)
 
             beamNumber = depth + 1
             # see if there is a component defined for this beam number
@@ -1421,7 +1455,7 @@ class TimeSignature(TimeSignatureBase):
 
             start = opFrac(pos)
             end = opFrac(pos + dur.quarterLength)
-            startNext = end
+            startNext: OffsetQL = end
 
             isLast = (i == len(srcList) - 1)
             isFirst = (i == 0)
@@ -1464,7 +1498,8 @@ class TimeSignature(TimeSignatureBase):
                     beamType = 'partial-right'
 
             # if last in complete measure or not in a measure, always stop
-            elif isLast and (not srcStream.isMeasure or srcStream.paddingRight == 0.0):
+            elif (isLast and (not isinstance(srcStream, stream.Measure)
+                              or srcStream.paddingRight == 0.0)):
                 beamType = 'stop'
                 # get a partial beam if we cannot form a beam
                 if (beamPrevious is None
@@ -1758,14 +1793,14 @@ class TimeSignature(TimeSignatureBase):
         >>> [ts1.getAccentWeight(x) for x in range(3)]
         [1.0, 0.5, 0.5]
 
-        Returns an error...
+        Calling getAccentWeight on durations beyond the score returns an error:
 
         >>> [ts1.getAccentWeight(x) for x in range(6)]
         Traceback (most recent call last):
         music21.exceptions21.MeterException: cannot access from qLenPos 3.0
             where total duration is 3.0
 
-        ...unless permitMeterModulus is employed
+        The error is removed if permitMeterModulus is employed:
 
         >>> [ts1.getAccentWeight(x, permitMeterModulus=True) for x in range(6)]
         [1.0, 0.5, 0.5, 1.0, 0.5, 0.5]
@@ -1799,8 +1834,8 @@ class TimeSignature(TimeSignatureBase):
 
         If you want a fractional number for the beat, see `getBeatProportion`.
 
-        TODO: In v7 -- getBeat will probably do what getBeatProportion does now...
-        but just with 1 added to it.
+        TODO: In a future version -- getBeat will probably do what getBeatProportion does now,
+            but just with 1 added to it.
 
         >>> a = meter.TimeSignature('3/4', 3)
         >>> a.getBeat(0)
@@ -1903,26 +1938,32 @@ class TimeSignature(TimeSignatureBase):
         >>> ts1.getOffsetFromBeat(3.25)
         2.25
 
-        >>> from fractions import Fraction
-        >>> ts1.getOffsetFromBeat(Fraction(8, 3))  # 2.66666
-        Fraction(5, 3)
+        Get the offset from beat 8/3 (2.6666): give a Fraction, get a Fraction.
 
+        >>> from fractions import Fraction
+        >>> ts1.getOffsetFromBeat(Fraction(8, 3))
+        Fraction(5, 3)
 
         >>> ts1 = meter.TimeSignature('6/8')
         >>> ts1.getOffsetFromBeat(1)
         0.0
         >>> ts1.getOffsetFromBeat(2)
         1.5
+
+        Check that 2.5 is 2.5 + (0.5 * 1.5):
+
+        >>> ts1.getOffsetFromBeat(2.5)
+        2.25
+
+        Decimals only need to be pretty close to work.
+        (But Fractions are better as demonstrated above)
+
         >>> ts1.getOffsetFromBeat(2.33)
         2.0
-        >>> ts1.getOffsetFromBeat(2.5)  # will be + 0.5 * 1.5
-        2.25
         >>> ts1.getOffsetFromBeat(2.66)
         2.5
 
-
         Works for asymmetrical meters as well:
-
 
         >>> ts3 = meter.TimeSignature('3/8+2/8')  # will partition as 2 beat
         >>> ts3.getOffsetFromBeat(1)
@@ -1936,16 +1977,18 @@ class TimeSignature(TimeSignatureBase):
 
 
         Let's try this on a real piece, a 4/4 chorale with a one beat pickup.  Here we get the
-        normal offset from the active TimeSignature, but we subtract out the pickup length which
-        is in a `Measure`'s :attr:`~music21.stream.Measure.paddingLeft` property.
+        normal offset for beat 4 from the active TimeSignature, but we subtract out
+        the pickup length which is in a `Measure`'s :attr:`~music21.stream.Measure.paddingLeft`
+        property, and thus see the distance from the beginning of the measure to beat 4 in
+        quarter notes
 
         >>> c = corpus.parse('bwv1.6')
         >>> for m in c.parts.first().getElementsByClass(stream.Measure):
         ...     ts = m.timeSignature or m.getContextByClass(meter.TimeSignature)
-        ...     print('%s %s' % (m.number, ts.getOffsetFromBeat(4.5) - m.paddingLeft))
-        0 0.5
-        1 3.5
-        2 3.5
+        ...     print(m.number, ts.getOffsetFromBeat(4.0) - m.paddingLeft)
+        0 0.0
+        1 3.0
+        2 3.0
         ...
         '''
         # divide into integer and floating point components
@@ -2110,7 +2153,7 @@ class SenzaMisuraTimeSignature(TimeSignatureBase):
             return str(self.text)
 
 
-# TODO: Implement or delete...
+# TODO: Implement or delete
 # class NonPowerOfTwoTimeSignature(TimeSignature):
 #     pass
 # class AutoAdjustTimeSignature(TimeSignature):

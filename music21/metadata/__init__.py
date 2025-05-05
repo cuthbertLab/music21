@@ -7,8 +7,7 @@
 #               Greg Chapman
 #               Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2010-22 Michael Scott Asato Cuthbert and the music21
-#               Project
+# Copyright:    Copyright © 2010-2022 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # -----------------------------------------------------------------------------
 '''
@@ -1070,7 +1069,7 @@ class Metadata(base.Music21Object):
         ...     )
         (True, 'composer')
 
-        These don't work (Richard didn't have the sense of rhythm to write this...)
+        These don't work (Richard didn't have the sense of rhythm to write this!)
 
         >>> md.search(
         ...     'Wagner',
@@ -1397,7 +1396,8 @@ class Metadata(base.Music21Object):
     @property
     def filePath(self) -> str|None:
         '''
-        Get or set the file path that was parsed.
+        Get or set the file path that was parsed.  This returns a string, not a Path object
+        that is deliberate for caching.
         '''
         return self._getSingularAttribute('filePath')
 
@@ -2541,8 +2541,8 @@ class RichMetadata(Metadata):
 
     def getSourcePath(self, streamObj) -> str:
         '''
-        Get a string of the path after the corpus for the piece...useful for
-        searching on corpus items without proper composer data...
+        Get a string of the path after the corpus for the piece.  Useful for
+        searching on corpus items without proper composer data.
 
         >>> rmd = metadata.RichMetadata()
         >>> b = corpus.parse('bwv66.6')

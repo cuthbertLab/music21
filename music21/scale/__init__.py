@@ -162,7 +162,7 @@ class Scale(base.Music21Object):
 
         Now we remove the F-4, D5, and A also because we are working with
         `comparisonAttribute=pitchClass`.
-        Note that we're using a Stream as `other` now...
+        Note that we're using a Stream as `other` now:
 
         >>> [str(p) for p in scale.Scale.extractPitchList(s, comparisonAttribute='pitchClass')]
         ['A4', 'D4', 'E4', 'D#4']
@@ -1426,7 +1426,7 @@ class ConcreteScale(Scale):
 
         * Changed in v6: changing `.abstract` is now allowed.
         '''
-        # copy before returning? (No... too slow)
+        # copy before returning? (No, it is too slow)
         return self._abstract
 
     @abstract.setter
@@ -1537,7 +1537,7 @@ class ConcreteScale(Scale):
         for e in streamObj.recurse().notes:  # get notes and chords
             if e.isChord:
                 elementPitches = e.pitches
-            else:  # simulate a lost
+            else:  # simulate a list
                 elementPitches = [e.pitch]
 
             # store a list of reset chord pitches
@@ -1899,7 +1899,7 @@ class ConcreteScale(Scale):
             alterDiff = pitchAlter - foundAlter
 
             if alterDiff == 0:
-                # should not happen...
+                # should not happen
                 return (scaleStepNormal, None)
             else:
                 alterAccidental = pitch.Accidental(alterDiff)
@@ -2148,7 +2148,7 @@ class ConcreteScale(Scale):
             else:
                 raise ScaleException('direction cannot be zero')
         else:  # when direction is a string, use scalar of 1
-            stepScalar = 1  # stepSize is still used...
+            stepScalar = 1  # stepSize is still used
             directionEnum = direction
 
         # pick reverse direction for neighbor
@@ -3158,7 +3158,7 @@ class SieveScale(ConcreteScale):
 
     OMIT_FROM_DOCS
 
-    Test that an empty SieveScale can be created...
+    Test that an empty SieveScale can be created:
 
     >>> sc = scale.SieveScale()
     '''

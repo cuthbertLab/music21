@@ -46,7 +46,7 @@ class DirectoryInformation(prebase.ProtoM21Object):
         return str(self.directoryName)
 
     def findWorks(self):
-        '''
+        r'''
         Populate other information about the directory such as
         files and filenames.
 
@@ -65,6 +65,9 @@ class DirectoryInformation(prebase.ProtoM21Object):
                                                         format='musicxml',
                                                         ext='.mxl')],
                                     virtual=False))])
+
+        (The ellipses in the documentation above represent '/' on Mac/Unix systems and
+        '\' on Windows.)
         '''
         self.works.clear()
         works = self.corpusObject.getComposer(self.directoryName)

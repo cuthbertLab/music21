@@ -6,16 +6,16 @@
 # Authors:      Christopher Ariza
 #               Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2009-2023 Michael Scott Asato Cuthbert
+# Copyright:    Copyright © 2009-2024 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # -----------------------------------------------------------------------------
 from __future__ import annotations
 
-import collections
 import fractions
 from functools import lru_cache
 import math
 import re
+import typing as t
 
 from music21 import common
 from music21.common.enums import MeterDivision
@@ -24,14 +24,18 @@ from music21.exceptions21 import MeterException, Music21Exception, TimeSignature
 
 environLocal = environment.Environment('meter.tools')
 
-MeterTerminalTuple = collections.namedtuple('MeterTerminalTuple',
-                                            ['numerator', 'denominator', 'division'])
+class MeterTerminalTuple(t.NamedTuple):
+    numerator: int
+    denominator: int
+    division: MeterDivision
+
+
 NumDenom = tuple[int, int]
 NumDenomTuple = tuple[NumDenom, ...]
 MeterOptions = tuple[tuple[str, ...], ...]
 
-validDenominators = [1, 2, 4, 8, 16, 32, 64, 128]  # in order
-validDenominatorsSet = set(validDenominators)
+validDenominators = (1, 2, 4, 8, 16, 32, 64, 128)  # in order
+validDenominatorsSet = frozenset(validDenominators)
 
 
 @lru_cache(512)
@@ -51,13 +55,16 @@ def slashToTuple(value: str) -> MeterTerminalTuple:
     valueNumbers, valueChars = common.getNumFromStr(value,
                                                     numbers='0123456789/.')
     valueNumbers = valueNumbers.strip()  # remove whitespace
-    valueChars = valueChars.strip()  # remove whitespace
-    if 'slow' in valueChars.lower():
-        division = MeterDivision.SLOW
-    elif 'fast' in valueChars.lower():
-        division = MeterDivision.FAST
+    if not valueChars:
+        division = MeterDivision.NONE  # speed up most common case
     else:
-        division = MeterDivision.NONE
+        valueChars = valueChars.strip()  # remove whitespace
+        if 'slow' in valueChars.lower():
+            division = MeterDivision.SLOW
+        elif 'fast' in valueChars.lower():
+            division = MeterDivision.FAST
+        else:
+            division = MeterDivision.NONE
 
     matches = re.match(r'(\d+)/(\d+)', valueNumbers)
     if matches is not None:
@@ -134,8 +141,7 @@ def slashMixedToFraction(valueSrc: str) -> tuple[NumDenomTuple, bool]:
     '''
     pre: list[NumDenom|tuple[int, None]] = []
     summedNumerator = False
-    value = valueSrc.strip()  # rem whitespace
-    value = value.split('+')
+    value = valueSrc.strip().split('+')
     for part in value:
         if '/' in part:
             try:
@@ -144,7 +150,7 @@ def slashMixedToFraction(valueSrc: str) -> tuple[NumDenomTuple, bool]:
                 raise TimeSignatureException(
                     f'Cannot create time signature from "{valueSrc}"') from me
             pre.append((tup.numerator, tup.denominator))
-        else:  # its just a numerator
+        else:  # it is just a numerator
             try:
                 pre.append((int(part), None))
                 summedNumerator = True
@@ -153,7 +159,7 @@ def slashMixedToFraction(valueSrc: str) -> tuple[NumDenomTuple, bool]:
                     'Cannot parse this file -- this error often comes '
                     + 'up if the musicxml pickled file is out of date after a change '
                     + 'in musicxml/__init__.py . '
-                    + 'Clear your temp directory of .p and .p.gz files and try again...; '
+                    + 'Clear your temp directory of .p and .p.gz files and try again. '
                     + f'Time Signature: {valueSrc} ')
 
     post: list[NumDenom] = []
@@ -243,7 +249,7 @@ def fractionSum(numDenomTuple: NumDenomTuple) -> NumDenom:
     if len(dListUnique) == 1:
         n = sum(nList)
         d = dList[0]
-        # Does not reduce to lowest terms...
+        # Does not reduce to lowest terms
         return (n, d)
     else:  # there might be a better way to do this
         dRed = math.lcm(*dListUnique)
@@ -258,7 +264,7 @@ def fractionSum(numDenomTuple: NumDenomTuple) -> NumDenom:
 def proportionToFraction(value: float) -> NumDenom:
     '''
     Given a floating point proportional value between 0 and 1, return the
-    best-fit slash-base fraction
+    best-fit slash-base fraction up to 16.
 
     >>> from music21.meter.tools import proportionToFraction
     >>> proportionToFraction(0.5)
@@ -286,7 +292,7 @@ def proportionToFraction(value: float) -> NumDenom:
 # load common meter templates into this sequence
 # no need to cache these -- getPartitionOptions is cached
 
-def divisionOptionsFractionsUpward(n, d) -> tuple[str, ...]:
+def divisionOptionsFractionsUpward(n: int, d: int) -> tuple[str, ...]:
     '''
     This simply gets restatements of the same fraction in smaller units,
     up to the largest valid denominator.
@@ -310,7 +316,7 @@ def divisionOptionsFractionsUpward(n, d) -> tuple[str, ...]:
     return tuple(opts)
 
 
-def divisionOptionsFractionsDownward(n, d) -> tuple[str, ...]:
+def divisionOptionsFractionsDownward(n: int, d: int) -> tuple[str, ...]:
     '''
     Get restatements of the same fraction in larger units
 
@@ -334,7 +340,7 @@ def divisionOptionsFractionsDownward(n, d) -> tuple[str, ...]:
     return tuple(opts)
 
 
-def divisionOptionsAdditiveMultiplesDownward(n, d) -> MeterOptions:
+def divisionOptionsAdditiveMultiplesDownward(n: int, d: int) -> MeterOptions:
     '''
     >>> meter.tools.divisionOptionsAdditiveMultiplesDownward(1, 16)
     (('1/32', '1/32'), ('1/64', '1/64', '1/64', '1/64'),
@@ -352,7 +358,7 @@ def divisionOptionsAdditiveMultiplesDownward(n, d) -> MeterOptions:
     return tuple(opts)
 
 
-def divisionOptionsAdditiveMultiples(n, d) -> MeterOptions:
+def divisionOptionsAdditiveMultiples(n: int, d: int) -> MeterOptions:
     '''
     Additive multiples with the same denominators.
 
@@ -375,7 +381,7 @@ def divisionOptionsAdditiveMultiples(n, d) -> MeterOptions:
     return tuple(opts)
 
 
-def divisionOptionsAdditiveMultiplesEvenDivision(n, d):
+def divisionOptionsAdditiveMultiplesEvenDivision(n: int, d: int) -> tuple[tuple[str, ...], ...]:
     '''
     >>> meter.tools.divisionOptionsAdditiveMultiplesEvenDivision(4, 16)
     (('1/8', '1/8'),)
@@ -399,7 +405,7 @@ def divisionOptionsAdditiveMultiplesEvenDivision(n, d):
     return tuple(opts)
 
 
-def divisionOptionsAdditiveMultiplesUpward(n, d) -> MeterOptions:
+def divisionOptionsAdditiveMultiplesUpward(n: int, d: int) -> MeterOptions:
     '''
     >>> meter.tools.divisionOptionsAdditiveMultiplesUpward(4, 16)
     (('1/16', '1/16', '1/16', '1/16'),
@@ -421,13 +427,9 @@ def divisionOptionsAdditiveMultiplesUpward(n, d) -> MeterOptions:
         else:
             nCountLimit = 16
 
-        while True:
-            # place practical limits on number of units to get
-            if dCurrent > validDenominators[-1] or nCount > nCountLimit:
-                break
-            seq = []
-            for j in range(nCount):
-                seq.append(f'{1}/{dCurrent}')
+        # place practical limits on number of units to get
+        while dCurrent <= validDenominators[-1] and nCount <= nCountLimit:
+            seq = [f'1/{dCurrent}'] * nCount
             opts.append(tuple(seq))
             # double count, double denominator
             dCurrent *= 2
@@ -539,14 +541,15 @@ def divisionOptionsAlgo(n, d) -> MeterOptions:
     opts = []
     group: tuple[int, ...]
 
+    # TODO: look at music21j code for more readable version.
+
     # compound meters; 6, 9, 12, 15, 18
     # 9/4, 9/2, 6/2 are all considered compound without d>4
     # if n % 3 == 0 and n > 3 and d > 4:
     if n % 3 == 0 and n > 3:
-        nMod = n / 3
         seq = []
         for j in range(int(n / 3)):
-            seq.append(f'{3}/{d}')
+            seq.append(f'3/{d}')
         opts.append(tuple(seq))
     # odd meters with common groupings
     if n == 5:

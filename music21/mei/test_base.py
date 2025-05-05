@@ -121,7 +121,7 @@ class Test(unittest.TestCase):
         '''
         MeiToM21Converter.run(): that it works
         '''
-        # ha... "test run"... get it?
+        # ha: "test run," get it?
         testConv = base.MeiToM21Converter()
         testConv.documentRoot = mock.MagicMock(spec_set=ETree.Element)
         testConv.documentRoot.find.return_value = 5
@@ -1080,9 +1080,9 @@ class Test(unittest.TestCase):
 
     # -----------------------------------------------------------------------------
     # Tests for noteFromElement()
-    # NOTE: For this TestCase, in the unit tests, if you get...
-    #       AttributeError: 'str' object has no attribute 'call_count'
-    #       ... it means a test failure, because the str should have been a MagicMock but was
+    # NOTE: For this TestCase, in the unit tests, if you get
+    #       "AttributeError: 'str' object has no attribute 'call_count'"
+    #       it means a test failure, because the str should have been a MagicMock but was
     #       replaced with a string by the unit under test.
 
     @mock.patch('music21.note.Note')
@@ -1588,8 +1588,8 @@ class Test(unittest.TestCase):
 
     # -----------------------------------------------------------------------------
     # Tests for chordFromElement()
-    # NOTE: For this TestCase, in the unit tests, if you get...
-    #       AttributeError: 'str' object has no attribute 'call_count'
+    # NOTE: For this TestCase, in the unit tests, if you get
+    #       "AttributeError: 'str' object has no attribute 'call_count'"
     #       ... it means a test failure, because the str should have been a MagicMock but was
     #       replaced with a string by the unit under test.
 
@@ -2531,7 +2531,7 @@ class Test(unittest.TestCase):
                     'clef': mockClef.return_value}
         # attributes on theMockInstrument that should be set by staffDefFromElement()
         # NB: because the part name wasn't recognized by music21, there won't be a part name on the
-        #     Instrument... the only reason we get an Instrument at all is because of @trans.semi
+        #     Instrument.  The only reason we get an Instrument at all is because of @trans.semi
         expectedAttrs = [('transposition', mockTrans.return_value)]  # D3
 
         # 2.) run
@@ -3931,7 +3931,7 @@ class Test(unittest.TestCase):
         # this must match Measure.duration.quarterLength
         # prepare the mock Measure objects returned by mockMeasure
         mockMeasRets = [mock.MagicMock(name=f'Measure {i + 1}') for i in range(4)]
-        expected = mockMeasRets  # finish preparing "expected" below...
+        expected = mockMeasRets  # finish preparing "expected" below
         for meas in mockMeasRets:
             meas.duration = mock.MagicMock(spec_set=duration.Duration)
             meas.duration.quarterLength = 4.0  # must match activeMeter.barDuration.quarterLength
@@ -4056,7 +4056,7 @@ class Test(unittest.TestCase):
 
         # prepare the mock Measure objects returned by mockMeasure
         mockMeasRets = [mock.MagicMock(name=f'Measure {i + 1}') for i in range(4)]
-        expected = mockMeasRets  # finish preparing "expected" below...
+        expected = mockMeasRets  # finish preparing "expected" below
         for meas in mockMeasRets:
             meas.duration = mock.MagicMock(spec_set=duration.Duration)
             meas.duration.quarterLength = base._DUR_ATTR_DICT[None]  # must be _DUR_ATTR_DICT[None]
@@ -4402,7 +4402,7 @@ class Test(unittest.TestCase):
 
         actual = base.scoreFromElement(elem, slurBundle)
 
-        # This is complicated... I'm sorry... but it's a rather detailed test of the whole system,
+        # This is complicated. I'm sorry. But it's a rather detailed test of the whole system,
         # so I hope it's worth it!
         self.assertEqual(2, len(actual.parts))
         self.assertEqual(3, len(actual))  # parts plus "slurBundle"

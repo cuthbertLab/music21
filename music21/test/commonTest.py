@@ -10,7 +10,7 @@
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
-Things that are common to testing...
+Things that are common to testing.
 '''
 from __future__ import annotations
 
@@ -121,8 +121,8 @@ def defaultDoctestSuite(name=None):
         s1 = doctest.DocTestSuite(**keywords)
     return s1
 
-# from testRunner...
-# more silent type...
+# from testRunner
+# more silent type
 
 
 class Music21TestRunner(unittest.runner.TextTestRunner):
@@ -223,7 +223,7 @@ class ModuleGather:
             'timeGraphs.py',
             'timeGraphImportStar.py',
             'multiprocessTest.py',
-            'setup.py',  # somehow got committed once and now screwing things up...
+            'setup.py',  # somehow got committed once and now screwing things up
 
             # 'corpus/virtual.py',  # offline for v.4+
             'figuredBass/examples.py',  # 40 seconds and runs fine
@@ -231,7 +231,7 @@ class ModuleGather:
         ]
 
         self.moduleSkipExtended = self.moduleSkip + [
-            'configure.py',  # runs oddly...
+            'configure.py',  # runs oddly
 
             'testSerialization.py',
             'mptCurses.py',
@@ -256,7 +256,7 @@ class ModuleGather:
             'audioSearch/repetitionGame.py',
             'abcFormat/testFiles.py',
         ]
-        # run these first...
+        # run these first
         self.slowModules = ['metadata/bundles',
                             'metadata/caching',
                             'features',
