@@ -34,6 +34,8 @@ from music21 import exceptions21
 from music21 import prebase
 from music21 import sites
 from music21 import style
+if t.TYPE_CHECKING:
+    from music21 import stream
 
 environLocal = environment.Environment('spanner')
 
@@ -488,7 +490,6 @@ class Spanner(base.Music21Object):
         >>> sl.getSpannedElementIds() == [id(n) for n in [n1, n2, n3, n4, n5]]
         True
         '''
-        from music21 import stream
         elements: list[base.Music21Object] = self.getSpannedElements()
         elOffsets: list[OffsetQL] = []
         elActiveSites: list[stream.Stream] = []
@@ -649,7 +650,6 @@ class Spanner(base.Music21Object):
                 )
 
         if t.TYPE_CHECKING:
-            from music21 import stream
             assert isinstance(searchStream, stream.Stream)
 
         endElement: base.Music21Object|None = self.getLast()
@@ -818,6 +818,11 @@ class PendingAssignmentRef(t.TypedDict):
     offsetInScore: OffsetQL
     staffKey: int
 
+class _SpannerRef(t.TypedDict):
+    # noinspection PyTypedDict
+    spanner: 'Spanner'
+    className: str
+
 class SpannerAnchor(base.Music21Object):
     '''
     A simple Music21Object that can be used to define the beginning or end
@@ -910,6 +915,7 @@ class SpannerBundle(prebase.ProtoM21Object):
         # SpannerBundle as missing a spannedElement; the next obj that meets
         # the class expectation will then be assigned and the spannedElement
         # cleared
+        self._pendingSpannedElementAssignment: list[_SpannerRef] = []
         self._pendingFirstSpannedElementAssignment: list[PendingAssignmentRef] = []
 
     def append(self, other: Spanner):
@@ -1341,6 +1347,90 @@ class SpannerBundle(prebase.ProtoM21Object):
         #    at the end.
         return self.getByClass(className).getByIdLocal(
             idLocal).getByCompleteStatus(completeStatus)
+
+    def setPendingSpannedElementAssignment(
+        self,
+        sp: Spanner,
+        className: str,
+    ):
+        '''
+        A SpannerBundle can be set up so that a particular spanner (sp)
+        is looking for an element of class (className) to complete it. Any future
+        element that matches the className which is passed to the SpannerBundle
+        via freePendingSpannedElementAssignment() will get it.
+
+        >>> n1 = note.Note('C')
+        >>> r1 = note.Rest()
+        >>> n2 = note.Note('D')
+        >>> n3 = note.Note('E')
+        >>> su1 = spanner.Slur([n1])
+        >>> sb = spanner.SpannerBundle()
+        >>> sb.append(su1)
+        >>> su1.getSpannedElements()
+        [<music21.note.Note C>]
+
+        >>> n1.getSpannerSites()
+        [<music21.spanner.Slur <music21.note.Note C>>]
+
+        Now set up su1 to get the next note assigned to it.
+
+        >>> sb.setPendingSpannedElementAssignment(su1, 'Note')
+
+        Call freePendingSpannedElementAssignment to attach.
+
+        Should not get a rest, because it is not a 'Note'
+
+        >>> sb.freePendingSpannedElementAssignment(r1)
+        >>> su1.getSpannedElements()
+        [<music21.note.Note C>]
+
+        But will get the next note:
+
+        >>> sb.freePendingSpannedElementAssignment(n2)
+        >>> su1.getSpannedElements()
+        [<music21.note.Note C>, <music21.note.Note D>]
+
+        >>> n2.getSpannerSites()
+        [<music21.spanner.Slur <music21.note.Note C><music21.note.Note D>>]
+
+        And now that the assignment has been made, the pending assignment
+        has been cleared, so n3 will not get assigned to the slur:
+
+        >>> sb.freePendingSpannedElementAssignment(n3)
+        >>> su1.getSpannedElements()
+        [<music21.note.Note C>, <music21.note.Note D>]
+
+        >>> n3.getSpannerSites()
+        []
+
+        '''
+        ref: _SpannerRef = {'spanner': sp, 'className': className}
+        self._pendingSpannedElementAssignment.append(ref)
+
+    def freePendingSpannedElementAssignment(self, spannedElementCandidate):
+        '''
+        Assigns and frees up a pendingSpannedElementAssignment if one is
+        active and the candidate matches the class.  See
+        setPendingSpannedElementAssignment for documentation and tests.
+
+        It is set up via a first-in, first-out priority.
+        '''
+
+        if not self._pendingSpannedElementAssignment:
+            return
+
+        remove = None
+        for i, ref in enumerate(self._pendingSpannedElementAssignment):
+            # environLocal.printDebug(['calling freePendingSpannedElementAssignment()',
+            #    self._pendingSpannedElementAssignment])
+            if ref['className'] in spannedElementCandidate.classSet:
+                ref['spanner'].addSpannedElements(spannedElementCandidate)
+                remove = i
+                # environLocal.printDebug(['freePendingSpannedElementAssignment()',
+                #    'added spannedElement', ref['spanner']])
+                break
+        if remove is not None:
+            self._pendingSpannedElementAssignment.pop(remove)
 
     def setPendingFirstSpannedElementAssignment(
         self,

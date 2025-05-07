@@ -787,8 +787,6 @@ class Test(unittest.TestCase):
                 # check that the spanners start and stop at exactly the same score offset
                 s1StartOffset = s1sp.getFirst().getOffsetInHierarchy(s1)
                 s2StartOffset = s2sp.getFirst().getOffsetInHierarchy(s2)
-                if s1StartOffset != s2StartOffset:
-                    print('hey')
                 self.assertEqual(s1StartOffset, s2StartOffset)
                 s1EndOffset = opFrac(
                     s1sp.getLast().getOffsetInHierarchy(s1) + s1sp.getLast().quarterLength
