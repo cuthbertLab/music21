@@ -799,6 +799,11 @@ class Spanner(base.Music21Object):
 
 # ------------------------------------------------------------------------------
 class PendingAssignmentRef(t.TypedDict):
+    '''
+    An object containing information about a pending first spanned element
+    assignment. See setPendingFirstSpannedElementAssignment for documentation
+    and tests.
+    '''
     # noinspection PyTypedDict
     spanner: 'Spanner'
     className: str
@@ -1427,14 +1432,18 @@ class SpannerBundle(prebase.ProtoM21Object):
         staffKey: int
     ):
         '''
-        A SpannerBundle can be set up so that a particular spanner (sp)
-        is looking for an element of class (className) to complete it. Any future
-        element that matches the className which is passed to the SpannerBundle
-        via freePendingSpannedElementAssignment() will get it.
+        A SpannerBundle can be set up so that a particular spanner (sp) is looking
+        for an element of class (className) to complete it (as first element). Any
+        future element that matches the className and offsetInScore which is passed
+        to the SpannerBundle via freePendingFirstSpannedElementAssignment() will
+        get it.  staffKey is not used in the match, but can be used by the client
+        when cleaning up any leftover pending assignments, by creating SpannerAnchors
+        at the appropriate offset in the specified staff.
 
         >>> n1 = note.Note('C')
         >>> r1 = note.Rest()
         >>> n2 = note.Note('D')
+        >>> n2Wrong = note.Note('B')
         >>> n3 = note.Note('E')
         >>> su1 = spanner.Slur([n1])
         >>> sb = spanner.SpannerBundle()
@@ -1450,6 +1459,12 @@ class SpannerBundle(prebase.ProtoM21Object):
         >>> sb.setPendingFirstSpannedElementAssignment(su1, 'Note', 0., 0)
 
         Call freePendingFirstSpannedElementAssignment to attach.
+
+        Should not get a note at the wrong offset.
+
+        >>> sb.freePendingFirstSpannedElementAssignment(n2Wrong, 1.)
+        >>> su1.getSpannedElements()
+        [<music21.note.Note C>]
 
         Should not get a rest, because it is not a 'Note'
 
@@ -1491,9 +1506,9 @@ class SpannerBundle(prebase.ProtoM21Object):
         offsetInScore: OffsetQL
     ):
         '''
-        Assigns and frees up a pendingSpannedElementAssignment if one is
+        Assigns and frees up a pendingFirstSpannedElementAssignment if one is
         active and the candidate matches the class and the offsetInScore.  See
-        setPendingSpannedElementAssignment for documentation and tests.
+        setPendingFirstSpannedElementAssignment for documentation and tests.
 
         It is set up via a first-in, first-out priority.
         '''
@@ -1515,6 +1530,15 @@ class SpannerBundle(prebase.ProtoM21Object):
             self._pendingFirstSpannedElementAssignment.pop(remove)
 
     def popPendingFirstSpannedElementAssignments(self) -> list[PendingAssignmentRef]:
+        '''
+        Removes and returns all pendingFirstSpannedElementAssignments.
+        This can be called when there will be no more calls to
+        freePendingFirstSpannedElementAssignment, and SpannerAnchors
+        need to be created for each remaining pending assignment.
+        The SpannerAnchors should be created at the appropriate offset
+        and staff, dictated by the assignment's offsetInScore and
+        staffKey, respectively.
+        '''
         output: list[PendingAssignmentRef] = self._pendingFirstSpannedElementAssignment
         self._pendingFirstSpannedElementAssignment = []
         return output
