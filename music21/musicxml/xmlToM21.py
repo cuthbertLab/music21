@@ -4517,20 +4517,24 @@ class MeasureParser(SoundTagMixin, XMLParserBase):
                 su.placement = placement
             self.spannerBundle.append(su)
 
+        if target is None:
+            return su
+
         # add a reference of this note to this spanner
-        priorLength = len(su)
-        if target is not None:
-            typeAttr = mxObj.get('type')
+        typeAttr = mxObj.get('type')
+        if typeAttr in ('start', 'stop'):
+            priorLength = len(su)
             if typeAttr == 'start':
                 su.insertFirstSpannedElement(target)
                 synchronizeIds(mxObj, su)
             elif typeAttr == 'stop':
                 su.addSpannedElements(target)
+            if priorLength == 1:
+                su.completeStatus = True
+                # only add after complete
+
         # environLocal.printDebug(['adding n', target, id(target), 'su.getSpannedElements',
         #     su.getSpannedElements(), su.getSpannedElementIds()])
-        if priorLength == 1:
-            su.completeStatus = True
-            # only add after complete
 
         return su
 
