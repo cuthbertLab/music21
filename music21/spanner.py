@@ -490,27 +490,14 @@ class Spanner(base.Music21Object):
         >>> sl.getSpannedElementIds() == [id(n) for n in [n1, n2, n3, n4, n5]]
         True
         '''
-        elements: list[base.Music21Object] = self.getSpannedElements()
-        elOffsets: list[OffsetQL] = []
-        elActiveSites: list[stream.Stream] = []
-        for el in elements:
-            elOffsets.append(el.offset)
-            elActiveSites.append(el.activeSite)
-
-        # remove them all
-        for el in elements:
-            self.spannerStorage.remove(el)
-
-        # add firstEl first
         self.addSpannedElements(firstEl)
 
-        # add all the rest in order
-        self.addSpannedElements(elements)
-
-        # restore all elements' activeSite and offset
-        for el, elOffset, elActiveSite in zip(elements, elOffsets, elActiveSites):
-            el.activeSite = elActiveSite
-            el.offset = elOffset
+        # now move it from last to first element (if it is not last element,
+        # it was already in the spanner, and this API is a no-op).
+        if self.spannerStorage.elements[-1] is firstEl:
+            self.spannerStorage.elements = (
+                (firstEl,) + self.spannerStorage.elements[:-1]
+            )
 
     def hasSpannedElement(self, spannedElement: base.Music21Object) -> bool:
         '''
