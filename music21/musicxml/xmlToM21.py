@@ -5192,8 +5192,8 @@ class MeasureParser(SoundTagMixin, XMLParserBase):
         <music21.pitch.Pitch D-3>
         '''
         # TODO: musicxml 4: attr: arrangement -- C/E or C over E etc.
-        # TODO: offset
-        # Element staff is covered by insertCoreAndReference in xmlHarmony()
+        # Element offset is covered by xmlHarmony(), which calls this.
+        # Element staff is also covered by insertCoreAndReference in xmlHarmony()
         b: pitch.Pitch|None = None
         r: pitch.Pitch|None = None
         inversion: int|None = None
@@ -5206,7 +5206,7 @@ class MeasureParser(SoundTagMixin, XMLParserBase):
 
         mxFrame = mxHarmony.find('frame')
 
-        mxBass = mxHarmony.find('bass')
+        mxBass: ET.Element | None = mxHarmony.find('bass')
         if mxBass is not None:
             # required
             bassStep = mxBass.find('bass-step')

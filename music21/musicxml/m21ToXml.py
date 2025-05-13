@@ -5951,7 +5951,6 @@ class MeasureExporter(XMLExporterBase):
         self.setPrintStyle(mxHarmony, cs)
 
         csRoot = cs.root()
-        csBass = cs.bass(find=False)
         # TODO: do not look at ._attributes
         if cs._roman is not None:
             mxFunction = SubElement(mxHarmony, 'function')
@@ -5994,6 +5993,9 @@ class MeasureExporter(XMLExporterBase):
             mxInversion = SubElement(mxHarmony, 'inversion')
             mxInversion.text = str(csInv)
 
+        # first -- go with the already defined bass, from overrides, etc.
+        # but if that is not defined, then find the bass itself.
+        csBass = cs.bass(find=False) or cs.bass(find=True)
         if csBass is not None and (csRoot is None or csRoot.name != csBass.name):
             # TODO.. reuse above from Root
             mxBass = SubElement(mxHarmony, 'bass')
