@@ -1536,6 +1536,27 @@ class Test(unittest.TestCase):
         self.assertEqual(len(note_ons), 3)
         self.assertEqual([ev.pitch for ev in note_ons], [67, 60, 60])
 
+    def testMidiImportLyrics(self):
+        lyricFactZh = ["明", "山", "涌", "水", "郁", "郁", "葱", "", "葱",
+                        "钟", "灵", "毓", "秀", "海", "天", "", "东", 
+                        "济", "济", "多", "士", "四", "方", "所", "", "崇", 
+                        "早", "", "育", "", "文", "明", "", "种"]
+        lyricFactKo = ["빛", "날", "세", "라", "영", "웅", "열", "", "사",
+                        "만", "세", "불", "망", "하", "실", "", "이",
+                        "옛", "적", "이", "나", "지", "금", "이", "", "나",
+                        "항", "상", "앙", "모", "합", "니", "", "다"]
+        testCases = [
+            ("test18.mid", "utf-8", lyricFactZh),
+            ("test19.mid", "gbk", lyricFactZh),
+            ("test20.mid", "utf-8", lyricFactKo),
+            ("test21.mid", "euc-kr", lyricFactKo),
+        ]
+        for (filename, encoding, lyricFact) in testCases:
+            fp = common.getSourceFilePath() / 'midi' / 'testPrimitive' / filename
+            s = converter.parse(fp, encoding_type = encoding)
+            
+            for (note, lyric) in zip(s.flat.notes, lyricFact):
+                self.assertEqual(note.lyric, lyric)
 
 # ------------------------------------------------------------------------------
 if __name__ == '__main__':
