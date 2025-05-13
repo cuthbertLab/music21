@@ -5555,37 +5555,41 @@ class MeasureExporter(XMLExporterBase):
 
         Called from articulationToXmlTechnical
 
-        >>> MEXClass = musicxml.m21ToXml.MeasureExporter
+        >>> from xml.etree.ElementTree import Element
+        >>> from fractions import Fraction
+
+        >>> MEXclass = musicxml.m21ToXml.MeasureExporter
 
         >>> a = articulations.FretBend(bendAlter=interval.Interval(2))
-
-        >>> from xml.etree.ElementTree import Element
         >>> mxh = Element('bend')
-
-        >>> MEXclass.setbend(mxh, a)
+        >>> MEXclass.setBend(mxh, a)
         >>> MEXclass.dump(mxh)
         <bend>
           <bend-alter>2</bend-alter>
         </bend>
-        >>> a.pre-bend = True
-        >>> MEXclass.setbend(mxh, a)
+        >>> mxh = Element('bend')
+        >>> a = articulations.FretBend(bendAlter=interval.Interval(2))
+        >>> a.preBend = True
+        >>> MEXclass.setBend(mxh, a)
         >>> MEXclass.dump(mxh)
         <bend>
           <bend-alter>2</bend-alter>
-          <pre-bend/>
+          <pre-bend />
         </bend>
-        >>> a = articulations.FretBend(bendAlter=interval.Interval(-2), release=OffsetQL(1, 10080))
-        >>> MEXclass.setbend(mxh, a)
+        >>> mxh = Element('bend')
+        >>> a = articulations.FretBend(bendAlter=interval.Interval(-2), release=Fraction(1, 10080))
+        >>> MEXclass.setBend(mxh, a)
         >>> MEXclass.dump(mxh)
         <bend>
           <bend-alter>-2</bend-alter>
-          <release offset='1'>
+          <release offset="1" />
         </bend>
+        >>> mxh = Element('bend')
         >>> a = articulations.FretBend(bendAlter=interval.Interval(-2), withBar='scoop')
-        >>> MEXclass.setbend(mxh, a)
+        >>> MEXclass.setBend(mxh, a)
         >>> MEXclass.dump(mxh)
         <bend>
-          <bend-alter>1</bend-alter>
+          <bend-alter>-2</bend-alter>
           <with-bar>scoop</with-bar>
         </bend>
         '''
