@@ -603,8 +603,8 @@ class FretBend(FretIndication):
     <music21.articulations.FretBend 1>
     >>> fb.preBend
     False
-    >>> fb.withBar
-    
+    >>> fb.withBar is None
+    True
     >>> fb.bendAlter
     <music21.interval.ChromaticInterval -2>
     >>> fb.release 
