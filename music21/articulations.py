@@ -609,7 +609,7 @@ class FretBend(FretIndication):
     True
     >>> fb.bendAlter
     <music21.interval.ChromaticInterval -2>
-    >>> fb.release 
+    >>> fb.release
     0.5
     '''
     bendAlter: interval.Interval | interval.ChromaticInterval | None
