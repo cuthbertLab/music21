@@ -81,6 +81,7 @@ import unittest
 from music21 import base
 from music21 import common
 from music21.common.classTools import tempAttribute
+from music21.common.types import OffsetQL
 from music21 import environment
 from music21 import interval
 from music21 import spanner
