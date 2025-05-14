@@ -5531,6 +5531,8 @@ class MeasureExporter(XMLExporterBase):
                 assert isinstance(articulationMark, articulations.FretIndication)
             mxTechnicalMark.text = str(articulationMark.number)
         if musicXMLTechnicalName == 'bend':
+            if t.TYPE_CHECKING:
+                assert isinstance(articulationMark, articulations.FretBend)
             self.setBend(mxTechnicalMark, articulationMark)
         # harmonic needs to check for whether it is artificial or natural, and
         # whether it is base-pitch, sounding-pitch, or touching-pitch
