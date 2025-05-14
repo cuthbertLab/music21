@@ -586,19 +586,19 @@ class FretBend(FretIndication):
 
     Bend in musicxml
 
-    Number is an identifier for the articulation. Defaults to 0.
+    `number` is an identifier for the articulation. Defaults to 0.
 
-    BendAlter is the interval of the bend in number of semitones,
-    bend-alter in musicxml. Defaults to None.
+    `bendAlter` is the interval defined by the bend,
+    bend-alter in musicxml. Defaults to `None`.
 
-    PreBend indicates if the string is bent before
-    the onset of the note. Defaults to False.
+    `preBend` indicates if the string is bent before
+    the onset of the note. Defaults to `False`.
 
-    Release is the quarterLength value from the start
-    of the note for releasing the bend, if Any. Defaults to None.
+    `release` is the quarterLength value from the start
+    of the note for releasing the bend, if any. Defaults to `None`.
 
     `withBar` indicates what whammy bar movement is used, if any.
-    MusicXML supports 'scoop' or 'dip'. Defaults to None.
+    MusicXML supports 'scoop' or 'dip'. Defaults to `None`.
 
     >>> fb = articulations.FretBend(1, bendAlter=interval.ChromaticInterval(-2),  release=0.5)
     >>> fb
