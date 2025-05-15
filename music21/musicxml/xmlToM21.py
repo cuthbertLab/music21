@@ -2593,14 +2593,17 @@ class MeasureParser(SoundTagMixin, XMLParserBase):
         # Get any pending first spanned elements that weren't found immediately following
         # the "start" of a spanner.
         leftOverPendingFirstSpannedElements: list[spanner.PendingAssignmentRef] = (
-            self.spannerBundle.popPendingFirstSpannedElementAssignments()
+            self.spannerBundle.popPendingSpannedElementAssignments()
         )
         for pfse in leftOverPendingFirstSpannedElements:
             # Note that these are all start elements, so we can't just
             # addSpannedElement, we need to insertFirstSpannedElement.
             sp: spanner.Spanner = pfse['spanner']
-            offsetInScore: OffsetQL = pfse['offsetInScore']
-            staffKey: int = pfse['staffKey']
+            offsetInScore: OffsetQL|None = pfse['offsetInScore']
+            staffKey: t.Any|None = pfse['clientInfo']
+            if t.TYPE_CHECKING:
+                assert isinstance(offsetInScore, OffsetQL)
+                assert isinstance(staffKey, int)
             startAnchor = spanner.SpannerAnchor()
             offsetInMeasure: OffsetQL = opFrac(offsetInScore - self.measureOffsetInScore)
             self.insertCoreAndRef(offsetInMeasure, staffKey, startAnchor)
@@ -2903,7 +2906,7 @@ class MeasureParser(SoundTagMixin, XMLParserBase):
             n.articulations = []
             n.expressions = []
 
-        self.spannerBundle.freePendingFirstSpannedElementAssignment(
+        self.spannerBundle.freePendingSpannedElementAssignment(
             c,
             opFrac(self.measureOffsetInScore + self.offsetMeasureNote)
         )
@@ -3471,7 +3474,7 @@ class MeasureParser(SoundTagMixin, XMLParserBase):
         '''
         spannerBundle = self.spannerBundle
         if freeSpanners is True:
-            spannerBundle.freePendingFirstSpannedElementAssignment(
+            spannerBundle.freePendingSpannedElementAssignment(
                 n,
                 opFrac(self.measureOffsetInScore + self.offsetMeasureNote)
             )
@@ -4214,7 +4217,7 @@ class MeasureParser(SoundTagMixin, XMLParserBase):
 
             if mType != 'stop':
                 sp = self.xmlOneSpanner(mxObj, None, spClass, allowDuplicateIds=True)
-                self.spannerBundle.setPendingFirstSpannedElementAssignment(
+                self.spannerBundle.setPendingSpannedElementAssignment(
                     sp,
                     'GeneralNote',
                     opFrac(self.measureOffsetInScore + totalOffset),
@@ -4253,7 +4256,7 @@ class MeasureParser(SoundTagMixin, XMLParserBase):
                     sp.startTick = mxObj.get('line-end')
                     sp.lineType = mxObj.get('line-type')  # redundant with setLineStyle()
 
-                self.spannerBundle.setPendingFirstSpannedElementAssignment(
+                self.spannerBundle.setPendingSpannedElementAssignment(
                     sp,
                     'GeneralNote',
                     opFrac(self.measureOffsetInScore + totalOffset),
@@ -4313,7 +4316,7 @@ class MeasureParser(SoundTagMixin, XMLParserBase):
                     sp.placement = 'above'
                 sp.idLocal = idFound
                 sp.type = (mxSize or 8, m21Type)
-                self.spannerBundle.setPendingFirstSpannedElementAssignment(
+                self.spannerBundle.setPendingSpannedElementAssignment(
                     sp,
                     'GeneralNote',
                     opFrac(self.measureOffsetInScore + totalOffset),
@@ -4367,7 +4370,7 @@ class MeasureParser(SoundTagMixin, XMLParserBase):
                 if mxAbbreviated == 'yes':
                     sp.abbreviated = True
 
-                self.spannerBundle.setPendingFirstSpannedElementAssignment(
+                self.spannerBundle.setPendingSpannedElementAssignment(
                     sp,
                     'GeneralNote',
                     opFrac(self.measureOffsetInScore + totalOffset),
