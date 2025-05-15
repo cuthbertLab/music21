@@ -769,6 +769,7 @@ class MusicXMLImporter(XMLParserBase):
         self.parts = []
 
         self.musicXmlVersion = defaults.musicxmlVersion
+        self.wasWrittenByFinale = False
 
     def scoreFromFile(self, filename):
         '''
@@ -1326,9 +1327,17 @@ class MusicXMLImporter(XMLParserBase):
         # TODO: encoder (text + type = role) multiple
         # TODO: encoding date multiple
         # TODO: encoding-description (string) multiple
+        finaleFound: bool = False
+        nonFinaleFound: bool = False
         for software in encoding.findall('software'):
             if softwareText := strippedText(software):
+                if 'Finale' in softwareText:
+                    finaleFound = True
+                else:
+                    nonFinaleFound = True
                 md.add('software', softwareText)
+        if finaleFound and not nonFinaleFound:
+            self.wasWrittenByFinale = True
 
         for supports in encoding.findall('supports'):
             # todo: element: required
@@ -2575,16 +2584,7 @@ class MeasureParser(SoundTagMixin, XMLParserBase):
 
         if self.useVoices is True:
             for v in self.stream.iter().voices:
-                if v:  # do not bother with empty voices
-                    # the musicDataMethods use insertCore, thus the voices need to run
-                    # coreElementsChanged
-                    v.coreElementsChanged()
-                    # Fill mid-measure gaps, and find end of measure gaps by ref to measure stream
-                    # https://github.com/cuthbertlab/music21/issues/444
-                    v.makeRests(refStreamOrTimeRange=self.stream,
-                                fillGaps=True,
-                                inPlace=True,
-                                hideRests=True)
+                v.coreElementsChanged()
         self.stream.coreElementsChanged()
 
         if (self.restAndNoteCount['rest'] == 1
@@ -2630,18 +2630,19 @@ class MeasureParser(SoundTagMixin, XMLParserBase):
         if durationText := strippedText(mxDuration):
             change = opFrac(float(durationText) / self.divisions)
 
-            # Create hidden rest (in other words, a spacer)
-            # old Finale documents close incomplete final measures with <forward>
-            # this will be removed afterward by removeEndForwardRest()
-            r = note.Rest(quarterLength=change)
-            r.style.hideObjectOnPrint = True
-            self.addToStaffReference(mxObj, r)
-            self.insertInMeasureOrVoice(mxObj, r)
+            if self.parent.parent.wasWrittenByFinale:
+                # Create hidden rest (in other words, a spacer)
+                # old Finale documents close incomplete final measures with <forward>
+                # this will be removed afterward by removeEndForwardRest()
+                r = note.Rest(quarterLength=change)
+                r.style.hideObjectOnPrint = True
+                self.addToStaffReference(mxObj, r)
+                self.insertInMeasureOrVoice(mxObj, r)
+                # xmlToNote() sets None
+                self.endedWithForwardTag = r
 
             # Allow overfilled measures for now -- TODO(someday): warn?
             self.offsetMeasureNote += change
-            # xmlToNote() sets None
-            self.endedWithForwardTag = r
 
     def xmlPrint(self, mxPrint: ET.Element):
         '''
