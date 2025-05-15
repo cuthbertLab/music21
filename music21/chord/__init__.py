@@ -2318,7 +2318,7 @@ class Chord(ChordBase):
         *,
         find: bool = True,
         testRoot: pitch.Pitch|None = None,
-        transposeOnSet: bool = True
+        transposeOnSet: bool = True,
     ) -> int|None:
         '''
         Find the chord's inversion or (if called with a number) set the chord to
@@ -2393,7 +2393,6 @@ class Chord(ChordBase):
         Traceback (most recent call last):
         music21.chord.ChordException: Could not invert chord: inversion may not exist
 
-
         If testRoot is True then that temporary root is used instead of self.root().
 
         Get the inversion for a seventh chord showing different roots
@@ -2430,7 +2429,7 @@ class Chord(ChordBase):
         sets the value to be returned later, which might be useful for
         cases where the chords are poorly spelled, or there is an added note.
 
-        * Changed in v8: chords without pitches
+        * Changed in v8: deal with chords without pitches
         '''
         if not self.pitches:
             return -1
@@ -2460,11 +2459,12 @@ class Chord(ChordBase):
         else:
             return -1
 
-    def _setInversion(self,
-                      newInversion: int,
-                      rootPitch: pitch.Pitch,
-                      transposeOnSet: bool
-                      ) -> None:
+    def _setInversion(
+        self,
+        newInversion: int,
+        rootPitch: pitch.Pitch,
+        transposeOnSet: bool,
+    ) -> None:
         '''
         Helper function for inversion(int)
         '''

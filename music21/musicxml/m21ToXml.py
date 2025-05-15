@@ -5473,11 +5473,18 @@ class MeasureExporter(XMLExporterBase):
         >>> mxOther = MEX.articulationToXmlTechnical(g)
         >>> MEX.dump(mxOther)
         <other-technical>unda maris</other-technical>
+
+        Same with technical marks not yet supported.
+        TODO: support HammerOn, PullOff, Hole, Arrow.
+
+        >>> h = articulations.HammerOn()
+        >>> mxOther = MEX.articulationToXmlTechnical(h)
+        >>> MEX.dump(mxOther)
+        <other-technical />
         '''
         # these technical have extra information
         # TODO: hammer-on
         # TODO: pull-off
-        # TODO: bend
         # TODO: hole
         # TODO: arrow
         musicXMLTechnicalName = None
@@ -5489,7 +5496,7 @@ class MeasureExporter(XMLExporterBase):
             musicXMLTechnicalName = 'other-technical'
 
         # TODO: support additional technical marks listed above
-        if musicXMLTechnicalName in ('bend', 'hole', 'arrow'):
+        if musicXMLTechnicalName in ('hole', 'arrow'):
             musicXMLTechnicalName = 'other-technical'
 
         mxTechnicalMark = Element(musicXMLTechnicalName)
@@ -5523,7 +5530,10 @@ class MeasureExporter(XMLExporterBase):
             if t.TYPE_CHECKING:
                 assert isinstance(articulationMark, articulations.FretIndication)
             mxTechnicalMark.text = str(articulationMark.number)
-
+        if musicXMLTechnicalName == 'bend':
+            if t.TYPE_CHECKING:
+                assert isinstance(articulationMark, articulations.FretBend)
+            self.setBend(mxTechnicalMark, articulationMark)
         # harmonic needs to check for whether it is artificial or natural, and
         # whether it is base-pitch, sounding-pitch, or touching-pitch
         if musicXMLTechnicalName == 'harmonic':
@@ -5538,6 +5548,67 @@ class MeasureExporter(XMLExporterBase):
         self.setPrintStyle(mxTechnicalMark, articulationMark)
         # mxArticulations.append(mxArticulationMark)
         return mxTechnicalMark
+
+    @staticmethod
+    def setBend(mxh: Element, bend: articulations.FretBend) -> None:
+        '''
+        Sets the bend-alter SubElement and the pre-bend,
+        release and with-bar SubElements when present.
+
+        Called from articulationToXmlTechnical
+
+        >>> from xml.etree.ElementTree import Element
+        >>> from fractions import Fraction
+
+        >>> MEXclass = musicxml.m21ToXml.MeasureExporter
+
+        >>> a = articulations.FretBend(bendAlter=interval.Interval(2))
+        >>> mxh = Element('bend')
+        >>> MEXclass.setBend(mxh, a)
+        >>> MEXclass.dump(mxh)
+        <bend>
+          <bend-alter>2</bend-alter>
+        </bend>
+        >>> mxh = Element('bend')
+        >>> a = articulations.FretBend(bendAlter=interval.Interval(2))
+        >>> a.preBend = True
+        >>> MEXclass.setBend(mxh, a)
+        >>> MEXclass.dump(mxh)
+        <bend>
+          <bend-alter>2</bend-alter>
+          <pre-bend />
+        </bend>
+        >>> mxh = Element('bend')
+        >>> a = articulations.FretBend(bendAlter=interval.Interval(-2), release=Fraction(1, 10080))
+        >>> MEXclass.setBend(mxh, a)
+        >>> MEXclass.dump(mxh)
+        <bend>
+          <bend-alter>-2</bend-alter>
+          <release offset="1" />
+        </bend>
+        >>> mxh = Element('bend')
+        >>> a = articulations.FretBend(bendAlter=interval.Interval(-2), withBar='scoop')
+        >>> MEXclass.setBend(mxh, a)
+        >>> MEXclass.dump(mxh)
+        <bend>
+          <bend-alter>-2</bend-alter>
+          <with-bar>scoop</with-bar>
+        </bend>
+        '''
+        bendAlterSubElement = SubElement(mxh, 'bend-alter')
+        alter = bend.bendAlter
+        if alter is not None:
+            bendAlterSubElement.text = str(alter.semitones)
+        if bend.preBend:
+            SubElement(mxh, 'pre-bend')
+        if bend.release is not None:
+            releaseSubElement = SubElement(mxh, 'release')
+            quarterLengthValue = bend.release
+            divisionsValue = int(defaults.divisionsPerQuarter * quarterLengthValue)
+            releaseSubElement.set('offset', str(divisionsValue))
+        if bend.withBar is not None:
+            withBarSubElement = SubElement(mxh, 'with-bar')
+            withBarSubElement.text = str(bend.withBar)
 
     @staticmethod
     def setHarmonic(mxh: Element, harm: articulations.StringHarmonic) -> None:
@@ -5951,7 +6022,6 @@ class MeasureExporter(XMLExporterBase):
         self.setPrintStyle(mxHarmony, cs)
 
         csRoot = cs.root()
-        csBass = cs.bass(find=False)
         # TODO: do not look at ._attributes
         if cs._roman is not None:
             mxFunction = SubElement(mxHarmony, 'function')
@@ -5994,6 +6064,9 @@ class MeasureExporter(XMLExporterBase):
             mxInversion = SubElement(mxHarmony, 'inversion')
             mxInversion.text = str(csInv)
 
+        # first -- go with the already defined bass, from overrides, etc.
+        # but if that is not defined, then find the bass itself.
+        csBass = cs.bass(find=False) or cs.bass(find=True)
         if csBass is not None and (csRoot is None or csRoot.name != csBass.name):
             # TODO.. reuse above from Root
             mxBass = SubElement(mxHarmony, 'bass')

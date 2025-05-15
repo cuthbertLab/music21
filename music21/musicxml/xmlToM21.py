@@ -3866,16 +3866,76 @@ class MeasureParser(SoundTagMixin, XMLParserBase):
             if tag in ('heel', 'toe'):
                 if mxObj.get('substitution') is not None:
                     tech.substitution = xmlObjects.yesNoToBoolean(mxObj.get('substitution'))
+            if tag == 'bend':
+                self.setBend(mxObj, tech)
             # TODO: <bend> attr: accelerate, beats, first-beat, last-beat, shape (4.0)
             # TODO: <bent> sub-elements: bend-alter, pre-bend, with-bar, release
             # TODO: musicxml 4: release sub-element as offset attribute
-
-
             self.setPlacement(mxObj, tech)
             return tech
         else:
             environLocal.printDebug(f'Cannot translate {tag} in {mxObj}.')
             return None
+
+    def setBend(self, mxh, bend):
+        '''
+        Gets the bend amplitude from the bend-alter tag,
+        then optional pre-bend and with-bar tags are processed,
+        as well as release which is converted from divisions to music21 time.
+
+        Called from xmlTechnicalToArticulation
+
+        >>> from xml.etree.ElementTree import fromstring as EL
+        >>> MP = musicxml.xmlToM21.MeasureParser()
+
+        >>> mxTech = EL('<bend><bend-alter>2</bend-alter></bend>')
+        >>> a = MP.xmlTechnicalToArticulation(mxTech)
+        >>> a
+        <music21.articulations.FretBend 0>
+        >>> a.bendAlter.semitones
+        2
+        >>> a.release
+
+        >>> a.withBar
+
+        >>> a.preBend
+        False
+
+        >>> mxTech = EL('<bend><bend-alter>-2</bend-alter><pre-bend/></bend>')
+        >>> a = MP.xmlTechnicalToArticulation(mxTech)
+        >>> a.bendAlter.semitones
+        -2
+        >>> a.preBend
+        True
+
+        >>> mxTech = EL('<bend><bend-alter>-2</bend-alter><release offset="1"/></bend>')
+        >>> a = MP.xmlTechnicalToArticulation(mxTech)
+        >>> a.bendAlter.semitones
+        -2
+        >>> a.release
+        Fraction(1, 10080)
+
+        >>> mxTech = EL('<bend><bend-alter>-1</bend-alter><with-bar>dip</with-bar></bend>')
+        >>> a = MP.xmlTechnicalToArticulation(mxTech)
+        >>> a.bendAlter.semitones
+        -1
+        >>> a.withBar
+        'dip'
+        '''
+        alter = mxh.find('bend-alter')
+        if alter is not None:
+            if alter.text is not None:
+                bend.bendAlter = interval.Interval(float(alter.text))
+        if mxh.find('pre-bend') is not None:
+            bend.preBend = True
+        if mxh.find('with-bar') is not None:
+            bend.withBar = mxh.find('with-bar').text
+        if mxh.find('release') is not None:
+            try:
+                divisions = float(mxh.find('release').get('offset'))
+                bend.release = opFrac(divisions / self.divisions)
+            except (ValueError, TypeError) as unused_err:
+                bend.release = 0.0
 
     @staticmethod
     def setHarmonic(mxh, harm):
@@ -5192,8 +5252,8 @@ class MeasureParser(SoundTagMixin, XMLParserBase):
         <music21.pitch.Pitch D-3>
         '''
         # TODO: musicxml 4: attr: arrangement -- C/E or C over E etc.
-        # TODO: offset
-        # Element staff is covered by insertCoreAndReference in xmlHarmony()
+        # Element offset is covered by xmlHarmony(), which calls this.
+        # Element staff is also covered by insertCoreAndReference in xmlHarmony()
         b: pitch.Pitch|None = None
         r: pitch.Pitch|None = None
         inversion: int|None = None
@@ -5206,7 +5266,7 @@ class MeasureParser(SoundTagMixin, XMLParserBase):
 
         mxFrame = mxHarmony.find('frame')
 
-        mxBass = mxHarmony.find('bass')
+        mxBass: ET.Element | None = mxHarmony.find('bass')
         if mxBass is not None:
             # required
             bassStep = mxBass.find('bass-step')
