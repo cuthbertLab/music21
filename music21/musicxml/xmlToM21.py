@@ -769,6 +769,7 @@ class MusicXMLImporter(XMLParserBase):
         self.parts = []
 
         self.musicXmlVersion = defaults.musicxmlVersion
+        self.wasWrittenByFinale = False
 
     def scoreFromFile(self, filename):
         '''
@@ -1341,9 +1342,17 @@ class MusicXMLImporter(XMLParserBase):
         # TODO: encoder (text + type = role) multiple
         # TODO: encoding date multiple
         # TODO: encoding-description (string) multiple
+        finaleFound: bool = False
+        nonFinaleFound: bool = False
         for software in encoding.findall('software'):
             if softwareText := strippedText(software):
+                if 'Finale' in softwareText:
+                    finaleFound = True
+                else:
+                    nonFinaleFound = True
                 md.add('software', softwareText)
+        if finaleFound and not nonFinaleFound:
+            self.wasWrittenByFinale = True
 
         for supports in encoding.findall('supports'):
             # todo: element: required
@@ -2656,6 +2665,18 @@ class MeasureParser(SoundTagMixin, XMLParserBase):
         mxDuration = mxObj.find('duration')
         if durationText := strippedText(mxDuration):
             change = opFrac(float(durationText) / self.divisions)
+
+            if self.parent.parent.wasWrittenByFinale:
+                # Create hidden rest (in other words, a spacer)
+                # old Finale documents close incomplete final measures with <forward>
+                # this will be removed afterward by removeEndForwardRest()
+                r = note.Rest(quarterLength=change)
+                r.style.hideObjectOnPrint = True
+                self.addToStaffReference(mxObj, r)
+                self.insertInMeasureOrVoice(mxObj, r)
+                # xmlToNote() sets None
+                self.endedWithForwardTag = r
+
             # Allow overfilled measures for now -- TODO(someday): warn?
             self.offsetMeasureNote = opFrac(self.offsetMeasureNote + change)
 
