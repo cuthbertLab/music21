@@ -263,24 +263,29 @@ class Harmony(chord.Chord):
             summary += ' '.join([p.name for p in self.pitches])
         return summary
 
-    # PRIVATE METHODS #
+    # PROTECTED METHODS #
     def _parseFigure(self):
         '''
-        subclass this in extensions (SO WHY IS IT PRIVATE???)
+        subclass this in extensions (protected in TypeScript/Java speak)
         '''
         return
 
     def _updatePitches(self):
         '''
-        subclass this in extensions (SO WHY IS IT PRIVATE???)
+        subclass this in extensions (protected in TypeScript/Java speak)
         '''
         return
 
-    def _updateFromParameters(self, root, bass, inversion: int|None = None):
+    def _updateFromParameters(
+        self,
+        root: str|pitch.Pitch|None,
+        bass: str|pitch.Pitch|None,
+        inversion: int|None = None
+    ) -> None:
         '''
         This method must be called twice, once before the pitches
         are rendered, and once after. This is because after the pitches
-        are rendered, the root() and bass() becomes reset by the chord class,
+        are rendered, the root() and bass() become reset by the chord class,
         but we want the objects to retain their initial root, bass, and inversion.
         '''
         if root and isinstance(root, str):
@@ -288,13 +293,17 @@ class Harmony(chord.Chord):
             self.root(pitch.Pitch(root, octave=3))
         elif root is not None:
             self.root(root)
+
+        # set inversion first...
+        if inversion is not None:
+            self.inversion(inversion, transposeOnSet=True)
+
+        # and then bass.
         if bass and isinstance(bass, str):
             bass = common.cleanedFlatNotation(bass)
             self.bass(pitch.Pitch(bass, octave=3), allow_add=True)
         elif bass is not None:
             self.bass(bass, allow_add=True)
-        if inversion is not None:
-            self.inversion(inversion, transposeOnSet=True)
 
     # PUBLIC PROPERTIES #
 
@@ -1609,7 +1618,7 @@ class ChordSymbol(Harmony):
     # INITIALIZER #
 
     def __init__(self,
-                 figure=None,
+                 figure: str|None = None,
                  root: pitch.Pitch|str|None = None,
                  bass: pitch.Pitch|str|None = None,
                  inversion: int|None = None,
@@ -2473,7 +2482,13 @@ class NoChord(ChordSymbol):
     >>> nc2.pitches
     ()
     '''
-    def __init__(self, figure=None, kind='none', kindStr=None, **keywords):
+    def __init__(
+        self,
+        figure: str|None = None,
+        kind: str|None = 'none',
+        kindStr: str|None = None,
+        **keywords
+    ):
         super().__init__(figure, kind=kind, kindStr=kindStr or figure or 'N.C.', **keywords)
 
         if self._figure is None:
@@ -2654,6 +2669,17 @@ class Test(unittest.TestCase):
         self.assertEqual(root.nameWithOctave, 'C4')
         b = d.bass()
         self.assertEqual(b.nameWithOctave, 'E-3')
+
+    def testHarmonyPreservesInversionAndBass(self):
+        '''
+        Test that bass is preserved even when both bass and inversion are given
+        '''
+        explicitFm6 = ChordSymbol(root='F', bass='A-', inversion=1, kind='minor')
+        self.assertEqual(explicitFm6.inversion(), 1)
+        self.assertEqual(explicitFm6.bass(find=False).name, 'A-')
+        self.assertEqual(explicitFm6.root(find=False).name, 'F')
+        self.assertLess(explicitFm6.bass(find=False).octave,
+                        explicitFm6.root(find=False).octave)
 
     def testClassSortOrderHarmony(self):
         '''
