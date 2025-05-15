@@ -1496,6 +1496,7 @@ class PartParser(XMLParserBase):
         self.lastDivisions: int = defaults.divisionsPerQuarter  # give a default value for testing
 
         self.appendToScoreAfterParse = True
+        self.lastMeasureParser: MeasureParser|None = None
 
     def parse(self) -> None:
         '''
@@ -1784,6 +1785,7 @@ class PartParser(XMLParserBase):
         for mxMeasure in self.mxPart.iterfind('measure'):
             self.xmlMeasureToMeasure(mxMeasure)
 
+        self.removeEndForwardRest()
         part.coreElementsChanged()
 
     def removeEndForwardRest(self):
@@ -1794,9 +1796,20 @@ class PartParser(XMLParserBase):
         remove the rest there (for backwards compatibility, esp.
         since bwv66.6 uses it)
 
-        * New in v7.  Deprecated in v9.7 (not needed, so does nothing. To be removed in v10.0)
+        * New in v7.
         '''
-        return
+        if self.lastMeasureParser is None:  # pragma: no cover
+            return  # should not happen
+        lmp = self.lastMeasureParser
+        self.lastMeasureParser = None  # clean memory
+
+        if lmp.endedWithForwardTag is None:
+            return
+        if lmp.useVoices is True:
+            return
+        endedForwardRest = lmp.endedWithForwardTag
+        if lmp.stream.recurse().notesAndRests.last() is endedForwardRest:
+            lmp.stream.remove(endedForwardRest, recurse=True)
 
     def separateOutPartStaves(self) -> list[stream.PartStaff]:
         '''
@@ -1976,6 +1989,8 @@ class PartParser(XMLParserBase):
                 MusicXMLWarning
             )
             raise e
+
+        self.lastMeasureParser = measureParser
 
         self.maxStaves = max(self.maxStaves, measureParser.staves)
 
