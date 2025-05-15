@@ -853,10 +853,10 @@ class Test(unittest.TestCase):
         '''
         from music21 import corpus
         c = corpus.parse('luca/gloria')
-        sa = c.parts[1].measure(99).getElementsByClass(spanner.SpannerAnchor).first()
-        bracketAttachedToAnchor = sa.getSpannerSites()[0]
-        self.assertIn('Line', bracketAttachedToAnchor.classes)
-        self.assertEqual(bracketAttachedToAnchor.idLocal, '1')
+        r = c.parts[1].measure(99).getElementsByClass(note.Rest).first()
+        bracketAttachedToRest = r.getSpannerSites()[0]
+        self.assertIn('Line', bracketAttachedToRest.classes)
+        self.assertEqual(bracketAttachedToRest.idLocal, '1')
 
         # c.show()
         # c.parts[1].show('t')
