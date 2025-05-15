@@ -201,8 +201,11 @@ class LilypondConverter:
     def setupTools(self):
         LILYEXEC = self.findLilyExec()
         command = [LILYEXEC, '--version']
+        platform = common.getPlatform()
+        creation_flags = subprocess.CREATE_NO_WINDOW if platform == 'win' else 0
         try:
-            with subprocess.Popen(command, stdout=subprocess.PIPE) as proc:
+            with subprocess.Popen(command, stdout=subprocess.PIPE,
+                                  creationflags=creation_flags) as proc:
                 stdout, unused = proc.communicate()
                 stdout = stdout.decode(encoding='utf-8')
                 versionString = stdout.split()[2]
