@@ -869,18 +869,7 @@ class MusicXMLImporter(XMLParserBase):
         s.coreElementsChanged()
         for m in s[stream.Measure]:
             for v in m.voices:
-                if v:  # do not bother with empty voices
-                    # the musicDataMethods use insertCore, thus the voices need to run
-                    # coreElementsChanged
-                    v.coreElementsChanged()
-                    # Fill mid-measure gaps, and find end of measure gaps by ref to measure stream
-                    # https://github.com/cuthbertlab/music21/issues/444
-                    # but only when the score comes from Finale
-                    if any('Finale' in software for software in md.software):
-                        v.makeRests(refStreamOrTimeRange=m,
-                                    fillGaps=True,
-                                    inPlace=True,
-                                    hideRests=True)
+                v.coreElementsChanged()
 
         s.definesExplicitSystemBreaks = self.definesExplicitSystemBreaks
         s.definesExplicitPageBreaks = self.definesExplicitPageBreaks

@@ -853,10 +853,10 @@ class Test(unittest.TestCase):
         '''
         from music21 import corpus
         c = corpus.parse('luca/gloria')
-        sa = c.parts[1].measure(99).getElementsByClass(spanner.SpannerAnchor).first()
-        bracketAttachedToAnchor = sa.getSpannerSites()[0]
-        self.assertIn('Line', bracketAttachedToAnchor.classes)
-        self.assertEqual(bracketAttachedToAnchor.idLocal, '1')
+        r = c.parts[1].measure(99).getElementsByClass(note.Rest).first()
+        bracketAttachedToRest = r.getSpannerSites()[0]
+        self.assertIn('Line', bracketAttachedToRest.classes)
+        self.assertEqual(bracketAttachedToRest.idLocal, '1')
 
         # c.show()
         # c.parts[1].show('t')
@@ -1362,13 +1362,12 @@ class Test(unittest.TestCase):
         # Voice 2: <forward> (half), quarter note, <forward> (quarter)
         s = converter.parse(testPrimitive.hiddenRestsFinale)
         v1, v2 = s.recurse().voices
-        self.assertEqual(v1.duration.quarterLength, 4.0)
-        self.assertEqual(v2.duration.quarterLength, 3.0)
+        self.assertEqual(v1.duration.quarterLength, v2.duration.quarterLength)
 
-        restsV1 = list(v1.getElementsByClass(note.Rest))
-        self.assertEqual(restsV1, [])
-        restsV2 = list(v2.getElementsByClass(note.Rest))
-        self.assertEqual(restsV2, [])
+        restV1 = v1.getElementsByClass(note.Rest)[0]
+        self.assertTrue(restV1.style.hideObjectOnPrint)
+        restsV2 = v2.getElementsByClass(note.Rest)
+        self.assertEqual([r.style.hideObjectOnPrint for r in restsV2], [True, True])
 
         # Schoenberg op.19/2
         # previously, last measure of LH duplicated hidden rest belonging to RH
