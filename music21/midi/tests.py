@@ -1538,23 +1538,24 @@ class Test(unittest.TestCase):
 
     def testMidiImportLyrics(self):
         lyricFactZh = ['明', '山', '涌', '水', '郁', '郁', '葱', '', '葱',
-                        '钟', '灵', '毓', '秀', '海', '天', '', '东',
-                        '济', '济', '多', '士', '四', '方', '所', '', '崇',
-                        '早', '', '育', '', '文', '明', '', '种']
+                       '钟', '灵', '毓', '秀', '海', '天', '', '东',
+                       '济', '济', '多', '士', '四', '方', '所', '', '崇',
+                       '早', '', '育', '', '文', '明', '', '种']
         lyricFactKo = ['빛', '날', '세', '라', '영', '웅', '열', '', '사',
-                        '만', '세', '불', '망', '하', '실', '', '이',
-                        '옛', '적', '이', '나', '지', '금', '이', '', '나',
-                        '항', '상', '앙', '모', '합', '니', '', '다']
+                       '만', '세', '불', '망', '하', '실', '', '이',
+                       '옛', '적', '이', '나', '지', '금', '이', '', '나',
+                       '항', '상', '앙', '모', '합', '니', '', '다']
         testCases = [
             ('test18.mid', 'utf-8', lyricFactZh),
             ('test19.mid', 'gbk', lyricFactZh),
             ('test20.mid', 'utf-8', lyricFactKo),
             ('test21.mid', 'euc-kr', lyricFactKo),
         ]
-        for (filename, encoding, lyricFact) in testCases:
+
+        for filename, encoding, lyricFact in testCases:
             fp = common.getSourceFilePath() / 'midi' / 'testPrimitive' / filename
             s = converter.parse(fp, encoding_type=encoding)
-            for (n, l) in zip(s.flat.notes, lyricFact):
+            for (n, l) in zip(s.flatten().notes, lyricFact):
                 self.assertEqual(n.lyric, l)
 
 

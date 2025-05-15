@@ -147,8 +147,11 @@ MAX_ELEMENTS_IN_SEGMENT = 48  # 8 measures of 6 notes, etc. each
 
 _ThreeDigitNumber = namedtuple('_ThreeDigitNumber', ['hundreds', 'tens', 'ones'])
 
-SegmentKey = namedtuple('SegmentKey', ['measure', 'ordinal', 'affinity', 'hand'])
-SegmentKey.__new__.__defaults__ = (0, 0, None, None)
+class SegmentKey(t.NamedTuple):
+    measure: int = 0
+    ordinal: int = 0
+    affinity: Affinity|None = None
+    hand: str|None = None
 
 
 # ------------------------------------------------------------------------------

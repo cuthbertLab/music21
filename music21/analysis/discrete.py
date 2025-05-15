@@ -407,7 +407,7 @@ class KeyWeightKeyAnalysis(DiscreteAnalysis):
             # environLocal.printDebug(['added likely key', likelyKeys[pc]])
         return likelyKeys
 
-    def _getDifference(self, keyResults, pcDistribution, weightType) -> None|list[int|float]:
+    def _getDifference(self, keyResults, pcDistribution, weightType) -> None|list[float]:
         '''
         Takes in a list of numerical probable key results and returns the
         difference of the top two keys.
@@ -416,14 +416,14 @@ class KeyWeightKeyAnalysis(DiscreteAnalysis):
         if keyResults is None:
             return None
 
-        solution: list[int|float] = [0.0] * 12
+        solution: list[float] = [0.0] * 12
         top = [0.0] * 12
         bottomRight = [0.0] * 12
         bottomLeft = [0.0] * 12
 
         toneWeights = self.getWeights(weightType)
-        profileAverage = float(sum(toneWeights)) / len(toneWeights)
-        histogramAverage = float(sum(pcDistribution)) / len(pcDistribution)
+        profileAverage = sum(toneWeights) / len(toneWeights)
+        histogramAverage = sum(pcDistribution) / len(pcDistribution)
 
         for i in range(len(solution)):
             for j in range(len(toneWeights)):
@@ -437,9 +437,9 @@ class KeyWeightKeyAnalysis(DiscreteAnalysis):
                     pcDistribution[j] - histogramAverage) ** 2)
 
                 if bottomRight[i] == 0 or bottomLeft[i] == 0:
-                    solution[i] = 0
+                    solution[i] = 0.0
                 else:
-                    solution[i] = float(top[i]) / ((bottomRight[i] * bottomLeft[i]) ** 0.5)
+                    solution[i] = float(top[i] / ((bottomRight[i] * bottomLeft[i]) ** 0.5))
         return solution
 
     def solutionLegend(self, compress=False):

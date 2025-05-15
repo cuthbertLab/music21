@@ -23,6 +23,7 @@ import warnings
 
 from music21 import chord
 from music21 import common
+from music21.common.numberTools import opFrac
 from music21 import defaults
 from music21 import duration
 from music21 import dynamics
@@ -48,12 +49,18 @@ from music21.midi.percussion import MIDIPercussionException, PercussionMapper
 
 if t.TYPE_CHECKING:
     from music21 import base
+    from music21.common.types import OffsetQLIn
 
 
 environLocal = environment.Environment('midi.translate')
 PERCUSSION_MAPPER = PercussionMapper()
 
 NotRestType = t.TypeVar('NotRestType', bound=note.NotRest)
+
+class TimedNoteEvent(t.NamedTuple):
+    onTime: int
+    offTime: int
+    event: MidiEvent
 
 # ------------------------------------------------------------------------------
 class TranslateException(exceptions21.Music21Exception):
@@ -67,7 +74,7 @@ class TranslateWarning(UserWarning):
 # Durations
 
 
-def offsetToMidiTicks(o, addStartDelay=False):
+def offsetToMidiTicks(o: OffsetQLIn, addStartDelay: bool = False) -> int:
     '''
     Helper function to convert a music21 offset value to MIDI ticks,
     depends on *defaults.ticksPerQuarter* and *defaults.ticksAtStart*.
@@ -97,7 +104,7 @@ def offsetToMidiTicks(o, addStartDelay=False):
     return ticks
 
 
-def durationToMidiTicks(d):
+def durationToMidiTicks(d: duration.Duration) -> int:
     # noinspection PyShadowingNames
     '''
     Converts a :class:`~music21.duration.Duration` object to midi ticks.
@@ -126,9 +133,11 @@ def durationToMidiTicks(d):
     return int(round(d.quarterLength * defaults.ticksPerQuarter))
 
 
-def ticksToDuration(ticks,
-                    ticksPerQuarter: int = defaults.ticksPerQuarter,
-                    inputM21DurationObject=None):
+def ticksToDuration(
+    ticks: int,
+    ticksPerQuarter: int = defaults.ticksPerQuarter,
+    inputM21DurationObject: duration.Duration|None = None
+) -> duration.Duration:
     # noinspection PyShadowingNames
     '''
     Converts a number of MIDI Ticks to a music21 duration.Duration() object.
@@ -178,7 +187,7 @@ def ticksToDuration(ticks,
         d = inputM21DurationObject
 
     # given a value in ticks
-    d.quarterLength = float(ticks) / ticksPerQuarter
+    d.quarterLength = opFrac(ticks / ticksPerQuarter)
     return d
 
 
@@ -1321,7 +1330,6 @@ def getPacketFromMidiEvent(
     return post
 
 
-# noinspection PyTypeChecker
 def elementToMidiEventList(
     el: base.Music21Object
 ) -> list[MidiEvent|DeltaTime]|None:
@@ -1339,9 +1347,8 @@ def elementToMidiEventList(
     [<music21.midi.MidiEvent NOTE_ON, track=None, channel=1, pitch=60, velocity=90>,
      <music21.midi.MidiEvent NOTE_OFF, track=None, channel=1, pitch=60, velocity=0>]
     '''
-    # remove Jetbrains "noinspection PyTypeChecker" when
-    # https://youtrack.jetbrains.com/issue/PY-48011/Pattern-Matching-Type-inference
-    # is fixed.  Until then, don't implement more Structural Pattern Matching.
+    # "Code is unreachable" PyCharm bug.
+    # https://youtrack.jetbrains.com/issue/PY-79770
     match el:
         case note.Rest():
             return None
@@ -1368,7 +1375,7 @@ def elementToMidiEventList(
             # note: tempo indications need to be in channel one for most playback
             return tempoToMidiEvents(el, includeDeltaTime=False)
         case instrument.Instrument():
-            # first instrument will have been gathered above with get start elements
+            # the first instrument will have been gathered above with get start elements
             return instrumentToMidiEvents(el, includeDeltaTime=False)
         case _:
             # other objects may have already been added
@@ -1389,7 +1396,7 @@ def streamToPackets(
 
     In converting from a Stream to MIDI, this is called first,
     resulting in a collection of packets by offset.
-    Then, packets to events is called.
+    Then, getPacketFromMidiEvent is called.
     '''
     # store all events by offset without delta times
     # as (absTime, event)
@@ -1719,8 +1726,8 @@ def filterPacketsByTrackId(
 
 
 def packetsToDeltaSeparatedEvents(
-        packets: list[dict[str, t.Any]],
-        midiTrack: MidiTrack,
+    packets: list[dict[str, t.Any]],
+    midiTrack: MidiTrack,
 ) -> list[MidiEvent|DeltaTime]:
     '''
     Given a list of packets (which already contain MidiEvent objects)
@@ -1833,16 +1840,16 @@ def getTimeForEvents(
 
 
 def getNotesFromEvents(
-    events: list[tuple[int, MidiEvent]]
+    timedEvents: list[tuple[int, MidiEvent]]
 ) -> list[tuple[tuple[int, MidiEvent],
                 tuple[int, MidiEvent]]]:
     '''
-    Returns a list of Tuples of MIDI events that are pairs of note-on and
+    Returns a list of Tuples of timed MIDI events that are pairs of note-on and
     note-off events.
     '''
     notes = []  # store pairs of pairs
     memo = set()   # store already matched note off
-    for i, eventTuple in enumerate(events):
+    for i, eventTuple in enumerate(timedEvents):
         if i in memo:
             continue
         unused_t, e = eventTuple
@@ -1852,17 +1859,17 @@ def getNotesFromEvents(
             continue
         match = None
         # environLocal.printDebug(['midiTrackToStream(): isNoteOn', e])
-        for j in range(i + 1, len(events)):
+        for j in range(i + 1, len(timedEvents)):
             if j in memo:
                 continue
-            unused_tSub, eSub = events[j]
+            unused_tSub, eSub = timedEvents[j]
             if e.matchedNoteOff(eSub):
                 memo.add(j)
                 match = i, j
                 break
         if match is not None:
             i, j = match
-            pairs = (events[i], events[j])
+            pairs = (timedEvents[i], timedEvents[j])
             notes.append(pairs)
         else:
             pass
@@ -1870,10 +1877,17 @@ def getNotesFromEvents(
             #    'midiTrackToStream(): cannot find a note off for a note on', e])
     return notes
 
-def getLyricsFromEvents(
+def lyricTimingsFromEvents(
     events: list[tuple[int, MidiEvent]],
     encoding_type: str = 'utf-8',
 ) -> dict[int, str]:
+    '''
+    From a list of timed events, that is a tuple of a tick time and a MidiEvent
+    Return a dictionary mapping a tick time to a string representing a lyric.
+
+    If more than one lyric is found at a given tick time, the last one found is
+    stored.
+    '''
     lyrics: dict[int, str] = {}
     for time, e in events:
         if e.type == MetaEvents.LYRIC and isinstance(e.data, bytes):
@@ -1889,10 +1903,17 @@ def getLyricsFromEvents(
 def getMetaEvents(
     events: list[tuple[int, MidiEvent]]
 ) -> list[tuple[int, base.Music21Object]]:
-    metaEvents: list[tuple[int, base.Music21Object]] = []  # store pairs of abs time, m21 object
+    '''
+    Translate MidiEvents whose type is a MetaEvent into Music21Objects.
+
+    Note: this does not translate MetaEvent.LYRIC, since that becomes a
+    bare string.
+    '''
+    # store pairs of abs time, m21 object
+    metaEvents: list[tuple[int, base.Music21Object]] = []
     last_program: int = -1
     for timeEvent, e in events:
-        metaObj = None
+        metaObj: base.Music21Object|None = None
         if e.type == MetaEvents.TIME_SIGNATURE:
             # time signature should be 4 bytes
             metaObj = midiEventsToTimeSignature(e)
@@ -1911,21 +1932,23 @@ def getMetaEvents(
             # midiEventsToInstrument() WILL set the program on the instance
             metaObj = midiEventsToInstrument(e)
             last_program = e.parameter1
-        elif e.type == MetaEvents.MIDI_PORT:
-            pass
-        else:
-            pass
+        # elif e.type == MetaEvents.MIDI_PORT:
+        #     pass
+        # else:
+        #     pass
+
         if metaObj:
             pair = (timeEvent, metaObj)
             metaEvents.append(pair)
 
     return metaEvents
 
-def insertConductorEvents(conductorPart: stream.Part,
-                          target: stream.Part,
-                          *,
-                          isFirst: bool = False,
-                          ):
+def insertConductorEvents(
+    conductorPart: stream.Part,
+    target: stream.Part,
+    *,
+    isFirst: bool = False,
+):
     '''
     Insert a deepcopy of any TimeSignature, KeySignature, or MetronomeMark
     found in the `conductorPart` into the `target` Part at the same offset.
@@ -1934,8 +1957,8 @@ def insertConductorEvents(conductorPart: stream.Part,
     '''
     for e in conductorPart.getElementsByClass(
             ('TimeSignature', 'KeySignature', 'MetronomeMark')):
-        # create a deepcopy of the element so a flat does not cause
-        # multiple references of the same
+        # create a deepcopy of the element so flatten() does not have
+        # multiple references of the same object in the same Stream
         eventCopy = copy.deepcopy(e)
         if 'TempoIndication' in eventCopy.classes and not isFirst:
             eventCopy.style.hideObjectOnPrint = True
@@ -2024,17 +2047,17 @@ def midiTrackToStream(
         s = inputM21
 
     # get events without DeltaTimes
-    events = getTimeForEvents(mt)
+    timedEvents = getTimeForEvents(mt)
 
     # need to build chords and notes
-    notes = getNotesFromEvents(events)
-    metaEvents = getMetaEvents(events)
-    lyricsDict = getLyricsFromEvents(events, encoding_type=encoding_type)
+    notes = getNotesFromEvents(timedEvents)
+    metaEvents = getMetaEvents(timedEvents)
+    lyricsDict = lyricTimingsFromEvents(timedEvents, encoding_type=encoding_type)
 
-    # first create meta events
+    # first create MetaEvents
     for tick, obj in metaEvents:
         # environLocal.printDebug(['insert midi meta event:', t, obj])
-        s.coreInsert(tick / ticksPerQuarter, obj)
+        s.coreInsert(opFrac(tick / ticksPerQuarter), obj)
     s.coreElementsChanged()
     deduplicate(s, inPlace=True)
     # environLocal.printDebug([
@@ -2045,104 +2068,84 @@ def midiTrackToStream(
     # composite = []
     chordSub: list[tuple[tuple[int, MidiEvent],
                          tuple[int, MidiEvent]]] = []
-    i = 0
-    iGathered = []  # store a list of indexes of gathered values put into chords
+    # store whether any given note index has already been gathered into a chord.
+    # changed in May 2025 -- O(n) space, but O(1) time; previously O(n) time.
+    iGathered: list[bool] = [False] * len(notes)
     voicesRequired = False
 
     if not quarterLengthDivisors:
         quarterLengthDivisors = defaults.quantizationQuarterLengthDivisors
 
-    if len(notes) > 1:
-        # environLocal.printDebug(['\n', 'midiTrackToStream(): notes', notes])
-        while i < len(notes):
-            if i in iGathered:
-                i += 1
-                continue
-            # look at each note; get on time and event
-            on, off = notes[i]
-            timeNow, unused_e = on
-            tOff, unused_eOff = off
-            # environLocal.printDebug(['on, off', on, off, 'i', i, 'len(notes)', len(notes)])
+    # let tolerance for chord subbing follow the quantization
+    if quantizePost:
+        divisor = max(quarterLengthDivisors)
+    # fallback: 1/16 of a quarter (64th)
+    else:
+        divisor = 16
+    chunkTolerance = ticksPerQuarter / divisor
 
-            # go through all following notes; if there is only 1 note, this will
-            # not execute;
-            # looking for other events that start within a certain small time
-            # window to make into a chord
-            # if we find a note with a different end time but same start
-            # time, throw into a different voice
-            for j in range(i + 1, len(notes)):
-                # look at each on time event
-                onSub, offSub = notes[j]
-                tSub, unused_eSub = onSub
-                tOffSub, unused_eOffSub = offSub
-
-                # let tolerance for chord subbing follow the quantization
-                if quantizePost:
-                    divisor = max(quarterLengthDivisors)
-                # fallback: 1/16 of a quarter (64th)
-                else:
-                    divisor = 16
-                chunkTolerance = ticksPerQuarter / divisor
-                # must be strictly less than the quantization unit
-                if abs(tSub - timeNow) < chunkTolerance:
-                    # isolate case where end time is not w/n tolerance
-                    if abs(tOffSub - tOff) > chunkTolerance:
-                        # need to store this as requiring movement to a diff
-                        # voice
-                        voicesRequired = True
-                        continue
-                    if not chordSub:  # start a new one
-                        chordSub = [notes[i]]
-                        iGathered.append(i)
-                    chordSub.append(notes[j])
-                    iGathered.append(j)
-                    continue  # keep looping through events to see
-                    # if we can add more elements to this chord group
-                else:  # no more matches; assuming chordSub tones are contiguous
-                    break
-            # this comparison must be outside the j loop, as the case where we
-            # have the last note in a list of notes and the j loop does not
-            # execute; chordSub will be None
-            if chordSub:
-                # composite.append(chordSub)
-                c = midiEventsToChord(chordSub, ticksPerQuarter)
-                tickStart = notes[i][0][0]
-                o = tickStart / ticksPerQuarter
-                c.editorial.midiTickStart = tickStart
-                lyric = lyricsDict.get(tickStart)
-                if (lyric is not None):
-                    c.lyric = lyric
-                s.coreInsert(o, c)
-                # iSkip = len(chordSub)  # amount of accumulated chords
-                chordSub = []
-            else:  # just append the note, chordSub is empty
-                # composite.append(notes[i])
-                n: note.NotRest = midiEventsToNote(notes[i], ticksPerQuarter)
-                # the time is the first value in the first pair
-                # need to round, as floating point error is likely
-                tickStart = notes[i][0][0]
-                o = tickStart / ticksPerQuarter
-                n.editorial.midiTickStart = tickStart
-                lyric = lyricsDict.get(tickStart)
-                if (lyric is not None):
-                    n.lyric = lyric
-
-                s.coreInsert(o, n)
-                # iSkip = 1
-            # break  # exit secondary loop
+    i = 0
+    while i < len(notes):
+        if iGathered[i]:
+            # this index has already been gathered into a chord
             i += 1
+            continue
+        # look at each note; get on time and event
+        on, off = notes[i]
+        timeNow, unused_e = on
+        tOff, unused_eOff = off
+        # environLocal.printDebug(['on, off', on, off, 'i', i, 'len(notes)', len(notes)])
 
-    elif len(notes) == 1:  # rare case of just one note
-        singleN: note.NotRest = midiEventsToNote(notes[0], ticksPerQuarter)
-        # the time is the first value in the first pair
-        # need to round, as floating point error is likely
+        # go through all following notes; if there is only 1 note, this will
+        # not execute;
+        # looking for other events that start within a certain small time
+        # window to make into a chord
+        # if we find a note with a different end time but the same start
+        # time, throw into a different voice
+        for j in range(i + 1, len(notes)):
+            # look at each on time event
+            onSub, offSub = notes[j]
+            tSub, unused_eSub = onSub
+            tOffSub, unused_eOffSub = offSub
+
+            # must be strictly less than the quantization unit
+            if abs(tSub - timeNow) < chunkTolerance:
+                # isolate case where end time is not w/n tolerance
+                if abs(tOffSub - tOff) > chunkTolerance:
+                    # need to store this as requiring movement to a different
+                    # voice
+                    voicesRequired = True
+                    continue
+                if not chordSub:  # start a new one
+                    chordSub = [notes[i]]
+                    iGathered[i] = True
+                chordSub.append(notes[j])
+                iGathered[j] = True
+                continue  # keep looping through events to see
+                # if we can add more elements to this chord group
+            else:  # no more matches; assuming chordSub tones are contiguous
+                break
+        # this comparison must be outside the j loop, as the case where we
+        # have the last note in a list of notes and the j loop does not
+        # execute; chordSub will be None
+
+        note_or_chord: note.NotRest
+        if chordSub:
+            # composite.append(chordSub)
+            note_or_chord = midiEventsToChord(chordSub, ticksPerQuarter)
+            chordSub = []
+        else:
+            # just append the note, chordSub is empty
+            note_or_chord = midiEventsToNote(notes[i], ticksPerQuarter)
+
         tickStart = notes[i][0][0]
-        o = tickStart / ticksPerQuarter
-        singleN.editorial.midiTickStart = tickStart
-        lyric = lyricsDict.get(tickStart)
-        if (lyric is not None):
-            singleN.lyric = lyric
-        s.coreInsert(o, singleN)
+        o = opFrac(tickStart / ticksPerQuarter)
+        note_or_chord.editorial.midiTickStart = tickStart
+        if lyric := lyricsDict.get(tickStart):
+            note_or_chord.lyric = lyric
+        s.coreInsert(o, note_or_chord)
+
+        i += 1
 
     s.sort(force=True)  # will also run coreElementsChanged()
     # quantize to nearest 16th
@@ -2529,7 +2532,7 @@ def packetStorageFromSubstreamList(
                 instObj = Conductor()
 
         trackPackets = streamToPackets(subs, trackId=trackId, addStartDelay=addStartDelay)
-        # store packets in dictionary; keys are trackIds
+        # store packets in a dictionary; keys are trackIds
         packetStorage[trackId] = {
             'rawPackets': trackPackets,
             'initInstrument': instObj,
@@ -2560,6 +2563,8 @@ def updatePacketStorageWithChannelInfo(
         elif isinstance(instObj, instrument.Conductor):
             initCh = None
         else:  # keys are midi program
+            if t.TYPE_CHECKING:
+                assert isinstance(instObj, instrument.Instrument)
             initCh = channelByInstrument[instObj.midiProgram]
         bundle['initChannel'] = initCh  # set for bundle too
 
