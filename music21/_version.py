@@ -50,7 +50,7 @@ so change it if a bug or new feature creates a problem with using old pickles.
 '''
 from __future__ import annotations
 
-__version__ = '9.6.0b19'
+__version__ = '9.6.0b20'
 
 def get_version_tuple(vv):
     v = vv.split('.')
