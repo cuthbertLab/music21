@@ -329,7 +329,7 @@ class Test(unittest.TestCase):
         fp = dirLib / 'test09.mid'
         # a simple file created in athenacl
         # dealing with midi files that use running status compression
-        s = converter.parse(fp, forceSource=True)
+        s = converter.parse(fp)
         self.assertEqual(len(s.parts), 2)
         self.assertEqual(len(s.parts[0].recurse().notes), 702)
         self.assertEqual(len(s.parts[1].recurse().notes), 856)
