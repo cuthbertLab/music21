@@ -38,6 +38,7 @@ from music21 import percussion
 from music21 import pitch
 from music21 import stream
 from music21 import tempo
+from music21 import volume
 
 from music21.midi.base import (
     MidiTrack, DeltaTime, MidiFile, MidiEvent,
@@ -351,26 +352,18 @@ def _constructOrUpdateNotRestSubclass(
     return nr
 
 def midiEventsToNote(
-    eventTuple: tuple[tuple[int, MidiEvent],
-                      tuple[int, MidiEvent]],
+    timedNoteEvent: TimedNoteEvent,
     ticksPerQuarter: int = defaults.ticksPerQuarter,
 ) -> note.Note|note.Unpitched:
     # noinspection PyShadowingNames
     '''
-    Convert from a tuple of two tuples of an int and a midi.MidiEvent objects
-    to a music21 Note.  The events should be arranged as follows:
+    Convert a TimedNoteEvent to a music21.note.Note or a music21.note.Unpitched.
+    A timed note event is a tuple of (onTime, offTime, MidiEvent) where the
+    MidiEvent is the Note On.  (The Note Off event is not used).
 
-        ((int timeStart, midiEvent1), (int timeEnd, midiEvent2))
+    This method is called as part of the midiToStream() conversion.
 
-    It is assumed, but not checked, that midiEvent2 is an
-    appropriate Note_Off command.  Thus, only three elements are really needed.
-
-    N.B. this takes in a list of music21 MidiEvent objects so see [...] on how to
-    convert raw MIDI data to MidiEvent objects
-
-    In this example, we start a NOTE_ON event at offset 1.0 that lasts
-    for 2.0 quarter notes until we
-    send a zero-velocity NOTE_ON (=NOTE_OFF) event for the same pitch.
+    In this example, we start a NOTE_ON event at offset 1.0 (at the standard 10080 to quarter)
 
     >>> mt = midi.MidiTrack(1)
     >>> dt1 = midi.DeltaTime(mt)
@@ -381,15 +374,21 @@ def midiEventsToNote(
     >>> me1.pitch = 45
     >>> me1.velocity = 94
 
+
+    This lasts until we send a NOTE_OFF event at offset 2.0.
+
     >>> dt2 = midi.DeltaTime(mt)
     >>> dt2.time = 20160
-
     >>> me2 = midi.MidiEvent(mt)
     >>> me2.type = midi.ChannelVoiceMessages.NOTE_ON
     >>> me2.pitch = 45
     >>> me2.velocity = 0
 
-    >>> n = midi.translate.midiEventsToNote(((dt1.time, me1), (dt2.time, me2)))
+    Another system will package dt1, dt2 and me1 into a TimedNoteEvent tuple.
+    In this example, me2 is not used.
+
+    >>> tne1 = midi.translate.TimedNoteEvent(dt1.time, dt2.time, me1)
+    >>> n = midi.translate.midiEventsToNote(tne1)
     >>> n.pitch
     <music21.pitch.Pitch A2>
     >>> n.duration.quarterLength
@@ -397,10 +396,10 @@ def midiEventsToNote(
     >>> n.volume.velocity
     94
 
-    If channel is 10, an Unpitched element is returned.
+    If the channel is 10, an Unpitched element is returned.
 
     >>> me1.channel = 10
-    >>> unp = midi.translate.midiEventsToNote(((dt1.time, me1), (dt2.time, me2)))
+    >>> unp = midi.translate.midiEventsToNote(tne1)
     >>> unp
     <music21.note.Unpitched 'Tom-Tom'>
 
@@ -413,7 +412,7 @@ def midiEventsToNote(
     :class:`~music21.instrument.UnpitchedPercussion` instance is given:
 
     >>> me1.pitch = 1
-    >>> unp = midi.translate.midiEventsToNote(((dt1.time, me1), (dt2.time, me2)))
+    >>> unp = midi.translate.midiEventsToNote(tne1)
     >>> unp.storedInstrument
     <music21.instrument.UnpitchedPercussion 'Percussion'>
 
@@ -421,9 +420,9 @@ def midiEventsToNote(
         :class:`~music21.note.Unpitched` instance if the event is on Channel 10.
     * Changed in v8: `inputM21` is no longer supported.
         The only supported usage now is two tuples.
+    * Changed in v9.7: Expects a single TimedNoteEvent
     '''
-    tOn, eOn = eventTuple[0]
-    tOff, unused_eOff = eventTuple[1]
+    tOn, tOff, eOn = timedNoteEvent
 
     returnClass: type[note.Unpitched]|type[note.Note]
     if eOn.channel == 10:
@@ -563,27 +562,15 @@ def noteToMidiEvents(
 # ------------------------------------------------------------------------------
 # Chords
 def midiEventsToChord(
-    eventList: Sequence[tuple[tuple[int, MidiEvent],
-                              tuple[int, MidiEvent]]],
+    timedNoteList: Sequence[TimedNoteEvent],
     ticksPerQuarter: int = defaults.ticksPerQuarter,
 ) -> chord.ChordBase:
     # noinspection PyShadowingNames
     '''
-    Creates a Chord from a list of :class:`~music21.midi.DeltaTime` or integers
-    and :class:`~music21.midi.MidiEvent` objects grouped as follows::
+    Creates a Chord from a list of TimedNoteEvents which
+    store the noteOn tick, noteOff tick, and Note-On MidiEvent for each note.
 
-        [((time_pitch1_on, pitch1_note_on_event),
-          (time_pitch1_off, pitch1_note_off_event)
-          ),
-         ((time_pitch2_on, pitch2_note_on_event),
-          (time_pitch2_off, pitch2_note_off_event)
-          ),
-
-    (etc.)
-
-    :func:`~music21.midi.translate.midiEventsToNote`.
-
-    All DeltaTime objects except the first (for the first note on)
+    Timings of all objects except the first (for the first note on)
     and last (for the last note off) are ignored.
 
     >>> mt = midi.MidiTrack(1)
@@ -601,7 +588,7 @@ def midiEventsToChord(
     >>> me3 = midi.MidiEvent(mt)
     >>> me3.type = midi.ChannelVoiceMessages.NOTE_OFF
 
-    The pitch of the NOTE_OFF events are not checked by this function.  They
+    The pitches of the NOTE_OFF events are not checked by this function.  They
     are assumed to have been aligned by the previous parser.
 
     >>> me3.pitch = 45
@@ -621,47 +608,46 @@ def midiEventsToChord(
     >>> me4.pitch = 46
     >>> me4.velocity = 0
 
-    >>> c = midi.translate.midiEventsToChord([((dt1.time, me1), (dt3.time, me3)),
-    ...                                       ((dt2.time, me2), (dt4.time, me4))])
+    >>> tne1 = midi.translate.TimedNoteEvent(dt1.time, dt3.time, me1)
+    >>> tne2 = midi.translate.TimedNoteEvent(dt2.time, dt4.time, me2)
+
+    >>> c = midi.translate.midiEventsToChord([tne1, tne2])
     >>> c
     <music21.chord.Chord A2 B-2>
     >>> c.duration.quarterLength
     2.0
 
-    If the channel is set to 10, then a PercussionChord is returned:
+    If the channel of the last element is set to 10, then a PercussionChord is returned:
 
     >>> me2.channel = 10
-    >>> midi.translate.midiEventsToChord([((dt1.time, me1), (dt3.time, me3)),
-    ...                                   ((dt2.time, me2), (dt4.time, me4))])
+    >>> midi.translate.midiEventsToChord([tne1, tne2])
     <music21.percussion.PercussionChord [Tom-Tom Hi-Hat Cymbal]>
 
     * Changed in v7: Uses the last DeltaTime in the list to get the end time.
     * Changed in v7.3: Returns a :class:`~music21.percussion.PercussionChord` if
       any event is on channel 10.
     * Changed in v8: inputM21 is no longer supported.  Flat list format is removed.
+    * Changed in v9.7: expects a list of TimedNoteEvents
     '''
     tOn: int = 0  # ticks
     tOff: int = 0  # ticks
 
-    from music21 import volume
     pitches: list[pitch.Pitch] = []
     volumes = []
 
-    firstOn: MidiEvent = eventList[0][0][1]
+    firstOn: MidiEvent = timedNoteList[0].event
     any_channel_10 = False
     # this is a format provided by the Stream conversion of
     # midi events; it pre-groups events for a chord together in nested pairs
     # of abs start time and the event object
-    for onPair, offPair in eventList:
-        tOn, eOn = onPair
+    for tOn, tOff, eOn in timedNoteList:
         if eOn.channel == 10:
             any_channel_10 = True
-        tOff, unused_eOff = offPair
         p = pitch.Pitch()
         p.midi = eOn.pitch
         pitches.append(p)
         v = volume.Volume(velocity=eOn.velocity)
-        v.velocityIsRelative = False  # velocity is absolute coming from
+        v.velocityIsRelative = False  # velocity is absolute coming from MIDI
         volumes.append(v)
 
     returnClass: type[percussion.PercussionChord]|type[chord.Chord]
@@ -669,6 +655,7 @@ def midiEventsToChord(
         returnClass = percussion.PercussionChord
     else:
         returnClass = chord.Chord
+
     c = _constructOrUpdateNotRestSubclass(
         firstOn,
         tOn,
@@ -1841,41 +1828,66 @@ def getTimeForEvents(
 
 def getNotesFromEvents(
     timedEvents: list[tuple[int, MidiEvent]]
-) -> list[tuple[tuple[int, MidiEvent],
-                tuple[int, MidiEvent]]]:
+) -> list[TimedNoteEvent]:
     '''
-    Returns a list of Tuples of timed MIDI events that are pairs of note-on and
-    note-off events.
+    Takes in a list of tuples of (tickTime, MidiEvent) and returns a list of
+    TimedNoteEvent objects which contain the note on time, the note off time,
+    and the MidiEvent of the note on.  (The note off MidiEvent is not included)
+
+    If timedEvents is sorted in non-decreasing order of tickTime, then the
+    output here will also be sorted in non-decreasing order of note on time.
+
+    Example: here are two pitches, represented as note on and note off events:
+
+    >>> CVM = midi.ChannelVoiceMessages
+    >>> ev1on = midi.MidiEvent(type=CVM.NOTE_ON)
+    >>> ev1on.pitch = 60
+    >>> ev2on = midi.MidiEvent(type=CVM.NOTE_ON)
+    >>> ev2on.pitch = 62
+    >>> ev1off = midi.MidiEvent(type=CVM.NOTE_OFF)
+    >>> ev1off.pitch = 60
+    >>> ev2off = midi.MidiEvent(type=CVM.NOTE_OFF)
+    >>> ev2off.pitch = 62
+
+    >>> events = [(0, ev1on), (1, ev2on), (2, ev2off), (3, ev1off)]
+
+    >>> notes = midi.translate.getNotesFromEvents(events)
+    >>> len(notes)
+    2
+    >>> notes
+    [TimedNoteEvent(onTime=0, offTime=3, event=<music21.midi.MidiEvent NOTE_ON...>),
+     TimedNoteEvent(onTime=1, offTime=2, event=<music21.midi.MidiEvent NOTE_ON...>)]
+    >>> (notes[0].event.pitch, notes[1].event.pitch)
+    (60, 62)
     '''
-    notes = []  # store pairs of pairs
-    memo = set()   # store already matched note off
-    for i, eventTuple in enumerate(timedEvents):
-        if i in memo:
-            continue
-        unused_t, e = eventTuple
-        # for each note on event, we need to search for a match in all future
-        # events
-        if not e.isNoteOn():
-            continue
-        match = None
-        # environLocal.printDebug(['midiTrackToStream(): isNoteOn', e])
-        for j in range(i + 1, len(timedEvents)):
-            if j in memo:
-                continue
-            unused_tSub, eSub = timedEvents[j]
-            if e.matchedNoteOff(eSub):
-                memo.add(j)
-                match = i, j
-                break
-        if match is not None:
-            i, j = match
-            pairs = (timedEvents[i], timedEvents[j])
-            notes.append(pairs)
-        else:
-            pass
-            # environLocal.printDebug([
-            #    'midiTrackToStream(): cannot find a note off for a note on', e])
-    return notes
+    notes: list[TimedNoteEvent] = []  # store tuples of (onTime, offTime, midiEvent)
+
+    # matching pitch and channel to off time
+    # Q: do we need to match channel? These should already be separated by channel, right?
+    awaitingNoteOn: dict[tuple[int|None, int], int] = {}
+    # pitch will never be None for noteOn or noteOff, but mypy does not know that.
+
+    # Iterate backwards: we see note offs first and then await
+    # their corresponding note ons.  We do this so that the note list is
+    # sorted by (decreasing) note-on time, not note-off time, which is
+    # the order we will expect, but without having to do an O(n log n) sort
+    # at the end.
+    for time, event in timedEvents[::-1]:
+        if event.isNoteOff():
+            awaitingNoteOn[event.pitch, event.channel] = time
+        elif event.isNoteOn():
+            try:
+                offTime = awaitingNoteOn.pop((event.pitch, event.channel))
+                notes.append(TimedNoteEvent(time, offTime, event))
+            except KeyError:  # pragma: no cover
+                pass
+                # raise TranslateException(
+                #     f' cannot find note off for pitch {event.pitch} and channel {event.channel}'
+                # )
+
+    # could raise a warning on note offs without a note on.
+    return notes[::-1]  # back to increasing order.
+
 
 def lyricTimingsFromEvents(
     events: list[tuple[int, MidiEvent]],
@@ -2050,7 +2062,7 @@ def midiTrackToStream(
     timedEvents = getTimeForEvents(mt)
 
     # need to build chords and notes
-    notes = getNotesFromEvents(timedEvents)
+    notes: list[TimedNoteEvent] = getNotesFromEvents(timedEvents)
     metaEvents = getMetaEvents(timedEvents)
     lyricsDict = lyricTimingsFromEvents(timedEvents, encoding_type=encoding_type)
 
@@ -2064,10 +2076,8 @@ def midiTrackToStream(
     #    'midiTrackToStream(): found notes ready for Stream import', len(notes)])
 
     # collect notes with similar start times into chords
-    # create a composite list of both notes and chords
-    # composite = []
-    chordSub: list[tuple[tuple[int, MidiEvent],
-                         tuple[int, MidiEvent]]] = []
+    chordSub: list[TimedNoteEvent] = []
+
     # store whether any given note index has already been gathered into a chord.
     # changed in May 2025 -- O(n) space, but O(1) time; previously O(n) time.
     iGathered: list[bool] = [False] * len(notes)
@@ -2084,16 +2094,16 @@ def midiTrackToStream(
         divisor = 16
     chunkTolerance = ticksPerQuarter / divisor
 
-    i = 0
-    while i < len(notes):
+    for i, timedNoteEvent in enumerate(notes):
         if iGathered[i]:
             # this index has already been gathered into a chord
-            i += 1
             continue
         # look at each note; get on time and event
-        on, off = notes[i]
-        timeNow, unused_e = on
-        tOff, unused_eOff = off
+        tickStart = timedNoteEvent.onTime
+        tOff = timedNoteEvent.offTime
+
+        chordSub = [timedNoteEvent]
+
         # environLocal.printDebug(['on, off', on, off, 'i', i, 'len(notes)', len(notes)])
 
         # go through all following notes; if there is only 1 note, this will
@@ -2102,50 +2112,41 @@ def midiTrackToStream(
         # window to make into a chord
         # if we find a note with a different end time but the same start
         # time, throw into a different voice
+        # this isn't really worth improving the speed on.
         for j in range(i + 1, len(notes)):
             # look at each on time event
-            onSub, offSub = notes[j]
-            tSub, unused_eSub = onSub
-            tOffSub, unused_eOffSub = offSub
+            tSub = notes[j].onTime
+            tOffSub = notes[j].offTime
 
             # must be strictly less than the quantization unit
-            if abs(tSub - timeNow) < chunkTolerance:
-                # isolate case where end time is not w/n tolerance
-                if abs(tOffSub - tOff) > chunkTolerance:
-                    # need to store this as requiring movement to a different
-                    # voice
-                    voicesRequired = True
-                    continue
-                if not chordSub:  # start a new one
-                    chordSub = [notes[i]]
-                    iGathered[i] = True
-                chordSub.append(notes[j])
-                iGathered[j] = True
-                continue  # keep looping through events to see
-                # if we can add more elements to this chord group
-            else:  # no more matches; assuming chordSub tones are contiguous
+            if abs(tSub - tickStart) >= chunkTolerance:
                 break
-        # this comparison must be outside the j loop, as the case where we
-        # have the last note in a list of notes and the j loop does not
-        # execute; chordSub will be None
+
+            # isolate case where end time is not w/n tolerance
+            if abs(tOffSub - tOff) > chunkTolerance:
+                # need to store this as requiring movement to a different
+                # voice
+                voicesRequired = True
+                continue
+            chordSub.append(notes[j])
+            iGathered[j] = True
+            # keep looping through events to see
+            # if we can add more elements to this chord group
 
         note_or_chord: note.NotRest
-        if chordSub:
+        if len(chordSub) > 1:
             # composite.append(chordSub)
             note_or_chord = midiEventsToChord(chordSub, ticksPerQuarter)
-            chordSub = []
         else:
-            # just append the note, chordSub is empty
-            note_or_chord = midiEventsToNote(notes[i], ticksPerQuarter)
+            # just append the note, chordSub has only one element
+            # timedNoteEvent is chordSub[0]
+            note_or_chord = midiEventsToNote(timedNoteEvent, ticksPerQuarter)
 
-        tickStart = notes[i][0][0]
         o = opFrac(tickStart / ticksPerQuarter)
         note_or_chord.editorial.midiTickStart = tickStart
         if lyric := lyricsDict.get(tickStart):
             note_or_chord.lyric = lyric
         s.coreInsert(o, note_or_chord)
-
-        i += 1
 
     s.sort(force=True)  # will also run coreElementsChanged()
     # quantize to nearest 16th

@@ -23,12 +23,20 @@ from music21.midi.base import (
     MidiFile,
 )
 from music21.midi.translate import (
+    TimedNoteEvent,
+    TranslateWarning,
+    channelInstrumentData,
+    conductorStream,
+    getMetaEvents,
     midiAsciiStringToBinaryString,
-    noteToMidiEvents,
+    midiEventsToInstrument,
     midiEventsToNote,
-    streamHierarchyToMidiTracks, midiFileToStream, conductorStream,
-    streamToMidiFile, prepareStreamForMidi, midiEventsToInstrument, getMetaEvents,
-    TranslateWarning, channelInstrumentData, packetStorageFromSubstreamList,
+    midiFileToStream,
+    noteToMidiEvents,
+    packetStorageFromSubstreamList,
+    prepareStreamForMidi,
+    streamHierarchyToMidiTracks,
+    streamToMidiFile,
     updatePacketStorageWithChannelInfo,
 )
 from music21.musicxml import testPrimitive
@@ -403,8 +411,7 @@ class Test(unittest.TestCase):
         self.assertIsInstance(eventList[3], MidiEvent)
 
         # translate eventList back to a note
-        n2 = midiEventsToNote(((eventList[0].time, eventList[1]),
-                               (eventList[2].time, eventList[2])))
+        n2 = midiEventsToNote(TimedNoteEvent(eventList[0].time, eventList[2].time, eventList[1]))
         self.assertEqual(n2.pitch.nameWithOctave, 'A4')
         self.assertEqual(n2.quarterLength, 2.0)
 
