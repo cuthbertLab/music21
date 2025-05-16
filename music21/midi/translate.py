@@ -1877,7 +1877,13 @@ def getNotesFromEvents(
             awaitingNoteOn[event.pitch, event.channel] = time
         elif event.isNoteOn():
             try:
-                offTime = awaitingNoteOn.pop((event.pitch, event.channel))
+                # we had .pop() instead of .get() which would be quite a bit
+                # better to have, but there are a number of cases, including the
+                # test09 midi set where there are multiple note ons at the same
+                # point with multiple note offs at the same time point for the
+                # same pitch and channel.  Better to have the notes turned off
+                # from some previous note off event then to lose it.
+                offTime = awaitingNoteOn.get((event.pitch, event.channel))
                 notes.append(TimedNoteEvent(time, offTime, event))
             except KeyError:  # pragma: no cover
                 pass
@@ -1885,7 +1891,8 @@ def getNotesFromEvents(
                 #     f' cannot find note off for pitch {event.pitch} and channel {event.channel}'
                 # )
 
-    # could raise a warning on note offs without a note on.
+    # could also raise a warning on note offs without a note on.
+    print(len(notes))
     return notes[::-1]  # back to increasing order.
 
 
