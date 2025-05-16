@@ -201,7 +201,7 @@ def getStartEvents(
     channel: int = 1,
     instrumentObj: instrument.Instrument|None = None,
     *,
-    encoding_type: str = 'utf-8',
+    encoding: str = 'utf-8',
 ) -> list[DeltaTime|MidiEvent]:
     '''
     Returns a list of midi.MidiEvent objects found at the beginning of a track.
@@ -240,7 +240,7 @@ def getStartEvents(
 
     me = MidiEvent(midiTrack, channel=channel)
     me.type = MetaEvents.SEQUENCE_TRACK_NAME
-    me.data = partName.encode(encoding_type, 'ignore')
+    me.data = partName.encode(encoding, 'ignore')
     events.append(me)
 
     # additional allocation of instruments may happen elsewhere
@@ -848,7 +848,9 @@ def instrumentToMidiEvents(
 # Meta events
 
 def midiEventsToInstrument(
-    eventList: MidiEvent|tuple[int, MidiEvent]
+    eventList: MidiEvent|tuple[int, MidiEvent],
+    *,
+    encoding: str = 'utf-8',
 ) -> instrument.Instrument:
     '''
     Convert a single MIDI event into a music21 Instrument object.
@@ -880,7 +882,7 @@ def midiEventsToInstrument(
         if isinstance(event.data, bytes):
             # MuseScore writes MIDI files with null-terminated
             # instrument names.  Thus, stop before the byte-0x0
-            decoded = event.data.decode('utf-8').split('\x00')[0]
+            decoded = event.data.decode(encoding).split('\x00')[0]
             decoded = decoded.strip()
             i = instrument.fromString(decoded)
         elif event.channel == 10 and isinstance(event.data, int):
@@ -1877,14 +1879,15 @@ def getNotesFromEvents(
             awaitingNoteOn[event.pitch, event.channel] = time
         elif event.isNoteOn():
             try:
-                # we had .pop() instead of .get() which would be quite a bit
+                # we had .pop() instead of dict access which would be quite a bit
                 # better to have, but there are a number of cases, including the
                 # test09 midi set where there are multiple note ons at the same
                 # point with multiple note offs at the same time point for the
                 # same pitch and channel.  Better to have the notes turned off
                 # from some previous note off event then to lose it.
-                offTime = awaitingNoteOn.get((event.pitch, event.channel))
-                notes.append(TimedNoteEvent(time, offTime, event))
+                offTime = awaitingNoteOn[event.pitch, event.channel]
+                tne = TimedNoteEvent(time, offTime, event)
+                notes.append(tne)
             except KeyError:  # pragma: no cover
                 pass
                 # raise TranslateException(
@@ -1892,13 +1895,13 @@ def getNotesFromEvents(
                 # )
 
     # could also raise a warning on note offs without a note on.
-    print(len(notes))
     return notes[::-1]  # back to increasing order.
 
 
 def lyricTimingsFromEvents(
     events: list[tuple[int, MidiEvent]],
-    encoding_type: str = 'utf-8',
+    *,
+    encoding: str = 'utf-8',
 ) -> dict[int, str]:
     '''
     From a list of timed events, that is a tuple of a tick time and a MidiEvent
@@ -1911,7 +1914,7 @@ def lyricTimingsFromEvents(
     for time, e in events:
         if e.type == MetaEvents.LYRIC and isinstance(e.data, bytes):
             try:
-                lyrics[time] = e.data.decode(encoding_type)
+                lyrics[time] = e.data.decode(encoding)
             except UnicodeDecodeError:
                 warnings.warn(
                     f'Unable to decode lyrics from {e}',
@@ -1920,13 +1923,17 @@ def lyricTimingsFromEvents(
 
 
 def getMetaEvents(
-    events: list[tuple[int, MidiEvent]]
+    events: list[tuple[int, MidiEvent]],
+    *,
+    encoding: str = 'utf-8',
 ) -> list[tuple[int, base.Music21Object]]:
     '''
     Translate MidiEvents whose type is a MetaEvent into Music21Objects.
 
     Note: this does not translate MetaEvent.LYRIC, since that becomes a
     bare string.
+
+    New in 9.7: add encoding
     '''
     # store pairs of abs time, m21 object
     metaEvents: list[tuple[int, base.Music21Object]] = []
@@ -1943,7 +1950,7 @@ def getMetaEvents(
         elif e.type in (MetaEvents.INSTRUMENT_NAME, MetaEvents.SEQUENCE_TRACK_NAME):
             # midiEventsToInstrument() WILL NOT have knowledge of the current
             # program, so set it here
-            metaObj = midiEventsToInstrument(e)
+            metaObj = midiEventsToInstrument(e, encoding=encoding)
             if last_program != -1:
                 # Only update if we have had an initial PROGRAM_CHANGE
                 metaObj.midiProgram = last_program
@@ -1993,7 +2000,7 @@ def midiTrackToStream(
     conductorPart: stream.Part|None = None,
     isFirst: bool = False,
     quarterLengthDivisors: Sequence[int] = (),
-    encoding_type: str = 'utf-8',
+    encoding: str = 'utf-8',
     **keywords
 ) -> stream.Part:
     # noinspection PyShadowingNames
@@ -2070,8 +2077,8 @@ def midiTrackToStream(
 
     # need to build chords and notes
     notes: list[TimedNoteEvent] = getNotesFromEvents(timedEvents)
-    metaEvents = getMetaEvents(timedEvents)
-    lyricsDict = lyricTimingsFromEvents(timedEvents, encoding_type=encoding_type)
+    metaEvents = getMetaEvents(timedEvents, encoding=encoding)
+    lyricsDict = lyricTimingsFromEvents(timedEvents, encoding=encoding)
 
     # first create MetaEvents
     for tick, obj in metaEvents:
@@ -2675,6 +2682,8 @@ def midiTracksToStreams(
     ticksPerQuarter: int = defaults.ticksPerQuarter,
     quantizePost=True,
     inputM21: stream.Score|None = None,
+    *,
+    encoding: str = 'utf-8',
     **keywords
 ) -> stream.Score:
     '''
@@ -2710,6 +2719,7 @@ def midiTracksToStreams(
                           inputM21=streamPart,
                           conductorPart=conductorPart,
                           isFirst=(mt is firstTrackWithNotes),
+                          encoding=encoding,
                           **keywords)
 
     return s
@@ -2765,6 +2775,7 @@ def midiFilePathToStream(
     filePath,
     *,
     inputM21=None,
+    encoding: str = 'utf-8',
     **keywords,
 ):
     '''
@@ -2793,7 +2804,7 @@ def midiFilePathToStream(
     mf.open(filePath)
     mf.read()
     mf.close()
-    return midiFileToStream(mf, inputM21=inputM21, **keywords)
+    return midiFileToStream(mf, inputM21=inputM21, encoding=encoding, **keywords)
 
 
 def midiAsciiStringToBinaryString(
@@ -2916,6 +2927,7 @@ def midiFileToStream(
     *,
     inputM21=None,
     quantizePost=True,
+    encoding: str = 'utf-8',
     **keywords
 ):
     # noinspection PyShadowingNames
@@ -2965,6 +2977,7 @@ def midiFileToStream(
                         ticksPerQuarter=mf.ticksPerQuarterNote,
                         quantizePost=quantizePost,
                         inputM21=s,
+                        encoding=encoding,
                         **keywords)
     # s._setMidiTracks(mf.tracks, mf.ticksPerQuarterNote)
 

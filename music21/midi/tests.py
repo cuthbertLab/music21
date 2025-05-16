@@ -331,7 +331,7 @@ class Test(unittest.TestCase):
         # dealing with midi files that use running status compression
         s = converter.parse(fp, forceSource=True)
         self.assertEqual(len(s.parts), 2)
-        self.assertEqual(len(s.parts[0].recurse().notes), 704)
+        self.assertEqual(len(s.parts[0].recurse().notes), 702)
         self.assertEqual(len(s.parts[1].recurse().notes), 856)
 
         # for n in s.parts[0].notes:
@@ -1561,7 +1561,7 @@ class Test(unittest.TestCase):
 
         for filename, encoding, lyricFact in testCases:
             fp = common.getSourceFilePath() / 'midi' / 'testPrimitive' / filename
-            s = converter.parse(fp, encoding_type=encoding)
+            s = converter.parse(fp, encoding=encoding)
             for (n, l) in zip(s.flatten().notes, lyricFact):
                 self.assertEqual(n.lyric, l)
 
