@@ -79,6 +79,7 @@ class SubConverter:
 
     def __init__(self, **keywords) -> None:
         self._stream: stream.Score|stream.Part|stream.Opus = stream.Score()
+        # TODO: unify keywords so that they are used by both parseFile and parseData
         self.keywords: dict[str, t.Any] = keywords
 
     def parseData(self, dataString, number: int|None = None):
@@ -1023,7 +1024,11 @@ class ConverterMidi(SubConverter):
     registerInputExtensions = ('mid', 'midi')
     registerOutputExtensions = ('mid',)
 
-    def parseData(self, strData, number=None):
+    def __init__(self, *, encoding='utf-8', **keywords):
+        self.encoding = encoding
+        super().__init__(**keywords)
+
+    def parseData(self, strData, number=None, *, encoding: str = ''):
         '''
         Get MIDI data from a binary string representation.
 
@@ -1033,13 +1038,22 @@ class ConverterMidi(SubConverter):
         `quantizePost` controls whether to quantize the output. (Default: True)
         `quarterLengthDivisors` allows for overriding the default quantization units
         in defaults.quantizationQuarterLengthDivisors. (Default: (4, 3)).
+
+        If encoding is not provided use the encoding of the Converter
+        (default "utf-8")
         '''
         from music21.midi import translate as midiTranslate
-        self.stream = midiTranslate.midiStringToStream(strData, **self.keywords)
+        self.stream = midiTranslate.midiStringToStream(
+            strData,
+            encoding=encoding or self.encoding,
+            **self.keywords
+        )
 
     def parseFile(self,
                   filePath: pathlib.Path|str,
                   number: int|None = None,
+                  *,
+                  encoding: str = '',
                   **keywords):
         '''
         Get MIDI data from a file path.
@@ -1050,9 +1064,17 @@ class ConverterMidi(SubConverter):
         `quantizePost` controls whether to quantize the output. (Default: True)
         `quarterLengthDivisors` allows for overriding the default quantization units
         in defaults.quantizationQuarterLengthDivisors. (Default: (4, 3)).
+
+        If encoding is not provided use the encoding of the Converter
+        (default "utf-8")
         '''
         from music21.midi import translate as midiTranslate
-        midiTranslate.midiFilePathToStream(filePath, inputM21=self.stream, **keywords)
+        midiTranslate.midiFilePathToStream(
+            filePath,
+            inputM21=self.stream,
+            encoding=encoding or self.encoding,
+            **keywords
+        )
 
     def write(self,
               obj,

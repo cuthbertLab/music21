@@ -862,7 +862,7 @@ class StreamAligner:
             raise AlignmentTracebackException('Traceback of best alignment did not end properly')
 
         self.changesCount = Counter(elem[2] for elem in self.changes)
-        self.similarityScore = float(self.changesCount[ChangeOps.NoChange]) / len(self.changes)
+        self.similarityScore = self.changesCount[ChangeOps.NoChange] / len(self.changes)
 
     def showChanges(self, show=False):
         '''

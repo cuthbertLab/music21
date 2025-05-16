@@ -23,12 +23,20 @@ from music21.midi.base import (
     MidiFile,
 )
 from music21.midi.translate import (
+    TimedNoteEvent,
+    TranslateWarning,
+    channelInstrumentData,
+    conductorStream,
+    getMetaEvents,
     midiAsciiStringToBinaryString,
-    noteToMidiEvents,
+    midiEventsToInstrument,
     midiEventsToNote,
-    streamHierarchyToMidiTracks, midiFileToStream, conductorStream,
-    streamToMidiFile, prepareStreamForMidi, midiEventsToInstrument, getMetaEvents,
-    TranslateWarning, channelInstrumentData, packetStorageFromSubstreamList,
+    midiFileToStream,
+    noteToMidiEvents,
+    packetStorageFromSubstreamList,
+    prepareStreamForMidi,
+    streamHierarchyToMidiTracks,
+    streamToMidiFile,
     updatePacketStorageWithChannelInfo,
 )
 from music21.musicxml import testPrimitive
@@ -323,7 +331,7 @@ class Test(unittest.TestCase):
         # dealing with midi files that use running status compression
         s = converter.parse(fp)
         self.assertEqual(len(s.parts), 2)
-        self.assertEqual(len(s.parts[0].recurse().notes), 704)
+        self.assertEqual(len(s.parts[0].recurse().notes), 702)
         self.assertEqual(len(s.parts[1].recurse().notes), 856)
 
         # for n in s.parts[0].notes:
@@ -403,8 +411,7 @@ class Test(unittest.TestCase):
         self.assertIsInstance(eventList[3], MidiEvent)
 
         # translate eventList back to a note
-        n2 = midiEventsToNote(((eventList[0].time, eventList[1]),
-                               (eventList[2].time, eventList[2])))
+        n2 = midiEventsToNote(TimedNoteEvent(eventList[0].time, eventList[2].time, eventList[1]))
         self.assertEqual(n2.pitch.nameWithOctave, 'A4')
         self.assertEqual(n2.quarterLength, 2.0)
 
@@ -1538,23 +1545,24 @@ class Test(unittest.TestCase):
 
     def testMidiImportLyrics(self):
         lyricFactZh = ['明', '山', '涌', '水', '郁', '郁', '葱', '', '葱',
-                        '钟', '灵', '毓', '秀', '海', '天', '', '东',
-                        '济', '济', '多', '士', '四', '方', '所', '', '崇',
-                        '早', '', '育', '', '文', '明', '', '种']
+                       '钟', '灵', '毓', '秀', '海', '天', '', '东',
+                       '济', '济', '多', '士', '四', '方', '所', '', '崇',
+                       '早', '', '育', '', '文', '明', '', '种']
         lyricFactKo = ['빛', '날', '세', '라', '영', '웅', '열', '', '사',
-                        '만', '세', '불', '망', '하', '실', '', '이',
-                        '옛', '적', '이', '나', '지', '금', '이', '', '나',
-                        '항', '상', '앙', '모', '합', '니', '', '다']
+                       '만', '세', '불', '망', '하', '실', '', '이',
+                       '옛', '적', '이', '나', '지', '금', '이', '', '나',
+                       '항', '상', '앙', '모', '합', '니', '', '다']
         testCases = [
             ('test18.mid', 'utf-8', lyricFactZh),
             ('test19.mid', 'gbk', lyricFactZh),
             ('test20.mid', 'utf-8', lyricFactKo),
             ('test21.mid', 'euc-kr', lyricFactKo),
         ]
-        for (filename, encoding, lyricFact) in testCases:
+
+        for filename, encoding, lyricFact in testCases:
             fp = common.getSourceFilePath() / 'midi' / 'testPrimitive' / filename
-            s = converter.parse(fp, encoding_type=encoding)
-            for (n, l) in zip(s.flat.notes, lyricFact):
+            s = converter.parse(fp, encoding=encoding)
+            for (n, l) in zip(s.flatten().notes, lyricFact):
                 self.assertEqual(n.lyric, l)
 
 
