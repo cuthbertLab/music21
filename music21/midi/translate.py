@@ -2234,8 +2234,6 @@ def prepareStreamForMidi(s) -> stream.Stream:
         {0.0} <music21.stream.Measure 1 offset=0.0>
             {0.0} <music21.note.Note C>
     '''
-    from music21 import volume
-
     if s[stream.Measure]:
         s = s.expandRepeats()  # makes a deep copy
     else:
