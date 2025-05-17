@@ -2584,7 +2584,10 @@ class MeasureParser(SoundTagMixin, XMLParserBase):
 
         if self.useVoices is True:
             for v in self.stream.iter().voices:
-                v.coreElementsChanged()
+                if v:  # do not bother with empty voices
+                    # the musicDataMethods use insertCore, thus the voices need to run
+                    # coreElementsChanged
+                    v.coreElementsChanged()
         self.stream.coreElementsChanged()
 
         if (self.restAndNoteCount['rest'] == 1
