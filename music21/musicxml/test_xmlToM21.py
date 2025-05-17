@@ -1326,15 +1326,24 @@ class Test(unittest.TestCase):
 
         # Voice 1: Half note, <forward> (quarter), quarter note
         # Voice 2: <forward> (half), quarter note, <forward> (quarter)
-        s = converter.parse(testPrimitive.hiddenRests)
+        s = converter.parse(testPrimitive.hiddenRestsNoFinale)
         v1, v2 = s.recurse().voices
-        self.assertEqual(v1.duration.quarterLength, 4.0)
-        self.assertEqual(v2.duration.quarterLength, 3.0)
+        # No rests should have been added
+        self.assertFalse(v1.getElementsByClass(note.Rest))
+        self.assertFalse(v2.getElementsByClass(note.Rest))
 
-        restsV1 = list(v1.getElementsByClass(note.Rest))
-        self.assertEqual(restsV1, [])
-        restsV2 = list(v2.getElementsByClass(note.Rest))
-        self.assertEqual(restsV2, [])
+        # Finale uses <forward> tags to represent hidden rests,
+        # so we want to have rests here
+        # Voice 1: Half note, <forward> (quarter), quarter note
+        # Voice 2: <forward> (half), quarter note, <forward> (quarter)
+        s = converter.parse(testPrimitive.hiddenRestsFinale)
+        v1, v2 = s.recurse().voices
+        self.assertEqual(v1.duration.quarterLength, v2.duration.quarterLength)
+
+        restV1 = v1.getElementsByClass(note.Rest)[0]
+        self.assertTrue(restV1.style.hideObjectOnPrint)
+        restsV2 = v2.getElementsByClass(note.Rest)
+        self.assertEqual([r.style.hideObjectOnPrint for r in restsV2], [True, True])
 
         # Schoenberg op.19/2
         # previously, last measure of LH duplicated hidden rest belonging to RH
