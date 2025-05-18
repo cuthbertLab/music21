@@ -515,12 +515,10 @@ def noteToMidiEvents(
     mt = None  # use a midi track set to None
     eventList: list[DeltaTime|MidiEvent] = []
 
-    if includeDeltaTime:
-        dt = DeltaTime(mt, channel=channel)
-        # add to track events
-        eventList.append(dt)
-
     if (inputM21.lyric is not None and inputM21.lyric != ''):
+        if includeDeltaTime:
+            dt = DeltaTime(mt, channel=channel)
+            eventList.append(dt)
         me = MidiEvent(track=mt)
         me.type = MetaEvents.LYRIC
         me.data = inputM21.lyric.encode(encoding, 'ignore')
@@ -744,11 +742,10 @@ def chordToMidiEvents(
     chordVolume = c.volume  # use if component volume are not defined
     hasComponentVolumes = c.hasComponentVolumes()
 
-    if includeDeltaTime:
-        dt = DeltaTime(track=mt)
-        eventList.append(dt)
-
     if (inputM21.lyric is not None and inputM21.lyric != ''):
+        if includeDeltaTime:
+            dt = DeltaTime(track=mt)
+            eventList.append(dt)
         me = MidiEvent(track=mt)
         me.type = MetaEvents.LYRIC
         me.data = inputM21.lyric.encode(encoding, 'ignore')
@@ -2572,7 +2569,8 @@ def packetStorageFromSubstreamList(
                 # maybe prepareStreamForMidi() wasn't run; create Conductor instance
                 instObj = Conductor()
 
-        trackPackets = streamToPackets(subs, trackId=trackId, addStartDelay=addStartDelay, encoding=encoding)
+        trackPackets = streamToPackets(subs, trackId=trackId, addStartDelay=addStartDelay,
+                                       encoding=encoding)
         # store packets in a dictionary; keys are trackIds
         packetStorage[trackId] = {
             'rawPackets': trackPackets,
@@ -2669,7 +2667,8 @@ def streamHierarchyToMidiTracks(
     for subs in substreamList:
         subs.stripTies(inPlace=True, matchByPitch=True)
 
-    packetStorage = packetStorageFromSubstreamList(substreamList, addStartDelay=addStartDelay, encoding=encoding)
+    packetStorage = packetStorageFromSubstreamList(substreamList, addStartDelay=addStartDelay,
+                                                   encoding=encoding)
     updatePacketStorageWithChannelInfo(packetStorage, channelByInstrument)
 
     initTrackIdToChannelMap = {}
