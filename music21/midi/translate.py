@@ -294,8 +294,8 @@ def getEndEvents(
 def music21ObjectToMidiFile(
     music21Object: base.Music21Object,
     *,
-    encoding: str = 'utf-8',
     addStartDelay=False,
+    encoding: str = 'utf-8',
 ) -> MidiFile:
     '''
     Either calls streamToMidiFile on the music21Object or
@@ -466,9 +466,9 @@ def midiEventsToNote(
 def noteToMidiEvents(
     inputM21: note.Note|note.Unpitched,
     *,
-    encoding: str = 'utf-8',
     includeDeltaTime: bool = True,
     channel: int = 1,
+    encoding: str = 'utf-8',
 ) -> list[DeltaTime|MidiEvent]:
     # noinspection PyShadowingNames
     '''
@@ -697,9 +697,9 @@ def midiEventsToChord(
 def chordToMidiEvents(
     inputM21: chord.ChordBase,
     *,
-    encoding: str = 'utf-8',
     includeDeltaTime: bool = True,
     channel: int = 1,
+    encoding: str = 'utf-8',
 ) -> list[DeltaTime|MidiEvent]:
     # noinspection PyShadowingNames
     '''
@@ -1941,7 +1941,7 @@ def lyricTimingsFromEvents(
                 lyrics[time] = e.data.decode(encoding)
             except UnicodeDecodeError:
                 warnings.warn(
-                    f'Unable to decode lyrics from {e}',
+                    f'Unable to decode lyrics from {e} as {encoding}',
                     TranslateWarning)
     return lyrics
 
@@ -2480,8 +2480,8 @@ def channelInstrumentData(
 def packetStorageFromSubstreamList(
     substreamList: list[stream.Part],
     *,
-    encoding: str = 'utf-8',
     addStartDelay=False,
+    encoding: str = 'utf-8',
 ) -> dict[int, dict[str, t.Any]]:
     # noinspection PyShadowingNames
     r'''
@@ -2614,9 +2614,9 @@ def updatePacketStorageWithChannelInfo(
 def streamHierarchyToMidiTracks(
     inputM21,
     *,
-    encoding: str = 'utf-8',
     acceptableChannelList=None,
     addStartDelay=False,
+    encoding: str = 'utf-8',
 ):
     '''
     Given a Stream, Score, Part, etc., that may have substreams (i.e.,
@@ -2754,9 +2754,9 @@ def midiTracksToStreams(
 def streamToMidiFile(
     inputM21: stream.Stream,
     *,
-    encoding: str = 'utf-8',
     addStartDelay: bool = False,
     acceptableChannelList: list[int]|None = None,
+    encoding: str = 'utf-8',
 ) -> MidiFile:
     # noinspection PyShadowingNames
     '''

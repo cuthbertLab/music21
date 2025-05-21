@@ -630,7 +630,7 @@ class Test(unittest.TestCase):
         <music21.midi.DeltaTime (empty) track=1>,
         <music21.midi.MidiEvent PITCH_BEND, track=1, channel=1, parameter1=0, parameter2=64>,
         <music21.midi.DeltaTime (empty) track=1>,
-        <music21.midi.MidiEvent PROGRAM_CHANGE, track=1, channel=1, data=0>,
+        <music21.midi.MidiEvent PROGRAM_CHANGE, track=1, channel=1, data=0>, 
         <music21.midi.DeltaTime (empty) track=1>,
         <music21.midi.MidiEvent NOTE_ON, track=1, channel=1, pitch=62, velocity=90>]'''
 
@@ -654,10 +654,12 @@ class Test(unittest.TestCase):
         <music21.midi.DeltaTime (empty) track=1>,
         <music21.midi.MidiEvent PROGRAM_CHANGE, track=1, channel=1, data=0>,
         <music21.midi.DeltaTime (empty) track=1>,
+        <music21.midi.MidiEvent LYRIC, track=1, data=b'1. Was\\nzu\\n2. Ich\\nwas'>,
+        <music21.midi.DeltaTime (empty) track=1>,
         <music21.midi.MidiEvent NOTE_ON, track=1, channel=1, pitch=66, velocity=90>,
         <music21.midi.DeltaTime t=5040, track=1>,
         <music21.midi.MidiEvent NOTE_OFF, track=1, channel=1, pitch=66, velocity=0>]'''
-        found = str(mtList[1].events[:10])
+        found = str(mtList[1].events[:12])
         self.assertTrue(common.whitespaceEqual(found, match), found)
 
     def testMidiProgramChangeA(self):
@@ -1565,6 +1567,43 @@ class Test(unittest.TestCase):
             for (n, l) in zip(s.flatten().notes, lyricFact):
                 self.assertEqual(n.lyric, l)
 
+    def testMidiExportLyrics(self):
+        lyricEn = 'cat'# ascii characters should be supported by every encodings
+        lyricZh = '明'
+        lyricKo = '빛'
+
+        testCases = [
+            ('utf-8', lyricEn),
+            ('gbk', lyricEn),
+            ('euc-kr', lyricEn),
+            ('utf-8', lyricZh),
+            ('gbk', lyricZh),
+            ('utf-8', lyricKo),
+            ('euc-kr', lyricKo),
+        ]
+        for encoding, lyric in testCases:
+            with self.subTest(encoding=encoding, lyric=lyric):
+                s = stream.Score()
+                p1 = stream.Part()
+                p2 = stream.Part()
+
+                n1 = note.Note('c4')
+                n1.lyric = lyric
+                n2 = note.Note('g4')
+                n2.lyric = lyric
+
+                p1.append(n1)
+                p2.append(n2)
+
+                s.append(p1)
+                s.append(p2)
+
+                b = converter.toData(s, fmt='midi', encoding=encoding)
+                self.assertIsInstance(b, bytes)
+
+                m = converter.parseData(b, fmt='midi', encoding=encoding)
+                for n in m.flatten().notes:
+                    self.assertEqual(n.lyric, lyric)
 
 # ------------------------------------------------------------------------------
 if __name__ == '__main__':
