@@ -1024,15 +1024,12 @@ class ConverterMidi(SubConverter):
     registerInputExtensions = ('mid', 'midi')
     registerOutputExtensions = ('mid',)
 
-    def __init__(self, **keywords):
-        super().__init__(**keywords)
-
     @property
     def encoding(self) -> str:
-        if "encoding" in self.keywords and self.keywords["encoding"]:
+        if 'encoding' in self.keywords and self.keywords['encoding']:
             # if the encoding is set to None or '', it will be ignored
-            return self.keywords["encoding"]
-        return "utf-8"
+            return self.keywords['encoding']
+        return 'utf-8'
 
     def parseData(self, strData, number=None, *, encoding: str = ''):
         '''
@@ -1078,7 +1075,7 @@ class ConverterMidi(SubConverter):
         '''
         from music21.midi import translate as midiTranslate
         keywords = {k: v for k, v in self.keywords.items()
-                    if k not in ('encoding',)} 
+                    if k not in ('encoding',)}
         midiTranslate.midiFilePathToStream(
             filePath,
             inputM21=self.stream,

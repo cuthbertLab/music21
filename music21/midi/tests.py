@@ -630,7 +630,7 @@ class Test(unittest.TestCase):
         <music21.midi.DeltaTime (empty) track=1>,
         <music21.midi.MidiEvent PITCH_BEND, track=1, channel=1, parameter1=0, parameter2=64>,
         <music21.midi.DeltaTime (empty) track=1>,
-        <music21.midi.MidiEvent PROGRAM_CHANGE, track=1, channel=1, data=0>, 
+        <music21.midi.MidiEvent PROGRAM_CHANGE, track=1, channel=1, data=0>,
         <music21.midi.DeltaTime (empty) track=1>,
         <music21.midi.MidiEvent NOTE_ON, track=1, channel=1, pitch=62, velocity=90>]'''
 
@@ -1568,7 +1568,7 @@ class Test(unittest.TestCase):
                 self.assertEqual(n.lyric, l)
 
     def testMidiExportLyrics(self):
-        lyricEn = 'cat'# ascii characters should be supported by every encodings
+        lyricEn = 'cat'  # ascii characters should be supported by every encoding
         lyricZh = '明'
         lyricKo = '빛'
 
@@ -1604,6 +1604,7 @@ class Test(unittest.TestCase):
                 m = converter.parseData(b, fmt='midi', encoding=encoding)
                 for n in m.flatten().notes:
                     self.assertEqual(n.lyric, lyric)
+
 
 # ------------------------------------------------------------------------------
 if __name__ == '__main__':
