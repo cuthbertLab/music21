@@ -160,7 +160,7 @@ class ActivityMatch:
                     else:
                         pairs.append((x, y))
 
-        # if requesting data points, just return all points
+        # if requesting data points, return all points
         if dataPoints:
             return pairs
 

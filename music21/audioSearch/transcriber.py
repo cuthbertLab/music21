@@ -28,16 +28,16 @@ def runTranscribe(show=True, plot=True, useMic=True,
 
     if `show` is True, show the stream.
 
-    if `plot` is True then a Tk graph of the frequencies will be displayed.
+    if `plot` is True, then a Tk graph of the frequencies will be displayed.
 
     if `useMic` is True then use the microphone.  If False it will load the file of `saveFile`
     or the default temp file to run transcriptions from.
 
-    a different scale besides the chromatic scale can be specified by setting `useScale`.
+    a different scale than the chromatic scale can be specified by setting `useScale`.
     See :ref:`moduleScale` for a list of allowable scales. (or a custom one can be given).
     Microtonal scales are totally accepted, as are retuned scales where A != 440hz.
 
-    if `saveFile` is False then the recorded audio is saved to disk.  If
+    if `saveFile` is False, then the recorded audio is saved to disk.  If
     set to `True` then `environLocal.getRootTempDir() / 'ex.wav'` is
     used as the filename.  If set to anything else then it will use that as the
     filename.
@@ -97,7 +97,7 @@ def monophonicStreamFromFile(fileName, useScale=None):
 
     `fileName` should be the complete path to a file on the disk.
 
-    a different scale besides the chromatic scale can be specified by setting `useScale`.
+    A different scale than the chromatic scale can be specified by setting `useScale`.
     See :ref:`moduleScale` for a list of allowable scales. (or a custom one can be given).
     Microtonal scales are totally accepted, as are retuned scales where A != 440hz.
 
@@ -145,7 +145,7 @@ class TestExternal(unittest.TestCase):
 
     def xtestTranscribePachelbel(self):
         saveFile = environLocal.getRootTempDir() / 'pachelbel.wav'
-        unused_myScore = runTranscribe(useMic=False, saveFile=saveFile, plot=False, show=False)
+        _myScore = runTranscribe(useMic=False, saveFile=saveFile, plot=False, show=False)
         # myScore.show()
 
 

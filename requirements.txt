@@ -3,6 +3,6 @@ joblib
 jsonpickle
 matplotlib
 more_itertools
-numpy<2.0.0
+numpy>=1.26.4
 webcolors>=1.5
 requests

@@ -180,7 +180,7 @@ class DiscreteAnalysis:
     def process(self, sStream):
         '''
         Given a Stream, apply the analysis to all components of this Stream.
-        Expected return is a solution (method specific) and a color value.
+        Expected return is a solution (method-specific) and a color value.
         '''
         pass
 
@@ -342,7 +342,7 @@ class KeyWeightKeyAnalysis(DiscreteAnalysis):
 
     def _getPitchClassDistribution(self, streamObj):
         '''
-        Given a flat Stream, obtain a pitch class distribution.
+        Given a flat Stream, return a pitch class distribution.
         The value of each pitch class is scaled by its duration in quarter lengths.
 
         >>> a = analysis.discrete.KrumhanslSchmuckler()
@@ -485,8 +485,8 @@ class KeyWeightKeyAnalysis(DiscreteAnalysis):
                 valid = self.keysValidMajor
             elif yLabel == 'Minor':
                 valid = self.keysValidMinor
-            row = []
-            row.append(yLabel)
+
+            row: list[t.Any] = [yLabel]
             pairs = []
             for keyPitch in [pitch.Pitch(p) for p in keySortOrderFiltered]:
                 try:
@@ -611,7 +611,7 @@ class KeyWeightKeyAnalysis(DiscreteAnalysis):
         Takes in a Stream or sub-Stream and performs analysis
         on all contents of the Stream. The
         :class:`~music21.analysis.windowed.WindowedAnalysis`
-        windowing system can be used to get numerous results
+        windowing system can be used to get many results
         by calling this method.
 
         Returns two values, a solution data list and a color string.
@@ -632,7 +632,7 @@ class KeyWeightKeyAnalysis(DiscreteAnalysis):
         # values are the result of _getLikelyKeys
         # each first index is the sorted results; there will be 12
         # each first index is tuple
-        # the tuple defines a Pitch, as well as the differences value
+        # the tuple defines a Pitch, as well as the difference value
         # from _getDifference
 
         # if likelyKeysMajor is None or likelyKeysMinor is None:
@@ -781,10 +781,10 @@ class AardenEssen(KeyWeightKeyAnalysis):
     name = 'Aarden Essen Key Analysis'
     identifiers = ['key.aarden', 'key.essen', 'key.aarden-essen', 'key.aardenessen',
                    'aarden', 'essen', 'aarden-essen', 'aardenessen',
+
+                   # adding these identifiers makes this the default
+                   'key', 'keyscape',
                    ]
-    # adding these identifiers make this the default
-    identifiers.append('key')
-    identifiers.append('keyscape')
 
     def __init__(self, referenceStream=None):
         super().__init__(referenceStream=referenceStream)
@@ -1135,8 +1135,7 @@ class Ambitus(DiscreteAnalysis):
 
         # split keys into two groups for two rows (optional)
         for keyGroup in [keysTopRow, keysBottomRow]:
-            row = []
-            row.append('')  # empty row label
+            row: list[t.Any] = ['']  # empty row label
             pairs = []
             for i in keyGroup:
                 color = colors[i]  # get form colors
@@ -1435,7 +1434,7 @@ class Test(unittest.TestCase):
         likelyKeysMinor1.sort()
         allResults1 = likelyKeysMajor1 + likelyKeysMinor1
         # post = []
-        unused_post = sorted([(y, x) for x, y in allResults1])
+        _post = sorted([(y, x) for x, y in allResults1])
 
         p.process(s2.flatten())
         likelyKeysMajor2, likelyKeysMinor2 = p._likelyKeys(s2.flatten())
@@ -1443,20 +1442,20 @@ class Test(unittest.TestCase):
         likelyKeysMinor2.sort()
         allResults2 = likelyKeysMajor2 + likelyKeysMinor2
         # post = []
-        unused_post = sorted([(y, x) for x, y in allResults2])
+        _post = sorted([(y, x) for x, y in allResults2])
 
         likelyKeysMajor3, likelyKeysMinor3 = p._likelyKeys(s3.flatten())
         likelyKeysMajor3.sort()
         likelyKeysMinor3.sort()
         allResults3 = likelyKeysMajor3 + likelyKeysMinor3
-        unused_post = sorted([(y, x) for x, y in allResults3])
+        _post = sorted([(y, x) for x, y in allResults3])
 
         avg = []
         for i in range(len(allResults1)):
             p, count1 = allResults1[i]
             p, count2 = allResults2[i]
             avg.append((p, (count1 + count2) / 2.0))
-        unused_post = sorted([(y, x) for x, y in avg])
+        _post = sorted([(y, x) for x, y in avg])
 
     def testIntervalDiversity(self):
         from music21 import stream
