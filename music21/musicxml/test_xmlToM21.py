@@ -17,6 +17,7 @@ from music21 import harmony
 from music21 import instrument
 from music21 import key
 from music21 import layout
+from music21 import metadata
 from music21 import meter
 from music21 import note
 from music21 import pitch
@@ -33,11 +34,6 @@ from music21.musicxml.xmlToM21 import (
 )
 
 class Test(unittest.TestCase):
-    def testParseSimple(self):
-        MI = MusicXMLImporter()
-        MI.xmlText = r'''<score-timewise />'''
-        self.assertRaises(MusicXMLImportException, MI.parseXMLText)
-
     def EL(self, elText):
         return ET.fromstring(elText)
 
@@ -52,6 +48,60 @@ class Test(unittest.TestCase):
         out = out[0:len(out) - 2]
         out += ']'
         return out
+
+    def testParseSimple(self):
+        MI = MusicXMLImporter()
+        MI.xmlText = r'''<score-timewise />'''
+        self.assertRaises(MusicXMLImportException, MI.parseXMLText)
+
+    def test_processEncoding(self):
+        '''
+        Test that the Encoding tag sets software etc. properly.
+        '''
+        enc1 = '''
+            <encoding>
+              <encoding-date>2025-05-21</encoding-date>
+              <software>Finale v26.3 for Mac</software>
+              <supports attribute="new-system" element="print" type="yes" value="yes" />
+              <supports attribute="new-page" element="print" type="yes" value="yes" />
+            </encoding>
+        '''
+        mxl_importer = MusicXMLImporter()
+        self.assertFalse(mxl_importer.applyFinaleWorkarounds)
+        self.assertFalse(mxl_importer.definesExplicitSystemBreaks)
+        self.assertFalse(mxl_importer.definesExplicitPageBreaks)
+
+        encoding = self.EL(enc1)
+        md = metadata.Metadata()
+        self.assertEqual(len(md.software), 1)
+        # we add music21 to all initial software...
+        self.assertIn('music21', md.software[0])
+
+        mxl_importer = MusicXMLImporter()
+        mxl_importer.processEncoding(encoding, md)
+        self.assertTrue(mxl_importer.applyFinaleWorkarounds)
+        self.assertTrue(mxl_importer.definesExplicitSystemBreaks)
+        self.assertTrue(mxl_importer.definesExplicitPageBreaks)
+        self.assertIn('Finale v26.3 for Mac', md.software)
+
+        enc1 = '''
+            <encoding>
+              <encoding-date>2099-05-21</encoding-date>
+              <software>music21 v.99</software>
+              <software>Finale v90 for ChatGPT Implant</software>
+              <supports attribute="new-system" element="print" type="yes" value="no" />
+              <supports attribute="new-page" element="print" type="yes" value="yes" />
+            </encoding>
+        '''
+        mxl_importer = MusicXMLImporter()
+        encoding = self.EL(enc1)
+        md = metadata.Metadata()
+        mxl_importer.processEncoding(encoding, md)
+        self.assertFalse(mxl_importer.applyFinaleWorkarounds)
+        self.assertFalse(mxl_importer.definesExplicitSystemBreaks)
+        self.assertTrue(mxl_importer.definesExplicitPageBreaks)
+        self.assertIn('music21 v.99', md.software)
+        self.assertIn('Finale v90 for ChatGPT Implant', md.software)
 
     def testExceptionMessage(self):
         mxScorePart = self.EL('<score-part><part-name>Elec.</part-name></score-part>')
