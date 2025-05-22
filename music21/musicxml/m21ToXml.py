@@ -38,6 +38,7 @@ from music21 import clef
 from music21 import chord
 from music21 import common
 from music21.common.enums import AppendSpanners
+from music21.common.numberTools import opFrac
 from music21 import defaults
 from music21 import duration
 from music21 import dynamics
@@ -3324,7 +3325,7 @@ class MeasureExporter(XMLExporterBase):
         else:
             # if necessary, jump to end of the measure.
             if self.offsetInMeasure < firstPassEndOffsetInMeasure:
-                self.moveForward(firstPassEndOffsetInMeasure - self.offsetInMeasure)
+                self.moveForward(opFrac(firstPassEndOffsetInMeasure - self.offsetInMeasure))
 
         self.currentVoiceId = None
 

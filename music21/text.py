@@ -589,12 +589,13 @@ class Trigram:
         thisLength = total ** 0.5
         self._length = thisLength
 
-    def similarity(self, other):
+    def similarity(self, other: Trigram) -> float:
         '''
         returns a number between 0 and 1 indicating similarity between
         two trigrams.
-        1 means an identical ratio of trigrams;
-        0 means no trigrams in common.
+
+        1.0 means an identical ratio of trigrams;
+        0.0 means no trigrams in common.
         '''
         if not isinstance(other, Trigram):
             raise TypeError("can't compare Trigram with non-Trigram")
@@ -612,14 +613,14 @@ class Trigram:
         # environLocal.warn([self.length, 'self'])
         # environLocal.warn([other.length, 'other'])
 
-        return float(total) / (self.length * other.length)
+        return float(total / (self.length * other.length))
 
-    def __sub__(self, other):
+    def __sub__(self, other: Trigram) -> float:
         '''
-        indicates difference between trigram sets; 1 is entirely
-        different, 0 is entirely the same.
+        indicates difference between trigram sets; 1.0 is entirely
+        different, 0.0 is entirely the same.
         '''
-        return 1 - self.similarity(other)
+        return 1.0 - self.similarity(other)
 
     def makeWords(self, count):
         '''
