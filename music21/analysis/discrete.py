@@ -1447,7 +1447,7 @@ class Test(unittest.TestCase):
         likelyKeysMajor3, likelyKeysMinor3 = p._likelyKeys(s3.flatten())
         likelyKeysMajor3.sort()
         likelyKeysMinor3.sort()
-        allResults3 = likelyKeysMajor3 + likelyKeysMinor3
+        # allResults3 = likelyKeysMajor3 + likelyKeysMinor3
         # _post = sorted([(y, x) for x, y in allResults3])
 
         avg = []
