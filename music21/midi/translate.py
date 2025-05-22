@@ -2616,7 +2616,7 @@ def streamHierarchyToMidiTracks(
     *,
     acceptableChannelList=None,
     addStartDelay=False,
-    encoding: str = 'utf-8',
+    encoding='utf-8',
 ):
     '''
     Given a Stream, Score, Part, etc., that may have substreams (i.e.,
