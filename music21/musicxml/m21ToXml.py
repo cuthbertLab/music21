@@ -38,6 +38,7 @@ from music21 import clef
 from music21 import chord
 from music21 import common
 from music21.common.enums import AppendSpanners
+from music21.common.numberTools import opFrac
 from music21 import defaults
 from music21 import duration
 from music21 import dynamics
@@ -3051,7 +3052,7 @@ class MeasureExporter(XMLExporterBase):
             ('TextExpression', 'textExpressionToXml'),
             ('RepeatExpression', 'textExpressionToXml'),
             ('RehearsalMark', 'rehearsalMarkToXml'),
-            ('PedalObject', 'pedalObjectToXml'),
+            ('PedalTransition', 'pedalTransitionToXml'),
         ]
     )
     # these need to be wrapped in an attributes tag if not at the beginning of the measure.
@@ -3277,7 +3278,9 @@ class MeasureExporter(XMLExporterBase):
                         self.parseOneElement(obj, AppendSpanners.NORMAL)
 
             for n in notesForLater:
-                if n.isRest and n.style.hideObjectOnPrint and n.duration.type == 'inexpressible':
+                if (n.isRest
+                        and n.style.hideObjectOnPrint
+                        and n.duration.type in ('inexpressible', 'complex')):
                     # Prefer a gap in stream, to be filled with a <forward> tag by
                     # fill_gap_with_forward_tag() rather than raising exceptions
                     continue
@@ -3300,8 +3303,8 @@ class MeasureExporter(XMLExporterBase):
             if self.offsetInMeasure:
                 self.moveBackward(self.offsetInMeasure)
 
-            objIterator = OffsetIterator(m)
-            for objGroup in objIterator:
+            objList = list(OffsetIterator(m))
+            for objGroup in objList:
                 # noinspection PyTypeChecker
                 if not any(self._hasRelatedSpanners(obj) for obj in objGroup):
                     continue
@@ -3322,7 +3325,7 @@ class MeasureExporter(XMLExporterBase):
         else:
             # if necessary, jump to end of the measure.
             if self.offsetInMeasure < firstPassEndOffsetInMeasure:
-                self.moveForward(firstPassEndOffsetInMeasure)
+                self.moveForward(opFrac(firstPassEndOffsetInMeasure - self.offsetInMeasure))
 
         self.currentVoiceId = None
 
@@ -3498,6 +3501,7 @@ class MeasureExporter(XMLExporterBase):
 
                     mxDirection = Element('direction')
                     synchronizeIds(mxDirection, thisSpanner)
+                    self.setPosition(mxElement, thisSpanner)
 
                     # Not all spanners have placements
                     if hasattr(thisSpanner, 'placement') and thisSpanner.placement is not None:
@@ -3515,7 +3519,9 @@ class MeasureExporter(XMLExporterBase):
                         # check to see if we also need to start a line
                         if t.TYPE_CHECKING:
                             assert isinstance(thisSpanner, expressions.PedalMark)
-                        if thisSpanner.pedalForm == expressions.PedalForm.SymbolLine:
+                        if (thisSpanner.startForm
+                                in (expressions.PedalForm.PedalName, expressions.PedalForm.Ped)
+                                and thisSpanner.continueLine == expressions.PedalLine.Line):
                             mxPedalLine = (
                                 self.makePedalResumeLineXml(thisSpanner)
                             )
@@ -3588,10 +3594,9 @@ class MeasureExporter(XMLExporterBase):
                 # so that's what we do here, hoping there is a text
                 # direction describing which pedal to use.
                 post['type'] = 'start'
-            if sp.pedalForm == expressions.PedalForm.Line:
+            if sp.startForm == expressions.PedalForm.VerticalLine:
                 post['line'] = 'yes'
             else:
-                # 'symbol', 'altsymbol', and 'symline' all start with a sign
                 post['sign'] = 'yes'
             if sp.abbreviated:
                 post['abbreviated'] = 'yes'
@@ -3631,10 +3636,10 @@ class MeasureExporter(XMLExporterBase):
         elif spannerClass == 'PedalMark':
             if t.TYPE_CHECKING:
                 assert isinstance(sp, expressions.PedalMark)
-            if sp.pedalForm in (expressions.PedalForm.Line, expressions.PedalForm.SymbolLine):
+            if (sp.continueLine == expressions.PedalLine.Line
+                    or sp.endForm == expressions.PedalForm.VerticalLine):
                 post['line'] = 'yes'
             else:
-                # 'symbol', 'altsymbol' both end with a sign
                 post['sign'] = 'yes'
 
         return post
@@ -6524,21 +6529,24 @@ class MeasureExporter(XMLExporterBase):
         self.xmlRoot.append(mxDirection)
         return mxDirection
 
-    def pedalObjectToXml(self, po: expressions.PedalObject) -> Element|None:
+    def pedalTransitionToXml(self, pt: expressions.PedalTransition) -> Element|None:
         # noinspection PyShadowingNames
         '''
-        Convert a PedalObject object (i.e. PedalBounce, PedalGapStart,
-        PedalGapEnds) to a MusicXML <direction> tag with a <pedal> tag
-        inside it.  Attributes like pedalForm are stored in the enclosing
-        PedalMark spanner.
+        Convert a PedalTransition object (i.e. PedalBounce, PedalGapStart,
+        PedalGapEnd) to a MusicXML <direction> tag with a <pedal> tag
+        inside it.
 
         >>> pm = expressions.PedalMark()
         >>> po = expressions.PedalBounce()
+        >>> po.overrideBounceUp = expressions.PedalForm.SlantedLine
+        >>> po.overrideBounceDown = expressions.PedalForm.SlantedLine
         >>> pm.addSpannedElements(po)
-        >>> pm.pedalForm = expressions.PedalForm.Line
         >>> pm.pedalType = expressions.PedalType.Sustain
+        >>> pm.startForm = expressions.PedalForm.VerticalLine
+        >>> pm.continueLine = expressions.PedalLine.Line
+        >>> pm.endForm = expressions.PedalForm.VerticalLine
         >>> MEX = musicxml.m21ToXml.MeasureExporter()
-        >>> mxPedal = MEX.pedalObjectToXml(po)
+        >>> mxPedal = MEX.pedalTransitionToXml(po)
         >>> MEX.dump(mxPedal)
         <direction>
           <direction-type>
@@ -6548,12 +6556,16 @@ class MeasureExporter(XMLExporterBase):
 
         >>> pm = expressions.PedalMark()
         >>> po = expressions.PedalGapStart()
+        >>> po.overrideBounceUp = expressions.PedalForm.SlantedLine
+        >>> po.overrideBounceDown = expressions.PedalForm.SlantedLine
         >>> pm.addSpannedElements(po)
-        >>> pm.pedalForm = expressions.PedalForm.Line
         >>> pm.pedalType = expressions.PedalType.Sustain
+        >>> pm.startForm = expressions.PedalForm.VerticalLine
+        >>> pm.continueLine = expressions.PedalLine.Line
+        >>> pm.endForm = expressions.PedalForm.VerticalLine
         >>> po.placement = 'above'
         >>> MEX = musicxml.m21ToXml.MeasureExporter()
-        >>> mxPedal = MEX.pedalObjectToXml(po)
+        >>> mxPedal = MEX.pedalTransitionToXml(po)
         >>> MEX.dump(mxPedal)
         <direction placement="above">
           <direction-type>
@@ -6564,11 +6576,13 @@ class MeasureExporter(XMLExporterBase):
         >>> pm = expressions.PedalMark()
         >>> po = expressions.PedalGapEnd()
         >>> pm.addSpannedElements(po)
-        >>> pm.pedalForm = expressions.PedalForm.Line
         >>> pm.pedalType = expressions.PedalType.Sustain
+        >>> pm.startForm = expressions.PedalForm.VerticalLine
+        >>> pm.continueLine = expressions.PedalLine.Line
+        >>> pm.endForm = expressions.PedalForm.VerticalLine
         >>> po.placement = 'below'
         >>> MEX = musicxml.m21ToXml.MeasureExporter()
-        >>> mxPedal = MEX.pedalObjectToXml(po)
+        >>> mxPedal = MEX.pedalTransitionToXml(po)
         >>> MEX.dump(mxPedal)
         <direction placement="below">
           <direction-type>
@@ -6577,74 +6591,93 @@ class MeasureExporter(XMLExporterBase):
         </direction>
         '''
         pm: expressions.PedalMark|None = None
-        spanners: list[spanner.Spanner] = po.getSpannerSites()
-        for sp in spanners:
-            if isinstance(sp, expressions.PedalMark):
-                pm = sp
-                break
+        spanners: list[spanner.Spanner] = pt.getSpannerSites((expressions.PedalMark,))
+        if spanners:
+            if t.TYPE_CHECKING:
+                assert isinstance(spanners[0], expressions.PedalMark)
+            pm = spanners[0]
 
         if pm is None:
-            # A PedalObject that is not in a PedalMark spanner
+            # A PedalTransition that is not in a PedalMark spanner
             # doesn't make sense.  Ignore it.
             return None
 
         mxPedals: list[Element] = []
-        if isinstance(po, expressions.PedalBounce):
-            if pm.pedalForm in (expressions.PedalForm.Line, expressions.PedalForm.SymbolLine):
-                # Line or SymbolLine bounce is a quick up-down-tick in the line, so this
-                # is a pedal 'change'.
-                mxPedals = [Element('pedal')]
-                mxPedals[0].set('type', 'change')
-            elif pm.pedalForm == expressions.PedalForm.SymbolAlt:
-                # SymbolAlt bounce is just "Ped.", so just a pedal 'start'
-                mxPedals = [Element('pedal')]
-                if pm.pedalType == expressions.PedalType.Sustain:
-                    mxPedals[0].set('type', 'start')
-                elif pm.pedalType == expressions.PedalType.Sostenuto:
-                    mxPedals[0].set('type', 'sostenuto')
-                else:
-                    # not exactly right for Soft or Silent, but
-                    # we can hope that there is a text direction
-                    # somewhere before this that specifies which
-                    # pedal these "Ped." marks refer to.
-                    mxPedals[0].set('type', 'sustain')
-            elif pm.pedalForm == expressions.PedalForm.Symbol:
-                # Symbol bounce is "*Ped.", so a pedal 'stop' followed immediately by pedal 'start'
-                mxPedals = [Element('pedal'), Element('pedal')]
-                mxPedals[0].set('type', 'stop')
-                if pm.pedalType == expressions.PedalType.Sustain:
-                    mxPedals[1].set('type', 'start')
-                elif pm.pedalType == expressions.PedalType.Sostenuto:
-                    mxPedals[1].set('type', 'sostenuto')
-                else:
-                    # not exactly right for Soft or Silent, but
-                    # we can hope that there is a text direction
-                    # somewhere before this that specifies which
-                    # pedal these "Ped." marks refer to.
-                    mxPedals[1].set('type', 'sustain')
-            else:
-                # shouldn't be able to happen
-                return None
+        if isinstance(pt, expressions.PedalBounce):
+            bounceUp: expressions.PedalForm = pt.bounceUp
+            bounceDown: expressions.PedalForm = pt.bounceDown
 
-        elif isinstance(po, expressions.PedalGapStart):
+            if expressions.PedalForm.SlantedLine in (bounceUp, bounceDown):
+                # We assume if one and/or the other is SlantedLine, the
+                # intention is a "caret" bounce.
+                mxPedals = [Element('pedal')]
+                if pm.idLocal is not None:
+                    mxPedals[0].set('number', str(pm.idLocal))
+                mxPedals[0].set('type', 'change')
+                mxPedals[0].set('line', 'yes')
+            else:
+                # We assume that bounceUp is either NoMark or Star.
+                if bounceUp == expressions.PedalForm.NoMark:
+                    # just a bounce down
+                    mxPedals = [Element('pedal')]
+                    # increment the idLocal for this 'start'
+                    # (room was made in spanner.setIdLocals)
+                    if pm.idLocal is not None:
+                        if t.TYPE_CHECKING:
+                            assert isinstance(pm.idLocal, int)
+                        pm.idLocal = (pm.idLocal % 6) + 1
+                        mxPedals[0].set('number', str(pm.idLocal))
+                else:
+                    # bounce up and then down, starting with a Star
+                    mxPedals = [Element('pedal'), Element('pedal')]
+                    # close out one pedal, then increment idLocal for the next one
+                    # (room was made in spanner.setIdLocals)
+                    if pm.idLocal is not None:
+                        mxPedals[0].set('number', str(pm.idLocal))
+                    mxPedals[0].set('sign', 'yes')
+                    mxPedals[0].set('type', 'stop')
+                    if t.TYPE_CHECKING:
+                        assert isinstance(pm.idLocal, int)
+                    if pm.idLocal is not None:
+                        pm.idLocal = (pm.idLocal % 6) + 1
+
+                # We assume that bounceDown is either Ped or PedalName
+                if pm.idLocal is not None:
+                    mxPedals[-1].set('number', str(pm.idLocal))
+                mxPedals[-1].set('sign', 'yes')
+                if bounceDown == expressions.PedalForm.Ped:
+                    mxPedals[-1].set('type', 'start')
+                elif pm.pedalType == expressions.PedalType.Sustain:
+                    mxPedals[-1].set('type', 'start')
+                elif pm.pedalType == expressions.PedalType.Sostenuto:
+                    mxPedals[-1].set('type', 'sostenuto')
+                else:
+                    # not exactly right for Soft or Silent, but
+                    # we can hope that there is a text direction
+                    # somewhere before this that specifies which
+                    # pedal these "Ped." marks refer to.
+                    mxPedals[-1].set('type', 'start')
+
+        elif isinstance(pt, expressions.PedalGapStart):
             mxPedals = [Element('pedal')]
+            if pm.idLocal is not None:
+                mxPedals[0].set('number', str(pm.idLocal))
             mxPedals[0].set('type', 'discontinue')
-        elif isinstance(po, expressions.PedalGapEnd):
+            mxPedals[0].set('line', 'yes')
+        elif isinstance(pt, expressions.PedalGapEnd):
             mxPedals = [Element('pedal')]
+            if pm.idLocal is not None:
+                mxPedals[0].set('number', str(pm.idLocal))
             mxPedals[0].set('type', 'resume')
+            mxPedals[0].set('line', 'yes')
         else:
             return None
 
         for mxPedal in mxPedals:
-            if pm.pedalForm in (expressions.PedalForm.Line, expressions.PedalForm.SymbolLine):
-                mxPedal.set('line', 'yes')
-            else:
-                mxPedal.set('sign', 'yes')
-
             # wrap in <direction><direction-type>
-            mxDirection = self.placeInDirection(mxPedal, po)
+            mxDirection = self.placeInDirection(mxPedal, pt)
             # placement goes on <direction>
-            self.setStyleAttributes(mxDirection, po, 'placement')
+            self.setStyleAttributes(mxDirection, pt, 'placement')
             self.xmlRoot.append(mxDirection)
 
         return mxDirection
@@ -6652,6 +6685,8 @@ class MeasureExporter(XMLExporterBase):
     def makePedalResumeLineXml(self, pm: expressions.PedalMark) -> Element:
         # does not append to self.xmlRoot (caller will do that)
         mxPedal = Element('pedal')
+        if pm.idLocal is not None:
+            mxPedal.set('number', str(pm.idLocal))
         mxPedal.set('type', 'resume')
         mxPedal.set('line', 'yes')
         # wrap in <direction><direction-type>

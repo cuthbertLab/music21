@@ -1130,46 +1130,80 @@ class Test(unittest.TestCase):
         self.assertEqual(len(pedals), 1)
         pm = pedals[0]
         pm.fill(s)
-        self.assertIsNone(pm.pedalForm)
         self.assertEqual(pm.pedalType, expressions.PedalType.Sustain)
+        self.assertEqual(pm.startForm, expressions.PedalForm.VerticalLine)
+        self.assertEqual(pm.continueLine, expressions.PedalLine.Line)
+        self.assertEqual(pm.bounceUp, expressions.PedalForm.Unspecified)
+        self.assertEqual(pm.bounceDown, expressions.PedalForm.Unspecified)
+        self.assertEqual(pm.endForm, expressions.PedalForm.VerticalLine)
+        self.assertFalse(pm.abbreviated)
         spElements = pm.getSpannedElements()
         self.assertEqual(len(spElements), 4)
+        expectedInstances = [
+            note.Note,
+            expressions.PedalBounce,
+            note.Note,
+            note.Note,
+        ]
         expectedOffsets = [0., 1., 1., 2.]
-        for i, (el, expectedOffset) in enumerate(zip(spElements, expectedOffsets)):
-            if i == 1:
-                self.assertIsInstance(el, expressions.PedalBounce)
-            else:
-                self.assertIsInstance(el, note.Note)
-                self.assertEqual(el.fullName, 'C in octave 4 Quarter Note')
+        for i, (el, expectedOffset, expectedInstance) in enumerate(zip(
+                spElements, expectedOffsets, expectedInstances)):
+            self.assertIsInstance(el, expectedInstance)
             self.assertEqual(el.offset, expectedOffset)
+            if expectedInstance == note.Note:
+                self.assertEqual(el.fullName, 'C in octave 4 Quarter Note')
+            elif expectedInstance == expressions.PedalBounce:
+                self.assertEqual(el.overrideBounceUp, expressions.PedalForm.SlantedLine)
+                self.assertEqual(el.overrideBounceDown, expressions.PedalForm.SlantedLine)
+                self.assertEqual(el.bounceUp, expressions.PedalForm.SlantedLine)
+                self.assertEqual(el.bounceDown, expressions.PedalForm.SlantedLine)
 
         s = converter.parse(testPrimitive.spanners33a)
         pedals = list(s[expressions.PedalMark])
         self.assertEqual(len(pedals), 1)
         pm = pedals[0]
         pm.fill(s)
-        self.assertIsNone(pm.pedalForm)
         self.assertEqual(pm.pedalType, expressions.PedalType.Sustain)
+        self.assertEqual(pm.startForm, expressions.PedalForm.VerticalLine)
+        self.assertEqual(pm.continueLine, expressions.PedalLine.Line)
+        self.assertEqual(pm.bounceUp, expressions.PedalForm.Unspecified)
+        self.assertEqual(pm.bounceDown, expressions.PedalForm.Unspecified)
+        self.assertEqual(pm.endForm, expressions.PedalForm.VerticalLine)
+        self.assertFalse(pm.abbreviated)
         spElements = pm.getSpannedElements()
         self.assertEqual(len(spElements), 3)
+        expectedInstances = [
+            note.Note,
+            expressions.PedalBounce,
+            note.Note,
+        ]
         expectedOffsets = [0., 1., 1.]
-        for i, (el, expectedOffset) in enumerate(zip(spElements, expectedOffsets)):
-            if i == 1:
-                self.assertIsInstance(el, expressions.PedalBounce)
-            else:
-                self.assertIsInstance(el, note.Note)
-                self.assertEqual(el.fullName, 'B in octave 4 Quarter Note')
+        for i, (el, expectedOffset, expectedInstance) in enumerate(zip(
+                spElements, expectedOffsets, expectedInstances)):
+            self.assertIsInstance(el, expectedInstance)
             self.assertEqual(el.offset, expectedOffset)
+            if expectedInstance == note.Note:
+                self.assertEqual(el.fullName, 'B in octave 4 Quarter Note')
+            elif expectedInstance == expressions.PedalBounce:
+                self.assertEqual(el.overrideBounceUp, expressions.PedalForm.SlantedLine)
+                self.assertEqual(el.overrideBounceDown, expressions.PedalForm.SlantedLine)
+                self.assertEqual(el.bounceUp, expressions.PedalForm.SlantedLine)
+                self.assertEqual(el.bounceDown, expressions.PedalForm.SlantedLine)
 
-        s = corpus.parse('beach')
+        s = corpus.parse('beach')  # , forceSource=True)
         pedals = list(s[expressions.PedalMark])
         self.assertEqual(len(pedals), 1)
         pm = pedals[0]
         pm.fill(s.parts[5])
-        self.assertEqual(pm.pedalForm, expressions.PedalForm.Symbol)
         self.assertEqual(pm.pedalType, expressions.PedalType.Sustain)
+        self.assertEqual(pm.startForm, expressions.PedalForm.PedalName)
+        self.assertEqual(pm.continueLine, expressions.PedalLine.NoLine)
+        self.assertEqual(pm.bounceUp, expressions.PedalForm.Unspecified)
+        self.assertEqual(pm.bounceDown, expressions.PedalForm.PedalName)
+        self.assertEqual(pm.endForm, expressions.PedalForm.Star)
+        self.assertFalse(pm.abbreviated)
         spElements = pm.getSpannedElements()
-        self.assertEqual(len(spElements), 2)
+        self.assertEqual(len(spElements), 3)
         self.assertIsInstance(spElements[0], chord.Chord)
         self.assertEqual(
             spElements[0].fullName,
@@ -1179,20 +1213,38 @@ class Test(unittest.TestCase):
         self.assertIsInstance(spElements[1], note.Note)
         self.assertEqual(spElements[1].fullName, 'E-flat in octave 1 Whole Note')
         self.assertEqual(spElements[1].offset, 0.)
+        self.assertEqual(spElements[1].quarterLength, 4.)
+        # The pedal "stop" happens a quarter-note _before_ the end of the last whole note
+        # (last whole note <duration> is 32, <pedal><offset> is -8)
+        self.assertEqual(spElements[2].offset, 3.)
+        self.assertIsInstance(spElements[2], spanner.SpannerAnchor)
 
-        s = corpus.parse('dichterliebe_no2')
+        s = corpus.parse('dichterliebe_no2')  # , forceSource=True)
         pedals = list(s[expressions.PedalMark])
         self.assertEqual(len(pedals), 1)
         pm = pedals[0]
         pm.fill(s.parts[2])
-        self.assertEqual(pm.pedalForm, expressions.PedalForm.Symbol)
         self.assertEqual(pm.pedalType, expressions.PedalType.Sustain)
+        self.assertEqual(pm.startForm, expressions.PedalForm.PedalName)
+        self.assertEqual(pm.continueLine, expressions.PedalLine.NoLine)
+        self.assertEqual(pm.bounceUp, expressions.PedalForm.Unspecified)
+        self.assertEqual(pm.bounceDown, expressions.PedalForm.PedalName)
+        self.assertEqual(pm.endForm, expressions.PedalForm.Star)
         spElements = pm.getSpannedElements()
         self.assertEqual(len(spElements), 5)
         expectedOffsets = [1.5, 1.75, 0., 0.75, 1.0]
-        for i, (el, expectedOffset) in enumerate(zip(spElements, expectedOffsets)):
-            self.assertIsInstance(el, note.Note)
-            self.assertEqual(el.nameWithOctave, 'A3')
+        expectedInstances = [
+            note.Note,
+            note.Note,
+            note.Note,
+            note.Note,
+            note.Note,
+        ]
+        for i, (el, expectedOffset, expectedInstance) in enumerate(zip(
+                spElements, expectedOffsets, expectedInstances)):
+            self.assertIsInstance(el, expectedInstance)
+            if expectedInstance == note.Note:
+                self.assertEqual(el.nameWithOctave, 'A3')
             self.assertEqual(el.offset, expectedOffset)
 
     def testNoChordImport(self):
@@ -1256,8 +1308,8 @@ class Test(unittest.TestCase):
         el2 = EL('<bracket type="stop" line-end="down" end-length="12.5" number="1"></bracket>')
 
         mp = MeasureParser()
-        line = mp.xmlDirectionTypeToSpanners(el1)[0]
-        mp.xmlDirectionTypeToSpanners(el2)
+        line = mp.xmlDirectionTypeToSpanners(el1, 1, 0.0)[0]
+        mp.xmlDirectionTypeToSpanners(el2, 1, 1.0)
         self.assertEqual(line.startHeight, 12.5)
         self.assertEqual(line.endHeight, 12.5)
 
@@ -1374,6 +1426,7 @@ class Test(unittest.TestCase):
         from music21 import corpus
         from music21.musicxml import testPrimitive
 
+        # With most software, <forward> tags should map to no objects at all
         # Voice 1: Half note, <forward> (quarter), quarter note
         # Voice 2: <forward> (half), quarter note, <forward> (quarter)
         s = converter.parse(testPrimitive.hiddenRestsNoFinale)
@@ -1580,11 +1633,37 @@ class Test(unittest.TestCase):
             [o.placement for o in ottava_objs],
             ['above', 'below', 'above', 'below']
         )
+        ottavaPitches = []
+        for o in ottava_objs:
+            ottavaPitches.append([])
+            for p in o.getSpannedElements():
+                if hasattr(p, 'nameWithOctave'):
+                    name = p.nameWithOctave
+                else:
+                    name = repr(p)
+                ottavaPitches[-1].append(name)
+
         self.assertEqual(
-            [[p.nameWithOctave for p in o.getSpannedElements()] for o in ottava_objs],
-            # TODO(bug): first element should be ['C7', 'A6']
-            # not reading <offset>-4</offset>
-            [['A6'], ['C3', 'B2'], ['A5', 'A5'], ['B3', 'C4']]
+            ottavaPitches, [
+                [
+                    '<music21.spanner.SpannerAnchor at 0.5>',
+                    'C5',
+                    '<music21.spanner.SpannerAnchor at 1.0>'
+                ],
+                [
+                    'C3',
+                    '<music21.spanner.SpannerAnchor at 2.0>'
+                ],
+                [
+                    'A5',
+                    'A5',
+                    '<music21.spanner.SpannerAnchor at 3.125>'
+                ],
+                [
+                    'B3',
+                    '<music21.spanner.SpannerAnchor at 3.75>'
+                ]
+            ]
         )
 
     def testClearingTuplets(self):

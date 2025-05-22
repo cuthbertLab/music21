@@ -2143,7 +2143,15 @@ class Test(unittest.TestCase):
     def testMakeRestsA(self):
         a = ['c', 'g#', 'd-', 'f#', 'e', 'f'] * 4
         partOffsetShift = 1.25
-        partOffset = 2  # start at non zero
+        partOffset = 2.  # start at non zero
+        partOffsetToNumRests = {
+            2.: 1,  # half rest
+            3.25: 3,  # half rest, quarter rest, 16th rest
+            4.5: 2,  # whole rest, eighth rest
+            5.75: 2,  # whole rest, double-dotted quarter rest
+            7.0: 1,  # double dotted whole rest
+            8.25: 2,  # breve rest, 16th rest
+        }
         for unused_part in range(6):
             p = Stream()
             for pitchName in a:
@@ -2162,12 +2170,11 @@ class Test(unittest.TestCase):
             # environLocal.printDebug(['first element', p[0], p[0].duration])
             # by default, initial rest should be made
             sub = p.getElementsByClass(note.Rest).stream()
-            self.assertEqual(len(sub), 1)
-
+            self.assertEqual(len(sub), partOffsetToNumRests[partOffset])
             self.assertEqual(sub.duration.quarterLength, partOffset)
 
-            # first element should have offset of first dur
-            self.assertEqual(p[1].offset, sub.duration.quarterLength)
+            # first element after rests should have offset of first dur
+            self.assertEqual(p[len(sub)].offset, sub.duration.quarterLength)
 
             partOffset += partOffsetShift
 
@@ -5860,16 +5867,21 @@ class Test(unittest.TestCase):
         sPost = s.makeRests(fillGaps=True, inPlace=False)
         self.assertEqual(str(list(sPost.voices[0].notesAndRests)),
                          '[<music21.note.Rest half>, <music21.note.Note C>, '
-                         + '<music21.note.Rest 2.25ql>, '
+                         + '<music21.note.Rest half>, '
+                         + '<music21.note.Rest 16th>, '
                          + '<music21.note.Note C>, '
-                         + '<music21.note.Rest 2.5ql>, '
+                         + '<music21.note.Rest half>, '
+                         + '<music21.note.Rest eighth>, '
                          + '<music21.note.Note C>, '
-                         + '<music21.note.Rest 4.25ql>, '
+                         + '<music21.note.Rest whole>, '
+                         + '<music21.note.Rest 16th>, '
                          + '<music21.note.Note C>, '
                          + '<music21.note.Rest half>]')
         self.assertEqual(str(list(sPost.voices[1].notesAndRests)),
                          '[<music21.note.Rest 16th>, <music21.note.Note C>, '
-                         + '<music21.note.Rest 3.25ql>, '
+                         + '<music21.note.Rest half>, '
+                         + '<music21.note.Rest quarter>, '
+                         + '<music21.note.Rest 16th>, '
                          + '<music21.note.Note C>, '
                          + '<music21.note.Rest dotted-quarter>, <music21.note.Note C>, '
                          + '<music21.note.Rest breve>, <music21.note.Note C>]')

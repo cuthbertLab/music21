@@ -327,16 +327,27 @@ class RehearsalMark(Expression):
 
 # ------------------------------------------------------------------------------
 class PedalType(common.StrEnum):
-    Sustain = 'sustain'
-    Sostenuto = 'sostenuto'
-    Soft = 'soft'
-    Silent = 'silent'
+    Unspecified = 'Unspecified'
+    Sustain = 'Sustain'
+    Sostenuto = 'Sostenuto'
+    Soft = 'Soft'
+    Silent = 'Silent'
 
 class PedalForm(common.StrEnum):
-    Line = 'line'
-    Symbol = 'symbol'
-    SymbolAlt = 'symbolalt'
-    SymbolLine = 'symbolline'
+    Unspecified = 'Unspecified'
+    PedalName = 'PedalName'
+    Ped = 'Ped'  # sometimes seen even for sostenuto, etc.
+    Star = 'Star'
+    VerticalLine = 'VerticalLine'
+    NoMark = 'NoMark'
+    SlantedLine = 'SlantedLine'
+    Inherit = 'Inherit'  # inherit from enclosing PedalMark
+
+class PedalLine(common.StrEnum):
+    Unspecified = 'Unspecified'
+    NoLine = 'NoLine'
+    Line = 'Line'
+    Dashed = 'Dashed'
 
 class PedalMark(spanner.Spanner):
     '''
@@ -349,8 +360,8 @@ class PedalMark(spanner.Spanner):
     examples use a pedal mark with one "bounce" in the middle::
 
         Pedal marks can be lines:            |_______^________|
-        Pedal marks can be normal symbolic:  Ped.    * Ped.   *
-        Pedal marks can be altered symbolic: Ped.    Ped.     *
+        Pedal marks can be symbols:          Ped.    *Ped.    *
+        Pedal bounces might not have a *:    Ped.    Ped.     *
         Pedal marks can be symbol and line:  Ped.____^________|
 
     Pedal marks, whether lines, symbols, or a combination, can
@@ -362,32 +373,53 @@ class PedalMark(spanner.Spanner):
     of Ped., S. instead of Sost.
 
     Pedal marks that are lines can have non-printed portions
-    (gaps) in them; these are usually started with "simile",
+    (gaps) in them; these gaps are usually started with "simile",
     but not necessarily.
     '''
     def __init__(
         self,
         *spannedElements,
+        pedalType: PedalType = PedalType.Unspecified,
+        startForm: PedalForm = PedalForm.Unspecified,
+        continueLine: PedalLine = PedalLine.Unspecified,
+        bounceUp: PedalForm = PedalForm.Unspecified,
+        bounceDown: PedalForm = PedalForm.Unspecified,
+        endForm: PedalForm = PedalForm.Unspecified,
+        abbreviated: bool = False,
         **keywords
     ) -> None:
         super().__init__(*spannedElements, **keywords)
         from music21 import note
         self.fillElementTypes = [note.GeneralNote]
 
-        self.pedalType: PedalType|None = None
-        self.pedalForm: PedalForm|None = None
-        self.abbreviated: bool = False
+        self.pedalType: PedalType = pedalType
+        self.startForm: PedalForm = startForm
+        self.continueLine: PedalLine = continueLine
+        self.bounceUp: PedalForm = bounceUp
+        self.bounceDown: PedalForm = bounceDown
+        self.endForm: PedalForm = endForm
+        self.abbreviated: bool = abbreviated
+
         self.placement: str|None = None
 
+    def hasLine(self) -> bool:
+        if self.startForm == PedalForm.VerticalLine:
+            # it's all lines
+            return True
+        if self.continueLine in (PedalLine.Line, PedalLine.Dashed):
+            # it's Ped followed by a line
+            return True
+        return False
 
-class PedalObject(base.Music21Object):
+
+class PedalTransition(base.Music21Object):
     '''
     Base class of individual objects that mark various transitions
     in a PedalMark spanner.
     '''
     def __init__(self, **keywords) -> None:
         super().__init__(**keywords)
-        self.placement: str | None = None
+        self.placement: str|None = None
 
     def _reprInternal(self) -> str:
         if self.activeSite is None:
@@ -395,14 +427,69 @@ class PedalObject(base.Music21Object):
         return f'at {self.offset}'
 
 
-class PedalBounce(PedalObject):
+class PedalBounce(PedalTransition):
     '''
     This object, when seen in a PedalMark spanner, represents an up/down bounce
     of the pedal.
+
+    >>> pm = expressions.PedalMark()
+    >>> pm.bounceUp = expressions.PedalForm.Star
+    >>> pm.bounceDown = expressions.PedalForm.Ped
+    >>> pb = expressions.PedalBounce()
+    >>> pm.addSpannedElements(pb)
+
+    By default, PedalBounce objects inherit their bounceUp/bounceDown forms
+    from the enclosing PedalMark spanner.
+
+    >>> pb.bounceUp
+    <PedalForm.Star>
+    >>> pb.bounceDown
+    <PedalForm.Ped>
+
+    But individual PedalBounce objects can override that bounceUp/bounceDown
+    inheritance.
+
+    >>> pb.overrideBounceUp = expressions.PedalForm.SlantedLine
+    >>> pb.overrideBounceDown = expressions.PedalForm.SlantedLine
+    >>> pb.bounceUp
+    <PedalForm.SlantedLine>
+    >>> pb.bounceDown
+    <PedalForm.SlantedLine>
+    >>>
     '''
+    def __init__(
+        self,
+        overrideBounceUp: PedalForm = PedalForm.Inherit,
+        overrideBounceDown: PedalForm = PedalForm.Inherit,
+        **keywords
+    ) -> None:
+        super().__init__(**keywords)
+        self.overrideBounceUp = overrideBounceUp
+        self.overrideBounceDown = overrideBounceDown
 
+    @property
+    def bounceUp(self) -> PedalForm:
+        if self.overrideBounceUp != PedalForm.Inherit:
+            return self.overrideBounceUp
+        pmList: list[spanner.Spanner] = self.getSpannerSites((PedalMark,))
+        if not pmList:
+            return self.overrideBounceUp
+        if t.TYPE_CHECKING:
+            assert isinstance(pmList[0], PedalMark)
+        return pmList[0].bounceUp
 
-class PedalGapStart(PedalObject):
+    @property
+    def bounceDown(self) -> PedalForm:
+        if self.overrideBounceDown != PedalForm.Inherit:
+            return self.overrideBounceDown
+        pmList: list[spanner.Spanner] = self.getSpannerSites((PedalMark,))
+        if not pmList:
+            return self.overrideBounceDown
+        if t.TYPE_CHECKING:
+            assert isinstance(pmList[0], PedalMark)
+        return pmList[0].bounceDown
+
+class PedalGapStart(PedalTransition):
     '''
     This object, when seen in a PedalMark spanner, represents a disappearance of
     the pedal line, usually with a TextExpression('simile').  The pedaling should
@@ -410,7 +497,7 @@ class PedalGapStart(PedalObject):
     '''
 
 
-class PedalGapEnd(PedalObject):
+class PedalGapEnd(PedalTransition):
     '''
     This object, when seen in a PedalMark spanner, represents the reappearance of
     the pedal line.
