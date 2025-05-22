@@ -1024,9 +1024,12 @@ class ConverterMidi(SubConverter):
     registerInputExtensions = ('mid', 'midi')
     registerOutputExtensions = ('mid',)
 
-    def __init__(self, *, encoding='utf-8', **keywords):
-        self.encoding = encoding
-        super().__init__(**keywords)
+    @property
+    def encoding(self) -> str:
+        if 'encoding' in self.keywords and self.keywords['encoding']:
+            # if the encoding is set to None or '', it will be ignored
+            return self.keywords['encoding']
+        return 'utf-8'
 
     def parseData(self, strData, number=None, *, encoding: str = ''):
         '''
@@ -1043,10 +1046,12 @@ class ConverterMidi(SubConverter):
         (default "utf-8")
         '''
         from music21.midi import translate as midiTranslate
+        keywords = {k: v for k, v in self.keywords.items()
+                    if k not in ('encoding',)}
         self.stream = midiTranslate.midiStringToStream(
             strData,
             encoding=encoding or self.encoding,
-            **self.keywords
+            **keywords
         )
 
     def parseFile(self,
@@ -1069,6 +1074,8 @@ class ConverterMidi(SubConverter):
         (default "utf-8")
         '''
         from music21.midi import translate as midiTranslate
+        keywords = {k: v for k, v in self.keywords.items()
+                    if k not in ('encoding',)}
         midiTranslate.midiFilePathToStream(
             filePath,
             inputM21=self.stream,
@@ -1083,12 +1090,14 @@ class ConverterMidi(SubConverter):
               subformats=(),
               *,
               addStartDelay: bool = False,
+              encoding: str = '',
               **keywords):  # pragma: no cover
         from music21.midi import translate as midiTranslate
         if fp is None:
             fp = self.getTemporaryFile()
 
-        mf = midiTranslate.music21ObjectToMidiFile(obj, addStartDelay=addStartDelay)
+        mf = midiTranslate.music21ObjectToMidiFile(obj, addStartDelay=addStartDelay,
+                                                   encoding=encoding or self.encoding)
         mf.open(fp, 'wb')  # write binary
         mf.write()
         mf.close()

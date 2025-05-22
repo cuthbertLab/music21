@@ -295,6 +295,7 @@ def music21ObjectToMidiFile(
     music21Object: base.Music21Object,
     *,
     addStartDelay=False,
+    encoding: str = 'utf-8',
 ) -> MidiFile:
     '''
     Either calls streamToMidiFile on the music21Object or
@@ -307,12 +308,14 @@ def music21ObjectToMidiFile(
             music21Object = music21Object.toSoundingPitch()
 
         return streamToMidiFile(t.cast(stream.Stream, music21Object),
-                                addStartDelay=addStartDelay)
+                                addStartDelay=addStartDelay,
+                                encoding=encoding)
     else:
         m21ObjectCopy = copy.deepcopy(music21Object)
         s: stream.Stream = stream.Stream()
         s.insert(0, m21ObjectCopy)
-        return streamToMidiFile(s, addStartDelay=addStartDelay)
+        return streamToMidiFile(s, addStartDelay=addStartDelay,
+                                encoding=encoding)
 
 
 # ------------------------------------------------------------------------------
@@ -465,6 +468,7 @@ def noteToMidiEvents(
     *,
     includeDeltaTime: bool = True,
     channel: int = 1,
+    encoding: str = 'utf-8',
 ) -> list[DeltaTime|MidiEvent]:
     # noinspection PyShadowingNames
     '''
@@ -511,9 +515,17 @@ def noteToMidiEvents(
     mt = None  # use a midi track set to None
     eventList: list[DeltaTime|MidiEvent] = []
 
+    if (inputM21.lyric is not None and inputM21.lyric != ''):
+        if includeDeltaTime:
+            dt = DeltaTime(mt, channel=channel)
+            eventList.append(dt)
+        me = MidiEvent(track=mt)
+        me.type = MetaEvents.LYRIC
+        me.data = inputM21.lyric.encode(encoding, 'ignore')
+        eventList.append(me)
+
     if includeDeltaTime:
-        dt = DeltaTime(mt, channel=channel)
-        # add to track events
+        dt = DeltaTime(track=mt)
         eventList.append(dt)
 
     me1 = MidiEvent(track=mt)
@@ -687,6 +699,7 @@ def chordToMidiEvents(
     *,
     includeDeltaTime: bool = True,
     channel: int = 1,
+    encoding: str = 'utf-8',
 ) -> list[DeltaTime|MidiEvent]:
     # noinspection PyShadowingNames
     '''
@@ -728,6 +741,15 @@ def chordToMidiEvents(
 
     chordVolume = c.volume  # use if component volume are not defined
     hasComponentVolumes = c.hasComponentVolumes()
+
+    if (inputM21.lyric is not None and inputM21.lyric != ''):
+        if includeDeltaTime:
+            dt = DeltaTime(track=mt)
+            eventList.append(dt)
+        me = MidiEvent(track=mt)
+        me.type = MetaEvents.LYRIC
+        me.data = inputM21.lyric.encode(encoding, 'ignore')
+        eventList.append(me)
 
     for i, chordComponent in enumerate(c):
         # pitchObj = c.pitches[i]
@@ -1320,7 +1342,8 @@ def getPacketFromMidiEvent(
 
 
 def elementToMidiEventList(
-    el: base.Music21Object
+    el: base.Music21Object,
+    encoding: str = 'utf-8',
 ) -> list[MidiEvent|DeltaTime]|None:
     '''
     Return a list of MidiEvents (or None) from a Music21Object,
@@ -1345,14 +1368,14 @@ def elementToMidiEventList(
             # get a list of midi events
             # using this property here is easier than using the above conversion
             # methods, as we do not need to know what the object is
-            return noteToMidiEvents(el, includeDeltaTime=False)
+            return noteToMidiEvents(el, includeDeltaTime=False, encoding=encoding)
         case note.Unpitched():
-            return noteToMidiEvents(el, includeDeltaTime=False, channel=10)
+            return noteToMidiEvents(el, includeDeltaTime=False, channel=10, encoding=encoding)
         case chord.Chord():
             # TODO: skip Harmony unless showAsChord
-            return chordToMidiEvents(el, includeDeltaTime=False)
+            return chordToMidiEvents(el, includeDeltaTime=False, encoding=encoding)
         case percussion.PercussionChord():
-            return chordToMidiEvents(el, includeDeltaTime=False, channel=10)
+            return chordToMidiEvents(el, includeDeltaTime=False, channel=10, encoding=encoding)
         case dynamics.Dynamic():
             return None  # dynamics have already been applied to notes
         case meter.TimeSignature():
@@ -1375,6 +1398,7 @@ def streamToPackets(
     s: stream.Stream,
     trackId: int = 1,
     addStartDelay: bool = False,
+    encoding: str = 'utf-8',
 ) -> list[dict[str, t.Any]]:
     '''
     Convert a flattened, sorted Stream to MIDI Packets.
@@ -1394,7 +1418,7 @@ def streamToPackets(
 
     # s should already be flat and sorted
     for el in s:
-        midiEventList = elementToMidiEventList(el)
+        midiEventList = elementToMidiEventList(el, encoding=encoding)
         if isinstance(el, instrument.Instrument):
             lastInstrument = el  # store last instrument
 
@@ -1917,7 +1941,7 @@ def lyricTimingsFromEvents(
                 lyrics[time] = e.data.decode(encoding)
             except UnicodeDecodeError:
                 warnings.warn(
-                    f'Unable to decode lyrics from {e}',
+                    f'Unable to decode lyrics from {e} as {encoding}',
                     TranslateWarning)
     return lyrics
 
@@ -2457,6 +2481,7 @@ def packetStorageFromSubstreamList(
     substreamList: list[stream.Part],
     *,
     addStartDelay=False,
+    encoding: str = 'utf-8',
 ) -> dict[int, dict[str, t.Any]]:
     # noinspection PyShadowingNames
     r'''
@@ -2544,7 +2569,8 @@ def packetStorageFromSubstreamList(
                 # maybe prepareStreamForMidi() wasn't run; create Conductor instance
                 instObj = Conductor()
 
-        trackPackets = streamToPackets(subs, trackId=trackId, addStartDelay=addStartDelay)
+        trackPackets = streamToPackets(subs, trackId=trackId, addStartDelay=addStartDelay,
+                                       encoding=encoding)
         # store packets in a dictionary; keys are trackIds
         packetStorage[trackId] = {
             'rawPackets': trackPackets,
@@ -2590,6 +2616,7 @@ def streamHierarchyToMidiTracks(
     *,
     acceptableChannelList=None,
     addStartDelay=False,
+    encoding='utf-8',
 ):
     '''
     Given a Stream, Score, Part, etc., that may have substreams (i.e.,
@@ -2640,7 +2667,8 @@ def streamHierarchyToMidiTracks(
     for subs in substreamList:
         subs.stripTies(inPlace=True, matchByPitch=True)
 
-    packetStorage = packetStorageFromSubstreamList(substreamList, addStartDelay=addStartDelay)
+    packetStorage = packetStorageFromSubstreamList(substreamList, addStartDelay=addStartDelay,
+                                                   encoding=encoding)
     updatePacketStorageWithChannelInfo(packetStorage, channelByInstrument)
 
     initTrackIdToChannelMap = {}
@@ -2728,6 +2756,7 @@ def streamToMidiFile(
     *,
     addStartDelay: bool = False,
     acceptableChannelList: list[int]|None = None,
+    encoding: str = 'utf-8',
 ) -> MidiFile:
     # noinspection PyShadowingNames
     '''
@@ -2759,6 +2788,7 @@ def streamToMidiFile(
     midiTracks = streamHierarchyToMidiTracks(s,
                                              addStartDelay=addStartDelay,
                                              acceptableChannelList=acceptableChannelList,
+                                             encoding=encoding,
                                              )
 
     # may need to update channel information
