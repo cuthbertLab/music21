@@ -1283,6 +1283,9 @@ class MidiEvent(prebase.ProtoM21Object):
         >>> me2.channel = 12
         >>> me1.matchedNoteOff(me2)
         False
+
+        Note that this method is no longer used in MIDI Parsing
+        because it is inefficient.
         '''
         if self.isNoteOn() and other.isNoteOff():
             if self.pitch == other.pitch and self.channel == other.channel:
