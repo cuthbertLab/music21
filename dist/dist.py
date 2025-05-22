@@ -26,7 +26,6 @@ you cannot check to see if fixed tests work while it is running.
 This takes a while and runs single core, and then almost always needs code patches
 so allocate time (2 min on M4).  Start working on the announcement while it's running.
 
-
 4. run test/warningMultiprocessTest.py for lowest and highest Py version -- fix all warnings!
 5. run `from music21.test import treeYield
     and then run `treeYield.find_all_non_hashable_m21objects()` and check that the set returned is
