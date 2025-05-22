@@ -1425,7 +1425,7 @@ class Test(unittest.TestCase):
         # https://github.com/cuthbertLab/music21/issues/991
         sch = corpus.parse('schoenberg/opus19', 2)
         rh_last = sch.parts[0][stream.Measure].last()
-        # lh_last = sch.parts[1][stream.Measure].last()
+        lh_last = sch.parts[1][stream.Measure].last()
 
         hiddenRest = rh_last.voices.last().first()
         self.assertIsInstance(hiddenRest, note.Rest)
