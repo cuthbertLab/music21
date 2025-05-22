@@ -770,6 +770,11 @@ class MusicXMLImporter(XMLParserBase):
 
         self.musicXmlVersion = defaults.musicxmlVersion
 
+        # Finale (RIP 2025) had a problem with writing extraneous <forward> tags.
+        # if this is True then we will be cautious before interpreting them as
+        # hidden rests.
+        self.applyFinaleWorkarounds = False
+
     def scoreFromFile(self, filename):
         '''
         main program: opens a file given by filename and returns a complete
@@ -1324,11 +1329,22 @@ class MusicXMLImporter(XMLParserBase):
             * new-page = Metadata.definesExplicitPageBreaks
         '''
         # TODO: encoder (text + type = role) multiple
-        # TODO: encoding date multiple
+        # TODO: encoding-date either singular or multiple
         # TODO: encoding-description (string) multiple
+
+        # If the first software tag contains Finale, then it
+        # is by finale. Otherwise, it is not
+        foundOneSoftwareTag: bool = False
+        finaleIsFirst: bool = False
         for software in encoding.findall('software'):
             if softwareText := strippedText(software):
+                if not foundOneSoftwareTag:
+                    if 'Finale' in softwareText:
+                        finaleIsFirst = True
+                foundOneSoftwareTag = True
                 md.add('software', softwareText)
+        if finaleIsFirst:
+            self.applyFinaleWorkarounds = True
 
         for supports in encoding.findall('supports'):
             # todo: element: required
@@ -1760,16 +1776,20 @@ class PartParser(XMLParserBase):
         for mxMeasure in self.mxPart.iterfind('measure'):
             self.xmlMeasureToMeasure(mxMeasure)
 
-        self.removeEndForwardRest()
+        self.removeFinaleIncorrectEndingForwardRest()
         part.coreElementsChanged()
 
-    def removeEndForwardRest(self):
+    def removeFinaleIncorrectEndingForwardRest(self):
         '''
-        If the last measure ended with a forward tag, as happens
-        in some pieces that end with incomplete measures,
-        and voices are not involved,
-        remove the rest there (for backwards compatibility, esp.
-        since bwv66.6 uses it)
+        If Finale generated the file AND it ended with an incomplete
+        measure (like 4/4 beginning with a quarter pickup and ending
+        with a 3-beat measure) then the file might have ended with a
+        `<forward>` tag, which Finale used to create hidden rests.
+
+        If this forward tag is at the end of the piece, then it
+        will create rests that "complete" the measure in an incorrect way
+        If voices are not involved (e.g., NOT bwv66.6) then we should
+        remove this forward tag.
 
         * New in v7.
         '''
@@ -1778,13 +1798,14 @@ class PartParser(XMLParserBase):
         lmp = self.lastMeasureParser
         self.lastMeasureParser = None  # clean memory
 
-        if lmp.endedWithForwardTag is None:
+        if lmp.lastForwardTagCreatedByFinale is None:
             return
         if lmp.useVoices is True:
             return
-        endedForwardRest = lmp.endedWithForwardTag
-        if lmp.stream.recurse().notesAndRests.last() is endedForwardRest:
-            lmp.stream.remove(endedForwardRest, recurse=True)
+        endingForwardRest: note.Rest|None = lmp.lastForwardTagCreatedByFinale
+        # important that we find that the last GeneralNote is this Forward tag
+        if lmp.stream[note.GeneralNote].last() is endingForwardRest:
+            lmp.stream.remove(endingForwardRest, recurse=True)
 
     def separateOutPartStaves(self) -> list[stream.PartStaff]:
         '''
@@ -2403,12 +2424,16 @@ class MeasureParser(SoundTagMixin, XMLParserBase):
         # what is the offset in the measure of the current note position?
         self.offsetMeasureNote: OffsetQL = 0.0
 
-        # keep track of the last rest that was added with a forward tag.
-        # there are many pieces that end with incomplete measures that
-        # older versions of Finale put a forward tag at the end, but this
-        # disguises the incomplete last measure.  The PartParser will
-        # pick this up from the last measure.
-        self.endedWithForwardTag: note.Rest|None = None
+        # Keep track of the last rest that was added with a forward tag.
+
+        # Older versions of Finale put a <forward> tag at the end of pieces
+        # which ended with an incomplete measure.  Find that last
+        # Forward tag (if created by Finale) and store it.
+        # if later we find that this measure is the last one,
+        # and doesn't have multiple voices, and was created by Finale,
+        # then we'll delete the Rest associated with this forward tag
+        # at the cleanup stage of PartParser.
+        self.lastForwardTagCreatedByFinale: note.Rest|None = None
 
         # Temporary storage of intended start offset of a PedalMark (we sometimes
         # need to know this before the PedalMark or its first element have been
@@ -2579,12 +2604,6 @@ class MeasureParser(SoundTagMixin, XMLParserBase):
                     # the musicDataMethods use insertCore, thus the voices need to run
                     # coreElementsChanged
                     v.coreElementsChanged()
-                    # Fill mid-measure gaps, and find end of measure gaps by ref to measure stream
-                    # https://github.com/cuthbertlab/music21/issues/444
-                    v.makeRests(refStreamOrTimeRange=self.stream,
-                                fillGaps=True,
-                                inPlace=True,
-                                hideRests=True)
         self.stream.coreElementsChanged()
 
         if (self.restAndNoteCount['rest'] == 1
@@ -2630,18 +2649,23 @@ class MeasureParser(SoundTagMixin, XMLParserBase):
         if durationText := strippedText(mxDuration):
             change = opFrac(float(durationText) / self.divisions)
 
-            # Create hidden rest (in other words, a spacer)
-            # old Finale documents close incomplete final measures with <forward>
-            # this will be removed afterward by removeEndForwardRest()
-            r = note.Rest(quarterLength=change)
-            r.style.hideObjectOnPrint = True
-            self.addToStaffReference(mxObj, r)
-            self.insertInMeasureOrVoice(mxObj, r)
+            if (self.parent
+                    and self.parent.parent
+                    and self.parent.parent.applyFinaleWorkarounds):
+                # If the ScoreParser senses the Score was written by Finale
+                # then Forward tags need to create hidden rests (except
+                # at the end of the piece!)  So create a hidden rest (spacer) here.
+                r = note.Rest(quarterLength=change)
+                r.style.hideObjectOnPrint = True
+                self.addToStaffReference(mxObj, r)
+                self.insertInMeasureOrVoice(mxObj, r)
+
+                # old Finale documents close incomplete final measures with <forward>
+                # this will be removed afterward by removeFinaleIncorrectEndingForwardRest()
+                self.lastForwardTagCreatedByFinale = r
 
             # Allow overfilled measures for now -- TODO(someday): warn?
             self.offsetMeasureNote += change
-            # xmlToNote() sets None
-            self.endedWithForwardTag = r
 
     def xmlPrint(self, mxPrint: ET.Element):
         '''
@@ -2801,7 +2825,7 @@ class MeasureParser(SoundTagMixin, XMLParserBase):
 
         # only increment Chords after completion
         self.offsetMeasureNote += offsetIncrement
-        self.endedWithForwardTag = None
+        self.lastForwardTagCreatedByFinale = None
 
     def xmlToChord(self, mxNoteList: list[ET.Element]) -> chord.ChordBase:
         # noinspection PyShadowingNames
