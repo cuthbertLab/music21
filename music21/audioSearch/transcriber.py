@@ -139,13 +139,14 @@ def monophonicStreamFromFile(fileName, useScale=None):
 
 class TestExternal(unittest.TestCase):
 
-    def xtestRunTranscribe(self):
+    def x_testRunTranscribe(self):
         saveFile = environLocal.getRootTempDir() / 'new_song.wav'
         runTranscribe(show=False, plot=False, saveFile=saveFile, seconds=10.0)
 
-    def xtestTranscribePachelbel(self):
+    def x_testTranscribePachelbel(self):
         saveFile = environLocal.getRootTempDir() / 'pachelbel.wav'
-        _myScore = runTranscribe(useMic=False, saveFile=saveFile, plot=False, show=False)
+        runTranscribe(useMic=False, saveFile=saveFile, plot=False, show=False)
+        # _myScore = runTranscribe(useMic=False, saveFile=saveFile, plot=False, show=False)
         # myScore.show()
 
 

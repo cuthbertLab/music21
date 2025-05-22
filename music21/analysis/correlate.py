@@ -176,11 +176,6 @@ class ActivityMatch:
         return pairs
 
 
-
-
-
-
-
 # ------------------------------------------------------------------------------
 class Test(unittest.TestCase):
 
