@@ -5885,10 +5885,12 @@ class MeasureExporter(XMLExporterBase):
         self.xmlRoot.append(mxHarmony)
         return mxHarmony
 
-    def chordSymbolToXml(self,
-                         cs: harmony.ChordSymbol,
-                         *,
-                         append: bool = True) -> Element|list[Element]:
+    def chordSymbolToXml(
+        self,
+        cs: harmony.ChordSymbol,
+        *,
+        append: bool = True
+    ) -> Element|list[Element]:
         # noinspection PyShadowingNames
         '''
         Convert a ChordSymbol object to either a chord (if .writeAsChord is True)
@@ -5920,7 +5922,6 @@ class MeasureExporter(XMLExporterBase):
             <bass-alter>-1</bass-alter>
           </bass>
         </harmony>
-
 
         Now give function:
 
