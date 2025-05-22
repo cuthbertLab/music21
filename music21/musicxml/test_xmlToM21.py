@@ -1432,10 +1432,8 @@ class Test(unittest.TestCase):
         self.assertEqual(hiddenRest.style.hideObjectOnPrint, True)
         self.assertEqual(hiddenRest.quarterLength, 2.0)
 
-        # I'm not sure why this test is failing; probably because I don't have the
-        # complete fix from PR #1636 yet, just most of the pieces.
-        # self.assertEqual(len(lh_last.voices), 0)
-        # self.assertEqual([r.style.hideObjectOnPrint for r in lh_last[note.Rest]], [False] * 3)
+        self.assertEqual(len(lh_last.voices), 0)
+        self.assertEqual([r.style.hideObjectOnPrint for r in lh_last[note.Rest]], [False] * 3)
 
     def testHiddenRestImpliedVoice(self):
         '''

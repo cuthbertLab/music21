@@ -871,10 +871,6 @@ class MusicXMLImporter(XMLParserBase):
             self.spannerBundle.remove(sp)
 
         s.coreElementsChanged()
-        for m in s[stream.Measure]:
-            for v in m.voices:
-                v.coreElementsChanged()
-
         s.definesExplicitSystemBreaks = self.definesExplicitSystemBreaks
         s.definesExplicitPageBreaks = self.definesExplicitPageBreaks
         for p in s.parts:
