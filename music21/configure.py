@@ -42,6 +42,8 @@ reSibeliusExe = re.compile(r'Sibelius\.exe', IGNORECASE)
 reFinaleReaderApp = re.compile(r'Finale Reader\.app', IGNORECASE)
 reMuseScoreApp = re.compile(r'MuseScore.*\.app', IGNORECASE)
 reMuseScoreExe = re.compile(r'Musescore.*\\bin\\MuseScore.*\.exe', IGNORECASE)
+reDoricoApp = re.compile(r'Dorico.*\.app', IGNORECASE)
+reDoricoExe = re.compile(r'Dorico.*\.exe', IGNORECASE)
 
 urlMusic21 = 'https://www.music21.org/music21docs/'
 urlMuseScore = 'https://www.musescore.org'
@@ -1177,12 +1179,16 @@ class SelectMusicXMLReader(SelectFilePath):
 
         def comparisonSibelius(x):
             return reSibeliusApp.search(x) is not None
+        
+        def comparisonDorico(x):
+            return reDoricoApp.search(x) is not None
 
         # order here results in ranks
         results = self._getDarwinApp(comparisonMuseScore)
         results += self._getDarwinApp(comparisonFinale)
         results += self._getDarwinApp(comparisonFinaleReader)
         results += self._getDarwinApp(comparisonSibelius)
+        results += self._getDarwinApp(comparisonDorico)
 
         # de-duplicate
         res = []
@@ -1204,11 +1210,15 @@ class SelectMusicXMLReader(SelectFilePath):
 
         def comparisonSibelius(x):
             return reSibeliusExe.search(x) is not None
+        
+        def comparisonDorico(x):
+            return reDoricoExe.search(x) is not None
 
         # order here results in ranks
         results = self._getWinApp(comparisonMuseScore)
         results += self._getWinApp(comparisonFinale)
         results += self._getWinApp(comparisonSibelius)
+        results += self._getWinApp(comparisonDorico)
 
         # de-duplicate (Windows especially can put the same environment var twice)
         res = []
