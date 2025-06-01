@@ -1179,7 +1179,7 @@ class SelectMusicXMLReader(SelectFilePath):
 
         def comparisonSibelius(x):
             return reSibeliusApp.search(x) is not None
-        
+
         def comparisonDorico(x):
             return reDoricoApp.search(x) is not None
 
@@ -1210,7 +1210,7 @@ class SelectMusicXMLReader(SelectFilePath):
 
         def comparisonSibelius(x):
             return reSibeliusExe.search(x) is not None
-        
+
         def comparisonDorico(x):
             return reDoricoExe.search(x) is not None
 
