@@ -1,0 +1,64 @@
+from music21 import stream, note, chord, tempo, meter, instrument, midi, key
+
+# Установка темпа и размера
+tempo_indication = tempo.MetronomeMark(number=75)
+time_signature = meter.TimeSignature('4/4')
+key_signature = key.Key('F#')
+
+# Функция для создания аккордов
+def get_chord(cname, duration=4.0):
+    if 'm' in cname:
+        cname = cname.replace('m', '')
+        return chord.Chord([cname, cname + '3', cname + '4'], duration=duration, type='minor')
+    else:
+        return chord.Chord([cname, cname + '3', cname + '4'], duration=duration)
+
+# Аккорды куплета и припева
+chord_progression = [
+    ['F#4', 'C#4', 'D#4m', 'B3'],
+    ['F#4', 'C#4', 'G#3m', 'B3'],
+    ['D#4m', 'B3', 'F#4', 'C#4'],
+    ['D#4m', 'B3', 'G#3m', 'C#4']
+]
+
+# Партия аккордов
+chord_part = stream.Part()
+chord_part.append(instrument.Piano())
+chord_part.append(tempo_indication)
+chord_part.append(time_signature)
+chord_part.append(key_signature)
+
+for progression in chord_progression:
+    for cname in progression:
+        ch = get_chord(cname)
+        chord_part.append(ch)
+
+# Партия баса
+bass_part = stream.Part()
+bass_part.append(instrument.ElectricBass())
+bass_part.append(tempo_indication)
+bass_part.append(time_signature)
+bass_part.append(key_signature)
+
+bass_notes = [
+    'F#2', 'C#2', 'D#2', 'B1',
+    'F#2', 'C#2', 'G#1', 'B1',
+    'D#2', 'B1', 'F#2', 'C#2',
+    'D#2', 'B1', 'G#1', 'C#2'
+]
+
+for bnote in bass_notes:
+    n = note.Note(bnote)
+    n.quarterLength = 4.0
+    bass_part.append(n)
+
+# Объединение партий
+full_score = stream.Score()
+full_score.append(chord_part)
+full_score.append(bass_part)
+
+# Сохранение в MIDI-файл
+mf = midi.translate.streamToMidiFile(full_score)
+mf.open("romantic_ballad_mellow.mid", 'wb')
+mf.write()
+mf.close()
