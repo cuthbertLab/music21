@@ -6,7 +6,7 @@
 # Authors:      Michael Scott Asato Cuthbert
 #               Christopher Ariza
 #
-# Copyright:    Copyright © 2006-2024 Michael Scott Asato Cuthbert
+# Copyright:    Copyright © 2006-2025 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # -----------------------------------------------------------------------------
 '''
@@ -27,7 +27,7 @@ available after importing `music21`.
 <class 'music21.base.Music21Object'>
 
 >>> music21.VERSION_STR
-'9.7.0'
+'9.7.1'
 
 Alternatively, after doing a complete import, these classes are available
 under the module "base":
