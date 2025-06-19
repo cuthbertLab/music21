@@ -6,7 +6,7 @@
 # Authors:      Christopher Ariza
 #               Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2010-2024 Michael Scott Asato Cuthbert
+# Copyright:    Copyright © 2010-2025 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
@@ -39,11 +39,11 @@ so allocate time (2 min on M4).  Start working on the announcement while it's ru
 7. run documentation/make.py clean  (skip on minor version changes) -- you may need to make a
      documentation/build directory first.
 8. run documentation/make.py linkcheck  [*] - missing http://www.musicxml.org/dtds/partwise.dtd
-     and code-of-conduct links are both okay.  The points about
+     and code-of-conduct links are both okay to fail.  The points about
      "more than one target found for cross-reference 'Direction'"
      are known bugs in Sphinx (when the same named Enum appears in different modules)
      and we can't fix.
-     StackOverflow seems also to be presenting linkcheck -- check manually every once in
+     StackOverflow seems also to be preventing linkcheck -- check manually every once in
      a while, but looking good May 2025.
      Ignore the errors at the end if everything looks good.
 9. run documentation/make.py   [*]
@@ -68,7 +68,7 @@ so allocate time (2 min on M4).  Start working on the announcement while it's ru
     DO NOT RUN THIS ON A PC or the Mac .tar.gz might have an incorrect permission if you do.
 
 14. PR and Commit to GitHub at this point w/ commit comment of the new version,
-    then don't change anything until the next step is done.
+    then don't change anything until the next step is done.  Merge to main/master
     (.gitignore will avoid uploading the large files created here.)
 
 15. Switch back to master/main branch
