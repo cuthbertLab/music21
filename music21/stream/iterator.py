@@ -6,7 +6,7 @@
 # Authors:      Michael Scott Asato Cuthbert
 #               Christopher Ariza
 #
-# Copyright:    Copyright © 2008-2024 Michael Scott Asato Cuthbert
+# Copyright:    Copyright © 2008-2025 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # -----------------------------------------------------------------------------
 '''
@@ -658,9 +658,12 @@ class StreamIterator(prebase.ProtoM21Object, Sequence[M21ObjType]):
             self.reset()
 
             # cleanupOnStop is rarely used, so we put in
-            # a dummy stream so that srcStream does not need
-            # to be x|None
-            SrcStreamClass = t.cast(type[StreamType], self.srcStream.__class__)
+            # a dummy stream so that self.srcStream does not need
+            # to be typed as Stream|None
+
+            # eventually want this to work
+            # SrcStreamClass = t.cast(type[StreamType], self.srcStream.__class__)
+            SrcStreamClass = self.srcStream.__class__
 
             del self.srcStream
             del self.srcStreamElements
