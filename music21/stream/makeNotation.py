@@ -2001,7 +2001,7 @@ def splitElementsToCompleteTuplets(
     for container in iterator:
         general_notes = list(container.notesAndRests)
         last_tuplet: duration.Tuplet|None = None
-        partial_tuplet_sum = 0.0
+        partial_tuplet_sum: OffsetQL = 0.0
         for gn in general_notes:
             if (
                 gn.duration.tuplets

@@ -881,7 +881,7 @@ class GeneralNote(base.Music21Object):
         return ()
 
     @pitches.setter
-    def pitches(self, _value: Iterable[Pitch]):
+    def pitches(self, _value: Iterable[Pitch]) -> None:
         pass
 
 
@@ -1709,7 +1709,7 @@ class Note(NotRest):
         return (self.pitch,)
 
     @pitches.setter
-    def pitches(self, value: Sequence[Pitch]):
+    def pitches(self, value: Iterable[Pitch]) -> None:
         if common.isListLike(value) and value:
             self.pitch = value[0]
         else:
