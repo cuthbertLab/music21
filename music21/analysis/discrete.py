@@ -153,7 +153,9 @@ class DiscreteAnalysis:
                 post.append(solution)
         return post
 
-    def solutionLegend(self, compress=False):
+    def solutionLegend(self, compress: bool = False) -> list[
+        list[str|list[tuple[int|str, str|None]]]
+    ]:
         '''
         A list of pairs showing all discrete results and the assigned color.
         Data should be organized to be passed to
@@ -162,7 +164,7 @@ class DiscreteAnalysis:
         If `compress` is True, the legend will only show values for solutions
         that have been encountered.
         '''
-        pass
+        return []
 
     def solutionUnitString(self):
         '''
@@ -211,7 +213,7 @@ class KeyWeightKeyAnalysis(DiscreteAnalysis):
     # favor eb minor
     # C- major cannot be determined if no enharmonics are present
     # C# major can be determined w/o enharmonics
-    keysValidMajor = (
+    keysValidMajor: tuple[str, ...] = (
         'C', 'C#', 'C-',
         'D-', 'D',
         'E-', 'E',
@@ -221,7 +223,7 @@ class KeyWeightKeyAnalysis(DiscreteAnalysis):
         'B-', 'B',
     )
 
-    keysValidMinor = (
+    keysValidMinor: tuple[str, ...] = (
         'C', 'C#',
         'D', 'D#',
         'E-', 'E',
@@ -442,7 +444,9 @@ class KeyWeightKeyAnalysis(DiscreteAnalysis):
                     solution[i] = float(top[i] / ((bottomRight[i] * bottomLeft[i]) ** 0.5))
         return solution
 
-    def solutionLegend(self, compress=False):
+    def solutionLegend(self, compress: bool = False) -> list[
+        list[str|list[tuple[int|str, str|None]]]
+    ]:
         '''
         Returns a list of lists of possible results for the creation of a legend.
 
@@ -478,16 +482,18 @@ class KeyWeightKeyAnalysis(DiscreteAnalysis):
             keySortOrderFiltered = _keySortOrder
 
         data = []
-        valid = None
+        valid: tuple[str, ...] = ()
 
+        yLabel: str
         for yLabel in ['Major', 'Minor']:
             if yLabel == 'Major':
                 valid = self.keysValidMajor
             elif yLabel == 'Minor':
                 valid = self.keysValidMinor
 
-            row: list[t.Any] = [yLabel]
-            pairs = []
+            row: list[str|list[tuple[int|str, str|None]]] = [yLabel]
+            pairs: list[tuple[int|str, str|None]] = []
+            color: str|None
             for keyPitch in [pitch.Pitch(p) for p in keySortOrderFiltered]:
                 try:
                     color = self.solutionToColor([keyPitch, yLabel])
@@ -499,6 +505,7 @@ class KeyWeightKeyAnalysis(DiscreteAnalysis):
                         mask = True
                 if keyPitch.name not in valid:
                     mask = True
+
                 if mask:
                     # set as white to maintain spacing
                     color = '#ffffff'
@@ -1076,7 +1083,9 @@ class Ambitus(DiscreteAnalysis):
 
         return minPitchObj, maxPitchObj
 
-    def solutionLegend(self, compress=False):
+    def solutionLegend(self, compress: bool = False) -> list[
+        list[str|list[tuple[int|str, str|None]]]
+    ]:
         '''
         Return legend data.
 
@@ -1119,7 +1128,7 @@ class Ambitus(DiscreteAnalysis):
 
         data = []
 
-        colors = {}  # a filtered dictionary
+        colors: dict[int, str] = {}  # a filtered dictionary
         for i in range(len(self._pitchSpanColors.keys())):
             if compress:
                 if self._pitchSpanColors[i] not in colorsUsed:
@@ -1135,8 +1144,8 @@ class Ambitus(DiscreteAnalysis):
 
         # split keys into two groups for two rows (optional)
         for keyGroup in [keysTopRow, keysBottomRow]:
-            row: list[t.Any] = ['']  # empty row label
-            pairs = []
+            row: list[str|list[tuple[int|str, str|None]]] = ['']  # empty row label
+            pairs: list[tuple[int|str, str|None]] = []
             for i in keyGroup:
                 color = colors[i]  # get form colors
                 pairs.append((i, color))
@@ -1151,7 +1160,7 @@ class Ambitus(DiscreteAnalysis):
         '''
         return 'Half-Steps'
 
-    def solutionToColor(self, solution):
+    def solutionToColor(self, solution: int|None) -> str:
         '''
 
         >>> p = analysis.discrete.Ambitus()

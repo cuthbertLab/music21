@@ -1209,9 +1209,15 @@ def romanNumeralFromChord(
         rnString = aug6NoKeyObjectSubs[rnString]
         nationalityStart = rnString[:2]  # nb: Ger = Ge
         if nationalityStart in ('It', 'Ge'):
-            keyObj = _getKeyFromCache(chordObj.fifth.name.lower())
+            fifth = chordObj.fifth
+            if t.TYPE_CHECKING:
+                assert fifth is not None
+            keyObj = _getKeyFromCache(fifth.name.lower())
         elif nationalityStart in ('Fr', 'Sw'):
-            keyObj = _getKeyFromCache(chordObj.seventh.name.lower())
+            seventh = chordObj.seventh
+            if t.TYPE_CHECKING:
+                assert seventh is not None
+            keyObj = _getKeyFromCache(seventh.name.lower())
 
     if (
         preferSecondaryDominants

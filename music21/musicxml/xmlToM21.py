@@ -1779,7 +1779,7 @@ class PartParser(XMLParserBase):
         self.removeFinaleIncorrectEndingForwardRest()
         part.coreElementsChanged()
 
-    def removeFinaleIncorrectEndingForwardRest(self):
+    def removeFinaleIncorrectEndingForwardRest(self) -> None:
         '''
         If Finale generated the file AND it ended with an incomplete
         measure (like 4/4 beginning with a quarter pickup and ending
@@ -1793,18 +1793,19 @@ class PartParser(XMLParserBase):
 
         * New in v7.
         '''
-        if self.lastMeasureParser is None:  # pragma: no cover
-            return  # should not happen
         lmp = self.lastMeasureParser
+        if lmp is None:  # pragma: no cover
+            return  # should not happen
         self.lastMeasureParser = None  # clean memory
 
         if lmp.lastForwardTagCreatedByFinale is None:
             return
-        if lmp.useVoices is True:
+        if lmp.useVoices:
             return
         endingForwardRest: note.Rest|None = lmp.lastForwardTagCreatedByFinale
         # important that we find that the last GeneralNote is this Forward tag
-        if lmp.stream[note.GeneralNote].last() is endingForwardRest:
+        if (lmp.stream[note.GeneralNote].last() is endingForwardRest
+                and endingForwardRest is not None):
             lmp.stream.remove(endingForwardRest, recurse=True)
 
     def separateOutPartStaves(self) -> list[stream.PartStaff]:
@@ -2379,7 +2380,7 @@ class MeasureParser(SoundTagMixin, XMLParserBase):
         self.staffReference: StaffReferenceType = {}
         self.activeTuplets: list[duration.Tuplet|None] = self.parent.activeTuplets
 
-        self.useVoices = False
+        self.useVoices: bool = False
         self.voicesById: dict[str|int, stream.Voice] = {}
         self.voiceIndices: set[str|int] = set()
         self.staves = 1
@@ -2598,7 +2599,7 @@ class MeasureParser(SoundTagMixin, XMLParserBase):
                     meth = getattr(self, methName)
                     meth(mxObj)
 
-        if self.useVoices is True:
+        if self.useVoices:
             for v in self.stream.iter().voices:
                 if v:  # do not bother with empty voices
                     # the musicDataMethods use insertCore, thus the voices need to run

@@ -153,8 +153,8 @@ class Derivation(SlottedObjectMixin):
         self._client: weakref.ReferenceType|None = None
         self._clientId: int|None = None  # store python-id to optimize w/o unwrapping
         self._method: str|None = None
-        # origin should be stored as a weak ref -- the place where the client was derived from.
-        self._origin = None
+        # origin could be stored as a weak ref -- the place where the client was derived from.
+        self._origin: base.Music21Object|None = None
         self._originId: int|None = None  # store id to optimize w/o unwrapping
 
         # set client; can handle None
