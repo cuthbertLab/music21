@@ -3573,7 +3573,7 @@ class Interval(IntervalBase):
                             chromatic=self.chromatic.reverse())
 
     @property
-    def pitchStart(self):
+    def pitchStart(self) -> pitch.Pitch|None:
         '''
         Get the start pitch or set it a new value.
         Setting this will adjust the value of the end pitch (`pitchEnd`).
@@ -3618,12 +3618,17 @@ class Interval(IntervalBase):
         return self._pitchStart
 
     @pitchStart.setter
-    def pitchStart(self, p: pitch.Pitch):
+    def pitchStart(self, p: pitch.Pitch|None) -> None:
         '''
         Assuming that this interval is defined,
         we can set a new start Pitch (_pitchStart) and
         automatically set the end Pitch (_pitchEnd).
         '''
+        if p is None:
+            self._pitchStart = None
+            self._pitchEnd = None
+            return
+
         # this is based on the procedure found in transposePitch() and
         # transposeNote() but offers a more object-oriented approach
         pitch2 = self.transposePitch(p)
@@ -3632,7 +3637,7 @@ class Interval(IntervalBase):
         self._pitchEnd = pitch2
 
     @property
-    def pitchEnd(self):
+    def pitchEnd(self) -> pitch.Pitch|None:
         '''
         Set the
         end pitch to a new value; this will adjust
@@ -3665,11 +3670,16 @@ class Interval(IntervalBase):
         return self._pitchEnd
 
     @pitchEnd.setter
-    def pitchEnd(self, p: music21.pitch.Pitch):
+    def pitchEnd(self, p: music21.pitch.Pitch|None) -> None:
         '''
         Assuming that this interval is defined, we can
         set a new end note (_pitchEnd) and automatically have the start pitch (_pitchStart).
         '''
+        if p is None:
+            self._pitchStart = None
+            self._pitchEnd = None
+            return
+
         # this is based on the procedure found in transposePitch() but offers
         # a more object-oriented approach
         pitch1 = self.transposePitch(p, reverse=True)
@@ -3689,9 +3699,11 @@ class Interval(IntervalBase):
         elif p:
             from music21 import note
             return note.Note(pitch=p)
+        else:
+            return None
 
     @noteStart.setter
-    def noteStart(self, n: music21.note.Note|None):
+    def noteStart(self, n: music21.note.Note|None) -> None:
         if n:
             self.pitchStart = n.pitch
         else:
@@ -3709,9 +3721,11 @@ class Interval(IntervalBase):
         elif p:
             from music21 import note
             return note.Note(pitch=p)
+        else:
+            return None
 
     @noteEnd.setter
-    def noteEnd(self, n: music21.note.Note|None):
+    def noteEnd(self, n: music21.note.Note|None) -> None:
         if n:
             self.pitchEnd = n.pitch
         else:

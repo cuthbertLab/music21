@@ -770,6 +770,11 @@ class MusicXMLImporter(XMLParserBase):
 
         self.musicXmlVersion = defaults.musicxmlVersion
 
+        # Finale (RIP 2025) had a problem with writing extraneous <forward> tags.
+        # if this is True then we will be cautious before interpreting them as
+        # hidden rests.
+        self.applyFinaleWorkarounds = False
+
     def scoreFromFile(self, filename):
         '''
         main program: opens a file given by filename and returns a complete
@@ -1339,11 +1344,22 @@ class MusicXMLImporter(XMLParserBase):
             * new-page = Metadata.definesExplicitPageBreaks
         '''
         # TODO: encoder (text + type = role) multiple
-        # TODO: encoding date multiple
+        # TODO: encoding-date either singular or multiple
         # TODO: encoding-description (string) multiple
+
+        # If the first software tag contains Finale, then it
+        # is by finale. Otherwise, it is not
+        foundOneSoftwareTag: bool = False
+        finaleIsFirst: bool = False
         for software in encoding.findall('software'):
             if softwareText := strippedText(software):
+                if not foundOneSoftwareTag:
+                    if 'Finale' in softwareText:
+                        finaleIsFirst = True
+                foundOneSoftwareTag = True
                 md.add('software', softwareText)
+        if finaleIsFirst:
+            self.applyFinaleWorkarounds = True
 
         for supports in encoding.findall('supports'):
             # todo: element: required
@@ -1774,16 +1790,20 @@ class PartParser(XMLParserBase):
         for mxMeasure in self.mxPart.iterfind('measure'):
             self.xmlMeasureToMeasure(mxMeasure)
 
-        self.removeEndForwardRest()
+        self.removeFinaleIncorrectEndingForwardRest()
         part.coreElementsChanged()
 
-    def removeEndForwardRest(self):
+    def removeFinaleIncorrectEndingForwardRest(self) -> None:
         '''
-        If the last measure ended with a forward tag, as happens
-        in some pieces that end with incomplete measures,
-        and voices are not involved,
-        remove the rest there (for backwards compatibility, esp.
-        since bwv66.6 uses it)
+        If Finale generated the file AND it ended with an incomplete
+        measure (like 4/4 beginning with a quarter pickup and ending
+        with a 3-beat measure) then the file might have ended with a
+        `<forward>` tag, which Finale used to create hidden rests.
+
+        If this forward tag is at the end of the piece, then it
+        will create rests that "complete" the measure in an incorrect way
+        If voices are not involved (e.g., NOT bwv66.6) then we should
+        remove this forward tag.
 
         * New in v7.  Stubbed out in v9.7.
         '''
@@ -2360,7 +2380,7 @@ class MeasureParser(SoundTagMixin, XMLParserBase):
         self.staffReference: StaffReferenceType = {}
         self.activeTuplets: list[duration.Tuplet|None] = self.parent.activeTuplets
 
-        self.useVoices = False
+        self.useVoices: bool = False
         self.voicesById: dict[str|int, stream.Voice] = {}
         self.voiceIndices: set[str|int] = set()
         self.staves = 1
@@ -2405,12 +2425,16 @@ class MeasureParser(SoundTagMixin, XMLParserBase):
         # what is the offset in the measure of the current note position?
         self.offsetMeasureNote: OffsetQL = 0.0
 
-        # keep track of the last rest that was added with a forward tag.
-        # there are many pieces that end with incomplete measures that
-        # older versions of Finale put a forward tag at the end, but this
-        # disguises the incomplete last measure.  The PartParser will
-        # pick this up from the last measure.
-        self.endedWithForwardTag: note.Rest|None = None
+        # Keep track of the last rest that was added with a forward tag.
+
+        # Older versions of Finale put a <forward> tag at the end of pieces
+        # which ended with an incomplete measure.  Find that last
+        # Forward tag (if created by Finale) and store it.
+        # if later we find that this measure is the last one,
+        # and doesn't have multiple voices, and was created by Finale,
+        # then we'll delete the Rest associated with this forward tag
+        # at the cleanup stage of PartParser.
+        self.lastForwardTagCreatedByFinale: note.Rest|None = None
 
         # Temporary storage of intended start offset of a PedalMark (we sometimes
         # need to know this before the PedalMark or its first element have been
@@ -2575,9 +2599,12 @@ class MeasureParser(SoundTagMixin, XMLParserBase):
                     meth = getattr(self, methName)
                     meth(mxObj)
 
-        if self.useVoices is True:
+        if self.useVoices:
             for v in self.stream.iter().voices:
-                v.coreElementsChanged()
+                if v:  # do not bother with empty voices
+                    # the musicDataMethods use insertCore, thus the voices need to run
+                    # coreElementsChanged
+                    v.coreElementsChanged()
         self.stream.coreElementsChanged()
 
         if (self.restAndNoteCount['rest'] == 1
@@ -2783,7 +2810,7 @@ class MeasureParser(SoundTagMixin, XMLParserBase):
 
         # only increment Chords after completion
         self.offsetMeasureNote += offsetIncrement
-        self.endedWithForwardTag = None
+        self.lastForwardTagCreatedByFinale = None
 
     def xmlToChord(self, mxNoteList: list[ET.Element]) -> chord.ChordBase:
         # noinspection PyShadowingNames
@@ -3848,16 +3875,76 @@ class MeasureParser(SoundTagMixin, XMLParserBase):
             if tag in ('heel', 'toe'):
                 if mxObj.get('substitution') is not None:
                     tech.substitution = xmlObjects.yesNoToBoolean(mxObj.get('substitution'))
+            if tag == 'bend':
+                self.setBend(mxObj, tech)
             # TODO: <bend> attr: accelerate, beats, first-beat, last-beat, shape (4.0)
             # TODO: <bent> sub-elements: bend-alter, pre-bend, with-bar, release
             # TODO: musicxml 4: release sub-element as offset attribute
-
-
             self.setPlacement(mxObj, tech)
             return tech
         else:
             environLocal.printDebug(f'Cannot translate {tag} in {mxObj}.')
             return None
+
+    def setBend(self, mxh, bend):
+        '''
+        Gets the bend amplitude from the bend-alter tag,
+        then optional pre-bend and with-bar tags are processed,
+        as well as release which is converted from divisions to music21 time.
+
+        Called from xmlTechnicalToArticulation
+
+        >>> from xml.etree.ElementTree import fromstring as EL
+        >>> MP = musicxml.xmlToM21.MeasureParser()
+
+        >>> mxTech = EL('<bend><bend-alter>2</bend-alter></bend>')
+        >>> a = MP.xmlTechnicalToArticulation(mxTech)
+        >>> a
+        <music21.articulations.FretBend 0>
+        >>> a.bendAlter.semitones
+        2
+        >>> a.release
+
+        >>> a.withBar
+
+        >>> a.preBend
+        False
+
+        >>> mxTech = EL('<bend><bend-alter>-2</bend-alter><pre-bend/></bend>')
+        >>> a = MP.xmlTechnicalToArticulation(mxTech)
+        >>> a.bendAlter.semitones
+        -2
+        >>> a.preBend
+        True
+
+        >>> mxTech = EL('<bend><bend-alter>-2</bend-alter><release offset="1"/></bend>')
+        >>> a = MP.xmlTechnicalToArticulation(mxTech)
+        >>> a.bendAlter.semitones
+        -2
+        >>> a.release
+        Fraction(1, 10080)
+
+        >>> mxTech = EL('<bend><bend-alter>-1</bend-alter><with-bar>dip</with-bar></bend>')
+        >>> a = MP.xmlTechnicalToArticulation(mxTech)
+        >>> a.bendAlter.semitones
+        -1
+        >>> a.withBar
+        'dip'
+        '''
+        alter = mxh.find('bend-alter')
+        if alter is not None:
+            if alter.text is not None:
+                bend.bendAlter = interval.Interval(float(alter.text))
+        if mxh.find('pre-bend') is not None:
+            bend.preBend = True
+        if mxh.find('with-bar') is not None:
+            bend.withBar = mxh.find('with-bar').text
+        if mxh.find('release') is not None:
+            try:
+                divisions = float(mxh.find('release').get('offset'))
+                bend.release = opFrac(divisions / self.divisions)
+            except (ValueError, TypeError) as unused_err:
+                bend.release = 0.0
 
     @staticmethod
     def setHarmonic(mxh, harm):
@@ -5186,8 +5273,8 @@ class MeasureParser(SoundTagMixin, XMLParserBase):
         <music21.pitch.Pitch D-3>
         '''
         # TODO: musicxml 4: attr: arrangement -- C/E or C over E etc.
-        # TODO: offset
-        # Element staff is covered by insertCoreAndReference in xmlHarmony()
+        # Element offset is covered by xmlHarmony(), which calls this.
+        # Element staff is also covered by insertCoreAndReference in xmlHarmony()
         b: pitch.Pitch|None = None
         r: pitch.Pitch|None = None
         inversion: int|None = None
@@ -5200,7 +5287,7 @@ class MeasureParser(SoundTagMixin, XMLParserBase):
 
         mxFrame = mxHarmony.find('frame')
 
-        mxBass = mxHarmony.find('bass')
+        mxBass: ET.Element | None = mxHarmony.find('bass')
         if mxBass is not None:
             # required
             bassStep = mxBass.find('bass-step')

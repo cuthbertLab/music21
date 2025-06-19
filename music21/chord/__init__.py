@@ -2318,7 +2318,7 @@ class Chord(ChordBase):
         *,
         find: bool = True,
         testRoot: pitch.Pitch|None = None,
-        transposeOnSet: bool = True
+        transposeOnSet: bool = True,
     ) -> int|None:
         '''
         Find the chord's inversion or (if called with a number) set the chord to
@@ -2393,7 +2393,6 @@ class Chord(ChordBase):
         Traceback (most recent call last):
         music21.chord.ChordException: Could not invert chord: inversion may not exist
 
-
         If testRoot is True then that temporary root is used instead of self.root().
 
         Get the inversion for a seventh chord showing different roots
@@ -2430,7 +2429,7 @@ class Chord(ChordBase):
         sets the value to be returned later, which might be useful for
         cases where the chords are poorly spelled, or there is an added note.
 
-        * Changed in v8: chords without pitches
+        * Changed in v8: deal with chords without pitches
         '''
         if not self.pitches:
             return -1
@@ -2460,11 +2459,12 @@ class Chord(ChordBase):
         else:
             return -1
 
-    def _setInversion(self,
-                      newInversion: int,
-                      rootPitch: pitch.Pitch,
-                      transposeOnSet: bool
-                      ) -> None:
+    def _setInversion(
+        self,
+        newInversion: int,
+        rootPitch: pitch.Pitch,
+        transposeOnSet: bool,
+    ) -> None:
         '''
         Helper function for inversion(int)
         '''
@@ -3230,6 +3230,8 @@ class Chord(ChordBase):
             root = self.root()
             third = self.third
             fifth = self.fifth
+            if not fifth:
+                return False
 
             # only the tonic (that is, fifth) can be doubled
             for p in self.pitches:
@@ -4955,7 +4957,10 @@ class Chord(ChordBase):
             hypothetical_fifth = c.root().transpose('P5')
             if hypothetical_fifth.name not in c.pitchNames:
                 return False
-            hypothetical_seventh = c.third.transpose('P5')
+            third = c.third
+            if not third:
+                return False
+            hypothetical_seventh = third.transpose('P5')
             if hypothetical_seventh.name not in c.pitchNames:
                 return False
             return True
@@ -5731,7 +5736,7 @@ class Chord(ChordBase):
         return pitches
 
     @pitches.setter
-    def pitches(self, value: Sequence[str|pitch.Pitch|int]):
+    def pitches(self, value: Iterable[pitch.Pitch]) -> None:
         self._notes = []
         self.clearCache()
         # TODO: individual ties are not being retained here

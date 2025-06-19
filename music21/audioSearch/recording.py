@@ -107,9 +107,6 @@ class RecordingException(exceptions21.Music21Exception):
 class Test(unittest.TestCase):
     pass
 
-
-
-
 class TestExternal(unittest.TestCase):  # pragma: no cover
     loader = find_spec('pyaudio')
     if loader is not None:  # pragma: no cover
