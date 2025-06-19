@@ -335,7 +335,7 @@ class Repeat(repeat.RepeatMark, Barline):
         return self._times
 
     @times.setter
-    def times(self, value: int):
+    def times(self, value: int|None) -> None:
         if value is None:
             self._times = None
         else:

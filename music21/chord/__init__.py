@@ -3230,6 +3230,8 @@ class Chord(ChordBase):
             root = self.root()
             third = self.third
             fifth = self.fifth
+            if not fifth:
+                return False
 
             # only the tonic (that is, fifth) can be doubled
             for p in self.pitches:
@@ -4955,7 +4957,10 @@ class Chord(ChordBase):
             hypothetical_fifth = c.root().transpose('P5')
             if hypothetical_fifth.name not in c.pitchNames:
                 return False
-            hypothetical_seventh = c.third.transpose('P5')
+            third = c.third
+            if not third:
+                return False
+            hypothetical_seventh = third.transpose('P5')
             if hypothetical_seventh.name not in c.pitchNames:
                 return False
             return True
@@ -5731,7 +5736,7 @@ class Chord(ChordBase):
         return pitches
 
     @pitches.setter
-    def pitches(self, value: Sequence[str|pitch.Pitch|int]):
+    def pitches(self, value: Iterable[pitch.Pitch]) -> None:
         self._notes = []
         self.clearCache()
         # TODO: individual ties are not being retained here
