@@ -14249,6 +14249,9 @@ class Score(Stream):
                     # only insert measure if new part does not already have measures
                     if not hasMeasures:
                         pActive.insert(m.getOffsetBySite(p), mActive)
+                
+                for spanner in p.spanners:
+                    pActive.insert(spanner.getOffsetBySite(p), spanner)
 
             s.insert(0, pActive)
             pActive = None
