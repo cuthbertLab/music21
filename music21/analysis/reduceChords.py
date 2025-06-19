@@ -263,7 +263,7 @@ class ChordReducer:
         >>> excerpt_tree = s.parts.first().asTimespans()
         >>> cr2.collapseArpeggios(excerpt_tree)
         >>> excerpt_tree
-        <TimespanTree {167} (0.0 to 124.0) <music21.stream.Part Soprano I>>
+        <TimespanTree {163} (0.0 to 124.0) <music21.stream.Part Soprano I>>
         '''
         for verticalities in scoreTree.iterateVerticalitiesNwise(n=2):
             one, two = verticalities
