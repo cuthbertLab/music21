@@ -153,7 +153,9 @@ class DiscreteAnalysis:
                 post.append(solution)
         return post
 
-    def solutionLegend(self, compress: bool = False) -> list[list[str|list[tuple[int|str, str|None]]]]:
+    def solutionLegend(self, compress: bool = False) -> list[
+        list[str|list[tuple[int|str, str|None]]]
+    ]:
         '''
         A list of pairs showing all discrete results and the assigned color.
         Data should be organized to be passed to
@@ -442,7 +444,9 @@ class KeyWeightKeyAnalysis(DiscreteAnalysis):
                     solution[i] = float(top[i] / ((bottomRight[i] * bottomLeft[i]) ** 0.5))
         return solution
 
-    def solutionLegend(self, compress: bool = False) -> list[list[str|list[tuple[int|str, str|None]]]]:
+    def solutionLegend(self, compress: bool = False) -> list[
+        list[str|list[tuple[int|str, str|None]]]
+    ]:
         '''
         Returns a list of lists of possible results for the creation of a legend.
 
@@ -1079,7 +1083,9 @@ class Ambitus(DiscreteAnalysis):
 
         return minPitchObj, maxPitchObj
 
-    def solutionLegend(self, compress: bool = False) -> list[list[str|list[tuple[int|str, str|None]]]]:
+    def solutionLegend(self, compress: bool = False) -> list[
+        list[str|list[tuple[int|str, str|None]]]
+    ]:
         '''
         Return legend data.
 

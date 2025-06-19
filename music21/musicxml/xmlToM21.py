@@ -1804,7 +1804,8 @@ class PartParser(XMLParserBase):
             return
         endingForwardRest: note.Rest|None = lmp.lastForwardTagCreatedByFinale
         # important that we find that the last GeneralNote is this Forward tag
-        if lmp.stream[note.GeneralNote].last() is endingForwardRest and endingForwardRest is not None:
+        if (lmp.stream[note.GeneralNote].last() is endingForwardRest
+                and endingForwardRest is not None):
             lmp.stream.remove(endingForwardRest, recurse=True)
 
     def separateOutPartStaves(self) -> list[stream.PartStaff]:
