@@ -1803,9 +1803,22 @@ class PartParser(XMLParserBase):
         If voices are not involved (e.g., NOT bwv66.6) then we should
         remove this forward tag.
 
-        * New in v7.  Stubbed out in 9.9; to be removed in v10.
+        * New in v7.
         '''
-        return
+        lmp = self.lastMeasureParser
+        if lmp is None:  # pragma: no cover
+            return  # should not happen
+        self.lastMeasureParser = None  # clean memory
+
+        if lmp.lastForwardTagCreatedByFinale is None:
+            return
+        if lmp.useVoices:
+            return
+        endingForwardRest: note.Rest|None = lmp.lastForwardTagCreatedByFinale
+        # important that we find that the last GeneralNote is this Forward tag
+        if (lmp.stream[note.GeneralNote].last() is endingForwardRest
+                and endingForwardRest is not None):
+            lmp.stream.remove(endingForwardRest, recurse=True)
 
     def separateOutPartStaves(self) -> list[stream.PartStaff]:
         '''
@@ -2603,7 +2616,26 @@ class MeasureParser(SoundTagMixin, XMLParserBase):
                     meth = getattr(self, methName)
                     meth(mxObj)
 
-        if self.useVoices:
+        # Get any pending first spanned elements that weren't found immediately following
+        # the "start" of a spanner.
+        leftOverPendingFirstSpannedElements: list[spanner.PendingAssignmentRef] = (
+            self.spannerBundle.popPendingSpannedElementAssignments()
+        )
+        for pfse in leftOverPendingFirstSpannedElements:
+            # Note that these are all start elements, so we can't just
+            # addSpannedElement, we need to insertFirstSpannedElement.
+            sp: spanner.Spanner = pfse['spanner']
+            offsetInScore: OffsetQL|None = pfse['offsetInScore']
+            staffKey: t.Any|None = pfse['clientInfo']
+            if t.TYPE_CHECKING:
+                assert isinstance(offsetInScore, OffsetQL)
+                assert isinstance(staffKey, int)
+            startAnchor = spanner.SpannerAnchor()
+            offsetInMeasure: OffsetQL = opFrac(offsetInScore - self.measureOffsetInScore)
+            self.insertCoreAndRef(offsetInMeasure, staffKey, startAnchor)
+            sp.insertFirstSpannedElement(startAnchor)
+
+        if self.useVoices is True:
             for v in self.stream.iter().voices:
                 if v:  # do not bother with empty voices
                     # the musicDataMethods use insertCore, thus the voices need to run
@@ -2653,6 +2685,22 @@ class MeasureParser(SoundTagMixin, XMLParserBase):
         mxDuration = mxObj.find('duration')
         if durationText := strippedText(mxDuration):
             change = opFrac(float(durationText) / self.divisions)
+
+            if (self.parent
+                    and self.parent.parent
+                    and self.parent.parent.applyFinaleWorkarounds):
+                # If the ScoreParser senses the Score was written by Finale
+                # then Forward tags need to create hidden rests (except
+                # at the end of the piece!)  So create a hidden rest (spacer) here.
+                r = note.Rest(quarterLength=change)
+                r.style.hideObjectOnPrint = True
+                self.addToStaffReference(mxObj, r)
+                self.insertInMeasureOrVoice(mxObj, r)
+
+                # old Finale documents close incomplete final measures with <forward>
+                # this will be removed afterward by removeFinaleIncorrectEndingForwardRest()
+                self.lastForwardTagCreatedByFinale = r
+
             # Allow overfilled measures for now -- TODO(someday): warn?
             self.offsetMeasureNote = opFrac(self.offsetMeasureNote + change)
 
