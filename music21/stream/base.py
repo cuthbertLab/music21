@@ -14238,7 +14238,7 @@ class Score(Stream):
                     v = Voice()
                     v.id = pIndex
                     # for now, just take notes, including rests
-                    for e in m.notesAndRests:  # m.getElementsByClass():
+                    for e in m.getElementsByClass(['Note', 'Chord', 'Rest', 'Spanner']):  # m.getElementsByClass():
                         if setStems and isinstance(e, note.Note):
                             e.stemDirection = 'up' if pIndex % 2 == 0 else 'down'
                         v.insert(e.getOffsetBySite(m), e)
@@ -14249,9 +14249,10 @@ class Score(Stream):
                     # only insert measure if new part does not already have measures
                     if not hasMeasures:
                         pActive.insert(m.getOffsetBySite(p), mActive)
-                
-                for spanner in p.spanners:
-                    pActive.insert(spanner.getOffsetBySite(p), spanner)
+
+                # merge spanners from current part into active part
+                for sp in p.spanners:
+                    pActive.insert(sp.getOffsetBySite(p), sp)
 
             s.insert(0, pActive)
             pActive = None
