@@ -135,13 +135,14 @@ class LyricSearcher:
         found if a work contains multiple voices.
     '''
 
-    def __init__(self, s: StreamType|None = None):
+    def __init__(self, s: StreamType|None = None, wordSeparator: str = ' '):
         self.stream: StreamType|None = s
         self.includeIntermediateElements = False  # currently does nothing
         self.includeTrailingMelisma = False  # currently does nothing
 
         self._indexText: str|None = None
         self._indexTuples: list[IndexedLyric] = []
+        self.wordSeparator = wordSeparator
 
     @property
     def indexText(self) -> str:
@@ -228,7 +229,7 @@ class LyricSearcher:
                 if lastSyllabic in ('begin', 'middle', None):
                     iText += txt
                 else:
-                    iText += ' ' + txt
+                    iText += self.wordSeparator + txt
                     posStart += 1
 
                 iTextByIdentifier[lyIdentifier] = iText

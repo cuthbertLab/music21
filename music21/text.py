@@ -54,7 +54,7 @@ articleReference = {
 
 
 # ------------------------------------------------------------------------------
-def assembleLyrics(streamIn, lineNumber=1):
+def assembleLyrics(streamIn, lineNumber=1, wordSeparator=' '):
     '''
     Concatenate text from a stream. The Stream is automatically flattened.
 
@@ -124,10 +124,10 @@ def assembleLyrics(streamIn, lineNumber=1):
                     word = []
             else:
                 raise ValueError(f'no known Text syllabic setting: {lyricObj.syllabic}')
-    return ' '.join(words)
+    return wordSeparator.join(words)
 
 
-def assembleAllLyrics(streamIn, maxLyrics=10, lyricSeparation='\n'):
+def assembleAllLyrics(streamIn, maxLyrics=10, lyricSeparation='\n', wordSeparator=' '):
     r'''
     Concatenate all Lyrics text from a stream separated by lyricSeparation.
     The Stream is automatically recursed.
@@ -152,7 +152,7 @@ def assembleAllLyrics(streamIn, maxLyrics=10, lyricSeparation='\n'):
     '''
     lyrics = ''
     for i in range(1, maxLyrics):
-        lyr = assembleLyrics(streamIn, i)
+        lyr = assembleLyrics(streamIn, i, wordSeparator)
         if lyr != '':
             if i > 1:
                 lyrics += lyricSeparation
@@ -687,6 +687,15 @@ class Test(unittest.TestCase):
         post = assembleLyrics(s)
         # noinspection SpellCheckingInspection
         self.assertEqual(post, 'aristocats are great')
+
+        s = stream.Stream()
+        for syl in ['长', '亭', '外', '古', '道', '边']:
+            n = note.Note()
+            n.lyric = syl
+            s.append(n)
+        post = assembleLyrics(s, wordSeparator='')
+        # custom word separator
+        self.assertEqual(post, '长亭外古道边')
 
     # noinspection SpellCheckingInspection
     def testLanguageDetector(self):
