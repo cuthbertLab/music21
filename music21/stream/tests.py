@@ -5990,7 +5990,7 @@ class Test(unittest.TestCase):
         #     'Measure')[0].hasVoices(), False)
 
     def testPartsToVoicesSpanner(self):
-        # NOTE: this test spanners merged from two parts into one part, including spanners under measure
+        # NOTE: this test spanners merged from two parts into one part
         clef1 = clef.TrebleClef()
         clef2 = clef.TrebleClef()
         ts1 = meter.TimeSignature('12/8')
@@ -6038,12 +6038,12 @@ class Test(unittest.TestCase):
         self.assertEqual(len(s_), 1)
         self.assertEqual(len(s_[0].getElementsByClass('Slur')), 3)
         self.assertEqual(len(s_[0]['Slur']), 4)
-        self.assertEqual(len(s_[0]), 4) # 1 measure + 3 slurs
+        self.assertEqual(len(s_[0]), 4)  # 1 measure + 3 slurs
         self.assertIsInstance(s_[0][0], Measure)
         self.assertEqual(s_[0][0][0], clef1)
         self.assertEqual(s_[0][0][1], ts1)
         self.assertEqual(len(s_[0][0].voices), 2)  # 2 voices
-        self.assertEqual(len(s_[0][0][2]['Slur']), 1) # 1 slur inside the first voice
+        self.assertEqual(len(s_[0][0][2]['Slur']), 1)  # 1 slur inside the first voice
         self.assertEqual(s_[0][0][2]['Slur'][0][0], n3)
         self.assertEqual(s_[0][0][2]['Slur'][0][1], n4)
 
