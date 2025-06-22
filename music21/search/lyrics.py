@@ -745,7 +745,7 @@ class Test(unittest.TestCase):
         for lenWordSep in range(5):
             wordSep = ' ' * lenWordSep
             ls = search.lyrics.LyricSearcher(s, wordSep)
-            for pair in more_itertools.pairwise("长亭外古道边"):
+            for pair in more_itertools.pairwise('长亭外古道边'):
                 keyword = pair[0] + wordSep + pair[1]
                 match = ls.search(keyword)
                 self.assertEqual(len(match), 1)
