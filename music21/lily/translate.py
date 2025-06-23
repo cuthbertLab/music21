@@ -261,10 +261,10 @@ class LilypondConverter:
         \version "2..."
         \include "lilypond-book-preamble.ly"
         color = #(define-music-function (parser location color) (string?) #{
-                \once \override NoteHead #'color = #(x11-color color)
-                \once \override Stem #'color = #(x11-color color)
-                \once \override Rest #'color = #(x11-color color)
-                \once \override Beam #'color = #(x11-color color)
+                \once \override NoteHead.color = #(x11-color color)
+                \once \override Stem.color = #(x11-color color)
+                \once \override Rest.color = #(x11-color color)
+                \once \override Beam.color = #(x11-color color)
              #})
         \header { }
         \score  {
@@ -463,12 +463,12 @@ class LilypondConverter:
                           \remove "Time_signature_engraver"
                           alignAboveContext = #"pa"
                           fontSize = #-3
-                          \override StaffSymbol #'staff-space = #(magstep -3)
-                          \override StaffSymbol #'thickness = #(magstep -3)
-                          \override TupletBracket #'bracket-visibility = ##f
-                          \override TupletNumber #'stencil = ##f
-                          \override Clef #'transparent = ##t
-                          \override OctavateEight #'transparent = ##t
+                          \override StaffSymbol.staff-space = #(magstep -3)
+                          \override StaffSymbol.thickness = #(magstep -3)
+                          \override TupletBracket.bracket-visibility = ##f
+                          \override TupletNumber.stencil = ##f
+                          \override Clef.transparent = ##t
+                          \override OctavateEight.transparent = ##t
                           \consists "Default_bar_line_engraver"
                         }
                  { \stopStaff s1 s1 s1 s1 }
@@ -477,12 +477,12 @@ class LilypondConverter:
                           \remove "Time_signature_engraver"
                           alignAboveContext = #"pa"
                           fontSize = #-3
-                          \override StaffSymbol #'staff-space = #(magstep -3)
-                          \override StaffSymbol #'thickness = #(magstep -3)
-                          \override TupletBracket #'bracket-visibility = ##f
-                          \override TupletNumber #'stencil = ##f
-                          \override Clef #'transparent = ##t
-                          \override OctavateEight #'transparent = ##t
+                          \override StaffSymbol.staff-space = #(magstep -3)
+                          \override StaffSymbol.thickness = #(magstep -3)
+                          \override TupletBracket.bracket-visibility = ##f
+                          \override TupletNumber.stencil = ##f
+                          \override Clef.transparent = ##t
+                          \override OctavateEight.transparent = ##t
                           \consists "Default_bar_line_engraver"
                         }
                  { \stopStaff s1 s1 s1 s1 }
@@ -492,12 +492,12 @@ class LilypondConverter:
                           \remove "Time_signature_engraver"
                           alignAboveContext = #"pb...
                           fontSize = #-3
-                          \override StaffSymbol #'staff-space = #(magstep -3)
-                          \override StaffSymbol #'thickness = #(magstep -3)
-                          \override TupletBracket #'bracket-visibility = ##f
-                          \override TupletNumber #'stencil = ##f
-                          \override Clef #'transparent = ##t
-                          \override OctavateEight #'transparent = ##t
+                          \override StaffSymbol.staff-space = #(magstep -3)
+                          \override StaffSymbol.thickness = #(magstep -3)
+                          \override TupletBracket.bracket-visibility = ##f
+                          \override TupletNumber.stencil = ##f
+                          \override Clef.transparent = ##t
+                          \override OctavateEight.transparent = ##t
                           \consists "Default_bar_line_engraver"
                         }
                  { \stopStaff s1 s1 s1 s1 }
@@ -506,12 +506,12 @@ class LilypondConverter:
                           \remove "Time_signature_engraver"
                           alignAboveContext = #"pb...
                           fontSize = #-3
-                          \override StaffSymbol #'staff-space = #(magstep -3)
-                          \override StaffSymbol #'thickness = #(magstep -3)
-                          \override TupletBracket #'bracket-visibility = ##f
-                          \override TupletNumber #'stencil = ##f
-                          \override Clef #'transparent = ##t
-                          \override OctavateEight #'transparent = ##t
+                          \override StaffSymbol.staff-space = #(magstep -3)
+                          \override StaffSymbol.thickness = #(magstep -3)
+                          \override TupletBracket.bracket-visibility = ##f
+                          \override TupletNumber.stencil = ##f
+                          \override Clef.transparent = ##t
+                          \override OctavateEight.transparent = ##t
                           \consists "Default_bar_line_engraver"
                         }
                  { \stopStaff s1 s1 s1 s1 }
@@ -639,22 +639,22 @@ class LilypondConverter:
                 \key fis \minor
                 \time 4/4
                 \set stemRightBeamCount = #1
-                \once \override Stem #'direction = #DOWN
+                \once \override Stem.direction = #DOWN
                 cis'' 8 [
                 \set stemLeftBeamCount = #1
-                \once \override Stem #'direction = #DOWN
+                \once \override Stem.direction = #DOWN
                 b... 8 ]
                 \bar "|"  %{ end measure 0 %}
-                \once \override Stem #'direction = #UP
+                \once \override Stem.direction = #UP
                 a' 4
-                \once \override Stem #'direction = #DOWN
+                \once \override Stem.direction = #DOWN
                 b... 4
-                \once \override Stem #'direction = #DOWN
+                \once \override Stem.direction = #DOWN
                 cis'' 4  \fermata
-                \once \override Stem #'direction = #DOWN
+                \once \override Stem.direction = #DOWN
                 e'' 4
                 \bar "|"  %{ end measure 1 %}
-                \once \override Stem #'direction = #DOWN
+                \once \override Stem.direction = #DOWN
                 cis'' 4
                 ...
         }
@@ -665,12 +665,12 @@ class LilypondConverter:
          }
          { \startStaff \partial 32*8
             \clef "treble"...
-            \once \override Stem #'direction = #UP
+            \once \override Stem.direction = #UP
             e' 4
             \bar "|"  %{ end measure 0 %}
-            \once \override Stem #'direction = #UP
+            \once \override Stem.direction = #UP
             fis' 4
-            \once \override Stem #'direction = #UP
+            \once \override Stem.direction = #UP
             e' 4
         ...
         }
@@ -2203,13 +2203,13 @@ class LilypondConverter:
         #      \remove "Time_signature_engraver"
         #      alignAboveContext = #"%s"
         #      fontSize = #-3
-        #      \override StaffSymbol #'staff-space = #(magstep -3)
-        #      \override StaffSymbol #'thickness = #(magstep -3)
-        #      \override TupletBracket #'bracket-visibility = ##f
-        #      \override TupletNumber #'stencil = ##f
-        #      \override Clef #'transparent = ##t
+        #      \override StaffSymbol.staff-space = #(magstep -3)
+        #      \override StaffSymbol.thickness = #(magstep -3)
+        #      \override TupletBracket.bracket-visibility = ##f
+        #      \override TupletNumber.stencil = ##f
+        #      \override Clef.transparent = ##t
         #    }
-        # ''' % containerId #\override BarLine #'transparent = ##t
+        # ''' % containerId #\override BarLine.transparent = ##t
         # # is the best way of fixing the #barlines that I have come up with.
         # lpPrefixCompositeMusicVariant.optionalContextMod = optionalContextMod
 
