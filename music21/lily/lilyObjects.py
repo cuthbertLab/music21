@@ -1482,11 +1482,11 @@ class LyPropertyOperation(LyObject):
 
     >>> lpo = lily.lilyObjects.LyPropertyOperation('override', 'simple', 'x', 'y')
     >>> str(lpo)
-    '\\override simple x = y '
+    '\\override simple.x = y '
 
     >>> lpo = lily.lilyObjects.LyPropertyOperation('revert', 'x', 'y')
     >>> str(lpo)
-    '\\revert x y '
+    '\\revert x.y '
 
     TODO: should \set be given?
     '''
