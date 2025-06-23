@@ -744,7 +744,7 @@ class Test(unittest.TestCase):
         s = converter.parse(partXML, format='MusicXML')
         for lenWordSep in range(5):
             wordSep = ' ' * lenWordSep
-            ls = search.lyrics.LyricSearcher(s, wordSep)
+            ls = search.lyrics.LyricSearcher(s, wordSeparator = wordSep)
             for pair in more_itertools.pairwise('长亭外古道边'):
                 keyword = pair[0] + wordSep + pair[1]
                 match = ls.search(keyword)
