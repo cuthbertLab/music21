@@ -98,10 +98,10 @@ class LilypondConverter:
     colorDef = (
         r'''
     color = #(define-music-function (parser location color) (string?) #{
-        \once \override NoteHead #'color = #(x11-color color)
-        \once \override Stem #'color = #(x11-color color)
-        \once \override Rest #'color = #(x11-color color)
-        \once \override Beam #'color = #(x11-color color)
+        \once \override NoteHead.color = #(x11-color color)
+        \once \override Stem.color = #(x11-color color)
+        \once \override Rest.color = #(x11-color color)
+        \once \override Beam.color = #(x11-color color)
      #})
     '''.lstrip())
     simplePaperDefinitionScm = r'''
@@ -114,8 +114,8 @@ class LilypondConverter:
     }
     '''.lstrip()
     transparencyStartScheme = r'''
-     \override Rest #'transparent  = ##t
-     \override Dots #'transparent  = ##t
+     \override Rest.transparent  = ##t
+     \override Dots.transparent  = ##t
      '''.lstrip()
     transparencyStopScheme = r'''
      \revert Rest #'transparent
@@ -548,12 +548,12 @@ class LilypondConverter:
                     contextModList = [r'\remove "Time_signature_engraver"',
                                       fr'alignAboveContext = #"{partIdText}"',
                                       r'fontSize = #-3',
-                                      r"\override StaffSymbol #'staff-space = #(magstep -3)",
-                                      r"\override StaffSymbol #'thickness = #(magstep -3)",
-                                      r"\override TupletBracket #'bracket-visibility = ##f",
-                                      r"\override TupletNumber #'stencil = ##f",
-                                      r"\override Clef #'transparent = ##t",
-                                      r"\override OctavateEight #'transparent = ##t",
+                                      r"\override StaffSymbol.staff-space = #(magstep -3)",
+                                      r"\override StaffSymbol.thickness = #(magstep -3)",
+                                      r"\override TupletBracket.bracket-visibility = ##f",
+                                      r"\override TupletNumber.stencil = ##f",
+                                      r"\override Clef.transparent = ##t",
+                                      r"\override OctavateEight.transparent = ##t",
                                       r'\consists "Default_bar_line_engraver"',
                                       ]
                     optionalContextMod = lyo.LyContextModification(contextModList)
@@ -872,7 +872,7 @@ class LilypondConverter:
         <music21.lily.lilyObjects.LyPrefixCompositeMusic \new Staff...>
         >>> print(lyPrefixCompositeMusicOut)
         \new Staff = ... \with {
-         \override StaffSymbol #'line-count = #4
+         \override StaffSymbol.line-count = #4
         }
         { \clef "bass"
              \time 3/4
@@ -908,7 +908,7 @@ class LilypondConverter:
             contextModList.append(r'\autoBeamOff ')
 
         if hasattr(streamIn, 'staffLines') and streamIn.staffLines != 5:
-            contextModList.append(fr"\override StaffSymbol #'line-count = #{streamIn.staffLines}")
+            contextModList.append(fr"\override StaffSymbol.line-count = #{streamIn.staffLines}")
             if streamIn.staffLines % 2 == 0:  # even stafflines need a change
                 pass
 
@@ -1409,12 +1409,12 @@ class LilypondConverter:
         >>> print(lpc.context.contents)
         [<music21.lily.lilyObjects.LyEmbeddedScm \once \ove...>]
         >>> print(lpc.context.contents[0])
-        \once \override Stem #'direction = #UP
+        \once \override Stem.direction = #UP
         '''
         if hasattr(noteOrChord, 'stemDirection') and noteOrChord.stemDirection is not None:
             stemDirection = noteOrChord.stemDirection.upper()
             if stemDirection in ['UP', 'DOWN']:
-                stemFile = fr'''\once \override Stem #'direction = #{stemDirection} '''
+                stemFile = fr'''\once \override Stem.direction = #{stemDirection} '''
                 lpStemScheme = lyo.LyEmbeddedScm(stemFile)
                 self.context.contents.append(lpStemScheme)
                 lpStemScheme.setParent(self.context)
@@ -2454,8 +2454,8 @@ class LilypondConverter:
             lilyCommand += '-f ' + format + ' '
         if backend is not None:
             lilyCommand += self.backendString + backend + ' '
-        lilyCommand += '-o ' + str(fileName) + ' ' + str(fileName)
 
+        lilyCommand += '-o ' + str(fileName) + ' ' + str(fileName)  
         os.system(lilyCommand)
 
         try:

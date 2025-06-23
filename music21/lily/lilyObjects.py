@@ -778,13 +778,13 @@ class LyPaperBlock(LyObject):
         else:
             return self.outputDef.stringOutput()
 
-
+# Modified by Jeremy Teitelbaum to adapt to changes in lilypond for 2.24
 class LyLayout(LyObject):
     def stringOutput(self):
         theseStrings = [self.backslash + 'layout {',
                         ' ' + self.backslash + 'context {',
-                        '   ' + self.backslash + 'RemoveEmptyStaffContext',
-                        '   ' + self.backslash + "override VerticalAxisGroup #'remove-first = ##t",
+                        '   ' + self.backslash + 'RemoveEmptyStaves',
+                        '   ' + self.backslash + "override VerticalAxisGroup.remove-first = ##t",
                         ' ' + '}', '}']
 
         return self.newlineSeparateStringOutputIfNotNone(theseStrings)
@@ -1507,10 +1507,10 @@ class LyPropertyOperation(LyObject):
         elif self.mode == 'unset':
             return self.backslash + 'unset ' + self.value1 + ' '
         elif self.mode == 'override':
-            return ''.join([self.backslash, 'override ', self.value1, ' ', self.value2,
+            return ''.join([self.backslash, 'override ', self.value1, '.', self.value2,
                             ' = ', self.value3, ' '])
         elif self.mode == 'revert':
-            return self.backslash + 'revert ' + self.value1 + ' ' + self.value2 + ' '
+            return self.backslash + 'revert ' + self.value1 + '.' + self.value2 + ' '
 
 
 class LyContextDefMod(LyObject):
