@@ -54,7 +54,7 @@ articleReference = {
 
 
 # ------------------------------------------------------------------------------
-def assembleLyrics(streamIn, lineNumber=1, wordSeparator=' '):
+def assembleLyrics(streamIn, lineNumber=1, *, wordSeparator=' '):
     '''
     Concatenate text from a stream. The Stream is automatically flattened.
 
@@ -127,7 +127,7 @@ def assembleLyrics(streamIn, lineNumber=1, wordSeparator=' '):
     return wordSeparator.join(words)
 
 
-def assembleAllLyrics(streamIn, maxLyrics=10, lyricSeparation='\n', wordSeparator=' '):
+def assembleAllLyrics(streamIn, maxLyrics=10, lyricSeparation='\n', *, wordSeparator=' '):
     r'''
     Concatenate all Lyrics text from a stream separated by lyricSeparation.
     The Stream is automatically recursed.
