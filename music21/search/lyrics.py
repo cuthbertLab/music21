@@ -135,7 +135,7 @@ class LyricSearcher:
         found if a work contains multiple voices.
     '''
 
-    def __init__(self, s: StreamType|None = None, wordSeparator: str = ' '):
+    def __init__(self, s: StreamType|None = None, *, wordSeparator: str = ' '):
         self.stream: StreamType|None = s
         self.includeIntermediateElements = False  # currently does nothing
         self.includeTrailingMelisma = False  # currently does nothing
