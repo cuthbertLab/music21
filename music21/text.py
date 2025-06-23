@@ -152,7 +152,7 @@ def assembleAllLyrics(streamIn, maxLyrics=10, lyricSeparation='\n', *, wordSepar
     '''
     lyrics = ''
     for i in range(1, maxLyrics):
-        lyr = assembleLyrics(streamIn, i, wordSeparator)
+        lyr = assembleLyrics(streamIn, i, wordSeparator=wordSeparator)
         if lyr != '':
             if i > 1:
                 lyrics += lyricSeparation
