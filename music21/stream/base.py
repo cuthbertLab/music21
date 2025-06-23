@@ -14159,6 +14159,8 @@ class Score(Stream):
         165
 
         '''
+        from music21 import spanner
+
         sub: list[Part] = []
         bundle = []
         if isinstance(voiceAllocation, int):
@@ -14238,7 +14240,7 @@ class Score(Stream):
                     v = Voice()
                     v.id = pIndex
                     # for now, just take notes, including rests
-                    for e in m.getElementsByClass(['Note', 'Chord', 'Rest', 'Spanner']):
+                    for e in m.getElementsByClass([note.GeneralNote, spanner.Spanner]):
                         if setStems and isinstance(e, note.Note):
                             e.stemDirection = 'up' if pIndex % 2 == 0 else 'down'
                         v.insert(e.getOffsetBySite(m), e)
