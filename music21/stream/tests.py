@@ -5989,6 +5989,64 @@ class Test(unittest.TestCase):
         # self.assertEqual(s2.parts[2].getElementsByClass(
         #     'Measure')[0].hasVoices(), False)
 
+    def testPartsToVoicesSpanner(self):
+        # NOTE: this test spanners merged from two parts into one part
+        clef1 = clef.TrebleClef()
+        clef2 = clef.TrebleClef()
+        ts1 = meter.TimeSignature('12/8')
+        ts2 = meter.TimeSignature('12/8')
+
+        m1 = Measure()
+        m2 = Measure()
+        n1 = note.Note('C#5', type='eighth')
+        n2 = note.Note('D5', type='eighth')
+        n3 = note.Note('A5', type='eighth')
+        n4 = note.Note('B-5', type='eighth')
+        n5 = note.Note('D5', type='eighth')
+        n6 = note.Note('C#5', type='eighth')
+        n7 = note.Note('C6', type='eighth')
+        n8 = note.Note('B-5', type='eighth')
+
+        m1.append((
+            clef1, ts1, note.Rest(type='eighth'), n1, n2,
+            note.Rest(type='eighth'), n3, n4,
+            spanner.Slur(n3, n4),
+            chord.Chord(['E4', 'G4']), note.Rest(type='eighth'),
+            chord.Chord(['G4', 'C#5']), note.Rest(type='eighth'),
+        ))
+        m1.rightBarline = bar.Barline('regular')
+        m2.append((
+            clef2, ts2, chord.Chord(['D4', 'F4']), note.Rest(type='eighth'),
+            chord.Chord(['F4', 'A4']), note.Rest(type='eighth'),
+            note.Rest(type='eighth'), n5, n6,
+            note.Rest(type='eighth'), n7, n8,
+        ))
+        m2.rightBarline = bar.Barline('regular')
+
+        p1 = Part()
+        p1.append(m1)
+        p1.append(spanner.Slur(n1, n2))
+        p2 = Part()
+        p2.append(spanner.Slur(n5, n6))
+        p2.append(spanner.Slur(n7, n8))
+        p2.append(m2)
+        s = Score()
+        s.insert(0, p1)
+        s.insert(0, p2)
+
+        s_ = s.partsToVoices(2, permitOneVoicePerPart=True)
+        self.assertEqual(len(s_), 1)
+        self.assertEqual(len(s_[0].getElementsByClass('Slur')), 3)
+        self.assertEqual(len(s_[0]['Slur']), 4)
+        self.assertEqual(len(s_[0]), 4)  # 1 measure + 3 slurs
+        self.assertIsInstance(s_[0][0], Measure)
+        self.assertEqual(s_[0][0][0], clef1)
+        self.assertEqual(s_[0][0][1], ts1)
+        self.assertEqual(len(s_[0][0].voices), 2)  # 2 voices
+        self.assertEqual(len(s_[0][0][2]['Slur']), 1)  # 1 slur inside the first voice
+        self.assertEqual(s_[0][0][2]['Slur'][0][0], n3)
+        self.assertEqual(s_[0][0][2]['Slur'][0][1], n4)
+
     def testVoicesToPartsA(self):
 
         s0 = corpus.parse('bwv66.6')
