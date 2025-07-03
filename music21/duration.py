@@ -301,6 +301,13 @@ def quarterLengthToClosestType(qLen: OffsetQLIn) -> tuple[str, bool]:
     music21.duration.DurationException: Cannot return types smaller than 2048th;
         qLen was: 0.00146484375
     '''
+    def raise_it(qLen_inner):
+        return DurationException('Cannot return types smaller than 2048th; '
+                                + f'qLen was: {qLen}')
+
+    if not qLen:
+        raise raise_it(qLen)
+
     noteLengthType: OffsetQL
     if isinstance(qLen, fractions.Fraction):
         noteLengthType = 4 / qLen  # divides right
@@ -322,8 +329,7 @@ def quarterLengthToClosestType(qLen: OffsetQLIn) -> tuple[str, bool]:
         if qLen > 128:
             return ('duplex-maxima', False)
 
-        raise DurationException('Cannot return types smaller than 2048th; '
-                                + f'qLen was: {qLen}')
+        raise raise_it(qLen)
 
 
 def convertQuarterLengthToType(qLen: OffsetQLIn) -> str:
@@ -341,6 +347,8 @@ def convertQuarterLengthToType(qLen: OffsetQLIn) -> str:
     Traceback (most recent call last):
     music21.duration.DurationException: cannot convert quarterLength 0.33333 exactly to type
     '''
+    if not qLen:
+        return 'zero'
     durationType, match = quarterLengthToClosestType(qLen)
     if not match:
         raise DurationException(
@@ -4028,6 +4036,44 @@ class Test(unittest.TestCase):
             gd.makeTime = 'True'
         with self.assertRaises(ValueError):
             gd.slash = 'none'
+
+    def testSmallRound(self):
+        '''
+        Test that some small rounding errors do not
+        give division by zero errors anymore.
+        '''
+        # Up to 65536, off errors are considered intentional
+        # and not floating point errors (users should
+        # use midi quantization tools to get rounded matches)
+        d = Duration(16384 / 65535)
+        self.assertEqual(d.quarterLength, fractions.Fraction(16384, 65535))
+        self.assertEqual(d.type, 'inexpressible')
+
+        with self.assertRaises(DurationException):
+            quarterLengthToClosestType(0)
+
+        self.assertEqual(convertQuarterLengthToType(0), 'zero')
+        self.assertEqual(quarterLengthToClosestType(16384 / 65535),
+                         ('16th', False))
+        self.assertEqual(dottedMatch(0), (False, False))
+
+        # above denominators of 65536 (2**16), small deviations
+        # are considered close enough to round to exact matches
+        o = quarterConversion(65536 / (65536*2 - 1))
+        self.assertIsInstance(o, QuarterLengthConversion)
+        c = o.components
+        self.assertEqual(len(c), 1)
+        c0 = c[0]
+        self.assertIsInstance(c0, DurationTuple)
+        self.assertEqual(c0.quarterLength, 0.75)
+
+        # strangely (and this behavior can/should change)
+        # it is currently converted as a triplet DOTTED eighth note
+        # rather than a normal eighth!
+        self.assertEqual(c0.type, 'eighth')
+        self.assertEqual(c0.dots, 1)
+        self.assertTrue(o.tuplet)
+        self.assertEqual(o.tuplet.tupletMultiplier(), fractions.Fraction(2, 3))
 
 
 # -------------------------------------------------------------------------------
