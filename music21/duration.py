@@ -4059,7 +4059,7 @@ class Test(unittest.TestCase):
 
         # above denominators of 65536 (2**16), small deviations
         # are considered close enough to round to exact matches
-        o = quarterConversion(65536 / (65536*2 - 1))
+        o = quarterConversion(65536 / (65536 * 2 - 1))
         self.assertIsInstance(o, QuarterLengthConversion)
         c = o.components
         self.assertEqual(len(c), 1)
