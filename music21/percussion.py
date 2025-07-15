@@ -10,6 +10,11 @@
 # Copyright:    Copyright © 2006-2019 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
+'''
+This module contains classes for representing unpitched events such as percussion.
+For backwards compatibility reasons, the module does not contain the actual
+:class:`~music21.note.Unpitched` which is in the `note` module.
+'''
 from __future__ import annotations
 
 from collections.abc import Iterable
@@ -27,21 +32,30 @@ if t.TYPE_CHECKING:
 
 class PercussionChord(chord.ChordBase):
     '''
-    :class:`~music21.chord.ChordBase` and `:class:`~music21.note.NotRest` subclass that is NOT
-    a :class:`~music21.chord.Chord` because one or more notes is an :class:`~music21.note.Unpitched`
+    A representation of one or (normally) more than one unpitched object sharing a stem
+    and treated like a "chord."  It may also contain standard notes (pitches) for cases
+    such as a percussionist playing a cymbal and marimba at the same time.
+
+    It is a :class:`~music21.chord.ChordBase` and `:class:`~music21.note.NotRest` subclass
+    that is NOT a :class:`~music21.chord.Chord` because one or more
+    notes is an :class:`~music21.note.Unpitched`
     object.
 
     >>> vibraslapNote = note.Unpitched(displayName='D4', storedInstrument=instrument.Vibraslap())
     >>> pChord = percussion.PercussionChord([vibraslapNote, note.Note('E5')])
+    >>> pChord
+    <music21.percussion.PercussionChord [Vibraslap E5]>
+
     >>> pChord.isChord
     False
 
-    Has notes, just like any ChordBase:
+    A PercussionChord has "notes," just like anything deriving from ChordBase.  Some of these
+    are Unpitched objects.
 
     >>> pChord.notes
     (<music21.note.Unpitched 'Vibraslap'>, <music21.note.Note E>)
 
-    Assign them to another PercussionChord:
+    The same notes can also be assigned to another PercussionChord:
 
     >>> pChord2 = percussion.PercussionChord()
     >>> pChord2.notes = pChord.notes
@@ -147,6 +161,7 @@ class PercussionChord(chord.ChordBase):
         (<music21.pitch.Pitch C4>,)
 
         Notice that setting pitches has now just cleared any existing notes, pitched or unpitched:
+
         >>> pChord.notes
         (<music21.note.Note C>,)
         '''
