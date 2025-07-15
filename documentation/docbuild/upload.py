@@ -3,56 +3,23 @@
 # Name:         upload.py
 # Purpose:      music21 documentation upload utility
 #
-# Authors:      Christopher Ariza
+# Authors:      Michael Scott Asato Cuthbert
+#               Christopher Ariza
 #
-# Copyright:    Copyright © 2009-2010, 2013 Michael Scott Asato Cuthbert
+# Copyright:    Copyright © 2009-2025 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 # pylint: disable=line-too-long
 '''
-if you get a 'ssh_askpass' not found error, create this file in
-/usr/libexec/ssh-askpass and sudo chmod +x it afterwards:
+Script to upload music21 documentation to music21.org's music21-docs
 
-..raw::
-    #!/bin/bash
-    # Script: ssh-askpass
-    # Author: Mark Carver
-    # Created: 2011-09-14
-    # Copyright (c) 2011 Beyond Eden Development, LLC. All rights reserved.
-
-    # A ssh-askpass command for Mac OS X
-    # Based from author: Joseph Mocker, Sun Microsystems
-    # http://blogs.oracle.com/mock/entry/and_now_chicken_of_the
-    # To use this script:
-    #   Install this script running INSTALL as root
-    #
-    # If you plan on manually installing this script, please note that you will have
-    # to set the following variable for SSH to recognize where the script is located:
-    #   export SSH_ASKPASS="/path/to/ssh-askpass"
-    TITLE="${SSH_ASKPASS_TITLE:-SSH}";
-    TEXT="$(whoami)'s password:";
-    IFS=$(printf "\n");
-    CODE=("on GetCurrentApp()");
-    CODE=(${CODE[*]} "tell application \"System Events\" to get short name of first process whose frontmost is true");
-    CODE=(${CODE[*]} "end GetCurrentApp");
-    CODE=(${CODE[*]} "tell application GetCurrentApp()");
-    CODE=(${CODE[*]} "activate");
-    CODE=(${CODE[*]} "display dialog \"${@:-$TEXT}\" default answer \"\" with title \"${TITLE}\" with icon caution with hidden answer");
-    CODE=(${CODE[*]} "text returned of result");
-    CODE=(${CODE[*]} "end tell");
-    SCRIPT="/usr/bin/osascript"
-    for LINE in ${CODE[*]}; do
-    SCRIPT="${SCRIPT} -e $(printf "%q" "${LINE}")";
-    done;
-    eval "${SCRIPT}";
-
-
-Otherwise just contact MSAC.
+Currently, it requires a private key in a very specific location, so not
+generally useful beyond to MSAC.
 '''
 from __future__ import annotations
 
-import getpass
 import os
+import subprocess
 
 def getDirBuildHtml():
     '''
@@ -66,20 +33,56 @@ def getDirBuildHtml():
 
 
 # noinspection SpellCheckingInspection
+# def main():
+#     # this needs to be on level higher then the level of the source
+#     remoteHost = 'music21.org'
+#     remoteDir = '/home/bitnami/htdocs/music21docs/'
+#     keyFile = '/Users/cuthbert/Web/trecentoweb_key-us-west-2.pem'
+#     user = 'bitnami'
+#
+#     src = getDirBuildHtml()
+#
+#     # -r flag makes this recursive
+#     # noinspection SpellCheckingInspection
+#     cmdStr = (
+#         f'tar czpf --disable-copyfile --no-xattrs - -C {src} . | '
+#         f'ssh -i "{keyFile}" {user}@{remoteHost} '
+#         f'"tar xzpf - -C {remoteDir}"'
+#     )
+#     print(cmdStr)
+#
+#     os.system(cmdStr)
+
+
 def main():
-    # this needs to be on level higher then the level of the source
-    # DST_MIT = 'athena.dialup.mit.edu:/afs/athena.mit.edu/org/m/music21/doc/'
-    remoteHost = 'athena.dialup.mit.edu'
-    remoteDir = '/afs/athena.mit.edu/org/m/music21/doc/'
-    # tar czpf - -C build/html/ . | ssh cuthbert@linux.mit.edu "tar xzpf - -C /afs/athena.mit.edu/org/m/music21/doc/"
-
-    user = getpass.getpass('provide user name : ')
-
+    '''
+    Main upload function -- call by running the "upload.py" file in the parent directory.
+    '''
+    # AI coding assistance (ChatGPT-4o) was used in translating the finicky old
+    # tar version to zip.
+    zipPath = '/tmp/music21docs.zip'
+    key = '/Users/cuthbert/Web/trecentoweb_key-us-west-2.pem'
+    remote = 'bitnami@music21.org'
+    remoteZip = '/tmp/music21docs.zip'
+    remoteDir = '/home/bitnami/htdocs/music21docs/'
     src = getDirBuildHtml()
-    # -r flag makes this recursive
-    # noinspection SpellCheckingInspection
-    cmdStr = f'tar czpf - -C {src} . | ssh {user}@{remoteHost} "tar xzpf - -C {remoteDir}"'
-    # cmdStr = 'scp -r "%s" %s@%s' % (src + "/*", user, DST_MIT)
-    print(cmdStr)
 
-    os.system(cmdStr)
+    # Zip it
+    print('Compressing sources.')
+    subprocess.run(['zip', '-qr', '-X', zipPath, '.'], cwd=src, check=True)
+
+    # Copy it
+    print('Copying to remote server.')
+    subprocess.run(['scp', '-i', key, zipPath, f'{remote}:{remoteZip}'], check=True)
+
+    # Unzip remotely
+    print('Unzipping on remote server.')
+    subprocess.run([
+        'ssh', '-i', key, remote,
+        f'unzip -oq {remoteZip} -d {remoteDir} && rm -f {remoteZip}'
+    ], check=True)
+
+    # Remove local
+    os.remove(zipPath)
+
+    print('Music21 documentation uploaded to music21.org')
