@@ -6,7 +6,7 @@
 			"packages": "musescore3,lilypond"
 		}
 	},
-	"postCreateCommand": "pip3 install --user -r requirements_dev.txt;pip3 install --user .",
+	"postCreateCommand": "pip3 install --user -r requirements_dev.txt;pip3 install --user -e .",
 	"customizations": {
 		"vscode": {
 			"extensions": [
