@@ -3,7 +3,7 @@
 	"image": "mcr.microsoft.com/devcontainers/python:1-3.13-bookworm",
 	"features": {
 		"ghcr.io/rocker-org/devcontainer-features/apt-packages:1": {
-    	    "packages": "musescore3,lilypond"
+			"packages": "musescore3,lilypond"
 		}
 	},
 	"postCreateCommand": "pip3 install --user -r requirements_dev.txt;pip3 install --user .",
@@ -16,8 +16,8 @@
 				"ms-python.python",
 				"redhat.vscode-xml",
 				"redhat.vscode-yaml",
-                "tamasfe.even-better-toml",
-                "ms-toolsai.jupyter"
+				"tamasfe.even-better-toml",
+				"ms-toolsai.jupyter"
 			]
 		}
 	},
