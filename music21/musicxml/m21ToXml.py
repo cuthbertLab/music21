@@ -38,6 +38,7 @@ from music21 import clef
 from music21 import chord
 from music21 import common
 from music21.common.enums import AppendSpanners
+from music21.common.numberTools import opFrac
 from music21 import defaults
 from music21 import duration
 from music21 import dynamics
@@ -3277,7 +3278,9 @@ class MeasureExporter(XMLExporterBase):
                         self.parseOneElement(obj, AppendSpanners.NORMAL)
 
             for n in notesForLater:
-                if n.isRest and n.style.hideObjectOnPrint and n.duration.type == 'inexpressible':
+                if (n.isRest
+                        and n.style.hideObjectOnPrint
+                        and n.duration.type in ('inexpressible', 'complex')):
                     # Prefer a gap in stream, to be filled with a <forward> tag by
                     # fill_gap_with_forward_tag() rather than raising exceptions
                     continue
@@ -3322,7 +3325,7 @@ class MeasureExporter(XMLExporterBase):
         else:
             # if necessary, jump to end of the measure.
             if self.offsetInMeasure < firstPassEndOffsetInMeasure:
-                self.moveForward(firstPassEndOffsetInMeasure)
+                self.moveForward(opFrac(firstPassEndOffsetInMeasure - self.offsetInMeasure))
 
         self.currentVoiceId = None
 
