@@ -712,9 +712,17 @@ class Test(unittest.TestCase):
         s = stream.Score()
         s.append(p)
         tree = self.getET(s, makeNotation=False)
-        self.assertEqual(len(tree.findall('.//forward')), 1)
-        self.assertEqual(len(tree.findall('.//note')), 1)
+        # There should be one forward and one note
+        forwardList = tree.findall('.//forward')
+        noteList = tree.findall('.//note')
+        self.assertEqual(len(forwardList), 1)
+        self.assertEqual(len(noteList), 1)
+        # There should be no rests
         self.assertEqual(len(tree.findall('.//rest')), 0)
+        # The forward duration should be 5x longer than quarter-note duration
+        noteDurEl = noteList[0].find('.//duration')
+        forwardDurEl = forwardList[0].find('.//duration')
+        self.assertEqual(int(forwardDurEl.text) / int(noteDurEl.text), 5)
 
     def testOutOfBoundsExpressionDoesNotCreateForward(self):
         '''
