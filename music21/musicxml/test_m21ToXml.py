@@ -712,9 +712,9 @@ class Test(unittest.TestCase):
         s = stream.Score()
         s.append(p)
         tree = self.getET(s, makeNotation=False)
-        self.assertTrue(tree.findall('.//forward'))
-        self.assertTrue(tree.findall('.//note'))
-        self.assertFalse(tree.findall('.//rest'))
+        self.assertEqual(len(tree.findall('.//forward')), 1)
+        self.assertEqual(len(tree.findall('.//note')), 1)
+        self.assertEqual(len(tree.findall('.//rest')), 0)
 
     def testOutOfBoundsExpressionDoesNotCreateForward(self):
         '''
