@@ -695,6 +695,27 @@ class Test(unittest.TestCase):
         self.assertTrue(tree.findall('.//note'))
         self.assertFalse(tree.findall('.//forward'))
 
+    def test_complexHiddenRestDoesNotCrashButInsteadCreatesForward(self):
+        '''
+        Complex hidden rests were raising an exception.  Now they create a forward tag instead.
+        '''
+        complexRest = note.Rest()
+        complexRest.quarterLength = 5.0
+        complexRest.style.hideObjectOnPrint = True
+        n = note.Note()
+        n.quarterLength = 1.0
+        m = stream.Measure()
+        m.append(complexRest)
+        m.append(n)
+        p = stream.Part()
+        p.append(m)
+        s = stream.Score()
+        s.append(p)
+        tree = self.getET(s, makeNotation=False)
+        self.assertTrue(tree.findall('.//forward'))
+        self.assertTrue(tree.findall('.//note'))
+        self.assertFalse(tree.findall('.//rest'))
+
     def testOutOfBoundsExpressionDoesNotCreateForward(self):
         '''
         A metronome mark at an offset exceeding the bar duration was causing
