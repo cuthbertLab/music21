@@ -724,6 +724,60 @@ class Test(unittest.TestCase):
         forwardDurEl = forwardList[0].find('.//duration')
         self.assertEqual(int(forwardDurEl.text) / int(noteDurEl.text), 5)
 
+    def test_writeFromSpannerAnchorsGetsMeasureEndOffsetRight(self):
+        '''
+        Write to MusicXML from a Measure containing SpannerAnchors was not positioning
+        the current time offset correctly before starting the next written measure.
+        Now the next measure is positioned at the correct offset.
+        '''
+        m1 = stream.Measure()
+        m1.append(note.Note())
+        m1.append(note.Note())
+        m1.append(note.Note())
+        m1.append(note.Note())
+        cresc = dynamics.Crescendo()
+        startAnchor = spanner.SpannerAnchor()
+        endAnchor = spanner.SpannerAnchor()
+        m1.insert(0.5, startAnchor)
+        m1.insert(1.5, endAnchor)
+        cresc.addSpannedElements(startAnchor, endAnchor)
+        m1.append(cresc)
+        p = stream.Part()
+        p.append(m1)
+        s = stream.Score()
+        s.append(p)
+        # write to MusicXML
+        tree = self.getET(s)
+
+        # walk all the durations (notes, forwards, backups) and make sure they add up
+        # to where the end of the measure should be (4.0ql)
+        measEl = None
+        divisionsEl = None
+        for el in tree.iter():
+            if el.tag == 'measure':
+                measEl = el
+                for el in measEl.iter():
+                    if el.tag == 'divisions':
+                        divisionsEl = el
+                        break
+                break
+
+        self.assertIsNotNone(measEl)
+        self.assertIsNotNone(divisionsEl)
+
+        divisionsInt = int(divisionsEl.text)
+        currOffsetQL = 0.
+        for el in measEl.findall('*'):
+            dur = el.find('duration')
+            if dur is not None:
+                durInt = int(dur.text)
+                durQL = common.opFrac(fractions.Fraction(durInt, divisionsInt))
+                if el.tag == 'backup':
+                    currOffsetQL = common.opFrac(currOffsetQL - durQL)
+                else:
+                    currOffsetQL = common.opFrac(currOffsetQL + durQL)
+        self.assertEqual(currOffsetQL, 4.)
+
     def testOutOfBoundsExpressionDoesNotCreateForward(self):
         '''
         A metronome mark at an offset exceeding the bar duration was causing
