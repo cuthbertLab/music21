@@ -761,17 +761,14 @@ def makeRests(
 
     >>> b = a.makeRests(inPlace=False)
     >>> len(b)
-    3
+    2
     >>> b.lowestOffset
     0.0
     >>> b.show('text')
-    {0.0} <music21.note.Rest 16ql>
-    {16.0} <music21.note.Rest whole>
+    {0.0} <music21.note.Rest 20ql>
     {20.0} <music21.note.Note C>
     >>> b[0].duration.quarterLength
-    16.0
-    >>> b[1].duration.quarterLength
-    4.0
+    20.0
 
     Same thing, but this time, with gaps, and hidden rests:
 
@@ -787,15 +784,13 @@ def makeRests(
     {30.0} <music21.note.Note D>
     >>> b = a.makeRests(fillGaps=True, inPlace=False, hideRests=True)
     >>> len(b)
-    6
+    4
     >>> b.lowestOffset
     0.0
     >>> b.show('text')
-    {0.0} <music21.note.Rest 16ql>
-    {16.0} <music21.note.Rest whole>
+    {0.0} <music21.note.Rest 20ql>
     {20.0} <music21.note.Note C>
-    {21.0} <music21.note.Rest breve>
-    {29.0} <music21.note.Rest quarter>
+    {21.0} <music21.note.Rest 9ql>
     {30.0} <music21.note.Note D>
     >>> b[0].style.hideObjectOnPrint
     True
@@ -954,13 +949,9 @@ def makeRests(
             r = note.Rest()
             r.duration.quarterLength = qLen
             r.style.hideObjectOnPrint = hideRests
-            rList = r.splitAtDurations()
             # environLocal.printDebug(['makeRests(): add rests', r, r.duration])
             # place at oLowTarget to reach to oLow
-            off: OffsetQL = oLowTarget
-            for r in rList:
-                component.insert(off, r)
-                off = opFrac(off + r.quarterLength)
+            component.insert(oLowTarget, r)
 
         # create rest from end to highest
         qLen = oHighTarget - oHigh
@@ -968,12 +959,8 @@ def makeRests(
             r = note.Rest()
             r.duration.quarterLength = qLen
             r.style.hideObjectOnPrint = hideRests
-            rList = r.splitAtDurations()
             # place at oHigh to reach to oHighTarget
-            off = oHigh
-            for r in rList:
-                component.insert(off, r)
-                off = opFrac(off + r.quarterLength)
+            component.insert(oHigh, r)
 
         if fillGaps:
             gapStream = component.findGaps()
@@ -982,11 +969,7 @@ def makeRests(
                     r = note.Rest()
                     r.duration.quarterLength = e.duration.quarterLength
                     r.style.hideObjectOnPrint = hideRests
-                    rList = r.splitAtDurations()
-                    off = e.offset
-                    for r in rList:
-                        component.insert(off, r)
-                        off = opFrac(off + r.quarterLength)
+                    component.insert(e.offset, r)
 
     if returnObj.hasMeasures():
         # split rests at measure boundaries
