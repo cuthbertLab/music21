@@ -548,12 +548,12 @@ class LilypondConverter:
                     contextModList = [r'\remove "Time_signature_engraver"',
                                       fr'alignAboveContext = #"{partIdText}"',
                                       r'fontSize = #-3',
-                                      r"\override StaffSymbol.staff-space = #(magstep -3)",
-                                      r"\override StaffSymbol.thickness = #(magstep -3)",
-                                      r"\override TupletBracket.bracket-visibility = ##f",
-                                      r"\override TupletNumber.stencil = ##f",
-                                      r"\override Clef.transparent = ##t",
-                                      r"\override OctavateEight.transparent = ##t",
+                                      r'\override StaffSymbol.staff-space = #(magstep -3)',
+                                      r'\override StaffSymbol.thickness = #(magstep -3)',
+                                      r'\override TupletBracket.bracket-visibility = ##f',
+                                      r'\override TupletNumber.stencil = ##f',
+                                      r'\override Clef.transparent = ##t',
+                                      r'\override OctavateEight.transparent = ##t',
                                       r'\consists "Default_bar_line_engraver"',
                                       ]
                     optionalContextMod = lyo.LyContextModification(contextModList)
@@ -908,7 +908,7 @@ class LilypondConverter:
             contextModList.append(r'\autoBeamOff ')
 
         if hasattr(streamIn, 'staffLines') and streamIn.staffLines != 5:
-            contextModList.append(fr"\override StaffSymbol.line-count = #{streamIn.staffLines}")
+            contextModList.append(fr'\override StaffSymbol.line-count = #{streamIn.staffLines}')
             if streamIn.staffLines % 2 == 0:  # even stafflines need a change
                 pass
 
@@ -2455,7 +2455,7 @@ class LilypondConverter:
         if backend is not None:
             lilyCommand += self.backendString + backend + ' '
 
-        lilyCommand += '-o ' + str(fileName) + ' ' + str(fileName)  
+        lilyCommand += '-o ' + str(fileName) + ' ' + str(fileName)
         os.system(lilyCommand)
 
         try:

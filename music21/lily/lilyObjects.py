@@ -4,16 +4,15 @@
 # Purpose:      python objects representing lilypond
 #
 # Authors:      Michael Scott Asato Cuthbert
+#               Jeremy Teitelbaum (Lilypond 2.24 adaptations)
 #
-# Copyright:    Copyright © 2007-2012 Michael Scott Asato Cuthbert
+# Copyright:    Copyright © 2007-2025 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
 music21 translates to Lilypond format and if Lilypond is installed on the
 local computer, can automatically generate .pdf, .png, and .svg versions
-of musical files using Lilypond
-
-this replaces (April 2012) the old LilyString() conversion methods.
+of musical files using Lilypond.
 
 The Grammar for Lilypond comes from
 http://lilypond.org/doc/v2.14/Documentation/notation/lilypond-grammar
@@ -778,13 +777,12 @@ class LyPaperBlock(LyObject):
         else:
             return self.outputDef.stringOutput()
 
-# Modified by Jeremy Teitelbaum to adapt to changes in lilypond for 2.24
 class LyLayout(LyObject):
     def stringOutput(self):
         theseStrings = [self.backslash + 'layout {',
                         ' ' + self.backslash + 'context {',
                         '   ' + self.backslash + 'RemoveEmptyStaves',
-                        '   ' + self.backslash + "override VerticalAxisGroup.remove-first = ##t",
+                        '   ' + self.backslash + 'override VerticalAxisGroup.remove-first = ##t',
                         ' ' + '}', '}']
 
         return self.newlineSeparateStringOutputIfNotNone(theseStrings)
