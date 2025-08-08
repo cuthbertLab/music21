@@ -4,16 +4,15 @@
 # Purpose:      python objects representing lilypond
 #
 # Authors:      Michael Scott Asato Cuthbert
+#               Jeremy Teitelbaum (Lilypond 2.24 adaptations)
 #
-# Copyright:    Copyright © 2007-2012 Michael Scott Asato Cuthbert
+# Copyright:    Copyright © 2007-2025 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
 music21 translates to Lilypond format and if Lilypond is installed on the
 local computer, can automatically generate .pdf, .png, and .svg versions
-of musical files using Lilypond
-
-this replaces (April 2012) the old LilyString() conversion methods.
+of musical files using Lilypond.
 
 The Grammar for Lilypond comes from
 http://lilypond.org/doc/v2.14/Documentation/notation/lilypond-grammar
@@ -778,13 +777,12 @@ class LyPaperBlock(LyObject):
         else:
             return self.outputDef.stringOutput()
 
-
 class LyLayout(LyObject):
     def stringOutput(self):
         theseStrings = [self.backslash + 'layout {',
                         ' ' + self.backslash + 'context {',
-                        '   ' + self.backslash + 'RemoveEmptyStaffContext',
-                        '   ' + self.backslash + "override VerticalAxisGroup #'remove-first = ##t",
+                        '   ' + self.backslash + 'RemoveEmptyStaves',
+                        '   ' + self.backslash + 'override VerticalAxisGroup.remove-first = ##t',
                         ' ' + '}', '}']
 
         return self.newlineSeparateStringOutputIfNotNone(theseStrings)
@@ -1482,11 +1480,11 @@ class LyPropertyOperation(LyObject):
 
     >>> lpo = lily.lilyObjects.LyPropertyOperation('override', 'simple', 'x', 'y')
     >>> str(lpo)
-    '\\override simple x = y '
+    '\\override simple.x = y '
 
     >>> lpo = lily.lilyObjects.LyPropertyOperation('revert', 'x', 'y')
     >>> str(lpo)
-    '\\revert x y '
+    '\\revert x.y '
 
     TODO: should \set be given?
     '''
@@ -1507,10 +1505,10 @@ class LyPropertyOperation(LyObject):
         elif self.mode == 'unset':
             return self.backslash + 'unset ' + self.value1 + ' '
         elif self.mode == 'override':
-            return ''.join([self.backslash, 'override ', self.value1, ' ', self.value2,
+            return ''.join([self.backslash, 'override ', self.value1, '.', self.value2,
                             ' = ', self.value3, ' '])
         elif self.mode == 'revert':
-            return self.backslash + 'revert ' + self.value1 + ' ' + self.value2 + ' '
+            return self.backslash + 'revert ' + self.value1 + '.' + self.value2 + ' '
 
 
 class LyContextDefMod(LyObject):
