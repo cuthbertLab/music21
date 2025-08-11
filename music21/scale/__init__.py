@@ -64,6 +64,7 @@ import copy
 import typing as t
 
 from music21.scale import intervalNetwork
+from music21.scale.intervalNetwork import Direction, Terminus
 from music21.scale import scala
 # -------------------------
 from music21 import base
@@ -78,9 +79,6 @@ from music21 import interval
 from music21 import sieve
 
 environLocal = environment.Environment('scale')
-
-Direction = intervalNetwork.Direction
-Terminus = intervalNetwork.Terminus
 
 _PitchDegreeCacheKey = tuple[
     type,  # scale class
@@ -2055,9 +2053,9 @@ class ConcreteScale(Scale):
     def next(
         self,
         pitchOrigin=None,
-        direction: Direction|int = Direction.ASCENDING,
+        direction: 'music21.scale.intervalNetwork.Direction'|int = Direction.ASCENDING,
         stepSize=1,
-        getNeighbor: Direction|bool = True,
+        getNeighbor: 'music21.scale.intervalNetwork.Direction'|bool = True,
     ):  # pragma: no cover
         '''
         See :meth:`~music21.scale.ConcreteScale.nextPitch`.  This function

@@ -453,7 +453,7 @@ class TimespanTree(trees.OffsetTree):
     def iterateVerticalities(
         self,
         reverse: bool = False,
-    ) -> Generator[Verticality, None, None]:
+    ) -> Generator['music21.tree.verticality.Verticality', None, None]:
         r'''
         Iterates all vertical moments in this TimespanTree, represented as
         :class:`~music21.tree.verticality.Verticality` objects.

@@ -241,12 +241,9 @@ def getVariableLengthNumber(midiBytes: bytes) -> tuple[int, bytes]:
 @common.deprecated('v9.7', 'v10', 'use list(midiBytes) instead')
 def getNumbersAsList(midiBytes: bytes|Iterable[int]) -> list[int]:
     r'''
-    Deprecated: this method existed in Python 2.6 and for Python 2 (no bytes)
+    **Deprecated**: this method existed in Python 2.6 and for Python 2 (no bytes)
     compatibility.  Now use `list(midiBytes)` instead.
 
-    Ability to pass in a string will be removed in v10.
-
-    ----
     Translate each char into a number, return in a list.
     Used for reading data messages where each byte encodes
     a different discrete value.
