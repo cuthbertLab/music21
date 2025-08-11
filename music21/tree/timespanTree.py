@@ -33,7 +33,7 @@ from music21.tree import trees
 
 
 if t.TYPE_CHECKING:
-    from music21.tree.verticality import Verticality, VerticalitySequence
+    from music21.tree.verticality import VerticalitySequence
 
 
 environLocal = environment.Environment('tree.timespanTree')
