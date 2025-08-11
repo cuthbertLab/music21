@@ -3278,9 +3278,7 @@ class MeasureExporter(XMLExporterBase):
                         self.parseOneElement(obj, AppendSpanners.NORMAL)
 
             for n in notesForLater:
-                if (n.isRest
-                        and n.style.hideObjectOnPrint
-                        and n.duration.type in ('inexpressible', 'complex')):
+                if n.isRest and n.style.hideObjectOnPrint and n.duration.type == 'inexpressible':
                     # Prefer a gap in stream, to be filled with a <forward> tag by
                     # fill_gap_with_forward_tag() rather than raising exceptions
                     continue

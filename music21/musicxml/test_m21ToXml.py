@@ -695,35 +695,6 @@ class Test(unittest.TestCase):
         self.assertTrue(tree.findall('.//note'))
         self.assertFalse(tree.findall('.//forward'))
 
-    def test_complexHiddenRestDoesNotCrashButInsteadCreatesForward(self):
-        '''
-        Complex hidden rests were raising an exception.  Now they create a forward tag instead.
-        '''
-        complexRest = note.Rest()
-        complexRest.quarterLength = 5.0
-        complexRest.style.hideObjectOnPrint = True
-        n = note.Note()
-        n.quarterLength = 1.0
-        m = stream.Measure()
-        m.append(complexRest)
-        m.append(n)
-        p = stream.Part()
-        p.append(m)
-        s = stream.Score()
-        s.append(p)
-        tree = self.getET(s, makeNotation=False)
-        # There should be one forward and one note
-        forwardList = tree.findall('.//forward')
-        noteList = tree.findall('.//note')
-        self.assertEqual(len(forwardList), 1)
-        self.assertEqual(len(noteList), 1)
-        # There should be no rests
-        self.assertEqual(len(tree.findall('.//rest')), 0)
-        # The forward duration should be 5x longer than quarter-note duration
-        noteDurEl = noteList[0].find('.//duration')
-        forwardDurEl = forwardList[0].find('.//duration')
-        self.assertEqual(int(forwardDurEl.text) / int(noteDurEl.text), 5)
-
     def test_writeFromSpannerAnchorsGetsMeasureEndOffsetRight(self):
         '''
         Write to MusicXML from a Measure containing SpannerAnchors was not positioning
