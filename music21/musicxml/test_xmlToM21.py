@@ -1140,7 +1140,7 @@ class Test(unittest.TestCase):
             note.Note,
             note.Note,
         ]
-        expectedOffsets = [0., 1., 1., 2.]
+        expectedOffsets = [0.0, 1.0, 1.0, 2.0]
         for i, (el, expectedOffset, expectedInstance) in enumerate(zip(
                 spElements, expectedOffsets, expectedInstances)):
             self.assertIsInstance(el, expectedInstance)
@@ -1162,7 +1162,7 @@ class Test(unittest.TestCase):
             expressions.PedalBounce,
             note.Note,
         ]
-        expectedOffsets = [0., 1., 1.]
+        expectedOffsets = [0.0, 1.0, 1.0]
         for i, (el, expectedOffset, expectedInstance) in enumerate(zip(
                 spElements, expectedOffsets, expectedInstances)):
             self.assertIsInstance(el, expectedInstance)
@@ -1203,7 +1203,7 @@ class Test(unittest.TestCase):
         self.assertEqual(pm.pedalType, expressions.PedalType.Sustain)
         spElements = pm.getSpannedElements()
         self.assertEqual(len(spElements), 5)
-        expectedOffsets = [1.5, 1.75, 0., 0.75, 1.0]
+        expectedOffsets = [1.5, 1.75, 0.0, 0.75, 1.0]
         expectedInstances = [
             note.Note,
             note.Note,

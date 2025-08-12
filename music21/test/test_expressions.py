@@ -77,7 +77,7 @@ class Test(unittest.TestCase):
         p1.append(key.Key('F', 'major'))
         p1.append(meter.TimeSignature('2/4'))
         n1 = note.Note('C5', type='half')
-        turn0 = expressions.Turn(delay=1.)  # delay is a quarter-note
+        turn0 = expressions.Turn(delay=1.0)  # delay is a quarter-note
         n1.expressions.append(turn0)
         n2 = note.Note('B4', type='quarter')
         n2.duration.dots = 1

@@ -15,7 +15,7 @@ And to install, see:
 https://www.music21.org/music21docs/usersGuide/usersGuide_01_installing.html
 
 `Music21` runs on Python 3.10+.  (Use version 4 on Python 2 or Py3.4, version 5
-on Py3.5, version 6 on Py3.6, version 7 on Py3.7, version 8 on Py3.8/Py3.9.)
+on Py3.5, version 6 on Py3.6, version 7 on Py3.7, version 8 on Py3.8/Py3.9)
 
 Released under the BSD (3-clause) license. See LICENSE.
 Externally provided software (including the MIT-licensed Lilypond/MusicXML test Suite) and
