@@ -308,7 +308,7 @@ def _convertPsToOct(ps: int|float) -> int:
     '''
     # environLocal.printDebug(['_convertPsToOct: input', ps])
     ps = round(ps, PITCH_SPACE_SIG_DIGITS)
-    return int(math.floor(ps / 12.)) - 1
+    return int(math.floor(ps / 12)) - 1
 
 
 def _convertPsToStep(

@@ -1134,7 +1134,7 @@ class Test(unittest.TestCase):
         self.assertEqual(pm.pedalType, expressions.PedalType.Sustain)
         spElements = pm.getSpannedElements()
         self.assertEqual(len(spElements), 4)
-        expectedOffsets = [0., 1., 1., 2.]
+        expectedOffsets = [0.0, 1.0, 1.0, 2.0]
         for i, (el, expectedOffset) in enumerate(zip(spElements, expectedOffsets)):
             if i == 1:
                 self.assertIsInstance(el, expressions.PedalBounce)
@@ -1152,7 +1152,7 @@ class Test(unittest.TestCase):
         self.assertEqual(pm.pedalType, expressions.PedalType.Sustain)
         spElements = pm.getSpannedElements()
         self.assertEqual(len(spElements), 3)
-        expectedOffsets = [0., 1., 1.]
+        expectedOffsets = [0.0, 1.0, 1.0]
         for i, (el, expectedOffset) in enumerate(zip(spElements, expectedOffsets)):
             if i == 1:
                 self.assertIsInstance(el, expressions.PedalBounce)
@@ -1189,7 +1189,7 @@ class Test(unittest.TestCase):
         self.assertEqual(pm.pedalType, expressions.PedalType.Sustain)
         spElements = pm.getSpannedElements()
         self.assertEqual(len(spElements), 5)
-        expectedOffsets = [1.5, 1.75, 0., 0.75, 1.0]
+        expectedOffsets = [1.5, 1.75, 0.0, 0.75, 1.0]
         for i, (el, expectedOffset) in enumerate(zip(spElements, expectedOffsets)):
             self.assertIsInstance(el, note.Note)
             self.assertEqual(el.nameWithOctave, 'A3')

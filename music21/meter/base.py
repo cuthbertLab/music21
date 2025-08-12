@@ -381,7 +381,7 @@ class TimeSignature(TimeSignatureBase):
     >>> [thisNote.beatStr for thisNote in m3.notes]
     ['1', '2', '3', '4', '5', '6']
 
-    As of v7., 3/8 also defaults to fast 3/8, that is, one beat:
+    As of v7, 3/8 also defaults to fast 3/8, that is, one beat:
 
     >>> meter.TimeSignature('3/8').beatCount
     1
@@ -1310,7 +1310,7 @@ class TimeSignature(TimeSignatureBase):
 
             maxInt = max(weightInts)
             weightValues = {}  # reference dictionary
-            # minimum value, something like 1/16., to be multiplied by powers of 2
+            # minimum value, something like 1/16, to be multiplied by powers of 2
             weightValueMin = 1 / pow(2, maxInt - 1)
             for x in range(maxInt):
                 # multiply base value (0.125) by 1, 2, 4
