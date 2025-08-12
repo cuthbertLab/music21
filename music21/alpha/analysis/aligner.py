@@ -1049,7 +1049,7 @@ class Test(unittest.TestCase):
 
         sa = StreamAligner(target, source)
         sa.align()
-        self.assertEqual(sa.similarityScore, 1.)
+        self.assertEqual(sa.similarityScore, 1.0)
 
     def testShowInsertion(self):
         '''

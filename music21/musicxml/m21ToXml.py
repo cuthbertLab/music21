@@ -38,6 +38,7 @@ from music21 import clef
 from music21 import chord
 from music21 import common
 from music21.common.enums import AppendSpanners
+from music21.common.numberTools import opFrac
 from music21 import defaults
 from music21 import duration
 from music21 import dynamics
@@ -3322,7 +3323,7 @@ class MeasureExporter(XMLExporterBase):
         else:
             # if necessary, jump to end of the measure.
             if self.offsetInMeasure < firstPassEndOffsetInMeasure:
-                self.moveForward(firstPassEndOffsetInMeasure)
+                self.moveForward(opFrac(firstPassEndOffsetInMeasure - self.offsetInMeasure))
 
         self.currentVoiceId = None
 
@@ -5246,7 +5247,7 @@ class MeasureExporter(XMLExporterBase):
         >>> MEX.dump(mxExpression)
         <inverted-turn placement="above" />
 
-        >>> invDelayedTurn = expressions.InvertedTurn(delay=1.)
+        >>> invDelayedTurn = expressions.InvertedTurn(delay=1.0)
         >>> invDelayedTurn.placement = 'below'
         >>> MEX = musicxml.m21ToXml.MeasureExporter()
         >>> mxExpression = MEX.expressionToXml(invDelayedTurn)
@@ -5885,10 +5886,12 @@ class MeasureExporter(XMLExporterBase):
         self.xmlRoot.append(mxHarmony)
         return mxHarmony
 
-    def chordSymbolToXml(self,
-                         cs: harmony.ChordSymbol,
-                         *,
-                         append: bool = True) -> Element|list[Element]:
+    def chordSymbolToXml(
+        self,
+        cs: harmony.ChordSymbol,
+        *,
+        append: bool = True
+    ) -> Element|list[Element]:
         # noinspection PyShadowingNames
         '''
         Convert a ChordSymbol object to either a chord (if .writeAsChord is True)
@@ -5920,7 +5923,6 @@ class MeasureExporter(XMLExporterBase):
             <bass-alter>-1</bass-alter>
           </bass>
         </harmony>
-
 
         Now give function:
 

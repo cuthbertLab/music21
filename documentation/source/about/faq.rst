@@ -14,13 +14,20 @@ How do I ask a question so that it becomes frequently asked?
 
 Why is it called `music21`?
 
-    `music21` gets its name from the fact that it was (mainly) created at
-    MIT in the Music and Theater Arts Section there.  At MIT, everything
-    has a number, and the department number for music is 21M.  There's
+    `music21` gets its name from the fact that it was originally created
+    while Cuthbert was a professor at MIT
+    in the Music and Theater Arts Section there.  At MIT, everything
+    has a number, and the department number for music is 21M.  It seemed like
+    a nice way to honor where initial support came from, while not tying it
+    to one institution.
+
+    (btw: There's
     no connection to "Twenty-first century" etc. and therefore superior
     to older software. In fact, if I had thought of that mental connection 
-    I probably would have come up with a different name.
-    
+    I probably would have come up with a different name.)
+
+So is this a `MUSIC-N` software?
+
     There was a tradition early on of naming software that dealt with
     music, with "MUSIC" followed by a number (https://en.wikipedia.org/wiki/MUSIC-N).      
     There is famously Max Matthews'
@@ -107,6 +114,31 @@ you help?
     Unfortunately, due to the number of different flavors of open-source
     operating systems, the development team can only give free help to
     Mac and Windows installation. (but see paid support, below).
+
+Recurring misunderstandings
+----------------------------
+When I call `.transpose(i)` where `i` is an integer, the enharmonics are wrong, even if `i == 0`.
+
+    Transposing by a number is equivalent to creating an :class:`music21.interval.ChromaticInterval`
+    object.  ChromaticIntervals are designed *not* to care about enharmonics.  When transposing
+    by a chromatic interval, `music21` will freely change the enharmonic to whatever it feels is
+    best in context (maybe right, maybe wrong).
+
+    If you care about enharmonics (I do!) use a string representing a
+    :class:`music21.interval.DiatonicInterval`, such as "P8" for up a perfect octave, or
+    "m-3" for down a minor third.  Unless the interval causes the note to have quintuple sharps
+    or flats (which `music21` does not support), it will always honor your enharmonic.
+
+When I call `.show()` something doesn't work.  Here's my code: `...Score...Measure...Notes`:
+
+    Much of `music21` will work no matter what your Stream structure is, but for certain
+    analyses or writing out to formats (including MusicXML), your stream structure needs to
+    be well formed.  That is, Scores must contain Parts which must contain Measures.
+    Measures can optionally contain Voices.  Only Measures and Voices can contain notes.
+
+    To check if you've done it right call `isWellFormedNotation()` on your stream.  If it
+    returns False, try something else.
+
 
 Uses
 ---------

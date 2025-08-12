@@ -15,6 +15,7 @@
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 
+from datetime import date
 import os
 import sys
 sys.path.insert(0, os.path.abspath('..'))
@@ -48,7 +49,7 @@ master_doc = 'index'
 project = 'music21'
 # pylint: disable=redefined-builtin
 # noinspection PyShadowingBuiltins
-copyright = '2006-2024 Michael Scott Asato Cuthbert'
+copyright = f'2006-{date.today().year} Michael Scott Asato Cuthbert'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the

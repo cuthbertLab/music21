@@ -2426,7 +2426,7 @@ def fromString(instrumentString: str,
     (an honorary 'language' for these purposes).
 
     Alternatively, you can specify the language to search using the `language`
-    argument. (New in v7.3.)
+    argument. (New in v7.3)
 
     >>> t12 = instrument.fromString('Klarinette', language=instrument.SearchLanguage.GERMAN)
     >>> t12
