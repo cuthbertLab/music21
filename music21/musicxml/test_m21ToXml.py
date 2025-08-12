@@ -747,7 +747,7 @@ class Test(unittest.TestCase):
                     currOffsetQL = common.opFrac(currOffsetQL - durQL)
                 else:
                     currOffsetQL = common.opFrac(currOffsetQL + durQL)
-        self.assertEqual(currOffsetQL, 4.)
+        self.assertEqual(currOffsetQL, 4.0)
 
     def testOutOfBoundsExpressionDoesNotCreateForward(self):
         '''

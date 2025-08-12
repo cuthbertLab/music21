@@ -5247,7 +5247,7 @@ class MeasureExporter(XMLExporterBase):
         >>> MEX.dump(mxExpression)
         <inverted-turn placement="above" />
 
-        >>> invDelayedTurn = expressions.InvertedTurn(delay=1.)
+        >>> invDelayedTurn = expressions.InvertedTurn(delay=1.0)
         >>> invDelayedTurn.placement = 'below'
         >>> MEX = musicxml.m21ToXml.MeasureExporter()
         >>> mxExpression = MEX.expressionToXml(invDelayedTurn)

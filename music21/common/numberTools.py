@@ -401,7 +401,7 @@ def mixedNumeral(expr: numbers.Real,
     '2 1/10000000'
     '''
     if not isinstance(expr, Fraction):
-        quotient, remainder = divmod(float(expr), 1.)
+        quotient, remainder = divmod(float(expr), 1.0)
         remainderFrac = Fraction(remainder).limit_denominator(limitDenominator)
         if quotient < -1:
             quotient += 1
@@ -824,7 +824,10 @@ def approximateGCD(values: Collection[int|float|Fraction], grain: float = 1e-4) 
         return lowest
 
     # assume that one of these divisions will match
-    divisors = (1., 2., 3., 4., 5., 6., 7., 8., 9., 10., 11., 12., 13., 14., 15., 16.)
+    divisors = (
+        1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0,
+        9.0, 10.0, 11.0, 12.0, 13.0, 14.0, 15.0, 16.0,
+    )
     divisions = []  # a list of lists, one for each entry
     uniqueDivisions = set()
     for index in values:

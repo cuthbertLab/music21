@@ -4296,7 +4296,7 @@ class Test(unittest.TestCase):
 
         # quintuplets
         s = Stream()
-        qlList = [1, 1 / 5, 1 / 5, 1 / 10, 1 / 10, 1 / 5, 1 / 5, 2.]
+        qlList = [1, 1 / 5, 1 / 5, 1 / 10, 1 / 10, 1 / 5, 1 / 5, 2.0]
         for ql in qlList:
             n = note.Note()
             n.quarterLength = ql
