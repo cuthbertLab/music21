@@ -1430,6 +1430,24 @@ class SpannerBundle(prebase.ProtoM21Object):
         need to be created for each remaining pending assignment.
         The SpannerAnchors should be created at the appropriate
         offset, dictated by the assignment's offsetInScore.
+
+        >>> sb = spanner.SpannerBundle()
+        >>> sl = spanner.Slur()
+        >>> sb.append(sl)
+        >>> sb.setPendingSpannedElementAssignment(sl, 'Note', 0.)
+
+        Check to make sure popPendingSpannedElementAssignments returns
+        the entire list, and leaves an empty list behind.
+        >>> expectedPending = sb._pendingSpannedElementAssignment
+        >>> expectedPending
+        [{'spanner': <music21.spanner.Slur>, 'className': 'Note',
+         'offsetInScore': 0.0, 'clientInfo': None}]
+
+        >>> pending = sb.popPendingSpannedElementAssignments()
+        >>> pending == expectedPending
+        True
+        >>> sb._pendingSpannedElementAssignment
+        []
         '''
         output: list[PendingAssignmentRef] = self._pendingSpannedElementAssignment
         self._pendingSpannedElementAssignment = []
