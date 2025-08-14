@@ -813,7 +813,7 @@ class PendingAssignmentRef(t.TypedDict):
     spanner: Spanner
     className: str
     offsetInScore: OffsetQL|None
-    clientInfo: t.Any|None
+    staffKey: int|None
 
 class SpannerAnchor(base.Music21Object):
     '''
@@ -1319,37 +1319,36 @@ class SpannerBundle(prebase.ProtoM21Object):
         sp: Spanner,
         className: str,
         offsetInScore: OffsetQL|None = None,
-        clientInfo: t.Any|None = None
+        staffKey: int|None = None
     ):
         '''
         A SpannerBundle can be set up so that a particular spanner (sp) is looking
         for an element of class (className) to be set as first element. Any future
         future element that matches the className (and offsetInScore, if specified)
         which is passed to the SpannerBundle via freePendingFirstSpannedElementAssignment()
-        will get it.  clientInfo is not used in the match, but can be used by the client
+        will get it.  staffKey is not used in the match, but can be used by the client
         when cleaning up any leftover pending assignments, by creating SpannerAnchors
-        at the appropriate offset.
+        in the appropriate staff.
 
         There are two ways to use the PendingSpannedElement APIs.  The old way,
         where setPendingSpannedElementAssignment is called without specifying
-        offsetInScore or clientInfo, and freePendingSpannedElementAssignment
+        offsetInScore or staffKey, and freePendingSpannedElementAssignment
         is called without specifying a matching offset; and the new way, where
         setPendingSpannedElementAssignment is called with an offsetInScore (and
-        perhaps a clientInfo), freePendingSpannedElementAssignment is called
+        perhaps a staffKey), freePendingSpannedElementAssignment is called
         with a matching offset, and then popPendingSpannedElementAssignments is
         called to get all the remaining pending assignments, so that SpannerAnchors
         can be created for them (since there was no note found at the specified
-        offsetInScore).  clientInfo is an optional argument in the new-style
-        API call, to stash off any info that is needed for the calling client
-        to correctly create and place the SpannerAnchors.  This can be as simple
-        as an int, or as complex as the complete client object.
+        offsetInScore).  staffKey is an optional argument in the new-style
+        API call, to stash off the info that is needed for the calling client
+        to correctly create and place the SpannerAnchors.
 
         The new way is useful (for example) for importing a <direction> from
         MusicXML that has <offset> specified, so that the next note parsed after
         the <direction> will not be at the correct offsetInScore for the start
         of the direction, and a SpannerAnchor will be required instead.
 
-        Test the old way (no offsetInScore or clientInfo):
+        Test the old way (no offsetInScore or staffKey):
 
         >>> n1 = note.Note('C')
         >>> r1 = note.Rest()
@@ -1420,11 +1419,10 @@ class SpannerBundle(prebase.ProtoM21Object):
         >>> n1.getSpannerSites()
         [<music21.spanner.Slur <music21.note.Note C>>]
 
-        Now set up su1 to get the next note assigned to it.  Stash off (in
-        clientInfo) the staffKey (1) that should be used for the SpannerAnchor,
-        should a SpannerAnchor be needed.
+        Now set up su1 to get the next note assigned to it.  Stash off the staffKey (1) that
+        should be used for the SpannerAnchor, should a SpannerAnchor be needed.
 
-        >>> sb.setPendingSpannedElementAssignment(su1, 'Note', 0.0, clientInfo=1)
+        >>> sb.setPendingSpannedElementAssignment(su1, 'Note', 0.0, staffKey=1)
 
         Call freePendingSpannedElementAssignment to attach.
         Should not get a note at the wrong offset.
@@ -1452,14 +1450,14 @@ class SpannerBundle(prebase.ProtoM21Object):
 
         >>> unmatched[0]
         {'spanner': <music21.spanner.Slur <music21.note.Note C>>, 'className': 'Note',
-         'offsetInScore': 0.0, 'clientInfo': 1}
+         'offsetInScore': 0.0, 'staffKey': 1}
 
         '''
         ref: PendingAssignmentRef = {
             'spanner': sp,
             'className': className,
             'offsetInScore': offsetInScore,
-            'clientInfo': clientInfo
+            'staffKey': staffKey
         }
         self._pendingSpannedElementAssignment.append(ref)
 
@@ -1507,14 +1505,14 @@ class SpannerBundle(prebase.ProtoM21Object):
         >>> sb = spanner.SpannerBundle()
         >>> sl = spanner.Slur()
         >>> sb.append(sl)
-        >>> sb.setPendingSpannedElementAssignment(sl, 'Note', 0.)
+        >>> sb.setPendingSpannedElementAssignment(sl, 'Note', 0.0)
 
         Check to make sure popPendingSpannedElementAssignments returns
         the entire list, and leaves an empty list behind.
         >>> expectedPending = sb._pendingSpannedElementAssignment
         >>> expectedPending
         [{'spanner': <music21.spanner.Slur>, 'className': 'Note',
-         'offsetInScore': 0.0, 'clientInfo': None}]
+         'offsetInScore': 0.0, 'staffKey': None}]
 
         >>> pending = sb.popPendingSpannedElementAssignments()
         >>> pending == expectedPending
