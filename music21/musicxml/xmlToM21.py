@@ -2626,7 +2626,7 @@ class MeasureParser(SoundTagMixin, XMLParserBase):
             # addSpannedElement, we need to insertFirstSpannedElement.
             sp: spanner.Spanner = pfse['spanner']
             offsetInScore: OffsetQL|None = pfse['offsetInScore']
-            staffKey: t.Any|None = pfse['clientInfo']
+            staffKey: t.Any|None = pfse['staffKey']
             if t.TYPE_CHECKING:
                 assert isinstance(offsetInScore, OffsetQL)
                 assert isinstance(staffKey, int)
