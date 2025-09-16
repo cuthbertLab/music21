@@ -175,15 +175,16 @@ AmbitusShort = namedtuple('AmbitusShort',
 
 class Metadata(base.Music21Object):
     r'''
-    Metadata represent data for a work or fragment, including title, composer,
-    dates, and other relevant information.
+    Metadata objects contain information about a work, including title, composer,
+    dates, and other relevant information. Metadata objects can also cover a fragment
+    of a Score such as individual parts or a range of measures.
 
     Metadata is a :class:`~music21.base.Music21Object` subclass, meaning that it
     can be positioned on a Stream by offset and have a
     :class:`~music21.duration.Duration`.
 
-    In many cases, each Stream will have a single Metadata object at the zero
-    offset position.
+    In many cases, each Stream will have a single Metadata object at the zero-offset
+    position.
 
     To get a simple string, use attribute-style access by unique name.
     Some workIds from music21 v7 have been renamed (e.g. 'date' has been renamed
