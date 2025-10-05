@@ -1359,8 +1359,25 @@ class UserSettings:
         '''
         Return the keys found in the user's
         :class:`~music21.environment.Environment` object.
+
+        Changed in v9.3 -- yields a generator, like Python 3 dict -- rather than
+            returning a list
         '''
-        return self._environment.getRefKeys() + ['localCorpusPath']
+        yield from (self._environment.getRefKeys() + ['localCorpusPath'])
+
+    def items(self):
+        '''
+        dict-like interface to allow iterating over items of the UserSettings.
+        '''
+        for k in self.keys():
+            yield (k, self[k])
+
+    def values(self):
+        '''
+        dict-like interface to allow iterating over values of the UserSettings.
+        '''
+        for _, v in self.items():
+            yield v
 
     def restoreDefaults(self):
         '''
