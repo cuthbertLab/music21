@@ -1370,13 +1370,13 @@ class UserSettings:
         dict-like interface to allow iterating over items of the UserSettings.
         '''
         for k in self.keys():
-            yield(k, self[k])
+            yield (k, self[k])
 
     def values(self):
         '''
         dict-like interface to allow iterating over values of the UserSettings.
         '''
-        for k,v in self.items():
+        for _, v in self.items():
             yield v
 
     def restoreDefaults(self):
