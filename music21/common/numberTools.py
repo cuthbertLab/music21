@@ -21,34 +21,34 @@ from typing import overload, TYPE_CHECKING
 import unittest
 
 from music21 import defaults
-from music21.common import deprecated
 from music21.common.types import OffsetQLIn, OffsetQL
 
 if TYPE_CHECKING:
-    from decimal import Decimal
-    from collections.abc import Iterable, Sequence, Collection
+    from collections.abc import Sequence, Collection
 
 
 __all__ = [
-    'ordinals', 'musicOrdinals', 'ordinalsToNumbers',
-    'numToIntOrFloat',
-
-    'opFrac', 'mixedNumeral',
-    'roundToHalfInteger',
-    'addFloatPrecision', 'strTrimFloat',
-    'nearestMultiple',
-
-    'dotMultiplier', 'decimalToTuplet',
-    'unitNormalizeProportion', 'unitBoundaryProportion',
-    'weightedSelection',
+    'addFloatPrecision',
     'approximateGCD',
-
     'contiguousList',
-
+    'decimalToTuplet',
+    'dotMultiplier',
+    'fromRoman',
     'groupContiguousIntegers',
-
-    'fromRoman', 'toRoman',
+    'mixedNumeral',
+    'musicOrdinals',
+    'nearestMultiple',
+    'numToIntOrFloat',
+    'opFrac',
     'ordinalAbbreviation',
+    'ordinals',
+    'ordinalsToNumbers',
+    'roundToHalfInteger',
+    'strTrimFloat',
+    'toRoman',
+    'unitBoundaryProportion',
+    'unitNormalizeProportion',
+    'weightedSelection',
 ]
 
 ordinals = [
@@ -855,42 +855,6 @@ def approximateGCD(values: Collection[int|float|Fraction], grain: float = 1e-4) 
     return max(commonUniqueDivisions)
 
 
-@deprecated('v9', 'v10', 'Use math.lcm instead')
-def lcm(filterList: Iterable[int]) -> int:
-    '''
-    Find the least common multiple of a list of values
-
-    common.lcm([3, 4, 5])
-    60
-    common.lcm([3, 4])
-    12
-    common.lcm([1, 2])
-    2
-    common.lcm([3, 6])
-    6
-
-    Works with any iterable, like this set
-
-    common.lcm({3, 5, 6})
-    30
-
-    Deprecated in v9 since Python 3.10 is the minimum version
-    and math.lcm works in C and is faster
-    '''
-    def _lcm(a, b):
-        '''
-        find the least common multiple of a, b
-        '''
-        # // forces integer style division (no remainder)
-        return abs(a * b) // gcd(a, b)
-
-    # derived from
-    # http://www.oreillynet.com/cs/user/view/cs_msg/41022
-    lcmVal = 1
-    for flValue in filterList:
-        lcmVal = _lcm(lcmVal, flValue)
-    return lcmVal
-
 
 def contiguousList(inputListOrTuple) -> bool:
     '''
@@ -1125,6 +1089,10 @@ for ordinal_index in range(len(ordinals)):
         ordinalsToNumbers[musicOrdinalNameLower] = ordinal_index
 
 del ordinal_index
+del ordinalName
+del ordinalNameLower
+del musicOrdinalName
+del musicOrdinalNameLower
 
 
 class Test(unittest.TestCase):

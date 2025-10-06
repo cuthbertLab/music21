@@ -17,11 +17,8 @@ Concept borrowed from m21j.
 '''
 from __future__ import annotations
 
-from collections.abc import Sequence
 import typing as t
 import unittest
-
-from music21.common import deprecated
 
 class ProtoM21Object:
     '''
@@ -82,36 +79,6 @@ class ProtoM21Object:
 
     __slots__: tuple[str, ...] = ()
 
-    @deprecated('v7', 'v10', 'use `someClass in .classSet`'
-        'or for intersection: `not classSet.isdisjoint(classList)`')
-    def isClassOrSubclass(self, classFilterList: Sequence) -> bool:
-        '''
-        Given a class filter list (a list or tuple must be submitted),
-        which may have strings or class objects, determine
-        if this class is of the provided classes or a subclasses.
-
-        NOTE: this is a performance critical operation
-        for performance, only accept lists or tuples
-
-        DEPRECATED in v7 -- prefer `someClass in el.classSet` or
-        `not el.classSet.isdisjoint(classList)` instead.
-
-        >>> n = note.Note()
-        >>> #_DOCS_SHOW n.isClassOrSubclass(('Note',))
-        True
-        >>> #_DOCS_SHOW n.isClassOrSubclass(('GeneralNote',))
-        True
-        >>> #_DOCS_SHOW n.isClassOrSubclass((note.Note,))
-        True
-        >>> #_DOCS_SHOW n.isClassOrSubclass((note.Rest,))
-        False
-        >>> #_DOCS_SHOW n.isClassOrSubclass((note.Note, note.Rest))
-        True
-        >>> #_DOCS_SHOW n.isClassOrSubclass(('Rest', 'Note'))
-        True
-        '''
-        return not self.classSet.isdisjoint(classFilterList)
-
     @property
     def classes(self) -> tuple[str, ...]:
         '''
@@ -171,9 +138,9 @@ class ProtoM21Object:
         to a particular class when you don't know if the user has given a string,
         a fully qualified string name, or an object.
 
-        Did I mention it's fast?  It's a drop in substitute for the deprecated
-        `.isClassOrSubclass`.  It's not as fast as x in n.classes or isinstance(n, x)
-        if you know whether it's a string or class, but this is good and safe.
+        Did I mention it's fast?  It's not as fast as x in n.classes or isinstance(n, x)
+        if you know whether it's a string or class, but this is good and safe to take
+        in either a string or a class.
 
         >>> n = note.Note()
         >>> 'Note' in n.classSet
@@ -187,6 +154,13 @@ class ProtoM21Object:
         False
         >>> note.Rest in n.classSet
         False
+
+        For checking if an object is part of any number of objects use `not`
+        with `isdisjoint`.  A little unwiedly but works super fast:
+
+        >>> checkClasses = (spanner.Slur, note.NotRest)
+        >>> not n.classSet.isdisjoint(checkClasses)
+        True
 
         >>> object in n.classSet
         True

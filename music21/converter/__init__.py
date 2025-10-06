@@ -36,7 +36,6 @@ the temp folder on the disk.
 from __future__ import annotations
 
 from collections import deque
-import copy
 from http.client import responses
 import io
 from math import isclose
@@ -69,14 +68,26 @@ if t.TYPE_CHECKING:
 
 
 __all__ = [
-    'subConverters', 'museScore',
-    'ArchiveManagerException', 'PickleFilterException',
-    'ConverterException', 'ConverterFileException',
-    'ArchiveManager', 'PickleFilter', 'resetSubConverters',
-    'registerSubConverter', 'unregisterSubConverter',
-    'Converter', 'parseFile', 'parseData', 'parseURL',
-    'parse', 'freeze', 'thaw', 'freezeStr', 'thawStr',
-
+    'ArchiveManager',
+    'ArchiveManagerException',
+    'Converter',
+    'ConverterException',
+    'ConverterFileException',
+    'PickleFilter',
+    'PickleFilterException',
+    'freeze',
+    'freezeStr',
+    'museScore',
+    'parse',
+    'parseData',
+    'parseFile',
+    'parseURL',
+    'registerSubConverter',
+    'resetSubConverters',
+    'subConverters',
+    'thaw',
+    'thawStr',
+    'unregisterSubConverter',
 ]
 
 environLocal = environment.Environment('converter')
@@ -424,15 +435,6 @@ def registerSubConverter(newSubConverter: type[subConverters.SubConverter]) -> N
     '''
     _registeredSubConverters.appendleft(newSubConverter)
 
-@common.deprecated('v9', 'v10', 'use unregisterSubconverter with capital C')
-def registerSubconverter(
-    newSubConverter: type[subConverters.SubConverter]
-) -> None:  # pragma: no cover
-    '''
-    Deprecated: use registerSubConverter w/ capital "C" instead.
-    '''
-    registerSubConverter(newSubConverter)
-
 def unregisterSubConverter(
     removeSubConverter: t.Literal['all']|type[subConverters.SubConverter]
 ) -> None:
@@ -485,16 +487,6 @@ def unregisterSubConverter(
         else:
             raise ConverterException(
                 f'Could not remove {removeSubConverter!r} from registered subConverters')
-
-
-@common.deprecated('v9', 'v10', 'use unregisterSubConverter with capital C')
-def unregisterSubconverter(
-    newSubConverter: type[subConverters.SubConverter]
-) -> None:  # pragma: no cover
-    '''
-    Deprecated: use unregisterSubConverter w/ capital "C" instead.
-    '''
-    unregisterSubConverter(newSubConverter)
 
 
 # ------------------------------------------------------------------------------
@@ -806,13 +798,6 @@ class Converter:
 
     # -----------------------------------------------------------------------#
     # SubConverters
-    @common.deprecated('v9', 'v10', 'use subConvertersList with capital C')
-    def subconvertersList(
-        self,
-        converterType: t.Literal['any', 'input', 'output'] = 'any'
-    ) -> list[type[subConverters.SubConverter]]:  # pragma: no cover
-        return self.subConvertersList(converterType)
-
     @staticmethod
     def subConvertersList(
         converterType: t.Literal['any', 'input', 'output'] = 'any'
@@ -944,10 +929,6 @@ class Converter:
 
         return filteredSubConvertersList
 
-    @common.deprecated('v9', 'v10', 'use defaultSubConverters with capital C')
-    def defaultSubconverters(self) -> list[type[subConverters.SubConverter]]:  # pragma: no cover
-        return self.defaultSubConverters()
-
     @staticmethod
     def defaultSubConverters() -> list[type[subConverters.SubConverter]]:
         '''
@@ -991,12 +972,6 @@ class Converter:
                     and issubclass(possibleSubConverter, subConverters.SubConverter)):
                 defaultSubConverters.append(possibleSubConverter)
         return defaultSubConverters
-
-    @common.deprecated('v9', 'v10', 'use getSubConverterFormats with capital C')
-    def getSubconverterFormats(
-        self
-    ) -> dict[str, type[subConverters.SubConverter]]:  # pragma: no cover
-        return self.getSubConverterFormats()
 
     @staticmethod
     def getSubConverterFormats() -> dict[str, type[subConverters.SubConverter]]:
@@ -1070,10 +1045,6 @@ class Converter:
             raise ConverterException(f'no converter available for format: {converterFormat}')
         subConverterClass = scf[converterFormat]
         return subConverterClass()
-
-    @common.deprecated('v9', 'v10', 'use setSubConverterFromFormat with capital C')
-    def setSubconverterFromFormat(self, converterFormat: str):  # pragma: no cover
-        self.setSubConverterFromFormat(converterFormat)
 
     def setSubConverterFromFormat(self, converterFormat: str):
         '''
@@ -1749,19 +1720,20 @@ class Test(unittest.TestCase):
                 # print(chords[i].pitches, len(chords[i].pitches))
                 self.assertEqual(knownSize[i], len(chords[i].pitches))
 
-    def testConversionMXBeams(self):
+    def testConversionMXBeams(self) -> None:
+        from music21 import beam
         from music21 import note
         from music21.musicxml import testPrimitive
 
         mxString = testPrimitive.beams01
-        a = parse(mxString)
+        a = t.cast(stream.Score, parse(mxString))
         part = a.parts[0]
         notes = part.recurse().notesAndRests
-        beams = []
+        theseBeams: list[beam.Beam] = []
         for n in notes:
             if isinstance(n, note.Note):
-                beams += n.beams.beamsList
-        self.assertEqual(len(beams), 152)
+                theseBeams += n.beams.beamsList
+        self.assertEqual(len(theseBeams), 152)
 
     def testConversionMXTime(self):
 
