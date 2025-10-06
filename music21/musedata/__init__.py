@@ -44,8 +44,8 @@ from music21 import prebase
 environLocal = environment.Environment('musedata')
 
 # for implementation
-# see http://www.ccarh.org/publications/books/beyondmidi/online/musedata/
-# and http://www.ccarh.org/publications/books/beyondmidi/online/musedata/record-organization/
+# see https://www.ccarh.org/publications/books/beyondmidi/online/musedata/
+# and https://www.ccarh.org/publications/books/beyondmidi/online/musedata/record-organization/
 
 
 # ------------------------------------------------------------------------------
