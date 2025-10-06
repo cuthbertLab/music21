@@ -243,7 +243,7 @@ linkcheck_anchors = False
 
 linkcheck_ignore = [
     r'http://www.musicxml.org/dtds/partwise.dtd',  # dtd is not a URL.
-    r'https://easyabc.sourceforge.net', # works 2025-10
+    r'https://easyabc.sourceforge.net',  # works 2025-10
     # does not find anchor immediately.  should wait longer
     r'https://github.com/cuthbertLab/music21/blob/master/README.md#community-code-of-conduct',
 ]
