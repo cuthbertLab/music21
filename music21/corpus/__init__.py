@@ -36,6 +36,7 @@ And use `corpus.search` if you do not:
 >>> cb[0].parse()
 <music21.stream.Score airdsAirs/book1.abc>
 '''
+
 from __future__ import annotations
 from collections.abc import Iterable
 import typing as t
@@ -51,25 +52,24 @@ from music21.corpus import work
 
 from music21.corpus.manager import search
 from music21 import environment
-from music21.exceptions21 import CorpusException
 
 __all__ = [
-    'chorales', 'corpora', 'manager',
+    'addPath',
+    'cacheMetadata',
+    'chorales',
+    'corpora',
+    'getComposer',
+    'getCorePaths',
+    'getLocalPaths',
+    'getPaths',
+    # 'getVirtualPaths',
+    'getWork',
+    'manager',
+    'noCorpus',
+    'parse',
     # virtual
     'work',
-    'parse',
-    'getCorePaths',
-    # 'getVirtualPaths',
-    'getLocalPaths',
-    'addPath',
-    'getPaths',
-    'cacheMetadata',
-    'getComposer',
-    'noCorpus',
-    'getWork',
-
 ]
-
 
 if t.TYPE_CHECKING:
     import pathlib

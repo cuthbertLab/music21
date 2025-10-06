@@ -131,9 +131,14 @@ the string.  See metadata/primitives.py for more information.
 from __future__ import annotations
 
 __all__ = [
+    'AmbitusShort',
     'Metadata',
     'RichMetadata',
-    'AmbitusShort',
+
+    'bundles',
+    'caching',
+    'primitives',
+    'properties',
 ]
 
 from collections import namedtuple
@@ -151,20 +156,40 @@ from music21 import environment
 from music21 import exceptions21
 from music21 import interval
 
-from music21.metadata import properties
-from music21.metadata.properties import PropertyDescription
 from music21.metadata import bundles
 from music21.metadata import caching
 from music21.metadata import primitives
-from music21.metadata.primitives import (Date, DatePrimitive,
-                                         DateSingle, DateRelative, DateBetween,
-                                         DateSelection, Text, Contributor, Creator,
-                                         Imprint, Copyright, ValueType)
+from music21.metadata.primitives import (
+    Contributor,
+    Copyright,
+    Creator,
+    Date,
+    DateBetween,
+    DatePrimitive,
+    DateRelative,
+    DateSelection,
+    DateSingle,
+    Imprint,
+    Text,
+    ValueType,
+)
+from music21.metadata import properties
+from music21.metadata.properties import PropertyDescription
+
 # -----------------------------------------------------------------------------
 environLocal = environment.Environment('metadata')
 
-AmbitusShort = namedtuple('AmbitusShort',
-                          ['semitones', 'diatonic', 'pitchLowest', 'pitchHighest'])
+class AmbitusShort(t.NamedTuple):
+    '''
+    A namedtuple representing the ambitus (range) using ints and strings
+
+    >>> metadata.AmbitusShort(7, 'P5', 'B3', 'F#4')
+    AmbitusShort(semitones=7, diatonic='P5', pitchLowest='B3', pitchHighest='F#4')
+    '''
+    semitones: int
+    diatonic: str
+    pitchLowest: str
+    pitchHighest: str
 
 # -----------------------------------------------------------------------------
 
@@ -2474,15 +2499,15 @@ class RichMetadata(Metadata):
 
     # INITIALIZER #
 
-    def __init__(self, **keywords):
+    def __init__(self, **keywords) -> None:
         super().__init__(**keywords)
-        self.ambitus = None
+        self.ambitus: AmbitusShort|None = None
         self.keySignatureFirst = None
         self.keySignatures = []
         self.noteCount = None
         self.numberOfParts = None
-        self.pitchHighest = None
-        self.pitchLowest = None
+        self.pitchHighest: str|None = None
+        self.pitchLowest: str|None = None
         self.quarterLength = None
         self.sourcePath = ''
         self.tempoFirst = None
@@ -2630,24 +2655,6 @@ class RichMetadata(Metadata):
             self.keySignatureFirst = self.keySignatures[0]
         if self.tempos:
             self.tempoFirst = self.tempos[0]
-
-        # for element in flat:
-        #    pitches = ()
-        #    if isinstance(element, note.Note):
-        #        pitches = (element.pitch,)
-        #    elif isinstance(element, chord.Chord):
-        #        pitches = element.pitches
-        #    for pitch in pitches:
-        #        if self.pitchHighest is None:
-        #            self.pitchHighest = pitch
-        #        if self.pitchLowest is None:
-        #            self.pitchLowest = pitch
-        #        if pitch.ps < self.pitchLowest.ps:
-        #            self.pitchLowest = pitch
-        #        elif self.pitchHighest.ps < pitch.ps:
-        #            self.pitchHighest = pitch
-        # self.pitchLowest = str(self.pitchLowest)
-        # self.pitchHighest = str(self.pitchHighest)
 
         self.noteCount = len(flat.notesAndRests)
         self.quarterLength = flat.highestTime
@@ -2798,7 +2805,7 @@ class RichMetadata(Metadata):
 
 # -----------------------------------------------------------------------------
 # tests are in test/test_metadata
-_DOC_ORDER: list[type] = []
+_DOC_ORDER: list[type] = [Metadata, RichMetadata, AmbitusShort]
 
 
 if __name__ == '__main__':
