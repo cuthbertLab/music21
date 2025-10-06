@@ -26,7 +26,6 @@ you cannot check to see if fixed tests work while it is running.
 This takes a while and runs single core, and then almost always needs code patches
 so allocate time (2 min on M4).  Start working on the announcement while it's running.
 
-
 4. run test/warningMultiprocessTest.py for lowest and highest Py version -- fix all warnings!
 5. run `from music21.test import treeYield
     and then run `treeYield.find_all_non_hashable_m21objects()` and check that the set returned is
@@ -38,20 +37,15 @@ so allocate time (2 min on M4).  Start working on the announcement while it's ru
 
 7. run documentation/make.py clean  (skip on minor version changes) -- you may need to make a
      documentation/build directory first.
-8. run documentation/make.py linkcheck  [*] - missing http://www.musicxml.org/dtds/partwise.dtd
-     and code-of-conduct links are both okay to fail.  The points about
-     "more than one target found for cross-reference 'Direction'"
-     are known bugs in Sphinx (when the same named Enum appears in different modules)
-     and we can't fix.
-     StackOverflow seems also to be preventing linkcheck -- check manually every once in
-     a while, but looking good May 2025.
-     Ignore the errors at the end if everything looks good.
+8. run documentation/make.py linkcheck  [*]
+     some persistent errors that actually work are in the conf.py file under linkcheck_ignore
 9. run documentation/make.py   [*]
 
 [*] you will need sphinx, Jupyter (pip or easy_install), markdown, and pandoc (.dmg) installed
 
 10. move music21 documentation/build/html to music21.org/music21docs/
-    via Amazon S3 (contact MSAC for authentication if need be)
+    via Amazon S3 (contact MSAC for authentication if need be) (MSAC has a program:
+    combine_sync/deploy.py that will do this automatically.
 
 11. zip up documentation/build/html and get ready to upload/delete it (you can put on your
     desktop or wherever you like).
@@ -64,7 +58,8 @@ so allocate time (2 min on M4).  Start working on the announcement while it's ru
     This builds the dist/music21-9.3.0.tar.gz and dist/music21-9.3.0-py3-none-any.whl
     files.  That used to be what *this* script did, but now hatch does it better!
 
-13. Run this (dist.py) file: it builds the no-corpus version of music21.  (need Python 3.12 or higher)
+13. Run this (dist.py) file: it builds the no-corpus version of music21.
+    (need Python 3.12 or higher)
     DO NOT RUN THIS ON A PC or the Mac .tar.gz might have an incorrect permission if you do.
 
 14. PR and Commit to GitHub at this point w/ commit comment of the new version,
