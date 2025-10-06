@@ -18,11 +18,13 @@ __all__ = [
     'Creator',
     'Date',
     'DateBetween',
+    'DatePrimitive',
     'DateRelative',
     'DateSelection',
     'DateSingle',
     'Imprint',
     'Text',
+    'ValueType',
 ]
 
 from collections.abc import Iterable
