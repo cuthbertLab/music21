@@ -12,10 +12,14 @@
 from __future__ import annotations
 
 __all__ = [
-    'archiveTools', 'lilypondTestSuite', 'm21ToXml',
+    'archiveTools',
+    'lilypondTestSuite',
+    'm21ToXml',
     'partStaffExporter',
-    'test_m21ToXml', 'test_xmlToM21',
-    'xmlObjects', 'xmlToM21',
+    'test_m21ToXml',
+    'test_xmlToM21',
+    'xmlObjects',
+    'xmlToM21',
 ]
 
 from music21.musicxml import archiveTools

@@ -1475,6 +1475,7 @@ class PartParser(XMLParserBase):
 
         self.atSoundingPitch = True
 
+        # a list of StaffReferenceType dicts -- one for each Measure parsed by MeasureParser
         self.staffReferenceList: list[StaffReferenceType] = []
 
         self.lastTimeSignature: meter.TimeSignature|None = None
@@ -1826,6 +1827,11 @@ class PartParser(XMLParserBase):
             'TempoIndication',
             'TimeSignature',
         ]
+        # spanners generally appear only on the first staff.
+        # RepeatBracket spanners, however, need to appear on every staff.
+        EXEMPT_FROM_REMOVE = frozenset(
+            ['RepeatBracket'],
+        )
 
         uniqueStaffKeys: list[int] = self._getUniqueStaffKeys()
         partStaves: list[stream.PartStaff] = []
@@ -1833,7 +1839,7 @@ class PartParser(XMLParserBase):
 
         def copy_into_partStaff(source: stream.Stream,
                                 target: stream.Stream,
-                                omitTheseElementIds: set[int]):
+                                omitTheseElementIds: set[int]) -> None:
             elementIterator = source.getElementsByClass(STAFF_SPECIFIC_CLASSES)
             elementIterator.restoreActiveSites = False
             for sourceElem in elementIterator:
@@ -1858,7 +1864,9 @@ class PartParser(XMLParserBase):
             removeClasses = STAFF_SPECIFIC_CLASSES[:]
             if staffIndex != 0:  # spanners only on the first staff.
                 removeClasses.append('Spanner')
-            newPartStaff = self.stream.template(removeClasses=removeClasses, fillWithRests=False)
+            newPartStaff = self.stream.template(removeClasses=removeClasses,
+                                                fillWithRests=False,
+                                                exemptFromRemove=EXEMPT_FROM_REMOVE)
             partStaffId = f'{self.partId}-Staff{staffKey}'
             newPartStaff.id = partStaffId
             # set group for components (recurse?)
@@ -1867,7 +1875,11 @@ class PartParser(XMLParserBase):
             partStaves.append(newPartStaff)
             self.parent.m21PartObjectsById[partStaffId] = newPartStaff
             elementsIdsNotToGoInThisStaff: set[int] = set()
+
+            # iterate over the StaffReferenceType dicts, one for each measure.
             for staffReference in self.staffReferenceList:
+                # this is a list of Music21Objects that should not go into the staff
+                # called by staffKey.
                 excludeOneMeasure = self._getStaffExclude(
                     staffReference,
                     staffKey
@@ -1905,7 +1917,8 @@ class PartParser(XMLParserBase):
         targetKey: int
     ) -> list[base.Music21Object]:
         '''
-        Given a staff reference dictionary, remove and combine in a list all elements that
+        Given a staff reference dictionary (for a single measure),
+        remove and combine in a list all elements that
         are NOT part of the given targetKey. Thus, return a list of all entries to remove.
         It keeps those elements under the staff key None (common to all) and
         those under given key. This then is the list of all elements that should be deleted.

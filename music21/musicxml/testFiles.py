@@ -10,6 +10,8 @@ from __future__ import annotations
 
 import unittest
 
+from music21 import common
+
 _DOC_IGNORE_MODULE_OR_PACKAGE = True
 
 chantQuemQueritis = '''<?xml version="1.0" standalone="no"?>
@@ -16067,6 +16069,131 @@ tabTest = '''<?xml version="1.0" encoding="UTF-8" ?>
 '''
 
 
+pianoRepeatEndings = r'''
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE score-partwise PUBLIC "-//Recordare//DTD MusicXML 4.0 Partwise//EN" "http://www.musicxml.org/dtds/partwise.dtd">
+<score-partwise version="4.0">
+  <work>
+    <work-title>Piano-Repeat</work-title>
+    </work>
+  <part-list>
+    <score-part id="P1">
+      </score-part>
+    </part-list>
+  <part id="P1">
+    <measure number="1">
+      <barline location="left">
+        <bar-style>heavy-light</bar-style>
+        <repeat direction="forward"/>
+        </barline>
+      <attributes>
+        <divisions>1</divisions>
+        <key>
+          <fifths>0</fifths>
+          </key>
+        <time symbol="common">
+          <beats>4</beats>
+          <beat-type>4</beat-type>
+          </time>
+        <staves>2</staves>
+        <clef number="1">
+          <sign>G</sign>
+          <line>2</line>
+          </clef>
+        <clef number="2">
+          <sign>G</sign>
+          <line>2</line>
+          </clef>
+        </attributes>
+      <note>
+        <pitch>
+          <step>G</step>
+          <octave>4</octave>
+          </pitch>
+        <duration>4</duration>
+        <type>whole</type>
+        <staff>1</staff>
+        </note>
+      <backup>
+        <duration>4</duration>
+        </backup>
+      <note>
+        <pitch>
+          <step>G</step>
+          <octave>4</octave>
+          </pitch>
+        <duration>4</duration>
+        <type>whole</type>
+        <staff>2</staff>
+        </note>
+      </measure>
+    <measure number="2">
+      <barline location="left">
+        <ending number="1" type="start">1</ending>
+        </barline>
+      <note>
+        <pitch>
+          <step>A</step>
+          <octave>4</octave>
+          </pitch>
+        <duration>4</duration>
+        <type>whole</type>
+        <staff>1</staff>
+        </note>
+      <backup>
+        <duration>4</duration>
+        </backup>
+      <note>
+        <pitch>
+          <step>A</step>
+          <octave>4</octave>
+          </pitch>
+        <duration>4</duration>
+        <type>whole</type>
+        <staff>2</staff>
+        </note>
+      <barline location="right">
+        <bar-style>light-heavy</bar-style>
+        <ending number="1" type="stop"/>
+        <repeat direction="backward"/>
+        </barline>
+      </measure>
+    <measure number="3">
+      <barline location="left">
+        <ending number="2" type="start">2</ending>
+        </barline>
+      <note>
+        <pitch>
+          <step>B</step>
+          <octave>4</octave>
+          </pitch>
+        <duration>4</duration>
+        <type>whole</type>
+        <staff>1</staff>
+        </note>
+      <backup>
+        <duration>4</duration>
+        </backup>
+      <note>
+        <pitch>
+          <step>B</step>
+          <octave>4</octave>
+          </pitch>
+        <duration>4</duration>
+        <type>whole</type>
+        <staff>2</staff>
+        </note>
+      <barline location="right">
+        <bar-style>light-heavy</bar-style>
+        <ending number="2" type="discontinue"/>
+        </barline>
+      </measure>
+    </part>
+  </score-partwise>
+'''
+
+
+
 # ------------------------------------------------------------------------------
 # define all strings for access
 
@@ -16086,16 +16213,14 @@ tabTest = '''<?xml version="1.0" encoding="UTF-8" ?>
 ALL = [
     chantQuemQueritis, mozartTrioK581Excerpt, schumannOp48No1,
     binchoisMagnificat, edgefield82b, tabTest,
+    pianoRepeatEndings,
 ]
 
 
+@common.deprecated('v10', 'This has never been developed beyond one file')
 def get(contentRequest):
     '''
-    Get test material by type of content
-
-    >>> from music21.musicxml.testFiles import get
-
-    >>> a = get('lyrics')
+    Get test material by type of content -- Deprecated - to be removed in v10
     '''
     if contentRequest in ['lyrics']:
         return chantQuemQueritis
