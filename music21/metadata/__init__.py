@@ -138,18 +138,14 @@ __all__ = [
 
 from collections import namedtuple
 from collections.abc import Iterable
-import copy
-from dataclasses import dataclass
 import datetime
 import pathlib
 import re
 import typing as t
 from typing import overload
-import unittest
 
 from music21 import base
 from music21 import common
-from music21.common import deprecated
 from music21 import defaults
 from music21 import environment
 from music21 import exceptions21
@@ -1333,21 +1329,6 @@ class Metadata(base.Music21Object):
         setattr(self, 'composers', value)
 
     @property
-    def date(self):
-        '''
-        The `.date` property is deprecated in v8 and will be removed in v10.
-        Use `dateCreated` instead.
-        '''
-        return self.dateCreated
-
-    @date.setter
-    def date(self, value: str) -> None:
-        '''
-        For type checking only. Does not run.
-        '''
-        setattr(self, 'date', value)
-
-    @property
     def dateCreated(self):
         r'''
         Get or set the creation date of this work as one of the following date
@@ -2246,7 +2227,7 @@ class Metadata(base.Music21Object):
 
         convertedValues: list[ValueType] = []
         for v in value:
-            convertedValues.append(self._convertValue(name, v))
+            convertedValues.append(self.convertValue(name, v))
 
         prevValues: list[ValueType]|None = self._contents.get(name, None)
         if not prevValues:  # None or []
@@ -2308,46 +2289,71 @@ class Metadata(base.Music21Object):
             self._add(name, value, isCustom)
 
     @staticmethod
-    def _convertValue(uniqueName: str, value: t.Any) -> ValueType:
+    def convertValue(uniqueName: str, value: t.Any) -> ValueType:
         '''
-        Converts a value to the appropriate valueType (looked up in STDPROPERTIES by
-        uniqueName).
+        Converts a value (string, date, etc.) to the appropriate ValueType
+        (defined by uniqueName and metadata.proporties.UNIQUE_NAME_TO_VALUE_TYPE).
 
-        Converts certain named values to Text
+        Converts certain named values to Text:
 
-        >>> metadata.Metadata._convertValue('title', 3.4)
-        <music21.metadata.primitives.Text 3.4>
-        >>> metadata.Metadata._convertValue('title', '3.4')
-        <music21.metadata.primitives.Text 3.4>
-        >>> metadata.Metadata._convertValue('title', metadata.Text('3.4'))
-        <music21.metadata.primitives.Text 3.4>
+        >>> metadata.Metadata.convertValue('title', 'Density 21.5')
+        <music21.metadata.primitives.Text Density 21.5>
 
-        Converts certain named values to Copyright
+        Non-string values can often be converted automatically
 
-        >>> metadata.Metadata._convertValue('copyright', 'copyright str')
-        <music21.metadata.primitives.Copyright copyright str>
-        >>> metadata.Metadata._convertValue('copyright', metadata.Text('copyright text'))
-        <music21.metadata.primitives.Copyright copyright text>
-        >>> metadata.Metadata._convertValue('copyright', metadata.Copyright('copyright'))
-        <music21.metadata.primitives.Copyright copyright>
+        >>> metadata.Metadata.convertValue('title', 21.5)
+        <music21.metadata.primitives.Text 21.5>
 
-        Converts certain named values to Contributor
 
-        >>> metadata.Metadata._convertValue('composer', 'composer str')
-        <music21.metadata.primitives.Contributor composer:composer str>
-        >>> metadata.Metadata._convertValue('composer', metadata.Text('composer text'))
-        <music21.metadata.primitives.Contributor composer:composer text>
-        >>> metadata.Metadata._convertValue('composer',
-        ...     metadata.Contributor(role='random', name='Joe'))
-        <music21.metadata.primitives.Contributor random:Joe>
+        If it is already the appropriate type, no change is made
 
-        Converts certain named values to DateSingle
+        >>> md_text = metadata.Text('The Desert Music')
+        >>> metadata.Metadata.convertValue('title', md_text)
+        <music21.metadata.primitives.Text The Desert Music>
+        >>> metadata.Metadata.convertValue('title', md_text) is md_text
+        True
 
-        >>> metadata.Metadata._convertValue('dateCreated', '1938')
+        Converts copyright named values to Copyright:
+
+        >>> metadata.Metadata.convertValue('copyright', 'copyright-as-string')
+        <music21.metadata.primitives.Copyright copyright-as-string>
+        >>> metadata.Metadata.convertValue('copyright', metadata.Text('copyright-as-text'))
+        <music21.metadata.primitives.Copyright copyright-as-text>
+        >>> metadata.Metadata.convertValue('copyright', metadata.Copyright('2025 Ariadne Press'))
+        <music21.metadata.primitives.Copyright 2025 Ariadne Press>
+
+        Converts composer or other named values to Contributors:
+
+        >>> metadata.Metadata.convertValue('composer', 'Kayleigh Rose Amstutz')
+        <music21.metadata.primitives.Contributor composer:Kayleigh Rose Amstutz>
+        >>> metadata.Metadata.convertValue('librettist', metadata.Text('Da Ponte'))
+        <music21.metadata.primitives.Contributor librettist:Da Ponte>
+
+        Unusual roles need to be passed with "otherContributor" and role already defined.
+        (Essentially, make your own)
+
+        >>> metadata.Metadata.convertValue('otherContributor',
+        ...     metadata.Contributor(role='conceptual-artist', name='Robert Wilson'))
+        <music21.metadata.primitives.Contributor conceptual-artist:Robert Wilson>
+
+        Converts certain named values to DateSingle:
+
+        >>> metadata.Metadata.convertValue('dateCreated', '1938')
         <music21.metadata.primitives.DateSingle 1938/--/-->
-        >>> metadata.Metadata._convertValue('dateCreated', metadata.Text('1938'))
-        <music21.metadata.primitives.DateSingle 1938/--/-->
-        >>> metadata.Metadata._convertValue('dateCreated',
+        >>> metadata.Metadata.convertValue('dateCreated', metadata.Text('1938/02'))
+        <music21.metadata.primitives.DateSingle 1938/02/-->
+
+        Datetime objects, like this one for the Rite of Spring riot, also get converted.
+
+        >>> from datetime import datetime
+        >>> dt = datetime(1913, 5, 29)
+        >>> metadata.Metadata.convertValue('dateCreated', dt)
+        <music21.metadata.primitives.DateSingle 1913/05/29>
+
+        For DateBetween objects one must pass their own already created primitive
+        (so no need to use this)
+
+        >>> metadata.Metadata.convertValue('dateCreated',
         ...     metadata.DateBetween(['1938', '1939']))
         <music21.metadata.primitives.DateBetween 1938/--/-- to 1939/--/-->
         '''
@@ -2392,14 +2398,11 @@ class Metadata(base.Music21Object):
                 return value
 
             if isinstance(value, (str, datetime.datetime, Date)):
-                # noinspection PyBroadException
-                # pylint: disable=bare-except
                 try:
                     return DateSingle(value)
-                except:
+                except ValueError:
                     # Couldn't convert; just return a generic text.
                     return Text(str(originalValue))
-                # pylint: enable=bare-except
 
             raise exceptions21.MetadataException(
                 f'invalid type for DateSingle: {type(value).__name__}')
@@ -2415,13 +2418,11 @@ class Metadata(base.Music21Object):
                 f'invalid type for Contributor: {type(value).__name__}')
 
         if valueType is int:
-            # noinspection PyBroadException
             try:
                 return int(value)
-            except:
+            except ValueError as e:
                 raise exceptions21.MetadataException(
-                    f'invalid type for int: {type(value).__name__}')
-            # pylint: enable=bare-except
+                    f'invalid type for int: {type(value).__name__}') from e
 
         raise exceptions21.MetadataException('internal error: invalid valueType')
 
