@@ -49,7 +49,7 @@ so allocate time (2 min on M4).  Start working on the announcement while it's ru
 
 11. zip up documentation/build/html and get ready to upload/delete it (you can put on your
     desktop or wherever you like).
-    Rename to music21.v.9.5.0-docs.zip (skip for Alpha/Beta)
+    Rename to music21-9.5.0-docs.zip (skip for Alpha/Beta)
 
 12. From the music21 main folder (not subfolder) run "hatch build" --
     requires hatch to be installed "pip install hatch" -- brew version of hatch
