@@ -1760,8 +1760,13 @@ class Test(unittest.TestCase):
 
 # ------------------------------------------------------------------------------
 # define presented order in documentation
-_DOC_ORDER = [MetronomeMark, TempoText, MetricModulation, TempoIndication,
-              AccelerandoSpanner, RitardandoSpanner, TempoChangeSpanner,
+_DOC_ORDER = [MetronomeMark,
+              TempoText,
+              MetricModulation,
+              TempoIndication,
+              AccelerandoSpanner,
+              RitardandoSpanner,
+              TempoChangeSpanner,
               interpolateElements]
 
 

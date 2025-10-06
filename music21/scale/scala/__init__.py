@@ -61,6 +61,7 @@ import unittest
 
 
 from music21 import common
+from music21.common.types import DocOrder
 from music21 import environment
 from music21 import interval
 
@@ -734,7 +735,7 @@ Aristoxenos' Chromatic/Enharmonic, 3 + 9 + 18 parts
 
 # ------------------------------------------------------------------------------
 # define presented order in documentation
-_DOC_ORDER: list[type] = [ScalaData, ScalaFile, ScalaPitch, parse, search]
+_DOC_ORDER: DocOrder = [ScalaData, ScalaFile, ScalaPitch, parse, search]
 
 
 if __name__ == '__main__':

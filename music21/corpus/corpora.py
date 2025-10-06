@@ -811,15 +811,14 @@ class LocalCorpus(Corpus):
         Paths added in this way will not be persisted from session to session
         unless explicitly saved by a call to ``LocalCorpus.save()``.
         '''
-        from music21 import corpus
         if not isinstance(directoryPath, (str, pathlib.Path)):
-            raise corpus.CorpusException(
+            raise CorpusException(
                 f'an invalid file path has been provided: {directoryPath!r}')
 
         directoryPath = common.cleanpath(directoryPath, returnPathlib=True)
         if (not directoryPath.exists()
                 or not directoryPath.is_dir()):
-            raise corpus.CorpusException(
+            raise CorpusException(
                 f'an invalid file path has been provided: {directoryPath!r}')
         if self.name not in LocalCorpus._temporaryLocalPaths:
             LocalCorpus._temporaryLocalPaths[self.name] = set()

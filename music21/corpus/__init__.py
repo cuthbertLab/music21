@@ -42,6 +42,7 @@ from collections.abc import Iterable
 import typing as t
 
 from music21 import common
+from music21.exceptions21 import CorpusException
 from music21 import metadata
 
 from music21.corpus import chorales
@@ -49,11 +50,11 @@ from music21.corpus import corpora
 from music21.corpus import manager
 from music21.corpus import virtual
 from music21.corpus import work
-
 from music21.corpus.manager import search
 from music21 import environment
 
 __all__ = [
+    'CorpusException',
     'addPath',
     'cacheMetadata',
     'chorales',
@@ -68,6 +69,7 @@ __all__ = [
     'noCorpus',
     'parse',
     # virtual
+    'search',
     'work',
 ]
 

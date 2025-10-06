@@ -141,7 +141,6 @@ __all__ = [
     'properties',
 ]
 
-from collections import namedtuple
 from collections.abc import Iterable
 import datetime
 import pathlib
@@ -151,6 +150,7 @@ from typing import overload
 
 from music21 import base
 from music21 import common
+from music21.common.types import DocOrder, OffsetQL
 from music21 import defaults
 from music21 import environment
 from music21 import exceptions21
@@ -175,6 +175,13 @@ from music21.metadata.primitives import (
 )
 from music21.metadata import properties
 from music21.metadata.properties import PropertyDescription
+
+
+if t.TYPE_CHECKING:
+    from music21 import key
+    from music21 import meter
+    from music21 import tempo
+
 
 # -----------------------------------------------------------------------------
 environLocal = environment.Environment('metadata')
@@ -2474,8 +2481,14 @@ class RichMetadata(Metadata):
 
     >>> richMetadata.additionalRichMetadataAttributes
     ('ambitus', 'keySignatureFirst', 'keySignatures', 'noteCount', 'numberOfParts',
-     'pitchHighest', 'pitchLowest', 'quarterLength', 'sourcePath', 'tempoFirst',
+     'pitchHighest', 'pitchLowest', 'scoreQuarterLength', 'sourcePath', 'tempoFirst',
      'tempos', 'timeSignatureFirst', 'timeSignatures')
+
+    Changed in v10: renamed `quarterLength` to `scoreQuarterLength`.
+       Because RichMetadata is a Music21Object, `quarterLength` is a property that must
+       return the length of the RichMetadata object itself and should not have been
+       ovewritten
+
     '''
 
     # CLASS VARIABLES #
@@ -2489,7 +2502,7 @@ class RichMetadata(Metadata):
         'numberOfParts',
         'pitchHighest',
         'pitchLowest',
-        'quarterLength',
+        'scoreQuarterLength',
         'sourcePath',
         'tempoFirst',
         'tempos',
@@ -2502,18 +2515,18 @@ class RichMetadata(Metadata):
     def __init__(self, **keywords) -> None:
         super().__init__(**keywords)
         self.ambitus: AmbitusShort|None = None
-        self.keySignatureFirst = None
-        self.keySignatures = []
-        self.noteCount = None
+        self.keySignatureFirst: key.KeySignature|None = None
+        self.keySignatures: list[key.KeySignature] = []
+        self.noteCount: int|None = None
         self.numberOfParts = None
         self.pitchHighest: str|None = None
         self.pitchLowest: str|None = None
-        self.quarterLength = None
+        self.scoreQuarterLength: OffsetQL = 0.0
         self.sourcePath = ''
-        self.tempoFirst = None
-        self.tempos = []
-        self.timeSignatureFirst = None
-        self.timeSignatures = []
+        self.tempoFirst: tempo.TempoIndication|None = None
+        self.tempos: list[tempo.TempoIndication] = []
+        self.timeSignatureFirst: meter.TimeSignature|None = None
+        self.timeSignatures: list[meter.TimeSignature] = []
 
     def _getPluralAttribute(self, attributeName) -> tuple[str, ...]:
         # we have to implement this to add the RichMetadata attributes, since
@@ -2657,7 +2670,7 @@ class RichMetadata(Metadata):
             self.tempoFirst = self.tempos[0]
 
         self.noteCount = len(flat.notesAndRests)
-        self.quarterLength = flat.highestTime
+        self.scoreQuarterLength = flat.highestTime
 
         # commenting out temporarily due to memory error
         # with corpus/beethoven/opus132.xml
@@ -2805,7 +2818,7 @@ class RichMetadata(Metadata):
 
 # -----------------------------------------------------------------------------
 # tests are in test/test_metadata
-_DOC_ORDER: list[type] = [Metadata, RichMetadata, AmbitusShort]
+_DOC_ORDER: DocOrder = [Metadata, RichMetadata, AmbitusShort]
 
 
 if __name__ == '__main__':
