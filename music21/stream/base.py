@@ -4701,6 +4701,8 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
                  fillWithRests=True,
                  removeClasses=None,
                  retainVoices=True,
+                 removeAll=False,
+                 exemptFromRemove=frozenset(),
                  ):
         '''
         Return a new Stream based on this one, but without the notes and other elements
@@ -4772,10 +4774,12 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         {5.0} <music21.stream.Measure 2 offset=5.0>
         ...
 
-        Setting removeClasses to True removes everything that is not a Stream:
+        Setting removeAll to True removes everything that is not a Stream:
+        (this was removeClasses=True; in v9.9 both removeClasses=True or removeAll=True
+        is allowed; in v10 only removeAll=True will be allowed).
 
         >>> bass = b.parts[3]
-        >>> bassEmpty = bass.template(fillWithRests=False, removeClasses=True)
+        >>> bassEmpty = bass.template(fillWithRests=False, removeAll=True)
         >>> bassEmpty.show('text')
         {0.0} <music21.stream.Measure 0 offset=0.0>
         <BLANKLINE>
@@ -4789,7 +4793,19 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         <BLANKLINE>
         ...
 
-        On the whole score:
+        `exemptFromRemove` should be a set of classes (or class strings) that
+        are exempted from removal by removeAll or removeClasses
+
+        >>> bass = b.parts[3]
+        >>> bassEmpty = bass.template(fillWithRests=False, removeAll=True,
+        ...                           exemptFromRemove={meter.TimeSignature})
+        >>> bassEmpty[meter.TimeSignature].first()
+        <music21.meter.TimeSignature 4/4>
+        >>> print(bassEmpty[clef.Clef].first())
+        None
+
+        Here is an example of exerpts of what calling template() with
+        default values on the whole score looks like.
 
         >>> b.template().show('text')
         {0.0} <music21.metadata.Metadata object at 0x106151940>
@@ -4857,17 +4873,21 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         on bwv66.6)
 
         * Changed in v7: all arguments are keyword only.
+        * New in v9.9: added exemptFromRemove
+        * Note: in v10
         '''
         out = self.cloneEmpty(derivationMethod='template')
         if removeClasses is None:
             removeClasses = {'GeneralNote', 'Dynamic', 'Expression'}
+        elif removeClasses is True:
+            removeClasses = set()
+            removeAll = True
         elif common.isIterable(removeClasses):
             removeClasses = set(removeClasses)
 
         restInfo = {'offset': None, 'endTime': None}
 
         def optionalAddRest():
-            # six.PY3  nonlocal currentRest  would remove the need for restInfo struct
             if not fillWithRests:
                 return
             if restInfo['offset'] is None:
@@ -4881,21 +4901,38 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
 
         for el in self:
             elOffset = self.elementOffset(el, returnSpecial=True)
+
+            # retain all streams (exception: Voices if retainVoices  is False
             if el.isStream and (retainVoices or ('Voice' not in el.classes)):
                 optionalAddRest()
                 outEl = el.template(fillWithRests=fillWithRests,
                                     removeClasses=removeClasses,
-                                    retainVoices=retainVoices)
+                                    retainVoices=retainVoices,
+                                    removeAll=removeAll,
+                                    exemptFromRemove=exemptFromRemove)
                 if elOffset != OffsetSpecial.AT_END:
                     out.coreInsert(elOffset, outEl)
                 else:  # pragma: no cover
                     # should not have streams stored at end.
                     out.coreStoreAtEnd(outEl)
+                continue
 
-            elif (removeClasses is True
-                    or el.classSet.intersection(removeClasses)
-                    or (not retainVoices and 'Voice' in el.classes)):
-                # remove this element
+            # okay now determine if we will be skipping or keeping this element
+            skip_element = False
+            if removeAll is True:
+                # with this setting we remove everything by default
+                skip_element = True
+            elif el.classSet.intersection(removeClasses):
+                skip_element = True
+            elif not retainVoices and 'Voice' in el.classSet:
+                skip_element = True
+
+            if exemptFromRemove and el.classSet.intersection(exemptFromRemove):
+                skip_element = False
+
+            if skip_element:
+                # we are removing this element, but if fillWithRests we need to keep track of
+                # the rest we will eventually fill.
                 if fillWithRests and el.duration.quarterLength:
                     endTime = elOffset + el.duration.quarterLength
                     if restInfo['offset'] is None:

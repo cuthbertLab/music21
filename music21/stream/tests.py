@@ -8408,10 +8408,29 @@ class Test(unittest.TestCase):
     def testTemplateAll(self):
         b = corpus.parse('bwv66.6')
         bass = b.parts[3]
-        bassEmpty = bass.template(fillWithRests=False, removeClasses=True)
+        bassEmpty = bass.template(fillWithRests=False, removeAll=True)
         for x in bassEmpty:
             if isinstance(x, Measure):
                 self.assertEqual(len(x), 0)
+            else:
+                self.fail('remove all was supposed to remove all!')
+
+        bassEmpty2 = bass.template(fillWithRests=True,
+                                   removeAll=True,
+                                   exemptFromRemove={meter.TimeSignature})
+        foundTimeSignature = False
+        foundRest = False
+        for x in bassEmpty2.flatten(retainContainers=True):
+            self.assertIsInstance(x, (Measure, note.Rest, meter.TimeSignature))
+            if isinstance(x, meter.TimeSignature):
+                foundTimeSignature = True
+            elif isinstance(x, note.Rest):
+                foundRest = True
+
+        self.assertTrue(foundTimeSignature, 'No TimeSignature was found even though exempted')
+        self.assertTrue(foundRest, 'No Rest found even though fillWithRest=True')
+
+
 
     def testSetElements(self):
         s = Stream()
