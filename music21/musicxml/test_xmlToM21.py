@@ -1679,7 +1679,7 @@ class Test(unittest.TestCase):
         self.assertTrue(s[layout.StaffGroup])
         sg = s[layout.StaffGroup].first()
 
-        for p_num in 0,1:
+        for p_num in (0, 1):
             p = s.parts[p_num]
             self.assertIn(p, sg)
             self.assertEqual(len(p[note.Note]), 3)
@@ -1715,6 +1715,7 @@ class Test(unittest.TestCase):
             p_expanded = repeat.Expander[stream.Part](p).process()
             p_notes2 = [n.name for n in p_expanded[note.Note]]
             self.assertEqual(p_notes2, ['G', 'A', 'G', 'B'])
+
 
 if __name__ == '__main__':
     import music21
