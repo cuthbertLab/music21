@@ -154,8 +154,8 @@ ydelta_       Not needed
 from __future__ import annotations
 
 __all__ = [
-    'spineParser',
     'instruments',
+    'spineParser',
     'testFiles',
 ]
 

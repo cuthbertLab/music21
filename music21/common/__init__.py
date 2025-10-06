@@ -34,12 +34,11 @@ __all__ = [
     'objects',
     'pathTools',
     'parallel',
+    'stringTools',
     'types',
     'weakrefTools',
 ]
 
-from music21 import defaults
-from music21 import exceptions21
 from music21.common.classTools import *  # including isNum, isListLike
 from music21.common.decorators import *  # gives the deprecated decorator
 from music21.common.enums import *

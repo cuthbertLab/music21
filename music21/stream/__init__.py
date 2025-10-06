@@ -13,10 +13,24 @@
 # -----------------------------------------------------------------------------
 from __future__ import annotations
 
-from music21.exceptions21 import StreamException, ImmutableStreamException
+from music21.exceptions21 import (
+    ImmutableStreamException,
+    StreamException,
+)
+
+from music21.stream import base
 from music21.stream.base import (
-    Stream, Opus, Score, Part, PartStaff, Measure, Voice,
-    SpannerStorage, VariantStorage, System, StreamType
+    Measure,
+    Opus,
+    Part,
+    PartStaff,
+    Score,
+    SpannerStorage,
+    Stream,
+    StreamType,
+    System,
+    VariantStorage,
+    Voice,
 )
 from music21.stream import core
 from music21.stream import enums
@@ -27,17 +41,20 @@ from music21.stream import streamStatus
 from music21.stream import tools
 
 __all__ = [
-    'Stream',
+    'ImmutableStreamException',
+    'Measure',
     'Opus',
-    'Score',
     'Part',
     'PartStaff',
-    'Measure',
-    'Voice',
+    'Score',
     'SpannerStorage',
-    'VariantStorage',
-    'System',
+    'Stream',
+    'StreamException',
     'StreamType',
+    'System',
+    'VariantStorage',
+    'Voice',
+    'base',
     'core',
     'enums',
     'filters',
@@ -45,7 +62,4 @@ __all__ = [
     'makeNotation',
     'streamStatus',
     'tools',
-    'StreamException',
-    'ImmutableStreamException',
 ]
-

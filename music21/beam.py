@@ -219,10 +219,10 @@ class Beams(prebase.ProtoM21Object, EqualSlottedObjectMixin):
 
     # INITIALIZER #
 
-    def __init__(self):
+    def __init__(self) -> None:
         # no need for super() call w/ ProtoM21 and EqualSlottedObject
-        self.beamsList = []
-        self.feathered = False
+        self.beamsList: list[Beam] = []
+        self.feathered: bool = False
 
         # this should not be called .id.
         self.id = id(self)

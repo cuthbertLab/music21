@@ -19,21 +19,26 @@ and more accurate using FFT convolve.
 from __future__ import annotations
 
 __all__ = [
-    'transcriber', 'recording', 'scoreFollower',
-    'histogram', 'autocorrelationFunction',
-    'prepareThresholds', 'interpolation',
-    'normalizeInputFrequency', 'pitchFrequenciesToObjects',
-    'getFrequenciesFromMicrophone',
-    'getFrequenciesFromAudioFile',
-    'getFrequenciesFromPartialAudioFile',
+    'AudioSearchException',
+    'autocorrelationFunction',
+    'decisionProcess',
     'detectPitchFrequencies',
-    'smoothFrequencies',
+    'getFrequenciesFromAudioFile',
+    'getFrequenciesFromMicrophone',
+    'getFrequenciesFromPartialAudioFile',
+    'histogram',
+    'interpolation',
     'joinConsecutiveIdenticalPitches',
+    'normalizeInputFrequency',
+    'notesAndDurationsToStream',
+    'pitchFrequenciesToObjects',
+    'prepareThresholds',
     'quantizeDuration',
     'quarterLengthEstimation',
-    'notesAndDurationsToStream',
-    'decisionProcess',
-    'AudioSearchException',
+    'recording',
+    'scoreFollower',
+    'smoothFrequencies',
+    'transcriber',
 ]
 
 import copy

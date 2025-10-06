@@ -23,13 +23,12 @@ __all__ = [
     'analysis',
     'core',
     'fromStream',
+    'makeExampleScore',
     'node',
     'spans',
     'toStream',
     'trees',
     'verticality',
-
-    'makeExampleScore',
 ]
 
 # import unittest

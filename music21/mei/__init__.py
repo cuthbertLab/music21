@@ -22,8 +22,14 @@ refer to the :mod:`~music21.mei.base` module's documentation.
 '''
 from __future__ import annotations
 
+__all__ = [
+    'MeiToM21Converter',
+    'base',
+]
+
 # NOTE: To keep the 'mei' namespace relatively clean-we should only put here those classes
 #       and functions that will be used regularly by other parts of music21, which is probably just
 #       the MeiToM21Converter used by the MEI-specific SubConverter class. Everything else belongs
 #       in its 'music21.mei.base.*' module, or similar.
+from music21.mei import base
 from music21.mei.base import MeiToM21Converter

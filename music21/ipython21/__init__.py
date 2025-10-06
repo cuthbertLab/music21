@@ -21,8 +21,13 @@ now just calls matplotlib inline)
 '''
 from __future__ import annotations
 
-__all__ = ['converters', 'ipExtension', 'objects',
-           'loadNoMagic', 'load_ipython_extension']
+__all__ = [
+    'converters',
+    'ipExtension',
+    'objects',
+    'load_ipython_extension',
+    'loadNoMagic',
+]
 
 from music21 import common
 
