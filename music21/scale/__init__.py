@@ -61,7 +61,6 @@ __all__ = [
     'RagMarwa', 'WeightedHexatonicBlues',
 ]
 import copy
-import typing as t
 
 from music21.scale import intervalNetwork
 from music21.scale.intervalNetwork import Direction, Terminus
@@ -69,7 +68,6 @@ from music21.scale import scala
 # -------------------------
 from music21 import base
 from music21 import common
-from music21.common.decorators import deprecated
 from music21 import defaults
 from music21 import environment
 from music21 import exceptions21
@@ -2046,33 +2044,6 @@ class ConcreteScale(Scale):
                 return syllableDict[scaleDeg][accidental.alter]
         else:
             return syllableDict[scaleDeg][0]
-
-    # no type checking as a deprecated call that shadows superclass.
-    @t.no_type_check
-    @deprecated('v9', 'v10', 'use nextPitch instead')
-    def next(
-        self,
-        pitchOrigin=None,
-        direction: 'music21.scale.intervalNetwork.Direction'|int = Direction.ASCENDING,
-        stepSize=1,
-        getNeighbor: 'music21.scale.intervalNetwork.Direction'|bool = True,
-    ):  # pragma: no cover
-        '''
-        See :meth:`~music21.scale.ConcreteScale.nextPitch`.  This function
-        is a deprecated alias for that method.
-
-        This routine was named and created before music21 aspired to have
-        full subclass substitution.  Thus, is shadows the `.next()` function of
-        Music21Object without performing similar functionality.
-
-        The routine is formally deprecated in v9 and will be removed in v10.
-        '''
-        return self.nextPitch(
-            pitchOrigin=pitchOrigin,
-            direction=direction,
-            stepSize=stepSize,
-            getNeighbor=getNeighbor
-        )
 
     def nextPitch(
         self,

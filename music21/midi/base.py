@@ -23,17 +23,21 @@ groups.google.com/g/alt.sources/msg/0c5fc523e050c35e
 from __future__ import annotations
 
 __all__ = [
-    'MidiEvent', 'MidiFile', 'MidiTrack', 'MidiException',
+    'ChannelModeMessages',
+    'ChannelVoiceMessages',
     'DeltaTime',
-    'MetaEvents', 'ChannelVoiceMessages', 'ChannelModeMessages',
-    'SysExEvents',
-    'charToBinary',
-    'getNumber', 'getVariableLengthNumber', 'putNumber', 'putVariableLengthNumber',
-    'getNumbersAsList', 'putNumbersAsList',
-    'intsToHexBytes',
-    # add enums:
-    'ChannelVoiceMessages', 'ChannelModeMessages', 'SysExEvents',
     'METAEVENT_MARKER',
+    'MetaEvents',
+    'MidiEvent',
+    'MidiException',
+    'MidiFile',
+    'MidiTrack',
+    'SysExEvents',
+    'getNumber',
+    'getVariableLengthNumber',
+    'putNumber',
+    'putNumbersAsList',
+    'putVariableLengthNumber',
 ]
 
 from collections.abc import Iterable
@@ -41,7 +45,6 @@ import unicodedata
 from typing import overload
 import typing as t
 
-from music21 import common
 from music21.common.enums import ContainsEnum
 from music21 import defaults
 from music21 import environment
@@ -57,47 +60,6 @@ class MidiException(exceptions21.Music21Exception):
     pass
 
 # ------------------------------------------------------------------------------
-@common.deprecated('v9.7', 'v10', 'use bin(ord(char)) instead.')
-def charToBinary(char: str):
-    '''
-    DEPRECATED: just use bin(ord(char)) instead.
-
-    Or for the exact prior output (with left-padding)
-    use `f'{int(bin(ord(char))[2:]):08d}'`
-
-
-    Convert a char into its binary representation. Useful for debugging.
-
-    >>> #_DOCS_SHOW midi.charToBinary('a')
-    >>> f'{int(bin(ord("a"))[2:]):08d}'  #_DOCS_HIDE
-    '01100001'
-
-    Note: This function is deprecated and will be removed in v10.  Music21 actually
-    predates the bin() function in Python (added in Python 2.6).
-    '''
-    binary = bin(ord(char))[2:]
-    zeroFix = (8 - len(binary)) * '0'
-    return zeroFix + binary
-
-@common.deprecated('v9.7', 'v10', 'Just use bytes(...) instead')
-def intsToHexBytes(intList: Iterable[int]) -> bytes:
-    r'''
-    (Deprecated: just use bytes(...) instead)
-
-    Convert a list of integers into hex bytes, suitable for testing MIDI encoding.
-
-    Here we take NOTE_ON message, Middle C, 120 velocity and translate it to bytes
-
-    >>> #_DOCS_SHOW midi.intsToHexBytes([0x90, 60, 120])
-    >>> bytes([0x90, 60, 120])  #_DOCS_HIDE
-    b'\x90<x'
-
-    Note: This function is deprecated and will be removed in v10.  This
-    function has not been needed since music21 became Python 3-only in v.5.
-    '''
-    return bytes(intList)
-
-
 @overload
 def getNumber(midiStr: int, length: int) -> tuple[int, int]:
     ...
@@ -236,34 +198,6 @@ def getVariableLengthNumber(midiBytes: bytes) -> tuple[int, bytes]:
             # environLocal.printDebug([f' getVariableLengthNumber: depth read into string: {i}'])
             return summation, midiBytes[i:]
     raise MidiException('did not find the end of the number!')
-
-
-@common.deprecated('v9.7', 'v10', 'use list(midiBytes) instead')
-def getNumbersAsList(midiBytes: bytes|Iterable[int]) -> list[int]:
-    r'''
-    **Deprecated**: this method existed in Python 2.6 and for Python 2 (no bytes)
-    compatibility.  Now use `list(midiBytes)` instead.
-
-    Translate each char into a number, return in a list.
-    Used for reading data messages where each byte encodes
-    a different discrete value.
-
-    >>> #_DOCS_SHOW midi.getNumbersAsList(b'\x00\x00\x00\x03')
-    >>> list(b'\x00\x00\x00\x03') #_DOCS_HIDE
-    [0, 0, 0, 3]
-
-    Now just do:
-
-    >>> list(b'\x00\x00\x00\x03')
-    [0, 0, 0, 3]
-    '''
-    post = []
-    for midiByte in midiBytes:
-        if isinstance(midiByte, str):
-            post.append(ord(midiByte))
-        else:
-            post.append(midiByte)
-    return post
 
 
 def putNumber(num: int, length: int) -> bytes:
