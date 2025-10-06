@@ -1720,16 +1720,16 @@ class Test(unittest.TestCase):
                 # print(chords[i].pitches, len(chords[i].pitches))
                 self.assertEqual(knownSize[i], len(chords[i].pitches))
 
-    def testConversionMXBeams(self):
+    def testConversionMXBeams(self) -> None:
         from music21 import beam
         from music21 import note
         from music21.musicxml import testPrimitive
 
         mxString = testPrimitive.beams01
-        a = parse(mxString)
+        a = t.cast(stream.Score, parse(mxString))
         part = a.parts[0]
         notes = part.recurse().notesAndRests
-        theseBeams: list[beam.Beams] = []
+        theseBeams: list[beam.Beam] = []
         for n in notes:
             if isinstance(n, note.Note):
                 theseBeams += n.beams.beamsList

@@ -2905,36 +2905,37 @@ class Duration(prebase.ProtoM21Object, SlottedObjectMixin):
 
         >>> for thisUnit in a.components:
         ...    print(thisUnit.quarterLength, thisUnit.type, thisUnit.dots)
-
+        3.5 half 2
 
         A duration of 2.5 quarter notes has to be represented as more than one
         component.
 
+        >>> b = duration.Duration()
         >>> b.quarterLength = 2.5
         >>> b.quarterLength
         2.5
 
         >>> for thisUnit in b.components:
         ...    print(thisUnit.quarterLength, thisUnit.type, thisUnit.dots)
-        (2.0, 'half', 0, None, None, None)
-        (0.5, 'eighth', 0, None, None, None)
+        2.0 half 0
+        0.5 eighth 0
 
         Note that integer values of quarter lengths get
         silently converted to floats (internally opFracs):
 
-        >>> b = duration.Duration()
-        >>> b.quarterLength = 5
-        >>> b.quarterLength
+        >>> c = duration.Duration()
+        >>> c.quarterLength = 5
+        >>> c.quarterLength
         5.0
-        >>> b.type  # complex because 5qL cannot be expressed as a single note.
+        >>> c.type  # complex because 5 quarters cannot be expressed as a single note.
         'complex'
 
         Float values will be converted to fractions if they are inexpressible exactly
         as floats:
 
-        >>> b = duration.Duration()
-        >>> b.quarterLength = 1/3
-        >>> b.quarterLength
+        >>> d = duration.Duration()
+        >>> d.quarterLength = 1/3
+        >>> d.quarterLength
         Fraction(1, 3)
         ''')
 
