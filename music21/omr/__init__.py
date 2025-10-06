@@ -11,7 +11,10 @@
 # ------------------------------------------------------------------------------
 from __future__ import annotations
 
-__all__ = ['correctors', 'evaluators']
+__all__ = [
+    'correctors',
+    'evaluators',
+]
 
 from music21.omr import correctors
 from music21.omr import evaluators

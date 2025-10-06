@@ -15,15 +15,23 @@ as well as other methods, functions, and objects related to chords.
 '''
 from __future__ import annotations
 
-__all__ = ['tools', 'tables', 'Chord', 'ChordException', 'fromIntervalVector', 'fromForteClass']
+__all__ = [
+    'Chord',
+    'ChordBase',
+    'ChordException',
+    'fromForteClass',
+    'fromIntervalVector',
+    'tables',
+    'tools',
+]
 
 from collections.abc import Iterable, Sequence
 import copy
 import typing as t
-from typing import overload  # pycharm bug
+# pycharm bug - need to import overload separately. typing.overload doesn't work
+from typing import overload
 import unittest
 
-from music21 import beam
 from music21 import common
 from music21.common.decorators import cacheMethod
 from music21 import derivation
@@ -42,7 +50,6 @@ from music21.chord import tools
 
 if t.TYPE_CHECKING:
     from music21 import stream
-    from music21.style import Style
 
 environLocal = environment.Environment('chord')
 
@@ -468,7 +475,7 @@ class ChordBase(note.NotRest):
 
 
     @volume.setter
-    def volume(self, expr: None|'music21.volume.Volume'|int|float):
+    def volume(self, expr: 'None|music21.volume.Volume|int|float'):
         # Do NOT change typing to volume.Volume  w/o quotes because it will take the property as
         # its name and be really confused.
         if isinstance(expr, volume.Volume):
@@ -4072,8 +4079,7 @@ class Chord(ChordBase):
             c2 = self
 
         if t.TYPE_CHECKING:
-            from music21.stream import Stream
-            assert isinstance(c2, Stream)
+            assert isinstance(c2, stream.Stream)
         # startOctave = c2.bass().octave
         remainingPitches = copy.copy(c2.pitches)  # no deepcopy needed
 
@@ -6134,8 +6140,7 @@ class Test(unittest.TestCase):
         testCopyAll(self, globals())
 
 
-
-_DOC_ORDER = [Chord]
+_DOC_ORDER = [Chord, ChordBase, fromForteClass, fromIntervalVector]
 
 
 if __name__ == '__main__':

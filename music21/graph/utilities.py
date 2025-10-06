@@ -30,7 +30,7 @@ environLocal = environment.Environment('graph.utilities')
 
 
 ExtendedModules = namedtuple('ExtendedModules',
-                             ['matplotlib', 'Axes3D', 'collections', 'patches', 'plt', 'networkx'])
+                             ['matplotlib', 'Axes3D', 'collections', 'patches', 'plt'])
 
 
 def getExtendedModules():
@@ -38,7 +38,7 @@ def getExtendedModules():
     this is done inside a function, so that the slow import of matplotlib is not done
     in ``from music21 import *`` unless it's actually needed.
 
-    Returns a namedtuple: (matplotlib, Axes3D, collections, patches, plt, networkx)
+    Returns a namedtuple: (matplotlib, Axes3D, collections, patches, plt)
     '''
     if 'matplotlib' in _missingImport:
         raise GraphException(
@@ -62,13 +62,7 @@ def getExtendedModules():
     # from matplotlib.colors import colorConverter
     import matplotlib.pyplot as plt  # type: ignore
 
-    try:
-        # noinspection PyPackageRequirements
-        import networkx  # type: ignore
-    except ImportError:  # pragma: no cover
-        networkx = None  # use for testing
-
-    return ExtendedModules(matplotlib, Axes3D, collections, patches, plt, networkx)
+    return ExtendedModules(matplotlib, Axes3D, collections, patches, plt)
 
 # ------------------------------------------------------------------------------
 

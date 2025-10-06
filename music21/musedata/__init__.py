@@ -27,6 +27,21 @@ Low level MuseData conversion is facilitated by the objects in this module and
 '''
 from __future__ import annotations
 
+__all__ = [
+    'MuseDataDirectory',
+    'MuseDataException',
+    'MuseDataFile',
+    'MuseDataMeasure',
+    'MuseDataMeasureIterator',
+    'MuseDataPart',
+    'MuseDataRecord',
+    'MuseDataRecordIterator',
+    'MuseDataWork',
+    'base12_26',
+    'base40',
+    'translate',
+]
+
 from collections.abc import Iterable
 import os
 import typing as t

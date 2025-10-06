@@ -131,12 +131,16 @@ the string.  See metadata/primitives.py for more information.
 from __future__ import annotations
 
 __all__ = [
+    'AmbitusShort',
     'Metadata',
     'RichMetadata',
-    'AmbitusShort',
+
+    'bundles',
+    'caching',
+    'primitives',
+    'properties',
 ]
 
-from collections import namedtuple
 from collections.abc import Iterable
 import datetime
 import pathlib
@@ -146,25 +150,53 @@ from typing import overload
 
 from music21 import base
 from music21 import common
+from music21.common.types import DocOrder, OffsetQL
 from music21 import defaults
 from music21 import environment
 from music21 import exceptions21
 from music21 import interval
 
-from music21.metadata import properties
-from music21.metadata.properties import PropertyDescription
 from music21.metadata import bundles
 from music21.metadata import caching
 from music21.metadata import primitives
-from music21.metadata.primitives import (Date, DatePrimitive,
-                                         DateSingle, DateRelative, DateBetween,
-                                         DateSelection, Text, Contributor, Creator,
-                                         Imprint, Copyright, ValueType)
+from music21.metadata.primitives import (
+    Contributor,
+    Copyright,
+    Creator,
+    Date,
+    DateBetween,
+    DatePrimitive,
+    DateRelative,
+    DateSelection,
+    DateSingle,
+    Imprint,
+    Text,
+    ValueType,
+)
+from music21.metadata import properties
+from music21.metadata.properties import PropertyDescription
+
+
+if t.TYPE_CHECKING:
+    from music21 import key
+    from music21 import meter
+    from music21 import tempo
+
+
 # -----------------------------------------------------------------------------
 environLocal = environment.Environment('metadata')
 
-AmbitusShort = namedtuple('AmbitusShort',
-                          ['semitones', 'diatonic', 'pitchLowest', 'pitchHighest'])
+class AmbitusShort(t.NamedTuple):
+    '''
+    A namedtuple representing the ambitus (range) using ints and strings
+
+    >>> metadata.AmbitusShort(7, 'P5', 'B3', 'F#4')
+    AmbitusShort(semitones=7, diatonic='P5', pitchLowest='B3', pitchHighest='F#4')
+    '''
+    semitones: int
+    diatonic: str
+    pitchLowest: str
+    pitchHighest: str
 
 # -----------------------------------------------------------------------------
 
@@ -2449,8 +2481,14 @@ class RichMetadata(Metadata):
 
     >>> richMetadata.additionalRichMetadataAttributes
     ('ambitus', 'keySignatureFirst', 'keySignatures', 'noteCount', 'numberOfParts',
-     'pitchHighest', 'pitchLowest', 'quarterLength', 'sourcePath', 'tempoFirst',
+     'pitchHighest', 'pitchLowest', 'scoreQuarterLength', 'sourcePath', 'tempoFirst',
      'tempos', 'timeSignatureFirst', 'timeSignatures')
+
+    Changed in v10: renamed `quarterLength` to `scoreQuarterLength`.
+       Because RichMetadata is a Music21Object, `quarterLength` is a property that must
+       return the length of the RichMetadata object itself and should not have been
+       ovewritten
+
     '''
 
     # CLASS VARIABLES #
@@ -2464,7 +2502,7 @@ class RichMetadata(Metadata):
         'numberOfParts',
         'pitchHighest',
         'pitchLowest',
-        'quarterLength',
+        'scoreQuarterLength',
         'sourcePath',
         'tempoFirst',
         'tempos',
@@ -2474,21 +2512,21 @@ class RichMetadata(Metadata):
 
     # INITIALIZER #
 
-    def __init__(self, **keywords):
+    def __init__(self, **keywords) -> None:
         super().__init__(**keywords)
-        self.ambitus = None
-        self.keySignatureFirst = None
-        self.keySignatures = []
-        self.noteCount = None
+        self.ambitus: AmbitusShort|None = None
+        self.keySignatureFirst: key.KeySignature|None = None
+        self.keySignatures: list[key.KeySignature] = []
+        self.noteCount: int|None = None
         self.numberOfParts = None
-        self.pitchHighest = None
-        self.pitchLowest = None
-        self.quarterLength = None
+        self.pitchHighest: str|None = None
+        self.pitchLowest: str|None = None
+        self.scoreQuarterLength: OffsetQL = 0.0
         self.sourcePath = ''
-        self.tempoFirst = None
-        self.tempos = []
-        self.timeSignatureFirst = None
-        self.timeSignatures = []
+        self.tempoFirst: tempo.TempoIndication|None = None
+        self.tempos: list[tempo.TempoIndication] = []
+        self.timeSignatureFirst: meter.TimeSignature|None = None
+        self.timeSignatures: list[meter.TimeSignature] = []
 
     def _getPluralAttribute(self, attributeName) -> tuple[str, ...]:
         # we have to implement this to add the RichMetadata attributes, since
@@ -2631,26 +2669,8 @@ class RichMetadata(Metadata):
         if self.tempos:
             self.tempoFirst = self.tempos[0]
 
-        # for element in flat:
-        #    pitches = ()
-        #    if isinstance(element, note.Note):
-        #        pitches = (element.pitch,)
-        #    elif isinstance(element, chord.Chord):
-        #        pitches = element.pitches
-        #    for pitch in pitches:
-        #        if self.pitchHighest is None:
-        #            self.pitchHighest = pitch
-        #        if self.pitchLowest is None:
-        #            self.pitchLowest = pitch
-        #        if pitch.ps < self.pitchLowest.ps:
-        #            self.pitchLowest = pitch
-        #        elif self.pitchHighest.ps < pitch.ps:
-        #            self.pitchHighest = pitch
-        # self.pitchLowest = str(self.pitchLowest)
-        # self.pitchHighest = str(self.pitchHighest)
-
         self.noteCount = len(flat.notesAndRests)
-        self.quarterLength = flat.highestTime
+        self.scoreQuarterLength = flat.highestTime
 
         # commenting out temporarily due to memory error
         # with corpus/beethoven/opus132.xml
@@ -2798,7 +2818,7 @@ class RichMetadata(Metadata):
 
 # -----------------------------------------------------------------------------
 # tests are in test/test_metadata
-_DOC_ORDER: list[type] = []
+_DOC_ORDER: DocOrder = [Metadata, RichMetadata, AmbitusShort]
 
 
 if __name__ == '__main__':

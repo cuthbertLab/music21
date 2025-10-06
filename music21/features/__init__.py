@@ -10,7 +10,12 @@
 # ------------------------------------------------------------------------------
 from __future__ import annotations
 
-__all__ = ['base', 'outputFormats', 'jSymbolic', 'native']
+__all__ = [
+    'base',
+    'jSymbolic',
+    'native',
+    'outputFormats',
+]
 
 from music21.features.base import *
 
