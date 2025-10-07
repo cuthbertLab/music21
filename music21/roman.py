@@ -115,12 +115,13 @@ figureShorthands = {
     'b7b53': 'ø7',
 }
 
-figureShorthandsMode: dict[str, dict] = {
-    'major': {
-    },
-    'minor': {
-    }
-}
+# not currently used
+# figureShorthandsMode: dict[str, dict] = {
+#     'major': {
+#     },
+#     'minor': {
+#     }
+# }
 
 
 # this is sort of a crock :-)  but it's very helpful.
@@ -324,7 +325,7 @@ def _postFigureFromChordAndKey(chordObj: chord.Chord, keyObj: key.Key) -> str:
     chordFigureTuples = figureTuples(chordObj, keyObj)
     bassFigureAlter = chordFigureTuples[0].alter
 
-    allFigureStringList = []
+    allFigureStringList: list[str] = []
 
     third = chordObj.third
     fifth = chordObj.fifth
@@ -375,12 +376,13 @@ def _postFigureFromChordAndKey(chordObj: chord.Chord, keyObj: key.Key) -> str:
                 allFigureStringList.append(figureString)
 
     allFigureString = ''.join(allFigureStringList)
-    key_mode = keyObj.mode
 
-    # first is not currently used.
-    if key_mode in figureShorthandsMode and allFigureString in figureShorthandsMode[key_mode]:
-        allFigureString = figureShorthandsMode[allFigureString]
-    elif allFigureString in figureShorthands:
+    # figureShorthandsMode is not currently used.
+    # key_mode = keyObj.mode
+    # if key_mode in figureShorthandsMode and allFigureString in figureShorthandsMode[key_mode]:
+    #     allFigureString = figureShorthandsMode[allFigureString]
+    # when uncommenting, the next if needs to become elif
+    if allFigureString in figureShorthands:
         allFigureString = figureShorthands[allFigureString]
 
     # simplify common omissions from 7th chords

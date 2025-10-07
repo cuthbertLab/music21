@@ -10,8 +10,6 @@ from __future__ import annotations
 
 import unittest
 
-from music21 import common
-
 _DOC_IGNORE_MODULE_OR_PACKAGE = True
 
 chantQuemQueritis = '''<?xml version="1.0" standalone="no"?>
