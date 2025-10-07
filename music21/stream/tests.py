@@ -28,6 +28,7 @@ from music21.stream.base import Part
 from music21.stream.base import Opus
 
 from music21 import bar
+from music21.base import Music21Object
 from music21 import beam
 from music21 import chord
 from music21 import clef
@@ -319,7 +320,7 @@ class Test(unittest.TestCase):
     def testIsFlat(self):
         a = Stream()
         for dummy in range(5):
-            a.insert(0, music21.Music21Object())
+            a.insert(0, Music21Object())
         self.assertTrue(a.isFlat)
         a[2] = note.Note('C#')
         self.assertTrue(a.isFlat)
@@ -328,7 +329,7 @@ class Test(unittest.TestCase):
 
     def testAppendFails(self):
         a = Stream()
-        others = [music21.Music21Object(), 'hello']
+        others = [Music21Object(), 'hello']
         with self.assertRaises(StreamException) as context:
             a.append(others)
         self.assertIn("'hello'", str(context.exception))
@@ -379,12 +380,31 @@ class Test(unittest.TestCase):
         sf1 = s1.flatten()
         sf1.id = 'flat s1'
 
-#        for site in n4.sites.get():
-#            print(site.id,)
-#            print(n4.sites.getOffsetBySite(site))
+        # for site in n4.sites.get():
+        #     print(site.id,)
+        #     print(n4.sites.getOffsetBySite(site))
 
         self.assertEqual(len(sf1), 4)
         assert sf1[1] is n2
+
+    def testFlattenDocTest(self):
+        '''
+        This test used to be in OMIT_FROM_DOCS in the flatten() doctest
+        '''
+        r = Stream()
+        for j in range(5):
+            q = Stream()
+            for i in range(5):
+                p = Stream()
+                p.repeatInsert(Music21Object(), [0, 1, 2, 3, 4])
+                q.insert(i * 10, p)
+            r.insert(j * 100, q)
+
+        self.assertEqual(len(r), 5)
+        self.assertEqual(len(r.flatten()), 125)
+
+        flattened = r.flatten()
+        self.assertAlmostEqual(flattened[124].offset, 444.0)
 
     def testActiveSiteCopiedStreams(self):
         srcStream = Stream()
@@ -395,12 +415,10 @@ class Test(unittest.TestCase):
         midStream = Stream()
         for x in range(2):
             srcNew = copy.deepcopy(srcStream)
-#             for n in srcNew:
-#                 offset = n.getOffsetBySite(srcStream)
+            # for n in srcNew:
+            #     offset = n.getOffsetBySite(srcStream)
 
             # gt = srcNew[0].getOffsetBySite(srcStream)
-
-            # for n in srcNew: pass
 
             srcNew.offset = x * 10
             midStream.insert(srcNew)
@@ -452,7 +470,7 @@ class Test(unittest.TestCase):
         self.assertEqual(len(srcStream.recurse()), 6)
         self.assertEqual(srcStream.flatten()[1].offset, 1.0)
 
-#        self.assertEqual(len(srcStream.getOverlaps()), 0)
+        # self.assertEqual(len(srcStream.getOverlaps()), 0)
 
         midStream = Stream()
         for x in range(4):
@@ -463,7 +481,7 @@ class Test(unittest.TestCase):
         self.assertEqual(len(midStream), 4)
         # environLocal.printDebug(['pre flat of mid stream'])
         self.assertEqual(len(midStream.flatten()), 24)
-#        self.assertEqual(len(midStream.getOverlaps()), 0)
+        # self.assertEqual(len(midStream.getOverlaps()), 0)
         mfs = midStream.flatten()
         self.assertEqual(mfs[7].getOffsetBySite(mfs), 11.0)
 
@@ -910,15 +928,15 @@ class Test(unittest.TestCase):
         Test basic Elements wrapping non music21 objects
         '''
         a = Stream()
-        a.insert(50, music21.Music21Object())
+        a.insert(50, Music21Object())
         self.assertEqual(len(a), 1)
 
         # there are two locations, default and the one just added
         self.assertEqual(len(a[0].sites), 2)
         # this works
-#        self.assertEqual(a[0].sites.getOffsetByIndex(-1), 50.0)
+        # self.assertEqual(a[0].sites.getOffsetByIndex(-1), 50.0)
 
-#        self.assertEqual(a[0].sites.getSiteByIndex(-1), a)
+        # self.assertEqual(a[0].sites.getSiteByIndex(-1), a)
         self.assertEqual(a[0].getOffsetBySite(a), 50.0)
         self.assertEqual(a[0].offset, 50.0)
 
@@ -6755,8 +6773,8 @@ class Test(unittest.TestCase):
         sSrc = corpus.parse('bach/bwv13.6.xml')
         sPart = sSrc.getElementById('Alto')
         ts = meter.TimeSignature('6/8')
-#         for n in sPart.flatten().notesAndRests:
-#             bs = n.beatStr
+        # for n in sPart.flatten().notesAndRests:
+        #     bs = n.beatStr
         # environLocal.printDebug(['calling makeMeasures'])
         sPartFlat = sPart.flatten()
         unused_notesAndRests = sPartFlat.notesAndRests

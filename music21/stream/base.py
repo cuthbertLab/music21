@@ -324,9 +324,6 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         # restrictClass: type[M21ObjType] = base.Music21Object,
         super().__init__(**keywords)
 
-        # TEMPORARY variable for v9 to deprecate the flat property. -- remove in v10
-        self._created_via_deprecated_flat = False
-
         self.streamStatus = streamStatus.StreamStatus(self)
         self._unlinkedDuration = None
 
@@ -451,13 +448,6 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         specialized :class:`music21.stream.StreamIterator` class, which
         adds necessary Stream-specific features.
         '''
-        # temporary for v9 -- remove in v10
-        if self._created_via_deprecated_flat:
-            warnings.warn('.flat is deprecated.  Call .flatten() instead',
-                          exceptions21.Music21DeprecationWarning,
-                          stacklevel=3)
-            self._created_via_deprecated_flat = False
-
         return t.cast(iterator.StreamIterator[M21ObjType],
                       iterator.StreamIterator(self))
 
@@ -4699,11 +4689,11 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
     def template(self,
                  *,
                  fillWithRests=True,
-                 removeClasses=None,
+                 removeClasses: Iterable[type|str]|set[type|str]|None = None,
                  retainVoices=True,
                  removeAll=False,
                  exemptFromRemove=frozenset(),
-                 ):
+                 ) -> t.Self:
         '''
         Return a new Stream based on this one, but without the notes and other elements
         but keeping instruments, clefs, keys, etc.
@@ -4874,14 +4864,11 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
 
         * Changed in v7: all arguments are keyword only.
         * New in v9.9: added exemptFromRemove
-        * Note: in v10
+        * Note: in v10: removeClasses cannot be boolean -- use removeAll instead
         '''
         out = self.cloneEmpty(derivationMethod='template')
         if removeClasses is None:
             removeClasses = {'GeneralNote', 'Dynamic', 'Expression'}
-        elif removeClasses is True:
-            removeClasses = set()
-            removeAll = True
         elif common.isIterable(removeClasses):
             removeClasses = set(removeClasses)
 
@@ -7770,7 +7757,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         A very important method that returns a new Stream
         that has all sub-containers "flattened" within it,
         that is, it returns a new Stream where no elements nest within
-        other elements.
+        other elements.  (Prior to v7 this was the property .flat)
 
         Here is a simple example of the usefulness of .flatten().  We
         will create a Score with two Parts in it, each with two Notes:
@@ -7847,6 +7834,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
 
         If `retainContainers=True` then a "semiFlat" version of the stream
         is returned where Streams are also included in the output stream.
+        (Prior to v7 this was the property semiFlat)
 
         In general, you will not need to use this because `.recurse()` is
         more efficient and does not lead to problems of the same
@@ -7963,25 +7951,19 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
          <music21.note.Note D>,
          <music21.note.Note D>)
 
-        OMIT_FROM_DOCS
+        .. note::Why did `.flat` become `.flatten()`? Early on music21's philosophy
+            was to use properties for commonly accessed "views" of a stream. This
+            worked well in the pre-IDE/debugger days of early Python 2. Now however
+            most of us program with IDEs and AI assistance that freely introspect the
+            attributes of objects. So if you're working with a Pitch object, your IDE
+            may have already looked up its .name or .accidental without your knowledge.
+            Properties are generally considered the same as attributes (that's what
+            they're designed for).  The problem is that flattening a stream is a
+            time consuming algorithm that alters the stream and all its elements in
+            the process. Therefore streams should only be flattened when the programmer
+            requests them to be. The way to tell a modern IDE that a process may
+            have consequences is to make it a `.method()` not a `.property`.
 
-        >>> r = stream.Stream()
-        >>> for j in range(5):
-        ...   q = stream.Stream()
-        ...   for i in range(5):
-        ...      p = stream.Stream()
-        ...      p.repeatInsert(base.Music21Object(), [0, 1, 2, 3, 4])
-        ...      q.insert(i * 10, p)
-        ...   r.insert(j * 100, q)
-
-        >>> len(r)
-        5
-
-        >>> len(r.flatten())
-        125
-
-        >>> r.flatten()[124].offset
-        444.0
         '''
         # environLocal.printDebug(['flatten(): self', self,
         #  'self.activeSite', self.activeSite])
@@ -8045,20 +8027,6 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         self._cache[method] = sNew
 
         return sNew
-
-    @property
-    def flat(self):
-        '''
-        Deprecated: use `.flatten()` instead
-
-        A property that returns the same flattened representation as `.flatten()`
-        as of music21 v7.
-
-        See :meth:`~music21.stream.base.Stream.flatten()` for documentation.
-        '''
-        flatStream = self.flatten(retainContainers=False)
-        flatStream._created_via_deprecated_flat = True
-        return flatStream
 
     @overload
     def recurse(self,
