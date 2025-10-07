@@ -61,11 +61,11 @@ class MidiException(exceptions21.Music21Exception):
 
 # ------------------------------------------------------------------------------
 @overload
-def getNumber(midiStr: int, length: int) -> tuple[int, int]:
+def getNumber(midiBytes: int, length: int) -> tuple[int, int]:
     ...
 
 @overload
-def getNumber(midiStr: bytes, length: int) -> tuple[int, bytes]:
+def getNumber(midiBytes: bytes, length: int) -> tuple[int, bytes]:
     ...
 
 def getNumber(midiBytes: bytes|int, length: int) -> tuple[int, bytes|int]:
