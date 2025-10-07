@@ -27,6 +27,7 @@ __all__ = [
     'makeExampleScore',
     'node',
     'spans',
+    'toStream',
     'trees',
     'verticality',
 ]
@@ -40,6 +41,7 @@ from music21.tree.examples import makeExampleScore
 from music21.tree import fromStream
 from music21.tree import node
 from music21.tree import spans
+from music21.tree import toStream
 from music21.tree import trees
 from music21.tree import verticality
 
