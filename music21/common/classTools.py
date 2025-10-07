@@ -46,18 +46,11 @@ def isInt(usrData: t.Any) -> t.TypeGuard[int]:
 def isNum(usrData: t.Any) -> t.TypeGuard[t.Union[float, int, Fraction]]:
     '''
     check if usrData is a music21 number (float, int, Fraction),
-    return boolean and if True casts the value as a Rational number
+    return boolean and if True casts the value as a float, int, or Fraction number
 
-    Differs from `isinstance(usrData, Rational)` which
-    does not return True for `True, False`, and does not support Decimal
+    Differs from `isinstance(usrData, Rational)` primarily in that this function
+    does not return True for `True, False`. See below for other differences.
 
-    Does not use `isinstance(usrData, Rational)` which is 2-6 times slower
-    than calling this function (except in the case of Fraction, when
-    it's 6 times faster, but that's rarer).  (6 times slower on Py3.4, now
-    only 2x slower in Python 3.10)
-
-    Runs by adding 0 to the "number" -- so anything that implements
-    add to a scalar works
 
     >>> common.isNum(3.0)
     True
@@ -68,14 +61,32 @@ def isNum(usrData: t.Any) -> t.TypeGuard[t.Union[float, int, Fraction]]:
     >>> common.isNum([2, 3, 4])
     False
 
-    True and False are NOT numbers:
+    True and False are not considered numbers by isNum.
 
     >>> common.isNum(True)
     False
     >>> common.isNum(False)
     False
+
+    None is also not a number:
+
     >>> common.isNum(None)
     False
+
+    This function does not use `isinstance(usrData, Rational)` which is 2-6 times slower
+    than calling this function (except in the case of Fraction, when
+    it's 6 times faster, but that's rarer).  (6 times slower on Py3.4, now
+    only 2x slower in Python 3.10)
+
+    Runs by adding 0 to the "number" -- so anything that implements
+    adding with a scalar will pass.  Thus, this Decimal number is technically incorrectly typed
+    as being a float, int, or Fraction.  However, since Decimals are not used in
+    music21 it is not really a problem.
+
+    >>> from decimal import Decimal
+    >>> common.isNum(Decimal('2.0'))
+    True
+
     '''
     # noinspection PyBroadException
     try:
@@ -135,6 +146,8 @@ def isIterable(usrData: t.Any) -> t.TypeGuard[Iterable]:
     Classes are not iterable even if their instances are:
 
     >>> common.isIterable(stream.Stream)
+    False
+    >>> common.isIterable(list)
     False
 
     * Changed in v7.3: Classes (not instances) are not iterable

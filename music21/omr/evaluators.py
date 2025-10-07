@@ -18,12 +18,6 @@ from __future__ import annotations
 from music21.omr import correctors
 from music21 import converter
 
-# import matplotlib.pyplot as plt
-# import numpy as np
-# from matplotlib.ticker import MultipleLocator, FormatStrFormatter
-
-# import difflib
-
 globalDebug = False
 
 
