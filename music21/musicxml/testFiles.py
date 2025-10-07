@@ -10,8 +10,6 @@ from __future__ import annotations
 
 import unittest
 
-from music21 import common
-
 _DOC_IGNORE_MODULE_OR_PACKAGE = True
 
 chantQuemQueritis = '''<?xml version="1.0" standalone="no"?>
@@ -16215,15 +16213,6 @@ ALL = [
     binchoisMagnificat, edgefield82b, tabTest,
     pianoRepeatEndings,
 ]
-
-
-@common.deprecated('v10', 'This has never been developed beyond one file')
-def get(contentRequest):
-    '''
-    Get test material by type of content -- Deprecated - to be removed in v10
-    '''
-    if contentRequest in ['lyrics']:
-        return chantQuemQueritis
 
 
 # ------------------------------------------------------------------------------

@@ -115,12 +115,13 @@ figureShorthands = {
     'b7b53': 'ø7',
 }
 
-figureShorthandsMode: dict[str, dict] = {
-    'major': {
-    },
-    'minor': {
-    }
-}
+# not currently used
+# figureShorthandsMode: dict[str, dict] = {
+#     'major': {
+#     },
+#     'minor': {
+#     }
+# }
 
 
 # this is sort of a crock :-)  but it's very helpful.
@@ -273,7 +274,7 @@ def correctSuffixForChordQuality(chordObj, inversionString):
     return qualityName + inversionString
 
 
-def postFigureFromChordAndKey(chordObj, keyObj=None):
+def _postFigureFromChordAndKey(chordObj: chord.Chord, keyObj: key.Key) -> str:
     '''
     (Note: this will become a private function by v10.)
 
@@ -281,7 +282,7 @@ def postFigureFromChordAndKey(chordObj, keyObj=None):
 
     If keyObj is none, it uses the root as a major key:
 
-    >>> roman.postFigureFromChordAndKey(
+    >>> roman._postFigureFromChordAndKey(
     ...     chord.Chord(['F#2', 'D3', 'A-3', 'C#4']),
     ...     key.Key('C'),
     ...     )
@@ -289,19 +290,19 @@ def postFigureFromChordAndKey(chordObj, keyObj=None):
 
     The function substitutes shorthand (e.g., '6' not '63')
 
-    >>> roman.postFigureFromChordAndKey(
+    >>> roman._postFigureFromChordAndKey(
     ...     chord.Chord(['E3', 'C4', 'G4']),
     ...     key.Key('C'),
     ...     )
     '6'
 
-    >>> roman.postFigureFromChordAndKey(
+    >>> roman._postFigureFromChordAndKey(
     ...     chord.Chord(['E3', 'C4', 'G4', 'B-5']),
     ...     key.Key('F'),
     ...     )
     '65'
 
-    >>> roman.postFigureFromChordAndKey(
+    >>> roman._postFigureFromChordAndKey(
     ...     chord.Chord(['E3', 'C4', 'G4', 'B-5']),
     ...     key.Key('C'),
     ...     )
@@ -310,25 +311,21 @@ def postFigureFromChordAndKey(chordObj, keyObj=None):
     We reduce common omissions from seventh chords to be '7' instead
     of '75', '73', etc.
 
-    >>> roman.postFigureFromChordAndKey(
+    >>> roman._postFigureFromChordAndKey(
     ...     chord.Chord(['A3', 'E-4', 'G-4']),
     ...     key.Key('b-'),
     ...     )
     'o7'
 
-    OMIT_FROM_DOCS
-
-    Fails on German Augmented 6th chords in root position.  Calls them
+    Known bug: Fails on German Augmented 6th chords in root position.  Calls them
     half-diminished chords.
 
-    (This is in OMIT_FROM_etc.)
+    Changed in v10: made _postFigureFromChordAndKey private, keyObj is not optional.
     '''
-    if keyObj is None:
-        keyObj = key.Key(chordObj.root())
     chordFigureTuples = figureTuples(chordObj, keyObj)
     bassFigureAlter = chordFigureTuples[0].alter
 
-    allFigureStringList = []
+    allFigureStringList: list[str] = []
 
     third = chordObj.third
     fifth = chordObj.fifth
@@ -379,12 +376,13 @@ def postFigureFromChordAndKey(chordObj, keyObj=None):
                 allFigureStringList.append(figureString)
 
     allFigureString = ''.join(allFigureStringList)
-    key_mode = keyObj.mode
 
-    # first is not currently used.
-    if key_mode in figureShorthandsMode and allFigureString in figureShorthandsMode[key_mode]:
-        allFigureString = figureShorthandsMode[allFigureString]
-    elif allFigureString in figureShorthands:
+    # figureShorthandsMode is not currently used.
+    # key_mode = keyObj.mode
+    # if key_mode in figureShorthandsMode and allFigureString in figureShorthandsMode[key_mode]:
+    #     allFigureString = figureShorthandsMode[allFigureString]
+    # when uncommenting, the next if needs to become elif
+    if allFigureString in figureShorthands:
         allFigureString = figureShorthands[allFigureString]
 
     # simplify common omissions from 7th chords
@@ -398,8 +396,6 @@ def postFigureFromChordAndKey(chordObj, keyObj=None):
 
 def figureTuples(chordObject: chord.Chord, keyObject: key.Key) -> list[ChordFigureTuple]:
     '''
-    (This will become a private function in v10)
-
     Return a set of tuplets for each pitch showing the presence of a note, its
     interval above the bass its alteration (float) from a step in the given
     key, an `alterationString`, and the pitch object.
@@ -1185,7 +1181,7 @@ def romanNumeralFromChord(
         pass
     elif not isMajorThird:
         stepRoman = stepRoman.lower()
-    inversionString = postFigureFromChordAndKey(chordObj, alteredKeyObj)
+    inversionString = _postFigureFromChordAndKey(chordObj, alteredKeyObj)
 
     rnString = ft.prefix + stepRoman + inversionString
 
@@ -1383,14 +1379,7 @@ class Minor67Default(enum.Enum):
 
 # -----------------------------------------------------------------------------
 
-# Delete RomanException in v10
-class RomanException(exceptions21.Music21Exception):
-    '''
-    RomanException will be removed in v10.  Catch RomanNumeralException instead.
-    '''
-
-
-class RomanNumeralException(ValueError, RomanException):
+class RomanNumeralException(ValueError, exceptions21.Music21Exception):
     pass
 
 
@@ -4386,7 +4375,7 @@ class Test(unittest.TestCase):
     def testAugmentedOctave(self):
         c = chord.Chord(['C4', 'E5', 'G5', 'C#6'])
         k = key.Key('C')
-        f = postFigureFromChordAndKey(c, k)
+        f = _postFigureFromChordAndKey(c, k)
         self.assertEqual(f, '#853')
 
         rn = romanNumeralFromChord(c, k)

@@ -29,7 +29,7 @@ from music21.midi.translate import (
     conductorStream,
     getMetaEvents,
     midiAsciiStringToBinaryString,
-    midiEventsToInstrument,
+    midiEventToInstrument,
     midiEventsToNote,
     midiFileToStream,
     noteToMidiEvents,
@@ -1391,12 +1391,12 @@ class Test(unittest.TestCase):
         '''
         event = MidiEvent()
         event.data = bytes('Piccolo\x00', 'utf-8')
-        i = midiEventsToInstrument(event)
+        i = midiEventToInstrument(event)
         self.assertIsInstance(i, instrument.Piccolo)
 
         # test that nothing was broken.
         event.data = bytes('Flute', 'utf-8')
-        i = midiEventsToInstrument(event)
+        i = midiEventToInstrument(event)
         self.assertIsInstance(i, instrument.Flute)
 
     def testLousyInstrumentData(self):
@@ -1406,7 +1406,7 @@ class Test(unittest.TestCase):
                 event = MidiEvent()
                 event.data = bytes(name, 'utf-8')
                 event.type = MetaEvents.INSTRUMENT_NAME
-                i = midiEventsToInstrument(event)
+                i = midiEventToInstrument(event)
                 self.assertIsNone(i.instrumentName)
 
         # lousy program change
@@ -1416,7 +1416,7 @@ class Test(unittest.TestCase):
         event.channel = 10
         event.type = ChannelVoiceMessages.PROGRAM_CHANGE
 
-        i = midiEventsToInstrument(event)
+        i = midiEventToInstrument(event)
         self.assertIsInstance(i, instrument.UnpitchedPercussion)
 
     def testConductorStream(self):

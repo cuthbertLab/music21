@@ -261,13 +261,11 @@ class FirstFret:
         self.fretNum = fretNum
         self.location = location
 
-# class that combines a ChordSymbol and a FretBoard
-
 
 class ChordWithFretBoard(harmony.ChordSymbol, FretBoard):
     '''
     Music21Object subclass that combines a ChordSymbol with a FretBoard.
-    Tuning must be set!
+    Its tuning must be set.
 
     >>> fn4 = tablature.FretNote(string=4, fret=0)
     >>> fn3 = tablature.FretNote(string=3, fret=2, fingering=2)

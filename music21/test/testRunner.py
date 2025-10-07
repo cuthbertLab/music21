@@ -139,7 +139,7 @@ def fix312OrderedDict(textString, replacement='...') -> str:
     '''
     Function that fixes the OrderedDicts to work on Python 3.12 and above.
     (eventually when 3.12 is the norm, this should be replaced to neuter
-    the doctests for 3.10/3.11 instead.  Or just wait until 3.12 is the minimum version?)
+    the doctests for 3.11 instead.  Or just wait until 3.12 is the minimum version?)
 
     >>> fix312 = test.testRunner.fix312OrderedDict
     >>> fix312('OrderedDict([(0, 1), (1, 2), (2, 3)])')

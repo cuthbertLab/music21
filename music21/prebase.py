@@ -220,6 +220,16 @@ class ProtoM21Object:
         The additional information is defined in the `_reprInternal` method,
         so objects inheriting from ProtoM21Object (such as Music21Object)
         should change `_reprInternal` and not `__repr__`.
+
+        Except for music21.base itself, any object in a file called base.py
+        has the base part removed.
+
+        >>> from music21.midi.base import MidiEvent
+        >>> me = MidiEvent()
+        >>> repr(me)
+        '<music21.midi.MidiEvent UNKNOWN, track=None>'
+        >>> me._reprInternal()
+        'UNKNOWN, track=None'
         '''
         reprHead = '<'
         if self.__module__ != '__main__':

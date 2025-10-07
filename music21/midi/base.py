@@ -563,7 +563,7 @@ class MidiEvent(prebase.ProtoM21Object):
         if self.time != 0:
             r += f't={self.time!r}, '
         r += f'track={trackIndex}'
-        if self.type in ChannelVoiceMessages or self.type in ChannelModeMessages:
+        if self.isChannelEvent():
             r += f', channel={self.channel!r}'
         if self.type in (ChannelVoiceMessages.NOTE_ON, ChannelVoiceMessages.NOTE_OFF):
             attrList = ['pitch', 'velocity']
@@ -626,6 +626,18 @@ class MidiEvent(prebase.ProtoM21Object):
                 value = bytes([int(value)])
         self.parameter1 = value
 
+    def isChannelEvent(self) -> bool:
+        '''
+        returns bool if the channel matters for this event
+
+        >>> me = midi.MidiEvent(type=midi.ChannelVoiceMessages.NOTE_ON, channel=4)
+        >>> me.isChannelEvent()
+        True
+        >>> dt = midi.DeltaTime()
+        >>> dt.isChannelEvent()
+        False
+        '''
+        return self.type in ChannelVoiceMessages or self.type in ChannelModeMessages
 
     def setPitchBend(self, cents: int|float, bendRange=2) -> None:
         '''
@@ -1220,7 +1232,7 @@ class DeltaTime(MidiEvent):
 
     Time values are in integers, representing ticks.
 
-    The `channel` attribute, inherited from MidiEvent is not used and set to None
+    The `channel` attribute, inherited from MidiEvent is not used and set to 1
     unless overridden (it does not do anything if set and is not written out to MIDI).
 
     >>> mt = midi.MidiTrack(1)
@@ -1247,6 +1259,12 @@ class DeltaTime(MidiEvent):
         if self.time == 0:
             rep = '(empty) ' + rep
         return rep
+
+    def isChannelEvent(self) -> bool:
+        '''
+        Save processing time -- is always False
+        '''
+        return False
 
     def readUntilLowByte(self, oldBytes: bytes) -> tuple[int, bytes]:
         r'''
@@ -1607,22 +1625,23 @@ class MidiTrack(prebase.ProtoM21Object):
 
     def getChannels(self) -> list[int]:
         '''
-        Get all channels (excluding None) used in this Track (sorted)
+        Get all channels used in this Track (sorted) excepting events like DeltaTime
+        or end events where the channel does not matter
 
         >>> mt = midi.MidiTrack(index=2)
         >>> noteOn = midi.MidiEvent(type=midi.ChannelVoiceMessages.NOTE_ON, channel=14)
         >>> noteOn2 = midi.MidiEvent(type=midi.ChannelVoiceMessages.NOTE_ON, channel=5)
+        >>> dt = midi.DeltaTime(1000, channel=2)  # channel does not matter
         >>> noteOn3 = midi.MidiEvent(type=midi.ChannelVoiceMessages.NOTE_ON, channel=14)
-        >>> noteOn4 = midi.MidiEvent(type=midi.ChannelVoiceMessages.PROGRAM_CHANGE, channel=None)
+        >>> noteOn4 = midi.MidiEvent(type=midi.ChannelVoiceMessages.PROGRAM_CHANGE, channel=5)
 
-        >>> mt.events = [noteOn, noteOn2, noteOn3, noteOn4]
-
+        >>> mt.events = [noteOn, noteOn2, dt, noteOn3, noteOn4]
         >>> mt.getChannels()
         [5, 14]
         '''
         post: set[int] = set()
         for e in self.events:
-            if e.channel is not None:
+            if e.isChannelEvent():
                 post.add(e.channel)
         return sorted(post)
 
