@@ -4890,7 +4890,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
             elOffset = self.elementOffset(el, returnSpecial=True)
 
             # retain all streams (exception: Voices if retainVoices  is False
-            if el.isStream and (retainVoices or ('Voice' not in el.classes)):
+            if isinstance(el, Stream) and (retainVoices or ('Voice' not in el.classes)):
                 optionalAddRest()
                 outEl = el.template(fillWithRests=fillWithRests,
                                     removeClasses=removeClasses,
@@ -4906,7 +4906,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
 
             # okay now determine if we will be skipping or keeping this element
             skip_element = False
-            if removeAll is True:
+            if removeAll:
                 # with this setting we remove everything by default
                 skip_element = True
             elif el.classSet.intersection(removeClasses):

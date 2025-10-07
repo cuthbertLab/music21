@@ -117,7 +117,7 @@ class ProtoM21Object:
         {10.0} <music21.clef.GClef>
         {30.0} <music21.clef.FrenchViolinClef>
 
-        `Changed 2015 Sep`: returns a tuple, not a list.
+        Changed in v2: returns a tuple, not a list.
         '''
         try:
             return self._classTupleCacheDict[self.__class__]

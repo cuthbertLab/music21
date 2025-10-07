@@ -1935,9 +1935,7 @@ class Rest(GeneralNote):
     gets rests as well.
 
     >>> r = note.Rest()
-    >>> r.isRest
-    True
-    >>> r.isNote
+    >>> isinstance(r, note.Note)
     False
     >>> r.duration.quarterLength = 2.0
     >>> r.duration.type
@@ -1984,6 +1982,13 @@ class Rest(GeneralNote):
     A rest is never equal to a note.
 
     >>> r1 == note.Note()
+    False
+
+    Currently, there are these convenience features, but they are going away
+    (They were originally added because isinstance was slow. It is now very fast)
+    >>> r.isRest
+    True
+    >>> r.isNote
     False
     '''
     isRest = True
