@@ -292,7 +292,7 @@ class OffsetNode(ElementNode):
 
     Here's an example of what it means and does:
 
-    >>> score = tree.makeExampleScore()
+    >>> score = tree.examples.makeExampleScore()
     >>> sf = score.flatten()
     >>> sf.show('text', addEndTimes=True)
     {0.0 - 0.0} <music21.instrument.Instrument 'PartA: : '>
@@ -400,7 +400,7 @@ class OffsetNode(ElementNode):
             The contents of the node at this point.  Usually a list of ElementTimespans
             or PitchedTimespans.
 
-            >>> score = tree.makeExampleScore()
+            >>> score = tree.examples.makeExampleScore()
             >>> scoreTree = tree.fromStream.asTimespans(score, flatten=True,
             ...                  classList=(note.Note, chord.Chord))
             >>> print(scoreTree.rootNode.debug())

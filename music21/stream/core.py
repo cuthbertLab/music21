@@ -470,7 +470,7 @@ class StreamCore(Music21Object):
         highly optimized data structure for searching through elements and
         offsets.
 
-        >>> score = tree.makeExampleScore()
+        >>> score = tree.examples.makeExampleScore()
         >>> scoreTree = score.asTimespans()
         >>> print(scoreTree)
         <TimespanTree {20} (0.0 to 8.0) <music21.stream.Score exampleScore>>
@@ -519,7 +519,7 @@ class StreamCore(Music21Object):
 
         See tree.fromStream.asTree() for more details.
 
-        >>> score = tree.makeExampleScore()
+        >>> score = tree.examples.makeExampleScore()
         >>> scoreTree = score.asTree(flatten=True)
         >>> scoreTree
         <ElementTree {20} (0.0 <0.-25...> to 8.0) <music21.stream.Score exampleScore>>
@@ -527,9 +527,9 @@ class StreamCore(Music21Object):
         if t.TYPE_CHECKING:
             assert isinstance(self, Stream)
         hashedAttributes = hash((tuple(classList or ()),
-                                  flatten,
-                                  useTimespans,
-                                  groupOffsets))
+                                 flatten,
+                                 useTimespans,
+                                 groupOffsets))
         cacheKey = 'elementTree' + str(hashedAttributes)
         if cacheKey not in self._cache or self._cache[cacheKey] is None:
             hashedElementTree = tree.fromStream.asTree(self,

@@ -55,7 +55,7 @@ def listOfTreesByClass(
     This is used internally by `streamToTimespanTree`.
 
 
-    >>> score = tree.makeExampleScore()
+    >>> score = tree.examples.makeExampleScore()
 
     Get everything in the score
 
@@ -168,7 +168,7 @@ def asTree(
 
     Use Stream.asTree() generally since that caches the ElementTree.
 
-    >>> score = tree.makeExampleScore()
+    >>> score = tree.examples.makeExampleScore()
     >>> elementTree = tree.fromStream.asTree(score)
     >>> elementTree
     <ElementTree {2} (0.0 <0.-20...> to 8.0) <music21.stream.Score exampleScore>>
@@ -401,7 +401,7 @@ class Test(unittest.TestCase):
             self.assertIs(fastI, slowI)
 
     def testAutoSortExample(self):
-        from music21.tree import makeExampleScore
+        from music21.tree.examples import makeExampleScore
         sc = makeExampleScore()
         sc.sort()
         scTree = asTree(sc)
