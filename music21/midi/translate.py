@@ -259,28 +259,25 @@ def getStartEvents(
 
 def getEndEvents(
     midiTrack: MidiTrack|None = None,
-    channel: int = 1
 ) -> list[MidiEvent|DeltaTime]:
     '''
     Returns a list of midi.MidiEvent objects found at the end of a track.
 
-    Note that the channel is basically ignored as no end events are channel
-    specific.  (Attribute will be removed in v10)
-
     >>> midi.translate.getEndEvents()
     [<music21.midi.DeltaTime t=10080, track=None>,
      <music21.midi.MidiEvent END_OF_TRACK, track=None, data=b''>]
+
+    Changed in v10 - getEndEvents does not take a channel
     '''
     events: list[MidiEvent|DeltaTime] = []
 
-    dt = DeltaTime(track=midiTrack, channel=channel)
+    dt = DeltaTime(track=midiTrack)
     dt.time = defaults.ticksAtStart
     events.append(dt)
 
     me = MidiEvent(
         track=midiTrack,
         type=MetaEvents.END_OF_TRACK,
-        channel=channel,
     )
     me.data = b''  # must set data to empty bytes
     events.append(me)
@@ -869,36 +866,57 @@ def instrumentToMidiEvents(
 # ------------------------------------------------------------------------------
 # Meta events
 
+@common.deprecated('v10', 'v11', 'passing a list was never used; use midiEventToInstrument instead')
 def midiEventsToInstrument(
     eventList: MidiEvent|tuple[int, MidiEvent],
+    *,
+    encoding: str = 'utf-8',
+) -> instrument.Instrument:
+    if not common.isListLike(eventList):
+        event = t.cast(MidiEvent, eventList)
+    else:  # get the second event; first is delta time
+        event = eventList[1]
+    return midiEventToInstrument(event, encoding=encoding)
+
+
+def midiEventToInstrument(
+    event: MidiEvent,
     *,
     encoding: str = 'utf-8',
 ) -> instrument.Instrument:
     '''
     Convert a single MIDI event into a music21 Instrument object.
 
-    >>> me = midi.MidiEvent()
+    MIDI Events that can be properly read are PROGRAM_CHANGE, INSTRUMENT_NAME
+    and SEQUENCE_TRACK_NAME
+
+    >>> me = midi.MidiEvent(channel=2)
     >>> me.type = midi.ChannelVoiceMessages.PROGRAM_CHANGE
     >>> me.data = 53  # MIDI program 54: Voice Oohs
-    >>> midi.translate.midiEventsToInstrument(me)
+    >>> midi.translate.midiEventToInstrument(me)
     <music21.instrument.Vocalist 'Voice'>
 
     The percussion map will be used if the channel is 10:
 
     >>> me.channel = 10
-    >>> instrumentObj = midi.translate.midiEventsToInstrument(me)
+    >>> instrumentObj = midi.translate.midiEventToInstrument(me)
     >>> instrumentObj
     <music21.instrument.UnpitchedPercussion 'Percussion'>
     >>> instrumentObj.midiChannel  # 0-indexed in music21
     9
     >>> instrumentObj.midiProgram  # 0-indexed in music21
     53
-    '''
-    if not common.isListLike(eventList):
-        event = t.cast(MidiEvent, eventList)
-    else:  # get the second event; first is delta time
-        event = eventList[1]
 
+    Get from instrument name with particular encodings
+
+    >>> encoded_flute = 'flöte'.encode('latin-1')
+    >>> me = midi.MidiEvent(channel=4)
+    >>> me.type = midi.MetaEvents.SEQUENCE_TRACK_NAME
+    >>> me.data = encoded_flute
+    >>> fl = midi.translate.midiEventToInstrument(me, encoding='latin-1')
+    >>> fl
+    <music21.instrument.Flute 'flöte'>
+    '''
     decoded: str = ''
     try:
         if isinstance(event.data, bytes):
@@ -929,8 +947,7 @@ def midiEventsToInstrument(
 
     # Set MIDI channel
     # Instrument.midiChannel is 0-indexed
-    if event.channel is not None:
-        i.midiChannel = event.channel - 1
+    i.midiChannel = event.channel - 1
 
     # Set partName or instrumentName with literal value from parsing
     if decoded:
@@ -1794,7 +1811,7 @@ def packetsToMidiTrack(packets, trackId=1, channel=1, instrumentObj=None):
     mt.events += packetsToDeltaSeparatedEvents(trackPackets, mt)
 
     # must update all events with a ref to this MidiTrack
-    mt.events += getEndEvents(mt, channel=channel)
+    mt.events += getEndEvents(mt)
     mt.updateEvents()  # sets this track as .track for all events
     return mt
 
@@ -1972,15 +1989,15 @@ def getMetaEvents(
         elif e.type == MetaEvents.SET_TEMPO:
             metaObj = midiEventsToTempo(e)
         elif e.type in (MetaEvents.INSTRUMENT_NAME, MetaEvents.SEQUENCE_TRACK_NAME):
-            # midiEventsToInstrument() WILL NOT have knowledge of the current
+            # midiEventToInstrument() WILL NOT have knowledge of the current
             # program, so set it here
-            metaObj = midiEventsToInstrument(e, encoding=encoding)
+            metaObj = midiEventToInstrument(e, encoding=encoding)
             if last_program != -1:
                 # Only update if we have had an initial PROGRAM_CHANGE
                 metaObj.midiProgram = last_program
         elif e.type == ChannelVoiceMessages.PROGRAM_CHANGE and isinstance(e.parameter1, int):
-            # midiEventsToInstrument() WILL set the program on the instance
-            metaObj = midiEventsToInstrument(e)
+            # midiEventToInstrument() WILL set the program on the instance
+            metaObj = midiEventToInstrument(e)
             last_program = e.parameter1
         # elif e.type == MetaEvents.MIDI_PORT:
         #     pass

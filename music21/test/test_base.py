@@ -641,7 +641,7 @@ class Test(unittest.TestCase):
         storage = []
         for i in range(6):
             soundFile = Wave_read()
-            # el = music21.Music21Object()
+            # el = base.Music21Object()
             el = base.ElementWrapper(soundFile)
             storage.append(el)
             self.assertEqual(el.obj, soundFile)

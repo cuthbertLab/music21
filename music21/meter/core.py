@@ -1439,13 +1439,6 @@ class MeterSequence(MeterTerminal):
                 mtList += obj._getFlatList()
         return mtList
 
-    @property
-    def flat(self):
-        '''
-        deprecated.  Call .flatten() instead.  To be removed in v11.
-        '''
-        return self.flatten()
-
     def flatten(self) -> MeterSequence:
         '''
         Return a new MeterSequence composed of the flattened representation.

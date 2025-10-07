@@ -33,7 +33,7 @@ or terminal and enter the following command-line argument (where "$" is the prom
     
 it should display something like:
 
-    Python 3.10.7
+    Python 3.13.2
 
 if so, you're okay.  If not, upgrade your version of Python.  This is
 often a problem on some AWS configuations, Google Colab, etc.

@@ -16217,15 +16217,6 @@ ALL = [
 ]
 
 
-@common.deprecated('v10', 'This has never been developed beyond one file')
-def get(contentRequest):
-    '''
-    Get test material by type of content -- Deprecated - to be removed in v10
-    '''
-    if contentRequest in ['lyrics']:
-        return chantQuemQueritis
-
-
 # ------------------------------------------------------------------------------
 class Test(unittest.TestCase):
 

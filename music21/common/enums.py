@@ -10,14 +10,12 @@
 # ------------------------------------------------------------------------------
 from __future__ import annotations
 
-from enum import Enum, EnumMeta, IntEnum
+from enum import Enum, EnumType, IntEnum
 import re
-
-# When Python 3.11 is minimum, import EnumType instead of EnumMeta
 
 # when Python 3.12 is minimum, will not need StrEnumMeta at all -- contains will work.
 
-class StrEnumMeta(EnumMeta):
+class StrEnumMeta(EnumType):
     def __contains__(cls, item):
         if isinstance(item, str):
             if item in cls.__members__.values():
@@ -30,9 +28,11 @@ class StrEnumMeta(EnumMeta):
             return False
 
 
-class ContainsMeta(EnumMeta):
+class ContainsMeta(EnumType):
     '''
     This is a backport of the Python 3.12 `EnumType` class's contains method.
+
+    This will be removed when Python 3.12 is the minimum version for music21.
     '''
     def __contains__(cls, item):
         try:
