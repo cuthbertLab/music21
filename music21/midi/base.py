@@ -7,7 +7,7 @@
 #               Michael Scott Asato Cuthbert
 #               (Will Ware -- see docs)
 #
-# Copyright:    Copyright © 2011-2013, 2019 Michael Scott Asato Cuthbert
+# Copyright:    Copyright © 2011-2013, 2019-2025 Michael Scott Asato Cuthbert
 #               Some parts of this module are in the Public Domain, see details.
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
@@ -17,7 +17,7 @@ Objects and tools for processing MIDI data.  Converts from MIDI files to
 :class:`~music21.midi.MidiFile` objects, and vice-versa.
 
 This module originally used routines from Will Ware's public domain midi.py
-library from 2001 which was once posted at (http link)
+library from 2001 which was once posted at
 groups.google.com/g/alt.sources/msg/0c5fc523e050c35e
 '''
 from __future__ import annotations
@@ -65,19 +65,13 @@ def getNumber(midiStr: int, length: int) -> tuple[int, int]:
     ...
 
 @overload
-def getNumber(midiStr: str, length: int) -> tuple[int, str]:
-    ...
-
-@overload
 def getNumber(midiStr: bytes, length: int) -> tuple[int, bytes]:
     ...
 
-def getNumber(midiStr: str|bytes|int, length: int) -> tuple[int, str|bytes|int]:
+def getNumber(midiBytes: bytes|int, length: int) -> tuple[int, bytes|int]:
     '''
-    Return the value of a string byte or bytes if length > 1
-    from an 8-bit string or bytes object
-
-    Then, return the remaining string or bytes object
+    Extract the first `length` bytes from a bytes object (or int)
+    and return it and the remaining bytes object as a 2-tuple
 
     The `length` is the number of chars to read.
     This will sum a length greater than 1 if desired.
@@ -85,17 +79,17 @@ def getNumber(midiStr: str|bytes|int, length: int) -> tuple[int, str|bytes|int]:
     Note that MIDI uses big-endian for everything.
     This is the inverse of Python's chr() function.
 
-    Read first two bytes
+    Read first two bytes from the bytes encoding of "tests" and return the remainder
 
-    >>> midi.getNumber(b'test', 2)
-    (29797, b'st')
+    >>> midi.getNumber(b'tests', 2)
+    (29797, b'sts')
 
     That number comes from:
 
     >>> ord('t') * 256 + ord('e')
     29797
 
-    Demonstration of reading the whole length in:
+    Demonstration of reading the whole length of a byte in:
 
     >>> midi.getNumber(b'test', 4)
     (1952805748, b'')
@@ -113,25 +107,16 @@ def getNumber(midiStr: str|bytes|int, length: int) -> tuple[int, str|bytes|int]:
     >>> midi.getNumber(516, 1)   # = 2*256 + 4
     (4, 512)
 
-    As of v9.7, this method can also take a string as input and return a string.
-    This usage is deprecated and will be removed in v10.
-
-    >>> midi.getNumber('test', 2)
-    (29797, 'st')
+    Changed in v10: remove Python 2 legacy string as input -- use bytes instead.
     '''
     summation = 0
-    if not isinstance(midiStr, int):
+    if isinstance(midiBytes, bytes):
         for i in range(length):
-            midiStrOrNum = midiStr[i]
-            if isinstance(midiStrOrNum, int):
-                summation = (summation << 8) + midiStrOrNum
-            else:  # to remove
-                if t.TYPE_CHECKING:
-                    assert isinstance(midiStrOrNum, str)
-                summation = (summation << 8) + ord(midiStrOrNum)
-        return summation, midiStr[length:]
+            midiByte = midiBytes[i]
+            summation = (summation << 8) + midiByte
+        return summation, midiBytes[length:]
     else:  # midiStr is an int
-        midNum = midiStr
+        midNum = midiBytes
         summation = midNum - ((midNum >> (8 * length)) << (8 * length))
         bigBytes = midNum - summation
         return summation, bigBytes

@@ -1612,13 +1612,6 @@ class RepeatBracket(Spanner):
             >>> rb.number = 1
         ''')
 
-    @common.deprecated('v9', 'v10', 'Look at .numberRange instead')
-    def getNumberList(self):  # pragma: no cover
-        '''
-        Deprecated -- just look at .numberRange
-        '''
-        return self.numberRange
-
     def _reprInternal(self):
         if self.overrideDisplay is not None:
             msg = self.overrideDisplay + ' '
