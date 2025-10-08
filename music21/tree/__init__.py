@@ -22,6 +22,7 @@ from __future__ import annotations
 __all__ = [
     'analysis',
     'core',
+    'core2',
     'examples',
     'fromStream',
     'makeExampleScore',
@@ -36,6 +37,7 @@ __all__ = [
 
 from music21.tree import analysis
 from music21.tree import core
+from music21.tree import core2
 from music21.tree import examples
 from music21.tree.examples import makeExampleScore
 from music21.tree import fromStream

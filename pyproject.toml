@@ -50,6 +50,7 @@ dependencies = [
     "more_itertools",
     "numpy>=1.26.4",
     "requests",
+    "sortedcontainers",
     "webcolors>=1.5",
 ]
 

@@ -17,7 +17,6 @@ and other positions.
 from __future__ import annotations
 
 from math import inf
-import typing as t
 import unittest
 import weakref
 

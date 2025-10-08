@@ -14,7 +14,8 @@ pylint>=3.2.0
 pytest
 python-Levenshtein
 scipy
-sphinx
+sortedcontainers-stubs
+phinx
 twine
 types-requests
 wheel

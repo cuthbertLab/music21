@@ -4,5 +4,6 @@ jsonpickle
 matplotlib
 more_itertools
 numpy>=1.26.4
-webcolors>=1.5
 requests
+sortedcontainers
+webcolors>=1.5
