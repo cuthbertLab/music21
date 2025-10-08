@@ -693,7 +693,7 @@ class StreamCore(Music21Object):
         '''
         sb = self.spannerBundle
         sIter: StreamIterator|RecursiveIterator
-        if recurse is True:
+        if recurse:
             sIter = self.recurse()  # type: ignore
         else:
             sIter = self.iter()  # type: ignore
@@ -708,16 +708,16 @@ class StreamCore(Music21Object):
                 if constrainingSpannerBundle is not None and sp not in constrainingSpannerBundle:
                     continue
                 if requireAllPresent:
-                    allFound = True
+                    allFound: bool = True
                     for spannedElement in sp.getSpannedElements():
                         if spannedElement not in sIter:
                             allFound = False
                             break
-                    if allFound is False:
+                    if not allFound:
                         continue
                 collectList.append(sp)
 
-        if insert is False:
+        if not insert:
             return collectList
 
         if collectList:  # do not run elementsChanged if nothing here.

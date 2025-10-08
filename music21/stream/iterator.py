@@ -79,9 +79,6 @@ class StreamIterator(prebase.ProtoM21Object, Sequence[M21ObjType]):
     * StreamIterator.streamLength -- length of elements.
 
     * StreamIterator.srcStreamElements -- srcStream._elements
-    * StreamIterator.cleanupOnStop -- should the StreamIterator delete the
-      reference to srcStream and srcStreamElements when stopping? default
-      False -- DEPRECATED: to be removed in v10.
     * StreamIterator.activeInformation -- a dict that contains information
       about where we are in the parse.  Especially useful for recursive
       streams:
@@ -114,6 +111,7 @@ class StreamIterator(prebase.ProtoM21Object, Sequence[M21ObjType]):
       - StreamIterator inherits from typing.Sequence, hence index
       was moved to elementIndex.
     * Changed in v9: cleanupOnStop is deprecated.  Was not working properly before: noone noticed.
+    * Changed in v10: remove cleanupOnStop.
 
     OMIT_FROM_DOCS
 
@@ -152,7 +150,6 @@ class StreamIterator(prebase.ProtoM21Object, Sequence[M21ObjType]):
         self.sectionIndex: int = -1
         self.iterSection: t.Literal['_elements', '_endElements'] = '_elements'
 
-        self.cleanupOnStop: bool = False
         self.restoreActiveSites: bool = restoreActiveSites
 
         self.overrideDerivation: str|None = None
@@ -358,7 +355,6 @@ class StreamIterator(prebase.ProtoM21Object, Sequence[M21ObjType]):
         >>> sI.srcStream is s
         True
 
-
         To request an element by id, put a '#' sign in front of the id,
         like in HTML DOM queries:
 
@@ -387,23 +383,6 @@ class StreamIterator(prebase.ProtoM21Object, Sequence[M21ObjType]):
         <music21.clef.TrebleClef>
         >>> s.iter().notes[0]
         <music21.note.Note F#>
-
-        Demo of cleanupOnStop = True; the sI[0] call counts as another iteration, so
-        after it is called, there is nothing more to iterate over!  Note that cleanupOnStop
-        will be removed in music21 v10.
-
-        >>> sI.cleanupOnStop = True
-        >>> for n in sI:
-        ...    printer = (repr(n), repr(sI[0]))
-        ...    print(printer)
-        ('<music21.note.Note F#>', '<music21.note.Note F#>')
-        >>> sI.srcStream is s  # set to an empty stream
-        False
-        >>> for n in sI:
-        ...    printer = (repr(n), repr(sI[0]))
-        ...    print(printer)
-
-        (nothing is printed)
 
         * Changed in v8: for strings: prepend a '#' sign to get elements by id.
           The old behavior still works until v9.
@@ -652,23 +631,9 @@ class StreamIterator(prebase.ProtoM21Object, Sequence[M21ObjType]):
 
     def cleanup(self) -> None:
         '''
-        stop iteration; and cleanup if need be.
+        stop iteration; and cleanup if need be.  Can be subclassed. does nothing.
         '''
-        if self.cleanupOnStop:
-            self.reset()
-
-            # cleanupOnStop is rarely used, so we put in
-            # a dummy stream so that self.srcStream does not need
-            # to be typed as Stream|None
-
-            # eventually want this to work
-            # SrcStreamClass = t.cast(type[StreamType], self.srcStream.__class__)
-            SrcStreamClass = self.srcStream.__class__
-
-            del self.srcStream
-            del self.srcStreamElements
-            self.srcStream = SrcStreamClass()
-            self.srcStreamElements = ()
+        pass
 
     # ---------------------------------------------------------------
     # getting items

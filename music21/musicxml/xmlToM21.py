@@ -1864,9 +1864,12 @@ class PartParser(XMLParserBase):
             removeClasses = STAFF_SPECIFIC_CLASSES[:]
             if staffIndex != 0:  # spanners only on the first staff.
                 removeClasses.append('Spanner')
-            newPartStaff = self.stream.template(removeClasses=removeClasses,
-                                                fillWithRests=False,
-                                                exemptFromRemove=EXEMPT_FROM_REMOVE)
+            newPartStaff = t.cast(
+                stream.PartStaff,
+                self.stream.template(removeClasses=removeClasses,
+                                     fillWithRests=False,
+                                     exemptFromRemove=EXEMPT_FROM_REMOVE)
+            )
             partStaffId = f'{self.partId}-Staff{staffKey}'
             newPartStaff.id = partStaffId
             # set group for components (recurse?)
