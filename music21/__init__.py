@@ -53,7 +53,7 @@ if sys.version_info < minPythonVersion:
     If you have the wrong version there are several options for getting
     the right one.
 
-    - 1. (Best) Upgrade to a recent version of Python 3 (such as 3.13).
+    - 1. (Best) Upgrade to a recent version of Python 3 (such as 3.14).
 
          The great features there will more
          than make up for the headache of downloading
