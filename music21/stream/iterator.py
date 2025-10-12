@@ -185,7 +185,7 @@ class StreamIterator(prebase.ProtoM21Object, Sequence[M21ObjType]):
 
         return f'for {streamClass}:{srcStreamId} @:{self.elementIndex}'
 
-    def __iter__(self: StreamIteratorType) -> StreamIteratorType:
+    def __iter__(self) -> t.Self:
         self.reset()
         return self
 
@@ -490,12 +490,12 @@ class StreamIterator(prebase.ProtoM21Object, Sequence[M21ObjType]):
         me.reverse()
         yield from me
 
-    def clone(self: StreamIteratorType) -> StreamIteratorType:
+    def clone(self) -> t.Self:
         '''
         Returns a new copy of the same iterator.
         (a shallow copy of some things except activeInformation)
         '''
-        out: StreamIteratorType = type(self)(
+        out: t.Self = type(self)(
             self.srcStream,
             filterList=copy.copy(self.filters),
             restoreActiveSites=self.restoreActiveSites,
@@ -913,11 +913,11 @@ class StreamIterator(prebase.ProtoM21Object, Sequence[M21ObjType]):
     # ------------------------------------------------------------
 
     def addFilter(
-        self: StreamIteratorType,
+        self,
         newFilter,
         *,
         returnClone=True
-    ) -> StreamIteratorType:
+    ) -> t.Self:
         '''
         Return a new StreamIterator with an additional filter.
         Also resets caches -- so do not add filters any other way.
@@ -941,11 +941,11 @@ class StreamIterator(prebase.ProtoM21Object, Sequence[M21ObjType]):
         return out
 
     def removeFilter(
-        self: StreamIteratorType,
+        self,
         oldFilter,
         *,
         returnClone=True
-    ) -> StreamIteratorType:
+    ) -> t.Self:
         '''
         Return a new StreamIterator where oldFilter is removed.
         '''
@@ -1177,7 +1177,7 @@ class StreamIterator(prebase.ProtoM21Object, Sequence[M21ObjType]):
         return self.addFilter(filters.GroupFilter(groupFilterList), returnClone=returnClone)
 
     def getElementsByOffset(
-        self: StreamIteratorType,
+        self,
         offsetStart,
         offsetEnd=None,
         *,
@@ -1187,7 +1187,7 @@ class StreamIterator(prebase.ProtoM21Object, Sequence[M21ObjType]):
         includeElementsThatEndAtStart=True,
         stopAfterEnd=True,
         returnClone=True,
-    ) -> StreamIteratorType:
+    ) -> t.Self:
         '''
         Adds a filter keeping only Music21Objects that
         are found at a certain offset or within a certain
@@ -1983,14 +1983,14 @@ class RecursiveIterator(StreamIterator[M21ObjType], Sequence[M21ObjType]):
             # will still return numbers even if _endElements
 
     def getElementsByOffsetInHierarchy(
-            self: StreamIteratorType,
+            self,
             offsetStart,
             offsetEnd=None,
             *,
             includeEndBoundary=True,
             mustFinishInSpan=False,
             mustBeginInSpan=True,
-            includeElementsThatEndAtStart=True) -> StreamIteratorType:
+            includeElementsThatEndAtStart=True) -> t.Self:
         '''
         Adds a filter keeping only Music21Objects that
         are found at a certain offset or within a certain

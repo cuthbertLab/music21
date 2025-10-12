@@ -40,8 +40,6 @@ from music21 import style
 if t.TYPE_CHECKING:
     from music21 import note
 
-PitchType = t.TypeVar('PitchType', bound='Pitch')
-
 environLocal = environment.Environment('pitch')
 
 PitchClassString = t.Literal['a', 'A', 't', 'T', 'b', 'B', 'e', 'E']
@@ -4013,20 +4011,20 @@ class Pitch(prebase.ProtoM21Object):
     _transpositionIntervals: dict[t.Literal['d2', '-d2'], interval.Interval] = {}
 
     @overload
-    def _getEnharmonicHelper(self: PitchType,
+    def _getEnharmonicHelper(self,
                              inPlace: t.Literal[True],
                              up: bool) -> None:
         ...
 
     @overload
-    def _getEnharmonicHelper(self: PitchType,
+    def _getEnharmonicHelper(self,
                              inPlace: t.Literal[False],
-                             up: bool) -> PitchType:
+                             up: bool) -> t.Self:
         ...
 
-    def _getEnharmonicHelper(self: PitchType,
+    def _getEnharmonicHelper(self,
                              inPlace: bool,
-                             up: bool) -> PitchType|None:
+                             up: bool) -> t.Self|None:
         '''
         abstracts the code from `getHigherEnharmonic` and `getLowerEnharmonic`
         '''
@@ -4055,14 +4053,14 @@ class Pitch(prebase.ProtoM21Object):
             return None
 
     @overload
-    def getHigherEnharmonic(self: PitchType, *, inPlace: t.Literal[False]) -> PitchType:
+    def getHigherEnharmonic(self, *, inPlace: t.Literal[False]) -> t.Self:
         return self
 
     @overload
-    def getHigherEnharmonic(self: PitchType, *, inPlace: t.Literal[True]) -> None:
+    def getHigherEnharmonic(self, *, inPlace: t.Literal[True]) -> None:
         return None
 
-    def getHigherEnharmonic(self: PitchType, *, inPlace: bool = False) -> PitchType|None:
+    def getHigherEnharmonic(self, *, inPlace: bool = False) -> t.Self|None:
         '''
         Returns an enharmonic `Pitch` object that is a higher
         enharmonic.  That is, the `Pitch` a diminished-second above
@@ -4119,14 +4117,14 @@ class Pitch(prebase.ProtoM21Object):
 
 
     @overload
-    def getLowerEnharmonic(self: PitchType, *, inPlace: t.Literal[False]) -> PitchType:
+    def getLowerEnharmonic(self, *, inPlace: t.Literal[False]) -> t.Self:
         return self
 
     @overload
-    def getLowerEnharmonic(self: PitchType, *, inPlace: t.Literal[True]) -> None:
+    def getLowerEnharmonic(self, *, inPlace: t.Literal[True]) -> None:
         return None
 
-    def getLowerEnharmonic(self: PitchType, *, inPlace: bool = False) -> PitchType|None:
+    def getLowerEnharmonic(self, *, inPlace: bool = False) -> t.Self|None:
         '''
         returns a Pitch enharmonic that is a diminished second
         below the current note
@@ -4160,11 +4158,11 @@ class Pitch(prebase.ProtoM21Object):
             return self._getEnharmonicHelper(inPlace=False, up=False)
 
     def simplifyEnharmonic(
-        self: PitchType,
+        self,
         *,
         inPlace=False,
         mostCommon=False
-    ) -> PitchType|None:
+    ) -> t.Self|None:
         '''
         Returns a new Pitch (or sets the current one if inPlace is True)
         that is either the same as the current pitch or has fewer
@@ -4253,7 +4251,7 @@ class Pitch(prebase.ProtoM21Object):
         else:
             return returnObj
 
-    def getEnharmonic(self: PitchType, *, inPlace=False) -> PitchType|None:
+    def getEnharmonic(self, *, inPlace=False) -> t.Self|None:
         # noinspection GrazieInspection
         '''
         Returns a new Pitch that is the(/an) enharmonic equivalent of this Pitch.
@@ -4351,7 +4349,7 @@ class Pitch(prebase.ProtoM21Object):
             self._client.pitchChanged()  # pylint: disable=no-member
 
 
-    def getAllCommonEnharmonics(self: PitchType, alterLimit: int = 2) -> list[PitchType]:
+    def getAllCommonEnharmonics(self, alterLimit: int = 2) -> list[t.Self]:
         '''
         Return all common unique enharmonics for a pitch,
         or those that do not involve more than two accidentals.
@@ -4384,7 +4382,7 @@ class Pitch(prebase.ProtoM21Object):
         Music21 does not support accidentals beyond quadruple sharp/flat, so
         `alterLimit` = 4 is the most you can use. (Thank goodness!)
         '''
-        post: list[PitchType] = []
+        post: list[t.Self] = []
         c = self.simplifyEnharmonic(inPlace=False)
         if c is None:  # pragma: no follow
             return post  # not going to happen
@@ -4511,7 +4509,7 @@ class Pitch(prebase.ProtoM21Object):
 
     @overload
     def transpose(
-        self: PitchType,
+        self,
         value: interval.IntervalBase|str|int,
         *,
         inPlace: t.Literal[True]
@@ -4520,19 +4518,19 @@ class Pitch(prebase.ProtoM21Object):
 
     @overload
     def transpose(
-        self: PitchType,
+        self,
         value: interval.IntervalBase|str|int,
         *,
         inPlace: t.Literal[False] = False
-    ) -> PitchType:
+    ) -> t.Self:
         ...
 
     def transpose(
-        self: PitchType,
+        self,
         value: interval.IntervalBase|str|int,
         *,
         inPlace: bool = False
-    ) -> PitchType|None:
+    ) -> t.Self|None:
         '''
         Transpose the pitch by the user-provided value.  If the value is an
         integer, the transposition is treated in half steps. If the value is a
@@ -4662,12 +4660,12 @@ class Pitch(prebase.ProtoM21Object):
     # utilities for pitch object manipulation
 
     def transposeBelowTarget(
-        self: PitchType,
+        self,
         target,
         *,
         minimize=False,
         inPlace=False
-    ) -> PitchType|None:
+    ) -> t.Self|None:
         # noinspection PyShadowingNames
         '''
         Given a source Pitch, shift it down some number of octaves until it is below the
@@ -4761,11 +4759,11 @@ class Pitch(prebase.ProtoM21Object):
             return src
         return None
 
-    def transposeAboveTarget(self: PitchType,
+    def transposeAboveTarget(self,
                              target,
                              *,
                              minimize=False,
-                             inPlace=False) -> PitchType|None:
+                             inPlace=False) -> t.Self|None:
         '''
         Given a source Pitch, shift it up octaves until it is above the target.
 
