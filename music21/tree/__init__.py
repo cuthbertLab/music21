@@ -16,6 +16,11 @@ organized by start and stop offsets.
 
 This is a lower-level tool that for now at least normal music21
 users won't need to worry about.
+
+This directory will change significantly and may even be removed in v10.
+Developers who depend on certain tree features (chirp...chirp...) should
+speak up on the music21list or GitHub -- but in > 12 years of having it
+no one has said they use it -- hence why it should be modified!
 '''
 from __future__ import annotations
 
