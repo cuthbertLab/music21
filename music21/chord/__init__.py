@@ -53,9 +53,6 @@ if t.TYPE_CHECKING:
 
 environLocal = environment.Environment('chord')
 
-_ChordBaseType = t.TypeVar('_ChordBaseType', bound='music21.chord.ChordBase')
-_ChordType = t.TypeVar('_ChordType', bound='music21.chord.Chord')
-
 # ------------------------------------------------------------------------------
 class ChordException(exceptions21.Music21Exception):
     pass
@@ -162,7 +159,7 @@ class ChordBase(note.NotRest):
     def __hash__(self):
         return super().__hash__()
 
-    def __deepcopy__(self: _ChordBaseType, memo=None) -> _ChordBaseType:
+    def __deepcopy__(self, memo=None) -> t.Self:
         '''
         As Chord objects have one or more Volume, objects, and Volume
         objects store weak refs to the client object, need to specialize
@@ -1014,11 +1011,11 @@ class Chord(ChordBase):
         return lowest
 
     def _removePitchByRedundantAttribute(
-        self: _ChordType,
+        self,
         attribute: str,
         *,
         inPlace=False
-    ) -> _ChordType|list[pitch.Pitch]:
+    ) -> t.Self|list[pitch.Pitch]:
         '''
         Common method for stripping pitches based on redundancy of one pitch
         attribute. The `attribute` is provided by a string.
@@ -1113,7 +1110,7 @@ class Chord(ChordBase):
 
     @overload
     def annotateIntervals(
-        self: _ChordType,
+        self,
         *,
         inPlace: bool = False,
         stripSpecifiers: bool = True,
@@ -1124,7 +1121,7 @@ class Chord(ChordBase):
 
     @overload
     def annotateIntervals(
-        self: _ChordType,
+        self,
         *,
         inPlace: t.Literal[True],
         stripSpecifiers: bool = True,
@@ -1135,23 +1132,23 @@ class Chord(ChordBase):
 
     @overload
     def annotateIntervals(
-        self: _ChordType,
+        self,
         *,
         inPlace: t.Literal[False] = False,
         stripSpecifiers: bool = True,
         sortPitches: bool = True,
         returnList: t.Literal[False] = False
-    ) -> _ChordType:
+    ) -> t.Self:
         ...
 
     def annotateIntervals(
-        self: _ChordType,
+        self,
         *,
         inPlace: bool = False,
         stripSpecifiers: bool = True,
         sortPitches: bool = True,
         returnList: bool = False
-    ) -> _ChordType|None|list[str]:
+    ) -> t.Self|None|list[str]:
         # noinspection PyShadowingNames
         '''
         Add lyrics to the chord that show the distance of each note from
@@ -1251,7 +1248,7 @@ class Chord(ChordBase):
         if not inPlace:
             return c
 
-    def areZRelations(self: _ChordType, other: _ChordType) -> bool:
+    def areZRelations(self, other: t.Self) -> bool:
         '''
         Check if another Chord is a z-relation to this Chord.
 
@@ -1489,7 +1486,7 @@ class Chord(ChordBase):
 
     @overload
     def closedPosition(
-        self: _ChordType,
+        self,
         *,
         forceOctave: int|None = None,
         inPlace: t.Literal[True],
@@ -1499,21 +1496,21 @@ class Chord(ChordBase):
 
     @overload
     def closedPosition(
-        self: _ChordType,
+        self,
         *,
         forceOctave: int|None = None,
         inPlace: t.Literal[False] = False,
         leaveRedundantPitches: bool = False
-    ) -> _ChordType:
+    ) -> t.Self:
         ...
 
     def closedPosition(
-        self: _ChordType,
+        self,
         *,
         forceOctave: int|None = None,
         inPlace: bool = False,
         leaveRedundantPitches: bool = False
-    ) -> _ChordType|None:
+    ) -> t.Self|None:
         '''
         Returns a new Chord object with the same pitch classes,
         but now in closed position.
@@ -4015,7 +4012,7 @@ class Chord(ChordBase):
 
     @overload
     def semiClosedPosition(
-        self: _ChordType,
+        self,
         *,
         forceOctave,
         inPlace: t.Literal[True],
@@ -4025,21 +4022,21 @@ class Chord(ChordBase):
 
     @overload
     def semiClosedPosition(
-        self: _ChordType,
+        self,
         *,
         forceOctave=None,
         inPlace: t.Literal[False] = False,
         leaveRedundantPitches=False
-    ) -> _ChordType:
+    ) -> t.Self:
         return self
 
     def semiClosedPosition(
-        self: _ChordType,
+        self,
         *,
         forceOctave: int|None = None,
         inPlace: t.Literal[True]|t.Literal[False] = False,
         leaveRedundantPitches: bool = False
-    ) -> None|_ChordType:
+    ) -> None|t.Self:
         # noinspection PyShadowingNames
         '''
         Similar to :meth:`~music21.chord.Chord.ClosedPosition` in that it
