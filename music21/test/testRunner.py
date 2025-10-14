@@ -242,6 +242,8 @@ def mainTest(*testClasses, **keywords):
             if ('importPlusRelative' in testClasses
                     or 'importPlusRelative' in sys.argv
                     or bool(keywords.get('importPlusRelative', False))):
+                # allow things like volpiano.py's function "fromStream"
+                # to be called in doctests as "fromStream" and not just "volpiano.fromStream"
                 globs.update(inspect.stack()[1][0].f_globals)
 
         try:

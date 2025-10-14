@@ -66,13 +66,13 @@ so allocate time (2 min on M4).  Start working on the announcement while it's ru
     then don't change anything until the next step is done.  Merge to main/master
     (.gitignore will avoid uploading the large files created here.)
 
-15. Switch back to master/main branch
+15. Switch back to master/main branch (or whatever main version we are releasing)
 
 16. Tag the commit: git tag -a vX.Y.Z -m "music21 vX.Y.Z"
     Don't forget the "v" in the release tag.
     Sanity check that the correct commit was tagged: git log
 
-17. Push tags: git push --tags  (or git push upstream --tags if not on main branch)
+17. Push tags: git push --tags
 
 18. Create a new release on GitHub (using the tag just created) and upload the
     non-wheel files created here and docs.
