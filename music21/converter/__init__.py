@@ -210,7 +210,10 @@ class ArchiveManager:
                 if 'META-INF' in subFp:
                     continue
                 # include .mxl to be kind to users who zipped up mislabeled files
-                if pathlib.Path(subFp).suffix not in ['.musicxml', '.xml', '.mxl']:
+                if pathlib.Path(subFp).suffix not in ['.musicxml',
+                                                      '.xml',
+                                                      '.mxl'] and subFp != '.xml':
+                    # Noteflight bug for untitled files puts filename as just '.xml'
                     continue
 
                 post = f.read(subFp)
