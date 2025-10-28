@@ -126,5 +126,4 @@ On the Mac, run::
 
     pip3 install pygame
 
-
-
+Pygame 1.9 or later is required for correct error handling

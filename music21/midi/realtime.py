@@ -6,7 +6,7 @@
 # Authors:      Michael Scott Asato Cuthbert
 #               (from an idea by Joe "Codeswell")
 #
-# Copyright:    Copyright © 2012 Michael Scott Asato Cuthbert
+# Copyright:    Copyright © 2012-25 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
@@ -18,7 +18,7 @@ https://joecodeswell.wordpress.com/2012/06/13/how-to-produce-python-controlled-a
 
 https://stackoverflow.com/questions/10983462/how-can-i-produce-real-time-audio-output-from-music-made-with-music21
 
-Requires pygame: pip3 install pygame
+Requires pygame 2 (or 1.9) install with: pip3 install pygame
 '''
 from __future__ import annotations
 
@@ -87,9 +87,6 @@ class StreamPlayer:  # pragma: no cover
             # noinspection PyPackageRequirements
             import pygame  # type: ignore
             self.pygame = pygame
-            # noinspection PyPackageRequirements
-            import pygame.exceptions    # type: ignore
-            self.pygame_exceptions = pygame.exceptions  # type: ignore  # pylint: disable=no-member
         except ImportError:
             raise StreamPlayerException('StreamPlayer requires pygame.  Install first')
         if self.mixerInitialized is False or reinitMixer:
@@ -152,10 +149,9 @@ class StreamPlayer:  # pragma: no cover
         pygameClock = self.pygame.time.Clock()
         try:
             self.pygame.mixer.music.load(stringIOFile)
-        except self.pygame_exceptions.PygameError as pge:
+        except self.pygame.error as pge:
             raise StreamPlayerException(
-                f'Could not play music file {stringIOFile} because: '
-                + f'{self.pygame_exceptions.get_error()}'
+                f'Could not play music file {stringIOFile} because: {pge}'
             ) from pge
         self.pygame.mixer.music.play()
         if not blocked:
