@@ -3,7 +3,7 @@
 # Name:         extensions.py
 # Purpose:      Sphinx extension for hiding and showing lines in docs
 #
-# Authors:      Josiah Wolf Oberholtzer
+# Authors:      Joséphine Wolf Oberholtzer
 #
 # Copyright:    Copyright © 2013-22 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
