@@ -5,7 +5,7 @@
 #
 # Authors:      Christopher Ariza
 #               Michael Scott Asato Cuthbert
-#               Josiah Oberholtzer
+#               Joséphine Wolf Oberholtzer
 #
 # Copyright:    Copyright © 2010, 2012-14, '17, '19-20
 #               Michael Scott Asato Cuthbert

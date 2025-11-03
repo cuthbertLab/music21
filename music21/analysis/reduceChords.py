@@ -3,7 +3,7 @@
 # Name:         reduceChords.py
 # Purpose:      Tools for eliminating passing chords, etc.
 #
-# Authors:      Josiah Wolf Oberholtzer
+# Authors:      Joséphine Wolf Oberholtzer
 #               Michael Scott Asato Cuthbert
 #
 # Copyright:    Copyright © 2013 Michael Scott Asato Cuthbert

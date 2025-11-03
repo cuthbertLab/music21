@@ -3,7 +3,7 @@
 # Name:         corpora.py
 # Purpose:      corpus classes
 #
-# Authors:      Josiah Wolf Oberholtzer
+# Authors:      Joséphine Wolf Oberholtzer
 #
 # Copyright:    Copyright © 2009-2012, 2014 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
