@@ -3,7 +3,7 @@
 # Name:         docbuild/writers.py
 # Purpose:      music21 documentation writer to rst
 #
-# Authors:      Josiah Wolf Oberholtzer
+# Authors:      Joséphine Wolf Oberholtzer
 #               Christopher Ariza
 #               Michael Scott Asato Cuthbert
 #

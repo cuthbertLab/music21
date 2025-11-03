@@ -5,7 +5,7 @@
 #
 # Authors:      Michael Scott Asato Cuthbert
 #               Christopher Ariza
-#               Josiah Wolf Oberholtzer
+#               Joséphine Wolf Oberholtzer
 #               Evan Lynch
 #
 # Copyright:    Copyright © 2008-2020 Michael Scott Asato Cuthbert
