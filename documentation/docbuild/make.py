@@ -3,7 +3,7 @@
 # Name:         documentation/make.py
 # Purpose:      music21 documentation script, v. 2.0
 #
-# Authors:      Josiah Wolf Oberholtzer
+# Authors:      Joséphine Wolf Oberholtzer
 #               Christopher Ariza
 #               Michael Scott Asato Cuthbert
 #

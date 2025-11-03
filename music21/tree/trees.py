@@ -3,7 +3,7 @@
 # Name:         tree/trees.py
 # Purpose:      Subclasses of tree.core.AVLTree for different purposes
 #
-# Authors:      Josiah Wolf Oberholtzer
+# Authors:      Joséphine Wolf Oberholtzer
 #               Michael Scott Asato Cuthbert
 #
 # Copyright:    Copyright © 2013-2016 Michael Scott Asato Cuthbert

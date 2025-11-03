@@ -3,7 +3,7 @@
 # Name:         timespans/node.py
 # Purpose:      Internal data structures for timespan collections
 #
-# Authors:      Josiah Wolf Oberholtzer
+# Authors:      Joséphine Wolf Oberholtzer
 #               Michael Scott Asato Cuthbert
 #
 # Copyright:    Copyright © 2013-2016 Michael Scott Asato Cuthbert

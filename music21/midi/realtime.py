@@ -44,7 +44,6 @@ class StreamPlayer:  # pragma: no cover
     consistent detuning from 30 cents flat to sharp)
     and play a Bach Chorale on it in real time.
 
-
     >>> import random
     >>> keyDetune = []
     >>> for i in range(127):
@@ -215,7 +214,6 @@ class TestExternal(unittest.TestCase):  # pragma: no cover
         '''
         tests to see if the busyCallback function is called properly
         '''
-
         from music21 import corpus
         import random
 
