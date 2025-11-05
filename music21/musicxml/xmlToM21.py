@@ -1191,7 +1191,11 @@ class MusicXMLImporter(XMLParserBase):
             self.spannerBundle.append(staffGroup)
             # self.stream.coreInsert(0, staffGroup)
 
-    def xmlMetadata(self, el=None, inputM21=None):
+    def xmlMetadata(
+        self,
+        el: ET.Element|None = None,
+        inputM21: metadata.Metadata|None = None
+    ) -> metadata.Metadata|None:
         '''
         Converts part of the root element into a metadata object
 
@@ -1234,17 +1238,24 @@ class MusicXMLImporter(XMLParserBase):
 
         identification = el.find('identification')
         if identification is not None:
-            self.identificationToMetadata(identification, md)
+            self.addIdentificationToMetadata(identification, md)
 
         if inputM21 is None:
             return md
+        return None
 
-    def identificationToMetadata(self,
-                                 identification: ET.Element,
-                                 inputM21: metadata.Metadata|None = None):
+
+    def addIdentificationToMetadata(
+        self,
+        identification: ET.Element,
+        md: metadata.Metadata,
+    ) -> None:
         '''
-        Convert an <identification> tag, containing <creator> tags, <rights> tags, and
-        <miscellaneous> tag.
+        Given an <identification> tag, , containing <creator> tags, <rights> tags, and
+        <miscellaneous> tags etc., add this information to the
+        :class:`~music21.metadata.Metadata` object passed in.
+
+        (Replaces identificationToMetadata which is now deprecated.)
 
         Not supported: source, relation
 
@@ -1254,11 +1265,6 @@ class MusicXMLImporter(XMLParserBase):
         new-system (definesExplicitSystemBreaks) and
         new-page (definesExplicitPageBreaks)
         '''
-        if inputM21 is not None:
-            md = inputM21
-        else:
-            md = metadata.Metadata()
-
         for creator in identification.findall('creator'):
             c = self.creatorToContributor(creator)
             if md.isContributorUniqueName(c.role):
@@ -1295,8 +1301,25 @@ class MusicXMLImporter(XMLParserBase):
                     # so nothing is lost.
                     md.addCustom(miscFieldName, miscFieldValue)
 
-        if inputM21 is None:
+    @common.deprecated('use addIdentificationToMetadata', 'v10', 'v11')
+    def identificationToMetadata(
+        self,
+        identification: ET.Element,
+        inputM21: metadata.Metadata|None = None
+    ) -> metadata.Metadata|None:
+        '''
+        Deprecated -- use addIdentificationToMetadata instead and always
+        pass in a metadata object.
+        '''
+        if inputM21 is not None:
+            md = inputM21
+        else:
+            md = metadata.Metadata()
+        self.addIdentificationToMetadata(identification, md)
+        if inputM21 is not None:
             return md
+        return None
+
 
     @staticmethod
     def isRecognizableMetadataKey(miscFieldName: str) -> bool:
@@ -5046,7 +5069,7 @@ class MeasureParser(SoundTagMixin, XMLParserBase):
 
         return thisVoice
 
-    def xmlBarline(self, mxBarline):
+    def xmlBarline(self, mxBarline: ET.Element) -> None:
         '''
         Handles everything for putting a barline into a Stream
         and updating repeat characteristics.
