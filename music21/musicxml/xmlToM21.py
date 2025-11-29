@@ -6355,7 +6355,18 @@ class MeasureParser(SoundTagMixin, XMLParserBase):
             except ValueError:
                 warnings.warn(
                     f'Got an incorrect staff-type in details: {mxStaffType}', MusicXMLWarning)
-        # TODO: staff-tuning*
+
+        mxStaffTuning = mxDetails.findall('staff-tuning')
+        if mxStaffTuning is not None:
+            tuning_pitches = []
+            for i in range(len(mxStaffTuning)):
+                staff_tuning = mxStaffTuning[i]
+                tuning_step = staff_tuning.find('tuning-step').text
+                tuning_octave = int(staff_tuning.find('tuning-octave').text)
+                tuning_pitches.append(pitch.Pitch(tuning_step + str(tuning_octave)))
+            fretboard = tablature.FretBoard.getFretBoardFromTuning(tuning_pitches)
+            setattr(stl, 'fretboard', fretboard)
+
         # TODO: capo
         seta(stl, mxDetails, 'staff-size', transform=_floatOrIntStr)
         # TODO: musicxml 4: staff-size has a scaling attribute for the notation
