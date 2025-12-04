@@ -2192,8 +2192,8 @@ class Chord(ChordBase):
 
     def hasAnyEnharmonicSpelledPitches(self) -> bool:
         '''
-        Returns True if for any given pitchClass there is at most one spelling of the note
-        (in any octave).
+        Returns True if for any given pitchClass there is more than one spelling of the note
+        in any octave (e.g., C#4 and D-5).
 
         >>> cChord = chord.Chord('C4 E4 G4 C5')
         >>> cChord.hasAnyEnharmonicSpelledPitches()
