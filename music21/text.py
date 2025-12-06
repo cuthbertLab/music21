@@ -54,7 +54,7 @@ articleReference = {
 
 
 # ------------------------------------------------------------------------------
-def assembleLyrics(streamIn, lineNumber=1):
+def assembleLyrics(streamIn, lineNumber=1, *, wordSeparator=' '):
     '''
     Concatenate text from a stream. The Stream is automatically flattened.
 
@@ -124,10 +124,10 @@ def assembleLyrics(streamIn, lineNumber=1):
                     word = []
             else:
                 raise ValueError(f'no known Text syllabic setting: {lyricObj.syllabic}')
-    return ' '.join(words)
+    return wordSeparator.join(words)
 
 
-def assembleAllLyrics(streamIn, maxLyrics=10, lyricSeparation='\n'):
+def assembleAllLyrics(streamIn, maxLyrics=10, lyricSeparation='\n', *, wordSeparator=' '):
     r'''
     Concatenate all Lyrics text from a stream separated by lyricSeparation.
     The Stream is automatically recursed.
@@ -152,7 +152,7 @@ def assembleAllLyrics(streamIn, maxLyrics=10, lyricSeparation='\n'):
     '''
     lyrics = ''
     for i in range(1, maxLyrics):
-        lyr = assembleLyrics(streamIn, i)
+        lyr = assembleLyrics(streamIn, i, wordSeparator=wordSeparator)
         if lyr != '':
             if i > 1:
                 lyrics += lyricSeparation
@@ -589,12 +589,13 @@ class Trigram:
         thisLength = total ** 0.5
         self._length = thisLength
 
-    def similarity(self, other):
+    def similarity(self, other: Trigram) -> float:
         '''
         returns a number between 0 and 1 indicating similarity between
         two trigrams.
-        1 means an identical ratio of trigrams;
-        0 means no trigrams in common.
+
+        1.0 means an identical ratio of trigrams;
+        0.0 means no trigrams in common.
         '''
         if not isinstance(other, Trigram):
             raise TypeError("can't compare Trigram with non-Trigram")
@@ -612,14 +613,14 @@ class Trigram:
         # environLocal.warn([self.length, 'self'])
         # environLocal.warn([other.length, 'other'])
 
-        return float(total) / (self.length * other.length)
+        return float(total / (self.length * other.length))
 
-    def __sub__(self, other):
+    def __sub__(self, other: Trigram) -> float:
         '''
-        indicates difference between trigram sets; 1 is entirely
-        different, 0 is entirely the same.
+        indicates difference between trigram sets; 1.0 is entirely
+        different, 0.0 is entirely the same.
         '''
-        return 1 - self.similarity(other)
+        return 1.0 - self.similarity(other)
 
     def makeWords(self, count):
         '''
@@ -686,6 +687,15 @@ class Test(unittest.TestCase):
         post = assembleLyrics(s)
         # noinspection SpellCheckingInspection
         self.assertEqual(post, 'aristocats are great')
+
+        s = stream.Stream()
+        for syl in ['长', '亭', '外', '古', '道', '边']:
+            n = note.Note()
+            n.lyric = syl
+            s.append(n)
+        post = assembleLyrics(s, wordSeparator='')
+        # custom word separator
+        self.assertEqual(post, '长亭外古道边')
 
     # noinspection SpellCheckingInspection
     def testLanguageDetector(self):

@@ -132,6 +132,7 @@ import unittest
 from music21 import bar
 from music21 import base
 from music21 import common
+from music21.common.types import OffsetQL
 from music21 import environment
 from music21 import exceptions21
 from music21 import harmony
@@ -392,7 +393,7 @@ class PartTranslator:
         fixPickupMeasure(p)
         p.makeBeams(inPlace=True)
         p.makeAccidentals(inPlace=True)
-        _addRepeatsFromRepeatEndings(p, self.repeatEndings)  # 1st and second endings...
+        _addRepeatsFromRepeatEndings(p, self.repeatEndings)  # 1st and second endings
         return p
 
     def translateOneLineToken(self, lineToken: rtObjects.RTTagged):
@@ -407,7 +408,7 @@ class PartTranslator:
         md = self.md
         # environLocal.printDebug(['token', t])
 
-        # most common case first...
+        # most common case first
         if lineToken.isMeasure():
             if t.TYPE_CHECKING:
                 assert isinstance(lineToken, rtObjects.RTMeasure)
@@ -703,7 +704,13 @@ class PartTranslator:
         m.coreElementsChanged()
         return m
 
-    def translateSingleMeasureAtom(self, a, m, *, isLastAtomInMeasure=False):
+    def translateSingleMeasureAtom(
+        self,
+        a: rtObjects.RTAtom,
+        m: stream.Measure,
+        *,
+        isLastAtomInMeasure: bool = False,
+    ) -> None:
         '''
         Translate a single atom in a measure token.
 
@@ -711,7 +718,7 @@ class PartTranslator:
         `m` is a `stream.Measure` object.
 
         Uses coreInsert and coreAppend methods, so must have `m.coreElementsChanged()`
-        called afterwards.
+        called afterward.
         '''
         if (isinstance(a, rtObjects.RTKey)
                 or (self.foundAKeySignatureSoFar is False
@@ -831,7 +838,12 @@ class PartTranslator:
             m.coreInsert(self.currentOffsetInMeasure, rtt)
             # environLocal.warn(f' Got an unknown token: {a}')
 
-    def processRTChord(self, a, m, currentOffset):
+    def processRTChord(
+        self,
+        a: rtObjects.RTChord,
+        m: stream.Measure,
+        currentOffset: OffsetQL
+    ) -> None:
         '''
         Process a single RTChord atom.
         '''
@@ -846,7 +858,7 @@ class PartTranslator:
             cacheTuple = (aSrc, self.kCurrent.tonicPitchNameWithCase)
             if USE_RN_CACHE and cacheTuple in _rnKeyCache:  # pragma: no cover
                 # print('Got a match: ' + str(cacheTuple))
-                # Problems with Caches not picking up pivot chords...
+                # Problems with Caches not picking up pivot chords
                 #    Not faster, see below.
                 rn = copy.deepcopy(_rnKeyCache[cacheTuple])
             else:
@@ -858,7 +870,7 @@ class PartTranslator:
                                         )
                 rn.writeAsChord = True
                 _rnKeyCache[cacheTuple] = rn
-            # surprisingly, not faster... and more dangerous
+            # surprisingly, not faster, and more dangerous
             # rn = roman.RomanNumeral(aSrc, kCurrent)
             # # SLOWEST!!!
             # rn = roman.RomanNumeral(aSrc, kCurrent.tonicPitchNameWithCase)
@@ -875,7 +887,7 @@ class PartTranslator:
             # ...    'from music21 import roman, key; import copy;
             # ...     k = key.Key("c#")', number=1000)
             # 22.49
-            # # key cache, does not help much...
+            # # key cache, does not help much
             # >>> t('copy.deepcopy(r)', 'from music21 import roman; import copy;
             # ...        r = roman.RomanNumeral("IV", "c#")', number=1000)
             # 19.01
@@ -887,7 +899,7 @@ class PartTranslator:
                 rn.followsKeyChange = False
         except roman.RomanNumeralException:  # pragma: no cover
             # environLocal.printDebug(f' cannot create RN from: {a.src}')
-            rn = note.Note()  # create placeholder
+            rn = roman.RomanNumeral()  # create placeholder
 
         if self.pivotChordPossible is False:
             # probably best to find duration
@@ -1066,7 +1078,7 @@ def _consolidateRepeatEndings(repeatEndings):
 
 def _addRepeatsFromRepeatEndings(s, repeatEndings):
     '''
-    given a Stream and the repeatEndings dict, add repeats to the stream...
+    Given a Stream and the repeatEndings dict, add repeats to the stream.
     '''
     consolidatedRepeats = _consolidateRepeatEndings(repeatEndings)
     for repeatEndingTuple in consolidatedRepeats:
@@ -1591,7 +1603,7 @@ m1 C: I'''
         pt.translateTokens(rtHandler.tokens)
         self.assertEqual(pt.romanTextVersion, 2.5)
 
-        # gives warning, not raises...
+        # gives warning, not raises
         #         src = '''RTVersion: XYZ
         # m1 C: I'''
         #         rtf = rtObjects.RTFile()

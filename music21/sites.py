@@ -76,11 +76,16 @@ class SiteRef(common.SlottedObjectMixin, prebase.ProtoM21Object):
     >>> s.site
     <music21.stream.Stream hi>
     >>> s.siteWeakref
-    <weakref at 0x123456; to 'Stream' at 0x111111>
-
+    <weakref at 0x123456; to ...Stream' at 0x111111>
 
     If you turn sites.WEAKREF_ACTIVE to False then .siteWeakref just stores another reference to
     the site.  Bad for memory. Good for debugging pickling.
+
+    OMIT_FROM_DOCS
+
+    Note that the ...Stream was needed after Python 3.13.
+    When 3.13 is the lowest version, replace ... with the
+    actual output.
     '''
     # CLASS VARIABLES #
 
@@ -166,7 +171,7 @@ class SiteRef(common.SlottedObjectMixin, prebase.ProtoM21Object):
 
 
 _NoneSiteRef = SiteRef()
-_NoneSiteRef.globalSiteIndex = -2  # -1 is used elsewhere...
+_NoneSiteRef.globalSiteIndex = -2  # -1 is used elsewhere
 _NoneSiteRef.siteIndex = -2
 
 _singletonCounter = common.SingletonCounter()
@@ -365,7 +370,7 @@ class Sites(common.SlottedObjectMixin):
 
         if updateNotAdd is True:
             siteRef = self.siteDict[idKey]
-            siteRef.isDead = False  # in case it used to be a dead site...
+            siteRef.isDead = False  # in case it used to be a dead site
         else:
             siteRef = SiteRef()
 
@@ -395,8 +400,7 @@ class Sites(common.SlottedObjectMixin):
                    sortByCreationTime: t.Union[bool, t.Literal['reverse']] = False,
                    priorityTarget=None,
                    ) -> Generator[stream.Stream, None, None]:
-        from music21 import stream
-        yield stream.Stream()
+        ...
 
     @overload
     def yieldSites(self,
@@ -405,7 +409,7 @@ class Sites(common.SlottedObjectMixin):
                    sortByCreationTime: t.Union[bool, t.Literal['reverse']] = False,
                    priorityTarget=None,
                    ) -> Generator[stream.Stream|None, None, None]:
-        yield None
+        ...
 
     def yieldSites(self,
                    *,
@@ -423,7 +427,7 @@ class Sites(common.SlottedObjectMixin):
 
         Note that priorityTarget is searched only on id -- this could be dangerous if the
         target has been garbage collected and the id is reused. Unlikely since you have to
-        pass in the priorityTarget itself, so therefore it still exists...
+        pass in the priorityTarget itself, so therefore it still exists.
 
         This can be much faster than .get in the case where the sought-for site
         is earlier in the list.

@@ -6,7 +6,7 @@
 # Authors:      Christopher Ariza
 #               Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2009-2023 Michael Scott Asato Cuthbert
+# Copyright:    Copyright © 2009-2024 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 from __future__ import annotations
@@ -23,7 +23,7 @@ DYNAMIC_MARKS = ['p', 'pp', 'ppp', 'pppp', 'ppppp', 'pppppp',
                  'f', 'ff', 'fff', 'ffff', 'fffff', 'ffffff',
                  'mp', 'mf', 'sf', 'sfp', 'sfpp', 'fp', 'rf', 'rfz', 'sfz', 'sffz', 'fz',
                  'n', 'pf', 'sfzp',  # musicxml 3.1
-                 'other-dynamics'  # non-empty...
+                 'other-dynamics'  # non-empty
                  ]
 
 ARTICULATION_MARKS = OrderedDict(
@@ -71,8 +71,7 @@ TECHNICAL_MARKS = OrderedDict([('up-bow', articulations.UpBow),
                                # in method objectAttachedSpannersToTechnicals of m21ToXml.py
                                # ('hammer-on', articulations.HammerOn),
                                # ('pull-off', articulations.PullOff),
-                               # bend not implemented because it needs many subcomponents
-                               # ('bend', articulations.FretBend),
+                               ('bend', articulations.FretBend),
                                ('tap', articulations.FretTap),
                                ('fret', articulations.FretIndication),
                                ('heel', articulations.OrganHeel),
@@ -101,7 +100,7 @@ ORNAMENT_MARKS = {'trill-mark': expressions.Trill,
                   'inverted-mordent': expressions.InvertedMordent,
                   'schleifer': expressions.Schleifer,
                   'other-ornament': expressions.Ornament
-                  # TODO: 'accidental-mark' -- something else...
+                  # TODO: 'accidental-mark' -- something else
                   }
 
 # ------------------------------------------------------------------------------
@@ -134,7 +133,6 @@ class MusicXMLWarning(UserWarning):
 # ------------------------------------------------------------------------------
 # helpers
 STYLE_ATTRIBUTES_YES_NO_TO_BOOL = ('hideObjectOnPrint', )
-STYLE_ATTRIBUTES_STR_NONE_TO_NONE = ('enclosure', )
 
 
 def yesNoToBoolean(value):
@@ -172,7 +170,7 @@ def fractionToPercent(value):
     >>> musicxml.xmlObjects.fractionToPercent(0.25)
     '25'
 
-    Only does whole numbers for now...
+    Only does whole numbers for now:
 
     >>> musicxml.xmlObjects.fractionToPercent(0.251)
     '25'

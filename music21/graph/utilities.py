@@ -6,7 +6,7 @@
 # Authors:      Christopher Ariza
 #               Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2009-2023 Michael Scott Asato Cuthbert,
+# Copyright:    Copyright © 2009-2023 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
@@ -30,7 +30,7 @@ environLocal = environment.Environment('graph.utilities')
 
 
 ExtendedModules = namedtuple('ExtendedModules',
-                             ['matplotlib', 'Axes3D', 'collections', 'patches', 'plt', 'networkx'])
+                             ['matplotlib', 'Axes3D', 'collections', 'patches', 'plt'])
 
 
 def getExtendedModules():
@@ -38,7 +38,7 @@ def getExtendedModules():
     this is done inside a function, so that the slow import of matplotlib is not done
     in ``from music21 import *`` unless it's actually needed.
 
-    Returns a namedtuple: (matplotlib, Axes3D, collections, patches, plt, networkx)
+    Returns a namedtuple: (matplotlib, Axes3D, collections, patches, plt)
     '''
     if 'matplotlib' in _missingImport:
         raise GraphException(
@@ -62,13 +62,7 @@ def getExtendedModules():
     # from matplotlib.colors import colorConverter
     import matplotlib.pyplot as plt  # type: ignore
 
-    try:
-        # noinspection PyPackageRequirements
-        import networkx  # type: ignore
-    except ImportError:  # pragma: no cover
-        networkx = None  # use for testing
-
-    return ExtendedModules(matplotlib, Axes3D, collections, patches, plt, networkx)
+    return ExtendedModules(matplotlib, Axes3D, collections, patches, plt)
 
 # ------------------------------------------------------------------------------
 
@@ -90,7 +84,7 @@ def accidentalLabelToUnicode(label):
     'B♭4'
 
     Since matplotlib's default fonts do not support double sharps or double flats,
-    etc. these are converted as best we can...
+    etc. these are converted as best we can.
 
     >>> graph.utilities.accidentalLabelToUnicode('B--4')
     'B♭♭4'
@@ -99,7 +93,7 @@ def accidentalLabelToUnicode(label):
         return label
     for modifier, unicodeAcc in pitch.unicodeFromModifier.items():
         if modifier != '' and modifier in label and modifier in ('-', '#'):
-            # ideally eventually matplotlib will do the other accidentals...
+            # ideally eventually matplotlib will do the other accidentals
             label = label.replace(modifier, unicodeAcc)
             break
 

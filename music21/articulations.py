@@ -76,18 +76,17 @@ A longer test showing the utility of the module:
 '''
 from __future__ import annotations
 
-import typing as t
 import unittest
 
 from music21 import base
 from music21 import common
 from music21.common.classTools import tempAttribute
+from music21.common.types import OffsetQL
 from music21 import environment
-from music21 import style
+from music21 import interval
 from music21 import spanner
+from music21 import style
 
-if t.TYPE_CHECKING:
-    from music21 import interval
 
 
 environLocal = environment.Environment('articulations')
@@ -283,7 +282,7 @@ class Spiccato(Staccato, Accent):
     def __init__(self, **keywords):
         Staccato.__init__(self)
         with tempAttribute(self, 'lengthShift'):
-            Accent.__init__(self)  # order matters...
+            Accent.__init__(self)  # order matters!
 
 
 class Tenuto(LengthArticulation):
@@ -405,7 +404,7 @@ class TechnicalIndication(Articulation):
 
 class Harmonic(TechnicalIndication):
     '''
-    A general harmonic indicator -- StringHarmonic is probably what you want...
+    A general harmonic indicator -- StringHarmonic is probably what you want.
     '''
 
 class Bowing(TechnicalIndication):
@@ -582,10 +581,57 @@ class PullOff(spanner.Spanner, TechnicalIndication):
     pass
 
 class FretBend(FretIndication):
-    bendAlter: interval.IntervalBase|None = None
-    preBend: t.Any = None
-    release: t.Any = None
-    withBar: t.Any = None
+    '''
+    Bend indication for fretted instruments
+
+    Bend in musicxml
+
+    `number` is an identifier for the articulation. Defaults to 0.
+
+    `bendAlter` is the interval defined by the bend,
+    bend-alter in musicxml. Defaults to `None`.
+
+    `preBend` indicates if the string is bent before
+    the onset of the note. Defaults to `False`.
+
+    `release` is the quarterLength value from the start
+    of the note for releasing the bend, if any. Defaults to `None`.
+
+    `withBar` indicates what whammy bar movement is used, if any.
+    MusicXML supports 'scoop' or 'dip'. Defaults to `None`.
+
+    >>> fb = articulations.FretBend(1, bendAlter=interval.ChromaticInterval(-2),  release=0.5)
+    >>> fb
+    <music21.articulations.FretBend 1>
+    >>> fb.preBend
+    False
+    >>> fb.withBar is None
+    True
+    >>> fb.bendAlter
+    <music21.interval.ChromaticInterval -2>
+    >>> fb.release
+    0.5
+    '''
+    bendAlter: interval.Interval | interval.ChromaticInterval | None
+    preBend: bool
+    release: OffsetQL | None
+    withBar: str | None
+
+    def __init__(
+        self,
+        number: int = 0,
+        *,
+        bendAlter: interval.Interval | interval.ChromaticInterval | None = None,
+        preBend: bool = False,
+        release: OffsetQL | None = None,
+        withBar: str | None = None,
+        **keywords
+    ):
+        super().__init__(number=number, **keywords)
+        self.bendAlter = bendAlter
+        self.preBend = preBend
+        self.release = release
+        self.withBar = withBar
 
 class FretTap(FretIndication):
     pass

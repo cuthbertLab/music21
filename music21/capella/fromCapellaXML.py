@@ -188,7 +188,7 @@ class CapellaImporter:
                     partDictById[thisPart.id] = {'part': newPart, 'number': j}
                 else:
                     newPart = partDictById[thisPart.id]['part']
-                for el in thisPart:  # no need for recurse...
+                for el in thisPart:  # no need for recurse
                     newPart.coreInsert(common.opFrac(el.offset + systemOffset), el)
                 newPart.coreElementsChanged()
         newScore = stream.Score()
@@ -307,7 +307,7 @@ class CapellaImporter:
                 raise CapellaImportException(
                     'No <voice> tag found in the <voices> tag for the <staff> tag for the '
                     + '<staves> element for this <system> element')
-            if len(voiceList) == 1:  # single voice staff... perfect!
+            if len(voiceList) == 1:  # single voice staff perfect!
                 thisVoiceElement = voiceList[0]
                 noteObjectsList = thisVoiceElement.findall('noteObjects')
                 if not noteObjectsList:
@@ -519,7 +519,7 @@ class CapellaImporter:
         noteNameWithOctave = headElement.attrib['pitch']
         n = note.Note()
         n.nameWithOctave = noteNameWithOctave
-        n.octave = n.octave - 1  # capella octaves are 1 off...
+        n.octave = n.octave - 1  # capella octaves are 1 off
 
         alters = headElement.findall('alter')
         if len(alters) > 1:

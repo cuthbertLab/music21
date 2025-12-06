@@ -136,7 +136,7 @@ class Barline(base.Music21Object):
                  **keywords):
         super().__init__(**keywords)
 
-        self._type = None  # same as style...
+        self._type = None  # same as style
         # this will raise an exception on error from property
         self.type = type
 
@@ -335,7 +335,7 @@ class Repeat(repeat.RepeatMark, Barline):
         return self._times
 
     @times.setter
-    def times(self, value: int):
+    def times(self, value: int|None) -> None:
         if value is None:
             self._times = None
         else:

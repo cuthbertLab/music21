@@ -5,7 +5,7 @@
 #
 # Authors:      Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2007-2023 Michael Scott Asato Cuthbert
+# Copyright:    Copyright © 2007-2024 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
@@ -50,7 +50,7 @@ except ModuleNotFoundError:  # pragma: no cover
 
 del find_spec
 
-# TODO: speed up tests everywhere! move these to music21 base...
+# TODO: speed up tests everywhere! move these to music21 base
 
 class _sharedCorpusTestObject:
     sharedCache: dict[str, stream.Stream] = {}
@@ -98,10 +98,10 @@ class LilypondConverter:
     colorDef = (
         r'''
     color = #(define-music-function (parser location color) (string?) #{
-        \once \override NoteHead #'color = #(x11-color color)
-        \once \override Stem #'color = #(x11-color color)
-        \once \override Rest #'color = #(x11-color color)
-        \once \override Beam #'color = #(x11-color color)
+        \once \override NoteHead.color = #(x11-color color)
+        \once \override Stem.color = #(x11-color color)
+        \once \override Rest.color = #(x11-color color)
+        \once \override Beam.color = #(x11-color color)
      #})
     '''.lstrip())
     simplePaperDefinitionScm = r'''
@@ -114,8 +114,8 @@ class LilypondConverter:
     }
     '''.lstrip()
     transparencyStartScheme = r'''
-     \override Rest #'transparent  = ##t
-     \override Dots #'transparent  = ##t
+     \override Rest.transparent  = ##t
+     \override Dots.transparent  = ##t
      '''.lstrip()
     transparencyStopScheme = r'''
      \revert Rest #'transparent
@@ -201,8 +201,11 @@ class LilypondConverter:
     def setupTools(self):
         LILYEXEC = self.findLilyExec()
         command = [LILYEXEC, '--version']
+        platform = common.getPlatform()
+        creation_flags = subprocess.CREATE_NO_WINDOW if platform == 'win' else 0
         try:
-            with subprocess.Popen(command, stdout=subprocess.PIPE) as proc:
+            with subprocess.Popen(command, stdout=subprocess.PIPE,
+                                  creationflags=creation_flags) as proc:
                 stdout, unused = proc.communicate()
                 stdout = stdout.decode(encoding='utf-8')
                 versionString = stdout.split()[2]
@@ -258,10 +261,10 @@ class LilypondConverter:
         \version "2..."
         \include "lilypond-book-preamble.ly"
         color = #(define-music-function (parser location color) (string?) #{
-                \once \override NoteHead #'color = #(x11-color color)
-                \once \override Stem #'color = #(x11-color color)
-                \once \override Rest #'color = #(x11-color color)
-                \once \override Beam #'color = #(x11-color color)
+                \once \override NoteHead.color = #(x11-color color)
+                \once \override Stem.color = #(x11-color color)
+                \once \override Rest.color = #(x11-color color)
+                \once \override Beam.color = #(x11-color color)
              #})
         \header { }
         \score  {
@@ -283,19 +286,19 @@ class LilypondConverter:
         arbitrary music21 object.
 
         TODO: make lilypond automatically run makeNotation.makeTupletBrackets(s)
-        TODO: Add tests...
+        TODO: Add tests.
         '''
         c = m21ObjectIn.classes
         if 'Stream' in c:
             if m21ObjectIn[variant.Variant]:
-                # has variants. so we need to make a deepcopy...
+                # has variants. so we need to make a deepcopy
                 m21ObjectIn = variant.makeAllVariantsReplacements(m21ObjectIn, recurse=True)
                 variant.makeVariantBlocks(m21ObjectIn)
 
         if ('Stream' not in c) or ('Measure' in c) or ('Voice' in c):
             scoreObj = stream.Score()
             partObj = stream.Part()
-            # no need for measures or voices...
+            # no need for measures or voices
             partObj.insert(0, m21ObjectIn)
             scoreObj.insert(0, partObj)
             self.loadObjectFromScore(scoreObj, makeNotation=False)
@@ -307,7 +310,7 @@ class LilypondConverter:
             self.loadObjectFromScore(m21ObjectIn, makeNotation=False)
         elif 'Opus' in c:
             self.loadObjectFromOpus(m21ObjectIn, makeNotation=False)
-        else:  # treat as part...
+        else:  # treat as part
             scoreObj = stream.Score()
             scoreObj.insert(0, m21ObjectIn)
             self.loadObjectFromScore(scoreObj, makeNotation=False)
@@ -376,7 +379,7 @@ class LilypondConverter:
         lpColorScheme = lyo.LyEmbeddedScm(self.colorDef)
         lpHeader = lyo.LyLilypondHeader()
 
-        # here's the heavy work...
+        # here's the heavy work
         lpScoreBlock = self.lyScoreBlockFromScore(scoreIn)
 
         lpOutputDefHead = lyo.LyOutputDefHead(defType='paper')
@@ -409,7 +412,7 @@ class LilypondConverter:
                 lpGroupedMusicList = self.lyGroupedMusicListFromScoreWithParts(scoreIn)
             lpCompositeMusic.groupedMusicList = lpGroupedMusicList
         else:
-            # treat as a part...
+            # treat as a part
             lpPrefixCompositeMusic = self.lyPrefixCompositeMusicFromStream(scoreIn)
             lpCompositeMusic.prefixCompositeMusic = lpPrefixCompositeMusic
 
@@ -460,12 +463,12 @@ class LilypondConverter:
                           \remove "Time_signature_engraver"
                           alignAboveContext = #"pa"
                           fontSize = #-3
-                          \override StaffSymbol #'staff-space = #(magstep -3)
-                          \override StaffSymbol #'thickness = #(magstep -3)
-                          \override TupletBracket #'bracket-visibility = ##f
-                          \override TupletNumber #'stencil = ##f
-                          \override Clef #'transparent = ##t
-                          \override OctavateEight #'transparent = ##t
+                          \override StaffSymbol.staff-space = #(magstep -3)
+                          \override StaffSymbol.thickness = #(magstep -3)
+                          \override TupletBracket.bracket-visibility = ##f
+                          \override TupletNumber.stencil = ##f
+                          \override Clef.transparent = ##t
+                          \override OctavateEight.transparent = ##t
                           \consists "Default_bar_line_engraver"
                         }
                  { \stopStaff s1 s1 s1 s1 }
@@ -474,12 +477,12 @@ class LilypondConverter:
                           \remove "Time_signature_engraver"
                           alignAboveContext = #"pa"
                           fontSize = #-3
-                          \override StaffSymbol #'staff-space = #(magstep -3)
-                          \override StaffSymbol #'thickness = #(magstep -3)
-                          \override TupletBracket #'bracket-visibility = ##f
-                          \override TupletNumber #'stencil = ##f
-                          \override Clef #'transparent = ##t
-                          \override OctavateEight #'transparent = ##t
+                          \override StaffSymbol.staff-space = #(magstep -3)
+                          \override StaffSymbol.thickness = #(magstep -3)
+                          \override TupletBracket.bracket-visibility = ##f
+                          \override TupletNumber.stencil = ##f
+                          \override Clef.transparent = ##t
+                          \override OctavateEight.transparent = ##t
                           \consists "Default_bar_line_engraver"
                         }
                  { \stopStaff s1 s1 s1 s1 }
@@ -489,12 +492,12 @@ class LilypondConverter:
                           \remove "Time_signature_engraver"
                           alignAboveContext = #"pb...
                           fontSize = #-3
-                          \override StaffSymbol #'staff-space = #(magstep -3)
-                          \override StaffSymbol #'thickness = #(magstep -3)
-                          \override TupletBracket #'bracket-visibility = ##f
-                          \override TupletNumber #'stencil = ##f
-                          \override Clef #'transparent = ##t
-                          \override OctavateEight #'transparent = ##t
+                          \override StaffSymbol.staff-space = #(magstep -3)
+                          \override StaffSymbol.thickness = #(magstep -3)
+                          \override TupletBracket.bracket-visibility = ##f
+                          \override TupletNumber.stencil = ##f
+                          \override Clef.transparent = ##t
+                          \override OctavateEight.transparent = ##t
                           \consists "Default_bar_line_engraver"
                         }
                  { \stopStaff s1 s1 s1 s1 }
@@ -503,12 +506,12 @@ class LilypondConverter:
                           \remove "Time_signature_engraver"
                           alignAboveContext = #"pb...
                           fontSize = #-3
-                          \override StaffSymbol #'staff-space = #(magstep -3)
-                          \override StaffSymbol #'thickness = #(magstep -3)
-                          \override TupletBracket #'bracket-visibility = ##f
-                          \override TupletNumber #'stencil = ##f
-                          \override Clef #'transparent = ##t
-                          \override OctavateEight #'transparent = ##t
+                          \override StaffSymbol.staff-space = #(magstep -3)
+                          \override StaffSymbol.thickness = #(magstep -3)
+                          \override TupletBracket.bracket-visibility = ##f
+                          \override TupletNumber.stencil = ##f
+                          \override Clef.transparent = ##t
+                          \override OctavateEight.transparent = ##t
                           \consists "Default_bar_line_engraver"
                         }
                  { \stopStaff s1 s1 s1 s1 }
@@ -545,12 +548,12 @@ class LilypondConverter:
                     contextModList = [r'\remove "Time_signature_engraver"',
                                       fr'alignAboveContext = #"{partIdText}"',
                                       r'fontSize = #-3',
-                                      r"\override StaffSymbol #'staff-space = #(magstep -3)",
-                                      r"\override StaffSymbol #'thickness = #(magstep -3)",
-                                      r"\override TupletBracket #'bracket-visibility = ##f",
-                                      r"\override TupletNumber #'stencil = ##f",
-                                      r"\override Clef #'transparent = ##t",
-                                      r"\override OctavateEight #'transparent = ##t",
+                                      r'\override StaffSymbol.staff-space = #(magstep -3)',
+                                      r'\override StaffSymbol.thickness = #(magstep -3)',
+                                      r'\override TupletBracket.bracket-visibility = ##f',
+                                      r'\override TupletNumber.stencil = ##f',
+                                      r'\override Clef.transparent = ##t',
+                                      r'\override OctavateEight.transparent = ##t',
                                       r'\consists "Default_bar_line_engraver"',
                                       ]
                     optionalContextMod = lyo.LyContextModification(contextModList)
@@ -578,7 +581,7 @@ class LilypondConverter:
         >>> print(lpc.getLySpacersFromStream(streamIn))
         s2. s2. s1 s1 s1 s1 s4
 
-        TODO: Low-priority... rare, but possible: tuplet time signatures (3/10)...
+        TODO: Low-priority: rare, but possible: tuplet time signatures (3/10), etc.
         '''
 
         returnString = ''
@@ -613,7 +616,7 @@ class LilypondConverter:
     def lyGroupedMusicListFromScoreWithParts(self, scoreIn, scoreInit=None):
         # noinspection PyShadowingNames,GrazieInspection
         r'''
-        More complex example showing how the score can be set up with ossia parts...
+        More complex example showing how the score can be set up with ossia parts:
 
         >>> lpc = lily.translate.LilypondConverter()
         >>> #_DOCS_SHOW b = corpus.parse('bach/bwv66.6')
@@ -636,22 +639,22 @@ class LilypondConverter:
                 \key fis \minor
                 \time 4/4
                 \set stemRightBeamCount = #1
-                \once \override Stem #'direction = #DOWN
+                \once \override Stem.direction = #DOWN
                 cis'' 8 [
                 \set stemLeftBeamCount = #1
-                \once \override Stem #'direction = #DOWN
+                \once \override Stem.direction = #DOWN
                 b... 8 ]
                 \bar "|"  %{ end measure 0 %}
-                \once \override Stem #'direction = #UP
+                \once \override Stem.direction = #UP
                 a' 4
-                \once \override Stem #'direction = #DOWN
+                \once \override Stem.direction = #DOWN
                 b... 4
-                \once \override Stem #'direction = #DOWN
+                \once \override Stem.direction = #DOWN
                 cis'' 4  \fermata
-                \once \override Stem #'direction = #DOWN
+                \once \override Stem.direction = #DOWN
                 e'' 4
                 \bar "|"  %{ end measure 1 %}
-                \once \override Stem #'direction = #DOWN
+                \once \override Stem.direction = #DOWN
                 cis'' 4
                 ...
         }
@@ -662,12 +665,12 @@ class LilypondConverter:
          }
          { \startStaff \partial 32*8
             \clef "treble"...
-            \once \override Stem #'direction = #UP
+            \once \override Stem.direction = #UP
             e' 4
             \bar "|"  %{ end measure 0 %}
-            \once \override Stem #'direction = #UP
+            \once \override Stem.direction = #UP
             fis' 4
-            \once \override Stem #'direction = #UP
+            \once \override Stem.direction = #UP
             e' 4
         ...
         }
@@ -858,7 +861,7 @@ class LilypondConverter:
         # noinspection PyShadowingNames
         r'''
         returns an LyPrefixCompositeMusic object from
-        a stream (generally a part, but who knows...)
+        a stream (generally a part, but who knows!)
 
         >>> c = converter.parse('tinynotation: 3/4 C4 D E F2.')
         >>> c.staffLines = 4
@@ -869,7 +872,7 @@ class LilypondConverter:
         <music21.lily.lilyObjects.LyPrefixCompositeMusic \new Staff...>
         >>> print(lyPrefixCompositeMusicOut)
         \new Staff = ... \with {
-         \override StaffSymbol #'line-count = #4
+         \override StaffSymbol.line-count = #4
         }
         { \clef "bass"
              \time 3/4
@@ -905,8 +908,8 @@ class LilypondConverter:
             contextModList.append(r'\autoBeamOff ')
 
         if hasattr(streamIn, 'staffLines') and streamIn.staffLines != 5:
-            contextModList.append(fr"\override StaffSymbol #'line-count = #{streamIn.staffLines}")
-            if streamIn.staffLines % 2 == 0:  # even stafflines need a change...
+            contextModList.append(fr'\override StaffSymbol.line-count = #{streamIn.staffLines}')
+            if streamIn.staffLines % 2 == 0:  # even stafflines need a change
                 pass
 
         lpNewLyrics = self.lyNewLyricsFromStream(streamIn, streamId=makeLettersOnlyId(streamIn.id))
@@ -972,7 +975,7 @@ class LilypondConverter:
         >>> lpMusicList = lily.lilyObjects.LyMusicList()
         >>> lpc.context = lpMusicList
         >>> lpc.appendObjectsToContextFromStream(m)
-        >>> print(lpc.context)  # internal spaces removed...
+        >>> print(lpc.context)  # internal spaces removed
           << \new Voice { c'' 1
                     \bar "|."  %{ end measure 1 %}
                   }
@@ -984,11 +987,11 @@ class LilypondConverter:
         for groupedElements in OffsetIterator(streamObject):
             # print(groupedElements)
 
-            if len(groupedElements) == 1:  # one thing at that moment...
+            if len(groupedElements) == 1:  # one thing at that moment
                 el = groupedElements[0]
                 el.activeSite = streamObject
                 self.appendM21ObjectToContext(el)
-            else:  # voices or other More than one thing at once...
+            else:  # voices or other More than one thing at once
                 # if voices
                 voiceList = []
                 variantList = []
@@ -1064,7 +1067,7 @@ class LilypondConverter:
 
         lyObject = None
         if 'Measure' in c:
-            # lilypond does not put groups around measures...
+            # lilypond does not put groups around measures
             # it does however need barline ends
             # also, if variantMode is True, the last note in each "measure" should have \noBeam
             closeMeasureObj = self.closeMeasure()  # could be None
@@ -1170,15 +1173,15 @@ class LilypondConverter:
             return
 
         # commented out until complete
-#         if self.variantMode is True:
-#             # TODO: attach \noBeam to note if it is the last note
-#             if isinstance(noteOrRest, note.NotRest):
-#                 n = noteOrRest
-#                 activeSite = n.activeSite
-#                 offset = n.offset
-#                 # failed at least once...
-#                 if offset + n.duration.quarterLength == activeSite.duration.quarterLength:
-#                     pass
+        # if self.variantMode is True:
+        #     # TODO: attach \noBeam to note if it is the last note
+        #     if isinstance(noteOrRest, note.NotRest):
+        #         n = noteOrRest
+        #         activeSite = n.activeSite
+        #         offset = n.offset
+        #         # failed at least once
+        #         if offset + n.duration.quarterLength == activeSite.duration.quarterLength:
+        #             pass
 
         self.setContextForTupletStart(noteOrRest)
         self.appendBeamCode(noteOrRest)
@@ -1243,7 +1246,7 @@ class LilypondConverter:
 
     def lySimpleMusicFromNoteOrRest(self, noteOrRest):
         r'''
-        returns a lilyObjects.LySimpleMusic object for the generalNote containing...
+        returns a lilyObjects.LySimpleMusic object for the generalNote containing this hierarchy::
 
             LyEventChord   containing
             LySimpleChordElements containing
@@ -1272,7 +1275,7 @@ class LilypondConverter:
         \override Stem.color = "blue"
         dis'' ! ? 4
 
-        Now make the note disappear...
+        Now make the note disappear:
 
         >>> n0.style.hideObjectOnPrint = True
         >>> sm = conv.lySimpleMusicFromNoteOrRest(n0)
@@ -1406,12 +1409,12 @@ class LilypondConverter:
         >>> print(lpc.context.contents)
         [<music21.lily.lilyObjects.LyEmbeddedScm \once \ove...>]
         >>> print(lpc.context.contents[0])
-        \once \override Stem #'direction = #UP
+        \once \override Stem.direction = #UP
         '''
         if hasattr(noteOrChord, 'stemDirection') and noteOrChord.stemDirection is not None:
             stemDirection = noteOrChord.stemDirection.upper()
             if stemDirection in ['UP', 'DOWN']:
-                stemFile = fr'''\once \override Stem #'direction = #{stemDirection} '''
+                stemFile = fr'''\once \override Stem.direction = #{stemDirection} '''
                 lpStemScheme = lyo.LyEmbeddedScm(stemFile)
                 self.context.contents.append(lpStemScheme)
                 lpStemScheme.setParent(self.context)
@@ -1464,7 +1467,7 @@ class LilypondConverter:
         evc = lyo.LyEventChord(noteChordElement=lpNoteChordElement)
         mlSM = lyo.LySimpleMusic(eventChord=evc)
         return mlSM
-        # TODO: Chord beaming...
+        # TODO: Chord beaming
 
     def postEventsFromObject(self, generalNote):
         r'''
@@ -1474,7 +1477,7 @@ class LilypondConverter:
         postEvents = []
 
         # remove this hack once lyrics work
-        # if generalNote.lyric is not None:  # hack that uses markup...
+        # if generalNote.lyric is not None:  # hack that uses markup
         #    postEvents.append(r'_\markup { "' + generalNote.lyric + '" }\n ')
         # consider this hack removed. Yeah!
 
@@ -1712,7 +1715,7 @@ class LilypondConverter:
 
         For now, no support for nested tuplets.  They're an
         easy extension, but there's too much
-        else that is missing to do it now...
+        else that is missing to do it now.
         '''
         if not inObj.duration.tuplets:
             return None
@@ -2200,13 +2203,13 @@ class LilypondConverter:
         #      \remove "Time_signature_engraver"
         #      alignAboveContext = #"%s"
         #      fontSize = #-3
-        #      \override StaffSymbol #'staff-space = #(magstep -3)
-        #      \override StaffSymbol #'thickness = #(magstep -3)
-        #      \override TupletBracket #'bracket-visibility = ##f
-        #      \override TupletNumber #'stencil = ##f
-        #      \override Clef #'transparent = ##t
+        #      \override StaffSymbol.staff-space = #(magstep -3)
+        #      \override StaffSymbol.thickness = #(magstep -3)
+        #      \override TupletBracket.bracket-visibility = ##f
+        #      \override TupletNumber.stencil = ##f
+        #      \override Clef.transparent = ##t
         #    }
-        # ''' % containerId #\override BarLine #'transparent = ##t
+        # ''' % containerId #\override BarLine.transparent = ##t
         # # is the best way of fixing the #barlines that I have come up with.
         # lpPrefixCompositeMusicVariant.optionalContextMod = optionalContextMod
 
@@ -2375,10 +2378,10 @@ class LilypondConverter:
         type LyMultipliedDuration.  You notate how many
         notes are left in the measure, for a quarter note, write "4"
         for an eighth, write "8", but for 3 eighths, write "8*3" !
-        so we will measure in 32nd notes always... won't work for tuplets
+        so we will measure in 32nd notes always. It won't work for tuplets
         of course.
 
-        returns a scheme object or None if not needed
+        Returns a scheme object or None if not needed.
 
         >>> m = stream.Measure()
         >>> m.append(meter.TimeSignature('3/4'))
@@ -2451,8 +2454,8 @@ class LilypondConverter:
             lilyCommand += '-f ' + format + ' '
         if backend is not None:
             lilyCommand += self.backendString + backend + ' '
-        lilyCommand += '-o ' + str(fileName) + ' ' + str(fileName)
 
+        lilyCommand += '-o ' + str(fileName) + ' ' + str(fileName)
         os.system(lilyCommand)
 
         try:
@@ -2518,7 +2521,7 @@ class LilypondConverter:
                 lilyImage2 = ImageOps.expand(lilyImage, 10, 'white')  # type: ignore
                 lilyImage2.save(str(lilyFile))
             except Exception:  # pylint: disable=broad-exception-caught
-                pass  # no big deal probably...
+                pass  # no big deal probably
         return lilyFile
 
     def showPNG(self):

@@ -84,14 +84,14 @@ class ScoreFollower:
         #     except ImportError:
         #         raise AudioSearchException('Cannot plot without matplotlib installed.')
         #
-        #     matplotlib.pyplot.plot(listplot)
+        #     matplotlib.pyplot.plot(plot)
         #     matplotlib.pyplot.show()
         environLocal.printDebug('* END')
 
     def repeatTranscription(self):
         '''
         First, it records from the microphone (or from a file if is used for
-        test). Later, it processes the signal in order to detect the pitches.
+        test). Later, it processes the signal to detect the pitches.
         It converts them into music21 objects and compares them with the score.
         It finds the best matching position of the recorded signal with the
         score, and decides, depending on matching accuracy, the last note
@@ -99,7 +99,7 @@ class ScoreFollower:
         signal is.
 
         It returns a value that is False if the song has not finished, or true
-        if there has been a problem like some consecutive bad matchings or the
+        if there has been a problem like some consecutive bad matches or the
         score has finished.
 
         >>> from music21.audioSearch import scoreFollower
@@ -154,12 +154,12 @@ class ScoreFollower:
         time_start = time()
         detectedPitchesFreq = audioSearch.detectPitchFrequencies(freqFromAQList, self.useScale)
         detectedPitchesFreq = audioSearch.smoothFrequencies(detectedPitchesFreq)
-        detectedPitchObjects, unused_listplot = audioSearch.pitchFrequenciesToObjects(
+        detectedPitchObjects, unused_plot = audioSearch.pitchFrequenciesToObjects(
             detectedPitchesFreq, self.useScale)
         notesList, durationList = audioSearch.joinConsecutiveIdenticalPitches(
             detectedPitchObjects)
         self.silencePeriodDetection(notesList)
-        environLocal.printDebug('made it to here...')
+        environLocal.printDebug('made it to here.')
         excerpt = self.scoreStream[self.lastNotePosition:self.lastNotePosition + len(notesList)]
         scNotes = stream.Part(excerpt)
         # print('1')
@@ -178,12 +178,12 @@ class ScoreFollower:
         )
         # print('3')
         self.processing_time = time() - time_start
-        environLocal.printDebug('and even to here...')
+        environLocal.printDebug('and even to here.')
         if END_OF_SCORE is True:
             exitType = 'endOfScore'  # 'endOfScore'
             return exitType
 
-        # estimate position, or exit if we can't at all...
+        # estimate position, or exit if we can't at all
         exitType = self.updatePosition(prob, totalLengthPeriod, time_start)
 
         if self.useMic is False:  # reading from the disc (only for TESTS)
@@ -198,7 +198,7 @@ class ScoreFollower:
         if self.lastNotePosition > len(self.scoreNotesOnly):
             # print('finishedPerforming')
             exitType = 'finishedPerforming'
-        elif (self.useMic is False and self.currentSample >= self.totalFile):
+        elif self.useMic is False and self.currentSample >= self.totalFile:
             # print('waveFileEOF')
             exitType = 'waveFileEOF'
 

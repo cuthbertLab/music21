@@ -140,7 +140,7 @@ class Variant(base.Music21Object):
         if attr in ['flat', 'pitches']:
             raise AttributeError
 
-        # needed for unpickling where ._stream doesn't exist until later...
+        # needed for unpickling where ._stream doesn't exist until later
         if attr != '_stream' and hasattr(self, '_stream'):
             return getattr(self._stream, attr)
         else:
@@ -422,7 +422,7 @@ class Variant(base.Music21Object):
                     'No contextStream or activeSite, finding most recently added site (dangerous)')
                 contextStream = self.getContextByClass('Stream')
                 if contextStream is None:
-                    raise VariantException('Cannot find a Stream context for this object...')
+                    raise VariantException('Cannot find a Stream context for this object.')
 
         if self not in contextStream.getElementsByClass(self.__class__):
             raise VariantException(f'Variant not found in stream {contextStream}')
@@ -551,7 +551,7 @@ class Variant(base.Music21Object):
                                         + 'finding most recently added site (dangerous)')
                 referenceStream = self.getContextByClass('Stream')
                 if referenceStream is None:
-                    raise VariantException('Cannot find a Stream context for this object...')
+                    raise VariantException('Cannot find a Stream context for this object.')
         if self not in referenceStream.getElementsByClass(self.__class__):
             raise VariantException(f'Variant not found in stream {referenceStream}')
 

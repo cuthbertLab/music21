@@ -16,7 +16,7 @@ The following papers and publications make extensive use of `music21`. Start her
 Cuthbert, Michael Scott Cuthbert and Christopher Ariza. 2010. "`music21`: A
 Toolkit for Computer-Aided Musicology and Symbolic Music Data." In
 *Proceedings of the International Society for Music Information Retrieval*.
-https://www.academia.edu/243058/music21_A_Toolkit_for_Computer-Aided_Musicology_and_Symbolic_Music_Data
+https://www.trecento.com/research/Cuthbert_Ariza_Music21_ISMIR_2010.pdf
 
 
 Then continue with:
@@ -24,47 +24,47 @@ Then continue with:
 Church, Maura and Michael Scott Cuthbert. 2014. "Improving Rhythmic
 Transcriptions via Probability Models Applied Post-OMR." In *Proceedings of the
 International Society for Music Information Retrieval*.
-https://www.academia.edu/7709124/Improving_Rhythmic_Transcriptions_via_Probability_Models_Applied_Post-OMR
+https://www.trecento.com/research/Church_Cuthbert_OMR.pdf
 
 Cuthbert, Michael Scott, Beth Hadley, Lars Johnson, and Christopher Reyes. 2012.
 "Interoperable Digital Musicology Research via `music21` Web Applications."
 From *Joint CLARIN-D/DARIAH Workshop at Digital Humanities Conference Hamburg*.
-https://www.academia.edu/1787946/Interoperable_Digital_Musicology_Research_via_music21_Web_Applications
+https://www.trecento.com/research/Cuthbert_Hadley_Johnson_Reyes_Music21_SOA.pdf
 
 Cuthbert, Michael Scott, Chris Ariza, Jose Cabal-Ugaz, Beth Hadley, and Neena Parikh. 2011.
 "Hidden Beyond MIDI’s Reach:Feature Extraction and Machine Learning with Rich Symbolic Formats
 in `music21`" In *Proceedings of the Neural Information Processing Systems Conference*.
-https://www.academia.edu/1256513/Hidden_Beyond_MIDI_s_Reach_Feature_Extraction_and_Machine_Learning_with_Rich_Symbolic_Formats_in_music21
+https://www.trecento.com/research/Cuthbert_Ariza_Cabal-Ugaz_Hadley_Parikh-Hidden-NIPS2011.pdf
 
 Cuthbert, Michael Scott, Chris Ariza, and Lisa D. Friedland. 2011. "Feature Extraction and
 Machine Learning on Symbolic Music using the `music21` Toolkit" In
 *Proceedings of the International Symposium on Music Information Retrieval*
-https://www.academia.edu/1256514/Feature_Extraction_and_Machine_Learning_on_Symbolic_Music_using_the_music21_Toolkit
+https://www.trecento.com/research/Cuthbert_Ariza_Friedland_Feature-Extraction_ISMIR_2011.pdf
 
 Jordi Barthomé Guillen and Michael Scott Cuthbert. 2011. "Score Following from
 Inaccurate Score and Audio Data using OMR and `music21`." In *Proceedings of the Neural
 Information Processing Systems Conference (Music and Machine Learning, Workshop 4*.
-https://www.academia.edu/1256512/Score_Following_from_Inaccurate_Score_and_Audio_Data_using_OMR_and_music21
+https://www.trecento.com/research/Bartolome-Guillen_Cuthbert_ScoreFollower.pdf
 
 Ariza, C. and Michael Scott Cuthbert. 2011. "The `music21` Stream: A New Object
 Model for Representing, Filtering, and Transforming Symbolic Musical
 Structures." In *Proceedings of the International Computer Music Conference*.
 San Francisco: International Computer Music Association, pp. 61-68.
 Available online at https://www.flexatone.net/static/docs/music21Stream.pdf
+and https://www.trecento.com/research/Ariza_Cuthbert_Stream_ICMC_2011.pdf
 
 Ariza, C. and Michael Scott Cuthbert. 2011. "Analytical and Compositional
 Applications of a Network-Based Scale Model in `music21`." In *Proceedings of the
 International Computer Music Conference*. San Francisco: International Computer
 Music Association, pp. 701-708. Available online at
 https://www.flexatone.net/static/docs/scaleNetwork.pdf
+and https://www.trecento.com/research/Ariza_Cuthbert_Scale_ICMC_2011.pdf
 
 Ariza, C. and Michael Scott Cuthbert. 2010. "Modeling Beats, Accents, Beams, and
 Time Signatures Hierarchically with `music21` Meter Objects." In *Proceedings of the
 International Computer Music Conference*. San Francisco: International Computer Music
 Association. 216-223. Available online at
-https://web.mit.edu/music21/papers/Ariza_Cuthbert_Stream_ICMC_2011.pdf
-
-
+https://www.trecento.com/research/Ariza_Cuthbert_Meter_ICMC_2010.pdf
 
 Future Goals and Potential Applications
 ---------------------------------------------------
@@ -94,7 +94,3 @@ interesting suggestions. To contact the authors, visit :ref:`about`.
 - Identify potential clefs for fragmentary Renaissance and Medieval pieces that are
   missing their clefs. (Use their staff-lines and minimizing number of melodic and
   harmonic tritones).
-
-
-
-

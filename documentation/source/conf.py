@@ -15,6 +15,7 @@
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 
+from datetime import date
 import os
 import sys
 sys.path.insert(0, os.path.abspath('..'))
@@ -36,7 +37,7 @@ extensions = [
 templates_path = ['_templates']
 
 # The suffix of source filenames.
-source_suffix = '.rst'
+source_suffix = {'.rst': 'restructuredtext'}
 
 # The encoding of source files.
 # source_encoding = 'utf-8-sig'
@@ -48,7 +49,7 @@ master_doc = 'index'
 project = 'music21'
 # pylint: disable=redefined-builtin
 # noinspection PyShadowingBuiltins
-copyright = '2006-2023 Michael Scott Asato Cuthbert'
+copyright = f'2006-{date.today().year} Michael Scott Asato Cuthbert'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -234,6 +235,18 @@ latex_documents = [
 # If false, no module index is generated.
 # latex_domain_indices = True
 
+
+# -- Options for linkcheck -----------------------------------------------------
+# requires downloading whole document, but also many anchors only load after
+# javascript these days.
+linkcheck_anchors = False
+
+linkcheck_ignore = [
+    r'http://www.musicxml.org/dtds/partwise.dtd',  # dtd is not a URL.
+    r'https://easyabc.sourceforge.net',  # works 2025-10
+    # does not find anchor immediately.  should wait longer
+    r'https://github.com/cuthbertLab/music21/blob/master/README.md#community-code-of-conduct',
+]
 
 # -- Options for manual page output --------------------------------------------
 

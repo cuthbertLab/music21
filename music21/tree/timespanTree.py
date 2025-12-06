@@ -3,11 +3,10 @@
 # Name:         tree/timespanTree.py
 # Purpose:      Subclasses of tree.trees.OffsetTree for manipulation
 #
-# Authors:      Josiah Wolf Oberholtzer
+# Authors:      Joséphine Wolf Oberholtzer
 #               Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2013-16 Michael Scott Asato Cuthbert and the music21
-#               Project
+# Copyright:    Copyright © 2013-2024 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # -----------------------------------------------------------------------------
 '''
@@ -107,7 +106,7 @@ class TimespanTree(trees.OffsetTree):
     (26.5, 9.5)
 
     Example: Remove neighbor tones from the Bach chorale.  (It's actually quite viscous
-    in its pruning...)
+    in its pruning.)
 
     Here in Alto, measure 7, there's a neighbor tone E#.
 
@@ -169,7 +168,7 @@ class TimespanTree(trees.OffsetTree):
         # if hasattr(x, 'element'):
         #     return x.element.sortTuple()[2:]
         # elif isinstance(x, TimespanTree) and x.source is not None:
-        #     environLocal.printDebug("Timespan tree added to Tree...nope...")
+        #     environLocal.printDebug("Timespan tree added to Tree: nope.")
         #     return x.source.sortTuple()[2:]
         # else:
         #     return x.endTime  # PitchedTimespan with no Element!
@@ -189,7 +188,7 @@ class TimespanTree(trees.OffsetTree):
         r'''
         Gets index of a TimeSpan in a TimespanTree.
 
-        Since Timespans do not have .sites, there is only one offset to deal with...
+        Since Timespans do not have .sites, there is only one offset to deal with
 
         >>> tsList = [(0, 2), (0, 9), (1, 1), (2, 3), (3, 4),
         ...           (4, 9), (5, 6), (5, 8), (6, 8), (7, 7)]
@@ -234,21 +233,25 @@ class TimespanTree(trees.OffsetTree):
 
     def removeTimespanList(self, elements, offsets=None, runUpdate=True):
         '''
-        this will eventually be different from above...
+        this will eventually be different from above
         '''
         self.removeElements(elements, offsets, runUpdate)
 
     def removeTimespan(self, elements, offsets=None, runUpdate=True):
         '''
-        this will eventually be different from above...
+        this will eventually be different from above.
         '''
         self.removeElements(elements, offsets, runUpdate)
 
-    def findNextPitchedTimespanInSameStreamByClass(self, pitchedTimespan, classList=None):
+    def findNextPitchedTimespanInSameStreamByClass(
+        self,
+        pitchedTimespan: spans.PitchedTimespan,
+        classList=None
+    ) -> spans.PitchedTimespan | None:
         r'''
         Finds next element timespan in the same stream class as `PitchedTimespan`.
 
-        Default classList is (stream.Part, )
+        Default classList is (stream.Part,)
 
         >>> score = corpus.parse('bwv66.6')
         >>> scoreTree = score.asTimespans(classList=(note.Note,))
@@ -289,7 +292,11 @@ class TimespanTree(trees.OffsetTree):
                         pitchedTimespan.getParentageByClass(classList)):
                     return nextPitchedTimespan
 
-    def findPreviousPitchedTimespanInSameStreamByClass(self, pitchedTimespan, classList=None):
+    def findPreviousPitchedTimespanInSameStreamByClass(
+        self,
+        pitchedTimespan: spans.PitchedTimespan,
+        classList=None
+    ) -> spans.PitchedTimespan | None:
         r'''
         Finds next element timespan in the same Part/Measure, etc. (specify in classList) as
         the `pitchedTimespan`.
@@ -445,8 +452,8 @@ class TimespanTree(trees.OffsetTree):
 
     def iterateVerticalities(
         self,
-        reverse=False,
-    ):
+        reverse: bool = False,
+    ) -> Generator['music21.tree.verticality.Verticality', None, None]:
         r'''
         Iterates all vertical moments in this TimespanTree, represented as
         :class:`~music21.tree.verticality.Verticality` objects.
@@ -795,7 +802,7 @@ class TimespanTree(trees.OffsetTree):
         '''
         defined so a TimespanTree can be used like an PitchedTimespan
 
-        TODO: Look at subclassing or at least deriving from a common base...
+        TODO: Look at subclassing or at least deriving from a common base.
         '''
         return common.unwrapWeakref(self._source)
 

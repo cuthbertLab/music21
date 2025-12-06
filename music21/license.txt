@@ -6,7 +6,7 @@
 #               distributed with this package, particularly the corpus files
 #               which have their own copyrights and licenses.
 #
-# Copyright:    music21 is "Copyright © 2006-2023 Michael Scott Asato Cuthbert"
+# Copyright:    music21 is "Copyright © 2006-2025 Michael Scott Asato Cuthbert"
 #               and is open-source licensed under the
 #               BSD 3-Clause License (beginning with music21 v2.0)
 #               reprinted below.
@@ -22,7 +22,7 @@ the BSD license still under effect.
 ---
 BSD License
 
-Copyright (c) 2006-2023 Michael Scott Asato Cuthbert
+Copyright (c) 2006-2025 Michael Scott Asato Cuthbert
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without

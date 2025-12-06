@@ -8,7 +8,7 @@
 #               Jackie Rogoff
 #               Beth Hadley
 #
-# Copyright:    Copyright © 2009-2023 Michael Scott Asato Cuthbert
+# Copyright:    Copyright © 2009-2024 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
@@ -19,7 +19,7 @@ divide a score up into these segments, returning a list of segments to later ana
 The list of objects included here are:
 
 * :class:`~music21.voiceLeading.VoiceLeadingQuartet` : two by two matrix of notes
-
+* :func:`~music21.voiceLeading.iterateAllVoiceLeadingQuartets` : yields each VLQ in a piece.
 * :class:`~music21.voiceLeading.Verticality` : vertical context in a score,
     composed of any music21 objects
 * :class:`~music21.voiceLeading.VerticalityNTuplet` : group of three
@@ -35,6 +35,7 @@ The list of objects included here are:
 '''
 from __future__ import annotations
 
+from collections.abc import Generator
 import enum
 import typing as t
 import unittest
@@ -51,6 +52,8 @@ from music21 import note
 from music21 import pitch
 from music21 import scale
 
+if t.TYPE_CHECKING:
+    from music21 import stream
 
 # from music21 import harmony can't do this either
 # from music21 import roman Can't import roman because of circular
@@ -347,7 +350,7 @@ class VoiceLeadingQuartet(base.Music21Object):
         <MotionType.oblique: 'Oblique'>
 
         No motion (if I had a dollar for every time I forgot to teach
-        that this is not a form of oblique motion...):
+        that this is not a form of oblique motion):
 
         >>> m1_f4 = note.Note('F4')   # C5, C5 against F4, F4
         >>> vl = voiceLeading.VoiceLeadingQuartet(n1_c5, n2_c5, m1_f4, m2_f4)
@@ -839,10 +842,13 @@ class VoiceLeadingQuartet(base.Music21Object):
 
     def parallelOctave(self) -> bool:
         '''
-        Returns True if the motion is a parallel Perfect Octave...
-        a concept so abhorrent we shudder to illustrate it with an example, but alas, we must:
+        Returns True if the motion is a parallel Perfect Octave.
+
+        (This is a concept so abhorrent we shudder to illustrate it
+        with an example, but alas, we must:)
 
         We will make the examples shorter with this abbreviation:
+
         >>> N = note.Note
 
         >>> vlq = voiceLeading.VoiceLeadingQuartet(N('C5'), N('D5'), N('C4'), N('D4'))
@@ -853,11 +859,15 @@ class VoiceLeadingQuartet(base.Music21Object):
         >>> vlq.parallelOctave()
         True
 
-        Or False if the motion is according to the rules of God's own creation:
+        Or False if the motion is according to the rules of God's own creation :-)
 
         >>> vlq = voiceLeading.VoiceLeadingQuartet(N('C4'), N('D4'), N('C4'), N('D4'))
         >>> vlq.parallelOctave()
         False
+
+        (P.S., we were joking about parallel octaves being abhorant or out of God's creation!
+        music21 works just as well with popular music and other styles that do not
+        have problems with parallel octaves.)
         '''
         return self.parallelInterval(self.octave)
 
@@ -1554,11 +1564,7 @@ class Verticality(base.Music21Object):
         >>> vs1.getShortestDuration()
         1.0
         '''
-        leastQuarterLength = self.objects[0].quarterLength
-        for obj in self.objects:
-            if obj.quarterLength < leastQuarterLength:
-                leastQuarterLength = obj.quarterLength
-        return leastQuarterLength
+        return min([obj.quarterLength for obj in self.objects])
 
     def getLongestDuration(self):
         '''
@@ -1574,11 +1580,7 @@ class Verticality(base.Music21Object):
         >>> vs1.getLongestDuration()
         4.0
         '''
-        longestQuarterLength = self.objects[0].quarterLength
-        for obj in self.objects:
-            if obj.quarterLength > longestQuarterLength:
-                longestQuarterLength = obj.quarterLength
-        return longestQuarterLength
+        return max([obj.quarterLength for obj in self.objects])
 
     def changeDurationOfAllObjects(self, newQuarterLength):
         '''
@@ -2413,6 +2415,42 @@ class TwoChordLinearSegment(NChordLinearSegment):
         '''
         return interval.notesToChromatic(self.chordList[0].bass(), self.chordList[1].bass())
 
+
+def iterateAllVoiceLeadingQuartets(
+    s: stream.Stream,
+    *,
+    includeRests: bool = True,
+    includeOblique: bool = True,
+    includeNoMotion: bool = False,
+    reverse: bool = False,
+) -> Generator[VoiceLeadingQuartet, None, None]:
+    '''
+    Iterate through all VoiceLeading quartets in a Stream (generally a Score),
+    yielding a generator of VoiceLeadingQuartets.  N.B. does not yet support Streams with
+    Chords in them.
+
+    >>> b = corpus.parse('bwv66.6')
+    >>> for vlq in voiceLeading.iterateAllVoiceLeadingQuartets(b):
+    ...     print(vlq.v1n1.measureNumber,
+    ...           vlq.v1n1.getContextByClass(stream.Part).id,
+    ...           vlq.v2n1.getContextByClass(stream.Part).id,
+    ...           vlq)
+    0 Soprano Tenor <music21.voiceLeading.VoiceLeadingQuartet v1n1=B4, v1n2=A4, v2n1=B3, v2n2=C#4>
+    0 Soprano Bass <music21.voiceLeading.VoiceLeadingQuartet v1n1=B4, v1n2=A4, v2n1=G#3, v2n2=F#3>
+    0 Tenor Bass <music21.voiceLeading.VoiceLeadingQuartet v1n1=B3, v1n2=C#4, v2n1=G#3, v2n2=F#3>
+    1 Soprano Alto <music21.voiceLeading.VoiceLeadingQuartet v1n1=A4, v1n2=B4, v2n1=F#4, v2n2=E4>
+    1 Soprano Tenor <music21.voiceLeading.VoiceLeadingQuartet v1n1=A4, v1n2=B4, v2n1=C#4, v2n2=B3>
+    1 Soprano Bass <music21.voiceLeading.VoiceLeadingQuartet v1n1=A4, v1n2=B4, v2n1=F#3, v2n2=G#3>
+    1 Alto Tenor <music21.voiceLeading.VoiceLeadingQuartet v1n1=F#4, v1n2=E4, v2n1=C#4, v2n2=B3>
+    1 Alto Bass <music21.voiceLeading.VoiceLeadingQuartet v1n1=F#4, v1n2=E4, v2n1=F#3, v2n2=G#3>
+    ...
+    '''
+    for v in s.asTimespans().iterateVerticalities(reverse=reverse):
+        yield from v.getAllVoiceLeadingQuartets(
+            includeRests=includeRests,
+            includeOblique=includeOblique,
+            includeNoMotion=includeNoMotion
+        )
 
 # ------------------------------------------------------------------------------
 

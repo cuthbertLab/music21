@@ -1289,7 +1289,7 @@ class Sieve:
         try:
             # assume we have either an int (M), or a tuple (M,N)
             # better to remove the eval, but at least there are no globals or locals this way
-            # waste of two {} dicts -- could be cached, but not worth it for now...
+            # waste of two {} dicts -- could be cached, but not worth it for now
             args = literal_eval(usrStr)
         except (NameError, SyntaxError, TypeError):
             return None
@@ -1681,7 +1681,7 @@ class Sieve:
         # this may raise an exception if mal-formed
         try:
             # better to remove the eval, but at least there are no globals or locals this way
-            # waste of two {} dicts -- could be cached, but not worth it for now...
+            # waste of two {} dicts -- could be cached, but not worth it for now
             seg = eval(evalStr, {'__builtins__': {'set': set}}, {})  # pylint: disable=eval-used
             # print('---: ' + evalStr)
             # print('xxx: ' + repr(seg))

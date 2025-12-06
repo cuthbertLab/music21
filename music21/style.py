@@ -5,8 +5,7 @@
 #
 # Authors:      Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2016-22 Michael Scott Asato Cuthbert and the music21
-#               Project
+# Copyright:    Copyright © 2016-2022 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # -----------------------------------------------------------------------------
 '''
@@ -46,7 +45,7 @@ class Enclosure(common.StrEnum):
     NONAGON = 'nonagon'
     DECAGON = 'decagon'
     INVERTED_BRACKET = 'inverted-bracket'
-    NONE = 'none'  # special -- sets to None.
+    NO_ENCLOSURE = 'none'
 
 
 class Style(ProtoM21Object):
@@ -88,6 +87,8 @@ class Style(ProtoM21Object):
         # managed by property below.
         self._absoluteY: float|int|None = None
 
+        # None means enclosure is left unspecified, NO_ENCLOSURE means
+        # explicitly that there is no enclosure.
         self._enclosure: Enclosure|None = None
 
         # how should this symbol be represented in the font?
@@ -102,45 +103,27 @@ class Style(ProtoM21Object):
         self.dashLength: float|int|None = None
         self.spaceLength: float|int|None = None
 
-    def _getEnclosure(self) -> Enclosure|None:
-        return self._enclosure
 
-    def _setEnclosure(self, value: Enclosure|None):
-        if value is None:
-            self._enclosure = value
-        elif value == Enclosure.NONE:
-            self._enclosure = None
-        elif isinstance(value, Enclosure):
-            self._enclosure = value
-        elif isinstance(value, str):
-            try:
-                enc_value = Enclosure(value.lower())
-            except ValueError as ve:
-                raise TextFormatException(f'Not a supported enclosure: {value!r}') from ve
+    @property
+    def enclosure(self) -> Enclosure|None:
+        '''
+        Get or set the enclosure as a style.Enclosure enum (or
+        None, which means the enclosure is left unspecified).
 
-            self._enclosure = enc_value
+        Valid names are:
 
-        else:
-            raise TextFormatException(f'Not a supported enclosure: {value!r}')
-
-    enclosure = property(_getEnclosure,
-                         _setEnclosure,
-                         doc='''
-        Get or set the enclosure as a style.Enclosure enum or None.
-
-        Valid names are
-        "rectangle"/style.Enclosure.RECTANGLE,
-        "square"/style.Enclosure.SQUARE,
-        "oval"/style.Enclosure.OVAL,
-        "circle"/style.Enclosure.CIRCLE,
-        "bracket"/style.Enclosure.BRACKET,
-        "inverted-bracket"/style.Enclosure.INVERTED_BRACKET (output in musicxml 4 only)
-        None/"none"/style.Enclosure.NONE (returns Python None object)
+        * "rectangle"/style.Enclosure.RECTANGLE,
+        * "square"/style.Enclosure.SQUARE,
+        * "oval"/style.Enclosure.OVAL,
+        * "circle"/style.Enclosure.CIRCLE,
+        * "bracket"/style.Enclosure.BRACKET,
+        * "inverted-bracket"/style.Enclosure.INVERTED_BRACKET (output in musicxml 4 only)
+        * "none"/style.Enclosure.NO_ENCLOSURE
+        * None (i.e. enclosure is unspecified)
 
         or the following other shapes with their ALLCAPS Enclosure equivalents:
 
-        triangle, diamond,
-        pentagon, hexagon, heptagon, octagon,
+        triangle, diamond, pentagon, hexagon, heptagon, octagon,
         nonagon, or decagon.
 
         >>> tst = style.TextStyle()
@@ -172,7 +155,28 @@ class Style(ProtoM21Object):
         Traceback (most recent call last):
         music21.style.TextFormatException:
             Not a supported enclosure: 4
-        ''')
+
+        * Changed in v9.7: We now differentiate between no enclosure
+          (Enclosure.NO_ENCLOSURE) and unspecified enclosure (None).
+        '''
+        return self._enclosure
+
+    @enclosure.setter
+    def enclosure(self, value: Enclosure|str|None):
+        if value is None:
+            self._enclosure = value
+        elif isinstance(value, Enclosure):
+            self._enclosure = value
+        elif isinstance(value, str):
+            try:
+                enc_value = Enclosure(value.lower())
+            except ValueError as ve:
+                raise TextFormatException(f'Not a supported enclosure: {value!r}') from ve
+
+            self._enclosure = enc_value
+
+        else:
+            raise TextFormatException(f'Not a supported enclosure: {value!r}')
 
     def _getAbsoluteY(self):
         return self._absoluteY

@@ -4,16 +4,15 @@
 # Purpose:      python objects representing lilypond
 #
 # Authors:      Michael Scott Asato Cuthbert
+#               Jeremy Teitelbaum (Lilypond 2.24 adaptations)
 #
-# Copyright:    Copyright © 2007-2012 Michael Scott Asato Cuthbert
+# Copyright:    Copyright © 2007-2025 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
 music21 translates to Lilypond format and if Lilypond is installed on the
 local computer, can automatically generate .pdf, .png, and .svg versions
-of musical files using Lilypond
-
-this replaces (April 2012) the old LilyString() conversion methods.
+of musical files using Lilypond.
 
 The Grammar for Lilypond comes from
 http://lilypond.org/doc/v2.14/Documentation/notation/lilypond-grammar
@@ -112,8 +111,8 @@ class LyObject(prebase.ProtoM21Object):
         Returns a dictionary and sets self.lilyAttributes to that dictionary, for a m21Object
         of class classLookup using the mapping of self.m21toLy[classLookup]
 
-
-        >>> class Mock(base.Music21Object): pass
+        >>> class Mock(base.Music21Object):
+        ...     pass
         >>> m = Mock()
         >>> m.mockAttribute = 32
         >>> m.mockAttribute2 = None
@@ -260,11 +259,11 @@ class LyObject(prebase.ProtoM21Object):
         stringNew = stringIn.replace('"', r'\"')
         return '"' + stringNew + '" '
 
-    def comment(self, stringIn):
+    def comment(self, stringIn: str) -> str:
         r'''
         returns a comment that is %{ stringIn.strip() %}
 
-        Don't put %} etc. in comments.  That's just rude...
+        (Don't put %} etc. in comments -- it will break the system.)
         '''
         return ' %{ ' + stringIn.strip() + ' %} '
 
@@ -725,12 +724,11 @@ class LyScoreBlock(LyObject):
 
 class LyScoreBody(LyObject):
     r'''
-    represents the contents of a \score { ...contents... }
+    represents the contents of a \score { contents }
     block
 
     can take one of the following attributes:
     music, scoreIdentifier, scoreBody, lilypondHeader, outputDef, error
-
 
     >>> lsb = lily.lilyObjects.LyScoreBody(scoreIdentifier='score')
     >>> str(lsb)
@@ -779,13 +777,12 @@ class LyPaperBlock(LyObject):
         else:
             return self.outputDef.stringOutput()
 
-
 class LyLayout(LyObject):
     def stringOutput(self):
         theseStrings = [self.backslash + 'layout {',
                         ' ' + self.backslash + 'context {',
-                        '   ' + self.backslash + 'RemoveEmptyStaffContext',
-                        '   ' + self.backslash + "override VerticalAxisGroup #'remove-first = ##t",
+                        '   ' + self.backslash + 'RemoveEmptyStaves',
+                        '   ' + self.backslash + 'override VerticalAxisGroup.remove-first = ##t',
                         ' ' + '}', '}']
 
         return self.newlineSeparateStringOutputIfNotNone(theseStrings)
@@ -793,7 +790,7 @@ class LyLayout(LyObject):
 
 class LyOutputDef(LyObject):
     r'''
-    This is an ugly grammar, since it does not close the curly bracket...
+    This is an ugly grammar, since it does not close the curly bracket.
     '''
 
     def __init__(self, outputDefBody=None):
@@ -1099,7 +1096,7 @@ class LyContextModification(LyObject):
         super().__init__()
         self.contextModList = contextModList
         self.contextModIdentifier = contextModIdentifier  # String?
-        self.displayWith = displayWith  # optional... but not supported without so far...
+        self.displayWith = displayWith  # optional, but not supported without so far
 
     def stringOutput(self):
         if self.contextModList is not None:
@@ -1425,7 +1422,7 @@ class LyReRhythmedMusic(LyObject):
         else:
             outputString = c + ' '
         outputString += self.newLyrics.stringOutput()
-        return outputString  # previously this did not return...
+        return outputString  # previously this did not return
 
 
 class LyContextChange(LyObject):
@@ -1483,11 +1480,11 @@ class LyPropertyOperation(LyObject):
 
     >>> lpo = lily.lilyObjects.LyPropertyOperation('override', 'simple', 'x', 'y')
     >>> str(lpo)
-    '\\override simple x = y '
+    '\\override simple.x = y '
 
     >>> lpo = lily.lilyObjects.LyPropertyOperation('revert', 'x', 'y')
     >>> str(lpo)
-    '\\revert x y '
+    '\\revert x.y '
 
     TODO: should \set be given?
     '''
@@ -1508,10 +1505,10 @@ class LyPropertyOperation(LyObject):
         elif self.mode == 'unset':
             return self.backslash + 'unset ' + self.value1 + ' '
         elif self.mode == 'override':
-            return ''.join([self.backslash, 'override ', self.value1, ' ', self.value2,
+            return ''.join([self.backslash, 'override ', self.value1, '.', self.value2,
                             ' = ', self.value3, ' '])
         elif self.mode == 'revert':
-            return self.backslash + 'revert ' + self.value1 + ' ' + self.value2 + ' '
+            return self.backslash + 'revert ' + self.value1 + '.' + self.value2 + ' '
 
 
 class LyContextDefMod(LyObject):
@@ -1561,13 +1558,13 @@ class LyMusicPropertyDef(LyObject):
 
 class LyEventChord(LyObject):
     r'''
-    takes all the parts as a list of up to three elements
+    takes all the parts as a list of up to three elements::
 
         event_chord: simple_chord_elements post_events
-                | CHORD_REPETITION optional_notemode_duration post_events
-                | MULTI_MEASURE_REST optional_notemode_duration post_events
-                | command_element
-               |note_chord_element
+               | CHORD_REPETITION optional_notemode_duration post_events
+               | MULTI_MEASURE_REST optional_notemode_duration post_events
+               | command_element
+               | note_chord_element
 
     simple_chord_elements can be a LySimpleElement object.  Or it can be a
     LyNewChord or LyFigureSpec + Duration
@@ -2135,7 +2132,7 @@ class LyMarkupBracedListBody(LyObject):
             c += str(m) + ' '
         return c
 
-# skip markup_command_list and arguments for now...
+# skip markup_command_list and arguments for now
 # skip markup_head_1_item
 # skip markup_head_1_list
 

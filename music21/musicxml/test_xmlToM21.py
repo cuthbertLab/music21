@@ -17,12 +17,14 @@ from music21 import harmony
 from music21 import instrument
 from music21 import key
 from music21 import layout
+from music21 import metadata
 from music21 import meter
 from music21 import note
 from music21 import pitch
 from music21 import repeat
 from music21 import spanner
 from music21 import stream
+from music21 import style
 from music21 import tempo
 from music21 import text
 
@@ -32,11 +34,6 @@ from music21.musicxml.xmlToM21 import (
 )
 
 class Test(unittest.TestCase):
-    def testParseSimple(self):
-        MI = MusicXMLImporter()
-        MI.xmlText = r'''<score-timewise />'''
-        self.assertRaises(MusicXMLImportException, MI.parseXMLText)
-
     def EL(self, elText):
         return ET.fromstring(elText)
 
@@ -51,6 +48,60 @@ class Test(unittest.TestCase):
         out = out[0:len(out) - 2]
         out += ']'
         return out
+
+    def testParseSimple(self):
+        MI = MusicXMLImporter()
+        MI.xmlText = r'''<score-timewise />'''
+        self.assertRaises(MusicXMLImportException, MI.parseXMLText)
+
+    def test_processEncoding(self):
+        '''
+        Test that the Encoding tag sets software etc. properly.
+        '''
+        enc1 = '''
+            <encoding>
+              <encoding-date>2025-05-21</encoding-date>
+              <software>Finale v26.3 for Mac</software>
+              <supports attribute="new-system" element="print" type="yes" value="yes" />
+              <supports attribute="new-page" element="print" type="yes" value="yes" />
+            </encoding>
+        '''
+        mxl_importer = MusicXMLImporter()
+        self.assertFalse(mxl_importer.applyFinaleWorkarounds)
+        self.assertFalse(mxl_importer.definesExplicitSystemBreaks)
+        self.assertFalse(mxl_importer.definesExplicitPageBreaks)
+
+        encoding = self.EL(enc1)
+        md = metadata.Metadata()
+        self.assertEqual(len(md.software), 1)
+        # we add music21 to all initial software...
+        self.assertIn('music21', md.software[0])
+
+        mxl_importer = MusicXMLImporter()
+        mxl_importer.processEncoding(encoding, md)
+        self.assertTrue(mxl_importer.applyFinaleWorkarounds)
+        self.assertTrue(mxl_importer.definesExplicitSystemBreaks)
+        self.assertTrue(mxl_importer.definesExplicitPageBreaks)
+        self.assertIn('Finale v26.3 for Mac', md.software)
+
+        enc1 = '''
+            <encoding>
+              <encoding-date>2099-05-21</encoding-date>
+              <software>music21 v.99</software>
+              <software>Finale v90 for ChatGPT Implant</software>
+              <supports attribute="new-system" element="print" type="yes" value="no" />
+              <supports attribute="new-page" element="print" type="yes" value="yes" />
+            </encoding>
+        '''
+        mxl_importer = MusicXMLImporter()
+        encoding = self.EL(enc1)
+        md = metadata.Metadata()
+        mxl_importer.processEncoding(encoding, md)
+        self.assertFalse(mxl_importer.applyFinaleWorkarounds)
+        self.assertFalse(mxl_importer.definesExplicitSystemBreaks)
+        self.assertTrue(mxl_importer.definesExplicitPageBreaks)
+        self.assertIn('music21 v.99', md.software)
+        self.assertIn('Finale v90 for ChatGPT Implant', md.software)
 
     def testExceptionMessage(self):
         mxScorePart = self.EL('<score-part><part-name>Elec.</part-name></score-part>')
@@ -396,7 +447,7 @@ class Test(unittest.TestCase):
         from music21.musicxml import m21ToXml
         from music21 import converter
 
-        # this also tests the EXPORTING of stem directions on notes within chords...
+        # this also tests the EXPORTING of stem directions on notes within chords
         n1 = note.Note('f3')
         n1.notehead = 'diamond'
         n1.stemDirection = 'down'
@@ -434,7 +485,7 @@ class Test(unittest.TestCase):
         self.assertEqual(sg2.symbol, 'brace')
         self.assertTrue(sg2.barTogether)
 
-        # TODO: more tests about which parts are there...
+        # TODO: more tests about which parts are there
 
     def testStaffGroupsPiano(self):
         from music21.musicxml import testPrimitive
@@ -572,7 +623,7 @@ class Test(unittest.TestCase):
     def x_testOrnamentAndTechnical(self):
         from music21 import converter
         beethoven = common.getCorpusFilePath() + '/beethoven/opus133.mxl'
-        # TODO: this is way too long... lots of hidden 32nd notes for trills...
+        # TODO: this is way too long. Lots of hidden 32nd notes for trills.
         s = converter.parse(beethoven, format='musicxml')
         ex = s.parts[0]
         countTrill = 0
@@ -582,8 +633,8 @@ class Test(unittest.TestCase):
                     countTrill += 1
         self.assertEqual(countTrill, 54)
 
-        # TODO: Get a better test... the single harmonic in the viola part,
-        # m. 482 is probably a mistake for an open string.
+        # TODO: Get a better test: the single harmonic in the viola part,
+        #     m. 482 is probably a mistake for an open string.
         countTechnical = 0
         for n in s.parts[2].recurse().notes:
             for a in n.articulations:
@@ -814,7 +865,7 @@ class Test(unittest.TestCase):
 
     def testCountDynamics(self):
         '''
-        good test of both dynamics and a PartStaff...
+        good test of both dynamics and a PartStaff.
         '''
         from music21 import corpus
         c = corpus.parse('schoenberg/opus19/movement2.mxl')
@@ -848,7 +899,7 @@ class Test(unittest.TestCase):
         lots of lines, including overlapping here; testing that
         a line attached to a rest is still there.  Formerly was a problem.
 
-        Many more tests could be done on this piece...
+        Many more tests could be done on this piece.
         '''
         from music21 import corpus
         c = corpus.parse('luca/gloria')
@@ -916,7 +967,7 @@ class Test(unittest.TestCase):
             self.assertEqual(len(tuplets), 1)
             self.assertEqual(tuplets[0].type, tupTypes[i])
 
-        # without number....
+        # without number.
         n0 = getNoteByTupletTypeNumber('start')
         n1 = getNoteByTupletTypeNumber()
         n2 = getNoteByTupletTypeNumber('stop')
@@ -1064,9 +1115,85 @@ class Test(unittest.TestCase):
         self.assertEqual(len(rmIterator), 4)
         self.assertEqual(rmIterator[0].content, 'A')
         self.assertEqual(rmIterator[1].content, 'B')
-        self.assertEqual(rmIterator[1].style.enclosure, None)
+        self.assertEqual(rmIterator[1].style.enclosure,
+                         style.Enclosure.NO_ENCLOSURE)
         self.assertEqual(rmIterator[2].content, 'Test')
         self.assertEqual(rmIterator[2].style.enclosure, 'square')
+
+    def testPedalMarks(self):
+        from music21 import converter
+        from music21 import corpus
+        from music21.musicxml import testPrimitive
+
+        s = converter.parse(testPrimitive.directions31a)
+        pedals = list(s[expressions.PedalMark])
+        self.assertEqual(len(pedals), 1)
+        pm = pedals[0]
+        pm.fill(s)
+        self.assertIsNone(pm.pedalForm)
+        self.assertEqual(pm.pedalType, expressions.PedalType.Sustain)
+        spElements = pm.getSpannedElements()
+        self.assertEqual(len(spElements), 4)
+        expectedOffsets = [0.0, 1.0, 1.0, 2.0]
+        for i, (el, expectedOffset) in enumerate(zip(spElements, expectedOffsets)):
+            if i == 1:
+                self.assertIsInstance(el, expressions.PedalBounce)
+            else:
+                self.assertIsInstance(el, note.Note)
+                self.assertEqual(el.fullName, 'C in octave 4 Quarter Note')
+            self.assertEqual(el.offset, expectedOffset)
+
+        s = converter.parse(testPrimitive.spanners33a)
+        pedals = list(s[expressions.PedalMark])
+        self.assertEqual(len(pedals), 1)
+        pm = pedals[0]
+        pm.fill(s)
+        self.assertIsNone(pm.pedalForm)
+        self.assertEqual(pm.pedalType, expressions.PedalType.Sustain)
+        spElements = pm.getSpannedElements()
+        self.assertEqual(len(spElements), 3)
+        expectedOffsets = [0.0, 1.0, 1.0]
+        for i, (el, expectedOffset) in enumerate(zip(spElements, expectedOffsets)):
+            if i == 1:
+                self.assertIsInstance(el, expressions.PedalBounce)
+            else:
+                self.assertIsInstance(el, note.Note)
+                self.assertEqual(el.fullName, 'B in octave 4 Quarter Note')
+            self.assertEqual(el.offset, expectedOffset)
+
+        s = corpus.parse('beach')
+        pedals = list(s[expressions.PedalMark])
+        self.assertEqual(len(pedals), 1)
+        pm = pedals[0]
+        pm.fill(s.parts[5])
+        self.assertEqual(pm.pedalForm, expressions.PedalForm.Symbol)
+        self.assertEqual(pm.pedalType, expressions.PedalType.Sustain)
+        spElements = pm.getSpannedElements()
+        self.assertEqual(len(spElements), 2)
+        self.assertIsInstance(spElements[0], chord.Chord)
+        self.assertEqual(
+            spElements[0].fullName,
+            'Chord {E-flat in octave 2 | B-flat in octave 2} Whole'
+        )
+        self.assertEqual(spElements[0].offset, 0.)
+        self.assertIsInstance(spElements[1], note.Note)
+        self.assertEqual(spElements[1].fullName, 'E-flat in octave 1 Whole Note')
+        self.assertEqual(spElements[1].offset, 0.)
+
+        s = corpus.parse('dichterliebe_no2')
+        pedals = list(s[expressions.PedalMark])
+        self.assertEqual(len(pedals), 1)
+        pm = pedals[0]
+        pm.fill(s.parts[2])
+        self.assertEqual(pm.pedalForm, expressions.PedalForm.Symbol)
+        self.assertEqual(pm.pedalType, expressions.PedalType.Sustain)
+        spElements = pm.getSpannedElements()
+        self.assertEqual(len(spElements), 5)
+        expectedOffsets = [1.5, 1.75, 0.0, 0.75, 1.0]
+        for i, (el, expectedOffset) in enumerate(zip(spElements, expectedOffsets)):
+            self.assertIsInstance(el, note.Note)
+            self.assertEqual(el.nameWithOctave, 'A3')
+            self.assertEqual(el.offset, expectedOffset)
 
     def testNoChordImport(self):
         from music21 import converter
@@ -1249,7 +1376,17 @@ class Test(unittest.TestCase):
 
         # Voice 1: Half note, <forward> (quarter), quarter note
         # Voice 2: <forward> (half), quarter note, <forward> (quarter)
-        s = converter.parse(testPrimitive.hiddenRests)
+        s = converter.parse(testPrimitive.hiddenRestsNoFinale)
+        v1, v2 = s.recurse().voices
+        # No rests should have been added
+        self.assertFalse(v1.getElementsByClass(note.Rest))
+        self.assertFalse(v2.getElementsByClass(note.Rest))
+
+        # Finale uses <forward> tags to represent hidden rests,
+        # so we want to have rests here
+        # Voice 1: Half note, <forward> (quarter), quarter note
+        # Voice 2: <forward> (half), quarter note, <forward> (quarter)
+        s = converter.parse(testPrimitive.hiddenRestsFinale)
         v1, v2 = s.recurse().voices
         self.assertEqual(v1.duration.quarterLength, v2.duration.quarterLength)
 
@@ -1290,7 +1427,7 @@ class Test(unittest.TestCase):
 
         self.assertEqual(len(MP.stream.voices), 2)
         self.assertEqual(len(MP.stream.voices[0].elements), 1)
-        self.assertEqual(len(MP.stream.voices[1].elements), 2)
+        self.assertEqual(len(MP.stream.voices[1].elements), 1)
         self.assertEqual(MP.stream.voices[1].id, 'non-integer-value')
 
     def testMultiDigitEnding(self):
@@ -1532,6 +1669,52 @@ class Test(unittest.TestCase):
         pp.setLastMeasureInfo(m)
         pp.adjustTimeAttributesFromMeasure(m)
         self.assertEqual(pp.lastMeasureOffset, 25.0)
+
+    def testPianoStaffWithRepeatEndings(self):
+        from music21 import converter
+        from music21.musicxml import testFiles
+
+        s = converter.parse(testFiles.pianoRepeatEndings)
+        self.assertEqual(len(s.parts), 2)
+        self.assertTrue(s[layout.StaffGroup])
+        sg = s[layout.StaffGroup].first()
+
+        for p_num in (0, 1):
+            p = s.parts[p_num]
+            self.assertIn(p, sg)
+            self.assertEqual(len(p[note.Note]), 3)
+            self.assertEqual(len(p[stream.Measure]), 3)
+            m1, m2, m3 = p[stream.Measure]
+            self.assertTrue(m1[bar.Repeat])
+            repeat_start = m1[bar.Repeat].first()
+            self.assertEqual(repeat_start.direction, 'start')
+            self.assertEqual(repeat_start.offset, 0.0)
+            self.assertTrue(m2[bar.Repeat])
+            repeat_end = m2[bar.Repeat].first()
+            self.assertEqual(repeat_end.direction, 'end')
+            self.assertEqual(repeat_end.offset, 4.0)
+            self.assertFalse(m3[bar.Repeat])
+            self.assertTrue(m3[bar.Barline].getElementsByOffset(4.0))
+            final_bar = m3[bar.Barline].getElementsByOffset(4.0, 4.0).first()
+            self.assertEqual(final_bar.type, 'final')
+
+            # formerly mistake
+            repeat_bracket_iterator = p[spanner.RepeatBracket]
+            self.assertTrue(repeat_bracket_iterator, f'Part {p_num}:{p} has no RepeatBrackets')
+            self.assertEqual(len(repeat_bracket_iterator), 2)
+            rb1, rb2 = repeat_bracket_iterator
+            if rb1.number == 2:
+                # these should iterate as 1, 2 but there's no guarantee
+                rb1, rb2 = rb2, rb1
+            self.assertEqual(list(rb1), [m2])
+            self.assertEqual(list(rb2), [m3])
+
+            p_notes = [n.name for n in p[note.Note]]
+            self.assertEqual(p_notes, ['G', 'A', 'B'])
+
+            p_expanded = repeat.Expander[stream.Part](p).process()
+            p_notes2 = [n.name for n in p_expanded[note.Note]]
+            self.assertEqual(p_notes2, ['G', 'A', 'G', 'B'])
 
 
 if __name__ == '__main__':

@@ -100,7 +100,7 @@ def runOneModuleWithoutImp(args):
         try:
             testResult = runner.run(s1)
 
-            # need to make testResult pickleable by removing the instancemethod parts...
+            # need to make testResult pickleable by removing the instancemethod parts
             errors = []
             for e in testResult.errors:
                 errors.append(e[1])
@@ -200,7 +200,7 @@ def mainPoolRunner(testGroup=('test',), restoreEnvironmentDefaults=False, leaveO
                 if timeouts % 5 == 0:
                     print(str(timeouts) + ' ', end='', flush=True)
                 if timeouts > maxTimeout and eventsProcessed > 0:
-                    print('\nToo many delays, giving up...', flush=True)
+                    print('\nToo many delays, giving up.', flush=True)
                     continueIt = False
                     printSummary(summaryOutput, timeStart, pathsToRun)
                     pool.close()

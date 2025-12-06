@@ -27,6 +27,7 @@ from music21 import note
 from music21 import repeat
 from music21 import spanner
 from music21 import stream
+from music21 import style
 from music21 import tempo
 
 from music21.musicxml import helpers
@@ -35,6 +36,7 @@ from music21.musicxml.m21ToXml import (
     GeneralObjectExporter, ScoreExporter,
     MusicXMLWarning, MusicXMLExportException
 )
+from music21.musicxml.xmlToM21 import MeasureParser
 
 def stripInnerSpaces(txt: str):
     '''
@@ -303,6 +305,34 @@ class Test(unittest.TestCase):
         self.assertEqual(ly2.findall('text')[0].text, 'd')
         self.assertEqual(ly2.findall('syllabic')[1].text, 'end')
         self.assertEqual(ly2.findall('text')[1].text, 'e')
+
+    def testExportChordSymbolWithInversions(self):
+        '''
+        This test checks for the issue in 1756 where a chord symbol imported
+        with both inversion and bass would not have them both set.
+
+        There were multiple bugs fixed, so important to check.
+        '''
+        explicitFm6 = harmony.ChordSymbol(root='F', bass='A-', inversion=1, kind='minor')
+        et = self.getET(explicitFm6)
+        harmonyEls = et.findall('part/measure/harmony')
+        self.assertEqual(len(harmonyEls), 1)
+        harmonyEl = harmonyEls[0]
+        # helpers.dump(harmonyEl)
+        root = harmonyEl.find('root')
+        rootStep = root.find('root-step')
+        self.assertEqual(rootStep.text, 'F')
+        self.assertEqual(harmonyEl.find('kind').text, 'minor')
+        self.assertEqual(harmonyEl.find('inversion').text, '1')
+        self.assertEqual(harmonyEl.find('bass/bass-step').text, 'A')
+        self.assertEqual(harmonyEl.find('bass/bass-alter').text, '-1')
+
+        # test round trip
+        mp = MeasureParser()
+        cs = mp.xmlToChordSymbol(harmonyEl)
+        self.assertEqual(explicitFm6.bass(find=False), cs.bass(find=False))
+        self.assertEqual(explicitFm6.root(find=False), cs.root(find=False))
+        self.assertEqual(explicitFm6.inversion(), cs.inversion())
 
     def testExportNC(self):
         s = stream.Score()
@@ -665,6 +695,60 @@ class Test(unittest.TestCase):
         self.assertTrue(tree.findall('.//note'))
         self.assertFalse(tree.findall('.//forward'))
 
+    def test_writeFromSpannerAnchorsGetsMeasureEndOffsetRight(self):
+        '''
+        Write to MusicXML from a Measure containing SpannerAnchors was not positioning
+        the current time offset correctly before starting the next written measure.
+        Now the next measure is positioned at the correct offset.
+        '''
+        m1 = stream.Measure()
+        m1.append(note.Note())
+        m1.append(note.Note())
+        m1.append(note.Note())
+        m1.append(note.Note())
+        cresc = dynamics.Crescendo()
+        startAnchor = spanner.SpannerAnchor()
+        endAnchor = spanner.SpannerAnchor()
+        m1.insert(0.5, startAnchor)
+        m1.insert(1.5, endAnchor)
+        cresc.addSpannedElements(startAnchor, endAnchor)
+        m1.append(cresc)
+        p = stream.Part()
+        p.append(m1)
+        s = stream.Score()
+        s.append(p)
+        # write to MusicXML
+        tree = self.getET(s)
+
+        # walk all the durations (notes, forwards, backups) and make sure they add up
+        # to where the end of the measure should be (4.0ql)
+        measEl = None
+        divisionsEl = None
+        for el in tree.iter():
+            if el.tag == 'measure':
+                measEl = el
+                for el in measEl.iter():
+                    if el.tag == 'divisions':
+                        divisionsEl = el
+                        break
+                break
+
+        self.assertIsNotNone(measEl)
+        self.assertIsNotNone(divisionsEl)
+
+        divisionsInt = int(divisionsEl.text)
+        currOffsetQL = 0.
+        for el in measEl.findall('*'):
+            dur = el.find('duration')
+            if dur is not None:
+                durInt = int(dur.text)
+                durQL = common.opFrac(fractions.Fraction(durInt, divisionsInt))
+                if el.tag == 'backup':
+                    currOffsetQL = common.opFrac(currOffsetQL - durQL)
+                else:
+                    currOffsetQL = common.opFrac(currOffsetQL + durQL)
+        self.assertEqual(currOffsetQL, 4.0)
+
     def testOutOfBoundsExpressionDoesNotCreateForward(self):
         '''
         A metronome mark at an offset exceeding the bar duration was causing
@@ -682,6 +766,86 @@ class Test(unittest.TestCase):
         self.assertEqual(
             int(tree.findall('.//direction/offset')[0].text),
             defaults.divisionsPerQuarter)
+
+    def testPedals(self):
+        expectedResults1 = (
+            {
+                'type': 'start',
+                'line': 'yes',
+                'number': '1',
+            },
+            {
+                'type': 'change',
+                'line': 'yes',
+            },
+            {
+                'type': 'discontinue',
+                'line': 'yes',
+            },
+            {
+                'type': 'resume',
+                'line': 'yes',
+            },
+            {
+                'type': 'change',
+                'line': 'yes',
+            },
+            {
+                'type': 'stop',
+                'line': 'yes',
+                'number': '1',
+            },
+        )
+        s = converter.parse(testPrimitive.pedalLines)
+        x = self.getET(s)
+        mxPart = x.find('part')
+        for i, mxPedal in enumerate(mxPart.findall('.//pedal')):
+            with self.subTest(pedal_index=i):
+                for k in expectedResults1[i]:
+                    self.assertEqual(mxPedal.get(k, ''), expectedResults1[i][k])
+
+        startIdx = len(expectedResults1)
+
+        expectedResults2 = (
+            {
+                'type': 'start',
+                'sign': 'yes',
+                'number': '1',
+            },
+            {
+                'type': 'resume',
+                'line': 'yes',
+            },
+            {
+                'type': 'change',
+                'line': 'yes',
+            },
+            {
+                'type': 'discontinue',
+                'line': 'yes',
+            },
+            {
+                'type': 'resume',
+                'line': 'yes',
+            },
+            {
+                'type': 'change',
+                'line': 'yes',
+            },
+            {
+                'type': 'stop',
+                'line': 'yes',
+                'number': '1',
+            },
+        )
+
+        s = converter.parse(testPrimitive.pedalSymLines)
+        x = self.getET(s)
+        mxPart = x.find('part')
+        for i, mxPedal in enumerate(mxPart.findall('.//pedal')):
+            with self.subTest(pedal_index=startIdx + i):
+                for k in expectedResults2[i]:
+                    self.assertEqual(mxPedal.get(k, ''), expectedResults2[i][k])
 
     def testArpeggios(self):
         expectedResults = (
@@ -921,6 +1085,13 @@ class Test(unittest.TestCase):
         self.assertIn('<rest', xmlOut)
         self.assertNotIn('<forward>', xmlOut)
 
+    def test_stem_style_without_direction(self):
+        one_note_tune = converter.parse('tinyNotation: 2/4 c2')
+        half_note = one_note_tune.recurse().notes.first()
+        half_note.style.stemStyle = style.Style()
+        half_note.style.stemStyle.color = 'red'
+        xmlOut = GeneralObjectExporter().parse(one_note_tune).decode('utf-8')
+        self.assertIn('<stem color="#FF0000">up</stem>', xmlOut)
 
 
 class TestExternal(unittest.TestCase):

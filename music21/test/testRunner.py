@@ -6,8 +6,7 @@
 # Authors:      Michael Scott Asato Cuthbert
 #               Christopher Ariza
 #
-# Copyright:    Copyright © 2006-2016 Michael Scott Asato Cuthbert and the music21
-#               Project
+# Copyright:    Copyright © 2006-2016 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # -----------------------------------------------------------------------------
 '''
@@ -140,7 +139,7 @@ def fix312OrderedDict(textString, replacement='...') -> str:
     '''
     Function that fixes the OrderedDicts to work on Python 3.12 and above.
     (eventually when 3.12 is the norm, this should be replaced to neuter
-    the doctests for 3.10/3.11 instead.)
+    the doctests for 3.11 instead.  Or just wait until 3.12 is the minimum version?)
 
     >>> fix312 = test.testRunner.fix312OrderedDict
     >>> fix312('OrderedDict([(0, 1), (1, 2), (2, 3)])')
@@ -243,6 +242,8 @@ def mainTest(*testClasses, **keywords):
             if ('importPlusRelative' in testClasses
                     or 'importPlusRelative' in sys.argv
                     or bool(keywords.get('importPlusRelative', False))):
+                # allow things like volpiano.py's function "fromStream"
+                # to be called in doctests as "fromStream" and not just "volpiano.fromStream"
                 globs.update(inspect.stack()[1][0].f_globals)
 
         try:
@@ -311,7 +312,7 @@ def mainTest(*testClasses, **keywords):
             s2 = unittest.defaultTestLoader.loadTestsFromTestCase(t)
             s1.addTests(s2)
 
-    # Add _DOC_ATTR tests...
+    # Add _DOC_ATTR tests
     if not skipDoctest:
         stacks = inspect.stack()
         if len(stacks) > 1:

@@ -7,8 +7,7 @@
 #               Greg Chapman
 #               Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2010-22 Michael Scott Asato Cuthbert and the music21
-#               Project
+# Copyright:    Copyright © 2010-2022 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # -----------------------------------------------------------------------------
 '''
@@ -132,59 +131,88 @@ the string.  See metadata/primitives.py for more information.
 from __future__ import annotations
 
 __all__ = [
+    'AmbitusShort',
     'Metadata',
     'RichMetadata',
-    'AmbitusShort',
+
+    'bundles',
+    'caching',
+    'primitives',
+    'properties',
 ]
 
-from collections import namedtuple
 from collections.abc import Iterable
-import copy
-from dataclasses import dataclass
 import datetime
 import pathlib
 import re
 import typing as t
 from typing import overload
-import unittest
 
 from music21 import base
 from music21 import common
-from music21.common import deprecated
+from music21.common.types import DocOrder, OffsetQL
 from music21 import defaults
 from music21 import environment
 from music21 import exceptions21
 from music21 import interval
 
-from music21.metadata import properties
-from music21.metadata.properties import PropertyDescription
 from music21.metadata import bundles
 from music21.metadata import caching
 from music21.metadata import primitives
-from music21.metadata.primitives import (Date, DatePrimitive,
-                                         DateSingle, DateRelative, DateBetween,
-                                         DateSelection, Text, Contributor, Creator,
-                                         Imprint, Copyright, ValueType)
+from music21.metadata.primitives import (
+    Contributor,
+    Copyright,
+    Creator,
+    Date,
+    DateBetween,
+    DatePrimitive,
+    DateRelative,
+    DateSelection,
+    DateSingle,
+    Imprint,
+    Text,
+    ValueType,
+)
+from music21.metadata import properties
+from music21.metadata.properties import PropertyDescription
+
+
+if t.TYPE_CHECKING:
+    from music21 import key
+    from music21 import meter
+    from music21 import tempo
+
+
 # -----------------------------------------------------------------------------
 environLocal = environment.Environment('metadata')
 
-AmbitusShort = namedtuple('AmbitusShort',
-                          ['semitones', 'diatonic', 'pitchLowest', 'pitchHighest'])
+class AmbitusShort(t.NamedTuple):
+    '''
+    A namedtuple representing the ambitus (range) using ints and strings
+
+    >>> metadata.AmbitusShort(7, 'P5', 'B3', 'F#4')
+    AmbitusShort(semitones=7, diatonic='P5', pitchLowest='B3', pitchHighest='F#4')
+    '''
+    semitones: int
+    diatonic: str
+    pitchLowest: str
+    pitchHighest: str
 
 # -----------------------------------------------------------------------------
 
 
 class Metadata(base.Music21Object):
     r'''
-    Metadata represent data for a work or fragment, including title, composer,
-    dates, and other relevant information.
+    Metadata objects contain information about a work, including title, composer,
+    dates, and other relevant information. Metadata objects can also cover a fragment
+    of a Score such as individual parts or a range of measures.
 
     Metadata is a :class:`~music21.base.Music21Object` subclass, meaning that it
     can be positioned on a Stream by offset and have a
     :class:`~music21.duration.Duration`.
 
-    In many cases, each Stream will have a single Metadata object at the zero
-    offset position.
+    In many cases, each Stream will have a single Metadata object at the zero-offset
+    position.
 
     To get a simple string, use attribute-style access by unique name.
     Some workIds from music21 v7 have been renamed (e.g. 'date' has been renamed
@@ -1070,7 +1098,7 @@ class Metadata(base.Music21Object):
         ...     )
         (True, 'composer')
 
-        These don't work (Richard didn't have the sense of rhythm to write this...)
+        These don't work (Richard didn't have the sense of rhythm to write this!)
 
         >>> md.search(
         ...     'Wagner',
@@ -1333,21 +1361,6 @@ class Metadata(base.Music21Object):
         setattr(self, 'composers', value)
 
     @property
-    def date(self):
-        '''
-        The `.date` property is deprecated in v8 and will be removed in v10.
-        Use `dateCreated` instead.
-        '''
-        return self.dateCreated
-
-    @date.setter
-    def date(self, value: str) -> None:
-        '''
-        For type checking only. Does not run.
-        '''
-        setattr(self, 'date', value)
-
-    @property
     def dateCreated(self):
         r'''
         Get or set the creation date of this work as one of the following date
@@ -1397,7 +1410,8 @@ class Metadata(base.Music21Object):
     @property
     def filePath(self) -> str|None:
         '''
-        Get or set the file path that was parsed.
+        Get or set the file path that was parsed.  This returns a string, not a Path object
+        that is deliberate for caching.
         '''
         return self._getSingularAttribute('filePath')
 
@@ -1705,11 +1719,8 @@ class Metadata(base.Music21Object):
 
         >>> md.bestTitle = 'Bonaparte'
         Traceback (most recent call last):
-        AttributeError: ...'bestTitle'...
+        AttributeError: property 'bestTitle' of 'Metadata' object has no setter
         '''
-        # TODO: once Py3.11 is the minimum, change doctest output to:
-        #    AttributeError: property 'bestTitle' of 'Metadata' object has no setter
-
         searchId = (
             'title',
             'popularTitle',
@@ -2045,7 +2056,7 @@ class Metadata(base.Music21Object):
         False
         '''
         prop: PropertyDescription|None = (
-            properties.UNIQUE_NAME_TO_PROPERTY_DESCRIPTION.get(uniqueName, None)
+            properties.UNIQUE_NAME_TO_PROPERTY_DESCRIPTION.get(uniqueName)
         )
         if prop is None:
             return False
@@ -2095,7 +2106,7 @@ class Metadata(base.Music21Object):
         False
         '''
         prop: PropertyDescription|None = (
-            properties.NAMESPACE_NAME_TO_PROPERTY_DESCRIPTION.get(namespaceName, None)
+            properties.NAMESPACE_NAME_TO_PROPERTY_DESCRIPTION.get(namespaceName)
         )
         if prop is None:
             return False
@@ -2133,7 +2144,7 @@ class Metadata(base.Music21Object):
         False
         '''
         prop: PropertyDescription|None = (
-            properties.NAMESPACE_NAME_TO_PROPERTY_DESCRIPTION.get(namespaceName, None)
+            properties.NAMESPACE_NAME_TO_PROPERTY_DESCRIPTION.get(namespaceName)
         )
         if prop is None:
             return False
@@ -2173,7 +2184,7 @@ class Metadata(base.Music21Object):
             return 'otherContributor'
 
         prop: PropertyDescription|None = (
-            properties.UNIQUE_NAME_TO_PROPERTY_DESCRIPTION.get(role, None)
+            properties.UNIQUE_NAME_TO_PROPERTY_DESCRIPTION.get(role)
         )
 
         if prop is None:
@@ -2207,7 +2218,7 @@ class Metadata(base.Music21Object):
                     ' Call addCustom/setCustom/getCustom for custom names.')
             name = uniqueName
 
-        valueList: list[ValueType]|None = self._contents.get(name, None)
+        valueList: list[ValueType]|None = self._contents.get(name)
 
         if not valueList:
             # return empty tuple
@@ -2245,7 +2256,7 @@ class Metadata(base.Music21Object):
 
         convertedValues: list[ValueType] = []
         for v in value:
-            convertedValues.append(self._convertValue(name, v))
+            convertedValues.append(self.convertValue(name, v))
 
         prevValues: list[ValueType]|None = self._contents.get(name, None)
         if not prevValues:  # None or []
@@ -2307,46 +2318,71 @@ class Metadata(base.Music21Object):
             self._add(name, value, isCustom)
 
     @staticmethod
-    def _convertValue(uniqueName: str, value: t.Any) -> ValueType:
+    def convertValue(uniqueName: str, value: t.Any) -> ValueType:
         '''
-        Converts a value to the appropriate valueType (looked up in STDPROPERTIES by
-        uniqueName).
+        Converts a value (string, date, etc.) to the appropriate ValueType
+        (defined by uniqueName and metadata.proporties.UNIQUE_NAME_TO_VALUE_TYPE).
 
-        Converts certain named values to Text
+        Converts certain named values to Text:
 
-        >>> metadata.Metadata._convertValue('title', 3.4)
-        <music21.metadata.primitives.Text 3.4>
-        >>> metadata.Metadata._convertValue('title', '3.4')
-        <music21.metadata.primitives.Text 3.4>
-        >>> metadata.Metadata._convertValue('title', metadata.Text('3.4'))
-        <music21.metadata.primitives.Text 3.4>
+        >>> metadata.Metadata.convertValue('title', 'Density 21.5')
+        <music21.metadata.primitives.Text Density 21.5>
 
-        Converts certain named values to Copyright
+        Non-string values can often be converted automatically
 
-        >>> metadata.Metadata._convertValue('copyright', 'copyright str')
-        <music21.metadata.primitives.Copyright copyright str>
-        >>> metadata.Metadata._convertValue('copyright', metadata.Text('copyright text'))
-        <music21.metadata.primitives.Copyright copyright text>
-        >>> metadata.Metadata._convertValue('copyright', metadata.Copyright('copyright'))
-        <music21.metadata.primitives.Copyright copyright>
+        >>> metadata.Metadata.convertValue('title', 21.5)
+        <music21.metadata.primitives.Text 21.5>
 
-        Converts certain named values to Contributor
 
-        >>> metadata.Metadata._convertValue('composer', 'composer str')
-        <music21.metadata.primitives.Contributor composer:composer str>
-        >>> metadata.Metadata._convertValue('composer', metadata.Text('composer text'))
-        <music21.metadata.primitives.Contributor composer:composer text>
-        >>> metadata.Metadata._convertValue('composer',
-        ...     metadata.Contributor(role='random', name='Joe'))
-        <music21.metadata.primitives.Contributor random:Joe>
+        If it is already the appropriate type, no change is made
 
-        Converts certain named values to DateSingle
+        >>> md_text = metadata.Text('The Desert Music')
+        >>> metadata.Metadata.convertValue('title', md_text)
+        <music21.metadata.primitives.Text The Desert Music>
+        >>> metadata.Metadata.convertValue('title', md_text) is md_text
+        True
 
-        >>> metadata.Metadata._convertValue('dateCreated', '1938')
+        Converts copyright named values to Copyright:
+
+        >>> metadata.Metadata.convertValue('copyright', 'copyright-as-string')
+        <music21.metadata.primitives.Copyright copyright-as-string>
+        >>> metadata.Metadata.convertValue('copyright', metadata.Text('copyright-as-text'))
+        <music21.metadata.primitives.Copyright copyright-as-text>
+        >>> metadata.Metadata.convertValue('copyright', metadata.Copyright('2025 Ariadne Press'))
+        <music21.metadata.primitives.Copyright 2025 Ariadne Press>
+
+        Converts composer or other named values to Contributors:
+
+        >>> metadata.Metadata.convertValue('composer', 'Kayleigh Rose Amstutz')
+        <music21.metadata.primitives.Contributor composer:Kayleigh Rose Amstutz>
+        >>> metadata.Metadata.convertValue('librettist', metadata.Text('Da Ponte'))
+        <music21.metadata.primitives.Contributor librettist:Da Ponte>
+
+        Unusual roles need to be passed with "otherContributor" and role already defined.
+        (Essentially, make your own)
+
+        >>> metadata.Metadata.convertValue('otherContributor',
+        ...     metadata.Contributor(role='conceptual-artist', name='Robert Wilson'))
+        <music21.metadata.primitives.Contributor conceptual-artist:Robert Wilson>
+
+        Converts certain named values to DateSingle:
+
+        >>> metadata.Metadata.convertValue('dateCreated', '1938')
         <music21.metadata.primitives.DateSingle 1938/--/-->
-        >>> metadata.Metadata._convertValue('dateCreated', metadata.Text('1938'))
-        <music21.metadata.primitives.DateSingle 1938/--/-->
-        >>> metadata.Metadata._convertValue('dateCreated',
+        >>> metadata.Metadata.convertValue('dateCreated', metadata.Text('1938/02'))
+        <music21.metadata.primitives.DateSingle 1938/02/-->
+
+        Datetime objects, like this one for the Rite of Spring riot, also get converted.
+
+        >>> from datetime import datetime
+        >>> dt = datetime(1913, 5, 29)
+        >>> metadata.Metadata.convertValue('dateCreated', dt)
+        <music21.metadata.primitives.DateSingle 1913/05/29>
+
+        For DateBetween objects one must pass their own already created primitive
+        (so no need to use this)
+
+        >>> metadata.Metadata.convertValue('dateCreated',
         ...     metadata.DateBetween(['1938', '1939']))
         <music21.metadata.primitives.DateBetween 1938/--/-- to 1939/--/-->
         '''
@@ -2391,14 +2427,11 @@ class Metadata(base.Music21Object):
                 return value
 
             if isinstance(value, (str, datetime.datetime, Date)):
-                # noinspection PyBroadException
-                # pylint: disable=bare-except
                 try:
                     return DateSingle(value)
-                except:
+                except ValueError:
                     # Couldn't convert; just return a generic text.
                     return Text(str(originalValue))
-                # pylint: enable=bare-except
 
             raise exceptions21.MetadataException(
                 f'invalid type for DateSingle: {type(value).__name__}')
@@ -2414,13 +2447,11 @@ class Metadata(base.Music21Object):
                 f'invalid type for Contributor: {type(value).__name__}')
 
         if valueType is int:
-            # noinspection PyBroadException
             try:
                 return int(value)
-            except:
+            except ValueError as e:
                 raise exceptions21.MetadataException(
-                    f'invalid type for int: {type(value).__name__}')
-            # pylint: enable=bare-except
+                    f'invalid type for int: {type(value).__name__}') from e
 
         raise exceptions21.MetadataException('internal error: invalid valueType')
 
@@ -2447,8 +2478,14 @@ class RichMetadata(Metadata):
 
     >>> richMetadata.additionalRichMetadataAttributes
     ('ambitus', 'keySignatureFirst', 'keySignatures', 'noteCount', 'numberOfParts',
-     'pitchHighest', 'pitchLowest', 'quarterLength', 'sourcePath', 'tempoFirst',
+     'pitchHighest', 'pitchLowest', 'scoreQuarterLength', 'sourcePath', 'tempoFirst',
      'tempos', 'timeSignatureFirst', 'timeSignatures')
+
+    Changed in v10: renamed `quarterLength` to `scoreQuarterLength`.
+       Because RichMetadata is a Music21Object, `quarterLength` is a property that must
+       return the length of the RichMetadata object itself and should not have been
+       ovewritten
+
     '''
 
     # CLASS VARIABLES #
@@ -2462,7 +2499,7 @@ class RichMetadata(Metadata):
         'numberOfParts',
         'pitchHighest',
         'pitchLowest',
-        'quarterLength',
+        'scoreQuarterLength',
         'sourcePath',
         'tempoFirst',
         'tempos',
@@ -2472,21 +2509,21 @@ class RichMetadata(Metadata):
 
     # INITIALIZER #
 
-    def __init__(self, **keywords):
+    def __init__(self, **keywords) -> None:
         super().__init__(**keywords)
-        self.ambitus = None
-        self.keySignatureFirst = None
-        self.keySignatures = []
-        self.noteCount = None
+        self.ambitus: AmbitusShort|None = None
+        self.keySignatureFirst: key.KeySignature|None = None
+        self.keySignatures: list[key.KeySignature] = []
+        self.noteCount: int|None = None
         self.numberOfParts = None
-        self.pitchHighest = None
-        self.pitchLowest = None
-        self.quarterLength = None
+        self.pitchHighest: str|None = None
+        self.pitchLowest: str|None = None
+        self.scoreQuarterLength: OffsetQL = 0.0
         self.sourcePath = ''
-        self.tempoFirst = None
-        self.tempos = []
-        self.timeSignatureFirst = None
-        self.timeSignatures = []
+        self.tempoFirst: tempo.TempoIndication|None = None
+        self.tempos: list[tempo.TempoIndication] = []
+        self.timeSignatureFirst: meter.TimeSignature|None = None
+        self.timeSignatures: list[meter.TimeSignature] = []
 
     def _getPluralAttribute(self, attributeName) -> tuple[str, ...]:
         # we have to implement this to add the RichMetadata attributes, since
@@ -2541,8 +2578,8 @@ class RichMetadata(Metadata):
 
     def getSourcePath(self, streamObj) -> str:
         '''
-        Get a string of the path after the corpus for the piece...useful for
-        searching on corpus items without proper composer data...
+        Get a string of the path after the corpus for the piece.  Useful for
+        searching on corpus items without proper composer data.
 
         >>> rmd = metadata.RichMetadata()
         >>> b = corpus.parse('bwv66.6')
@@ -2629,26 +2666,8 @@ class RichMetadata(Metadata):
         if self.tempos:
             self.tempoFirst = self.tempos[0]
 
-        # for element in flat:
-        #    pitches = ()
-        #    if isinstance(element, note.Note):
-        #        pitches = (element.pitch,)
-        #    elif isinstance(element, chord.Chord):
-        #        pitches = element.pitches
-        #    for pitch in pitches:
-        #        if self.pitchHighest is None:
-        #            self.pitchHighest = pitch
-        #        if self.pitchLowest is None:
-        #            self.pitchLowest = pitch
-        #        if pitch.ps < self.pitchLowest.ps:
-        #            self.pitchLowest = pitch
-        #        elif self.pitchHighest.ps < pitch.ps:
-        #            self.pitchHighest = pitch
-        # self.pitchLowest = str(self.pitchLowest)
-        # self.pitchHighest = str(self.pitchHighest)
-
         self.noteCount = len(flat.notesAndRests)
-        self.quarterLength = flat.highestTime
+        self.scoreQuarterLength = flat.highestTime
 
         # commenting out temporarily due to memory error
         # with corpus/beethoven/opus132.xml
@@ -2796,7 +2815,7 @@ class RichMetadata(Metadata):
 
 # -----------------------------------------------------------------------------
 # tests are in test/test_metadata
-_DOC_ORDER: list[type] = []
+_DOC_ORDER: DocOrder = [Metadata, RichMetadata, AmbitusShort]
 
 
 if __name__ == '__main__':

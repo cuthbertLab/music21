@@ -10,7 +10,7 @@
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
-If it doesn't fit anywhere else in the common directory, you'll find it here...
+If it doesn't fit anywhere else in the common directory, you'll find it here!
 '''
 from __future__ import annotations
 
@@ -26,19 +26,17 @@ import types
 import typing as t
 import weakref
 
-from music21.common.decorators import deprecated
-
 __all__ = [
+    'cleanedFlatNotation',
+    'defaultDeepcopy',
     'flattenList',
     'getMissingImportStr',
     'getPlatform',
     'macOSVersion',
-    'sortModules',
     'pitchList',
-    'unique',
     'runningInNotebook',
-    'defaultDeepcopy',
-    'cleanedFlatNotation',
+    'sortModules',
+    'unique',
 ]
 
 if t.TYPE_CHECKING:
@@ -49,13 +47,17 @@ if t.TYPE_CHECKING:
 
 def flattenList(originalList: Iterable[Iterable[_T]]) -> list[_T]:
     '''
-    Flatten a list of lists into a flat list
-
-    but not a list of lists of lists...
+    Flatten a list of lists into a flat list:
 
     >>> l = [[1, 2, 3], [4, 5], [6]]
     >>> common.flattenList(l)
     [1, 2, 3, 4, 5, 6]
+
+    But not a list of lists-of-lists!
+
+    >>> l2 = [[1, 2, 3], [4, 5], [6, [7, 8]]]
+    >>> common.flattenList(l2)
+    [1, 2, 3, 4, 5, 6, [7, 8]]
     '''
     return [item for sublist in originalList for item in sublist]
 
@@ -111,12 +113,12 @@ def getMissingImportStr(modNameList):
     >>> print(common.getMissingImportStr(['matplotlib']))
     Certain music21 functions might need the optional package matplotlib;
     if you run into errors, install it by following the instructions at
-    http://mit.edu/music21/doc/installing/installAdditional.html
+    https://www.music21.org/music21docs/installing/installAdditional.html
 
     >>> print(common.getMissingImportStr(['matplotlib', 'numpy']))
     Certain music21 functions might need these optional packages: matplotlib, numpy;
     if you run into errors, install them by following the instructions at
-    http://mit.edu/music21/doc/installing/installAdditional.html
+    https://www.music21.org/music21docs/installing/installAdditional.html
     '''
     if not modNameList:
         return None
@@ -124,13 +126,13 @@ def getMissingImportStr(modNameList):
         m = modNameList[0]
         return textwrap.dedent(f'''Certain music21 functions might need the optional package {m};
                   if you run into errors, install it by following the instructions at
-                  http://mit.edu/music21/doc/installing/installAdditional.html''')
+                  https://www.music21.org/music21docs/installing/installAdditional.html''')
     else:
         m = ', '.join(modNameList)
         return textwrap.dedent(
             f'''Certain music21 functions might need these optional packages: {m};
                    if you run into errors, install them by following the instructions at
-                   http://mit.edu/music21/doc/installing/installAdditional.html''')
+                   https://www.music21.org/music21docs/installing/installAdditional.html''')
 
 
 def getPlatform() -> str:
@@ -223,14 +225,6 @@ def runningInNotebook() -> bool:
         return True
     else:
         return False
-
-
-@deprecated('v9', 'v10', 'use runningInNotebook() instead')
-def runningUnderIPython() -> bool:  # pragma: no cover
-    '''
-    DEPRECATED in v9: use runningInNotebook() instead
-    '''
-    return runningInNotebook()
 
 
 # ----------------------------

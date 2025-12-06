@@ -40,8 +40,12 @@ From highest level to lowest level usage, ways of graphing are as follows:
 from __future__ import annotations
 
 __all__ = [
-    'axis', 'findPlot', 'plot', 'primitives', 'utilities',
+    'axis',
+    'findPlot',
+    'plot',
     'plotStream',
+    'primitives',
+    'utilities',
 ]
 
 import typing as t
@@ -152,7 +156,7 @@ def plotStream(
                 setattr(obj, attrName, axisClass(obj, axisName))
         obj.run()
 
-    return obj  # just last one...
+    return obj  # just last one
 
 # ------------------------------------------------------------------------------
 class TestExternal(unittest.TestCase):

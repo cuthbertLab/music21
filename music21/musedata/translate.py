@@ -94,7 +94,7 @@ def _musedataRecordListToNoteOrChord(records, previousElement=None):
         post.pitch = records[0].getPitchObject()
     else:
         # environLocal.printDebug(['attempting chord creation: records', len(records)])
-        # can supply a lost of Pitch objects at creation
+        # can supply a list of Pitch objects at creation
         post = chord.Chord([r.getPitchObject() for r in records])
 
     # if a chord, we are assuming that all durations are the same
@@ -581,7 +581,7 @@ class Test(unittest.TestCase):
     #     # note: this is importing a large work, but this seems to presently
     #     # be the only one with dynamics
     #
-    #     # TODO: Turn back on when a smaller work is found...
+    #     # TODO: Turn back on when a smaller work is found
     #     from music21 import corpus
     #     s = corpus.parse('symphony94', 3)
     #     sFlat = s.flatten()

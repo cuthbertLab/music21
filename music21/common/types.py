@@ -5,7 +5,7 @@
 #
 # Authors:      Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2021-2023 Michael Scott Asato Cuthbert
+# Copyright:    Copyright © 2021-2024 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 from __future__ import annotations

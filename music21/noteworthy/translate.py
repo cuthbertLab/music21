@@ -30,14 +30,14 @@ Module to translate Noteworthy Composer's NWCTXT format to music21.
 # |Ending|Endings:1
 # |Ending|Endings:2,D
 #
-# ...as expression
+# As expression
 # |TempoVariance|Style:Fermata|Pause:3|Pos:-4
 #
-# ...as spanner
+# As spanner
 # |TempoVariance|Style:Accelerando|Pos:-6
 #
 #
-# ...beams:
+# Beams:
 # |Note|Dur:8th|Pos:0|Opts:Stem=Down,Beam=First
 # |Note|Dur:8th|Pos:0|Opts:Stem=Down,Beam
 # |Note|Dur:8th|Pos:0|Opts:Stem=Down,Beam
@@ -82,6 +82,8 @@ from music21 import spanner
 from music21 import stream
 from music21 import tempo
 from music21 import tie
+
+from music21.noteworthy.dictionaries import dictionaries
 
 environLocal = environment.Environment('noteworthy.translate')
 
@@ -246,9 +248,6 @@ class NoteworthyTranslator:
         <music21.duration.Duration 2.0>
 
         '''
-        from music21 import noteworthy
-        dictionaries = noteworthy.dictionaries
-
         parts = durationInfo.split(',')
         lengthNote = parts[0]
         thisNoteIsSlurred = False
@@ -258,7 +257,7 @@ class NoteworthyTranslator:
             if kk == 'Grace':
                 durationObject = durationObject.getGraceDuration()
             elif kk == 'Slur':
-                if self.withinSlur is False:
+                if not self.withinSlur:
                     self.beginningSlurNote = generalNote
                 thisNoteIsSlurred = True
             elif kk == 'Dotted':
@@ -273,11 +272,11 @@ class NoteworthyTranslator:
         generalNote.duration = durationObject
 
         # if Slur
-        if self.withinSlur is True and thisNoteIsSlurred is False:
+        if self.withinSlur and not thisNoteIsSlurred:
             music21SlurObj = spanner.Slur(self.beginningSlurNote, generalNote)
             self.currentMeasure.append(music21SlurObj)
             self.withinSlur = False
-        elif thisNoteIsSlurred is True:
+        elif thisNoteIsSlurred:
             self.withinSlur = True
         else:
             self.withinSlur = False
@@ -357,7 +356,7 @@ class NoteworthyTranslator:
     def getOnePitchFromPosition(self, pos):
         # noinspection PyShadowingNames
         '''
-        get one pitch from a position...
+        Get one pitch from a position:
 
         >>> nwt = noteworthy.translate.NoteworthyTranslator()
         >>> nwt.currentClef = 'BASS'
@@ -410,46 +409,39 @@ class NoteworthyTranslator:
         >>> (step, octave)
         ('G', 3)
         '''
-        from music21 import noteworthy
-        dictionaries = noteworthy.dictionaries
-
-        octave = 4
         currentClef = self.currentClef
-        dictionary = ''
-
-        minPosition = 1
         if currentClef == 'TREBLE8dw':
             octave = 4
             minPosition = 1
-            dictionary = 'dictionaryTreble'
+            dictionary = dictionaries['dictionaryTreble']
         elif currentClef == 'TREBLE8up':
             octave = 6
             minPosition = 1
-            dictionary = 'dictionaryTreble'
+            dictionary = dictionaries['dictionaryTreble']
         elif currentClef in ('BASS', 'PERCUSSION'):
             octave = 3
             minPosition = -1
-            dictionary = 'dictionaryBass'
+            dictionary = dictionaries['dictionaryBass']
         elif currentClef == 'BASS8dw':
             octave = 2
             minPosition = -1
-            dictionary = 'dictionaryBass'
+            dictionary = dictionaries['dictionaryBass']
         elif currentClef == 'BASS8up':
             octave = 4
             minPosition = -1
-            dictionary = 'dictionaryBass'
+            dictionary = dictionaries['dictionaryBass']
         elif currentClef == 'ALTO':
             octave = 4
             minPosition = 0
-            dictionary = 'dictionaryAlto'
+            dictionary = dictionaries['dictionaryAlto']
         elif currentClef == 'TENOR':
             octave = 3
             minPosition = -5
-            dictionary = 'dictionaryTenor'
+            dictionary = dictionaries['dictionaryTenor']
         else:  # 'TREBLE':
             octave = 5
             minPosition = 1
-            dictionary = 'dictionaryTreble'
+            dictionary = dictionaries['dictionaryTreble']
 
         while positionNote < minPosition or positionNote > (minPosition + 6):
             if positionNote < minPosition:
@@ -458,7 +450,7 @@ class NoteworthyTranslator:
             if positionNote > (minPosition + 6):
                 positionNote = positionNote - 7
                 octave = octave + 1
-        noteName = dictionaries[dictionary][positionNote]
+        noteName = dictionary[positionNote]
 
         return (noteName, octave)
 

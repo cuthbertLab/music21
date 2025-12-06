@@ -8,7 +8,7 @@
 #               Amy Hailes
 #               Christopher Ariza
 #
-# Copyright:    Copyright © 2009-2023 Michael Scott Asato Cuthbert
+# Copyright:    Copyright © 2009-2024 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
@@ -24,9 +24,9 @@ from fractions import Fraction
 import abc
 import copy
 import enum
-import math
 import re
 import typing as t
+from typing import overload
 
 from music21 import base
 from music21 import common
@@ -70,6 +70,17 @@ niceSpecNames = ['ERROR', 'Perfect', 'Major', 'Minor', 'Augmented', 'Diminished'
                  'Triply-Diminished', 'Quadruply-Augmented', 'Quadruply-Diminished']
 
 prefixSpecs = ('ERROR', 'P', 'M', 'm', 'A', 'd', 'AA', 'dd', 'AAA', 'ddd', 'AAAA', 'dddd')
+
+
+# helper for comparisons
+def _same_class(note1: note.Note|pitch.Pitch, note2: note.Note|pitch.Pitch) -> None:
+    '''
+    Raise a ValueError if note1 and note2 are not both Notes or both Pitches
+    '''
+    if ((hasattr(note1, 'pitch') and not hasattr(note2, 'pitch'))
+            or (hasattr(note2, 'pitch') and not hasattr(note1, 'pitch'))):
+        raise ValueError(f'note1 {note1!r} and note2 {note2!r} must both be notes or pitches')
+
 
 class Specifier(enum.IntEnum):
     '''
@@ -442,7 +453,7 @@ def parseSpecifier(value: str|int|Specifier) -> Specifier:
     >>> interval.parseSpecifier(3)
     <Specifier.MINOR>
 
-    Why? because...
+    Why? Because of this:
 
     >>> interval.Specifier.MINOR.value
     3
@@ -513,7 +524,7 @@ def convertGeneric(value: int|str) -> int:
     Traceback (most recent call last):
     music21.interval.IntervalException: Cannot get a direction from None.
 
-    Strings are not the same as numbers...
+    Strings are not the same as numbers:
 
     >>> interval.convertGeneric('1')
     Traceback (most recent call last):
@@ -1060,11 +1071,9 @@ class GenericInterval(IntervalBase):
         Returns simpleUndirectedSteps and undirectedOctaves.
         '''
         # unisons (even augmented) are neither steps nor skips.
-        steps, octaves = math.modf(self.undirected / 7)
-        steps = int(steps * 7 + 0.001)
-        octaves = int(octaves)
+        octaves, steps = divmod(self.undirected, 7)
         if steps == 0:
-            octaves = octaves - 1
+            octaves -= 1
             steps = 7
         return steps, octaves
 
@@ -1417,7 +1426,7 @@ class GenericInterval(IntervalBase):
             newPitch = copy.deepcopy(p)
 
         newPitch.diatonicNoteNum = pitchDNN + self.staffDistance
-        if useImplicitOctave is True:
+        if useImplicitOctave:
             newPitch.octave = None
 
         if not inPlace:
@@ -1443,7 +1452,7 @@ class GenericInterval(IntervalBase):
         <music21.pitch.Pitch D5>
 
         But if a key or keySignature (such as one from `.getContextByClass(key.KeySignature)`)
-        is given, then the fun begins...
+        is given, then the fun begins:
 
         >>> fis = pitch.Pitch('F#4')
         >>> e = pitch.Pitch('E')
@@ -1508,7 +1517,7 @@ class GenericInterval(IntervalBase):
         offsetFromKey = pAlter - stepAlter
 
         newPitch = self.transposePitch(p, inPlace=inPlace)
-        if inPlace is True:
+        if inPlace:
             newPitch = p
 
         newAccidentalByStep = k.accidentalByStep(newPitch.step)
@@ -1520,7 +1529,7 @@ class GenericInterval(IntervalBase):
         elif newPitch.accidental is not None:
             newPitch.accidental = None
 
-        if inPlace is False:
+        if not inPlace:
             return newPitch
 
     def getDiatonic(self, specifier: Specifier|str) -> DiatonicInterval:
@@ -1729,7 +1738,7 @@ class DiatonicInterval(IntervalBase):
         elif not hasattr(other, 'specifier'):
             return False
 
-        # untested...
+        # untested
         # if self.direction != other.direction:
         #    return False
         if (self.generic == other.generic
@@ -2661,7 +2670,7 @@ def _getSpecifierFromGenericChromatic(
     '''
     Given a :class:`~music21.interval.GenericInterval` and
     a :class:`~music21.interval.ChromaticInterval` object, return a specifier
-    (i.e. Specifier.MAJOR, Specifier.MINOR, etc...).
+    (i.e. Specifier.MAJOR, Specifier.MINOR, etc.).
 
     >>> aInterval = interval.GenericInterval('seventh')
     >>> bInterval = interval.ChromaticInterval(11)
@@ -2693,7 +2702,7 @@ def _getSpecifierFromGenericChromatic(
         # all normal intervals
         theseSemis = cInt.undirected
     # round out microtones
-    # fix python3 rounding...
+    # fix python3 rounding
     if cInt.undirected > 0:
         roundingError = 0.0001
     else:
@@ -2987,7 +2996,7 @@ class Interval(IntervalBase):
     >>> aInterval.isStep
     True
 
-    This is in OMIT... put changelog above.
+    This is in OMIT_FROM_etc. put changelog above.
     '''
     def __init__(self,
                  arg0: t.Union[str,
@@ -3518,7 +3527,7 @@ class Interval(IntervalBase):
                         pitch2.accidental.displayStatus = False
 
         else:
-            # no halfStepsToFix, so pitch2 is fine as is, but...
+            # no halfStepsToFix, so pitch2 is fine as is, but
             if inheritAccidentalDisplayStatus:
                 # We have set pitch2.accidental to None, so we might have lost some
                 # display options. So we restore oldPitch2Accidental if that makes sense.
@@ -3526,7 +3535,7 @@ class Interval(IntervalBase):
                         and oldPitch2Accidental.name == 'natural'):
                     pitch2.accidental = oldPitch2Accidental
 
-        if useImplicitOctave is True:
+        if useImplicitOctave:
             pitch2.octave = None
 
         if not inPlace:
@@ -3564,7 +3573,7 @@ class Interval(IntervalBase):
                             chromatic=self.chromatic.reverse())
 
     @property
-    def pitchStart(self):
+    def pitchStart(self) -> pitch.Pitch|None:
         '''
         Get the start pitch or set it a new value.
         Setting this will adjust the value of the end pitch (`pitchEnd`).
@@ -3609,12 +3618,17 @@ class Interval(IntervalBase):
         return self._pitchStart
 
     @pitchStart.setter
-    def pitchStart(self, p: pitch.Pitch):
+    def pitchStart(self, p: pitch.Pitch|None) -> None:
         '''
         Assuming that this interval is defined,
         we can set a new start Pitch (_pitchStart) and
         automatically set the end Pitch (_pitchEnd).
         '''
+        if p is None:
+            self._pitchStart = None
+            self._pitchEnd = None
+            return
+
         # this is based on the procedure found in transposePitch() and
         # transposeNote() but offers a more object-oriented approach
         pitch2 = self.transposePitch(p)
@@ -3623,7 +3637,7 @@ class Interval(IntervalBase):
         self._pitchEnd = pitch2
 
     @property
-    def pitchEnd(self):
+    def pitchEnd(self) -> pitch.Pitch|None:
         '''
         Set the
         end pitch to a new value; this will adjust
@@ -3656,11 +3670,16 @@ class Interval(IntervalBase):
         return self._pitchEnd
 
     @pitchEnd.setter
-    def pitchEnd(self, p: music21.pitch.Pitch):
+    def pitchEnd(self, p: music21.pitch.Pitch|None) -> None:
         '''
         Assuming that this interval is defined, we can
         set a new end note (_pitchEnd) and automatically have the start pitch (_pitchStart).
         '''
+        if p is None:
+            self._pitchStart = None
+            self._pitchEnd = None
+            return
+
         # this is based on the procedure found in transposePitch() but offers
         # a more object-oriented approach
         pitch1 = self.transposePitch(p, reverse=True)
@@ -3680,9 +3699,11 @@ class Interval(IntervalBase):
         elif p:
             from music21 import note
             return note.Note(pitch=p)
+        else:
+            return None
 
     @noteStart.setter
-    def noteStart(self, n: music21.note.Note|None):
+    def noteStart(self, n: music21.note.Note|None) -> None:
         if n:
             self.pitchStart = n.pitch
         else:
@@ -3700,9 +3721,11 @@ class Interval(IntervalBase):
         elif p:
             from music21 import note
             return note.Note(pitch=p)
+        else:
+            return None
 
     @noteEnd.setter
-    def noteEnd(self, n: music21.note.Note|None):
+    def noteEnd(self, n: music21.note.Note|None) -> None:
         if n:
             self.pitchEnd = n.pitch
         else:
@@ -3710,6 +3733,19 @@ class Interval(IntervalBase):
 
 
 # ------------------------------------------------------------------------------
+@overload
+def getWrittenHigherNote(note1: note.Note,
+                         note2: note.Note|pitch.Pitch
+                         ) -> note.Note:
+    ...
+
+@overload
+def getWrittenHigherNote(note1: pitch.Pitch,
+                         note2: note.Note|pitch.Pitch
+                         ) -> pitch.Pitch:
+    ...
+
+
 def getWrittenHigherNote(note1: note.Note|pitch.Pitch,
                          note2: note.Note|pitch.Pitch
                          ) -> note.Note|pitch.Pitch:
@@ -3736,6 +3772,7 @@ def getWrittenHigherNote(note1: note.Note|pitch.Pitch,
     >>> interval.getWrittenHigherNote(aNote, bNote) is aNote
     True
     '''
+    _same_class(note1, note2)
     (p1, p2) = (_extractPitch(note1), _extractPitch(note2))
 
     num1 = p1.diatonicNoteNum
@@ -3747,6 +3784,19 @@ def getWrittenHigherNote(note1: note.Note|pitch.Pitch,
     else:
         return getAbsoluteHigherNote(note1, note2)
 
+
+
+@overload
+def getAbsoluteHigherNote(note1: note.Note,
+                          note2: note.Note|pitch.Pitch
+                          ) -> note.Note:
+    ...
+
+@overload
+def getAbsoluteHigherNote(note1: pitch.Pitch,
+                          note2: note.Note|pitch.Pitch
+                          ) -> pitch.Pitch:
+    ...
 
 def getAbsoluteHigherNote(note1: note.Note|pitch.Pitch,
                           note2: note.Note|pitch.Pitch
@@ -3761,6 +3811,7 @@ def getAbsoluteHigherNote(note1: note.Note|pitch.Pitch,
     >>> interval.getAbsoluteHigherNote(aNote, bNote)
     <music21.note.Note C#>
     '''
+    _same_class(note1, note2)
     chromatic = notesToChromatic(note1, note2)
     semitones = chromatic.semitones
     if semitones > 0:
@@ -3769,6 +3820,19 @@ def getAbsoluteHigherNote(note1: note.Note|pitch.Pitch,
         return note1
     else:
         return note1
+
+
+@overload
+def getWrittenLowerNote(note1: note.Note,
+                        note2: note.Note|pitch.Pitch
+                        ) -> note.Note:
+    ...
+
+@overload
+def getWrittenLowerNote(note1: pitch.Pitch,
+                        note2: note.Note|pitch.Pitch
+                        ) -> pitch.Pitch:
+    ...
 
 
 def getWrittenLowerNote(note1: note.Note|pitch.Pitch,
@@ -3781,16 +3845,27 @@ def getWrittenLowerNote(note1: note.Note|pitch.Pitch,
     the same returns the sounding lower element,
     or the first element if sounding pitch is also the same.
 
-    >>> aNote = pitch.Pitch('c#3')
-    >>> bNote = pitch.Pitch('d--3')
+    >>> aNote = pitch.Pitch('C#3')
+    >>> bNote = pitch.Pitch('D--3')
     >>> interval.getWrittenLowerNote(aNote, bNote)
     <music21.pitch.Pitch C#3>
 
-    >>> aNote = pitch.Pitch('c#3')
-    >>> bNote = pitch.Pitch('d-3')
+    >>> aNote = pitch.Pitch('C#3')
+    >>> bNote = pitch.Pitch('D-3')
     >>> interval.getWrittenLowerNote(aNote, bNote)
     <music21.pitch.Pitch C#3>
+
+    Both elements should be pitches or notes -- if note2 is lower and not the same class
+    as note1 raises a ValueError:
+
+    >>> aNote = pitch.Pitch('C#4')
+    >>> bNote = note.Note('C#3')
+    >>> interval.getWrittenLowerNote(aNote, bNote)
+    Traceback (most recent call last):
+    ValueError: note1 <music21.pitch.Pitch C#4>
+        and note2 <music21.note.Note C#> must both be notes or pitches
     '''
+    _same_class(note1, note2)
     (p1, p2) = (_extractPitch(note1), _extractPitch(note2))
 
     num1 = p1.diatonicNoteNum
@@ -3801,6 +3876,19 @@ def getWrittenLowerNote(note1: note.Note|pitch.Pitch,
         return note2
     else:
         return getAbsoluteLowerNote(note1, note2)
+
+
+@overload
+def getAbsoluteLowerNote(note1: note.Note,
+                         note2: note.Note|pitch.Pitch
+                         ) -> note.Note:
+    ...
+
+@overload
+def getAbsoluteLowerNote(note1: pitch.Pitch,
+                         note2: note.Note|pitch.Pitch
+                         ) -> pitch.Pitch:
+    ...
 
 
 def getAbsoluteLowerNote(note1: note.Note|pitch.Pitch,
@@ -3816,6 +3904,7 @@ def getAbsoluteLowerNote(note1: note.Note|pitch.Pitch,
     >>> interval.getAbsoluteLowerNote(aNote, bNote)
     <music21.pitch.Pitch D--3>
     '''
+    _same_class(note1, note2)
     chromatic = notesToChromatic(note1, note2)
     semitones = chromatic.semitones
     if semitones > 0:
@@ -3935,7 +4024,7 @@ def add(intervalList):
     Add a list of intervals and return the composite interval
     Intervals can be Interval objects or just strings.
 
-    (Currently not particularly efficient for large lists...)
+    (Currently not particularly efficient for large lists)
 
     >>> A2 = interval.Interval('A2')
     >>> P5 = interval.Interval('P5')
@@ -3956,7 +4045,7 @@ def add(intervalList):
     if not intervalList:
         raise IntervalException('Cannot add an empty set of intervals')
 
-    p1 = pitch.Pitch('C4')  # need octave to not be implicit...
+    p1 = pitch.Pitch('C4')  # need octave to not be implicit
     p2 = pitch.Pitch('C4')
     for i in intervalList:
         p2 = transposePitch(p2, i)

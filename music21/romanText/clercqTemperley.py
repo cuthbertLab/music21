@@ -13,7 +13,7 @@
 '''
 Parses the de Clercq-Temperley popular music flavor of RomanText.
 The Clercq-Temperley file format and additional rock corpus analysis
-information may be located at http://rockcorpus.midside.com
+information may be located at https://rockcorpus.midside.com
 '''
 from __future__ import annotations
 
@@ -310,7 +310,7 @@ class CTSong(prebase.ProtoM21Object):
 
     OMIT_FROM_DOCS
 
-    one more example...the bane of this parser's existence...::
+    one more example, which is the bane of this parser's existence::
 
         % Ring Of Fire
 
@@ -409,9 +409,7 @@ class CTSong(prebase.ProtoM21Object):
                 raise CTSongException(
                     f'Invalid File Format; must be string or text file: {textFile}')
 
-        lines = [e for e in lines if len(e) != 0]
-        for i in range(len(lines)):
-            lines[i] = lines[i].strip()
+        lines = [e.strip() for e in lines if len(e) != 0]
         self.lines = lines
         pieceString = '\n'.join(lines)
 
@@ -589,7 +587,7 @@ class CTSong(prebase.ProtoM21Object):
     def toPart(self, labelRomanNumerals=True, labelSubsectionsOnScore=True) -> stream.Part:
         # noinspection PyShadowingNames
         '''
-        creates a Part object out of a from CTSong...also creates CTRule objects in the process,
+        creates a Part object out of a from CTSong and also creates CTRule objects in the process,
         filling their .streamFromCTSong attribute with the corresponding smaller inner stream.
         Individual attributes of a rule are defined by the entire CTSong, such as
         meter and time signature, so creation of CTRule objects typically occurs
@@ -761,7 +759,7 @@ class CTRule(prebase.ProtoM21Object):
 
         m = stream.Measure()
         atoms = content.split()
-        # key/timeSig pass...
+        # key/timeSig pass
         regularAtoms: list[str] = []
         for atom in atoms:
             if atom.startswith('['):

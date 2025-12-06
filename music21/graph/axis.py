@@ -19,6 +19,7 @@ from __future__ import annotations
 import collections
 import math
 import re
+import typing as t
 import unittest
 
 from music21.graph.utilities import accidentalLabelToUnicode, GraphException
@@ -33,6 +34,10 @@ from music21 import stream
 
 from music21.analysis import elements as elementAnalysis
 from music21.analysis import pitchAnalysis
+
+
+if t.TYPE_CHECKING:
+    from music21 import note
 
 
 USE_GRACE_NOTE_SPACING = -1
@@ -180,9 +185,9 @@ class Axis(prebase.ProtoM21Object):
         else:
             return c.streamObj
 
-    def extractOneElement(self, n, formatDict):
+    def extractOneElement(self, n: note.GeneralNote, formatDict: dict[str, t.Any]) -> t.Any:
         '''
-        Override in subclasses...
+        Override in subclasses
         '''
         return 1
 
@@ -319,7 +324,7 @@ class PitchAxis(Axis):
         self.hideUnused = True
 
     @staticmethod
-    def makePitchLabelsUnicode(ticks):
+    def makePitchLabelsUnicode(ticks: list[tuple[t.Any, str]]) -> list[tuple[t.Any, str]]:
         # noinspection PyShadowingNames
         '''
         Given a list of ticks, replace all labels with alternative/unicode symbols where necessary.
@@ -407,7 +412,7 @@ class PitchAxis(Axis):
             label = None
             if not weights:  # get a default
                 if self.hideUnused:
-                    continue  # don't append any ticks...
+                    continue  # don't append any ticks
                 if not self.blankLabelUnused:
                     label = getattr(p, attributeCounter)
                 else:  # use an empty label to maintain spacing
@@ -452,9 +457,10 @@ class PitchClassAxis(PitchAxis):
         self.minValue = 0
         self.maxValue = 11
 
-    def extractOneElement(self, n, formatDict):
+    def extractOneElement(self, n, formatDict) -> int|None:
         if hasattr(n, 'pitch'):
             return n.pitch.pitchClass
+        return None
 
     def ticks(self):
         '''
@@ -524,7 +530,7 @@ class PitchClassAxis(PitchAxis):
         10 B♭
         11 B
 
-        .showEnharmonic will change here...
+        `.showEnharmonic` will change here:
 
         >>> s.append(note.Note('A#4'))
         >>> s.append(note.Note('G#4'))
@@ -567,7 +573,7 @@ class PitchClassAxis(PitchAxis):
         OMIT_FROM_DOCS
 
         TODO: this ultimately needs to look at key signature/key to determine
-        defaults for undefined notes where blankLabelUnused is False...
+            defaults for undefined notes where blankLabelUnused is False.
         '''
         # keys are integers
         # name strings are keys, and enharmonic are thus different
@@ -576,7 +582,7 @@ class PitchClassAxis(PitchAxis):
 
 class PitchSpaceAxis(PitchAxis):
     '''
-    Axis subclass for dealing with PitchSpace (MIDI numbers...)
+    Axis subclass for dealing with PitchSpace (MIDI numbers)
     '''
     labelDefault = 'Pitch'
     quantities: tuple[str, ...] = ('pitchSpace', 'pitch', 'pitchspace', 'ps')
@@ -787,7 +793,7 @@ class OffsetAxis(PositionAxis):
     def __init__(self, client=None, axisName='x'):
         super().__init__(client, axisName)
         self.useMeasures = None
-        # self.displayMeasureNumberZero = False  # not used...
+        # self.displayMeasureNumberZero = False  # not used
         self.offsetStepSize = 10
         self.mostMeasureTicksToShow = 20
         self.minMaxMeasureOnly = False
@@ -947,8 +953,8 @@ class OffsetAxis(PositionAxis):
                 #     continue  # skip
                 # if key == sorted(offsetMap.keys())[-1]:
                 #    continue  # skip last
-                # assume we can get the first Measure in the lost if
-                # measurers; this may not always be True
+                # assume we can get the first Measure in the list if
+                # there are measures; this may not always be True
                 mNoToUse.append(key)
         # environLocal.printDebug(['ticksOffset():', 'mNotToUse', mNoToUse])
 

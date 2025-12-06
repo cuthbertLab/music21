@@ -193,7 +193,9 @@ class Test(unittest.TestCase):
         richMetadata.merge(score.metadata)
         richMetadata.update(score)
         self.assertEqual(richMetadata.noteCount, 165)
-        self.assertEqual(richMetadata.quarterLength, 36.0)
+        # changed in v10: scoreQuarterLength
+        self.assertEqual(richMetadata.scoreQuarterLength, 36.0)
+        self.assertEqual(richMetadata.quarterLength, 0.0)
 
     def checkUniqueNamedItem(
             self,
@@ -204,7 +206,7 @@ class Test(unittest.TestCase):
 
         if ':' not in namespaceName:
             # It's just the namespace because name == uniqueName,
-            # and I didn't want to spend the time to type it twice...
+            # and I didn't want to spend the time to type it twice
             namespaceName += ':' + uniqueName
 
         if namespaceName.startswith('marcrel'):

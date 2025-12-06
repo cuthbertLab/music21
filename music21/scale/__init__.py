@@ -44,31 +44,59 @@ next pitch. In all cases :class:`~music21.pitch.Pitch` objects are returned.
 from __future__ import annotations
 
 __all__ = [
-    'intervalNetwork', 'scala',
-    'Direction', 'Terminus',
-    'ScaleException', 'Scale',
-    'AbstractScale', 'AbstractDiatonicScale', 'AbstractOctatonicScale',
-    'AbstractHarmonicMinorScale', 'AbstractMelodicMinorScale',
-    'AbstractCyclicalScale', 'AbstractOctaveRepeatingScale',
-    'AbstractRagAsawari', 'AbstractRagMarwa', 'AbstractWeightedHexatonicBlues',
-    'ConcreteScale', 'DiatonicScale', 'MajorScale',
-    'MinorScale', 'DorianScale', 'PhrygianScale', 'LydianScale', 'MixolydianScale',
-    'HypodorianScale', 'HypophrygianScale', 'HypolydianScale', 'HypomixolydianScale',
-    'LocrianScale', 'HypolocrianScale', 'HypoaeolianScale',
-    'HarmonicMinorScale', 'MelodicMinorScale',
-    'OctatonicScale', 'OctaveRepeatingScale', 'CyclicalScale', 'ChromaticScale',
-    'WholeToneScale', 'SieveScale', 'ScalaScale', 'RagAsawari',
-    'RagMarwa', 'WeightedHexatonicBlues',
+    'AbstractCyclicalScale',
+    'AbstractDiatonicScale',
+    'AbstractHarmonicMinorScale',
+    'AbstractMelodicMinorScale',
+    'AbstractOctatonicScale',
+    'AbstractOctaveRepeatingScale',
+    'AbstractRagAsawari',
+    'AbstractRagMarwa',
+    'AbstractScale',
+    'AbstractWeightedHexatonicBlues',
+    'ChromaticScale',
+    'ConcreteScale',
+    'CyclicalScale',
+    'DiatonicScale',
+    'Direction',
+    'DorianScale',
+    'HarmonicMinorScale',
+    'HypoaeolianScale',
+    'HypodorianScale',
+    'HypolocrianScale',
+    'HypolydianScale',
+    'HypomixolydianScale',
+    'HypophrygianScale',
+    'LocrianScale',
+    'LydianScale',
+    'MajorScale',
+    'MelodicMinorScale',
+    'MinorScale',
+    'MixolydianScale',
+    'OctatonicScale',
+    'OctaveRepeatingScale',
+    'PhrygianScale',
+    'RagAsawari',
+    'RagMarwa',
+    'ScalaScale',
+    'Scale',
+    'ScaleException',
+    'SieveScale',
+    'Terminus',
+    'WeightedHexatonicBlues',
+    'WholeToneScale',
+    'intervalNetwork',
+    'scala',
 ]
+
 import copy
-import typing as t
 
 from music21.scale import intervalNetwork
+from music21.scale.intervalNetwork import Direction, Terminus
 from music21.scale import scala
 # -------------------------
 from music21 import base
 from music21 import common
-from music21.common.decorators import deprecated
 from music21 import defaults
 from music21 import environment
 from music21 import exceptions21
@@ -78,9 +106,6 @@ from music21 import interval
 from music21 import sieve
 
 environLocal = environment.Environment('scale')
-
-Direction = intervalNetwork.Direction
-Terminus = intervalNetwork.Terminus
 
 _PitchDegreeCacheKey = tuple[
     type,  # scale class
@@ -162,7 +187,7 @@ class Scale(base.Music21Object):
 
         Now we remove the F-4, D5, and A also because we are working with
         `comparisonAttribute=pitchClass`.
-        Note that we're using a Stream as `other` now...
+        Note that we're using a Stream as `other` now:
 
         >>> [str(p) for p in scale.Scale.extractPitchList(s, comparisonAttribute='pitchClass')]
         ['A4', 'D4', 'E4', 'D#4']
@@ -1426,7 +1451,7 @@ class ConcreteScale(Scale):
 
         * Changed in v6: changing `.abstract` is now allowed.
         '''
-        # copy before returning? (No... too slow)
+        # copy before returning? (No, it is too slow)
         return self._abstract
 
     @abstract.setter
@@ -1537,7 +1562,7 @@ class ConcreteScale(Scale):
         for e in streamObj.recurse().notes:  # get notes and chords
             if e.isChord:
                 elementPitches = e.pitches
-            else:  # simulate a lost
+            else:  # simulate a list
                 elementPitches = [e.pitch]
 
             # store a list of reset chord pitches
@@ -1899,7 +1924,7 @@ class ConcreteScale(Scale):
             alterDiff = pitchAlter - foundAlter
 
             if alterDiff == 0:
-                # should not happen...
+                # should not happen
                 return (scaleStepNormal, None)
             else:
                 alterAccidental = pitch.Accidental(alterDiff)
@@ -2049,33 +2074,6 @@ class ConcreteScale(Scale):
         else:
             return syllableDict[scaleDeg][0]
 
-    # no type checking as a deprecated call that shadows superclass.
-    @t.no_type_check
-    @deprecated('v9', 'v10', 'use nextPitch instead')
-    def next(
-        self,
-        pitchOrigin=None,
-        direction: Direction|int = Direction.ASCENDING,
-        stepSize=1,
-        getNeighbor: Direction|bool = True,
-    ):  # pragma: no cover
-        '''
-        See :meth:`~music21.scale.ConcreteScale.nextPitch`.  This function
-        is a deprecated alias for that method.
-
-        This routine was named and created before music21 aspired to have
-        full subclass substitution.  Thus, is shadows the `.next()` function of
-        Music21Object without performing similar functionality.
-
-        The routine is formally deprecated in v9 and will be removed in v10.
-        '''
-        return self.nextPitch(
-            pitchOrigin=pitchOrigin,
-            direction=direction,
-            stepSize=stepSize,
-            getNeighbor=getNeighbor
-        )
-
     def nextPitch(
         self,
         pitchOrigin=None,
@@ -2148,7 +2146,7 @@ class ConcreteScale(Scale):
             else:
                 raise ScaleException('direction cannot be zero')
         else:  # when direction is a string, use scalar of 1
-            stepScalar = 1  # stepSize is still used...
+            stepScalar = 1  # stepSize is still used
             directionEnum = direction
 
         # pick reverse direction for neighbor
@@ -3158,7 +3156,7 @@ class SieveScale(ConcreteScale):
 
     OMIT_FROM_DOCS
 
-    Test that an empty SieveScale can be created...
+    Test that an empty SieveScale can be created:
 
     >>> sc = scale.SieveScale()
     '''

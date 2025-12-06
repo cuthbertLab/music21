@@ -133,7 +133,7 @@ class ScoreCorrector:
         try:
             ms = self.measureSlices[i]
             if ms == 0:
-                raise IndexError('nope...')
+                raise IndexError(f'Measure slice {i} out of range')
         except IndexError:
             ms = MeasureSlice(self, i)
             if i >= len(self.measureSlices):
@@ -761,11 +761,10 @@ class MeasureHash:
                 hashString += self.hashGrace(n)
             elif n.isNote:
                 hashString += self.hashNote(n)
-            elif not n.isNote:
-                if n.isRest:
-                    hashString += self.hashRest(n)
-                elif n.isChord:
-                    hashString += self.hashNote(n)
+            elif n.isRest:
+                hashString += self.hashRest(n)
+            elif n.isChord:
+                hashString += self.hashNote(n)
         self.hashString = hashString
         return hashString
 

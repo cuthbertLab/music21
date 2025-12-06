@@ -49,7 +49,7 @@ key_          :meth:`~music21.stream.Stream.analyze` ('key')
 melac_        see Notes                                          :meth:`~music21.analysis.metrical.thomassenMelodicAccent`.  incorporates humdrum additions for giving accent of the first and last notes.
 metpos_       `1 / obj.beatStrength()`                           the beatStrength of an object is essentially something similar but inverted.  beatStrength handles irregular meters.
 midi_         `.show('midi')`
-midireset_    None                                               Not needed for now because we do not write directly to MIDI.  A midi.allOff() will be needed for direct midi access...
+midireset_    None                                               Not needed for now because we do not write directly to MIDI.  A midi.allOff() will be needed for direct midi access.
 mint_         `interval.Interval(note1, note2)`                  Or :meth:`~music21.stream.Stream.melodicIntervals`
 nf_           :meth:`~music21.chord.Chord.normalOrder`           Also :meth:`~music21.chord.Chord.primeForm`, :meth:`~music21.chord.Chord.intervalVector`, :meth:`~music21.chord.Chord.forteClass`, :meth:`~music21.chord.Chord.getZRelation` etc.
 num_          Not needed                                         try: `for i in range(len(s.recurse().getElementsByClass(X)))` etc.
@@ -154,8 +154,8 @@ ydelta_       Not needed
 from __future__ import annotations
 
 __all__ = [
-    'spineParser',
     'instruments',
+    'spineParser',
     'testFiles',
 ]
 

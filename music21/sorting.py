@@ -5,8 +5,7 @@
 #
 # Authors:      Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2014-2015 Michael Scott Asato Cuthbert and the music21
-#               Project
+# Copyright:    Copyright © 2014-2015 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # -----------------------------------------------------------------------------
 '''
@@ -29,18 +28,26 @@ SortTuple(atEnd=0, offset=0.0, priority=inf, classSortOrder=0, isNotGrace=1, ins
 '''
 from __future__ import annotations
 
-from collections import namedtuple
 from math import inf as INFINITY
-from music21 import exceptions21
+import typing as t
 
+from music21.common.types import OffsetQL
+from music21 import exceptions21
 
 class SortingException(exceptions21.Music21Exception):
     pass
 
 
-class SortTuple(namedtuple('SortTuple', (
-    'atEnd', 'offset', 'priority', 'classSortOrder', 'isNotGrace', 'insertIndex'
-))):
+_SortTupleBase = t.NamedTuple('SortTuple', [   # type: ignore[name-match]
+    ('atEnd', int),
+    ('offset', OffsetQL),
+    ('priority', int),
+    ('classSortOrder', int),
+    ('isNotGrace', int),
+    ('insertIndex', int),
+])
+
+class SortTuple(_SortTupleBase):
     '''
     Derived class of namedTuple which allows for comparisons with pure ints/fractions.
 
@@ -256,9 +263,9 @@ class SortTuple(namedtuple('SortTuple', (
             raise SortingException('Cannot add attributes from a different class')
 
         outList = [min(getattr(self, attr), getattr(other, attr))
-                    if attr in ('atEnd', 'isNotGrace')
-                    else (getattr(self, attr) - getattr(other, attr))
-                    for attr in self._fields]  # _fields are the namedtuple attributes
+                   if attr in ('atEnd', 'isNotGrace')
+                   else (getattr(self, attr) - getattr(other, attr))
+                   for attr in self._fields]  # _fields are the namedtuple attributes
 
         return self.__class__(*outList)
 

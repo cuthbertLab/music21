@@ -14,7 +14,7 @@ Inner classes and functions for transcribing musical segments into braille.
 This module was made in consultation with the manual "Introduction to Braille
 Music Transcription, Second Edition" by Mary Turner De Garmo, 2005. It is
 available from the Library of Congress
-`here <https://www.loc.gov/nls/braille-audio-reading-materials/music-materials/>`_,
+`here <https://www.loc.gov/nls/services-and-resources/music-service-and-materials/>`_,
 and will henceforth be referred to as BMTM.
 '''
 from __future__ import annotations
@@ -147,8 +147,11 @@ MAX_ELEMENTS_IN_SEGMENT = 48  # 8 measures of 6 notes, etc. each
 
 _ThreeDigitNumber = namedtuple('_ThreeDigitNumber', ['hundreds', 'tens', 'ones'])
 
-SegmentKey = namedtuple('SegmentKey', ['measure', 'ordinal', 'affinity', 'hand'])
-SegmentKey.__new__.__defaults__ = (0, 0, None, None)
+class SegmentKey(t.NamedTuple):
+    measure: int = 0
+    ordinal: int = 0
+    affinity: Affinity|None = None
+    hand: str|None = None
 
 
 # ------------------------------------------------------------------------------
@@ -173,7 +176,7 @@ class BrailleElementGrouping(ProtoM21Object):
     <music21.note.Rest quarter>
     <music21.note.Note F>
 
-    These are the defaults, and they are shared across all objects...
+    These are the defaults, and they are shared across all objects.
 
     >>> bg.keySignature
     <music21.key.KeySignature of no sharps or flats>
@@ -555,7 +558,7 @@ class BrailleSegment(text.BrailleText):
         timeSignature = None
         tempoText = None
         metronomeMark = None
-        # find the first keySignature and timeSignature...
+        # find the first keySignature and timeSignature
 
         groupingKeysToProcess = self.groupingKeysToProcess or deque(sorted(self.keys()))
 
@@ -565,7 +568,7 @@ class BrailleSegment(text.BrailleText):
             cgk = groupingKeysToProcess.popleft()  # cgk = currentGroupingKey
 
             cgkAffinityGroup = cgk.affinity
-            currentBrailleGrouping = self._groupingDict.get(cgk)  # currentGrouping...
+            currentBrailleGrouping = self._groupingDict.get(cgk)  # currentGrouping
 
             if cgkAffinityGroup == Affinity.SIGNATURE:
                 if len(currentBrailleGrouping) >= 2:
@@ -722,7 +725,7 @@ class BrailleSegment(text.BrailleText):
                 firstNote = allNotes[0]
                 showLeadingOctave = basic.showOctaveWithNote(self.lastNote, firstNote)
             # noinspection PyAttributeOutsideInit
-            self.lastNote = allNotes[-1]  # probably should not be here...
+            self.lastNote = allNotes[-1]  # probably should not be here
 
         return showLeadingOctave
 
@@ -916,7 +919,7 @@ class BrailleSegment(text.BrailleText):
 
     def extractTempoTextGrouping(self):
         '''
-        extracts a tempo text and processes it...
+        Extracts a tempo text and processes it.
         '''
         self.groupingKeysToProcess.appendleft(self.currentGroupingKey)
         if self.previousGroupingKey.affinity == Affinity.SIGNATURE:
@@ -1058,7 +1061,7 @@ class BrailleSegment(text.BrailleText):
             if numSequential < 3:
                 return
             # else:
-            # double the articulation on the first note and remove from the next...
+            # double the articulation on the first note and remove from the next
             music21NoteStart.articulations.append(artic)
             for noteIndexContinue in range(noteIndexStart + 1,
                                            noteIndexStart + numSequential):
@@ -2060,7 +2063,7 @@ def extractBrailleElements(
         except BrailleSegmentException as notSupportedException:  # pragma: no cover
             isExempt = [isinstance(music21Object, music21Class)
                         for music21Class in excludeFromBrailleElements]
-            if isExempt.count(True) == 0:
+            if not any(isExempt):
                 environRules.warn(f'{notSupportedException}')
 
     allElements.sort(key=lambda x: (x.offset, x.classSortOrder))
@@ -2241,7 +2244,7 @@ def areGroupingsIdentical(noteGroupingA, noteGroupingB):
     Takes in two note groupings, noteGroupingA and noteGroupingB. Returns True
     if both groupings have identical contents. False otherwise.
 
-    Helper for numRepeats...
+    Helper for numRepeats.
 
     Needs two identical length groupings.
 

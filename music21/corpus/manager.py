@@ -4,7 +4,7 @@
 # Purpose:      Manage multiple corpora
 #
 # Authors:      Christopher Ariza
-#               Josiah Wolf Oberholtzer
+#               Joséphine Wolf Oberholtzer
 #               Michael Scott Asato Cuthbert
 #
 # Copyright:    Copyright © 2009, 2013, 2015-17 Michael Scott Asato Cuthbert
@@ -95,8 +95,8 @@ def iterateCorpora(returnObjects=True):
     <music21.corpus.corpora.CoreCorpus>
     <music21.corpus.corpora.LocalCorpus: 'local'>
 
-    We can also get names instead... Note that the name of the main local corpus is 'local' not
-    None
+    We can also get names instead.
+    (Note that the name of the main local corpus is `"local"` not `None`)
 
     >>> for i, corpusName in enumerate(corpus.manager.iterateCorpora(returnObjects=False)):
     ...     print(corpusName)
@@ -341,7 +341,7 @@ def getMetadataBundleByCorpus(corpusObject: corpora.Corpus) -> bundles.MetadataB
     >>> mdb1 is cc.metadataBundle
     True
 
-    Non-existent corpus...
+    Non-existent corpus:
 
     >>> lc = corpus.corpora.LocalCorpus('junk')
     >>> mdb1 = corpus.manager.getMetadataBundleByCorpus(lc)

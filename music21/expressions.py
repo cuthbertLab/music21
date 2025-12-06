@@ -7,7 +7,7 @@
 #               Christopher Ariza
 #               Neena Parikh
 #
-# Copyright:    Copyright © 2009-2023 Michael Scott Asato Cuthbert
+# Copyright:    Copyright © 2009-2024 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
@@ -119,7 +119,7 @@ def realizeOrnaments(
                     break
 
         retList = []
-        # TODO: use extend...
+        # TODO: use extend instead of iteration
         for i in preExpandList:
             retList.append(i)
         if srcObject is not None:
@@ -323,6 +323,98 @@ class RehearsalMark(Expression):
         'roman'
         '''
         return RehearsalMark(self.nextContent(), numbering=self.numbering)
+
+
+# ------------------------------------------------------------------------------
+class PedalType(common.StrEnum):
+    Sustain = 'sustain'
+    Sostenuto = 'sostenuto'
+    Soft = 'soft'
+    Silent = 'silent'
+
+class PedalForm(common.StrEnum):
+    Line = 'line'
+    Symbol = 'symbol'
+    SymbolAlt = 'symbolalt'
+    SymbolLine = 'symbolline'
+
+class PedalMark(spanner.Spanner):
+    '''
+    A pedal mark spanner contains a pedaled set of notes.
+    The spanner starts at the moment of down-pedal, and
+    ends at the moment of up-pedal.  There can be any
+    number of pedal "bounces" in the middle of the spanner.
+
+    The visual form of the pedal mark can vary.  The following
+    examples use a pedal mark with one "bounce" in the middle::
+
+        Pedal marks can be lines:            |_______^________|
+        Pedal marks can be normal symbolic:  Ped.    * Ped.   *
+        Pedal marks can be altered symbolic: Ped.    Ped.     *
+        Pedal marks can be symbol and line:  Ped.____^________|
+
+    Pedal marks, whether lines, symbols, or a combination, can
+    represent the sustain pedal (Ped.), the sostenuto pedal
+    (Sost.), the soft (una corda) pedal, or (more rarely) the
+    silent (muting) pedal.
+
+    Pedal marks that are symbolic can be abbreviated: e.g. P. instead
+    of Ped., S. instead of Sost.
+
+    Pedal marks that are lines can have non-printed portions
+    (gaps) in them; these are usually started with "simile",
+    but not necessarily.
+    '''
+    def __init__(
+        self,
+        *spannedElements,
+        **keywords
+    ) -> None:
+        super().__init__(*spannedElements, **keywords)
+        from music21 import note
+        self.fillElementTypes = [note.GeneralNote]
+
+        self.pedalType: PedalType|None = None
+        self.pedalForm: PedalForm|None = None
+        self.abbreviated: bool = False
+        self.placement: str|None = None
+
+
+class PedalObject(base.Music21Object):
+    '''
+    Base class of individual objects that mark various transitions
+    in a PedalMark spanner.
+    '''
+    def __init__(self, **keywords) -> None:
+        super().__init__(**keywords)
+        self.placement: str | None = None
+
+    def _reprInternal(self) -> str:
+        if self.activeSite is None:
+            return 'uninserted'
+        return f'at {self.offset}'
+
+
+class PedalBounce(PedalObject):
+    '''
+    This object, when seen in a PedalMark spanner, represents an up/down bounce
+    of the pedal.
+    '''
+
+
+class PedalGapStart(PedalObject):
+    '''
+    This object, when seen in a PedalMark spanner, represents a disappearance of
+    the pedal line, usually with a TextExpression('simile').  The pedaling should
+    continue (similarly to before), but the line is invisible during this gap.
+    '''
+
+
+class PedalGapEnd(PedalObject):
+    '''
+    This object, when seen in a PedalMark spanner, represents the reappearance of
+    the pedal line.
+    '''
 
 
 # ------------------------------------------------------------------------------

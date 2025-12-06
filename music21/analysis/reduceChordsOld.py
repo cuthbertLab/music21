@@ -53,7 +53,7 @@ class ChordReducer:
         self.positionInMeasure = None
         self.numberOfElementsInMeasure = None
 
-        # for working...
+        # for working
         self._lastPitchedObject = None
         self._lastTs = None
 
@@ -63,6 +63,7 @@ class ChordReducer:
                                weightAlgorithm=None,
                                trimBelow=0.25):
         '''
+        Takes a measure and reduces it to only one chord or `numChords` chords.
 
         >>> s = analysis.reduceChordsOld.testMeasureStream1()
         >>> cr = analysis.reduceChordsOld.ChordReducer()
@@ -86,8 +87,7 @@ class ChordReducer:
 
         chordWeights = self.computeMeasureChordWeights(mObj, weightAlgorithm)
 
-        if numChords > len(chordWeights):
-            numChords = len(chordWeights)
+        numChords = min(numChords, len(chordWeights))
 
         maxNChords = sorted(chordWeights, key=chordWeights.get, reverse=True)[:numChords]
         if not maxNChords:
@@ -111,10 +111,7 @@ class ChordReducer:
         currentGreedyChordPCs = None
         currentGreedyChordNewLength = 0.0
         for c in mObj:
-            if c.isNote:
-                p = tuple(c.pitch.pitchClass)
-            else:
-                p = tuple({x.pitchClass for x in c.pitches})
+            p = tuple({x.pitchClass for x in c.pitches})
             if p in trimmedMaxChords and p != currentGreedyChordPCs:
                 # keep this chord
                 if currentGreedyChord is None and c.offset != 0.0:
@@ -137,7 +134,7 @@ class ChordReducer:
             currentGreedyChord.quarterLength = currentGreedyChordNewLength
             currentGreedyChordNewLength = 0.0
 
-        # even chord lengths...
+        # even chord lengths
         for i in range(1, len(mObj)):
             c = mObj[i]
             cOffsetCurrent = c.offset
@@ -201,10 +198,7 @@ class ChordReducer:
 
         for i, c in enumerate(measureObj):
             self.positionInMeasure = i
-            if c.isNote:
-                p = tuple(c.pitch.pitchClass)
-            else:
-                p = tuple({x.pitchClass for x in c.pitches})
+            p = tuple({x.pitchClass for x in c.pitches})
             if p not in presentPCs:
                 presentPCs[p] = 0.0
             presentPCs[p] += weightAlgorithm(c)
@@ -318,7 +312,7 @@ class ChordReducer:
                     for pitchI in range(len(self._lastPitchedObject)):
                         if self._lastPitchedObject.pitches[pitchI] != firstPitched.pitches[pitchI]:
                             allSame = False
-                    if allSame is True:
+                    if allSame:
                         self._lastPitchedObject.tie = tie.Tie('start')
         self._lastPitchedObject = m[-1]
 

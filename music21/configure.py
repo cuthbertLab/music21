@@ -42,10 +42,12 @@ reSibeliusExe = re.compile(r'Sibelius\.exe', IGNORECASE)
 reFinaleReaderApp = re.compile(r'Finale Reader\.app', IGNORECASE)
 reMuseScoreApp = re.compile(r'MuseScore.*\.app', IGNORECASE)
 reMuseScoreExe = re.compile(r'Musescore.*\\bin\\MuseScore.*\.exe', IGNORECASE)
+reDoricoApp = re.compile(r'Dorico.*\.app', IGNORECASE)
+reDoricoExe = re.compile(r'Dorico.*\.exe', IGNORECASE)
 
-urlMusic21 = 'https://web.mit.edu/music21'
-urlMuseScore = 'http://musescore.org'
-urlGettingStarted = 'https://web.mit.edu/music21/doc/'
+urlMusic21 = 'https://www.music21.org/music21docs/'
+urlMuseScore = 'https://www.musescore.org'
+urlGettingStarted = 'https://www.music21.org/music21docs/'
 urlMusic21List = 'https://groups.google.com/g/music21list'
 
 LINE_WIDTH = 78
@@ -707,8 +709,7 @@ class AskOpenInBrowser(YesOrNo):
     '''
     Ask the user if the want to open a URL in a browser.
 
-
-    >>> d = configure.AskOpenInBrowser('http://mit.edu/music21')
+    >>> d = configure.AskOpenInBrowser('https://www.music21.org/')
     '''
 
     def __init__(self, urlTarget, default=True, tryAgain=True,
@@ -863,7 +864,7 @@ class SelectFromList(Dialog):
             return False
         else:  # must be True or False
             if post not in [True, False]:
-                # this should never happen...
+                # this should never happen
                 raise DialogException(
                     '_askFillEmptyList(): sub-command returned non True/False value')
             return post
@@ -1179,11 +1180,15 @@ class SelectMusicXMLReader(SelectFilePath):
         def comparisonSibelius(x):
             return reSibeliusApp.search(x) is not None
 
+        def comparisonDorico(x):
+            return reDoricoApp.search(x) is not None
+
         # order here results in ranks
         results = self._getDarwinApp(comparisonMuseScore)
         results += self._getDarwinApp(comparisonFinale)
         results += self._getDarwinApp(comparisonFinaleReader)
         results += self._getDarwinApp(comparisonSibelius)
+        results += self._getDarwinApp(comparisonDorico)
 
         # de-duplicate
         res = []
@@ -1206,10 +1211,14 @@ class SelectMusicXMLReader(SelectFilePath):
         def comparisonSibelius(x):
             return reSibeliusExe.search(x) is not None
 
+        def comparisonDorico(x):
+            return reDoricoExe.search(x) is not None
+
         # order here results in ranks
         results = self._getWinApp(comparisonMuseScore)
         results += self._getWinApp(comparisonFinale)
         results += self._getWinApp(comparisonSibelius)
+        results += self._getWinApp(comparisonDorico)
 
         # de-duplicate (Windows especially can put the same environment var twice)
         res = []
@@ -1494,7 +1503,7 @@ class TestUserInput(unittest.TestCase):  # pragma: no cover
 
     def testOpenInBrowser(self):
         print()
-        d = AskOpenInBrowser('http://mit.edu/music21')
+        d = AskOpenInBrowser('https://www.music21.org/')
         d.askUser()
         print('getResult():', d.getResult())
         d.performAction()

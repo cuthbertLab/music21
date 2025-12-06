@@ -55,7 +55,7 @@ class TreeYielder:  # pragma: no cover
         if self.yieldValue(obj) is True:
             yield obj
 
-        # now check for sub values...
+        # now check for sub values
         self.currentStack.append(obj)
 
         tObj = type(obj)
@@ -66,19 +66,17 @@ class TreeYielder:  # pragma: no cover
                 dictTuple = ('dict', keyX)
                 self.stackVals.append(dictTuple)
                 x = obj[keyX]
-                for z in self.run(x, memo=memo):
-                    yield z
+                yield from self.run(x, memo=memo)
                 self.stackVals.pop()
 
         elif tObj in [list, tuple]:
             for i, x in enumerate(obj):
                 listTuple = ('listLike', i)
                 self.stackVals.append(listTuple)
-                for z in self.run(x, memo=memo):
-                    yield z
+                yield from self.run(x, memo=memo)
                 self.stackVals.pop()
 
-        else:  # objects or uncaught types...
+        else:  # objects or uncaught types
             # from http://bugs.python.org/file18699/static.py
             try:
                 instance_dict = object.__getattribute__(obj, '__dict__')
@@ -95,8 +93,7 @@ class TreeYielder:  # pragma: no cover
                 objTuple = ('getattr', x)
                 self.stackVals.append(objTuple)
                 try:
-                    for z in self.run(gotValue, memo=memo):
-                        yield z
+                    yield from self.run(gotValue, memo=memo)
                 except RuntimeError:
                     raise ValueError(f'Maximum recursion on:\n{self.currentLevel()}')
                 self.stackVals.pop()
@@ -109,7 +106,7 @@ class TreeYielder:  # pragma: no cover
             if stackType == 'dict':
                 if isinstance(stackValue, str):
                     currentStr += "['" + stackValue + "']"
-                else:  # numeric key...
+                else:  # numeric key
                     currentStr += '[' + str(stackValue) + ']'
             elif stackType == 'listLike':
                 currentStr += '[' + str(stackValue) + ']'

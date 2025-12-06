@@ -3,11 +3,10 @@
 # Name:         timespans/fromStream.py
 # Purpose:      Tools for creating timespans from Streams
 #
-# Authors:      Josiah Wolf Oberholtzer
+# Authors:      Joséphine Wolf Oberholtzer
 #               Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2013-22 Michael Scott Asato Cuthbert and the music21
-#               Project
+# Copyright:    Copyright © 2013-2022 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # -----------------------------------------------------------------------------
 '''
@@ -56,7 +55,7 @@ def listOfTreesByClass(
     This is used internally by `streamToTimespanTree`.
 
 
-    >>> score = tree.makeExampleScore()
+    >>> score = tree.examples.makeExampleScore()
 
     Get everything in the score
 
@@ -169,7 +168,7 @@ def asTree(
 
     Use Stream.asTree() generally since that caches the ElementTree.
 
-    >>> score = tree.makeExampleScore()
+    >>> score = tree.examples.makeExampleScore()
     >>> elementTree = tree.fromStream.asTree(score)
     >>> elementTree
     <ElementTree {2} (0.0 <0.-20...> to 8.0) <music21.stream.Score exampleScore>>
@@ -231,7 +230,7 @@ def asTree(
 
             if element.isStream and flatten is not False:  # True or 'semiFlat'
                 localParentage = currentParentage + (element,)
-                recurseGetTreeByClass(element,  # put the elements into the current tree...
+                recurseGetTreeByClass(element,  # put the elements into the current tree
                                       currentParentage=localParentage,
                                       initialOffset=flatOffset,
                                       inner_outputTree=inner_outputTree)
@@ -261,7 +260,7 @@ def asTree(
 
         return inner_outputTree
 
-    # first time through...
+    # first time through
     treeClass: type[trees.ElementTree]
 
     if useTimespans:
@@ -402,7 +401,7 @@ class Test(unittest.TestCase):
             self.assertIs(fastI, slowI)
 
     def testAutoSortExample(self):
-        from music21.tree import makeExampleScore
+        from music21.tree.examples import makeExampleScore
         sc = makeExampleScore()
         sc.sort()
         scTree = asTree(sc)

@@ -6,7 +6,7 @@
 # Authors:      Michael Scott Asato Cuthbert
 #               (from an idea by Joe "Codeswell")
 #
-# Copyright:    Copyright © 2012 Michael Scott Asato Cuthbert
+# Copyright:    Copyright © 2012-25 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
@@ -18,7 +18,7 @@ https://joecodeswell.wordpress.com/2012/06/13/how-to-produce-python-controlled-a
 
 https://stackoverflow.com/questions/10983462/how-can-i-produce-real-time-audio-output-from-music-made-with-music21
 
-Requires pygame: http://www.pygame.org/download.shtml
+Requires pygame 2 (or 1.9) install with: pip3 install pygame
 '''
 from __future__ import annotations
 
@@ -43,7 +43,6 @@ class StreamPlayer:  # pragma: no cover
     Set up a detuned piano (where each key has a random but
     consistent detuning from 30 cents flat to sharp)
     and play a Bach Chorale on it in real time.
-
 
     >>> import random
     >>> keyDetune = []
@@ -149,9 +148,10 @@ class StreamPlayer:  # pragma: no cover
         pygameClock = self.pygame.time.Clock()
         try:
             self.pygame.mixer.music.load(stringIOFile)
-        except self.pygame.error:
+        except self.pygame.error as pge:
             raise StreamPlayerException(
-                f'Could not play music file {stringIOFile} because: {self.pygame.get_error()}')
+                f'Could not play music file {stringIOFile} because: {pge}'
+            ) from pge
         self.pygame.mixer.music.play()
         if not blocked:
             return
@@ -210,7 +210,6 @@ class TestExternal(unittest.TestCase):  # pragma: no cover
         '''
         tests to see if the busyCallback function is called properly
         '''
-
         from music21 import corpus
         import random
 

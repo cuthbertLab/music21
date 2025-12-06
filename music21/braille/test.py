@@ -53,7 +53,7 @@ def example11_2():
 # Examples follow the order in:
 #   Introduction to Braille Music Transcription, Second Edition (2005)
 # Mary Turner De Garmo
-# https://www.loc.gov/nls/music/
+# https://www.loc.gov/nls/services-and-resources/music-service-and-materials/
 # ------------------------------------------------------------------------------
 class Test(unittest.TestCase):
     '''

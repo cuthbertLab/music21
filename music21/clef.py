@@ -7,7 +7,7 @@
 #               Christopher Ariza
 #               Michael Bodenbach
 #
-# Copyright:    Copyright © 2009-2023 Michael Scott Asato Cuthbert
+# Copyright:    Copyright © 2009-2024 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
@@ -271,12 +271,12 @@ class Clef(base.Music21Object):
 
 class PitchClef(Clef):
     '''
-    superclass for all other clef subclasses that use pitches...
+    Superclass for all other clef subclasses that use pitches.
     '''
     _DOC_ATTR: dict[str, str] = {
         'lowestLine': '''
             The diatonicNoteNumber of the lowest line of the clef.
-            (Can be none...)
+            (Can be `None`)
 
             >>> clef.TrebleClef().lowestLine
             31
@@ -967,7 +967,7 @@ def bestClef(streamObj: stream.Stream,
         return height
     # environLocal.printDebug(['calling bestClef()'])
 
-    totalNotes = 0
+    totalPitches = 0
     totalHeight = 0
 
     sIter = streamObj.recurse() if recurse else streamObj.iter()
@@ -975,19 +975,13 @@ def bestClef(streamObj: stream.Stream,
     notes = sIter.notesAndRests
 
     for n in notes:
-        if n.isRest:
-            pass
-        elif n.isNote:
-            totalNotes += 1
-            totalHeight += findHeight(n.pitch)
-        elif n.isChord:
-            for p in n.pitches:
-                totalNotes += 1
-                totalHeight += findHeight(p)
-    if totalNotes == 0:
+        for p in n.pitches:
+            totalPitches += 1
+            totalHeight += findHeight(p)
+    if totalPitches == 0:
         averageHeight = 29.0
     else:
-        averageHeight = totalHeight / totalNotes
+        averageHeight = totalHeight / totalPitches
 
     # environLocal.printDebug(['average height', averageHeight])
     if averageHeight > 49:  # value found with experimentation; revise

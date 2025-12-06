@@ -584,7 +584,8 @@ class Spanner(base.Music21Object):
         >>> ott3 = spanner.Ottava(note.Note('D'), note.Note('E'))
         >>> ott3.fill()
         Traceback (most recent call last):
-        music21.spanner.SpannerException: ...requires a searchStream or getFirst().activeSite
+        music21.spanner.SpannerException: Spanner.fill() requires a searchStream
+            or getFirst().activeSite
         '''
 
         if not self.fillElementTypes:
@@ -1610,13 +1611,6 @@ class RepeatBracket(Spanner):
             [5, 6, 7]
             >>> rb.number = 1
         ''')
-
-    @common.deprecated('v9', 'v10', 'Look at .numberRange instead')
-    def getNumberList(self):  # pragma: no cover
-        '''
-        Deprecated -- just look at .numberRange
-        '''
-        return self.numberRange
 
     def _reprInternal(self):
         if self.overrideDisplay is not None:

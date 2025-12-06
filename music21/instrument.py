@@ -178,13 +178,13 @@ class Instrument(base.Music21Object):
         self.transposition: interval.Interval|None = None
 
         self.inGMPercMap = False
-        self.soundfontFn = None  # if defined...
+        self.soundfontFn = None  # if defined
 
     def __str__(self):
         msg = []
         if self.partId is not None:
             msg.append(f'{self.partId}: ')
-        if self.partName is not None:
+        if self.partName is not None and self.partName != self.instrumentName:
             msg.append(f'{self.partName}: ')
         if self.instrumentName is not None:
             msg.append(self.instrumentName)
@@ -1138,7 +1138,7 @@ class UnpitchedPercussion(Percussion):
         if self.inGMPercMap is True and modifier.lower() in self._modifierToPercMapPitch:
             self.percMapPitch = self._modifierToPercMapPitch[modifier.lower()]
 
-            # normalize modifiers...
+            # normalize modifiers
             if self.percMapPitch in self._percMapPitchToModifier:
                 modifier = self._percMapPitchToModifier[self.percMapPitch]
 
@@ -1867,7 +1867,7 @@ def deduplicate(s: stream.Stream, inPlace: bool = False) -> stream.Stream:
     [<music21.instrument.Flute 'Flute'>, <music21.instrument.Flute 'Flute'>]
     >>> s2 = instrument.deduplicate(s2, inPlace=True)
     >>> list(p1.getInstruments())
-    [<music21.instrument.Piccolo 'Piccolo: Piccolo'>]
+    [<music21.instrument.Piccolo 'Piccolo'>]
     >>> list(p2.getInstruments())
     [<music21.instrument.Flute 'Flute'>]
     '''
@@ -2112,7 +2112,7 @@ def partitionByInstrument(streamObj: stream.Stream) -> stream.Stream:
     >>> p1.getElementsByClass(stream.Measure)[1].insert(3.0, instrument.Piccolo())
 
     >>> p2.getElementsByClass(stream.Measure)[0].insert(0.0, instrument.Trombone())
-    >>> p2.getElementsByClass(stream.Measure)[0].insert(3.0, instrument.Piccolo())  # not likely...
+    >>> p2.getElementsByClass(stream.Measure)[0].insert(3.0, instrument.Piccolo())  # not likely
     >>> p2.getElementsByClass(stream.Measure)[1].insert(1.0, instrument.Trombone())
 
     >>> s = stream.Score()
@@ -2162,11 +2162,12 @@ def partitionByInstrument(streamObj: stream.Stream) -> stream.Stream:
     >>> len(s2.parts)
     3
 
-    # TODO: this step might not be necessary...
+    # TODO: this step might not be necessary:
+
     >>> for p in s2.parts:
     ...     p.makeRests(fillGaps=True, inPlace=True)
 
-    # TODO: this step SHOULD not be necessary (.template())...
+    # TODO: this step SHOULD not be necessary (.template()):
 
     >>> for p in s2.parts:
     ...     p.makeMeasures(inPlace=True)
@@ -2295,7 +2296,7 @@ def partitionByInstrument(streamObj: stream.Stream) -> stream.Stream:
                     pass
                     # it is possible to enter an element twice because the getElementsByOffset
                     # might return something twice if it's at the same offset as the
-                    # instrument switch...
+                    # instrument switch
 
     for inst in post.recurse().getElementsByClass(Instrument):
         inst.duration.quarterLength = 0
@@ -2425,7 +2426,7 @@ def fromString(instrumentString: str,
     (an honorary 'language' for these purposes).
 
     Alternatively, you can specify the language to search using the `language`
-    argument. (New in v7.3.)
+    argument. (New in v7.3)
 
     >>> t12 = instrument.fromString('Klarinette', language=instrument.SearchLanguage.GERMAN)
     >>> t12
@@ -2455,7 +2456,7 @@ def fromString(instrumentString: str,
     allCombinations = _combinations(instrumentString)
     # First task: Find the best instrument.
     bestInstrument = None
-    bestName = None
+    bestName: str = ''
 
     this_module = importlib.import_module('music21.instrument')
     for substring in allCombinations:

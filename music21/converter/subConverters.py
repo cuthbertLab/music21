@@ -79,6 +79,7 @@ class SubConverter:
 
     def __init__(self, **keywords) -> None:
         self._stream: stream.Score|stream.Part|stream.Opus = stream.Score()
+        # TODO: unify keywords so that they are used by both parseFile and parseData
         self.keywords: dict[str, t.Any] = keywords
 
     def parseData(self, dataString, number: int|None = None):
@@ -1003,7 +1004,7 @@ class ConverterMusicXML(SubConverter):
 
     def show(self, obj, fmt, app=None, subformats=(), **keywords):  # pragma: no cover
         '''
-        Override to do something with png...
+        Override to do something with png
         '''
         returnedFilePath = self.write(obj, fmt, subformats=subformats, **keywords)
         if 'png' in subformats:
@@ -1023,7 +1024,14 @@ class ConverterMidi(SubConverter):
     registerInputExtensions = ('mid', 'midi')
     registerOutputExtensions = ('mid',)
 
-    def parseData(self, strData, number=None):
+    @property
+    def encoding(self) -> str:
+        if 'encoding' in self.keywords and self.keywords['encoding']:
+            # if the encoding is set to None or '', it will be ignored
+            return self.keywords['encoding']
+        return 'utf-8'
+
+    def parseData(self, strData, number=None, *, encoding: str = ''):
         '''
         Get MIDI data from a binary string representation.
 
@@ -1033,13 +1041,24 @@ class ConverterMidi(SubConverter):
         `quantizePost` controls whether to quantize the output. (Default: True)
         `quarterLengthDivisors` allows for overriding the default quantization units
         in defaults.quantizationQuarterLengthDivisors. (Default: (4, 3)).
+
+        If encoding is not provided use the encoding of the Converter
+        (default "utf-8")
         '''
         from music21.midi import translate as midiTranslate
-        self.stream = midiTranslate.midiStringToStream(strData, **self.keywords)
+        keywords = {k: v for k, v in self.keywords.items()
+                    if k not in ('encoding',)}
+        self.stream = midiTranslate.midiStringToStream(
+            strData,
+            encoding=encoding or self.encoding,
+            **keywords
+        )
 
     def parseFile(self,
                   filePath: pathlib.Path|str,
                   number: int|None = None,
+                  *,
+                  encoding: str = '',
                   **keywords):
         '''
         Get MIDI data from a file path.
@@ -1050,9 +1069,19 @@ class ConverterMidi(SubConverter):
         `quantizePost` controls whether to quantize the output. (Default: True)
         `quarterLengthDivisors` allows for overriding the default quantization units
         in defaults.quantizationQuarterLengthDivisors. (Default: (4, 3)).
+
+        If encoding is not provided use the encoding of the Converter
+        (default "utf-8")
         '''
         from music21.midi import translate as midiTranslate
-        midiTranslate.midiFilePathToStream(filePath, inputM21=self.stream, **keywords)
+        keywords = {k: v for k, v in self.keywords.items()
+                    if k not in ('encoding',)}
+        midiTranslate.midiFilePathToStream(
+            filePath,
+            inputM21=self.stream,
+            encoding=encoding or self.encoding,
+            **keywords
+        )
 
     def write(self,
               obj,
@@ -1061,12 +1090,14 @@ class ConverterMidi(SubConverter):
               subformats=(),
               *,
               addStartDelay: bool = False,
+              encoding: str = '',
               **keywords):  # pragma: no cover
         from music21.midi import translate as midiTranslate
         if fp is None:
             fp = self.getTemporaryFile()
 
-        mf = midiTranslate.music21ObjectToMidiFile(obj, addStartDelay=addStartDelay)
+        mf = midiTranslate.music21ObjectToMidiFile(obj, addStartDelay=addStartDelay,
+                                                   encoding=encoding or self.encoding)
         mf.open(fp, 'wb')  # write binary
         mf.write()
         mf.close()

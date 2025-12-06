@@ -12,7 +12,7 @@ dynamic = [
 description = "A Toolkit for Computer-Aided Musical Analysis and Computational Musicology."
 readme = "README.md"
 license = "BSD-3-Clause"
-requires-python = ">=3.10"
+requires-python = ">=3.11"
 classifiers = [
     "Development Status :: 5 - Production/Stable",
     "Environment :: Console",
@@ -29,14 +29,16 @@ classifiers = [
     "Operating System :: POSIX",
     "Programming Language :: Python",
     "Programming Language :: Python :: 3 :: Only",
-    "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
     "Topic :: Artistic Software",
     "Topic :: Multimedia :: Sound/Audio",
     "Topic :: Multimedia :: Sound/Audio :: Conversion",
     "Topic :: Multimedia :: Sound/Audio :: MIDI",
     "Topic :: Software Development :: Libraries :: Python Modules",
+    "Typing :: Typed",
 ]
 
 # when hatch-requirements-txt is stable, replace with that
@@ -46,7 +48,7 @@ dependencies = [
     "jsonpickle",
     "matplotlib",
     "more_itertools",
-    "numpy",
+    "numpy>=1.26.4",
     "requests",
     "webcolors>=1.5",
 ]
@@ -58,6 +60,7 @@ email = "michael.asato.cuthbert@gmail.com"
 [project.urls]
 Download = "https://github.com/cuthbertLab/music21/releases/"
 Homepage = "https://github.com/cuthbertLab/music21"
+Documentation = "https://www.music21.org/music21docs/"
 
 [tool.hatch.version]
 path = "music21/_version.py"

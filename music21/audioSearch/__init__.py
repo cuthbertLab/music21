@@ -19,21 +19,26 @@ and more accurate using FFT convolve.
 from __future__ import annotations
 
 __all__ = [
-    'transcriber', 'recording', 'scoreFollower',
-    'histogram', 'autocorrelationFunction',
-    'prepareThresholds', 'interpolation',
-    'normalizeInputFrequency', 'pitchFrequenciesToObjects',
-    'getFrequenciesFromMicrophone',
-    'getFrequenciesFromAudioFile',
-    'getFrequenciesFromPartialAudioFile',
+    'AudioSearchException',
+    'autocorrelationFunction',
+    'decisionProcess',
     'detectPitchFrequencies',
-    'smoothFrequencies',
+    'getFrequenciesFromAudioFile',
+    'getFrequenciesFromMicrophone',
+    'getFrequenciesFromPartialAudioFile',
+    'histogram',
+    'interpolation',
     'joinConsecutiveIdenticalPitches',
+    'normalizeInputFrequency',
+    'notesAndDurationsToStream',
+    'pitchFrequenciesToObjects',
+    'prepareThresholds',
     'quantizeDuration',
     'quarterLengthEstimation',
-    'notesAndDurationsToStream',
-    'decisionProcess',
-    'AudioSearchException',
+    'recording',
+    'scoreFollower',
+    'smoothFrequencies',
+    'transcriber',
 ]
 
 import copy
@@ -43,10 +48,11 @@ import wave
 import warnings
 import unittest
 
+from typing import cast
+
 # cannot call this base, because when audioSearch.__init__.py
 # imports * from base, it overwrites audioSearch!
 from music21 import base
-from music21 import common
 from music21 import environment
 from music21 import exceptions21
 from music21 import features
@@ -102,8 +108,7 @@ def histogram(data, bins):
             count += 1
         container[count - 1] += 1
 
-    binsLimits = []
-    binsLimits.append(minValue)
+    binsLimits = [minValue]
     count = 1
     for i in range(int(bins)):
         binsLimits.append(minValue + count * lengthEachBin)
@@ -114,9 +119,9 @@ def histogram(data, bins):
 def autocorrelationFunction(recordedSignal, recordSampleRateIn):
     # noinspection PyShadowingNames
     '''
-    Converts the temporal domain into a frequency domain. In order to do that, it
+    Converts the temporal domain into a frequency domain. To do that, it
     uses the autocorrelation function, which finds periodicities in the signal
-    in the temporal domain and, consequently, obtains the frequency in each instant
+    in the temporal domain and, consequently, finds the frequency in each instant
     of time.
 
     >>> import wave
@@ -131,14 +136,16 @@ def autocorrelationFunction(recordedSignal, recordSampleRateIn):
     >>> print(finalResult)
     143.6276...
     '''
-    if 'numpy' in base._missingImport:
+    # noinspection PyProtectedMember
+    if 'numpy' in (bmi := base._missingImport):
         # len(_missingImport) > 0:
         raise AudioSearchException(
             'Cannot run autocorrelationFunction without '
-            + f'numpy installed (scipy recommended).  Missing {base._missingImport}')
+            + f'numpy installed (scipy recommended).  Missing {bmi}')
     import numpy
+    convolve = None
     try:
-        with warnings.catch_warnings():  # scipy.signal gives ImportWarning...
+        with warnings.catch_warnings():  # scipy.signal gives ImportWarning
             warnings.simplefilter('ignore', ImportWarning)
             # numpy warns scipy that oldnumeric will be dropped soon.
             warnings.simplefilter('ignore', DeprecationWarning)
@@ -181,7 +188,7 @@ def prepareThresholds(useScale=None):
 
     Thus, the list returned has one less element than the number of notes in the
     scale + octave repetition.  If useScale is a ChromaticScale, `prepareThresholds`
-    will return a 12 element list.  If it's a diatonic scale, it'll have 7 elements.
+    will return a 12-element list.  If it's a diatonic scale, it'll have 7 elements.
 
 
     >>> pitchThresholds, pitches = audioSearch.prepareThresholds(scale.MajorScale('A3'))
@@ -225,7 +232,7 @@ def interpolation(correlation, peak):
 
     >>> import numpy
     >>> f = [2, 3, 1, 6, 4, 2, 3, 1]
-    >>> peak = numpy.argmax(f)
+    >>> peak = int(numpy.argmax(f))
     >>> peak  # f[3] is 6, which is the max.
     3
     >>> audioSearch.interpolation(f, peak)
@@ -248,7 +255,7 @@ def normalizeInputFrequency(inputPitchFrequency, thresholds=None, pitches=None):
     pitch detected (as a :class:`~music21.pitch.Pitch` object)
 
     It will convert the frequency to be within the range of the default frequencies
-    (usually C4 to C5) but the pitch object will have the correct octave.
+    (usually C4 to C5), but the pitch object will have the correct octave.
 
     >>> audioSearch.normalizeInputFrequency(441.72)
     (440.0, <music21.pitch.Pitch A4>)
@@ -264,8 +271,10 @@ def normalizeInputFrequency(inputPitchFrequency, thresholds=None, pitches=None):
     (277.18263..., <music21.pitch.Pitch C#5>)
     (293.66476..., <music21.pitch.Pitch D5>)
     '''
-    if ((thresholds is None and pitches is not None)
-         or (thresholds is not None and pitches is None)):
+    if (
+        (thresholds is None and pitches is not None)
+        or (thresholds is not None and pitches is None)
+    ):
         raise AudioSearchException(
             'Cannot normalize input frequency if thresholds are given and '
             + 'pitches are not, or vice-versa')
@@ -351,8 +360,9 @@ def getFrequenciesFromMicrophone(length=10.0, storeWaveFilename=None):
 
     Returns a list of frequencies detected.
 
-    TODO -- find a way to test... or at least demo
+    TODO -- find a way to test or at least demo
     '''
+    # noinspection PyProtectedMember
     if 'numpy' in base._missingImport:
         raise AudioSearchException(
             'Cannot run getFrequenciesFromMicrophone without numpy installed')
@@ -386,6 +396,7 @@ def getFrequenciesFromAudioFile(waveFilename='xmas.wav'):
     >>> print(freq)
     [143.627..., 99.083..., 211.004..., 4700.313..., ...]
     '''
+    # noinspection PyProtectedMember
     if 'numpy' in base._missingImport:
         raise AudioSearchException(
             'Cannot run getFrequenciesFromAudioFile without numpy installed')
@@ -406,7 +417,7 @@ def getFrequenciesFromAudioFile(waveFilename='xmas.wav'):
     freqFromAQList = []
     for data in storedWaveSampleList:
         samples = numpy.frombuffer(data, dtype=numpy.int16)
-        freqFromAQList.append(autocorrelationFunction(samples, recordSampleRate))
+        freqFromAQList.append(float(autocorrelationFunction(samples, recordSampleRate)))
     wv.close()
 
     return freqFromAQList
@@ -436,7 +447,7 @@ def getFrequenciesFromPartialAudioFile(waveFilenameOrHandle='temp', length=10.0,
     >>> print(currentSample)  # should be near 44100, but probably not exact
     44032
 
-    Now read the next 1 second...
+    Now read the next 1 second:
 
     >>> fTup = audioSearch.getFrequenciesFromPartialAudioFile(pachelbelFileHandle, length=1.0,
     ...                                                       startSample=currentSample)
@@ -451,6 +462,7 @@ def getFrequenciesFromPartialAudioFile(waveFilenameOrHandle='temp', length=10.0,
     >>> print(currentSample)  # should be exactly double the previous
     88064
     '''
+    # noinspection PyProtectedMember
     if 'numpy' in base._missingImport:
         raise AudioSearchException(
             'Cannot run getFrequenciesFromPartialAudioFile without numpy installed')
@@ -466,12 +478,13 @@ def getFrequenciesFromPartialAudioFile(waveFilenameOrHandle='temp', length=10.0,
         # waveFilenameOrHandle is a filename
         waveFilename = waveFilenameOrHandle
         try:
+            # noinspection PyUnusedLocal
             waveHandle = wave.open(waveFilename, 'r')
         except IOError:
             raise AudioSearchException(f'Cannot open {waveFilename} for reading, does not exist')
     else:
         # waveFilenameOrHandle is a file handle
-        waveHandle = waveFilenameOrHandle
+        waveHandle = cast(wave.Wave_read, waveFilenameOrHandle)
 
     storedWaveSampleList = []
 
@@ -531,10 +544,10 @@ def smoothFrequencies(
     inPlace=False
 ) -> list[int]|None:
     '''
-    Smooths the shape of the signal in order to avoid false detections in the fundamental
+    Smooths the shape of the signal to avoid false detections in the fundamental
     frequency.  Takes in a list of ints or floats.
 
-    The second pitch below is obviously too low.  It will be smoothed out...
+    The second pitch below is certainly too low.  It will be smoothed out:
 
     >>> inputPitches = [440, 220, 440, 440, 442, 443, 441, 470, 440, 441, 440,
     ...                 442, 440, 440, 440, 397, 440, 440, 440, 442, 443, 441,
@@ -639,6 +652,7 @@ def smoothFrequencies(
     else:
         for i in range(len(frequencyList)):
             frequencyList[i] = out[i]
+        return None
 
 
 # ------------------------------------------------------
@@ -648,7 +662,7 @@ def smoothFrequencies(
 def joinConsecutiveIdenticalPitches(detectedPitchObjects):
     # noinspection PyShadowingNames
     '''
-    takes a list of equally-spaced :class:`~music21.pitch.Pitch` objects
+    takes a list of equally spaced :class:`~music21.pitch.Pitch` objects
     and returns a tuple of two lists, the first a list of
     :class:`~music21.note.Note`
     or :class:`~music21.note.Rest` objects (each of quarterLength 1.0)
@@ -971,11 +985,11 @@ def decisionProcess(
         countdown = countdown + 1
     elif dist > 20 and countdown == 0:
         countdown += 1
-        environLocal.printDebug(f'Excessive distance....? {dist=}')
+        environLocal.printDebug(f'Excessive distance? {dist=}')
 
     elif dist > 30 and countdown == 1:
         countdown += 1
-        environLocal.printDebug(f'Excessive distance....? {dist=}')
+        environLocal.printDebug(f'Excessive distance? {dist=}')
 
     elif ((firstNotePage is not None and lastNotePage is not None)
           and ((positionBeginningData < firstNotePage

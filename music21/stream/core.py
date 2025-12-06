@@ -6,7 +6,7 @@
 # Authors:      Michael Scott Asato Cuthbert
 #               Christopher Ariza
 #
-# Copyright:    Copyright © 2008-2023 Michael Scott Asato Cuthbert
+# Copyright:    Copyright © 2008-2024 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # -----------------------------------------------------------------------------
 '''
@@ -66,7 +66,7 @@ class StreamCore(Music21Object):
         # should isFlat become readonly?
         self.isFlat = True  # does it have no embedded Streams
 
-        # someday...
+        # someday
         # self._elementTree = tree.trees.ElementTree(source=self)
 
     def coreInsert(
@@ -256,7 +256,7 @@ class StreamCore(Music21Object):
 
         # WHY??? THIS SEEMS OVERKILL, esp. since the first call to .sort() in .flatten() will
         # invalidate it! TODO: Investigate if this is necessary and then remove if not necessary
-        # should not need to do this...
+        # should not need to do this
 
         # if this Stream is a flat representation of something, and its
         # elements have changed, than we must clear the cache of that
@@ -429,7 +429,7 @@ class StreamCore(Music21Object):
                                 f'the object ({element!r}, id()={id(element)} '
                                 + f'is already found in this Stream ({self!r}, id()={id(self)})'
                             )
-                # something was old... delete from _offsetDict
+                # something was old. delete from _offsetDict
                 # environLocal.warn('stale object')
                 del self._offsetDict[idElement]  # pragma: no cover
         # if we do not purge locations here, we may have ids() for
@@ -470,7 +470,7 @@ class StreamCore(Music21Object):
         highly optimized data structure for searching through elements and
         offsets.
 
-        >>> score = tree.makeExampleScore()
+        >>> score = tree.examples.makeExampleScore()
         >>> scoreTree = score.asTimespans()
         >>> print(scoreTree)
         <TimespanTree {20} (0.0 to 8.0) <music21.stream.Score exampleScore>>
@@ -519,7 +519,7 @@ class StreamCore(Music21Object):
 
         See tree.fromStream.asTree() for more details.
 
-        >>> score = tree.makeExampleScore()
+        >>> score = tree.examples.makeExampleScore()
         >>> scoreTree = score.asTree(flatten=True)
         >>> scoreTree
         <ElementTree {20} (0.0 <0.-25...> to 8.0) <music21.stream.Score exampleScore>>
@@ -527,9 +527,9 @@ class StreamCore(Music21Object):
         if t.TYPE_CHECKING:
             assert isinstance(self, Stream)
         hashedAttributes = hash((tuple(classList or ()),
-                                  flatten,
-                                  useTimespans,
-                                  groupOffsets))
+                                 flatten,
+                                 useTimespans,
+                                 groupOffsets))
         cacheKey = 'elementTree' + str(hashedAttributes)
         if cacheKey not in self._cache or self._cache[cacheKey] is None:
             hashedElementTree = tree.fromStream.asTree(self,
@@ -693,7 +693,7 @@ class StreamCore(Music21Object):
         '''
         sb = self.spannerBundle
         sIter: StreamIterator|RecursiveIterator
-        if recurse is True:
+        if recurse:
             sIter = self.recurse()  # type: ignore
         else:
             sIter = self.iter()  # type: ignore
@@ -708,16 +708,16 @@ class StreamCore(Music21Object):
                 if constrainingSpannerBundle is not None and sp not in constrainingSpannerBundle:
                     continue
                 if requireAllPresent:
-                    allFound = True
+                    allFound: bool = True
                     for spannedElement in sp.getSpannedElements():
                         if spannedElement not in sIter:
                             allFound = False
                             break
-                    if allFound is False:
+                    if not allFound:
                         continue
                 collectList.append(sp)
 
-        if insert is False:
+        if not insert:
             return collectList
 
         if collectList:  # do not run elementsChanged if nothing here.

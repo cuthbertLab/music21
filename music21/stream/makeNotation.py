@@ -8,7 +8,7 @@
 #               Jacob Walls
 #               Evan Lynch
 #
-# Copyright:    Copyright © 2008-2023 Michael Scott Asato Cuthbert
+# Copyright:    Copyright © 2008-2024 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # -----------------------------------------------------------------------------
 from __future__ import annotations
@@ -523,8 +523,7 @@ def makeMeasures(
             refStreamHighestTime = refStreamOrTimeRange.highestTime
         else:  # assume it's a list
             refStreamHighestTime = max(refStreamOrTimeRange)
-        if refStreamHighestTime > oMax:
-            oMax = refStreamHighestTime
+        oMax = max(oMax, refStreamHighestTime)
 
     # create a stream of measures to contain the offsets range defined
     # create as many measures as needed to fit in oMax
@@ -758,7 +757,7 @@ def makeRests(
     >>> a.show('text')
     {20.0} <music21.note.Note C>
 
-    Now make some rests...
+    Now make some rests:
 
     >>> b = a.makeRests(inPlace=False)
     >>> len(b)
@@ -771,7 +770,7 @@ def makeRests(
     >>> b[0].duration.quarterLength
     20.0
 
-    Same thing, but this time, with gaps, and hidden rests...
+    Same thing, but this time, with gaps, and hidden rests:
 
     >>> a = stream.Stream()
     >>> a.insert(20, note.Note('C4'))
@@ -1214,7 +1213,7 @@ def makeTies(
     if returnObj.hasPartLikeStreams():
         # part-like does not necessarily mean that the next level down is a stream.Part
         # object or that this is a stream.Score object, so do not substitute
-        # returnObj.parts for this...
+        # returnObj.parts for this
         for p in returnObj.getElementsByClass(stream.Stream):
             # already copied if necessary; edit in place
             p.makeTies(meterStream=meterStream,
@@ -1394,7 +1393,7 @@ def makeTupletBrackets(s: StreamType, *, inPlace=False) -> StreamType|None:
     '''
     durationList: list[duration.Duration] = []
 
-    # Stream, as it should be...
+    # Stream, as it should be
     if not inPlace:  # make a copy
         returnObj = s.coreCopyAsDerivation('makeTupletBrackets')
     else:
@@ -1467,7 +1466,7 @@ def makeTupletBrackets(s: StreamType, *, inPlace=False) -> StreamType|None:
             # this, below, is optional:
             # if next normal type is not the same as this one, also stop
             elif tupletNext is None or completionCount >= completionTarget:
-                tupletObj.type = 'stop'  # should be impossible once frozen...
+                tupletObj.type = 'stop'  # should be impossible once frozen
                 completionTarget = None  # reset
                 completionCount = 0.0  # reset
                 # environLocal.printDebug(['stopping tuplet type, value:',
@@ -2002,7 +2001,7 @@ def splitElementsToCompleteTuplets(
     for container in iterator:
         general_notes = list(container.notesAndRests)
         last_tuplet: duration.Tuplet|None = None
-        partial_tuplet_sum = 0.0
+        partial_tuplet_sum: OffsetQL = 0.0
         for gn in general_notes:
             if (
                 gn.duration.tuplets

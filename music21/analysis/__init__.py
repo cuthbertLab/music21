@@ -2,12 +2,23 @@
 from __future__ import annotations
 
 __all__ = [
-    'correlate', 'discrete', 'elements', 'enharmonics',
-    'floatingKey', 'harmonicFunction', 'metrical', 'neoRiemannian',
-    'patel', 'pitchAnalysis',
-    'reduceChords', 'reduceChordsOld', 'reduction', 'segmentByRests',
-    'transposition', 'windowed',
     'AnalysisException',
+    'correlate',
+    'discrete',
+    'elements',
+    'enharmonics',
+    'floatingKey',
+    'harmonicFunction',
+    'metrical',
+    'neoRiemannian',
+    'patel',
+    'pitchAnalysis',
+    'reduceChords',
+    'reduceChordsOld',
+    'reduction',
+    'segmentByRests',
+    'transposition',
+    'windowed',
 ]
 
 # this is necessary to get these names available with a

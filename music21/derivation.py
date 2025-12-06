@@ -4,11 +4,10 @@
 # Purpose:      Class for storing and managing Stream-based derivations
 #
 # Authors:      Christopher Ariza
-#               Josiah Oberholtzer
+#               Joséphine Wolf Oberholtzer
 #               Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2011-2014 Michael Scott Asato Cuthbert and the music21
-#               Project
+# Copyright:    Copyright © 2011-2014 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ----------------------------------------------------------------------------
 '''
@@ -121,7 +120,7 @@ class Derivation(SlottedObjectMixin):
 
     Deleting the origin stream does not change the Derivation, since origin is held by strong ref:
 
-    >>> import gc  # Garbage collection...
+    >>> import gc  # Garbage collection
     >>> del s2
     >>> unused = gc.collect()  # ensure Garbage collection is run
     >>> d1
@@ -154,8 +153,8 @@ class Derivation(SlottedObjectMixin):
         self._client: weakref.ReferenceType|None = None
         self._clientId: int|None = None  # store python-id to optimize w/o unwrapping
         self._method: str|None = None
-        # origin should be stored as a weak ref -- the place where the client was derived from.
-        self._origin = None
+        # origin could be stored as a weak ref -- the place where the client was derived from.
+        self._origin: base.Music21Object|None = None
         self._originId: int|None = None  # store id to optimize w/o unwrapping
 
         # set client; can handle None
@@ -240,10 +239,10 @@ class Derivation(SlottedObjectMixin):
         >>> list(s3.derivation.chain()) == [s2, s1]
         True
         '''
-        origin = self.origin
-        while origin is not None:
-            yield origin
-            origin = origin.derivation.origin
+        orig: base.Music21Object | None = self.origin
+        while orig is not None:
+            yield orig
+            orig = orig.derivation.origin  # pylint: disable=no-member
 
     @property
     def method(self) -> str|None:

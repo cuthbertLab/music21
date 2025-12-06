@@ -153,7 +153,9 @@ class DiscreteAnalysis:
                 post.append(solution)
         return post
 
-    def solutionLegend(self, compress=False):
+    def solutionLegend(self, compress: bool = False) -> list[
+        list[str|list[tuple[int|str, str|None]]]
+    ]:
         '''
         A list of pairs showing all discrete results and the assigned color.
         Data should be organized to be passed to
@@ -162,7 +164,7 @@ class DiscreteAnalysis:
         If `compress` is True, the legend will only show values for solutions
         that have been encountered.
         '''
-        pass
+        return []
 
     def solutionUnitString(self):
         '''
@@ -180,7 +182,7 @@ class DiscreteAnalysis:
     def process(self, sStream):
         '''
         Given a Stream, apply the analysis to all components of this Stream.
-        Expected return is a solution (method specific) and a color value.
+        Expected return is a solution (method-specific) and a color value.
         '''
         pass
 
@@ -211,7 +213,7 @@ class KeyWeightKeyAnalysis(DiscreteAnalysis):
     # favor eb minor
     # C- major cannot be determined if no enharmonics are present
     # C# major can be determined w/o enharmonics
-    keysValidMajor = (
+    keysValidMajor: tuple[str, ...] = (
         'C', 'C#', 'C-',
         'D-', 'D',
         'E-', 'E',
@@ -221,7 +223,7 @@ class KeyWeightKeyAnalysis(DiscreteAnalysis):
         'B-', 'B',
     )
 
-    keysValidMinor = (
+    keysValidMinor: tuple[str, ...] = (
         'C', 'C#',
         'D', 'D#',
         'E-', 'E',
@@ -342,7 +344,7 @@ class KeyWeightKeyAnalysis(DiscreteAnalysis):
 
     def _getPitchClassDistribution(self, streamObj):
         '''
-        Given a flat Stream, obtain a pitch class distribution.
+        Given a flat Stream, return a pitch class distribution.
         The value of each pitch class is scaled by its duration in quarter lengths.
 
         >>> a = analysis.discrete.KrumhanslSchmuckler()
@@ -407,7 +409,7 @@ class KeyWeightKeyAnalysis(DiscreteAnalysis):
             # environLocal.printDebug(['added likely key', likelyKeys[pc]])
         return likelyKeys
 
-    def _getDifference(self, keyResults, pcDistribution, weightType) -> None|list[int|float]:
+    def _getDifference(self, keyResults, pcDistribution, weightType) -> None|list[float]:
         '''
         Takes in a list of numerical probable key results and returns the
         difference of the top two keys.
@@ -416,14 +418,14 @@ class KeyWeightKeyAnalysis(DiscreteAnalysis):
         if keyResults is None:
             return None
 
-        solution: list[int|float] = [0.0] * 12
+        solution: list[float] = [0.0] * 12
         top = [0.0] * 12
         bottomRight = [0.0] * 12
         bottomLeft = [0.0] * 12
 
         toneWeights = self.getWeights(weightType)
-        profileAverage = float(sum(toneWeights)) / len(toneWeights)
-        histogramAverage = float(sum(pcDistribution)) / len(pcDistribution)
+        profileAverage = sum(toneWeights) / len(toneWeights)
+        histogramAverage = sum(pcDistribution) / len(pcDistribution)
 
         for i in range(len(solution)):
             for j in range(len(toneWeights)):
@@ -437,12 +439,14 @@ class KeyWeightKeyAnalysis(DiscreteAnalysis):
                     pcDistribution[j] - histogramAverage) ** 2)
 
                 if bottomRight[i] == 0 or bottomLeft[i] == 0:
-                    solution[i] = 0
+                    solution[i] = 0.0
                 else:
-                    solution[i] = float(top[i]) / ((bottomRight[i] * bottomLeft[i]) ** 0.5)
+                    solution[i] = float(top[i] / ((bottomRight[i] * bottomLeft[i]) ** 0.5))
         return solution
 
-    def solutionLegend(self, compress=False):
+    def solutionLegend(self, compress: bool = False) -> list[
+        list[str|list[tuple[int|str, str|None]]]
+    ]:
         '''
         Returns a list of lists of possible results for the creation of a legend.
 
@@ -478,16 +482,18 @@ class KeyWeightKeyAnalysis(DiscreteAnalysis):
             keySortOrderFiltered = _keySortOrder
 
         data = []
-        valid = None
+        valid: tuple[str, ...] = ()
 
+        yLabel: str
         for yLabel in ['Major', 'Minor']:
             if yLabel == 'Major':
                 valid = self.keysValidMajor
             elif yLabel == 'Minor':
                 valid = self.keysValidMinor
-            row = []
-            row.append(yLabel)
-            pairs = []
+
+            row: list[str|list[tuple[int|str, str|None]]] = [yLabel]
+            pairs: list[tuple[int|str, str|None]] = []
+            color: str|None
             for keyPitch in [pitch.Pitch(p) for p in keySortOrderFiltered]:
                 try:
                     color = self.solutionToColor([keyPitch, yLabel])
@@ -499,6 +505,7 @@ class KeyWeightKeyAnalysis(DiscreteAnalysis):
                         mask = True
                 if keyPitch.name not in valid:
                     mask = True
+
                 if mask:
                     # set as white to maintain spacing
                     color = '#ffffff'
@@ -611,7 +618,7 @@ class KeyWeightKeyAnalysis(DiscreteAnalysis):
         Takes in a Stream or sub-Stream and performs analysis
         on all contents of the Stream. The
         :class:`~music21.analysis.windowed.WindowedAnalysis`
-        windowing system can be used to get numerous results
+        windowing system can be used to get many results
         by calling this method.
 
         Returns two values, a solution data list and a color string.
@@ -632,7 +639,7 @@ class KeyWeightKeyAnalysis(DiscreteAnalysis):
         # values are the result of _getLikelyKeys
         # each first index is the sorted results; there will be 12
         # each first index is tuple
-        # the tuple defines a Pitch, as well as the differences value
+        # the tuple defines a Pitch, as well as the difference value
         # from _getDifference
 
         # if likelyKeysMajor is None or likelyKeysMinor is None:
@@ -781,10 +788,10 @@ class AardenEssen(KeyWeightKeyAnalysis):
     name = 'Aarden Essen Key Analysis'
     identifiers = ['key.aarden', 'key.essen', 'key.aarden-essen', 'key.aardenessen',
                    'aarden', 'essen', 'aarden-essen', 'aardenessen',
+
+                   # adding these identifiers makes this the default
+                   'key', 'keyscape',
                    ]
-    # adding these identifiers make this the default
-    identifiers.append('key')
-    identifiers.append('keyscape')
 
     def __init__(self, referenceStream=None):
         super().__init__(referenceStream=referenceStream)
@@ -1009,9 +1016,9 @@ class Ambitus(DiscreteAnalysis):
         For a given subStream, return a tuple consisting of the two pitches
         with the minimum and maximum pitch space value.
 
-        This public method may be used by other classes.
+        This public method may be used by other classes.  It ignores ChordSymbol objects.
 
-        ignores ChordSymbol objects...
+        Demonstration:
 
         >>> s = corpus.parse('bach/bwv66.6')
         >>> p = analysis.discrete.Ambitus()
@@ -1076,7 +1083,9 @@ class Ambitus(DiscreteAnalysis):
 
         return minPitchObj, maxPitchObj
 
-    def solutionLegend(self, compress=False):
+    def solutionLegend(self, compress: bool = False) -> list[
+        list[str|list[tuple[int|str, str|None]]]
+    ]:
         '''
         Return legend data.
 
@@ -1119,7 +1128,7 @@ class Ambitus(DiscreteAnalysis):
 
         data = []
 
-        colors = {}  # a filtered dictionary
+        colors: dict[int, str] = {}  # a filtered dictionary
         for i in range(len(self._pitchSpanColors.keys())):
             if compress:
                 if self._pitchSpanColors[i] not in colorsUsed:
@@ -1135,9 +1144,8 @@ class Ambitus(DiscreteAnalysis):
 
         # split keys into two groups for two rows (optional)
         for keyGroup in [keysTopRow, keysBottomRow]:
-            row = []
-            row.append('')  # empty row label
-            pairs = []
+            row: list[str|list[tuple[int|str, str|None]]] = ['']  # empty row label
+            pairs: list[tuple[int|str, str|None]] = []
             for i in keyGroup:
                 color = colors[i]  # get form colors
                 pairs.append((i, color))
@@ -1152,7 +1160,7 @@ class Ambitus(DiscreteAnalysis):
         '''
         return 'Half-Steps'
 
-    def solutionToColor(self, solution):
+    def solutionToColor(self, solution: int|None) -> str:
         '''
 
         >>> p = analysis.discrete.Ambitus()
@@ -1362,7 +1370,7 @@ def analysisClassFromMethodName(method: str) -> type[DiscreteAnalysis]|None:
     >>> acfmn('span')
     <class 'music21.analysis.discrete.Ambitus'>
 
-    This one is fundamentally important...
+    This one is fundamentally important:
 
     >>> acfmn('key')
     <class 'music21.analysis.discrete.AardenEssen'>
@@ -1435,7 +1443,7 @@ class Test(unittest.TestCase):
         likelyKeysMinor1.sort()
         allResults1 = likelyKeysMajor1 + likelyKeysMinor1
         # post = []
-        unused_post = sorted([(y, x) for x, y in allResults1])
+        # _post = sorted([(y, x) for x, y in allResults1])
 
         p.process(s2.flatten())
         likelyKeysMajor2, likelyKeysMinor2 = p._likelyKeys(s2.flatten())
@@ -1443,20 +1451,20 @@ class Test(unittest.TestCase):
         likelyKeysMinor2.sort()
         allResults2 = likelyKeysMajor2 + likelyKeysMinor2
         # post = []
-        unused_post = sorted([(y, x) for x, y in allResults2])
+        # _post = sorted([(y, x) for x, y in allResults2])
 
         likelyKeysMajor3, likelyKeysMinor3 = p._likelyKeys(s3.flatten())
         likelyKeysMajor3.sort()
         likelyKeysMinor3.sort()
-        allResults3 = likelyKeysMajor3 + likelyKeysMinor3
-        unused_post = sorted([(y, x) for x, y in allResults3])
+        # allResults3 = likelyKeysMajor3 + likelyKeysMinor3
+        # _post = sorted([(y, x) for x, y in allResults3])
 
         avg = []
         for i in range(len(allResults1)):
             p, count1 = allResults1[i]
             p, count2 = allResults2[i]
             avg.append((p, (count1 + count2) / 2.0))
-        unused_post = sorted([(y, x) for x, y in avg])
+        # _post = sorted([(y, x) for x, y in avg])
 
     def testIntervalDiversity(self):
         from music21 import stream

@@ -17,7 +17,6 @@ Chord from FretBoard Object with tuning.
 '''
 from __future__ import annotations
 
-import typing as t
 import unittest
 
 from music21 import common
@@ -25,10 +24,6 @@ from music21 import exceptions21
 from music21 import harmony
 from music21 import pitch
 from music21 import prebase
-
-
-if t.TYPE_CHECKING:
-    from music21 import duration
 
 
 class TablatureException(exceptions21.Music21Exception):
@@ -53,15 +48,19 @@ class FretNote(prebase.ProtoM21Object):
     >>> fn.displayFingerNumber
     True
 
-    >>> fnStupid = tablature.FretNote()
-    >>> fnStupid.string is None
+    >>> fnUnknownFinger = tablature.FretNote(1, 1)
+    >>> fnUnknownFinger.fingering is None
     True
     '''
-    def __init__(self, string=None, fret=None, fingering=None):
-        self.string = string
-        self.fret = fret
-        self.fingering = fingering
-        self.displayFingerNumber = True
+    def __init__(
+        self, string: int|None = None,
+        fret: int|None = None,
+        fingering: int|None = None
+    ):
+        self.string: int|None = string
+        self.fret: int|None = fret
+        self.fingering: int|None = fingering
+        self.displayFingerNumber: bool = True
 
     def _reprInternal(self):
         '''
@@ -133,15 +132,16 @@ class FretBoard(prebase.ProtoM21Object):
     <music21.tablature.FretNote 2nd string, 3rd fret, 3rd finger>
     '''
 
-    def __init__(self, numStrings=6, fretNotes=None, displayFrets=4):
-        if fretNotes is None:
-            fretNotes = []
-
-        self.numStrings = numStrings
-        self.fretNotes = fretNotes
+    def __init__(
+        self, numStrings: int = 6,
+        fretNotes: list[FretNote]|None = None,
+        displayFrets: int = 4
+    ):
+        self.numStrings: int = numStrings
+        self.fretNotes: list[FretNote] = fretNotes or []
         self.displayFrets = displayFrets
 
-        self.tuning = []
+        self.tuning: list[pitch.Pitch] = []
 
     def _reprInternal(self):
         '''
@@ -239,11 +239,11 @@ class FretBoard(prebase.ProtoM21Object):
             return pitchList
 
         for thisFretNote in self.fretNotes:
-            pitchListPosition = (thisFretNote.string * -1)
+            pitchListPosition = (thisFretNote.string or 0) * -1
 
             tuningPitch = self.tuning[pitchListPosition]
-            tuningPitchAsPs = tuningPitch.ps
-            actualPitch = tuningPitchAsPs + thisFretNote.fret
+            tuningPitchAsPs: float = tuningPitch.ps
+            actualPitch: float = tuningPitchAsPs + (thisFretNote.fret or 0)
             displayPitch = pitch.Pitch(actualPitch)
 
             pitchList[pitchListPosition] = displayPitch
@@ -261,13 +261,11 @@ class FirstFret:
         self.fretNum = fretNum
         self.location = location
 
-# class that combines a ChordSymbol and a FretBoard
-
 
 class ChordWithFretBoard(harmony.ChordSymbol, FretBoard):
     '''
     Music21Object subclass that combines a ChordSymbol with a FretBoard.
-    Tuning must be set!
+    Its tuning must be set.
 
     >>> fn4 = tablature.FretNote(string=4, fret=0)
     >>> fn3 = tablature.FretNote(string=3, fret=2, fingering=2)
@@ -278,7 +276,7 @@ class ChordWithFretBoard(harmony.ChordSymbol, FretBoard):
 
     def __init__(self, figure=None, numStrings=6, fretNotes=None, displayFrets=4, **keywords):
         harmony.ChordSymbol.__init__(self, figure=figure, **keywords)
-        # uncomment when self.getFretNotesFromFigure() works...
+        # uncomment when self.getFretNotesFromFigure() works
         # if fretNotes is None:
         #     fretNotes = self.getFretNotesFromFigure()
 

@@ -56,7 +56,7 @@ def showImageThroughMuseScore(
         pngData = base64.b64decode(pngData64)
         # noinspection PyTypeChecker
         display(Image(data=pngData, retina=True))
-        return
+        return None
 
     # hack to make musescore excerpts -- fix with a converter class in MusicXML
     # or make a new keyword to ignoreTitles, etc.
@@ -75,7 +75,7 @@ def showImageThroughMuseScore(
                 multipageWidget=multipageWidget,
                 **keywords,
             )
-        return
+        return None
 
     fp = subConverter.write(
         obj,
@@ -86,7 +86,7 @@ def showImageThroughMuseScore(
     )
 
     if subformats[0] != 'png':
-        return
+        return None
 
     last_png = museScore.findLastPNGPath(fp)
     last_number, num_digits = museScore.findPNGRange(fp, last_png)
@@ -109,7 +109,7 @@ def showImageThroughMuseScore(
     else:
         # multi-page png -- use our widget.
         # noinspection PyPackageRequirements
-        from ipywidgets import interact  # type: ignore
+        from ipywidgets import interact  # type: ignore  # pylint: disable=import-error
 
         @interact(page=(1, last_number))
         def page_display(page=1):

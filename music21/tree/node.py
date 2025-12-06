@@ -3,11 +3,10 @@
 # Name:         timespans/node.py
 # Purpose:      Internal data structures for timespan collections
 #
-# Authors:      Josiah Wolf Oberholtzer
+# Authors:      Joséphine Wolf Oberholtzer
 #               Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2013-16 Michael Scott Asato Cuthbert and the music21
-#               Project
+# Copyright:    Copyright © 2013-2016 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # -----------------------------------------------------------------------------
 '''
@@ -273,18 +272,14 @@ class ElementNode(core.AVLNode):
         leftChild = self.leftChild
         if leftChild:
             leftChild.updateEndTimes()
-            if leftChild.endTimeLow < endTimeLow:
-                endTimeLow = leftChild.endTimeLow
-            if endTimeHigh < leftChild.endTimeHigh:
-                endTimeHigh = leftChild.endTimeHigh
+            endTimeLow = min(endTimeLow, leftChild.endTimeLow)
+            endTimeHigh = max(endTimeHigh, leftChild.endTimeHigh)
 
         rightChild = self.rightChild
         if rightChild:
             rightChild.updateEndTimes()
-            if rightChild.endTimeLow < endTimeLow:
-                endTimeLow = rightChild.endTimeLow
-            if endTimeHigh < rightChild.endTimeHigh:
-                endTimeHigh = rightChild.endTimeHigh
+            endTimeLow = min(endTimeLow, rightChild.endTimeLow)
+            endTimeHigh = max(endTimeHigh, rightChild.endTimeHigh)
         self.endTimeLow = endTimeLow
         self.endTimeHigh = endTimeHigh
 
@@ -297,7 +292,7 @@ class OffsetNode(ElementNode):
 
     Here's an example of what it means and does:
 
-    >>> score = tree.makeExampleScore()
+    >>> score = tree.examples.makeExampleScore()
     >>> sf = score.flatten()
     >>> sf.show('text', addEndTimes=True)
     {0.0 - 0.0} <music21.instrument.Instrument 'PartA: : '>
@@ -405,7 +400,7 @@ class OffsetNode(ElementNode):
             The contents of the node at this point.  Usually a list of ElementTimespans
             or PitchedTimespans.
 
-            >>> score = tree.makeExampleScore()
+            >>> score = tree.examples.makeExampleScore()
             >>> scoreTree = tree.fromStream.asTimespans(score, flatten=True,
             ...                  classList=(note.Note, chord.Chord))
             >>> print(scoreTree.rootNode.debug())
@@ -515,18 +510,14 @@ class OffsetNode(ElementNode):
         leftChild = self.leftChild
         if leftChild:
             leftChild.updateEndTimes()
-            if leftChild.endTimeLow < endTimeLow:
-                endTimeLow = leftChild.endTimeLow
-            if endTimeHigh < leftChild.endTimeHigh:
-                endTimeHigh = leftChild.endTimeHigh
+            endTimeLow = min(endTimeLow, leftChild.endTimeLow)
+            endTimeHigh = max(endTimeHigh, leftChild.endTimeHigh)
 
         rightChild = self.rightChild
         if rightChild:
             rightChild.updateEndTimes()
-            if rightChild.endTimeLow < endTimeLow:
-                endTimeLow = rightChild.endTimeLow
-            if endTimeHigh < rightChild.endTimeHigh:
-                endTimeHigh = rightChild.endTimeHigh
+            endTimeLow = min(endTimeLow, rightChild.endTimeLow)
+            endTimeHigh = max(endTimeHigh, rightChild.endTimeHigh)
         self.endTimeLow = endTimeLow
         self.endTimeHigh = endTimeHigh
 
