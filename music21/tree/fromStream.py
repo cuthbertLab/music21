@@ -3,7 +3,7 @@
 # Name:         timespans/fromStream.py
 # Purpose:      Tools for creating timespans from Streams
 #
-# Authors:      Josiah Wolf Oberholtzer
+# Authors:      Joséphine Wolf Oberholtzer
 #               Michael Scott Asato Cuthbert
 #
 # Copyright:    Copyright © 2013-2022 Michael Scott Asato Cuthbert

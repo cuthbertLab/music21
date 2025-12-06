@@ -4,7 +4,7 @@
 # Purpose:      Object for dealing with vertical simultaneities in a
 #               fast way w/o Chord's overhead
 #
-# Authors:      Josiah Wolf Oberholtzer
+# Authors:      Joséphine Wolf Oberholtzer
 #               Michael Scott Asato Cuthbert
 #
 # Copyright:    Copyright © 2013-2016 Michael Scott Asato Cuthbert

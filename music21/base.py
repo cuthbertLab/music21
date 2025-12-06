@@ -27,7 +27,7 @@ available after importing `music21`.
 <class 'music21.base.Music21Object'>
 
 >>> music21.VERSION_STR
-'10.0.1b1'
+'10.0.1b3'
 
 Alternatively, after doing a complete import, these classes are available
 under the module "base":
@@ -548,7 +548,7 @@ class Music21Object(prebase.ProtoM21Object):
         if quarterLength is not None:
             self.duration.quarterLength = quarterLength
 
-    def __eq__(self: _M21T, other) -> t.TypeGuard[_M21T]:
+    def __eq__(self, other) -> t.TypeGuard[t.Self]:
         '''
         Define equality for Music21Objects.  See main class docs.
         '''
@@ -612,10 +612,10 @@ class Music21Object(prebase.ProtoM21Object):
             self.id = other.id
         self.groups = copy.deepcopy(other.groups)
 
-    def _deepcopySubclassable(self: _M21T,
+    def _deepcopySubclassable(self,
                               memo: dict[int, t.Any]|None = None,
                               *,
-                              ignoreAttributes: set[str]|None = None) -> _M21T:
+                              ignoreAttributes: set[str]|None = None) -> t.Self:
         '''
         Subclassable __deepcopy__ helper so that the same attributes
         do not need to be called for each Music21Object subclass.
@@ -657,7 +657,7 @@ class Music21Object(prebase.ProtoM21Object):
 
         return new
 
-    def __deepcopy__(self: _M21T, memo: dict[int, t.Any]|None = None) -> _M21T:
+    def __deepcopy__(self, memo: dict[int, t.Any]|None = None) -> t.Self:
         '''
         Helper method to copy.py's deepcopy function.  Call it from there.
 

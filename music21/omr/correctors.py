@@ -761,11 +761,10 @@ class MeasureHash:
                 hashString += self.hashGrace(n)
             elif n.isNote:
                 hashString += self.hashNote(n)
-            elif not n.isNote:
-                if n.isRest:
-                    hashString += self.hashRest(n)
-                elif n.isChord:
-                    hashString += self.hashNote(n)
+            elif n.isRest:
+                hashString += self.hashRest(n)
+            elif n.isChord:
+                hashString += self.hashNote(n)
         self.hashString = hashString
         return hashString
 

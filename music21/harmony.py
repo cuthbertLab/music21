@@ -38,9 +38,6 @@ from music21 import style
 
 environLocal = environment.Environment('harmony')
 
-T = t.TypeVar('T', bound='ChordSymbol')
-NCT = t.TypeVar('NCT', bound='NoChord')
-
 if t.TYPE_CHECKING:
     from music21.figuredBass import realizerScale
 
@@ -2394,7 +2391,7 @@ class ChordSymbol(Harmony):
         else:
             return False
 
-    def transpose(self: T, value, *, inPlace=False) -> T|None:
+    def transpose(self, value, *, inPlace=False) -> t.Self|None:
         '''
         Overrides :meth:`~music21.chord.Chord.transpose` so that this ChordSymbol's
         `figure` is appropriately cleared afterward.
@@ -2506,7 +2503,7 @@ class NoChord(ChordSymbol):
         # do nothing, everything is already set.
         return
 
-    def transpose(self: NCT, _value, *, inPlace=False) -> NCT|None:
+    def transpose(self, _value, *, inPlace=False) -> t.Self|None:
         '''
         Overrides :meth:`~music21.chord.Chord.transpose` to do nothing.
 

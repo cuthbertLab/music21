@@ -20,7 +20,6 @@ This module will move to a medren package hopefully by v7
 from __future__ import annotations
 
 import enum
-import unittest
 
 from music21 import bar
 from music21 import base
@@ -460,14 +459,8 @@ def fromStream(s, *, layoutToBreaks=False):
     return ''.join(volpianoTokens)
 
 
-
-class Test(unittest.TestCase):
-    pass
-
-    def testNoteNames(self):
-        pass
-
-
 if __name__ == '__main__':
     import music21
-    music21.mainTest(Test, 'importPlusRelative')
+    # allow things like "fromStream" to be called in doctests as "fromStream"
+    # and not just "volpiano.fromStream"
+    music21.mainTest('importPlusRelative')

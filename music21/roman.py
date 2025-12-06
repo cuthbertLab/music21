@@ -42,8 +42,6 @@ environLocal = environment.Environment('roman')
 
 # TODO: setting inversion should change the figure
 
-T = t.TypeVar('T', bound='RomanNumeral')
-
 # -----------------------------------------------------------------------------
 
 
@@ -1301,7 +1299,7 @@ class Minor67Default(enum.Enum):
 
     The enumeration of `CAUTIONARY` is identical to `QUALITY` except that it
     ignores the `#` in #vi and the `b` in bVI, allowing users to write these
-    chords in two different way.  `CAUTIONARY` is recommended in the case where
+    chords in two different ways.  `CAUTIONARY` is recommended in the case where
     users from different systems of training are working together, and no
     exotic chords (such as major triads on raised ^6) are used.
 
@@ -3298,7 +3296,7 @@ class RomanNumeral(harmony.Harmony):
                 f'_updatePitches() was unable to derive pitches from the figure: {self.figure!r}'
             )  # pragma: no cover
 
-    def transpose(self: T, value, *, inPlace=False) -> T|None:
+    def transpose(self, value, *, inPlace=False) -> t.Self|None:
         '''
         Overrides :meth:`~music21.harmony.Harmony.transpose` so that `key`
         attribute is transposed as well.

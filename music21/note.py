@@ -43,9 +43,6 @@ if t.TYPE_CHECKING:
     from music21 import chord
     from music21 import instrument
     from music21 import percussion
-    from music21.style import Style
-
-    _NotRestType = t.TypeVar('_NotRestType', bound='NotRest')
 
 environLocal = environment.Environment('note')
 
@@ -666,7 +663,7 @@ class GeneralNote(base.Music21Object):
 
     # --------------------------------------------------------------------------
     @property
-    def tie(self) -> tie.Tie|None:
+    def tie(self) -> 'tie.Tie|None':
         '''
         Return and set a :class:`~music21.note.Tie` object, or None.
 
@@ -678,7 +675,7 @@ class GeneralNote(base.Music21Object):
         return self._tie
 
     @tie.setter
-    def tie(self, value: tie.Tie|None):
+    def tie(self, value: 'tie.Tie|None'):
         self._tie = value
 
     @property
@@ -1046,13 +1043,13 @@ class NotRest(GeneralNote):
     # Special functions
     # ==============================================================================================
 
-    def _deepcopySubclassable(self: _NotRestType,
+    def _deepcopySubclassable(self,
                               memo: dict[int, t.Any]|None = None,
                               *,
-                              ignoreAttributes: set[str]|None = None) -> _NotRestType:
+                              ignoreAttributes: set[str]|None = None) -> t.Self:
         new = super()._deepcopySubclassable(memo, ignoreAttributes={'_chordAttached'})
         if t.TYPE_CHECKING:
-            new = t.cast(_NotRestType, new)
+            new = t.cast(t.Self, new)
         # let the chord restore _chordAttached
 
         # after copying, if a Volume exists, it is linked to the old object
@@ -1292,7 +1289,7 @@ class NotRest(GeneralNote):
             raise TypeError(f'this must be a Volume object, not {value}')
 
     @property
-    def volume(self) -> volume.Volume:
+    def volume(self) -> 'volume.Volume':
         '''
         Get and set the :class:`~music21.volume.Volume` object of this object.
         Volume objects are created on demand.
@@ -1309,7 +1306,7 @@ class NotRest(GeneralNote):
         return self._getVolume()
 
     @volume.setter
-    def volume(self, value: None|volume.Volume|int|float):
+    def volume(self, value: 'None|volume.Volume|int|float'):
         self._setVolume(value)
 
     @property
@@ -1606,7 +1603,7 @@ class Note(NotRest):
         except AttributeError:
             return NotImplemented
 
-    def __deepcopy__(self: Note, memo=None) -> Note:
+    def __deepcopy__(self, memo=None) -> t.Self:
         '''
         After doing a deepcopy of the pitch, be sure to set the client
         '''

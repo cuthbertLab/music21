@@ -3,7 +3,7 @@
 # Name:         tree/timespanTree.py
 # Purpose:      Subclasses of tree.trees.OffsetTree for manipulation
 #
-# Authors:      Josiah Wolf Oberholtzer
+# Authors:      Joséphine Wolf Oberholtzer
 #               Michael Scott Asato Cuthbert
 #
 # Copyright:    Copyright © 2013-2024 Michael Scott Asato Cuthbert

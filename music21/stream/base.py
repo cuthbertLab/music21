@@ -5,7 +5,7 @@
 #
 # Authors:      Michael Scott Asato Cuthbert
 #               Christopher Ariza
-#               Josiah Wolf Oberholtzer
+#               Joséphine Wolf Oberholtzer
 #               Evan Lynch
 #
 # Copyright:    Copyright © 2008-2024 Michael Scott Asato Cuthbert
@@ -1001,7 +1001,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         del self._elements[k]
         self.coreElementsChanged()
 
-    def __add__(self: StreamType, other: 'Stream') -> StreamType:
+    def __add__(self, other: 'Stream') -> t.Self:
         '''
         Add, or concatenate, two Streams.
 
@@ -1364,7 +1364,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         '''
         self.elements = ()
 
-    def cloneEmpty(self: StreamType, derivationMethod: str|None = None) -> StreamType:
+    def cloneEmpty(self, derivationMethod: str|None = None) -> t.Self:
         '''
         Create a Stream that is identical to this one except that the elements are empty
         and set derivation.
@@ -1385,7 +1385,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         >>> len(q)
         0
         '''
-        returnObj: StreamType = self.__class__()
+        returnObj: t.Self = self.__class__()
         returnObj.derivation.client = returnObj
         returnObj.derivation.origin = self
         if derivationMethod is not None:
@@ -1951,11 +1951,11 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         return self._removeIteration(elFilter)
 
     # pylint: disable=no-member
-    def _deepcopySubclassable(self: StreamType,
+    def _deepcopySubclassable(self,
                               memo: dict[int, t.Any]|None = None,
                               *,
                               ignoreAttributes=None,
-                              ) -> StreamType:
+                              ) -> t.Self:
         # NOTE: this is a performance critical operation
         defaultIgnoreSet = {
             '_offsetDict', '_elements', '_endElements',
@@ -1967,7 +1967,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
 
         # PyCharm seems to think that this is a StreamCore
         # noinspection PyTypeChecker
-        new: StreamType = super()._deepcopySubclassable(memo, ignoreAttributes=ignoreAttributes)
+        new: t.Self = super()._deepcopySubclassable(memo, ignoreAttributes=ignoreAttributes)
 
         # new._offsetDict will get filled when ._elements is copied.
         newOffsetDict: dict[int, tuple[OffsetQLSpecial, base.Music21Object]] = {}
@@ -2019,7 +2019,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
 
         return new
 
-    def __deepcopy__(self: StreamType, memo=None) -> StreamType:
+    def __deepcopy__(self, memo=None) -> t.Self:
         '''
         Deepcopy the stream from copy.deepcopy()
         '''
@@ -5239,7 +5239,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
 
     @overload
     def _transposeByInstrument(
-        self: StreamType,
+        self,
         *,
         reverse: bool = False,
         transposeKeySignature: bool = True,
@@ -5250,23 +5250,23 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
 
     @overload
     def _transposeByInstrument(
-        self: StreamType,
+        self,
         *,
         reverse: bool = False,
         transposeKeySignature: bool = True,
         preserveAccidentalDisplay: bool = False,
         inPlace: t.Literal[False] = False,
-    ) -> StreamType:
+    ) -> t.Self:
         pass
 
     def _transposeByInstrument(
-        self: StreamType,
+        self,
         *,
         reverse: bool = False,
         transposeKeySignature: bool = True,
         preserveAccidentalDisplay: bool = False,
         inPlace: bool = False,
-    ) -> StreamType|None:
+    ) -> t.Self|None:
         '''
         Transpose the Stream according to each instrument's transposition.
 
@@ -6938,7 +6938,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         '''
         return self.streamStatus.accidentals
 
-    def makeNotation(self: StreamType,
+    def makeNotation(self,
                      *,
                      meterStream=None,
                      refStreamOrTimeRange=None,
@@ -6989,7 +6989,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         * Changed in v7: `inPlace=True` returns `None`.
         '''
         # determine what is the object to work on first
-        returnStream: StreamType|Stream[t.Any]
+        returnStream: t.Self|Stream[t.Any]
         if inPlace:
             returnStream = self
         else:
@@ -7752,7 +7752,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         self._cache['sorted'] = s
         return s
 
-    def flatten(self: StreamType, retainContainers=False) -> StreamType:
+    def flatten(self, retainContainers=False) -> t.Self:
         '''
         A very important method that returns a new Stream
         that has all sub-containers "flattened" within it,
@@ -7874,7 +7874,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         >>> sf[4]
         <music21.note.Note C>
 
-        Unless it is important to get iterate in order from
+        Unless it is important to iterate in order from
         front of score to back of the score, you are generally better off using recurse
         instead of `.flatten(retainContainers=True)`, with `.getOffsetInHierarchy()`
         to figure out where in the score each element lies.
@@ -9027,7 +9027,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
 
     def transpose(
         self,
-        value: str|int|'music21.interval.IntervalBase',
+        value: 'str|int|music21.interval.IntervalBase',
         /,
         *,
         inPlace=False,
@@ -9524,7 +9524,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         if inPlace is False:
             return returnStream
 
-    def expandRepeats(self: StreamType, copySpanners: bool = True) -> StreamType:
+    def expandRepeats(self, copySpanners: bool = True) -> t.Self:
         '''
         Expand this Stream with repeats. Nested repeats
         given with :class:`~music21.bar.Repeat` objects, or
@@ -13982,7 +13982,7 @@ class Score(Stream):
 
         return post
 
-    def expandRepeats(self: Score, copySpanners: bool = True) -> Score:
+    def expandRepeats(self, copySpanners: bool = True) -> t.Self:
         '''
         Expand all repeats, as well as all repeat indications
         given by text expressions such as D.C. al Segno.
@@ -14054,7 +14054,7 @@ class Score(Stream):
 
     @overload
     def sliceByGreatestDivisor(
-        self: Score,
+        self,
         *,
         addTies: bool = True,
         inPlace: t.Literal[True],
@@ -14063,19 +14063,19 @@ class Score(Stream):
 
     @overload
     def sliceByGreatestDivisor(
-        self: Score,
+        self,
         *,
         addTies: bool = True,
         inPlace: t.Literal[False] = False,
-    ) -> Score:
+    ) -> t.Self:
         pass
 
     def sliceByGreatestDivisor(
-        self: Score,
+        self,
         *,
         addTies: bool = True,
         inPlace: bool = False,
-    ) -> Score|None:
+    ) -> t.Self|None:
         '''
         Slice all duration of all part by the minimum duration
         that can be summed to each concurrent duration.

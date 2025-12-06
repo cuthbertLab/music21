@@ -3,7 +3,7 @@
 # Name:         docbuild/iterators.py
 # Purpose:      music21 documentation iterators, including Jupyter notebook to ReST converter
 #
-# Authors:      Josiah Wolf Oberholtzer
+# Authors:      Joséphine Wolf Oberholtzer
 #               Michael Scott Asato Cuthbert
 #
 # Copyright:    Copyright © 2013, 17 Michael Scott Asato Cuthbert

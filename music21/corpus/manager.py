@@ -4,7 +4,7 @@
 # Purpose:      Manage multiple corpora
 #
 # Authors:      Christopher Ariza
-#               Josiah Wolf Oberholtzer
+#               Joséphine Wolf Oberholtzer
 #               Michael Scott Asato Cuthbert
 #
 # Copyright:    Copyright © 2009, 2013, 2015-17 Michael Scott Asato Cuthbert

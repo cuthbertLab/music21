@@ -3,7 +3,7 @@
 # Name:         documentation/library/documenters.py
 # Purpose:      music21 documentation helper classes for proper formatting
 #
-# Authors:      Josiah Wolf Oberholtzer
+# Authors:      Joséphine Wolf Oberholtzer
 #               Christopher Ariza
 #               Michael Scott Asato Cuthbert
 #

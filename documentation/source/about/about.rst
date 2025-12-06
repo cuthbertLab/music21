@@ -32,9 +32,11 @@ and papers on algorithmic composition and generative music systems.
 Ariza received his A.B.
 degree from Harvard University and his M.A. and Ph.D. degrees from New York University.
 
-**Benjamin Hogue** is Former Lead Programmer of `music21` for 2013.
+**Benjamin Hogue** is Former Lead Programmer of `music21` for 2013, working
+on percussion representation.
 
-**Josiah Wolf Oberholtzer** is Former Lead Programmer of `music21` for 2014-15.
+**Joséphine Wolf Oberholtzer** is Former Lead Programmer of `music21` for 2014-15. Her work
+included the extremely efficient tree representation for fast context searching.
 
 Additional contributions by many MIT students and visitors and the
 Open Source software community.

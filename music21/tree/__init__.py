@@ -4,7 +4,7 @@
 # Purpose:      Tools for grouping notes and chords into a searchable tree
 #               organized by start and stop offsets
 #
-# Authors:      Josiah Wolf Oberholtzer
+# Authors:      Joséphine Wolf Oberholtzer
 #               Michael Scott Asato Cuthbert
 #
 # Copyright:    Copyright © 2013-2015 Michael Scott Asato Cuthbert
