@@ -3,7 +3,7 @@
 `music21` -- A Toolkit for Computer-Aided Musical Analysis and 
 Computational Musicology
 
-Copyright © 2006-2025 [Michael Scott Asato Cuthbert](http://www.trecento.com)
+Copyright © 2006-2026 [Michael Scott Asato Cuthbert](http://www.trecento.com)
 
 For more information, visit:
 https://www.music21.org/music21docs/
