@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 # Name:         graph/utilities.py
 # Purpose:      Functions for finding external modules, manipulating colors, etc.

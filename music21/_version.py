@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+
 '''
 This file contains Music21's version number information.
 

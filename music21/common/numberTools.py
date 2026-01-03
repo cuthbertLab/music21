@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 # Name:         common/numberTools.py
 # Purpose:      Utilities for working with numbers or number-like objects

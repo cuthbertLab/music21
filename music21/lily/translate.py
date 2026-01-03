@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 # Name:         lily/translate.py
 # Purpose:      music21 classes for translating to Lilypond

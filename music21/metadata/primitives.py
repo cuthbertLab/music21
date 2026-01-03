@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # -----------------------------------------------------------------------------
 # Name:         primitives.py
 # Purpose:      music21 classes for representing score and work metadata

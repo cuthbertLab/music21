@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 # Name:         ipython21/__init__.py
 # Purpose:      music21 Jupyter Notebook support

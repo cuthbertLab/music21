@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 '''
 Run tests of notebooks using nbval -- called from testDocumentation
 

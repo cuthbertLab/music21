@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 # Name:         tempo.py
 # Purpose:      Classes and tools relating to tempo

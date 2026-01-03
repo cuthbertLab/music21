@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # -----------------------------------------------------------------------------
 # Name:         base.py
 # Purpose:      Music21 base classes and important utilities

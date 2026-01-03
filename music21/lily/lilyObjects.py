@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 # Name:         lily/objects.py
 # Purpose:      python objects representing lilypond

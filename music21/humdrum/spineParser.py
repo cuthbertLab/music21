@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 # Name:         humdrum.spineParser.py
 # Purpose:      Conversion and Utility functions for Humdrum and kern in particular

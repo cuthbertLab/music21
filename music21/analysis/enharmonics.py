@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 # Name:         enharmonics.py
 # Purpose:      Tools for returning best enharmonics

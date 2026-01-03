@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 # Name:         musicxml/xmlToM21.py
 # Purpose:      Conversion from MusicXML to Music21

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 # Name:         noteworthy/binaryTranslate.py
 # Purpose:      parses .nwc binary files, compressed and uncompressed

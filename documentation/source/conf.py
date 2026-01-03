@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 #
 # music21 documentation build configuration file, created by
 # sphinx-quickstart on Fri Jun 14 16:48:40 2013.

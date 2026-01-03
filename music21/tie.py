@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 # Name:         tie.py
 # Purpose:      music21 classes for representing ties (visual and conceptual)

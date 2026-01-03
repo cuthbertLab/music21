@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 # Name:         audioSearch.recording.py
 # Purpose:      routines for making recordings from microphone input

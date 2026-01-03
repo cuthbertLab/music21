@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 # Name:         interval.py
 # Purpose:      music21 classes for representing intervals

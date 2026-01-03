@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # -----------------------------------------------------------------------------
 # Name:         freezeThaw.py
 # Purpose:      Methods for storing any music21 object on disk.

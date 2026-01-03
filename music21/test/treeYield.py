@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 # Name:         treeYield.py
 # Purpose:      traverse a complex datastructure and yield elements

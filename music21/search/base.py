@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 # Name:         search/base.py
 # Purpose:      music21 classes for searching within files

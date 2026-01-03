@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 # Name:         humdrum.harmparser.py
 # Purpose:      A parser for annotations in **harm spines of Humdrum

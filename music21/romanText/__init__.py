@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 # Name:         romanText/__init__.py
 # Purpose:      music21 classes for processing roman numeral analysis files

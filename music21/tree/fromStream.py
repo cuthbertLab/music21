@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # -----------------------------------------------------------------------------
 # Name:         timespans/fromStream.py
 # Purpose:      Tools for creating timespans from Streams

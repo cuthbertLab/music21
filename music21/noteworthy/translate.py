@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 # Name:         noteworthy/translate.py
 # Purpose:      translates Noteworthy Composer's NWCTXT format

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 # Name:         text.py
 # Purpose:      music21 classes for text processing
@@ -669,8 +668,8 @@ class Test(unittest.TestCase):
 
 
     def testAssembleLyricsA(self):
-        from music21 import stream
         from music21 import note
+        from music21 import stream
         s = stream.Stream()
         for syl in ['hel-', '-lo', 'a-', '-gain']:
             n = note.Note()

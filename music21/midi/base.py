@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 # Name:         midi/__init__.py
 # Purpose:      Access to MIDI library / music21 classes for dealing with midi data

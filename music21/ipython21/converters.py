@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 # Name:         ipython21/converters.py
 # Purpose:      music21 Jupyter Notebook external converters

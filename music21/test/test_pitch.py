@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 # Name:         test.test_pitch.py
 # Purpose:      music21 tests for pitches

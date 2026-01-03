@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 # Name:         checker.py
 # Purpose:      checks figured basses for following voice-leading rules

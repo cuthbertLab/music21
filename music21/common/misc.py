@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 # Name:         common/misc.py
 # Purpose:      Everything that doesn't fit into anything else.

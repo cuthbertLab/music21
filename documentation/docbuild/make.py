@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 # Name:         documentation/make.py
 # Purpose:      music21 documentation script, v. 2.0

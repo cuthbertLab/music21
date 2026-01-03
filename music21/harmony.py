@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 # Name:         harmony.py
 # Purpose:      music21 classes for representing harmonies and chord symbols

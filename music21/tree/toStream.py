@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # -----------------------------------------------------------------------------
 # Name:         tree/toStream.py
 # Purpose:      Tools for recreating streams from trees

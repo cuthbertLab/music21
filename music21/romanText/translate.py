@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 # Name:         romanText/translate.py
 # Purpose:      Translation routines for roman numeral analysis text files

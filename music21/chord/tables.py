@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 # Name:         chord.tables.py
 # Purpose:      data and tables for chord and set class processing.

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 # Name:         expressions.py
 # Purpose:      Expressions such as Fermatas, etc.

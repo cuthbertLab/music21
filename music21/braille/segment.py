@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 # Name:         segment.py
 # Purpose:      Division of stream.Part into segments for individual handling

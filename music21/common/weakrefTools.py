@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 # Name:         common/weakrefTools.py
 # Purpose:      Utilities for weak references

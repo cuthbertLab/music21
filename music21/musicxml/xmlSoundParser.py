@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 # Name:         musicxml/xmlSoundParser.py
 # Purpose:      Translate the <sound> tag to music21

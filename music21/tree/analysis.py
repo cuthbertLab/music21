@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # -----------------------------------------------------------------------------
 # Name:         tree/analysis.py
 # Purpose:      horizontal analysis tools on timespan trees

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # -----------------------------------------------------------------------------
 # Name:         mei/test_main.py
 # Purpose:      Tests for mei/base.py

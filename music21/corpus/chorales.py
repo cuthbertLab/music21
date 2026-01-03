@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 # Name:         corpus/chorales.py
 # Purpose:      Access to the chorale collection

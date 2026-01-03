@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 # Name:         windowed.py
 # Purpose:      Framework for modular, windowed analysis

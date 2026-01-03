@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # -----------------------------------------------------------------------------
 # Name:         abcFormat.translate.py
 # Purpose:      Translate ABC and music21 objects

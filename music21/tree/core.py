@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # -----------------------------------------------------------------------------
 # Name:         tree/core.py
 # Purpose:      Core AVLTree object.  To be optimized the hell out of.

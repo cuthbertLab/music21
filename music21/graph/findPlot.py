@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 # Name:         graph/findPlot.py
 # Purpose:      Functions that find appropriate plots for graph.plot

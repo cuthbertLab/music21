@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 # Name:         musicxml/partStaffExporter.py
 # Purpose:      Change music21 PartStaff objects to single musicxml parts

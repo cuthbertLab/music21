@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 # Name:         pitch.py
 # Purpose:      music21 classes for representing pitches

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 # Name:         examples.py
 # Purpose:      Transcribing popular music into braille music using music21.

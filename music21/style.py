@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # -----------------------------------------------------------------------------
 # Name:         style.py
 # Purpose:      Music21 classes for non-analytic display properties

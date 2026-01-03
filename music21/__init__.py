@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 '''
 The music21 Framework is Copyright © 2006-2026 Michael Scott Asato Cuthbert.
 

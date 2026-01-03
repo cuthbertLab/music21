@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 # Name:         search/lyrics.py
 # Purpose:      music21 classes for searching lyrics
