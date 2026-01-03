@@ -1273,10 +1273,13 @@ class Test(unittest.TestCase):
         # looking at cases where notes appear to be chord but
         # are better seen as voices
         # specialized problem of not importing last notes
+
+        # voice 1 -- m1 (half E G) m2 (F# B) m3 -- Chord C4C5 (zero duration?)
+        # voice 2 -- m1 whole C  m2 whole D  -- m3 (not existent)
         dirLib = common.getSourceFilePath() / 'midi' / 'testPrimitive'
         fp = dirLib / 'test13.mid'
         s = converter.parse(fp)
-        # s.show('t')
+        # s.show('text', addEndTimes=True)
         self.assertEqual(len(s.flatten().notes), 7)
         # s.show('midi')
 
@@ -1291,7 +1294,7 @@ class Test(unittest.TestCase):
         fp = dirLib / 'test05.mid'
 
         # a simple file created in athenacl
-        s = converter.parse(fp)
+        s = converter.parse(fp, forceSource=True)
         # s.show('t')
         self.assertEqual(len(s[chord.Chord]), 5)
 

@@ -1600,6 +1600,7 @@ class Staff(stream.Part):
             + f'st.{self.staffNumber}'
         )
 
+
 _DOC_ORDER = [ScoreLayout, PageLayout, SystemLayout, StaffLayout, LayoutBase,
               LayoutScore, Page, System, Staff]
 # ------------------------------------------------------------------------------

@@ -198,7 +198,9 @@ def upperPartsWithinLimit(possibA, maxSemitoneSeparation=12):
 
     return areUpperPartsWithinLimit
 
+
 DEFAULT_MAX_PITCH = pitch.Pitch('B5')
+
 
 def pitchesWithinLimit(possibA, maxPitch=DEFAULT_MAX_PITCH):
     '''

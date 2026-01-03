@@ -8580,7 +8580,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
                 mm = ti.getSoundingMetronomeMark()
                 offsetMetronomeMarkPairs.append([o, mm])
 
-        if len(offsetMetronomeMarkPairs) and offsetMetronomeMarkPairs[0][0] > 0.0:
+        if offsetMetronomeMarkPairs and offsetMetronomeMarkPairs[0][0] > 0.0:
             getTempoFromContext = True
 
         if getTempoFromContext:
