@@ -318,7 +318,6 @@ def music21ObjectToMidiFile(
 # Notes
 
 def _constructOrUpdateNotRestSubclass(
-    eOn: MidiEvent,
     tOn: int,
     tOff: int,
     ticksPerQuarter: int,
@@ -329,11 +328,9 @@ def _constructOrUpdateNotRestSubclass(
     Construct (or edit the duration of) a NotRest subclass, usually
     a note.Note (or a chord.Chord if provided to `returnClass`).
 
-    If the MidiEvent is on channel 10, then an Unpitched or PercussionChord
-    is constructed instead. Raises TypeError if an incompatible class is provided
-    for returnClass.
-
     * Changed in v8: no inputM21
+    * Changed in v10: Remove part about creating an Unpitched object -- that has been wrong
+      for some time (probably since PercussionChords were introduced)
     '''
     if not issubclass(returnClass, note.NotRest):
         raise TypeError(f'Expected subclass of note.NotRest; got {returnClass}')
@@ -421,16 +418,15 @@ def midiEventsToNote(
         The only supported usage now is two tuples.
     * Changed in v9.7: Expects a single TimedNoteEvent
     '''
-    tOn, tOff, eOn = timedNoteEvent
+    tOn, tOff, midiOnEvent = timedNoteEvent
 
     returnClass: type[note.Unpitched]|type[note.Note]
-    if eOn.channel == 10:
+    if midiOnEvent.channel == 10:
         returnClass = note.Unpitched
     else:
         returnClass = note.Note
 
     nr = _constructOrUpdateNotRestSubclass(
-        eOn,
         tOn,
         tOff,
         ticksPerQuarter,
@@ -438,10 +434,10 @@ def midiEventsToNote(
     )
 
     if isinstance(nr, note.Note):
-        nr.pitch.midi = eOn.pitch
+        nr.pitch.midi = midiOnEvent.pitch
     elif isinstance(nr, note.Unpitched):
         try:
-            i = PERCUSSION_MAPPER.midiPitchToInstrument(eOn.pitch)
+            i = PERCUSSION_MAPPER.midiPitchToInstrument(midiOnEvent.pitch)
         except MIDIPercussionException:
             i = instrument.UnpitchedPercussion()
         nr.storedInstrument = i
@@ -451,9 +447,8 @@ def midiEventsToNote(
             f'Got something other than a Note or Unpitched from conversion: {nr}'
         )
 
-    nr.volume.velocity = eOn.velocity
+    nr.volume.velocity = midiOnEvent.velocity
     nr.volume.velocityIsRelative = False  # not relative coming from MIDI
-    # n._midiVelocity = eOn.velocity
 
     return t.cast(note.Note|note.Unpitched, nr)
 
@@ -636,24 +631,27 @@ def midiEventsToChord(
     * Changed in v8: inputM21 is no longer supported.  Flat list format is removed.
     * Changed in v9.7: expects a list of TimedNoteEvents
     '''
-    tOn: int = 0  # ticks
-    tOff: int = 0  # ticks
+    # * Changed in v10: Fix long-standing bug where only the first on-time was being used
+    #   not yet -- must fix quantization tests to do so...
+    # THIS IS A BUG -- should be timedNoteList[0]
+    #    fixing it breaks stream/tests/testQuantizeMinimumDuration though, so a separate PR
+    first_tOn: int = timedNoteList[-1][0]  # ticks
+    last_tOff: int = timedNoteList[-1][1]  # ticks
 
     pitches: list[pitch.Pitch] = []
-    volumes = []
+    volumes: list[volume.Volume] = []
 
-    firstOn: MidiEvent = timedNoteList[0].event
     any_channel_10 = False
     # this is a format provided by the Stream conversion of
     # midi events; it pre-groups events for a chord together in nested pairs
     # of abs start time and the event object
-    for _tOn, _tOff, eOn in timedNoteList:
-        if eOn.channel == 10:
+    for _tOn, _tOff, midiOnEvent in timedNoteList:
+        if midiOnEvent.channel == 10:
             any_channel_10 = True
         p = pitch.Pitch()
-        p.midi = eOn.pitch
+        p.midi = midiOnEvent.pitch
         pitches.append(p)
-        v = volume.Volume(velocity=eOn.velocity)
+        v = volume.Volume(velocity=midiOnEvent.velocity)
         v.velocityIsRelative = False  # velocity is absolute coming from MIDI
         volumes.append(v)
 
@@ -664,9 +662,8 @@ def midiEventsToChord(
         returnClass = chord.Chord
 
     c = _constructOrUpdateNotRestSubclass(
-        firstOn,
-        tOn,
-        tOff,
+        first_tOn,
+        last_tOff,
         ticksPerQuarter,
         returnClass=returnClass
     )

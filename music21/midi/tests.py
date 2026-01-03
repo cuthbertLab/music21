@@ -1294,8 +1294,8 @@ class Test(unittest.TestCase):
         fp = dirLib / 'test05.mid'
 
         # a simple file created in athenacl
-        s = converter.parse(fp, forceSource=True)
-        # s.show('t')
+        s = converter.parse(fp)
+        # s.show('text')
         self.assertEqual(len(s[chord.Chord]), 5)
 
     def testMidiEventsImported(self):
