@@ -597,7 +597,7 @@ class LilypondConverter:
                 dur = str(self.lyMultipliedDurationFromDuration(el.duration))
                 returnString = returnString + 's' + dur
             # general exception is the only way to catch str exceptions
-            except Exception:  # pylint: disable=bare-except
+            except Exception:  # pylint: disable=broad-exception-caught
                 for c in el.duration.components:
                     dur = str(self.lyMultipliedDurationFromDuration(c))
                     returnString = returnString + 's' + dur
