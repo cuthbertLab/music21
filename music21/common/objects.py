@@ -193,7 +193,7 @@ class SlottedObjectMixin:
 
     def __getstate__(self):
         if getattr(self, '__dict__', None) is not None:
-            state = getattr(self, '__dict__').copy()
+            state = self.__dict__.copy()
         else:
             state = {}
         slots = self._getSlotsRecursive()

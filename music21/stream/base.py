@@ -5814,7 +5814,12 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         )
         return post.first()
 
-    def invertDiatonic(self, inversionNote: note.Note|None = None, *, inPlace=False):
+    def invertDiatonic(
+        self,
+        inversionNote: note.Note|None = None,
+        *,
+        inPlace: bool = False
+    ):
         '''
         inverts a stream diatonically around the given note (by default, middle C)
 
@@ -5881,23 +5886,23 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
 
         keySigSearch = returnStream.recurse().getElementsByClass(key.KeySignature)
 
-        quickSearch = True
+        ourKey: key.KeySignature | None
         if not keySigSearch:
             ourKey = key.Key('C')
         elif len(keySigSearch) == 1:
             ourKey = keySigSearch[0]
         else:
             ourKey = None  # for might be undefined warning
-            quickSearch = False
 
         inversionDNN = inversionNoteReal.pitch.diatonicNoteNum
-        for n in returnStream[note.NotRest]:
+        for n in returnStream[note.Note]:
             n.pitch.diatonicNoteNum = (2 * inversionDNN) - n.pitch.diatonicNoteNum
-            if quickSearch:  # use previously found
+            if ourKey:  # use previously found
                 n.pitch.accidental = ourKey.accidentalByStep(n.pitch.step)
             else:  # use context search
                 ksActive = n.getContextByClass(key.KeySignature)
-                n.pitch.accidental = ksActive.accidentalByStep(n.pitch.step)
+                if ksActive:
+                    n.pitch.accidental = ksActive.accidentalByStep(n.pitch.step)
 
             if n.pitch.accidental is not None:
                 n.pitch.accidental.displayStatus = None

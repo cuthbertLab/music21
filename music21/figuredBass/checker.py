@@ -369,18 +369,12 @@ def voiceCrossing(possibA):
     '''
     partViolations = []
     for part1Index in range(len(possibA)):
-        try:  # noqa
-            higherPitch = possibA[part1Index]
-            # noinspection PyStatementEffect
-            higherPitch.ps  # pylint: disable=pointless-statement
-        except AttributeError:
+        higherPitch = possibA[part1Index]
+        if not hasattr(higherPitch, 'ps'):
             continue
         for part2Index in range(part1Index + 1, len(possibA)):
-            try:  # noqa
-                lowerPitch = possibA[part2Index]
-                # noinspection PyStatementEffect
-                lowerPitch.ps  # pylint: disable=pointless-statement
-            except AttributeError:
+            lowerPitch = possibA[part2Index]
+            if not hasattr(lowerPitch, 'ps'):
                 continue
             if higherPitch < lowerPitch:
                 partViolations.append((part1Index + 1, part2Index + 1))

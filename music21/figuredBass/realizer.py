@@ -717,7 +717,7 @@ class Realization:
 
         else:  # Chorale-style output
             upperParts = []
-            for partNumber in range(len(possibilityProgression[0]) - 1):
+            for _partNumber in range(len(possibilityProgression[0]) - 1):
                 fbPart = stream.Part()
                 sol.insert(0.0, fbPart)
                 fbPart.append([copy.deepcopy(self._keySig), copy.deepcopy(self._inTime)])

@@ -347,7 +347,7 @@ class JobProcessor:
                     'filePath': job.filePath,
                     'remainingJobs': remainingJobs,
                 }
-        for worker in workers:
+        for _worker in workers:
             job_queue.put(None)
         job_queue.join()
         result_queue.close()

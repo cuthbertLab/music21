@@ -1945,7 +1945,7 @@ class Test(unittest.TestCase):
             else:
                 partition[key[0]].append(value)  # append unique ids
 
-        for key, value in partition.items():
+        for value in partition.values():
             # the length of the list should be the max value stored
             self.assertEqual(max(value), len(value))
 

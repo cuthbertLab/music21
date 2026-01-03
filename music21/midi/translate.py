@@ -647,7 +647,7 @@ def midiEventsToChord(
     # this is a format provided by the Stream conversion of
     # midi events; it pre-groups events for a chord together in nested pairs
     # of abs start time and the event object
-    for tOn, tOff, eOn in timedNoteList:
+    for _tOn, _tOff, eOn in timedNoteList:
         if eOn.channel == 10:
             any_channel_10 = True
         p = pitch.Pitch()
@@ -1676,7 +1676,7 @@ def assignPacketsToChannels(
 
     # after processing, collect all channels used
     foundChannels = []
-    for start, stop, usedChannel in list(uniqueChannelEvents):  # a list
+    for _start, _stop, usedChannel in list(uniqueChannelEvents):
         if usedChannel not in foundChannels:
             foundChannels.append(usedChannel)
     # for ch in chList:

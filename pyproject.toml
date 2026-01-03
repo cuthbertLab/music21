@@ -93,6 +93,8 @@ ignore = [
     'E303',
     # do not assign lambda -- okay by me.
     'E731',
+    # except and then raise without from -- should do soon.
+    'B904',
     # zip without strict= ... nice to turn this off someday, when code more mature
     'B905',
 ]

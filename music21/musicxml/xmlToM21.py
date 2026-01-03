@@ -6361,7 +6361,10 @@ class MeasureParser(SoundTagMixin, XMLParserBase):
                 stl.staffType = stream.enums.StaffType(xmlText)
             except ValueError:
                 warnings.warn(
-                    f'Got an incorrect staff-type in details: {mxStaffType}', MusicXMLWarning, stacklevel=2)
+                    f'Got an incorrect staff-type in details: {mxStaffType}',
+                    MusicXMLWarning,
+                    stacklevel=2,
+                )
         # TODO: staff-tuning*
         # TODO: capo
         seta(stl, mxDetails, 'staff-size', transform=_floatOrIntStr)

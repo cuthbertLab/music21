@@ -638,8 +638,8 @@ class Music21Object(prebase.ProtoM21Object):
             ignoreAttributes = ignoreAttributes | defaultIgnoreSet
 
         new = common.defaultDeepcopy(self, memo, ignoreAttributes=ignoreAttributes)
-        setattr(new, '_cache', {})
-        setattr(new, '_sites', Sites())
+        new._cache = {}
+        new._sites = Sites()
         if 'groups' in defaultIgnoreSet:
             new.groups = Groups()
 
@@ -648,7 +648,7 @@ class Music21Object(prebase.ProtoM21Object):
         newDerivation = Derivation(client=new)
         newDerivation.origin = self
         newDerivation.method = '__deepcopy__'
-        setattr(new, '_derivation', newDerivation)
+        new._derivation = newDerivation
         # None activeSite is correct for new value
 
         # must do this after copying

@@ -671,7 +671,7 @@ class Metadata(base.Music21Object):
         '''
         For type checking only. Does not run.
         '''
-        setattr(self, 'copyright', value)
+        self.copyright = value
 
     # SPECIAL METHODS #
     def all(
@@ -1302,7 +1302,7 @@ class Metadata(base.Music21Object):
         '''
         For type checking only. Does not run.
         '''
-        setattr(self, 'alternativeTitle', value)
+        self.alternativeTitle = value
 
     @property
     def composer(self):
@@ -1336,7 +1336,7 @@ class Metadata(base.Music21Object):
         '''
         For type checking only. Does not run.
         '''
-        setattr(self, 'composer', value)
+        self.composer = value
 
     @property
     def composers(self):
@@ -1372,7 +1372,7 @@ class Metadata(base.Music21Object):
         '''
         For type checking only. Does not run.
         '''
-        setattr(self, 'composers', value)
+        self.composers = value
 
     @property
     def dateCreated(self):
@@ -1405,7 +1405,7 @@ class Metadata(base.Music21Object):
         '''
         For type checking only. Does not run.
         '''
-        setattr(self, 'dateCreated', value)
+        self.dateCreated = value
 
     @property
     def fileFormat(self) -> str|None:
@@ -1419,7 +1419,7 @@ class Metadata(base.Music21Object):
         '''
         For type checking only. Does not run.
         '''
-        setattr(self, 'fileFormat', value)
+        self.fileFormat = value
 
     @property
     def filePath(self) -> str|None:
@@ -1434,7 +1434,7 @@ class Metadata(base.Music21Object):
         '''
         For type checking only. Does not run.
         '''
-        setattr(self, 'filePath', value)
+        self.filePath = value
 
     @property
     def corpusFilePath(self) -> str|None:
@@ -1448,7 +1448,7 @@ class Metadata(base.Music21Object):
         '''
         For type checking only. Does not run.
         '''
-        setattr(self, 'corpusFilePath', value)
+        self.corpusFilePath = value
 
     @property
     def fileNumber(self) -> str|None:
@@ -1462,7 +1462,7 @@ class Metadata(base.Music21Object):
         '''
         For type checking only. Does not run.
         '''
-        setattr(self, 'fileNumber', value)
+        self.fileNumber = value
 
     @property
     def localeOfComposition(self):
@@ -1481,7 +1481,7 @@ class Metadata(base.Music21Object):
         '''
         For type checking only. Does not run.
         '''
-        setattr(self, 'localeOfComposition', value)
+        self.localeOfComposition = value
 
     @property
     def librettist(self):
@@ -1504,7 +1504,7 @@ class Metadata(base.Music21Object):
         '''
         For type checking only. Does not run.
         '''
-        setattr(self, 'librettist', value)
+        self.librettist = value
 
     @property
     def librettists(self):
@@ -1525,7 +1525,7 @@ class Metadata(base.Music21Object):
         '''
         For type checking only. Does not run.
         '''
-        setattr(self, 'librettists', value)
+        self.librettists = value
 
     @property
     def lyricist(self):
@@ -1551,7 +1551,7 @@ class Metadata(base.Music21Object):
         '''
         For type checking only. Does not run.
         '''
-        setattr(self, 'lyricist', value)
+        self.lyricist = value
 
     @property
     def lyricists(self):
@@ -1572,7 +1572,7 @@ class Metadata(base.Music21Object):
         '''
         For type checking only. Does not run.
         '''
-        setattr(self, 'lyricists', value)
+        self.lyricists = value
 
     @property
     def movementName(self):
@@ -1595,7 +1595,7 @@ class Metadata(base.Music21Object):
         '''
         For type checking only. Does not run.
         '''
-        setattr(self, 'movementName', value)
+        self.movementName = value
 
     @property
     def movementNumber(self) -> str|None:
@@ -1618,7 +1618,7 @@ class Metadata(base.Music21Object):
         '''
         For type checking only. Does not run.
         '''
-        setattr(self, 'movementNumber', value)
+        self.movementNumber = value
 
     @property
     def number(self) -> str|None:
@@ -1648,7 +1648,7 @@ class Metadata(base.Music21Object):
         '''
         For type checking only. Does not run.
         '''
-        setattr(self, 'number', value)
+        self.number = value
 
     @property
     def opusNumber(self) -> str|None:
@@ -1678,7 +1678,7 @@ class Metadata(base.Music21Object):
         '''
         For type checking only. Does not run.
         '''
-        setattr(self, 'opusNumber', value)
+        self.opusNumber = value
 
     @property
     def title(self):
@@ -1700,7 +1700,7 @@ class Metadata(base.Music21Object):
         '''
         For type checking only. Does not run.
         '''
-        setattr(self, 'title', value)
+        self.title = value
 
     @property
     def bestTitle(self) -> str|None:

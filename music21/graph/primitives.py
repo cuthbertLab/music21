@@ -1430,7 +1430,7 @@ class GraphGroupedVerticalBar(Graph):
         rects = []
         for i in range(barsPerGroup):
             yVals = []
-            for j, x in enumerate(xVals):
+            for j, _x in enumerate(xVals):
                 # get position, then get bar group
                 yVals.append(yBundles[j][i])
             xValsShifted = []
