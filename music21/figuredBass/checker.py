@@ -85,7 +85,7 @@ def extractHarmonies(music21Stream):
     >>> from music21.figuredBass import checker
     >>> allHarmonies = checker.extractHarmonies(score)
     >>> for (offsets, notes) in sorted(allHarmonies.items()):
-    ...    print('{0!s:15}[{1!s:23}{2!s:23}{3!s:22}]'.format(offsets, notes[0], notes[1], notes[2]))
+    ...     print(f'{offsets!s:15}[{notes[0]!s:23}{notes[1]!s:23}{notes[2]!s:22}]')
     (0.0, 1.5)     [<music21.note.Note C>  <music21.note.Note A>  <music21.note.Note F> ]
     (1.5, 2.0)     [<music21.note.Note C>  <music21.note.Note A>  <music21.note.Note F> ]
     (2.0, 3.0)     [<music21.note.Note B-> <music21.note.Note G>  <music21.note.Note G> ]
@@ -123,7 +123,7 @@ def createOffsetMapping(music21Part):
     >>> v0 = score[0]
     >>> offsetMapping = checker.createOffsetMapping(v0)
     >>> for (offsets, notes) in sorted(offsetMapping.items()):
-    ...    print('{0!s:15}[{1!s:22}]'.format(offsets, notes[0]))
+    ...     print(f'{offsets!s:15}[{notes[0]!s:22}]')
     (0.0, 1.5)     [<music21.note.Note C> ]
     (1.5, 2.0)     [<music21.note.Note C> ]
     (2.0, 3.0)     [<music21.note.Note B->]
@@ -157,7 +157,7 @@ def correlateHarmonies(currentMapping, music21Part):
     >>> v1 = score[1]
     >>> newMapping = checker.correlateHarmonies(offsetMapping, v1)
     >>> for (offsets, notes) in sorted(newMapping.items()):
-    ...    print('{0!s:15}[{1!s:23}{2!s:21}]'.format(offsets, notes[0], notes[1]))
+    ...     print(f'{offsets!s:15}[{notes[0]!s:23}{notes[1]!s:21}]')
     (0.0, 1.5)     [<music21.note.Note C>  <music21.note.Note A>]
     (1.5, 2.0)     [<music21.note.Note C>  <music21.note.Note A>]
     (2.0, 3.0)     [<music21.note.Note B-> <music21.note.Note G>]

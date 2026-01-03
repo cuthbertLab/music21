@@ -241,8 +241,8 @@ class VexflowPickler:
         loadM21Formatted = self.getLoadTemplate(d)
         jsBodyScript = self.getJSBodyScript(dataSplit, d)
         formatted = self.templateHtml.format(title=title,
-                                                 loadM21Template=loadM21Formatted,
-                                                 jsBodyScript=jsBodyScript)
+                                             loadM21Template=loadM21Formatted,
+                                             jsBodyScript=jsBodyScript)
         return formatted
 
     def fromStream(self, thisStream, mode=None):

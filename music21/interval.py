@@ -3962,8 +3962,9 @@ def transposePitch(
     else:
         if not hasattr(interval1, 'transposePitch'):
             raise IntervalException(
-                'interval must be a music21.interval.Interval object not {}'.format(
-                    interval1.__class__.__name__))
+                'interval must be a music21.interval.Interval object not '
+                + interval1.__class__.__name__
+            )
     return interval1.transposePitch(pitch1, inPlace=inPlace)
 
 

@@ -1593,11 +1593,12 @@ class Staff(stream.Part):
         self.staffLayout = None
 
     def _reprInternal(self):
-        return '{0}: p.{1}, sys.{2}, st.{3}'.format(self.scoreStaffNumber,
-                                                    self.pageNumber,
-                                                    self.pageSystemNumber,
-                                                    self.staffNumber)
-
+        return (
+            f'{self.scoreStaffNumber}: '
+            + f'p.{self.pageNumber}, '
+            + f'sys.{self.pageSystemNumber}, '
+            + f'st.{self.staffNumber}'
+        )
 
 _DOC_ORDER = [ScoreLayout, PageLayout, SystemLayout, StaffLayout, LayoutBase,
               LayoutScore, Page, System, Staff]

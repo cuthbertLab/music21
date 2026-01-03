@@ -99,8 +99,10 @@ class SearchMatch(namedtuple('SearchMatch', ['elStart', 'els', 'index', 'iterato
     }
 
     def __repr__(self):
-        return 'SearchMatch(elStart={0}, els=len({1}), index={2}, iterator=[...])'.format(
-            repr(self.elStart), len(self.els), repr(self.index))
+        es = self.elStart
+        el = len(self.els)
+        ix = self.index
+        return f'SearchMatch(elStart={es!r}, els=len({el}), index={ix!r}, iterator=[...])'
 
 
 class StreamSearcher:

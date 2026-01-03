@@ -429,14 +429,18 @@ class BrailleSegment(text.BrailleText):
                     continue
             except TypeError:
                 pass
-            allKeys.append('Measure {0}, {1} {2}:\n'.format(itemKey.measure,
-                                                             affinityNames[itemKey.affinity],
-                                                             itemKey.ordinal + 1))
+            allKeys.append(
+                f'Measure {itemKey.measure}, '
+                f'{affinityNames[itemKey.affinity]} '
+                f'{itemKey.ordinal + 1}:\n'
+            )
             gStr = str(grouping)
             allGroupings.append(gStr)
             prevKey = itemKey
-        allElementGroupings = '\n'.join([''.join([k, g, '\n==='])
-                                          for (k, g) in list(zip(allKeys, allGroupings))])
+        allElementGroupings = '\n'.join(
+            f'{k}{g}\n==='
+            for k, g in zip(allKeys, allGroupings)
+        )
         out = '\n'.join(['---begin segment---',
                           name,
                           allElementGroupings,
@@ -1114,15 +1118,21 @@ class BrailleGrandSegment(BrailleSegment, text.BrailleKeyboard):
         allPairs = []
         for (rightKey, leftKey) in self.yieldCombinedGroupingKeys():
             if rightKey is not None:
-                rightHeading = 'Measure {0} Right, {1} {2}:\n'.format(
-                    rightKey.measure, affinityNames[rightKey.affinity], rightKey.ordinal + 1)
+                rightHeading = (
+                    f'Measure {rightKey.measure} Right, '
+                    f'{affinityNames[rightKey.affinity]} '
+                    f'{rightKey.ordinal + 1}:\n'
+                )
                 rightContents = str(self._groupingDict.get(rightKey))
                 rightFull = ''.join([rightHeading, rightContents])
             else:
                 rightFull = ''
             if leftKey is not None:
-                leftHeading = '\nMeasure {0} Left, {1} {2}:\n'.format(
-                    leftKey.measure, affinityNames[leftKey.affinity], leftKey.ordinal + 1)
+                leftHeading = (
+                    f'\nMeasure {leftKey.measure} Left, '
+                    f'{affinityNames[leftKey.affinity]} '
+                    f'{leftKey.ordinal + 1}:\n'
+                )
                 leftContents = str(self._groupingDict.get(leftKey))
                 leftFull = ''.join([leftHeading, leftContents])
             else:

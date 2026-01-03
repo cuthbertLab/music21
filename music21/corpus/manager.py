@@ -355,9 +355,10 @@ def getMetadataBundleByCorpus(corpusObject: corpora.Corpus) -> bundles.MetadataB
             assert mdb is not None  # cacheMetadataBundleFromDisk makes None impossible
         return mdb
     else:  # pragma: no cover
-        raise CorpusException('No metadata bundle found for corpus {0} with name {1}'.format(
-            corpusObject, corpusName))
-
+        raise CorpusException(
+            f'No metadata bundle found for corpus {corpusObject} '
+            f'with name {corpusName}'
+        )
 
 def cacheMetadataBundleFromDisk(corpusObject: corpora.Corpus) -> None:
     r'''
