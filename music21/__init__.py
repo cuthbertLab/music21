@@ -167,6 +167,16 @@ __all__ = [
     'voiceLeading',
     'volpiano',
     'volume',
+
+    'Music21Exception',
+    'SitesException',
+    'Music21ObjectException',
+    'ElementException',
+
+    'Groups',
+    'Music21Object',
+    'ElementWrapper',
+    'VERSION',
 ]
 
 # ------------------------------------------------------------------------------

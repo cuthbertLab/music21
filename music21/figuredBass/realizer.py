@@ -61,9 +61,6 @@ from music21.figuredBass import realizerScale
 from music21.figuredBass import rules
 from music21.figuredBass import segment
 
-if t.TYPE_CHECKING:
-    from music21.stream.iterator import StreamIterator
-
 
 def figuredBassFromStream(streamPart: stream.Stream) -> FiguredBassLine:
     # noinspection PyShadowingNames

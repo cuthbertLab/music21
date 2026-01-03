@@ -21,7 +21,6 @@ import os
 import sys
 import typing
 import types
-import unittest
 import unittest.runner
 from unittest.signals import registerResult
 import warnings
@@ -91,12 +90,12 @@ def testImports():
     '''
     # pylint: disable=unused-import
     try:
-        import scipy  # type: ignore
+        import scipy  # type: ignore  # noqa: F401
     except ImportError as e:
         raise ImportError('pip install scipy : needed for running test suites') from e
 
     try:
-        from Levenshtein import StringMatcher  # type: ignore
+        from Levenshtein import StringMatcher  # type: ignore  # noqa: F401
     except ImportError as e:
         raise ImportError('pip install python-Levenshtein : needed for running test suites') from e
 

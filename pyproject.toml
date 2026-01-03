@@ -76,7 +76,9 @@ line-length = 100
 
 [tool.ruff.lint]
 # Flake8 core (pycodestyle + pyflakes) + flake8-quotes
-select = ['E', 'Q']
+select = ['E', 'Q', 'F']
+
+dummy-variable-rgx = "^(_.*|unused.*|i|j|counter|junk|dummy)"
 
 # add once allowed: E122 (continuation line missing indentation) and E124 (bracket align)
 
@@ -104,7 +106,7 @@ ignore = [
 'music21/musicxml/testFiles.py' = ['E501']  # line-too-long
 'music21/musicxml/testPrimitive.py' = ['E501']  # line-too-long
 'music21/romanText/testFiles.py' = ['E501']  # line-too-long
-'music21/search/__init__.py' = ['F403']
+'music21/search/__init__.py' = ['F403', 'F405']  # 405--star exports fine
 'music21/variant.py' = ['E501']  # line-too-long
 
 [tool.ruff.lint.flake8-quotes]

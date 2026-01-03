@@ -161,14 +161,9 @@ from music21.metadata import primitives
 from music21.metadata.primitives import (
     Contributor,
     Copyright,
-    Creator,
     Date,
-    DateBetween,
     DatePrimitive,
-    DateRelative,
-    DateSelection,
     DateSingle,
-    Imprint,
     Text,
     ValueType,
 )
