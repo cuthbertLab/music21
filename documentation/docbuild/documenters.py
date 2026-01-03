@@ -942,13 +942,10 @@ class ClassDocumenter(ObjectDocumenter):
                 result.append('.. hlist::')
                 result.append('   :columns: 3')
                 result.append('')
-                formatString = '   - :attr:`~{0}.{1}`'
+                basePath = baseDocumenter.referentPackageSystemPath
                 for attrName in attrNames:
                     result.append(
-                        formatString.format(
-                            baseDocumenter.referentPackageSystemPath,
-                            attrName,
-                        )
+                        f'   - :attr:`~{basePath}.{attrName}`'
                     )
                 result.append('')
         return result
@@ -1596,14 +1593,15 @@ class CorpusDocumenter(Documenter):
 
     # def getRstVirtualWorkFileDictFormat(self, corpusFile):
     #     result = []
-    #     result.append('- {0} *({1})*: `{2}`'.format(
-    #         str(corpusFile.title),
-    #         str(corpusFile.format),
-    #         str(corpusFile.path),
-    #         ))
+    #     result.append(
+    #         f'- {corpusFile.title} '
+    #         f'*({corpusFile.format})*: '
+    #         f'`{corpusFile.path}`'
+    #     )
     #     result.append('')
-    #     result.append('  Source: {0}'.format(
-    #         str(corpusFile.url)))
+    #     result.append(
+    #         f'  Source: {corpusFile.url}'
+    #     )
     #     result.append('')
     #     return result
 

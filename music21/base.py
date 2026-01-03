@@ -2127,10 +2127,11 @@ class Music21Object(prebase.ProtoM21Object):
                 hypotheticalPosition = positionInStream.modify(offset=inStreamOffset)
 
                 if topLevel not in memo:
-                    # environLocal.printDebug('Yielding {}, {}, {} from contextSites'.format(
-                    #                                                topLevel,
-                    #                                                inStreamPos.shortRepr(),
-                    #                                                recurType))
+                    # environLocal.printDebug(
+                    #     f'Yielding {topLevel}, '
+                    #     f'{inStreamPos.shortRepr()}, '
+                    #     f'{recurType} from contextSites'
+                    # )
                     if returnSortTuples:
                         yield ContextSortTuple(topLevel, hypotheticalPosition, recurType)
                     else:
