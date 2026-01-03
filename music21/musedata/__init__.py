@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 # Name:         musedata/__init__.py
 # Purpose:      parses Walter Hewlett's MuseData format

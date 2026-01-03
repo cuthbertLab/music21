@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 '''
 The Lilypond MusicXML Test Suite comes from
 https://github.com/cuthbertLab/musicxmlTestSuite

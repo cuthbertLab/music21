@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 # Name:         vexflow/toMusic21j.py
 # Purpose:      music21 classes for converting music21 objects to music21j

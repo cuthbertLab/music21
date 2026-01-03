@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 # Name:         volume.py
 # Purpose:      Objects for representing volume, amplitude, and related

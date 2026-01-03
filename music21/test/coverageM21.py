@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 # Name:         coverageM21.py
 # Purpose:      Starts Coverage w/ default arguments

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # -----------------------------------------------------------------------------
 # Name:         stream/filters.py
 # Purpose:      Classes for filtering iterators of streams

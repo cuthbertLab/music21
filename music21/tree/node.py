@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # -----------------------------------------------------------------------------
 # Name:         timespans/node.py
 # Purpose:      Internal data structures for timespan collections

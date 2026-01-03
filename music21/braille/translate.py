@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # -----------------------------------------------------------------------------
 # Name:         translate.py
 # Purpose:      music21 class which allows transcription of music21 data to braille

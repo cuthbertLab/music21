@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 # Name:         test.test_base.py
 # Purpose:      music21 tests for Music21Objects etc.

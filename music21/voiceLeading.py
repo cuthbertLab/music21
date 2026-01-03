@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 # Name:         voiceLeading.py
 # Purpose:      music21 classes for voice leading

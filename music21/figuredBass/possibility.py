@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 # Name:         possibility.py
 # Purpose:      rule checking functions for a "possibility" represented as a tuple.

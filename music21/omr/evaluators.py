@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 # Name:         omr/evaluators.py
 # Purpose:      music21 module for evaluating correcting of output from OMR software

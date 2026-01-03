@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 # Name:         analysis/neoRiemannian.py
 # Purpose:      Neo-Riemannian Chord Transformations

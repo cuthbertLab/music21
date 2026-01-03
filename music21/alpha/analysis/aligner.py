@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 # Name:         alpha/analysis/aligner.py
 # Purpose:      A general aligner that tries its best to align two streams

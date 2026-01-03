@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 # Name:         graph/axis.py
 # Purpose:      Classes for extracting one dimensional data for graphs

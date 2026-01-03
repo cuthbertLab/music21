@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 # Name:         audioSearch.transcriber.py
 # Purpose:      Automatically transcribe melodies from a microphone or

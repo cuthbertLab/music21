@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 # Name:         fromCapellaXML.py
 # Purpose:      Module for importing capellaXML (.capx) files.

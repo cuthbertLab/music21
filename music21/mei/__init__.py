@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # -----------------------------------------------------------------------------
 # Name:         mei/__init__.py
 # Purpose:      MEI: The Music Encoding Initiative modules and classes

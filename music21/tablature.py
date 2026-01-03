@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 # Name:         tablature.py
 # Purpose:      Object for storing music21 information in the form of musical tablature.

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 # Name:         noteworthy/__init__.py
 # Purpose:      parses NWCTXT Notation

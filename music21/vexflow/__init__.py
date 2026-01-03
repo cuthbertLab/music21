@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 # Name:         vexflow/__init__.py
 # Purpose:      music21 classes for converting music21 objects to vexflow

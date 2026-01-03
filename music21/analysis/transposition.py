@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 # Name:         transposition.py
 # Purpose:      Tools for checking distinct transposition

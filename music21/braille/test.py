@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 # Name:         test.py
 # Purpose:      Examples from "Introduction to Braille Music Transcription"

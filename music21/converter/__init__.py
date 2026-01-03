@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 # Name:         converter/__init__.py
 # Purpose:      Provide a common way to create Streams from any data music21

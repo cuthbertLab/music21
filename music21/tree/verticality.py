@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # ----------------------------------------------------------------------------
 # Name:         tree/verticality.py
 # Purpose:      Object for dealing with vertical simultaneities in a

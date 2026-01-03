@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # -------------------------------------------------------------------------------
 # Name:         tinyNotation.py
 # Purpose:      A simple notation input format.

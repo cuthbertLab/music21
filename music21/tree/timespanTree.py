@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # -----------------------------------------------------------------------------
 # Name:         tree/timespanTree.py
 # Purpose:      Subclasses of tree.trees.OffsetTree for manipulation
@@ -814,9 +813,9 @@ class TimespanTree(trees.OffsetTree):
 class Test(unittest.TestCase):
 
     def testGetVerticalityAtWithKey(self):
-        from music21 import stream
         from music21 import key
         from music21 import note
+        from music21 import stream
         s = stream.Stream()
         s.insert(0, key.Key('C'))
         s.insert(0, note.Note('F#4'))

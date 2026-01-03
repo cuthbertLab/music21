@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 # Name:         graph/primitives.py
 # Purpose:      Classes for graphing in matplotlib and/or other graphing tools.

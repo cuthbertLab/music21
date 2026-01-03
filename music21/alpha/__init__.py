@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # -----------------------------------------------------------------------------
 # Name:         alpha/__init__.py
 # Purpose:      music21 modules not fully ready for prime-time

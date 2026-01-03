@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 # Name:         docbuild/iterators.py
 # Purpose:      music21 documentation iterators, including Jupyter notebook to ReST converter

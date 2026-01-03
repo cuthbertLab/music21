@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # -----------------------------------------------------------------------------
 # Name:         meter.tools.py
 # Purpose:      Tools for working with meter

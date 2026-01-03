@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 # Name:         exceptions21.py
 # Purpose:      music21 Exceptions (called out to not require import music21 to access)

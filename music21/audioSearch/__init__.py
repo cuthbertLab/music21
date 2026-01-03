@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # -----------------------------------------------------------------------------
 # Name:         audioSearch.py
 # Purpose:      base subroutines for all audioSearching and score following

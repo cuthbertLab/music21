@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 # Name:         musicxml/xmlObjects.py
 # Purpose:      MusicXML objects for conversion to and from music21

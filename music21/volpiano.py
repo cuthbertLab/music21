@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 # Name:         volpiano.py
 # Purpose:      music21 classes for converting to and from volpiano
