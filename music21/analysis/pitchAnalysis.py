@@ -36,7 +36,7 @@ def pitchAttributeCount(s, pitchAttr='name'):
 
     >>> nameCount = analysis.pitchAnalysis.pitchAttributeCount(bach, 'name')
     >>> for n, count in nameCount.most_common(3):
-    ...     print(f'{n:2s}: {nameCount[n]:2d}')
+    ...     print(f'{n:>2s}: {nameCount[n]:2d}')
      D: 26
      A: 17
     F#: 15
@@ -44,7 +44,7 @@ def pitchAttributeCount(s, pitchAttr='name'):
 
     >>> nameOctaveCount = analysis.pitchAnalysis.pitchAttributeCount(bach, 'nameWithOctave')
     >>> for n in sorted(nameOctaveCount):
-    ...     print(f'{n:3s}: {nameOctaveCount[n]:2d}')
+    ...     print(f'{n:>3s}: {nameOctaveCount[n]:2d}')
      A2:  2
      A3:  5
      A4: 10
