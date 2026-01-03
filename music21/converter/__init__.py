@@ -706,8 +706,9 @@ class Converter:
             elif 'Time Signature:' in dataStrMakeStr and 'm1' in dataStrMakeStr:
                 useFormat = 'romanText'
             else:
-                raise ConverterException('File not found or no such format found for: %s' %
-                                         dataStrMakeStr)
+                raise ConverterException(
+                    f'File not found or no such format found for: {dataStrMakeStr}'
+                )
 
         self.setSubConverterFromFormat(useFormat)
         if t.TYPE_CHECKING:

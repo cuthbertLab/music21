@@ -127,7 +127,7 @@ class Dynamic(base.Music21Object):
     >>> ppp = dynamics.Dynamic(0.15)  # on 0 to 1 scale
     >>> ppp.value
     'ppp'
-    >>> print('%.2f' % ppp.volumeScalar)
+    >>> print(f'{ppp.volumeScalar:.2f}')
     0.15
 
     Note that we got lucky last time because the dynamic 0.15 exactly corresponds
@@ -138,7 +138,7 @@ class Dynamic(base.Music21Object):
     >>> loud = dynamics.Dynamic(0.98)  # on 0 to 1 scale
     >>> loud.value
     'fff'
-    >>> print('%.2f' % loud.volumeScalar)
+    >>> print(f'{loud.volumeScalar:.2f}')
     0.98
 
     Transferring the .value ('fff') to a new Dynamic object will set the volumeScalar
@@ -147,7 +147,7 @@ class Dynamic(base.Music21Object):
     >>> loud2 = dynamics.Dynamic(loud.value)
     >>> loud2.value
     'fff'
-    >>> print('%.2f' % loud2.volumeScalar)
+    >>> print(f'{loud2.volumeScalar:.2f}')
     0.90
 
     Custom dynamics are possible:

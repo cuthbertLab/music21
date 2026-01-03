@@ -3500,7 +3500,7 @@ class Interval(IntervalBase):
                 # pitchAlt.ps = pitch2.ps + halfStepsToFix
                 # environLocal.printDebug(
                 #    'coercing pitch due to a transposition that requires an extreme ' +
-                #    'accidental: %s -> %s' % (pitch2, pitchAlt) )
+                #    f'accidental: {pitch2} -> {pitchAlt}')
                 # pitch2 = pitchAlt
                 pitch2.ps = pitch2.ps + halfStepsToFix
             else:

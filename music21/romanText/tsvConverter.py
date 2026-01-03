@@ -13,7 +13,6 @@ DCMLab's Annotated Beethoven Corpus (Neuwirth et al. 2018).
 '''
 from __future__ import annotations
 
-import abc
 import csv
 import fractions
 import pathlib
@@ -155,7 +154,7 @@ DCML_V2_HEADERS = (
 
 DCML_HEADERS = {1: DCML_V1_HEADERS, 2: DCML_V2_HEADERS}
 
-class TabChordBase(abc.ABC):
+class TabChordBase():
     '''
     Abstract base class for intermediate representation format for moving
     between tabular data and music21 chords.

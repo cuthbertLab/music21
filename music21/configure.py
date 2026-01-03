@@ -1419,7 +1419,7 @@ class ConfigurationAssistant:
 #         self.timeLeft -= value
 #
 #     def printPrompt(self):
-#         sys.stdout.write('%s: ' % self.prompt)
+#         sys.stdout.write(f'{self.prompt}: ')
 #
 #     def run(self):
 #         self.printPrompt()  # print on first call
@@ -1445,7 +1445,7 @@ class ConfigurationAssistant:
 #         current.removeTime(updateInterval)
 #
 #         if intervalCount % reportInterval == reportInterval - 1:
-#             sys.stdout.write('\n time out in %s seconds\n' % current.timeLeft)
+#             sys.stdout.write(f'\n time out in {current.timeLeft} seconds\n')
 #             current.printPrompt()
 #
 #         intervalCount += 1
@@ -1459,7 +1459,7 @@ class ConfigurationAssistant:
 #     if post == None:
 #         print('got no value')
 #     else:
-#         print('got: %s' % post)
+#         print(f'got: {post}')
 # ------------------------------------------------------------------------------
 # define presented order in documentation
 _DOC_ORDER: list[type] = []

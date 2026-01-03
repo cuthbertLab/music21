@@ -462,10 +462,12 @@ class Spanner(base.Music21Object):
             else:
                 pass
                 # it makes sense to not have multiple copies
-                # environLocal.printDebug(['''attempting to add an object (%s) that is
-                #    already found in the SpannerStorage stream of spanner %s;
-                #    this may not be an error.''' % (c, self)])
-
+                # environLocal.printDebug([
+                #     'attempting to add an object '
+                #     + f'({c}) that is already found in the SpannerStorage stream '
+                #     + f'of spanner {self};\n'
+                #     + 'this may not be an error.'
+                # ])
         self.spannerStorage.coreElementsChanged()
 
     def hasSpannedElement(self, spannedElement: base.Music21Object) -> bool:

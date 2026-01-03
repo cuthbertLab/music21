@@ -159,7 +159,7 @@ class ChordReducer:
         >>> cr = analysis.reduceChordsOld.ChordReducer()
         >>> cws = cr.computeMeasureChordWeights(s)
         >>> for pcs in sorted(cws):
-        ...     print("%18r  %2.1f" % (pcs, cws[pcs]))
+        ...     print(f'{pcs!r:18}  {cws[pcs]:2.1f}')
              (0, 4, 7)  3.0
          (0, 11, 4, 5)  1.0
 
@@ -167,7 +167,7 @@ class ChordReducer:
 
         >>> cws = cr.computeMeasureChordWeights(s, weightAlgorithm=cr.quarterLengthBeatStrength)
         >>> for pcs in sorted(cws):
-        ...     print("%18r  %2.1f" % (pcs, cws[pcs]))
+        ...     print(f'{pcs!r:18}  {cws[pcs]:2.1f}')
              (0, 4, 7)  2.2
          (0, 11, 4, 5)  0.5
 
@@ -176,7 +176,7 @@ class ChordReducer:
         >>> cws = cr.computeMeasureChordWeights(s,
         ...              weightAlgorithm=cr.quarterLengthBeatStrengthMeasurePosition)
         >>> for pcs in sorted(cws):
-        ...     print("%18r  %2.1f" % (pcs, cws[pcs]))
+        ...     print(f'{pcs!r:18}  {cws[pcs]:2.1f}')
              (0, 4, 7)  3.0
          (0, 11, 4, 5)  0.5
 
@@ -184,7 +184,7 @@ class ChordReducer:
 
         >>> cws = cr.computeMeasureChordWeights(s, weightAlgorithm=cr.qlbsmpConsonance)
         >>> for pcs in sorted(cws):
-        ...     print("%18r  %2.1f" % (pcs, cws[pcs]))
+        ...     print(f'{pcs!r:18}  {cws[pcs]:2.1f}')
                  (0, 4, 7)  3.0
              (0, 11, 4, 5)  0.5
         '''

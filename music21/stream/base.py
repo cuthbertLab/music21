@@ -668,11 +668,11 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
             else:
                 try:
                     match = self.elements[k]
-                except IndexError:
+                except IndexError as ie:
                     raise IndexError(
                         f'attempting to access index {k} '
                         + f'while elements is of size {len(self.elements)}'
-                    )
+                    ) from ie
             # setting active site as cautionary measure
             self.coreSelfActiveSite(match)
             return t.cast(M21ObjType, match)
@@ -2185,10 +2185,10 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         if isinstance(o, str) and returnSpecial is False and o in OffsetSpecial:
             try:
                 return getattr(self, o)
-            except AttributeError:  # pragma: no cover
+            except AttributeError as ae:  # pragma: no cover
                 raise base.SitesException(
                     'attempted to retrieve a bound offset with a string '
-                    + f'attribute that is not supported: {o}')
+                    + f'attribute that is not supported: {o}') from ae
         else:
             return o
 
@@ -2296,15 +2296,15 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
             try:
                 activeSite = item.activeSite
                 offset = item.getOffsetBySite(activeSite)
-            except AttributeError:
+            except AttributeError as ae:
                 raise StreamException(f'Cannot insert item {item!r} to stream '
-                                      + '-- is it a music21 object?')
+                                      + '-- is it a music21 object?') from ae
 
         # if not common.isNum(offset):
         try:  # using float conversion instead of isNum for performance
             offset = float(offset)
-        except (ValueError, TypeError):
-            raise StreamException(f'Offset {offset!r} must be a number.')
+        except (ValueError, TypeError) as ve:
+            raise StreamException(f'Offset {offset!r} must be a number.') from ve
 
         element = item
 
@@ -4318,9 +4318,9 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
             for m in measureIterator:
                 try:
                     mNumber = int(m.number)
-                except ValueError:  # pragma: no cover
+                except ValueError as ve:  # pragma: no cover
                     # should never happen.
-                    raise StreamException(f'found problematic measure for numbering: {m}')
+                    raise StreamException(f'found problematic measure for numbering: {m}') from ve
                 if mNumber != 0:
                     return True
             return False
@@ -5678,8 +5678,9 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         # get a default and/or place default at zero if nothing at zero
         if returnDefault:
             if not post or post[0].offset > 0.0:
-                ts = meter.TimeSignature('%s/%s' % (defaults.meterNumerator,
-                                                    defaults.meterDenominatorBeatType))
+                ts = meter.TimeSignature(
+                    f'{defaults.meterNumerator}/{defaults.meterDenominatorBeatType}'
+                )
                 post.insert(0, ts)
         # environLocal.printDebug(['getTimeSignatures(): final result:', post[0]])
         return post
@@ -5813,7 +5814,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         )
         return post.first()
 
-    def invertDiatonic(self, inversionNote=note.Note('C4'), *, inPlace=False):
+    def invertDiatonic(self, inversionNote: note.Note|None = None, *, inPlace=False):
         '''
         inverts a stream diatonically around the given note (by default, middle C)
 
@@ -5872,6 +5873,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
 
         * Changed in v5: inPlace is False by default.
         '''
+        inversionNoteReal: note.Note = inversionNote or note.Note('C4')
         if inPlace:
             returnStream = self
         else:
@@ -5888,7 +5890,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
             ourKey = None  # for might be undefined warning
             quickSearch = False
 
-        inversionDNN = inversionNote.pitch.diatonicNoteNum
+        inversionDNN = inversionNoteReal.pitch.diatonicNoteNum
         for n in returnStream[note.NotRest]:
             n.pitch.diatonicNoteNum = (2 * inversionDNN) - n.pitch.diatonicNoteNum
             if quickSearch:  # use previously found
@@ -6037,10 +6039,10 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
             unused = item.isStream
             element = item
         # if not isinstance(item, music21.Music21Object):
-        except AttributeError:
+        except AttributeError as ae:
             # element = music21.ElementWrapper(item)
             raise StreamException('to put a non Music21Object in a stream, '
-                                  + 'create a music21.ElementWrapper for the item')
+                                  + 'create a music21.ElementWrapper for the item') from ae
         # # if not an element, embed
         # if not isinstance(item, music21.Music21Object):
         #     element = music21.ElementWrapper(item)
@@ -6072,11 +6074,11 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
             unused = item.isStream
             element = item
         # if not isinstance(item, music21.Music21Object):
-        except AttributeError:
+        except AttributeError as ae:
             # if not an element, embed
             # element = music21.ElementWrapper(item)
             raise StreamException('to put a non Music21Object in a stream, '
-                                  + 'create a music21.ElementWrapper for the item')
+                                  + 'create a music21.ElementWrapper for the item') from ae
         # if not isinstance(item, music21.Music21Object):
         #     # if not an element, embed
         #     element = music21.ElementWrapper(item)
@@ -7048,7 +7050,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
             try:
                 makeNotation.makeBeams(returnStream, inPlace=True)
             except meter.MeterException as me:
-                warnings.warn(str(me))
+                warnings.warn(str(me), stacklevel=2)
 
         # note: this needs to be after makeBeams, as placing this before
         # makeBeams was causing the duration's tuplet to lose its type setting
@@ -7698,7 +7700,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         False
         >>> g = ''
         >>> for myElement in s:
-        ...    g += '%s: %s; ' % (myElement.offset, myElement.name)
+        ...    g += f'{myElement.offset}: {myElement.name}; '
         >>> g
         '0.0: C#; 2.0: C#; 4.0: C#; 1.0: D-; 3.0: D-; 5.0: D-; '
         >>> y = s.sorted()
@@ -7706,7 +7708,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         True
         >>> g = ''
         >>> for myElement in y:
-        ...    g += '%s: %s; ' % (myElement.offset, myElement.name)
+        ...    g += f'{myElement.offset}: {myElement.name}; '
         >>> g
         '0.0: C#; 1.0: D-; 2.0: C#; 3.0: D-; 4.0: C#; 5.0: D-; '
         >>> farRight = note.Note('E')
@@ -7715,13 +7717,13 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         >>> y.insert(farRight)
         >>> g = ''
         >>> for myElement in y:
-        ...    g += '%s: %s; ' % (myElement.offset, myElement.name)
+        ...    g += f'{myElement.offset}: {myElement.name}; '
         >>> g
         '0.0: C#; 1.0: D-; 2.0: C#; 3.0: D-; 4.0: C#; 5.0: D-; 2.0: E; '
         >>> z = y.sorted()
         >>> g = ''
         >>> for myElement in z:
-        ...    g += '%s: %s; ' % (myElement.offset, myElement.name)
+        ...    g += f'{myElement.offset}: {myElement.name}; '
         >>> g
         '0.0: C#; 1.0: D-; 2.0: C#; 2.0: E; 3.0: D-; 4.0: C#; 5.0: D-; '
         >>> z[2].name, z[3].name
@@ -7904,9 +7906,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
 
         >>> g = ''
         >>> for myElement in s:
-        ...    g += '%s: %s; ' % (myElement.offset, myElement.name)
-        ...
-
+        ...    g += f'{myElement.offset}: {myElement.name}; '
         >>> g
         '0.0: C#; 2.0: C#; 4.0: C#; 1.0: D-; 3.0: D-; 5.0: D-; '
 
@@ -7916,9 +7916,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
 
         >>> g = ''
         >>> for myElement in y:
-        ...    g += '%s: %s; ' % (myElement.offset, myElement.name)
-        ...
-
+        ...    g += f'{myElement.offset}: {myElement.name}; '
         >>> g
         '0.0: C#; 1.0: D-; 2.0: C#; 3.0: D-; 4.0: C#; 5.0: D-; '
 
@@ -8577,10 +8575,8 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
                 mm = ti.getSoundingMetronomeMark()
                 offsetMetronomeMarkPairs.append([o, mm])
 
-        for i, (o, mm) in enumerate(offsetMetronomeMarkPairs):
-            if i == 0 and o > 0.0:
-                getTempoFromContext = True
-            break  # just need first
+        if len(offsetMetronomeMarkPairs) and offsetMetronomeMarkPairs[0][0] > 0.0:
+            getTempoFromContext = True
 
         if getTempoFromContext:
             ti = self.getContextByClass('TempoIndication')
@@ -8717,10 +8713,9 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
                                      offsetPairs[0][1]))
             # add any remaining ranges, starting from the second; if last,
             # use the highest time as the boundary
-            for i, (o, mm) in enumerate(offsetPairs):
-                if i == 0:
-                    continue  # already added first
-                elif i == len(offsetPairs) - 1:  # last index
+            for i in range(1, len(offsetPairs)):
+                # start at 1 since we have already added first
+                if i == len(offsetPairs) - 1:  # last index
                     mmBoundaries.append((offsetPairs[i][0], highestTime,
                                          offsetPairs[i][1]))
                 else:  # add with next boundary
@@ -8978,9 +8973,10 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
                 'beatAndMeasureFromOffset: could not find a time signature for that place.')
         try:
             myBeat = ts1.getBeatProportion(searchOffset - myMeas.offset)
-        except (ValueError, IndexError, AttributeError, exceptions21.Music21Exception):
+        except (ValueError, IndexError, AttributeError, exceptions21.Music21Exception) as exc:
             raise StreamException(
-                'beatAndMeasureFromOffset: offset is beyond the end of the piece')
+                'beatAndMeasureFromOffset: offset is beyond the end of the piece'
+            ) from exc
         foundMeasureNumber = myMeas.number
         # deal with second half of partial measures
 
@@ -9639,8 +9635,9 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
 
             if not opFrac(sum(qlProcess)) == e.quarterLength:
                 raise StreamException(
-                    'cannot map quarterLength list into element Duration: %s, %s' % (
-                        sum(qlProcess), e.quarterLength))
+                    'cannot map quarterLength list into element Duration: '
+                    + f'{sum(qlProcess)}, {e.quarterLength}'
+                )
 
             post = e.splitByQuarterLengths(qlProcess, addTies=addTies)
             # remove e from the source

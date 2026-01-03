@@ -75,8 +75,8 @@ include = [
 line-length = 100
 
 [tool.ruff.lint]
-# Flake8 core (pycodestyle + pyflakes) + flake8-quotes
-select = ['E', 'Q', 'F']
+# Flake8, pycodestyle, flake8-quotes + pyflakes
+select = ['E', 'W', 'Q', 'F', 'B']
 
 dummy-variable-rgx = "^(_.*|unused.*|i|j|counter|junk|dummy)"
 
@@ -93,6 +93,8 @@ ignore = [
     'E303',
     # do not assign lambda -- okay by me.
     'E731',
+    # zip without strict= ... nice to turn this off someday, when code more mature
+    'B905',
 ]
 
 [tool.ruff.lint.per-file-ignores]

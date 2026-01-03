@@ -267,7 +267,11 @@ class PartStaffExporterMixin:
         joinable_components_list = flattenList(deduplicatedGroups)
         if len(set(joinable_components_list)) != len(joinable_components_list):
             warnings.warn(
-                MusicXMLWarning('Got overlapping StaffGroups; will not merge ANY groups.'))
+                MusicXMLWarning(
+                    'Got overlapping StaffGroups; will not merge ANY groups.'
+                ),
+                stacklevel=2,
+            )
             return []
 
         # Finally, store a reference to earlier siblings (if any) on PartExporters

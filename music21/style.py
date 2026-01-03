@@ -457,7 +457,7 @@ class TextStyle(Style):
                 value = common.numToIntOrFloat(value)
             except ValueError:
                 pass  # MusicXML font sizes can be CSS strings.
-                # raise TextFormatException('Not a supported size: %s' % value)
+                # raise TextFormatException(f'Not a supported size: {value}')
         self._fontSize = value
 
     fontSize = property(_getSize,
@@ -653,11 +653,8 @@ class StyleMixin(common.SlottedObjectMixin):
         >>> lObj.hasStyleInformation
         True
         '''
-        try:
-            self._style
-        except AttributeError:
-            pass
-
+        if not hasattr(self, '_style'):
+            return False
         return self._style is not None
 
     @property

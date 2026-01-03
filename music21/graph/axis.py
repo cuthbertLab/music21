@@ -1334,7 +1334,7 @@ class DynamicsAxis(Axis):
             self.setBoundariesFromData()
         for i in range(self.minValue, self.maxValue + 1):
             # place string in tex format for italic display
-            ticks.append((i, r'$%s$' % dynamics.shortNames[i]))
+            ticks.append((i, f'${dynamics.shortNames[i]}$'))
         return ticks
 
 # -----------------------------------------------------------------------------

@@ -459,7 +459,7 @@ class Test(unittest.TestCase):
         self.assertEqual(m2.duration.quarterLength, 4.0)
         # we cannot get a bar duration b/c we have not associated a ts
         try:
-            m2.barDuration.quarterLength
+            m2.barDuration.quarterLength  # noqa: B018 (useless expression)
         except exceptions21.StreamException:
             pass
 

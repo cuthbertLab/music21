@@ -1561,8 +1561,8 @@ def _validateAddress(address):
     # ultimately this can be removed
     # try:
     #     nfSet = cardinalityToChordMembers[card][(index, inversion)][0]
-    # except KeyError:
-    #     raise ChordTablesException('cannot validate address: %s' % address)
+    # except KeyError as ke:
+    #     raise ChordTablesException(f'cannot validate address: {address}') from ke
 
     return (card, index, inversion)
 

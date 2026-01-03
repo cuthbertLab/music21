@@ -353,7 +353,6 @@ class AbstractScale(Scale):
         for currentPitch, nextPitch in zip(pitchList, pitchList[1:]):
             intervalList.append(interval.Interval(currentPitch, nextPitch))
         if pitchList[-1].name == pitchList[0].name:  # the completion of the scale has been given.
-            # print('hi %s ' % pitchList)
             # this scale is only octave duplicating if the top note is exactly
             # 1 octave above the bottom; if it spans more than one octave,
             # all notes must be identical in each octave
@@ -1752,12 +1751,6 @@ class ConcreteScale(Scale):
             _pitchDegreeCache[cacheKey] = post.nameWithOctave
 
         return post
-
-        # if 0 < degree <= self._abstract.getDegreeMaxUnique():
-        #     return self.getPitches()[degree - 1]
-        # else:
-        #     raise('Scale degree is out of bounds: must be between 1 and %s.' % (
-        #        self._abstract.getDegreeMaxUnique()))
 
     def pitchesFromScaleDegrees(
             self,

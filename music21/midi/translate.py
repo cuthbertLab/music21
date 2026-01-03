@@ -443,7 +443,6 @@ def midiEventsToNote(
         try:
             i = PERCUSSION_MAPPER.midiPitchToInstrument(eOn.pitch)
         except MIDIPercussionException:
-            # warnings.warn(str(mpe), TranslateWarning)
             i = instrument.UnpitchedPercussion()
         nr.storedInstrument = i
         # TODO: set reasonable displayPitch?
@@ -679,7 +678,6 @@ def midiEventsToChord(
             try:
                 i = PERCUSSION_MAPPER.midiPitchToInstrument(midi_pitch)
             except MIDIPercussionException:
-                # warnings.warn(str(mpe), TranslateWarning)
                 i = instrument.UnpitchedPercussion()
             unp.storedInstrument = i
             c.add(unp)
@@ -938,7 +936,9 @@ def midiEventToInstrument(
     except UnicodeDecodeError:
         warnings.warn(
             f'Unable to determine instrument from {event}; getting generic Instrument',
-            TranslateWarning)
+            TranslateWarning,
+            stacklevel=2,
+        )
         i = instrument.Instrument()
     except instrument.InstrumentException:
         # Debug logging would be better than warning here
@@ -1059,7 +1059,8 @@ def timeSignatureToMidiEvents(ts, includeDeltaTime=True) -> list[DeltaTime|MidiE
     if n > 255:
         warnings.warn(
             f'TimeSignature with numerator > 255 cannot be stored in MIDI. Ignoring {ts}',
-            TranslateWarning
+            TranslateWarning,
+            stacklevel=2
         )
         return []
 
@@ -1958,7 +1959,9 @@ def lyricTimingsFromEvents(
             except UnicodeDecodeError:
                 warnings.warn(
                     f'Unable to decode lyrics from {e} as {encoding}',
-                    TranslateWarning)
+                    TranslateWarning,
+                    stacklevel=2,
+                )
     return lyrics
 
 
@@ -2460,7 +2463,8 @@ def channelInstrumentData(
                             f'{inst} specified 1-indexed MIDI channel {thisChannel} '
                             f'but acceptable channels were {acceptableChannels}. '
                             'Defaulting to channel 1.',
-                            TranslateWarning)
+                            TranslateWarning,
+                            stacklevel=2)
                         thisChannel = 1
                 channelsAssigned.add(thisChannel)
                 channelByInstrument[inst.midiProgram] = thisChannel

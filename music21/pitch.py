@@ -2592,7 +2592,7 @@ class Pitch(prebase.ProtoM21Object):
 
         >>> p = pitch.Pitch('c4')
         >>> p.microtone = 20
-        >>> print('%.1f' % p.ps)
+        >>> print(f'{p.ps:.1f}')
         60.2
 
         Octaveless pitches use their .implicitOctave attributes:

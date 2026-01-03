@@ -151,7 +151,7 @@ def autocorrelationFunction(recordedSignal, recordSampleRateIn):
             # noinspection PyPackageRequirements
             from scipy.signal import fftconvolve as convolve  # type: ignore
     except ImportError:  # pragma: no cover
-        warnings.warn('Running convolve without scipy -- will be slower')
+        warnings.warn('Running convolve without scipy -- will be slower', stacklevel=2)
         convolve = numpy.convolve
 
     recordedSignal = numpy.array(recordedSignal)

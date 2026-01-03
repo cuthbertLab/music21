@@ -215,7 +215,7 @@ class StreamIterator(prebase.ProtoM21Object, Sequence[M21ObjType]):
             return e
 
         self.cleanup()
-        raise StopIteration
+        raise StopIteration()
 
     def __getattr__(self, attr):
         '''
@@ -1575,7 +1575,7 @@ class OffsetIterator(StreamIterator, Sequence[list[M21ObjType]]):
 
     def __next__(self) -> list[M21ObjType]:  # type: ignore
         if self.raiseStopIterationNext:
-            raise StopIteration
+            raise StopIteration()
 
         retElementList: list[M21ObjType] = []
         # make sure that cleanup is not called during the loop
@@ -1602,13 +1602,13 @@ class OffsetIterator(StreamIterator, Sequence[list[M21ObjType]]):
                     self.activeInformation['lastYielded'] = retElementList[0]
                     return retElementList
 
-        except StopIteration:  # from the while statement.
+        except StopIteration as parent_stop:  # from the while statement.
             if retElementList:
                 self.raiseStopIterationNext = True
                 self.activeInformation['lastYielded'] = retElementList[0]
                 return retElementList
             else:
-                raise StopIteration
+                raise StopIteration() from parent_stop
 
     def reset(self):
         '''
@@ -1855,7 +1855,7 @@ class RecursiveIterator(StreamIterator[M21ObjType], Sequence[M21ObjType]):
 
         self.activeInformation['lastYielded'] = None  # always clean this up, no matter what
         self.cleanup()
-        raise StopIteration
+        raise StopIteration()
 
     def reset(self):
         '''

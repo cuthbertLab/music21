@@ -588,7 +588,7 @@ class Music21Object(prebase.ProtoM21Object):
         if isinstance(new_id, int) and new_id > defaults.minIdNumberToConsiderMemoryLocation:
             msg = 'Setting an ID that could be mistaken for a memory location '
             msg += f'is discouraged: got {new_id}'
-            warnings.warn(msg)
+            warnings.warn(msg, stacklevel=2)
         self._id = new_id
 
     def mergeAttributes(self, other: Music21Object) -> None:

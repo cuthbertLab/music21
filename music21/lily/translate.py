@@ -313,7 +313,7 @@ class LilypondConverter:
             scoreObj = stream.Score()
             scoreObj.insert(0, m21ObjectIn)
             self.loadObjectFromScore(scoreObj, makeNotation=False)
-            # raise LilyTranslateException('Unknown stream type %s.' % (m21ObjectIn.__class__))
+            # raise LilyTranslateException(f'Unknown stream type {m21ObjectIn.__class__}')
 
     def loadObjectFromOpus(self, opusIn=None, makeNotation=True):
         r'''
@@ -1088,8 +1088,6 @@ class LilypondConverter:
             lyObject = self.lyPrefixCompositeMusicFromStream(thisObject)
             currentMusicList.append(lyObject)
             lyObject.setParent(contextObject)
-            # except AttributeError as ae:
-            #    raise ValueError('Cannot parse %s: %s' % (thisObject, str(ae)))
         elif 'Note' in c or 'Rest' in c:
             self.appendContextFromNoteOrRest(thisObject)
         elif 'Chord' in c:
@@ -2197,18 +2195,19 @@ class LilypondConverter:
                 simpleString='Staff',
                 music=lpOssiaMusicVariantWithSpacer)
 
-        # optionalContextMod = r'''
+        # optionalContextMod = rf'''
         # \with {
         #      \remove "Time_signature_engraver"
-        #      alignAboveContext = #"%s"
+        #      alignAboveContext = #"{containerId}"
         #      fontSize = #-3
         #      \override StaffSymbol.staff-space = #(magstep -3)
         #      \override StaffSymbol.thickness = #(magstep -3)
         #      \override TupletBracket.bracket-visibility = ##f
         #      \override TupletNumber.stencil = ##f
         #      \override Clef.transparent = ##t
+        #      \override BarLine.transparent = ##t
         #    }
-        # ''' % containerId #\override BarLine.transparent = ##t
+        # '''
         # # is the best way of fixing the #barlines that I have come up with.
         # lpPrefixCompositeMusicVariant.optionalContextMod = optionalContextMod
 

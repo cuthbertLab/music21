@@ -926,8 +926,10 @@ class OffsetTree(ElementTree):
         '''
         try:
             offset = element.offset
-        except AttributeError:
-            raise ElementTreeException('element must be a Music21Object, i.e., must have offset')
+        except AttributeError as ae:
+            raise ElementTreeException(
+                'element must be a Music21Object, i.e., must have offset'
+            ) from ae
         candidates = self.elementsStartingAt(offset)
         if element in candidates:
             return True

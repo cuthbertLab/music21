@@ -1240,13 +1240,14 @@ class BrailleGrandSegment(BrailleSegment, text.BrailleKeyboard):
     #                     gkLeft = gkRight._replace(affinity=gkRight.affinity - 1)
     #                 try:
     #                     groupingKeysLeft.remove(gkLeft)
-    #                 except ValueError:
+    #                 except ValueError as ve:
     #                     raise BrailleSegmentException(
-    #                         'Misaligned braille groupings: ' +
-    #                         'groupingKeyLeft was %s' % gkLeft +
-    #                         'groupingKeyRight was %s' % gkRight +
-    #                         'rightSegment was %s, leftSegment was %s' %
-    #                                    (rightSegment, leftSegment))
+    #                         'Misaligned braille groupings: '
+    #                         + f'groupingKeyLeft was {gkLeft} '
+    #                         + f'groupingKeyRight was {gkRight} '
+    #                         + f'rightSegment was {rightSegment}, '
+    #                         + f'leftSegment was {leftSegment}'
+    #                     ) from ve
     #
     #                 try:
     #                     combinedGroupingTuple = (gkRight, gkLeft)

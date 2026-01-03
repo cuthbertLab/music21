@@ -1259,7 +1259,8 @@ def interpolateElements(element1, element2, sourceStream,
     >>> destStream2.insert(50.5, element2)
     >>> tempo.interpolateElements(element1, element2, sourceStream, destStream2)
     >>> for el in [eA, eB, eC]:
-    ...    print('%.1f' % (el.getOffsetBySite(destStream2),))
+    ...    offset = el.getOffsetBySite(destStream2)
+    ...    print(f'{offset:.1f}')
     20.2
     30.3
     40.4

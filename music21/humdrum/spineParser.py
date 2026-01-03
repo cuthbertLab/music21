@@ -1096,7 +1096,7 @@ class HumdrumSpine(prebase.ProtoM21Object):
         Returns the current event and increments the iteration index.
         '''
         if self.iterIndex == len(self.eventList):
-            raise StopIteration
+            raise StopIteration()
         thisEvent = self.eventList[self.iterIndex]
         self.iterIndex += 1
         return thisEvent
@@ -1627,7 +1627,7 @@ class SpineCollection(prebase.ProtoM21Object):
         Returns the current spine and decrements the iteration index.
         '''
         if self.iterIndex < 0:
-            raise StopIteration
+            raise StopIteration()
         thisSpine = self.spines[self.iterIndex]
         self.iterIndex -= 1
         return thisSpine
@@ -2937,7 +2937,7 @@ class Test(unittest.TestCase):
         hf1.parse()
         masterStream = hf1.stream
         # for spineX in hf1.spineCollection:
-        #     spineX.stream.id = 'spine %s' % str(spineX.id)
+        #     spineX.stream.id = f'spine {spineX.id}'
         #     masterStream.append(spineX.stream)
         # self.assertTrue(common.whitespaceEqual
         #                  (common.stripAddresses(expectedOutput),

@@ -7,8 +7,8 @@ if __name__ == '__main__':
     try:
         # noinspection PyPackageRequirements
         import guppy  # type: ignore
-    except ImportError:
-        raise exceptions21.Music21Exception('memoryUsage.py requires guppy')
+    except ImportError as ie:
+        raise exceptions21.Music21Exception('memoryUsage.py requires guppy') from ie
 
     hp = guppy.hpy()
     hp.setrelheap()

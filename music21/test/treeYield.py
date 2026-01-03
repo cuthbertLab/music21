@@ -93,8 +93,10 @@ class TreeYielder:  # pragma: no cover
                 self.stackVals.append(objTuple)
                 try:
                     yield from self.run(gotValue, memo=memo)
-                except RuntimeError:
-                    raise ValueError(f'Maximum recursion on:\n{self.currentLevel()}')
+                except RuntimeError as runError:
+                    raise ValueError(
+                        f'Maximum recursion on:\n{self.currentLevel()}'
+                    ) from runError
                 self.stackVals.pop()
 
         self.currentStack.pop()

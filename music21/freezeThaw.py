@@ -1083,9 +1083,11 @@ class Test(unittest.TestCase):
         # for el in s._elements:
         #    idEl = el.id
         #    if idEl not in storedIds:
-        #        print('Could not find ID %s for element %r at offset %f' %
-        #              (idEl, el, el.offset))
+        #        print(
+        #            f'Could not find ID {idEl} for element {el!r} at offset {el.offset:f}'
+        #        )
         # print(storedIds)
+
         # s.show('t')
 
     def x_testFreezeThawPickle(self):

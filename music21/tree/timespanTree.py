@@ -196,8 +196,7 @@ class TimespanTree(trees.OffsetTree):
         >>> tsTree.insert(ts)
 
         >>> for timespan in ts:
-        ...     print("%r %s" % (timespan, tsTree.index(timespan)))
-        ...
+        ...     print(f'{timespan!r} {tsTree.index(timespan)}')
         <Timespan 0.0 2.0> 0
         <Timespan 0.0 9.0> 1
         <Timespan 1.0 1.0> 2
@@ -651,8 +650,7 @@ class TimespanTree(trees.OffsetTree):
         ()
 
         >>> for timespan in scoreTree.elementsOverlappingOffset(0.1):
-        ...     print("%r, %s" % (timespan, timespan.part.id))
-        ...
+        ...     print(f'{timespan!r}, {timespan.part.id}')
         <PitchedTimespan (0.0 to 0.5) <music21.note.Note C#>>, Soprano
         <PitchedTimespan (0.0 to 0.5) <music21.note.Note A>>, Tenor
         <PitchedTimespan (0.0 to 0.5) <music21.note.Note A>>, Bass
@@ -663,8 +661,7 @@ class TimespanTree(trees.OffsetTree):
 
         >>> scoreTree.splitAt(0.1)
         >>> for timespan in scoreTree.elementsStartingAt(0.1):
-        ...     print("%r, %s" % (timespan, timespan.part.id))
-        ...
+        ...     print(f'{timespan!r}, {timespan.part.id}')
         <PitchedTimespan (0.1 to 0.5) <music21.note.Note C#>>, Soprano
         <PitchedTimespan (0.1 to 0.5) <music21.note.Note A>>, Tenor
         <PitchedTimespan (0.1 to 0.5) <music21.note.Note A>>, Bass
@@ -718,7 +715,7 @@ class TimespanTree(trees.OffsetTree):
         ...     print(part)
         ...     horizontality = unwrapped[part]
         ...     for timespan in horizontality:
-        ...         print('\t%r' % timespan)
+        ...         print(f'\t{timespan!r}')
         ...
         <music21.stream.Part Alto>
             <PitchedTimespan (0.0 to 1.0) <music21.note.Note E>>

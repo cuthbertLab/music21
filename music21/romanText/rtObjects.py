@@ -824,8 +824,10 @@ class RTBeat(RTAtom):
         try:
             post = timeSignature.getOffsetFromBeat(beat)
         except exceptions21.TimeSignatureException:
-            environLocal.printDebug(['bad beat specification: %s in a meter of %s' % (
-                                    self.src, timeSignature)])
+            environLocal.printDebug([
+                'bad beat specification: '
+                + f'{self.src} in a meter of {timeSignature}'
+            ])
             post = 0.0
 
         return post
@@ -1164,11 +1166,13 @@ class RTHandler:
                     rtt = RTTagged(line)
                     rtt.lineNumber = currentLineNumber
                     post.append(rtt)
-            except Exception:
+            except Exception as exc:
                 import traceback
                 tracebackMessage = traceback.format_exc()
-                raise RTHandlerException('At line %s (%s) an exception was raised: \n%s' % (
-                    currentLineNumber, line, tracebackMessage))
+                raise RTHandlerException(
+                    f'At line {currentLineNumber} ({line}) an exception was raised:\n'
+                    + f'{tracebackMessage}'
+                ) from exc
         return post
 
     def tokenizeAtoms(self, line, container=None):

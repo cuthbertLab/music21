@@ -1104,7 +1104,7 @@ class GraphHorizontalBarWeighted(Graph):
         #     for x in range(int(math.floor(xMin)),
         #                    round(math.ceil(xMax)),
         #                    rangeStep):
-        #         xTicks.append([x, '%s' % x])
+        #         xTicks.append([x, f'{x}'])
         #         self.setTicks('x', xTicks)
         # environLocal.printDebug(['xTicks', xTicks])
 

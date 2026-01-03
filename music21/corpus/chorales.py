@@ -1168,7 +1168,7 @@ class Iterator:
         _currentIndex becomes higher than the _highestIndex, the iteration stops.
         '''
         if self._currentIndex > self._highestIndex:
-            raise StopIteration
+            raise StopIteration()
         nextChorale = self._returnChorale()
         self._currentIndex += 1
         return nextChorale

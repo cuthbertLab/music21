@@ -1429,7 +1429,7 @@ realizerScaleCache: dict[tuple[str, str], realizerScale.FiguredBassScale] = {}
 
 class ChordSymbol(Harmony):
     # noinspection SpellCheckingInspection
-    '''
+    r'''
     Class representing the Chord Symbols commonly found on lead sheets.
     Chord Symbol objects can be instantiated one of two main ways:
 
@@ -1485,7 +1485,8 @@ class ChordSymbol(Harmony):
     ...     chordSymbolName = 'C' + s
     ...     h = harmony.ChordSymbol(chordSymbolName)
     ...     pitchNames = [str(p) for p in h.pitches]
-    ...     print('%-10s%s' % (chordSymbolName, '[' + (', '.join(pitchNames)) + ']'))
+    ...     print(f'{chordSymbolName:<10}', end='[')
+    ...     print(*pitchNames, sep=', ', end=']\n')
     C         [C3, E3, G3]
     Cm        [C3, E-3, G3]
     C+        [C3, E3, G#3]

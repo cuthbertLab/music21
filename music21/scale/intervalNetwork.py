@@ -2201,7 +2201,7 @@ class IntervalNetwork:
         # now find lowest and highest pitch
         minPitch = post[-1]
         maxPitch = post[0]
-        for p, nId in postPairs + prePairs:
+        for p, _nId in postPairs + prePairs:
             if p.ps < minPitch.ps:
                 minPitch = p
             if p.ps > maxPitch.ps:
