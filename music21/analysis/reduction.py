@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 # Name:         reduction.py
 # Purpose:      Tools for creating a score reduction.

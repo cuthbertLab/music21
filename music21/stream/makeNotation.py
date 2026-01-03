@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # -----------------------------------------------------------------------------
 # Name:         makeNotation.py
 # Purpose:      functionality for manipulating streams

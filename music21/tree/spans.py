@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # -----------------------------------------------------------------------------
 # Name:         tree/spans.py
 # Purpose:      Tools for marking off spans of time that optionally contain

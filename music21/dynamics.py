@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 # Name:         dynamics.py
 # Purpose:      Module for dealing with dynamics changes.

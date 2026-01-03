@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 # Name:         scale.intervalNetwork.py
 # Purpose:      A graph of intervals, for scales and harmonies.

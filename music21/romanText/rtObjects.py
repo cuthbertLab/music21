@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 # Name:         romanText/rtObjects.py
 # Purpose:      music21 objects for processing roman numeral analysis text files

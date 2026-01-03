@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # -----------------------------------------------------------------------------
 # Name:         extensions.py
 # Purpose:      Sphinx extension for hiding and showing lines in docs

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 # Name:         configure.py
 # Purpose:      Installation and Configuration Utilities

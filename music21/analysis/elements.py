@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 # Name:         analysis/elements.py
 # Purpose:      Tools for analyzing general elements

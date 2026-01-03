@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 # Name:         repeat.py
 # Purpose:      Base classes for processing repeats

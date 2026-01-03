@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 # Name:         romanText/tsvConverter.py
 # Purpose:      Converter for the DCMLab's tabular format for representing harmonic analysis.

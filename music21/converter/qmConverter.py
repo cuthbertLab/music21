@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 # Name:         converter/qmConverter.py
 # Purpose:      Example of subclassing SubConverter to parse a new format

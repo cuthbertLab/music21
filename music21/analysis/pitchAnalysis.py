@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 # Name:         analysis/pitchAnalysis.py
 # Purpose:      Tools for analyzing pitches

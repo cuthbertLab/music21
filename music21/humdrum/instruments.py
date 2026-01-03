@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 # Name:         humdrum.instruments.py
 # Purpose:      Instrument Lists for Humdrum and kern in particular

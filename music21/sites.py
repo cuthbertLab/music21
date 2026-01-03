@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 # Name:         sites.py
 # Purpose:      Objects for keeping track of relationships among Music21Objects

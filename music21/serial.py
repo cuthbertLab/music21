@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 # Name:         serial.py
 # Purpose:      music21 classes for serial transformations

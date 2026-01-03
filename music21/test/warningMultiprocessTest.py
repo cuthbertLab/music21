@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 '''
 Runs MultiprocessTest with all warnings including traceback
 '''

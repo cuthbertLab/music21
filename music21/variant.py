@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 # Name:         variant.py
 # Purpose:      Ossia and other variant reading tools

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 # Name:         object.py
 # Purpose:      music21 classes for indicating Braille formatting, etc.

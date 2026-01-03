@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 # Name:         harmonicFunction.py
 # Purpose:      Mapping between Roman numeral figures and harmonic function labels

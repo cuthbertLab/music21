@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 # Name:         documentation/library/documenters.py
 # Purpose:      music21 documentation helper classes for proper formatting

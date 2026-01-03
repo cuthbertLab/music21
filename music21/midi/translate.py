@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 # Name:         midi.translate.py
 # Purpose:      Translate MIDI and music21 objects

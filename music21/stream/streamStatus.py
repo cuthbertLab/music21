@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # -----------------------------------------------------------------------------
 # Name:         streamStatus.py
 # Purpose:      Functionality for reporting on the notational status of streams

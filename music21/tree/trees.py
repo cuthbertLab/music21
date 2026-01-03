@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # -----------------------------------------------------------------------------
 # Name:         tree/trees.py
 # Purpose:      Subclasses of tree.core.AVLTree for different purposes
@@ -1482,8 +1481,8 @@ class Test(unittest.TestCase):
         test that get position after works with
         an offset when the tree is built on SortTuples.
         '''
-        from music21 import stream
         from music21 import note
+        from music21 import stream
 
         et = ElementTree()
 

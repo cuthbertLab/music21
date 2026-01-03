@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # -----------------------------------------------------------------------------
 # Name:         musicxml/archiveTools.py
 # Purpose:      Tools for compressing and decompressing MusicXML files

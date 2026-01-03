@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 # Name:         testPerformance.py
 # Purpose:      Tests keep track of long-term performance targets

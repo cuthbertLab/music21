@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 # Name:         figuredBass/__init__.py
 # Purpose:      Figured Bass representation, manipulation, and analysis

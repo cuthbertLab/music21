@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 # Name:         omr/__init__.py
 # Purpose:      music21 modules for improving and evaluating (not performing) OMR

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # -----------------------------------------------------------------------------
 # Name:         audioSearch.scoreFollower.py
 # Purpose:      Detection of the position in the score in real time

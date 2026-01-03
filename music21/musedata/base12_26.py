@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 # Name:         base12_26.py
 # Purpose:      Placeholder of Hewlett's base 40 system for 0th and 1st order (base12 and 26).

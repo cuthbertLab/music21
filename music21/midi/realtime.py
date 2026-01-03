@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 # Name:         midi.realtime.py
 # Purpose:      music21 classes for playing midi data in realtime

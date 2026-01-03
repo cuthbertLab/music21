@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 # Name:         prebase.py
 # Purpose:      classes for anything in music21 to inherit from.

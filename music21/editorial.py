@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # -----------------------------------------------------------------------------
 # Name:         editorial.py
 # Purpose:      music21 classes for representing editorial information

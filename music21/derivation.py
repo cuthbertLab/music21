@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # -----------------------------------------------------------------------------
 # Name:         derivation.py
 # Purpose:      Class for storing and managing Stream-based derivations

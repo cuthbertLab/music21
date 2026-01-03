@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # -----------------------------------------------------------------------------
 # Name:         corpus/__init__.py
 # Purpose:      Shortcuts to the corpus collection

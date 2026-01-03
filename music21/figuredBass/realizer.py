@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 # Name:         realizer.py
 # Purpose:      figured bass lines, consisting of notes

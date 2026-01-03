@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # -----------------------------------------------------------------------------
 # Name:         tree/__init__.py
 # Purpose:      Tools for grouping notes and chords into a searchable tree
