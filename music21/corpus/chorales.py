@@ -1273,7 +1273,7 @@ class Iterator:
                 try:
                     nextIndex = self._currentIndex + 1
                     riemenschneiderName = ('bach/choraleAnalyses/'
-                                           + f'riemenschneider{nextIndex:03d}.rntxt')
+                                           f'riemenschneider{nextIndex:03d}.rntxt')
                     analysis = corpus.parse(riemenschneiderName)
                     if analysis is not None:
                         chorale.insert(0, analysis.parts[0])
@@ -1582,7 +1582,7 @@ class Iterator:
                 else:
                     raise BachException(
                         f'{value} does not correspond to a chorale in the '
-                        + f'{self.numberingSystem} numbering system'
+                        f'{self.numberingSystem} numbering system'
                     )
 
         elif self._iterationType == 'index':
@@ -1699,7 +1699,7 @@ class Iterator:
                 else:
                     raise BachException(
                         f'{value} does not correspond to a chorale in the '
-                        + f'{self.numberingSystem} numbering system'
+                        f'{self.numberingSystem} numbering system'
                     )
 
     # - Return Type

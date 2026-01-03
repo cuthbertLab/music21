@@ -245,13 +245,13 @@ def printSummary(summaryOutput, timeStart, pathsToRun):
         elif moduleResponse.returnCode == 'TrappedException':
             otherSummary.append(
                 f'Trapped Exception for module {moduleResponse.moduleName}, '
-                + f'at {moduleResponse.fp}: '
-                + f'{moduleResponse.testRunner}'
+                f'at {moduleResponse.fp}: '
+                f'{moduleResponse.testRunner}'
             )
         elif moduleResponse.returnCode == 'LargeException':
             otherSummary.append(
                 f'Large Exception for file {moduleResponse.fp}: '
-                + f'{moduleResponse.testResult}'
+                f'{moduleResponse.testResult}'
             )
         elif moduleResponse.returnCode == 'ImportError':
             otherSummary.append(f'Import Error for {moduleResponse.fp}')
@@ -263,8 +263,8 @@ def printSummary(summaryOutput, timeStart, pathsToRun):
             if moduleResponse.success:
                 successSummary.append(
                     f'{moduleResponse.moduleName} successfully ran '
-                    + f'{moduleResponse.testsRun} tests in '
-                    + f'{moduleResponse.runTime} seconds'
+                    f'{moduleResponse.testsRun} tests in '
+                    f'{moduleResponse.runTime} seconds'
                 )
             else:
                 errorsList = moduleResponse.errors
@@ -272,12 +272,12 @@ def printSummary(summaryOutput, timeStart, pathsToRun):
                 failuresList = moduleResponse.failures
                 errorsFoundSummary.append(
                     '\n-----------------------------\n'
-                    + f'{moduleResponse.moduleName} had '
-                    + f'{len(errorsList)} ERRORS and '
-                    + f'{len(failuresList)} FAILURES in '
-                    + f'{moduleResponse.testsRun} tests after '
-                    + f'{moduleResponse.runTime} seconds:\n'
-                    + '-----------------------------\n'
+                    f'{moduleResponse.moduleName} had '
+                    f'{len(errorsList)} ERRORS and '
+                    f'{len(failuresList)} FAILURES in '
+                    f'{moduleResponse.testsRun} tests after '
+                    f'{moduleResponse.runTime} seconds:\n'
+                    '-----------------------------\n'
                 )
                 for e in errorsList:
                     outStr += e + '\n'

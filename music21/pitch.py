@@ -3713,7 +3713,7 @@ class Pitch(prebase.ProtoM21Object):
         if target.ps <= fundamental.ps:
             raise PitchException(
                 'cannot find an equivalent harmonic for a fundamental '
-                + f'({fundamental}) that is not above this Pitch ({self})'
+                f'({fundamental}) that is not above this Pitch ({self})'
             )
 
         # up to the 32 harmonic

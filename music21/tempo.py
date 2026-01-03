@@ -1259,7 +1259,7 @@ def interpolateElements(element1, element2, sourceStream,
     >>> destStream2.insert(50.5, element2)
     >>> tempo.interpolateElements(element1, element2, sourceStream, destStream2)
     >>> for el in [eA, eB, eC]:
-    ...    offset = el.getOffsetBySite(destStream2)
+    ...    offset = float(el.getOffsetBySite(destStream2))
     ...    print(f'{offset:.1f}')
     20.2
     30.3
@@ -1275,6 +1275,8 @@ def interpolateElements(element1, element2, sourceStream,
     Traceback (most recent call last):
     music21.tempo.TempoException: Could not find element <music21.note.Note D> with id ...
     '''
+    # TODO: when python 3.13 is the minimum, get rid of the float around el.getOffsetBySite
+    #    in the doctest above
     try:
         startOffsetSrc = element1.getOffsetBySite(sourceStream)
     except exceptions21.Music21Exception as e:
@@ -1310,8 +1312,9 @@ def interpolateElements(element1, element2, sourceStream,
             else:
                 raise TempoException(
                     'Could not find element '
-                    + f'{el!r} with id {el.id!r} '
-                    + 'in destinationStream and autoAdd is false') from e
+                    f'{el!r} with id {el.id!r} '
+                    'in destinationStream and autoAdd is false'
+                ) from e
         else:
             destinationOffset = (scaleAmount * (elOffsetSrc - startOffsetSrc)) + startOffsetDest
             el.setOffsetBySite(destinationStream, destinationOffset)

@@ -826,7 +826,7 @@ class RTBeat(RTAtom):
         except exceptions21.TimeSignatureException:
             environLocal.printDebug([
                 'bad beat specification: '
-                + f'{self.src} in a meter of {timeSignature}'
+                f'{self.src} in a meter of {timeSignature}'
             ])
             post = 0.0
 
@@ -1171,7 +1171,7 @@ class RTHandler:
                 tracebackMessage = traceback.format_exc()
                 raise RTHandlerException(
                     f'At line {currentLineNumber} ({line}) an exception was raised:\n'
-                    + f'{tracebackMessage}'
+                    f'{tracebackMessage}'
                 ) from exc
         return post
 

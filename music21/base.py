@@ -245,7 +245,7 @@ class Groups(list):  # no need to inherit from slotted object
     def _validName(self, value: str) -> None:
         if not isinstance(value, str):
             raise exceptions21.GroupException('Only strings can be used as group names, '
-                                              + f'not {value!r}')
+                                              f'not {value!r}')
         # if ' ' in value:
         #     raise exceptions21.GroupException('Spaces are not allowed as group names')
 
@@ -2110,7 +2110,7 @@ class Music21Object(prebase.ProtoM21Object):
             memo.add(siteObj)
             environLocal.printDebug(
                 f'looking in contextSites for {siteObj}'
-                + f' with position {positionInStream.shortRepr()}')
+                f' with position {positionInStream.shortRepr()}')
             for topLevel, inStreamPos, recurType in siteObj.contextSites(
                 callerFirst=callerFirst,
                 memo=memo,
@@ -2144,7 +2144,7 @@ class Music21Object(prebase.ProtoM21Object):
             for derivedObject in topLevel.derivation.chain():
                 environLocal.printDebug(
                     'looking now in derivedObject, '
-                    + f'{derivedObject} with offsetAppend {offsetAppend}')
+                    f'{derivedObject} with offsetAppend {offsetAppend}')
                 for derivedCsTuple in derivedObject.contextSites(
                         callerFirst=None,
                         memo=memo,
@@ -2441,7 +2441,7 @@ class Music21Object(prebase.ProtoM21Object):
             except SitesException as se:
                 raise SitesException(
                     'activeSite cannot be set for '
-                    + f'object {self} not in the Stream {site}'
+                    f'object {self} not in the Stream {site}'
                 ) from se
 
             self._activeSiteStoredOffset = storedOffset
@@ -3219,7 +3219,7 @@ class Music21Object(prebase.ProtoM21Object):
         if quarterLength > self.duration.quarterLength:
             raise DurationException(
                 f'cannot split a duration ({self.duration.quarterLength}) '
-                + f'at this quarterLength ({quarterLength})'
+                f'at this quarterLength ({quarterLength})'
             )
 
         if retainOrigin is True:
@@ -3379,8 +3379,8 @@ class Music21Object(prebase.ProtoM21Object):
         if opFrac(sum(quarterLengthList)) != self.duration.quarterLength:
             raise Music21ObjectException(
                 'cannot split by quarter length list whose sum is not '
-                + 'equal to the quarterLength duration of the source: '
-                + f'{quarterLengthList}, {self.duration.quarterLength}'
+                'equal to the quarterLength duration of the source: '
+                f'{quarterLengthList}, {self.duration.quarterLength}'
             )
 
         # if nothing to do

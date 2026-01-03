@@ -157,7 +157,7 @@ class MetadataCachingJob:
             else:
                 environLocal.printDebug(
                     'addFromPaths: got stream without metadata, '
-                    + f'creating stub: {common.relativepath(str(self.cleanFilePath))}'
+                    f'creating stub: {common.relativepath(str(self.cleanFilePath))}'
                 )
                 metadataEntry = metadata.bundles.MetadataEntry(
                     sourcePath=self.cleanFilePath,
@@ -168,7 +168,7 @@ class MetadataCachingJob:
         except Exception:  # wide catch is fine. pylint: disable=broad-exception-caught
             environLocal.warn(
                 'Had a problem with extracting metadata '
-                + f'for {self.filePath}, piece ignored'
+                f'for {self.filePath}, piece ignored'
             )
             environLocal.warn(traceback.format_exc())
 
@@ -185,8 +185,8 @@ class MetadataCachingJob:
         except Exception as exception:  # wide catch is fine. pylint: disable=broad-exception-caught
             environLocal.warn(
                 'Had a problem with extracting metadata for score '
-                + f'{scoreNumber} in {self.filePath}, whole opus ignored: '
-                + f'{exception}'
+                f'{scoreNumber} in {self.filePath}, whole opus ignored: '
+                f'{exception}'
             )
             environLocal.printDebug(traceback.format_exc())
         # Create a dummy metadata entry, representing the entire opus.

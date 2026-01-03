@@ -228,8 +228,8 @@ class FretBoard(prebase.ProtoM21Object):
         if len(self.tuning) != self.numStrings:
             raise TablatureException(
                 'Tuning must be set first, tuned for '
-                + f'{len(self.tuning)} notes, on a '
-                + f'{self.numStrings} string instrument'
+                f'{len(self.tuning)} notes, on a '
+                f'{self.numStrings} string instrument'
             )
 
         pitchList: list[pitch.Pitch|None] = [None] * self.numStrings

@@ -372,8 +372,7 @@ class TimespanTree(trees.OffsetTree):
         ...     for verticality in subsequence:
         ...         verticalityChord = verticality.toChord()
         ...         print(f'\t[{verticality.measureNumber}] '
-        ...               + f'{verticality}: {verticalityChord.isConsonant()}')
-        ...
+        ...               f'{verticality}: {verticalityChord.isConsonant()}')
         Subsequence:
             [2] <music21.tree.verticality.Verticality 6.0 {E3 E4 G#4 B4}>: True
             [2] <music21.tree.verticality.Verticality 6.5 {E3 D4 G#4 B4}>: False

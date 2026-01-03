@@ -1075,7 +1075,7 @@ def mostCommonMeasureRhythms(streamIn, transposeDiatonic=False):
     ...     measures = in_dict['measures']
     ...     print(
     ...         f'no: {number} '
-    ...         + f'rhythmString: {rhythmString}'
+    ...         f'rhythmString: {rhythmString}'
     ...     )
     ...     bars = [
     ...         (m.number, str(m.getContextByClass(stream.Part).id))

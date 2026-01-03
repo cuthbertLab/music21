@@ -413,7 +413,7 @@ class GeneralObjectExporter:
         if outObj is None:
             raise MusicXMLExportException(
                 'Cannot translate the object '
-                + f'{self.generalObj} to a complete musicXML document; put it in a Stream first!'
+                f'{self.generalObj} to a complete musicXML document; put it in a Stream first!'
             )
         return outObj
 
@@ -6907,7 +6907,7 @@ class MeasureExporter(XMLExporterBase):
             else:
                 raise MusicXMLExportException(
                     'partial beam defined without a proper direction set '
-                    + f'(set to {beamObject.direction})'
+                    f'(set to {beamObject.direction})'
                 )
         else:
             raise MusicXMLExportException(

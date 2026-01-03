@@ -1237,8 +1237,8 @@ def romanNumeralFromChord(
     except fbNotation.ModifierException as strerror:  # pragma: no cover
         raise RomanNumeralException(
             'Could not parse '
-            + f'{rnString} from chord {chordObj} as an RN '
-            + f'in key {keyObj}: {strerror}'
+            f'{rnString} from chord {chordObj} as an RN '
+            f'in key {keyObj}: {strerror}'
         ) from strerror
 
     # Is this linking them in an unsafe way?
@@ -3474,8 +3474,8 @@ class RomanNumeral(harmony.Harmony):
             except AttributeError:  # pragma: no cover
                 raise RomanNumeralException(
                     'Cannot call classes on object '
-                    + f'{keyOrScale!r}, send only Key '
-                    + 'or Scale Music21Objects'
+                    f'{keyOrScale!r}, send only Key '
+                    'or Scale Music21Objects'
                 )
             if 'Key' in keyClasses:
                 # good to go

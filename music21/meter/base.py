@@ -2000,7 +2000,7 @@ class TimeSignature(TimeSignatureBase):
         if beatInt - 1 > len(self.beatSequence) - 1:
             raise TimeSignatureException(
                 f'requested beat value ({beatInt}) not found in beat partitions '
-                + f'({self.beatSequence}) of ts {self}'
+                f'({self.beatSequence}) of ts {self}'
             )
         # get a duration object for the beat; will translate into quarterLength
         # beat int counts from 1; subtract 1 to get index

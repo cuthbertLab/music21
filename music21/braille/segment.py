@@ -442,9 +442,9 @@ class BrailleSegment(text.BrailleText):
             for k, g in zip(allKeys, allGroupings)
         )
         out = '\n'.join(['---begin segment---',
-                          name,
-                          allElementGroupings,
-                          '---end segment---'])
+                         name,
+                         allElementGroupings,
+                         '---end segment---'])
         return out
 
     def transcribe(self):
@@ -1138,8 +1138,10 @@ class BrailleGrandSegment(BrailleSegment, text.BrailleKeyboard):
             else:
                 leftFull = ''
             allPairs.append('\n'.join([rightFull, leftFull, '====\n']))
-        out = '\n'.join(['---begin grand segment---', name, ''.join(allPairs),
-                           '---end grand segment---'])
+        out = '\n'.join(['---begin grand segment---',
+                         name,
+                         ''.join(allPairs),
+                         '---end grand segment---'])
         return out
 
     def yieldCombinedGroupingKeys(self):
@@ -1253,10 +1255,10 @@ class BrailleGrandSegment(BrailleSegment, text.BrailleKeyboard):
     #                 except ValueError as ve:
     #                     raise BrailleSegmentException(
     #                         'Misaligned braille groupings: '
-    #                         + f'groupingKeyLeft was {gkLeft} '
-    #                         + f'groupingKeyRight was {gkRight} '
-    #                         + f'rightSegment was {rightSegment}, '
-    #                         + f'leftSegment was {leftSegment}'
+    #                         f'groupingKeyLeft was {gkLeft} '
+    #                         f'groupingKeyRight was {gkRight} '
+    #                         f'rightSegment was {rightSegment}, '
+    #                         f'leftSegment was {leftSegment}'
     #                     ) from ve
     #
     #                 try:
@@ -2369,7 +2371,7 @@ def splitMeasure(music21Measure, beatDivisionOffset=0, useTimeSignature=None):
         if abs(beatDivisionOffset) > len(ts.beatDivisionDurations):
             raise BrailleSegmentException(
                 f'beatDivisionOffset {beatDivisionOffset} is outside '
-                + f'of ts.beatDivisionDurations {ts.beatDivisionDurations}'
+                f'of ts.beatDivisionDurations {ts.beatDivisionDurations}'
             )
         duration_index = len(ts.beatDivisionDurations) - abs(beatDivisionOffset)
         try:
@@ -2377,7 +2379,7 @@ def splitMeasure(music21Measure, beatDivisionOffset=0, useTimeSignature=None):
             offset = opFrac(offset)
         except IndexError:
             environRules.warn('Problem in converting a time signature in measure '
-                              + f'{music21Measure.number}, offset may be wrong')
+                              f'{music21Measure.number}, offset may be wrong')
     bs = copy.deepcopy(ts.beatSequence)
 
     numberOfPartitions = 2

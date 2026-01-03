@@ -524,7 +524,7 @@ class MeterSequence(MeterTerminal):
         # comparison of numerator and denominator
         if not isinstance(value, MeterTerminal):
             raise MeterException('values in MeterSequences must be MeterTerminals or '
-                                 + f'MeterSequences, not {value}')
+                                 f'MeterSequences, not {value}')
         if value.ratioEqual(self[key]):
             self._partition[key] = value
         else:
@@ -1374,8 +1374,8 @@ class MeterSequence(MeterTerminal):
         except TypeError as te:
             raise MeterException(
                 'Something wrong with the type of '
-                + f'this numerator {self._numerator} {type(self._numerator)} '
-                + f'or this denominator {self._denominator} {type(self._denominator)}'
+                f'this numerator {self._numerator} {type(self._numerator)} '
+                f'or this denominator {self._denominator} {type(self._denominator)}'
             ) from te
 
         for mt in self._partition:
@@ -1856,7 +1856,7 @@ class MeterSequence(MeterTerminal):
         if qLenPos >= self.duration.quarterLength or qLenPos < 0:
             raise MeterException(
                 f'cannot access from qLenPos {qLenPos} '
-                + f'where total duration is {self.duration.quarterLength}'
+                f'where total duration is {self.duration.quarterLength}'
             )
 
         qPos = 0
@@ -1971,7 +1971,7 @@ class MeterSequence(MeterTerminal):
                 #   'self.duration', self.duration])
                 raise MeterException(
                     f'cannot access qLenPos {qLenPos} when total duration is '
-                    + f'{self.duration.quarterLength} and ts is {self}'
+                    f'{self.duration.quarterLength} and ts is {self}'
                 )
 
             # environLocal.printDebug(['offsetToSpan', 'got qLenPos old', qLenPos])
@@ -2009,7 +2009,7 @@ class MeterSequence(MeterTerminal):
         if qLenPos >= self.duration.quarterLength or qLenPos < 0:
             raise MeterException(
                 f'cannot access qLenPos {qLenPos} when total duration is '
-                + f'{self.duration.quarterLength} and ts is {self}'
+                f'{self.duration.quarterLength} and ts is {self}'
             )
         iMatch = self.offsetToIndex(qLenPos)
         return opFrac(self[iMatch].weight)

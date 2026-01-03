@@ -273,7 +273,8 @@ class FiguredBassLine:
         else:
             raise FiguredBassLineException(
                 'Not a valid bassObject (only note.Note, '
-                + f'harmony.ChordSymbol, and roman.RomanNumeral supported) was {bassObject!r}')
+                f'harmony.ChordSymbol, and roman.RomanNumeral supported) was {bassObject!r}'
+            )
 
     def generateBassLine(self):
         '''

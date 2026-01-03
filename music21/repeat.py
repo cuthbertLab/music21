@@ -942,12 +942,12 @@ class Expander(t.Generic[StreamType]):
         if startCount not in (endCount, endCount - 1):
             environLocal.printDebug([
                 'start count not the same as end count: '
-                + f'{startCount} / {endCount}'
+                f'{startCount} / {endCount}'
             ])
             return False
         # environLocal.printDebug([
         #     'matched start and end repeat barline count of: '
-        #     + f'{startCount}/{endCount}'
+        #     f'{startCount}/{endCount}'
         # ])
         return True
 

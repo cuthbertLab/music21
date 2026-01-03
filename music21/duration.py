@@ -250,7 +250,7 @@ def quarterLengthToClosestType(qLen: OffsetQLIn) -> tuple[str, bool]:
     '''
     def raise_it(qLen_inner):
         return DurationException('Cannot return types smaller than 2048th; '
-                                + f'qLen was: {qLen}')
+                                 f'qLen was: {qLen}')
 
     if not qLen:
         raise raise_it(qLen)
@@ -2122,7 +2122,8 @@ class Duration(prebase.ProtoM21Object, SlottedObjectMixin):
         if not (0 <= componentIndex < len(self.components)):
             raise IndexError(
                 f'invalid component index value {componentIndex} '
-                + f'submitted; value must be an integer between 0 and {len(self.components) - 1}')
+                f'submitted; value must be an integer between 0 and {len(self.components) - 1}'
+            )
         components = self.components[:componentIndex]
         return float(sum([c.quarterLength for c in components]))
 

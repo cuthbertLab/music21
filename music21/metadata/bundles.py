@@ -1118,7 +1118,7 @@ class MetadataBundle(prebase.ProtoM21Object):
         if not filePath.exists():
             environLocal.printDebug(
                 f'no metadata found for: {self.name!r}; '
-                + f'try building cache with corpus.cacheMetadata({self.name!r})'
+                f'try building cache with corpus.cacheMetadata({self.name!r})'
             )
             return self
 

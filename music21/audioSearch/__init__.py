@@ -140,7 +140,7 @@ def autocorrelationFunction(recordedSignal, recordSampleRateIn):
         # len(_missingImport) > 0:
         raise AudioSearchException(
             'Cannot run autocorrelationFunction without '
-            + f'numpy installed (scipy recommended).  Missing {bmi}')
+            f'numpy installed (scipy recommended).  Missing {bmi}')
     import numpy
     convolve = None
     try:

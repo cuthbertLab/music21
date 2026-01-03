@@ -267,9 +267,9 @@ def _copyMultipleMeasures(rtMeasure: rtObjects.RTMeasure,
             except TypeError as te:  # pragma: no cover
                 raise RomanTextTranslateException(
                     f'Failed to copy measure {mPast.number} to measure range '
-                    + f'{targetStart}-{targetEnd}: did you perhaps parse an RTOpus '
-                    + 'object with romanTextToStreamScore instead of '
-                    + 'romanTextToStreamOpus?'
+                    f'{targetStart}-{targetEnd}: did you perhaps parse an RTOpus '
+                    'object with romanTextToStreamScore instead of '
+                    'romanTextToStreamOpus?'
                 ) from te
             m.number = rtMeasure.number[0] + mPast.number - targetStart
             measures.append(m)
@@ -386,7 +386,7 @@ class PartTranslator:
                 tracebackMessage = traceback.format_exc()
                 raise RomanTextTranslateException(
                     f'At line {token.lineNumber} for token {token}, '
-                    + f'an exception was raised: \n{tracebackMessage}') from exc
+                    f'an exception was raised: \n{tracebackMessage}') from exc
 
         p = self.p
         p.coreElementsChanged()

@@ -1083,7 +1083,7 @@ class DataSet:
             outputFormat = self._getOutputFormat(format)
         if outputFormat is None:
             raise DataSetException('no output format could be defined from file path '
-                                   + f'{fp} or format {format}')
+                                   f'{fp} or format {format}')
 
         return outputFormat.write(fp=fp, includeClassLabel=includeClassLabel)
 
@@ -1694,8 +1694,8 @@ class Test(unittest.TestCase):
     #
     #             print(
     #                 f'{classifierStr} {classifierType}: misclassified '
-    #                 + f'{mismatch}/{len(matchData)} of '
-    #                 + f'{matchStr}'
+    #                 f'{mismatch}/{len(matchData)} of '
+    #                 f'{matchStr}'
     #             )
     #
     #         # if classifierType == orngTree.TreeLearner:
@@ -1746,8 +1746,8 @@ class Test(unittest.TestCase):
     #
     #             print(
     #                 f'{classifierStr} {classifierType}: misclassified '
-    #                 + f'{mismatch}/{len(matchData)} of '
-    #                 + f'{matchStr}'
+    #                 f'{mismatch}/{len(matchData)} of '
+    #                 f'{matchStr}'
     #             )
 
     # def xtestOrangeClassifiers(self):  # pragma: no cover

@@ -196,8 +196,8 @@ def makeBeams(
             if durSum > barQL:
                 # environLocal.printDebug([
                 #     'attempting makeBeams with a bar that contains durations '
-                #     + 'that sum greater than bar duration '
-                #     + f'({durSum} > {barQL})'
+                #     'that sum greater than bar duration '
+                #     f'({durSum} > {barQL})'
                 # ])
                 continue
 
@@ -1306,8 +1306,8 @@ def makeTies(
                     # TODO: put them entirely in the next measure.
                     # raise stream.StreamException(
                     #     'element '
-                    #     + f'({e}) has offset {eOffset} within a measure '
-                    #     + f'that ends at offset {mEnd}'
+                    #     f'({e}) has offset {eOffset} within a measure '
+                    #     f'that ends at offset {mEnd}'
                     # )
 
                 qLenWithinMeasure = mEnd - eOffset

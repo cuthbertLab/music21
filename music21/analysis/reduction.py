@@ -1095,7 +1095,7 @@ class Test(unittest.TestCase):
                     dataMatch[2],
                     dataTarget[2],
                     msg=(f'for partId {partId}, entry {i}: '
-                         + f'should be {dataMatch[2]} <-> was {dataTarget[2]}')
+                         f'should be {dataMatch[2]} <-> was {dataTarget[2]}')
                 )
 
     def testPartReductionB(self, show=False):

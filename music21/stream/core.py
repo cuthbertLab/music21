@@ -426,7 +426,7 @@ class StreamCore(Music21Object):
                         if eInStream is element:
                             raise StreamException(
                                 f'the object ({element!r}, id()={id(element)} '
-                                + f'is already found in this Stream ({self!r}, id()={id(self)})'
+                                f'is already found in this Stream ({self!r}, id()={id(self)})'
                             )
                 # something was old. delete from _offsetDict
                 # environLocal.warn('stale object')

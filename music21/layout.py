@@ -381,7 +381,7 @@ class StaffLayout(LayoutBase):
 
     def _reprInternal(self):
         return (f'distance {self.distance!r}, staffNumber {self.staffNumber!r}, '
-                + f'staffSize {self.staffSize!r}, staffLines {self.staffLines!r}')
+                f'staffSize {self.staffSize!r}, staffLines {self.staffLines!r}')
 
 # ------------------------------------------------------------------------------
 
@@ -1595,9 +1595,9 @@ class Staff(stream.Part):
     def _reprInternal(self):
         return (
             f'{self.scoreStaffNumber}: '
-            + f'p.{self.pageNumber}, '
-            + f'sys.{self.pageSystemNumber}, '
-            + f'st.{self.staffNumber}'
+            f'p.{self.pageNumber}, '
+            f'sys.{self.pageSystemNumber}, '
+            f'st.{self.staffNumber}'
         )
 
 

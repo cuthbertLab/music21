@@ -671,7 +671,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
                 except IndexError as ie:
                     raise IndexError(
                         f'attempting to access index {k} '
-                        + f'while elements is of size {len(self.elements)}'
+                        f'while elements is of size {len(self.elements)}'
                     ) from ie
             # setting active site as cautionary measure
             self.coreSelfActiveSite(match)
@@ -2188,7 +2188,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
             except AttributeError as ae:  # pragma: no cover
                 raise base.SitesException(
                     'attempted to retrieve a bound offset with a string '
-                    + f'attribute that is not supported: {o}') from ae
+                    f'attribute that is not supported: {o}') from ae
         else:
             return o
 
@@ -6400,8 +6400,8 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
                 if quarterLength < 0:  # pragma: no cover
                     environLocal.warn(
                         'Something is wrong with the verticality '
-                        + f'in stream {templateInner!r}: {vert!r} '
-                        + f'its endTime {endTime} is less than its offset {offset}'
+                        f'in stream {templateInner!r}: {vert!r} '
+                        f'its endTime {endTime} is less than its offset {offset}'
                     )
 
                 chordOrRest = vert.makeElement(quarterLength,
@@ -9641,7 +9641,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
             if not opFrac(sum(qlProcess)) == e.quarterLength:
                 raise StreamException(
                     'cannot map quarterLength list into element Duration: '
-                    + f'{sum(qlProcess)}, {e.quarterLength}'
+                    f'{sum(qlProcess)}, {e.quarterLength}'
                 )
 
             post = e.splitByQuarterLengths(qlProcess, addTies=addTies)

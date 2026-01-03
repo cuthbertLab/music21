@@ -677,7 +677,7 @@ class HumdrumDataCollection(prebase.ProtoM21Object):
 
             if exchangeActive is not False:
                 raise HumdrumException('ProtoSpine found with unpaired exchange instruction '
-                                       + f'at line {i} [{thisEventCollection.events}]')
+                                       f'at line {i} [{thisEventCollection.events}]')
             currentSpineList = newSpineList
 
         return spineCollection
@@ -920,10 +920,10 @@ class GlobalReferenceLine(HumdrumLine):
             value = value.strip()
             if code is None:
                 raise HumdrumException('GlobalReferenceLine (!!!) found without a code '
-                                       + f'listed; this is probably a problem! {contents} ')
+                                       f'listed; this is probably a problem! {contents} ')
         except IndexError:  # pragma: no cover
             raise HumdrumException('GlobalReferenceLine (!!!) found without a code listed; '
-                                   + f'this is probably a problem! {contents} ')
+                                   f'this is probably a problem! {contents} ')
 
         self.contents = contents
         self.code = code

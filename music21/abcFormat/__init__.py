@@ -2621,7 +2621,7 @@ class ABCHandler:
                 else:
                     environLocal.printDebug(
                         ['broken rhythm marker '
-                         + f'({token.src}) not positioned between two notes or chords'])
+                         f'({token.src}) not positioned between two notes or chords'])
 
             # need to update tuplets with currently active meter
             if isinstance(token, ABCTuplet):
@@ -2698,7 +2698,7 @@ class ABCHandler:
                 if lastDefaultQL is None:
                     raise ABCHandlerException(
                         'no active default note length provided for note processing. '
-                        + f'tPrev: {tPrev}, token: {token}, tNext: {tNext}'
+                        f'tPrev: {tPrev}, token: {token}, tNext: {tNext}'
                     )
                 token.activeDefaultQuarterLength = lastDefaultQL
                 token.activeKeySignature = lastKeySignature

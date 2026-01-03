@@ -357,7 +357,7 @@ class Sites(common.SlottedObjectMixin):
             # if idKey is not None:
             #     print(
             #         'Updating idKey '
-            #         + f'{idKey} for object {id(obj)}'
+            #         f'{idKey} for object {id(obj)}'
             #     )
 
         # environLocal.printDebug(['adding obj', obj, idKey])
@@ -966,7 +966,7 @@ class Sites(common.SlottedObjectMixin):
         except Exception as e:
             raise SitesException(
                 'an entry for this object '
-                + f'({site}) is not stored in this Sites object'
+                f'({site}) is not stored in this Sites object'
             ) from e
 
     def removeById(self, idKey):

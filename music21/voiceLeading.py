@@ -205,7 +205,7 @@ class VoiceLeadingQuartet(base.Music21Object):
             except AttributeError as ae:  # pragma: no cover
                 raise VoiceLeadingQuartetException(
                     'got a key signature that is not a string or music21 Key '
-                    + f'object: {keyValue}'
+                    f'object: {keyValue}'
                 ) from ae
         self._key = keyValue
 

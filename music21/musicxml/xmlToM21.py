@@ -1165,10 +1165,10 @@ class MusicXMLImporter(XMLParserBase):
                             staffGroup.addSpannedElements(self.m21PartObjectsById[partIdTest])
                             foundOne = True
 
-                    if foundOne is False:
+                    if not foundOne:
                         raise MusicXMLImportException(
                             'Cannot find part in m21PartObjectsById dictionary by Id:'
-                            + f' {ke} \n   Full Dict:\n   {self.m21PartObjectsById!r} ')
+                            f' {ke} \n   Full Dict:\n   {self.m21PartObjectsById!r} ')
             mxPartGroup = pgObj.mxPartGroup
             seta(staffGroup, mxPartGroup, 'group-name', 'name')
             # TODO: group-name-display
