@@ -1131,12 +1131,12 @@ class TestExternal(unittest.TestCase):
         with io.open(fp, encoding='utf-8') as f:
             v2 = f.read()
         differ = list(difflib.ndiff(v.splitlines(), v2.splitlines()))
-        for i, l in enumerate(differ):
-            if l.startswith('-') or l.startswith('?') or l.startswith('+'):
-                if 'id=' in l:
+        for i, line in enumerate(differ):
+            if line.startswith('-') or line.startswith('?') or line.startswith('+'):
+                if 'id=' in line:
                     continue
                 if self.show:
-                    print(l)
+                    print(line)
                     # for j in range(i - 1,i + 1):
                     #    print(differ[j])
                     # print('------------------')

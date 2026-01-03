@@ -1110,8 +1110,8 @@ class RTHandler:
         '''
         # iterate over lines and find the first measure definition
         iStartBody = None
-        for i, l in enumerate(lines):
-            if reMeasureTag.match(l.strip()) is not None:
+        for i, line in enumerate(lines):
+            if reMeasureTag.match(line.strip()) is not None:
                 # found a measure definition
                 iStartBody = i
                 break

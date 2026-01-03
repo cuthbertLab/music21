@@ -849,8 +849,8 @@ class Chord(ChordBase):
         if isinstance(key, int):
             try:
                 foundNote = self._notes[key]  # must be a number
-            except (KeyError, IndexError):
-                raise KeyError(keyErrorStr)
+            except (KeyError, IndexError) as exc:
+                raise KeyError(keyErrorStr) from exc
 
         elif isinstance(key, str):
             key = key.upper()

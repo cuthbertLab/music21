@@ -2957,7 +2957,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
 
         Note that it does not work the other way: if we made the replacement on `s`
         then `sf`, the flattened representation, would not be changed, since `s`
-        does not derive from `sf` but vice-versa.
+        does not derive from `sf` but vice versa.
 
         With `recurse=True`, a stream can replace an element that is
         further down in the hierarchy.  First let's set up a
@@ -8978,7 +8978,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
                 'beatAndMeasureFromOffset: could not find a time signature for that place.')
         try:
             myBeat = ts1.getBeatProportion(searchOffset - myMeas.offset)
-        except:
+        except (ValueError, IndexError, AttributeError, exceptions21.Music21Exception):
             raise StreamException(
                 'beatAndMeasureFromOffset: offset is beyond the end of the piece')
         foundMeasureNumber = myMeas.number
@@ -12830,7 +12830,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         from music21 import variant
 
         # containedPart must be in self, or an exception is raised.
-        if not (containedPart in self):
+        if containedPart not in self:
             raise variant.VariantException(f'Could not find {containedPart} in {self}')
 
         if inPlace is True:
@@ -12853,7 +12853,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
                 eClasses = e.classes
                 if 'Variant' in eClasses:
                     elementGroups = e.groups
-                    if (not (variantGroup in elementGroups)
+                    if (variantGroup not in elementGroups
                             or e.lengthType in ['elongation', 'deletion']):
                         newPart.remove(e)
                     else:

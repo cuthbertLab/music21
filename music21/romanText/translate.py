@@ -932,7 +932,7 @@ class PartTranslator:
         try:  # this sets the key and the keysignature
             self.kCurrent, pl = _getKeyAndPrefix(a)
             self.prefixLyric += pl
-        except:  # pragma: no cover
+        except (ValueError, exceptions21.Music21Exception):  # pragma: no cover
             raise RomanTextTranslateException(
                 f'cannot get analytic key from {a.src} in line {self.currentMeasureToken.src}')
         self.setKeyChangeToken = True

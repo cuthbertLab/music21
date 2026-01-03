@@ -396,7 +396,7 @@ class Sites(common.SlottedObjectMixin):
     def yieldSites(self,
                    *,
                    excludeNone: t.Literal[True],
-                   sortByCreationTime: t.Union[bool, t.Literal['reverse']] = False,
+                   sortByCreationTime: bool|t.Literal['reverse'] = False,
                    priorityTarget=None,
                    ) -> Generator[stream.Stream, None, None]:
         ...
@@ -405,7 +405,7 @@ class Sites(common.SlottedObjectMixin):
     def yieldSites(self,
                    *,
                    excludeNone: bool = False,
-                   sortByCreationTime: t.Union[bool, t.Literal['reverse']] = False,
+                   sortByCreationTime: bool|t.Literal['reverse'] = False,
                    priorityTarget=None,
                    ) -> Generator[stream.Stream|None, None, None]:
         ...
@@ -413,7 +413,7 @@ class Sites(common.SlottedObjectMixin):
     def yieldSites(self,
                    *,
                    excludeNone: bool = False,
-                   sortByCreationTime: t.Union[bool, t.Literal['reverse']] = False,
+                   sortByCreationTime: bool|t.Literal['reverse'] = False,
                    priorityTarget=None,
                    ) -> Generator[stream.Stream|None, None, None]:
         # noinspection PyDunderSlots

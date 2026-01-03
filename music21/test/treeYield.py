@@ -60,7 +60,7 @@ class TreeYielder:  # pragma: no cover
         tObj = type(obj)
         if tObj in self.nonIterables:
             pass
-        elif tObj == dict:
+        elif tObj is dict:
             for keyX in obj:
                 dictTuple = ('dict', keyX)
                 self.stackVals.append(dictTuple)

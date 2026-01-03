@@ -2732,7 +2732,7 @@ class MeasureParser(SoundTagMixin, XMLParserBase):
 
         addPageLayout = hasPageLayout()
         addSystemLayout = hasSystemLayout()
-        addStaffLayout = not (mxPrint.find('staff-layout') is None)
+        addStaffLayout = mxPrint.find('staff-layout') is not None
 
         # --- now we know what we need to add, add em
         m = self.stream

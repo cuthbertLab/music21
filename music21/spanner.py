@@ -207,8 +207,7 @@ class Spanner(base.Music21Object):
     equalityAttributes = ('spannerStorage',)
 
     def __init__(self,
-                 *spannedElements: t.Union[base.Music21Object,
-                                           Sequence[base.Music21Object]],
+                 *spannedElements: base.Music21Object|Sequence[base.Music21Object],
                  **keywords):
         super().__init__(**keywords)
 
@@ -424,8 +423,7 @@ class Spanner(base.Music21Object):
 
     def addSpannedElements(
         self,
-        spannedElements: t.Union[Sequence[base.Music21Object],
-                                 base.Music21Object],
+        spannedElements: Sequence[base.Music21Object]|base.Music21Object,
         *otherElements: base.Music21Object,
     ):
         '''

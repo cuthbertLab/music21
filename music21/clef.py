@@ -297,7 +297,7 @@ class PitchClef(Clef):
         >>> clef.Treble8vbClef().octaveChange
         -1
 
-        Changing octaveChange changes lowestLine (but not vice-versa)
+        Changing octaveChange changes lowestLine (but not vice versa)
 
         >>> tc.lowestLine
         31

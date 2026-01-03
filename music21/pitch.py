@@ -2912,8 +2912,8 @@ class Pitch(prebase.ProtoM21Object):
             octave = int(value[-1])
             self.name = name
             self.octave = octave
-        except:
-            raise PitchException(f'Cannot set a nameWithOctave with {value!r}')
+        except (ValueError, PitchException) as e:
+            raise PitchException(f'Cannot set a nameWithOctave with {value!r}') from e
 
     @property
     def unicodeNameWithOctave(self) -> str:

@@ -771,8 +771,10 @@ def convertToPitch(pitchString):
     if isinstance(pitchString, str):
         try:
             return pitch.Pitch(pitchString)
-        except:
-            raise ValueError('Cannot convert string ' + pitchString + ' to a music21 Pitch.')
+        except (ValueError, pitch.PitchException) as pe:
+            raise ValueError(
+                'Cannot convert string ' + pitchString + ' to a music21 Pitch.'
+            ) from pe
 
     raise TypeError('Cannot convert ' + pitchString + ' to a music21 Pitch.')
 

@@ -1281,7 +1281,7 @@ class GenericInterval(IntervalBase):
         '''
         Return the inversion of this interval within an octave.
         For instance, seconds become sevenths, octaves become unisons,
-        and vice-versa.
+        and vice versa.
 
         All are undirected intervals.
 
@@ -2083,7 +2083,7 @@ class DiatonicInterval(IntervalBase):
         'A-5'
 
         (Ascending) Augmented Unisons reverse to (Descending)
-        Diminished Unisons and vice-versa
+        Diminished Unisons and vice versa
 
         >>> aug1 = interval.DiatonicInterval('augmented', 1)
         >>> aug1.direction

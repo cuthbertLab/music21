@@ -1564,8 +1564,8 @@ class Test(unittest.TestCase):
         for filename, encoding, lyricFact in testCases:
             fp = common.getSourceFilePath() / 'midi' / 'testPrimitive' / filename
             s = converter.parse(fp, encoding=encoding)
-            for (n, l) in zip(s.flatten().notes, lyricFact):
-                self.assertEqual(n.lyric, l)
+            for (n, lyricStr) in zip(s.flatten().notes, lyricFact):
+                self.assertEqual(n.lyric, lyricStr)
 
     def testMidiExportLyrics(self):
         lyricEn = 'cat'  # ascii characters should be supported by every encoding

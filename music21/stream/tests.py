@@ -7958,23 +7958,23 @@ class Test(unittest.TestCase):
             return ss
 
         s = getS()
-        l, r = s.splitAtQuarterLength(2, retainOrigin=True)
-        # if retain origin is true, l is the original
-        self.assertIs(l, s)
-        self.assertEqual(l.highestTime, 2)
-        self.assertEqual(len(l.notes), 2)
-        self.assertEqual(r.highestTime, 2)
-        self.assertEqual(len(r.notes), 2)
+        left, right = s.splitAtQuarterLength(2, retainOrigin=True)
+        # if retain origin is true, left is the original
+        self.assertIs(left, s)
+        self.assertEqual(left.highestTime, 2)
+        self.assertEqual(len(left.notes), 2)
+        self.assertEqual(right.highestTime, 2)
+        self.assertEqual(len(right.notes), 2)
 
         sPost = Stream()
-        sPost.append(l)
-        sPost.append(r)
+        sPost.append(left)
+        sPost.append(right)
 
         s = getS()
         l2, r2 = s.splitAtQuarterLength(2, retainOrigin=False)
         self.assertIsNot(l2, s)
-        self.assertEqual(l2.highestTime, l.highestTime)
-        self.assertEqual(len(l2), len(l))
+        self.assertEqual(l2.highestTime, left.highestTime)
+        self.assertEqual(len(l2), len(left))
         self.assertEqual(len(r2.notes), 2)
 
         s = getS()

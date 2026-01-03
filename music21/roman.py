@@ -3469,7 +3469,7 @@ class RomanNumeral(harmony.Harmony):
             # environLocal.printDebug(['got keyOrScale', keyOrScale])
             try:
                 keyClasses = keyOrScale.classes
-            except:  # pragma: no cover
+            except AttributeError:  # pragma: no cover
                 raise RomanNumeralException(
                     'Cannot call classes on object {0!r}, send only Key '
                     'or Scale Music21Objects'.format(keyOrScale))

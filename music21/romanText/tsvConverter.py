@@ -888,17 +888,17 @@ class M21toTSV:
                 thisEntry.numeral = thisRN.romanNumeral
                 thisEntry.form = getForm(thisRN)
                 # Strip any leading non-digits from figbass (e.g., M43 -> 43)
-                figbassm = re.match(r'^\D*(\d.*|)', thisRN.figuresWritten)
+                fig_bass_m = re.match(r'^\D*(\d.*|)', thisRN.figuresWritten)
                 # implementing the following check according to the review
-                # at https://github.com/cuthbertLab/music21/pull/1267/files/a1ad510356697f393bf6b636af8f45e81ad6ccc8#r936472302 #pylint: disable=line-too-long
+                # at https://github.com/cuthbertLab/music21/pull/1267/
                 # but the match should always exist because either:
                 #   1. there is a digit in the string, in which case it matches
                 #       because of the left side of the alternation operator
                 #   2. there is no digit in the string, in which case it matches
                 #       because of the right side of the alternation operator
                 #       (an empty string)
-                if figbassm is not None:
-                    thisEntry.figbass = figbassm.group(1)
+                if fig_bass_m is not None:
+                    thisEntry.figbass = fig_bass_m.group(1)
                 else:
                     thisEntry.figbass = ''
                 thisEntry.changes = None

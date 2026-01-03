@@ -276,7 +276,7 @@ def normalizeInputFrequency(inputPitchFrequency, thresholds=None, pitches=None):
     ):
         raise AudioSearchException(
             'Cannot normalize input frequency if thresholds are given and '
-            + 'pitches are not, or vice-versa')
+            + 'pitches are not, or vice versa')
 
     if thresholds is None:
         (thresholds, pitches) = prepareThresholds()

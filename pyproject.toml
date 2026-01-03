@@ -70,3 +70,44 @@ include = [
     "music21",
     "py.typed",  # indicates source is typed.
 ]
+
+[tool.ruff]
+line-length = 100
+
+[tool.ruff.lint]
+# Flake8 core (pycodestyle + pyflakes) + flake8-quotes
+select = ['E', 'Q']
+
+# add once allowed: E122 (continuation line missing indentation) and E124 (bracket align)
+
+ignore = [
+    # space around | -- nice to omit in int|str
+    'E227',
+    # 0 blank lines -- good test but something going wrong in new algorithm
+    'E301',
+    # blank lines
+    'E302',
+    # blank lines
+    'E303',
+    # do not assign lambda -- okay by me.
+    'E731',
+]
+
+[tool.ruff.lint.per-file-ignores]
+'music21/abcFormat/testFiles.py' = ['E501']  # line-too-long
+# when allowed again -- chord/tables omit E122, E127
+'music21/chord/tables.py' = ['E201', 'E202', 'E203', 'E221', 'E231', 'E241']
+'music21/common/__init__.py' = ['F403']
+'music21/features/__init__.py' = ['F403']
+'music21/humdrum/__init__.py' = ['E501']  # line-too-long
+'music21/humdrum/testFiles.py' = ['E501']  # line-too-long
+'music21/musicxml/testFiles.py' = ['E501']  # line-too-long
+'music21/musicxml/testPrimitive.py' = ['E501']  # line-too-long
+'music21/romanText/testFiles.py' = ['E501']  # line-too-long
+'music21/search/__init__.py' = ['F403']
+'music21/variant.py' = ['E501']  # line-too-long
+
+[tool.ruff.lint.flake8-quotes]
+inline-quotes = 'single'
+multiline-quotes = 'single'
+docstring-quotes = 'single'

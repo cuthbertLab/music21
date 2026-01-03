@@ -623,7 +623,7 @@ class StyleMixin(common.SlottedObjectMixin):
     Not used by Music21Objects because of the added trouble in copying etc. so
     there is code duplication with base.Music21Object
     '''
-    # anytime something is changed here, change in base.Music21Object and vice-versa
+    # anytime something is changed here, change in base.Music21Object and vice versa
     _styleClass = Style
 
     __slots__ = ('_style', '_editorial')
@@ -658,7 +658,7 @@ class StyleMixin(common.SlottedObjectMixin):
         except AttributeError:
             pass
 
-        return not (self._style is None)
+        return self._style is not None
 
     @property
     def style(self) -> Style:
@@ -683,7 +683,7 @@ class StyleMixin(common.SlottedObjectMixin):
         >>> acc.style.absoluteX is None
         True
         '''
-        # anytime something is changed here, change in base.Music21Object and vice-versa
+        # anytime something is changed here, change in base.Music21Object and vice versa
         if self._style is None:
             styleClass = self._styleClass
             self._style = styleClass()
@@ -712,7 +712,7 @@ class StyleMixin(common.SlottedObjectMixin):
         >>> acc.hasEditorialInformation
         True
         '''
-        return not (self._editorial is None)
+        return self._editorial is not None
 
     @property
     def editorial(self) -> editorial.Editorial:
@@ -731,7 +731,7 @@ class StyleMixin(common.SlottedObjectMixin):
         >>> acc.editorial
         <music21.editorial.Editorial {'ficta': <music21.pitch.Accidental sharp>}>
         '''
-        # anytime something is changed here, change in base.Music21Object and vice-versa
+        # anytime something is changed here, change in base.Music21Object and vice versa
         from music21 import editorial
         if self._editorial is None:
             self._editorial = editorial.Editorial()

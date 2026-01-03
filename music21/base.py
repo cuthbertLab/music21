@@ -749,8 +749,8 @@ class Music21Object(prebase.ProtoM21Object):
         >>> mObj.hasEditorialInformation
         True
         '''
-        # anytime something is changed here, change in style.StyleMixin and vice-versa
-        return not (self._editorial is None)
+        # any time something is changed here, change in style.StyleMixin and vice versa
+        return self._editorial is not None
 
     @property
     def editorial(self) -> Editorial:
@@ -772,7 +772,7 @@ class Music21Object(prebase.ProtoM21Object):
         # Dev note: because the property "editorial" shadows module editorial,
         # typing has to be in quotes.
 
-        # anytime something is changed here, change in style.StyleMixin and vice-versa
+        # anytime something is changed here, change in style.StyleMixin and vice versa
         if self._editorial is None:
             self._editorial = Editorial()
         return self._editorial
@@ -800,8 +800,8 @@ class Music21Object(prebase.ProtoM21Object):
         >>> mObj.hasStyleInformation
         True
         '''
-        # anytime something is changed here, change in style.StyleMixin and vice-versa
-        return not (self._style is None)
+        # anytime something is changed here, change in style.StyleMixin and vice versa
+        return self._style is not None
 
     @property
     def style(self) -> Style:
@@ -826,7 +826,7 @@ class Music21Object(prebase.ProtoM21Object):
         >>> n.style.absoluteX is None
         True
         '''
-        # anytime something is changed here, change in style.StyleMixin and vice-versa
+        # anytime something is changed here, change in style.StyleMixin and vice versa
         if not self.hasStyleInformation:
             StyleClass = self._styleClass
             self._style = StyleClass()

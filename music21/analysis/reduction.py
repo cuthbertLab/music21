@@ -295,13 +295,13 @@ class ScoreReduction:
 
 
         # a list of Lyric objects
-        for k, l in enumerate(n.lyrics):
+        for k, lyr in enumerate(n.lyrics):
             # store measure index
-            rn = ReductiveNote(l.text, n, infoDict['measureIndex'], offset)
+            rn = ReductiveNote(lyr.text, n, infoDict['measureIndex'], offset)
             if rn.isParsed():
                 # environLocal.printDebug(['parsing reductive note', rn])
                 # use id, lyric text as hash
-                key = str(id(n)) + l.text
+                key = str(id(n)) + lyr.text
                 self._reductiveNotes[key] = rn
                 removalIndices.append(k)
         if removeAfterParsing:
