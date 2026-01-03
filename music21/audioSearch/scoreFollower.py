@@ -126,7 +126,7 @@ class ScoreFollower:
 
         # print('WE STAY AT:',)
         # print(self.lastNotePosition, len(self.scoreNotesOnly),)
-        # print(f'en percent {self.lastNotePosition * 100 / len(self.scoreNotesOnly}%')
+        # print(f'en percent {self.lastNotePosition * 100 / len(self.scoreNotesOnly)}%')
         # print(' this search begins at: ', self.startSearchAtSlot,)
         # print(f'countdown {self.countdown}')
         # print('Measure last note', self.scoreStream[self.lastNotePosition].measureNumber)
