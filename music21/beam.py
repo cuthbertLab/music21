@@ -367,8 +367,9 @@ class Beams(prebase.ProtoM21Object, EqualSlottedObjectMixin):
                     continue
                 if nextBeam.type in ('continue', 'stop'):
                     environLocal.warn(
-                        'Found a messed up beam pair {}, {}, at index {} of \n{}'.format(
-                            bThis, bNext, i, beamsList))
+                        f'Found a messed up beam pair {bThis}, {bNext}, '
+                        f'at index {i} of \n{beamsList}'
+                    )
                     continue
 
                 thisBeam.type = 'start'

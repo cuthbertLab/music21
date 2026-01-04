@@ -1165,10 +1165,10 @@ class MusicXMLImporter(XMLParserBase):
                             staffGroup.addSpannedElements(self.m21PartObjectsById[partIdTest])
                             foundOne = True
 
-                    if foundOne is False:
+                    if not foundOne:
                         raise MusicXMLImportException(
                             'Cannot find part in m21PartObjectsById dictionary by Id:'
-                            + f' {ke} \n   Full Dict:\n   {self.m21PartObjectsById!r} ')
+                            f' {ke} \n   Full Dict:\n   {self.m21PartObjectsById!r} ')
             mxPartGroup = pgObj.mxPartGroup
             seta(staffGroup, mxPartGroup, 'group-name', 'name')
             # TODO: group-name-display
@@ -1732,14 +1732,14 @@ class PartParser(XMLParserBase):
                     i = pm.midiPitchToInstrument(_adjustMidiData(midiUnpitchedText))
                 except MIDIPercussionException as mpe:
                     # objects not yet existing in m21 such as Cabasa
-                    warnings.warn(MusicXMLWarning(mpe))
+                    warnings.warn(MusicXMLWarning(mpe), stacklevel=2)
                     i = instrument.UnpitchedPercussion()
                     i.percMapPitch = _adjustMidiData(midiUnpitchedText)
             elif midiProgramText := strippedText(mxMidiProgram):
                 try:
                     i = instrument.instrumentFromMidiProgram(_adjustMidiData(midiProgramText))
                 except instrument.InstrumentException as ie:
-                    warnings.warn(MusicXMLWarning(ie))
+                    warnings.warn(MusicXMLWarning(ie), stacklevel=2)
                     # Invalid MIDI program, out of range 0-127
                     i = instrument.Instrument()
                 seta(i, mxMIDIInstrument, 'midi-channel', transform=_adjustMidiData)
@@ -2020,7 +2020,8 @@ class PartParser(XMLParserBase):
             warnings.warn(
                 f'The following exception took place in m. {measureParser.measureNumber} in '
                 + f'part {self.stream.partName}.',
-                MusicXMLWarning
+                MusicXMLWarning,
+                stacklevel=2
             )
             raise e
 
@@ -2105,7 +2106,9 @@ class PartParser(XMLParserBase):
             # and create a Generic Instrument object rather than dying.
             warnings.warn(
                 'Received a transposition tag, but no instrument to put it on!',
-                MusicXMLWarning)
+                MusicXMLWarning,
+                stacklevel=2,
+            )
             fakeInst = instrument.Instrument()
             self.activeInstrument = fakeInst
             self.stream.coreInsert(self.lastMeasureOffset, fakeInst)
@@ -2266,7 +2269,8 @@ class PartParser(XMLParserBase):
                     f'Warning: measure {m.number} in part {self.stream.partName}'
                     f'is overfull: {mHighestTime} > {lastTimeSignatureQuarterLength},'
                     f'assuming {mOffsetShift} is correct.',
-                    MusicXMLWarning
+                    MusicXMLWarning,
+                    stacklevel=2,
                 )
         elif (mHighestTime == 0.0
               and not m.recurse().notesAndRests.getElementsNotOfClass('Harmony')
@@ -2732,7 +2736,7 @@ class MeasureParser(SoundTagMixin, XMLParserBase):
 
         addPageLayout = hasPageLayout()
         addSystemLayout = hasSystemLayout()
-        addStaffLayout = not (mxPrint.find('staff-layout') is None)
+        addStaffLayout = mxPrint.find('staff-layout') is not None
 
         # --- now we know what we need to add, add em
         m = self.stream
@@ -4345,7 +4349,11 @@ class MeasureParser(SoundTagMixin, XMLParserBase):
                         'Line', idFound, False)[0]
                     # get first
                 except IndexError:
-                    warnings.warn('Line <' + mxObj.tag + '> stop without start', MusicXMLWarning)
+                    warnings.warn(
+                        'Line <' + mxObj.tag + '> stop without start',
+                        MusicXMLWarning,
+                        stacklevel=2,
+                    )
                     return []
                 sp.completeStatus = True
 
@@ -5045,7 +5053,7 @@ class MeasureParser(SoundTagMixin, XMLParserBase):
             if useVoice is None:  # pragma: no cover
                 warnings.warn('Cannot put in an element with a missing voice tag when '
                     + 'no previous voice tag was given.  Assuming voice 1... ',
-                    MusicXMLWarning)
+                    MusicXMLWarning, stacklevel=2)
                 useVoice = 1
 
         thisVoice: stream.Voice|None = None
@@ -5058,13 +5066,13 @@ class MeasureParser(SoundTagMixin, XMLParserBase):
         else:
             warnings.warn(
                 f'Cannot find voice {useVoice!r}; putting outside of voices.',
-                MusicXMLWarning)
+                MusicXMLWarning, stacklevel=2)
             warnings.warn(
                 f'Current voiceIds: {list(self.voicesById)}',
-                MusicXMLWarning)
+                MusicXMLWarning, stacklevel=2)
             warnings.warn(
                 f'Current voices: {list(m.voices)} in m. {m.number}',
-                MusicXMLWarning)
+                MusicXMLWarning, stacklevel=2)
 
         return thisVoice
 
@@ -5513,7 +5521,7 @@ class MeasureParser(SoundTagMixin, XMLParserBase):
                     mxDir, staffKey, totalOffset
                 )
             except MusicXMLImportException as excep:
-                warnings.warn(f'Could not import {tag}: {excep}', MusicXMLWarning)
+                warnings.warn(f'Could not import {tag}: {excep}', MusicXMLWarning, stacklevel=2)
                 spannerList = []
 
             for sp in spannerList:
@@ -6353,7 +6361,10 @@ class MeasureParser(SoundTagMixin, XMLParserBase):
                 stl.staffType = stream.enums.StaffType(xmlText)
             except ValueError:
                 warnings.warn(
-                    f'Got an incorrect staff-type in details: {mxStaffType}', MusicXMLWarning)
+                    f'Got an incorrect staff-type in details: {mxStaffType}',
+                    MusicXMLWarning,
+                    stacklevel=2,
+                )
         # TODO: staff-tuning*
         # TODO: capo
         seta(stl, mxDetails, 'staff-size', transform=_floatOrIntStr)

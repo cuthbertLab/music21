@@ -1523,7 +1523,7 @@ class Test(unittest.TestCase):
                 validTokenTypeCounts,
                 (
                     'Found unexpected token type in default token map:'
-                    + f'{tokenType.__class__.__name__}.'
+                    f'{tokenType.__class__.__name__}.'
                 )
             )
 
@@ -1534,8 +1534,8 @@ class Test(unittest.TestCase):
                 0,
                 (
                     'Should provide a non-empty string for the regular '
-                    + 'expression in the default token map for tokens of type '
-                    + f'{tokenType.__class__.__name__}.'
+                    'expression in the default token map for tokens of type '
+                    f'{tokenType.__class__.__name__}.'
                 )
             )
 

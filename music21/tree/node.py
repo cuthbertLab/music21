@@ -181,13 +181,14 @@ class ElementNode(core.AVLNode):
         pos = self.position
         if hasattr(pos, 'shortRepr'):
             pos = pos.shortRepr()
-        return '<ElementNode: Start:{} Indices:(l:{} *{}* r:{}) Payload:{!r}>'.format(
-            pos,
-            self.subtreeElementsStartIndex,
-            self.payloadElementIndex,
-            self.subtreeElementsStopIndex,
-            self.payload,
-        )
+
+        ps = pos
+        li = self.subtreeElementsStartIndex
+        pi = self.payloadElementIndex
+        ri = self.subtreeElementsStopIndex
+        pl = self.payload
+
+        return f'<ElementNode: Start:{ps} Indices:(l:{li} *{pi}* r:{ri}) Payload:{pl!r}>'
 
     # PROPERTIES #
     @property

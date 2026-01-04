@@ -429,18 +429,22 @@ class BrailleSegment(text.BrailleText):
                     continue
             except TypeError:
                 pass
-            allKeys.append('Measure {0}, {1} {2}:\n'.format(itemKey.measure,
-                                                             affinityNames[itemKey.affinity],
-                                                             itemKey.ordinal + 1))
+            allKeys.append(
+                f'Measure {itemKey.measure}, '
+                f'{affinityNames[itemKey.affinity]} '
+                f'{itemKey.ordinal + 1}:\n'
+            )
             gStr = str(grouping)
             allGroupings.append(gStr)
             prevKey = itemKey
-        allElementGroupings = '\n'.join([''.join([k, g, '\n==='])
-                                          for (k, g) in list(zip(allKeys, allGroupings))])
+        allElementGroupings = '\n'.join(
+            f'{k}{g}\n==='
+            for k, g in zip(allKeys, allGroupings)
+        )
         out = '\n'.join(['---begin segment---',
-                          name,
-                          allElementGroupings,
-                          '---end segment---'])
+                         name,
+                         allElementGroupings,
+                         '---end segment---'])
         return out
 
     def transcribe(self):
@@ -1114,22 +1118,30 @@ class BrailleGrandSegment(BrailleSegment, text.BrailleKeyboard):
         allPairs = []
         for (rightKey, leftKey) in self.yieldCombinedGroupingKeys():
             if rightKey is not None:
-                rightHeading = 'Measure {0} Right, {1} {2}:\n'.format(
-                    rightKey.measure, affinityNames[rightKey.affinity], rightKey.ordinal + 1)
+                rightHeading = (
+                    f'Measure {rightKey.measure} Right, '
+                    f'{affinityNames[rightKey.affinity]} '
+                    f'{rightKey.ordinal + 1}:\n'
+                )
                 rightContents = str(self._groupingDict.get(rightKey))
                 rightFull = ''.join([rightHeading, rightContents])
             else:
                 rightFull = ''
             if leftKey is not None:
-                leftHeading = '\nMeasure {0} Left, {1} {2}:\n'.format(
-                    leftKey.measure, affinityNames[leftKey.affinity], leftKey.ordinal + 1)
+                leftHeading = (
+                    f'\nMeasure {leftKey.measure} Left, '
+                    f'{affinityNames[leftKey.affinity]} '
+                    f'{leftKey.ordinal + 1}:\n'
+                )
                 leftContents = str(self._groupingDict.get(leftKey))
                 leftFull = ''.join([leftHeading, leftContents])
             else:
                 leftFull = ''
             allPairs.append('\n'.join([rightFull, leftFull, '====\n']))
-        out = '\n'.join(['---begin grand segment---', name, ''.join(allPairs),
-                           '---end grand segment---'])
+        out = '\n'.join(['---begin grand segment---',
+                         name,
+                         ''.join(allPairs),
+                         '---end grand segment---'])
         return out
 
     def yieldCombinedGroupingKeys(self):
@@ -1240,13 +1252,14 @@ class BrailleGrandSegment(BrailleSegment, text.BrailleKeyboard):
     #                     gkLeft = gkRight._replace(affinity=gkRight.affinity - 1)
     #                 try:
     #                     groupingKeysLeft.remove(gkLeft)
-    #                 except ValueError:
+    #                 except ValueError as ve:
     #                     raise BrailleSegmentException(
-    #                         'Misaligned braille groupings: ' +
-    #                         'groupingKeyLeft was %s' % gkLeft +
-    #                         'groupingKeyRight was %s' % gkRight +
-    #                         'rightSegment was %s, leftSegment was %s' %
-    #                                    (rightSegment, leftSegment))
+    #                         'Misaligned braille groupings: '
+    #                         f'groupingKeyLeft was {gkLeft} '
+    #                         f'groupingKeyRight was {gkRight} '
+    #                         f'rightSegment was {rightSegment}, '
+    #                         f'leftSegment was {leftSegment}'
+    #                     ) from ve
     #
     #                 try:
     #                     combinedGroupingTuple = (gkRight, gkLeft)
@@ -2358,7 +2371,7 @@ def splitMeasure(music21Measure, beatDivisionOffset=0, useTimeSignature=None):
         if abs(beatDivisionOffset) > len(ts.beatDivisionDurations):
             raise BrailleSegmentException(
                 f'beatDivisionOffset {beatDivisionOffset} is outside '
-                + f'of ts.beatDivisionDurations {ts.beatDivisionDurations}'
+                f'of ts.beatDivisionDurations {ts.beatDivisionDurations}'
             )
         duration_index = len(ts.beatDivisionDurations) - abs(beatDivisionOffset)
         try:
@@ -2366,7 +2379,7 @@ def splitMeasure(music21Measure, beatDivisionOffset=0, useTimeSignature=None):
             offset = opFrac(offset)
         except IndexError:
             environRules.warn('Problem in converting a time signature in measure '
-                              + f'{music21Measure.number}, offset may be wrong')
+                              f'{music21Measure.number}, offset may be wrong')
     bs = copy.deepcopy(ts.beatSequence)
 
     numberOfPartitions = 2

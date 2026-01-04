@@ -243,13 +243,16 @@ def printSummary(summaryOutput, timeStart, pathsToRun):
         elif moduleResponse.returnCode == 'UntrappedException':
             otherSummary.append(f'Untrapped Exception for unknown module: {moduleResponse.fp}')
         elif moduleResponse.returnCode == 'TrappedException':
-            otherSummary.append('Trapped Exception for module %s, at %s: %s' %
-                                (moduleResponse.moduleName,
-                                  moduleResponse.fp,
-                                  moduleResponse.testRunner))
+            otherSummary.append(
+                f'Trapped Exception for module {moduleResponse.moduleName}, '
+                f'at {moduleResponse.fp}: '
+                f'{moduleResponse.testRunner}'
+            )
         elif moduleResponse.returnCode == 'LargeException':
-            otherSummary.append('Large Exception for file %s: %s' %
-                                (moduleResponse.fp, moduleResponse.testResult))
+            otherSummary.append(
+                f'Large Exception for file {moduleResponse.fp}: '
+                f'{moduleResponse.testResult}'
+            )
         elif moduleResponse.returnCode == 'ImportError':
             otherSummary.append(f'Import Error for {moduleResponse.fp}')
         elif moduleResponse.returnCode == 'NotInTree':
@@ -258,33 +261,30 @@ def printSummary(summaryOutput, timeStart, pathsToRun):
         elif moduleResponse.returnCode == 'TestsRun':
             totalTests += moduleResponse.testsRun
             if moduleResponse.success:
-                successSummary.append('%s successfully ran %s tests in %s seconds'
-                                      % (moduleResponse.moduleName,
-                                         moduleResponse.testsRun,
-                                         moduleResponse.runTime))
+                successSummary.append(
+                    f'{moduleResponse.moduleName} successfully ran '
+                    f'{moduleResponse.testsRun} tests in '
+                    f'{moduleResponse.runTime} seconds'
+                )
             else:
                 errorsList = moduleResponse.errors
                 # not the original errors list! see pickle note above
                 failuresList = moduleResponse.failures
                 errorsFoundSummary.append(
                     '\n-----------------------------\n'
-                    + '%s had %s ERRORS and %s FAILURES in %s tests after %s seconds:\n' %
-                    (moduleResponse.moduleName, len(errorsList),
-                       len(failuresList), moduleResponse.testsRun, moduleResponse.runTime)
-                    + '-----------------------------\n')
-
+                    f'{moduleResponse.moduleName} had '
+                    f'{len(errorsList)} ERRORS and '
+                    f'{len(failuresList)} FAILURES in '
+                    f'{moduleResponse.testsRun} tests after '
+                    f'{moduleResponse.runTime} seconds:\n'
+                    '-----------------------------\n'
+                )
                 for e in errorsList:
                     outStr += e + '\n'
                     errorsFoundSummary.append(str(e))
                 for f in failuresList:
                     outStr += f + '\n'
                     errorsFoundSummary.append(str(f))
-                # for e in errorsList:
-                #     print(e[0], e[1])
-                #     errorsFoundSummary.append('%s: %s' % (e[0], e[1]))
-                # for f in failuresList:
-                #     print(f[0], f[1])
-                #     errorsFoundSummary.append('%s: %s' % (f[0], f[1]))
         else:
             otherSummary.append(f'Unknown return code {moduleResponse}')
 

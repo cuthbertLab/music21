@@ -602,7 +602,7 @@ class MuseDataRecordIterator:
 
     def __next__(self):
         if self.index >= len(self.src):
-            raise StopIteration
+            raise StopIteration()
         # add one b/c end is inclusive
         mdr = MuseDataRecord(self.src[self.index], self.parent)
         self.index += 1
@@ -763,7 +763,7 @@ class MuseDataMeasureIterator:
 
     def __next__(self):
         if self.index >= len(self.boundaries):
-            raise StopIteration
+            raise StopIteration()
         start, end = self.boundaries[self.index]
         # add one b/c end is inclusive
         mdm = MuseDataMeasure(self.src[start:end + 1], self.parent)
@@ -1584,7 +1584,7 @@ class MuseDataWork(prebase.ProtoM21Object):
         for fpInner in fpList:
             mdf = MuseDataFile()
             mdf.encoding = self.encoding
-            # environLocal.printDebug('processing MuseData file: %s' % fp)
+            # environLocal.printDebug(f'processing MuseData file: {fp}')
             mdf.open(fpInner)
             mdf.read()  # process string and break into parts
             mdf.close()

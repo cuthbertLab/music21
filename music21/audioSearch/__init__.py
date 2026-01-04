@@ -140,7 +140,7 @@ def autocorrelationFunction(recordedSignal, recordSampleRateIn):
         # len(_missingImport) > 0:
         raise AudioSearchException(
             'Cannot run autocorrelationFunction without '
-            + f'numpy installed (scipy recommended).  Missing {bmi}')
+            f'numpy installed (scipy recommended).  Missing {bmi}')
     import numpy
     convolve = None
     try:
@@ -151,7 +151,7 @@ def autocorrelationFunction(recordedSignal, recordSampleRateIn):
             # noinspection PyPackageRequirements
             from scipy.signal import fftconvolve as convolve  # type: ignore
     except ImportError:  # pragma: no cover
-        warnings.warn('Running convolve without scipy -- will be slower')
+        warnings.warn('Running convolve without scipy -- will be slower', stacklevel=2)
         convolve = numpy.convolve
 
     recordedSignal = numpy.array(recordedSignal)
@@ -276,7 +276,7 @@ def normalizeInputFrequency(inputPitchFrequency, thresholds=None, pitches=None):
     ):
         raise AudioSearchException(
             'Cannot normalize input frequency if thresholds are given and '
-            + 'pitches are not, or vice-versa')
+            + 'pitches are not, or vice versa')
 
     if thresholds is None:
         (thresholds, pitches) = prepareThresholds()

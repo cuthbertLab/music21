@@ -1281,7 +1281,7 @@ class GenericInterval(IntervalBase):
         '''
         Return the inversion of this interval within an octave.
         For instance, seconds become sevenths, octaves become unisons,
-        and vice-versa.
+        and vice versa.
 
         All are undirected intervals.
 
@@ -2083,7 +2083,7 @@ class DiatonicInterval(IntervalBase):
         'A-5'
 
         (Ascending) Augmented Unisons reverse to (Descending)
-        Diminished Unisons and vice-versa
+        Diminished Unisons and vice versa
 
         >>> aug1 = interval.DiatonicInterval('augmented', 1)
         >>> aug1.direction
@@ -3500,7 +3500,7 @@ class Interval(IntervalBase):
                 # pitchAlt.ps = pitch2.ps + halfStepsToFix
                 # environLocal.printDebug(
                 #    'coercing pitch due to a transposition that requires an extreme ' +
-                #    'accidental: %s -> %s' % (pitch2, pitchAlt) )
+                #    f'accidental: {pitch2} -> {pitchAlt}')
                 # pitch2 = pitchAlt
                 pitch2.ps = pitch2.ps + halfStepsToFix
             else:
@@ -3962,8 +3962,9 @@ def transposePitch(
     else:
         if not hasattr(interval1, 'transposePitch'):
             raise IntervalException(
-                'interval must be a music21.interval.Interval object not {}'.format(
-                    interval1.__class__.__name__))
+                'interval must be a music21.interval.Interval object not '
+                + interval1.__class__.__name__
+            )
     return interval1.transposePitch(pitch1, inPlace=inPlace)
 
 

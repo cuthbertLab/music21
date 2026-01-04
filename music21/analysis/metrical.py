@@ -43,7 +43,7 @@ def labelBeatDepth(streamIn):
     >>> sOut = []
     >>> for n in s.flatten().notes:
     ...     stars = "".join([l.text for l in n.lyrics])
-    ...     sOut.append("{0:8s} {1}".format(n.beatStr, stars))
+    ...     sOut.append(f'{n.beatStr:8s} {stars}')
     >>> print("\n".join(sOut))
     1        ****
     1 1/2    *

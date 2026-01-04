@@ -21,7 +21,7 @@ def pitchAttributeCount(s, pitchAttr='name'):
     >>> bach = corpus.parse('bach/bwv324.xml')
     >>> pcCount = analysis.pitchAnalysis.pitchAttributeCount(bach, 'pitchClass')
     >>> for n in sorted(pcCount):
-    ...     print("%2d: %2d" % (n, pcCount[n]))
+    ...     print(f'{n:2d}: {pcCount[n]:2d}')
      0:  3
      2: 26
      3:  3
@@ -36,7 +36,7 @@ def pitchAttributeCount(s, pitchAttr='name'):
 
     >>> nameCount = analysis.pitchAnalysis.pitchAttributeCount(bach, 'name')
     >>> for n, count in nameCount.most_common(3):
-    ...     print("%2s: %2d" % (n, nameCount[n]))
+    ...     print(f'{n:>2s}: {nameCount[n]:2d}')
      D: 26
      A: 17
     F#: 15
@@ -44,7 +44,7 @@ def pitchAttributeCount(s, pitchAttr='name'):
 
     >>> nameOctaveCount = analysis.pitchAnalysis.pitchAttributeCount(bach, 'nameWithOctave')
     >>> for n in sorted(nameOctaveCount):
-    ...     print("%3s: %2d" % (n, nameOctaveCount[n]))
+    ...     print(f'{n:>3s}: {nameOctaveCount[n]:2d}')
      A2:  2
      A3:  5
      A4: 10

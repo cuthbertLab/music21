@@ -67,7 +67,7 @@ __all__ = [
     'manager',
     'noCorpus',
     'parse',
-    # virtual
+    'virtual',
     'search',
     'work',
 ]

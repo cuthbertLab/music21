@@ -351,7 +351,7 @@ class Lyric(prebase.ProtoM21Object, style.StyleMixin):
         if newSyllabic not in SYLLABIC_CHOICES:
             raise LyricException(
                 f'Syllabic value {newSyllabic!r} is not in '
-                + f'note.SYLLABIC_CHOICES, namely: {SYLLABIC_CHOICES}'
+                f'note.SYLLABIC_CHOICES, namely: {SYLLABIC_CHOICES}'
             )
         self._syllabic = newSyllabic
 

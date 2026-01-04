@@ -255,8 +255,6 @@ class Sites(common.SlottedObjectMixin):
                 newIdKey = None
             else:
                 newIdKey = id(newSite.site)
-                # if newIdKey != idKey and oldSite.site != None:
-                #    print('Error! %s %s' % (newIdKey, idKey))
             newSite.siteIndex = oldSite.siteIndex
             newSite.globalSiteIndex = _singletonCounter()
             newSite.classString = oldSite.classString
@@ -357,7 +355,10 @@ class Sites(common.SlottedObjectMixin):
                 updateNotAdd = True
 
             # if idKey is not None:
-            #    print('Updating idKey %s for object %s' % (idKey, id(obj)))
+            #     print(
+            #         'Updating idKey '
+            #         f'{idKey} for object {id(obj)}'
+            #     )
 
         # environLocal.printDebug(['adding obj', obj, idKey])
         # weak refs were being passed in __deepcopy__ calling this method
@@ -396,7 +397,7 @@ class Sites(common.SlottedObjectMixin):
     def yieldSites(self,
                    *,
                    excludeNone: t.Literal[True],
-                   sortByCreationTime: t.Union[bool, t.Literal['reverse']] = False,
+                   sortByCreationTime: bool|t.Literal['reverse'] = False,
                    priorityTarget=None,
                    ) -> Generator[stream.Stream, None, None]:
         ...
@@ -405,7 +406,7 @@ class Sites(common.SlottedObjectMixin):
     def yieldSites(self,
                    *,
                    excludeNone: bool = False,
-                   sortByCreationTime: t.Union[bool, t.Literal['reverse']] = False,
+                   sortByCreationTime: bool|t.Literal['reverse'] = False,
                    priorityTarget=None,
                    ) -> Generator[stream.Stream|None, None, None]:
         ...
@@ -413,7 +414,7 @@ class Sites(common.SlottedObjectMixin):
     def yieldSites(self,
                    *,
                    excludeNone: bool = False,
-                   sortByCreationTime: t.Union[bool, t.Literal['reverse']] = False,
+                   sortByCreationTime: bool|t.Literal['reverse'] = False,
                    priorityTarget=None,
                    ) -> Generator[stream.Stream|None, None, None]:
         # noinspection PyDunderSlots
@@ -663,7 +664,11 @@ class Sites(common.SlottedObjectMixin):
             priorityTarget=priorityTarget,
             excludeNone=True,
         )  # objs is a generator
-        # printMemo(memo, 'getObjByClass() called: looking at %s sites' % len(objs))
+        # printMemo(
+        #     memo,
+        #     'getObjByClass() called: looking at '
+        #     + f'{len(objs)} sites'
+        # )
         classNameIsStr = isinstance(className, str)
         for obj in objs:
             # environLocal.printDebug(['memo', memo])
@@ -961,7 +966,7 @@ class Sites(common.SlottedObjectMixin):
         except Exception as e:
             raise SitesException(
                 'an entry for this object '
-                + f'({site}) is not stored in this Sites object'
+                f'({site}) is not stored in this Sites object'
             ) from e
 
     def removeById(self, idKey):

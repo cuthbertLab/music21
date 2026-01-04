@@ -157,8 +157,8 @@ class MetadataCachingJob:
             else:
                 environLocal.printDebug(
                     'addFromPaths: got stream without metadata, '
-                    'creating stub: {0}'.format(
-                        common.relativepath(str(self.cleanFilePath))))
+                    f'creating stub: {common.relativepath(str(self.cleanFilePath))}'
+                )
                 metadataEntry = metadata.bundles.MetadataEntry(
                     sourcePath=self.cleanFilePath,
                     metadataPayload=None,
@@ -166,8 +166,10 @@ class MetadataCachingJob:
                 )
                 self.results.append(metadataEntry)
         except Exception:  # wide catch is fine. pylint: disable=broad-exception-caught
-            environLocal.warn('Had a problem with extracting metadata '
-                              'for {0}, piece ignored'.format(self.filePath))
+            environLocal.warn(
+                'Had a problem with extracting metadata '
+                f'for {self.filePath}, piece ignored'
+            )
             environLocal.warn(traceback.format_exc())
 
     def parseOpus(self, parsedObject):
@@ -182,9 +184,10 @@ class MetadataCachingJob:
                 del score  # for memory conservation
         except Exception as exception:  # wide catch is fine. pylint: disable=broad-exception-caught
             environLocal.warn(
-                'Had a problem with extracting metadata for score {0} '
-                'in {1}, whole opus ignored: {2}'.format(
-                    scoreNumber, self.filePath, str(exception)))
+                'Had a problem with extracting metadata for score '
+                f'{scoreNumber} in {self.filePath}, whole opus ignored: '
+                f'{exception}'
+            )
             environLocal.printDebug(traceback.format_exc())
         # Create a dummy metadata entry, representing the entire opus.
         # This lets the metadata bundle know it has already processed this
@@ -208,8 +211,9 @@ class MetadataCachingJob:
             if score.metadata is None or score.metadata.number is None:
                 environLocal.printDebug(
                     'addFromPaths: got Opus that contains '
-                    'Streams that do not have work numbers: '
-                    '{0}'.format(self.filePath))
+                    + 'Streams that do not have work numbers: '
+                    + str(self.filePath)
+                )
             else:
                 # update path to include work number
                 corpusPath = metadata.bundles.MetadataBundle.corpusPathToKey(
@@ -226,10 +230,9 @@ class MetadataCachingJob:
                 self.results.append(metadataEntry)
         except Exception as exception:  # pylint: disable=broad-exception-caught
             environLocal.warn(
-                'Had a problem with extracting metadata '
-                'for score {0} in {1}, whole opus ignored: '
-                '{2}'.format(
-                    scoreNumber, self.filePath, str(exception)))
+                f'Had a problem with extracting metadata for score {scoreNumber} '
+                f'in {self.filePath}, whole opus ignored: {exception}'
+            )
             environLocal.printDebug(traceback.format_exc())
 
     # PUBLIC METHODS #
@@ -294,11 +297,11 @@ class JobProcessor:
         '''
         Report on the current job status.
         '''
-        message = 'updated {0} of {1} files; total errors: {2} ... last file: {3}'.format(
-            totalJobs - remainingJobs,
-            totalJobs,
-            filePathErrorCount,
-            filePath,
+        completedJobs = totalJobs - remainingJobs
+        message = (
+            f'updated {completedJobs} of {totalJobs} files; '
+            f'total errors: {filePathErrorCount} ... '
+            f'last file: {filePath}'
         )
         return message
 
@@ -344,7 +347,7 @@ class JobProcessor:
                     'filePath': job.filePath,
                     'remainingJobs': remainingJobs,
                 }
-        for worker in workers:
+        for _worker in workers:
             job_queue.put(None)
         job_queue.join()
         result_queue.close()

@@ -297,7 +297,7 @@ class PitchClef(Clef):
         >>> clef.Treble8vbClef().octaveChange
         -1
 
-        Changing octaveChange changes lowestLine (but not vice-versa)
+        Changing octaveChange changes lowestLine (but not vice versa)
 
         >>> tc.lowestLine
         31
@@ -858,7 +858,7 @@ def clefFromString(clefString, octaveShift=0) -> Clef:
 
     if lineNum < 1 or lineNum > 5:
         raise ClefException('line number (second character) must be 1-5; do not use this '
-                            + f'function for clefs on special staves such as {xnStr!r}')
+                            f'function for clefs on special staves such as {xnStr!r}')
 
     clefObj: Clef
     if thisType in CLASS_FROM_TYPE:

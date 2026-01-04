@@ -431,7 +431,7 @@ class KeySignature(base.Music21Object):
         '''
         our_sharps = self.sharps or 0  # || 0 in case of None -- non-standard key-signature
         if mode is not None and tonic is not None:
-            warnings.warn(f'ignoring provided tonic: {tonic}', KeyWarning)
+            warnings.warn(f'ignoring provided tonic: {tonic}', KeyWarning, stacklevel=2)
         if mode is None and tonic is None:
             mode = 'major'
         if mode is None and tonic is not None:

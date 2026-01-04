@@ -1561,8 +1561,8 @@ def _validateAddress(address):
     # ultimately this can be removed
     # try:
     #     nfSet = cardinalityToChordMembers[card][(index, inversion)][0]
-    # except KeyError:
-    #     raise ChordTablesException('cannot validate address: %s' % address)
+    # except KeyError as ke:
+    #     raise ChordTablesException(f'cannot validate address: {address}') from ke
 
     return (card, index, inversion)
 
@@ -1945,7 +1945,7 @@ class Test(unittest.TestCase):
             else:
                 partition[key[0]].append(value)  # append unique ids
 
-        for key, value in partition.items():
+        for value in partition.values():
             # the length of the list should be the max value stored
             self.assertEqual(max(value), len(value))
 

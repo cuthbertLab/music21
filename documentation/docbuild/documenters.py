@@ -538,8 +538,11 @@ class ClassDocumenter(ObjectDocumenter):
         for classDocumenter in self.baseClassDocumenters:
             if classDocumenter not in mapping:
                 continue
-            result.append(banner.format(
-                classDocumenter.rstCrossReferenceString))
+            result.append(
+                banner.format(
+                    classDocumenter.rstCrossReferenceString
+                )
+            )
             result.append('')
             memberDocumenters = mapping[classDocumenter]
             result.append('.. hlist::')
@@ -757,10 +760,9 @@ class ClassDocumenter(ObjectDocumenter):
         >>> mapping = documenter.inheritedReadwritePropertiesMapping
         >>> sortBy = lambda x: x.referentPackageSystemPath
         >>> for classDocumenter in sorted(mapping, key=sortBy):
-        ...     print('{0}:'.format(classDocumenter.referentPackageSystemPath))
+        ...     print(f'{classDocumenter.referentPackageSystemPath}:')
         ...     for attributeDocumenter in mapping[classDocumenter][:10]:
-        ...         print('- {0}'.format(attributeDocumenter.referentPackageSystemPath))
-        ...
+        ...         print(f'- {attributeDocumenter.referentPackageSystemPath}')
         music21.base.Music21Object:
         - music21.base.Music21Object.activeSite
         - music21.base.Music21Object.derivation
@@ -940,13 +942,10 @@ class ClassDocumenter(ObjectDocumenter):
                 result.append('.. hlist::')
                 result.append('   :columns: 3')
                 result.append('')
-                formatString = '   - :attr:`~{0}.{1}`'
+                basePath = baseDocumenter.referentPackageSystemPath
                 for attrName in attrNames:
                     result.append(
-                        formatString.format(
-                            baseDocumenter.referentPackageSystemPath,
-                            attrName,
-                        )
+                        f'   - :attr:`~{basePath}.{attrName}`'
                     )
                 result.append('')
         return result
@@ -1594,14 +1593,15 @@ class CorpusDocumenter(Documenter):
 
     # def getRstVirtualWorkFileDictFormat(self, corpusFile):
     #     result = []
-    #     result.append('- {0} *({1})*: `{2}`'.format(
-    #         str(corpusFile.title),
-    #         str(corpusFile.format),
-    #         str(corpusFile.path),
-    #         ))
+    #     result.append(
+    #         f'- {corpusFile.title} '
+    #         f'*({corpusFile.format})*: '
+    #         f'`{corpusFile.path}`'
+    #     )
     #     result.append('')
-    #     result.append('  Source: {0}'.format(
-    #         str(corpusFile.url)))
+    #     result.append(
+    #         f'  Source: {corpusFile.url}'
+    #     )
     #     result.append('')
     #     return result
 

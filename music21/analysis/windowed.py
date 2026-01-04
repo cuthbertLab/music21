@@ -164,7 +164,8 @@ class WindowedAnalysis:
             windowCount = int(windowCountFloat)
             if windowCountFloat != windowCount:
                 warnings.warn(
-                    'maxWindowCount is not divisible by windowSize, possibly undefined behavior'
+                    'maxWindowCount is not divisible by windowSize, possibly undefined behavior',
+                    stacklevel=2
                 )
         elif windowType == 'adjacentAverage':
             windowCount = maxWindowCount

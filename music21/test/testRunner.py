@@ -252,8 +252,7 @@ def mainTest(*testClasses, **keywords):
                 optionflags=optionflags,
             )
         except ValueError as ve:  # no docstrings
-            print('Problem in docstrings [usually a missing r value before '
-                  + f'the quotes:] {ve}')
+            print(f'Problem in docstrings [usually a missing r value before the quotes]: {ve}')
             s1 = unittest.TestSuite()
 
     verbosity = 1

@@ -413,7 +413,7 @@ class GeneralObjectExporter:
         if outObj is None:
             raise MusicXMLExportException(
                 'Cannot translate the object '
-                + f'{self.generalObj} to a complete musicXML document; put it in a Stream first!'
+                f'{self.generalObj} to a complete musicXML document; put it in a Stream first!'
             )
         return outObj
 
@@ -424,8 +424,11 @@ class GeneralObjectExporter:
         if self.makeNotation:
             sc.makeNotation(inPlace=True)
         if not sc.isWellFormedNotation():
-            warnings.warn(f'{sc} is not well-formed; see isWellFormedNotation()',
-                category=MusicXMLWarning)
+            warnings.warn(
+                f'{sc} is not well-formed; see isWellFormedNotation()',
+                category=MusicXMLWarning,
+                stacklevel=2,
+            )
         # sc.makeImmutable()
         return sc
 
@@ -2865,9 +2868,7 @@ class PartExporter(XMLExporterBase):
             try:
                 part.makeBeams(inPlace=True)
             except exceptions21.StreamException as se:  # no measures or no time sig?
-                # incorrectly flagging MusicXMLWarning as not a Warning
-                # noinspection PyTypeChecker
-                warnings.warn(MusicXMLWarning, str(se))
+                warnings.warn(MusicXMLWarning(se), stacklevel=2)
         if not part.streamStatus.tuplets:
             for m in measures:
                 for m_or_v in [m, *m.voices]:
@@ -5400,7 +5401,7 @@ class MeasureExporter(XMLExporterBase):
                 break
         if musicXMLArticulationName is None:
             musicXMLArticulationName = 'other-articulation'
-            # raise MusicXMLExportException('Cannot translate %s to musicxml' % articulationMark)
+            # raise MusicXMLExportException(f'Cannot translate {articulationMark} to musicxml')
         mxArticulationMark = Element(musicXMLArticulationName)
         if articulationMark.placement is not None:
             mxArticulationMark.set('placement', articulationMark.placement)
@@ -6164,7 +6165,7 @@ class MeasureExporter(XMLExporterBase):
         or whatever:
 
         >>> ppp = dynamics.Dynamic('ppp')
-        >>> print('%.2f' % ppp.volumeScalar)
+        >>> print(f'{ppp.volumeScalar:.2f}')
         0.15
         >>> ppp.style.relativeY = -10
 
@@ -6905,8 +6906,9 @@ class MeasureExporter(XMLExporterBase):
                 mxBeam.text = 'forward hook'
             else:
                 raise MusicXMLExportException(
-                    'partial beam defined without a proper direction set (set to %s)' %
-                    beamObject.direction)
+                    'partial beam defined without a proper direction set '
+                    f'(set to {beamObject.direction})'
+                )
         else:
             raise MusicXMLExportException(
                 f'unexpected beam type encountered ({beamObject.type})'

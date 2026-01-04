@@ -204,7 +204,7 @@ def chordToBraille(music21Chord, descending=True, showOctave=True):
         except KeyError:
             environRules.warn(
                 f'Accidental {currentPitch.accidental} of '
-                + f'chord {music21Chord} cannot be transcribed to braille.'
+                f'chord {music21Chord} cannot be transcribed to braille.'
             )
         intervalDistance = interval.notesToGeneric(basePitch, currentPitch).undirected
         if intervalDistance > 8:
@@ -1115,7 +1115,7 @@ def timeSigToBraille(m21TimeSignature):
         brailleSig = ''.join(timeSigTrans)
         m21TimeSignature.editorial.brailleEnglish.append(
             f'Time Signature {m21TimeSignature.numerator}/{m21TimeSignature.denominator} '
-            + f'{brailleSig}'
+            f'{brailleSig}'
         )
         return brailleSig
     except (BrailleBasicException, KeyError) as unused_error:  # pragma: no cover

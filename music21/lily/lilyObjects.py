@@ -143,10 +143,10 @@ class LyObject(prebase.ProtoM21Object):
                 foundClass = True
                 break
 
-        if foundClass is False:  # pragma: no cover
+        if not foundClass:  # pragma: no cover
             raise LilyObjectsException(
                 'Could not support setting attributes from '
-                + f'{m21Object}: supported classes: {self.supportedClasses}')
+                f'{m21Object}: supported classes: {self.supportedClasses}')
         return attrs
 
     def setAttributesFromClassObject(self, classLookup, m21Object):
@@ -188,8 +188,9 @@ class LyObject(prebase.ProtoM21Object):
         if classLookup not in self.m21toLy:  # pragma: no cover
             raise LilyObjectsException(
                 'Could not support setting attributes from '
-                + f'{m21Object} error in self.m21toLy,'
-                + ' missing class definitions and no "*"')
+                f'{m21Object} error in self.m21toLy,'
+                ' missing class definitions and no "*"'
+            )
         classDict = self.m21toLy[classLookup]
         for m21Attribute in classDict:
             try:

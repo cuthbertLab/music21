@@ -94,7 +94,8 @@ def chordified(timespans, templateStream=None):  # pragma: no cover
             if quarterLength < 0:
                 raise TreeException(
                     'Something is wrong with the verticality '
-                    + f'{vert!r} its endTime {endTime:f} is less than its offset {offset:f}')
+                    f'{vert!r} its endTime {endTime:f} is less than its offset {offset:f}'
+                )
             element = vert.makeElement(quarterLength)
             measureList[measureIndex].append(element)
         return outputStream
@@ -107,7 +108,8 @@ def chordified(timespans, templateStream=None):  # pragma: no cover
             if quarterLength < 0:
                 raise TreeException(
                     'Something is wrong with the verticality '
-                    + f'{vert!r}, its endTime {endTime:f} is less than its offset {offset:f}')
+                    f'{vert!r}, its endTime {endTime:f} is less than its offset {offset:f}'
+                )
             element = vert.makeElement(quarterLength)
             elements.append(element)
 

@@ -218,7 +218,7 @@ class NoteworthyTranslator:
                 elif command == 'TimeSig':
                     self.createTimeSignature(attributes)
             except Exception as e:
-                print('Cannot create object from "%s"' % (attributes))
+                print(f'Cannot create object from "{attributes}"')
                 raise NoteworthyTranslateException from e
 
                 # Add the last Stuff
@@ -904,7 +904,7 @@ class NoteworthyTranslator:
             g = dynamics.Diminuendo()
         else:
             pass
-            # raise NoteworthyTranslateException('Cannot get style from %s' % str(attributes))
+            # raise NoteworthyTranslateException(f'Cannot get style from {attributes}')
         if g is not None:
             self.currentMeasure.append(g)
 

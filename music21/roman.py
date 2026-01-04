@@ -1234,10 +1234,12 @@ def romanNumeralFromChord(
         rn = RomanNumeral(rnString, keyObj, updatePitches=False,
             # correctRNAlterationForMinor() adds cautionary
             sixthMinor=Minor67Default.CAUTIONARY, seventhMinor=Minor67Default.CAUTIONARY)
-    except fbNotation.ModifierException as strerror:
+    except fbNotation.ModifierException as strerror:  # pragma: no cover
         raise RomanNumeralException(
-            'Could not parse {0} from chord {1} as an RN '
-            'in key {2}: {3}'.format(rnString, chordObj, keyObj, strerror))  # pragma: no cover
+            'Could not parse '
+            f'{rnString} from chord {chordObj} as an RN '
+            f'in key {keyObj}: {strerror}'
+        ) from strerror
 
     # Is this linking them in an unsafe way?
     rn.pitches = chordObj.pitches
@@ -3469,10 +3471,12 @@ class RomanNumeral(harmony.Harmony):
             # environLocal.printDebug(['got keyOrScale', keyOrScale])
             try:
                 keyClasses = keyOrScale.classes
-            except:  # pragma: no cover
+            except AttributeError:  # pragma: no cover
                 raise RomanNumeralException(
-                    'Cannot call classes on object {0!r}, send only Key '
-                    'or Scale Music21Objects'.format(keyOrScale))
+                    'Cannot call classes on object '
+                    f'{keyOrScale!r}, send only Key '
+                    'or Scale Music21Objects'
+                )
             if 'Key' in keyClasses:
                 # good to go
                 if keyOrScale.tonicPitchNameWithCase not in _keyCache:

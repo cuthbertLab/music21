@@ -202,11 +202,11 @@ class VoiceLeadingQuartet(base.Music21Object):
                 isKey = (isinstance(keyValue, key.Key))
                 if isKey is False:
                     raise AttributeError
-            except AttributeError:  # pragma: no cover
+            except AttributeError as ae:  # pragma: no cover
                 raise VoiceLeadingQuartetException(
                     'got a key signature that is not a string or music21 Key '
-                    + f'object: {keyValue}'
-                )
+                    f'object: {keyValue}'
+                ) from ae
         self._key = keyValue
 
     def _setVoiceNote(
@@ -1979,7 +1979,7 @@ class NNoteLinearSegment(base.Music21Object):
         tempListOne = self.noteList[:-1]
         tempListTwo = self.noteList[1:]
         melodicIntervalList = []
-        for n1, n2 in zip(tempListOne, tempListTwo):
+        for n1, n2 in zip(tempListOne, tempListTwo, strict=True):
             if n1 and n2:
                 melodicIntervalList.append(interval.Interval(n1, n2))
             else:
@@ -2355,7 +2355,7 @@ class NChordLinearSegment(NObjectLinearSegment):
                         self._chordList.append(value)
                     # else:
                         # raise NChordLinearSegmentException(
-                        #     'not a valid chord specification: %s' % value)
+                        #     f'not a valid chord specification: {value}')
                 except AttributeError as e:  # pragma: no cover
                     raise NChordLinearSegmentException(
                         f'not a valid chord specification: {value!r}'

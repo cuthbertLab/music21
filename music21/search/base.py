@@ -99,8 +99,10 @@ class SearchMatch(namedtuple('SearchMatch', ['elStart', 'els', 'index', 'iterato
     }
 
     def __repr__(self):
-        return 'SearchMatch(elStart={0}, els=len({1}), index={2}, iterator=[...])'.format(
-            repr(self.elStart), len(self.els), repr(self.index))
+        es = self.elStart
+        el = len(self.els)
+        ix = self.index
+        return f'SearchMatch(elStart={es!r}, els=len({el}), index={ix!r}, iterator=[...])'
 
 
 class StreamSearcher:
@@ -525,7 +527,7 @@ def approximateNoteSearch(thisStream, otherStreams):
     >>> o3.id = 'o3'
     >>> l = search.approximateNoteSearch(s, [o1, o2, o3])
     >>> for i in l:
-    ...    print('%s %r' % (i.id, i.matchProbability))
+    ...     print(f'{i.id} {i.matchProbability!r}')
     o1 0.666666...
     o3 0.333333...
     o2 0.083333...
@@ -561,7 +563,7 @@ def approximateNoteSearchNoRhythm(thisStream, otherStreams):
     >>> o3.id = 'o3'
     >>> l = search.approximateNoteSearchNoRhythm(s, [o1, o2, o3])
     >>> for i in l:
-    ...    print('%s %r' % (i.id, i.matchProbability))
+    ...     print(f'{i.id} {i.matchProbability!r}')
     o1 0.83333333...
     o3 0.5
     o2 0.1666666...
@@ -597,7 +599,7 @@ def approximateNoteSearchOnlyRhythm(thisStream, otherStreams):
     >>> o3.id = 'o3'
     >>> l = search.approximateNoteSearchOnlyRhythm(s, [o1, o2, o3])
     >>> for i in l:
-    ...    print('%s %r' % (i.id, i.matchProbability))
+    ...     print(f'{i.id} {i.matchProbability!r}')
     o1 0.5
     o3 0.33...
     o2 0.0
@@ -635,7 +637,7 @@ def approximateNoteSearchWeighted(thisStream, otherStreams):
     >>> o4.id = 'o4'
     >>> l = search.approximateNoteSearchWeighted(s, [o1, o2, o3, o4])
     >>> for i in l:
-    ...    print('%s %r' % (i.id, i.matchProbability))
+    ...     print(f'{i.id} {i.matchProbability!r}')
     o3 0.83333...
     o1 0.75
     o4 0.75
@@ -1068,10 +1070,18 @@ def mostCommonMeasureRhythms(streamIn, transposeDiatonic=False):
     >>> bach = corpus.parse('bwv1.6')
     >>> sortedRhythms = search.mostCommonMeasureRhythms(bach)
     >>> for in_dict in sortedRhythms[0:3]:
-    ...     print(f"no: {in_dict['number']} rhythmString: {in_dict['rhythmString']}")
-    ...     print('bars: %r' % ([(m.number,
-    ...                               str(m.getContextByClass(stream.Part).id))
-    ...                            for m in in_dict['measures']]))
+    ...     number = in_dict['number']
+    ...     rhythmString = in_dict['rhythmString']
+    ...     measures = in_dict['measures']
+    ...     print(
+    ...         f'no: {number} '
+    ...         f'rhythmString: {rhythmString}'
+    ...     )
+    ...     bars = [
+    ...         (m.number, str(m.getContextByClass(stream.Part).id))
+    ...         for m in measures
+    ...     ]
+    ...     print(f'bars: {bars!r}')
     ...     in_dict['rhythm'].show('text')
     ...     print('-----')
     no: 34 rhythmString: PPPP

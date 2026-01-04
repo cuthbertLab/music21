@@ -60,7 +60,7 @@ class TreeYielder:  # pragma: no cover
         tObj = type(obj)
         if tObj in self.nonIterables:
             pass
-        elif tObj == dict:
+        elif tObj is dict:
             for keyX in obj:
                 dictTuple = ('dict', keyX)
                 self.stackVals.append(dictTuple)
@@ -93,8 +93,10 @@ class TreeYielder:  # pragma: no cover
                 self.stackVals.append(objTuple)
                 try:
                     yield from self.run(gotValue, memo=memo)
-                except RuntimeError:
-                    raise ValueError(f'Maximum recursion on:\n{self.currentLevel()}')
+                except RuntimeError as runError:
+                    raise ValueError(
+                        f'Maximum recursion on:\n{self.currentLevel()}'
+                    ) from runError
                 self.stackVals.pop()
 
         self.currentStack.pop()

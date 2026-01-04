@@ -2621,7 +2621,7 @@ class ABCHandler:
                 else:
                     environLocal.printDebug(
                         ['broken rhythm marker '
-                         + f'({token.src}) not positioned between two notes or chords'])
+                         f'({token.src}) not positioned between two notes or chords'])
 
             # need to update tuplets with currently active meter
             if isinstance(token, ABCTuplet):
@@ -2698,7 +2698,7 @@ class ABCHandler:
                 if lastDefaultQL is None:
                     raise ABCHandlerException(
                         'no active default note length provided for note processing. '
-                        + f'tPrev: {tPrev}, token: {token}, tNext: {tNext}'
+                        f'tPrev: {tPrev}, token: {token}, tNext: {tNext}'
                     )
                 token.activeDefaultQuarterLength = lastDefaultQL
                 token.activeKeySignature = lastKeySignature
@@ -3671,21 +3671,22 @@ class Test(unittest.TestCase):
         ah.process(testFiles.hectorTheHero)
         ahm = ah.splitByMeasure()
 
-        for i, l, r in [(0, None, None),  # metadata
-                        (2, '|:', '|'),
-                        (3, '|', '|'),
-                        (-2, '[1', ':|'),
-                        (-1, '[2', '|'),
-                        ]:
-            if l is None:
+        for i, left, right in [
+            (0, None, None),  # metadata
+            (2, '|:', '|'),
+            (3, '|', '|'),
+            (-2, '[1', ':|'),
+            (-1, '[2', '|'),
+        ]:
+            if left is None:
                 self.assertEqual(ahm[i].leftBarToken, None)
             else:
-                self.assertEqual(ahm[i].leftBarToken.src, l)
+                self.assertEqual(ahm[i].leftBarToken.src, left)
 
-            if r is None:
+            if right is None:
                 self.assertEqual(ahm[i].rightBarToken, None)
             else:
-                self.assertEqual(ahm[i].rightBarToken.src, r)
+                self.assertEqual(ahm[i].rightBarToken.src, right)
 
         # for ahSub in ah.splitByMeasure():
         #     environLocal.printDebug(['split by measure:', ahSub.tokens])
@@ -3696,37 +3697,39 @@ class Test(unittest.TestCase):
         ah.process(testFiles.theBeggerBoy)
         ahm = ah.splitByMeasure()
 
-        for i, l, r in [(0, None, None),  # metadata
-                        (1, None, '|'),
-                        (-1, '||', None),  # trailing lyric metadata
-                        ]:
-            if l is None:
+        for i, left, right in [
+            (0, None, None),  # metadata
+            (1, None, '|'),
+            (-1, '||', None),  # trailing lyric metadata
+        ]:
+            if left is None:
                 self.assertEqual(ahm[i].leftBarToken, None)
             else:
-                self.assertEqual(ahm[i].leftBarToken.src, l)
+                self.assertEqual(ahm[i].leftBarToken.src, left)
 
-            if r is None:
+            if right is None:
                 self.assertEqual(ahm[i].rightBarToken, None)
             else:
-                self.assertEqual(ahm[i].rightBarToken.src, r)
+                self.assertEqual(ahm[i].rightBarToken.src, right)
 
         # test a simple string with no bars
         ah = ABCHandler()
         ah.process('M:6/8\nL:1/8\nK:G\nc1D2')
         ahm = ah.splitByMeasure()
 
-        for i, l, r in [(0, None, None),  # metadata
-                        (-1, None, None),  # note data, but no bars
-                        ]:
-            if l is None:
+        for i, left, right in [
+            (0, None, None),  # metadata
+            (-1, None, None),  # note data, but no bars
+        ]:
+            if left is None:
                 self.assertEqual(ahm[i].leftBarToken, None)
             else:
-                self.assertEqual(ahm[i].leftBarToken.src, l)
+                self.assertEqual(ahm[i].leftBarToken.src, left)
 
-            if r is None:
+            if right is None:
                 self.assertEqual(ahm[i].rightBarToken, None)
             else:
-                self.assertEqual(ahm[i].rightBarToken.src, r)
+                self.assertEqual(ahm[i].rightBarToken.src, right)
 
     def testMergeLeadingMetaData(self):
         from music21.abcFormat import testFiles

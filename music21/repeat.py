@@ -61,7 +61,7 @@ class RepeatMark(prebase.ProtoM21Object):
     >>> s.append(PartialRepeat())
     >>> repeats = s.getElementsByClass('RepeatMark')  # not a Music21Object, so use quotes
     >>> if repeats:
-    ...    print('Stream has %s repeat(s) in it' % (len(repeats)))
+    ...    print(f'Stream has {len(repeats)} repeat(s) in it')
     Stream has 1 repeat(s) in it
     '''
 
@@ -877,7 +877,7 @@ class Expander(t.Generic[StreamType]):
         lb = m.leftBarline
         rb = m.rightBarline
         if lb is not None and 'music21.bar.Repeat' in lb.classSet:
-            # environLocal.printDebug(['inserting new barline: %s' % newStyle])
+            # environLocal.printDebug([f'inserting new barline: {newStyle}'])
             m.leftBarline = bar.Barline(newType)
         if rb is not None and 'music21.bar.Repeat' in rb.classSet:
             m.rightBarline = bar.Barline(newType)
@@ -940,11 +940,15 @@ class Expander(t.Generic[StreamType]):
             environLocal.printDebug([f'Repeats are not balanced: countBalance: {countBalance}'])
             return False
         if startCount not in (endCount, endCount - 1):
-            environLocal.printDebug(['start count not the same as end count: %s / %s' % (
-                startCount, endCount)])
+            environLocal.printDebug([
+                'start count not the same as end count: '
+                f'{startCount} / {endCount}'
+            ])
             return False
-        # environLocal.printDebug(['matched start and end repeat barline count of: ',
-        #    '%s/%s' % (startCount, endCount)])
+        # environLocal.printDebug([
+        #     'matched start and end repeat barline count of: '
+        #     f'{startCount}/{endCount}'
+        # ])
         return True
 
     def _daCapoOrSegno(self):
@@ -1276,7 +1280,7 @@ class Expander(t.Generic[StreamType]):
                 # an end may be placed on the left barline; of the next measure
                 # meaning that we only want up until the previous
                 elif lb.direction == 'end':
-                    # environLocal.printDebug(['found an end in left barline: %s' % lb])
+                    # environLocal.printDebug([f'found an end in left barline: {lb}'])
                     if not startIndices:
                         # get from first to this one
                         barRepeatIndices = range(i)

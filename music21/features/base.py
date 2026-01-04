@@ -1083,7 +1083,7 @@ class DataSet:
             outputFormat = self._getOutputFormat(format)
         if outputFormat is None:
             raise DataSetException('no output format could be defined from file path '
-                                   + f'{fp} or format {format}')
+                                   f'{fp} or format {format}')
 
         return outputFormat.write(fp=fp, includeClassLabel=includeClassLabel)
 
@@ -1692,8 +1692,11 @@ class Test(unittest.TestCase):
     #                 if c != matchData[i].getclass():
     #                     mismatch += 1
     #
-    #             print('%s %s: misclassified %s/%s of %s' % (
-    #                     classifierStr, classifierType, mismatch, len(matchData), matchStr))
+    #             print(
+    #                 f'{classifierStr} {classifierType}: misclassified '
+    #                 f'{mismatch}/{len(matchData)} of '
+    #                 f'{matchStr}'
+    #             )
     #
     #         # if classifierType == orngTree.TreeLearner:
     #         #     orngTree.printTxt(classifier)
@@ -1741,9 +1744,11 @@ class Test(unittest.TestCase):
     #                     if c != matchData[i].getclass():
     #                         mismatch += 1
     #
-    #                 print('%s %s: misclassified %s/%s of %s' % (
-    #                         classifierStr, classifierType, mismatch, len(matchData), matchStr))
-
+    #             print(
+    #                 f'{classifierStr} {classifierType}: misclassified '
+    #                 f'{mismatch}/{len(matchData)} of '
+    #                 f'{matchStr}'
+    #             )
 
     # def xtestOrangeClassifiers(self):  # pragma: no cover
     #     '''
@@ -1770,16 +1775,15 @@ class Test(unittest.TestCase):
     #     print('Possible classes:', data.domain.classVar.values)
     #     print('Original Class', end=' ')
     #     for l in classifiers:
-    #         print('%-13s' % (l.name), end=' ')
+    #         print(f'{l.name:<13}', end=' ')
     #     print()
     #
     #     for example in data:
-    #         print('(%-10s)  ' % (example.getclass()), end=' ')
+    #         print(f'({example.getclass():<10})  ', end=' ')
     #         for c in classifiers:
     #             p = c([example, orange.GetProbabilities])
-    #             print('%5.3f        ' % (p[0]), end=' ')
+    #             print(f'{p[0]:5.3f}        ', end=' ')
     #         print('')
-
 
     # def xtestOrangeClassifierTreeLearner(self):  # pragma: no cover
     #     import orange, orngTree  # pylint: disable=import-error
@@ -1790,7 +1794,9 @@ class Test(unittest.TestCase):
     #     # tree = orngTree.TreeLearner(data)
     #     for i in range(len(data)):
     #         p = tree(data[i], orange.GetProbabilities)
-    #         print('%s: %5.3f (originally %s)' % (i + 1, p[1], data[i].getclass()))
+    #         print(
+    #             f'{i + 1}: {p[1]:5.3f} (originally {data[i].getclass()})'
+    #         )
     #
     #     orngTree.printTxt(tree)
 

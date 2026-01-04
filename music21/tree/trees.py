@@ -16,7 +16,6 @@ and other positions.
 from __future__ import annotations
 
 from math import inf
-import typing as t
 import unittest
 import weakref
 
@@ -439,7 +438,6 @@ class ElementTree(core.AVLTree):
             if parent is None or parent in visitedParents:
                 continue
             visitedParents.add(parent)
-            parentPosition = parent.offset
             parent._removeElementAtPosition(self, oldPosition)
             # Trees don't have offsets currently
             raise NotImplementedError
@@ -928,8 +926,10 @@ class OffsetTree(ElementTree):
         '''
         try:
             offset = element.offset
-        except AttributeError:
-            raise ElementTreeException('element must be a Music21Object, i.e., must have offset')
+        except AttributeError as ae:
+            raise ElementTreeException(
+                'element must be a Music21Object, i.e., must have offset'
+            ) from ae
         candidates = self.elementsStartingAt(offset)
         if element in candidates:
             return True

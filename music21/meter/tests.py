@@ -51,8 +51,9 @@ class TestExternal(unittest.TestCase):
         for i in range(8):
             msg = []
             for j in range(1, random.choice([2, 4])):
-                msg.append('%s/%s' % (random.choice(meterStrNumerator),
-                                      random.choice(meterStrDenominator)))
+                numerator = random.choice(meterStrNumerator)
+                denominator = random.choice(meterStrDenominator)
+                msg.append(f'{numerator}/{denominator}')
             ts = TimeSignature('+'.join(msg))
             m = stream.Measure()
             m.timeSignature = ts

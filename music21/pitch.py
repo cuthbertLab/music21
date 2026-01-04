@@ -2592,7 +2592,7 @@ class Pitch(prebase.ProtoM21Object):
 
         >>> p = pitch.Pitch('c4')
         >>> p.microtone = 20
-        >>> print('%.1f' % p.ps)
+        >>> print(f'{p.ps:.1f}')
         60.2
 
         Octaveless pitches use their .implicitOctave attributes:
@@ -2912,8 +2912,8 @@ class Pitch(prebase.ProtoM21Object):
             octave = int(value[-1])
             self.name = name
             self.octave = octave
-        except:
-            raise PitchException(f'Cannot set a nameWithOctave with {value!r}')
+        except (ValueError, PitchException) as e:
+            raise PitchException(f'Cannot set a nameWithOctave with {value!r}') from e
 
     @property
     def unicodeNameWithOctave(self) -> str:
@@ -3713,7 +3713,7 @@ class Pitch(prebase.ProtoM21Object):
         if target.ps <= fundamental.ps:
             raise PitchException(
                 'cannot find an equivalent harmonic for a fundamental '
-                + f'({fundamental}) that is not above this Pitch ({self})'
+                f'({fundamental}) that is not above this Pitch ({self})'
             )
 
         # up to the 32 harmonic

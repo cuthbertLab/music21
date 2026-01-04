@@ -13,7 +13,7 @@
 '''
 Objects and tools for processing MIDI data.  Converts from MIDI files to
 :class:`~music21.midi.MidiEvent`, :class:`~music21.midi.MidiTrack`, and
-:class:`~music21.midi.MidiFile` objects, and vice-versa.
+:class:`~music21.midi.MidiFile` objects, and vice versa.
 
 This module originally used routines from Will Ware's public domain midi.py
 library from 2001 which was once posted at

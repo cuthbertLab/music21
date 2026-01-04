@@ -194,9 +194,9 @@ class StreamCore(Music21Object):
         try:
             # try first, for the general case of not OffsetSpecial.
             offset = opFrac(offset)  # type: ignore
-        except TypeError:
+        except TypeError as te:
             if offset not in OffsetSpecial:  # pragma: no cover
-                raise StreamException(f'Cannot set offset to {offset!r} for {element}')
+                raise StreamException(f'Cannot set offset to {offset!r} for {element}') from te
 
         idEl = id(element)
         if not addElement and idEl not in self._offsetDict:
@@ -426,7 +426,7 @@ class StreamCore(Music21Object):
                         if eInStream is element:
                             raise StreamException(
                                 f'the object ({element!r}, id()={id(element)} '
-                                + f'is already found in this Stream ({self!r}, id()={id(self)})'
+                                f'is already found in this Stream ({self!r}, id()={id(self)})'
                             )
                 # something was old. delete from _offsetDict
                 # environLocal.warn('stale object')

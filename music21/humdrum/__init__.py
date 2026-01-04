@@ -14,9 +14,7 @@ Files in this package deal specifically with making life easier for
 people who have previously used humdrum or need to import
 humdrum data (in spines, etc.) into music21.
 
-
 Humdrum programs and their closest music21 equivalents:
-
 
 ============  =================================================  =========================================================================================================================================================================
 Humdrum       music21                                            notes

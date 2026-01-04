@@ -242,20 +242,19 @@ class AVLNode(common.SlottedObjectMixin):
     # SPECIAL METHODS #
 
     def __repr__(self):
-        lcHeight = None
+        lch = None
         if self.leftChild:
-            lcHeight = self.leftChild.height
-        rcHeight = None
-        if self.rightChild:
-            rcHeight = self.rightChild.height
+            lch = self.leftChild.height
 
-        return '<{}: Start:{} Height:{} L:{} R:{}>'.format(
-            self.__class__.__name__,
-            self.position,
-            self.height,
-            lcHeight,
-            rcHeight
-        )
+        rch = None
+        if self.rightChild:
+            rch = self.rightChild.height
+
+        cn = self.__class__.__name__
+        ps = self.position
+        ht = self.height
+
+        return f'<{cn}: Start:{ps} Height:{ht} L:{lch} R:{rch}>'
 
     def moveAttributes(self, other):
         '''

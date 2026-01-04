@@ -245,7 +245,7 @@ class Groups(list):  # no need to inherit from slotted object
     def _validName(self, value: str) -> None:
         if not isinstance(value, str):
             raise exceptions21.GroupException('Only strings can be used as group names, '
-                                              + f'not {value!r}')
+                                              f'not {value!r}')
         # if ' ' in value:
         #     raise exceptions21.GroupException('Spaces are not allowed as group names')
 
@@ -588,7 +588,7 @@ class Music21Object(prebase.ProtoM21Object):
         if isinstance(new_id, int) and new_id > defaults.minIdNumberToConsiderMemoryLocation:
             msg = 'Setting an ID that could be mistaken for a memory location '
             msg += f'is discouraged: got {new_id}'
-            warnings.warn(msg)
+            warnings.warn(msg, stacklevel=2)
         self._id = new_id
 
     def mergeAttributes(self, other: Music21Object) -> None:
@@ -638,8 +638,8 @@ class Music21Object(prebase.ProtoM21Object):
             ignoreAttributes = ignoreAttributes | defaultIgnoreSet
 
         new = common.defaultDeepcopy(self, memo, ignoreAttributes=ignoreAttributes)
-        setattr(new, '_cache', {})
-        setattr(new, '_sites', Sites())
+        new._cache = {}
+        new._sites = Sites()
         if 'groups' in defaultIgnoreSet:
             new.groups = Groups()
 
@@ -648,7 +648,7 @@ class Music21Object(prebase.ProtoM21Object):
         newDerivation = Derivation(client=new)
         newDerivation.origin = self
         newDerivation.method = '__deepcopy__'
-        setattr(new, '_derivation', newDerivation)
+        new._derivation = newDerivation
         # None activeSite is correct for new value
 
         # must do this after copying
@@ -749,8 +749,8 @@ class Music21Object(prebase.ProtoM21Object):
         >>> mObj.hasEditorialInformation
         True
         '''
-        # anytime something is changed here, change in style.StyleMixin and vice-versa
-        return not (self._editorial is None)
+        # any time something is changed here, change in style.StyleMixin and vice versa
+        return self._editorial is not None
 
     @property
     def editorial(self) -> Editorial:
@@ -772,7 +772,7 @@ class Music21Object(prebase.ProtoM21Object):
         # Dev note: because the property "editorial" shadows module editorial,
         # typing has to be in quotes.
 
-        # anytime something is changed here, change in style.StyleMixin and vice-versa
+        # anytime something is changed here, change in style.StyleMixin and vice versa
         if self._editorial is None:
             self._editorial = Editorial()
         return self._editorial
@@ -800,8 +800,8 @@ class Music21Object(prebase.ProtoM21Object):
         >>> mObj.hasStyleInformation
         True
         '''
-        # anytime something is changed here, change in style.StyleMixin and vice-versa
-        return not (self._style is None)
+        # anytime something is changed here, change in style.StyleMixin and vice versa
+        return self._style is not None
 
     @property
     def style(self) -> Style:
@@ -826,7 +826,7 @@ class Music21Object(prebase.ProtoM21Object):
         >>> n.style.absoluteX is None
         True
         '''
-        # anytime something is changed here, change in style.StyleMixin and vice-versa
+        # anytime something is changed here, change in style.StyleMixin and vice versa
         if not self.hasStyleInformation:
             StyleClass = self._styleClass
             self._style = StyleClass()
@@ -2110,7 +2110,7 @@ class Music21Object(prebase.ProtoM21Object):
             memo.add(siteObj)
             environLocal.printDebug(
                 f'looking in contextSites for {siteObj}'
-                + f' with position {positionInStream.shortRepr()}')
+                f' with position {positionInStream.shortRepr()}')
             for topLevel, inStreamPos, recurType in siteObj.contextSites(
                 callerFirst=callerFirst,
                 memo=memo,
@@ -2127,10 +2127,11 @@ class Music21Object(prebase.ProtoM21Object):
                 hypotheticalPosition = positionInStream.modify(offset=inStreamOffset)
 
                 if topLevel not in memo:
-                    # environLocal.printDebug('Yielding {}, {}, {} from contextSites'.format(
-                    #                                                topLevel,
-                    #                                                inStreamPos.shortRepr(),
-                    #                                                recurType))
+                    # environLocal.printDebug(
+                    #     f'Yielding {topLevel}, '
+                    #     f'{inStreamPos.shortRepr()}, '
+                    #     f'{recurType} from contextSites'
+                    # )
                     if returnSortTuples:
                         yield ContextSortTuple(topLevel, hypotheticalPosition, recurType)
                     else:
@@ -2143,7 +2144,7 @@ class Music21Object(prebase.ProtoM21Object):
             for derivedObject in topLevel.derivation.chain():
                 environLocal.printDebug(
                     'looking now in derivedObject, '
-                    + f'{derivedObject} with offsetAppend {offsetAppend}')
+                    f'{derivedObject} with offsetAppend {offsetAppend}')
                 for derivedCsTuple in derivedObject.contextSites(
                         callerFirst=None,
                         memo=memo,
@@ -2440,7 +2441,7 @@ class Music21Object(prebase.ProtoM21Object):
             except SitesException as se:
                 raise SitesException(
                     'activeSite cannot be set for '
-                    + f'object {self} not in the Stream {site}'
+                    f'object {self} not in the Stream {site}'
                 ) from se
 
             self._activeSiteStoredOffset = storedOffset
@@ -3218,7 +3219,7 @@ class Music21Object(prebase.ProtoM21Object):
         if quarterLength > self.duration.quarterLength:
             raise DurationException(
                 f'cannot split a duration ({self.duration.quarterLength}) '
-                + f'at this quarterLength ({quarterLength})'
+                f'at this quarterLength ({quarterLength})'
             )
 
         if retainOrigin is True:
@@ -3378,8 +3379,8 @@ class Music21Object(prebase.ProtoM21Object):
         if opFrac(sum(quarterLengthList)) != self.duration.quarterLength:
             raise Music21ObjectException(
                 'cannot split by quarter length list whose sum is not '
-                + 'equal to the quarterLength duration of the source: '
-                + f'{quarterLengthList}, {self.duration.quarterLength}'
+                'equal to the quarterLength duration of the source: '
+                f'{quarterLengthList}, {self.duration.quarterLength}'
             )
 
         # if nothing to do
