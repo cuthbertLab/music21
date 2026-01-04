@@ -71,10 +71,10 @@ jobs:
                   pip install wheel
                   pip install -r requirements.txt
                   pip install -r requirements_dev.txt
-            - name: PEP8 with flake8
+            - name: Code-style etc. with Ruff
               run: |
-                  flake8 music21
-                  flake8 documentation
+                  ruff check music21
+                  ruff check documentation
 
     mypy:
         runs-on: ubuntu-latest
