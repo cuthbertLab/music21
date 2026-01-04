@@ -12,9 +12,9 @@ import sys
 import subprocess
 
 # noinspection PyPackageRequirements
-import pytest  # pylint: disable=unused-import
+import pytest  # pylint: disable=unused-import  # noqa
 # noinspection PyPackageRequirements
-import nbval  # pylint: disable=unused-import
+import nbval  # pylint: disable=unused-import  # noqa
 
 from music21 import environment
 from music21 import common
