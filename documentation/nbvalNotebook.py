@@ -12,12 +12,29 @@ import sys
 import subprocess
 
 # noinspection PyPackageRequirements
-import pytest  # pylint: disable=unused-import  # noqa
+try:
+    import pytest
+except ImportError:  # pragma: no cover
+    # fail here to get a better message than file-not-found below.
+    raise ImportError(
+        'Please install pytest -- in the music21 directory run "pip install ".[dev]"'
+    )
+
 # noinspection PyPackageRequirements
-import nbval  # pylint: disable=unused-import  # noqa
+try:
+    import nbval
+except ImportError:  # pragma: no cover
+    raise ImportError(
+        'Please install nbval -- in the music21 directory run "pip install ".[dev]"'
+    )
 
 from music21 import environment
 from music21 import common
+
+if pytest is None or nbval is None:  # pragma: no cover
+    # this will never run, but it's important to use pytest and nbval variables
+    # or some modern code linters will remove the import pytest, import nbval lines.
+    raise ImportError('Please install pytest and nbval')
 
 # pytest --nbval usersGuide_15_key.ipynb --nbval-sanitize-with ../../nbval-sanitize.cfg -q
 skip = ['installJupyter.ipynb']
