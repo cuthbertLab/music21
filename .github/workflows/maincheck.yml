@@ -16,10 +16,16 @@ jobs:
             matrix:
                 python-version: [3.11, 3.12, 3.13, 3.14]
         steps:
+        - uses: actions/checkout@v4
         - uses: actions/setup-python@v4
           with:
               python-version: ${{ matrix.python-version }}
-        - uses: actions/checkout@v4
+        - name: Install uv
+          uses: astral-sh/setup-uv@v7
+          with:
+              enable-cache: true
+              cache-dependency-glob: |
+                  pyproject.toml
         - name: Install Ubuntu dependencies
           run: ./.github/scripts/install_ubuntu_deps.sh
         - name: Setup Lilypond
@@ -42,19 +48,23 @@ jobs:
               with:
                   python-version: '3.14'
                   cache: 'pip'
+            - name: Install uv
+              uses: astral-sh/setup-uv@v7
+              with:
+                  enable-cache: true
+                  cache-dependency-glob: |
+                      pyproject.toml
             - name: Install dependencies
               run: |
-                  python -m pip install --upgrade pip
-                  pip install wheel
-                  pip install -r requirements.txt
-                  pip install -r requirements_dev.txt
+                  uv pip install wheel
+                  uv pip install -e '.[dev]'
             - name: Install music21 in editable mode
               run: |
-                  python -m pip install -e .
+                  uv pip install -e .
             - name: Lint with pylint
               run: |
-                  pylint -j0 music21
-                  pylint -j0 documentation
+                  uv run pylint -j0 music21
+                  uv run pylint -j0 documentation
 
     ruff:
         runs-on: ubuntu-latest
@@ -65,16 +75,20 @@ jobs:
               with:
                   python-version: '3.14'
                   cache: 'pip'
+            - name: Install uv
+              uses: astral-sh/setup-uv@v7
+              with:
+                  enable-cache: true
+                  cache-dependency-glob: |
+                      pyproject.toml
             - name: Install dependencies
               run: |
-                  python -m pip install --upgrade pip
-                  pip install wheel
-                  pip install -r requirements.txt
-                  pip install -r requirements_dev.txt
+                  uv pip install wheel
+                  uv pip install -e '.[dev]'
             - name: Code-style etc. with Ruff
               run: |
-                  ruff check music21
-                  ruff check documentation
+                  uv run ruff check music21
+                  uv run ruff check documentation
 
     mypy:
         runs-on: ubuntu-latest
@@ -85,11 +99,16 @@ jobs:
               with:
                   python-version: '3.14'
                   cache: 'pip'
+            - name: Install uv
+              uses: astral-sh/setup-uv@v7
+              with:
+                  enable-cache: true
+                  cache-dependency-glob: |
+                      pyproject.toml
             - name: Install dependencies
               run: |
-                  pip install wheel
-                  python -m pip install -r requirements.txt
-                  python -m pip install -r requirements_dev.txt
+                  uv pip install wheel
+                  uv pip install -e '.[dev]'
             - name: Type-check all modules with mypy
               run: |
-                  mypy music21
+                  uv run mypy music21

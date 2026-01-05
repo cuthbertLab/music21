@@ -76,11 +76,13 @@ def runOne(nbFile):
     us['musescoreDirectPNGPath'] = '/skip' + str(museScore)
 
     # this config file changes 0x39f3a0 to 0xADDRESS.
-    sanitize_fn = str(common.getRootFilePath()
-                      / 'documentation'
-                      / 'docbuild'
-                      / 'nbval-sanitize.cfg'
-                      )
+    sanitize_fn = str(
+        common.getRootFilePath()
+        / 'documentation'
+        / 'docbuild'
+        / 'nbval-sanitize.cfg'
+    )
+
     try:
         retVal = subprocess.run(
             ['pytest',
