@@ -68,11 +68,17 @@ path = "music21/_version.py"
 [tool.hatch.build.targets.sdist]
 include = [
     "music21",
-    "py.typed",  # indicates source is typed.
 ]
+
+[tool.mypy]
+allow_redefinition = true
+warn_no_return = false
 
 [tool.ruff]
 line-length = 100
+exclude = [
+    'documentation/source/usersGuide/usersGuide_02_notes.ipynb',  # demonstrates invalid syntax
+]
 
 [tool.ruff.lint]
 # Flake8, pycodestyle, flake8-quotes + pyflakes
@@ -83,17 +89,20 @@ dummy-variable-rgx = "^(_.*|unused.*|i|j|counter|junk|dummy)"
 # add once allowed: E122 (continuation line missing indentation) and E124 (bracket align)
 
 ignore = [
+    # ignore E127 (over idented) once implemented by Ruff
+    # ignore E128 (under idented) once implemented by Ruff
+
     # space around | -- nice to omit in int|str
     'E227',
     # 0 blank lines -- good test but something going wrong in new algorithm
     'E301',
-    # blank lines
+    # blank lines -- expected 2 blank lines
     'E302',
-    # blank lines
+    # too many blank lines (maybe turn on soon)
     'E303',
-    # do not assign lambda -- okay by me.
+    # assignment to lambda is sometimes fine by me.
     'E731',
-    # except and then raise without from -- should do soon.
+    # "except" and then "raise without from" -- should do soon.
     'B904',
     # zip without strict= ... nice to turn this off someday, when code more mature
     'B905',
@@ -102,16 +111,31 @@ ignore = [
 [tool.ruff.lint.per-file-ignores]
 'music21/abcFormat/testFiles.py' = ['E501']  # line-too-long
 # when allowed again -- chord/tables omit E122, E127
-'music21/chord/tables.py' = ['E201', 'E202', 'E203', 'E221', 'E231', 'E241']
-'music21/common/__init__.py' = ['F403']
+'music21/chord/tables.py' = [
+    'E201',
+    'E202',
+    'E203',
+    'E221',
+    'E231',
+    'E241',
+]
+'music21/common/__init__.py' = ['F403']  # F403 -- star imports
 'music21/features/__init__.py' = ['F403']
 'music21/humdrum/__init__.py' = ['E501']  # line-too-long
 'music21/humdrum/testFiles.py' = ['E501']  # line-too-long
 'music21/musicxml/testFiles.py' = ['E501']  # line-too-long
 'music21/musicxml/testPrimitive.py' = ['E501']  # line-too-long
 'music21/romanText/testFiles.py' = ['E501']  # line-too-long
-'music21/search/__init__.py' = ['F403', 'F405']  # 405--star exports fine
+'music21/search/__init__.py' = [
+    'F403',
+    'F405',
+]  # F405 -- star exports
 'music21/variant.py' = ['E501']  # line-too-long
+'*.ipynb' = [
+    'F403',
+    'F405',
+    'W293',  # blank-line contains whitespace -- it happens
+]
 
 [tool.ruff.lint.flake8-quotes]
 inline-quotes = 'single'

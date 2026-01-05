@@ -2,8 +2,6 @@
 coverage
 coveralls
 docutils
-flake8<7.0.0
-flake8-quotes>=3.3.2
 hatch
 hatchling
 jupyter
@@ -13,6 +11,7 @@ nbval
 pylint>=3.2.0
 pytest
 python-Levenshtein
+ruff
 scipy
 sphinx
 twine
