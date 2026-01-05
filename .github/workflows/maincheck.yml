@@ -62,7 +62,7 @@ jobs:
                   uv pip install --system -e '.[dev]'
             - name: Install music21 in editable mode
               run: |
-                  uv pip install -e .
+                  uv pip install --system -e .
             - name: Lint with pylint
               run: |
                   uv run pylint -j0 music21
