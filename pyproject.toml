@@ -53,6 +53,28 @@ dependencies = [
     "webcolors>=1.5",
 ]
 
+[project.optional-dependencies]
+dev = [
+    'coverage',
+    'coveralls',
+    'docutils',
+    'hatch',
+    'hatchling',
+    'jupyter',
+    'mypy>=1.16.0',
+    'nbconvert',
+    'nbval',
+    'pylint>=3.2.0',
+    'pytest',
+    'python-Levenshtein',
+    'ruff',
+    'scipy',
+    'sphinx',
+    'twine',
+    'types-requests',
+    'wheel',
+]
+
 [[project.authors]]
 name = "Michael Scott Asato Cuthbert"
 email = "michael.asato.cuthbert@gmail.com"
