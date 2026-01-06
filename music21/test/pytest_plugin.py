@@ -9,7 +9,8 @@ import pytest  # noqa  # part of dev not running
 try:
     from _pytest.doctest import DoctestItem  # noqa
 except ImportError:
-    DoctestItem = ()
+    class DoctestItem:  # type: ignore[no-redef]
+        pass
 
 import music21
 from music21.test.testRunner import fix312OrderedDict, stripAddresses
