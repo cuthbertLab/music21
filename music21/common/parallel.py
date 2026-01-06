@@ -10,18 +10,24 @@
 from __future__ import annotations
 
 __all__ = [
+    'cpus',
     'runParallel',
     'runNonParallel',
-    'cpus',
+    'safeToParallize',
 ]
 
 import multiprocessing
+import os
 import unittest
 
 
-def runParallel(iterable, parallelFunction, *,
-                updateFunction=None, updateMultiply=3,
-                unpackIterable=False, updateSendsIterable=False):
+def runParallel(iterable,
+                parallelFunction,
+                *,
+                updateFunction=None,
+                updateMultiply=3,
+                unpackIterable=False,
+                updateSendsIterable=False):
     '''
     runs parallelFunction over iterable in parallel, optionally calling updateFunction after
     each common.cpus * updateMultiply calls.
@@ -103,9 +109,7 @@ def runParallel(iterable, parallelFunction, *,
     >>> outputs
     [99, 11, 123]
     '''
-    numCpus = cpus()
-
-    if numCpus == 1 or multiprocessing.current_process().daemon:
+    if not safeToParallize():
         return runNonParallel(iterable, parallelFunction,
                               updateFunction=updateFunction,
                               updateMultiply=updateMultiply,
@@ -135,7 +139,7 @@ def runParallel(iterable, parallelFunction, *,
                 else:
                     thisResult = resultsList[thisPosition]
 
-                if updateSendsIterable is False:
+                if not updateSendsIterable:
                     updateFunction(thisPosition, iterLength, thisResult)
                 else:
                     updateFunction(thisPosition, iterLength, thisResult, iterable[thisPosition])
@@ -143,6 +147,7 @@ def runParallel(iterable, parallelFunction, *,
     callUpdate(0)
     from joblib import Parallel, delayed  # type: ignore
 
+    numCpus = cpus()
     with Parallel(n_jobs=numCpus) as para:
         delayFunction = delayed(parallelFunction)
         while totalRun < iterLength:
@@ -161,9 +166,13 @@ def runParallel(iterable, parallelFunction, *,
     return resultsList
 
 
-def runNonParallel(iterable, parallelFunction, *,
-                   updateFunction=None, updateMultiply=3,
-                   unpackIterable=False, updateSendsIterable=False):
+def runNonParallel(iterable,
+                   parallelFunction,
+                   *,
+                   updateFunction=None,
+                   updateMultiply=3,
+                   unpackIterable=False,
+                   updateSendsIterable=False):
     '''
     This is intended to be a perfect drop in replacement for runParallel, except that
     it runs on one core only, and not in parallel.
@@ -190,7 +199,7 @@ def runNonParallel(iterable, parallelFunction, *,
                 else:
                     thisResult = resultsList[thisPosition]
 
-                if updateSendsIterable is False:
+                if not updateSendsIterable:
                     updateFunction(thisPosition, iterLength, thisResult)
                 else:
                     updateFunction(thisPosition, iterLength, thisResult, iterable[thisPosition])
@@ -218,6 +227,22 @@ def cpus():
         return cpuCount - 1
     else:
         return cpuCount
+
+def safeToParallize() -> bool:
+    '''
+    Check to see if it is safe or even useful to start a parallel process.
+
+    Will return False if we are in a multiprocessing child process or if
+    there is only one CPU or if pytest's x-dist worker flag is in the environment.
+
+    * New in v10
+    '''
+    return (
+        cpus() > 1
+        and not multiprocessing.parent_process()
+        and 'PYTEST_XDIST_WORKER' not in os.environ
+    )
+
 
 # Not shown to work.
 # def pickleCopy(obj):
@@ -252,12 +277,15 @@ class Test(unittest.TestCase):
         from music21.common.parallel import _countN, _countUnpacked
         output = runParallel(files, _countN)
         self.assertEqual(output, [165, 50, 131])
-        runParallel(files, _countN,
+        runParallel(files,
+                    _countN,
                     updateFunction=self._customUpdate1)
-        runParallel(files, _countN,
+        runParallel(files,
+                    _countN,
                     updateFunction=self._customUpdate2,
                     updateSendsIterable=True)
-        passed = runParallel(list(enumerate(files)), _countUnpacked,
+        passed = runParallel(list(enumerate(files)),
+                             _countUnpacked,
                              unpackIterable=True)
         self.assertEqual(len(passed), 3)
         self.assertNotIn(False, passed)

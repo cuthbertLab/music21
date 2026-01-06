@@ -247,7 +247,7 @@ class AppendSpanners(StrEnum):
     AppendSpanners.NONE means do not append the related spanners at all (i.e. only append
         the object).
 
-    * new in v9.
+    * New in v9.
     '''
     NORMAL = 'normal'
     RELATED_ONLY = 'related_only'
@@ -262,7 +262,7 @@ class OrnamentDelay(StrEnum):
     OrnamentDelay.NO_DELAY means there is no delay (this is equivalent to setting delay to 0.0)
     OrnamentDelay.DEFAULT_DELAY means the delay is half the duration of the ornamented note.
 
-    * new in v9.
+    * New in v9.
     '''
     NO_DELAY = 'noDelay'
     DEFAULT_DELAY = 'defaultDelay'

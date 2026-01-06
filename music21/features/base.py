@@ -18,6 +18,7 @@ import pickle
 import unittest
 
 from music21 import common
+from music21.common.parallel import safeToParallize
 from music21.common.types import StreamType
 from music21 import converter
 from music21 import corpus
@@ -931,7 +932,7 @@ class DataSet:
         Process all Data with all FeatureExtractors.
         Processed data is stored internally as numerous Feature objects.
         '''
-        if self.runParallel:
+        if self.runParallel and safeToParallize():
             return self._processParallel()
         else:
             return self._processNonParallel()
@@ -947,10 +948,10 @@ class DataSet:
 
         # print('about to run parallel')
         outputData = common.runParallel([(di, self.failFast) for di in self.dataInstances],
-                                           _dataSetParallelSubprocess,
-                                           updateFunction=shouldUpdate,
-                                           updateMultiply=1,
-                                           unpackIterable=True
+                                        _dataSetParallelSubprocess,
+                                        updateFunction=shouldUpdate,
+                                        updateMultiply=1,
+                                        unpackIterable=True
                                         )
         featureData, errors, classValues, ids = zip(*outputData)
         errors = common.flattenList(errors)

@@ -200,10 +200,6 @@ def main(runOne: str|bool = False):
     totalFailures = 0
 
     timeStart = time.time()
-    unused_dtr = doctest.DocTestRunner(doctest.OutputChecker(),
-                                verbose=False,
-                                optionflags=doctest.ELLIPSIS | doctest.NORMALIZE_WHITESPACE)
-
     for mt in getDocumentationFiles(runOne):
         # if 'examples' in mt.module:
         #     continue
