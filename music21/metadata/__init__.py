@@ -2399,6 +2399,8 @@ class Metadata(base.Music21Object):
         >>> metadata.Metadata.convertValue('dateCreated',
         ...     metadata.DateBetween(['1938', '1939']))
         <music21.metadata.primitives.DateBetween 1938/--/-- to 1939/--/-->
+
+        * Added in v10 -- newly exposed as a public function (was private)
         '''
         valueType: type[ValueType]|None = properties.UNIQUE_NAME_TO_VALUE_TYPE.get(
             uniqueName, None

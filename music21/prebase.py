@@ -43,7 +43,7 @@ class ProtoM21Object:
     >>> pc.classSet.isdisjoint(classList)
     True
     >>> repr(pc)
-    '<music21.PitchCounter no pitches>'
+    '<...PitchCounter no pitches>'
 
 
     ProtoM21Objects, like other Python primitives, cannot be put into streams --

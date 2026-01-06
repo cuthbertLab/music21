@@ -33,7 +33,7 @@ from music21 import stream
 from music21 import tempo
 
 # -----------------------------------------------------------------------------
-class TestMock(Music21Object):
+class MockObject(Music21Object):
     pass
 
 
@@ -45,7 +45,7 @@ class Test(unittest.TestCase):
         self.assertEqual(repr(a), f'<music21.base.Music21Object object at {address}>')
 
     def testObjectCreation(self):
-        a = TestMock()
+        a = MockObject()
         a.groups.append('hello')
         a.id = 'hi'
         a.offset = 2.0

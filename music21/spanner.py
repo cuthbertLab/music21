@@ -97,7 +97,7 @@ class Spanner(base.Music21Object):
     >>> for e in s:
     ...    print(e)
     <music21.note.Note C>
-    <music21.CarterAccelerandoSign <music21.note.Note C><music21.note.Note D><music21.note.Note E>>
+    <...CarterAccelerandoSign <music21.note.Note C><music21.note.Note D><music21.note.Note E>>
     <music21.note.Note D>
     <music21.note.Note E>
 
@@ -107,13 +107,13 @@ class Spanner(base.Music21Object):
     >>> spannerCollection = s.spanners  # a stream object
     >>> for thisSpanner in spannerCollection:
     ...     print(thisSpanner)
-    <music21.CarterAccelerandoSign <music21.note.Note C><music21.note.Note D><music21.note.Note E>>
+    <...CarterAccelerandoSign <music21.note.Note C><music21.note.Note D><music21.note.Note E>>
 
     (3) we can get the spanner by looking at the list getSpannerSites() on
     any object that has a spanner:
 
     >>> n2.getSpannerSites()
-    [<music21.CarterAccelerandoSign
+    [<music21...CarterAccelerandoSign
             <music21.note.Note C><music21.note.Note D><music21.note.Note E>>]
 
     In this example we will slur a few notes and then iterate over the stream to

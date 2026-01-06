@@ -58,7 +58,7 @@ def addDocAttrTestsToSuite(suite,
     client ()
     '''
     dtp = doctest.DocTestParser()
-    if globs is False:
+    if not globs:
         globs = __import__(defaultImports[0]).__dict__.copy()
 
     elif globs is None:
@@ -285,7 +285,7 @@ def mainTest(*testClasses, **keywords):
         testClasses = []  # remove cases
     for t in testClasses:
         if not isinstance(t, str):
-            if displayNames is True:
+            if displayNames:
                 for tName in unittest.defaultTestLoader.getTestCaseNames(t):
                     print(f'Unit Test Method: {tName}')
             if runThisTest is not None:
@@ -322,7 +322,7 @@ def mainTest(*testClasses, **keywords):
         localVariables = list(outerFrame.f_locals.values())
         addDocAttrTestsToSuite(s1, localVariables, outerFilename, globs, optionflags)
 
-    if runAllTests is True:
+    if runAllTests:
         fixDoctests(s1)
 
         runner = unittest.TextTestRunner()

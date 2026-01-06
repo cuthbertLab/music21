@@ -345,7 +345,7 @@ class WindowedAnalysis:
 
 # -----------------------------------------------------------------------------
 
-class TestMockProcessor:
+class MockObjectProcessor:
 
     def process(self, subStream):
         '''
@@ -380,7 +380,7 @@ class Test(unittest.TestCase):
         '''
         Test that windows are doing what they are supposed to do
         '''
-        p = TestMockProcessor()
+        p = MockObjectProcessor()
 
         from music21 import note
         s1 = stream.Stream()

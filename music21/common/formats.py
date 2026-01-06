@@ -141,21 +141,20 @@ def findFormat(fmt):
 
     >>> common.findFormat('wpd')
     (None, None)
-
-
-    These don't work but should eventually:
-
-    # >>> common.findFormat('png')
-    # ('musicxml.png', '.png')
-
-    # >>> common.findFormat('ipython')
-    # ('ipython', '.png')
-    # >>> common.findFormat('ipython.png')
-    # ('ipython', '.png')
-
-    # >>> common.findFormat('musicxml.png')
-    # ('musicxml.png', '.png')
     '''
+    # These don't work but should eventually:
+    #
+    # # >>> common.findFormat('png')
+    # # ('musicxml.png', '.png')
+    #
+    # # >>> common.findFormat('ipython')
+    # # ('ipython', '.png')
+    # # >>> common.findFormat('ipython.png')
+    # # ('ipython', '.png')
+    #
+    # # >>> common.findFormat('musicxml.png')
+    # # ('musicxml.png', '.png')
+
     from music21 import converter
     c = converter.Converter()
     fileFormat = c.regularizeFormat(fmt)

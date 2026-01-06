@@ -163,3 +163,7 @@ ignore = [
 inline-quotes = 'single'
 multiline-quotes = 'single'
 docstring-quotes = 'single'
+
+[tool.pytest.ini_options]
+addopts = ['--doctest-modules', '-p', 'music21.test.pytest_plugin']
+doctest_optionflags = ['NORMALIZE_WHITESPACE', 'ELLIPSIS']
