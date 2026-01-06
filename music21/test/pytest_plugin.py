@@ -19,13 +19,8 @@ def doctest_namespace() -> dict[str, Any]:
     ns: dict[str, Any] = {}
 
     all_names: list[str] = list(getattr(music21, '__all__', []))
-    if all_names:
-        for name in all_names:
-            ns[name] = getattr(music21, name)
-    else:
-        for name in dir(music21):
-            if not name.startswith('_'):
-                ns[name] = getattr(music21, name)
+    for name in all_names:
+        ns[name] = getattr(music21, name)
 
     # let doctests reference "music21" itself too.
     ns['music21'] = music21
