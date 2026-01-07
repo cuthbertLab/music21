@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 # Name:         clef.py
 # Purpose:      Objects for representing clefs
@@ -298,7 +297,7 @@ class PitchClef(Clef):
         >>> clef.Treble8vbClef().octaveChange
         -1
 
-        Changing octaveChange changes lowestLine (but not vice-versa)
+        Changing octaveChange changes lowestLine (but not vice versa)
 
         >>> tc.lowestLine
         31
@@ -859,7 +858,7 @@ def clefFromString(clefString, octaveShift=0) -> Clef:
 
     if lineNum < 1 or lineNum > 5:
         raise ClefException('line number (second character) must be 1-5; do not use this '
-                            + f'function for clefs on special staves such as {xnStr!r}')
+                            f'function for clefs on special staves such as {xnStr!r}')
 
     clefObj: Clef
     if thisType in CLASS_FROM_TYPE:
@@ -967,7 +966,7 @@ def bestClef(streamObj: stream.Stream,
         return height
     # environLocal.printDebug(['calling bestClef()'])
 
-    totalNotes = 0
+    totalPitches = 0
     totalHeight = 0
 
     sIter = streamObj.recurse() if recurse else streamObj.iter()
@@ -975,19 +974,13 @@ def bestClef(streamObj: stream.Stream,
     notes = sIter.notesAndRests
 
     for n in notes:
-        if n.isRest:
-            pass
-        elif n.isNote:
-            totalNotes += 1
-            totalHeight += findHeight(n.pitch)
-        elif n.isChord:
-            for p in n.pitches:
-                totalNotes += 1
-                totalHeight += findHeight(p)
-    if totalNotes == 0:
+        for p in n.pitches:
+            totalPitches += 1
+            totalHeight += findHeight(p)
+    if totalPitches == 0:
         averageHeight = 29.0
     else:
-        averageHeight = totalHeight / totalNotes
+        averageHeight = totalHeight / totalPitches
 
     # environLocal.printDebug(['average height', averageHeight])
     if averageHeight > 49:  # value found with experimentation; revise

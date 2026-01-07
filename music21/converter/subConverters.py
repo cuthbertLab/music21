@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 # Name:         converter/__init__.py
 # Purpose:      Specific subConverters for formats music21 should handle

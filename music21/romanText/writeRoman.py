@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 # Name:         romanText/writeRoman.py
 # Purpose:      Writer for the 'RomanText' format

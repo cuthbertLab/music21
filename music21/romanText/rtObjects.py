@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 # Name:         romanText/rtObjects.py
 # Purpose:      music21 objects for processing roman numeral analysis text files
@@ -825,8 +824,10 @@ class RTBeat(RTAtom):
         try:
             post = timeSignature.getOffsetFromBeat(beat)
         except exceptions21.TimeSignatureException:
-            environLocal.printDebug(['bad beat specification: %s in a meter of %s' % (
-                                    self.src, timeSignature)])
+            environLocal.printDebug([
+                'bad beat specification: '
+                f'{self.src} in a meter of {timeSignature}'
+            ])
             post = 0.0
 
         return post
@@ -1111,8 +1112,8 @@ class RTHandler:
         '''
         # iterate over lines and find the first measure definition
         iStartBody = None
-        for i, l in enumerate(lines):
-            if reMeasureTag.match(l.strip()) is not None:
+        for i, line in enumerate(lines):
+            if reMeasureTag.match(line.strip()) is not None:
                 # found a measure definition
                 iStartBody = i
                 break
@@ -1165,11 +1166,13 @@ class RTHandler:
                     rtt = RTTagged(line)
                     rtt.lineNumber = currentLineNumber
                     post.append(rtt)
-            except Exception:
+            except Exception as exc:
                 import traceback
                 tracebackMessage = traceback.format_exc()
-                raise RTHandlerException('At line %s (%s) an exception was raised: \n%s' % (
-                    currentLineNumber, line, tracebackMessage))
+                raise RTHandlerException(
+                    f'At line {currentLineNumber} ({line}) an exception was raised:\n'
+                    f'{tracebackMessage}'
+                ) from exc
         return post
 
     def tokenizeAtoms(self, line, container=None):

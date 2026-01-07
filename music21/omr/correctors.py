@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 # Name:         omr/correctors.py
 # Purpose:      music21 modules for correcting the output from OMR software
@@ -189,7 +188,7 @@ class ScoreCorrector:
         >>> omrScore = converter.parse(omrPath)
         >>> ssOMR = omr.correctors.ScoreCorrector(omrScore)
         >>> allDists = ssOMR.getVerticalProbabilityDistributionSinglePart(1)
-        >>> ['%0.3f' % p for p in allDists]
+        >>> [f'{p:0.3f}' for p in allDists]
         ['0.571', '1.000', '0.667', '0.714']
         '''
         i = pn
@@ -761,11 +760,10 @@ class MeasureHash:
                 hashString += self.hashGrace(n)
             elif n.isNote:
                 hashString += self.hashNote(n)
-            elif not n.isNote:
-                if n.isRest:
-                    hashString += self.hashRest(n)
-                elif n.isChord:
-                    hashString += self.hashNote(n)
+            elif n.isRest:
+                hashString += self.hashRest(n)
+            elif n.isChord:
+                hashString += self.hashNote(n)
         self.hashString = hashString
         return hashString
 
@@ -1007,8 +1005,11 @@ class MeasureHash:
         'PFFPFF'
         >>> opCodes = vlnIIMH.getOpCodes(violaMH.hashString)
         >>> for oc in opCodes:
-        ...    print('%30r : %.3f' %
-        ...           (oc, vlnIIMH.differenceProbabilityForOneOpCode(oc, violaMH.hashString)))
+        ...     prob = vlnIIMH.differenceProbabilityForOneOpCode(
+        ...         oc,
+        ...         violaMH.hashString,
+        ...     )
+        ...     print(f'{oc!r:>30} : {prob:.3f}')
                  ('equal', 0, 1, 0, 1) : 0.968
                ('replace', 1, 2, 1, 2) : 0.009
                  ('equal', 2, 6, 2, 6) : 0.876

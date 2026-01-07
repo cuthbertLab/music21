@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # -----------------------------------------------------------------------------
 # Name:         meter.core.py
 # Purpose:      Component objects for meters
@@ -525,7 +524,7 @@ class MeterSequence(MeterTerminal):
         # comparison of numerator and denominator
         if not isinstance(value, MeterTerminal):
             raise MeterException('values in MeterSequences must be MeterTerminals or '
-                                 + f'MeterSequences, not {value}')
+                                 f'MeterSequences, not {value}')
         if value.ratioEqual(self[key]):
             self._partition[key] = value
         else:
@@ -589,7 +588,7 @@ class MeterSequence(MeterTerminal):
         # elif isinstance(value, MeterTerminal):  # may be a MeterSequence
         #     mt = value
         # else:
-        #     raise MeterException('cannot add %s to this sequence' % value)
+        #     raise MeterException(f'cannot add {value} to this sequence')
         self._partition.append(mt)
         # clear cache
         self._levelListCache = {}
@@ -1272,7 +1271,7 @@ class MeterSequence(MeterTerminal):
 
         elif common.isIterable(value):  # a list of Terminals or Sequence es
             for obj in value:
-                # environLocal.printDebug('creating MeterSequence with %s' % obj)
+                # environLocal.printDebug(f'creating MeterSequence with {obj}')
                 self._addTerminal(obj)
             self._updateRatio()
             if targetWeight is not None:
@@ -1372,12 +1371,12 @@ class MeterSequence(MeterTerminal):
 
         try:
             totalRatio = self._numerator / self._denominator
-        except TypeError:
+        except TypeError as te:
             raise MeterException(
                 'Something wrong with the type of '
-                + 'this numerator %s %s or this denominator %s %s' %
-                (self._numerator, type(self._numerator),
-                                  self._denominator, type(self._denominator)))
+                f'this numerator {self._numerator} {type(self._numerator)} '
+                f'or this denominator {self._denominator} {type(self._denominator)}'
+            ) from te
 
         for mt in self._partition:
             # for mt in self:
@@ -1438,13 +1437,6 @@ class MeterSequence(MeterTerminal):
             else:  # its a meter sequence
                 mtList += obj._getFlatList()
         return mtList
-
-    @property
-    def flat(self):
-        '''
-        deprecated.  Call .flatten() instead.  To be removed in v11.
-        '''
-        return self.flatten()
 
     def flatten(self) -> MeterSequence:
         '''
@@ -1691,8 +1683,9 @@ class MeterSequence(MeterTerminal):
                         levelCount - 1, flat)
                 else:  # level count is at zero
                     if flat:  # make sequence into a terminal
-                        mt = MeterTerminal('%s/%s' % (
-                            partition_i.numerator, partition_i.denominator))
+                        mt = MeterTerminal(
+                            f'{partition_i.numerator}/{partition_i.denominator}'
+                        )
                         # set weight to that of the sequence
                         mt.weight = partition_i.weight
                         mtList.append(mt)
@@ -1863,7 +1856,7 @@ class MeterSequence(MeterTerminal):
         if qLenPos >= self.duration.quarterLength or qLenPos < 0:
             raise MeterException(
                 f'cannot access from qLenPos {qLenPos} '
-                + f'where total duration is {self.duration.quarterLength}'
+                f'where total duration is {self.duration.quarterLength}'
             )
 
         qPos = 0
@@ -1977,8 +1970,9 @@ class MeterSequence(MeterTerminal):
                 # environLocal.printDebug(['exceeding range:', self,
                 #   'self.duration', self.duration])
                 raise MeterException(
-                    'cannot access qLenPos %s when total duration is %s and ts is %s' % (
-                        qLenPos, self.duration.quarterLength, self))
+                    f'cannot access qLenPos {qLenPos} when total duration is '
+                    f'{self.duration.quarterLength} and ts is {self}'
+                )
 
             # environLocal.printDebug(['offsetToSpan', 'got qLenPos old', qLenPos])
             qLenPos = qLenPos % self.duration.quarterLength
@@ -2014,8 +2008,9 @@ class MeterSequence(MeterTerminal):
         qLenPos = opFrac(qLenPos)
         if qLenPos >= self.duration.quarterLength or qLenPos < 0:
             raise MeterException(
-                'cannot access qLenPos %s when total duration is %s and ts is %s' % (
-                    qLenPos, self.duration.quarterLength, self))
+                f'cannot access qLenPos {qLenPos} when total duration is '
+                f'{self.duration.quarterLength} and ts is {self}'
+            )
         iMatch = self.offsetToIndex(qLenPos)
         return opFrac(self[iMatch].weight)
 

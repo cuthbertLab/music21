@@ -1,9 +1,8 @@
-# -*- coding: utf-8 -*-
 # -----------------------------------------------------------------------------
 # Name:         tree/core.py
 # Purpose:      Core AVLTree object.  To be optimized the hell out of.
 #
-# Authors:      Josiah Wolf Oberholtzer
+# Authors:      Joséphine Wolf Oberholtzer
 #               Michael Scott Asato Cuthbert
 #
 # Copyright:    Copyright © 2013-2016 Michael Scott Asato Cuthbert
@@ -65,7 +64,7 @@ class AVLNode(common.SlottedObjectMixin):
 
         This attribute is used to help balance the AVL tree.
 
-        >>> score = tree.makeExampleScore()
+        >>> score = tree.examples.makeExampleScore()
         >>> scoreTree = tree.fromStream.asTimespans(score, flatten=True,
         ...                    classList=(note.Note, chord.Chord))
         >>> print(scoreTree.debug())
@@ -111,7 +110,7 @@ class AVLNode(common.SlottedObjectMixin):
 
         This property is used to help balance the AVL tree.
 
-        >>> score = tree.makeExampleScore()
+        >>> score = tree.examples.makeExampleScore()
         >>> scoreTree = tree.fromStream.asTimespans(score, flatten=True,
         ...              classList=(note.Note, chord.Chord))
         >>> print(scoreTree.debug())
@@ -149,7 +148,7 @@ class AVLNode(common.SlottedObjectMixin):
         The position of this node -- this is often the same as the offset of
         the node in a containing score, but does not need to be. It could be the .sortTuple
 
-        >>> score = tree.makeExampleScore()
+        >>> score = tree.examples.makeExampleScore()
         >>> scoreTree = tree.fromStream.asTimespans(score, flatten=True,
         ...            classList=(note.Note, chord.Chord))
         >>> print(scoreTree.rootNode.debug())
@@ -176,7 +175,7 @@ class AVLNode(common.SlottedObjectMixin):
 
         After setting the left child you need to do a node update. with node.update()
 
-        >>> score = tree.makeExampleScore()
+        >>> score = tree.examples.makeExampleScore()
         >>> scoreTree = tree.fromStream.asTimespans(score, flatten=True,
         ...           classList=(note.Note, chord.Chord))
         >>> print(scoreTree.rootNode.debug())
@@ -199,7 +198,7 @@ class AVLNode(common.SlottedObjectMixin):
 
         After setting the right child you need to do a node update. with node.update()
 
-        >>> score = tree.makeExampleScore()
+        >>> score = tree.examples.makeExampleScore()
         >>> scoreTree = tree.fromStream.asTimespans(score, flatten=True,
         ...             classList=(note.Note, chord.Chord))
         >>> print(scoreTree.rootNode.debug())
@@ -243,20 +242,19 @@ class AVLNode(common.SlottedObjectMixin):
     # SPECIAL METHODS #
 
     def __repr__(self):
-        lcHeight = None
+        lch = None
         if self.leftChild:
-            lcHeight = self.leftChild.height
-        rcHeight = None
-        if self.rightChild:
-            rcHeight = self.rightChild.height
+            lch = self.leftChild.height
 
-        return '<{}: Start:{} Height:{} L:{} R:{}>'.format(
-            self.__class__.__name__,
-            self.position,
-            self.height,
-            lcHeight,
-            rcHeight
-        )
+        rch = None
+        if self.rightChild:
+            rch = self.rightChild.height
+
+        cn = self.__class__.__name__
+        ps = self.position
+        ht = self.height
+
+        return f'<{cn}: Start:{ps} Height:{ht} L:{lch} R:{rch}>'
 
     def moveAttributes(self, other):
         '''
@@ -275,7 +273,7 @@ class AVLNode(common.SlottedObjectMixin):
         '''
         Get a debug of the Node:
 
-        >>> score = tree.makeExampleScore()
+        >>> score = tree.examples.makeExampleScore()
         >>> scoreTree = tree.fromStream.asTimespans(score, flatten=True,
         ...              classList=(note.Note, chord.Chord))
         >>> rn = scoreTree.rootNode
@@ -297,7 +295,7 @@ class AVLNode(common.SlottedObjectMixin):
 
         Called recursively
 
-        >>> score = tree.makeExampleScore()
+        >>> score = tree.examples.makeExampleScore()
         >>> scoreTree = tree.fromStream.asTimespans(score, flatten=True,
         ...            classList=(note.Note, chord.Chord))
         >>> rn = scoreTree.rootNode
@@ -338,7 +336,7 @@ class AVLNode(common.SlottedObjectMixin):
 
         We create a score with everything correct.
 
-        >>> score = tree.makeExampleScore()
+        >>> score = tree.examples.makeExampleScore()
         >>> scoreTree = tree.fromStream.asTimespans(score, flatten=True,
         ...             classList=(note.Note, chord.Chord))
         >>> n = scoreTree.rootNode

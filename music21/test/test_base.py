@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 # Name:         test.test_base.py
 # Purpose:      music21 tests for Music21Objects etc.
@@ -34,7 +33,7 @@ from music21 import stream
 from music21 import tempo
 
 # -----------------------------------------------------------------------------
-class TestMock(Music21Object):
+class MockObject(Music21Object):
     pass
 
 
@@ -46,7 +45,7 @@ class Test(unittest.TestCase):
         self.assertEqual(repr(a), f'<music21.base.Music21Object object at {address}>')
 
     def testObjectCreation(self):
-        a = TestMock()
+        a = MockObject()
         a.groups.append('hello')
         a.id = 'hi'
         a.offset = 2.0
@@ -460,7 +459,7 @@ class Test(unittest.TestCase):
         self.assertEqual(m2.duration.quarterLength, 4.0)
         # we cannot get a bar duration b/c we have not associated a ts
         try:
-            m2.barDuration.quarterLength
+            m2.barDuration.quarterLength  # noqa: B018 (useless expression)
         except exceptions21.StreamException:
             pass
 
@@ -641,7 +640,7 @@ class Test(unittest.TestCase):
         storage = []
         for i in range(6):
             soundFile = Wave_read()
-            # el = music21.Music21Object()
+            # el = base.Music21Object()
             el = base.ElementWrapper(soundFile)
             storage.append(el)
             self.assertEqual(el.obj, soundFile)

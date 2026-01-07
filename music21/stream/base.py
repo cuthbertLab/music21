@@ -1,11 +1,10 @@
-# -*- coding: utf-8 -*-
 # -----------------------------------------------------------------------------
 # Name:         stream/base.py
 # Purpose:      base classes for dealing with groups of positioned objects
 #
 # Authors:      Michael Scott Asato Cuthbert
 #               Christopher Ariza
-#               Josiah Wolf Oberholtzer
+#               Joséphine Wolf Oberholtzer
 #               Evan Lynch
 #
 # Copyright:    Copyright © 2008-2024 Michael Scott Asato Cuthbert
@@ -324,9 +323,6 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         # restrictClass: type[M21ObjType] = base.Music21Object,
         super().__init__(**keywords)
 
-        # TEMPORARY variable for v9 to deprecate the flat property. -- remove in v10
-        self._created_via_deprecated_flat = False
-
         self.streamStatus = streamStatus.StreamStatus(self)
         self._unlinkedDuration = None
 
@@ -451,13 +447,6 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         specialized :class:`music21.stream.StreamIterator` class, which
         adds necessary Stream-specific features.
         '''
-        # temporary for v9 -- remove in v10
-        if self._created_via_deprecated_flat:
-            warnings.warn('.flat is deprecated.  Call .flatten() instead',
-                          exceptions21.Music21DeprecationWarning,
-                          stacklevel=3)
-            self._created_via_deprecated_flat = False
-
         return t.cast(iterator.StreamIterator[M21ObjType],
                       iterator.StreamIterator(self))
 
@@ -679,11 +668,11 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
             else:
                 try:
                     match = self.elements[k]
-                except IndexError:
+                except IndexError as ie:
                     raise IndexError(
                         f'attempting to access index {k} '
-                        + f'while elements is of size {len(self.elements)}'
-                    )
+                        f'while elements is of size {len(self.elements)}'
+                    ) from ie
             # setting active site as cautionary measure
             self.coreSelfActiveSite(match)
             return t.cast(M21ObjType, match)
@@ -1011,7 +1000,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         del self._elements[k]
         self.coreElementsChanged()
 
-    def __add__(self: StreamType, other: 'Stream') -> StreamType:
+    def __add__(self, other: 'Stream') -> t.Self:
         '''
         Add, or concatenate, two Streams.
 
@@ -1374,7 +1363,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         '''
         self.elements = ()
 
-    def cloneEmpty(self: StreamType, derivationMethod: str|None = None) -> StreamType:
+    def cloneEmpty(self, derivationMethod: str|None = None) -> t.Self:
         '''
         Create a Stream that is identical to this one except that the elements are empty
         and set derivation.
@@ -1395,7 +1384,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         >>> len(q)
         0
         '''
-        returnObj: StreamType = self.__class__()
+        returnObj: t.Self = self.__class__()
         returnObj.derivation.client = returnObj
         returnObj.derivation.origin = self
         if derivationMethod is not None:
@@ -1961,11 +1950,11 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         return self._removeIteration(elFilter)
 
     # pylint: disable=no-member
-    def _deepcopySubclassable(self: StreamType,
+    def _deepcopySubclassable(self,
                               memo: dict[int, t.Any]|None = None,
                               *,
                               ignoreAttributes=None,
-                              ) -> StreamType:
+                              ) -> t.Self:
         # NOTE: this is a performance critical operation
         defaultIgnoreSet = {
             '_offsetDict', '_elements', '_endElements',
@@ -1977,7 +1966,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
 
         # PyCharm seems to think that this is a StreamCore
         # noinspection PyTypeChecker
-        new: StreamType = super()._deepcopySubclassable(memo, ignoreAttributes=ignoreAttributes)
+        new: t.Self = super()._deepcopySubclassable(memo, ignoreAttributes=ignoreAttributes)
 
         # new._offsetDict will get filled when ._elements is copied.
         newOffsetDict: dict[int, tuple[OffsetQLSpecial, base.Music21Object]] = {}
@@ -2029,7 +2018,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
 
         return new
 
-    def __deepcopy__(self: StreamType, memo=None) -> StreamType:
+    def __deepcopy__(self, memo=None) -> t.Self:
         '''
         Deepcopy the stream from copy.deepcopy()
         '''
@@ -2196,10 +2185,10 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         if isinstance(o, str) and returnSpecial is False and o in OffsetSpecial:
             try:
                 return getattr(self, o)
-            except AttributeError:  # pragma: no cover
+            except AttributeError as ae:  # pragma: no cover
                 raise base.SitesException(
                     'attempted to retrieve a bound offset with a string '
-                    + f'attribute that is not supported: {o}')
+                    f'attribute that is not supported: {o}') from ae
         else:
             return o
 
@@ -2307,15 +2296,15 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
             try:
                 activeSite = item.activeSite
                 offset = item.getOffsetBySite(activeSite)
-            except AttributeError:
+            except AttributeError as ae:
                 raise StreamException(f'Cannot insert item {item!r} to stream '
-                                      + '-- is it a music21 object?')
+                                      + '-- is it a music21 object?') from ae
 
         # if not common.isNum(offset):
         try:  # using float conversion instead of isNum for performance
             offset = float(offset)
-        except (ValueError, TypeError):
-            raise StreamException(f'Offset {offset!r} must be a number.')
+        except (ValueError, TypeError) as ve:
+            raise StreamException(f'Offset {offset!r} must be a number.') from ve
 
         element = item
 
@@ -2968,7 +2957,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
 
         Note that it does not work the other way: if we made the replacement on `s`
         then `sf`, the flattened representation, would not be changed, since `s`
-        does not derive from `sf` but vice-versa.
+        does not derive from `sf` but vice versa.
 
         With `recurse=True`, a stream can replace an element that is
         further down in the hierarchy.  First let's set up a
@@ -4329,9 +4318,9 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
             for m in measureIterator:
                 try:
                     mNumber = int(m.number)
-                except ValueError:  # pragma: no cover
+                except ValueError as ve:  # pragma: no cover
                     # should never happen.
-                    raise StreamException(f'found problematic measure for numbering: {m}')
+                    raise StreamException(f'found problematic measure for numbering: {m}') from ve
                 if mNumber != 0:
                     return True
             return False
@@ -4699,9 +4688,11 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
     def template(self,
                  *,
                  fillWithRests=True,
-                 removeClasses=None,
+                 removeClasses: Iterable[type|str]|set[type|str]|None = None,
                  retainVoices=True,
-                 ):
+                 removeAll=False,
+                 exemptFromRemove=frozenset(),
+                 ) -> t.Self:
         '''
         Return a new Stream based on this one, but without the notes and other elements
         but keeping instruments, clefs, keys, etc.
@@ -4772,10 +4763,12 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         {5.0} <music21.stream.Measure 2 offset=5.0>
         ...
 
-        Setting removeClasses to True removes everything that is not a Stream:
+        Setting removeAll to True removes everything that is not a Stream:
+        (this was removeClasses=True; in v9.9 both removeClasses=True or removeAll=True
+        is allowed; in v10 only removeAll=True will be allowed).
 
         >>> bass = b.parts[3]
-        >>> bassEmpty = bass.template(fillWithRests=False, removeClasses=True)
+        >>> bassEmpty = bass.template(fillWithRests=False, removeAll=True)
         >>> bassEmpty.show('text')
         {0.0} <music21.stream.Measure 0 offset=0.0>
         <BLANKLINE>
@@ -4789,7 +4782,19 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         <BLANKLINE>
         ...
 
-        On the whole score:
+        `exemptFromRemove` should be a set of classes (or class strings) that
+        are exempted from removal by removeAll or removeClasses
+
+        >>> bass = b.parts[3]
+        >>> bassEmpty = bass.template(fillWithRests=False, removeAll=True,
+        ...                           exemptFromRemove={meter.TimeSignature})
+        >>> bassEmpty[meter.TimeSignature].first()
+        <music21.meter.TimeSignature 4/4>
+        >>> print(bassEmpty[clef.Clef].first())
+        None
+
+        Here is an example of exerpts of what calling template() with
+        default values on the whole score looks like.
 
         >>> b.template().show('text')
         {0.0} <music21.metadata.Metadata object at 0x106151940>
@@ -4857,6 +4862,8 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         on bwv66.6)
 
         * Changed in v7: all arguments are keyword only.
+        * New in v9.9: added exemptFromRemove
+        * Note: in v10: removeClasses cannot be boolean -- use removeAll instead
         '''
         out = self.cloneEmpty(derivationMethod='template')
         if removeClasses is None:
@@ -4867,7 +4874,6 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         restInfo = {'offset': None, 'endTime': None}
 
         def optionalAddRest():
-            # six.PY3  nonlocal currentRest  would remove the need for restInfo struct
             if not fillWithRests:
                 return
             if restInfo['offset'] is None:
@@ -4881,21 +4887,38 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
 
         for el in self:
             elOffset = self.elementOffset(el, returnSpecial=True)
-            if el.isStream and (retainVoices or ('Voice' not in el.classes)):
+
+            # retain all streams (exception: Voices if retainVoices  is False
+            if isinstance(el, Stream) and (retainVoices or ('Voice' not in el.classes)):
                 optionalAddRest()
                 outEl = el.template(fillWithRests=fillWithRests,
                                     removeClasses=removeClasses,
-                                    retainVoices=retainVoices)
+                                    retainVoices=retainVoices,
+                                    removeAll=removeAll,
+                                    exemptFromRemove=exemptFromRemove)
                 if elOffset != OffsetSpecial.AT_END:
                     out.coreInsert(elOffset, outEl)
                 else:  # pragma: no cover
                     # should not have streams stored at end.
                     out.coreStoreAtEnd(outEl)
+                continue
 
-            elif (removeClasses is True
-                    or el.classSet.intersection(removeClasses)
-                    or (not retainVoices and 'Voice' in el.classes)):
-                # remove this element
+            # okay now determine if we will be skipping or keeping this element
+            skip_element = False
+            if removeAll:
+                # with this setting we remove everything by default
+                skip_element = True
+            elif el.classSet.intersection(removeClasses):
+                skip_element = True
+            elif not retainVoices and 'Voice' in el.classSet:
+                skip_element = True
+
+            if exemptFromRemove and el.classSet.intersection(exemptFromRemove):
+                skip_element = False
+
+            if skip_element:
+                # we are removing this element, but if fillWithRests we need to keep track of
+                # the rest we will eventually fill.
                 if fillWithRests and el.duration.quarterLength:
                     endTime = elOffset + el.duration.quarterLength
                     if restInfo['offset'] is None:
@@ -5215,7 +5238,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
 
     @overload
     def _transposeByInstrument(
-        self: StreamType,
+        self,
         *,
         reverse: bool = False,
         transposeKeySignature: bool = True,
@@ -5226,23 +5249,23 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
 
     @overload
     def _transposeByInstrument(
-        self: StreamType,
+        self,
         *,
         reverse: bool = False,
         transposeKeySignature: bool = True,
         preserveAccidentalDisplay: bool = False,
         inPlace: t.Literal[False] = False,
-    ) -> StreamType:
+    ) -> t.Self:
         pass
 
     def _transposeByInstrument(
-        self: StreamType,
+        self,
         *,
         reverse: bool = False,
         transposeKeySignature: bool = True,
         preserveAccidentalDisplay: bool = False,
         inPlace: bool = False,
-    ) -> StreamType|None:
+    ) -> t.Self|None:
         '''
         Transpose the Stream according to each instrument's transposition.
 
@@ -5655,8 +5678,9 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         # get a default and/or place default at zero if nothing at zero
         if returnDefault:
             if not post or post[0].offset > 0.0:
-                ts = meter.TimeSignature('%s/%s' % (defaults.meterNumerator,
-                                                    defaults.meterDenominatorBeatType))
+                ts = meter.TimeSignature(
+                    f'{defaults.meterNumerator}/{defaults.meterDenominatorBeatType}'
+                )
                 post.insert(0, ts)
         # environLocal.printDebug(['getTimeSignatures(): final result:', post[0]])
         return post
@@ -5790,7 +5814,12 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         )
         return post.first()
 
-    def invertDiatonic(self, inversionNote=note.Note('C4'), *, inPlace=False):
+    def invertDiatonic(
+        self,
+        inversionNote: note.Note|None = None,
+        *,
+        inPlace: bool = False
+    ):
         '''
         inverts a stream diatonically around the given note (by default, middle C)
 
@@ -5849,6 +5878,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
 
         * Changed in v5: inPlace is False by default.
         '''
+        inversionNoteReal: note.Note = inversionNote or note.Note('C4')
         if inPlace:
             returnStream = self
         else:
@@ -5856,23 +5886,23 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
 
         keySigSearch = returnStream.recurse().getElementsByClass(key.KeySignature)
 
-        quickSearch = True
+        ourKey: key.KeySignature | None
         if not keySigSearch:
             ourKey = key.Key('C')
         elif len(keySigSearch) == 1:
             ourKey = keySigSearch[0]
         else:
             ourKey = None  # for might be undefined warning
-            quickSearch = False
 
-        inversionDNN = inversionNote.pitch.diatonicNoteNum
-        for n in returnStream[note.NotRest]:
+        inversionDNN = inversionNoteReal.pitch.diatonicNoteNum
+        for n in returnStream[note.Note]:
             n.pitch.diatonicNoteNum = (2 * inversionDNN) - n.pitch.diatonicNoteNum
-            if quickSearch:  # use previously found
+            if ourKey:  # use previously found
                 n.pitch.accidental = ourKey.accidentalByStep(n.pitch.step)
             else:  # use context search
                 ksActive = n.getContextByClass(key.KeySignature)
-                n.pitch.accidental = ksActive.accidentalByStep(n.pitch.step)
+                if ksActive:
+                    n.pitch.accidental = ksActive.accidentalByStep(n.pitch.step)
 
             if n.pitch.accidental is not None:
                 n.pitch.accidental.displayStatus = None
@@ -6014,10 +6044,10 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
             unused = item.isStream
             element = item
         # if not isinstance(item, music21.Music21Object):
-        except AttributeError:
+        except AttributeError as ae:
             # element = music21.ElementWrapper(item)
             raise StreamException('to put a non Music21Object in a stream, '
-                                  + 'create a music21.ElementWrapper for the item')
+                                  + 'create a music21.ElementWrapper for the item') from ae
         # # if not an element, embed
         # if not isinstance(item, music21.Music21Object):
         #     element = music21.ElementWrapper(item)
@@ -6049,11 +6079,11 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
             unused = item.isStream
             element = item
         # if not isinstance(item, music21.Music21Object):
-        except AttributeError:
+        except AttributeError as ae:
             # if not an element, embed
             # element = music21.ElementWrapper(item)
             raise StreamException('to put a non Music21Object in a stream, '
-                                  + 'create a music21.ElementWrapper for the item')
+                                  + 'create a music21.ElementWrapper for the item') from ae
         # if not isinstance(item, music21.Music21Object):
         #     # if not an element, embed
         #     element = music21.ElementWrapper(item)
@@ -6370,8 +6400,8 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
                 if quarterLength < 0:  # pragma: no cover
                     environLocal.warn(
                         'Something is wrong with the verticality '
-                        + f'in stream {templateInner!r}: {vert!r} '
-                        + f'its endTime {endTime} is less than its offset {offset}'
+                        f'in stream {templateInner!r}: {vert!r} '
+                        f'its endTime {endTime} is less than its offset {offset}'
                     )
 
                 chordOrRest = vert.makeElement(quarterLength,
@@ -6914,7 +6944,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         '''
         return self.streamStatus.accidentals
 
-    def makeNotation(self: StreamType,
+    def makeNotation(self,
                      *,
                      meterStream=None,
                      refStreamOrTimeRange=None,
@@ -6965,7 +6995,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         * Changed in v7: `inPlace=True` returns `None`.
         '''
         # determine what is the object to work on first
-        returnStream: StreamType|Stream[t.Any]
+        returnStream: t.Self|Stream[t.Any]
         if inPlace:
             returnStream = self
         else:
@@ -7025,7 +7055,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
             try:
                 makeNotation.makeBeams(returnStream, inPlace=True)
             except meter.MeterException as me:
-                warnings.warn(str(me))
+                warnings.warn(str(me), stacklevel=2)
 
         # note: this needs to be after makeBeams, as placing this before
         # makeBeams was causing the duration's tuplet to lose its type setting
@@ -7675,7 +7705,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         False
         >>> g = ''
         >>> for myElement in s:
-        ...    g += '%s: %s; ' % (myElement.offset, myElement.name)
+        ...    g += f'{myElement.offset}: {myElement.name}; '
         >>> g
         '0.0: C#; 2.0: C#; 4.0: C#; 1.0: D-; 3.0: D-; 5.0: D-; '
         >>> y = s.sorted()
@@ -7683,7 +7713,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         True
         >>> g = ''
         >>> for myElement in y:
-        ...    g += '%s: %s; ' % (myElement.offset, myElement.name)
+        ...    g += f'{myElement.offset}: {myElement.name}; '
         >>> g
         '0.0: C#; 1.0: D-; 2.0: C#; 3.0: D-; 4.0: C#; 5.0: D-; '
         >>> farRight = note.Note('E')
@@ -7692,13 +7722,13 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         >>> y.insert(farRight)
         >>> g = ''
         >>> for myElement in y:
-        ...    g += '%s: %s; ' % (myElement.offset, myElement.name)
+        ...    g += f'{myElement.offset}: {myElement.name}; '
         >>> g
         '0.0: C#; 1.0: D-; 2.0: C#; 3.0: D-; 4.0: C#; 5.0: D-; 2.0: E; '
         >>> z = y.sorted()
         >>> g = ''
         >>> for myElement in z:
-        ...    g += '%s: %s; ' % (myElement.offset, myElement.name)
+        ...    g += f'{myElement.offset}: {myElement.name}; '
         >>> g
         '0.0: C#; 1.0: D-; 2.0: C#; 2.0: E; 3.0: D-; 4.0: C#; 5.0: D-; '
         >>> z[2].name, z[3].name
@@ -7728,12 +7758,12 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         self._cache['sorted'] = s
         return s
 
-    def flatten(self: StreamType, retainContainers=False) -> StreamType:
+    def flatten(self, retainContainers=False) -> t.Self:
         '''
         A very important method that returns a new Stream
         that has all sub-containers "flattened" within it,
         that is, it returns a new Stream where no elements nest within
-        other elements.
+        other elements.  (Prior to v7 this was the property .flat)
 
         Here is a simple example of the usefulness of .flatten().  We
         will create a Score with two Parts in it, each with two Notes:
@@ -7810,6 +7840,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
 
         If `retainContainers=True` then a "semiFlat" version of the stream
         is returned where Streams are also included in the output stream.
+        (Prior to v7 this was the property semiFlat)
 
         In general, you will not need to use this because `.recurse()` is
         more efficient and does not lead to problems of the same
@@ -7849,7 +7880,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         >>> sf[4]
         <music21.note.Note C>
 
-        Unless it is important to get iterate in order from
+        Unless it is important to iterate in order from
         front of score to back of the score, you are generally better off using recurse
         instead of `.flatten(retainContainers=True)`, with `.getOffsetInHierarchy()`
         to figure out where in the score each element lies.
@@ -7880,9 +7911,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
 
         >>> g = ''
         >>> for myElement in s:
-        ...    g += '%s: %s; ' % (myElement.offset, myElement.name)
-        ...
-
+        ...    g += f'{myElement.offset}: {myElement.name}; '
         >>> g
         '0.0: C#; 2.0: C#; 4.0: C#; 1.0: D-; 3.0: D-; 5.0: D-; '
 
@@ -7892,9 +7921,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
 
         >>> g = ''
         >>> for myElement in y:
-        ...    g += '%s: %s; ' % (myElement.offset, myElement.name)
-        ...
-
+        ...    g += f'{myElement.offset}: {myElement.name}; '
         >>> g
         '0.0: C#; 1.0: D-; 2.0: C#; 3.0: D-; 4.0: C#; 5.0: D-; '
 
@@ -7926,25 +7953,19 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
          <music21.note.Note D>,
          <music21.note.Note D>)
 
-        OMIT_FROM_DOCS
+        .. note::Why did `.flat` become `.flatten()`? Early on music21's philosophy
+            was to use properties for commonly accessed "views" of a stream. This
+            worked well in the pre-IDE/debugger days of early Python 2. Now however
+            most of us program with IDEs and AI assistance that freely introspect the
+            attributes of objects. So if you're working with a Pitch object, your IDE
+            may have already looked up its .name or .accidental without your knowledge.
+            Properties are generally considered the same as attributes (that's what
+            they're designed for).  The problem is that flattening a stream is a
+            time consuming algorithm that alters the stream and all its elements in
+            the process. Therefore streams should only be flattened when the programmer
+            requests them to be. The way to tell a modern IDE that a process may
+            have consequences is to make it a `.method()` not a `.property`.
 
-        >>> r = stream.Stream()
-        >>> for j in range(5):
-        ...   q = stream.Stream()
-        ...   for i in range(5):
-        ...      p = stream.Stream()
-        ...      p.repeatInsert(base.Music21Object(), [0, 1, 2, 3, 4])
-        ...      q.insert(i * 10, p)
-        ...   r.insert(j * 100, q)
-
-        >>> len(r)
-        5
-
-        >>> len(r.flatten())
-        125
-
-        >>> r.flatten()[124].offset
-        444.0
         '''
         # environLocal.printDebug(['flatten(): self', self,
         #  'self.activeSite', self.activeSite])
@@ -8008,20 +8029,6 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         self._cache[method] = sNew
 
         return sNew
-
-    @property
-    def flat(self):
-        '''
-        Deprecated: use `.flatten()` instead
-
-        A property that returns the same flattened representation as `.flatten()`
-        as of music21 v7.
-
-        See :meth:`~music21.stream.base.Stream.flatten()` for documentation.
-        '''
-        flatStream = self.flatten(retainContainers=False)
-        flatStream._created_via_deprecated_flat = True
-        return flatStream
 
     @overload
     def recurse(self,
@@ -8573,10 +8580,8 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
                 mm = ti.getSoundingMetronomeMark()
                 offsetMetronomeMarkPairs.append([o, mm])
 
-        for i, (o, mm) in enumerate(offsetMetronomeMarkPairs):
-            if i == 0 and o > 0.0:
-                getTempoFromContext = True
-            break  # just need first
+        if offsetMetronomeMarkPairs and offsetMetronomeMarkPairs[0][0] > 0.0:
+            getTempoFromContext = True
 
         if getTempoFromContext:
             ti = self.getContextByClass('TempoIndication')
@@ -8713,10 +8718,9 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
                                      offsetPairs[0][1]))
             # add any remaining ranges, starting from the second; if last,
             # use the highest time as the boundary
-            for i, (o, mm) in enumerate(offsetPairs):
-                if i == 0:
-                    continue  # already added first
-                elif i == len(offsetPairs) - 1:  # last index
+            for i in range(1, len(offsetPairs)):
+                # start at 1 since we have already added first
+                if i == len(offsetPairs) - 1:  # last index
                     mmBoundaries.append((offsetPairs[i][0], highestTime,
                                          offsetPairs[i][1]))
                 else:  # add with next boundary
@@ -8974,9 +8978,10 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
                 'beatAndMeasureFromOffset: could not find a time signature for that place.')
         try:
             myBeat = ts1.getBeatProportion(searchOffset - myMeas.offset)
-        except:
+        except (ValueError, IndexError, AttributeError, exceptions21.Music21Exception) as exc:
             raise StreamException(
-                'beatAndMeasureFromOffset: offset is beyond the end of the piece')
+                'beatAndMeasureFromOffset: offset is beyond the end of the piece'
+            ) from exc
         foundMeasureNumber = myMeas.number
         # deal with second half of partial measures
 
@@ -9022,7 +9027,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
 
     def transpose(
         self,
-        value: str|int|'music21.interval.IntervalBase',
+        value: 'str|int|music21.interval.IntervalBase',
         /,
         *,
         inPlace=False,
@@ -9519,7 +9524,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         if inPlace is False:
             return returnStream
 
-    def expandRepeats(self: StreamType, copySpanners: bool = True) -> StreamType:
+    def expandRepeats(self, copySpanners: bool = True) -> t.Self:
         '''
         Expand this Stream with repeats. Nested repeats
         given with :class:`~music21.bar.Repeat` objects, or
@@ -9635,8 +9640,9 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
 
             if not opFrac(sum(qlProcess)) == e.quarterLength:
                 raise StreamException(
-                    'cannot map quarterLength list into element Duration: %s, %s' % (
-                        sum(qlProcess), e.quarterLength))
+                    'cannot map quarterLength list into element Duration: '
+                    f'{sum(qlProcess)}, {e.quarterLength}'
+                )
 
             post = e.splitByQuarterLengths(qlProcess, addTies=addTies)
             # remove e from the source
@@ -12826,7 +12832,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         from music21 import variant
 
         # containedPart must be in self, or an exception is raised.
-        if not (containedPart in self):
+        if containedPart not in self:
             raise variant.VariantException(f'Could not find {containedPart} in {self}')
 
         if inPlace is True:
@@ -12849,7 +12855,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
                 eClasses = e.classes
                 if 'Variant' in eClasses:
                     elementGroups = e.groups
-                    if (not (variantGroup in elementGroups)
+                    if (variantGroup not in elementGroups
                             or e.lengthType in ['elongation', 'deletion']):
                         newPart.remove(e)
                     else:
@@ -13977,7 +13983,7 @@ class Score(Stream):
 
         return post
 
-    def expandRepeats(self: Score, copySpanners: bool = True) -> Score:
+    def expandRepeats(self, copySpanners: bool = True) -> t.Self:
         '''
         Expand all repeats, as well as all repeat indications
         given by text expressions such as D.C. al Segno.
@@ -14049,7 +14055,7 @@ class Score(Stream):
 
     @overload
     def sliceByGreatestDivisor(
-        self: Score,
+        self,
         *,
         addTies: bool = True,
         inPlace: t.Literal[True],
@@ -14058,19 +14064,19 @@ class Score(Stream):
 
     @overload
     def sliceByGreatestDivisor(
-        self: Score,
+        self,
         *,
         addTies: bool = True,
         inPlace: t.Literal[False] = False,
-    ) -> Score:
+    ) -> t.Self:
         pass
 
     def sliceByGreatestDivisor(
-        self: Score,
+        self,
         *,
         addTies: bool = True,
         inPlace: bool = False,
-    ) -> Score|None:
+    ) -> t.Self|None:
         '''
         Slice all duration of all part by the minimum duration
         that can be summed to each concurrent duration.

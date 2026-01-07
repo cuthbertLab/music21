@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 # Name:         midi.translate.py
 # Purpose:      Translate MIDI and music21 objects
@@ -259,28 +258,25 @@ def getStartEvents(
 
 def getEndEvents(
     midiTrack: MidiTrack|None = None,
-    channel: int = 1
 ) -> list[MidiEvent|DeltaTime]:
     '''
     Returns a list of midi.MidiEvent objects found at the end of a track.
 
-    Note that the channel is basically ignored as no end events are channel
-    specific.  (Attribute will be removed in v10)
-
     >>> midi.translate.getEndEvents()
     [<music21.midi.DeltaTime t=10080, track=None>,
      <music21.midi.MidiEvent END_OF_TRACK, track=None, data=b''>]
+
+    Changed in v10 - getEndEvents does not take a channel
     '''
     events: list[MidiEvent|DeltaTime] = []
 
-    dt = DeltaTime(track=midiTrack, channel=channel)
+    dt = DeltaTime(track=midiTrack)
     dt.time = defaults.ticksAtStart
     events.append(dt)
 
     me = MidiEvent(
         track=midiTrack,
         type=MetaEvents.END_OF_TRACK,
-        channel=channel,
     )
     me.data = b''  # must set data to empty bytes
     events.append(me)
@@ -322,7 +318,6 @@ def music21ObjectToMidiFile(
 # Notes
 
 def _constructOrUpdateNotRestSubclass(
-    eOn: MidiEvent,
     tOn: int,
     tOff: int,
     ticksPerQuarter: int,
@@ -333,11 +328,9 @@ def _constructOrUpdateNotRestSubclass(
     Construct (or edit the duration of) a NotRest subclass, usually
     a note.Note (or a chord.Chord if provided to `returnClass`).
 
-    If the MidiEvent is on channel 10, then an Unpitched or PercussionChord
-    is constructed instead. Raises TypeError if an incompatible class is provided
-    for returnClass.
-
     * Changed in v8: no inputM21
+    * Changed in v10: Remove part about creating an Unpitched object -- that has been wrong
+      for some time (probably since PercussionChords were introduced)
     '''
     if not issubclass(returnClass, note.NotRest):
         raise TypeError(f'Expected subclass of note.NotRest; got {returnClass}')
@@ -425,16 +418,15 @@ def midiEventsToNote(
         The only supported usage now is two tuples.
     * Changed in v9.7: Expects a single TimedNoteEvent
     '''
-    tOn, tOff, eOn = timedNoteEvent
+    tOn, tOff, midiOnEvent = timedNoteEvent
 
     returnClass: type[note.Unpitched]|type[note.Note]
-    if eOn.channel == 10:
+    if midiOnEvent.channel == 10:
         returnClass = note.Unpitched
     else:
         returnClass = note.Note
 
     nr = _constructOrUpdateNotRestSubclass(
-        eOn,
         tOn,
         tOff,
         ticksPerQuarter,
@@ -442,12 +434,11 @@ def midiEventsToNote(
     )
 
     if isinstance(nr, note.Note):
-        nr.pitch.midi = eOn.pitch
+        nr.pitch.midi = midiOnEvent.pitch
     elif isinstance(nr, note.Unpitched):
         try:
-            i = PERCUSSION_MAPPER.midiPitchToInstrument(eOn.pitch)
+            i = PERCUSSION_MAPPER.midiPitchToInstrument(midiOnEvent.pitch)
         except MIDIPercussionException:
-            # warnings.warn(str(mpe), TranslateWarning)
             i = instrument.UnpitchedPercussion()
         nr.storedInstrument = i
         # TODO: set reasonable displayPitch?
@@ -456,9 +447,8 @@ def midiEventsToNote(
             f'Got something other than a Note or Unpitched from conversion: {nr}'
         )
 
-    nr.volume.velocity = eOn.velocity
+    nr.volume.velocity = midiOnEvent.velocity
     nr.volume.velocityIsRelative = False  # not relative coming from MIDI
-    # n._midiVelocity = eOn.velocity
 
     return t.cast(note.Note|note.Unpitched, nr)
 
@@ -641,24 +631,27 @@ def midiEventsToChord(
     * Changed in v8: inputM21 is no longer supported.  Flat list format is removed.
     * Changed in v9.7: expects a list of TimedNoteEvents
     '''
-    tOn: int = 0  # ticks
-    tOff: int = 0  # ticks
+    # * Changed in v10: Fix long-standing bug where only the first on-time was being used
+    #   not yet -- must fix quantization tests to do so...
+    # THIS IS A BUG -- should be timedNoteList[0]
+    #    fixing it breaks stream/tests/testQuantizeMinimumDuration though, so a separate PR
+    first_tOn: int = timedNoteList[-1][0]  # ticks
+    last_tOff: int = timedNoteList[-1][1]  # ticks
 
     pitches: list[pitch.Pitch] = []
-    volumes = []
+    volumes: list[volume.Volume] = []
 
-    firstOn: MidiEvent = timedNoteList[0].event
     any_channel_10 = False
     # this is a format provided by the Stream conversion of
     # midi events; it pre-groups events for a chord together in nested pairs
     # of abs start time and the event object
-    for tOn, tOff, eOn in timedNoteList:
-        if eOn.channel == 10:
+    for _tOn, _tOff, midiOnEvent in timedNoteList:
+        if midiOnEvent.channel == 10:
             any_channel_10 = True
         p = pitch.Pitch()
-        p.midi = eOn.pitch
+        p.midi = midiOnEvent.pitch
         pitches.append(p)
-        v = volume.Volume(velocity=eOn.velocity)
+        v = volume.Volume(velocity=midiOnEvent.velocity)
         v.velocityIsRelative = False  # velocity is absolute coming from MIDI
         volumes.append(v)
 
@@ -669,9 +662,8 @@ def midiEventsToChord(
         returnClass = chord.Chord
 
     c = _constructOrUpdateNotRestSubclass(
-        firstOn,
-        tOn,
-        tOff,
+        first_tOn,
+        last_tOff,
         ticksPerQuarter,
         returnClass=returnClass
     )
@@ -683,7 +675,6 @@ def midiEventsToChord(
             try:
                 i = PERCUSSION_MAPPER.midiPitchToInstrument(midi_pitch)
             except MIDIPercussionException:
-                # warnings.warn(str(mpe), TranslateWarning)
                 i = instrument.UnpitchedPercussion()
             unp.storedInstrument = i
             c.add(unp)
@@ -869,36 +860,57 @@ def instrumentToMidiEvents(
 # ------------------------------------------------------------------------------
 # Meta events
 
+@common.deprecated('v10', 'v11', 'passing a list was never used; use midiEventToInstrument instead')
 def midiEventsToInstrument(
     eventList: MidiEvent|tuple[int, MidiEvent],
+    *,
+    encoding: str = 'utf-8',
+) -> instrument.Instrument:
+    if not common.isListLike(eventList):
+        event = t.cast(MidiEvent, eventList)
+    else:  # get the second event; first is delta time
+        event = eventList[1]
+    return midiEventToInstrument(event, encoding=encoding)
+
+
+def midiEventToInstrument(
+    event: MidiEvent,
     *,
     encoding: str = 'utf-8',
 ) -> instrument.Instrument:
     '''
     Convert a single MIDI event into a music21 Instrument object.
 
-    >>> me = midi.MidiEvent()
+    MIDI Events that can be properly read are PROGRAM_CHANGE, INSTRUMENT_NAME
+    and SEQUENCE_TRACK_NAME
+
+    >>> me = midi.MidiEvent(channel=2)
     >>> me.type = midi.ChannelVoiceMessages.PROGRAM_CHANGE
     >>> me.data = 53  # MIDI program 54: Voice Oohs
-    >>> midi.translate.midiEventsToInstrument(me)
+    >>> midi.translate.midiEventToInstrument(me)
     <music21.instrument.Vocalist 'Voice'>
 
     The percussion map will be used if the channel is 10:
 
     >>> me.channel = 10
-    >>> instrumentObj = midi.translate.midiEventsToInstrument(me)
+    >>> instrumentObj = midi.translate.midiEventToInstrument(me)
     >>> instrumentObj
     <music21.instrument.UnpitchedPercussion 'Percussion'>
     >>> instrumentObj.midiChannel  # 0-indexed in music21
     9
     >>> instrumentObj.midiProgram  # 0-indexed in music21
     53
-    '''
-    if not common.isListLike(eventList):
-        event = t.cast(MidiEvent, eventList)
-    else:  # get the second event; first is delta time
-        event = eventList[1]
 
+    Get from instrument name with particular encodings
+
+    >>> encoded_flute = 'flöte'.encode('latin-1')
+    >>> me = midi.MidiEvent(channel=4)
+    >>> me.type = midi.MetaEvents.SEQUENCE_TRACK_NAME
+    >>> me.data = encoded_flute
+    >>> fl = midi.translate.midiEventToInstrument(me, encoding='latin-1')
+    >>> fl
+    <music21.instrument.Flute 'flöte'>
+    '''
     decoded: str = ''
     try:
         if isinstance(event.data, bytes):
@@ -921,7 +933,9 @@ def midiEventsToInstrument(
     except UnicodeDecodeError:
         warnings.warn(
             f'Unable to determine instrument from {event}; getting generic Instrument',
-            TranslateWarning)
+            TranslateWarning,
+            stacklevel=2,
+        )
         i = instrument.Instrument()
     except instrument.InstrumentException:
         # Debug logging would be better than warning here
@@ -929,8 +943,7 @@ def midiEventsToInstrument(
 
     # Set MIDI channel
     # Instrument.midiChannel is 0-indexed
-    if event.channel is not None:
-        i.midiChannel = event.channel - 1
+    i.midiChannel = event.channel - 1
 
     # Set partName or instrumentName with literal value from parsing
     if decoded:
@@ -1043,7 +1056,8 @@ def timeSignatureToMidiEvents(ts, includeDeltaTime=True) -> list[DeltaTime|MidiE
     if n > 255:
         warnings.warn(
             f'TimeSignature with numerator > 255 cannot be stored in MIDI. Ignoring {ts}',
-            TranslateWarning
+            TranslateWarning,
+            stacklevel=2
         )
         return []
 
@@ -1659,7 +1673,7 @@ def assignPacketsToChannels(
 
     # after processing, collect all channels used
     foundChannels = []
-    for start, stop, usedChannel in list(uniqueChannelEvents):  # a list
+    for _start, _stop, usedChannel in list(uniqueChannelEvents):
         if usedChannel not in foundChannels:
             foundChannels.append(usedChannel)
     # for ch in chList:
@@ -1794,7 +1808,7 @@ def packetsToMidiTrack(packets, trackId=1, channel=1, instrumentObj=None):
     mt.events += packetsToDeltaSeparatedEvents(trackPackets, mt)
 
     # must update all events with a ref to this MidiTrack
-    mt.events += getEndEvents(mt, channel=channel)
+    mt.events += getEndEvents(mt)
     mt.updateEvents()  # sets this track as .track for all events
     return mt
 
@@ -1942,7 +1956,9 @@ def lyricTimingsFromEvents(
             except UnicodeDecodeError:
                 warnings.warn(
                     f'Unable to decode lyrics from {e} as {encoding}',
-                    TranslateWarning)
+                    TranslateWarning,
+                    stacklevel=2,
+                )
     return lyrics
 
 
@@ -1972,15 +1988,15 @@ def getMetaEvents(
         elif e.type == MetaEvents.SET_TEMPO:
             metaObj = midiEventsToTempo(e)
         elif e.type in (MetaEvents.INSTRUMENT_NAME, MetaEvents.SEQUENCE_TRACK_NAME):
-            # midiEventsToInstrument() WILL NOT have knowledge of the current
+            # midiEventToInstrument() WILL NOT have knowledge of the current
             # program, so set it here
-            metaObj = midiEventsToInstrument(e, encoding=encoding)
+            metaObj = midiEventToInstrument(e, encoding=encoding)
             if last_program != -1:
                 # Only update if we have had an initial PROGRAM_CHANGE
                 metaObj.midiProgram = last_program
         elif e.type == ChannelVoiceMessages.PROGRAM_CHANGE and isinstance(e.parameter1, int):
-            # midiEventsToInstrument() WILL set the program on the instance
-            metaObj = midiEventsToInstrument(e)
+            # midiEventToInstrument() WILL set the program on the instance
+            metaObj = midiEventToInstrument(e)
             last_program = e.parameter1
         # elif e.type == MetaEvents.MIDI_PORT:
         #     pass
@@ -2444,7 +2460,8 @@ def channelInstrumentData(
                             f'{inst} specified 1-indexed MIDI channel {thisChannel} '
                             f'but acceptable channels were {acceptableChannels}. '
                             'Defaulting to channel 1.',
-                            TranslateWarning)
+                            TranslateWarning,
+                            stacklevel=2)
                         thisChannel = 1
                 channelsAssigned.add(thisChannel)
                 channelByInstrument[inst.midiProgram] = thisChannel

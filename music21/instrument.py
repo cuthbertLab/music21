@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 # Name:         instrument.py
 # Purpose:      Class for basic instrument information
@@ -184,7 +183,7 @@ class Instrument(base.Music21Object):
         msg = []
         if self.partId is not None:
             msg.append(f'{self.partId}: ')
-        if self.partName is not None:
+        if self.partName is not None and self.partName != self.instrumentName:
             msg.append(f'{self.partName}: ')
         if self.instrumentName is not None:
             msg.append(self.instrumentName)
@@ -1867,7 +1866,7 @@ def deduplicate(s: stream.Stream, inPlace: bool = False) -> stream.Stream:
     [<music21.instrument.Flute 'Flute'>, <music21.instrument.Flute 'Flute'>]
     >>> s2 = instrument.deduplicate(s2, inPlace=True)
     >>> list(p1.getInstruments())
-    [<music21.instrument.Piccolo 'Piccolo: Piccolo'>]
+    [<music21.instrument.Piccolo 'Piccolo'>]
     >>> list(p2.getInstruments())
     [<music21.instrument.Flute 'Flute'>]
     '''

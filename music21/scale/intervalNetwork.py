@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 # Name:         scale.intervalNetwork.py
 # Purpose:      A graph of intervals, for scales and harmonies.
@@ -2202,7 +2201,7 @@ class IntervalNetwork:
         # now find lowest and highest pitch
         minPitch = post[-1]
         maxPitch = post[0]
-        for p, nId in postPairs + prePairs:
+        for p, _nId in postPairs + prePairs:
             if p.ps < minPitch.ps:
                 minPitch = p
             if p.ps > maxPitch.ps:
@@ -2285,87 +2284,6 @@ class IntervalNetwork:
             if self.degreeModulus(n.degree) in nodeDegreeTargetsModulus:
                 post.append(p)
         return post
-
-    def getNetworkxGraph(self):
-        '''
-        Create a networkx graph from the raw Node representation.
-
-        Return a networks Graph object representing a realized version
-        of this IntervalNetwork if networkx is installed
-        '''
-        # noinspection PyPackageRequirements
-        import networkx  # type: ignore  # pylint: disable=import-error
-        weight = 1
-        style = 'solid'
-
-        def sortTerminusLowThenIntThenTerminusHigh(a):
-            '''
-            return a two-tuple where the first element is -1 if 'Terminus.LOW',
-            0 if an int, and 1 if 'Terminus.HIGH' or another string, and
-            the second element is the value itself.
-            '''
-            sortFirst = 0
-            if isinstance(a, str):
-                if a.upper() == 'Terminus.LOW':
-                    sortFirst = -1
-                else:
-                    sortFirst = 1
-            return (sortFirst, a)
-
-        # g = networkx.DiGraph()
-        g = networkx.MultiDiGraph()
-
-        for unused_eId, e in self.edges.items():
-            if e.direction == Direction.ASCENDING:
-                weight = 0.9  # these values are just for display
-                style = 'solid'
-            elif e.direction == Direction.DESCENDING:
-                weight = 0.6
-                style = 'solid'
-            elif e.direction == Direction.BI:
-                weight = 1.0
-                style = 'solid'
-            for src, dst in e.connections:
-                g.add_edge(src, dst, weight=weight, style=style)
-
-        # set positions of all nodes based on degree, where y value is degree
-        # and x is count of values at that degree
-        degreeCount = OrderedDict()  # degree, count pairs
-        # sorting nodes will help, but not insure, proper positioning
-        nKeys = list(self.nodes.keys())
-        nKeys.sort(key=sortTerminusLowThenIntThenTerminusHigh)
-        for nId in nKeys:
-            n = self.nodes[nId]
-            if n.degree not in degreeCount:
-                degreeCount[n.degree] = 0
-            g.node[nId]['pos'] = (degreeCount[n.degree], n.degree)
-            degreeCount[n.degree] += 1
-        environLocal.printDebug(['got degree count', degreeCount])
-        return g
-
-    def plot(self,
-             **keywords):
-        '''
-        Given a method and keyword configuration arguments, create and display a plot.
-
-        Requires `networkx` to be installed.
-
-        * Changed in v8: other parameters were unused and removed.
-        '''
-        #
-        # >>> s = corpus.parse('bach/bwv324.xml') #_DOCS_HIDE
-        # >>> s.plot('pianoroll', doneAction=None) #_DOCS_HIDE
-        # >>> #_DOCS_SHOW s = corpus.parse('bach/bwv57.8')
-        # >>> #_DOCS_SHOW s.plot('pianoroll')
-        #
-        # .. image:: images/PlotHorizontalBarPitchSpaceOffset.*
-        #     :width: 600
-        # import is here to avoid import of matplotlib problems
-        from music21 import graph
-        # first ordered arg can be method type
-        g = graph.primitives.GraphNetworkxGraph(
-            networkxGraph=self.getNetworkxGraph())
-        g.process()
 
     def getRelativeNodeId(
         self,

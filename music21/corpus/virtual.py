@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 # Name:         corpus/virtual.py
 # Purpose:      Access to the Virtual corpus collection

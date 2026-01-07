@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 # Name:         spanner.py
 # Purpose:      The Spanner base-class and subclasses
@@ -100,7 +99,7 @@ class Spanner(base.Music21Object):
     >>> for e in s:
     ...    print(e)
     <music21.note.Note C>
-    <music21.CarterAccelerandoSign <music21.note.Note C><music21.note.Note D><music21.note.Note E>>
+    <...CarterAccelerandoSign <music21.note.Note C><music21.note.Note D><music21.note.Note E>>
     <music21.note.Note D>
     <music21.note.Note E>
 
@@ -110,13 +109,13 @@ class Spanner(base.Music21Object):
     >>> spannerCollection = s.spanners  # a stream object
     >>> for thisSpanner in spannerCollection:
     ...     print(thisSpanner)
-    <music21.CarterAccelerandoSign <music21.note.Note C><music21.note.Note D><music21.note.Note E>>
+    <...CarterAccelerandoSign <music21.note.Note C><music21.note.Note D><music21.note.Note E>>
 
     (3) we can get the spanner by looking at the list getSpannerSites() on
     any object that has a spanner:
 
     >>> n2.getSpannerSites()
-    [<music21.CarterAccelerandoSign
+    [<music21...CarterAccelerandoSign
             <music21.note.Note C><music21.note.Note D><music21.note.Note E>>]
 
     In this example we will slur a few notes and then iterate over the stream to
@@ -210,8 +209,7 @@ class Spanner(base.Music21Object):
     equalityAttributes = ('spannerStorage',)
 
     def __init__(self,
-                 *spannedElements: t.Union[base.Music21Object,
-                                           Sequence[base.Music21Object]],
+                 *spannedElements: base.Music21Object|Sequence[base.Music21Object],
                  **keywords):
         super().__init__(**keywords)
 
@@ -427,8 +425,7 @@ class Spanner(base.Music21Object):
 
     def addSpannedElements(
         self,
-        spannedElements: t.Union[Sequence[base.Music21Object],
-                                 base.Music21Object],
+        spannedElements: Sequence[base.Music21Object]|base.Music21Object,
         *otherElements: base.Music21Object,
     ):
         '''
@@ -467,10 +464,12 @@ class Spanner(base.Music21Object):
             else:
                 pass
                 # it makes sense to not have multiple copies
-                # environLocal.printDebug(['''attempting to add an object (%s) that is
-                #    already found in the SpannerStorage stream of spanner %s;
-                #    this may not be an error.''' % (c, self)])
-
+                # environLocal.printDebug([
+                #     'attempting to add an object '
+                #     f'({c}) that is already found in the SpannerStorage stream '
+                #     f'of spanner {self};\n'
+                #     'this may not be an error.'
+                # ])
         self.spannerStorage.coreElementsChanged()
 
     def insertFirstSpannedElement(self, firstEl: base.Music21Object):
@@ -1801,13 +1800,6 @@ class RepeatBracket(Spanner):
             [5, 6, 7]
             >>> rb.number = 1
         ''')
-
-    @common.deprecated('v9', 'v10', 'Look at .numberRange instead')
-    def getNumberList(self):  # pragma: no cover
-        '''
-        Deprecated -- just look at .numberRange
-        '''
-        return self.numberRange
 
     def _reprInternal(self):
         if self.overrideDisplay is not None:

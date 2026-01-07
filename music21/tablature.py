@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 # Name:         tablature.py
 # Purpose:      Object for storing music21 information in the form of musical tablature.
@@ -228,10 +227,10 @@ class FretBoard(prebase.ProtoM21Object):
         '''
         if len(self.tuning) != self.numStrings:
             raise TablatureException(
-                'Tuning must be set first, tuned for {0} notes, on a {1} string instrument'.format(
-                    len(self.tuning),
-                    self.numStrings
-                ))
+                'Tuning must be set first, tuned for '
+                f'{len(self.tuning)} notes, on a '
+                f'{self.numStrings} string instrument'
+            )
 
         pitchList: list[pitch.Pitch|None] = [None] * self.numStrings
 
@@ -261,13 +260,11 @@ class FirstFret:
         self.fretNum = fretNum
         self.location = location
 
-# class that combines a ChordSymbol and a FretBoard
-
 
 class ChordWithFretBoard(harmony.ChordSymbol, FretBoard):
     '''
     Music21Object subclass that combines a ChordSymbol with a FretBoard.
-    Tuning must be set!
+    Its tuning must be set.
 
     >>> fn4 = tablature.FretNote(string=4, fret=0)
     >>> fn3 = tablature.FretNote(string=3, fret=2, fingering=2)

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from __future__ import annotations
 
 import re
@@ -193,7 +192,9 @@ class Test(unittest.TestCase):
         richMetadata.merge(score.metadata)
         richMetadata.update(score)
         self.assertEqual(richMetadata.noteCount, 165)
-        self.assertEqual(richMetadata.quarterLength, 36.0)
+        # changed in v10: scoreQuarterLength
+        self.assertEqual(richMetadata.scoreQuarterLength, 36.0)
+        self.assertEqual(richMetadata.quarterLength, 0.0)
 
     def checkUniqueNamedItem(
             self,

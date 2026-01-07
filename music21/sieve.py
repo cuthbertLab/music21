@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 # Name:         sieve.py
 # Purpose:      sieve operations, after Iannis Xenakis.
@@ -861,8 +860,10 @@ class CompressionSegment:
         # assign self._residuals and do analysis
         try:
             self._process()
-        except AssertionError:
-            raise CompressionSegmentException('no Residual classes found for this z range')
+        except AssertionError as assertError:
+            raise CompressionSegmentException(
+                'no Residual classes found for this z range'
+            ) from assertError
 
     def _zUpdate(self, z=None):
         # z must at least be a superset of match

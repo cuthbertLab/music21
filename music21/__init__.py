@@ -1,6 +1,5 @@
-# -*- coding: utf-8 -*-
 '''
-The music21 Framework is Copyright © 2006-2025 Michael Scott Asato Cuthbert.
+The music21 Framework is Copyright © 2006-2026 Michael Scott Asato Cuthbert.
 
 Some Rights Reserved
 Released under the BSD (3-clause) license.  See license.txt.
@@ -20,10 +19,10 @@ and the developers are credited.
 
 The development of music21 was supported by grants
 from the Seaver Institute and the NEH/Digging into Data Challenge,
-with the support of the MIT
-Music and Theater Arts section and the School of Humanities, Arts,
-and Social Sciences.  Portions of music21 were originally part of
-the PMusic (Perl) library, developed by Cuthbert prior to arriving at MIT.
+with the support of the MIT Music and Theater Arts section
+and the School of Humanities, Arts, and Social Sciences.
+Portions of music21 were originally part of the PMusic (Perl) library,
+developed by Cuthbert prior to arriving at MIT.
 
 music21 outputs a subset of XML data defined by the MusicXML 4.0
 standard, Copyright © 2004-2022 W3C, open source.
@@ -35,7 +34,7 @@ from __future__ import annotations
 
 import sys
 
-minPythonVersion = (3, 10)
+minPythonVersion = (3, 11)
 minPythonVersionStr = '.'.join([str(x) for x in minPythonVersion])
 if sys.version_info < minPythonVersion:
     # DO NOT CHANGE THIS TO AN f-String -- it needs to run on old python.
@@ -48,11 +47,12 @@ if sys.version_info < minPythonVersion:
     Use music21 v6.7 to run on Python 3.6.
     Use music21 v7.3 to run on Python 3.7
     Use music21 v8.1 to run on Python 3.8/3.9
+    Use music21 v9.9 to run on Python 3.10.
 
     If you have the wrong version there are several options for getting
     the right one.
 
-    - 1. (Best) Upgrade to a recent version of Python 3 (such as 3.13).
+    - 1. (Best) Upgrade to a recent version of Python 3 (such as 3.14).
 
          The great features there will more
          than make up for the headache of downloading
@@ -167,6 +167,16 @@ __all__ = [
     'voiceLeading',
     'volpiano',
     'volume',
+
+    'Music21Exception',
+    'SitesException',
+    'Music21ObjectException',
+    'ElementException',
+
+    'Groups',
+    'Music21Object',
+    'ElementWrapper',
+    'VERSION',
 ]
 
 # ------------------------------------------------------------------------------
@@ -273,4 +283,3 @@ from music21 import variant  # noqa: E402
 from music21 import voiceLeading  # noqa: E402
 from music21 import volpiano  # noqa: E402
 from music21 import volume  # noqa: E402
-

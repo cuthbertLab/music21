@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 # Name:         search/__init__.py
 # Purpose:      music21 classes for searching within files
@@ -17,21 +16,33 @@ For searching a group of scores, see the search functions within
 from __future__ import annotations
 
 __all__ = [
-    'base', 'lyrics', 'segment', 'serial',
-
-    'Wildcard', 'WildcardDuration', 'SearchMatch', 'StreamSearcher',
-    'streamSearchBase', 'rhythmicSearch', 'noteNameSearch', 'noteNameRhythmicSearch',
-    'approximateNoteSearch', 'approximateNoteSearchNoRhythm', 'approximateNoteSearchOnlyRhythm',
+    'SearchException',
+    'SearchMatch',
+    'StreamSearcher',
+    'Wildcard',
+    'WildcardDuration',
+    'approximateNoteSearch',
+    'approximateNoteSearchNoRhythm',
+    'approximateNoteSearchOnlyRhythm',
     'approximateNoteSearchWeighted',
-    'translateStreamToString',
-    'translateDiatonicStreamToString', 'translateIntervalsAndSpeed',
-    'translateStreamToStringNoRhythm', 'translateStreamToStringOnlyRhythm',
+    'base',
+    'lyrics',
+    'mostCommonMeasureRhythms',
+    'noteNameRhythmicSearch',
+    'noteNameSearch',
+    'rhythmicSearch',
+    'segment',
+    'serial',
+    'streamSearchBase',
+    'translateDiatonicStreamToString',
+    'translateDurationToBytes',
+    'translateIntervalsAndSpeed',
+    'translateNoteTieToByte',
     'translateNoteToByte',
     'translateNoteWithDurationToBytes',
-    'translateNoteTieToByte',
-    'translateDurationToBytes',
-    'mostCommonMeasureRhythms',
-    'SearchException',
+    'translateStreamToString',
+    'translateStreamToStringNoRhythm',
+    'translateStreamToStringOnlyRhythm',
 ]
 
 from music21.search import base

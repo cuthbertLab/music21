@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # -----------------------------------------------------------------------------
 # Name:         stream/iterator.py
 # Purpose:      Classes for walking through streams
@@ -79,9 +78,6 @@ class StreamIterator(prebase.ProtoM21Object, Sequence[M21ObjType]):
     * StreamIterator.streamLength -- length of elements.
 
     * StreamIterator.srcStreamElements -- srcStream._elements
-    * StreamIterator.cleanupOnStop -- should the StreamIterator delete the
-      reference to srcStream and srcStreamElements when stopping? default
-      False -- DEPRECATED: to be removed in v10.
     * StreamIterator.activeInformation -- a dict that contains information
       about where we are in the parse.  Especially useful for recursive
       streams:
@@ -114,6 +110,7 @@ class StreamIterator(prebase.ProtoM21Object, Sequence[M21ObjType]):
       - StreamIterator inherits from typing.Sequence, hence index
       was moved to elementIndex.
     * Changed in v9: cleanupOnStop is deprecated.  Was not working properly before: noone noticed.
+    * Changed in v10: remove cleanupOnStop.
 
     OMIT_FROM_DOCS
 
@@ -152,7 +149,6 @@ class StreamIterator(prebase.ProtoM21Object, Sequence[M21ObjType]):
         self.sectionIndex: int = -1
         self.iterSection: t.Literal['_elements', '_endElements'] = '_elements'
 
-        self.cleanupOnStop: bool = False
         self.restoreActiveSites: bool = restoreActiveSites
 
         self.overrideDerivation: str|None = None
@@ -188,7 +184,7 @@ class StreamIterator(prebase.ProtoM21Object, Sequence[M21ObjType]):
 
         return f'for {streamClass}:{srcStreamId} @:{self.elementIndex}'
 
-    def __iter__(self: StreamIteratorType) -> StreamIteratorType:
+    def __iter__(self) -> t.Self:
         self.reset()
         return self
 
@@ -219,7 +215,7 @@ class StreamIterator(prebase.ProtoM21Object, Sequence[M21ObjType]):
             return e
 
         self.cleanup()
-        raise StopIteration
+        raise StopIteration()
 
     def __getattr__(self, attr):
         '''
@@ -358,7 +354,6 @@ class StreamIterator(prebase.ProtoM21Object, Sequence[M21ObjType]):
         >>> sI.srcStream is s
         True
 
-
         To request an element by id, put a '#' sign in front of the id,
         like in HTML DOM queries:
 
@@ -387,23 +382,6 @@ class StreamIterator(prebase.ProtoM21Object, Sequence[M21ObjType]):
         <music21.clef.TrebleClef>
         >>> s.iter().notes[0]
         <music21.note.Note F#>
-
-        Demo of cleanupOnStop = True; the sI[0] call counts as another iteration, so
-        after it is called, there is nothing more to iterate over!  Note that cleanupOnStop
-        will be removed in music21 v10.
-
-        >>> sI.cleanupOnStop = True
-        >>> for n in sI:
-        ...    printer = (repr(n), repr(sI[0]))
-        ...    print(printer)
-        ('<music21.note.Note F#>', '<music21.note.Note F#>')
-        >>> sI.srcStream is s  # set to an empty stream
-        False
-        >>> for n in sI:
-        ...    printer = (repr(n), repr(sI[0]))
-        ...    print(printer)
-
-        (nothing is printed)
 
         * Changed in v8: for strings: prepend a '#' sign to get elements by id.
           The old behavior still works until v9.
@@ -511,12 +489,12 @@ class StreamIterator(prebase.ProtoM21Object, Sequence[M21ObjType]):
         me.reverse()
         yield from me
 
-    def clone(self: StreamIteratorType) -> StreamIteratorType:
+    def clone(self) -> t.Self:
         '''
         Returns a new copy of the same iterator.
         (a shallow copy of some things except activeInformation)
         '''
-        out: StreamIteratorType = type(self)(
+        out: t.Self = type(self)(
             self.srcStream,
             filterList=copy.copy(self.filters),
             restoreActiveSites=self.restoreActiveSites,
@@ -652,23 +630,9 @@ class StreamIterator(prebase.ProtoM21Object, Sequence[M21ObjType]):
 
     def cleanup(self) -> None:
         '''
-        stop iteration; and cleanup if need be.
+        stop iteration; and cleanup if need be.  Can be subclassed. does nothing.
         '''
-        if self.cleanupOnStop:
-            self.reset()
-
-            # cleanupOnStop is rarely used, so we put in
-            # a dummy stream so that self.srcStream does not need
-            # to be typed as Stream|None
-
-            # eventually want this to work
-            # SrcStreamClass = t.cast(type[StreamType], self.srcStream.__class__)
-            SrcStreamClass = self.srcStream.__class__
-
-            del self.srcStream
-            del self.srcStreamElements
-            self.srcStream = SrcStreamClass()
-            self.srcStreamElements = ()
+        pass
 
     # ---------------------------------------------------------------
     # getting items
@@ -948,11 +912,11 @@ class StreamIterator(prebase.ProtoM21Object, Sequence[M21ObjType]):
     # ------------------------------------------------------------
 
     def addFilter(
-        self: StreamIteratorType,
+        self,
         newFilter,
         *,
         returnClone=True
-    ) -> StreamIteratorType:
+    ) -> t.Self:
         '''
         Return a new StreamIterator with an additional filter.
         Also resets caches -- so do not add filters any other way.
@@ -976,11 +940,11 @@ class StreamIterator(prebase.ProtoM21Object, Sequence[M21ObjType]):
         return out
 
     def removeFilter(
-        self: StreamIteratorType,
+        self,
         oldFilter,
         *,
         returnClone=True
-    ) -> StreamIteratorType:
+    ) -> t.Self:
         '''
         Return a new StreamIterator where oldFilter is removed.
         '''
@@ -1212,7 +1176,7 @@ class StreamIterator(prebase.ProtoM21Object, Sequence[M21ObjType]):
         return self.addFilter(filters.GroupFilter(groupFilterList), returnClone=returnClone)
 
     def getElementsByOffset(
-        self: StreamIteratorType,
+        self,
         offsetStart,
         offsetEnd=None,
         *,
@@ -1222,7 +1186,7 @@ class StreamIterator(prebase.ProtoM21Object, Sequence[M21ObjType]):
         includeElementsThatEndAtStart=True,
         stopAfterEnd=True,
         returnClone=True,
-    ) -> StreamIteratorType:
+    ) -> t.Self:
         '''
         Adds a filter keeping only Music21Objects that
         are found at a certain offset or within a certain
@@ -1611,7 +1575,7 @@ class OffsetIterator(StreamIterator, Sequence[list[M21ObjType]]):
 
     def __next__(self) -> list[M21ObjType]:  # type: ignore
         if self.raiseStopIterationNext:
-            raise StopIteration
+            raise StopIteration()
 
         retElementList: list[M21ObjType] = []
         # make sure that cleanup is not called during the loop
@@ -1638,13 +1602,13 @@ class OffsetIterator(StreamIterator, Sequence[list[M21ObjType]]):
                     self.activeInformation['lastYielded'] = retElementList[0]
                     return retElementList
 
-        except StopIteration:  # from the while statement.
+        except StopIteration as parent_stop:  # from the while statement.
             if retElementList:
                 self.raiseStopIterationNext = True
                 self.activeInformation['lastYielded'] = retElementList[0]
                 return retElementList
             else:
-                raise StopIteration
+                raise StopIteration() from parent_stop
 
     def reset(self):
         '''
@@ -1891,7 +1855,7 @@ class RecursiveIterator(StreamIterator[M21ObjType], Sequence[M21ObjType]):
 
         self.activeInformation['lastYielded'] = None  # always clean this up, no matter what
         self.cleanup()
-        raise StopIteration
+        raise StopIteration()
 
     def reset(self):
         '''
@@ -2018,14 +1982,14 @@ class RecursiveIterator(StreamIterator[M21ObjType], Sequence[M21ObjType]):
             # will still return numbers even if _endElements
 
     def getElementsByOffsetInHierarchy(
-            self: StreamIteratorType,
+            self,
             offsetStart,
             offsetEnd=None,
             *,
             includeEndBoundary=True,
             mustFinishInSpan=False,
             mustBeginInSpan=True,
-            includeElementsThatEndAtStart=True) -> StreamIteratorType:
+            includeElementsThatEndAtStart=True) -> t.Self:
         '''
         Adds a filter keeping only Music21Objects that
         are found at a certain offset or within a certain

@@ -1,10 +1,9 @@
-# -*- coding: utf-8 -*-
 # -----------------------------------------------------------------------------
 # Name:         tree/spans.py
 # Purpose:      Tools for marking off spans of time that optionally contain
 #               elements and which can be manipulated quickly in a tree
 #
-# Authors:      Josiah Wolf Oberholtzer
+# Authors:      Joséphine Wolf Oberholtzer
 #               Michael Scott Asato Cuthbert
 #
 # Copyright:    Copyright © 2013-2024 Michael Scott Asato Cuthbert

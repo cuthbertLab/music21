@@ -1,10 +1,9 @@
-# -*- coding: utf-8 -*-
 # -----------------------------------------------------------------------------
 # Name:         derivation.py
 # Purpose:      Class for storing and managing Stream-based derivations
 #
 # Authors:      Christopher Ariza
-#               Josiah Oberholtzer
+#               Joséphine Wolf Oberholtzer
 #               Michael Scott Asato Cuthbert
 #
 # Copyright:    Copyright © 2011-2014 Michael Scott Asato Cuthbert

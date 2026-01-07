@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 # Name:         prebase.py
 # Purpose:      classes for anything in music21 to inherit from.
@@ -17,11 +16,8 @@ Concept borrowed from m21j.
 '''
 from __future__ import annotations
 
-from collections.abc import Sequence
 import typing as t
 import unittest
-
-from music21.common import deprecated
 
 class ProtoM21Object:
     '''
@@ -47,7 +43,7 @@ class ProtoM21Object:
     >>> pc.classSet.isdisjoint(classList)
     True
     >>> repr(pc)
-    '<music21.PitchCounter no pitches>'
+    '<...PitchCounter no pitches>'
 
 
     ProtoM21Objects, like other Python primitives, cannot be put into streams --
@@ -81,36 +77,6 @@ class ProtoM21Object:
     _classSetCacheDict: dict[type, frozenset[str|type]] = {}
 
     __slots__: tuple[str, ...] = ()
-
-    @deprecated('v7', 'v10', 'use `someClass in .classSet`'
-        'or for intersection: `not classSet.isdisjoint(classList)`')
-    def isClassOrSubclass(self, classFilterList: Sequence) -> bool:
-        '''
-        Given a class filter list (a list or tuple must be submitted),
-        which may have strings or class objects, determine
-        if this class is of the provided classes or a subclasses.
-
-        NOTE: this is a performance critical operation
-        for performance, only accept lists or tuples
-
-        DEPRECATED in v7 -- prefer `someClass in el.classSet` or
-        `not el.classSet.isdisjoint(classList)` instead.
-
-        >>> n = note.Note()
-        >>> #_DOCS_SHOW n.isClassOrSubclass(('Note',))
-        True
-        >>> #_DOCS_SHOW n.isClassOrSubclass(('GeneralNote',))
-        True
-        >>> #_DOCS_SHOW n.isClassOrSubclass((note.Note,))
-        True
-        >>> #_DOCS_SHOW n.isClassOrSubclass((note.Rest,))
-        False
-        >>> #_DOCS_SHOW n.isClassOrSubclass((note.Note, note.Rest))
-        True
-        >>> #_DOCS_SHOW n.isClassOrSubclass(('Rest', 'Note'))
-        True
-        '''
-        return not self.classSet.isdisjoint(classFilterList)
 
     @property
     def classes(self) -> tuple[str, ...]:
@@ -150,7 +116,7 @@ class ProtoM21Object:
         {10.0} <music21.clef.GClef>
         {30.0} <music21.clef.FrenchViolinClef>
 
-        `Changed 2015 Sep`: returns a tuple, not a list.
+        Changed in v2: returns a tuple, not a list.
         '''
         try:
             return self._classTupleCacheDict[self.__class__]
@@ -171,9 +137,9 @@ class ProtoM21Object:
         to a particular class when you don't know if the user has given a string,
         a fully qualified string name, or an object.
 
-        Did I mention it's fast?  It's a drop in substitute for the deprecated
-        `.isClassOrSubclass`.  It's not as fast as x in n.classes or isinstance(n, x)
-        if you know whether it's a string or class, but this is good and safe.
+        Did I mention it's fast?  It's not as fast as x in n.classes or isinstance(n, x)
+        if you know whether it's a string or class, but this is good and safe to take
+        in either a string or a class.
 
         >>> n = note.Note()
         >>> 'Note' in n.classSet
@@ -187,6 +153,13 @@ class ProtoM21Object:
         False
         >>> note.Rest in n.classSet
         False
+
+        For checking if an object is part of any number of objects use `not`
+        with `isdisjoint`.  A little unwiedly but works super fast:
+
+        >>> checkClasses = (spanner.Slur, note.NotRest)
+        >>> not n.classSet.isdisjoint(checkClasses)
+        True
 
         >>> object in n.classSet
         True
@@ -246,6 +219,16 @@ class ProtoM21Object:
         The additional information is defined in the `_reprInternal` method,
         so objects inheriting from ProtoM21Object (such as Music21Object)
         should change `_reprInternal` and not `__repr__`.
+
+        Except for music21.base itself, any object in a file called base.py
+        has the base part removed.
+
+        >>> from music21.midi.base import MidiEvent
+        >>> me = MidiEvent()
+        >>> repr(me)
+        '<music21.midi.MidiEvent UNKNOWN, track=None>'
+        >>> me._reprInternal()
+        'UNKNOWN, track=None'
         '''
         reprHead = '<'
         if self.__module__ != '__main__':

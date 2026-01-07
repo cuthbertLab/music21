@@ -1,4 +1,4 @@
-# Configuration file for readthedocs
+# Configuration file for docs
 # builds everything before sphinx
 
 import os

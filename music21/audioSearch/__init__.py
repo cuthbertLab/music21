@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # -----------------------------------------------------------------------------
 # Name:         audioSearch.py
 # Purpose:      base subroutines for all audioSearching and score following
@@ -19,21 +18,26 @@ and more accurate using FFT convolve.
 from __future__ import annotations
 
 __all__ = [
-    'transcriber', 'recording', 'scoreFollower',
-    'histogram', 'autocorrelationFunction',
-    'prepareThresholds', 'interpolation',
-    'normalizeInputFrequency', 'pitchFrequenciesToObjects',
-    'getFrequenciesFromMicrophone',
-    'getFrequenciesFromAudioFile',
-    'getFrequenciesFromPartialAudioFile',
+    'AudioSearchException',
+    'autocorrelationFunction',
+    'decisionProcess',
     'detectPitchFrequencies',
-    'smoothFrequencies',
+    'getFrequenciesFromAudioFile',
+    'getFrequenciesFromMicrophone',
+    'getFrequenciesFromPartialAudioFile',
+    'histogram',
+    'interpolation',
     'joinConsecutiveIdenticalPitches',
+    'normalizeInputFrequency',
+    'notesAndDurationsToStream',
+    'pitchFrequenciesToObjects',
+    'prepareThresholds',
     'quantizeDuration',
     'quarterLengthEstimation',
-    'notesAndDurationsToStream',
-    'decisionProcess',
-    'AudioSearchException',
+    'recording',
+    'scoreFollower',
+    'smoothFrequencies',
+    'transcriber',
 ]
 
 import copy
@@ -136,7 +140,7 @@ def autocorrelationFunction(recordedSignal, recordSampleRateIn):
         # len(_missingImport) > 0:
         raise AudioSearchException(
             'Cannot run autocorrelationFunction without '
-            + f'numpy installed (scipy recommended).  Missing {bmi}')
+            f'numpy installed (scipy recommended).  Missing {bmi}')
     import numpy
     convolve = None
     try:
@@ -147,7 +151,7 @@ def autocorrelationFunction(recordedSignal, recordSampleRateIn):
             # noinspection PyPackageRequirements
             from scipy.signal import fftconvolve as convolve  # type: ignore
     except ImportError:  # pragma: no cover
-        warnings.warn('Running convolve without scipy -- will be slower')
+        warnings.warn('Running convolve without scipy -- will be slower', stacklevel=2)
         convolve = numpy.convolve
 
     recordedSignal = numpy.array(recordedSignal)
@@ -272,7 +276,7 @@ def normalizeInputFrequency(inputPitchFrequency, thresholds=None, pitches=None):
     ):
         raise AudioSearchException(
             'Cannot normalize input frequency if thresholds are given and '
-            + 'pitches are not, or vice-versa')
+            + 'pitches are not, or vice versa')
 
     if thresholds is None:
         (thresholds, pitches) = prepareThresholds()

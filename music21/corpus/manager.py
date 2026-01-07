@@ -1,10 +1,9 @@
-# -*- coding: utf-8 -*-
 # -----------------------------------------------------------------------------
 # Name:         corpus/manager.py
 # Purpose:      Manage multiple corpora
 #
 # Authors:      Christopher Ariza
-#               Josiah Wolf Oberholtzer
+#               Joséphine Wolf Oberholtzer
 #               Michael Scott Asato Cuthbert
 #
 # Copyright:    Copyright © 2009, 2013, 2015-17 Michael Scott Asato Cuthbert
@@ -356,9 +355,10 @@ def getMetadataBundleByCorpus(corpusObject: corpora.Corpus) -> bundles.MetadataB
             assert mdb is not None  # cacheMetadataBundleFromDisk makes None impossible
         return mdb
     else:  # pragma: no cover
-        raise CorpusException('No metadata bundle found for corpus {0} with name {1}'.format(
-            corpusObject, corpusName))
-
+        raise CorpusException(
+            f'No metadata bundle found for corpus {corpusObject} '
+            f'with name {corpusName}'
+        )
 
 def cacheMetadataBundleFromDisk(corpusObject: corpora.Corpus) -> None:
     r'''

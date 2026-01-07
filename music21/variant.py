@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 # Name:         variant.py
 # Purpose:      Ossia and other variant reading tools
@@ -25,7 +24,6 @@ from __future__ import annotations
 from collections.abc import Sequence
 import copy
 import difflib
-import typing as t
 import unittest
 
 from music21 import base
@@ -94,9 +92,11 @@ class Variant(base.Music21Object):
     # this copies the init of Streams
     def __init__(
         self,
-        givenElements: t.Union[None,
-                               base.Music21Object,
-                               Sequence[base.Music21Object]] = None,
+        givenElements: (
+            None
+            | base.Music21Object
+            | Sequence[base.Music21Object]
+        ) = None,
         name: str|None = None,
         givenElementsBehavior: GivenElementsBehavior = GivenElementsBehavior.OFFSETS,
         **music21ObjectKeywords,

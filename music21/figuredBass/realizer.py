@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 # Name:         realizer.py
 # Purpose:      figured bass lines, consisting of notes
@@ -61,9 +60,6 @@ from music21.figuredBass import notation
 from music21.figuredBass import realizerScale
 from music21.figuredBass import rules
 from music21.figuredBass import segment
-
-if t.TYPE_CHECKING:
-    from music21.stream.iterator import StreamIterator
 
 
 def figuredBassFromStream(streamPart: stream.Stream) -> FiguredBassLine:
@@ -277,7 +273,8 @@ class FiguredBassLine:
         else:
             raise FiguredBassLineException(
                 'Not a valid bassObject (only note.Note, '
-                + f'harmony.ChordSymbol, and roman.RomanNumeral supported) was {bassObject!r}')
+                f'harmony.ChordSymbol, and roman.RomanNumeral supported) was {bassObject!r}'
+            )
 
     def generateBassLine(self):
         '''
@@ -721,7 +718,7 @@ class Realization:
 
         else:  # Chorale-style output
             upperParts = []
-            for partNumber in range(len(possibilityProgression[0]) - 1):
+            for _partNumber in range(len(possibilityProgression[0]) - 1):
                 fbPart = stream.Part()
                 sol.insert(0.0, fbPart)
                 fbPart.append([copy.deepcopy(self._keySig), copy.deepcopy(self._inTime)])

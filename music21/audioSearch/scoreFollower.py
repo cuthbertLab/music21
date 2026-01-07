@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # -----------------------------------------------------------------------------
 # Name:         audioSearch.scoreFollower.py
 # Purpose:      Detection of the position in the score in real time
@@ -127,9 +126,9 @@ class ScoreFollower:
 
         # print('WE STAY AT:',)
         # print(self.lastNotePosition, len(self.scoreNotesOnly),)
-        # print('en percent %s %%' % (self.lastNotePosition * 100 / len(self.scoreNotesOnly)),)
+        # print(f'en percent {self.lastNotePosition * 100 / len(self.scoreNotesOnly)}%')
         # print(' this search begins at: ', self.startSearchAtSlot,)
-        # print('countdown %s' % self.countdown)
+        # print(f'countdown {self.countdown}')
         # print('Measure last note', self.scoreStream[self.lastNotePosition].measureNumber)
 
         environLocal.printDebug('repeat transcription starting')

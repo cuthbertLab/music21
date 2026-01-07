@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # -----------------------------------------------------------------------------
 # Name:         beam.py
 # Purpose:      music21 classes for representing beams and beam groups
@@ -219,10 +218,10 @@ class Beams(prebase.ProtoM21Object, EqualSlottedObjectMixin):
 
     # INITIALIZER #
 
-    def __init__(self):
+    def __init__(self) -> None:
         # no need for super() call w/ ProtoM21 and EqualSlottedObject
-        self.beamsList = []
-        self.feathered = False
+        self.beamsList: list[Beam] = []
+        self.feathered: bool = False
 
         # this should not be called .id.
         self.id = id(self)
@@ -368,8 +367,9 @@ class Beams(prebase.ProtoM21Object, EqualSlottedObjectMixin):
                     continue
                 if nextBeam.type in ('continue', 'stop'):
                     environLocal.warn(
-                        'Found a messed up beam pair {}, {}, at index {} of \n{}'.format(
-                            bThis, bNext, i, beamsList))
+                        f'Found a messed up beam pair {bThis}, {bNext}, '
+                        f'at index {i} of \n{beamsList}'
+                    )
                     continue
 
                 thisBeam.type = 'start'

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 # Name:         common/stringTools.py
 # Purpose:      Utilities for strings
@@ -304,12 +303,27 @@ def stripAccents(inputString: str) -> str:
     >>> common.stripAccents(s)
     'tres vite'
 
-    Also handles the German Eszett
+    Also handles the German Eszett and smart quotes
 
     >>> common.stripAccents('Muß')
     'Muss'
+    >>> common.stripAccents('Süss, “êtré”')
+    'Suss, "etre"'
+
+    Note -- is is still possible to have non-Ascii characters after this,
+    like in this Japanese expression for music:
+
+    >>> common.stripAccents('音楽')
+    '音楽'
     '''
-    nfkd_form = unicodedata.normalize('NFKD', inputString).replace('ß', 'ss')
+    nfkd_form = (
+        unicodedata.normalize('NFKD', inputString)
+        .replace('ß', 'ss')
+        .replace('“', '"')
+        .replace('”', '"')
+        .replace('‘', "'")
+        .replace('’', "'")
+    )
     return ''.join([c for c in nfkd_form if not unicodedata.combining(c)])
 
 
@@ -324,7 +338,7 @@ def normalizeFilename(name: str) -> str:
     without any accented characters.
 
     >>> common.normalizeFilename('03-Niccolò all’lessandra.not really.xml')
-    '03-Niccolo_alllessandra_not_really.xml'
+    '03-Niccolo_all_lessandra_not_really.xml'
     '''
     extension = None
     lenName = len(name)

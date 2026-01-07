@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # -----------------------------------------------------------------------------
 # Name:         stream/filters.py
 # Purpose:      Classes for filtering iterators of streams
@@ -134,7 +133,7 @@ class IsFilter(StreamFilter):
 
     def __call__(self, item, iterator=None):
         if self.numToFind == 0:  # short circuit -- we already have
-            raise StopIteration
+            raise StopIteration()
 
         if item in self.target:
             # would popping the item be faster? No: then can't use for IsNotFilter
@@ -416,7 +415,7 @@ class OffsetFilter(StreamFilter):
             if stopAfterEnd:
                 # if sorted, optimize by breaking after exceeding offsetEnd
                 # eventually we could do a binary search to speed up
-                raise StopIteration
+                raise StopIteration()
             return False
 
         dur = e.duration

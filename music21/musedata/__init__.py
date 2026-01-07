@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 # Name:         musedata/__init__.py
 # Purpose:      parses Walter Hewlett's MuseData format
@@ -27,6 +26,21 @@ Low level MuseData conversion is facilitated by the objects in this module and
 '''
 from __future__ import annotations
 
+__all__ = [
+    'MuseDataDirectory',
+    'MuseDataException',
+    'MuseDataFile',
+    'MuseDataMeasure',
+    'MuseDataMeasureIterator',
+    'MuseDataPart',
+    'MuseDataRecord',
+    'MuseDataRecordIterator',
+    'MuseDataWork',
+    'base12_26',
+    'base40',
+    'translate',
+]
+
 from collections.abc import Iterable
 import os
 import typing as t
@@ -44,8 +58,8 @@ from music21 import prebase
 environLocal = environment.Environment('musedata')
 
 # for implementation
-# see http://www.ccarh.org/publications/books/beyondmidi/online/musedata/
-# and http://www.ccarh.org/publications/books/beyondmidi/online/musedata/record-organization/
+# see https://www.ccarh.org/publications/books/beyondmidi/online/musedata/
+# and https://www.ccarh.org/publications/books/beyondmidi/online/musedata/record-organization/
 
 
 # ------------------------------------------------------------------------------
@@ -588,7 +602,7 @@ class MuseDataRecordIterator:
 
     def __next__(self):
         if self.index >= len(self.src):
-            raise StopIteration
+            raise StopIteration()
         # add one b/c end is inclusive
         mdr = MuseDataRecord(self.src[self.index], self.parent)
         self.index += 1
@@ -749,7 +763,7 @@ class MuseDataMeasureIterator:
 
     def __next__(self):
         if self.index >= len(self.boundaries):
-            raise StopIteration
+            raise StopIteration()
         start, end = self.boundaries[self.index]
         # add one b/c end is inclusive
         mdm = MuseDataMeasure(self.src[start:end + 1], self.parent)
@@ -1570,7 +1584,7 @@ class MuseDataWork(prebase.ProtoM21Object):
         for fpInner in fpList:
             mdf = MuseDataFile()
             mdf.encoding = self.encoding
-            # environLocal.printDebug('processing MuseData file: %s' % fp)
+            # environLocal.printDebug(f'processing MuseData file: {fp}')
             mdf.open(fpInner)
             mdf.read()  # process string and break into parts
             mdf.close()

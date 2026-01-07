@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 # Name:         correlate.py
 # Purpose:      Stream analyzer designed to correlate and graph two properties
@@ -132,7 +131,7 @@ class ActivityMatch:
             dstCheck = self.streamObj.recurse().getElementsByClass(objName)
             if not dstCheck:
                 raise CorrelateException('cannot create correlation: an object '
-                                         + f'that is not found in the Stream: {objName}')
+                                         f'that is not found in the Stream: {objName}')
 
         self._findActive(objNameSrc, objNameDst)
 

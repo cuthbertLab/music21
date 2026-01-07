@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 # Name:         humdrum.__init__.py
 # Purpose:      base module for emulating Humdrum functionality in music21
@@ -15,9 +14,7 @@ Files in this package deal specifically with making life easier for
 people who have previously used humdrum or need to import
 humdrum data (in spines, etc.) into music21.
 
-
 Humdrum programs and their closest music21 equivalents:
-
 
 ============  =================================================  =========================================================================================================================================================================
 Humdrum       music21                                            notes
@@ -154,8 +151,8 @@ ydelta_       Not needed
 from __future__ import annotations
 
 __all__ = [
-    'spineParser',
     'instruments',
+    'spineParser',
     'testFiles',
 ]
 

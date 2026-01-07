@@ -1,9 +1,8 @@
-# -*- coding: utf-8 -*-
 # -----------------------------------------------------------------------------
 # Name:         tree/timespanTree.py
 # Purpose:      Subclasses of tree.trees.OffsetTree for manipulation
 #
-# Authors:      Josiah Wolf Oberholtzer
+# Authors:      Joséphine Wolf Oberholtzer
 #               Michael Scott Asato Cuthbert
 #
 # Copyright:    Copyright © 2013-2024 Michael Scott Asato Cuthbert
@@ -197,8 +196,7 @@ class TimespanTree(trees.OffsetTree):
         >>> tsTree.insert(ts)
 
         >>> for timespan in ts:
-        ...     print("%r %s" % (timespan, tsTree.index(timespan)))
-        ...
+        ...     print(f'{timespan!r} {tsTree.index(timespan)}')
         <Timespan 0.0 2.0> 0
         <Timespan 0.0 9.0> 1
         <Timespan 1.0 1.0> 2
@@ -374,8 +372,7 @@ class TimespanTree(trees.OffsetTree):
         ...     for verticality in subsequence:
         ...         verticalityChord = verticality.toChord()
         ...         print(f'\t[{verticality.measureNumber}] '
-        ...               + f'{verticality}: {verticalityChord.isConsonant()}')
-        ...
+        ...               f'{verticality}: {verticalityChord.isConsonant()}')
         Subsequence:
             [2] <music21.tree.verticality.Verticality 6.0 {E3 E4 G#4 B4}>: True
             [2] <music21.tree.verticality.Verticality 6.5 {E3 D4 G#4 B4}>: False
@@ -652,8 +649,7 @@ class TimespanTree(trees.OffsetTree):
         ()
 
         >>> for timespan in scoreTree.elementsOverlappingOffset(0.1):
-        ...     print("%r, %s" % (timespan, timespan.part.id))
-        ...
+        ...     print(f'{timespan!r}, {timespan.part.id}')
         <PitchedTimespan (0.0 to 0.5) <music21.note.Note C#>>, Soprano
         <PitchedTimespan (0.0 to 0.5) <music21.note.Note A>>, Tenor
         <PitchedTimespan (0.0 to 0.5) <music21.note.Note A>>, Bass
@@ -664,8 +660,7 @@ class TimespanTree(trees.OffsetTree):
 
         >>> scoreTree.splitAt(0.1)
         >>> for timespan in scoreTree.elementsStartingAt(0.1):
-        ...     print("%r, %s" % (timespan, timespan.part.id))
-        ...
+        ...     print(f'{timespan!r}, {timespan.part.id}')
         <PitchedTimespan (0.1 to 0.5) <music21.note.Note C#>>, Soprano
         <PitchedTimespan (0.1 to 0.5) <music21.note.Note A>>, Tenor
         <PitchedTimespan (0.1 to 0.5) <music21.note.Note A>>, Bass
@@ -719,7 +714,7 @@ class TimespanTree(trees.OffsetTree):
         ...     print(part)
         ...     horizontality = unwrapped[part]
         ...     for timespan in horizontality:
-        ...         print('\t%r' % timespan)
+        ...         print(f'\t{timespan!r}')
         ...
         <music21.stream.Part Alto>
             <PitchedTimespan (0.0 to 1.0) <music21.note.Note E>>
@@ -814,9 +809,9 @@ class TimespanTree(trees.OffsetTree):
 class Test(unittest.TestCase):
 
     def testGetVerticalityAtWithKey(self):
-        from music21 import stream
         from music21 import key
         from music21 import note
+        from music21 import stream
         s = stream.Stream()
         s.insert(0, key.Key('C'))
         s.insert(0, note.Note('F#4'))

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # -----------------------------------------------------------------------------
 # Name:         corpus/__init__.py
 # Purpose:      Shortcuts to the corpus collection
@@ -36,11 +35,13 @@ And use `corpus.search` if you do not:
 >>> cb[0].parse()
 <music21.stream.Score airdsAirs/book1.abc>
 '''
+
 from __future__ import annotations
 from collections.abc import Iterable
 import typing as t
 
 from music21 import common
+from music21.exceptions21 import CorpusException
 from music21 import metadata
 
 from music21.corpus import chorales
@@ -48,28 +49,28 @@ from music21.corpus import corpora
 from music21.corpus import manager
 from music21.corpus import virtual
 from music21.corpus import work
-
 from music21.corpus.manager import search
 from music21 import environment
-from music21.exceptions21 import CorpusException
 
 __all__ = [
-    'chorales', 'corpora', 'manager',
-    # virtual
-    'work',
-    'parse',
-    'getCorePaths',
-    # 'getVirtualPaths',
-    'getLocalPaths',
+    'CorpusException',
     'addPath',
-    'getPaths',
     'cacheMetadata',
+    'chorales',
+    'corpora',
     'getComposer',
-    'noCorpus',
+    'getCorePaths',
+    'getLocalPaths',
+    'getPaths',
+    # 'getVirtualPaths',
     'getWork',
-
+    'manager',
+    'noCorpus',
+    'parse',
+    'virtual',
+    'search',
+    'work',
 ]
-
 
 if t.TYPE_CHECKING:
     import pathlib

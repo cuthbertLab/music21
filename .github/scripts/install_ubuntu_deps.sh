@@ -9,6 +9,4 @@ sudo apt-get install -y libpng-dev
 wget -q https://lilypond.org/download/binaries/linux-64/lilypond-2.22.1-1.linux-64.sh
 sh lilypond-2.22.1-1.linux-64.sh --batch
 export PATH=/home/runner/bin:$PATH
-pip3 install wheel
-pip3 install -r requirements_dev.txt
 python3 -m compileall music21

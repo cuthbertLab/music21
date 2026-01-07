@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 # Name:         search/lyrics.py
 # Purpose:      music21 classes for searching lyrics
@@ -55,10 +54,11 @@ class IndexedLyric(namedtuple(
         'absoluteStart': '''the position, not in the current identifier, but in all the lyrics''',
         'absoluteEnd': '''the end position in all the lyrics'''
     }
+
     def __repr__(self):
         return (f'IndexedLyric(el={self.el!r}, start={self.start!r}, end={self.end!r}, '
-                + f'measure={self.measure!r}, lyric={self.lyric!r}, text={self.text!r}, '
-                + f'identifier={self.identifier!r})')
+                f'measure={self.measure!r}, lyric={self.lyric!r}, text={self.text!r}, '
+                f'identifier={self.identifier!r})')
 
     def modify(self, **keywords):
         '''
@@ -102,8 +102,8 @@ class SearchMatch(namedtuple('SearchMatch',
 
     def __repr__(self):
         return (f'SearchMatch(mStart={self.mStart!r}, mEnd={self.mEnd!r}, '
-                + f'matchText={self.matchText!r}, els={self.els!r}, indices=[...], '
-                + f'identifier={self.identifier!r})')
+                f'matchText={self.matchText!r}, els={self.els!r}, indices=[...], '
+                f'identifier={self.identifier!r})')
 
 
 class LyricSearcherException(Music21Exception):

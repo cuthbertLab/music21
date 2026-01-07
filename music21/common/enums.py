@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 # Name:         common/enums.py
 # Purpose:      Music21 Enumerations
@@ -10,14 +9,12 @@
 # ------------------------------------------------------------------------------
 from __future__ import annotations
 
-from enum import Enum, EnumMeta, IntEnum
+from enum import Enum, EnumType, IntEnum
 import re
-
-# When Python 3.11 is minimum, import EnumType instead of EnumMeta
 
 # when Python 3.12 is minimum, will not need StrEnumMeta at all -- contains will work.
 
-class StrEnumMeta(EnumMeta):
+class StrEnumMeta(EnumType):
     def __contains__(cls, item):
         if isinstance(item, str):
             if item in cls.__members__.values():
@@ -30,9 +27,11 @@ class StrEnumMeta(EnumMeta):
             return False
 
 
-class ContainsMeta(EnumMeta):
+class ContainsMeta(EnumType):
     '''
     This is a backport of the Python 3.12 `EnumType` class's contains method.
+
+    This will be removed when Python 3.12 is the minimum version for music21.
     '''
     def __contains__(cls, item):
         try:
@@ -248,7 +247,7 @@ class AppendSpanners(StrEnum):
     AppendSpanners.NONE means do not append the related spanners at all (i.e. only append
         the object).
 
-    * new in v9.
+    * New in v9.
     '''
     NORMAL = 'normal'
     RELATED_ONLY = 'related_only'
@@ -263,7 +262,7 @@ class OrnamentDelay(StrEnum):
     OrnamentDelay.NO_DELAY means there is no delay (this is equivalent to setting delay to 0.0)
     OrnamentDelay.DEFAULT_DELAY means the delay is half the duration of the ornamented note.
 
-    * new in v9.
+    * New in v9.
     '''
     NO_DELAY = 'noDelay'
     DEFAULT_DELAY = 'defaultDelay'

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 # Name:         graph/primitives.py
 # Purpose:      Classes for graphing in matplotlib and/or other graphing tools.
@@ -579,93 +578,6 @@ class Graph(prebase.ProtoM21Object):
             return self.figure
 
 
-class GraphNetworkxGraph(Graph):
-    '''
-    Grid a networkx graph -- which is a graph of nodes and edges.
-    Requires the optional networkx module.
-    '''
-    #
-    # >>> #_DOCS_SHOW g = graph.primitives.GraphNetworkxGraph()
-    #
-    # .. image:: images/GraphNetworkxGraph.*
-    #     :width: 600
-    _DOC_ATTR: dict[str, str] = {
-        'networkxGraph': '''An instance of a networkx graph object.''',
-        'hideLeftBottomSpines': 'bool to hide the left and bottom axis spines; default True',
-    }
-
-    graphType = 'networkx'
-    keywordConfigurables = Graph.keywordConfigurables + (
-        'networkxGraph', 'hideLeftBottomSpines',
-    )
-
-    def __init__(self, **keywords):
-        self.networkxGraph = None
-        self.hideLeftBottomSpines = True
-
-        super().__init__(**keywords)
-
-        extm = getExtendedModules()
-
-        if 'title' not in keywords:
-            self.title = 'Network Plot'
-
-        elif extm.networkx is not None:  # if we have this module
-            # testing default; temporary
-            try:  # pragma: no cover
-                g = extm.networkx.Graph()
-                # g.add_edge('a', 'b',weight=1.0)
-                # g.add_edge('b', 'c',weight=0.6)
-                # g.add_edge('c', 'd',weight=0.2)
-                # g.add_edge('d', 'e',weight=0.6)
-                self.networkxGraph = g
-            except NameError:
-                pass  # keep as None
-
-    def renderSubplot(self, subplot):  # pragma: no cover
-        # figure size can be set w/ figsize=(5,10)
-        extm = getExtendedModules()
-        networkx = extm.networkx
-
-        # positions for all nodes
-        # positions are stored in the networkx graph as a pos attribute
-        posNodes = {}
-        posNodeLabels = {}
-        # returns a data dictionary
-        for nId, nData in self.networkxGraph.nodes(data=True):
-            posNodes[nId] = nData['pos']
-            # shift labels off center of nodes
-            posNodeLabels[nId] = (nData['pos'][0] + 0.125, nData['pos'][1])
-
-        # environLocal.printDebug(['get position', posNodes])
-        # posNodes = networkx.spring_layout(self.networkxGraph, weighted=True)
-        # draw nodes
-        networkx.draw_networkx_nodes(self.networkxGraph, posNodes,
-                                     node_size=300, ax=subplot, node_color='#605C7F', alpha=0.5)
-
-        for (u, v, d) in self.networkxGraph.edges(data=True):
-            environLocal.printDebug(['GraphNetworkxGraph', (u, v, d)])
-            # print(u,v,d)
-            # adding one at a time to permit individual alpha settings
-            edgelist = [(u, v)]
-            networkx.draw_networkx_edges(self.networkxGraph, posNodes, edgelist=edgelist,
-                                         width=2, style=d['style'],
-                                         edge_color='#666666', alpha=d['weight'], ax=subplot)
-
-        # labels
-        networkx.draw_networkx_labels(self.networkxGraph, posNodeLabels,
-                                      font_size=self.labelFontSize,
-                                      font_family=self.fontFamily, font_color='#000000',
-                                      ax=subplot)
-
-        # remove all labels
-        self.setAxisLabel('y', '')
-        self.setAxisLabel('x', '')
-        self.setTicks('y', [])
-        self.setTicks('x', [])
-        # turn off grid
-        self.grid = False
-
 
 class GraphColorGrid(Graph):
     '''
@@ -1192,7 +1104,7 @@ class GraphHorizontalBarWeighted(Graph):
         #     for x in range(int(math.floor(xMin)),
         #                    round(math.ceil(xMax)),
         #                    rangeStep):
-        #         xTicks.append([x, '%s' % x])
+        #         xTicks.append([x, f'{x}'])
         #         self.setTicks('x', xTicks)
         # environLocal.printDebug(['xTicks', xTicks])
 
@@ -1518,7 +1430,7 @@ class GraphGroupedVerticalBar(Graph):
         rects = []
         for i in range(barsPerGroup):
             yVals = []
-            for j, x in enumerate(xVals):
+            for j, _x in enumerate(xVals):
                 # get position, then get bar group
                 yVals.append(yBundles[j][i])
             xValsShifted = []
@@ -1847,14 +1759,6 @@ class TestExternal(unittest.TestCase):
         data = [(f'bar{x}', {'a': 3, 'b': 2, 'c': 1}) for x in range(10)]
         g.data = data
         g.process()
-
-    def testGraphNetworkxGraph(self):
-        extm = getExtendedModules()
-
-        if extm.networkx is not None:  # pragma: no cover
-            b = GraphNetworkxGraph(doneAction=None)
-            # b = GraphNetworkxGraph()
-            b.process()
 
 
 if __name__ == '__main__':

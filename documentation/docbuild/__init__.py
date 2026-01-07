@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 __all__ = ['documenters', 'iterators', 'writers']
 
 from . import documenters

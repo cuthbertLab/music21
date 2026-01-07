@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 # Name:         key.py
 # Purpose:      Classes for keys
@@ -39,8 +38,6 @@ from music21 import style
 
 environLocal = environment.Environment('key')
 
-KeySignatureType = t.TypeVar('KeySignatureType', bound='KeySignature')
-KeyType = t.TypeVar('KeyType', bound='Key')
 TransposeTypes = int|str|interval.Interval|interval.GenericInterval
 
 
@@ -434,7 +431,7 @@ class KeySignature(base.Music21Object):
         '''
         our_sharps = self.sharps or 0  # || 0 in case of None -- non-standard key-signature
         if mode is not None and tonic is not None:
-            warnings.warn(f'ignoring provided tonic: {tonic}', KeyWarning)
+            warnings.warn(f'ignoring provided tonic: {tonic}', KeyWarning, stacklevel=2)
         if mode is None and tonic is None:
             mode = 'major'
         if mode is None and tonic is not None:
@@ -661,23 +658,23 @@ class KeySignature(base.Music21Object):
     # --------------------------------------------------------------------------
     # methods
     @overload
-    def transpose(self: KeySignatureType,
+    def transpose(self,
                   value: TransposeTypes,
                   *,
-                  inPlace: t.Literal[False] = False) -> KeySignatureType:
+                  inPlace: t.Literal[False] = False) -> t.Self:
         ...
 
     @overload
-    def transpose(self: KeySignatureType,
+    def transpose(self,
                   value: TransposeTypes,
                   *,
                   inPlace: t.Literal[True]) -> None:
         ...
 
-    def transpose(self: KeySignatureType,
+    def transpose(self,
                   value: TransposeTypes,
                   *,
-                  inPlace: bool = False) -> KeySignatureType|None:
+                  inPlace: bool = False) -> t.Self|None:
         '''
         Transpose the KeySignature by the user-provided value.
         If the value is an integer, the transposition is treated
@@ -1232,26 +1229,26 @@ class Key(KeySignature, scale.DiatonicScale):
             raise ValueError(f'Unknown method: {method}')
 
     @overload
-    def transpose(self: KeyType,
+    def transpose(self,
                   value: TransposeTypes,
                   *,
                   inPlace: t.Literal[False] = False
-                  ) -> KeyType:
+                  ) -> t.Self:
         ...
 
     @overload
-    def transpose(self: KeyType,
+    def transpose(self,
                   value: TransposeTypes,
                   *,
                   inPlace: t.Literal[True]
                   ) -> None:
         ...
 
-    def transpose(self: KeyType,
+    def transpose(self,
                   value: TransposeTypes,
                   *,
                   inPlace: bool = False
-                  ) -> KeyType|None:
+                  ) -> t.Self|None:
         '''
         Transpose the Key by the user-provided value.
         If the value is an integer, the transposition is treated

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 # Name:         test.py
 # Purpose:      Controller for all module tests in music21.

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 # Name:         volume.py
 # Purpose:      Objects for representing volume, amplitude, and related
@@ -142,10 +141,11 @@ class Volume(prebase.ProtoM21Object, SlottedObjectMixin):
     def getRealizedStr(self,
                        useDynamicContext: dynamics.Dynamic|bool = True,
                        useVelocity=True,
-                       useArticulations: t.Union[bool,
-                                                 articulations.Articulation,
-                                                 Iterable[articulations.Articulation]
-                                                 ] = True,
+                       useArticulations: (
+                           bool
+                           | articulations.Articulation
+                           | Iterable[articulations.Articulation]
+                       ) = True,
                        baseLevel=0.5,
                        clip=True):
         '''
@@ -166,9 +166,11 @@ class Volume(prebase.ProtoM21Object, SlottedObjectMixin):
         self,
         useDynamicContext: bool|dynamics.Dynamic = True,
         useVelocity=True,
-        useArticulations: t.Union[
-            bool, articulations.Articulation, Iterable[articulations.Articulation]
-        ] = True,
+        useArticulations: (
+            bool
+            | articulations.Articulation
+            | Iterable[articulations.Articulation]
+        ) = True,
         baseLevel=0.5,
         clip=True,
     ):

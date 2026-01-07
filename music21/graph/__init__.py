@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 # Name:         graph.py
 # Purpose:      Classes for graphing in matplotlib and/or other graphing tools.
@@ -40,8 +39,12 @@ From highest level to lowest level usage, ways of graphing are as follows:
 from __future__ import annotations
 
 __all__ = [
-    'axis', 'findPlot', 'plot', 'primitives', 'utilities',
+    'axis',
+    'findPlot',
+    'plot',
     'plotStream',
+    'primitives',
+    'utilities',
 ]
 
 import typing as t
