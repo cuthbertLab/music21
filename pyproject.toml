@@ -41,7 +41,6 @@ classifiers = [
     "Typing :: Typed",
 ]
 
-# when hatch-requirements-txt is stable, replace with that
 dependencies = [
     "chardet",
     "joblib",
