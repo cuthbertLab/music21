@@ -5,6 +5,8 @@ Computational Musicology
 
 Copyright © 2006-2026 [Michael Scott Asato Cuthbert](http://www.trecento.com)
 
+Released under the BSD (3-clause) license. See LICENSE and below.
+
 For more information, visit:
 https://www.music21.org/music21docs/
 
@@ -16,12 +18,6 @@ https://www.music21.org/music21docs/usersGuide/usersGuide_01_installing.html
 
 `Music21` runs on Python 3.11+.  (Use music21 version 4 on Python 2 or Py3.4, v5
 on Py3.5, v6 on Py3.6, v7 on Py3.7, v8 on Py3.8/Py3.9, and v9 on Py3.10)
-
-Released under the BSD (3-clause) license. See LICENSE.
-Externally provided software (including the MIT-licensed Lilypond/MusicXML test Suite) and
-music encoding in the corpus may have different licenses and/or copyrights. 
-A no-corpus version of `music21` is available also on GitHub for those needing strict
-BSD-license of all parts of the system.
 
 [![Build Status](https://github.com/cuthbertLab/music21/workflows/maincheck/badge.svg)](https://github.com/cuthbertLab/music21)
 [![Coverage Status](https://coveralls.io/repos/github/cuthbertLab/music21/badge.svg?branch=master)](https://coveralls.io/github/cuthbertLab/music21?branch=master)
@@ -69,3 +65,29 @@ The early development of `music21` was supported by
 the generosity of the Seaver Institute and the
 National Endowment for the Humanities, along with MIT's Music and Theater Arts Section
 and the School of Humanities, Arts, and Social Sciences.
+
+## License Coverage and Other/Prior Licenses ##
+
+Music21 is Open-Source Software released under the BSD (3-clause) license.
+Essentially, it's free and you can do with it what you'd like as long as you
+keep the LICENSE file and copyright statement.
+
+The license applies to all code files that are new to music21 along with
+documentation. Externally provided software (including the MIT-licensed 
+Lilypond/MusicXML test Suite) may have other licenses.  The encoded
+musical scores in the corpus have their own copyrights and licenses. They
+underlying music is believed to be in the public domain in the US, EU, and
+Canada (and most of the world) and the encodings are also either public domain
+or used by permission. For those needing a strict BSD-license of all parts of
+the music21 system, a no-corpus version of `music21` is available also on GitHub 
+for those needing strict BSD-license of all parts of the system.
+
+(For historical reasons, music21 before v2 can also be used under the LGPL license.
+Between v1 and 2, all prior contributors were 
+contacted (it was a handful back then) and all agreed to relicense 
+their contributions under the BSD license).
+
+These detailed explanations of the license were moved to this README.md file in
+2026 (v10) and out of LICENSE, music21/LICENSE and music21/license.txt in 
+order to make the music21 license more parsable by tooling.  The move was not 
+meant to imply any change in the license or your rights or obligations under it.
