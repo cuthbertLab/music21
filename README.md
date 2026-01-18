@@ -79,8 +79,8 @@ musical scores in the corpus have their own copyrights and licenses. They
 underlying music is believed to be in the public domain in the US, EU, and
 Canada (and most of the world) and the encodings are also either public domain
 or used by permission. For those needing a strict BSD-license of all parts of
-the music21 system, a no-corpus version of `music21` is available also on GitHub 
-for those needing strict BSD-license of all parts of the system.
+the music21 system, a no-corpus version of `music21` is available also on GitHub
+or from the FreeBSD repo.
 
 (For historical reasons, music21 before v2 can also be used under the LGPL license.
 Between v1 and 2, all prior contributors were 
