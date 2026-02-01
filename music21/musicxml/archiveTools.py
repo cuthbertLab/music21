@@ -101,6 +101,7 @@ def compressXML(filename: str|pathlib.Path,
 def uncompressMXL(filename: str|pathlib.Path,
                   *,
                   deleteOriginal=False,
+                  silent=False,
                   strictMxlCheck=True) -> bool:
     '''
     Takes a filename, and if the filename corresponds to a compressed musicXML
@@ -119,7 +120,8 @@ def uncompressMXL(filename: str|pathlib.Path,
         return False  # not a compressed musicXML file
 
     fp: pathlib.Path = common.pathTools.cleanpath(filename, returnPathlib=True)
-    environLocal.warn(f'Updating file: {fp}')
+    if not silent:  # pragma: no cover
+        environLocal.warn(f'Updating file: {fp}')
     extractPath = str(fp.parent)
     unarchivedName = fp.with_suffix('.musicxml').name
     # Export container and original xml file to system as a compressed XML.
