@@ -40,38 +40,20 @@ document.addEventListener('DOMContentLoaded', () => {
         border_color = cs.borderTopColor;
     }
 
-    const button_styles = {
-        'cursor': 'pointer',
-        'position': 'absolute',
-        'top': '0',
-        'right': '0',
-        'border-color': border_color,
-        'border-style': border_style,
-        'border-width': border_width,
-        'color': border_color,
-        'text-size': '75%',
-        'font-family': 'monospace',
-        'padding-left': '0.2em',
-        'padding-right': '0.2em',
-        'border-radius': '0 3px 0 0'
-    };
-
     function apply_button_styles(button) {
-        // Keep the original style keys, but translate the ones that need JS-style names.
-        button.style.cursor = button_styles['cursor'];
-        button.style.position = button_styles['position'];
-        button.style.top = button_styles['top'];
-        button.style.right = button_styles['right'];
-        button.style.borderColor = button_styles['border-color'];
-        button.style.borderStyle = button_styles['border-style'];
-        button.style.borderWidth = button_styles['border-width'];
-        button.style.color = button_styles['color'];
-        // Old code had 'text-size' which is not a real CSS property; map it to font-size.
+        button.style.cursor = 'pointer';
+        button.style.position = 'absolute';
+        button.style.top = '0';
+        button.style.right = '0';
+        button.style.borderColor = border_color;
+        button.style.borderStyle = border_style;
+        button.style.borderWidth = border_width;
+        button.style.color = border_color;
         button.style.fontSize = '75%';
-        button.style.fontFamily = button_styles['font-family'];
-        button.style.paddingLeft = button_styles['padding-left'];
-        button.style.paddingRight = button_styles['padding-right'];
-        button.style.borderRadius = button_styles['border-radius'];
+        button.style.fontFamily = 'monospace';
+        button.style.paddingLeft = '0.2em';
+        button.style.paddingRight = '0.2em';
+        button.style.borderRadius = '0 3px 0 0';
     }
 
     function hide_elements(parent, selector) {
@@ -129,9 +111,11 @@ document.addEventListener('DOMContentLoaded', () => {
             const button = document.createElement('span');
             button.className = 'copy_button';
             button.textContent = '>>>';
+            button.setAttribute('role', 'button');
+            button.setAttribute('tabindex', '0');
             apply_button_styles(button);
             button.setAttribute('title', hide_text);
-            button.setAttribute('data-hidden', 'false');
+            button.setAttribute('aria-pressed', 'false');
             this_div.insertBefore(button, this_div.firstChild);
         }
 
@@ -159,7 +143,7 @@ document.addEventListener('DOMContentLoaded', () => {
             e.preventDefault();
             const parent = button.parentNode;
             const pre = next_pre_sibling(button);
-            if (button.getAttribute('data-hidden') === 'false') {
+            if (button.getAttribute('aria-pressed') === 'false') {
                 // hide the code output
                 hide_elements(parent, '.go, .gp, .gt');
                 if (pre) {
@@ -167,7 +151,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
                 button.style.textDecoration = 'line-through';
                 button.setAttribute('title', show_text);
-                button.setAttribute('data-hidden', 'true');
+                button.setAttribute('aria-pressed', 'true');
             } else {
                 // show the code output
                 show_elements(parent, '.go, .gp, .gt');
@@ -177,7 +161,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
                 button.style.textDecoration = 'none';
                 button.setAttribute('title', hide_text);
-                button.setAttribute('data-hidden', 'false');
+                button.setAttribute('aria-pressed', 'false');
+            }
+        });
+        button.addEventListener('keydown', e => {
+            if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                button.click();
             }
         });
     }
