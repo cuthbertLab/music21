@@ -5,7 +5,7 @@
 /** Add a [>>>] button on the top-right corner of code samples to hide
  * the >>> and ... prompts and the output and thus make the code
  * copyable. */
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', () => {
     const div = document.querySelectorAll(
         '.highlight-python .highlight,'
         + '.highlight-python3 .highlight,'
@@ -15,8 +15,8 @@ document.addEventListener('DOMContentLoaded', function() {
     // NOTE: in the old jQuery version, `pre` was a jQuery collection across all divs.
     // Here we take the first <pre> we find (if any) to read theme styles.
     let firstPre = null;
-    for (let i = 0; i < div.length; i++) {
-        const maybePre = div[i].querySelector('pre');
+    for (const this_div of div) {
+        const maybePre = this_div.querySelector('pre');
         if (maybePre) {
             firstPre = maybePre;
             break;
@@ -76,23 +76,23 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function hide_elements(parent, selector) {
         const els = parent.querySelectorAll(selector);
-        for (let i = 0; i < els.length; i++) {
-            els[i].style.display = 'none';
+        for (const el of els) {
+            el.style.display = 'none';
         }
     }
 
     function show_elements(parent, selector) {
         const els = parent.querySelectorAll(selector);
-        for (let i = 0; i < els.length; i++) {
-            els[i].style.display = '';
+        for (const el of els) {
+            el.style.display = '';
         }
     }
 
     function set_traceback_visibility(pre, visible) {
         // Equivalent to: button.next('pre').find('.gt').nextUntil('.gp, .go')...
         const gts = pre.querySelectorAll('.gt');
-        for (let i = 0; i < gts.length; i++) {
-            let n = gts[i].nextSibling;
+        for (const gt of gts) {
+            let n = gt.nextSibling;
             while (n) {
                 if (n.nodeType === Node.ELEMENT_NODE) {
                     const el = n;
@@ -107,11 +107,9 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // create and add the button to all the code blocks that contain >>>
-    for (let index = 0; index < div.length; index++) {
-        const this_div = div[index];
-        const pre = this_div.querySelector('pre');
-
+    for (const this_div of div) {
         // get the styles from the current theme (per-block positioning like before)
+        const pre = this_div.querySelector('pre');
         if (pre && pre.parentElement && pre.parentElement.parentElement) {
             pre.parentElement.parentElement.style.position = 'relative';
         }
@@ -129,15 +127,14 @@ document.addEventListener('DOMContentLoaded', function() {
         // tracebacks (.gt) contain bare text elements that need to be
         // wrapped in a span to work with .nextUntil() (see later)
         const preWithGt = this_div.querySelectorAll('pre');
-        for (let p = 0; p < preWithGt.length; p++) {
-            if (preWithGt[p].querySelector('.gt')) {
-                const contents = Array.prototype.slice.call(preWithGt[p].childNodes);
-                for (let c = 0; c < contents.length; c++) {
-                    const node = contents[c];
+        for (const preNode of preWithGt) {
+            if (preNode.querySelector('.gt')) {
+                const contents = Array.prototype.slice.call(preNode.childNodes);
+                for (const node of contents) {
                     if ((node.nodeType === 3) && (node.data.trim().length > 0)) {
                         const span = document.createElement('span');
                         span.textContent = node.data;
-                        preWithGt[p].replaceChild(span, node);
+                        preNode.replaceChild(span, node);
                     }
                 }
             }
@@ -146,10 +143,10 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // define the behavior of the button when it's clicked
     const buttons = document.querySelectorAll('.copybutton');
-    for (let b = 0; b < buttons.length; b++) {
-        buttons[b].addEventListener('click', function(e){
+    for (const buttonEl of buttons) {
+        buttonEl.addEventListener('click', e => {
             e.preventDefault();
-            const button = this;
+            const button = e.currentTarget;
             if (button.getAttribute('data-hidden') === 'false') {
                 // hide the code output
                 hide_elements(button.parentNode, '.go, .gp, .gt');
