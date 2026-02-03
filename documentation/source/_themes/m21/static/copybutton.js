@@ -6,7 +6,7 @@
  * the >>> and ... prompts and the output and thus make the code
  * copyable. */
 document.addEventListener('DOMContentLoaded', function() {
-    var div = document.querySelectorAll(
+    const div = document.querySelectorAll(
         '.highlight-python .highlight,'
         + '.highlight-python3 .highlight,'
         + '.highlight-default .highlight'
@@ -14,9 +14,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // NOTE: in the old jQuery version, `pre` was a jQuery collection across all divs.
     // Here we take the first <pre> we find (if any) to read theme styles.
-    var firstPre = null;
-    for (var i = 0; i < div.length; i++) {
-        var maybePre = div[i].querySelector('pre');
+    let firstPre = null;
+    for (let i = 0; i < div.length; i++) {
+        const maybePre = div[i].querySelector('pre');
         if (maybePre) {
             firstPre = maybePre;
             break;
@@ -27,20 +27,20 @@ document.addEventListener('DOMContentLoaded', function() {
     if (firstPre && firstPre.parentElement && firstPre.parentElement.parentElement) {
         firstPre.parentElement.parentElement.style.position = 'relative';
     }
-    var hide_text = 'Hide the prompts and output';
-    var show_text = 'Show the prompts and output';
+    const hide_text = 'Hide the prompts and output';
+    const show_text = 'Show the prompts and output';
 
-    var border_width = '';
-    var border_style = '';
-    var border_color = '';
+    let border_width = '';
+    let border_style = '';
+    let border_color = '';
     if (firstPre) {
-        var cs = window.getComputedStyle(firstPre);
+        const cs = window.getComputedStyle(firstPre);
         border_width = cs.borderTopWidth;
         border_style = cs.borderTopStyle;
         border_color = cs.borderTopColor;
     }
 
-    var button_styles = {
+    const button_styles = {
         'cursor': 'pointer',
         'position': 'absolute',
         'top': '0',
@@ -75,27 +75,27 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function hide_elements(parent, selector) {
-        var els = parent.querySelectorAll(selector);
-        for (var i = 0; i < els.length; i++) {
+        const els = parent.querySelectorAll(selector);
+        for (let i = 0; i < els.length; i++) {
             els[i].style.display = 'none';
         }
     }
 
     function show_elements(parent, selector) {
-        var els = parent.querySelectorAll(selector);
-        for (var i = 0; i < els.length; i++) {
+        const els = parent.querySelectorAll(selector);
+        for (let i = 0; i < els.length; i++) {
             els[i].style.display = '';
         }
     }
 
     function set_traceback_visibility(pre, visible) {
         // Equivalent to: button.next('pre').find('.gt').nextUntil('.gp, .go')...
-        var gts = pre.querySelectorAll('.gt');
-        for (var i = 0; i < gts.length; i++) {
-            var n = gts[i].nextSibling;
+        const gts = pre.querySelectorAll('.gt');
+        for (let i = 0; i < gts.length; i++) {
+            let n = gts[i].nextSibling;
             while (n) {
                 if (n.nodeType === Node.ELEMENT_NODE) {
-                    var el = n;
+                    const el = n;
                     if (el.classList.contains('gp') || el.classList.contains('go')) {
                         break;
                     }
@@ -107,9 +107,9 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // create and add the button to all the code blocks that contain >>>
-    for (var index = 0; index < div.length; index++) {
-        var this_div = div[index];
-        var pre = this_div.querySelector('pre');
+    for (let index = 0; index < div.length; index++) {
+        const this_div = div[index];
+        const pre = this_div.querySelector('pre');
 
         // get the styles from the current theme (per-block positioning like before)
         if (pre && pre.parentElement && pre.parentElement.parentElement) {
@@ -117,7 +117,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         if (this_div.querySelectorAll('.gp').length > 0) {
-            var button = document.createElement('span');
+            const button = document.createElement('span');
             button.className = 'copybutton';
             button.textContent = '>>>';
             apply_button_styles(button);
@@ -128,14 +128,14 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // tracebacks (.gt) contain bare text elements that need to be
         // wrapped in a span to work with .nextUntil() (see later)
-        var preWithGt = this_div.querySelectorAll('pre');
-        for (var p = 0; p < preWithGt.length; p++) {
+        const preWithGt = this_div.querySelectorAll('pre');
+        for (let p = 0; p < preWithGt.length; p++) {
             if (preWithGt[p].querySelector('.gt')) {
-                var contents = Array.prototype.slice.call(preWithGt[p].childNodes);
-                for (var c = 0; c < contents.length; c++) {
-                    var node = contents[c];
+                const contents = Array.prototype.slice.call(preWithGt[p].childNodes);
+                for (let c = 0; c < contents.length; c++) {
+                    const node = contents[c];
                     if ((node.nodeType === 3) && (node.data.trim().length > 0)) {
-                        var span = document.createElement('span');
+                        const span = document.createElement('span');
                         span.textContent = node.data;
                         preWithGt[p].replaceChild(span, node);
                     }
@@ -145,15 +145,15 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // define the behavior of the button when it's clicked
-    var buttons = document.querySelectorAll('.copybutton');
-    for (var b = 0; b < buttons.length; b++) {
+    const buttons = document.querySelectorAll('.copybutton');
+    for (let b = 0; b < buttons.length; b++) {
         buttons[b].addEventListener('click', function(e){
             e.preventDefault();
-            var button = this;
+            const button = this;
             if (button.getAttribute('data-hidden') === 'false') {
                 // hide the code output
                 hide_elements(button.parentNode, '.go, .gp, .gt');
-                var next = button.nextElementSibling;
+                let next = button.nextElementSibling;
                 while (next && next.tagName.toLowerCase() !== 'pre') {
                     next = next.nextElementSibling;
                 }
@@ -166,7 +166,7 @@ document.addEventListener('DOMContentLoaded', function() {
             } else {
                 // show the code output
                 show_elements(button.parentNode, '.go, .gp, .gt');
-                var next2 = button.nextElementSibling;
+                let next2 = button.nextElementSibling;
                 while (next2 && next2.tagName.toLowerCase() !== 'pre') {
                     next2 = next2.nextElementSibling;
                 }
