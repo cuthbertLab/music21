@@ -106,6 +106,17 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    /**
+     * find the next sibling that is a <pre> tag.
+     */
+    function next_pre_sibling(startEl) {
+        let next = startEl.nextElementSibling;
+        while (next && next.tagName.toLowerCase() !== 'pre') {
+            next = next.nextElementSibling;
+        }
+        return next;
+    }
+
     // create and add the button to all the code blocks that contain >>>
     for (const this_div of div) {
         // get the styles from the current theme (per-block positioning like before)
@@ -116,7 +127,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (this_div.querySelectorAll('.gp').length > 0) {
             const button = document.createElement('span');
-            button.className = 'copybutton';
+            button.className = 'copy_button';
             button.textContent = '>>>';
             apply_button_styles(button);
             button.setAttribute('title', hide_text);
@@ -129,9 +140,9 @@ document.addEventListener('DOMContentLoaded', () => {
         const preWithGt = this_div.querySelectorAll('pre');
         for (const preNode of preWithGt) {
             if (preNode.querySelector('.gt')) {
-                const contents = Array.prototype.slice.call(preNode.childNodes);
+                const contents = Array.from(preNode.childNodes);
                 for (const node of contents) {
-                    if ((node.nodeType === 3) && (node.data.trim().length > 0)) {
+                    if ((node.nodeType === Node.TEXT_NODE) && node.data.trim()) {
                         const span = document.createElement('span');
                         span.textContent = node.data;
                         preNode.replaceChild(span, node);
@@ -142,34 +153,27 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // define the behavior of the button when it's clicked
-    const buttons = document.querySelectorAll('.copybutton');
-    for (const buttonEl of buttons) {
-        buttonEl.addEventListener('click', e => {
+    const buttons = document.querySelectorAll('.copy_button');
+    for (const button of buttons) {
+        button.addEventListener('click', e => {
             e.preventDefault();
-            const button = e.currentTarget;
+            const parent = button.parentNode;
+            const pre = next_pre_sibling(button);
             if (button.getAttribute('data-hidden') === 'false') {
                 // hide the code output
-                hide_elements(button.parentNode, '.go, .gp, .gt');
-                let next = button.nextElementSibling;
-                while (next && next.tagName.toLowerCase() !== 'pre') {
-                    next = next.nextElementSibling;
-                }
-                if (next) {
-                    set_traceback_visibility(next, false);
+                hide_elements(parent, '.go, .gp, .gt');
+                if (pre) {
+                    set_traceback_visibility(pre, false);
                 }
                 button.style.textDecoration = 'line-through';
                 button.setAttribute('title', show_text);
                 button.setAttribute('data-hidden', 'true');
             } else {
                 // show the code output
-                show_elements(button.parentNode, '.go, .gp, .gt');
-                let next2 = button.nextElementSibling;
-                while (next2 && next2.tagName.toLowerCase() !== 'pre') {
-                    next2 = next2.nextElementSibling;
-                }
-                if (next2) {
-                    // next2 is the same thing jQuery would return for .next('pre')
-                    set_traceback_visibility(next2, true);
+                show_elements(parent, '.go, .gp, .gt');
+                if (pre) {
+                    // pre is the same thing jQuery would return for .next('pre')
+                    set_traceback_visibility(pre, true);
                 }
                 button.style.textDecoration = 'none';
                 button.setAttribute('title', hide_text);
