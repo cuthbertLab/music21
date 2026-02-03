@@ -6,16 +6,16 @@
  * the >>> and ... prompts and the output and thus make the code
  * copyable. */
 document.addEventListener('DOMContentLoaded', () => {
-    const div = document.querySelectorAll(
+    const divs = document.querySelectorAll(
         '.highlight-python .highlight,'
         + '.highlight-python3 .highlight,'
         + '.highlight-default .highlight'
     );
 
-    // NOTE: in the old jQuery version, `pre` was a jQuery collection across all divs.
-    // Here we take the first <pre> we find (if any) to read theme styles.
+    // We take the first <pre> we find (if any) to read theme styles
+    // and apply them to the buttons
     let firstPre = null;
-    for (const this_div of div) {
+    for (const this_div of divs) {
         const maybePre = this_div.querySelector('pre');
         if (maybePre) {
             firstPre = maybePre;
@@ -118,7 +118,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // create and add the button to all the code blocks that contain >>>
-    for (const this_div of div) {
+    for (const this_div of divs) {
         // get the styles from the current theme (per-block positioning like before)
         const pre = this_div.querySelector('pre');
         if (pre && pre.parentElement && pre.parentElement.parentElement) {
