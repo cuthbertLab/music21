@@ -59,6 +59,7 @@ dev = [
     'docutils',
     'hatch',
     'hatchling',
+    'ipython',
     'jupyter',
     'mypy>=1.16.0',
     'nbconvert',
