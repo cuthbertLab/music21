@@ -3535,6 +3535,72 @@ class TupletFixer:
                 n.duration.informClient()
         # else: pass
 
+
+class TupletSearchState:  # pylint: disable=W0201
+    '''
+    Private helper for makeNotation.consolidateCompletedTuplets().
+    '''
+    def __init__(self, onlyIfTied=True) -> None:
+        self.onlyIfTied: bool = onlyIfTied
+        self.reset()
+
+    def reset(self) -> None:
+        self.to_consolidate: list[note.GeneralNote | None] = []
+        self.partial_tuplet_sum: OffsetQL = 0.0
+        self.last_tuplet: Tuplet|None = None
+        self.completion_target: OffsetQL|None = None
+
+    def advance_tuplet_sum(self, gn: note.GeneralNote) -> None:
+        self.partial_tuplet_sum = opFrac(self.partial_tuplet_sum + gn.quarterLength)
+
+    def append(self, gn: note.GeneralNote) -> None:
+        if self.to_consolidate:
+            self.to_consolidate.append(gn)
+        else:
+            self.partial_tuplet_sum = gn.quarterLength
+            if not gn.duration.tuplets:
+                raise ValueError
+            self.last_tuplet = gn.duration.tuplets[0]
+            if t.TYPE_CHECKING:
+                assert self.last_tuplet is not None
+            self.completion_target = self.last_tuplet.totalTupletLength()
+            self.to_consolidate.append(gn)
+
+    def mark_no_consolidation(self) -> None:
+        self.to_consolidate.append(None)
+
+    def get_consolidatable_notes(self) -> list[note.GeneralNote]:
+        if not all(self.is_reexpressible(gn) for gn in self.to_consolidate):
+            return []
+        return t.cast(list['note.GeneralNote'], self.to_consolidate)
+
+    def is_reexpressible(self, gn: note.GeneralNote | None) -> bool:
+        return (
+            gn is not None
+            and gn.duration.expressionIsInferred
+            and len(gn.duration.tuplets) < 2
+            and (gn.isRest or gn.tie is not None or not self.onlyIfTied)
+        )
+
+    def should_be_tested(self, gn: note.GeneralNote) -> bool:
+        if not self.to_consolidate:
+            return True
+        prev_gn = gn.previous('GeneralNote', activeSiteOnly=True)
+        return (
+            (
+                # rests_match?
+                (gn.isRest and prev_gn.isRest)
+                # notes match?
+                or (not gn.isRest and not prev_gn.isRest and gn.pitches == prev_gn.pitches)
+            )
+            # And no gaps.
+            and opFrac(prev_gn.offset + prev_gn.quarterLength) == gn.offset
+            # And tuplet matches.
+            and len(gn.duration.tuplets) == 1
+            and gn.duration.tuplets[0] == self.last_tuplet
+        )
+
+
 # -------------------------------------------------------------------------------
 
 
