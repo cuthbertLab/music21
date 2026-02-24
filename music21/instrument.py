@@ -2045,7 +2045,7 @@ MIDI_PROGRAM_TO_INSTRUMENT = {
     109: Bagpipes,
     110: Violin,  # TODO: instrumentSound
     111: Shehnai,
-    112: Glockenspiel,  # TODO 112: Tinkle Bell
+    112: Glockenspiel,  # TODO: 112: Tinkle Bell
     113: Agogo,
     114: SteelDrum,
     115: Woodblock,
