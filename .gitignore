@@ -93,3 +93,5 @@ music21/monkeytype.sqlite3
 # Emacs backups
 *.txt~
 *.py~
+.ai/
+.cadence/
