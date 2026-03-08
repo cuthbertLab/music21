@@ -59,11 +59,9 @@ class Test(unittest.TestCase):
     A series of tests from the DeGarmo book that run automatically
     when self.b (expected braille) or self.e (expected english) are altered
     '''
-
-    def _s(self, streamIn):
+    @property
+    def s(self, streamIn):
         self.stream = streamIn
-
-    s = property(fset=_s)
 
     def _neutralizeSpacing(self, sStr):
         sStr = textwrap.dedent(sStr)
@@ -71,7 +69,8 @@ class Test(unittest.TestCase):
         sStr = sStr.rstrip() + '\n'  # (but not before first word.)
         return sStr
 
-    def _b(self, brailleInput):
+    @property
+    def b(self, brailleInput):
         '''
         Sets the expected brailleInput and runs assertMultilineEqual
         '''
@@ -79,28 +78,31 @@ class Test(unittest.TestCase):
         if self.autoRun:
             self.runB()
 
-    b = property(fset=_b)
-
-    def _e(self, english):
+    @property
+    def e(self, english):
         self.expectedEnglish = self._neutralizeSpacing(english)
         if self.autoRun:
             self.runE()
-
-    e = property(fset=_e)
 
     def runB(self):
         ns = self._neutralizeSpacing
         if self.stream is None:
             return
         streamBraille = self.method(self.stream, inPlace=True, **self.methodArgs)
-        self.assertMultiLineEqual(ns(streamBraille), self.expectedBraille)
+        self.assertMultiLineEqual(
+            ns(streamBraille),
+            self.expectedBraille
+        )
 
     def runE(self):
         ns = self._neutralizeSpacing
         if self.stream is None:
             return
         streamEnglish = self.method(self.stream, inPlace=True, debug=True, **self.methodArgs)
-        self.assertMultiLineEqual(ns(streamEnglish), self.expectedEnglish)
+        self.assertMultiLineEqual(
+            ns(streamEnglish),
+            self.expectedEnglish
+        )
 
     def setUp(self):
         self.maxDiff = None
@@ -3293,17 +3295,17 @@ Barline final ⠣⠅
         bm = converter.parse('''
             tinynotation: 12/8 r1 r4 r8 b-8 e-16 e'- g- g'- b- b'- bn b'n
             b- b'- bn b'n b- b'- a'- f' d' b- e'-4.''').flatten()
-        bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
-        lastMeasure = bm.getElementsByClass(stream.Measure).last()
+        bm2 = bm.makeNotation(cautionaryNotImmediateRepeat=False)
+        lastMeasure = bm2.getElementsByClass(stream.Measure).last()
         lastMeasure.rightBarline = None
-        for m in bm.getElementsByClass(stream.Measure):
+        for m in bm2.getElementsByClass(stream.Measure):
             m.number -= 1
-        m0 = bm.getElementsByClass(stream.Measure).first()
+        m0 = bm2.getElementsByClass(stream.Measure).first()
         for i in range(3):
             m0.pop(2)
         lastMeasure.notes[7].pitch.accidental = pitch.Accidental('natural')
         lastMeasure.notes[11].pitch.accidental = pitch.Accidental('natural')
-        self.s = bm
+        self.s = bm2
         self.b = '''
         ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠼⠁⠃⠦⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
         ⠼⠚⠀⠣⠐⠚⠀⠣⠯⠣⠨⠋⠣⠐⠓⠣⠨⠓⠣⠐⠚⠣⠨⠚⠡⠐⠾⠡⠨⠾⠣⠐⠾⠣⠨⠾⠐

@@ -332,8 +332,8 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         # self.restrictClass = restrictClass
 
         # these should become part of style or something else
-        self.definesExplicitSystemBreaks = False
-        self.definesExplicitPageBreaks = False
+        self.definesExplicitSystemBreaks: bool = False
+        self.definesExplicitPageBreaks: bool = False
 
         # property for transposition status;
         self._atSoundingPitch: bool|t.Literal['unknown'] = 'unknown'
@@ -6958,7 +6958,8 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
                      cautionaryAll: bool = False,
                      overrideStatus: bool = False,
                      cautionaryNotImmediateRepeat: bool = True,
-                     tiePitchSet: set[str]|None = None
+                     tiePitchSet: set[str]|None = None,
+                     streamStatusParent: streamStatus.StreamStatus|None = None,
                      ):
         '''
         This method calls a sequence of Stream methods on this Stream to prepare
@@ -6980,7 +6981,6 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
             overrideStatus
             cautionaryNotImmediateRepeat
             tiePitchSet
-
 
         >>> s = stream.Stream()
         >>> n = note.Note('g')
@@ -7032,7 +7032,9 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         # pitches from last measure are passed
         # this needs to be called before makeTies
         # note that this functionality is also placed in Part
-        if not returnStream.streamStatus.accidentals:
+        if (not returnStream.streamStatus.accidentals
+                and (streamStatusParent is None or not streamStatusParent.accidentals)):
+            # we use streamStatusParent so that setting on the Score sets for Part etc.
             makeNotation.makeAccidentalsInMeasureStream(
                 returnStream,
                 pitchPast=pitchPast,
@@ -7044,29 +7046,36 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
                 overrideStatus=overrideStatus,
                 cautionaryNotImmediateRepeat=cautionaryNotImmediateRepeat,
                 tiePitchSet=tiePitchSet)
+        returnStream.streamStatus.accidentals = True
 
+        # if (not returnStream.streamStatus.ties
+        #         and (streamStatusParent is None or not streamStatusParent.ties)):
+        # ties are ready to be tracked by streamStatus but are not done yet.
         makeNotation.makeTies(returnStream, meterStream=meterStream, inPlace=True)
 
         for m in returnStream.getElementsByClass(Measure):
             makeNotation.splitElementsToCompleteTuplets(m, recurse=True, addTies=True)
             makeNotation.consolidateCompletedTuplets(m, recurse=True, onlyIfTied=True)
 
-        if not returnStream.streamStatus.beams:
+        if (not returnStream.streamStatus.beams
+                and (streamStatusParent is None or not streamStatusParent.beams)):
             try:
                 makeNotation.makeBeams(returnStream, inPlace=True)
             except meter.MeterException as me:
                 warnings.warn(str(me), stacklevel=2)
+        returnStream.streamStatus.beams = True
 
         # note: this needs to be after makeBeams, as placing this before
         # makeBeams was causing the duration's tuplet to lose its type setting
         # check for tuplet brackets one measure at a time
         # this means that they will never extend beyond one measure
         for m in returnStream.getElementsByClass(Measure):
-            if not m.streamStatus.tuplets:
+            if not m.streamStatus.tuplets:  # TODO: consult my streamStatus + streamStatusParent
                 makeNotation.makeTupletBrackets(m, inPlace=True)
 
         if not inPlace:
             return returnStream
+        return None
 
     def extendDuration(self, objClass, *, inPlace=False):
         '''
@@ -13121,6 +13130,7 @@ class Measure(Stream):
     # -------------------------------------------------------------------------
     def makeNotation(self,
                      inPlace=False,
+                     streamStatusParent: streamStatus.StreamStatus | None = None,
                      **subroutineKeywords):
         # noinspection PyShadowingNames
         '''
@@ -13156,7 +13166,10 @@ class Measure(Stream):
             if illegalKey in srkCopy:
                 del srkCopy[illegalKey]
 
-        m.makeAccidentals(searchKeySignatureByContext=True, inPlace=True, **srkCopy)
+
+        if (not m.streamStatus.accidentals
+                and (streamStatusParent is None or not streamStatusParent.accidentals)):
+            m.makeAccidentals(searchKeySignatureByContext=True, inPlace=True, **srkCopy)
         # makeTies is for cross-bar associations, and cannot be used
         # at just the measure level
         # m.makeTies(meterStream, inPlace=True)
@@ -13182,7 +13195,9 @@ class Measure(Stream):
         makeNotation.splitElementsToCompleteTuplets(m, recurse=True, addTies=True)
         makeNotation.consolidateCompletedTuplets(m, recurse=True, onlyIfTied=True)
 
-        m.makeBeams(inPlace=True)
+        if (not m.streamStatus.beams
+                and (streamStatusParent is None or not streamStatusParent.beams)):
+            m.makeBeams(inPlace=True)
         for m_or_v in [m, *m.voices]:
             makeNotation.makeTupletBrackets(m_or_v, inPlace=True)
 
@@ -14289,6 +14304,7 @@ class Score(Stream):
         refStreamOrTimeRange=None,
         inPlace=False,
         bestClef=False,
+        streamStatusParent: streamStatus.StreamStatus|None = None,
         **subroutineKeywords
     ):
         '''
@@ -14309,13 +14325,14 @@ class Score(Stream):
 
         # do not assume that we have parts here
         if self.hasPartLikeStreams():
-            # s: Stream
-            for s in returnStream.getElementsByClass('Stream'):
+            # p: Part
+            for p in returnStream.getElementsByClass('Stream'):
                 # process all component Streams inPlace
-                s.makeNotation(meterStream=meterStream,
+                p.makeNotation(meterStream=meterStream,
                                refStreamOrTimeRange=refStreamOrTimeRange,
                                inPlace=True,
                                bestClef=bestClef,
+                               streamStatusParent=self.streamStatus,
                                **subroutineKeywords)
             # note: while the local-streams have updated their caches, the
             # containing score has an out-of-date cache of flat.
