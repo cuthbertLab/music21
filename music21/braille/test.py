@@ -59,9 +59,10 @@ class Test(unittest.TestCase):
     A series of tests from the DeGarmo book that run automatically
     when self.b (expected braille) or self.e (expected english) are altered
     '''
-    @property
-    def s(self, streamIn):
+    def _s(self, streamIn):
         self.stream = streamIn
+
+    s = property(fset=_s)  # write-only property
 
     def _neutralizeSpacing(self, sStr):
         sStr = textwrap.dedent(sStr)
@@ -69,8 +70,7 @@ class Test(unittest.TestCase):
         sStr = sStr.rstrip() + '\n'  # (but not before first word.)
         return sStr
 
-    @property
-    def b(self, brailleInput):
+    def _b(self, brailleInput):
         '''
         Sets the expected brailleInput and runs assertMultilineEqual
         '''
@@ -78,11 +78,14 @@ class Test(unittest.TestCase):
         if self.autoRun:
             self.runB()
 
-    @property
-    def e(self, english):
+    b = property(fset=_b)  # write-only property; write triggers checks if .autoRun is True
+
+    def _e(self, english):
         self.expectedEnglish = self._neutralizeSpacing(english)
         if self.autoRun:
             self.runE()
+
+    e = property(fset=_e)  # write-only property; write triggers checks if .autoRun is True
 
     def runB(self):
         ns = self._neutralizeSpacing
