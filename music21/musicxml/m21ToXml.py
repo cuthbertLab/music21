@@ -2490,7 +2490,8 @@ class ScoreExporter(XMLExporterBase, PartStaffExporterMixin):
         <supports attribute="new-page" element="print" type="yes" value="yes" />
 
         '''
-        def getSupport(element: str, supports_type: bool, attribute: str|None = None, value: str|None = None):
+        def getSupport(element: str, supports_type: bool,
+                       attribute: str|None = None, value: str|None = None):
             su = Element('supports')
             su.set('element', element)
             su.set('type', xmlObjects.booleanToYesNo(supports_type))
