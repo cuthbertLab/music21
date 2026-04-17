@@ -95,3 +95,8 @@ music21/monkeytype.sqlite3
 *.py~
 .ai/
 .cadence/
+
+
+# agents
+.agents/worktrees
+.claude/worktrees
