@@ -6019,7 +6019,8 @@ class MeasureExporter(XMLExporterBase):
 
         self.setPrintObject(mxHarmony, cs)
         # TODO: attr: print-frame
-        # TODO: attrGroup: placement
+        if cs.placement is not None:
+            mxHarmony.set('placement', cs.placement)
 
         self.setPrintStyle(mxHarmony, cs)
 
