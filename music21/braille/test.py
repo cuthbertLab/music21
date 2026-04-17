@@ -68,6 +68,7 @@ class Test(unittest.TestCase):
     def _neutralizeSpacing(self, sStr):
         sStr = textwrap.dedent(sStr)
         sStr = re.sub(r'^ *\n', '', sStr)  # remove spaces to first line break
+        sStr = '\n'.join(line.rstrip() for line in sStr.split('\n'))
         sStr = sStr.rstrip() + '\n'  # (but not before first word.)
         return sStr
 
@@ -96,10 +97,12 @@ class Test(unittest.TestCase):
         self.assertMultiLineEqual(ns(streamBraille), self.expectedBraille)
 
     def runE(self):
+        import copy
         ns = self._neutralizeSpacing
         if self.stream is None:
             return
-        streamEnglish = self.method(self.stream, inPlace=True, debug=True, **self.methodArgs)
+        stream_copy = copy.deepcopy(self.stream)
+        streamEnglish = self.method(stream_copy, inPlace=True, debug=True, **self.methodArgs)
         self.assertMultiLineEqual(ns(streamEnglish), self.expectedEnglish)
 
     def setUp(self):
@@ -128,40 +131,100 @@ class Test(unittest.TestCase):
         bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
         self.s = bm
         self.methodArgs = {'suppressOctaveMarks': True}
+        self.e = '''
+        ---begin segment---
+        <music21.braille.segment BrailleSegment>
+        Measure 1, Signature Grouping 1:
+        Time Signature 3/8 ⠼⠉⠦
+        ===
+        Measure 1, Note Grouping 1:
+        <music21.clef.TrebleClef>
+        G eighth ⠓
+        Rest eighth ⠭
+        E eighth ⠋
+        ===
+        Measure 2, Note Grouping 1:
+        F eighth ⠛
+        Rest eighth ⠭
+        A eighth ⠊
+        ===
+        Measure 3, Note Grouping 1:
+        G eighth ⠓
+        Rest eighth ⠭
+        F eighth ⠛
+        ===
+        Measure 4, Note Grouping 1:
+        E eighth ⠋
+        Rest eighth ⠭
+        Rest eighth ⠭
+        ===
+        Measure 5, Note Grouping 1:
+        E eighth ⠋
+        Rest eighth ⠭
+        C eighth ⠙
+        ===
+        Measure 6, Note Grouping 1:
+        D eighth ⠑
+        Rest eighth ⠭
+        F eighth ⠛
+        ===
+        Measure 7, Note Grouping 1:
+        E eighth ⠋
+        Rest eighth ⠭
+        D eighth ⠑
+        ===
+        Measure 8, Note Grouping 1:
+        C eighth ⠙
+        Rest eighth ⠭
+        Rest eighth ⠭
+        ===
+        Measure 9, Note Grouping 1:
+        D eighth ⠑
+        Rest eighth ⠭
+        F eighth ⠛
+        ===
+        Measure 10, Note Grouping 1:
+        E eighth ⠋
+        Rest eighth ⠭
+        G eighth ⠓
+        ===
+        Measure 11, Note Grouping 1:
+        F eighth ⠛
+        G eighth ⠓
+        A eighth ⠊
+        ===
+        Measure 12, Note Grouping 1:
+        G eighth ⠓
+        Rest eighth ⠭
+        Rest eighth ⠭
+        ===
+        Measure 13, Note Grouping 1:
+        A eighth ⠊
+        Rest eighth ⠭
+        F eighth ⠛
+        ===
+        Measure 14, Note Grouping 1:
+        G eighth ⠓
+        Rest eighth ⠭
+        E eighth ⠋
+        ===
+        Measure 15, Note Grouping 1:
+        F eighth ⠛
+        E eighth ⠋
+        D eighth ⠑
+        ===
+        Measure 16, Note Grouping 1:
+        C eighth ⠙
+        Rest eighth ⠭
+        Rest eighth ⠭
+        Barline final ⠣⠅
+        ===
+        ---end segment---
+        '''
         self.b = '''
         ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠼⠉⠦⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
         ⠼⠁⠀⠓⠭⠋⠀⠛⠭⠊⠀⠓⠭⠛⠀⠋⠭⠭⠀⠋⠭⠙⠀⠑⠭⠛⠀⠋⠭⠑⠀⠙⠭⠭⠀⠑⠭⠛
         ⠀⠀⠋⠭⠓⠀⠛⠓⠊⠀⠓⠭⠭⠀⠊⠭⠛⠀⠓⠭⠋⠀⠛⠋⠑⠀⠙⠭⠭⠣⠅
-        '''
-        self.s = bm.measures(1, 4)
-        self.e = '''
-          ---begin segment---
-          <music21.braille.segment BrailleSegment>
-          Measure 1, Signature Grouping 1:
-          Time Signature 3/8 ⠼⠉⠦
-          ===
-          Measure 1, Note Grouping 1:
-          <music21.clef.TrebleClef>
-          G eighth ⠓
-          Rest eighth ⠭
-          E eighth ⠋
-          ===
-          Measure 2, Note Grouping 1:
-          F eighth ⠛
-          Rest eighth ⠭
-          A eighth ⠊
-          ===
-          Measure 3, Note Grouping 1:
-          G eighth ⠓
-          Rest eighth ⠭
-          F eighth ⠛
-          ===
-          Measure 4, Note Grouping 1:
-          E eighth ⠋
-          Rest eighth ⠭
-          Rest eighth ⠭
-          ===
-          ---end segment---
         '''
 
     def test_example02_2(self):
@@ -174,6 +237,67 @@ class Test(unittest.TestCase):
         for measure in m:
             measure.number -= 1
         self.methodArgs = {'suppressOctaveMarks': True}
+        self.e = '''
+        ---begin segment---
+        <music21.braille.segment BrailleSegment>
+        Measure 0, Signature Grouping 1:
+        Time Signature 4/8 ⠼⠙⠦
+        ===
+        Measure 0, Note Grouping 1:
+        <music21.clef.BassClef>
+        D eighth ⠑
+        ===
+        Measure 1, Note Grouping 1:
+        D eighth ⠑
+        C eighth ⠙
+        B eighth ⠚
+        D eighth ⠑
+        ===
+        Measure 2, Note Grouping 1:
+        C eighth ⠙
+        B eighth ⠚
+        A eighth ⠊
+        C eighth ⠙
+        ===
+        Measure 3, Note Grouping 1:
+        B eighth ⠚
+        A eighth ⠊
+        G eighth ⠓
+        B eighth ⠚
+        ===
+        Measure 4, Note Grouping 1:
+        A eighth ⠊
+        A eighth ⠊
+        D eighth ⠑
+        Rest eighth ⠭
+        ===
+        Measure 5, Note Grouping 1:
+        E eighth ⠋
+        E eighth ⠋
+        G eighth ⠓
+        E eighth ⠋
+        ===
+        Measure 6, Note Grouping 1:
+        D eighth ⠑
+        E eighth ⠋
+        G eighth ⠓
+        B eighth ⠚
+        ===
+        Measure 7, Note Grouping 1:
+        D eighth ⠑
+        C eighth ⠙
+        B eighth ⠚
+        A eighth ⠊
+        ===
+        Measure 8, Note Grouping 1:
+        G eighth ⠓
+        G eighth ⠓
+        G eighth ⠓
+        Rest eighth ⠭
+        Barline final ⠣⠅
+        ===
+        ---end segment---
+        '''
         self.b = '''
         ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠼⠙⠦⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
         ⠼⠚⠀⠑⠀⠑⠙⠚⠑⠀⠙⠚⠊⠙⠀⠚⠊⠓⠚⠀⠊⠊⠑⠭⠀⠋⠋⠓⠋⠀⠑⠋⠓⠚⠀⠑⠙⠚⠊
@@ -187,6 +311,80 @@ class Test(unittest.TestCase):
             r8 e8 e8 f8 f8 g8 a8 b8 c'8 a8 f8 e8 d8 c8 B8 c8 r8''')
         bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
         self.s = bm
+        self.e = '''
+        ---begin segment---
+        <music21.braille.segment BrailleSegment>
+        Measure 1, Signature Grouping 1:
+        Time Signature 2/8 ⠼⠃⠦
+        ===
+        Measure 1, Note Grouping 1:
+        <music21.clef.TrebleClef>
+        E eighth ⠋
+        E eighth ⠋
+        ===
+        Measure 2, Note Grouping 1:
+        G eighth ⠓
+        A eighth ⠊
+        ===
+        Measure 3, Note Grouping 1:
+        G eighth ⠓
+        F eighth ⠛
+        ===
+        Measure 4, Note Grouping 1:
+        E eighth ⠋
+        G eighth ⠓
+        ===
+        Measure 5, Note Grouping 1:
+        F eighth ⠛
+        E eighth ⠋
+        ===
+        Measure 6, Note Grouping 1:
+        D eighth ⠑
+        F eighth ⠛
+        ===
+        Measure 7, Note Grouping 1:
+        E eighth ⠋
+        C eighth ⠙
+        ===
+        Measure 8, Note Grouping 1:
+        D eighth ⠑
+        Rest eighth ⠭
+        ===
+        Measure 9, Note Grouping 1:
+        E eighth ⠋
+        E eighth ⠋
+        ===
+        Measure 10, Note Grouping 1:
+        F eighth ⠛
+        F eighth ⠛
+        ===
+        Measure 11, Note Grouping 1:
+        G eighth ⠓
+        A eighth ⠊
+        ===
+        Measure 12, Note Grouping 1:
+        B eighth ⠚
+        C eighth ⠙
+        ===
+        Measure 13, Note Grouping 1:
+        A eighth ⠊
+        F eighth ⠛
+        ===
+        Measure 14, Note Grouping 1:
+        E eighth ⠋
+        D eighth ⠑
+        ===
+        Measure 15, Note Grouping 1:
+        C eighth ⠙
+        B eighth ⠚
+        ===
+        Measure 16, Note Grouping 1:
+        C eighth ⠙
+        Rest eighth ⠭
+        Barline final ⠣⠅
+        ===
+        ---end segment---
+        '''
         self.b = '''
         ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠼⠃⠦⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
         ⠼⠁⠀⠋⠋⠀⠓⠊⠀⠓⠛⠀⠋⠓⠀⠛⠋⠀⠑⠛⠀⠋⠙⠀⠑⠭⠀⠋⠋⠀⠛⠛⠀⠓⠊⠀⠚⠙
@@ -203,6 +401,97 @@ class Test(unittest.TestCase):
         m = bm.getElementsByClass(stream.Measure)
         m[7].rightBarline = bar.Barline('double')
         self.s = bm
+        self.e = '''
+        ---begin segment---
+        <music21.braille.segment BrailleSegment>
+        Measure 1, Signature Grouping 1:
+        Time Signature 3/8 ⠼⠉⠦
+        ===
+        Measure 1, Note Grouping 1:
+        <music21.clef.TrebleClef>
+        A eighth ⠊
+        C eighth ⠙
+        E eighth ⠋
+        ===
+        Measure 2, Note Grouping 1:
+        D eighth ⠑
+        C eighth ⠙
+        B eighth ⠚
+        ===
+        Measure 3, Note Grouping 1:
+        C eighth ⠙
+        Rest eighth ⠭
+        B eighth ⠚
+        ===
+        Measure 4, Note Grouping 1:
+        A eighth ⠊
+        Rest eighth ⠭
+        Rest eighth ⠭
+        ===
+        Measure 5, Note Grouping 1:
+        B eighth ⠚
+        B eighth ⠚
+        C eighth ⠙
+        ===
+        Measure 6, Note Grouping 1:
+        D eighth ⠑
+        C eighth ⠙
+        B eighth ⠚
+        ===
+        Measure 7, Note Grouping 1:
+        A eighth ⠊
+        Rest eighth ⠭
+        A eighth ⠊
+        ===
+        Measure 8, Note Grouping 1:
+        B eighth ⠚
+        Rest eighth ⠭
+        Rest eighth ⠭
+        Barline double ⠣⠅⠄
+        ===
+        Measure 9, Note Grouping 1:
+        A eighth ⠊
+        E eighth ⠋
+        A eighth ⠊
+        ===
+        Measure 10, Note Grouping 1:
+        C eighth ⠙
+        B eighth ⠚
+        A eighth ⠊
+        ===
+        Measure 11, Note Grouping 1:
+        A eighth ⠊
+        B eighth ⠚
+        C eighth ⠙
+        ===
+        Measure 12, Note Grouping 1:
+        D eighth ⠑
+        Rest eighth ⠭
+        Rest eighth ⠭
+        ===
+        Measure 13, Note Grouping 1:
+        E eighth ⠋
+        D eighth ⠑
+        C eighth ⠙
+        ===
+        Measure 14, Note Grouping 1:
+        B eighth ⠚
+        E eighth ⠋
+        B eighth ⠚
+        ===
+        Measure 15, Note Grouping 1:
+        A eighth ⠊
+        Rest eighth ⠭
+        A eighth ⠊
+        ===
+        Measure 16, Note Grouping 1:
+        A eighth ⠊
+        Rest eighth ⠭
+        Rest eighth ⠭
+        Barline final ⠣⠅
+        ===
+        ---end segment---
+        '''
         self.b = '''
         ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠼⠉⠦⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
         ⠼⠁⠀⠊⠙⠋⠀⠑⠙⠚⠀⠙⠭⠚⠀⠊⠭⠭⠀⠚⠚⠙⠀⠑⠙⠚⠀⠊⠭⠊⠀⠚⠭⠭⠣⠅⠄
@@ -221,6 +510,66 @@ class Test(unittest.TestCase):
         for measure in m:
             measure.number -= 1
         self.s = bm
+        self.e = '''
+        ---begin segment---
+        <music21.braille.segment BrailleSegment>
+        Measure 0, Signature Grouping 1:
+        Time Signature 4/8 ⠼⠙⠦
+        ===
+        Measure 0, Note Grouping 1:
+        <music21.clef.TrebleClef>
+        D eighth ⠑
+        E eighth ⠋
+        ===
+        Measure 1, Note Grouping 1:
+        F eighth ⠛
+        C eighth ⠙
+        A eighth ⠊
+        C eighth ⠙
+        ===
+        Measure 2, Note Grouping 1:
+        D eighth ⠑
+        C eighth ⠙
+        A eighth ⠊
+        C eighth ⠙
+        ===
+        Measure 3, Note Grouping 1:
+        A eighth ⠊
+        C eighth ⠙
+        A eighth ⠊
+        G eighth ⠓
+        ===
+        Measure 4, Note Grouping 1:
+        E eighth ⠋
+        G eighth ⠓
+        F eighth ⠛
+        Rest eighth ⠭
+        ===
+        Measure 5, Note Grouping 1:
+        D eighth ⠑
+        E eighth ⠋
+        F eighth ⠛
+        D eighth ⠑
+        ===
+        Measure 6, Note Grouping 1:
+        C eighth ⠙
+        D eighth ⠑
+        E eighth ⠋
+        F eighth ⠛
+        ===
+        Measure 7, Note Grouping 1:
+        G eighth ⠓
+        E eighth ⠋
+        C eighth ⠙
+        E eighth ⠋
+        ===
+        Measure 8, Note Grouping 1:
+        F eighth ⠛
+        Rest eighth ⠭
+        Barline final ⠣⠅
+        ===
+        ---end segment---
+        '''
         self.b = '''
         ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠼⠙⠦⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
         ⠼⠚⠀⠑⠋⠀⠛⠙⠊⠙⠀⠑⠙⠊⠙⠀⠊⠙⠊⠓⠀⠋⠓⠛⠭⠀⠑⠋⠛⠑⠀⠙⠑⠋⠛⠀⠓⠋⠙⠋
@@ -236,6 +585,80 @@ class Test(unittest.TestCase):
             D8 G8 F8 D8 C8 E8 D8 C8 r8 r8''').flatten()
         bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
         self.s = bm
+        self.e = '''
+        ---begin segment---
+        <music21.braille.segment BrailleSegment>
+        Measure 1, Signature Grouping 1:
+        Time Signature 6/8 ⠼⠋⠦
+        ===
+        Measure 1, Note Grouping 1:
+        <music21.clef.BassClef>
+        G eighth ⠓
+        G eighth ⠓
+        G eighth ⠓
+        G eighth ⠓
+        E eighth ⠋
+        F eighth ⠛
+        ===
+        Measure 2, Note Grouping 1:
+        A eighth ⠊
+        G eighth ⠓
+        G eighth ⠓
+        G eighth ⠓
+        Rest eighth ⠭
+        G eighth ⠓
+        ===
+        Measure 3, Note Grouping 1:
+        A eighth ⠊
+        A eighth ⠊
+        A eighth ⠊
+        C eighth ⠙
+        B eighth ⠚
+        A eighth ⠊
+        ===
+        Measure 4, Note Grouping 1:
+        A eighth ⠊
+        G eighth ⠓
+        G eighth ⠓
+        G eighth ⠓
+        Rest eighth ⠭
+        Rest eighth ⠭
+        ===
+        Measure 5, Note Grouping 1:
+        G eighth ⠓
+        F eighth ⠛
+        F eighth ⠛
+        F eighth ⠛
+        Rest eighth ⠭
+        Rest eighth ⠭
+        ===
+        Measure 6, Note Grouping 1:
+        F eighth ⠛
+        E eighth ⠋
+        E eighth ⠋
+        E eighth ⠋
+        Rest eighth ⠭
+        Rest eighth ⠭
+        ===
+        Measure 7, Note Grouping 1:
+        D eighth ⠑
+        E eighth ⠋
+        D eighth ⠑
+        G eighth ⠓
+        F eighth ⠛
+        D eighth ⠑
+        ===
+        Measure 8, Note Grouping 1:
+        C eighth ⠙
+        E eighth ⠋
+        D eighth ⠑
+        C eighth ⠙
+        Rest eighth ⠭
+        Rest eighth ⠭
+        Barline final ⠣⠅
+        ===
+        ---end segment---
+        '''
         self.b = '''
         ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠼⠋⠦⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
         ⠼⠁⠀⠓⠓⠓⠓⠋⠛⠀⠊⠓⠓⠓⠭⠓⠀⠊⠊⠊⠙⠚⠊⠀⠊⠓⠓⠓⠭⠭⠀⠓⠛⠛⠛⠭⠭
@@ -251,6 +674,80 @@ class Test(unittest.TestCase):
             g8 g8 a8 b8 d'8 c'8 c'8 c'8 r8 r8''').flatten()
         bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
         self.s = bm
+        self.e = '''
+        ---begin segment---
+        <music21.braille.segment BrailleSegment>
+        Measure 1, Signature Grouping 1:
+        Time Signature 6/8 ⠼⠋⠦
+        ===
+        Measure 1, Note Grouping 1:
+        <music21.clef.TrebleClef>
+        E eighth ⠋
+        Rest eighth ⠭
+        E eighth ⠋
+        F eighth ⠛
+        Rest eighth ⠭
+        F eighth ⠛
+        ===
+        Measure 2, Note Grouping 1:
+        D eighth ⠑
+        Rest eighth ⠭
+        D eighth ⠑
+        E eighth ⠋
+        Rest eighth ⠭
+        E eighth ⠋
+        ===
+        Measure 3, Note Grouping 1:
+        C eighth ⠙
+        D eighth ⠑
+        E eighth ⠋
+        G eighth ⠓
+        F eighth ⠛
+        E eighth ⠋
+        ===
+        Measure 4, Note Grouping 1:
+        E eighth ⠋
+        D eighth ⠑
+        D eighth ⠑
+        D eighth ⠑
+        Rest eighth ⠭
+        Rest eighth ⠭
+        ===
+        Measure 5, Note Grouping 1:
+        C eighth ⠙
+        Rest eighth ⠭
+        C eighth ⠙
+        E eighth ⠋
+        Rest eighth ⠭
+        E eighth ⠋
+        ===
+        Measure 6, Note Grouping 1:
+        F eighth ⠛
+        Rest eighth ⠭
+        F eighth ⠛
+        A eighth ⠊
+        Rest eighth ⠭
+        A eighth ⠊
+        ===
+        Measure 7, Note Grouping 1:
+        G eighth ⠓
+        Rest eighth ⠭
+        G eighth ⠓
+        G eighth ⠓
+        A eighth ⠊
+        B eighth ⠚
+        ===
+        Measure 8, Note Grouping 1:
+        D eighth ⠑
+        C eighth ⠙
+        C eighth ⠙
+        C eighth ⠙
+        Rest eighth ⠭
+        Rest eighth ⠭
+        Barline final ⠣⠅
+        ===
+        ---end segment---
+        '''
         self.b = '''
         ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠼⠋⠦⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
         ⠼⠁⠀⠋⠭⠋⠛⠭⠛⠀⠑⠭⠑⠋⠭⠋⠀⠙⠑⠋⠓⠛⠋⠀⠋⠑⠑⠑⠭⠭⠀⠙⠭⠙⠋⠭⠋
@@ -267,6 +764,64 @@ class Test(unittest.TestCase):
             d4 r4 e4 g4 a4 g4 d4 g4 b4 d'4 e'4 d'4 c'4 a4 g4 d4 g4 r4''')
         bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
         self.s = bm
+        self.e = '''
+        ---begin segment---
+        <music21.braille.segment BrailleSegment>
+        Measure 1, Signature Grouping 1:
+        Time Signature 4/4 ⠼⠙⠲
+        ===
+        Measure 1, Note Grouping 1:
+        <music21.clef.TrebleClef>
+        D quarter ⠱
+        B quarter ⠺
+        G quarter ⠳
+        B quarter ⠺
+        ===
+        Measure 2, Note Grouping 1:
+        C quarter ⠹
+        B quarter ⠺
+        A quarter ⠪
+        Rest quarter ⠧
+        ===
+        Measure 3, Note Grouping 1:
+        B quarter ⠺
+        G quarter ⠳
+        E quarter ⠫
+        G quarter ⠳
+        ===
+        Measure 4, Note Grouping 1:
+        D quarter ⠱
+        B quarter ⠺
+        D quarter ⠱
+        Rest quarter ⠧
+        ===
+        Measure 5, Note Grouping 1:
+        E quarter ⠫
+        G quarter ⠳
+        A quarter ⠪
+        G quarter ⠳
+        ===
+        Measure 6, Note Grouping 1:
+        D quarter ⠱
+        G quarter ⠳
+        B quarter ⠺
+        D quarter ⠱
+        ===
+        Measure 7, Note Grouping 1:
+        E quarter ⠫
+        D quarter ⠱
+        C quarter ⠹
+        A quarter ⠪
+        ===
+        Measure 8, Note Grouping 1:
+        G quarter ⠳
+        D quarter ⠱
+        G quarter ⠳
+        Rest quarter ⠧
+        Barline final ⠣⠅
+        ===
+        ---end segment---
+        '''
         self.b = '''
         ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠼⠙⠲⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
         ⠼⠁⠀⠱⠺⠳⠺⠀⠹⠺⠪⠧⠀⠺⠳⠫⠳⠀⠱⠺⠱⠧⠀⠫⠳⠪⠳⠀⠱⠳⠺⠱⠀⠫⠱⠹⠪
@@ -280,6 +835,64 @@ class Test(unittest.TestCase):
             'F4 A4 c4 d4 c4 A4 G4 C4 D4 E4 F4 r4')
         bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
         self.s = bm
+        self.e = '''
+        ---begin segment---
+        <music21.braille.segment BrailleSegment>
+        Measure 1, Signature Grouping 1:
+        Time Signature 4/4 ⠼⠙⠲
+        ===
+        Measure 1, Note Grouping 1:
+        <music21.clef.BassClef>
+        A quarter ⠪
+        F quarter ⠻
+        C quarter ⠹
+        F quarter ⠻
+        ===
+        Measure 2, Note Grouping 1:
+        G quarter ⠳
+        E quarter ⠫
+        C quarter ⠹
+        E quarter ⠫
+        ===
+        Measure 3, Note Grouping 1:
+        F quarter ⠻
+        G quarter ⠳
+        A quarter ⠪
+        F quarter ⠻
+        ===
+        Measure 4, Note Grouping 1:
+        D quarter ⠱
+        E quarter ⠫
+        F quarter ⠻
+        Rest quarter ⠧
+        ===
+        Measure 5, Note Grouping 1:
+        G quarter ⠳
+        A quarter ⠪
+        G quarter ⠳
+        C quarter ⠹
+        ===
+        Measure 6, Note Grouping 1:
+        F quarter ⠻
+        A quarter ⠪
+        C quarter ⠹
+        D quarter ⠱
+        ===
+        Measure 7, Note Grouping 1:
+        C quarter ⠹
+        A quarter ⠪
+        G quarter ⠳
+        C quarter ⠹
+        ===
+        Measure 8, Note Grouping 1:
+        D quarter ⠱
+        E quarter ⠫
+        F quarter ⠻
+        Rest quarter ⠧
+        Barline final ⠣⠅
+        ===
+        ---end segment---
+        '''
         self.b = '''
         ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠼⠙⠲⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
         ⠼⠁⠀⠪⠻⠹⠻⠀⠳⠫⠹⠫⠀⠻⠳⠪⠻⠀⠱⠫⠻⠧⠀⠳⠪⠳⠹⠀⠻⠪⠹⠱⠀⠹⠪⠳⠹
@@ -293,6 +906,83 @@ class Test(unittest.TestCase):
             r4 c4 r4 g4 g4 a4 b4 c'4 r4 a4 r4 g4. g8 f4 d4 c4 e4 c4 r4''').flatten()
         bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
         self.s = bm
+        self.e = '''
+        ---begin segment---
+        <music21.braille.segment BrailleSegment>
+        Measure 1, Signature Grouping 1:
+        Time Signature 2/4 ⠼⠃⠲
+        ===
+        Measure 1, Note Grouping 1:
+        <music21.clef.TrebleClef>
+        G quarter ⠳
+        E quarter ⠫
+        ===
+        Measure 2, Note Grouping 1:
+        A quarter ⠪
+        G quarter ⠳
+        ===
+        Measure 3, Note Grouping 1:
+        F quarter ⠻
+        Rest quarter ⠧
+        ===
+        Measure 4, Note Grouping 1:
+        D quarter ⠱
+        Rest quarter ⠧
+        ===
+        Measure 5, Note Grouping 1:
+        C quarter ⠹
+        Dot ⠄
+        C eighth ⠙
+        ===
+        Measure 6, Note Grouping 1:
+        D quarter ⠱
+        Dot ⠄
+        D eighth ⠑
+        ===
+        Measure 7, Note Grouping 1:
+        E quarter ⠫
+        Rest quarter ⠧
+        ===
+        Measure 8, Note Grouping 1:
+        C quarter ⠹
+        Rest quarter ⠧
+        ===
+        Measure 9, Note Grouping 1:
+        G quarter ⠳
+        G quarter ⠳
+        ===
+        Measure 10, Note Grouping 1:
+        A quarter ⠪
+        B quarter ⠺
+        ===
+        Measure 11, Note Grouping 1:
+        C quarter ⠹
+        Rest quarter ⠧
+        ===
+        Measure 12, Note Grouping 1:
+        A quarter ⠪
+        Rest quarter ⠧
+        ===
+        Measure 13, Note Grouping 1:
+        G quarter ⠳
+        Dot ⠄
+        G eighth ⠓
+        ===
+        Measure 14, Note Grouping 1:
+        F quarter ⠻
+        D quarter ⠱
+        ===
+        Measure 15, Note Grouping 1:
+        C quarter ⠹
+        E quarter ⠫
+        ===
+        Measure 16, Note Grouping 1:
+        C quarter ⠹
+        Rest quarter ⠧
+        Barline final ⠣⠅
+        ===
+        ---end segment---
+        '''
         self.b = '''
         ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠼⠃⠲⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
         ⠼⠁⠀⠳⠫⠀⠪⠳⠀⠻⠧⠀⠱⠧⠀⠹⠄⠙⠀⠱⠄⠑⠀⠫⠧⠀⠹⠧⠀⠳⠳⠀⠪⠺⠀⠹⠧⠀⠪⠧
@@ -306,6 +996,72 @@ class Test(unittest.TestCase):
                              'F8 E8 F8 G4 F4 D4 C4 r4')
         bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
         self.s = bm
+        self.e = '''
+        ---begin segment---
+        <music21.braille.segment BrailleSegment>
+        Measure 1, Signature Grouping 1:
+        Time Signature 4/4 ⠼⠙⠲
+        ===
+        Measure 1, Note Grouping 1:
+        <music21.clef.BassClef>
+        E quarter ⠫
+        C eighth ⠙
+        D eighth ⠑
+        E quarter ⠫
+        Rest quarter ⠧
+        ===
+        Measure 2, Note Grouping 1:
+        F quarter ⠻
+        A eighth ⠊
+        F eighth ⠛
+        E quarter ⠫
+        Rest quarter ⠧
+        ===
+        Measure 3, Note Grouping 1:
+        D quarter ⠱
+        E eighth ⠋
+        F eighth ⠛
+        G eighth ⠓
+        E eighth ⠋
+        C quarter ⠹
+        ===
+        Measure 4, Note Grouping 1:
+        D quarter ⠱
+        D quarter ⠱
+        G quarter ⠳
+        Rest quarter ⠧
+        ===
+        Measure 5, Note Grouping 1:
+        F quarter ⠻
+        E eighth ⠋
+        D eighth ⠑
+        E quarter ⠫
+        Rest quarter ⠧
+        ===
+        Measure 6, Note Grouping 1:
+        G quarter ⠳
+        F eighth ⠛
+        E eighth ⠋
+        F quarter ⠻
+        Rest quarter ⠧
+        ===
+        Measure 7, Note Grouping 1:
+        A quarter ⠪
+        G eighth ⠓
+        F eighth ⠛
+        E eighth ⠋
+        F eighth ⠛
+        G quarter ⠳
+        ===
+        Measure 8, Note Grouping 1:
+        F quarter ⠻
+        D quarter ⠱
+        C quarter ⠹
+        Rest quarter ⠧
+        Barline final ⠣⠅
+        ===
+        ---end segment---
+        '''
         self.b = '''
         ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠼⠙⠲⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
         ⠼⠁⠀⠫⠙⠑⠫⠧⠀⠻⠊⠛⠫⠧⠀⠱⠋⠛⠓⠋⠹⠀⠱⠱⠳⠧⠀⠻⠋⠑⠫⠧⠀⠳⠛⠋⠻⠧
@@ -322,6 +1078,69 @@ class Test(unittest.TestCase):
         m = bm.getElementsByClass(stream.Measure)
         m[3].rightBarline = bar.Barline('double')
         self.s = bm
+        self.e = '''
+        ---begin segment---
+        <music21.braille.segment BrailleSegment>
+        Measure 1, Signature Grouping 1:
+        Time Signature 4/4 ⠼⠙⠲
+        ===
+        Measure 1, Note Grouping 1:
+        <music21.clef.TrebleClef>
+        F quarter ⠻
+        Dot ⠄
+        C eighth ⠙
+        D quarter ⠱
+        E quarter ⠫
+        ===
+        Measure 2, Note Grouping 1:
+        F quarter ⠻
+        Dot ⠄
+        G eighth ⠓
+        A quarter ⠪
+        F quarter ⠻
+        ===
+        Measure 3, Note Grouping 1:
+        A quarter ⠪
+        C quarter ⠹
+        D quarter ⠱
+        C quarter ⠹
+        ===
+        Measure 4, Note Grouping 1:
+        A quarter ⠪
+        F quarter ⠻
+        G quarter ⠳
+        Rest quarter ⠧
+        Barline double ⠣⠅⠄
+        ===
+        Measure 5, Note Grouping 1:
+        G quarter ⠳
+        Dot ⠄
+        E eighth ⠋
+        C quarter ⠹
+        E quarter ⠫
+        ===
+        Measure 6, Note Grouping 1:
+        F quarter ⠻
+        Dot ⠄
+        C eighth ⠙
+        F quarter ⠻
+        A quarter ⠪
+        ===
+        Measure 7, Note Grouping 1:
+        G quarter ⠳
+        G quarter ⠳
+        F quarter ⠻
+        E quarter ⠫
+        ===
+        Measure 8, Note Grouping 1:
+        F quarter ⠻
+        A quarter ⠪
+        F quarter ⠻
+        Rest quarter ⠧
+        Barline final ⠣⠅
+        ===
+        ---end segment---
+        '''
         self.b = '''
         ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠼⠙⠲⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
         ⠼⠁⠀⠻⠄⠙⠱⠫⠀⠻⠄⠓⠪⠻⠀⠪⠹⠱⠹⠀⠪⠻⠳⠧⠣⠅⠄⠀⠳⠄⠋⠹⠫⠀⠻⠄⠙⠻⠪
@@ -337,6 +1156,67 @@ class Test(unittest.TestCase):
             g4 g8 g4 r8''').flatten()
         bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
         self.s = bm
+        self.e = '''
+        ---begin segment---
+        <music21.braille.segment BrailleSegment>
+        Measure 1, Signature Grouping 1:
+        Time Signature 3/4 ⠼⠉⠲
+        ===
+        Measure 1, Note Grouping 1:
+        <music21.clef.TrebleClef>
+        G quarter ⠳
+        G eighth ⠓
+        D quarter ⠱
+        D eighth ⠑
+        ===
+        Measure 2, Note Grouping 1:
+        G quarter ⠳
+        B eighth ⠚
+        D eighth ⠑
+        B eighth ⠚
+        G eighth ⠓
+        ===
+        Measure 3, Note Grouping 1:
+        A quarter ⠪
+        A eighth ⠊
+        A eighth ⠊
+        B eighth ⠚
+        C eighth ⠙
+        ===
+        Measure 4, Note Grouping 1:
+        B quarter ⠺
+        B eighth ⠚
+        G quarter ⠳
+        Rest eighth ⠭
+        ===
+        Measure 5, Note Grouping 1:
+        A quarter ⠪
+        A eighth ⠊
+        D quarter ⠱
+        D eighth ⠑
+        ===
+        Measure 6, Note Grouping 1:
+        G quarter ⠳
+        B eighth ⠚
+        A quarter ⠪
+        C eighth ⠙
+        ===
+        Measure 7, Note Grouping 1:
+        B eighth ⠚
+        C eighth ⠙
+        D eighth ⠑
+        C quarter ⠹
+        A eighth ⠊
+        ===
+        Measure 8, Note Grouping 1:
+        G quarter ⠳
+        G eighth ⠓
+        G quarter ⠳
+        Rest eighth ⠭
+        Barline final ⠣⠅
+        ===
+        ---end segment---
+        '''
         self.b = '''
         ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠼⠉⠲⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
         ⠼⠁⠀⠳⠓⠱⠑⠀⠳⠚⠑⠚⠓⠀⠪⠊⠊⠚⠙⠀⠺⠚⠳⠭⠀⠪⠊⠱⠑⠀⠳⠚⠪⠙⠀⠚⠙⠑⠹⠊
@@ -353,6 +1233,48 @@ class Test(unittest.TestCase):
             ''').flatten()
         bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
         self.s = bm
+        self.e = '''
+        ---begin segment---
+        <music21.braille.segment BrailleSegment>
+        Measure 1, Signature Grouping 1:
+        Time Signature 4/4 ⠼⠙⠲
+        ===
+        Measure 1, Note Grouping 1:
+        <music21.clef.TrebleClef>
+        C half ⠝
+        E half ⠏
+        ===
+        Measure 2, Note Grouping 1:
+        D half ⠕
+        F half ⠟
+        ===
+        Measure 3, Note Grouping 1:
+        E half ⠏
+        G half ⠗
+        ===
+        Measure 4, Note Grouping 1:
+        F half ⠟
+        A half ⠎
+        ===
+        Measure 5, Note Grouping 1:
+        G half ⠗
+        B half ⠞
+        ===
+        Measure 6, Note Grouping 1:
+        A half ⠎
+        C half ⠝
+        ===
+        Measure 7, Note Grouping 1:
+        B half ⠞
+        D half ⠕
+        ===
+        Measure 8, Note Grouping 1:
+        C half ⠝
+        Rest half ⠥
+        Barline final ⠣⠅
+        ===
+        ---end segment---
+        '''
         self.b = '''
         ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠼⠙⠲⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
         ⠼⠁⠀⠝⠏⠀⠕⠟⠀⠏⠗⠀⠟⠎⠀⠗⠞⠀⠎⠝⠀⠞⠕⠀⠝⠥⠣⠅
@@ -365,6 +1287,52 @@ class Test(unittest.TestCase):
         ).flatten()
         bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
         self.s = bm
+        self.e = '''
+        ---begin segment---
+        <music21.braille.segment BrailleSegment>
+        Measure 1, Signature Grouping 1:
+        Time Signature 4/4 ⠼⠙⠲
+        ===
+        Measure 1, Note Grouping 1:
+        <music21.clef.BassClef>
+        F half ⠟
+        A half ⠎
+        ===
+        Measure 2, Note Grouping 1:
+        G half ⠗
+        C half ⠝
+        ===
+        Measure 3, Note Grouping 1:
+        D quarter ⠱
+        C quarter ⠹
+        D quarter ⠱
+        E quarter ⠫
+        ===
+        Measure 4, Note Grouping 1:
+        F half ⠟
+        Rest half ⠥
+        ===
+        Measure 5, Note Grouping 1:
+        D half ⠕
+        F half ⠟
+        ===
+        Measure 6, Note Grouping 1:
+        C half ⠝
+        F half ⠟
+        ===
+        Measure 7, Note Grouping 1:
+        E quarter ⠫
+        F quarter ⠻
+        G quarter ⠳
+        A quarter ⠪
+        ===
+        Measure 8, Note Grouping 1:
+        F half ⠟
+        Rest half ⠥
+        Barline final ⠣⠅
+        ===
+        ---end segment---
+        '''
         self.b = '''
         ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠼⠙⠲⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
         ⠼⠁⠀⠟⠎⠀⠗⠝⠀⠱⠹⠱⠫⠀⠟⠥⠀⠕⠟⠀⠝⠟⠀⠫⠻⠳⠪⠀⠟⠥⠣⠅
@@ -379,6 +1347,106 @@ class Test(unittest.TestCase):
             f8 e8 d8 e8 f8 d8 c4 r2''').flatten()
         bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
         self.s = bm
+        self.e = '''
+        ---begin segment---
+        <music21.braille.segment BrailleSegment>
+        Measure 1, Signature Grouping 1:
+        Time Signature 3/4 ⠼⠉⠲
+        ===
+        Measure 1, Note Grouping 1:
+        <music21.clef.TrebleClef>
+        C half ⠝
+        C quarter ⠹
+        ===
+        Measure 2, Note Grouping 1:
+        D eighth ⠑
+        C eighth ⠙
+        B eighth ⠚
+        C eighth ⠙
+        D quarter ⠱
+        ===
+        Measure 3, Note Grouping 1:
+        E half ⠏
+        E quarter ⠫
+        ===
+        Measure 4, Note Grouping 1:
+        F eighth ⠛
+        E eighth ⠋
+        D eighth ⠑
+        E eighth ⠋
+        F quarter ⠻
+        ===
+        Measure 5, Note Grouping 1:
+        G half ⠗
+        G quarter ⠳
+        ===
+        Measure 6, Note Grouping 1:
+        A eighth ⠊
+        G eighth ⠓
+        F eighth ⠛
+        G eighth ⠓
+        A quarter ⠪
+        ===
+        Measure 7, Note Grouping 1:
+        B eighth ⠚
+        A eighth ⠊
+        G eighth ⠓
+        A eighth ⠊
+        B eighth ⠚
+        D eighth ⠑
+        ===
+        Measure 8, Note Grouping 1:
+        C quarter ⠹
+        Rest half ⠥
+        ===
+        Measure 9, Note Grouping 1:
+        E half ⠏
+        E quarter ⠫
+        ===
+        Measure 10, Note Grouping 1:
+        D eighth ⠑
+        C eighth ⠙
+        B eighth ⠚
+        C eighth ⠙
+        D quarter ⠱
+        ===
+        Measure 11, Note Grouping 1:
+        C half ⠝
+        C quarter ⠹
+        ===
+        Measure 12, Note Grouping 1:
+        B eighth ⠚
+        A eighth ⠊
+        G eighth ⠓
+        A eighth ⠊
+        B quarter ⠺
+        ===
+        Measure 13, Note Grouping 1:
+        A half ⠎
+        A quarter ⠪
+        ===
+        Measure 14, Note Grouping 1:
+        G eighth ⠓
+        F eighth ⠛
+        E eighth ⠋
+        F eighth ⠛
+        G quarter ⠳
+        ===
+        Measure 15, Note Grouping 1:
+        F eighth ⠛
+        E eighth ⠋
+        D eighth ⠑
+        E eighth ⠋
+        F eighth ⠛
+        D eighth ⠑
+        ===
+        Measure 16, Note Grouping 1:
+        C quarter ⠹
+        Rest half ⠥
+        Barline final ⠣⠅
+        ===
+        ---end segment---
+        '''
         self.b = '''
         ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠼⠉⠲⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
         ⠼⠁⠀⠝⠹⠀⠑⠙⠚⠙⠱⠀⠏⠫⠀⠛⠋⠑⠋⠻⠀⠗⠳⠀⠊⠓⠛⠓⠪⠀⠚⠊⠓⠊⠚⠑⠀⠹⠥
@@ -394,6 +1462,19 @@ class Test(unittest.TestCase):
         m[0].pop(1)
         m[-1].rightBarline = None
         self.s = m[0]
+        self.e = '''
+        ---begin segment---
+        <music21.braille.segment BrailleSegment>
+        Measure 1, Note Grouping 1:
+        <music21.clef.TrebleClef>
+        F half ⠟
+        Tie ⠈⠉
+        F quarter ⠻
+        Dot ⠄
+        F eighth ⠛
+        ===
+        ---end segment---
+        '''
         self.b = '''
         ⠟⠈⠉⠻⠄⠛
         '''
@@ -407,6 +1488,20 @@ class Test(unittest.TestCase):
         m[0].pop(1)
         m[-1].rightBarline = None
         self.s = m[0]
+        self.e = '''
+        ---begin segment---
+        <music21.braille.segment BrailleSegment>
+        Measure 1, Note Grouping 1:
+        <music21.clef.TrebleClef>
+        G quarter ⠳
+        Dot ⠄
+        Tie ⠈⠉
+        G eighth ⠓
+        A eighth ⠊
+        G eighth ⠓
+        ===
+        ---end segment---
+        '''
         self.b = '''
         ⠳⠄⠈⠉⠓⠊⠓
         '''
@@ -420,10 +1515,32 @@ class Test(unittest.TestCase):
         m[0].pop(0)
         m[-1].rightBarline = None
         self.s = m[0]
+        self.e = '''
+        ---begin segment---
+        <music21.braille.segment BrailleSegment>
+        Measure 1, Signature Grouping 1:
+        Time Signature 3/4 ⠼⠉⠲
+        ===
+        Measure 1, Note Grouping 1:
+        G half ⠗
+        G quarter ⠳
+        Tie ⠈⠉
+        ===
+        ---end segment---
+        '''
         self.b = '''
         ⠼⠉⠲⠀⠗⠳⠈⠉
         '''
         self.s = m[1]
+        self.e = '''
+        ---begin segment---
+        <music21.braille.segment BrailleSegment>
+        Measure 2, Note Grouping 1:
+        G half ⠗
+        Rest quarter ⠧
+        ===
+        ---end segment---
+        '''
         self.b = '''
         ⠗⠧
         '''
@@ -434,6 +1551,86 @@ class Test(unittest.TestCase):
                              'e2 e4 e4 f4 g4 a2 a4 a4 g4 f4 e2 f4 d2 e4 c2.~ c2.').flatten()
         bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
         self.s = bm
+        self.e = '''
+        ---begin segment---
+        <music21.braille.segment BrailleSegment>
+        Measure 1, Signature Grouping 1:
+        Time Signature 3/4 ⠼⠉⠲
+        ===
+        Measure 1, Note Grouping 1:
+        <music21.clef.TrebleClef>
+        G half ⠗
+        Dot ⠄
+        ===
+        Measure 2, Note Grouping 1:
+        E half ⠏
+        Dot ⠄
+        ===
+        Measure 3, Note Grouping 1:
+        C half ⠝
+        Dot ⠄
+        ===
+        Measure 4, Note Grouping 1:
+        E half ⠏
+        Dot ⠄
+        ===
+        Measure 5, Note Grouping 1:
+        C quarter ⠹
+        D quarter ⠱
+        E quarter ⠫
+        ===
+        Measure 6, Note Grouping 1:
+        G quarter ⠳
+        F quarter ⠻
+        E quarter ⠫
+        ===
+        Measure 7, Note Grouping 1:
+        D half ⠕
+        Dot ⠄
+        Tie ⠈⠉
+        ===
+        Measure 8, Note Grouping 1:
+        D half ⠕
+        Dot ⠄
+        ===
+        Measure 9, Note Grouping 1:
+        E half ⠏
+        E quarter ⠫
+        ===
+        Measure 10, Note Grouping 1:
+        E quarter ⠫
+        F quarter ⠻
+        G quarter ⠳
+        ===
+        Measure 11, Note Grouping 1:
+        A half ⠎
+        A quarter ⠪
+        ===
+        Measure 12, Note Grouping 1:
+        A quarter ⠪
+        G quarter ⠳
+        F quarter ⠻
+        ===
+        Measure 13, Note Grouping 1:
+        E half ⠏
+        F quarter ⠻
+        ===
+        Measure 14, Note Grouping 1:
+        D half ⠕
+        E quarter ⠫
+        ===
+        Measure 15, Note Grouping 1:
+        C half ⠝
+        Dot ⠄
+        Tie ⠈⠉
+        ===
+        Measure 16, Note Grouping 1:
+        C half ⠝
+        Dot ⠄
+        Barline final ⠣⠅
+        ===
+        ---end segment---
+        '''
         self.b = '''
         ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠼⠉⠲⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
         ⠼⠁⠀⠗⠄⠀⠏⠄⠀⠝⠄⠀⠏⠄⠀⠹⠱⠫⠀⠳⠻⠫⠀⠕⠄⠈⠉⠀⠕⠄⠀⠏⠫⠀⠫⠻⠳⠀⠎⠪
@@ -451,6 +1648,66 @@ class Test(unittest.TestCase):
             d'1 e'1 f'1 d'1 c'1 g'1 f'1~ f'1''').flatten()
         bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
         self.s = bm
+        self.e = '''
+        ---begin segment---
+        <music21.braille.segment BrailleSegment>
+        Measure 1, Signature Grouping 1:
+        Time Signature 4/4 ⠼⠙⠲
+        ===
+        Measure 1, Note Grouping 1:
+        <music21.clef.TrebleClef>
+        C whole ⠽
+        ===
+        Measure 2, Note Grouping 1:
+        A whole ⠮
+        ===
+        Measure 3, Note Grouping 1:
+        F whole ⠿
+        ===
+        Measure 4, Note Grouping 1:
+        A whole ⠮
+        ===
+        Measure 5, Note Grouping 1:
+        C whole ⠽
+        ===
+        Measure 6, Note Grouping 1:
+        D whole ⠵
+        ===
+        Measure 7, Note Grouping 1:
+        C whole ⠽
+        Tie ⠈⠉
+        ===
+        Measure 8, Note Grouping 1:
+        C whole ⠽
+        ===
+        Measure 9, Note Grouping 1:
+        D whole ⠵
+        ===
+        Measure 10, Note Grouping 1:
+        E whole ⠯
+        ===
+        Measure 11, Note Grouping 1:
+        F whole ⠿
+        ===
+        Measure 12, Note Grouping 1:
+        D whole ⠵
+        ===
+        Measure 13, Note Grouping 1:
+        C whole ⠽
+        ===
+        Measure 14, Note Grouping 1:
+        G whole ⠷
+        ===
+        Measure 15, Note Grouping 1:
+        F whole ⠿
+        Tie ⠈⠉
+        ===
+        Measure 16, Note Grouping 1:
+        F whole ⠿
+        Barline final ⠣⠅
+        ===
+        ---end segment---
+        '''
         self.b = '''
         ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠼⠙⠲⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
         ⠼⠁⠀⠽⠀⠮⠀⠿⠀⠮⠀⠽⠀⠵⠀⠽⠈⠉⠀⠽⠀⠵⠀⠯⠀⠿⠀⠵⠀⠽⠀⠷⠀⠿⠈⠉⠀⠿⠣⠅
@@ -462,6 +1719,90 @@ class Test(unittest.TestCase):
                              'F1 G1 B1 G1 E1 F1 A1 F1 D1 BB1 D1 C1~ C1').flatten()
         bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
         self.s = bm
+        self.e = '''
+        ---begin segment---
+        <music21.braille.segment BrailleSegment>
+        Measure 1, Signature Grouping 1:
+        Time Signature 4/4 ⠼⠙⠲
+        ===
+        Measure 1, Note Grouping 1:
+        <music21.clef.BassClef>
+        C whole ⠽
+        ===
+        Measure 2, Note Grouping 1:
+        E whole ⠯
+        ===
+        Measure 3, Note Grouping 1:
+        G whole ⠷
+        ===
+        Measure 4, Note Grouping 1:
+        A whole ⠮
+        ===
+        Measure 5, Note Grouping 1:
+        B whole ⠾
+        ===
+        Measure 6, Note Grouping 1:
+        A whole ⠮
+        ===
+        Measure 7, Note Grouping 1:
+        G whole ⠷
+        Tie ⠈⠉
+        ===
+        Measure 8, Note Grouping 1:
+        G whole ⠷
+        ===
+        Measure 9, Note Grouping 1:
+        A whole ⠮
+        ===
+        Measure 10, Note Grouping 1:
+        C whole ⠽
+        ===
+        Measure 11, Note Grouping 1:
+        A whole ⠮
+        ===
+        Measure 12, Note Grouping 1:
+        F whole ⠿
+        ===
+        Measure 13, Note Grouping 1:
+        G whole ⠷
+        ===
+        Measure 14, Note Grouping 1:
+        B whole ⠾
+        ===
+        Measure 15, Note Grouping 1:
+        G whole ⠷
+        ===
+        Measure 16, Note Grouping 1:
+        E whole ⠯
+        ===
+        Measure 17, Note Grouping 1:
+        F whole ⠿
+        ===
+        Measure 18, Note Grouping 1:
+        A whole ⠮
+        ===
+        Measure 19, Note Grouping 1:
+        F whole ⠿
+        ===
+        Measure 20, Note Grouping 1:
+        D whole ⠵
+        ===
+        Measure 21, Note Grouping 1:
+        B whole ⠾
+        ===
+        Measure 22, Note Grouping 1:
+        D whole ⠵
+        ===
+        Measure 23, Note Grouping 1:
+        C whole ⠽
+        Tie ⠈⠉
+        ===
+        Measure 24, Note Grouping 1:
+        C whole ⠽
+        Barline final ⠣⠅
+        ===
+        ---end segment---
+        '''
         self.b = '''
         ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠼⠙⠲⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
         ⠼⠁⠀⠽⠀⠯⠀⠷⠀⠮⠀⠾⠀⠮⠀⠷⠈⠉⠀⠷⠀⠮⠀⠽⠀⠮⠀⠿⠀⠷⠀⠾⠀⠷⠀⠯⠀⠿⠀⠮
@@ -473,6 +1814,30 @@ class Test(unittest.TestCase):
         bm = converter.parse('tinynotation: 3/2 r1 g2 g2 g2 g2 g4 g4 r1').flatten()
         bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
         self.s = bm
+        self.e = '''
+        ---begin segment---
+        <music21.braille.segment BrailleSegment>
+        Measure 1, Signature Grouping 1:
+        Time Signature 3/2 ⠼⠉⠆
+        ===
+        Measure 1, Note Grouping 1:
+        <music21.clef.TrebleClef>
+        Rest whole ⠍
+        G half ⠗
+        ===
+        Measure 2, Note Grouping 1:
+        G half ⠗
+        G half ⠗
+        G half ⠗
+        ===
+        Measure 3, Note Grouping 1:
+        G quarter ⠳
+        G quarter ⠳
+        Rest whole ⠍
+        Barline final ⠣⠅
+        ===
+        ---end segment---
+        '''
         self.b = '''
         ⠀⠀⠀⠀⠀⠀⠼⠉⠆⠀⠀⠀⠀⠀⠀
         ⠼⠁⠀⠍⠗⠀⠗⠗⠗⠀⠳⠳⠍⠣⠅
@@ -484,11 +1849,6 @@ class Test(unittest.TestCase):
                                 'C2 D2 E1 F2 G2 A1 G2 F2 E2 D2 C1 r1')
         bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
         self.s = bm
-        self.b = '''
-        ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠼⠙⠲⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
-        ⠼⠁⠀⠏⠟⠀⠷⠀⠏⠕⠀⠽⠀⠕⠏⠀⠟⠏⠀⠵⠀⠍⠀⠝⠕⠀⠯⠀⠟⠗⠀⠮⠀⠗⠟⠀⠏⠕⠀⠽
-        ⠀⠀⠍⠣⠅
-        '''
         self.e = '''
         ---begin segment---
         <music21.braille.segment BrailleSegment>
@@ -555,6 +1915,11 @@ class Test(unittest.TestCase):
         ===
         ---end segment---
         '''
+        self.b = '''
+        ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠼⠙⠲⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+        ⠼⠁⠀⠏⠟⠀⠷⠀⠏⠕⠀⠽⠀⠕⠏⠀⠟⠏⠀⠵⠀⠍⠀⠝⠕⠀⠯⠀⠟⠗⠀⠮⠀⠗⠟⠀⠏⠕⠀⠽
+        ⠀⠀⠍⠣⠅
+        '''
 
     def test_example05_5(self):
         self.methodArgs = {'suppressOctaveMarks': True}
@@ -562,11 +1927,6 @@ class Test(unittest.TestCase):
                              'E2. r2. G2. r2. C4 D4 E4 G4 E4 C4 F4 r2 r2.').flatten()
         bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
         self.s = bm
-        self.b = '''
-        ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠼⠉⠲⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
-        ⠼⠁⠀⠟⠄⠀⠍⠀⠎⠄⠀⠍⠀⠻⠳⠪⠀⠹⠪⠻⠀⠳⠥⠀⠍⠀⠏⠄⠀⠍⠀⠗⠄⠀⠍⠀⠹⠱⠫
-        ⠀⠀⠳⠫⠹⠀⠻⠥⠀⠍⠣⠅
-        '''
         self. e = '''
         ---begin segment---
         <music21.braille.segment BrailleSegment>
@@ -640,6 +2000,11 @@ class Test(unittest.TestCase):
         ---end segment---
 
         '''
+        self.b = '''
+        ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠼⠉⠲⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+        ⠼⠁⠀⠟⠄⠀⠍⠀⠎⠄⠀⠍⠀⠻⠳⠪⠀⠹⠪⠻⠀⠳⠥⠀⠍⠀⠏⠄⠀⠍⠀⠗⠄⠀⠍⠀⠹⠱⠫
+        ⠀⠀⠳⠫⠹⠀⠻⠥⠀⠍⠣⠅
+        '''
 
     def test_example05_6(self):
         # NOTE: Breve note and breve rest are transcribed using method (b) on page 24.
@@ -656,6 +2021,42 @@ class Test(unittest.TestCase):
         bm = bm.flatten()
         bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
         self.s = bm
+        self.e = '''
+        ---begin segment---
+        <music21.braille.segment BrailleSegment>
+        Measure 1, Signature Grouping 1:
+        Time Signature 6/2 ⠼⠋⠆
+        ===
+        Measure 1, Note Grouping 1:
+        <music21.clef.TrebleClef>
+        A whole ⠮
+        C whole ⠽
+        B whole ⠾
+        ===
+        Measure 2, Note Grouping 1:
+        C half ⠝
+        B half ⠞
+        A whole ⠮
+        B half ⠞
+        C half ⠝
+        ===
+        Measure 3, Note Grouping 1:
+        B whole ⠾
+        Rest breve ⠍⠘⠉⠍
+        ===
+        Measure 4, Note Grouping 1:
+        G whole ⠷
+        B whole ⠾
+        A half ⠎
+        G half ⠗
+        ===
+        Measure 5, Note Grouping 1:
+        A breve ⠮⠘⠉⠮
+        Rest whole ⠍
+        Barline final ⠣⠅
+        ===
+        ---end segment---
+        '''
         self.b = '''
         ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠼⠋⠆⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
         ⠼⠁⠀⠮⠽⠾⠀⠝⠞⠮⠞⠝⠀⠾⠍⠘⠉⠍⠀⠷⠾⠎⠗⠀⠮⠘⠉⠮⠍⠣⠅
@@ -711,6 +2112,19 @@ class Test(unittest.TestCase):
         m[0].pop(1)
         m[-1].rightBarline = None
         self.s = m[0]
+        self.e = '''
+        ---begin segment---
+        <music21.braille.segment BrailleSegment>
+        Measure 1, Note Grouping 1:
+        <music21.clef.TrebleClef>
+        Accidental sharp ⠩
+        G quarter ⠳
+        Accidental double-sharp ⠩⠩
+        F quarter ⠻
+        G half ⠗
+        ===
+        ---end segment---
+        '''
         self.b = '⠩⠳⠩⠩⠻⠗'
 
     def test_example06_3(self):
@@ -723,8 +2137,33 @@ class Test(unittest.TestCase):
         m[0].pop(0)
         m[-1].rightBarline = None
         self.s = m[0]
+        self.e = '''
+        ---begin segment---
+        <music21.braille.segment BrailleSegment>
+        Measure 1, Signature Grouping 1:
+        Time Signature 4/4 ⠼⠙⠲
+        ===
+        Measure 1, Note Grouping 1:
+        C half ⠝
+        Accidental flat ⠣
+        B half ⠞
+        Tie ⠈⠉
+        ===
+        ---end segment---
+        '''
         self.b = '⠼⠙⠲⠀⠝⠣⠞⠈⠉'
         self.s = m[1]
+        self.e = '''
+        ---begin segment---
+        <music21.braille.segment BrailleSegment>
+        Measure 2, Note Grouping 1:
+        B quarter ⠺
+        C quarter ⠹
+        A quarter ⠪
+        F quarter ⠻
+        ===
+        ---end segment---
+        '''
         self.b = '⠺⠹⠪⠻'
 
     def test_example06_4(self):
@@ -740,10 +2179,37 @@ class Test(unittest.TestCase):
         m = bm.getElementsByClass(stream.Measure)
         m[-1].rightBarline = None
         self.s = m[0]
+        self.e = '''
+        ---begin segment---
+        <music21.braille.segment BrailleSegment>
+        Measure 1, Signature Grouping 1:
+        Time Signature 3/4 ⠼⠉⠲
+        ===
+        Measure 1, Note Grouping 1:
+        <music21.clef.TrebleClef>
+        Accidental natural ⠡
+        E quarter ⠫
+        E eighth ⠋
+        A eighth ⠊
+        C eighth ⠙
+        Accidental natural ⠡
+        E eighth ⠋
+        ===
+        ---end segment---
+        '''
         self.b = '''
         ⠼⠉⠲⠀⠡⠫⠋⠊⠙⠡⠋
         '''
         self.s = m[1]
+        self.e = '''
+        ---begin segment---
+        <music21.braille.segment BrailleSegment>
+        Measure 2, Note Grouping 1:
+        F half ⠟
+        Dot ⠄
+        ===
+        ---end segment---
+        '''
         self.b = '''
         ⠟⠄
         '''
@@ -758,10 +2224,39 @@ class Test(unittest.TestCase):
         m = bm.getElementsByClass(stream.Measure)
         m[-1].rightBarline = None
         self.s = m[0]
+        self.e = '''
+        ---begin segment---
+        <music21.braille.segment BrailleSegment>
+        Measure 1, Signature Grouping 1:
+        Time Signature 3/4 ⠼⠉⠲
+        ===
+        Measure 1, Note Grouping 1:
+        <music21.clef.TrebleClef>
+        C eighth ⠙
+        Accidental flat ⠣
+        B eighth ⠚
+        A eighth ⠊
+        G eighth ⠓
+        F quarter ⠻
+        ===
+        ---end segment---
+        '''
         self.b = '''
         ⠼⠉⠲⠀⠙⠣⠚⠊⠓⠻
         '''
         self.s = m[1]
+        self.e = '''
+        ---begin segment---
+        <music21.braille.segment BrailleSegment>
+        Measure 2, Note Grouping 1:
+        G eighth ⠓
+        Accidental natural ⠡
+        B eighth ⠚
+        C quarter ⠹
+        D quarter ⠱
+        ===
+        ---end segment---
+        '''
         self.b = '''
         ⠓⠡⠚⠹⠱
         '''
@@ -774,6 +2269,69 @@ class Test(unittest.TestCase):
             c'2 r2 e'2 e'-4 d'4 c'4 d'4 e'4 c'4 b4 b-4 a4 bn4 c'2 r2''')
         bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
         self.s = bm
+        self.e = '''
+        ---begin segment---
+        <music21.braille.segment BrailleSegment>
+        Measure 1, Signature Grouping 1:
+        Time Signature 4/4 ⠼⠙⠲
+        ===
+        Measure 1, Note Grouping 1:
+        <music21.clef.TrebleClef>
+        C quarter ⠹
+        Accidental sharp ⠩
+        C quarter ⠹
+        D quarter ⠱
+        Accidental sharp ⠩
+        D quarter ⠱
+        ===
+        Measure 2, Note Grouping 1:
+        E quarter ⠫
+        F quarter ⠻
+        Accidental sharp ⠩
+        F quarter ⠻
+        G quarter ⠳
+        ===
+        Measure 3, Note Grouping 1:
+        Accidental sharp ⠩
+        G quarter ⠳
+        A quarter ⠪
+        Accidental flat ⠣
+        B quarter ⠺
+        Accidental natural ⠡
+        B quarter ⠺
+        ===
+        Measure 4, Note Grouping 1:
+        C half ⠝
+        Rest half ⠥
+        ===
+        Measure 5, Note Grouping 1:
+        E half ⠏
+        Accidental flat ⠣
+        E quarter ⠫
+        D quarter ⠱
+        ===
+        Measure 6, Note Grouping 1:
+        C quarter ⠹
+        D quarter ⠱
+        Accidental natural ⠡
+        E quarter ⠫
+        C quarter ⠹
+        ===
+        Measure 7, Note Grouping 1:
+        B quarter ⠺
+        Accidental flat ⠣
+        B quarter ⠺
+        A quarter ⠪
+        Accidental natural ⠡
+        B quarter ⠺
+        ===
+        Measure 8, Note Grouping 1:
+        C half ⠝
+        Rest half ⠥
+        Barline final ⠣⠅
+        ===
+        ---end segment---
+        '''
         self.b = '''
         ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠼⠙⠲⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
         ⠼⠁⠀⠹⠩⠹⠱⠩⠱⠀⠫⠻⠩⠻⠳⠀⠩⠳⠪⠣⠺⠡⠺⠀⠝⠥⠀⠏⠣⠫⠱⠀⠹⠱⠡⠫⠹
@@ -791,6 +2349,69 @@ class Test(unittest.TestCase):
         m[-3][2].pitch.accidental.displayStatus = False
         m[-3][3].pitch.accidental.displayStatus = False
         self.s = bm
+        self.e = '''
+        ---begin segment---
+        <music21.braille.segment BrailleSegment>
+        Measure 1, Signature Grouping 1:
+        Time Signature 4/4 ⠼⠙⠲
+        ===
+        Measure 1, Note Grouping 1:
+        <music21.clef.TrebleClef>
+        G quarter ⠳
+        Accidental sharp ⠩
+        F quarter ⠻
+        Accidental natural ⠡
+        F quarter ⠻
+        E quarter ⠫
+        ===
+        Measure 2, Note Grouping 1:
+        Accidental flat ⠣
+        E quarter ⠫
+        D quarter ⠱
+        Accidental flat ⠣
+        D quarter ⠱
+        C quarter ⠹
+        ===
+        Measure 3, Note Grouping 1:
+        B quarter ⠺
+        Accidental flat ⠣
+        B quarter ⠺
+        A quarter ⠪
+        Accidental flat ⠣
+        A quarter ⠪
+        ===
+        Measure 4, Note Grouping 1:
+        G quarter ⠳
+        Accidental sharp ⠩
+        F quarter ⠻
+        Accidental natural ⠡
+        F quarter ⠻
+        E quarter ⠫
+        ===
+        Measure 5, Note Grouping 1:
+        Accidental flat ⠣
+        E quarter ⠫
+        D quarter ⠱
+        Accidental flat ⠣
+        D quarter ⠱
+        C quarter ⠹
+        ===
+        Measure 6, Note Grouping 1:
+        B quarter ⠺
+        C quarter ⠹
+        D quarter ⠱
+        E quarter ⠫
+        ===
+        Measure 7, Note Grouping 1:
+        C half ⠝
+        Rest half ⠥
+        ===
+        Measure 8, Note Grouping 1:
+        C whole ⠽
+        Barline final ⠣⠅
+        ===
+        ---end segment---
+        '''
         self.b = '''
         ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠼⠙⠲⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
         ⠼⠁⠀⠳⠩⠻⠡⠻⠫⠀⠣⠫⠱⠣⠱⠹⠀⠺⠣⠺⠪⠣⠪⠀⠳⠩⠻⠡⠻⠫⠀⠣⠫⠱⠣⠱⠹
@@ -805,6 +2426,54 @@ class Test(unittest.TestCase):
             d'-4 f'8 d'-8 c'8 c'8 a-8 f8 g8 g8 c8 c8 f2''')
         bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
         self.s = bm
+        self.e = '''
+        ---begin segment---
+        <music21.braille.segment BrailleSegment>
+        Measure 1, Signature Grouping 1:
+        Time Signature 4/4 ⠼⠙⠲
+        ===
+        Measure 1, Note Grouping 1:
+        <music21.clef.TrebleClef>
+        C quarter ⠹
+        C eighth ⠙
+        Accidental flat ⠣
+        B eighth ⠚
+        Accidental flat ⠣
+        A eighth ⠊
+        C eighth ⠙
+        F eighth ⠛
+        Accidental flat ⠣
+        A eighth ⠊
+        Tie ⠈⠉
+        ===
+        Measure 2, Note Grouping 1:
+        A eighth ⠊
+        G eighth ⠓
+        F eighth ⠛
+        G eighth ⠓
+        C half ⠝
+        ===
+        Measure 3, Note Grouping 1:
+        Accidental flat ⠣
+        D quarter ⠱
+        F eighth ⠛
+        D eighth ⠑
+        C eighth ⠙
+        C eighth ⠙
+        Accidental flat ⠣
+        A eighth ⠊
+        F eighth ⠛
+        ===
+        Measure 4, Note Grouping 1:
+        G eighth ⠓
+        G eighth ⠓
+        C eighth ⠙
+        C eighth ⠙
+        F half ⠟
+        Barline final ⠣⠅
+        ===
+        ---end segment---
+        '''
         self.b = '''
         ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠼⠙⠲⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
         ⠼⠁⠀⠹⠙⠣⠚⠣⠊⠙⠛⠣⠊⠈⠉⠀⠊⠓⠛⠓⠝⠀⠣⠱⠛⠑⠙⠙⠣⠊⠛⠀⠓⠓⠙⠙⠟⠣⠅
@@ -816,6 +2485,69 @@ class Test(unittest.TestCase):
                              'C4 E2 F#4 G4 B2 c4 B8 A8 G8 B8 A8 G8 F#8 D#8 E1')
         bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
         self.s = bm
+        self.e = '''
+        ---begin segment---
+        <music21.braille.segment BrailleSegment>
+        Measure 1, Signature Grouping 1:
+        Time Signature 4/4 ⠼⠙⠲
+        ===
+        Measure 1, Note Grouping 1:
+        <music21.clef.BassClef>
+        E quarter ⠫
+        G half ⠗
+        E quarter ⠫
+        ===
+        Measure 2, Note Grouping 1:
+        Accidental sharp ⠩
+        F quarter ⠻
+        A half ⠎
+        F quarter ⠻
+        ===
+        Measure 3, Note Grouping 1:
+        G eighth ⠓
+        A eighth ⠊
+        B quarter ⠺
+        G quarter ⠳
+        E quarter ⠫
+        ===
+        Measure 4, Note Grouping 1:
+        Accidental sharp ⠩
+        D eighth ⠑
+        E eighth ⠋
+        Accidental sharp ⠩
+        F quarter ⠻
+        D quarter ⠱
+        G quarter ⠳
+        ===
+        Measure 5, Note Grouping 1:
+        C quarter ⠹
+        E half ⠏
+        Accidental sharp ⠩
+        F quarter ⠻
+        ===
+        Measure 6, Note Grouping 1:
+        G quarter ⠳
+        B half ⠞
+        C quarter ⠹
+        ===
+        Measure 7, Note Grouping 1:
+        B eighth ⠚
+        A eighth ⠊
+        G eighth ⠓
+        B eighth ⠚
+        A eighth ⠊
+        G eighth ⠓
+        Accidental sharp ⠩
+        F eighth ⠛
+        Accidental sharp ⠩
+        D eighth ⠑
+        ===
+        Measure 8, Note Grouping 1:
+        E whole ⠯
+        Barline final ⠣⠅
+        ===
+        ---end segment---
+        '''
         self.b = '''
         ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠼⠙⠲⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
         ⠼⠁⠀⠫⠗⠫⠀⠩⠻⠎⠻⠀⠓⠊⠺⠳⠫⠀⠩⠑⠋⠩⠻⠱⠳⠀⠹⠏⠩⠻⠀⠳⠞⠹
@@ -829,6 +2561,68 @@ class Test(unittest.TestCase):
             e'8 e'4 e'8 f'4 r4 e'8 e'4 e'8 d'4 r4 c'8 c'4 c'8 b-8 b-4 b-8 a2. r4''')
         bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
         self.s = bm
+        self.e = '''
+        ---begin segment---
+        <music21.braille.segment BrailleSegment>
+        Measure 1, Signature Grouping 1:
+        Time Signature 4/4 ⠼⠙⠲
+        ===
+        Measure 1, Note Grouping 1:
+        <music21.clef.TrebleClef>
+        A quarter ⠪
+        A half ⠎
+        A quarter ⠪
+        Tie ⠈⠉
+        ===
+        Measure 2, Note Grouping 1:
+        A quarter ⠪
+        Rest quarter ⠧
+        Accidental flat ⠣
+        B half ⠞
+        ===
+        Measure 3, Note Grouping 1:
+        C quarter ⠹
+        C quarter ⠹
+        Rest quarter ⠧
+        C quarter ⠹
+        Tie ⠈⠉
+        ===
+        Measure 4, Note Grouping 1:
+        C quarter ⠹
+        Rest quarter ⠧
+        D half ⠕
+        ===
+        Measure 5, Note Grouping 1:
+        E eighth ⠋
+        E quarter ⠫
+        E eighth ⠋
+        F quarter ⠻
+        Rest quarter ⠧
+        ===
+        Measure 6, Note Grouping 1:
+        E eighth ⠋
+        E quarter ⠫
+        E eighth ⠋
+        D quarter ⠱
+        Rest quarter ⠧
+        ===
+        Measure 7, Note Grouping 1:
+        C eighth ⠙
+        C quarter ⠹
+        C eighth ⠙
+        Accidental flat ⠣
+        B eighth ⠚
+        B quarter ⠺
+        B eighth ⠚
+        ===
+        Measure 8, Note Grouping 1:
+        A half ⠎
+        Dot ⠄
+        Rest quarter ⠧
+        Barline final ⠣⠅
+        ===
+        ---end segment---
+        '''
         self.b = '''
         ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠼⠙⠲⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
         ⠼⠁⠀⠪⠎⠪⠈⠉⠀⠪⠧⠣⠞⠀⠹⠹⠧⠹⠈⠉⠀⠹⠧⠕⠀⠋⠫⠋⠻⠧⠀⠋⠫⠋⠱⠧
@@ -843,6 +2637,81 @@ class Test(unittest.TestCase):
             g#4. e8 a2 b4. b8 c'2 d'8 c'8 b8 a8 g#8 e8 f#8 g#8 a2~ a8 g#8 a4''')
         bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
         self.s = bm
+        self.e = '''
+        ---begin segment---
+        <music21.braille.segment BrailleSegment>
+        Measure 1, Signature Grouping 1:
+        Time Signature 4/4 ⠼⠙⠲
+        ===
+        Measure 1, Note Grouping 1:
+        <music21.clef.TrebleClef>
+        A quarter ⠪
+        Dot ⠄
+        B eighth ⠚
+        C quarter ⠹
+        B quarter ⠺
+        ===
+        Measure 2, Note Grouping 1:
+        A eighth ⠊
+        C eighth ⠙
+        E eighth ⠋
+        C eighth ⠙
+        A eighth ⠊
+        C eighth ⠙
+        E quarter ⠫
+        ===
+        Measure 3, Note Grouping 1:
+        D quarter ⠱
+        Dot ⠄
+        F eighth ⠛
+        A quarter ⠪
+        F quarter ⠻
+        ===
+        Measure 4, Note Grouping 1:
+        D eighth ⠑
+        F eighth ⠛
+        A eighth ⠊
+        F eighth ⠛
+        D eighth ⠑
+        F eighth ⠛
+        A quarter ⠪
+        ===
+        Measure 5, Note Grouping 1:
+        Accidental sharp ⠩
+        G quarter ⠳
+        Dot ⠄
+        E eighth ⠋
+        A half ⠎
+        ===
+        Measure 6, Note Grouping 1:
+        B quarter ⠺
+        Dot ⠄
+        B eighth ⠚
+        C half ⠝
+        ===
+        Measure 7, Note Grouping 1:
+        D eighth ⠑
+        C eighth ⠙
+        B eighth ⠚
+        A eighth ⠊
+        Accidental sharp ⠩
+        G eighth ⠓
+        E eighth ⠋
+        Accidental sharp ⠩
+        F eighth ⠛
+        G eighth ⠓
+        ===
+        Measure 8, Note Grouping 1:
+        A half ⠎
+        Tie ⠈⠉
+        A eighth ⠊
+        Accidental sharp ⠩
+        G eighth ⠓
+        A quarter ⠪
+        Barline final ⠣⠅
+        ===
+        ---end segment---
+        '''
         self.b = '''
         ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠼⠙⠲⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
         ⠼⠁⠀⠪⠄⠚⠹⠺⠀⠊⠙⠋⠙⠊⠙⠫⠀⠱⠄⠛⠪⠻⠀⠑⠛⠊⠛⠑⠛⠪⠀⠩⠳⠄⠋⠎
@@ -859,6 +2728,63 @@ class Test(unittest.TestCase):
         bm.measure(2).notes[6].pitch.accidental.displayStatus = False
         bm.measure(3).notes[1].pitch.accidental.displayStatus = False
         self.s = bm
+        self.e = '''
+        ---begin segment---
+        <music21.braille.segment BrailleSegment>
+        Measure 1, Signature Grouping 1:
+        Time Signature 4/4 ⠼⠙⠲
+        ===
+        Measure 1, Note Grouping 1:
+        <music21.clef.TrebleClef>
+        E eighth ⠋
+        Accidental flat ⠣
+        E eighth ⠋
+        D eighth ⠑
+        Accidental flat ⠣
+        D eighth ⠑
+        C eighth ⠙
+        A eighth ⠊
+        Accidental flat ⠣
+        A eighth ⠊
+        G eighth ⠓
+        ===
+        Measure 2, Note Grouping 1:
+        Accidental double-flat ⠣⠣
+        B eighth ⠚
+        Accidental flat ⠣
+        A eighth ⠊
+        G eighth ⠓
+        Accidental flat ⠣
+        G eighth ⠓
+        F eighth ⠛
+        E eighth ⠋
+        D eighth ⠑
+        C eighth ⠙
+        ===
+        Measure 3, Note Grouping 1:
+        D eighth ⠑
+        B eighth ⠚
+        Accidental flat ⠣
+        B eighth ⠚
+        Accidental natural ⠡
+        B eighth ⠚
+        C eighth ⠙
+        D eighth ⠑
+        E eighth ⠋
+        F eighth ⠛
+        ===
+        Measure 4, Note Grouping 1:
+        G eighth ⠓
+        Accidental sharp ⠩
+        G eighth ⠓
+        A eighth ⠊
+        B eighth ⠚
+        C quarter ⠹
+        Rest quarter ⠧
+        Barline final ⠣⠅
+        ===
+        ---end segment---
+        '''
         self.b = '''
         ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠼⠙⠲⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
         ⠼⠁⠀⠋⠣⠋⠑⠣⠑⠙⠊⠣⠊⠓⠀⠣⠣⠚⠣⠊⠓⠣⠓⠛⠋⠑⠙⠀⠑⠚⠣⠚⠡⠚⠙⠑⠋⠛
@@ -881,6 +2807,43 @@ class Test(unittest.TestCase):
         m = bm.getElementsByClass(stream.Measure)
         m[-1].rightBarline = None
         self.s = bm
+        self.e = '''
+        ---begin segment---
+        <music21.braille.segment BrailleSegment>
+        Measure 1, Signature Grouping 1:
+        Time Signature 4/4 ⠼⠙⠲
+        ===
+        Measure 1, Note Grouping 1:
+        <music21.clef.TrebleClef>
+        Octave 1 ⠈
+        C whole ⠽
+        ===
+        Measure 2, Note Grouping 1:
+        Octave 2 ⠘
+        C whole ⠽
+        ===
+        Measure 3, Note Grouping 1:
+        Octave 3 ⠸
+        C whole ⠽
+        ===
+        Measure 4, Note Grouping 1:
+        Octave 4 ⠐
+        C whole ⠽
+        ===
+        Measure 5, Note Grouping 1:
+        Octave 5 ⠨
+        C whole ⠽
+        ===
+        Measure 6, Note Grouping 1:
+        Octave 6 ⠰
+        C whole ⠽
+        ===
+        Measure 7, Note Grouping 1:
+        Octave 7 ⠠
+        C whole ⠽
+        ===
+        ---end segment---
+        '''
         self.b = '''
         ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠼⠙⠲⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
         ⠼⠁⠀⠈⠽⠀⠘⠽⠀⠸⠽⠀⠐⠽⠀⠨⠽⠀⠰⠽⠀⠠⠽
@@ -897,6 +2860,23 @@ class Test(unittest.TestCase):
         m[0].pop(0)
         m[-1].rightBarline = None
         self.s = bm
+        self.e = '''
+        ---begin segment---
+        <music21.braille.segment BrailleSegment>
+        Measure 1, Signature Grouping 1:
+        Time Signature 2/1 ⠼⠃⠂
+        ===
+        Measure 1, Note Grouping 1:
+        Octave 0 ⠈⠈
+        A whole ⠮
+        B whole ⠾
+        ===
+        Measure 2, Note Grouping 1:
+        Octave 8 ⠠⠠
+        C whole ⠽
+        ===
+        ---end segment---
+        '''
         self.b = '''
         ⠀⠀⠀⠀⠼⠃⠂⠀⠀⠀⠀
         ⠼⠁⠀⠈⠈⠮⠾⠀⠠⠠⠽
@@ -910,6 +2890,17 @@ class Test(unittest.TestCase):
         m[0].pop(1)
         m[-1].rightBarline = None
         self.s = m[0]
+        self.e = '''
+        ---begin segment---
+        <music21.braille.segment BrailleSegment>
+        Measure 1, Note Grouping 1:
+        <music21.clef.TrebleClef>
+        Octave 4 ⠐
+        C quarter ⠹
+        E quarter ⠫
+        ===
+        ---end segment---
+        '''
         self.b = '⠐⠹⠫'
 
     def test_example07_3b(self):
@@ -920,6 +2911,18 @@ class Test(unittest.TestCase):
         m[0].pop(1)
         m[-1].rightBarline = None
         self.s = m[0]
+        self.e = '''
+        ---begin segment---
+        <music21.braille.segment BrailleSegment>
+        Measure 1, Note Grouping 1:
+        <music21.clef.TrebleClef>
+        Octave 5 ⠨
+        C half ⠝
+        Dot ⠄
+        A quarter ⠪
+        ===
+        ---end segment---
+        '''
         self.b = '⠨⠝⠄⠪'
 
     def test_example07_4a(self):
@@ -930,6 +2933,18 @@ class Test(unittest.TestCase):
         m[0].pop(1)
         m[-1].rightBarline = None
         self.s = m[0]
+        self.e = '''
+        ---begin segment---
+        <music21.braille.segment BrailleSegment>
+        Measure 1, Note Grouping 1:
+        <music21.clef.TrebleClef>
+        Octave 4 ⠐
+        C half ⠝
+        Octave 4 ⠐
+        A half ⠎
+        ===
+        ---end segment---
+        '''
         self.b = '⠐⠝⠐⠎'
 
     def test_example07_4b(self):
@@ -940,6 +2955,18 @@ class Test(unittest.TestCase):
         m[0].pop(1)
         m[-1].rightBarline = None
         self.s = m[0]
+        self.e = '''
+        ---begin segment---
+        <music21.braille.segment BrailleSegment>
+        Measure 1, Note Grouping 1:
+        <music21.clef.TrebleClef>
+        Octave 5 ⠨
+        C half ⠝
+        Octave 4 ⠐
+        E half ⠏
+        ===
+        ---end segment---
+        '''
         self.b = '⠨⠝⠐⠏'
 
     def test_example07_5a(self):
@@ -950,6 +2977,17 @@ class Test(unittest.TestCase):
         m[0].pop(1)
         m[-1].rightBarline = None
         self.s = m[0]
+        self.e = '''
+        ---begin segment---
+        <music21.braille.segment BrailleSegment>
+        Measure 1, Note Grouping 1:
+        <music21.clef.BassClef>
+        Octave 3 ⠸
+        C half ⠝
+        F half ⠟
+        ===
+        ---end segment---
+        '''
         self.b = '⠸⠝⠟'
 
     def test_example07_5b(self):
@@ -960,6 +2998,18 @@ class Test(unittest.TestCase):
         m[0].pop(1)
         m[-1].rightBarline = None
         self.s = m[0]
+        self.e = '''
+        ---begin segment---
+        <music21.braille.segment BrailleSegment>
+        Measure 1, Note Grouping 1:
+        <music21.clef.TrebleClef>
+        Octave 4 ⠐
+        F half ⠟
+        Octave 5 ⠨
+        C half ⠝
+        ===
+        ---end segment---
+        '''
         self.b = '⠐⠟⠨⠝'
 
     def test_example07_6(self):
@@ -969,12 +3019,6 @@ class Test(unittest.TestCase):
             f8 f8 c'4 b-8 b-8 f'4 e'-8 d'8 c'8 b-8 e'-4 e-4''').flatten()
         bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
         self.s = bm
-        self.b = '''
-        ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠼⠙⠦⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
-        ⠼⠁⠀⠣⠨⠋⠋⠋⠋⠀⠑⠑⠣⠺⠀⠙⠙⠙⠙⠀⠣⠐⠋⠨⠙⠣⠺⠀⠛⠛⠨⠹⠀⠣⠚⠚⠨⠻
-        ⠀⠀⠣⠨⠋⠑⠙⠣⠚⠀⠣⠨⠫⠣⠐⠫⠣⠅
-        '''
-
         self.e = '''
         ---begin segment---
         <music21.braille.segment BrailleSegment>
@@ -1044,6 +3088,12 @@ class Test(unittest.TestCase):
         ===
         ---end segment---
         '''
+        self.b = '''
+        ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠼⠙⠦⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+        ⠼⠁⠀⠣⠨⠋⠋⠋⠋⠀⠑⠑⠣⠺⠀⠙⠙⠙⠙⠀⠣⠐⠋⠨⠙⠣⠺⠀⠛⠛⠨⠹⠀⠣⠚⠚⠨⠻
+        ⠀⠀⠣⠨⠋⠑⠙⠣⠚⠀⠣⠨⠫⠣⠐⠫⠣⠅
+        '''
+
         self.assertTrue(bm.measure(7).notes[3].pitch.accidental.displayStatus)
 
     def test_example07_7(self):
@@ -1063,6 +3113,46 @@ class Test(unittest.TestCase):
         m[1].transpose('P8', inPlace=True)
         m[2].transpose('P8', inPlace=True)
         self.s = bm
+        self.e = '''
+        ---begin segment---
+        <music21.braille.segment BrailleSegment>
+        Measure 1, Signature Grouping 1:
+        Time Signature 4/8 ⠼⠙⠦
+        ===
+        Measure 1, Note Grouping 1:
+        Octave 4 ⠐
+        A eighth ⠊
+        C eighth ⠙
+        F eighth ⠛
+        C eighth ⠙
+        ===
+        Measure 2, Note Grouping 1:
+        Octave 5 ⠨
+        A eighth ⠊
+        C eighth ⠙
+        F eighth ⠛
+        C eighth ⠙
+        ===
+        Measure 3, Note Grouping 1:
+        Octave 6 ⠰
+        A eighth ⠊
+        F eighth ⠛
+        C eighth ⠙
+        D eighth ⠑
+        ===
+        Measure 4, Note Grouping 1:
+        Octave 5 ⠨
+        A eighth ⠊
+        F eighth ⠛
+        E eighth ⠋
+        C eighth ⠙
+        ===
+        Measure 5, Note Grouping 1:
+        F half ⠟
+        Barline final ⠣⠅
+        ===
+        ---end segment---
+        '''
         self.b = '''
         ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠼⠙⠦⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
         ⠼⠁⠀⠐⠊⠙⠛⠙⠀⠨⠊⠙⠛⠙⠀⠰⠊⠛⠙⠑⠀⠨⠊⠛⠋⠙⠀⠟⠣⠅
@@ -1073,6 +3163,69 @@ class Test(unittest.TestCase):
                              'c4. B8 A4 G4 A4 F4 C4 AA4 GG4 GG4 D4 G4 E4 C2.')
         bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
         self.s = bm
+        self.e = '''
+        ---begin segment---
+        <music21.braille.segment BrailleSegment>
+        Measure 1, Signature Grouping 1:
+        Time Signature 4/4 ⠼⠙⠲
+        ===
+        Measure 1, Note Grouping 1:
+        <music21.clef.BassClef>
+        Octave 3 ⠸
+        C half ⠝
+        Octave 2 ⠘
+        G quarter ⠳
+        Octave 3 ⠸
+        E quarter ⠫
+        ===
+        Measure 2, Note Grouping 1:
+        D quarter ⠱
+        Dot ⠄
+        C eighth ⠙
+        C quarter ⠹
+        C quarter ⠹
+        ===
+        Measure 3, Note Grouping 1:
+        Octave 3 ⠸
+        A half ⠎
+        G quarter ⠳
+        E quarter ⠫
+        ===
+        Measure 4, Note Grouping 1:
+        D quarter ⠱
+        G half ⠗
+        G quarter ⠳
+        ===
+        Measure 5, Note Grouping 1:
+        Octave 4 ⠐
+        C quarter ⠹
+        Dot ⠄
+        B eighth ⠚
+        A quarter ⠪
+        G quarter ⠳
+        ===
+        Measure 6, Note Grouping 1:
+        A quarter ⠪
+        F quarter ⠻
+        C quarter ⠹
+        A quarter ⠪
+        ===
+        Measure 7, Note Grouping 1:
+        Octave 2 ⠘
+        G quarter ⠳
+        G quarter ⠳
+        Octave 3 ⠸
+        D quarter ⠱
+        G quarter ⠳
+        ===
+        Measure 8, Note Grouping 1:
+        E quarter ⠫
+        C half ⠝
+        Dot ⠄
+        Barline final ⠣⠅
+        ===
+        ---end segment---
+        '''
         self.b = '''
         ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠼⠙⠲⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
         ⠼⠁⠀⠸⠝⠘⠳⠸⠫⠀⠱⠄⠙⠹⠹⠀⠸⠎⠳⠫⠀⠱⠗⠳⠀⠐⠹⠄⠚⠪⠳⠀⠪⠻⠹⠪
@@ -1085,6 +3238,82 @@ class Test(unittest.TestCase):
             a8 c'#8 e'8 a'8 c'#8 g'8 f'8 d'8 a8 e'8 d'8 f8 c'8 b8 d8 a8 g#8 e8 a2.''')
         bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
         self.s = bm
+        self.e = '''
+        ---begin segment---
+        <music21.braille.segment BrailleSegment>
+        Measure 1, Signature Grouping 1:
+        Time Signature 3/4 ⠼⠉⠲
+        ===
+        Measure 1, Note Grouping 1:
+        <music21.clef.TrebleClef>
+        Octave 4 ⠐
+        E quarter ⠫
+        Dot ⠄
+        A eighth ⠊
+        C eighth ⠙
+        E eighth ⠋
+        ===
+        Measure 2, Note Grouping 1:
+        D quarter ⠱
+        D eighth ⠑
+        C eighth ⠙
+        B quarter ⠺
+        ===
+        Measure 3, Note Grouping 1:
+        E quarter ⠫
+        Dot ⠄
+        Accidental sharp ⠩
+        G eighth ⠓
+        B eighth ⠚
+        Octave 5 ⠨
+        E eighth ⠋
+        ===
+        Measure 4, Note Grouping 1:
+        C quarter ⠹
+        C eighth ⠙
+        B eighth ⠚
+        A quarter ⠪
+        ===
+        Measure 5, Note Grouping 1:
+        A eighth ⠊
+        Accidental sharp ⠩
+        C eighth ⠙
+        E eighth ⠋
+        A eighth ⠊
+        Octave 5 ⠨
+        C eighth ⠙
+        G eighth ⠓
+        ===
+        Measure 6, Note Grouping 1:
+        Octave 5 ⠨
+        F eighth ⠛
+        D eighth ⠑
+        Octave 4 ⠐
+        A eighth ⠊
+        Octave 5 ⠨
+        E eighth ⠋
+        D eighth ⠑
+        Octave 4 ⠐
+        F eighth ⠛
+        ===
+        Measure 7, Note Grouping 1:
+        Octave 5 ⠨
+        C eighth ⠙
+        B eighth ⠚
+        Octave 4 ⠐
+        D eighth ⠑
+        A eighth ⠊
+        Accidental sharp ⠩
+        G eighth ⠓
+        E eighth ⠋
+        ===
+        Measure 8, Note Grouping 1:
+        A half ⠎
+        Dot ⠄
+        Barline final ⠣⠅
+        ===
+        ---end segment---
+        '''
         self.b = '''
         ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠼⠉⠲⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
         ⠼⠁⠀⠐⠫⠄⠊⠙⠋⠀⠱⠑⠙⠺⠀⠫⠄⠩⠓⠚⠨⠋⠀⠹⠙⠚⠪⠀⠊⠩⠙⠋⠊⠨⠙⠓
@@ -1099,6 +3328,98 @@ class Test(unittest.TestCase):
             a'8 c'#8 g'#8 f'#8 e'8 e8 c'#8 b8 a2 r2''')
         bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
         self.s = bm
+        self.e = '''
+        ---begin segment---
+        <music21.braille.segment BrailleSegment>
+        Measure 1, Signature Grouping 1:
+        Time Signature 4/4 ⠼⠙⠲
+        ===
+        Measure 1, Note Grouping 1:
+        <music21.clef.TrebleClef>
+        Octave 4 ⠐
+        A quarter ⠪
+        Octave 5 ⠨
+        E quarter ⠫
+        A quarter ⠪
+        E quarter ⠫
+        ===
+        Measure 2, Note Grouping 1:
+        Accidental sharp ⠩
+        C eighth ⠙
+        Accidental sharp ⠩
+        F eighth ⠛
+        E eighth ⠋
+        Octave 4 ⠐
+        A eighth ⠊
+        B quarter ⠺
+        Octave 5 ⠨
+        E quarter ⠫
+        ===
+        Measure 3, Note Grouping 1:
+        D eighth ⠑
+        Octave 4 ⠐
+        A eighth ⠊
+        Accidental sharp ⠩
+        F eighth ⠛
+        Octave 5 ⠨
+        D eighth ⠑
+        Accidental sharp ⠩
+        C eighth ⠙
+        A eighth ⠊
+        E eighth ⠋
+        Octave 5 ⠨
+        C eighth ⠙
+        ===
+        Measure 4, Note Grouping 1:
+        Octave 4 ⠐
+        B eighth ⠚
+        Accidental sharp ⠩
+        F eighth ⠛
+        Accidental sharp ⠩
+        G eighth ⠓
+        A eighth ⠊
+        B quarter ⠺
+        E quarter ⠫
+        ===
+        Measure 5, Note Grouping 1:
+        A quarter ⠪
+        A quarter ⠪
+        Accidental sharp ⠩
+        Octave 5 ⠨
+        F quarter ⠻
+        E quarter ⠫
+        ===
+        Measure 6, Note Grouping 1:
+        D quarter ⠱
+        D quarter ⠱
+        Octave 5 ⠨
+        B quarter ⠺
+        A quarter ⠪
+        ===
+        Measure 7, Note Grouping 1:
+        A eighth ⠊
+        Accidental sharp ⠩
+        Octave 5 ⠨
+        C eighth ⠙
+        Accidental sharp ⠩
+        G eighth ⠓
+        Accidental sharp ⠩
+        F eighth ⠛
+        E eighth ⠋
+        Octave 4 ⠐
+        E eighth ⠋
+        Octave 5 ⠨
+        C eighth ⠙
+        B eighth ⠚
+        ===
+        Measure 8, Note Grouping 1:
+        Octave 4 ⠐
+        A half ⠎
+        Rest half ⠥
+        Barline final ⠣⠅
+        ===
+        ---end segment---
+        '''
         self.b = '''
         ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠼⠙⠲⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
         ⠼⠁⠀⠐⠪⠨⠫⠪⠫⠀⠩⠙⠩⠛⠋⠐⠊⠺⠨⠫⠀⠑⠐⠊⠩⠛⠨⠑⠩⠙⠊⠋⠨⠙
@@ -1124,6 +3445,93 @@ class Test(unittest.TestCase):
             measure.number -= 1
         bm.measure(7).notes[3].pitch.accidental = pitch.Accidental()
         self.s = bm
+        self.e = '''
+        ---begin segment---
+        <music21.braille.segment BrailleSegment>
+        Measure 0, Signature Grouping 1:
+        Time Signature 6/8 ⠼⠋⠦
+        ===
+        Measure 0, Note Grouping 1:
+        <music21.clef.BassClef>
+        Octave 2 ⠘
+        G eighth ⠓
+        ===
+        Measure 1, Note Grouping 1:
+        Octave 3 ⠸
+        C quarter ⠹
+        Octave 2 ⠘
+        G eighth ⠓
+        Octave 3 ⠸
+        C quarter ⠹
+        Accidental flat ⠣
+        E eighth ⠋
+        ===
+        Measure 2, Note Grouping 1:
+        D quarter ⠱
+        Octave 2 ⠘
+        G eighth ⠓
+        Octave 3 ⠸
+        D quarter ⠱
+        G eighth ⠓
+        ===
+        Measure 3, Note Grouping 1:
+        C quarter ⠹
+        G eighth ⠓
+        Octave 4 ⠐
+        C quarter ⠹
+        Accidental flat ⠣
+        B eighth ⠚
+        ===
+        Measure 4, Note Grouping 1:
+        Accidental flat ⠣
+        A quarter ⠪
+        F eighth ⠛
+        C quarter ⠹
+        Octave 3 ⠸
+        A eighth ⠊
+        ===
+        Measure 5, Note Grouping 1:
+        Octave 3 ⠸
+        G eighth ⠓
+        Accidental flat ⠣
+        E eighth ⠋
+        Accidental flat ⠣
+        A eighth ⠊
+        G eighth ⠓
+        C eighth ⠙
+        F eighth ⠛
+        ===
+        Measure 6, Note Grouping 1:
+        Accidental flat ⠣
+        E eighth ⠋
+        Octave 2 ⠘
+        G eighth ⠓
+        Octave 3 ⠸
+        D eighth ⠑
+        C eighth ⠙
+        Octave 2 ⠘
+        G eighth ⠓
+        Accidental flat ⠣
+        E eighth ⠋
+        ===
+        Measure 7, Note Grouping 1:
+        F eighth ⠛
+        Octave 3 ⠸
+        D eighth ⠑
+        C eighth ⠙
+        Accidental natural ⠡
+        B eighth ⠚
+        G eighth ⠓
+        G eighth ⠓
+        ===
+        Measure 8, Note Grouping 1:
+        C quarter ⠹
+        Dot ⠄
+        Rest quarter ⠧
+        Barline final ⠣⠅
+        ===
+        ---end segment---
+        '''
         self.b = '''
         ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠼⠋⠦⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
         ⠼⠚⠀⠘⠓⠀⠸⠹⠘⠓⠸⠹⠣⠋⠀⠱⠘⠓⠸⠱⠓⠀⠹⠓⠐⠹⠣⠚⠀⠣⠪⠛⠹⠸⠊
@@ -1267,6 +3675,80 @@ class Test(unittest.TestCase):
         bm.insert(0, tempo.MetronomeMark(number=92, referent=note.Note(type='quarter')))
         bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
         self.s = bm
+        self.e = '''
+        ---begin segment---
+        <music21.braille.segment BrailleSegment>
+        Measure 1, Signature Grouping 1:
+        Time Signature common ⠨⠉
+        ===
+        Measure 1, Tempo Text Grouping 1:
+        Tempo Text Andante maestoso ⠠⠁⠝⠙⠁⠝⠞⠑⠀⠍⠁⠑⠎⠞⠕⠎⠕⠲
+        ===
+        Measure 1, Metronome Mark Grouping 1:
+        Metronome Note C quarter ⠹
+        Metronome symbol ⠶
+        Metronome number 92 ⠼⠊⠃
+        ===
+        Measure 1, Note Grouping 1:
+        <music21.clef.TrebleClef>
+        Octave 4 ⠐
+        A half ⠎
+        G eighth ⠓
+        F eighth ⠛
+        E quarter ⠫
+        ===
+        Measure 2, Note Grouping 1:
+        D quarter ⠱
+        E quarter ⠫
+        F eighth ⠛
+        G eighth ⠓
+        A quarter ⠪
+        ===
+        Measure 3, Note Grouping 1:
+        G quarter ⠳
+        Octave 5 ⠨
+        C eighth ⠙
+        B eighth ⠚
+        A quarter ⠪
+        G quarter ⠳
+        ===
+        Measure 4, Note Grouping 1:
+        F quarter ⠻
+        Dot ⠄
+        E eighth ⠋
+        D half ⠕
+        ===
+        Measure 5, Note Grouping 1:
+        C quarter ⠹
+        E quarter ⠫
+        A quarter ⠪
+        Octave 5 ⠨
+        E quarter ⠫
+        ===
+        Measure 6, Note Grouping 1:
+        E quarter ⠫
+        D quarter ⠱
+        C eighth ⠙
+        B eighth ⠚
+        A quarter ⠪
+        ===
+        Measure 7, Note Grouping 1:
+        Octave 5 ⠨
+        A quarter ⠪
+        G eighth ⠓
+        F eighth ⠛
+        E quarter ⠫
+        D quarter ⠱
+        ===
+        Measure 8, Note Grouping 1:
+        C quarter ⠹
+        A eighth ⠊
+        B eighth ⠚
+        C half ⠝
+        Barline final ⠣⠅
+        ===
+        ---end segment---
+        '''
         self.b = '''
         ⠀⠀⠀⠀⠀⠠⠁⠝⠙⠁⠝⠞⠑⠀⠍⠁⠑⠎⠞⠕⠎⠕⠲⠀⠹⠶⠼⠊⠃⠀⠨⠉⠀⠀⠀⠀⠀⠀
         ⠼⠁⠀⠐⠎⠓⠛⠫⠀⠱⠫⠛⠓⠪⠀⠳⠨⠙⠚⠪⠳⠀⠻⠄⠋⠕⠀⠹⠫⠪⠨⠫⠀⠫⠱⠙⠚⠪
@@ -1286,6 +3768,116 @@ class Test(unittest.TestCase):
         bm.measure(7).notes[-1].pitch.accidental.displayStatus = False
         bm.measure(11).notes[-1].pitch.accidental.displayStatus = False
         self.s = bm
+        self.e = '''
+        ---begin segment---
+        <music21.braille.segment BrailleSegment>
+        Measure 1, Signature Grouping 1:
+        Key Signature 3 flat(s) ⠣⠣⠣
+        Time Signature 3/4 ⠼⠉⠲
+        ===
+        Measure 1, Tempo Text Grouping 1:
+        Tempo Text In strict time ⠠⠊⠝⠀⠎⠞⠗⠊⠉⠞⠀⠞⠊⠍⠑⠲
+        ===
+        Measure 1, Note Grouping 1:
+        <music21.clef.BassClef>
+        Octave 3 ⠸
+        E eighth ⠋
+        Rest eighth ⠭
+        Octave 2 ⠘
+        B eighth ⠚
+        Rest eighth ⠭
+        Octave 3 ⠸
+        E eighth ⠋
+        Rest eighth ⠭
+        ===
+        Measure 2, Note Grouping 1:
+        Accidental natural ⠡
+        E quarter ⠫
+        F quarter ⠻
+        Accidental sharp ⠩
+        F quarter ⠻
+        ===
+        Measure 3, Note Grouping 1:
+        G eighth ⠓
+        Rest eighth ⠭
+        D eighth ⠑
+        Rest eighth ⠭
+        G eighth ⠓
+        Rest eighth ⠭
+        ===
+        Measure 4, Note Grouping 1:
+        A quarter ⠪
+        G quarter ⠳
+        F quarter ⠻
+        ===
+        Measure 5, Note Grouping 1:
+        E eighth ⠋
+        Rest eighth ⠭
+        C eighth ⠙
+        Rest eighth ⠭
+        A eighth ⠊
+        Rest eighth ⠭
+        ===
+        Measure 6, Note Grouping 1:
+        Accidental natural ⠡
+        Octave 2 ⠘
+        A quarter ⠪
+        B quarter ⠺
+        Accidental natural ⠡
+        B quarter ⠺
+        ===
+        Measure 7, Note Grouping 1:
+        C eighth ⠙
+        D eighth ⠑
+        Rest eighth ⠭
+        E eighth ⠋
+        Rest eighth ⠭
+        Octave 2 ⠘
+        B eighth ⠚
+        ===
+        Measure 8, Note Grouping 1:
+        Octave 3 ⠸
+        E eighth ⠋
+        Accidental natural ⠡
+        E eighth ⠋
+        Rest eighth ⠭
+        F eighth ⠛
+        Rest eighth ⠭
+        Accidental sharp ⠩
+        F eighth ⠛
+        ===
+        Measure 9, Note Grouping 1:
+        G eighth ⠓
+        D eighth ⠑
+        Rest eighth ⠭
+        G eighth ⠓
+        Rest eighth ⠭
+        A eighth ⠊
+        ===
+        Measure 10, Note Grouping 1:
+        A eighth ⠊
+        G eighth ⠓
+        Rest eighth ⠭
+        F eighth ⠛
+        Rest eighth ⠭
+        E eighth ⠋
+        ===
+        Measure 11, Note Grouping 1:
+        Octave 3 ⠸
+        D eighth ⠑
+        C eighth ⠙
+        B quarter ⠺
+        Octave 1 ⠈
+        B quarter ⠺
+        ===
+        Measure 12, Note Grouping 1:
+        Octave 2 ⠘
+        E half ⠏
+        Dot ⠄
+        Barline final ⠣⠅
+        ===
+        ---end segment---
+        '''
         self.b = '''
         ⠀⠀⠀⠀⠀⠀⠀⠀⠠⠊⠝⠀⠎⠞⠗⠊⠉⠞⠀⠞⠊⠍⠑⠲⠀⠣⠣⠣⠼⠉⠲⠀⠀⠀⠀⠀⠀⠀⠀⠀
         ⠼⠁⠀⠸⠋⠭⠘⠚⠭⠸⠋⠭⠀⠡⠫⠻⠩⠻⠀⠓⠭⠑⠭⠓⠭⠀⠪⠳⠻⠀⠋⠭⠙⠭⠊⠭
@@ -1308,6 +3900,115 @@ class Test(unittest.TestCase):
         for measure in m:
             measure.number -= 1
         self.s = bm
+        self.e = '''
+        ---begin segment---
+        <music21.braille.segment BrailleSegment>
+        Measure 0, Signature Grouping 1:
+        Key Signature 5 sharp(s) ⠼⠑⠩
+        Time Signature 6/8 ⠼⠋⠦
+        ===
+        Measure 0, Tempo Text Grouping 1:
+        Tempo Text Con delicatezza ⠠⠉⠕⠝⠀⠙⠑⠇⠊⠉⠁⠞⠑⠵⠵⠁⠲
+        ===
+        Measure 0, Note Grouping 1:
+        <music21.clef.TrebleClef>
+        Octave 5 ⠨
+        D eighth ⠑
+        C eighth ⠙
+        ===
+        Measure 1, Note Grouping 1:
+        B quarter ⠺
+        Dot ⠄
+        Tie ⠈⠉
+        B eighth ⠚
+        D eighth ⠑
+        G eighth ⠓
+        ===
+        Measure 2, Note Grouping 1:
+        G quarter ⠳
+        Dot ⠄
+        F quarter ⠻
+        Rest eighth ⠭
+        ===
+        Measure 3, Note Grouping 1:
+        E quarter ⠫
+        Dot ⠄
+        Tie ⠈⠉
+        E eighth ⠋
+        D eighth ⠑
+        Octave 4 ⠐
+        G eighth ⠓
+        ===
+        Measure 4, Note Grouping 1:
+        Octave 5 ⠨
+        D quarter ⠱
+        C eighth ⠙
+        D quarter ⠱
+        Rest eighth ⠭
+        ===
+        Measure 5, Note Grouping 1:
+        Octave 4 ⠐
+        A eighth ⠊
+        G eighth ⠓
+        A eighth ⠊
+        B eighth ⠚
+        A eighth ⠊
+        B eighth ⠚
+        ===
+        Measure 6, Note Grouping 1:
+        C eighth ⠙
+        D eighth ⠑
+        E eighth ⠋
+        F eighth ⠛
+        G eighth ⠓
+        A eighth ⠊
+        ===
+        Measure 7, Note Grouping 1:
+        B eighth ⠚
+        F eighth ⠛
+        D eighth ⠑
+        G eighth ⠓
+        E eighth ⠋
+        Octave 4 ⠐
+        B eighth ⠚
+        ===
+        Measure 8, Note Grouping 1:
+        Octave 5 ⠨
+        F quarter ⠻
+        D eighth ⠑
+        E eighth ⠋
+        D eighth ⠑
+        C eighth ⠙
+        ===
+        Measure 9, Note Grouping 1:
+        B eighth ⠚
+        F eighth ⠛
+        Octave 5 ⠨
+        D eighth ⠑
+        B quarter ⠺
+        F eighth ⠛
+        ===
+        Measure 10, Note Grouping 1:
+        Octave 4 ⠐
+        D eighth ⠑
+        F eighth ⠛
+        B eighth ⠚
+        C quarter ⠹
+        A eighth ⠊
+        ===
+        Measure 11, Note Grouping 1:
+        B half ⠞
+        Dot ⠄
+        Tie ⠈⠉
+        ===
+        Measure 12, Note Grouping 1:
+        B quarter ⠺
+        Dot ⠄
+        Rest eighth ⠭
+        Barline final ⠣⠅
+        ===
+        ---end segment---
+        '''
         self.b = '''
         ⠀⠀⠀⠀⠀⠀⠀⠠⠉⠕⠝⠀⠙⠑⠇⠊⠉⠁⠞⠑⠵⠵⠁⠲⠀⠼⠑⠩⠼⠋⠦⠀⠀⠀⠀⠀⠀⠀
         ⠼⠚⠀⠨⠑⠙⠀⠺⠄⠈⠉⠚⠑⠓⠀⠳⠄⠻⠭⠀⠫⠄⠈⠉⠋⠑⠐⠓⠀⠨⠱⠙⠱⠭
@@ -1323,6 +4024,74 @@ class Test(unittest.TestCase):
         bm.insert(0, tempo.TempoText('Grazioso'))
         bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
         self.s = bm
+        self.e = '''
+        ---begin segment---
+        <music21.braille.segment BrailleSegment>
+        Measure 1, Signature Grouping 1:
+        Key Signature 1 flat(s) ⠣
+        Time Signature 4/4 ⠼⠙⠲
+        ===
+        Measure 1, Tempo Text Grouping 1:
+        Tempo Text Grazioso ⠠⠛⠗⠁⠵⠊⠕⠎⠕⠲
+        ===
+        Measure 1, Note Grouping 1:
+        <music21.clef.BassClef>
+        Octave 3 ⠸
+        A half ⠎
+        Dot ⠄
+        Dot ⠄
+        G eighth ⠓
+        ===
+        Measure 2, Note Grouping 1:
+        F half ⠟
+        E quarter ⠫
+        D quarter ⠱
+        ===
+        Measure 3, Note Grouping 1:
+        E quarter ⠫
+        Dot ⠄
+        F eighth ⠛
+        G quarter ⠳
+        E quarter ⠫
+        ===
+        Measure 4, Note Grouping 1:
+        Accidental sharp ⠩
+        C half ⠝
+        D quarter ⠱
+        Rest quarter ⠧
+        ===
+        Measure 5, Note Grouping 1:
+        Octave 2 ⠘
+        A half ⠎
+        Dot ⠄
+        Dot ⠄
+        Accidental natural ⠡
+        B eighth ⠚
+        ===
+        Measure 6, Note Grouping 1:
+        Accidental sharp ⠩
+        C quarter ⠹
+        Dot ⠄
+        D eighth ⠑
+        E quarter ⠫
+        G quarter ⠳
+        ===
+        Measure 7, Note Grouping 1:
+        Octave 3 ⠸
+        F quarter ⠻
+        G quarter ⠳
+        A quarter ⠪
+        F quarter ⠻
+        ===
+        Measure 8, Note Grouping 1:
+        D half ⠕
+        Dot ⠄
+        Dot ⠄
+        Rest eighth ⠭
+        Barline final ⠣⠅
+        ===
+        ---end segment---
+        '''
         self.b = '''
         ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠠⠛⠗⠁⠵⠊⠕⠎⠕⠲⠀⠣⠼⠙⠲⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
         ⠼⠁⠀⠸⠎⠄⠄⠓⠀⠟⠫⠱⠀⠫⠄⠛⠳⠫⠀⠩⠝⠱⠧⠀⠘⠎⠄⠄⠡⠚⠀⠩⠹⠄⠑⠫⠳
@@ -1346,6 +4115,121 @@ class Test(unittest.TestCase):
         for measure in m:
             measure.number -= 1
         self.s = bm
+        self.e = '''
+        ---begin segment---
+        <music21.braille.segment BrailleSegment>
+        Measure 0, Signature Grouping 1:
+        Key Signature 2 flat(s) ⠣⠣
+        Time Signature cut ⠸⠉
+        ===
+        Measure 0, Tempo Text Grouping 1:
+        Tempo Text Ben marcato ⠠⠃⠑⠝⠀⠍⠁⠗⠉⠁⠞⠕⠲
+        ===
+        Measure 0, Metronome Mark Grouping 1:
+        Metronome Note C half ⠝
+        Metronome symbol ⠶
+        Metronome number 112 ⠼⠁⠁⠃
+        ===
+        Measure 0, Note Grouping 1:
+        <music21.clef.TrebleClef>
+        Octave 5 ⠨
+        F quarter ⠻
+        E quarter ⠫
+        ===
+        Measure 1, Note Grouping 1:
+        D half ⠕
+        B quarter ⠺
+        G quarter ⠳
+        ===
+        Measure 2, Note Grouping 1:
+        Octave 5 ⠨
+        E half ⠏
+        C quarter ⠹
+        Octave 4 ⠐
+        F quarter ⠻
+        ===
+        Measure 3, Note Grouping 1:
+        Octave 5 ⠨
+        F half ⠟
+        E quarter ⠫
+        D quarter ⠱
+        ===
+        Measure 4, Note Grouping 1:
+        C half ⠝
+        Octave 4 ⠐
+        F quarter ⠻
+        F quarter ⠻
+        ===
+        Measure 5, Note Grouping 1:
+        G half ⠗
+        F quarter ⠻
+        G quarter ⠳
+        ===
+        Measure 6, Note Grouping 1:
+        A half ⠎
+        Octave 5 ⠨
+        D quarter ⠱
+        C quarter ⠹
+        ===
+        Measure 7, Note Grouping 1:
+        B quarter ⠺
+        A quarter ⠪
+        B quarter ⠺
+        C quarter ⠹
+        ===
+        Measure 8, Note Grouping 1:
+        Octave 5 ⠨
+        D half ⠕
+        E quarter ⠫
+        F quarter ⠻
+        ===
+        Measure 9, Note Grouping 1:
+        G half ⠗
+        E quarter ⠫
+        C quarter ⠹
+        ===
+        Measure 10, Note Grouping 1:
+        F half ⠟
+        D quarter ⠱
+        B quarter ⠺
+        ===
+        Measure 11, Note Grouping 1:
+        Octave 5 ⠨
+        E half ⠏
+        C quarter ⠹
+        Octave 4 ⠐
+        F quarter ⠻
+        ===
+        Measure 12, Note Grouping 1:
+        Octave 5 ⠨
+        D half ⠕
+        B quarter ⠺
+        B quarter ⠺
+        ===
+        Measure 13, Note Grouping 1:
+        C half ⠝
+        B quarter ⠺
+        C quarter ⠹
+        ===
+        Measure 14, Note Grouping 1:
+        D quarter ⠱
+        B quarter ⠺
+        C quarter ⠹
+        D quarter ⠱
+        ===
+        Measure 15, Note Grouping 1:
+        B quarter ⠺
+        C quarter ⠹
+        B quarter ⠺
+        A quarter ⠪
+        ===
+        Measure 16, Note Grouping 1:
+        Octave 4 ⠐
+        B half ⠞
+        Barline final ⠣⠅
+        ===
+        ---end segment---
+        '''
         self.b = '''
         ⠀⠀⠀⠀⠀⠀⠀⠠⠃⠑⠝⠀⠍⠁⠗⠉⠁⠞⠕⠲⠀⠝⠶⠼⠁⠁⠃⠀⠣⠣⠸⠉⠀⠀⠀⠀⠀⠀⠀⠀
         ⠼⠚⠀⠨⠻⠫⠀⠕⠺⠳⠀⠨⠏⠹⠐⠻⠀⠨⠟⠫⠱⠀⠝⠐⠻⠻⠀⠗⠻⠳⠀⠎⠨⠱⠹⠀⠺⠪⠺⠹
@@ -1368,10 +4252,6 @@ class Test(unittest.TestCase):
         m[1].notes[0].articulations.append(Fingering('2'))
         m[1].notes[1].articulations.append(Fingering('1'))
         self.s = bm
-        self.b = '''
-        ⠀⠀⠀⠀⠣⠼⠃⠲⠀⠀⠀
-        ⠐⠪⠂⠳⠇⠀⠻⠄⠃⠙⠁
-        '''
         self.e = '''
         ---begin segment---
         <music21.braille.segment BrailleSegment>
@@ -1392,6 +4272,10 @@ class Test(unittest.TestCase):
         ===
         ---end segment---
         '''
+        self.b = '''
+        ⠀⠀⠀⠀⠣⠼⠃⠲⠀⠀⠀
+        ⠐⠪⠂⠳⠇⠀⠻⠄⠃⠙⠁
+        '''
 
     def test_example09_2(self):
         self.methodArgs = {'showFirstMeasureNumber': False}
@@ -1406,6 +4290,32 @@ class Test(unittest.TestCase):
         m[0].notes[3].articulations.append(Fingering('1'))
         m[0].notes[4].articulations.append(Fingering('2'))
         self.s = bm
+        self.e = '''
+        ---begin segment---
+        <music21.braille.segment BrailleSegment>
+        Measure 1, Signature Grouping 1:
+        Key Signature 2 flat(s) ⠣⠣
+        Time Signature 3/4 ⠼⠉⠲
+        ===
+        Measure 1, Note Grouping 1:
+        <music21.clef.TrebleClef>
+        Octave 5 ⠨
+        F quarter ⠻
+        E eighth ⠋
+        D eighth ⠑
+        C eighth ⠙
+        B eighth ⠚
+        Tie ⠈⠉
+        ===
+        Measure 2, Note Grouping 1:
+        B quarter ⠺
+        Rest eighth ⠭
+        A eighth ⠊
+        C eighth ⠙
+        B eighth ⠚
+        ===
+        ---end segment---
+        '''
         self.b = '''
         ⠀⠀⠀⠀⠀⠀⠀⠣⠣⠼⠉⠲⠀⠀⠀⠀⠀⠀⠀
         ⠨⠻⠂⠋⠇⠑⠃⠙⠁⠚⠃⠈⠉⠀⠺⠭⠊⠙⠚
@@ -1420,6 +4330,27 @@ class Test(unittest.TestCase):
         m[0].notes[0].articulations.append(Fingering('1'))
         m[1].notes[1].articulations.append(Fingering('2'))
         self.s = bm
+        self.e = '''
+        ---begin segment---
+        <music21.braille.segment BrailleSegment>
+        Measure 1, Signature Grouping 1:
+        Time Signature 6/8 ⠼⠋⠦
+        ===
+        Measure 1, Note Grouping 1:
+        <music21.clef.TrebleClef>
+        Octave 4 ⠐
+        C half ⠝
+        Dot ⠄
+        Tie ⠈⠉
+        ===
+        Measure 2, Note Grouping 1:
+        C quarter ⠹
+        Dot ⠄
+        F quarter ⠻
+        G eighth ⠓
+        ===
+        ---end segment---
+        '''
         self.b = '''
         ⠀⠀⠀⠀⠼⠋⠦⠀⠀⠀⠀⠀
         ⠐⠝⠄⠁⠈⠉⠀⠹⠄⠻⠃⠓
@@ -1434,6 +4365,22 @@ class Test(unittest.TestCase):
         m[-1].rightBarline = None
         m[0].notes[0].articulations.append(Fingering('2-1'))
         self.s = bm
+        self.e = '''
+        ---begin segment---
+        <music21.braille.segment BrailleSegment>
+        Measure 1, Signature Grouping 1:
+        Key Signature 2 sharp(s) ⠩⠩
+        Time Signature 3/4 ⠼⠉⠲
+        ===
+        Measure 1, Note Grouping 1:
+        <music21.clef.BassClef>
+        Octave 4 ⠐
+        D half ⠕
+        Octave 3 ⠸
+        F quarter ⠻
+        ===
+        ---end segment---
+        '''
         self.b = '''
         ⠀⠩⠩⠼⠉⠲⠀
         ⠐⠕⠃⠉⠁⠸⠻
@@ -1447,6 +4394,20 @@ class Test(unittest.TestCase):
         m[-1].rightBarline = None
         m[0].notes[0].articulations.append(Fingering('3-1'))
         self.s = bm
+        self.e = '''
+        ---begin segment---
+        <music21.braille.segment BrailleSegment>
+        Measure 1, Signature Grouping 1:
+        Time Signature 3/4 ⠼⠉⠲
+        ===
+        Measure 1, Note Grouping 1:
+        <music21.clef.TrebleClef>
+        Octave 4 ⠐
+        C half ⠝
+        G quarter ⠳
+        ===
+        ---end segment---
+        '''
         self.b = '''
         ⠀⠼⠉⠲⠀⠀
         ⠐⠝⠇⠉⠁⠳
@@ -1460,6 +4421,23 @@ class Test(unittest.TestCase):
         m[-1].rightBarline = None
         m[0].notes[3].articulations.append(Fingering('5|4'))
         self.s = bm
+        self.e = '''
+        ---begin segment---
+        <music21.braille.segment BrailleSegment>
+        Measure 1, Signature Grouping 1:
+        Time Signature 2/4 ⠼⠃⠲
+        ===
+        Measure 1, Note Grouping 1:
+        <music21.clef.TrebleClef>
+        Octave 4 ⠐
+        C eighth ⠙
+        E eighth ⠋
+        G eighth ⠓
+        Octave 5 ⠨
+        C eighth ⠙
+        ===
+        ---end segment---
+        '''
         self.b = '''
         ⠀⠀⠼⠃⠲⠀⠀⠀
         ⠐⠙⠋⠓⠨⠙⠅⠂
@@ -1477,6 +4455,23 @@ class Test(unittest.TestCase):
         m[0].notes[2].articulations.append(Fingering('3|2'))
         m[0].notes[3].articulations.append(Fingering('4|3'))
         self.s = bm
+        self.e = '''
+        ---begin segment---
+        <music21.braille.segment BrailleSegment>
+        Measure 1, Signature Grouping 1:
+        Time Signature 6/8 ⠼⠋⠦
+        ===
+        Measure 1, Note Grouping 1:
+        <music21.clef.TrebleClef>
+        Octave 4 ⠐
+        D eighth ⠑
+        C eighth ⠙
+        D eighth ⠑
+        E quarter ⠫
+        Dot ⠄
+        ===
+        ---end segment---
+        '''
         self.b = '''
         ⠀⠀⠀⠀⠀⠼⠋⠦⠀⠀⠀⠀⠀⠀
         ⠐⠑⠃⠇⠙⠁⠃⠑⠃⠇⠫⠄⠇⠂
@@ -1498,10 +4493,6 @@ class Test(unittest.TestCase):
         m[2].notes[0].articulations.append(Fingering('4,3'))
         m[2].notes[1].articulations.append(Fingering('3,2'))
         self.s = bm
-        self.b = '''
-        ⠀⠀⠀⠀⠀⠀⠀⠀⠩⠩⠼⠃⠲⠀⠀⠀⠀⠀⠀⠀⠀⠀
-        ⠐⠻⠃⠁⠪⠁⠃⠀⠨⠱⠠⠂⠻⠂⠅⠀⠻⠂⠇⠫⠇⠃
-        '''
         self.e = '''
         ---begin segment---
         <music21.braille.segment BrailleSegment>
@@ -1526,8 +4517,36 @@ class Test(unittest.TestCase):
         ===
         ---end segment---
         '''
+        self.b = '''
+        ⠀⠀⠀⠀⠀⠀⠀⠀⠩⠩⠼⠃⠲⠀⠀⠀⠀⠀⠀⠀⠀⠀
+        ⠐⠻⠃⠁⠪⠁⠃⠀⠨⠱⠠⠂⠻⠂⠅⠀⠻⠂⠇⠫⠇⠃
+        '''
         self.methodArgs = {'showFirstMeasureNumber': False,
                            'upperFirstInNoteFingering': False}
+        self.e = '''
+        ---begin segment---
+        <music21.braille.segment BrailleSegment>
+        Measure 1, Signature Grouping 1:
+        Key Signature 2 sharp(s) ⠩⠩
+        Time Signature 2/4 ⠼⠃⠲
+        ===
+        Measure 1, Note Grouping 1:
+        <music21.clef.TrebleClef>
+        Octave 4 ⠐
+        F quarter ⠻
+        A quarter ⠪
+        ===
+        Measure 2, Note Grouping 1:
+        Octave 5 ⠨
+        D quarter ⠱
+        F quarter ⠻
+        ===
+        Measure 3, Note Grouping 1:
+        F quarter ⠻
+        E quarter ⠫
+        ===
+        ---end segment---
+        '''
         self.b = '''
         ⠀⠀⠀⠀⠀⠀⠀⠀⠩⠩⠼⠃⠲⠀⠀⠀⠀⠀⠀⠀⠀⠀
         ⠐⠻⠁⠃⠪⠃⠁⠀⠨⠱⠂⠄⠻⠅⠂⠀⠻⠇⠂⠫⠃⠇
@@ -1563,6 +4582,86 @@ class Test(unittest.TestCase):
         bm[7].notes[5].articulations.append(Fingering('2|1'))
         bm[8].notes[0].articulations.append(Fingering('1|2'))
         self.s = bmSave
+        self.e = '''
+        ---begin segment---
+        <music21.braille.segment BrailleSegment>
+        Measure 0, Signature Grouping 1:
+        Key Signature 3 flat(s) ⠣⠣⠣
+        Time Signature 6/8 ⠼⠋⠦
+        ===
+        Measure 0, Tempo Text Grouping 1:
+        Tempo Text Allegretto ⠠⠁⠇⠇⠑⠛⠗⠑⠞⠞⠕⠲
+        ===
+        Measure 0, Note Grouping 1:
+        <music21.clef.TrebleClef>
+        Octave 4 ⠐
+        G eighth ⠓
+        A eighth ⠊
+        ===
+        Measure 1, Note Grouping 1:
+        B quarter ⠺
+        Dot ⠄
+        Tie ⠈⠉
+        B eighth ⠚
+        G eighth ⠓
+        B eighth ⠚
+        ===
+        Measure 2, Note Grouping 1:
+        D quarter ⠱
+        Dot ⠄
+        Tie ⠈⠉
+        D eighth ⠑
+        C eighth ⠙
+        B eighth ⠚
+        ===
+        Measure 3, Note Grouping 1:
+        A quarter ⠪
+        G eighth ⠓
+        E quarter ⠫
+        F eighth ⠛
+        ===
+        Measure 4, Note Grouping 1:
+        G quarter ⠳
+        Dot ⠄
+        Rest eighth ⠭
+        A eighth ⠊
+        B eighth ⠚
+        ===
+        Measure 5, Note Grouping 1:
+        Octave 5 ⠨
+        C quarter ⠹
+        Dot ⠄
+        Tie ⠈⠉
+        C eighth ⠙
+        A eighth ⠊
+        C eighth ⠙
+        ===
+        Measure 6, Note Grouping 1:
+        E quarter ⠫
+        Dot ⠄
+        Tie ⠈⠉
+        E eighth ⠋
+        D eighth ⠑
+        F eighth ⠛
+        ===
+        Measure 7, Note Grouping 1:
+        E eighth ⠋
+        D eighth ⠑
+        C eighth ⠙
+        B eighth ⠚
+        A eighth ⠊
+        F eighth ⠛
+        ===
+        Measure 8, Note Grouping 1:
+        Octave 4 ⠐
+        E quarter ⠫
+        Dot ⠄
+        Tie ⠈⠉
+        E eighth ⠋
+        Barline final ⠣⠅
+        ===
+        ---end segment---
+        '''
         self.b = '''
         ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠠⠁⠇⠇⠑⠛⠗⠑⠞⠞⠕⠲⠀⠣⠣⠣⠼⠋⠦⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
         ⠼⠚⠀⠐⠓⠃⠊⠀⠺⠄⠈⠉⠚⠓⠁⠚⠀⠱⠄⠅⠈⠉⠑⠙⠚⠀⠪⠓⠫⠃⠛⠁⠀⠳⠄⠃⠭⠊⠚
@@ -1615,6 +4714,103 @@ class Test(unittest.TestCase):
         bm[6].notes[6].articulations.append(Fingering('2'))
         bm[7].notes[0].articulations.append(Fingering('1'))
         self.s = bmSave
+        self.e = '''
+        ---begin segment---
+        <music21.braille.segment BrailleSegment>
+        Measure 1, Signature Grouping 1:
+        Time Signature common ⠨⠉
+        ===
+        Measure 1, Tempo Text Grouping 1:
+        Tempo Text Adagio e molto legato ⠠⠁⠙⠁⠛⠊⠕⠀⠑⠀⠍⠕⠇⠞⠕⠀⠇⠑⠛⠁⠞⠕⠲
+        ===
+        Measure 1, Note Grouping 1:
+        <music21.clef.TrebleClef>
+        Octave 4 ⠐
+        A half ⠎
+        Tie ⠈⠉
+        A eighth ⠊
+        G eighth ⠓
+        A eighth ⠊
+        Octave 5 ⠨
+        D eighth ⠑
+        ===
+        Measure 2, Note Grouping 1:
+        C eighth ⠙
+        B eighth ⠚
+        Octave 5 ⠨
+        E eighth ⠋
+        D eighth ⠑
+        C eighth ⠙
+        F eighth ⠛
+        E quarter ⠫
+        Tie ⠈⠉
+        ===
+        Measure 3, Note Grouping 1:
+        Octave 5 ⠨
+        E eighth ⠋
+        F eighth ⠛
+        E eighth ⠋
+        Octave 4 ⠐
+        B eighth ⠚
+        C eighth ⠙
+        D eighth ⠑
+        Octave 4 ⠐
+        A eighth ⠊
+        B eighth ⠚
+        ===
+        Measure 4, Note Grouping 1:
+        C eighth ⠙
+        Octave 4 ⠐
+        G eighth ⠓
+        A half ⠎
+        Tie ⠈⠉
+        A eighth ⠊
+        F eighth ⠛
+        ===
+        Measure 5, Note Grouping 1:
+        Octave 4 ⠐
+        G eighth ⠓
+        Octave 5 ⠨
+        C eighth ⠙
+        B eighth ⠚
+        A eighth ⠊
+        Octave 5 ⠨
+        D eighth ⠑
+        C eighth ⠙
+        B eighth ⠚
+        Octave 5 ⠨
+        E eighth ⠋
+        ===
+        Measure 6, Note Grouping 1:
+        D half ⠕
+        Tie ⠈⠉
+        D eighth ⠑
+        G eighth ⠓
+        F eighth ⠛
+        C eighth ⠙
+        ===
+        Measure 7, Note Grouping 1:
+        Octave 5 ⠨
+        D eighth ⠑
+        E eighth ⠋
+        Octave 4 ⠐
+        B eighth ⠚
+        C eighth ⠙
+        D quarter ⠱
+        Octave 4 ⠐
+        A eighth ⠊
+        G eighth ⠓
+        ===
+        Measure 8, Note Grouping 1:
+        A half ⠎
+        Dot ⠄
+        Tie ⠈⠉
+        A eighth ⠊
+        Rest eighth ⠭
+        Barline final ⠣⠅
+        ===
+        ---end segment---
+        '''
         self.b = '''
         ⠀⠀⠀⠀⠀⠀⠠⠁⠙⠁⠛⠊⠕⠀⠑⠀⠍⠕⠇⠞⠕⠀⠇⠑⠛⠁⠞⠕⠲⠀⠨⠉⠀⠀⠀⠀⠀⠀
         ⠼⠁⠀⠐⠎⠃⠈⠉⠊⠓⠊⠨⠑⠅⠂⠀⠙⠂⠇⠚⠇⠁⠨⠋⠅⠂⠑⠂⠇⠙⠇⠃⠛⠅⠫⠂⠈⠉
@@ -1673,6 +4869,73 @@ class Test(unittest.TestCase):
         # measure 9 fingerings
         bm[8].notes[0].articulations.append(Fingering('1,3'))
         self.s = bmSave
+        self.e = '''
+        ---begin segment---
+        <music21.braille.segment BrailleSegment>
+        Measure 1, Signature Grouping 1:
+        Key Signature 2 sharp(s) ⠩⠩
+        Time Signature 2/4 ⠼⠃⠲
+        ===
+        Measure 1, Tempo Text Grouping 1:
+        Tempo Text Moderato ⠠⠍⠕⠙⠑⠗⠁⠞⠕⠲
+        ===
+        Measure 1, Note Grouping 1:
+        <music21.clef.BassClef>
+        Octave 2 ⠘
+        B quarter ⠺
+        C eighth ⠙
+        D eighth ⠑
+        ===
+        Measure 2, Note Grouping 1:
+        E eighth ⠋
+        F eighth ⠛
+        G eighth ⠓
+        A eighth ⠊
+        ===
+        Measure 3, Note Grouping 1:
+        <music21.clef.TrebleClef>
+        B quarter ⠺
+        C eighth ⠙
+        D eighth ⠑
+        ===
+        Measure 4, Note Grouping 1:
+        Octave 4 ⠐
+        E eighth ⠋
+        F eighth ⠛
+        G eighth ⠓
+        F eighth ⠛
+        ===
+        Measure 5, Note Grouping 1:
+        E quarter ⠫
+        D eighth ⠑
+        C eighth ⠙
+        ===
+        Measure 6, Note Grouping 1:
+        <music21.clef.BassClef>
+        B eighth ⠚
+        A eighth ⠊
+        G eighth ⠓
+        F eighth ⠛
+        ===
+        Measure 7, Note Grouping 1:
+        Octave 3 ⠸
+        E quarter ⠫
+        D eighth ⠑
+        C eighth ⠙
+        ===
+        Measure 8, Note Grouping 1:
+        D eighth ⠑
+        C eighth ⠙
+        B eighth ⠚
+        Accidental sharp ⠩
+        A eighth ⠊
+        ===
+        Measure 9, Note Grouping 1:
+        B half ⠞
+        Barline final ⠣⠅
+        ===
+        ---end segment---
+        '''
         self.b = '''
         ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠠⠍⠕⠙⠑⠗⠁⠞⠕⠲⠀⠩⠩⠼⠃⠲⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
         ⠼⠁⠀⠘⠺⠇⠂⠙⠃⠇⠑⠁⠃⠀⠋⠂⠁⠛⠠⠇⠓⠠⠁⠊⠁⠃⠀⠺⠇⠁⠙⠠⠇⠑⠁⠃
@@ -1733,6 +4996,111 @@ class Test(unittest.TestCase):
         # measure 12 fingerings
         bm[11].notes[0].articulations.append(Fingering('1'))
         self.s = bmSave
+        self.e = '''
+        ---begin segment---
+        <music21.braille.segment BrailleSegment>
+        Measure 1, Signature Grouping 1:
+        Key Signature 1 sharp(s) ⠩
+        Time Signature 5/8 ⠼⠑⠦
+        ===
+        Measure 1, Tempo Text Grouping 1:
+        Tempo Text Not too fast ⠠⠝⠕⠞⠀⠞⠕⠕⠀⠋⠁⠎⠞⠲
+        ===
+        Measure 1, Metronome Mark Grouping 1:
+        Metronome Note C quarter ⠹
+        Metronome symbol ⠶
+        Metronome number 100 ⠼⠁⠚⠚
+        ===
+        Measure 1, Note Grouping 1:
+        <music21.clef.BassClef>
+        Octave 3 ⠸
+        E eighth ⠋
+        Accidental sharp ⠩
+        D eighth ⠑
+        E eighth ⠋
+        F eighth ⠛
+        D eighth ⠑
+        ===
+        Measure 2, Note Grouping 1:
+        B quarter ⠺
+        Octave 3 ⠸
+        E quarter ⠫
+        G eighth ⠓
+        ===
+        Measure 3, Note Grouping 1:
+        G eighth ⠓
+        F eighth ⠛
+        G eighth ⠓
+        A eighth ⠊
+        B eighth ⠚
+        ===
+        Measure 4, Note Grouping 1:
+        B quarter ⠺
+        Octave 2 ⠘
+        B quarter ⠺
+        B eighth ⠚
+        ===
+        Measure 5, Note Grouping 1:
+        Octave 2 ⠘
+        D eighth ⠑
+        G eighth ⠓
+        B eighth ⠚
+        G eighth ⠓
+        B eighth ⠚
+        ===
+        Measure 6, Note Grouping 1:
+        Octave 3 ⠸
+        E quarter ⠫
+        G quarter ⠳
+        F eighth ⠛
+        ===
+        Measure 7, Note Grouping 1:
+        E eighth ⠋
+        Octave 2 ⠘
+        B eighth ⠚
+        Octave 3 ⠸
+        G eighth ⠓
+        E eighth ⠋
+        Octave 2 ⠘
+        B eighth ⠚
+        ===
+        Measure 8, Note Grouping 1:
+        Octave 3 ⠸
+        E quarter ⠫
+        Octave 2 ⠘
+        E quarter ⠫
+        E eighth ⠋
+        ===
+        Measure 9, Note Grouping 1:
+        Octave 2 ⠘
+        E quarter ⠫
+        Rest eighth ⠭
+        E eighth ⠋
+        E eighth ⠋
+        ===
+        Measure 10, Note Grouping 1:
+        D eighth ⠑
+        E eighth ⠋
+        E eighth ⠋
+        E eighth ⠋
+        E eighth ⠋
+        ===
+        Measure 11, Note Grouping 1:
+        E eighth ⠋
+        E eighth ⠋
+        E quarter ⠫
+        E eighth ⠋
+        ===
+        Measure 12, Note Grouping 1:
+        E quarter ⠫
+        Tie ⠈⠉
+        E eighth ⠋
+        Rest eighth ⠭
+        Rest eighth ⠭
+        Barline final ⠣⠅
+        ===
+        ---end segment---
+        '''
         self.b = '''
         ⠀⠀⠀⠀⠀⠀⠀⠠⠝⠕⠞⠀⠞⠕⠕⠀⠋⠁⠎⠞⠲⠀⠹⠶⠼⠁⠚⠚⠀⠩⠼⠑⠦⠀⠀⠀⠀⠀⠀⠀
         ⠼⠁⠀⠸⠋⠩⠑⠃⠋⠛⠃⠑⠀⠺⠸⠫⠇⠓⠀⠓⠃⠛⠇⠓⠊⠚⠃⠀⠺⠁⠘⠺⠅⠚⠁
@@ -1867,6 +5235,77 @@ class Test(unittest.TestCase):
 
         bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
         self.s = bm
+        self.e = '''
+        ---begin segment---
+        <music21.braille.segment BrailleSegment>
+        Measure 1, Signature Grouping 1:
+        Key Signature 4 flat(s) ⠼⠙⠣
+        Time Signature 6/8 ⠼⠋⠦
+        ===
+        Measure 1, Note Grouping 1:
+        <music21.clef.TrebleClef>
+        Octave 4 ⠐
+        F quarter ⠻
+        Octave 5 ⠨
+        C eighth ⠙
+        D eighth ⠑
+        C eighth ⠙
+        B eighth ⠚
+        ===
+        Measure 2, Signature Grouping 1:
+        Time Signature 2/4 ⠼⠃⠲
+        ===
+        Measure 2, Note Grouping 1:
+        Octave 4 ⠐
+        A quarter ⠪
+        G quarter ⠳
+        Barline double ⠣⠅⠄
+        ===
+        Measure 3, Signature Grouping 1:
+        Key Signature -4 naturals ⠡
+        Key Signature 3 flat(s) ⠣⠣⠣
+        Time Signature 6/8 ⠼⠋⠦
+        ===
+        Measure 3, Note Grouping 1:
+        Octave 4 ⠐
+        E eighth ⠋
+        Octave 5 ⠨
+        E eighth ⠋
+        D eighth ⠑
+        E quarter ⠫
+        Octave 4 ⠐
+        G eighth ⠓
+        ===
+        Measure 4, Signature Grouping 1:
+        Time Signature 3/4 ⠼⠉⠲
+        ===
+        Measure 4, Note Grouping 1:
+        Octave 4 ⠐
+        A quarter ⠪
+        G quarter ⠳
+        F quarter ⠻
+        Barline double ⠣⠅⠄
+        ===
+        Measure 5, Signature Grouping 1:
+        Key Signature -3 naturals ⠡⠡⠡
+        Key Signature 0 flat(s)
+        ===
+        Measure 5, Note Grouping 1:
+        Octave 4 ⠐
+        G eighth ⠓
+        F eighth ⠛
+        E eighth ⠋
+        D eighth ⠑
+        C eighth ⠙
+        B eighth ⠚
+        ===
+        Measure 6, Note Grouping 1:
+        C half ⠝
+        Dot ⠄
+        Barline final ⠣⠅
+        ===
+        ---end segment---
+        '''
         self.b = '''
         ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠼⠙⠣⠼⠋⠦⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
         ⠼⠁⠀⠐⠻⠨⠙⠑⠙⠚⠀⠼⠃⠲⠀⠐⠪⠳⠣⠅⠄⠀⠡⠣⠣⠣⠼⠋⠦⠀⠐⠋⠨⠋⠑⠫⠐⠓
@@ -1883,6 +5322,43 @@ class Test(unittest.TestCase):
         if gm2:
             gm2.displayStatus = False
         self.s = bm
+        self.e = '''
+        ---begin segment---
+        <music21.braille.segment BrailleSegment>
+        Measure 1, Signature Grouping 1:
+        Key Signature 1 flat(s) ⠣
+        Time Signature 4/4 ⠼⠙⠲
+        ===
+        Measure 1, Split Note Grouping A 1:
+        <music21.clef.TrebleClef>
+        Octave 4 ⠐
+        E eighth ⠋
+        Accidental sharp ⠩
+        F eighth ⠛
+        Accidental sharp ⠩
+        G eighth ⠓
+        A eighth ⠊
+        music hyphen ⠐
+        ===
+        Measure 1, Split Note Grouping B 1:
+        Octave 4 ⠐
+        B eighth ⠚
+        Accidental natural ⠡
+        G eighth ⠓
+        E eighth ⠋
+        C eighth ⠙
+        ===
+        Measure 2, Note Grouping 1:
+        F eighth ⠛
+        A eighth ⠊
+        G eighth ⠓
+        C eighth ⠙
+        Octave 4 ⠐
+        A half ⠎
+        Barline final ⠣⠅
+        ===
+        ---end segment---
+        '''
         self.b = '''
         ⠀⠀⠀⠀⠀⠀⠀⠣⠼⠙⠲⠀⠀⠀⠀⠀⠀
         ⠼⠁⠀⠄⠄⠄⠄⠄⠀⠐⠋⠩⠛⠩⠓⠊⠐
@@ -1900,6 +5376,46 @@ class Test(unittest.TestCase):
             gm2.displayStatus = False
 
         self.s = bm
+        self.e = '''
+        ---begin segment---
+        <music21.braille.segment BrailleSegment>
+        Measure 1, Signature Grouping 1:
+        Key Signature 1 flat(s) ⠣
+        Time Signature 6/8 ⠼⠋⠦
+        ===
+        Measure 1, Split Note Grouping A 1:
+        <music21.clef.TrebleClef>
+        Octave 4 ⠐
+        E eighth ⠋
+        Accidental sharp ⠩
+        F eighth ⠛
+        Accidental sharp ⠩
+        G eighth ⠓
+        music hyphen ⠐
+        ===
+        Measure 1, Split Note Grouping B 1:
+        Octave 4 ⠐
+        A eighth ⠊
+        B eighth ⠚
+        Accidental natural ⠡
+        G eighth ⠓
+        ===
+        Measure 2, Note Grouping 1:
+        E eighth ⠋
+        C eighth ⠙
+        F eighth ⠛
+        A eighth ⠊
+        G eighth ⠓
+        C eighth ⠙
+        ===
+        Measure 3, Note Grouping 1:
+        Octave 4 ⠐
+        A half ⠎
+        Dot ⠄
+        Barline final ⠣⠅
+        ===
+        ---end segment---
+        '''
         self.b = '''
         ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠣⠼⠋⠦⠀⠀⠀⠀⠀⠀⠀⠀
         ⠼⠁⠀⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠀⠐⠋⠩⠛⠩⠓⠐
@@ -1915,6 +5431,54 @@ class Test(unittest.TestCase):
         m = bm.getElementsByClass(stream.Measure)
         m[1].notesAndRests[3].pitch.accidental.displayStatus = False
         self.s = bm
+        self.e = '''
+        ---begin segment---
+        <music21.braille.segment BrailleSegment>
+        Measure 1, Signature Grouping 1:
+        Key Signature 1 flat(s) ⠣
+        Time Signature 12/8 ⠼⠁⠃⠦
+        ===
+        Measure 1, Note Grouping 1:
+        <music21.clef.TrebleClef>
+        Octave 4 ⠐
+        E half ⠏
+        Dot ⠄
+        Tie ⠈⠉
+        E eighth ⠋
+        Accidental sharp ⠩
+        F eighth ⠛
+        Accidental sharp ⠩
+        G eighth ⠓
+        A eighth ⠊
+        B eighth ⠚
+        Accidental natural ⠡
+        G eighth ⠓
+        ===
+        Measure 2, Split Note Grouping A 1:
+        C eighth ⠙
+        D eighth ⠑
+        E eighth ⠋
+        F quarter ⠻
+        Dot ⠄
+        Tie ⠈⠉
+        F eighth ⠛
+        music hyphen ⠐
+        ===
+        Measure 2, Split Note Grouping B 1:
+        Octave 4 ⠐
+        E eighth ⠋
+        F eighth ⠛
+        G eighth ⠓
+        F eighth ⠛
+        E eighth ⠋
+        ===
+        Measure 3, Note Grouping 1:
+        F half ⠟
+        Dot ⠄
+        Barline final ⠣⠅
+        ===
+        ---end segment---
+        '''
         self.b = '''
         ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠣⠼⠁⠃⠦⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
         ⠼⠁⠀⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠀⠐⠏⠄⠈⠉⠋⠩⠛⠩⠓⠊⠚⠡⠓⠀⠙⠑⠋⠻⠄⠈⠉⠛⠐
@@ -1933,6 +5497,87 @@ class Test(unittest.TestCase):
         m[5].insert(2, key.KeySignature(-4))
         m[5].insert(2, bar.Barline('double'))
         self.s = bm
+        self.e = '''
+        ---begin segment---
+        <music21.braille.segment BrailleSegment>
+        Measure 1, Signature Grouping 1:
+        Key Signature 3 flat(s) ⠣⠣⠣
+        Time Signature 3/4 ⠼⠉⠲
+        ===
+        Measure 1, Note Grouping 1:
+        <music21.clef.TrebleClef>
+        Octave 4 ⠐
+        G quarter ⠳
+        Dot ⠄
+        F eighth ⠛
+        E quarter ⠫
+        ===
+        Measure 2, Note Grouping 1:
+        Octave 3 ⠸
+        B quarter ⠺
+        Octave 4 ⠐
+        B quarter ⠺
+        G quarter ⠳
+        ===
+        Measure 3, Note Grouping 1:
+        F half ⠟
+        Barline double ⠣⠅⠄
+        music hyphen ⠐
+        ===
+        Measure 3, Note Grouping 2:
+        Octave 4 ⠐
+        G quarter ⠳
+        ===
+        Measure 4, Note Grouping 1:
+        Octave 5 ⠨
+        E quarter ⠫
+        Dot ⠄
+        D eighth ⠑
+        C quarter ⠹
+        ===
+        Measure 5, Note Grouping 1:
+        D quarter ⠱
+        Octave 4 ⠐
+        G quarter ⠳
+        Accidental natural ⠡
+        B quarter ⠺
+        ===
+        Measure 6, Note Grouping 1:
+        Octave 5 ⠨
+        D quarter ⠱
+        C quarter ⠹
+        Barline double ⠣⠅⠄
+        music hyphen ⠐
+        ===
+        Measure 6, Signature Grouping 2:
+        Key Signature 4 flat(s) ⠼⠙⠣
+        music hyphen ⠐
+        ===
+        Measure 6, Note Grouping 2:
+        Octave 5 ⠨
+        C quarter ⠹
+        ===
+        Measure 7, Note Grouping 1:
+        A quarter ⠪
+        Dot ⠄
+        G eighth ⠓
+        F quarter ⠻
+        ===
+        Measure 8, Note Grouping 1:
+        C quarter ⠹
+        Octave 5 ⠨
+        C quarter ⠹
+        Accidental natural ⠡
+        Octave 4 ⠐
+        E quarter ⠫
+        ===
+        Measure 9, Note Grouping 1:
+        F half ⠟
+        Dot ⠄
+        Barline final ⠣⠅
+        ===
+        ---end segment---
+        '''
         self.b = '''
         ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠣⠣⠣⠼⠉⠲⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
         ⠼⠁⠀⠐⠳⠄⠛⠫⠀⠸⠺⠐⠺⠳⠀⠟⠣⠅⠄⠐⠀⠐⠳⠀⠨⠫⠄⠑⠹⠀⠱⠐⠳⠡⠺
@@ -1949,6 +5594,73 @@ class Test(unittest.TestCase):
         m = bm.getElementsByClass(stream.Measure)
         m[3].insert(2.0, bar.Barline('double'))
         self.s = bm
+        self.e = '''
+        ---begin segment---
+        <music21.braille.segment BrailleSegment>
+        Measure 1, Signature Grouping 1:
+        Key Signature 3 sharp(s) ⠩⠩⠩
+        Time Signature 4/4 ⠼⠙⠲
+        ===
+        Measure 1, Note Grouping 1:
+        <music21.clef.TrebleClef>
+        Octave 4 ⠐
+        A quarter ⠪
+        Octave 5 ⠨
+        A quarter ⠪
+        Tie ⠈⠉
+        A eighth ⠊
+        G eighth ⠓
+        F eighth ⠛
+        E eighth ⠋
+        ===
+        Measure 2, Note Grouping 1:
+        F quarter ⠻
+        E quarter ⠫
+        Tie ⠈⠉
+        E eighth ⠋
+        D eighth ⠑
+        C eighth ⠙
+        B eighth ⠚
+        ===
+        Measure 3, Note Grouping 1:
+        D quarter ⠱
+        C quarter ⠹
+        Tie ⠈⠉
+        C eighth ⠙
+        B eighth ⠚
+        A eighth ⠊
+        B eighth ⠚
+        ===
+        Measure 4, Note Grouping 1:
+        C half ⠝
+        Barline double ⠣⠅⠄
+        music hyphen ⠐
+        ===
+        Measure 4, Note Grouping 2:
+        Rest eighth ⠭
+        Octave 5 ⠨
+        A eighth ⠊
+        G eighth ⠓
+        F eighth ⠛
+        ===
+        Measure 5, Note Grouping 1:
+        E eighth ⠋
+        D eighth ⠑
+        C eighth ⠙
+        B eighth ⠚
+        A eighth ⠊
+        B eighth ⠚
+        C eighth ⠙
+        B eighth ⠚
+        ===
+        Measure 6, Note Grouping 1:
+        A half ⠎
+        Dot ⠄
+        Rest quarter ⠧
+        Barline final ⠣⠅
+        ===
+        ---end segment---
+        '''
         self.b = '''
         ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠩⠩⠩⠼⠙⠲⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
         ⠼⠁⠀⠐⠪⠨⠪⠈⠉⠊⠓⠛⠋⠀⠻⠫⠈⠉⠋⠑⠙⠚⠀⠱⠹⠈⠉⠙⠚⠊⠚⠀⠝⠣⠅⠄
@@ -1964,11 +5676,71 @@ class Test(unittest.TestCase):
         m = bm.getElementsByClass(stream.Measure)
         m[0].insert(3.0, clef.TrebleClef())
         self.s = bm
+        self.e = '''
+        ---begin segment---
+        <music21.braille.segment BrailleSegment>
+        Measure 1, Signature Grouping 1:
+        Key Signature 2 flat(s) ⠣⠣
+        Time Signature 4/4 ⠼⠙⠲
+        ===
+        Measure 1, Note Grouping 1:
+        <music21.clef.BassClef>
+        Octave 2 ⠘
+        B quarter ⠺
+        Octave 3 ⠸
+        F quarter ⠻
+        B quarter ⠺
+        <music21.clef.TrebleClef>
+        Octave 4 ⠐
+        F quarter ⠻
+        ===
+        Measure 2, Note Grouping 1:
+        B quarter ⠺
+        D quarter ⠱
+        C quarter ⠹
+        A quarter ⠪
+        ===
+        Measure 3, Note Grouping 1:
+        B whole ⠾
+        Barline final ⠣⠅
+        ===
+        ---end segment---
+        '''
         self.b = '''
         ⠀⠀⠀⠀⠀⠀⠀⠣⠣⠼⠙⠲⠀⠀⠀⠀⠀⠀⠀
         ⠼⠁⠀⠘⠺⠸⠻⠺⠐⠻⠀⠺⠱⠹⠪⠀⠾⠣⠅
         '''
         self.methodArgs = {'showClefSigns': True}
+        self.e = '''
+        ---begin segment---
+        <music21.braille.segment BrailleSegment>
+        Measure 1, Signature Grouping 1:
+        Key Signature 2 flat(s) ⠣⠣
+        Time Signature 4/4 ⠼⠙⠲
+        ===
+        Measure 1, Note Grouping 1:
+        Bass Clef ⠜⠼
+        Octave 2 ⠘
+        B quarter ⠺
+        Octave 3 ⠸
+        F quarter ⠻
+        B quarter ⠺
+        Treble Clef ⠜⠌
+        Octave 4 ⠐
+        F quarter ⠻
+        ===
+        Measure 2, Note Grouping 1:
+        B quarter ⠺
+        D quarter ⠱
+        C quarter ⠹
+        A quarter ⠪
+        ===
+        Measure 3, Note Grouping 1:
+        B whole ⠾
+        Barline final ⠣⠅
+        ===
+        ---end segment---
+        '''
         self.b = '''
         ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠣⠣⠼⠙⠲⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
         ⠼⠁⠀⠜⠼⠇⠘⠺⠸⠻⠺⠜⠌⠇⠐⠻⠀⠺⠱⠹⠪⠀⠾⠣⠅
@@ -1984,11 +5756,68 @@ class Test(unittest.TestCase):
         m = bm.getElementsByClass(stream.Measure)
         m[1].insert(0.0, clef.TrebleClef())
         self.s = bm
+        self.e = '''
+        ---begin segment---
+        <music21.braille.segment BrailleSegment>
+        Measure 1, Signature Grouping 1:
+        Key Signature 3 sharp(s) ⠩⠩⠩
+        Time Signature 6/8 ⠼⠋⠦
+        ===
+        Measure 1, Note Grouping 1:
+        <music21.clef.AltoClef>
+        Octave 4 ⠐
+        A eighth ⠊
+        E eighth ⠋
+        A eighth ⠊
+        B eighth ⠚
+        C eighth ⠙
+        D eighth ⠑
+        ===
+        Measure 2, Note Grouping 1:
+        <music21.clef.TrebleClef>
+        E eighth ⠋
+        F eighth ⠛
+        G eighth ⠓
+        A quarter ⠪
+        Dot ⠄
+        Barline final ⠣⠅
+        ===
+        ---end segment---
+        '''
         self.b = '''
         ⠀⠀⠀⠀⠀⠀⠩⠩⠩⠼⠋⠦⠀⠀⠀⠀⠀⠀
         ⠼⠁⠀⠐⠊⠋⠊⠚⠙⠑⠀⠋⠛⠓⠪⠄⠣⠅
         '''
         self.methodArgs = {'showClefSigns': True}
+        self.e = '''
+        ---begin segment---
+        <music21.braille.segment BrailleSegment>
+        Measure 1, Signature Grouping 1:
+        Key Signature 3 sharp(s) ⠩⠩⠩
+        Time Signature 6/8 ⠼⠋⠦
+        ===
+        Measure 1, Note Grouping 1:
+        Alto Clef ⠜⠬
+        Octave 4 ⠐
+        A eighth ⠊
+        E eighth ⠋
+        A eighth ⠊
+        B eighth ⠚
+        C eighth ⠙
+        D eighth ⠑
+        ===
+        Measure 2, Note Grouping 1:
+        Treble Clef ⠜⠌
+        Octave 5 ⠨
+        E eighth ⠋
+        F eighth ⠛
+        G eighth ⠓
+        A quarter ⠪
+        Dot ⠄
+        Barline final ⠣⠅
+        ===
+        ---end segment---
+        '''
         self.b = '''
         ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠩⠩⠩⠼⠋⠦⠀⠀⠀⠀⠀⠀⠀⠀⠀
         ⠼⠁⠀⠜⠬⠇⠐⠊⠋⠊⠚⠙⠑⠀⠜⠌⠇⠨⠋⠛⠓⠪⠄⠣⠅
@@ -2015,14 +5844,6 @@ class Test(unittest.TestCase):
         m[9].rightBarline = bar.Barline('double')
         m[11].rightBarline = bar.Barline('double')
         self.s = bm
-        self.b = '''
-        ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠩⠩⠼⠙⠲⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
-        ⠼⠁⠀⠐⠱⠻⠪⠻⠀⠑⠋⠛⠓⠎⠣⠅⠄⠀⠣⠣⠣⠀⠐⠫⠳⠺⠳⠀⠋⠛⠓⠊⠞⠣⠅⠄⠀⠼⠙⠩
-        ⠀⠀⠐⠫⠳⠺⠳⠀⠋⠛⠓⠊⠞⠣⠅⠄⠀⠣⠀⠐⠻⠪⠹⠪⠀⠛⠓⠊⠚⠝⠣⠅⠄⠀⠼⠋⠣
-        ⠀⠀⠐⠳⠺⠱⠺⠀⠓⠊⠚⠙⠕⠣⠅⠄
-        ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
-        ⠼⠁⠁⠀⠨⠱⠺⠳⠺⠀⠑⠙⠚⠊⠗⠣⠅⠄
-        '''
         self.e = '''
         ---begin segment---
         <music21.braille.segment BrailleSegment>
@@ -2141,6 +5962,14 @@ class Test(unittest.TestCase):
         ===
         ---end segment---
         '''
+        self.b = '''
+        ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠩⠩⠼⠙⠲⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+        ⠼⠁⠀⠐⠱⠻⠪⠻⠀⠑⠋⠛⠓⠎⠣⠅⠄⠀⠣⠣⠣⠀⠐⠫⠳⠺⠳⠀⠋⠛⠓⠊⠞⠣⠅⠄⠀⠼⠙⠩
+        ⠀⠀⠐⠫⠳⠺⠳⠀⠋⠛⠓⠊⠞⠣⠅⠄⠀⠣⠀⠐⠻⠪⠹⠪⠀⠛⠓⠊⠚⠝⠣⠅⠄⠀⠼⠋⠣
+        ⠀⠀⠐⠳⠺⠱⠺⠀⠓⠊⠚⠙⠕⠣⠅⠄
+        ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+        ⠼⠁⠁⠀⠨⠱⠺⠳⠺⠀⠑⠙⠚⠊⠗⠣⠅⠄
+        '''
     # test_drill10_3 -- requires alternate time signature symbols
 
     def test_drill10_4(self):
@@ -2163,12 +5992,6 @@ class Test(unittest.TestCase):
             sm.number -= 1
         self.methodArgs = {'showClefSigns': True}
         self.s = bm
-        self.b = '''
-        ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠠⠉⠕⠝⠀⠃⠗⠊⠕⠲⠀⠣⠨⠉⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
-        ⠼⠚⠀⠜⠼⠇⠘⠪⠀⠱⠧⠐⠕⠈⠉⠀⠑⠛⠋⠑⠩⠹⠪⠀⠞⠈⠉⠚⠑⠠⠄⠡⠠⠄⠙⠚
-        ⠀⠀⠸⠪⠻⠱⠫⠀⠻⠓⠊⠺⠩⠙⠡⠚⠀⠩⠙⠑⠜⠌⠇⠐⠑⠋⠛⠊⠪⠀⠓⠋⠩⠙⠓⠐
-        ⠀⠀⠐⠛⠑⠡⠚⠐⠛⠀⠜⠼⠇⠐⠋⠩⠙⠊⠐⠋⠑⠡⠙⠚⠑⠀⠹⠚⠊⠳⠛⠋⠀⠱⠘⠪⠱⠣⠅
-        '''
         self.e = '''
 ---begin segment---
 <music21.braille.segment BrailleSegment>
@@ -2289,6 +6112,12 @@ Barline final ⠣⠅
 ===
 ---end segment---
         '''
+        self.b = '''
+        ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠠⠉⠕⠝⠀⠃⠗⠊⠕⠲⠀⠣⠨⠉⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+        ⠼⠚⠀⠜⠼⠇⠘⠪⠀⠱⠧⠐⠕⠈⠉⠀⠑⠛⠋⠑⠩⠹⠪⠀⠞⠈⠉⠚⠑⠠⠄⠡⠠⠄⠙⠚
+        ⠀⠀⠸⠪⠻⠱⠫⠀⠻⠓⠊⠺⠩⠙⠡⠚⠀⠩⠙⠑⠜⠌⠇⠐⠑⠋⠛⠊⠪⠀⠓⠋⠩⠙⠓⠐
+        ⠀⠀⠐⠛⠑⠡⠚⠐⠛⠀⠜⠼⠇⠐⠋⠩⠙⠊⠐⠋⠑⠡⠙⠚⠑⠀⠹⠚⠊⠳⠛⠋⠀⠱⠘⠪⠱⠣⠅
+        '''
 
 # ------------------------------------------------------------------------------
 # Chapter 11: Segments for Single-Line Instrumental Music, Format for the
@@ -2303,6 +6132,129 @@ Barline final ⠣⠅
         bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
         bm.measure(9).insert(0, BrailleSegmentDivision())
         self.s = bm
+        self.e = '''
+        ---begin segment---
+        <music21.braille.segment BrailleSegment>
+        Measure 1, Signature Grouping 1:
+        Key Signature 2 sharp(s) ⠩⠩
+        Time Signature 3/4 ⠼⠉⠲
+        ===
+        Measure 1, Note Grouping 1:
+        <music21.clef.BassClef>
+        Octave 3 ⠸
+        D quarter ⠱
+        E eighth ⠋
+        F eighth ⠛
+        G eighth ⠓
+        A eighth ⠊
+        ===
+        Measure 2, Note Grouping 1:
+        B quarter ⠺
+        A quarter ⠪
+        G eighth ⠓
+        F eighth ⠛
+        ===
+        Measure 3, Note Grouping 1:
+        E eighth ⠋
+        D eighth ⠑
+        C eighth ⠙
+        D eighth ⠑
+        E eighth ⠋
+        F eighth ⠛
+        ===
+        Measure 4, Note Grouping 1:
+        G quarter ⠳
+        A quarter ⠪
+        Rest quarter ⠧
+        ===
+        Measure 5, Note Grouping 1:
+        B quarter ⠺
+        C eighth ⠙
+        D eighth ⠑
+        E eighth ⠋
+        F eighth ⠛
+        ===
+        Measure 6, Note Grouping 1:
+        E quarter ⠫
+        D quarter ⠱
+        C eighth ⠙
+        B eighth ⠚
+        ===
+        Measure 7, Note Grouping 1:
+        Octave 4 ⠐
+        C eighth ⠙
+        E eighth ⠋
+        D eighth ⠑
+        C eighth ⠙
+        B eighth ⠚
+        Accidental sharp ⠩
+        A eighth ⠊
+        ===
+        Measure 8, Note Grouping 1:
+        B half ⠞
+        Rest quarter ⠧
+        ===
+        ---end segment---
+        ---begin segment---
+        <music21.braille.segment BrailleSegment>
+        Measure 9, Note Grouping 1:
+        Octave 4 ⠐
+        F quarter ⠻
+        D eighth ⠑
+        C eighth ⠙
+        B quarter ⠺
+        ===
+        Measure 10, Note Grouping 1:
+        Octave 4 ⠐
+        E quarter ⠫
+        C eighth ⠙
+        B eighth ⠚
+        Accidental sharp ⠩
+        A quarter ⠪
+        ===
+        Measure 11, Note Grouping 1:
+        Octave 4 ⠐
+        D quarter ⠱
+        B eighth ⠚
+        Accidental natural ⠡
+        A eighth ⠊
+        Accidental sharp ⠩
+        G quarter ⠳
+        ===
+        Measure 12, Note Grouping 1:
+        A half ⠎
+        Rest quarter ⠧
+        ===
+        Measure 13, Note Grouping 1:
+        A quarter ⠪
+        G eighth ⠓
+        F eighth ⠛
+        E eighth ⠋
+        D eighth ⠑
+        ===
+        Measure 14, Note Grouping 1:
+        C quarter ⠹
+        D quarter ⠱
+        E eighth ⠋
+        F eighth ⠛
+        ===
+        Measure 15, Note Grouping 1:
+        Octave 3 ⠸
+        G eighth ⠓
+        A eighth ⠊
+        B eighth ⠚
+        A eighth ⠊
+        G eighth ⠓
+        F eighth ⠛
+        ===
+        Measure 16, Note Grouping 1:
+        E quarter ⠫
+        D quarter ⠱
+        Rest quarter ⠧
+        Barline final ⠣⠅
+        ===
+        ---end segment---
+        '''
         self.b = '''
         ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠩⠩⠼⠉⠲⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
         ⠼⠁⠀⠸⠱⠋⠛⠓⠊⠀⠺⠪⠓⠛⠀⠋⠑⠙⠑⠋⠛⠀⠳⠪⠧⠀⠺⠙⠑⠋⠛⠀⠫⠱⠙⠚
@@ -2315,13 +6267,6 @@ Barline final ⠣⠅
         # this example was used elsewhere, so needed to be retained.
         bm = example11_2()
         self.s = bm
-        self.b = '''
-        ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠣⠣⠣⠼⠙⠲⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
-        ⠼⠚⠀⠐⠺⠀⠳⠫⠱⠫⠀⠗⠻⠫⠀⠪⠳⠨⠹⠄⠙⠀⠞⠄⠺⠀⠨⠫⠐⠺⠪⠄⠓⠀⠗⠻⠨⠹
-        ⠀⠀⠨⠹⠐⠻⠪⠄⠑⠀⠏⠄⠐
-        ⠼⠓⠄⠀⠐⠳⠀⠳⠄⠛⠻⠻⠀⠎⠳⠺⠀⠺⠡⠪⠪⠹⠀⠞⠄⠺⠀⠨⠫⠐⠺⠪⠳⠀⠗⠻⠨⠹
-        ⠀⠀⠨⠹⠧⠐⠻⠧⠀⠎⠄⠱⠀⠏⠄⠣⠅
-        '''
         self.e = '''
         ---begin segment---
         <music21.braille.segment BrailleSegment>
@@ -2452,6 +6397,13 @@ Barline final ⠣⠅
         ===
         ---end segment---
         '''
+        self.b = '''
+        ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠣⠣⠣⠼⠙⠲⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+        ⠼⠚⠀⠐⠺⠀⠳⠫⠱⠫⠀⠗⠻⠫⠀⠪⠳⠨⠹⠄⠙⠀⠞⠄⠺⠀⠨⠫⠐⠺⠪⠄⠓⠀⠗⠻⠨⠹
+        ⠀⠀⠨⠹⠐⠻⠪⠄⠑⠀⠏⠄⠐
+        ⠼⠓⠄⠀⠐⠳⠀⠳⠄⠛⠻⠻⠀⠎⠳⠺⠀⠺⠡⠪⠪⠹⠀⠞⠄⠺⠀⠨⠫⠐⠺⠪⠳⠀⠗⠻⠨⠹
+        ⠀⠀⠨⠹⠧⠐⠻⠧⠀⠎⠄⠱⠀⠏⠄⠣⠅
+        '''
 
 # ------------------------------------------------------------------------------
 # Chapter 12: Slurs (Phrasing)
@@ -2472,6 +6424,50 @@ Barline final ⠣⠅
         m[3].rightBarline = None
         self.s = bm
         self.methodArgs = {'showFirstMeasureNumber': False}
+        self.e = '''
+        ---begin segment---
+        <music21.braille.segment BrailleSegment>
+        Measure 1, Signature Grouping 1:
+        Time Signature 4/4 ⠼⠙⠲
+        ===
+        Measure 1, Note Grouping 1:
+        <music21.clef.TrebleClef>
+        Octave 4 ⠐
+        G quarter ⠳
+        Dot ⠄
+        Opening single slur ⠉
+        F eighth ⠛
+        E quarter ⠫
+        Opening single slur ⠉
+        D quarter ⠱
+        ===
+        Measure 2, Note Grouping 1:
+        G quarter ⠳
+        Opening single slur ⠉
+        F quarter ⠻
+        Opening single slur ⠉
+        E quarter ⠫
+        Rest quarter ⠧
+        ===
+        Measure 3, Note Grouping 1:
+        F quarter ⠻
+        Opening single slur ⠉
+        G quarter ⠳
+        Opening single slur ⠉
+        A quarter ⠪
+        Opening single slur ⠉
+        B quarter ⠺
+        ===
+        Measure 4, Note Grouping 1:
+        C quarter ⠹
+        Opening single slur ⠉
+        D quarter ⠱
+        Opening single slur ⠉
+        C quarter ⠹
+        Rest quarter ⠧
+        ===
+        ---end segment---
+        '''
         self.b = '''
         ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠼⠙⠲⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
         ⠐⠳⠄⠅⠉⠛⠫⠉⠱⠀⠳⠉⠻⠉⠫⠧⠀⠻⠃⠉⠳⠁⠉⠪⠉⠺⠀⠹⠉⠱⠉⠹⠧
@@ -2490,6 +6486,45 @@ Barline final ⠣⠅
         self.s = bm
         self.methodArgs = {'showFirstMeasureNumber': False,
                            'slurLongPhraseWithBrackets': False}
+        self.e = '''
+        ---begin segment---
+        <music21.braille.segment BrailleSegment>
+        Measure 1, Signature Grouping 1:
+        Time Signature 4/4 ⠼⠙⠲
+        ===
+        Measure 1, Note Grouping 1:
+        <music21.clef.TrebleClef>
+        Octave 4 ⠐
+        G quarter ⠳
+        Dot ⠄
+        Opening double slur ⠉⠉
+        F eighth ⠛
+        E quarter ⠫
+        D quarter ⠱
+        ===
+        Measure 2, Note Grouping 1:
+        G quarter ⠳
+        F quarter ⠻
+        Closing bracket slur ⠉
+        E quarter ⠫
+        Rest quarter ⠧
+        ===
+        Measure 3, Note Grouping 1:
+        F quarter ⠻
+        Opening double slur ⠉⠉
+        G quarter ⠳
+        A quarter ⠪
+        B quarter ⠺
+        ===
+        Measure 4, Note Grouping 1:
+        C quarter ⠹
+        D quarter ⠱
+        Closing bracket slur ⠉
+        C quarter ⠹
+        Rest quarter ⠧
+        ===
+        ---end segment---
+        '''
         self.b = '''
         ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠼⠙⠲⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
         ⠐⠳⠄⠅⠉⠉⠛⠫⠱⠀⠳⠻⠉⠫⠧⠀⠻⠁⠉⠉⠳⠪⠺⠀⠹⠁⠱⠉⠹⠧
@@ -2508,6 +6543,48 @@ Barline final ⠣⠅
         m[3].rightBarline = None
         self.s = bm
         self.methodArgs = {'showFirstMeasureNumber': False}
+        self.e = '''
+        ---begin segment---
+        <music21.braille.segment BrailleSegment>
+        Measure 1, Signature Grouping 1:
+        Time Signature 4/4 ⠼⠙⠲
+        ===
+        Measure 1, Note Grouping 1:
+        <music21.clef.TrebleClef>
+        Opening bracket slur ⠰⠃
+        Accidental flat ⠣
+        Octave 4 ⠐
+        E quarter ⠫
+        Dot ⠄
+        F eighth ⠛
+        G quarter ⠳
+        E quarter ⠫
+        ===
+        Measure 2, Note Grouping 1:
+        F quarter ⠻
+        G quarter ⠳
+        Accidental flat ⠣
+        A quarter ⠪
+        Closing bracket slur ⠘⠆
+        Rest quarter ⠧
+        ===
+        Measure 3, Note Grouping 1:
+        Opening bracket slur ⠰⠃
+        G quarter ⠳
+        G quarter ⠳
+        Accidental flat ⠣
+        Octave 5 ⠨
+        E quarter ⠫
+        D quarter ⠱
+        ===
+        Measure 4, Note Grouping 1:
+        C half ⠝
+        Dot ⠄
+        Closing bracket slur ⠘⠆
+        Rest quarter ⠧
+        ===
+        ---end segment---
+        '''
         self.b = '''
         ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠼⠙⠲⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
         ⠰⠃⠣⠐⠫⠄⠁⠛⠳⠫⠀⠻⠳⠣⠪⠘⠆⠧⠀⠰⠃⠳⠁⠳⠣⠨⠫⠂⠱⠀⠝⠄⠘⠆⠧
@@ -2523,6 +6600,32 @@ Barline final ⠣⠅
         m[0].rightBarline = None
         self.s = bm
         self.methodArgs = {'showFirstMeasureNumber': False}
+        self.e = '''
+        ---begin segment---
+        <music21.braille.segment BrailleSegment>
+        Measure 1, Signature Grouping 1:
+        Time Signature 12/8 ⠼⠁⠃⠦
+        ===
+        Measure 1, Note Grouping 1:
+        <music21.clef.TrebleClef>
+        Opening bracket slur ⠰⠃
+        Octave 5 ⠨
+        E quarter ⠫
+        Dot ⠄
+        Opening single slur ⠉
+        C quarter ⠹
+        Opening single slur ⠉
+        G eighth ⠓
+        G quarter ⠳
+        Dot ⠄
+        Opening single slur ⠉
+        F quarter ⠻
+        Opening single slur ⠉
+        E eighth ⠋
+        Closing bracket slur ⠘⠆
+        ===
+        ---end segment---
+        '''
         self.b = '''
         ⠀⠀⠀⠀⠀⠀⠀⠼⠁⠃⠦⠀⠀⠀⠀⠀⠀
         ⠰⠃⠨⠫⠄⠉⠹⠉⠓⠳⠄⠉⠻⠉⠋⠘⠆
@@ -2539,11 +6642,89 @@ Barline final ⠣⠅
         m[3].rightBarline = None
         self.s = bm
         self.methodArgs = {'showFirstMeasureNumber': False}
+        self.e = '''
+        ---begin segment---
+        <music21.braille.segment BrailleSegment>
+        Measure 1, Signature Grouping 1:
+        Key Signature 2 sharp(s) ⠩⠩
+        Time Signature 3/4 ⠼⠉⠲
+        ===
+        Measure 1, Note Grouping 1:
+        <music21.clef.TrebleClef>
+        Opening bracket slur ⠰⠃
+        Octave 4 ⠐
+        A half ⠎
+        B quarter ⠺
+        ===
+        Measure 2, Note Grouping 1:
+        A eighth ⠊
+        Octave 5 ⠨
+        F eighth ⠛
+        E eighth ⠋
+        D eighth ⠑
+        C eighth ⠙
+        B eighth ⠚
+        ===
+        Measure 3, Note Grouping 1:
+        Opening bracket slur ⠰⠃
+        Closing bracket slur ⠘⠆
+        A quarter ⠪
+        B eighth ⠚
+        C eighth ⠙
+        D eighth ⠑
+        E eighth ⠋
+        ===
+        Measure 4, Note Grouping 1:
+        F half ⠟
+        Dot ⠄
+        Closing bracket slur ⠘⠆
+        ===
+        ---end segment---
+        '''
         self.b = '''
         ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠩⠩⠼⠉⠲⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
         ⠰⠃⠐⠎⠺⠀⠊⠨⠛⠋⠑⠙⠚⠀⠰⠃⠘⠆⠪⠚⠙⠑⠋⠀⠟⠄⠘⠆
         '''
         self.methodArgs = {'showFirstMeasureNumber': False, 'slurLongPhraseWithBrackets': False}
+        self.e = '''
+        ---begin segment---
+        <music21.braille.segment BrailleSegment>
+        Measure 1, Signature Grouping 1:
+        Key Signature 2 sharp(s) ⠩⠩
+        Time Signature 3/4 ⠼⠉⠲
+        ===
+        Measure 1, Note Grouping 1:
+        <music21.clef.TrebleClef>
+        Octave 4 ⠐
+        A half ⠎
+        Opening double slur ⠉⠉
+        B quarter ⠺
+        ===
+        Measure 2, Note Grouping 1:
+        A eighth ⠊
+        Octave 5 ⠨
+        F eighth ⠛
+        E eighth ⠋
+        D eighth ⠑
+        C eighth ⠙
+        B eighth ⠚
+        Closing bracket slur ⠉
+        ===
+        Measure 3, Note Grouping 1:
+        A quarter ⠪
+        Opening double slur ⠉⠉
+        B eighth ⠚
+        C eighth ⠙
+        D eighth ⠑
+        E eighth ⠋
+        Closing bracket slur ⠉
+        ===
+        Measure 4, Note Grouping 1:
+        F half ⠟
+        Dot ⠄
+        ===
+        ---end segment---
+        '''
         self.b = '''
         ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠩⠩⠼⠉⠲⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
         ⠐⠎⠉⠉⠺⠀⠊⠨⠛⠋⠑⠙⠚⠉⠀⠪⠉⠉⠚⠙⠑⠋⠉⠀⠟⠄
@@ -2558,11 +6739,61 @@ Barline final ⠣⠅
         m[1].rightBarline = None
         self.s = bm
         self.methodArgs = {'showFirstMeasureNumber': False, 'showShortSlursAndTiesTogether': False}
+        self.e = '''
+        ---begin segment---
+        <music21.braille.segment BrailleSegment>
+        Measure 1, Signature Grouping 1:
+        Time Signature 3/4 ⠼⠉⠲
+        ===
+        Measure 1, Note Grouping 1:
+        <music21.clef.TrebleClef>
+        Octave 5 ⠨
+        C half ⠝
+        Tie ⠈⠉
+        C eighth ⠙
+        Opening single slur ⠉
+        D eighth ⠑
+        ===
+        Measure 2, Note Grouping 1:
+        D half ⠕
+        Tie ⠈⠉
+        D eighth ⠑
+        Opening single slur ⠉
+        E eighth ⠋
+        ===
+        ---end segment---
+        '''
         self.b = '''
         ⠀⠀⠀⠀⠀⠼⠉⠲⠀⠀⠀⠀⠀⠀
         ⠨⠝⠈⠉⠙⠉⠑⠀⠕⠈⠉⠑⠉⠋
         '''
         self.methodArgs = {'showFirstMeasureNumber': False, 'showShortSlursAndTiesTogether': True}
+        self.e = '''
+        ---begin segment---
+        <music21.braille.segment BrailleSegment>
+        Measure 1, Signature Grouping 1:
+        Time Signature 3/4 ⠼⠉⠲
+        ===
+        Measure 1, Note Grouping 1:
+        <music21.clef.TrebleClef>
+        Octave 5 ⠨
+        C half ⠝
+        Opening single slur ⠉
+        Tie ⠈⠉
+        C eighth ⠙
+        Opening single slur ⠉
+        D eighth ⠑
+        ===
+        Measure 2, Note Grouping 1:
+        D half ⠕
+        Opening single slur ⠉
+        Tie ⠈⠉
+        D eighth ⠑
+        Opening single slur ⠉
+        E eighth ⠋
+        ===
+        ---end segment---
+        '''
         self.b = '''
         ⠀⠀⠀⠀⠀⠀⠼⠉⠲⠀⠀⠀⠀⠀⠀⠀
         ⠨⠝⠉⠈⠉⠙⠉⠑⠀⠕⠉⠈⠉⠑⠉⠋
@@ -2577,11 +6808,63 @@ Barline final ⠣⠅
         m[-1].rightBarline = None
         self.s = bm
         self.methodArgs = {'showFirstMeasureNumber': False}
+        self.e = '''
+        ---begin segment---
+        <music21.braille.segment BrailleSegment>
+        Measure 1, Signature Grouping 1:
+        Key Signature 1 flat(s) ⠣
+        Time Signature 3/4 ⠼⠉⠲
+        ===
+        Measure 1, Note Grouping 1:
+        <music21.clef.TrebleClef>
+        Opening bracket slur ⠰⠃
+        Octave 5 ⠨
+        F half ⠟
+        Dot ⠄
+        Tie ⠈⠉
+        ===
+        Measure 2, Note Grouping 1:
+        F eighth ⠛
+        C eighth ⠙
+        D eighth ⠑
+        C eighth ⠙
+        B eighth ⠚
+        A eighth ⠊
+        Closing bracket slur ⠘⠆
+        ===
+        ---end segment---
+        '''
         self.b = '''
         ⠀⠀⠀⠀⠀⠀⠣⠼⠉⠲⠀⠀⠀⠀⠀⠀
         ⠰⠃⠨⠟⠄⠈⠉⠀⠛⠙⠑⠙⠚⠊⠘⠆
         '''
         self.methodArgs = {'showFirstMeasureNumber': False, 'slurLongPhraseWithBrackets': False}
+        self.e = '''
+        ---begin segment---
+        <music21.braille.segment BrailleSegment>
+        Measure 1, Signature Grouping 1:
+        Key Signature 1 flat(s) ⠣
+        Time Signature 3/4 ⠼⠉⠲
+        ===
+        Measure 1, Note Grouping 1:
+        <music21.clef.TrebleClef>
+        Octave 5 ⠨
+        F half ⠟
+        Dot ⠄
+        Tie ⠈⠉
+        ===
+        Measure 2, Note Grouping 1:
+        F eighth ⠛
+        Opening double slur ⠉⠉
+        C eighth ⠙
+        D eighth ⠑
+        C eighth ⠙
+        B eighth ⠚
+        Closing bracket slur ⠉
+        A eighth ⠊
+        ===
+        ---end segment---
+        '''
         self.b = '''
         ⠀⠀⠀⠀⠀⠀⠣⠼⠉⠲⠀⠀⠀⠀⠀
         ⠨⠟⠄⠈⠉⠀⠛⠉⠉⠙⠑⠙⠚⠉⠊
@@ -2596,11 +6879,63 @@ Barline final ⠣⠅
         ml.rightBarline = None
         self.s = bm
         self.methodArgs = {'showFirstMeasureNumber': False}
+        self.e = '''
+        ---begin segment---
+        <music21.braille.segment BrailleSegment>
+        Measure 1, Signature Grouping 1:
+        Key Signature 1 flat(s) ⠣
+        Time Signature 3/4 ⠼⠉⠲
+        ===
+        Measure 1, Note Grouping 1:
+        <music21.clef.TrebleClef>
+        Octave 5 ⠨
+        F half ⠟
+        Dot ⠄
+        Tie ⠈⠉
+        ===
+        Measure 2, Note Grouping 1:
+        Opening bracket slur ⠰⠃
+        F eighth ⠛
+        C eighth ⠙
+        D eighth ⠑
+        C eighth ⠙
+        B eighth ⠚
+        A eighth ⠊
+        Closing bracket slur ⠘⠆
+        ===
+        ---end segment---
+        '''
         self.b = '''
         ⠀⠀⠀⠀⠀⠀⠣⠼⠉⠲⠀⠀⠀⠀⠀⠀
         ⠨⠟⠄⠈⠉⠀⠰⠃⠛⠙⠑⠙⠚⠊⠘⠆
         '''
         self.methodArgs = {'showFirstMeasureNumber': False, 'slurLongPhraseWithBrackets': False}
+        self.e = '''
+        ---begin segment---
+        <music21.braille.segment BrailleSegment>
+        Measure 1, Signature Grouping 1:
+        Key Signature 1 flat(s) ⠣
+        Time Signature 3/4 ⠼⠉⠲
+        ===
+        Measure 1, Note Grouping 1:
+        <music21.clef.TrebleClef>
+        Octave 5 ⠨
+        F half ⠟
+        Dot ⠄
+        Tie ⠈⠉
+        ===
+        Measure 2, Note Grouping 1:
+        F eighth ⠛
+        Opening double slur ⠉⠉
+        C eighth ⠙
+        D eighth ⠑
+        C eighth ⠙
+        B eighth ⠚
+        Closing bracket slur ⠉
+        A eighth ⠊
+        ===
+        ---end segment---
+        '''
         self.b = '''
         ⠀⠀⠀⠀⠀⠀⠣⠼⠉⠲⠀⠀⠀⠀⠀
         ⠨⠟⠄⠈⠉⠀⠛⠉⠉⠙⠑⠙⠚⠉⠊
@@ -2614,11 +6949,71 @@ Barline final ⠣⠅
         m[-1].rightBarline = None
         self.s = bm
         self.methodArgs = {'showFirstMeasureNumber': False}
+        self.e = '''
+        ---begin segment---
+        <music21.braille.segment BrailleSegment>
+        Measure 1, Signature Grouping 1:
+        Time Signature 3/4 ⠼⠉⠲
+        ===
+        Measure 1, Note Grouping 1:
+        <music21.clef.TrebleClef>
+        Opening bracket slur ⠰⠃
+        Octave 5 ⠨
+        E eighth ⠋
+        F eighth ⠛
+        G eighth ⠓
+        F eighth ⠛
+        E eighth ⠋
+        D eighth ⠑
+        ===
+        Measure 2, Note Grouping 1:
+        C half ⠝
+        Dot ⠄
+        Tie ⠈⠉
+        ===
+        Measure 3, Note Grouping 1:
+        C quarter ⠹
+        Closing bracket slur ⠘⠆
+        Rest quarter ⠧
+        Rest quarter ⠧
+        ===
+        ---end segment---
+        '''
         self.b = '''
         ⠀⠀⠀⠀⠀⠀⠀⠀⠼⠉⠲⠀⠀⠀⠀⠀⠀⠀⠀⠀
         ⠰⠃⠨⠋⠛⠓⠛⠋⠑⠀⠝⠄⠈⠉⠀⠹⠘⠆⠧⠧
         '''
         self.methodArgs = {'showFirstMeasureNumber': False, 'slurLongPhraseWithBrackets': False}
+        self.e = '''
+        ---begin segment---
+        <music21.braille.segment BrailleSegment>
+        Measure 1, Signature Grouping 1:
+        Time Signature 3/4 ⠼⠉⠲
+        ===
+        Measure 1, Note Grouping 1:
+        <music21.clef.TrebleClef>
+        Octave 5 ⠨
+        E eighth ⠋
+        Opening double slur ⠉⠉
+        F eighth ⠛
+        G eighth ⠓
+        F eighth ⠛
+        E eighth ⠋
+        D eighth ⠑
+        Closing bracket slur ⠉
+        ===
+        Measure 2, Note Grouping 1:
+        C half ⠝
+        Dot ⠄
+        Tie ⠈⠉
+        ===
+        Measure 3, Note Grouping 1:
+        C quarter ⠹
+        Rest quarter ⠧
+        Rest quarter ⠧
+        ===
+        ---end segment---
+        '''
         self.b = '''
         ⠀⠀⠀⠀⠀⠀⠀⠀⠼⠉⠲⠀⠀⠀⠀⠀⠀⠀⠀
         ⠨⠋⠉⠉⠛⠓⠛⠋⠑⠉⠀⠝⠄⠈⠉⠀⠹⠧⠧
@@ -2655,6 +7050,25 @@ Barline final ⠣⠅
         m[-1].rightBarline = None
         self.s = bm
         self.methodArgs = {'showFirstMeasureNumber': False}
+        self.e = '''
+        ---begin segment---
+        <music21.braille.segment BrailleSegment>
+        Measure 1, Signature Grouping 1:
+        Time Signature 4/4 ⠼⠙⠲
+        ===
+        Measure 1, Note Grouping 1:
+        <music21.clef.TrebleClef>
+        Octave 4 ⠐
+        C quarter ⠹
+        Opening single slur ⠉
+        C quarter ⠹
+        Opening single slur ⠉
+        C quarter ⠹
+        Opening single slur ⠉
+        C quarter ⠹
+        ===
+        ---end segment---
+        '''
         self.b = '''
         ⠀⠀⠀⠀⠼⠙⠲⠀⠀⠀⠀⠀
         ⠐⠹⠇⠉⠹⠃⠉⠹⠁⠉⠹⠇
@@ -2674,6 +7088,62 @@ Barline final ⠣⠅
         m[3].insert(1.0, dynamics.Dynamic('mf'))
         m[4].insert(1.0, expressions.TextExpression('rit.'))
         self.s = bm
+        self.e = '''
+        ---begin segment---
+        <music21.braille.segment BrailleSegment>
+        Measure 1, Signature Grouping 1:
+        Key Signature 1 flat(s) ⠣
+        Time Signature 3/4 ⠼⠉⠲
+        ===
+        Measure 1, Note Grouping 1:
+        <music21.clef.TrebleClef>
+        Word ⠜
+        Text Expression dolce ⠙⠕⠇⠉⠑
+        Octave 4 ⠐
+        F half ⠟
+        E quarter ⠫
+        ===
+        Measure 2, Note Grouping 1:
+        E quarter ⠫
+        D quarter ⠱
+        Word: ⠜
+        Dynamic p ⠏
+        Octave 4 ⠐
+        C quarter ⠹
+        ===
+        Measure 3, Note Grouping 1:
+        Octave 4 ⠐
+        A quarter ⠪
+        Dot ⠄
+        B eighth ⠚
+        A quarter ⠪
+        ===
+        Measure 4, Note Grouping 1:
+        G quarter ⠳
+        Word: ⠜
+        Dynamic mf ⠍⠋
+        Octave 4 ⠐
+        C eighth ⠙
+        D eighth ⠑
+        E eighth ⠋
+        F eighth ⠛
+        ===
+        Measure 5, Note Grouping 1:
+        Octave 4 ⠐
+        G quarter ⠳
+        Word ⠜
+        Text Expression rit. ⠗⠊⠞⠄
+        Octave 4 ⠐
+        F quarter ⠻
+        E quarter ⠫
+        ===
+        Measure 6, Note Grouping 1:
+        F half ⠟
+        Dot ⠄
+        Barline final ⠣⠅
+        ===
+        ---end segment---
+        '''
         self.b = '''
         ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠣⠼⠉⠲⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
         ⠼⠁⠀⠜⠙⠕⠇⠉⠑⠐⠟⠫⠀⠫⠱⠜⠏⠐⠹⠀⠐⠪⠄⠚⠪⠀⠳⠜⠍⠋⠐⠙⠑⠋⠛
@@ -2699,6 +7169,77 @@ Barline final ⠣⠅
         ml[2].insert(2.0, expressions.TextExpression('morendo'))
         ml[3].insert(4.0, dynamics.Dynamic('ppp'))
         self.s = bm
+        self.e = '''
+        ---begin segment---
+        <music21.braille.segment BrailleSegment>
+        Measure 1, Signature Grouping 1:
+        Key Signature 1 sharp(s) ⠩
+        Time Signature 4/4 ⠼⠙⠲
+        ===
+        Measure 1, Note Grouping 1:
+        <music21.clef.TrebleClef>
+        Word: ⠜
+        Dynamic f ⠋
+        Dot 3 ⠄
+        Accidental sharp ⠩
+        Octave 5 ⠨
+        D quarter ⠱
+        Opening single slur ⠉
+        E eighth ⠋
+        Rest eighth ⠭
+        Word: ⠜
+        Dynamic p ⠏
+        Opening bracket slur ⠰⠃
+        Octave 4 ⠐
+        B quarter ⠺
+        G quarter ⠳
+        ===
+        Measure 2, Note Grouping 1:
+        A quarter ⠪
+        F quarter ⠻
+        G quarter ⠳
+        Closing bracket slur ⠘⠆
+        Word ⠜
+        Text Expression rit. ⠗⠊⠞⠄
+        Accidental natural ⠡
+        Octave 4 ⠐
+        F eighth ⠛
+        Opening single slur ⠉
+        E eighth ⠋
+        ===
+        Measure 3, Note Grouping 1:
+        Octave 4 ⠐
+        D eighth ⠑
+        Opening single slur ⠉
+        E eighth ⠋
+        Opening single slur ⠉
+        Accidental natural ⠡
+        F eighth ⠛
+        Opening single slur ⠉
+        E eighth ⠋
+        Word ⠜
+        Text Expression morendo ⠍⠕⠗⠑⠝⠙⠕
+        Dot 3 ⠄
+        Accidental sharp ⠩
+        Octave 4 ⠐
+        F eighth ⠛
+        Opening single slur ⠉
+        G eighth ⠓
+        F eighth ⠛
+        Opening single slur ⠉
+        Accidental sharp ⠩
+        G eighth ⠓
+        ===
+        Measure 4, Note Grouping 1:
+        Accidental sharp ⠩
+        A whole ⠮
+        Word: ⠜
+        Dynamic ppp ⠏⠏⠏
+        Dot 3 ⠄
+        Barline final ⠣⠅
+        ===
+        ---end segment---
+        '''
         self.b = '''
         ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠩⠼⠙⠲⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
         ⠼⠁⠀⠜⠋⠄⠩⠨⠱⠉⠋⠭⠜⠏⠰⠃⠐⠺⠳⠀⠪⠻⠳⠘⠆⠜⠗⠊⠞⠄⠡⠐⠛⠉⠋
@@ -2732,6 +7273,30 @@ Barline final ⠣⠅
         ml[-1].rightBarline = None
         self.methodArgs = {'showFirstMeasureNumber': False}
         self.s = bm
+        self.e = '''
+        ---begin segment---
+        <music21.braille.segment BrailleSegment>
+        Measure 1, Signature Grouping 1:
+        Time Signature 4/4 ⠼⠙⠲
+        ===
+        Measure 1, Note Grouping 1:
+        <music21.clef.TrebleClef>
+        Word ⠜
+        Text Expression rush! ⠗⠥⠎⠓⠖
+        Word: ⠜
+        Dynamic f ⠋
+        Octave 4 ⠐
+        G eighth ⠓
+        A eighth ⠊
+        B eighth ⠚
+        C eighth ⠙
+        D eighth ⠑
+        E eighth ⠋
+        F eighth ⠛
+        G eighth ⠓
+        ===
+        ---end segment---
+        '''
         self.b = '''
         ⠀⠀⠀⠀⠀⠀⠀⠼⠙⠲⠀⠀⠀⠀⠀⠀⠀
         ⠜⠗⠥⠎⠓⠖⠜⠋⠐⠓⠊⠚⠙⠑⠋⠛⠓
@@ -2746,6 +7311,26 @@ Barline final ⠣⠅
         ml[-1].rightBarline = None
         self.methodArgs = {'showFirstMeasureNumber': False}
         self.s = bm
+        self.e = '''
+        ---begin segment---
+        <music21.braille.segment BrailleSegment>
+        Measure 1, Signature Grouping 1:
+        Time Signature 4/4 ⠼⠙⠲
+        ===
+        Measure 1, Note Grouping 1:
+        <music21.clef.TrebleClef>
+        Word ⠜
+        Text Expression (marc.) ⠶⠍⠁⠗⠉⠄⠶
+        Word: ⠜
+        Dynamic f ⠋
+        Octave 4 ⠐
+        C quarter ⠹
+        C quarter ⠹
+        E quarter ⠫
+        C quarter ⠹
+        ===
+        ---end segment---
+        '''
         self.b = '''
         ⠀⠀⠀⠀⠀⠀⠼⠙⠲⠀⠀⠀⠀⠀⠀
         ⠜⠶⠍⠁⠗⠉⠄⠶⠜⠋⠐⠹⠹⠫⠹
@@ -2774,6 +7359,46 @@ Barline final ⠣⠅
         ml[-1].rightBarline = None
         self.methodArgs = {'showFirstMeasureNumber': False}
         self.s = bm
+        self.e = '''
+        ---begin segment---
+        <music21.braille.segment BrailleSegment>
+        Measure 1, Signature Grouping 1:
+        Key Signature 2 sharp(s) ⠩⠩
+        Time Signature 3/4 ⠼⠉⠲
+        ===
+        Measure 1, Note Grouping 1:
+        <music21.clef.TrebleClef>
+        Octave 5 ⠨
+        E quarter ⠫
+        E quarter ⠫
+        F quarter ⠻
+        ===
+        Measure 2, Note Grouping 1:
+        G half ⠗
+        Dot ⠄
+        ===
+        Measure 3, Long Text Expression Grouping 1:
+        Word ⠜
+        Text Expression dim. e rall. ⠙⠊⠍⠄⠀⠑⠀⠗⠁⠇⠇⠄
+        Word ⠜
+        ===
+        Measure 3, Note Grouping 1:
+        Octave 5 ⠨
+        F eighth ⠛
+        D eighth ⠑
+        Octave 4 ⠐
+        A eighth ⠊
+        Octave 5 ⠨
+        D eighth ⠑
+        E eighth ⠋
+        C eighth ⠙
+        ===
+        Measure 4, Note Grouping 1:
+        D half ⠕
+        Dot ⠄
+        ===
+        ---end segment---
+        '''
         self.b = '''
         ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠩⠩⠼⠉⠲⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
         ⠨⠫⠫⠻⠀⠗⠄⠀⠜⠙⠊⠍⠄⠀⠑⠀⠗⠁⠇⠇⠄⠜⠀⠨⠛⠑⠐⠊⠨⠑⠋⠙⠀⠕⠄
@@ -2788,6 +7413,50 @@ Barline final ⠣⠅
         ml[-1].rightBarline = None
         self.methodArgs = {'showFirstMeasureNumber': False}
         self.s = bm
+        self.e = '''
+        ---begin segment---
+        <music21.braille.segment BrailleSegment>
+        Measure 1, Signature Grouping 1:
+        Key Signature 2 flat(s) ⠣⠣
+        Time Signature 2/4 ⠼⠃⠲
+        ===
+        Measure 1, Note Grouping 1:
+        <music21.clef.TrebleClef>
+        Octave 5 ⠨
+        D eighth ⠑
+        C eighth ⠙
+        B eighth ⠚
+        A eighth ⠊
+        ===
+        Measure 2, Note Grouping 1:
+        G half ⠗
+        ===
+        Measure 3, Long Text Expression Grouping 1:
+        Word ⠜
+        Text Expression calm, serene ⠉⠁⠇⠍⠂⠀⠎⠑⠗⠑⠝⠑
+        Word ⠜
+        ===
+        Measure 3, Note Grouping 1:
+        Octave 4 ⠐
+        B quarter ⠺
+        Dot ⠄
+        A eighth ⠊
+        ===
+        Measure 4, Note Grouping 1:
+        G quarter ⠳
+        Dot ⠄
+        B eighth ⠚
+        ===
+        Measure 5, Note Grouping 1:
+        A quarter ⠪
+        Dot ⠄
+        G eighth ⠓
+        ===
+        Measure 6, Note Grouping 1:
+        F half ⠟
+        ===
+        ---end segment---
+        '''
         self.b = '''
         ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠣⠣⠼⠃⠲⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
         ⠨⠑⠙⠚⠊⠀⠗⠀⠜⠉⠁⠇⠍⠂⠀⠎⠑⠗⠑⠝⠑⠜⠀⠐⠺⠄⠊⠀⠳⠄⠚⠀⠪⠄⠓⠀⠟
@@ -2803,6 +7472,50 @@ Barline final ⠣⠅
         ml[-1].rightBarline = None
         self.methodArgs = {'showFirstMeasureNumber': False}
         self.s = bm
+        self.e = '''
+        ---begin segment---
+        <music21.braille.segment BrailleSegment>
+        Measure 1, Signature Grouping 1:
+        Key Signature 2 flat(s) ⠣⠣
+        Time Signature 2/4 ⠼⠃⠲
+        ===
+        Measure 1, Note Grouping 1:
+        <music21.clef.TrebleClef>
+        Octave 5 ⠨
+        D eighth ⠑
+        C eighth ⠙
+        B eighth ⠚
+        A eighth ⠊
+        ===
+        Measure 2, Note Grouping 1:
+        G half ⠗
+        ===
+        Measure 3, Long Text Expression Grouping 1:
+        Word ⠜
+        Text Expression Sehr ruhig ⠎⠑⠓⠗⠀⠗⠥⠓⠊⠛
+        Word ⠜
+        ===
+        Measure 3, Note Grouping 1:
+        Octave 4 ⠐
+        B quarter ⠺
+        Dot ⠄
+        A eighth ⠊
+        ===
+        Measure 4, Note Grouping 1:
+        G quarter ⠳
+        Dot ⠄
+        B eighth ⠚
+        ===
+        Measure 5, Note Grouping 1:
+        A quarter ⠪
+        Dot ⠄
+        G eighth ⠓
+        ===
+        Measure 6, Note Grouping 1:
+        F half ⠟
+        ===
+        ---end segment---
+        '''
         self.b = '''
         ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠣⠣⠼⠃⠲⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
         ⠨⠑⠙⠚⠊⠀⠗⠀⠜⠎⠑⠓⠗⠀⠗⠥⠓⠊⠛⠜⠀⠐⠺⠄⠊⠀⠳⠄⠚⠀⠪⠄⠓⠀⠟
@@ -2817,6 +7530,47 @@ Barline final ⠣⠅
         ml[-1].rightBarline = None
         self.methodArgs = {'showFirstMeasureNumber': False}
         self.s = bm
+        self.e = '''
+        ---begin segment---
+        <music21.braille.segment BrailleSegment>
+        Measure 1, Signature Grouping 1:
+        Time Signature 3/4 ⠼⠉⠲
+        ===
+        Measure 1, Note Grouping 1:
+        <music21.clef.TrebleClef>
+        Octave 4 ⠐
+        G quarter ⠳
+        Rest quarter ⠧
+        music hyphen ⠐
+        ===
+        Measure 1, Long Text Expression Grouping 2:
+        Word ⠜
+        Text Expression rit. e dim. ⠗⠊⠞⠄⠀⠑⠀⠙⠊⠍⠄
+        Word ⠜
+        music hyphen ⠐
+        ===
+        Measure 1, Note Grouping 2:
+        Opening bracket slur ⠰⠃
+        Octave 5 ⠨
+        G quarter ⠳
+        ===
+        Measure 2, Note Grouping 1:
+        G quarter ⠳
+        E quarter ⠫
+        C quarter ⠹
+        ===
+        Measure 3, Note Grouping 1:
+        F quarter ⠻
+        D quarter ⠱
+        B quarter ⠺
+        ===
+        Measure 4, Note Grouping 1:
+        C half ⠝
+        Dot ⠄
+        Closing bracket slur ⠘⠆
+        ===
+        ---end segment---
+        '''
         self.b = '''
         ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠼⠉⠲⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
         ⠐⠳⠧⠐⠀⠜⠗⠊⠞⠄⠀⠑⠀⠙⠊⠍⠄⠜⠀⠰⠃⠨⠳⠀⠳⠫⠹⠀⠻⠱⠺⠀⠝⠄⠘⠆
@@ -2832,11 +7586,6 @@ Barline final ⠣⠅
         ml[1].insert(2.0, expressions.TextExpression('slowing'))
         ml[-1].rightBarline = None
         self.s = bm
-        self.b = '''
-        ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠣⠼⠉⠲⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
-        ⠼⠁⠀⠘⠻⠐⠀⠜⠎⠏⠑⠑⠙⠊⠝⠛⠀⠥⠏⠜⠀⠘⠓⠊⠚⠙⠀⠱⠚⠙⠐
-        ⠀⠀⠜⠎⠇⠕⠺⠊⠝⠛⠸⠑⠋⠀⠻⠋⠑⠹
-        '''
         self.e = '''
         ---begin segment---
         <music21.braille.segment BrailleSegment>
@@ -2884,6 +7633,11 @@ Barline final ⠣⠅
         ===
         ---end segment---
         '''
+        self.b = '''
+        ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠣⠼⠉⠲⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+        ⠼⠁⠀⠘⠻⠐⠀⠜⠎⠏⠑⠑⠙⠊⠝⠛⠀⠥⠏⠜⠀⠘⠓⠊⠚⠙⠀⠱⠚⠙⠐
+        ⠀⠀⠜⠎⠇⠕⠺⠊⠝⠛⠸⠑⠋⠀⠻⠋⠑⠹
+        '''
 
     def xtest_example13_19(self):
         bm = converter.parse("tinynotation: 3/4 c'8 d' c' b- a g a2.").flatten()
@@ -2916,6 +7670,87 @@ Barline final ⠣⠅
         ml[4].insert(0.0, tempo.TempoText('Presto'))
         ml[-1].rightBarline = None
         self.s = bm
+        self.e = '''
+        ---begin segment---
+        <music21.braille.segment BrailleSegment>
+        Measure 45, Signature Grouping 1:
+        Key Signature 2 sharp(s) ⠩⠩
+        Time Signature 4/4 ⠼⠙⠲
+        ===
+        Measure 45, Note Grouping 1:
+        <music21.clef.TrebleClef>
+        Opening bracket slur ⠰⠃
+        Octave 4 ⠐
+        E half ⠏
+        F quarter ⠻
+        G quarter ⠳
+        ===
+        Measure 46, Note Grouping 1:
+        A half ⠎
+        Word ⠜
+        Text Expression rall. ⠗⠁⠇⠇⠄
+        Octave 4 ⠐
+        B quarter ⠺
+        A quarter ⠪
+        ===
+        Measure 47, Note Grouping 1:
+        G half ⠗
+        F quarter ⠻
+        E quarter ⠫
+        ===
+        Measure 48, Note Grouping 1:
+        D half ⠕
+        Dot ⠄
+        Closing bracket slur ⠘⠆
+        Rest quarter ⠧
+        Barline double ⠣⠅⠄
+        ===
+        Measure 49, Signature Grouping 1:
+        Key Signature 2 flat(s) ⠣⠣
+        ===
+        Measure 49, Tempo Text Grouping 1:
+        Tempo Text Presto ⠠⠏⠗⠑⠎⠞⠕⠲
+        ===
+        Measure 49, Note Grouping 1:
+        Word ⠜
+        Text Expression ff ⠋⠋
+        Octave 4 ⠐
+        B quarter ⠺
+        D eighth ⠑
+        F eighth ⠛
+        B quarter ⠺
+        F eighth ⠛
+        D eighth ⠑
+        ===
+        Measure 50, Note Grouping 1:
+        B quarter ⠺
+        Octave 5 ⠨
+        E eighth ⠋
+        G eighth ⠓
+        B quarter ⠺
+        G eighth ⠓
+        E eighth ⠋
+        ===
+        Measure 51, Note Grouping 1:
+        Octave 4 ⠐
+        B quarter ⠺
+        Octave 5 ⠨
+        E eighth ⠋
+        F eighth ⠛
+        A quarter ⠪
+        F eighth ⠛
+        E eighth ⠋
+        ===
+        Measure 52, Note Grouping 1:
+        Octave 4 ⠐
+        B quarter ⠺
+        D eighth ⠑
+        F eighth ⠛
+        B quarter ⠺
+        Rest quarter ⠧
+        ===
+        ---end segment---
+        '''
         self.b = '''
         ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠩⠩⠼⠙⠲⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
         ⠼⠙⠑⠀⠰⠃⠐⠏⠻⠳⠀⠎⠜⠗⠁⠇⠇⠄⠐⠺⠪⠀⠗⠻⠫⠀⠕⠄⠘⠆⠧⠣⠅⠄⠀⠡⠡⠣⠣
@@ -2937,6 +7772,33 @@ Barline final ⠣⠅
         bm.getElementsByClass(stream.Measure)[-1].rightBarline = None
         self.methodArgs = {'showFirstMeasureNumber': False}
         self.s = bm
+        self.e = '''
+        ---begin segment---
+        <music21.braille.segment BrailleSegment>
+        Measure 1, Signature Grouping 1:
+        Key Signature 1 flat(s) ⠣
+        Time Signature 4/4 ⠼⠙⠲
+        ===
+        Measure 1, Note Grouping 1:
+        <music21.clef.TrebleClef>
+        Articulation accent ⠨⠦
+        Octave 4 ⠐
+        F eighth ⠛
+        A eighth ⠊
+        Articulation accent ⠨⠦
+        C eighth ⠙
+        A eighth ⠊
+        Articulation accent ⠨⠦
+        G eighth ⠓
+        Octave 5 ⠨
+        C eighth ⠙
+        Articulation accent ⠨⠦
+        Octave 4 ⠐
+        E eighth ⠋
+        G eighth ⠓
+        ===
+        ---end segment---
+        '''
         self.b = '''
         ⠀⠀⠀⠀⠀⠀⠀⠀⠣⠼⠙⠲⠀⠀⠀⠀⠀⠀⠀
         ⠨⠦⠐⠛⠊⠨⠦⠙⠊⠨⠦⠓⠨⠙⠨⠦⠐⠋⠓
@@ -2961,6 +7823,49 @@ Barline final ⠣⠅
         ml[-1].rightBarline = None
         self.methodArgs = {'showFirstMeasureNumber': False, 'slurLongPhraseWithBrackets': True}
         self.s = bm
+        self.e = '''
+        ---begin segment---
+        <music21.braille.segment BrailleSegment>
+        Measure 1, Signature Grouping 1:
+        Time Signature 3/4 ⠼⠉⠲
+        ===
+        Measure 1, Note Grouping 1:
+        <music21.clef.TrebleClef>
+        Opening bracket slur ⠰⠃
+        Octave 5 ⠨
+        E half ⠏
+        Dot ⠄
+        ===
+        Measure 2, Note Grouping 1:
+        D quarter ⠱
+        F quarter ⠻
+        Octave 4 ⠐
+        B quarter ⠺
+        ===
+        Measure 3, Note Grouping 1:
+        C quarter ⠹
+        Closing bracket slur ⠘⠆
+        Articulation tenuto ⠸⠦
+        Articulation tenuto ⠸⠦
+        Octave 4 ⠐
+        E quarter ⠫
+        G quarter ⠳
+        ===
+        Measure 4, Note Grouping 1:
+        Octave 5 ⠨
+        C quarter ⠹
+        D quarter ⠱
+        Articulation tenuto ⠸⠦
+        Accidental sharp ⠩
+        D quarter ⠱
+        ===
+        Measure 5, Note Grouping 1:
+        Articulation accent ⠨⠦
+        E half ⠏
+        Dot ⠄
+        ===
+        ---end segment---
+        '''
         self.b = '''
         ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠼⠉⠲⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
         ⠰⠃⠨⠏⠄⠀⠱⠻⠐⠺⠀⠹⠘⠆⠸⠦⠸⠦⠐⠫⠳⠀⠨⠹⠱⠸⠦⠩⠱⠀⠨⠦⠏⠄
@@ -2989,6 +7894,62 @@ Barline final ⠣⠅
         m3.notes[1].articulations.append(articulations.Tenuto())
         mLast.rightBarline = None
         self.s = bm
+        self.e = '''
+        ---begin segment---
+        <music21.braille.segment BrailleSegment>
+        Measure 1, Signature Grouping 1:
+        Key Signature 3 flat(s) ⠣⠣⠣
+        Time Signature 4/4 ⠼⠙⠲
+        ===
+        Measure 1, Note Grouping 1:
+        <music21.clef.TrebleClef>
+        Opening bracket slur ⠰⠃
+        Articulation accent ⠨⠦
+        Octave 5 ⠨
+        D eighth ⠑
+        E eighth ⠋
+        C eighth ⠙
+        D eighth ⠑
+        B eighth ⠚
+        A eighth ⠊
+        G eighth ⠓
+        F eighth ⠛
+        Closing bracket slur ⠘⠆
+        ===
+        Measure 2, Note Grouping 1:
+        Articulation staccato ⠦
+        G quarter ⠳
+        Articulation staccato ⠦
+        E quarter ⠫
+        Articulation tenuto ⠸⠦
+        E half ⠏
+        ===
+        Measure 3, Note Grouping 1:
+        E quarter ⠫
+        Opening single slur ⠉
+        Articulation staccato ⠦
+        E eighth ⠋
+        Rest eighth ⠭
+        G quarter ⠳
+        Opening single slur ⠉
+        Articulation staccato ⠦
+        G eighth ⠓
+        Rest eighth ⠭
+        ===
+        Measure 4, Note Grouping 1:
+        Articulation tenuto ⠸⠦
+        Octave 4 ⠐
+        F quarter ⠻
+        Opening single slur ⠉
+        Articulation tenuto ⠸⠦
+        F quarter ⠻
+        E quarter ⠫
+        Tie ⠈⠉
+        E eighth ⠋
+        Rest eighth ⠭
+        ===
+        ---end segment---
+        '''
         self.b = '''
         ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠣⠣⠣⠼⠙⠲⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
         ⠼⠁⠀⠰⠃⠨⠦⠨⠑⠋⠙⠑⠚⠊⠓⠛⠘⠆⠀⠦⠳⠦⠫⠸⠦⠏⠀⠫⠉⠦⠋⠭⠳⠉⠦⠓⠭
@@ -3011,6 +7972,37 @@ Barline final ⠣⠅
         bm.getElementsByClass(stream.Measure)[-1].rightBarline = None
         self.methodArgs = {'showFirstMeasureNumber': False}
         self.s = bm
+        self.e = '''
+        ---begin segment---
+        <music21.braille.segment BrailleSegment>
+        Measure 1, Signature Grouping 1:
+        Key Signature 1 flat(s) ⠣
+        Time Signature cut ⠸⠉
+        ===
+        Measure 1, Note Grouping 1:
+        <music21.clef.BassClef>
+        Articulation staccato ⠦
+        Articulation staccato ⠦
+        Octave 3 ⠸
+        D eighth ⠑
+        Rest eighth ⠭
+        F eighth ⠛
+        Rest eighth ⠭
+        A eighth ⠊
+        Rest eighth ⠭
+        Articulation staccato ⠦
+        Octave 4 ⠐
+        D eighth ⠑
+        Rest eighth ⠭
+        ===
+        Measure 2, Note Grouping 1:
+        Articulation accent ⠨⠦
+        B half ⠞
+        A quarter ⠪
+        Rest quarter ⠧
+        ===
+        ---end segment---
+        '''
         self.b = '''
         ⠀⠀⠀⠀⠀⠀⠀⠀⠣⠸⠉⠀⠀⠀⠀⠀⠀⠀⠀
         ⠦⠦⠸⠑⠭⠛⠭⠊⠭⠦⠐⠑⠭⠀⠨⠦⠞⠪⠧
@@ -3028,10 +8020,6 @@ Barline final ⠣⠅
         bm.getElementsByClass(stream.Measure)[-1].rightBarline = None
         self.methodArgs = {'showFirstMeasureNumber': False}
         self.s = bm
-        self.b = '''
-        ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠼⠉⠲⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
-        ⠸⠻⠦⠦⠑⠛⠙⠋⠀⠨⠦⠨⠦⠘⠚⠊⠚⠙⠨⠦⠱⠀⠑⠦⠋⠸⠦⠻⠧
-        '''
         self.e = '''
         ---begin segment---
         <music21.braille.segment BrailleSegment>
@@ -3070,6 +8058,10 @@ Barline final ⠣⠅
         ===
         ---end segment---
         '''
+        self.b = '''
+        ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠼⠉⠲⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+        ⠸⠻⠦⠦⠑⠛⠙⠋⠀⠨⠦⠨⠦⠘⠚⠊⠚⠙⠨⠦⠱⠀⠑⠦⠋⠸⠦⠻⠧
+        '''
 
     def test_example14_7(self):
         bm = converter.parse('tinynotation: 3/4 C4 E F').flatten()
@@ -3080,6 +8072,27 @@ Barline final ⠣⠅
         bm.getElementsByClass(stream.Measure).first().rightBarline = None
         self.methodArgs = {'showFirstMeasureNumber': False}
         self.s = bm
+        self.e = '''
+        ---begin segment---
+        <music21.braille.segment BrailleSegment>
+        Measure 1, Signature Grouping 1:
+        Time Signature 3/4 ⠼⠉⠲
+        ===
+        Measure 1, Note Grouping 1:
+        <music21.clef.BassClef>
+        Articulation staccato ⠦
+        Articulation accent ⠨⠦
+        Octave 3 ⠸
+        C quarter ⠹
+        Articulation staccato ⠦
+        Articulation accent ⠨⠦
+        E quarter ⠫
+        Articulation staccato ⠦
+        Articulation accent ⠨⠦
+        F quarter ⠻
+        ===
+        ---end segment---
+        '''
         self.b = '''
         ⠀⠀⠀⠀⠀⠼⠉⠲⠀⠀⠀⠀⠀
         ⠦⠨⠦⠸⠹⠦⠨⠦⠫⠦⠨⠦⠻
@@ -3095,6 +8108,27 @@ Barline final ⠣⠅
         bm.getElementsByClass(stream.Measure).first().rightBarline = None
         self.methodArgs = {'showFirstMeasureNumber': False}
         self.s = bm
+        self.e = '''
+        ---begin segment---
+        <music21.braille.segment BrailleSegment>
+        Measure 1, Signature Grouping 1:
+        Time Signature 3/4 ⠼⠉⠲
+        ===
+        Measure 1, Note Grouping 1:
+        <music21.clef.BassClef>
+        Articulation accent ⠨⠦
+        Articulation tenuto ⠸⠦
+        Octave 3 ⠸
+        G quarter ⠳
+        Articulation accent ⠨⠦
+        Articulation tenuto ⠸⠦
+        B quarter ⠺
+        Articulation accent ⠨⠦
+        Articulation tenuto ⠸⠦
+        C quarter ⠹
+        ===
+        ---end segment---
+        '''
         self.b = '''
         ⠀⠀⠀⠀⠀⠀⠼⠉⠲⠀⠀⠀⠀⠀⠀⠀
         ⠨⠦⠸⠦⠸⠳⠨⠦⠸⠦⠺⠨⠦⠸⠦⠹
@@ -3109,6 +8143,29 @@ Barline final ⠣⠅
         bm.measure(2).rightBarline = None
         self.methodArgs = {'showFirstMeasureNumber': False}
         self.s = bm
+        self.e = '''
+        ---begin segment---
+        <music21.braille.segment BrailleSegment>
+        Measure 1, Signature Grouping 1:
+        Time Signature 3/4 ⠼⠉⠲
+        ===
+        Measure 1, Note Grouping 1:
+        <music21.clef.BassClef>
+        Octave 3 ⠸
+        G quarter ⠳
+        Note-fermata: Shape normal: ⠣⠇
+        Tie ⠈⠉
+        G eighth ⠓
+        F eighth ⠛
+        D eighth ⠑
+        B eighth ⠚
+        ===
+        Measure 2, Note Grouping 1:
+        C half ⠝
+        Dot ⠄
+        ===
+        ---end segment---
+        '''
         self.b = '''
         ⠀⠀⠀⠀⠀⠀⠼⠉⠲⠀⠀⠀⠀⠀⠀
         ⠸⠳⠃⠣⠇⠈⠉⠓⠛⠁⠑⠚⠀⠝⠄
@@ -3128,6 +8185,42 @@ Barline final ⠣⠅
         bm.measure(3).rightBarline = None
         self.methodArgs = {'showFirstMeasureNumber': False}
         self.s = bm
+        self.e = '''
+        ---begin segment---
+        <music21.braille.segment BrailleSegment>
+        Measure 1, Signature Grouping 1:
+        Key Signature 1 flat(s) ⠣
+        Time Signature 4/4 ⠼⠙⠲
+        ===
+        Measure 1, Note Grouping 1:
+        <music21.clef.TrebleClef>
+        Octave 5 ⠨
+        D eighth ⠑
+        F eighth ⠛
+        F quarter ⠻
+        E eighth ⠋
+        C eighth ⠙
+        Rest quarter ⠧
+        Note-fermata: Shape normal: ⠣⠇
+        ===
+        Measure 2, Note Grouping 1:
+        D half ⠕
+        Rest quarter ⠧
+        Note-fermata: Shape normal: ⠣⠇
+        Opening bracket slur ⠰⠃
+        D eighth ⠑
+        F eighth ⠛
+        ===
+        Measure 3, Note Grouping 1:
+        E eighth ⠋
+        C eighth ⠙
+        D half ⠕
+        Closing bracket slur ⠘⠆
+        Rest quarter ⠧
+        Note-fermata: Shape normal: ⠣⠇
+        ===
+        ---end segment---
+        '''
         self.b = '''
         ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠣⠼⠙⠲⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
         ⠨⠑⠛⠻⠋⠙⠧⠣⠇⠀⠕⠧⠣⠇⠰⠃⠑⠛⠀⠋⠙⠕⠘⠆⠧⠣⠇
@@ -3148,6 +8241,72 @@ Barline final ⠣⠅
             m.number -= 1
         bm.getElementsByClass(stream.Measure).last().rightBarline = None
         self.s = bm
+        self.e = '''
+        ---begin segment---
+        <music21.braille.segment BrailleSegment>
+        Measure 0, Signature Grouping 1:
+        Key Signature 1 sharp(s) ⠩
+        Time Signature 2/4 ⠼⠃⠲
+        ===
+        Measure 0, Note Grouping 1:
+        <music21.clef.TrebleClef>
+        Octave 4 ⠐
+        D eighth ⠑
+        ===
+        Measure 1, Note Grouping 1:
+        G eighth ⠓
+        Dot ⠄
+        F 16th ⠿
+        G eighth ⠓
+        B eighth ⠚
+        ===
+        Measure 2, Note Grouping 1:
+        A eighth ⠊
+        Dot ⠄
+        G 16th ⠷
+        A eighth ⠊
+        B eighth ⠚
+        ===
+        Measure 3, Note Grouping 1:
+        G eighth ⠓
+        Dot ⠄
+        G 16th ⠷
+        B eighth ⠚
+        D eighth ⠑
+        ===
+        Measure 4, Note Grouping 1:
+        E quarter ⠫
+        Dot ⠄
+        E eighth ⠋
+        ===
+        Measure 5, Note Grouping 1:
+        D eighth ⠑
+        Dot ⠄
+        B 16th ⠾
+        B eighth ⠚
+        G eighth ⠓
+        ===
+        Measure 6, Note Grouping 1:
+        A eighth ⠊
+        Dot ⠄
+        G 16th ⠷
+        A eighth ⠊
+        B eighth ⠚
+        ===
+        Measure 7, Note Grouping 1:
+        Octave 4 ⠐
+        G eighth ⠓
+        Dot ⠄
+        E 16th ⠯
+        E eighth ⠋
+        D eighth ⠑
+        ===
+        Measure 8, Note Grouping 1:
+        G quarter ⠳
+        Dot ⠄
+        ===
+        ---end segment---
+        '''
         self.b = '''
         ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠩⠼⠃⠲⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
         ⠼⠚⠀⠐⠑⠀⠓⠄⠿⠓⠚⠀⠊⠄⠷⠊⠚⠀⠓⠄⠷⠚⠑⠀⠫⠄⠋⠀⠑⠄⠾⠚⠓⠀⠊⠄⠷⠊⠚
@@ -3163,6 +8322,45 @@ Barline final ⠣⠅
         bm.getElementsByClass(stream.Measure)[-1].rightBarline = None
         self.methodArgs = {'showFirstMeasureNumber': False}
         self.s = bm
+        self.e = '''
+        ---begin segment---
+        <music21.braille.segment BrailleSegment>
+        Measure 1, Signature Grouping 1:
+        Key Signature 1 sharp(s) ⠩
+        Time Signature 2/4 ⠼⠃⠲
+        ===
+        Measure 1, Note Grouping 1:
+        <music21.clef.TrebleClef>
+        Octave 5 ⠨
+        D eighth ⠑
+        Rest 16th ⠍
+        E 16th ⠯
+        D eighth ⠑
+        Rest 16th ⠍
+        Accidental sharp ⠩
+        C 16th ⠽
+        ===
+        Measure 2, Note Grouping 1:
+        D quarter ⠱
+        B eighth ⠚
+        Rest eighth ⠭
+        ===
+        Measure 3, Note Grouping 1:
+        B eighth ⠚
+        Rest 16th ⠍
+        C 16th ⠽
+        B eighth ⠚
+        Rest 16th ⠍
+        Accidental sharp ⠩
+        A 16th ⠮
+        ===
+        Measure 4, Note Grouping 1:
+        B quarter ⠺
+        G eighth ⠓
+        Rest eighth ⠭
+        ===
+        ---end segment---
+        '''
         self.b = '''
         ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠩⠼⠃⠲⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
         ⠨⠑⠍⠯⠑⠍⠩⠽⠀⠱⠚⠭⠀⠚⠍⠽⠚⠍⠩⠮⠀⠺⠓⠭
@@ -3175,6 +8373,60 @@ Barline final ⠣⠅
         bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
         bm.getElementsByClass(stream.Measure)[-1].rightBarline = None
         self.s = bm
+        self.e = '''
+        ---begin segment---
+        <music21.braille.segment BrailleSegment>
+        Measure 1, Signature Grouping 1:
+        Time Signature 6/8 ⠼⠋⠦
+        ===
+        Measure 1, Note Grouping 1:
+        <music21.clef.TrebleClef>
+        Octave 4 ⠐
+        E eighth ⠋
+        Dot ⠄
+        F 16th ⠿
+        E eighth ⠋
+        G quarter ⠳
+        G eighth ⠓
+        ===
+        Measure 2, Note Grouping 1:
+        D eighth ⠑
+        Dot ⠄
+        E 16th ⠯
+        D eighth ⠑
+        F quarter ⠻
+        F eighth ⠛
+        ===
+        Measure 3, Note Grouping 1:
+        C quarter ⠹
+        D eighth ⠑
+        E quarter ⠫
+        F eighth ⠛
+        ===
+        Measure 4, Note Grouping 1:
+        E quarter ⠫
+        D eighth ⠑
+        D quarter ⠱
+        E eighth ⠋
+        ===
+        Measure 5, Note Grouping 1:
+        E quarter ⠫
+        F eighth ⠛
+        G quarter ⠳
+        A 16th ⠮
+        B 32nd ⠞
+        C 32nd ⠝
+        ===
+        Measure 6, Note Grouping 1:
+        Octave 4 ⠐
+        C quarter ⠹
+        E 16th ⠯
+        D 16th ⠵
+        C quarter ⠹
+        Rest 16th ⠍
+        ===
+        ---end segment---
+        '''
         self.b = '''
         ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠼⠋⠦⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
         ⠼⠁⠀⠐⠋⠄⠿⠋⠳⠓⠀⠑⠄⠯⠑⠻⠛⠀⠹⠑⠫⠛⠀⠫⠑⠱⠋⠀⠫⠛⠳⠮⠞⠝
@@ -3189,6 +8441,50 @@ Barline final ⠣⠅
         bm.getElementsByClass(stream.Measure)[-1].rightBarline = None
         self.methodArgs = {'showFirstMeasureNumber': False}
         self.s = bm
+        self.e = '''
+        ---begin segment---
+        <music21.braille.segment BrailleSegment>
+        Measure 1, Signature Grouping 1:
+        Time Signature 3/4 ⠼⠉⠲
+        ===
+        Measure 1, Note Grouping 1:
+        <music21.clef.TrebleClef>
+        Octave 5 ⠨
+        E quarter ⠫
+        Tie ⠈⠉
+        E eighth ⠋
+        Dot ⠄
+        F 16th ⠿
+        D eighth ⠑
+        Dot ⠄
+        E 16th ⠯
+        ===
+        Measure 2, Note Grouping 1:
+        C quarter ⠹
+        Octave 6 ⠰
+        C quarter ⠹
+        C quarter ⠹
+        ===
+        Measure 3, Note Grouping 1:
+        Accidental sharp ⠩
+        Octave 5 ⠨
+        G 16th ⠷
+        A 16th ⠮
+        Rest eighth ⠭
+        E 16th ⠯
+        F 16th ⠿
+        Rest eighth ⠭
+        D 16th ⠵
+        B 16th ⠾
+        Rest eighth ⠭
+        ===
+        Measure 4, Note Grouping 1:
+        C quarter ⠹
+        Rest quarter ⠧
+        Rest quarter ⠧
+        ===
+        ---end segment---
+        '''
         self.b = '''
         ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠼⠉⠲⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
         ⠨⠫⠈⠉⠋⠄⠿⠑⠄⠯⠀⠹⠰⠹⠹⠀⠩⠨⠷⠮⠭⠯⠿⠭⠵⠾⠭⠀⠹⠧⠧
@@ -3208,6 +8504,73 @@ Barline final ⠣⠅
             m.number -= 1
         bm.getElementsByClass(stream.Measure).last().rightBarline = bar.Barline('double')
         self.s = bm
+        self.e = '''
+        ---begin segment---
+        <music21.braille.segment BrailleSegment>
+        Measure 0, Signature Grouping 1:
+        Key Signature 3 sharp(s) ⠩⠩⠩
+        Time Signature 3/8 ⠼⠉⠦
+        ===
+        Measure 0, Note Grouping 1:
+        <music21.clef.TrebleClef>
+        Octave 4 ⠐
+        E 16th ⠯
+        Dot ⠄
+        B 32nd ⠞
+        ===
+        Measure 1, Note Grouping 1:
+        B eighth ⠚
+        A eighth ⠊
+        B eighth ⠚
+        ===
+        Measure 2, Note Grouping 1:
+        Accidental sharp ⠩
+        B eighth ⠚
+        C 16th ⠽
+        Rest 16th ⠍
+        Octave 4 ⠐
+        E 16th ⠯
+        Dot ⠄
+        Octave 5 ⠨
+        C 32nd ⠝
+        ===
+        Measure 3, Note Grouping 1:
+        C eighth ⠙
+        B eighth ⠚
+        C eighth ⠙
+        ===
+        Measure 4, Note Grouping 1:
+        C eighth ⠙
+        D 16th ⠵
+        Rest 16th ⠍
+        D eighth ⠑
+        ===
+        Measure 5, Note Grouping 1:
+        D quarter ⠱
+        E 16th ⠯
+        F 16th ⠿
+        ===
+        Measure 6, Note Grouping 1:
+        F 16th ⠿
+        Octave 4 ⠐
+        B eighth ⠚
+        Dot ⠄
+        C eighth ⠙
+        ===
+        Measure 7, Note Grouping 1:
+        Octave 5 ⠨
+        E eighth ⠋
+        Dot ⠄
+        D 16th ⠵
+        C 16th ⠽
+        B 16th ⠾
+        ===
+        Measure 8, Note Grouping 1:
+        A quarter ⠪
+        Barline double ⠣⠅⠄
+        ===
+        ---end segment---
+        '''
         self.b = '''
         ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠩⠩⠩⠼⠉⠦⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
         ⠼⠚⠀⠐⠯⠄⠞⠀⠚⠊⠚⠀⠩⠚⠽⠍⠐⠯⠄⠨⠝⠀⠙⠚⠙⠀⠙⠵⠍⠑⠀⠱⠯⠿⠀⠿⠐⠚⠄⠙
@@ -3221,6 +8584,34 @@ Barline final ⠣⠅
         bm.getElementsByClass(stream.Measure)[-1].rightBarline = None
         self.methodArgs = {'showFirstMeasureNumber': False}
         self.s = bm
+        self.e = '''
+        ---begin segment---
+        <music21.braille.segment BrailleSegment>
+        Measure 1, Signature Grouping 1:
+        Time Signature 4/4 ⠼⠙⠲
+        ===
+        Measure 1, Note Grouping 1:
+        <music21.clef.TrebleClef>
+        Octave 4 ⠐
+        C 16th ⠽
+        B beam ⠚
+        C beam ⠙
+        D beam ⠑
+        E 16th ⠯
+        D beam ⠑
+        E beam ⠋
+        F beam ⠛
+        G 16th ⠷
+        G beam ⠓
+        A beam ⠊
+        B beam ⠚
+        C 16th ⠽
+        D beam ⠑
+        E beam ⠋
+        E beam ⠋
+        ===
+        ---end segment---
+        '''
         self.b = '''
         ⠀⠀⠀⠀⠀⠀⠀⠼⠙⠲⠀⠀⠀⠀⠀⠀⠀
         ⠐⠽⠚⠙⠑⠯⠑⠋⠛⠷⠓⠊⠚⠽⠑⠋⠋
@@ -3235,6 +8626,34 @@ Barline final ⠣⠅
         bm.getElementsByClass(stream.Measure)[-1].rightBarline = None
         self.methodArgs = {'showFirstMeasureNumber': False}
         self.s = bm
+        self.e = '''
+        ---begin segment---
+        <music21.braille.segment BrailleSegment>
+        Measure 1, Signature Grouping 1:
+        Time Signature 4/4 ⠼⠙⠲
+        ===
+        Measure 1, Note Grouping 1:
+        <music21.clef.TrebleClef>
+        Octave 4 ⠐
+        C 16th ⠽
+        B 16th ⠾
+        C 16th ⠽
+        D 16th ⠵
+        E 16th ⠯
+        D 16th ⠵
+        E 16th ⠯
+        F 16th ⠿
+        G 16th ⠷
+        G 16th ⠷
+        A 16th ⠮
+        B 16th ⠾
+        C 16th ⠽
+        D 16th ⠵
+        E 16th ⠯
+        E 16th ⠯
+        ===
+        ---end segment---
+        '''
         self.b = '''
         ⠀⠀⠀⠀⠀⠀⠀⠼⠙⠲⠀⠀⠀⠀⠀⠀⠀
         ⠐⠽⠾⠽⠵⠯⠵⠯⠿⠷⠷⠮⠾⠽⠵⠯⠯
@@ -3246,6 +8665,33 @@ Barline final ⠣⠅
         bm.getElementsByClass(stream.Measure)[-1].rightBarline = None
         self.methodArgs = {'showFirstMeasureNumber': False}
         self.s = bm
+        self.e = '''
+        ---begin segment---
+        <music21.braille.segment BrailleSegment>
+        Measure 1, Signature Grouping 1:
+        Time Signature 2/4 ⠼⠃⠲
+        ===
+        Measure 1, Note Grouping 1:
+        <music21.clef.TrebleClef>
+        Octave 4 ⠐
+        G 16th ⠷
+        Octave 5 ⠨
+        D beam ⠑
+        C beam ⠙
+        B beam ⠚
+        C quarter ⠹
+        ===
+        Measure 2, Note Grouping 1:
+        Octave 4 ⠐
+        G 16th ⠷
+        Dot ⠄
+        F 32nd ⠟
+        E 16th ⠯
+        D 16th ⠵
+        E quarter ⠫
+        ===
+        ---end segment---
+        '''
         self.b = '''
         ⠀⠀⠀⠀⠀⠀⠼⠃⠲⠀⠀⠀⠀⠀⠀
         ⠐⠷⠨⠑⠙⠚⠹⠀⠐⠷⠄⠟⠯⠵⠫
@@ -3257,6 +8703,34 @@ Barline final ⠣⠅
         bm.getElementsByClass(stream.Measure)[-1].rightBarline = None
         self.methodArgs = {'showFirstMeasureNumber': False}
         self.s = bm
+        self.e = '''
+        ---begin segment---
+        <music21.braille.segment BrailleSegment>
+        Measure 1, Signature Grouping 1:
+        Time Signature 2/4 ⠼⠃⠲
+        ===
+        Measure 1, Note Grouping 1:
+        <music21.clef.BassClef>
+        Octave 3 ⠸
+        G 16th ⠷
+        E beam ⠋
+        F beam ⠛
+        E beam ⠋
+        G 16th ⠷
+        F 16th ⠿
+        Rest eighth ⠭
+        ===
+        Measure 2, Note Grouping 1:
+        F 16th ⠿
+        D beam ⠑
+        E beam ⠋
+        D beam ⠑
+        F 16th ⠿
+        E 16th ⠯
+        Rest eighth ⠭
+        ===
+        ---end segment---
+        '''
         self.b = '''
         ⠀⠀⠀⠀⠀⠀⠼⠃⠲⠀⠀⠀⠀⠀⠀⠀
         ⠸⠷⠋⠛⠋⠷⠿⠭⠀⠿⠑⠋⠑⠿⠯⠭
@@ -3271,6 +8745,51 @@ Barline final ⠣⠅
         bm.getElementsByClass(stream.Measure)[-1].rightBarline = None
         self.methodArgs = {'showFirstMeasureNumber': False}
         self.s = bm
+        self.e = '''
+        ---begin segment---
+        <music21.braille.segment BrailleSegment>
+        Measure 1, Signature Grouping 1:
+        Key Signature 1 sharp(s) ⠩
+        Time Signature 2/4 ⠼⠃⠲
+        ===
+        Measure 1, Note Grouping 1:
+        <music21.clef.TrebleClef>
+        Rest 16th ⠍
+        Octave 5 ⠨
+        D beam ⠑
+        C beam ⠙
+        B beam ⠚
+        C 16th ⠽
+        D beam ⠑
+        E beam ⠋
+        C beam ⠙
+        ===
+        Measure 2, Note Grouping 1:
+        B 16th ⠾
+        C beam ⠙
+        B beam ⠚
+        A beam ⠊
+        G 16th ⠷
+        F 16th ⠿
+        G 16th ⠷
+        Rest 16th ⠍
+        ===
+        Measure 3, Note Grouping 1:
+        Octave 5 ⠨
+        G 16th ⠷
+        F beam ⠛
+        E beam ⠋
+        D beam ⠑
+        C 16th ⠽
+        Rest 16th ⠍
+        B 16th ⠾
+        A 16th ⠮
+        ===
+        Measure 4, Note Grouping 1:
+        G half ⠗
+        ===
+        ---end segment---
+        '''
         self.b = '''
         ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠩⠼⠃⠲⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
         ⠍⠨⠑⠙⠚⠽⠑⠋⠙⠀⠾⠙⠚⠊⠷⠿⠷⠍⠀⠨⠷⠛⠋⠑⠽⠍⠾⠮⠀⠗
@@ -3304,6 +8823,74 @@ Barline final ⠣⠅
         lastMeasure.notes[7].pitch.accidental = pitch.Accidental('natural')
         lastMeasure.notes[11].pitch.accidental = pitch.Accidental('natural')
         self.s = bm
+        self.e = '''
+        ---begin segment---
+        <music21.braille.segment BrailleSegment>
+        Measure 0, Signature Grouping 1:
+        Time Signature 12/8 ⠼⠁⠃⠦
+        ===
+        Measure 0, Note Grouping 1:
+        <music21.clef.TrebleClef>
+        Accidental flat ⠣
+        Octave 4 ⠐
+        B eighth ⠚
+        ===
+        Measure 1, Split Note Grouping A 1:
+        Accidental flat ⠣
+        E 16th ⠯
+        Accidental flat ⠣
+        Octave 5 ⠨
+        E beam ⠋
+        Accidental flat ⠣
+        Octave 4 ⠐
+        G beam ⠓
+        Accidental flat ⠣
+        Octave 5 ⠨
+        G beam ⠓
+        Accidental flat ⠣
+        Octave 4 ⠐
+        B beam ⠚
+        Accidental flat ⠣
+        Octave 5 ⠨
+        B beam ⠚
+        Accidental natural ⠡
+        Octave 4 ⠐
+        B 16th ⠾
+        Accidental natural ⠡
+        Octave 5 ⠨
+        B 16th ⠾
+        Accidental flat ⠣
+        Octave 4 ⠐
+        B 16th ⠾
+        Accidental flat ⠣
+        Octave 5 ⠨
+        B 16th ⠾
+        music hyphen ⠐
+        ===
+        Measure 1, Split Note Grouping B 1:
+        Accidental natural ⠡
+        Octave 4 ⠐
+        B 16th ⠾
+        Accidental natural ⠡
+        Octave 5 ⠨
+        B 16th ⠾
+        Accidental flat ⠣
+        Octave 4 ⠐
+        B 16th ⠾
+        Accidental flat ⠣
+        Octave 5 ⠨
+        B beam ⠚
+        Accidental flat ⠣
+        A beam ⠊
+        F beam ⠛
+        D beam ⠑
+        B beam ⠚
+        Octave 5 ⠨
+        E quarter ⠫
+        Dot ⠄
+        ===
+        ---end segment---
+        '''
         self.b = '''
         ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠼⠁⠃⠦⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
         ⠼⠚⠀⠣⠐⠚⠀⠣⠯⠣⠨⠋⠣⠐⠓⠣⠨⠓⠣⠐⠚⠣⠨⠚⠡⠐⠾⠡⠨⠾⠣⠐⠾⠣⠨⠾⠐
@@ -3324,6 +8911,33 @@ Barline final ⠣⠅
             m.notes.first().articulations.append(articulations.Accent())
         self.methodArgs = {'showFirstMeasureNumber': False}
         self.s = bm
+        self.e = '''
+        ---begin segment---
+        <music21.braille.segment BrailleSegment>
+        Measure 1, Signature Grouping 1:
+        Time Signature 2/4 ⠼⠃⠲
+        ===
+        Measure 1, Note Grouping 1:
+        <music21.clef.TrebleClef>
+        Triplet ⠆
+        Articulation accent ⠨⠦
+        Octave 4 ⠐
+        C eighth ⠙
+        E eighth ⠋
+        A eighth ⠊
+        G quarter ⠳
+        ===
+        Measure 2, Note Grouping 1:
+        Triplet ⠆
+        Articulation accent ⠨⠦
+        Octave 3 ⠸
+        B eighth ⠚
+        D eighth ⠑
+        A eighth ⠊
+        G quarter ⠳
+        ===
+        ---end segment---
+        '''
         self.b = '''
         ⠀⠀⠀⠀⠀⠀⠀⠼⠃⠲⠀⠀⠀⠀⠀⠀⠀
         ⠆⠨⠦⠐⠙⠋⠊⠳⠀⠆⠨⠦⠸⠚⠑⠊⠳
@@ -3338,6 +8952,43 @@ Barline final ⠣⠅
         bm.getElementsByClass(stream.Measure)[-1].rightBarline = None
         self.methodArgs = {'showFirstMeasureNumber': False}
         self.s = bm
+        self.e = '''
+        ---begin segment---
+        <music21.braille.segment BrailleSegment>
+        Measure 1, Signature Grouping 1:
+        Key Signature 2 flat(s) ⠣⠣
+        Time Signature 3/4 ⠼⠉⠲
+        ===
+        Measure 1, Note Grouping 1:
+        <music21.clef.TrebleClef>
+        Octave 4 ⠐
+        B quarter ⠺
+        Tie ⠈⠉
+        Triplet ⠆
+        B eighth ⠚
+        C eighth ⠙
+        Octave 4 ⠐
+        F eighth ⠛
+        Triplet ⠆
+        B eighth ⠚
+        D eighth ⠑
+        Octave 4 ⠐
+        F eighth ⠛
+        ===
+        Measure 2, Note Grouping 1:
+        B quarter ⠺
+        Tie ⠈⠉
+        Triplet ⠆
+        B eighth ⠚
+        C eighth ⠙
+        D eighth ⠑
+        Triplet ⠆
+        D eighth ⠑
+        C eighth ⠙
+        B eighth ⠚
+        ===
+        ---end segment---
+        '''
         self.b = '''
         ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠣⠣⠼⠉⠲⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
         ⠐⠺⠈⠉⠆⠚⠙⠐⠛⠆⠚⠑⠐⠛⠀⠺⠈⠉⠆⠚⠙⠑⠆⠑⠙⠚
@@ -3356,6 +9007,38 @@ Barline final ⠣⠅
         bm.getElementsByClass(stream.Measure)[-1].rightBarline = None
         self.methodArgs = {'showFirstMeasureNumber': False}
         self.s = bm
+        self.e = '''
+        ---begin segment---
+        <music21.braille.segment BrailleSegment>
+        Measure 1, Signature Grouping 1:
+        Key Signature 4 flat(s) ⠼⠙⠣
+        Time Signature 4/4 ⠼⠙⠲
+        ===
+        Measure 1, Note Grouping 1:
+        <music21.clef.TrebleClef>
+        Word ⠜
+        Text Expression legato ⠇⠑⠛⠁⠞⠕
+        Word: ⠜
+        Dynamic p ⠏
+        Opening bracket slur ⠰⠃
+        Triplet ⠆
+        Octave 5 ⠨
+        C eighth ⠙
+        B eighth ⠚
+        A eighth ⠊
+        Triplet ⠆
+        A eighth ⠊
+        B eighth ⠚
+        C eighth ⠙
+        Triplet ⠆
+        B eighth ⠚
+        C eighth ⠙
+        B eighth ⠚
+        E quarter ⠫
+        Closing bracket slur ⠘⠆
+        ===
+        ---end segment---
+        '''
         self.b = '''
         ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠼⠙⠣⠼⠙⠲⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
         ⠜⠇⠑⠛⠁⠞⠕⠜⠏⠰⠃⠆⠨⠙⠚⠊⠆⠊⠚⠙⠆⠚⠙⠚⠫⠘⠆
@@ -3381,6 +9064,49 @@ Barline final ⠣⠅
         bm.getElementsByClass(stream.Measure)[-1].rightBarline = None
         self.methodArgs = {'showFirstMeasureNumber': False}
         self.s = bm
+        self.e = '''
+        ---begin segment---
+        <music21.braille.segment BrailleSegment>
+        Measure 1, Signature Grouping 1:
+        Key Signature 2 sharp(s) ⠩⠩
+        Time Signature 6/8 ⠼⠋⠦
+        ===
+        Measure 1, Note Grouping 1:
+        <music21.clef.TrebleClef>
+        Octave 4 ⠐
+        F quarter ⠻
+        A eighth ⠊
+        Octave 5 ⠨
+        D eighth ⠑
+        C eighth ⠙
+        B eighth ⠚
+        ===
+        Measure 2, Note Grouping 1:
+        Tuplet of 4/3rds ⠸⠲⠄
+        A eighth ⠊
+        G eighth ⠓
+        F eighth ⠛
+        A eighth ⠊
+        Tuplet of 4/3rds ⠸⠲⠄
+        G eighth ⠓
+        F eighth ⠛
+        E eighth ⠋
+        G eighth ⠓
+        ===
+        Measure 3, Note Grouping 1:
+        F eighth ⠛
+        G eighth ⠓
+        B eighth ⠚
+        A eighth ⠊
+        F eighth ⠛
+        E eighth ⠋
+        ===
+        Measure 4, Note Grouping 1:
+        D half ⠕
+        Dot ⠄
+        ===
+        ---end segment---
+        '''
         self.b = '''
         ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠩⠩⠼⠋⠦⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
         ⠐⠻⠊⠨⠑⠙⠚⠀⠸⠲⠄⠊⠓⠛⠊⠸⠲⠄⠓⠛⠋⠓⠀⠛⠓⠚⠊⠛⠋⠀⠕⠄
@@ -3395,6 +9121,33 @@ Barline final ⠣⠅
         bm.getElementsByClass(stream.Measure)[-1].rightBarline = None
         self.methodArgs = {'showFirstMeasureNumber': False}
         self.s = bm
+        self.e = '''
+        ---begin segment---
+        <music21.braille.segment BrailleSegment>
+        Measure 1, Signature Grouping 1:
+        Time Signature 4/4 ⠼⠙⠲
+        ===
+        Measure 1, Note Grouping 1:
+        <music21.clef.TrebleClef>
+        Octave 4 ⠐
+        C quarter ⠹
+        E quarter ⠫
+        A quarter ⠪
+        G quarter ⠳
+        ** Grouping x 2 **
+        ===
+        Measure 3, Note Grouping 1:
+        Octave 3 ⠸
+        B quarter ⠺
+        D quarter ⠱
+        A quarter ⠪
+        G quarter ⠳
+        ===
+        Measure 4, Note Grouping 1:
+        G whole ⠷
+        ===
+        ---end segment---
+        '''
         self.b = '''
         ⠀⠀⠀⠀⠀⠀⠼⠙⠲⠀⠀⠀⠀⠀⠀
         ⠐⠹⠫⠪⠳⠀⠶⠀⠸⠺⠱⠪⠳⠀⠷
@@ -3414,6 +9167,34 @@ Barline final ⠣⠅
         m1.notes[2].articulations.append(articulations.Accent())
         self.methodArgs = {'showFirstMeasureNumber': False}
         self.s = bm
+        self.e = '''
+        ---begin segment---
+        <music21.braille.segment BrailleSegment>
+        Measure 1, Signature Grouping 1:
+        Time Signature 4/4 ⠼⠙⠲
+        ===
+        Measure 1, Note Grouping 1:
+        <music21.clef.TrebleClef>
+        Articulation staccato ⠦
+        Octave 4 ⠐
+        G quarter ⠳
+        Articulation staccato ⠦
+        Accidental sharp ⠩
+        F quarter ⠻
+        Articulation accent ⠨⠦
+        Accidental natural ⠡
+        F half ⠟
+        ** Grouping x 2 **
+        ===
+        Measure 3, Note Grouping 1:
+        E half ⠏
+        G half ⠗
+        ===
+        Measure 4, Note Grouping 1:
+        E whole ⠯
+        ===
+        ---end segment---
+        '''
         self.b = '''
         ⠀⠀⠀⠀⠀⠀⠀⠼⠙⠲⠀⠀⠀⠀⠀⠀⠀
         ⠦⠐⠳⠦⠩⠻⠨⠦⠡⠟⠀⠶⠀⠏⠗⠀⠯
@@ -3425,6 +9206,27 @@ Barline final ⠣⠅
         bm.getElementsByClass(stream.Measure)[-1].rightBarline = None
         self.methodArgs = {'showFirstMeasureNumber': False}
         self.s = bm
+        self.e = '''
+        ---begin segment---
+        <music21.braille.segment BrailleSegment>
+        Measure 1, Signature Grouping 1:
+        Time Signature 3/4 ⠼⠉⠲
+        ===
+        Measure 1, Note Grouping 1:
+        <music21.clef.TrebleClef>
+        Octave 4 ⠐
+        C quarter ⠹
+        E quarter ⠫
+        G quarter ⠳
+        ** Grouping x 3 **
+        ===
+        Measure 4, Note Grouping 1:
+        Octave 5 ⠨
+        C half ⠝
+        Dot ⠄
+        ===
+        ---end segment---
+        '''
         self.b = '''
         ⠀⠀⠀⠀⠼⠉⠲⠀⠀⠀⠀⠀
         ⠐⠹⠫⠳⠀⠶⠀⠶⠀⠨⠝⠄
@@ -3436,6 +9238,26 @@ Barline final ⠣⠅
         bm.getElementsByClass(stream.Measure)[-1].rightBarline = None
         self.methodArgs = {'showFirstMeasureNumber': False}
         self.s = bm
+        self.e = '''
+        ---begin segment---
+        <music21.braille.segment BrailleSegment>
+        Measure 1, Signature Grouping 1:
+        Time Signature 3/4 ⠼⠉⠲
+        ===
+        Measure 1, Note Grouping 1:
+        <music21.clef.TrebleClef>
+        Octave 4 ⠐
+        C quarter ⠹
+        E quarter ⠫
+        G quarter ⠳
+        ** Grouping x 3 **
+        ===
+        Measure 4, Note Grouping 1:
+        A half ⠎
+        Dot ⠄
+        ===
+        ---end segment---
+        '''
         self.b = '''
         ⠀⠀⠀⠀⠼⠉⠲⠀⠀⠀⠀
         ⠐⠹⠫⠳⠀⠶⠀⠶⠀⠎⠄
@@ -3455,6 +9277,33 @@ Barline final ⠣⠅
         bm.getElementsByClass(stream.Measure)[-1].rightBarline = None
         self.methodArgs = {'showFirstMeasureNumber': False}
         self.s = bm
+        self.e = '''
+        ---begin segment---
+        <music21.braille.segment BrailleSegment>
+        Measure 1, Signature Grouping 1:
+        Time Signature 3/4 ⠼⠉⠲
+        ===
+        Measure 1, Note Grouping 1:
+        <music21.clef.TrebleClef>
+        Octave 4 ⠐
+        G quarter ⠳
+        G eighth ⠓
+        G eighth ⠓
+        G quarter ⠳
+        ** Grouping x 6 **
+        ===
+        Measure 7, Note Grouping 1:
+        Octave 4 ⠐
+        C eighth ⠙
+        E eighth ⠋
+        G eighth ⠓
+        Octave 5 ⠨
+        C eighth ⠙
+        E quarter ⠫
+        ** Grouping x 2 **
+        ===
+        ---end segment---
+        '''
         self.b = '''
         ⠀⠀⠀⠀⠀⠀⠀⠀⠼⠉⠲⠀⠀⠀⠀⠀⠀⠀⠀
         ⠐⠳⠓⠓⠳⠀⠶⠼⠑⠀⠐⠙⠋⠓⠨⠙⠫⠀⠶
@@ -3477,6 +9326,22 @@ Barline final ⠣⠅
         m.insert(0.0, dynamics.Dynamic('f'))
         self.methodArgs = {'showHand': 'right', 'showHeading': True}
         self.s = m
+        self.e = '''
+        ---begin segment---
+        <music21.braille.segment BrailleSegment>
+        Measure 1, Signature Grouping 1:
+        Time Signature 4/4 ⠼⠙⠲
+        ===
+        Measure 1, Note Grouping 1:
+        <music21.clef.TrebleClef>
+        Word: ⠜
+        Dynamic f ⠋
+        Octave 4 ⠐
+        C half ⠝
+        E half ⠏
+        ===
+        ---end segment---
+        '''
         self.b = '''
         ⠀⠀⠼⠙⠲⠀⠀⠀
         ⠨⠜⠄⠜⠋⠐⠝⠏
@@ -3491,6 +9356,22 @@ Barline final ⠣⠅
         m.rightBarline = None
         self.methodArgs = {'showHand': 'left', 'showHeading': True}
         self.s = m
+        self.e = '''
+        ---begin segment---
+        <music21.braille.segment BrailleSegment>
+        Measure 1, Signature Grouping 1:
+        Time Signature 2/4 ⠼⠃⠲
+        ===
+        Measure 1, Note Grouping 1:
+        <music21.clef.BassClef>
+        Octave 3 ⠸
+        C eighth ⠙
+        Rest eighth ⠭
+        E eighth ⠋
+        Rest eighth ⠭
+        ===
+        ---end segment---
+        '''
         self.b = '''
         ⠀⠀⠼⠃⠲⠀⠀
         ⠸⠜⠸⠙⠭⠋⠭
@@ -3510,6 +9391,131 @@ Barline final ⠣⠅
         keyboardPart.append(rightHand)
         keyboardPart.append(leftHand)
         self.s = keyboardPart
+        self.e = '''
+        ---begin grand segment---
+        <music21.braille.segment BrailleGrandSegment>
+        ===
+        Measure 1 Right, Signature Grouping 1:
+        Time Signature 2/4 ⠼⠃⠲
+
+        Measure 1 Left, Signature Grouping 1:
+        <music21.meter.TimeSignature 2/4>
+        ====
+        Measure 1 Right, Note Grouping 1:
+        <music21.clef.TrebleClef>
+        Octave 5 ⠨
+        C eighth ⠙
+        Octave 4 ⠐
+        G eighth ⠓
+        E eighth ⠋
+        G eighth ⠓
+
+        Measure 1 Left, Note Grouping 1:
+        <music21.clef.BassClef>
+        Octave 3 ⠸
+        C eighth ⠙
+        G eighth ⠓
+        Octave 4 ⠐
+        C eighth ⠙
+        B eighth ⠚
+        ====
+        Measure 2 Right, Note Grouping 1:
+        Octave 4 ⠐
+        F eighth ⠛
+        G eighth ⠓
+        E eighth ⠋
+        A eighth ⠊
+
+        Measure 2 Left, Note Grouping 1:
+        Octave 3 ⠸
+        A eighth ⠊
+        B eighth ⠚
+        C eighth ⠙
+        C eighth ⠙
+        ====
+        Measure 3 Right, Note Grouping 1:
+        Octave 4 ⠐
+        G eighth ⠓
+        F eighth ⠛
+        E eighth ⠋
+        D eighth ⠑
+
+        Measure 3 Left, Note Grouping 1:
+        Octave 3 ⠸
+        B eighth ⠚
+        A eighth ⠊
+        G eighth ⠓
+        B eighth ⠚
+        ====
+        Measure 4 Right, Note Grouping 1:
+        Octave 4 ⠐
+        E eighth ⠋
+        E eighth ⠋
+        D eighth ⠑
+        Rest eighth ⠭
+
+        Measure 4 Left, Note Grouping 1:
+        Octave 4 ⠐
+        C eighth ⠙
+        C eighth ⠙
+        B eighth ⠚
+        G eighth ⠓
+        ====
+        Measure 5 Right, Note Grouping 1:
+        Octave 4 ⠐
+        E eighth ⠋
+        D eighth ⠑
+        E eighth ⠋
+        G eighth ⠓
+
+        Measure 5 Left, Note Grouping 1:
+        Octave 4 ⠐
+        C eighth ⠙
+        Rest eighth ⠭
+        Accidental flat ⠣
+        B quarter ⠺
+        ====
+        Measure 6 Right, Note Grouping 1:
+        Octave 4 ⠐
+        F eighth ⠛
+        G eighth ⠓
+        A eighth ⠊
+        F eighth ⠛
+
+        Measure 6 Left, Note Grouping 1:
+        Octave 3 ⠸
+        A eighth ⠊
+        Rest eighth ⠭
+        C eighth ⠙
+        Rest eighth ⠭
+        ====
+        Measure 7 Right, Note Grouping 1:
+        Octave 4 ⠐
+        E eighth ⠋
+        G eighth ⠓
+        G eighth ⠓
+        F eighth ⠛
+
+        Measure 7 Left, Note Grouping 1:
+        Octave 4 ⠐
+        C eighth ⠙
+        Rest eighth ⠭
+        B eighth ⠚
+        G eighth ⠓
+        ====
+        Measure 8 Right, Note Grouping 1:
+        Octave 4 ⠐
+        E half ⠏
+        Barline final ⠣⠅
+
+        Measure 8 Left, Note Grouping 1:
+        Octave 4 ⠐
+        C half ⠝
+        Barline final ⠣⠅
+        ====
+
+        ---end grand segment---
+        '''
         self.b = '''
         ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠼⠃⠲⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
         ⠁⠀⠨⠜⠨⠙⠐⠓⠋⠓⠀⠐⠛⠓⠋⠊⠀⠐⠓⠛⠋⠑⠀⠐⠋⠋⠑⠭⠀⠐⠋⠑⠋⠓⠀⠐⠛⠓⠊⠛
@@ -3549,6 +9555,64 @@ Barline final ⠣⠅
         keyboardPart.append(rightHand)
         keyboardPart.append(leftHand)
         self.s = keyboardPart
+        self.e = '''
+        ---begin grand segment---
+        <music21.braille.segment BrailleGrandSegment>
+        ===
+        Measure 0 Right, Signature Grouping 1:
+        Key Signature 2 flat(s) ⠣⠣
+        Time Signature 3/4 ⠼⠉⠲
+
+        Measure 0 Left, Signature Grouping 1:
+        <music21.key.KeySignature of 2 flats>
+        <music21.meter.TimeSignature 3/4>
+        ====
+        Measure 0 Right, Note Grouping 1:
+        <music21.clef.TrebleClef>
+        Octave 5 ⠨
+        D quarter ⠱
+
+        Measure 0 Left, Note Grouping 1:
+        <music21.clef.BassClef>
+        Octave 3 ⠸
+        B eighth ⠚
+        A eighth ⠊
+        ====
+        Measure 1 Right, Note Grouping 1:
+        Octave 5 ⠨
+        D eighth ⠑
+        E eighth ⠋
+        D eighth ⠑
+        C eighth ⠙
+        B eighth ⠚
+        A eighth ⠊
+
+        Measure 1 Left, Note Grouping 1:
+        Octave 3 ⠸
+        G eighth ⠓
+        Rest eighth ⠭
+        B eighth ⠚
+        Rest eighth ⠭
+        D eighth ⠑
+        Rest eighth ⠭
+        ====
+        Measure 2 Right, Note Grouping 1:
+        Octave 4 ⠐
+        G half ⠗
+        Opening single slur ⠉
+        B quarter ⠺
+
+        Measure 2 Left, Note Grouping 1:
+        Octave 3 ⠸
+        G eighth ⠓
+        A eighth ⠊
+        B eighth ⠚
+        C eighth ⠙
+        D quarter ⠱
+        ====
+
+        ---end grand segment---
+        '''
         self.b = '''
         ⠀⠀⠀⠀⠀⠀⠀⠀⠣⠣⠼⠉⠲⠀⠀⠀⠀⠀⠀⠀⠀⠀
         ⠚⠀⠨⠜⠨⠱⠇⠀⠨⠑⠋⠑⠙⠚⠊⠀⠐⠗⠁⠉⠺⠇
@@ -3578,6 +9642,109 @@ Barline final ⠣⠅
         keyboardPart.append(rightHand)
         keyboardPart.append(leftHand)
         self.s = keyboardPart
+        self.e = '''
+        ---begin grand segment---
+        <music21.braille.segment BrailleGrandSegment>
+        ===
+        Measure 9 Right, Signature Grouping 1:
+        Key Signature 2 sharp(s) ⠩⠩
+        Time Signature 4/4 ⠼⠙⠲
+
+        Measure 9 Left, Signature Grouping 1:
+        <music21.key.KeySignature of 2 sharps>
+        <music21.meter.TimeSignature 4/4>
+        ====
+        Measure 9 Right, Note Grouping 1:
+        <music21.clef.TrebleClef>
+        Octave 6 ⠰
+        D 16th ⠵
+        B beam ⠚
+        A beam ⠊
+        F beam ⠛
+        E quarter ⠫
+        Tie ⠈⠉
+        E 16th ⠯
+        D beam ⠑
+        Octave 4 ⠐
+        A beam ⠊
+        Octave 5 ⠨
+        D beam ⠑
+        E quarter ⠫
+
+        Measure 9 Left, Note Grouping 1:
+        <music21.clef.TrebleClef>
+        Octave 5 ⠨
+        D quarter ⠱
+        Tie ⠈⠉
+        D 16th ⠵
+        C beam ⠙
+        B beam ⠚
+        G beam ⠓
+        F quarter ⠻
+        Tie ⠈⠉
+        F 16th ⠿
+        G beam ⠓
+        B beam ⠚
+        G beam ⠓
+        ====
+        Measure 10 Right, Note Grouping 1:
+        Octave 5 ⠨
+        C 16th ⠽
+        B beam ⠚
+        C beam ⠙
+        D beam ⠑
+        E 16th ⠯
+        G beam ⠓
+        F beam ⠛
+        E beam ⠋
+        F 16th ⠿
+        E beam ⠋
+        F beam ⠛
+        G beam ⠓
+        A 16th ⠮
+        B beam ⠚
+        C beam ⠙
+        D beam ⠑
+
+        Measure 10 Left, Note Grouping 1:
+        Octave 4 ⠐
+        A quarter ⠪
+        C quarter ⠹
+        D eighth ⠑
+        D 16th ⠵
+        E 16th ⠯
+        F 16th ⠿
+        G beam ⠓
+        E beam ⠋
+        F beam ⠛
+        ====
+        Measure 11 Right, Note Grouping 1:
+        Octave 6 ⠰
+        E 16th ⠯
+        D beam ⠑
+        C beam ⠙
+        B beam ⠚
+        A 16th ⠮
+        G beam ⠓
+        F beam ⠛
+        E beam ⠋
+        D half ⠕
+        Barline final ⠣⠅
+
+        Measure 11 Left, Note Grouping 1:
+        Octave 5 ⠨
+        G quarter ⠳
+        C quarter ⠹
+        Rest 16th ⠍
+        A beam ⠊
+        F beam ⠛
+        E beam ⠋
+        D quarter ⠱
+        Barline final ⠣⠅
+        ====
+
+        ---end grand segment---
+        '''
         self.b = '''
         ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠩⠩⠼⠙⠲⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
         ⠀⠊⠀⠨⠜⠰⠵⠚⠊⠛⠫⠈⠉⠯⠑⠐⠊⠨⠑⠫⠀⠨⠽⠚⠙⠑⠯⠓⠛⠋⠿⠋⠛⠓⠮⠚⠙⠑
@@ -3625,6 +9792,19 @@ Barline final ⠣⠅
         m1.append(c1)
         self.methodArgs = {'showHand': 'right', 'descendingChords': True}
         self.s = m1
+        self.e = '''
+        ---begin segment---
+        <music21.braille.segment BrailleSegment>
+        Measure 0, Note Grouping 1:
+        Descending Chord:
+        Octave 5 ⠨
+        G whole ⠷
+        Interval 4 ⠼
+        Interval 6 ⠴
+        Interval 8 ⠤
+        ===
+        ---end segment---
+        '''
         self.b = '''
         ⠨⠜⠨⠷⠼⠴⠤
         '''
@@ -3636,6 +9816,19 @@ Barline final ⠣⠅
         m1.append(c1)
         self.methodArgs = {'showHand': 'left', 'descendingChords': False}
         self.s = m1
+        self.e = '''
+        ---begin segment---
+        <music21.braille.segment BrailleSegment>
+        Measure 0, Note Grouping 1:
+        Ascending Chord:
+        Octave 2 ⠘
+        G whole ⠷
+        Interval 3 ⠬
+        Interval 5 ⠔
+        Interval 8 ⠤
+        ===
+        ---end segment---
+        '''
         self.b = '''
         ⠸⠜⠘⠷⠬⠔⠤
         '''
@@ -3658,6 +9851,35 @@ Barline final ⠣⠅
         keyboardPart.append(part_right)
         keyboardPart.append(part_left)
         self.s = keyboardPart
+        self.e = '''
+        ---begin grand segment---
+        <music21.braille.segment BrailleGrandSegment>
+        ===
+        Measure 1 Right, Signature Grouping 1:
+        Time Signature common ⠨⠉
+
+        Measure 1 Left, Signature Grouping 1:
+        <music21.meter.TimeSignature 4/4>
+        ====
+        Measure 1 Right, Note Grouping 1:
+        <music21.clef.TrebleClef>
+        Descending Chord:
+        Octave 5 ⠨
+        G whole ⠷
+        Interval 6 ⠴
+        Interval 4 ⠼
+
+        Measure 1 Left, Note Grouping 1:
+        <music21.clef.BassClef>
+        Ascending Chord:
+        Octave 2 ⠘
+        G whole ⠷
+        Interval 5 ⠔
+        Interval 3 ⠬
+        ====
+
+        ---end grand segment---
+        '''
         self.b = '''
         ⠀⠀⠀⠨⠉⠀⠀⠀
         ⠁⠀⠨⠜⠨⠷⠴⠼
@@ -3682,6 +9904,35 @@ Barline final ⠣⠅
         keyboardPart.append(part_right)
         keyboardPart.append(part_left)
         self.s = keyboardPart
+        self.e = '''
+        ---begin grand segment---
+        <music21.braille.segment BrailleGrandSegment>
+        ===
+        Measure 1 Right, Signature Grouping 1:
+        Time Signature common ⠨⠉
+
+        Measure 1 Left, Signature Grouping 1:
+        <music21.meter.TimeSignature 4/4>
+        ====
+        Measure 1 Right, Note Grouping 1:
+        <music21.clef.TrebleClef>
+        Descending Chord:
+        Octave 5 ⠨
+        E whole ⠯
+        Octave 4 ⠐
+        Interval 3 ⠬
+
+        Measure 1 Left, Note Grouping 1:
+        <music21.clef.BassClef>
+        Ascending Chord:
+        Octave 2 ⠘
+        C whole ⠽
+        Octave 3 ⠸
+        Interval 3 ⠬
+        ====
+
+        ---end grand segment---
+        '''
         self.b = '''
         ⠀⠀⠀⠨⠉⠀⠀⠀
         ⠁⠀⠨⠜⠨⠯⠐⠬
@@ -3706,6 +9957,36 @@ Barline final ⠣⠅
         keyboardPart.append(part_right)
         keyboardPart.append(part_left)
         self.s = keyboardPart
+        self.e = '''
+        ---begin grand segment---
+        <music21.braille.segment BrailleGrandSegment>
+        ===
+        Measure 1 Right, Signature Grouping 1:
+        Time Signature common ⠨⠉
+
+        Measure 1 Left, Signature Grouping 1:
+        <music21.meter.TimeSignature 4/4>
+        ====
+        Measure 1 Right, Note Grouping 1:
+        <music21.clef.TrebleClef>
+        Descending Chord:
+        Octave 6 ⠰
+        C whole ⠽
+        Interval 6 ⠴
+        Interval 2 ⠌
+
+        Measure 1 Left, Note Grouping 1:
+        <music21.clef.BassClef>
+        Ascending Chord:
+        Octave 2 ⠘
+        G whole ⠷
+        Interval 6 ⠴
+        Octave 4 ⠐
+        Interval 6 ⠴
+        ====
+
+        ---end grand segment---
+        '''
         self.b = '''
         ⠀⠀⠀⠀⠨⠉⠀⠀⠀
         ⠁⠀⠨⠜⠰⠽⠴⠌⠀
@@ -3742,6 +10023,69 @@ Barline final ⠣⠅
         keyboardPart.append(part_right)
         keyboardPart.append(part_left)
         self.s = keyboardPart
+        self.e = '''
+        ---begin grand segment---
+        <music21.braille.segment BrailleGrandSegment>
+        ===
+        Measure 1 Right, Signature Grouping 1:
+        Key Signature 1 sharp(s) ⠩
+        Time Signature 4/4 ⠼⠙⠲
+
+        Measure 1 Left, Signature Grouping 1:
+        <music21.key.KeySignature of 1 sharp>
+        <music21.meter.TimeSignature 4/4>
+        ====
+        Measure 1 Right, Note Grouping 1:
+        <music21.clef.TrebleClef>
+        Descending Chord:
+        Octave 4 ⠐
+        B eighth ⠚
+        Interval 3 ⠬
+        C eighth ⠙
+        Descending Chord:
+        D eighth ⠑
+        Interval 3 ⠬
+        Octave 4 ⠐
+        G eighth ⠓
+        Descending Chord:
+        Octave 5 ⠨
+        E eighth ⠋
+        Interval 3 ⠬
+        F eighth ⠛
+        Descending Chord:
+        G eighth ⠓
+        Interval 6 ⠴
+        Octave 4 ⠐
+        G eighth ⠓
+
+        Measure 1 Left, Note Grouping 1:
+        <music21.clef.BassClef>
+        Ascending Chord:
+        Octave 2 ⠘
+        G eighth ⠓
+        Interval 5 ⠔
+        Octave 3 ⠸
+        E eighth ⠋
+        Ascending Chord:
+        Octave 2 ⠘
+        G eighth ⠓
+        Interval 5 ⠔
+        Octave 3 ⠸
+        B eighth ⠚
+        Ascending Chord:
+        Octave 3 ⠸
+        C eighth ⠙
+        Interval 5 ⠔
+        A eighth ⠊
+        Ascending Chord:
+        G eighth ⠓
+        Interval 5 ⠔
+        Octave 3 ⠸
+        B eighth ⠚
+        ====
+
+        ---end grand segment---
+        '''
         self.b = '''
         ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠩⠼⠙⠲⠀⠀⠀⠀⠀⠀⠀⠀⠀
         ⠁⠀⠨⠜⠐⠚⠬⠙⠑⠬⠐⠓⠨⠋⠬⠛⠓⠴⠐⠓⠀⠀
@@ -3768,6 +10112,53 @@ Barline final ⠣⠅
         keyboardPart.append(part_right)
         keyboardPart.append(part_left)
         self.s = keyboardPart
+        self.e = '''
+        ---begin grand segment---
+        <music21.braille.segment BrailleGrandSegment>
+        ===
+        Measure 1 Right, Signature Grouping 1:
+        Time Signature 2/4 ⠼⠃⠲
+
+        Measure 1 Left, Signature Grouping 1:
+        <music21.meter.TimeSignature 2/4>
+        ====
+        Measure 1 Right, Note Grouping 1:
+        <music21.clef.TrebleClef>
+        Descending Chord:
+        Octave 5 ⠨
+        E quarter ⠫
+        Interval 3 ⠬
+        Descending Chord:
+        D quarter ⠱
+        Interval 3 ⠬
+
+        Measure 1 Left, Note Grouping 1:
+        <music21.clef.BassClef>
+        Ascending Chord:
+        Octave 3 ⠸
+        E quarter ⠫
+        Interval 3 ⠬
+        Ascending Chord:
+        G quarter ⠳
+        Octave 3 ⠸
+        Interval 8 ⠤
+        ====
+        Measure 2 Right, Note Grouping 1:
+        Descending Chord:
+        Octave 5 ⠨
+        C half ⠝
+        Octave 5 ⠨
+        Interval 8 ⠤
+
+        Measure 2 Left, Note Grouping 1:
+        Ascending Chord:
+        Octave 3 ⠸
+        C half ⠝
+        Interval 8 ⠤
+        ====
+
+        ---end grand segment---
+        '''
         self.b = '''
         ⠀⠀⠀⠀⠀⠀⠼⠃⠲⠀⠀⠀⠀⠀⠀
         ⠁⠀⠨⠜⠨⠫⠬⠱⠬⠀⠀⠨⠝⠨⠤
