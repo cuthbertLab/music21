@@ -8824,7 +8824,7 @@ Barline final ⠣⠅
             m0.pop(2)
         lastMeasure.notes[7].pitch.accidental = pitch.Accidental('natural')
         lastMeasure.notes[11].pitch.accidental = pitch.Accidental('natural')
-        self.s = bm
+        self.s = bm2
         self.b = '''
         ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠼⠁⠃⠦⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
         ⠼⠚⠀⠣⠐⠚⠀⠣⠯⠣⠨⠋⠣⠐⠓⠣⠨⠓⠣⠐⠚⠣⠨⠚⠡⠐⠾⠡⠨⠾⠣⠐⠾⠣⠨⠾⠐
