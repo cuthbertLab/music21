@@ -71,7 +71,6 @@ def compressXML(filename: str|pathlib.Path,
         environLocal.warn(f'Updating file: {fp}')
     newFilename = str(fp.with_suffix('.mxl'))
 
-
     # contents of container.xml file in META-INF folder
     container = f'''<?xml version="1.0" encoding="UTF-8"?>
 <container>
