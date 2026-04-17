@@ -147,9 +147,6 @@ def makeBeams(
 
     m: stream.Measure
     for m in mColl:
-        if m.streamStatus.beams:
-            continue
-
         # this means that the first of a stream of time signatures will
         # be used
         lastTimeSignature = m.timeSignature or m.getContextByClass(meter.TimeSignature)

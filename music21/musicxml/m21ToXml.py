@@ -445,8 +445,6 @@ class GeneralObjectExporter:
         sc = stream.Score()
         sc.insert(0, p)
         sc.metadata = copy.deepcopy(getMetadataFromContext(p))
-        sc.streamStatus = copy.deepcopy(p.streamStatus)
-        sc.streamStatus.client = sc
         return self.fromScore(sc)
 
     def fromMeasure(self, m):
@@ -474,8 +472,6 @@ class GeneralObjectExporter:
         p = stream.Part()
         p.append(m)
         p.metadata = copy.deepcopy(getMetadataFromContext(m))
-        p.streamStatus = copy.deepcopy(m.streamStatus)
-        p.streamStatus.client = p
         context_part = m.getContextByClass(stream.Part)
         if context_part is not None:
             p.partName = context_part.partName
@@ -485,36 +481,25 @@ class GeneralObjectExporter:
     def fromVoice(self, v):
         m = stream.Measure(number=1)
         m.insert(0, v)
-        m.metadata = copy.deepcopy(getMetadataFromContext(v))
-        m.streamStatus = copy.deepcopy(v.streamStatus)
-        m.streamStatus.client = m
         return self.fromMeasure(m)
 
-    def fromStream(self, st: stream.Stream):
-        # noinspection PyShadowingNames
-        def post_fix(s2, *, bestClef: bool|None = None):
-            if bestClef is not None:
-                s2.makeNotation(inPlace=True, bestClef=bestClef)
-            else:
-                s2.makeNotation(inPlace=True)
-            s2.metadata = copy.deepcopy(getMetadataFromContext(st))
-            s2.streamStatus = copy.deepcopy(st.streamStatus)
-            s2.streamStatus.client = s2
-
+    def fromStream(self, st):
         if st.isFlat:
             st2 = stream.Part()
             st2.mergeAttributes(st)
             st2.elements = copy.deepcopy(st)
             if not st.getElementsByClass(clef.Clef).getElementsByOffset(0.0):
                 st2.clef = clef.bestClef(st2)
-            post_fix(st2)
+            st2.makeNotation(inPlace=True)
+            st2.metadata = copy.deepcopy(getMetadataFromContext(st))
             return self.fromPart(st2)
 
         elif st.hasPartLikeStreams():
             st2 = stream.Score()
             st2.mergeAttributes(st)
             st2.elements = copy.deepcopy(st)
-            post_fix(st2)
+            st2.makeNotation(inPlace=True)
+            st2.metadata = copy.deepcopy(getMetadataFromContext(st))
             return self.fromScore(st2)
 
         elif st.getElementsByClass(stream.Stream).first().isFlat:  # like a part w/ measures
@@ -525,7 +510,8 @@ class GeneralObjectExporter:
                 bestClef = True
             else:
                 bestClef = False
-            post_fix(st2, bestClef=bestClef)
+            st2.makeNotation(inPlace=True, bestClef=bestClef)
+            st2.metadata = copy.deepcopy(getMetadataFromContext(st))
             return self.fromPart(st2)
 
         else:
@@ -534,8 +520,7 @@ class GeneralObjectExporter:
                 bestClef = True
             else:
                 bestClef = False
-            st2 = copy.deepcopy(st)
-            post_fix(st2, bestClef=bestClef)
+            st2 = st.makeNotation(inPlace=False, bestClef=bestClef)
             return self.fromScore(st2)
 
     def fromDuration(self, d):
