@@ -2301,7 +2301,9 @@ class Test(unittest.TestCase):
             n.stemDirection = dStems[i]
         p.makeBeams(inPlace=True)
         self.assertEqual([n.stemDirection for n in p.flatten().notes],
-                         ['up'] * 4 + ['down'] * 6 + ['up'] * 4
+                         ['up'] * 4
+                         + ['down'] * 6
+                         + ['up'] * 4
                          + ['down', 'noStem', 'double', 'down']
                          )
 
