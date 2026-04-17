@@ -278,6 +278,7 @@ class PartStaffExporterMixin:
         for group in deduplicatedGroups:
             prior_part_staff = None
             for part_staff in group:
+                assert isinstance(part_staff, stream.PartStaff)
                 for part_exporter in self.partExporterList:
                     if part_exporter.stream is not part_staff:
                         continue

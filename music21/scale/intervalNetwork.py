@@ -2163,7 +2163,7 @@ class IntervalNetwork:
             fillMinMaxIfNone=False)  # avoid recursion by setting false
         # environLocal.printDebug(['realizeMinMax()', 'post', post, 'postNodeId', postNodeId])
 
-        postPairs = []
+        postPairs: list[tuple[pitch.Pitch, Terminus|int]] = []
         collect = False
         for i, nId in enumerate(postNodeId):
             p = post[i]
@@ -2180,7 +2180,7 @@ class IntervalNetwork:
                 postPairs.append((p, nId))
         # environLocal.printDebug(['realizeMinMax()', 'postPairs', postPairs])
 
-        prePairs = []
+        prePairs: list[tuple[pitch.Pitch, Terminus|int]] = []
         collect = False
         for i, nId in enumerate(preNodeId):
             p = pre[i]
