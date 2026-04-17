@@ -5428,7 +5428,7 @@ class MeasureParser(SoundTagMixin, XMLParserBase):
         self.setPrintObject(mxHarmony, cs)
 
         # TODO: attr: print-frame
-        # TODO: attrGroup: placement
+        self.setPlacement(mxHarmony, cs)
         # TODO: attr: use-symbols
         # TODO: attr: stack-degrees
         # TODO: attr: parentheses-degrees

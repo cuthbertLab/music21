@@ -1241,6 +1241,28 @@ class Test(unittest.TestCase):
                               offsets):
             self.assertEqual(ch.offset, offset)
 
+    def testChordSymbolPlacement(self):
+        from xml.etree.ElementTree import fromstring as EL
+        mp = MeasureParser()
+
+        h_below = EL('<harmony placement="below">'
+                     '<root><root-step>C</root-step></root>'
+                     '<kind>major</kind></harmony>')
+        cs = mp.xmlToChordSymbol(h_below)
+        self.assertEqual(cs.placement, 'below')
+
+        h_above = EL('<harmony placement="above">'
+                     '<root><root-step>G</root-step></root>'
+                     '<kind>major</kind></harmony>')
+        cs2 = mp.xmlToChordSymbol(h_above)
+        self.assertEqual(cs2.placement, 'above')
+
+        h_none = EL('<harmony>'
+                    '<root><root-step>F</root-step></root>'
+                    '<kind>major</kind></harmony>')
+        cs3 = mp.xmlToChordSymbol(h_none)
+        self.assertIsNone(cs3.placement)
+
     def testChordInversion(self):
         from xml.etree.ElementTree import fromstring as EL
         h = EL('''
