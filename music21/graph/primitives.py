@@ -306,7 +306,6 @@ class Graph(prebase.ProtoM21Object):
             tickStep = 2
         for y in range(0, maxData + 1, tickStep):
             tickList.append([y, f'{y}'])
-        tickList.sort()
         return self.setTicks(axisKey, tickList)
 
     def setAxisRange(self, axisKey, valueRange, paddingFraction=0.1):
@@ -1272,12 +1271,6 @@ class GraphScatter(Graph):
             y = row[1]
             xValues.append(x)
             yValues.append(y)
-        xValues.sort()
-        yValues.sort()
-
-        for row in self.data:
-            x = row[0]
-            y = row[1]
             marker = self.marker
             color = self.nextColor()
             alpha = self.alpha
@@ -1295,12 +1288,12 @@ class GraphScatter(Graph):
 
             subplot.plot(x, y, marker=marker, color=color, alpha=alpha, markersize=markersize)
             i += 1
-        # values are sorted, so no need to use max/min
+
         if not self.axisRangeHasBeenSet['y']:
-            self.setAxisRange('y', (yValues[0], yValues[-1]))
+            self.setAxisRange('y', (min(yValues), max(yValues)))
 
         if not self.axisRangeHasBeenSet['x']:
-            self.setAxisRange('x', (xValues[0], xValues[-1]))
+            self.setAxisRange('x', (min(xValues), max(xValues)))
 
 
 class GraphHistogram(Graph):
@@ -1499,49 +1492,38 @@ class Graph3DBars(Graph):
         self.callDoneAction()
 
     def renderSubplot(self, subplot):
-        yDict = {}
-        # TODO: use the formatDict!
-        for point in self.data:
-            if len(point) > 3:
-                x, y, z, unused_formatDict = point
-            else:
-                x, y, z = point
-            if y not in yDict:
-                yDict[y] = []
-            yDict[y].append((x, z))
-
-        yVals = list(yDict.keys())
-        yVals.sort()
-
-        zVals = []
         xVals = []
-        for key in yVals:
-            for i in range(len(yDict[key])):
-                x, z = yDict[key][i]
-                zVals.append(z)
-                xVals.append(x)
-        # environLocal.printDebug(['yVals', yVals])
-        # environLocal.printDebug(['xVals', xVals])
+        yVals = []
+        zVals = []
+        for point in self.data:
+            x, y, z = point[0], point[1], point[2]
+            xVals.append(x)
+            yVals.append(y)
+            zVals.append(z)
+
+        xMin, xMax = min(xVals), max(xVals)
+        yMin, yMax = min(yVals), max(yVals)
+        zMin, zMax = min(zVals), max(zVals)
 
         if self.axis['x']['range'] is None:
-            self.axis['x']['range'] = min(xVals), max(xVals)
+            self.axis['x']['range'] = xMin, xMax
         # swap y for z
         if self.axis['z']['range'] is None:
-            self.axis['z']['range'] = min(zVals), max(zVals)
+            self.axis['z']['range'] = zMin, zMax
         if self.axis['y']['range'] is None:
-            self.axis['y']['range'] = min(yVals), max(yVals)
+            self.axis['y']['range'] = yMin, yMax
 
-        barWidth = (max(xVals) - min(xVals)) / 20
-        barDepth = (max(yVals) - min(yVals)) / 20
+        barWidth = (xMax - xMin) / 20
+        barDepth = (yMax - yMin) / 20
 
         for dataPoint in self.data:
             if len(dataPoint) == 3:
                 x, y, z = dataPoint
                 formatDict = {}
-            elif len(dataPoint) > 3:
+            elif len(dataPoint) == 4:
                 x, y, z, formatDict = dataPoint
             else:
-                raise GraphException('Cannot plot a point with fewer than 3 values')
+                raise GraphException('Cannot plot a point unless it has 3 or 4 values')
 
             if 'color' in formatDict:
                 color = formatDict['color']
