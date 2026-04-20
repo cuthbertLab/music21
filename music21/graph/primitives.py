@@ -306,7 +306,6 @@ class Graph(prebase.ProtoM21Object):
             tickStep = 2
         for y in range(0, maxData + 1, tickStep):
             tickList.append([y, f'{y}'])
-        tickList.sort()
         return self.setTicks(axisKey, tickList)
 
     def setAxisRange(self, axisKey, valueRange, paddingFraction=0.1):
@@ -1272,12 +1271,6 @@ class GraphScatter(Graph):
             y = row[1]
             xValues.append(x)
             yValues.append(y)
-        xValues.sort()
-        yValues.sort()
-
-        for row in self.data:
-            x = row[0]
-            y = row[1]
             marker = self.marker
             color = self.nextColor()
             alpha = self.alpha
@@ -1295,12 +1288,12 @@ class GraphScatter(Graph):
 
             subplot.plot(x, y, marker=marker, color=color, alpha=alpha, markersize=markersize)
             i += 1
-        # values are sorted, so no need to use max/min
+
         if not self.axisRangeHasBeenSet['y']:
-            self.setAxisRange('y', (yValues[0], yValues[-1]))
+            self.setAxisRange('y', (min(yValues), max(yValues)))
 
         if not self.axisRangeHasBeenSet['x']:
-            self.setAxisRange('x', (xValues[0], xValues[-1]))
+            self.setAxisRange('x', (min(xValues), max(xValues)))
 
 
 class GraphHistogram(Graph):
