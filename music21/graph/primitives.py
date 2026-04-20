@@ -1362,10 +1362,10 @@ class GraphHistogram(Graph):
 
 class GraphGroupedVerticalBar(Graph):
     '''
-    Graph the count of on or more elements in vertical bars
+    Graph the count of one or more elements in vertical bars.
 
-    Data set is simply a list of x and y pairs, where there
-    is only one of each x value, and y value is a list of values
+    The `.data` is simply a list of x and y pairs, where there
+    is only one of each x value, and y value is a list of values.
 
     >>> from collections import OrderedDict
     >>> g = graph.primitives.GraphGroupedVerticalBar()
@@ -1477,12 +1477,32 @@ class Graph3DBars(Graph):
     >>> g.data = data
     >>> g.process()
 
+    When creating the graph these keyword arguments can be used (in addition to any
+    such as `colors` that all Graph classes can use).
+
+    * ``alpha`` -- opacity of each bar, from 0.0 (transparent) to 1.0 (opaque).
+      Defaults to 0.8.
+    * ``barWidth`` -- width of each bar along the x-axis.  When ``None``
+      (default) the width is computed automatically.
+      Individual data points may also override this
+      via a ``'barWidth'`` key in their per-point format dict.
+    * ``barDepth`` -- depth of each bar along the y-axis.  When ``None``
+      (default) the depth is computed automatically.
+      Individual data points may also override this
+      via a ``'barDepth'`` key in their per-point format dict.
     '''
     graphType = '3DBars'
     axisKeys = ('x', 'y', 'z')
 
-    def __init__(self, *, alpha: float = 0.8, **keywords):
+    def __init__(self,
+                 *,
+                 alpha: float = 0.8,
+                 barWidth: float|int|None = None,
+                 barDepth: float|int|None = None,
+                 **keywords):
         super().__init__(alpha=alpha, **keywords)
+        self.barWidth: float|int|None = barWidth
+        self.barDepth: float|int|None = barDepth
         if 'colors' not in keywords:
             self.colors = ['#ff0000', '#00ff00', '#6666ff']
 
@@ -1499,54 +1519,48 @@ class Graph3DBars(Graph):
         self.callDoneAction()
 
     def renderSubplot(self, subplot):
-        yDict = {}
-        # TODO: use the formatDict!
-        for point in self.data:
-            if len(point) > 3:
-                x, y, z, unused_formatDict = point
-            else:
-                x, y, z = point
-            if y not in yDict:
-                yDict[y] = []
-            yDict[y].append((x, z))
-
-        yVals = list(yDict.keys())
-        yVals.sort()
-
-        zVals = []
         xVals = []
-        for key in yVals:
-            for i in range(len(yDict[key])):
-                x, z = yDict[key][i]
-                zVals.append(z)
-                xVals.append(x)
-        # environLocal.printDebug(['yVals', yVals])
-        # environLocal.printDebug(['xVals', xVals])
+        yVals = []
+        zVals = []
+        for point in self.data:
+            x, y, z = point[0], point[1], point[2]
+            xVals.append(x)
+            yVals.append(y)
+            zVals.append(z)
+
+        xMin, xMax = min(xVals), max(xVals)
+        yMin, yMax = min(yVals), max(yVals)
+        zMin, zMax = min(zVals), max(zVals)
 
         if self.axis['x']['range'] is None:
-            self.axis['x']['range'] = min(xVals), max(xVals)
+            self.axis['x']['range'] = xMin, xMax
         # swap y for z
         if self.axis['z']['range'] is None:
-            self.axis['z']['range'] = min(zVals), max(zVals)
+            self.axis['z']['range'] = zMin, zMax
         if self.axis['y']['range'] is None:
-            self.axis['y']['range'] = min(yVals), max(yVals)
+            self.axis['y']['range'] = yMin, yMax
 
-        barWidth = (max(xVals) - min(xVals)) / 20
-        barDepth = (max(yVals) - min(yVals)) / 20
+        barWidth = self.barWidth if self.barWidth is not None else (xMax - xMin) / 20
+        barDepth = self.barDepth if self.barDepth is not None else (yMax - yMin) / 20
 
         for dataPoint in self.data:
             if len(dataPoint) == 3:
                 x, y, z = dataPoint
                 formatDict = {}
-            elif len(dataPoint) > 3:
+            elif len(dataPoint) == 4:
                 x, y, z, formatDict = dataPoint
             else:
-                raise GraphException('Cannot plot a point with fewer than 3 values')
+                raise GraphException('Cannot plot a point unless it has 3 or 4 values')
 
             if 'color' in formatDict:
                 color = formatDict['color']
             else:
                 color = self.nextColor()
+
+            if 'barWidth' in formatDict:
+                barWidth = formatDict['barWidth']
+            if 'barDepth' in formatDict:
+                barDepth = formatDict['barDepth']
 
             subplot.bar3d(x - (barWidth / 2), y - (barDepth / 2), 0,
                           barWidth, barDepth, z,
