@@ -310,7 +310,7 @@ def stripAccents(inputString: str) -> str:
     >>> common.stripAccents('Süss, “êtré”')
     'Suss, "etre"'
 
-    Note -- is is still possible to have non-Ascii characters after this,
+    Note -- it is still possible to have non-Ascii characters after this,
     like in this Japanese expression for music:
 
     >>> common.stripAccents('音楽')
