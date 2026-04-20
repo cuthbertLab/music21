@@ -113,7 +113,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
     Stream can have its own offset, when Streams are
     embedded the offset of an element is relatively only
     to its parent Stream. The :meth:`~music21.stream.Stream.flatten`
-    and method provides access to a flat version of all
+    method provides access to a flat version of all
     embedded Streams, with offsets relative to the
     top-level Stream.
 

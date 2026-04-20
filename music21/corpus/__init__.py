@@ -88,7 +88,7 @@ def getCorePaths(
     expandExtensions=True
 ) -> list[pathlib.Path]:
     '''
-    Get all paths in the corpus that match a known extension, or an extenion
+    Get all paths in the corpus that match a known extension, or an extension
     provided by an argument.
 
     If `expandExtensions` is True, a format for an extension, and related
