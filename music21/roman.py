@@ -1313,7 +1313,7 @@ class Minor67Default(enum.Enum):
     >>> vi('VI', roman.Minor67Default.CAUTIONARY)
     'A- C E-'
 
-    Whereas `QUALITY` follows a strict interpretation of what preceeding sharp and flat
+    Whereas `QUALITY` follows a strict interpretation of what preceding sharp and flat
     signs mean.  With `QUALITY`, since vi is already sharpened, #vi raises it even more.
     And since VI is already flattened, bVI lowers it even further:
 
