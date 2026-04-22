@@ -421,6 +421,8 @@ class Graph(prebase.ProtoM21Object):
 
         # this figure instance is created in the subclassed process() method
         # set total size of figure
+        if self.figure is None:
+            raise ValueError('Cannot apply formatting without a figure; call process() first')
         assert self.figure is not None
         self.figure.set_figwidth(self.figureSize[0])
         self.figure.set_figheight(self.figureSize[1])
@@ -573,6 +575,8 @@ class Graph(prebase.ProtoM21Object):
         For most matplotlib back ends, this will open
         a GUI window with the desired graph.
         '''
+        if self.figure is None:
+            raise ValueError('Cannot show graph without a figure; call process() first')
         assert self.figure is not None
         self.figure.show()
 
@@ -582,6 +586,8 @@ class Graph(prebase.ProtoM21Object):
         '''
         Writes the graph to a file. If no file path is given, a temporary file is used.
         '''
+        if self.figure is None:
+            raise ValueError('Cannot write graph without a figure; call process() first')
         assert self.figure is not None
         if fp is None:
             fp = environLocal.getTempFile('.png')
@@ -635,7 +641,11 @@ class GraphColorGrid(Graph):
 
     def renderSubplot(self, subplot: matplotlib.axes.Axes) -> None:
         # do not need a grid for the outer container
+        if self.figure is None:
+            raise ValueError('Cannot render subplot without a figure; call process() first')
         assert self.figure is not None
+        if self.data is None:
+            raise ValueError('Cannot render subplot without data; set self.data before calling process()')
         assert self.data is not None
 
         # these approaches do not work:
@@ -748,7 +758,11 @@ class GraphColorGridLegend(Graph):
             self.title = 'Legend'
 
     def renderSubplot(self, subplot: matplotlib.axes.Axes) -> None:
+        if self.figure is None:
+            raise ValueError('Cannot render subplot without a figure; call process() first')
         assert self.figure is not None
+        if self.data is None:
+            raise ValueError('Cannot render subplot without data; set self.data before calling process()')
         assert self.data is not None
         for i, rowLabelAndData in enumerate(self.data):
             rowLabel = rowLabelAndData[0]
@@ -797,6 +811,8 @@ class GraphColorGridLegend(Graph):
         >>> subplot
         <Axes: >
         '''
+        if self.data is None:
+            raise ValueError('Cannot create row of graph without data; set self.data before calling process()')
         assert self.data is not None
         # environLocal.printDebug(['rowLabel', rowLabel, i])
 
@@ -926,7 +942,11 @@ class GraphHorizontalBar(Graph):
         return self.barSpace - (self.margin * 2)
 
     def renderSubplot(self, subplot: matplotlib.axes.Axes) -> None:
+        if self.figure is None:
+            raise ValueError('Cannot render subplot without a figure; call process() first')
         assert self.figure is not None
+        if self.data is None:
+            raise ValueError('Cannot render subplot without data; set self.data before calling process()')
         assert self.data is not None
         self.figure.subplots_adjust(left=0.15)
 
@@ -1049,7 +1069,11 @@ class GraphHorizontalBarWeighted(Graph):
         return self.barSpace - (self.margin * 2)
 
     def renderSubplot(self, subplot: matplotlib.axes.Axes) -> None:
+        if self.figure is None:
+            raise ValueError('Cannot render subplot without a figure; call process() first')
         assert self.figure is not None
+        if self.data is None:
+            raise ValueError('Cannot render subplot without data; set self.data before calling process()')
         assert self.data is not None
         # might need more space here for larger y-axis labels
         self.figure.subplots_adjust(left=0.15)
@@ -1088,6 +1112,9 @@ class GraphHorizontalBarWeighted(Graph):
                     x, span, heightScalar, color, alpha, yShift = data
                 # filter color value
                 color = getColor(color)
+                if span is None:
+                    raise ValueError(f'Data point must have at least 3 elements '
+                                     f'(x, span, heightScalar, ...); got: {data}')
                 assert span is not None
                 # add to x ranges
                 xRanges.append((x, span))
@@ -1186,7 +1213,11 @@ class GraphScatterWeighted(Graph):
         return self.maxDiameter - self.minDiameter
 
     def renderSubplot(self, subplot: matplotlib.axes.Axes) -> None:
+        if self.figure is None:
+            raise ValueError('Cannot render subplot without a figure; call process() first')
         assert self.figure is not None
+        if self.data is None:
+            raise ValueError('Cannot render subplot without data; set self.data before calling process()')
         assert self.data is not None
         extm = getExtendedModules()
         patches = extm.patches
@@ -1300,7 +1331,11 @@ class GraphScatter(Graph):
     graphType = 'scatter'
 
     def renderSubplot(self, subplot: matplotlib.axes.Axes) -> None:
+        if self.figure is None:
+            raise ValueError('Cannot render subplot without a figure; call process() first')
         assert self.figure is not None
+        if self.data is None:
+            raise ValueError('Cannot render subplot without data; set self.data before calling process()')
         assert self.data is not None
         self.figure.subplots_adjust(left=0.15)
         xValues = []
@@ -1377,7 +1412,11 @@ class GraphHistogram(Graph):
         super().__init__(alpha=alpha, **keywords)
 
     def renderSubplot(self, subplot: matplotlib.axes.Axes) -> None:
+        if self.figure is None:
+            raise ValueError('Cannot render subplot without a figure; call process() first')
         assert self.figure is not None
+        if self.data is None:
+            raise ValueError('Cannot render subplot without data; set self.data before calling process()')
         assert self.data is not None
         self.figure.subplots_adjust(left=0.15)
 
@@ -1442,6 +1481,8 @@ class GraphGroupedVerticalBar(Graph):
                          family=self.fontFamily)
 
     def renderSubplot(self, subplot: matplotlib.axes.Axes) -> None:
+        if self.data is None:
+            raise ValueError('Cannot render subplot without data; set self.data before calling process()')
         assert self.data is not None
         extm = getExtendedModules()
         matplotlib = extm.matplotlib
@@ -1558,6 +1599,8 @@ class Graph3DBars(Graph):
         self.callDoneAction()
 
     def renderSubplot(self, subplot: matplotlib.axes.Axes) -> None:
+        if self.data is None:
+            raise ValueError('Cannot render subplot without data; set self.data before calling process()')
         assert self.data is not None
         xVals = []
         yVals = []
@@ -1602,7 +1645,7 @@ class Graph3DBars(Graph):
             if 'barDepth' in formatDict:
                 barDepth = formatDict['barDepth']
 
-            subplot.bar3d(x - (barWidth / 2), y - (barDepth / 2), 0,
+            subplot.bar3d(x - (barWidth / 2), y - (barDepth / 2), 0,  # type: ignore[attr-defined]
                           barWidth, barDepth, z,
                           color=color,
                           alpha=self.alpha)
