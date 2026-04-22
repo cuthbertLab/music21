@@ -645,7 +645,8 @@ class GraphColorGrid(Graph):
             raise ValueError('Cannot render subplot without a figure; call process() first')
         assert self.figure is not None
         if self.data is None:
-            raise ValueError('Cannot render subplot without data; set self.data before calling process()')
+            raise ValueError('Cannot render subplot without data; '
+                             'set self.data before calling process()')
         assert self.data is not None
 
         # these approaches do not work:
@@ -762,7 +763,8 @@ class GraphColorGridLegend(Graph):
             raise ValueError('Cannot render subplot without a figure; call process() first')
         assert self.figure is not None
         if self.data is None:
-            raise ValueError('Cannot render subplot without data; set self.data before calling process()')
+            raise ValueError('Cannot render subplot without data; '
+                             'set self.data before calling process()')
         assert self.data is not None
         for i, rowLabelAndData in enumerate(self.data):
             rowLabel = rowLabelAndData[0]
@@ -812,7 +814,8 @@ class GraphColorGridLegend(Graph):
         <Axes: >
         '''
         if self.data is None:
-            raise ValueError('Cannot create row of graph without data; set self.data before calling process()')
+            raise ValueError('Cannot create row of graph without data; '
+                             'set self.data before calling process()')
         assert self.data is not None
         # environLocal.printDebug(['rowLabel', rowLabel, i])
 
@@ -946,7 +949,8 @@ class GraphHorizontalBar(Graph):
             raise ValueError('Cannot render subplot without a figure; call process() first')
         assert self.figure is not None
         if self.data is None:
-            raise ValueError('Cannot render subplot without data; set self.data before calling process()')
+            raise ValueError('Cannot render subplot without data; '
+                             'set self.data before calling process()')
         assert self.data is not None
         self.figure.subplots_adjust(left=0.15)
 
@@ -1073,7 +1077,8 @@ class GraphHorizontalBarWeighted(Graph):
             raise ValueError('Cannot render subplot without a figure; call process() first')
         assert self.figure is not None
         if self.data is None:
-            raise ValueError('Cannot render subplot without data; set self.data before calling process()')
+            raise ValueError('Cannot render subplot without data; '
+                             'set self.data before calling process()')
         assert self.data is not None
         # might need more space here for larger y-axis labels
         self.figure.subplots_adjust(left=0.15)
@@ -1217,7 +1222,8 @@ class GraphScatterWeighted(Graph):
             raise ValueError('Cannot render subplot without a figure; call process() first')
         assert self.figure is not None
         if self.data is None:
-            raise ValueError('Cannot render subplot without data; set self.data before calling process()')
+            raise ValueError('Cannot render subplot without data; '
+                             'set self.data before calling process()')
         assert self.data is not None
         extm = getExtendedModules()
         patches = extm.patches
@@ -1335,7 +1341,8 @@ class GraphScatter(Graph):
             raise ValueError('Cannot render subplot without a figure; call process() first')
         assert self.figure is not None
         if self.data is None:
-            raise ValueError('Cannot render subplot without data; set self.data before calling process()')
+            raise ValueError('Cannot render subplot without data; '
+                             'set self.data before calling process()')
         assert self.data is not None
         self.figure.subplots_adjust(left=0.15)
         xValues = []
@@ -1416,7 +1423,8 @@ class GraphHistogram(Graph):
             raise ValueError('Cannot render subplot without a figure; call process() first')
         assert self.figure is not None
         if self.data is None:
-            raise ValueError('Cannot render subplot without data; set self.data before calling process()')
+            raise ValueError('Cannot render subplot without data; '
+                             'set self.data before calling process()')
         assert self.data is not None
         self.figure.subplots_adjust(left=0.15)
 
@@ -1482,7 +1490,8 @@ class GraphGroupedVerticalBar(Graph):
 
     def renderSubplot(self, subplot: matplotlib.axes.Axes) -> None:
         if self.data is None:
-            raise ValueError('Cannot render subplot without data; set self.data before calling process()')
+            raise ValueError('Cannot render subplot without data; '
+                             'set self.data before calling process()')
         assert self.data is not None
         extm = getExtendedModules()
         matplotlib = extm.matplotlib
@@ -1600,7 +1609,8 @@ class Graph3DBars(Graph):
 
     def renderSubplot(self, subplot: matplotlib.axes.Axes) -> None:
         if self.data is None:
-            raise ValueError('Cannot render subplot without data; set self.data before calling process()')
+            raise ValueError('Cannot render subplot without data; '
+                             'set self.data before calling process()')
         assert self.data is not None
         xVals = []
         yVals = []
