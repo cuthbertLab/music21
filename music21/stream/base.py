@@ -8193,10 +8193,10 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         >>> for el in s.flatten().notes:
         ...     tup = (el, el.offset, el.activeSite)
         ...     print(tup)
-        (<music21.note.Note C>, 0.0, <music21.stream.Score mainScore_flat>)
-        (<music21.note.Note E>, 0.0, <music21.stream.Score mainScore_flat>)
-        (<music21.note.Note D>, 4.0, <music21.stream.Score mainScore_flat>)
-        (<music21.note.Note F>, 4.0, <music21.stream.Score mainScore_flat>)
+        (<music21.note.Note C>, 0.0, <music21.stream.Score mainScore_flatten>)
+        (<music21.note.Note E>, 0.0, <music21.stream.Score mainScore_flatten>)
+        (<music21.note.Note D>, 4.0, <music21.stream.Score mainScore_flatten>)
+        (<music21.note.Note F>, 4.0, <music21.stream.Score mainScore_flatten>)
 
         If you don't need correct offsets or activeSites, set `restoreActiveSites` to `False`.
         Then the last offset/activeSite will be used.  It's a bit of a speedup, but leads to some
@@ -8208,10 +8208,10 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         >>> for el in s.recurse(classFilter=('Note', 'Rest'), restoreActiveSites=False):
         ...     tup = (el, el.offset, el.activeSite)
         ...     print(tup)
-        (<music21.note.Note C>, 0.0, <music21.stream.Score mainScore_flat>)
-        (<music21.note.Note D>, 4.0, <music21.stream.Score mainScore_flat>)
-        (<music21.note.Note E>, 0.0, <music21.stream.Score mainScore_flat>)
-        (<music21.note.Note F>, 4.0, <music21.stream.Score mainScore_flat>)
+        (<music21.note.Note C>, 0.0, <music21.stream.Score mainScore_flatten>)
+        (<music21.note.Note D>, 4.0, <music21.stream.Score mainScore_flatten>)
+        (<music21.note.Note E>, 0.0, <music21.stream.Score mainScore_flatten>)
+        (<music21.note.Note F>, 4.0, <music21.stream.Score mainScore_flatten>)
 
         So, this is pretty unreliable so don't use it unless the tiny speedup is worth it.
 
