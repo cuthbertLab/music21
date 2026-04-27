@@ -1313,7 +1313,7 @@ class Minor67Default(enum.Enum):
     >>> vi('VI', roman.Minor67Default.CAUTIONARY)
     'A- C E-'
 
-    Whereas `QUALITY` follows a strict interpretation of what preceeding sharp and flat
+    Whereas `QUALITY` follows a strict interpretation of what preceding sharp and flat
     signs mean.  With `QUALITY`, since vi is already sharpened, #vi raises it even more.
     And since VI is already flattened, bVI lowers it even further:
 
@@ -3058,7 +3058,6 @@ class RomanNumeral(harmony.Harmony):
         >>> rn.frontAlterationAccidental
         <music21.pitch.Accidental sharp>
 
-
         >>> rn = roman.RomanNumeral()
         >>> rn.scaleDegree = 6
         >>> rn.impliedQuality = 'major'
@@ -3067,6 +3066,9 @@ class RomanNumeral(harmony.Harmony):
         True
         >>> rn.frontAlterationAccidental is None
         True
+
+        Note that this function is not called in parsing, but a private function having the
+        guts of this function is called.
 
         * Changed in v6.4: public function became hook to private function having the actual guts
         '''
@@ -3104,6 +3106,11 @@ class RomanNumeral(harmony.Harmony):
         '''
         def sharpen(wFig: str) -> str:
             changeFrontAlteration(interval.Interval('A1'), 1)
+
+            # changing the working figure is important if the private function is called
+            # on its own (as happens in parse figure).  It doesn't have any effect if
+            # calling the public adjustMinorVIandVIIByQuality.
+
             # If root is in the figure, lower the root to avoid double-sharpening
             if '##' in wFig:
                 wFig = wFig.replace('##8', '#8')

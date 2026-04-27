@@ -6,9 +6,6 @@ __pycache__/
 .mypy_cache/**
 **/.mypy_cache/**
 
-# we are a library, don't lock the requirements
-uv.lock
-
 # PyCharm ignore
 # Keep the dictionary to help new users...
 .idea/codeStyles
@@ -93,3 +90,10 @@ music21/monkeytype.sqlite3
 # Emacs backups
 *.txt~
 *.py~
+.ai/
+.cadence/
+
+
+# agents
+.agents/worktrees
+.claude/worktrees

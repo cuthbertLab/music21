@@ -595,8 +595,6 @@ class VoiceLeadingQuartet(base.Music21Object):
 
             return intervalsAreValid
 
-
-
     def contraryMotion(self) -> bool:
         '''
         Returns True if both voices move in opposite directions

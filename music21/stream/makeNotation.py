@@ -51,9 +51,9 @@ environLocal = environment.Environment(__file__)
 def makeBeams(
     s: StreamType,
     *,
-    inPlace=False,
-    setStemDirections=True,
-    failOnNoTimeSignature=False,
+    inPlace: bool = False,
+    setStemDirections: bool = True,
+    failOnNoTimeSignature: bool = False,
 ) -> StreamType|None:
     # noinspection PyShadowingNames
     '''
@@ -225,8 +225,9 @@ def makeBeams(
         setStemDirectionForBeamGroups(returnObj)
 
     returnObj.streamStatus.beams = True
-    if inPlace is not True:
+    if not inPlace:
         return returnObj
+    return None
 
 
 def makeMeasures(
@@ -707,7 +708,7 @@ def makeMeasures(
         for e in postSorted:
             # may need to handle spanners; already have s as site
             s.insert(post.elementOffset(e), e)
-
+        return None
 
 def makeRests(
     s: StreamType,
@@ -2269,7 +2270,9 @@ class Test(unittest.TestCase):
             n.stemDirection = dStems[i]
         p.makeBeams(inPlace=True)
         self.assertEqual([n.stemDirection for n in p.flatten().notes],
-                         ['up'] * 4 + ['down'] * 6 + ['up'] * 4
+                         ['up'] * 4
+                         + ['down'] * 6
+                         + ['up'] * 4
                          + ['down', 'noStem', 'double', 'down']
                          )
 
@@ -2295,11 +2298,12 @@ class Test(unittest.TestCase):
         from music21 import stream
 
         p = converter.parse('tinyNotation: 2/4 r2 d8 d8 d8 d8')
-        m2 = p[stream.Measure].last()
-        self.assertIsNone(m2.timeSignature)
+        m = p[stream.Measure].last()
+        self.assertIsNone(m.timeSignature)
+        m_n0 = m.notes.first()
+        self.assertEqual(len(m_n0.beams.beamsList), 0)
+        m2 = m.makeBeams()
         m2_n0 = m2.notes.first()
-        self.assertEqual(len(m2_n0.beams.beamsList), 0)
-        m2.makeBeams(inPlace=True)
         self.assertEqual(len(m2_n0.beams.beamsList), 1)
 
         # Failure if no TimeSignature in context
@@ -2307,7 +2311,7 @@ class Test(unittest.TestCase):
         m1.timeSignature = None
         msg = 'cannot process beams in a Measure without a time signature'
         with self.assertRaisesRegex(stream.StreamException, msg):
-            m2.makeBeams(inPlace=True, failOnNoTimeSignature=True)
+            m1.makeBeams(failOnNoTimeSignature=True)
 
     def testStreamExceptions(self):
         from music21 import converter

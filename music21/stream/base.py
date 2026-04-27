@@ -113,7 +113,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
     Stream can have its own offset, when Streams are
     embedded the offset of an element is relatively only
     to its parent Stream. The :meth:`~music21.stream.Stream.flatten`
-    and method provides access to a flat version of all
+    method provides access to a flat version of all
     embedded Streams, with offsets relative to the
     top-level Stream.
 
@@ -332,8 +332,8 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         # self.restrictClass = restrictClass
 
         # these should become part of style or something else
-        self.definesExplicitSystemBreaks = False
-        self.definesExplicitPageBreaks = False
+        self.definesExplicitSystemBreaks: bool = False
+        self.definesExplicitPageBreaks: bool = False
 
         # property for transposition status;
         self._atSoundingPitch: bool|t.Literal['unknown'] = 'unknown'
@@ -6981,7 +6981,6 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
             cautionaryNotImmediateRepeat
             tiePitchSet
 
-
         >>> s = stream.Stream()
         >>> n = note.Note('g')
         >>> n.quarterLength = 1.5
@@ -7062,11 +7061,12 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         # check for tuplet brackets one measure at a time
         # this means that they will never extend beyond one measure
         for m in returnStream.getElementsByClass(Measure):
-            if not m.streamStatus.tuplets:
+            if not m.streamStatus.tuplets:  # TODO: consult my streamStatus + streamStatusParent
                 makeNotation.makeTupletBrackets(m, inPlace=True)
 
         if not inPlace:
             return returnStream
+        return None
 
     def extendDuration(self, objClass, *, inPlace=False):
         '''
@@ -13155,6 +13155,7 @@ class Measure(Stream):
         for illegalKey in ('meterStream', 'refStreamOrTimeRange', 'bestClef'):
             if illegalKey in srkCopy:
                 del srkCopy[illegalKey]
+
 
         m.makeAccidentals(searchKeySignatureByContext=True, inPlace=True, **srkCopy)
         # makeTies is for cross-bar associations, and cannot be used

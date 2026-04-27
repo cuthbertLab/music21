@@ -198,6 +198,17 @@ class Harmony(chord.Chord):
 
     Accepts a keyword 'updatePitches'. By default, it
     is `True`, but can be set to `False` to initialize faster if pitches are not needed.
+
+    The `placement` attribute controls where the symbol appears relative to the staff,
+    matching the MusicXML `placement` attribute on `<harmony>`. Valid values are
+    ``'above'``, ``'below'``, or ``None`` (let the notation software decide):
+
+    >>> cs = harmony.ChordSymbol('G7')
+    >>> cs.placement is None
+    True
+    >>> cs.placement = 'below'
+    >>> cs.placement
+    'below'
     '''
     # sort harmony just before notes and chords and other default objects
     classSortOrder = base.Music21Object.classSortOrder - 1
@@ -224,6 +235,7 @@ class Harmony(chord.Chord):
         # a romanNumeral numeral object, musicxml stores this within a node
         # called <function> which might conflict with the Harmony
         self._roman = None
+        self.placement: str|None = None
         # specify an array of degree alteration objects
         self.chordStepModifications: list[ChordStepModification] = []
         self._degreesList: list[str] = []
