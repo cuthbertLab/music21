@@ -53,7 +53,16 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
+extras = [
+    'python-Levenshtein',
+    'scipy',
+]
+
+[dependency-groups]
+# `dev` pulls in every extra via the `music21[extras]` self-reference
+# so `uv sync` alone is enough to develop and test music21.
 dev = [
+    'music21[extras]',
     'coverage',
     'coveralls',
     'docutils',
@@ -66,9 +75,7 @@ dev = [
     'nbval',
     'pylint>=3.2.0',
     'pytest',
-    'python-Levenshtein',
     'ruff',
-    'scipy',
     'sphinx',
     'twine',
     'types-requests',
@@ -83,6 +90,9 @@ email = "michael.asato.cuthbert@gmail.com"
 Download = "https://github.com/cuthbertLab/music21/releases/"
 Homepage = "https://github.com/cuthbertLab/music21"
 Documentation = "https://www.music21.org/music21docs/"
+
+[tool.uv]
+default-groups = ["dev"]
 
 [tool.hatch.version]
 path = "music21/_version.py"

@@ -17,7 +17,7 @@ jobs:
                 python-version: [3.11, 3.12, 3.13, 3.14]
         steps:
         - uses: actions/checkout@v4
-        - uses: actions/setup-python@v4
+        - uses: actions/setup-python@v5
           with:
               python-version: ${{ matrix.python-version }}
         - name: Install uv
@@ -26,28 +26,29 @@ jobs:
               enable-cache: true
               cache-dependency-glob: |
                   pyproject.toml
+                  uv.lock
         - name: Install dependencies
           run: |
-              uv pip install --system -e '.[dev]'
+              uv sync --locked
         - name: Install Ubuntu dependencies
           run: ./.github/scripts/install_ubuntu_deps.sh
         - name: Setup Lilypond
-          run: python -c 'from music21 import environment; environment.UserSettings()["lilypondPath"] = "/home/runner/bin/lilypond"'
+          run: uv run python -c 'from music21 import environment; environment.UserSettings()["lilypondPath"] = "/home/runner/bin/lilypond"'
         - name: Run Main Test script
-          run: python -c 'from music21.test.testSingleCoreAll import ciMain as ci; ci()'
+          run: uv run python -c 'from music21.test.testSingleCoreAll import ciMain as ci; ci()'
         - name: Coveralls
           if: ${{ matrix.python-version == '3.12' }}
           env:  # when changing number above also change coverageM21.getCoverage
               GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
               COVERALLS_SERVICE_NAME: github
-          run: coveralls
+          run: uv run coveralls
 
     lint:
         runs-on: ubuntu-latest
         steps:
             - uses: actions/checkout@v4
             - name: Set up Python
-              uses: actions/setup-python@v4
+              uses: actions/setup-python@v5
               with:
                   python-version: '3.14'
             - name: Install uv
@@ -56,12 +57,10 @@ jobs:
                   enable-cache: true
                   cache-dependency-glob: |
                       pyproject.toml
+                      uv.lock
             - name: Install dependencies
               run: |
-                  uv pip install --system -e '.[dev]'
-            - name: Install music21 in editable mode
-              run: |
-                  uv pip install --system -e .
+                  uv sync --locked
             - name: Lint with pylint
               run: |
                   uv run pylint -j0 music21
@@ -72,7 +71,7 @@ jobs:
         steps:
             - uses: actions/checkout@v4
             - name: Set up Python
-              uses: actions/setup-python@v4
+              uses: actions/setup-python@v5
               with:
                   python-version: '3.14'
             - name: Install uv
@@ -81,9 +80,10 @@ jobs:
                   enable-cache: true
                   cache-dependency-glob: |
                       pyproject.toml
+                      uv.lock
             - name: Install dependencies
               run: |
-                  uv pip install --system -e '.[dev]'
+                  uv sync --locked
             - name: Code-style etc. with Ruff
               run: |
                   uv run ruff check music21
@@ -94,7 +94,7 @@ jobs:
         steps:
             - uses: actions/checkout@v4
             - name: Set up Python
-              uses: actions/setup-python@v4
+              uses: actions/setup-python@v5
               with:
                   python-version: '3.14'
             - name: Install uv
@@ -103,9 +103,10 @@ jobs:
                   enable-cache: true
                   cache-dependency-glob: |
                       pyproject.toml
+                      uv.lock
             - name: Install dependencies
               run: |
-                  uv pip install --system -e '.[dev]'
+                  uv sync --locked
             - name: Type-check all modules with mypy
               run: |
                   uv run mypy music21

@@ -10,6 +10,11 @@
 - All PRs need to be declared AI-assisted.
 - 10 or more lines of code written by an agent needs to be declared as AI-assisted in the docstring.  Humans can remove and should remove this note when they do a review.
 
+# Setup
+
+- `uv sync` installs runtime deps + the `dev` group, which self-references `music21[extras]`,
+  so scipy and python-Levenshtein come along automatically. Tests will not pass without them.
+
 # Worktrees
 
 - When creating a new worktree, create a new virtual environment with `uv sync`.
