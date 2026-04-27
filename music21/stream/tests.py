@@ -6438,7 +6438,7 @@ class Test(unittest.TestCase):
         s1.repeatAppend(note.Note(), 10)
         s1Flat = s1.flatten()
         self.assertIs(s1Flat.derivation.origin, s1)
-        self.assertEqual(s1Flat.derivation.method, 'flat')
+        self.assertEqual(s1Flat.derivation.method, 'flatten')
 
         s1Elements = s1Flat.getElementsByClass(note.Note).stream()
         self.assertEqual(s1Elements.derivation.method, 'getElementsByClass')
