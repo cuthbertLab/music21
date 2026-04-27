@@ -1031,14 +1031,19 @@ class Music21Object(prebase.ProtoM21Object):
             maxSearch = 100
             while a is None:
                 try:
-                    a = site.elementOffset(tryOrigin, returnSpecial=returnSpecial)
+                    # mypy needs this split (in 2026) in order to properly type `a`
+                    if returnSpecial:
+                        a = site.elementOffset(tryOrigin, returnSpecial=True)
+                    else:
+                        a = site.elementOffset(tryOrigin, returnSpecial=False)
                 except AttributeError as ae:
                     raise SitesException(
                         f'You were using {site!r} as a site, when it is not a Stream.'
                     ) from ae
                 except Music21Exception as e:  # currently StreamException, but will change
+                    # noinspection PyProtectedMember
                     if tryOrigin in site._endElements:
-                        if returnSpecial is True:
+                        if returnSpecial:
                             return OffsetSpecial.AT_END
                         else:
                             return site.highestTime

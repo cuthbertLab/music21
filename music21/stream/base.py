@@ -41,7 +41,7 @@ from music21 import common
 from music21.common.enums import GatherSpanners, OffsetSpecial
 from music21.common.numberTools import opFrac
 from music21.common.types import (
-    StreamType, M21ObjType, ChangedM21ObjType, OffsetQL, OffsetQLSpecial
+    StreamType, M21ObjType, ChangedM21ObjType, OffsetQL, OffsetQLIn, OffsetQLSpecial
 )
 from music21 import clef
 from music21 import chord
@@ -1780,7 +1780,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
             # TODO: move it
             matchedEndElement = False
             baseElementCount = len(self._elements)
-            matchOffset = 0.0  # to avoid possibility of undefined
+            matchOffset: OffsetQLIn = 0.0  # to avoid possibility of undefined
 
             if indexInStream < baseElementCount:
                 match = self._elements.pop(indexInStream)
@@ -2505,6 +2505,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
                     pitches = list(target.pitches)
                     components = list(target)
 
+            finalTarget: chord.Chord | note.Note | note.Rest
             if len(pitches) > 1 or chordsOnly:
                 finalTarget = chord.Chord(pitches)
             elif len(pitches) == 1:
@@ -4892,7 +4893,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         elif common.isIterable(removeClasses):
             removeClasses = set(removeClasses)
 
-        restInfo = {'offset': None, 'endTime': None}
+        restInfo: dict[str, OffsetQLIn|None] = {'offset': None, 'endTime': None}
 
         def optionalAddRest():
             if not fillWithRests:
@@ -4918,6 +4919,8 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
                                     removeAll=removeAll,
                                     exemptFromRemove=exemptFromRemove)
                 if elOffset != OffsetSpecial.AT_END:
+                    # the other OffsetSpecials are not returned from elementOffset
+                    assert not isinstance(elOffset, OffsetSpecial)
                     out.coreInsert(elOffset, outEl)
                 else:  # pragma: no cover
                     # should not have streams stored at end.
@@ -4941,16 +4944,21 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
                 # we are removing this element, but if fillWithRests we need to keep track of
                 # the rest we will eventually fill.
                 if fillWithRests and el.duration.quarterLength:
+                    # the other OffsetSpecials are not returned from elementOffset
+                    assert not isinstance(elOffset, OffsetSpecial)
                     endTime = elOffset + el.duration.quarterLength
+                    existingEnd = restInfo['endTime']
                     if restInfo['offset'] is None:
                         restInfo['offset'] = elOffset
                         restInfo['endTime'] = endTime
-                    elif endTime > restInfo['endTime']:
+                    elif existingEnd is not None and endTime > existingEnd:
                         restInfo['endTime'] = endTime
             else:
                 optionalAddRest()
                 elNew = copy.deepcopy(el)
                 if elOffset != OffsetSpecial.AT_END:
+                    # the other OffsetSpecials are not returned from elementOffset
+                    assert not isinstance(elOffset, OffsetSpecial)
                     out.coreInsert(elOffset, elNew)
                 else:
                     out.coreStoreAtEnd(elNew)
