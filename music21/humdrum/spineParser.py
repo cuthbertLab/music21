@@ -494,62 +494,51 @@ class HumdrumDataCollection(prebase.ProtoM21Object):
         # one of Events(horizontal slices)
         returnProtoSpines: list[ProtoSpine] = []
         returnEventCollections: list[EventCollection] = []
-        protoSpineEventList: list[SpineEvent|None] = []
 
         # noinspection PyShadowingNames
-        def doOneCell(i: int, j: int) -> None:
-            # get the currentEventCollection
+        def processEventForOneCell(i: int, j: int) -> SpineEvent|None:
+            '''
+            Process the (i, j) cell.  Mutates `returnEventCollections[i]`
+            and returns the SpineEvent to record in the protoSpine, or
+            None if there's no event at this cell.
+            '''
             thisEventCollection = returnEventCollections[i]
             currentLine = self.eventList[i]
 
-            # parse this cell
-            if isinstance(currentLine, SpineLine):
-                # not a global event
-                if len(currentLine.spineData) > j:
-                    # are there actually this many spines at this point?
-                    # thus, is there an event here? True
-                    thisEvent = SpineEvent(currentLine.spineData[j])
-                    thisEvent.position = i
-                    thisEvent.protoSpineId = j
-                    if thisEvent.contents in spinePathIndicators:
-                        thisEventCollection.spinePathData = True
-
-                    protoSpineEventList.append(thisEvent)
-                    thisEventCollection.addSpineEvent(j, thisEvent)
-                    if thisEvent.contents == '.' and i > 0:
-                        lastEvent = returnEventCollections[i - 1].events[j]
-                        if lastEvent is not None:
-                            occurringEvent = (
-                                returnEventCollections[i - 1].getSpineOccurring(j)
-                            )
-                            if occurringEvent is not None:
-                                thisEventCollection.addLastSpineEvent(j, occurringEvent)
-                else:  # no data here
-                    thisEvent = SpineEvent('')
-                    thisEvent.position = i
-                    thisEvent.protoSpineId = j
-                    thisEventCollection.addSpineEvent(j, thisEvent)
-
-                    protoSpineEventList.append(None)
-            else:  # Global event -- either GlobalCommentLine or GlobalReferenceLine
-                if j == 0:  # adds to all spines but just runs the first time.
-                    thisEventCollection.addGlobalEvent(self.eventList[i])
-                thisEvent = SpineEvent('')
+            if isinstance(currentLine, SpineLine) and len(currentLine.spineData) > j:
+                # actual event at this cell
+                thisEvent = SpineEvent(currentLine.spineData[j])
                 thisEvent.position = i
                 thisEvent.protoSpineId = j
+                if thisEvent.contents in spinePathIndicators:
+                    thisEventCollection.spinePathData = True
                 thisEventCollection.addSpineEvent(j, thisEvent)
-                protoSpineEventList.append(None)
+                if thisEvent.contents == '.' and i > 0:
+                    lastEvent = returnEventCollections[i - 1].events[j]
+                    if lastEvent is not None:
+                        occurringEvent = returnEventCollections[i - 1].getSpineOccurring(j)
+                        if occurringEvent is not None:
+                            thisEventCollection.addLastSpineEvent(j, occurringEvent)
+                return thisEvent
 
-        # end doOneCell
+            # placeholder cell: either a SpineLine with no data this far over,
+            # or a global (comment/reference) line. First check for Global Comment or Reference
+            if not isinstance(currentLine, SpineLine) and j == 0:
+                # not SpineLine = GlobalComment or GlobalReference.
+                # global events register once, against the first column
+                thisEventCollection.addGlobalEvent(currentLine)
+            placeholder = SpineEvent('')
+            placeholder.position = i
+            placeholder.protoSpineId = j
+            thisEventCollection.addSpineEvent(j, placeholder)
+            return None
+
         for j in range(self.maxSpines):
-            protoSpineEventList = []
-
+            protoSpineEventList: list[SpineEvent|None] = []
             for i in range(self.fileLength):
                 if j == 0:
                     returnEventCollections.append(EventCollection(self.maxSpines))
-
-                doOneCell(i, j)
-
+                protoSpineEventList.append(processEventForOneCell(i, j))
             returnProtoSpines.append(ProtoSpine(protoSpineEventList))
 
         self.protoSpines = returnProtoSpines
