@@ -44,7 +44,7 @@ SpineParsing consists of several steps.
 
 Changed in v10: flag attributes `isSpineLine, isComment, isGlobal, isReference` have been
     removed from HumdrumLine and all subclasses. `isinstance(...)` is a bit slower than
-    checking these, but adds correct typing.
+    checking these, but adds correct typing.  Nothing is stored with weakrefs.
 '''
 from __future__ import annotations
 
@@ -53,6 +53,7 @@ import math
 import re
 import typing as t
 import unittest
+import weakref
 
 from music21.common.types import OffsetQL
 
@@ -184,7 +185,6 @@ class HumdrumDataCollection(prebase.ProtoM21Object):
         self.maxSpines = 0
 
         # parse global comments and figure out the maximum number of spines we will have
-
         self.parsePositionInStream = 0
         self.parseEventListFromDataStream(dataStream)  # sets self.eventList and fileLength
         try:
@@ -1266,6 +1266,9 @@ class HumdrumSpine(prebase.ProtoM21Object):
         as ElementWrappers.  Should be overridden in
         specific Spine subclasses.
         '''
+        if t.TYPE_CHECKING:
+            assert self.spineCollection is not None
+        humdrumPositions = self.spineCollection.humdrumPositions
         lastContainer = hdStringToMeasure('=0')
 
         for event in self.eventList:
@@ -1283,11 +1286,10 @@ class HumdrumSpine(prebase.ProtoM21Object):
             elif eventC.startswith('!'):
                 thisObject = SpineComment(eventC)
             else:
-                wrapper = base.ElementWrapper(event)
-                wrapper.humdrumPosition = event.position
-                thisObject = wrapper
+                thisObject = base.ElementWrapper(event)
 
             if thisObject is not None:
+                humdrumPositions[thisObject] = event.position
                 self.stream.coreAppend(thisObject)
         self.stream.coreElementsChanged()
 
@@ -1314,6 +1316,9 @@ class KernSpine(HumdrumSpine):
         self.desiredTupletDuration: OffsetQL = 0.0
 
     def parse(self) -> None:
+        if t.TYPE_CHECKING:
+            assert self.spineCollection is not None
+        humdrumPositions = self.spineCollection.humdrumPositions
         self.lastContainer = hdStringToMeasure('=0')
         self.inTuplet = False
         self.lastNote = None
@@ -1346,7 +1351,7 @@ class KernSpine(HumdrumSpine):
                     thisObject = self.processNoteEvent(eventC)
 
                 if thisObject is not None:
-                    thisObject.humdrumPosition = event.position  # type: ignore[attr-defined]
+                    humdrumPositions[thisObject] = event.position
                     thisObject.priority = event.position
                     self.stream.coreAppend(thisObject)
             except Exception as e:  # pylint: disable=broad-exception-caught  # pragma: no cover
@@ -1455,6 +1460,9 @@ class DynamSpine(HumdrumSpine):
     are dynamics.
     '''
     def parse(self) -> None:
+        if t.TYPE_CHECKING:
+            assert self.spineCollection is not None
+        humdrumPositions = self.spineCollection.humdrumPositions
         thisContainer: stream.Measure|None = None
         for event in self.eventList:
             eventC = str(event.contents)  # is str already; just so Eclipse gives the right tools
@@ -1483,8 +1491,7 @@ class DynamSpine(HumdrumSpine):
                 thisObject = dynamics.Dynamic(eventC)
 
             if thisObject is not None:
-                # pylint: disable=attribute-defined-outside-init
-                thisObject.humdrumPosition = event.position  # type: ignore[attr-defined]
+                humdrumPositions[thisObject] = event.position
                 if thisContainer is None:
                     self.stream.coreAppend(thisObject)
                 else:
@@ -1505,6 +1512,9 @@ class HarmSpine(HumdrumSpine):
     RomanText and the MuseScore roman numeral notations.
     '''
     def parse(self) -> None:
+        if t.TYPE_CHECKING:
+            assert self.spineCollection is not None
+        humdrumPositions = self.spineCollection.humdrumPositions
         lastContainer = hdStringToMeasure('=0')
         currentKey = key.Key('C')
         for event in self.eventList:
@@ -1539,8 +1549,7 @@ class HarmSpine(HumdrumSpine):
                 )
 
             if thisObject is not None:
-                # pylint: disable=attribute-defined-outside-init
-                thisObject.humdrumPosition = event.position  # type: ignore[attr-defined]
+                humdrumPositions[thisObject] = event.position
                 thisObject.priority = event.position
                 self.stream.coreAppend(thisObject)
         self.stream.coreElementsChanged()
@@ -1624,13 +1633,16 @@ class SpineCollection(prebase.ProtoM21Object):
     When you iterate over a SpineCollection, it goes from right to
     left, since that's the order that humdrum expects.
     '''
-
     def __init__(self) -> None:
         self.spines: list[HumdrumSpine] = []
         self.nextFreeId: int = 0
         self.spineReclassDone: bool = False
         self.iterIndex: int = 0
         self.newSpine: HumdrumSpine|None = None
+        # Maps each parsed Music21Object to its humdrum file line position.
+        self.humdrumPositions: weakref.WeakKeyDictionary[base.Music21Object, int] = (
+            weakref.WeakKeyDictionary()
+        )
 
     def __iter__(self) -> SpineCollection:
         '''
@@ -1658,7 +1670,6 @@ class SpineCollection(prebase.ProtoM21Object):
         by passing in a different streamClass.
 
         Automatically sets the id of the Spine.
-
 
         >>> hsc = humdrum.spineParser.SpineCollection()
         >>> newSpine = hsc.addSpine()
@@ -1702,8 +1713,7 @@ class SpineCollection(prebase.ProtoM21Object):
 
     def removeSpineById(self, spineId: int) -> None:
         '''
-        deletes a spine from the SpineCollection (after inserting, integrating, etc.)
-
+        Deletes a spine from the SpineCollection (after inserting, integrating, etc.)
 
         >>> hsc = humdrum.spineParser.SpineCollection()
         >>> newSpine = hsc.addSpine()
@@ -1749,8 +1759,8 @@ class SpineCollection(prebase.ProtoM21Object):
 
     def assignIds(self) -> None:
         '''
-        assign an ID based on the instrument or just a string of a number if none
-
+        Assign an ID based on the instrument, or just a string of a number
+        if there is no instrument.
 
         >>> hsc = humdrum.spineParser.SpineCollection()
         >>> newSpineDefault = hsc.addSpine()
@@ -1797,8 +1807,8 @@ class SpineCollection(prebase.ProtoM21Object):
 
     def performInsertions(self) -> None:
         '''
-        take a parsed spineCollection as music21 objects and take
-        sub-spines and put them in their proper location
+        Take a parsed spineCollection as Music21Objects and take
+        sub-spines and put them in their proper location.
         '''
         for thisSpine in self.spines:
             # removeSpines = []
@@ -1811,10 +1821,9 @@ class SpineCollection(prebase.ProtoM21Object):
             newStream = thisSpine.stream.__class__()
             insertPoints = sorted(thisSpine.childSpineInsertPoints)
             lastHumdrumPosition = -1
-            # use _elements for being faster.
-            for el in thisSpine.stream._elements:
-                try:
-                    humdrumPosition = el.humdrumPosition  # type: ignore[attr-defined]
+            for el in thisSpine.stream:
+                humdrumPosition = self.humdrumPositions.get(el)
+                if humdrumPosition is not None:
                     for i in insertPoints:
                         if lastHumdrumPosition > i or humdrumPosition < i:
                             continue
@@ -1822,9 +1831,7 @@ class SpineCollection(prebase.ProtoM21Object):
                         self.performSpineInsertion(thisSpine, newStream, i)
                         insertPoints.remove(i)
                     lastHumdrumPosition = humdrumPosition
-                    del el.humdrumPosition  # type: ignore[attr-defined]
-                except AttributeError:  # no el.humdrumPosition
-                    pass
+                    del self.humdrumPositions[el]
                 newStream.coreAppend(el)
                 # newStream.append(el)
             newStream.coreElementsChanged()
@@ -1857,7 +1864,7 @@ class SpineCollection(prebase.ProtoM21Object):
             # removeSpines.append(insertSpine.id)
             voiceNumber += 1
             voiceStr = 'voice' + str(voiceNumber)
-            for insertEl in insertSpine.stream._elements:
+            for insertEl in insertSpine.stream:
                 if insertSpine.isFirstVoice is False and isinstance(insertEl, stream.Measure):
                     pass  # only insert one measure object per spine
                 else:
@@ -1868,7 +1875,7 @@ class SpineCollection(prebase.ProtoM21Object):
 
     def reclassSpines(self) -> None:
         r'''
-        changes the classes of HumdrumSpines to more specific types
+        Changes the classes of HumdrumSpines to more specific types
         (KernSpine, DynamicSpine)
         according to their spineType (e.g., \*\*kern, \*\*dynam)
         '''
@@ -1885,8 +1892,8 @@ class SpineCollection(prebase.ProtoM21Object):
         self,
     ) -> dict[int, tuple[OffsetQL, list[base.Music21Object]]]:
         '''
-        iterates through the spines by location
-        and records the offset and priority for each
+        Iterates through the spines by location
+        and records the offset and priority for each element in the spines.
 
         Returns a dictionary where each index is humdrumPosition and the value is a
         two-element tuple where the first element is the music21 offset and the
@@ -1895,17 +1902,14 @@ class SpineCollection(prebase.ProtoM21Object):
         positionDict: dict[int, tuple[OffsetQL, list[base.Music21Object]]] = {}
         for thisSpine in self.spines:
             if thisSpine.parentSpine is None:
-                sf = thisSpine.stream.flatten()
-                for el in sf:
-                    if hasattr(el, 'humdrumPosition'):
-                        if el.humdrumPosition not in positionDict:
-                            elementList = [el]
-                            valueTuple = (el.offset, elementList)
-                            positionDict[el.humdrumPosition] = valueTuple
-                        else:
-                            elementList = positionDict[el.humdrumPosition][1]
-                            elementList.append(el)
-        # print(positionDict)
+                for el in thisSpine.stream.flatten():
+                    pos = self.humdrumPositions.get(el)
+                    if pos is None:
+                        continue
+                    if pos not in positionDict:
+                        positionDict[pos] = (el.offset, [el])
+                    else:
+                        positionDict[pos][1].append(el)
         return positionDict
 
     def moveObjectsToMeasures(self) -> None:
@@ -1965,8 +1969,9 @@ class SpineCollection(prebase.ProtoM21Object):
             if thisSpine.spineType == 'dynam':
                 for dynamic in thisSpine.stream.flatten():
                     if isinstance(dynamic, dynamics.Dynamic):
-                        dynamicPos = dynamic.humdrumPosition  # type: ignore[attr-defined]
-                        prioritiesToSearch[dynamicPos] = dynamic
+                        dynamicPos = self.humdrumPositions.get(dynamic)
+                        if dynamicPos is not None:
+                            prioritiesToSearch[dynamicPos] = dynamic
                 for applyStaff in stavesAppliedTo:
                     applyStream = kernStreams[applyStaff]
                     for el in applyStream.recurse():
@@ -1983,8 +1988,9 @@ class SpineCollection(prebase.ProtoM21Object):
             elif thisSpine.spineType == 'harm':
                 for harm in thisSpine.stream.flatten():
                     if isinstance(harm, roman.RomanNumeral):
-                        harmPos = harm.humdrumPosition  # type: ignore[attr-defined]
-                        prioritiesToSearch[harmPos] = harm
+                        harmPos = self.humdrumPositions.get(harm)
+                        if harmPos is not None:
+                            prioritiesToSearch[harmPos] = harm
                 for applyStaff in stavesAppliedTo:
                     applyStream = kernStreams[applyStaff]
                     for el in applyStream.recurse():
@@ -2001,8 +2007,9 @@ class SpineCollection(prebase.ProtoM21Object):
             elif thisSpine.spineType in ('lyrics', 'text'):
                 for text in thisSpine.stream.recurse():
                     if isinstance(text, base.ElementWrapper):
-                        textPos = text.humdrumPosition  # type: ignore[attr-defined]
-                        prioritiesToSearch[textPos] = text.obj
+                        textPos = self.humdrumPositions.get(text)
+                        if textPos is not None:
+                            prioritiesToSearch[textPos] = text.obj
                 for applyStaff in stavesAppliedTo:
                     applyStream = kernStreams[applyStaff]
                     for el in applyStream.recurse():
@@ -2643,8 +2650,6 @@ def kernTandemToObject(tandem: str) -> base.Music21Object|None:
 
 
 class MiscTandem(base.Music21Object):
-    humdrumPosition: int = 0
-
     def __init__(self, tandem: str = '', **keywords) -> None:
         super().__init__(**keywords)
         self.tandem: str = tandem
@@ -2664,8 +2669,6 @@ class SpineComment(base.Music21Object):
     >>> sc.comment
     'this is a spine comment'
     '''
-    humdrumPosition: int = 0
-
     def __init__(self, comment: str = '', **keywords) -> None:
         super().__init__(**keywords)
         commentPart = re.sub(r'^!+\s?', '', comment)
