@@ -67,9 +67,9 @@ def makeBeams(
     If `inPlace` is True, this is done in-place; if `inPlace` is False,
     this returns a modified deep copy.
 
-    .. note: Before Version 1.6, `inPlace` default was `True`; now `False`
-             like most `inPlace` options in music21.  Also, in 1.8, no tuplets are made
-             automatically.  Use makeTupletBrackets()
+    .. note:: Before Version 1.6, `inPlace` default was `True`; now `False`
+        like most `inPlace` options in music21.  Also, in 1.8, no tuplets are made
+        automatically.  Use makeTupletBrackets()
 
     See :meth:`~music21.meter.TimeSignature.getBeams` for the algorithm used.
 

@@ -95,21 +95,20 @@ class HumdrumException(exceptions21.Music21Exception):
 
 class HumdrumDataCollection(prebase.ProtoM21Object):
     r'''
+    .. note:: Most users should not need to be here.  Just run `converter.parse('file.krn')`
+        and it will give you a stream.Score instead.
+        Intermediate users who want to get into the guts of Humdrum are still
+        probably better off running humdrum.parseFile("filename")
+        which returns a humdrum.SpineCollection directly.
+
     A HumdrumDataCollection takes in a mandatory list where each element
     is a line of humdrum data.  Together this list represents a collection
     of spines.  Essentially it's the contents of a humdrum file.
-
 
     Usually you will probably want to use HumdrumFile which can read
     in a file directly.  This class exists in case you have your Humdrum
     data in another format (database, from the web, etc.) and already
     have it as a string.
-
-
-    You are probably better off running humdrum.parseFile("filename")
-    which returns a humdrum.SpineCollection directly, or even better,
-    converter.parse('file.krn') which will just give you a stream.Score
-    instead.
 
     LIMITATIONS:
     (1) Spines cannot change definition (\*\*exclusive interpretations) mid-spine.
@@ -126,7 +125,7 @@ class HumdrumDataCollection(prebase.ProtoM21Object):
 
         The Aarden/Miller Palestrina dataset uses `\*-` followed by `\*\*kern`
         at the changes of sections thus some parsing of multiple exclusive
-        interpretations in a protospine may be necessary.
+        interpretations in a protospine may be necessary.  But none change definition.
 
     (2) Split spines are assumed to be voices in a single spine staff.
     '''
