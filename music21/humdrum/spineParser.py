@@ -42,7 +42,7 @@ SpineParsing consists of several steps.
 * Stream elements are moved into their measures within a Stream.
 * Measures are searched for elements with voice groups and Voice objects are created.
 
-Changed in v10: flag attributes `isSpineLine, isComment, isGlobal, isReference` have been
+* Changed in v10: flag attributes `isSpineLine, isComment, isGlobal, isReference` have been
     removed from HumdrumLine and all subclasses. `isinstance(...)` is a bit slower than
     checking these, but adds correct typing.  Nothing is stored with weakrefs.  `.iterIndex`
     and hand roled iterator/generators are gone now (could've gone when Python 2.4 became
@@ -57,6 +57,7 @@ import typing as t
 import unittest
 import weakref
 
+from music21.common.numberTools import opFrac
 from music21.common.types import OffsetQL
 
 from music21 import articulations
@@ -80,6 +81,7 @@ from music21 import prebase
 from music21 import stream
 from music21 import tempo
 from music21 import tie
+from music21.duration import GraceDuration
 
 from music21.humdrum import testFiles
 from music21.humdrum import harmparser
@@ -448,9 +450,8 @@ class HumdrumDataCollection(prebase.ProtoM21Object):
         Calls :meth:`~music21.humdrum.spineParser.parseEventListFromDataStream`
         if it hasn't already been called.
 
-        returns a tuple of protoSpines and eventCollections in addition to
+        Returns a tuple of protoSpines and eventCollections in addition to
         setting it in the calling object.
-
 
         >>> eventString = ('!!!COM: Beethoven, Ludwig van\n' +
         ...                '!! Not really a piece by Beethoven\n' +
@@ -466,7 +467,7 @@ class HumdrumDataCollection(prebase.ProtoM21Object):
         >>> eventCollections is hdc.eventCollections
         True
 
-        Looking at individual slices is unlikely to tell you much.
+        Looking at individual slices is unlikely to tell you much:
 
         >>> for thisSlice in eventCollections:
         ...    print(thisSlice)
@@ -1292,14 +1293,17 @@ class KernSpine(HumdrumSpine):
     `__class__` from `HumdrumSpine` to `KernSpine` once the spine's
     exclusive interpretation is known.  All KernSpine-specific state
     is initialized at the top of `parse()`.
+
+    * Changed in v10: `currentTupletDuration` / `desiredTupletDuration`
+        renamed to `currentTupletQL` / `desiredTupletQL`.
     '''
     # Set in parse(); declared here so type-checkers see them.
     lastContainer: stream.Measure|None
     inTuplet: bool
     lastNote: note.GeneralNote|None
     currentBeamNumbers: int
-    currentTupletDuration: OffsetQL
-    desiredTupletDuration: OffsetQL
+    currentTupletQL: OffsetQL
+    desiredTupletQL: OffsetQL
 
     def parse(self) -> None:
         if t.TYPE_CHECKING:
@@ -1309,8 +1313,8 @@ class KernSpine(HumdrumSpine):
         self.inTuplet = False
         self.lastNote = None
         self.currentBeamNumbers = 0
-        self.currentTupletDuration = 0.0
-        self.desiredTupletDuration = 0.0
+        self.currentTupletQL = 0.0
+        self.desiredTupletQL = 0.0
 
         for event in self.eventList:
             # event is a SpineEvent object
@@ -1417,26 +1421,26 @@ class KernSpine(HumdrumSpine):
 
         if not self.inTuplet and nTuplets:
             self.inTuplet = True
-            self.desiredTupletDuration = nTuplets[0].totalTupletLength()
-            self.currentTupletDuration = nDur.quarterLength
+            self.desiredTupletQL = nTuplets[0].totalTupletLength()
+            self.currentTupletQL = nDur.quarterLength
             n.duration.tuplets[0].type = 'start'
         elif self.inTuplet and not nTuplets:
             self.inTuplet = False
-            self.desiredTupletDuration = 0.0
-            self.currentTupletDuration = 0.0
+            self.desiredTupletQL = 0.0
+            self.currentTupletQL = 0.0
             if self.lastNote is not None:
                 self.lastNote.duration.tuplets[0].type = 'stop'
         elif self.inTuplet:
-            self.currentTupletDuration += nDur.quarterLength
-            if (self.currentTupletDuration == self.desiredTupletDuration
-                # check for things like 6 6 3 6 6;
-                # redundant with previous, but written out for clarity
-                    or (self.currentTupletDuration / self.desiredTupletDuration) == int(
-                        self.currentTupletDuration / self.desiredTupletDuration)):
+            self.currentTupletQL = opFrac(self.currentTupletQL + nDur.quarterLength)
+            # Stop on the first integer multiple of desiredTupletQL --
+            # handles both exact fits and overshoots like trying to get 3 1/6ths to
+            # add to 0.5, but getting instead 1/6+1/6+1/3+1/6+1/6 = 2*0.5.
+            if (self.currentTupletQL >= self.desiredTupletQL
+                    and self.currentTupletQL % self.desiredTupletQL == 0):
                 nTuplets[0].type = 'stop'
                 self.inTuplet = False
-                self.currentTupletDuration = 0.0
-                self.desiredTupletDuration = 0.0
+                self.currentTupletQL = 0.0
+                self.desiredTupletQL = 0.0
 
 
 class DynamSpine(HumdrumSpine):
@@ -1451,7 +1455,7 @@ class DynamSpine(HumdrumSpine):
         humdrumPositions = self.spineCollection.humdrumPositions
         thisContainer: stream.Measure|None = None
         for event in self.eventList:
-            eventC = str(event.contents)  # is str already; just so Eclipse gives the right tools
+            eventC = event.contents
             thisObject: base.Music21Object|None = None
             if eventC == '.':
                 pass
@@ -1564,7 +1568,6 @@ class SpineEvent(prebase.ProtoM21Object):
 
     The `toNote()` method converts the contents into a music21 note as
     if it's kern -- useful to have in all spine types.
-
 
     >>> se1 = humdrum.spineParser.SpineEvent('EEE-8')
     >>> se1.position = 40
@@ -2157,7 +2160,6 @@ def hdStringToNote(contents: str) -> note.GeneralNote:
     >>> n.duration.fullName
     'Imperfect Maxima'
 
-
     Note that the following example is interpreted as one note in the time of a
     double-dotted quarter not a double-dotted quarter-note triplet.
 
@@ -2384,8 +2386,10 @@ def hdStringToNote(contents: str) -> note.GeneralNote:
         thisObject.duration.type = 'eighth'
     elif 'Q' in contents:
         thisObject = thisObject.getGrace()
-        thisObject.duration.slash = False  # type: ignore[attr-defined]
-        thisObject.duration.type = 'eighth'
+        dur = thisObject.duration
+        assert isinstance(dur, GraceDuration)
+        dur.slash = False
+        dur.type = 'eighth'
     elif 'P' in contents:
         thisObject = thisObject.getGrace(appoggiatura=True)
     elif 'p' in contents:
@@ -2414,89 +2418,72 @@ def hdStringToMeasure(
     kern uses an equals sign followed by processing instructions to
     create new measures.
 
-    N.B. -- much of the code for describing how repeat
-    signs are encoded is among the oldest code for music21
-    and was not updated when musicxml parsing was added.
-    It does not yet use the bar.RepeatMark() class
-    or any other post 2009 additions.
+    Changed in v10: repeat dots are encoded as :class:`~music21.bar.Repeat`
+    objects instead of being stuffed into a non-existent ``Barline.repeatDots``
+    attribute.  ``:|:`` now produces an end-Repeat on the previous measure's
+    right barline AND a start-Repeat on the new measure's left barline.
     '''
-    # TODO(msc): fix!!!
+    if contents == '==|':
+        environLocal.warn(
+            '"Double bar visually rendered as a single bar" is not supported '
+            'in music21; storing as a double bar.')
 
-    m1 = stream.Measure()
-    rematchMN = re.search(r'(\d+)([a-z]?)', contents)
+    m = stream.Measure()
+    match_measure_number = re.search(r'(\d+)([a-z]?)', contents)
+    if match_measure_number:
+        m.number = int(match_measure_number.group(1))
+        if match_measure_number.group(2):
+            m.numberSuffix = match_measure_number.group(2)
 
-    if rematchMN:
-        m1.number = int(rematchMN.group(1))
-        if rematchMN.group(2):
-            m1.numberSuffix = rematchMN.group(2)
-
-    barline = bar.Barline()
-
+    # Bar type from the bar character(s).
+    barType = ''
     if '-' in contents:
-        barline.type = 'none'
+        barType = 'none'
     elif "'" in contents:
-        barline.type = 'short'
+        barType = 'short'
     elif '`' in contents:
-        barline.type = 'tick'
-    elif '||' in contents:
-        barline.type = 'double'
-        if contents.count(':') > 1:
-            barline.repeatDots = 'both'  # type: ignore[attr-defined]
-        elif ':|' in contents:
-            barline.repeatDots = 'left'  # type: ignore[attr-defined]
-        elif '|:' in contents:
-            barline.repeatDots = 'right'  # type: ignore[attr-defined]
+        barType = 'tick'
+    elif '||' in contents or '==' in contents:
+        barType = 'double'
     elif '!!' in contents:
-        barline.type = 'heavy-heavy'
-        if contents.count(':') > 1:
-            barline.repeatDots = 'both'  # type: ignore[attr-defined]
-        elif ':!' in contents:
-            barline.repeatDots = 'left'  # type: ignore[attr-defined]
-        elif '!:' in contents:
-            barline.repeatDots = 'right'  # type: ignore[attr-defined]
+        barType = 'heavy-heavy'
     elif '|!' in contents:
-        barline.type = 'final'
-        if contents.count(':') > 1:
-            barline.repeatDots = 'both'  # type: ignore[attr-defined]
-        elif ':|' in contents:
-            barline.repeatDots = 'left'  # type: ignore[attr-defined]
-        elif '!:' in contents:
-            barline.repeatDots = 'right'  # type: ignore[attr-defined]
+        barType = 'final'
     elif '!|' in contents:
-        barline.type = 'heavy-light'
-        if contents.count(':') > 1:
-            barline.repeatDots = 'both'  # type: ignore[attr-defined]
-        elif ':!' in contents:
-            barline.repeatDots = 'left'  # type: ignore[attr-defined]
-        elif '|:' in contents:
-            barline.repeatDots = 'right'  # type: ignore[attr-defined]
+        barType = 'heavy-light'
     elif '|' in contents:
-        barline.type = 'regular'
-        if contents.count(':') > 1:
-            barline.repeatDots = 'both'  # type: ignore[attr-defined]
-        elif ':|' in contents:
-            barline.repeatDots = 'left'  # type: ignore[attr-defined]
-        elif '|:' in contents:
-            barline.repeatDots = 'right'  # type: ignore[attr-defined]
-    elif '==' in contents:
-        barline.type = 'double'
-        if contents.count(':') > 1:
-            barline.repeatDots = 'both'  # type: ignore[attr-defined]
-            # cannot specify single repeat dots without styles
-        if contents == '==|':
-            raise HumdrumException(
-                'Cannot import a double bar visually rendered as a single bar -- '
-                + 'not sure exactly what that would mean anyhow.')
+        barType = 'regular'
 
+    # Repeat dots:
+    #   ':' before a bar character → end-repeat (dots on the left of the bar)
+    #   ':' after a bar character  → start-repeat (dots on the right of the bar)
+    #   two or more ':' anywhere   → both
+    bothRepeats = contents.count(':') > 1
+    endRepeat = bothRepeats or bool(re.search(r':[|!=]', contents))
+    startRepeat = bothRepeats or bool(re.search(r'[|!=]:', contents))
+
+    def makeBar(direction: str|None) -> bar.Barline:
+        if direction is not None:
+            b: bar.Barline = bar.Repeat(direction=direction)
+        else:
+            b = bar.Barline()
+        if barType:
+            b.type = barType
+        return b
+
+    rightBar = makeBar('end' if endRepeat else None)
     if ';' in contents:
-        barline.pause = expressions.Fermata()
+        rightBar.pause = expressions.Fermata()
 
     if previousMeasure is not None:
-        previousMeasure.rightBarline = barline
+        previousMeasure.rightBarline = rightBar
+        if startRepeat:
+            m.leftBarline = makeBar('start')
     else:
-        m1.leftBarline = barline
+        # No previous measure to attach to: put whatever we have on m's left.
+        m.leftBarline = makeBar('start') if startRepeat else rightBar
 
-    return m1
+    return m
 
 
 def kernTandemToObject(tandem: str) -> base.Music21Object|None:
@@ -2504,7 +2491,6 @@ def kernTandemToObject(tandem: str) -> base.Music21Object|None:
     Kern uses symbols such as :samp:`*M5/4` and :samp:`*clefG2`, etc., to control processing
 
     This method converts them to music21 objects.
-
 
     >>> m = humdrum.spineParser.kernTandemToObject('*M3/1')
     >>> m
@@ -2634,7 +2620,6 @@ class SpineComment(base.Music21Object):
     '''
     A Music21Object that represents a comment in a single spine.
 
-
     >>> sc = humdrum.spineParser.SpineComment('! this is a spine comment')
     >>> sc
     <music21.humdrum.spineParser.SpineComment 'this is a spine comment'>
@@ -2684,7 +2669,7 @@ class GlobalReference(base.Music21Object):
     >>> sc.value
     'this is a global reference'
 
-    Alternate form
+    Alternate form:
 
     >>> sc = humdrum.spineParser.GlobalReference('REF', 'this is a global reference')
     >>> sc
@@ -2919,10 +2904,14 @@ class Test(unittest.TestCase):
         m1 = hdStringToMeasure('=29a;:|:', m0)
         self.assertEqual(m1.number, 29)
         self.assertEqual(m1.numberSuffix, 'a')
+        # ':|:' produces an end-Repeat on m0's right and a start-Repeat on m1's left.
+        self.assertIsInstance(m0.rightBarline, bar.Repeat)
+        self.assertEqual(m0.rightBarline.direction, 'end')
         self.assertEqual(m0.rightBarline.type, 'regular')
-        self.assertEqual(m0.rightBarline.repeatDots, 'both')
-        self.assertIsNotNone(m0.rightBarline.pause)
         self.assertIsInstance(m0.rightBarline.pause, expressions.Fermata)
+        self.assertIsInstance(m1.leftBarline, bar.Repeat)
+        self.assertEqual(m1.leftBarline.direction, 'start')
+        self.assertEqual(m1.leftBarline.type, 'regular')
 
     def testMeterBreve(self):
         m = kernTandemToObject('*M3/1')
@@ -3227,5 +3216,4 @@ class TestExternal(unittest.TestCase):
 
 if __name__ == '__main__':
     import music21
-    music21.mainTest(Test)  # , runTest='testSplitSpines2') #, TestExternal)
-
+    music21.mainTest(Test)
