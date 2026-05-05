@@ -1007,10 +1007,12 @@ class HumdrumSpine(prebase.ProtoM21Object):
     regardless of \*\*definition after spine path indicators have
     been simplified.
 
+    A subclass of HumdrumSpine should be defined for each \*\*type. Those
+    subclasses cannot redefine `__init__()`
+
     A HumdrumSpine is a collection of events arranged vertically that have a
     connection to each other.
     Each HumdrumSpine MUST have an id (numeric or string) attached to it.
-
 
     >>> SE = humdrum.spineParser.SpineEvent
     >>> spineEvents = [SE('**kern'), SE('c,4'), SE('d#8')]
@@ -1027,7 +1029,7 @@ class HumdrumSpine(prebase.ProtoM21Object):
     >>> spine1.spineCollection = spineCollection1
 
     The spineType property searches the EventList or parentSpine to
-    figure out the spineType
+    figure out the spineType.
 
     >>> spine1.spineType
     'kern'
@@ -1049,6 +1051,7 @@ class HumdrumSpine(prebase.ProtoM21Object):
     <music21.stream.Part ...>
     '''
 
+    @t.final
     def __init__(
         self,
         spineId: int = 0,
@@ -1076,10 +1079,10 @@ class HumdrumSpine(prebase.ProtoM21Object):
         self.insertionsDone: bool = False
 
         self.spineCollection: SpineCollection|None = None
-        self._spineType: str|None = None
+        self._spineType: str = ''
 
-        self.isFirstVoice: bool|None = None
-        self.iterIndex: int|None = None
+        self.isFirstVoice: bool = False
+        self.iterIndex: int = 0
 
     def _reprInternal(self) -> str:
         representation = ': ' + str(self.id)
@@ -1111,54 +1114,44 @@ class HumdrumSpine(prebase.ProtoM21Object):
         '''
         if self.iterIndex == len(self.eventList):
             raise StopIteration()
-        if t.TYPE_CHECKING:
-            assert self.iterIndex is not None
         thisEvent = self.eventList[self.iterIndex]
         self.iterIndex += 1
         return thisEvent
 
-    def _getLocalSpineType(self) -> str|None:
-        if self._spineType is not None:
+    def _getLocalSpineType(self) -> str:
+        if self._spineType:
             return self._spineType
-        else:
-            for thisEvent in self.eventList:
-                m1 = re.match(r'\*\*(.*)', thisEvent.contents)
-                if m1:
-                    self._spineType = m1.group(1)
-                    return self._spineType
-            return None
+        for thisEvent in self.eventList:
+            m1 = re.match(r'\*\*(.*)', thisEvent.contents)
+            if m1:
+                self._spineType = m1.group(1)
+                return self._spineType
+        return ''
 
-    def _getParentSpineType(self) -> str|None:
+    def _getParentSpineType(self) -> str:
         parentSpine = self.parentSpine
-        if parentSpine is not None:
-            psSpineType = parentSpine.spineType
-            if psSpineType is not None:
-                return psSpineType
-            return None
-        else:
-            return None
+        if parentSpine is None:
+            return ''
+        return parentSpine.spineType
 
     def _getSpineType(self) -> str:
         '''
         searches the current and parent spineType for a search
         '''
-        if self._spineType is not None:
+        if self._spineType:
             return self._spineType
-        else:
-            st = self._getLocalSpineType()
-            if st is not None:
-                self._spineType = st
-                return st
-            else:
-                st = self._getParentSpineType()
-                if st is not None:
-                    self._spineType = st
-                    return st
-                else:
-                    raise HumdrumException('Could not determine spineType '
-                                           + 'for spine with id ' + str(self.id))
+        st = self._getLocalSpineType()
+        if st:
+            self._spineType = st
+            return st
+        st = self._getParentSpineType()
+        if st:
+            self._spineType = st
+            return st
+        raise HumdrumException('Could not determine spineType '
+                               + 'for spine with id ' + str(self.id))
 
-    def _setSpineType(self, newSpineType: str|None = None) -> None:
+    def _setSpineType(self, newSpineType: str = '') -> None:
         self._spineType = newSpineType
 
     spineType = property(_getSpineType, _setSpineType)
@@ -1298,22 +1291,20 @@ class KernSpine(HumdrumSpine):
     r'''
     A KernSpine is a type of humdrum spine with the \*\*kern
     attribute set and thus events are processed as if they
-    are kern notes
-    '''
+    are kern notes.
 
-    def __init__(
-        self,
-        spineId: int = 0,
-        eventList: list[SpineEvent]|None = None,
-        streamClass: type[stream.Stream] = stream.Stream,
-    ) -> None:
-        super().__init__(spineId, eventList, streamClass)
-        self.lastContainer: stream.Measure|None = None
-        self.inTuplet: bool = False
-        self.lastNote: note.GeneralNote|None = None
-        self.currentBeamNumbers: int = 0
-        self.currentTupletDuration: OffsetQL = 0.0
-        self.desiredTupletDuration: OffsetQL = 0.0
+    Instances are not constructed directly; `reclassSpines` reassigns
+    `__class__` from `HumdrumSpine` to `KernSpine` once the spine's
+    exclusive interpretation is known.  All KernSpine-specific state
+    is initialized at the top of `parse()`.
+    '''
+    # Set in parse(); declared here so type-checkers see them.
+    lastContainer: stream.Measure|None
+    inTuplet: bool
+    lastNote: note.GeneralNote|None
+    currentBeamNumbers: int
+    currentTupletDuration: OffsetQL
+    desiredTupletDuration: OffsetQL
 
     def parse(self) -> None:
         if t.TYPE_CHECKING:
@@ -1689,8 +1680,6 @@ class SpineCollection(prebase.ProtoM21Object):
         self.newSpine.spineCollection = self
         self.spines.append(self.newSpine)
         self.nextFreeId += 1
-        # if this is a sub-spine (Voice) then does it need to close off measures, etc.
-        self.newSpine.isFirstVoice = False
         return self.newSpine
 
     def appendSpine(self, spine: HumdrumSpine) -> None:
@@ -1865,7 +1854,7 @@ class SpineCollection(prebase.ProtoM21Object):
             voiceNumber += 1
             voiceStr = 'voice' + str(voiceNumber)
             for insertEl in insertSpine.stream:
-                if insertSpine.isFirstVoice is False and isinstance(insertEl, stream.Measure):
+                if not insertSpine.isFirstVoice and isinstance(insertEl, stream.Measure):
                     pass  # only insert one measure object per spine
                 else:
                     insertEl.groups.append(voiceStr)
