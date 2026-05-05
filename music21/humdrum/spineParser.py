@@ -38,13 +38,15 @@ SpineParsing consists of several steps.
 * For HumdrumSpines with parent spines their .stream contents are then
     inserted into their parent spines with
     voice tagged as a music21 Group property.
-* Lyrics and Dynamics are placed into their corresponding HumdrumSpine.stream objects
-* Stream elements are moved into their measures within a Stream
-* Measures are searched for elements with voice groups and Voice objects are created
+* Lyrics and Dynamics are placed into their corresponding HumdrumSpine.stream objects.
+* Stream elements are moved into their measures within a Stream.
+* Measures are searched for elements with voice groups and Voice objects are created.
 
 Changed in v10: flag attributes `isSpineLine, isComment, isGlobal, isReference` have been
     removed from HumdrumLine and all subclasses. `isinstance(...)` is a bit slower than
-    checking these, but adds correct typing.  Nothing is stored with weakrefs.
+    checking these, but adds correct typing.  Nothing is stored with weakrefs.  `.iterIndex`
+    and hand roled iterator/generators are gone now (could've gone when Python 2.4 became
+    the minimum version).
 '''
 from __future__ import annotations
 
@@ -122,13 +124,13 @@ class HumdrumDataCollection(prebase.ProtoM21Object):
 
         So if you start off with \*\*kern, the rest of the spine needs to be
         \*\*kern (actually, the first exclusive interpretation for a spine is
-        used throughout)
+        used throughout).
 
         Note that, even though changing exclusive interpretations mid-spine
         seems to be legal by the humdrum definition, it looks like none of the
         conventional humdrum parsing tools allow for changing
         definitions mid-spine, so I don't think this limitation is a problem.
-        (Craig Stuart Sapp confirmed this to me)
+        (Craig Stuart Sapp confirmed this to me.)
 
         The Aarden/Miller Palestrina dataset uses `\*-` followed by `\*\*kern`
         at the changes of sections thus some parsing of multiple exclusive
@@ -269,6 +271,9 @@ class HumdrumDataCollection(prebase.ProtoM21Object):
         '''
         if dataStream is None:
             dataStream = self.dataStream
+
+        if dataStream is None:  # pragma: no cover
+            raise TypeError('dataStream cannot be None')
 
         startPositions = []
         endPositions = []
@@ -706,9 +711,10 @@ class HumdrumDataCollection(prebase.ProtoM21Object):
         Is run automatically by `self.parse()`.
         uses `self.spineCollection.getOffsetsAndPrioritiesByPosition()`
         '''
+        spineCollection = self.spineCollection
         if t.TYPE_CHECKING:
-            assert self.spineCollection is not None
-        positionDict = self.spineCollection.getOffsetsAndPrioritiesByPosition()
+            assert spineCollection is not None
+        positionDict = spineCollection.getOffsetsAndPrioritiesByPosition()
         eventList = self.eventList
         maxEventList = len(eventList)
         numberOfGlobalEventsInARow = 0
@@ -730,7 +736,8 @@ class HumdrumDataCollection(prebase.ProtoM21Object):
                         break
                 el: GlobalReference|GlobalComment
                 if isinstance(event, GlobalReferenceLine):
-                    # TODO: Fix GlobalReference -- ???
+                    # TODO: Fix GlobalReference (added in 2012; as of 2016 not sure what to fix)
+                    #    might add language?
                     el = GlobalReference(event.code, event.value)
                 else:
                     el = GlobalComment(event.value)
@@ -886,7 +893,7 @@ class GlobalReferenceLine(HumdrumLine):
     # noinspection SpellCheckingInspection
     r'''
     A GlobalReferenceLine is a type of HumdrumLine that contains
-    information about the humdrum document.
+    information/metadata about the humdrum document.
 
     In humdrum it is represented by three exclamation points
     followed by non-whitespace followed by a colon.  Examples::
@@ -920,6 +927,9 @@ class GlobalReferenceLine(HumdrumLine):
     'Stravinsky, Igor Fyodorovich'
 
     TODO: add parsing of three-digit Kern comment codes into fuller metadata
+    TODO: parse `@`/`@@` language tags here (e.g. `!!!OPT@@RUS:`, `!!!OPT@FRE:`)
+        and propagate language/isPrimary so that GlobalReference.updateMetadata
+        can attach `metadata.Text(value, language=...)` instead of bare strings.
     '''
     def __init__(self, position: int = 0, contents: str = '!!! NUL: None') -> None:
         self.position = position
@@ -1082,7 +1092,6 @@ class HumdrumSpine(prebase.ProtoM21Object):
         self._spineType: str = ''
 
         self.isFirstVoice: bool = False
-        self.iterIndex: int = 0
 
     def _reprInternal(self) -> str:
         representation = ': ' + str(self.id)
@@ -1101,22 +1110,8 @@ class HumdrumSpine(prebase.ProtoM21Object):
         '''
         self.eventList.append(event)
 
-    def __iter__(self) -> HumdrumSpine:
-        '''
-        Resets the counter to 0 so that iteration is correct
-        '''
-        self.iterIndex = 0
-        return self
-
-    def __next__(self) -> SpineEvent:
-        '''
-        Returns the current event and increments the iteration index.
-        '''
-        if self.iterIndex == len(self.eventList):
-            raise StopIteration()
-        thisEvent = self.eventList[self.iterIndex]
-        self.iterIndex += 1
-        return thisEvent
+    def __iter__(self) -> t.Iterator[SpineEvent]:
+        return iter(self.eventList)
 
     def _getLocalSpineType(self) -> str:
         if self._spineType:
@@ -1628,29 +1623,17 @@ class SpineCollection(prebase.ProtoM21Object):
         self.spines: list[HumdrumSpine] = []
         self.nextFreeId: int = 0
         self.spineReclassDone: bool = False
-        self.iterIndex: int = 0
         self.newSpine: HumdrumSpine|None = None
         # Maps each parsed Music21Object to its humdrum file line position.
         self.humdrumPositions: weakref.WeakKeyDictionary[base.Music21Object, int] = (
             weakref.WeakKeyDictionary()
         )
 
-    def __iter__(self) -> SpineCollection:
+    def __iter__(self) -> t.Iterator[HumdrumSpine]:
         '''
-        Resets the counter to len(self.spines) so that iteration is correct
+        Iterates spines right-to-left, the order humdrum expects.
         '''
-        self.iterIndex = len(self.spines) - 1
-        return self
-
-    def __next__(self) -> HumdrumSpine:
-        '''
-        Returns the current spine and decrements the iteration index.
-        '''
-        if self.iterIndex < 0:
-            raise StopIteration()
-        thisSpine = self.spines[self.iterIndex]
-        self.iterIndex -= 1
-        return thisSpine
+        return reversed(self.spines)
 
     def addSpine(self, streamClass: type[stream.Stream] = stream.Part) -> HumdrumSpine:
         '''
