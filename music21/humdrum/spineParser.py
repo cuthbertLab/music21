@@ -2117,15 +2117,17 @@ class SpineCollection(prebase.ProtoM21Object):
 class EventCollection(prebase.ProtoM21Object):
     '''
     An EventCollection holds every event that appears on a single source line
-    of a humdrum file -- one cell per spine.  Despite the historical "time
-    slice" framing, this is a *line-number* concept, not a time concept: a
-    clef change and the note that follows it on the next line take place at
-    the same musical time but live in different EventCollections.
+    of a humdrum file -- one cell per spine, in their `events` array.
 
     If a spine's cell on this line is '.' or a comment (no new event), use
     `lastEvents[spineNum]` to retrieve the previous event still sounding.
     `getSpineOccurring` returns either the current event or the last event
     that's still active.
+
+    Theses events should happen at the same time (offset)
+    but they are not necessarily the only events to happen at that same time.
+    E.g. a clef change and the note that follows it on the next line take place at
+    the same musical time but live in different EventCollections.
 
     These objects normally get created by
     :meth:`~music21.humdrum.spineParser.HumdrumDataCollection.parseProtoSpinesAndEventCollections`
@@ -2155,8 +2157,16 @@ class EventCollection(prebase.ProtoM21Object):
     5
     >>> ec2.getAllOccurring()
     [<music21.humdrum.spineParser.SpineEvent D4>, <music21.humdrum.spineParser.SpineEvent pp>]
-    '''
 
+    If there were spine path markers this next boolean would be true:
+
+    >>> ec2.spinePathData
+    False
+
+    In the future, EventCollection may enforce that all events have the same lineNumber
+
+    * New in v10: lineNumber
+    '''
     def __init__(self, maxSpines: int = 0, lineNumber: int = 0) -> None:
         self.events: common.defaultlist = common.defaultlist(lambda: None)
         self.lastEvents: common.defaultlist = common.defaultlist(lambda: None)
