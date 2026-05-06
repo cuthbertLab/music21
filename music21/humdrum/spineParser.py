@@ -90,8 +90,7 @@ from music21 import tempo
 from music21 import tie
 from music21.duration import GraceDuration
 
-from music21.humdrum import testFiles
-from music21.humdrum import harmparser
+from music21.humdrum import harmParser
 from music21.humdrum import instruments
 
 if t.TYPE_CHECKING:
@@ -477,11 +476,11 @@ class HumdrumDataCollection(prebase.ProtoM21Object):
 
         >>> for thisSlice in eventCollections:
         ...    print(thisSlice)
-        <music21.humdrum.spineParser.EventCollection 2 events, 2 spines>
-        <music21.humdrum.spineParser.EventCollection 2 events, 2 spines>
-        <music21.humdrum.spineParser.EventCollection 2 events, 2 spines>
-        <music21.humdrum.spineParser.EventCollection 2 events, 2 spines>
-        <music21.humdrum.spineParser.EventCollection 2 events, 2 spines>
+        <music21.humdrum.spineParser.EventCollection line 1, 2 events, 2 spines>
+        <music21.humdrum.spineParser.EventCollection line 2, 2 events, 2 spines>
+        <music21.humdrum.spineParser.EventCollection line 3, 2 events, 2 spines>
+        <music21.humdrum.spineParser.EventCollection line 4, 2 events, 2 spines>
+        <music21.humdrum.spineParser.EventCollection line 5, 2 events, 2 spines>
 
         >>> for thisSlice in protoSpines:
         ...    print(thisSlice)
@@ -550,7 +549,9 @@ class HumdrumDataCollection(prebase.ProtoM21Object):
             protoSpineEventList: list[SpineEvent|None] = []
             for i in range(numEvents):
                 if j == 0:
-                    returnEventCollections.append(EventCollection(self.maxSpines))
+                    returnEventCollections.append(
+                        EventCollection(self.maxSpines,
+                                        lineNumber=self.eventList[i].lineNumber))
                 protoSpineEventList.append(processEventForOneCell(i, j))
             returnProtoSpines.append(ProtoSpine(protoSpineEventList))
 
@@ -598,6 +599,7 @@ class HumdrumDataCollection(prebase.ProtoM21Object):
         # go through the event collections line by line
         for i in range(len(eventCollections)):
             thisEventCollection = eventCollections[i]
+            lineNumber = thisEventCollection.lineNumber
             for j in range(maxSpines):
                 thisEvent = protoSpines[j].eventList[i]
 
@@ -609,7 +611,7 @@ class HumdrumDataCollection(prebase.ProtoM21Object):
                     # first event after a None = new spine because
                     # Humdrum does not require *+ at the beginning
                     currentSpine = spineCollection.addSpine()
-                    currentSpine.insertPoint = i
+                    currentSpine.insertPoint = lineNumber
                     currentSpineList[j] = currentSpine
 
                 currentSpine.append(thisEvent)
@@ -638,23 +640,24 @@ class HumdrumDataCollection(prebase.ProtoM21Object):
                 if thisEvent is None and currentSpine is not None:
                     # should this happen?
                     newSpineList.append(currentSpine)
+                    continue
                 elif thisEvent is None:
                     continue
-                elif thisEvent.contents == '*-':  # terminate spine
-                    currentSpine.endingPoint = i
+                if thisEvent.contents == '*-':  # terminate spine
+                    currentSpine.endingPoint = lineNumber
                 elif thisEvent.contents == '*^':  # split spine assume they are voices
                     newSpine1 = spineCollection.addSpine(streamClass=stream.Voice)
-                    newSpine1.insertPoint = i + 1
+                    newSpine1.insertPoint = lineNumber + 1
                     newSpine1.parentSpine = currentSpine
                     newSpine1.isFirstVoice = True
                     newSpine2 = spineCollection.addSpine(streamClass=stream.Voice)
-                    newSpine2.insertPoint = i + 1
+                    newSpine2.insertPoint = lineNumber + 1
                     newSpine2.parentSpine = currentSpine
-                    currentSpine.endingPoint = i  # will be overridden if merged
+                    currentSpine.endingPoint = lineNumber  # overridden if merged
                     currentSpine.childSpines.append(newSpine1)
                     currentSpine.childSpines.append(newSpine2)
 
-                    currentSpine.childSpineInsertPoints[i] = (newSpine1, newSpine2)
+                    currentSpine.childSpineInsertPoints[lineNumber] = (newSpine1, newSpine2)
                     newSpineList.append(newSpine1)
                     newSpineList.append(newSpine2)
                 elif thisEvent.contents == '*v':
@@ -667,11 +670,11 @@ class HumdrumDataCollection(prebase.ProtoM21Object):
                             mergerActive = currentSpine.parentSpine
                         else:
                             mergerActive = True
-                        currentSpine.endingPoint = i
+                        currentSpine.endingPoint = lineNumber
                     else:
                         # if second merger code is not found then
                         # a one-to-one spine 'merge' occurs
-                        currentSpine.endingPoint = i
+                        currentSpine.endingPoint = lineNumber
                         # merge back to parent if possible:
                         if currentSpine.parentSpine is not None:
                             newSpineList.append(currentSpine.parentSpine)
@@ -681,7 +684,7 @@ class HumdrumDataCollection(prebase.ProtoM21Object):
                         # or make a new spine:
                         else:
                             s = spineCollection.addSpine(streamClass=stream.Part)
-                            s.insertPoint = i
+                            s.insertPoint = lineNumber
                             newSpineList.append(s)
 
                         mergerActive = False
@@ -703,7 +706,7 @@ class HumdrumDataCollection(prebase.ProtoM21Object):
 
             if exchangeActive is not False:
                 raise HumdrumException('ProtoSpine found with unpaired exchange instruction '
-                                       f'at line {i} [{thisEventCollection.events}]')
+                                       f'at line {lineNumber} [{thisEventCollection.events}]')
             currentSpineList = newSpineList
 
         return spineCollection
@@ -1526,6 +1529,10 @@ class DynamSpine(HumdrumSpine):
                 else:
                     thisContainer.coreAppend(thisObject)
 
+        # flush the final Measure (events after the last barline)
+        if thisContainer is not None:
+            thisContainer.coreElementsChanged()
+            self.stream.coreAppend(thisContainer)
         self.stream.coreElementsChanged()
 
 
@@ -1567,7 +1574,7 @@ class HarmSpine(HumdrumSpine):
                 thisObject = SpineComment(eventC)
             else:
                 harmStr = event.contents
-                romanStr = harmparser.convertHarmToRoman(harmStr)
+                romanStr = harmParser.convertHarmToRoman(harmStr)
                 thisObject = roman.RomanNumeral(
                     romanStr,
                     currentKey,
@@ -1953,6 +1960,15 @@ class SpineCollection(prebase.ProtoM21Object):
         move :samp:`**dynam` and :samp:`**lyrics/**text` information to the appropriate staff.
 
         Assumes that :samp:`*staff` is consistent through the spine.
+
+        TODO: misaligned events (a `**dynam` or `**harm` whose source line has '.'
+        in the kern column) are silently dropped because the matcher only accepts
+        exact :samp:`el.priority == event.lineNumber`.  Desired: when no kern note
+        sits on the same line, attach to the stream at the offset of the most
+        recently-sounding kern note (ideal: between current and next note's
+        offsets).  Lyrics/text continue to attach to notes only.
+        See `humdrum.tests.Test.testDynamAttachedMisaligned` /
+        `testHarmAttachedMisaligned`.
         '''
         kernStreams: dict[int, stream.Stream] = {}
         for thisSpine in self.spines:
@@ -2100,46 +2116,67 @@ class SpineCollection(prebase.ProtoM21Object):
 
 class EventCollection(prebase.ProtoM21Object):
     '''
-    An EventCollection is a time slice of all events that have
-    an onset of a certain time.  If an event does not occur at
-    a certain time, then you should check EventCollection[n].lastEvents
-    to get the previous event.  (If it is a note, it is the note
-    still sounding, etc.).  The happeningEvent method gets either
-    currentEvent or lastEvent.
+    An EventCollection holds every event that appears on a single source line
+    of a humdrum file -- one cell per spine, in their `events` array.
+
+    If a spine's cell on this line is '.' or a comment (no new event), use
+    `lastEvents[spineNum]` to retrieve the previous event still sounding.
+    `getSpineOccurring` returns either the current event or the last event
+    that's still active.
+
+    Theses events should happen at the same time (offset)
+    but they are not necessarily the only events to happen at that same time.
+    E.g. a clef change and the note that follows it on the next line take place at
+    the same musical time but live in different EventCollections.
 
     These objects normally get created by
     :meth:`~music21.humdrum.spineParser.HumdrumDataCollection.parseProtoSpinesAndEventCollections`
     so you won't need to do all the setup.
 
     Assume that ec1 is
-         C4     pp
 
-    and ec2 is:
-         D4     .
+        C4     pp
+
+    on source line 4, and ec2 is
+
+        D4     .
+
+    on source line 5:
 
     >>> SE = humdrum.spineParser.SpineEvent
-    >>> eventList1 = [SE('C4'),SE('pp')]
-    >>> eventList2 = [SE('D4'),SE('.')]
-    >>> ec1 = humdrum.spineParser.EventCollection(maxSpines=2)
+    >>> eventList1 = [SE('C4', lineNumber=4), SE('pp', lineNumber=4)]
+    >>> eventList2 = [SE('D4', lineNumber=5), SE('.', lineNumber=5)]
+    >>> ec1 = humdrum.spineParser.EventCollection(maxSpines=2, lineNumber=4)
     >>> ec1.events = eventList1
-    >>> ec2 = humdrum.spineParser.EventCollection(maxSpines=2)
+    >>> ec2 = humdrum.spineParser.EventCollection(maxSpines=2, lineNumber=5)
     >>> ec2.events = eventList2
     >>> ec2.lastEvents[1] = eventList1[1]
     >>> ec2.maxSpines
     2
+    >>> ec2.lineNumber
+    5
     >>> ec2.getAllOccurring()
     [<music21.humdrum.spineParser.SpineEvent D4>, <music21.humdrum.spineParser.SpineEvent pp>]
-    '''
 
-    def __init__(self, maxSpines: int = 0) -> None:
+    If there were spine path markers this next boolean would be true:
+
+    >>> ec2.spinePathData
+    False
+
+    In the future, EventCollection may enforce that all events have the same lineNumber
+
+    * New in v10: lineNumber
+    '''
+    def __init__(self, maxSpines: int = 0, lineNumber: int = 0) -> None:
         self.events: common.defaultlist = common.defaultlist(lambda: None)
         self.lastEvents: common.defaultlist = common.defaultlist(lambda: None)
         self.maxSpines: int = maxSpines
+        self.lineNumber: int = lineNumber
         self.spinePathData: bool = False
         # true if the line contains data about changing spinePaths
 
     def _reprInternal(self) -> str:
-        return f'{len(self.events)} events, {self.maxSpines} spines'
+        return f'line {self.lineNumber}, {len(self.events)} events, {self.maxSpines} spines'
 
     def addSpineEvent(self, spineNum: int, spineEvent: SpineEvent) -> None:
         self.events[spineNum] = spineEvent
@@ -2892,365 +2929,16 @@ class GlobalReference(base.Music21Object):
 
 
 class Test(unittest.TestCase):
+    '''
+    Note: most spineParser tests are in :mod:`music21.humdrum.tests`.
+    Only `testCopyAndDeepcopy` lives here so that `globals()` resolves.
+    '''
     def testCopyAndDeepcopy(self) -> None:
         from music21.test.commonTest import testCopyAll
         testCopyAll(self, globals())
 
-    def testLoadMazurka(self):
-        # hf1 = HumdrumFile('d:/web/eclipse/music21misc/mazurka06-2.krn')
 
-        hf1 = HumdrumDataCollection(testFiles.mazurka6)
-        hf1.parse()
-
-        # hf1 = HumdrumFile('d:/web/eclipse/music21misc/ojibway.krn')
-        # for thisEventCollection in hf1.eventCollections:
-        #     ev = thisEventCollection.getSpineEvent(0).contents
-        #     if ev is not None:
-        #         print(ev)
-        #     else:
-        #         print('NONE')
-        #
-        # for mySpine in hf1.spineCollection:
-        #     print('\n\n***NEW SPINE: No. ' + str(mySpine.id) + ' parentSpine: '
-        #         + str(mySpine.parentSpine) + ' childSpines: ' + str(mySpine.childSpines))
-        #     print(mySpine.spineType)
-        #     for childSpinesSpine in mySpine.childSpinesSpines():
-        #         print(str(childSpinesSpine.id) + ' *** testing spineCollection code ***')
-        #     for thisEvent in mySpine:
-        #         print(thisEvent.contents)
-        spine5 = hf1.spineCollection.getSpineById(5)
-        self.assertEqual(spine5.id, 5)
-        self.assertEqual(spine5.parentSpine.id, 1)
-
-        spine1 = hf1.spineCollection.getSpineById(1)
-        spine1Children = [cs.id for cs in spine1.childSpines]
-        self.assertEqual(spine1Children,
-                         [5, 6, 9, 10, 13, 14, 23, 24, 27, 28, 31, 32, 35, 36, 39, 40])
-
-        self.assertEqual(spine5.spineType, 'kern')
-        self.assertIsInstance(spine5, KernSpine)
-
-    def testSingleNote(self):
-        # noinspection SpellCheckingInspection
-        a = SpineEvent('40..ccccc##_wtLLK~v/')
-        b = a.toNote()
-        self.assertEqual(b.pitch.accidental.name, 'double-sharp')
-        self.assertEqual(b.duration.dots, 0)
-        self.assertEqual(b.duration.tuplets[0].durationNormal.dots, 2)
-
-    def testMeasureBoundaries(self):
-        m0 = stream.Measure()
-        m1 = hdStringToMeasure('=29a;:|:', m0)
-        self.assertEqual(m1.number, 29)
-        self.assertEqual(m1.numberSuffix, 'a')
-        # ':|:' produces an end-Repeat on m0's right and a start-Repeat on m1's left.
-        self.assertIsInstance(m0.rightBarline, bar.Repeat)
-        self.assertEqual(m0.rightBarline.direction, 'end')
-        self.assertEqual(m0.rightBarline.type, 'regular')
-        self.assertIsInstance(m0.rightBarline.pause, expressions.Fermata)
-        self.assertIsInstance(m1.leftBarline, bar.Repeat)
-        self.assertEqual(m1.leftBarline.direction, 'start')
-        self.assertEqual(m1.leftBarline.type, 'regular')
-
-    def testMeterBreve(self):
-        m = kernTandemToObject('*M3/1')
-        self.assertEqual(str(m), '<music21.meter.TimeSignature 3/1>')
-        m = kernTandemToObject('*M3/0')
-        self.assertEqual(str(m), '<music21.meter.TimeSignature 6/1>')
-        m = kernTandemToObject('*M3/00')
-        self.assertEqual(str(m), '<music21.meter.TimeSignature 12/1>')
-        m = kernTandemToObject('*M3/000')
-        self.assertEqual(str(m), '<music21.meter.TimeSignature 24/1>')
-
-    def x_testFakePiece(self):
-        '''
-        test loading a fake piece with spine paths, lyrics, dynamics, etc.
-        '''
-        hdc = HumdrumDataCollection(testFiles.fakeTest)
-        hdc.parse()
-        ms = hdc.stream
-        ms.show()
-
-    def testSpineMazurka(self):
-        # hf1 = HumdrumFile('d:/web/eclipse/music21misc/mazurka06-2.krn')
-        hf1 = HumdrumDataCollection(testFiles.mazurka6)
-        # hf1 = HumdrumDataCollection(testFiles.ojibway)
-        # hf1 = HumdrumDataCollection(testFiles.schubert)
-        # hf1 = HumdrumDataCollection(testFiles.ivesSpring)
-        # hf1 = HumdrumDataCollection(testFiles.sousaStars)  # parse errors b/c of graces
-        hf1.parse()
-        masterStream = hf1.stream
-        # for spineX in hf1.spineCollection:
-        #     spineX.stream.id = f'spine {spineX.id}'
-        #     masterStream.append(spineX.stream)
-        # self.assertTrue(common.whitespaceEqual
-        #                  (common.stripAddresses(expectedOutput),
-        #                   common.stripAddresses(masterStream._reprText())))
-        # print(common.stripAddresses(expectedOutput))
-        # print(common.stripAddresses(masterStream.recurseRepr()))
-
-        # humdrum type problem: how many G#s start on beat 2 of a measure?
-        gSharpCount = 0
-        # masterStream.show('text')
-        for n in masterStream.recurse():
-            if hasattr(n, 'pitch') and n.pitch.name == 'G#':
-                if n.beat == 2:  # beat doesn't work :-(
-                    gSharpCount += 1
-            elif hasattr(n, 'pitches'):
-                for p in n.pitches:
-                    if p.name == 'G#' and n.beat == 2:
-                        gSharpCount += 1
-        # masterStream.show()
-        self.assertEqual(gSharpCount, 86)
-        # masterStream.show()
-        # masterStream.show('text')
-
-    def testParseSineNomine(self):
-        from music21 import converter
-        parserPath = common.getSourceFilePath() / 'humdrum'
-        sineNominePath = parserPath / 'Missa_Sine_nomine-Kyrie.krn'
-        unused_myScore = converter.parse(sineNominePath)
-        # unused_myScore.show('text')
-
-    def testSplitSpines(self):
-        hf1 = HumdrumDataCollection(testFiles.splitSpines2)
-        hf1.parse()
-        masterStream = hf1.stream
-        self.assertTrue(masterStream.parts[0].measure(4).hasVoices())
-        self.assertFalse(masterStream.parts[0].measure(5).hasVoices())
-
-    def x_testMoveDynamics(self):
-        hf1 = HumdrumDataCollection(testFiles.fakeTest)
-        hf1.parse()
-        # hf1.spineCollection.attachNonKernEvents()
-        unused_s = hf1.stream
-        # unused_s.show('text')
-
-    def testLyricsInSpine(self):
-        from music21 import text
-        hf1 = HumdrumDataCollection(testFiles.fakeTest)
-        hf1.parse()
-        # hf1.spineCollection.attachNonKernEvents()
-        s = hf1.stream
-        lyrics = text.assembleLyrics(s)
-        # noinspection SpellCheckingInspection
-        self.assertEqual(lyrics, 'Magijago ickewyan')
-
-    def testSplitSpines2(self):
-        '''
-        Currently this does not work since a second split on a stream that
-        already resulted from a split does not parse properly.  Shows up also
-        in strangeWTCOpening, below.
-        '''
-        hf1 = HumdrumDataCollection(testFiles.splitLots)
-        hf1.parse()
-        unused_masterStream = hf1.stream
-
-    def testParseStrangeSplit(self):
-        hf1 = HumdrumDataCollection(testFiles.strangeWTCOpening)
-        unused_masterStream = hf1.stream
-
-    def testSpineComments(self):
-        hf1 = HumdrumDataCollection(testFiles.fakeTest)
-        hf1.parse()
-        s = hf1.stream  # .show()
-        p = s.parts[2]  # last part has a comment
-        comments = []
-        for c in p[SpineComment]:
-            comments.append(c.comment)
-        self.assertTrue('spine comment' in comments)
-        # s.show('text')
-
-    def testHarmSpineDegrees(self):
-        hf1 = HumdrumDataCollection(testFiles.harmScaleDegrees)
-        hf1.parse()
-        s = hf1.stream
-        groundTruth = {
-            0.0: ('I in C major', [0, 4, 7], 'C', 'C', 53, False),
-            1.0: ('ii in C major', [2, 5, 9], 'D', 'D', 53, False),
-            2.0: ('iii in C major', [4, 7, 11], 'E', 'E', 53, False),
-            3.0: ('IV in C major', [5, 9, 0], 'F', 'F', 53, False),
-            4.0: ('I64 in C major', [7, 0, 4], 'C', 'G', 64, False),
-            5.0: ('V in C major', [7, 11, 2], 'G', 'G', 53, False),
-            6.0: ('vi in C major', [9, 0, 4], 'A', 'A', 53, False),
-            7.0: ('V6 in C major', [11, 2, 7], 'G', 'B', 6, False),
-            8.0: ('viio65/i in C major', [2, 5, 8, 11], 'B', 'D', 65, True),
-            9.0: ('I in C major', [0, 4, 7], 'C', 'C', 53, False),
-            11.0: ('I in C major', [0, 4, 7], 'C', 'C', 53, False),
-            12.0: ('i in c minor', [0, 3, 7], 'C', 'C', 53, False),
-            13.0: ('iio in c minor', [2, 5, 8], 'D', 'D', 53, False),
-            14.0: ('III in c minor', [3, 7, 10], 'E-', 'E-', 53, False),
-            15.0: ('N6 in c minor', [5, 8, 1], 'D-', 'F', 6, False),
-            16.0: ('i64 in c minor', [7, 0, 3], 'C', 'G', 64, False),
-            17.0: ('V in c minor', [7, 11, 2], 'G', 'G', 53, False),
-            18.0: ('It6 in c minor', [8, 0, 6], 'F#', 'A-', 6, False),
-            20.0: ('V in c minor', [7, 11, 2], 'G', 'G', 53, False),
-            21.0: ('Fr43 in c minor', [8, 0, 2, 6], 'D', 'A-', 43, True),
-            23.0: ('V in c minor', [7, 11, 2], 'G', 'G', 53, False),
-            24.0: ('Ger65 in c minor', [8, 0, 3, 6], 'F#', 'A-', 65, True),
-            27.0: ('iv in c minor', [5, 8, 0], 'F', 'F', 53, False),
-            30.0: ('V in c minor', [7, 11, 2], 'G', 'G', 53, False),
-            32.0: ('V in c minor', [7, 11, 2], 'G', 'G', 53, False),
-            33.0: ('I in c minor', [0, 4, 7], 'C', 'C', 53, False)
-        }
-        for harm in s.flatten().getElementsByClass(roman.RomanNumeral):
-            figureAndKey = harm.figureAndKey
-            pitchClasses = harm.pitchClasses
-            root = harm.root().name
-            bass = harm.bass().name
-            inversionName = harm.inversionName()
-            isSeventh = harm.isSeventh()
-            assertTuple = (
-                figureAndKey,
-                pitchClasses,
-                root,
-                bass,
-                inversionName,
-                isSeventh
-            )
-            self.assertEqual(assertTuple, groundTruth[harm.offset])
-
-    def testHarmSpineSevenths(self):
-        hf1 = HumdrumDataCollection(testFiles.harmSevenths)
-        hf1.parse()
-        s = hf1.stream
-        groundTruth = {
-            0.0: ('I7 in C major', [0, 4, 7, 11], 'C', 'C', 7, True),
-            1.0: ('IV7 in C major', [5, 9, 0, 4], 'F', 'F', 7, True),
-            2.0: ('viio7 in C major', [11, 2, 5, 8], 'B', 'B', 7, True),
-            3.0: ('iii7 in C major', [4, 7, 11, 2], 'E', 'E', 7, True),
-            4.0: ('vi7 in C major', [9, 0, 4, 7], 'A', 'A', 7, True),
-            5.0: ('ii7 in C major', [2, 5, 9, 0], 'D', 'D', 7, True),
-            6.0: ('V7 in C major', [7, 11, 2, 5], 'G', 'G', 7, True),
-            7.0: ('I in C major', [0, 4, 7], 'C', 'C', 53, False),
-            12.0: ('i7 in a minor', [9, 0, 4, 7], 'A', 'A', 7, True),
-            13.0: ('iv7 in a minor', [2, 5, 9, 0], 'D', 'D', 7, True),
-            14.0: ('-VII7 in a minor', [7, 11, 2, 5], 'G', 'G', 7, True),
-            15.0: ('III7 in a minor', [0, 4, 7, 11], 'C', 'C', 7, True),
-            16.0: ('VI7 in a minor', [5, 9, 0, 4], 'F', 'F', 7, True),
-            17.0: ('iio7 in a minor', [11, 2, 5, 8], 'B', 'B', 7, True),
-            18.0: ('V7 in a minor', [4, 8, 11, 2], 'E', 'E', 7, True),
-            19.0: ('i in a minor', [9, 0, 4], 'A', 'A', 53, False),
-            24.0: ('I65 in C major', [4, 7, 11, 0], 'C', 'E', 65, True),
-            25.0: ('IV2 in C major', [4, 5, 9, 0], 'F', 'E', 42, True),
-            26.0: ('viio65 in C major', [2, 5, 8, 11], 'B', 'D', 65, True),
-            27.0: ('iii2 in C major', [2, 4, 7, 11], 'E', 'D', 42, True),
-            28.0: ('vi43 in C major', [4, 7, 9, 0], 'A', 'E', 43, True),
-            29.0: ('ii7 in C major', [2, 5, 9, 0], 'D', 'D', 7, True),
-            30.0: ('V43 in C major', [2, 5, 7, 11], 'G', 'D', 43, True),
-            31.0: ('I in C major', [0, 4, 7], 'C', 'C', 53, False),
-            36.0: ('i65 in a minor', [0, 4, 7, 9], 'A', 'C', 65, True),
-            37.0: ('iv2 in a minor', [0, 2, 5, 9], 'D', 'C', 42, True),
-            38.0: ('-VII65 in a minor', [11, 2, 5, 7], 'G', 'B', 65, True),
-            39.0: ('III2 in a minor', [11, 0, 4, 7], 'C', 'B', 42, True),
-            40.0: ('VI43 in a minor', [0, 4, 5, 9], 'F', 'C', 43, True),
-            41.0: ('iio7 in a minor', [11, 2, 5, 8], 'B', 'B', 7, True),
-            42.0: ('V43 in a minor', [11, 2, 4, 8], 'E', 'B', 43, True),
-            43.0: ('i in a minor', [9, 0, 4], 'A', 'A', 53, False)
-        }
-        for harm in s.flatten().getElementsByClass(roman.RomanNumeral):
-            figureAndKey = harm.figureAndKey
-            pitchClasses = harm.pitchClasses
-            root = harm.root().name
-            bass = harm.bass().name
-            inversionName = harm.inversionName()
-            isSeventh = harm.isSeventh()
-            assertTuple = (
-                figureAndKey,
-                pitchClasses,
-                root,
-                bass,
-                inversionName,
-                isSeventh
-            )
-            self.assertEqual(assertTuple, groundTruth[harm.offset])
-
-    def testHarmSpineAugmentedSixths(self):
-        hf1 = HumdrumDataCollection(testFiles.harmScaleDegrees)
-        hf1.parse()
-        s = hf1.stream
-        groundTruth = {
-            # Aug6, Italian, French, German
-            0.0: (False, False, False, False),
-            1.0: (False, False, False, False),
-            2.0: (False, False, False, False),
-            3.0: (False, False, False, False),
-            4.0: (False, False, False, False),
-            5.0: (False, False, False, False),
-            6.0: (False, False, False, False),
-            7.0: (False, False, False, False),
-            8.0: (False, False, False, False),
-            9.0: (False, False, False, False),
-            11.0: (False, False, False, False),
-            12.0: (False, False, False, False),
-            13.0: (False, False, False, False),
-            14.0: (False, False, False, False),
-            15.0: (False, False, False, False),
-            16.0: (False, False, False, False),
-            17.0: (False, False, False, False),
-            18.0: (True, True, False, False),
-            20.0: (False, False, False, False),
-            21.0: (True, False, True, False),
-            23.0: (False, False, False, False),
-            24.0: (True, False, False, True),
-            27.0: (False, False, False, False),
-            30.0: (False, False, False, False),
-            32.0: (False, False, False, False),
-            33.0: (False, False, False, False)
-        }
-        for harm in s.flatten().getElementsByClass(roman.RomanNumeral):
-            isAugmentedSixth = harm.isAugmentedSixth()
-            isItalianAugmentedSixth = harm.isItalianAugmentedSixth()
-            isFrenchAugmentedSixth = harm.isFrenchAugmentedSixth()
-            isGermanAugmentedSixth = harm.isGermanAugmentedSixth()
-            assertTuple = (
-                isAugmentedSixth,
-                isItalianAugmentedSixth,
-                isFrenchAugmentedSixth,
-                isGermanAugmentedSixth
-            )
-            self.assertEqual(assertTuple, groundTruth[harm.offset])
-
-    def testMetadataRetrieved(self):
-        from music21 import corpus
-        c = corpus.parse('palestrina/agnus_0')
-        md = c.metadata
-        self.assertIsNotNone(md.composer)
-        self.assertIn('Palestrina', md.composer)
-
-    def testFlavors(self):
-        prevFlavor = flavors['JRP']
-        flavors['JRP'] = False
-        hdc = HumdrumDataCollection(testFiles.dottedTuplet)
-        hdc.parse()
-        c = hdc.stream
-        flavors['JRP'] = True
-        hdc2 = HumdrumDataCollection(testFiles.dottedTuplet)
-        hdc2.parse()
-        d = hdc2.stream
-        flavors['JRP'] = prevFlavor
-        cn = c.parts[0].measure(1).notes[1]
-        dn = d.parts[0].measure(1).notes[1]
-        self.assertEqual(cn.duration.fullName, 'Eighth Triplet (1/2 QL)')
-        self.assertEqual(cn.duration.dots, 0)
-        self.assertEqual(repr(cn.duration.tuplets[0].durationNormal),
-                         "DurationTuple(type='eighth', dots=1, quarterLength=0.75)")
-        self.assertEqual(cn.duration.tuplets[0].durationNormal.dots, 1)
-        self.assertEqual(dn.duration.fullName, 'Dotted Eighth Triplet (1/2 QL)')
-        self.assertEqual(dn.duration.dots, 1)
-        self.assertEqual(repr(dn.duration.tuplets[0].durationNormal),
-                         "DurationTuple(type='eighth', dots=0, quarterLength=0.5)")
-        self.assertEqual(dn.duration.tuplets[0].durationNormal.dots, 0)
-
-
-class TestExternal(unittest.TestCase):
-    show = True
-
-    def testShowSousa(self):
-        hf1 = HumdrumDataCollection(testFiles.sousaStars)
-        hf1.parse()
-        if self.show:
-            hf1.stream.show()
+# -----------------------------------------------------------------------------
 
 
 if __name__ == '__main__':
