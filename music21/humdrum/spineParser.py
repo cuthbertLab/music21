@@ -51,7 +51,9 @@ SpineParsing consists of several steps.
     property `numLines` (= `len(self.dataStream)`); `HumdrumLine.position` and
     `SpineEvent.position` were both renamed to `lineNumber` and now hold the 1-based
     source line number (was eventList index for SpineEvent),
-    advancing on blank lines too.
+    advancing on blank lines too.  Blank lines now produce `BlankLine` HumdrumLine
+    entries rather than being skipped, so `eventList[lineNumber - 1]` always
+    resolves to the line at that source position.
 '''
 from __future__ import annotations
 
@@ -282,37 +284,37 @@ class HumdrumDataCollection(prebase.ProtoM21Object):
         if dataStream is None:  # pragma: no cover
             raise TypeError('dataStream cannot be None')
 
-        startPositions = []
-        endPositions = []
+        startIndices = []
+        endIndices = []
         for i, line in enumerate(dataStream):
             line = line.rstrip()
             if re.search(r'^(\*-\t)*\*-$', line):
-                endPositions.append(i)
+                endIndices.append(i)
             elif re.search(r'^(\*\*\w+\t)*\*\*\w+$', line):
-                startPositions.append(i)
-        if len(startPositions) < 2:
+                startIndices.append(i)
+        if len(startIndices) < 2:
             return (False, None)
-        if endPositions[-1] > startPositions[-1]:
+        if endIndices[-1] > startIndices[-1]:
             # properly formed .krn with *- at end
             pass
         else:
             # improperly formed .krn without *- at end
-            endPositions.append(len(dataStream))
+            endIndices.append(len(dataStream))
 
         dataCollections = []
-        for i in range(len(endPositions)):
+        for i in range(len(endIndices)):
             if i == 0:
-                endPos = endPositions[i]
+                endPos = endIndices[i]
                 dataCollections.append(dataStream[:endPos + 1])
-            elif i == len(endPositions) - 1:
+            elif i == len(endIndices) - 1:
                 # ignore endPosition and grab to end of file
-                startPos = endPositions[i - 1] + 1
-                dataCollections.append(dataStream[startPos:])
+                startIndex = endIndices[i - 1] + 1
+                dataCollections.append(dataStream[startIndex:])
             else:
-                # ignore startPositions, grab comments etc. between scores
-                startPos = endPositions[i - 1] + 1
-                endPos = endPositions[i] + 1
-                dataCollections.append(dataStream[startPos:endPos])
+                # ignore startIndices, grab comments etc. between scores
+                startIndex = endIndices[i - 1] + 1
+                endIndex = endIndices[i] + 1
+                dataCollections.append(dataStream[startIndex:endIndex])
 
         if len(dataCollections) > 1:
             return (True, dataCollections)
@@ -413,8 +415,10 @@ class HumdrumDataCollection(prebase.ProtoM21Object):
             lineNumber += 1
             line = line.rstrip()
             if line == '':
-                continue  # technically forbidden by Humdrum but the source of so many errors!
-            if re.match(r'!!!', line):
+                # Humdrum forbids blanks, but they appear in real files; keep
+                # eventList aligned with the source so eventList[n-1] is line n.
+                self.eventList.append(BlankLine(lineNumber))
+            elif re.match(r'!!!', line):
                 self.eventList.append(GlobalReferenceLine(lineNumber, line))
             elif re.match(r'!!', line):  # find global comments at the top of the line
                 self.eventList.append(GlobalCommentLine(lineNumber, line))
@@ -439,14 +443,13 @@ class HumdrumDataCollection(prebase.ProtoM21Object):
         of ProtoSpines, that is a vertical slice of everything that
         happens in a column, regardless of spine-path indicators.
 
-        EventCollection objects store global events at the position.
-        ProtoSpines do not.
+        EventCollection objects store global events. ProtoSpines do not.
 
         So `self.eventCollections` and `self.protoSpines` can each be
         thought of as a two-dimensional sheet of cells, but where
-        the first index of the former is the vertical position in
+        the first index of the former is the vertical index in
         the dataStream and the first index of the latter is the
-        horizontal position in the dataStream.  The contents of
+        horizontal index in the dataStream.  The contents of
         each cell is a SpineEvent object or None (if there's no
         data at that point).  Even '.' (continuation events) get
         translated into SpineEvent objects.
@@ -532,9 +535,9 @@ class HumdrumDataCollection(prebase.ProtoM21Object):
                 return thisEvent
 
             # placeholder cell: either a SpineLine with no data this far over,
-            # or a global (comment/reference) line. First check for Global Comment or Reference
+            # or a global line (GlobalComment, GlobalReference, or BlankLine).
             if not isinstance(currentLine, SpineLine) and j == 0:
-                # not SpineLine = GlobalComment or GlobalReference.
+                # not SpineLine = GlobalComment, GlobalReference, or BlankLine.
                 # global events register once, against the first column
                 thisEventCollection.addGlobalEvent(currentLine)
             placeholder = SpineEvent('', currentLine.lineNumber)
@@ -623,6 +626,9 @@ class HumdrumDataCollection(prebase.ProtoM21Object):
             # *x     *x     C#4
 
             newSpineList = common.defaultlist(lambda: None)
+
+            # These are either False OR the spine being merged/exchanged.
+            # TODO: separate the two concepts.
             mergerActive = False
             exchangeActive = False
             for j in range(maxSpines):
@@ -635,7 +641,7 @@ class HumdrumDataCollection(prebase.ProtoM21Object):
                 elif thisEvent is None:
                     continue
                 elif thisEvent.contents == '*-':  # terminate spine
-                    currentSpine.endingPosition = i
+                    currentSpine.endingPoint = i
                 elif thisEvent.contents == '*^':  # split spine assume they are voices
                     newSpine1 = spineCollection.addSpine(streamClass=stream.Voice)
                     newSpine1.insertPoint = i + 1
@@ -644,7 +650,7 @@ class HumdrumDataCollection(prebase.ProtoM21Object):
                     newSpine2 = spineCollection.addSpine(streamClass=stream.Voice)
                     newSpine2.insertPoint = i + 1
                     newSpine2.parentSpine = currentSpine
-                    currentSpine.endingPosition = i  # will be overridden if merged
+                    currentSpine.endingPoint = i  # will be overridden if merged
                     currentSpine.childSpines.append(newSpine1)
                     currentSpine.childSpines.append(newSpine2)
 
@@ -661,11 +667,11 @@ class HumdrumDataCollection(prebase.ProtoM21Object):
                             mergerActive = currentSpine.parentSpine
                         else:
                             mergerActive = True
-                        currentSpine.endingPosition = i
+                        currentSpine.endingPoint = i
                     else:
                         # if second merger code is not found then
                         # a one-to-one spine 'merge' occurs
-                        currentSpine.endingPosition = i
+                        currentSpine.endingPoint = i
                         # merge back to parent if possible:
                         if currentSpine.parentSpine is not None:
                             newSpineList.append(currentSpine.parentSpine)
@@ -709,12 +715,12 @@ class HumdrumDataCollection(prebase.ProtoM21Object):
 
         Run after `self.spineCollection.createMusic21Streams()`.
         Is run automatically by `self.parse()`.
-        uses `self.spineCollection.getOffsetsAndPrioritiesByPosition()`
+        uses `self.spineCollection.getOffsetsAndPrioritiesByLineNumber()`
         '''
         spineCollection = self.spineCollection
         if t.TYPE_CHECKING:
             assert spineCollection is not None
-        positionDict = spineCollection.getOffsetsAndPrioritiesByPosition()
+        lineNumberDict = spineCollection.getOffsetsAndPrioritiesByLineNumber()
         eventList = self.eventList
         maxEventList = len(eventList)
         numberOfGlobalEventsInARow = 0
@@ -727,10 +733,10 @@ class HumdrumDataCollection(prebase.ProtoM21Object):
                 insertOffset: OffsetQL|None = None
                 insertPriority = 0
                 for j in range(i + 1, maxEventList):
-                    if j in positionDict:
-                        insertOffset = positionDict[j][0]
+                    if j in lineNumberDict:
+                        insertOffset = lineNumberDict[j][0]
                         # hopefully not more than 20 events in a row!
-                        insertPriority = (positionDict[j][1][0].priority
+                        insertPriority = (lineNumberDict[j][1][0].priority
                                           - 40
                                           + numberOfGlobalEventsInARow)
                         break
@@ -989,6 +995,30 @@ class GlobalCommentLine(HumdrumLine):
         return repr(self.value)
 
 
+class BlankLine(HumdrumLine):
+    '''
+    A blank line in a humdrum source.  Humdrum forbids blank lines, but
+    they appear in the wild.  Storing them as BlankLine objects keeps
+    `eventList` aligned with the source: `eventList[lineNumber - 1]` is
+    always the HumdrumLine at that 1-based source line.
+
+    Treated as a global event by `parseProtoSpinesAndEventCollections`
+    (no SpineEvent is created at this line for any spine).
+
+    >>> b = humdrum.spineParser.BlankLine(lineNumber=12)
+    >>> b
+    <music21.humdrum.spineParser.BlankLine line 12>
+    >>> b.lineNumber
+    12
+    '''
+    def __init__(self, lineNumber: int = 0) -> None:
+        self.lineNumber = lineNumber
+        self.contents = ''
+
+    def _reprInternal(self) -> str:
+        return f'line {self.lineNumber}'
+
+
 class ProtoSpine(prebase.ProtoM21Object):
     '''
     A ProtoSpine is a collection of events arranged vertically.
@@ -1036,7 +1066,7 @@ class HumdrumSpine(prebase.ProtoM21Object):
     >>> spine1Id = 5
     >>> spine1 = humdrum.spineParser.HumdrumSpine(spine1Id, spineEvents)
     >>> spine1.insertPoint = 5
-    >>> spine1.endingPosition = 6
+    >>> spine1.endingPoint = 6
     >>> spine1.parentSpine = 3  # spine 3 is the previous spine leading to this one
     >>> spine1.childSpines = [7, 8]  # the spine ends by being split into spines 7 and 8
 
@@ -1083,7 +1113,7 @@ class HumdrumSpine(prebase.ProtoM21Object):
         self.eventList: list[SpineEvent] = eventList
         self.stream: stream.Stream = streamClass()
         self.insertPoint: int = 0
-        self.endingPosition: int = 0
+        self.endingPoint: int = 0
         self.parentSpine: HumdrumSpine|None = None
         self.newSpine: HumdrumSpine|None = None
         self.isLastSpine: bool = False
@@ -1262,7 +1292,7 @@ class HumdrumSpine(prebase.ProtoM21Object):
         '''
         if t.TYPE_CHECKING:
             assert self.spineCollection is not None
-        humdrumPositions = self.spineCollection.humdrumPositions
+        humdrumLineNumbers = self.spineCollection.humdrumLineNumbers
         lastContainer = hdStringToMeasure('=0')
 
         for event in self.eventList:
@@ -1283,7 +1313,7 @@ class HumdrumSpine(prebase.ProtoM21Object):
                 thisObject = base.ElementWrapper(event)
 
             if thisObject is not None:
-                humdrumPositions[thisObject] = event.lineNumber
+                humdrumLineNumbers[thisObject] = event.lineNumber
                 self.stream.coreAppend(thisObject)
         self.stream.coreElementsChanged()
 
@@ -1313,7 +1343,7 @@ class KernSpine(HumdrumSpine):
     def parse(self) -> None:
         if t.TYPE_CHECKING:
             assert self.spineCollection is not None
-        humdrumPositions = self.spineCollection.humdrumPositions
+        humdrumLineNumbers = self.spineCollection.humdrumLineNumbers
         self.lastContainer = hdStringToMeasure('=0')
         self.inTuplet = False
         self.lastNote = None
@@ -1346,7 +1376,7 @@ class KernSpine(HumdrumSpine):
                     thisObject = self.processNoteEvent(eventC)
 
                 if thisObject is not None:
-                    humdrumPositions[thisObject] = event.lineNumber
+                    humdrumLineNumbers[thisObject] = event.lineNumber
                     # priority is doing double duty: real Stream sort priority
                     # (used by insertGlobalEvents) AND a proxy for humdrum line
                     # number (used by attachNonKernEvents to align spines).
@@ -1460,7 +1490,7 @@ class DynamSpine(HumdrumSpine):
     def parse(self) -> None:
         if t.TYPE_CHECKING:
             assert self.spineCollection is not None
-        humdrumPositions = self.spineCollection.humdrumPositions
+        humdrumLineNumbers = self.spineCollection.humdrumLineNumbers
         thisContainer: stream.Measure|None = None
         for event in self.eventList:
             eventC = event.contents
@@ -1489,7 +1519,7 @@ class DynamSpine(HumdrumSpine):
                 thisObject = dynamics.Dynamic(eventC)
 
             if thisObject is not None:
-                humdrumPositions[thisObject] = event.lineNumber
+                humdrumLineNumbers[thisObject] = event.lineNumber
                 if thisContainer is None:
                     self.stream.coreAppend(thisObject)
                 else:
@@ -1512,7 +1542,7 @@ class HarmSpine(HumdrumSpine):
     def parse(self) -> None:
         if t.TYPE_CHECKING:
             assert self.spineCollection is not None
-        humdrumPositions = self.spineCollection.humdrumPositions
+        humdrumLineNumbers = self.spineCollection.humdrumLineNumbers
         lastContainer = hdStringToMeasure('=0')
         currentKey = key.Key('C')
         for event in self.eventList:
@@ -1547,7 +1577,7 @@ class HarmSpine(HumdrumSpine):
                 )
 
             if thisObject is not None:
-                humdrumPositions[thisObject] = event.lineNumber
+                humdrumLineNumbers[thisObject] = event.lineNumber
                 thisObject.priority = event.lineNumber
                 self.stream.coreAppend(thisObject)
         self.stream.coreElementsChanged()
@@ -1636,7 +1666,7 @@ class SpineCollection(prebase.ProtoM21Object):
         self.spineReclassDone: bool = False
         self.newSpine: HumdrumSpine|None = None
         # Maps each parsed Music21Object to its humdrum file line position.
-        self.humdrumPositions: weakref.WeakKeyDictionary[base.Music21Object, int] = (
+        self.humdrumLineNumbers: weakref.WeakKeyDictionary[base.Music21Object, int] = (
             weakref.WeakKeyDictionary()
         )
 
@@ -1803,18 +1833,18 @@ class SpineCollection(prebase.ProtoM21Object):
             # only spines with children spines and parent spines continue
             newStream = thisSpine.stream.__class__()
             insertPoints = sorted(thisSpine.childSpineInsertPoints)
-            lastHumdrumPosition = -1
+            lastLineNumber = -1
             for el in thisSpine.stream:
-                humdrumPosition = self.humdrumPositions.get(el)
-                if humdrumPosition is not None:
+                lineNumber = self.humdrumLineNumbers.get(el)
+                if lineNumber is not None:
                     for i in insertPoints:
-                        if lastHumdrumPosition > i or humdrumPosition < i:
+                        if lastLineNumber > i or lineNumber < i:
                             continue
                         # insert a sub-spine into this Stream at the current location
                         self.performSpineInsertion(thisSpine, newStream, i)
                         insertPoints.remove(i)
-                    lastHumdrumPosition = humdrumPosition
-                    del self.humdrumPositions[el]
+                    lastLineNumber = lineNumber
+                    del self.humdrumLineNumbers[el]
                 newStream.coreAppend(el)
                 # newStream.append(el)
             newStream.coreElementsChanged()
@@ -1871,29 +1901,28 @@ class SpineCollection(prebase.ProtoM21Object):
                 thisSpine.__class__ = HarmSpine
         self.spineReclassDone = True
 
-    def getOffsetsAndPrioritiesByPosition(
+    def getOffsetsAndPrioritiesByLineNumber(
         self,
     ) -> dict[int, tuple[OffsetQL, list[base.Music21Object]]]:
         '''
         Iterates through the spines by location
         and records the offset and priority for each element in the spines.
 
-        Returns a dictionary where each index is humdrumPosition and the value is a
-        two-element tuple where the first element is the music21 offset and the
-        second element is a list of Music21Objects at that position
+        Returns a dictionary keyed by humdrum line number whose values are
+        two-element tuples: (music21 offset, list of Music21Objects at that line).
         '''
-        positionDict: dict[int, tuple[OffsetQL, list[base.Music21Object]]] = {}
+        lineNumberDict: dict[int, tuple[OffsetQL, list[base.Music21Object]]] = {}
         for thisSpine in self.spines:
             if thisSpine.parentSpine is None:
                 for el in thisSpine.stream.flatten():
-                    pos = self.humdrumPositions.get(el)
+                    pos = self.humdrumLineNumbers.get(el)
                     if pos is None:
                         continue
-                    if pos not in positionDict:
-                        positionDict[pos] = (el.offset, [el])
+                    if pos not in lineNumberDict:
+                        lineNumberDict[pos] = (el.offset, [el])
                     else:
-                        positionDict[pos][1].append(el)
-        return positionDict
+                        lineNumberDict[pos][1].append(el)
+        return lineNumberDict
 
     def moveObjectsToMeasures(self) -> None:
         '''
@@ -1951,7 +1980,7 @@ class SpineCollection(prebase.ProtoM21Object):
                     break
             if thisSpine.spineType == 'dynam':
                 for dynamic in thisSpine.stream[dynamics.Dynamic]:
-                    dynamicPos = self.humdrumPositions.get(dynamic)
+                    dynamicPos = self.humdrumLineNumbers.get(dynamic)
                     if dynamicPos is not None:
                         prioritiesToSearch[dynamicPos] = dynamic
                 for applyStaff in stavesAppliedTo:
@@ -1969,7 +1998,7 @@ class SpineCollection(prebase.ProtoM21Object):
                             #    copy.deepcopy(prioritiesToSearch[el.priority]))
             elif thisSpine.spineType == 'harm':
                 for harm in thisSpine.stream[roman.RomanNumeral]:
-                    harmPos = self.humdrumPositions.get(harm)
+                    harmPos = self.humdrumLineNumbers.get(harm)
                     if harmPos is not None:
                         prioritiesToSearch[harmPos] = harm
                 for applyStaff in stavesAppliedTo:
@@ -1987,7 +2016,7 @@ class SpineCollection(prebase.ProtoM21Object):
                             #    copy.deepcopy(prioritiesToSearch[el.priority]))
             elif thisSpine.spineType in ('lyrics', 'text'):
                 for wrapper in thisSpine.stream[base.ElementWrapper]:
-                    wrapperPos = self.humdrumPositions.get(wrapper)
+                    wrapperPos = self.humdrumLineNumbers.get(wrapper)
                     if wrapperPos is not None:
                         prioritiesToSearch[wrapperPos] = wrapper.obj
                 for applyStaff in stavesAppliedTo:
