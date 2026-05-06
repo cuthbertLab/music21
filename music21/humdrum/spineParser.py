@@ -718,8 +718,10 @@ class HumdrumDataCollection(prebase.ProtoM21Object):
         uses `self.spineCollection.getOffsetsAndPrioritiesByLineNumber()`
         '''
         spineCollection = self.spineCollection
-        if t.TYPE_CHECKING:
-            assert spineCollection is not None
+        if spineCollection is None:
+            raise HumdrumException(
+                'cannot insert global events: no spineCollection. '
+                'Call parse() (or createHumdrumSpines() and parseMusic21()) first.')
         lineNumberDict = spineCollection.getOffsetsAndPrioritiesByLineNumber()
         eventList = self.eventList
         maxEventList = len(eventList)
@@ -1073,7 +1075,7 @@ class HumdrumSpine(prebase.ProtoM21Object):
     A spine knows the SpineCollection it belongs to:
 
     >>> spineCollection1 = humdrum.spineParser.SpineCollection()
-    >>> spine1.spineCollection = spineCollection1
+    >>> spine1.parentSpineCollection = spineCollection1
 
     The spineType property searches the EventList or parentSpine to
     figure out the spineType.
@@ -1103,6 +1105,7 @@ class HumdrumSpine(prebase.ProtoM21Object):
         spineId: int = 0,
         eventList: list[SpineEvent]|None = None,
         streamClass: type[stream.Stream] = stream.Stream,
+        parentSpineCollection: SpineCollection|None = None,
     ) -> None:
         self.id: int = spineId
         if eventList is None:
@@ -1124,7 +1127,11 @@ class HumdrumSpine(prebase.ProtoM21Object):
         self.measuresMoved: bool = False
         self.insertionsDone: bool = False
 
-        self.spineCollection: SpineCollection|None = None
+        if parentSpineCollection is None:
+            # Mostly for unit tests / direct construction.  Real spines come
+            # from SpineCollection.addSpine() which always passes the parent.
+            parentSpineCollection = SpineCollection()
+        self.parentSpineCollection: SpineCollection = parentSpineCollection
         self._spineType: str = ''
 
         self.isFirstVoice: bool = False
@@ -1290,9 +1297,7 @@ class HumdrumSpine(prebase.ProtoM21Object):
         as ElementWrappers.  Should be overridden in
         specific Spine subclasses.
         '''
-        if t.TYPE_CHECKING:
-            assert self.spineCollection is not None
-        humdrumLineNumbers = self.spineCollection.humdrumLineNumbers
+        humdrumLineNumbers = self.parentSpineCollection.humdrumLineNumbers
         lastContainer = hdStringToMeasure('=0')
 
         for event in self.eventList:
@@ -1341,9 +1346,7 @@ class KernSpine(HumdrumSpine):
     desiredTupletQL: OffsetQL
 
     def parse(self) -> None:
-        if t.TYPE_CHECKING:
-            assert self.spineCollection is not None
-        humdrumLineNumbers = self.spineCollection.humdrumLineNumbers
+        humdrumLineNumbers = self.parentSpineCollection.humdrumLineNumbers
         self.lastContainer = hdStringToMeasure('=0')
         self.inTuplet = False
         self.lastNote = None
@@ -1488,9 +1491,7 @@ class DynamSpine(HumdrumSpine):
     are dynamics.
     '''
     def parse(self) -> None:
-        if t.TYPE_CHECKING:
-            assert self.spineCollection is not None
-        humdrumLineNumbers = self.spineCollection.humdrumLineNumbers
+        humdrumLineNumbers = self.parentSpineCollection.humdrumLineNumbers
         thisContainer: stream.Measure|None = None
         for event in self.eventList:
             eventC = event.contents
@@ -1540,9 +1541,7 @@ class HarmSpine(HumdrumSpine):
     RomanText and the MuseScore roman numeral notations.
     '''
     def parse(self) -> None:
-        if t.TYPE_CHECKING:
-            assert self.spineCollection is not None
-        humdrumLineNumbers = self.spineCollection.humdrumLineNumbers
+        humdrumLineNumbers = self.parentSpineCollection.humdrumLineNumbers
         lastContainer = hdStringToMeasure('=0')
         currentKey = key.Key('C')
         for event in self.eventList:
@@ -1700,8 +1699,11 @@ class SpineCollection(prebase.ProtoM21Object):
         >>> newSpine2.stream
         <music21.stream.Stream ...>
         '''
-        self.newSpine = HumdrumSpine(self.nextFreeId, streamClass=streamClass)
-        self.newSpine.spineCollection = self
+        self.newSpine = HumdrumSpine(
+            self.nextFreeId,
+            streamClass=streamClass,
+            parentSpineCollection=self
+        )
         self.spines.append(self.newSpine)
         self.nextFreeId += 1
         return self.newSpine
