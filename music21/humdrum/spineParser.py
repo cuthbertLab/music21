@@ -2931,9 +2931,7 @@ class GlobalReference(base.Music21Object):
 class Test(unittest.TestCase):
     '''
     Note: most spineParser tests are in :mod:`music21.humdrum.tests`.
-    Only `testCopyAndDeepcopy` lives here so that `globals()` resolves to
-    spineParser's module namespace (where the parser classes live) for the
-    deep-copy round trip.
+    Only `testCopyAndDeepcopy` lives here so that `globals()` resolves.
     '''
     def testCopyAndDeepcopy(self) -> None:
         from music21.test.commonTest import testCopyAll
