@@ -177,3 +177,8 @@ docstring-quotes = 'single'
 [tool.pytest.ini_options]
 addopts = ['--doctest-modules', '-p', 'music21.test.pytest_plugin']
 doctest_optionflags = ['NORMALIZE_WHITESPACE', 'ELLIPSIS']
+# defaults are test_*.py and *_test.py; add tests.py so that
+# music21's house style (e.g. stream/tests.py, humdrum/tests.py) is picked up
+# during directory-based collection.  --doctest-modules collects doctests from
+# every .py regardless of this list.
+python_files = ['test_*.py', '*_test.py', 'tests.py']
