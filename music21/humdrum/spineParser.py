@@ -477,11 +477,11 @@ class HumdrumDataCollection(prebase.ProtoM21Object):
 
         >>> for thisSlice in eventCollections:
         ...    print(thisSlice)
-        <music21.humdrum.spineParser.EventCollection 2 events, 2 spines>
-        <music21.humdrum.spineParser.EventCollection 2 events, 2 spines>
-        <music21.humdrum.spineParser.EventCollection 2 events, 2 spines>
-        <music21.humdrum.spineParser.EventCollection 2 events, 2 spines>
-        <music21.humdrum.spineParser.EventCollection 2 events, 2 spines>
+        <music21.humdrum.spineParser.EventCollection line 1, 2 events, 2 spines>
+        <music21.humdrum.spineParser.EventCollection line 2, 2 events, 2 spines>
+        <music21.humdrum.spineParser.EventCollection line 3, 2 events, 2 spines>
+        <music21.humdrum.spineParser.EventCollection line 4, 2 events, 2 spines>
+        <music21.humdrum.spineParser.EventCollection line 5, 2 events, 2 spines>
 
         >>> for thisSlice in protoSpines:
         ...    print(thisSlice)
@@ -550,7 +550,9 @@ class HumdrumDataCollection(prebase.ProtoM21Object):
             protoSpineEventList: list[SpineEvent|None] = []
             for i in range(numEvents):
                 if j == 0:
-                    returnEventCollections.append(EventCollection(self.maxSpines))
+                    returnEventCollections.append(
+                        EventCollection(self.maxSpines,
+                                        lineNumber=self.eventList[i].lineNumber))
                 protoSpineEventList.append(processEventForOneCell(i, j))
             returnProtoSpines.append(ProtoSpine(protoSpineEventList))
 
@@ -598,6 +600,7 @@ class HumdrumDataCollection(prebase.ProtoM21Object):
         # go through the event collections line by line
         for i in range(len(eventCollections)):
             thisEventCollection = eventCollections[i]
+            lineNumber = thisEventCollection.lineNumber
             for j in range(maxSpines):
                 thisEvent = protoSpines[j].eventList[i]
 
@@ -609,7 +612,7 @@ class HumdrumDataCollection(prebase.ProtoM21Object):
                     # first event after a None = new spine because
                     # Humdrum does not require *+ at the beginning
                     currentSpine = spineCollection.addSpine()
-                    currentSpine.insertPoint = i
+                    currentSpine.insertPoint = lineNumber
                     currentSpineList[j] = currentSpine
 
                 currentSpine.append(thisEvent)
@@ -638,23 +641,24 @@ class HumdrumDataCollection(prebase.ProtoM21Object):
                 if thisEvent is None and currentSpine is not None:
                     # should this happen?
                     newSpineList.append(currentSpine)
+                    continue
                 elif thisEvent is None:
                     continue
-                elif thisEvent.contents == '*-':  # terminate spine
-                    currentSpine.endingPoint = i
+                if thisEvent.contents == '*-':  # terminate spine
+                    currentSpine.endingPoint = lineNumber
                 elif thisEvent.contents == '*^':  # split spine assume they are voices
                     newSpine1 = spineCollection.addSpine(streamClass=stream.Voice)
-                    newSpine1.insertPoint = i + 1
+                    newSpine1.insertPoint = lineNumber + 1
                     newSpine1.parentSpine = currentSpine
                     newSpine1.isFirstVoice = True
                     newSpine2 = spineCollection.addSpine(streamClass=stream.Voice)
-                    newSpine2.insertPoint = i + 1
+                    newSpine2.insertPoint = lineNumber + 1
                     newSpine2.parentSpine = currentSpine
-                    currentSpine.endingPoint = i  # will be overridden if merged
+                    currentSpine.endingPoint = lineNumber  # overridden if merged
                     currentSpine.childSpines.append(newSpine1)
                     currentSpine.childSpines.append(newSpine2)
 
-                    currentSpine.childSpineInsertPoints[i] = (newSpine1, newSpine2)
+                    currentSpine.childSpineInsertPoints[lineNumber] = (newSpine1, newSpine2)
                     newSpineList.append(newSpine1)
                     newSpineList.append(newSpine2)
                 elif thisEvent.contents == '*v':
@@ -667,11 +671,11 @@ class HumdrumDataCollection(prebase.ProtoM21Object):
                             mergerActive = currentSpine.parentSpine
                         else:
                             mergerActive = True
-                        currentSpine.endingPoint = i
+                        currentSpine.endingPoint = lineNumber
                     else:
                         # if second merger code is not found then
                         # a one-to-one spine 'merge' occurs
-                        currentSpine.endingPoint = i
+                        currentSpine.endingPoint = lineNumber
                         # merge back to parent if possible:
                         if currentSpine.parentSpine is not None:
                             newSpineList.append(currentSpine.parentSpine)
@@ -681,7 +685,7 @@ class HumdrumDataCollection(prebase.ProtoM21Object):
                         # or make a new spine:
                         else:
                             s = spineCollection.addSpine(streamClass=stream.Part)
-                            s.insertPoint = i
+                            s.insertPoint = lineNumber
                             newSpineList.append(s)
 
                         mergerActive = False
@@ -703,7 +707,7 @@ class HumdrumDataCollection(prebase.ProtoM21Object):
 
             if exchangeActive is not False:
                 raise HumdrumException('ProtoSpine found with unpaired exchange instruction '
-                                       f'at line {i} [{thisEventCollection.events}]')
+                                       f'at line {lineNumber} [{thisEventCollection.events}]')
             currentSpineList = newSpineList
 
         return spineCollection
@@ -1526,6 +1530,10 @@ class DynamSpine(HumdrumSpine):
                 else:
                     thisContainer.coreAppend(thisObject)
 
+        # flush the final Measure (events after the last barline)
+        if thisContainer is not None:
+            thisContainer.coreElementsChanged()
+            self.stream.coreAppend(thisContainer)
         self.stream.coreElementsChanged()
 
 
@@ -1953,6 +1961,14 @@ class SpineCollection(prebase.ProtoM21Object):
         move :samp:`**dynam` and :samp:`**lyrics/**text` information to the appropriate staff.
 
         Assumes that :samp:`*staff` is consistent through the spine.
+
+        TODO: misaligned events (a `**dynam` or `**harm` whose source line has '.'
+        in the kern column) are silently dropped because the matcher only accepts
+        exact :samp:`el.priority == event.lineNumber`.  Desired: when no kern note
+        sits on the same line, attach to the stream at the offset of the most
+        recently-sounding kern note (ideal: between current and next note's
+        offsets).  Lyrics/text continue to attach to notes only.
+        See `Test.testDynamAttachedMisaligned` / `testHarmAttachedMisaligned`.
         '''
         kernStreams: dict[int, stream.Stream] = {}
         for thisSpine in self.spines:
@@ -2100,46 +2116,57 @@ class SpineCollection(prebase.ProtoM21Object):
 
 class EventCollection(prebase.ProtoM21Object):
     '''
-    An EventCollection is a time slice of all events that have
-    an onset of a certain time.  If an event does not occur at
-    a certain time, then you should check EventCollection[n].lastEvents
-    to get the previous event.  (If it is a note, it is the note
-    still sounding, etc.).  The happeningEvent method gets either
-    currentEvent or lastEvent.
+    An EventCollection holds every event that appears on a single source line
+    of a humdrum file -- one cell per spine.  Despite the historical "time
+    slice" framing, this is a *line-number* concept, not a time concept: a
+    clef change and the note that follows it on the next line take place at
+    the same musical time but live in different EventCollections.
+
+    If a spine's cell on this line is '.' or a comment (no new event), use
+    `lastEvents[spineNum]` to retrieve the previous event still sounding.
+    `getSpineOccurring` returns either the current event or the last event
+    that's still active.
 
     These objects normally get created by
     :meth:`~music21.humdrum.spineParser.HumdrumDataCollection.parseProtoSpinesAndEventCollections`
     so you won't need to do all the setup.
 
     Assume that ec1 is
-         C4     pp
 
-    and ec2 is:
-         D4     .
+        C4     pp
+
+    on source line 4, and ec2 is
+
+        D4     .
+
+    on source line 5:
 
     >>> SE = humdrum.spineParser.SpineEvent
-    >>> eventList1 = [SE('C4'),SE('pp')]
-    >>> eventList2 = [SE('D4'),SE('.')]
-    >>> ec1 = humdrum.spineParser.EventCollection(maxSpines=2)
+    >>> eventList1 = [SE('C4', lineNumber=4), SE('pp', lineNumber=4)]
+    >>> eventList2 = [SE('D4', lineNumber=5), SE('.', lineNumber=5)]
+    >>> ec1 = humdrum.spineParser.EventCollection(maxSpines=2, lineNumber=4)
     >>> ec1.events = eventList1
-    >>> ec2 = humdrum.spineParser.EventCollection(maxSpines=2)
+    >>> ec2 = humdrum.spineParser.EventCollection(maxSpines=2, lineNumber=5)
     >>> ec2.events = eventList2
     >>> ec2.lastEvents[1] = eventList1[1]
     >>> ec2.maxSpines
     2
+    >>> ec2.lineNumber
+    5
     >>> ec2.getAllOccurring()
     [<music21.humdrum.spineParser.SpineEvent D4>, <music21.humdrum.spineParser.SpineEvent pp>]
     '''
 
-    def __init__(self, maxSpines: int = 0) -> None:
+    def __init__(self, maxSpines: int = 0, lineNumber: int = 0) -> None:
         self.events: common.defaultlist = common.defaultlist(lambda: None)
         self.lastEvents: common.defaultlist = common.defaultlist(lambda: None)
         self.maxSpines: int = maxSpines
+        self.lineNumber: int = lineNumber
         self.spinePathData: bool = False
         # true if the line contains data about changing spinePaths
 
     def _reprInternal(self) -> str:
-        return f'{len(self.events)} events, {self.maxSpines} spines'
+        return f'line {self.lineNumber}, {len(self.events)} events, {self.maxSpines} spines'
 
     def addSpineEvent(self, spineNum: int, spineEvent: SpineEvent) -> None:
         self.events[spineNum] = spineEvent
@@ -3049,6 +3076,359 @@ class Test(unittest.TestCase):
     def testParseStrangeSplit(self):
         hf1 = HumdrumDataCollection(testFiles.strangeWTCOpening)
         unused_masterStream = hf1.stream
+
+    def testSplitAfterBarline(self):
+        '''
+        2/4 piece: m1 has one half note in a single spine; m2 splits into two
+        spines (split indicator immediately *after* the =2 barline) with a half
+        note on each, merges back to one spine before =3, and m3 has a single
+        half note.
+
+        Currently fails: the split-after-barline causes m1 to absorb m2's
+        contents.  See the diagnosis comment on `performInsertions`.
+
+        Test is AI-assisted.
+        '''
+        krn = re.sub(r'\s\s\s\s+', '\t', r'''
+**kern
+*M2/4
+=1
+2c
+=2
+*^
+2d    2e
+*v    *v
+=3
+2f
+*-
+''')
+        hdc = HumdrumDataCollection(krn)
+        hdc.parse()
+        s = hdc.stream
+
+        self.assertEqual(len(s.parts), 1)
+        measures = list(s.parts[0].getElementsByClass(stream.Measure))
+        self.assertEqual([m.number for m in measures], [1, 2, 3])
+        self.assertEqual([m.duration.quarterLength for m in measures], [2.0, 2.0, 2.0])
+
+        m1, m2, m3 = measures
+        self.assertFalse(m1.hasVoices())
+        self.assertEqual([n.pitch.name for n in m1.notes], ['C'])
+
+        self.assertTrue(m2.hasVoices())
+        self.assertEqual(len(m2.voices), 2)
+        self.assertEqual(
+            sorted(n.pitch.name for v in m2.voices for n in v.notes),
+            ['D', 'E'],
+        )
+
+        self.assertFalse(m3.hasVoices())
+        self.assertEqual([n.pitch.name for n in m3.notes], ['F'])
+
+    def testSplitBeforeBarline(self):
+        '''
+        Same shape as testSplitAfterBarline but with the spine split placed
+        *before* the =2 barline (the barline therefore appears within both new
+        spines).  Humdrum syntax permits this; only adjacency rules constrain
+        spine path indicators.  Currently fails: m1 ends up empty and the C
+        from m1 lands inside m2.
+
+        Test is AI-assisted.
+        '''
+        krn = re.sub(r'\s\s\s\s+', '\t', r'''
+**kern
+*M2/4
+=1
+2c
+*^
+=2    =2
+2d    2e
+*v    *v
+=3
+2f
+*-
+''')
+        hdc = HumdrumDataCollection(krn)
+        hdc.parse()
+        s = hdc.stream
+
+        self.assertEqual(len(s.parts), 1)
+        measures = list(s.parts[0].getElementsByClass(stream.Measure))
+        self.assertEqual([m.number for m in measures], [1, 2, 3])
+        self.assertEqual([m.duration.quarterLength for m in measures], [2.0, 2.0, 2.0])
+
+        m1, m2, m3 = measures
+        self.assertFalse(m1.hasVoices())
+        self.assertEqual([n.pitch.name for n in m1.notes], ['C'])
+
+        self.assertTrue(m2.hasVoices())
+        self.assertEqual(len(m2.voices), 2)
+        self.assertEqual(
+            sorted(n.pitch.name for v in m2.voices for n in v.notes),
+            ['D', 'E'],
+        )
+
+        self.assertFalse(m3.hasVoices())
+        self.assertEqual([n.pitch.name for n in m3.notes], ['F'])
+
+    def testSplitMergeImmediateResplit(self):
+        '''
+        2/4 piece: m1 has one half note in a single spine; m2 splits into two
+        spines (half note on each), then merges back to one spine at the end of
+        m2; m3 immediately splits again into two spines (half note on each)
+        and the piece ends without re-merging.
+
+        Expected layout: one Part with three Measures, each two quarters long;
+        m1 has no voices, m2 and m3 each have two voices with one half note
+        each.
+
+        Test is AI-assisted.
+        '''
+        krn = re.sub(r'\s\s\s\s+', '\t', r'''
+**kern
+*M2/4
+=1
+2c
+=2
+*^
+2d    2e
+*v    *v
+=3
+*^
+2f    2g
+*-    *-
+''')
+        hdc = HumdrumDataCollection(krn)
+        hdc.parse()
+        s = hdc.stream
+
+        self.assertEqual(len(s.parts), 1)
+        measures = list(s.parts[0].getElementsByClass(stream.Measure))
+        self.assertEqual([m.number for m in measures], [1, 2, 3])
+        self.assertEqual([m.duration.quarterLength for m in measures], [2.0, 2.0, 2.0])
+
+        m1, m2, m3 = measures
+        self.assertFalse(m1.hasVoices())
+        self.assertEqual([n.pitch.name for n in m1.notes], ['C'])
+
+        self.assertTrue(m2.hasVoices())
+        self.assertEqual(len(m2.voices), 2)
+        self.assertEqual(
+            sorted(n.pitch.name for v in m2.voices for n in v.notes),
+            ['D', 'E'],
+        )
+
+        self.assertTrue(m3.hasVoices())
+        self.assertEqual(len(m3.voices), 2)
+        self.assertEqual(
+            sorted(n.pitch.name for v in m3.voices for n in v.notes),
+            ['F', 'G'],
+        )
+
+    def testDynamAttachedAligned(self):
+        '''
+        **dynam events on the same line as a kern note attach at that note's
+        offset.  Sanity-check companion to testDynamAttachedMisaligned.
+
+        Test is AI-assisted.
+        '''
+        krn = re.sub(r'\s\s\s\s+', '\t', r'''
+**kern    **dynam
+*staff1    *staff1
+*M4/4     *
+=1        =1
+2c        f
+2d        p
+=2        =2
+4e        sf
+4f        .
+4g        .
+4a        .
+*-        *-
+''')
+        hdc = HumdrumDataCollection(krn)
+        hdc.parse()
+        found = [(d.value, float(d.getOffsetInHierarchy(hdc.stream)))
+                 for d in hdc.stream.recurse().getElementsByClass(dynamics.Dynamic)]
+        self.assertEqual(found, [('f', 0.0), ('p', 2.0), ('sf', 4.0)])
+
+    @unittest.expectedFailure
+    def testDynamAttachedMisaligned(self):
+        '''
+        A **dynam event on a line where the kern column has '.' (no new note
+        event) should still attach -- to the stream at the offset of the most
+        recently-sounding note.  Currently fails: misaligned dynamics are
+        silently dropped.  See TODO in `SpineCollection.attachNonKernEvents`.
+
+        Test is AI-assisted.
+        '''
+        krn = re.sub(r'\s\s\s\s+', '\t', r'''
+**kern    **dynam
+*staff1    *staff1
+*M4/4     *
+=1        =1
+2c        f
+.         p
+2d        .
+=2        =2
+4e        sf
+4f        .
+4g        .
+4a        .
+*-        *-
+''')
+        hdc = HumdrumDataCollection(krn)
+        hdc.parse()
+        found = [(d.value, float(d.getOffsetInHierarchy(hdc.stream)))
+                 for d in hdc.stream.recurse().getElementsByClass(dynamics.Dynamic)]
+        # 'p' occurs while C (offset 0, half note) is sustaining; falls back to
+        # the C's offset.
+        self.assertEqual(found, [('f', 0.0), ('p', 0.0), ('sf', 4.0)])
+
+    @unittest.expectedFailure
+    def testHarmAttachedMisaligned(self):
+        '''
+        A **harm event on a line where the kern column has '.' should still
+        attach -- to the stream at the offset of the most recently-sounding
+        note.  Currently fails: misaligned harm events are silently dropped.
+        See TODO in `SpineCollection.attachNonKernEvents`.
+
+        Test is AI-assisted.
+        '''
+        krn = re.sub(r'\s\s\s\s+', '\t', r'''
+**kern    **harm
+*staff1    *staff1
+*M4/4     *
+*C:       *C:
+=1        =1
+2c        I
+.         V
+2g        .
+=2        =2
+4f        IV
+4g        V
+4a        vi
+4c        I
+*-        *-
+''')
+        hdc = HumdrumDataCollection(krn)
+        hdc.parse()
+        found = [(r.figure, float(r.getOffsetInHierarchy(hdc.stream)))
+                 for r in hdc.stream.recurse().getElementsByClass(roman.RomanNumeral)]
+        # 'V' on the dot line falls back to the C's offset (still sustaining).
+        self.assertEqual(
+            found,
+            [('I', 0.0), ('V', 0.0), ('IV', 4.0), ('V', 5.0), ('vi', 6.0), ('I', 7.0)],
+        )
+
+    def testBlankLinesPreserveSplitParse(self):
+        '''
+        Blank lines should not affect parsing.  Same shape as
+        testSplitAfterBarline but with blank lines sprinkled throughout.
+
+        Test is AI-assisted.
+        '''
+        krn = re.sub(r'\s\s\s\s+', '\t', r'''
+
+**kern
+*M2/4
+
+=1
+2c
+
+=2
+*^
+
+2d    2e
+*v    *v
+
+=3
+
+2f
+*-
+''')
+        hdc = HumdrumDataCollection(krn)
+        hdc.parse()
+        s = hdc.stream
+
+        self.assertEqual(len(s.parts), 1)
+        measures = list(s.parts[0].getElementsByClass(stream.Measure))
+        self.assertEqual([m.number for m in measures], [1, 2, 3])
+        self.assertEqual([m.duration.quarterLength for m in measures], [2.0, 2.0, 2.0])
+
+        m1, m2, m3 = measures
+        self.assertEqual([n.pitch.name for n in m1.notes], ['C'])
+        self.assertEqual(
+            sorted(n.pitch.name for v in m2.voices for n in v.notes),
+            ['D', 'E'],
+        )
+        self.assertEqual([n.pitch.name for n in m3.notes], ['F'])
+
+    def testBlankLinesPreserveDynamAndHarm(self):
+        '''
+        Blank lines mixed into a kern + dynam + harm piece should not affect
+        which events attach where.
+
+        Test is AI-assisted.
+        '''
+        krn = re.sub(r'\s\s\s\s+', '\t', r'''
+**kern    **dynam    **harm
+*staff1    *staff1    *staff1
+*M4/4     *         *
+*C:       *         *C:
+
+=1        =1        =1
+2c        f         I
+
+2d        p         V
+=2        =2        =2
+
+4e        sf        I
+4f        .         IV
+4g        .         V
+4a        .         vi
+*-        *-        *-
+''')
+        hdc = HumdrumDataCollection(krn)
+        hdc.parse()
+        s = hdc.stream
+        dyn = [(d.value, float(d.getOffsetInHierarchy(s)))
+               for d in s.recurse().getElementsByClass(dynamics.Dynamic)]
+        harm = [(r.figure, float(r.getOffsetInHierarchy(s)))
+                for r in s.recurse().getElementsByClass(roman.RomanNumeral)]
+        self.assertEqual(dyn, [('f', 0.0), ('p', 2.0), ('sf', 4.0)])
+        self.assertEqual(
+            harm,
+            [('I', 0.0), ('V', 2.0), ('I', 4.0), ('IV', 5.0), ('V', 6.0), ('vi', 7.0)],
+        )
+
+    def testLyricsCorrectlyAligned(self):
+        '''
+        Verify that each lyric syllable from a **text spine attaches to the
+        kern note on the same line.  Existing testLyricsInSpine only checks
+        the assembled lyric string; this checks the per-note mapping.
+
+        Test is AI-assisted.
+        '''
+        krn = re.sub(r'\s\s\s\s+', '\t', r'''
+**kern    **text
+*staff1    *staff1
+*M4/4     *
+=1        =1
+4c        Ma
+4d        gi
+4e        ja
+4f        go
+*-        *-
+''')
+        hdc = HumdrumDataCollection(krn)
+        hdc.parse()
+        notesAndLyrics = [(n.pitch.name, n.lyric)
+                          for n in hdc.stream.recurse().notes]
+        self.assertEqual(
+            notesAndLyrics,
+            [('C', 'Ma'), ('D', 'gi'), ('E', 'ja'), ('F', 'go')],
+        )
 
     def testSpineComments(self):
         hf1 = HumdrumDataCollection(testFiles.fakeTest)
