@@ -71,12 +71,12 @@ so allocate time (2 min on M4).  Start working on the announcement while it's ru
     Don't forget the "v" in the release tag.
     Sanity check that the correct commit was tagged: git log
 
-17. Push tags: git push --tags
+17. Push that tag: git push origin vX.Y.Z
 
 18. Create a new release on GitHub (using the tag just created) and upload the
     non-wheel files created here and docs.
 
-    Drag in this order: .tar.gz, -docs.zip, no-corpus.tar.gz
+    Drag in this order: .tar.gz (wait to finish), -docs.zip (wait), no-corpus.tar.gz
 
     Finish this before doing the next step, even though it looks like it could be done in parallel.
 
