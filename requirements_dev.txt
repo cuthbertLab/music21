@@ -7,7 +7,7 @@ flake8-quotes>=3.3.2
 hatch
 hatchling
 jupyter
-mypy>=1.16.0
+mypy==1.16.1
 nbconvert
 nbval
 pylint>=3.2.0
