@@ -4,6 +4,7 @@ set -e  # error if anything returns non-zero exit code
 # needed for some tests that add Desktop
 mkdir ~/Desktop
 
+sudo apt-get update
 sudo apt-get install -y libpng-dev
 # sudo apt-get install -y python3-pyqt5
 wget -q https://lilypond.org/download/binaries/linux-64/lilypond-2.22.1-1.linux-64.sh
