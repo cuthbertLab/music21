@@ -139,6 +139,7 @@ def displayMusic21jMIDI(
         fmt,
         subformats=subformats,
         addStartDelay=True,
+        **keywords,
     )
 
     with open(fp, 'rb') as f:
@@ -159,6 +160,7 @@ def displayMusic21jMIDI(
     display(HTML('''
         <div id="''' + outputId + '''"></div>
         <link rel="stylesheet" href="https://cuthbertLab.github.io/music21j/css/m21.css">
+        <link rel="stylesheet" href="https://cuthbertLab.github.io/music21j/css/midiPlayer.css">
         ''' + load_require_script + '''
         <script>
         function ''' + outputId + '''_play() {
