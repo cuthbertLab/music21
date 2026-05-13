@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 # Name:         musicxml/xmlSoundParser.py
 # Purpose:      Translate the <sound> tag to music21
@@ -108,7 +107,7 @@ class SoundTagMixin:
 
         qpm = common.numToIntOrFloat(float(mxSound.get('tempo', 0)))
         if qpm == 0:
-            warnings.warn('0 qpm tempo tag found, skipping.')
+            warnings.warn('0 qpm tempo tag found, skipping.', stacklevel=2)
             return
         mm = tempo.MetronomeMark(referent=duration.Duration(type='quarter'),
                                  number=None,

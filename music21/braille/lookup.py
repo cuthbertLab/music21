@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # ----------------------------------------------------------------------------------
 # Name:         lookup.py
 # Purpose:      music21 class which contains lookup tables between print and braille

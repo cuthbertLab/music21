@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 # Name:         harmony.py
 # Purpose:      music21 classes for representing harmonies and chord symbols
@@ -37,9 +36,6 @@ from music21 import prebase
 from music21 import style
 
 environLocal = environment.Environment('harmony')
-
-T = t.TypeVar('T', bound='ChordSymbol')
-NCT = t.TypeVar('NCT', bound='NoChord')
 
 if t.TYPE_CHECKING:
     from music21.figuredBass import realizerScale
@@ -202,6 +198,17 @@ class Harmony(chord.Chord):
 
     Accepts a keyword 'updatePitches'. By default, it
     is `True`, but can be set to `False` to initialize faster if pitches are not needed.
+
+    The `placement` attribute controls where the symbol appears relative to the staff,
+    matching the MusicXML `placement` attribute on `<harmony>`. Valid values are
+    ``'above'``, ``'below'``, or ``None`` (let the notation software decide):
+
+    >>> cs = harmony.ChordSymbol('G7')
+    >>> cs.placement is None
+    True
+    >>> cs.placement = 'below'
+    >>> cs.placement
+    'below'
     '''
     # sort harmony just before notes and chords and other default objects
     classSortOrder = base.Music21Object.classSortOrder - 1
@@ -228,6 +235,7 @@ class Harmony(chord.Chord):
         # a romanNumeral numeral object, musicxml stores this within a node
         # called <function> which might conflict with the Harmony
         self._roman = None
+        self.placement: str|None = None
         # specify an array of degree alteration objects
         self.chordStepModifications: list[ChordStepModification] = []
         self._degreesList: list[str] = []
@@ -1433,7 +1441,7 @@ realizerScaleCache: dict[tuple[str, str], realizerScale.FiguredBassScale] = {}
 
 class ChordSymbol(Harmony):
     # noinspection SpellCheckingInspection
-    '''
+    r'''
     Class representing the Chord Symbols commonly found on lead sheets.
     Chord Symbol objects can be instantiated one of two main ways:
 
@@ -1489,7 +1497,8 @@ class ChordSymbol(Harmony):
     ...     chordSymbolName = 'C' + s
     ...     h = harmony.ChordSymbol(chordSymbolName)
     ...     pitchNames = [str(p) for p in h.pitches]
-    ...     print('%-10s%s' % (chordSymbolName, '[' + (', '.join(pitchNames)) + ']'))
+    ...     print(f'{chordSymbolName:<10}', end='[')
+    ...     print(*pitchNames, sep=', ', end=']\n')
     C         [C3, E3, G3]
     Cm        [C3, E-3, G3]
     C+        [C3, E3, G#3]
@@ -2394,7 +2403,7 @@ class ChordSymbol(Harmony):
         else:
             return False
 
-    def transpose(self: T, value, *, inPlace=False) -> T|None:
+    def transpose(self, value, *, inPlace=False) -> t.Self|None:
         '''
         Overrides :meth:`~music21.chord.Chord.transpose` so that this ChordSymbol's
         `figure` is appropriately cleared afterward.
@@ -2506,7 +2515,7 @@ class NoChord(ChordSymbol):
         # do nothing, everything is already set.
         return
 
-    def transpose(self: NCT, _value, *, inPlace=False) -> NCT|None:
+    def transpose(self, _value, *, inPlace=False) -> t.Self|None:
         '''
         Overrides :meth:`~music21.chord.Chord.transpose` to do nothing.
 

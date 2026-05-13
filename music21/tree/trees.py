@@ -1,9 +1,8 @@
-# -*- coding: utf-8 -*-
 # -----------------------------------------------------------------------------
 # Name:         tree/trees.py
 # Purpose:      Subclasses of tree.core.AVLTree for different purposes
 #
-# Authors:      Josiah Wolf Oberholtzer
+# Authors:      Joséphine Wolf Oberholtzer
 #               Michael Scott Asato Cuthbert
 #
 # Copyright:    Copyright © 2013-2016 Michael Scott Asato Cuthbert
@@ -17,7 +16,6 @@ and other positions.
 from __future__ import annotations
 
 from math import inf
-import typing as t
 import unittest
 import weakref
 
@@ -123,7 +121,7 @@ class ElementTree(core.AVLTree):
         If element.sortTuple(self.source) returns the right information, it's a fast
         O(log n) search. If not his is an O(n log n) operation in python not C, so slow.
 
-        >>> score = tree.makeExampleScore()
+        >>> score = tree.examples.makeExampleScore()
         >>> scoreTree = score.asTree(flatten=True)
         >>> lastNote = score.flatten().notes[-1]
         >>> lastNote in scoreTree
@@ -178,7 +176,7 @@ class ElementTree(core.AVLTree):
         (O(log n)), but it's O(log n) in Python while normal list slicing is O(1) in C, so
         don't use trees for __getitem__ searching if you don't have to.
 
-        >>> score = tree.makeExampleScore()
+        >>> score = tree.examples.makeExampleScore()
         >>> scoreTree = score.asTree(flatten=True)
         >>> scoreTree
         <ElementTree {20} (0.0 <0.-25...> to 8.0) <music21.stream.Score exampleScore>>
@@ -243,7 +241,7 @@ class ElementTree(core.AVLTree):
         Gets the length of the ElementTree, i.e., the number of elements enclosed.
         This is a very very fast O(1).
 
-        >>> score = tree.makeExampleScore()
+        >>> score = tree.examples.makeExampleScore()
         >>> scoreTree = score.asTree(flatten=True)
         >>> len(scoreTree)
         20
@@ -300,7 +298,7 @@ class ElementTree(core.AVLTree):
         Sets elements at index `i` to `new`, but keeping the old position
         of the element there. (This is different from OffsetTrees, where things can move around).
 
-        >>> score = tree.makeExampleScore()
+        >>> score = tree.examples.makeExampleScore()
         >>> scoreTree = score.asTree(flatten=True)
         >>> n = scoreTree[10]
         >>> n
@@ -349,7 +347,7 @@ class ElementTree(core.AVLTree):
 
         Slow: O(n log n) time, but it's just for debugging
 
-        >>> score = tree.makeExampleScore()
+        >>> score = tree.examples.makeExampleScore()
         >>> scoreTree = score.asTree(flatten=True)
         >>> print(scoreTree)
         <ElementTree {20} (0.0 <0.-25...> to 8.0) <music21.stream.Score exampleScore>>
@@ -390,7 +388,7 @@ class ElementTree(core.AVLTree):
         Not an especially efficient way of using this beautiful tree object!  But useful
         for debugging or a final iteration for conversion.
 
-        >>> score = tree.makeExampleScore()
+        >>> score = tree.examples.makeExampleScore()
         >>> scoreTree = score.asTree(flatten=True)
         >>> for x in scoreTree:
         ...     print(x)
@@ -440,7 +438,6 @@ class ElementTree(core.AVLTree):
             if parent is None or parent in visitedParents:
                 continue
             visitedParents.add(parent)
-            parentPosition = parent.offset
             parent._removeElementAtPosition(self, oldPosition)
             # Trees don't have offsets currently
             raise NotImplementedError
@@ -582,7 +579,7 @@ class ElementTree(core.AVLTree):
 
         See __getitem__ for caveats about speed.
 
-        >>> score = tree.makeExampleScore()
+        >>> score = tree.examples.makeExampleScore()
         >>> scoreTree = score.asTree(flatten=True)
         >>> scoreTree
         <ElementTree {20} (0.0 <0.-25...> to 8.0) <music21.stream.Score exampleScore>>
@@ -658,7 +655,7 @@ class ElementTree(core.AVLTree):
 
         Slow: O(n log n) time so don't make this your main thing.
 
-        >>> score = tree.makeExampleScore()
+        >>> score = tree.examples.makeExampleScore()
         >>> scoreTree = score.asTree(flatten=True)
         >>> scoreTree
         <ElementTree {20} (0.0 <0.-25...> to 8.0) <music21.stream.Score exampleScore>>
@@ -699,7 +696,7 @@ class ElementTree(core.AVLTree):
 
         If the element is in the original score, then it should be very fast (O(log n))
 
-        >>> score = tree.makeExampleScore()
+        >>> score = tree.examples.makeExampleScore()
         >>> scoreFlat = score.flatten()
         >>> n = scoreFlat.notes[-1]
 
@@ -823,7 +820,7 @@ class ElementTree(core.AVLTree):
         r'''
         Gets the earliest position in this tree.
 
-        >>> score = tree.makeExampleScore()
+        >>> score = tree.examples.makeExampleScore()
         >>> elTree = score.asTree()
         >>> elTree.lowestPosition().shortRepr()
         '0.0 <0.-20...>'
@@ -848,7 +845,7 @@ class ElementTree(core.AVLTree):
         '''
         the original stream. (stored as a weakref but returned unwrapped)
 
-        >>> example = tree.makeExampleScore()
+        >>> example = tree.examples.makeExampleScore()
         >>> eTree = example.asTree()
         >>> eTree.source is example
         True
@@ -910,7 +907,7 @@ class OffsetTree(ElementTree):
         TRUE IF and ONLY if the
         .offset of the element matches the position in the tree -- thus it is very fast!
 
-        >>> score = tree.makeExampleScore()
+        >>> score = tree.examples.makeExampleScore()
         >>> scoreTree = score.asTree(flatten=True, groupOffsets=True)
 
         >>> score.flatten()[5] in scoreTree
@@ -929,8 +926,10 @@ class OffsetTree(ElementTree):
         '''
         try:
             offset = element.offset
-        except AttributeError:
-            raise ElementTreeException('element must be a Music21Object, i.e., must have offset')
+        except AttributeError as ae:
+            raise ElementTreeException(
+                'element must be a Music21Object, i.e., must have offset'
+            ) from ae
         candidates = self.elementsStartingAt(offset)
         if element in candidates:
             return True
@@ -941,7 +940,7 @@ class OffsetTree(ElementTree):
         r'''
         Gets elements by integer index or slice.
 
-        >>> score = tree.makeExampleScore()
+        >>> score = tree.examples.makeExampleScore()
         >>> scoreTree = score.asTree(flatten=True, groupOffsets=True)
 
         >>> scoreTree[0]
@@ -1066,7 +1065,7 @@ class OffsetTree(ElementTree):
 
         Not an especially efficient way of using this beautiful tree object.
 
-        >>> score = tree.makeExampleScore()
+        >>> score = tree.examples.makeExampleScore()
         >>> scoreTree = score.asTree(flatten=True, groupOffsets=True)
         >>> for x in scoreTree:
         ...     print(x)
@@ -1149,7 +1148,7 @@ class OffsetTree(ElementTree):
         with 3600 items took 500ms.  Creating the tree the first time
         was 40 seconds, so about an 80x speedup.
 
-        >>> score = tree.makeExampleScore()
+        >>> score = tree.examples.makeExampleScore()
         >>> scoreTree = score.asTimespans()
         >>> newTree = scoreTree.copy()
         >>> newTree
@@ -1441,7 +1440,7 @@ class OffsetTree(ElementTree):
         Creates a dictionary of offsets that have more than one element starting at that time,
         where the keys are offset times and the values are lists of elements at that moment.
 
-        >>> score = tree.makeExampleScore()
+        >>> score = tree.examples.makeExampleScore()
         >>> scoreTree = score.asTree(flatten=True, groupOffsets=True)
         >>> scoreTree
         <OffsetTree {20} (0.0 to 8.0) <music21.stream.Score exampleScore>>
@@ -1482,8 +1481,8 @@ class Test(unittest.TestCase):
         test that get position after works with
         an offset when the tree is built on SortTuples.
         '''
-        from music21 import stream
         from music21 import note
+        from music21 import stream
 
         et = ElementTree()
 

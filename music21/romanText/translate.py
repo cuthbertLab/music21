@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 # Name:         romanText/translate.py
 # Purpose:      Translation routines for roman numeral analysis text files
@@ -199,11 +198,12 @@ def _copySingleMeasure(rtTagged, p, kCurrent):
         if mPast.number == target:
             try:
                 m = copy.deepcopy(mPast)
-            except TypeError:  # pragma: no cover
+            except TypeError as te:  # pragma: no cover
                 raise RomanTextTranslateException(
                     f'Failed to copy measure {mPast.number}:'
                     + ' did you perhaps parse an RTOpus object with romanTextToStreamScore '
-                    + 'instead of romanTextToStreamOpus?')
+                    + 'instead of romanTextToStreamOpus?'
+                ) from te
             m.number = rtTagged.number[0]
             # update all keys
             for rnPast in m.getElementsByClass(roman.RomanNumeral):
@@ -264,13 +264,13 @@ def _copyMultipleMeasures(rtMeasure: rtObjects.RTMeasure,
         if mPast.number in range(targetStart, targetEnd + 1):
             try:
                 m = copy.deepcopy(mPast)
-            except TypeError:  # pragma: no cover
+            except TypeError as te:  # pragma: no cover
                 raise RomanTextTranslateException(
-                    'Failed to copy measure {0} to measure range {1}-{2}: '.format(
-                        mPast.number, targetStart, targetEnd)
-                    + 'did you perhaps parse an RTOpus object with romanTextToStreamScore '
-                    + 'instead of romanTextToStreamOpus?')
-
+                    f'Failed to copy measure {mPast.number} to measure range '
+                    f'{targetStart}-{targetEnd}: did you perhaps parse an RTOpus '
+                    'object with romanTextToStreamScore instead of '
+                    'romanTextToStreamOpus?'
+                ) from te
             m.number = rtMeasure.number[0] + mPast.number - targetStart
             measures.append(m)
             # update all keys
@@ -382,11 +382,11 @@ class PartTranslator:
         for token in tokens:
             try:
                 self.translateOneLineToken(token)
-            except Exception:
+            except Exception as exc:
                 tracebackMessage = traceback.format_exc()
                 raise RomanTextTranslateException(
                     f'At line {token.lineNumber} for token {token}, '
-                    + f'an exception was raised: \n{tracebackMessage}')
+                    f'an exception was raised: \n{tracebackMessage}') from exc
 
         p = self.p
         p.coreElementsChanged()
@@ -662,8 +662,8 @@ class PartTranslator:
             try:
                 dataVal = int(data)
                 self.keySigCurrent = key.KeySignature(dataVal)
-            except ValueError:
-                raise RomanTextTranslateException(f'Cannot parse key signature: {data!r}')
+            except ValueError as ve:
+                raise RomanTextTranslateException(f'Cannot parse key signature: {data!r}') from ve
         self.setKeySigFromFirstKeyToken = False
         # environLocal.printDebug(['keySigCurrent:', keySigCurrent])
         self.foundAKeySignatureSoFar = True
@@ -735,9 +735,10 @@ class PartTranslator:
         elif isinstance(a, rtObjects.RTKeySignature):
             try:  # this sets the keysignature but not the prefix text
                 thisSig = a.getKeySignature()
-            except (exceptions21.Music21Exception, ValueError):  # pragma: no cover
+            except (exceptions21.Music21Exception, ValueError) as ve:  # pragma: no cover
                 raise RomanTextTranslateException(
-                    f'cannot get key from {a.src} in line {self.currentMeasureToken.src}')
+                    f'cannot get key from {a.src} in line {self.currentMeasureToken.src}'
+                ) from ve
             # insert at beginning of measure if at beginning
             #     -- for things like pickups.
             if m.number <= 1:
@@ -753,13 +754,12 @@ class PartTranslator:
             # set new offset based on beat
             try:
                 newOffset = a.getOffset(self.tsCurrent)
-            except ValueError:  # pragma: no cover
+            except ValueError as ve:  # pragma: no cover
                 raise RomanTextTranslateException(
-                    'cannot properly get an offset from '
-                    + f'beat data {a.src}'
-                    + 'under timeSignature {0} in line {1}'.format(
-                        self.tsCurrent,
-                        self.currentMeasureToken.src))
+                    f'cannot properly get an offset from beat data {a.src} '
+                    f'under timeSignature {self.tsCurrent} '
+                    f'in line {self.currentMeasureToken.src}'
+                ) from ve
             if (self.previousChordInMeasure is None
                     and self.previousRn is not None
                     and newOffset > 0):
@@ -933,9 +933,10 @@ class PartTranslator:
         try:  # this sets the key and the keysignature
             self.kCurrent, pl = _getKeyAndPrefix(a)
             self.prefixLyric += pl
-        except:  # pragma: no cover
+        except (ValueError, exceptions21.Music21Exception) as ve:  # pragma: no cover
             raise RomanTextTranslateException(
-                f'cannot get analytic key from {a.src} in line {self.currentMeasureToken.src}')
+                f'cannot get analytic key from {a.src} in line {self.currentMeasureToken.src}'
+            ) from ve
         self.setKeyChangeToken = True
 
 

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 # Name:         scala/__init__.py
 # Purpose:      Interface and representation of Scala scale files
@@ -42,15 +41,26 @@ For most people you'll want to do something like this:
 '''
 from __future__ import annotations
 
+__all__ = [
+    'SCALA_PATHS',
+    'ScalaData',
+    'ScalaFile',
+    'ScalaPitch',
+    'getPaths',
+    'parse',
+    'scl',
+    'search',
+]
+
 import io
 import math
 import os
 import pathlib
-import typing as t
 import unittest
 
 
 from music21 import common
+from music21.common.types import DocOrder
 from music21 import environment
 from music21 import interval
 
@@ -165,8 +175,6 @@ class ScalaPitch:
             # http://www.sengpielaudio.com/calculator-centsratio.htm
             self.cents = 1200.0 * math.log((n / d), 2)
         return self.cents
-
-
 
 
 class ScalaData:
@@ -442,9 +450,10 @@ class ScalaFile:
         ws = self.writestr()
         self.file.write(ws)
 
-    def writestr(self):
+    def writestr(self) -> str:
         if isinstance(self.data, ScalaData):
             return self.data.getFileString()
+        return ''
         # handle Scale or other objects
 
 
@@ -725,7 +734,7 @@ Aristoxenos' Chromatic/Enharmonic, 3 + 9 + 18 parts
 
 # ------------------------------------------------------------------------------
 # define presented order in documentation
-_DOC_ORDER: list[type] = []
+_DOC_ORDER: DocOrder = [ScalaData, ScalaFile, ScalaPitch, parse, search]
 
 
 if __name__ == '__main__':

@@ -335,6 +335,18 @@ class Test(unittest.TestCase):
         self.assertEqual(explicitFm6.root(find=False), cs.root(find=False))
         self.assertEqual(explicitFm6.inversion(), cs.inversion())
 
+    def testExportChordSymbolPlacement(self):
+        cs = harmony.ChordSymbol('C')
+        cs.placement = 'below'
+        et = self.getET(cs)
+        harmonyEl = et.find('part/measure/harmony')
+        self.assertEqual(harmonyEl.get('placement'), 'below')
+
+        cs2 = harmony.ChordSymbol('G')
+        et2 = self.getET(cs2)
+        harmonyEl2 = et2.find('part/measure/harmony')
+        self.assertIsNone(harmonyEl2.get('placement'))
+
     def testExportNC(self):
         s = stream.Score()
         p = stream.Part()
@@ -1189,12 +1201,12 @@ class TestExternal(unittest.TestCase):
         with io.open(fp, encoding='utf-8') as f:
             v2 = f.read()
         differ = list(difflib.ndiff(v.splitlines(), v2.splitlines()))
-        for i, l in enumerate(differ):
-            if l.startswith('-') or l.startswith('?') or l.startswith('+'):
-                if 'id=' in l:
+        for i, line in enumerate(differ):
+            if line.startswith('-') or line.startswith('?') or line.startswith('+'):
+                if 'id=' in line:
                     continue
                 if self.show:
-                    print(l)
+                    print(line)
                     # for j in range(i - 1,i + 1):
                     #    print(differ[j])
                     # print('------------------')

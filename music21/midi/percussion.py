@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 # Name:         midi/percussion.py
 # Purpose:      music21 classes for representing pitches

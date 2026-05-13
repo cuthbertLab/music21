@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 # Name:         braille/runAllBrailleTests.py
 # Purpose:      Test runner for Bo-Cheng Jhan and others who would prefer

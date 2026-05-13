@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 # Name:         possibility.py
 # Purpose:      rule checking functions for a "possibility" represented as a tuple.
@@ -200,7 +199,10 @@ def upperPartsWithinLimit(possibA, maxSemitoneSeparation=12):
     return areUpperPartsWithinLimit
 
 
-def pitchesWithinLimit(possibA, maxPitch=pitch.Pitch('B5')):
+DEFAULT_MAX_PITCH = pitch.Pitch('B5')
+
+
+def pitchesWithinLimit(possibA, maxPitch=DEFAULT_MAX_PITCH):
     '''
     Returns True if all pitches in possibA are less than or equal to
     the maxPitch provided. Comparisons between pitches are done using pitch

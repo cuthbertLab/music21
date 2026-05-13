@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 # Name:         midi/__init__.py
 # Purpose:      Access to MIDI library / music21 classes for dealing with midi data
@@ -7,33 +6,37 @@
 #               Michael Scott Asato Cuthbert
 #               (Will Ware -- see docs)
 #
-# Copyright:    Copyright © 2011-2013, 2019 Michael Scott Asato Cuthbert
+# Copyright:    Copyright © 2011-2013, 2019-2025 Michael Scott Asato Cuthbert
 #               Some parts of this module are in the Public Domain, see details.
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
 Objects and tools for processing MIDI data.  Converts from MIDI files to
 :class:`~music21.midi.MidiEvent`, :class:`~music21.midi.MidiTrack`, and
-:class:`~music21.midi.MidiFile` objects, and vice-versa.
+:class:`~music21.midi.MidiFile` objects, and vice versa.
 
 This module originally used routines from Will Ware's public domain midi.py
-library from 2001 which was once posted at (http link)
+library from 2001 which was once posted at
 groups.google.com/g/alt.sources/msg/0c5fc523e050c35e
 '''
 from __future__ import annotations
 
 __all__ = [
-    'MidiEvent', 'MidiFile', 'MidiTrack', 'MidiException',
+    'ChannelModeMessages',
+    'ChannelVoiceMessages',
     'DeltaTime',
-    'MetaEvents', 'ChannelVoiceMessages', 'ChannelModeMessages',
-    'SysExEvents',
-    'charToBinary',
-    'getNumber', 'getVariableLengthNumber', 'putNumber', 'putVariableLengthNumber',
-    'getNumbersAsList', 'putNumbersAsList',
-    'intsToHexBytes',
-    # add enums:
-    'ChannelVoiceMessages', 'ChannelModeMessages', 'SysExEvents',
     'METAEVENT_MARKER',
+    'MetaEvents',
+    'MidiEvent',
+    'MidiException',
+    'MidiFile',
+    'MidiTrack',
+    'SysExEvents',
+    'getNumber',
+    'getVariableLengthNumber',
+    'putNumber',
+    'putNumbersAsList',
+    'putVariableLengthNumber',
 ]
 
 from collections.abc import Iterable
@@ -41,7 +44,6 @@ import unicodedata
 from typing import overload
 import typing as t
 
-from music21 import common
 from music21.common.enums import ContainsEnum
 from music21 import defaults
 from music21 import environment
@@ -57,65 +59,18 @@ class MidiException(exceptions21.Music21Exception):
     pass
 
 # ------------------------------------------------------------------------------
-@common.deprecated('v9.7', 'v10', 'use bin(ord(char)) instead.')
-def charToBinary(char: str):
-    '''
-    DEPRECATED: just use bin(ord(char)) instead.
-
-    Or for the exact prior output (with left-padding)
-    use `f'{int(bin(ord(char))[2:]):08d}'`
-
-
-    Convert a char into its binary representation. Useful for debugging.
-
-    >>> #_DOCS_SHOW midi.charToBinary('a')
-    >>> f'{int(bin(ord("a"))[2:]):08d}'  #_DOCS_HIDE
-    '01100001'
-
-    Note: This function is deprecated and will be removed in v10.  Music21 actually
-    predates the bin() function in Python (added in Python 2.6).
-    '''
-    binary = bin(ord(char))[2:]
-    zeroFix = (8 - len(binary)) * '0'
-    return zeroFix + binary
-
-@common.deprecated('v9.7', 'v10', 'Just use bytes(...) instead')
-def intsToHexBytes(intList: Iterable[int]) -> bytes:
-    r'''
-    (Deprecated: just use bytes(...) instead)
-
-    Convert a list of integers into hex bytes, suitable for testing MIDI encoding.
-
-    Here we take NOTE_ON message, Middle C, 120 velocity and translate it to bytes
-
-    >>> #_DOCS_SHOW midi.intsToHexBytes([0x90, 60, 120])
-    >>> bytes([0x90, 60, 120])  #_DOCS_HIDE
-    b'\x90<x'
-
-    Note: This function is deprecated and will be removed in v10.  This
-    function has not been needed since music21 became Python 3-only in v.5.
-    '''
-    return bytes(intList)
-
-
 @overload
-def getNumber(midiStr: int, length: int) -> tuple[int, int]:
+def getNumber(midiBytes: int, length: int) -> tuple[int, int]:
     ...
 
 @overload
-def getNumber(midiStr: str, length: int) -> tuple[int, str]:
+def getNumber(midiBytes: bytes, length: int) -> tuple[int, bytes]:
     ...
 
-@overload
-def getNumber(midiStr: bytes, length: int) -> tuple[int, bytes]:
-    ...
-
-def getNumber(midiStr: str|bytes|int, length: int) -> tuple[int, str|bytes|int]:
+def getNumber(midiBytes: bytes|int, length: int) -> tuple[int, bytes|int]:
     '''
-    Return the value of a string byte or bytes if length > 1
-    from an 8-bit string or bytes object
-
-    Then, return the remaining string or bytes object
+    Extract the first `length` bytes from a bytes object (or int)
+    and return it and the remaining bytes object as a 2-tuple
 
     The `length` is the number of chars to read.
     This will sum a length greater than 1 if desired.
@@ -123,17 +78,17 @@ def getNumber(midiStr: str|bytes|int, length: int) -> tuple[int, str|bytes|int]:
     Note that MIDI uses big-endian for everything.
     This is the inverse of Python's chr() function.
 
-    Read first two bytes
+    Read first two bytes from the bytes encoding of "tests" and return the remainder
 
-    >>> midi.getNumber(b'test', 2)
-    (29797, b'st')
+    >>> midi.getNumber(b'tests', 2)
+    (29797, b'sts')
 
     That number comes from:
 
     >>> ord('t') * 256 + ord('e')
     29797
 
-    Demonstration of reading the whole length in:
+    Demonstration of reading the whole length of a byte in:
 
     >>> midi.getNumber(b'test', 4)
     (1952805748, b'')
@@ -151,25 +106,16 @@ def getNumber(midiStr: str|bytes|int, length: int) -> tuple[int, str|bytes|int]:
     >>> midi.getNumber(516, 1)   # = 2*256 + 4
     (4, 512)
 
-    As of v9.7, this method can also take a string as input and return a string.
-    This usage is deprecated and will be removed in v10.
-
-    >>> midi.getNumber('test', 2)
-    (29797, 'st')
+    Changed in v10: remove Python 2 legacy string as input -- use bytes instead.
     '''
     summation = 0
-    if not isinstance(midiStr, int):
+    if isinstance(midiBytes, bytes):
         for i in range(length):
-            midiStrOrNum = midiStr[i]
-            if isinstance(midiStrOrNum, int):
-                summation = (summation << 8) + midiStrOrNum
-            else:  # to remove
-                if t.TYPE_CHECKING:
-                    assert isinstance(midiStrOrNum, str)
-                summation = (summation << 8) + ord(midiStrOrNum)
-        return summation, midiStr[length:]
+            midiByte = midiBytes[i]
+            summation = (summation << 8) + midiByte
+        return summation, midiBytes[length:]
     else:  # midiStr is an int
-        midNum = midiStr
+        midNum = midiBytes
         summation = midNum - ((midNum >> (8 * length)) << (8 * length))
         bigBytes = midNum - summation
         return summation, bigBytes
@@ -236,34 +182,6 @@ def getVariableLengthNumber(midiBytes: bytes) -> tuple[int, bytes]:
             # environLocal.printDebug([f' getVariableLengthNumber: depth read into string: {i}'])
             return summation, midiBytes[i:]
     raise MidiException('did not find the end of the number!')
-
-
-@common.deprecated('v9.7', 'v10', 'use list(midiBytes) instead')
-def getNumbersAsList(midiBytes: bytes|Iterable[int]) -> list[int]:
-    r'''
-    **Deprecated**: this method existed in Python 2.6 and for Python 2 (no bytes)
-    compatibility.  Now use `list(midiBytes)` instead.
-
-    Translate each char into a number, return in a list.
-    Used for reading data messages where each byte encodes
-    a different discrete value.
-
-    >>> #_DOCS_SHOW midi.getNumbersAsList(b'\x00\x00\x00\x03')
-    >>> list(b'\x00\x00\x00\x03') #_DOCS_HIDE
-    [0, 0, 0, 3]
-
-    Now just do:
-
-    >>> list(b'\x00\x00\x00\x03')
-    [0, 0, 0, 3]
-    '''
-    post = []
-    for midiByte in midiBytes:
-        if isinstance(midiByte, str):
-            post.append(ord(midiByte))
-        else:
-            post.append(midiByte)
-    return post
 
 
 def putNumber(num: int, length: int) -> bytes:
@@ -644,7 +562,7 @@ class MidiEvent(prebase.ProtoM21Object):
         if self.time != 0:
             r += f't={self.time!r}, '
         r += f'track={trackIndex}'
-        if self.type in ChannelVoiceMessages or self.type in ChannelModeMessages:
+        if self.isChannelEvent():
             r += f', channel={self.channel!r}'
         if self.type in (ChannelVoiceMessages.NOTE_ON, ChannelVoiceMessages.NOTE_OFF):
             attrList = ['pitch', 'velocity']
@@ -707,6 +625,18 @@ class MidiEvent(prebase.ProtoM21Object):
                 value = bytes([int(value)])
         self.parameter1 = value
 
+    def isChannelEvent(self) -> bool:
+        '''
+        returns bool if the channel matters for this event
+
+        >>> me = midi.MidiEvent(type=midi.ChannelVoiceMessages.NOTE_ON, channel=4)
+        >>> me.isChannelEvent()
+        True
+        >>> dt = midi.DeltaTime()
+        >>> dt.isChannelEvent()
+        False
+        '''
+        return self.type in ChannelVoiceMessages or self.type in ChannelModeMessages
 
     def setPitchBend(self, cents: int|float, bendRange=2) -> None:
         '''
@@ -1301,7 +1231,7 @@ class DeltaTime(MidiEvent):
 
     Time values are in integers, representing ticks.
 
-    The `channel` attribute, inherited from MidiEvent is not used and set to None
+    The `channel` attribute, inherited from MidiEvent is not used and set to 1
     unless overridden (it does not do anything if set and is not written out to MIDI).
 
     >>> mt = midi.MidiTrack(1)
@@ -1328,6 +1258,12 @@ class DeltaTime(MidiEvent):
         if self.time == 0:
             rep = '(empty) ' + rep
         return rep
+
+    def isChannelEvent(self) -> bool:
+        '''
+        Save processing time -- is always False
+        '''
+        return False
 
     def readUntilLowByte(self, oldBytes: bytes) -> tuple[int, bytes]:
         r'''
@@ -1688,22 +1624,23 @@ class MidiTrack(prebase.ProtoM21Object):
 
     def getChannels(self) -> list[int]:
         '''
-        Get all channels (excluding None) used in this Track (sorted)
+        Get all channels used in this Track (sorted) excepting events like DeltaTime
+        or end events where the channel does not matter
 
         >>> mt = midi.MidiTrack(index=2)
         >>> noteOn = midi.MidiEvent(type=midi.ChannelVoiceMessages.NOTE_ON, channel=14)
         >>> noteOn2 = midi.MidiEvent(type=midi.ChannelVoiceMessages.NOTE_ON, channel=5)
+        >>> dt = midi.DeltaTime(1000, channel=2)  # channel does not matter
         >>> noteOn3 = midi.MidiEvent(type=midi.ChannelVoiceMessages.NOTE_ON, channel=14)
-        >>> noteOn4 = midi.MidiEvent(type=midi.ChannelVoiceMessages.PROGRAM_CHANGE, channel=None)
+        >>> noteOn4 = midi.MidiEvent(type=midi.ChannelVoiceMessages.PROGRAM_CHANGE, channel=5)
 
-        >>> mt.events = [noteOn, noteOn2, noteOn3, noteOn4]
-
+        >>> mt.events = [noteOn, noteOn2, dt, noteOn3, noteOn4]
         >>> mt.getChannels()
         [5, 14]
         '''
         post: set[int] = set()
         for e in self.events:
-            if e.channel is not None:
+            if e.isChannelEvent():
                 post.add(e.channel)
         return sorted(post)
 

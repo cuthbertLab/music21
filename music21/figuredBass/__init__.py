@@ -1,7 +1,18 @@
-# -*- coding: utf-8 -*-
+# ------------------------------------------------------------------------------
+# Name:         figuredBass/__init__.py
+# Purpose:      Figured Bass representation, manipulation, and analysis
+#
+# Authors:      Jose Cabal-Ugaz
+#               Michael Scott Asato Cuthbert
+#
+# Copyright:    Copyright © 2012-25 Michael Scott Asato Cuthbert
+# License:      BSD, see license.txt
+# ------------------------------------------------------------------------------
 from __future__ import annotations
 
 __all__ = [
+    'FiguredBass',
+
     'checker',
     'examples',
     'harmony',
@@ -12,8 +23,6 @@ __all__ = [
     'resolution',
     'rules',
     'segment',
-
-    'FiguredBass',
 ]
 
 from music21.figuredBass import checker

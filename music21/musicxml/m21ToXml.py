@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 # Name:         musicxml/m21ToXml.py
 # Purpose:      Translate from music21 objects to musicxml representation
@@ -294,6 +293,9 @@ class GeneralObjectExporter:
             <encoding>
               <encoding-date>...</encoding-date>
               <software>music21 v...</software>
+              <supports element="beam" type="yes" />
+              <supports element="stem" type="yes" />
+              <supports element="accidental" type="yes" />
             </encoding>
           </identification>
           <defaults>
@@ -414,7 +416,7 @@ class GeneralObjectExporter:
         if outObj is None:
             raise MusicXMLExportException(
                 'Cannot translate the object '
-                + f'{self.generalObj} to a complete musicXML document; put it in a Stream first!'
+                f'{self.generalObj} to a complete musicXML document; put it in a Stream first!'
             )
         return outObj
 
@@ -425,8 +427,11 @@ class GeneralObjectExporter:
         if self.makeNotation:
             sc.makeNotation(inPlace=True)
         if not sc.isWellFormedNotation():
-            warnings.warn(f'{sc} is not well-formed; see isWellFormedNotation()',
-                category=MusicXMLWarning)
+            warnings.warn(
+                f'{sc} is not well-formed; see isWellFormedNotation()',
+                category=MusicXMLWarning,
+                stacklevel=2,
+            )
         # sc.makeImmutable()
         return sc
 
@@ -437,10 +442,10 @@ class GeneralObjectExporter:
         if p.isFlat:
             p.makeMeasures(inPlace=True)
         # p.makeImmutable()  # impossible, we haven't made notation yet.
-        s = stream.Score()
-        s.insert(0, p)
-        s.metadata = copy.deepcopy(getMetadataFromContext(p))
-        return self.fromScore(s)
+        sc = stream.Score()
+        sc.insert(0, p)
+        sc.metadata = copy.deepcopy(getMetadataFromContext(p))
+        return self.fromScore(sc)
 
     def fromMeasure(self, m):
         '''
@@ -516,7 +521,7 @@ class GeneralObjectExporter:
             else:
                 bestClef = False
             st2 = st.makeNotation(inPlace=False, bestClef=bestClef)
-            return self.fromScore(st)
+            return self.fromScore(st2)
 
     def fromDuration(self, d):
         '''
@@ -2213,6 +2218,9 @@ class ScoreExporter(XMLExporterBase, PartStaffExporterMixin):
           <encoding>
             <encoding-date>20...-...-...</encoding-date>
             <software>music21 v...</software>
+            <supports element="beam" type="yes" />
+            <supports element="stem" type="yes" />
+            <supports element="accidental" type="yes" />
           </encoding>
         </identification>
 
@@ -2235,6 +2243,9 @@ class ScoreExporter(XMLExporterBase, PartStaffExporterMixin):
           <encoding>
             <encoding-date>...</encoding-date>
             <software>music21 v...</software>
+            <supports element="beam" type="yes" />
+            <supports element="stem" type="yes" />
+            <supports element="accidental" type="yes" />
           </encoding>
         </identification>
 
@@ -2250,9 +2261,11 @@ class ScoreExporter(XMLExporterBase, PartStaffExporterMixin):
           <encoding>
             <encoding-date>20...-...-...</encoding-date>
             <software>music21 v...</software>
+            <supports element="beam" type="yes" />
+            <supports element="stem" type="yes" />
+            <supports element="accidental" type="yes" />
           </encoding>
         </identification>
-
         '''
         if self.mxIdentification is not None:
             mxId = self.mxIdentification
@@ -2405,6 +2418,9 @@ class ScoreExporter(XMLExporterBase, PartStaffExporterMixin):
         <encoding>
           <encoding-date>20...-...-...</encoding-date>
           <software>music21 v...</software>
+          <supports element="beam" type="yes" />
+          <supports element="stem" type="yes" />
+          <supports element="accidental" type="yes" />
         </encoding>
 
         Encoding-date is in YYYY-MM-DD format.
@@ -2443,42 +2459,60 @@ class ScoreExporter(XMLExporterBase, PartStaffExporterMixin):
 
         return mxEncoding  # for testing
 
-    def getSupports(self):
+    def getSupports(self) -> list[Element]:
         '''
-        return a list of <supports> tags  for what this supports.  Does not append
+        return a list of <supports> tags for what this supports.  Does not append to
+        mxEncoding itself.
 
-        Currently just supports new-system and new-page if s.definesExplicitSystemBreaks
-        and s.definesExplicitPageBreaks is True.
+        Currently just supports beam, stem, accidental, and
+        print's new-system if s.definesExplicitSystemBreaks is True
+        and print's new-page if s.definesExplicitPageBreaks is True.
 
         >>> SX = musicxml.m21ToXml.ScoreExporter()
         >>> SX.getSupports()
-        []
+        [<Element 'supports' at 0x...>,
+         <Element 'supports' at 0x...>,
+         <Element 'supports' at 0x...>]
+        >>> for support in SX.getSupports():
+        ...     SX.dump(support)
+        <supports element="beam" type="yes" />
+        <supports element="stem" type="yes" />
+        <supports element="accidental" type="yes" />
+
         >>> SX.stream.definesExplicitSystemBreaks = True
-        >>> SX.getSupports()
-        [<Element 'supports' at 0x...>]
-        >>> SX.dump(SX.getSupports()[0])
+        >>> len(SX.getSupports())
+        4
+        >>> SX.dump(SX.getSupports()[-1])
         <supports attribute="new-system" element="print" type="yes" value="yes" />
 
         >>> SX.stream.definesExplicitPageBreaks = True
-        >>> SX.dump(SX.getSupports()[1])
+        >>> SX.dump(SX.getSupports()[-1])
         <supports attribute="new-page" element="print" type="yes" value="yes" />
 
         '''
-        def getSupport(attribute, supports_type, value, element):
+        def getSupport(element: str, supports_type: bool,
+                       attribute: str|None = None, value: str|None = None):
             su = Element('supports')
-            su.set('attribute', attribute)
-            su.set('type', supports_type)
-            su.set('value', value)
             su.set('element', element)
+            su.set('type', xmlObjects.booleanToYesNo(supports_type))
+            if attribute:
+                su.set('attribute', attribute)
+                if value is not None:
+                    su.set('value', xmlObjects.booleanToYesNo(value))
             return su
 
-        supportsList = []
-        s = self.stream
-        if s.definesExplicitSystemBreaks is True:
-            supportsList.append(getSupport('new-system', 'yes', 'yes', 'print'))
+        supportsList: list[Element] = [
+            getSupport('beam', True),
+            getSupport('stem', True),
+            getSupport('accidental', True),
+        ]
 
-        if s.definesExplicitPageBreaks is True:
-            supportsList.append(getSupport('new-page', 'yes', 'yes', 'print'))
+        s = self.stream
+        if s.definesExplicitSystemBreaks:
+            supportsList.append(getSupport('print', True, 'new-system', 'yes'))
+
+        if s.definesExplicitPageBreaks:
+            supportsList.append(getSupport('print', True, 'new-page', 'yes'))
 
         return supportsList
 
@@ -2866,9 +2900,7 @@ class PartExporter(XMLExporterBase):
             try:
                 part.makeBeams(inPlace=True)
             except exceptions21.StreamException as se:  # no measures or no time sig?
-                # incorrectly flagging MusicXMLWarning as not a Warning
-                # noinspection PyTypeChecker
-                warnings.warn(MusicXMLWarning, str(se))
+                warnings.warn(MusicXMLWarning(se), stacklevel=2)
         if not part.streamStatus.tuplets:
             for m in measures:
                 for m_or_v in [m, *m.voices]:
@@ -5401,7 +5433,7 @@ class MeasureExporter(XMLExporterBase):
                 break
         if musicXMLArticulationName is None:
             musicXMLArticulationName = 'other-articulation'
-            # raise MusicXMLExportException('Cannot translate %s to musicxml' % articulationMark)
+            # raise MusicXMLExportException(f'Cannot translate {articulationMark} to musicxml')
         mxArticulationMark = Element(musicXMLArticulationName)
         if articulationMark.placement is not None:
             mxArticulationMark.set('placement', articulationMark.placement)
@@ -6019,7 +6051,8 @@ class MeasureExporter(XMLExporterBase):
 
         self.setPrintObject(mxHarmony, cs)
         # TODO: attr: print-frame
-        # TODO: attrGroup: placement
+        if cs.placement is not None:
+            mxHarmony.set('placement', cs.placement)
 
         self.setPrintStyle(mxHarmony, cs)
 
@@ -6165,7 +6198,7 @@ class MeasureExporter(XMLExporterBase):
         or whatever:
 
         >>> ppp = dynamics.Dynamic('ppp')
-        >>> print('%.2f' % ppp.volumeScalar)
+        >>> print(f'{ppp.volumeScalar:.2f}')
         0.15
         >>> ppp.style.relativeY = -10
 
@@ -6906,8 +6939,9 @@ class MeasureExporter(XMLExporterBase):
                 mxBeam.text = 'forward hook'
             else:
                 raise MusicXMLExportException(
-                    'partial beam defined without a proper direction set (set to %s)' %
-                    beamObject.direction)
+                    'partial beam defined without a proper direction set '
+                    f'(set to {beamObject.direction})'
+                )
         else:
             raise MusicXMLExportException(
                 f'unexpected beam type encountered ({beamObject.type})'

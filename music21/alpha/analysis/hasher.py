@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 # Name:         alpha/analysis/hasher.py
 # Purpose:      Hash musical notation

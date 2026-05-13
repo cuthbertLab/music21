@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 # Name:          timeGraphsImportStar.py
 # Purpose:       time how long it takes to import music21, and report biggest offenders

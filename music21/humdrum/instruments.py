@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 # Name:         humdrum.instruments.py
 # Purpose:      Instrument Lists for Humdrum and kern in particular
@@ -242,9 +241,10 @@ def fromHumdrumClass(hdClass):
         i = humdrumInstrumentClassToInstrument[hdClass]
         iObj = getattr(instrument, i)()
         return iObj
-    except:
+    except (IndexError, KeyError, AttributeError) as exc:
         raise HumdrumInstrumentException(
-            f'Cannot get an instrument from this humdrum class *IC{hdClass}')
+            f'Cannot get an instrument from this humdrum class *IC{hdClass}'
+        ) from exc
 
 
 def fromHumdrumInstrument(hdInst):
@@ -260,9 +260,10 @@ def fromHumdrumInstrument(hdInst):
         i = humdrumInstruments[hdInst]
         iObj = getattr(instrument, i)()
         return iObj
-    except:
+    except (IndexError, KeyError, AttributeError) as exc:
         raise HumdrumInstrumentException(
-            f'Cannot get an instrument from this humdrum class: *I{hdInst}')
+            f'Cannot get an instrument from this humdrum class: *I{hdInst}'
+        ) from exc
 
 
 class Test(unittest.TestCase):

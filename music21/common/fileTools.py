@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 # Name:         common/fileTools.py
 # Purpose:      Utilities for files
@@ -79,37 +78,39 @@ def readFileEncodingSafe(filePath, firstGuess='utf-8') -> str:
     # noinspection PyShadowingNames
     r'''
     Slow, but will read a file of unknown encoding as safely as possible using
-    the chardet package.
+    the chardet package.  Mostly obsolete in the utf-8 world of today, but
+    useful for older code
 
-    Let's try to load this file as ascii -- it has a copyright symbol at the top,
-    so it won't load in Python3:
+    Let's try to load the `music21.common.__init__.py` file as ascii --
+    it has a copyright symbol near the top, so it won't load in Python3:
 
     >>> import os
     >>> c = str(common.getSourceFilePath() / 'common' / '__init__.py')
-    >>> #_DOCS_SHOW f = open(c)
-    >>> #_DOCS_SHOW data = f.read()
+    >>> f = open(c, encoding='ascii')
+    >>> data = f.read()
     Traceback (most recent call last):
     UnicodeDecodeError: 'ascii' codec can't decode byte 0xc2 in position ...:
         ordinal not in range(128)
 
-    That won't do! now I know that it is in utf-8, but maybe you don't. Or it could
-    be an old humdrum or Noteworthy file with unknown encoding.  This will load it safely.
+    That won't do! Now I know that it is in utf-8, but maybe you don't. Or it could
+    be an old Humdrum or Noteworthy file with Windows or unknown encoding.
+    This will load it as safely as possible.
 
     >>> data = common.readFileEncodingSafe(c)
-    >>> data[0:30]
-    '# -*- coding: utf-8 -*-\n# ----'
+    >>> data[83:106]
+    'Name:         common.py'
 
     Well, that's nothing, since the first guess here is utf-8, and it's right. So let's
     give a worse first guess:
 
     >>> data = common.readFileEncodingSafe(c, firstGuess='SHIFT_JIS')  # old Japanese standard
-    >>> data[0:30]
-    '# -*- coding: utf-8 -*-\n# ----'
+    >>> data[83:106]
+    'Name:         common.py'
 
     It worked!
 
-    Note that this is slow enough if it gets it wrong that the firstGuess should be set
-    to something reasonable like 'ascii' or 'utf-8'.
+    Note that trying lots of encodings is slow enough when the first guess is wrong
+    that the firstGuess should be set to something reasonable like 'utf-8' or 'ascii'.
     '''
     try:
         with io.open(filePath, 'r', encoding=firstGuess) as thisFile:

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 # Name:         corpus/testCorpus.py
 # Purpose:      testing for the corpus

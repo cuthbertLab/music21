@@ -66,7 +66,7 @@ it should display in Terminal something like the following:
 .. image:: images/macScreenPythonVersion.*
     :width: 650
 
-If it says 3.8 or higher (or possibly a number like 3.10.7), you're okay.
+If it says 3.11 or higher (or possibly a number like 3.11.7), you're okay.
 If it says 2.7 or 3.4 or something,
 go to https://www.python.org/downloads/
 and download a newer version.  Multiple versions of Python can exist

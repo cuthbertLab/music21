@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 # Name:         graph/plots.py
 # Purpose:      Classes for plotting music21 graphs based on Streams.

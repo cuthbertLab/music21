@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 # Name:         segmentByRests.py
 # Purpose:      Break up a part into its contiguous melodies.

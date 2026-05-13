@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 # Name:         segment.py
 # Purpose:      figured bass note and notational realization.

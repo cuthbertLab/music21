@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 # Name:         ipython21/converters.py
 # Purpose:      music21 Jupyter Notebook external converters
@@ -56,7 +55,7 @@ def showImageThroughMuseScore(
         pngData = base64.b64decode(pngData64)
         # noinspection PyTypeChecker
         display(Image(data=pngData, retina=True))
-        return
+        return None
 
     # hack to make musescore excerpts -- fix with a converter class in MusicXML
     # or make a new keyword to ignoreTitles, etc.
@@ -75,7 +74,7 @@ def showImageThroughMuseScore(
                 multipageWidget=multipageWidget,
                 **keywords,
             )
-        return
+        return None
 
     fp = subConverter.write(
         obj,
@@ -86,7 +85,7 @@ def showImageThroughMuseScore(
     )
 
     if subformats[0] != 'png':
-        return
+        return None
 
     last_png = museScore.findLastPNGPath(fp)
     last_number, num_digits = museScore.findPNGRange(fp, last_png)
@@ -109,7 +108,7 @@ def showImageThroughMuseScore(
     else:
         # multi-page png -- use our widget.
         # noinspection PyPackageRequirements
-        from ipywidgets import interact  # type: ignore
+        from ipywidgets import interact  # type: ignore  # pylint: disable=import-error
 
         @interact(page=(1, last_number))
         def page_display(page=1):
@@ -140,6 +139,7 @@ def displayMusic21jMIDI(
         fmt,
         subformats=subformats,
         addStartDelay=True,
+        **keywords,
     )
 
     with open(fp, 'rb') as f:
@@ -160,6 +160,7 @@ def displayMusic21jMIDI(
     display(HTML('''
         <div id="''' + outputId + '''"></div>
         <link rel="stylesheet" href="https://cuthbertLab.github.io/music21j/css/m21.css">
+        <link rel="stylesheet" href="https://cuthbertLab.github.io/music21j/css/midiPlayer.css">
         ''' + load_require_script + '''
         <script>
         function ''' + outputId + '''_play() {

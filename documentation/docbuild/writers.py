@@ -1,9 +1,8 @@
-# -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 # Name:         docbuild/writers.py
 # Purpose:      music21 documentation writer to rst
 #
-# Authors:      Josiah Wolf Oberholtzer
+# Authors:      Joséphine Wolf Oberholtzer
 #               Christopher Ariza
 #               Michael Scott Asato Cuthbert
 #
@@ -361,11 +360,11 @@ class JupyterNotebookReSTWriter(ReSTWriter):
         self.runNBConvert(jupyterNotebookFilePath)
         # uses this convoluted way of reading because 'encoding' was an invalid keyword argument
         # for the built-in 'open' in old python, and never upgraded.
-        with rstFilePath.open('r', encoding='utf8') as f:
+        with rstFilePath.open('r', encoding='utf-8') as f:
             oldLines = f.read().splitlines()
 
         lines = self.cleanConvertedNotebook(oldLines, jupyterNotebookFilePath)
-        with rstFilePath.open('w', encoding='utf8') as f:
+        with rstFilePath.open('w', encoding='utf-8') as f:
             f.write('\n'.join(lines))
 
         return True

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 #
 # music21 documentation build configuration file, created by
 # sphinx-quickstart on Fri Jun 14 16:48:40 2013.
@@ -235,6 +234,18 @@ latex_documents = [
 # If false, no module index is generated.
 # latex_domain_indices = True
 
+
+# -- Options for linkcheck -----------------------------------------------------
+# requires downloading whole document, but also many anchors only load after
+# javascript these days.
+linkcheck_anchors = False
+
+linkcheck_ignore = [
+    r'http://www.musicxml.org/dtds/partwise.dtd',  # dtd is not a URL.
+    r'https://easyabc.sourceforge.net',  # works 2025-10
+    # does not find anchor immediately.  should wait longer
+    r'https://github.com/cuthbertLab/music21/blob/master/README.md#community-code-of-conduct',
+]
 
 # -- Options for manual page output --------------------------------------------
 

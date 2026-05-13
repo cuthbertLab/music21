@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 # Name:         resolution.py
 # Purpose:      Defines standard resolutions for possibility instances

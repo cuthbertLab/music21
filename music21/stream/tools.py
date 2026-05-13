@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 # Name:         stream/tools.py
 # Purpose:      Additional tools for working with streams

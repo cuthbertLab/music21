@@ -4,9 +4,10 @@
 	"features": {
 		"ghcr.io/rocker-org/devcontainer-features/apt-packages:1": {
 			"packages": "musescore3,lilypond"
-		}
+		},
+		"ghcr.io/va-h/devcontainers-features/uv:1": {}
 	},
-	"postCreateCommand": "pip3 install --user -r requirements_dev.txt;pip3 install --user -e .",
+	"postCreateCommand": "uv sync --locked",
 	"customizations": {
 		"vscode": {
 			"extensions": [

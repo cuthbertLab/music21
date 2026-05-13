@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 # Name:         features/base.py
 # Purpose:      Feature extractors base classes.
@@ -19,6 +18,7 @@ import pickle
 import unittest
 
 from music21 import common
+from music21.common.parallel import safeToParallize
 from music21.common.types import StreamType
 from music21 import converter
 from music21 import corpus
@@ -932,7 +932,7 @@ class DataSet:
         Process all Data with all FeatureExtractors.
         Processed data is stored internally as numerous Feature objects.
         '''
-        if self.runParallel:
+        if self.runParallel and safeToParallize():
             return self._processParallel()
         else:
             return self._processNonParallel()
@@ -948,10 +948,10 @@ class DataSet:
 
         # print('about to run parallel')
         outputData = common.runParallel([(di, self.failFast) for di in self.dataInstances],
-                                           _dataSetParallelSubprocess,
-                                           updateFunction=shouldUpdate,
-                                           updateMultiply=1,
-                                           unpackIterable=True
+                                        _dataSetParallelSubprocess,
+                                        updateFunction=shouldUpdate,
+                                        updateMultiply=1,
+                                        unpackIterable=True
                                         )
         featureData, errors, classValues, ids = zip(*outputData)
         errors = common.flattenList(errors)
@@ -1084,7 +1084,7 @@ class DataSet:
             outputFormat = self._getOutputFormat(format)
         if outputFormat is None:
             raise DataSetException('no output format could be defined from file path '
-                                   + f'{fp} or format {format}')
+                                   f'{fp} or format {format}')
 
         return outputFormat.write(fp=fp, includeClassLabel=includeClassLabel)
 
@@ -1693,8 +1693,11 @@ class Test(unittest.TestCase):
     #                 if c != matchData[i].getclass():
     #                     mismatch += 1
     #
-    #             print('%s %s: misclassified %s/%s of %s' % (
-    #                     classifierStr, classifierType, mismatch, len(matchData), matchStr))
+    #             print(
+    #                 f'{classifierStr} {classifierType}: misclassified '
+    #                 f'{mismatch}/{len(matchData)} of '
+    #                 f'{matchStr}'
+    #             )
     #
     #         # if classifierType == orngTree.TreeLearner:
     #         #     orngTree.printTxt(classifier)
@@ -1742,9 +1745,11 @@ class Test(unittest.TestCase):
     #                     if c != matchData[i].getclass():
     #                         mismatch += 1
     #
-    #                 print('%s %s: misclassified %s/%s of %s' % (
-    #                         classifierStr, classifierType, mismatch, len(matchData), matchStr))
-
+    #             print(
+    #                 f'{classifierStr} {classifierType}: misclassified '
+    #                 f'{mismatch}/{len(matchData)} of '
+    #                 f'{matchStr}'
+    #             )
 
     # def xtestOrangeClassifiers(self):  # pragma: no cover
     #     '''
@@ -1771,16 +1776,15 @@ class Test(unittest.TestCase):
     #     print('Possible classes:', data.domain.classVar.values)
     #     print('Original Class', end=' ')
     #     for l in classifiers:
-    #         print('%-13s' % (l.name), end=' ')
+    #         print(f'{l.name:<13}', end=' ')
     #     print()
     #
     #     for example in data:
-    #         print('(%-10s)  ' % (example.getclass()), end=' ')
+    #         print(f'({example.getclass():<10})  ', end=' ')
     #         for c in classifiers:
     #             p = c([example, orange.GetProbabilities])
-    #             print('%5.3f        ' % (p[0]), end=' ')
+    #             print(f'{p[0]:5.3f}        ', end=' ')
     #         print('')
-
 
     # def xtestOrangeClassifierTreeLearner(self):  # pragma: no cover
     #     import orange, orngTree  # pylint: disable=import-error
@@ -1791,7 +1795,9 @@ class Test(unittest.TestCase):
     #     # tree = orngTree.TreeLearner(data)
     #     for i in range(len(data)):
     #         p = tree(data[i], orange.GetProbabilities)
-    #         print('%s: %5.3f (originally %s)' % (i + 1, p[1], data[i].getclass()))
+    #         print(
+    #             f'{i + 1}: {p[1]:5.3f} (originally {data[i].getclass()})'
+    #         )
     #
     #     orngTree.printTxt(tree)
 

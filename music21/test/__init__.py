@@ -1,5 +1,17 @@
 from __future__ import annotations
 
+__all__ = [
+    'base',
+    'chord',
+    'clef',
+    'expressions',
+    'interval',
+    'metadata',
+    'note',
+    'pitch',
+    'repeat',
+]
+
 from music21.test import test_base as base
 from music21.test import test_chord as chord
 from music21.test import test_clef as clef

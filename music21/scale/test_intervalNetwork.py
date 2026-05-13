@@ -182,12 +182,6 @@ class Test(unittest.TestCase):
         # what scale degree is c# in this scale? the seventh
         self.assertEqual(netScale.getRelativeNodeDegree('d', 1, 'c#'), 7)
 
-    def testGraphedOutput(self):
-        # note this relies on networkx
-        edgeList = ['M2', 'M2', 'm2', 'M2', 'M2', 'M2', 'm2']
-        unused_netScale = IntervalNetwork(edgeList)
-        # netScale.plot(pitchObj='F#', nodeId=3, minPitch='c2', maxPitch='c5')
-
     def testBasicA(self):
         edgeList = ['M2', 'M2', 'm2', 'M2', 'M2', 'M2', 'm2']
         net = IntervalNetwork()

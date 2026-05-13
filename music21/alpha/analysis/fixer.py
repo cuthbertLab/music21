@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 # Name:         alpha/analysis/fixer.py
 # Purpose:      Fixes two streams given a list of changes between them

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 # Name:         alpha/analysis/ornamentRecognizer.py
 # Purpose:      Identifies expanded ornaments

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 # Name:         defaults.py
 # Purpose:      Storage for user environment settings and defaults

@@ -1264,6 +1264,28 @@ class Test(unittest.TestCase):
                               offsets):
             self.assertEqual(ch.offset, offset)
 
+    def testChordSymbolPlacement(self):
+        from xml.etree.ElementTree import fromstring as EL
+        mp = MeasureParser()
+
+        h_below = EL('<harmony placement="below">'
+                     '<root><root-step>C</root-step></root>'
+                     '<kind>major</kind></harmony>')
+        cs = mp.xmlToChordSymbol(h_below)
+        self.assertEqual(cs.placement, 'below')
+
+        h_above = EL('<harmony placement="above">'
+                     '<root><root-step>G</root-step></root>'
+                     '<kind>major</kind></harmony>')
+        cs2 = mp.xmlToChordSymbol(h_above)
+        self.assertEqual(cs2.placement, 'above')
+
+        h_none = EL('<harmony>'
+                    '<root><root-step>F</root-step></root>'
+                    '<kind>major</kind></harmony>')
+        cs3 = mp.xmlToChordSymbol(h_none)
+        self.assertIsNone(cs3.placement)
+
     def testChordInversion(self):
         from xml.etree.ElementTree import fromstring as EL
         h = EL('''
@@ -1719,6 +1741,52 @@ class Test(unittest.TestCase):
         pp.setLastMeasureInfo(m)
         pp.adjustTimeAttributesFromMeasure(m)
         self.assertEqual(pp.lastMeasureOffset, 25.0)
+
+    def testPianoStaffWithRepeatEndings(self):
+        from music21 import converter
+        from music21.musicxml import testFiles
+
+        s = converter.parse(testFiles.pianoRepeatEndings)
+        self.assertEqual(len(s.parts), 2)
+        self.assertTrue(s[layout.StaffGroup])
+        sg = s[layout.StaffGroup].first()
+
+        for p_num in (0, 1):
+            p = s.parts[p_num]
+            self.assertIn(p, sg)
+            self.assertEqual(len(p[note.Note]), 3)
+            self.assertEqual(len(p[stream.Measure]), 3)
+            m1, m2, m3 = p[stream.Measure]
+            self.assertTrue(m1[bar.Repeat])
+            repeat_start = m1[bar.Repeat].first()
+            self.assertEqual(repeat_start.direction, 'start')
+            self.assertEqual(repeat_start.offset, 0.0)
+            self.assertTrue(m2[bar.Repeat])
+            repeat_end = m2[bar.Repeat].first()
+            self.assertEqual(repeat_end.direction, 'end')
+            self.assertEqual(repeat_end.offset, 4.0)
+            self.assertFalse(m3[bar.Repeat])
+            self.assertTrue(m3[bar.Barline].getElementsByOffset(4.0))
+            final_bar = m3[bar.Barline].getElementsByOffset(4.0, 4.0).first()
+            self.assertEqual(final_bar.type, 'final')
+
+            # formerly mistake
+            repeat_bracket_iterator = p[spanner.RepeatBracket]
+            self.assertTrue(repeat_bracket_iterator, f'Part {p_num}:{p} has no RepeatBrackets')
+            self.assertEqual(len(repeat_bracket_iterator), 2)
+            rb1, rb2 = repeat_bracket_iterator
+            if rb1.number == 2:
+                # these should iterate as 1, 2 but there's no guarantee
+                rb1, rb2 = rb2, rb1
+            self.assertEqual(list(rb1), [m2])
+            self.assertEqual(list(rb2), [m3])
+
+            p_notes = [n.name for n in p[note.Note]]
+            self.assertEqual(p_notes, ['G', 'A', 'B'])
+
+            p_expanded = repeat.Expander[stream.Part](p).process()
+            p_notes2 = [n.name for n in p_expanded[note.Note]]
+            self.assertEqual(p_notes2, ['G', 'A', 'G', 'B'])
 
 
 if __name__ == '__main__':

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 # Name:         instrument.py
 # Purpose:      Class for basic instrument information
@@ -184,7 +183,7 @@ class Instrument(base.Music21Object):
         msg = []
         if self.partId is not None:
             msg.append(f'{self.partId}: ')
-        if self.partName is not None:
+        if self.partName is not None and self.partName != self.instrumentName:
             msg.append(f'{self.partName}: ')
         if self.instrumentName is not None:
             msg.append(self.instrumentName)
@@ -457,7 +456,7 @@ class ReedOrgan(Organ):
         super().__init__(**keywords)
 
         self.instrumentName = 'Reed Organ'
-        # TODO self.instrumentAbbreviation = ''
+        self.instrumentAbbreviation = 'R Org'
         self.midiProgram = 20
         self.instrumentSound = 'keyboard.organ.reed'
 
@@ -682,7 +681,7 @@ class FretlessBass(Guitar):
         super().__init__(**keywords)
 
         self.instrumentName = 'Fretless Bass'
-        # TODO: self.instrumentAbbreviation = ''
+        self.instrumentAbbreviation = 'Fretl b'
         self.midiProgram = 35
         self.instrumentSound = 'pluck.bass.fretless'
 
@@ -753,7 +752,7 @@ class Shamisen(StringInstrument):
         super().__init__(**keywords)
 
         self.instrumentName = 'Shamisen'
-        # TODO: self.instrumentAbbreviation = ''
+        self.instrumentAbbreviation = 'Shmsn'
         self.instrumentSound = 'pluck.shamisen'
         self.midiProgram = 106
 
@@ -763,7 +762,7 @@ class Koto(StringInstrument):
         super().__init__(**keywords)
 
         self.instrumentName = 'Koto'
-        # TODO: self.instrumentAbbreviation = ''
+        self.instrumentAbbreviation = 'Koto'
         self.instrumentSound = 'pluck.koto'
         self.midiProgram = 107
 
@@ -1249,7 +1248,7 @@ class Handbells(PitchedPercussion):
         super().__init__(**keywords)
 
         self.instrumentName = 'Handbells'
-        # TODO: self.instrumentAbbreviation = ''
+        self.instrumentAbbreviation = 'Hbells'
         self.instrumentSound = 'pitched-percussion.handbells'
 
 
@@ -1258,7 +1257,7 @@ class Dulcimer(PitchedPercussion):
         super().__init__(**keywords)
 
         self.instrumentName = 'Dulcimer'
-        # TODO: self.instrumentAbbreviation = ''
+        self.instrumentAbbreviation = 'Dlc'
         self.instrumentSound = 'pluck.dulcimer'
         self.midiProgram = 15
 
@@ -1334,7 +1333,7 @@ class Maracas(UnpitchedPercussion):
         self.instrumentName = 'Maracas'
         self.inGMPercMap = True
         self.percMapPitch = 70
-        # TODO: self.instrumentAbbreviation = ''
+        self.instrumentAbbreviation = 'Mrcs'
         self.instrumentSound = 'rattle.maraca'
 
 
@@ -1392,7 +1391,7 @@ class SuspendedCymbal(Cymbals):
         super().__init__(**keywords)
 
         self.instrumentName = 'Suspended Cymbal'
-        # TODO: self.instrumentAbbreviation = ''
+        self.instrumentAbbreviation = 'Sus Cym'
         self.instrumentSound = 'metal.cymbal.suspended'
 
 
@@ -1401,7 +1400,7 @@ class SizzleCymbal(Cymbals):
         super().__init__(**keywords)
 
         self.instrumentName = 'Sizzle Cymbal'
-        # TODO: self.instrumentAbbreviation = ''
+        self.instrumentAbbreviation = 'Siz Cym'
         self.instrumentSound = 'metal.cymbal.sizzle'
 
 
@@ -1410,7 +1409,7 @@ class SplashCymbals(Cymbals):
         super().__init__(**keywords)
 
         self.instrumentName = 'Splash Cymbals'
-        # TODO: self.instrumentAbbreviation = ''
+        self.instrumentAbbreviation = 'Spl Cym'
         self.instrumentSound = 'metal.cymbal.splash'
 
 
@@ -1419,7 +1418,7 @@ class RideCymbals(Cymbals):
         super().__init__(**keywords)
 
         self.instrumentName = 'Ride Cymbals'
-        # TODO: self.instrumentAbbreviation = ''
+        self.instrumentAbbreviation = 'Ride Cym'
         self.instrumentSound = 'metal.cymbal.ride'
 
 
@@ -1443,7 +1442,7 @@ class HiHatCymbal(Cymbals):
                                         }
         self.percMapPitch = self._modifierToPercMapPitch[self._modifier]
 
-        # TODO: self.instrumentAbbreviation = ''
+        self.instrumentAbbreviation = 'Hi-Hat'
 
 
 class Triangle(UnpitchedPercussion):
@@ -1481,7 +1480,7 @@ class Agogo(UnpitchedPercussion):
         super().__init__(**keywords)
 
         self.instrumentName = 'Agogo'
-        # TODO: self.instrumentAbbreviation = ''
+        self.instrumentAbbreviation = 'Ago'
         self.instrumentSound = 'metal.bells.agogo'
         self.inGMPercMap = True
         self.percMapPitch = 67
@@ -1493,7 +1492,7 @@ class TamTam(UnpitchedPercussion):
         super().__init__(**keywords)
 
         self.instrumentName = 'Tam-Tam'
-        # TODO: self.instrumentAbbreviation = ''
+        self.instrumentAbbreviation = 'Tam-t'
         self.instrumentSound = 'metal.tamtam'
 
 
@@ -1502,7 +1501,7 @@ class SleighBells(UnpitchedPercussion):
         super().__init__(**keywords)
 
         self.instrumentName = 'Sleigh Bells'
-        # TODO: self.instrumentAbbreviation = ''
+        self.instrumentAbbreviation = 'Slgh Bl'
         self.instrumentSound = 'metal.bells.sleigh-bells'
 
 
@@ -1555,7 +1554,7 @@ class TomTom(UnpitchedPercussion):
         super().__init__(**keywords)
 
         self.instrumentName = 'Tom-Tom'
-        # TODO: self.instrumentAbbreviation = ''
+        self.instrumentAbbreviation = 'Tom'
         self.instrumentSound = 'drum.tom-tom'
         self.inGMPercMap = True
         self._modifier = 'low floor'
@@ -1613,7 +1612,7 @@ class Taiko(UnpitchedPercussion):
         super().__init__(**keywords)
 
         self.instrumentName = 'Taiko'
-        # TODO: self.instrumentAbbreviation = ''
+        self.instrumentAbbreviation = 'Tko'
         self.instrumentSound = 'drum.taiko'
         self.midiProgram = 116
 
@@ -1634,7 +1633,7 @@ class Whip(UnpitchedPercussion):
         super().__init__(**keywords)
 
         self.instrumentName = 'Whip'
-        # TODO: self.instrumentAbbreviation = ''
+        self.instrumentAbbreviation = 'Whip'
         self.instrumentSound = 'effect.whip'
 
 
@@ -1643,7 +1642,7 @@ class Ratchet(UnpitchedPercussion):
         super().__init__(**keywords)
 
         self.instrumentName = 'Ratchet'
-        # TODO: self.instrumentAbbreviation = ''
+        self.instrumentAbbreviation = 'Ratc'
         self.instrumentSound = 'rattle.ratchet'
 
 
@@ -1652,7 +1651,7 @@ class Siren(UnpitchedPercussion):
         super().__init__(**keywords)
 
         self.instrumentName = 'Siren'
-        # TODO: self.instrumentAbbreviation = ''
+        self.instrumentAbbreviation = 'Siren'
         self.instrumentSound = 'effect.siren'
 
 
@@ -1670,7 +1669,7 @@ class WindMachine(UnpitchedPercussion):
         super().__init__(**keywords)
 
         self.instrumentName = 'Wind Machine'
-        # TODO: self.instrumentAbbreviation = ''
+        self.instrumentAbbreviation = 'Wind Mach'
         self.instrumentSound = 'effect.wind'
 
 
@@ -1867,7 +1866,7 @@ def deduplicate(s: stream.Stream, inPlace: bool = False) -> stream.Stream:
     [<music21.instrument.Flute 'Flute'>, <music21.instrument.Flute 'Flute'>]
     >>> s2 = instrument.deduplicate(s2, inPlace=True)
     >>> list(p1.getInstruments())
-    [<music21.instrument.Piccolo 'Piccolo: Piccolo'>]
+    [<music21.instrument.Piccolo 'Piccolo'>]
     >>> list(p2.getInstruments())
     [<music21.instrument.Flute 'Flute'>]
     '''
@@ -2010,7 +2009,7 @@ MIDI_PROGRAM_TO_INSTRUMENT = {
     73: Flute,
     74: Recorder,
     75: PanFlute,
-    76: PanFlute,  # TODO 76: Bottle
+    76: PanFlute,  # TODO: 76: Bottle
     77: Shakuhachi,
     78: Whistle,
     79: Ocarina,
@@ -2046,7 +2045,7 @@ MIDI_PROGRAM_TO_INSTRUMENT = {
     109: Bagpipes,
     110: Violin,  # TODO: instrumentSound
     111: Shehnai,
-    112: Glockenspiel,  # TODO 112: Tinkle Bell
+    112: Glockenspiel,  # TODO: 112: Tinkle Bell
     113: Agogo,
     114: SteelDrum,
     115: Woodblock,
@@ -2061,7 +2060,7 @@ MIDI_PROGRAM_TO_INSTRUMENT = {
     124: Sampler,
     125: Sampler,
     126: Sampler,
-    127: Sampler
+    127: Sampler,
 }
 
 

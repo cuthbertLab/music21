@@ -1,9 +1,8 @@
-# -*- coding: utf-8 -*-
 # -----------------------------------------------------------------------------
 # Name:         reduceChords.py
 # Purpose:      Tools for eliminating passing chords, etc.
 #
-# Authors:      Josiah Wolf Oberholtzer
+# Authors:      Joséphine Wolf Oberholtzer
 #               Michael Scott Asato Cuthbert
 #
 # Copyright:    Copyright © 2013 Michael Scott Asato Cuthbert
@@ -276,11 +275,11 @@ class ChordReducer:
             elif one.measureNumber != two.measureNumber:
                 continue
 
-            # is this used?
-            bothPitches = set()
-            bothPitches.update([x.nameWithOctave for x in onePitches])
-            bothPitches.update([x.nameWithOctave for x in twoPitches])
-            bothPitches = sorted([pitch.Pitch(x) for x in bothPitches])
+            # # is this used?
+            # bothPitches = set()
+            # bothPitches.update([x.nameWithOctave for x in onePitches])
+            # bothPitches.update([x.nameWithOctave for x in twoPitches])
+            # bothPitches = sorted([pitch.Pitch(x) for x in bothPitches])
 
             # if not timespanStream.Verticality.pitchesAreConsonant(bothPitches):
             #    intervalClasses = self._getIntervalClassSet(bothPitches)
@@ -321,7 +320,7 @@ class ChordReducer:
         >>> cr = analysis.reduceChords.ChordReducer()
         >>> cws = cr.computeMeasureChordWeights(s)
         >>> for pcs in sorted(cws):
-        ...     print("%18r  %2.1f" % (pcs, cws[pcs]))
+        ...     print(f'{pcs!r:18}  {cws[pcs]:2.1f}')
             (0, 4, 7)  3.0
         (0, 11, 4, 5)  1.0
 
@@ -330,7 +329,7 @@ class ChordReducer:
         >>> cws = cr.computeMeasureChordWeights(s,
         ...     weightAlgorithm=cr.quarterLengthBeatStrength)
         >>> for pcs in sorted(cws):
-        ...     print("%18r  %2.1f" % (pcs, cws[pcs]))
+        ...     print(f'{pcs!r:18}  {cws[pcs]:2.1f}')
             (0, 4, 7)  2.2
         (0, 11, 4, 5)  0.5
 
@@ -339,7 +338,7 @@ class ChordReducer:
         >>> cws = cr.computeMeasureChordWeights(s,
         ...     weightAlgorithm=cr.quarterLengthBeatStrengthMeasurePosition)
         >>> for pcs in sorted(cws):
-        ...     print("%18r  %2.1f" % (pcs, cws[pcs]))
+        ...     print(f'{pcs!r:18}  {cws[pcs]:2.1f}')
             (0, 4, 7)  3.0
         (0, 11, 4, 5)  0.5
 
@@ -348,7 +347,7 @@ class ChordReducer:
         >>> cws = cr.computeMeasureChordWeights(s,
         ...     weightAlgorithm=cr.qlbsmpConsonance)
         >>> for pcs in sorted(cws):
-        ...     print("%18r  %2.1f" % (pcs, cws[pcs]))
+        ...     print(f'{pcs!r:18}  {cws[pcs]:2.1f}')
              (0, 4, 7)  3.0
          (0, 11, 4, 5)  0.1
         '''
@@ -359,10 +358,7 @@ class ChordReducer:
         self.numberOfElementsInMeasure = len(measureObject)
         for i, c in enumerate(measureObject):
             self.positionInMeasure = i
-            if c.isNote:
-                p = tuple(c.pitch.pitchClass)
-            else:
-                p = tuple({x.pitchClass for x in c.pitches})
+            p = tuple({x.pitchClass for x in c.pitches})
             if p not in presentPCs:
                 presentPCs[p] = 0.0
             presentPCs[p] += weightAlgorithm(c)
@@ -582,13 +578,8 @@ class ChordReducer:
         currentGreedyChord = None
         currentGreedyChordPCs = None
         currentGreedyChordNewLength = 0.0
-        for c in measureObject:
-            if isinstance(c, note.Note):
-                p = tuple(c.pitch.pitchClass)
-            elif isinstance(c, chord.Chord):
-                p = tuple({x.pitchClass for x in c.pitches})
-            else:
-                continue
+        for c in measureObject.getElementsByClass(note.NotRest):
+            p = tuple({x.pitchClass for x in c.pitches})
             if p in trimmedMaxChords and p != currentGreedyChordPCs:
                 # keep this chord
                 if currentGreedyChord is None and c.offset != 0.0:
@@ -609,7 +600,7 @@ class ChordReducer:
                 measureObject.remove(c)
         if currentGreedyChord is not None:
             currentGreedyChord.quarterLength = currentGreedyChordNewLength
-            # not read later - no need to cleanup.
+            # not read later - no need to clean up.
             # currentGreedyChordNewLength = 0.0
         # even chord lengths
         for i in range(1, len(measureObject)):

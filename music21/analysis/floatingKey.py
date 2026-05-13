@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 # Name:         analysis/floatingKey.py
 # Purpose:      Framework for floating key analysis

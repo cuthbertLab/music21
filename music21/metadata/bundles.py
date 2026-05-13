@@ -1,11 +1,10 @@
-# -*- coding: utf-8 -*-
 # -----------------------------------------------------------------------------
 # Name:         bundles.py
 # Purpose:      music21 classes for representing score and work metadata
 #
 # Authors:      Christopher Ariza
 #               Michael Scott Asato Cuthbert
-#               Josiah Oberholtzer
+#               Joséphine Wolf Oberholtzer
 #
 # Copyright:    Copyright © 2010, 2012-14, '17, '19-20
 #               Michael Scott Asato Cuthbert
@@ -1117,9 +1116,10 @@ class MetadataBundle(prebase.ProtoM21Object):
             filePath = pathlib.Path(filePath)
 
         if not filePath.exists():
-            environLocal.printDebug('no metadata found for: {0!r}; '
-                                    'try building cache with corpus.cacheMetadata({1!r})'.format(
-                                        self.name, self.name))
+            environLocal.printDebug(
+                f'no metadata found for: {self.name!r}; '
+                f'try building cache with corpus.cacheMetadata({self.name!r})'
+            )
             return self
 
         newMdb = readPickleGzip(filePath)

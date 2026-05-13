@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # -----------------------------------------------------------------------------
 # Name:         mei/base.py
 # Purpose:      Public interfaces for the MEI module
@@ -1561,9 +1560,9 @@ def scoreDefFromElement(elem, slurBundle=None):
     >>> len(result)
     5
     >>> result['1']
-    {'instrument': <music21.instrument.Clarinet '1: Clarinet: Clarinet'>}
+    {'instrument': <music21.instrument.Clarinet '1: Clarinet'>}
     >>> result['3']
-    {'instrument': <music21.instrument.Violin '3: Violin: Violin'>}
+    {'instrument': <music21.instrument.Violin '3: Violin'>}
     >>> result['all-part objects']
     [<music21.meter.TimeSignature 3/4>]
     >>> result['whole-score objects']
@@ -1727,7 +1726,7 @@ def staffDefFromElement(elem, slurBundle=None):
     >>> len(result)
     1
     >>> result
-    {'instrument': <music21.instrument.Clarinet '1: Clarinet: Clarinet'>}
+    {'instrument': <music21.instrument.Clarinet '1: Clarinet'>}
     >>> result['instrument'].partId
     '1'
     >>> result['instrument'].partName
@@ -1747,7 +1746,7 @@ def staffDefFromElement(elem, slurBundle=None):
     >>> len(result)
     3
     >>> result['instrument']
-    <music21.instrument.Tuba '2: Tuba: Tuba'>
+    <music21.instrument.Tuba '2: Tuba'>
     >>> result['clef']
     <music21.clef.BassClef>
     >>> result['key']

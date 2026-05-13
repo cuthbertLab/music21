@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 # Name:         common/misc.py
 # Purpose:      Everything that doesn't fit into anything else.
@@ -26,19 +25,17 @@ import types
 import typing as t
 import weakref
 
-from music21.common.decorators import deprecated
-
 __all__ = [
+    'cleanedFlatNotation',
+    'defaultDeepcopy',
     'flattenList',
     'getMissingImportStr',
     'getPlatform',
     'macOSVersion',
-    'sortModules',
     'pitchList',
-    'unique',
     'runningInNotebook',
-    'defaultDeepcopy',
-    'cleanedFlatNotation',
+    'sortModules',
+    'unique',
 ]
 
 if t.TYPE_CHECKING:
@@ -227,14 +224,6 @@ def runningInNotebook() -> bool:
         return True
     else:
         return False
-
-
-@deprecated('v9', 'v10', 'use runningInNotebook() instead')
-def runningUnderIPython() -> bool:  # pragma: no cover
-    '''
-    DEPRECATED in v9: use runningInNotebook() instead
-    '''
-    return runningInNotebook()
 
 
 # ----------------------------

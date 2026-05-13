@@ -1,9 +1,8 @@
-# -*- coding: utf-8 -*-
 # -----------------------------------------------------------------------------
 # Name:         timespans/node.py
 # Purpose:      Internal data structures for timespan collections
 #
-# Authors:      Josiah Wolf Oberholtzer
+# Authors:      Joséphine Wolf Oberholtzer
 #               Michael Scott Asato Cuthbert
 #
 # Copyright:    Copyright © 2013-2016 Michael Scott Asato Cuthbert
@@ -182,13 +181,14 @@ class ElementNode(core.AVLNode):
         pos = self.position
         if hasattr(pos, 'shortRepr'):
             pos = pos.shortRepr()
-        return '<ElementNode: Start:{} Indices:(l:{} *{}* r:{}) Payload:{!r}>'.format(
-            pos,
-            self.subtreeElementsStartIndex,
-            self.payloadElementIndex,
-            self.subtreeElementsStopIndex,
-            self.payload,
-        )
+
+        ps = pos
+        li = self.subtreeElementsStartIndex
+        pi = self.payloadElementIndex
+        ri = self.subtreeElementsStopIndex
+        pl = self.payload
+
+        return f'<ElementNode: Start:{ps} Indices:(l:{li} *{pi}* r:{ri}) Payload:{pl!r}>'
 
     # PROPERTIES #
     @property
@@ -292,7 +292,7 @@ class OffsetNode(ElementNode):
 
     Here's an example of what it means and does:
 
-    >>> score = tree.makeExampleScore()
+    >>> score = tree.examples.makeExampleScore()
     >>> sf = score.flatten()
     >>> sf.show('text', addEndTimes=True)
     {0.0 - 0.0} <music21.instrument.Instrument 'PartA: : '>
@@ -400,7 +400,7 @@ class OffsetNode(ElementNode):
             The contents of the node at this point.  Usually a list of ElementTimespans
             or PitchedTimespans.
 
-            >>> score = tree.makeExampleScore()
+            >>> score = tree.examples.makeExampleScore()
             >>> scoreTree = tree.fromStream.asTimespans(score, flatten=True,
             ...                  classList=(note.Note, chord.Chord))
             >>> print(scoreTree.rootNode.debug())

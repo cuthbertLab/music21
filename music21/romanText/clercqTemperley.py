@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 # Name:         clercqTemperley.py
 # Purpose:      Routines to parse the popular music

@@ -1,6 +1,5 @@
-# -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
-# Name:         humdrum.harmparser.py
+# Name:         humdrum.harmParser.py
 # Purpose:      A parser for annotations in **harm spines of Humdrum
 #
 # Authors:      Nestor Napoles Lopez
@@ -30,7 +29,7 @@ def convertHarmToRoman(harmStr):
 
     Instantiate a HarmParser to process `**harm` strings
 
-    >>> convertHarmToRoman = humdrum.harmparser.convertHarmToRoman
+    >>> convertHarmToRoman = humdrum.harmParser.convertHarmToRoman
 
     Convert a few `**harm` strings to music21.roman.RomanNumeral figures
 

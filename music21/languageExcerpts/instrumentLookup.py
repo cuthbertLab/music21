@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 # Name:         instrumentLookup.py
 # Purpose:      Multi-lingual instrument translation tables

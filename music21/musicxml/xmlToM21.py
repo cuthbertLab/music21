@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 # Name:         musicxml/xmlToM21.py
 # Purpose:      Conversion from MusicXML to Music21
@@ -31,7 +30,7 @@ from music21 import common
 from music21 import defaults
 from music21 import duration
 from music21 import dynamics
-from music21.common.enums import OrnamentDelay
+from music21.common.enums import OffsetSpecial, OrnamentDelay
 from music21.common.numberTools import opFrac, nearestMultiple
 from music21 import editorial
 from music21 import environment
@@ -1166,10 +1165,10 @@ class MusicXMLImporter(XMLParserBase):
                             staffGroup.addSpannedElements(self.m21PartObjectsById[partIdTest])
                             foundOne = True
 
-                    if foundOne is False:
+                    if not foundOne:
                         raise MusicXMLImportException(
                             'Cannot find part in m21PartObjectsById dictionary by Id:'
-                            + f' {ke} \n   Full Dict:\n   {self.m21PartObjectsById!r} ')
+                            f' {ke} \n   Full Dict:\n   {self.m21PartObjectsById!r} ')
             mxPartGroup = pgObj.mxPartGroup
             seta(staffGroup, mxPartGroup, 'group-name', 'name')
             # TODO: group-name-display
@@ -1191,7 +1190,11 @@ class MusicXMLImporter(XMLParserBase):
             self.spannerBundle.append(staffGroup)
             # self.stream.coreInsert(0, staffGroup)
 
-    def xmlMetadata(self, el=None, inputM21=None):
+    def xmlMetadata(
+        self,
+        el: ET.Element|None = None,
+        inputM21: metadata.Metadata|None = None
+    ) -> metadata.Metadata|None:
         '''
         Converts part of the root element into a metadata object
 
@@ -1234,17 +1237,24 @@ class MusicXMLImporter(XMLParserBase):
 
         identification = el.find('identification')
         if identification is not None:
-            self.identificationToMetadata(identification, md)
+            self.addIdentificationToMetadata(identification, md)
 
         if inputM21 is None:
             return md
+        return None
 
-    def identificationToMetadata(self,
-                                 identification: ET.Element,
-                                 inputM21: metadata.Metadata|None = None):
+
+    def addIdentificationToMetadata(
+        self,
+        identification: ET.Element,
+        md: metadata.Metadata,
+    ) -> None:
         '''
-        Convert an <identification> tag, containing <creator> tags, <rights> tags, and
-        <miscellaneous> tag.
+        Given an <identification> tag, , containing <creator> tags, <rights> tags, and
+        <miscellaneous> tags etc., add this information to the
+        :class:`~music21.metadata.Metadata` object passed in.
+
+        (Replaces identificationToMetadata which is now deprecated.)
 
         Not supported: source, relation
 
@@ -1254,11 +1264,6 @@ class MusicXMLImporter(XMLParserBase):
         new-system (definesExplicitSystemBreaks) and
         new-page (definesExplicitPageBreaks)
         '''
-        if inputM21 is not None:
-            md = inputM21
-        else:
-            md = metadata.Metadata()
-
         for creator in identification.findall('creator'):
             c = self.creatorToContributor(creator)
             if md.isContributorUniqueName(c.role):
@@ -1295,8 +1300,25 @@ class MusicXMLImporter(XMLParserBase):
                     # so nothing is lost.
                     md.addCustom(miscFieldName, miscFieldValue)
 
-        if inputM21 is None:
+    @common.deprecated('use addIdentificationToMetadata', 'v10', 'v11')
+    def identificationToMetadata(
+        self,
+        identification: ET.Element,
+        inputM21: metadata.Metadata|None = None
+    ) -> metadata.Metadata|None:
+        '''
+        Deprecated -- use addIdentificationToMetadata instead and always
+        pass in a metadata object.
+        '''
+        if inputM21 is not None:
+            md = inputM21
+        else:
+            md = metadata.Metadata()
+        self.addIdentificationToMetadata(identification, md)
+        if inputM21 is not None:
             return md
+        return None
+
 
     @staticmethod
     def isRecognizableMetadataKey(miscFieldName: str) -> bool:
@@ -1475,6 +1497,7 @@ class PartParser(XMLParserBase):
 
         self.atSoundingPitch = True
 
+        # a list of StaffReferenceType dicts -- one for each Measure parsed by MeasureParser
         self.staffReferenceList: list[StaffReferenceType] = []
 
         self.lastTimeSignature: meter.TimeSignature|None = None
@@ -1721,14 +1744,14 @@ class PartParser(XMLParserBase):
                     i = pm.midiPitchToInstrument(_adjustMidiData(midiUnpitchedText))
                 except MIDIPercussionException as mpe:
                     # objects not yet existing in m21 such as Cabasa
-                    warnings.warn(MusicXMLWarning(mpe))
+                    warnings.warn(MusicXMLWarning(mpe), stacklevel=2)
                     i = instrument.UnpitchedPercussion()
                     i.percMapPitch = _adjustMidiData(midiUnpitchedText)
             elif midiProgramText := strippedText(mxMidiProgram):
                 try:
                     i = instrument.instrumentFromMidiProgram(_adjustMidiData(midiProgramText))
                 except instrument.InstrumentException as ie:
-                    warnings.warn(MusicXMLWarning(ie))
+                    warnings.warn(MusicXMLWarning(ie), stacklevel=2)
                     # Invalid MIDI program, out of range 0-127
                     i = instrument.Instrument()
                 seta(i, mxMIDIInstrument, 'midi-channel', transform=_adjustMidiData)
@@ -1839,6 +1862,11 @@ class PartParser(XMLParserBase):
             'TimeSignature',
             'SpannerAnchor',
         ]
+        # spanners generally appear only on the first staff.
+        # RepeatBracket spanners, however, need to appear on every staff.
+        EXEMPT_FROM_REMOVE = frozenset(
+            ['RepeatBracket'],
+        )
 
         uniqueStaffKeys: list[int] = self._getUniqueStaffKeys()
         partStaves: list[stream.PartStaff] = []
@@ -1846,7 +1874,7 @@ class PartParser(XMLParserBase):
 
         def copy_into_partStaff(source: stream.Stream,
                                 target: stream.Stream,
-                                omitTheseElementIds: set[int]):
+                                omitTheseElementIds: set[int]) -> None:
             elementIterator = source.getElementsByClass(STAFF_SPECIFIC_CLASSES)
             elementIterator.restoreActiveSites = False
             for sourceElem in elementIterator:
@@ -1859,7 +1887,9 @@ class PartParser(XMLParserBase):
                     targetElem = sourceElem  # do not make a copy if not yet in staff.
                     appendedElementIds.add(idSource)
                 sourceOffset = source.elementOffset(sourceElem, returnSpecial=True)
-                if sourceOffset != 'highestTime':
+                if sourceOffset != OffsetSpecial.AT_END:
+                    # the other OffsetSpecials are not returned from elementOffset
+                    assert not isinstance(sourceOffset, OffsetSpecial)
                     target.coreInsert(sourceOffset, targetElem)
                 else:
                     target.coreStoreAtEnd(targetElem)
@@ -1871,7 +1901,12 @@ class PartParser(XMLParserBase):
             removeClasses = STAFF_SPECIFIC_CLASSES[:]
             if staffIndex != 0:  # spanners only on the first staff.
                 removeClasses.append('Spanner')
-            newPartStaff = self.stream.template(removeClasses=removeClasses, fillWithRests=False)
+            newPartStaff = t.cast(
+                stream.PartStaff,
+                self.stream.template(removeClasses=removeClasses,
+                                     fillWithRests=False,
+                                     exemptFromRemove=EXEMPT_FROM_REMOVE)
+            )
             partStaffId = f'{self.partId}-Staff{staffKey}'
             newPartStaff.id = partStaffId
             # set group for components (recurse?)
@@ -1880,7 +1915,11 @@ class PartParser(XMLParserBase):
             partStaves.append(newPartStaff)
             self.parent.m21PartObjectsById[partStaffId] = newPartStaff
             elementsIdsNotToGoInThisStaff: set[int] = set()
+
+            # iterate over the StaffReferenceType dicts, one for each measure.
             for staffReference in self.staffReferenceList:
+                # this is a list of Music21Objects that should not go into the staff
+                # called by staffKey.
                 excludeOneMeasure = self._getStaffExclude(
                     staffReference,
                     staffKey
@@ -1918,7 +1957,8 @@ class PartParser(XMLParserBase):
         targetKey: int
     ) -> list[base.Music21Object]:
         '''
-        Given a staff reference dictionary, remove and combine in a list all elements that
+        Given a staff reference dictionary (for a single measure),
+        remove and combine in a list all elements that
         are NOT part of the given targetKey. Thus, return a list of all entries to remove.
         It keeps those elements under the staff key None (common to all) and
         those under given key. This then is the list of all elements that should be deleted.
@@ -1995,7 +2035,8 @@ class PartParser(XMLParserBase):
             warnings.warn(
                 f'The following exception took place in m. {measureParser.measureNumber} in '
                 + f'part {self.stream.partName}.',
-                MusicXMLWarning
+                MusicXMLWarning,
+                stacklevel=2
             )
             raise e
 
@@ -2080,7 +2121,9 @@ class PartParser(XMLParserBase):
             # and create a Generic Instrument object rather than dying.
             warnings.warn(
                 'Received a transposition tag, but no instrument to put it on!',
-                MusicXMLWarning)
+                MusicXMLWarning,
+                stacklevel=2,
+            )
             fakeInst = instrument.Instrument()
             self.activeInstrument = fakeInst
             self.stream.coreInsert(self.lastMeasureOffset, fakeInst)
@@ -2241,7 +2284,8 @@ class PartParser(XMLParserBase):
                     f'Warning: measure {m.number} in part {self.stream.partName}'
                     f'is overfull: {mHighestTime} > {lastTimeSignatureQuarterLength},'
                     f'assuming {mOffsetShift} is correct.',
-                    MusicXMLWarning
+                    MusicXMLWarning,
+                    stacklevel=2,
                 )
         elif (mHighestTime == 0.0
               and not m.recurse().notesAndRests.getElementsNotOfClass('Harmony')
@@ -2730,7 +2774,7 @@ class MeasureParser(SoundTagMixin, XMLParserBase):
 
         addPageLayout = hasPageLayout()
         addSystemLayout = hasSystemLayout()
-        addStaffLayout = not (mxPrint.find('staff-layout') is None)
+        addStaffLayout = mxPrint.find('staff-layout') is not None
 
         # --- now we know what we need to add, add em
         m = self.stream
@@ -4378,7 +4422,11 @@ class MeasureParser(SoundTagMixin, XMLParserBase):
                         'Line', idFound, False)[0]
                     # get first
                 except IndexError:
-                    warnings.warn('Line <' + mxObj.tag + '> stop without start', MusicXMLWarning)
+                    warnings.warn(
+                        'Line <' + mxObj.tag + '> stop without start',
+                        MusicXMLWarning,
+                        stacklevel=2,
+                    )
                     return []
 
                 if mxObj.tag == 'dashes':
@@ -5109,7 +5157,7 @@ class MeasureParser(SoundTagMixin, XMLParserBase):
             if useVoice is None:  # pragma: no cover
                 warnings.warn('Cannot put in an element with a missing voice tag when '
                     + 'no previous voice tag was given.  Assuming voice 1... ',
-                    MusicXMLWarning)
+                    MusicXMLWarning, stacklevel=2)
                 useVoice = 1
 
         thisVoice: stream.Voice|None = None
@@ -5122,17 +5170,17 @@ class MeasureParser(SoundTagMixin, XMLParserBase):
         else:
             warnings.warn(
                 f'Cannot find voice {useVoice!r}; putting outside of voices.',
-                MusicXMLWarning)
+                MusicXMLWarning, stacklevel=2)
             warnings.warn(
                 f'Current voiceIds: {list(self.voicesById)}',
-                MusicXMLWarning)
+                MusicXMLWarning, stacklevel=2)
             warnings.warn(
                 f'Current voices: {list(m.voices)} in m. {m.number}',
-                MusicXMLWarning)
+                MusicXMLWarning, stacklevel=2)
 
         return thisVoice
 
-    def xmlBarline(self, mxBarline):
+    def xmlBarline(self, mxBarline: ET.Element) -> None:
         '''
         Handles everything for putting a barline into a Stream
         and updating repeat characteristics.
@@ -5484,7 +5532,7 @@ class MeasureParser(SoundTagMixin, XMLParserBase):
         self.setPrintObject(mxHarmony, cs)
 
         # TODO: attr: print-frame
-        # TODO: attrGroup: placement
+        self.setPlacement(mxHarmony, cs)
         # TODO: attr: use-symbols
         # TODO: attr: stack-degrees
         # TODO: attr: parentheses-degrees
@@ -5577,7 +5625,7 @@ class MeasureParser(SoundTagMixin, XMLParserBase):
                     mxDir, staffKey, totalOffset
                 )
             except MusicXMLImportException as excep:
-                warnings.warn(f'Could not import {tag}: {excep}', MusicXMLWarning)
+                warnings.warn(f'Could not import {tag}: {excep}', MusicXMLWarning, stacklevel=2)
                 spannerList = []
 
             for sp in spannerList:
@@ -6417,7 +6465,10 @@ class MeasureParser(SoundTagMixin, XMLParserBase):
                 stl.staffType = stream.enums.StaffType(xmlText)
             except ValueError:
                 warnings.warn(
-                    f'Got an incorrect staff-type in details: {mxStaffType}', MusicXMLWarning)
+                    f'Got an incorrect staff-type in details: {mxStaffType}',
+                    MusicXMLWarning,
+                    stacklevel=2,
+                )
         # TODO: staff-tuning*
         # TODO: capo
         seta(stl, mxDetails, 'staff-size', transform=_floatOrIntStr)

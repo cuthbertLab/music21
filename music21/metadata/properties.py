@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # -----------------------------------------------------------------------------
 # Name:         properties.py
 # Purpose:      Data describing the standard set of metadata properties

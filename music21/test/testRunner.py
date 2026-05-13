@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # -----------------------------------------------------------------------------
 # Name:         testRunner.py
 # Purpose:      Music21 testing suite
@@ -59,7 +58,7 @@ def addDocAttrTestsToSuite(suite,
     client ()
     '''
     dtp = doctest.DocTestParser()
-    if globs is False:
+    if not globs:
         globs = __import__(defaultImports[0]).__dict__.copy()
 
     elif globs is None:
@@ -139,7 +138,7 @@ def fix312OrderedDict(textString, replacement='...') -> str:
     '''
     Function that fixes the OrderedDicts to work on Python 3.12 and above.
     (eventually when 3.12 is the norm, this should be replaced to neuter
-    the doctests for 3.10/3.11 instead.  Or just wait until 3.12 is the minimum version?)
+    the doctests for 3.11 instead.  Or just wait until 3.12 is the minimum version?)
 
     >>> fix312 = test.testRunner.fix312OrderedDict
     >>> fix312('OrderedDict([(0, 1), (1, 2), (2, 3)])')
@@ -242,6 +241,8 @@ def mainTest(*testClasses, **keywords):
             if ('importPlusRelative' in testClasses
                     or 'importPlusRelative' in sys.argv
                     or bool(keywords.get('importPlusRelative', False))):
+                # allow things like volpiano.py's function "fromStream"
+                # to be called in doctests as "fromStream" and not just "volpiano.fromStream"
                 globs.update(inspect.stack()[1][0].f_globals)
 
         try:
@@ -251,8 +252,7 @@ def mainTest(*testClasses, **keywords):
                 optionflags=optionflags,
             )
         except ValueError as ve:  # no docstrings
-            print('Problem in docstrings [usually a missing r value before '
-                  + f'the quotes:] {ve}')
+            print(f'Problem in docstrings [usually a missing r value before the quotes]: {ve}')
             s1 = unittest.TestSuite()
 
     verbosity = 1
@@ -285,7 +285,7 @@ def mainTest(*testClasses, **keywords):
         testClasses = []  # remove cases
     for t in testClasses:
         if not isinstance(t, str):
-            if displayNames is True:
+            if displayNames:
                 for tName in unittest.defaultTestLoader.getTestCaseNames(t):
                     print(f'Unit Test Method: {tName}')
             if runThisTest is not None:
@@ -322,7 +322,7 @@ def mainTest(*testClasses, **keywords):
         localVariables = list(outerFrame.f_locals.values())
         addDocAttrTestsToSuite(s1, localVariables, outerFilename, globs, optionflags)
 
-    if runAllTests is True:
+    if runAllTests:
         fixDoctests(s1)
 
         runner = unittest.TextTestRunner()

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 # Name:         search/base.py
 # Purpose:      music21 classes for searching within files
@@ -33,19 +32,29 @@ from music21.stream import Measure, Stream
 from music21.stream import filters, iterator
 
 __all__ = [
-    'Wildcard', 'WildcardDuration', 'SearchMatch', 'StreamSearcher',
-    'streamSearchBase', 'rhythmicSearch', 'noteNameSearch', 'noteNameRhythmicSearch',
-    'approximateNoteSearch', 'approximateNoteSearchNoRhythm', 'approximateNoteSearchOnlyRhythm',
+    'SearchException',
+    'SearchMatch',
+    'StreamSearcher',
+    'Wildcard',
+    'WildcardDuration',
+    'approximateNoteSearch',
+    'approximateNoteSearchNoRhythm',
+    'approximateNoteSearchOnlyRhythm',
     'approximateNoteSearchWeighted',
-    'translateStreamToString',
-    'translateDiatonicStreamToString', 'translateIntervalsAndSpeed',
-    'translateStreamToStringNoRhythm', 'translateStreamToStringOnlyRhythm',
+    'mostCommonMeasureRhythms',
+    'noteNameRhythmicSearch',
+    'noteNameSearch',
+    'rhythmicSearch',
+    'streamSearchBase',
+    'translateDiatonicStreamToString',
+    'translateDurationToBytes',
+    'translateIntervalsAndSpeed',
+    'translateNoteTieToByte',
     'translateNoteToByte',
     'translateNoteWithDurationToBytes',
-    'translateNoteTieToByte',
-    'translateDurationToBytes',
-    'mostCommonMeasureRhythms',
-    'SearchException',
+    'translateStreamToString',
+    'translateStreamToStringNoRhythm',
+    'translateStreamToStringOnlyRhythm',
 ]
 
 
@@ -90,8 +99,10 @@ class SearchMatch(namedtuple('SearchMatch', ['elStart', 'els', 'index', 'iterato
     }
 
     def __repr__(self):
-        return 'SearchMatch(elStart={0}, els=len({1}), index={2}, iterator=[...])'.format(
-            repr(self.elStart), len(self.els), repr(self.index))
+        es = self.elStart
+        el = len(self.els)
+        ix = self.index
+        return f'SearchMatch(elStart={es!r}, els=len({el}), index={ix!r}, iterator=[...])'
 
 
 class StreamSearcher:
@@ -516,7 +527,7 @@ def approximateNoteSearch(thisStream, otherStreams):
     >>> o3.id = 'o3'
     >>> l = search.approximateNoteSearch(s, [o1, o2, o3])
     >>> for i in l:
-    ...    print('%s %r' % (i.id, i.matchProbability))
+    ...     print(f'{i.id} {i.matchProbability!r}')
     o1 0.666666...
     o3 0.333333...
     o2 0.083333...
@@ -552,7 +563,7 @@ def approximateNoteSearchNoRhythm(thisStream, otherStreams):
     >>> o3.id = 'o3'
     >>> l = search.approximateNoteSearchNoRhythm(s, [o1, o2, o3])
     >>> for i in l:
-    ...    print('%s %r' % (i.id, i.matchProbability))
+    ...     print(f'{i.id} {i.matchProbability!r}')
     o1 0.83333333...
     o3 0.5
     o2 0.1666666...
@@ -588,7 +599,7 @@ def approximateNoteSearchOnlyRhythm(thisStream, otherStreams):
     >>> o3.id = 'o3'
     >>> l = search.approximateNoteSearchOnlyRhythm(s, [o1, o2, o3])
     >>> for i in l:
-    ...    print('%s %r' % (i.id, i.matchProbability))
+    ...     print(f'{i.id} {i.matchProbability!r}')
     o1 0.5
     o3 0.33...
     o2 0.0
@@ -626,7 +637,7 @@ def approximateNoteSearchWeighted(thisStream, otherStreams):
     >>> o4.id = 'o4'
     >>> l = search.approximateNoteSearchWeighted(s, [o1, o2, o3, o4])
     >>> for i in l:
-    ...    print('%s %r' % (i.id, i.matchProbability))
+    ...     print(f'{i.id} {i.matchProbability!r}')
     o3 0.83333...
     o1 0.75
     o4 0.75
@@ -688,7 +699,7 @@ def translateStreamToString(inputStreamOrIterator, returnMeasures=False):
         b += translateNoteWithDurationToBytes(n)
         if returnMeasures:
             measures.append(n.measureNumber)
-    if returnMeasures is False:
+    if not returnMeasures:
         return b
     else:
         return (b, measures)
@@ -740,7 +751,7 @@ def translateDiatonicStreamToString(inputStreamOrIterator, returnMeasures=False)
             mNum = n.measureNumber
 
         if n.isRest:
-            if previousRest is True:
+            if previousRest:
                 continue
             else:
                 previousRest = True
@@ -749,7 +760,7 @@ def translateDiatonicStreamToString(inputStreamOrIterator, returnMeasures=False)
                 continue
         else:
             previousRest = False
-        if previousTie is True:
+        if previousTie:
             if n.tie is None or n.tie.type == 'stop':
                 previousTie = False
             continue
@@ -768,7 +779,7 @@ def translateDiatonicStreamToString(inputStreamOrIterator, returnMeasures=False)
         b.append(newName)
 
     joined = ''.join(b)
-    if returnMeasures is False:
+    if not returnMeasures:
         return joined
     else:
         return (joined, measures)
@@ -812,21 +823,20 @@ def translateIntervalsAndSpeed(inputStream, returnMeasures=False):
     b = []
     measures = []
 
-    previousRest = False
-    previousTie = False
+    previousRest = False  # was the previous a Rest
+    previousTie = False  # was the previous a Tie?
     previousQL = None
     previousMidi = 60
-    for n in inputStream:
-        if n.isNote:
-            previousMidi = n.pitches[0].midi
-            break
+    for n in inputStream.getElementsByClass(note.Note):
+        previousMidi = n.pitches[0].midi
+        break
 
     for n in inputStream:
         mNum = None
         if returnMeasures:
             mNum = n.measureNumber
         if n.isRest:
-            if previousRest is True:
+            if previousRest:
                 continue
             else:
                 previousRest = True
@@ -835,7 +845,7 @@ def translateIntervalsAndSpeed(inputStream, returnMeasures=False):
                 continue
         else:
             previousRest = False
-        if previousTie is True:
+        if previousTie:
             if n.tie is None or n.tie.type == 'stop':
                 previousTie = False
             continue
@@ -860,7 +870,7 @@ def translateIntervalsAndSpeed(inputStream, returnMeasures=False):
         b.append(newName)
 
     joined = ''.join(b)
-    if returnMeasures is False:
+    if not returnMeasures:
         return joined
     else:
         return (joined, measures)
@@ -918,10 +928,10 @@ def translateStreamToStringOnlyRhythm(inputStream, returnMeasures=False):
         return b
 
 
-def translateNoteToByte(n: note.GeneralNote):
+def translateNoteToByte(n: note.GeneralNote) -> str:
     # noinspection PyShadowingNames
     '''
-    takes a note.Note object and translates it to a single byte representation.
+    takes a note.Note object and translates it to a single byte representation in a string.
 
     currently returns the chr() for the note's midi number. or chr(127) for rests
     and unpitched.
@@ -947,10 +957,10 @@ def translateNoteToByte(n: note.GeneralNote):
     else:
         return chr(127)
 
-def translateNoteWithDurationToBytes(n: note.GeneralNote, includeTieByte=True):
+def translateNoteWithDurationToBytes(n: note.GeneralNote, includeTieByte: bool = True) -> str:
     # noinspection PyShadowingNames
     '''
-    takes a note.Note object and translates it to a three-byte representation.
+    takes a note.Note object and translates it to a three-byte representation as a string.
 
     currently returns the chr() for the note's midi number. or chr(127) for rests
     followed by the log of the quarter length (fitted to 1-127, see
@@ -977,7 +987,7 @@ def translateNoteWithDurationToBytes(n: note.GeneralNote, includeTieByte=True):
     firstByte = translateNoteToByte(n)
     secondByte = translateDurationToBytes(n)
     thirdByte = translateNoteTieToByte(n)
-    if includeTieByte is True:
+    if includeTieByte:
         return firstByte + secondByte + thirdByte
     else:
         return firstByte + secondByte
@@ -1060,10 +1070,18 @@ def mostCommonMeasureRhythms(streamIn, transposeDiatonic=False):
     >>> bach = corpus.parse('bwv1.6')
     >>> sortedRhythms = search.mostCommonMeasureRhythms(bach)
     >>> for in_dict in sortedRhythms[0:3]:
-    ...     print(f"no: {in_dict['number']} rhythmString: {in_dict['rhythmString']}")
-    ...     print('bars: %r' % ([(m.number,
-    ...                               str(m.getContextByClass(stream.Part).id))
-    ...                            for m in in_dict['measures']]))
+    ...     number = in_dict['number']
+    ...     rhythmString = in_dict['rhythmString']
+    ...     measures = in_dict['measures']
+    ...     print(
+    ...         f'no: {number} '
+    ...         f'rhythmString: {rhythmString}'
+    ...     )
+    ...     bars = [
+    ...         (m.number, str(m.getContextByClass(stream.Part).id))
+    ...         for m in measures
+    ...     ]
+    ...     print(f'bars: {bars!r}')
     ...     in_dict['rhythm'].show('text')
     ...     print('-----')
     no: 34 rhythmString: PPPP
@@ -1088,7 +1106,6 @@ def mostCommonMeasureRhythms(streamIn, transposeDiatonic=False):
     * Changed in v7: bars are ordered first by number, then by part.
     '''
     returnDicts = []
-    distanceToTranspose = 0
 
     for thisMeasure in streamIn[Measure]:
         rhythmString = translateStreamToStringOnlyRhythm(thisMeasure.notesAndRests)
@@ -1099,7 +1116,7 @@ def mostCommonMeasureRhythms(streamIn, transposeDiatonic=False):
                 entry['number'] += 1
                 entry['measures'].append(thisMeasure)
                 break
-        if rhythmFound is False:
+        if not rhythmFound:
             newDict = {
                 'number': 1,
                 'rhythmString': rhythmString,

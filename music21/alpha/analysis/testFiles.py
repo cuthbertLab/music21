@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 # Name:         alpha/analysis/testFiles.py
 # Purpose:      consolidated testFiles

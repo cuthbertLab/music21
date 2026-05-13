@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 # Name:         windowed.py
 # Purpose:      Framework for modular, windowed analysis
@@ -165,7 +164,8 @@ class WindowedAnalysis:
             windowCount = int(windowCountFloat)
             if windowCountFloat != windowCount:
                 warnings.warn(
-                    'maxWindowCount is not divisible by windowSize, possibly undefined behavior'
+                    'maxWindowCount is not divisible by windowSize, possibly undefined behavior',
+                    stacklevel=2
                 )
         elif windowType == 'adjacentAverage':
             windowCount = maxWindowCount
@@ -345,7 +345,7 @@ class WindowedAnalysis:
 
 # -----------------------------------------------------------------------------
 
-class TestMockProcessor:
+class MockObjectProcessor:
 
     def process(self, subStream):
         '''
@@ -380,7 +380,7 @@ class Test(unittest.TestCase):
         '''
         Test that windows are doing what they are supposed to do
         '''
-        p = TestMockProcessor()
+        p = MockObjectProcessor()
 
         from music21 import note
         s1 = stream.Stream()

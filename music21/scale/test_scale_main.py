@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 # Name:         scale.test_scale_main.py
 # Purpose:      Tests for scale/__init__.py

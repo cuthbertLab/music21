@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # -----------------------------------------------------------------------------
 # Name:         roman.py
 # Purpose:      music21 classes for doing Roman Numeral / Tonal analysis
@@ -41,8 +40,6 @@ ChordFigureTuple = namedtuple('ChordFigureTuple', ['aboveBass', 'alter', 'prefix
 environLocal = environment.Environment('roman')
 
 # TODO: setting inversion should change the figure
-
-T = t.TypeVar('T', bound='RomanNumeral')
 
 # -----------------------------------------------------------------------------
 
@@ -115,12 +112,13 @@ figureShorthands = {
     'b7b53': 'ø7',
 }
 
-figureShorthandsMode: dict[str, dict] = {
-    'major': {
-    },
-    'minor': {
-    }
-}
+# not currently used
+# figureShorthandsMode: dict[str, dict] = {
+#     'major': {
+#     },
+#     'minor': {
+#     }
+# }
 
 
 # this is sort of a crock :-)  but it's very helpful.
@@ -273,7 +271,7 @@ def correctSuffixForChordQuality(chordObj, inversionString):
     return qualityName + inversionString
 
 
-def postFigureFromChordAndKey(chordObj, keyObj=None):
+def _postFigureFromChordAndKey(chordObj: chord.Chord, keyObj: key.Key) -> str:
     '''
     (Note: this will become a private function by v10.)
 
@@ -281,7 +279,7 @@ def postFigureFromChordAndKey(chordObj, keyObj=None):
 
     If keyObj is none, it uses the root as a major key:
 
-    >>> roman.postFigureFromChordAndKey(
+    >>> roman._postFigureFromChordAndKey(
     ...     chord.Chord(['F#2', 'D3', 'A-3', 'C#4']),
     ...     key.Key('C'),
     ...     )
@@ -289,19 +287,19 @@ def postFigureFromChordAndKey(chordObj, keyObj=None):
 
     The function substitutes shorthand (e.g., '6' not '63')
 
-    >>> roman.postFigureFromChordAndKey(
+    >>> roman._postFigureFromChordAndKey(
     ...     chord.Chord(['E3', 'C4', 'G4']),
     ...     key.Key('C'),
     ...     )
     '6'
 
-    >>> roman.postFigureFromChordAndKey(
+    >>> roman._postFigureFromChordAndKey(
     ...     chord.Chord(['E3', 'C4', 'G4', 'B-5']),
     ...     key.Key('F'),
     ...     )
     '65'
 
-    >>> roman.postFigureFromChordAndKey(
+    >>> roman._postFigureFromChordAndKey(
     ...     chord.Chord(['E3', 'C4', 'G4', 'B-5']),
     ...     key.Key('C'),
     ...     )
@@ -310,25 +308,21 @@ def postFigureFromChordAndKey(chordObj, keyObj=None):
     We reduce common omissions from seventh chords to be '7' instead
     of '75', '73', etc.
 
-    >>> roman.postFigureFromChordAndKey(
+    >>> roman._postFigureFromChordAndKey(
     ...     chord.Chord(['A3', 'E-4', 'G-4']),
     ...     key.Key('b-'),
     ...     )
     'o7'
 
-    OMIT_FROM_DOCS
-
-    Fails on German Augmented 6th chords in root position.  Calls them
+    Known bug: Fails on German Augmented 6th chords in root position.  Calls them
     half-diminished chords.
 
-    (This is in OMIT_FROM_etc.)
+    Changed in v10: made _postFigureFromChordAndKey private, keyObj is not optional.
     '''
-    if keyObj is None:
-        keyObj = key.Key(chordObj.root())
     chordFigureTuples = figureTuples(chordObj, keyObj)
     bassFigureAlter = chordFigureTuples[0].alter
 
-    allFigureStringList = []
+    allFigureStringList: list[str] = []
 
     third = chordObj.third
     fifth = chordObj.fifth
@@ -379,12 +373,13 @@ def postFigureFromChordAndKey(chordObj, keyObj=None):
                 allFigureStringList.append(figureString)
 
     allFigureString = ''.join(allFigureStringList)
-    key_mode = keyObj.mode
 
-    # first is not currently used.
-    if key_mode in figureShorthandsMode and allFigureString in figureShorthandsMode[key_mode]:
-        allFigureString = figureShorthandsMode[allFigureString]
-    elif allFigureString in figureShorthands:
+    # figureShorthandsMode is not currently used.
+    # key_mode = keyObj.mode
+    # if key_mode in figureShorthandsMode and allFigureString in figureShorthandsMode[key_mode]:
+    #     allFigureString = figureShorthandsMode[allFigureString]
+    # when uncommenting, the next if needs to become elif
+    if allFigureString in figureShorthands:
         allFigureString = figureShorthands[allFigureString]
 
     # simplify common omissions from 7th chords
@@ -398,8 +393,6 @@ def postFigureFromChordAndKey(chordObj, keyObj=None):
 
 def figureTuples(chordObject: chord.Chord, keyObject: key.Key) -> list[ChordFigureTuple]:
     '''
-    (This will become a private function in v10)
-
     Return a set of tuplets for each pitch showing the presence of a note, its
     interval above the bass its alteration (float) from a step in the given
     key, an `alterationString`, and the pitch object.
@@ -1185,7 +1178,7 @@ def romanNumeralFromChord(
         pass
     elif not isMajorThird:
         stepRoman = stepRoman.lower()
-    inversionString = postFigureFromChordAndKey(chordObj, alteredKeyObj)
+    inversionString = _postFigureFromChordAndKey(chordObj, alteredKeyObj)
 
     rnString = ft.prefix + stepRoman + inversionString
 
@@ -1241,10 +1234,12 @@ def romanNumeralFromChord(
         rn = RomanNumeral(rnString, keyObj, updatePitches=False,
             # correctRNAlterationForMinor() adds cautionary
             sixthMinor=Minor67Default.CAUTIONARY, seventhMinor=Minor67Default.CAUTIONARY)
-    except fbNotation.ModifierException as strerror:
+    except fbNotation.ModifierException as strerror:  # pragma: no cover
         raise RomanNumeralException(
-            'Could not parse {0} from chord {1} as an RN '
-            'in key {2}: {3}'.format(rnString, chordObj, keyObj, strerror))  # pragma: no cover
+            'Could not parse '
+            f'{rnString} from chord {chordObj} as an RN '
+            f'in key {keyObj}: {strerror}'
+        ) from strerror
 
     # Is this linking them in an unsafe way?
     rn.pitches = chordObj.pitches
@@ -1305,7 +1300,7 @@ class Minor67Default(enum.Enum):
 
     The enumeration of `CAUTIONARY` is identical to `QUALITY` except that it
     ignores the `#` in #vi and the `b` in bVI, allowing users to write these
-    chords in two different way.  `CAUTIONARY` is recommended in the case where
+    chords in two different ways.  `CAUTIONARY` is recommended in the case where
     users from different systems of training are working together, and no
     exotic chords (such as major triads on raised ^6) are used.
 
@@ -1318,7 +1313,7 @@ class Minor67Default(enum.Enum):
     >>> vi('VI', roman.Minor67Default.CAUTIONARY)
     'A- C E-'
 
-    Whereas `QUALITY` follows a strict interpretation of what preceeding sharp and flat
+    Whereas `QUALITY` follows a strict interpretation of what preceding sharp and flat
     signs mean.  With `QUALITY`, since vi is already sharpened, #vi raises it even more.
     And since VI is already flattened, bVI lowers it even further:
 
@@ -1383,14 +1378,7 @@ class Minor67Default(enum.Enum):
 
 # -----------------------------------------------------------------------------
 
-# Delete RomanException in v10
-class RomanException(exceptions21.Music21Exception):
-    '''
-    RomanException will be removed in v10.  Catch RomanNumeralException instead.
-    '''
-
-
-class RomanNumeralException(ValueError, RomanException):
+class RomanNumeralException(ValueError, exceptions21.Music21Exception):
     pass
 
 
@@ -3070,7 +3058,6 @@ class RomanNumeral(harmony.Harmony):
         >>> rn.frontAlterationAccidental
         <music21.pitch.Accidental sharp>
 
-
         >>> rn = roman.RomanNumeral()
         >>> rn.scaleDegree = 6
         >>> rn.impliedQuality = 'major'
@@ -3079,6 +3066,9 @@ class RomanNumeral(harmony.Harmony):
         True
         >>> rn.frontAlterationAccidental is None
         True
+
+        Note that this function is not called in parsing, but a private function having the
+        guts of this function is called.
 
         * Changed in v6.4: public function became hook to private function having the actual guts
         '''
@@ -3116,6 +3106,11 @@ class RomanNumeral(harmony.Harmony):
         '''
         def sharpen(wFig: str) -> str:
             changeFrontAlteration(interval.Interval('A1'), 1)
+
+            # changing the working figure is important if the private function is called
+            # on its own (as happens in parse figure).  It doesn't have any effect if
+            # calling the public adjustMinorVIandVIIByQuality.
+
             # If root is in the figure, lower the root to avoid double-sharpening
             if '##' in wFig:
                 wFig = wFig.replace('##8', '#8')
@@ -3309,7 +3304,7 @@ class RomanNumeral(harmony.Harmony):
                 f'_updatePitches() was unable to derive pitches from the figure: {self.figure!r}'
             )  # pragma: no cover
 
-    def transpose(self: T, value, *, inPlace=False) -> T|None:
+    def transpose(self, value, *, inPlace=False) -> t.Self|None:
         '''
         Overrides :meth:`~music21.harmony.Harmony.transpose` so that `key`
         attribute is transposed as well.
@@ -3483,10 +3478,12 @@ class RomanNumeral(harmony.Harmony):
             # environLocal.printDebug(['got keyOrScale', keyOrScale])
             try:
                 keyClasses = keyOrScale.classes
-            except:  # pragma: no cover
+            except AttributeError:  # pragma: no cover
                 raise RomanNumeralException(
-                    'Cannot call classes on object {0!r}, send only Key '
-                    'or Scale Music21Objects'.format(keyOrScale))
+                    'Cannot call classes on object '
+                    f'{keyOrScale!r}, send only Key '
+                    'or Scale Music21Objects'
+                )
             if 'Key' in keyClasses:
                 # good to go
                 if keyOrScale.tonicPitchNameWithCase not in _keyCache:
@@ -4386,7 +4383,7 @@ class Test(unittest.TestCase):
     def testAugmentedOctave(self):
         c = chord.Chord(['C4', 'E5', 'G5', 'C#6'])
         k = key.Key('C')
-        f = postFigureFromChordAndKey(c, k)
+        f = _postFigureFromChordAndKey(c, k)
         self.assertEqual(f, '#853')
 
         rn = romanNumeralFromChord(c, k)

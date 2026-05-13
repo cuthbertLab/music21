@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 # Name:         testLint.py
 # Purpose:      Controller for all lint based testing.

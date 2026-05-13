@@ -32,9 +32,11 @@ and papers on algorithmic composition and generative music systems.
 Ariza received his A.B.
 degree from Harvard University and his M.A. and Ph.D. degrees from New York University.
 
-**Benjamin Hogue** is Former Lead Programmer of `music21` for 2013.
+**Benjamin Hogue** is Former Lead Programmer of `music21` for 2013, working
+on percussion representation.
 
-**Josiah Wolf Oberholtzer** is Former Lead Programmer of `music21` for 2014-15.
+**Joséphine Wolf Oberholtzer** is Former Lead Programmer of `music21` for 2014-15. Her work
+included the extremely efficient tree representation for fast context searching.
 
 Additional contributions by many MIT students and visitors and the
 Open Source software community.
@@ -79,7 +81,7 @@ working on other music and technology projects, in particular:
 .. _David Huron: https://music.osu.edu/people/david-huron
 .. _Humdrum: https://www.humdrum.org
 .. _Michael Good: https://www.musicxml.com
-.. _Center for Computer-Assisted Research in the Humanities: http://www.ccarh.org/
+.. _Center for Computer-Assisted Research in the Humanities: https://www.ccarh.org/
 
 Contributors
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -146,7 +148,7 @@ to this project.  Their contributions and generosity are greatly appreciated.
 .. _Laura E. Conrad: http://www.serpentpublications.org/drupal7/
 .. _MuseScore: https://musescore.com/
 .. _Bryen Travis: http://www.bachcentral.com/
-.. _Ewa Dahlig-Turek: http://www.esac-data.org
+.. _Ewa Dahlig-Turek: https://www.esac-data.org
 .. _Seymour Shlien: https://ifdo.ca/~seymour/runabc/esac/esacdatabase.html
 .. _Manuel Op de Coul: https://www.huygens-fokker.org/scala
 .. _John Chambers: http://trillian.mit.edu/~jc/music/book

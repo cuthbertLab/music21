@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 # Name:          timeGraphs.py
 # Purpose:       time how long it takes to run music21 commands

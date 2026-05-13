@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 # Name:         musicxml/partStaffExporter.py
 # Purpose:      Change music21 PartStaff objects to single musicxml parts
@@ -268,13 +267,18 @@ class PartStaffExporterMixin:
         joinable_components_list = flattenList(deduplicatedGroups)
         if len(set(joinable_components_list)) != len(joinable_components_list):
             warnings.warn(
-                MusicXMLWarning('Got overlapping StaffGroups; will not merge ANY groups.'))
+                MusicXMLWarning(
+                    'Got overlapping StaffGroups; will not merge ANY groups.'
+                ),
+                stacklevel=2,
+            )
             return []
 
         # Finally, store a reference to earlier siblings (if any) on PartExporters
         for group in deduplicatedGroups:
             prior_part_staff = None
             for part_staff in group:
+                assert isinstance(part_staff, stream.PartStaff)
                 for part_exporter in self.partExporterList:
                     if part_exporter.stream is not part_staff:
                         continue

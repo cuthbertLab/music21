@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 '''
 This module is no longer needed in v9 and just kept for historical reasons.
 '''

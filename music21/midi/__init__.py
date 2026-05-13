@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 # Name:         midi/__init__.py
 # Purpose:      Access to MIDI library / music21 classes for dealing with midi data
@@ -33,48 +32,48 @@ from music21.midi import tests
 from music21.midi import translate
 
 from music21.midi.base import (
+    ChannelModeMessages,
+    ChannelVoiceMessages,
+    DeltaTime,
+    METAEVENT_MARKER,
+    MetaEvents,
+    MidiEvent,
     MidiException,
-    charToBinary,
-    intsToHexBytes,
+    MidiFile,
+    MidiTrack,
+    SysExEvents,
     getNumber,
     getVariableLengthNumber,
-    getNumbersAsList,
     putNumber,
-    putVariableLengthNumber,
     putNumbersAsList,
-    ChannelVoiceMessages,
-    ChannelModeMessages,
-    MetaEvents,
-    SysExEvents,
-    METAEVENT_MARKER,
-    MidiEvent,
-    DeltaTime,
-    MidiTrack,
-    MidiFile,
+    putVariableLengthNumber,
 )
 
 __all__ = [
-    'base', 'realtime', 'percussion', 'tests', 'translate',
-    # from base
-    'MidiException',
-    'charToBinary',
-    'intsToHexBytes',
-    'getNumber',
-    'getVariableLengthNumber',
-    'getNumbersAsList',
-    'putNumber',
-    'putVariableLengthNumber',
-    'putNumbersAsList',
+    'base',
+    'percussion',
+    'realtime',
+    'tests',
+    'translate',
 
+    # from base
     'ChannelVoiceMessages',
     'ChannelModeMessages',
-    'MetaEvents',
-    'SysExEvents',
-    'METAEVENT_MARKER',
-    'MidiEvent',
     'DeltaTime',
-    'MidiTrack',
+    'METAEVENT_MARKER',
+    'MetaEvents',
+    'MidiEvent',
+    'MidiException',
     'MidiFile',
+    'MidiTrack',
+    'SysExEvents',
+
+    'getNumber',
+    'getVariableLengthNumber',
+    'putNumber',
+    'putNumbersAsList',
+    'putVariableLengthNumber',
+
 ]
 
 environLocal = environment.Environment('midi')

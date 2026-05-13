@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 # Name:         vexflow/__init__.py
 # Purpose:      music21 classes for converting music21 objects to vexflow
@@ -11,7 +10,10 @@
 # ------------------------------------------------------------------------------
 from __future__ import annotations
 
-__all__ = ['toMusic21j', 'fromObject']
+__all__ = [
+    'fromObject',
+    'toMusic21j',
+]
 
 from music21.vexflow import toMusic21j
 from music21.vexflow.toMusic21j import fromObject

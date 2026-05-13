@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 # Name:         test.toggleDebug.py
 # Purpose:      Changes debug on if off, off if on

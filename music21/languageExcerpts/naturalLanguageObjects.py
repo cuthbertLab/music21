@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 # Name:         naturalLanguageObjects.py
 # Purpose:      Multilingual conversion of pitch, etc. objects

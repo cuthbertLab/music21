@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 # Name:         chord.py
 # Purpose:      Chord representation and utilities
@@ -15,15 +14,23 @@ as well as other methods, functions, and objects related to chords.
 '''
 from __future__ import annotations
 
-__all__ = ['tools', 'tables', 'Chord', 'ChordException', 'fromIntervalVector', 'fromForteClass']
+__all__ = [
+    'Chord',
+    'ChordBase',
+    'ChordException',
+    'fromForteClass',
+    'fromIntervalVector',
+    'tables',
+    'tools',
+]
 
 from collections.abc import Iterable, Sequence
 import copy
 import typing as t
-from typing import overload  # pycharm bug
+# pycharm bug - need to import overload separately. typing.overload doesn't work
+from typing import overload
 import unittest
 
-from music21 import beam
 from music21 import common
 from music21.common.decorators import cacheMethod
 from music21 import derivation
@@ -42,12 +49,8 @@ from music21.chord import tools
 
 if t.TYPE_CHECKING:
     from music21 import stream
-    from music21.style import Style
 
 environLocal = environment.Environment('chord')
-
-_ChordBaseType = t.TypeVar('_ChordBaseType', bound='music21.chord.ChordBase')
-_ChordType = t.TypeVar('_ChordType', bound='music21.chord.Chord')
 
 # ------------------------------------------------------------------------------
 class ChordException(exceptions21.Music21Exception):
@@ -155,7 +158,7 @@ class ChordBase(note.NotRest):
     def __hash__(self):
         return super().__hash__()
 
-    def __deepcopy__(self: _ChordBaseType, memo=None) -> _ChordBaseType:
+    def __deepcopy__(self, memo=None) -> t.Self:
         '''
         As Chord objects have one or more Volume, objects, and Volume
         objects store weak refs to the client object, need to specialize
@@ -468,7 +471,7 @@ class ChordBase(note.NotRest):
 
 
     @volume.setter
-    def volume(self, expr: None|'music21.volume.Volume'|int|float):
+    def volume(self, expr: 'None|music21.volume.Volume|int|float'):
         # Do NOT change typing to volume.Volume  w/o quotes because it will take the property as
         # its name and be really confused.
         if isinstance(expr, volume.Volume):
@@ -846,8 +849,8 @@ class Chord(ChordBase):
         if isinstance(key, int):
             try:
                 foundNote = self._notes[key]  # must be a number
-            except (KeyError, IndexError):
-                raise KeyError(keyErrorStr)
+            except (KeyError, IndexError) as exc:
+                raise KeyError(keyErrorStr) from exc
 
         elif isinstance(key, str):
             key = key.upper()
@@ -1007,11 +1010,11 @@ class Chord(ChordBase):
         return lowest
 
     def _removePitchByRedundantAttribute(
-        self: _ChordType,
+        self,
         attribute: str,
         *,
         inPlace=False
-    ) -> _ChordType|list[pitch.Pitch]:
+    ) -> t.Self|list[pitch.Pitch]:
         '''
         Common method for stripping pitches based on redundancy of one pitch
         attribute. The `attribute` is provided by a string.
@@ -1106,7 +1109,7 @@ class Chord(ChordBase):
 
     @overload
     def annotateIntervals(
-        self: _ChordType,
+        self,
         *,
         inPlace: bool = False,
         stripSpecifiers: bool = True,
@@ -1117,7 +1120,7 @@ class Chord(ChordBase):
 
     @overload
     def annotateIntervals(
-        self: _ChordType,
+        self,
         *,
         inPlace: t.Literal[True],
         stripSpecifiers: bool = True,
@@ -1128,23 +1131,23 @@ class Chord(ChordBase):
 
     @overload
     def annotateIntervals(
-        self: _ChordType,
+        self,
         *,
         inPlace: t.Literal[False] = False,
         stripSpecifiers: bool = True,
         sortPitches: bool = True,
         returnList: t.Literal[False] = False
-    ) -> _ChordType:
+    ) -> t.Self:
         ...
 
     def annotateIntervals(
-        self: _ChordType,
+        self,
         *,
         inPlace: bool = False,
         stripSpecifiers: bool = True,
         sortPitches: bool = True,
         returnList: bool = False
-    ) -> _ChordType|None|list[str]:
+    ) -> t.Self|None|list[str]:
         # noinspection PyShadowingNames
         '''
         Add lyrics to the chord that show the distance of each note from
@@ -1244,7 +1247,7 @@ class Chord(ChordBase):
         if not inPlace:
             return c
 
-    def areZRelations(self: _ChordType, other: _ChordType) -> bool:
+    def areZRelations(self, other: t.Self) -> bool:
         '''
         Check if another Chord is a z-relation to this Chord.
 
@@ -1482,7 +1485,7 @@ class Chord(ChordBase):
 
     @overload
     def closedPosition(
-        self: _ChordType,
+        self,
         *,
         forceOctave: int|None = None,
         inPlace: t.Literal[True],
@@ -1492,21 +1495,21 @@ class Chord(ChordBase):
 
     @overload
     def closedPosition(
-        self: _ChordType,
+        self,
         *,
         forceOctave: int|None = None,
         inPlace: t.Literal[False] = False,
         leaveRedundantPitches: bool = False
-    ) -> _ChordType:
+    ) -> t.Self:
         ...
 
     def closedPosition(
-        self: _ChordType,
+        self,
         *,
         forceOctave: int|None = None,
         inPlace: bool = False,
         leaveRedundantPitches: bool = False
-    ) -> _ChordType|None:
+    ) -> t.Self|None:
         '''
         Returns a new Chord object with the same pitch classes,
         but now in closed position.
@@ -2188,8 +2191,8 @@ class Chord(ChordBase):
 
     def hasAnyEnharmonicSpelledPitches(self) -> bool:
         '''
-        Returns True if for any given pitchClass there is at most one spelling of the note
-        (in any octave).
+        Returns True if for any given pitchClass there is more than one spelling of the note
+        in any octave (e.g., C#4 and D-5).
 
         >>> cChord = chord.Chord('C4 E4 G4 C5')
         >>> cChord.hasAnyEnharmonicSpelledPitches()
@@ -4008,7 +4011,7 @@ class Chord(ChordBase):
 
     @overload
     def semiClosedPosition(
-        self: _ChordType,
+        self,
         *,
         forceOctave,
         inPlace: t.Literal[True],
@@ -4018,21 +4021,21 @@ class Chord(ChordBase):
 
     @overload
     def semiClosedPosition(
-        self: _ChordType,
+        self,
         *,
         forceOctave=None,
         inPlace: t.Literal[False] = False,
         leaveRedundantPitches=False
-    ) -> _ChordType:
+    ) -> t.Self:
         return self
 
     def semiClosedPosition(
-        self: _ChordType,
+        self,
         *,
         forceOctave: int|None = None,
         inPlace: t.Literal[True]|t.Literal[False] = False,
         leaveRedundantPitches: bool = False
-    ) -> None|_ChordType:
+    ) -> None|t.Self:
         # noinspection PyShadowingNames
         '''
         Similar to :meth:`~music21.chord.Chord.ClosedPosition` in that it
@@ -4072,8 +4075,7 @@ class Chord(ChordBase):
             c2 = self
 
         if t.TYPE_CHECKING:
-            from music21.stream import Stream
-            assert isinstance(c2, Stream)
+            assert isinstance(c2, stream.Stream)
         # startOctave = c2.bass().octave
         remainingPitches = copy.copy(c2.pitches)  # no deepcopy needed
 
@@ -6134,8 +6136,7 @@ class Test(unittest.TestCase):
         testCopyAll(self, globals())
 
 
-
-_DOC_ORDER = [Chord]
+_DOC_ORDER = [Chord, ChordBase, fromForteClass, fromIntervalVector]
 
 
 if __name__ == '__main__':

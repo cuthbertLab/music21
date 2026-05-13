@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 # Name:         search.serial.py
 # Purpose:      music21 classes for serial searching

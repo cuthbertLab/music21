@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 # Name:         testPrimitive.py
 # Purpose:      MusicXML test files

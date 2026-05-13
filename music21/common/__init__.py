@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 # Name:         common.py
 # Purpose:      Basic Utilities
@@ -34,24 +33,36 @@ __all__ = [
     'objects',
     'pathTools',
     'parallel',
+    'stringTools',
     'types',
     'weakrefTools',
 ]
 
-from music21 import defaults
-from music21 import exceptions21
+from music21.common import classTools
 from music21.common.classTools import *  # including isNum, isListLike
+from music21.common import decorators
 from music21.common.decorators import *  # gives the deprecated decorator
+from music21.common import enums
 from music21.common.enums import *
+from music21.common import fileTools
 from music21.common.fileTools import *  # file tools.
+from music21.common import formats
 from music21.common.formats import *  # most are deprecated!
+from music21.common import misc
 from music21.common.misc import *  # most are deprecated!
+from music21.common import numberTools
 from music21.common.numberTools import *  # including opFrac
+from music21.common import objects
 from music21.common.objects import *
+from music21.common import pathTools
 from music21.common.pathTools import *
+from music21.common import parallel
 from music21.common.parallel import *
+from music21.common import stringTools
 from music21.common.stringTools import *
+from music21.common import types
 from music21.common.types import *
+from music21.common import weakrefTools
 from music21.common.weakrefTools import *  # including wrapWeakref
 
 DEBUG_OFF = 0

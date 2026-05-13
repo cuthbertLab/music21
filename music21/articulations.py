@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 # Name:         articulations.py
 # Purpose:      music21 classes for representing articulations

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 # Name:         romanText/base.py
 # Purpose:      test files for roman numeral text analysis

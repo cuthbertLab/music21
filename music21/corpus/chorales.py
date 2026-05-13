@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 # Name:         corpus/chorales.py
 # Purpose:      Access to the chorale collection
@@ -1169,7 +1168,7 @@ class Iterator:
         _currentIndex becomes higher than the _highestIndex, the iteration stops.
         '''
         if self._currentIndex > self._highestIndex:
-            raise StopIteration
+            raise StopIteration()
         nextChorale = self._returnChorale()
         self._currentIndex += 1
         return nextChorale
@@ -1274,7 +1273,7 @@ class Iterator:
                 try:
                     nextIndex = self._currentIndex + 1
                     riemenschneiderName = ('bach/choraleAnalyses/'
-                                           + f'riemenschneider{nextIndex:03d}.rntxt')
+                                           f'riemenschneider{nextIndex:03d}.rntxt')
                     analysis = corpus.parse(riemenschneiderName)
                     if analysis is not None:
                         chorale.insert(0, analysis.parts[0])
@@ -1583,7 +1582,7 @@ class Iterator:
                 else:
                     raise BachException(
                         f'{value} does not correspond to a chorale in the '
-                        + f'{self.numberingSystem} numbering system'
+                        f'{self.numberingSystem} numbering system'
                     )
 
         elif self._iterationType == 'index':
@@ -1700,7 +1699,7 @@ class Iterator:
                 else:
                     raise BachException(
                         f'{value} does not correspond to a chorale in the '
-                        + f'{self.numberingSystem} numbering system'
+                        f'{self.numberingSystem} numbering system'
                     )
 
     # - Return Type

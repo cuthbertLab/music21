@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 # Name:         testSerialization.py
 # Purpose:      tests for serializing music21 objects

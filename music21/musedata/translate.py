@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 # Name:         musedata.translate.py
 # Purpose:      Translate MuseData into music21 objects

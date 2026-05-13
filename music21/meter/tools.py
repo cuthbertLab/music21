@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # -----------------------------------------------------------------------------
 # Name:         meter.tools.py
 # Purpose:      Tools for working with meter
@@ -157,10 +156,10 @@ def slashMixedToFraction(valueSrc: str) -> tuple[NumDenomTuple, bool]:
             except ValueError:
                 raise Music21Exception(
                     'Cannot parse this file -- this error often comes '
-                    + 'up if the musicxml pickled file is out of date after a change '
-                    + 'in musicxml/__init__.py . '
-                    + 'Clear your temp directory of .p and .p.gz files and try again. '
-                    + f'Time Signature: {valueSrc} ')
+                    'up if the musicxml pickled file is out of date after a change '
+                    'in musicxml/__init__.py . '
+                    'Clear your temp directory of .p and .p.gz files and try again. '
+                    f'Time Signature: {valueSrc} ')
 
     post: list[NumDenom] = []
     # when encountering a missing denominator, find the first defined

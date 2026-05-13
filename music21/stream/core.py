@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # -----------------------------------------------------------------------------
 # Name:         stream/core.py
 # Purpose:      mixin class for the core elements of Streams
@@ -195,9 +194,9 @@ class StreamCore(Music21Object):
         try:
             # try first, for the general case of not OffsetSpecial.
             offset = opFrac(offset)  # type: ignore
-        except TypeError:
+        except TypeError as te:
             if offset not in OffsetSpecial:  # pragma: no cover
-                raise StreamException(f'Cannot set offset to {offset!r} for {element}')
+                raise StreamException(f'Cannot set offset to {offset!r} for {element}') from te
 
         idEl = id(element)
         if not addElement and idEl not in self._offsetDict:
@@ -427,7 +426,7 @@ class StreamCore(Music21Object):
                         if eInStream is element:
                             raise StreamException(
                                 f'the object ({element!r}, id()={id(element)} '
-                                + f'is already found in this Stream ({self!r}, id()={id(self)})'
+                                f'is already found in this Stream ({self!r}, id()={id(self)})'
                             )
                 # something was old. delete from _offsetDict
                 # environLocal.warn('stale object')
@@ -470,7 +469,7 @@ class StreamCore(Music21Object):
         highly optimized data structure for searching through elements and
         offsets.
 
-        >>> score = tree.makeExampleScore()
+        >>> score = tree.examples.makeExampleScore()
         >>> scoreTree = score.asTimespans()
         >>> print(scoreTree)
         <TimespanTree {20} (0.0 to 8.0) <music21.stream.Score exampleScore>>
@@ -519,7 +518,7 @@ class StreamCore(Music21Object):
 
         See tree.fromStream.asTree() for more details.
 
-        >>> score = tree.makeExampleScore()
+        >>> score = tree.examples.makeExampleScore()
         >>> scoreTree = score.asTree(flatten=True)
         >>> scoreTree
         <ElementTree {20} (0.0 <0.-25...> to 8.0) <music21.stream.Score exampleScore>>
@@ -527,9 +526,9 @@ class StreamCore(Music21Object):
         if t.TYPE_CHECKING:
             assert isinstance(self, Stream)
         hashedAttributes = hash((tuple(classList or ()),
-                                  flatten,
-                                  useTimespans,
-                                  groupOffsets))
+                                 flatten,
+                                 useTimespans,
+                                 groupOffsets))
         cacheKey = 'elementTree' + str(hashedAttributes)
         if cacheKey not in self._cache or self._cache[cacheKey] is None:
             hashedElementTree = tree.fromStream.asTree(self,
@@ -693,7 +692,7 @@ class StreamCore(Music21Object):
         '''
         sb = self.spannerBundle
         sIter: StreamIterator|RecursiveIterator
-        if recurse is True:
+        if recurse:
             sIter = self.recurse()  # type: ignore
         else:
             sIter = self.iter()  # type: ignore
@@ -708,16 +707,16 @@ class StreamCore(Music21Object):
                 if constrainingSpannerBundle is not None and sp not in constrainingSpannerBundle:
                     continue
                 if requireAllPresent:
-                    allFound = True
+                    allFound: bool = True
                     for spannedElement in sp.getSpannedElements():
                         if spannedElement not in sIter:
                             allFound = False
                             break
-                    if allFound is False:
+                    if not allFound:
                         continue
                 collectList.append(sp)
 
-        if insert is False:
+        if not insert:
             return collectList
 
         if collectList:  # do not run elementsChanged if nothing here.

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 # Name:         commonTest.py
 # Purpose:      Things common to testing
@@ -22,7 +21,6 @@ import os
 import sys
 import typing
 import types
-import unittest
 import unittest.runner
 from unittest.signals import registerResult
 import warnings
@@ -92,12 +90,12 @@ def testImports():
     '''
     # pylint: disable=unused-import
     try:
-        import scipy  # type: ignore
+        import scipy  # type: ignore  # noqa: F401
     except ImportError as e:
         raise ImportError('pip install scipy : needed for running test suites') from e
 
     try:
-        from Levenshtein import StringMatcher  # type: ignore
+        from Levenshtein import StringMatcher  # type: ignore  # noqa: F401
     except ImportError as e:
         raise ImportError('pip install python-Levenshtein : needed for running test suites') from e
 
@@ -350,7 +348,8 @@ class ModuleGather:
         if fn.startswith(os.sep):
             fn = fn[1:]
         fn = fn.replace(os.sep, '_')  # replace w/ _
-        fn = fn.replace('.py', '')
+        if fn.endswith('.py'):
+            fn = fn[:-3]
         return fn
 
     def _getNamePeriod(self, fp, *, addM21=False):
@@ -365,11 +364,11 @@ class ModuleGather:
         '''
         fn = fp.replace(self.dirParent, '')  # remove parent
         parts = [x for x in fn.split(os.sep) if x]
-        if parts[-1] == '__init__.py':
+        if parts[-1].endswith('.py'):
+            parts[-1] = parts[-1][:-3]
+        if parts[-1] == '__init__':
             parts.pop()
         fn = '.'.join(parts)  # replace w/ period
-
-        fn = fn.replace('.py', '')
         if addM21 and fn:
             fn = 'music21.' + fn
         elif addM21:

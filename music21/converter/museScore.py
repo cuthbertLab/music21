@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 # Name:         converter/museScore.py
 # Purpose:      music21 to MuseScore connection

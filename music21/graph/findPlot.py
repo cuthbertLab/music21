@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 # Name:         graph/findPlot.py
 # Purpose:      Functions that find appropriate plots for graph.plot
@@ -368,7 +367,7 @@ def getPlotsToMake(graphFormat: str|None = None,
 
     # no matches for values.  Try agnostic about X and Y
     graphRemove = []
-    for axisLetter, axisValue in (('x', xValue), ('y', yValue), ('z', zValue)):
+    for _axisLetter, axisValue in (('x', xValue), ('y', yValue), ('z', zValue)):
         for gc in graphClasses:
             if axisValue is None:
                 continue
