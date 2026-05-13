@@ -5,8 +5,9 @@
 # Authors:      Michael Scott Asato Cuthbert
 #               Christopher Ariza
 #               Jacob Tyler Walls
+#               Greg Chapman
 #
-# Copyright:    Copyright © 2009-2024 Michael Scott Asato Cuthbert
+# Copyright:    Copyright © 2009-2026 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 from __future__ import annotations
@@ -1502,7 +1503,7 @@ class PartParser(XMLParserBase):
 
         self.lastTimeSignature: meter.TimeSignature|None = None
         self.lastMeasureWasShort = False
-        self.lastMeasureOffset = 0.0
+        self.lastMeasureOffset: OffsetQL = 0.0
 
         # a dict of clefs per staff number
         self.lastClefs: dict[int, clef.Clef|None] = {NO_STAFF_ASSIGNED: clef.TrebleClef()}
@@ -2379,9 +2380,7 @@ class PartParser(XMLParserBase):
 # -----------------------------------------------------------------------------
 class MeasureParser(SoundTagMixin, XMLParserBase):
     '''
-    parser to work with a single <measure> tag.
-
-    called out for simplicity.
+    A parser that works with a single <measure> tag.
 
     >>> from xml.etree.ElementTree import fromstring as EL
 
@@ -2422,6 +2421,7 @@ class MeasureParser(SoundTagMixin, XMLParserBase):
         # Note: <print> is handled separately
         # <sound> and xmlSound are found in xmlSoundParser.py
     }
+
     def __init__(self,
                  mxMeasure: ET.Element|None = None,
                  parent: PartParser|None = None):
@@ -2499,6 +2499,10 @@ class MeasureParser(SoundTagMixin, XMLParserBase):
         # inserted into a Stream).
         # key is PedalMark; value is OffsetQL
         self.pedalToStartOffset: weakref.WeakKeyDictionary = weakref.WeakKeyDictionary()
+
+        # For parts with multiple staves, we want to keep track of what staffKey
+        # a spanner that is waiting its conclusion is a assigned to:
+        self.pendingRefIdToStaff: dict[int, int] = {}
 
     @staticmethod
     def getStaffNumber(mxObjectOrNumber) -> int:
@@ -2665,21 +2669,18 @@ class MeasureParser(SoundTagMixin, XMLParserBase):
         leftOverPendingFirstSpannedElements: list[spanner.PendingAssignmentRef] = (
             self.spannerBundle.popPendingSpannedElementAssignments()
         )
-        for pfse in leftOverPendingFirstSpannedElements:
+        for pendingRef in leftOverPendingFirstSpannedElements:
             # Note that these are all start elements, so we can't just
             # addSpannedElement, we need to insertFirstSpannedElement.
-            sp: spanner.Spanner = pfse['spanner']
-            offsetInScore: OffsetQL|None = pfse['offsetInScore']
-            staffKey: t.Any|None = pfse['staffKey']
-            if t.TYPE_CHECKING:
-                assert isinstance(offsetInScore, OffsetQL)
-                assert isinstance(staffKey, int)
+            sp: spanner.Spanner = pendingRef.spanner
+            offsetInScore: OffsetQL = pendingRef.offsetInScore or 0.0  # or 0.0 for typechecker
+            staffKey: int = self.pendingRefIdToStaff[id(pendingRef)]
             startAnchor = spanner.SpannerAnchor()
             offsetInMeasure: OffsetQL = opFrac(offsetInScore - self.measureOffsetInScore)
             self.insertCoreAndRef(offsetInMeasure, staffKey, startAnchor)
             sp.insertFirstSpannedElement(startAnchor)
 
-        if self.useVoices is True:
+        if self.useVoices:
             for v in self.stream.iter().voices:
                 if v:  # do not bother with empty voices
                     # the musicDataMethods use insertCore, thus the voices need to run
@@ -3577,9 +3578,7 @@ class MeasureParser(SoundTagMixin, XMLParserBase):
 
         # attr dynamics -- MIDI Note On velocity with 90 = 100, but unbounded on the top
         dynamPercentage = mxNote.get('dynamics')
-        if dynamPercentage is not None and not n.isRest:
-            if t.TYPE_CHECKING:
-                assert not isinstance(n, note.Rest)
+        if dynamPercentage is not None and not isinstance(n, note.Rest):
             dynamFloat = float(dynamPercentage) * (90 / 12700)
             n.volume.velocityScalar = dynamFloat
 
@@ -4253,7 +4252,7 @@ class MeasureParser(SoundTagMixin, XMLParserBase):
         mxObj: ET.Element,
         staffKey: int,
         totalOffset: OffsetQL
-    ):
+    ) -> list[spanner.Spanner]:
         # noinspection PyShadowingNames
         '''
         Some spanners, such as MusicXML wedge, bracket, dashes, pedal,
@@ -4366,12 +4365,12 @@ class MeasureParser(SoundTagMixin, XMLParserBase):
 
             if mType != 'stop':
                 sp = self.xmlOneSpanner(mxObj, None, spClass, allowDuplicateIds=True)
-                self.spannerBundle.setPendingSpannedElementAssignment(
+                pendingRef = self.spannerBundle.setPendingSpannedElementAssignment(
                     sp,
                     'GeneralNote',
                     opFrac(self.measureOffsetInScore + totalOffset),
-                    staffKey
                 )
+                self.pendingRefIdToStaff[id(pendingRef)] = staffKey
                 returnList.append(sp)
             else:
                 idFound = mxObj.get('number')
@@ -4405,12 +4404,12 @@ class MeasureParser(SoundTagMixin, XMLParserBase):
                     sp.startTick = mxObj.get('line-end')
                     sp.lineType = mxObj.get('line-type')  # redundant with setLineStyle()
 
-                self.spannerBundle.setPendingSpannedElementAssignment(
+                pendingRef = self.spannerBundle.setPendingSpannedElementAssignment(
                     sp,
                     'GeneralNote',
                     opFrac(self.measureOffsetInScore + totalOffset),
-                    staffKey
                 )
+                self.pendingRefIdToStaff[id(pendingRef)] = staffKey
                 self.spannerBundle.append(sp)
                 returnList.append(sp)
 
@@ -4469,12 +4468,12 @@ class MeasureParser(SoundTagMixin, XMLParserBase):
                     sp.placement = 'above'
                 sp.idLocal = idFound
                 sp.type = (mxSize or 8, m21Type)
-                self.spannerBundle.setPendingSpannedElementAssignment(
+                pendingRef = self.spannerBundle.setPendingSpannedElementAssignment(
                     sp,
                     'GeneralNote',
                     opFrac(self.measureOffsetInScore + totalOffset),
-                    staffKey
                 )
+                self.pendingRefIdToStaff[id(pendingRef)] = staffKey
                 self.spannerBundle.append(sp)
                 returnList.append(sp)
 
@@ -4523,12 +4522,12 @@ class MeasureParser(SoundTagMixin, XMLParserBase):
                 if mxAbbreviated == 'yes':
                     sp.abbreviated = True
 
-                self.spannerBundle.setPendingSpannedElementAssignment(
+                pendingRef = self.spannerBundle.setPendingSpannedElementAssignment(
                     sp,
                     'GeneralNote',
                     opFrac(self.measureOffsetInScore + totalOffset),
-                    staffKey
                 )
+                self.pendingRefIdToStaff[id(pendingRef)] = staffKey
                 self.spannerBundle.append(sp)
                 returnList.append(sp)
 
