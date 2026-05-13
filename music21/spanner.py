@@ -1334,30 +1334,18 @@ class SpannerBundle(prebase.ProtoM21Object):
         which is passed to the SpannerBundle via freePendingSpannedElementAssignment()
         will get it.
 
-        There are two ways to use the PendingSpannedElement APIs.  One
-        where setPendingSpannedElementAssignment is called without specifying
-        offsetInScore and freePendingSpannedElementAssignment
-        is called without specifying a matching offset; and a more specific way where
-        setPendingSpannedElementAssignment is called with an offsetInScore,
-        freePendingSpannedElementAssignment is called
-        with a matching offset, and then popPendingSpannedElementAssignments is
-        called to get all the remaining pending assignments, so that SpannerAnchors
-        can be created for them (since there was no note found at the specified
-        offsetInScore).
+        Call `popPendingSpannedElementAssignments` after parsing to
+        recover pending spanners that never matched their expected elements
+        — e.g., a MusicXML `<direction>` whose
+        `<offset>` lands between notes, needing a `SpannerAnchor` instead.
 
-        The new way is useful (for example) for importing a <direction> from
-        MusicXML that has <offset> specified, so that the next note parsed after
-        the <direction> will not be at the correct offsetInScore for the start
-        of the direction, and a SpannerAnchor will be required instead.
-
-        Usage without offset:
+        First, let's see the usage without an explicit offset:
 
         Create some notes and a rest.
 
         >>> n1 = note.Note('C')
         >>> r1 = note.Rest()
         >>> n2 = note.Note('D')
-        >>> n3 = note.Note('E')
 
         Notes start without any associated spanners.
 
@@ -1400,13 +1388,13 @@ class SpannerBundle(prebase.ProtoM21Object):
         [<music21.spanner.Slur <music21.note.Note C>>]
 
         Once the pending assignment has been satisfied, the registration is cleared
-        from the SpannerBundle, so no future notes that would have satified the assignment
+        from the SpannerBundle, so no future notes that would have satisfied the assignment
         get assigned:
 
-        >>> sb1.freePendingSpannedElementAssignment(n3)
-        >>> n3 in su1
+        >>> sb1.freePendingSpannedElementAssignment(n2)
+        >>> n2 in su1
         False
-        >>> n3.getSpannerSites()
+        >>> n2.getSpannerSites()
         []
 
         And we can see that the SpannerBundle `sb1` has no spanners still awaiting (pending)
@@ -1421,19 +1409,19 @@ class SpannerBundle(prebase.ProtoM21Object):
 
         Create two notes and a rest.
 
-        >>> n4 = note.Note('C#')
+        >>> n3 = note.Note('C#')
         >>> wrongOffsetNote = note.Note('B')
         >>> r2 = note.Rest()
 
-        Create a slur with `n4` already in it.
+        Create a slur with `n3` already in it.
 
         >>> sb2 = spanner.SpannerBundle()
-        >>> su2 = spanner.Slur([n4])
+        >>> su2 = spanner.Slur([n3])
         >>> sb2.append(su2)
         >>> su2.getSpannedElements()
         [<music21.note.Note C#>]
 
-        Register a pending on `su2` looking for the next Note at offset 4.0:
+        Register `su2` as pending and looking for the next Note at offset 4.0:
 
         >>> ref = sb2.setPendingSpannedElementAssignment(su2, 'Note', 4.0)
         >>> ref
@@ -1451,7 +1439,11 @@ class SpannerBundle(prebase.ProtoM21Object):
         >>> wrongOffsetNote in su2
         False
 
-        Again, it will not get a rest, even at the correct offsetInScore,
+        (Passing an offset here is important since, when parsing MusicXML,
+        if a `<direction>` has `<offset>` specified, the next note might not be the one
+        at the start of the spanner)
+
+        The freePending method will not get a rest even at the correct offsetInScore
         because it is not the class being searched for.
 
         >>> sb2.freePendingSpannedElementAssignment(r2, 4.0)
@@ -1485,7 +1477,7 @@ class SpannerBundle(prebase.ProtoM21Object):
         with the right offset. (We'll demonstrate also that you need to pass
         in your own fractions.)
 
-        >>> frac = music21.common.numberTools.opFrac
+        >>> frac = common.numberTools.opFrac
         >>> n4 = note.Note('G')
         >>> n5 = note.Note('A')
         >>> su3 = spanner.Slur([n4])
@@ -1498,13 +1490,13 @@ class SpannerBundle(prebase.ProtoM21Object):
         >>> n5 in su3
         True
 
-        An important detail demonstrated above a freed element is always inserted as the
+        An important detail demonstrated above is that a freed element is always inserted as the
         first element of the spanner, even when the spanner already has
-        other elements. The insert-at-front behavior is important for MusicXML parsing, since
-        a `<direction>` is often encountered before
+        other elements. (Note A is before note G in the slur).
+        The insert-at-front behavior is important for MusicXML parsing, since
+        a `<direction>` specified is often encountered before
         the note that should *start* the spanner (because of voices, other classes, etc.),
         so when the starting note arrives it needs to go to the start.
-
         '''
         ref = PendingAssignmentRef(
             spanner=sp,
