@@ -41,7 +41,6 @@ classifiers = [
     "Typing :: Typed",
 ]
 
-# when hatch-requirements-txt is stable, replace with that
 dependencies = [
     "chardet",
     "joblib",
@@ -54,21 +53,29 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
+extras = [
+    'python-Levenshtein',
+    'scipy',
+]
+
+[dependency-groups]
+# `dev` pulls in every extra via the `music21[extras]` self-reference
+# so `uv sync` alone is enough to develop and test music21.
 dev = [
+    'music21[extras]',
     'coverage',
     'coveralls',
     'docutils',
     'hatch',
     'hatchling',
+    'ipython',
     'jupyter',
     'mypy>=1.16.0',
     'nbconvert',
     'nbval',
     'pylint>=3.2.0',
     'pytest',
-    'python-Levenshtein',
     'ruff',
-    'scipy',
     'sphinx',
     'twine',
     'types-requests',
@@ -83,6 +90,9 @@ email = "michael.asato.cuthbert@gmail.com"
 Download = "https://github.com/cuthbertLab/music21/releases/"
 Homepage = "https://github.com/cuthbertLab/music21"
 Documentation = "https://www.music21.org/music21docs/"
+
+[tool.uv]
+default-groups = ["dev"]
 
 [tool.hatch.version]
 path = "music21/_version.py"
@@ -167,3 +177,8 @@ docstring-quotes = 'single'
 [tool.pytest.ini_options]
 addopts = ['--doctest-modules', '-p', 'music21.test.pytest_plugin']
 doctest_optionflags = ['NORMALIZE_WHITESPACE', 'ELLIPSIS']
+# defaults are test_*.py and *_test.py; add tests.py so that
+# music21's house style (e.g. stream/tests.py, humdrum/tests.py) is picked up
+# during directory-based collection.  --doctest-modules collects doctests from
+# every .py regardless of this list.
+python_files = ['test_*.py', '*_test.py', 'tests.py']

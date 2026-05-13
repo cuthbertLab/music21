@@ -25,7 +25,7 @@ import warnings
 from music21 import common
 from music21.common.classTools import tempAttribute, saveAttributes
 from music21.common.enums import OffsetSpecial
-from music21.common.types import M21ObjType, StreamType, ChangedM21ObjType
+from music21.common.types import M21ObjType, OffsetQLIn, StreamType, ChangedM21ObjType
 from music21 import note
 from music21.stream import filters
 from music21 import prebase
@@ -1571,7 +1571,7 @@ class OffsetIterator(StreamIterator, Sequence[list[M21ObjType]]):
                          )
         self.raiseStopIterationNext = False
         self.nextToYield: list[M21ObjType] = []
-        self.nextOffsetToYield = None
+        self.nextOffsetToYield: OffsetQLIn|None = None
 
     def __next__(self) -> list[M21ObjType]:  # type: ignore
         if self.raiseStopIterationNext:

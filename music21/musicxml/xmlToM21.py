@@ -30,7 +30,7 @@ from music21 import common
 from music21 import defaults
 from music21 import duration
 from music21 import dynamics
-from music21.common.enums import OrnamentDelay
+from music21.common.enums import OffsetSpecial, OrnamentDelay
 from music21.common.numberTools import opFrac, nearestMultiple
 from music21 import editorial
 from music21 import environment
@@ -1874,7 +1874,9 @@ class PartParser(XMLParserBase):
                     targetElem = sourceElem  # do not make a copy if not yet in staff.
                     appendedElementIds.add(idSource)
                 sourceOffset = source.elementOffset(sourceElem, returnSpecial=True)
-                if sourceOffset != 'highestTime':
+                if sourceOffset != OffsetSpecial.AT_END:
+                    # the other OffsetSpecials are not returned from elementOffset
+                    assert not isinstance(sourceOffset, OffsetSpecial)
                     target.coreInsert(sourceOffset, targetElem)
                 else:
                     target.coreStoreAtEnd(targetElem)
@@ -5428,7 +5430,7 @@ class MeasureParser(SoundTagMixin, XMLParserBase):
         self.setPrintObject(mxHarmony, cs)
 
         # TODO: attr: print-frame
-        # TODO: attrGroup: placement
+        self.setPlacement(mxHarmony, cs)
         # TODO: attr: use-symbols
         # TODO: attr: stack-degrees
         # TODO: attr: parentheses-degrees

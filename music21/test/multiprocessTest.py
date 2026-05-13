@@ -165,7 +165,7 @@ def mainPoolRunner(testGroup=('test',), restoreEnvironmentDefaults=False, leaveO
         eventsProcessed = 0
         summaryOutput = []
 
-        while continueIt is True:
+        while continueIt:
             try:
                 newResult = res.next(timeout=1)
                 if timeouts >= 5:

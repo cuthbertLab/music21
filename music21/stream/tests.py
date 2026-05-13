@@ -6438,7 +6438,7 @@ class Test(unittest.TestCase):
         s1.repeatAppend(note.Note(), 10)
         s1Flat = s1.flatten()
         self.assertIs(s1Flat.derivation.origin, s1)
-        self.assertEqual(s1Flat.derivation.method, 'flat')
+        self.assertEqual(s1Flat.derivation.method, 'flatten')
 
         s1Elements = s1Flat.getElementsByClass(note.Note).stream()
         self.assertEqual(s1Elements.derivation.method, 'getElementsByClass')
@@ -8717,8 +8717,8 @@ class Test(unittest.TestCase):
         m.append(note.Note(type='eighth'))
         m.append(note.Note(type='eighth'))
 
-        m.makeBeams(inPlace=True)
-        beams = self.get_beams_from_stream(m)
+        m2 = m.makeBeams()
+        beams = self.get_beams_from_stream(m2)
 
         no_beam = beam.Beams()
         start_beam = beam.Beams()
@@ -8730,9 +8730,8 @@ class Test(unittest.TestCase):
 
         m.paddingRight = 0.5
         m.append(note.Note(type='eighth'))
-
-        m.makeBeams(inPlace=True)
-        beams = self.get_beams_from_stream(m)
+        m3 = m.makeBeams()
+        beams = self.get_beams_from_stream(m3)
 
         self.assertEqual(beams, [no_beam, no_beam, start_beam, stop_beam])
 

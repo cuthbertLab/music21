@@ -51,9 +51,9 @@ environLocal = environment.Environment(__file__)
 def makeBeams(
     s: StreamType,
     *,
-    inPlace=False,
-    setStemDirections=True,
-    failOnNoTimeSignature=False,
+    inPlace: bool = False,
+    setStemDirections: bool = True,
+    failOnNoTimeSignature: bool = False,
 ) -> StreamType|None:
     # noinspection PyShadowingNames
     '''
@@ -67,9 +67,9 @@ def makeBeams(
     If `inPlace` is True, this is done in-place; if `inPlace` is False,
     this returns a modified deep copy.
 
-    .. note: Before Version 1.6, `inPlace` default was `True`; now `False`
-             like most `inPlace` options in music21.  Also, in 1.8, no tuplets are made
-             automatically.  Use makeTupletBrackets()
+    .. note:: Before Version 1.6, `inPlace` default was `True`; now `False`
+        like most `inPlace` options in music21.  Also, in 1.8, no tuplets are made
+        automatically.  Use makeTupletBrackets()
 
     See :meth:`~music21.meter.TimeSignature.getBeams` for the algorithm used.
 
@@ -225,8 +225,9 @@ def makeBeams(
         setStemDirectionForBeamGroups(returnObj)
 
     returnObj.streamStatus.beams = True
-    if inPlace is not True:
+    if not inPlace:
         return returnObj
+    return None
 
 
 def makeMeasures(
@@ -707,7 +708,7 @@ def makeMeasures(
         for e in postSorted:
             # may need to handle spanners; already have s as site
             s.insert(post.elementOffset(e), e)
-
+        return None
 
 def makeRests(
     s: StreamType,
@@ -2047,6 +2048,7 @@ def consolidateCompletedTuplets(
         - be consecutive (with respect to :class:`~music21.note.GeneralNote` objects)
         - be all rests, or all :class:`~music21.note.NotRest`s with equal `.pitches`
         - all have :attr:`~music21.duration.Duration.expressionIsInferred` = `True`.
+        - not begin during a tuplet
         - sum to the tuplet's total length
         - if `NotRest`, all must be tied (if `onlyIfTied` is True)
 
@@ -2065,7 +2067,7 @@ def consolidateCompletedTuplets(
     >>> [el.quarterLength for el in s.notesAndRests]
     [0.5, Fraction(1, 6), Fraction(1, 6), Fraction(1, 6)]
 
-    `mustBeTied` is `True` by default:
+    `onlyIfTied` is `True` by default:
 
     >>> s2 = stream.Stream()
     >>> n = note.Note(quarterLength=1/3)
@@ -2092,71 +2094,38 @@ def consolidateCompletedTuplets(
 
     Does nothing if there are multiple (nested) tuplets.
     '''
-    def is_reexpressible(gn: note.GeneralNote) -> bool:
-        return (
-            gn.duration.expressionIsInferred
-            and len(gn.duration.tuplets) < 2
-            and (gn.isRest or gn.tie is not None or not onlyIfTied)
-        )
-
+    search_state = duration.TupletSearchState(onlyIfTied=onlyIfTied)
     iterator: Iterable[stream.Stream]
     if recurse:
         iterator = s.recurse(streamsOnly=True, includeSelf=True)
     else:
         iterator = [s]
     for container in iterator:
-        reexpressible = [gn for gn in container.notesAndRests if is_reexpressible(gn)]
-        to_consolidate: list[note.GeneralNote] = []
-        partial_tuplet_sum: OffsetQL = 0.0
-        last_tuplet: duration.Tuplet|None = None
-        completion_target: OffsetQL|None = None
-        for gn in reexpressible:
-            prev_gn = gn.previous(note.GeneralNote, activeSiteOnly=True)
-            if (
-                prev_gn in to_consolidate
-                and (
-                    (isinstance(gn, note.Rest) and isinstance(prev_gn, note.Rest))
-                    or (
-                        isinstance(gn, note.NotRest)
-                        and isinstance(prev_gn, note.NotRest)
-                        and gn.pitches == prev_gn.pitches
-                    )
-                )
-                and opFrac(prev_gn.offset + prev_gn.quarterLength) == gn.offset
-                and len(gn.duration.tuplets) == 1 and gn.duration.tuplets[0] == last_tuplet
-            ):
-                partial_tuplet_sum = opFrac(partial_tuplet_sum + gn.quarterLength)
-                to_consolidate.append(gn)
+        search_state.reset()
+        for gn in container.notesAndRests:
+            search_state.advance_tuplet_sum(gn)
+            if search_state.should_be_tested(gn):
+                try:
+                    search_state.append(gn)
+                except ValueError:
+                    # Not in a tuplet, keep scanning.
+                    pass
+            elif search_state.to_consolidate:
+                # Found during an incomplete tuplet, but doesn't match it.
+                search_state.mark_no_consolidation()
 
-                if partial_tuplet_sum == completion_target:
+            if search_state.partial_tuplet_sum == search_state.completion_target:
+                if consolidatableNotes := search_state.get_consolidatable_notes():
                     # set flag to remake tuplet brackets
                     container.streamStatus.tuplets = False
-                    first_note_in_group = to_consolidate[0]
-                    for other_note in to_consolidate[1:]:
+                    first_note_in_group = consolidatableNotes[0]
+                    for other_note in consolidatableNotes[1:]:
                         container.remove(other_note)
                     first_note_in_group.duration.clear()
                     first_note_in_group.duration.tuplets = ()
-                    first_note_in_group.quarterLength = completion_target
+                    first_note_in_group.quarterLength = search_state.completion_target
+                search_state.reset()
 
-                    # reset search values
-                    to_consolidate = []
-                    partial_tuplet_sum = 0.0
-                    last_tuplet = None
-                    completion_target = None
-            else:
-                # reset to current values
-                if gn.duration.tuplets:
-                    partial_tuplet_sum = gn.quarterLength
-                    last_tuplet = gn.duration.tuplets[0]
-                    if t.TYPE_CHECKING:
-                        assert last_tuplet is not None
-                    completion_target = last_tuplet.totalTupletLength()
-                    to_consolidate = [gn]
-                else:
-                    to_consolidate = []
-                    partial_tuplet_sum = 0.0
-                    last_tuplet = None
-                    completion_target = None
 
 @contextlib.contextmanager
 def saveAccidentalDisplayStatus(s) -> t.Generator[None, None, None]:
@@ -2301,7 +2270,9 @@ class Test(unittest.TestCase):
             n.stemDirection = dStems[i]
         p.makeBeams(inPlace=True)
         self.assertEqual([n.stemDirection for n in p.flatten().notes],
-                         ['up'] * 4 + ['down'] * 6 + ['up'] * 4
+                         ['up'] * 4
+                         + ['down'] * 6
+                         + ['up'] * 4
                          + ['down', 'noStem', 'double', 'down']
                          )
 
@@ -2327,11 +2298,12 @@ class Test(unittest.TestCase):
         from music21 import stream
 
         p = converter.parse('tinyNotation: 2/4 r2 d8 d8 d8 d8')
-        m2 = p[stream.Measure].last()
-        self.assertIsNone(m2.timeSignature)
+        m = p[stream.Measure].last()
+        self.assertIsNone(m.timeSignature)
+        m_n0 = m.notes.first()
+        self.assertEqual(len(m_n0.beams.beamsList), 0)
+        m2 = m.makeBeams()
         m2_n0 = m2.notes.first()
-        self.assertEqual(len(m2_n0.beams.beamsList), 0)
-        m2.makeBeams(inPlace=True)
         self.assertEqual(len(m2_n0.beams.beamsList), 1)
 
         # Failure if no TimeSignature in context
@@ -2339,7 +2311,7 @@ class Test(unittest.TestCase):
         m1.timeSignature = None
         msg = 'cannot process beams in a Measure without a time signature'
         with self.assertRaisesRegex(stream.StreamException, msg):
-            m2.makeBeams(inPlace=True, failOnNoTimeSignature=True)
+            m1.makeBeams(failOnNoTimeSignature=True)
 
     def testStreamExceptions(self):
         from music21 import converter
@@ -2373,6 +2345,21 @@ class Test(unittest.TestCase):
         self.assertEqual(pp[stream.Measure][1].notes.first().duration.quarterLength, 24.0)
         self.assertEqual(len(pp[stream.Measure][2].notes), 1)
         self.assertEqual(pp[stream.Measure][2].notes.first().duration.quarterLength, 24.0)
+
+    def testConsolidateCompletedTupletsNoFalsePositive(self):
+        from fractions import Fraction
+        from music21 import converter
+
+        s = converter.parse('tinyNotation: 2/4 trip{c8 d8 e8} trip{e8 e8 r8}')
+        for el in s[note.GeneralNote]:
+            el.duration.expressionIsInferred = True
+        consolidateCompletedTuplets(s, recurse=True, onlyIfTied=False)
+
+        # Before, the 3 e8's were consolidated, breaking both tuplets.
+        self.assertEqual(
+            [gn.quarterLength for gn in s[note.GeneralNote]],
+            [Fraction(1, 3)] * 6,
+        )
 
     def testSaveAccidentalDisplayStatus(self):
         from music21 import interval

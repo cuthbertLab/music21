@@ -151,11 +151,13 @@ ydelta_       Not needed
 from __future__ import annotations
 
 __all__ = [
+    'harmParser',
     'instruments',
     'spineParser',
     'testFiles',
 ]
 
+from music21.humdrum import harmParser
 from music21.humdrum import instruments
 from music21.humdrum import spineParser
 from music21.humdrum import testFiles

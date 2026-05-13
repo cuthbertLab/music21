@@ -116,6 +116,7 @@ def runParallel(iterable,
                               unpackIterable=unpackIterable,
                               updateSendsIterable=updateSendsIterable)
 
+    numCpus = cpus()
     iterLength = len(iterable)
     totalRun = 0
     if updateFunction is None:
@@ -147,7 +148,6 @@ def runParallel(iterable,
     callUpdate(0)
     from joblib import Parallel, delayed  # type: ignore
 
-    numCpus = cpus()
     with Parallel(n_jobs=numCpus) as para:
         delayFunction = delayed(parallelFunction)
         while totalRun < iterLength:

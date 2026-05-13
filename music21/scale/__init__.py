@@ -25,7 +25,7 @@ as :class:`~music21.scale.OctatonicScale`, :class:`~music21.scale.SieveScale`,
 and :class:`~music21.scale.RagMarwa`.
 
 All :class:`~music21.scale.ConcreteScale` subclasses provide the ability
-to get a pitches across any range, get a pitch for scale step, get a
+to get pitches across any range, get a pitch for scale step, get a
 scale step for pitch, and, for any given pitch ascend or descend to the
 next pitch. In all cases :class:`~music21.pitch.Pitch` objects are returned.
 
@@ -155,7 +155,7 @@ class Scale(base.Music21Object):
         '''
         To be concrete, a Scale must have a defined tonic.
         An abstract Scale is not Concrete, nor is a Concrete scale
-        without a defined tonic.  Thus, is always false.
+        without a defined tonic.  Thus, it is always false.
         '''
         return False
 
