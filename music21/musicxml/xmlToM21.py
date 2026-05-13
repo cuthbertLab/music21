@@ -763,6 +763,8 @@ class MusicXMLImporter(XMLParserBase):
         self.definesExplicitPageBreaks = False
 
         self.spannerBundle = self.stream.spannerBundle
+        self.pendingRefIdToStaff = {}
+
         self.mxScorePartDict = {}
         self.m21PartObjectsById = {}
         self.partGroupList = []
@@ -1486,7 +1488,8 @@ class PartParser(XMLParserBase):
         else:
             self.partId = ''
         self.parent = parent if parent is not None else MusicXMLImporter()
-        self.spannerBundle = self.parent.spannerBundle
+        self.spannerBundle: spanner.SpannerBundle = self.parent.spannerBundle
+        self.pendingRefIdToStaff: dict[int, int] = self.parent.pendingRefIdToStaff
 
         self.stream: stream.Part = stream.Part()
         if self.mxPart is not None:
@@ -2434,7 +2437,11 @@ class MeasureParser(SoundTagMixin, XMLParserBase):
         self.measureOffsetInScore: OffsetQL = self.parent.lastMeasureOffset
 
         self.transposition = None
-        self.spannerBundle = self.parent.spannerBundle
+        self.spannerBundle: spanner.SpannerBundle = self.parent.spannerBundle
+        # For parts with multiple staves, we want to keep track of what staffKey
+        # a spanner that is waiting its conclusion is a assigned to:
+        self.pendingRefIdToStaff: dict[int, int] = self.parent.pendingRefIdToStaff
+
         self.staffReference: StaffReferenceType = {}
         self.activeTuplets: list[duration.Tuplet|None] = self.parent.activeTuplets
 
@@ -2499,10 +2506,6 @@ class MeasureParser(SoundTagMixin, XMLParserBase):
         # inserted into a Stream).
         # key is PedalMark; value is OffsetQL
         self.pedalToStartOffset: weakref.WeakKeyDictionary = weakref.WeakKeyDictionary()
-
-        # For parts with multiple staves, we want to keep track of what staffKey
-        # a spanner that is waiting its conclusion is a assigned to:
-        self.pendingRefIdToStaff: dict[int, int] = {}
 
     @staticmethod
     def getStaffNumber(mxObjectOrNumber) -> int:
@@ -5215,7 +5218,7 @@ class MeasureParser(SoundTagMixin, XMLParserBase):
             else:
                 # environLocal.printDebug(['matching RepeatBracket spanner',
                 #    'len(rbSpanners)', len(rbSpanners)])
-                rb = rbSpanners[0]  # get RepeatBracket
+                rb = t.cast(spanner.RepeatBracket, rbSpanners[0])  # get RepeatBracket
                 # try to add this measure; may be the same
                 rb.addSpannedElements(m)
 
