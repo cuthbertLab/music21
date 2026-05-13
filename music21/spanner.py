@@ -21,6 +21,7 @@ from __future__ import annotations
 
 from collections.abc import Sequence, Iterable
 import copy
+from dataclasses import dataclass
 import typing as t
 import unittest
 
@@ -810,17 +811,16 @@ class Spanner(base.Music21Object):
 
 
 # ------------------------------------------------------------------------------
-class PendingAssignmentRef(t.TypedDict):
+@dataclass(frozen=True)
+class PendingAssignmentRef:
     '''
-    An object containing information about a pending first spanned element
-    assignment. See setPendingFirstSpannedElementAssignment for documentation
+    A dataclass containing information about a pending first spanned element assignment.
+    See :meth:`SpannerBundle.setPendingSpannedElementAssignment` for documentation
     and tests.
     '''
-    # noinspection PyTypedDict
     spanner: Spanner
     className: str
-    offsetInScore: OffsetQL|None
-    staffKey: int|None
+    offsetInScore: OffsetQL|None = None
 
 class SpannerAnchor(base.Music21Object):
     '''
@@ -1330,8 +1330,8 @@ class SpannerBundle(prebase.ProtoM21Object):
         '''
         A SpannerBundle can be set up so that a particular spanner (sp) is looking
         for an element of class (className) to be set as first element. Any future
-        future element that matches the className (and offsetInScore, if specified)
-        which is passed to the SpannerBundle via freePendingFirstSpannedElementAssignment()
+        element that matches the className (and offsetInScore, if specified)
+        which is passed to the SpannerBundle via freePendingSpannedElementAssignment()
         will get it.
 
         There are two ways to use the PendingSpannedElement APIs.  One
@@ -1352,7 +1352,7 @@ class SpannerBundle(prebase.ProtoM21Object):
 
         Usage without offset:
 
-        Create some notes:
+        Create some notes and a rest.
 
         >>> n1 = note.Note('C')
         >>> r1 = note.Rest()
@@ -1364,54 +1364,46 @@ class SpannerBundle(prebase.ProtoM21Object):
         >>> n1.getSpannerSites()
         []
 
-        Create a slur.
+        Create an empty Slur and a SpannerBundle to hold it.
 
         >>> su1 = spanner.Slur()
         >>> sb1 = spanner.SpannerBundle()
         >>> sb1.append(su1)
-
-        It starts with no notes.
-
         >>> su1.getSpannedElements()
         []
 
-
-        Now call this method to set up su1 to get the next note assigned to the spannerBundle.
-        This method returns a TypedDict called a `PendingAssignmentRef` which essentially
-        just encodes the information passed into this function:
+        Now call this method to register `su1` as awaiting the next note element.
+        The method returns a `PendingAssignmentRef` (frozen dataclass) with information
+        about what is registered as pending assignment.
 
         >>> sb1.setPendingSpannedElementAssignment(su1, 'Note')
-        {'spanner': <music21.spanner.Slur>, 'className': 'Note',
-         'offsetInScore': None, 'staffKey': None}
+        PendingAssignmentRef(spanner=<music21.spanner.Slur>,
+                             className='Note', offsetInScore=None)
 
-        Elements are then potentially assigned to spanners by calling
-        `freePendingSpannedElementAssignment` on the spannerBundle.
+        Elements are then potentially added to spanners by calling
+        `freePendingSpannedElementAssignment` on the SpannerBundle.
 
-        That method will not attach a rest like `r1` because it is not a 'Note'
+        That method will not attach a rest like `r1` because it is not a `'Note'`:
 
         >>> sb1.freePendingSpannedElementAssignment(r1)
-        >>> su1.getSpannedElements()
-        []
+        >>> r1 in su1
+        False
 
-        But `freePendingSpannedElementAssignment` will properly associate the next
-        Note object with the spanner.
+        But the next Note will be attached:
 
         >>> sb1.freePendingSpannedElementAssignment(n1)
         >>> su1
         <music21.spanner.Slur <music21.note.Note C>>
-        >>> su1.getSpannedElements()
-        [<music21.note.Note C>]
-        >>> n1.getSpannerSites()
-        [<music21.spanner.Slur <music21.note.Note C>>]
         >>> n1 in su1
         True
+        >>> n1.getSpannerSites()
+        [<music21.spanner.Slur <music21.note.Note C>>]
 
-        And now that the assignment has been made, the pending assignment
-        has been cleared, so n3 will not get assigned to the slur:
+        Once the pending assignment has been satisfied, the registration is cleared
+        from the SpannerBundle, so no future notes that would have satified the assignment
+        get assigned:
 
         >>> sb1.freePendingSpannedElementAssignment(n3)
-        >>> su1.getSpannedElements()
-        [<music21.note.Note C>]
         >>> n3 in su1
         False
         >>> n3.getSpannerSites()
@@ -1423,42 +1415,37 @@ class SpannerBundle(prebase.ProtoM21Object):
         >>> sb1.popPendingSpannedElementAssignments()
         []
 
-        Now the same deal but with offsetInScore. When offsetInScore is
-        specified it is used to filter out the matches
-        by `freePendingSpannedElementAssignment`.
+        Now a similar example using `offsetInScore`.  When `offsetInScore` is
+        specified at registration, only candidates passed with a matching
+        offset to `freePendingSpannedElementAssignment` will be attached.
 
         Create two notes and a rest.
 
-        >>> n4 = note.Note('C')
+        >>> n4 = note.Note('C#')
         >>> wrongOffsetNote = note.Note('B')
         >>> r2 = note.Rest()
 
-        Create a slur with n4 already in it.
+        Create a slur with `n4` already in it.
 
         >>> sb2 = spanner.SpannerBundle()
         >>> su2 = spanner.Slur([n4])
         >>> sb2.append(su2)
         >>> su2.getSpannedElements()
-        [<music21.note.Note C>]
+        [<music21.note.Note C#>]
 
-        Now set up su2 to get the next note assigned to it at offset 4.0.
+        Register a pending on `su2` looking for the next Note at offset 4.0:
 
         >>> ref = sb2.setPendingSpannedElementAssignment(su2, 'Note', 4.0)
-
-        We will also give `ref`, a `PendingAssignmentRef`, the staffKey of 1
-        which could be used in later parsing (such as in MusicXML parsing to figure out
-        which PartStaff to assign the slur or SpannerAnchor to). It is unused by
-        `freePendingSpannedElementAssignment`
-
-        >>> ref['staffKey'] = 1
         >>> ref
-        {'spanner': <music21.spanner.Slur <music21.note.Note C>>, 'className': 'Note',
-         'offsetInScore': 4.0, 'staffKey': 1}
+        PendingAssignmentRef(spanner=<music21.spanner.Slur <music21.note.Note C#>>,
+                             className='Note', offsetInScore=4.0)
 
         Call `freePendingSpannedElementAssignment` to attach an element of the right class
         and offset.  Note that the offset must be passed to the method; it is not
         necessarily the offset of the object itself (most often it is the `offsetInHierarchy`
         of the Part object).
+
+        A note offered at the wrong offset is not attached:
 
         >>> sb2.freePendingSpannedElementAssignment(wrongOffsetNote, 5.0)
         >>> wrongOffsetNote in su2
@@ -1473,29 +1460,57 @@ class SpannerBundle(prebase.ProtoM21Object):
 
         We are all out of possible notes, we can see which PendingAssignmentRef elements
         are still awaiting elements to attach to. In this case, there is one, our
-        Slur
+        Slur:
 
         >>> unmatched_pendingAssignmentRefs = sb2.popPendingSpannedElementAssignments()
         >>> len(unmatched_pendingAssignmentRefs)
         1
         >>> unmatched_pendingAssignmentRefs[0]
-        {'spanner': <music21.spanner.Slur <music21.note.Note C>>, 'className': 'Note',
-         'offsetInScore': 4.0, 'staffKey': 1}
-        >>> unmatched_pendingAssignmentRefs[0]['spanner'] is su2
+        PendingAssignmentRef(spanner=<music21.spanner.Slur <music21.note.Note C#>>,
+                             className='Note', offsetInScore=4.0)
+        >>> unmatched_pendingAssignmentRefs[0].spanner is su2
         True
 
         Parsers can use the information from the unmatched PendingAssignmentRef to
         add additional elements to the score at places where a match was expected.
         Given this ref, the most logical choice would be to create a `SpannerAnchor`
-        object and put it at score offset 4.0.  The manually added `staffKey` of 1,
-        would help a parser remember that the SpannerAnchor should go in staff 1.
+        object and put it at score offset 4.0 and insert it as the spanner's first element
+        with `insertFirstSpannedElement`.
+
+        (If a parser needs more information about where the Spanner and SpannerAnchor
+        should go, such as a staff number, etc. it can keep a dictionary mapping
+        `id(PendingAssignmentRef)` to a staffKey, etc.)
+
+        And now the happy path: a pending assignment that finds a matching note
+        with the right offset. (We'll demonstrate also that you need to pass
+        in your own fractions.)
+
+        >>> frac = music21.common.numberTools.opFrac
+        >>> n4 = note.Note('G')
+        >>> n5 = note.Note('A')
+        >>> su3 = spanner.Slur([n4])
+        >>> sb3 = spanner.SpannerBundle()
+        >>> sb3.append(su3)
+        >>> _ = sb3.setPendingSpannedElementAssignment(su3, 'Note', frac(77.33333))
+        >>> sb3.freePendingSpannedElementAssignment(n5, frac(77.33333))
+        >>> su3
+        <music21.spanner.Slur <music21.note.Note A><music21.note.Note G>>
+        >>> n5 in su3
+        True
+
+        An important detail demonstrated above a freed element is always inserted as the
+        first element of the spanner, even when the spanner already has
+        other elements. The insert-at-front behavior is important for MusicXML parsing, since
+        a `<direction>` is often encountered before
+        the note that should *start* the spanner (because of voices, other classes, etc.),
+        so when the starting note arrives it needs to go to the start.
+
         '''
-        ref: PendingAssignmentRef = {
-            'spanner': sp,
-            'className': className,
-            'offsetInScore': offsetInScore,
-            'staffKey': None,
-        }
+        ref = PendingAssignmentRef(
+            spanner=sp,
+            className=className,
+            offsetInScore=offsetInScore,
+        )
         self._pendingSpannedElementAssignment.append(ref)
         return ref
 
@@ -1517,15 +1532,11 @@ class SpannerBundle(prebase.ProtoM21Object):
 
         remove = None
         for i, ref in enumerate(self._pendingSpannedElementAssignment):
-            # environLocal.printDebug(['calling freePendingSpannedElementAssignment()',
-            #    self._pendingSpannedElementAssignment])
-            if ref['className'] in spannedElementCandidate.classSet:
+            if ref.className in spannedElementCandidate.classSet:
                 if (offsetInScore is None
-                        or offsetInScore == ref['offsetInScore']):
-                    ref['spanner'].insertFirstSpannedElement(spannedElementCandidate)
+                        or offsetInScore == ref.offsetInScore):
+                    ref.spanner.insertFirstSpannedElement(spannedElementCandidate)
                     remove = i
-                    # environLocal.printDebug(['freePendingSpannedElementAssignment()',
-                    #    'added spannedElement', ref['spanner']])
                     break
         if remove is not None:
             self._pendingSpannedElementAssignment.pop(remove)
@@ -1543,16 +1554,13 @@ class SpannerBundle(prebase.ProtoM21Object):
         >>> sl = spanner.Slur()
         >>> sb.append(sl)
         >>> sb.setPendingSpannedElementAssignment(sl, 'Note', 0.0)
-        {'spanner': <music21.spanner.Slur>, 'className': 'Note',
-         'offsetInScore': 0.0, 'staffKey': None}
+        PendingAssignmentRef(spanner=<music21.spanner.Slur>,
+                             className='Note', offsetInScore=0.0)
 
-        Check to make sure popPendingSpannedElementAssignments returns
-        the entire list, and leaves an empty list behind.
-        >>> expectedPending = sb._pendingSpannedElementAssignment
-        >>> expectedPending
-        [{'spanner': <music21.spanner.Slur>, 'className': 'Note',
-         'offsetInScore': 0.0, 'staffKey': None}]
+        `popPendingSpannedElementAssignments` returns the full list and leaves
+        an empty list behind:
 
+        >>> expectedPending = list(sb._pendingSpannedElementAssignment)
         >>> pending = sb.popPendingSpannedElementAssignments()
         >>> pending == expectedPending
         True
