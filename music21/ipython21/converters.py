@@ -23,8 +23,6 @@ from music21 import defaults
 from music21 import environment
 from music21 import stream
 
-# from music21.ipython21.ipExtension import needsToLoadRequireJS
-
 if t.TYPE_CHECKING:
     from music21 import base
     from music21.converter.subConverters import SubConverter, ConverterMidi
@@ -148,38 +146,69 @@ def displayMusic21jMIDI(
     binaryBase64 = base64.b64encode(binaryMidiData)
     s = common.SingletonCounter()
     outputId = 'midiPlayerDiv' + str(s())
-
-    load_require_script = '''
-        <script
-        src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js"
-        ></script>
-    '''
-
-    utf_binary = binaryBase64.decode('utf-8')
+    utf_binary: str = binaryBase64.decode('utf-8')
     # noinspection PyTypeChecker
     display(HTML('''
-        <div id="''' + outputId + '''"></div>
-        <link rel="stylesheet" href="https://cuthbertLab.github.io/music21j/css/m21.css">
-        <link rel="stylesheet" href="https://cuthbertLab.github.io/music21j/css/midiPlayer.css">
-        ''' + load_require_script + '''
+        <div id="''' + outputId + '''">
+            <p class="m21-trust-warning">
+                This MIDI player only runs in <em>trusted</em> notebooks.
+                In JupyterLab: File &rarr; Trust Notebook, then re-run this cell.
+            </p>
+        </div>
         <script>
-        function ''' + outputId + '''_play() {
-            const rq = require.config({
-                paths: {
-                    'music21': 'https://cuthbertLab.github.io/music21j/releases/music21.debug',
-                }
-            });
-            rq(['music21'], function(music21) {
-                mp = new music21.miditools.MidiPlayer();
-                mp.addPlayer("#''' + outputId + '''");
-                mp.base64Load("data:audio/midi;base64,''' + utf_binary + '''");
-            });
-        }
-        if (typeof require === 'undefined') {
-            setTimeout(''' + outputId + '''_play, 2000);
-        } else {
-            ''' + outputId + '''_play();
-        }
+        (function() {
+            const outputId = "''' + outputId + '''";
+            const b64 = "''' + utf_binary + '''";
+            const jsUrl = "https://cdn.jsdelivr.net/npm/music21j@0.23.1/releases/music21.debug.min.js";
+            const cssUrl = "https://cdn.jsdelivr.net/npm/music21j@0.23.1/releases/music21j.min.css";
+
+            const root = document.getElementById(outputId);
+            const warning = root && root.querySelector(".m21-trust-warning");
+            if (warning) warning.remove();
+
+            function play(music21) {
+                music21.common.urls.soundfontUrl = "https://cdn.jsdelivr.net/gh/cuthbertLab/midi-js-soundfonts@2026.05.15/FluidR3_GM/";
+                music21.common.urls.midiPlayer = "https://cdn.jsdelivr.net/gh/cuthbertLab/music21j@v0.23.1/webResources/midiPlayer";
+                const mp = new music21.miditools.MidiPlayer();
+                mp.addPlayer("#" + outputId);
+                mp.base64Load("data:audio/midi;base64," + b64);
+            }
+
+            window.m21conf = window.m21conf || { loadSoundfont: false };
+            if (!document.querySelector("link[data-music21j]")) {
+                const link = document.createElement("link");
+                link.rel = "stylesheet";
+                link.href = cssUrl;
+                link.dataset.music21j = "1";
+                document.head.appendChild(link);
+            }
+
+            // RequireJS / AMD route (Sphinx/nbsphinx HTML, classic Jupyter):
+            // the music21j UMD bundle registers as an AMD module when define.amd
+            // is present and never sets window.music21, so the script-tag/global
+            // path below would fire play() with music21 undefined.
+            if (typeof window.require === "function"
+                    && typeof window.require.config === "function") {
+                window.require.config({
+                    paths: { music21: jsUrl.replace(/\\.js$/, "") }
+                });
+                window.require(["music21"], play);
+                return;
+            }
+
+            if (window.music21) {
+                play(window.music21);
+                return;
+            }
+            let script = document.querySelector("script[data-music21j]");
+            if (!script) {
+                script = document.createElement("script");
+                script.src = jsUrl;
+                script.dataset.music21j = "1";
+                document.head.appendChild(script);
+            }
+            script.addEventListener("load", function() { play(window.music21); });
+        })();
         </script>'''))
 
 

@@ -52,6 +52,3 @@ def notebookVersion():
     except (ImportError, AttributeError):
         return (0, 0, 0)
 
-def needsToLoadRequireJS():
-    return inGoogleColabNotebook() or notebookVersion() >= (7, 0, 0)
-
