@@ -5,6 +5,7 @@ Documentation and tests in progress
     :maxdepth: 1
 
     usersGuide_33_expressions
+    usersGuide_34_instruments
     usersGuide_36_clientWeakref
     usersGuide_41_figuredBass
     usersGuide_43_searching1
@@ -20,3 +21,5 @@ Documentation and tests in progress
     devTest_plots_w_m21
     devTest_widgets
     notebook_show_tests
+
+    midi
