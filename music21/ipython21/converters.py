@@ -167,7 +167,7 @@ def displayMusic21jMIDI(
             if (warning) warning.remove();
 
             function play(music21) {
-                music21.common.urls.soundfontUrl = "https://cuthbertLab.github.io/music21j/soundfonts/midi-js-soundfonts-master/FluidR3_GM/";
+                music21.common.urls.soundfontUrl = "https://cdn.jsdelivr.net/gh/cuthbertLab/midi-js-soundfonts@2026.05.15/FluidR3_GM/";
                 music21.common.urls.midiPlayer = "https://cdn.jsdelivr.net/gh/cuthbertLab/music21j@v0.23.1/webResources/midiPlayer";
                 const mp = new music21.miditools.MidiPlayer();
                 mp.addPlayer("#" + outputId);
