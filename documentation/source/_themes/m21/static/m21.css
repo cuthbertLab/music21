@@ -491,3 +491,8 @@ dt:target, span.highlighted {
 dl.class > dt:first-of-type {
     display: block !important;
 }
+
+.viewcode-link {
+    font-size: 0.85em;
+    font-family: 'Bitter', serif;
+}
