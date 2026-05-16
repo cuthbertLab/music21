@@ -4509,6 +4509,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         ...     print(thing)
         P1: Soprano: Instrument 1
         <music21.clef.TrebleClef>
+        <music21.tempo.MetronomeMark Quarter=96 (playback only)>
         f# minor
         <music21.meter.TimeSignature 4/4>
         <music21.stream.Measure 7 offset=0.0>
@@ -4523,6 +4524,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         ...     print(thing)
         P1: Soprano: Instrument 1
         <music21.clef.TrebleClef>
+        <music21.tempo.MetronomeMark Quarter=96 (playback only)>
         D- major
         ...
 
