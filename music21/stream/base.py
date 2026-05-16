@@ -13929,7 +13929,13 @@ class Score(Stream):
     # this is Score.measure
     def measure(self,
                 measureNumber,
-                collect=(clef.Clef, meter.TimeSignature, instrument.Instrument, key.KeySignature, tempo.MetronomeMark),
+                collect=(
+                    clef.Clef,
+                    meter.TimeSignature,
+                    instrument.Instrument,
+                    key.KeySignature,
+                    tempo.MetronomeMark
+                ),
                 gatherSpanners=GatherSpanners.ALL,
                 indicesNotNumbers=False):
         '''
