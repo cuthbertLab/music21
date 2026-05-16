@@ -17,6 +17,7 @@
 from datetime import date
 import os
 import sys
+import sphinx.util.logging as _sxl
 sys.path.insert(0, os.path.abspath('..'))
 
 # -- General configuration -----------------------------------------------------
@@ -28,9 +29,32 @@ sys.path.insert(0, os.path.abspath('..'))
 # coming with Sphinx (named 'sphinx.ext.*') or your custom ones.
 extensions = [
     'sphinx.ext.autodoc',
-    # 'sphinx.ext.viewcode',
+    'sphinx.ext.intersphinx',
+    'sphinx.ext.viewcode',
     'docbuild.extensions',
 ]
+
+intersphinx_mapping = {
+    'python': ('https://docs.python.org/3', None),
+    'numpy': ('https://numpy.org/doc/stable', None),
+    'matplotlib': ('https://matplotlib.org/stable', None),
+}
+
+# Filter noisy ambiguous cross-reference warnings for bare `type`.
+# Sphinx's py-domain resolver partial-matches the four music21 `.type`
+# instance attributes (Barline.type, Tie.type, Duration.type, Ottava.type)
+# before consulting intersphinx, so every `type[X]` annotation triggers a
+# false-positive ambiguity warning. Suppress just that specific message.
+_orig_warning = _sxl.SphinxLoggerAdapter.warning
+def _filtered_warning(self, msg, *args, **kw):
+    if (
+        'more than one target found for cross-reference' in str(msg)
+        and args
+        and args[0] == 'type'
+    ):
+        return
+    return _orig_warning(self, msg, *args, **kw)
+_sxl.SphinxLoggerAdapter.warning = _filtered_warning
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
@@ -245,6 +269,8 @@ linkcheck_ignore = [
     r'https://easyabc.sourceforge.net',  # works 2025-10
     # does not find anchor immediately.  should wait longer
     r'https://github.com/cuthbertLab/music21/blob/master/README.md#community-code-of-conduct',
+    r'https://docutils.sourceforge.io/rst.html',  # anti bot?
+    r'https://id.loc.gov/vocabulary/relators.html', # LOC + captcha? Shame!
 ]
 
 # -- Options for manual page output --------------------------------------------

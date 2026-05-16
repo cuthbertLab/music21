@@ -152,7 +152,7 @@ to this project.  Their contributions and generosity are greatly appreciated.
 .. _Seymour Shlien: https://ifdo.ca/~seymour/runabc/esac/esacdatabase.html
 .. _Manuel Op de Coul: https://www.huygens-fokker.org/scala
 .. _John Chambers: http://trillian.mit.edu/~jc/music/book
-.. _Jack Campin: http://www.campin.me.uk/
+.. _Jack Campin: https://web.archive.org/web/20090226015201/http://www.campin.me.uk/
 .. _McGill University: https://works.hcommons.org/records/c6ew2-tth07
 .. _Project Gutenberg: https://www.gutenberg.org/browse/categories/4
 

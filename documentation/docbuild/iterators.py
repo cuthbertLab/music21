@@ -45,8 +45,8 @@ class JupyterNotebookIterator(Iterator):
     ...         break
     ...     print(nb.relative_to(sp))
     documentation/source/about/what.ipynb
-    documentation/source/developerReference/devTest_inversions.ipynb
-    documentation/source/developerReference/devTest_timespans.ipynb
+    documentation/source/developerReference/developerGuidelines.ipynb
+    documentation/source/developerReference/installJupyter.ipynb
     '''
 
     # SPECIAL METHODS #
@@ -165,6 +165,7 @@ class CodebaseIterator(Iterator):
     <class 'music21.articulations.DetachedLegato'>
     <class 'music21.articulations.Doit'>
     <class 'music21.articulations.DoubleTongue'>
+    <class 'music21.articulations.DownBow'>
     '''
 
     # SPECIAL METHODS #
@@ -227,12 +228,12 @@ class FunctionIterator(Iterator):
     ('music21.abcFormat.translate', 'abcToStreamOpus')
     ('music21.abcFormat.translate', 'abcToStreamPart')
     ('music21.abcFormat.translate', 'abcToStreamScore')
+    ('music21.abcFormat.translate', 'metadataToM21Object')
+    ('music21.abcFormat.translate', 'parseABCNote')
     ('music21.abcFormat.translate', 'parseTokens')
     ('music21.abcFormat.translate', 'reBar')
     ('music21.alpha.analysis.fixer', 'getNotesWithinDuration')
     ('music21.alpha.analysis.ornamentRecognizer', 'calculateTrillNoteDuration')
-    ('music21.alpha.analysis.search', 'findConsecutiveScale')
-    ('music21.analysis.discrete', 'analysisClassFromMethodName')
     '''
 
     # SPECIAL METHODS #
