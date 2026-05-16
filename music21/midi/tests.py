@@ -1316,9 +1316,9 @@ class Test(unittest.TestCase):
         # part.show('midi')
 
         mf = streamToMidiFile(part)
-        match = [(0, 'KEY_SIGNATURE', None),  # Conductor track
+        match = [(0, 'SET_TEMPO', None),
+                 (0, 'KEY_SIGNATURE', None),  # Conductor track
                  (0, 'TIME_SIGNATURE', None),
-                 (0, 'SET_TEMPO', None),
                  (10080, 'END_OF_TRACK', None),
                  (0, 'SEQUENCE_TRACK_NAME', None),  # Music track
                  (0, 'PITCH_BEND', None),
