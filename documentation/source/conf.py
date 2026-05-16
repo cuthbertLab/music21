@@ -17,6 +17,7 @@
 from datetime import date
 import os
 import sys
+import sphinx.util.logging as _sxl
 sys.path.insert(0, os.path.abspath('..'))
 
 # -- General configuration -----------------------------------------------------
@@ -44,7 +45,6 @@ intersphinx_mapping = {
 # instance attributes (Barline.type, Tie.type, Duration.type, Ottava.type)
 # before consulting intersphinx, so every `type[X]` annotation triggers a
 # false-positive ambiguity warning. Suppress just that specific message.
-import sphinx.util.logging as _sxl
 _orig_warning = _sxl.SphinxLoggerAdapter.warning
 def _filtered_warning(self, msg, *args, **kw):
     if (
