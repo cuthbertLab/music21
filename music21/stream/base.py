@@ -13936,7 +13936,7 @@ class Score(Stream):
                     meter.TimeSignature,
                     instrument.Instrument,
                     key.KeySignature,
-                    tempo.MetronomeMark
+                    tempo.MetronomeMark,
                 ),
                 gatherSpanners=GatherSpanners.ALL,
                 indicesNotNumbers=False):
