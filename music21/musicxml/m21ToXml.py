@@ -7217,7 +7217,7 @@ class MeasureExporter(XMLExporterBase):
         </staff-details>
         '''
         # TODO: number lines from the bottom and hide others as necessary
-        # see: https://github.com/w3c/musicxml/issues/351
+        # see: https://github.com/w3c-cg/musicxml/issues/351
         # TODO: number (bigger issue)
         # TODO: show-frets
         # TODO: print-spacing

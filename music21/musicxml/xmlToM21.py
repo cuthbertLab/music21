@@ -3448,7 +3448,7 @@ class MeasureParser(SoundTagMixin, XMLParserBase):
         will set MeasureParser to fullMeasureRest but not set fullMeasure = True
         on the music21 Rest object itself because pickup measures often use
         measure="yes" in Finale, but display as quarter rests, etc.
-        See https://github.com/w3c/musicxml/issues/478
+        See https://github.com/w3c-cg/musicxml/issues/478
 
         >>> mxr = EL('<note><rest measure="yes"/><duration>10</duration>'
         ...          + '<type>quarter</type></note>')

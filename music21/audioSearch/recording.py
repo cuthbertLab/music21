@@ -11,7 +11,7 @@
 '''
 modules for audio searching that directly record from the microphone.
 
-Requires PyAudio and portaudio to be installed (https://www.portaudio.com/download.html)
+Requires PyAudio and portaudio to be installed (https://portaudio.com/download.html)
 
 Windows users will get pyaudio and portaudio with `pip install pyaudio`
 

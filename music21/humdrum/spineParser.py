@@ -937,9 +937,9 @@ class GlobalReferenceLine(HumdrumLine):
     'Stravinsky, Igor Fyodorovich'
 
     TODO: add parsing of three-digit Kern comment codes into fuller metadata
-    TODO: parse `@`/`@@` language tags here (e.g. `!!!OPT@@RUS:`, `!!!OPT@FRE:`)
-        and propagate language/isPrimary so that GlobalReference.updateMetadata
-        can attach `metadata.Text(value, language=...)` instead of bare strings.
+    TODO: parse ``@``/``@@`` language tags here (e.g. ``!!!OPT@@RUS:``, ``!!!OPT@FRE:``)
+    and propagate language/isPrimary so that GlobalReference.updateMetadata
+    can attach ``metadata.Text(value, language=...)`` instead of bare strings.
     '''
     def __init__(self, lineNumber: int = 0, contents: str = '!!! NUL: None') -> None:
         self.lineNumber = lineNumber

@@ -245,6 +245,8 @@ linkcheck_ignore = [
     r'https://easyabc.sourceforge.net',  # works 2025-10
     # does not find anchor immediately.  should wait longer
     r'https://github.com/cuthbertLab/music21/blob/master/README.md#community-code-of-conduct',
+    r'https://docutils.sourceforge.io/rst.html',  # anti bot?
+    r'https://id.loc.gov/vocabulary/relators.html', # LOC + captcha? Shame!
 ]
 
 # -- Options for manual page output --------------------------------------------

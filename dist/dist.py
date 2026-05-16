@@ -35,14 +35,14 @@ Cannot run 2 and 3 in parallel, since often metadata changes cause documentation
 6. commit and wait for results on GitHub Actions
      (normally not necessary, because it's slower and mostly duplicates multiprocessTest,
      but should be done before making a release).
-7. run documentation/make.py clean  (skip on minor version changes) -- you may need to make a
+7. `uv run documentation/make.py clean`  (skip on minor version changes) -- you may need to make a
      documentation/build directory first.
 8. `uv run documentation/make.py linkcheck`  [*]
      some persistent errors that actually work are in the conf.py file under linkcheck_ignore
 9. `uv run documentation/make.py`   [*]
 9b. `uv run documentation/upload.py`
 
-[*] you will need sphinx, Jupyter (pip or easy_install), markdown, and pandoc (.dmg) installed
+[*] you will need sphinx, Jupyter (uv will install it), markdown, and pandoc (.dmg) installed
 
 10. move music21 documentation/build/html to music21.org/music21docs/
     via Amazon S3 (contact MSAC for authentication if need be) (MSAC has a program:
