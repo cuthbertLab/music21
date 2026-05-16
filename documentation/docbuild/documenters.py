@@ -379,6 +379,7 @@ class ClassDocumenter(ObjectDocumenter):
     Methods inherited from :class:`~music21.base.Music21Object`:
     .. hlist::
        :columns: 3
+       - :meth:`~music21.base.Music21Object.__eq__`
        - :meth:`~music21.base.Music21Object.clearCache`
        - :meth:`~music21.base.Music21Object.containerHierarchy`
        - :meth:`~music21.base.Music21Object.contextSites`
@@ -386,10 +387,6 @@ class ClassDocumenter(ObjectDocumenter):
        - :meth:`~music21.base.Music21Object.splitAtQuarterLength`
        - :meth:`~music21.base.Music21Object.splitByQuarterLengths`
        - :meth:`~music21.base.Music21Object.write`
-    Methods inherited from :class:`~music21.prebase.ProtoM21Object`:
-    .. hlist::
-       :columns: 3
-       - :meth:`~music21.prebase.ProtoM21Object.isClassOrSubclass`
     .. rubric:: :class:`~music21.articulations.Caesura` instance variables
     Instance variables inherited from :class:`~music21.base.Music21Object`:
     .. hlist::
@@ -698,12 +695,12 @@ class ClassDocumenter(ObjectDocumenter):
         - music21.stream.base.Stream.beatDuration
         - music21.stream.base.Stream.beatStr
         - music21.stream.base.Stream.beatStrength
-        - music21.stream.base.Stream.flat
         - music21.stream.base.Stream.highestOffset
         - music21.stream.base.Stream.highestTime
         - music21.stream.base.Stream.isGapless
         - music21.stream.base.Stream.lowestOffset
         - music21.stream.base.Stream.notes
+        - music21.stream.base.Stream.notesAndRests
         music21.stream.core.StreamCore:
         - music21.stream.core.StreamCore.spannerBundle
         '''
@@ -731,14 +728,12 @@ class ClassDocumenter(ObjectDocumenter):
         - music21.base.Music21Object.contextSites
         - music21.base.Music21Object.getAllContextsByClass
         - music21.base.Music21Object.getContextByClass
-        music21.prebase.ProtoM21Object:
-        - music21.prebase.ProtoM21Object.isClassOrSubclass
         music21.stream.base.Stream:
+        - music21.stream.base.Stream.__eq__
         - music21.stream.base.Stream.__getitem__
         - music21.stream.base.Stream.activateVariants
         - music21.stream.base.Stream.addGroupForElements
         - music21.stream.base.Stream.allPlayingWhileSounding
-        - music21.stream.base.Stream.analyze
         music21.stream.core.StreamCore:
         - music21.stream.core.StreamCore.asTimespans
         - music21.stream.core.StreamCore.asTree
@@ -793,6 +788,8 @@ class ClassDocumenter(ObjectDocumenter):
         ...     method
         ...
         <docbuild.documenters.MethodDocumenter:
+            music21.stream.base.Stream.__eq__>
+        <docbuild.documenters.MethodDocumenter:
             music21.stream.base.Stream.__getitem__>
         <docbuild.documenters.MethodDocumenter:
             music21.stream.base.Stream.activateVariants>
@@ -810,8 +807,6 @@ class ClassDocumenter(ObjectDocumenter):
             music21.stream.base.Stream.attachMelodicIntervals>
         <docbuild.documenters.MethodDocumenter:
             music21.stream.base.Stream.augmentOrDiminish>
-        <docbuild.documenters.MethodDocumenter:
-            music21.stream.base.Stream.beatAndMeasureFromOffset>
         '''
         return self._methods
 
@@ -830,7 +825,6 @@ class ClassDocumenter(ObjectDocumenter):
         <docbuild.documenters.AttributeDocumenter: music21.stream.base.Stream.beatDuration>
         <docbuild.documenters.AttributeDocumenter: music21.stream.base.Stream.beatStr>
         <docbuild.documenters.AttributeDocumenter: music21.stream.base.Stream.beatStrength>
-        <docbuild.documenters.AttributeDocumenter: music21.stream.base.Stream.flat>
         ...
         '''
         return self._readonlyProperties
@@ -974,6 +968,7 @@ class ClassDocumenter(ObjectDocumenter):
         '.. hlist::'
         '   :columns: 3'
         ''
+        '   - :meth:`~music21.note.GeneralNote.__eq__`'
         '   - :meth:`~music21.note.GeneralNote.addLyric`'
         '   - :meth:`~music21.note.GeneralNote.augmentOrDiminish`'
         '   - :meth:`~music21.note.GeneralNote.getGrace`'
@@ -989,7 +984,6 @@ class ClassDocumenter(ObjectDocumenter):
         '   - :meth:`~music21.base.Music21Object.contextSites`'
         ...
         ''
-
         '''
         mapping = self.inheritedMethodsMapping
         banner = 'Methods inherited from {0}:'
@@ -1051,6 +1045,7 @@ class ClassDocumenter(ObjectDocumenter):
         '   - :attr:`~music21.note.NotRest.noteheadFill`'
         '   - :attr:`~music21.note.NotRest.noteheadParenthesis`'
         '   - :attr:`~music21.note.NotRest.stemDirection`'
+        '   - :attr:`~music21.note.NotRest.storedInstrument`'
         '   - :attr:`~music21.note.NotRest.volume`'
         ''
         'Read/write properties inherited from :class:`~music21.note.GeneralNote`:'
@@ -1131,14 +1126,6 @@ class ClassDocumenter(ObjectDocumenter):
         ...
         '   - :meth:`~music21.base.Music21Object.splitByQuarterLengths`'
         ''
-        'Methods inherited from :class:`~music21.prebase.ProtoM21Object`:'
-        ''
-        '.. hlist::'
-        '   :columns: 3'
-        ''
-        '   - :meth:`~music21.prebase.ProtoM21Object.isClassOrSubclass`'
-        ''
-
         '''
         result = []
         if self.methods:

@@ -37,8 +37,10 @@ from music21.ipython21.ipExtension import load_ipython_extension
 
 def loadNoMagic():
     '''
-    Load the magic functions of load_ipython_extension when running IPython
+    Load the magic functions of load_ipython_extension when running Jupyter (was IPython)
     without needing to call a %magic function
+
+    Safest is always ot call %load_ext music21.ipython21 anyhow.
     '''
     if common.runningInNotebook():
         # noinspection PyPackageRequirements

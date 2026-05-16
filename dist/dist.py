@@ -18,27 +18,29 @@ To do a release,
     for a major change that affects parsing run corpus.corpora.CoreCorpus().rebuildMetadataCache()
     (2 min on M4) -- either of these MAY change a
     lot of tests in corpus, metadata, etc. so don't skip the next step!
-3. IMPORTANT: run python documentation/testDocumentation.py and afterwards fix errors [*]
+3. IMPORTANT: `uv run documentation/testDocumentation.py` and afterwards fix errors [*]
 
 [*] you will need pytest, docutils, nbval installed (along with ipython and jupyter),
 you cannot check to see if fixed tests work while it is running.
 This takes a while and runs single core, and then almost always needs code patches
 so allocate time (2 min on M4).  Start working on the announcement while it's running.
+Cannot run 2 and 3 in parallel, since often metadata changes cause documentation changes.
 
-4. run test/warningMultiprocessTest.py for lowest and highest Py version -- fix all warnings!
+4. `uv run music21/test/warningMultiprocessTest.py` for lowest and highest Py version -- fix all warnings!
 5. run `from music21.test import treeYield
     and then run `treeYield.find_all_non_hashable_m21objects()` and check that the set returned is
-    empty.  Note -- it will print a bunch of module names, but only the final set matters.
-    Then do the same for `treeYield.find_all_non_default_instantiation_m21objects()`.
+    empty.  Note -- it will print a bunch of module names, but only the final `set()` being empty matters.
+    Then do the same for `treeYield.find_all_non_default_instantiation_m21objects()`.  If that one isn't
+    empty it is not a bug, but it would be nice to keep is so Music21Objects don't need args.
 6. commit and wait for results on GitHub Actions
      (normally not necessary, because it's slower and mostly duplicates multiprocessTest,
      but should be done before making a release).
-
 7. run documentation/make.py clean  (skip on minor version changes) -- you may need to make a
      documentation/build directory first.
-8. run documentation/make.py linkcheck  [*]
+8. `uv run documentation/make.py linkcheck`  [*]
      some persistent errors that actually work are in the conf.py file under linkcheck_ignore
-9. run documentation/make.py   [*]
+9. `uv run documentation/make.py`   [*]
+9b. `uv run documentation/upload.py`
 
 [*] you will need sphinx, Jupyter (pip or easy_install), markdown, and pandoc (.dmg) installed
 

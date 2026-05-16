@@ -2950,7 +2950,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         If `allDerived` is True (as it is by default), all sites (stream) that
         this stream derives from and also
         have a reference for the replacement will be similarly changed.
-        This is useful for altering both a flat and nested representation.
+        This is useful for altering both a flattened and nested representation.
 
         >>> cSharp = note.Note('C#4')
         >>> s = stream.Stream()

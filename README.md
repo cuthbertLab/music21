@@ -11,7 +11,7 @@ For more information, visit:
 https://www.music21.org/music21docs/
 
 To try it out, visit:
-https://tinyurl.com/m21colab (runs music21 v7)
+https://tinyurl.com/m21colab (run all to set up an environment for the latest release)
 
 And to install, see:
 https://www.music21.org/music21docs/usersGuide/usersGuide_01_installing.html
