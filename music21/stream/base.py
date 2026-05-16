@@ -4422,7 +4422,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         numberStart,
         numberEnd,
         *,
-        collect=('Clef', 'TimeSignature', 'Instrument', 'KeySignature'),
+        collect=('Clef', 'TimeSignature', 'Instrument', 'KeySignature', 'MetronomeMark'),
         gatherSpanners=GatherSpanners.ALL,
         indicesNotNumbers=False
     ) -> Stream[Measure]:
@@ -4509,6 +4509,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         ...     print(thing)
         P1: Soprano: Instrument 1
         <music21.clef.TrebleClef>
+        <music21.tempo.MetronomeMark Quarter=96 (playback only)>
         f# minor
         <music21.meter.TimeSignature 4/4>
         <music21.stream.Measure 7 offset=0.0>
@@ -4523,6 +4524,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         ...     print(thing)
         P1: Soprano: Instrument 1
         <music21.clef.TrebleClef>
+        <music21.tempo.MetronomeMark Quarter=96 (playback only)>
         D- major
         ...
 
@@ -4652,7 +4654,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
     def measure(self,
                 measureNumber,
                 *,
-                collect=('Clef', 'TimeSignature', 'Instrument', 'KeySignature'),
+                collect=('Clef', 'TimeSignature', 'Instrument', 'KeySignature', 'MetronomeMark'),
                 indicesNotNumbers=False) -> Measure|None:
         '''
         Given a measure number, return a single
@@ -13881,7 +13883,7 @@ class Score(Stream):
     def measures(self,
                  numberStart,
                  numberEnd,
-                 collect=('Clef', 'TimeSignature', 'Instrument', 'KeySignature'),
+                 collect=('Clef', 'TimeSignature', 'Instrument', 'KeySignature', 'MetronomeMark'),
                  gatherSpanners=GatherSpanners.ALL,
                  indicesNotNumbers=False):
         # noinspection PyShadowingNames
@@ -13929,7 +13931,13 @@ class Score(Stream):
     # this is Score.measure
     def measure(self,
                 measureNumber,
-                collect=(clef.Clef, meter.TimeSignature, instrument.Instrument, key.KeySignature),
+                collect=(
+                    clef.Clef,
+                    meter.TimeSignature,
+                    instrument.Instrument,
+                    key.KeySignature,
+                    tempo.MetronomeMark,
+                ),
                 gatherSpanners=GatherSpanners.ALL,
                 indicesNotNumbers=False):
         '''
