@@ -1608,6 +1608,27 @@ class Test(unittest.TestCase):
                 for n in m.flatten().notes:
                     self.assertEqual(n.lyric, lyric)
 
+    def testAddEndDelay(self):
+        from music21 import defaults
+        s = stream.Stream()
+        s.repeatAppend(note.Note('C4', quarterLength=1.0), 2)
+
+        # default keeps the trailing rest
+        mfDefault = streamToMidiFile(s)
+        endDtDefault = mfDefault.tracks[-1].events[-2]
+        self.assertEqual(endDtDefault.time, defaults.ticksAtStart)
+
+        # addEndDelay=False removes the trailing rest
+        mfNoDelay = streamToMidiFile(s, addEndDelay=False)
+        endDtNoDelay = mfNoDelay.tracks[-1].events[-2]
+        self.assertEqual(endDtNoDelay.time, 0)
+
+    def testGetEndEventsAddEndDelay(self):
+        from music21 import defaults
+        from music21.midi.translate import getEndEvents
+        self.assertEqual(getEndEvents()[0].time, defaults.ticksAtStart)
+        self.assertEqual(getEndEvents(addEndDelay=False)[0].time, 0)
+
 
 # ------------------------------------------------------------------------------
 if __name__ == '__main__':

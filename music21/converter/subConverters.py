@@ -1089,6 +1089,7 @@ class ConverterMidi(SubConverter):
               subformats=(),
               *,
               addStartDelay: bool = False,
+              addEndDelay: bool = True,
               encoding: str = '',
               **keywords):  # pragma: no cover
         from music21.midi import translate as midiTranslate
@@ -1096,6 +1097,7 @@ class ConverterMidi(SubConverter):
             fp = self.getTemporaryFile()
 
         mf = midiTranslate.music21ObjectToMidiFile(obj, addStartDelay=addStartDelay,
+                                                   addEndDelay=addEndDelay,
                                                    encoding=encoding or self.encoding)
         mf.open(fp, 'wb')  # write binary
         mf.write()
