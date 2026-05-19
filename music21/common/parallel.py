@@ -235,7 +235,7 @@ def safeToParallize() -> bool:
     Will return False if we are in a multiprocessing child process or if
     there is only one CPU or if pytest's x-dist worker flag is in the environment.
 
-    * New in v10
+    * New in v10.
     '''
     return (
         cpus() > 1

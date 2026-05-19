@@ -596,7 +596,7 @@ class Ornament(Expression):
         and a list of notes after the "main note".
 
         * New in v8: inPlace boolean; note that some ornaments
-          might not return a Note in the second position at all (such as trills)
+          might not return a Note in the second position at all (such as trills),
           so inPlace does nothing.
         * Changed in v9: Optional keySig can be passed in (useful in cases where there
           is no keySig in srcObj's context, or where a different keySig is desired).
@@ -1049,8 +1049,6 @@ class Mordent(GeneralMordent):
     <music21.interval.Interval M-2>
     >>> mNotFlatWithKeyFromContext.getSize(noteB3)
     <music21.interval.Interval M-2>
-
-
 
     * Changed in v7: Mordent sizes are GenericIntervals -- as was originally
       intended but programmed incorrectly.

@@ -149,7 +149,7 @@ def isIterable(usrData: t.Any) -> t.TypeGuard[Iterable]:
     >>> common.isIterable(list)
     False
 
-    * Changed in v7.3: Classes (not instances) are not iterable
+    * Changed in v7.3: Classes (not instances) are not iterable.
     '''
     if isinstance(usrData, (str, bytes)):
         return False

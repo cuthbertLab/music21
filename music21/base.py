@@ -26,7 +26,7 @@ available after importing `music21`.
 <class 'music21.base.Music21Object'>
 
 >>> music21.VERSION_STR
-'10.1.0'
+'10.2.0b1'
 
 Alternatively, after doing a complete import, these classes are available
 under the module "base":
@@ -1570,7 +1570,7 @@ class Music21Object(prebase.ProtoM21Object):
         and `priorityTargetOnly=True`.
 
         * Changed in v5.7: added followDerivation=False and made
-          everything but the class keyword only
+          everything but the class keyword only.
         * New in v6: added priorityTargetOnly -- see contextSites for description.
         * New in v7: added getElementMethod `all` and `ElementSearch` enum.
         * Changed in v8: class-based calls return properly typed items.  Putting
@@ -2288,7 +2288,7 @@ class Music21Object(prebase.ProtoM21Object):
         <music21.note.Note F#> <music21.stream.Part Soprano>
         <music21.bar.Barline type=final> <music21.stream.Part Soprano>
 
-        * Changed in v6: added activeSiteOnly -- see description in `.contextSites()`
+        * Changed in v6: added activeSiteOnly -- see description in `.contextSites()`.
         '''
         allSiteContexts = list(self.contextSites(
             returnSortTuples=True,
@@ -2375,7 +2375,7 @@ class Music21Object(prebase.ProtoM21Object):
         <music21.metadata.Metadata object at 0x11116d080>
         <music21.stream.Score bach/bwv66.6.mxl>
 
-        * Changed in v6: added activeSiteOnly -- see description in `.contextSites()`
+        * Changed in v6: added activeSiteOnly -- see description in `.contextSites()`.
         '''
         # allSiteContexts = list(self.contextSites(returnSortTuples=True))
         # maxRecurse = 20
@@ -3068,7 +3068,7 @@ class Music21Object(prebase.ProtoM21Object):
          <music21.stream.Part newPart>]
 
         * Changed in v5.7: `followDerivation` and
-          `includeNonStreamDerivations` are now keyword only
+          `includeNonStreamDerivations` are now keyword only.
         '''
         post = []
         focus = self
@@ -3212,7 +3212,7 @@ class Music21Object(prebase.ProtoM21Object):
         music21.duration.DurationException: cannot split a duration (0.5)
             at this quarterLength (7/10)
 
-        * Changed in v7: all but quarterLength are keyword only
+        * Changed in v7: all but quarterLength are keyword only.
         '''
         from music21 import chord
         from music21 import note
@@ -3764,8 +3764,7 @@ class Music21Object(prebase.ProtoM21Object):
         >>> math.isnan(isolatedNote.beat)
         True
 
-        * Changed in v6.3: returns `nan` if
-          there is no TimeSignature in sites.
+        * Changed in v6.3: returns `nan` if there is no TimeSignature in sites.
           Previously raised an exception.
         '''
         try:
@@ -3807,8 +3806,7 @@ class Music21Object(prebase.ProtoM21Object):
         >>> isolatedNote.beatStr
         'nan'
 
-        * Changed in v6.3: returns 'nan' if
-          there is no TimeSignature in sites.
+        * Changed in v6.3: returns 'nan' if there is no TimeSignature in sites.
           Previously raised an exception.
         '''
         try:

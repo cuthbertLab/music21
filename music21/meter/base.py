@@ -1163,7 +1163,7 @@ class TimeSignature(TimeSignatureBase):
         >>> len(ts.beatSequence)
         6
 
-        * Changed in v7: favorCompound is keyword only
+        * Changed in v7: favorCompound is keyword only.
         '''
         # if a non-compound meter has been given, as in
         # not 3+1/4; just 5/4

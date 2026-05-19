@@ -2707,7 +2707,7 @@ class IntervalNetwork:
         Traceback (most recent call last):
         ValueError: There must be at least one pitch given.
 
-        * Changed in v8: staticmethod.  Raise value error on empty
+        * Changed in v8: staticmethod.  Raise value error on empty.
         '''
         pitchList: list[pitch.Pitch]
         if not isinstance(pitchTarget, (list, tuple)):

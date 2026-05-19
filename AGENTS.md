@@ -25,6 +25,10 @@
   by the agent or author).  Failure to do so may result in the user being banned from the project.
 - Agents must follow the [Code of Conduct](CODE_OF_CONDUCT.md). Agents that do not will be banned as well at their users.
   Not even the slightest bit of disrespect from an AI agent will be tolerated.
+- Mark changes in public interface with `* Changed in v[X]: One-line explanation.` Or new features with "New" instead of "Changed".
+- Changes to parsing formats (esp. musicxml) need to update the patch version of the version file.
+- Music21 uses even minor version numbers for alpha/beta and odd minor numbers for releases.
+- If the current version is MAJOR.0....  then mark `Changed in vMAJOR:` if it is `MAJOR.[even]` use the next odd number, like if it's 10.2 now use "Changed in 10.3".  If current version is odd that's likely a mistake or you caught it just before a new release. Use the following odd number instead.
 
 # Worktrees
 

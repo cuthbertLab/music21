@@ -274,9 +274,8 @@ def getEndEvents(
     [<music21.midi.DeltaTime (empty) track=None>,
      <music21.midi.MidiEvent END_OF_TRACK, track=None, data=b''>]
 
-    Changed in v10 - getEndEvents does not take a channel
-
-    New in v10.2 - addEndDelay keyword
+    * Changed in v10: getEndEvents does not take a channel.
+    * New in v10.3: addEndDelay keyword.
 
     Note: the addEndDelay keyword and its threading through the MIDI export
     functions was AI-assisted (issue #1141).
@@ -313,7 +312,7 @@ def music21ObjectToMidiFile(
     not to change activeSites, etc.) and calls streamToMidiFile on
     that object.
 
-    New in v10.2 - addEndDelay keyword
+    * New in v10.3: addEndDelay keyword.
     '''
     if isinstance(music21Object, stream.Stream):
         if music21Object.atSoundingPitch is False:
@@ -346,9 +345,9 @@ def _constructOrUpdateNotRestSubclass(
     Construct (or edit the duration of) a NotRest subclass, usually
     a note.Note (or a chord.Chord if provided to `returnClass`).
 
-    * Changed in v8: no inputM21
+    * Changed in v8: no inputM21.
     * Changed in v10: Remove part about creating an Unpitched object -- that has been wrong
-      for some time (probably since PercussionChords were introduced)
+      for some time (probably since PercussionChords were introduced).
     '''
     if not issubclass(returnClass, note.NotRest):
         raise TypeError(f'Expected subclass of note.NotRest; got {returnClass}')
@@ -434,7 +433,7 @@ def midiEventsToNote(
         :class:`~music21.note.Unpitched` instance if the event is on Channel 10.
     * Changed in v8: `inputM21` is no longer supported.
         The only supported usage now is two tuples.
-    * Changed in v9.7: Expects a single TimedNoteEvent
+    * Changed in v9.7: Expects a single TimedNoteEvent.
     '''
     tOn, tOff, midiOnEvent = timedNoteEvent
 
@@ -516,7 +515,7 @@ def noteToMidiEvents(
      <music21.midi.MidiEvent NOTE_OFF, track=None, channel=9, pitch=61, velocity=0>]
 
     * Changed in v7: made keyword-only.
-    * Changed in v8: added support for :class:`~music21.note.Unpitched`
+    * Changed in v8: added support for :class:`~music21.note.Unpitched`.
     '''
     n = inputM21
 
@@ -647,7 +646,7 @@ def midiEventsToChord(
     * Changed in v7.3: Returns a :class:`~music21.percussion.PercussionChord` if
       any event is on channel 10.
     * Changed in v8: inputM21 is no longer supported.  Flat list format is removed.
-    * Changed in v9.7: expects a list of TimedNoteEvents
+    * Changed in v9.7: expects a list of TimedNoteEvents.
     '''
     # * Changed in v10: Fix long-standing bug where only the first on-time was being used
     #   not yet -- must fix quantization tests to do so...
@@ -738,7 +737,7 @@ def chordToMidiEvents(
      <music21.midi.MidiEvent NOTE_OFF, track=None, channel=1, pitch=83, velocity=0>]
 
     * Changed in v7: made keyword-only.
-    * Changed in v8: added support for :class:`~music21.percussion.PercussionChord`
+    * Changed in v8: added support for :class:`~music21.percussion.PercussionChord`.
     '''
     mt = None  # midi track
     eventList: list[DeltaTime|MidiEvent] = []
@@ -1814,7 +1813,7 @@ def packetsToMidiTrack(packets, trackId=1, channel=1, instrumentObj=None, *, add
 
     Use streamToPackets to convert the Stream to the packets
 
-    New in v10.2 - addEndDelay keyword
+    * New in v10.3: addEndDelay keyword.
     '''
     # TODO: for a given track id, need to find start/end channel
     mt = MidiTrack(trackId)
@@ -2680,7 +2679,7 @@ def streamHierarchyToMidiTracks(
 
     * Changed in v6: acceptableChannelList is keyword only.  addStartDelay is new.
     * Changed in v6.5: Track 0 (tempo/conductor track) always exported.
-    * New in v10.2: addEndDelay keyword.
+    * New in v10.3: addEndDelay keyword.
     '''
     # makes a deepcopy
     s = prepareStreamForMidi(inputM21)
@@ -2827,7 +2826,7 @@ def streamToMidiFile(
 
     Set `addEndDelay` to False to skip the trailing rest added by `getEndEvents`.
 
-    New in v10.2 - addEndDelay keyword
+    * New in v10.3: addEndDelay keyword.
     '''
     s = inputM21
     midiTracks = streamHierarchyToMidiTracks(s,

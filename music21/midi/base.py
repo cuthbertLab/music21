@@ -106,7 +106,7 @@ def getNumber(midiBytes: bytes|int, length: int) -> tuple[int, bytes|int]:
     >>> midi.getNumber(516, 1)   # = 2*256 + 4
     (4, 512)
 
-    Changed in v10: remove Python 2 legacy string as input -- use bytes instead.
+    * Changed in v10: remove Python 2 legacy string as input -- use bytes instead.
     '''
     summation = 0
     if isinstance(midiBytes, bytes):
@@ -485,7 +485,7 @@ class MidiEvent(prebase.ProtoM21Object):
     >>> me2
     <music21.midi.MidiEvent SEQUENCE_TRACK_NAME, track=1, data=b'guitar'>
 
-    Changed in v9.7 - None is not a valid type anymore.  Use MetaEvents.UNKNOWN instead.
+    * Changed in v9.7: None is not a valid type anymore.  Use MetaEvents.UNKNOWN instead.
         Channel defaults to 1.
     '''
     # noinspection PyShadowingBuiltins
@@ -1291,7 +1291,7 @@ class DeltaTime(MidiEvent):
         >>> dt.readUntilLowByte(b'\x82hello')
         (360, b'ello')
 
-        Changed in v9: had an incompatible signature with MidiEvent
+        * Changed in v9: had an incompatible signature with MidiEvent.
         '''
         self.time, newBytes = getVariableLengthNumber(oldBytes)
         return self.time, newBytes
@@ -1359,7 +1359,7 @@ class MidiTrack(prebase.ProtoM21Object):
     >>> mt.length
     22
 
-    New in v9.7: len(mt) returns the same as mt.length, but more Pythonic.
+    * New in v9.7: len(mt) returns the same as mt.length, but more Pythonic.
 
     >>> len(mt)
     22
@@ -1399,7 +1399,7 @@ class MidiTrack(prebase.ProtoM21Object):
 
     def __len__(self) -> int:
         '''
-        New in v9.7
+        * New in v9.7.
         '''
         return len(self.data)
 

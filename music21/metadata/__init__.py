@@ -1145,8 +1145,7 @@ class Metadata(base.Music21Object):
         (True, 'composer')
 
 
-        * New in v4: use a keyword argument to search
-          that field directly:
+        * New in v4: use a keyword argument to search that field directly:
 
         >>> md.search(composer='Joplin')
         (True, 'composer')
@@ -2497,7 +2496,7 @@ class RichMetadata(Metadata):
      'pitchHighest', 'pitchLowest', 'scoreQuarterLength', 'sourcePath', 'tempoFirst',
      'tempos', 'timeSignatureFirst', 'timeSignatures')
 
-    Changed in v10: renamed `quarterLength` to `scoreQuarterLength`.
+    * Changed in v10: renamed `quarterLength` to `scoreQuarterLength`.
        Because RichMetadata is a Music21Object, `quarterLength` is a property that must
        return the length of the RichMetadata object itself and should not have been
        ovewritten

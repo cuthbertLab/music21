@@ -210,7 +210,7 @@ class ChordBase(note.NotRest):
 
         Also requires that notes be iterable.
 
-        Changed in v9: incorrect arguments raise TypeError
+        * Changed in v9: incorrect arguments raise TypeError.
         '''
         # quickDuration specifies whether the duration object for the chord
         # should be taken from the first note of the list.
@@ -565,7 +565,7 @@ class ChordBase(note.NotRest):
         >>> c.volume
         <music21.volume.Volume realized=0.76>
 
-        * New in v8: replaces setting .volume to a list
+        * New in v8: replaces setting .volume to a list.
         '''
         # if setting components, remove single velocity
         self._volume = None
@@ -2432,7 +2432,7 @@ class Chord(ChordBase):
         sets the value to be returned later, which might be useful for
         cases where the chords are poorly spelled, or there is an added note.
 
-        * Changed in v8: deal with chords without pitches
+        * Changed in v8: deal with chords without pitches.
         '''
         if not self.pitches:
             return -1
@@ -2975,7 +2975,7 @@ class Chord(ChordBase):
         >>> fr6c.isFrenchAugmentedSixth(permitAnyInversion=True)
         True
 
-        * Changed in v7: `permitAnyInversion` added
+        * Changed in v7: `permitAnyInversion` added.
 
         OMIT_FROM_DOCS
 
@@ -3020,7 +3020,7 @@ class Chord(ChordBase):
         >>> gr6c.isGermanAugmentedSixth(permitAnyInversion=True)
         True
 
-        * Changed in v7: `permitAnyInversion` added
+        * Changed in v7: `permitAnyInversion` added.
 
         OMIT_FROM_DOCS
 
@@ -3632,7 +3632,7 @@ class Chord(ChordBase):
         >>> ch3.isSwissAugmentedSixth(permitAnyInversion=True)
         True
 
-        * Changed in v7: `permitAnyInversion` added
+        * Changed in v7: `permitAnyInversion` added.
         '''
         return self._isAugmentedSixthHelper(
             (4, 27, -1),
@@ -3947,7 +3947,7 @@ class Chord(ChordBase):
         music21.chord.ChordException: no pitches in chord <music21.chord.Chord ...>
 
         * Changed in v5.2: `find` is a keyword-only parameter,
-          `newroot` finds `Pitch` in `Chord`
+          `newroot` finds `Pitch` in `Chord`.
         '''
         # None value for find indicates: return override if overridden, cache if cached
         # or find new value if neither is the case.
@@ -4878,7 +4878,7 @@ class Chord(ChordBase):
         >>> chord.Chord('C4 E-4 G4 A#4 D4').commonName
         'enharmonic equivalent to minor-ninth chord'
 
-        * Changed in v5.5: special cases for checking enharmonics in some cases
+        * Changed in v5.5: special cases for checking enharmonics in some cases.
         * Changed in v6.5: better handling of 0-, 1-, and 2-pitchClass and microtonal chords.
         * Changed in v7: Inversions of augmented sixth-chords are specified.
         * Changed in v7.3: Enharmonic equivalents to common seventh and ninth chords are specified.
@@ -5374,7 +5374,7 @@ class Chord(ChordBase):
         >>> c1
         <music21.chord.Chord D#4 C#4>
 
-        * New in v5.7
+        * New in v5.7.
         '''
         return tuple(self._notes)
 
@@ -5940,7 +5940,7 @@ class Chord(ChordBase):
         >>> chord.Chord('C4 E4 G4').scaleDegrees is None
         True
 
-        * Changed in v6.5: will return `None` if no context can be found:
+        * Changed in v6.5: will return `None` if no context can be found.
         '''
         from music21 import scale
         # roman numerals have this built in as the key attribute
@@ -5990,7 +5990,7 @@ class Chord(ChordBase):
         >>> c.seventh
         <music21.pitch.Pitch B#4>
 
-        * Changed in v6.5: return None on empty chords/errors
+        * Changed in v6.5: return `None` on empty chords/errors.
 
         OMIT_FROM_DOCS
 
@@ -6015,7 +6015,7 @@ class Chord(ChordBase):
         >>> cMaj1stInv.third.octave
         3
 
-        * Changed in v6.5: return `None` on empty chords/errors
+        * Changed in v6.5: return `None` on empty chords/errors.
 
         OMIT_FROM_DOCS
 

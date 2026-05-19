@@ -364,7 +364,7 @@ def parse(
     >>> bachChorale.metadata.corpusFilePath
     'bach/bwv66.6.mxl'
 
-    Changed in v9: corpusFilePath is stored in metadata and now has a capital 'P'
+    * Changed in v9: corpusFilePath is stored in metadata and now has a capital 'P'.
     '''
     return manager.parse(
         workName=workName,

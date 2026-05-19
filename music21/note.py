@@ -203,7 +203,7 @@ class Lyric(prebase.ProtoM21Object, style.StyleMixin):
 
     Custom elision elements for composite components will be supported later.
 
-    * New in v6.7: composite components, elisionBefore
+    * New in v6.7: composite components, elisionBefore.
     * Changed in v8: lyric text can be an empty string, but not None.
     '''
     _styleClass = style.TextStylePlacement
@@ -722,7 +722,7 @@ class GeneralNote(base.Music21Object):
         'bon'
 
         * Changed in v6.7: added setting to a Lyric object.  Removed undocumented
-          setting to False instead of setting to None
+          setting to False instead of setting to None.
         '''
         if not self.lyrics:
             return None
