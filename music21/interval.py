@@ -893,7 +893,7 @@ class GenericInterval(IntervalBase):
     >>> threeOctaveThird.simpleNiceName
     'Third'
 
-    * Changed in v6: large intervals get abbreviations
+    * Changed in v6: large intervals get abbreviations.
     '''
     def __init__(self,
                  value: int|str = 'Unison',
@@ -1221,7 +1221,7 @@ class GenericInterval(IntervalBase):
         >>> interval.GenericInterval(44).niceName
         '44th'
 
-        * Changed in v6: large numbers get the 'th' or 'rd' etc. suffix
+        * Changed in v6: large numbers get the 'th' or 'rd' etc. suffix.
         '''
         return self._nameFromInt(self.undirected)
 
@@ -2168,7 +2168,7 @@ class DiatonicInterval(IntervalBase):
         <music21.pitch.Pitch F#5>
 
 
-        * Changed in v6: added inPlace
+        * Changed in v6: added inPlace.
         '''
         fullIntervalObject = Interval(diatonic=self, chromatic=self.getChromatic())
         return fullIntervalObject.transposePitch(p, inPlace=inPlace)
@@ -2505,7 +2505,7 @@ class ChromaticInterval(IntervalBase):
         >>> p.spellingIsInferred
         True
 
-        * Changed in v6: added inPlace
+        * Changed in v6: added inPlace.
         '''
         if p.octave is None:
             useImplicitOctave = True
@@ -3302,7 +3302,7 @@ class Interval(IntervalBase):
         >>> interval.Interval().intervalClass
         0
 
-        * Changed in v6.5: empty intervals return 0
+        * Changed in v6.5: empty intervals return 0.
         '''
         return self.chromatic.intervalClass
 
@@ -3393,8 +3393,7 @@ class Interval(IntervalBase):
         it is the same as `i.reverse().transposePitch(x)` and that format
         will be much faster when calling many times.
 
-        * Changed in v6: inPlace parameter added.  Reverse and maxAccidental
-          changed to keyword only.
+        * Changed in v6: inPlace parameter added. Reverse and maxAccidental changed to keyword only.
 
         OMIT_FROM_DOCS
 
@@ -3952,7 +3951,7 @@ def transposePitch(
     >>> C4
     <music21.pitch.Pitch G4>
 
-    * Changed in v6: added inPlace parameter
+    * Changed in v6: added inPlace parameter.
     '''
 
     # check if interval1 is a string,

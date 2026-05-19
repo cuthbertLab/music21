@@ -253,7 +253,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
             def __init__(self, givenElements, craziness, **keywords):
                 ...
 
-    * New in v7: smart appending
+    * New in v7: smart appending.
     * New in v8: givenElementsBehavior keyword configures the smart appending.
     '''
     # this static attributes offer a performance boost over other
@@ -1446,7 +1446,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         >>> s.hasElementOfClass('Measure')
         False
 
-        To be deprecated in v10 -- to be removed in v11, use:
+        To be deprecated in v11 -- to be removed in v12, use:
 
         >>> bool(s.getElementsByClass(meter.TimeSignature))
         True
@@ -1726,7 +1726,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         False
 
         * Changed in v5.3: firstMatchOnly removed -- impossible to have element
-          in stream twice.  recurse and shiftOffsets changed to keywordOnly arguments
+          in stream twice.  recurse and shiftOffsets changed to keywordOnly arguments.
         '''
         # experimental
         if not self._mutable:  # pragma: no cover
@@ -2105,10 +2105,10 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         music21.exceptions21.StreamException: Cannot set the offset for element
             <music21.note.Note D>, not in Stream <music21.stream.Stream Stream1>.
 
-        * Changed in v5.5: also sets .activeSite for the element
-        * Changed in v6.7: also runs coreElementsChanged()
+        * Changed in v5.5: also sets .activeSite for the element.
+        * Changed in v6.7: also runs coreElementsChanged().
         * Changed in v7: addElement is removed;
-          see :meth:`~music21.stream.core.StreamCoreMixin.coreSetElementOffset`
+          see :meth:`~music21.stream.core.StreamCoreMixin.coreSetElementOffset`.
         '''
         self.coreSetElementOffset(element,
                                   offset,
@@ -3010,7 +3010,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
           searches in derivation chain.
         * Changed in v5.3: `firstMatchOnly` removed -- impossible to have element
           in stream twice.  `recurse` and `shiftOffsets` changed to keywordOnly arguments
-        * Changed in v6: recurse works
+        * Changed in v6: recurse works.
         * Changed in v7: raises `StreamException` if replacement is already in the stream.
         '''
         def replaceDerived(startSite=self):
@@ -3431,7 +3431,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         in Jupyter notebook/JupyterLab/Google Colab.  The
         keyword `returnInNotebook` if True returns a plot no matter what.
 
-        Changed in v9: Changed default for return in notebook, and added
+        * Changed in v9: Changed default for return in notebook, and added
           `returnInNotebook` keyword based on changes to recent Jupyter and
           similar releases.
         '''
@@ -3570,7 +3570,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         >>> s.recurse().notes[3].groups
         ['scaleNote']
 
-        * New in v6.7.1: recurse
+        * New in v6.7.1: recurse.
         '''
         sIterator = self.iter() if not recurse else self.recurse()
         if classFilter is not None:
@@ -4886,8 +4886,8 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         on bwv66.6)
 
         * Changed in v7: all arguments are keyword only.
-        * New in v9.9: added exemptFromRemove
-        * Note: in v10: removeClasses cannot be boolean -- use removeAll instead
+        * New in v9.9: added exemptFromRemove.
+        * Note: in v10: removeClasses cannot be boolean -- use removeAll instead.
         '''
         out = self.cloneEmpty(derivationMethod='template')
         if removeClasses is None:
@@ -5058,7 +5058,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         <music21.stream.Measure 3 offset=8.0> Tenor
         <music21.stream.Measure 3 offset=8.0> Bass
 
-        Changed in v9: classFilterList must be a list or tuple of strings or Music21Objects
+        * Changed in v9: classFilterList must be a list or tuple of strings or Music21Objects
 
         OMIT_FROM_DOCS
 
@@ -5460,9 +5460,9 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         >>> sp.derivation.origin is p
         True
 
-        * Changed in v2.0.10: inPlace is False
-        * Changed in v5: returns None if inPlace=True
-        * Changed in v9: no transposition instead of exception if atSoundingPitch is 'unknown'
+        * Changed in v2.0.10: inPlace is False.
+        * Changed in v5: returns None if inPlace=True.
+        * Changed in v9: no transposition instead of exception if atSoundingPitch is 'unknown'.
         '''
         from music21 import spanner
 
@@ -5538,9 +5538,9 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         >>> scWritten.recurse().notes[0].nameWithOctave
         'A4'
 
-        * Changed in v3: `inPlace` defaults to `False`
-        * Changed in v5 returns `None` if `inPlace=True`
-        * Changed in v9: no transposition instead of exception if atSoundingPitch is 'unknown'
+        * Changed in v3: `inPlace` defaults to `False`.
+        * Changed in v5 returns `None` if `inPlace=True`.
+        * Changed in v9: no transposition instead of exception if atSoundingPitch is 'unknown'.
         '''
         from music21 import spanner
 
@@ -6810,7 +6810,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         this returns a modified deep copy.
 
         * Changed in v6: does not return anything if inPlace is True.
-        * Changed in v7: default inPlace is False
+        * Changed in v7: default inPlace is False.
         * Changed in v8: altered unisons/octaves in Chords now supply clarifying naturals.
 
         All arguments are keyword only.
@@ -8003,7 +8003,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
             requests them to be. The way to tell a modern IDE that a process may
             have consequences is to make it a `.method()` not a `.property`.
 
-        Changed in v.10 - Derivation method names changed to flatten and flatten_retain_containers
+        * Changed in v.10: Derivation method names changed to flatten and flatten_retain_containers
         '''
         # environLocal.printDebug(['flatten(): self', self,
         #  'self.activeSite', self.activeSite])
@@ -10353,13 +10353,10 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
          <music21.note.Note B->, <music21.note.Note A->]
 
         * Changed in v7:
-
-          * now finds notes in Voices without requiring `getOverlaps=True`
+          - now finds notes in Voices without requiring `getOverlaps=True`
             and iterates over Parts rather than flattening.
-
-          * If `noNone=False`, inserts `None`
+          - If `noNone=False`, inserts `None`
             when backing up to scan a subsequent voice or part.
-
         * Changed in v8: all parameters are keyword only.
 
 

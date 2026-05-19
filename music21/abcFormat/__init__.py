@@ -206,7 +206,7 @@ class ABCToken(prebase.ProtoM21Object, common.objects.EqualSlottedObjectMixin):
         >>> abcFormat.ABCToken.stripComment('b1 % a b-flat actually')
         'b1 '
 
-        * Changed in v6.2: made a staticmethod
+        * Changed in v6.2: made a staticmethod.
         '''
         if '%' in strSrc:
             return strSrc.split('%')[0]
@@ -1860,7 +1860,7 @@ class ABCHandler:
     define new phrases.  This is useful for parsing extra information from
     the Essen Folksong repertory
 
-    * New in v6.3: lineBreaksDefinePhrases -- does not yet do anything
+    * New in v6.3: lineBreaksDefinePhrases -- does not yet do anything.
     '''
     def __init__(self,
                  abcVersion: tuple[int, ...] = defaults.abcVersionDefault,
@@ -2041,7 +2041,7 @@ class ABCHandler:
         >>> ah.abcVersion
         (2, 3, 2)
 
-        Changed in v9: abcVersion defaults to (1, 3, 0) as documented.
+        * Changed in v9: abcVersion defaults to (1, 3, 0) as documented.
         '''
         verMats = reAbcVersion.search(inputSearch)
         if verMats:

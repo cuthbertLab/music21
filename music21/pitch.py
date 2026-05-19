@@ -1217,7 +1217,7 @@ class Accidental(prebase.ProtoM21Object, style.StyleMixin):
         This is the argument that .name and .alter use to allow non-standard names
 
 
-        * Changed in v5: added allowNonStandardValue
+        * Changed in v5: added allowNonStandardValue.
         '''
         if isinstance(name, str):
             name = name.lower()  # sometimes args get capitalized
@@ -1338,7 +1338,7 @@ class Accidental(prebase.ProtoM21Object, style.StyleMixin):
         Traceback (most recent call last):
         music21.pitch.AccidentalException: Cannot set attribute color independently of other parts.
 
-        * New in v5: needed because .name, .alter, and .modifier run .set()
+        * New in v5: needed because .name, .alter, and .modifier run .set().
         '''
         if attribute not in ('name', 'alter', 'modifier'):
             raise AccidentalException(
@@ -1396,7 +1396,7 @@ class Accidental(prebase.ProtoM21Object, style.StyleMixin):
         >>> a.alter
         -1.0
 
-        * Changed in v5: changing the name here changes other values, conditionally
+        * Changed in v5: changing the name here changes other values, conditionally.
         '''
         return self._name
 
@@ -1430,7 +1430,7 @@ class Accidental(prebase.ProtoM21Object, style.StyleMixin):
         >>> notSoFlat.name
         'flat'
 
-        * Changed in v5: changing the alter here changes other values, conditionally
+        * Changed in v5: changing the alter here changes other values, conditionally.
         '''
         return self._alter
 
@@ -1462,8 +1462,7 @@ class Accidental(prebase.ProtoM21Object, style.StyleMixin):
         >>> f.name
         'sharp'
 
-        * Changed in v5: changing the modifier here changes
-          other values, conditionally
+        * Changed in v5: changing the modifier here changes other values, conditionally.
         '''
         return self._modifier
 

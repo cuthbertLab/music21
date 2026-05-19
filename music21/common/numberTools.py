@@ -292,7 +292,7 @@ def opFrac(num: OffsetQLIn) -> OffsetQL:
     0.0
 
     * Changed in v9.3: opFrac(None) should not be called.  If it is called,
-      it now returns 0.0
+      it now returns 0.0.
     '''
     # This is a performance critical operation, tuned to go as fast as possible.
     # hence redundancy -- first we check for type (no inheritance) and then we

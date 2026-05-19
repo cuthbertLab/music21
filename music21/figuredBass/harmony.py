@@ -60,7 +60,7 @@ class FiguredBass(Harmony):
     >>> fb.pitches
     ()
 
-    * New in v9.3
+    * New in v9.3.
     '''
     def __init__(self,
                  figureString: str = '',

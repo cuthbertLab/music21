@@ -1540,7 +1540,7 @@ class MeterSequence(MeterTerminal):
         >>> ms.isUniformPartition()
         False
 
-        * Changed in v7: depth is keyword only
+        * Changed in v7: depth is keyword only.
         '''
         n = []
         d = []

@@ -1036,7 +1036,7 @@ class ProtoSpine(prebase.ProtoM21Object):
     See :meth:`~music21.humdrum.spineParser.parseProtoSpinesAndEventCollections`
     for more details on how ProtoSpine objects are created.
 
-    * Changed in v10: ProtoSpines now iterate over their eventLists and are ProtoM21Objects
+    * Changed in v10: ProtoSpines now iterate over their eventLists and are ProtoM21Objects.
     '''
 
     def __init__(self, eventList: list[SpineEvent|None]|None = None) -> None:
@@ -2165,7 +2165,7 @@ class EventCollection(prebase.ProtoM21Object):
 
     In the future, EventCollection may enforce that all events have the same lineNumber
 
-    * New in v10: lineNumber
+    * New in v10: lineNumber.
     '''
     def __init__(self, maxSpines: int = 0, lineNumber: int = 0) -> None:
         self.events: common.defaultlist = common.defaultlist(lambda: None)
@@ -2495,10 +2495,10 @@ def hdStringToMeasure(
     kern uses an equals sign followed by processing instructions to
     create new measures.
 
-    Changed in v10: repeat dots are encoded as :class:`~music21.bar.Repeat`
-    objects instead of being stuffed into a non-existent ``Barline.repeatDots``
-    attribute.  ``:|:`` now produces an end-Repeat on the previous measure's
-    right barline AND a start-Repeat on the new measure's left barline.
+    * Changed in v10: repeat dots are encoded as :class:`~music21.bar.Repeat`
+        objects instead of being stuffed into a non-existent ``Barline.repeatDots``
+        attribute.  ``:|:`` now produces an end-Repeat on the previous measure's
+        right barline AND a start-Repeat on the new measure's left barline.
     '''
     if contents == '==|':
         environLocal.warn(

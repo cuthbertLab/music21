@@ -1140,7 +1140,7 @@ class Key(KeySignature, scale.DiatonicScale):
         searching, melodic minor scales cannot be used as abstracts
         for deriving by degree.
 
-        * New in v6: preserve mode in key.Key.deriveByDegree
+        * New in v6: preserve mode in key.Key.deriveByDegree.
         '''
         ret = super().deriveByDegree(degree, pitchRef)
         ret.mode = self.mode

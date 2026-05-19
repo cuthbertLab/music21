@@ -1755,7 +1755,7 @@ class Verticality(base.Music21Object):
         1.0
 
         * Changed in v8: renamed getVerticalityOffset to not conflict with
-            .offset property.  Made leftAlign keyword only
+            .offset property.  Made leftAlign keyword only.
         '''
         if not self.objects:
             return 0.0

@@ -712,7 +712,7 @@ class Expander(t.Generic[StreamType]):
         {0.0} <music21.note.Note F>
         {3.0} <music21.bar.Barline type=final>
 
-    Changed in v9: Expander must be initialized with a Stream object.
+    * Changed in v9: Expander must be initialized with a Stream object.
 
     OMIT_FROM_DOCS
 

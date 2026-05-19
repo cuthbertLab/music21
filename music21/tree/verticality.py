@@ -731,7 +731,7 @@ class Verticality(prebase.ProtoM21Object):
          <...AllAttachArticulation>,
          <...OtherAllAttachArticulation>]
 
-        * New in v6.3: copyPitches option
+        * New in v6.3: copyPitches option.
 
         OMIT_FROM_DOCS
 

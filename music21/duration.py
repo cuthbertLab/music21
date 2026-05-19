@@ -2460,7 +2460,7 @@ class Duration(prebase.ProtoM21Object, SlottedObjectMixin):
         '''
         Look to components and determine quarter length.
 
-        * Changed in v7: made private.  And faster
+        * Changed in v7: made private and faster.
         '''
         if self.linked is False:
             return

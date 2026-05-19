@@ -317,7 +317,7 @@ def _postFigureFromChordAndKey(chordObj: chord.Chord, keyObj: key.Key) -> str:
     Known bug: Fails on German Augmented 6th chords in root position.  Calls them
     half-diminished chords.
 
-    Changed in v10: made _postFigureFromChordAndKey private, keyObj is not optional.
+    * Changed in v10: made _postFigureFromChordAndKey private, keyObj is not optional.
     '''
     chordFigureTuples = figureTuples(chordObj, keyObj)
     bassFigureAlter = chordFigureTuples[0].alter
@@ -1909,10 +1909,8 @@ class RomanNumeral(harmony.Harmony):
     * Changed in v7: RomanNumeral.romanNumeral will always give a "b" for a flattened
       degree (i.e., '-II' becomes 'bII') as this is what people expect in looking at
       the figure.
-
     * Changed in v7.3: figures that are not normally used to indicate inversion
       such as V54 (a suspension) no longer give strange inversions.
-
     * Changed in v8: Figures are now validated as alphanumeric or containing one of
       the following symbols (after the example "V"):
 
@@ -2128,7 +2126,7 @@ class RomanNumeral(harmony.Harmony):
 
             Changing this value will not change existing pitches.
 
-            * Changed in v6.5: always returns a string, never None
+            * Changed in v6.5: always returns a string, never None.
             ''',
         'frontAlterationString': '''
             A string representing the chromatic alteration of a RomanNumeral, if any
@@ -2140,7 +2138,7 @@ class RomanNumeral(harmony.Harmony):
 
             Changing this value will not change existing pitches.
 
-            * Changed in v6.5: always returns a string, never None
+            * Changed in v6.5: always returns a string, never None.
             ''',
         'frontAlterationTransposeInterval': '''
             An optional :class:`~music21.interval.Interval` object
@@ -3070,7 +3068,7 @@ class RomanNumeral(harmony.Harmony):
         Note that this function is not called in parsing, but a private function having the
         guts of this function is called.
 
-        * Changed in v6.4: public function became hook to private function having the actual guts
+        * Changed in v6.5: public function became hook to private function having the actual guts.
         '''
         unused_workingFigure = self._adjustMinorVIandVIIByQuality('', useScale)
 
@@ -3101,7 +3099,7 @@ class RomanNumeral(harmony.Harmony):
         >>> ' '.join([p.name for p in rn.pitches])
         'G# B D G##'
 
-        * Changed in v6.4: Made private when `workingFigure`
+        * Changed in v6.5: Made private when `workingFigure`
           was added to the signature and returned.
         '''
         def sharpen(wFig: str) -> str:
@@ -3969,7 +3967,7 @@ RomanNumeral.figure.__doc__ = '''
 
     Changing this value will not change existing pitches.
 
-    * Changed in v6.5: empty RomanNumerals now have figure of '' not None
+    * Changed in v6.5: empty RomanNumerals now have figure of '' not None.
     '''
 
 

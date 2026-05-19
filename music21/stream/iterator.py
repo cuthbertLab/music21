@@ -707,7 +707,7 @@ class StreamIterator(prebase.ProtoM21Object, Sequence[M21ObjType]):
         >>> {e.activeSite.id for e in sI_notes.matchingElements()}
         {'tn3/4'}
 
-        * New in v7: restoreActiveSites
+        * New in v7: restoreActiveSites.
         * Changed in v9.3: restoreActiveSites allows `None` which takes from the iterator's
           `restoreActiveSites` attribute.
         '''
