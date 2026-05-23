@@ -216,7 +216,7 @@ class SubConverter:
         app=None,
         subformats=(),
         **keywords
-    ) -> None:
+    ) -> t.Any|None:
         '''
         Write the data, then show the generated data, using `.launch()` or printing
         to a console.
@@ -355,7 +355,7 @@ class ConverterIPython(SubConverter):
     registerOutputSubformatExtensions = {'lilypond': 'ly'}
 
     def show(self, obj, fmt, app=None, subformats=(),
-             **keywords):  # pragma: no cover
+             **keywords) -> t.Any:  # pragma: no cover
         '''
         show a specialized for Jupyter Notebook using the appropriate subformat.
 
@@ -387,10 +387,11 @@ class ConverterIPython(SubConverter):
                 subformats=helperSubformats,
                 **keywords,
             )
+            return None
         elif helperFormat == 'midi':
             if t.TYPE_CHECKING:
                 assert isinstance(helperSubConverter, ConverterMidi)
-            ip21_converters.displayMusic21jMIDI(
+            return ip21_converters.displayMusic21jMIDI(
                 obj,
                 subConverter=helperSubConverter,
                 fmt=helperFormat,
