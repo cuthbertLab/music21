@@ -18,6 +18,7 @@ import pathlib
 import typing as t
 
 from music21 import common
+from music21.common.misc import runningInJupyterOrColab, runningInMarimo
 from music21.converter import museScore
 from music21 import defaults
 from music21 import environment
@@ -128,10 +129,7 @@ def displayMusic21jMIDI(
     fmt: str = 'midi',
     subformats: Sequence[str] = (),
     **keywords,
-):
-    # noinspection PyPackageRequirements
-    from IPython.display import display, HTML  # type: ignore
-
+) -> t.Any:
     fp = subConverter.write(
         obj,
         fmt,
@@ -141,14 +139,34 @@ def displayMusic21jMIDI(
     )
 
     with open(fp, 'rb') as f:
-        binaryMidiData = f.read()
+        binaryMidiData: bytes = f.read()
 
+    htmlOutput = htmlOutputForMidi(binaryMidiData)
+    displayMusic21jMIDIMarimo(htmlOutput)
+
+    if runningInJupyterOrColab():
+        displayMusic21jMIDIJupyter(htmlOutput)
+    elif runningInMarimo():
+        return displayMusic21jMIDIMarimo(htmlOutput)
+    else:
+        raise ValueError('Cannot run displayMusic21jMIDI if not running in a supported Notebook')
+
+def displayMusic21jMIDIJupyter(htmlOutput: str) -> None:
+    from IPython.display import display, HTML
+    display(HTML(htmlOutput))
+
+def displayMusic21jMIDIMarimo(htmlOutput: str) -> t.Any:
+    # noinspection PyPackageRequirements
+    from marimo import iframe  # type: ignore  # pylint: disable=import-error
+    return iframe(htmlOutput, width='100%', height='80px')
+
+def htmlOutputForMidi(binaryMidiData: bytes) -> str:
     binaryBase64 = base64.b64encode(binaryMidiData)
     s = common.SingletonCounter()
     outputId = 'midiPlayerDiv' + str(s())
     utf_binary: str = binaryBase64.decode('utf-8')
     # noinspection PyTypeChecker
-    display(HTML('''
+    return '''
         <div id="''' + outputId + '''">
             <p class="m21-trust-warning">
                 This MIDI player only runs in <em>trusted</em> notebooks.
@@ -209,7 +227,7 @@ def displayMusic21jMIDI(
             }
             script.addEventListener("load", function() { play(window.music21); });
         })();
-        </script>'''))
+        </script>'''
 
 
     # def vfshow(self, s):
