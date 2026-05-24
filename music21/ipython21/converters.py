@@ -152,14 +152,13 @@ def displayMusic21jMIDI(
         raise ValueError('Cannot run displayMusic21jMIDI if not running in a supported Notebook')
 
 def displayMusic21jMIDIJupyter(htmlOutput: str) -> None:
-    # noinspection PyPackageRequirements
-    from IPython.display import display, HTML  # type: ignore
+    from IPython.display import display, HTML
     display(HTML(htmlOutput))
 
 def displayMusic21jMIDIMarimo(htmlOutput: str) -> t.Any:
     # noinspection PyPackageRequirements
-    import marimo as mo  # type: ignore
-    return mo.iframe(htmlOutput, width='100%', height='80px')
+    from marimo import iframe  # type: ignore  # pylint: disable=import-error
+    return iframe(htmlOutput, width='100%', height='80px')
 
 def htmlOutputForMidi(binaryMidiData: bytes) -> str:
     binaryBase64 = base64.b64encode(binaryMidiData)
