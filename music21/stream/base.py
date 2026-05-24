@@ -7161,13 +7161,14 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         elements = list(returnObj.getElementsByClass(objClass))
 
         for element, nextElement in zip(elements, elements[1:]):
-            span = returnObj.elementOffset(nextElement) - returnObj.elementOffset(element)
+            span = opFrac(returnObj.elementOffset(nextElement) - returnObj.elementOffset(element))
             element.duration.quarterLength = span
 
         # handle last element
         if elements:
-            elements[-1].duration.quarterLength = (qLenTotal
-                                                   - returnObj.elementOffset(elements[-1]))
+            elements[-1].duration.quarterLength = opFrac(
+                qLenTotal - returnObj.elementOffset(elements[-1])
+            )
         if not inPlace:
             return returnObj
 
