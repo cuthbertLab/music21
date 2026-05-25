@@ -2244,8 +2244,8 @@ class Turn(Ornament):
         keySig: key.KeySignature|None = None,
         inPlace: bool = False
     ) -> tuple[list[note.Note|note.Unpitched],
-                note.Note|note.Unpitched|None,
-                list[note.Note|note.Unpitched]]:
+               note.Note|note.Unpitched|None,
+               list[note.Note|note.Unpitched]]:
         # noinspection PyShadowingNames
         '''
         realize a turn.
@@ -2371,7 +2371,7 @@ class Turn(Ornament):
         if turnDuration < 4 * self.quarterLength:
             if not self.autoScale:
                 raise ExpressionException('The note is not long enough to realize a turn')
-            useQL = opFrac(turnDuration / 4)
+            useQL = turnDuration / 4
         elif turnDuration > 4 * self.quarterLength:
             # in this case, we keep the first 3 turn notes as self.quarterLength, and
             # extend the 4th turn note to finish up the turnDuration

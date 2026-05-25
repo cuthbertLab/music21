@@ -1154,7 +1154,7 @@ class Test(unittest.TestCase):
         stream2.append(m)
         # c.show('t')
         variant.addVariant(c.parts[0], 6.0, stream2,
-                           variantName='rhythmic_switch', replacementDuration=3.0)
+                           variantName='rhythmic_switch', replacementQuarterLength=3.0)
 
         # test Variant is in stream
         unused_v1 = c.parts.first().getElementsByClass(variant.Variant).first()

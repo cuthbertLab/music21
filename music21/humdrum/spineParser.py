@@ -1289,8 +1289,8 @@ class HumdrumSpine(prebase.ProtoM21Object):
             m1TimeSignature = m1.timeSignature
             if m1TimeSignature is not None:
                 if m1.duration.quarterLength < m1TimeSignature.barDuration.quarterLength:
-                    m1.paddingLeft = (m1TimeSignature.barDuration.quarterLength
-                                      - m1.duration.quarterLength)
+                    m1.paddingLeft = opFrac(m1TimeSignature.barDuration.quarterLength
+                                            - m1.duration.quarterLength)
 
         return streamOut
 
@@ -2409,8 +2409,8 @@ def hdStringToNote(contents: str) -> note.GeneralNote:
     foundNumber = re.search(r'(\d+)', contents)
     if foundRational:
         durationFirst = int(foundRational.group(1))
-        durationSecond = float(foundRational.group(2))
-        thisObject.duration.quarterLength = 4 * durationSecond / durationFirst
+        durationSecond = int(foundRational.group(2))
+        thisObject.duration.quarterLength = opFrac(4 * durationSecond / durationFirst)
         if '.' in contents:
             thisObject.duration.dots = contents.count('.')
 

@@ -18,14 +18,15 @@ from collections.abc import Sequence
 import copy
 import typing as t
 
-from music21 import prebase
+from music21 import common
 from music21.common.numberTools import opFrac
 from music21.common.objects import SlottedObjectMixin
-from music21 import common
+from music21.common.types import OffsetQLIn
 from music21.duration import Duration, DurationException
 from music21 import environment
 from music21.exceptions21 import MeterException
 from music21.meter import tools
+from music21 import prebase
 
 environLocal = environment.Environment('meter.core')
 
@@ -1915,7 +1916,7 @@ class MeterSequence(MeterTerminal):
         i = None
         for i in range(len(self)):
             start = qPos
-            end = qPos + self[i].duration.quarterLength
+            end = opFrac(qPos + self[i].duration.quarterLength)
             # if adjoining ends are permitted, first match is found
             if includeCoincidentBoundaries:
                 if start <= qLenPos <= end:
@@ -1925,13 +1926,13 @@ class MeterSequence(MeterTerminal):
                 if start <= qLenPos < end:
                     match.append(i)
                     break
-            qPos += self[i].duration.quarterLength
+            qPos = opFrac(qPos + self[i].duration.quarterLength)
 
         if i is not None and isinstance(self[i], MeterSequence):  # recurse
             # qLenPosition needs to be relative to this subdivision
             # start is our current position that this subdivision
             # starts at
-            qLenPosShift = qLenPos - start
+            qLenPosShift = opFrac(qLenPos - start)
             match += self[i].offsetToAddress(qLenPosShift,
                                              includeCoincidentBoundaries)
 
@@ -2014,9 +2015,10 @@ class MeterSequence(MeterTerminal):
         iMatch = self.offsetToIndex(qLenPos)
         return opFrac(self[iMatch].weight)
 
-    def offsetToDepth(self, qLenPos, align='quantize', index: int|None = None):
+    def offsetToDepth(self, qLenPos: OffsetQLIn, align: str = 'quantize', index: int|None = None):
         '''
-        Given a qLenPos, return the maximum available depth at this position.
+        Given a qLenPos, return the maximum available depth at this position.  Align can be
+        start, quantize, or end.
 
         >>> b = meter.MeterSequence('4/4', 4)
         >>> b[1] = b[1].subdivide(2)
@@ -2040,6 +2042,7 @@ class MeterSequence(MeterTerminal):
         * Changed in v7: `index` can be provided, if known, for a long
           `MeterSequence` to improve performance.
         '''
+        # TODO: Change the aligns to be StrEnums.
         qLenPos = opFrac(qLenPos)
         if qLenPos >= self.duration.quarterLength or qLenPos < 0:
             raise MeterException(f'cannot access from qLenPos {qLenPos}')

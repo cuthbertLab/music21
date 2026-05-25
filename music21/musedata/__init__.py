@@ -54,6 +54,7 @@ from music21.musedata import translate
 
 from music21 import common
 from music21 import prebase
+from music21.common.types import OffsetQL
 
 environLocal = environment.Environment('musedata')
 
@@ -295,7 +296,7 @@ class MuseDataRecord(prebase.ProtoM21Object):
             # environLocal.printDebug(['p', p])
             return p
 
-    def getQuarterLength(self, divisionsPerQuarterNote=None):
+    def getQuarterLength(self, divisionsPerQuarterNote: int|None = None) -> OffsetQL:
         '''
         Gets the quarterLength of the note given the prevailing divisionsPerQuarterNote
 
@@ -340,7 +341,7 @@ class MuseDataRecord(prebase.ProtoM21Object):
         else:
             raise MuseDataException('cannot access parent container of this record '
                                     + 'to obtain divisions per quarter')
-        return divisions / dpq
+        return common.opFrac(divisions / dpq)
 
     def getDots(self):
         if self.stage == 1:
@@ -353,16 +354,16 @@ class MuseDataRecord(prebase.ProtoM21Object):
                     return 2
             return 0
 
-#    def getType(self):
-#        # TODO: column 17 self.src[16] defines the graphic note type
-#        # this may or may not align with derived quarter length
-#        if self.stage == 1:
-#            return None
-#        else:
-#            if len(self.src) == 0:
-#                return None
-#            data = self.src[16]
-#            return data
+   # def getType(self):
+   #     # TODO: column 17 self.src[16] defines the graphic note type
+   #     # this may or may not align with derived quarter length
+   #     if self.stage == 1:
+   #         return None
+   #     else:
+   #         if len(self.src) == 0:
+   #             return None
+   #         data = self.src[16]
+   #         return data
 
     def getLyrics(self):
         '''

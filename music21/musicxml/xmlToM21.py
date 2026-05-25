@@ -2607,7 +2607,8 @@ class MeasureParser(SoundTagMixin, XMLParserBase):
 
     def insertCoreAndRef(self, offset, mxObjectOrNumber, m21Object):
         '''
-        runs addToStaffReference and then insertCore.
+        runs addToStaffReference and then insertCore (which will do opFracs, so no need to do
+        so before here)
 
         >>> from xml.etree.ElementTree import fromstring as EL
         >>> mxNote = EL('<note><staff>1</staff></note>')
@@ -2665,13 +2666,13 @@ class MeasureParser(SoundTagMixin, XMLParserBase):
 
         >>> MP = musicxml.xmlToM21.MeasureParser()
         >>> MP.divisions = 100
-        >>> MP.offsetMeasureNote = 1.9979
+        >>> MP.offsetMeasureNote = 1.875
 
         >>> from xml.etree.ElementTree import fromstring as EL
         >>> mxBackup = EL('<backup><duration>100</duration></backup>')
         >>> MP.xmlBackup(mxBackup)
         >>> MP.offsetMeasureNote
-        0.9979
+        0.875
 
         >>> MP.xmlBackup(mxBackup)
         >>> MP.offsetMeasureNote
@@ -2679,8 +2680,8 @@ class MeasureParser(SoundTagMixin, XMLParserBase):
         '''
         mxDuration = mxObj.find('duration')
         if durationText := strippedText(mxDuration):
-            change = opFrac(float(durationText) / self.divisions)
-            self.offsetMeasureNote -= change
+            self.offsetMeasureNote = opFrac(self.offsetMeasureNote
+                                            - float(durationText) / self.divisions)
             # check for negative offsets produced by
             # musicxml durations with float rounding issues
             # https://github.com/cuthbertLab/music21/issues/971
@@ -2710,7 +2711,7 @@ class MeasureParser(SoundTagMixin, XMLParserBase):
                 self.lastForwardTagCreatedByFinale = r
 
             # Allow overfilled measures for now -- TODO(someday): warn?
-            self.offsetMeasureNote += change
+            self.offsetMeasureNote = opFrac(self.offsetMeasureNote + change)
 
     def xmlPrint(self, mxPrint: ET.Element):
         '''
@@ -2869,7 +2870,7 @@ class MeasureParser(SoundTagMixin, XMLParserBase):
             self.nLast = c  # update
 
         # only increment Chords after completion
-        self.offsetMeasureNote += offsetIncrement
+        self.offsetMeasureNote = opFrac(self.offsetMeasureNote + offsetIncrement)
         self.lastForwardTagCreatedByFinale = None
 
     def xmlToChord(self, mxNoteList: list[ET.Element]) -> chord.ChordBase:
@@ -5720,7 +5721,7 @@ class MeasureParser(SoundTagMixin, XMLParserBase):
         self.setPosition(mxMetronome, mm)
         return mm
 
-    def xmlToOffset(self, mxObj):
+    def xmlToOffset(self, mxObj: ET.Element) -> float:
         '''
         Finds an <offset> inside the mxObj and returns it as
         a music21 offset (in quarterLengths)
@@ -5732,17 +5733,16 @@ class MeasureParser(SoundTagMixin, XMLParserBase):
         >>> MP.xmlToOffset(off)
         2.5
 
-        Returns a float, not fraction.
+        Returns a float, not fraction, since the inserts will later convert to a Fraction
+        if need be.
 
         >>> MP.divisions = 30
         >>> off = EL(r'<direction><offset>10</offset></direction>')
         >>> MP.xmlToOffset(off)
         0.33333...
-
         '''
-
         try:
-            offset = float(mxObj.find('offset').text.strip())
+            offset = float(mxObj.find('offset').text.strip())  # type: ignore
         except (ValueError, AttributeError):
             return 0.0
         return offset / self.divisions

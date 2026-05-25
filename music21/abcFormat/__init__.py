@@ -85,6 +85,7 @@ import typing as t
 import unittest
 
 from music21 import common
+from music21.common.types import OffsetQL
 from music21 import defaults
 from music21 import environment
 from music21 import exceptions21
@@ -1403,7 +1404,7 @@ class ABCNote(ABCToken):
         # Pitch and duration attributes for m21 conversion
         # they are set via parse() based on other contextual information.
         self.pitchName: str|None = None  # if None, a rest or chord
-        self.quarterLength: float = 0.0
+        self.quarterLength: OffsetQL = 0.0
 
     @staticmethod
     def _splitChordSymbols(strSrc: str) -> tuple[list[str], str]:
@@ -1597,7 +1598,7 @@ class ABCNote(ABCToken):
 
     def getQuarterLength(self,
                          strSrc: str,
-                         forceDefaultQuarterLength: float|None = None) -> float:
+                         forceDefaultQuarterLength: float|None = None) -> OffsetQL:
         '''
         Called with parse(), after context processing, to calculate duration
 
@@ -1666,7 +1667,7 @@ class ABCNote(ABCToken):
 
         # get default
         if numStr == '':
-            ql = activeDefaultQuarterLength
+            ql: OffsetQL = activeDefaultQuarterLength
         # if only, shorthand for /2
         elif numStr == '/':
             ql = activeDefaultQuarterLength * 0.5
@@ -1676,7 +1677,7 @@ class ABCNote(ABCToken):
             ql = activeDefaultQuarterLength * 0.125
         # if a half fraction
         elif numStr.startswith('/'):
-            ql = activeDefaultQuarterLength / int(numStr.split('/')[1])
+            ql = common.opFrac(activeDefaultQuarterLength / int(numStr.split('/')[1]))
         # uncommon usage: 3/ short for 3/2
         elif numStr.endswith('/'):
             n = int(numStr.split('/', maxsplit=1)[0].strip())
@@ -1695,7 +1696,7 @@ class ABCNote(ABCToken):
                 assert dStr is not None
             n = int(nStr.strip())
             d = int(dStr.strip())
-            ql = activeDefaultQuarterLength * n / d
+            ql = common.opFrac(activeDefaultQuarterLength * n / d)
         # not a fraction; a multiplier
         else:
             ql = activeDefaultQuarterLength * int(numStr)
