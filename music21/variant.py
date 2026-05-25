@@ -106,7 +106,7 @@ class Variant(base.Music21Object):
         self._stream = stream.VariantStorage(givenElements=givenElements,
                                              givenElementsBehavior=givenElementsBehavior)
 
-        self._replacementDuration = None
+        self._replacementQuarterLength = None
 
         if name is not None:
             self.groups.append(name)
@@ -270,22 +270,47 @@ class Variant(base.Music21Object):
         '''
         return self._stream
 
-    def _getReplacementDuration(self):
-        if self._replacementDuration is None:
+    def _getReplacementQuarterLength(self):
+        if self._replacementQuarterLength is None:
             return self._stream.duration.quarterLength
         else:
-            return self._replacementDuration
+            return self._replacementQuarterLength
+
+    def _setReplacementQuarterLength(self, value):
+        self._replacementQuarterLength = value
+
+    replacementQuarterLength = property(
+        _getReplacementQuarterLength,
+        _setReplacementQuarterLength,
+        doc='''
+        Set or Return the quarterLength in the main stream which this variant
+        object replaces in the variant version of the stream. If replacementQuarterLength is
+        not set, it is assumed to be the same length as the variant. If it is set to 0,
+        the variant should be interpreted as an insertion. Setting replacementQuarterLength
+        to None will return the value to the default which is the length of the variant
+        itself.
+
+        * New in v10.3: renamed from ``replacementDuration``.
+        ''')
+
+    def _getReplacementDuration(self):
+        return self.replacementQuarterLength
 
     def _setReplacementDuration(self, value):
-        self._replacementDuration = value
+        self.replacementQuarterLength = value
 
-    replacementDuration = property(_getReplacementDuration, _setReplacementDuration, doc='''
-        Set or Return the quarterLength duration in the main stream which this variant
-        object replaces in the variant version of the stream. If replacementDuration is
-        not set, it is assumed to be the same length as the variant. If, it is set to 0,
-        the variant should be interpreted as an insertion. Setting replacementDuration
-        to None will return the value to the default which is the duration of the variant
-        itself.
+    replacementDuration = property(
+        _getReplacementDuration,
+        _setReplacementDuration,
+        doc='''
+        Synonym for :attr:`replacementQuarterLength`.
+
+        .. note::
+
+            ``replacementDuration`` is pending deprecation as of v10.3 (music21
+            avoids referring to an offset/quarterLength value as a "Duration"). It will be
+            fully deprecated in v11 and removed in v12.  Use
+            :attr:`replacementQuarterLength` instead.
         ''')
 
     @property
@@ -295,7 +320,7 @@ class Variant(base.Music21Object):
         if the variant is longer than the region it replaces, and 'replacement' if it is
         the same length.
         '''
-        lengthDifference = self.replacementDuration - self.containedHighestTime
+        lengthDifference = self.replacementQuarterLength - self.containedHighestTime
         if lengthDifference > 0.0:
             return 'deletion'
         elif lengthDifference < 0.0:
@@ -309,7 +334,7 @@ class Variant(base.Music21Object):
         '''
         Returns a Stream containing the elements which this variant replaces in a
         given context stream.
-        This Stream will have length self.replacementDuration.
+        This Stream will have length self.replacementQuarterLength.
 
         In regions that are strictly replaced, only elements that share a class with
         an element in the variant
@@ -338,8 +363,8 @@ class Variant(base.Music21Object):
         ...    v2measure2.insert(e.offset, e)
 
         >>> v3 = variant.Variant()
-        >>> v2.replacementDuration = 4.0
-        >>> v3.replacementDuration = 4.0
+        >>> v2.replacementQuarterLength = 4.0
+        >>> v3.replacementQuarterLength = 4.0
 
         >>> s.insert(4.0, v1)    # replacement variant
         >>> s.insert(12.0, v2)  # insertion variant (2 bars replace 1 bar)
@@ -384,7 +409,7 @@ class Variant(base.Music21Object):
         ...        m.append(n)
         ...    v.append(m)
         >>> v.groups = ['paris']
-        >>> v.replacementDuration = 4.0
+        >>> v.replacementQuarterLength = 4.0
 
         >>> s = stream.Stream()
         >>> streamDataM1 = [('a', 'quarter'), ('b', 'quarter'), ('a', 'quarter'), ('g', 'quarter')]
@@ -436,7 +461,7 @@ class Variant(base.Music21Object):
 
 
         if self.lengthType in ('replacement', 'elongation'):
-            vEnd = vStart + self.replacementDuration + spacerDuration
+            vEnd = vStart + self.replacementQuarterLength + spacerDuration
             classes = []
             for e in self.elements:
                 classes.append(e.classes[0])
@@ -450,7 +475,7 @@ class Variant(base.Music21Object):
 
         elif self.lengthType == 'deletion':
             vMiddle = vStart + self.containedHighestTime
-            vEnd = vStart + self.replacementDuration
+            vEnd = vStart + self.replacementQuarterLength
             classes = []  # collect all classes found in this variant
             for e in self.elements:
                 classes.append(e.classes[0])
@@ -503,7 +528,7 @@ class Variant(base.Music21Object):
         ...        m.append(n)
         ...    v.append(m)
         >>> v.groups = ['paris']
-        >>> v.replacementDuration = 4.0
+        >>> v.replacementQuarterLength = 4.0
 
         >>> s = stream.Stream()
         >>> streamDataM1 = [('a', 'quarter'), ('b', 'quarter'), ('a', 'quarter'), ('g', 'quarter')]
@@ -850,9 +875,9 @@ def mergeVariantMeasureStreams(streamX, streamY, variantName='variant', *, inPla
         {3.0} <music21.note.Note B>
     {16.0} <music21.variant.Variant object of length 8.0>
 
-    >>> mergedStream[variant.Variant][0].replacementDuration
+    >>> mergedStream[variant.Variant][0].replacementQuarterLength
     4.0
-    >>> mergedStream[variant.Variant][1].replacementDuration
+    >>> mergedStream[variant.Variant][1].replacementQuarterLength
     0.0
 
     >>> parisStream = mergedStream.activateVariants('paris', inPlace=False)
@@ -895,11 +920,11 @@ def mergeVariantMeasureStreams(streamX, streamY, variantName='variant', *, inPla
         {2.0} <music21.note.Note E>
         {3.0} <music21.note.Note E>
 
-    >>> parisStream[variant.Variant][0].replacementDuration
+    >>> parisStream[variant.Variant][0].replacementQuarterLength
     0.0
-    >>> parisStream[variant.Variant][1].replacementDuration
+    >>> parisStream[variant.Variant][1].replacementQuarterLength
     4.0
-    >>> parisStream[variant.Variant][2].replacementDuration
+    >>> parisStream[variant.Variant][2].replacementQuarterLength
     8.0
     '''
     if inPlace is True:
@@ -920,26 +945,26 @@ def mergeVariantMeasureStreams(streamX, streamY, variantName='variant', *, inPla
             startOffset = returnObj.measure(xRegionStartMeasure + 1).getOffsetBySite(returnObj)
 
         yRegion = None
-        replacementDuration = 0.0
+        replacementQuarterLength = 0.0
 
         if regionType == 'equal':
             # yRegion = streamY.measures(yRegionStartMeasure + 1, yRegionEndMeasure)
             continue  # Do nothing
         elif regionType == 'replace':
             xRegion = returnObj.measures(xRegionStartMeasure + 1, xRegionEndMeasure)
-            replacementDuration = xRegion.duration.quarterLength
+            replacementQuarterLength = xRegion.duration.quarterLength
             yRegion = streamY.measures(yRegionStartMeasure + 1, yRegionEndMeasure)
         elif regionType == 'delete':
             xRegion = returnObj.measures(xRegionStartMeasure + 1, xRegionEndMeasure)
-            replacementDuration = xRegion.duration.quarterLength
+            replacementQuarterLength = xRegion.duration.quarterLength
             yRegion = None
         elif regionType == 'insert':
             yRegion = streamY.measures(yRegionStartMeasure + 1, yRegionEndMeasure)
-            replacementDuration = 0.0
+            replacementQuarterLength = 0.0
         else:
             raise VariantException(f'Unknown regionType {regionType!r}')
         addVariant(returnObj, startOffset, yRegion,
-                   variantName=variantName, replacementDuration=replacementDuration)
+                   variantName=variantName, replacementQuarterLength=replacementQuarterLength)
 
     if inPlace is True:
         return
@@ -1325,7 +1350,7 @@ def mergePartAsOssia(mainPart, ossiaPart, ossiaName,
                                ossiaMeasure,
                                variantName=ossiaName,
                                variantGroups=None,
-                               replacementDuration=None
+                               replacementQuarterLength=None
                                )
     else:
         for ossiaMeasure in ossiaPart.getElementsByClass(stream.Measure):
@@ -1342,7 +1367,8 @@ def mergePartAsOssia(mainPart, ossiaPart, ossiaName,
                     )
                 else:
                     addVariant(returnObj, ossiaOffset, ossiaMeasure,
-                               variantName=ossiaName, variantGroups=None, replacementDuration=None)
+                               variantName=ossiaName, variantGroups=None,
+                               replacementQuarterLength=None)
 
     if inPlace is True:
         return
@@ -1358,18 +1384,24 @@ def addVariant(
     sVariant: stream.Stream|Variant,
     variantName=None,
     variantGroups=None,
-    replacementDuration=None
+    replacementQuarterLength=None,
+    *,
+    replacementDuration=None,
 ):
     # noinspection PyShadowingNames
     '''
     Takes a stream, the location of the variant to be added to
     that stream (startOffset), the content of the
-    variant to be added (sVariant), and the duration of the section of the stream which the variant
-    replaces (replacementDuration).
+    variant to be added (sVariant), and the quarterLength of the section of the stream which
+    the variant replaces (replacementQuarterLength).
 
-    If replacementDuration is 0,
+    If replacementQuarterLength is 0,
     this is an insertion. If sVariant is
     None, this is a deletion.
+
+    * Changed in v10.3: the ``replacementDuration`` keyword renamed to
+      ``replacementQuarterLength``.  The old name is pending deprecation:
+      will warn in v11 and be removed in v12.
 
     >>> data1M1 = [('a', 'quarter'), ('b', 'eighth'), ('c', 'eighth'),
     ...            ('a', 'quarter'), ('a', 'quarter')]
@@ -1397,7 +1429,7 @@ def addVariant(
     ...    m.append(n)
     >>> stream2.append(m)
     >>> variant.addVariant(stream1, 4.0, stream2,
-    ...                    variantName='rhythmic_switch', replacementDuration=4.0)
+    ...                    variantName='rhythmic_switch', replacementQuarterLength=4.0)
     >>> stream1.show('text')
     {0.0} <music21.stream.Measure 0 offset=0.0>
         {0.0} <music21.note.Note A>
@@ -1424,7 +1456,7 @@ def addVariant(
     >>> variant1.repeatAppend(note.Note('f'), 3)
     >>> startOffset = 3.0
     >>> variant.addVariant(stream1, startOffset, variant1,
-    ...                    variantName='paris', replacementDuration=3.0)
+    ...                    variantName='paris', replacementQuarterLength=3.0)
     >>> stream1.show('text')
     {0.0} <music21.note.Note E>
     {1.0} <music21.note.Note E>
@@ -1434,6 +1466,15 @@ def addVariant(
     {4.0} <music21.note.Note E>
     {5.0} <music21.note.Note E>
     '''
+    if replacementDuration is not None:
+        # 'replacementDuration' was renamed to 'replacementQuarterLength' in v10.3.
+        # Pending deprecation: still accepted in v10, will warn in v11, be removed in v12.
+        if replacementQuarterLength is not None:
+            raise TypeError(
+                "addVariant() received both 'replacementQuarterLength' and its former "
+                + "name 'replacementDuration'; pass only 'replacementQuarterLength'.")
+        replacementQuarterLength = replacementDuration
+
     tempVariant = Variant()
 
     if variantGroups is not None:
@@ -1441,7 +1482,7 @@ def addVariant(
     if variantName is not None:
         tempVariant.groups.append(variantName)
 
-    tempVariant.replacementDuration = replacementDuration
+    tempVariant.replacementQuarterLength = replacementQuarterLength
 
     if sVariant is None:  # deletion
         pass
@@ -1495,7 +1536,7 @@ def refineVariant(s, sVariant, *, inPlace=False):
     ...        m.append(n)
     ...    v.append(m)
     >>> v.groups = ['paris']
-    >>> v.replacementDuration = 8.0
+    >>> v.replacementQuarterLength = 8.0
 
     >>> s = stream.Stream()
     >>> streamDataM1 = [('a', 'quarter'), ('b', 'quarter'), ('a', 'quarter'), ('g', 'quarter')]
@@ -1556,7 +1597,7 @@ def refineVariant(s, sVariant, *, inPlace=False):
 
     # useful parameters from variant and its location
     variantGroups = sVariant.groups
-    replacementDuration = sVariant.replacementDuration
+    replacementDuration = sVariant.replacementQuarterLength
     startOffset = sVariant.getOffsetBySite(s)
     # endOffset = replacementDuration + startOffset
 
@@ -1615,7 +1656,7 @@ def refineVariant(s, sVariant, *, inPlace=False):
                    startOffset,
                    variantSubRegion,
                    variantGroups=variantGroups,
-                   replacementDuration=replacementDuration
+                   replacementQuarterLength=replacementDuration
                    )
 
     # The original variant object has been replaced by more refined
@@ -1696,7 +1737,7 @@ def _mergeVariantMeasureStreamsCarefully(streamX, streamY, variantName, *, inPla
             startOffset,
             variantSubRegion,
             variantGroups=[variantName],
-            replacementDuration=replacementDuration
+            replacementQuarterLength=replacementDuration
         )
 
     if not inPlace:
@@ -2161,7 +2202,7 @@ def makeAllVariantsReplacements(streamWithVariants,
 
     >>> returnStream = variant.makeAllVariantsReplacements(newStream, recurse=False)
     >>> for v in returnStream.parts[0][variant.Variant]:
-    ...     (v.offset, v.lengthType, v.replacementDuration)
+    ...     (v.offset, v.lengthType, v.replacementQuarterLength)
     (4.0, 'replacement', 4.0)
     (16.0, 'elongation', 0.0)
     (20.0, 'deletion', 4.0)
@@ -2169,14 +2210,14 @@ def makeAllVariantsReplacements(streamWithVariants,
     >>> returnStream = variant.makeAllVariantsReplacements(
     ...                            newStream, variantNames=['france'], recurse=True)
     >>> for v in returnStream.parts[0][variant.Variant]:
-    ...     (v.offset, v.lengthType, v.replacementDuration)
+    ...     (v.offset, v.lengthType, v.replacementQuarterLength)
     (4.0, 'replacement', 4.0)
     (16.0, 'elongation', 0.0)
     (20.0, 'deletion', 4.0)
 
     >>> variant.makeAllVariantsReplacements(newStream, recurse=True, inPlace=True)
     >>> for v in newStream.parts[0][variant.Variant]:
-    ...     (v.offset, v.lengthType, v.replacementDuration, v.containedHighestTime)
+    ...     (v.offset, v.lengthType, v.replacementQuarterLength, v.containedHighestTime)
     (4.0, 'replacement', 4.0, 4.0)
     (12.0, 'elongation', 4.0, 12.0)
     (20.0, 'deletion', 8.0, 4.0)
@@ -2235,7 +2276,7 @@ def _doVariantFixingOnStream(s, variantNames=None):
     ...
 
     >>> for v in s[variant.Variant]:
-    ...     (v.offset, v.lengthType, v.replacementDuration)
+    ...     (v.offset, v.lengthType, v.replacementQuarterLength)
     (0.0, 'elongation', 4.0)
     (4.0, 'replacement', 4.0)
     (12.0, 'elongation', 4.0)
@@ -2248,18 +2289,18 @@ def _doVariantFixingOnStream(s, variantNames=None):
     >>> v1Stream = converter.parse('tinyNotation: 4/4   a4 a a a                                       ', makeNotation=False)
     >>> #                                               initial insertion     deletion
     >>> v1 = variant.Variant(v1Stream.notes)
-    >>> v1.replacementDuration = 0.0
+    >>> v1.replacementQuarterLength = 0.0
     >>> v1.groups = ['london']
     >>> s.insert(0.0, v1)
 
     >>> v2 = variant.Variant()
-    >>> v2.replacementDuration = 4.0
+    >>> v2.replacementQuarterLength = 4.0
     >>> v2.groups = ['london']
     >>> s.insert(4.0, v2)
 
     >>> variant._doVariantFixingOnStream(s, 'london')
     >>> for v in s[variant.Variant]:
-    ...     (v.offset, v.lengthType, v.replacementDuration, v.containedHighestTime)
+    ...     (v.offset, v.lengthType, v.replacementQuarterLength, v.containedHighestTime)
     (0.0, 'elongation', 1.0, 5.0)
     (4.0, 'deletion', 5.0, 1.0)
     '''
@@ -2272,7 +2313,7 @@ def _doVariantFixingOnStream(s, variantNames=None):
             else:
                 continue  # huh????
         lengthType = v.lengthType
-        replacementDuration = v.replacementDuration
+        replacementDuration = v.replacementQuarterLength
         highestTime = v.containedHighestTime
 
         if lengthType == 'elongation' and replacementDuration == 0.0:
@@ -2285,7 +2326,7 @@ def _doVariantFixingOnStream(s, variantNames=None):
         if v.getOffsetBySite(s) == 0.0:
             isInitial = True
             isFinal = False
-        elif v.getOffsetBySite(s) + v.replacementDuration == s.duration.quarterLength:
+        elif v.getOffsetBySite(s) + v.replacementQuarterLength == s.duration.quarterLength:
             isInitial = False
             isFinal = True
         else:
@@ -2324,8 +2365,9 @@ def _doVariantFixingOnStream(s, variantNames=None):
             s.insert(newVariantOffset, v)
 
             # Give it a new replacementDuration including the added element
-        oldReplacementDuration = v.replacementDuration
-        v.replacementDuration = oldReplacementDuration + targetElement.duration.quarterLength
+        oldReplacementQuarterLength = v.replacementQuarterLength
+        v.replacementQuarterLength = common.opFrac(
+            oldReplacementQuarterLength + targetElement.duration.quarterLength)
 
 
 def _getNextElements(s, v, numberOfElements=1):
@@ -2353,12 +2395,12 @@ def _getNextElements(s, v, numberOfElements=1):
     >>> v1Stream = converter.parse('tinyNotation: 4/4   a4 a a a                                       ', makeNotation=False)
     >>> #                                               initial insertion
     >>> v1 = variant.Variant(v1Stream.notes)
-    >>> v1.replacementDuration = 0.0
+    >>> v1.replacementQuarterLength = 0.0
     >>> v1.groups = ['london']
     >>> s.insert(0.0, v1)
 
     >>> v2 = variant.Variant()
-    >>> v2.replacementDuration = 4.0
+    >>> v2.replacementQuarterLength = 4.0
     >>> v2.groups = ['london']
     >>> s.insert(4.0, v2)
     >>> for v in s[variant.Variant]:
@@ -2391,7 +2433,7 @@ def _getNextElements(s, v, numberOfElements=1):
         returnElement = potentialTargets.first()
 
     else:
-        replacementDuration = v.replacementDuration
+        replacementDuration = v.replacementQuarterLength
         variantOffset = v.getOffsetBySite(s)
         potentialTargets = s.getElementsByOffset(variantOffset + replacementDuration,
                                                   offsetEnd=s.highestTime,
@@ -2431,12 +2473,12 @@ def _getPreviousElement(s, v):
     >>> v1Stream = converter.parse('tinyNotation: 4/4           f4 f f f                                ', makeNotation=False)
     >>> #                                                       insertion                final deletion
     >>> v1 = variant.Variant(v1Stream.notes)
-    >>> v1.replacementDuration = 0.0
+    >>> v1.replacementQuarterLength = 0.0
     >>> v1.groups = ['london']
     >>> s.insert(4.0, v1)
 
     >>> v2 = variant.Variant()
-    >>> v2.replacementDuration = 4.0
+    >>> v2.replacementQuarterLength = 4.0
     >>> v2.groups = ['london']
     >>> s.insert(8.0, v2)
     >>> for v in s[variant.Variant]:
@@ -2484,7 +2526,7 @@ def makeVariantBlocks(s):
 
     for v in variantsToBeDone:
         startOffset = s.elementOffset(v)
-        endOffset = v.replacementDuration + startOffset
+        endOffset = v.replacementQuarterLength + startOffset
         conflictingVariants = s.getElementsByOffset(offsetStart=startOffset,
                                                     offsetEnd=endOffset,
                                                     includeEndBoundary=False,
@@ -2492,7 +2534,7 @@ def makeVariantBlocks(s):
                                                     mustBeginInSpan=True,
                                                     classList=[variant.Variant])
         for cV in conflictingVariants:
-            oldReplacementDuration = cV.replacementDuration
+            oldReplacementDuration = cV.replacementQuarterLength
             if s.elementOffset(cV) == startOffset:
                 continue  # do nothing
             else:
@@ -2505,7 +2547,7 @@ def makeVariantBlocks(s):
                     cV._stream.coreSetElementOffset(el, oldOffset + shiftOffset)
                 cV.coreElementsChanged()
                 cV.insert(0.0, r)
-                cV.replacementDuration = oldReplacementDuration
+                cV.replacementQuarterLength = oldReplacementDuration
                 s.remove(cV)
                 s.insert(startOffset, cV)
                 variantsToBeDone.append(cV)

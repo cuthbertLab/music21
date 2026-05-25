@@ -784,6 +784,28 @@ def convertTypeToNumber(dType: str) -> float:
 
 # -----------------------------------------------------------------------------------
 class DurationTuple(t.NamedTuple):
+    '''
+    A DurationTuple is the atomic, un-tupleted building block of a
+    :class:`~music21.duration.Duration`. It bundles a note `type`
+    (e.g. ``'quarter'``, ``'eighth'``) with a
+    number of `dots` and the `quarterLength` that those produce:
+
+    >>> dt = duration.DurationTuple('quarter', 1, 1.5)
+    >>> dt.type
+    'quarter'
+    >>> dt.dots
+    1
+    >>> dt.quarterLength
+    1.5
+
+    Most Durations have one DurationTuple stored in `.components`.  Tuplet notes
+    have a DurationTuple and a Tuplet object. A complex Duration (like
+    a quarter tied to an sixteenth) can have tow or more DurationTuples.
+
+    A DurationTuple's `quarterLength` is also stored alongside `type` and `dots`
+    for quick computation.  For `inexpressible` DurationTuples, `quarterLength`
+    stores the ground-truth.
+    '''
     type: str
     dots: int
     quarterLength: OffsetQL
@@ -815,7 +837,7 @@ class DurationTuple(t.NamedTuple):
             raise DurationException(
                 f'Could not determine durationNumber from {self.type}')
 
-
+# Caches for DurationTuple lookups
 _durationTupleCacheTypeDots: dict[tuple[str, int], DurationTuple] = {}
 _durationTupleCacheQuarterLength: dict[OffsetQL, DurationTuple] = {}
 
@@ -1880,7 +1902,7 @@ class Duration(prebase.ProtoM21Object, SlottedObjectMixin):
         newTuplet.frozen = True
         self.tuplets = self._tuplets + (newTuplet,)
 
-    def augmentOrDiminish(self, amountToScale, retainComponents=False):
+    def augmentOrDiminish(self, amountToScale: OffsetQLIn, retainComponents=False) -> t.Self:
         '''
         Given a number greater than zero, creates a new Duration object
         after
@@ -1888,8 +1910,7 @@ class Duration(prebase.ProtoM21Object, SlottedObjectMixin):
         duration by the number and resets the components
         for the duration (by default).
 
-        Returns a new duration that has
-        the new length.
+        Returns a new duration that has the new length.
 
         >>> aDur = duration.Duration()
         >>> aDur.quarterLength = 1.5  # dotted quarter
@@ -1968,6 +1989,9 @@ class Duration(prebase.ProtoM21Object, SlottedObjectMixin):
         >>> fDur.augmentOrDiminish(-1)
         Traceback (most recent call last):
         ValueError: amountToScale must be greater than zero
+
+        Note: for unlinked durations w/ tuplet scaling, amountToScale must already
+        by a Fraction.
         '''
         if not amountToScale > 0:
             raise ValueError('amountToScale must be greater than zero')
@@ -1983,6 +2007,7 @@ class Duration(prebase.ProtoM21Object, SlottedObjectMixin):
             self._quarterLengthNeedsUpdating = True
         else:
             post.tuplets = ()
+            # post.quarterLength will run opFrac unless it is unlinked.
             post.quarterLength = self.quarterLength * amountToScale
 
         return post
@@ -2086,7 +2111,8 @@ class Duration(prebase.ProtoM21Object, SlottedObjectMixin):
         For a valid component index value, this returns the quarter note offset
         at which that component would start.
 
-        This does not handle fractional arguments.
+        This method does not handle fractional arguments, since components are stored
+        untupleted.
 
         >>> components = []
         >>> qdt = duration.DurationTuple('quarter', 0, 1.0)

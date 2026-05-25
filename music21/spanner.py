@@ -27,6 +27,7 @@ import unittest
 
 from music21 import base
 from music21 import common
+from music21.common.numberTools import opFrac
 from music21.common.types import OffsetQL
 from music21 import defaults
 from music21 import environment
@@ -686,9 +687,8 @@ class Spanner(base.Music21Object):
         endOffsetInHierarchy: OffsetQL
         if endElement is not None:
             try:
-                endOffsetInHierarchy = (
-                    endElement.getOffsetInHierarchy(searchStream) + endElement.quarterLength
-                )
+                endOffsetInHierarchy = opFrac(endElement.getOffsetInHierarchy(searchStream)
+                                              + endElement.quarterLength)
             except sites.SitesException:
                 # print('end element not in searchStream')
                 self.addSpannedElements(endElement)
@@ -698,9 +698,7 @@ class Spanner(base.Music21Object):
                     endElement.activeSite = savedEndElementActiveSite
                 return
         else:
-            endOffsetInHierarchy = (
-                startOffsetInHierarchy + startElement.quarterLength
-            )
+            endOffsetInHierarchy = opFrac(startOffsetInHierarchy + startElement.quarterLength)
 
         matchIterator = (searchStream
             .recurse()

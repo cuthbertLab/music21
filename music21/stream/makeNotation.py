@@ -876,6 +876,7 @@ def makeRests(
         if m is not None:
             post -= m.paddingLeft
             post -= m.paddingRight
+            post = opFrac(post)
         return max(post, 0.0)
 
     oLowTarget: OffsetQL = 0.0
@@ -894,9 +895,9 @@ def makeRests(
         elif returnObj.hasMeasures():
             # This could be optimized to save some context searches,
             # but at the cost of readability.
-            oHighTarget = sum(
+            oHighTarget = opFrac(sum(
                 m.barDuration.quarterLength for m in returnObj.getElementsByClass(stream.Measure)
-            )
+            ))
 
     # If the above search didn't run or still yielded 0.0, use refStreamOrTimeRange
     if oHighTarget == 0.0:

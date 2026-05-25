@@ -1857,13 +1857,13 @@ class LilypondConverter:
         >>> v1 = variant.Variant()
         >>> for el in s1:
         ...     v1.append(el)
-        >>> v1.replacementDuration = 4.0
+        >>> v1.replacementQuarterLength = 4.0
 
         >>> v2 = variant.Variant()
         >>> sp2 = note.Rest()
         >>> sp2.style.hideObjectOnPrint = True
         >>> sp2.duration.quarterLength = 4.0
-        >>> v2.replacementDuration = 4.0
+        >>> v2.replacementQuarterLength = 4.0
         >>> v2.append(sp2)
         >>> for el in s2:
         ...     v2.append(el)
@@ -1872,7 +1872,7 @@ class LilypondConverter:
         >>> sp3 = note.Rest()
         >>> sp3.style.hideObjectOnPrint = True
         >>> sp3.duration.quarterLength = 8.0
-        >>> v3.replacementDuration = 4.0
+        >>> v3.replacementQuarterLength = 4.0
         >>> v3.append(sp3)
         >>> for el in s3:
         ...     v3.append(el)
@@ -1881,7 +1881,7 @@ class LilypondConverter:
         >>> sp4 = note.Rest()
         >>> sp4.style.hideObjectOnPrint = True
         >>> sp4.duration.quarterLength = 16.0
-        >>> v4.replacementDuration = 4.0
+        >>> v4.replacementQuarterLength = 4.0
         >>> v4.append(sp4)
         >>> for el in s4:
         ...     v4.append(el)
@@ -1994,7 +1994,7 @@ class LilypondConverter:
                 raise LilyTranslateException('Should not have overlapping variants.')
 
             spacerDuration = firstOffset - highestOffsetSoFar
-            highestOffsetSoFar = v.replacementDuration + firstOffset
+            highestOffsetSoFar = v.replacementQuarterLength + firstOffset
 
             # make spacer with spacerDuration and append
             if spacerDuration > 0.0:
@@ -2013,9 +2013,9 @@ class LilypondConverter:
             endOffset = v.containedHighestTime
             vStripped = variant.Variant(v._stream.getElementsByOffset(firstOffset,
                                                                       offsetEnd=endOffset))
-            vStripped.replacementDuration = v.replacementDuration
+            vStripped.replacementQuarterLength = v.replacementQuarterLength
 
-            replacedElementsLength = vStripped.replacementDuration
+            replacedElementsLength = vStripped.replacementQuarterLength
             variantLength = vStripped.containedHighestTime - firstOffset
 
             if variantLength != replacedElementsLength:
@@ -2143,7 +2143,7 @@ class LilypondConverter:
 
         lpOssiaMusicVariant = self.lyOssiaMusicFromVariant(variantObject)
 
-        replacedElementsLength = variantObject.replacementDuration
+        replacedElementsLength = variantObject.replacementQuarterLength
         variantLength = variantObject.containedHighestTime - spacerDur
 
         self.variantMode = True

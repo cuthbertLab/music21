@@ -1299,7 +1299,7 @@ class TimeSignature(TimeSignatureBase):
             divStep = self.barDuration.quarterLength / accentCount
             weightInts = [0] * accentCount  # weights as integer/depth counts
             for i in range(accentCount):
-                ql = i * divStep
+                ql = opFrac(i * divStep)
                 weightInts[i] = ms.offsetToDepth(ql, align='quantize', index=i)
 
             maxInt = max(weightInts)
@@ -1723,7 +1723,7 @@ class TimeSignature(TimeSignatureBase):
             totalWeight += elWeight
         return totalWeight / totalObjects
 
-    def getMeasureOffsetOrMeterModulusOffset(self, el):
+    def getMeasureOffsetOrMeterModulusOffset(self, el: base.Music21Object) -> OffsetQL:
         '''
         Return the measure offset based on a Measure, if it exists,
         otherwise based on meter modulus of the TimeSignature.
@@ -1760,12 +1760,12 @@ class TimeSignature(TimeSignatureBase):
         '''
         mOffset = el._getMeasureOffset()  # TODO(msc): expose this method and remove private
         tsMeasureOffset = self._getMeasureOffset(includeMeasurePadding=False)
-        if (mOffset + tsMeasureOffset) < self.barDuration.quarterLength:
+        if opFrac(mOffset + tsMeasureOffset) < self.barDuration.quarterLength:
             return mOffset
         else:
             # must get offset relative to not just start of Stream, but the last
             # time signature
-            post = ((mOffset - tsMeasureOffset) % self.barDuration.quarterLength)
+            post = opFrac((mOffset - tsMeasureOffset) % self.barDuration.quarterLength)
             # environLocal.printDebug(['result', post])
             return post
 
@@ -2004,7 +2004,7 @@ class TimeSignature(TimeSignatureBase):
 
         >>> a = meter.TimeSignature('3/4', 3)
         >>> a.getBeatProgress(0)
-        (1, 0)
+        (1, 0.0)
         >>> a.getBeatProgress(0.75)
         (1, 0.75)
         >>> a.getBeatProgress(1.0)
@@ -2020,7 +2020,7 @@ class TimeSignature(TimeSignatureBase):
         '''
         beatIndex = self.beatSequence.offsetToIndex(qLenPos)
         start, unused_end = self.beatSequence.offsetToSpan(qLenPos)
-        return beatIndex + 1, qLenPos - start
+        return beatIndex + 1, opFrac(qLenPos - start)
 
     def getBeatProportion(self, qLenPos):
         '''

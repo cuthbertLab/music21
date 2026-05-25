@@ -11773,7 +11773,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         replace elements defined in the Variant with those in the calling Stream.
         Elements replaced will be gathered into a new Variant
         given the group 'default'. If a variant is activated with
-        .replacementDuration different from its length, the appropriate elements
+        .replacementQuarterLength different from its length, the appropriate elements
         in the stream will have their offsets shifted, and measure numbering
         will be fixed. If matchBySpan is True, variants with lengthType
         'replacement' will replace all the elements in the
@@ -11801,7 +11801,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         ...    v1measure.insert(e.offset, e)
 
         >>> v2 = variant.Variant()
-        >>> v2.replacementDuration = 4.0
+        >>> v2.replacementQuarterLength = 4.0
         >>> v2measure1 = stream.Measure()
         >>> v2measure2 = stream.Measure()
         >>> v2.insert(0.0, v2measure1)
@@ -11812,7 +11812,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         ...    v2measure2.insert(e.offset, e)
 
         >>> v3 = variant.Variant()
-        >>> v3.replacementDuration = 4.0
+        >>> v3.replacementQuarterLength = 4.0
         >>> v1.groups = ['docVariants']
         >>> v2.groups = ['docVariants']
         >>> v3.groups = ['docVariants']
@@ -12028,8 +12028,8 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         insertionRegionsForExpansion = []  # For saving the insertion regions
         # go through all elongation variants to find the insertion regions.
         for v in elongationVariants:
-            lengthDifference = v.replacementDuration - v.containedHighestTime
-            insertionStart = v.getOffsetBySite(returnObj) + v.replacementDuration
+            lengthDifference = v.replacementQuarterLength - v.containedHighestTime
+            insertionStart = v.getOffsetBySite(returnObj) + v.replacementQuarterLength
             # Saves the information for each gap to be expanded
             insertionRegionsForExpansion.append((insertionStart, -1 * lengthDifference, [v]))
 
@@ -12076,7 +12076,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         ...        m.append(n)
         ...    v.append(m)
         >>> v.groups = ['paris']
-        >>> v.replacementDuration = 8.0
+        >>> v.replacementQuarterLength = 8.0
 
         >>> s = stream.Stream()
         >>> streamDataM1 = [('a', 'quarter'), ('b', 'quarter'), ('a', 'quarter'), ('g', 'quarter')]
@@ -12236,7 +12236,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         ...        m.append(n)
         ...    v.append(m)
         >>> v.groups = ['paris']
-        >>> v.replacementDuration = 12.0
+        >>> v.replacementQuarterLength = 12.0
 
         >>> s = stream.Stream()
         >>> streamDataM1 = [('a', 'quarter'), ('b', 'quarter'), ('a', 'quarter'), ('g', 'quarter')]
@@ -12285,11 +12285,11 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
 
         deletedMeasures = deque()  # For keeping track of what measure numbers are deleted
         # length of the deleted region
-        lengthDifference = v.replacementDuration - v.containedHighestTime
+        lengthDifference = v.replacementQuarterLength - v.containedHighestTime
 
         removed = variant.Variant()  # what group should this have?
         removed.groups = ['default']  # for now, default
-        removed.replacementDuration = v.containedHighestTime
+        removed.replacementQuarterLength = v.containedHighestTime
 
         vStart = self.elementOffset(v)
         deletionStart = vStart + v.containedHighestTime
@@ -12359,7 +12359,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         ...        m.append(n)
         ...    v.append(m)
         >>> v.groups = ['paris']
-        >>> v.replacementDuration = 4.0
+        >>> v.replacementQuarterLength = 4.0
 
         >>> s = stream.Stream()
         >>> streamDataM1 = [('a', 'quarter'), ('b', 'quarter'), ('a', 'quarter'), ('g', 'quarter')]
@@ -12422,7 +12422,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         deletedMeasures = deque()
         removed = variant.Variant()  # what group should this have?
         removed.groups = ['default']  # for now, default
-        removed.replacementDuration = v.containedHighestTime
+        removed.replacementQuarterLength = v.containedHighestTime
         vStart = self.elementOffset(v)
 
         # First deal with the elements in the overlapping section (limit by class)
@@ -12802,8 +12802,8 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         ...    v2measure.insert(e.offset, e)
 
         >>> v3 = variant.Variant()
-        >>> v2.replacementDuration = 4.0
-        >>> v3.replacementDuration = 4.0
+        >>> v2.replacementQuarterLength = 4.0
+        >>> v3.replacementQuarterLength = 4.0
         >>> v1.groups = ['variant1']
         >>> v2.groups = ['variant2']
         >>> v3.groups = ['variant3']

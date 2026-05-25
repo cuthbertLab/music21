@@ -26,7 +26,7 @@ available after importing `music21`.
 <class 'music21.base.Music21Object'>
 
 >>> music21.VERSION_STR
-'10.2.0b1'
+'10.2.0b2'
 
 Alternatively, after doing a complete import, these classes are available
 under the module "base":
@@ -3591,7 +3591,7 @@ class Music21Object(prebase.ProtoM21Object):
                     mNumber = m.number  # type: ignore
         return mNumber
 
-    def _getMeasureOffset(self, includeMeasurePadding=True) -> float|fractions.Fraction:
+    def _getMeasureOffset(self, includeMeasurePadding: bool = True) -> OffsetQL:
         # noinspection PyShadowingNames
         '''
         Try to obtain the nearest Measure that contains this object,
@@ -3623,11 +3623,11 @@ class Music21Object(prebase.ProtoM21Object):
 
         # TODO: v8 -- expose as public.
         activeS = self.activeSite
-        if activeS is not None and activeS.isMeasure:
+        if activeS is not None and isinstance(activeS, stream.Measure):
             # environLocal.printDebug(['found activeSite as Measure, using for offset'])
             offsetLocal = activeS.elementOffset(self)
-            if includeMeasurePadding:
-                offsetLocal += activeS.paddingLeft
+            if includeMeasurePadding and activeS.paddingLeft:
+                offsetLocal = opFrac(offsetLocal + activeS.paddingLeft)
         else:
             # environLocal.printDebug(['did not find activeSite as Measure,
             #    doing context search', 'self.activeSite', self.activeSite])
@@ -3638,8 +3638,8 @@ class Music21Object(prebase.ProtoM21Object):
                 # environLocal.printDebug(['using found Measure for offset access'])
                 try:
                     offsetLocal = m.elementOffset(self)
-                    if includeMeasurePadding:
-                        offsetLocal += m.paddingLeft
+                    if includeMeasurePadding and m.paddingLeft:
+                        offsetLocal = opFrac(offsetLocal + m.paddingLeft)
                 except SitesException:
                     offsetLocal = self.offset
 

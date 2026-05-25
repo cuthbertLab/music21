@@ -93,6 +93,8 @@ class StreamCore(Music21Object):
         Returns boolean if the Stream (assuming it was sorted before) is still guaranteed
         to be sorted.  (False doesn't mean that it's not sorted, just that we can't guarantee it.)
         If you don't care and plan to sort the stream later, then use `ignoreSort=True`.
+
+        No need to opFrac before getting here -- the inner routine will do it for us.
         '''
         # environLocal.printDebug(['coreInsert', 'self', self,
         #    'offset', offset, 'element', element])
@@ -120,7 +122,7 @@ class StreamCore(Music21Object):
 
         self.coreSetElementOffset(
             element,
-            float(offset),  # why is this not opFrac?
+            offset,  # coreSetElementOffset will opFrac for us
             addElement=True,
             setActiveSite=setActiveSite
         )
@@ -159,7 +161,7 @@ class StreamCore(Music21Object):
         # Make this faster
         # self._elementTree.insert(self.highestTime, element)
         # does not change sorted state
-        self._setHighestTime(ht + element.duration.quarterLength)    # type: ignore
+        self._setHighestTime(opFrac(ht + element.duration.quarterLength))    # type: ignore
     # --------------------------------------------------------------------------
     # adding and editing Elements and Streams -- all need to call coreElementsChanged
     # most will set isSorted to False
