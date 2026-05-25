@@ -110,7 +110,6 @@ def getMissingImportStr(modNameList):
     Given a list of missing module names, returns a nicely-formatted message to the user
     that gives instructions on how to expand music21 with optional packages.
 
-
     >>> print(common.getMissingImportStr(['matplotlib']))
     Certain music21 functions might need the optional package matplotlib;
     if you run into errors, install it by following the instructions at

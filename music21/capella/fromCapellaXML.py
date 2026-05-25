@@ -429,7 +429,6 @@ class CapellaImporter:
         is returned if the <chord> has one <head> element, a `Chord` is
         returned if there are multiple <head> elements.
 
-
         >>> ci = capella.fromCapellaXML.CapellaImporter()
         >>> chordElement = ci.domElementFromText(
         ...     '<chord><duration base="1/1"/><heads><head pitch="G4"/></heads></chord>')
@@ -573,7 +572,6 @@ class CapellaImporter:
 
         if begin == 'true' then Tie.type = start
 
-
         >>> ci = capella.fromCapellaXML.CapellaImporter()
         >>> tieEl = ci.domElementFromText('<tie begin="true"/>')
         >>> ci.tieFromTie(tieEl)
@@ -614,7 +612,6 @@ class CapellaImporter:
     def lyricListFromLyric(self, lyricElement):
         '''
         returns a list of :class:`~music21.note.Lyric` objects from a <lyric> tag
-
 
         >>> ci = capella.fromCapellaXML.CapellaImporter()
         >>> lyricEl = ci.domElementFromText(
@@ -779,7 +776,6 @@ class CapellaImporter:
         >>> d2.tuplets
         (<music21.duration.Tuplet 3/2>,)
 
-
         Does not handle noDuration='true', display, churchStyle on rest durations
         '''
         dur = duration.Duration()
@@ -807,7 +803,6 @@ class CapellaImporter:
     def tupletFromTuplet(self, tupletElement):
         '''
         Returns a :class:`~music21.duration.Tuplet` object from a <tuplet> tag.
-
 
         >>> ci = capella.fromCapellaXML.CapellaImporter()
         >>> tupletTag = ci.domElementFromText('<tuplet count="3"/>')
@@ -850,7 +845,6 @@ class CapellaImporter:
 
         Returns a LIST of :class:`~music21.bar.Barline` or :class:`~music21.bar.Repeat` objects
         because the `repEndBegin` type requires two `bar.Repeat` objects to encode in `music21`.
-
 
         >>> ci = capella.fromCapellaXML.CapellaImporter()
         >>> barlineTag = ci.domElementFromText('<barline type="end"/>')

@@ -14,7 +14,6 @@ options.  It was originally developed to notate trecento (medieval Italian)
 music, but it is pretty useful for a lot of short examples, so we have
 made it a generally supported music21 format.
 
-
 N.B.: TinyNotation is not meant to expand to cover every single case.  Instead,
 it is meant to be subclassable to extend to the cases *your* project needs.
 
@@ -101,8 +100,6 @@ Changing time signatures are supported:
     {0.0} <music21.note.Note C>
     {1.0} <music21.bar.Barline type=final>
 
-
-
 Here is an equivalent way of doing the example above, but using the lower level
 :class:`music21.tinyNotation.Converter` object:
 
@@ -160,7 +157,6 @@ The supported modifiers are:
     * `(data)` (`modifierParens`, no default action)
     * `*data*` (`modifierStar`, no default action)
 
-
 Another example: TinyNotation does not support key signatures -- well, no problem! Let's
 create a new Token type and add it to the tokenMap
 
@@ -182,7 +178,6 @@ create a new Token type and add it to the tokenMap
     {0.0} <music21.key.Key of f# minor>
     {0.0} <music21.note.Note A>
     {4.0} <music21.bar.Barline type=final>
-
 
 TokenMap should be passed a string, representing a regular expression with exactly one
 group (which can be the entire expression), and a subclass of :class:`~music21.tinyNotation.Token`
@@ -939,7 +934,6 @@ class Converter:
         {2.0} <music21.note.Note C>
         {4.0} <music21.bar.Barline type=final>
 
-
     Or, breaking down what Parse does bit by bit:
 
     >>> tnc = tinyNotation.Converter('4/4 C##4 D e-8 f~ f f# g4 trip{f8 e d} C2=hello')
@@ -1318,7 +1312,6 @@ class Converter:
         '~'
         >>> quadState.stateInfo
         'quad{'
-
 
         Note that the affected tokens haven't yet been added:
 

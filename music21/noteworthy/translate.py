@@ -135,8 +135,6 @@ class NoteworthyTranslator:
 
         Returns a :class:`~music21.stream.Score` object
 
-
-
         >>> data = []
         >>> data.append('!NoteWorthyComposer(2.0)\n')
         >>> data.append('|AddStaff|\n')
@@ -338,7 +336,6 @@ class NoteworthyTranslator:
         returns a list of pitch objects given the Pos:... info
         for a chord.
 
-
         >>> nwt = noteworthy.translate.NoteworthyTranslator()
         >>> nwt.currentClef = 'BASS'
         >>> pList = nwt.getMultiplePitchesFromPositionInfo('1,b3,5^')
@@ -456,8 +453,6 @@ class NoteworthyTranslator:
     def translateNote(self, attributes):
         r'''
         Translation of a music21 note from a NWC note.
-
-
 
         >>> measure = stream.Measure()
         >>> nwt = noteworthy.translate.NoteworthyTranslator()
@@ -604,8 +599,6 @@ class NoteworthyTranslator:
         r'''
         Translation of a music21 rest.  Adds the rest to the given measure.
 
-
-
         >>> measureIn = stream.Measure()
         >>> measureIn.append(note.Note('C#4', type='half'))
 
@@ -630,11 +623,8 @@ class NoteworthyTranslator:
         r'''
         Add a new clef to the current measure and return the currentClef.
 
-
         Clef lines should look like: \|Clef\|Type:ClefType  or
         \|Clef\|Type:ClefType\|OctaveShift:Octave Down (or Up)
-
-
 
         >>> nwt = noteworthy.translate.NoteworthyTranslator()
         >>> nwt.currentMeasure = stream.Measure()
@@ -653,10 +643,7 @@ class NoteworthyTranslator:
         {0.0} <music21.clef.Bass8vbClef>
         {0.0} <music21.clef.PercussionClef>
 
-
-
         If no clef can be found then it raises a NoteworthyTranslate exception
-
 
         >>> nwt.createClef({'Type' : 'OrangeClef'})
         Traceback (most recent call last):
@@ -751,7 +738,6 @@ class NoteworthyTranslator:
         r'''
         Adding a time signature in the score.
 
-
         >>> measure = stream.Measure()
         >>> nwt = noteworthy.translate.NoteworthyTranslator()
         >>> nwt.currentMeasure = measure
@@ -783,9 +769,6 @@ class NoteworthyTranslator:
     def createBarlines(self, attributes):
         r'''
         Translates bar lines into music21.
-
-
-
 
         >>> nwt = noteworthy.translate.NoteworthyTranslator()
         >>> nwt.currentPart = stream.Part()
@@ -859,7 +842,6 @@ class NoteworthyTranslator:
         r'''
         Repetitions like 'Coda', 'Segno' and some others.
 
-
         >>> nwt = noteworthy.translate.NoteworthyTranslator()
         >>> nwt.currentMeasure = stream.Measure()
         >>> nwt.createOtherRepetitions({'Style' : 'ToCoda', 'Pos': '8',
@@ -889,7 +871,6 @@ class NoteworthyTranslator:
         r'''
         Adding dynamics like "crescendo" to the measure.
 
-
         >>> nwt = noteworthy.translate.NoteworthyTranslator()
         >>> nwt.currentMeasure = stream.Measure()
         >>> nwt.createDynamicVariance({'Style' : 'Crescendo', 'Pos': '-6'})
@@ -911,7 +892,6 @@ class NoteworthyTranslator:
     def createDynamics(self, attributes):
         r'''
         Adding dynamics like "fff", "pp", ... to the measure.
-
 
         >>> nwt = noteworthy.translate.NoteworthyTranslator()
         >>> nwt.currentMeasure = stream.Measure()

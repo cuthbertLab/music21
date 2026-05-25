@@ -202,7 +202,6 @@ class MetadataBundle(prebase.ProtoM21Object):
     >>> resultsEntries
     <music21.metadata.bundles.MetadataBundle {40 entries}>
 
-
     Results are ordered by their source path:
 
     >>> resultsEntries[0]
@@ -218,13 +217,11 @@ class MetadataBundle(prebase.ProtoM21Object):
     >>> converter.parse(resultsEntries[0])
     <music21.stream.Score ...>
 
-
     A metadata bundle can be instantiated in three ways, (1) from a ``Corpus`` instance,
     or (2) a string indicating which corpus name to draw from, and then calling
     .read() or (3) by calling
     .metadataBundle on a corpus object.  This
     calls `.read()` automatically:
-
 
     Method 1:
 
@@ -254,8 +251,6 @@ class MetadataBundle(prebase.ProtoM21Object):
 
     >>> coreBundle
     <music21.metadata.bundles.MetadataBundle 'core': {151... entries}>
-
-
 
     Additionally, any two metadata bundles can be operated on together as
     though they were sets, allowing us to build up more complex searches:
@@ -425,7 +420,6 @@ class MetadataBundle(prebase.ProtoM21Object):
         True
         >>> coreBundle > coreBundle
         False
-
 
         Returns boolean.
         '''

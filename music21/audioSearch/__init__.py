@@ -189,7 +189,6 @@ def prepareThresholds(useScale=None):
     scale + octave repetition.  If useScale is a ChromaticScale, `prepareThresholds`
     will return a 12-element list.  If it's a diatonic scale, it'll have 7 elements.
 
-
     >>> pitchThresholds, pitches = audioSearch.prepareThresholds(scale.MajorScale('A3'))
     >>> for i in range(len(pitchThresholds)):
     ...    print(f'{pitches[i]} < {pitchThresholds[i]:.2f} < {pitches[i + 1]}')
@@ -573,7 +572,6 @@ def smoothFrequencies(
     >>> audioSearch.smoothFrequencies(inputPitches, smoothLevels=28)[:5]
     [432, 432, 432, 432, 432]
 
-
     If inPlace is True then the list is modified in place and nothing is returned:
 
     >>> audioSearch.smoothFrequencies(inputPitches, inPlace=True)
@@ -836,7 +834,6 @@ def notesAndDurationsToStream(
     a metadata object and a single :class:`~music21.stream.Part` object, which in turn
     contains the notes, etc.  Does not run :meth:`~music21.stream.base.Stream.makeNotation`
     on the Score.
-
 
     >>> durationList = [20, 19, 10, 30, 6, 21]
     >>> n = note.Note

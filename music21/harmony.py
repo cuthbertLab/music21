@@ -403,7 +403,6 @@ class Harmony(chord.Chord):
         >>> [str(p) for p in h1.pitches]
         ['D-2', 'F-2', 'A-2', 'C-3', 'E-3', 'G-3']
 
-
         But it should change the .romanNumeral object:
 
         >>> y = harmony.ChordSymbol('F')
@@ -933,7 +932,6 @@ def chordSymbolFigureFromChord(inChord: chord.Chord, includeChordType=False):
     >>> harmony.chordSymbolFigureFromChord(c, True)
     ('CmaddD', 'minor')
 
-
     ELEVENTHS
 
     >>> c = chord.Chord(['E-3', 'G3', 'B-3', 'D-4', 'F3', 'A-3'] )
@@ -1095,7 +1093,6 @@ def chordSymbolFigureFromChord(inChord: chord.Chord, includeChordType=False):
     <music21.pitch.Pitch C3>
     >>> c.bass()
     <music21.pitch.Pitch C3>
-
 
     >>> c = chord.Chord(['C3', 'F3', 'G3'])
     >>> harmony.chordSymbolFigureFromChord(c, True)
@@ -1603,7 +1600,6 @@ class ChordSymbol(Harmony):
     >>> [[str(c.name) for c in c.pitches] for c in initialSymbols]
     [['F', 'A', 'C'], ['B-', 'D', 'F'], ['F', 'A', 'C'], ['C', 'E', 'G'], ['F', 'A', 'C']]
 
-
     Test creating an empty chordSymbol:
 
     >>> cs = harmony.ChordSymbol()
@@ -1689,7 +1685,6 @@ class ChordSymbol(Harmony):
                 intervals except for a minor seventh)
             if `alter` or `subtract`:
                 degree-alter is relative to degree already in the chord based on its kind element
-
 
         FROM XML DOCUMENTATION
 

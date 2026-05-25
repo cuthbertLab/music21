@@ -411,7 +411,6 @@ def quarterLengthToTuplet(
     Note that 4:3 tuplets won't be found, but will be found as dotted notes
     by dottedMatch.
 
-
     >>> duration.quarterLengthToTuplet(0.33333333)
     [<music21.duration.Tuplet 3/2/eighth>, <music21.duration.Tuplet 3/1/quarter>]
 
@@ -419,7 +418,6 @@ def quarterLengthToTuplet(
     [<music21.duration.Tuplet 5/4/16th>,
      <music21.duration.Tuplet 5/2/eighth>,
      <music21.duration.Tuplet 5/1/quarter>]
-
 
     By specifying only 1 `maxToReturn`, a single-length list containing the
     Tuplet with the smallest type will be returned.
@@ -522,7 +520,6 @@ def quarterConversion(qLen: OffsetQLIn) -> QuarterLengthConversion:
     >>> tup.durationActual
     DurationTuple(type='quarter', dots=0, quarterLength=1.0)
 
-
     A triplet eighth note, where 3 eights are in the place of 2.
     Or, an eighth that is 1/3 of a quarter
     Or, an eighth that is 2/3 of eighth
@@ -542,14 +539,12 @@ def quarterConversion(qLen: OffsetQLIn) -> QuarterLengthConversion:
     QuarterLengthConversion(components=(DurationTuple(type='16th', dots=0, quarterLength=0.25),),
         tuplet=<music21.duration.Tuplet 3/2/16th>)
 
-
     A sixteenth that is 1/5 of a quarter
     Or, a sixteenth that is 4/5ths of a 16th
 
     >>> duration.quarterConversion(1/5)
     QuarterLengthConversion(components=(DurationTuple(type='16th', dots=0, quarterLength=0.25),),
         tuplet=<music21.duration.Tuplet 5/4/16th>)
-
 
     A 16th that is  1/7th of a quarter
     Or, a 16th that is 4/7 of a 16th
@@ -574,7 +569,6 @@ def quarterConversion(qLen: OffsetQLIn) -> QuarterLengthConversion:
                                         DurationTuple(type='eighth', dots=0, quarterLength=0.5)),
                             tuplet=None)
 
-
     Since tuplets apply to the entire Duration (since v2), expect some odder tuplets for unusual
     values that should probably be split generally:
 
@@ -588,7 +582,6 @@ def quarterConversion(qLen: OffsetQLIn) -> QuarterLengthConversion:
     >>> duration.quarterConversion(1/3).tuplet is duration.quarterConversion(1/3).tuplet
     True
 
-
     This is a very close approximation:
 
     >>> duration.quarterConversion(0.18333333333333)
@@ -598,7 +591,6 @@ def quarterConversion(qLen: OffsetQLIn) -> QuarterLengthConversion:
     >>> duration.quarterConversion(0.0)
     QuarterLengthConversion(components=(DurationTuple(type='zero', dots=0, quarterLength=0.0),),
         tuplet=None)
-
 
     >>> duration.quarterConversion(99.0)
     QuarterLengthConversion(components=(DurationTuple(type='inexpressible',
@@ -955,7 +947,6 @@ class Tuplet(prebase.ProtoM21Object):
     DurationTuple(type='eighth', dots=0, quarterLength=0.5)
     >>> myTup
     <music21.duration.Tuplet 5/4/eighth>
-
 
     In this case, the tupletMultiplier is a float because it can be expressed
     as a binary number:
@@ -1927,7 +1918,6 @@ class Duration(prebase.ProtoM21Object, SlottedObjectMixin):
         (DurationTuple(type='half', dots=0, quarterLength=2.0),
          DurationTuple(type='32nd', dots=0, quarterLength=0.125))
 
-
         By default, when augmenting or diminishing, we will delete any
         unusual components or tuplets:
 
@@ -2033,7 +2023,6 @@ class Duration(prebase.ProtoM21Object, SlottedObjectMixin):
 
         Note that for 0 and the last value, the object is returned.
 
-
         >>> components = []
         >>> components.append(duration.Duration('quarter'))
         >>> components.append(duration.Duration('quarter'))
@@ -2049,7 +2038,6 @@ class Duration(prebase.ProtoM21Object, SlottedObjectMixin):
         1
         >>> a.componentIndexAtQtrPosition(2.5)
         2
-
 
         this is odd behavior:
 
@@ -2361,7 +2349,6 @@ class Duration(prebase.ProtoM21Object, SlottedObjectMixin):
         (DurationTuple(type='quarter', dots=0, quarterLength=1.0),
          DurationTuple(type='16th', dots=0, quarterLength=0.25))
 
-
         Generally, just look at `.components`
 
         >>> d = duration.Duration(1.25)
@@ -2492,7 +2479,6 @@ class Duration(prebase.ProtoM21Object, SlottedObjectMixin):
         >>> d = duration.Duration(1/3)
         >>> d.components
         (DurationTuple(type='eighth', dots=0, quarterLength=0.5),)
-
 
         With a complex duration it becomes clearer why multiple components are needed.
         Here is a duration that cannot be expressed as a single note.
@@ -3391,7 +3377,6 @@ class TupletFixer:
         >>> [n.duration.tuplets[0].type for n in tg0]
         ['start', 'stop']
 
-
         More complex example, from a piece by Josquin:
 
         >>> humdrumExcerpt = '**kern *M3/1 3.c 6d 3e 3f 3d 3%2g 3e 3f#'
@@ -3440,7 +3425,6 @@ class TupletFixer:
          <music21.duration.Tuplet 3/2/half>, <music21.duration.Tuplet 3/2/half>]
         >>> [n.duration.tuplets[0].type for n in tupletGroups[1]]
         ['start', None, None, None, 'stop']
-
 
         Fix the last broken tuplet group.
 

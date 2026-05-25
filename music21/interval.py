@@ -218,7 +218,6 @@ class Specifier(enum.IntEnum):
         >>> Specifier.MINOR.semitonesAboveMajor()
         -1
 
-
         Diminished intervals are below minor:
 
         >>> Specifier.DIMINISHED.semitonesAboveMajor()
@@ -838,7 +837,6 @@ class GenericInterval(IntervalBase):
     >>> complement12.staffDistance
     3
 
-
     Note this illegal interval:
 
     >>> zeroth = interval.GenericInterval(0)
@@ -859,7 +857,6 @@ class GenericInterval(IntervalBase):
     a Perfect Unison or an Augmented Unison (or Augmented Prime as some prefer)?
     Thus, the illegal check will be moved to a higher level Interval object.
 
-
     A second is a step:
 
     >>> second = interval.GenericInterval(2)
@@ -875,7 +872,6 @@ class GenericInterval(IntervalBase):
     False
     >>> third.isStep
     False
-
 
     Intervals more than three octaves use numbers with abbreviations instead of names
 
@@ -1662,7 +1658,6 @@ class DiatonicInterval(IntervalBase):
     >>> dimDescending.direction
     <Direction.DESCENDING: -1>
 
-
     This raises an error:
 
     >>> interval.DiatonicInterval('Perfect', -1)
@@ -2166,7 +2161,6 @@ class DiatonicInterval(IntervalBase):
         >>> di.transposePitch(p, inPlace=True)
         >>> p
         <music21.pitch.Pitch F#5>
-
 
         * Changed in v6: added inPlace.
         '''
@@ -4077,7 +4071,6 @@ def subtract(intervalList):
     <music21.interval.Interval A7>
     >>> interval.subtract(['P8', 'A1'])
     <music21.interval.Interval d8>
-
 
     >>> a = interval.subtract(['P5', 'A5'])
     >>> a.niceName

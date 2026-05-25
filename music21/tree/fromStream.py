@@ -53,7 +53,6 @@ def listOfTreesByClass(
 
     This is used internally by `streamToTimespanTree`.
 
-
     >>> score = tree.examples.makeExampleScore()
 
     Get everything in the score

@@ -50,7 +50,6 @@ def isNum(usrData: t.Any) -> t.TypeGuard[t.Union[float, int, Fraction]]:
     Differs from `isinstance(usrData, Rational)` primarily in that this function
     does not return True for `True, False`. See below for other differences.
 
-
     >>> common.isNum(3.0)
     True
     >>> common.isNum(3)

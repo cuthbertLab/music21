@@ -488,7 +488,6 @@ class KeySignature(base.Music21Object):
         >>> [str(p) for p in g.alteredPitches]
         ['B-', 'E-', 'A-', 'D-', 'G-', 'C-', 'F-', 'B--']
 
-
         Non-standard, non-traditional key signatures can set their own
         altered pitches cache.
 
@@ -908,7 +907,6 @@ class Key(KeySignature, scale.DiatonicScale):
     >>> fFlatMaj.accidentalByStep('B')
     <music21.pitch.Accidental double-flat>
 
-
     >>> eDor = key.Key('E', 'dorian')
     >>> eDor
     <music21.key.Key of E dorian>
@@ -1209,7 +1207,6 @@ class Key(KeySignature, scale.DiatonicScale):
 
         >>> k.alternateInterpretations[-1]
         <music21.key.Key of F# major>
-
 
         Note that this method only exists if the key has come from an analysis method. Otherwise
         it raises a KeySignatureException

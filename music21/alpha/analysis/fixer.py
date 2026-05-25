@@ -100,7 +100,6 @@ class EnharmonicFixer(OMRMidiFixer):
     >>> omrStream1[1]
     <music21.note.Note A#>
 
-
     TEST 2, no changes in OMR stream
 
     >>> omrStream2 = stream.Stream()
@@ -126,7 +125,6 @@ class EnharmonicFixer(OMRMidiFixer):
     >>> omrStream1[1]
     <music21.note.Note A#>
 
-
     TEST 3 (case 1)
 
     >>> midiNote3 = note.Note('A4')
@@ -141,7 +139,6 @@ class EnharmonicFixer(OMRMidiFixer):
     >>> fixer3 = alpha.analysis.fixer.EnharmonicFixer(changes3, None, None)
     >>> fixer3.fix()
     >>> omrNote3.pitch.accidental
-
 
     TEST 4 (case 2-1) e.g MIDI = g#, ground truth = a-, OMR = an
 
@@ -159,7 +156,6 @@ class EnharmonicFixer(OMRMidiFixer):
     >>> omrNote4.pitch.accidental
     <music21.pitch.Accidental flat>
 
-
     TEST 5 (case 2-2) e.g midi = g-, gt = f#, omr = fn
 
     >>> midiNote5 = note.Note('G-4')
@@ -175,7 +171,6 @@ class EnharmonicFixer(OMRMidiFixer):
     >>> fixer5.fix()
     >>> omrNote5.pitch.accidental
     <music21.pitch.Accidental sharp>
-
 
     TEST 6.1 (case 3) e.g. midi = g#, gt = g#, omr = gn or omr = g-
 
@@ -200,7 +195,6 @@ class EnharmonicFixer(OMRMidiFixer):
     <music21.pitch.Accidental sharp>
     >>> omrNote6_2.pitch.accidental
     <music21.pitch.Accidental sharp>
-
 
     TEST 7 (case 4-1, 4-2) notes are on different step, off by an interval of 2:
     * 4-1: e.g. midi = g#, gt = a-, omr = a#

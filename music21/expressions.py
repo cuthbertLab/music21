@@ -272,7 +272,6 @@ class RehearsalMark(Expression):
         >>> expressions.RehearsalMark('Z').nextContent()
         'AA'
 
-
         With rehearsal mark 'I' default is to consider it
         as a roman numeral:
 
@@ -312,7 +311,6 @@ class RehearsalMark(Expression):
         >>> rm = expressions.RehearsalMark('C')
         >>> rm.nextMark()
         <music21.expressions.RehearsalMark 'D'>
-
 
         >>> rm = expressions.RehearsalMark('IV', numbering='roman')
         >>> nm = rm.nextMark()
@@ -796,7 +794,6 @@ class GeneralMordent(Ornament):
         If no key signature is found, a key signature with no sharps and no flats
         will be used.
 
-
         A mordent on a G in a key with no sharps or flats (ornamental pitch will be F).
 
         >>> noSharpsOrFlats = key.KeySignature(sharps=0)
@@ -1000,7 +997,6 @@ class Mordent(GeneralMordent):
 
         A musical ornament consisting of the alternation of the written note
         with the note immediately below it.
-
 
     A mordent has the size of a second, of some form, depending on the note
     that will have the mordent, the current key signature in that note's context, as
@@ -1648,7 +1644,6 @@ class Trill(Ornament):
           <music21.note.Note D#>,
           <music21.note.Note C>,
           <music21.note.Note D#>], None, [])
-
 
         To avoid this case, create a :class:`~music21.expressions.HalfStepTrill` or
         :class:`~music21.expressions.WholeStepTrill`.
@@ -2485,7 +2480,6 @@ class GeneralAppoggiatura(Ornament):
         >>> a1.realize(n1)
         ([<music21.note.Note D>], <music21.note.Note C>, [])
 
-
         >>> n2 = note.Note('C4')
         >>> n2.quarterLength = 1
         >>> a2 = expressions.HalfStepInvertedAppoggiatura()
@@ -2656,7 +2650,6 @@ class Tremolo(Ornament):
         {0.625} <music21.note.Note C>
         {0.75} <music21.note.Note C>
         {0.875} <music21.note.Note C>
-
 
         >>> trem.numberOfMarks = 1
         >>> y = stream.makeNotation.realizeOrnaments(s)

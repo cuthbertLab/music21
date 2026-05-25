@@ -86,7 +86,6 @@ def offsetToMidiTicks(o: OffsetQLIn, addStartDelay: bool = False) -> int:
     >>> defaults.ticksAtStart
     10080
 
-
     >>> midi.translate.offsetToMidiTicks(0)
     0
     >>> midi.translate.offsetToMidiTicks(0, addStartDelay=True)
@@ -111,7 +110,6 @@ def durationToMidiTicks(d: duration.Duration) -> int:
 
     Depends on *defaults.ticksPerQuarter*, Returns an int.
     Does not use defaults.ticksAtStart
-
 
     >>> n = note.Note()
     >>> n.duration.type = 'half'
@@ -386,7 +384,6 @@ def midiEventsToNote(
     >>> me1.type = midi.ChannelVoiceMessages.NOTE_ON
     >>> me1.pitch = 45
     >>> me1.velocity = 94
-
 
     This lasts until we send a NOTE_OFF event at offset 2.0.
 
@@ -1268,7 +1265,6 @@ def tempoToMidiEvents(
 
     >>> midi.translate.tempoToMidiEvents(mm, includeDeltaTime=False)
     [<music21.midi.MidiEvent SET_TEMPO...>]
-
 
     Test round-trip.  Note that for pure tempo numbers, by default
     we create a text name if there's an appropriate one:

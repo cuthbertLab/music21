@@ -200,7 +200,6 @@ class StreamAligner:
         >>> target0 = converter.parse('tinyNotation: C4 D C E')
         >>> source0 = converter.parse('tinyNotation: C4 D C')
 
-
         >>> sa0 = alpha.analysis.aligner.StreamAligner(target0, source0)
         >>> sa0.setupDistanceMatrix()
         >>> sa0.distanceMatrix.size
@@ -423,7 +422,6 @@ class StreamAligner:
                [4, 2, 0, 2],
                [6, 4, 2, 0],
                [8, 6, 4, 2]])
-
 
         >>> sa.getOpFromLocation(4, 3)
         <ChangeOps.Insertion: 0>

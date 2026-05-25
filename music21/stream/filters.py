@@ -95,7 +95,6 @@ class IsFilter(StreamFilter):
 
     `.numToFind` is used so that once all elements are found, the iterator can short circuit.
 
-
     >>> for el in s.iter().addFilter(isFilter):
     ...     print(el is n)
     True
@@ -162,7 +161,6 @@ class IsNotFilter(IsFilter):
     ...     el
     <music21.key.KeySignature of 3 flats>
     <music21.note.Rest quarter>
-
 
     Using multiple filters:
 

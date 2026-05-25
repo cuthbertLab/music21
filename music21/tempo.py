@@ -355,7 +355,6 @@ class MetronomeMark(TempoIndication):
     >>> print(a.text)
     slow
 
-
     Some text marks will automatically suggest a number.
 
     >>> mm = tempo.MetronomeMark('adagio')
@@ -634,7 +633,6 @@ class MetronomeMark(TempoIndication):
         BPM values are assumed to refer only to quarter notes; different beat values,
         if defined here, will be scaled
 
-
         >>> mm = tempo.MetronomeMark(number=60, referent='half')
         >>> mm.setQuarterBPM(240)  # set to 240 for a quarter
         >>> mm.number  # a half is half as fast
@@ -685,7 +683,6 @@ class MetronomeMark(TempoIndication):
 
         The `spread` value is a +/- shift around the default tempo
         indications defined in defaultTempoValues
-
 
         >>> mm = tempo.MetronomeMark()
         >>> mm._getDefaultText(92)
@@ -750,7 +747,6 @@ class MetronomeMark(TempoIndication):
         Return a new MetronomeMark object that has an equivalent speed but
         different number and referent values based on a supplied referent
         (given as a Duration type, quarterLength, or Duration object).
-
 
         >>> mm1 = tempo.MetronomeMark(number=60, referent=1.0)
         >>> mm1.getEquivalentByReferent(0.5)

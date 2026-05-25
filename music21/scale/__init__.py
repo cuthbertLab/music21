@@ -1246,7 +1246,6 @@ class ConcreteScale(Scale):
     >>> [str(p) for p in myScale.getPitches('E-5', 'G-7')]
     ['E-5', 'G-5', 'A5', 'C6', 'E-6', 'G-6', 'A6', 'C7', 'E-7', 'G-7']
 
-
     A scale that lasts two octaves and uses quarter tones (D~)
 
     >>> complexScale = scale.ConcreteScale(
@@ -1271,8 +1270,6 @@ class ConcreteScale(Scale):
     Two ConcreteScales are the same if they satisfy all general Music21Object
     equality methods and their Abstract scales, their tonics, and their
     boundRanges are the same:
-
-
 
     OMIT_FROM_DOCS
 
@@ -1869,7 +1866,6 @@ class ConcreteScale(Scale):
         >>> cMaj.getScaleDegreeAndAccidentalFromPitch(pitch.Pitch('E-'))
         (3, <music21.pitch.Accidental flat>)
 
-
         The Direction of a melodic minor scale is significant
 
         >>> aMin = scale.MelodicMinorScale('a')
@@ -2362,7 +2358,6 @@ class ConcreteScale(Scale):
          (2, <music21.scale.ConcreteScale B Concrete>),
          (2, <music21.scale.ConcreteScale A Concrete>),
          (2, <music21.scale.ConcreteScale G# Concrete>)]
-
 
         >>> eConcrete = bestScales[0][1]
         >>> ' '.join([str(p) for p in eConcrete.pitches])
@@ -3002,7 +2997,6 @@ class OctaveRepeatingScale(ConcreteScale):
     '''
     A concrete cyclical scale, based on a cycle of intervals.
 
-
     >>> sc = scale.OctaveRepeatingScale('c4', ['m3', 'M3'])
     >>> sc.pitches
     [<music21.pitch.Pitch C4>, <music21.pitch.Pitch E-4>,
@@ -3062,7 +3056,6 @@ class CyclicalScale(ConcreteScale):
 class ChromaticScale(ConcreteScale):
     '''
     A concrete cyclical scale, based on a cycle of half steps.
-
 
     >>> sc = scale.ChromaticScale('g2')
     >>> [str(p) for p in sc.pitches]
@@ -3134,7 +3127,6 @@ class SieveScale(ConcreteScale):
     :class:`~music21.sieve.Sieve` object definition. The complete period of the
     sieve is realized as intervals and used to create a scale.
 
-
     >>> sc = scale.SieveScale('c4', '3@0')
     >>> sc.pitches
     [<music21.pitch.Pitch C4>, <music21.pitch.Pitch E-4>]
@@ -3144,7 +3136,6 @@ class SieveScale(ConcreteScale):
     >>> sc = scale.SieveScale('c2', '(-3@2 & 4) | (-3@1 & 4@1) | (3@2 & 4@2) | (-3 & 4@3)')
     >>> [str(p) for p in sc.pitches]
     ['C2', 'D2', 'E2', 'F2', 'G2', 'A2', 'B2', 'C3']
-
 
     OMIT_FROM_DOCS
 

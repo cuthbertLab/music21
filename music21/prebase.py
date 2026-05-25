@@ -45,7 +45,6 @@ class ProtoM21Object:
     >>> repr(pc)
     '<...PitchCounter no pitches>'
 
-
     ProtoM21Objects, like other Python primitives, cannot be put into streams --
     this is what base.Music21Object does.
 
@@ -96,7 +95,6 @@ class ProtoM21Object:
         >>> d = duration.Duration('half')
         >>> d.classes
         ('Duration', 'ProtoM21Object', 'SlottedObjectMixin', 'object')
-
 
         Having quick access to these things as strings makes it easier to do comparisons:
 

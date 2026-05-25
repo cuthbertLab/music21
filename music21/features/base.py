@@ -718,7 +718,6 @@ class DataSet:
 
     Comprises multiple DataInstance objects, a FeatureSet, and an OutputFormat.
 
-
     >>> ds = features.DataSet(classLabel='Composer')
     >>> f = [features.jSymbolic.PitchClassDistributionFeature,
     ...      features.jSymbolic.ChangesOfMeterFeature,
@@ -735,7 +734,6 @@ class DataSet:
     0.0288..., 0.0, 0, 4, 4, 'Bach']
 
     >>> ds = ds.getString()
-
 
     By default, all exceptions are caught and printed if debug mode is on.
 
@@ -784,7 +782,6 @@ class DataSet:
         '''
         Return a list of all attribute labels. Optionally add a class
         label field and/or an id field.
-
 
         >>> f = [features.jSymbolic.PitchClassDistributionFeature,
         ...      features.jSymbolic.ChangesOfMeterFeature]
@@ -1156,7 +1153,6 @@ def extractorsById(idOrList, library=('jSymbolic', 'native')):
     >>> [x.id for x in features.extractorsById(['p19', 'p20'])]
     ['P19', 'P20']
 
-
     Normalizes case:
 
     >>> [x.id for x in features.extractorsById(['r31', 'r32', 'r33', 'r34', 'r35', 'p1', 'p2'])]
@@ -1242,7 +1238,6 @@ def getIndex(featureString, extractorType=None):
 
     optionally include the extractorType ('jsymbolic' or 'native') if known
     and searching will be made more efficient
-
 
     >>> features.getIndex('Range')
     (61, 'jsymbolic')

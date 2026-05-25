@@ -314,7 +314,6 @@ class ElementTree(core.AVLTree):
         <ElementNode: Start:2.0 <0.20...> Indices:(l:10 *10* r:11)
             Payload:<music21.note.Note F#>>
 
-
         >>> scoreTree[10:13]
         [<music21.note.Note F#>, <music21.note.Note F>, <music21.note.Note G>]
         >>> scoreTree[10:14:2] = [note.Note('E#'), note.Note('F-')]

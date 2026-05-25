@@ -976,7 +976,6 @@ class GlobalCommentLine(HumdrumLine):
     The constructor can be passed (lineNumber, contents); if contents begins with
     bangs, they are removed along with up to one space directly afterwards.
 
-
     >>> com1 = humdrum.spineParser.GlobalCommentLine(
     ...          lineNumber=4, contents='!! this comment is global')
     >>> com1

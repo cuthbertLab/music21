@@ -287,7 +287,6 @@ class ContiguousSegmentSearcher:
     [[<music21.note.Note G>, <music21.note.Note A>, <music21.note.Note B>],
      [<music21.note.Note A>, <music21.note.Note B>, <music21.note.Note C>]]
 
-
     In order to be considered repetition, the spellings of the notes
     in question must be exactly the same:
     enharmonic equivalents are not checked and notes with the
@@ -310,7 +309,6 @@ class ContiguousSegmentSearcher:
     >>> foundSegments = searcherNew.byLength(3)
     >>> [seg.segment for seg in foundSegments]
     [[<music21.note.Note C>, <music21.note.Note C>, <music21.note.Note B#>]]
-
 
     'rowsOnly' searches only for tone rows, in which all pitch classes
     in the segment must be distinct. Below,
@@ -847,7 +845,6 @@ class SegmentMatcher:
     matches at least one of the elements of the searchList,
     subject to the settings specified in reps and includeChords.
 
-
     >>> sc = stream.Score()
     >>> part = stream.Part()
     >>> sig = meter.TimeSignature('2/4')
@@ -920,7 +917,6 @@ class SegmentMatcher:
     >>> matcher = search.serial.SegmentMatcher(sc, reps='ignoreAll', includeChords=True)
     >>> [seg.segment for seg in matcher.find([[5, 7, 'B']])]
     [[<music21.note.Note F>, <music21.chord.Chord G4 B4>]]
-
 
     As expected, the pitch classes found segment are read
     in the order 5, 7, 11 ('B'), as the pitches
@@ -1213,7 +1209,6 @@ class TransposedSegmentMatcher(SegmentMatcher):
     least one of the elements of the searchList,
     subject to the settings specified in reps and includeChords.
 
-
     >>> part = stream.Part()
     >>> n1 = note.Note('e4')
     >>> n1.quarterLength = 6
@@ -1366,7 +1361,6 @@ class TransformedSegmentMatcher(SegmentMatcher):
     least one of the elements of the searchList,
     subject to the settings specified in reps and includeChords.
 
-
     >>> n1 = note.Note('c#4')
     >>> n2 = note.Note('e4')
     >>> n3 = note.Note('d#4')
@@ -1381,7 +1375,6 @@ class TransformedSegmentMatcher(SegmentMatcher):
 
     .. image:: images/serial-findTransformedSegments.png
         :width: 150
-
 
     >>> tsMatcher = search.serial.TransformedSegmentMatcher(part, 'rowsOnly',
     ...                 includeChords=False)
@@ -1577,7 +1570,6 @@ class MultisetSegmentMatcher(SegmentMatcher):
     matches at least one of the elements of the searchList,
     subject to the settings specified in reps and includeChords.
 
-
     >>> part = stream.Part()
     >>> n1 = note.Note('e4')
     >>> n1.quarterLength = 4
@@ -1615,7 +1607,6 @@ class MultisetSegmentMatcher(SegmentMatcher):
     .. image:: images/serial-findMultisets.png
         :width: 150
 
-
     Find all instances of the multiset [5, 4, 4] in the part
 
     >>> MSS = search.serial.MultisetSegmentMatcher(part, 'includeAll', includeChords=False)
@@ -1625,7 +1616,6 @@ class MultisetSegmentMatcher(SegmentMatcher):
      <music21.search.serial.ContiguousSegmentOfNotes ['E4', 'F4', 'E4']>]
     >>> [(seg.activeSegment, seg.startMeasureNumber) for seg in EEF]
     [([4, 4, 5], 1), ([4, 5, 4], 2)]
-
 
     >>> MSS = search.serial.MultisetSegmentMatcher(part, 'ignoreAll')
     >>> EF = MSS.find([5, 4])
@@ -1740,7 +1730,6 @@ class TransposedMultisetMatcher(SegmentMatcher):
     matches at least one of the elements of the searchList,
     subject to the settings specified in reps and includeChords.
 
-
     >>> part = stream.Part()
     >>> n1 = note.Note('c4')
     >>> n2 = note.Note('c#4')
@@ -1766,9 +1755,7 @@ class TransposedMultisetMatcher(SegmentMatcher):
     ([2, 4, 3], 3, [-9, -10, -11])
     ([3, 4, 2], 5, [-9, -10, -11])
 
-
     OMIT_FROM_DOCS
-
 
     >>> part2 = stream.Part()
     >>> n1 = chord.Chord(['c4', 'c5'])
@@ -1850,7 +1837,6 @@ class TransposedInvertedMultisetMatcher(TransposedMultisetMatcher):
     interpreted as a multiset,
     matches at least one of the elements of the searchList,
     subject to the settings specified in reps and includeChords.
-
 
     >>> s = stream.Stream()
     >>> n1 = note.Note('c4')
@@ -2240,7 +2226,6 @@ def labelMultisets(inputStream, multisetDict, reps='skipConsecutive', includeCho
     there will be more than six spanners active
     simultaneously, which may result in some
     spanners not showing correctly in XML format, or not at all.
-
 
     >>> part = stream.Part()
     >>> n1 = note.Note('e4')

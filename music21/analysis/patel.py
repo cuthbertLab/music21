@@ -17,11 +17,9 @@ def nPVI(streamForAnalysis):
     Algorithm to give the normalized pairwise variability index
     (Low, Grabe, & Nolan, 2000) of the rhythm of a stream.
 
-
     Used by Aniruddh D. Patel to argue for national differences between musical
     themes.  First encountered it in a presentation by Patel, Chew, Francois,
     and Child at MIT.
-
 
     n.b. -- takes the distance between each element, including clefs, keys, etc.
     use .notesAndRests etc. to filter out elements that are not useful (though this will skip

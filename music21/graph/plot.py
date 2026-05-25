@@ -990,7 +990,6 @@ class WindowedKey(WindowedAnalysis):
     Stream plotting of windowed version of Krumhansl-Schmuckler analysis routine.
     See :class:`~music21.analysis.discrete.KrumhanslSchmuckler` for more details.
 
-
     >>> s = corpus.parse('bach/bwv66.6')
     >>> p = graph.plot.WindowedKey(s.parts[0])
     >>> p.doneAction = None #_DOCS_HIDE
@@ -1280,7 +1279,6 @@ class Dolan(HorizontalBarWeighted):
 
     Numerous parameters can be configured based on functionality encoded in
     the :class:`~music21.analysis.reduction.PartReduction` object.
-
 
     If the `fillByMeasure` parameter is True, and if measures are available, each part
     will segment by Measure divisions, and look for the target activity only once per

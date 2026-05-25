@@ -327,7 +327,6 @@ def autoCorrelationBestMeasure(inputScore):
     >>> print( float(totalUnflaggedWithMatches) / totalUnflagged )
     0.901...
 
-
     Schoenberg has low autoCorrelation.
 
     >>> c = corpus.parse('schoenberg/opus19/movement6')

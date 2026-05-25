@@ -27,11 +27,9 @@ from start to finish. See :class:`~music21.figuredBass.realizer.FiguredBassLine`
     .. image:: images/figuredBass/fbRealizer_intro.*
         :width: 500
 
-
 The same can be accomplished by taking the notes and notations
 from a :class:`~music21.stream.Stream`.
 See :meth:`~music21.figuredBass.realizer.figuredBassFromStream` for more details.
-
 
 >>> s = converter.parse('tinynotation: C4 D4_4,3 C2', makeNotation=False)
 >>> fbLine = realizer.figuredBassFromStream(s)
@@ -197,7 +195,6 @@ class FiguredBassLine:
     :attr:`~music21.note.GeneralNote.quarterLength` or duration of a realization above a bassNote
     is identical to that of the bassNote.
 
-
     `inKey` defaults to C major.
 
     `inTime` defaults to 4/4.
@@ -240,7 +237,6 @@ class FiguredBassLine:
         '''
         Use this method to add (bassNote, notationString) pairs to the bass line. Elements
         are realized in the order they are added.
-
 
         >>> from music21.figuredBass import realizer
         >>> fbLine = realizer.FiguredBassLine(key.Key('B'), meter.TimeSignature('3/4'))
@@ -289,7 +285,6 @@ class FiguredBassLine:
 
         .. image:: images/figuredBass/fbRealizer_bassLine.*
             :width: 200
-
 
         >>> sBach = corpus.parse('bach/bwv307')
         >>> sBach.parts.last().measure(0).show('text')
@@ -548,7 +543,6 @@ class Realization:
     :meth:`~music21.figuredBass.realizer.FiguredBassLine.realize`. Allows for the
     generation of realizations as a :class:`~music21.stream.Score`.
 
-
     * See the :mod:`~music21.figuredBass.examples` module for examples on the generation
       of realizations.
     * A possibility progression is a valid progression through a string of
@@ -628,7 +622,6 @@ class Realization:
         '''
         Compiles each unique possibility progression, adding
         it to a master list. Returns the master list.
-
 
         .. warning:: This method is unoptimized, and may take a prohibitive amount
             of time for a Realization which has more than 200,000 solutions.
@@ -756,7 +749,6 @@ class Realization:
         '''
         Generates all unique realizations as a :class:`~music21.stream.Score`.
 
-
         .. warning:: This method is unoptimized, and may take a prohibitive amount
             of time for a Realization which has more than 100 solutions.
         '''
@@ -787,7 +779,6 @@ class Realization:
     def generateRandomRealizations(self, amountToGenerate=20):
         '''
         Generates *amountToGenerate* unique realizations as a :class:`~music21.stream.Score`.
-
 
         .. warning:: This method is unoptimized, and may take a prohibitive amount
             of time if amountToGenerate is more than 100.

@@ -259,8 +259,6 @@ class Instrument(base.Music21Object):
         >>> used
         [0, 1, 2, 3, 4, 5, 6, 7, 8, 10, 11]
 
-
-
         Unpitched percussion will be set to 9, so long as it's not in the filter list:
 
         >>> used = [0]
@@ -2346,7 +2344,6 @@ def fromString(instrumentString: str,
     >>> t3
     <music21.instrument.Flute 'flauto 2'>
 
-
     Excess information is ignored, and the useful information can be extracted
     correctly as long as it's sequential.
 
@@ -2379,7 +2376,6 @@ def fromString(instrumentString: str,
     >>> t8.transposition
     <music21.interval.Interval m3>
 
-
     Note that because of the ubiquity of B-flat clarinets and trumpets, and the
     rareness of B-natural forms of those instruments, this gives a B-flat, not
     B-natural clarinet, using the German form:
@@ -2392,7 +2388,6 @@ def fromString(instrumentString: str,
 
     Use "H" or "b-natural" to get an instrument in B-major.  Or donate one to me,
     and I'll change this back!
-
 
     Standard abbreviations are acceptable:
 
@@ -2408,7 +2403,6 @@ def fromString(instrumentString: str,
     >>> t11.__class__ == t10.__class__
     True
 
-
     Previously an exact instrument name was not always working:
 
     >>> instrument.fromString('Flute')
@@ -2418,7 +2412,6 @@ def fromString(instrumentString: str,
 
     >>> instrument.fromString('Choir (Aahs)')
     <music21.instrument.Choir 'Choir (Aahs)'>
-
 
     By default, this function searches over all stored instrument names.
     This includes multiple languages as well as the abbreviations

@@ -322,7 +322,6 @@ class BrailleSegment(text.BrailleText):
         >>> brailleSeg.showFirstMeasureNumber
         True
 
-
         Possible showHand values are None, 'right', 'left':
 
         >>> brailleSeg.showHand is None
@@ -682,7 +681,6 @@ class BrailleSegment(text.BrailleText):
         >>> bs1.suppressOctaveMarks = True
         >>> bs1.showLeadingOctaveFromNoteGrouping(beg2)
         False
-
 
         We also show octaves if for some reason two noteGroups in the same measure have
         different BrailleElementGroupings keyed to consecutive ordinals.  The code simulates
@@ -1503,7 +1501,6 @@ def findSegments(music21Part,
     ===
     ---end segment---
 
-
     Second segment
 
     >>> print(str(allSegments[1]))
@@ -1616,7 +1613,6 @@ def prepareSlurredNotes(music21Part,
     slur covers up to four notes. A short slur symbol should follow each
     note except the last.
 
-
     >>> import copy
     >>> from music21.braille import segment
     >>> short = converter.parse('tinynotation: 3/4 c4 d e')
@@ -1638,13 +1634,11 @@ def prepareSlurredNotes(music21Part,
     >>> shortA.recurse().notes[1].shortSlur
     True
 
-
     In a long phrase, a slur covers more than four notes. There are two
     options for slurring long phrases. The first is by using the bracket
     slur. By default, slurLongPhraseWithBrackets is True. The opening
     bracket sign is put before the first note, and the closing bracket
     sign is put before the last note.
-
 
     >>> long = converter.parse('tinynotation: 3/4 c8 d e f g a')
     >>> s2 = spanner.Slur(long[note.Note].first(), long[note.Note].last())
@@ -1668,7 +1662,6 @@ def prepareSlurredNotes(music21Part,
     >>> longA[note.Note].last().endLongBracketSlur
     True
 
-
     The other way is by using the double slur, setting `slurLongPhraseWithBrackets`
     to False. The opening sign of the double slur is put after the first note
     (i.e. before the second note) and the closing sign is put before the last
@@ -1677,7 +1670,6 @@ def prepareSlurredNotes(music21Part,
     If a value is not supplied for `showLongSlursAndTiesTogether`, it will take the
     value set for `slurLongPhraseWithBrackets`, which defaults True.
 
-
     >>> longB = copy.deepcopy(long)
     >>> segment.prepareSlurredNotes(longB, slurLongPhraseWithBrackets=False)
     >>> longB.recurse().notes[1].beginLongDoubleSlur
@@ -1685,17 +1677,14 @@ def prepareSlurredNotes(music21Part,
     >>> longB.recurse().notes[-2].endLongDoubleSlur
     True
 
-
     In the event that slurs and ties are shown together in print, the slur is
     redundant. Examples are shown for slurring a short phrase; the process is
     identical for slurring a long phrase.
-
 
     Below, a tie has been added between the first two notes of the short phrase
     defined above. If showShortSlursAndTiesTogether is set to its default value of
     False, then the slur on either side of the phrase is reduced by the amount that
     ties are present, as shown below.
-
 
     >>> short.recurse().notes[0].tie = tie.Tie('start')
     >>> shortB = copy.deepcopy(short)
@@ -1707,7 +1696,6 @@ def prepareSlurredNotes(music21Part,
     <music21.tie.Tie start>
     >>> shortB.recurse().notes[1].shortSlur
     True
-
 
     If showShortSlursAndTiesTogether is set to True, then the slurs and ties are
     shown together (i.e. the note has both a shortSlur and a tie).
@@ -2029,7 +2017,6 @@ def extractBrailleElements(
     {2.0} <music21.spanner.Slur <music21.note.Note C><music21.note.Note D>>
     {2.0} <music21.bar.Barline type=final>
 
-
     Spanners are dealt with in :func:`~music21.braille.segment.prepareSlurredNotes`,
     so they are not returned by this function, as seen below.
 
@@ -2213,7 +2200,6 @@ def setAffinityCode(music21Object: base.Music21Object):
     A BrailleSegmentException is raised if an affinity code cannot be assigned to
     the object.
 
-
     As seen in the following example, the affinity code of a :class:`~music21.note.Note`
     and a :class:`~music21.clef.TrebleClef` are the same, because they should be grouped
     together. However, the classSortOrder indicates that the TrebleClef should come first
@@ -2307,7 +2293,6 @@ def splitNoteGrouping(noteGrouping, beatDivisionOffset=0):
     >>> right
     <music21.braille.segment.BrailleElementGrouping
         [<music21.note.Rest quarter>, <music21.note.Note E>]>
-
 
     Now split one beat division earlier than it should be.  For 2/2 that means
     one half of a beat, or one quarter note earlier:

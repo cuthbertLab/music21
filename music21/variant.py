@@ -221,7 +221,6 @@ class Variant(base.Music21Object):
 
         This method must be overridden, otherwise Music21Object.show() is called.
 
-
         >>> v = variant.Variant()
         >>> v.repeatAppend(note.Note(quarterLength=0.25), 8)
         >>> v.show('t')
@@ -369,9 +368,7 @@ class Variant(base.Music21Object):
             {2.0} <music21.note.Note B->
             {3.0} <music21.note.Note A>
 
-
         A second example:
-
 
         >>> v = variant.Variant()
         >>> variantDataM1 = [('b', 'eighth'), ('c', 'eighth'), ('a', 'quarter'),
@@ -493,7 +490,6 @@ class Variant(base.Music21Object):
         '''
         remove replaced elements from a referenceStream or activeSite
 
-
         >>> v = variant.Variant()
         >>> variantDataM1 = [('b', 'eighth'), ('c', 'eighth'), ('a', 'quarter'),
         ...                  ('a', 'quarter'),('b', 'quarter')]
@@ -599,7 +595,6 @@ def mergeVariants(streamX, streamY, variantName='variant', *, inPlace=False):
     music21.variant.VariantException: Could not determine what merging method to use.
             Try using a more specific merging function.
 
-
     Example: Create a main score (aScore) and a variant score (vScore), each with
     two parts (ap1/vp1
     and ap2/vp2) and some small variants between ap1/vp1 and ap2/vp2, marked with * below.
@@ -662,7 +657,6 @@ def mergeVariants(streamX, streamY, variantName='variant', *, inPlace=False):
             {2.0} <music21.note.Note G>
             {3.0} <music21.note.Note F>
             {4.0} <music21.bar.Barline type=final>
-
 
     >>> mergedPart = variant.mergeVariants(ap2, vp2, variantName='docVariant', inPlace=False)
     >>> mergedPart.show('text')
@@ -773,7 +767,6 @@ def mergeVariantMeasureStreams(streamX, streamY, variantName='variant', *, inPla
     a new bar has been inserted between the
     original third and fourth bars, and two bars have been added at the end.
 
-
     >>> data1M1 = [('a', 'quarter'), ('b', 'eighth'), ('c', 'eighth'),
     ...            ('a', 'quarter'), ('a', 'quarter')]
     >>> data1M2 = [('b', 'eighth'), ('c', 'eighth'), ('a', 'quarter'),
@@ -820,12 +813,10 @@ def mergeVariantMeasureStreams(streamX, streamY, variantName='variant', *, inPla
     ...    stream2.append(m)
     >>> #_DOCS_SHOW stream1.show()
 
-
     .. image:: images/variant_measuresStreamMergeStream1.*
         :width: 600
 
     >>> #_DOCS_SHOW stream2.show()
-
 
     .. image:: images/variant_measuresStreamMergeStream2.*
         :width: 600
@@ -972,7 +963,6 @@ def mergeVariantsEqualDuration(streams, variantNames, *, inPlace=False):
     variant objects (i.e. more than once under different names).
     Also, note that a streams with bars of differing lengths will not behave properly.
 
-
     >>> stream1 = stream.Stream()
     >>> stream2paris = stream.Stream()
     >>> stream3london = stream.Stream()
@@ -1102,10 +1092,8 @@ def mergeVariantsEqualDuration(streams, variantNames, *, inPlace=False):
             {3.0} <music21.note.Note E>
     >>> #_DOCS_SHOW mergedStreams.show()
 
-
     .. image:: images/variant_measuresAndParts.*
         :width: 600
-
 
     >>> for p in mergedStreams.getElementsByClass(stream.Part):
     ...    for m in p.getElementsByClass(stream.Measure):
@@ -1133,7 +1121,6 @@ def mergeVariantsEqualDuration(streams, variantNames, *, inPlace=False):
             {2.0} <music21.note.Note A>
             {3.0} <music21.note.Note A>
     >>> #_DOCS_SHOW mergedStreams.show()
-
 
     .. image:: images/variant_measuresAndParts2.*
         :width: 600
@@ -1231,7 +1218,6 @@ def mergePartAsOssia(mainPart, ossiaPart, ossiaName,
     different duration than the segment of stream which it replaces
     because that information is not contained in the format of score this method is
     designed to deal with.
-
 
     >>> mainStream = converter.parse('tinynotation: 4/4   A4 B4 C4 D4   E1    F2 E2     E8 F8 F4 G2   G2 G4 F4   F4 F4 F4 F4   G1      ')
     >>> ossiaStream = converter.parse('tinynotation: 4/4  r1            r1    r1        E4 E4 F4 G4   r1         F2    F2      r1      ')
@@ -1385,7 +1371,6 @@ def addVariant(
     this is an insertion. If sVariant is
     None, this is a deletion.
 
-
     >>> data1M1 = [('a', 'quarter'), ('b', 'eighth'), ('c', 'eighth'),
     ...            ('a', 'quarter'), ('a', 'quarter')]
     >>> data1M3 = [('c', 'quarter'), ('d', 'quarter'), ('e', 'quarter'), ('e', 'quarter')]
@@ -1496,7 +1481,6 @@ def refineVariant(s, sVariant, *, inPlace=False):
     look at the documentation for _getBestListAndScore
 
     Note that this code does not work properly yet.
-
 
     >>> v = variant.Variant()
     >>> variantDataM1 = [('b', 'eighth'), ('c', 'eighth'), ('a', 'quarter'),
@@ -1764,7 +1748,6 @@ def _getBestListAndScore(streamX, streamY, badnessDict, listDict,
     in the list where this function has determined that the bar appearing
     in streamY does not have a counterpart in streamX anywhere and is an insertion.
 
-
     >>> badnessDict = {}
     >>> listDict = {}
     >>> stream1 = stream.Stream()
@@ -1883,7 +1866,6 @@ def _diffScore(measureX, measureY):
     isNone is true (i.e. testing when a bar does not associate with any existing bars the reference
     stream), is well-matched with the similarity scores generated by this function.
 
-
     >>> m1 = stream.Measure()
     >>> m2 = stream.Measure()
     >>> m1.append([note.Note('e'), note.Note('f'), note.Note('g'), note.Note('a')])
@@ -1911,7 +1893,6 @@ def _getRegionsFromStreams(streamX, streamY):
     '''
     Takes in two streams, returns a list of 5-tuples via difflib.get_opcodes()
     working on measure differences.
-
 
     >>> s1 = converter.parse("tinynotation: 2/4 d4 e8. f16 GG4 b'4 b-2 c4 d8. e16 FF4 a'4 b-2")
 
@@ -1945,7 +1926,6 @@ def _mergeVariants(streamA, streamB, *, variantName=None, inPlace=False):
     function will compare streamB to the streamA as well as the
     variant streams contained in streamA.
     Note that variant streams in streamB will be ignored and lost.
-
 
     >>> stream1 = stream.Stream()
     >>> stream2 = stream.Stream()
@@ -2262,7 +2242,6 @@ def _doVariantFixingOnStream(s, variantNames=None):
     (20.0, 'deletion', 8.0)
     (24.0, 'deletion', 8.0)
 
-
     This also works on streams with variants that contain notes and rests rather than measures.
 
     >>> s = converter.parse('tinyNotation: 4/4                     e4 b b b   f4 f f f   g4 a a a       ', makeNotation=False)
@@ -2355,7 +2334,6 @@ def _getNextElements(s, v, numberOfElements=1):
     This is a helper function for makeAllVariantsReplacements() which returns the next element in s
     of the type of elements found in the variant v so that it can be added to v.
 
-
     >>> #                                                   *                       *
     >>> s1 = converter.parse('tinyNotation: 4/4             b4 c d e    f4 g a b   d4 e f g   ', makeNotation=False)
     >>> s2 = converter.parse('tinyNotation: 4/4 e4 f g a    b4 c d e               d4 e f g   ', makeNotation=False)
@@ -2433,7 +2411,6 @@ def _getPreviousElement(s, v):
     This is a helper function for makeAllVariantsReplacements() which returns
     the previous element in s
     of the type of elements found in the variant v so that it can be added to v.
-
 
     >>> #                                                   *                       *
     >>> s1 = converter.parse('tinyNotation: 4/4 a4 b c d                b4 c d e    f4 g a b    ')

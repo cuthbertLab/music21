@@ -116,7 +116,6 @@ def numToIntOrFloat(value: OffsetQLIn) -> int|float:
     Traceback (most recent call last):
     ValueError: could not convert string to float: 'one'
 
-
     Fractions also become ints or floats
 
     >>> from fractions import Fraction
@@ -707,7 +706,6 @@ def unitNormalizeProportion(values: Sequence[int|float]) -> list[float]:
     >>> common.unitNormalizeProportion([1.0, 1, 1.0])
     [0.3333333..., 0.333333..., 0.333333...]
 
-
     On 32-bit computers this number may be inexact even for small floats.
     On 64-bit it works fine.  This is the 32-bit output for this result.
 
@@ -862,7 +860,6 @@ def contiguousList(inputListOrTuple) -> bool:
 
     requires the list to be sorted first
 
-
     >>> l = [3, 4, 5, 6]
     >>> common.contiguousList(l)
     True
@@ -940,7 +937,6 @@ def fromRoman(num: str, *, strictModern=False) -> int:
 
     https://code.activestate.com/recipes/81611-roman-numerals/
 
-
     >>> common.fromRoman('ii')
     2
     >>> common.fromRoman('vii')
@@ -953,7 +949,6 @@ def fromRoman(num: str, *, strictModern=False) -> int:
     >>> common.fromRoman('MCDLXXXIX')
     1489
 
-
     Some people consider this an error, but you see it in medieval and ancient roman documents:
 
     >>> common.fromRoman('ic')
@@ -964,7 +959,6 @@ def fromRoman(num: str, *, strictModern=False) -> int:
     >>> common.fromRoman('ic', strictModern=True)
     Traceback (most recent call last):
     ValueError: input contains an invalid subtraction element (modern interpretation): ic
-
 
     But things like this are never seen, and thus cause an error:
 

@@ -73,7 +73,6 @@ def makeLettersOnlyId(inputString):
         Takes an id and makes it purely letters by substituting
         letters for all other characters.
 
-
         >>> print(lily.translate.makeLettersOnlyId('rainbow123@@dfas'))
         rainbowxyzmmdfas
         '''
@@ -254,7 +253,6 @@ class LilypondConverter:
         r'''
         get a proper lilypond text file for writing from a music21 object
 
-
         >>> n = note.Note()
         >>> print(lily.translate.LilypondConverter().textFromMusic21Object(n))
         \version "2..."
@@ -321,7 +319,6 @@ class LilypondConverter:
         whose string representation accurately reflects all the Score objects
         in this Opus object.
 
-
         >>> #_DOCS_SHOW fifeOpus = corpus.parse('miscFolk/americanfifeopus.abc')
         >>> #_DOCS_SHOW lpc = lily.translate.LilypondConverter()
         >>> #_DOCS_SHOW lpc.loadObjectFromOpus(fifeOpus, makeNotation=False)
@@ -363,7 +360,6 @@ class LilypondConverter:
 
         creates a filled topLevelObject (lily.lilyObjects.LyLilypondTop)
         whose string representation accurately reflects this Score object.
-
 
         >>> lpc = lily.translate.LilypondConverter()
         >>> #_DOCS_SHOW b = corpus.parse('bach/bwv66.6')
@@ -427,7 +423,6 @@ class LilypondConverter:
         Takes in a score and returns a block that starts each part context and variant context
         with an identifier and {\stopStaff s1*n} (or s, whatever is needed for the duration)
         where n is the number of measures in the score.
-
 
         >>> import copy
 
@@ -567,7 +562,6 @@ class LilypondConverter:
         # noinspection PyShadowingNames
         r'''
         Creates a series of Spacer objects for the measures in a Stream Part.
-
 
         >>> m1 = stream.Measure(converter.parse('tinynotation: 3/4 a2.'))
         >>> m2 = stream.Measure(converter.parse('tinynotation: 3/4 b2.'))
@@ -942,7 +936,6 @@ class LilypondConverter:
 
         (should eventually replace the main Score parts finding tools)
 
-
         >>> lpc = lily.translate.LilypondConverter()
         >>> lpMusicList = lily.lilyObjects.LyMusicList()
         >>> lpc.context = lpMusicList
@@ -962,7 +955,6 @@ class LilypondConverter:
         des' 4
         eis' 4
         <BLANKLINE>
-
 
         >>> v1 = stream.Voice()
         >>> v1.append(note.Note('C5', quarterLength = 4.0))
@@ -1127,7 +1119,6 @@ class LilypondConverter:
         appends lySimpleMusicFromNoteOrRest to the
         current context.
 
-
         >>> n = note.Note('C#4')
         >>> lpc = lily.translate.LilypondConverter()
         >>> lpMusicList = lily.lilyObjects.LyMusicList()
@@ -1136,7 +1127,6 @@ class LilypondConverter:
         >>> print(lpMusicList)
         cis' 4
         <BLANKLINE>
-
 
         >>> n2 = note.Note('D#4')
         >>> n2.duration.quarterLength = 1/3
@@ -1194,7 +1184,6 @@ class LilypondConverter:
         appends lySimpleMusicFromChord to the
         current context.
 
-
         >>> c = chord.Chord(['C4', 'E4', 'G4'])
         >>> lpc = lily.translate.LilypondConverter()
         >>> lpMusicList = lily.lilyObjects.LyMusicList()
@@ -1203,7 +1192,6 @@ class LilypondConverter:
         >>> print(lpMusicList)
         < c' e' g'  > 4
         <BLANKLINE>
-
 
         >>> c2 = chord.Chord(['D4', 'F#4', 'A4'])
         >>> c2.duration.quarterLength = 1/3
@@ -1394,7 +1382,6 @@ class LilypondConverter:
         Adds an LyEmbeddedScm object to the context's contents if the object's stem direction
         is set (currently, only "up" and "down" are supported).
 
-
         >>> lpc = lily.translate.LilypondConverter()
         >>> lpMusicList = lily.lilyObjects.LyMusicList()
         >>> lpc.context = lpMusicList
@@ -1418,7 +1405,6 @@ class LilypondConverter:
 
     def lySimpleMusicFromChord(self, chordObj):
         '''
-
 
         >>> conv = lily.translate.LilypondConverter()
         >>> c1 = chord.Chord(['C#2', 'E4', 'D#5'])
@@ -1552,7 +1538,6 @@ class LilypondConverter:
         music21.lily.translate.LilyTranslateException: Cannot translate an object of
             zero duration <music21.duration.Duration 0.0>
 
-
         Does not work with complex durations:
 
         >>> d = duration.Duration(5.0)
@@ -1602,7 +1587,6 @@ class LilypondConverter:
         converts a Clef object to a
         lilyObjects.LyEmbeddedScm object
 
-
         >>> tc = clef.TrebleClef()
         >>> conv = lily.translate.LilypondConverter()
         >>> lpEmbeddedScm = conv.lyEmbeddedScmFromClef(tc)
@@ -1649,7 +1633,6 @@ class LilypondConverter:
         converts a Key or KeySignature object
         to a lilyObjects.LyEmbeddedScm object
 
-
         >>> d = key.Key('d')
         >>> conv = lily.translate.LilypondConverter()
         >>> lpEmbeddedScm = conv.lyEmbeddedScmFromKeySignature(d)
@@ -1686,7 +1669,6 @@ class LilypondConverter:
         r'''
         convert a :class:`~music21.meter.TimeSignature` object
         to a lilyObjects.LyEmbeddedScm object
-
 
         >>> ts = meter.TimeSignature('3/4')
         >>> conv = lily.translate.LilypondConverter()
@@ -1732,7 +1714,6 @@ class LilypondConverter:
         Returns an lpMusicList object contained in an lpSequentialMusic object
         in an lpPrefixCompositeMusic object which sets the times object to a particular
         fraction.
-
 
         >>> lpc = lily.translate.LilypondConverter()
         >>> lpc.context
@@ -1862,7 +1843,6 @@ class LilypondConverter:
         # noinspection PyShadowingNames
         r'''
 
-
         >>> s1 = converter.parse('tinynotation: 4/4 a4 a a a  a1')
         >>> s2 = converter.parse('tinynotation: 4/4 b4 b b b')
         >>> s3 = converter.parse('tinynotation: 4/4 c4 c c c')
@@ -1910,7 +1890,6 @@ class LilypondConverter:
         >>> for v in variantList :
         ...     v.groups = ['london']
         ...     activeSite.insert(0.0, v)
-
 
         >>> lpc = lily.translate.LilypondConverter()
 
@@ -2234,7 +2213,6 @@ class LilypondConverter:
     def lyOssiaMusicFromVariant(self, variantIn):
         r'''
         returns a LyOssiaMusic object from a stream
-
 
         >>> c = converter.parse('tinynotation: 3/4 C4 D E F2.')
         >>> v = variant.Variant(c.elements)

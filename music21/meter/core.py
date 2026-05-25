@@ -668,7 +668,6 @@ class MeterSequence(MeterTerminal):
         >>> str(b)
         '{2/8+2/8+1/8}'
 
-
         Here we use loadDefault=True to get the default partition in case
         there is no known way to do this:
 
@@ -739,7 +738,6 @@ class MeterSequence(MeterTerminal):
         >>> a.partitionByList(['3/4', '1/8', '1/8'])
         >>> a
         <music21.meter.core.MeterSequence {3/4+1/8+1/8}>
-
 
         But the basics of the MeterSequence must be observed:
 
@@ -1175,7 +1173,6 @@ class MeterSequence(MeterTerminal):
         >>> ms.partitionStr
         '13-uple'
 
-
         Single partition:
 
         >>> ms = meter.MeterSequence('3/4', 1)
@@ -1352,7 +1349,6 @@ class MeterSequence(MeterTerminal):
         >>> accentSequence.weight = 1.0
         >>> (downbeat.weight, upbeat.weight)
         (0.5, 0.5)
-
 
         Assume this MeterSequence is a whole, not a part of some larger MeterSequence.
         Thus, we cannot use numerator/denominator relationship
@@ -1608,7 +1604,6 @@ class MeterSequence(MeterTerminal):
          <music21.meter.core.MeterSequence {1/8+1/8}>,
          <music21.meter.core.MeterTerminal 1/4>,
          <music21.meter.core.MeterSequence {{1/16+1/16}+1/8}>]
-
 
         >>> b.getLevelList(1, flat=False)
         [<music21.meter.core.MeterTerminal 1/4>,
@@ -1945,7 +1940,6 @@ class MeterSequence(MeterTerminal):
         If `permitMeterModulus` is True, quarter length positions
         greater than the duration of the Meter will be accepted
         as the modulus of the total meter duration.
-
 
         >>> a = meter.MeterSequence('3/4', 3)
         >>> a.offsetToSpan(0.5)

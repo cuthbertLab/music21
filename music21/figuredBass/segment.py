@@ -91,7 +91,6 @@ class Segment:
         if fbRules is None, a rules.Rules() instance is created.  Each Segment gets
         its own deepcopy of the one given.
 
-
         Here, a Segment is created using the default values: a FiguredBassScale in C,
         a bassNote of C3, an empty notationString, and a default
         Rules object.
@@ -302,9 +301,7 @@ class Segment:
 
         Items are added within this method in the following form:
 
-
         (willRunOnlyIfTrue, methodToRun, optionalArgs)
-
 
         These items are compiled internally
         when :meth:`~music21.figuredBass.segment.Segment.allCorrectConsecutivePossibilities`
@@ -552,7 +549,6 @@ class Segment:
         is resolved
         as an ordinary Segment.
 
-
         >>> from music21.figuredBass import segment
         >>> segmentA = segment.Segment(bassNote=note.Note('A-2'), notationString='#6,b5,3')
         >>> segmentA.pitchNamesInChord  # spell out a Gr+6 chord
@@ -638,13 +634,11 @@ class Segment:
         >>> allPossib.__class__
         <... 'itertools.product'>
 
-
         The number of naive possibilities is always the length of
         :attr:`~music21.figuredBass.segment.Segment.allPitchesAboveBass`
         raised to the (:attr:`~music21.figuredBass.segment.Segment.numParts` - 1)
         power. The power is 1 less than the number of parts because
         the bass pitch is constant.
-
 
         >>> allPossibList = list(allPossib)
         >>> len(segmentA.allPitchesAboveBass)
@@ -673,16 +667,13 @@ class Segment:
         a Segment, all possibilities which pass all filters in
         :meth:`~music21.figuredBass.segment.Segment.singlePossibilityRules`.
 
-
         >>> from music21.figuredBass import segment
         >>> segmentA = segment.Segment()
         >>> allPossib = segmentA.allSinglePossibilities()
         >>> allCorrectPossib = segmentA.allCorrectSinglePossibilities()
 
-
         Most of the 729 naive possibilities were filtered out using the default rules set,
         leaving only 21.
-
 
         >>> allPossibList = list(allPossib)
         >>> len(allPossibList)
@@ -798,7 +789,6 @@ class Segment:
         '''
         An ordinary segment is defined as a segment which needs no special resolution, where the
         segment does not spell out a special chord, for example, a dominant seventh.
-
 
         Finds iterators through all possibA and possibB by calling
         :meth:`~music21.figuredBass.segment.Segment.allCorrectSinglePossibilities`

@@ -164,7 +164,6 @@ def base40DeltaToInterval(delta):
     instance, would return a diminished second, even though it's
     a quadruplely augmented unison) just would not occur.
 
-
     >>> musedata.base40.base40DeltaToInterval(4)
     <music21.interval.Interval d2>
     >>> musedata.base40.base40DeltaToInterval(11)
@@ -215,7 +214,6 @@ def base40ToPitch(base40Num):
     have an associated pitch name. There is one unassigned number
     each time the interval between two letters is a whole step.
 
-
     >>> musedata.base40.base40ToPitch(1)
     <music21.pitch.Pitch C--1>
     >>> musedata.base40.base40ToPitch(40)
@@ -246,7 +244,6 @@ def pitchToBase40(pitchToConvert):
     of pitches that Base40 can handle; for example, half flats
     and half sharps or triple flats and triple sharps.
 
-
     >>> musedata.base40.pitchToBase40(pitch.Pitch('C--5'))
     161
     >>> musedata.base40.pitchToBase40('F##4')
@@ -276,13 +273,11 @@ def base40Interval(base40NumA, base40NumB):
     to an interval in Base40, or if either base40 pitch
     number doesn't correspond to a pitch name.
 
-
     >>> musedata.base40.base40Interval(163, 191)
     <music21.interval.Interval m6>
 
     >>> musedata.base40.base40Interval(186, 174)      # Descending M3
     <music21.interval.Interval M-3>
-
 
     Base40 has limitations for intervals smaller than diminished or bigger than augmented.
 
@@ -335,7 +330,6 @@ def base40ActualInterval(base40NumA, base40NumB):
     numbers does not correspond to a pitch name or (b) If
     an unusual interval is encountered that can't be handled
     by music21.
-
 
     >>> musedata.base40.base40ActualInterval(163, 191)
     <music21.interval.Interval m6>

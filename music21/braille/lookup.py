@@ -12,7 +12,6 @@
 This file contains some basic lookups for symbols (used where there is not much more
 logical code to deduce).
 
-
 Music21 standards generally follow Mary Turner De Garmo,
 Introduction to Braille Music Transcription (2005) (called "degarmo" or "IBMT2005" below).
 

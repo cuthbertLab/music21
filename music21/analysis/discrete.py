@@ -698,7 +698,6 @@ class KeyWeightKeyAnalysis(DiscreteAnalysis):
         Note that all alternative solutions are returned as Key objects and stored
         on a list found at Key.alternateInterpretations.
 
-
         >>> s = corpus.parse('bach/bwv66.6')
         >>> p = analysis.discrete.KrumhanslSchmuckler()
         >>> p.getSolution(s)  # this seems correct
@@ -1331,7 +1330,6 @@ def analyzeStream(
     <music21.key.Key of f# minor>
     >>> analysis.discrete.analyzeStream(s, 'span')
     <music21.interval.Interval m21>
-
 
     Note that the same results can be obtained by calling "analyze" directly on the stream object:
     >>> s.analyze('key')

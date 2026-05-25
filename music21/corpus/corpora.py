@@ -164,7 +164,6 @@ class Corpus(prebase.ProtoM21Object):
         >>> coreCorpus.translateExtensions(('xml',))
         ('.xml', '.mxl', '.musicxml')
 
-
         # With multiple extensions:
 
         >>> coreCorpus.translateExtensions(('.mid', '.musicxml'), expandExtensions=False)

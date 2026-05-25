@@ -87,7 +87,6 @@ def makeBeams(
     2 <music21.beam.Beams <music21.beam.Beam 1/continue>/<music21.beam.Beam 2/start>>
     3 <music21.beam.Beams <music21.beam.Beam 1/stop>/<music21.beam.Beam 2/stop>>
 
-
     This was formerly a bug -- we could not have a partial-left beam at the start of a
     beam group.  Now merges across the archetypeSpan
 

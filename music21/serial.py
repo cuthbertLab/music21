@@ -522,7 +522,6 @@ class ToneRow(stream.Stream):
         transform the row appropriately (without transposition), then transpose the resulting
         row by n semitones.
 
-
         >>> chromatic = serial.pcToToneRow(range(12))
         >>> chromatic.pitchClasses()
         [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]
@@ -559,7 +558,6 @@ class ToneRow(stream.Stream):
 
         See :meth:`~music21.serial.ToneRow.zeroCenteredTransformation` for
         an explanation of this convention.
-
 
         >>> chromatic = serial.pcToToneRow([2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 0, 1])
         >>> reverseChromatic = serial.pcToToneRow([8, 7, 6, 5, 4, 3, 2, 1, 0, 11, 10, 9])
@@ -809,7 +807,6 @@ class TwelveToneRow(ToneRow):
         of the all-trichord hexachord. Note that the interval sets may be transformed.
 
         Named for John Link who discovered them.
-
 
         >>> bergLyric = serial.getHistoricalRowByName('BergLyricSuite')
         >>> bergLyric.pitchClasses()

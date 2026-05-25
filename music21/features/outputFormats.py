@@ -140,7 +140,6 @@ class OutputCSV(OutputFormat):
         '''
         Get the header as a list of lines.
 
-
         >>> f = [features.jSymbolic.ChangesOfMeterFeature]
         >>> ds = features.DataSet(classLabel='Composer')
         >>> ds.addFeatureExtractors(f)
@@ -176,7 +175,6 @@ class OutputARFF(OutputFormat):
     See
     https://web.archive.org/web/20160212022757/http://weka.wikispaces.com/ARFF+%28stable+version%29
     for more details
-
 
     >>> oa = features.outputFormats.OutputARFF()
     >>> oa.ext

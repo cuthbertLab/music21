@@ -154,7 +154,6 @@ class LyObject(prebase.ProtoM21Object):
         Returns a dictionary and sets self.lilyAttributes to that dictionary, for a m21Object
         of class classLookup using the mapping of self.m21toLy[classLookup]
 
-
         >>> class Mock(base.Music21Object): pass
         >>> m = Mock()
         >>> lm = lily.lilyObjects.LyMock()
@@ -167,13 +166,11 @@ class LyObject(prebase.ProtoM21Object):
         mockAttribute: mock-attribute
         mockAttribute2: mock-attribute-2
 
-
         Some of these attributes have defaults:
 
         >>> for x in sorted(lm.defaultAttributes.keys()):
         ...    print(f'{x}: {lm.defaultAttributes[x]}')
         mockAttribute2: 7
-
 
         >>> m.mockAttribute = 'hello'
         >>> lilyAttributes = lm.setAttributesFromClassObject('Mock', m)
@@ -297,7 +294,6 @@ class LyLilypondTop(LyObject):
              | lilypond assignment
              | lilypond error
              | lilypond "\invalid"`
-
 
     error and \invalid are not defined by music21
     '''
@@ -542,7 +538,6 @@ class LyContextDefSpecBody(LyObject):
     >>> lyContextBody.stringOutput()
     'cdi'
 
-
     >>> embedScm = lily.lilyObjects.LyEmbeddedScm('#t')
     >>> lyContextBody = lily.lilyObjects.LyContextDefSpecBody(
     ...                 contextDefSpecBody='body', embeddedScm=embedScm)
@@ -667,7 +662,6 @@ class LyBookpartBody(LyObject):
        fullMarkupList
        lilypondHeader
        error
-
 
     >>> lyBookpartBody = lily.lilyObjects.LyBookpartBody(bookIdentifier='bookId')
     >>> lyBookpartBody.stringOutput()
@@ -874,7 +868,6 @@ class LyTempoEvent(LyObject):
     tempo_event: "\tempo" steno_duration '=' tempo_range
                | "\tempo" scalar steno_duration '=' tempo_range
                | "\tempo" scalar
-
 
     >>> lte = lily.lilyObjects.LyTempoEvent(scalar='40')
     >>> str(lte)
@@ -1470,9 +1463,7 @@ class LyPropertyOperation(LyObject):
 
     mandatory mode in ['set', 'unset', 'override', 'revert']
 
-
     also represents simple_music_property_def which has the same forms
-
 
     >>> lpo = lily.lilyObjects.LyPropertyOperation('unset', 'simple')
     >>> str(lpo)
@@ -1872,7 +1863,6 @@ class LyStenoDuration(LyObject):
 
     a duration number followed by one or more dots
 
-
     >>> lsd = lily.lilyObjects.LyStenoDuration('2', 2)
     >>> print(lsd)
     2..
@@ -1972,7 +1962,6 @@ class LySimpleElement(LyObject):
 class LyLyricElement(LyObject):
     r'''
     Object represents a single Lyric in lilypond.
-
 
     >>> lle = lily.lilyObjects.LyLyricElement('hel_')
     >>> lle

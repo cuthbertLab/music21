@@ -829,7 +829,6 @@ def romanNumeralFromChord(
     >>> romanNumeral10
     <music21.roman.RomanNumeral #iiiø7 in d minor>
 
-
     Augmented 6ths without key context
 
     >>> roman.romanNumeralFromChord(
@@ -926,7 +925,6 @@ def romanNumeralFromChord(
     ...     chord.Chord('E4 G4 B-4 C#5')
     ...     )
     <music21.roman.RomanNumeral io6b5b3 in c# minor>
-
 
     The preferSecondaryDominants option defaults to False, but if set to True,
     then certain rare figures are swapped with their
@@ -1038,7 +1036,6 @@ def romanNumeralFromChord(
 
     # >>> roman.romanNumeralFromChord(chord.Chord('B3 D3 E-3 G3'), key.Key('c'))
     # <music21.roman.RomanNumeral III+642 in c minor>
-
 
     These two are debatable -- is the harmonic minor or the natural minor used as the basis?
 
@@ -1414,7 +1411,6 @@ class RomanNumeral(harmony.Harmony):
     >>> roman.RomanNumeral('v64', 'c').pitches
     (<music21.pitch.Pitch D4>, <music21.pitch.Pitch G4>, <music21.pitch.Pitch B-4>)
 
-
     If no Key is given then it exists as a theoretical, keyless RomanNumeral;
     e.g., V in any key.  But when realized, keyless RomanNumerals are
     treated as if they are in C major.
@@ -1511,7 +1507,6 @@ class RomanNumeral(harmony.Harmony):
     >>> cp(minorSharpSix)
     ['C#5', 'E5', 'G#5']
 
-
     These rules can be changed by passing in a `sixthMinor` or `seventhMinor` parameter set to
     a member of :class:`music21.roman.Minor67Default`:
 
@@ -1530,7 +1525,6 @@ class RomanNumeral(harmony.Harmony):
     >>> majHarmonicSeven = roman.RomanNumeral('bVII', em, seventhMinor=roman.Minor67Default.SHARP)
     >>> cp(majHarmonicSeven)
     ['D5', 'F#5', 'A5']
-
 
     >>> majHarmonicSix = roman.RomanNumeral('VI', em, sixthMinor=roman.Minor67Default.FLAT)
     >>> cp(majHarmonicSix)
@@ -1775,7 +1769,6 @@ class RomanNumeral(harmony.Harmony):
     >>> r2.secondaryRomanNumeral.secondaryRomanNumeral
     <music21.roman.RomanNumeral vi in C major>
 
-
     The I64 chord can also be specified as Cad64, which
     simply parses as I64:
 
@@ -1798,7 +1791,6 @@ class RomanNumeral(harmony.Harmony):
     <music21.roman.RomanNumeral Cad64/V in c minor>
     >>> cp(r)
     ['D5', 'G5', 'B5']
-
 
     In a major context, i7 and iv7 and their inversions are treated as minor-7th
     chords:
@@ -1833,7 +1825,6 @@ class RomanNumeral(harmony.Harmony):
     >>> cp(roman.RomanNumeral('i#7', 'c'))
     ['C4', 'E-4', 'G4', 'B4']
 
-
     >>> cp(roman.RomanNumeral('i42[#7]', 'C'))
     ['B4', 'C5', 'E-5', 'G5']
 
@@ -1849,15 +1840,12 @@ class RomanNumeral(harmony.Harmony):
     >>> cp(roman.RomanNumeral('i7[#7]', 'c'))
     ['C4', 'E-4', 'G4', 'B4']
 
-
     Other inversions are the same as with major keys:
 
     >>> cp(roman.RomanNumeral('i65[#7]', 'c'))
     ['E-4', 'G4', 'B4', 'C5']
     >>> cp(roman.RomanNumeral('i43[#7]', 'c'))
     ['G4', 'B4', 'C5', 'E-5']
-
-
 
     The RomanNumeral constructor accepts a keyword 'updatePitches' which is
     passed to harmony.Harmony. By default, it
@@ -1902,7 +1890,6 @@ class RomanNumeral(harmony.Harmony):
     >>> rn7 = roman.RomanNumeral('N6', 'c')
     >>> rn5 == rn7
     False
-
 
     * Changed in v6.5: caseMatters is keyword only. It along with sixthMinor and
       seventhMinor are now the only allowable keywords to pass in.
@@ -2958,7 +2945,6 @@ class RomanNumeral(harmony.Harmony):
         '65'
         >>> rn.scaleDegreeWithAlteration
         (4, <music21.pitch.Accidental sharp>)
-
 
         Working figures might be changed to defaults:
 

@@ -222,7 +222,6 @@ class ScoreFollower:
         >>> ScF.silencePeriodCounter
         1
 
-
         >>> ScF = scoreFollower.ScoreFollower(scoreStream=scNotes)
         >>> notesList = []
         >>> notesList.append(note.Rest())

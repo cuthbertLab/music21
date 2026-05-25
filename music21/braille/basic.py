@@ -117,7 +117,6 @@ def chordToBraille(music21Chord, descending=True, showOctave=True):
     Takes in a :class:`~music21.chord.Chord` and returns its representation
     as a braille string in UTF-8 unicode.
 
-
     In braille, only one pitch of a chord is brailled, with the rest represented
     as numeric intervals from that one pitch. If descending is True, the highest
     (sounding) pitch is brailled, and intervals are labeled in descending order;
@@ -125,7 +124,6 @@ def chordToBraille(music21Chord, descending=True, showOctave=True):
     intervals are labeled in ascending order. Convention dictates that chords
     found in the treble clef are brailled descending, and those found in the bass
     clef are brailled ascending.
-
 
     If showOctave is True, the octave of the brailled pitch is shown. Other
     octave marks are shown in context relative to the brailled pitch.
@@ -375,10 +373,8 @@ def dynamicToBraille(music21Dynamic, precedeByWordSign=True):
     :attr:`~music21.dynamics.Dynamic.value` as a braille string in
     UTF-8 unicode.
 
-
     If precedeByWordSign is True, the value is preceded by a word
     sign (⠜).
-
 
     >>> from music21.braille.basic import dynamicToBraille
     >>> print(dynamicToBraille(dynamics.Dynamic('f')))
@@ -627,15 +623,12 @@ def noteToBraille(
     Given a :class:`~music21.note.Note`, returns the appropriate braille
     characters as a string in UTF-8 unicode.
 
-
     The format for note display in braille is the accidental (if necessary)
     + octave (if necessary) + pitch name with length.
-
 
     If the note has an :class:`~music21.pitch.Accidental`, the accidental is always
     displayed unless its :attr:`~music21.pitch.Accidental.displayStatus` is set to
     False. The octave of the note is only displayed if showOctave is set to True.
-
 
     >>> from music21.braille.basic import noteToBraille
     >>> C4 = note.Note('C4')
@@ -657,7 +650,6 @@ def noteToBraille(
     >>> print(noteToBraille(A2))
     ⠘⠎⠄
 
-
     >>> B = note.Note('B4')
     >>> f = expressions.Fermata()
     >>> B.expressions.append(f)
@@ -677,7 +669,6 @@ def noteToBraille(
     Octave 4 ⠐
     B quarter ⠺
     Note-fermata: Shape square: ⠰⠣⠇
-
 
     >>> C4 = note.Note('C4')
     >>> print(noteToBraille(C4))
@@ -912,7 +903,6 @@ def restToBraille(music21Rest):
     '''
     Given a :class:`~music21.note.Rest`, returns the appropriate braille
     characters as a string in UTF-8 unicode.
-
 
     Currently, only supports single rests with or without dots.
     Complex rests are not supported.
@@ -1156,10 +1146,8 @@ def showOctaveWithNote(previousNote, currentNote):
     1) If a braille measure goes to a new line, the first note in the measure carries an
        octave designation regardless of what the previous note was.
 
-
     2) If a braille measure contains a new key or time signature, the first note carries
        an octave designation regardless of what the previous note was.
-
 
     3) If a new key or time signature occurs in the middle of a measure, or if a double bar
        line is encountered, both of which would necessitate a music hyphen, the next note after
@@ -1370,7 +1358,6 @@ def transcribeNoteFingering(sampleNoteFingering='1', upperFirstInFingering=True)
     ⠂⠄
     >>> print(transcribeNoteFingering('4,x', upperFirstInFingering=False))
     ⠠⠂
-
 
     A change of fingering and a choice of fingering combined (thanks to Bo-cheng Jhan
     for the patch):

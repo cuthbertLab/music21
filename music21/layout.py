@@ -208,7 +208,6 @@ class PageLayout(LayoutBase):
 
     PageLayout objects may be found on Measure or Part Streams.
 
-
     >>> pl = layout.PageLayout(pageNumber=4, leftMargin=234, rightMargin=124,
     ...                        pageHeight=4000, pageWidth=3000, isNew=True)
     >>> pl.pageNumber
@@ -264,7 +263,6 @@ class SystemLayout(LayoutBase):
     Importantly, if isNew is True then this object
     indicates that a new system should start here.
 
-
     >>> sl = layout.SystemLayout(leftMargin=234, rightMargin=124, distance=3, isNew=True)
     >>> sl.distance
     3
@@ -308,7 +306,6 @@ class StaffLayout(LayoutBase):
     The musicxml equivalent <staff-layout> lives in
     the <defaults> and in <print> attributes.
 
-
     >>> sl = layout.StaffLayout(distance=3, staffNumber=1, staffSize=113, staffLines=5)
     >>> sl.distance
     3
@@ -334,7 +331,6 @@ class StaffLayout(LayoutBase):
     113.0
     >>> sl
     <music21.layout.StaffLayout distance 3, staffNumber 1, staffSize 113.0, staffLines 5>
-
 
     StaffLayout can also specify the staffType:
 
@@ -519,13 +515,11 @@ def divideByPages(
     (because our spanner gathering algorithm is currently O(n^2);
     something TODO: to fix.)
 
-
     >>> lt = corpus.parse('demos/layoutTest.xml')
     >>> len(lt.parts)
     3
     >>> len(lt.parts[0].getElementsByClass(stream.Measure))
     80
-
 
     Divide the score up into layout.Page objects
 
@@ -551,7 +545,6 @@ def divideByPages(
     <music21.layout.Page ...>
     >>> 'Opus' in lastPage.classes
     True
-
 
     Each page now has Systems not parts.
 
@@ -786,7 +779,6 @@ class LayoutScore(stream.Opus):
 
         Similarly, the first systemId on each page will be 0
 
-
         >>> lt = corpus.parse('demos/layoutTest.xml')
         >>> l = layout.divideByPages(lt, fastMeasures=True)
         >>> l.getPageAndSystemNumberFromMeasureNumber(80)
@@ -833,7 +825,6 @@ class LayoutScore(stream.Opus):
         margins for a given pageId in tenths
 
         Default of (100, 100, 100, 100, 850, 1100) if undefined
-
 
         >>> #_DOCS_SHOW g = corpus.parse('luca/gloria')
         >>> #_DOCS_SHOW m22 = g.parts[0].getElementsByClass(stream.Measure)[22]
@@ -1061,7 +1052,6 @@ class LayoutScore(stream.Opus):
         >>> ls.getPositionForStaff(0, 3, 2)
         (133.0, 173.0)
 
-
         Tests for a score with PartStaff objects:
         >>> lt = corpus.parse('demos/layoutTestMore.xml')
         >>> ls = layout.divideByPages(lt, fastMeasures = True)
@@ -1251,7 +1241,6 @@ class LayoutScore(stream.Opus):
         returns the staffLayout.hidden attribute for a staffId, or if it is not
         defined, recursively search through previous staves until one is found.
 
-
         >>> lt = corpus.parse('demos/layoutTestMore.xml')
         >>> ls = layout.divideByPages(lt, fastMeasures = True)
         >>> ls.getStaffHiddenAttribute(0, 0, 0)
@@ -1333,7 +1322,6 @@ class LayoutScore(stream.Opus):
         If returnFormat is "float", returns each as a number from 0 to 1 where 0 is the
         top or left of the page, and 1 is the bottom or right of the page.
 
-
         >>> lt = corpus.parse('demos/layoutTest.xml')
         >>> ls = layout.divideByPages(lt, fastMeasures = True)
 
@@ -1352,13 +1340,11 @@ class LayoutScore(stream.Opus):
         >>> ls.getPositionForStaffMeasure(2, 1)
         ((602.0, 170.0), (642.0, 417.0), 0)
 
-
         If float is requested for returning, then the numbers are the fraction of
         the distance across the page.
 
         >>> ls.getPositionForStaffMeasure(0, 1, returnFormat='float')
         ((0.152..., 0.0996...), (0.170..., 0.244...), 0)
-
 
         Moving over the page boundary:
 
@@ -1424,7 +1410,6 @@ class LayoutScore(stream.Opus):
         no staffId is needed since (at least for now) all measures begin and end at the same
         X position
 
-
         >>> l = corpus.parse('demos/layoutTest.xml')
         >>> ls = layout.divideByPages(l, fastMeasures = True)
         >>> ls.measurePositionWithinSystem(1, 0, 0)
@@ -1479,7 +1464,6 @@ class LayoutScore(stream.Opus):
         '''
         returns a list of dictionaries, where each dictionary gives the measure number
         and other information, etc. in the document.
-
 
         # >>> g = corpus.parse('luca/gloria')
         # >>> gl = layout.divideByPages(g)

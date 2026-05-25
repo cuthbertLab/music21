@@ -17,7 +17,6 @@ This module is really only needed for people extending the parser,
 for others it's simple to get Harmony, RomanNumeral, Key (or KeySignature)
 and other objects out of an rntxt file by running this:
 
-
 >>> monteverdi = corpus.parse('monteverdi/madrigal.3.1.rntxt')
 >>> monteverdi.show('text')
 {0.0} <music21.metadata.Metadata object at 0x...>
@@ -90,7 +89,6 @@ It's a little complex, but worth seeing in full:
 ...    i += 1
 >>> histogram.data = data
 
-
 These commands give nice labels for the data; optional:
 
 >>> histogram.setIntegerTicksFromData(values, 'y')
@@ -103,7 +101,6 @@ Now generate the histogram:
 
 .. image:: images/romanTranslatePitchDistribution.*
     :width: 600
-
 
 OMIT_FROM_DOCS
 
@@ -495,7 +492,6 @@ class PartTranslator:
         >>> pt.setMinorRootParse(tag)
         >>> print(pt.sixthMinor)
         Minor67Default.FLAT
-
 
         Unknown settings raise a `RomanTextTranslateException`
 

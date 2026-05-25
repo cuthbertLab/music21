@@ -157,7 +157,6 @@ def toPart(volpianoText, *, breaksToLayout=False):
         {0.0} <music21.note.Note E>
         {1.0} <music21.bar.Barline type=double>
 
-
     As layout objects using breaksToLayout=True
 
     >>> breakTest = volpiano.toPart('1---e-7-e-77-e-777-e-3-e-4', breaksToLayout=True)
@@ -175,7 +174,6 @@ def toPart(volpianoText, *, breaksToLayout=False):
     {4.0} <music21.stream.Measure 0 offset=4.0>
         {0.0} <music21.note.Note E>
         {1.0} <music21.bar.Barline type=double>
-
 
     Liquescence test:
 

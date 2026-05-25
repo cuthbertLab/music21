@@ -317,7 +317,6 @@ def setM21AttributeFromAttribute(
     >>> pl.isNew
     'yes'
 
-
     Transform the pageNumber value to an int.
 
     >>> setb(pl, e, 'page-number', transform=int)
@@ -376,7 +375,6 @@ def setXMLAttributeFromAttribute(
     >>> setb(pl, e, 'new-page', 'isNew')
     >>> e.get('new-page')
     'True'
-
 
     Transform the isNew value to 'yes'.
 

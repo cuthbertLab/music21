@@ -100,7 +100,6 @@ class LocalCorpusSettings(list):
                         name='theWholeEnchilada',
                         cacheFilePath='/home/enchilada.json')
 
-
     >>> list(lcs)
     ['/tmp', '/home']
     >>> lcs.name
