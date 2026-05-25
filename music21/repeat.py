@@ -2056,7 +2056,8 @@ class RepeatFinder:
         .. image:: images/repeat-rf_hasPickup.*
            :width: 600
 
-        _OMIT_FROM_DOCS_
+        OMIT_FROM_DOCS
+
         >>> repeat.RepeatFinder(noPickup.parts[0].measures(1, 2)).hasPickup()
         Traceback (most recent call last):
         music21.repeat.InsufficientLengthException: Cannot determine length of pickup
@@ -2109,7 +2110,8 @@ class RepeatFinder:
         [[1, 2, 4, 5, 6, 8, 10], [2, 4, 5, 6, 8, 10], [4, 5, 6, 8, 10],
          [7, 9, 11], [5, 6, 8, 10], [6, 8, 10], [8, 10], [9, 11], [10], [11], [], []]
 
-        _OMIT_FROM_DOCS_
+        OMIT_FROM_DOCS
+
         >>> repeat.RepeatFinder().getMeasureSimilarityList()
         Traceback (most recent call last):
         music21.repeat.NoInternalStreamException: RepeatFinder must be initialized with a stream
@@ -2187,25 +2189,26 @@ class RepeatFinder:
         compareList=[compare, compare + 1, compare + 2, ...]), where
         measure sourceList[i] is the same as measure compareList[i]
 
-        Inputs:
-        measures -  A list returned from getMeasureSimilarityList.
-        source   -  The measure number which you are considering
-        compare  -  The measure number which is compared to the source measure
-                    (this is a repeat of the source measure)
-        resDict  -  A dictionary of memoized results where for each key (i,j),
-                    there is stored a tuple
-                    ([i, i + 1, i + 2, ...], [j, j + 1, j + 2, ...])
-                    where measures i and j are equal,
-                    and measure i + 1 and j + 1 are equal,
-                    and measures i + 2 and j + 2 are equal, etc.
-        useDict  -  A dictionary for each input that maps to False if
-                    and only if the function calls
-                    the same input m and i. Has the result that if resDict((i, j)) maps to
-                    something like ([i, i + 1, i + 2...],
-                    [j, j + 1, j + 2, ...]), then
-                    useDict(i,j) is only False if resDict(i - 1, j - 1) is
-                    something like ([i - 1, i, i + 1, ...],
-                    [j - 1, j, j + 1, ..])
+        Inputs::
+
+            measures -  A list returned from getMeasureSimilarityList.
+            source   -  The measure number which you are considering
+            compare  -  The measure number which is compared to the source measure
+                        (this is a repeat of the source measure)
+            resDict  -  A dictionary of memoized results where for each key (i,j),
+                        there is stored a tuple
+                        ([i, i + 1, i + 2, ...], [j, j + 1, j + 2, ...])
+                        where measures i and j are equal,
+                        and measure i + 1 and j + 1 are equal,
+                        and measures i + 2 and j + 2 are equal, etc.
+            useDict  -  A dictionary for each input that maps to False if
+                        and only if the function calls
+                        the same input m and i. Has the result that if resDict((i, j)) maps to
+                        something like ([i, i + 1, i + 2...],
+                        [j, j + 1, j + 2, ...]), then
+                        useDict(i,j) is only False if resDict(i - 1, j - 1) is
+                        something like ([i - 1, i, i + 1, ...],
+                        [j - 1, j, j + 1, ..])
 
         See getSimilarMeasureGroupsFromList documentation for tests.
         '''

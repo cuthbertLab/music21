@@ -167,7 +167,7 @@ class Test(unittest.TestCase):
 
     def testSafePitch3(self):
         '''
-        safePitch(): when ``name`` is not given, but there are various **keywords
+        safePitch(): when ``name`` is not given, but there are various ``**keywords``
         '''
         expected = pitch.Pitch('D#6')
         actual = base.safePitch(name='D', accidental='#', octave='6')

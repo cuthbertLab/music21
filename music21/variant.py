@@ -1896,7 +1896,7 @@ def _getRegionsFromStreams(streamX, streamY):
 
     >>> s1 = converter.parse("tinynotation: 2/4 d4 e8. f16 GG4 b'4 b-2 c4 d8. e16 FF4 a'4 b-2")
 
-                                                *0:Eq  *1:Rep        * *3:Eq             *6:In
+                                                ``*0:Eq  *1:Rep        * *3:Eq             *6:In``
 
     >>> s2 = converter.parse("tinynotation: 2/4 d4 e8. f16 FF4 b'4 c4 d8. e16 FF4 a'4 b-2 b-2")
     >>> s1m = s1.makeMeasures()

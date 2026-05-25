@@ -1074,7 +1074,7 @@ class SelectFilePath(SelectFromList):
         comparisonFunction = function (lambda function on path returning True/False)
         path0 = os-specific string
         post = list of matching results to fill
-        glob = string to glob for (default **/*, but **/*.exe on Windows and * on Mac).
+        glob = string to glob for (default ``**/*``, but ``**/*.exe`` on Windows and ``*`` on Mac).
         '''
         path0_as_path = pathlib.Path(path0)
         for path1 in path0_as_path.glob(glob):

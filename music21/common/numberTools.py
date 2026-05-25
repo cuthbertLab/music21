@@ -165,17 +165,17 @@ def _preFracLimitDenominator(n: int, d: int) -> tuple[int, int]:
 
     Timing differences are huge!
 
-    t is timeit.timeit
+    t is timeit.timeit::
 
-    t('Fraction(*common.numberTools._preFracLimitDenominator(*x.as_integer_ratio()))',
-       setup='x = 1000001/3000001; from music21 import common;from fractions import Fraction',
-       number=100000)
-    1.0814228057861328
+        t('Fraction(*common.numberTools._preFracLimitDenominator(*x.as_integer_ratio()))',
+           setup='x = 1000001/3000001; from music21 import common; from fractions import Fraction',
+           number=100000)
+        1.0814228057861328
 
-    t('Fraction(x).limit_denominator(65535)',
-       setup='x = 1000001/3000001; from fractions import Fraction',
-       number=100000)
-    7.941488981246948
+        t('Fraction(x).limit_denominator(65535)',
+           setup='x = 1000001/3000001; from fractions import Fraction',
+           number=100000)
+        7.941488981246948
 
     Nothing changed in 2023, in fact, it's faster now with the cache, and even
     without the cache, it's still 4x faster.

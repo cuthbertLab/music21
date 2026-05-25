@@ -757,7 +757,7 @@ class Residual:
 
     def __or__(self, other):
         '''
-        |, not sure if this can be implemented
+        ``|``, not sure if this can be implemented
         i.e., a union of two Residual classes can not be expressed as a single
         Residual, that is intersections can always be reduced, whereas unions
         cannot be reduced.
@@ -1189,7 +1189,7 @@ class Sieve:
 
     def __or__(self, other):
         '''
-        |, produces a union
+        ``|``, produces a union
 
         >>> a = sieve.Sieve('3@11')
         >>> b = sieve.Sieve('2&4&8|5')
@@ -1300,11 +1300,13 @@ class Sieve:
 
     def _parseLogic(self, usrStr):
         '''
-        provide synonyms for logical symbols
-        intersection == and, &, *
-        union        == or, |, +
-        not          == not, -
-        the native format for str representation uses only &, |, -
+        provide synonyms for logical symbols::
+
+            intersection == and, &, *
+            union        == or, |, +
+            not          == not, -
+
+        the native format for str representation uses only ``&``, ``|``, ``-``;
         this method converts all other string representations
 
         all brackets and braces are replaced with parenthesis

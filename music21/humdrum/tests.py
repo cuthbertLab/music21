@@ -339,7 +339,7 @@ class Test(unittest.TestCase):
 
     def testDynamAttachedAligned(self):
         '''
-        **dynam events on the same line as a kern note attach at that note's
+        ``**dynam`` events on the same line as a kern note attach at that note's
         offset.  Sanity-check companion to testDynamAttachedMisaligned.
 
         Test is AI-assisted.
@@ -368,7 +368,7 @@ class Test(unittest.TestCase):
                    'SpineCollection.attachNonKernEvents.')
     def testDynamAttachedMisaligned(self):
         '''
-        A **dynam event on a line where the kern column has '.' (no new note
+        A ``**dynam`` event on a line where the kern column has '.' (no new note
         event) should still attach -- to the stream at the offset of the most
         recently-sounding note.  Currently fails: misaligned dynamics are
         silently dropped.  See TODO in `SpineCollection.attachNonKernEvents`.
@@ -402,7 +402,7 @@ class Test(unittest.TestCase):
                    'SpineCollection.attachNonKernEvents.')
     def testHarmAttachedMisaligned(self):
         '''
-        A **harm event on a line where the kern column has '.' should still
+        A ``**harm`` event on a line where the kern column has '.' should still
         attach -- to the stream at the offset of the most recently-sounding
         note.  Currently fails: misaligned harm events are silently dropped.
         See TODO in `SpineCollection.attachNonKernEvents`.
@@ -518,7 +518,7 @@ class Test(unittest.TestCase):
 
     def testLyricsCorrectlyAligned(self):
         '''
-        Verify that each lyric syllable from a **text spine attaches to the
+        Verify that each lyric syllable from a ``**text`` spine attaches to the
         kern note on the same line.  Existing testLyricsInSpine only checks
         the assembled lyric string; this checks the per-note mapping.
 
