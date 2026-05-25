@@ -103,7 +103,8 @@ language = 'en'
 exclude_patterns = []
 
 # The reST default role (used for this markup: `text`) to use for all documents.
-# default_role = None
+# 'literal' makes single backticks render as inline code, like Markdown.
+default_role = 'literal'
 
 # If true, '()' will be appended to :func: etc. cross-reference text.
 # add_function_parentheses = True
