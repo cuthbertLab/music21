@@ -646,8 +646,11 @@ class Test(unittest.TestCase):
                 self.assertFalse(trill, cond.name)
 
 
-def calculateTrillNoteDuration(numTrillNotes, totalDuration):
-    return totalDuration.quarterLength / numTrillNotes
+def calculateTrillNoteDuration(
+    numTrillNotes: int,
+    totalDuration: duration.Duration
+) -> OffsetQL:
+    return opFrac(totalDuration.quarterLength / numTrillNotes)
 
 
 if __name__ == '__main__':
