@@ -96,7 +96,6 @@ def findFormat(fmt):
 
     DEPRECATED May 2014 -- moving to converter
 
-
     All but the first element of the tuple are deprecated for use, since
     the extension can vary by subConverter (e.g., lily.png)
 
@@ -127,15 +126,12 @@ def findFormat(fmt):
     >>> common.findFormat('capx')
     ('capella', '.capx')
 
-
     Works the same whether you have a leading dot or not:
-
 
     >>> common.findFormat('md')
     ('musedata', '.md')
     >>> common.findFormat('.md')
     ('musedata', '.md')
-
 
     If you give something we can't deal with, returns a Tuple of None, None:
 
@@ -238,7 +234,6 @@ def findFormatFile(fp):
 
     DEPRECATED May 2014 -- moving to converter
 
-
     >>> common.findFormatFile('test.xml')
     'musicxml'
     >>> common.findFormatFile('long/file/path/test-2009.03.02.xml')
@@ -301,7 +296,6 @@ def findFormatExtURL(url):
     This may scrub arguments in a URL, or simply look at the last characters.
 
     DEPRECATED May 2014 -- moving to converter
-
 
     >>> urlA = 'http://somesite.com/?l=cc/schubert/piano/d0576&file=d0576-06.krn&f=xml'
     >>> urlB = 'http://somesite.com/cgi-bin/ksdata?l=cc/schubert/d0576&file=d0576-06.krn&f=kern'

@@ -110,7 +110,6 @@ def getAxisQuantities(synonyms=False, axesToCheck=None):
     ['count', 'quantity', 'frequency', 'counting',
      'offset', 'measure', 'offsets', 'measures', 'time']
 
-
     '''
     if axesToCheck is None:
         axesToCheck = getAxisClasses()
@@ -217,7 +216,6 @@ def axisMatchesValue(axisClass: type[axis.Axis]|axis.Axis,
     >>> graph.findPlot.axisMatchesValue(ax, 'offset')
     False
 
-
     Works on an instantiated object as well:
 
     >>> ax = graph.axis.CountingAxis()
@@ -246,9 +244,7 @@ def getPlotsToMake(graphFormat: str|None = None,
     or a list of tuples where the first element of each tuple is the plot class
     and the second is a dict of {'x': axisXClass, 'y': axisYClass} etc.
 
-
     Default is pianoroll
-
 
     >>> graph.findPlot.getPlotsToMake()
     [<class 'music21.graph.plot.HorizontalBarPitchSpaceOffset'>]
@@ -289,7 +285,6 @@ def getPlotsToMake(graphFormat: str|None = None,
     [(<class 'music21.graph.plot.Scatter'>,
       OrderedDict([('x', <class 'music21.graph.axis.OffsetAxis'>),
                    ('y', <class 'music21.graph.axis.DynamicsAxis'>)]))]
-
 
     Just a couple of values:
 

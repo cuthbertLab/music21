@@ -119,7 +119,6 @@ def plotStream(
     * :class:`~music21.graph.plot.WindowedAmbitus`
     * :class:`~music21.graph.plot.Dolan`
 
-
     >>> s = corpus.parse('bach/bwv324.xml') #_DOCS_HIDE
     >>> thePlot = s.plot('histogram', 'pitch', doneAction=None) #_DOCS_HIDE
     >>> #_DOCS_SHOW s = corpus.parse('bach/bwv57.8')
@@ -127,7 +126,6 @@ def plotStream(
 
     .. image:: images/HistogramPitchSpace.*
         :width: 600
-
 
     >>> s = corpus.parse('bach/bwv324.xml') #_DOCS_HIDE
     >>> thePlot = s.plot('pianoroll', doneAction=None) #_DOCS_HIDE

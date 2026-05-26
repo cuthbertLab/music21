@@ -145,7 +145,6 @@ class Style(ProtoM21Object):
         music21.style.TextFormatException:
             Not a supported enclosure: 'parabola'
 
-
         OMIT_FROM_DOCS
 
         Similarly for non-strings:

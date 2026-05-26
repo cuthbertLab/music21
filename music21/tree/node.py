@@ -74,14 +74,12 @@ class ElementNode(core.AVLNode):
     >>> m.offset
     0.0
 
-
     >>> rElNode.payloadElementIndex = 0
     >>> elNode.payloadElementIndex = 1
     >>> n2ElNode.payloadElementIndex = 2
 
     >>> elNode.updateIndices()
     >>> elNode.updateEndTimes()
-
 
     Now let's look at the ElementNode:
 
@@ -346,7 +344,6 @@ class OffsetNode(ElementNode):
     <music21.note.Note F>
     >>> rn.payload[0].element is sf[11]
     True
-
 
     We can look at the leftChild of the root node to get some more interesting cases:
 

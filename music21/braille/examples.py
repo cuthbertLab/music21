@@ -9,7 +9,6 @@
 '''
 The melody to the "Happy Birthday" song, in G major and 3/4 time.
 
-
 >>> from music21.braille import examples
 >>> hb = examples.happyBirthday()
 >>> #_DOCS_SHOW hb.show('braille')
@@ -17,10 +16,8 @@ The melody to the "Happy Birthday" song, in G major and 3/4 time.
 ⠼⠁⠀⠐⠑⠄⠵⠫⠱⠀⠳⠟⠀⠑⠄⠵⠫⠱⠀⠪⠗⠀⠑⠄⠵⠨⠱⠺⠀⠓⠄⠷⠻⠫
 ⠀⠀⠨⠙⠄⠽⠺⠳⠀⠪⠗⠣⠅
 
-
 A piano reduction of Giuseppi Verdi's famous aria from the opera
 Rigoletto, "La Donna É Mobile," in Bb major and 3/8 time.
-
 
 >>> verdi = corpus.parse('verdi/laDonnaEMobile')
 >>> #_DOCS_SHOW verdi.show('braille')
@@ -60,9 +57,7 @@ Rigoletto, "La Donna É Mobile," in Bb major and 3/8 time.
 ⠉⠙⠀⠨⠜⠄⠜⠋⠋⠰⠃⠨⠦⠨⠮⠄⠗⠿⠄⠏⠵⠄⠝⠀⠐⠾⠘⠆⠍⠜⠋⠋⠋⠨⠚⠼⠴⠭⠣⠅
 ⠀⠀⠀⠸⠜⠄⠄⠄⠧⠸⠛⠬⠒⠣⠜⠸⠫⠄⠬⠴⠀⠀⠀⠀⠸⠾⠬⠍⠘⠚⠬⠔⠭⠣⠅⠀⠀⠀⠀⠀
 
-
 The exposition to movement 1 of Mozart's K545.
-
 
 >>> #_DOCS_SHOW mozart = converter.parse('mozart_k545_exposition.xml')
 >>> #_DOCS_SHOW mozart.show('braille')
@@ -79,9 +74,6 @@ The exposition to movement 1 of Mozart's K545.
 ⠀⠀⠀⠸⠜⠸⠻⠄⠓⠪⠄⠩⠛⠀⠀⠀⠀⠀⠀⠀⠀⠀
 ⠁⠁⠀⠨⠜⠐⠚⠨⠓⠋⠙⠑⠓⠋⠙⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠨⠱⠳⠼⠴⠐⠳⠧⠣⠅
 ⠀⠀⠀⠸⠜⠘⠷⠚⠑⠓⠘⠷⠸⠙⠋⠓⠘⠷⠚⠑⠓⠘⠷⠸⠙⠋⠓⠀⠘⠳⠸⠳⠘⠳⠧⠣⠅⠀
-
-
-
 
 >>> print(braille.translate.objectToBraille(verdi.measures(1, 3), debug=True))
 ---begin grand segment---

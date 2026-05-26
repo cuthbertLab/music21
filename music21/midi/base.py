@@ -98,7 +98,6 @@ def getNumber(midiBytes: bytes|int, length: int) -> tuple[int, bytes|int]:
     >>> midi.getNumber(b'test', 0)
     (0, b'test')
 
-
     The method can also take in an integer and return an integer and the remainder part.
     This usage might be deprecated in the future and has already been replaced within
     music21 internal code.
@@ -247,7 +246,6 @@ def putVariableLengthNumber(x: int) -> bytes:
     >>> bytes([255])
     b'\xff'
 
-
     This method can also deal with numbers > 255, which `bytes` cannot.
 
     >>> midi.putVariableLengthNumber(256)
@@ -327,7 +325,6 @@ def putNumbersAsList(numList: Iterable[int]) -> bytes:
 
     >>> bytes([0, 0, 0, 3])
     b'\x00\x00\x00\x03'
-
 
     If a number is < 0 then it wraps around from the top.  This is used in places
     like MIDI key signatures where flats are represented by `256 - flats`.
@@ -785,7 +782,6 @@ class MidiEvent(prebase.ProtoM21Object):
         >>> midBytes += b'hello'
         >>> midBytes
         b'\x92<xhello'
-
 
         Now see how parsing this ChannelVoiceMessage changes the MidiEvent
 

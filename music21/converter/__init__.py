@@ -1103,7 +1103,6 @@ class Converter:
         >>> c.formatFromHeader(b'binary-data')
         (None, b'binary-data')
 
-
         New formats can register new headers, like this old Amiga format:
 
         >>> class ConverterSonix(converter.subConverters.SubConverter):
@@ -1329,7 +1328,6 @@ def parse(value: bundles.MetadataEntry|bytes|str|pathlib.Path|list|tuple,
     URL:
 
     >>> #_DOCS_SHOW s = converter.parse('https://midirepository.org/file220/file.mid')
-
 
     Data is preceded by an identifier such as "tinynotation:"
 

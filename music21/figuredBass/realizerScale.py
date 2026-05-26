@@ -34,7 +34,6 @@ class FiguredBassScale:
     Acts as a wrapper for :class:`~music21.scale.Scale`. Used to represent the
     concept of a figured bass scale, with a scale value and mode.
 
-
     Accepted scale types: major, minor, dorian, phrygian, and hypophrygian.
     A FiguredBassScaleException is raised if an invalid scale type is provided.
 

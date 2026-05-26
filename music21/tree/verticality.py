@@ -54,13 +54,11 @@ class Verticality(prebase.ProtoM21Object):
     A collection of information about elements that are sounding at a given
     offset or just finished at that offset or are continuing from before, etc..
 
-
     Create a timespan-stream from a score:
 
     >>> score = corpus.parse('bwv66.6')
     >>> scoreTree = tree.fromStream.asTimespans(score, flatten=True,
     ...        classList=(note.Note, chord.Chord))
-
 
     Find the verticality at offset 6.5, or beat 2.5 of measure 2 (there's a one
     beat pickup)
@@ -69,10 +67,8 @@ class Verticality(prebase.ProtoM21Object):
     >>> verticality
     <music21.tree.verticality.Verticality 6.5 {E3 D4 G#4 B4}>
 
-
     The representation of a verticality gives the pitches from lowest to
     highest (in sounding notes).
-
 
     A verticality knows its offset, but because elements might end at
     different times, it doesn't know its endTime
@@ -82,7 +78,6 @@ class Verticality(prebase.ProtoM21Object):
     >>> verticality.endTime
     Traceback (most recent call last):
     AttributeError: 'Verticality' object has no attribute 'endTime'
-
 
     However, we can find when the next verticality starts by looking at the nextVerticality
 
@@ -297,7 +292,6 @@ class Verticality(prebase.ProtoM21Object):
         >>> verticality = scoreTree.getVerticalityAt(1.0)
         >>> verticality.beatStrength
         1.0
-
 
         Note that it will return None if there are no startTimespans at this point:
 
@@ -609,7 +603,6 @@ class Verticality(prebase.ProtoM21Object):
         >>> el.duration.fullName
         'Eighth Triplet (1/3 QL)'
 
-
         >>> n1 = note.Note('C4')
         >>> n2 = note.Note('C4')
         >>> s = stream.Score()
@@ -645,7 +638,6 @@ class Verticality(prebase.ProtoM21Object):
         >>> (n1.name, n2.name)
         ('F', 'G')
 
-
         gatherArticulations and gatherExpressions can be True, False, or (default) 'single'.
 
         * If False, no articulations (or expressions) are transferred to the chord.
@@ -670,7 +662,6 @@ class Verticality(prebase.ProtoM21Object):
         ...         super().__init__()
         ...         self.tieAttach = 'all'
 
-
         >>> n1.articulations.append(articulations.Accent())
         >>> n1.articulations.append(AllAttachArticulation())
         >>> n1.expressions.append(expressions.Fermata())
@@ -690,7 +681,6 @@ class Verticality(prebase.ProtoM21Object):
         [<music21.articulations.Accent>, <...AllAttachArticulation>]
 
         >>> verticality = scoreTree.getVerticalityAt(0.5)
-
 
         Here there will be no expressions, because there is no note ending
         at 0.75 and Fermatas attach to the last note:
@@ -1009,7 +999,6 @@ class Verticality(prebase.ProtoM21Object):
         >>> verticality22.getAllVoiceLeadingQuartets(includeOblique=False, includeRests=False)
         []
 
-
         Raw output, returns a 2-element tuple of 2-element tuples of PitchedTimespans
 
         >>> for vlqRaw in verticality22.getAllVoiceLeadingQuartets(returnObjects=False):
@@ -1135,7 +1124,6 @@ class Verticality(prebase.ProtoM21Object):
          <PitchedTimespan (22.0 to 23.0) <music21.note.Note F>>)
         (<PitchedTimespan (21.5 to 22.5) <music21.note.Note A>>,
          <PitchedTimespan (21.5 to 22.5) <music21.note.Note A>>)
-
 
         Oblique here means a pair that does not move (it could be called noMotion,
         because there's no motion

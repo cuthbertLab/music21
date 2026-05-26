@@ -514,7 +514,6 @@ class IntervalNetwork:
         >>> net.edges
         OrderedDict()
 
-
         >>> net.fillBiDirectedEdges(edgeList)
         >>> net.nodes
         OrderedDict([(Terminus.LOW, <music21.scale.intervalNetwork.Node id=Terminus.LOW>),
@@ -687,7 +686,6 @@ class IntervalNetwork:
                       'connections': ([0, Terminus.HIGH, Direction.BI],)
                       },
                     )
-
 
         >>> nodes = ({'id': scale.Terminus.LOW, 'degree': 1},
         ...          {'id': 0, 'degree': 2},
@@ -1228,7 +1226,6 @@ class IntervalNetwork:
 
         The `nodeName` parameter may be a :class:`~music21.scale.intervalNetwork.Node` object,
         a node degree, a Terminus Enum, or a None (indicating Terminus.LOW).
-
 
         >>> edgeList = ['M2', 'M2', 'm2', 'M2', 'M2', 'M2', 'm2']
         >>> net = scale.intervalNetwork.IntervalNetwork()
@@ -1980,7 +1977,6 @@ class IntervalNetwork:
         The nodeId, when a simple, linear network, can be used as a scale degree
         value starting from one.
 
-
         >>> edgeList = ['M2', 'M2', 'm2', 'M2', 'M2', 'M2', 'm2']
         >>> net = scale.intervalNetwork.IntervalNetwork()
         >>> net.fillBiDirectedEdges(edgeList)
@@ -2003,9 +1999,7 @@ class IntervalNetwork:
         >>> [str(p) for p in net.realizePitch(pitch.Pitch('a#2'), 7, 'c6', 'c7')]
         ['C#6', 'D#6', 'E6', 'F#6', 'G#6', 'A#6', 'B6']
 
-
         Circle of fifths
-
 
         >>> edgeList = ['P5'] * 6 + ['d6'] + ['P5'] * 5
         >>> net5ths = scale.intervalNetwork.IntervalNetwork()
@@ -2310,7 +2304,6 @@ class IntervalNetwork:
         If more than one node defines the same pitch, Node weights are used
         to select a single node.
 
-
         >>> edgeList = ['M2', 'M2', 'm2', 'M2', 'M2', 'M2', 'm2']
         >>> net = scale.intervalNetwork.IntervalNetwork(edgeList)
         >>> net.getRelativeNodeId('a', 1, 'a4')
@@ -2466,7 +2459,6 @@ class IntervalNetwork:
         equality.  Use `ps` (default) for post-tonal uses.  `name` for
         tonal, and `step` for diatonic.
 
-
         >>> edgeList = ['M2', 'M2', 'm2', 'M2', 'M2', 'M2', 'm2']
         >>> net = scale.intervalNetwork.IntervalNetwork(edgeList)
         >>> [str(p) for p in net.realizePitch(pitch.Pitch('e-2')) ]
@@ -2507,7 +2499,6 @@ class IntervalNetwork:
         1
         >>> net.getRelativeNodeDegree('e-3', 1, 'b-1')
         5
-
 
         >>> edgeList = ['p4', 'p4', 'p4']  # a non octave-repeating scale
         >>> net = scale.intervalNetwork.IntervalNetwork(edgeList)
@@ -2584,7 +2575,6 @@ class IntervalNetwork:
         <music21.pitch.Pitch F#4>
         >>> net.getPitchFromNodeDegree('e4', 1, 3, minPitch='c2', maxPitch='c3')
         <music21.pitch.Pitch G#2>
-
 
         This will always get the lowest pitch:
 
@@ -2883,7 +2873,6 @@ class IntervalNetwork:
         Given a collection of pitches, test all transpositions of a realized
         version of this network, and return the number of matches in each for
         each pitch assigned to the first node.
-
 
         >>> edgeList = ['M2', 'M2', 'm2', 'M2', 'M2', 'M2', 'm2']
         >>> net = scale.intervalNetwork.IntervalNetwork(edgeList)

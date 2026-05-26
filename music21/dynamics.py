@@ -56,7 +56,6 @@ def dynamicStrFromDecimal(n):
     with 0 being the softest (0.01 = 'ppp') and 1 being the loudest (0.9+ = 'fff')
     0 returns "n" (niente), while ppp and fff are the loudest dynamics used.
 
-
     >>> dynamics.dynamicStrFromDecimal(0.25)
     'pp'
     >>> dynamics.dynamicStrFromDecimal(1)
@@ -162,7 +161,6 @@ class Dynamic(base.Music21Object):
     0.87
 
     Dynamics can be placed anywhere in a stream.
-
 
     >>> s = stream.Stream()
     >>> s.insert(0, note.Note('E-4', type='half'))

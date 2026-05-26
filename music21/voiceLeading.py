@@ -356,7 +356,6 @@ class VoiceLeadingQuartet(base.Music21Object):
         >>> vl.motionType()
         <MotionType.noMotion: 'No Motion'>
 
-
         Anti-parallel motion has to be explicitly enabled to appear:
 
         >>> n1_a5 = note.Note('A5')
@@ -778,7 +777,6 @@ class VoiceLeadingQuartet(base.Music21Object):
         >>> vlq2a.parallelInterval(interval.Interval('P8'))
         True
 
-
         Non-parallel intervals are, of course, False
 
         >>> n12b = note.Note('B4')  # ascending 3rd
@@ -1047,7 +1045,6 @@ class VoiceLeadingQuartet(base.Music21Object):
             d5:     in by contrary motion to a third, with 7 resolving up to 1 in the bass
 
             m7:     Resolves to a third with a leap from 5 to 1 in the bass
-
 
         We will make the examples shorter with this abbreviation:
         >>> N = note.Note

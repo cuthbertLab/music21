@@ -45,7 +45,6 @@ def exampleA():
     The soprano part is limited to stepwise motion, and the alto and tenor parts are
     limited to motions within a perfect octave.
 
-
     >>> from music21.figuredBass import rules
     >>> fbRules = rules.Rules()
     >>> fbRules.partMovementLimits = [(1, 2), (2, 12), (3, 12)]
@@ -57,10 +56,8 @@ def exampleA():
     .. image:: images/figuredBass/fbExamples_sol1A.*
             :width: 700
 
-
     Now, the restriction on upper parts being within a perfect octave of each other is
     removed, and fbLine is realized again.
-
 
     >>> fbRules.upperPartsMaxSemitoneSeparation = None
     >>> fbRealization2 = fbLine.realize(fbRules)
@@ -155,7 +152,6 @@ def exampleB():
 
     First, fbLine is realized with the default rules set.
 
-
     >>> fbRealization1 = fbLine.realize()
     >>> fbRealization1.getNumSolutions()
     422
@@ -164,10 +160,8 @@ def exampleB():
     .. image:: images/figuredBass/fbExamples_sol1B.*
         :width: 700
 
-
     Now, a Rules object is created, and the restriction that the chords
     need to be complete is lifted. fbLine is realized once again.
-
 
     >>> from music21.figuredBass import rules
     >>> fbRules = rules.Rules()
@@ -208,7 +202,6 @@ def exampleC():
 
     .. image:: images/figuredBass/fbExamples_sol1C.*
         :width: 700
-
 
     Now, parallel fifths are allowed in realizations. The image below
     shows one of them. There is a parallel fifth between the bass and
@@ -264,7 +257,6 @@ def viio65ResolutionExample():
     :attr:`~music21.figuredBass.rules.Rules.doubledRootInDim7`.
     However, when resolving a diminished 6,5, the third is found in the bass and the
     proper resolution is determined in context, regardless of user preference.
-
 
     The following shows both cases involving a diminished 6,5. The resolution of the
     first diminished chord has a doubled D, while that of the second has a doubled F#.
@@ -329,7 +321,6 @@ def italianA6ResolutionExample():
     chord could map internally to two different resolutions.
     Every other special resolution in fbRealizer
     consists of a 1:1 mapping of special chords to resolutions.
-
 
     Here, the It+6 chord is resolving to the dominant, minor tonic,
     and major tonic, respectively. In the

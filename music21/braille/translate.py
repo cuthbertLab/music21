@@ -15,16 +15,13 @@ available from the Library of Congress
 `here <https://www.loc.gov/nls/services-and-resources/music-service-and-materials/>`_,
 and will henceforth be referred to as BMTM.
 
-
 The most important function, and the only one that is needed to translate music
 into braille, is :func:`~music21.braille.translate.objectToBraille`. This function,
 as well as the others, accepts keyword arguments that serve to modify the output.
 If no keyword arguments are needed, then using the function is equivalent to
 calling :meth:`~music21.base.Music21Object.show` on the music.
 
-
 Keywords:
-
 
 * **inPlace** (False): If False, then :meth:`~music21.stream.base.Stream.makeNotation` is called
   on all :class:`~music21.stream.Measure`, :class:`~music21.stream.Part`, and
@@ -36,7 +33,6 @@ Keywords:
   to be organized into measures for transcription to work.
 * **debug** (False): If True, a braille-english representation of the music is returned. Useful
   for knowing how the music was interpreted by the braille transcriber.
-
 
 The rest of the keywords are segment keywords. A segment is "a group of measures occupying
 more than one braille line." Music is divided into segments to "present the music to
@@ -130,26 +126,20 @@ def objectToBraille(music21Obj: base.Music21Object,
     >>> samplePart = converter.parse('tinynotation: 3/4 C4 D16 E F G# r4 e2.')
     >>> #_DOCS_SHOW samplePart.show()
 
-
         .. image:: images/objectToBraille.*
             :width: 700
-
 
     >>> print(translate.objectToBraille(samplePart))
     ⠀⠀⠀⠀⠀⠀⠀⠼⠉⠲⠀⠀⠀⠀⠀⠀⠀
     ⠼⠁⠀⠸⠹⠵⠋⠛⠩⠓⠧⠀⠐⠏⠄⠣⠅
 
-
     For normal users, you'll just call this, which starts a text editor:
-
 
     >>> #_DOCS_SHOW samplePart.show('braille')
     ⠀⠀⠀⠀⠀⠀⠀⠼⠉⠲⠀⠀⠀⠀⠀⠀⠀
     ⠼⠁⠀⠸⠹⠵⠋⠛⠩⠓⠧⠀⠐⠏⠄⠣⠅
 
-
     Other examples:
-
 
     >>> sampleNote = note.Note('C3')
     >>> print(translate.objectToBraille(sampleNote))

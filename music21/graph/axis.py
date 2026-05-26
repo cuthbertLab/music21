@@ -493,7 +493,6 @@ class PitchClassAxis(PitchAxis):
         9 A
         11 B
 
-
         >>> s = corpus.parse('bach/bwv281.xml')
         >>> plotS = graph.plot.PlotStream(s)
         >>> ax = graph.axis.PitchClassAxis(plotS)
@@ -567,7 +566,6 @@ class PitchClassAxis(PitchAxis):
         9 A
         10 B♭
         11 B
-
 
         OMIT_FROM_DOCS
 
@@ -857,7 +855,6 @@ class OffsetAxis(PositionAxis):
         >>> ax.ticks()
         [(0.0, '0'), (9.0, '3'), (21.0, '6'), (29.0, '8')]
 
-
         We can also plot on a part:
 
         >>> soprano = bach.parts.first()
@@ -874,7 +871,6 @@ class OffsetAxis(PositionAxis):
         >>> ax.ticks()
         [(0.0, '0'), (29.0, '8')]
 
-
         Only show ticks between minValue and maxValue (in offsets):
 
         >>> ax.minMaxMeasureOnly = False
@@ -882,7 +878,6 @@ class OffsetAxis(PositionAxis):
         >>> ax.maxValue = 12
         >>> ax.ticks()
         [(9.0, '3')]
-
 
         Double bars and other heavy bars always show up.
         (Let's get a new axis object to see.)

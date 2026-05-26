@@ -377,7 +377,6 @@ class Spanner(base.Music21Object):
         Return all the elements of `.spannerStorage` for this Spanner
         as a list of Music21Objects.
 
-
         >>> n1 = note.Note('g')
         >>> n2 = note.Note('f#')
         >>> sl = spanner.Spanner()
@@ -1215,7 +1214,6 @@ class SpannerBundle(prebase.ProtoM21Object):
         class have been closed.  The example below demonstrates that the
         position of the contents of the spanner have no bearing on
         its idLocal (since we don't even put anything into the spanners).
-
 
         >>> su1 = spanner.Slur()
         >>> su2 = layout.StaffGroup()

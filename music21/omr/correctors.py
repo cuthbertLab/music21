@@ -1111,7 +1111,6 @@ class MeasureHash:
         >>> mh.getProbabilityOnSubstitute('F', 'PP')
         0.0001485
 
-
         Take minimum length. Compare index to index. Any additional letters
         in the flagged measure get graded as additions. Any additional letters
         in the comparison measure get graded as omissions.
@@ -1161,7 +1160,6 @@ class MeasureHash:
 
         >>> mh.getProbabilityFromOneCharSub('P', 'V')
         0.009
-
 
         Dotted quarter note to quarter note:
 

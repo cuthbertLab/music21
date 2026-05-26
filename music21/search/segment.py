@@ -66,7 +66,6 @@ def translateMonophonicPartToSegments(
     >>> segments[0:2]
     ['HJHEAAEHHCE@JHGECA@A>@A><A@AAE', '@A>@A><A@AAEEECGHJHGH@CAE@FECA']
 
-
     Segment zero begins at measure 1 and ends in m. 12.  Segment 1 spans m.7 - m.18:
 
     >>> measureLists[0:2]

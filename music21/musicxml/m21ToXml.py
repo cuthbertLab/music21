@@ -1057,7 +1057,6 @@ class XMLExporterBase:
           </page-layout>
         </print>
 
-
         >>> MP = musicxml.xmlToM21.MeasureParser()
         >>> pl2 = MP.xmlPrintToPageLayout(mxPrint)
         >>> pl2.isNew
@@ -1137,7 +1136,6 @@ class XMLExporterBase:
             <system-distance>55</system-distance>
           </system-layout>
         </print>
-
 
         Test return conversion
 
@@ -1268,7 +1266,6 @@ class XMLExporterBase:
         >>> acc.set('double-flat')
         >>> XB.dump(a2m(acc))
         <accidental>flat-flat</accidental>
-
 
         >>> acc.set('one-and-a-half-sharp')
         >>> XB.dump(a2m(acc, elName='accidental-mark'))
@@ -2148,7 +2145,6 @@ class ScoreExporter(XMLExporterBase, PartStaffExporterMixin):
 
         >>> mxPartGroup.set('number', str(1))
 
-
         What can we do with it?
 
         >>> firstStaffGroup.name = 'Voices'
@@ -2248,7 +2244,6 @@ class ScoreExporter(XMLExporterBase, PartStaffExporterMixin):
             <supports element="accidental" type="yes" />
           </encoding>
         </identification>
-
 
         Overriding the default:
 
@@ -4342,10 +4337,8 @@ class MeasureExporter(XMLExporterBase):
           <duration>30240</duration>
         </note>
 
-
         Note that if a measure has paddingLeft/paddingRight (such as a pickup)
         then a fullMeasure duration might not match the TimeSignature duration.
-
 
         The display-step and display-octave are set from a Rest's stepShift:
 
@@ -4474,7 +4467,6 @@ class MeasureExporter(XMLExporterBase):
           <duration>20160</duration>
           <type>half</type>
         </note>
-
 
         Test that notehead and style translation works:
 
@@ -5492,7 +5484,6 @@ class MeasureExporter(XMLExporterBase):
         >>> MEX.dump(mxTechnicalMark)
         <up-bow placement="below" />
 
-
         >>> f = articulations.Fingering(4)
         >>> f.substitution = True
         >>> mxFingering = MEX.articulationToXmlTechnical(f)
@@ -6377,7 +6368,6 @@ class MeasureExporter(XMLExporterBase):
           </direction-type>
         </direction>
 
-
         >>> mm = tempo.MetronomeMark('slow', 40, duration.Duration(quarterLength=1.5))
         >>> mxDirection = MEX.tempoIndicationToXml(mm)
         >>> MEX.dump(mxDirection)
@@ -6856,7 +6846,6 @@ class MeasureExporter(XMLExporterBase):
         '''
         Returns a list of <beam> tags
         from a :class:`~music21.beam.Beams` object
-
 
         >>> a = beam.Beams()
         >>> a.fill(2, type='start')
@@ -7488,7 +7477,6 @@ class MeasureExporter(XMLExporterBase):
           <chromatic>7</chromatic>
         </transpose>
 
-
         >>> i = interval.Interval('A13')
         >>> mxTranspose = ME.intervalToXmlTranspose(i)
         >>> ME.dump(mxTranspose)
@@ -7505,7 +7493,6 @@ class MeasureExporter(XMLExporterBase):
           <diatonic>-5</diatonic>
           <chromatic>-9</chromatic>
         </transpose>
-
 
         >>> i = interval.Interval('-M9')
         >>> mxTranspose = ME.intervalToXmlTranspose(i)

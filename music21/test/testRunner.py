@@ -193,7 +193,6 @@ def mainTest(*testClasses, **keywords):
         if __name__ == '__main__':
             music21.mainTest(Test)
 
-
     This module tries to fix up some differences between python2 and python3 so
     that the same doctests can work.  These differences can now be removed, but
     I cannot remember what they are!

@@ -554,10 +554,8 @@ class XMLParserBase:
         Given an mxPrint object, set object data for
         the print section of a layout.PageLayout object
 
-
         >>> from xml.etree.ElementTree import fromstring as El
         >>> MP = musicxml.xmlToM21.MeasureParser()
-
 
         >>> mxPrint = El('<print new-page="yes" page-number="5">'
         ...    + '    <page-layout><page-height>4000</page-height>'
@@ -2170,7 +2168,6 @@ class PartParser(XMLParserBase):
         >>> pp2.lastTimeSignature
         <music21.meter.TimeSignature 4/4>
 
-
         For obscure reasons relating to how Finale gives suffixes
         to unnumbered measures, if a measure has the same number
         as the lastMeasureNumber, the lastNumberSuffix is not updated:
@@ -2994,7 +2991,6 @@ class MeasureParser(SoundTagMixin, XMLParserBase):
         >>> n.articulations
         [<music21.articulations.Pizzicato>]
 
-
         >>> beams = EL('<beam>begin</beam>')
         >>> mxNote.append(beams)
         >>> n = MP.xmlToSimpleNote(mxNote)
@@ -3336,7 +3332,6 @@ class MeasureParser(SoundTagMixin, XMLParserBase):
         'half-flat'
         >>> b.alter
         -0.5
-
 
         >>> a = EL('<accidental bracket="yes">sharp</accidental>')
         >>> b = MP.xmlToAccidental(a)
@@ -3902,7 +3897,6 @@ class MeasureParser(SoundTagMixin, XMLParserBase):
 
         >>> f.fingerNumber
         5
-
 
         >>> mxTech = EL('<fingering alternate="yes">4-3</fingering>')
         >>> f = MP.xmlTechnicalToArticulation(mxTech)
@@ -4909,7 +4903,6 @@ class MeasureParser(SoundTagMixin, XMLParserBase):
         >>> l2
         <music21.note.Lyric number=0 identifier='part2verse1' syllabic=single text='word'>
 
-
         Multiple texts can be created and result in composite lyrics
 
         >>> mxBianco = ET.fromstring('<lyric>'
@@ -5829,7 +5822,6 @@ class MeasureParser(SoundTagMixin, XMLParserBase):
         >>> MP.xmlTransposeToInterval(t)
         <music21.interval.Interval M-6>
 
-
         Not mentioned in MusicXML XSD but supported in (Finale; MuseScore): octave-change
         refers to both diatonic and chromatic, so we will deal:
 
@@ -5945,7 +5937,6 @@ class MeasureParser(SoundTagMixin, XMLParserBase):
         >>> mxSenza = ET.fromstring('<time><senza-misura>0</senza-misura></time>')
         >>> MP.xmlToTimeSignature(mxSenza)
         <music21.meter.SenzaMisuraTimeSignature 0>
-
 
         Small Duration Time Signatures
 
@@ -6109,13 +6100,11 @@ class MeasureParser(SoundTagMixin, XMLParserBase):
         >>> MP.xmlToKeySignature(mxKey)
         <music21.key.KeySignature of 4 flats>
 
-
         >>> mxKey = ET.fromstring('<key><fifths>-4</fifths><mode>minor</mode></key>')
 
         >>> MP = musicxml.xmlToM21.MeasureParser()
         >>> MP.xmlToKeySignature(mxKey)
         <music21.key.Key of f minor>
-
 
         Invalid modes get ignored and returned as KeySignatures
 
@@ -6210,7 +6199,6 @@ class MeasureParser(SoundTagMixin, XMLParserBase):
 
         >>> MP.xmlToKeySignature(mxKey)
         <music21.key.KeySignature of pitches: [E-]>
-
 
         Works with key-accidental also:
 

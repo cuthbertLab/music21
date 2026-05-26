@@ -130,7 +130,6 @@ class TimespanTree(trees.OffsetTree):
     ...             scoreTree.removeTimespan(horizontality[2])
     ...             scoreTree.insert(merged)
 
-
     >>> #_DOCS_SHOW newBach = tree.toStream.partwise(scoreTree, templateStream=bach)
     >>> #_DOCS_SHOW newBach.parts['#Alto'].measure(7).show('text')
     {0.0} <music21.chord.Chord F#4>
@@ -156,7 +155,6 @@ class TimespanTree(trees.OffsetTree):
         sorted.
 
     OMIT_FROM_DOCS
-
 
     TODO: Doc examples for all functions, including privates.
     '''
@@ -586,7 +584,6 @@ class TimespanTree(trees.OffsetTree):
             (36.0 {}),
             (36.0 {})
             ]>
-
 
         * Changed in v8: added padEnd.  Streams with fewer than n elements
             also return an empty sentinel entry.

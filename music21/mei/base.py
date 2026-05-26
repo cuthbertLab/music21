@@ -999,7 +999,7 @@ def _processEmbeddedElements(
 
     If debugging is enabled for the previous example, this warning would be displayed:
 
-    ``mei.base: Found an unprocessed <rest> element in a <doctest>.
+    ``mei.base: Found an unprocessed <rest> element in a <doctest>.``
 
     The "beam" element holds "note" elements. All elements appear in a single level of the list:
 
@@ -3025,7 +3025,7 @@ def _correctMRestDurs(staves, targetLength):
                     del eachObject.m21wasMRest
 
 
-def _makeBarlines(elem, staves):
+def _makeBarlines(elem: Element, staves: dict) -> dict:
     '''
     This is a helper function for :func:`measureFromElement`, made independent only to improve
     that function's ease of testing.
@@ -3034,11 +3034,10 @@ def _makeBarlines(elem, staves):
     been processed, change the barlines of the :class:`Measure` objects in accordance with the
     element's @left and @right attributes.
 
-    :param :class:`~xml.etree.ElementTree.Element` elem: The ``<measure>`` tag to process.
-    :param dict staves: Dictionary where keys are @n attributes and values are corresponding
-        :class:`~music21.stream.Measure` objects.
-    :returns: The ``staves`` dictionary with properly-set barlines.
-    :rtype: dict
+    elem is the ``<measure>`` tag to process; staves maps @n attributes to their corresponding
+    :class:`~music21.stream.Measure` objects.
+
+    Returns the ``staves`` dictionary with properly-set barlines.
     '''
     if elem.get('left') is not None:
         bars = _barlineFromAttr(elem.get('left'))

@@ -355,7 +355,6 @@ def _convertPsToStep(
     >>> pitch._convertPsToStep(61.5)
     ('C', <music21.pitch.Accidental one-and-a-half-sharp>, <music21.pitch.Microtone (+0c)>, 0)
 
-
     Note that Microtones can have negative and positive zeros.
 
     >>> pitch._convertPsToStep(43.00001)
@@ -526,7 +525,6 @@ def _convertHarmonicToCents(value: int|float) -> int:
      4302, 4441, 4569, 4688, 4800, 4905, 5004, 5098, 5186, 5271, 5351,
      5428, 5502, 5573, 5641, 5706, 5769, 5830, 5888, 5945, 6000]
 
-
     Works with subHarmonics as well by specifying them as either 1/x or negative numbers.
     note that -2 is the first subharmonic, since -1 == 1:
 
@@ -662,7 +660,6 @@ def simplifyMultipleEnharmonics(pitches, criterion=_dissonanceScore, keyContext=
     >>> pitch.simplifyMultipleEnharmonics([6, 10, 1], keyContext=key.Key('C-'))
     [<music21.pitch.Pitch G->, <music21.pitch.Pitch B->, <music21.pitch.Pitch D->]
 
-
     Note that if there's no key context, then we won't simplify everything (at least
     for now; this behavior may change, ).
 
@@ -670,8 +667,6 @@ def simplifyMultipleEnharmonics(pitches, criterion=_dissonanceScore, keyContext=
     ...                                    pitch.Pitch('F-3'),
     ...                                    pitch.Pitch('A--3')])
     [<music21.pitch.Pitch D--3>, <music21.pitch.Pitch F-3>, <music21.pitch.Pitch A--3>]
-
-
 
     >>> pitch.simplifyMultipleEnharmonics([pitch.Pitch('D--3'),
     ...                                    pitch.Pitch('F-3'),
@@ -745,7 +740,6 @@ class Microtone(prebase.ProtoM21Object, SlottedObjectMixin):
 
     Microtones can be shifted according to the harmonic. Here we take the 3rd
     harmonic of the previous microtone
-
 
     >>> m.harmonicShift = 3
     >>> m.harmonicShift
@@ -1216,7 +1210,6 @@ class Accidental(prebase.ProtoM21Object, style.StyleMixin):
 
         This is the argument that .name and .alter use to allow non-standard names
 
-
         * Changed in v5: added allowNonStandardValue.
         '''
         if isinstance(name, str):
@@ -1640,7 +1633,6 @@ class Pitch(prebase.ProtoM21Object):
     >>> highEflat.nameWithOctave
     'E-6'
 
-
     `Pitch` objects represent themselves as the class name followed
     by the `.nameWithOctave`:
 
@@ -1673,7 +1665,6 @@ class Pitch(prebase.ProtoM21Object):
         AttributeError: 'NoneType' object has no attribute 'alter'
         >>> alters
         [1.0, -1.0]
-
 
     If a `Pitch` doesn't have an associated octave, then its
     `.octave` value is None.  This means that it represents
@@ -1711,7 +1702,6 @@ class Pitch(prebase.ProtoM21Object):
     >>> pitch.Pitch(65.5).accidental
     <music21.pitch.Accidental half-sharp>
 
-
     A `pitch.Pitch` object can also be created using only a number
     from 0-11, that number is taken to be a `pitchClass`, where
     0 = C, 1 = C#/D-, etc. and no octave is set.
@@ -1742,7 +1732,6 @@ class Pitch(prebase.ProtoM21Object):
     >>> lowE = pitch.Pitch(midi=3)
     >>> lowE.name, lowE.octave
     ('E-', -1)
-
 
     Instead of using a single string or integer for creating the object, a succession
     of named keywords can be used instead:
@@ -1822,7 +1811,6 @@ class Pitch(prebase.ProtoM21Object):
 
     >>> pitch.Pitch('C#5').ps == pitch.Pitch('D-5').ps
     True
-
 
     Advanced construction of pitch with keywords:
 
@@ -2342,7 +2330,6 @@ class Pitch(prebase.ProtoM21Object):
         >>> p.getCentShiftFromMidi()
         25
 
-
         >>> p = pitch.Pitch('c#4')
         >>> p.microtone = -25
         >>> p.ps
@@ -2566,7 +2553,6 @@ class Pitch(prebase.ProtoM21Object):
         <music21.pitch.Pitch A2>
         >>> a.ps
         45.0
-
 
         Notice that ps 61 represents both
         C# and D-flat.  Thus, "spellingIsInferred"
@@ -2854,7 +2840,6 @@ class Pitch(prebase.ProtoM21Object):
         Return or set the pitch name with an octave designation.
         If no octave as been set, no octave value is returned.
 
-
         >>> gSharp = pitch.Pitch('G#4')
         >>> gSharp.nameWithOctave
         'G#4'
@@ -2870,7 +2855,6 @@ class Pitch(prebase.ProtoM21Object):
         'C#'
         >>> dFlatFive.octave
         6
-
 
         N.B. -- it's generally better to set the name and octave separately, especially
         since you may at some point encounter very low pitches such as "A octave -1", which
@@ -3097,7 +3081,6 @@ class Pitch(prebase.ProtoM21Object):
         >>> pitch.Pitch(midi=p.midi).pitchClass
         1
 
-
         This means that pitchClass + microtone is NOT a good way to estimate the frequency
         of a pitch.  For instance, if we take a pitch that is 90% of the way between pitchClass
         0 (C) and pitchClass 1 (C#/D-flat), this formula gives an inaccurate answer of 1.9, not
@@ -3297,7 +3280,6 @@ class Pitch(prebase.ProtoM21Object):
         of a Pitch in the Italian system
         (F-sharp is fa diesis, C-flat is do bemolle, etc.)
         (Microtones and Quarter tones raise an error).
-
 
         >>> print(pitch.Pitch('B-').italian)
         si bemolle
@@ -3681,7 +3663,6 @@ class Pitch(prebase.ProtoM21Object):
         Example: G4 is the third harmonic of C3, albeit 2 cents flatter than
         the true 3rd harmonic.
 
-
         >>> p = pitch.Pitch('g4')
         >>> f = pitch.Pitch('c3')
         >>> p.harmonicFromFundamental(f)
@@ -3787,7 +3768,6 @@ class Pitch(prebase.ProtoM21Object):
         would use to play the harmonic on.  (Perhaps should be
         renamed).
 
-
         >>> pitch.Pitch('g4').harmonicString('c3')
         '3rdH(-2c)/C3'
 
@@ -3846,7 +3826,6 @@ class Pitch(prebase.ProtoM21Object):
         Given a Pitch that is a plausible target for a fundamental,
         return the harmonic number and a potentially shifted fundamental
         that describes this Pitch.
-
 
         >>> g4 = pitch.Pitch('g4')
         >>> g4.harmonicAndFundamentalFromPitch('c3')
@@ -4150,7 +4129,6 @@ class Pitch(prebase.ProtoM21Object):
         >>> print(p2)
         D#
 
-
         The lower enharmonic can have a different octave than
         the original.
 
@@ -4319,7 +4297,6 @@ class Pitch(prebase.ProtoM21Object):
         >>> p.getEnharmonic()
         <music21.pitch.Pitch C>
 
-
         Works with half-sharps, but converts them to microtones:
 
         >>> dHalfSharp = pitch.Pitch('D~')
@@ -4449,7 +4426,6 @@ class Pitch(prebase.ProtoM21Object):
 
         C4 (middleC) = 29, C#4 = 29, C##4 = 29, D-4 = 30, D4 = 30, etc.
 
-
         >>> c = pitch.Pitch('c4')
         >>> c.diatonicNoteNum
         29
@@ -4467,7 +4443,6 @@ class Pitch(prebase.ProtoM21Object):
         'double-flat'
         >>> d.diatonicNoteNum
         30
-
 
         >>> lowC = pitch.Pitch('c1')
         >>> lowC.diatonicNoteNum
@@ -4494,7 +4469,6 @@ class Pitch(prebase.ProtoM21Object):
         1
         >>> lowDSharp.name
         'D#'
-
 
         Negative diatonicNoteNums are possible,
         in case, like John Luther Adams, you want
@@ -4560,7 +4534,6 @@ class Pitch(prebase.ProtoM21Object):
         >>> cPitch
         <music21.pitch.Pitch C-5>
 
-
         An interval object can also be a certain number of semitones,
         in which case, the spelling of the resulting note (sharp or flat, etc.)
         is up to the system to choose.
@@ -4569,7 +4542,6 @@ class Pitch(prebase.ProtoM21Object):
         >>> bPitch = aPitch.transpose(aInterval)
         >>> bPitch
         <music21.pitch.Pitch C#4>
-
 
         Transpose fFlat down 5 semitones -- sort of like a Perfect 4th, but
         should be respelled:
@@ -4695,14 +4667,12 @@ class Pitch(prebase.ProtoM21Object):
         >>> higherG
         <music21.pitch.Pitch G5>
 
-
         To change the pitch itself, set inPlace to True:
 
         >>> p = pitch.Pitch('G5')
         >>> p.transposeBelowTarget(pitch.Pitch('C#4'), inPlace=True)
         >>> p
         <music21.pitch.Pitch G3>
-
 
         If already below the target, make no change:
 
@@ -4713,7 +4683,6 @@ class Pitch(prebase.ProtoM21Object):
 
         >>> pitch.Pitch('g#8').transposeBelowTarget(pitch.Pitch('g#1'))
         <music21.pitch.Pitch G#1>
-
 
         This does nothing because it is already low enough:
 
@@ -4786,7 +4755,6 @@ class Pitch(prebase.ProtoM21Object):
 
         >>> pitch.Pitch('d2').transposeAboveTarget(pitch.Pitch('e4'))
         <music21.pitch.Pitch D5>
-
 
         To change the pitch itself, set inPlace to True:
 

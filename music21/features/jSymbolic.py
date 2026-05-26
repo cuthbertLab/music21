@@ -1884,7 +1884,6 @@ class StrengthRatioOfTwoStrongestRhythmicPulsesFeature(
     The frequency of the higher (in terms of frequency) of the two beat bins
     corresponding to the peaks with the highest frequency divided by the frequency of the lower.
 
-
     >>> sch = corpus.parse('schoenberg/opus19', 2)
     >>> for p in sch.parts:
     ...     p.insert(0, tempo.MetronomeMark('Langsam', 70))
@@ -2102,7 +2101,6 @@ class BeatHistogramFeature(featuresModule.FeatureExtractor):
 
     A feature extractor that finds a feature array with entries corresponding to the frequency
     values of each of the bins of the beat histogram (except the first 40 empty ones).
-
 
     '''
     id = 'R14'
@@ -2911,7 +2909,6 @@ class VariationOfDynamicsFeature(featuresModule.FeatureExtractor):
 
     Standard deviation of loudness levels of all notes.
 
-
     TODO: implement
 
     '''
@@ -2954,7 +2951,6 @@ class AverageNoteToNoteDynamicsChangeFeature(featuresModule.FeatureExtractor):
 
     Average change of loudness from one note to the next note in the
     same channel (in MIDI velocity units).
-
 
     TODO: implement
 
@@ -3070,7 +3066,6 @@ class VariabilityOfNumberOfIndependentVoicesFeature(
     Standard deviation of number of different channels in which notes have sounded simultaneously.
     Rests are not included in this calculation.
 
-
     >>> s = corpus.parse('bwv66.6')
     >>> fe = features.jSymbolic.VariabilityOfNumberOfIndependentVoicesFeature(s)
     >>> f = fe.extract()
@@ -3110,8 +3105,6 @@ class VoiceEqualityNumberOfNotesFeature(featuresModule.FeatureExtractor):
     '''
     Not implemented
 
-
-
     TODO: implement
 
     Standard deviation of the total number of Note Ons in each channel
@@ -3133,8 +3126,6 @@ class VoiceEqualityNoteDurationFeature(featuresModule.FeatureExtractor):
     '''
     Not implemented
 
-
-
     TODO: implement
 
     '''
@@ -3154,8 +3145,6 @@ class VoiceEqualityDynamicsFeature(featuresModule.FeatureExtractor):
     '''
     Not implemented
 
-
-
     TODO: implement
 
     '''
@@ -3174,8 +3163,6 @@ class VoiceEqualityDynamicsFeature(featuresModule.FeatureExtractor):
 class VoiceEqualityMelodicLeapsFeature(featuresModule.FeatureExtractor):
     '''
     Not implemented
-
-
 
     TODO: implement
 
@@ -3277,8 +3264,6 @@ class RangeOfHighestLineFeature(featuresModule.FeatureExtractor):
 class RelativeNoteDensityOfHighestLineFeature(featuresModule.FeatureExtractor):
     '''
     Not implemented
-
-
 
     TODO: implement
 
@@ -3510,8 +3495,6 @@ class NotePrevalenceOfUnpitchedInstrumentsFeature(
     '''
     Not implemented
 
-
-
     TODO: implement
 
     '''
@@ -3626,7 +3609,6 @@ class VariabilityOfNotePrevalenceOfUnpitchedInstrumentsFeature(
     Map instrument that is used to play at least one note. It should be noted that only
     instruments 35 to 81 are included here, as they are the ones that are included in the
     official standard.
-
 
     TODO: implement
 

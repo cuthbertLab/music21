@@ -615,7 +615,6 @@ class GraphColorGrid(Graph):
     Data is provided as a list of lists of colors, where colors are specified as a hex triplet,
     or the common HTML color codes, and based on analysis-specific mapping of colors to results.
 
-
     >>> #_DOCS_SHOW g = graph.primitives.GraphColorGrid()
     >>> g = graph.primitives.GraphColorGrid(doneAction=None) #_DOCS_HIDE
     >>> data = [['#55FF00', '#9b0000', '#009b00'],
@@ -1388,7 +1387,6 @@ class GraphHistogram(Graph):
     Data set is simply a list of x and y pairs, where there
     is only one of each x value, and y value is the count or magnitude
     of that value
-
 
     >>> import random
     >>> g = graph.primitives.GraphHistogram()

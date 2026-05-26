@@ -482,7 +482,6 @@ def parse(target):
     >>> ss.fileName
     'barbour_chrom1.scl'
 
-
     >>> ss = scale.scala.parse('blackj_gws.scl')
     >>> ss.description
     'Detempered Blackjack in 1/4 kleismic marvel tuning'

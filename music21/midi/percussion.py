@@ -127,7 +127,6 @@ class PercussionMapper:
         Traceback (most recent call last):
         music21.midi.percussion.MIDIPercussionException: 69 does not map to a valid instrument!
 
-
         Some music21 Instruments have more than one MidiPitch.  In this case you'll
         get the same Instrument object but with a different modifier
 
@@ -168,7 +167,6 @@ class PercussionMapper:
         '''
         Takes an instrument.Instrument object and returns a pitch object
         with the corresponding 1-indexed MIDI note, according to the GM Percussion Map.
-
 
         >>> pm = midi.percussion.PercussionMapper()
         >>> myCow = instrument.Cowbell()

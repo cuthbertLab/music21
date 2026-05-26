@@ -62,7 +62,6 @@ class SubConverter:
         stringEncoding = string (default 'utf-8'). If codecWrite is True, this specifies what
             encoding to use
 
-
     '''
     readBinary: bool = False
     canBePickled: bool = True
@@ -743,7 +742,6 @@ class ConverterNoteworthy(SubConverter):
     Gets data with the file format .nwctxt
 
     Users should not need this routine.  The basic format is converter.parse('file.nwctxt')
-
 
     >>> nwcTranslatePath = common.getSourceFilePath() / 'noteworthy' #_DOCS_HIDE
     >>> paertPath = nwcTranslatePath / 'Part_OWeisheit.nwctxt' #_DOCS_HIDE

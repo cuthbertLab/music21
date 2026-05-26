@@ -318,7 +318,6 @@ class RTTagged(RTToken):
         >>> tag.isKeySignature()
         False
 
-
         N.B.: this is not the same as a key definition found inside a
         Measure. These are represented by RTKey rtObjects, defined below, and are
         not RTTagged rtObjects, but RTAtom subclasses.
@@ -506,7 +505,6 @@ class RTMeasure(RTToken):
     ['a']
     >>> rtm.isMeasure()
     True
-
 
     '''
 
@@ -738,17 +736,14 @@ class RTBeat(RTAtom):
         >>> RTB('b1.2').getBeatFloatOrFrac()
         Fraction(6, 5)
 
-
         A third digit of 0.5 adds 1/2 of 1/DENOM of before.  Here DENOM is 3 (in 5/3) so
         we add 1/6 to 5/3 to get 11/6:
-
 
         >>> RTB('b1.66').getBeatFloatOrFrac()
         Fraction(5, 3)
 
         >>> RTB('b1.66.5').getBeatFloatOrFrac()
         Fraction(11, 6)
-
 
         Similarly 0.25 adds 1/4 of 1/DENOM, to get 21/12 or 7/4 or 1.75:
 

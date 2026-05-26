@@ -19,7 +19,6 @@ can change functionality until 2.1, 3.1, etc. is released.  This is against the 
 but I don't want to have lots of 2.0.0-alpha2, etc., I'd rather call it 2.0.2, and tell users
 to wait for 2.1.  Even numbered first decimal releases (e.g. 5.4) are also beta.
 
-
 Q: Why is this here and not in music21/__init__.py?
 
 A: Keeping the information here makes it available to package managers and others who
@@ -32,9 +31,7 @@ of Music21 makes installation cleaner, and also helps other software - like
 package managers in various Linux distributions - work with Music21 without
 complaint.
 
-
 Thanks to Andrew Hankinson for suggesting this way of dealing with versions to begin with.
-
 
 Changing Versions
 ==================

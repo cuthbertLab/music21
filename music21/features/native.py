@@ -81,7 +81,6 @@ class QualityFeature(featuresModule.FeatureExtractor):
     >>> f2.vector
     [1]
 
-
     OMIT_FROM_DOCS
 
     # for monophonic melodies
@@ -653,7 +652,6 @@ class TriadSimultaneityPrevalence(featuresModule.FeatureExtractor):
     '''
     Gives the proportion of all simultaneities which form triads (major,
     minor, diminished, or augmented)
-
 
     >>> s = corpus.parse('bwv66.6')
     >>> fe = features.native.TriadSimultaneityPrevalence(s)

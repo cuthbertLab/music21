@@ -135,7 +135,6 @@ class StreamSearcher:
     >>> d = note.Note('D', quarterLength=0.5)
     >>> searchList = [c, d]
 
-
     Now create a StreamSearcher:
 
     >>> ss = search.StreamSearcher(thisStream, searchList)
@@ -163,7 +162,6 @@ class StreamSearcher:
     [<function StreamSearcher.wildcardAlgorithm at 0x111b6e340>,
      <function StreamSearcher.rhythmAlgorithm at 0x11200000>]
 
-
     Now run it:
 
     >>> results = ss.run()
@@ -175,7 +173,6 @@ class StreamSearcher:
     1
     >>> results[1].elStart.measureNumber
     2
-
 
     Wildcards can be useful:
 
@@ -193,7 +190,6 @@ class StreamSearcher:
     (<music21.note.Note D>, <music21.note.Note E>, <music21.note.Note G>)
     >>> [n.duration.quarterLength for n in results[0].els]
     [0.5, 1.0, 1.5]
-
 
     OMIT_FROM_DOCS
 
@@ -386,13 +382,10 @@ def rhythmicSearch(thisStreamOrIterator, searchList):
     {0.0} <music21.note.Note G>
     {1.5} <music21.note.Note A>
 
-
-
     Slightly more advanced search: we will look for any instances of eighth,
     followed by a note (or other element) of any length, followed by a dotted quarter
     note.  Again, we will find two instances; this time we will tag them both with
     a TextExpression of "*" and then show the original stream:
-
 
     >>> searchStream2 = stream.Stream()
     >>> searchStream2.append(note.Note(quarterLength=0.5))
@@ -405,7 +398,6 @@ def rhythmicSearch(thisStreamOrIterator, searchList):
     ...     thisStreamIter[found].lyric = '*'
     >>> #_DOCS_SHOW thisStream.show()
 
-
     .. image:: images/searchRhythmic1.*
         :width: 221
 
@@ -416,7 +408,6 @@ def rhythmicSearch(thisStreamOrIterator, searchList):
     is than the second (eighth, anything, dotted-quarter).  In fact, my hypothesis
     was wrong, and the second term is actually more common than the first! (n.b. rests
     are being counted here as well as notes)
-
 
     >>> grave = corpus.parse('corelli/opus3no1/1grave')
     >>> term1results = []
@@ -722,7 +713,6 @@ def translateDiatonicStreamToString(inputStreamOrIterator, returnMeasures=False)
     O-U = note of shorter length than previous
     Z = rest
 
-
     >>> s = converter.parse("tinynotation: 3/4 c4 d8~ d16 r16 FF8 F#8 a'8 b-2.")
     >>> streamString = search.translateDiatonicStreamToString(s.recurse().notesAndRests)
     >>> print(streamString)
@@ -796,7 +786,6 @@ def translateIntervalsAndSpeed(inputStream, returnMeasures=False):
     Skips all but the first note of tie. Skips multiple rests in a row
 
     Each note gets one byte and encodes up from -13 to 13 (all notes > octave are 13 or -13)
-
 
     >>> s = converter.parse("tinynotation: 3/4 c4 d8~ d16 r16 F8 F#8 F8 a'8 b-2")
     >>> sn = s.flatten().notesAndRests.stream()
@@ -1065,7 +1054,6 @@ def mostCommonMeasureRhythms(streamIn, transposeDiatonic=False):
     rhythm: the rhythm found (with the pitches of the first instance of the rhythm transposed to C5)
     measures: a list of measures containing the rhythm
     rhythmString: a string representation of the rhythm (see translateStreamToStringOnlyRhythm)
-
 
     >>> bach = corpus.parse('bwv1.6')
     >>> sortedRhythms = search.mostCommonMeasureRhythms(bach)

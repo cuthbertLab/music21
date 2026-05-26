@@ -461,7 +461,6 @@ class Beams(prebase.ProtoM21Object, EqualSlottedObjectMixin):
         >>> beams.beamsList
         [<music21.beam.Beam 1/start>, <music21.beam.Beam 2/partial/right>]
 
-
         A beam object can also be specified:
 
         >>> beams = beam.Beams()

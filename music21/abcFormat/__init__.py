@@ -602,7 +602,6 @@ class ABCMetadata(ABCToken):
         Return a music21 :class:`~music21.key.KeySignature` or :class:`~music21.key.Key`
         object for this metadata tag.
 
-
         >>> am = abcFormat.ABCMetadata('K:G')
         >>> am.preParse()
         >>> ks = am.getKeySignatureObject()
@@ -772,7 +771,6 @@ class ABCMetadata(ABCToken):
         >>> am.getDefaultQuarterLength()
         0.5
 
-
         If taking from meter, find the "fraction" and if < 0.75 use sixteenth notes.
         If >= 0.75 use eighth notes.
 
@@ -786,12 +784,10 @@ class ABCMetadata(ABCToken):
         >>> am.getDefaultQuarterLength()
         0.5
 
-
         >>> am = abcFormat.ABCMetadata('M:6/8')
         >>> am.preParse()
         >>> am.getDefaultQuarterLength()
         0.5
-
 
         Meter is only used for default length if there is no L:
 
@@ -1060,7 +1056,6 @@ class ABCTuplet(ABCToken):
         >>> at.updateRatio()
         >>> at.numberNotesActual, at.numberNotesNormal
         (2, 3)
-
 
         Some other types:
 
@@ -1477,7 +1472,6 @@ class ABCNote(ABCToken):
 
         >>> an.getPitchName('{c}')
         ('C5', None)
-
 
         Given an active KeySignature object, the pitch name might
         change:
@@ -2765,7 +2759,6 @@ class ABCHandler:
 
         Used in polyphonic metadata merge
 
-
         >>> abcStr = 'M:6/8\\nL:1/8\\nK:G\\n'
         >>> ah1 = abcFormat.ABCHandler()
         >>> junk = ah1.process(abcStr)
@@ -2799,13 +2792,11 @@ class ABCHandler:
         Return True if this token structure defines more than 1 reference number,
         usually implying multiple pieces encoded in one file.
 
-
         >>> abcStr = 'X:5\\nM:6/8\\nL:1/8\\nK:G\\nB3 A3 | G6 | B3 A3 | G6 ||'
         >>> ah = abcFormat.ABCHandler()
         >>> junk = ah.process(abcStr)
         >>> ah.definesReferenceNumbers()  # only one returns False
         False
-
 
         >>> abcStr = 'X:5\\nM:6/8\\nL:1/8\\nK:G\\nB3 A3 | G6 | B3 A3 | G6 ||\\n'
         >>> abcStr += 'X:6\\nM:6/8\\nL:1/8\\nK:G\\nB3 A3 | G6 | B3 A3 | G6 ||'
@@ -2940,7 +2931,6 @@ class ABCHandler:
         '''
         If tokens are processed, get the first
         reference number defined.
-
 
         >>> abcStr = 'X:5\\nM:6/8\\nL:1/8\\nK:G\\nB3 A3 | G6 | B3 A3 | G6 ||'
         >>> ah = abcFormat.ABCHandler()
@@ -3488,7 +3478,6 @@ class ABCFile(prebase.ProtoM21Object):
         Traceback (most recent call last):
         music21.abcFormat.ABCFileException: cannot find requested
             reference number in source file: 99
-
 
         If the same number is defined twice in one file (should not be) only
         the first data is returned.

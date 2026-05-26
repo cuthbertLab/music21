@@ -114,7 +114,6 @@ class MuseDataRecord(prebase.ProtoM21Object):
         >>> mdr.isTied()
         True
 
-
         >>> mdr = musedata.MuseDataRecord('C4     1        s     u  [[')
         >>> mdr.isTied()
         False
@@ -261,7 +260,6 @@ class MuseDataRecord(prebase.ProtoM21Object):
         'F#4'
         >>> p.accidental.displayStatus
         True
-
 
         Double sharps were giving octave problems.
 
@@ -1115,7 +1113,6 @@ class MuseDataPart(prebase.ProtoM21Object):
         The attributes record is not in a fixed position,
         but is the first line that starts with a $.
 
-
         >>> fp1 = (common.getSourceFilePath() / 'musedata' / 'testPrimitive'
         ...                    / 'test01' / '01.md')
         >>> mdw = musedata.MuseDataWork()
@@ -1311,7 +1308,6 @@ class MuseDataPart(prebase.ProtoM21Object):
     def _getTranspositionParameters(self):
         '''
         Get the transposition, if defined, from the Metadata header.
-
 
         >>> fp1 = (common.getSourceFilePath() / 'musedata' / 'testPrimitive'
         ...                    / 'test01' / '01.md')

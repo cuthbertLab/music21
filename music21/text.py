@@ -205,7 +205,6 @@ def postpendArticle(src, language=None):
     Given a text string, if an article is found in a leading position,
     place it at the end with a comma.
 
-
     >>> text.postpendArticle('The Ale is Dear')
     'Ale is Dear, The'
     >>> text.postpendArticle('The Ale is Dear', 'en')

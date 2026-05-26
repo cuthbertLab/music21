@@ -33,15 +33,12 @@ The :class:`music21.sieve.Sieve` class permits generation segments in four forma
 >>> len(a.segment(segmentFormat='unit'))
 43
 
-
 A :class:`music21.sieve.CompressionSegment` can be used to derive a Sieve from a
 ny sequence of integers.
-
 
 >>> a = sieve.CompressionSegment([3, 4, 5, 6, 7, 8, 13, 19])
 >>> str(a)
 '6@1|7@6|8@5|9@4|10@3|11@8'
-
 
 The :class:`music21.sieve.PitchSieve` class provides a quick generation of
 :class:`music21.pitch.Pitch` lists from Sieves.
@@ -132,17 +129,14 @@ def eratosthenes(firstCandidate=2):
     To use this generator, create an instance and then call the .next() method
     on the instance.
 
-
     >>> a = sieve.eratosthenes()
     >>> next(a)
     2
     >>> next(a)
     3
 
-
     We can also specify a starting value for the sequence, skipping over
     initial primes smaller than this number:
-
 
     >>> a = sieve.eratosthenes(95)
     >>> next(a)
@@ -182,7 +176,6 @@ def rabinMiller(n):
     Rabin Miller primality test.
 
     See also here: http://www.4dsolutions.net/ocn/numeracy2.html
-
 
     >>> sieve.rabinMiller(234)
     False
@@ -255,7 +248,6 @@ def discreteBinaryPad(series: Iterable[int], fixRange=None) -> list[int]:
     the first entry (signifying 3), 0s for the next six entries (signifying
     4-9), a 1 (for 10), a 0 (for 11), and a 1 (for 12).
 
-
     >>> sieve.discreteBinaryPad([3, 10, 12])
     [1, 0, 0, 0, 0, 0, 0, 1, 0, 1]
 
@@ -293,18 +285,14 @@ def unitNormRange(series, fixRange=None):
     according to their distance between these two units.  For instance, for 0, 3, 4
     the middle entry will be 0.75 since 3 is 3/4 of the distance between 0 and 4:
 
-
     >>> sieve.unitNormRange([0, 3, 4])
     [0.0, 0.75, 1.0]
-
 
     but for [1, 3, 4], it will be 0.666... because 3 is 2/3 of the distance between
     1 and 4
 
-
     >>> sieve.unitNormRange([1, 3, 4])
     [0.0, 0.666..., 1.0]
-
 
     '''
     if fixRange is not None:
@@ -363,7 +351,6 @@ def unitNormStep(step, a=0, b=1, normalized=True):
     necessary to cover region.
 
     Note that returned values are, by default, normalized within the unit interval.
-
 
     >>> sieve.unitNormStep(0.5, 0, 1)
     [0.0, 0.5, 1]
@@ -770,7 +757,7 @@ class Residual:
 
     def __or__(self, other):
         '''
-        |, not sure if this can be implemented
+        ``|``, not sure if this can be implemented
         i.e., a union of two Residual classes can not be expressed as a single
         Residual, that is intersections can always be reduced, whereas unions
         cannot be reduced.
@@ -1202,7 +1189,7 @@ class Sieve:
 
     def __or__(self, other):
         '''
-        |, produces a union
+        ``|``, produces a union
 
         >>> a = sieve.Sieve('3@11')
         >>> b = sieve.Sieve('2&4&8|5')
@@ -1313,11 +1300,13 @@ class Sieve:
 
     def _parseLogic(self, usrStr):
         '''
-        provide synonyms for logical symbols
-        intersection == and, &, *
-        union        == or, |, +
-        not          == not, -
-        the native format for str representation uses only &, |, -
+        provide synonyms for logical symbols::
+
+            intersection == and, &, *
+            union        == or, |, +
+            not          == not, -
+
+        the native format for str representation uses only ``&``, ``|``, ``-``;
         this method converts all other string representations
 
         all brackets and braces are replaced with parenthesis

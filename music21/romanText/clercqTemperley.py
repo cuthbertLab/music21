@@ -235,7 +235,6 @@ class CTSong(prebase.ProtoM21Object):
     >>> rule.sectionName
     'Introduction'
 
-
     With this object-oriented approach to parsing the clercq-temperley text file format,
     we now have the ability to analyze a large corpus (200 files) of popular music
     using the full suite of harmonic tools of music21. We can not only analyze each
@@ -299,7 +298,6 @@ class CTSong(prebase.ProtoM21Object):
                          text='S: [A] $In $Vr $Vr $Vr $Vr $Vr $Vr $Vrf
                                      % 3rd and 6th verses are instrumental'>)])
 
-
     >>> rule = s.rules['In']
     >>> rule.text
     'In: I | | | | | | V | |'
@@ -325,7 +323,6 @@ class CTSong(prebase.ProtoM21Object):
         Fadeout: I . . V | I . . V | I . . V |
         Co: [2/4] I | [4/4] . . . V | I . . V | $Fadeout
         S: [G] $In $Vr $Ch $In*2 $Ch $Vr2 $Ch $Ch $Co
-
 
     """
     _DOC_ORDER = ['text', 'toPart', 'title', 'homeTimeSig', 'homeKey', 'comments', 'rules']

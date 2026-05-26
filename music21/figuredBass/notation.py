@@ -267,7 +267,6 @@ class Notation(prebase.ProtoM21Object):
         >>> notation2.origModStrings
         ('-', '-')
 
-
         An example of a seventh chord with extender:
 
         >>> notation3 = n.Notation('7_')
@@ -420,7 +419,6 @@ class Notation(prebase.ProtoM21Object):
         '''
         Turns the numbers and Modifier objects into Figure objects, each corresponding
         to a number with its Modifier.
-
 
         >>> from music21.figuredBass import notation as n
         >>> notation2 = n.Notation('-6,-')  #__init__ method calls _getFigures()
@@ -583,7 +581,6 @@ class Modifier(prebase.ProtoM21Object):
     :attr:`~music21.figuredBass.notation.Notation.notationColumn`)
     to an :class:`~music21.pitch.Accidental`. A ModifierException
     is raised if the modifierString is not valid.
-
 
     Accepted inputs are those accepted by Accidental, as well as the following:
 

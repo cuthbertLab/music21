@@ -127,7 +127,6 @@ class WindowedAnalysis:
         minus the window size plus one. If we have 20 1/4 windows, then the results lists
         will be of length 20 for window size 1, 19 for window size 2, 18 for window size 3, etc.
 
-
         >>> s = corpus.parse('bach/bwv66.6')
         >>> p = analysis.discrete.Ambitus()
         >>> wa = analysis.windowed.WindowedAnalysis(s.flatten(), p)
@@ -258,7 +257,6 @@ class WindowedAnalysis:
         If `minWindow` or `maxWindow` is None, the largest window size available will be set.
 
         If `includeTotalWindow` is True, the largest window size will always be added.
-
 
         >>> s = corpus.parse('bach/bwv324')
         >>> ksAnalyzer = analysis.discrete.KrumhanslSchmuckler()

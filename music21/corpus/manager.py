@@ -59,7 +59,6 @@ def fromName(name):
     >>> corpus.manager.fromName(None)
     <music21.corpus.corpora.LocalCorpus: 'local'>
 
-
     Note that this corpus probably does not exist on disk, but it's ready to have
     paths added to it and to be stored on disk.
 
@@ -274,7 +273,6 @@ def search(
     >>> #_DOCS_SHOW corpus.search(sourcePath='bach', numberOfParts=4)
     >>> corpus.search(sourcePath='bach', numberOfParts=4, corpusNames=('core',))  #_DOCS_HIDE
     <music21.metadata.bundles.MetadataBundle {368 entries}>
-
 
     This function is implemented in `corpus.manager` as a method there but also directly
     available in the corpus module for ease of use.

@@ -824,7 +824,6 @@ class StreamIterator(prebase.ProtoM21Object, Sequence[M21ObjType]):
         >>> s4.show('t')
         {0.0} <music21.bar.Barline type=regular>
 
-
         Note that this routine can create Streams that have elements that the original
         stream did not, in the case of recursion:
 
@@ -1042,7 +1041,6 @@ class StreamIterator(prebase.ProtoM21Object, Sequence[M21ObjType]):
         ...     print(el)
         <music21.note.Rest quarter>
 
-
         ActiveSite is restored.
 
         >>> s2 = stream.Stream(id='s2')
@@ -1053,7 +1051,6 @@ class StreamIterator(prebase.ProtoM21Object, Sequence[M21ObjType]):
         >>> for el in s.iter().getElementsByClass(note.Rest):
         ...     print(el.activeSite.id)
         s1
-
 
         Strings work in addition to classes, but your IDE will not know that
         `el` is a :class:`~music21.note.Rest` object.
@@ -1195,11 +1192,9 @@ class StreamIterator(prebase.ProtoM21Object, Sequence[M21ObjType]):
         There are several attributes that govern how this range is
         determined:
 
-
         If `mustFinishInSpan` is True then an event that begins
         between offsetStart and offsetEnd but which ends after offsetEnd
         will not be included.  The default is False.
-
 
         For instance, a half note at offset 2.0 will be found in
         getElementsByOffset(1.5, 2.5) or getElementsByOffset(1.5, 2.5,
@@ -1361,7 +1356,6 @@ class StreamIterator(prebase.ProtoM21Object, Sequence[M21ObjType]):
         ...     print(el, el.offset, el.getOffsetInHierarchy(bwv66), el.activeSite)
         <music21.stream.Measure 1 offset=1.0> 1.0 1.0 <music21.stream.Part Soprano>
         <music21.note.Note B> 1.0 2.0 <music21.stream.Measure 1 offset=1.0>
-
 
         RecursiveIterators will probably want to use
         :meth:`~music21.stream.iterator.RecursiveIterator.getElementsByOffsetInHierarchy`
@@ -1541,7 +1535,6 @@ class OffsetIterator(StreamIterator, Sequence[list[M21ObjType]]):
     [<music21.note.Note E>]
     [<music21.note.Note F>, <music21.note.Note G>]
     [<music21.bar.Repeat direction=end>, <music21.clef.TrebleClef>]
-
 
     >>> for groupedElements in oIter.notes:
     ...     print(groupedElements)

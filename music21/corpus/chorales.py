@@ -1196,7 +1196,6 @@ class Iterator:
         >>> riemenschneider371.metadata.title
         'Christ lag in Todesbanden'
 
-
         >>> BCI.numberingSystem = 'title'
         >>> BCI._returnChorale()
         Traceback (most recent call last):

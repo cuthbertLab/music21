@@ -187,7 +187,6 @@ This is very beta.  Much better would be to convert the file into .xml or .nwctx
             {0.0} <music21.chord.Chord F3 A3 C4>
             {3.0} <music21.note.Rest quarter>
 
-
 '''
 from __future__ import annotations
 

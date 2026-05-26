@@ -87,7 +87,6 @@ def deprecated(method, startDate=None, removeDate=None, message=None):
     >>> hi('myke')
     myke
 
-
     Now a new function demonstrating the argument form.
 
     >>> @common.deprecated('February 1972', 'September 2099', 'You should be okay.')

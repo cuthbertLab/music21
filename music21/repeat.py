@@ -51,7 +51,6 @@ class RepeatMark(prebase.ProtoM21Object):
 
     The following demonstration shows how a user might see if a Stream has any repeats in it.
 
-
     >>> class PartialRepeat(repeat.RepeatMark, base.Music21Object):
     ...    def __init__(self, **keywords):
     ...        super().__init__(**keywords)
@@ -309,7 +308,6 @@ class DaCapoAlCoda(RepeatExpressionCommand):
     indicating that any repeats encountered on the
     Da Capo repeat not be repeated.
 
-
     >>> rm = repeat.DaCapoAlCoda()
     '''
 
@@ -419,7 +417,6 @@ def insertRepeatEnding(s, start, end, endingNumber: int = 1, *, inPlace=False):
 
     Example: create first and second endings over measures 4-6 and measures 11-13 of a chorale,
     respectively.
-
 
     >>> c1 = corpus.parse('bwv10.7.mxl')
     >>> repeat.insertRepeatEnding(c1,  4,  6, 1, inPlace=True)
@@ -824,7 +821,6 @@ class Expander(t.Generic[StreamType]):
         rather than just seeing
         what needs to be expanded and returning that.
 
-
         >>> s = converter.parse('tinynotation: 3/4 A2.  C4 D E   F2.    G4 a b   c2.')
         >>> s.makeMeasures(inPlace=True)
         >>> s.measure(2).leftBarline = bar.Repeat(direction='start')
@@ -1083,7 +1079,6 @@ class Expander(t.Generic[StreamType]):
         This is used to handle when there are more than
         one group of repeat brackets per Stream.
 
-
         >>> s = converter.parse('tinynotation: 3/4 A2.  C4 D E   F2.    G4 a b   c2.')
         >>> s.makeMeasures(inPlace=True)
         >>> s.measure(2).leftBarline = bar.Repeat(direction='start')
@@ -1243,7 +1238,6 @@ class Expander(t.Generic[StreamType]):
 
         The provided Stream must be a Stream only of Measures.
 
-
         >>> s = converter.parse('tinynotation: 3/4 A2.  C4 D E   F2.    G4 a b   c2.')
         >>> s.makeMeasures(inPlace=True)
         >>> s.measure(2).leftBarline = bar.Repeat(direction='start')
@@ -1309,7 +1303,6 @@ class Expander(t.Generic[StreamType]):
         placed on the left of a measure that is not actually
         being copied.
 
-
         The `index` parameter is the index of the last
         measure to be copied. The streamObj must only have Measures.
         '''
@@ -1353,7 +1346,6 @@ class Expander(t.Generic[StreamType]):
 
         If `returnExpansionOnly` is True, only the expanded portion is
         returned, the rest of the Stream is not retained.
-
 
         >>> s = converter.parse('tinynotation: 3/4 A2.  C4 D E   F2.    G4 a b   c2.')
         >>> s.makeMeasures(inPlace=True)
@@ -1429,7 +1421,6 @@ class Expander(t.Generic[StreamType]):
             {3.0} <music21.bar.Barline type=double>
         {21.0} <music21.stream.Measure 5 offset=21.0>
         ...
-
 
         Should work even if no start repeat is given:
 
@@ -1992,7 +1983,6 @@ class RepeatFinder:
         Raises an exception if RepeatFinder's internal stream is too short
         (i.e. fewer than 3 measures long)
 
-
         >>> noPickup = corpus.parse('bwv10.7.mxl')
         >>> repeat.RepeatFinder(noPickup).getQuarterLengthOfPickupMeasure()
         0.0
@@ -2066,7 +2056,8 @@ class RepeatFinder:
         .. image:: images/repeat-rf_hasPickup.*
            :width: 600
 
-        _OMIT_FROM_DOCS_
+        OMIT_FROM_DOCS
+
         >>> repeat.RepeatFinder(noPickup.parts[0].measures(1, 2)).hasPickup()
         Traceback (most recent call last):
         music21.repeat.InsufficientLengthException: Cannot determine length of pickup
@@ -2119,7 +2110,8 @@ class RepeatFinder:
         [[1, 2, 4, 5, 6, 8, 10], [2, 4, 5, 6, 8, 10], [4, 5, 6, 8, 10],
          [7, 9, 11], [5, 6, 8, 10], [6, 8, 10], [8, 10], [9, 11], [10], [11], [], []]
 
-        _OMIT_FROM_DOCS_
+        OMIT_FROM_DOCS
+
         >>> repeat.RepeatFinder().getMeasureSimilarityList()
         Traceback (most recent call last):
         music21.repeat.NoInternalStreamException: RepeatFinder must be initialized with a stream
@@ -2197,25 +2189,26 @@ class RepeatFinder:
         compareList=[compare, compare + 1, compare + 2, ...]), where
         measure sourceList[i] is the same as measure compareList[i]
 
-        Inputs:
-        measures -  A list returned from getMeasureSimilarityList.
-        source   -  The measure number which you are considering
-        compare  -  The measure number which is compared to the source measure
-                    (this is a repeat of the source measure)
-        resDict  -  A dictionary of memoized results where for each key (i,j),
-                    there is stored a tuple
-                    ([i, i + 1, i + 2, ...], [j, j + 1, j + 2, ...])
-                    where measures i and j are equal,
-                    and measure i + 1 and j + 1 are equal,
-                    and measures i + 2 and j + 2 are equal, etc.
-        useDict  -  A dictionary for each input that maps to False if
-                    and only if the function calls
-                    the same input m and i. Has the result that if resDict((i, j)) maps to
-                    something like ([i, i + 1, i + 2...],
-                    [j, j + 1, j + 2, ...]), then
-                    useDict(i,j) is only False if resDict(i - 1, j - 1) is
-                    something like ([i - 1, i, i + 1, ...],
-                    [j - 1, j, j + 1, ..])
+        Inputs::
+
+            measures -  A list returned from getMeasureSimilarityList.
+            source   -  The measure number which you are considering
+            compare  -  The measure number which is compared to the source measure
+                        (this is a repeat of the source measure)
+            resDict  -  A dictionary of memoized results where for each key (i,j),
+                        there is stored a tuple
+                        ([i, i + 1, i + 2, ...], [j, j + 1, j + 2, ...])
+                        where measures i and j are equal,
+                        and measure i + 1 and j + 1 are equal,
+                        and measures i + 2 and j + 2 are equal, etc.
+            useDict  -  A dictionary for each input that maps to False if
+                        and only if the function calls
+                        the same input m and i. Has the result that if resDict((i, j)) maps to
+                        something like ([i, i + 1, i + 2...],
+                        [j, j + 1, j + 2, ...]), then
+                        useDict(i,j) is only False if resDict(i - 1, j - 1) is
+                        something like ([i - 1, i, i + 1, ...],
+                        [j - 1, j, j + 1, ..])
 
         See getSimilarMeasureGroupsFromList documentation for tests.
         '''
@@ -2394,18 +2387,14 @@ class RepeatFinder:
         ...    s.append(m)
         >>> #_DOCS_SHOW s.show()
 
-
         .. image:: images/repeat-RepeatFinderDSCH.*
             :width: 600
 
         >>> s2 = repeat.RepeatFinder(s).simplify()
         >>> #_DOCS_SHOW s2.show()
 
-
         .. image:: images/repeat-RepeatFinderDSCHsimplified.*
             :width: 600
-
-
 
         OMIT_FROM_DOCS
 

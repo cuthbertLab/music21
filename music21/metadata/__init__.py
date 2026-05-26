@@ -1144,7 +1144,6 @@ class Metadata(base.Music21Object):
         >>> md.search('opl(.*)cott')
         (True, 'composer')
 
-
         * New in v4: use a keyword argument to search that field directly:
 
         >>> md.search(composer='Joplin')
@@ -2345,7 +2344,6 @@ class Metadata(base.Music21Object):
 
         >>> metadata.Metadata.convertValue('title', 21.5)
         <music21.metadata.primitives.Text 21.5>
-
 
         If it is already the appropriate type, no change is made
 

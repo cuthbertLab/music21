@@ -89,7 +89,6 @@ class Derivation(SlottedObjectMixin):
     >>> sNew.derivation.method
     '__deepcopy__'
 
-
     >>> s1 = stream.Stream()
     >>> s1.id = 'DerivedStream'
     >>> d1 = derivation.Derivation(s1)
