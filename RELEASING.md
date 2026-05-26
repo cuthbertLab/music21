@@ -23,23 +23,23 @@ Install separately:
    `metadata`, etc., so do not skip the next step.
 
 3. Run `uv run documentation/testDocumentation.py`, then fix errors.
-   - You cannot check whether fixed tests work while it is still running.
-   - This takes a while, runs single-core, and then almost always needs code
-     patches, so allocate time (~2 min on an M4). Start working on the
-     announcement while it runs.
-   - You cannot run steps 2 and 3 in parallel, since metadata changes often
-     cause documentation changes.
+    - You cannot check whether fixed tests work while it is still running.
+    - This takes a while, runs single-core, and then almost always needs code
+      patches, so allocate time (~2 min on an M4). Start working on the
+      announcement while it runs.
+    - You cannot run steps 2 and 3 in parallel, since metadata changes often
+      cause documentation changes.
 
 4. `uv run music21/test/warningMultiprocessTest.py` for the lowest and highest
    supported Python versions — fix all warnings.
 
 5. Run `from music21.test import treeYield`, then:
-   - `treeYield.find_all_non_hashable_m21objects()` and check that the returned
-     set is empty. (It prints a bunch of module names, but only the final
-     `set()` being empty matters.)
-   - Then the same for `treeYield.find_all_non_default_instantiation_m21objects()`.
-     If that one isn't empty it is not a bug, but it's nice to keep it so that
-     `Music21Object`s don't need args.
+    - `treeYield.find_all_non_hashable_m21objects()` and check that the returned
+      set is empty. (It prints a bunch of module names, but only the final
+      `set()` being empty matters.)
+    - Then the same for `treeYield.find_all_non_default_instantiation_m21objects()`.
+      If that one isn't empty it is not a bug, but it's nice to keep it so that
+      `Music21Object`s don't need args.
 
 6. Commit and wait for results on GitHub Actions.
    (Normally not necessary — it's slower and mostly duplicates
@@ -86,7 +86,7 @@ Install separately:
 
 18. Create a new release on GitHub (using the tag just created) and upload the
     non-wheel files created here and the docs.
-    Drag in this order: `.tar.gz` (wait to finish), `-docs.zip` (wait),
+    Drag in this order: `.tar.gz` (wait to finish), `-docs.zip` (wait), `.whl` (wait), and
     `no-corpus.tar.gz`. Finish this before doing the next step, even though it
     looks like it could be done in parallel.
 
@@ -94,29 +94,29 @@ Install separately:
 
 20. Do the same for the `.whl` file (but not for the no-corpus file).
 
-   - You will need a `~/.pypirc` file:
+    - You will need a `~/.pypirc` file:
 
-     ```ini
-     [distutils]
-     index-servers =
-         pypi
+      ```ini
+      [distutils]
+      index-servers =
+          pypi
 
-     [pypi]
-     username:__token__
-     password:pypi-API_TOKEN
-     ```
+      [pypi]
+      username:__token__
+      password:pypi-API_TOKEN
+      ```
 
-     The "password" is the API token you just created — if you lose this file you
-     also lose the API token and have to create it again. This is all very poorly
-     documented. It is not the "Unique identifier" you see in the "API Tokens"
-     tab on the "Your Account" page — super confusing.
+    - The "password" is the API token you just created — if you lose this file you
+      also lose the API token and have to create it again. This is all very poorly
+      documented. It is not the "Unique identifier" you see in the "API Tokens"
+      tab on the "Your Account" page — super confusing.
 
 21. Delete the two `.tar.gz` files and the `.whl` file in `dist/` (and the docs).
 
 22. For starting a new major release, create a GitHub branch to preserve the old
     one for patches, etc., especially during beta releases.
 
-23. Immediately increment the number in `_version.py` and run tests on it to
+23. Immediately increment the number in `_version.py` and run test on VERSION_STR in base.py to
     prepare for the next release.
 
 24. Announce on the blog and to the list.
