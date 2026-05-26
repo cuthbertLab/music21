@@ -81,6 +81,8 @@ del minPythonVersionStr
 
 
 __all__ = [
+    '__version__',
+
     # testing routines
     'mainTest',
 
@@ -177,6 +179,7 @@ __all__ = [
     'Music21Object',
     'ElementWrapper',
     'VERSION',
+    'VERSION_STR',
 ]
 
 # ------------------------------------------------------------------------------

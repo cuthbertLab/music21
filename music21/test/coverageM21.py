@@ -13,7 +13,7 @@ from __future__ import annotations
 import sys
 
 omit_modules = [
-    'dist/dist.py',
+    'scripts/buildNoCorpus.py',
     'music21/test/*',
     'music21/configure.py',
     'music21/figuredBass/examples.py',
