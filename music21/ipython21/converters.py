@@ -142,7 +142,6 @@ def displayMusic21jMIDI(
         binaryMidiData: bytes = f.read()
 
     htmlOutput = htmlOutputForMidi(binaryMidiData)
-    displayMusic21jMIDIMarimo(htmlOutput)
 
     if runningInJupyterOrColab():
         displayMusic21jMIDIJupyter(htmlOutput)
