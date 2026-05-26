@@ -2,6 +2,8 @@
 # music21 documentation build configuration file, created by
 # sphinx-quickstart on Fri Jun 14 16:48:40 2013.
 #
+# conf.py
+#
 # This file is execfile()d with the current directory set to its containing dir.
 #
 # Note that not all possible configuration values are present in this
@@ -271,7 +273,9 @@ linkcheck_ignore = [
     # does not find anchor immediately.  should wait longer
     r'https://github.com/cuthbertLab/music21/blob/master/README.md#community-code-of-conduct',
     r'https://docutils.sourceforge.io/rst.html',  # anti bot?
-    r'https://id.loc.gov/vocabulary/relators.html', # LOC + captcha? Shame!
+    r'https://id.loc.gov/vocabulary/relators.html',  # LOC + captcha? Shame!
+    r'https://musescore.com/',  # being picky:
+
 ]
 
 # -- Options for manual page output --------------------------------------------
