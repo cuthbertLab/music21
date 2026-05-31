@@ -2556,6 +2556,11 @@ class MeasureParser(SoundTagMixin, XMLParserBase):
                 pass
             except AttributeError:  # a normal number
                 pass
+            if mxObject.tag in ('staff-layout',
+                                'staff-details',
+                                'clef'):
+                # for this subset of number'ed tags, no number means staff 1
+                return 1
             return NO_STAFF_ASSIGNED
         else:
             return NO_STAFF_ASSIGNED
