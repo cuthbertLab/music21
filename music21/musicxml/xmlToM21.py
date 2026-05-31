@@ -6017,7 +6017,7 @@ class MeasureParser(SoundTagMixin, XMLParserBase):
         >>> MP = musicxml.xmlToM21.MeasureParser()
         >>> MP.handleClef(mxClef)
         >>> MP.lastClefs
-        {0: <music21.clef.TrebleClef>}
+        {0: <music21.clef.TrebleClef>, 1: <music21.clef.TrebleClef>}
 
         >>> mxClefBC = ET.fromstring('<clef number="2"><sign>F</sign><line>4</line></clef>')
         >>> MP.handleClef(mxClefBC)
