@@ -4575,12 +4575,7 @@ class Test(unittest.TestCase):
     def test_key_cache_mode_not_just_name(self):
         '''
         Regression test: the Key cache must distinguish modes that share a
-        tonic name, not just upper/lower case.  Previously a `C lydian` Key
-        was cached under 'C' (because `tonicPitchNameWithCase` falls back to
-        the upper-case tonic for non-major/minor modes), so a subsequent
-        request for `C major` would return the cached lydian Key.
-
-        This test was AI-assisted.
+        tonic name (like C major and C lydian), not just upper/lower case.
         '''
         # lydian requested first, then major
         _keyCache.clear()
@@ -4618,10 +4613,8 @@ class Test(unittest.TestCase):
 
     def test_get_key_from_cache_mode(self):
         '''
-        `_getKeyFromCache` builds major/minor keys from string case and must
-        not be polluted by exotic-mode Keys stored under the bare tonic name.
-
-        This test was AI-assisted.
+        Test that `_getKeyFromCache` is
+        not polluted by exotic-mode Keys stored under the bare tonic name.
         '''
         _keyCache.clear()
         # populate the cache with a non-major/minor mode keyed on tonic 'C'
