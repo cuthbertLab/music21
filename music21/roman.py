@@ -70,6 +70,22 @@ FIGURES_IMPLYING_ROOT: tuple[tuple[int, ...], ...] = (
 )
 
 
+def _keyCacheKey(keyObj: key.Key) -> str:
+    '''
+    Return the string used to cache a Key in `_keyCache`.
+
+    `tonicPitchNameWithCase` only distinguishes major (upper case) from minor
+    (lower case); every other mode falls back to the upper-case tonic, which
+    collides with the major key on the same tonic.  For major and minor we keep
+    the case-only form so that string lookups like ``_getKeyFromCache('C')``
+    still hit; any other mode is qualified with its mode name so that, for
+    example, ``C lydian`` cannot be returned when ``C major`` was requested.
+    '''
+    if keyObj.mode in ('major', 'minor'):
+        return keyObj.tonicPitchNameWithCase
+    return str(keyObj)
+
+
 def _getKeyFromCache(keyStr: str) -> key.Key:
     '''
     get a key from the cache if it is there; otherwise
@@ -83,7 +99,7 @@ def _getKeyFromCache(keyStr: str) -> key.Key:
         keyObj = copy.copy(_keyCache[keyStr])
     else:
         keyObj = key.Key(keyStr)
-        _keyCache[keyObj.tonicPitchNameWithCase] = keyObj
+        _keyCache[_keyCacheKey(keyObj)] = keyObj
     return keyObj
 
 
@@ -3470,9 +3486,10 @@ class RomanNumeral(harmony.Harmony):
                 )
             if 'Key' in keyClasses:
                 # good to go
-                if keyOrScale.tonicPitchNameWithCase not in _keyCache:
+                cacheKey = _keyCacheKey(keyOrScale)
+                if cacheKey not in _keyCache:
                     # store for later
-                    _keyCache[keyOrScale.tonicPitchNameWithCase] = keyOrScale
+                    _keyCache[cacheKey] = keyOrScale
             elif 'Scale' in keyClasses:
                 # Need unique 'hash' for each scale. Names is not enough as there are
                 # multiple scales with the same name but different pitches.
@@ -4554,6 +4571,63 @@ class Test(unittest.TestCase):
         mcs = scale.ConcreteScale('c', pitches=('C', 'D', 'E-', 'F', 'G', 'A', 'B'))
         rn = mcs.romanNumeral('IV7')
         self.assertEqual([p.unicodeName for p in rn.pitches], ['F', 'A', 'C', 'E♭'])
+
+    def test_key_cache_mode_not_just_name(self):
+        '''
+        Regression test: the Key cache must distinguish modes that share a
+        tonic name, not just upper/lower case.  Previously a `C lydian` Key
+        was cached under 'C' (because `tonicPitchNameWithCase` falls back to
+        the upper-case tonic for non-major/minor modes), so a subsequent
+        request for `C major` would return the cached lydian Key.
+
+        This test was AI-assisted.
+        '''
+        # lydian requested first, then major
+        _keyCache.clear()
+        _scaleCache.clear()
+        lydianFirst = RomanNumeral('I', key.Key('C', 'lydian'))
+        self.assertEqual(lydianFirst.key.mode, 'lydian')
+        majorAfter = RomanNumeral('I', 'C')
+        self.assertEqual(majorAfter.key.mode, 'major')
+        self.assertEqual([p.name for p in majorAfter.pitches], ['C', 'E', 'G'])
+
+        # major requested first, then lydian (the reverse order)
+        _keyCache.clear()
+        _scaleCache.clear()
+        majorFirst = RomanNumeral('I', 'C')
+        self.assertEqual(majorFirst.key.mode, 'major')
+        lydianAfter = RomanNumeral('I', key.Key('C', 'lydian'))
+        self.assertEqual(lydianAfter.key.mode, 'lydian')
+
+        # both modes can be cached simultaneously without clobbering each other
+        _keyCache.clear()
+        _scaleCache.clear()
+        cLydian = RomanNumeral('I', key.Key('C', 'lydian'))
+        cMajor = RomanNumeral('I', key.Key('C', 'major'))
+        cMinor = RomanNumeral('i', key.Key('c', 'minor'))
+        self.assertEqual(cLydian.key.mode, 'lydian')
+        self.assertEqual(cMajor.key.mode, 'major')
+        self.assertEqual(cMinor.key.mode, 'minor')
+
+        # all three live under distinct cache keys; the mode-qualified 'C lydian'
+        # entry does not clobber the case-only 'C' (major) / 'c' (minor) entries
+        self.assertEqual(set(_keyCache), {'C', 'c', 'C lydian'})
+        self.assertEqual(_keyCache['C'].mode, 'major')
+        self.assertEqual(_keyCache['c'].mode, 'minor')
+        self.assertEqual(_keyCache['C lydian'].mode, 'lydian')
+
+    def test_get_key_from_cache_mode(self):
+        '''
+        `_getKeyFromCache` builds major/minor keys from string case and must
+        not be polluted by exotic-mode Keys stored under the bare tonic name.
+
+        This test was AI-assisted.
+        '''
+        _keyCache.clear()
+        # populate the cache with a non-major/minor mode keyed on tonic 'C'
+        _keyCache[_keyCacheKey(key.Key('C', 'lydian'))] = key.Key('C', 'lydian')
+        self.assertEqual(_getKeyFromCache('C').mode, 'major')
+        self.assertEqual(_getKeyFromCache('c').mode, 'minor')
 
 
 class TestExternal(unittest.TestCase):
