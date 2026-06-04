@@ -4833,6 +4833,9 @@ class MeasureParser(SoundTagMixin, XMLParserBase):
                                               remainderFraction.numerator)
             remainderTuplet.durationNormal = timeModTup.durationNormal
             remainderTuplet.durationActual = timeModTup.durationActual
+            remainderTuplet.bracket = False
+            remainderTuplet.tupletActualShow = None
+            remainderTuplet.tupletNormalShow = None
             returnTuplets[-1] = remainderTuplet
 
         # now we can remove stops for future notes.
