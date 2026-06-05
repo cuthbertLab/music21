@@ -1082,26 +1082,71 @@ class Test(unittest.TestCase):
 
     def testTremoloImpliedTuplet(self):
         '''
-        Test that between-note tremolos with time-modification of 2:1 do not get tuplets with show-number None, as they should not be drawn as tuplets.
+        Test that between-note tremolos with time-modification of 2:1 do not
+        get tuplets with show-number None, as they should not be drawn as
+        tuplets.
         '''
         from music21 import converter
 
         mxString = '''<?xml version="1.0" encoding="UTF-8"?>
-        <score-partwise version="4.0">
-        <part-list><score-part id="P1"><part-name>P</part-name></score-part></part-list>
-        <part id="P1"><measure number="1">
-            <attributes><divisions>256</divisions>
-            <time><beats>2</beats><beat-type>2</beat-type></time>
-            <clef><sign>F</sign><line>4</line></clef></attributes>
-            <note><pitch><step>E</step><octave>3</octave></pitch>
-            <duration>512</duration><voice>1</voice><type>whole</type>
-            <time-modification><actual-notes>2</actual-notes><normal-notes>1</normal-notes></time-modification>
-            <notations><ornaments><tremolo type="start">4</tremolo></ornaments></notations></note>
-            <note><pitch><step>G</step><octave>3</octave></pitch>
-            <duration>512</duration><voice>1</voice><type>whole</type>
-            <time-modification><actual-notes>2</actual-notes><normal-notes>1</normal-notes></time-modification>
-            <notations><ornaments><tremolo type="stop">4</tremolo></ornaments></notations></note>
-        </measure></part></score-partwise>'''
+                    <score-partwise version="4.0">
+                    <part-list>
+                        <score-part id="P1">
+                        <part-name>P</part-name>
+                        </score-part>
+                    </part-list>
+                    <part id="P1">
+                        <measure number="1">
+                        <attributes>
+                            <divisions>256</divisions>
+                            <time>
+                            <beats>2</beats>
+                            <beat-type>2</beat-type>
+                            </time>
+                            <clef>
+                            <sign>F</sign>
+                            <line>4</line>
+                            </clef>
+                        </attributes>
+                        <note>
+                            <pitch>
+                            <step>E</step>
+                            <octave>3</octave>
+                            </pitch>
+                            <duration>512</duration>
+                            <voice>1</voice>
+                            <type>whole</type>
+                            <time-modification>
+                            <actual-notes>2</actual-notes>
+                            <normal-notes>1</normal-notes>
+                            </time-modification>
+                            <notations>
+                            <ornaments>
+                                <tremolo type="start">4</tremolo>
+                            </ornaments>
+                            </notations>
+                        </note>
+                        <note>
+                            <pitch>
+                            <step>G</step>
+                            <octave>3</octave>
+                            </pitch>
+                            <duration>512</duration>
+                            <voice>1</voice>
+                            <type>whole</type>
+                            <time-modification>
+                            <actual-notes>2</actual-notes>
+                            <normal-notes>1</normal-notes>
+                            </time-modification>
+                            <notations>
+                            <ornaments>
+                                <tremolo type="stop">4</tremolo>
+                            </ornaments>
+                            </notations>
+                        </note>
+                        </measure>
+                    </part>
+                    </score-partwise>'''
 
         s = converter.parse(mxString, format='musicxml')
         tuplets = [n.duration.tuplets[0] for n in s.recurse().notes]
