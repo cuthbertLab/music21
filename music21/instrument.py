@@ -200,7 +200,7 @@ class Instrument(base.Music21Object):
             new.instrumentIdRandomize()
         return new
 
-    def bestName(self):
+    def bestName(self) -> str|None:
         '''
         Find a viable name, looking first at instrument, then part, then
         abbreviations.

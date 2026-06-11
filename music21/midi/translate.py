@@ -227,10 +227,10 @@ def getStartEvents(
     events: list[DeltaTime|MidiEvent] = []
     if isinstance(instrumentObj, Conductor):
         return events
-    elif instrumentObj is None or instrumentObj.bestName() is None:
+    elif instrumentObj is None or (bestName := instrumentObj.bestName()) is None:
         partName = ''
     else:
-        partName = instrumentObj.bestName()
+        partName = bestName
 
     dt = DeltaTime(midiTrack, channel=channel)
     events.append(dt)
