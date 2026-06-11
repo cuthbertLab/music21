@@ -601,7 +601,8 @@ def measureToBraille(music21Measure,
     '''
     measureToTranscribe = music21Measure
     if not inPlace:
-        measureToTranscribe = music21Measure.makeNotation(cautionaryNotImmediateRepeat=False)
+        measureToTranscribe = music21Measure.makeNotation(
+            cautionaryNotImmediateRepeat=False, minimumPastMeasurePitches=0)
     music21Part = stream.Part()
     music21Part.append(measureToTranscribe)
     return partToBraille(music21Part,
@@ -650,7 +651,8 @@ def partToBraille(music21Part,
     '''
     partToTranscribe = music21Part
     if not inPlace:
-        partToTranscribe = music21Part.makeNotation(cautionaryNotImmediateRepeat=False)
+        partToTranscribe = music21Part.makeNotation(
+            cautionaryNotImmediateRepeat=False, minimumPastMeasurePitches=0)
     allSegments = segment.findSegments(partToTranscribe,
                                        cancelOutgoingKeySig=cancelOutgoingKeySig,
                                        descendingChords=descendingChords,
@@ -714,10 +716,12 @@ def keyboardPartsToBraille(keyboardScore,
     staffLower = parts[1]
     upperPartToTranscribe = staffUpper
     if not inPlace:
-        upperPartToTranscribe = staffUpper.makeNotation(cautionaryNotImmediateRepeat=False)
+        upperPartToTranscribe = staffUpper.makeNotation(
+            cautionaryNotImmediateRepeat=False, minimumPastMeasurePitches=0)
     lowerPartToTranscribe = staffLower
     if not inPlace:
-        lowerPartToTranscribe = staffLower.makeNotation(cautionaryNotImmediateRepeat=False)
+        lowerPartToTranscribe = staffLower.makeNotation(
+            cautionaryNotImmediateRepeat=False, minimumPastMeasurePitches=0)
     rhSegments = segment.findSegments(upperPartToTranscribe,
                                       setHand='right',
                                       cancelOutgoingKeySig=cancelOutgoingKeySig,

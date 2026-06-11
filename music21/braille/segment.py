@@ -2431,7 +2431,7 @@ class Test(unittest.TestCase):
         from music21 import converter
 
         tn = converter.parse("tinynotation: 3/4 c4 c c e e e g g g c'2.")
-        tn = tn.makeNotation(cautionaryNotImmediateRepeat=False)
+        tn = tn.makeNotation(cautionaryNotImmediateRepeat=False, minimumPastMeasurePitches=0)
 
         rawSegList = getRawSegments(tn)
         unused = str(rawSegList[0])

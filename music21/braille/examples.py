@@ -171,7 +171,8 @@ def happyBirthday():
     hb.insert(0, key.KeySignature(1))
     hb.insert(0, tempo.TempoText('Brightly'))
     hb.insert(0, tempo.MetronomeMark(number=120, referent=note.Note(type='quarter')))
-    hb.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
+    hb.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False,
+                    minimumPastMeasurePitches=0)
     return hb
 
 # ------------------------------------------------------------------------------

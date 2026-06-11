@@ -2972,6 +2972,144 @@ class Test(unittest.TestCase):
         for n in s.notes:
             self.assertFalse(n.pitch.accidental.displayStatus)
 
+    def testMakeAccidentalsPastMeasureLookback(self):
+        '''
+        A sparse measure (here, one whole note) no longer erases the
+        cautionary-accidental context of the measures just before it.
+        AI-assisted (Claude).
+        '''
+        p = converter.parse('tinyNotation: 4/4 c#4 d e f   g1   c1')
+        pHistorical = copy.deepcopy(p)
+
+        p.makeAccidentals(inPlace=True, overrideStatus=True)
+        lastC = list(p.recurse().notes)[-1]
+        self.assertIsNotNone(lastC.pitch.accidental)
+        self.assertEqual(lastC.pitch.accidental.name, 'natural')
+        self.assertTrue(lastC.pitch.accidental.displayStatus)
+
+        # the historical behavior looked back exactly one measure, so the
+        # whole-note G hid the C-sharp from view
+        pHistorical.makeAccidentals(
+            inPlace=True, overrideStatus=True, minimumPastMeasurePitches=0)
+        lastCHistorical = list(pHistorical.recurse().notes)[-1]
+        accidental = lastCHistorical.pitch.accidental
+        self.assertTrue(accidental is None or accidental.displayStatus is not True)
+
+    def testUpdateFollowingAccidentalsCascade(self):
+        '''
+        A change cascades through a sparse intervening measure: the scan must
+        not stop at a changeless measure whose pitch count is too small to
+        block the lookback context.  AI-assisted (Claude).
+        '''
+        from music21.stream import makeNotation as makeNotationModule
+        p = converter.parse('tinyNotation: 4/4 c#4 d e f   g1   c1')
+        p.makeAccidentals(inPlace=True, overrideStatus=True)
+        notes = list(p.recurse().notes)
+        lastC = notes[-1]
+        self.assertTrue(lastC.pitch.accidental.displayStatus)
+
+        # remove the C-sharp: the courtesy natural two measures later
+        # (reached through the sparse G measure) must be withdrawn
+        notes[0].pitch.name = 'C'
+        changed = makeNotationModule.updateFollowingAccidentals(
+            p, notes[0].pitch)
+        self.assertIn(lastC.pitch, changed)
+        finalAccidental = lastC.pitch.accidental
+        self.assertTrue(finalAccidental is None or not finalAccidental.displayStatus)
+
+    def testUpdateFollowingAccidentalsScore(self):
+        from music21.stream import makeNotation as makeNotationModule
+        sc = corpus.parse('bwv66.6')
+        n = sc.parts[0].recurse().notes.first()
+        with self.assertRaises(StreamException):
+            makeNotationModule.updateFollowingAccidentals(sc, n.pitch)
+        # but calling on the part works
+        makeNotationModule.updateFollowingAccidentals(
+            sc.parts[0], n.pitch)
+
+    def buildRandomAccidentalPart(self, rng):
+        '''
+        Like buildRandomAccidentalStream, but a Part with possible key
+        signatures and without preset displayStatus/displayType values
+        (a freshly entered, never-displayed score).  AI-assisted (Claude).
+        '''
+        p = Part()
+        pitchNames = ('C', 'C#', 'D-', 'D', 'E-', 'E', 'C##')
+
+        def cleanPitch():
+            innerP = pitch.Pitch(rng.choice(pitchNames))
+            innerP.octave = rng.choice([3, 4, 4, 4, 5])
+            return innerP
+
+        nMeasures = rng.randint(3, 6)
+        for i in range(nMeasures):
+            m = Measure()
+            if (i == 0 and rng.random() < 0.4) or rng.random() < 0.15:
+                m.append(key.KeySignature(rng.randint(-3, 3)))
+            for _ in range(rng.randint(1, 8)):
+                roll = rng.random()
+                if roll < 0.1:
+                    m.append(note.Rest())
+                    continue
+
+                if roll < 0.22:
+                    c = chord.Chord([cleanPitch() for _ in range(rng.randint(2, 3))])
+                    if rng.random() < 0.15:
+                        c.tie = tie.Tie('start')
+                    m.append(c)
+                else:
+                    n = note.Note()
+                    n.pitch = cleanPitch()
+                    if rng.random() < 0.15:
+                        n.tie = tie.Tie('start')
+                    m.append(n)
+            p.append(m)
+        return p
+
+    def testUpdateFollowingAccidentalsRandom(self):
+        '''
+        Changing a random pitch and rescanning forward must give the same
+        display everywhere as editing the same pitch in a never-displayed
+        copy and running makeAccidentals from scratch.  AI-assisted (Claude).
+        '''
+        from music21.stream import makeNotation as makeNotationModule
+        rng = random.Random(112233)
+        pitchNames = ('C', 'C#', 'D-', 'D', 'E-', 'E')
+        for trial in range(60):
+            pClean = self.buildRandomAccidentalPart(rng)
+            pEdited = copy.deepcopy(pClean)
+            pEdited.makeAccidentals(inPlace=True)
+
+            editedPitches = [p for n in pEdited.recurse().notes for p in n.pitches]
+            if not editedPitches:
+                continue
+            editIndex = rng.randrange(len(editedPitches))
+            newName = rng.choice(pitchNames)
+
+            target = editedPitches[editIndex]
+            oldStep = target.step
+            target.name = newName
+            makeNotationModule.updateFollowingAccidentals(
+                pEdited, target, oldStep=oldStep)
+
+            # oracle: same edit on the never-displayed copy, then a full
+            # makeAccidentals run
+            cleanPitches = [p for n in pClean.recurse().notes for p in n.pitches]
+            cleanPitches[editIndex].name = newName
+            pClean.makeAccidentals(inPlace=True)
+
+            for idx, (pEd, pCl) in enumerate(zip(editedPitches, cleanPitches)):
+                accEd = pEd.accidental
+                accCl = pCl.accidental
+                self.assertEqual(
+                    (accEd.name if accEd else None,
+                     accEd.displayStatus if accEd else None),
+                    (accCl.name if accCl else None,
+                     accCl.displayStatus if accCl else None),
+                    f'trial={trial} editIndex={editIndex} newName={newName} '
+                    + f'idx={idx} pitch={pEd.nameWithOctave}'
+                )
+
     def testScaleOffsetsBasic(self):
         def procCompare(s_inner, scalar, match):
             oListSrc = [e.offset for e in s_inner]

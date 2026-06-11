@@ -12,9 +12,11 @@
 # -----------------------------------------------------------------------------
 from __future__ import annotations
 
+from collections import deque
 from collections.abc import Iterable, Generator
 import contextlib
 import copy
+import enum
 import typing as t
 import unittest
 
@@ -1641,6 +1643,664 @@ def getTiePitchSet(prior: 'music21.note.NotRest') -> set[str]|None:
         tiePitchSet.add(n.pitch.nameWithOctave)
     return tiePitchSet
 
+
+class WalkAction(enum.Enum):
+    '''
+    Actions arising from one comparison in the reverse walk over past
+    pitches in AccidentalDisplayTracker.updateAccidentalDisplay, mirroring
+    the `return` / `break` / `continue` statements in the reverse walk of
+    pitch.Pitch.updateAccidentalDisplay.
+    '''
+    RETURN = enum.auto()
+    BREAK = enum.auto()
+    CONTINUE = enum.auto()
+
+
+class AccidentalDisplayTracker:
+    '''
+    An object that tracks the pitches sounded so far in a measure (and in the
+    immediately preceding measure) and decides whether each new pitch needs to
+    display its accidental, exactly as
+    :meth:`~music21.pitch.Pitch.updateAccidentalDisplay` would, but much faster
+    over a whole stream.
+
+    Where `Pitch.updateAccidentalDisplay` rescans the entire list of past
+    pitches for every note (making :meth:`~music21.stream.base.Stream.makeAccidentals`
+    quadratic in the length of a measure), this tracker indexes past pitches in
+    a deque per diatonic step.  Since only pitches sharing a step (in any
+    octave) can affect an accidental-display decision, each decision touches
+    only the handful of relevant past notes.  Runs of repeated identical
+    pitches are collapsed, so even pathological measures stay fast.
+
+    The tracker also maintains plain ``pitchPast`` and ``pitchPastMeasure``
+    lists, identical to the lists that `Stream.makeAccidentals` historically
+    maintained, so that code that needs the old list interface (such as
+    :func:`~music21.stream.makeNotation.makeOrnamentalAccidentals`) keeps
+    working; call :meth:`syncPitchPast` after appending to ``pitchPast``
+    directly.
+
+    The keyword arguments have the same meanings as in
+    :meth:`~music21.stream.base.Stream.makeAccidentals`.
+
+    >>> ksAltered = key.KeySignature(2).alteredPitches
+    >>> tracker = stream.makeNotation.AccidentalDisplayTracker(alteredPitches=ksAltered)
+    >>> for pName in ('a#4', 'c#4', 'c4'):
+    ...     tracker.addPastPitch(pitch.Pitch(pName))
+    >>> a = pitch.Pitch('a4')
+    >>> tracker.updateAccidentalDisplay(a)
+    >>> a.accidental, a.accidental.displayStatus
+    (<music21.pitch.Accidental natural>, True)
+
+    Calling :meth:`advanceMeasure` moves the tracked pitches into
+    previous-measure context:
+
+    >>> tracker.addPastPitch(a)
+    >>> tracker.advanceMeasure()
+    >>> tracker.pitchPast
+    []
+    >>> len(tracker.pitchPastMeasure)
+    4
+
+    Previous-measure context is kept one whole measure at a time, and sparse
+    measures do not wipe out the context before them: on each
+    :meth:`advanceMeasure`, the most recent measures are retained until the
+    context holds at least `minimumPastMeasurePitches` pitches (but always at
+    least the one immediately previous measure).  Here, a measure containing
+    one whole note keeps the four pitches above in context as well:
+
+    >>> tracker.addPastPitch(pitch.Pitch('e5'))
+    >>> tracker.advanceMeasure()
+    >>> len(tracker.pitchPastMeasure)
+    5
+
+    Pass ``minimumPastMeasurePitches=0`` for the historical behavior of
+    exactly one measure of context.
+
+    * New in v10.5.  AI-assisted (Claude).
+    '''
+
+    def __init__(
+        self,
+        *,
+        pitchPast: list[pitch.Pitch]|None = None,
+        pitchPastMeasure: list[pitch.Pitch]|None = None,
+        alteredPitches: Iterable[pitch.Pitch]|None = None,
+        cautionaryPitchClass: bool = True,
+        cautionaryAll: bool = False,
+        overrideStatus: bool = False,
+        cautionaryNotImmediateRepeat: bool = True,
+        minimumPastMeasurePitches: int = 4,
+    ) -> None:
+        self.cautionaryPitchClass: bool = cautionaryPitchClass
+        self.cautionaryAll: bool = cautionaryAll
+        self.overrideStatus: bool = overrideStatus
+        self.cautionaryNotImmediateRepeat: bool = cautionaryNotImmediateRepeat
+        self.minimumPastMeasurePitches: int = minimumPastMeasurePitches
+
+        # digest of alteredPitches: which steps are altered, and the
+        # accidental names altering each step.
+        self._alteredStepSet: set[str] = set()
+        self._alteredNamesByStep: dict[str, set[str]] = {}
+        if alteredPitches is not None:
+            for ap in alteredPitches:
+                self._alteredStepSet.add(ap.step)
+                apAccidental = ap.accidental
+                if apAccidental is not None:
+                    self._alteredNamesByStep.setdefault(ap.step, set()).add(apAccidental.name)
+
+        # full histories, for compatibility with list-based consumers.
+        # pitchPast is kept as the same (mutable) list object passed in.
+        self.pitchPast: list[pitch.Pitch] = pitchPast if pitchPast is not None else []
+        self.pitchPastMeasure: list[pitch.Pitch] = (
+            pitchPastMeasure if pitchPastMeasure is not None else []
+        )
+        # the previous-measure context, one chunk (list) per measure, so that
+        # advanceMeasure can retain whole recent measures while the context
+        # is sparse.  An explicitly passed pitchPastMeasure counts as one chunk.
+        self._pastChunks: deque[list[pitch.Pitch]] = deque()
+        if self.pitchPastMeasure:
+            self._pastChunks.append(self.pitchPastMeasure)
+
+        # per-step indexes.  In-measure deques hold (position, pitch) pairs;
+        # positions count pitches globally (rests are not counted, matching
+        # the historical pitchPast list).  Past-measure deques hold the same
+        # pair shape, but positions there are never consulted.
+        self._byStep: dict[str, deque[tuple[int, pitch.Pitch]]] = {}
+        self._pastByStep: dict[str, deque[tuple[int, pitch.Pitch]]] = {}
+        self._lastPosByStep: dict[str, int] = {}
+        self._nextPos: int = 0
+        self._countInMeasure: int = 0
+        self._countPastMeasure: int = 0
+        self._ingestedLen: int = 0
+
+        for pPastMeasure in self.pitchPastMeasure:
+            self._ingestPastMeasurePitch(pPastMeasure)
+        self.syncPitchPast()
+
+    @staticmethod
+    def _accidentalsEquivalent(
+        acc1: 'pitch.Accidental|None',
+        acc2: 'pitch.Accidental|None',
+    ) -> bool:
+        '''
+        True if two accidentals are interchangeable for every display
+        decision about a *past* pitch: decisions read only the name and
+        displayStatus of past accidentals.  displayType is deliberately not
+        compared: the decision logic (here and in
+        pitch.Pitch.updateAccidentalDisplay) consults displayType only on the
+        pitch currently being decided, never on a past pitch, so two past
+        accidentals differing only in displayType shadow each other all the
+        same.
+        '''
+        if acc1 is None or acc2 is None:
+            return acc1 is None and acc2 is None
+        return acc1.name == acc2.name and acc1.displayStatus == acc2.displayStatus
+
+    def _ingestPastMeasurePitch(self, p: pitch.Pitch) -> None:
+        '''
+        Index a previous-measure pitch.  Adjacent equivalent entries collapse:
+        in past-measure context neither positions nor repeat-continuity are
+        ever consulted, so an entry shadowed by an equivalent newer one can
+        never influence a decision.
+        '''
+        self._countPastMeasure += 1
+        dq = self._pastByStep.get(p.step)
+        if dq is None:
+            dq = deque()
+            self._pastByStep[p.step] = dq
+        elif dq:
+            lastP = dq[-1][1]
+            if (lastP.nameWithOctave == p.nameWithOctave
+                    and self._accidentalsEquivalent(lastP.accidental, p.accidental)):
+                dq.pop()
+        dq.append((0, p))
+
+    def _ingestPitch(self, p: pitch.Pitch) -> None:
+        '''
+        Index a current-measure pitch that is already in self.pitchPast.
+        Strictly consecutive equivalent repetitions collapse: the newer entry
+        gives every later comparison (including repeat-continuity, which is
+        position-based) the same answers the older one would have.
+        '''
+        pos = self._nextPos
+        self._nextPos += 1
+        self._countInMeasure += 1
+        self._ingestedLen += 1
+        step = p.step
+        dq = self._byStep.get(step)
+        if dq is None:
+            dq = deque()
+            self._byStep[step] = dq
+        elif dq:
+            lastPos, lastP = dq[-1]
+            if (lastPos == pos - 1
+                    and lastP.nameWithOctave == p.nameWithOctave
+                    and self._accidentalsEquivalent(lastP.accidental, p.accidental)):
+                dq.pop()
+        dq.append((pos, p))
+        self._lastPosByStep[step] = pos
+
+    def addPastPitch(self, p: pitch.Pitch) -> None:
+        '''
+        Record a pitch as sounded, so that it affects future decisions.
+        (This does not decide the pitch's own accidental display: call
+        :meth:`updateAccidentalDisplay` first.)
+        '''
+        self.pitchPast.append(p)
+        self._ingestPitch(p)
+
+    def syncPitchPast(self) -> None:
+        '''
+        Index any pitches that were appended directly to the ``pitchPast``
+        list (for instance by
+        :func:`~music21.stream.makeNotation.makeOrnamentalAccidentals`).
+        '''
+        while self._ingestedLen < len(self.pitchPast):
+            self._ingestPitch(self.pitchPast[self._ingestedLen])
+
+    def advanceMeasure(self) -> None:
+        '''
+        Begin a new measure: the just-ended measure's pitches join the
+        previous-measure context and the current-measure history is cleared.
+        The newest measures are retained in the context, one whole measure at
+        a time, until it holds at least `minimumPastMeasurePitches` pitches
+        (always at least the one immediately previous measure); anything
+        older is forgotten.
+        '''
+        self._pastChunks.append(self.pitchPast)
+        while (len(self._pastChunks) > 1
+               and (sum(len(chunk) for chunk in self._pastChunks)
+                    - len(self._pastChunks[0])) >= self.minimumPastMeasurePitches):
+            self._pastChunks.popleft()
+
+        self._pastByStep = {}
+        self._countPastMeasure = 0
+        newPastMeasure: list[pitch.Pitch] = []
+        for chunk in self._pastChunks:
+            newPastMeasure.extend(chunk)
+        self.pitchPastMeasure = newPastMeasure
+        for p in newPastMeasure:
+            self._ingestPastMeasurePitch(p)
+
+        self.pitchPast = []
+        self._byStep = {}
+        self._countInMeasure = 0
+        self._ingestedLen = 0
+        # self._lastPosByStep deliberately persists: stale positions from
+        # earlier measures are always smaller than any new in-measure
+        # position, so they can never wrongly break a continuity run.
+
+    def updateAccidentalDisplay(
+        self,
+        p: pitch.Pitch,
+        *,
+        otherSimultaneousPitches: Iterable[pitch.Pitch]|None = None,
+        lastNoteWasTied: bool = False,
+    ) -> None:
+        '''
+        Decide whether `p` needs to display its accidental, given the pitches
+        tracked so far, setting ``p.accidental.displayStatus`` in place
+        (and creating a natural accidental if one is needed for display).
+
+        This is a per-step-indexed port of
+        :meth:`~music21.pitch.Pitch.updateAccidentalDisplay` (which remains
+        the way to run this decision for a single pitch against explicit
+        lists).  KEEP THE TWO IN SYNC: any change to the logic here or there
+        must be mirrored in the other, and both are compared on randomized
+        input by the differential tests in music21.stream.tests.
+        '''
+        # pylint: disable=too-many-statements
+        acc = p.accidental
+
+        def none_to_natural() -> None:
+            nonlocal acc
+            if acc is None:
+                acc = pitch.Accidental('natural')
+                p.accidental = acc
+
+        def set_displayStatus(newDisplayStatus: bool) -> None:
+            none_to_natural()
+            assert acc is not None  # mypy
+            acc.displayStatus = newDisplayStatus
+
+        def nameInKeySignature() -> bool:
+            # mirrors pitch.Pitch._nameInKeySignature(alteredPitches)
+            if acc is None:
+                return False
+            alteredNames = self._alteredNamesByStep.get(pStep)
+            return alteredNames is not None and acc.name in alteredNames
+
+        if not self.overrideStatus:  # go with what we have defined
+            if acc is not None and acc.displayStatus is not None:
+                return  # exit: already set, do not override
+
+        # remove the never possibilities.
+        if acc is not None and acc.displayType == 'never':
+            acc.displayStatus = False
+            return
+
+        if lastNoteWasTied is True:
+            if acc is not None:
+                acc.displayStatus = (acc.displayType == 'even-tied')
+            return  # exit: nothing more to do
+
+        pStep = p.step
+        pName = p.name
+        pOctave = p.octave
+        pNwo = p.nameWithOctave
+        stepInKs = pStep in self._alteredStepSet
+
+        if (
+            otherSimultaneousPitches
+            and self.cautionaryPitchClass
+            and any(pSimult.step == pStep and pSimult.pitchClass != p.pitchClass
+                    for pSimult in otherSimultaneousPitches)
+        ):
+            set_displayStatus(True)
+            return
+
+        # no pitches in the past at all
+        if self._countInMeasure + self._countPastMeasure == 0:
+            # if we have no past, we show the accidental if this pitch name
+            # is not in the alteredPitches list, or for naturals: if the
+            # step is IN the altered pitches
+            if (acc is not None
+                    and (self.overrideStatus or acc.displayStatus in (False, None))):
+                if acc.name == 'natural':
+                    acc.displayStatus = stepInKs
+                else:
+                    acc.displayStatus = not nameInKeySignature()
+
+            # in case display set to True and in alteredPitches, makeFalse
+            elif (acc is not None
+                  and acc.displayStatus is True
+                  and nameInKeySignature()):
+                acc.displayStatus = False
+
+            # if we have no accidental or a natural accidental,
+            # but our step matches a step in the key sig
+            # we need to show or add or an accidental.
+            elif (acc is None or acc.name == 'natural') and stepInKs:
+                set_displayStatus(True)
+            return  # do not search past
+
+        inMeasureDeque = self._byStep.get(pStep)
+
+        # pitches in the past in this measure:
+        # first search if the last pitch in our measure
+        # with the same step and at this octave contradicts this pitch.
+        # if so, then no matter what we need an accidental.
+        if inMeasureDeque:
+            for _unused, pPast in reversed(inMeasureDeque):
+                if pPast.octave == pOctave:
+                    # conflicting alters, need accidental and return
+                    if pPast.name != pName:
+                        set_displayStatus(True)
+                        return
+                    else:  # names are the same, skip this line of questioning
+                        break
+        # nope, no conflicting accidentals at this name and octave in the past
+
+        # here tied and always are treated the same; we assume that
+        # making ties sets the displayStatus, and thus we would not be
+        # overriding that display status here
+        if (self.cautionaryAll is True
+                or (acc is not None
+                    and acc.displayType in ('even-tied', 'always'))):
+            # show all accidentals, even if past encountered
+            set_displayStatus(True)
+            return  # do not search past
+
+        # should we display accidental if no previous accidentals have been displayed
+        # i.e. if it's the first instance of an accidental after a tie
+        displayAccidentalIfNoPreviousAccidentals = False
+        # store if a match was found and display set from past pitches
+        setFromPitchPast = False
+
+        def visitPastPitch(
+            pPast: pitch.Pitch,
+            pPastInMeasure: bool,
+            continuousRepeatsInMeasure: bool,
+        ) -> WalkAction:
+            '''
+            One reverse-walk comparison of p against a same-step past pitch,
+            mirroring the body of the backwards loop in
+            pitch.Pitch.updateAccidentalDisplay.  (Past pitches with other
+            steps need no comparison: there, the original loop body falls
+            through without effect.)
+            '''
+            nonlocal displayAccidentalIfNoPreviousAccidentals, setFromPitchPast
+            pPastAccidental = pPast.accidental
+            # store whether these match at the same octave; needed for some
+            # comparisons even if not matching pitchSpace
+            octaveMatch = (pOctave == pPast.octave)
+
+            # repeats of the same pitch immediately following, in the same measure
+            # where one previous pitch has displayStatus = True; don't display
+            if (continuousRepeatsInMeasure is True
+                    and pPastAccidental is not None
+                    and pPastAccidental.displayStatus is True):
+                # only needed if one has a natural and this does not
+                if acc is not None:
+                    acc.displayStatus = False
+                return WalkAction.RETURN
+
+            # repeats of the same accidental immediately following
+            # if An to An or A# to A#: do not need unless repeats requested,
+            # regardless of if 'unless-repeated' is set, this will catch
+            # a repeated case
+            elif (continuousRepeatsInMeasure is True
+                  and pPastAccidental is not None
+                  and acc is not None
+                  and pPastAccidental.name == acc.name):
+                # BUG! what about C#4 C#5 C#4 C#5 -- last C#4 and C#5
+                #   should not show accidental if cautionaryNotImmediateRepeat is False
+
+                # if not in the same octave, and not in the key sig, do show accidental
+                if (nameInKeySignature() is False
+                        and (octaveMatch is False
+                             or pPastAccidental.displayStatus is False)):
+                    displayAccidentalIfNoPreviousAccidentals = True
+                    return WalkAction.CONTINUE
+                else:
+                    acc.displayStatus = False
+                    setFromPitchPast = True
+                    return WalkAction.BREAK
+
+            # if An to A: do not need another natural
+            # yet, if we are against the key sig, then we need another natural if in another octave
+            elif (pPastAccidental is not None
+                  and pPastAccidental.name == 'natural'
+                  and (acc is None or acc.name == 'natural')):
+                if continuousRepeatsInMeasure is True:  # an immediate repeat; do not show
+                    # unless we are altering the key signature and in
+                    # a different register
+                    if stepInKs is True and octaveMatch is False:
+                        set_displayStatus(True)
+                    else:
+                        if acc is not None:
+                            acc.displayStatus = False
+                # if we match the step in a key signature, and we want
+                # cautionary not immediate repeated
+                elif stepInKs is True and self.cautionaryNotImmediateRepeat is True:
+                    set_displayStatus(True)
+
+                # cautionaryNotImmediateRepeat is False
+                # but the previous note was not in this measure,
+                # so do the previous step anyhow
+                elif (stepInKs is True
+                      and self.cautionaryNotImmediateRepeat is False
+                      and pPastInMeasure is False):
+                    set_displayStatus(True)
+
+                # other cases: already natural in past usage, do not need
+                # natural again (and not in key sig)
+                else:
+                    if acc is not None:
+                        acc.displayStatus = False
+                setFromPitchPast = True
+                return WalkAction.BREAK
+
+            # if A# to A, or A- to A, but not A# to A#
+            # we use step and octave though not necessarily a ps comparison
+            elif (pPastAccidental is not None
+                  and pPast.name != pName
+                  and pPastAccidental.name != 'natural'
+                  and (acc is None or acc.displayStatus is False)):
+                if octaveMatch is False and self.cautionaryPitchClass is False:
+                    return WalkAction.CONTINUE
+                if (octaveMatch is False
+                        and acc is not None
+                        and acc.displayType == 'if-absolutely-necessary'):
+                    return WalkAction.CONTINUE
+
+                set_displayStatus(True)
+                setFromPitchPast = True
+                return WalkAction.BREAK
+
+            # if An or A to A#: need to make sure display is set
+            elif ((pPastAccidental is None or pPastAccidental.name == 'natural')
+                  and acc is not None
+                  and acc.name != 'natural'):
+                acc.displayStatus = True
+                setFromPitchPast = True
+                return WalkAction.BREAK
+
+            # if A- or An to A#: need to make sure display is set
+            elif (pPastAccidental is not None
+                  and acc is not None
+                  and pPastAccidental.name != acc.name
+                  and (octaveMatch or acc.displayType != 'if-absolutely-necessary')):
+                acc.displayStatus = True
+                setFromPitchPast = True
+                return WalkAction.BREAK
+
+            # going from a natural to an accidental, we should already be
+            # showing the accidental, but just to check
+            # if A to A#, or A to A-, but not A# to A, nor A (implicit) to An (explicit)
+            elif pPastAccidental is None and acc is not None:
+                if acc.name == 'natural':
+                    acc.displayStatus = stepInKs
+                else:
+                    acc.displayStatus = True
+                # environLocal.printDebug(['match previous no mark'])
+                setFromPitchPast = True
+                return WalkAction.BREAK
+
+            # if A# to A# and not immediately repeated:
+            # default is to show accidental
+            # if cautionaryNotImmediateRepeat is False, will not be shown
+            elif (continuousRepeatsInMeasure is False
+                  and pPastAccidental is not None
+                  and acc is not None
+                  and pPastAccidental.name == acc.name
+                  and octaveMatch is True):
+                if (self.cautionaryNotImmediateRepeat is False
+                        and pPastAccidental.displayStatus is not False):
+                    # do not show (unless previous note's accidental wasn't displayed
+                    # because of a tie or some other reason)
+                    # result will be False, do not need to check altered tones
+                    acc.displayStatus = False
+                    displayAccidentalIfNoPreviousAccidentals = False
+                    setFromPitchPast = True
+                    return WalkAction.BREAK
+                elif pPastAccidental.displayStatus is False:
+                    # in case of ties
+                    displayAccidentalIfNoPreviousAccidentals = True
+                    return WalkAction.CONTINUE
+                else:
+                    acc.displayStatus = not nameInKeySignature()
+                    setFromPitchPast = True
+                    return WalkAction.RETURN
+
+            return WalkAction.CONTINUE
+
+        # need to step through the past in reverse, comparing this pitch to
+        # past pitches of the same step; if we find a match in terms of name,
+        # then decide what to do.  Past pitches of other steps cannot affect
+        # the decision; they matter only as breaks in the run of immediate
+        # repetitions of this pitch, which the position bookkeeping covers.
+        brokeOut = False
+
+        if inMeasureDeque:
+            # the most recent position at which a pitch with a different step
+            # was sounded in this measure (-1 if none): any same-step entry
+            # before that position cannot be part of a run of immediate
+            # repetitions of this pitch.
+            lastOtherStepPos = -1
+            for otherStep, lastPos in self._lastPosByStep.items():
+                if otherStep != pStep and lastPos > lastOtherStepPos:
+                    lastOtherStepPos = lastPos
+
+            # do we have a continuous stream of the same note leading up to
+            # this one?  (i.e. all pitches after this entry, this entry
+            # included, match p.nameWithOctave, with no other-step pitch
+            # in between)
+            allLaterContinuous = True
+            for entryPos, pPast in reversed(inMeasureDeque):
+                continuousRepeatsInMeasure = (allLaterContinuous
+                                              and entryPos > lastOtherStepPos
+                                              and pPast.nameWithOctave == pNwo)
+                allLaterContinuous = continuousRepeatsInMeasure
+                action = visitPastPitch(pPast, True, continuousRepeatsInMeasure)
+                if action == WalkAction.RETURN:
+                    return
+                elif action == WalkAction.BREAK:
+                    brokeOut = True
+                    break
+
+        if not brokeOut and self._countPastMeasure:
+            # the walk has crossed into the previous measure.
+            if acc is not None and acc.displayType == 'if-absolutely-necessary':
+                # pitches outside the measure do not affect
+                # "if-absolutely-necessary" accidentals
+                pass
+            else:
+                # if the pitch is the first of a measure, has an accidental,
+                # it is not an altered key signature pitch,
+                # and it is not a natural, it should always be set to display
+                if acc is not None and not nameInKeySignature():
+                    acc.displayStatus = True
+                    return  # do not search past
+                pastMeasureDeque = self._pastByStep.get(pStep)
+                if pastMeasureDeque:
+                    for _unused, pPast in reversed(pastMeasureDeque):
+                        action = visitPastPitch(pPast, False, False)
+                        if action == WalkAction.RETURN:
+                            return
+                        elif action == WalkAction.BREAK:
+                            break
+
+        # if we have no previous matches for this pitch and there is
+        # an accidental: show, unless in alteredPitches.
+        # cases of displayAlways and related are matched above
+        if displayAccidentalIfNoPreviousAccidentals is True:
+            # not the first pitch of this nameWithOctave in the measure
+            # but, because of ties, the first to be displayed
+            if nameInKeySignature() is False:
+                set_displayStatus(True)
+            else:
+                if acc is not None:
+                    acc.displayStatus = False
+        elif not setFromPitchPast and acc is not None:
+            if acc.name == 'natural':
+                acc.displayStatus = stepInKs
+            else:
+                acc.displayStatus = not nameInKeySignature()
+
+        # if we have natural that alters the key sig, create a natural
+        elif not setFromPitchPast and acc is None:
+            if stepInKs:
+                set_displayStatus(True)
+
+
+def _collectPastMeasureContext(
+    measuresOnly: list['music21.stream.Measure'],
+    i: int,
+    ksLast: bool|key.KeySignature,
+    minimumPastMeasurePitches: int,
+) -> list[pitch.Pitch]|None:
+    '''
+    Build the `pitchPastMeasure` context for measuresOnly[i] (i > 0): the
+    pitches (and ornamental pitches) of the immediately previous measure,
+    extended backwards through additional whole measures while the context
+    still holds fewer than `minimumPastMeasurePitches` pitches -- so that a
+    sparse measure (say, a single whole note) does not erase the accidental
+    context that came just before it.  The lookback never crosses a measure
+    that carries a key signature, since pitches before it lived under
+    different alterations.
+
+    `ksLast` is the key signature in effect before measure i.  When measure i
+    itself carries a key signature, only pitches chromatic to `ksLast` are
+    kept: G-naturals in C major following G-flats in F major need cautionary
+    accidentals; following G-flats in D-flat major they don't.  Returns None
+    in the historical corner case where measure i introduces the first key
+    signature seen (callers keep their previous context value).
+    '''
+    m = measuresOnly[i]
+    ksLastDiatonic: list[str]|None = None
+    if m.keySignature is not None:
+        if not ksLast:
+            return None
+        if t.TYPE_CHECKING:
+            assert isinstance(ksLast, key.KeySignature)
+        ksLastDiatonic = [p.name for p in ksLast.getScale().pitches]
+
+    prevM = measuresOnly[i - 1]
+    collected = prevM.pitches + ornamentalPitches(prevM)
+    j = i - 2
+    while (j >= 0
+           and len(collected) < minimumPastMeasurePitches
+           and measuresOnly[j + 1].keySignature is None):
+        mj = measuresOnly[j]
+        collected = mj.pitches + ornamentalPitches(mj) + collected
+        j -= 1
+
+    if ksLastDiatonic is not None:
+        collected = [p for p in collected if p.name not in ksLastDiatonic]
+    return collected
+
+
 def makeAccidentalsInMeasureStream(
     s: StreamType|StreamIterator,
     *,
@@ -1652,7 +2312,8 @@ def makeAccidentalsInMeasureStream(
     cautionaryAll: bool = False,
     overrideStatus: bool = False,
     cautionaryNotImmediateRepeat: bool = True,
-    tiePitchSet: set[str]|None = None
+    tiePitchSet: set[str]|None = None,
+    minimumPastMeasurePitches: int = 4,
 ) -> None:
     '''
     Makes accidentals in place on a stream that contains Measures.
@@ -1673,6 +2334,12 @@ def makeAccidentalsInMeasureStream(
 
     * Changed in v8: the Stream may have other elements besides measures and the method
         will still work.
+    * Changed in v10.5: when the previous measure holds fewer than
+        `minimumPastMeasurePitches` pitches (new keyword, default 4), the
+        previous-measure context extends backwards through additional whole
+        measures (never crossing a key signature change) until it holds at
+        least that many.  Pass 0 for the historical exactly-one-measure
+        behavior.  (This change was AI-assisted (Claude).)
     '''
     from music21.stream import Measure, Stream
     # bool values for useKeySignature are not helpful here
@@ -1680,30 +2347,23 @@ def makeAccidentalsInMeasureStream(
     # only key.KeySignature values are interesting
     # but method arg is typed this way for backwards compatibility
     ksLast: bool|key.KeySignature = False
-    ksLastDiatonic: list[str] = []
 
     if isinstance(useKeySignature, key.KeySignature):
         ksLast = useKeySignature
-        ksLastDiatonic = [p.name for p in ksLast.getScale().pitches]
 
     measuresOnly: list[Measure] = list(s.getElementsByClass(Measure))
     for i, m in enumerate(measuresOnly):
-        # if beyond the first measure, use the pitches from the last
-        # measure for context (cautionary accidentals)
-        # unless this measure has a key signature object
+        # if beyond the first measure, use the pitches from recent measures
+        # for context (cautionary accidentals)
         if i > 0:
-            if m.keySignature is None:
-                pitchPastMeasure = (
-                    measuresOnly[i - 1].pitches + ornamentalPitches(measuresOnly[i - 1])
-                )
-            elif ksLast:
-                # If there is any key signature object to the left,
-                # just get the chromatic pitches from previous measure
-                # G-naturals in C major following G-flats in F major need cautionary
-                # G-naturals in C major following G-flats in Db major don't
-                pitchPastMeasure = [p for p in
-                    measuresOnly[i - 1].pitches + ornamentalPitches(measuresOnly[i - 1])
-                    if p.name not in ksLastDiatonic]
+            newContext = _collectPastMeasureContext(
+                measuresOnly, i, ksLast, minimumPastMeasurePitches)
+            if newContext is not None:
+                pitchPastMeasure = newContext
+            # when newContext is None (this measure introduces the first key
+            # signature seen), pitchPastMeasure keeps its previous value
+            # (historical behavior)
+
             # Get tiePitchSet from previous measure
             try:
                 previousNoteOrChord = measuresOnly[i - 1][note.NotRest][-1]
@@ -1719,7 +2379,6 @@ def makeAccidentalsInMeasureStream(
 
         if m.keySignature is not None:
             ksLast = m.keySignature
-            ksLastDiatonic = [p.name for p in ksLast.getScale().pitches]
 
         m.makeAccidentals(
             pitchPast=pitchPast,
@@ -1733,6 +2392,7 @@ def makeAccidentalsInMeasureStream(
             overrideStatus=overrideStatus,
             cautionaryNotImmediateRepeat=cautionaryNotImmediateRepeat,
             tiePitchSet=tiePitchSet,
+            minimumPastMeasurePitches=minimumPastMeasurePitches,
         )
     if isinstance(s, Stream):
         s.streamStatus.accidentals = True
@@ -1798,6 +2458,334 @@ def makeOrnamentalAccidentals(
 
         if pitchPast is not None:
             pitchPast += orn.ornamentalPitches
+
+
+def _accidentalDisplaySnapshot(p: pitch.Pitch) -> tuple[str|None, bool|None]:
+    '''
+    The aspects of a pitch's accidental that updateFollowingAccidentals
+    watches for changes: the accidental name and its displayStatus.
+    '''
+    acc = p.accidental
+    if acc is None:
+        return (None, None)
+    return (acc.name, acc.displayStatus)
+
+
+def updateFollowingAccidentals(
+    s: StreamType,
+    changedNoteOrPitch: note.NotRest|pitch.Pitch,
+    *,
+    oldStep: str|None = None,
+    useKeySignature: bool|key.KeySignature = True,
+    alteredPitches: list[pitch.Pitch]|None = None,
+    cautionaryPitchClass: bool = True,
+    cautionaryAll: bool = False,
+    cautionaryNotImmediateRepeat: bool = True,
+    minimumPastMeasurePitches: int = 4,
+) -> list[pitch.Pitch]:
+    # noinspection PyShadowingNames
+    '''
+    After changing one pitch's name or accidental in a stream whose
+    accidental display was already computed (by
+    :meth:`~music21.stream.base.Stream.makeAccidentals`), scan FORWARD from
+    that pitch and refresh the accidental display of every pitch the change
+    could affect, in place.  Returns the list of pitches whose accidental
+    display changed (including, usually, the changed pitch itself).
+
+    Only pitches that the change can influence are examined: pitches sharing
+    the changed pitch's diatonic step (in any octave), in the same measure or
+    later.  Pass `oldStep` when the change moved the pitch to a different
+    step (say, D-flat respelled as C-sharp: `oldStep='D'`) so that pitches on
+    the old step are refreshed too.  For every examined pitch the
+    `displayStatus` is recomputed from scratch, overwriting whatever was
+    there before -- displayStatus is computed display state, never sacrosanct.
+    Likewise, a natural accidental with the default displayType 'normal' on
+    an examined pitch is treated as a creation of the earlier
+    `makeAccidentals` run: it is discarded and recreated only if the new
+    context still calls for it.  To force a particular display, set the
+    accidental's `displayType` (for example 'always' or 'never'), which this
+    scan, like `makeAccidentals`, respects.  The scan stops once nothing needed
+    updating for a full `minimumPastMeasurePitches` pitches' worth of
+    complete measures (after the changed pitch's measure), at which point no
+    later measure's previous-measures context can reach back to anything
+    that changed.
+
+    `s` should be the :class:`~music21.stream.Measure` containing the changed
+    note, or a Stream (such as a :class:`~music21.stream.Part`) whose
+    measures contain it.  For a Score, call this on the part that contains
+    the changed note.  `changedNoteOrPitch` is normally the Note or Chord
+    that was edited (all of its pitches are treated as changed); a Pitch may
+    be passed instead, in which case its pitches are matched by identity.
+    Either way, the starting point is found by walking `s` and comparing
+    object identity -- offsets, sites, and the pitch's client are never
+    consulted, so the same walk that rebuilds the accidental context also
+    locates the change, and a Pitch object shared by several notes (say,
+    after `repeatAppend`) starts the scan from its first appearance.
+
+    >>> p = converter.parse('tinyNotation: 4/4 c#4 d c#4 c4   c2 e')
+    >>> p.makeAccidentals(inPlace=True)
+    >>> notes = list(p.recurse().notes)
+
+    The second C-sharp of measure 1 shows a (cautionary) sharp, and the
+    C that follows it displays a natural:
+
+    >>> notes[2].pitch.accidental.displayStatus, notes[3].pitch.accidental.displayStatus
+    (True, True)
+
+    Now respell that second C-sharp as a plain C and rescan forward:
+
+    >>> notes[2].pitch.name = 'C'
+    >>> changed = stream.makeNotation.updateFollowingAccidentals(
+    ...     p, notes[2].pitch)
+
+    The respelled note now shows a natural (contradicting the opening
+    C-sharp), and the natural on the following C -- a creation of the earlier
+    makeAccidentals run, no longer called for -- is withdrawn:
+
+    >>> notes[2].pitch.accidental.displayStatus
+    True
+    >>> print(notes[3].pitch.accidental)
+    None
+    >>> sorted(c.nameWithOctave for c in changed)
+    ['C4', 'C4']
+
+    Pitches whose step is unrelated to the change (like the E) are skipped,
+    since the change cannot affect what they need to display.
+
+    The keyword arguments (including `minimumPastMeasurePitches`, which
+    controls how many previous measures stay in the cautionary-accidental
+    context) should be given the same values that were used when
+    `makeAccidentals` was run.
+
+    * New in v10.5.  AI-assisted (Claude).
+    '''
+    from music21.stream import Measure, Part
+
+    regions: list[t.Any] = list(s.getElementsByClass(Measure))
+    if not regions:
+        if s.getElementsByClass(Part):
+            raise StreamException(
+                'updateFollowingAccidentals cannot run on a Score: '
+                'call it on the Part (or Measure) containing the changed pitch.'
+            )
+        regions = [s]
+
+    if isinstance(changedNoteOrPitch, note.NotRest):
+        changedPitchList = list(changedNoteOrPitch.pitches)
+    else:
+        changedPitchList = [changedNoteOrPitch]
+
+    # locate the first note (or chord) containing the changed pitch
+    targetIndex: int = -1
+    changedNote: note.NotRest|None = None
+    for i, region in enumerate(regions):
+        for n in region.recurse().notesAndRests:
+            if not isinstance(n, note.NotRest):
+                continue
+            if n is changedNoteOrPitch or any(
+                    nPitch is cp for nPitch in n.pitches for cp in changedPitchList):
+                targetIndex = i
+                changedNote = n
+                break
+        if targetIndex != -1:
+            break
+    if targetIndex == -1 or changedNote is None:
+        raise StreamException(
+            f'changedNoteOrPitch {changedNoteOrPitch!r} was not found in this stream.')
+
+    dirtySteps: set[str] = {cp.step for cp in changedPitchList}
+    if oldStep is not None:
+        dirtySteps.add(oldStep.upper())
+
+    def regionKeySignature(region) -> key.KeySignature|None:
+        if isinstance(region, Measure):
+            return region.keySignature
+        return region.getElementsByClass(key.KeySignature).first()
+
+    # the key signature in effect before the changed pitch's measure
+    # (mirroring makeAccidentalsInMeasureStream)
+    ksLast: bool|key.KeySignature = False
+    if isinstance(useKeySignature, key.KeySignature):
+        ksLast = useKeySignature
+    for region in regions[:targetIndex]:
+        ks = regionKeySignature(region)
+        if ks is not None:
+            ksLast = ks
+
+    changedPitches: list[pitch.Pitch] = []
+    beforeChange = True
+    # pitch count of complete, changeless measures since the last measure in
+    # which something changed: once this reaches minimumPastMeasurePitches,
+    # no later measure's lookback context can reach a changed measure
+    pitchesSinceChange = 0
+    # the previous-measures context carried from one measure to the next
+    carriedContext: list[pitch.Pitch]|None = None
+
+    def processRegion(
+        m,
+        tracker: AccidentalDisplayTracker,
+        measureAltered: list[pitch.Pitch],
+        tiePitchSet: set[str],
+    ) -> int:
+        '''
+        Walk one measure (or flat region), re-deciding accidental display for
+        pitches on the dirty steps and observing everything into the tracker.
+        Returns the number of pitches whose display changed.
+        '''
+        nonlocal beforeChange
+        changesInThisMeasure = 0
+
+        def decidePitch(
+            p: pitch.Pitch,
+            *,
+            otherSimultaneousPitches: list[pitch.Pitch]|None = None,
+            lastNoteWasTied: bool = False,
+        ) -> None:
+            nonlocal changesInThisMeasure
+            before = _accidentalDisplaySnapshot(p)
+            acc = p.accidental
+            if acc is not None and acc.name == 'natural' and acc.displayType == 'normal':
+                # a natural with the default displayType is (or is
+                # indistinguishable from) a display artifact that an earlier
+                # makeAccidentals run created: discard it and let the decision
+                # below recreate it if it is still needed.  (A natural that
+                # must always print should set displayType='always'.)
+                p.accidental = None
+            tracker.updateAccidentalDisplay(
+                p,
+                otherSimultaneousPitches=otherSimultaneousPitches,
+                lastNoteWasTied=lastNoteWasTied)
+            if _accidentalDisplaySnapshot(p) != before:
+                changesInThisMeasure += 1
+                changedPitches.append(p)
+
+        def handleOrnaments(noteOrChord: note.NotRest) -> None:
+            nonlocal changesInThisMeasure
+            for orn in noteOrChord.expressions:
+                if not isinstance(orn, expressions.Ornament):
+                    continue
+                oldOrnamentalPitches = orn.ornamentalPitches
+                decide = (not beforeChange
+                          and (noteOrChord is changedNote
+                               or any(op.step in dirtySteps for op in oldOrnamentalPitches)))
+                if decide:
+                    beforeSnapshots = [
+                        (op.nameWithOctave, _accidentalDisplaySnapshot(op))
+                        for op in oldOrnamentalPitches
+                    ]
+                    orn.resolveOrnamentalPitches(noteOrChord)
+                    orn.updateAccidentalDisplay(
+                        pitchPast=tracker.pitchPast,
+                        pitchPastMeasure=tracker.pitchPastMeasure,
+                        alteredPitches=measureAltered,
+                        cautionaryPitchClass=cautionaryPitchClass,
+                        cautionaryAll=cautionaryAll,
+                        overrideStatus=True,
+                        cautionaryNotImmediateRepeat=cautionaryNotImmediateRepeat)
+                    afterSnapshots = [
+                        (op.nameWithOctave, _accidentalDisplaySnapshot(op))
+                        for op in orn.ornamentalPitches
+                    ]
+                    if beforeSnapshots != afterSnapshots:
+                        changesInThisMeasure += 1
+                        changedPitches.extend(orn.ornamentalPitches)
+                for op in orn.ornamentalPitches:
+                    tracker.addPastPitch(op)
+
+        for e in m.recurse().notesAndRests:
+            if e is changedNote:
+                beforeChange = False
+            if isinstance(e, note.Note):
+                if not beforeChange and e.pitch.step in dirtySteps:
+                    decidePitch(
+                        e.pitch,
+                        lastNoteWasTied=(e.pitch.nameWithOctave in tiePitchSet))
+                tracker.addPastPitch(e.pitch)
+                tiePitchSet.clear()
+                if e.tie is not None and e.tie.type != 'stop':
+                    tiePitchSet.add(e.pitch.nameWithOctave)
+                handleOrnaments(e)
+            elif isinstance(e, chord.Chord):
+                seenPitchNames = set()
+                for n in list(e):
+                    p = n.pitch
+                    if not beforeChange and p.step in dirtySteps:
+                        decidePitch(
+                            p,
+                            otherSimultaneousPitches=[
+                                other for other in e.pitches if other is not p],
+                            lastNoteWasTied=(p.nameWithOctave in tiePitchSet))
+                    if n.tie is not None and n.tie.type != 'stop':
+                        seenPitchNames.add(p.nameWithOctave)
+                    handleOrnaments(n)
+                tiePitchSet.clear()
+                tiePitchSet.update(seenPitchNames)
+                for p in e.pitches:
+                    tracker.addPastPitch(p)
+                handleOrnaments(e)
+            else:
+                tiePitchSet.clear()
+        return changesInThisMeasure
+
+    for i in range(targetIndex, len(regions)):
+        m = regions[i]
+        mKs = regionKeySignature(m)
+
+        # previous-measures context, mirroring makeAccidentalsInMeasureStream
+        tiePitchSet: set[str]|None = None
+        if i > 0:
+            newContext = _collectPastMeasureContext(
+                regions, i, ksLast, minimumPastMeasurePitches)
+            if newContext is not None:
+                carriedContext = newContext
+            elif i == targetIndex and i >= 2:
+                # this measure introduces the first key signature seen, where
+                # makeAccidentalsInMeasureStream keeps carrying the context it
+                # built for the previous measure (which, having no earlier key
+                # signature, cannot itself carry one)
+                carriedContext = _collectPastMeasureContext(
+                    regions, i - 1, False, minimumPastMeasurePitches)
+            try:
+                prevM = regions[i - 1]
+                previousNoteOrChord = prevM[note.NotRest][-1]
+                tiePitchSet = getTiePitchSet(previousNoteOrChord)
+                if tiePitchSet is not None and mKs is not None:
+                    ksNewDiatonic = [ksp.name for ksp in mKs.getScale().pitches]
+                    tiePitchSet = {tp for tp in tiePitchSet if tp in ksNewDiatonic}
+            except (IndexError, StreamException):
+                pass
+        pitchPastMeasure = carriedContext
+
+        if mKs is not None:
+            ksLast = mKs
+
+        regionAltered: list[pitch.Pitch] = list(alteredPitches) if alteredPitches else []
+        if isinstance(ksLast, key.KeySignature):
+            regionAltered += ksLast.alteredPitches
+
+        regionTracker = AccidentalDisplayTracker(
+            pitchPastMeasure=pitchPastMeasure,
+            alteredPitches=regionAltered,
+            cautionaryPitchClass=cautionaryPitchClass,
+            cautionaryAll=cautionaryAll,
+            overrideStatus=True,
+            cautionaryNotImmediateRepeat=cautionaryNotImmediateRepeat)
+        if tiePitchSet is None:
+            tiePitchSet = set()
+
+        changesInThisMeasure = processRegion(m, regionTracker, regionAltered, tiePitchSet)
+
+        if i > targetIndex and not changesInThisMeasure:
+            pitchesSinceChange += len(regionTracker.pitchPast)
+            if pitchesSinceChange >= minimumPastMeasurePitches:
+                # enough unaffected music has gone by that no later measure's
+                # previous-measures context can reach back to a change
+                break
+        else:
+            pitchesSinceChange = 0
+
+    return changedPitches
+
 
 def iterateBeamGroups(
     s: StreamType,

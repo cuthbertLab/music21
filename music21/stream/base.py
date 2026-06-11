@@ -6734,7 +6734,8 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         inPlace: bool = False,
         overrideStatus: bool = False,
         cautionaryNotImmediateRepeat: bool = True,
-        tiePitchSet: set[str]|None = None
+        tiePitchSet: set[str]|None = None,
+        minimumPastMeasurePitches: int = 4,
     ):
         '''
         A method to set and provide accidentals given various conditions and contexts.
@@ -6775,8 +6776,15 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         If `searchKeySignatureByContext` is True then keySignatures from the context of the
         stream will be used if none found.
 
-        The :meth:`~music21.pitch.Pitch.updateAccidentalDisplay` method is used to determine if
-        an accidental is necessary.
+        When this Stream contains Measures, `minimumPastMeasurePitches` controls how
+        much previous-measure context survives each measure boundary for cautionary
+        purposes: the most recent whole measures are kept until the context holds at
+        least that many pitches (always at least one measure).  Pass 0 for the
+        historical behavior of keeping exactly one measure.
+
+        The same display logic as :meth:`~music21.pitch.Pitch.updateAccidentalDisplay`
+        (which remains the way to run this determination on a single pitch)
+        is used to determine if an accidental is necessary.
 
         This will assume that the complete Stream is the context of evaluation. For smaller context
         ranges, call this on Measure objects.
@@ -6787,6 +6795,14 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         * Changed in v6: does not return anything if inPlace is True.
         * Changed in v7: default inPlace is False.
         * Changed in v8: altered unisons/octaves in Chords now supply clarifying naturals.
+        * Changed in v10.5: past pitches are tracked in per-step deques
+          (:class:`~music21.stream.makeNotation.AccidentalDisplayTracker`)
+          instead of rescanning every past pitch for every note, making this
+          method linear rather than quadratic in the length of a measure.
+          With that change alone the results are unchanged; the new
+          `minimumPastMeasurePitches` keyword (default 4) additionally keeps
+          sparse measures from erasing the cautionary-accidental context.
+          (This change was AI-assisted (Claude).)
 
         All arguments are keyword only.
         '''
@@ -6828,12 +6844,37 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         # environLocal.printDebug(['processing makeAccidentals() with alteredPitches:',
         #   alteredPitches])
 
+        # the tracker indexes past pitches by step, so each note's decision
+        # touches only relevant past notes.  It also maintains pitchPast and
+        # pitchPastMeasure lists for makeOrnamentalAccidentals (keeping the
+        # same list objects, since the lists passed in are mutated here).
+        tracker = makeNotation.AccidentalDisplayTracker(
+            pitchPast=pitchPast,
+            pitchPastMeasure=pitchPastMeasure,
+            alteredPitches=alteredPitches,
+            cautionaryPitchClass=cautionaryPitchClass,
+            cautionaryAll=cautionaryAll,
+            overrideStatus=overrideStatus,
+            cautionaryNotImmediateRepeat=cautionaryNotImmediateRepeat,
+            minimumPastMeasurePitches=minimumPastMeasurePitches)
+
+        def ornamentalAccidentals(noteOrChord):
+            # handle ornaments' ornamentalPitches on a note, chord, or
+            # note-in-chord, then index whatever pitches that appended
+            makeNotation.makeOrnamentalAccidentals(
+                noteOrChord,
+                pitchPast=tracker.pitchPast,
+                pitchPastMeasure=tracker.pitchPastMeasure,
+                alteredPitches=alteredPitches,
+                cautionaryPitchClass=cautionaryPitchClass,
+                cautionaryAll=cautionaryAll,
+                overrideStatus=overrideStatus,
+                cautionaryNotImmediateRepeat=cautionaryNotImmediateRepeat)
+            tracker.syncPitchPast()
+
         # need to move through notes in order
         # recurse to capture notes in substreams: https://github.com/cuthbertLab/music21/issues/577
         noteIterator = returnObj.recurse().notesAndRests
-
-        # environLocal.printDebug(['alteredPitches', alteredPitches])
-        # environLocal.printDebug(['pitchPast', pitchPast])
 
         if tiePitchSet is None:
             tiePitchSet = set()
@@ -6845,40 +6886,20 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
                 if last_measure is not None and e.activeSite is not last_measure:
                     # New measure encountered: move pitchPast to
                     # pitchPastMeasure and clear pitchPast
-                    pitchPastMeasure = pitchPast[:]
-                    pitchPast = []
+                    tracker.advanceMeasure()
                 last_measure = e.activeSite
             if isinstance(e, note.Note):
-                if e.pitch.nameWithOctave in tiePitchSet:
-                    lastNoteWasTied = True
-                else:
-                    lastNoteWasTied = False
+                lastNoteWasTied = e.pitch.nameWithOctave in tiePitchSet
 
-                e.pitch.updateAccidentalDisplay(
-                    pitchPast=pitchPast,
-                    pitchPastMeasure=pitchPastMeasure,
-                    alteredPitches=alteredPitches,
-                    cautionaryPitchClass=cautionaryPitchClass,
-                    cautionaryAll=cautionaryAll,
-                    overrideStatus=overrideStatus,
-                    cautionaryNotImmediateRepeat=cautionaryNotImmediateRepeat,
-                    lastNoteWasTied=lastNoteWasTied)
-                pitchPast.append(e.pitch)
+                tracker.updateAccidentalDisplay(e.pitch, lastNoteWasTied=lastNoteWasTied)
+                tracker.addPastPitch(e.pitch)
 
                 tiePitchSet.clear()
                 if e.tie is not None and e.tie.type != 'stop':
                     tiePitchSet.add(e.pitch.nameWithOctave)
 
                 # handle this note's ornaments' ornamentalPitches
-                makeNotation.makeOrnamentalAccidentals(
-                    e,
-                    pitchPast=pitchPast,
-                    pitchPastMeasure=pitchPastMeasure,
-                    alteredPitches=alteredPitches,
-                    cautionaryPitchClass=cautionaryPitchClass,
-                    cautionaryAll=cautionaryAll,
-                    overrideStatus=overrideStatus,
-                    cautionaryNotImmediateRepeat=cautionaryNotImmediateRepeat)
+                ornamentalAccidentals(e)
 
             elif isinstance(e, chord.Chord):
                 # when reading a chord, this will apply an accidental
@@ -6887,54 +6908,30 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
 
                 for n in list(e):
                     p = n.pitch
-                    if p.nameWithOctave in tiePitchSet:
-                        lastNoteWasTied = True
-                    else:
-                        lastNoteWasTied = False
+                    lastNoteWasTied = p.nameWithOctave in tiePitchSet
 
                     otherSimultaneousPitches = [other for other in e.pitches if other is not p]
 
-                    p.updateAccidentalDisplay(
-                        pitchPast=pitchPast,
-                        pitchPastMeasure=pitchPastMeasure,
+                    tracker.updateAccidentalDisplay(
+                        p,
                         otherSimultaneousPitches=otherSimultaneousPitches,
-                        alteredPitches=alteredPitches,
-                        cautionaryPitchClass=cautionaryPitchClass,
-                        cautionaryAll=cautionaryAll,
-                        overrideStatus=overrideStatus,
-                        cautionaryNotImmediateRepeat=cautionaryNotImmediateRepeat,
                         lastNoteWasTied=lastNoteWasTied)
 
                     if n.tie is not None and n.tie.type != 'stop':
                         seenPitchNames.add(p.nameWithOctave)
 
                     # handle this note-in-chord's ornaments' ornamentalPitches
-                    makeNotation.makeOrnamentalAccidentals(
-                        n,
-                        pitchPast=pitchPast,
-                        pitchPastMeasure=pitchPastMeasure,
-                        alteredPitches=alteredPitches,
-                        cautionaryPitchClass=cautionaryPitchClass,
-                        cautionaryAll=cautionaryAll,
-                        overrideStatus=overrideStatus,
-                        cautionaryNotImmediateRepeat=cautionaryNotImmediateRepeat)
+                    ornamentalAccidentals(n)
 
                 tiePitchSet.clear()
                 for pName in seenPitchNames:
                     tiePitchSet.add(pName)
 
-                pitchPast += e.pitches
+                for p in e.pitches:
+                    tracker.addPastPitch(p)
 
                 # handle this chord's ornaments' ornamentalPitches
-                makeNotation.makeOrnamentalAccidentals(
-                    e,
-                    pitchPast=pitchPast,
-                    pitchPastMeasure=pitchPastMeasure,
-                    alteredPitches=alteredPitches,
-                    cautionaryPitchClass=cautionaryPitchClass,
-                    cautionaryAll=cautionaryAll,
-                    overrideStatus=overrideStatus,
-                    cautionaryNotImmediateRepeat=cautionaryNotImmediateRepeat)
+                ornamentalAccidentals(e)
 
             else:
                 tiePitchSet.clear()
@@ -6970,7 +6967,8 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
                      cautionaryAll: bool = False,
                      overrideStatus: bool = False,
                      cautionaryNotImmediateRepeat: bool = True,
-                     tiePitchSet: set[str]|None = None
+                     tiePitchSet: set[str]|None = None,
+                     minimumPastMeasurePitches: int = 4,
                      ):
         '''
         This method calls a sequence of Stream methods on this Stream to prepare
@@ -6992,6 +6990,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
             overrideStatus
             cautionaryNotImmediateRepeat
             tiePitchSet
+            minimumPastMeasurePitches
 
         >>> s = stream.Stream()
         >>> n = note.Note('g')
@@ -7054,7 +7053,8 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
                 cautionaryAll=cautionaryAll,
                 overrideStatus=overrideStatus,
                 cautionaryNotImmediateRepeat=cautionaryNotImmediateRepeat,
-                tiePitchSet=tiePitchSet)
+                tiePitchSet=tiePitchSet,
+                minimumPastMeasurePitches=minimumPastMeasurePitches)
 
         makeNotation.makeTies(returnStream, meterStream=meterStream, inPlace=True)
 
@@ -13694,6 +13694,7 @@ class Part(Stream):
         overrideStatus=False,
         cautionaryNotImmediateRepeat=True,
         tiePitchSet=None,
+        minimumPastMeasurePitches=4,
     ):
         '''
         This overridden method of Stream.makeAccidentals
@@ -13704,8 +13705,8 @@ class Part(Stream):
         1. Ties across barlines are detected so that accidentals are not
         unnecessarily reiterated. (`tiePitchSet`)
 
-        2. Pitches appearing on the same step in an immediately preceding measure,
-        if foreign to the key signature of that previous measure,
+        2. Pitches appearing on the same step in recently preceding measures,
+        if foreign to the key signature of those previous measures,
         are printed with cautionary accidentals in the subsequent measure.
         (`pitchPastMeasure`)
 
@@ -13715,6 +13716,10 @@ class Part(Stream):
         measures to iterate.
 
         * Changed in v7: `inPlace` defaults False
+        * Changed in v10.5: new `minimumPastMeasurePitches` keyword (default 4):
+          when the previous measure is sparse, earlier whole measures stay in
+          the cautionary-accidental context until at least that many pitches
+          are in view.  Pass 0 for the historical one-measure behavior.
         '''
         if not inPlace:  # make a copy
             returnObj = self.coreCopyAsDerivation('makeAccidentals')
@@ -13730,6 +13735,7 @@ class Part(Stream):
             overrideStatus=overrideStatus,
             cautionaryNotImmediateRepeat=cautionaryNotImmediateRepeat,
             tiePitchSet=tiePitchSet,
+            minimumPastMeasurePitches=minimumPastMeasurePitches,
         )
         if not inPlace:
             return returnObj
