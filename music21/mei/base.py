@@ -447,8 +447,8 @@ def allPartsPresent(scoreElem) -> tuple[str, ...]:
     ...         <!-- ... some music ... -->
     ...     </section>
     ... </score>"""
-    >>> import xml.etree.ElementTree as ETree
-    >>> meiDoc = ETree.fromstring(meiDoc)
+    >>> from xml.etree.ElementTree import fromstring as EL
+    >>> meiDoc = EL(meiDoc)
     >>> mei.base.allPartsPresent(meiDoc)
     ('1', '2')
 

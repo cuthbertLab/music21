@@ -820,8 +820,8 @@ class CTRule(prebase.ProtoM21Object):
         str content, either "|" (a normal measure ) or "$" (an expansion),
         and the number of repetitions.  Comments are stripped.
 
-        >>> rs = ('In: [A] [4/4] $Vr $BP*3 I IV | I | ' +
-        ...          '$BP*3 I IV | I | | R |*4 I |*4 % This is a comment')
+        >>> rs = ('In: [A] [4/4] $Vr $BP*3 I IV | I | '
+        ...           '$BP*3 I IV | I | | R |*4 I |*4 % This is a comment')
         >>> s = romanText.clercqTemperley.CTRule(rs)
         >>> s._measureGroups()
         [('[A] [4/4]', '|', 1),

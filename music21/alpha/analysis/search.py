@@ -187,8 +187,8 @@ def findConsecutiveScale(source, targetScale, degreesRequired=5,
                                   stepSize=1,
                                   comparisonAttribute=comparisonAttribute):
                 pass
-                # environLocal.printDebug(['matched degree count but next pitch is ' +
-                #        'in scale and direction', 'collDegrees', collDegrees])
+                # environLocal.printDebug(['matched degree count but next pitch is '
+                #        + 'in scale and direction', 'collDegrees', collDegrees])
             else:
                 # environLocal.printDebug(['matched degree count', 'collDegrees', collDegrees,
                 #    'pNext', pNext])

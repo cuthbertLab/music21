@@ -297,8 +297,8 @@ class Harmony(chord.Chord):
         but we want the objects to retain their initial root, bass, and inversion.
         '''
         if root and isinstance(root, str):
-            root = common.cleanedFlatNotation(root)
-            self.root(pitch.Pitch(root, octave=3))
+            root_str = common.cleanedFlatNotation(root)
+            self.root(pitch.Pitch(root_str, octave=3))
         elif root is not None:
             self.root(root)
 
@@ -308,8 +308,8 @@ class Harmony(chord.Chord):
 
         # and then bass.
         if bass and isinstance(bass, str):
-            bass = common.cleanedFlatNotation(bass)
-            self.bass(pitch.Pitch(bass, octave=3), allow_add=True)
+            bass_str = common.cleanedFlatNotation(bass)
+            self.bass(pitch.Pitch(bass_str, octave=3), allow_add=True)
         elif bass is not None:
             self.bass(bass, allow_add=True)
 
@@ -2267,9 +2267,9 @@ class ChordSymbol(Harmony):
         >>> from xml.etree.ElementTree import fromstring as EL
         >>> MP = musicxml.xmlToM21.MeasureParser()
 
-        >>> elStr = (r'<harmony><root><root-step>C</root-step></root><kind>dominant</kind>' +
-        ...           '<degree><degree-value>9</degree-value><degree-alter>-1</degree-alter>' +
-        ...           '        <degree-type>add</degree-type></degree></harmony>')
+        >>> elStr = ('<harmony><root><root-step>C</root-step></root><kind>dominant</kind>'
+        ...          '<degree><degree-value>9</degree-value><degree-alter>-1</degree-alter>'
+        ...          '        <degree-type>add</degree-type></degree></harmony>')
         >>> mxHarmony = EL(elStr)
 
         >>> cs = MP.xmlToChordSymbol(mxHarmony)
@@ -2283,10 +2283,10 @@ class ChordSymbol(Harmony):
          <music21.pitch.Pitch B-3>,
          <music21.pitch.Pitch D-4>)
 
-        >>> elStr = (r'<harmony><root><root-step>C</root-step></root><kind>major</kind>' +
-        ...           '<bass><bass-step>B</bass-step><bass-alter>-1</bass-alter></bass>' +
-        ...           '<degree><degree-value>2</degree-value><degree-alter>0</degree-alter>' +
-        ...           '        <degree-type>add</degree-type></degree></harmony>')
+        >>> elStr = ('<harmony><root><root-step>C</root-step></root><kind>major</kind>'
+        ...          '<bass><bass-step>B</bass-step><bass-alter>-1</bass-alter></bass>'
+        ...          '<degree><degree-value>2</degree-value><degree-alter>0</degree-alter>'
+        ...          '        <degree-type>add</degree-type></degree></harmony>')
         >>> mxHarmony = EL(elStr)
 
         >>> cs = MP.xmlToChordSymbol(mxHarmony)
@@ -2682,8 +2682,13 @@ class Test(unittest.TestCase):
         self.assertEqual(explicitFm6.inversion(), 1)
         self.assertEqual(explicitFm6.bass(find=False).name, 'A-')
         self.assertEqual(explicitFm6.root(find=False).name, 'F')
-        self.assertLess(explicitFm6.bass(find=False).octave,
-                        explicitFm6.root(find=False).octave)
+        fm6bassOctave = explicitFm6.bass(find=False).octave
+        fm6rootOctave = explicitFm6.root(find=False).octave
+        self.assertIsNotNone(fm6bassOctave)
+        self.assertIsNotNone(fm6rootOctave)
+        assert fm6bassOctave is not None
+        assert fm6rootOctave is not None
+        self.assertLess(fm6bassOctave, fm6rootOctave)
 
     def testClassSortOrderHarmony(self):
         '''
@@ -2836,7 +2841,6 @@ class Test(unittest.TestCase):
         self.assertEqual(cs1.bass(), cs3.bass())
 
     def testChordWithBass(self):
-
         xmlString = '''
           <harmony>
             <root>

@@ -615,11 +615,10 @@ class PartReduction:
                     #         eLast = partMeasures[0][i]
                     #     # use duration, not barDuration.quarterLength
                     #     # as want filled duration?
-                    #     eEnd = (eLast.getOffsetBySite(
-                    #             partMeasures[0]) +
-                    #             eLast.barDuration.quarterLength)
-                    #     ds = {'eStart':eStart, 'span':eEnd-eStart,
-                    #           'weight':None, 'color':pColor}
+                    #     eEnd = (eLast.getOffsetBySite(partMeasures[0])
+                    #             + eLast.barDuration.quarterLength)
+                    #     ds = {'eStart': eStart, 'span': eEnd - eStart,
+                    #           'weight': None, 'color': pColor}
                     #     dataEvents.append(ds)
                     #     eStart = None
 #                    eLast = partMeasures[0][i]

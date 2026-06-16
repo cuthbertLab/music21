@@ -148,7 +148,7 @@ class CapellaImporter:
 
         >>> ci = capella.fromCapellaXML.CapellaImporter()
         >>> funnyTag = ci.domElementFromText(
-        ...    '<funny yes="definitely"><greg/>hi<greg><ha>ha</ha>' +
+        ...    '<funny yes="definitely"><greg/>hi<greg><ha>ha</ha>'
         ...    '<greg type="embedded"/></greg></funny>')
         >>> funnyTag
         <Element 'funny' at 0x...>
@@ -441,7 +441,7 @@ class CapellaImporter:
         This one is an actual chord
 
         >>> chordElement = ci.domElementFromText(
-        ...        '<chord><duration base="1/8"/>' +
+        ...        '<chord><duration base="1/8"/>'
         ...        '<heads><head pitch="G4"/><head pitch="A5"/></heads></chord>')
         >>> c = ci.chordOrNoteFromChord(chordElement)
         >>> c
@@ -615,7 +615,7 @@ class CapellaImporter:
 
         >>> ci = capella.fromCapellaXML.CapellaImporter()
         >>> lyricEl = ci.domElementFromText(
-        ...      '<lyric><verse i="0" hyphen="true">di</verse>' +
+        ...      '<lyric><verse i="0" hyphen="true">di</verse>'
         ...      '<verse i="1">man,</verse><verse i="2">frau,</verse></lyric>')
         >>> ci.lyricListFromLyric(lyricEl)
         [<music21.note.Lyric number=1 syllabic=begin text='di'>,

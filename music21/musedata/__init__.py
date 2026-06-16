@@ -1592,11 +1592,11 @@ class MuseDataWork(prebase.ProtoM21Object):
         Add a string representation acting like a part file
 
         >>> mdw = musedata.MuseDataWork()
-        >>> mdw.addString('WK#:581       MV#:3c\nBreitkopf & Hartel, Vol. 13\n' +
-        ...               'Clarinet Quintet\n' +
-        ...               'Trio II\n' +
-        ...               '$  K:0   Q:6   T:3/4   X:-11   C:4\n' +
-        ...               'C5     3        e     d  [     (&0p\n' +
+        >>> mdw.addString('WK#:581       MV#:3c\nBreitkopf & Hartel, Vol. 13\n'
+        ...               'Clarinet Quintet\n'
+        ...               'Trio II\n'
+        ...               '$  K:0   Q:6   T:3/4   X:-11   C:4\n'
+        ...               'C5     3        e     d  [     (&0p\n'
         ...               'E5     3        e     d  ]')
 
         # TODO: Okay, so what? did we test this or demo anything?

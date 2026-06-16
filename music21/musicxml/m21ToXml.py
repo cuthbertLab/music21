@@ -903,9 +903,9 @@ class XMLExporterBase:
 
         conforms to attr-group %font in the MusicXML DTD
 
-        >>> from xml.etree.ElementTree import fromstring as El
+        >>> from xml.etree.ElementTree import fromstring as EL
         >>> XB = musicxml.m21ToXml.XMLExporterBase()
-        >>> mxObj = El('<text>hi</text>')
+        >>> mxObj = EL('<text>hi</text>')
         >>> te = expressions.TextExpression('hi!')
         >>> te.style.fontFamily = ['Courier', 'monospaced']
         >>> te.style.fontStyle = 'italic'
@@ -915,7 +915,7 @@ class XMLExporterBase:
         <text font-family="Courier,monospaced" font-size="24" font-style="italic">hi</text>
 
         >>> XB = musicxml.m21ToXml.XMLExporterBase()
-        >>> mxObj = El('<text>hi</text>')
+        >>> mxObj = EL('<text>hi</text>')
         >>> te = expressions.TextExpression('hi!')
         >>> te.style.fontStyle = 'bold'
         >>> XB.setFont(mxObj, te)
@@ -964,9 +964,9 @@ class XMLExporterBase:
 
     def setEditorial(self, mxObject, m21Object):
         '''
-        >>> from xml.etree.ElementTree import fromstring as El
+        >>> from xml.etree.ElementTree import fromstring as EL
         >>> XB = musicxml.m21ToXml.XMLExporterBase()
-        >>> mxObj = El('<note />')
+        >>> mxObj = EL('<note />')
         >>> n = note.Note('C-5')
 
         Most common case: does nothing
@@ -988,7 +988,7 @@ class XMLExporterBase:
 
         Placing information in `.editorial.comments` only puts out the level:
 
-        >>> mxObj = El('<note />')
+        >>> mxObj = EL('<note />')
         >>> n = note.Note('C-5')
         >>> com = editorial.Comment('flat is obvious error for sharp')
         >>> com.levelInformation = 'hello'
@@ -1927,14 +1927,17 @@ class ScoreExporter(XMLExporterBase, PartStaffExporterMixin):
         Demonstrating round tripping:
 
         >>> import xml.etree.ElementTree as ET
-        >>> defaults = ET.fromstring('<defaults>'
-        ...          + '<music-font font-family="Maestro, Opus" font-weight="bold" />'
-        ...          + '<word-font font-family="Garamond" font-style="italic" />'
-        ...          + '<lyric-font name="verse" font-size="12" />'
-        ...          + '<lyric-font name="chorus" font-size="14" />'
-        ...          + '<lyric-language name="verse" xml:lang="fr" />'
-        ...          + '<lyric-language name="chorus" xml:lang="en" />'
-        ...          + '</defaults>')
+        >>> from xml.etree.ElementTree import fromstring as EL
+        >>> defaults = ET.fromstring(
+        ...     '<defaults>'
+        ...     '<music-font font-family="Maestro, Opus" font-weight="bold" />'
+        ...     '<word-font font-family="Garamond" font-style="italic" />'
+        ...     '<lyric-font name="verse" font-size="12" />'
+        ...     '<lyric-font name="chorus" font-size="14" />'
+        ...     '<lyric-language name="verse" xml:lang="fr" />'
+        ...     '<lyric-language name="chorus" xml:lang="en" />'
+        ...     '</defaults>'
+        ... )
 
         >>> MI = musicxml.xmlToM21.MusicXMLImporter()
         >>> MI.styleFromXmlDefaults(defaults)

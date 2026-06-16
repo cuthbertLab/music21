@@ -1768,7 +1768,11 @@ class ABCChord(ABCNote):
         # store a list of component objects
         self.subTokens: list[ABCToken] = []
 
-    def parse(self, forceKeySignature=None, forceDefaultQuarterLength=None):
+    def parse(
+        self,
+        forceDefaultQuarterLength: float|None = None,
+        forceKeySignature: key.KeySignature|None = None
+    ):
         '''
         Handles the following types of chords:
 
@@ -1803,6 +1807,7 @@ class ABCChord(ABCNote):
         outer_lengthModifier = self.getQuarterLength(outerLengthModifierStr,
                                                      forceDefaultQuarterLength=1.0)
 
+        activeKeySignature: key.KeySignature|None
         if forceKeySignature is not None:
             activeKeySignature = forceKeySignature
         else:  # may be None
@@ -1815,7 +1820,7 @@ class ABCChord(ABCNote):
         # may need to supply key?
         ah.tokenize(tokenStr)
 
-        inner_quarterLength = 0
+        inner_quarterLength: OffsetQL = 0.0
         # tokens contained here are each ABCNote instances
         for token in ah.tokens:
             # environLocal.printDebug(['ABCChord: subTokens', t])
@@ -2631,10 +2636,10 @@ class ABCHandler:
             # notes within slur marks need to be added to the spanner
             if isinstance(token, ABCSlurStart):
                 token.fillSlur()
+                slurObj = token.slurObj
                 if t.TYPE_CHECKING:
-                    assert token.slurObj is not None
-
-                self.activeSpanners.append(token.slurObj)
+                    assert slurObj is not None
+                self.activeSpanners.append(slurObj)
                 self.activeParens.append('Slur')
             elif isinstance(token, ABCParenStop):
                 if self.activeParens:
@@ -2951,10 +2956,10 @@ class ABCHandler:
         Returns True if this token structure defines Measures in a normal Measure form.
         Otherwise False
 
-        >>> abcStr = ('M:6/8\\nL:1/8\\nK:G\\nV:1 name="Whistle" ' +
-        ...     'snm="wh"\\nB3 A3 | G6 | B3 A3 | G6 ||\\nV:2 name="violin" ' +
-        ...     'snm="v"\\nBdB AcA | GAG D3 | BdB AcA | GAG D6 ||\\nV:3 name="Bass" ' +
-        ...     'snm="b" clef=bass\\nD3 D3 | D6 | D3 D3 | D6 ||')
+        >>> abcStr = ('M:6/8\\nL:1/8\\nK:G\\nV:1 name="Whistle" '
+        ...           'snm="wh"\\nB3 A3 | G6 | B3 A3 | G6 ||\\nV:2 name="violin" '
+        ...           'snm="v"\\nBdB AcA | GAG D3 | BdB AcA | GAG D6 ||\\nV:3 name="Bass" '
+        ...           'snm="b" clef=bass\\nD3 D3 | D6 | D3 D3 | D6 ||')
         >>> ah = abcFormat.ABCHandler()
         >>> junk = ah.process(abcStr)
         >>> ah.definesMeasures()
@@ -2989,10 +2994,10 @@ class ABCHandler:
 
         Each part is returned as a ABCHandler instance.
 
-        >>> abcStr = ('M:6/8\\nL:1/8\\nK:G\\nV:1 name="Whistle" ' +
-        ...     'snm="wh"\\nB3 A3 | G6 | B3 A3 | G6 ||\\nV:2 name="violin" ' +
-        ...     'snm="v"\\nBdB AcA | GAG D3 | BdB AcA | GAG D6 ||\\nV:3 name="Bass" ' +
-        ...     'snm="b" clef=bass\\nD3 D3 | D6 | D3 D3 | D6 ||')
+        >>> abcStr = ('M:6/8\\nL:1/8\\nK:G\\nV:1 name="Whistle" '
+        ...           'snm="wh"\\nB3 A3 | G6 | B3 A3 | G6 ||\\nV:2 name="violin" '
+        ...           'snm="v"\\nBdB AcA | GAG D3 | BdB AcA | GAG D6 ||\\nV:3 name="Bass" '
+        ...           'snm="b" clef=bass\\nD3 D3 | D6 | D3 D3 | D6 ||')
         >>> ah = abcFormat.ABCHandler()
         >>> ah.process(abcStr)
         >>> tokenColls = ah.splitByVoice()
