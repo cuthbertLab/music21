@@ -1502,8 +1502,8 @@ class PartParser(XMLParserBase):
         self.lastMeasureWasShort = False
         self.lastMeasureOffset = 0.0
 
-        # a dict of clefs per staff number
-        self.lastClefs: dict[int, clef.Clef|None] = {NO_STAFF_ASSIGNED: clef.TrebleClef()}
+        # a dict of clefs per staff number -- needed for converting rests w/ steps
+        self.lastClefs: dict[int, clef.Clef|None] = {}
         self.activeTuplets: list[duration.Tuplet|None] = [None] * 7
 
         self.maxStaves = 1  # will be changed in measure parsing
@@ -2484,7 +2484,7 @@ class MeasureParser(SoundTagMixin, XMLParserBase):
         self.pedalToStartOffset: weakref.WeakKeyDictionary = weakref.WeakKeyDictionary()
 
     @staticmethod
-    def getStaffNumber(mxObjectOrNumber) -> int:
+    def getStaffNumber(mxObject: ET.Element|int|None) -> int:
         '''
         gets an int representing a staff number, or 0 (representing no staff assigned)
         from an mxObject or a number:
@@ -2492,77 +2492,108 @@ class MeasureParser(SoundTagMixin, XMLParserBase):
         >>> mp = musicxml.xmlToM21.MeasureParser()
         >>> from xml.etree.ElementTree import fromstring as EL
 
-        >>> gsn = mp.getStaffNumber
-        >>> gsn(1)
-        1
-        >>> gsn('2')
-        2
-
         <note> tags store their staff numbers in a <staff> tag's text:
 
-        >>> gsn(EL('<note><staff>2</staff></note>'))
-        2
+        >>> mp.getStaffNumber(EL('<note><staff>3</staff></note>'))
+        3
 
-        Or if there is no <staff> tag, they get a special NO_STAFF_ASSIGNED value.
+        If there is no <staff> tag, notes return the special NO_STAFF_ASSIGNED value,
+        (which is for now just a fancy alias for 0!)
 
         >>> el = EL('<note><pitch><step>C</step><octave>4</octave></pitch></note>')
-        >>> gsn(el) == musicxml.xmlToM21.NO_STAFF_ASSIGNED
+        >>> NO_STAFF_ASSIGNED = musicxml.xmlToM21.NO_STAFF_ASSIGNED
+        >>> mp.getStaffNumber(el) == NO_STAFF_ASSIGNED
         True
 
-        Clefs, however, store their staff numbers in a `number` attribute.
+        Other objects, such as keys, clefs, and various layouts, however,
+        store their staff numbers in a `number` attribute.
 
-        >>> gsn(EL('<clef number="2"/>'))
+        >>> mp.getStaffNumber(EL('<key number="2"/>'))
         2
-        >>> gsn(None) == musicxml.xmlToM21.NO_STAFF_ASSIGNED
+
+        If there is no number for most objects, such as keys and time signatures,
+        it means that the object affects all staves (makes sense for a time signature, no?).
+        Hence they are treated as NO_STAFF_ASSIGNED
+
+        >>> mp.getStaffNumber(EL('<key/>')) == NO_STAFF_ASSIGNED
         True
+
+
+        Clef, staff-layout, and staff-details objects, however, use a missing number
+        to mean staff 1.
+
+        >>> mp.getStaffNumber(EL('<clef/>'))
+        1
+
+        Passing in None or an int is allowed.
+
+        >>> mp.getStaffNumber(None) == NO_STAFF_ASSIGNED
+        True
+        >>> mp.getStaffNumber(1)
+        1
+
+        Deprecation notice: getting staff number from a string is deprecated
+            and will be removed in v11 (this sort of lazy conversion is frowned upon).
+
+        OMIT_FROM_DOCS
+
+        Stop dealing with and documenting this silliness in v11
+
+        >>> mp.getStaffNumber('2')
+        2
         '''
-        if isinstance(mxObjectOrNumber, int):
-            return mxObjectOrNumber
-        elif isinstance(mxObjectOrNumber, str):
-            return int(mxObjectOrNumber)
-        elif mxObjectOrNumber is None:
+        if isinstance(mxObject, int):
+            return mxObject
+        elif isinstance(mxObject, str):
+            return int(mxObject)
+        elif mxObject is None:
             return NO_STAFF_ASSIGNED
-        mxObject = mxObjectOrNumber
+        tag = mxObject.tag
 
         # find objects that use a "staff" element
         # harmony, forward, note, direction
-        if mxObject.tag in ('harmony', 'forward', 'note', 'direction'):
+        if tag in ('harmony', 'forward', 'note', 'direction'):
             try:
                 staffObject = mxObject.find('staff')
                 if staffObject is not None:
-                    try:
-                        k = staffObject.text.strip()
+                    staffText = staffObject.text
+                    if staffText is not None:
+                        k = staffText.strip()
                         return int(k)
-                    except TypeError:
-                        return NO_STAFF_ASSIGNED
-                    except AttributeError:
-                        pass
-            except AttributeError:
+            except (AttributeError, TypeError, ValueError):
                 pass
             return NO_STAFF_ASSIGNED
-        elif mxObject.tag in ('staff-layout',
-                              'staff-details',
-                              'measure-style',
-                              'clef',
-                              'key',
-                              'time',
-                              'transpose'):
+        elif tag in ('staff-layout',
+                     'staff-details',
+                     'measure-style',
+                     'clef',
+                     'key',
+                     'time',
+                     'transpose'):
             # these objects store staff assignment simply as an attribute called number.
             try:
-                k = mxObject.get('number')
+                k_str = mxObject.get('number')
                 # this must be a positive integer as string
-                return int(k)
-            except TypeError:
+                if k_str is not None:
+                    return int(k_str)
+            except (TypeError, ValueError, AttributeError):
                 pass
-            except AttributeError:  # a normal number
-                pass
+            if tag in ('staff-layout',
+                       'staff-details',
+                       'clef'):
+                # for this subset of number'ed tags, no number means staff 1
+                return 1
             return NO_STAFF_ASSIGNED
         else:
             return NO_STAFF_ASSIGNED
             # TODO: handle part-symbol (attributes: top-staff, bottom-staff)
             # separately
 
-    def addToStaffReference(self, mxObjectOrNumber, m21Object):
+    def addToStaffReference(
+        self,
+        mxObjectOrNumber: int|ET.Element|None,
+        m21Object: base.Music21Object
+    ) -> None:
         '''
         Utility routine for importing musicXML objects;
         here, we store a reference to the music21 object in a dictionary,
@@ -2597,12 +2628,20 @@ class MeasureParser(SoundTagMixin, XMLParserBase):
         [<music21.note.Note G>]
         '''
         staffReference = self.staffReference
-        staffKey = self.getStaffNumber(mxObjectOrNumber)  # an int, including 0 = NO_STAFF_ASSIGNED
+        if isinstance(mxObjectOrNumber, int):
+            staffKey = mxObjectOrNumber
+        else:
+            staffKey = self.getStaffNumber(mxObjectOrNumber)  # an int incl. NO_STAFF_ASSIGNED
         if staffKey not in staffReference:
             staffReference[staffKey] = []
         staffReference[staffKey].append(m21Object)
 
-    def insertCoreAndRef(self, offset, mxObjectOrNumber, m21Object):
+    def insertCoreAndRef(
+        self,
+        offset,
+        staffSource: int|ET.Element|None,
+        m21Object: base.Music21Object
+    ) -> None:
         '''
         runs addToStaffReference and then insertCore (which will do opFracs, so no need to do
         so before here)
@@ -2620,7 +2659,7 @@ class MeasureParser(SoundTagMixin, XMLParserBase):
         >>> MP.stream.show('text')
         {1.0} <music21.note.Note F>
         '''
-        self.addToStaffReference(mxObjectOrNumber, m21Object)
+        self.addToStaffReference(staffSource, m21Object)
         self.stream.coreInsert(offset, m21Object)
 
     def parse(self):
@@ -2755,8 +2794,8 @@ class MeasureParser(SoundTagMixin, XMLParserBase):
             # so that staff distance can change.
             for stl in stlList:
                 if stl is None or stl.staffNumber is None:
-                    continue  # sibelius likes to give empty staff layouts!
-                self.insertCoreAndRef(0.0, str(stl.staffNumber), stl)
+                    continue  # Sibelius likes to give empty staff layouts!
+                self.insertCoreAndRef(0.0, int(stl.staffNumber), stl)
             self.stream.coreElementsChanged()
         # TODO: measure-layout -- affect self.stream
         mxMeasureNumbering = mxPrint.find('measure-numbering')
@@ -3395,27 +3434,33 @@ class MeasureParser(SoundTagMixin, XMLParserBase):
         >>> r.duration.quarterLength
         0.5
 
-        >>> mxr = EL('<note><rest><display-step>G</display-step>' +
-        ...              '<display-octave>4</display-octave>' +
-        ...              '</rest><duration>5</duration><type>eighth</type></note>')
-        >>> r = MP.xmlToRest(mxr)
+        Rests that have display-step and display-octave get converted to rests
+        with `stepShift` set.  For instance, this rest appears where G4 normally is:
+
+        >>> mxr_positioned = EL(
+        ...     '<note><rest>'
+        ...     + '<display-step>G</display-step>'
+        ...     + '<display-octave>4</display-octave>'
+        ...     + '</rest>'
+        ...     + '<duration>5</duration><type>eighth</type></note>'
+        ... )
+        >>> r = MP.xmlToRest(mxr_positioned)
         >>> r
         <music21.note.Rest eighth>
 
-        A rest normally lies at B4 in treble clef, but here we have put it at
-        G4, so we'll shift it down two steps.
+        A rest normally lies at B4 in treble clef, so G4 is shifted down two steps.
 
         >>> r.stepShift
         -2
 
-        Clef context matters, here we will set it for notes that don't specify a staff:
+        Note that clef context matters.  If the last clef for the staff were BassClef
+        this would be a very high clef.  (Rests without a `<staff>` set read the clef
+        from staff number 1, or treble clef if no pitch clef has been assigned).
 
-        >>> MP.lastClefs[musicxml.xmlToM21.NO_STAFF_ASSIGNED] = clef.BassClef()
-        >>> r = MP.xmlToRest(mxr)
+        If the last clef for staff 1 were bass clef, this would be a very high rest.
 
-        Now this is a high rest:
-
-        >>> r.stepShift
+        >>> MP.lastClefs[1] = clef.BassClef()
+        >>> MP.xmlToRest(mxr_positioned).stepShift
         10
 
         Test full measure rest defined with measure="yes" and a duration indicating
@@ -3453,6 +3498,24 @@ class MeasureParser(SoundTagMixin, XMLParserBase):
         True
         >>> r.fullMeasure
         'auto'
+
+        OMIT_FROM_DOCS
+
+        Check that the `<staff>` element for rests is properly read.
+
+        >>> MP2 = musicxml.xmlToM21.MeasureParser()
+        >>> MP2.divisions = 10
+        >>> MP2.lastClefs[1] = clef.BassClef()
+        >>> MP2.lastClefs[2] = clef.AltoClef()
+
+        >>> staff2 = EL('<staff>2</staff>')
+        >>> mxr_positioned.append(staff2)
+        >>> r = MP2.xmlToRest(mxr_positioned)
+
+        From treble is -2, but +6 for treble to alto clef conversion = 4
+
+        >>> r.stepShift
+        4
         '''
         d = self.xmlToDuration(mxRest)
         r = note.Rest(duration=d)
@@ -3482,16 +3545,16 @@ class MeasureParser(SoundTagMixin, XMLParserBase):
             # musicxml records rest display as a pitch in the current
             # clef.  Music21 records it as an offset (in steps) from the
             # middle line.  So we need clef context.
-            restStaff = self.getStaffNumber(mxRest)
+            restStaff = self.getStaffNumber(mxRest) or 1  # 1 = default staff for getting clef
             try:
                 cc = self.lastClefs[restStaff]
-                if cc is None:
-                    ccMidLine = 35  # assume TrebleClef
+                if cc is None or not isinstance(cc, clef.PitchClef):
+                    ccMidLine = clef.TREBLE_MID_LINE_DNN  # assume TrebleClef
                 else:
                     ccMidLine = cc.lowestLine + 4
             except KeyError:
                 # assume treble clef
-                ccMidLine = 35
+                ccMidLine = clef.TREBLE_MID_LINE_DNN
             r.stepShift = tempP.diatonicNoteNum - ccMidLine
 
         return self.xmlNoteToGeneralNoteHelper(r, mxRest)
@@ -6000,26 +6063,48 @@ class MeasureParser(SoundTagMixin, XMLParserBase):
             # this should be done by changing the displaySequence directly.
         return ts
 
-    def handleClef(self, mxClef):
+    def handleClef(self, mxClef) -> clef.Clef:
         # noinspection PyShadowingNames
         '''
-        Handles a clef object, appending it to the core, and
-        setting self.lastClefs for the staff number.
+        Convert a `<clef>` tag to a music21.clef.Clef object, append it to the
+        core, and set self.lastClefs for the staff number.
 
-        >>> import xml.etree.ElementTree as ET
-        >>> mxClef = ET.fromstring('<clef><sign>G</sign><line>2</line></clef>')
-
+        >>> from xml.etree.ElementTree import fromstring as EL
         >>> MP = musicxml.xmlToM21.MeasureParser()
-        >>> MP.handleClef(mxClef)
         >>> MP.lastClefs
-        {0: <music21.clef.TrebleClef>}
+        {}
 
-        >>> mxClefBC = ET.fromstring('<clef number="2"><sign>F</sign><line>4</line></clef>')
-        >>> MP.handleClef(mxClefBC)
-        >>> MP.lastClefs[2]
+        >>> mxAltoClef = EL('<clef number="2"><sign>C</sign><line>3</line></clef>')
+        >>> altoClef = MP.handleClef(mxAltoClef)
+        >>> altoClef
+        <music21.clef.AltoClef>
+
+        The MeasureParser (together with its parent PartParser) keeps track of the
+        current clef for each staff in a shared dictionary called `.lastClefs`.
+
+        >>> MP.lastClefs
+        {2: <music21.clef.AltoClef>}
+        >>> MP.lastClefs[2] is altoClef
+        True
+
+        The dictionary is shared with the parent PartParser.
+
+        >>> MP.parent.lastClefs is MP.lastClefs
+        True
+
+        Per MusicXML standard, a clef without a number is interpreted as being for staff 1
+
+        >>> mxClefBC = EL('<clef><sign>F</sign><line>4</line></clef>')
+        >>> bc = MP.handleClef(mxClefBC)
+        >>> bc
         <music21.clef.BassClef>
-        >>> MP.lastClefs[0]
-        <music21.clef.TrebleClef>
+
+        >>> MP.lastClefs
+        {2: <music21.clef.AltoClef>, 1: <music21.clef.BassClef>}
+
+        Changed in v10.5 -- Fixed bug where clefs without number were applied to all staves
+            rather than correct MusicXML interpretation of staff 1.  Returns the clef created.
+            There is no longer a default treble clef for NO_STAFF_ASSIGNED.
         '''
         clefObj = self.xmlToClef(mxClef)
         self.insertCoreAndRef(self.offsetMeasureNote, mxClef, clefObj)
@@ -6027,6 +6112,7 @@ class MeasureParser(SoundTagMixin, XMLParserBase):
         # Update the list of lastClefs -- needed for rest display.
         staffNumberStrOrNone = self.getStaffNumber(mxClef)
         self.lastClefs[staffNumberStrOrNone] = clefObj
+        return clefObj
 
     def xmlToClef(self, mxClef):
         # noinspection PyShadowingNames

@@ -34,6 +34,8 @@ if t.TYPE_CHECKING:
 
 environLocal = environment.Environment('clef')
 
+TREBLE_MID_LINE_DNN = 35
+
 
 class ClefException(exceptions21.Music21Exception):
     pass
@@ -251,7 +253,7 @@ class Clef(base.Music21Object):
         if isinstance(self, (PercussionClef, PitchClef)) and self.lowestLine is not None:
             midLine = self.lowestLine + 4  # pylint: disable=no-member
         else:
-            midLine = 35  # assume TrebleClef-like.
+            midLine = TREBLE_MID_LINE_DNN  # assume TrebleClef-like.
 
         for p in relevantPitches:
             distanceFromMidLine = p.diatonicNoteNum - midLine
