@@ -104,7 +104,8 @@ class VoiceLeadingQuartet(base.Music21Object):
     * Changed in v11: all four notes are now required arguments and can no
       longer be None; they are always present as :class:`~music21.note.Note`
       objects.  This allows the `.v1n1`, `.v1n2`, `.v2n1`, and `.v2n2` properties
-      to satisfy modern static type checking.
+      to satisfy modern static type checking.  The ``analyticKey`` keyword was
+      renamed to ``key``.
     '''
 
     _DOC_ATTR: dict[str, str] = {
@@ -134,9 +135,12 @@ class VoiceLeadingQuartet(base.Music21Object):
         v1n2: str|note.Note|pitch.Pitch,
         v2n1: str|note.Note|pitch.Pitch,
         v2n2: str|note.Note|pitch.Pitch,
-        analyticKey: Key|None = None,
+        key: str|Key|None = None,
         **keywords
     ):
+        # ``analyticKey`` is the long-deprecated former name of ``key``.
+        if 'analyticKey' in keywords:
+            key = keywords.pop('analyticKey')
         super().__init__(**keywords)
         global _intervals
         if _intervals is None:
@@ -154,8 +158,8 @@ class VoiceLeadingQuartet(base.Music21Object):
         self.v2n2 = v2n2
 
         self._key: Key|None = None
-        if analyticKey is not None:
-            self.key = analyticKey
+        if key is not None:
+            self.key = key
         self._findIntervals()
 
     def _reprInternal(self) -> str:
