@@ -60,20 +60,16 @@ if t.TYPE_CHECKING:
 #    importing issue with counterpoint.py and figuredbass
 
 
+# noinspection PyInvalidCast
 @dataclasses.dataclass
 class _IntervalCache:
     '''
     The three fixed intervals that VoiceLeadingQuartet compares against when
-    testing for parallels and hidden intervals.  The fields start out None and
-    are filled in the first time a VoiceLeadingQuartet is created, so importing
-    this module does not build Interval objects that may never be needed.
-
-    Typed as always-present: by the time any method reads them, __init__ has run
-    and filled them in.
+    testing for parallels and hidden intervals.  Filled in on first `__init__`
     '''
-    unison: interval.Interval = None  # type: ignore[assignment]
-    fifth: interval.Interval = None  # type: ignore[assignment]
-    octave: interval.Interval = None  # type: ignore[assignment]
+    unison: interval.Interval = t.cast(interval.Interval, None)
+    fifth: interval.Interval = t.cast(interval.Interval, None)
+    octave: interval.Interval = t.cast(interval.Interval, None)
 
 
 # Shared P1/P5/P8 cache; its fields are populated the first time a
@@ -105,10 +101,8 @@ class VoiceLeadingQuartet(base.Music21Object):
     to make sense.  Most routines will work the other way still though.
 
     * Changed in v11: all four notes are now required arguments and can no
-      longer be None; they are always present as :class:`~music21.note.Note`
-      objects.  This allows the `.v1n1`, `.v1n2`, `.v2n1`, and `.v2n2` properties
-      to satisfy modern static type checking.  The ``analyticKey`` keyword was
-      renamed to ``key``.
+      longer be set later; they are always present as :class:`~music21.note.Note`
+      objects. `analyticKey` renamed to `key`. `vIntervals` and ``hIntervals` are now tuples.
     '''
 
     _DOC_ATTR: dict[str, str] = {
@@ -141,7 +135,7 @@ class VoiceLeadingQuartet(base.Music21Object):
         key: str|Key|None = None,
         **keywords
     ):
-        # ``analyticKey`` is the long-deprecated former name of ``key``.
+        # ``analyticKey`` is the former name of ``key``.  Remove sometime in deep future.
         if 'analyticKey' in keywords:
             key = keywords.pop('analyticKey')
         super().__init__(**keywords)
@@ -1440,9 +1434,11 @@ def getVerticalityFromObject(music21Obj, scoreObjectIsFrom, classFilterList=None
 
     contentDict = {}
     for partNum, partObj in enumerate(scoreObjectIsFrom.parts):
-        elementSelection = partObj.flatten().getElementsByOffset(offsetOfObject,
-                                                         mustBeginInSpan=False,
-                                                         classList=classFilterList)
+        elementSelection = partObj.flatten().getElementsByOffset(
+            offsetOfObject,
+            mustBeginInSpan=False,
+            classList=classFilterList,
+        )
         for el in elementSelection:
             if partNum in contentDict:
                 contentDict[partNum].append(el)
@@ -1453,7 +1449,8 @@ def getVerticalityFromObject(music21Obj, scoreObjectIsFrom, classFilterList=None
 
 class Verticality(base.Music21Object):
     '''
-    DEPRECATED in v7 in favor of tree.verticality.Verticality
+    DEPRECATED in favor of tree.verticality.Verticality (but still available since
+    not every feature of it has been replicated there).
 
     A Verticality (previously called "vertical slice")
     object provides more accessible information about
