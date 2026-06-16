@@ -90,8 +90,6 @@ class VoiceLeadingQuartet(base.Music21Object):
       longer be None; they are always present as :class:`~music21.note.Note`
       objects.  This allows the `.v1n1`, `.v1n2`, `.v2n1`, and `.v2n2` properties
       to satisfy modern static type checking.
-
-    Note: the v11 change requiring the four notes was AI-assisted (Claude).
     '''
 
     _DOC_ATTR: dict[str, str] = {
