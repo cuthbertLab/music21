@@ -166,7 +166,7 @@ class VoiceLeadingQuartet(base.Music21Object):
     def key(self) -> Key|None:
         '''
         Get or set the key of this VoiceLeadingQuartet, for use in theory analysis routines
-        such as closesIncorrectly. Can be None
+        such as clausulaVera. Can be None
 
         >>> vlq = voiceLeading.VoiceLeadingQuartet('D', 'G', 'B', 'G')
         >>> vlq.key is None
@@ -1233,45 +1233,47 @@ class VoiceLeadingQuartet(base.Music21Object):
         else:
             return False
 
-    def opensIncorrectly(self) -> bool:
+    def modalOpening(self) -> bool:
         '''
-        TODO(msc): will be renamed to be less dogmatic
-
-        Returns True if the VLQ would be an incorrect opening in
-        the style of 16th century Counterpoint (not Bach Chorale style)
+        Returns True if the VLQ would be an acceptable opening in
+        the style of 16th century Counterpoint (not Bach Chorale style).
 
         Returns True if the opening or second harmonic interval is PU, P8, or P5,
-        to accommodate an anacrusis.
-        also checks to see if opening establishes tonic or dominant harmony (uses
-        :meth:`~music21.roman.identifyAsTonicOrDominant`
+        to accommodate an anacrusis,
+        and the opening establishes tonic or dominant harmony (uses
+        :meth:`~music21.roman.identifyAsTonicOrDominant`).
 
         >>> vl = voiceLeading.VoiceLeadingQuartet('D', 'D', 'D', 'F#')
         >>> vl.key = 'D'
-        >>> vl.opensIncorrectly()
-        False
+        >>> vl.modalOpening()
+        True
         >>> vl = voiceLeading.VoiceLeadingQuartet('B', 'A', 'G#', 'A')
         >>> vl.key = 'A'
-        >>> vl.opensIncorrectly()
-        False
+        >>> vl.modalOpening()
+        True
         >>> vl = voiceLeading.VoiceLeadingQuartet('A', 'A', 'F#', 'D')
         >>> vl.key = 'A'
-        >>> vl.opensIncorrectly()
-        False
+        >>> vl.modalOpening()
+        True
 
         >>> vl = voiceLeading.VoiceLeadingQuartet('C#', 'C#', 'D', 'E')
         >>> vl.key = 'A'
-        >>> vl.opensIncorrectly()
-        True
+        >>> vl.modalOpening()
+        False
 
         >>> vl = voiceLeading.VoiceLeadingQuartet('B', 'B', 'A', 'A')
         >>> vl.key = 'C'
-        >>> vl.opensIncorrectly()
-        True
+        >>> vl.modalOpening()
+        False
+
+        * New in v11: replaces the deprecated ``opensIncorrectly``, with the
+          sense of the returned boolean reversed.
         '''
         from music21 import roman
         if self.key is None:
             raise VoiceLeadingQuartetException(
-                'opensIncorrectly requires a key to be set on the VoiceLeadingQuartet'
+                'modalOpening requires a key to be set '
+                'on the VoiceLeadingQuartet'
             )
         v0 = self.vIntervals[0]
         v1 = self.vIntervals[1]
@@ -1289,65 +1291,96 @@ class VoiceLeadingQuartet(base.Music21Object):
         r1 = roman.identifyAsTonicOrDominant(c1, self.key)
         r2 = roman.identifyAsTonicOrDominant(c2, self.key)
         openings = ['P1', 'P5', 'I', 'V']
-        return not ((v0.simpleName in openings
-                        or v1.simpleName in openings)
-                      and (r1[0].upper() in openings if r1 is not False else False
-                           or r2[0].upper() in openings if r2 is not False else False))
+        return ((v0.simpleName in openings
+                    or v1.simpleName in openings)
+                  and (r1[0].upper() in openings if r1 is not False else False
+                       or r2[0].upper() in openings if r2 is not False else False))
 
-    def closesIncorrectly(self) -> bool:
+    @common.decorators.deprecated(
+        'June 2026', 'v12', 'Use `not vlq.modalOpening()` instead.'
+    )
+    def opensIncorrectly(self) -> bool:  # pragma: no cover
         '''
-        TODO(msc): will be renamed to be less dogmatic
+        Deprecated synonym for ``not self.modalOpening()``.
+        '''
+        return not self.modalOpening()
 
-        Returns True if the VLQ would be an incorrect closing in
-        the style of 16th century Counterpoint (not Bach Chorale style)
+    def clausulaVera(self) -> bool:
+        '''
+        Returns True if the VLQ is an acceptable closing (a *clausula vera*
+        cadence) in the style of 16th century Counterpoint (not Bach Chorale
+        style).
 
-        Returns True if closing harmonic interval is a P8 or PU and the interval
-        approaching the close is
-        6 - 8, 10 - 8, or 3 - U. Must be in contrary motion, and if in minor key,
-        has a leading tone resolves to the tonic.
+        The closing must be a stepwise, contrary-motion approach to the tonic:
+        the two melodic motions are a minor second in one voice (the leading
+        tone) and a major second in the other, both voices land on the tonic of
+        :attr:`key`, and the closing harmonic interval is a unison or a single
+        octave (not a double octave or wider).
 
         >>> vl = voiceLeading.VoiceLeadingQuartet('C#', 'D', 'E', 'D')
         >>> vl.key = key.Key('d')
-        >>> vl.closesIncorrectly()
-        False
+        >>> vl.clausulaVera()
+        True
+
+        A close on the octave works too:
+
+        >>> vl = voiceLeading.VoiceLeadingQuartet('B4', 'C5', 'D4', 'C4')
+        >>> vl.key = key.Key('C')
+        >>> vl.clausulaVera()
+        True
+
+        A leap to the tonic (here the bass leaps rather than steps) is not a
+        clausula vera:
+
         >>> vl = voiceLeading.VoiceLeadingQuartet('B3', 'C4', 'G3', 'C2')
         >>> vl.key = key.Key('C')
-        >>> vl.closesIncorrectly()
+        >>> vl.clausulaVera()
         False
+
+        Similar motion (rather than contrary) is rejected:
+
         >>> vl = voiceLeading.VoiceLeadingQuartet('F', 'G', 'D', 'G')
         >>> vl.key = key.Key('g')
-        >>> vl.closesIncorrectly()
-        True
-        >>> vl = voiceLeading.VoiceLeadingQuartet('C#4', 'D4', 'A2', 'D3', analyticKey='D')
-        >>> vl.closesIncorrectly()
-        True
+        >>> vl.clausulaVera()
+        False
+
+        And a stepwise contrary close onto the tonic two octaves apart is
+        rejected, since the closing interval is a double octave:
+
+        >>> vl = voiceLeading.VoiceLeadingQuartet('B4', 'C5', 'D3', 'C3')
+        >>> vl.key = key.Key('C')
+        >>> vl.clausulaVera()
+        False
+
+        Note that Phrygian clausula vera forms (in which the semitone is the
+        descending upper-voice motion to the final rather than an ascending
+        leading tone) are not currently respected.
+
+        * New in v11: replaces the deprecated ``closesIncorrectly``, with the
+          sense of the returned boolean reversed and the test simplified to a
+          strict clausula vera.
         '''
         if self.key is None:
             raise VoiceLeadingQuartetException(
-                'closesIncorrectly requires a key to be set on the VoiceLeadingQuartet'
+                'clausulaVera requires a key to be set '
+                'on the VoiceLeadingQuartet'
             )
-        raisedMinorCorrectly = False
-        if self.key.mode == 'minor':
-            if self.key.pitchFromDegree(7).transpose('A1').name == self.v1n1.name:
-                raisedMinorCorrectly = self.key.getScaleDegreeFromPitch(self.v1n2) == 1
-            elif self.key.pitchFromDegree(7).transpose('A1').name == self.v2n1.name:
-                raisedMinorCorrectly = self.key.getScaleDegreeFromPitch(self.v1n2) == 1
-        else:
-            raisedMinorCorrectly = True
-        preClosings = (6, 3)
-        closingPitches = [self.v1n2.pitch.name, self.v2n2.name]
+        tonicName = self.key.tonic.name
+        hIntervalNames = {self.hIntervals[0].name, self.hIntervals[1].name}
+        return (hIntervalNames == {'m2', 'M2'}
+                 and self.contraryMotion()
+                 and self.vIntervals[1].name in ('P1', 'P8')
+                 and self.v1n2.name == tonicName
+                 and self.v2n2.name == tonicName)
 
-        vInt0_generic = self.vIntervals[0].generic
-        vInt1_generic = self.vIntervals[1].generic
-        if t.TYPE_CHECKING:
-            assert vInt0_generic is not None
-            assert vInt1_generic is not None
-
-        return not (vInt0_generic.simpleUndirected in preClosings
-                     and vInt1_generic.simpleUndirected == 1
-                     and raisedMinorCorrectly
-                     and self.key.pitchFromDegree(1).name in closingPitches
-                     and self.contraryMotion())
+    @common.decorators.deprecated(
+        'June 2026', 'v12', 'Use `not vlq.clausulaVera()` instead.'
+    )
+    def closesIncorrectly(self) -> bool:  # pragma: no cover
+        '''
+        Deprecated synonym for ``not self.clausulaVera()``.
+        '''
+        return not self.clausulaVera()
 
 
 class VoiceLeadingQuartetException(exceptions21.Music21Exception):
