@@ -94,11 +94,11 @@ class VoiceLeadingQuartet(base.Music21Object):
 
     _DOC_ATTR: dict[str, str] = {
         'vIntervals': '''
-            A two-element list of the two harmonic intervals present,
+            A two-element tuple of the two harmonic intervals present,
             vn1n1 to v2n1 and v1n2 to v2n2.
             ''',
         'hIntervals': '''
-            A two-element list of the two melodic intervals present,
+            A two-element tuple of the two melodic intervals present,
             v1n1 to v1n2 and v2n1 to v2n2.
             ''',
     }
@@ -136,8 +136,10 @@ class VoiceLeadingQuartet(base.Music21Object):
         self.v2n1 = v2n1
         self.v2n2 = v2n2
 
-        self.vIntervals: list[interval.Interval] = []  # vertical intervals (harmonic)
-        self.hIntervals: list[interval.Interval] = []  # horizontal intervals (melodic)
+        # vertical (harmonic) and horizontal (melodic) intervals, each a fixed
+        # pair, populated by _findIntervals() below.
+        self.vIntervals: tuple[interval.Interval, interval.Interval]
+        self.hIntervals: tuple[interval.Interval, interval.Interval]
 
         self._key = None
         if analyticKey is not None:
@@ -267,15 +269,17 @@ class VoiceLeadingQuartet(base.Music21Object):
         <music21.note.Note F>
         ''')
 
-    def _findIntervals(self):
-        self.vIntervals.append(interval.Interval(self.v1n1, self.v2n1))
-        self.vIntervals.append(interval.Interval(self.v1n2, self.v2n2))
-        self.hIntervals.append(interval.Interval(self.v1n1, self.v1n2))
-        self.hIntervals.append(interval.Interval(self.v2n1, self.v2n2))
-        for vIntv in self.vIntervals:
-            vIntv.intervalType = 'harmonic'
-        for hIntv in self.hIntervals:
-            hIntv.intervalType = 'melodic'
+    def _findIntervals(self) -> None:
+        vInterval0 = interval.Interval(self.v1n1, self.v2n1)
+        vInterval1 = interval.Interval(self.v1n2, self.v2n2)
+        hInterval0 = interval.Interval(self.v1n1, self.v1n2)
+        hInterval1 = interval.Interval(self.v2n1, self.v2n2)
+        vInterval0.intervalType = 'harmonic'
+        vInterval1.intervalType = 'harmonic'
+        hInterval0.intervalType = 'melodic'
+        hInterval1.intervalType = 'melodic'
+        self.vIntervals = (vInterval0, vInterval1)
+        self.hIntervals = (hInterval0, hInterval1)
 
     def motionType(self, *, allowAntiParallel=False):
         '''
