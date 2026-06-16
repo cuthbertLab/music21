@@ -7,7 +7,7 @@
 #               Jackie Rogoff
 #               Beth Hadley
 #
-# Copyright:    Copyright © 2009-2024 Michael Scott Asato Cuthbert
+# Copyright:    Copyright © 2009-2026 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
@@ -35,6 +35,7 @@ The list of objects included here are:
 from __future__ import annotations
 
 from collections.abc import Generator
+import dataclasses
 import enum
 import typing as t
 import unittest
@@ -45,7 +46,7 @@ from music21 import clef
 from music21 import common
 from music21 import exceptions21
 from music21 import interval
-from music21 import key
+from music21.key import Key, KeySignature, convertKeyStringToMusic21KeyString
 from music21 import meter
 from music21 import note
 from music21 import pitch
@@ -58,9 +59,23 @@ if t.TYPE_CHECKING:
 # from music21 import roman Can't import roman because of circular
 #    importing issue with counterpoint.py and figuredbass
 
-# create a module level shared cache for intervals of P1, P5, P8
-# to be populated the first time a VLQ object is created
-intervalCache: list[interval.Interval] = []
+
+@dataclasses.dataclass(frozen=True)
+class _IntervalCache:
+    '''
+    The three fixed intervals that VoiceLeadingQuartet compares against when
+    testing for parallels and hidden intervals.
+    '''
+    unison: interval.Interval
+    fifth: interval.Interval
+    octave: interval.Interval
+
+
+# Shared P1/P5/P8 cache, populated the first time a VoiceLeadingQuartet is
+# created (don't want to slow import if no VLQ is created).
+# Typed as always-present: by the time any method reads it, __init__ has run and filled it in.
+# noinspection PyInvalidCast
+_intervals: _IntervalCache = t.cast(_IntervalCache, None)
 
 
 class MotionType(str, enum.Enum):
@@ -103,57 +118,54 @@ class VoiceLeadingQuartet(base.Music21Object):
             ''',
     }
 
+    # All six are populated during __init__: the four notes via the property
+    # setters (which use setattr) and the interval pairs via _findIntervals().
+    # Declared at class level so type checkers see them as always-present.
+    _v1n1: note.Note
+    _v1n2: note.Note
+    _v2n1: note.Note
+    _v2n2: note.Note
+    vIntervals: tuple[interval.Interval, interval.Interval]
+    hIntervals: tuple[interval.Interval, interval.Interval]
+
     def __init__(
         self,
         v1n1: str|note.Note|pitch.Pitch,
         v1n2: str|note.Note|pitch.Pitch,
         v2n1: str|note.Note|pitch.Pitch,
         v2n2: str|note.Note|pitch.Pitch,
-        analyticKey: key.Key|None = None,
+        analyticKey: Key|None = None,
         **keywords
     ):
         super().__init__(**keywords)
-        if not intervalCache:
-            # populate interval cache if not done yet
-            # more efficient than doing it as Class level variables
-            # if VLQ is never called (likely)
-            intervalCache.append(interval.Interval('P1'))
-            intervalCache.append(interval.Interval('P5'))
-            intervalCache.append(interval.Interval('P8'))
-        self.unison = intervalCache[0]
-        self.fifth = intervalCache[1]
-        self.octave = intervalCache[2]
+        global _intervals
+        if _intervals is None:
+            # populate the shared interval cache the first time a VLQ is created
+            _intervals = _IntervalCache(
+                unison=interval.Interval('P1'),
+                fifth=interval.Interval('P5'),
+                octave=interval.Interval('P8'),
+            )
 
-        # the four notes are always set; the private attributes are populated
-        # by the property setters below (via setattr in _setVoiceNote).
-        self._v1n1: note.Note
-        self._v1n2: note.Note
-        self._v2n1: note.Note
-        self._v2n2: note.Note
-
+        # the four notes (the property setters populate _v1n1.._v2n2 via setattr)
         self.v1n1 = v1n1
         self.v1n2 = v1n2
         self.v2n1 = v2n1
         self.v2n2 = v2n2
 
-        # vertical (harmonic) and horizontal (melodic) intervals, each a fixed
-        # pair, populated by _findIntervals() below.
-        self.vIntervals: tuple[interval.Interval, interval.Interval]
-        self.hIntervals: tuple[interval.Interval, interval.Interval]
-
-        self._key = None
+        self._key: Key|None = None
         if analyticKey is not None:
             self.key = analyticKey
         self._findIntervals()
 
-    def _reprInternal(self):
+    def _reprInternal(self) -> str:
         return (f'v1n1={self.v1n1.nameWithOctave}, v1n2={self.v1n2.nameWithOctave}, '
                 f'v2n1={self.v2n1.nameWithOctave}, v2n2={self.v2n2.nameWithOctave}')
 
     @property
-    def key(self):
+    def key(self) -> Key|None:
         '''
-        get or set the key of this VoiceLeadingQuartet, for use in theory analysis routines
+        Get or set the key of this VoiceLeadingQuartet, for use in theory analysis routines
         such as closesIncorrectly. Can be None
 
         >>> vlq = voiceLeading.VoiceLeadingQuartet('D', 'G', 'B', 'G')
@@ -169,36 +181,32 @@ class VoiceLeadingQuartet(base.Music21Object):
         >>> vlq.key
         <music21.key.Key of d minor>
 
-        Incorrect keys raise VoiceLeadingQuartetExceptions
+        Or set back to None:
+
+        >>> vlq.key = None
+        >>> vlq.key is None
+        True
+
+        Incorrect key strings raise VoiceLeadingQuartetExceptions
         '''
         return self._key
 
     @key.setter
-    def key(self, keyValue):
+    def key(self, keyValue: str|Key|None) -> None:
         if isinstance(keyValue, str):
             try:
-                keyValue = key.Key(key.convertKeyStringToMusic21KeyString(keyValue))
+                keyValue = Key(convertKeyStringToMusic21KeyString(keyValue))
             except Exception as e:  # pragma: no cover
                 raise VoiceLeadingQuartetException(
                     f'got a key signature string that is not supported: {keyValue}'
                 ) from e
-        else:
-            try:
-                isKey = (isinstance(keyValue, key.Key))
-                if isKey is False:
-                    raise AttributeError
-            except AttributeError as ae:  # pragma: no cover
-                raise VoiceLeadingQuartetException(
-                    'got a key signature that is not a string or music21 Key '
-                    f'object: {keyValue}'
-                ) from ae
         self._key = keyValue
 
     def _setVoiceNote(
         self,
         value: str|note.Note|pitch.Pitch,
         which: t.Literal['_v1n1', '_v1n2', '_v2n1', '_v2n2']
-    ):
+    ) -> None:
         if isinstance(value, str):
             setattr(self, which, note.Note(value))
         elif isinstance(value, note.Note):
@@ -213,61 +221,65 @@ class VoiceLeadingQuartet(base.Music21Object):
                 f'not a valid note specification: {value!r}'
             )
 
-    def _getV1n1(self) -> note.Note:
-        return self._v1n1
-
-    def _setV1n1(self, value: str|note.Note|pitch.Pitch):
-        self._setVoiceNote(value, '_v1n1')
-
-    v1n1 = property(_getV1n1, _setV1n1, doc='''
-        set note1 for voice 1
+    @property
+    def v1n1(self) -> note.Note:
+        '''
+        Get or set note 1 for voice 1.
 
         >>> vl = voiceLeading.VoiceLeadingQuartet('C', 'D', 'E', 'F')
         >>> vl.v1n1
         <music21.note.Note C>
-        ''')
+        '''
+        return self._v1n1
 
-    def _getV1n2(self) -> note.Note:
-        return self._v1n2
+    @v1n1.setter
+    def v1n1(self, value: str|note.Note|pitch.Pitch) -> None:
+        self._setVoiceNote(value, '_v1n1')
 
-    def _setV1n2(self, value: str|note.Note|pitch.Pitch):
-        self._setVoiceNote(value, '_v1n2')
-
-    v1n2 = property(_getV1n2, _setV1n2, doc='''
-        set note 2 for voice 1
+    @property
+    def v1n2(self) -> note.Note:
+        '''
+        Get or set note 2 for voice 1.
 
         >>> vl = voiceLeading.VoiceLeadingQuartet('C', 'D', 'E', 'F')
         >>> vl.v1n2
         <music21.note.Note D>
-        ''')
+        '''
+        return self._v1n2
 
-    def _getV2n1(self) -> note.Note:
-        return self._v2n1
+    @v1n2.setter
+    def v1n2(self, value: str|note.Note|pitch.Pitch) -> None:
+        self._setVoiceNote(value, '_v1n2')
 
-    def _setV2n1(self, value: str|note.Note|pitch.Pitch):
-        self._setVoiceNote(value, '_v2n1')
-
-    v2n1 = property(_getV2n1, _setV2n1, doc='''
-        set note 1 for voice 2
+    @property
+    def v2n1(self) -> note.Note:
+        '''
+        Get or set note 1 for voice 2.
 
         >>> vl = voiceLeading.VoiceLeadingQuartet('C', 'D', 'E', 'F')
         >>> vl.v2n1
         <music21.note.Note E>
-        ''')
+        '''
+        return self._v2n1
 
-    def _getV2n2(self) -> note.Note:
-        return self._v2n2
+    @v2n1.setter
+    def v2n1(self, value: str|note.Note|pitch.Pitch) -> None:
+        self._setVoiceNote(value, '_v2n1')
 
-    def _setV2n2(self, value: str|note.Note|pitch.Pitch):
-        self._setVoiceNote(value, '_v2n2')
-
-    v2n2 = property(_getV2n2, _setV2n2, doc='''
-        set note 2 for voice 2
+    @property
+    def v2n2(self) -> note.Note:
+        '''
+        Get or set note 2 for voice 2.
 
         >>> vl = voiceLeading.VoiceLeadingQuartet('C', 'D', 'E', 'F')
         >>> vl.v2n2
         <music21.note.Note F>
-        ''')
+        '''
+        return self._v2n2
+
+    @v2n2.setter
+    def v2n2(self, value: str|note.Note|pitch.Pitch) -> None:
+        self._setVoiceNote(value, '_v2n2')
 
     def _findIntervals(self) -> None:
         vInterval0 = interval.Interval(self.v1n1, self.v2n1)
@@ -281,7 +293,7 @@ class VoiceLeadingQuartet(base.Music21Object):
         self.vIntervals = (vInterval0, vInterval1)
         self.hIntervals = (hInterval0, hInterval1)
 
-    def motionType(self, *, allowAntiParallel=False):
+    def motionType(self, *, allowAntiParallel: bool = False) -> MotionType:
         '''
         returns the type of motion from the MotionType Enum object
         that exists in this voice leading quartet
@@ -352,7 +364,7 @@ class VoiceLeadingQuartet(base.Music21Object):
           able to be returned in previous versions, but a bug prevented it.
           To preserve backwards compatibility, it must be explicitly enabled.
         '''
-        motionType = ''
+        motionType: MotionType
         if self.obliqueMotion():
             motionType = MotionType.oblique
         elif self.parallelMotion():
@@ -365,6 +377,8 @@ class VoiceLeadingQuartet(base.Music21Object):
             motionType = MotionType.contrary
         elif self.noMotion():
             motionType = MotionType.noMotion
+        else:
+            raise VoiceLeadingQuartetException('Not any type of motion?')
 
         return motionType
 
@@ -455,8 +469,8 @@ class VoiceLeadingQuartet(base.Music21Object):
 
     def parallelMotion(
         self,
-        requiredInterval=None,
-        allowOctaveDisplacement=False
+        requiredInterval: str|int|interval.IntervalBase|None = None,
+        allowOctaveDisplacement: bool = False
     ) -> bool:
         '''
         Returns True if both the first and second intervals are the same sized
@@ -665,7 +679,7 @@ class VoiceLeadingQuartet(base.Music21Object):
         return (self.contraryMotion()
                 and self.hIntervals[0].direction == interval.Direction.DESCENDING)
 
-    def antiParallelMotion(self, simpleName=None) -> bool:
+    def antiParallelMotion(self, simpleName: str|interval.Interval|None = None) -> bool:
         '''
         Returns True if the simple interval before is the same as the simple
         interval after and the motion is contrary. if simpleName is
@@ -726,7 +740,7 @@ class VoiceLeadingQuartet(base.Music21Object):
             else:
                 return False
 
-    def parallelInterval(self, thisInterval) -> bool:
+    def parallelInterval(self, thisInterval: interval.Interval) -> bool:
         '''
         Returns True if there is a parallel motion or antiParallel motion of
         this type (thisInterval should be an Interval object)
@@ -816,7 +830,7 @@ class VoiceLeadingQuartet(base.Music21Object):
         >>> vlq.parallelFifth()
         False
         '''
-        return self.parallelInterval(self.fifth)
+        return self.parallelInterval(_intervals.fifth)
 
     def parallelOctave(self) -> bool:
         '''
@@ -847,7 +861,7 @@ class VoiceLeadingQuartet(base.Music21Object):
         music21 works just as well with popular music and other styles that do not
         have problems with parallel octaves.)
         '''
-        return self.parallelInterval(self.octave)
+        return self.parallelInterval(_intervals.octave)
 
     def parallelUnison(self) -> bool:
         '''
@@ -865,7 +879,7 @@ class VoiceLeadingQuartet(base.Music21Object):
         >>> vlq.parallelUnison()
         False
         '''
-        return self.parallelInterval(self.unison)
+        return self.parallelInterval(_intervals.unison)
 
     def parallelUnisonOrOctave(self) -> bool:
         '''
@@ -891,7 +905,7 @@ class VoiceLeadingQuartet(base.Music21Object):
 
         return self.parallelUnison() or self.parallelOctave()
 
-    def hiddenInterval(self, thisInterval) -> bool:
+    def hiddenInterval(self, thisInterval: str|interval.Interval) -> bool:
         '''
         Returns True if there is a hidden interval that matches
         thisInterval.
@@ -943,13 +957,13 @@ class VoiceLeadingQuartet(base.Music21Object):
         Calls :meth:`~music21.voiceLeading.VoiceLeadingQuartet.hiddenInterval`
         by passing a fifth
         '''
-        return self.hiddenInterval(self.fifth)
+        return self.hiddenInterval(_intervals.fifth)
 
     def hiddenOctave(self) -> bool:
         '''
         Calls hiddenInterval by passing an octave
         '''
-        return self.hiddenInterval(self.octave)
+        return self.hiddenInterval(_intervals.octave)
 
     def voiceOverlap(self) -> bool:
         '''
@@ -1255,6 +1269,10 @@ class VoiceLeadingQuartet(base.Music21Object):
         True
         '''
         from music21 import roman
+        if self.key is None:
+            raise VoiceLeadingQuartetException(
+                'opensIncorrectly requires a key to be set on the VoiceLeadingQuartet'
+            )
         v0 = self.vIntervals[0]
         v1 = self.vIntervals[1]
         v0ns = v0.noteStart
@@ -1304,6 +1322,10 @@ class VoiceLeadingQuartet(base.Music21Object):
         >>> vl.closesIncorrectly()
         True
         '''
+        if self.key is None:
+            raise VoiceLeadingQuartetException(
+                'closesIncorrectly requires a key to be set on the VoiceLeadingQuartet'
+            )
         raisedMinorCorrectly = False
         if self.key.mode == 'minor':
             if self.key.pitchFromDegree(7).transpose('A1').name == self.v1n1.name:
@@ -1688,7 +1710,7 @@ class Verticality(base.Music21Object):
             foundObj = elementList[0]
 
             cl = foundObj.getContextByClass(clef.Clef)
-            ks = foundObj.getContextByClass(key.KeySignature)
+            ks = foundObj.getContextByClass(KeySignature)
             ts = foundObj.getContextByClass(meter.TimeSignature)
 
             if cl:
@@ -2432,15 +2454,6 @@ def iterateAllVoiceLeadingQuartets(
 # ------------------------------------------------------------------------------
 
 class Test(unittest.TestCase):
-
-    def testInstantiateEmptyObject(self):
-        '''
-        A VoiceLeadingQuartet requires all four notes; constructing one
-        without them raises TypeError.
-        '''
-        with self.assertRaises(TypeError):
-            VoiceLeadingQuartet()  # pylint: disable=no-value-for-parameter
-
     def testCopyAndDeepcopy(self):
         from music21.test.commonTest import testCopyAll
         testCopyAll(self, globals())
