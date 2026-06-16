@@ -631,8 +631,8 @@ class ConverterHumdrum(SubConverter):
         Open Humdrum data from a string -- calls
         :meth:`~music21.humdrum.spineParser.HumdrumDataCollection.parse()`.
 
-        >>> humData = ('**kern\\n*M2/4\\n=1\\n24r\\n24g#\\n24f#\\n24e\\n24c#\\n' +
-        ...     '24f\\n24r\\n24dn\\n24e-\\n24gn\\n24e-\\n24dn\\n*-')
+        >>> humData = ('**kern\\n*M2/4\\n=1\\n24r\\n24g#\\n24f#\\n24e\\n24c#\\n'
+        ...            '24f\\n24r\\n24dn\\n24e-\\n24gn\\n24e-\\n24dn\\n*-')
         >>> c = converter.subConverters.ConverterHumdrum()
         >>> s = c.parseData(humData)
         >>> c.stream.show('text')
@@ -762,8 +762,8 @@ class ConverterNoteworthy(SubConverter):
         r'''
         Open Noteworthy data from a string or list
 
-        >>> nwcData = ('!NoteWorthyComposer(2.0)\n|AddStaff\n|Clef|' +
-        ...     'Type:Treble\n|Note|Dur:Whole|Pos:1^')
+        >>> nwcData = ('!NoteWorthyComposer(2.0)\n|AddStaff\n|Clef|'
+        ...            'Type:Treble\n|Note|Dur:Whole|Pos:1^')
         >>> c = converter.subConverters.ConverterNoteworthy()
         >>> c.parseData(nwcData)
         >>> c.stream.show('text')

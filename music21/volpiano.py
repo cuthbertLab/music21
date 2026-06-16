@@ -95,7 +95,7 @@ def toPart(volpianoText, *, breaksToLayout=False):
     Returns a music21 Part from volpiano text.
 
     >>> veniSancti = volpiano.toPart('1---c--d---f--d---ed--c--d---f'
-    ...                              + '---g--h--j---hgf--g--h---')
+    ...                              '---g--h--j---hgf--g--h---')
     >>> veniSancti.show('text')
     {0.0} <music21.stream.Measure 0 offset=0.0>
         {0.0} <music21.clef.TrebleClef>

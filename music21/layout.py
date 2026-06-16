@@ -999,8 +999,8 @@ class LayoutScore(stream.Opus):
         >>> ls.getPositionForStaff(1, 0, 0)
         (0.0, 40.0)
 
-        The second staff (staff 1) begins at the end of staff 0 (40.0) +
-        the appropriate staffDistance
+        The second staff (staff 1) begins at the end of
+        staff 0 (40.0) plus the appropriate staffDistance
         and adds the height of the staff.  Staff 1 here has a size of 80 which means
         80% of the normal staff size.  40 * 0.8 = 32.0:
 

@@ -1626,8 +1626,8 @@ def refineVariant(s, sVariant, *, inPlace=False):
     # each region is processed for variants.
     for regionType, returnStart, returnEnd, variantStart, variantEnd in regions:
         startOffset = returnRegion[returnStart].getOffsetBySite(returnRegion)
-        # endOffset = (returnRegion[returnEnd-1].getOffsetBySite(returnRegion) +
-        #              returnRegion[returnEnd-1].duration.quarterLength)
+        # endOffset = (returnRegion[returnEnd - 1].getOffsetBySite(returnRegion)
+        #              + returnRegion[returnEnd - 1].duration.quarterLength)
         variantSubRegion = None
         if regionType == 'equal':
             returnSubRegion = returnRegion.measures(returnStart + 1, returnEnd)

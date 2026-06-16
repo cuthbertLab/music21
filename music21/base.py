@@ -2447,8 +2447,8 @@ class Music21Object(prebase.ProtoM21Object):
             self._activeSiteStoredOffset = storedOffset
             # siteId = id(site)
             # if not self.sites.hasSiteId(siteId):  # This should raise a warning, should not happen
-            #    # environLocal.warn('Adding a siteDict entry for a ' +
-            #    #                        'site that should already be there!')
+            #    # environLocal.warn('Adding a siteDict entry for a '
+            #    #                   'site that should already be there!')
             #    self.sites.add(site, idKey=siteId)
         else:
             self._activeSiteStoredOffset = None

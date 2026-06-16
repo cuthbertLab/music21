@@ -315,7 +315,7 @@ class Instrument(base.Music21Object):
                     self.midiChannel = ch
                     return self.midiChannel
             return 0
-            # raise InstrumentException('we are out of midi channels and this ' +
+            # raise InstrumentException('we are out of midi channels and this '
             #            'was not already detected PROGRAM BUG!')
 
 

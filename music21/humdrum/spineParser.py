@@ -377,10 +377,10 @@ class HumdrumDataCollection(prebase.ProtoM21Object):
 
         Returns eventList in addition to setting it as `self.eventList`.
 
-        >>> eventString = ('!!! COM: Beethoven, Ludwig van\n' +
-        ...                '!! Not really a piece by Beethoven\n' +
-        ...                '**kern\t**dynam\n' +
-        ...                'C4\tpp\n' +
+        >>> eventString = ('!!! COM: Beethoven, Ludwig van\n'
+        ...                '!! Not really a piece by Beethoven\n'
+        ...                '**kern\t**dynam\n'
+        ...                'C4\tpp\n'
         ...                'D8\t.\n')
         >>> hdc = humdrum.spineParser.HumdrumDataCollection(eventString)
         >>> hdc.maxSpines = 2
@@ -459,10 +459,10 @@ class HumdrumDataCollection(prebase.ProtoM21Object):
         Returns a tuple of protoSpines and eventCollections in addition to
         setting it in the calling object.
 
-        >>> eventString = ('!!!COM: Beethoven, Ludwig van\n' +
-        ...                '!! Not really a piece by Beethoven\n' +
-        ...                '**kern\t**dynam\n' +
-        ...                'C4\tpp\n' +
+        >>> eventString = ('!!!COM: Beethoven, Ludwig van\n'
+        ...                '!! Not really a piece by Beethoven\n'
+        ...                '**kern\t**dynam\n'
+        ...                'C4\tpp\n'
         ...                'D8\t.\n')
         >>> hdc = humdrum.spineParser.HumdrumDataCollection(eventString)
         >>> hdc.maxSpines = 2
@@ -784,11 +784,11 @@ class HumdrumDataCollection(prebase.ProtoM21Object):
     #     if self.spineCollection is None:
     #         raise HumdrumException('parsing got no spine collections!')
     #     elif self.spineCollection.spines is None:
-    #         raise HumdrumException('not a single spine in your data. Is this your problem? ' +
-    #                                '(File a bug report if you ' +
+    #         raise HumdrumException('not a single spine in your data. Is this your problem? '
+    #                                '(File a bug report if you '
     #                                'have doubled checked your data)')
     #     elif self.spineCollection.spines[0].stream is None:
-    #         raise HumdrumException('okay, you got at least one spine, but it does not have ' +
+    #         raise HumdrumException('okay, you got at least one spine, but it does not have '
     #                                'a stream in it; (check your data or file a bug report)')
     #     else:
     #         masterStream = stream.Score()
@@ -2400,7 +2400,7 @@ def hdStringToNote(contents: str) -> note.GeneralNote:
         elif '\\' in contents:
             thisObject.stemDirection = 'down'
 
-    # 3.2.7 Duration +
+    # 3.2.7 Duration and
     # 3.2.8 N-Tuplets
 
     # TODO: SPEEDUP -- only search for rational after foundNumber.

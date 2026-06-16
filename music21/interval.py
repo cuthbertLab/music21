@@ -3492,7 +3492,7 @@ class Interval(IntervalBase):
                 # pitchAlt = copy.deepcopy(pitch2)
                 # pitchAlt.ps = pitch2.ps + halfStepsToFix
                 # environLocal.printDebug(
-                #    'coercing pitch due to a transposition that requires an extreme ' +
+                #    'coercing pitch due to a transposition that requires an extreme '
                 #    f'accidental: {pitch2} -> {pitchAlt}')
                 # pitch2 = pitchAlt
                 pitch2.ps = pitch2.ps + halfStepsToFix
