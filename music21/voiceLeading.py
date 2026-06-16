@@ -1294,11 +1294,12 @@ class VoiceLeadingQuartet(base.Music21Object):
         c2 = chord.Chord([v1ns, v1ne])
         r1 = roman.identifyAsTonicOrDominant(c1, self.key)
         r2 = roman.identifyAsTonicOrDominant(c2, self.key)
-        openings = ['P1', 'P5', 'I', 'V']
-        return ((v0.simpleName in openings
-                    or v1.simpleName in openings)
-                  and (r1[0].upper() in openings if r1 is not False else False
-                       or r2[0].upper() in openings if r2 is not False else False))
+        openingIntervals = ('P1', 'P5')
+        openingFunctions = ('I', 'V')
+        return ((v0.simpleName in openingIntervals
+                    or v1.simpleName in openingIntervals)
+                  and (r1[0].upper() in openingFunctions if r1 is not False else False
+                       or r2[0].upper() in openingFunctions if r2 is not False else False))
 
     @common.decorators.deprecated(
         'June 2026', 'v12', 'Use `not vlq.modalOpening()` instead.'
