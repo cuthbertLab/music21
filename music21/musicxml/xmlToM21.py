@@ -2556,9 +2556,9 @@ class MeasureParser(SoundTagMixin, XMLParserBase):
             try:
                 staffObject = mxObject.find('staff')
                 if staffObject is not None:
-                    t = staffObject.text
-                    if t is not None:
-                        k = t.strip()
+                    staffText = staffObject.text
+                    if staffText is not None:
+                        k = staffText.strip()
                         return int(k)
             except (AttributeError, TypeError, ValueError):
                 pass
