@@ -60,22 +60,25 @@ if t.TYPE_CHECKING:
 #    importing issue with counterpoint.py and figuredbass
 
 
-@dataclasses.dataclass(frozen=True)
+@dataclasses.dataclass
 class _IntervalCache:
     '''
     The three fixed intervals that VoiceLeadingQuartet compares against when
-    testing for parallels and hidden intervals.
+    testing for parallels and hidden intervals.  The fields start out None and
+    are filled in the first time a VoiceLeadingQuartet is created, so importing
+    this module does not build Interval objects that may never be needed.
+
+    Typed as always-present: by the time any method reads them, __init__ has run
+    and filled them in.
     '''
-    unison: interval.Interval
-    fifth: interval.Interval
-    octave: interval.Interval
+    unison: interval.Interval = None  # type: ignore[assignment]
+    fifth: interval.Interval = None  # type: ignore[assignment]
+    octave: interval.Interval = None  # type: ignore[assignment]
 
 
-# Shared P1/P5/P8 cache, populated the first time a VoiceLeadingQuartet is
-# created (don't want to slow import if no VLQ is created).
-# Typed as always-present: by the time any method reads it, __init__ has run and filled it in.
-# noinspection PyInvalidCast
-_intervals: _IntervalCache = t.cast(_IntervalCache, None)
+# Shared P1/P5/P8 cache; its fields are populated the first time a
+# VoiceLeadingQuartet is created.
+_intervals = _IntervalCache()
 
 
 class MotionType(str, enum.Enum):
@@ -142,14 +145,11 @@ class VoiceLeadingQuartet(base.Music21Object):
         if 'analyticKey' in keywords:
             key = keywords.pop('analyticKey')
         super().__init__(**keywords)
-        global _intervals
-        if _intervals is None:
+        if _intervals.unison is None:
             # populate the shared interval cache the first time a VLQ is created
-            _intervals = _IntervalCache(
-                unison=interval.Interval('P1'),
-                fifth=interval.Interval('P5'),
-                octave=interval.Interval('P8'),
-            )
+            _intervals.unison = interval.Interval('P1')
+            _intervals.fifth = interval.Interval('P5')
+            _intervals.octave = interval.Interval('P8')
 
         # the four notes (the property setters populate _v1n1.._v2n2 via setattr)
         self.v1n1 = v1n1
