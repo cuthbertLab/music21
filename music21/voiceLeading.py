@@ -85,6 +85,13 @@ class VoiceLeadingQuartet(base.Music21Object):
     In general, v1 should be the "higher" voice and v2 the "lower" voice
     in order for methods such as `.voiceCrossing` and `isProperResolution`
     to make sense.  Most routines will work the other way still though.
+
+    * Changed in v11: all four notes are now required arguments and can no
+      longer be None; they are always present as :class:`~music21.note.Note`
+      objects.  This allows the `.v1n1`, `.v1n2`, `.v2n1`, and `.v2n2` properties
+      to satisfy modern static type checking.
+
+    Note: the v11 change requiring the four notes was AI-assisted (Claude).
     '''
 
     _DOC_ATTR: dict[str, str] = {
@@ -100,10 +107,10 @@ class VoiceLeadingQuartet(base.Music21Object):
 
     def __init__(
         self,
-        v1n1: None|str|note.Note|pitch.Pitch = None,
-        v1n2: None|str|note.Note|pitch.Pitch = None,
-        v2n1: None|str|note.Note|pitch.Pitch = None,
-        v2n2: None|str|note.Note|pitch.Pitch = None,
+        v1n1: str|note.Note|pitch.Pitch,
+        v1n2: str|note.Note|pitch.Pitch,
+        v2n1: str|note.Note|pitch.Pitch,
+        v2n2: str|note.Note|pitch.Pitch,
         analyticKey: key.Key|None = None,
         **keywords
     ):
@@ -119,10 +126,12 @@ class VoiceLeadingQuartet(base.Music21Object):
         self.fifth = intervalCache[1]
         self.octave = intervalCache[2]
 
-        self._v1n1 = None
-        self._v1n2 = None
-        self._v2n1 = None
-        self._v2n2 = None
+        # the four notes are always set; the private attributes are populated
+        # by the property setters below (via setattr in _setVoiceNote).
+        self._v1n1: note.Note
+        self._v1n2: note.Note
+        self._v2n1: note.Note
+        self._v2n2: note.Note
 
         self.v1n1 = v1n1
         self.v1n2 = v1n2
@@ -135,35 +144,11 @@ class VoiceLeadingQuartet(base.Music21Object):
         self._key = None
         if analyticKey is not None:
             self.key = analyticKey
-        if v1n1 is not None and v1n2 is not None and v2n1 is not None and v2n2 is not None:
-            self._findIntervals()
+        self._findIntervals()
 
     def _reprInternal(self):
-        nameV1n1 = None
-        nameV1n2 = None
-        nameV2n1 = None
-        nameV2n2 = None
-        try:
-            nameV1n1 = self.v1n1.nameWithOctave
-        except AttributeError:
-            pass
-
-        try:
-            nameV1n2 = self.v1n2.nameWithOctave
-        except AttributeError:
-            pass
-
-        try:
-            nameV2n1 = self.v2n1.nameWithOctave
-        except AttributeError:
-            pass
-
-        try:
-            nameV2n2 = self.v2n2.nameWithOctave
-        except AttributeError:
-            pass
-
-        return f'v1n1={nameV1n1}, v1n2={nameV1n2}, v2n1={nameV2n1}, v2n2={nameV2n2}'
+        return (f'v1n1={self.v1n1.nameWithOctave}, v1n2={self.v1n2.nameWithOctave}, '
+                f'v2n1={self.v2n1.nameWithOctave}, v2n2={self.v2n2.nameWithOctave}')
 
     @property
     def key(self):
@@ -211,31 +196,27 @@ class VoiceLeadingQuartet(base.Music21Object):
 
     def _setVoiceNote(
         self,
-        value: None|str|note.Note|pitch.Pitch,
+        value: str|note.Note|pitch.Pitch,
         which: t.Literal['_v1n1', '_v1n2', '_v2n1', '_v2n2']
     ):
-        if value is None:
-            setattr(self, which, None)
-        elif isinstance(value, str):
+        if isinstance(value, str):
             setattr(self, which, note.Note(value))
+        elif isinstance(value, note.Note):
+            setattr(self, which, value)
+        elif isinstance(value, pitch.Pitch):
+            n = note.Note()
+            n.duration.quarterLength = 0.0
+            n.pitch = value
+            setattr(self, which, n)
         else:
-            try:
-                if isinstance(value, note.Note):
-                    setattr(self, which, value)
-                elif isinstance(value, pitch.Pitch):
-                    n = note.Note()
-                    n.duration.quarterLength = 0.0
-                    n.pitch = value
-                    setattr(self, which, n)
-            except Exception as e:  # pragma: no cover
-                raise VoiceLeadingQuartetException(
-                    f'not a valid note specification: {value!r}'
-                ) from e
+            raise VoiceLeadingQuartetException(
+                f'not a valid note specification: {value!r}'
+            )
 
-    def _getV1n1(self) -> None|note.Note:
+    def _getV1n1(self) -> note.Note:
         return self._v1n1
 
-    def _setV1n1(self, value: None|str|note.Note|pitch.Pitch):
+    def _setV1n1(self, value: str|note.Note|pitch.Pitch):
         self._setVoiceNote(value, '_v1n1')
 
     v1n1 = property(_getV1n1, _setV1n1, doc='''
@@ -246,10 +227,10 @@ class VoiceLeadingQuartet(base.Music21Object):
         <music21.note.Note C>
         ''')
 
-    def _getV1n2(self) -> None|note.Note:
+    def _getV1n2(self) -> note.Note:
         return self._v1n2
 
-    def _setV1n2(self, value: None|str|note.Note|pitch.Pitch):
+    def _setV1n2(self, value: str|note.Note|pitch.Pitch):
         self._setVoiceNote(value, '_v1n2')
 
     v1n2 = property(_getV1n2, _setV1n2, doc='''
@@ -260,10 +241,10 @@ class VoiceLeadingQuartet(base.Music21Object):
         <music21.note.Note D>
         ''')
 
-    def _getV2n1(self) -> None|note.Note:
+    def _getV2n1(self) -> note.Note:
         return self._v2n1
 
-    def _setV2n1(self, value: None|str|note.Note|pitch.Pitch):
+    def _setV2n1(self, value: str|note.Note|pitch.Pitch):
         self._setVoiceNote(value, '_v2n1')
 
     v2n1 = property(_getV2n1, _setV2n1, doc='''
@@ -274,10 +255,10 @@ class VoiceLeadingQuartet(base.Music21Object):
         <music21.note.Note E>
         ''')
 
-    def _getV2n2(self) -> None|note.Note:
+    def _getV2n2(self) -> note.Note:
         return self._v2n2
 
-    def _setV2n2(self, value: None|str|note.Note|pitch.Pitch):
+    def _setV2n2(self, value: str|note.Note|pitch.Pitch):
         self._setVoiceNote(value, '_v2n2')
 
     v2n2 = property(_getV2n2, _setV2n2, doc='''
@@ -2452,9 +2433,11 @@ class Test(unittest.TestCase):
 
     def testInstantiateEmptyObject(self):
         '''
-        test instantiating an empty VoiceLeadingQuartet
+        A VoiceLeadingQuartet requires all four notes; constructing one
+        without them raises TypeError.
         '''
-        VoiceLeadingQuartet()
+        with self.assertRaises(TypeError):
+            VoiceLeadingQuartet()  # pylint: disable=no-value-for-parameter
 
     def testCopyAndDeepcopy(self):
         from music21.test.commonTest import testCopyAll
