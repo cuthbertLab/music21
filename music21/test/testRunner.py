@@ -92,7 +92,6 @@ def fixDoctests(doctestSuite: doctest._DocTestSuite) -> None:
     In the future, it will again!
     '''
     windows: bool = platform.system() == 'Windows'
-    isPython312 = sys.version_info[1] >= 12
 
     for dtc in doctestSuite:  # Suite to DocTestCase -- undocumented.
         if not hasattr(dtc, '_dt_test'):
@@ -101,8 +100,7 @@ def fixDoctests(doctestSuite: doctest._DocTestSuite) -> None:
         dt = dtc._dt_test  # DocTest
         for example in dt.examples:
             example.want = stripAddresses(example.want, '0x...')
-            if isPython312:
-                example.want = fix312OrderedDict(example.want, '...')
+            example.want = fix312OrderedDict(example.want, '...')
             if windows:
                 example.want = example.want.replace('PosixPath', 'WindowsPath')
 
@@ -137,8 +135,9 @@ def stripAddresses(textString, replacement='ADDRESS') -> str:
 def fix312OrderedDict(textString, replacement='...') -> str:
     '''
     Function that fixes the OrderedDicts to work on Python 3.12 and above.
-    (eventually when 3.12 is the norm, this should be replaced to neuter
-    the doctests for 3.11 instead.  Or just wait until 3.12 is the minimum version?)
+    (Since 3.12 is now the minimum supported version, every supported Python
+    already uses the ``OrderedDict({...})`` repr, so in practice this is a
+    no-op kept around for the next time Python changes a repr on us.)
 
     >>> fix312 = test.testRunner.fix312OrderedDict
     >>> fix312('OrderedDict([(0, 1), (1, 2), (2, 3)])')

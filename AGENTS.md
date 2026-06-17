@@ -20,6 +20,17 @@
 - `uv sync` installs runtime deps + the `dev` group, which self-references `music21[extras]`,
   so scipy and python-Levenshtein come along automatically. Tests will not pass without them.
 
+# Python version support
+
+- Since v9, `music21` has supported at least the last two released versions of Python,
+  but rarely more. We do, however, try to keep supporting whatever (often older) version
+  of Python that Google Colab runs on (as of 2026, that is Python 3.12).
+- The coverage/coveralls CI run is intentionally pinned to the **middle** supported
+  Python version (the middle is least likely to fail independently of the lowest or
+  highest, so it is the best canary). When you change the supported versions, update
+  `coverageM21.getCoverage` and the matching `if: ${{ matrix.python-version == ... }}`
+  line in `.github/workflows/maincheck.yml` to the new middle version.
+
 # PRs and Issues
 
 - All PRs and Issues need to be declared AI-assisted.
