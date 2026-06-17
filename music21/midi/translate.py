@@ -876,19 +876,6 @@ def instrumentToMidiEvents(
 # ------------------------------------------------------------------------------
 # Meta events
 
-@common.deprecated('v10', 'v11', 'passing a list was never used; use midiEventToInstrument instead')
-def midiEventsToInstrument(
-    eventList: MidiEvent|tuple[int, MidiEvent],
-    *,
-    encoding: str = 'utf-8',
-) -> instrument.Instrument:
-    if not common.isListLike(eventList):
-        event = t.cast(MidiEvent, eventList)
-    else:  # get the second event; first is delta time
-        event = eventList[1]
-    return midiEventToInstrument(event, encoding=encoding)
-
-
 def midiEventToInstrument(
     event: MidiEvent,
     *,

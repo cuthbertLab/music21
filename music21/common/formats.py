@@ -41,13 +41,11 @@ if t.TYPE_CHECKING:
 VALID_SHOW_FORMATS = ['musicxml', 'lilypond', 'text', 'textline', 'midi',
                       'png', 'pdf', 'svg',
                       'lily.pdf', 'lily.png', 'lily.svg', 'braille',
-                      'vexflow', 'vexflow.html', 'vexflow.js',
                       'ipython', 'ipython.png', 'ipython.midi',
                       'musicxml.png', 'musicxml.pdf']
 VALID_WRITE_FORMATS = ['musicxml', 'lilypond', 'text', 'textline', 'midi',
                        'png', 'pdf', 'svg',
                        'lily.pdf', 'lily.png', 'lily.svg', 'braille',
-                       'vexflow', 'vexflow.html', 'vexflow.js',
                        'ipython', 'ipython.png', 'ipython.midi',
                        'musicxml.png', 'musicxml.pdf',
                        'rntxt']
@@ -121,8 +119,6 @@ def findFormat(fmt):
     ('scala', '.scl')
     >>> common.findFormat('braille')
     ('braille', '.txt')
-    >>> common.findFormat('vexflow')
-    ('vexflow', '.html')
     >>> common.findFormat('capx')
     ('capella', '.capx')
 

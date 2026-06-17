@@ -1415,19 +1415,11 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
             if hasattr(other, attr):
                 setattr(self, attr, getattr(other, attr))
 
-    @common.deprecated('v9.3', 'v11', 'Use `el in stream` instead of '
-                       '`stream.hasElement(el)`')
-    def hasElement(self, obj: base.Music21Object) -> bool:
-        '''
-        DEPRECATED: just use `el in stream` instead of `stream.hasElement(el)`
-
-        Return True if an element, provided as an argument, is contained in
-        this Stream.
-        '''
-        return obj in self
-
+    @common.deprecated('v11', 'v12', 'use `bool(s.getElementsByClass(className))` instead')
     def hasElementOfClass(self, className, forceFlat=False):
         '''
+        Deprecated: use `bool(s.getElementsByClass(className))` instead.
+
         Given a single class name as string,
         return True or False if an element with the
         specified class is found.
@@ -1438,13 +1430,6 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         >>> s.append(meter.TimeSignature('5/8'))
         >>> s.append(note.Note('d-2'))
         >>> s.insert(dynamics.Dynamic('fff'))
-        >>> s.hasElementOfClass(meter.TimeSignature)
-        True
-        >>> s.hasElementOfClass('Measure')
-        False
-
-        To be deprecated in v11 -- to be removed in v12, use:
-
         >>> bool(s.getElementsByClass(meter.TimeSignature))
         True
         >>> bool(s.getElementsByClass(stream.Measure))
@@ -1452,11 +1437,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
 
         forceFlat does nothing, while getElementsByClass can be done on recurse()
         '''
-        # environLocal.printDebug(['calling hasElementOfClass()', className])
-        for e in self.elements:
-            if className in e.classSet:
-                return True
-        return False
+        return bool(self.getElementsByClass(className))
 
     def mergeElements(self, other, classFilterList=None):
         '''
@@ -3658,6 +3639,27 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         ...     totalFound += len(found)
         >>> totalFound
         25
+
+        To test merely whether any element of a class is present, just use
+        `if` or `bool()` around the getElementsByClass call.  It will
+        scan through until it finds the first element with that class.
+        (It is a replacement for the older :meth:`hasElementOfClass`)
+
+        >>> bool(a.getElementsByClass(note.Note))
+        True
+        >>> if a.getElementsByClass(stream.Measure):
+        ...     print('has measures')
+        ... else:
+        ...     print('no measures')
+        no measures
+
+        Use `recurse()` to search nested streams as well, or the `[X]` shorthand
+        for `.recurse().getElementsByClass(X)`:
+
+        >>> bool(a.recurse().getElementsByClass(note.Rest))
+        True
+        >>> bool(a[note.Note])
+        True
 
         The class name of the Stream created is usually the same as the original:
 

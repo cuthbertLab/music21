@@ -694,7 +694,7 @@ class Sites(common.SlottedObjectMixin):
                 # environLocal.printDebug(
                 #    ['\tY: skipping flat stream that does not contain object:'])
                 if obj.sites.getSiteCount() == 0:  # is top level; no more to search
-                    if not obj.hasElementOfClass(className, forceFlat=True):
+                    if not obj.getElementsByClass(className):
                         continue  # skip, not in this stream
 
             # if after trying to match name, look in the defined contexts'
