@@ -1,4 +1,9 @@
 
+# Session start
+
+- At the start of every session, run `git fetch` (and pull/rebase as appropriate) from
+  origin so work always begins from the latest commits on the current branch / master.
+
 # Code style
 
 - read documentation/source/developerReference/developerGuidelines.ipynb
