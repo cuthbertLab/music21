@@ -970,7 +970,7 @@ forteNumberWithInversionToTnIndex = {
 # http://solo1.home.mindspring.com/pcsets.htm
 # Larry Solomon, 1997, 2000
 # Larry Solomon's 'The List of Chords, Their Properties and Use in Analysis,'
-# in Interface, Journal of New Music Research , 1982, v11/2.
+# in _Interface, Journal of New Music Research_ 11.2 (1982).
 # http://www.sweb.cz/vladimir_ladma/english/music/structs/mus_rot.htm
 # Vladimir Ladma, Czech Republic
 
@@ -1263,7 +1263,7 @@ tnIndexToChordInfo = {
     (6, 35,  0): {'name': ('whole tone scale',
                            '6 equal part division',
                            'F all-combinatorial (P1, P3, P5, P7, P9, P11, I1, I3, I5, I7, '
-                              + 'I9, I11, R2, R4, R6, R8, R10, RI2, RI4, RI6, RI8, RI10)',
+                           + 'I9, I11, R2, R4, R6, R8, R10, RI2, RI4, RI6, RI8, RI10)',
                            "Messiaen's mode 1",
                            'sixth-order all combinatorial')},
     (6, 36,  1): {},

@@ -3640,6 +3640,27 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         >>> totalFound
         25
 
+        To test merely whether any element of a class is present, just use
+        `if` or `bool()` around the getElementsByClass call.  It will
+        scan through until it finds the first element with that class.
+        (It is a replacement for the older :meth:`hasElementOfClass`)
+
+        >>> bool(a.getElementsByClass(note.Note))
+        True
+        >>> if a.getElementsByClass(stream.Measure):
+        ...     print('has measures')
+        ... else:
+        ...     print('no measures')
+        no measures
+
+        Use `recurse()` to search nested streams as well, or the `[X]` shorthand
+        for `.recurse().getElementsByClass(X)`:
+
+        >>> bool(a.recurse().getElementsByClass(note.Rest))
+        True
+        >>> bool(a[note.Note])
+        True
+
         The class name of the Stream created is usually the same as the original:
 
         >>> found = a.getElementsByClass(note.Note).stream()
@@ -3658,28 +3679,6 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         >>> foundList = list(a.recurse().getElementsByClass(note.Rest))
         >>> len(foundList)
         25
-
-        To test merely whether *any* element of a class is present, take the
-        `bool()` of the resulting iterator, or use it directly in an `if`
-        statement.  Since an empty iterator is falsy and a non-empty one is
-        truthy, this is the preferred replacement for the deprecated
-        :meth:`hasElementOfClass`:
-
-        >>> bool(a.getElementsByClass(note.Note))
-        True
-        >>> if a.getElementsByClass(stream.Measure):
-        ...     print('has measures')
-        ... else:
-        ...     print('no measures')
-        no measures
-
-        Use `recurse()` to search nested streams as well, or the `[]` operator
-        as a shorthand for `getElementsByClass`:
-
-        >>> bool(a.recurse().getElementsByClass(note.Rest))
-        True
-        >>> bool(a[note.Note])
-        True
         '''
         return self.iter().getElementsByClass(classFilterList)
 
