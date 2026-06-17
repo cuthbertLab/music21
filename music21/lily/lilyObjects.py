@@ -122,7 +122,7 @@ class LyObject(prebase.ProtoM21Object):
         to LyMock.lilyAttributes:
 
         >>> print(lm.supportedClasses)
-        [...'Mock', ...'Mocker']
+        ['Mock', 'Mocker']
 
         Thus, we can get attributes from the Mock class (see `setAttributesFromClassObject`):
 

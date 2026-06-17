@@ -1066,7 +1066,7 @@ class RTRepeatStart(RTRepeat):
     '''
     >>> repeat = romanText.rtObjects.RTRepeatStart()
     >>> repeat
-    <music21.romanText.rtObjects.RTRepeatStart ...'||:'>
+    <music21.romanText.rtObjects.RTRepeatStart '||:'>
     '''
 
     def __init__(self, src='||:', container=None):
@@ -1077,7 +1077,7 @@ class RTRepeatStop(RTRepeat):
     '''
     >>> repeat = romanText.rtObjects.RTRepeatStop()
     >>> repeat
-    <music21.romanText.rtObjects.RTRepeatStop ...':||'>
+    <music21.romanText.rtObjects.RTRepeatStop ':||'>
     '''
 
     def __init__(self, src=':||', container=None):

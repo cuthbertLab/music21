@@ -632,7 +632,7 @@ class Segment:
         >>> segmentA = segment.Segment()
         >>> allPossib = segmentA.allSinglePossibilities()
         >>> allPossib.__class__
-        <... 'itertools.product'>
+        <class 'itertools.product'>
 
         The number of naive possibilities is always the length of
         :attr:`~music21.figuredBass.segment.Segment.allPitchesAboveBass`
