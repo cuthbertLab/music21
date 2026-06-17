@@ -10,6 +10,7 @@
 # ------------------------------------------------------------------------------
 from __future__ import annotations
 
+import typing as t
 import unittest
 
 from music21 import pitch
@@ -94,7 +95,7 @@ class PercussionMapper:
     # formerly at:
     # https://www.midi.org/specifications/item/gm-level-1-sound-set
 
-    def midiPitchToInstrument(self, midiPitch):
+    def midiPitchToInstrument(self, midiPitch: int|pitch.Pitch) -> instrument.Instrument:
         '''
         Takes a pitch.Pitch object or int ranging from 0-127 and returns
         the corresponding instrument in the GM Percussion Map.
@@ -157,13 +158,15 @@ class PercussionMapper:
         midiInstrumentObject = midiInstrument()
         if (midiInstrumentObject.inGMPercMap is True
                 and hasattr(midiInstrumentObject, '_percMapPitchToModifier')):
+            if t.TYPE_CHECKING:
+                assert isinstance(midiInstrumentObject, instrument.UnpitchedPercussion)
             if midiNumber in midiInstrumentObject._percMapPitchToModifier:
                 modifier = midiInstrumentObject._percMapPitchToModifier[midiNumber]
                 midiInstrumentObject.modifier = modifier
 
         return midiInstrumentObject
 
-    def midiInstrumentToPitch(self, midiInstrument):
+    def midiInstrumentToPitch(self, midiInstrument: instrument.Instrument) -> pitch.Pitch:
         '''
         Takes an instrument.Instrument object and returns a pitch object
         with the corresponding 1-indexed MIDI note, according to the GM Percussion Map.
@@ -191,6 +194,9 @@ class PercussionMapper:
         '''
         if not hasattr(midiInstrument, 'inGMPercMap') or midiInstrument.inGMPercMap is False:
             raise MIDIPercussionException(f'{midiInstrument!r} is not in the GM Percussion Map!')
+        if t.TYPE_CHECKING:
+            assert isinstance(midiInstrument, instrument.Percussion)
+            assert midiInstrument.percMapPitch is not None
         midiPitch = midiInstrument.percMapPitch
         pitchObject = pitch.Pitch()
         pitchObject.midi = midiPitch
@@ -201,7 +207,7 @@ class PercussionMapper:
 
 class Test(unittest.TestCase):
 
-    def testCopyAndDeepcopy(self):
+    def testCopyAndDeepcopy(self) -> None:
         from music21.test.commonTest import testCopyAll
         testCopyAll(self, globals())
 
