@@ -26,12 +26,19 @@ This takes a while and runs single core, and then almost always needs code patch
 so allocate time (2 min on M4).  Start working on the announcement while it's running.
 Cannot run 2 and 3 in parallel, since often metadata changes cause documentation changes.
 
-4. `uv run music21/test/warningMultiprocessTest.py` for lowest and highest Py version -- fix all warnings!
+* developerReference/musicxmlTest - 41b and 41c are currently failing and acceptable.
+* usersGuide_22_graphing 3dbars sometimes returns 1, sometimes 2 Axes.  It should just do one...
+
+4. `uv run music21/test/warningMultiprocessTest.py` for lowest and highest Py
+    version -- fix all warnings!
 5. run `from music21.test import treeYield
     and then run `treeYield.find_all_non_hashable_m21objects()` and check that the set returned is
-    empty.  Note -- it will print a bunch of module names, but only the final `set()` being empty matters.
-    Then do the same for `treeYield.find_all_non_default_instantiation_m21objects()`.  If that one isn't
-    empty it is not a bug, but it would be nice to keep is so Music21Objects don't need args.
+    empty.  Note -- it will print a bunch of module names, but only the final `set()`
+    being empty matters.
+    (You can also check to see if
+    `treeYield.find_all_non_default_instantiation_m21objects()` looks sane.
+    If that one isn't empty it is not a bug, and v11 will make some M21 objects require
+    arguments (such as VoiceLeadingQuartet)
 6. commit and wait for results on GitHub Actions
      (normally not necessary, because it's slower and mostly duplicates multiprocessTest,
      but should be done before making a release).
@@ -39,14 +46,17 @@ Cannot run 2 and 3 in parallel, since often metadata changes cause documentation
      documentation/build directory first.
 8. `uv run documentation/make.py linkcheck`  [*]
      some persistent errors that actually work are in the conf.py file under linkcheck_ignore
+     note that since AI-Agent world, more and more links are being blocked from bot checking.
 9. `uv run documentation/make.py`   [*]
-9b. `uv run documentation/upload.py`
 
 [*] you will need sphinx, Jupyter (uv will install it), markdown, and pandoc (.dmg) installed
 
 10. move music21 documentation/build/html to music21.org/music21docs/
-    via Amazon S3 (contact MSAC for authentication if need be) (MSAC has a program:
-    combine_sync/deploy.py that will do this automatically.
+    via Amazon S3 (contact MSAC for authentication if need be)
+    Two ways to do this:
+    * `uv run documentation/upload.py`
+    * or MSAC has a program combine_sync/deploy.py that will do this automatically
+      when he updates the site.
 
 11. zip up documentation/build/html and get ready to upload/delete it (you can put on your
     desktop or wherever you like).
