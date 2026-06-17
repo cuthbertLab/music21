@@ -21,8 +21,10 @@ Requires pygame 2 (or 1.9) install with: pip3 install pygame
 '''
 from __future__ import annotations
 
+from collections.abc import Callable
 from importlib.util import find_spec
 from io import BytesIO
+import typing as t
 import unittest
 
 from music21 import defaults
@@ -80,7 +82,7 @@ class StreamPlayer:  # pragma: no cover
         mixerBitSize: int = -16,
         mixerChannels: int = 2,
         mixerBuffer: int = 1024,
-    ):
+    ) -> None:
         try:
             # noinspection PyPackageRequirements
             import pygame  # type: ignore
@@ -93,14 +95,14 @@ class StreamPlayer:  # pragma: no cover
         self.streamIn = streamIn
 
     def play(self,
-             busyFunction=None,
-             busyArgs=None,
-             endFunction=None,
-             endArgs=None,
-             busyWaitMilliseconds=50,
+             busyFunction: Callable[[t.Any], t.Any]|None = None,
+             busyArgs: t.Any = None,
+             endFunction: Callable[[t.Any], t.Any]|None = None,
+             endArgs: t.Any = None,
+             busyWaitMilliseconds: int = 50,
              *,
-             playForMilliseconds=float('inf'),
-             blocked=True):
+             playForMilliseconds: float = float('inf'),
+             blocked: bool = True) -> None:
         '''
         busyFunction is a function that is called with busyArgs when the music is busy every
         busyWaitMilliseconds.
@@ -123,15 +125,21 @@ class StreamPlayer:  # pragma: no cover
                               playForMilliseconds=playForMilliseconds,
                               blocked=blocked)
 
-    def getStringOrBytesIOFile(self):
+    def getStringOrBytesIOFile(self) -> BytesIO:
         streamMidiFile = midiTranslate.streamToMidiFile(self.streamIn)
         streamMidiWritten = streamMidiFile.writestr()
         return BytesIO(streamMidiWritten)
 
-    def playStringIOFile(self, stringIOFile, busyFunction=None, busyArgs=None,
-                         endFunction=None, endArgs=None, busyWaitMilliseconds=50,
+    def playStringIOFile(self,
+                         stringIOFile: BytesIO,
+                         busyFunction: Callable[[t.Any], t.Any]|None = None,
+                         busyArgs: t.Any = None,
+                         endFunction: Callable[[t.Any], t.Any]|None = None,
+                         endArgs: t.Any = None,
+                         busyWaitMilliseconds: int = 50,
                          *,
-                         playForMilliseconds=float('inf'), blocked=True):
+                         playForMilliseconds: float = float('inf'),
+                         blocked: bool = True) -> None:
         '''
         busyFunction is a function that is called with busyArgs when the music is busy every
         busyWaitMilliseconds.
@@ -167,7 +175,7 @@ class StreamPlayer:  # pragma: no cover
         if endFunction is not None:
             endFunction(endArgs)
 
-    def stop(self):
+    def stop(self) -> None:
         self.pygame.mixer.music.stop()
 
 
@@ -183,7 +191,7 @@ class TestExternal(unittest.TestCase):  # pragma: no cover
         pygame_installed = False
 
     @unittest.skipUnless(pygame_installed, 'pygame is not installed')
-    def testBachDetune(self):
+    def testBachDetune(self) -> None:
         from music21 import corpus
         import random
         b = corpus.parse('bwv66.6')
@@ -232,7 +240,7 @@ class TestExternal(unittest.TestCase):  # pragma: no cover
         sp = StreamPlayer(b)
         sp.play(busyFunction=busyCounter, busyArgs=[timeCounter], busyWaitMilliseconds=500)
 
-    def x_testPlayOneMeasureAtATime(self):
+    def x_testPlayOneMeasureAtATime(self) -> None:
         from music21 import corpus
         defaults.ticksAtStart = 0
         b = corpus.parse('bwv66.6')
