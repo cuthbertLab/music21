@@ -22,8 +22,6 @@ import re
 import sys
 import unittest
 
-from music21.common.stringTools import parenthesesMatch, ParenthesesMatch
-
 defaultImports = ['music21']
 
 
@@ -85,11 +83,10 @@ def addDocAttrTestsToSuite(suite,
 
 def fixDoctests(doctestSuite: doctest._DocTestSuite) -> None:
     r'''
-    Fix doctests so that addresses are sanitized, WindowsPath is okay on windows
-    and OrderedDicts pass on Python 3.12.
+    Fix doctests so that addresses are sanitized and WindowsPath is okay on windows.
 
-    In the past this fixed other differences among Python versions.
-    In the future, it will again!
+    In the past this fixed other differences among Python versions (such as the
+    pre-3.12 OrderedDict repr).  In the future, it will again!
     '''
     windows: bool = platform.system() == 'Windows'
 

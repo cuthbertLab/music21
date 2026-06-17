@@ -12,7 +12,7 @@ except ImportError:
         pass
 
 import music21
-from music21.test.testRunner import fix312OrderedDict, stripAddresses
+from music21.test.testRunner import stripAddresses
 
 @pytest.fixture(scope='session')
 def doctest_namespace() -> dict[str, Any]:
@@ -62,7 +62,6 @@ def pytest_collection_modifyitems(config, items) -> None:
 
         for example in dt.examples:
             example.want = stripAddresses(example.want, '0x...')
-            example.want = fix312OrderedDict(example.want, '...')
 
             if windows:
                 example.want = example.want.replace('PosixPath', 'WindowsPath')

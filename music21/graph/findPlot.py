@@ -283,29 +283,29 @@ def getPlotsToMake(graphFormat: str|None = None,
 
     >>> graph.findPlot.getPlotsToMake('scatter', 'offset', 'dynamics')
     [(<class 'music21.graph.plot.Scatter'>,
-      OrderedDict([('x', <class 'music21.graph.axis.OffsetAxis'>),
-                   ('y', <class 'music21.graph.axis.DynamicsAxis'>)]))]
+      OrderedDict({'x': <class 'music21.graph.axis.OffsetAxis'>,
+                   'y': <class 'music21.graph.axis.DynamicsAxis'>}))]
 
     Just a couple of values:
 
     >>> graph.findPlot.getPlotsToMake('offset', 'dynamics')
     [(<class 'music21.graph.plot.Scatter'>,
-      OrderedDict([('x', <class 'music21.graph.axis.OffsetAxis'>),
-                   ('y', <class 'music21.graph.axis.DynamicsAxis'>)]))]
+      OrderedDict({'x': <class 'music21.graph.axis.OffsetAxis'>,
+                   'y': <class 'music21.graph.axis.DynamicsAxis'>}))]
 
     Just one value:
 
     >>> graph.findPlot.getPlotsToMake('octave')
     [(<class 'music21.graph.plot.Histogram'>,
-      OrderedDict([('x', <class 'music21.graph.axis.PitchSpaceOctaveAxis'>)]))]
+      OrderedDict({'x': <class 'music21.graph.axis.PitchSpaceOctaveAxis'>}))]
 
     Three values:
 
     >>> graph.findPlot.getPlotsToMake('offset', 'dynamics', 'count')
     [(<class 'music21.graph.plot.ScatterWeighted'>,
-      OrderedDict([('x', <class 'music21.graph.axis.OffsetAxis'>),
-                   ('y', <class 'music21.graph.axis.DynamicsAxis'>),
-                   ('z', <class 'music21.graph.axis.CountingAxis'>)]))]
+      OrderedDict({'x': <class 'music21.graph.axis.OffsetAxis'>,
+                   'y': <class 'music21.graph.axis.DynamicsAxis'>,
+                   'z': <class 'music21.graph.axis.CountingAxis'>}))]
 
     '''
     def _bestPlotType(graphClassesToChooseFrom):

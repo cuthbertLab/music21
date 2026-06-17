@@ -1011,10 +1011,10 @@ class OffsetAxis(PositionAxis):
         >>> ax = graph.axis.OffsetAxis(p, 'x')
         >>> om = ax.getOffsetMap()
         >>> om
-        OrderedDict([(0.0, [<music21.stream.Measure 0 offset=0.0>]),
-                     (1.0, [<music21.stream.Measure 1 offset=1.0>]),
-                     (5.0, [<music21.stream.Measure 2 offset=5.0>]),
-                     ...])
+        OrderedDict({0.0: [<music21.stream.Measure 0 offset=0.0>],
+                     1.0: [<music21.stream.Measure 1 offset=1.0>],
+                     5.0: [<music21.stream.Measure 2 offset=5.0>],
+                     ...})
 
         Same if called on a single part:
 
@@ -1022,10 +1022,10 @@ class OffsetAxis(PositionAxis):
         >>> ax = graph.axis.OffsetAxis(p, 'x')
         >>> om2 = ax.getOffsetMap()
         >>> om2
-        OrderedDict([(0.0, [<music21.stream.Measure 0 offset=0.0>]),
-                     (1.0, [<music21.stream.Measure 1 offset=1.0>]),
-                     (5.0, [<music21.stream.Measure 2 offset=5.0>]),
-                     ...])
+        OrderedDict({0.0: [<music21.stream.Measure 0 offset=0.0>],
+                     1.0: [<music21.stream.Measure 1 offset=1.0>],
+                     5.0: [<music21.stream.Measure 2 offset=5.0>],
+                     ...})
 
         But empty if called on a single Measure ...
 

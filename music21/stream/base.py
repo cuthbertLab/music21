@@ -4996,11 +4996,11 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         >>> alto = chorale.parts['#alto']
         >>> altoMeasures = alto.measureOffsetMap()
         >>> altoMeasures
-        OrderedDict([(0.0, [<music21.stream.Measure 1 offset=0.0>]),
-                     (4.0, [<music21.stream.Measure 2 offset=4.0>]),
-                     (8.0, [<music21.stream.Measure 3 offset=8.0>]),
+        OrderedDict({0.0: [<music21.stream.Measure 1 offset=0.0>],
+                     4.0: [<music21.stream.Measure 2 offset=4.0>],
+                     8.0: [<music21.stream.Measure 3 offset=8.0>],
                      ...
-                     (38.0, [<music21.stream.Measure 9 offset=38.0>])])
+                     38.0: [<music21.stream.Measure 9 offset=38.0>]})
         >>> list(altoMeasures.keys())
         [0.0, 4.0, 8.0, 12.0, 16.0, 20.0, 24.0, 34.0, 38.0]
 
@@ -5025,12 +5025,12 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
 
         >>> mom = chorale.measureOffsetMap()
         >>> mom
-        OrderedDict([(0.0, [<music21.stream.Measure 1 offset=0.0>,
+        OrderedDict({0.0: [<music21.stream.Measure 1 offset=0.0>,
                             <music21.stream.Measure 1 offset=0.0>,
                             <music21.stream.Measure 1 offset=0.0>,
-                            <music21.stream.Measure 1 offset=0.0>]),
-                      (4.0, [<music21.stream.Measure 2 offset=4.0>,
-                             ...])])
+                            <music21.stream.Measure 1 offset=0.0>],
+                      4.0: [<music21.stream.Measure 2 offset=4.0>,
+                             ...]})
         >>> for measure_obj in mom[8.0]:
         ...     print(measure_obj, measure_obj.getContextByClass(stream.Part).id)
         <music21.stream.Measure 3 offset=8.0> Soprano

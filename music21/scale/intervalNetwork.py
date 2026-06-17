@@ -516,21 +516,21 @@ class IntervalNetwork:
 
         >>> net.fillBiDirectedEdges(edgeList)
         >>> net.nodes
-        OrderedDict([(Terminus.LOW, <music21.scale.intervalNetwork.Node id=Terminus.LOW>),
-                     (0, <music21.scale.intervalNetwork.Node id=0>),
-                     (1, <music21.scale.intervalNetwork.Node id=1>),
+        OrderedDict({Terminus.LOW: <music21.scale.intervalNetwork.Node id=Terminus.LOW>,
+                     0: <music21.scale.intervalNetwork.Node id=0>,
+                     1: <music21.scale.intervalNetwork.Node id=1>,
                      ...
-                     (5, <music21.scale.intervalNetwork.Node id=5>),
-                     (Terminus.HIGH, <music21.scale.intervalNetwork.Node id=Terminus.HIGH>)])
+                     5: <music21.scale.intervalNetwork.Node id=5>,
+                     Terminus.HIGH: <music21.scale.intervalNetwork.Node id=Terminus.HIGH>})
         >>> net.edges
-        OrderedDict([(0, <music21.scale.intervalNetwork.Edge Direction.BI M2
-                            [(Terminus.LOW, 0), (0, Terminus.LOW)]>),
-                     (1, <music21.scale.intervalNetwork.Edge Direction.BI M2 [(0, 1), (1, 0)]>),
-                     (2, <music21.scale.intervalNetwork.Edge Direction.BI m2 [(1, 2), (2, 1)]>),
+        OrderedDict({0: <music21.scale.intervalNetwork.Edge Direction.BI M2
+                            [(Terminus.LOW, 0), (0, Terminus.LOW)]>,
+                     1: <music21.scale.intervalNetwork.Edge Direction.BI M2 [(0, 1), (1, 0)]>,
+                     2: <music21.scale.intervalNetwork.Edge Direction.BI m2 [(1, 2), (2, 1)]>,
                      ...
-                     (5, <music21.scale.intervalNetwork.Edge Direction.BI M2 [(4, 5), (5, 4)]>),
-                     (6, <music21.scale.intervalNetwork.Edge Direction.BI m2
-                            [(5, Terminus.HIGH), (Terminus.HIGH, 5)]>)])
+                     5: <music21.scale.intervalNetwork.Edge Direction.BI M2 [(4, 5), (5, 4)]>,
+                     6: <music21.scale.intervalNetwork.Edge Direction.BI m2
+                            [(5, Terminus.HIGH), (Terminus.HIGH, 5)]>})
 
         >>> [str(p) for p in net.realizePitch('g4')]
         ['G4', 'A4', 'B4', 'C5', 'D5', 'E5', 'F#5', 'G5']
