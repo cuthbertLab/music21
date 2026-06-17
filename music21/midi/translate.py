@@ -21,7 +21,6 @@ import typing as t
 import warnings
 
 from music21 import chord
-from music21 import common
 from music21.common.numberTools import opFrac
 from music21 import defaults
 from music21 import duration
