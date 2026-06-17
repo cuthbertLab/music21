@@ -451,9 +451,7 @@ def midiEventsToNote(
     if isinstance(nr, note.Note):
         nr.pitch.midi = midiOnEvent.pitch
     elif isinstance(nr, note.Unpitched):
-        onPitch = midiOnEvent.pitch
-        if t.TYPE_CHECKING:
-            assert onPitch is not None
+        onPitch = t.cast(int, midiOnEvent.pitch)
         try:
             i = PERCUSSION_MAPPER.midiPitchToInstrument(onPitch)
         except MIDIPercussionException:
@@ -1028,9 +1026,8 @@ def midiEventsToTimeSignature(
         event = eventList[1]
 
     # time signature is 4 byte encoding
-    if t.TYPE_CHECKING:
-        assert isinstance(event.data, bytes)
-    post = list(event.data)
+    eventData = t.cast(bytes, event.data)
+    post = list(eventData)
 
     n = post[0]
     d = pow(2, post[1])
@@ -1139,9 +1136,8 @@ def midiEventsToKey(eventList: MidiEvent|Sequence[MidiEvent]) -> key.Key:
         event = eventList
     else:  # get the second event; first is delta time
         event = eventList[1]
-    if t.TYPE_CHECKING:
-        assert isinstance(event.data, bytes)
-    post = list(event.data)
+    eventData = t.cast(bytes, event.data)
+    post = list(eventData)
 
     # first value is number of sharp, or neg for number of flat
     if post[0] > 12:
@@ -1235,9 +1231,8 @@ def midiEventsToTempo(eventList: MidiEvent|Sequence[MidiEvent]) -> tempo.Metrono
     else:  # get the second event; first is delta time
         event = eventList[1]
     # get microseconds per quarter
-    if t.TYPE_CHECKING:
-        assert isinstance(event.data, bytes)
-    mspq = getNumber(event.data, 3)[0]  # first data is number
+    eventData = t.cast(bytes, event.data)
+    mspq = getNumber(eventData, 3)[0]  # first data is number
     bpm = round(60_000_000 / mspq, 2)
     # post = list(event.data)
     # environLocal.printDebug(['midiEventsToTempo, got bpm', bpm])

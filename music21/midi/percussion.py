@@ -158,11 +158,11 @@ class PercussionMapper:
         midiInstrumentObject = midiInstrument()
         if (midiInstrumentObject.inGMPercMap is True
                 and hasattr(midiInstrumentObject, '_percMapPitchToModifier')):
-            if t.TYPE_CHECKING:
-                assert isinstance(midiInstrumentObject, instrument.UnpitchedPercussion)
-            if midiNumber in midiInstrumentObject._percMapPitchToModifier:
-                modifier = midiInstrumentObject._percMapPitchToModifier[midiNumber]
-                midiInstrumentObject.modifier = modifier
+            midiUnpitchedPercussion = t.cast(
+                instrument.UnpitchedPercussion, midiInstrumentObject)
+            if midiNumber in midiUnpitchedPercussion._percMapPitchToModifier:
+                modifier = midiUnpitchedPercussion._percMapPitchToModifier[midiNumber]
+                midiUnpitchedPercussion.modifier = modifier
 
         return midiInstrumentObject
 
@@ -194,10 +194,8 @@ class PercussionMapper:
         '''
         if not hasattr(midiInstrument, 'inGMPercMap') or midiInstrument.inGMPercMap is False:
             raise MIDIPercussionException(f'{midiInstrument!r} is not in the GM Percussion Map!')
-        if t.TYPE_CHECKING:
-            assert isinstance(midiInstrument, instrument.Percussion)
-            assert midiInstrument.percMapPitch is not None
-        midiPitch = midiInstrument.percMapPitch
+        percInstrument = t.cast(instrument.Percussion, midiInstrument)
+        midiPitch = t.cast(int, percInstrument.percMapPitch)
         pitchObject = pitch.Pitch()
         pitchObject.midi = midiPitch
         return pitchObject
