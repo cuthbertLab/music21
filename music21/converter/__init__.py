@@ -867,7 +867,6 @@ class Converter:
          <class 'music21.converter.subConverters.ConverterScala'>,
          <class 'music21.converter.subConverters.ConverterText'>,
          <class 'music21.converter.subConverters.ConverterTextLine'>,
-         <class 'music21.converter.subConverters.ConverterVexflow'>,
          <class 'music21.converter.subConverters.ConverterVolpiano'>]
 
         >>> class ConverterSonix(converter.subConverters.SubConverter):
@@ -979,7 +978,6 @@ class Converter:
         <class 'music21.converter.subConverters.ConverterText'>
         <class 'music21.converter.subConverters.ConverterTextLine'>
         <class 'music21.converter.subConverters.ConverterTinyNotation'>
-        <class 'music21.converter.subConverters.ConverterVexflow'>
         <class 'music21.converter.subConverters.ConverterVolpiano'>
         <class 'music21.converter.subConverters.SubConverter'>
         '''
@@ -1031,7 +1029,6 @@ class Converter:
         ('textline', <class 'music21.converter.subConverters.ConverterTextLine'>)
         ('tinynotation', <class 'music21.converter.subConverters.ConverterTinyNotation'>)
         ('txt', <class 'music21.converter.subConverters.ConverterText'>)
-        ('vexflow', <class 'music21.converter.subConverters.ConverterVexflow'>)
         ('volpiano', <class 'music21.converter.subConverters.ConverterVolpiano'>)
         ('xml', <class 'music21.converter.subConverters.ConverterMusicXML'>)
         '''

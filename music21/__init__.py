@@ -120,7 +120,6 @@ __all__ = [
     'stream',
     'test',
     'tree',
-    'vexflow',
 
     # individual modules
     # KEEP ALPHABETICAL unless necessary for load reasons, if so
@@ -239,7 +238,6 @@ from music21 import search  # noqa: E402
 from music21 import stream  # noqa: E402
 from music21 import test  # noqa: E402
 from music21 import tree  # noqa: E402
-from music21 import vexflow  # noqa: E402
 
 # individual modules
 from music21 import articulations  # noqa: E402

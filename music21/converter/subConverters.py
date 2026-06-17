@@ -346,8 +346,7 @@ class SubConverter:
 class ConverterIPython(SubConverter):
     '''
     Meta-subConverter for displaying image data in a Notebook
-    using either png (via MuseScore or LilyPond) or directly via
-    Vexflow/music21j, or MIDI using music21j.
+    using either png (via MuseScore or LilyPond) or MIDI using music21j.
     '''
     registerFormats = ('ipython', 'jupyter')
     registerOutputExtensions = ()
@@ -487,25 +486,6 @@ class ConverterBraille(SubConverter):
         dataStr = braille.translate.objectToBraille(obj, **keywords)
         if 'ascii' in subformats:
             dataStr = braille.basic.brailleUnicodeToBrailleAscii(dataStr)
-        fp = self.writeDataStream(fp, dataStr)
-        return fp
-
-
-class ConverterVexflow(SubConverter):
-    registerFormats = ('vexflow',)
-    registerOutputExtensions = ('html',)
-
-    def write(self,
-              obj,
-              fmt,
-              fp=None,
-              subformats=(),
-              *,
-              local: bool = False,
-              **keywords):  # pragma: no cover
-        # from music21 import vexflow
-        from music21.vexflow import toMusic21j as vexflow
-        dataStr = vexflow.fromObject(obj, mode='html', local=local)
         fp = self.writeDataStream(fp, dataStr)
         return fp
 
