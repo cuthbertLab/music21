@@ -227,28 +227,3 @@ def htmlOutputForMidi(binaryMidiData: bytes) -> str:
             script.addEventListener("load", function() { play(window.music21); });
         })();
         </script>'''
-
-
-    # def vfshow(self, s):
-    #     '''
-    #     pickle this object and send it to Vexflow
-    #
-    #     Alpha -- does not work too well.
-    #     '''
-    #     import random
-    #     from music21.vexflow import toMusic21j
-    #     from IPython.display import HTML
-    #     vfp = toMusic21j.VexflowPickler()
-    #     vfp.mode = 'jsonSplit'
-    #     outputCode = vfp.fromObject(s)
-    #     idName = 'canvasDiv' + str(random.randint(0, 10000))
-    #     htmlBlock = '<div id="' + idName + '"><canvas/></div>'
-    #     js = '''
-    #     <script>
-    #          data = ''' + outputCode + ''';
-    #          var jpc = new music21.jsonPickle.Converter();
-    #          var streamObj = jpc.run(data);
-    #          streamObj.replaceCanvas("#''' + idName + '''");
-    #     </script>
-    #     '''
-    #     return HTML(htmlBlock + js)
