@@ -798,17 +798,21 @@ class Converter:
             raise ConverterException(f'Cannot automatically find a format for {fp!r}')
 
         self.setSubConverterFromFormat(useFormat)
-        if t.TYPE_CHECKING:
-            assert isinstance(self.subConverter, subConverters.SubConverter)
 
-        self.subConverter.keywords = keywords
-        self.subConverter.parseFile(fp, number=number)
+        subConverter = t.cast(subConverters.SubConverter, self.subConverter)
+        subConverter.keywords = keywords
+        subConverter.parseFile(fp, number=number)
 
-        if self.stream is None:
+        s = self.stream
+        if s is None:
             raise ConverterException('Could not create a Stream via a subConverter.')
-        self.stream.metadata.filePath = fp
-        self.stream.metadata.fileNumber = number
-        self.stream.metadata.fileFormat = useFormat
+
+        if not s.metadata:
+            s.metadata = metadata.Metadata()
+
+        s.metadata.filePath = fp
+        s.metadata.fileNumber = number
+        s.metadata.fileFormat = useFormat
 
 
     # -----------------------------------------------------------------------#
