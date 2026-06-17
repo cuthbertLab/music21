@@ -208,18 +208,18 @@ class CTSong(prebase.ProtoM21Object):
     the individual rules that make up the song object. For example,
 
     >>> s.rules
-    OrderedDict([('VP', <music21.romanText.clercqTemperley.CTRule
-                         text='VP: I | IV | I | V |'>),
-                 ('In', <music21.romanText.clercqTemperley.CTRule text='In: $VP*2'>),
-                 ('Vr', <music21.romanText.clercqTemperley.CTRule
+    OrderedDict({'VP': <music21.romanText.clercqTemperley.CTRule
+                         text='VP: I | IV | I | V |'>,
+                 'In': <music21.romanText.clercqTemperley.CTRule text='In: $VP*2'>,
+                 'Vr': <music21.romanText.clercqTemperley.CTRule
                          text='Vr: $VP*4 IV | V | I | vi | IV | V | I | V |
-                                     % Second half could be called chorus'>),
-                 ('Ch', <music21.romanText.clercqTemperley.CTRule
-                         text='Ch: V | | $VP*2 I |*4'>),
-                 ('Ch2', <music21.romanText.clercqTemperley.CTRule
-                         text='Ch2: V | | $VP*3     % Fadeout'>),
-                 ('S', <music21.romanText.clercqTemperley.CTRule
-                         text='S: [G] $In $Vr $Vr $Ch $VP $Vr $Ch2'>)])
+                                     % Second half could be called chorus'>,
+                 'Ch': <music21.romanText.clercqTemperley.CTRule
+                         text='Ch: V | | $VP*2 I |*4'>,
+                 'Ch2': <music21.romanText.clercqTemperley.CTRule
+                         text='Ch2: V | | $VP*3     % Fadeout'>,
+                 'S': <music21.romanText.clercqTemperley.CTRule
+                         text='S: [G] $In $Vr $Vr $Ch $VP $Vr $Ch2'>})
 
     The parser extracts meaningful properties to each rule, such as sectionName,
     home time signature of that rule, home key of that rule, and of course the individual
@@ -288,15 +288,15 @@ class CTSong(prebase.ProtoM21Object):
     1952
 
     >>> s.rules
-    OrderedDict([('In', <music21.romanText.clercqTemperley.CTRule
-                            text='In: I | | | | | | V | |'>),
-                 ('Vr', <music21.romanText.clercqTemperley.CTRule
-                         text='Vr: I | | | | IVd7 | | I | | V7 | | I | | %a comment on verse'>),
-                 ('Vrf', <music21.romanText.clercqTemperley.CTRule
-                         text='Vrf: I | | | | IVd7 | | I | | V7 | | I | IV iv | V | . I |'>),
-                 ('S', <music21.romanText.clercqTemperley.CTRule
+    OrderedDict({'In': <music21.romanText.clercqTemperley.CTRule
+                            text='In: I | | | | | | V | |'>,
+                 'Vr': <music21.romanText.clercqTemperley.CTRule
+                         text='Vr: I | | | | IVd7 | | I | | V7 | | I | | %a comment on verse'>,
+                 'Vrf': <music21.romanText.clercqTemperley.CTRule
+                         text='Vrf: I | | | | IVd7 | | I | | V7 | | I | IV iv | V | . I |'>,
+                 'S': <music21.romanText.clercqTemperley.CTRule
                          text='S: [A] $In $Vr $Vr $Vr $Vr $Vr $Vr $Vrf
-                                     % 3rd and 6th verses are instrumental'>)])
+                                     % 3rd and 6th verses are instrumental'>})
 
     >>> rule = s.rules['In']
     >>> rule.text

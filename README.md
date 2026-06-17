@@ -16,8 +16,12 @@ https://tinyurl.com/m21colab (run all to set up an environment for the latest re
 And to install, see:
 https://www.music21.org/music21docs/usersGuide/usersGuide_01_installing.html
 
-`Music21` runs on Python 3.11+.  (Use music21 version 4 on Python 2 or Py3.4, v5
-on Py3.5, v6 on Py3.6, v7 on Py3.7, v8 on Py3.8/Py3.9, and v9 on Py3.10)
+`Music21` runs on Python 3.12+.  (Use music21 version 4 on Python 2 or Py3.4, v5
+on Py3.5, v6 on Py3.6, v7 on Py3.7, v8 on Py3.8/Py3.9, v9 on Py3.10, and v10 on Py3.11)
+
+Since v9, `music21` has supported at least the last two released versions of Python,
+but rarely more.  We do, however, try to keep supporting whatever (often older)
+version of Python that Google Colab runs on (as of 2026, that is Python 3.12).
 
 [![Build Status](https://github.com/cuthbertLab/music21/workflows/maincheck/badge.svg)](https://github.com/cuthbertLab/music21)
 [![Coverage Status](https://coveralls.io/repos/github/cuthbertLab/music21/badge.svg?branch=master)](https://coveralls.io/github/cuthbertLab/music21?branch=master)

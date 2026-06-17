@@ -20,13 +20,21 @@
 - `uv sync` installs runtime deps + the `dev` group, which self-references `music21[extras]`,
   so scipy and python-Levenshtein come along automatically. Tests will not pass without them.
 
+# Python version support
+
+- `music21` supports at least the last two released versions of Python and up to whatever
+  Python version Google Colab runs (unless it gets EOL). Policy can change as features are added.
+- The coverage CI run is intentionally pinned to the **middle** supported
+  Python version. See `coverageM21.getCoverage`.
+
 # PRs and Issues
 
 - All PRs and Issues need to be declared AI-assisted.
 - 10 or more lines of code written by an agent needs to be declared as AI-assisted in the docstring.  
   Humans can remove and should remove this note when they do a review.
-- If no code was written by a user, any PR
-  must declare "entirely AI written".  If it does not pass the tests it will be closed (or should be closed 
+- If no code was written by a user, any PR must declare "entirely AI written" unless the user
+  is a longtime contributor to music21.
+  If it does not pass the tests it will be closed (or should be closed 
   by the agent or author).  Failure to do so may result in the user being banned from the project.
 - Agents must follow the [Code of Conduct](CODE_OF_CONDUCT.md). Agents that do not will be banned as well at their users.
   Not even the slightest bit of disrespect from an AI agent will be tolerated.

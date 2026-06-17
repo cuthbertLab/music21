@@ -33,18 +33,19 @@ exclude_lines = [
 
 
 def getCoverage(overrideVersion=False):
-    # Run this on a middle Python version so that we can
+    # MEMORY / NOTE FOR UPDATING PYTHON:
+    # Run this on a MIDDLE supported Python version so that we can
     # check timing of newest vs oldest, AND so that
     # we can quickly see failures on newest and oldest.
     # (The odds of a failure on the middle version are low if
-    # the newest and oldest are passing)
+    # the newest and oldest are passing.)
     #
-    # Note the .minor == 12 -- that makes it only run on 3.12
+    # Note the .minor == 13 -- that makes it only run on 3.13
     #
     # When changing the version, be sure also to change
-    # .github/maincheck.yml's line:
-    #           if: ${{ matrix.python-version == '3.12' }}
-    if overrideVersion or sys.version_info.minor == 12:
+    # .github/workflows/maincheck.yml's line:
+    #           if: ${{ matrix.python-version == '3.13' }}
+    if overrideVersion or sys.version_info.minor == 13:
         try:
             # noinspection PyPackageRequirements
             import coverage  # type: ignore

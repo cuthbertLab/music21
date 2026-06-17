@@ -1456,9 +1456,9 @@ class GraphGroupedVerticalBar(Graph):
     >>> lengths = OrderedDict( [('a', 3), ('b', 2), ('c', 1)] )
     >>> data = [('bar' + str(x), lengths) for x in range(3)]
     >>> data
-    [('bar0', OrderedDict([('a', 3), ('b', 2), ('c', 1)])),
-     ('bar1', OrderedDict([('a', 3), ('b', 2), ('c', 1)])),
-     ('bar2', OrderedDict([('a', 3), ('b', 2), ('c', 1)]))]
+    [('bar0', OrderedDict({'a': 3, 'b': 2, 'c': 1})),
+     ('bar1', OrderedDict({'a': 3, 'b': 2, 'c': 1})),
+     ('bar2', OrderedDict({'a': 3, 'b': 2, 'c': 1}))]
     >>> g.data = data
     >>> g.process()
     '''
