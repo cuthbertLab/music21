@@ -100,7 +100,6 @@ def fixDoctests(doctestSuite: doctest._DocTestSuite) -> None:
         dt = dtc._dt_test  # DocTest
         for example in dt.examples:
             example.want = stripAddresses(example.want, '0x...')
-            example.want = fix312OrderedDict(example.want, '...')
             if windows:
                 example.want = example.want.replace('PosixPath', 'WindowsPath')
 
@@ -130,40 +129,6 @@ def stripAddresses(textString, replacement='ADDRESS') -> str:
     '{0.0} <music21.base.Music21Object object at 0x...>'
     '''
     return ADDRESS.sub(replacement, textString)
-
-
-def fix312OrderedDict(textString, replacement='...') -> str:
-    '''
-    Function that fixes the OrderedDicts to work on Python 3.12 and above.
-    (Since 3.12 is now the minimum supported version, every supported Python
-    already uses the ``OrderedDict({...})`` repr, so in practice this is a
-    no-op kept around for the next time Python changes a repr on us.)
-
-    >>> fix312 = test.testRunner.fix312OrderedDict
-    >>> fix312('OrderedDict([(0, 1), (1, 2), (2, 3)])')
-    'OrderedDict({...})'
-
-    while this is left alone:
-
-    >>> fix312('{0: 1, 1: 2, 2: 3}', 'nope!')
-    '{0: 1, 1: 2, 2: 3}'
-    '''
-    if 'OrderedDict([(' not in textString:
-        return textString
-
-    try:
-        matches = parenthesesMatch(textString, open='OrderedDict([(', close=')])')
-        out = []
-        last = 0
-        m: ParenthesesMatch
-        for m in matches:
-            out.append(textString[last:m.start - len('OrderedDict([(')])
-            out.append('OrderedDict({' + replacement + '})')
-            last = m.end + 3  # compensate for ')])'
-        out.append(textString[last:])
-        return ''.join(out)
-    except ValueError:
-        return replacement  # ignore -- too complex to test, hopefully okay on other Python
 
 
 # ------------------------------------------------------------------------------
