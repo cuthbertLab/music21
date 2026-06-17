@@ -1259,8 +1259,6 @@ class MusicXMLImporter(XMLParserBase):
         <miscellaneous> tags etc., add this information to the
         :class:`~music21.metadata.Metadata` object passed in.
 
-        (Replaces identificationToMetadata which is now deprecated.)
-
         Not supported: source, relation
 
         Only the first <rights> tag is supported
@@ -1304,26 +1302,6 @@ class MusicXMLImporter(XMLParserBase):
                     # We didn't recognize miscFieldName? Add as custom metadata,
                     # so nothing is lost.
                     md.addCustom(miscFieldName, miscFieldValue)
-
-    @common.deprecated('use addIdentificationToMetadata', 'v10', 'v11')
-    def identificationToMetadata(
-        self,
-        identification: ET.Element,
-        inputM21: metadata.Metadata|None = None
-    ) -> metadata.Metadata|None:
-        '''
-        Deprecated -- use addIdentificationToMetadata instead and always
-        pass in a metadata object.
-        '''
-        if inputM21 is not None:
-            md = inputM21
-        else:
-            md = metadata.Metadata()
-        self.addIdentificationToMetadata(identification, md)
-        if inputM21 is not None:
-            return md
-        return None
-
 
     @staticmethod
     def isRecognizableMetadataKey(miscFieldName: str) -> bool:
@@ -1427,7 +1405,7 @@ class MusicXMLImporter(XMLParserBase):
             # We don't check against metadata.Contributor.roleNames here.
             # Custom roles/creatorTypes are allowed, and will be stored in
             # the metadata with uniqueName 'otherContributor' (see code in
-            # identificationToMetadata that does this).
+            # addIdentificationToMetadata that does this).
             c.role = creatorType
 
         creatorText = creator.text
@@ -2541,21 +2519,9 @@ class MeasureParser(SoundTagMixin, XMLParserBase):
         True
         >>> mp.getStaffNumber(1)
         1
-
-        Deprecation notice: getting staff number from a string is deprecated
-            and will be removed in v11 (this sort of lazy conversion is frowned upon).
-
-        OMIT_FROM_DOCS
-
-        Stop dealing with and documenting this silliness in v11
-
-        >>> mp.getStaffNumber('2')
-        2
         '''
         if isinstance(mxObject, int):
             return mxObject
-        elif isinstance(mxObject, str):
-            return int(mxObject)
         elif mxObject is None:
             return NO_STAFF_ASSIGNED
         tag = mxObject.tag
