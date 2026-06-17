@@ -38,14 +38,12 @@ def getCoverage(overrideVersion=False):
     # check timing of newest vs oldest, AND so that
     # we can quickly see failures on newest and oldest.
     # (The odds of a failure on the middle version are low if
-    # the newest and oldest are passing -- a middle version is least
-    # likely to fail independently of the lowest or highest.)
+    # the newest and oldest are passing.)
     #
     # Note the .minor == 13 -- that makes it only run on 3.13
-    # (the middle of the then-supported 3.12, 3.13, 3.14).
     #
-    # When changing the version, bump this to the new middle version and
-    # be sure also to change .github/workflows/maincheck.yml's line:
+    # When changing the version, be sure also to change
+    # .github/workflows/maincheck.yml's line:
     #           if: ${{ matrix.python-version == '3.13' }}
     if overrideVersion or sys.version_info.minor == 13:
         try:

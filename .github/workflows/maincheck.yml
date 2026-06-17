@@ -37,10 +37,6 @@ jobs:
         - name: Run Main Test script
           run: uv run python -c 'from music21.test.testSingleCoreAll import ciMain as ci; ci()'
         - name: Coveralls
-          # Run coverage on the MIDDLE supported Python version (least likely to
-          # fail independently of the lowest or highest). When changing supported
-          # versions, update this number to the new middle one and keep it in sync
-          # with coverageM21.getCoverage.
           if: ${{ matrix.python-version == '3.13' }}
           env:  # when changing number above also change coverageM21.getCoverage
               GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
