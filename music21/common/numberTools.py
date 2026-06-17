@@ -1015,7 +1015,7 @@ def toRoman(num: int) -> str:
 
     >>> common.toRoman('hi')
     Traceback (most recent call last):
-    TypeError: expected integer, got <... 'str'>
+    TypeError: expected integer, got <class 'str'>
 
     >>> common.toRoman(0)
     Traceback (most recent call last):
