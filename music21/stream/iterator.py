@@ -25,7 +25,7 @@ import warnings
 from music21 import common
 from music21.common.classTools import tempAttribute, saveAttributes
 from music21.common.enums import OffsetSpecial
-from music21.common.types import M21ObjType, OffsetQLIn, StreamType, ChangedM21ObjType
+from music21.common.types import OffsetQLIn, StreamType, ChangedM21ObjType
 from music21 import note
 from music21.stream import filters
 from music21 import prebase
@@ -42,7 +42,7 @@ S = t.TypeVar('S')
 StreamIteratorType = t.TypeVar('StreamIteratorType', bound='StreamIterator')
 
 # pipe | version not passing mypy.
-FilterType = t.Union[Callable[[t.Any, t.Optional[t.Any]], t.Any], filters.StreamFilter]
+type FilterType = t.Union[Callable[[t.Any, t.Optional[t.Any]], t.Any], filters.StreamFilter]
 
 
 # -----------------------------------------------------------------------------
@@ -59,7 +59,7 @@ class ActiveInformation(t.TypedDict, total=False):
 
 
 # -----------------------------------------------------------------------------
-class StreamIterator(prebase.ProtoM21Object, Sequence[M21ObjType]):
+class StreamIterator[M21ObjType: base.Music21Object](prebase.ProtoM21Object, Sequence[M21ObjType]):
     '''
     An Iterator object used to handle getting items from Streams.
     The :meth:`~music21.stream.Stream.__iter__` method
@@ -1504,7 +1504,7 @@ class StreamIterator(prebase.ProtoM21Object, Sequence[M21ObjType]):
 
 
 # -----------------------------------------------------------------------------
-class OffsetIterator(StreamIterator, Sequence[list[M21ObjType]]):
+class OffsetIterator[M21ObjType: base.Music21Object](StreamIterator, Sequence[list[M21ObjType]]):
     '''
     An iterator that with each iteration returns a list of elements
     that are at the same offset (or all at end)
@@ -1669,7 +1669,9 @@ class OffsetIterator(StreamIterator, Sequence[list[M21ObjType]]):
 
 
 # -----------------------------------------------------------------------------
-class RecursiveIterator(StreamIterator[M21ObjType], Sequence[M21ObjType]):
+class RecursiveIterator[M21ObjType: base.Music21Object](
+    StreamIterator[M21ObjType], Sequence[M21ObjType]
+):
     '''
     One of the most powerful iterators in music21.  Generally not called
     directly, but created by being invoked on a stream with `Stream.recurse()`

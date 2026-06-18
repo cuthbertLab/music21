@@ -7,6 +7,15 @@
 # Code style
 
 - read documentation/source/developerReference/developerGuidelines.ipynb
+- music21 targets Python 3.12+, so use PEP 695 syntax: the `type` statement for
+  type aliases (`type OffsetQL = float|Fraction`) and the bracket form for
+  generic classes (`class Stream[M21ObjType: base.Music21Object]:`).
+- f-strings: even though Python 3.12 (PEP 701) lets a nested string reuse the
+  f-string's own quote character, we deliberately do **not** do that — reusing
+  the same quote inside an f-string is harder to read. Keep using the *other*
+  quote for nested strings, e.g. `f'the value is {d["key"]}'`, not
+  `f"the value is {d["key"]}"`. This is pinned in `pyproject.toml` via
+  `[tool.ruff.format] nested-string-quote-style = "alternating"`.
 
 # Testing
 

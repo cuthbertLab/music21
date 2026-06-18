@@ -41,7 +41,7 @@ if t.TYPE_CHECKING:
 
 environLocal = environment.Environment('pitch')
 
-PitchClassString = t.Literal['a', 'A', 't', 'T', 'b', 'B', 'e', 'E']
+type PitchClassString = t.Literal['a', 'A', 't', 'T', 'b', 'B', 'e', 'E']
 
 STEPREF: dict[StepName, int] = {
     'C': 0,

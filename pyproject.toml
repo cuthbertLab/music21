@@ -111,6 +111,12 @@ exclude = [
     'documentation/source/usersGuide/usersGuide_02_notes.ipynb',  # demonstrates invalid syntax
 ]
 
+[tool.ruff.format]
+# A nested string uses the *other* quote than the f-string delimiter, e.g.
+# f'{d["key"]}'.  This is Ruff's default, but we pin it so the choice stays
+# explicit.  See developerGuidelines for the rationale.
+nested-string-quote-style = "alternating"
+
 [tool.ruff.lint]
 # Flake8, pycodestyle, flake8-quotes + pyflakes
 select = ['E', 'W', 'Q', 'F', 'B']

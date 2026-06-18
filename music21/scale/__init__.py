@@ -106,7 +106,7 @@ from music21 import sieve
 
 environLocal = environment.Environment('scale')
 
-_PitchDegreeCacheKey = tuple[
+type _PitchDegreeCacheKey = tuple[
     type,  # scale class
     str,  # scale type
     str,  # tonic name with octave

@@ -39,7 +39,7 @@ if t.TYPE_CHECKING:
 
 environLocal = environment.Environment('tree.verticality')
 
-PitchedTimespanQuartet = tuple[
+type PitchedTimespanQuartet = tuple[
     tuple[spans.PitchedTimespan, spans.PitchedTimespan],
     tuple[spans.PitchedTimespan, spans.PitchedTimespan],
 ]

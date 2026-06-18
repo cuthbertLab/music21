@@ -1607,8 +1607,8 @@ _DOC_ORDER = (
     Copyright,
 )
 
-DateParseType = Date|datetime.datetime|str
-ValueType = DatePrimitive|Text|Contributor|Copyright|int
+type DateParseType = Date|datetime.datetime|str
+type ValueType = DatePrimitive|Text|Contributor|Copyright|int
 
 
 if __name__ == '__main__':

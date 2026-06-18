@@ -18,7 +18,7 @@ import typing as t
 from music21 import _version
 
 # note: this module should not import any higher level modules
-StepName = t.Literal['C', 'D', 'E', 'F', 'G', 'A', 'B']  # restating so as not to import.
+type StepName = t.Literal['C', 'D', 'E', 'F', 'G', 'A', 'B']  # restating so as not to import.
 
 
 # TODO: defaults should check the environment object to see

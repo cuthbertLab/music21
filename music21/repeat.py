@@ -21,7 +21,6 @@ import copy
 import string
 import typing as t
 
-from music21.common.types import StreamType
 from music21 import environment
 from music21 import exceptions21
 from music21 import expressions
@@ -646,7 +645,7 @@ class ExpanderException(exceptions21.Music21Exception):
     pass
 
 
-class Expander(t.Generic[StreamType]):
+class Expander[StreamType: 'music21.stream.Stream']:
     '''
     The Expander object can expand a single Part or Part-like Stream with repeats. Nested
     repeats given with :class:`~music21.bar.Repeat` objects, or

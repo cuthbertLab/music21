@@ -127,7 +127,7 @@ class NotRestException(exceptions21.Music21Exception):
 
 
 # ------------------------------------------------------------------------------
-SyllabicChoices = t.Literal[None, 'begin', 'single', 'end', 'middle', 'composite']
+type SyllabicChoices = t.Literal[None, 'begin', 'single', 'end', 'middle', 'composite']
 
 SYLLABIC_CHOICES: list[SyllabicChoices] = [
     None, 'begin', 'single', 'end', 'middle', 'composite',
