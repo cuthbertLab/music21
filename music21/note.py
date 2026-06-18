@@ -390,7 +390,7 @@ class Lyric(prebase.ProtoM21Object, style.StyleMixin):
     @property
     def rawText(self) -> str:
         '''
-        returns the text of the syllable with '-' etc.
+        Returns the text of the syllable with '-' etc.
 
         >>> l = note.Lyric('hel-')
         >>> l.text
@@ -529,7 +529,7 @@ class Lyric(prebase.ProtoM21Object, style.StyleMixin):
         This method wipes out components.
         '''
         # do not want to do this unless we are sure this is not a string
-        # possible might alter unicode or other string-like representations
+        # possibly might alter unicode or other string-like representations
         if not isinstance(rawText, str):
             rawText = str(rawText)
 
@@ -607,7 +607,7 @@ class GeneralNote(base.Music21Object):
                  **keywords
                  ):
         if duration is None:
-            # ensure music21base not automatically create a zero duration before we can.
+            # ensure music21base does not automatically create a zero duration before we can.
             if not keywords or ('type' not in keywords and 'quarterLength' not in keywords):
                 tempDuration = Duration(1.0)
             else:
@@ -823,7 +823,7 @@ class GeneralNote(base.Music21Object):
         '''
         Inserts a lyric into the Note, Chord, or Rest's lyric list in front of
         the index specified (0 by default), using index + 1 as the inserted lyric's
-        line number. shifts line numbers of all following lyrics in list
+        line number. Shifts line numbers of all following lyrics in list
 
         >>> n1 = note.Note()
         >>> n1.addLyric('second')
@@ -1892,8 +1892,8 @@ class Unpitched(NotRest):
 
     def displayPitch(self) -> Pitch:
         '''
-        returns a pitch object that is the same as the displayStep and displayOctave.
-        it will never have an accidental.
+        Returns a pitch object that is the same as the displayStep and displayOctave.
+        It will never have an accidental.
 
         >>> unp = note.Unpitched()
         >>> unp.displayStep = 'E'
