@@ -870,23 +870,23 @@ class M21toTSV:
                 thisEntry.numeral = '@none'
                 thisEntry.chord = '@none'
             else:
-                thisRomanNumeral = t.cast(roman.RomanNumeral, thisRN)
-                local_key = localKeyAsRn(thisRomanNumeral.key, global_key_obj)
+                thisRN = t.cast(roman.RomanNumeral, thisRN)
+                local_key = localKeyAsRn(thisRN.key, global_key_obj)
                 relativeroot = None
-                if thisRomanNumeral.secondaryRomanNumeral:
-                    relativeroot = thisRomanNumeral.secondaryRomanNumeral.figure
+                if thisRN.secondaryRomanNumeral:
+                    relativeroot = thisRN.secondaryRomanNumeral.figure
                     relativeroot = characterSwaps(
                         relativeroot, isMinor(local_key), direction='m21-DCML'
                     )
                 # We replace the "d" annotation for Mm7 chords on degrees other than
                 #   V because it is not used by the DCML standard
                 # NB: slightly different from DCML: no key.
-                thisEntry.chord = thisRomanNumeral.figure.replace('d', '', 1)
+                thisEntry.chord = thisRN.figure.replace('d', '', 1)
                 thisEntry.pedal = None
-                thisEntry.numeral = thisRomanNumeral.romanNumeral
-                thisEntry.form = getForm(thisRomanNumeral)
+                thisEntry.numeral = thisRN.romanNumeral
+                thisEntry.form = getForm(thisRN)
                 # Strip any leading non-digits from figbass (e.g., M43 -> 43)
-                fig_bass_m = re.match(r'^\D*(\d.*|)', thisRomanNumeral.figuresWritten)
+                fig_bass_m = re.match(r'^\D*(\d.*|)', thisRN.figuresWritten)
                 # implementing the following check according to the review
                 # at https://github.com/cuthbertLab/music21/pull/1267/
                 # but the match should always exist because either:
