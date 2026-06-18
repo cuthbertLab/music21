@@ -178,7 +178,7 @@ class ABCToken(prebase.ProtoM21Object, common.objects.EqualSlottedObjectMixin):
     The source ABC string itself is stored in self.src.
 
     Because of how copying ABCTokens works, all tokens must have default parameters in their
-    initializers
+    initializers.
     '''
     __slots__ = ('src',)
 
@@ -755,7 +755,7 @@ class ABCMetadata(ABCToken):
 
     def getDefaultQuarterLength(self) -> float:
         r'''
-        If there is a quarter length representation available, return it as a floating point value
+        If there is a quarter length representation available, return it as a floating point value.
 
         >>> am = abcFormat.ABCMetadata('L:1/2')
         >>> am.preParse()
@@ -812,7 +812,7 @@ class ABCMetadata(ABCToken):
             return n * 4 / d
 
         elif self.isMeter():
-            # if meter auto-set a default not length
+            # if meter, auto-set a default note length
             parameters = self.getTimeSignatureParameters()
             if parameters is None:
                 return 0.5  # TODO: assume default, need to configure
@@ -840,7 +840,7 @@ class ABCBar(ABCToken):
         super().__init__(src)
         self.barType = ''  # repeat or barline
         self.barStyle = ''  # regular, heavy-light, etc
-        self.repeatForm = ''  # end, start, bidrectional, first, second
+        self.repeatForm = ''  # end, start, bidirectional, first, second
 
     def parse(self) -> None:
         '''
@@ -1156,7 +1156,7 @@ class ABCTuplet(ABCToken):
         if self.numberNotesActual == -1:
             raise ABCTokenException('must set numberNotesActual with updateRatio()')
 
-        # nee dto
+        # need to create the tuplet object
         from music21 import duration
         self.tupletObj = duration.Tuplet(
             numberNotesActual=self.numberNotesActual,
@@ -1406,7 +1406,7 @@ class ABCNote(ABCToken):
     def _splitChordSymbols(strSrc: str) -> tuple[list[str], str]:
         '''
         Splits chord symbols from other string characteristics.
-        Returns a 2-tuple of a list of chord symbols, and clean remaining chars
+        Returns a 2-tuple of a list of chord symbols, and clean remaining chars.
 
         Staticmethod:
 
@@ -1481,7 +1481,7 @@ class ABCNote(ABCToken):
         >>> an.getPitchName('c')
         ('C#5', False)
 
-        Illegal pitch names raise an ABCHandlerException
+        Illegal pitch names raise an ABCHandlerException:
 
         >>> an.getPitchName('x')
         Traceback (most recent call last):
@@ -1596,7 +1596,7 @@ class ABCNote(ABCToken):
                          strSrc: str,
                          forceDefaultQuarterLength: float|None = None) -> OffsetQL:
         '''
-        Called with parse(), after context processing, to calculate duration
+        Called with parse(), after context processing, to calculate duration.
 
         >>> an = abcFormat.ABCNote()
         >>> an.activeDefaultQuarterLength = 0.5
@@ -1729,7 +1729,7 @@ class ABCNote(ABCToken):
     ) -> None:
         # environLocal.printDebug(['parse', self.src])
         self.chordSymbols, nonChordSymStr = self._splitChordSymbols(self.src)
-        # get pitch name form remaining string
+        # get pitch name from remaining string
         # rests will have a pitch name of None
 
         pn: str|None
@@ -1852,22 +1852,22 @@ class ABCChord(ABCNote):
 # ------------------------------------------------------------------------------
 class ABCHandler:
     '''
-    An ABCHandler is able to divide elements of a character stream into objects and handle
-    store in a list, and passes global information to components
+    An ABCHandler is able to divide elements of a character stream into objects,
+    store them in a list, and pass global information to components.
 
     Optionally, specify the (major, minor, patch) version of ABC to process--
     e.g., (1.2.0). If not set, default ABC 1.3 parsing is performed.
 
     If lineBreaksDefinePhrases is True then new lines within music elements
     define new phrases.  This is useful for parsing extra information from
-    the Essen Folksong repertory
+    the Essen Folksong repertory.
 
     * New in v6.3: lineBreaksDefinePhrases -- does not yet do anything.
     '''
     def __init__(self,
                  abcVersion: tuple[int, ...] = defaults.abcVersionDefault,
                  lineBreaksDefinePhrases: bool = False) -> None:
-        # tokens are ABC objects import n a linear stream
+        # tokens are ABC objects in a linear stream
         self.abcVersion: tuple[int, ...] = abcVersion
         self.abcDirectives: dict[str, str] = {}
         self.tokens: list[ABCToken] = []
@@ -2144,11 +2144,11 @@ class ABCHandler:
         False
 
         Pipe after colon indicates not metadata (bar info).
-        For example need to not misinterpret repeat bars as metadata
+        For example, we need to avoid misinterpreting repeat bars as metadata,
         e.g. `dAG FED:|2 dAG FGA|`
 
-        this is incorrect, but we can avoid it by
-        looking for a leading pipe and returning False
+        This is incorrect, but we can avoid it by
+        looking for a leading pipe and returning False.
 
         >>> ah.startsMetadata('A', ':', '|')
         False
@@ -2314,7 +2314,7 @@ class ABCHandler:
                     j += 1
                 self.currentCollectStr = self.strSrc[self.pos:j]
                 # environLocal.printDebug(
-                #     ['got bidrectional rhythm mod:', repr(self.currentCollectStr)])
+                #     ['got bidirectional rhythm mod:', repr(self.currentCollectStr)])
                 self.tokens.append(ABCBrokenRhythmMarker(self.currentCollectStr))
                 self.skipAhead = j - (self.pos + 1)
                 continue
@@ -2629,7 +2629,7 @@ class ABCHandler:
             if isinstance(token, ABCTuplet):
                 token.updateRatio(lastTimeSignatureObj)
                 # set number of notes that will be altered
-                # might need to do this with ql values, or look ahead to nxt
+                # might need to do this with ql values, or look ahead to next
                 # token
                 token.updateNoteCount()
                 lastTupletToken = token
@@ -2994,7 +2994,7 @@ class ABCHandler:
         Given a processed token list, look for voices. If voices exist,
         split into parts: common metadata, then next voice, next voice, etc.
 
-        Each part is returned as a ABCHandler instance.
+        Each part is returned as an ABCHandler instance.
 
         >>> abcStr = ('M:6/8\\nL:1/8\\nK:G\\nV:1 name="Whistle" '
         ...           'snm="wh"\\nB3 A3 | G6 | B3 A3 | G6 ||\\nV:2 name="violin" '
@@ -3093,7 +3093,7 @@ class ABCHandler:
         Given a list of indices of a list marking the position of
         each barline or implied barline, and the last valid index,
         return a list of two-element lists, each indicating
-        the start and positions of a measure.
+        the start and end positions of a measure.
 
         Here's an easy case that makes this method look worthless:
 
@@ -3144,7 +3144,7 @@ class ABCHandler:
         as an empty bar. This is often done with leading metadata.
 
         Returns a list of ABCHandlerBar instances.
-        The first usually defines only Metadata
+        The first usually defines only Metadata.
 
         TODO: Test and examples
         '''
@@ -3277,7 +3277,7 @@ class ABCHandler:
     def hasNotes(self) -> bool:
         '''
         If tokens are processed, return True if ABCNote or
-        ABCChord classes are defined
+        ABCChord classes are defined.
 
         >>> abcStr = 'M:6/8\\nL:1/8\\nK:G\\n'
         >>> ah1 = abcFormat.ABCHandler()
@@ -3440,6 +3440,30 @@ class ABCFile(prebase.ProtoM21Object):
         self.file = fileLike  # already 'open'
 
     def _reprInternal(self) -> str:
+        '''
+        Return the filename if one is set, otherwise a placeholder for an
+        open file-like object, otherwise the empty string.
+
+        >>> abcFile = abcFormat.ABCFile()
+        >>> abcFile
+        <music21.abcFormat.ABCFile>
+
+        >>> abcFile.filename = 'tune.abc'
+        >>> abcFile
+        <music21.abcFormat.ABCFile tune.abc>
+
+        A file-like object with no filename shows a generic placeholder:
+
+        >>> from io import StringIO
+        >>> abcFile2 = abcFormat.ABCFile()
+        >>> abcFile2.openFileLike(StringIO('X:1'))
+        >>> abcFile2
+        <music21.abcFormat.ABCFile <filelike-object>>
+        '''
+        if self.filename:
+            return str(self.filename)
+        if self.file is not None:
+            return '<filelike-object>'
         return ''
 
     def close(self) -> None:
@@ -3528,7 +3552,7 @@ class ABCFile(prebase.ProtoM21Object):
     def readstr(self, strSrc: str, number: int|None = None) -> ABCHandler:
         '''
         Read a string and process all Tokens.
-        Returns a ABCHandler instance.
+        Returns an ABCHandler instance.
         '''
         if number is not None:
             # will raise exception if number cannot be found

@@ -63,7 +63,7 @@ def abcToStreamPart(
     '''
     Handler conversion of a single Part of a Score with multiple Parts.
     Results are added into the provided inputM21 object
-    or a newly created Part object
+    or a newly created Part object.
 
     The part object is then returned.
     '''
@@ -122,7 +122,7 @@ def abcToStreamPart(
             # environLocal.printDebug(['abcToStreamPart', 'useMeasures',
             #    useMeasures, 'mh.hasNotes()', mh.hasNotes()])
             dst = stream.Measure()
-            # bar tokens are already extracted form token list and are available
+            # bar tokens are already extracted from token list and are available
             # as attributes on the handler object
             # may return None for a regular barline
 
@@ -256,7 +256,7 @@ def parseTokens(
     useMeasures: bool
 ) -> tuple[int, bool]:
     '''
-    parses all the tokens in a measure or part.
+    Parses all the tokens in a measure or part.
     '''
     # in case need to transpose due to clef indication
     from music21 import abcFormat
@@ -536,14 +536,15 @@ def abcToStreamOpus(
     abcHandler: abcFormat.ABCHandler,
     inputM21: stream.Opus|None = None,
     number: int|None = None
-) -> stream.Score|stream.Opus:
+) -> stream.Opus:
     '''
     Convert a multi-work stream into one or more complete works packed into an Opus Stream.
 
     If a `number` argument is given, and a work is defined by
-    that number, that work is returned.
+    that number, an Opus containing just that single work is returned.
+
+    * Changed in v11: always returns an Opus even if only a single number is given.
     '''
-    opus: stream.Score|stream.Opus
     if inputM21 is None:
         opus = stream.Opus()
     else:
@@ -555,8 +556,8 @@ def abcToStreamOpus(
     if abcHandler.definesReferenceNumbers():
         abcDict = abcHandler.splitByReferenceNumber()
         if number is not None and number in abcDict:
-            # get number from dictionary; set to new score
-            opus = abcToStreamScore(abcDict[number])  # return a score, not an opus
+            # get the single requested work, but still wrap it in an Opus
+            opus.append(abcToStreamScore(abcDict[number]))
         else:  # build entire opus into an opus stream
             scoreList = []
             for key, value in sorted(abcDict.items()):
@@ -574,6 +575,16 @@ def abcToStreamOpus(
     else:  # just return single entry in opus object
         opus.append(abcToStreamScore(abcHandler))
     return opus
+
+
+@typing.overload
+def reBar(music21Part: stream.Part, *, inPlace: typing.Literal[True]) -> None:
+    ...
+
+
+@typing.overload
+def reBar(music21Part: stream.Part, *, inPlace: typing.Literal[False] = False) -> stream.Part:
+    ...
 
 
 def reBar(music21Part: stream.Part, *, inPlace: bool = False) -> stream.Part|None:
