@@ -823,7 +823,7 @@ class GeneralNote(base.Music21Object):
         '''
         Inserts a lyric into the Note, Chord, or Rest's lyric list in front of
         the index specified (0 by default), using index + 1 as the inserted lyric's
-        line number. Shifts line numbers of all following lyrics in list
+        line number. Shifts line numbers of all following lyrics in the list.
 
         >>> n1 = note.Note()
         >>> n1.addLyric('second')
