@@ -192,7 +192,6 @@ from __future__ import annotations
 
 import pathlib
 import struct
-import typing as t
 from typing import TypedDict
 
 from music21 import environment
@@ -736,7 +735,7 @@ class NWCStaff:
 
         # print('Number of objects: ', self.numberOfObjects)
         for i in range(self.numberOfObjects):
-            thisObject = NWCObject(staffParent=self, parserParent=p)
+            thisObject = NWCObject(parserParent=p)
             thisObject.parse()
             objects.append(thisObject)
         self.objects = objects
@@ -753,8 +752,7 @@ class NWCObject:
     Each parsing method should set up the 'dumpMethod' method that return the nwctxt version
     of the object.
     '''
-    def __init__(self, staffParent: NWCStaff, parserParent: NWCConverter):
-        self.staffParent: NWCStaff = staffParent
+    def __init__(self, parserParent: NWCConverter):
         self.parserParent: NWCConverter = parserParent
         self.type = None
         self.placement = 0
@@ -1147,7 +1145,7 @@ class NWCObject:
 
         self.data2 = []
         for i in range(numberOfNotes):
-            chordNote = NWCObject(staffParent=t.cast(NWCStaff, self), parserParent=p)
+            chordNote = NWCObject(parserParent=p)
             chordNote.parse()
             self.data2.append(chordNote)
 
@@ -1290,7 +1288,7 @@ class NWCObject:
         '''
         self.noteChordMember()
         self.type = 'RestChordMember'
-        rest = NWCObject(staffParent=t.cast(NWCStaff, self), parserParent=self.parserParent)
+        rest = NWCObject(parserParent=self.parserParent)
         rest.duration = self.data1[0]
         rest.data2 = self.data1
         rest.durationStr = rest.setDurationForObject()
