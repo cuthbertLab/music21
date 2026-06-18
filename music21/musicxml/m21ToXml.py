@@ -1533,8 +1533,7 @@ class ScoreExporter(XMLExporterBase, PartStaffExporterMixin):
         music21.musicxml.xmlObjects.MusicXMLExportException:
         Exporting scores nested inside scores is not supported
         '''
-        s = self.stream
-        s = t.cast(stream.Score, s)
+        s = t.cast(stream.Score, self.stream)
 
         # environLocal.printDebug('streamToMx(): interpreting multipart')
         streamOfStreams = s.getElementsByClass(stream.Stream)
@@ -1805,8 +1804,7 @@ class ScoreExporter(XMLExporterBase, PartStaffExporterMixin):
         # TODO: link/bookmark in credit-words
         self.setPrintStyleAlign(mxCreditWords, textBox)
         if textBox.hasStyleInformation:
-            sty = textBox.style
-            sty = t.cast(style.TextStyle, sty)
+            sty = t.cast(style.TextStyle, textBox.style)
             if sty.justify is not None:
                 mxCreditWords.set('justify', sty.justify)
         mxCredit.append(mxCreditWords)
@@ -2741,8 +2739,8 @@ class PartExporter(XMLExporterBase):
         else:
             # get a default instrument if not assigned
             self.instrumentStream = self.stream.getInstruments(returnDefault=True, recurse=True)
-        firstInstrumentObject = self.instrumentStream[0]  # store first, as handled differently
-        firstInstrumentObject = t.cast(instrument.Instrument, firstInstrumentObject)
+        # store first, as handled differently
+        firstInstrumentObject = t.cast(instrument.Instrument, self.instrumentStream[0])
         self.firstInstrumentObject = firstInstrumentObject
 
         if self.parent is not None:
