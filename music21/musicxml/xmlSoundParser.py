@@ -29,30 +29,34 @@ if t.TYPE_CHECKING:
     from music21.musicxml.xmlToM21 import MeasureParser
 
 
-class SoundTagMixin:
+class SoundTagParser:
     '''
-    This Mixin is applied to MeasureParser -- it is moved
-    out from there because there is still a lot to write
-    here and xmlToM21.py is getting too big.
+    Parses the <sound> tag on behalf of a :class:`MeasureParser`.
+
+    Held by the MeasureParser (as ``.soundParser``) rather than mixed in,
+    because there is still a lot to write here and xmlToM21.py is getting
+    too big. Reaches back into the owning MeasureParser via ``self.measureParser``.
     '''
+    def __init__(self, measureParser: MeasureParser):
+        self.measureParser = measureParser
+
     def xmlSound(self, mxSound: ET.Element) -> None:
         '''
         Convert a <sound> tag to one or more relevant objects
         (presently just MetronomeMark),
         and add it or them to the core and staffReference.
         '''
-        # this mixin is only ever mixed into MeasureParser
-        mp = t.cast('MeasureParser', self)
+        mp = self.measureParser
         # offset is out of order because we need to know it before direction-type
         offsetDirection = mp.xmlToOffset(mxSound)
         totalOffset = offsetDirection + mp.offsetMeasureNote
 
         staffKey = mp.getStaffNumber(mxSound)
 
-        mp.setSound(mxSound,
-                    None,
-                    staffKey,
-                    totalOffset)
+        self.setSound(mxSound,
+                      None,
+                      staffKey,
+                      totalOffset)
 
     def setSound(
         self,
@@ -86,8 +90,7 @@ class SoundTagMixin:
         # TODO: musicxml4: instrument-change: instrument-sound, solo or ensemble or none
         #                                     virtual-instrument
         if 'tempo' in mxSound.attrib:
-            mp = t.cast('MeasureParser', self)
-            mp.setSoundTempo(mxSound, mxDir, staffKey, totalOffset)
+            self.setSoundTempo(mxSound, mxDir, staffKey, totalOffset)
 
 
     def setSoundTempo(
@@ -100,7 +103,7 @@ class SoundTagMixin:
         '''
         Add a metronome mark from the tempo attribute of a <sound> tag.
         '''
-        mp = t.cast('MeasureParser', self)
+        mp = self.measureParser
         qpm = common.numToIntOrFloat(float(mxSound.get('tempo', 0)))
         if qpm == 0:
             warnings.warn('0 qpm tempo tag found, skipping.', stacklevel=2)

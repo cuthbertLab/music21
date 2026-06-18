@@ -58,7 +58,7 @@ from music21 import tie
 
 from music21.musicxml import xmlObjects
 from music21.musicxml import helpers
-from music21.musicxml.xmlSoundParser import SoundTagMixin
+from music21.musicxml.xmlSoundParser import SoundTagParser
 from music21.musicxml.xmlObjects import MusicXMLImportException, MusicXMLWarning
 
 synchronizeIds = helpers.synchronizeIdsToM21
@@ -2348,7 +2348,7 @@ class PartParser(XMLParserBase):
 
 
 # -----------------------------------------------------------------------------
-class MeasureParser(SoundTagMixin, XMLParserBase):
+class MeasureParser(XMLParserBase):
     '''
     parser to work with a single <measure> tag.
 
@@ -2469,6 +2469,16 @@ class MeasureParser(SoundTagMixin, XMLParserBase):
         # inserted into a Stream).
         # key is PedalMark; value is OffsetQL
         self.pedalToStartOffset: weakref.WeakKeyDictionary = weakref.WeakKeyDictionary()
+
+        # parses <sound> tags; pulled out to keep this file smaller (see xmlSoundParser)
+        self.soundParser = SoundTagParser(self)
+
+    def xmlSound(self, mxSound: ET.Element) -> None:
+        '''
+        Convert a <sound> tag; delegates to
+        :class:`~music21.musicxml.xmlSoundParser.SoundTagParser`.
+        '''
+        self.soundParser.xmlSound(mxSound)
 
     @staticmethod
     def getStaffNumber(mxObject: ET.Element|int|None) -> int:
@@ -5516,11 +5526,11 @@ class MeasureParser(SoundTagMixin, XMLParserBase):
             for mxSound in mxDirection.findall('sound'):
                 if 'tempo' not in mxSound.attrib:
                     continue
-                # setSoundTempo is defined in xmlSoundParser.py
-                self.setSound(mxSound,
-                              mxDirection,
-                              staffKey,
-                              totalOffset)
+                # setSound is defined in xmlSoundParser.py
+                self.soundParser.setSound(mxSound,
+                                          mxDirection,
+                                          staffKey,
+                                          totalOffset)
                 break
 
         # TODO: musicxml 4:listening
