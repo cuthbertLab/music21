@@ -111,7 +111,7 @@ class CapellaImporter:
         self.readCapellaXMLFile(filename)
         mainDom = self.parseXMLText()
         scoreObj = self.systemScoreFromScore(mainDom)
-        if systemScore is True:
+        if systemScore:
             return scoreObj
         else:
             partScore = self.partScoreFromSystemScore(scoreObj)
@@ -624,11 +624,11 @@ class CapellaImporter:
             end = True
 
         tieType = None
-        if begin is True and end is True:
+        if begin and end:
             tieType = 'continue'
-        elif begin is True:
+        elif begin:
             tieType = 'start'
-        elif end is True:
+        elif end:
             tieType = 'stop'
         else:
             return None
@@ -896,7 +896,7 @@ class CapellaImporter:
                         hasRepeatEnd = True
                     if repeatType.find('start') > -1:
                         startRep = bar.Repeat('start')
-                        if hasRepeatEnd is True:
+                        if hasRepeatEnd:
                             startRep.priority = 1
                         barlineList.append(startRep)
             else:
