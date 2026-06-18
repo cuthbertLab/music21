@@ -88,8 +88,12 @@ def setSound(
     '''
     Takes a <sound> tag and creates objects from it on the MeasureParser `mp`.
     Presently only handles <sound tempo='x'> events and inserts them as MetronomeMarks.
+
     If the <sound> tag is a child of a <direction> tag, the direction information
-    is used to set the placement of the MetronomeMark.
+    is used to set the placement of the MetronomeMark.  (`xmlToM21` calls this routine
+    directly in that circumstance.)
+
+    Setup:
 
     >>> from music21.musicxml.xmlSoundParser import setSound
     >>> from xml.etree.ElementTree import fromstring as EL
@@ -97,13 +101,13 @@ def setSound(
 
     A <sound> with a tempo attribute inserts a MetronomeMark:
 
-    >>> setSound(mp, EL('<sound tempo="144"/>'), mxDir=None, totalOffset=0.0)
+    >>> setSound(mp, EL('<sound tempo="144"/>'), mxDir=None, totalOffset=2.0)
     >>> mp.stream.coreElementsChanged()
     >>> mp.stream.getElementsByClass(tempo.MetronomeMark).first()
     <music21.tempo.MetronomeMark Quarter=144 (playback only)>
 
     A <sound> without a tempo attribute is (currently) a no-op, so no second
-    mark is added:
+    mark is added.  This should change soon.
 
     >>> setSound(mp, EL('<sound dynamics="70"/>'), mxDir=None, totalOffset=0.0)
     >>> mp.stream.coreElementsChanged()

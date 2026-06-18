@@ -5527,9 +5527,8 @@ class MeasureParser(XMLParserBase):
                 # setSound is defined in xmlSoundParser.py
                 xmlSoundParser.setSound(self,
                                         mxSound,
-                                        mxDirection,
-                                        staffKey,
-                                        totalOffset)
+                                        mxDir=mxDirection,
+                                        totalOffset=totalOffset)
                 break
 
         # TODO: musicxml 4:listening
