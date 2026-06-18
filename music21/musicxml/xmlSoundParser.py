@@ -4,19 +4,16 @@
 #
 # Authors:      Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2016-22 Michael Scott Asato Cuthbert
+# Copyright:    Copyright © 2016-26 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
 Functions that convert the <sound> tag to the many music21
 objects that this tag might represent.
 
-Pulled out because xmlToM21 is getting way too big. These are plain functions
+Pulled out because xmlToM21 got way too big. These are plain functions
 (not methods/a mixin) that take the owning :class:`MeasureParser` as their first
-argument, like the functions in :mod:`~music21.stream.makeNotation`. Only
-:func:`xmlSound` is exposed on MeasureParser (as a thin method), so that no
-per-measure helper object is created for the common case of a measure with no
-<sound> tag.
+argument (like in :mod:`~music21.stream.makeNotation`).
 '''
 from __future__ import annotations
 
@@ -41,38 +38,51 @@ def xmlSound(mp: MeasureParser, mxSound: ET.Element) -> None:
     (presently just MetronomeMark),
     and add it or them to the core and staffReference of the MeasureParser `mp`.
 
-    Unlike :func:`setSound`, the offset is read from `mp` (it is not passed in),
-    so the mark lands at the parser's current position in the measure:
+    Reads offset is from `mp` via `.offsetMeasureNote` so the mark lands at the
+    current position in the measure.
+
+    Set up everything:
 
     >>> from music21.musicxml.xmlSoundParser import xmlSound
     >>> from xml.etree.ElementTree import fromstring as EL
     >>> mp = musicxml.xmlToM21.MeasureParser()
     >>> mp.offsetMeasureNote = 2.0
-    >>> xmlSound(mp, EL('<sound tempo="120"/>'))
-    >>> mm = mp.stream.getElementsByClass(tempo.MetronomeMark).first()
+    >>> len(mp.stream[tempo.MetronomeMark])
+    0
+
+    Now call the routine.
+
+    >>> xmlSound(mp, EL('<sound tempo="128"/>'))
+
+    Nothing is returned, but the stream inside the MeasureParser now has a metronomeMark
+    at the `.offsetMeasureNote` of `mp`.  Because all the routines in this module
+    are optimized for speed, we first need to call `coreElementsChanged`
+    before querying the stream for each of them (normally the MeasureParser
+    does this for us after parsing the entire measure).
+
+    >>> mp.stream.coreElementsChanged()
+    >>> mm = mp.stream[tempo.MetronomeMark].first()
     >>> mm
-    <music21.tempo.MetronomeMark Quarter=120 (playback only)>
+    <music21.tempo.MetronomeMark Quarter=128 (playback only)>
     >>> mm.offset
     2.0
     '''
-    # offset is out of order because we need to know it before direction-type
+    # sound tags can specify an offset that begin at, relative to current position.
     offsetDirection = mp.xmlToOffset(mxSound)
+    # we put offsetDirection + mp.offsetMeasureNote to force conversion of Fraction to float
     totalOffset = offsetDirection + mp.offsetMeasureNote
 
-    staffKey = mp.getStaffNumber(mxSound)
-
     setSound(mp,
-             mxSound,
-             None,
-             staffKey,
-             totalOffset)
+             mxSound=mxSound,
+             mxDir=None,
+             totalOffset=totalOffset)
 
 
 def setSound(
     mp: MeasureParser,
     mxSound: ET.Element,
+    *,
     mxDir: ET.Element|None,
-    staffKey: int,
     totalOffset: float
 ) -> None:
     '''
@@ -87,17 +97,23 @@ def setSound(
 
     A <sound> with a tempo attribute inserts a MetronomeMark:
 
-    >>> setSound(mp, EL('<sound tempo="144"/>'), mxDir=None, staffKey=1, totalOffset=0.0)
+    >>> setSound(mp, EL('<sound tempo="144"/>'), mxDir=None, totalOffset=0.0)
+    >>> mp.stream.coreElementsChanged()
     >>> mp.stream.getElementsByClass(tempo.MetronomeMark).first()
     <music21.tempo.MetronomeMark Quarter=144 (playback only)>
 
     A <sound> without a tempo attribute is (currently) a no-op, so no second
     mark is added:
 
-    >>> setSound(mp, EL('<sound dynamics="70"/>'), mxDir=None, staffKey=1, totalOffset=0.0)
-    >>> len(mp.stream.getElementsByClass(tempo.MetronomeMark))
+    >>> setSound(mp, EL('<sound dynamics="70"/>'), mxDir=None, totalOffset=0.0)
+    >>> mp.stream.coreElementsChanged()
+    >>> len(mp.stream[tempo.MetronomeMark])
     1
     '''
+    # extract the staffKey once since it will be the same for all the rest.
+    staffKey = mp.getStaffNumber(mxSound)
+    attrib = mxSound.attrib
+
     # TODO: coda
     # TODO: dacapo
     # TODO: dalsegno
@@ -116,13 +132,14 @@ def setSound(
     # TODO: musicxml4: swing: straight or first/second/swing-type, swing-style
     # TODO: musicxml4: instrument-change: instrument-sound, solo or ensemble or none
     #                                     virtual-instrument
-    if 'tempo' in mxSound.attrib:
-        setSoundTempo(mp, mxSound, mxDir, staffKey, totalOffset)
+    if 'tempo' in attrib:
+        setSoundTempo(mp, mxSound, mxDir=mxDir, staffKey=staffKey, totalOffset=totalOffset)
 
 
 def setSoundTempo(
     mp: MeasureParser,
     mxSound: ET.Element,
+    *,
     mxDir: ET.Element|None,
     staffKey: int,
     totalOffset: float
@@ -134,12 +151,13 @@ def setSoundTempo(
     >>> from music21.musicxml.xmlSoundParser import setSoundTempo
     >>> from xml.etree.ElementTree import fromstring as EL
     >>> mp = musicxml.xmlToM21.MeasureParser()
-    >>> setSoundTempo(mp, EL('<sound tempo="90"/>'), mxDir=None, staffKey=1, totalOffset=0.0)
-    >>> mm = mp.stream.getElementsByClass(tempo.MetronomeMark).first()
+    >>> setSoundTempo(mp, EL('<sound tempo="92"/>'), mxDir=None, staffKey=1, totalOffset=0.0)
+    >>> mp.stream.coreElementsChanged()
+    >>> mm = mp.stream[tempo.MetronomeMark].first()
     >>> mm
-    <music21.tempo.MetronomeMark Quarter=90 (playback only)>
+    <music21.tempo.MetronomeMark Quarter=92 (playback only)>
     >>> mm.numberSounding
-    90
+    92
     >>> mm.number is None
     True
     '''
@@ -174,6 +192,7 @@ class Test(unittest.TestCase):
         with self.assertWarns(UserWarning):
             setSoundTempo(mp, EL('<sound tempo="0"/>'),
                           mxDir=None, staffKey=1, totalOffset=0.0)
+            mp.stream.coreElementsChanged()
         self.assertEqual(
             len(mp.stream.getElementsByClass(tempo.MetronomeMark)), 0)
 
