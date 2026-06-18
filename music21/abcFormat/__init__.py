@@ -101,6 +101,7 @@ if t.TYPE_CHECKING:
     from music21 import dynamics
     from music21 import key
     from music21 import meter
+    from music21 import note
     from music21 import tempo
     from music21 import spanner
 
@@ -181,10 +182,10 @@ class ABCToken(prebase.ProtoM21Object, common.objects.EqualSlottedObjectMixin):
     '''
     __slots__ = ('src',)
 
-    def __init__(self, src: str = ''):
+    def __init__(self, src: str = '') -> None:
         self.src: str = src  # store source character sequence
 
-    def _reprInternal(self):
+    def _reprInternal(self) -> str:
         return repr(self.src)
 
     @staticmethod
@@ -213,14 +214,14 @@ class ABCToken(prebase.ProtoM21Object, common.objects.EqualSlottedObjectMixin):
             return strSrc.split('%')[0]
         return strSrc
 
-    def preParse(self):
+    def preParse(self) -> None:
         '''
         Dummy method that is called before contextual adjustments.
         Designed to be subclassed or overridden.
         '''
         pass
 
-    def parse(self):
+    def parse(self) -> None:
         '''
         Dummy method that reads self.src and loads attributes.
         It is called after contextual adjustments.
@@ -256,7 +257,7 @@ class ABCMetadata(ABCToken):
 
     # given a logical unit, create an object
     # may be a chord, notes, metadata, bars
-    def __init__(self, src: str = ''):
+    def __init__(self, src: str = '') -> None:
         super().__init__(src)
         self.tag: str = ''
         self.data: str = ''
@@ -280,7 +281,7 @@ class ABCMetadata(ABCToken):
             self.tag = strSrc[:div - 1]  # do not get the colon
             self.data = strSrc[div:].strip()  # remove leading/trailing
 
-    def parse(self):
+    def parse(self) -> None:
         pass
 
     def isDefaultNoteLength(self) -> bool:
@@ -835,7 +836,7 @@ class ABCBar(ABCToken):
     # may be a chord, notes, metadata, bars
     __slots__ = ('barType', 'barStyle', 'repeatForm')
 
-    def __init__(self, src):
+    def __init__(self, src: str = '') -> None:
         super().__init__(src)
         self.barType = ''  # repeat or barline
         self.barStyle = ''  # regular, heavy-light, etc
@@ -989,7 +990,7 @@ class ABCTuplet(ABCToken):
     '''
     __slots__ = ('noteCount', 'numberNotesActual', 'numberNotesNormal', 'tupletObj')
 
-    def __init__(self, src: str = ''):
+    def __init__(self, src: str = '') -> None:
         super().__init__(src)
 
         # self.qlRemain = None  # how many ql are left of this tuplets activity
@@ -1179,9 +1180,9 @@ class ABCTie(ABCToken):
     '''
     __slots__ = ('noteObj',)
 
-    def __init__(self, src=''):
+    def __init__(self, src: str = '') -> None:
         super().__init__(src)
-        self.noteObj = None
+        self.noteObj: note.Note|None = None
 
 
 class ABCSlurStart(ABCToken):
@@ -1191,11 +1192,11 @@ class ABCSlurStart(ABCToken):
     '''
     __slots__ = ('slurObj',)
 
-    def __init__(self, src: str = ''):
+    def __init__(self, src: str = '') -> None:
         super().__init__(src)
         self.slurObj: spanner.Slur|None = None
 
-    def fillSlur(self):
+    def fillSlur(self) -> None:
         '''
         Creates a spanner object for each open paren associated with a slur;
         these slurs are filled with notes until end parens are read.
@@ -1220,7 +1221,7 @@ class ABCCrescStart(ABCToken):
     '''
     __slots__ = ('crescObj',)
 
-    def __init__(self, src: str = ''):
+    def __init__(self, src: str = '') -> None:
         super().__init__(src)
         self.crescObj: dynamics.Crescendo|None = None
 
@@ -1236,11 +1237,11 @@ class ABCDimStart(ABCToken):
     '''
     __slots__ = ('dimObj',)
 
-    def __init__(self, src: str = ''):
+    def __init__(self, src: str = '') -> None:
         super().__init__(src)
         self.dimObj: dynamics.Diminuendo|None = None
 
-    def fillDim(self):
+    def fillDim(self) -> None:
         from music21 import dynamics
         self.dimObj = dynamics.Diminuendo()
 
@@ -1315,11 +1316,11 @@ class ABCBrokenRhythmMarker(ABCToken):
     '''
     __slots__ = ('data',)
 
-    def __init__(self, src: str = ''):
+    def __init__(self, src: str = '') -> None:
         super().__init__(src)
         self.data: str = ''
 
-    def preParse(self):
+    def preParse(self) -> None:
         '''
         Called before context adjustments: need to have access to data
 
@@ -1352,7 +1353,7 @@ class ABCNote(ABCToken):
                  'articulations', 'accidentalDisplayStatus', 'isRest',
                  'pitchName', 'quarterLength',)
 
-    def __init__(self, src='', carriedAccidental: str = ''):
+    def __init__(self, src: str = '', carriedAccidental: str = '') -> None:
         super().__init__(src)
 
         # store the ABC accidental string propagated in the measure that
@@ -1431,7 +1432,7 @@ class ABCNote(ABCToken):
     def getPitchName(
         self,
         strSrc: str,
-        forceKeySignature=None
+        forceKeySignature: key.KeySignature|None = None
     ) -> tuple[str|None, bool|None]:
         '''
         Given a note or rest string without a chord symbol,
@@ -1502,6 +1503,7 @@ class ABCNote(ABCToken):
         if name == 'z':
             return (None, None)  # designates a rest
 
+        activeKeySignature: key.KeySignature|None
         if forceKeySignature is not None:
             activeKeySignature = forceKeySignature
         else:  # may be None
@@ -1763,7 +1765,7 @@ class ABCChord(ABCNote):
     A subclass of ABCNote.
     '''
 
-    def __init__(self, src: str = ''):
+    def __init__(self, src: str = '') -> None:
         super().__init__(src)
         # store a list of component objects
         self.subTokens: list[ABCToken] = []
@@ -1772,7 +1774,7 @@ class ABCChord(ABCNote):
         self,
         forceDefaultQuarterLength: float|None = None,
         forceKeySignature: key.KeySignature|None = None
-    ):
+    ) -> None:
         '''
         Handles the following types of chords:
 
@@ -1864,7 +1866,7 @@ class ABCHandler:
     '''
     def __init__(self,
                  abcVersion: tuple[int, ...] = defaults.abcVersionDefault,
-                 lineBreaksDefinePhrases=False):
+                 lineBreaksDefinePhrases: bool = False) -> None:
         # tokens are ABC objects import n a linear stream
         self.abcVersion: tuple[int, ...] = abcVersion
         self.abcDirectives: dict[str, str] = {}
@@ -2070,7 +2072,7 @@ class ABCHandler:
             abcPatch = 0
         return (abcMajor, abcMinor, abcPatch)
 
-    def processComment(self):
+    def processComment(self) -> None:
         r'''
         Processes the comment at self.pos in self.strSrc, setting self.skipAhead
         and self.abcDirectives for the directiveKey.
@@ -2753,10 +2755,10 @@ class ABCHandler:
     # --------------------------------------------------------------------------
     # access tokens
 
-    def __len__(self):
+    def __len__(self) -> int:
         return len(self.tokens)
 
-    def __add__(self, other):
+    def __add__(self, other: ABCHandler) -> ABCHandler:
         '''
         Return a new handler adding the tokens in both
 
@@ -2792,7 +2794,7 @@ class ABCHandler:
     # --------------------------------------------------------------------------
     # utility methods for post-processing
 
-    def definesReferenceNumbers(self):
+    def definesReferenceNumbers(self) -> bool:
         '''
         Return True if this token structure defines more than 1 reference number,
         usually implying multiple pieces encoded in one file.
@@ -2932,7 +2934,7 @@ class ABCHandler:
 
         return ahDict
 
-    def getReferenceNumber(self):
+    def getReferenceNumber(self) -> str|None:
         '''
         If tokens are processed, get the first
         reference number defined.
@@ -2951,7 +2953,7 @@ class ABCHandler:
                     return token.data
         return None
 
-    def definesMeasures(self):
+    def definesMeasures(self) -> bool:
         '''
         Returns True if this token structure defines Measures in a normal Measure form.
         Otherwise False
@@ -3331,7 +3333,7 @@ class ABCHandlerBar(ABCHandler):
         self.leftBarToken: ABCBar|None = None
         self.rightBarToken: ABCBar|None = None
 
-    def __add__(self, other):
+    def __add__(self, other: ABCHandler) -> ABCHandlerBar:
         ah = self.__class__()  # will get the same class type
         ah.tokens = self.tokens + other.tokens
         # get defined tokens
@@ -3412,12 +3414,12 @@ class ABCFile(prebase.ProtoM21Object):
 
     If not set, default ABC 1.3 parsing is performed.
     '''
-    def __init__(self, abcVersion: tuple[int, int, int] = defaults.abcVersionDefault):
+    def __init__(self, abcVersion: tuple[int, int, int] = defaults.abcVersionDefault) -> None:
         self.abcVersion: tuple[int, int, int] = abcVersion
         self.file: t.IO|None = None
         self.filename: str|pathlib.Path = ''
 
-    def open(self, filename: str|pathlib.Path):
+    def open(self, filename: str|pathlib.Path) -> None:
         '''
         Open a file for reading
         '''
@@ -3427,7 +3429,7 @@ class ABCFile(prebase.ProtoM21Object):
         # self.file = io.open(filename, encoding='latin-1')
         self.filename = filename
 
-    def openFileLike(self, fileLike):
+    def openFileLike(self, fileLike: t.IO) -> None:
         '''
         Assign a file-like object, such as those provided by
         StringIO, as an open file object.
@@ -3437,20 +3439,24 @@ class ABCFile(prebase.ProtoM21Object):
         '''
         self.file = fileLike  # already 'open'
 
-    def _reprInternal(self):
+    def _reprInternal(self) -> str:
         return ''
 
-    def close(self):
-        self.file.close()
+    def close(self) -> None:
+        if self.file is not None:
+            self.file.close()
 
-    def read(self, number=None):
+    def read(self, number: int|None = None) -> ABCHandler:
         '''
         Read a file. Note that this calls readstr,
         which processes all tokens.
 
         If `number` is given, a work number will be extracted if possible.
         '''
-        return self.readstr(self.file.read(), number)
+        file = self.file
+        if file is None:
+            raise ABCFileException('cannot read; no file or file-like object is open')
+        return self.readstr(file.read(), number)
 
     @staticmethod
     def extractReferenceNumber(strSrc: str, number: int) -> str:

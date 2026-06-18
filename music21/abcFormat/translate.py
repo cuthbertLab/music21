@@ -443,7 +443,10 @@ def metadataToM21Object(
     return postTransposition, clefSet
 
 
-def abcToStreamScore(abcHandler, inputM21=None):
+def abcToStreamScore(
+    abcHandler: abcFormat.ABCHandler,
+    inputM21: stream.Score|None = None
+) -> stream.Score:
     '''
     Given an abcHandler object, build into a
     multi-part :class:`~music21.stream.Score` with metadata.
@@ -472,12 +475,11 @@ def abcToStreamScore(abcHandler, inputM21=None):
         if isinstance(t, abcFormat.ABCMetadata):
             if t.isVersion():
                 v = t.data.replace('abc-version', '').strip()
-                try:
+                versionMatch = re.match(r'(\d+).(\d+).?(\d+)?', v)
+                if versionMatch is not None:
                     abcHandler.abcVersion = abcHandler.returnAbcVersionFromMatch(
-                        re.match(r'(\d+).(\d+).?(\d+)?', v)
+                        versionMatch
                     )
-                except AttributeError:
-                    pass
 
             elif t.isTitle():
                 if titleCount == 0:  # first
@@ -530,13 +532,18 @@ def abcToStreamScore(abcHandler, inputM21=None):
     s.coreElementsChanged()
     return s
 
-def abcToStreamOpus(abcHandler, inputM21=None, number=None):
+def abcToStreamOpus(
+    abcHandler: abcFormat.ABCHandler,
+    inputM21: stream.Opus|None = None,
+    number: int|None = None
+) -> stream.Score|stream.Opus:
     '''
     Convert a multi-work stream into one or more complete works packed into an Opus Stream.
 
     If a `number` argument is given, and a work is defined by
     that number, that work is returned.
     '''
+    opus: stream.Score|stream.Opus
     if inputM21 is None:
         opus = stream.Opus()
     else:
@@ -569,7 +576,7 @@ def abcToStreamOpus(abcHandler, inputM21=None, number=None):
     return opus
 
 
-def reBar(music21Part, *, inPlace=False):
+def reBar(music21Part: stream.Part, *, inPlace: bool = False) -> stream.Part|None:
     # noinspection PyShadowingNames,SpellCheckingInspection
     '''
     Re-bar overflow measures using the last known time signature.
