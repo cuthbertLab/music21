@@ -1573,7 +1573,7 @@ class HarmSpine(HumdrumSpine):
                 thisObject = SpineComment(eventC)
             else:
                 harmStr = event.contents
-                romanStr = harmParser.convertHarmToRoman(harmStr)
+                romanStr = harmParser.convertHarmToRoman(harmStr) or ''
                 thisObject = roman.RomanNumeral(
                     romanStr,
                     currentKey,

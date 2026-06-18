@@ -18,7 +18,7 @@ import re
 import typing as t
 import unittest
 
-def convertHarmToRoman(harmStr):
+def convertHarmToRoman(harmStr: str) -> str|None:
     # noinspection PyShadowingNames
     '''
     Converts a `**harm` string into a string that
@@ -202,11 +202,11 @@ class HarmParser:
 
     defs = HarmDefs()
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.harmRegExp = re.compile(HarmParser.defs.harmExpression, re.VERBOSE)
         self.impliedRegExp = re.compile(HarmParser.defs.implied, re.VERBOSE)
 
-    def parse(self, harmExpression) -> dict[str, t.Any]:
+    def parse(self, harmExpression: str) -> dict[str, t.Any]:
         # Check for implied harmony
         m: dict[str, t.Any]
         impliedMatch = self.impliedRegExp.match(harmExpression)

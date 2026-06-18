@@ -13,12 +13,16 @@ https://web.archive.org/web/20100115001258/http://www.music-cog.ohio-state.edu/H
 '''
 from __future__ import annotations
 
+import typing as t
 import unittest
 
 from music21 import exceptions21
 
+if t.TYPE_CHECKING:
+    from music21 import instrument
+
 # noinspection SpellCheckingInspection
-humdrumInstrumentClassToInstrument = {
+humdrumInstrumentClassToInstrument: dict[str, str] = {
     'vox': 'Vocalist',
     'str': 'StringInstrument',
     'ww': 'WoodwindInstrument',
@@ -36,7 +40,7 @@ humdrumInstrumentClassToInstrument = {
 #    *IGconc    concertino instrument
 
 # noinspection SpellCheckingInspection
-humdrumInstruments = {
+humdrumInstruments: dict[str, str] = {
     'soprn': 'Soprano',
     'cant': 'Soprano',  # Found in many sources, but not a predefined humdrum instrument
     'mezzo': 'MezzoSoprano',
@@ -229,7 +233,7 @@ class HumdrumInstrumentException(exceptions21.Music21Exception):
     pass
 
 
-def fromHumdrumClass(hdClass):
+def fromHumdrumClass(hdClass: str) -> instrument.Instrument:
     '''
     Get a music21 instrument object from a humdrum instrument class abbreviation
 
@@ -247,7 +251,7 @@ def fromHumdrumClass(hdClass):
         ) from exc
 
 
-def fromHumdrumInstrument(hdInst):
+def fromHumdrumInstrument(hdInst: str) -> instrument.Instrument:
     # noinspection SpellCheckingInspection
     '''
     Get a music21 instrument object from a humdrum instrument abbreviation
