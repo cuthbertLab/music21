@@ -20,7 +20,6 @@ Type annotations and docstring grammar were added with AI assistance (Claude).
 '''
 from __future__ import annotations
 
-from io import StringIO
 import pathlib
 import typing as t
 import unittest
@@ -142,11 +141,10 @@ class CapellaImporter:
                 'No XML text to parse; call readCapellaXMLFile first.')
         if not isinstance(xmlText, str):
             xmlText = xmlText.decode('utf-8')
-        it = ET.iterparse(StringIO(xmlText))
-        for unused, el in it:
+        rootElement = ET.fromstring(xmlText)
+        for el in rootElement.iter():
             if '}' in el.tag:
                 el.tag = el.tag.split('}', 1)[1]  # strip all namespaces
-        rootElement = t.cast(ET.Element, it.root)  # type: ignore[attr-defined]
         self.mainDom = rootElement
         return rootElement
 
