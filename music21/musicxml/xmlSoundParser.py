@@ -86,14 +86,14 @@ def setSound(
 
     A <sound> with a tempo attribute inserts a MetronomeMark:
 
-    >>> setSound(mp, EL('<sound tempo="144"/>'), None, 1, 0.0)
+    >>> setSound(mp, EL('<sound tempo="144"/>'), mxDir=None, staffKey=1, totalOffset=0.0)
     >>> mp.stream.getElementsByClass(tempo.MetronomeMark).first()
     <music21.tempo.MetronomeMark Quarter=144 (playback only)>
 
     A <sound> without a tempo attribute is (currently) a no-op, so no second
     mark is added:
 
-    >>> setSound(mp, EL('<sound dynamics="70"/>'), None, 1, 0.0)
+    >>> setSound(mp, EL('<sound dynamics="70"/>'), mxDir=None, staffKey=1, totalOffset=0.0)
     >>> len(mp.stream.getElementsByClass(tempo.MetronomeMark))
     1
     '''
@@ -133,7 +133,7 @@ def setSoundTempo(
     >>> from music21.musicxml.xmlSoundParser import setSoundTempo
     >>> from xml.etree.ElementTree import fromstring as EL
     >>> mp = musicxml.xmlToM21.MeasureParser()
-    >>> setSoundTempo(mp, EL('<sound tempo="90"/>'), None, 1, 0.0)
+    >>> setSoundTempo(mp, EL('<sound tempo="90"/>'), mxDir=None, staffKey=1, totalOffset=0.0)
     >>> mm = mp.stream.getElementsByClass(tempo.MetronomeMark).first()
     >>> mm
     <music21.tempo.MetronomeMark Quarter=90 (playback only)>
@@ -148,7 +148,7 @@ def setSoundTempo(
     >>> import warnings
     >>> with warnings.catch_warnings():
     ...     warnings.simplefilter('ignore')
-    ...     setSoundTempo(mp, EL('<sound tempo="0"/>'), None, 1, 0.0)
+    ...     setSoundTempo(mp, EL('<sound tempo="0"/>'), mxDir=None, staffKey=1, totalOffset=0.0)
     >>> len(mp.stream.getElementsByClass(tempo.MetronomeMark))
     1
     '''
