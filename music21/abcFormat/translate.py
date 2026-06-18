@@ -63,7 +63,7 @@ def abcToStreamPart(
     '''
     Handler conversion of a single Part of a Score with multiple Parts.
     Results are added into the provided inputM21 object
-    or a newly created Part object
+    or a newly created Part object.
 
     The part object is then returned.
     '''
@@ -122,7 +122,7 @@ def abcToStreamPart(
             # environLocal.printDebug(['abcToStreamPart', 'useMeasures',
             #    useMeasures, 'mh.hasNotes()', mh.hasNotes()])
             dst = stream.Measure()
-            # bar tokens are already extracted form token list and are available
+            # bar tokens are already extracted from token list and are available
             # as attributes on the handler object
             # may return None for a regular barline
 
@@ -256,7 +256,7 @@ def parseTokens(
     useMeasures: bool
 ) -> tuple[int, bool]:
     '''
-    parses all the tokens in a measure or part.
+    Parses all the tokens in a measure or part.
     '''
     # in case need to transpose due to clef indication
     from music21 import abcFormat
@@ -443,7 +443,10 @@ def metadataToM21Object(
     return postTransposition, clefSet
 
 
-def abcToStreamScore(abcHandler, inputM21=None):
+def abcToStreamScore(
+    abcHandler: abcFormat.ABCHandler,
+    inputM21: stream.Score|None = None
+) -> stream.Score:
     '''
     Given an abcHandler object, build into a
     multi-part :class:`~music21.stream.Score` with metadata.
@@ -472,12 +475,11 @@ def abcToStreamScore(abcHandler, inputM21=None):
         if isinstance(t, abcFormat.ABCMetadata):
             if t.isVersion():
                 v = t.data.replace('abc-version', '').strip()
-                try:
+                versionMatch = re.match(r'(\d+).(\d+).?(\d+)?', v)
+                if versionMatch is not None:
                     abcHandler.abcVersion = abcHandler.returnAbcVersionFromMatch(
-                        re.match(r'(\d+).(\d+).?(\d+)?', v)
+                        versionMatch
                     )
-                except AttributeError:
-                    pass
 
             elif t.isTitle():
                 if titleCount == 0:  # first
@@ -530,12 +532,18 @@ def abcToStreamScore(abcHandler, inputM21=None):
     s.coreElementsChanged()
     return s
 
-def abcToStreamOpus(abcHandler, inputM21=None, number=None):
+def abcToStreamOpus(
+    abcHandler: abcFormat.ABCHandler,
+    inputM21: stream.Opus|None = None,
+    number: int|None = None
+) -> stream.Opus:
     '''
     Convert a multi-work stream into one or more complete works packed into an Opus Stream.
 
     If a `number` argument is given, and a work is defined by
-    that number, that work is returned.
+    that number, an Opus containing just that single work is returned.
+
+    * Changed in v11: always returns an Opus even if only a single number is given.
     '''
     if inputM21 is None:
         opus = stream.Opus()
@@ -548,8 +556,8 @@ def abcToStreamOpus(abcHandler, inputM21=None, number=None):
     if abcHandler.definesReferenceNumbers():
         abcDict = abcHandler.splitByReferenceNumber()
         if number is not None and number in abcDict:
-            # get number from dictionary; set to new score
-            opus = abcToStreamScore(abcDict[number])  # return a score, not an opus
+            # get the single requested work, but still wrap it in an Opus
+            opus.append(abcToStreamScore(abcDict[number]))
         else:  # build entire opus into an opus stream
             scoreList = []
             for key, value in sorted(abcDict.items()):
@@ -569,7 +577,17 @@ def abcToStreamOpus(abcHandler, inputM21=None, number=None):
     return opus
 
 
-def reBar(music21Part, *, inPlace=False):
+@typing.overload
+def reBar(music21Part: stream.Part, *, inPlace: typing.Literal[True]) -> None:
+    ...
+
+
+@typing.overload
+def reBar(music21Part: stream.Part, *, inPlace: typing.Literal[False] = False) -> stream.Part:
+    ...
+
+
+def reBar(music21Part: stream.Part, *, inPlace: bool = False) -> stream.Part|None:
     # noinspection PyShadowingNames,SpellCheckingInspection
     '''
     Re-bar overflow measures using the last known time signature.
