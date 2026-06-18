@@ -8,7 +8,7 @@
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
-Harmonic annotations from humdrum to `music21`.
+Harmonic annotations from Humdrum to `music21`.
 
 The `**harm` representation is described here: https://www.humdrum.org/rep/harm/
 '''
@@ -42,9 +42,9 @@ def convertHarmToRoman(harmStr: str) -> str|None:
     >>> [convertHarmToRoman(x) for x in diatonicSevenths]
     ['V7', 'viio43', 'V2', 'viio65', 'V43']
 
-    Inversion-wise, augmented sixth chords are a bit tricky
-    German and French are treated as seventh-chords (4 notes)
-    Italians are treated as triads
+    Inversion-wise, augmented sixth chords are a bit tricky.
+    German and French are treated as seventh-chords (4 notes).
+    Italians are treated as triads.
 
     >>> italianSixths = ['Lt', 'Ltb', 'Ltc']
     >>> [convertHarmToRoman(x) for x in italianSixths]

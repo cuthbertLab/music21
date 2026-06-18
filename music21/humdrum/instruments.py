@@ -42,7 +42,7 @@ humdrumInstrumentClassToInstrument: dict[str, str] = {
 # noinspection SpellCheckingInspection
 humdrumInstruments: dict[str, str] = {
     'soprn': 'Soprano',
-    'cant': 'Soprano',  # Found in many sources, but not a predefined humdrum instrument
+    'cant': 'Soprano',  # Found in many sources, but not a predefined Humdrum instrument
     'mezzo': 'MezzoSoprano',
     'calto': 'Alto',  # no distinction with contralto
     'tenor': 'Tenor',
@@ -235,7 +235,7 @@ class HumdrumInstrumentException(exceptions21.Music21Exception):
 
 def fromHumdrumClass(hdClass: str) -> instrument.Instrument:
     '''
-    Get a music21 instrument object from a humdrum instrument class abbreviation
+    Get a music21 instrument object from a Humdrum instrument class abbreviation.
 
     >>> humdrum.instruments.fromHumdrumClass('vox')
     <music21.instrument.Vocalist 'Voice'>
@@ -247,14 +247,14 @@ def fromHumdrumClass(hdClass: str) -> instrument.Instrument:
         return iObj
     except (IndexError, KeyError, AttributeError) as exc:
         raise HumdrumInstrumentException(
-            f'Cannot get an instrument from this humdrum class *IC{hdClass}'
+            f'Cannot get an instrument from this Humdrum class *IC{hdClass}'
         ) from exc
 
 
 def fromHumdrumInstrument(hdInst: str) -> instrument.Instrument:
     # noinspection SpellCheckingInspection
     '''
-    Get a music21 instrument object from a humdrum instrument abbreviation
+    Get a music21 instrument object from a Humdrum instrument abbreviation.
 
     >>> humdrum.instruments.fromHumdrumInstrument('calto')
     <music21.instrument.Alto 'Alto'>
@@ -266,7 +266,7 @@ def fromHumdrumInstrument(hdInst: str) -> instrument.Instrument:
         return iObj
     except (IndexError, KeyError, AttributeError) as exc:
         raise HumdrumInstrumentException(
-            f'Cannot get an instrument from this humdrum class: *I{hdInst}'
+            f'Cannot get an instrument from this Humdrum class: *I{hdInst}'
         ) from exc
 
 
