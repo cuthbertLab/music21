@@ -58,7 +58,7 @@ from music21 import tie
 
 from music21.musicxml import xmlObjects
 from music21.musicxml import helpers
-from music21.musicxml.xmlSoundParser import SoundTagParser
+from music21.musicxml import xmlSoundParser
 from music21.musicxml.xmlObjects import MusicXMLImportException, MusicXMLWarning
 
 synchronizeIds = helpers.synchronizeIdsToM21
@@ -2470,15 +2470,13 @@ class MeasureParser(XMLParserBase):
         # key is PedalMark; value is OffsetQL
         self.pedalToStartOffset: weakref.WeakKeyDictionary = weakref.WeakKeyDictionary()
 
-        # parses <sound> tags; pulled out to keep this file smaller (see xmlSoundParser)
-        self.soundParser = SoundTagParser(self)
-
     def xmlSound(self, mxSound: ET.Element) -> None:
         '''
         Convert a <sound> tag; delegates to
-        :class:`~music21.musicxml.xmlSoundParser.SoundTagParser`.
+        :func:`~music21.musicxml.xmlSoundParser.xmlSound`, which is pulled out to
+        keep this file smaller.
         '''
-        self.soundParser.xmlSound(mxSound)
+        xmlSoundParser.xmlSound(self, mxSound)
 
     @staticmethod
     def getStaffNumber(mxObject: ET.Element|int|None) -> int:
@@ -5527,10 +5525,11 @@ class MeasureParser(XMLParserBase):
                 if 'tempo' not in mxSound.attrib:
                     continue
                 # setSound is defined in xmlSoundParser.py
-                self.soundParser.setSound(mxSound,
-                                          mxDirection,
-                                          staffKey,
-                                          totalOffset)
+                xmlSoundParser.setSound(self,
+                                        mxSound,
+                                        mxDirection,
+                                        staffKey,
+                                        totalOffset)
                 break
 
         # TODO: musicxml 4:listening
