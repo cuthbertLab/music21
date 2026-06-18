@@ -256,7 +256,7 @@ def limitPartToPitch(possibA, partPitchLimits=None):
 # CONSECUTIVE POSSIBILITY RULE-CHECKING METHODS
 # ---------------------------------------------
 # Speedup tables
-PITCH_QUARTET_TO_BOOL_TYPE = dict[
+type PITCH_QUARTET_TO_BOOL_TYPE = dict[
     tuple[pitch.Pitch, pitch.Pitch, pitch.Pitch, pitch.Pitch],
     bool
 ]

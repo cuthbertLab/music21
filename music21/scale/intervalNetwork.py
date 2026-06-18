@@ -79,7 +79,7 @@ class Direction(enum.Enum):
         return 'Direction.' + self.name
 
 
-CacheKey = tuple[
+type CacheKey = tuple[
     int|Terminus, str, str|None, str|None, bool, bool|None]
 
 

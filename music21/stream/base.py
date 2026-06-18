@@ -41,7 +41,7 @@ from music21 import common
 from music21.common.enums import GatherSpanners, OffsetSpecial
 from music21.common.numberTools import opFrac
 from music21.common.types import (
-    StreamType, M21ObjType, ChangedM21ObjType, OffsetQL, OffsetQLIn, OffsetQLSpecial
+    StreamType, ChangedM21ObjType, OffsetQL, OffsetQLIn, OffsetQLSpecial
 )
 from music21 import clef
 from music21 import chord
@@ -81,7 +81,7 @@ StreamException = exceptions21.StreamException
 ImmutableStreamException = exceptions21.ImmutableStreamException
 
 T = t.TypeVar('T')
-RecursiveLyricList = note.Lyric|None|list['RecursiveLyricList']
+type RecursiveLyricList = note.Lyric|None|list[RecursiveLyricList]
 
 BestQuantizationMatch = namedtuple(
     'BestQuantizationMatch',
@@ -100,7 +100,7 @@ OffsetMap = namedtuple('OffsetMap', ['element', 'offset', 'endTime', 'voiceIndex
 
 
 # -----------------------------------------------------------------------------
-class Stream(core.StreamCore, t.Generic[M21ObjType]):
+class Stream[M21ObjType: base.Music21Object](core.StreamCore):
     '''
     This is the fundamental container for Music21Objects;
     objects may be ordered and/or placed in time based on

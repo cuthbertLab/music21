@@ -376,7 +376,7 @@ def voiceCrossing(possibA):
 # Consecutive Possibility Rule-Checking Methods
 
 
-PITCH_QUARTET_TO_BOOL_TYPE = dict[
+type PITCH_QUARTET_TO_BOOL_TYPE = dict[
     tuple[pitch.Pitch, pitch.Pitch, pitch.Pitch, pitch.Pitch],
     bool
 ]

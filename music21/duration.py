@@ -77,8 +77,8 @@ DENOM_LIMIT = defaults.limitOffsetDenominator
 
 POSSIBLE_DOTS_IN_TUPLETS = (0, 1)
 
-TupletType = t.Literal['start', 'stop', 'startStop', False, None]
-TupletShowOptions = t.Literal['number', 'type', 'both', None]
+type TupletType = t.Literal['start', 'stop', 'startStop', False, None]
+type TupletShowOptions = t.Literal['number', 'type', 'both', None]
 
 class DurationException(exceptions21.Music21Exception):
     pass

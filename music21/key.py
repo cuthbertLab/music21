@@ -38,7 +38,7 @@ from music21 import style
 
 environLocal = environment.Environment('key')
 
-TransposeTypes = int|str|interval.Interval|interval.GenericInterval
+type TransposeTypes = int|str|interval.Interval|interval.GenericInterval
 
 
 # ------------------------------------------------------------------------------
