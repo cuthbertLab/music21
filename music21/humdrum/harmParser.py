@@ -8,7 +8,7 @@
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
-Harmonic annotations from humdrum to `music21`.
+Harmonic annotations from Humdrum to `music21`.
 
 The `**harm` representation is described here: https://www.humdrum.org/rep/harm/
 '''
@@ -18,7 +18,7 @@ import re
 import typing as t
 import unittest
 
-def convertHarmToRoman(harmStr):
+def convertHarmToRoman(harmStr: str) -> str|None:
     # noinspection PyShadowingNames
     '''
     Converts a `**harm` string into a string that
@@ -42,9 +42,9 @@ def convertHarmToRoman(harmStr):
     >>> [convertHarmToRoman(x) for x in diatonicSevenths]
     ['V7', 'viio43', 'V2', 'viio65', 'V43']
 
-    Inversion-wise, augmented sixth chords are a bit tricky
-    German and French are treated as seventh-chords (4 notes)
-    Italians are treated as triads
+    Inversion-wise, augmented sixth chords are a bit tricky.
+    German and French are treated as seventh-chords (4 notes).
+    Italians are treated as triads.
 
     >>> italianSixths = ['Lt', 'Ltb', 'Ltc']
     >>> [convertHarmToRoman(x) for x in italianSixths]
@@ -202,11 +202,11 @@ class HarmParser:
 
     defs = HarmDefs()
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.harmRegExp = re.compile(HarmParser.defs.harmExpression, re.VERBOSE)
         self.impliedRegExp = re.compile(HarmParser.defs.implied, re.VERBOSE)
 
-    def parse(self, harmExpression) -> dict[str, t.Any]:
+    def parse(self, harmExpression: str) -> dict[str, t.Any]:
         # Check for implied harmony
         m: dict[str, t.Any]
         impliedMatch = self.impliedRegExp.match(harmExpression)

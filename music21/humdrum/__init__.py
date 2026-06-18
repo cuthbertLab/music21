@@ -11,8 +11,8 @@
 # noinspection SpellCheckingInspection
 '''
 Files in this package deal specifically with making life easier for
-people who have previously used humdrum or need to import
-humdrum data (in spines, etc.) into music21.
+people who have previously used Humdrum (David Huron's Humdrum Toolkit)
+or need to import Humdrum data (in spines, etc.) into music21.
 
 Humdrum programs and their closest music21 equivalents:
 
@@ -29,7 +29,7 @@ deg_          Several tools, see Notes                           Closest is :met
 degree_       see above for "`deg`"
 diss_         Spectral analysis.  Out of scope for m21           Would be "analysis.kkdiss" for Kameoka and Kuriyagawa.
 ditto_        see Notes                                          :meth:`~music21.stream.Stream.chordify` and the offsetTree objects accomplish similar things. Use `copy.copy(object)` or `copy.deepcopy(object)` to get another copy of an object
-encode_       `midi.(severaltools)`                              Multifunction humdrum program.  See the midi directory for some replacements.  Or for simple conversion, `converter.parse` and `show('midi')` do this automatically
+encode_       `midi.(severaltools)`                              Multifunction Humdrum program.  See the midi directory for some replacements.  Or for simple conversion, `converter.parse` and `show('midi')` do this automatically
 extract_      Not needed                                         Use python commands to extract objects with certain properties
 fields_       Not needed
 fin2hum_      `music21.converter.parse` (filename)               Enigma Transport Format did not take off and is rarely used. Software to convert Enigma to MusicXML is available from recordare
@@ -43,7 +43,7 @@ infot_        Not needed                                         Use general pur
 iv_           :meth:`~music21.chord.Chord.intervalVector`
 kern_         None                                               Output to Humdrum is not currently supported
 key_          :meth:`~music21.stream.Stream.analyze` ('key')
-melac_        see Notes                                          :meth:`~music21.analysis.metrical.thomassenMelodicAccent`.  incorporates humdrum additions for giving accent of the first and last notes.
+melac_        see Notes                                          :meth:`~music21.analysis.metrical.thomassenMelodicAccent`.  incorporates Humdrum additions for giving accent of the first and last notes.
 metpos_       `1 / obj.beatStrength()`                           the beatStrength of an object is essentially something similar but inverted.  beatStrength handles irregular meters.
 midi_         `.show('midi')`
 midireset_    None                                               Not needed for now because we do not write directly to MIDI.  A midi.allOff() will be needed for direct midi access.
@@ -68,7 +68,7 @@ scramble_     Not needed                                         Use random modu
 semits_       see Notes                                          :meth:`~music21.pitch.Pitch.ps`, :meth:`~music21.pitch.Pitch.p.midiNote` or :meth:`~music21.interval.Interval.chromatic`.  See also :class:`music21.pitch.Accidental`, esp. the `.alter` property.
 simil_        Many implementations
 smf_          `.write('midi')`                                   See midi above
-solfa_        :meth:`~music21.scale.ConcreteScale.solfeg`        Use variant='humdrum' to get exact humdrum solfeg syllables
+solfa_        :meth:`~music21.scale.ConcreteScale.solfeg`        Use variant='humdrum' to get exact Humdrum solfeg syllables
 solfg_        :meth:`~music21.pitch.Pitch.french`                Also .dutch, .italian, .spanish
 strophe_      :meth:`~music21.text.assembleLyrics`               You probably won't need this though
 synco_        To-Do                                              Will be "analysis.leeLHiggins" but not yet written -- low priority
