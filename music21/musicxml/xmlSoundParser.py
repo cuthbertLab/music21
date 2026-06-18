@@ -41,8 +41,7 @@ class SoundTagMixin:
         (presently just MetronomeMark),
         and add it or them to the core and staffReference.
         '''
-        if t.TYPE_CHECKING:
-            assert isinstance(self, MeasureParser) and isinstance(self, SoundTagMixin)
+        self = t.cast('MeasureParser', self)
 
         # offset is out of order because we need to know it before direction-type
         offsetDirection = self.xmlToOffset(mxSound)
@@ -68,8 +67,7 @@ class SoundTagMixin:
         If the <sound> tag is a child of a <direction> tag, the direction information
         is used to set the placement of the MetronomeMark.
         '''
-        if t.TYPE_CHECKING:
-            assert isinstance(self, MeasureParser) and isinstance(self, SoundTagMixin)
+        self = t.cast('MeasureParser', self)
         # TODO: coda
         # TODO: dacapo
         # TODO: dalsegno
@@ -102,8 +100,7 @@ class SoundTagMixin:
         '''
         Add a metronome mark from the tempo attribute of a <sound> tag.
         '''
-        if t.TYPE_CHECKING:
-            assert isinstance(self, MeasureParser) and isinstance(self, SoundTagMixin)
+        self = t.cast('MeasureParser', self)
 
         qpm = common.numToIntOrFloat(float(mxSound.get('tempo', 0)))
         if qpm == 0:

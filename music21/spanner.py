@@ -649,8 +649,7 @@ class Spanner(base.Music21Object):
                     'Spanner.fill() requires a searchStream or getFirst().activeSite'
                 )
 
-        if t.TYPE_CHECKING:
-            assert isinstance(searchStream, stream.Stream)
+        searchStream = t.cast('stream.Stream', searchStream)
 
         endElement: base.Music21Object|None = self.getLast()
         if endElement is startElement:

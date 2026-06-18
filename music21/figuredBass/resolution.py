@@ -106,11 +106,10 @@ def augmentedSixthToDominant(
     else:
         raise ResolutionException(f'Unknown augSixthType: {augSixthType!r}')
 
-    if t.TYPE_CHECKING:
-        assert isinstance(bass, pitch.Pitch)
-        assert isinstance(root, pitch.Pitch)
-        assert isinstance(fifth, pitch.Pitch)
-        assert isinstance(other, pitch.Pitch)
+    bass = t.cast(pitch.Pitch, bass)
+    root = t.cast(pitch.Pitch, root)
+    fifth = t.cast(pitch.Pitch, fifth)
+    other = t.cast(pitch.Pitch, other)
 
     howToResolve = [(lambda p: p and bass and p.name == bass.name, '-m2'),
                     (lambda p: p and root and p.name == root.name, 'm2'),
@@ -189,11 +188,10 @@ def augmentedSixthToMajorTonic(
     else:
         raise ResolutionException(f'Unknown augSixthType: {augSixthType!r}')
 
-    if t.TYPE_CHECKING:
-        assert isinstance(bass, pitch.Pitch)
-        assert isinstance(root, pitch.Pitch)
-        assert isinstance(fifth, pitch.Pitch)
-        assert isinstance(other, pitch.Pitch)
+    bass = t.cast(pitch.Pitch, bass)
+    root = t.cast(pitch.Pitch, root)
+    fifth = t.cast(pitch.Pitch, fifth)
+    other = t.cast(pitch.Pitch, other)
 
     howToResolve = [(lambda p: p and bass and p.name == bass.name, '-m2'),
                     (lambda p: p and root and p.name == root.name, 'm2'),
@@ -273,11 +271,10 @@ def augmentedSixthToMinorTonic(
     else:
         raise ResolutionException(f'Unknown augSixthType: {augSixthType!r}')
 
-    if t.TYPE_CHECKING:
-        assert isinstance(bass, pitch.Pitch)
-        assert isinstance(root, pitch.Pitch)
-        assert isinstance(fifth, pitch.Pitch)
-        assert isinstance(other, pitch.Pitch)
+    bass = t.cast(pitch.Pitch, bass)
+    root = t.cast(pitch.Pitch, root)
+    fifth = t.cast(pitch.Pitch, fifth)
+    other = t.cast(pitch.Pitch, other)
 
     howToResolve = [(lambda p: p and bass and p.name == bass.name, '-m2'),
                     (lambda p: p and root and p.name == root.name, 'm2'),

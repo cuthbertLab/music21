@@ -2850,14 +2850,12 @@ class MeasureParser(SoundTagMixin, XMLParserBase):
             n = self.xmlToRest(mxNote)
 
         if isChord is False:  # normal note or rest
-            if t.TYPE_CHECKING:
-                assert isinstance(n, note.GeneralNote)
-
-            self.updateLyricsFromList(n, mxNote.findall('lyric'))
-            self.addToStaffReference(mxNote, n)
-            self.insertInMeasureOrVoice(mxNote, n)
-            offsetIncrement = n.duration.quarterLength
-            self.nLast = n  # update
+            generalNote = t.cast(note.GeneralNote, n)
+            self.updateLyricsFromList(generalNote, mxNote.findall('lyric'))
+            self.addToStaffReference(mxNote, generalNote)
+            self.insertInMeasureOrVoice(mxNote, generalNote)
+            offsetIncrement = generalNote.duration.quarterLength
+            self.nLast = generalNote  # update
 
         # if we have notes in the note list and the next
         # note either does not exist or is not a chord, we

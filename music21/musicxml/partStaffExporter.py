@@ -433,8 +433,7 @@ class PartStaffExporterMixin:
                    and helpers.measureNumberComesBefore(sourceNumber, targetNumber)):
                 if i not in insertions:
                     insertions[i] = []
-                if t.TYPE_CHECKING:
-                    assert isinstance(sourceNumber, str)
+                sourceNumber = t.cast(str, sourceNumber)
                 insertions[i] += [makeDivider(sourceNumber), sourceMeasure]
                 try:
                     sourceMeasure = next(sourceMeasures)
@@ -456,8 +455,7 @@ class PartStaffExporterMixin:
             idx = len(target)
             if idx not in insertions:
                 insertions[idx] = []
-            if t.TYPE_CHECKING:
-                assert isinstance(sourceNumber, str)
+            sourceNumber = t.cast(str, sourceNumber)
 
             insertions[idx] += [makeDivider(sourceNumber), remaining]
         return insertions

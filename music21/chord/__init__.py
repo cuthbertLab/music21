@@ -47,9 +47,6 @@ from music21.chord import tables
 from music21.chord import tools
 
 
-if t.TYPE_CHECKING:
-    from music21 import stream
-
 environLocal = environment.Environment('chord')
 
 # ------------------------------------------------------------------------------
@@ -4059,8 +4056,9 @@ class Chord(ChordBase):
         if inPlace is True:
             c2 = self
 
-        if t.TYPE_CHECKING:
-            assert isinstance(c2, stream.Stream)
+        # c2 behaves as both a Chord and a Stream here; cast to Any to keep
+        # access to members of both (formerly a TYPE_CHECKING isinstance assertion).
+        c2 = t.cast(t.Any, c2)
         # startOctave = c2.bass().octave
         remainingPitches = copy.copy(c2.pitches)  # no deepcopy needed
 
@@ -5040,9 +5038,7 @@ class Chord(ChordBase):
             pitchZeroDuration = self._notes[0].duration
             self._duration = pitchZeroDuration
 
-        d_out = self._duration
-        if t.TYPE_CHECKING:
-            assert isinstance(d_out, Duration)
+        d_out = t.cast(Duration, self._duration)
         return d_out
 
     @duration.setter

@@ -739,9 +739,8 @@ class StreamIterator(prebase.ProtoM21Object, Sequence[M21ObjType]):
                     if f(e, self) is False:
                         return False
                 except TypeError:  # one element filters are acceptable.
-                    if t.TYPE_CHECKING:
-                        assert isinstance(f, filters.StreamFilter)
-                    if f(e) is False:
+                    streamFilter = t.cast(filters.StreamFilter, f)
+                    if streamFilter(e) is False:
                         return False
             except StopIteration:  # pylint: disable=try-except-raise
                 raise  # clearer this way to see that this can happen
@@ -1811,11 +1810,9 @@ class RecursiveIterator(StreamIterator[M21ObjType], Sequence[M21ObjType]):
             # in a recursive filter, the stream does not need to match the filter,
             # only the internal elements.
             if e.isStream:
-                if t.TYPE_CHECKING:
-                    assert isinstance(e, streamModule.Stream)
-
+                eStream = t.cast('streamModule.Stream', e)
                 childRecursiveIterator: RecursiveIterator[M21ObjType] = RecursiveIterator(
-                    srcStream=e,
+                    srcStream=eStream,
                     restoreActiveSites=self.restoreActiveSites,
                     filterList=self.filters,  # shared list
                     activeInformation=self.activeInformation,  # shared dict

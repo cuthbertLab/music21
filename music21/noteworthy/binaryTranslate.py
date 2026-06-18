@@ -1146,8 +1146,7 @@ class NWCObject:
             self.stemLength = 7
 
         self.data2 = []
-        if t.TYPE_CHECKING:
-            assert isinstance(self, NWCStaff)
+        self = t.cast(NWCStaff, self)
         for i in range(numberOfNotes):
             chordNote = NWCObject(staffParent=self, parserParent=p)
             chordNote.parse()
@@ -1292,8 +1291,7 @@ class NWCObject:
         '''
         self.noteChordMember()
         self.type = 'RestChordMember'
-        if t.TYPE_CHECKING:
-            assert isinstance(self, NWCStaff)
+        self = t.cast(NWCStaff, self)
         rest = NWCObject(staffParent=self, parserParent=self.parserParent)
         rest.duration = self.data1[0]
         rest.data2 = self.data1

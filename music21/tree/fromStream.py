@@ -372,9 +372,7 @@ def asTimespans(
                                              flatten=flatten,
                                              classLists=classLists,
                                              useTimespans=True)
-    timespanTreeFirst = listOfTimespanTrees[0]
-    if t.TYPE_CHECKING:
-        assert isinstance(timespanTreeFirst, timespanTree.TimespanTree)
+    timespanTreeFirst = t.cast(timespanTree.TimespanTree, listOfTimespanTrees[0])
     return timespanTreeFirst
 
 

@@ -1718,9 +1718,8 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
 
         targetList: list[base.Music21Object]
         if not common.isListLike(targetOrList):
-            if t.TYPE_CHECKING:
-                assert isinstance(targetOrList, base.Music21Object)
-            targetList = [targetOrList]
+            targetObj = t.cast(base.Music21Object, targetOrList)
+            targetList = [targetObj]
         elif isinstance(targetOrList, Sequence) and len(targetOrList) > 1:
             if t.TYPE_CHECKING:
                 assert not isinstance(targetOrList, base.Music21Object)
@@ -5534,9 +5533,8 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         if returnObj.hasPartLikeStreams() or 'Opus' in returnObj.classes:
             for partLike in returnObj.getElementsByClass('Stream'):
                 # call on each part
-                if t.TYPE_CHECKING:
-                    assert isinstance(partLike, Stream)
-                partLike.toWrittenPitch(
+                partStream = t.cast(Stream, partLike)
+                partStream.toWrittenPitch(
                     inPlace=True,
                     ottavasToSounding=ottavasToSounding,
                     preserveAccidentalDisplay=preserveAccidentalDisplay
@@ -9105,9 +9103,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         elif isinstance(value, interval.DiatonicInterval):
             intv = interval.Interval(diatonic=value)
         else:
-            if t.TYPE_CHECKING:
-                assert isinstance(value, (interval.GenericInterval, interval.Interval))
-            intv = value
+            intv = t.cast(interval.GenericInterval | interval.Interval, value)
 
         # for p in post.pitches:  # includes chords
         #     # do inplace transpositions on the deepcopy
