@@ -4069,7 +4069,7 @@ class Chord(ChordBase):
                 if p.step not in usedSteps:
                     usedSteps.append(p.step)
                 else:
-                    p.octave = t.cast(int, p.octave) + 1
+                    p.octave = p.implicitOctave + 1
                     newRemainingPitches.append(p)
             remainingPitches = newRemainingPitches
 
