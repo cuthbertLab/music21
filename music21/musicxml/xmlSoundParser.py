@@ -129,7 +129,10 @@ def setSound(
     1
     '''
     # extract the staffKey once since it will be the same for all the rest.
-    staffKey = mp.getStaffNumber(mxSound)
+    # When the <sound> is inside a <direction>, the <staff> lives on the
+    # <direction>, not on the <sound> -- read it from there so the mark is
+    # assigned to the right staff (otherwise it goes to every staff).
+    staffKey = mp.getStaffNumber(mxDir if mxDir is not None else mxSound)
     attrib = mxSound.attrib
 
     # TODO: coda
