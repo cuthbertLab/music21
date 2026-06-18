@@ -21,6 +21,7 @@ per-measure helper object is created for the common case of a measure with no
 from __future__ import annotations
 
 import typing as t
+import unittest
 import xml.etree.ElementTree as ET
 import warnings
 
@@ -141,16 +142,6 @@ def setSoundTempo(
     90
     >>> mm.number is None
     True
-
-    A tempo of zero is skipped (with a warning) and nothing is inserted, so the
-    count stays at the one mark from above:
-
-    >>> import warnings
-    >>> with warnings.catch_warnings():
-    ...     warnings.simplefilter('ignore')
-    ...     setSoundTempo(mp, EL('<sound tempo="0"/>'), mxDir=None, staffKey=1, totalOffset=0.0)
-    >>> len(mp.stream.getElementsByClass(tempo.MetronomeMark))
-    1
     '''
     qpm = common.numToIntOrFloat(float(mxSound.get('tempo', 0)))
     if qpm == 0:
@@ -171,6 +162,22 @@ def setSoundTempo(
     mp.insertCoreAndRef(totalOffset, staffKey, mm)
 
 
+class Test(unittest.TestCase):
+    def testSetSoundTempoZeroIsSkipped(self):
+        '''
+        A <sound> tag with tempo='0' warns and inserts no MetronomeMark.
+        '''
+        from xml.etree.ElementTree import fromstring as EL
+        from music21.musicxml.xmlToM21 import MeasureParser
+
+        mp = MeasureParser()
+        with self.assertWarns(UserWarning):
+            setSoundTempo(mp, EL('<sound tempo="0"/>'),
+                          mxDir=None, staffKey=1, totalOffset=0.0)
+        self.assertEqual(
+            len(mp.stream.getElementsByClass(tempo.MetronomeMark)), 0)
+
+
 if __name__ == '__main__':
     import music21
-    music21.mainTest()  # doctests only
+    music21.mainTest(Test)
