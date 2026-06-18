@@ -4056,11 +4056,11 @@ class Chord(ChordBase):
         if inPlace is True:
             c2 = self
 
-        # c2 behaves as both a Chord and a Stream here; cast to Any to keep
-        # access to members of both (formerly a TYPE_CHECKING isinstance assertion).
-        c2 = t.cast(t.Any, c2)
+        # closedPosition() only returns None when inPlace=True, in which case c2
+        # is overwritten with self above, so c2 is always a non-None Chord here.
+        c2 = t.cast(t.Self, c2)
         # startOctave = c2.bass().octave
-        remainingPitches = copy.copy(c2.pitches)  # no deepcopy needed
+        remainingPitches = list(c2.pitches)  # no deepcopy needed
 
         while remainingPitches:
             usedSteps = []
@@ -4069,7 +4069,7 @@ class Chord(ChordBase):
                 if p.step not in usedSteps:
                     usedSteps.append(p.step)
                 else:
-                    p.octave += 1
+                    p.octave = t.cast(int, p.octave) + 1
                     newRemainingPitches.append(p)
             remainingPitches = newRemainingPitches
 
