@@ -395,14 +395,14 @@ def _convertPsToStep(
             # if we can round to 0.5, then this is a quarter-tone accidental
             alter = 0.5
             # need to find microtonal alteration around this value
-            # of alter is 0.5 and micro is 0.7 than  micro should be 0.2
-            # of alter is 0.5 and micro is 0.4 than  micro should be -0.1
+            # if alter is 0.5 and micro is 0.7 then micro should be 0.2
+            # if alter is 0.5 and micro is 0.4 then micro should be -0.1
             micro = micro - alter
         # if greater than 0.5
         elif 0.25 < micro < 0.75:
             alter = 0.5
             micro = micro - alter
-        # if closer to 1, than go to the higher alter and get negative micro
+        # if closer to 1, then go to the higher alter and get negative micro
         elif 0.75 <= micro < 1:
             alter = 1.0
             micro = micro - alter
@@ -1573,7 +1573,7 @@ class Accidental(prebase.ProtoM21Object, style.StyleMixin):
 
         Some accidentals, such as double sharps, produce code points outside
         the 2-byte set (so called "astral plane" unicode) and thus cannot be
-        used in every circumnstance.
+        used in every circumstance.
 
         >>> sharp = pitch.Accidental('quadruple-flat')
         >>> sharp.unicode
@@ -4246,7 +4246,7 @@ class Pitch(prebase.ProtoM21Object):
     def getEnharmonic(self, *, inPlace=False) -> t.Self|None:
         # noinspection GrazieInspection
         '''
-        Returns a new Pitch that is the(/an) enharmonic equivalent of this Pitch.
+        Returns a new Pitch that is the (or at least an) enharmonic equivalent of this Pitch.
         Can be thought of as flipEnharmonic or something like that.
 
         N.B.: n1.name == getEnharmonic(getEnharmonic(n1)).name is not necessarily true.
