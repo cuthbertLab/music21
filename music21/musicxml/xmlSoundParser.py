@@ -66,6 +66,20 @@ def xmlSound(mp: MeasureParser, mxSound: ET.Element) -> None:
     <music21.tempo.MetronomeMark Quarter=128 (playback only)>
     >>> mm.offset
     2.0
+
+    A <sound> tag may also carry its own <offset> child, which is measured in
+    MusicXML *divisions* and shifts the mark relative to the current position.
+    `mp.divisions` is the number of divisions per quarter note, so with 8
+    divisions per quarter an <offset> of 4 is half a quarter note -- an eighth
+    note -- and the mark lands an eighth later than `.offsetMeasureNote`:
+
+    >>> mp = musicxml.xmlToM21.MeasureParser()
+    >>> mp.divisions = 8
+    >>> mp.offsetMeasureNote = 2.0
+    >>> xmlSound(mp, EL('<sound tempo="108"><offset>4</offset></sound>'))
+    >>> mp.stream.coreElementsChanged()
+    >>> mp.stream[tempo.MetronomeMark].first().offset
+    2.5
     '''
     # sound tags can specify an offset that begin at, relative to current position.
     offsetDirection = mp.xmlToOffset(mxSound)
@@ -195,6 +209,23 @@ class Test(unittest.TestCase):
             mp.stream.coreElementsChanged()
         self.assertEqual(
             len(mp.stream.getElementsByClass(tempo.MetronomeMark)), 0)
+
+    def testNegativeOffsetShiftsEarlier(self):
+        '''
+        A negative <offset> child inside a <sound> tag shifts the mark earlier.
+        Here, at 8 divisions per quarter, an <offset> of -4 is an eighth note,
+        so the mark lands an eighth before `.offsetMeasureNote`.
+        '''
+        from xml.etree.ElementTree import fromstring as EL
+        from music21.musicxml.xmlToM21 import MeasureParser
+
+        mp = MeasureParser()
+        mp.divisions = 8
+        mp.offsetMeasureNote = 2.0
+        xmlSound(mp, EL('<sound tempo="84"><offset>-4</offset></sound>'))
+        mp.stream.coreElementsChanged()
+        mm = mp.stream[tempo.MetronomeMark].first()
+        self.assertEqual(mm.offset, 1.5)
 
 
 if __name__ == '__main__':
