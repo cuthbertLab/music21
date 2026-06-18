@@ -41,18 +41,18 @@ class SoundTagMixin:
         (presently just MetronomeMark),
         and add it or them to the core and staffReference.
         '''
-        self = t.cast('MeasureParser', self)
-
+        # this mixin is only ever mixed into MeasureParser
+        mp = t.cast('MeasureParser', self)
         # offset is out of order because we need to know it before direction-type
-        offsetDirection = self.xmlToOffset(mxSound)
-        totalOffset = offsetDirection + self.offsetMeasureNote
+        offsetDirection = mp.xmlToOffset(mxSound)
+        totalOffset = offsetDirection + mp.offsetMeasureNote
 
-        staffKey = self.getStaffNumber(mxSound)
+        staffKey = mp.getStaffNumber(mxSound)
 
-        self.setSound(mxSound,
-                      None,
-                      staffKey,
-                      totalOffset)
+        mp.setSound(mxSound,
+                    None,
+                    staffKey,
+                    totalOffset)
 
     def setSound(
         self,
@@ -67,7 +67,6 @@ class SoundTagMixin:
         If the <sound> tag is a child of a <direction> tag, the direction information
         is used to set the placement of the MetronomeMark.
         '''
-        self = t.cast('MeasureParser', self)
         # TODO: coda
         # TODO: dacapo
         # TODO: dalsegno
@@ -87,7 +86,8 @@ class SoundTagMixin:
         # TODO: musicxml4: instrument-change: instrument-sound, solo or ensemble or none
         #                                     virtual-instrument
         if 'tempo' in mxSound.attrib:
-            self.setSoundTempo(mxSound, mxDir, staffKey, totalOffset)
+            mp = t.cast('MeasureParser', self)
+            mp.setSoundTempo(mxSound, mxDir, staffKey, totalOffset)
 
 
     def setSoundTempo(
@@ -100,8 +100,7 @@ class SoundTagMixin:
         '''
         Add a metronome mark from the tempo attribute of a <sound> tag.
         '''
-        self = t.cast('MeasureParser', self)
-
+        mp = t.cast('MeasureParser', self)
         qpm = common.numToIntOrFloat(float(mxSound.get('tempo', 0)))
         if qpm == 0:
             warnings.warn('0 qpm tempo tag found, skipping.', stacklevel=2)
@@ -111,14 +110,14 @@ class SoundTagMixin:
                                  numberSounding=qpm,
                                  )
         helpers.synchronizeIdsToM21(mxSound, mm)
-        self.setPrintObject(mxSound, mm)
-        self.setPosition(mxSound, mm)
+        mp.setPrintObject(mxSound, mm)
+        mp.setPosition(mxSound, mm)
         if mxDir is not None:
             helpers.setM21AttributeFromAttribute(
                 mm, mxDir, 'placement', 'placement'
             )
-            self.setEditorial(mxDir, mm)
-        self.insertCoreAndRef(totalOffset, staffKey, mm)
+            mp.setEditorial(mxDir, mm)
+        mp.insertCoreAndRef(totalOffset, staffKey, mm)
 
 
 if __name__ == '__main__':

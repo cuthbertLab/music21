@@ -1146,9 +1146,8 @@ class NWCObject:
             self.stemLength = 7
 
         self.data2 = []
-        self = t.cast(NWCStaff, self)
         for i in range(numberOfNotes):
-            chordNote = NWCObject(staffParent=self, parserParent=p)
+            chordNote = NWCObject(staffParent=t.cast(NWCStaff, self), parserParent=p)
             chordNote.parse()
             self.data2.append(chordNote)
 
@@ -1291,8 +1290,7 @@ class NWCObject:
         '''
         self.noteChordMember()
         self.type = 'RestChordMember'
-        self = t.cast(NWCStaff, self)
-        rest = NWCObject(staffParent=self, parserParent=self.parserParent)
+        rest = NWCObject(staffParent=t.cast(NWCStaff, self), parserParent=self.parserParent)
         rest.duration = self.data1[0]
         rest.data2 = self.data1
         rest.durationStr = rest.setDurationForObject()
