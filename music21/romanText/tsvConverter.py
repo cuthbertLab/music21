@@ -870,8 +870,7 @@ class M21toTSV:
                 thisEntry.numeral = '@none'
                 thisEntry.chord = '@none'
             else:
-                if t.TYPE_CHECKING:
-                    assert isinstance(thisRN, roman.RomanNumeral)
+                thisRN = t.cast(roman.RomanNumeral, thisRN)
                 local_key = localKeyAsRn(thisRN.key, global_key_obj)
                 relativeroot = None
                 if thisRN.secondaryRomanNumeral:

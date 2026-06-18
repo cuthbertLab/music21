@@ -58,7 +58,7 @@ from music21 import tie
 
 from music21.musicxml import xmlObjects
 from music21.musicxml import helpers
-from music21.musicxml.xmlSoundParser import SoundTagMixin
+from music21.musicxml import xmlSoundParser
 from music21.musicxml.xmlObjects import MusicXMLImportException, MusicXMLWarning
 
 synchronizeIds = helpers.synchronizeIdsToM21
@@ -2348,7 +2348,7 @@ class PartParser(XMLParserBase):
 
 
 # -----------------------------------------------------------------------------
-class MeasureParser(SoundTagMixin, XMLParserBase):
+class MeasureParser(XMLParserBase):
     '''
     parser to work with a single <measure> tag.
 
@@ -2469,6 +2469,14 @@ class MeasureParser(SoundTagMixin, XMLParserBase):
         # inserted into a Stream).
         # key is PedalMark; value is OffsetQL
         self.pedalToStartOffset: weakref.WeakKeyDictionary = weakref.WeakKeyDictionary()
+
+    def xmlSound(self, mxSound: ET.Element) -> None:
+        '''
+        Convert a <sound> tag; delegates to
+        :func:`~music21.musicxml.xmlSoundParser.xmlSound`, which is pulled out to
+        keep this file smaller.
+        '''
+        xmlSoundParser.xmlSound(self, mxSound)
 
     @staticmethod
     def getStaffNumber(mxObject: ET.Element|int|None) -> int:
@@ -2850,14 +2858,12 @@ class MeasureParser(SoundTagMixin, XMLParserBase):
             n = self.xmlToRest(mxNote)
 
         if isChord is False:  # normal note or rest
-            if t.TYPE_CHECKING:
-                assert isinstance(n, note.GeneralNote)
-
-            self.updateLyricsFromList(n, mxNote.findall('lyric'))
-            self.addToStaffReference(mxNote, n)
-            self.insertInMeasureOrVoice(mxNote, n)
-            offsetIncrement = n.duration.quarterLength
-            self.nLast = n  # update
+            generalNote = t.cast(note.GeneralNote, n)
+            self.updateLyricsFromList(generalNote, mxNote.findall('lyric'))
+            self.addToStaffReference(mxNote, generalNote)
+            self.insertInMeasureOrVoice(mxNote, generalNote)
+            offsetIncrement = generalNote.duration.quarterLength
+            self.nLast = generalNote  # update
 
         # if we have notes in the note list and the next
         # note either does not exist or is not a chord, we
@@ -5518,11 +5524,11 @@ class MeasureParser(SoundTagMixin, XMLParserBase):
             for mxSound in mxDirection.findall('sound'):
                 if 'tempo' not in mxSound.attrib:
                     continue
-                # setSoundTempo is defined in xmlSoundParser.py
-                self.setSound(mxSound,
-                              mxDirection,
-                              staffKey,
-                              totalOffset)
+                # setSound is defined in xmlSoundParser.py
+                xmlSoundParser.setSound(self,
+                                        mxSound,
+                                        mxDir=mxDirection,
+                                        totalOffset=totalOffset)
                 break
 
         # TODO: musicxml 4:listening

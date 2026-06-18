@@ -14,6 +14,14 @@
   if on a single core machine.)
 - Run `uv run ruff check music21` before making PRs or pushes to open PRs.
 - Run `uv run mypy music21` before making PRs or pushes to open PRs.
+- Never commit `forceSource=True` to a test or doctest (it re-parses from source every
+  run and slows the suite for everyone). The ONLY exception is the one test that exercises
+  `forceSource` itself. If you hit a stale-parse problem while developing:
+  - If it is local-only (e.g. you just changed a parser and a cached pickle is stale),
+    clear the music21 temp cache (the `*.p.gz` files under `environment.Environment().getRootTempDir()`).
+  - If the stale result could have spread to other users/devs, increment the music21
+    patch/beta version (see "PRs and Issues" below) — bumping the version invalidates all
+    caches everywhere.
 
 # Setup
 

@@ -407,9 +407,8 @@ class PartTranslator:
 
         # most common case first
         if lineToken.isMeasure():
-            if t.TYPE_CHECKING:
-                assert isinstance(lineToken, rtObjects.RTMeasure)
-            self.translateMeasureLineToken(lineToken)
+            measureToken = t.cast(rtObjects.RTMeasure, lineToken)
+            self.translateMeasureLineToken(measureToken)
 
         elif lineToken.isTitle():
             md.add('title', lineToken.data)

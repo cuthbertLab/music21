@@ -2640,9 +2640,8 @@ def updatePacketStorageWithChannelInfo(
         elif isinstance(instObj, instrument.Conductor):
             initCh = None
         else:  # keys are midi program
-            if t.TYPE_CHECKING:
-                assert isinstance(instObj, instrument.Instrument)
-            initCh = channelByInstrument[instObj.midiProgram]
+            instObjInstrument = t.cast(instrument.Instrument, instObj)
+            initCh = channelByInstrument[instObjInstrument.midiProgram]
         bundle['initChannel'] = initCh  # set for bundle too
 
         for rawPacket in bundle['rawPackets']:

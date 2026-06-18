@@ -565,12 +565,11 @@ class Converter:
         if useFormat is None:
             useFormat = self.getFormatFromFileExtension(fpPathlib)
         self.setSubConverterFromFormat(useFormat)
-        if t.TYPE_CHECKING:
-            assert isinstance(self.subConverter, subConverters.SubConverter)
+        subConverter = t.cast(subConverters.SubConverter, self.subConverter)
 
-        self.subConverter.keywords = keywords
+        subConverter.keywords = keywords
         try:
-            self.subConverter.parseFile(
+            subConverter.parseFile(
                 fp,
                 number=number,
                 **keywords
@@ -578,14 +577,13 @@ class Converter:
         except NotImplementedError:
             raise ConverterFileException(f'File is not in a correct format: {fp}')
 
-        if t.TYPE_CHECKING:
-            assert isinstance(self.stream, stream.Stream)
+        parsedStream = t.cast(stream.Stream, self.stream)
 
-        if not self.stream.metadata:
-            self.stream.metadata = metadata.Metadata()
-        self.stream.metadata.filePath = str(fpPathlib)
-        self.stream.metadata.fileNumber = number
-        self.stream.metadata.fileFormat = useFormat
+        if not parsedStream.metadata:
+            parsedStream.metadata = metadata.Metadata()
+        parsedStream.metadata.filePath = str(fpPathlib)
+        parsedStream.metadata.fileNumber = number
+        parsedStream.metadata.fileFormat = useFormat
 
     def getFormatFromFileExtension(self, fp):
         # noinspection PyShadowingNames
@@ -723,10 +721,9 @@ class Converter:
                 )
 
         self.setSubConverterFromFormat(useFormat)
-        if t.TYPE_CHECKING:
-            assert isinstance(self.subConverter, subConverters.SubConverter)
-        self.subConverter.keywords = keywords
-        self.subConverter.parseData(dataStr, number=number)
+        subConverter = t.cast(subConverters.SubConverter, self.subConverter)
+        subConverter.keywords = keywords
+        subConverter.parseData(dataStr, number=number)
 
     def parseURL(
         self,
@@ -1248,9 +1245,8 @@ def parseFile(fp,
     v = Converter()
     fp = common.cleanpath(fp, returnPathlib=True)
     v.parseFile(fp, number=number, format=format, forceSource=forceSource, **keywords)
-    if t.TYPE_CHECKING:
-        assert isinstance(v.stream, (stream.Score, stream.Part, stream.Opus))
-    return v.stream
+    vStream = t.cast(stream.Score | stream.Part | stream.Opus, v.stream)
+    return vStream
 
 # pylint: disable=redefined-builtin
 # noinspection PyShadowingBuiltins
@@ -1264,9 +1260,8 @@ def parseData(dataStr,
     '''
     v = Converter()
     v.parseData(dataStr, number=number, format=format, **keywords)
-    if t.TYPE_CHECKING:
-        assert isinstance(v.stream, (stream.Score, stream.Part, stream.Opus))
-    return v.stream
+    vStream = t.cast(stream.Score | stream.Part | stream.Opus, v.stream)
+    return vStream
 
 # pylint: disable=redefined-builtin
 # noinspection PyShadowingBuiltins
@@ -1285,9 +1280,8 @@ def parseURL(url,
     '''
     v = Converter()
     v.parseURL(url, format=format, forceSource=forceSource, **keywords)
-    if t.TYPE_CHECKING:
-        assert isinstance(v.stream, (stream.Score, stream.Part, stream.Opus))
-    return v.stream
+    vStream = t.cast(stream.Score | stream.Part | stream.Opus, v.stream)
+    return vStream
 
 
 def parse(value: bundles.MetadataEntry|bytes|str|pathlib.Path|list|tuple,

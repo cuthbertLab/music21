@@ -525,15 +525,13 @@ class StreamCore(Music21Object):
         >>> scoreTree
         <ElementTree {20} (0.0 <0.-25...> to 8.0) <music21.stream.Score exampleScore>>
         '''
-        if t.TYPE_CHECKING:
-            assert isinstance(self, Stream)
         hashedAttributes = hash((tuple(classList or ()),
                                  flatten,
                                  useTimespans,
                                  groupOffsets))
         cacheKey = 'elementTree' + str(hashedAttributes)
         if cacheKey not in self._cache or self._cache[cacheKey] is None:
-            hashedElementTree = tree.fromStream.asTree(self,
+            hashedElementTree = tree.fromStream.asTree(t.cast('Stream', self),
                                                        flatten=flatten,
                                                        classList=classList,
                                                        useTimespans=useTimespans,

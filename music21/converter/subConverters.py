@@ -387,11 +387,10 @@ class ConverterIPython(SubConverter):
             )
             return None
         elif helperFormat == 'midi':
-            if t.TYPE_CHECKING:
-                assert isinstance(helperSubConverter, ConverterMidi)
+            midiSubConverter = t.cast(ConverterMidi, helperSubConverter)
             return ip21_converters.displayMusic21jMIDI(
                 obj,
-                subConverter=helperSubConverter,
+                subConverter=midiSubConverter,
                 fmt=helperFormat,
                 subformats=helperSubformats,
                 **keywords,

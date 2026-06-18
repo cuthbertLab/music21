@@ -47,9 +47,6 @@ from music21.chord import tables
 from music21.chord import tools
 
 
-if t.TYPE_CHECKING:
-    from music21 import stream
-
 environLocal = environment.Environment('chord')
 
 # ------------------------------------------------------------------------------
@@ -4059,10 +4056,11 @@ class Chord(ChordBase):
         if inPlace is True:
             c2 = self
 
-        if t.TYPE_CHECKING:
-            assert isinstance(c2, stream.Stream)
+        # closedPosition() only returns None when inPlace=True, in which case c2
+        # is overwritten with self above, so c2 is always a non-None Chord here.
+        c2 = t.cast(t.Self, c2)
         # startOctave = c2.bass().octave
-        remainingPitches = copy.copy(c2.pitches)  # no deepcopy needed
+        remainingPitches = list(c2.pitches)  # no deepcopy needed
 
         while remainingPitches:
             usedSteps = []
@@ -4071,7 +4069,7 @@ class Chord(ChordBase):
                 if p.step not in usedSteps:
                     usedSteps.append(p.step)
                 else:
-                    p.octave += 1
+                    p.octave = p.implicitOctave + 1
                     newRemainingPitches.append(p)
             remainingPitches = newRemainingPitches
 
@@ -5040,9 +5038,7 @@ class Chord(ChordBase):
             pitchZeroDuration = self._notes[0].duration
             self._duration = pitchZeroDuration
 
-        d_out = self._duration
-        if t.TYPE_CHECKING:
-            assert isinstance(d_out, Duration)
+        d_out = t.cast(Duration, self._duration)
         return d_out
 
     @duration.setter
