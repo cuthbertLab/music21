@@ -151,6 +151,10 @@ class ChordBase(note.NotRest):
             self._add_core_or_init(notes, useDuration=self.duration)
 
     def __eq__(self, other):
+        '''
+        See the **Equality** section of the :class:`ChordBase` documentation
+        above for the (deliberately surprising) rules.
+        '''
         if not super().__eq__(other):
             return False
         if len(self.notes) != len(other.notes):
