@@ -4817,9 +4817,10 @@ class Chord(ChordBase):
 
     # Override only the getter (to lazily inherit the first note's duration);
     # the setter is inherited unchanged from Music21Object via ChordBase.duration.
-    # (mypy mis-models a property reached through the class, hence the ignore.)
+    # (mypy mis-models a property reached through the class, hence the ignore;
+    # pylint likewise sees the .getter result as a method, not a property.)
     @ChordBase.duration.getter  # type: ignore[attr-defined]
-    def duration(self) -> Duration:
+    def duration(self) -> Duration:  # pylint: disable=invalid-overridden-method
         # noinspection PyShadowingNames
         '''
         Get or set the duration of this Chord as a Duration object.
