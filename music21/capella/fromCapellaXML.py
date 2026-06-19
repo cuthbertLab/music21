@@ -541,8 +541,7 @@ class CapellaImporter:
         noteNameWithOctave = headElement.attrib['pitch']
         n = note.Note()
         n.nameWithOctave = noteNameWithOctave
-        octave = t.cast(int, n.octave)
-        n.octave = octave - 1  # capella octaves are 1 off
+        n.octave = n.pitch.implicitOctave - 1  # capella octaves are 1 off
 
         alters = headElement.findall('alter')
         if len(alters) > 1:
