@@ -150,19 +150,6 @@ alternateNameToAccidentalName = {
 }
 
 
-# sort modifiers by length, from longest to shortest
-def _sortModifiers() -> list[str]:
-    for i in (4, 3, 2, 1):
-        ams = []
-        for sym in accidentalNameToModifier.values():
-            if len(sym) == i:
-                ams.append(sym)
-        return ams
-    return []  # pragma: no cover -- (4, 3, 2, 1) is never empty
-
-
-accidentalModifiersSorted = _sortModifiers()
-
 def isValidAccidentalName(name: str) -> bool:
     '''
     Check if name is a valid accidental name string that can
