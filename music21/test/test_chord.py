@@ -684,13 +684,16 @@ class Test(unittest.TestCase):
         self.assertIs(c['D-4'], c[1])
         self.assertEqual(c['G4'].pitch.nameWithOctave, 'G4')
 
+        # a Pitch matches the component by value
+        self.assertIs(c[pitch.Pitch('D-4')], c[1])
+
         # the returned Note is the live component, so mutating it persists
         c[0].volume.velocity = 20
         self.assertEqual(c[0].volume.velocity, 20)
         self.assertEqual([n.volume.velocity for n in c][0], 20)
 
-        # out-of-range indices and unmatched pitch names raise KeyError
-        with self.assertRaises(KeyError):
+        # an out-of-range index raises IndexError; an unmatched pitch name raises KeyError
+        with self.assertRaises(IndexError):
             _ = c[5]
         with self.assertRaises(KeyError):
             _ = c['E4']
