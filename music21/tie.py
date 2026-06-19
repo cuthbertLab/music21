@@ -95,7 +95,7 @@ class Tie(prebase.ProtoM21Object, SlottedObjectMixin):
             ''',
         'style': '''
             The style of the tie.  Currently can be 'normal', 'dotted', 'dashed' or 'hidden'.
-''',
+            ''',
         'placement': '''
             Whether the tie should go up or down. Can be None, meaning
             it is unknown or should be determined from context, or 'above' or 'below'.
