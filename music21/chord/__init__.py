@@ -1892,7 +1892,8 @@ class Chord(ChordBase):
 
         >>> n = note.Note('C4')
         >>> n.style.color = 'red'
-        >>> c = chord.Chord([n, 'E4'])
+        >>> e4 = note.Note('E4')
+        >>> c = chord.Chord([n, e4])
         >>> c['C4'].style.color
         'red'
 
