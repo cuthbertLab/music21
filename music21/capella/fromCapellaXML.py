@@ -4,7 +4,7 @@
 #
 # Authors:      Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2012 Michael Scott Asato Cuthbert
+# Copyright:    Copyright © 2012-2026 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
@@ -15,8 +15,6 @@ slurs, dynamics, ornamentation, etc.
 
 Does not handle pickup notes, which are defined simply with an early barline
 (the same as incomplete bars at the end).
-
-Type annotations and docstring grammar were added with AI assistance (Claude).
 '''
 from __future__ import annotations
 
