@@ -762,6 +762,11 @@ class Chord(ChordBase):
     # SPECIAL METHODS #
 
     def __eq__(self, other):
+        '''
+        Two Chords are equal if they pass all `super()` equality tests and all
+        of their pitches equal the pitches of the other Chord.  The pitches can,
+        however, be in different orders.
+        '''
         if not super().__eq__(other):
             return False
         if set(self.pitches) != set(other.pitches):
@@ -817,11 +822,8 @@ class Chord(ChordBase):
         >>> c[0].step
         'C'
 
-        * Changed in v11: an integer index, a pitch-name string, or a Pitch is
-          accepted, and a :class:`~music21.note.Note` is always returned.
-          Reading a component attribute through a dotted string (``c['0.step']``)
-          or looking up a component by Note object is no longer supported; index
-          to the component and use normal attribute access.
+        * Changed in v11: only accepts int, str (nameWithOctave), and Pitch
+          objects.  Always returns a Note.
         '''
         if isinstance(key, int):
             return self._notes[key]
@@ -870,9 +872,8 @@ class Chord(ChordBase):
         >>> c
         <music21.chord.Chord C#3 F4 G4>
 
-        * Changed in v11: an integer index, a pitch-name string, or a Pitch is
-          accepted as the key; setting a component attribute through a dotted
-          string (``c['0.octave'] = 3``) is no longer supported.
+        * Changed in v11: the key only accepts int, str (nameWithOctave), and
+          Pitch objects.
         '''
         keyIndex = self._notes.index(self[key])
 
