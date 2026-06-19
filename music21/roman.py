@@ -2717,7 +2717,10 @@ class RomanNumeral(harmony.Harmony):
                 # i7 or iv7 chord or their inversions, in a major context.
                 # check first that this isn't on purpose
                 if not shouldSkipThisChordStep(7):
-                    correctFaultyPitch(self.seventh, -1)
+                    seventhPitch = self.seventh
+                    if t.TYPE_CHECKING:
+                        assert seventhPitch is not None
+                    correctFaultyPitch(seventhPitch, -1)
 
 
     def _correctForSecondaryRomanNumeral(
