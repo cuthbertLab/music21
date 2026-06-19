@@ -448,7 +448,7 @@ def midiEventsToNote(
     )
 
     if isinstance(nr, note.Note):
-        nr.pitch.midi = midiOnEvent.pitch
+        nr.pitch.midi = t.cast(int, midiOnEvent.pitch)
     elif isinstance(nr, note.Unpitched):
         onPitch = t.cast(int, midiOnEvent.pitch)
         try:
@@ -664,7 +664,7 @@ def midiEventsToChord(
         if midiOnEvent.channel == 10:
             any_channel_10 = True
         p = pitch.Pitch()
-        p.midi = midiOnEvent.pitch
+        p.midi = t.cast(int, midiOnEvent.pitch)
         pitches.append(p)
         v = volume.Volume(velocity=midiOnEvent.velocity)
         v.velocityIsRelative = False  # velocity is absolute coming from MIDI
