@@ -2924,7 +2924,7 @@ class MeasureParser(XMLParserBase):
         ...        + qnDuration
         ...        + '<notehead>diamond</notehead></note>')
         >>> c = MP.xmlToChord([a, b])
-        >>> c.getNotehead(c.pitches[0])
+        >>> c[0].notehead
         'diamond'
 
         >>> a = EL('<note><unpitched><display-step>A</display-step>'

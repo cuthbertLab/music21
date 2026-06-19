@@ -151,6 +151,10 @@ class ChordBase(note.NotRest):
             self._add_core_or_init(notes, useDuration=self.duration)
 
     def __eq__(self, other):
+        '''
+        See the **Equality** section of the :class:`ChordBase` documentation
+        above for the (deliberately surprising) rules.
+        '''
         if not super().__eq__(other):
             return False
         if len(self.notes) != len(other.notes):
@@ -231,7 +235,6 @@ class ChordBase(note.NotRest):
                 else:
                     newNote = note.Note(n)
                 self._notes.append(newNote)
-                # self._notes.append({'pitch':n})
             elif isinstance(n, ChordBase):
                 for newNote in n._notes:
                     self._notes.append(copy.deepcopy(newNote))
@@ -250,7 +253,6 @@ class ChordBase(note.NotRest):
                     self._notes.append(note.Note(n, duration=useDuration))
                 else:
                     self._notes.append(note.Note(n))
-                # self._notes.append({'pitch':music21.pitch.Pitch(n)})
             else:
                 raise TypeError(f'Could not process input argument {n}')
 
@@ -407,7 +409,7 @@ class ChordBase(note.NotRest):
         >>> c1.tie
         <music21.tie.Tie start>
 
-        >>> c1.getTie(c1.pitches[1])
+        >>> c1[1].tie
         <music21.tie.Tie start>
         '''
         for d in self._notes:
@@ -419,8 +421,6 @@ class ChordBase(note.NotRest):
     def tie(self, value: tie.Tie|None) -> None:
         for d in self._notes:
             d.tie = value
-            # set the same instance for each pitch
-            # d['tie'] = value
 
     @property
     def volume(self) -> 'music21.volume.Volume':  # do NOT change to volume.Volume, see setter
@@ -766,6 +766,11 @@ class Chord(ChordBase):
     # SPECIAL METHODS #
 
     def __eq__(self, other):
+        '''
+        Two Chords are equal if they pass all `super()` equality tests and all
+        of their pitches equal the pitches of the other Chord.  The pitches can,
+        however, be in different orders.
+        '''
         if not super().__eq__(other):
             return False
         if set(self.pitches) != set(other.pitches):
@@ -775,172 +780,108 @@ class Chord(ChordBase):
     def __hash__(self) -> int:
         return super().__hash__()
 
-    def __getitem__(self, key: int|str|note.Note|pitch.Pitch) -> t.Any:
+    def __getitem__(self, key: int|str|pitch.Pitch) -> note.Note:
         '''
-        Get item makes accessing pitch components for the Chord easier
+        Get the component :class:`~music21.note.Note` for an index (int), a
+        pitch name with octave (str, e.g. 'D-4'), or a
+        :class:`~music21.pitch.Pitch`.
 
         >>> c = chord.Chord('C#4 D-4')
-        >>> cSharp = c[0]
-        >>> cSharp
+        >>> c[0]
         <music21.note.Note C#>
+        >>> c[1]
+        <music21.note.Note D->
 
-        >>> c['0.step']
-        'C'
-        >>> c['3.accidental']
-        Traceback (most recent call last):
-        KeyError: "Cannot access component with: '3.accidental'"
+        Indexing by an integer is equivalent to ``c.notes[index]``.
 
-        >>> c[5]
-        Traceback (most recent call last):
-        KeyError: 'Cannot access component with: 5'
+        A string is interpreted as a pitch name with octave, and returns the
+        first component whose pitch matches:
 
         >>> c['D-4']
         <music21.note.Note D->
 
-        >>> c['D-4.style.color'] is None
+        A Pitch matches a component first by identity and then by value, and
+        returns the stored component Note (not the Pitch that was passed in):
+
+        >>> cSharp = c[0]
+        >>> queryPitch = pitch.Pitch('C#4')
+        >>> c[queryPitch] is cSharp
         True
 
-        Getting by note does not do very much:
+        An out-of-range integer index raises an IndexError, while an unmatched
+        pitch name or Pitch raises a KeyError:
 
-        >>> c[cSharp]
-        <music21.note.Note C#>
-
-        But we can get from another note
-
-        >>> cSharp2 = note.Note('C#4')
-        >>> cSharp2.duration.quarterLength = 3.0
-        >>> c[cSharp2] is cSharp
-        True
-        >>> c[cSharp2] is cSharp2
-        False
-
-        KeyError is raised if not in chord.
-
-        >>> notInChord = note.Note('G')
-        >>> c[notInChord]
+        >>> c[5]
         Traceback (most recent call last):
-        KeyError: 'Cannot access component with: <music21.note.Note G>'
+        IndexError: list index out of range
 
-        >>> c[None]
+        >>> c['E4']
         Traceback (most recent call last):
-        KeyError: 'Cannot access component with: None'
+        KeyError: "No note in the chord matches 'E4'"
+
+        >>> c[pitch.Pitch('A#6')]
+        Traceback (most recent call last):
+        KeyError: 'No note in the chord matches <music21.pitch.Pitch A#6>'
+
+        To read or change an attribute of a component, index to the Note first:
+
+        >>> c[0].step
+        'C'
+
+        * Changed in v11: only accepts int, str (nameWithOctave), and Pitch
+          objects.  Always returns a Note.
         '''
-        foundNote: note.Note
-        attributes: tuple[str, ...]
-
-        keyErrorStr = f'Cannot access component with: {key!r}'
-        if isinstance(key, str):
-            if '.' in key:
-                key, attrStr = key.split('.', 1)
-                if '.' in attrStr:
-                    attributes = tuple(attrStr.split('.'))
-                else:
-                    attributes = (attrStr,)
-            else:
-                attributes = ()
-
-            try:
-                key = int(key)
-            except ValueError:
-                pass
-
-        else:
-            attributes = ()
-
         if isinstance(key, int):
-            try:
-                foundNote = self._notes[key]  # must be a number
-            except (KeyError, IndexError) as exc:
-                raise KeyError(keyErrorStr) from exc
-
-        elif isinstance(key, str):
-            key = key.upper()
+            return self._notes[key]
+        if isinstance(key, str):
+            keyUpper = key.upper()
             for n in self._notes:
-                if n.pitch.nameWithOctave == key:
-                    foundNote = n
-                    break
-            else:
-                raise KeyError(keyErrorStr)
-        elif isinstance(key, note.Note):
-            for n in self._notes:
-                if n is key:
-                    foundNote = n
-                    break
-            else:
-                for n in self._notes:
-                    if n.pitch == key.pitch:
-                        foundNote = n
-                        break
-                else:
-                    raise KeyError(keyErrorStr)
-        elif isinstance(key, pitch.Pitch):
+                if n.pitch.nameWithOctave == keyUpper:
+                    return n
+        else:
             for n in self._notes:
                 if n.pitch is key:
-                    foundNote = n
-                    break
-            else:
-                for n in self._notes:
-                    if n.pitch == key:
-                        foundNote = n
-                        break
-                else:
-                    raise KeyError(keyErrorStr)
-        else:
-            raise KeyError(keyErrorStr)
-
-        if not attributes:
-            return foundNote
-
-        currentValue: t.Any = foundNote
-
-        for attr in attributes:
-            if attr == 'volume':  # special handling
-                # noinspection PyArgumentList
-                currentValue = currentValue._getVolume(forceClient=self)
-            else:
-                currentValue = getattr(currentValue, attr)
-
-        return currentValue
+                    return n
+            for n in self._notes:
+                if n.pitch == key:
+                    return n
+        raise KeyError(f'No note in the chord matches {key!r}')
 
     def __setitem__(
         self,
-        key: int|str|note.Note|pitch.Pitch,
+        key: int|str|pitch.Pitch,
         value: str|pitch.Pitch|note.Note
     ) -> None:
         '''
-        Change either a note in the chord components, or set an attribute on a
-        component
+        Replace a component, found by index, pitch name, or Pitch, with a new
+        Note (a string or Pitch is converted to a Note).
 
         >>> c = chord.Chord('C4 E4 G4')
         >>> c[0] = note.Note('C#4')
         >>> c
         <music21.chord.Chord C#4 E4 G4>
-        >>> c['0.octave'] = 3
-        >>> c
-        <music21.chord.Chord C#3 E4 G4>
+
         >>> c['E4'] = 'F4'
         >>> c
-        <music21.chord.Chord C#3 F4 G4>
-        >>> c['G4.style.color'] = 'red'
-        >>> c['G4.style.color']
-        'red'
-        >>> c[-1].style.color
-        'red'
+        <music21.chord.Chord C#4 F4 G4>
+
+        Setting a component to something other than a Note, Pitch, or pitch
+        string raises a ValueError:
 
         >>> c[0] = None
         Traceback (most recent call last):
         ValueError: Chord index must be set to a valid note object
-        '''
-        if isinstance(key, str) and '.' in key:
-            keySplit = key.split('.')
-            keyFind = '.'.join(keySplit[0:-1])
-            attr = keySplit[-1]
-            keyObj = self[keyFind]
-            setattr(keyObj, attr, value)
-            return
 
-        keyObj = self[key]
-        keyIndex = self._notes.index(keyObj)
+        To change an attribute of a component, index to the Note first:
+
+        >>> c[0].octave = 3
+        >>> c
+        <music21.chord.Chord C#3 F4 G4>
+
+        * Changed in v11: the key only accepts int, str (nameWithOctave), and
+          Pitch objects.
+        '''
+        keyIndex = self._notes.index(self[key])
 
         if isinstance(value, str):
             value = note.Note(value)
@@ -1940,37 +1881,33 @@ class Chord(ChordBase):
                 return thisPitch
         return None
 
+    @common.deprecated('v11', 'v12',
+                       'read a component color via c[query].style.color')
     def getColor(
         self,
         pitchTarget: str|pitch.Pitch
-    ) -> str|None:
+    ) -> str|None:  # pragma: no cover
         # noinspection PyShadowingNames
         '''
-        For a pitch in this Chord, return the color stored in self.editorial,
-        or, if set for each component, return the color assigned to this
-        component.
+        Deprecated: get the component with ``Chord[query]`` and read
+        ``.style.color``.  Will be removed in v12.
 
-        First checks for "is" then "equals"
-
-        >>> p = pitch.Pitch('C4')
-        >>> n = note.Note(p)
+        >>> n = note.Note('C4')
         >>> n.style.color = 'red'
-        >>> c = chord.Chord([n, 'E4'])
-        >>> c.getColor(p)
+        >>> e4 = note.Note('E4')
+        >>> c = chord.Chord([n, e4])
+        >>> c['C4'].style.color
         'red'
-        >>> c.getColor('C4')
-        'red'
-        >>> c.getColor('E4') is None
-        True
 
-        The color of any pitch (even a non-existing one) is the color of the chord if
-        the color of that pitch is not defined.
+        Unlike this method, direct access does not fall back to the chord's own
+        color, but you can reproduce that with ``or``:
 
-        >>> c.style.color = 'pink'
-        >>> c.getColor('E4')
-        'pink'
-        >>> c.getColor('D#7')
-        'pink'
+        >>> c2 = chord.Chord('C4 E4')
+        >>> c2.style.color = 'blue'
+        >>> print(c2['E4'].style.color)
+        None
+        >>> c2['E4'].style.color or c2.style.color
+        'blue'
         '''
         if isinstance(pitchTarget, str):
             pitchTarget = pitch.Pitch(pitchTarget)
@@ -1987,30 +1924,20 @@ class Chord(ChordBase):
         else:
             return None
 
-    def getNotehead(self, p: note.Note|pitch.Pitch) -> str|None:
+    @common.deprecated('v11', 'v12',
+                       'index the component and read .notehead, e.g. c[query].notehead')
+    def getNotehead(self, p: note.Note|pitch.Pitch) -> str|None:  # pragma: no cover
         '''
-        Given a pitch in this Chord, return an associated notehead
-        attribute, or return 'normal' if not defined for that Pitch.
+        Deprecated: get the component with ``Chord[query]`` and read its
+        :attr:`~music21.note.Note.notehead`.  Will be removed in v12.
 
-        If the pitch is not found, None will be returned.
-
-        >>> n1 = note.Note('D4')
         >>> n2 = note.Note('G4')
         >>> n2.notehead = 'diamond'
-        >>> c1 = chord.Chord([n1, n2])
-        >>> c1.getNotehead(c1.pitches[1])
+        >>> c = chord.Chord([note.Note('D4'), n2])
+        >>> c['G4'].notehead
         'diamond'
-
-        >>> c1.getNotehead(c1.pitches[0])
+        >>> c['D4'].notehead
         'normal'
-
-        >>> c1.getNotehead(pitch.Pitch('A#6')) is None
-        True
-
-        Will work if the two notes are equal in pitch
-
-        >>> c1.getNotehead(note.Note('G4'))
-        'diamond'
         '''
         if isinstance(p, note.Note):
             p = p.pitch
@@ -2023,33 +1950,20 @@ class Chord(ChordBase):
                 return d.notehead
         return None
 
-    def getNoteheadFill(self, p: note.Note|pitch.Pitch) -> bool|None:
+    @common.deprecated('v11', 'v12',
+                       'index the component and read .noteheadFill, e.g. c[query].noteheadFill')
+    def getNoteheadFill(self, p: note.Note|pitch.Pitch) -> bool|None:  # pragma: no cover
         '''
-        Given a pitch in this Chord, return an associated noteheadFill
-        attribute, or return None if not defined for that Pitch.
+        Deprecated: get the component with ``Chord[query]`` and read its
+        :attr:`~music21.note.Note.noteheadFill`.  Will be removed in v12.
 
-        If the pitch is not found, None will also be returned.
-
-        >>> n1 = note.Note('D4')
         >>> n2 = note.Note('G4')
         >>> n2.noteheadFill = True
-        >>> c1 = chord.Chord([n1, n2])
-        >>> c1.getNoteheadFill(c1.pitches[1])
+        >>> c = chord.Chord([note.Note('D4'), n2])
+        >>> c['G4'].noteheadFill
         True
-
-        >>> print(c1.getNoteheadFill(c1.pitches[0]))
-        None
-
-        >>> c1.getNoteheadFill(pitch.Pitch('A#6')) is None
+        >>> c['D4'].noteheadFill is None
         True
-
-        Will work if the two notes are equal in pitch
-
-        >>> c1.getNoteheadFill(note.Note('G4'))
-        True
-
-        Returns None if the pitch is not in the Chord:
-
         '''
         if isinstance(p, note.Note):
             p = p.pitch
@@ -2062,33 +1976,20 @@ class Chord(ChordBase):
                 return d.noteheadFill
         return None
 
-    def getStemDirection(self, p: note.Note|pitch.Pitch) -> str|None:
+    @common.deprecated('v11', 'v12',
+                       'index the component and read .stemDirection, e.g. c[query].stemDirection')
+    def getStemDirection(self, p: note.Note|pitch.Pitch) -> str|None:  # pragma: no cover
         '''
-        Given a pitch in this Chord, return an associated stem attribute, or
-        return 'unspecified' if not defined for that Pitch or None.
+        Deprecated: get the component with ``Chord[query]`` and read its
+        :attr:`~music21.note.Note.stemDirection`.  Will be removed in v12.
 
-        If the pitch is not found, None will be returned.
-
-        >>> n1 = note.Note('D4')
         >>> n2 = note.Note('G4')
         >>> n2.stemDirection = 'double'
-        >>> c1 = chord.Chord([n1, n2])
-        >>> c1.getStemDirection(c1.pitches[1])
+        >>> c = chord.Chord([note.Note('D4'), n2])
+        >>> c['G4'].stemDirection
         'double'
-
-        >>> c1.getStemDirection(c1.pitches[0])
+        >>> c['D4'].stemDirection
         'unspecified'
-
-        Will work if the two pitches are equal in pitch
-
-        >>> c1.getStemDirection(note.Note('G4'))
-        'double'
-
-        Returns None if a Note or Pitch is not in the Chord
-
-        >>> c1.getStemDirection(pitch.Pitch('A#4')) is None
-        True
-
         '''
         if isinstance(p, note.Note):
             p = p.pitch
@@ -2102,34 +2003,25 @@ class Chord(ChordBase):
                 return d.stemDirection
         return None
 
-    def getTie(self, p: int|str|note.Note|pitch.Pitch) -> tie.Tie|None:
+    @common.deprecated('v11', 'v12', 'index the component and read .tie, e.g. c[query].tie')
+    def getTie(self, p: int|str|pitch.Pitch) -> tie.Tie|None:  # pragma: no cover
         '''
-        Given a pitch in this Chord, return an associated Tie object, or return
-        None if not defined for that Pitch.
+        Deprecated: get the component with ``Chord[query]`` and read its
+        :attr:`~music21.note.Note.tie` directly.  Will be removed in v12.
 
-        >>> c1 = chord.Chord(['d', 'e-', 'b-'])
-        >>> t1 = tie.Tie('start')
-        >>> c1.setTie(t1, c1.pitches[2])  # just to b-
-        >>> c1.getTie(c1.pitches[2]) == t1
-        True
-
-        >>> c1.getTie(c1.pitches[0]) is None
-        True
-
-        All notes not in chord return None
-
-        >>> c1.getTie(pitch.Pitch('F#2')) is None
-        True
-
-        >>> c1.getTie('B-')
+        >>> c = chord.Chord(['d', 'e-', 'b-'])
+        >>> c['b-'].tie = tie.Tie('start')
+        >>> c['B-'].tie
         <music21.tie.Tie start>
+        >>> c['D'].tie is None
+        True
         '''
         try:
             return self[p].tie
         except KeyError:
             return None
 
-    def getVolume(self, p: int|str|note.Note|pitch.Pitch) -> volume.Volume:
+    def getVolume(self, p: int|str|pitch.Pitch) -> volume.Volume:
         '''
         For a given Pitch in this Chord, return the
         :class:`~music21.volume.Volume` object.
@@ -4222,23 +4114,20 @@ class Chord(ChordBase):
         else:
             return tempInt.chromatic.mod12
 
-    def setColor(self, value: str|None, pitchTarget: str|pitch.Pitch|None = None) -> None:
+    @common.deprecated('v11', 'v12',
+                       'set a component color via c[query].style.color = ... '
+                       '(whole chord: c.style.color)')
+    def setColor(
+        self, value: str|None, pitchTarget: str|pitch.Pitch|None = None
+    ) -> None:  # pragma: no cover
         '''
-        Set color for specific pitch.
+        Deprecated: set a component's color via ``c[query].style.color``, or the
+        whole chord's via ``c.style.color``.  Will be removed in v12.
 
         >>> c = chord.Chord('C4 E4 G4')
-        >>> c.setColor('red', 'C4')
-        >>> c['0.style.color']
+        >>> c['C4'].style.color = 'red'
+        >>> c['C4'].style.color
         'red'
-        >>> c.setColor('blue')  # set for whole chord
-        >>> c.style.color
-        'blue'
-        >>> c['E4.style.color']
-        'blue'
-
-        >>> c.setColor('red', 'C9')
-        Traceback (most recent call last):
-        music21.chord.ChordException: the given pitch is not in the Chord: C9
         '''
         # assign to base
         if pitchTarget is None and self._notes:
@@ -4266,86 +4155,17 @@ class Chord(ChordBase):
             raise ChordException(
                 f'the given pitch is not in the Chord: {pitchTarget}')
 
-    def setNotehead(self, nh: str, pitchTarget: str|pitch.Pitch|None) -> None:
+    @common.deprecated('v11', 'v12',
+                       'set the component notehead via c[query].notehead = ...')
+    def setNotehead(self, nh: str, pitchTarget: str|pitch.Pitch|None) -> None:  # pragma: no cover
         '''
-        Given a notehead attribute as a string and a pitch object in this
-        Chord, set the notehead attribute of that pitch to the value of that
-        notehead. Valid notehead type names are found in note.noteheadTypeNames
-        (see below):
+        Deprecated: set a component's :attr:`~music21.note.Note.notehead` via
+        ``c[query].notehead = ...``.  Will be removed in v12.
 
-        >>> for noteheadType in note.noteheadTypeNames:
-        ...    noteheadType
-        ...
-        'arrow down'
-        'arrow up'
-        'back slashed'
-        'circle dot'
-        'circle-x'
-        'circled'
-        'cluster'
-        'cross'
+        >>> c = chord.Chord('C3 F4')
+        >>> c['F4'].notehead = 'diamond'
+        >>> c['F4'].notehead
         'diamond'
-        'do'
-        'fa'
-        'fa up'
-        'inverted triangle'
-        'la'
-        'left triangle'
-        'mi'
-        'none'
-        'normal'
-        'other'
-        're'
-        'rectangle'
-        'slash'
-        'slashed'
-        'so'
-        'square'
-        'ti'
-        'triangle'
-        'x'
-
-        >>> n1 = note.Note('D4')
-        >>> n2 = note.Note('G4')
-        >>> c1 = chord.Chord([n1, n2])
-        >>> c1.setNotehead('diamond', c1.pitches[1])  # just to g
-        >>> c1.getNotehead(c1.pitches[1])
-        'diamond'
-
-        >>> c1.getNotehead(c1.pitches[0])
-        'normal'
-
-        If a chord has two of the same pitch, but each associated with a different notehead, then
-        object equality must be used to distinguish between the two.
-
-        >>> c2 = chord.Chord(['D4', 'D4'])
-        >>> secondD4 = c2.pitches[1]
-        >>> c2.setNotehead('diamond', secondD4)
-        >>> for i in [0, 1]:
-        ...     c2.getNotehead(c2.pitches[i])
-        ...
-        'normal'
-        'diamond'
-
-        By default, assigns to first pitch:
-
-        >>> c3 = chord.Chord('C3 F4')
-        >>> c3.setNotehead('slash', None)
-        >>> c3['0.notehead']
-        'slash'
-
-        Less safe to match by string, but possible:
-
-        >>> c3.setNotehead('so', 'F4')
-        >>> c3['1.notehead']
-        'so'
-
-        Error:
-
-        >>> c3.setNotehead('so', 'G4')
-        Traceback (most recent call last):
-        music21.chord.ChordException: the given pitch is not in the Chord: G4
-
         '''
         # assign to first pitch by default
         if pitchTarget is None and self._notes:
@@ -4367,52 +4187,19 @@ class Chord(ChordBase):
         if not match:
             raise ChordException(f'the given pitch is not in the Chord: {pitchTarget}')
 
-    def setNoteheadFill(self, nh: bool|str|None, pitchTarget: str|pitch.Pitch|None) -> None:
+    @common.deprecated('v11', 'v12',
+                       'set the component noteheadFill via c[query].noteheadFill = ...')
+    def setNoteheadFill(
+        self, nh: bool|str|None, pitchTarget: str|pitch.Pitch|None
+    ) -> None:  # pragma: no cover
         '''
-        Given a noteheadFill attribute as a string (or False) and a pitch object in this
-        Chord, set the noteheadFill attribute of that pitch to the value of that
-        notehead. Valid noteheadFill names are True, False, None (default)
+        Deprecated: set a component's :attr:`~music21.note.Note.noteheadFill` via
+        ``c[query].noteheadFill = ...``.  Will be removed in v12.
 
-        >>> n1 = note.Note('D4')
-        >>> n2 = note.Note('G4')
-        >>> c1 = chord.Chord([n1, n2])
-        >>> c1.setNoteheadFill(False, c1.pitches[1])  # just to g
-        >>> c1.getNoteheadFill(c1.pitches[1])
+        >>> c = chord.Chord('C3 F4')
+        >>> c['F4'].noteheadFill = False
+        >>> c['F4'].noteheadFill
         False
-
-        >>> c1.getNoteheadFill(c1.pitches[0]) is None
-        True
-
-        If a chord has two of the same pitch, but each associated with a different notehead, then
-        object equality must be used to distinguish between the two.
-
-        >>> c2 = chord.Chord(['D4', 'D4'])
-        >>> secondD4 = c2.pitches[1]
-        >>> c2.setNoteheadFill(False, secondD4)
-        >>> for i in [0, 1]:
-        ...     print(c2.getNoteheadFill(c2.pitches[i]))
-        ...
-        None
-        False
-
-        By default, assigns to first pitch:
-
-        >>> c3 = chord.Chord('C3 F4')
-        >>> c3.setNoteheadFill(False, None)
-        >>> c3['0.noteheadFill']
-        False
-
-        Less safe to match by string, but possible:
-
-        >>> c3.setNoteheadFill(True, 'F4')
-        >>> c3['1.noteheadFill']
-        True
-
-        Error:
-        >>> c3.setNoteheadFill(True, 'G4')
-        Traceback (most recent call last):
-        music21.chord.ChordException: the given pitch is not in the Chord: G4
-
         '''
         # assign to first pitch by default
         if pitchTarget is None and self._notes:
@@ -4434,63 +4221,19 @@ class Chord(ChordBase):
         if not match:
             raise ChordException(f'the given pitch is not in the Chord: {pitchTarget}')
 
-    def setStemDirection(self, stem: str|None, pitchTarget: str|pitch.Pitch|None) -> None:
+    @common.deprecated('v11', 'v12',
+                       'set the component stemDirection via c[query].stemDirection = ...')
+    def setStemDirection(
+        self, stem: str|None, pitchTarget: str|pitch.Pitch|None
+    ) -> None:  # pragma: no cover
         '''
-        Given a stem attribute as a string and a pitch object in this Chord,
-        set the stem attribute of that pitch to the value of that stem. Valid
-        stem directions are found note.stemDirectionNames (see below).
+        Deprecated: set a component's :attr:`~music21.note.Note.stemDirection`
+        via ``c[query].stemDirection = ...``.  Will be removed in v12.
 
-        >>> for name in note.stemDirectionNames:
-        ...     name
-        ...
-        'double'
+        >>> c = chord.Chord('C3 F4')
+        >>> c['F4'].stemDirection = 'down'
+        >>> c['F4'].stemDirection
         'down'
-        'noStem'
-        'none'
-        'unspecified'
-        'up'
-
-        >>> n1 = note.Note('D4')
-        >>> n2 = note.Note('G4')
-        >>> c1 = chord.Chord([n1, n2])
-        >>> c1.setStemDirection('double', c1.pitches[1])  # just to g
-        >>> c1.getStemDirection(c1.pitches[1])
-        'double'
-
-        >>> c1.getStemDirection(c1.pitches[0])
-        'unspecified'
-
-        If a chord has two of the same pitch, but each associated with a
-        different stem, then object equality must be used to distinguish
-        between the two.
-
-        >>> c2 = chord.Chord(['D4', 'D4'])
-        >>> secondD4 = c2.pitches[1]
-        >>> c2.setStemDirection('double', secondD4)
-        >>> for i in [0, 1]:
-        ...    print(c2.getStemDirection(c2.pitches[i]))
-        ...
-        unspecified
-        double
-
-        By default, assigns to first pitch:
-
-        >>> c3 = chord.Chord('C3 F4')
-        >>> c3.setStemDirection('down', None)
-        >>> c3['0.stemDirection']
-        'down'
-
-        Less safe to match by string, but possible:
-
-        >>> c3.setStemDirection('down', 'F4')
-        >>> c3['1.stemDirection']
-        'down'
-
-        Error:
-        >>> c3.setStemDirection('up', 'G4')
-        Traceback (most recent call last):
-        music21.chord.ChordException: the given pitch is not in the Chord: G4
-
         '''
         if pitchTarget is None and self._notes:
             pitchTarget = self._notes[0].pitch  # first is default
@@ -4512,51 +4255,20 @@ class Chord(ChordBase):
             raise ChordException(
                 f'the given pitch is not in the Chord: {pitchTarget}')
 
+    @common.deprecated('v11', 'v12', 'index the component and set .tie, e.g. c[query].tie = ...')
     def setTie(
         self,
         tieObjOrStr: tie.Tie|str,
         pitchTarget: str|pitch.Pitch|note.Note|None
-    ) -> None:
+    ) -> None:  # pragma: no cover
         '''
-        Given a tie object (or a tie type string) and a pitch or Note in this Chord,
-        set the pitch's tie attribute in this chord to that tie type.
+        Deprecated: get the component with ``Chord[query]`` and set its
+        :attr:`~music21.note.Note.tie` directly.  Will be removed in v12.
 
-        >>> c1 = chord.Chord(['d3', 'e-4', 'b-4'])
-        >>> t1 = tie.Tie('start')
-        >>> c1.setTie(t1, 'b-4')  # or it can be done with a pitch.Pitch object
-        >>> c1.getTie(c1.pitches[2]) is t1
-        True
-
-        Setting a tie with a chord with the same pitch twice requires
-        getting the exact pitch object out to be sure which one:
-
-        >>> c2 = chord.Chord(['D4', 'D4'])
-        >>> secondD4 = c2.pitches[1]
-        >>> c2.setTie('start', secondD4)
-        >>> for i in [0, 1]:
-        ...    print(c2.getTie(c2.pitches[i]))
-        ...
-        None
+        >>> c = chord.Chord('C3 F4')
+        >>> c['F4'].tie = tie.Tie('start')
+        >>> c['F4'].tie
         <music21.tie.Tie start>
-
-        >>> c3 = chord.Chord('C3 F4')
-        >>> c3.setTie('start', None)
-        >>> c3.getTie(c3.pitches[0])
-        <music21.tie.Tie start>
-
-        Less safe to match by string, because there might be multiple
-        pitches with the same name in the chord, but possible:
-
-        >>> c4 = chord.Chord('D4 F#4')
-        >>> c4.setTie('start', 'F#4')
-        >>> c4.getTie('F#4')
-        <music21.tie.Tie start>
-
-        Setting a tie on a note not in the chord is an error:
-
-        >>> c3.setTie('stop', 'G4')
-        Traceback (most recent call last):
-        music21.chord.ChordException: the given pitch is not in the Chord: G4
         '''
         if pitchTarget is None and self._notes:  # if no pitch
             pitchTarget = self._notes[0].pitch
@@ -5103,8 +4815,12 @@ class Chord(ChordBase):
             return ctn[0]
 
 
-    @property
-    def duration(self) -> Duration:
+    # Override only the getter (to lazily inherit the first note's duration);
+    # the setter is inherited unchanged from Music21Object via ChordBase.duration.
+    # (mypy mis-models a property reached through the class, hence the ignore;
+    # pylint likewise sees the .getter result as a method, not a property.)
+    @ChordBase.duration.getter  # type: ignore[attr-defined]
+    def duration(self) -> Duration:  # pylint: disable=invalid-overridden-method
         # noinspection PyShadowingNames
         '''
         Get or set the duration of this Chord as a Duration object.
@@ -5129,23 +4845,11 @@ class Chord(ChordBase):
         '''
         d = t.cast(Duration|None, self._duration)  # type: ignore
         if d is None and self._notes:
-            # pitchZeroDuration = self._notes[0]['pitch'].duration
             pitchZeroDuration = self._notes[0].duration
             self._duration = pitchZeroDuration
 
         d_out = t.cast(Duration, self._duration)
         return d_out
-
-    @duration.setter
-    def duration(self, durationObj: Duration) -> None:
-        '''
-        Set a Duration object.
-        '''
-        if isinstance(durationObj, Duration):
-            self._duration = durationObj
-        else:
-            # need to permit Duration object assignment here
-            raise ChordException(f'this must be a Duration object, not {durationObj}')
 
     @property  # type: ignore
     @cacheMethod
@@ -5403,6 +5107,12 @@ class Chord(ChordBase):
         >>> c1Notes = c1.notes
         >>> c1Notes
         (<music21.note.Note C>, <music21.note.Note E->, <music21.note.Note G>)
+
+        Indexing the chord by an integer returns the same Note (``c[1]`` is
+        ``c.notes[1]``):
+
+        >>> c1[1] is c1.notes[1]
+        True
 
         Note that to set duration independently, a new Duration object needs to
         be created.  Internal notes for Chords created from strings or pitches

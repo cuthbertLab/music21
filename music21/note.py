@@ -75,6 +75,10 @@ noteheadTypeNames = (
     'triangle',
     'x',
 )
+'''
+A tuple of the valid notehead type names accepted by a Note's
+:attr:`~music21.note.NotRest.notehead` property.
+'''
 
 stemDirectionNames = (
     'double',
@@ -84,6 +88,10 @@ stemDirectionNames = (
     'unspecified',
     'up',
 )
+'''
+A tuple of the valid stem direction names accepted by a Note's
+:attr:`~music21.note.NotRest.stemDirection` property.
+'''
 
 def __dir__():
     out = [n for n in globals() if not n.startswith('__') and not n.startswith('Test')]

@@ -5381,7 +5381,7 @@ class Pitch(prebase.ProtoM21Object):
         pitchList = chordIn.pitches
         isStringHarmonic = False
 
-        if chordIn.getNotehead(pitchList[1]) == 'diamond':
+        if chordIn[1].notehead == 'diamond':
             isStringHarmonic = True
 
         if not isStringHarmonic:
@@ -5414,7 +5414,7 @@ class Pitch(prebase.ProtoM21Object):
 
         note1 = note.Note(pitchList[0].nameWithOctave)
         note2 = note.Note(pitchList[1].nameWithOctave)
-        note2.notehead = chordIn.getNotehead(pitchList[1])
+        note2.notehead = chordIn[1].notehead
 
         # TODO: make note small
 

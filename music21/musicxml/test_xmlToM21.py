@@ -465,8 +465,8 @@ class Test(unittest.TestCase):
         #         for n in chordResult:
         #             print(n.stemDirection)
 
-        self.assertEqual(chordResult.getStemDirection(chordResult.pitches[0]), 'down')
-        self.assertEqual(chordResult.getStemDirection(chordResult.pitches[1]), 'noStem')
+        self.assertEqual(chordResult[0].stemDirection, 'down')
+        self.assertEqual(chordResult[1].stemDirection, 'noStem')
 
     def testStaffGroupsA(self):
         from music21.musicxml import testPrimitive

@@ -296,15 +296,15 @@ class NoteworthyTranslator:
         # if Tied
         if thisNoteBeginsATie:
             if achord is not None:
-                for p in achord.pitches:
-                    achord.setTie(tie.Tie('start'), p)
+                for n in achord:
+                    n.tie = tie.Tie('start')
             else:
                 noteOrChord.tie = tie.Tie('start')
 
         if self.withinTie is True and thisNoteIsTied is False:
             if achord is not None:
-                for p in achord.pitches:
-                    achord.setTie(tie.Tie('stop'), p)
+                for n in achord:
+                    n.tie = tie.Tie('stop')
             else:
                 noteOrChord.tie = tie.Tie('stop')
             self.withinTie = False
