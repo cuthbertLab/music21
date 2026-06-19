@@ -18,10 +18,15 @@ chord representations. All features of this module are made available through
 from __future__ import annotations
 
 from collections import namedtuple
+from collections.abc import Sequence
+import typing as t
 import unittest
 
 from music21 import environment
 from music21 import exceptions21
+
+if t.TYPE_CHECKING:
+    from music21 import chord
 
 environLocal = environment.Environment('chord.tables')
 
@@ -58,6 +63,15 @@ type TNIStructure = tuple[
     tuple[int, int, int, int, int, int, int, int],
     int,
 ]
+
+# Each entry maps (forteIndex, inversion) -> (pitch classes, Morris invariance
+# vector, interval class vector).
+type ChordMemberEntry = tuple[
+    tuple[int, ...],
+    tuple[int, ...],
+    tuple[int, ...],
+]
+type CardinalityToChordMembers = dict[int, dict[tuple[int, int], ChordMemberEntry]]
 
 # noinspection DuplicatedCode
 t1: TNIStructure
@@ -540,12 +554,14 @@ inversionDefaultPitchClasses = {
 #         [data(0=pitches, 1=ICV, 2=invariance vector (morris), 3 = Z-relation)]
 #         [element in list]
 # ------------------------------------------------------------------------------
-def _makeCardinalityToChordMembers():
-    _cardinalityToChordMembers = {}
+def _makeCardinalityToChordMembers() -> CardinalityToChordMembers:
+    _cardinalityToChordMembers: CardinalityToChordMembers = {}
 
     for cardinality in range(1, 13):
-        forte_cardinality_lookup = FORTE[cardinality]
-        this_cardinality_entries = {}
+        forte_cardinality_lookup = t.cast(
+            tuple[TNIStructure, ...], FORTE[cardinality]
+        )
+        this_cardinality_entries: dict[tuple[int, int], ChordMemberEntry] = {}
         for forte_after_dash in range(1, len(forte_cardinality_lookup)):
             forte_entry = forte_cardinality_lookup[forte_after_dash]
             has_distinct_inversion = (forte_entry[2][1] == 0)
@@ -570,7 +586,7 @@ def _makeCardinalityToChordMembers():
     return _cardinalityToChordMembers
 
 
-cardinalityToChordMembers = _makeCardinalityToChordMembers()
+cardinalityToChordMembers: CardinalityToChordMembers = _makeCardinalityToChordMembers()
 del _makeCardinalityToChordMembers
 
 # ------------------------------------------------------------------------------
@@ -1479,9 +1495,9 @@ tnIndexToChordInfo = {
 # ------------------------------------------------------------------------------
 # function to access data
 
-def forteIndexToInversionsAvailable(card, index):
+def forteIndexToInversionsAvailable(card: int, index: int) -> list[int]:
     '''
-    Return possible inversion values for any cardinality and Forte index
+    Return possible inversion values for any cardinality and Forte index.
 
     >>> chord.tables.forteIndexToInversionsAvailable(3, 1)
     [0]
@@ -1499,15 +1515,17 @@ def forteIndexToInversionsAvailable(card, index):
     if index < 1 or index > maximumIndexNumberWithoutInversionEquivalence[card]:
         raise ChordTablesException(f'index {index} not valid')
     # get morris invariance vector
-    morris = FORTE[card][index][2]
+    cardForte = t.cast(tuple[TNIStructure | None, ...], FORTE[card])
+    dataLine = t.cast(TNIStructure, cardForte[index])
+    morris = dataLine[2]
     if morris[1] > 0:  # second value stored inversion status
         return [0]
     else:
         return [-1, 1]
 
-def _validateAddress(address):
+def _validateAddress(address: Sequence[int]) -> tuple[int, int, int]:
     '''
-    Check that an address is valid
+    Check that an address is valid.
 
     >>> chord.tables._validateAddress((3, 1, 0))
     (3, 1, 0)
@@ -1530,11 +1548,12 @@ def _validateAddress(address):
     Traceback (most recent call last):
     music21.chord.tables.ChordTablesException: inversion -30 not valid
     '''
-    address = list(address)
-    card = address[0]
-    index = address[1]
-    if len(address) >= 3:
-        inversion = address[2]
+    addressList = list(address)
+    card = addressList[0]
+    index = addressList[1]
+    inversion: int | None
+    if len(addressList) >= 3:
+        inversion = addressList[2]
     else:
         inversion = None
 
@@ -1567,7 +1586,7 @@ def _validateAddress(address):
     return (card, index, inversion)
 
 
-def addressToTransposedNormalForm(address):
+def addressToTransposedNormalForm(address: Sequence[int]) -> tuple[int, ...]:
     '''
     Given a TN address, return the normal form transposed to start on 0.
 
@@ -1592,9 +1611,9 @@ def addressToTransposedNormalForm(address):
     return cardinalityToChordMembers[card][(index, inversion)][0]
 
 
-def addressToPrimeForm(address):
+def addressToPrimeForm(address: Sequence[int]) -> tuple[int, ...]:
     '''
-    Given a TN address, return the prime form
+    Given a TN address, return the prime form.
 
     >>> chord.tables.addressToPrimeForm((3, 1, 0))
     (0, 1, 2)
@@ -1619,9 +1638,9 @@ def addressToPrimeForm(address):
     return cardinalityToChordMembers[card][(index, inversion)][0]
 
 
-def addressToIntervalVector(address):
+def addressToIntervalVector(address: Sequence[int]) -> tuple[int, ...]:
     '''
-    Given a TN address, return the interval class vector as a 6-tuple
+    Given a TN address, return the interval class vector as a 6-tuple.
 
     >>> chord.tables.addressToIntervalVector((3, 1, 0))
     (2, 1, 0, 0, 0, 0)
@@ -1631,7 +1650,7 @@ def addressToIntervalVector(address):
     (0, 0, 1, 1, 1, 0)
 
     Inversion can be omitted or None without causing an error (or, of course,
-    changing the output)
+    changing the output).
 
     >>> chord.tables.addressToIntervalVector((4, 29))
     (1, 1, 1, 1, 1, 1)
@@ -1642,7 +1661,7 @@ def addressToIntervalVector(address):
     return cardinalityToChordMembers[card][(index, inversion)][2]
 
 
-def intervalVectorToAddress(vector):
+def intervalVectorToAddress(vector: Sequence[int]) -> list[ChordTableAddress]:
     '''
     Given a vector as a 6-tuple, return a list of
     ChordTableAddress namedtuples for
@@ -1676,21 +1695,22 @@ def intervalVectorToAddress(vector):
     Traceback (most recent call last):
     ValueError: Vector must have exactly six entries
     '''
-    post = []
-    vector = tuple(vector)
-    if len(vector) != 6:
+    post: list[ChordTableAddress] = []
+    vectorTuple = tuple(vector)
+    if len(vectorTuple) != 6:
         raise ValueError('Vector must have exactly six entries')
 
     for card in range(1, 13):
-        for num, sc in enumerate(FORTE[card]):
+        cardForte = t.cast(tuple[TNIStructure | None, ...], FORTE[card])
+        for num, sc in enumerate(cardForte):
             if sc is None:
                 continue  # first, used for spacing
             # index 1 is the vector
-            if sc[1] == vector:
+            if sc[1] == vectorTuple:
                 post.append(ChordTableAddress(card, num, None, None))
     return post
 
-def addressToZAddress(address):
+def addressToZAddress(address: Sequence[int]) -> ChordTableAddress | None:
     '''
     Given a TN address, return the ChordTableAddress of the Z-set if one exists.
     If none exists, returns None.
@@ -1709,14 +1729,16 @@ def addressToZAddress(address):
     ChordTableAddress(cardinality=8, forteClass=15, inversion=1, pcOriginal=None)
     '''
     card, index, unused_inversion = _validateAddress(address)
-    z = FORTE[card][index][3]
+    cardForte = t.cast(tuple[TNIStructure | None, ...], FORTE[card])
+    dataLine = t.cast(TNIStructure, cardForte[index])
+    z = dataLine[3]
     if z == 0:
         return None
     else:
-        zAddress = _validateAddress((card, z, None))
+        zAddress = _validateAddress(t.cast(Sequence[int], (card, z, None)))
         return ChordTableAddress(*zAddress, None)
 
-def addressToCommonNames(address):
+def addressToCommonNames(address: Sequence[int]) -> list[str] | None:
     '''
     Given a TN address, return one or more common names if available:
 
@@ -1742,14 +1764,16 @@ def addressToCommonNames(address):
     Those matching this description that are still in common use will be demoted
     to the end of the list of names and may still be removed in the future.
     '''
-    address = _validateAddress(address)
-    refDict = tnIndexToChordInfo[address]
+    validAddress = _validateAddress(address)
+    refDict = t.cast(
+        'dict[str, tuple[str, ...]]', tnIndexToChordInfo[validAddress]
+    )
     if 'name' in refDict:
         return list(refDict['name'])  # convert to a list
     else:
         return None
 
-def addressToForteName(address, classification='tn'):
+def addressToForteName(address: Sequence[int], classification: str = 'tn') -> str:
     '''
     Given an address, return the set-class name as a string.  By default,
     A and B are appended to chords without inversional equivalence:
@@ -1788,7 +1812,7 @@ def addressToForteName(address, classification='tn'):
 
 
 # noinspection GrazieInspection
-def seekChordTablesAddress(c):
+def seekChordTablesAddress(c: chord.Chord) -> ChordTableAddress:
     '''
     Utility method to return the address to the chord table; used by
     many Chord operations, such as `.primeForm`, `.normalOrder`, etc.
@@ -1889,8 +1913,9 @@ def seekChordTablesAddress(c):
     match = False
     matchedPCOriginal = None
 
-    for indexCandidate in range(1, len(FORTE[card])):  # first entry is None
-        dataLine = FORTE[card][indexCandidate]
+    cardForte = t.cast(tuple[TNIStructure | None, ...], FORTE[card])
+    for indexCandidate in range(1, len(cardForte)):  # first entry is None
+        dataLine = t.cast(TNIStructure, cardForte[indexCandidate])
         dataLinePcs = dataLine[0]
         inversionsAvailable = forteIndexToInversionsAvailable(card, indexCandidate)
 
