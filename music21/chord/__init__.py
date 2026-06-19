@@ -771,42 +771,57 @@ class Chord(ChordBase):
     def __hash__(self) -> int:
         return super().__hash__()
 
-    def _noteForKey(self, key: int|str|pitch.Pitch) -> note.Note:
+    def __getitem__(self, key: int|str|pitch.Pitch) -> note.Note:
         '''
-        Return the component :class:`~music21.note.Note` matching `key`, where
-        `key` is an index (int), a pitch name with octave (str, e.g. 'D-4'), or
-        a :class:`~music21.pitch.Pitch` matched first by identity and then by
-        value.
-
-        This is the shared lookup behind ``Chord[query]``, :meth:`getTie`, and
-        :meth:`getVolume`.
+        Get the component :class:`~music21.note.Note` for an index (int), a
+        pitch name with octave (str, e.g. 'D-4'), or a
+        :class:`~music21.pitch.Pitch`.
 
         >>> c = chord.Chord('C#4 D-4')
-        >>> c._noteForKey(0)
+        >>> c[0]
         <music21.note.Note C#>
-        >>> c._noteForKey('D-4')
+        >>> c[1]
         <music21.note.Note D->
 
-        A Pitch matches by identity first, then by value, and returns the stored
-        component Note (not the Pitch that was passed in):
+        A string is interpreted as a pitch name with octave, and returns the
+        first component whose pitch matches:
 
-        >>> cSharp = c._noteForKey(0)
+        >>> c['D-4']
+        <music21.note.Note D->
+
+        A Pitch matches a component first by identity and then by value, and
+        returns the stored component Note (not the Pitch that was passed in):
+
+        >>> cSharp = c[0]
         >>> queryPitch = pitch.Pitch('C#4')
-        >>> c._noteForKey(queryPitch) is cSharp
+        >>> c[queryPitch] is cSharp
         True
 
         An out-of-range integer index raises an IndexError, while an unmatched
         pitch name or Pitch raises a KeyError:
 
-        >>> c._noteForKey(5)
+        >>> c[5]
         Traceback (most recent call last):
         IndexError: list index out of range
-        >>> c._noteForKey('E4')
+
+        >>> c['E4']
         Traceback (most recent call last):
         KeyError: "No note in the chord matches 'E4'"
-        >>> c._noteForKey(pitch.Pitch('A#6'))
+
+        >>> c[pitch.Pitch('A#6')]
         Traceback (most recent call last):
         KeyError: 'No note in the chord matches <music21.pitch.Pitch A#6>'
+
+        To read or change an attribute of a component, index to the Note first:
+
+        >>> c[0].step
+        'C'
+
+        * Changed in v11: an integer index, a pitch-name string, or a Pitch is
+          accepted, and a :class:`~music21.note.Note` is always returned.
+          Reading a component attribute through a dotted string (``c['0.step']``)
+          or looking up a component by Note object is no longer supported; index
+          to the component and use normal attribute access.
         '''
         if isinstance(key, int):
             return self._notes[key]
@@ -823,53 +838,6 @@ class Chord(ChordBase):
                 if n.pitch == key:
                     return n
         raise KeyError(f'No note in the chord matches {key!r}')
-
-    def __getitem__(self, key: int|str|pitch.Pitch) -> note.Note:
-        '''
-        Get the component :class:`~music21.note.Note` for an index, pitch name,
-        or :class:`~music21.pitch.Pitch`.
-
-        >>> c = chord.Chord('C#4 D-4')
-        >>> c[0]
-        <music21.note.Note C#>
-        >>> c[1]
-        <music21.note.Note D->
-
-        A string is interpreted as a pitch name with octave, and returns the
-        first component whose pitch matches:
-
-        >>> c['D-4']
-        <music21.note.Note D->
-
-        A Pitch returns the component it matches by value (see
-        :meth:`~music21.chord.Chord._noteForKey`):
-
-        >>> c[pitch.Pitch('C#4')]
-        <music21.note.Note C#>
-
-        An out-of-range index raises an IndexError; an unmatched pitch name or
-        Pitch raises a KeyError:
-
-        >>> c[5]
-        Traceback (most recent call last):
-        IndexError: list index out of range
-
-        >>> c['E4']
-        Traceback (most recent call last):
-        KeyError: "No note in the chord matches 'E4'"
-
-        To read or change an attribute of a component, index to the Note first:
-
-        >>> c[0].step
-        'C'
-
-        * Changed in v11: an integer index, a pitch-name string, or a Pitch is
-          accepted, and a :class:`~music21.note.Note` is always returned.
-          Reading a component attribute through a dotted string (``c['0.step']``)
-          or looking up a component by Note object is no longer supported; index
-          to the component and use normal attribute access.
-        '''
-        return self._noteForKey(key)
 
     def __setitem__(
         self,
@@ -906,7 +874,7 @@ class Chord(ChordBase):
           accepted as the key; setting a component attribute through a dotted
           string (``c['0.octave'] = 3``) is no longer supported.
         '''
-        keyIndex = self._notes.index(self._noteForKey(key))
+        keyIndex = self._notes.index(self[key])
 
         if isinstance(value, str):
             value = note.Note(value)
@@ -2032,7 +2000,7 @@ class Chord(ChordBase):
         True
         '''
         try:
-            return self._noteForKey(p).tie
+            return self[p].tie
         except KeyError:
             return None
 
@@ -2057,7 +2025,7 @@ class Chord(ChordBase):
         music21.chord.ChordException: the given pitch is not in the Chord: G4
         '''
         try:
-            n = self._noteForKey(p)
+            n = self[p]
             # noinspection PyArgumentList
             return n._getVolume(forceClient=self)
         except KeyError:
