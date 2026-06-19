@@ -137,7 +137,7 @@ class Variant(base.Music21Object):
         #               + attr + ' to private Stream'])
 
         # must mask pitches so as not to recurse
-        # TODO: check tt recurse does not go into this
+        # TODO: check that recurse does not go into this
         if attr in ['flat', 'pitches']:
             raise AttributeError
 
@@ -519,7 +519,7 @@ class Variant(base.Music21Object):
 
     def removeReplacedElementsFromStream(self, referenceStream=None, classList=None):
         '''
-        remove replaced elements from a referenceStream or activeSite
+        Remove replaced elements from a referenceStream or activeSite.
 
         >>> v = variant.Variant()
         >>> variantDataM1 = [('b', 'eighth'), ('c', 'eighth'), ('a', 'quarter'),
@@ -1532,7 +1532,7 @@ def refineVariant(s, sVariant, *, inPlace=False):
     Calling refineVariant on this stream and that variant object would result in a variant object
     in the measures for each F#/F pair, and a variant object containing the added bar at the end.
     For a more detailed explanation of how similar measures are properly associated with each other
-    look at the documentation for _getBestListAndScore
+    look at the documentation for _getBestListAndScore.
 
     Note that this code does not work properly yet.
 
@@ -1762,7 +1762,7 @@ def getMeasureHashes(s):
     '''
     Takes in a stream containing measures and returns a list of hashes,
     one for each measure. This is currently implemented
-    with search.translateStreamToString()
+    with search.translateStreamToString().
 
     >>> s = converter.parse("tinynotation: 2/4 c4 d8. e16 FF4 a'4 b-2")
     >>> sm = s.makeMeasures()

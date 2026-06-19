@@ -45,7 +45,7 @@ class ClefException(exceptions21.Music21Exception):
 class Clef(base.Music21Object):
     '''
     A Clef is a basic `music21` object for representing musical clefs
-    (Treble, Bass, etc.)
+    (Treble, Bass, etc.).
 
     Some clefs only represent the graphical element of the clef,
     such as G clef, which is subclassed by TrebleClef() and FrenchViolinClef().
@@ -322,7 +322,7 @@ class PitchClef(Clef):
 
 class PercussionClef(Clef):
     '''
-    represents a Percussion clef.
+    Represents a Percussion clef.
 
     >>> pc = clef.PercussionClef()
     >>> pc.sign
@@ -350,7 +350,7 @@ class PercussionClef(Clef):
 
 class NoClef(Clef):
     '''
-    represents the absence of a Clef.
+    Represents the absence of a Clef.
 
     >>> nc = clef.NoClef()
     >>> nc.sign
@@ -385,7 +385,7 @@ class JianpuClef(NoClef):
 
 class TabClef(PitchClef):
     '''
-    represents a Tablature clef.
+    Represents a Tablature clef.
 
     >>> a = clef.TabClef()
     >>> a.sign
@@ -414,13 +414,13 @@ class TabClef(PitchClef):
 
 class GClef(PitchClef):
     '''
-    A generic G Clef
+    A generic G Clef.
 
     >>> a = clef.GClef()
     >>> a.sign
     'G'
 
-    If not defined, the lowestLine is set as a Treble Clef (E4 = 31)
+    If not defined, the lowestLine is set as a Treble Clef (E4 = 31).
 
     >>> a.lowestLine
     31
@@ -490,7 +490,7 @@ class Treble8vbClef(TrebleClef):
 
 class Treble8vaClef(TrebleClef):
     '''
-    A treble clef an octave up (such as for piccolos)
+    A treble clef an octave up (such as for piccolos).
 
     >>> a = clef.Treble8vaClef()
     >>> a.sign
@@ -527,7 +527,7 @@ class GSopranoClef(GClef):
 
 class CClef(PitchClef):
     '''
-    A generic C Clef, with no line set
+    A generic C Clef, with no line set.
 
     >>> a = clef.CClef()
     >>> a.sign
@@ -542,7 +542,7 @@ class CClef(PitchClef):
 class SopranoClef(CClef):
     '''
     A soprano clef, with C on the lowest line
-    (found in Bach often)
+    (found in Bach often).
 
     >>> a = clef.SopranoClef()
     >>> a.sign
@@ -560,7 +560,7 @@ class SopranoClef(CClef):
 class MezzoSopranoClef(CClef):
     '''
     A C clef with C on the second line.  Perhaps
-    the rarest of the C clefs
+    the rarest of the C clefs.
 
     >>> a = clef.MezzoSopranoClef()
     >>> a.sign
@@ -613,7 +613,7 @@ class TenorClef(CClef):
 
 class CBaritoneClef(CClef):
     '''
-    A Baritone C clef (as opposed to an F Baritone Clef)
+    A Baritone C clef (as opposed to an F Baritone Clef).
 
     >>> a = clef.CBaritoneClef()
     >>> a.sign
@@ -631,7 +631,7 @@ class CBaritoneClef(CClef):
 # ------------------------------------------------------------------------------
 class FClef(PitchClef):
     '''
-    A generic F-Clef, like a Bass clef
+    A generic F-Clef, like a Bass clef.
 
     >>> a = clef.FClef()
     >>> a.sign
@@ -645,7 +645,7 @@ class FClef(PitchClef):
 
 class FBaritoneClef(FClef):
     '''
-    an F Baritone Clef
+    An F Baritone Clef.
 
     >>> a = clef.FBaritoneClef()
     >>> a.sign

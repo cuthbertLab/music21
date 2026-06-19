@@ -61,12 +61,12 @@ clefLine = 2
 # define a default notehead for notes that know they are unpitched
 noteheadUnpitched = 'square'
 '''
-Divisions are a MusicXML concept that music21 does not share
+Divisions are a MusicXML concept that music21 does not share.
 It basically represents the lowest time unit that all other notes
 are integer multiples of.  Useful for compatibility with MIDI, but
 ultimately restricting since it must be less than 16384, so thus
 cannot accurately reflect a piece which uses 64th notes, triplets,
-quintuplets, septuplets, 11-tuplets, and 13-tuplets in the same piece
+quintuplets, septuplets, 11-tuplets, and 13-tuplets in the same piece.
 I have chosen a useful base that allows for perfect representation of
 128th notes, triplets within triplets, quintuplets, and septuplets
 within the piece.  Other tuplets (11, etc.) will be close enough for

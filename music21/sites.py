@@ -53,7 +53,7 @@ class SitesException(exceptions21.Music21Exception):
 
 class SiteRef(common.SlottedObjectMixin, prebase.ProtoM21Object):
     '''
-    a single Site (stream, container, parent, reference, etc.) stored inside the Sites object.
+    A single Site (stream, container, parent, reference, etc.) stored inside the Sites object.
 
     A very simple object.
 
@@ -287,7 +287,7 @@ class Sites(common.SlottedObjectMixin):
 
     def __contains__(self, checkSite):
         '''
-        returns True if checkSite in Sites.
+        Returns True if checkSite in Sites.
 
         >>> m1 = stream.Measure(number=1)
         >>> m2 = stream.Measure(number=2)
@@ -614,11 +614,11 @@ class Sites(common.SlottedObjectMixin):
         This will recursively search the sitesDicts of objects in Site objects in
         the siteDict.
 
-        The `callerFirst` parameters is simply used to pass a reference of the
+        The `callerFirst` parameter is simply used to pass a reference of the
         first caller; this is necessary if we are looking within a Stream for a
         flat offset position.
 
-        If `priorityTarget` is specified, this location will be searched first. use
+        If `priorityTarget` is specified, this location will be searched first. Use
         priorityTarget=activeSite to prioritize that.
 
         The `getElementMethod` is a string that selects which Stream method is
@@ -774,7 +774,7 @@ class Sites(common.SlottedObjectMixin):
         (generally a Stream)
         that matches the provided class.
 
-        Input can be either a Class object or a string
+        Input can be either a Class object or a string.
 
         >>> class Mock(base.Music21Object):
         ...     pass

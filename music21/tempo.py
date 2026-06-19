@@ -236,7 +236,7 @@ class TempoText(TempoIndication):
     def getMetronomeMark(self):
         # noinspection PyShadowingNames
         '''
-        Return a MetronomeMark object that is configured from this objects Text.
+        Return a MetronomeMark object that is configured from this object's Text.
 
         >>> tt = tempo.TempoText('slow')
         >>> mm = tt.getMetronomeMark()
@@ -279,7 +279,7 @@ class TempoText(TempoIndication):
 
     def applyTextFormatting(self, te=None, numberImplicit=False):
         '''
-        Apply the default text formatting to the text expression version of this tempo mark
+        Apply the default text formatting to the text expression version of this tempo mark.
         '''
         if te is None:  # use the stored version if possible
             te = self._textExpression
@@ -363,7 +363,7 @@ class MetronomeMark(TempoIndication):
     >>> mm.numberImplicit
     True
 
-    For certain numbers, a text value can be set implicitly
+    For certain numbers, a text value can be set implicitly.
 
     >>> tm2 = tempo.MetronomeMark(number=208)
     >>> print(tm2.text)
@@ -466,7 +466,7 @@ class MetronomeMark(TempoIndication):
 
     def _updateTextFromNumber(self):
         '''
-        Update text if number is given and text is not defined
+        Update text if number is given and text is not defined.
         '''
         if self._tempoText is None and self._number is not None:
             # PyCharm inspection does not like using attributes on functions that become properties
@@ -478,7 +478,7 @@ class MetronomeMark(TempoIndication):
 
     def _updateNumberFromText(self):
         '''
-        Update number if text is given and number is not defined
+        Update number if text is given and number is not defined.
         '''
         if self._number is None and self._tempoText is not None:
             self._number = self._getDefaultNumber(self._tempoText)
@@ -631,7 +631,7 @@ class MetronomeMark(TempoIndication):
         '''
         Given a value in BPM, use it to set the value of this MetronomeMark.
         BPM values are assumed to refer only to quarter notes; different beat values,
-        if defined here, will be scaled
+        if defined here, will be scaled.
 
         >>> mm = tempo.MetronomeMark(number=60, referent='half')
         >>> mm.setQuarterBPM(240)  # set to 240 for a quarter
@@ -648,7 +648,7 @@ class MetronomeMark(TempoIndication):
 
     def _getDefaultNumber(self, tempoText):
         '''
-        Given a tempo text expression or an TempoText, get the default number.
+        Given a tempo text expression or a TempoText, get the default number.
 
         >>> mm = tempo.MetronomeMark()
         >>> mm._getDefaultNumber('schnell')
@@ -682,7 +682,7 @@ class MetronomeMark(TempoIndication):
         presently only looks for approximate matches
 
         The `spread` value is a +/- shift around the default tempo
-        indications defined in defaultTempoValues
+        indications defined in defaultTempoValues.
 
         >>> mm = tempo.MetronomeMark()
         >>> mm._getDefaultText(92)
@@ -867,7 +867,7 @@ class MetricModulation(TempoIndication):
     one for the oldMetronome, the other for the newMetronome. High level properties,
     oldReferent and newReferent, and convenience methods permit only setting the referent.
 
-    The `classicalStyle` attribute determines of the first MetronomeMark describes the
+    The `classicalStyle` attribute determines if the first MetronomeMark describes the
     new tempo, not the old (the reverse of expected usage).
 
     The `maintainBeat` attribute determines if, after an equality statement,
@@ -1051,7 +1051,7 @@ class MetricModulation(TempoIndication):
     def _setNewReferent(self, value):
         if value is None:
             raise MetricModulationException('cannot set new referent to None')
-        # of oldMetronome is defined, get new metronome from old
+        # if oldMetronome is defined, get new metronome from old
         mm = None
         if self._newMetronome is not None:
             # if metro defined, get based on new referent
@@ -1085,7 +1085,7 @@ class MetricModulation(TempoIndication):
     @property
     def number(self):
         '''
-        Get and the number of the MetricModulation, or the number
+        Get the number of the MetricModulation, or the number
         assigned to the new MetronomeMark.
 
         >>> s = stream.Stream()
@@ -1507,7 +1507,7 @@ class Test(unittest.TestCase):
                          '<music21.tempo.MetricModulation '
                          + '<music21.tempo.MetronomeMark animato Eighth=120>='
                          + '<music21.tempo.MetronomeMark animato 16th=120>>')
-        # the effective speed as been slowed by this modulation
+        # the effective speed has been slowed by this modulation
         self.assertEqual(mmod1.oldMetronome.getQuarterBPM(), 60.0)
         self.assertEqual(mmod1.newMetronome.getQuarterBPM(), 30.0)
 
@@ -1688,7 +1688,7 @@ class Test(unittest.TestCase):
         mmod1.updateByContext()
 
         self.assertEqual(str(mmod1.oldMetronome.referent), '<music21.duration.Duration 1.0>')
-        self.assertEqual(mmod1.oldMetronome.number, 60)  # value form last mm
+        self.assertEqual(mmod1.oldMetronome.number, 60)  # value from last mm
         # still have not set new
         self.assertEqual(mmod1.newMetronome, None)
 

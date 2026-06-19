@@ -94,7 +94,7 @@ class Volume(prebase.ProtoM21Object, SlottedObjectMixin):
     # SPECIAL METHODS #
     def __deepcopy__(self, memo=None):
         '''
-        Don't copy the client; set to current
+        Don't copy the client; set to current.
         '''
         new = common.defaultDeepcopy(self, memo, ignoreAttributes={'client'})
         new.client = self.client
@@ -388,7 +388,7 @@ class Volume(prebase.ProtoM21Object, SlottedObjectMixin):
         >>> n.volume.velocityScalar
         1.0
 
-        If velocity is not set, then this will return None
+        If velocity is not set, then this will return None.
 
         >>> n = note.Note()
         >>> n.volume.velocityScalar is None

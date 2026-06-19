@@ -53,7 +53,7 @@ englishNames = {'ppp': 'extremely soft',
 def dynamicStrFromDecimal(n):
     '''
     Given a decimal from 0 to 1, return a string representing a dynamic
-    with 0 being the softest (0.01 = 'ppp') and 1 being the loudest (0.9+ = 'fff')
+    with 0 being the softest (0.01 = 'ppp') and 1 being the loudest (0.9+ = 'fff').
     0 returns "n" (niente), while ppp and fff are the loudest dynamics used.
 
     >>> dynamics.dynamicStrFromDecimal(0.25)
@@ -121,7 +121,7 @@ class Dynamic(base.Music21Object):
     'very soft'
 
     Dynamics can also be specified on a 0 to 1 scale with 1 being the
-    loudest (see dynamicStrFromDecimal() above)
+    loudest (see dynamicStrFromDecimal() above).
 
     >>> ppp = dynamics.Dynamic(0.15)  # on 0 to 1 scale
     >>> ppp.value
@@ -141,7 +141,7 @@ class Dynamic(base.Music21Object):
     0.98
 
     Transferring the .value ('fff') to a new Dynamic object will set the volumeScalar
-    back to 0.9
+    back to 0.9.
 
     >>> loud2 = dynamics.Dynamic(loud.value)
     >>> loud2.value
@@ -349,7 +349,7 @@ class DynamicWedge(spanner.Spanner):
         # self.fillElementTypes = [note.GeneralNote]
 
         self.type = None  # crescendo or diminuendo
-        self.placement = 'below'  # can above or below, after musicxml
+        self.placement = 'below'  # can be above or below, after musicxml
         self.spread = 15  # this unit is in tenths
         self.niente = False
 

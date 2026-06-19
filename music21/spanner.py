@@ -755,7 +755,7 @@ class Spanner(base.Music21Object):
 
     def getFirst(self):
         '''
-        Get the object of the first spannedElement (or None if it's an empty spanner)
+        Get the object of the first spannedElement (or None if it's an empty spanner).
 
         >>> n1 = note.Note('g')
         >>> n2 = note.Note('f#')
@@ -778,13 +778,13 @@ class Spanner(base.Music21Object):
 
     def isLast(self, spannedElement):
         '''
-        Given a spannedElement, is it last?  Returns True or False
+        Given a spannedElement, is it last?  Returns True or False.
         '''
         return self.getLast() is spannedElement
 
     def getLast(self):
         '''
-        Get the object of the last spannedElement (or None if it's an empty spanner)
+        Get the object of the last spannedElement (or None if it's an empty spanner).
 
         >>> n1 = note.Note('g')
         >>> n2 = note.Note('f#')
@@ -914,7 +914,7 @@ class SpannerBundle(prebase.ProtoM21Object):
 
     def append(self, other: Spanner):
         '''
-        adds a Spanner to the bundle. Will be done automatically when adding a Spanner
+        Adds a Spanner to the bundle. Will be done automatically when adding a Spanner
         to a Stream.
         '''
         self._storage.append(other)
@@ -961,7 +961,7 @@ class SpannerBundle(prebase.ProtoM21Object):
 
     def getSpannerStorageIds(self) -> list[int]:
         '''
-        Return all SpannerStorage ids from all contained Spanners
+        Return all SpannerStorage ids from all contained Spanners.
         '''
         post: list[int] = []
         for x in self._storage:
@@ -1006,7 +1006,7 @@ class SpannerBundle(prebase.ProtoM21Object):
 
     def getByCompleteStatus(self, completeStatus: bool) -> SpannerBundle:
         '''
-        Get spanners by matching status of `completeStatus` to the same attribute
+        Get spanners by matching status of `completeStatus` to the same attribute.
 
         >>> su1 = spanner.Slur()
         >>> su1.idLocal = 1
@@ -1726,7 +1726,7 @@ class RepeatBracket(Spanner):
         'numberRange': '''
             Get a contiguous list of repeat numbers that are applicable for this instance.
 
-            Will always have at least one element, but [0] means undefined
+            Will always have at least one element, but [0] means undefined.
 
             >>> rb = spanner.RepeatBracket()
             >>> rb.numberRange
@@ -1760,14 +1760,14 @@ class RepeatBracket(Spanner):
     @property
     def _numberSpanIsAdjacent(self) -> bool:
         '''
-        are there exactly two numbers that should be written as 3, 4 not 3-4.
+        Are there exactly two numbers that should be written as 3, 4 not 3-4.
         '''
         return len(self.numberRange) == 2 and self.numberRange[0] == self.numberRange[1] - 1
 
     @property
     def _numberSpanIsContiguous(self) -> bool:
         '''
-        can we write as '3, 4' or '5-10' and not as '1, 5, 6, 11'
+        Can we write as '3, 4' or '5-10' and not as '1, 5, 6, 11'.
         '''
         return common.contiguousList(self.numberRange)
 
@@ -1791,7 +1791,7 @@ class RepeatBracket(Spanner):
 
     def _setNumber(self, value: int|str|Iterable[int]):
         '''
-        Set the bracket number. There may be range of values provided
+        Set the bracket number. There may be a range of values provided.
         '''
         if value == '':
             # undefined.
@@ -1995,7 +1995,7 @@ class Ottava(Spanner):
 
     def shiftDirection(self, reverse=False):
         '''
-        Returns up or down depending on the type of shift:
+        Returns up or down depending on the type of shift.
         '''
         # an 8va mark means that the notes must be shifted down with the mark
         if self._type.endswith('a'):
@@ -2012,7 +2012,7 @@ class Ottava(Spanner):
 
     def interval(self, reverse=False):
         '''
-        return an interval.Interval() object representing this ottava
+        Return an interval.Interval() object representing this ottava.
 
         >>> ottava = spanner.Ottava(type='15mb')
         >>> i = ottava.interval()
@@ -2264,7 +2264,7 @@ class Glissando(Spanner):
     Different line types can be specified.
 
     Glissandos can have a label and a lineType.  Label is a string or None.
-    lineType defaults to 'wavy'
+    lineType defaults to 'wavy'.
 
     >>> gl = spanner.Glissando()
     >>> gl.lineType

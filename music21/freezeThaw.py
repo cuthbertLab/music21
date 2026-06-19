@@ -97,7 +97,7 @@ class FreezeThawException(exceptions21.Music21Exception):
 class StreamFreezeThawBase:
     '''
     Contains a few methods that are used for both
-    StreamFreezer and StreamThawer
+    StreamFreezer and StreamThawer.
     '''
 
     def __init__(self):
@@ -302,7 +302,7 @@ class StreamFreezer(StreamFreezeThawBase):
 
     def removeStreamStatusClient(self, streamObj):
         '''
-        if s is a stream then
+        If s is a stream then
 
         s.streamStatus._client is s
 
@@ -314,12 +314,12 @@ class StreamFreezer(StreamFreezeThawBase):
 
     def recursiveClearSites(self, startObj):
         '''
-        recursively clear all sites, including activeSites, taking into account
+        Recursively clear all sites, including activeSites, taking into account
         that spanners and variants behave differently.
 
         Called by setupSerializationScaffold.
 
-        To be run after setupStoredElementOffsetTuples() has been run
+        To be run after setupStoredElementOffsetTuples() has been run.
 
         >>> n = note.Note('D#4')
         >>> len(n.sites)
@@ -354,7 +354,7 @@ class StreamFreezer(StreamFreezeThawBase):
         >>> n.getOffsetBySite(s2)
         20.0
 
-        After recursiveClearSites n will be not know its location anywhere:
+        After recursiveClearSites n will not know its location anywhere:
 
         >>> sf.recursiveClearSites(s)
         >>> len(n.sites)  # just the None site
@@ -366,7 +366,7 @@ class StreamFreezer(StreamFreezeThawBase):
         True
 
         This predicament is why when the standard freezeThaw call is made, what is frozen is a
-        deepcopy of the Stream so that nothing is left in an unusable position
+        deepcopy of the Stream so that nothing is left in an unusable position.
         '''
         if hasattr(startObj, '_storedElementOffsetTuples'):
             storedElementOffsetTuples = startObj._storedElementOffsetTuples
@@ -390,7 +390,7 @@ class StreamFreezer(StreamFreezeThawBase):
 
     def setupStoredElementOffsetTuples(self, streamObj):
         '''
-        move all elements from ._elements and ._endElements
+        Move all elements from ._elements and ._endElements
         to a new attribute ._storedElementOffsetTuples
         which contains a list of tuples of the form
         (el, offset or 'end').
@@ -597,7 +597,7 @@ class StreamFreezer(StreamFreezeThawBase):
 
     def parseWriteFmt(self, fmt):
         '''
-        Parse a passed-in write format
+        Parse a passed-in write format.
 
         >>> sf = freezeThaw.StreamFreezer()
         >>> sf.parseWriteFmt(None)
@@ -687,7 +687,7 @@ class StreamFreezer(StreamFreezeThawBase):
     def writeStr(self, fmt=None, **keywords):
         '''
         Convert the object to a pickled/jsonpickled string
-        and return the string
+        and return the string.
         '''
         fmt = self.parseWriteFmt(fmt)
         storage = self.packStream(self.stream)
@@ -708,7 +708,7 @@ class StreamThawer(StreamFreezeThawBase):
     '''
     This class is used to thaw a data string into a Stream
 
-    In general user :func:`~music21.converter.parse` to read from a
+    In general use :func:`~music21.converter.parse` to read from a
     serialized file.
 
     >>> s = stream.Stream()
@@ -882,7 +882,7 @@ class StreamThawer(StreamFreezeThawBase):
 
     def parseOpenFmt(self, storage):
         '''
-        Look at the file and determine the format
+        Look at the file and determine the format.
         '''
         if isinstance(storage, bytes):
             if storage.startswith(b'{"'):  # pragma: no cover
@@ -899,7 +899,7 @@ class StreamThawer(StreamFreezeThawBase):
 
     def open(self, fp, zipType=None):
         '''
-        For a supplied file path to a pickled stream, unpickle
+        For a supplied file path to a pickled stream, unpickle.
         '''
         if not os.path.exists(fp):  # pragma: no cover
             directory = environLocal.getRootTempDir()
@@ -1026,7 +1026,7 @@ class Test(unittest.TestCase):
         '''
         Versions of jsonpickle prior to  0.9.3 were having problems serializing Enums.
 
-        Works now
+        Works now.
         '''
         from music21 import corpus
         c = corpus.parse('luca/gloria').parts[2].measures(1, 2)

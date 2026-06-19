@@ -138,7 +138,7 @@ class Style(ProtoM21Object):
         >>> tst.enclosure
         <Enclosure.OCTAGON>
 
-        Setting an invalid enclosure raises a TextFormatException
+        Setting an invalid enclosure raises a TextFormatException.
 
         >>> tst.enclosure = 'parabola'
         Traceback (most recent call last):
@@ -204,7 +204,7 @@ class Style(ProtoM21Object):
 
         Other legal positions are 'above' and 'below' which
         are synonyms for 10 and -70 respectively (for 5-line
-        staves; other staves are not yet implemented)
+        staves; other staves are not yet implemented).
         This behavior may change in music21 v8 or after.
 
         >>> te = style.Style()
@@ -216,7 +216,7 @@ class Style(ProtoM21Object):
         >>> te.absoluteY
         -70
 
-        Setting an invalid position raises a TextFormatException
+        Setting an invalid position raises a TextFormatException.
 
         >>> te.absoluteY = 'hello'
         Traceback (most recent call last):
@@ -321,7 +321,7 @@ class TextStyle(Style):
                              _setAlignVertical,
                              doc='''
         Get or set the vertical align. Valid values are top, middle, bottom, baseline
-        or None
+        or None.
 
         >>> te = style.TextStyle()
         >>> te.alignVertical = 'top'
@@ -349,7 +349,7 @@ class TextStyle(Style):
                                _setAlignHorizontal,
                                doc='''
         Get or set the horizontal alignment.  Valid values are left, right, center,
-        or None
+        or None.
 
         >>> te = style.TextStyle()
         >>> te.alignHorizontal = 'right'
@@ -369,14 +369,14 @@ class TextStyle(Style):
     def justify(self) -> str|None:
         '''
         Get or set the justification.  Valid values are left,
-        center, right, full (not supported by MusicXML), and None
+        center, right, full (not supported by MusicXML), and None.
 
         >>> tst = style.TextStyle()
         >>> tst.justify = 'center'
         >>> tst.justify
         'center'
 
-        Invalid values raise a TextFormatException
+        Invalid values raise a TextFormatException.
 
         >>> tst.justify = 'hello'
         Traceback (most recent call last):
@@ -405,7 +405,7 @@ class TextStyle(Style):
         >>> tst.fontStyle
         'bold'
 
-        Invalid values raise a TextFormatException
+        Invalid values raise a TextFormatException.
 
         >>> tst.fontStyle = 'hello'
         Traceback (most recent call last):
@@ -462,7 +462,7 @@ class TextStyle(Style):
     fontSize = property(_getSize,
                         _setSize,
                         doc='''
-        Get or set the size.  Best, an int or float, but also a css font size
+        Get or set the size.  Best, an int or float, but also a css font size.
 
         >>> tst = style.TextStyle()
         >>> tst.fontSize = 20
@@ -534,7 +534,7 @@ class TextStyle(Style):
 
 class TextStylePlacement(TextStyle):
     '''
-    TextStyle plus a placement attribute
+    TextStyle plus a placement attribute.
     '''
 
     def __init__(self):
@@ -561,7 +561,7 @@ class BezierStyle(Style):
 
 class LineStyle(Style):
     '''
-    from the MusicXML Definition
+    From the MusicXML Definition.
 
     Defines lineShape ('straight', 'curved' or None)
     lineType ('solid', 'dashed', 'dotted', 'wavy' or None)
@@ -581,7 +581,7 @@ class LineStyle(Style):
 class StreamStyle(Style):
     '''
     Includes several elements in the MusicXML <appearance> tag in <defaults>
-    along with <music-font> and <word-font>
+    along with <music-font> and <word-font>.
     '''
 
     def __init__(self):
@@ -606,7 +606,7 @@ class StreamStyle(Style):
 
 class BeamStyle(Style):
     '''
-    Style for beams
+    Style for beams.
     '''
 
     def __init__(self):

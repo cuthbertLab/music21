@@ -85,10 +85,10 @@ class Editorial(prebase.ProtoM21Object, dict):
             ''',
         'ficta': '''a :class:`~music21.pitch.Accidental` object that specifies musica
             ficta for the note.  Will only be displayed in LilyPond and then only if
-            there is no Accidental object on the note itself''',
+            there is no Accidental object on the note itself.''',
         'harmonicInterval': '''an :class:`~music21.interval.Interval` object that specifies
             the harmonic interval between this object and a single other object, or None
-            (useful for storing information post analysis)''',
+            (useful for storing information post analysis).''',
         'melodicInterval': '''an :class:`~music21.interval.Interval` object that specifies
             the melodic interval to the next object in this Part/Voice/Stream, etc.''',
     }

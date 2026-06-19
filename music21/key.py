@@ -933,7 +933,7 @@ class Key(KeySignature, scale.DiatonicScale):
     **Equality**
 
     Two Keys are equal if their tonics' names are equal, their sharps are equal,
-    and their modes are equal (and they pass all superclass tests)
+    and their modes are equal (and they pass all superclass tests).
 
     >>> k = key.Key(pitch.Pitch('C4'))
     >>> k2 = key.Key(pitch.Pitch('C5'))
@@ -1022,7 +1022,7 @@ class Key(KeySignature, scale.DiatonicScale):
     @property
     def relative(self) -> Key:
         '''
-        if the Key is major or minor, return the relative minor or major.
+        If the Key is major or minor, return the relative minor or major.
 
         Otherwise, just returns self -- this is the best way to not have random crashes
         in the middle of large datasets.
@@ -1052,7 +1052,7 @@ class Key(KeySignature, scale.DiatonicScale):
     @property
     def parallel(self) -> Key:
         '''
-        if the Key is major or minor, return the parallel minor or major.
+        If the Key is major or minor, return the parallel minor or major.
 
         Otherwise, just returns self -- this is the best way to not have random crashes
         in the middle of large datasets.
@@ -1079,7 +1079,7 @@ class Key(KeySignature, scale.DiatonicScale):
     @property
     def tonicPitchNameWithCase(self) -> str:
         '''
-        Return the pitch name as a string with the proper case (upper = major; lower = minor)
+        Return the pitch name as a string with the proper case (upper = major; lower = minor).
 
         Useful, but simple:
 
@@ -1093,7 +1093,7 @@ class Key(KeySignature, scale.DiatonicScale):
         >>> k.tonicPitchNameWithCase
         'b'
 
-        Anything else will return the default (capital)
+        Anything else will return the default (capital).
 
         >>> k.mode = 'dorian'
         >>> k.tonicPitchNameWithCase
@@ -1109,7 +1109,7 @@ class Key(KeySignature, scale.DiatonicScale):
     def deriveByDegree(self, degree, pitchRef):
         '''
         Given a degree and pitchReference derive a new
-        Key object that has the same mode but a different tonic
+        Key object that has the same mode but a different tonic.
 
         Example: What minor key has scale degree 3 as B-flat?
 
@@ -1209,7 +1209,7 @@ class Key(KeySignature, scale.DiatonicScale):
         <music21.key.Key of F# major>
 
         Note that this method only exists if the key has come from an analysis method. Otherwise
-        it raises a KeySignatureException
+        it raises a KeySignatureException.
 
         >>> k2 = key.Key('b-')
         >>> k2.tonalCertainty()

@@ -271,7 +271,7 @@ class ToneRow(stream.Stream):
     <music21.serial.ToneRow retrograde_jungfrau>
 
     A ToneRow does not need to have twelve pitches, like this ten-tone row
-    from Ruth Crawford Seeger's String Quartet 1931
+    from Ruth Crawford Seeger's String Quartet 1931.
 
     >>> rcsRow = serial.ToneRow([2, 4, 5, 3, 6, 9, 8, 7, 1, 0])
     >>> rcsRow
@@ -666,7 +666,7 @@ class TwelveToneRow(ToneRow):
         # noinspection PyShadowingNames
         '''
         Returns a :class:`~music21.serial.TwelveToneMatrix` object for the row.
-        That object can just be printed (or displayed via .show())
+        That object can just be printed (or displayed via .show()).
 
         >>> src = serial.getHistoricalRowByName('SchoenbergOp37')
         >>> [p.name for p in src]
@@ -1227,7 +1227,7 @@ def pcToToneRow(pcSet):
     # noinspection GrazieInspection
     '''
     A convenience function that, given a list of pitch classes represented as integers
-    and turns it in to a :class:`~music21.serial.ToneRow` object.
+    and turns it into a :class:`~music21.serial.ToneRow` object.
 
     >>> chromaticRow = serial.pcToToneRow([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11])
     >>> chromaticRow.show('text')
@@ -1295,7 +1295,7 @@ def pcToToneRow(pcSet):
 def rowToMatrix(p: list[int]) -> str:
     # noinspection PyShadowingNames
     '''
-    Takes a list of numbers of converts it to a string representation of a
+    Takes a list of numbers and converts it to a string representation of a
     12-tone matrix.
 
     >>> aMatrix = serial.rowToMatrix([0, 2, 11, 7, 8, 3, 9, 1, 4, 10, 6, 5])
