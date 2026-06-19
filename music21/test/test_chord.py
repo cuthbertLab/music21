@@ -689,8 +689,9 @@ class Test(unittest.TestCase):
 
         # the returned Note is the live component, so mutating it persists
         c[0].volume.velocity = 20
-        self.assertEqual(c[0].volume.velocity, 20)
-        self.assertEqual([n.volume.velocity for n in c][0], 20)
+        c[1].volume.velocity = 80
+        c[2].volume.velocity = 120
+        self.assertEqual([n.volume.velocity for n in c], [20, 80, 120])
 
         # an out-of-range index raises IndexError; an unmatched pitch name raises KeyError
         with self.assertRaises(IndexError):
