@@ -129,7 +129,7 @@ class RepeatExpression(RepeatMark, expressions.Expression):
 
     def applyTextFormatting(self, te=None):
         '''
-        Apply the default text formatting to the text expression version of this repeat
+        Apply the default text formatting to the text expression version of this repeat.
         '''
         if te is None:  # use the stored version if possible
             te = self._textExpression
@@ -179,7 +179,7 @@ class RepeatExpression(RepeatMark, expressions.Expression):
 class RepeatExpressionMarker(RepeatExpression):
     '''
     Some repeat expressions are markers of positions
-    in the score to jump to; these classes model those makers,
+    in the score to jump to; these classes model those markers,
     such as Coda, Segno, and Fine, which are subclassed below.
     '''
 
@@ -393,7 +393,7 @@ class DalSegnoAlCoda(RepeatExpressionCommand):
 
 
 # ------------------------------------------------------------------------------
-# store a list of one each of RepeatExpression objects; these are used for t
+# store a list of one each of RepeatExpression objects; these are used for
 # testing TextExpressions
 # 500 microseconds to run
 repeatExpressionReference = [
@@ -757,14 +757,14 @@ class Expander[StreamType: 'music21.stream.Stream']:
 
     def process(self, deepcopy: bool = True) -> StreamType:
         '''
-        This is the main call for Expander
+        This is the main call for Expander.
 
         Processes all repeats. Note that this processing only
         happens for Measures contained in the given Stream.
         Other objects in that Stream are neither processed nor copied.
 
-        if deepcopy is False then it will leave the stream in an unusual state, but acceptable if
-        the source stream has already been deep-copied and will be discarded later
+        If deepcopy is False then it will leave the stream in an unusual state, but acceptable if
+        the source stream has already been deep-copied and will be discarded later.
         '''
         canExpand = self.isExpandable()
 
@@ -810,7 +810,7 @@ class Expander[StreamType: 'music21.stream.Stream']:
 
     def measureMap(self, returnType='index'):
         '''
-        returns a list where for each measure in the expanded stream, the index of the
+        Returns a list where for each measure in the expanded stream, the index of the
         measure in the original
         stream is given.  if returnType = 'measureNumber' then the str(measureNumber)
         of the original instead of the
@@ -898,7 +898,7 @@ class Expander[StreamType: 'music21.stream.Stream']:
 
     def repeatBarsAreCoherent(self):
         '''
-        Check that all repeat bars are paired properly. Returns True or False
+        Check that all repeat bars are paired properly. Returns True or False.
         '''
         startCount = 0
         endCount = 0
@@ -998,7 +998,7 @@ class Expander[StreamType: 'music21.stream.Stream']:
 
     def _daCapoIsCoherent(self):
         '''
-        Check of a DC statement is coherent.
+        Check if a DC statement is coherent.
         '''
         # there can be only one da capo statement for the provided span
         sumDc = self._dcCount + self._dcafCount + self._dcacCount
@@ -1025,7 +1025,7 @@ class Expander[StreamType: 'music21.stream.Stream']:
 
     def _dalSegnoIsCoherent(self):
         '''
-        Check of a sa segno statement is coherent.
+        Check if a dal segno statement is coherent.
         '''
         # there can be only one da segno statement for the provided span
         sumDs = (self._asCount
@@ -1559,7 +1559,7 @@ class Expander[StreamType: 'music21.stream.Stream']:
         The `repeatBracketsMemo` is a dictionary that stores
         id(rb): rb entries for all RepeatBrackets.
 
-        This is not recursively applied here, but done in __processRecursiveRepeatBars
+        This is not recursively applied here, but done in __processRecursiveRepeatBars.
         '''
         if repeatBracketsMemo is None:
             repeatBracketsMemo = {}
@@ -1667,7 +1667,7 @@ class Expander[StreamType: 'music21.stream.Stream']:
         for data in boundaries:
             # environLocal.printDebug(['processing data bundle:', data])
 
-            # each number in a racket corresponds to one or more repeat
+            # each number in a bracket corresponds to one or more repeat
             # find indices to process and times based on repeat brackets
 
             # TODO: need to pass parameter to keep opening repeat until
@@ -1772,7 +1772,7 @@ class Expander[StreamType: 'music21.stream.Stream']:
         Recursively expand any number of nested repeat bars.
         Will also expand all repeat brackets.
 
-        if makeDeepCopy is True, then it will make a deepcopy of the stream.  Otherwise
+        If makeDeepCopy is True, then it will make a deepcopy of the stream.  Otherwise
         assumes it has already been done.
         '''
         # This assumes just a stream of measures.
@@ -1980,7 +1980,7 @@ class RepeatFinder:
         in quarterLengths.  If there is no pickup, returns 0.0.
 
         Raises an exception if RepeatFinder's internal stream is too short
-        (i.e. fewer than 3 measures long)
+        (i.e. fewer than 3 measures long).
 
         >>> noPickup = corpus.parse('bwv10.7.mxl')
         >>> repeat.RepeatFinder(noPickup).getQuarterLengthOfPickupMeasure()

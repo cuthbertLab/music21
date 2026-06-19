@@ -12,8 +12,8 @@
 # ------------------------------------------------------------------------------
 '''
 Objects to represent unique elements in a score that contain special analysis routines
-to identify certain aspects of music theory. for use especially with theoryAnalyzer, which will
-divide a score up into these segments, returning a list of segments to later analyze
+to identify certain aspects of music theory. For use especially with theoryAnalyzer, which will
+divide a score up into these segments, returning a list of segments to later analyze.
 
 The list of objects included here are:
 
@@ -65,7 +65,7 @@ if t.TYPE_CHECKING:
 class _IntervalCache:
     '''
     The three fixed intervals that VoiceLeadingQuartet compares against when
-    testing for parallels and hidden intervals.  Filled in on first `__init__`
+    testing for parallels and hidden intervals.  Filled in on first `__init__`.
     '''
     unison: interval.Interval = t.cast(interval.Interval, None)
     fifth: interval.Interval = t.cast(interval.Interval, None)
@@ -164,7 +164,7 @@ class VoiceLeadingQuartet(base.Music21Object):
     def key(self) -> Key|None:
         '''
         Get or set the key of this VoiceLeadingQuartet, for use in theory analysis routines
-        such as clausulaVera. Can be None
+        such as clausulaVera. Can be None.
 
         >>> vlq = voiceLeading.VoiceLeadingQuartet('D', 'G', 'B', 'G')
         >>> vlq.key is None
@@ -185,7 +185,7 @@ class VoiceLeadingQuartet(base.Music21Object):
         >>> vlq.key is None
         True
 
-        Incorrect key strings raise VoiceLeadingQuartetExceptions
+        Incorrect key strings raise VoiceLeadingQuartetExceptions.
         '''
         return self._key
 
@@ -293,8 +293,8 @@ class VoiceLeadingQuartet(base.Music21Object):
 
     def motionType(self, *, allowAntiParallel: bool = False) -> MotionType:
         '''
-        returns the type of motion from the MotionType Enum object
-        that exists in this voice leading quartet
+        Returns the type of motion from the MotionType Enum object
+        that exists in this voice leading quartet.
 
         >>> for mt in voiceLeading.MotionType:
         ...     print(repr(mt))
@@ -382,7 +382,7 @@ class VoiceLeadingQuartet(base.Music21Object):
 
     def noMotion(self) -> bool:
         '''
-        Returns True if no voice moves in this "voice-leading" moment
+        Returns True if no voice moves in this "voice-leading" moment.
 
         >>> n1 = note.Note('G4')
         >>> n2 = note.Note('G4')
@@ -591,7 +591,7 @@ class VoiceLeadingQuartet(base.Music21Object):
 
     def contraryMotion(self) -> bool:
         '''
-        Returns True if both voices move in opposite directions
+        Returns True if both voices move in opposite directions.
 
         >>> n1 = note.Note('G4')
         >>> n2 = note.Note('G4')
@@ -645,7 +645,7 @@ class VoiceLeadingQuartet(base.Music21Object):
 
     def outwardContraryMotion(self) -> bool:
         '''
-        Returns True if both voices move outward by contrary motion
+        Returns True if both voices move outward by contrary motion.
 
         >>> n1 = note.Note('D5')
         >>> n2 = note.Note('E5')
@@ -662,7 +662,7 @@ class VoiceLeadingQuartet(base.Music21Object):
 
     def inwardContraryMotion(self) -> bool:
         '''
-        Returns True if both voices move inward by contrary motion
+        Returns True if both voices move inward by contrary motion.
 
         >>> n1 = note.Note('C5')
         >>> n2 = note.Note('B4')
@@ -680,7 +680,7 @@ class VoiceLeadingQuartet(base.Music21Object):
     def antiParallelMotion(self, simpleName: str|interval.Interval|None = None) -> bool:
         '''
         Returns True if the simple interval before is the same as the simple
-        interval after and the motion is contrary. if simpleName is
+        interval after and the motion is contrary. If simpleName is
         specified as an Interval object or a string then it only returns
         true if the simpleName of both intervals is the same as simpleName
         (i.e., use to find antiParallel fifths)
@@ -741,7 +741,7 @@ class VoiceLeadingQuartet(base.Music21Object):
     def parallelInterval(self, thisInterval: interval.Interval) -> bool:
         '''
         Returns True if there is a parallel motion or antiParallel motion of
-        this type (thisInterval should be an Interval object)
+        this type (thisInterval should be an Interval object).
 
         >>> n11 = note.Note('G4')
         >>> n12a = note.Note('A4')  # ascending 2nd
@@ -763,7 +763,7 @@ class VoiceLeadingQuartet(base.Music21Object):
         >>> vlq2.parallelInterval(interval.Interval('P5'))
         True
 
-        But Antiparallel other interval are not:
+        But Antiparallel other intervals are not:
 
         >>> N = note.Note
         >>> vlq2a = voiceLeading.VoiceLeadingQuartet(N('C5'), N('C6'), N('C4'), N('C3'))
@@ -953,13 +953,13 @@ class VoiceLeadingQuartet(base.Music21Object):
     def hiddenFifth(self) -> bool:
         '''
         Calls :meth:`~music21.voiceLeading.VoiceLeadingQuartet.hiddenInterval`
-        by passing a fifth
+        by passing a fifth.
         '''
         return self.hiddenInterval(_intervals.fifth)
 
     def hiddenOctave(self) -> bool:
         '''
-        Calls hiddenInterval by passing an octave
+        Calls hiddenInterval by passing an octave.
         '''
         return self.hiddenInterval(_intervals.octave)
 
@@ -1183,9 +1183,9 @@ class VoiceLeadingQuartet(base.Music21Object):
 
     def leapNotSetWithStep(self) -> bool:
         '''
-        Returns True if there is a leap or skip in once voice then the other voice must
+        Returns True if there is a leap or skip in one voice then the other voice must
         be a step or unison.
-        if neither part skips then False is returned. Returns False if the two voices
+        If neither part skips then False is returned. Returns False if the two voices
         skip thirds in contrary motion.
 
         >>> n1 = note.Note('G4')
@@ -1388,9 +1388,9 @@ class VoiceLeadingQuartetException(exceptions21.Music21Exception):
 
 def getVerticalityFromObject(music21Obj, scoreObjectIsFrom, classFilterList=None):
     '''
-    returns the :class:`~music21.voiceLeading.Verticality` object given a score,
+    Returns the :class:`~music21.voiceLeading.Verticality` object given a score,
     and a music21 object within this score
-    (under development)
+    (under development).
 
     >>> c = corpus.parse('bach/bwv66.6')
     >>> n1 = c.flatten().getElementsByClass(note.Note).first()
@@ -1421,7 +1421,7 @@ def getVerticalityFromObject(music21Obj, scoreObjectIsFrom, classFilterList=None
                   <music21.meter.TimeSignature 4/4>,
                   <music21.note.Note A>]}>
 
-    for getting things at the beginning of scores, probably better to use a classFilterList:
+    For getting things at the beginning of scores, probably better to use a classFilterList:
 
     >>> voiceLeading.getVerticalityFromObject(n1, c,
     ...                      classFilterList=[note.Note, chord.Chord, note.Rest])
@@ -1479,10 +1479,10 @@ class Verticality(base.Music21Object):
 
     _DOC_ATTR: dict[str, str] = {
         'contentDict': '''Dictionary representing contents of Verticalities.
-            the keys of the dictionary
+            The keys of the dictionary
             are the part numbers and the element at each key is a list of
             music21 objects (allows for multiple voices
-            in a single part)''',
+            in a single part).''',
     }
 
     def __init__(self, contentDict: dict|None = None, **keywords):
@@ -1497,10 +1497,10 @@ class Verticality(base.Music21Object):
 
     def isConsonant(self):
         '''
-        evaluates whether this Verticality moment is consonant or dissonant
+        Evaluates whether this Verticality moment is consonant or dissonant
         according to the common-practice
         consonance rules. Method generates chord of all simultaneously sounding pitches, then calls
-        :meth:`~music21.chord.isConsonant`
+        :meth:`~music21.chord.isConsonant`.
 
         >>> V = voiceLeading.Verticality
         >>> N = note.Note
@@ -1522,7 +1522,7 @@ class Verticality(base.Music21Object):
 
     def getChord(self):
         '''
-        extracts all simultaneously sounding pitches (from chords, notes, harmony objects, etc.)
+        Extracts all simultaneously sounding pitches (from chords, notes, harmony objects, etc.)
         and returns
         as a chord. Pretty much returns the Verticality to a chordified output.
 
@@ -1548,9 +1548,9 @@ class Verticality(base.Music21Object):
 
     def makeAllSmallestDuration(self):
         '''
-        locates the smallest duration of all elements in the Verticality
+        Locates the smallest duration of all elements in the Verticality
         and assigns this duration
-        to each element
+        to each element.
 
         >>> n1 =  note.Note('C4')
         >>> n1.quarterLength = 1
@@ -1567,9 +1567,9 @@ class Verticality(base.Music21Object):
 
     def makeAllLargestDuration(self):
         '''
-        locates the largest duration of all elements in the Verticality
+        Locates the largest duration of all elements in the Verticality
         and assigns this duration
-        to each element
+        to each element.
 
         >>> n1 =  note.Note('C4')
         >>> n1.quarterLength = 1
@@ -1586,7 +1586,7 @@ class Verticality(base.Music21Object):
 
     def getShortestDuration(self):
         '''
-        returns the smallest quarterLength that exists among all elements
+        Returns the smallest quarterLength that exists among all elements.
 
         >>> n1 =  note.Note('C4')
         >>> n1.quarterLength = 1
@@ -1602,7 +1602,7 @@ class Verticality(base.Music21Object):
 
     def getLongestDuration(self):
         '''
-        returns the longest duration that exists among all elements
+        Returns the longest duration that exists among all elements.
 
         >>> n1 =  note.Note('C4')
         >>> n1.quarterLength = 1
@@ -1618,7 +1618,7 @@ class Verticality(base.Music21Object):
 
     def changeDurationOfAllObjects(self, newQuarterLength):
         '''
-        changes the duration of all objects in Verticality
+        Changes the duration of all objects in Verticality.
 
         >>> n1 =  note.Note('C4')
         >>> n1.quarterLength = 1
@@ -1638,10 +1638,10 @@ class Verticality(base.Music21Object):
 
     def getObjectsByPart(self, partNum, classFilterList=None):
         '''
-        returns the list of music21 objects associated with a given part number
-        (if more than one). returns
+        Returns the list of music21 objects associated with a given part number
+        (if more than one). Returns
         the single object if only one. Optionally specify which
-        type of objects to return with classFilterList
+        type of objects to return with classFilterList.
 
         >>> vs1 = voiceLeading.Verticality({0: [note.Note('A4'), harmony.ChordSymbol('C')],
         ...                                 1: [note.Note('C')]})
@@ -1671,9 +1671,9 @@ class Verticality(base.Music21Object):
 
     def getObjectsByClass(self, classFilterList, partNums=None):
         '''
-        returns a list of all objects in the Verticality of a type contained
+        Returns a list of all objects in the Verticality of a type contained
         in the classFilterList. Optionally
-        specify part numbers to only search for matching objects
+        specify part numbers to only search for matching objects.
 
         >>> N = note.Note
         >>> vs1 = voiceLeading.Verticality({0: [N('A4'), harmony.ChordSymbol('C')],
@@ -1703,7 +1703,7 @@ class Verticality(base.Music21Object):
     @property
     def objects(self):
         '''
-        return a list of all the music21 objects in the Verticality
+        Return a list of all the music21 objects in the Verticality.
 
         >>> vs1 = voiceLeading.Verticality({0: [harmony.ChordSymbol('C'), note.Note('A4'),],
         ...                                 1: [note.Note('C')]})
@@ -1718,8 +1718,8 @@ class Verticality(base.Music21Object):
 
     def getStream(self):
         '''
-        returns a stream representation of this Verticality. Correct key, meter, and time
-        signatures will be included if they are found in the context of the first part
+        Returns a stream representation of this Verticality. Correct key, meter, and time
+        signatures will be included if they are found in the context of the first part.
 
         >>> vs1 = voiceLeading.Verticality({0: [harmony.ChordSymbol('C'), note.Note('A4'),],
         ...                                 1: [note.Note('C')]})
@@ -1761,7 +1761,7 @@ class Verticality(base.Music21Object):
 
     def getVerticalityOffset(self, *, leftAlign=True):
         '''
-        returns the overall offset of the Verticality. Typically, this would just be the
+        Returns the overall offset of the Verticality. Typically, this would just be the
         offset of each object in the Verticality,
         and each object would have the same offset.
         However, if the duration of one object in the slice is different from
@@ -1771,7 +1771,7 @@ class Verticality(base.Music21Object):
         different. In this case, specify leftAlign=True to return the lowest valued-offset
         of all the objects
         in the Verticality. If you prefer the offset of the right-most starting object,
-        then specify leftAlign=False
+        then specify leftAlign=False.
 
         >>> s = stream.Score()
         >>> n1 = note.Note('A4', quarterLength=1.0)
@@ -1810,7 +1810,7 @@ class Verticality(base.Music21Object):
         return newList[0].lyric
 
     lyric = property(_getLyric, _setLyric, doc='''
-        sets each object on the Verticality to have the passed in lyric
+        Sets each object on the Verticality to have the passed in lyric.
 
         >>> h = voiceLeading.Verticality({1: note.Note('C'), 2: harmony.ChordSymbol('C')})
         >>> h.lyric = 'Verticality 1'
@@ -1830,7 +1830,7 @@ class Verticality(base.Music21Object):
         return self.style.color
 
     color = property(_getColor, _setColor, doc='''
-        sets the color of each element in the Verticality
+        Sets the color of each element in the Verticality.
 
         >>> vs1 = voiceLeading.Verticality({1:note.Note('C'), 2:harmony.ChordSymbol('D')})
         >>> vs1.color = 'blue'
@@ -1841,9 +1841,9 @@ class Verticality(base.Music21Object):
 
 class VerticalityNTuplet(base.Music21Object):
     '''
-    a collection of n number of Verticalities. These objects are useful when
+    A collection of n number of Verticalities. These objects are useful when
     analyzing counterpoint
-    motion and music theory elements such as passing tones
+    motion and music theory elements such as passing tones.
     '''
 
     def __init__(self, listOfVerticalities=(), **keywords):
@@ -1867,7 +1867,7 @@ class VerticalityNTuplet(base.Music21Object):
 
 class VerticalityTriplet(VerticalityNTuplet):
     '''
-    a collection of three Verticalities
+    A collection of three Verticalities.
     '''
     def __init__(self, listOfVerticalities=(), **keywords):
         super().__init__(listOfVerticalities, **keywords)
@@ -1878,7 +1878,7 @@ class VerticalityTriplet(VerticalityNTuplet):
 
     def _calcTNLS(self):
         '''
-        calculates the three note linear segments if only three Verticalities provided
+        Calculates the three note linear segments if only three Verticalities provided.
         '''
         for partNum in range(min(len(self.verticalities[0].getObjectsByClass(note.Note)),
                                     len(self.verticalities[1].getObjectsByClass(note.Note)),
@@ -1895,16 +1895,16 @@ class VerticalityTriplet(VerticalityNTuplet):
 
     def hasPassingTone(self, partNumToIdentify, unaccentedOnly=False):
         '''
-        return true if this Verticality triplet contains a passing tone
+        Return true if this Verticality triplet contains a passing tone.
         music21 currently identifies passing tones by analyzing both horizontal motion
         and vertical motion.
         It first checks to see if the note could be a passing tone based on the notes
         linearly adjacent to it.
         It then checks to see if the note's vertical context is dissonant, while the
         Verticalities
-        to the left and right are consonant
+        to the left and right are consonant.
 
-        partNum is the part (starting with 0) to identify the passing tone
+        partNum is the part (starting with 0) to identify the passing tone.
 
         >>> vs1 = voiceLeading.Verticality({0:note.Note('A4'), 1:note.Note('F2')})
         >>> vs2 = voiceLeading.Verticality({0:note.Note('B-4'), 1:note.Note('F2')})
@@ -1936,17 +1936,17 @@ class VerticalityTriplet(VerticalityNTuplet):
 
     def hasNeighborTone(self, partNumToIdentify, unaccentedOnly=False):
         '''
-        return true if this Verticality triplet contains a neighbor tone
+        Return true if this Verticality triplet contains a neighbor tone.
         music21 currently identifies neighbor tones by analyzing both horizontal motion
         and vertical motion.
         It first checks to see if the note could be a neighbor tone based on the notes
         linearly adjacent to it.
         It then checks to see if the note's vertical context is dissonant,
         while the Verticalities
-        to the left and right are consonant
+        to the left and right are consonant.
 
         partNum is the part (starting with 0) to identify the passing tone
-        for use on 3 Verticalities (3-tuplet)
+        for use on 3 Verticalities (3-tuplet).
 
         >>> vs1 = voiceLeading.Verticality({0:note.Note('E-4'), 1: note.Note('C3')})
         >>> vs2 = voiceLeading.Verticality({0:note.Note('E-4'), 1: note.Note('B2')})
@@ -1972,10 +1972,10 @@ class VerticalityTriplet(VerticalityNTuplet):
 
 class NNoteLinearSegment(base.Music21Object):
     '''
-    a list of n notes strung together in a sequence
+    A list of n notes strung together in a sequence
     noteList = [note1, note2, note3, ..., note-n ] Once this
     object is created with a noteList, the noteList may not
-    be changed
+    be changed.
 
     >>> n = voiceLeading.NNoteLinearSegment(['A', 'C', 'D'])
     >>> n.noteList
@@ -2022,7 +2022,7 @@ class NNoteLinearSegment(base.Music21Object):
         return melodicIntervalList
 
     melodicIntervals = property(_getMelodicIntervals, doc='''
-        calculates the melodic intervals and returns them as a list,
+        Calculates the melodic intervals and returns them as a list,
         with the interval at 0 being the interval between the first and second note.
 
         >>> linSeg = voiceLeading.NNoteLinearSegment([note.Note('A'), note.Note('B'),
@@ -2040,7 +2040,7 @@ class ThreeNoteLinearSegmentException(exceptions21.Music21Exception):
 
 class ThreeNoteLinearSegment(NNoteLinearSegment):
     '''
-    An object consisting of three sequential notes
+    An object consisting of three sequential notes.
 
     The middle tone in a ThreeNoteLinearSegment can
     be classified using methods enclosed in this class
@@ -2073,7 +2073,7 @@ class ThreeNoteLinearSegment(NNoteLinearSegment):
     >>> ex.iRight
     <music21.interval.Interval m10>
 
-    if no octave specified, default octave of 4 is assumed
+    If no octave specified, default octave of 4 is assumed.
 
     >>> ex2 = voiceLeading.ThreeNoteLinearSegment('a', 'b', 'c')
     >>> ex2.n1
@@ -2131,13 +2131,13 @@ class ThreeNoteLinearSegment(NNoteLinearSegment):
 
 
     n1 = property(_getN1, _setN1, doc='''
-        get or set the first note (left-most) in the segment
+        Get or set the first note (left-most) in the segment.
         ''')
     n2 = property(_getN2, _setN2, doc='''
-        get or set the middle note in the segment
+        Get or set the middle note in the segment.
         ''')
     n3 = property(_getN3, _setN3, doc='''
-        get or set the last note (right-most) in the segment
+        Get or set the last note (right-most) in the segment.
         ''')
 
     def _getILeftToRight(self):
@@ -2153,8 +2153,8 @@ class ThreeNoteLinearSegment(NNoteLinearSegment):
         return self.melodicIntervals[1]
 
     iLeftToRight = property(_getILeftToRight, doc='''
-        get the interval between the left-most note and the right-most note
-        (read-only property)
+        Get the interval between the left-most note and the right-most note
+        (read-only property).
 
         >>> tnls = voiceLeading.ThreeNoteLinearSegment('C', 'E', 'G')
         >>> tnls.iLeftToRight
@@ -2162,16 +2162,16 @@ class ThreeNoteLinearSegment(NNoteLinearSegment):
         ''')
 
     iLeft = property(_getILeft, doc='''
-        get the interval between the left-most note and the middle note
-        (read-only property)
+        Get the interval between the left-most note and the middle note
+        (read-only property).
 
         >>> tnls = voiceLeading.ThreeNoteLinearSegment('A', 'B', 'G')
         >>> tnls.iLeft
         <music21.interval.Interval M2>
         ''')
     iRight = property(_getIRight, doc='''
-        get the interval between the middle note and the right-most note
-        (read-only property)
+        Get the interval between the middle note and the right-most note
+        (read-only property).
 
         >>> tnls = voiceLeading.ThreeNoteLinearSegment('A', 'B', 'G')
         >>> tnls.iRight
@@ -2187,13 +2187,13 @@ class ThreeNoteLinearSegment(NNoteLinearSegment):
 
     def couldBePassingTone(self) -> bool:
         '''
-        checks if the two intervals are steps and if these steps
+        Checks if the two intervals are steps and if these steps
         are moving in the same direction. Returns True if the tone is
         identified as either a chromatic passing tone or a diatonic passing
         tone. Only major and minor diatonic passing tones are recognized (not
         pentatonic or scales beyond twelve-notes). Does NOT check if tone is non-harmonic.
 
-        Accepts pitch or note objects; method is dependent on octave information
+        Accepts pitch or note objects; method is dependent on octave information.
 
         >>> voiceLeading.ThreeNoteLinearSegment('C#4', 'D4', 'E-4').couldBePassingTone()
         True
@@ -2206,12 +2206,12 @@ class ThreeNoteLinearSegment(NNoteLinearSegment):
         >>> voiceLeading.ThreeNoteLinearSegment('A3', 'C3', 'D3').couldBePassingTone()
         False
 
-        Directionality must be maintained
+        Directionality must be maintained.
 
         >>> voiceLeading.ThreeNoteLinearSegment('B##3', 'C4', 'D--4').couldBePassingTone()
         False
 
-        If no octave is given then ._defaultOctave is used.  This is generally octave 4
+        If no octave is given then ._defaultOctave is used.  This is generally octave 4.
 
         >>> voiceLeading.ThreeNoteLinearSegment('C', 'D', 'E').couldBePassingTone()
         True
@@ -2262,7 +2262,7 @@ class ThreeNoteLinearSegment(NNoteLinearSegment):
 
     def couldBeChromaticPassingTone(self):
         '''
-        A note could a chromatic passing tone (and therefore a passing tone in general)
+        A note could be a chromatic passing tone (and therefore a passing tone in general)
         if the generic interval between the previous and the current is -2, 1, or 2;
         the generic interval between the current and next is -2, 1, 2; the two generic
         intervals multiply to -2 or 2 (if 4 then it's a diatonic interval; if 1 then
@@ -2296,7 +2296,7 @@ class ThreeNoteLinearSegment(NNoteLinearSegment):
 
     def couldBeNeighborTone(self):
         '''
-        checks if noteToAnalyze could be a neighbor tone, either a diatonic neighbor tone
+        Checks if noteToAnalyze could be a neighbor tone, either a diatonic neighbor tone
         or a chromatic neighbor tone. Does NOT check if tone is non-harmonic.
 
         >>> voiceLeading.ThreeNoteLinearSegment('E3', 'F3', 'E3').couldBeNeighborTone()
@@ -2323,7 +2323,7 @@ class ThreeNoteLinearSegment(NNoteLinearSegment):
     def couldBeDiatonicNeighborTone(self) -> bool:
         '''
         Returns True if and only if noteToAnalyze could be a diatonic neighbor tone, that is,
-        the left and right notes are identical while the middle is a diatonic step up or down
+        the left and right notes are identical while the middle is a diatonic step up or down.
 
         >>> voiceLeading.ThreeNoteLinearSegment('C3', 'D3', 'C3').couldBeDiatonicNeighborTone()
         True
@@ -2342,8 +2342,8 @@ class ThreeNoteLinearSegment(NNoteLinearSegment):
 
     def couldBeChromaticNeighborTone(self) -> bool:
         '''
-        returns True if and only if noteToAnalyze could be a chromatic neighbor tone, that is,
-        the left and right notes are identical while the middle is a chromatic step up or down
+        Returns True if and only if noteToAnalyze could be a chromatic neighbor tone, that is,
+        the left and right notes are identical while the middle is a chromatic step up or down.
 
         >>> voiceLeading.ThreeNoteLinearSegment('C3', 'D3', 'C3').couldBeChromaticNeighborTone()
         False
@@ -2429,7 +2429,7 @@ class TwoChordLinearSegment(NChordLinearSegment):
 
     def rootInterval(self):
         '''
-        returns the chromatic interval between the roots of the two chord symbols
+        Returns the chromatic interval between the roots of the two chord symbols.
 
         >>> h = voiceLeading.TwoChordLinearSegment([harmony.ChordSymbol('C'),
         ...                                         harmony.ChordSymbol('G')])
@@ -2440,7 +2440,7 @@ class TwoChordLinearSegment(NChordLinearSegment):
 
     def bassInterval(self):
         '''
-        returns the chromatic interval between the basses of the two chord symbols
+        Returns the chromatic interval between the basses of the two chord symbols.
 
         >>> h = voiceLeading.TwoChordLinearSegment(harmony.ChordSymbol('C/E'),
         ...                                        harmony.ChordSymbol('G'))

@@ -439,7 +439,7 @@ def figureTuples(chordObject: chord.Chord, keyObject: key.Key) -> list[ChordFigu
      ChordFigureTuple(aboveBass=3, alter=0.0, prefix='', pitch=<music21.pitch.Pitch A-3>),
      ChordFigureTuple(aboveBass=5, alter=1.0, prefix='#', pitch=<music21.pitch.Pitch C#4>)]
 
-    A C dominant-seventh chord in c minor alters the bass but not the 7th degree
+    A C dominant-seventh chord in c minor alters the bass but not the 7th degree.
 
     >>> roman.figureTuples(
     ...     chord.Chord(['E3', 'C4', 'G4', 'B-5']),
@@ -542,7 +542,7 @@ def identifyAsTonicOrDominant(
     Returns the roman numeral string expression (either tonic or dominant) that
     best matches the inChord. Useful when you know inChord is either tonic or
     dominant, but only two pitches are provided in the chord. If neither tonic
-    nor dominant is possibly correct, False is returned
+    nor dominant is possibly correct, False is returned.
 
     >>> roman.identifyAsTonicOrDominant(['B2', 'F5'], key.Key('C'))
     'V65'
@@ -1285,7 +1285,7 @@ class Minor67Default(enum.Enum):
 
     The enumeration `FLAT` means that lowered ^6 is used for the root no matter what.
     (Note that `FLAT` does not mean that the root will have a flat sign on it,
-    for instance, in f-sharp minor, lowered ^6 is D natural. and in a-sharp minor,
+    for instance, in f-sharp minor, lowered ^6 is D natural. And in a-sharp minor,
     lowered ^6 is F#.)
 
     >>> vi('vi', roman.Minor67Default.FLAT)
@@ -1532,7 +1532,7 @@ class RomanNumeral(harmony.Harmony):
 
     For instance, if you prefer a harmonic minor context where VI (or vi) always refers
     to the lowered 6 and viio (or VII) always refers to the raised 7, send along
-    `sixthMinor=roman.Minor67Default.FLAT` and `seventhMinor=roman.Minor67Default.SHARP`
+    `sixthMinor=roman.Minor67Default.FLAT` and `seventhMinor=roman.Minor67Default.SHARP`.
 
     >>> dimHarmonicSeven = roman.RomanNumeral('viio', em, seventhMinor=roman.Minor67Default.SHARP)
     >>> cp(dimHarmonicSeven)
@@ -3783,10 +3783,10 @@ class RomanNumeral(harmony.Harmony):
 
         This list is broadly consistent with (and limited to) borrowing between the major and
         natural minor, except for excluding V (G-B-D) and viio (B-D-F) in minor.
-        There are several borderline caes and this in-/exclusion is all open to debate, of course.
-        The choices here reflect this method's primarily goal to aid anthologizing and
+        There are several borderline cases and this in-/exclusion is all open to debate, of course.
+        The choices here reflect this method's primary goal to aid anthologizing and
         pointing to clear cases of mixture in common practice Classical music.
-        At least in that context, V and viio are not generally regarded as mixure.
+        At least in that context, V and viio are not generally regarded as mixture.
 
         By way of example usage, here are both major and minor versions of the
         tonic and subdominant triads in the major context.

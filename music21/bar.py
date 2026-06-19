@@ -53,7 +53,7 @@ def typeToMusicXMLBarStyle(value):
     '''
     Convert a music21 barline name into the musicxml name --
     essentially just changes the names of 'double' and 'final'
-    to 'light-light' and 'light-heavy'
+    to 'light-light' and 'light-heavy'.
 
     Does not do error checking to make sure it's a valid name,
     since setting the style on a Barline object already does that.
@@ -72,7 +72,7 @@ def standardizeBarType(value):
     '''
     Standardizes bar type names.
 
-    converts all names to lower case, None to 'regular',
+    Converts all names to lower case, None to 'regular',
     and 'light-light' to 'double' and 'light-heavy' to 'final',
     raises an error for unknown styles.
     '''
@@ -175,7 +175,7 @@ class Barline(base.Music21Object):
 
     def musicXMLBarStyle(self):
         '''
-        returns the musicxml style for the bar.  most are the same as
+        Returns the musicxml style for the bar.  Most are the same as
         `.type` but "double" and "final" are different.
 
         >>> b = bar.Barline('tick')
@@ -243,7 +243,7 @@ class Repeat(repeat.RepeatMark, Barline):
 
     The method :meth:`~music21.stream.Part.expandRepeats` on a
     :class:`~music21.stream.Part` object expands the repeats, but
-    does not update measure numbers
+    does not update measure numbers.
 
     >>> q = p.expandRepeats()
     >>> q.show('text')

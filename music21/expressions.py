@@ -58,7 +58,7 @@ def realizeOrnaments(
     keySig: key.KeySignature|None = None
 ):
     '''
-    given a Note or Unpitched with Ornament expressions,
+    Given a Note or Unpitched with Ornament expressions,
     convert them into a list of objects that represents
     the performed version of the object:
 
@@ -149,7 +149,7 @@ class Expression(base.Music21Object):
     @property
     def name(self) -> str:
         '''
-        returns the name of the expression, which is generally the
+        Returns the name of the expression, which is generally the
         class name lowercased and spaces where a new capital occurs.
 
         Subclasses can override this as necessary.
@@ -200,7 +200,7 @@ class RehearsalMark(Expression):
     @staticmethod
     def _getNumberingFromContent(c) -> str|None:
         '''
-        if numbering was not set, get it from the content
+        If numbering was not set, get it from the content.
 
         >>> ex = expressions.RehearsalMark()
         >>> ex._getNumberingFromContent('C')
@@ -255,7 +255,7 @@ class RehearsalMark(Expression):
 
     def nextContent(self):
         '''
-        Return the next content based on the numbering
+        Return the next content based on the numbering.
 
         >>> expressions.RehearsalMark('A').nextContent()
         'B'
@@ -458,7 +458,7 @@ class TextExpression(Expression):
     def __init__(self, content=None, **keywords):
         super().__init__(**keywords)
         # numerous properties are inherited from TextFormat
-        # the text string to be displayed; not that line breaks
+        # the text string to be displayed; note that line breaks
         # are given in the xml with this non-printing character: (#)
         if not isinstance(content, str):
             self._content = str(content)
@@ -587,7 +587,7 @@ class Ornament(Expression):
                 note.Note|note.Unpitched|None,
                 list[note.Note|note.Unpitched]]:
         '''
-        subclassable method call that takes a sourceObject and optional keySig
+        Subclassable method call that takes a sourceObject and optional keySig
         and returns a three-element tuple of a list of notes before the
         "main note" or the result of the expression if it gobbles up the entire note,
         the "main note" itself (or None) to keep processing for ornaments,
@@ -690,7 +690,7 @@ class GeneralMordent(Ornament):
     @property
     def name(self) -> str:
         '''
-        returns the name of the Mordent/InvertedMordent, which is generally
+        Returns the name of the Mordent/InvertedMordent, which is generally
         the class name lowercased, with spaces where a new capital occurs. The
         name also will include any accidental, if it exists.
 
@@ -919,7 +919,7 @@ class GeneralMordent(Ornament):
         '''
         Realize a mordent.
 
-        returns a three-element tuple.
+        Returns a three-element tuple.
         The first is a list of the two notes that the beginning of the note were converted to.
         The second is the rest of the note.
         The third is an empty list (since there are no notes at the end of a mordent).
@@ -1239,7 +1239,7 @@ class WholeStepInvertedMordent(InvertedMordent):
 # ------------------------------------------------------------------------------
 class Trill(Ornament):
     '''
-    A basic trill marker without the trill extension
+    A basic trill marker without the trill extension.
 
     >>> tr = expressions.Trill()
     >>> tr.placement
@@ -1286,7 +1286,7 @@ class Trill(Ornament):
     @property
     def name(self) -> str:
         '''
-        returns the name of the Trill, which is generally the class name
+        Returns the name of the Trill, which is generally the class name
         lowercased, with spaces where a new capital occurs. The name also
         will include the accidental, if it exists.
 
@@ -1480,7 +1480,7 @@ class Trill(Ornament):
         '''
         Updates accidental display for a Trill's ornamental pitch.
         Defined exactly like Pitch.updateAccidentalDisplay, with two changes:
-        Instead of self being the pitch to update, self is an Trill whose
+        Instead of self being the pitch to update, self is a Trill whose
         ornamentalPitch is to be updated; and we pay no attention to ties,
         since ornamental notes cannot be tied.
 
@@ -1584,7 +1584,7 @@ class Trill(Ornament):
                 note.Note|note.Unpitched|None,
                 list[note.Note|note.Unpitched]]:
         '''
-        realize a trill.
+        Realize a trill.
 
         Returns a three-element tuple:
 
@@ -1633,7 +1633,7 @@ class Trill(Ornament):
           <music21.note.Note D>], None, [])
 
         This can lead to certain unusual circumstances such as augmented second trills
-        which are technically correct, but probably not what a performer exprects.
+        which are technically correct, but probably not what a performer expects.
 
         >>> k3 = key.Key('E')
         >>> m.replace(k2, k3)
@@ -1871,9 +1871,9 @@ class Shake(Trill):
 
 class Schleifer(Ornament):
     '''
-    A slide or culee
+    A slide or culee.
 
-    * Changed in v7: size is a Generic second.  removed unused nachschlag component.
+    * Changed in v7: size is a Generic second.  Removed unused nachschlag component.
     '''
     def __init__(self, **keywords):
         super().__init__(**keywords)
@@ -1886,7 +1886,7 @@ class Turn(Ornament):
     '''
     A turn or Gruppetto.
 
-    * Changed in v7: size is a Generic second.  removed unused nachschlag component.
+    * Changed in v7: size is a Generic second.  Removed unused nachschlag component.
     * Changed in v9: Added support for delayed vs non-delayed Turn.
     * Changed in v9: Support upper and lower accidentals on turns. This also adds
       the concept of ornamental pitches that are processed by makeAccidentals.
@@ -1967,7 +1967,7 @@ class Turn(Ornament):
     @property
     def name(self) -> str:
         '''
-        returns the name of the Turn/InvertedTurn, which is generally the class
+        Returns the name of the Turn/InvertedTurn, which is generally the class
         name lowercased, with spaces where a new capital occurs, but also with
         a 'delayed' prefix, if the Turn/InvertedTurn is delayed.  If the delay
         is of a specific duration, the prefix will include that duration. The
@@ -2239,9 +2239,9 @@ class Turn(Ornament):
                list[note.Note|note.Unpitched]]:
         # noinspection PyShadowingNames
         '''
-        realize a turn.
+        Realize a turn.
 
-        returns a three-element tuple.
+        Returns a three-element tuple.
         The first element is an empty list because there are no notes at the start of a turn.
         The second element is the original note with a duration equal to the delay (but if there
         is no delay, the second element is None, because the turn "eats up" the entire note).
@@ -2458,12 +2458,12 @@ class GeneralAppoggiatura(Ornament):
                 note.Note|note.Unpitched|None,
                 list[note.Note|note.Unpitched]]:
         '''
-        realize an appoggiatura
+        Realize an appoggiatura.
 
-        returns a three-element tuple.
+        Returns a three-element tuple.
         The first is the list of notes that the grace note was converted to.
-        The second is the rest of the note
-        The third is an empty list (since there are no notes at the end of an appoggiatura)
+        The second is the rest of the note.
+        The third is an empty list (since there are no notes at the end of an appoggiatura).
 
         >>> n1 = note.Note('C4')
         >>> n1.quarterLength = 0.5
@@ -2606,7 +2606,7 @@ class Tremolo(Ornament):
                 note.Note|note.Unpitched|None,
                 list[note.Note|note.Unpitched]]:
         '''
-        Realize the ornament
+        Realize the ornament.
 
         >>> n = note.Note(type='quarter')
         >>> trem = expressions.Tremolo()
@@ -2700,8 +2700,8 @@ class TrillExtensionException(exceptions21.Music21Exception):
 
 class TrillExtension(spanner.Spanner):
     '''
-    A wavy line trill extension, placed between two notes. N
-    ote that some MusicXML readers include a trill symbol with the wavy line.
+    A wavy line trill extension, placed between two notes.
+    Note that some MusicXML readers include a trill symbol with the wavy line.
 
     >>> s = stream.Stream()
     >>> s.repeatAppend(note.Note(), 8)

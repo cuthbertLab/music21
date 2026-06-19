@@ -126,7 +126,7 @@ class Derivation(SlottedObjectMixin):
         from <music21.stream.Stream OriginalStream> via 'measure'>
 
     But deleting the client stream changes the Derivation, since client is held by weak ref,
-    and will also delete the origin (so long as client was ever set)
+    and will also delete the origin (so long as client was ever set).
 
     >>> del s1
     >>> unused = gc.collect()  # ensure Garbage collection is run
@@ -163,7 +163,7 @@ class Derivation(SlottedObjectMixin):
     def __deepcopy__(self, memo=None):
         '''
         Manage deepcopying by creating a new reference to the same object. If
-        the origin no longer exists, than origin is set to None
+        the origin no longer exists, then origin is set to None.
         '''
         new = type(self)()
         new.client = self.client
@@ -172,7 +172,7 @@ class Derivation(SlottedObjectMixin):
 
     def __repr__(self):
         '''
-        representation of the Derivation
+        Representation of the Derivation.
         '''
         klass = self.__class__.__name__
         via = f' via {self.method!r}' if self.method else ''

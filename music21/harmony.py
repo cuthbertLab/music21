@@ -274,13 +274,13 @@ class Harmony(chord.Chord):
     # PROTECTED METHODS #
     def _parseFigure(self):
         '''
-        subclass this in extensions (protected in TypeScript/Java speak)
+        Subclass this in extensions (protected in TypeScript/Java speak).
         '''
         return
 
     def _updatePitches(self):
         '''
-        subclass this in extensions (protected in TypeScript/Java speak)
+        Subclass this in extensions (protected in TypeScript/Java speak).
         '''
         return
 
@@ -1208,9 +1208,9 @@ def chordSymbolFigureFromChord(inChord: chord.Chord, includeChordType=False):
         '''
         inChord is the chord the user submits to analyze,
         givenChordNum is the chord type that the method is currently looking at
-        to determine if it could be a match for inChord
+        to determine if it could be a match for inChord.
 
-        the corresponding semitones are compared, and if they do not match it is determined
+        The corresponding semitones are compared, and if they do not match it is determined
         whether this is a permitted omission, etc.
 
         '''
@@ -1535,7 +1535,7 @@ class ChordSymbol(Harmony):
     You can also create a Chord Symbol by writing out each degree,
     and any alterations to that degree:
 
-    You must explicitly indicate EACH degree (a triad is NOT necessarily implied)
+    You must explicitly indicate EACH degree (a triad is NOT necessarily implied).
 
     >>> [str(p) for p in harmony.ChordSymbol('C35b7b9#11b13').pitches]
     ['C2', 'E2', 'G2', 'D-3', 'F#3', 'A-3', 'B-3']
@@ -1543,7 +1543,7 @@ class ChordSymbol(Harmony):
     >>> [str(p) for p in harmony.ChordSymbol('C35911').pitches]
     ['C2', 'E2', 'G2', 'D3', 'F3']
 
-    to prevent ambiguity in notation and in accordance with the rest of music21,
+    To prevent ambiguity in notation and in accordance with the rest of music21,
     if a root or bass is flat, the '-' must be used, and NOT 'b'. However, alterations and chord
     abbreviations are specified normally with the 'b' and '#' signs.
 
@@ -1593,7 +1593,7 @@ class ChordSymbol(Harmony):
     >>> cs.figure
     'Eo7/C'
 
-    And now, and example of parsing in the wild:
+    And now, an example of parsing in the wild:
 
     >>> s = corpus.parse('leadsheet/fosterBrownHair')
     >>> initialSymbols = s.flatten().getElementsByClass(harmony.ChordSymbol)[0:5]
@@ -1724,8 +1724,8 @@ class ChordSymbol(Harmony):
 
         def typeAdd(hD):
             '''
-            change the pitches list based on this chordStepModification, adding
-            a pitch
+            Change the pitches list based on this chordStepModification, adding
+            a pitch.
             '''
             pitchToAppend = sc.pitchFromDegree(hD.degree, rootPitch)
             if hD.interval and hD.interval.semitones != 0:
@@ -1780,7 +1780,7 @@ class ChordSymbol(Harmony):
 
         def typeSubtract(hD):
             '''
-            change the pitches list based on this chordStepModification, removing a pitch
+            Change the pitches list based on this chordStepModification, removing a pitch.
             '''
             degrees = self._degreesList
             if not degrees:
@@ -1927,7 +1927,7 @@ class ChordSymbol(Harmony):
 
     def _notationString(self):
         '''
-        returns NotationString of ChordSymbolObject which dictates which scale
+        Returns NotationString of ChordSymbolObject which dictates which scale
         degrees and how those scale degrees are altered in this chord.
 
         >>> h = harmony.ChordSymbol('F-dim7')
@@ -2223,7 +2223,7 @@ class ChordSymbol(Harmony):
         >>> h.figure
         'FN6/D-'
 
-        Thanks to Norman Schmidt for code sample and helping fix a bug
+        Thanks to Norman Schmidt for code sample and helping fix a bug.
 
         >>> foster = corpus.parse('leadsheet/fosterBrownHair.xml')
         >>> foster = foster.parts[0].getElementsByClass(stream.Measure)
@@ -2676,7 +2676,7 @@ class Test(unittest.TestCase):
 
     def testHarmonyPreservesInversionAndBass(self):
         '''
-        Test that bass is preserved even when both bass and inversion are given
+        Test that bass is preserved even when both bass and inversion are given.
         '''
         explicitFm6 = ChordSymbol(root='F', bass='A-', inversion=1, kind='minor')
         self.assertEqual(explicitFm6.inversion(), 1)
@@ -3211,7 +3211,7 @@ class Test(unittest.TestCase):
 
     def x_testPower(self):
         '''
-        power chords should not have inversions
+        Power chords should not have inversions.
         '''
         pitches = ('E2', 'A2', 'E3')
         pitches = tuple(pitch.Pitch(p) for p in pitches)

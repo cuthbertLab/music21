@@ -341,7 +341,7 @@ def _getEqualityAttributes(cls) -> frozenset[str]:
 class Music21Object(prebase.ProtoM21Object):
     '''
     Music21Object is the base class for all elements that can go into Streams.
-    Notes, Clefs, TimeSignatures are all sublcasses of Music21Object.  Durations
+    Notes, Clefs, TimeSignatures are all subclasses of Music21Object.  Durations
     and Pitches (which need to be attached to Notes, etc.) are not.
 
     All music21 objects have these pieces of information:
@@ -381,7 +381,7 @@ class Music21Object(prebase.ProtoM21Object):
 
     Their offset, activeSite, id, and groups do not matter for equality.
 
-    Since these two objects are therefore not interchangable, they do not have
+    Since these two objects are therefore not interchangeable, they do not have
     the same hash value.
 
     >>> obj1 = base.Music21Object(id='obj1')
@@ -391,7 +391,7 @@ class Music21Object(prebase.ProtoM21Object):
     >>> hash(obj1) == hash(obj2)
     False
 
-    This has the stange side effect that structures that use equality to
+    This has the strange side effect that structures that use equality to
     report containment (such as lists and tuples) will report differently from
     structures that use hash values to report containment (such as dicts and sets):
 
@@ -463,7 +463,7 @@ class Music21Object(prebase.ProtoM21Object):
             references to Streams that hold this object.''',
         'isStream': '''Boolean value for quickly identifying
             :class:`~music21.stream.Stream` objects (False by default).''',
-        'classSortOrder': '''Property which returns an number (int or otherwise)
+        'classSortOrder': '''Property which returns a number (int or otherwise)
             depending on the class of the Music21Object that
             represents a priority for an object based on its class alone --
             used as a tie for stream sorting in case two objects have the
@@ -1293,7 +1293,7 @@ class Music21Object(prebase.ProtoM21Object):
         # TODO: how can this be optimized to not use getSites, to
         # not unwrap weakrefs?
         for s in self.sites.yieldSites(excludeNone=True):
-            # of the site does not actually have this Music21Object in
+            # if the site does not actually have this Music21Object in
             # its elements list, it is an orphan and should be removed
             # note: this permits non-site context Streams to continue
             if s.isStream and self not in s:
@@ -3357,7 +3357,7 @@ class Music21Object(prebase.ProtoM21Object):
         that are partitioned and tied with the specified quarter
         length list durations.
 
-        THe SplitTuple will also have a .spannerList which
+        The SplitTuple will also have a .spannerList which
         contains a list of spanner created during the split, such as by splitting a trill
         note into more than one trill.
 
@@ -3950,7 +3950,7 @@ class Music21Object(prebase.ProtoM21Object):
 
     def _getSeconds(self) -> float:
         from music21 import tempo
-        # do not search of duration is zero
+        # do not search if duration is zero
         if self.duration.quarterLength == 0.0:
             return 0.0
 

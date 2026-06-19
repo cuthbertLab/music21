@@ -14,7 +14,7 @@ easily with immediate visual feedback (see the CANTUS database).
 This module parses chants encoded in Volpiano and can generate Volpiano
 from any music21 Stream.
 
-This module will move to a medren package hopefully by v7
+This module will move to a medren package hopefully by v7.
 '''
 from __future__ import annotations
 
@@ -60,7 +60,7 @@ class LineBreak(base.Music21Object):
 
 class PageBreak(base.Music21Object):
     '''
-    Indicates that the page breaks at this point in the manuscript
+    Indicates that the page breaks at this point in the manuscript.
 
     Denoted by two 7s.
     '''
@@ -69,7 +69,7 @@ class PageBreak(base.Music21Object):
 
 class ColumnBreak(base.Music21Object):
     '''
-    Indicates that the page breaks at this point in the manuscript
+    Indicates that the page breaks at this point in the manuscript.
 
     Denoted by three 7s.
     '''
