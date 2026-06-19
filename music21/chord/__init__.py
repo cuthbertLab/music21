@@ -1888,14 +1888,23 @@ class Chord(ChordBase):
         # noinspection PyShadowingNames
         '''
         Deprecated: get the component with ``Chord[query]`` and read
-        ``.style.color``.  Will be removed in v12.  Unlike this method, direct
-        access does not fall back to the chord's own color.
+        ``.style.color``.  Will be removed in v12.
 
         >>> n = note.Note('C4')
         >>> n.style.color = 'red'
         >>> c = chord.Chord([n, 'E4'])
         >>> c['C4'].style.color
         'red'
+
+        Unlike this method, direct access does not fall back to the chord's own
+        color, but you can reproduce that with ``or``:
+
+        >>> c2 = chord.Chord('C4 E4')
+        >>> c2.style.color = 'blue'
+        >>> print(c2['E4'].style.color)
+        None
+        >>> c2['E4'].style.color or c2.style.color
+        'blue'
         '''
         if isinstance(pitchTarget, str):
             pitchTarget = pitch.Pitch(pitchTarget)
