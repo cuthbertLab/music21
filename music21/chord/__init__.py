@@ -231,7 +231,6 @@ class ChordBase(note.NotRest):
                 else:
                     newNote = note.Note(n)
                 self._notes.append(newNote)
-                # self._notes.append({'pitch':n})
             elif isinstance(n, ChordBase):
                 for newNote in n._notes:
                     self._notes.append(copy.deepcopy(newNote))
@@ -250,7 +249,6 @@ class ChordBase(note.NotRest):
                     self._notes.append(note.Note(n, duration=useDuration))
                 else:
                     self._notes.append(note.Note(n))
-                # self._notes.append({'pitch':music21.pitch.Pitch(n)})
             else:
                 raise TypeError(f'Could not process input argument {n}')
 
@@ -419,8 +417,6 @@ class ChordBase(note.NotRest):
     def tie(self, value: tie.Tie|None) -> None:
         for d in self._notes:
             d.tie = value
-            # set the same instance for each pitch
-            # d['tie'] = value
 
     @property
     def volume(self) -> 'music21.volume.Volume':  # do NOT change to volume.Volume, see setter
@@ -5080,7 +5076,6 @@ class Chord(ChordBase):
         '''
         d = t.cast(Duration|None, self._duration)  # type: ignore
         if d is None and self._notes:
-            # pitchZeroDuration = self._notes[0]['pitch'].duration
             pitchZeroDuration = self._notes[0].duration
             self._duration = pitchZeroDuration
 
