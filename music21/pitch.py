@@ -630,8 +630,8 @@ def simplifyMultipleEnharmonics(
     keyContext: key.KeySignature|None = None
 ) -> list[Pitch]:
     r'''
-    Try to simplify the enharmonic spelling of a list of pitches, pitches,
-    or pitch-class numbers according to a given criterion.
+    Try to simplify the enharmonic spelling of a list of pitch strings,
+    `Pitch` objects, or pitch/pitch-class numbers according to a given criterion.
 
     A function can be passed as the `criterion` argument; it is minimized in a
     greedy, left-to-right fashion.
