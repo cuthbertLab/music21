@@ -18,7 +18,6 @@ Does not handle pickup notes, which are defined simply with an early barline
 '''
 from __future__ import annotations
 
-from io import StringIO
 import pathlib
 import typing as t
 import unittest
@@ -109,7 +108,7 @@ class CapellaImporter:
         self.readCapellaXMLFile(filename)
         mainDom = self.parseXMLText()
         scoreObj = self.systemScoreFromScore(mainDom)
-        if systemScore is True:
+        if systemScore:
             return scoreObj
         else:
             partScore = self.partScoreFromSystemScore(scoreObj)
@@ -140,11 +139,10 @@ class CapellaImporter:
                 'No XML text to parse; call readCapellaXMLFile first.')
         if not isinstance(xmlText, str):
             xmlText = xmlText.decode('utf-8')
-        it = ET.iterparse(StringIO(xmlText))
-        for unused, el in it:
+        rootElement = ET.fromstring(xmlText)
+        for el in rootElement.iter():
             if '}' in el.tag:
                 el.tag = el.tag.split('}', 1)[1]  # strip all namespaces
-        rootElement = t.cast(ET.Element, it.root)  # type: ignore[attr-defined]
         self.mainDom = rootElement
         return rootElement
 
@@ -541,8 +539,7 @@ class CapellaImporter:
         noteNameWithOctave = headElement.attrib['pitch']
         n = note.Note()
         n.nameWithOctave = noteNameWithOctave
-        octave = t.cast(int, n.octave)
-        n.octave = octave - 1  # capella octaves are 1 off
+        n.octave = n.pitch.implicitOctave - 1  # capella octaves are 1 off
 
         alters = headElement.findall('alter')
         if len(alters) > 1:
@@ -622,11 +619,11 @@ class CapellaImporter:
             end = True
 
         tieType = None
-        if begin is True and end is True:
+        if begin and end:
             tieType = 'continue'
-        elif begin is True:
+        elif begin:
             tieType = 'start'
-        elif end is True:
+        elif end:
             tieType = 'stop'
         else:
             return None
@@ -894,7 +891,7 @@ class CapellaImporter:
                         hasRepeatEnd = True
                     if repeatType.find('start') > -1:
                         startRep = bar.Repeat('start')
-                        if hasRepeatEnd is True:
+                        if hasRepeatEnd:
                             startRep.priority = 1
                         barlineList.append(startRep)
             else:
