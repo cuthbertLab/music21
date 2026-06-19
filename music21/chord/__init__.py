@@ -792,6 +792,8 @@ class Chord(ChordBase):
         >>> c[1]
         <music21.note.Note D->
 
+        Indexing by an integer is equivalent to ``c.notes[index]``.
+
         A string is interpreted as a pitch name with octave, and returns the
         first component whose pitch matches:
 
@@ -5104,6 +5106,12 @@ class Chord(ChordBase):
         >>> c1Notes = c1.notes
         >>> c1Notes
         (<music21.note.Note C>, <music21.note.Note E->, <music21.note.Note G>)
+
+        Indexing the chord by an integer returns the same Note (``c[1]`` is
+        ``c.notes[1]``):
+
+        >>> c1[1] is c1.notes[1]
+        True
 
         Note that to set duration independently, a new Duration object needs to
         be created.  Internal notes for Chords created from strings or pitches
