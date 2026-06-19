@@ -775,172 +775,120 @@ class Chord(ChordBase):
     def __hash__(self) -> int:
         return super().__hash__()
 
-    def __getitem__(self, key: int|str|note.Note|pitch.Pitch) -> t.Any:
+    def _noteForKey(self, key: int|str|note.Note|pitch.Pitch) -> note.Note:
         '''
-        Get item makes accessing pitch components for the Chord easier
+        Return the component :class:`~music21.note.Note` matching `key`, where
+        `key` is an index (int), a pitch name with octave (str, e.g. 'D-4'), or
+        a Note or Pitch matched first by identity and then by equality.
+
+        Raises a KeyError if no component matches.  This is the shared lookup
+        used by `__getitem__`, `__setitem__`, `getTie`, and `getVolume`.
+        '''
+        keyErrorStr = f'Cannot access component with: {key!r}'
+        if isinstance(key, int):
+            try:
+                return self._notes[key]
+            except IndexError as exc:
+                raise KeyError(keyErrorStr) from exc
+        if isinstance(key, str):
+            keyUpper = key.upper()
+            for n in self._notes:
+                if n.pitch.nameWithOctave == keyUpper:
+                    return n
+            raise KeyError(keyErrorStr)
+        if isinstance(key, note.Note):
+            for n in self._notes:
+                if n is key:
+                    return n
+            for n in self._notes:
+                if n.pitch == key.pitch:
+                    return n
+            raise KeyError(keyErrorStr)
+        if isinstance(key, pitch.Pitch):
+            for n in self._notes:
+                if n.pitch is key:
+                    return n
+            for n in self._notes:
+                if n.pitch == key:
+                    return n
+            raise KeyError(keyErrorStr)
+        raise KeyError(keyErrorStr)
+
+    def __getitem__(self, key: int|str) -> note.Note:
+        '''
+        Get the component :class:`~music21.note.Note` for an index or pitch name.
 
         >>> c = chord.Chord('C#4 D-4')
-        >>> cSharp = c[0]
-        >>> cSharp
+        >>> c[0]
         <music21.note.Note C#>
+        >>> c[1]
+        <music21.note.Note D->
 
-        >>> c['0.step']
-        'C'
-        >>> c['3.accidental']
-        Traceback (most recent call last):
-        KeyError: "Cannot access component with: '3.accidental'"
+        A string is interpreted as a pitch name with octave, and returns the
+        first component whose pitch matches:
+
+        >>> c['D-4']
+        <music21.note.Note D->
+
+        Out-of-range indices and unmatched pitch names raise a KeyError:
 
         >>> c[5]
         Traceback (most recent call last):
         KeyError: 'Cannot access component with: 5'
 
-        >>> c['D-4']
-        <music21.note.Note D->
-
-        >>> c['D-4.style.color'] is None
-        True
-
-        Getting by note does not do very much:
-
-        >>> c[cSharp]
-        <music21.note.Note C#>
-
-        But we can get from another note
-
-        >>> cSharp2 = note.Note('C#4')
-        >>> cSharp2.duration.quarterLength = 3.0
-        >>> c[cSharp2] is cSharp
-        True
-        >>> c[cSharp2] is cSharp2
-        False
-
-        KeyError is raised if not in chord.
-
-        >>> notInChord = note.Note('G')
-        >>> c[notInChord]
+        >>> c['E4']
         Traceback (most recent call last):
-        KeyError: 'Cannot access component with: <music21.note.Note G>'
+        KeyError: "Cannot access component with: 'E4'"
 
-        >>> c[None]
-        Traceback (most recent call last):
-        KeyError: 'Cannot access component with: None'
+        To read or change an attribute of a component, index to the Note first:
+
+        >>> c[0].step
+        'C'
+
+        * Changed in v11: only an integer index or a pitch-name string is
+          accepted, and a :class:`~music21.note.Note` is always returned.
+          Reading a component attribute through a dotted string (``c['0.step']``)
+          or looking up a component by Note or Pitch object is no longer
+          supported; index to the component and use normal attribute access.
         '''
-        foundNote: note.Note
-        attributes: tuple[str, ...]
-
-        keyErrorStr = f'Cannot access component with: {key!r}'
-        if isinstance(key, str):
-            if '.' in key:
-                key, attrStr = key.split('.', 1)
-                if '.' in attrStr:
-                    attributes = tuple(attrStr.split('.'))
-                else:
-                    attributes = (attrStr,)
-            else:
-                attributes = ()
-
-            try:
-                key = int(key)
-            except ValueError:
-                pass
-
-        else:
-            attributes = ()
-
-        if isinstance(key, int):
-            try:
-                foundNote = self._notes[key]  # must be a number
-            except (KeyError, IndexError) as exc:
-                raise KeyError(keyErrorStr) from exc
-
-        elif isinstance(key, str):
-            key = key.upper()
-            for n in self._notes:
-                if n.pitch.nameWithOctave == key:
-                    foundNote = n
-                    break
-            else:
-                raise KeyError(keyErrorStr)
-        elif isinstance(key, note.Note):
-            for n in self._notes:
-                if n is key:
-                    foundNote = n
-                    break
-            else:
-                for n in self._notes:
-                    if n.pitch == key.pitch:
-                        foundNote = n
-                        break
-                else:
-                    raise KeyError(keyErrorStr)
-        elif isinstance(key, pitch.Pitch):
-            for n in self._notes:
-                if n.pitch is key:
-                    foundNote = n
-                    break
-            else:
-                for n in self._notes:
-                    if n.pitch == key:
-                        foundNote = n
-                        break
-                else:
-                    raise KeyError(keyErrorStr)
-        else:
-            raise KeyError(keyErrorStr)
-
-        if not attributes:
-            return foundNote
-
-        currentValue: t.Any = foundNote
-
-        for attr in attributes:
-            if attr == 'volume':  # special handling
-                # noinspection PyArgumentList
-                currentValue = currentValue._getVolume(forceClient=self)
-            else:
-                currentValue = getattr(currentValue, attr)
-
-        return currentValue
+        return self._noteForKey(key)
 
     def __setitem__(
         self,
-        key: int|str|note.Note|pitch.Pitch,
+        key: int|str,
         value: str|pitch.Pitch|note.Note
     ) -> None:
         '''
-        Change either a note in the chord components, or set an attribute on a
-        component
+        Replace a component, found by index or pitch name, with a new Note
+        (a string or Pitch is converted to a Note).
 
         >>> c = chord.Chord('C4 E4 G4')
         >>> c[0] = note.Note('C#4')
         >>> c
         <music21.chord.Chord C#4 E4 G4>
-        >>> c['0.octave'] = 3
-        >>> c
-        <music21.chord.Chord C#3 E4 G4>
+
         >>> c['E4'] = 'F4'
         >>> c
-        <music21.chord.Chord C#3 F4 G4>
-        >>> c['G4.style.color'] = 'red'
-        >>> c['G4.style.color']
-        'red'
-        >>> c[-1].style.color
-        'red'
+        <music21.chord.Chord C#4 F4 G4>
+
+        Setting a component to something other than a Note, Pitch, or pitch
+        string raises a ValueError:
 
         >>> c[0] = None
         Traceback (most recent call last):
         ValueError: Chord index must be set to a valid note object
-        '''
-        if isinstance(key, str) and '.' in key:
-            keySplit = key.split('.')
-            keyFind = '.'.join(keySplit[0:-1])
-            attr = keySplit[-1]
-            keyObj = self[keyFind]
-            setattr(keyObj, attr, value)
-            return
 
-        keyObj = self[key]
-        keyIndex = self._notes.index(keyObj)
+        To change an attribute of a component, index to the Note first:
+
+        >>> c[0].octave = 3
+        >>> c
+        <music21.chord.Chord C#3 F4 G4>
+
+        * Changed in v11: only an integer index or pitch-name string is accepted
+          as the key; setting a component attribute through a dotted string
+          (``c['0.octave'] = 3``) is no longer supported.
+        '''
+        keyIndex = self._notes.index(self._noteForKey(key))
 
         if isinstance(value, str):
             value = note.Note(value)
@@ -2125,7 +2073,7 @@ class Chord(ChordBase):
         <music21.tie.Tie start>
         '''
         try:
-            return self[p].tie
+            return self._noteForKey(p).tie
         except KeyError:
             return None
 
@@ -2150,7 +2098,7 @@ class Chord(ChordBase):
         music21.chord.ChordException: the given pitch is not in the Chord: G4
         '''
         try:
-            n = self[p]
+            n = self._noteForKey(p)
             # noinspection PyArgumentList
             return n._getVolume(forceClient=self)
         except KeyError:
@@ -4228,12 +4176,12 @@ class Chord(ChordBase):
 
         >>> c = chord.Chord('C4 E4 G4')
         >>> c.setColor('red', 'C4')
-        >>> c['0.style.color']
+        >>> c[0].style.color
         'red'
         >>> c.setColor('blue')  # set for whole chord
         >>> c.style.color
         'blue'
-        >>> c['E4.style.color']
+        >>> c['E4'].style.color
         'blue'
 
         >>> c.setColor('red', 'C9')
@@ -4331,13 +4279,13 @@ class Chord(ChordBase):
 
         >>> c3 = chord.Chord('C3 F4')
         >>> c3.setNotehead('slash', None)
-        >>> c3['0.notehead']
+        >>> c3[0].notehead
         'slash'
 
         Less safe to match by string, but possible:
 
         >>> c3.setNotehead('so', 'F4')
-        >>> c3['1.notehead']
+        >>> c3[1].notehead
         'so'
 
         Error:
@@ -4399,13 +4347,13 @@ class Chord(ChordBase):
 
         >>> c3 = chord.Chord('C3 F4')
         >>> c3.setNoteheadFill(False, None)
-        >>> c3['0.noteheadFill']
+        >>> c3[0].noteheadFill
         False
 
         Less safe to match by string, but possible:
 
         >>> c3.setNoteheadFill(True, 'F4')
-        >>> c3['1.noteheadFill']
+        >>> c3[1].noteheadFill
         True
 
         Error:
@@ -4477,13 +4425,13 @@ class Chord(ChordBase):
 
         >>> c3 = chord.Chord('C3 F4')
         >>> c3.setStemDirection('down', None)
-        >>> c3['0.stemDirection']
+        >>> c3[0].stemDirection
         'down'
 
         Less safe to match by string, but possible:
 
         >>> c3.setStemDirection('down', 'F4')
-        >>> c3['1.stemDirection']
+        >>> c3[1].stemDirection
         'down'
 
         Error:
@@ -5103,7 +5051,10 @@ class Chord(ChordBase):
             return ctn[0]
 
 
-    @property
+    # Override only the getter (to lazily inherit the first note's duration);
+    # the setter is inherited unchanged from Music21Object via ChordBase.duration.
+    # (mypy mis-models a property reached through the class, hence the ignore.)
+    @ChordBase.duration.getter  # type: ignore[attr-defined]
     def duration(self) -> Duration:
         # noinspection PyShadowingNames
         '''
@@ -5135,17 +5086,6 @@ class Chord(ChordBase):
 
         d_out = t.cast(Duration, self._duration)
         return d_out
-
-    @duration.setter
-    def duration(self, durationObj: Duration) -> None:
-        '''
-        Set a Duration object.
-        '''
-        if isinstance(durationObj, Duration):
-            self._duration = durationObj
-        else:
-            # need to permit Duration object assignment here
-            raise ChordException(f'this must be a Duration object, not {durationObj}')
 
     @property  # type: ignore
     @cacheMethod

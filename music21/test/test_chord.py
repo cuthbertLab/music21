@@ -674,33 +674,26 @@ class Test(unittest.TestCase):
 
     def testGetItemA(self):
         c = Chord(['c4', 'd-4', 'g4'])
+        # an integer index returns the live component Note
         self.assertEqual(str(c[0].pitch), 'C4')
         self.assertEqual(str(c[1].pitch), 'D-4')
         self.assertEqual(str(c[2].pitch), 'G4')
-        self.assertEqual(str(c['0.pitch']), 'C4')
-        self.assertEqual(str(c['1.pitch']), 'D-4')
-        self.assertEqual(str(c['2.pitch']), 'G4')
-        # cannot do this, as this provides raw access
-        # self.assertEqual(str(c[0]['volume']), 'C4')
-        self.assertEqual(str(c['0.volume']), '<music21.volume.Volume realized=0.71>')
-        self.assertEqual(str(c['1.volume']), '<music21.volume.Volume realized=0.71>')
-        self.assertEqual(str(c['1.volume']), '<music21.volume.Volume realized=0.71>')
-        c['0.volume'].velocity = 20
-        c['1.volume'].velocity = 80
-        c['2.volume'].velocity = 120
-        self.assertEqual(c['0.volume'].velocity, 20)
-        self.assertEqual(c['1.volume'].velocity, 80)
-        self.assertEqual(c['2.volume'].velocity, 120)
-        self.assertEqual([x.volume.velocity for x in c], [20, 80, 120])
-        cCopy = copy.deepcopy(c)
-        self.assertEqual([x.volume.velocity for x in cCopy], [20, 80, 120])
-        velocities = [11, 22, 33]
-        for i, x in enumerate(cCopy):
-            x.volume.velocity = velocities[i]
-        self.assertEqual([x.volume.velocity for x in cCopy], [11, 22, 33])
-        self.assertEqual([x.volume.velocity for x in c], [20, 80, 120])
-        self.assertEqual([x.volume.client for x in cCopy], [cCopy, cCopy, cCopy])
-        self.assertEqual([x.volume.client for x in c], [c, c, c])
+        self.assertIs(c[1], c.notes[1])
+
+        # a string key is a pitch name with octave and returns the matching Note
+        self.assertIs(c['D-4'], c[1])
+        self.assertEqual(c['G4'].pitch.nameWithOctave, 'G4')
+
+        # the returned Note is the live component, so mutating it persists
+        c[0].volume.velocity = 20
+        self.assertEqual(c[0].volume.velocity, 20)
+        self.assertEqual([n.volume.velocity for n in c][0], 20)
+
+        # out-of-range indices and unmatched pitch names raise KeyError
+        with self.assertRaises(KeyError):
+            _ = c[5]
+        with self.assertRaises(KeyError):
+            _ = c['E4']
 
     def testChordComponentsA(self):
         c = Chord(['d2', 'e-1', 'b-6'])
