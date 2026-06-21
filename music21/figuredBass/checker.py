@@ -24,7 +24,6 @@ from music21.exceptions21 import Music21Exception, Music21ValueError
 
 if t.TYPE_CHECKING:
     from collections.abc import Callable
-    from music21 import base
     from music21 import note
 
 # A vertical sonority observed from a score for voice-leading checking: one
@@ -300,7 +299,6 @@ def checkSinglePossibilities(
                         initOffset,
                         initOffset,
                         mustBeginInSpan=False)[0]
-                    noteA = t.cast('base.Music21Object', noteA)
                     noteA.style.color = color
             if debug is True:
                 debugInfo.append(f'{offsets!s:25}{partNumberTuple!s}')
@@ -373,8 +371,9 @@ def checkConsecutivePossibilities(
                         initOffsetA, initOffsetA, mustBeginInSpan=False).first()
                     noteB = allParts[partNumber - 1].getElementsByOffset(
                         initOffsetB, initOffsetB, mustBeginInSpan=False).first()
-                    noteA = t.cast('base.Music21Object', noteA)
-                    noteB = t.cast('base.Music21Object', noteB)
+                    if noteA is None or noteB is None:
+                        raise Music21Exception(
+                            'Expected notes to color at the violation offset, but found none')
                     noteA.style.color = color
                     noteB.style.color = color
             if debug is True:
