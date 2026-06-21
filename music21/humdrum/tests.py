@@ -81,6 +81,33 @@ class Test(unittest.TestCase):
         self.assertEqual(b.duration.dots, 0)
         self.assertEqual(b.duration.tuplets[0].durationNormal.dots, 2)
 
+    def testGraceNote(self):
+        ks = KernSpine()
+        # noinspection SpellCheckingInspection
+        a = ks.processNoteEvent('4Cq')
+        self.assertEqual(a.duration.type, 'quarter')
+        self.assertEqual(a.duration.slash, True)
+
+    def testGraceNote2(self):
+        ks = KernSpine()
+        # noinspection SpellCheckingInspection
+        a = ks.processNoteEvent('16Cqq')
+        self.assertEqual(a.duration.type, '16th')
+        self.assertEqual(a.duration.slash, False)
+
+    def testChord(self):
+        ks = KernSpine()
+        # noinspection SpellCheckingInspection
+        c = ks.processChordEvent('8C 8E')
+        self.assertEqual(len(c.notes), 2)
+        self.assertEqual(c.notes[0].duration, c.duration)
+
+    def testChord2(self):
+        # noinspection SpellCheckingInspection
+        ks = KernSpine()
+        c = ks.processChordEvent('8C E')
+        self.assertEqual(c.notes[0].duration, c.notes[1].duration)
+
     def testMeasureBoundaries(self):
         m0 = stream.Measure()
         m1 = hdStringToMeasure('=29a;:|:', m0)
