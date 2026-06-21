@@ -2507,13 +2507,13 @@ def hdStringToNote(contents: str,
         thisObject.articulations.append(articulations.DownBow())
 
     # 3.2.9 Grace Notes and Groupettos
-    if (qCount := contents.count('q')):
+    qCount = contents.count('q')
+    if qCount or 'Q' in contents:
         thisObject.getGrace(inPlace=True)
-        if qCount == 2:
-            thisObject.duration.slash = False  # type: ignore
-    elif 'Q' in contents:
-        thisObject.getGrace(inPlace=True)
-        thisObject.duration.slash = False  # type: ignore
+        # != 1: number of q's == 0 (because it's a capital Q) or 2+ (== qq)
+        if qCount != 1:
+            graceDuration = t.cast(duration.GraceDuration, thisObject.duration)
+            graceDuration.slash = False
     elif 'P' in contents:
         thisObject.getGrace(appoggiatura=True, inPlace=True)
     # elif 'p' in contents:
