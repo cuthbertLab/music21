@@ -107,6 +107,33 @@ class Test(unittest.TestCase):
         ks = KernSpine()
         c = ks.processChordEvent('8C E')
         self.assertEqual(c.notes[0].duration, c.notes[1].duration)
+    def testGraceNoteKeepsWrittenDuration(self):
+        '''
+        A single `q` is a slashed grace note that keeps its written duration
+        '''
+        n = SpineEvent('16ccq').toNote()
+        self.assertTrue(n.duration.isGrace)
+        self.assertEqual(n.duration.type, '16th')
+        self.assertTrue(n.duration.slash)
+
+    def testUnslashedGraceNote(self):
+        '''
+        `qq` or `Q` marks two kinds of unslashed grace note.
+        '''
+        for contents in ('16ccqq', '16ccQ'):
+            n = SpineEvent(contents).toNote()
+            self.assertTrue(n.duration.isGrace)
+            self.assertEqual(n.duration.type, '16th')
+            self.assertFalse(n.duration.slash)
+
+    def testGraceNoteWithoutDurationDefaultsToEighth(self):
+        '''
+        With no written duration a grace note defaults to an eighth.
+        '''
+        n = SpineEvent('ccq').toNote()
+        self.assertTrue(n.duration.isGrace)
+        self.assertEqual(n.duration.type, 'eighth')
+        self.assertTrue(n.duration.slash)
 
     def testMeasureBoundaries(self):
         m0 = stream.Measure()
@@ -226,8 +253,6 @@ class Test(unittest.TestCase):
         spines (split indicator immediately *after* the =2 barline) with a half
         note on each, merges back to one spine before =3, and m3 has a single
         half note.
-
-        Test is AI-assisted.
         '''
         krn = re.sub(r'\s\s\s\s+', '\t', r'''
 **kern
@@ -271,8 +296,6 @@ class Test(unittest.TestCase):
         *before* the =2 barline (the barline therefore appears within both new
         spines).  Humdrum syntax permits this; only adjacency rules constrain
         spine path indicators.
-
-        Test is AI-assisted.
         '''
         krn = re.sub(r'\s\s\s\s+', '\t', r'''
 **kern
@@ -320,8 +343,6 @@ class Test(unittest.TestCase):
         Expected layout: one Part with three Measures, each two quarters long;
         m1 has no voices, m2 and m3 each have two voices with one half note
         each.
-
-        Test is AI-assisted.
         '''
         krn = re.sub(r'\s\s\s\s+', '\t', r'''
 **kern
@@ -368,8 +389,6 @@ class Test(unittest.TestCase):
         '''
         ``**dynam`` events on the same line as a kern note attach at that note's
         offset.  Sanity-check companion to testDynamAttachedMisaligned.
-
-        Test is AI-assisted.
         '''
         krn = re.sub(r'\s\s\s\s+', '\t', r'''
 **kern    **dynam
@@ -399,8 +418,6 @@ class Test(unittest.TestCase):
         event) should still attach -- to the stream at the offset of the most
         recently-sounding note.  Currently fails: misaligned dynamics are
         silently dropped.  See TODO in `SpineCollection.attachNonKernEvents`.
-
-        Test is AI-assisted.
         '''
         krn = re.sub(r'\s\s\s\s+', '\t', r'''
 **kern    **dynam
@@ -433,8 +450,6 @@ class Test(unittest.TestCase):
         attach -- to the stream at the offset of the most recently-sounding
         note.  Currently fails: misaligned harm events are silently dropped.
         See TODO in `SpineCollection.attachNonKernEvents`.
-
-        Test is AI-assisted.
         '''
         krn = re.sub(r'\s\s\s\s+', '\t', r'''
 **kern    **harm
@@ -466,8 +481,6 @@ class Test(unittest.TestCase):
         '''
         Blank lines should not affect parsing.  Same shape as
         testSplitAfterBarline but with blank lines sprinkled throughout.
-
-        Test is AI-assisted.
         '''
         krn = re.sub(r'\s\s\s\s+', '\t', r'''
 
@@ -509,8 +522,6 @@ class Test(unittest.TestCase):
         '''
         Blank lines mixed into a kern + dynam + harm piece should not affect
         which events attach where.
-
-        Test is AI-assisted.
         '''
         krn = re.sub(r'\s\s\s\s+', '\t', r'''
 **kern    **dynam    **harm
@@ -548,8 +559,6 @@ class Test(unittest.TestCase):
         Verify that each lyric syllable from a ``**text`` spine attaches to the
         kern note on the same line.  Existing testLyricsInSpine only checks
         the assembled lyric string; this checks the per-note mapping.
-
-        Test is AI-assisted.
         '''
         krn = re.sub(r'\s\s\s\s+', '\t', r'''
 **kern    **text
