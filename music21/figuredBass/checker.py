@@ -13,18 +13,17 @@ import copy
 import typing as t
 import unittest
 
+from music21 import note
 from music21 import pitch
 from music21 import stream
 from music21 import voiceLeading
 from music21.common.numberTools import opFrac
 from music21.common.types import OffsetQL
-from music21.figuredBass import possibility
 from music21.figuredBass.possibility import PitchQuartetToBool
-from music21.exceptions21 import Music21Exception, Music21ValueError
+from music21.exceptions21 import Music21Exception
 
 if t.TYPE_CHECKING:
     from collections.abc import Callable
-    from music21 import note
 
 # A vertical sonority observed from a score for voice-leading checking: one
 # element per part, each a Pitch or the rest placeholder 'RT' returned by
@@ -36,22 +35,6 @@ type OffsetEndTime = tuple[OffsetQL, OffsetQL]
 # (partNumberA, partNumberB) one-indexed voice pair forming a violation.
 type PartPair = tuple[int, int]
 
-
-def possibilityIsPitchOnlyOrRaise(possib: PossibilityWithRests) -> possibility.Possibility:
-    '''
-    Return `possib` narrowed to a pitch-only
-    :obj:`~music21.figuredBass.possibility.Possibility`, or raise
-    :class:`~music21.exceptions21.Music21ValueError` if it contains an 'RT' rest
-    placeholder.
-
-    The voice-leading checks here do not support possibilities with rests. Raising
-    is deliberate: silently returning an empty list would falsely imply that no
-    violations were found.
-    '''
-    if any(isinstance(element, str) for element in possib):
-        raise Music21ValueError(
-            'voice-leading checks do not support possibilities with rests')
-    return t.cast('possibility.Possibility', possib)
 
 # ------------------------------------------------------------------------------
 # Parsing scores into voice leading moments (a.k.a. harmonies)
@@ -417,12 +400,15 @@ def voiceCrossing(possibA: PossibilityWithRests) -> list[PartPair]:
     >>> checker.voiceCrossing(possibA2)
     []
     '''
-    possibA = possibilityIsPitchOnlyOrRaise(possibA)
     partViolations: list[PartPair] = []
     for part1Index in range(len(possibA)):
         higherPitch = possibA[part1Index]
+        if not isinstance(higherPitch, pitch.Pitch):
+            continue
         for part2Index in range(part1Index + 1, len(possibA)):
             lowerPitch = possibA[part2Index]
+            if not isinstance(lowerPitch, pitch.Pitch):
+                continue
             if higherPitch < lowerPitch:
                 partViolations.append((part1Index + 1, part2Index + 1))
     return partViolations
@@ -479,15 +465,21 @@ def parallelFifths(possibA: PossibilityWithRests, possibB: PossibilityWithRests)
     >>> checker.parallelFifths(possibA2, possibB2)
     []
     '''
-    possibA = possibilityIsPitchOnlyOrRaise(possibA)
-    possibB = possibilityIsPitchOnlyOrRaise(possibB)
     partViolations: list[PartPair] = []
-    pairsList = possibility.partPairs(possibA, possibB)
+    pairsList = list(zip(possibA, possibB))
 
     for pair1Index in range(len(pairsList)):
         (higherPitchA, higherPitchB) = pairsList[pair1Index]
+        if not isinstance(higherPitchA, pitch.Pitch):
+            continue
+        if not isinstance(higherPitchB, pitch.Pitch):
+            continue
         for pair2Index in range(pair1Index + 1, len(pairsList)):
             (lowerPitchA, lowerPitchB) = pairsList[pair2Index]
+            if not isinstance(lowerPitchA, pitch.Pitch):
+                continue
+            if not isinstance(lowerPitchB, pitch.Pitch):
+                continue
             if not abs(higherPitchA.ps - lowerPitchA.ps) % 12 == 7:
                 continue
             if not abs(higherPitchB.ps - lowerPitchB.ps) % 12 == 7:
@@ -555,12 +547,18 @@ def hiddenFifth(possibA: PossibilityWithRests, possibB: PossibilityWithRests) ->
     >>> checker.hiddenFifth(possibA3, possibB3)
     []
     '''
-    possibA = possibilityIsPitchOnlyOrRaise(possibA)
-    possibB = possibilityIsPitchOnlyOrRaise(possibB)
     partViolations: list[PartPair] = []
-    pairsList = possibility.partPairs(possibA, possibB)
+    pairsList = list(zip(possibA, possibB))
     (highestPitchA, highestPitchB) = pairsList[0]
     (lowestPitchA, lowestPitchB) = pairsList[-1]
+    if not isinstance(highestPitchA, pitch.Pitch):
+        return partViolations
+    if not isinstance(highestPitchB, pitch.Pitch):
+        return partViolations
+    if not isinstance(lowestPitchA, pitch.Pitch):
+        return partViolations
+    if not isinstance(lowestPitchB, pitch.Pitch):
+        return partViolations
 
     if abs(highestPitchB.ps - lowestPitchB.ps) % 12 == 7:
         # Very high probability of hidden fifth, but still not certain.
@@ -623,15 +621,21 @@ def parallelOctaves(possibA: PossibilityWithRests, possibB: PossibilityWithRests
     >>> checker.parallelOctaves(possibA2, possibB2)
     []
     '''
-    possibA = possibilityIsPitchOnlyOrRaise(possibA)
-    possibB = possibilityIsPitchOnlyOrRaise(possibB)
     partViolations: list[PartPair] = []
-    pairsList = possibility.partPairs(possibA, possibB)
+    pairsList = list(zip(possibA, possibB))
 
     for pair1Index in range(len(pairsList)):
         (higherPitchA, higherPitchB) = pairsList[pair1Index]
+        if not isinstance(higherPitchA, pitch.Pitch):
+            continue
+        if not isinstance(higherPitchB, pitch.Pitch):
+            continue
         for pair2Index in range(pair1Index + 1, len(pairsList)):
             (lowerPitchA, lowerPitchB) = pairsList[pair2Index]
+            if not isinstance(lowerPitchA, pitch.Pitch):
+                continue
+            if not isinstance(lowerPitchB, pitch.Pitch):
+                continue
             if not abs(higherPitchA.ps - lowerPitchA.ps) % 12 == 0:
                 continue
             if not abs(higherPitchB.ps - lowerPitchB.ps) % 12 == 0:
@@ -689,12 +693,18 @@ def hiddenOctave(possibA: PossibilityWithRests, possibB: PossibilityWithRests) -
     >>> checker.hiddenOctave(possibA2, possibB2)
     []
     '''
-    possibA = possibilityIsPitchOnlyOrRaise(possibA)
-    possibB = possibilityIsPitchOnlyOrRaise(possibB)
     partViolations: list[PartPair] = []
-    pairsList = possibility.partPairs(possibA, possibB)
+    pairsList = list(zip(possibA, possibB))
     (highestPitchA, highestPitchB) = pairsList[0]
     (lowestPitchA, lowestPitchB) = pairsList[-1]
+    if not isinstance(highestPitchA, pitch.Pitch):
+        return partViolations
+    if not isinstance(highestPitchB, pitch.Pitch):
+        return partViolations
+    if not isinstance(lowestPitchA, pitch.Pitch):
+        return partViolations
+    if not isinstance(lowestPitchB, pitch.Pitch):
+        return partViolations
 
     if abs(highestPitchB.ps - lowestPitchB.ps) % 12 == 0:
         # Very high probability of hidden octave, but still not certain.
@@ -730,9 +740,8 @@ def generalNoteToPitch(music21GeneralNote: note.GeneralNote) -> pitch.Pitch | t.
     >>> figuredBass.checker.generalNoteToPitch(c1)
     'RT'
     '''
-    if music21GeneralNote.isNote:
-        thisNote = t.cast('note.Note', music21GeneralNote)
-        return thisNote.pitch
+    if isinstance(music21GeneralNote, note.Note):
+        return music21GeneralNote.pitch
     else:
         return 'RT'
 
