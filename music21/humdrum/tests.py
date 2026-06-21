@@ -83,6 +83,7 @@ class Test(unittest.TestCase):
 
     def testGraceNote(self):
         ks = KernSpine()
+        ks.parse()
         # noinspection SpellCheckingInspection
         a = ks.processNoteEvent('4Cq')
         self.assertEqual(a.duration.type, 'quarter')
@@ -90,6 +91,7 @@ class Test(unittest.TestCase):
 
     def testGraceNote2(self):
         ks = KernSpine()
+        ks.parse()
         # noinspection SpellCheckingInspection
         a = ks.processNoteEvent('16Cqq')
         self.assertEqual(a.duration.type, '16th')
@@ -97,6 +99,7 @@ class Test(unittest.TestCase):
 
     def testChord(self):
         ks = KernSpine()
+        ks.parse()
         # noinspection SpellCheckingInspection
         c = ks.processChordEvent('8C 8E')
         self.assertEqual(len(c.notes), 2)
@@ -105,8 +108,10 @@ class Test(unittest.TestCase):
     def testChord2(self):
         # noinspection SpellCheckingInspection
         ks = KernSpine()
+        ks.parse()
         c = ks.processChordEvent('8C E')
         self.assertEqual(c.notes[0].duration, c.notes[1].duration)
+
     def testGraceNoteKeepsWrittenDuration(self):
         '''
         A single `q` is a slashed grace note that keeps its written duration
