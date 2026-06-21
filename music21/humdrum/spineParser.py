@@ -1424,7 +1424,7 @@ class KernSpine(HumdrumSpine):
         # multipleNotes
         notesToProcess = eventC.split()
         chordNotes: list[note.Note] = []
-        defaultDuration: duration.Duration|None = None  # used for non-first notes without a duration
+        defaultDuration: duration.Duration|None = None  # for non-first notes without a duration
         for i, noteToProcess in enumerate(notesToProcess):
             thisNote = hdStringToNote(noteToProcess, defaultDuration)
             if isinstance(thisNote, note.Note):
