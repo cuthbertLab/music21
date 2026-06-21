@@ -1423,12 +1423,26 @@ class KernSpine(HumdrumSpine):
         # multipleNotes
         notesToProcess = eventC.split()
         chordNotes: list[note.Note] = []
+        # A note after the first that omits a duration, or just repeats the first
+        # note's, shares its Duration object.  A note with a genuinely different
+        # duration (the held `2g` in `4G 4e 2g`) keeps its own.
+        firstDuration: duration.Duration|None = None
+        firstDurationChars = ''
         for noteToProcess in notesToProcess:
-            thisNote = hdStringToNote(noteToProcess)
+            durationChars = ''.join(c for c in noteToProcess if c in '0123456789.%')
+            if firstDuration is not None and durationChars in ('', firstDurationChars):
+                # drop the repeated duration so the note reuses firstDuration
+                bareContents = re.sub(r'[0-9.%]', '', noteToProcess)
+                thisNote = hdStringToNote(bareContents, firstDuration)
+            else:
+                thisNote = hdStringToNote(noteToProcess)
+                if firstDuration is None:
+                    firstDuration = thisNote.duration
+                    firstDurationChars = durationChars
             if isinstance(thisNote, note.Note):
                 chordNotes.append(thisNote)
-        eventChord = chord.Chord(chordNotes, beams=chordNotes[-1].beams)
-        eventChord.duration = chordNotes[0].duration
+        eventChord = chord.Chord(chordNotes, beams=chordNotes[-1].beams,
+                                 duration=firstDuration)
 
         self.setBeamsForNote(eventChord)
         self.setTupletTypeForNote(eventChord)
@@ -2217,11 +2231,23 @@ class EventCollection(prebase.ProtoM21Object):
         return retEvents
 
 
-def hdStringToNote(contents: str) -> note.GeneralNote:
+def hdStringToNote(
+    contents: str,
+    defaultDurationOrNone: duration.Duration|None = None,
+) -> note.GeneralNote:
     '''
     returns a :class:`~music21.note.Note` (or Rest or Unpitched, etc.)
     matching the current SpineEvent.
     Does not check to see that it is sane or part of a :samp:`**kern` spine, etc.
+
+    If `contents` has no written duration, the note takes `defaultDurationOrNone`
+    when one is given, otherwise a quarter note.  This is used for chords whose
+    notes after the first omit a duration, e.g. the `E` and `G` in `8C E G`.
+    (In practice, all chords with notes of the same duration, such as
+    `16.C 16.E 16.G`, will be parsed as if the subsequent notes omit their
+    durations, e.g. as `16.C E G`, since processChordEvent removes duration
+    markers from the second and succeeding chord pitches whose durations are
+    identical to the first.)
 
     New rhythmic extensions formerly defined in
     `wiki.humdrum.org/index.php/Rational_rhythms`
@@ -2331,8 +2357,11 @@ def hdStringToNote(contents: str) -> note.GeneralNote:
     # Detect rests first, because rests can contain manual positioning information,
     # which is also detected by the `matchedNote` variable above.
     thisObject: note.GeneralNote
+    # Build with defaultDurationOrNone (None gives the usual default).  A note
+    # that omits its own duration then shares this exact Duration object rather
+    # than allocating a copy; one that has its own duration replaces it below.
     if 'r' in contents:
-        thisObject = note.Rest()
+        thisObject = note.Rest(duration=defaultDurationOrNone)
 
     elif matchedNote:
         kernNoteName = matchedNote.group(1)
@@ -2341,7 +2370,7 @@ def hdStringToNote(contents: str) -> note.GeneralNote:
             octave = 3 + len(kernNoteName)
         else:  # below middle C
             octave = 4 - len(kernNoteName)
-        builtNote = note.Note(octave=octave)
+        builtNote = note.Note(octave=octave, duration=defaultDurationOrNone)
         builtNote.step = step  # type: ignore[assignment]
         thisObject = builtNote
 
@@ -2444,6 +2473,12 @@ def hdStringToNote(contents: str) -> note.GeneralNote:
     # TODO: SPEEDUP -- only search for rational after foundNumber.
     foundRational = re.search(r'(\d+)%(\d+)', contents)
     foundNumber = re.search(r'(\d+)', contents)
+
+    if (foundRational or foundNumber) and defaultDurationOrNone is not None:
+        # we will be manipulating the duration, so we should give this object
+        # its own duration object
+        thisObject.duration = duration.Duration(1.0)
+
     if foundRational:
         durationFirst = int(foundRational.group(1))
         durationSecond = int(foundRational.group(2))

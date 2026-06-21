@@ -34,6 +34,7 @@ from music21.humdrum.spineParser import (
     SpineEvent,
     flavors,
     hdStringToMeasure,
+    hdStringToNote,
     kernTandemToObject,
 )
 
@@ -108,6 +109,78 @@ class Test(unittest.TestCase):
         self.assertTrue(n.duration.isGrace)
         self.assertEqual(n.duration.type, 'eighth')
         self.assertTrue(n.duration.slash)
+
+    def testChordNoteInheritsDefaultDuration(self):
+        '''
+        A note with no written duration takes the given defaultDurationOrNone
+        (the first note's duration in a chord), sharing the same Duration object;
+        a note with its own written duration ignores it.
+        '''
+        first = hdStringToNote('8C')
+        inherited = hdStringToNote('E', first.duration)
+        self.assertEqual(inherited.duration.type, 'eighth')
+        self.assertIs(inherited.duration, first.duration)
+
+        ownDuration = hdStringToNote('2G', first.duration)
+        self.assertEqual(ownDuration.duration.type, 'half')
+
+    def testPartiallyNotatedChordDurations(self):
+        '''
+        In a kern chord whose later notes omit a duration (`8C E G`), every note
+        takes the first note's duration instead of defaulting to a quarter; a
+        chord that notates each duration (`8C 2E 2G`) keeps them.
+        '''
+        krn = re.sub(r'\s\s\s\s+', '\t', r'''
+**kern
+*M4/4
+=1
+8C E G
+8C 2E 2G
+2r
+*-
+''')
+        hdc = HumdrumDataCollection(krn)
+        hdc.parse()
+        chords = list(hdc.stream.recurse().getElementsByClass('Chord'))
+        self.assertEqual(len(chords), 2)
+        partial, fullyNotated = chords
+        self.assertEqual([n.duration.type for n in partial],
+                         ['eighth', 'eighth', 'eighth'])
+        self.assertEqual([n.duration.type for n in fullyNotated],
+                         ['eighth', 'half', 'half'])
+
+    def testChordSharesMatchingDurationObjects(self):
+        '''
+        Chord notes that omit or repeat the first note's duration share its
+        Duration object; a note with a different duration keeps its own (e.g. the
+        held top voice in `4G 4e 2g`).
+        '''
+        krn = re.sub(r'\s\s\s\s+', '\t', r'''
+**kern
+*M4/4
+=1
+8C 8E 8G
+4G 4e 2g
+2r
+*-
+''')
+        hdc = HumdrumDataCollection(krn)
+        hdc.parse()
+        chords = list(hdc.stream.recurse().getElementsByClass('Chord'))
+        self.assertEqual(len(chords), 2)
+        matched, mixed = chords
+
+        # 8C 8E 8G: all three notes share one Duration object
+        matchedDurations = [n.duration for n in matched.notes]
+        self.assertEqual(len({id(d) for d in matchedDurations}), 1)
+
+        # 4G 4e 2g: the two quarters share one object, the half is its own
+        mixedDurations = [n.duration for n in mixed.notes]
+        quarters = [d for d in mixedDurations if d.type == 'quarter']
+        halves = [d for d in mixedDurations if d.type == 'half']
+        self.assertEqual(len(quarters), 2)
+        self.assertEqual(len(halves), 1)
+        self.assertEqual(len({id(d) for d in quarters}), 1)
 
     def testMeasureBoundaries(self):
         m0 = stream.Measure()
