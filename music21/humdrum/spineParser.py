@@ -2381,7 +2381,6 @@ def hdStringToNote(contents: str,
     thisDuration = _hdStringToDuration(contents, defaultDuration)
 
     # 3.2.1 Pitches and 3.3 Rests
-    thisObject: t.Union[note.Note|note.Rest]
     # Detect rests first, because rests can contain manual positioning information,
     # which is also detected by the `matchedNote` variable above.
     thisObject: note.GeneralNote
@@ -2492,7 +2491,7 @@ def hdStringToNote(contents: str,
     # elif 'p' in contents:
     #     pass  # end appoggiatura duration -- not needed in music21...
 
-    if thisObject.isNote:  # handle note-specific attributes
+    if isinstance(thisObject, note.Note):  # handle note-specific attributes
         # 3.2.6 Stem Directions
         if '/' in contents:
             thisObject.stemDirection = 'up'
@@ -2501,13 +2500,13 @@ def hdStringToNote(contents: str,
 
         # 3.2.10 Beaming
         # TODO: Support really complex beams
-        for i in range(contents.count('L')):
+        for _ in range(contents.count('L')):
             thisObject.beams.append('start')
-        for i in range(contents.count('J')):
+        for _ in range(contents.count('J')):
             thisObject.beams.append('stop')
-        for i in range(contents.count('k')):
+        for _ in range(contents.count('k')):
             thisObject.beams.append('partial', 'right')
-        for i in range(contents.count('K')):
+        for _ in range(contents.count('K')):
             thisObject.beams.append('partial', 'right')
 
     return thisObject
