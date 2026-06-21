@@ -12,16 +12,21 @@ Multilingual conversion of pitch, etc. objects
 '''
 from __future__ import annotations
 
+import typing as t
 import unittest
 
 from music21 import pitch
+
+if t.TYPE_CHECKING:
+    from music21 import chord
+    from music21 import note
 
 SUPPORTED_LANGUAGES = ['de', 'fr', 'it', 'es']
 SUPPORTED_ACCIDENTALS = ['----', '---', '--', '-', '', '#', '##', '###', '####']
 SUPPORTED_MICROTONES = ['A', 'B', 'C', 'D', 'E', 'F', 'G']
 
 
-def generateLanguageDictionary(languageString):
+def generateLanguageDictionary(languageString: str) -> dict[str, str]:
 
     # Helper method for toPitch
 
@@ -31,8 +36,8 @@ def generateLanguageDictionary(languageString):
     if languageString not in SUPPORTED_LANGUAGES:
         return {}
 
-    dictionary = {}
-    pitchStrings = []
+    dictionary: dict[str, str] = {}
+    pitchStrings: list[str] = []
 
     for microtone in SUPPORTED_MICROTONES:
         for accidental in SUPPORTED_ACCIDENTALS:
@@ -58,7 +63,7 @@ def generateLanguageDictionary(languageString):
     return dictionary
 
 
-def toPitch(pitchString, languageString):
+def toPitch(pitchString: str, languageString: str) -> pitch.Pitch:
     '''
     Converts a string to a :class:`music21.pitch.Pitch` object given a language.
 
@@ -84,7 +89,7 @@ def toPitch(pitchString, languageString):
     return pitch.Pitch(langDict[pitchString])
 
 
-def toNote(pitchString, languageString):
+def toNote(pitchString: str, languageString: str) -> note.Note:
     '''
     Converts a string to a :class:`music21.note.Note` object given a language
 
@@ -109,7 +114,7 @@ def toNote(pitchString, languageString):
     return note.Note(toPitch(pitchString, languageString))
 
 
-def toChord(pitchArray, languageString):
+def toChord(pitchArray: list[str], languageString: str) -> chord.Chord:
     '''
     Converts a list of strings to a :class:`music21.chord.Chord` object given a language
 
@@ -130,7 +135,7 @@ def toChord(pitchArray, languageString):
 
 class Test(unittest.TestCase):
 
-    def testConvertPitches(self):
+    def testConvertPitches(self) -> None:
         # testing defaults in case of invalid language and invalid input
         self.assertEqual('<music21.pitch.Pitch C>', repr(toPitch('hello', '')))
         self.assertEqual('<music21.pitch.Pitch C>', repr(toPitch('', 'hello')))
@@ -171,7 +176,7 @@ class Test(unittest.TestCase):
                          repr(toPitch('la quadruple dièse', 'fr')))
         self.assertEqual('<music21.pitch.Pitch B--->', repr(toPitch('si triple bémol', 'fr')))
 
-    def testConvertNotes(self):
+    def testConvertNotes(self) -> None:
         # testing defaults in case of invalid language and invalid input
         self.assertEqual('<music21.note.Note C>', repr(toNote('hello', '')))
         self.assertEqual('<music21.note.Note C>', repr(toNote('', 'hello')))
@@ -209,7 +214,7 @@ class Test(unittest.TestCase):
                             repr(toNote('la quadruple dièse', 'fr')))
         self.assertEqual('<music21.note.Note B--->', repr(toNote('si triple bémol', 'fr')))
 
-    def testConvertChords(self):
+    def testConvertChords(self) -> None:
         # testing defaults in case of invalid language and no input
         self.assertEqual((), toChord([], '').pitches)
         self.assertEqual((), toChord([], 'hello').pitches)

@@ -39,7 +39,9 @@ def showImageThroughMuseScore(
     *,
     multipageWidget: bool = False,
     **keywords,
-):
+) -> t.Any:
+    # Returns None in the common cases, but returns the ipywidgets interact
+    # callable in the multipage-widget branch, so the return type is t.Any.
     # noinspection PyPackageRequirements
     from IPython.display import Image, display, HTML  # type: ignore
 
@@ -110,7 +112,7 @@ def showImageThroughMuseScore(
         from ipywidgets import interact  # type: ignore  # pylint: disable=import-error
 
         @interact(page=(1, last_number))
-        def page_display(page=1):
+        def page_display(page: int = 1) -> None:
             inner_page_fp = pages[page]
             if inner_page_fp.exists():
                 display(Image(data=inner_page_fp.read_bytes(), retina=True))
