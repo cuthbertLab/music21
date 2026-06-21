@@ -2291,6 +2291,34 @@ def hdStringToNote(contents: str) -> note.GeneralNote:
     >>> n.duration.isGrace
     True
 
+    A grace note without duration is an eighth note.  If a duration, like ``16``,
+    is given, that type is preserved in the unlinked GraceDuration.  A single
+    ``q`` is a slashed grace note (acciaccatura):
+
+    >>> n = humdrum.spineParser.hdStringToNote('16ccq')
+    >>> n.duration
+    <music21.duration.GraceDuration unlinked type:16th quarterLength:0.0>
+    >>> n.duration.slash
+    True
+
+    Two ``q``\\s signify a grace note without a slash (or accented grace note):
+
+    >>> n = humdrum.spineParser.hdStringToNote('16ccqq')
+    >>> n.duration.type
+    '16th'
+    >>> n.duration.slash
+    False
+
+    .. note::
+
+        A capital ``Q`` was the original Humdrum way of signifying these notes
+        (gruppettos).  Some post-2020 encodings use ``Q`` to mean a cue-sized
+        note.  Given no way of distinguishing these interpretations, music21
+        will remain with the original version; so ``Q`` and ``qq`` are synonyms.
+
+    * Changed in v11: grace notes keep their written duration, and ``qq`` is
+      parsed as an unslashed grace note.
+
     >>> humdrum.spineParser.flavors['JRP'] = storedFlavors  #_DOCS_HIDE
 
     '''
@@ -2468,15 +2496,17 @@ def hdStringToNote(contents: str) -> note.GeneralNote:
             # call Duration.TupletFixer after to correct this.
 
     # 3.2.9 Grace Notes and Groupettos
-    if 'q' in contents:
+    # A single `q` is a slashed grace note; `qq` or `Q` is an unslashed grace note.
+    # A grace note keeps its written duration; with none written it defaults to an eighth.
+    qCount = contents.count('q')
+    if qCount or 'Q' in contents:
         thisObject = thisObject.getGrace()
-        thisObject.duration.type = 'eighth'
-    elif 'Q' in contents:
-        thisObject = thisObject.getGrace()
-        dur = thisObject.duration
-        assert isinstance(dur, GraceDuration)
-        dur.slash = False
-        dur.type = 'eighth'
+        if foundNumber is None:
+            thisObject.duration.type = 'eighth'
+        # != 1: number of q's == 0 (because it's a capital Q) or 2+ (== qq)
+        if qCount != 1:
+            graceDuration = t.cast(GraceDuration, thisObject.duration)
+            graceDuration.slash = False
     elif 'P' in contents:
         thisObject = thisObject.getGrace(appoggiatura=True)
     elif 'p' in contents:
