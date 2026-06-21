@@ -81,6 +81,41 @@ class Test(unittest.TestCase):
         self.assertEqual(b.duration.dots, 0)
         self.assertEqual(b.duration.tuplets[0].durationNormal.dots, 2)
 
+    def testGraceNoteKeepsWrittenDuration(self):
+        '''
+        A single `q` is a slashed grace note that keeps its written duration
+        rather than always becoming an eighth.
+
+        Test is AI-assisted.
+        '''
+        n = SpineEvent('16ccq').toNote()
+        self.assertTrue(n.duration.isGrace)
+        self.assertEqual(n.duration.type, '16th')
+        self.assertTrue(n.duration.slash)
+
+    def testUnslashedGraceNote(self):
+        '''
+        `qq` or `Q` marks an unslashed grace note.
+
+        Test is AI-assisted.
+        '''
+        for contents in ('16ccqq', '16ccQ'):
+            n = SpineEvent(contents).toNote()
+            self.assertTrue(n.duration.isGrace)
+            self.assertEqual(n.duration.type, '16th')
+            self.assertFalse(n.duration.slash)
+
+    def testGraceNoteWithoutDurationDefaultsToEighth(self):
+        '''
+        With no written duration a grace note defaults to an eighth.
+
+        Test is AI-assisted.
+        '''
+        n = SpineEvent('ccq').toNote()
+        self.assertTrue(n.duration.isGrace)
+        self.assertEqual(n.duration.type, 'eighth')
+        self.assertTrue(n.duration.slash)
+
     def testMeasureBoundaries(self):
         m0 = stream.Measure()
         m1 = hdStringToMeasure('=29a;:|:', m0)
