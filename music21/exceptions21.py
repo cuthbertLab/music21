@@ -21,6 +21,14 @@ from __future__ import annotations
 class Music21Exception(Exception):
     pass
 
+
+class Music21ValueError(Music21Exception, ValueError):
+    '''
+    A music21 error that is also a builtin :class:`ValueError`, so it can be
+    caught as either ``Music21Exception`` or ``ValueError``.  Raise this when an
+    argument has the right type but an unacceptable value.
+    '''
+
 # The rest of these are here because they are imported by more than one module
 # which cannot import the other module because of circular imports.
 #
