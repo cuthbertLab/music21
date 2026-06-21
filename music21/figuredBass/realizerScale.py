@@ -10,6 +10,7 @@ from __future__ import annotations
 
 import copy
 import itertools
+import typing as t
 import unittest
 
 from music21 import exceptions21
@@ -61,15 +62,20 @@ class FiguredBassScale:
             ''',
     }
 
-    def __init__(self, scaleValue='C', scaleMode='major'):
+    def __init__(self,
+                 scaleValue: str | pitch.Pitch | note.Note = 'C',
+                 scaleMode: str = 'major') -> None:
         try:
             scaleClass = scaleModes[scaleMode]
-            self.realizerScale = scaleClass(scaleValue)
-            self.keySig = key.KeySignature(key.pitchToSharps(scaleValue, scaleMode))
+            self.realizerScale: scale.ConcreteScale = scaleClass(scaleValue)
+            self.keySig: key.KeySignature = key.KeySignature(
+                key.pitchToSharps(scaleValue, scaleMode))
         except KeyError:
             raise FiguredBassScaleException('Unsupported scale type-> ' + scaleMode)
 
-    def getPitchNames(self, bassPitch, notationString=None):
+    def getPitchNames(self,
+                      bassPitch: str | pitch.Pitch,
+                      notationString: str | None = None) -> list[str]:
         '''
         Takes a bassPitch and notationString and returns a list of corresponding
         pitch names based on the scale value and mode above and inclusive of the
@@ -88,7 +94,7 @@ class FiguredBassScale:
         '''
         bassPitch = convertToPitch(bassPitch)  # Convert string to pitch (if necessary)
         bassSD = self.realizerScale.getScaleDegreeFromPitch(bassPitch)
-        nt = notation.Notation(notationString)
+        nt = notation.Notation(notationString or '')
 
         if bassSD is None:
             bassPitchCopy = copy.deepcopy(bassPitch)
@@ -98,10 +104,12 @@ class FiguredBassScale:
                 bassNote.pitch.accidental = self.keySig.accidentalByStep(bassNote.pitch.step)
             bassSD = self.realizerScale.getScaleDegreeFromPitch(bassNote.pitch)
 
-        pitchNames = []
+        bassScaleDegree = t.cast(int, bassSD)
+        pitchNames: list[str] = []
         for i in range(len(nt.numbers)):
-            pitchSD = (bassSD + nt.numbers[i] - 1) % 7
-            samplePitch = self.realizerScale.pitchFromDegree(pitchSD)
+            number = t.cast(int, nt.numbers[i])
+            pitchSD = (bassScaleDegree + number - 1) % 7
+            samplePitch = t.cast(pitch.Pitch, self.realizerScale.pitchFromDegree(pitchSD))
             pitchName = nt.modifiers[i].modifyPitchName(samplePitch.name)
             pitchNames.append(pitchName)
 
@@ -109,7 +117,9 @@ class FiguredBassScale:
         pitchNames.reverse()
         return pitchNames
 
-    def getSamplePitches(self, bassPitch, notationString=None):
+    def getSamplePitches(self,
+                         bassPitch: str | pitch.Pitch,
+                         notationString: str | None = None) -> list[pitch.Pitch]:
         '''
         Returns all pitches for a bassPitch and notationString within
         an octave of the bassPitch, inclusive of the bassPitch but
@@ -154,7 +164,10 @@ class FiguredBassScale:
         samplePitches = self.getPitches(bassPitch, notationString, maxPitch)
         return samplePitches
 
-    def getPitches(self, bassPitch, notationString=None, maxPitch=None):
+    def getPitches(self,
+                   bassPitch: str | pitch.Pitch,
+                   notationString: str | None = None,
+                   maxPitch: str | pitch.Pitch | None = None) -> list[pitch.Pitch]:
         '''
         Takes in a bassPitch, a notationString, and a maxPitch representing the highest
         possible pitch that can be returned. Returns a sorted list of pitches which
@@ -188,7 +201,8 @@ class FiguredBassScale:
         bassPitch = convertToPitch(bassPitch)
         maxPitch = convertToPitch(maxPitch)
         pitchNames = self.getPitchNames(bassPitch, notationString)
-        iter1 = itertools.product(pitchNames, range(maxPitch.octave + 1))
+        maxOctave = t.cast(int, maxPitch.octave)
+        iter1 = itertools.product(pitchNames, range(maxOctave + 1))
         iter2 = map(lambda x: pitch.Pitch(x[0] + str(x[1])), iter1)
         iter3 = itertools.filterfalse(lambda samplePitch: bassPitch > samplePitch, iter2)
         iter4 = itertools.filterfalse(lambda samplePitch: samplePitch > maxPitch, iter3)
@@ -196,7 +210,7 @@ class FiguredBassScale:
         allPitches.sort()
         return allPitches
 
-    def _reprInternal(self):
+    def _reprInternal(self) -> str:
         return f'{self.realizerScale!r}'
 
 

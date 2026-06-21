@@ -8,9 +8,11 @@
 # ------------------------------------------------------------------------------
 from __future__ import annotations
 
+from collections.abc import Callable, Iterable, Iterator
 import collections
 import copy
 import itertools
+import typing as t
 import unittest
 
 from music21 import chord
@@ -19,7 +21,9 @@ from music21 import exceptions21
 from music21 import note
 from music21 import pitch
 from music21 import scale
+from music21.common.types import OffsetQL
 from music21.figuredBass import possibility
+from music21.figuredBass.possibility import Possibility
 from music21.figuredBass import realizerScale
 from music21.figuredBass import resolution
 from music21.figuredBass import rules
@@ -63,14 +67,20 @@ class Segment:
         'fbRules': 'A deepcopy of the :class:`~music21.figuredBass.rules.Rules` object provided.',
     }
 
+    # Attributes set externally (e.g. by figuredBass.realizer) during realization.
+    # Declared here for typing only; they are not initialized in __init__.
+    movements: dict[Possibility, list[Possibility]]
+    correctA: list[Possibility]
+    quarterLength: OffsetQL
+
     def __init__(self,
                  bassNote: str|note.Note = 'C3',
                  notationString: str|None = None,
                  fbScale: realizerScale.FiguredBassScale|None = None,
                  fbRules: rules.Rules|None = None,
-                 numParts=4,
+                 numParts: int = 4,
                  maxPitch: str|pitch.Pitch = 'B5',
-                 listOfPitches=None):
+                 listOfPitches: Iterable[str]|None = None):
         '''
         A Segment corresponds to a 1:1 realization of a bassNote and notationString
         of a :class:`~music21.figuredBass.realizer.FiguredBassLine`.
@@ -124,13 +134,13 @@ class Segment:
         else:
             self.fbRules = copy.deepcopy(fbRules)
 
-        self._specialResolutionRuleChecking = None
-        self._singlePossibilityRuleChecking = None
-        self._consecutivePossibilityRuleChecking = None
+        self._specialResolutionRuleChecking: dict[bool, list[tuple[t.Any, ...]]]|None = None
+        self._singlePossibilityRuleChecking: dict[bool, list[tuple[t.Any, ...]]]|None = None
+        self._consecutivePossibilityRuleChecking: dict[bool, list[tuple[t.Any, ...]]]|None = None
 
-        self.bassNote = bassNote
-        self.numParts = numParts
-        self._maxPitch = maxPitch
+        self.bassNote: note.Note = bassNote
+        self.numParts: int = numParts
+        self._maxPitch: pitch.Pitch = maxPitch
         if notationString is None and listOfPitches is not None:
             # must be a chord symbol or roman num.
             self.pitchNamesInChord = listOfPitches
@@ -148,7 +158,10 @@ class Segment:
     # ------------------------------------------------------------------------------
     # EXTERNAL METHODS
 
-    def singlePossibilityRules(self, fbRules=None):
+    def singlePossibilityRules(
+        self,
+        fbRules: rules.Rules|None = None
+    ) -> list[tuple[t.Any, ...]]:
         # noinspection PyShadowingNames
         '''
         A framework for storing single possibility rules and methods to be applied
@@ -205,7 +218,10 @@ class Segment:
 
         return singlePossibRules
 
-    def consecutivePossibilityRules(self, fbRules=None):
+    def consecutivePossibilityRules(
+        self,
+        fbRules: rules.Rules|None = None
+    ) -> list[tuple[t.Any, ...]]:
         # noinspection PyShadowingNames
         '''
         A framework for storing consecutive possibility rules and methods to be applied
@@ -287,7 +303,10 @@ class Segment:
 
         return consecutivePossibRules
 
-    def specialResolutionRules(self, fbRules=None):
+    def specialResolutionRules(
+        self,
+        fbRules: rules.Rules|None = None
+    ) -> list[tuple[t.Any, ...]]:
         '''
         A framework for storing methods which perform special resolutions
         on Segments. Unlike the methods in
@@ -366,7 +385,10 @@ class Segment:
 
         return specialResRules
 
-    def resolveDominantSeventhSegment(self, segmentB):
+    def resolveDominantSeventhSegment(
+        self,
+        segmentB: Segment
+    ) -> Iterator[tuple[Possibility, Possibility]]:
         # noinspection PyShadowingNames
         '''
         Can resolve a Segment whose :attr:`~music21.figuredBass.segment.Segment.segmentChord`
@@ -409,13 +431,13 @@ class Segment:
             # Put here for stand-alone purposes.
             raise SegmentException('Dominant seventh resolution: Not a dominant seventh Segment.')
         domChordInfo = _unpackSeventhChord(domChord)
-        dominantScale = scale.MajorScale().derive(domChord)
+        dominantScale = t.cast(scale.MajorScale, scale.MajorScale().derive(domChord))
         minorScale = dominantScale.getParallelMinor()
 
-        tonic = dominantScale.getTonic()
-        subdominant = dominantScale.pitchFromDegree(4)
-        majSubmediant = dominantScale.pitchFromDegree(6)
-        minSubmediant = minorScale.pitchFromDegree(6)
+        tonic = t.cast(pitch.Pitch, dominantScale.getTonic())
+        subdominant = t.cast(pitch.Pitch, dominantScale.pitchFromDegree(4))
+        majSubmediant = t.cast(pitch.Pitch, dominantScale.pitchFromDegree(6))
+        minSubmediant = t.cast(pitch.Pitch, minorScale.pitchFromDegree(6))
 
         resChord = segmentB.segmentChord
         domInversion = (domChord.inversion() == 2)
@@ -465,7 +487,11 @@ class Segment:
                 + 'Executing ordinary resolution.')
             return self._resolveOrdinarySegment(segmentB)
 
-    def resolveDiminishedSeventhSegment(self, segmentB, doubledRoot=False):
+    def resolveDiminishedSeventhSegment(
+        self,
+        segmentB: Segment,
+        doubledRoot: bool = False
+    ) -> Iterator[tuple[Possibility, Possibility]]:
         # noinspection PyShadowingNames
         '''
         Can resolve a Segment whose :attr:`~music21.figuredBass.segment.Segment.segmentChord`
@@ -503,8 +529,8 @@ class Segment:
         dimScale = scale.HarmonicMinorScale().deriveByDegree(7, dimChord.root())
         # minorScale = dimScale.getParallelMinor()
 
-        tonic = dimScale.getTonic()
-        subdominant = dimScale.pitchFromDegree(4)
+        tonic = t.cast(pitch.Pitch, dimScale.getTonic())
+        subdominant = t.cast(pitch.Pitch, dimScale.pitchFromDegree(4))
 
         resChord = segmentB.segmentChord
         if dimChord.inversion() == 1:  # Doubled root in context
@@ -536,7 +562,10 @@ class Segment:
                 + 'Executing ordinary resolution.')
             return self._resolveOrdinarySegment(segmentB)
 
-    def resolveAugmentedSixthSegment(self, segmentB):
+    def resolveAugmentedSixthSegment(
+        self,
+        segmentB: Segment
+    ) -> Iterator[tuple[Possibility, Possibility]]:
         # noinspection PyShadowingNames
         '''
         Can resolve a Segment whose :attr:`~music21.figuredBass.segment.Segment.segmentChord`
@@ -607,7 +636,7 @@ class Segment:
                 and resChord.isMinorTriad()),
                 resolution.augmentedSixthToMinorTonic,
                 [augSixthType, augSixthChordInfo]),
-            ((majorScale.pitchFromDegree(5).name == resChord.bass().name
+            ((t.cast(pitch.Pitch, majorScale.pitchFromDegree(5)).name == resChord.bass().name
                 and resChord.isMajorTriad()),
                 resolution.augmentedSixthToDominant,
                 [augSixthType, augSixthChordInfo])
@@ -621,7 +650,7 @@ class Segment:
                 + 'Executing ordinary resolution.')
             return self._resolveOrdinarySegment(segmentB)
 
-    def allSinglePossibilities(self):
+    def allSinglePossibilities(self) -> Iterator[Possibility]:
         '''
         Returns an iterator through a set of naive possibilities for
         a Segment, using :attr:`~music21.figuredBass.segment.Segment.numParts`,
@@ -660,7 +689,7 @@ class Segment:
         iterables.append([pitch.Pitch(self.bassNote.pitch.nameWithOctave)])
         return itertools.product(*iterables)
 
-    def allCorrectSinglePossibilities(self):
+    def allCorrectSinglePossibilities(self) -> list[Possibility]:
         '''
         Uses :meth:`~music21.figuredBass.segment.Segment.allSinglePossibilities` and
         returns an iterator through a set of correct possibilities for
@@ -693,7 +722,10 @@ class Segment:
         allA = self.allSinglePossibilities()
         return [possibA for possibA in allA if self._isCorrectSinglePossibility(possibA)]
 
-    def allCorrectConsecutivePossibilities(self, segmentB):
+    def allCorrectConsecutivePossibilities(
+        self,
+        segmentB: Segment
+    ) -> Iterator[tuple[Possibility, Possibility]]:
         # noinspection PyShadowingNames
         '''
         Returns an iterator through correct (possibA, possibB) pairs.
@@ -761,31 +793,42 @@ class Segment:
     # ------------------------------------------------------------------------------
     # INTERNAL METHODS
 
-    def _isCorrectSinglePossibility(self, possibA):
+    def _isCorrectSinglePossibility(self, possibA: Possibility) -> bool:
         '''
         Takes in a possibility (possibA) from a segmentA (self) and returns True
         if the possibility is correct given
         :meth:`~music21.figuredBass.segment.Segment.singlePossibilityRules`
         from segmentA.
         '''
-        for (method, isCorrect, args) in self._singlePossibilityRuleChecking[True]:
+        ruleChecking = self._singlePossibilityRuleChecking
+        assert ruleChecking is not None
+        for (method, isCorrect, args) in ruleChecking[True]:
             if not (method(possibA, *args) == isCorrect):
                 return False
         return True
 
-    def _isCorrectConsecutivePossibility(self, possibA, possibB):
+    def _isCorrectConsecutivePossibility(
+        self,
+        possibA: Possibility,
+        possibB: Possibility
+    ) -> bool:
         '''
         Takes in a (possibA, possibB) pair from a segmentA (self) and segmentB,
         and returns True if the pair is correct given
         :meth:`~music21.figuredBass.segment.Segment.consecutivePossibilityRules`
         from segmentA.
         '''
-        for (method, isCorrect, args) in self._consecutivePossibilityRuleChecking[True]:
+        ruleChecking = self._consecutivePossibilityRuleChecking
+        assert ruleChecking is not None
+        for (method, isCorrect, args) in ruleChecking[True]:
             if not (method(possibA, possibB, *args) == isCorrect):
                 return False
         return True
 
-    def _resolveOrdinarySegment(self, segmentB):
+    def _resolveOrdinarySegment(
+        self,
+        segmentB: Segment
+    ) -> Iterator[tuple[Possibility, Possibility]]:
         '''
         An ordinary segment is defined as a segment which needs no special resolution, where the
         segment does not spell out a special chord, for example, a dominant seventh.
@@ -807,7 +850,11 @@ class Segment:
                                                                               possibB=possibAB[1]),
                        correctAB)
 
-    def _resolveSpecialSegment(self, segmentB, specialResolutionMethods):
+    def _resolveSpecialSegment(
+        self,
+        segmentB: Segment,
+        specialResolutionMethods: list[tuple[t.Any, ...]]
+    ) -> Iterator[tuple[Possibility, Possibility]]:
         resolutionMethodExecutor = _compileRules(specialResolutionMethods, 3)
         for (resolutionMethod, args) in resolutionMethodExecutor[True]:
             iterables = []
@@ -840,7 +887,7 @@ class OverlaidSegment(Segment):
     Class to allow Segments to be overlaid with non-chord notes.
     '''
 
-    def allSinglePossibilities(self):
+    def allSinglePossibilities(self) -> Iterator[Possibility]:
         iterables = [self.allPitchesAboveBass] * (self.numParts - 1)  # Parts 1 -> n-1
         iterables.append([pitch.Pitch(self.bassNote.pitch.nameWithOctave)])  # Part n
         for (partNumber, partPitch) in self.fbRules._partPitchLimits:
@@ -850,9 +897,9 @@ class OverlaidSegment(Segment):
 
 # HELPER METHODS
 # --------------
-def getPitches(pitchNames=('C', 'E', 'G'),
+def getPitches(pitchNames: Iterable[str] = ('C', 'E', 'G'),
                bassPitch: str|pitch.Pitch = 'C3',
-               maxPitch: str|pitch.Pitch = 'C8'):
+               maxPitch: str|pitch.Pitch = 'C8') -> list[pitch.Pitch]:
     '''
     Given a list of pitchNames, a bassPitch, and a maxPitch, returns a sorted list of
     pitches between the two limits (inclusive) which correspond to items in pitchNames.
@@ -892,7 +939,7 @@ def getPitches(pitchNames=('C', 'E', 'G'),
     return allPitches
 
 
-def _unpackSeventhChord(seventhChord):
+def _unpackSeventhChord(seventhChord: chord.Chord) -> list[pitch.Pitch|None]:
     bass = seventhChord.bass()
     root = seventhChord.root()
     third = seventhChord.getChordStep(3)
@@ -902,7 +949,7 @@ def _unpackSeventhChord(seventhChord):
     return seventhChordInfo
 
 
-def _unpackTriad(threePartChord):
+def _unpackTriad(threePartChord: chord.Chord) -> list[pitch.Pitch|None]:
     bass = threePartChord.bass()
     root = threePartChord.root()
     third = threePartChord.getChordStep(3)
@@ -911,8 +958,11 @@ def _unpackTriad(threePartChord):
     return threePartChordInfo
 
 
-def _compileRules(rulesList, maxLength=4):
-    ruleChecking = collections.defaultdict(list)
+def _compileRules(
+    rulesList: list[tuple[t.Any, ...]],
+    maxLength: int = 4
+) -> dict[bool, list[tuple[t.Any, ...]]]:
+    ruleChecking: dict[bool, list[tuple[t.Any, ...]]] = collections.defaultdict(list)
     for ruleIndex in range(len(rulesList)):
         args = []
         if len(rulesList[ruleIndex]) == maxLength:
@@ -927,7 +977,7 @@ def _compileRules(rulesList, maxLength=4):
     return ruleChecking
 
 
-def printRules(rulesList, maxLength=4):
+def printRules(rulesList: list[tuple[t.Any, ...]], maxLength: int = 4) -> None:
     '''
     Method which can print to the console rules inputted into
     :meth:`~music21.figuredBass.segment.Segment.singlePossibilityRules`,
@@ -944,7 +994,7 @@ def printRules(rulesList, maxLength=4):
         if len(rule[1].__name__) >= MAX_SIZE:
             MAX_SIZE = len(rule[1].__name__) + 2
 
-    def padMethod(m):
+    def padMethod(m: Callable[..., t.Any]) -> str:
         methodName = m.__name__[0:MAX_SIZE]
         if len(methodName) < MAX_SIZE:
             methodName += ' ' * (MAX_SIZE - len(methodName))

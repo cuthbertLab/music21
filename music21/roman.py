@@ -3219,7 +3219,7 @@ class RomanNumeral(harmony.Harmony):
         for j in range(numberNotes):
             i = numberNotes - j - 1
             thisScaleDegree = (bassScaleDegree
-                                + self.figuresNotationObj.numbers[i]
+                                + t.cast(int, self.figuresNotationObj.numbers[i])
                                 - 1)
             newPitch = useScale.pitchFromDegree(thisScaleDegree,
                                                 direction=scale.Direction.ASCENDING)
@@ -3603,7 +3603,7 @@ class RomanNumeral(harmony.Harmony):
         if notationObject.numbers not in FIGURES_IMPLYING_ROOT:
             return self.scaleDegree
         for i in notationObject.numbers:
-            distanceToMove = i - 1
+            distanceToMove = t.cast(int, i) - 1
             newDiatonicNumber = (cDNN + distanceToMove)
 
             newStep, newOctave = interval.convertDiatonicNumberToStep(
