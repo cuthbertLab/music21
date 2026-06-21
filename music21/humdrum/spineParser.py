@@ -89,7 +89,6 @@ from music21 import prebase
 from music21 import stream
 from music21 import tempo
 from music21 import tie
-from music21.duration import GraceDuration
 
 from music21.humdrum import harmParser
 from music21.humdrum import instruments
@@ -2952,6 +2951,16 @@ class GlobalReference(base.Music21Object):
 
     def _reprInternal(self) -> str:
         return f'{self.code} {self.value!r}'
+
+
+class Test(unittest.TestCase):
+    '''
+    Note: most spineParser tests are in :mod:`music21.humdrum.tests`.
+    Only `testCopyAndDeepcopy` lives here so that `globals()` resolves.
+    '''
+    def testCopyAndDeepcopy(self) -> None:
+        from music21.test.commonTest import testCopyAll
+        testCopyAll(self, globals())
 
 
 # -----------------------------------------------------------------------------
