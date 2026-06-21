@@ -33,7 +33,7 @@ scaleModes = {'major': scale.MajorScale,
 class FiguredBassScale:
     '''
     Acts as a wrapper for :class:`~music21.scale.Scale`. Used to represent the
-    concept of a figured bass scale, with a scale value and mode.
+    concept of a figured bass scale, with a scale tonic and mode.
 
     Accepted scale types: major, minor, dorian, phrygian, and hypophrygian.
     A FiguredBassScaleException is raised if an invalid scale type is provided.
@@ -50,32 +50,34 @@ class FiguredBassScale:
     <music21.scale.MinorScale D minor>
     >>> fbScale.keySig
     <music21.key.KeySignature of 1 flat>
+
+    * Changed in v11: the first argument was renamed from `scaleValue` to `scaleTonic`.
     '''
     _DOC_ATTR: dict[str, str] = {
         'realizerScale': '''
             A :class:`~music21.scale.Scale` based on the
-            desired value and mode.
+            desired tonic and mode.
             ''',
         'keySig': '''
             A :class:`~music21.key.KeySignature` corresponding to
-            the scale value and mode.
+            the scale tonic and mode.
             ''',
     }
 
     def __init__(self,
-                 scaleValue: str | pitch.Pitch | note.Note = 'C',
+                 scaleTonic: str | pitch.Pitch | note.Note = 'C',
                  scaleMode: str = 'major') -> None:
         try:
             scaleClass = scaleModes[scaleMode]
-            self.realizerScale: scale.ConcreteScale = scaleClass(scaleValue)
+            self.realizerScale: scale.ConcreteScale = scaleClass(scaleTonic)
             self.keySig: key.KeySignature = key.KeySignature(
-                key.pitchToSharps(scaleValue, scaleMode))
+                key.pitchToSharps(scaleTonic, scaleMode))
         except KeyError:
             raise FiguredBassScaleException('Unsupported scale type-> ' + scaleMode)
 
     def getPitchNames(self,
                       bassPitch: str | pitch.Pitch,
-                      notationString: str | None = None) -> list[str]:
+                      notationString: str = '') -> list[str]:
         '''
         Takes a bassPitch and notationString and returns a list of corresponding
         pitch names based on the scale value and mode above and inclusive of the
@@ -94,7 +96,7 @@ class FiguredBassScale:
         '''
         bassPitch = convertToPitch(bassPitch)  # Convert string to pitch (if necessary)
         bassSD = self.realizerScale.getScaleDegreeFromPitch(bassPitch)
-        nt = notation.Notation(notationString or '')
+        nt = notation.Notation(notationString)
 
         if bassSD is None:
             bassPitchCopy = copy.deepcopy(bassPitch)
@@ -119,7 +121,7 @@ class FiguredBassScale:
 
     def getSamplePitches(self,
                          bassPitch: str | pitch.Pitch,
-                         notationString: str | None = None) -> list[pitch.Pitch]:
+                         notationString: str = '') -> list[pitch.Pitch]:
         '''
         Returns all pitches for a bassPitch and notationString within
         an octave of the bassPitch, inclusive of the bassPitch but
@@ -166,7 +168,7 @@ class FiguredBassScale:
 
     def getPitches(self,
                    bassPitch: str | pitch.Pitch,
-                   notationString: str | None = None,
+                   notationString: str = '',
                    maxPitch: str | pitch.Pitch | None = None) -> list[pitch.Pitch]:
         '''
         Takes in a bassPitch, a notationString, and a maxPitch representing the highest
@@ -201,7 +203,7 @@ class FiguredBassScale:
         bassPitch = convertToPitch(bassPitch)
         maxPitch = convertToPitch(maxPitch)
         pitchNames = self.getPitchNames(bassPitch, notationString)
-        maxOctave = t.cast(int, maxPitch.octave)
+        maxOctave = maxPitch.implicitOctave
         iter1 = itertools.product(pitchNames, range(maxOctave + 1))
         iter2 = map(lambda x: pitch.Pitch(x[0] + str(x[1])), iter1)
         iter3 = itertools.filterfalse(lambda samplePitch: bassPitch > samplePitch, iter2)

@@ -17,6 +17,11 @@ the last element of each possibility is the bass.
 .. note:: fbRealizer supports voice crossing, so the order of pitches from lowest
     to highest may not correspond to the ordering of parts.
 
+.. note:: A realized possibility has one pitch per part, so with the default four-part
+    (SATB) realization each possibility holds four pitches, the last being the bass. The
+    examples in this module use shorter, often three-voice, possibilities purely for
+    brevity; every function here works for any number of parts.
+
 Here, a possibility is created. G5 is in the highest part, and C4 is the bass. The highest
 part contains the highest Pitch, and the lowest part contains the lowest Pitch. No voice
 crossing is present.
@@ -56,7 +61,6 @@ The application of these methods is controlled by corresponding instance variabl
 '''
 from __future__ import annotations
 
-import typing as t
 import unittest
 
 from music21 import chord
@@ -263,11 +267,10 @@ def limitPartToPitch(
 
 # CONSECUTIVE POSSIBILITY RULE-CHECKING METHODS
 # ---------------------------------------------
-# Speedup tables
-# TODO: reinstitute PitchQuartetToBool caching with proper pitch hash checking
-#   (keying on Pitch objects relies on identity, so these caches rarely hit;
-#   rework to key on nameWithOctave strings).  Same applies to the copies in
-#   figuredBass.checker.
+# Speedup tables.  pitch.Pitch hashes and compares by value, so tuples of
+# pitches work as dict keys: a quartet of value-equal pitches hits the cache
+# regardless of object identity.  The same tables are duplicated in
+# figuredBass.checker.
 type PitchQuartetToBool = dict[
     tuple[pitch.Pitch, pitch.Pitch, pitch.Pitch, pitch.Pitch],
     bool
@@ -425,7 +428,7 @@ def parallelOctaves(possibA: Possibility, possibB: Possibility) -> bool:
     return hasParallelOctaves
 
 
-def hiddenFifth(possibA: Possibility, possibB: Possibility) -> bool:
+def hiddenFifths(possibA: Possibility, possibB: Possibility) -> bool:
     '''
     Returns True if there is a hidden fifth between shared outer parts
     of possibA and possibB. The outer parts here are the first and last
@@ -450,7 +453,7 @@ def hiddenFifth(possibA: Possibility, possibB: Possibility) -> bool:
 
     >>> possibA1 = (E5, E3, C3)
     >>> possibB1 = (A5, F3, D3)
-    >>> possibility.hiddenFifth(possibA1, possibB1)
+    >>> possibility.hiddenFifths(possibA1, possibB1)
     True
 
     Here, the soprano and bass parts also move in similar motion, but the
@@ -460,7 +463,7 @@ def hiddenFifth(possibA: Possibility, possibB: Possibility) -> bool:
     >>> Ab5 = pitch.Pitch('A-5')
     >>> possibA2 = (E5, E3, C3)
     >>> possibB2 = (Ab5, F3, D3)
-    >>> possibility.hiddenFifth(possibA2, possibB2)
+    >>> possibility.hiddenFifths(possibA2, possibB2)
     False
 
     Now, we have the soprano and bass parts again moving to A5 and D3, whose
@@ -470,8 +473,10 @@ def hiddenFifth(possibA: Possibility, possibB: Possibility) -> bool:
     >>> E6 = pitch.Pitch('E6')
     >>> possibA3 = (E6, E3, C3)
     >>> possibB3 = (A5, F3, D3)
-    >>> possibility.hiddenFifth(possibA3, possibB3)
+    >>> possibility.hiddenFifths(possibA3, possibB3)
     False
+
+    * Changed in v11: renamed from hiddenFifth (singular) to match parallelFifths.
     '''
     hasHiddenFifth = False
     pairsList = partPairs(possibA, possibB)
@@ -492,7 +497,7 @@ def hiddenFifth(possibA: Possibility, possibB: Possibility) -> bool:
     return hasHiddenFifth
 
 
-def hiddenOctave(possibA: Possibility, possibB: Possibility) -> bool:
+def hiddenOctaves(possibA: Possibility, possibB: Possibility) -> bool:
     '''
     Returns True if there is a hidden octave between shared outer parts
     of possibA and possibB. The outer parts here are the first and last
@@ -517,7 +522,7 @@ def hiddenOctave(possibA: Possibility, possibB: Possibility) -> bool:
 
     >>> possibA1 = (A5, E3, C3)
     >>> possibB1 = (D6, F3, D3)  # Perfect octave between soprano and bass.
-    >>> possibility.hiddenOctave(possibA1, possibB1)
+    >>> possibility.hiddenOctaves(possibA1, possibB1)
     True
 
     Here, the bass part moves up from C3 to D3 but the soprano part moves
@@ -527,8 +532,10 @@ def hiddenOctave(possibA: Possibility, possibB: Possibility) -> bool:
     >>> A6 = pitch.Pitch('A6')
     >>> possibA2 = (A6, E3, C3)
     >>> possibB2 = (D6, F3, D3)
-    >>> possibility.hiddenOctave(possibA2, possibB2)
+    >>> possibility.hiddenOctaves(possibA2, possibB2)
     False
+
+    * Changed in v11: renamed from hiddenOctave (singular) to match parallelOctaves.
     '''
     hasHiddenOctave = False
     pairsList = partPairs(possibA, possibB)
@@ -809,8 +816,10 @@ def couldBeItalianA6Resolution(
             raise PossibilityException('possibA does not spell out an It+6 chord.')
         bass = augSixthChord.bass()
         root = augSixthChord.root()
-        third = t.cast(pitch.Pitch, augSixthChord.getChordStep(3))
-        fifth = t.cast(pitch.Pitch, augSixthChord.getChordStep(5))
+        third = augSixthChord.getChordStep(3)
+        fifth = augSixthChord.getChordStep(5)
+        if third is None or fifth is None:
+            raise PossibilityException('possibA does not spell out an It+6 chord.')
         threePartChordInfo = [bass, root, third, fifth]
 
     allowedIntervalNames = ['M3', 'm3', 'M2', 'm-2']
@@ -931,7 +940,7 @@ def partPairs(
      (<music21.pitch.Pitch C4>, <music21.pitch.Pitch D4>)]
 
     '''
-    return list(zip(possibA, possibB))
+    return list(zip(possibA, possibB, strict=True))
 
 # apply a function to one pitch of possibA at a time
 # apply a function to two pitches of possibA at a time
@@ -943,7 +952,7 @@ def partPairs(
 singlePossibilityMethods = [voiceCrossing, isIncomplete, upperPartsWithinLimit, pitchesWithinLimit]
 # singlePossibilityMethods.sort(None, lambda x: x.__name__)
 consequentPossibilityMethods = [parallelFifths, parallelOctaves,
-                                hiddenFifth, hiddenOctave, voiceOverlap,
+                                hiddenFifths, hiddenOctaves, voiceOverlap,
                                 partMovementsWithinLimits, upperPartsSame,
                                 couldBeItalianA6Resolution]
 # consequentPossibilityMethods.sort(None, lambda x: x.__name__)
