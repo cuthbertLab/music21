@@ -56,6 +56,7 @@ The application of these methods is controlled by corresponding instance variabl
 '''
 from __future__ import annotations
 
+import typing as t
 import unittest
 
 from music21 import chord
@@ -64,10 +65,14 @@ from music21 import interval
 from music21 import pitch
 from music21 import voiceLeading
 
+# A possibility is a tuple of pitches, one per part, ordered from the highest
+# part to the lowest part (the last element is the bass).
+type Possibility = tuple[pitch.Pitch, ...]
+
 
 # SINGLE POSSIBILITY RULE-CHECKING METHODS
 # ----------------------------------------
-def voiceCrossing(possibA):
+def voiceCrossing(possibA: Possibility) -> bool:
     '''
     Returns True if there is voice crossing present between any two parts
     in possibA. The parts from the lowest part to the highest part (right to left)
@@ -100,7 +105,7 @@ def voiceCrossing(possibA):
     return hasVoiceCrossing
 
 
-def isIncomplete(possibA, pitchNamesToContain):
+def isIncomplete(possibA: Possibility, pitchNamesToContain: list[str]) -> bool:
     '''
     Returns True if possibA is incomplete, if it doesn't contain at least
     one of every pitch name in pitchNamesToContain.
@@ -126,7 +131,7 @@ def isIncomplete(possibA, pitchNamesToContain):
     False
     '''
     isIncompleteV = False
-    pitchNamesContained = []
+    pitchNamesContained: list[str] = []
     for givenPitch in possibA:
         if givenPitch.name not in pitchNamesContained:
             pitchNamesContained.append(givenPitch.name)
@@ -141,7 +146,7 @@ def isIncomplete(possibA, pitchNamesToContain):
     return isIncompleteV
 
 
-def upperPartsWithinLimit(possibA, maxSemitoneSeparation=12):
+def upperPartsWithinLimit(possibA: Possibility, maxSemitoneSeparation: int|None = 12) -> bool:
     '''
     Returns True if the pitches in the upper parts of possibA
     are found within maxSemitoneSeparation of each other. The
@@ -188,7 +193,7 @@ def upperPartsWithinLimit(possibA, maxSemitoneSeparation=12):
 DEFAULT_MAX_PITCH = pitch.Pitch('B5')
 
 
-def pitchesWithinLimit(possibA, maxPitch=DEFAULT_MAX_PITCH):
+def pitchesWithinLimit(possibA: Possibility, maxPitch: pitch.Pitch = DEFAULT_MAX_PITCH) -> bool:
     '''
     Returns True if all pitches in possibA are less than or equal to
     the maxPitch provided. Comparisons between pitches are done using pitch
@@ -224,7 +229,10 @@ def pitchesWithinLimit(possibA, maxPitch=DEFAULT_MAX_PITCH):
     return True
 
 
-def limitPartToPitch(possibA, partPitchLimits=None):
+def limitPartToPitch(
+    possibA: Possibility,
+    partPitchLimits: dict[int, pitch.Pitch]|None = None
+) -> bool:
     '''
     Takes in a dict, partPitchLimits containing (partNumber, partPitch) pairs, each
     of which limits a part in possibA to a certain :class:`~music21.pitch.Pitch`.
@@ -256,17 +264,21 @@ def limitPartToPitch(possibA, partPitchLimits=None):
 # CONSECUTIVE POSSIBILITY RULE-CHECKING METHODS
 # ---------------------------------------------
 # Speedup tables
-type PITCH_QUARTET_TO_BOOL_TYPE = dict[
+# TODO: reinstitute PitchQuartetToBool caching with proper pitch hash checking
+#   (keying on Pitch objects relies on identity, so these caches rarely hit;
+#   rework to key on nameWithOctave strings).  Same applies to the copies in
+#   figuredBass.checker.
+type PitchQuartetToBool = dict[
     tuple[pitch.Pitch, pitch.Pitch, pitch.Pitch, pitch.Pitch],
     bool
 ]
-parallelFifthsTable: PITCH_QUARTET_TO_BOOL_TYPE = {}
-parallelOctavesTable: PITCH_QUARTET_TO_BOOL_TYPE = {}
-hiddenFifthsTable: PITCH_QUARTET_TO_BOOL_TYPE = {}
-hiddenOctavesTable: PITCH_QUARTET_TO_BOOL_TYPE = {}
+parallelFifthsTable: PitchQuartetToBool = {}
+parallelOctavesTable: PitchQuartetToBool = {}
+hiddenFifthsTable: PitchQuartetToBool = {}
+hiddenOctavesTable: PitchQuartetToBool = {}
 
 
-def parallelFifths(possibA, possibB):
+def parallelFifths(possibA: Possibility, possibB: Possibility) -> bool:
     '''
     Returns True if there are parallel fifths between any
     two shared parts of possibA and possibB.
@@ -339,7 +351,7 @@ def parallelFifths(possibA, possibB):
     return hasParallelFifths
 
 
-def parallelOctaves(possibA, possibB):
+def parallelOctaves(possibA: Possibility, possibB: Possibility) -> bool:
     '''
     Returns True if there are parallel octaves between any
     two shared parts of possibA and possibB.
@@ -413,7 +425,7 @@ def parallelOctaves(possibA, possibB):
     return hasParallelOctaves
 
 
-def hiddenFifth(possibA, possibB):
+def hiddenFifth(possibA: Possibility, possibB: Possibility) -> bool:
     '''
     Returns True if there is a hidden fifth between shared outer parts
     of possibA and possibB. The outer parts here are the first and last
@@ -480,7 +492,7 @@ def hiddenFifth(possibA, possibB):
     return hasHiddenFifth
 
 
-def hiddenOctave(possibA, possibB):
+def hiddenOctave(possibA: Possibility, possibB: Possibility) -> bool:
     '''
     Returns True if there is a hidden octave between shared outer parts
     of possibA and possibB. The outer parts here are the first and last
@@ -537,7 +549,7 @@ def hiddenOctave(possibA, possibB):
     return hasHiddenOctave
 
 
-def voiceOverlap(possibA, possibB):
+def voiceOverlap(possibA: Possibility, possibB: Possibility) -> bool:
     '''
     Returns True if there is voice overlap between any two shared parts
     of possibA and possibB.
@@ -603,7 +615,11 @@ def voiceOverlap(possibA, possibB):
     return hasVoiceOverlap
 
 
-def partMovementsWithinLimits(possibA, possibB, partMovementLimits=None):
+def partMovementsWithinLimits(
+    possibA: Possibility,
+    possibB: Possibility,
+    partMovementLimits: list[tuple[int, int]]|None = None
+) -> bool:
     # noinspection PyShadowingNames
     '''
     Returns True if all movements between shared parts of possibA and possibB
@@ -654,7 +670,7 @@ def partMovementsWithinLimits(possibA, possibB, partMovementLimits=None):
     return withinLimits
 
 
-def upperPartsSame(possibA, possibB):
+def upperPartsSame(possibA: Possibility, possibB: Possibility) -> bool:
     '''
     Returns True if the upper parts are the same.
     False otherwise.
@@ -684,7 +700,11 @@ def upperPartsSame(possibA, possibB):
     return True
 
 
-def partsSame(possibA, possibB, partsToCheck=None):
+def partsSame(
+    possibA: Possibility,
+    possibB: Possibility,
+    partsToCheck: list[int]|None = None
+) -> bool:
     '''
     Takes in partsToCheck, a list of part numbers. Checks if pitches at those part numbers of
     possibA and possibB are equal, determined by pitch space.
@@ -713,7 +733,12 @@ def partsSame(possibA, possibB, partsToCheck=None):
     return True
 
 
-def couldBeItalianA6Resolution(possibA, possibB, threePartChordInfo=None, restrictDoublings=True):
+def couldBeItalianA6Resolution(
+    possibA: Possibility,
+    possibB: Possibility,
+    threePartChordInfo: list[pitch.Pitch]|None = None,
+    restrictDoublings: bool = True
+) -> bool:
     '''
     Speed-enhanced but designed to stand alone.
     Returns True if possibA is an Italian A6 chord
@@ -784,8 +809,8 @@ def couldBeItalianA6Resolution(possibA, possibB, threePartChordInfo=None, restri
             raise PossibilityException('possibA does not spell out an It+6 chord.')
         bass = augSixthChord.bass()
         root = augSixthChord.root()
-        third = augSixthChord.getChordStep(3)
-        fifth = augSixthChord.getChordStep(5)
+        third = t.cast(pitch.Pitch, augSixthChord.getChordStep(3))
+        fifth = t.cast(pitch.Pitch, augSixthChord.getChordStep(5))
         threePartChordInfo = [bass, root, third, fifth]
 
     allowedIntervalNames = ['M3', 'm3', 'M2', 'm-2']
@@ -876,7 +901,10 @@ def couldBeItalianA6Resolution(possibA, possibB, threePartChordInfo=None, restri
 # --------------
 
 
-def partPairs(possibA, possibB):
+def partPairs(
+    possibA: Possibility,
+    possibB: Possibility
+) -> list[tuple[pitch.Pitch, pitch.Pitch]]:
     '''
     Groups together pitches of possibA and possibB which correspond to the same part,
     constituting a shared part.
