@@ -82,6 +82,15 @@ class Test(unittest.TestCase):
         self.assertEqual(b.duration.dots, 0)
         self.assertEqual(b.duration.tuplets[0].durationNormal.dots, 2)
 
+    def testPartialBeamDirections(self):
+        # lowercase `k` is a partial beam to the left, uppercase `K` to the right
+        left = SpineEvent('8ccLk').toNote()
+        self.assertEqual([(bm.type, bm.direction) for bm in left.beams.beamsList],
+                         [('start', None), ('partial', 'left')])
+        right = SpineEvent('8ccLK').toNote()
+        self.assertEqual([(bm.type, bm.direction) for bm in right.beams.beamsList],
+                         [('start', None), ('partial', 'right')])
+
     def testGraceNoteKeepsWrittenDuration(self):
         '''
         A single `q` is a slashed grace note that keeps its written duration

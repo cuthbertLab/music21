@@ -83,6 +83,7 @@ from music21 import key
 from music21 import note
 from music21 import meter
 from music21 import metadata
+from music21 import pitch
 from music21 import roman
 from music21 import prebase
 from music21 import stream
@@ -2353,17 +2354,18 @@ def hdStringToNote(
 
     # 3.2.1 Pitches and 3.3 Rests
 
-    matchedNote = re.search('([a-gA-G]+)', contents)
-    # Detect rests first, because rests can contain manual positioning information,
-    # which is also detected by the `matchedNote` variable above.
-    thisObject: note.GeneralNote
+    # Detect rests first, because rests can contain manual positioning information
+    # (a pitch letter) that the note search would otherwise pick up; only notes
+    # need that search at all.
+    #
     # Build with defaultDurationOrNone (None gives the usual default).  A note
     # that omits its own duration then shares this exact Duration object rather
     # than allocating a copy; one that has its own duration replaces it below.
+    thisObject: note.GeneralNote
     if 'r' in contents:
         thisObject = note.Rest(duration=defaultDurationOrNone)
 
-    elif matchedNote:
+    elif matchedNote := re.search('([a-gA-G]+)', contents):
         kernNoteName = matchedNote.group(1)
         step = kernNoteName[0].lower()
         if step == kernNoteName[0]:  # middle C or higher
@@ -2377,27 +2379,26 @@ def hdStringToNote(
     else:
         raise HumdrumException(f'Could not parse {contents} for note information')
 
-    matchedSharp = re.search(r'(#+)', contents)
-    matchedFlat = re.search(r'(-+)', contents)
-
+    # The count of '#' (or '-') gives the number of sharps (or flats) directly,
+    # which is also the Accidental's alteration -- no regex needed.
     if isinstance(thisObject, note.Note):
-        if matchedSharp:
-            thisObject.pitch.accidental = matchedSharp.group(0)
-        elif matchedFlat:
-            thisObject.pitch.accidental = matchedFlat.group(0)
+        if (sharps := contents.count('#')):
+            thisObject.pitch.accidental = pitch.Accidental(sharps)
+        elif (flats := contents.count('-')):
+            thisObject.pitch.accidental = pitch.Accidental(-flats)
         elif 'n' in contents:
-            thisObject.pitch.accidental = 'n'
+            thisObject.pitch.accidental = pitch.Accidental('n')
 
     # 3.2.2 -- Slurs, Ties, Phrases
     # TODO: add music21 phrase information
-    for i in range(contents.count('{')):
-        pass  # phraseMark start
-    for i in range(contents.count('}')):
-        pass  # phraseMark end
-    for i in range(contents.count('(')):
-        pass  # slur start
-    for i in range(contents.count(')')):
-        pass  # slur end
+    # for i in range(contents.count('{')):
+    #     pass  # phraseMark start
+    # for i in range(contents.count('}')):
+    #     pass  # phraseMark end
+    # for i in range(contents.count('(')):
+    #     pass  # slur start
+    # for i in range(contents.count(')')):
+    #     pass  # slur end
     if '[' in contents:
         thisObject.tie = tie.Tie('start')
     elif ']' in contents:
@@ -2429,10 +2430,10 @@ def hdStringToNote(
         t1.connectedToPrevious = True  # true by default, but explicitly
         thisObject.expressions.append(t1)
 
-    if ':' in contents:
-        # TODO: deal with arpeggiation -- should have been in a
-        #  chord structure
-        pass
+    # if ':' in contents:
+    #     # TODO: deal with arpeggiation -- should have been in a
+    #     #  chord structure
+    #     pass
 
     if 'O' in contents:
         thisObject.expressions.append(expressions.Ornament())
@@ -2470,13 +2471,14 @@ def hdStringToNote(
     # 3.2.7 Duration and
     # 3.2.8 N-Tuplets
 
-    # TODO: SPEEDUP -- only search for rational after foundNumber.
-    foundRational = re.search(r'(\d+)%(\d+)', contents)
+    # Rational durations are rare, and require a '%'; skip the regex without one.
+    foundRational = re.search(r'(\d+)%(\d+)', contents) if '%' in contents else None
     foundNumber = re.search(r'(\d+)', contents)
 
-    if (foundRational or foundNumber) and defaultDurationOrNone is not None:
+    if defaultDurationOrNone is not None and foundNumber:
         # we will be manipulating the duration, so we should give this object
-        # its own duration object
+        # its own duration object (foundRational implies foundNumber, so this
+        # also covers rational durations)
         thisObject.duration = duration.Duration(1.0)
 
     if foundRational:
@@ -2548,15 +2550,14 @@ def hdStringToNote(
         pass  # end appoggiatura duration -- not needed in music21...
 
     # 3.2.10 Beaming
-    # TODO: Support really complex beams
     if isinstance(thisObject, note.NotRest):
-        for i in range(contents.count('L')):
+        for _ in range(contents.count('L')):
             thisObject.beams.append('start')
-        for i in range(contents.count('J')):
+        for _ in range(contents.count('J')):
             thisObject.beams.append('stop')
-        for i in range(contents.count('k')):
-            thisObject.beams.append('partial', 'right')
-        for i in range(contents.count('K')):
+        for _ in range(contents.count('k')):
+            thisObject.beams.append('partial', 'left')
+        for _ in range(contents.count('K')):
             thisObject.beams.append('partial', 'right')
 
     return thisObject
