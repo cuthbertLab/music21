@@ -56,6 +56,7 @@ import io
 import math
 import os
 import pathlib
+import typing as t
 import unittest
 
 
@@ -74,7 +75,7 @@ environLocal = environment.Environment('scale.scala')
 # global variable to cache the paths returned from getPaths()
 SCALA_PATHS: dict[str, dict[str, list[str]]|None] = {'allPaths': None}
 
-def getPaths():
+def getPaths() -> dict[str, list[str]]:
     '''
     Get all scala scale paths. This is called once or the module and
     cached as SCALA_PATHS, which should be used instead of calls to this function.
@@ -86,19 +87,20 @@ def getPaths():
     if SCALA_PATHS['allPaths'] is not None:
         return SCALA_PATHS['allPaths']
     moduleName = scl
+    dirListing: list[str]
     if not hasattr(moduleName, '__path__'):
         # when importing a package name (a directory) the moduleName
         # may be a list of all paths contained within the package
         # this seems to be dependent on the context of the call:
         # from the command line is different from calling from the interpreter
-        dirListing = moduleName
+        dirListing = t.cast(list[str], moduleName)
     else:
         # returns a list with one or more paths
         # the first is the path to the directory that contains xml files
         directory = moduleName.__path__[0]
         dirListing = [os.path.join(directory, x) for x in sorted(os.listdir(directory))]
 
-    paths = {}  # return a dictionary with keys and list of alternate names
+    paths: dict[str, list[str]] = {}  # return dictionary with keys and list of alternate names
     for fp in dirListing:
         if fp.endswith('.scl'):
             paths[fp] = []
@@ -141,40 +143,43 @@ class ScalaPitch:
     # pitch values; if it has a period, it is cents.  Otherwise, it is a ratio
     # above the implied base ratio
     # integer values w/ no period or slash: 2 is 2/1
-    def __init__(self, sourceString=None):
+    def __init__(self, sourceString: str|None = None) -> None:
 
-        self.src = None
+        self.src: str|None = None
         if sourceString is not None:
             self._setSrc(sourceString)
 
         # resole all values into cents shifts
-        self.cents = None
+        self.cents: float|None = None
 
-    def _setSrc(self, raw):
+    def _setSrc(self, raw: str) -> None:
         raw = raw.strip()
         # get decimals and fractions
         raw, junk = common.getNumFromStr(raw, numbers='0123456789./')
         self.src = raw.strip()
 
-    def parse(self, sourceString=None):
+    def parse(self, sourceString: str|None = None) -> float:
         '''
         Parse the source string and set self.cents.
         '''
         if sourceString is not None:
             self._setSrc(sourceString)
 
-        if '.' in self.src:  # cents
-            self.cents = float(self.src)
+        src = t.cast(str, self.src)
+        cents: float
+        if '.' in src:  # cents
+            cents = float(src)
         else:  # it is a ratio
-            if '/' in self.src:
-                n, d = self.src.split('/')
-                n, d = float(n), float(d)
+            if '/' in src:
+                nStr, dStr = src.split('/')
+                n, d = float(nStr), float(dStr)
             else:
-                n = float(self.src)
+                n = float(src)
                 d = 1.0
             # http://www.sengpielaudio.com/calculator-centsratio.htm
-            self.cents = 1200.0 * math.log((n / d), 2)
-        return self.cents
+            cents = 1200.0 * math.log((n / d), 2)
+        self.cents = cents
+        return cents
 
 
 class ScalaData:
@@ -248,23 +253,24 @@ class ScalaData:
 
     >>> sf.close()
     '''
-    def __init__(self, sourceString=None, fileName=None):
+    def __init__(self, sourceString: str|None = None, fileName: str|None = None) -> None:
         self.src = sourceString
         self.fileName = fileName  # store source file name
 
         # added in parsing:
-        self.description = None
+        self.description: str|None = None
 
         # lower limit is 0, as degree 0, or the 1/1 ratio, is implied
         # assumes octave equivalence?
-        self.pitchCount = None  # number of lines w/ pitch values will follow
-        self.pitchValues = []
+        self.pitchCount: int|None = None  # number of lines w/ pitch values will follow
+        self.pitchValues: list[ScalaPitch] = []
 
-    def parse(self):
+    def parse(self) -> None:
         '''
         Parse a scala file delivered as a long string with line breaks
         '''
-        lines = self.src.split('\n')
+        src = t.cast(str, self.src)
+        lines = src.split('\n')
         count = 0  # count non-comment lines
         for i, line in enumerate(lines):
             line = line.strip()
@@ -289,20 +295,21 @@ class ScalaData:
                     sp.parse()
                     self.pitchValues.append(sp)
 
-    def getCentsAboveTonic(self):
+    def getCentsAboveTonic(self) -> list[float|None]:
         '''
         Return a list of cent values above the implied tonic.
         '''
         return [sp.cents for sp in self.pitchValues]
 
 
-    def getAdjacentCents(self):
+    def getAdjacentCents(self) -> list[float]:
         '''
         Get cents values between adjacent intervals.
         '''
-        post = []
-        location = 0
-        for c in self.getCentsAboveTonic():
+        post: list[float] = []
+        location = 0.0
+        for cOrNone in self.getCentsAboveTonic():
+            c = t.cast(float, cOrNone)
             dif = c - location
             # environLocal.printDebug(['getAdjacentCents', 'c',
             #                           c, 'location', location, 'dif', dif])
@@ -310,45 +317,45 @@ class ScalaData:
             location = c  # set new location
         return post
 
-    def setAdjacentCents(self, centList):
+    def setAdjacentCents(self, centList: list[float]) -> None:
         '''
         Given a list of adjacent cent values, create the necessary ScalaPitch
         objects and update them
         '''
         self.pitchValues = []
-        location = 0
+        location = 0.0
         for c in centList:
             sp = ScalaPitch()
-            sp.cents = location + c
-            location = sp.cents
+            location = location + c
+            sp.cents = location
             self.pitchValues.append(sp)
         self.pitchCount = len(self.pitchValues)
 
-    def getIntervalSequence(self):
+    def getIntervalSequence(self) -> list[interval.Interval]:
         '''
         Get the scale as a list of Interval objects.
         '''
-        post = []
+        post: list[interval.Interval] = []
         for c in self.getAdjacentCents():
             # convert cent values to semitone values to create intervals
             post.append(interval.Interval(c * 0.01))
         return post
 
-    def setIntervalSequence(self, iList):
+    def setIntervalSequence(self, iList: list[interval.Interval]) -> None:
         '''
         Set the scale from a list of Interval objects.
         '''
         self.pitchValues = []
-        location = 0
+        location = 0.0
         for i in iList:
             # convert cent values to semitone values to create intervals
             sp = ScalaPitch()
-            sp.cents = location + i.cents
-            location = sp.cents
+            location = location + i.cents
+            sp.cents = location
             self.pitchValues.append(sp)
         self.pitchCount = len(self.pitchValues)
 
-    def getFileString(self):
+    def getFileString(self) -> str:
         '''
         Return a unicode-string suitable for writing a Scala file
 
@@ -403,41 +410,43 @@ class ScalaFile:
     >>> sf.close()
     '''
 
-    def __init__(self, data=None):
-        self.fileName = None
-        self.file = None
+    def __init__(self, data: ScalaData|None = None) -> None:
+        self.fileName: str|None = None
+        self.file: t.IO[str]|None = None
         # store data source if provided
         self.data = data
 
-    def open(self, fp, mode='r'):
+    def open(self, fp: str|pathlib.Path, mode: str = 'r') -> None:
         '''
         Open a file for reading
         '''
         self.file = io.open(fp, mode, encoding='latin-1')  # pylint: disable=consider-using-with
         self.fileName = os.path.basename(fp)
 
-    def openFileLike(self, fileLike):
+    def openFileLike(self, fileLike: t.IO[str]) -> None:
         '''
         Assign a file-like object, such as those provided by StringIO, as an open file object.
         '''
         self.file = fileLike  # already 'open'
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         r = '<ScalaFile>'
         return r
 
-    def close(self):
-        self.file.close()
+    def close(self) -> None:
+        file = t.cast(t.IO[str], self.file)
+        file.close()
 
-    def read(self):
+    def read(self) -> ScalaData:
         '''
         Read a file. Note that this calls readstr, which processes all tokens.
 
         If `number` is given, a work number will be extracted if possible.
         '''
-        return self.readstr(self.file.read())
+        file = t.cast(t.IO[str], self.file)
+        return self.readstr(file.read())
 
-    def readstr(self, strSrc):
+    def readstr(self, strSrc: str) -> ScalaData:
         '''
         Read a string and process all Tokens. Returns a ABCHandler instance.
         '''
@@ -446,9 +455,10 @@ class ScalaFile:
         self.data = ss
         return ss
 
-    def write(self):
+    def write(self) -> None:
         ws = self.writestr()
-        self.file.write(ws)
+        file = t.cast(t.IO[str], self.file)
+        file.write(ws)
 
     def writestr(self) -> str:
         if isinstance(self.data, ScalaData):
@@ -458,7 +468,7 @@ class ScalaFile:
 
 
 # ------------------------------------------------------------------------------
-def parse(target):
+def parse(target: str|pathlib.Path) -> ScalaData|None:
     # noinspection SpellCheckingInspection, PyShadowingNames
     '''
     Get a :class:`~music21.scala.ScalaData` object from
@@ -486,7 +496,7 @@ def parse(target):
     >>> ss.description
     'Detempered Blackjack in 1/4 kleismic marvel tuning'
     '''
-    match = None
+    match: str|None = None
 
     if isinstance(target, pathlib.Path):
         target = str(target)
@@ -531,7 +541,7 @@ def parse(target):
         return ss
 
 
-def search(target):
+def search(target: str) -> list[str]:
     # noinspection SpellCheckingInspection
     '''
     Search the scala archive for matches based on a string
@@ -541,7 +551,7 @@ def search(target):
     ['mbira_banda.scl', 'mbira_banda2.scl', 'mbira_gondo.scl', 'mbira_kunaka.scl',
      'mbira_kunaka2.scl', 'mbira_mude.scl', 'mbira_mujuru.scl', 'mbira_zimb.scl']
     '''
-    match = []
+    match: list[str] = []
     # try from stored collections
     # remove any spaces
     target = target.replace(' ', '')
@@ -559,7 +569,7 @@ def search(target):
             if target.lower() in alt:
                 if fp not in match:
                     match.append(fp)
-    names = []
+    names: list[str] = []
     for fp in match:
         names.append(os.path.basename(fp))
     names.sort()
@@ -575,7 +585,7 @@ class TestExternal(unittest.TestCase):
 
 class Test(unittest.TestCase):
 
-    def testScalaScaleA(self):
+    def testScalaScaleA(self) -> None:
         msg = '''! slendro5_2.scl
 !
 A slendro type pentatonic which is based on intervals of 7, no. 2
@@ -612,7 +622,7 @@ A slendro type pentatonic which is based on intervals of 7, no. 2
                           '<music21.interval.Interval M2 (+31c)>'])
 
     # noinspection SpellCheckingInspection
-    def testScalaScaleB(self):
+    def testScalaScaleB(self) -> None:
         msg = '''! fj-12tet.scl
 !
 Franck Jedrzejewski continued fractions approx. of 12-tet
@@ -698,7 +708,7 @@ Franck Jedrzejewski continued fractions approx. of 12-tet
                              '1088.268714730',
                              '1200.000000000'])
 
-    def testScalaFileA(self):
+    def testScalaFileA(self) -> None:
         # noinspection SpellCheckingInspection
         msg = '''! arist_chromenh.scl
 !
