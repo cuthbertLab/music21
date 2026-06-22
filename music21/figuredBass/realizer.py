@@ -45,13 +45,16 @@ import random
 import typing as t
 import unittest
 
+from music21 import base
 from music21 import chord
 from music21 import clef
 from music21 import exceptions21
+from music21 import harmony
 from music21 import key
 from music21 import meter
 from music21 import note
 from music21 import pitch
+from music21 import roman
 from music21 import stream
 from music21.common.types import OffsetQL
 from music21.figuredBass import checker
@@ -60,10 +63,6 @@ from music21.figuredBass import realizerScale
 from music21.figuredBass import rules
 from music21.figuredBass import segment
 from music21.figuredBass.possibility import Possibility
-
-if t.TYPE_CHECKING:
-    from music21 import harmony
-    from music21 import roman
 
 
 def figuredBassFromStream(streamPart: stream.Stream) -> FiguredBassLine:
@@ -164,7 +163,7 @@ def figuredBassFromStream(streamPart: stream.Stream) -> FiguredBassLine:
     return fb
 
 
-def addLyricsToBassNote(bassNote: note.Note, notationString: str|None = None) -> None:
+def addLyricsToBassNote(bassNote: note.Note, notationString: str = '') -> None:
     '''
     Takes in a bassNote and a corresponding notationString as arguments.
     Adds the parsed notationString as lyrics to the bassNote, which is
@@ -183,7 +182,7 @@ def addLyricsToBassNote(bassNote: note.Note, notationString: str|None = None) ->
         :width: 100
     '''
     bassNote.lyrics = []
-    n = notation.Notation(notationString or '')
+    n = notation.Notation(notationString)
     if not n.figureStrings:
         return
     maxLength = max([len(fs) for fs in n.figureStrings])
@@ -274,15 +273,12 @@ class FiguredBassLine:
         >>> fbLine.addElement(roman.RomanNumeral('V'))
         '''
         bassObject.editorial.notationString = notationString
-        c = bassObject.classes
-        if 'Note' in c:
-            bassNote = t.cast(note.Note, bassObject)
-            self._fbList.append((bassNote, notationString))  # a bass note, and a notationString
-            addLyricsToBassNote(bassNote, notationString)
+        if isinstance(bassObject, note.Note):
+            self._fbList.append((bassObject, notationString))  # a bass note, and a notationString
+            addLyricsToBassNote(bassObject, notationString or '')
         # ---------- Added to accommodate harmony.ChordSymbol and roman.RomanNumeral objects ---
-        elif 'RomanNumeral' in c or 'ChordSymbol' in c:
-            harmonyObject = t.cast('harmony.ChordSymbol | roman.RomanNumeral', bassObject)
-            self._fbList.append(harmonyObject)  # a roman Numeral object
+        elif isinstance(bassObject, (roman.RomanNumeral, harmony.ChordSymbol)):
+            self._fbList.append(bassObject)  # a roman Numeral object
         else:
             raise FiguredBassLineException(
                 'Not a valid bassObject (only note.Note, '
@@ -474,11 +470,8 @@ class FiguredBassLine:
             if isinstance(item, tuple):
                 # a (bassNote, notationString) pair, not a harmony object
                 continue
-            c = item.classes
-            if 'Note' in c:
-                break
             # Added to accommodate harmony.ChordSymbol and roman.RomanNumeral objects
-            if 'RomanNumeral' in c or 'ChordSymbol' in c:
+            if isinstance(item, (roman.RomanNumeral, harmony.ChordSymbol)):
                 listOfHarmonyObjects = True
                 break
 
@@ -548,7 +541,7 @@ class FiguredBassLine:
         elif len(segmentList) >= 3:
             segmentList.reverse()
             # gets this wrong  # pylint: disable=cell-var-from-loop
-            movementsAB: dict[Possibility, list[Possibility]]|None = None
+            movementsAB: dict[Possibility, list[Possibility]] = {}
             for segmentIndex in range(1, len(segmentList) - 1):
                 movementsAB = segmentList[segmentIndex + 1].movements
                 movementsBC = segmentList[segmentIndex].movements
@@ -560,10 +553,9 @@ class FiguredBassLine:
                     movementsAB[possibA] = list(
                         filter(lambda possibBB: (possibBB in movementsBC), possibBList))
 
-            movementsABFinal = t.cast('dict[Possibility, list[Possibility]]', movementsAB)
-            for (possibA, possibBList) in list(movementsABFinal.items()):
+            for (possibA, possibBList) in list(movementsAB.items()):
                 if not possibBList:
-                    del movementsABFinal[possibA]
+                    del movementsAB[possibA]
 
             segmentList.reverse()
             return True
@@ -592,6 +584,15 @@ class Realization:
             realizations are represented in chorale style with n staves,
             where n is the number of parts. SATB if n = 4.''',
     }
+
+    # Populated in __init__ from FiguredBassLine.realize()'s keyword outputs.
+    # Declared here for typing; **fbLineOutputs stays untyped for Sphinx's sake.
+    _segmentList: list[segment.Segment]
+    _inKey: key.Key
+    _keySig: key.KeySignature
+    _inTime: meter.TimeSignature
+    _overlaidParts: list[base.Music21Object]
+    _paddingLeft: OffsetQL
 
     def __init__(self, **fbLineOutputs: t.Any) -> None:
         # fbLineOutputs always will have three elements, checks are for sphinx documentation only.
@@ -695,7 +696,7 @@ class Realization:
         currMovements = self._segmentList[0].movements
         if self.getNumSolutions() == 0:
             raise FiguredBassLineException('Zero solutions')
-        prevPossib = random.sample(currMovements.keys(), 1)[0]
+        prevPossib = random.sample(list(currMovements.keys()), 1)[0]
         progression.append(prevPossib)
 
         for segmentIndex in range(len(self._segmentList) - 1):

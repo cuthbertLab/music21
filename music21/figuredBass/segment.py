@@ -134,19 +134,26 @@ class Segment:
         else:
             self.fbRules = copy.deepcopy(fbRules)
 
-        self._specialResolutionRuleChecking: dict[bool, list[tuple[t.Any, ...]]]|None = None
-        self._singlePossibilityRuleChecking: dict[bool, list[tuple[t.Any, ...]]]|None = None
-        self._consecutivePossibilityRuleChecking: dict[bool, list[tuple[t.Any, ...]]]|None = None
+        # Empty until the matching allCorrect*/special-resolution method compiles them.
+        self._specialResolutionRuleChecking: dict[bool, list[tuple[t.Any, ...]]] = {}
+        self._singlePossibilityRuleChecking: dict[bool, list[tuple[t.Any, ...]]] = {}
+        self._consecutivePossibilityRuleChecking: dict[bool, list[tuple[t.Any, ...]]] = {}
 
         self.bassNote: note.Note = bassNote
         self.numParts: int = numParts
         self._maxPitch: pitch.Pitch = maxPitch
+        # `notationString is None` is the mode sentinel: None means "no figures given,
+        # take the chord from listOfPitches" (the harmony.ChordSymbol / roman.RomanNumeral
+        # path); any string (including '') means "figured bass, derive pitches from the
+        # figures". realizer.py only ever supplies one of the two, so they never collide,
+        # but if both are given listOfPitches is silently dropped. (This is why
+        # notationString must NOT be defaulted to '': that would disable the sentinel and
+        # break every chord-symbol/roman realization.)
         if notationString is None and listOfPitches is not None:
-            # must be a chord symbol or roman num.
             self.pitchNamesInChord = listOfPitches
-        # ------ Added to accommodate harmony.ChordSymbol and roman.RomanNumeral objects ------
         else:
-            self.pitchNamesInChord = fbScale.getPitchNames(self.bassNote.pitch, notationString)
+            self.pitchNamesInChord = fbScale.getPitchNames(self.bassNote.pitch,
+                                                           notationString or '')
 
         self.allPitchesAboveBass = getPitches(self.pitchNamesInChord,
                                               self.bassNote.pitch,
@@ -250,8 +257,8 @@ class Segment:
         True       partMovementsWithinLimits     True                          []
         True       parallelFifths                False                         None
         True       parallelOctaves               False                         None
-        True       hiddenFifth                   False                         None
-        True       hiddenOctave                  False                         None
+        True       hiddenFifths                  False                         None
+        True       hiddenOctaves                 False                         None
         False      couldBeItalianA6Resolution    True           [<music21.pitch.Pitch C3>,
                                                                  <music21.pitch.Pitch C3>,
                                                                  <music21.pitch.Pitch E3>,
@@ -274,8 +281,8 @@ class Segment:
         True       partMovementsWithinLimits     True                          [(1, 2)]
         True       parallelFifths                False                         None
         True       parallelOctaves               False                         None
-        True       hiddenFifth                   False                         None
-        False      hiddenOctave                  False                         None
+        True       hiddenFifths                  False                         None
+        False      hiddenOctaves                 False                         None
         False      couldBeItalianA6Resolution    True           [<music21.pitch.Pitch C3>,
                                                                  <music21.pitch.Pitch C3>,
                                                                  <music21.pitch.Pitch E3>,
@@ -293,8 +300,8 @@ class Segment:
             (True, possibility.partMovementsWithinLimits, True, [fbRules.partMovementLimits]),
             (fbRules.forbidParallelFifths, possibility.parallelFifths, False),
             (fbRules.forbidParallelOctaves, possibility.parallelOctaves, False),
-            (fbRules.forbidHiddenFifths, possibility.hiddenFifth, False),
-            (fbRules.forbidHiddenOctaves, possibility.hiddenOctave, False),
+            (fbRules.forbidHiddenFifths, possibility.hiddenFifths, False),
+            (fbRules.forbidHiddenOctaves, possibility.hiddenOctaves, False),
             (fbRules.resolveAugmentedSixthProperly and isItalianAugmentedSixth,
                 possibility.couldBeItalianA6Resolution,
                 True,
@@ -434,6 +441,8 @@ class Segment:
         dominantScale = t.cast(scale.MajorScale, scale.MajorScale().derive(domChord))
         minorScale = dominantScale.getParallelMinor()
 
+        # A complete diatonic scale always defines a tonic and every degree 1-7,
+        # so getTonic() and pitchFromDegree() never return None here; the casts are safe.
         tonic = t.cast(pitch.Pitch, dominantScale.getTonic())
         subdominant = t.cast(pitch.Pitch, dominantScale.pitchFromDegree(4))
         majSubmediant = t.cast(pitch.Pitch, dominantScale.pitchFromDegree(6))
@@ -529,6 +538,8 @@ class Segment:
         dimScale = scale.HarmonicMinorScale().deriveByDegree(7, dimChord.root())
         # minorScale = dimScale.getParallelMinor()
 
+        # A complete diatonic scale always defines a tonic and every degree 1-7,
+        # so getTonic() and pitchFromDegree() never return None here; the casts are safe.
         tonic = t.cast(pitch.Pitch, dimScale.getTonic())
         subdominant = t.cast(pitch.Pitch, dimScale.pitchFromDegree(4))
 
@@ -801,7 +812,6 @@ class Segment:
         from segmentA.
         '''
         ruleChecking = self._singlePossibilityRuleChecking
-        assert ruleChecking is not None
         for (method, isCorrect, args) in ruleChecking[True]:
             if not (method(possibA, *args) == isCorrect):
                 return False
@@ -819,7 +829,6 @@ class Segment:
         from segmentA.
         '''
         ruleChecking = self._consecutivePossibilityRuleChecking
-        assert ruleChecking is not None
         for (method, isCorrect, args) in ruleChecking[True]:
             if not (method(possibA, possibB, *args) == isCorrect):
                 return False

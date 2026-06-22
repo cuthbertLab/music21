@@ -38,11 +38,11 @@ doc_parallelOctaves = '''True by default. If True,
     (possibA, possibB) pairs, and all those pairs for which the method returns
     False are retained.'''
 doc_hiddenFifths = '''True by default. If True,
-    :meth:`~music21.figuredBass.possibility.hiddenFifth` is applied to all
+    :meth:`~music21.figuredBass.possibility.hiddenFifths` is applied to all
     (possibA, possibB) pairs, and all those pairs for which the method returns
     False are retained.'''
 doc_hiddenOctaves = '''True by default. If True,
-    :meth:`~music21.figuredBass.possibility.hiddenOctave` is applied to all
+    :meth:`~music21.figuredBass.possibility.hiddenOctaves` is applied to all
     (possibA, possibB) pairs, and all those pairs for which the method returns
     False are retained.'''
 doc_voiceOverlap = '''True by default. If True,
