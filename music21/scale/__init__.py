@@ -312,6 +312,17 @@ class AbstractScale(Scale):
         # step: {'direction':Direction.BI, 'interval':Interval}
         self._alteredDegrees: intervalNetwork.AlteredDegrees = {}
 
+    @property
+    def _netRequired(self) -> intervalNetwork.IntervalNetwork:
+        '''
+        The built :class:`~music21.scale.intervalNetwork.IntervalNetwork`, raising
+        :class:`ScaleException` if :meth:`buildNetwork` has not populated it yet.
+        '''
+        if self._net is None:
+            raise ScaleException(
+                'this AbstractScale has no interval network yet; call buildNetwork() first')
+        return self._net
+
     def buildNetwork(self, mode: t.Any = None) -> None:
         '''
         Calling the buildNetwork, with or without parameters,
@@ -549,7 +560,7 @@ class AbstractScale(Scale):
         '''
         Get a pitch for desired scale degree.
         '''
-        net = t.cast('intervalNetwork.IntervalNetwork', self._net)
+        net = self._netRequired
         post = net.getPitchFromNodeDegree(
             pitchReference=pitchReference,  # pitch defined here
             nodeName=nodeName,  # defined in abstract class
@@ -583,7 +594,7 @@ class AbstractScale(Scale):
         >>> abstractScale.buildNetworkFromPitches([pitch.Pitch(p) for p in pitchList])
         '''
         # TODO: rely here on intervalNetwork for caching
-        net = t.cast('intervalNetwork.IntervalNetwork', self._net)
+        net = self._netRequired
         post = net.realizePitchByDegree(
             pitchReference=pitchReference,  # pitch defined here
             nodeId=nodeId,  # defined in abstract class
@@ -605,7 +616,7 @@ class AbstractScale(Scale):
         :class:`~music21.intervalNetwork.IntervalNetwork`, passing on the
         stored alteredDegrees dictionary.
         '''
-        net = t.cast('intervalNetwork.IntervalNetwork', self._net)
+        net = self._netRequired
         post = net.getRelativeNodeDegree(
             pitchReference=pitchReference,
             nodeId=nodeName,
@@ -627,7 +638,7 @@ class AbstractScale(Scale):
         Expose functionality from :class:`~music21.intervalNetwork.IntervalNetwork`,
         passing on the stored alteredDegrees dictionary.
         '''
-        net = t.cast('intervalNetwork.IntervalNetwork', self._net)
+        net = self._netRequired
         post = net.nextPitch(pitchReference=pitchReference,
                                    nodeName=nodeName,
                                    pitchOrigin=pitchOrigin,
@@ -647,7 +658,7 @@ class AbstractScale(Scale):
         '''
         Define a pitch target and a node.
         '''
-        net = t.cast('intervalNetwork.IntervalNetwork', self._net)
+        net = self._netRequired
         post = net.getPitchFromNodeDegree(
             pitchReference=pitchReference,
             nodeName=nodeName,
@@ -1498,6 +1509,16 @@ class ConcreteScale(Scale):
             raise TypeError(f'abstract must be an AbstractScale, not {type(newAbstract)}')
         self._abstract = newAbstract
 
+    @property
+    def _abstractRequired(self) -> AbstractScale:
+        '''
+        The :class:`AbstractScale` backing this concrete scale, raising
+        :class:`ScaleException` if none has been defined yet.
+        '''
+        if self._abstract is None:
+            raise ScaleException('this ConcreteScale has no abstract scale defined')
+        return self._abstract
+
 
     def getDegreeMaxUnique(self) -> int:
         '''
@@ -1833,7 +1854,7 @@ class ConcreteScale(Scale):
         ['C2', 'G#2', 'C3', 'G#3', 'C4', 'G#4', 'C5', 'G#5', 'C6']
         '''
         # TODO: rely here on intervalNetwork for caching
-        abstract = t.cast(AbstractScale, self._abstract)
+        abstract = self._abstractRequired
         post = abstract.realizePitchByDegree(
             pitchReference=t.cast(pitch.Pitch, self.tonic),  # pitch defined here
             nodeId=abstract.tonicDegree,  # defined in abstract class
@@ -1908,7 +1929,7 @@ class ConcreteScale(Scale):
         ...                              comparisonAttribute='step')
         3
         '''
-        abstract = t.cast(AbstractScale, self._abstract)
+        abstract = self._abstractRequired
         post = abstract.getRelativeNodeDegree(
             pitchReference=t.cast(pitch.Pitch, self.tonic),
             nodeName=abstract.tonicDegree,
@@ -2304,7 +2325,7 @@ class ConcreteScale(Scale):
                                              comparisonAttribute=comparisonAttribute)
 
         # need to deal with direction here? or get an aggregate scale
-        abstract = t.cast(AbstractScale, self._abstract)
+        abstract = self._abstractRequired
         net = t.cast('intervalNetwork.IntervalNetwork', abstract._net)
         matched, notMatched = net.match(
             pitchReference=t.cast(pitch.Pitch, self.tonic),
@@ -2340,7 +2361,7 @@ class ConcreteScale(Scale):
         # strip out unique pitches in a list
         otherPitches = self.extractPitchList(other,
                                              comparisonAttribute=comparisonAttribute)
-        abstract = t.cast(AbstractScale, self._abstract)
+        abstract = self._abstractRequired
         net = t.cast('intervalNetwork.IntervalNetwork', abstract._net)
         post = net.findMissing(
             pitchReference=t.cast(pitch.Pitch, self.tonic),
@@ -2449,7 +2470,7 @@ class ConcreteScale(Scale):
                                              comparisonAttribute=comparisonAttribute,
                                              removeDuplicates=removeDuplicates)
 
-        abstract = t.cast(AbstractScale, self._abstract)
+        abstract = self._abstractRequired
         net = t.cast('intervalNetwork.IntervalNetwork', abstract._net)
         pairs = net.find(pitchTarget=otherPitches,
                          resultsReturned=resultsReturned,
@@ -2485,7 +2506,7 @@ class ConcreteScale(Scale):
                                              comparisonAttribute=comparisonAttribute)
 
         # weight target membership
-        abstract = t.cast(AbstractScale, self._abstract)
+        abstract = self._abstractRequired
         net = t.cast('intervalNetwork.IntervalNetwork', abstract._net)
         pairs = net.find(pitchTarget=otherPitches,
                          comparisonAttribute=comparisonAttribute)
@@ -2535,7 +2556,7 @@ class ConcreteScale(Scale):
         otherPitches = self.extractPitchList(other,
                                              comparisonAttribute=comparisonAttribute)
 
-        abstract = t.cast(AbstractScale, self._abstract)
+        abstract = self._abstractRequired
         net = t.cast('intervalNetwork.IntervalNetwork', abstract._net)
         pairs = net.find(pitchTarget=otherPitches,
                          resultsReturned=None,
@@ -2566,7 +2587,7 @@ class ConcreteScale(Scale):
 
         TODO: Does not yet work for directional scales
         '''
-        abstract = t.cast(AbstractScale, self._abstract)
+        abstract = self._abstractRequired
         p = abstract.getNewTonicPitch(
             pitchReference=pitchRef,
             nodeName=degree,
@@ -2595,7 +2616,7 @@ class ConcreteScale(Scale):
         Object for this scale.  It can be used to find interval
         distances in cents between degrees.
         '''
-        abstract = t.cast(AbstractScale, self.abstract)
+        abstract = self._abstractRequired
         ss = abstract.getScalaData()
         # customize with more specific representation
         ss.description = repr(self)
@@ -2613,7 +2634,7 @@ class ConcreteScale(Scale):
         if fmt is not None:
             fileFormat, unused_ext = common.findFormat(fmt)
             if fileFormat == 'scala':
-                abstract = t.cast(AbstractScale, self.abstract)
+                abstract = self._abstractRequired
                 return abstract.write(fmt=fmt, fp=fp, direction=direction)
         return Scale.write(self, fmt=fmt, fp=fp, **keywords)
 
@@ -2629,7 +2650,7 @@ class ConcreteScale(Scale):
         if fmt is not None:
             fileFormat, unused_ext = common.findFormat(fmt)
             if fileFormat == 'scala':
-                abstract = t.cast(AbstractScale, self.abstract)
+                abstract = self._abstractRequired
                 abstract.show(fmt=fmt, app=app, direction=direction)
                 return
         Scale.show(self, fmt=fmt, app=app, **keywords)
@@ -2683,7 +2704,7 @@ class DiatonicScale(ConcreteScale):
         >>> sc.getDominant()
         <music21.pitch.Pitch C#5>
         '''
-        abstract = t.cast(AbstractDiatonicScale, self._abstract)
+        abstract = t.cast(AbstractDiatonicScale, self._abstractRequired)
         return self.pitchFromDegree(abstract.dominantDegree)
 
     def getLeadingTone(self) -> pitch.Pitch:
@@ -2757,7 +2778,7 @@ class DiatonicScale(ConcreteScale):
         >>> [str(p) for p in sc2.pitches]
         ['F#5', 'G#5', 'A5', 'B5', 'C#6', 'D6', 'E6', 'F#6']
         '''
-        abstract = t.cast(AbstractDiatonicScale, self.abstract)
+        abstract = t.cast(AbstractDiatonicScale, self._abstractRequired)
         return MinorScale(self.pitchFromDegree(abstract.relativeMinorDegree))
 
     def getRelativeMajor(self) -> MajorScale:
@@ -2783,7 +2804,7 @@ class DiatonicScale(ConcreteScale):
         >>> [str(p) for p in sc2.getRelativeMajor().pitches]
         ['C5', 'D5', 'E5', 'F5', 'G5', 'A5', 'B5', 'C6']
         '''
-        abstract = t.cast(AbstractDiatonicScale, self.abstract)
+        abstract = t.cast(AbstractDiatonicScale, self._abstractRequired)
         return MajorScale(self.pitchFromDegree(abstract.relativeMajorDegree))
 
 
@@ -3197,7 +3218,7 @@ class ChromaticScale(ConcreteScale):
         self._abstract = AbstractCyclicalScale(mode=[
             'm2', 'm2', 'm2',
             'm2', 'm2', 'm2', 'm2', 'm2', 'm2', 'm2', 'm2', 'm2'])
-        net = t.cast('intervalNetwork.IntervalNetwork', self._abstract._net)
+        net = self._abstractRequired._netRequired
         net.pitchSimplification = 'mostCommon'
         self.type = 'Chromatic'
 
@@ -3349,7 +3370,7 @@ class ScalaScale(ConcreteScale):
         scalaData = self._scalaData
         intervalSequence = scalaData.getIntervalSequence()
         self._abstract = AbstractCyclicalScale(mode=intervalSequence)
-        net = t.cast('intervalNetwork.IntervalNetwork', self._abstract._net)
+        net = self._abstractRequired._netRequired
         net.pitchSimplification = 'mostCommon'
         self.type = f'Scala: {scalaData.fileName}'
         self.description = scalaData.description
