@@ -969,8 +969,6 @@ class GeneralNote(base.Music21Object):
 
         Appoggiaturas are still a work in progress.
 
-        * Changed in v6: corrected spelling of `appoggiatura` keyword.
-
         >>> ng2 = n.getGrace(appoggiatura=True)
         >>> ng2.duration
         <music21.duration.AppoggiaturaDuration unlinked type:half quarterLength:0.0>
@@ -984,15 +982,17 @@ class GeneralNote(base.Music21Object):
         >>> r.getGrace(inPlace=True)
         >>> r.duration
         <music21.duration.GraceDuration unlinked type:eighth quarterLength:0.0>
+
+        * Changed in v6: corrected spelling of `appoggiatura` keyword.
         '''
-        if inPlace is False:
+        if not inPlace:
             e = copy.deepcopy(self)
         else:
             e = self
 
         e.duration = e.duration.getGraceDuration(appoggiatura=appoggiatura)
 
-        if inPlace is False:
+        if not inPlace:
             return e
 
 

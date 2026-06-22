@@ -18,12 +18,14 @@ for the deep-copy round trip.
 from __future__ import annotations
 
 import re
+import typing as t
 import unittest
 
 from music21 import bar
 from music21 import common
 from music21 import dynamics
 from music21 import expressions
+from music21 import note
 from music21 import roman
 from music21 import stream
 from music21.humdrum import testFiles
@@ -34,7 +36,6 @@ from music21.humdrum.spineParser import (
     SpineEvent,
     flavors,
     hdStringToMeasure,
-    hdStringToNote,
     kernTandemToObject,
 )
 
@@ -119,19 +120,41 @@ class Test(unittest.TestCase):
         self.assertEqual(n.duration.type, 'eighth')
         self.assertTrue(n.duration.slash)
 
+    def testGraceNoteFromProcessNoteEvent(self):
+        ks = KernSpine()
+        ks.setup()
+        # noinspection SpellCheckingInspection
+        a = ks.processNoteEvent('4Cq')
+        self.assertEqual(a.duration.type, 'quarter')
+        self.assertEqual(a.duration.slash, True)
+        # noinspection SpellCheckingInspection
+        a = ks.processNoteEvent('16Cqq')
+        self.assertEqual(a.duration.type, '16th')
+        self.assertEqual(a.duration.slash, False)
+
+    def testChordFromProcessChordEvent(self):
+        ks = KernSpine()
+        ks.setup()
+        c = ks.processChordEvent('8C 8E')
+        self.assertEqual(len(c.notes), 2)
+        self.assertEqual(c.notes[0].duration, c.duration)
+        c = ks.processChordEvent('8C E')
+        self.assertEqual(c.notes[0].duration, c.notes[1].duration)
+
     def testChordNoteInheritsDefaultDuration(self):
         '''
         A note with no written duration takes the given defaultDurationOrNone
         (the first note's duration in a chord), sharing the same Duration object;
         a note with its own written duration ignores it.
         '''
-        first = hdStringToNote('8C')
-        inherited = hdStringToNote('E', first.duration)
-        self.assertEqual(inherited.duration.type, 'eighth')
-        self.assertIs(inherited.duration, first.duration)
-
-        ownDuration = hdStringToNote('2G', first.duration)
-        self.assertEqual(ownDuration.duration.type, 'half')
+        ks = KernSpine()
+        ks.setup()
+        c = ks.processChordEvent('8C E 2G')
+        self.assertIs(c.duration, c[0].duration)
+        self.assertEqual(c.notes[0].duration.type, 'eighth')
+        self.assertIs(c[0].duration, c[1].duration)
+        self.assertIsNot(c[0].duration, c[2].duration)
+        self.assertEqual(c.notes[2].duration.type, 'half')
 
     def testPartiallyNotatedChordDurations(self):
         '''
@@ -806,22 +829,25 @@ class Test(unittest.TestCase):
 
     def testFlavors(self):
         prevFlavor = flavors['JRP']
-        flavors['JRP'] = False
-        hdc = HumdrumDataCollection(testFiles.dottedTuplet)
-        hdc.parse()
-        c = hdc.stream
-        flavors['JRP'] = True
-        hdc2 = HumdrumDataCollection(testFiles.dottedTuplet)
-        hdc2.parse()
-        d = hdc2.stream
-        flavors['JRP'] = prevFlavor
-        cn = c.parts[0].measure(1).notes[1]
-        dn = d.parts[0].measure(1).notes[1]
+        try:
+            flavors['JRP'] = False
+            hdc = HumdrumDataCollection(testFiles.dottedTuplet)
+            hdc.parse()
+            c = t.cast(stream.Score, hdc.stream)
+            flavors['JRP'] = True
+            hdc2 = HumdrumDataCollection(testFiles.dottedTuplet)
+            hdc2.parse()
+            d = t.cast(stream.Score, hdc2.stream)
+        finally:
+            flavors['JRP'] = prevFlavor
+        cn = c[note.Note][1]
         self.assertEqual(cn.duration.fullName, 'Eighth Triplet (1/2 QL)')
         self.assertEqual(cn.duration.dots, 0)
         self.assertEqual(repr(cn.duration.tuplets[0].durationNormal),
                          "DurationTuple(type='eighth', dots=1, quarterLength=0.75)")
         self.assertEqual(cn.duration.tuplets[0].durationNormal.dots, 1)
+
+        dn = d[note.Note][1]
         self.assertEqual(dn.duration.fullName, 'Dotted Eighth Triplet (1/2 QL)')
         self.assertEqual(dn.duration.dots, 1)
         self.assertEqual(repr(dn.duration.tuplets[0].durationNormal),
