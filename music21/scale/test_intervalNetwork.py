@@ -333,9 +333,9 @@ class Test(unittest.TestCase):
 
     def testScaleArbitrary(self):
         sc1 = scale.MajorScale('g')
-        self.assertEqual(sorted([str(x) for x in sc1.abstract._net.nodes.keys()]),
+        self.assertEqual(sorted([str(x) for x in sc1.abstract.network.nodes.keys()]),
                          ['0', '1', '2', '3', '4', '5', 'Terminus.HIGH', 'Terminus.LOW'])
-        self.assertEqual(sorted(sc1.abstract._net.edges.keys()),
+        self.assertEqual(sorted(sc1.abstract.network.edges.keys()),
                          [0, 1, 2, 3, 4, 5, 6])
 
         nodes = ({'id': Terminus.LOW, 'degree': 1},

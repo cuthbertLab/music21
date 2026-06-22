@@ -2175,7 +2175,7 @@ class IntervalNetwork:
         Note that it might not always be two octaves apart
 
         #  s = scale.AbstractDiatonicScale('major')
-        #  s._net.realizeMinMax(pitch.Pitch('D2'))
+        #  s.network.realizeMinMax(pitch.Pitch('D2'))
         #  (<music21.pitch.Pitch D2>, <music21.pitch.Pitch D3>)
         '''
         # first, get termini, then extend by an octave.
