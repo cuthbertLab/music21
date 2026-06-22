@@ -240,14 +240,14 @@ class Scale(base.Music21Object):
         if removeDuplicates is False:
             return pre
 
-        uniquePitches: dict[t.Any, bool] = {}
+        seen: set[object] = set()
 
         post: list[pitch.Pitch] = []
 
         for p in pre:
             hashValue = getattr(p, comparisonAttribute)
-            if hashValue not in uniquePitches:
-                uniquePitches[hashValue] = True
+            if hashValue not in seen:
+                seen.add(hashValue)
                 post.append(p)
         for p in post:
             if p.octave is None:
