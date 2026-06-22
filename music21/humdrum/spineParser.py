@@ -44,16 +44,15 @@ SpineParsing consists of several steps.
 
 * Changed in v10: flag attributes `isSpineLine, isComment, isGlobal, isReference` have been
     removed from HumdrumLine and all subclasses. `isinstance(...)` is a bit slower than
-    checking these, but adds correct typing.  Nothing is stored with weakrefs.  `.iterIndex`
-    and hand rolled iterator/generators are gone now (could've gone when Python 2.4 became
+    checking these, but adds correct typing.  `.iterIndex` and hand rolled iterator/generators
+    are gone now (they could've gone away when Python 2.4 became
     the minimum version).  `HumdrumDataCollection.parsePositionInStream` is gone (was
     duplicating `numLines`); `HumdrumDataCollection.fileLength` is now the read-only
     property `numLines` (= `len(self.dataStream)`); `HumdrumLine.position` and
     `SpineEvent.position` were both renamed to `lineNumber` and now hold the 1-based
-    source line number (was eventList index for SpineEvent),
-    advancing on blank lines too.  Blank lines now produce `BlankLine` HumdrumLine
-    entries rather than being skipped, so `eventList[lineNumber - 1]` always
-    resolves to the line at that source position.
+    source line number (was eventList index for SpineEvent), advancing on blank lines too.
+    Blank lines now produce `BlankLine` HumdrumLine entries rather than being skipped,
+    in order that `eventList[lineNumber - 1]` always resolve to the line at that source position.
 '''
 from __future__ import annotations
 
@@ -159,7 +158,7 @@ class HumdrumDataCollection(prebase.ProtoM21Object):
         if isinstance(dataStream, str):
             dataStream = dataStream.splitlines()
 
-        self.dataStream: list[str] = dataStream
+        self.dataStream = t.cast(list[str], dataStream)
         # Defaults to a Score; parseOpusDataCollections will replace it with
         # an Opus if the input turns out to be a multipart file.
         self.stream: stream.Score|stream.Opus = stream.Score()
@@ -204,11 +203,12 @@ class HumdrumDataCollection(prebase.ProtoM21Object):
         self.parseEventListFromDataStream(dataStream)  # sets self.eventList
         self.parseProtoSpinesAndEventCollections()
         self.spineCollection = self.createHumdrumSpines()
-        self.spineCollection.createMusic21Streams()
+        spineCollection = t.cast(SpineCollection, self.spineCollection)
+        spineCollection.createMusic21Streams()
         self.insertGlobalEvents()
-        for thisSpine in self.spineCollection:
+        for thisSpine in spineCollection:
             thisSpine.stream.id = 'spine_' + str(thisSpine.id)
-        for thisSpine in self.spineCollection:
+        for thisSpine in spineCollection:
             if thisSpine.parentSpine is None and thisSpine.spineType == 'kern':
                 score.insert(thisSpine.stream)
 
@@ -1670,6 +1670,9 @@ class SpineEvent(prebase.ProtoM21Object):
         <music21.note.Note D#>
         >>> n.octave
         2
+
+        Default duration is a quarter note.
+
         >>> n.duration.type
         'quarter'
         '''
