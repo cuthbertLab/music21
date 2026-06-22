@@ -61,6 +61,7 @@ import math
 import re
 import typing as t
 import unittest
+import warnings
 import weakref
 
 from music21.common.numberTools import opFrac
@@ -69,6 +70,7 @@ from music21.common.types import OffsetQL
 from music21 import articulations
 from music21 import bar
 from music21 import base
+from music21 import beam  # cast only, can use 'beam' if it ever becomes circular.
 from music21 import chord
 from music21 import clef
 from music21 import common
@@ -1310,15 +1312,15 @@ class HumdrumSpine(prebase.ProtoM21Object):
         '''
         Extract duration characters from a token, returning what is left.
 
-        >>> humdrum.KernSpine.extractDuration('2cc.')
+        >>> humdrum.spineParser.KernSpine.extractDuration('2cc.')
         ('2.', 'cc')
 
         available on all Humdrum spines, since they might need duration
         information from other spines.
 
-        >>> humdrum.HumdrumSpine.extractDuration('3%2D')
+        >>> humdrum.spineParser.HumdrumSpine.extractDuration('3%2D')
         ('3%2', 'D')
-        >>> humdrum.HarmSpine.extractDuration('B#')
+        >>> humdrum.spineParser.HarmSpine.extractDuration('B#')
         ('', 'B#')
 
         For ``**kern``, this routine should be run separately for each component of a chord.
@@ -1333,7 +1335,6 @@ class HumdrumSpine(prebase.ProtoM21Object):
             else:
                 remain.append(c)
         return (''.join(d), ''.join(remain))
-
 
     def parse(self) -> None:
         '''
@@ -1467,13 +1468,19 @@ class KernSpine(HumdrumSpine):
 
     def processChordEvent(self, eventC: str) -> chord.Chord:
         '''
-        Process a single chord event
+        Process a single chord event.
 
         Like processNoteEvent, stores information about current beam and tuplet state.
+
+        The same duration object is normally used for each member of the chord
+        whether they write their duration out ('8C 8E 8G') or others omit them
+        ('8C E G' - not in spec, but often seen).  Humdrum spec does not technically
+        allow different durations ('8C 8E 4G'), but it is seen (Bach) so we support it.
         '''
         # multipleNotes
         notesToProcess = eventC.split()
         chordNotes: list[note.Note] = []
+
         # A note after the first that omits a duration, or just repeats the first
         # note's, shares its Duration object.  A note with a genuinely different
         # duration (the held `2g` in `4G 4e 2g`) keeps its own.
@@ -1482,17 +1489,24 @@ class KernSpine(HumdrumSpine):
         for noteToProcess in notesToProcess:
             durationChars, bareContents = self.extractDuration(noteToProcess)
             if firstDuration is not None and durationChars in ('', firstDurationChars):
-                thisNote = hdStringToNote(bareContents, firstDuration)
+                thisNote = hdStringToNote(bareContents, overrideDuration=firstDuration)
             else:
                 thisNote = hdStringToNote(noteToProcess)
                 if firstDuration is None:
                     firstDuration = thisNote.duration
                     firstDurationChars = durationChars
-            if isinstance(thisNote, note.Note):
+            if isinstance(thisNote, note.Note):  # perhaps unpitched maybe also?
                 chordNotes.append(thisNote)
-        eventChord = chord.Chord(chordNotes, beams=chordNotes[-1].beams,
-                                 duration=firstDuration)
+            # else -- error?
 
+        if not chordNotes:  # pragma: no cover
+            # for typing.
+            raise HumdrumException(
+                'Do not call processChordEvent unless there is at least one note'
+            )
+        eventChord = chord.Chord(chordNotes,
+                                 beams=chordNotes[-1].beams,
+                                 duration=firstDuration)
         self.setBeamsForNote(eventChord)
         self.setTupletTypeForNote(eventChord)
         self.lastNote = eventChord
@@ -1506,17 +1520,18 @@ class KernSpine(HumdrumSpine):
 
         Safe enough to use on elements such as rests that don't have beam info.
         '''
-        if not hasattr(n, 'beams'):
+        if not isinstance(n, note.NotRest):
             return None
 
-        if self.currentBeamNumbers != 0 and not n.beams.beamsList:
+        n_beams = t.cast(beam.Beams, n.beams)
+        if self.currentBeamNumbers != 0 and not n_beams.beamsList:
             for unused_counter in range(self.currentBeamNumbers):
-                n.beams.append('continue')
-        elif n.beams.beamsList:
-            if n.beams.beamsList[0].type == 'stop':
+                n_beams.append('continue')
+        elif n_beams.beamsList:
+            if n_beams.beamsList[0].type == 'stop':
                 self.currentBeamNumbers = 0
             else:
-                for thisBeam in n.beams.beamsList:
+                for thisBeam in n_beams.beamsList:
                     if thisBeam.type != 'stop':
                         self.currentBeamNumbers += 1
 
@@ -2282,109 +2297,62 @@ class EventCollection(prebase.ProtoM21Object):
             retEvents.append(self.getSpineOccurring(i))
         return retEvents
 
-
-def hdStringToNote(
-    contents: str,
-    overrideDuration: duration.Duration|None = None,
-) -> note.GeneralNote:
+def hdStringToDuration(contents: str) -> duration.Duration:
     '''
-    returns a :class:`~music21.note.Note` (or Rest or Unpitched, etc.)
-    matching the current SpineEvent.
-    Does not check to see that it is sane or part of a :samp:`**kern` spine, etc.
+    Convert ``contents`` to a :class:`~music21.duration.Duration` object.
 
-    If `contents` has no written duration, the note takes `overrideDuration`
-    when one is given, otherwise a quarter note.  This is used for chords whose
-    notes after the first omit a duration, e.g. the `E` and `G` in `8C E G`.
-    (In practice, all chords with notes of the same duration, such as
-    `16.C 16.E 16.G`, will be parsed as if the subsequent notes omit their
-    durations, e.g. as `16.C E G`, since processChordEvent removes duration
-    markers from the second and succeeding chord pitches whose durations are
-    identical to the first.)
+    >>> d = humdrum.spineParser.hdStringToDuration('32')
+    >>> d
+    <music21.duration.Duration 0.125>
+    >>> d.type
+    '32nd'
 
-    New rhythmic extensions formerly defined in
-    `wiki.humdrum.org/index.php/Rational_rhythms`
-    and now at https://extras.humdrum.org/man/rscale/
-    are fully implemented:
+    Other information such as pitch can be passed here (and in practice is passed here)
+    without affecting parsing, such as the ``C#`` here.
 
-    >>> n = humdrum.spineParser.hdStringToNote('CC3%2')
-    >>> n.duration.quarterLength
-    Fraction(8, 3)
-    >>> n.duration.fullName
-    'Whole Triplet (2 2/3 QL)'
-
-    >>> n = humdrum.spineParser.hdStringToNote('e-00.')
-    >>> n.pitch
-    <music21.pitch.Pitch E-4>
-    >>> n.duration.quarterLength
-    24.0
-    >>> n.duration.fullName
-    'Perfect Longa'
-
-    >>> n = humdrum.spineParser.hdStringToNote('F#000')
-    >>> n.duration.quarterLength
-    32.0
-    >>> n.duration.fullName
-    'Imperfect Maxima'
-
-    Note that the following example is interpreted as one note in the time of a
-    double-dotted quarter not a double-dotted quarter-note triplet.
-
-    I believe that the latter definition, though used in
-    https://kern.humdrum.org/cgi-bin/ksdata?l=musedata/mozart/quartet&file=k421-01.krn&f=kern
-    and the Josquin Research Project [JRP] is incorrect, seeing as it
-    contradicts the specification in
-    https://web.archive.org/web/20100203144730/http://www.music-cog.ohio-state.edu/Humdrum/representations/kern.html#N-Tuplets
-
-    >>> storedFlavors = humdrum.spineParser.flavors['JRP']  #_DOCS_HIDE
-
-    This is the default:
-
-    >>> humdrum.spineParser.flavors['JRP'] = False
-
-    >>> n = humdrum.spineParser.hdStringToNote('6..fff')
-    >>> n.duration.quarterLength
-    Fraction(7, 6)
-
-    >>> n.duration.dots
-    0
-
-    >>> n.duration.tuplets[0].durationNormal.dots
+    >>> d = humdrum.spineParser.hdStringToDuration('8C#..')
+    >>> d.type
+    'eighth'
+    >>> d.dots
     2
 
-    If you want the JRP definition, set humdrum.spineParser.flavors['JRP'] = True
-    before calling converter.parse() or anything like that:
+    Tuplets are represented with the number of them in a whole note, such as 12 for
+    eighth-note triplets:
 
-    >>> humdrum.spineParser.flavors['JRP'] = True
-    >>> n = humdrum.spineParser.hdStringToNote('6..fff')
-    >>> n.duration.quarterLength
-    Fraction(7, 6)
-    >>> n.duration.dots
-    2
-    >>> n.duration.tuplets[0].durationNormal.dots
-    0
+    >>> d = humdrum.spineParser.hdStringToDuration('12')
+    >>> d.fullName
+    'Eighth Triplet (1/3 QL)'
+    >>> d.type
+    'eighth'
+    >>> d.tuplets
+    (<music21.duration.Tuplet 3/2/eighth>,)
 
-    >>> n = humdrum.spineParser.hdStringToNote('gg#q/LL')
-    >>> n.duration
+    Grace notes are represented by ``q``.  A grace note without duration is an eighth note:
+
+    >>> d = humdrum.spineParser.hdStringToDuration('gg#q/LL')
+    >>> d
     <music21.duration.GraceDuration unlinked type:eighth quarterLength:0.0>
-    >>> n.duration.isGrace
+    >>> d.isGrace
     True
 
-    A grace note without duration is an eighth note.  If a duration, like ``16``,
-    is given, that type is preserved in the unlinked GraceDuration.  A single
-    ``q`` is a slashed grace note (acciaccatura):
+    If a duration, like ``16``, is given, that type is preserved in the
+    unlinked GraceDuration.
 
-    >>> n = humdrum.spineParser.hdStringToNote('16ccq')
-    >>> n.duration
+    >>> d = humdrum.spineParser.hdStringToDuration('16ccq')
+    >>> d
     <music21.duration.GraceDuration unlinked type:16th quarterLength:0.0>
-    >>> n.duration.slash
+
+    A single ``q`` is a slashed grace note (acciaccatura):
+
+    >>> d.slash
     True
 
     Two ``q``\\s signify a grace note without a slash (or accented grace note):
 
-    >>> n = humdrum.spineParser.hdStringToNote('16ccqq')
-    >>> n.duration.type
+    >>> d = humdrum.spineParser.hdStringToDuration('16ccqq')
+    >>> d.type
     '16th'
-    >>> n.duration.slash
+    >>> d.slash
     False
 
     .. note::
@@ -2394,14 +2362,235 @@ def hdStringToNote(
         note.  Given no way of distinguishing these interpretations, music21
         will remain with the original version; so ``Q`` and ``qq`` are synonyms.
 
-    * Changed in v11: grace notes keep their written duration, and ``qq`` is
-      parsed as an unslashed grace note.
+    New rhythmic extensions formerly defined in
+    `wiki.humdrum.org/index.php/Rational_rhythms`
+    and now at https://extras.humdrum.org/man/rscale/
+    are fully implemented:
 
-    >>> humdrum.spineParser.flavors['JRP'] = storedFlavors  #_DOCS_HIDE
+    >>> d = humdrum.spineParser.hdStringToDuration('CC3%2')
+    >>> d.quarterLength
+    Fraction(8, 3)
+    >>> d.fullName
+    'Whole Triplet (2 2/3 QL)'
 
+    >>> d = humdrum.spineParser.hdStringToDuration('e-00.')
+    >>> d.quarterLength
+    24.0
+    >>> d.fullName
+    'Perfect Longa'
+
+    >>> d = humdrum.spineParser.hdStringToDuration('F#000')
+    >>> d.quarterLength
+    32.0
+    >>> d.fullName
+    'Imperfect Maxima'
+
+    Note that the following example is interpreted as one note in the time of a
+    double-dotted quarter (not a double-dotted quarter-note triplet).
+
+    >>> stored_JRP_Flavor = humdrum.spineParser.flavors['JRP']  #_DOCS_HIDE
+    >>> humdrum.spineParser.flavors['JRP'] = False  #_DOCS_HIDE
+
+    >>> d = humdrum.spineParser.hdStringToDuration('6..fff')
+    >>> d.quarterLength
+    Fraction(7, 6)
+    >>> d.dots
+    0
+    >>> d.tuplets[0].durationNormal.dots
+    2
+    >>> d.tuplets[0].totalTupletLength()
+    3.5
+
+    The latter definition (a double-dotted quarter-note triplet) though used in
+    https://kern.humdrum.org/cgi-bin/ksdata?l=musedata/mozart/quartet&file=k421-01.krn&f=kern
+    and the Josquin Research Project (JRP) is incorrect, seeing as it
+    contradicts the specification in
+    https://www.humdrum.org/Humdrum/representations/kern.html#N-Tuplets
+    (_"92.." is the correct ``**kern`` encoding for a note whose duration is
+    23 notes in the time of a doubly-dotted quarter._)
+
+    We will call the second interpretation the "JRP Flavor". The default JRP Flavor is False::
+
+    >>> humdrum.spineParser.flavors['JRP']
+    False
+
+    If you want the JRP definition, where dots apply to the note, not tuplet,
+    set humdrum.spineParser.flavors['JRP'] = True before calling converter.parse()
+    or anything other parsing routine like hdStringToDuration:
+
+    >>> humdrum.spineParser.flavors['JRP'] = True
+    >>> d = humdrum.spineParser.hdStringToDuration('6..fff')
+
+    Note that the quarter length of the individual note is the same:
+
+    >>> d.quarterLength
+    Fraction(7, 6)
+
+    But the representation of how many dots are on the note as opposed to
+    the total tuplet duration is quite different.
+
+    >>> d.dots
+    2
+    >>> d.tuplets[0].durationNormal.dots
+    0
+    >>> d.tuplets[0].totalTupletLength()
+    2.0
+
+    >>> humdrum.spineParser.flavors['JRP'] = stored_JRP_Flavor  #_DOCS_HIDE
+
+    If no duration number can be found and this is not a grace note (which gets
+    a default eighth-note duration), then a HumdrumException is raised.
+
+    >>> humdrum.spineParser.hdStringToDuration('nada')
+    Traceback (most recent call last):
+    music21.humdrum.spineParser.HumdrumException: Could not find a duration in 'nada'
+
+    * Changed in v11: Duration extraction moved to hdStringToDuration.
+        Grace notes keep their written duration, and ``qq`` is
+        parsed as an unslashed grace note.
     '''
 
+    # 3.2.7 Duration and
+    # 3.2.8 N-Tuplets
+
+    # Rational durations are rare, and require a '%'; skip the regex without one.
+    foundRational = re.search(r'(\d+)%(\d+)', contents) if '%' in contents else None
+    foundNumber = re.search(r'(\d+)', contents)
+
+    numDots = contents.count('.')
+    hasGrace = 'q' in contents or 'Q' in contents
+
+    d: duration.Duration
+    if foundRational:
+        durationFirst = int(foundRational.group(1))
+        durationSecond = int(foundRational.group(2))
+        d = duration.Duration(
+            quarterLength=opFrac(4 * durationSecond / durationFirst),
+        )
+        # append dots after the quarterLength has been computed.
+        d.dots = numDots
+
+    elif foundNumber:
+        humdrumDurationNumber = int(foundNumber.group(1))
+        d_type: str
+        if humdrumDurationNumber == 0:
+            durationString = foundNumber.group(1)
+            if durationString == '000':
+                # for larger values, see https://extras.humdrum.org/man/rscale/
+                d_type = 'maxima'
+            elif durationString == '00':
+                # for larger values, see https://extras.humdrum.org/man/rscale/
+                d_type = 'longa'
+            else:
+                d_type = 'breve'
+            d = duration.Duration(type=d_type, dots=numDots)
+        elif humdrumDurationNumber in duration.typeFromNumDict:
+            d_type = duration.typeFromNumDict[humdrumDurationNumber]
+            d = duration.Duration(type=d_type, dots=numDots)
+        else:
+            exponents = math.floor(math.log2(humdrumDurationNumber))
+            baseValue = t.cast(int, 2 ** exponents)
+            d_type = duration.typeFromNumDict[baseValue]
+            newTup = duration.Tuplet()
+            newTup.durationActual = duration.durationTupleFromTypeDots(d_type, 0)
+            newTup.durationNormal = newTup.durationActual
+
+            gcd = math.gcd(humdrumDurationNumber, baseValue)
+            newTup.numberNotesActual = humdrumDurationNumber // gcd
+            newTup.numberNotesNormal = baseValue // gcd
+
+            # The Josquin Research Project uses a definition of
+            # Humdrum tuplets that breaks normal usage.
+            JRP = flavors['JRP']
+            if not JRP and numDots:
+                # normal Humdrum way of interpreting dots -- they apply to the tuplet
+                newTup.durationNormal = duration.durationTupleFromTypeDots(d_type, numDots)
+            d = duration.Duration(type=d_type)
+            d.appendTuplet(newTup)
+            if JRP and numDots:
+                d.dots = numDots
+            # call Duration.TupletFixer after to correct this.
+    elif hasGrace:
+        d = duration.Duration(type='eighth')
+    else:
+        raise HumdrumException(f'Could not find a duration in {contents!r}')
+
+    # 3.2.9 Grace Notes and Groupettos
+    # A single `q` is a slashed grace note; `qq` or `Q` is an unslashed grace note.
+    # A grace note keeps its written duration; with none written it defaults to an eighth.
+    if hasGrace:
+        d = d.getGraceDuration(appoggiatura=False)
+        if foundNumber is None:
+            d.type = 'eighth'
+        # != 1: number of q's == 0 (because it's a capital Q) or 2+ (== qq)
+        if contents.count('q') != 1:
+            t.cast(GraceDuration, d).slash = False
+    elif 'P' in contents:
+        d = d.getGraceDuration(appoggiatura=True)
+    elif 'p' in contents:
+        pass  # end appoggiatura duration -- not recorded in music21...
+
+    return d
+
+
+def hdStringToNote(
+    contents: str,
+    *,
+    overrideDuration: duration.Duration|None = None,
+) -> note.GeneralNote:
+    '''
+    returns a :class:`~music21.note.Note` (or Rest or Unpitched, etc.)
+    matching the current SpineEvent.
+
+    Does not check to see that it is sane or part of a :samp:`**kern` spine, etc.
+
+    If `contents` has no written duration, the note should have had `overrideDuration`
+    given, as happens with chord members.
+
+    >>> n = humdrum.spineParser.hdStringToNote('4CC.')
+    >>> n.fullName
+    'C in octave 2 Dotted Quarter Note'
+
+    >>> n = humdrum.spineParser.hdStringToNote('12dd##')
+    >>> n.fullName
+    'D-double-sharp in octave 5 Eighth Triplet (1/3 QL) Note'
+
+    If `overrideDuration` is passed in as a Duration object, that is used no matter what::
+
+    >>> n = humdrum.spineParser.hdStringToNote('12dd##',
+    ...         overrideDuration=duration.Duration('whole'))
+    >>> n.duration
+    <music21.duration.Duration 4.0>
+    >>> n.duration.type
+    'whole'
+
+    The `overrideDuration` is needed if a note is not a grace note. For instance, for
+    chord members after the first one.
+
+    >>> n = humdrum.spineParser.hdStringToNote('BBB--',
+    ...         overrideDuration=duration.Duration('eighth'))
+    >>> n.fullName
+    'B-double-flat in octave 1 Eighth Note'
+
+    Otherwise, it uses a quarter note and gives a warning.  This may become an error in
+    future versions::
+
+    >>> import warnings
+    >>> with warnings.catch_warnings(record=True) as w:
+    ...      n = humdrum.spineParser.hdStringToNote('B-')
+    ...      n.fullName
+    'B-flat in octave 3 Quarter Note'
+    >>> w[0].message
+    UserWarning('Could not find a duration in B-, using quarter note.')
+    '''
     # http://www.lib.virginia.edu/artsandmedia/dmmc/Music/Humdrum/kern_hlp.html#kern
+
+    # Get duration early
+    try:
+        d = overrideDuration or hdStringToDuration(contents)
+    except HumdrumException:
+        d = duration.Duration(1.0)
+        warnings.warn(f'Could not find a duration in {contents}, using quarter note.')
 
     # 3.2.1 Pitches and 3.3 Rests
 
@@ -2410,7 +2599,7 @@ def hdStringToNote(
     # need that search at all.
     thisObject: note.GeneralNote
     if 'r' in contents:
-        thisObject = note.Rest(duration=overrideDuration)
+        thisObject = note.Rest(duration=d)
 
     elif matchedNote := re.search('([a-gA-G]+)', contents):
         kernNoteName = matchedNote.group(1)
@@ -2419,7 +2608,7 @@ def hdStringToNote(
             octave = 3 + len(kernNoteName)
         else:  # below middle C
             octave = 4 - len(kernNoteName)
-        builtNote = note.Note(octave=octave, duration=overrideDuration)
+        builtNote = note.Note(octave=octave, duration=d)
         builtNote.step = step  # type: ignore[assignment]
         thisObject = builtNote
 
@@ -2514,87 +2703,6 @@ def hdStringToNote(
             thisObject.stemDirection = 'up'
         elif '\\' in contents:
             thisObject.stemDirection = 'down'
-
-    # 3.2.7 Duration and
-    # 3.2.8 N-Tuplets
-
-    # Rational durations are rare, and require a '%'; skip the regex without one.
-    foundRational = re.search(r'(\d+)%(\d+)', contents) if '%' in contents else None
-    foundNumber = re.search(r'(\d+)', contents)
-
-    if overrideDuration is not None and foundNumber:
-        # we will be manipulating the duration, so we should give this object
-        # its own duration object (foundRational implies foundNumber, so this
-        # also covers rational durations)
-        thisObject.duration = duration.Duration(1.0)
-
-    if foundRational:
-        durationFirst = int(foundRational.group(1))
-        durationSecond = int(foundRational.group(2))
-        thisObject.duration.quarterLength = opFrac(4 * durationSecond / durationFirst)
-        if '.' in contents:
-            thisObject.duration.dots = contents.count('.')
-
-    elif foundNumber:
-        durationType = int(foundNumber.group(1))
-        if durationType == 0:
-            durationString = foundNumber.group(1)
-            if durationString == '000':
-                # for larger values, see https://extras.humdrum.org/man/rscale/
-                thisObject.duration.type = 'maxima'
-            elif durationString == '00':
-                # for larger values, see https://extras.humdrum.org/man/rscale/
-                thisObject.duration.type = 'longa'
-            else:
-                thisObject.duration.type = 'breve'
-            if '.' in contents:
-                thisObject.duration.dots = contents.count('.')
-        elif durationType in duration.typeFromNumDict:
-            thisObject.duration.type = duration.typeFromNumDict[durationType]
-            if '.' in contents:
-                thisObject.duration.dots = contents.count('.')
-        else:
-            dT = int(durationType) + 0.0
-            (unused_remainder, exponents) = math.modf(math.log2(dT))
-            baseValue = 2 ** exponents
-            thisObject.duration.type = duration.typeFromNumDict[int(baseValue)]
-            newTup = duration.Tuplet()
-            newTup.durationActual = duration.durationTupleFromTypeDots(thisObject.duration.type, 0)
-            newTup.durationNormal = duration.durationTupleFromTypeDots(thisObject.duration.type, 0)
-
-            gcd = math.gcd(int(dT), int(baseValue))
-            newTup.numberNotesActual = int(dT / gcd)
-            newTup.numberNotesNormal = int(float(baseValue) / gcd)
-
-            # The Josquin Research Project uses an incorrect definition of
-            # Humdrum tuplets that breaks normal usage.  TODO: Refactor adding a Flavor = 'JRP'
-            # code that uses this other method.
-            JRP = flavors['JRP']
-            if not JRP and '.' in contents:
-                newTup.durationNormal = duration.durationTupleFromTypeDots(
-                    newTup.durationNormal.type, contents.count('.'))
-
-            thisObject.duration.appendTuplet(newTup)
-            if JRP and '.' in contents:
-                thisObject.duration.dots = contents.count('.')
-            # call Duration.TupletFixer after to correct this.
-
-    # 3.2.9 Grace Notes and Groupettos
-    # A single `q` is a slashed grace note; `qq` or `Q` is an unslashed grace note.
-    # A grace note keeps its written duration; with none written it defaults to an eighth.
-    qCount = contents.count('q')
-    if qCount or 'Q' in contents:
-        thisObject = thisObject.getGrace()
-        if foundNumber is None:
-            thisObject.duration.type = 'eighth'
-        # != 1: number of q's == 0 (because it's a capital Q) or 2+ (== qq)
-        if qCount != 1:
-            graceDuration = t.cast(GraceDuration, thisObject.duration)
-            graceDuration.slash = False
-    elif 'P' in contents:
-        thisObject = thisObject.getGrace(appoggiatura=True)
-    elif 'p' in contents:
-        pass  # end appoggiatura duration -- not needed in music21...
 
     # 3.2.10 Beaming
     if isinstance(thisObject, note.NotRest):
@@ -3048,6 +3156,9 @@ class GlobalReference(base.Music21Object):
 
     def _reprInternal(self) -> str:
         return f'{self.code} {self.value!r}'
+
+
+# -----------------------------------------------------------------------------
 
 
 class Test(unittest.TestCase):

@@ -872,7 +872,7 @@ def durationTupleFromQuarterLength(ql=1.0) -> DurationTuple:
             return DurationTuple('inexpressible', 0, ql)
 
 
-def durationTupleFromTypeDots(durType='quarter', dots=0):
+def durationTupleFromTypeDots(durType: str = 'quarter', dots: int = 0) -> DurationTuple:
     '''
     Returns a DurationTuple (which knows its quarterLength) for
     a given type and dots (no tuplets)
