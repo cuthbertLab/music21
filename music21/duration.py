@@ -1697,7 +1697,7 @@ class Duration(prebase.ProtoM21Object, SlottedObjectMixin):
 
 
     # SPECIAL METHODS #
-    
+
     def __eq__(self, other):
         '''
         Two durations are the same if their type, dots, tuplets, and
