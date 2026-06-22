@@ -10,12 +10,18 @@ from __future__ import annotations
 
 import copy
 import re
-import typing as t
 import unittest
 
 from music21 import exceptions21
 from music21 import pitch
 from music21 import prebase
+
+EXTENDER_SENTINEL: int = -1
+'''
+Sentinel value used in a :class:`~music21.figuredBass.notation.Notation`'s
+``numbers`` and ``origNumbers`` for an extender ("``_``") figure that carries no
+number of its own.
+'''
 
 shorthandNotation: dict[tuple[int|None, ...], tuple[int, ...]] = {
                      (None,): (5, 3),
@@ -210,12 +216,12 @@ class Notation(prebase.ProtoM21Object):
         # Parse notation string
         self.notationColumn: str = notationColumn or ''
         self.figureStrings: list[str] = []
-        # numbers are usually ints, but an extender-only figure stores the
-        # underscore string '_' as its "number" (see _parseNotationColumn), and a
-        # figure with a modifier but no number stores None until longhand expansion.
-        self.origNumbers: tuple[int|str|None, ...] = ()
+        # numbers are usually ints, but an extender-only figure stores
+        # EXTENDER_SENTINEL (see _parseNotationColumn), and a figure with a modifier
+        # but no number stores None until longhand expansion.
+        self.origNumbers: tuple[int|None, ...] = ()
         self.origModStrings: tuple[str|None, ...] = ()
-        self.numbers: tuple[int|str|None, ...] = ()
+        self.numbers: tuple[int|None, ...] = ()
         self.modifierStrings: tuple[str|None, ...] = ()
         self.extenders: list[bool] = []
         self.hasExtenders: bool = False
@@ -287,7 +293,7 @@ class Notation(prebase.ProtoM21Object):
         figures = re.split(delimiter, self.notationColumn)
         patternA1 = '([0-9_]*)'
         patternA2 = '([^0-9_]*)'
-        numbers: list[int|str|None] = []
+        numbers: list[int|None] = []
         modifierStrings: list[str|None] = []
         figureStrings: list[str] = []
 
@@ -303,14 +309,14 @@ class Notation(prebase.ProtoM21Object):
             if not (len(m1) <= 1 or len(m2) <= 1):
                 raise NotationException('Invalid Notation: ' + figure)
 
-            number: int|str|None = None
+            number: int|None = None
             modifierString: str|None = None
             extender = False
             if m1:
                 # if no number is there and only an extender is found.
                 if '_' in m1:
                     self.hasExtenders = True
-                    number = '_'
+                    number = EXTENDER_SENTINEL
                     extender = True
                 else:
                     # is an extender part of the number string?
@@ -354,13 +360,12 @@ class Notation(prebase.ProtoM21Object):
         ('-', '-')
         '''
         oldNumbers = self.numbers
-        newNumbers: tuple[int|str|None, ...] = oldNumbers
+        newNumbers: tuple[int|None, ...] = oldNumbers
         oldModifierStrings = self.modifierStrings
         newModifierStrings: tuple[str|None, ...] = oldModifierStrings
 
         try:
-            shorthandKey = t.cast('tuple[int|None, ...]', oldNumbers)
-            newNumbers = shorthandNotation[shorthandKey]
+            newNumbers = shorthandNotation[oldNumbers]
             modStrings: list[str|None] = []
 
             expandedOldNumbers = tuple(
@@ -504,12 +509,12 @@ class Figure(prebase.ProtoM21Object):
 
     def __init__(
         self,
-        number: int|str|None = 1,
+        number: int|None = 1,
         modifierString: str|None = '',
         *,
         extender: bool = False
     ) -> None:
-        self.number: int|str|None = number
+        self.number: int|None = number
         self.modifierString: str|None = modifierString
         self.modifier: Modifier = Modifier(modifierString)
         # look for extender's underscore
@@ -541,7 +546,7 @@ class Figure(prebase.ProtoM21Object):
             num = 'pure-extender'
             ext = ''
         else:
-            num = str(self.number)
+            num = '_' if self.number == EXTENDER_SENTINEL else str(self.number)
             ext = '(extender)' if self.hasExtender else ''
         mod = repr(self.modifier).replace('music21.figuredBass.notation.', '')
         return f'{num}{ext} {mod}'
@@ -779,7 +784,31 @@ _DOC_ORDER = [Notation, Figure, Modifier]
 
 
 class Test(unittest.TestCase):
-    pass
+    def testExtenderOnlyFigureUsesSentinel(self):
+        # A bare underscore is an extender that carries no number of its own,
+        # so its number is EXTENDER_SENTINEL in both origNumbers and numbers.
+        n = Notation('_')
+        self.assertTrue(n.hasExtenders)
+        self.assertEqual(n.extenders, [True])
+        self.assertEqual(n.origNumbers, (EXTENDER_SENTINEL,))
+        self.assertEqual(n.numbers, (EXTENDER_SENTINEL,))
+
+    def testNumberWithExtenderKeepsItsNumber(self):
+        # A number directly followed by '_' keeps the number and flags the extender;
+        # the sentinel is only for extenders with no number.
+        n = Notation('7_')
+        self.assertTrue(n.hasExtenders)
+        self.assertEqual(n.extenders, [True])
+        self.assertEqual(n.origNumbers, (7,))
+        self.assertEqual(n.numbers, (7, 5, 3))
+        self.assertNotIn(EXTENDER_SENTINEL, n.numbers)
+
+    def testExtenderSentinelRendersAsUnderscore(self):
+        # The sentinel is shown as '_' in repr, never as its raw -1 value.
+        f = Figure(EXTENDER_SENTINEL, extender=True)
+        self.assertEqual(f.number, EXTENDER_SENTINEL)
+        self.assertIn('_(extender)', repr(f))
+        self.assertNotIn('-1', repr(f))
 
 
 if __name__ == '__main__':

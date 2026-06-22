@@ -73,6 +73,12 @@ from music21 import voiceLeading
 # part to the lowest part (the last element is the bass).
 type Possibility = tuple[pitch.Pitch, ...]
 
+POSSIBILITY_REST_PS: float = 0.0
+'''
+Sentinel :attr:`~music21.pitch.Pitch.ps` value marking a rest (or any non-Note)
+in an observed sonority.
+'''
+
 
 # SINGLE POSSIBILITY RULE-CHECKING METHODS
 # ----------------------------------------
