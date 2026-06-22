@@ -119,6 +119,27 @@ class Test(unittest.TestCase):
         self.assertEqual(n.duration.type, 'eighth')
         self.assertTrue(n.duration.slash)
 
+    def testGraceNoteFromProcessNoteEvent(self):
+        ks = KernSpine()
+        ks.setup()
+        # noinspection SpellCheckingInspection
+        a = ks.processNoteEvent('4Cq')
+        self.assertEqual(a.duration.type, 'quarter')
+        self.assertEqual(a.duration.slash, True)
+        # noinspection SpellCheckingInspection
+        a = ks.processNoteEvent('16Cqq')
+        self.assertEqual(a.duration.type, '16th')
+        self.assertEqual(a.duration.slash, False)
+
+    def testChordFromProcessChordEvent(self):
+        ks = KernSpine()
+        ks.setup()
+        c = ks.processChordEvent('8C 8E')
+        self.assertEqual(len(c.notes), 2)
+        self.assertEqual(c.notes[0].duration, c.duration)
+        c = ks.processChordEvent('8C E')
+        self.assertEqual(c.notes[0].duration, c.notes[1].duration)
+
     def testChordNoteInheritsDefaultDuration(self):
         '''
         A note with no written duration takes the given defaultDurationOrNone

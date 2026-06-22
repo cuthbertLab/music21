@@ -99,6 +99,18 @@ if t.TYPE_CHECKING:
 environLocal = environment.Environment('humdrum.spineParser')
 
 flavors = {'JRP': False}
+'''
+Humdrum has developed several "flavors" or local varieties of parsing.
+These are unfortunately not usually indicated in the scores themselves
+(since communities mostly work within their own flavor groups).
+
+Music21 currently supports one flavor type, ``JRP`` for Stanford's
+Josquin Research Project, which interprets dots on tuplets differently
+from other parts of the Humdrum community (in a way that is more typically
+seen in early music).  Switch ``music21.humdrum.flavors['JRP'] = True` to
+get that behavior before parsing.
+'''
+
 
 spinePathIndicators = ['*+', '*-', '*^', '*v', '*x', '*']
 
@@ -115,7 +127,7 @@ class HumdrumDataCollection(prebase.ProtoM21Object):
     .. note:: Most users should not need to be here.  Just run `converter.parse('file.krn')`
         and it will give you a stream.Score instead.
         Intermediate users who want to get into the guts of Humdrum are still
-        probably better off running humdrum.parseFile("filename")
+        probably better off running humdrum.parseFile('filename')
         which returns a humdrum.SpineCollection directly.
 
     A HumdrumDataCollection takes in a mandatory list where each element
@@ -128,10 +140,10 @@ class HumdrumDataCollection(prebase.ProtoM21Object):
     have it as a string.
 
     LIMITATIONS:
-    (1) Spines cannot change definition (\*\*exclusive interpretations) mid-spine.
+    (1) Spines cannot change definition (``**exclusive`` interpretations) mid-spine.
 
-        So if you start off with \*\*kern, the rest of the spine needs to be
-        \*\*kern (actually, the first exclusive interpretation for a spine is
+        So if you start off with ``**kern``, the rest of the spine needs to be
+        ``**kern`` (actually, the first exclusive interpretation for a spine is
         used throughout).
 
         Note that, even though changing exclusive interpretations mid-spine
@@ -140,13 +152,12 @@ class HumdrumDataCollection(prebase.ProtoM21Object):
         definitions mid-spine, so I don't think this limitation is a problem.
         (Craig Stuart Sapp confirmed this to me.)
 
-        The Aarden/Miller Palestrina dataset uses `\*-` followed by `\*\*kern`
+        The Aarden/Miller Palestrina dataset uses ``\*-`` followed by ``**kern``
         at the changes of sections thus some parsing of multiple exclusive
         interpretations in a protospine may be necessary.  But none change definition.
 
     (2) Split spines are assumed to be voices in a single spine staff.
     '''
-
     def __init__(self, dataStream: str|list[str]) -> None:
         # attributes
         self.eventList: list[HumdrumLine] = []
@@ -1056,10 +1067,10 @@ class ProtoSpine(prebase.ProtoM21Object):
 class HumdrumSpine(prebase.ProtoM21Object):
     r'''
     A HumdrumSpine is a representation of a generic HumdrumSpine
-    regardless of \*\*definition after spine path indicators have
+    regardless of ``**definition`` after spine path indicators have
     been simplified.
 
-    A subclass of HumdrumSpine should be defined for each \*\*type. Those
+    A subclass of HumdrumSpine should be defined for each ``**type``. Those
     subclasses cannot redefine `__init__()`
 
     A HumdrumSpine is a collection of events arranged vertically that have a
@@ -1294,6 +1305,36 @@ class HumdrumSpine(prebase.ProtoM21Object):
 
         return streamOut
 
+    @staticmethod
+    def extractDuration(eventC: str) -> tuple[str, str]:
+        '''
+        Extract duration characters from a token, returning what is left.
+
+        >>> humdrum.KernSpine.extractDuration('2cc.')
+        ('2.', 'cc')
+
+        available on all Humdrum spines, since they might need duration
+        information from other spines.
+
+        >>> humdrum.HumdrumSpine.extractDuration('3%2D')
+        ('3%2', 'D')
+        >>> humdrum.HarmSpine.extractDuration('B#')
+        ('', 'B#')
+
+        For ``**kern``, this routine should be run separately for each component of a chord.
+
+        New in v11.
+        '''
+        d = []
+        remain = []
+        for c in eventC:
+            if c in '0123456789.%':
+                d.append(c)
+            else:
+                remain.append(c)
+        return (''.join(d), ''.join(remain))
+
+
     def parse(self) -> None:
         '''
         Dummy method that pushes all these objects to HumdrumSpine.stream
@@ -1328,7 +1369,7 @@ class HumdrumSpine(prebase.ProtoM21Object):
 
 class KernSpine(HumdrumSpine):
     r'''
-    A KernSpine is a type of Humdrum spine with the \*\*kern
+    A KernSpine is a type of Humdrum spine with the ``**kern``
     attribute set and thus events are processed as if they
     are kern notes.
 
@@ -1348,14 +1389,23 @@ class KernSpine(HumdrumSpine):
     currentTupletQL: OffsetQL
     desiredTupletQL: OffsetQL
 
-    def parse(self) -> None:
-        humdrumLineNumbers = self.parentSpineCollection.humdrumLineNumbers
+    def setup(self) -> None:
+        '''
+        Pre-parse setup routines for KernSpine.
+
+        These set defaults for attributes which would normally be defined in __init__
+        if we weren't reclassing spines.
+        '''
         self.lastContainer = hdStringToMeasure('=0')
         self.inTuplet = False
         self.lastNote = None
         self.currentBeamNumbers = 0
         self.currentTupletQL = 0.0
         self.desiredTupletQL = 0.0
+
+    def parse(self) -> None:
+        self.setup()
+        humdrumLineNumbers = self.parentSpineCollection.humdrumLineNumbers
 
         for event in self.eventList:
             # event is a SpineEvent object
@@ -1430,10 +1480,8 @@ class KernSpine(HumdrumSpine):
         firstDuration: duration.Duration|None = None
         firstDurationChars = ''
         for noteToProcess in notesToProcess:
-            durationChars = ''.join(c for c in noteToProcess if c in '0123456789.%')
+            durationChars, bareContents = self.extractDuration(noteToProcess)
             if firstDuration is not None and durationChars in ('', firstDurationChars):
-                # drop the repeated duration so the note reuses firstDuration
-                bareContents = re.sub(r'[0-9.%]', '', noteToProcess)
                 thisNote = hdStringToNote(bareContents, firstDuration)
             else:
                 thisNote = hdStringToNote(noteToProcess)
@@ -1503,7 +1551,7 @@ class KernSpine(HumdrumSpine):
 
 class DynamSpine(HumdrumSpine):
     r'''
-    A DynamSpine is a type of Humdrum spine with the \*\*dynam
+    A DynamSpine is a type of Humdrum spine with the ``**dynam``
     attribute set and thus events are processed as if they
     are dynamics.
     '''
@@ -1552,12 +1600,12 @@ class DynamSpine(HumdrumSpine):
 
 class HarmSpine(HumdrumSpine):
     r'''
-    A HarmSpine is a type of Humdrum spine with the \*\*harm
+    A HarmSpine is a type of Humdrum spine with the ``**harm``
     attribute set and thus events are processed as if they
     are harmonic analysis annotations in the "harm" syntax.
 
     The harm roman numeral annotations are parsed using
-    a superset of the original \*\*harm Humdrum representation, written
+    a superset of the original ``**harm`` Humdrum representation, written
     for python and extending the syntax based on other projects like the
     RomanText and the MuseScore roman numeral notations.
     '''
@@ -1661,7 +1709,7 @@ class SpineEvent(prebase.ProtoM21Object):
 
     def toNote(self, convertString: str|None = None) -> note.GeneralNote:
         r'''
-        parse the object as a \*\*kern note and return a
+        parse the object as a ``**kern`` note and return a
         :class:`~music21.note.Note` object (or Rest, or Chord)
 
         >>> se = humdrum.spineParser.SpineEvent('DD#4')
@@ -1926,7 +1974,7 @@ class SpineCollection(prebase.ProtoM21Object):
         r'''
         Changes the classes of HumdrumSpines to more specific types
         (KernSpine, DynamicSpine)
-        according to their spineType (e.g., \*\*kern, \*\*dynam)
+        according to their spineType (e.g., ``**kern``, ``**dynam``)
         '''
         for thisSpine in self.spines:
             if thisSpine.spineType == 'kern':
@@ -2237,14 +2285,14 @@ class EventCollection(prebase.ProtoM21Object):
 
 def hdStringToNote(
     contents: str,
-    defaultDurationOrNone: duration.Duration|None = None,
+    overrideDuration: duration.Duration|None = None,
 ) -> note.GeneralNote:
     '''
     returns a :class:`~music21.note.Note` (or Rest or Unpitched, etc.)
     matching the current SpineEvent.
     Does not check to see that it is sane or part of a :samp:`**kern` spine, etc.
 
-    If `contents` has no written duration, the note takes `defaultDurationOrNone`
+    If `contents` has no written duration, the note takes `overrideDuration`
     when one is given, otherwise a quarter note.  This is used for chords whose
     notes after the first omit a duration, e.g. the `E` and `G` in `8C E G`.
     (In practice, all chords with notes of the same duration, such as
@@ -2360,13 +2408,9 @@ def hdStringToNote(
     # Detect rests first, because rests can contain manual positioning information
     # (a pitch letter) that the note search would otherwise pick up; only notes
     # need that search at all.
-    #
-    # Build with defaultDurationOrNone (None gives the usual default).  A note
-    # that omits its own duration then shares this exact Duration object rather
-    # than allocating a copy; one that has its own duration replaces it below.
     thisObject: note.GeneralNote
     if 'r' in contents:
-        thisObject = note.Rest(duration=defaultDurationOrNone)
+        thisObject = note.Rest(duration=overrideDuration)
 
     elif matchedNote := re.search('([a-gA-G]+)', contents):
         kernNoteName = matchedNote.group(1)
@@ -2375,7 +2419,7 @@ def hdStringToNote(
             octave = 3 + len(kernNoteName)
         else:  # below middle C
             octave = 4 - len(kernNoteName)
-        builtNote = note.Note(octave=octave, duration=defaultDurationOrNone)
+        builtNote = note.Note(octave=octave, duration=overrideDuration)
         builtNote.step = step  # type: ignore[assignment]
         thisObject = builtNote
 
@@ -2385,9 +2429,9 @@ def hdStringToNote(
     # The count of '#' (or '-') gives the number of sharps (or flats) directly,
     # which is also the Accidental's alteration -- no regex needed.
     if isinstance(thisObject, note.Note):
-        if (sharps := contents.count('#')):
+        if sharps := contents.count('#'):
             thisObject.pitch.accidental = pitch.Accidental(sharps)
-        elif (flats := contents.count('-')):
+        elif flats := contents.count('-'):
             thisObject.pitch.accidental = pitch.Accidental(-flats)
         elif 'n' in contents:
             thisObject.pitch.accidental = pitch.Accidental('n')
@@ -2478,7 +2522,7 @@ def hdStringToNote(
     foundRational = re.search(r'(\d+)%(\d+)', contents) if '%' in contents else None
     foundNumber = re.search(r'(\d+)', contents)
 
-    if defaultDurationOrNone is not None and foundNumber:
+    if overrideDuration is not None and foundNumber:
         # we will be manipulating the duration, so we should give this object
         # its own duration object (foundRational implies foundNumber, so this
         # also covers rational durations)
