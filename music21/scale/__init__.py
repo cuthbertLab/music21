@@ -426,8 +426,9 @@ class AbstractScale(Scale):
 
         # environLocal.printDebug(['intervalList', intervalList,
         #                        'self.octaveDuplicating', self.octaveDuplicating])
-        self._network = intervalNetwork.IntervalNetwork(intervalList,
-                                                    octaveDuplicating=self.octaveDuplicating)
+        self._network = intervalNetwork.IntervalNetwork(
+            intervalList,
+            octaveDuplicating=self.octaveDuplicating)
 
     @staticmethod
     def fixDefaultOctaveForPitchList(pitchList: list[pitch.Pitch]) -> list[pitch.Pitch]:
@@ -517,13 +518,14 @@ class AbstractScale(Scale):
         if self._network is None:
             raise ScaleException('no IntervalNetwork is defined by this "scale".')
 
-        post = self._network.realizePitch(pitchObj,
-                                      stepOfPitch,
-                                      minPitch=minPitch,
-                                      maxPitch=maxPitch,
-                                      alteredDegrees=self._alteredDegrees,
-                                      direction=direction,
-                                      reverse=reverse)
+        post = self._network.realizePitch(
+            pitchObj,
+            stepOfPitch,
+            minPitch=minPitch,
+            maxPitch=maxPitch,
+            alteredDegrees=self._alteredDegrees,
+            direction=direction,
+            reverse=reverse)
         # here, we copy the list of pitches so as not to allow editing of
         # cached pitch values later
         return copy.deepcopy(post)
@@ -542,12 +544,13 @@ class AbstractScale(Scale):
         if self._network is None:
             raise ScaleException('no network is defined.')
 
-        post = self._network.realizeIntervals(stepOfPitch,
-                                          minPitch=minPitch,
-                                          maxPitch=maxPitch,
-                                          alteredDegrees=self._alteredDegrees,
-                                          direction=direction,
-                                          reverse=reverse)
+        post = self._network.realizeIntervals(
+            stepOfPitch,
+            minPitch=minPitch,
+            maxPitch=maxPitch,
+            alteredDegrees=self._alteredDegrees,
+            direction=direction,
+            reverse=reverse)
         # here, we copy the list of pitches so as not to allow editing of
         # cached pitch values later
         return post
@@ -914,9 +917,10 @@ class AbstractOctatonicScale(AbstractScale):
             self.tonicDegree = 1
         else:
             raise ScaleException(f'cannot create a scale of the following mode: {mode}')
-        self._network = intervalNetwork.IntervalNetwork(intervalList,
-                                                    octaveDuplicating=self.octaveDuplicating,
-                                                    pitchSimplification='maxAccidental')
+        self._network = intervalNetwork.IntervalNetwork(
+            intervalList,
+            octaveDuplicating=self.octaveDuplicating,
+            pitchSimplification='maxAccidental')
         # might also set weights for tonic and dominant here
 
 
@@ -940,9 +944,10 @@ class AbstractHarmonicMinorScale(AbstractScale):
         intervalList = ['M2', 'm2', 'M2', 'M2', 'm2', 'M2', 'M2']  # a to A
         self.tonicDegree = 1
         self.dominantDegree = 5
-        self._network = intervalNetwork.IntervalNetwork(intervalList,
-                                                    octaveDuplicating=self.octaveDuplicating,
-                                                    pitchSimplification=None)
+        self._network = intervalNetwork.IntervalNetwork(
+            intervalList,
+            octaveDuplicating=self.octaveDuplicating,
+            pitchSimplification=None)
 
         # raise the seventh in all directions
         # 7 here is scale step/degree, not node id
@@ -998,8 +1003,9 @@ class AbstractCyclicalScale(AbstractScale):
         else:
             modeList = list(mode)
         self.tonicDegree = 1
-        self._network = intervalNetwork.IntervalNetwork(modeList,
-                                                    octaveDuplicating=self.octaveDuplicating)
+        self._network = intervalNetwork.IntervalNetwork(
+            modeList,
+            octaveDuplicating=self.octaveDuplicating)
 
 
 class AbstractOctaveRepeatingScale(AbstractScale):
@@ -1040,8 +1046,9 @@ class AbstractOctaveRepeatingScale(AbstractScale):
             mode.append(iComplement)
 
         self.tonicDegree = 1
-        self._network = intervalNetwork.IntervalNetwork(mode,
-                                                    octaveDuplicating=self.octaveDuplicating)
+        self._network = intervalNetwork.IntervalNetwork(
+            mode,
+            octaveDuplicating=self.octaveDuplicating)
 
 
 class AbstractRagAsawari(AbstractScale):
