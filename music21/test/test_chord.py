@@ -502,27 +502,27 @@ class Test(unittest.TestCase):
         t4 = tie.Tie()
         t5 = tie.Tie()
 
-        c1.setTie(t3, c1.pitches[0])
-        c1.setTie(t4, c1.pitches[1])
-        c1.setTie(t5, c1.pitches[2])
+        c1[0].tie = t3
+        c1[1].tie = t4
+        c1[2].tie = t5
 
-        self.assertEqual(id(c1.getTie(c1.pitches[0])), id(t3))
-        self.assertEqual(id(c1.getTie(c1.pitches[1])), id(t4))
-        self.assertEqual(id(c1.getTie(c1.pitches[2])), id(t5))
+        self.assertEqual(id(c1[0].tie), id(t3))
+        self.assertEqual(id(c1[1].tie), id(t4))
+        self.assertEqual(id(c1[2].tie), id(t5))
 
         s = converter.parse(testPrimitive.chordIndependentTies)
         chords = s.flatten().getElementsByClass(chord.Chord)
         # the middle pitch should have a tie
-        self.assertEqual(chords[0].getTie(pitch.Pitch('a4')).type, 'start')
-        self.assertEqual(chords[0].getTie(pitch.Pitch('c5')), None)
-        self.assertEqual(chords[0].getTie(pitch.Pitch('f4')), None)
+        self.assertEqual(chords[0]['A4'].tie.type, 'start')
+        self.assertEqual(chords[0]['C5'].tie, None)
+        self.assertEqual(chords[0]['F4'].tie, None)
 
-        self.assertEqual(chords[1].getTie(pitch.Pitch('a4')).type, 'continue')
-        self.assertEqual(chords[1].getTie(pitch.Pitch('g5')), None)
+        self.assertEqual(chords[1]['a4'].tie.type, 'continue')
+        self.assertEqual(chords[1]['g5'].tie, None)
 
-        self.assertEqual(chords[2].getTie(pitch.Pitch('a4')).type, 'continue')
-        self.assertEqual(chords[2].getTie(pitch.Pitch('f4')).type, 'start')
-        self.assertEqual(chords[2].getTie(pitch.Pitch('c5')), None)
+        self.assertEqual(chords[2]['a4'].tie.type, 'continue')
+        self.assertEqual(chords[2]['f4'].tie.type, 'start')
+        self.assertEqual(chords[2]['c5'].tie, None)
 
         # s.show()
         GEX = m21ToXml.GeneralObjectExporter()
@@ -543,14 +543,14 @@ class Test(unittest.TestCase):
             tiePos = list(range(i + 1))  # py3 = list
             c = sc.getChord('c4', 'c5', quarterLength=1)
             for pos in tiePos:
-                c.setTie(tie.Tie('start'), c.pitches[pos])
+                c[pos].tie = tie.Tie('start')
             s.append(c)
         # s.show()
 
     def testTiesC(self):
         c2 = Chord(['D4', 'D4'])
         secondD4 = c2.pitches[1]
-        c2.setTie('start', secondD4)
+        c2[secondD4].tie = tie.Tie('start')
         self.assertIsNone(c2._notes[0].tie)
         self.assertEqual(c2._notes[1].tie.type, 'start')
 

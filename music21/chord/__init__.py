@@ -5096,11 +5096,9 @@ class Chord(ChordBase):
         '''
         Return a tuple (immutable) of the notes contained in the chord.
 
-        Generally using .pitches or iterating over the chord is the best way to work with
-        the components of a chord, but in unusual cases, a chord may, for instance, consist
-        of notes with independent durations, volumes, or colors, or, more often, different tie
-        statuses.  `Chord` includes methods such as `.setTie()` for most of these features,
-        but from time to time accessing all the `Note` objects as a tuple can be valuable.
+        Generally you can just iterate over or index the chord to work with
+        the component note.Note object of a chord, but this gives another way to approach
+        the notes as a group, similar to how .pitches returns all the pitches.
 
         >>> c1 = chord.Chord(['c', 'e-', 'g'])
         >>> c1.duration.type = 'quarter'
